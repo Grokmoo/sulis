@@ -3,6 +3,7 @@ extern crate game;
 use std::io;
 use std::error::Error;
 
+use game::config;
 use game::resource;
 use game::state::GameState;
 
@@ -12,7 +13,18 @@ fn main() {
     let stdout = stdout.lock();
     let stdin = stdin.lock();
 
-    let resource_set = resource::ResourceSet::new("data");
+    let config = config::Config::new("config.toml");
+    let config = match config {
+        Ok(c) => c,
+        Err(e) => {
+            eprintln!("{}", e);
+            eprintln!("There was a fatal error loading the configuration from 'config.toml'");
+            eprintln!("Exiting...");
+            ::std::process::exit(1);
+        }
+    };
+
+    let resource_set = resource::ResourceSet::new(&config.resources.directory);
     let resource_set = match resource_set {
         Ok(r) => r,
         Err(e) => {
@@ -34,7 +46,7 @@ fn main() {
         }
     };
     
-    let mut io = game::io::create(game::io::Type::Pancurses, stdin, stdout);
+    let mut io = game::io::create(config.display.adapter, stdin, stdout);
 
     loop {
         io.render_output(&game_state);

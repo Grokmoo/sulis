@@ -1,0 +1,5 @@
+[display]
+adapter = "Pancurses"
+
+[resources]
+directory = "data"

@@ -4,6 +4,9 @@ pub use self::area_state::AreaState;
 mod entity_state;
 pub use self::entity_state::EntityState;
 
+mod actor_state;
+pub use self::actor_state::ActorState;
+
 mod location;
 pub use self::location::Location;
 
@@ -12,7 +15,7 @@ use std::rc::Rc;
 use std::cell::{Ref, RefMut, RefCell};
 
 use resource::ResourceSet;
-use resource::Entity;
+use resource::Actor;
 use config::Config;
 
 pub struct GameState<'a> {
@@ -51,7 +54,7 @@ impl<'a> GameState<'a> {
                                   "Unable to create starting location."));
         }
 
-        let pc = resources.entities.get(&game.pc);
+        let pc = resources.get_actor(&game.pc);
         let pc = match pc {
             Some(a) => a,
             None => {
@@ -61,7 +64,7 @@ impl<'a> GameState<'a> {
             }
         };
         
-        if !area_state.borrow_mut().add_entity(pc, location) {
+        if !area_state.borrow_mut().add_actor(pc, location) {
             eprintln!("Player character starting location must be within area bounds and passable.");
             return Err(Error::new(ErrorKind::InvalidData,
                                   "Unable to add player character to starting area at starting location"));
@@ -130,9 +133,9 @@ impl<'a> GameState<'a> {
         return (*self.pc_mut()).move_to(x, y);
     }
 
-    pub fn add_entity(&mut self, entity: &'a Entity, x: usize,
+    pub fn add_actor(&mut self, actor: Rc<Actor>, x: usize,
                      y: usize) -> bool {
         let location = Location::new(x, y, Rc::clone(&self.area_state));
-        self.area_state_mut().add_entity(entity, location)
+        self.area_state_mut().add_actor(actor, location)
     }
 }

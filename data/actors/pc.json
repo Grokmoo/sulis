@@ -2,5 +2,5 @@
     "id": "pc",
     "player": true,
     "display": "@",
-    "size": 5
+    "default_size": 5
 }

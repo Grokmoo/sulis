@@ -1,6 +1,5 @@
 use resource::Game;
 use resource::Tile;
-use resource::Entity;
 use resource::Actor;
 use resource::ResourceBuilder;
 use resource::area::AreaBuilder;
@@ -15,7 +14,6 @@ pub struct ResourceBuilderSet {
     pub game: Game,
     pub area_builders: HashMap<String, AreaBuilder>,
     pub tiles: HashMap<String, Tile>,
-    pub entities: HashMap<String, Entity>,
     pub actors: HashMap<String, Actor>,
 }
 
@@ -33,7 +31,6 @@ impl ResourceBuilderSet {
         Ok(ResourceBuilderSet {
             game,
             tiles: read_resources(&format!("{}/tiles/", root)),
-            entities: read_resources(&format!("{}/entities/", root)),
             actors: read_resources(&format!("{}/actors/", root)),
             area_builders: read_resources(&format!("{}/areas/", root)),
         })

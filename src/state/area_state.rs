@@ -1,5 +1,5 @@
 use resource::Area;
-use resource::Entity;
+use resource::Actor;
 
 use state::EntityState;
 use state::Location;
@@ -40,7 +40,7 @@ impl<'a> AreaState<'a> {
 
     pub fn is_passable(&self, requester: Ref<EntityState<'a>>,
                        new_x: usize, new_y: usize) -> bool {
-        let size = requester.entity.size;
+        let size = requester.size;
         
         for y in new_y..(new_y + size) {
             for x in new_x..(new_x + size) {
@@ -66,29 +66,28 @@ impl<'a> AreaState<'a> {
         true
     }
 
-    pub(in state) fn add_entity(&mut self, entity: &'a Entity,
+    pub(in state) fn add_actor(&mut self, actor: Rc<Actor>,
                      location: Location<'a>) -> bool {
-        let entity_state = EntityState {
-            entity: entity,
-            location: location,
-        };
 
-        let x = entity_state.location.x;
-        let y = entity_state.location.y;
+        let entity = EntityState::new(actor, location);
 
-        let entity_state = Rc::new(RefCell::new(entity_state));
+        let x = entity.location.x;
+        let y = entity.location.y;
+        let size = entity.size;
 
-        if !self.is_passable(entity_state.borrow(), x, y) {
+        let entity = Rc::new(RefCell::new(entity));
+
+        if !self.is_passable(entity.borrow(), x, y) {
             return false;
         }
 
-        for y in y..(y + entity.size) {
-            for x in x..(x + entity.size) {
-                self.update_display(x, y, entity.display);
+        for y in y..(y + size) {
+            for x in x..(x + size) {
+                self.update_display(x, y, entity.borrow().display());
             }
         }
 
-        self.entities.push(entity_state);
+        self.entities.push(entity);
 
         true
     }
@@ -96,7 +95,7 @@ impl<'a> AreaState<'a> {
     pub(in state) fn update_entity_display(&mut self, entity: &EntityState<'a>, new_x: usize, new_y: usize) {
         let cur_x = entity.location.x;
         let cur_y = entity.location.y;
-        let size = entity.entity.size;
+        let size = entity.size;
 
         for y in cur_y..(cur_y + size) {
             for x in cur_x..(cur_x + size) {
@@ -106,7 +105,7 @@ impl<'a> AreaState<'a> {
 
         for y in new_y..(new_y + size) {
             for x in new_x..(new_x + size) {
-                self.update_display(x, y, entity.entity.display);
+                self.update_display(x, y, entity.display());
             }
         }
     }

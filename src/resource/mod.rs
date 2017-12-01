@@ -13,9 +13,6 @@ pub use self::terrain::Terrain;
 mod tile;
 pub use self::tile::Tile;
 
-mod entity;
-pub use self::entity::Entity;
-
 mod actor;
 pub use self::actor::Actor;
 
@@ -29,9 +26,8 @@ use resource::resource_builder_set::ResourceBuilderSet;
 pub struct ResourceSet {
     pub game: Game,
     pub areas: HashMap<String, Area>,
-    pub tiles: HashMap<String, Rc<Tile>>,
-    pub entities: HashMap<String, Rc<Entity>>,
-    pub actors: HashMap<String, Rc<Actor>>,
+    tiles: HashMap<String, Rc<Tile>>,
+    actors: HashMap<String, Rc<Actor>>,
 }
 
 pub trait ResourceBuilder where Self: Sized {
@@ -59,12 +55,28 @@ impl ResourceSet {
         Ok(ResourceSet {
             tiles: tiles,
             areas: areas,
-            entities: create_rc_hashmap(builder_set.entities),
             actors: create_rc_hashmap(builder_set.actors),
             game: builder_set.game,
         })
     }
 
+    pub fn get_actor(&self, id: &str) -> Option<Rc<Actor>> {
+        let actor = self.actors.get(id);
+
+        match actor {
+            None => None,
+            Some(a) => Some(Rc::clone(a)),
+        }
+    }
+
+    pub fn get_tile(&self, id: &str) -> Option<Rc<Tile>> {
+        let tile = self.tiles.get(id);
+
+        match tile {
+            None => None,
+            Some(t) => Some(Rc::clone(t)),
+        }
+    }
 }
 
 fn create_rc_hashmap<T>(data: HashMap<String, T>) -> HashMap<String, Rc<T>> {

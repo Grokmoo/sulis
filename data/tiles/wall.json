@@ -1,0 +1,6 @@
+{
+    "id": "wall",
+    "name": "Wall",
+    "display": "*",
+    "passable": false
+}

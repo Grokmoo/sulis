@@ -12,8 +12,8 @@ pub use self::terrain::Terrain;
 mod tile;
 pub use self::tile::Tile;
 
-mod actor;
-pub use self::actor::Actor;
+mod entity;
+pub use self::entity::Entity;
 
 use std::collections::HashMap;
 use std::fs::{self, File};
@@ -22,7 +22,7 @@ use std::ffi::OsStr;
 
 use resource::tile::TileBuilder;
 use resource::area::AreaBuilder;
-use resource::actor::ActorBuilder;
+use resource::entity::EntityBuilder;
 
 use std::rc::Rc;
 
@@ -30,7 +30,7 @@ pub struct ResourceSet {
     pub game: Game,
     pub areas: HashMap<String, Area>,
     pub tiles: HashMap<String, Rc<Tile>>,
-    pub actors: HashMap<String, Actor>,
+    pub entities: HashMap<String, Entity>,
 }
 
 impl ResourceSet {
@@ -51,13 +51,13 @@ impl ResourceSet {
             }
         }
 
-        let actors: HashMap<String, Actor> = builder_set.actor_builders.into_iter()
-            .map(|(id, builder)| (id, Actor::new(builder))).collect();
+        let entities: HashMap<String, Entity> = builder_set.entity_builders.into_iter()
+            .map(|(id, builder)| (id, Entity::new(builder))).collect();
 
         Ok(ResourceSet {
             tiles: tiles,
             areas: areas,
-            actors: actors,
+            entities: entities,
             game: builder_set.game,
         })
     }
@@ -74,7 +74,7 @@ pub struct ResourceBuilderSet {
     pub game: Game,
     pub area_builders: HashMap<String, AreaBuilder>,
     pub tile_builders: HashMap<String, TileBuilder>,
-    pub actor_builders: HashMap<String, ActorBuilder>,
+    pub entity_builders: HashMap<String, EntityBuilder>,
 }
 
 impl ResourceBuilderSet {
@@ -92,7 +92,7 @@ impl ResourceBuilderSet {
             game,
             tile_builders: read_resources(&format!("{}/tiles/", root)),
             area_builders: read_resources(&format!("{}/areas/", root)),
-            actor_builders: read_resources(&format!("{}/actors/", root)),
+            entity_builders: read_resources(&format!("{}/entities/", root)),
         })
     }
 

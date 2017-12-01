@@ -1,21 +1,21 @@
 mod area_state;
 pub use self::area_state::AreaState;
 
-mod actor_state;
-pub use self::actor_state::ActorState;
+mod entity_state;
+pub use self::entity_state::EntityState;
 
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 use std::cell::{Ref, RefMut, RefCell};
 
 use resource::ResourceSet;
-use resource::Actor;
+use resource::Entity;
 use config::Config;
 
 pub struct GameState<'a> {
     config: Config,
     area_state: Rc<RefCell<AreaState<'a>>>,
-    pc: Rc<RefCell<ActorState<'a>>>,
+    pc: Rc<RefCell<EntityState<'a>>>,
 }
 
 impl<'a> GameState<'a> {
@@ -48,7 +48,7 @@ impl<'a> GameState<'a> {
                                   "Unable to create starting location."));
         }
 
-        let pc = resources.actors.get(&game.pc);
+        let pc = resources.entities.get(&game.pc);
         let pc = match pc {
             Some(a) => a,
             None => {
@@ -58,13 +58,13 @@ impl<'a> GameState<'a> {
             }
         };
         
-        if !area_state.borrow_mut().add_actor(pc, location) {
+        if !area_state.borrow_mut().add_entity(pc, location) {
             eprintln!("Player character starting location must be within area bounds and passable.");
             return Err(Error::new(ErrorKind::InvalidData,
                                   "Unable to add player character to starting area at starting location"));
         }
         
-        let pc_state = Rc::clone(area_state.borrow().actors.last().unwrap());
+        let pc_state = Rc::clone(area_state.borrow().entities.last().unwrap());
 
         Ok(GameState {
             config: config,
@@ -73,11 +73,11 @@ impl<'a> GameState<'a> {
         })
     }
     
-    pub fn pc(&self) -> Ref<ActorState<'a>> {
+    pub fn pc(&self) -> Ref<EntityState<'a>> {
         self.pc.borrow()
     }
 
-    pub fn pc_mut(&mut self) -> RefMut<ActorState<'a>> {
+    pub fn pc_mut(&mut self) -> RefMut<EntityState<'a>> {
         self.pc.borrow_mut()
     }
 
@@ -109,15 +109,15 @@ impl<'a> GameState<'a> {
 
     pub fn pc_move_by(&mut self, x: i32, y: i32) -> bool {
         let (x, y) = {
-            let actor = self.pc();
-            let x = x + (*actor).location.x as i32;
-            let y = y + (*actor).location.y as i32;
+            let entity = self.pc();
+            let x = x + (*entity).location.x as i32;
+            let y = y + (*entity).location.y as i32;
             
             if x < 0 || y < 0 { return false; }
             let x = x as usize;
             let y = y as usize;
 
-            let area_state = (*actor).location.area_state.borrow();
+            let area_state = (*entity).location.area_state.borrow();
 
             if !area_state.is_passable(self.pc(), x, y) { return false; }
 
@@ -127,10 +127,10 @@ impl<'a> GameState<'a> {
         return (*self.pc_mut()).move_to(x, y);
     }
 
-    pub fn add_actor(&mut self, actor: &'a Actor, x: usize,
+    pub fn add_entity(&mut self, entity: &'a Entity, x: usize,
                      y: usize) -> bool {
         let location = Location::new(x, y, Rc::clone(&self.area_state));
-        self.area_state_mut().add_actor(actor, location)
+        self.area_state_mut().add_entity(entity, location)
     }
 }
 

@@ -1,7 +1,7 @@
 use resource::Area;
-use resource::Actor;
+use resource::Entity;
 
-use state::ActorState;
+use state::EntityState;
 use state::Location;
 
 use std::rc::Rc;
@@ -9,7 +9,7 @@ use std::cell::{Ref, RefCell};
 
 pub struct AreaState<'a> {
     pub area: &'a Area,
-    pub actors: Vec<Rc<RefCell<ActorState<'a>>>>,
+    pub entities: Vec<Rc<RefCell<EntityState<'a>>>>,
 
     display: Vec<char>,
 }
@@ -29,7 +29,7 @@ impl<'a> AreaState<'a> {
 
         AreaState {
             area,
-            actors: Vec::new(),
+            entities: Vec::new(),
             display
         }
     }
@@ -38,9 +38,9 @@ impl<'a> AreaState<'a> {
         *self.display.get(x + y * self.area.width).unwrap()
     }
 
-    pub fn is_passable(&self, requester: Ref<ActorState<'a>>,
+    pub fn is_passable(&self, requester: Ref<EntityState<'a>>,
                        new_x: usize, new_y: usize) -> bool {
-        let size = requester.actor.size;
+        let size = requester.entity.size;
         
         for y in new_y..(new_y + size) {
             for x in new_x..(new_x + size) {
@@ -51,52 +51,52 @@ impl<'a> AreaState<'a> {
         true
     }
 
-    fn point_passable(&self, requester: &Ref<ActorState<'a>>, x: usize, y: usize) -> bool {
+    fn point_passable(&self, requester: &Ref<EntityState<'a>>, x: usize, y: usize) -> bool {
         if !self.area.coords_valid(x, y) { return false; }
 
         if !self.area.terrain.at(x, y).passable { return false; }
        
-        for actor in self.actors.iter() {
-            let actor = actor.borrow();
+        for entity in self.entities.iter() {
+            let entity = entity.borrow();
 
-            if *actor == **requester { continue; }
-            if actor.location.equals(x, y) { return false; }
+            if *entity == **requester { continue; }
+            if entity.location.equals(x, y) { return false; }
         }
 
         true
     }
 
-    pub(in state) fn add_actor(&mut self, actor: &'a Actor,
+    pub(in state) fn add_entity(&mut self, entity: &'a Entity,
                      location: Location<'a>) -> bool {
-        let actor_state = ActorState {
-            actor: actor,
+        let entity_state = EntityState {
+            entity: entity,
             location: location,
         };
 
-        let x = actor_state.location.x;
-        let y = actor_state.location.y;
+        let x = entity_state.location.x;
+        let y = entity_state.location.y;
 
-        let actor_state = Rc::new(RefCell::new(actor_state));
+        let entity_state = Rc::new(RefCell::new(entity_state));
 
-        if !self.is_passable(actor_state.borrow(), x, y) {
+        if !self.is_passable(entity_state.borrow(), x, y) {
             return false;
         }
 
-        for y in y..(y + actor.size) {
-            for x in x..(x + actor.size) {
-                self.update_display(x, y, actor.display);
+        for y in y..(y + entity.size) {
+            for x in x..(x + entity.size) {
+                self.update_display(x, y, entity.display);
             }
         }
 
-        self.actors.push(actor_state);
+        self.entities.push(entity_state);
 
         true
     }
 
-    pub(in state) fn update_actor_display(&mut self, actor: &ActorState<'a>, new_x: usize, new_y: usize) {
-        let cur_x = actor.location.x;
-        let cur_y = actor.location.y;
-        let size = actor.actor.size;
+    pub(in state) fn update_entity_display(&mut self, entity: &EntityState<'a>, new_x: usize, new_y: usize) {
+        let cur_x = entity.location.x;
+        let cur_y = entity.location.y;
+        let size = entity.entity.size;
 
         for y in cur_y..(cur_y + size) {
             for x in cur_x..(cur_x + size) {
@@ -106,7 +106,7 @@ impl<'a> AreaState<'a> {
 
         for y in new_y..(new_y + size) {
             for x in new_x..(new_x + size) {
-                self.update_display(x, y, actor.actor.display);
+                self.update_display(x, y, entity.entity.display);
             }
         }
     }

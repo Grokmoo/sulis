@@ -5,9 +5,7 @@ use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 
 pub fn generate_area(tiles: &HashMap<String, Rc<Tile>>,
-                     width: usize, height: usize) -> Result<Vec<Vec<Option<Rc<Tile>>>>, Error> {
-
-    let mut terrain: Vec<Vec<Option<Rc<Tile>>>> = vec![vec![None;width];height];
+                     width: usize, height: usize) -> Result<Vec<Rc<Tile>>, Error> {
 
     let (passable_tiles, impassable_tiles):
         (Vec<Rc<Tile>>, Vec<Rc<Tile>>) = tiles.values().
@@ -23,29 +21,26 @@ pub fn generate_area(tiles: &HashMap<String, Rc<Tile>>,
                               "Found no impassable tiles to generate terrain."))
     }
 
-    // set passable for all tiles
-    for y in 0..height {
-        for x in 0..width {
-            let cell = terrain.get_mut(y).unwrap().get_mut(x).unwrap();
-            *cell = Some(Rc::clone(passable_tiles.first().unwrap()));
-        }
-    }
+    // set up terrain array as passable
+    let mut terrain: Vec<Rc<Tile>> =
+        vec![Rc::clone(passable_tiles.first().unwrap());width * height];
 
-    // impassable generate borders
+    // generate impassable borders
+    let impass = impassable_tiles.first().unwrap();
     for x in 0..width {
-        { let cell = terrain.get_mut(0).unwrap().get_mut(x).unwrap();
-        *cell = Some(Rc::clone(impassable_tiles.first().unwrap())); }
+        { let cell = terrain.get_mut(x + 0 * width).unwrap();
+        *cell = Rc::clone(impass); }
 
-        let cell = terrain.get_mut(height - 1).unwrap().get_mut(x).unwrap();
-        *cell = Some(Rc::clone(impassable_tiles.first().unwrap()));
+        let cell = terrain.get_mut(x + (height - 1) * width).unwrap();
+        *cell = Rc::clone(impass);
     }
 
     for y in 0..height {
-        { let cell = terrain.get_mut(y).unwrap().get_mut(0).unwrap();
-        *cell = Some(Rc::clone(impassable_tiles.first().unwrap())); }
+        { let cell = terrain.get_mut(0 + y * width).unwrap();
+        *cell = Rc::clone(impass); }
 
-        let cell = terrain.get_mut(y).unwrap().get_mut(width - 1).unwrap();
-        *cell = Some(Rc::clone(impassable_tiles.first().unwrap()));
+        let cell = terrain.get_mut(width - 1 + y * width).unwrap();
+        *cell = Rc::clone(impass);
     }
 
     Ok(terrain)

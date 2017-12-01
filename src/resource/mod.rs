@@ -6,6 +6,9 @@ pub use self::game::Game;
 mod area;
 pub use self::area::Area;
 
+mod terrain;
+pub use self::terrain::Terrain;
+
 mod tile;
 pub use self::tile::Tile;
 
@@ -42,8 +45,9 @@ impl ResourceSet {
         for (id, area_builder) in builder_set.area_builders {
             let area = Area::new(area_builder, &tiles);
 
-            if let Ok(a) = area {
-                areas.insert(id, a);
+            match area {
+                Ok(a) => { areas.insert(id, a); }
+                Err(e) => { eprintln!("{}", e); }
             }
         }
 

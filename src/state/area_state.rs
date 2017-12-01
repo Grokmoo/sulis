@@ -11,7 +11,7 @@ pub struct AreaState<'a> {
     pub area: &'a Area,
     pub actors: Vec<Rc<RefCell<ActorState<'a>>>>,
 
-    display: Vec<Vec<char>>,
+    display: Vec<char>,
 }
 
 impl<'a> PartialEq for AreaState<'a> {
@@ -22,12 +22,9 @@ impl<'a> PartialEq for AreaState<'a> {
 
 impl<'a> AreaState<'a> {
     pub fn new(area: &'a Area) -> AreaState<'a> {
-        let mut display = vec![vec![' ';area.width as usize];area.height as usize];
-        for y in 0..area.height {
-            for x in 0..area.width {
-                let cell = display.get_mut(y).unwrap().get_mut(x).unwrap();
-                *cell = area.terrain_display_at(x, y);
-            }
+        let mut display = vec![' ';area.width * area.height];
+        for (index, element) in display.iter_mut().enumerate() {
+            *element = area.terrain.display(index);
         }
 
         AreaState {
@@ -38,7 +35,7 @@ impl<'a> AreaState<'a> {
     }
 
     pub fn get_display(&self, x: usize, y: usize) -> char {
-        *self.display.get(y).unwrap().get(x).unwrap()
+        *self.display.get(x + y * self.area.width).unwrap()
     }
 
     pub fn is_passable(&self, requester: Ref<ActorState<'a>>,
@@ -55,11 +52,9 @@ impl<'a> AreaState<'a> {
     }
 
     fn point_passable(&self, requester: &Ref<ActorState<'a>>, x: usize, y: usize) -> bool {
-        match self.area.terrain_at(x, y) {
-            Some(ref tile) => {
-                if !tile.passable { return false; }
-            }, None => return false
-        };
+        if !self.area.coords_valid(x, y) { return false; }
+
+        if !self.area.terrain.at(x, y).passable { return false; }
        
         for actor in self.actors.iter() {
             let actor = actor.borrow();
@@ -89,8 +84,7 @@ impl<'a> AreaState<'a> {
 
         for y in y..(y + actor.size) {
             for x in x..(x + actor.size) {
-                let cell = self.display.get_mut(y).unwrap().get_mut(x).unwrap();
-                *cell = actor.display;
+                self.update_display(x, y, actor.display);
             }
         }
 
@@ -106,16 +100,18 @@ impl<'a> AreaState<'a> {
 
         for y in cur_y..(cur_y + size) {
             for x in cur_x..(cur_x + size) {
-                let cell = self.display.get_mut(y).unwrap().get_mut(x).unwrap();
-                *cell = self.area.terrain_display_at(x, y);
+                self.update_display(x, y, self.area.terrain.display_at(x, y));
             }
         }
 
         for y in new_y..(new_y + size) {
             for x in new_x..(new_x + size) {
-                let cell = self.display.get_mut(y).unwrap().get_mut(x).unwrap();
-                *cell = actor.actor.display;
+                self.update_display(x, y, actor.actor.display);
             }
         }
+    }
+
+    fn update_display(&mut self, x: usize, y: usize, c: char) {
+        *self.display.get_mut(x + y * self.area.width).unwrap() = c;
     }
 }

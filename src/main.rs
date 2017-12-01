@@ -34,7 +34,7 @@ fn main() {
         }
     };
     
-    let mut io = game::io::create(game::io::Type::Terminal, stdin, stdout);
+    let mut io = game::io::create(game::io::Type::Termion, stdin, stdout);
 
     loop {
         io.process_input(&mut game_state);

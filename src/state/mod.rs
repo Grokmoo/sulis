@@ -10,14 +10,16 @@ use std::cell::{Ref, RefMut, RefCell};
 
 use resource::ResourceSet;
 use resource::Actor;
+use config::Config;
 
 pub struct GameState<'a> {
+    config: Config,
     area_state: Rc<RefCell<AreaState<'a>>>,
     pc: Rc<RefCell<ActorState<'a>>>,
 }
 
 impl<'a> GameState<'a> {
-    pub fn new(resources: &'a ResourceSet) -> Result<GameState<'a>, Error> {
+    pub fn new(config: Config, resources: &'a ResourceSet) -> Result<GameState<'a>, Error> {
         let game = &resources.game;
 
         let area = resources.areas.get(&game.starting_area);
@@ -65,24 +67,12 @@ impl<'a> GameState<'a> {
         let pc_state = Rc::clone(area_state.borrow().actors.last().unwrap());
 
         Ok(GameState {
+            config: config,
             area_state: area_state,
             pc: pc_state,
         })
     }
     
-    //pub fn new(area: &'a Area, pc: &'a Actor, pc_x: usize, pc_y: usize) -> GameState<'a> {
-    //    let area_state = Rc::new(RefCell::new(AreaState::new(area)));
-    //    let location = Location::new(pc_x, pc_y, Rc::clone(&area_state));
-    //    
-    //    area_state.borrow_mut().add_actor(pc, location);
-    //    let pc = Rc::clone(area_state.borrow().actors.last().unwrap());
-    //    
-    //    GameState {
-    //        area_state: area_state,
-    //        pc: pc, 
-    //    }
-    //}
-
     pub fn pc(&self) -> Ref<ActorState<'a>> {
         self.pc.borrow()
     }
@@ -97,6 +87,24 @@ impl<'a> GameState<'a> {
 
     pub fn area_state_mut(&mut self) -> RefMut<AreaState<'a>> {
         self.area_state.borrow_mut()
+    }
+
+    pub fn handle_input(&mut self, c: char) {
+        let action = {
+            let action = self.config.get_input_action(c);
+
+            if let None = action { return; }
+
+            *action.unwrap()
+        };
+
+        use config::InputAction::*;
+        match action {
+            MoveUp => self.pc_move_by(0, -1),
+            MoveDown => self.pc_move_by(0, 1),
+            MoveRight => self.pc_move_by(-1, 0),
+            MoveLeft => self.pc_move_by(1, 0),
+        };
     }
 
     pub fn pc_move_by(&mut self, x: i32, y: i32) -> bool {

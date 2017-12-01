@@ -30,11 +30,8 @@ impl<'a> IO for Terminal<'a> {
         let b = self.stdin.next().unwrap().unwrap();
         use termion::event::Key::*;
         match b {
-            Char('w') => state.pc_move_by(0, -1),
-            Char('a') => state.pc_move_by(-1, 0),
-            Char('s') => state.pc_move_by(0, 1),
-            Char('d') => state.pc_move_by(1, 0),
-            _ => false ,
+            Char(c) => state.handle_input(c),
+            _ => (),
         };
     }
 

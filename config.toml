@@ -3,3 +3,10 @@ adapter = "Pancurses"
 
 [resources]
 directory = "data"
+
+[input]
+[input.keybindings]
+"w" = "MoveUp"
+"a" = "MoveRight"
+"s" = "MoveDown"
+"d" = "MoveLeft"

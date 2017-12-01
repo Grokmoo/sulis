@@ -35,7 +35,9 @@ fn main() {
         }
     };
 
-    let game_state = GameState::new(&resource_set);
+    let mut io = game::io::create(config.display.adapter, stdin, stdout);
+    
+    let game_state = GameState::new(config, &resource_set);
     let mut game_state = match game_state {
         Ok(s) => s,
         Err(e) => {
@@ -45,8 +47,6 @@ fn main() {
             ::std::process::exit(1);
         }
     };
-    
-    let mut io = game::io::create(config.display.adapter, stdin, stdout);
 
     loop {
         io.render_output(&game_state);

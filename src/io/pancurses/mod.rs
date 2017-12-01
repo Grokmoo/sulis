@@ -26,13 +26,7 @@ impl IO for Terminal {
     fn process_input(&mut self, state: &mut GameState) {
         match self.window.getch() {
             Some(Input::Character(c)) => {
-                match c {
-                    'w' => state.pc_move_by(0, -1),
-                    'a' => state.pc_move_by(-1, 0),
-                    's' => state.pc_move_by(0, 1),
-                    'd' => state.pc_move_by(1, 0),
-                    _ => false,
-                };
+                state.handle_input(c);
             }
             Some(input) => {
                 self.window.addstr(&format!("{:?}", input));

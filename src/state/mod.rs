@@ -4,6 +4,9 @@ pub use self::area_state::AreaState;
 mod entity_state;
 pub use self::entity_state::EntityState;
 
+mod location;
+pub use self::location::Location;
+
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 use std::cell::{Ref, RefMut, RefCell};
@@ -131,41 +134,5 @@ impl<'a> GameState<'a> {
                      y: usize) -> bool {
         let location = Location::new(x, y, Rc::clone(&self.area_state));
         self.area_state_mut().add_entity(entity, location)
-    }
-}
-
-struct Location<'a> {
-    x: usize,
-    y: usize,
-    area_state: Rc<RefCell<AreaState<'a>>>
-}
-
-impl<'a> PartialEq for Location<'a> {
-    fn eq(&self, other: &Location<'a>) -> bool {
-        if self.x != other.x || self.y != other.y { return false; }
-
-        if &self.area_state != &other.area_state { return false; }
-
-        true
-    }
-}
-
-impl<'a> Location<'a> {
-    pub fn new(x: usize, y: usize, area_state: Rc<RefCell<AreaState<'a>>>) -> Location<'a> {
-        Location { x, y, area_state }
-    }
-
-    pub fn equals(&self, x: usize, y: usize) -> bool {
-        return self.x == x && self.y == y
-    }
-
-    pub fn move_to(&mut self, x: usize, y: usize) {
-        self.x = x;
-        self.y = y;
-    }
-
-    fn coords_valid(&self, x: usize, y: usize) -> bool{
-        if !self.area_state.borrow().area.coords_valid(x, y) { return false; }
-        true
     }
 }

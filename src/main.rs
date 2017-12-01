@@ -34,10 +34,10 @@ fn main() {
         }
     };
     
-    let mut io = game::io::create(game::io::Type::Termion, stdin, stdout);
+    let mut io = game::io::create(game::io::Type::Pancurses, stdin, stdout);
 
     loop {
-        io.process_input(&mut game_state);
         io.render_output(&game_state);
+        io.process_input(&mut game_state);
     }
 }

@@ -8,6 +8,7 @@ extern crate serde_derive;
 
 // terminal display library
 extern crate termion;
+extern crate pancurses;
 
 pub mod resource;
 

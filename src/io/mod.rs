@@ -1,11 +1,13 @@
 mod termion;
 
+mod pancurses;
+
 use std::io::{StdinLock, StdoutLock};
 
 use state::GameState;
 
 pub enum Type {
-    Termion,
+    Termion, Pancurses
 }
 
 pub trait IO {
@@ -18,8 +20,10 @@ pub fn create<'a>(io_type: Type, stdin: StdinLock<'a>,
                   stdout: StdoutLock<'a>) -> Box<IO + 'a> {
     match io_type {
         Type::Termion => {
-            let term = termion::Terminal::new(stdin, stdout);
-            Box::new(term)
+            Box::new(termion::Terminal::new(stdin, stdout))
+        },
+        Type::Pancurses => {
+            Box::new(pancurses::Terminal::new())
         }
     }
 }

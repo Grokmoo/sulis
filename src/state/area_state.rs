@@ -40,15 +40,7 @@ impl<'a> AreaState<'a> {
 
     pub fn is_passable(&self, requester: Ref<EntityState<'a>>,
                        new_x: usize, new_y: usize) -> bool {
-        let size = requester.size;
-        
-        for y in new_y..(new_y + size) {
-            for x in new_x..(new_x + size) {
-                if !self.point_passable(&requester, x, y) { return false; }
-            }
-        }
-    
-        true
+        requester.points(new_x, new_y).all(|p| self.point_passable(&requester, p.x, p.y))
     }
 
     fn point_passable(&self, requester: &Ref<EntityState<'a>>, x: usize, y: usize) -> bool {
@@ -73,7 +65,6 @@ impl<'a> AreaState<'a> {
 
         let x = entity.location.x;
         let y = entity.location.y;
-        let size = entity.size;
 
         let entity = Rc::new(RefCell::new(entity));
 
@@ -81,11 +72,8 @@ impl<'a> AreaState<'a> {
             return false;
         }
 
-        for y in y..(y + size) {
-            for x in x..(x + size) {
-                self.update_display(x, y, entity.borrow().display());
-            }
-        }
+        entity.borrow().points(x, y).
+            for_each(|p| self.update_display(p.x, p.y, entity.borrow().display()));
 
         self.entities.push(entity);
 
@@ -95,19 +83,12 @@ impl<'a> AreaState<'a> {
     pub(in state) fn update_entity_display(&mut self, entity: &EntityState<'a>, new_x: usize, new_y: usize) {
         let cur_x = entity.location.x;
         let cur_y = entity.location.y;
-        let size = entity.size;
 
-        for y in cur_y..(cur_y + size) {
-            for x in cur_x..(cur_x + size) {
-                self.update_display(x, y, self.area.terrain.display_at(x, y));
-            }
-        }
+        entity.points(cur_x, cur_y).
+            for_each(|p| self.update_display(p.x, p.y, self.area.terrain.display_at(p.x, p.y)));
 
-        for y in new_y..(new_y + size) {
-            for x in new_x..(new_x + size) {
-                self.update_display(x, y, entity.display());
-            }
-        }
+        entity.points(new_x, new_y).
+            for_each(|p| self.update_display(p.x, p.y, entity.display()));
     }
 
     fn update_display(&mut self, x: usize, y: usize, c: char) {

@@ -1,6 +1,7 @@
+use resource::size::SizeBuilder;
 use resource::Game;
 use resource::Tile;
-use resource::Actor;
+use resource::ActorBuilder;
 use resource::ResourceBuilder;
 use resource::area::AreaBuilder;
 
@@ -12,9 +13,10 @@ use std::ffi::OsStr;
 #[derive(Debug)]
 pub struct ResourceBuilderSet {
     pub game: Game,
+    pub size_builders: HashMap<String, SizeBuilder>,
     pub area_builders: HashMap<String, AreaBuilder>,
     pub tiles: HashMap<String, Tile>,
-    pub actors: HashMap<String, Actor>,
+    pub actor_builders: HashMap<String, ActorBuilder>,
 }
 
 impl ResourceBuilderSet {
@@ -30,8 +32,9 @@ impl ResourceBuilderSet {
 
         Ok(ResourceBuilderSet {
             game,
+            size_builders: read_resources(&format!("{}/sizes/", root)),
             tiles: read_resources(&format!("{}/tiles/", root)),
-            actors: read_resources(&format!("{}/actors/", root)),
+            actor_builders: read_resources(&format!("{}/actors/", root)),
             area_builders: read_resources(&format!("{}/areas/", root)),
         })
     }
@@ -104,7 +107,7 @@ fn read_resources<T: ResourceBuilder>(dir: &str) -> HashMap<String, T> {
 
             let id = resource.owned_id();
             if resources.contains_key(&id) {
-                eprintln!("Error: duplicate resource key: {}", id);
+                eprintln!("Error: duplicate resource key: {} in {}", id, dir);
                 continue;
             }
 

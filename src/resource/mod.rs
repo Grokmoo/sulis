@@ -16,10 +16,19 @@ pub use self::tile::Tile;
 mod actor;
 pub use self::actor::Actor;
 
+mod size;
+pub use self::size::Size;
+pub use self::size::SizeIterator;
+
+mod point;
+pub use self::point::Point;
+
 use std::collections::HashMap;
+use std::hash::Hash;
 use std::rc::Rc;
 use std::io::Error;
 
+use resource::actor::ActorBuilder;
 use resource::area::AreaBuilder;
 use resource::resource_builder_set::ResourceBuilderSet;
 
@@ -28,6 +37,7 @@ pub struct ResourceSet {
     pub areas: HashMap<String, Area>,
     tiles: HashMap<String, Rc<Tile>>,
     actors: HashMap<String, Rc<Actor>>,
+    sizes: HashMap<usize, Rc<Size>>,
 }
 
 pub trait ResourceBuilder where Self: Sized {
@@ -39,6 +49,9 @@ pub trait ResourceBuilder where Self: Sized {
 impl ResourceSet {
     pub fn new(root_directory: &str) -> Result<ResourceSet, Error> {
         let builder_set = ResourceBuilderSet::new(root_directory)?;
+
+        let sizes: HashMap<usize, Rc<Size>> = builder_set.size_builders.into_iter().
+            map(|(_id_str, size)| (size.size, Rc::new(Size::new(size)))).collect();
 
         let tiles = create_rc_hashmap(builder_set.tiles);
 
@@ -52,11 +65,22 @@ impl ResourceSet {
             }
         }
 
+        let mut actors: HashMap<String, Rc<Actor>> = HashMap::new();
+        for (id, builder) in builder_set.actor_builders.into_iter() {
+            let actor = Actor::new(builder, &sizes);
+
+            match actor {
+                Ok(a) => { actors.insert(id, Rc::new(a)); }
+                Err(e) => { eprintln!("{}", e); }
+            }
+        }
+
         Ok(ResourceSet {
             tiles: tiles,
             areas: areas,
-            actors: create_rc_hashmap(builder_set.actors),
+            actors: actors,
             game: builder_set.game,
+            sizes: sizes,
         })
     }
 
@@ -77,8 +101,17 @@ impl ResourceSet {
             Some(t) => Some(Rc::clone(t)),
         }
     }
+
+    pub fn get_size(&self, size: usize) -> Option<Rc<Size>> {
+        let size = self.sizes.get(&size);
+
+        match size {
+            None => None,
+            Some(s) => Some(Rc::clone(s)),
+        }
+    }
 }
 
-fn create_rc_hashmap<T>(data: HashMap<String, T>) -> HashMap<String, Rc<T>> {
+fn create_rc_hashmap<K: Eq + Hash, V>(data: HashMap<K, V>) -> HashMap<K, Rc<V>> {
     data.into_iter().map(|(id, entry)| (id, Rc::new(entry))).collect()
 }

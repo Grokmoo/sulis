@@ -8,7 +8,7 @@ use std::rc::Rc;
 use std::cell::{Ref, RefCell};
 
 pub struct AreaState<'a> {
-    pub area: &'a Area,
+    pub area: Rc<Area>,
     pub entities: Vec<Rc<RefCell<EntityState<'a>>>>,
 
     display: Vec<char>,
@@ -21,7 +21,7 @@ impl<'a> PartialEq for AreaState<'a> {
 }
 
 impl<'a> AreaState<'a> {
-    pub fn new(area: &'a Area) -> AreaState<'a> {
+    pub fn new(area: Rc<Area>) -> AreaState<'a> {
         let mut display = vec![' ';area.width * area.height];
         for (index, element) in display.iter_mut().enumerate() {
             *element = area.terrain.display(index);
@@ -46,7 +46,7 @@ impl<'a> AreaState<'a> {
     fn point_passable(&self, requester: &Ref<EntityState<'a>>, x: usize, y: usize) -> bool {
         if !self.area.coords_valid(x, y) { return false; }
 
-        if !self.area.terrain.at(x, y).passable { return false; }
+        if !self.area.terrain.is_passable(x, y) { return false; }
        
         for entity in self.entities.iter() {
             let entity = entity.borrow();
@@ -84,8 +84,10 @@ impl<'a> AreaState<'a> {
         let cur_x = entity.location.x;
         let cur_y = entity.location.y;
 
-        entity.points(cur_x, cur_y).
-            for_each(|p| self.update_display(p.x, p.y, self.area.terrain.display_at(p.x, p.y)));
+        for p in entity.points(cur_x, cur_y) {
+            let c = self.area.terrain.display_at(p.x, p.y);
+            self.update_display(p.x, p.y, c);
+        }
 
         entity.points(new_x, new_y).
             for_each(|p| self.update_display(p.x, p.y, entity.display()));

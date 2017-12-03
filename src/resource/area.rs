@@ -29,6 +29,7 @@ impl Area {
         let terrain = match terrain {
             Ok(l) => l,
             Err(e) => {
+                eprintln!("Unable to generate terrain for area'{}'", builder.id);
                 return Err(e);
             }
         };
@@ -77,7 +78,7 @@ impl ResourceBuilder for AreaBuilder {
 
                 let row = terrain.get_mut(y).unwrap();
                 let cell = row.get_mut(x).unwrap();
-
+// verify tile coords are within area bounds here
                 if *cell > 0 {
                     let msg = format!("Multiple terrain references to cell {},{}", x, y);
                     return Err(Error::new(ErrorKind::AlreadyExists, msg));

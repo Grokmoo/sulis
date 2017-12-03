@@ -28,7 +28,7 @@ impl<'a> GameState<'a> {
     pub fn new(config: Config, resources: &'a ResourceSet) -> Result<GameState<'a>, Error> {
         let game = &resources.game;
 
-        let area = resources.areas.get(&game.starting_area);
+        let area = resources.get_area(&game.starting_area);
         let area = match area {
             Some(a) => a,
             None => {

@@ -5,11 +5,11 @@ use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 
 pub fn generate_area(tiles: &HashMap<String, Rc<Tile>>,
-                     width: usize, height: usize) -> Result<Vec<Rc<Tile>>, Error> {
+                     width: usize, height: usize) -> Result<Vec<Option<Rc<Tile>>>, Error> {
 
     let (passable_tiles, impassable_tiles):
         (Vec<Rc<Tile>>, Vec<Rc<Tile>>) = tiles.values().
-         map(|tile| Rc::clone(tile)).partition(|tile| tile.passable);
+         map(|tile| Rc::clone(tile)).partition(|tile| tile.impass.len() == 0);
 
     if passable_tiles.len() == 0 {
         return Err(Error::new(ErrorKind::InvalidData,
@@ -22,25 +22,25 @@ pub fn generate_area(tiles: &HashMap<String, Rc<Tile>>,
     }
 
     // set up terrain array as passable
-    let mut terrain: Vec<Rc<Tile>> =
-        vec![Rc::clone(passable_tiles.first().unwrap());width * height];
+    let mut terrain: Vec<Option<Rc<Tile>>> =
+        vec![Some(Rc::clone(passable_tiles.first().unwrap()));width * height];
 
     // generate impassable borders
     let impass = impassable_tiles.first().unwrap();
     for x in 0..width {
         { let cell = terrain.get_mut(x + 0 * width).unwrap();
-        *cell = Rc::clone(impass); }
+        *cell = Some(Rc::clone(impass)); }
 
         let cell = terrain.get_mut(x + (height - 1) * width).unwrap();
-        *cell = Rc::clone(impass);
+        *cell = Some(Rc::clone(impass));
     }
 
     for y in 0..height {
         { let cell = terrain.get_mut(0 + y * width).unwrap();
-        *cell = Rc::clone(impass); }
+        *cell = Some(Rc::clone(impass)); }
 
         let cell = terrain.get_mut(width - 1 + y * width).unwrap();
-        *cell = Rc::clone(impass);
+        *cell = Some(Rc::clone(impass));
     }
 
     Ok(terrain)

@@ -24,17 +24,19 @@ mod point;
 pub use self::point::Point;
 
 use std::collections::HashMap;
-use std::hash::Hash;
 use std::rc::Rc;
 use std::io::Error;
+use std::fmt::Display;
+use std::hash::Hash;
 
 use resource::actor::ActorBuilder;
 use resource::area::AreaBuilder;
+use resource::tile::TileBuilder;
 use resource::resource_builder_set::ResourceBuilderSet;
 
 pub struct ResourceSet {
     pub game: Game,
-    pub areas: HashMap<String, Area>,
+    areas: HashMap<String, Rc<Area>>,
     tiles: HashMap<String, Rc<Tile>>,
     actors: HashMap<String, Rc<Actor>>,
     sizes: HashMap<usize, Rc<Size>>,
@@ -50,29 +52,24 @@ impl ResourceSet {
     pub fn new(root_directory: &str) -> Result<ResourceSet, Error> {
         let builder_set = ResourceBuilderSet::new(root_directory)?;
 
-        let sizes: HashMap<usize, Rc<Size>> = builder_set.size_builders.into_iter().
-            map(|(_id_str, size)| (size.size, Rc::new(Size::new(size)))).collect();
+        let mut sizes: HashMap<usize, Rc<Size>> = HashMap::new();
+        for (_id_str, builder) in builder_set.size_builders {
+            insert_if_ok("size", builder.size, Size::new(builder), &mut sizes);
+        }
 
-        let tiles = create_rc_hashmap(builder_set.tiles);
-
-        let mut areas: HashMap<String, Area> = HashMap::new();
-        for (id, area_builder) in builder_set.area_builders {
-            let area = Area::new(area_builder, &tiles);
-
-            match area {
-                Ok(a) => { areas.insert(id, a); }
-                Err(e) => { eprintln!("{}", e); }
-            }
+        let mut tiles: HashMap<String, Rc<Tile>> = HashMap::new();
+        for (id, builder) in builder_set.tile_builders {
+            insert_if_ok("tile", id, Tile::new(builder), &mut tiles);
         }
 
         let mut actors: HashMap<String, Rc<Actor>> = HashMap::new();
         for (id, builder) in builder_set.actor_builders.into_iter() {
-            let actor = Actor::new(builder, &sizes);
+            insert_if_ok("actor", id, Actor::new(builder, &sizes), &mut actors);
+        }
 
-            match actor {
-                Ok(a) => { actors.insert(id, Rc::new(a)); }
-                Err(e) => { eprintln!("{}", e); }
-            }
+        let mut areas: HashMap<String, Rc<Area>> = HashMap::new();
+        for (id, builder) in builder_set.area_builders {
+            insert_if_ok("area", id, Area::new(builder, &tiles), &mut areas);
         }
 
         Ok(ResourceSet {
@@ -82,6 +79,15 @@ impl ResourceSet {
             game: builder_set.game,
             sizes: sizes,
         })
+    }
+
+    pub fn get_area(&self, id: &str) -> Option<Rc<Area>> {
+        let area = self.areas.get(id);
+
+        match area {
+            None => None,
+            Some(a) => Some(Rc::clone(a)),
+        }
     }
 
     pub fn get_actor(&self, id: &str) -> Option<Rc<Actor>> {
@@ -112,6 +118,13 @@ impl ResourceSet {
     }
 }
 
-fn create_rc_hashmap<K: Eq + Hash, V>(data: HashMap<K, V>) -> HashMap<K, Rc<V>> {
-    data.into_iter().map(|(id, entry)| (id, Rc::new(entry))).collect()
+fn insert_if_ok<K: Eq + Hash + Display, V>(type_str: &str, key: K, val: Result<V, Error>,
+                                           map: &mut HashMap<K, Rc<V>>) {
+    match val {
+        Err(e) => {
+            eprintln!("Error in {} with id '{}'", type_str, key);
+            eprintln!("{}", e);
+        },
+        Ok(v) => { (*map).insert(key, Rc::new(v)); }
+    };
 }

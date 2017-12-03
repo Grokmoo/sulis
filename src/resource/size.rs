@@ -1,4 +1,4 @@
-use std::io::Error;
+use std::io::{Error, ErrorKind};
 
 use resource::ResourceBuilder;
 use resource::Point;
@@ -11,17 +11,29 @@ pub struct Size {
 }
 
 impl Size {
-    pub fn new(builder: SizeBuilder) -> Size {
+    pub fn new(builder: SizeBuilder) -> Result<Size, Error> {
         let mut points: Vec<Point> = Vec::new();
         
         for p in builder.relative_points.into_iter() {
-            points.push(Point::new(*p.get(0).unwrap(), *p.get(1).unwrap()));
+            if p.len() != 2 {
+                return Err(Error::new(ErrorKind::InvalidData,
+                                      "Point array length is not equal to 2."));
+            }
+            let x = *p.get(0).unwrap();
+            let y = *p.get(1).unwrap();
+            if x >= builder.size || y >= builder.size {
+                return Err(Error::new(ErrorKind::InvalidData,
+                                      format!("Point has coordinate greater than size '{}'",
+                                              builder.size)));
+            }
+
+            points.push(Point::new(x, y));
         }
 
-        Size {
+        Ok(Size {
             size: builder.size,
             relative_points: points
-        }
+        })
     }
 
     pub fn relative_points(&self) -> SizeIterator {

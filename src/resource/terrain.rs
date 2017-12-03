@@ -9,7 +9,9 @@ use resource::AreaBuilder;
 pub struct Terrain {
     pub width: usize,
     pub height: usize,
-    layer: Vec<Rc<Tile>>,
+    _layer: Vec<Option<Rc<Tile>>>,
+    text_display: Vec<char>,
+    passable: Vec<bool>,
 }
 
 impl Terrain {
@@ -24,8 +26,6 @@ impl Terrain {
             match layer {
                 Ok(l) => l,
                 Err(e) => {
-                    eprintln!("Unable to generate terrain for area '{}'", builder.id);
-                    eprintln!("  {}", e);
                     return Err(e);
                 }
             }
@@ -34,50 +34,75 @@ impl Terrain {
                 vec![None;width * height];
 
             for (terrain_type, locations) in &builder.terrain {
+                let tile_ref = tiles.get(terrain_type);
+                let tile_ref = match tile_ref {
+                    Some(t) => t,
+                    None => {
+                        return Err(Error::new(ErrorKind::InvalidData,
+                                    format!("Tile not found '{}'", terrain_type)));
+                    }
+                };
+                
                 for point in locations.iter() {
+                    if point.len() != 2 {
+                        return Err(
+                            Error::new(ErrorKind::InvalidData,
+                                format!("Point array is not 2 coordinates in '{}'", terrain_type))
+                            );
+                    }
+
                     let x = point[0];
                     let y = point[1];
-
-                    let cell = layer.get_mut(x + y * width).unwrap();
-
-                    let tile_ref = tiles.get(terrain_type);
-                    if let Some(tile) = tile_ref {
-                        *cell = Some(Rc::clone(tile));
-                    }
+                    *layer.get_mut(x + y * width).unwrap() = Some(Rc::clone(tile_ref));
                 }
             }
-
-            for (index, tile) in layer.iter().enumerate() {
-                if let None = *tile {
-                    eprintln!("Unable to generate terrain for '{}'", builder.id);
-                    let x = index % width;
-                    let y = index / width;
-                    return Err(
-                        Error::new(ErrorKind::InvalidData,
-                                   format!("Terrain is empty at position [{}, {}]", x, y))
-                        );
-                }
-            }
-
-            layer.into_iter().map(|tile| tile.unwrap()).collect() 
+            
+            layer
         };
 
+        let mut text_display = vec![' ';width * height];
+        let mut passable = vec![true;width * height];
+        for (index, tile) in layer.iter().enumerate() {
+            if let None = *tile { continue; }
+
+            let tile = match tile {
+                &None => continue,
+                &Some(ref t) => Rc::clone(&t),
+            };
+
+            let base_x = index % width;
+            let base_y = index / width;
+
+            for y in 0..tile.height {
+                for x in 0..tile.width {
+                    *text_display.get_mut(base_x + x + (base_y + y) * width).unwrap() =
+                        tile.get_text_display(x, y);
+                }
+            }
+
+            for p in tile.impass.iter() {
+                *passable.get_mut(base_x + p.x + (base_y + p.y) * width).unwrap() = false;
+            }
+        }
+
         Ok(Terrain {
-            layer,
+            _layer: layer,
             width,
-            height
+            height,
+            text_display,
+            passable,
         })
     }
 
-    pub fn at(&self, x: usize, y: usize) -> Rc<Tile> {
-        Rc::clone(self.layer.get(x + y * self.width).unwrap())
+    pub fn is_passable(&self, x: usize, y: usize) -> bool {
+        *self.passable.get(x + y * self.width).unwrap()
     }
 
     pub fn display_at(&self, x: usize, y: usize) -> char {
-        self.layer.get(x + y * self.width).unwrap().display
+        *self.text_display.get(x + y * self.width).unwrap()
     }
 
     pub fn display(&self, index: usize) -> char {
-        self.layer.get(index).unwrap().display
+        *self.text_display.get(index).unwrap()
     }
 }

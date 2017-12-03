@@ -2,5 +2,10 @@
     "id": "floor",
     "name": "Floor",
     "display": ".",
-    "passable": true
+    "passable": true,
+
+    "width" : 1,
+    "height" : 1,
+    "text_display" : [["."]],
+    "impass": []
 }

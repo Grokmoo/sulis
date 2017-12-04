@@ -7,6 +7,15 @@ use std::rc::Rc;
 pub fn generate_area(tiles: &HashMap<String, Rc<Tile>>,
                      width: usize, height: usize) -> Result<Vec<Option<Rc<Tile>>>, Error> {
 
+    // filter down to only tiles of size one
+    let tiles: HashMap<String, Rc<Tile>> = tiles.iter().filter_map( |(id, tile)| {
+        if tile.width == 1 && tile.height == 1 {
+            Some((id.clone(), Rc::clone(tile)))
+        } else {
+            None
+        }
+    }).collect();
+
     let (passable_tiles, impassable_tiles):
         (Vec<Rc<Tile>>, Vec<Rc<Tile>>) = tiles.values().
          map(|tile| Rc::clone(tile)).partition(|tile| tile.impass.len() == 0);

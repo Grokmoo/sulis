@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use std::io::{Error, ErrorKind};
+use std::io::Error;
 use std::rc::Rc;
 
 use resource::ResourceBuilder;
@@ -29,7 +29,7 @@ impl Area {
         let terrain = match terrain {
             Ok(l) => l,
             Err(e) => {
-                eprintln!("Unable to generate terrain for area'{}'", builder.id);
+                eprintln!("Unable to generate terrain for area '{}'", builder.id);
                 return Err(e);
             }
         };
@@ -68,25 +68,6 @@ impl ResourceBuilder for AreaBuilder {
     fn new(data: &str) -> Result<AreaBuilder, Error> {
         let builder: AreaBuilder = serde_json::from_str(data)?;
 
-        let mut terrain: Vec<Vec<u32>> =
-            vec![vec![0;builder.width as usize];builder.height as usize];
-
-        for (_terrain_type, locations) in &builder.terrain {
-            for point in locations.iter() {
-                let x = point[0];
-                let y = point[1];
-
-                let row = terrain.get_mut(y).unwrap();
-                let cell = row.get_mut(x).unwrap();
-// verify tile coords are within area bounds here
-                if *cell > 0 {
-                    let msg = format!("Multiple terrain references to cell {},{}", x, y);
-                    return Err(Error::new(ErrorKind::AlreadyExists, msg));
-                }
-
-                *cell += 1;
-            }
-        }
         Ok(builder)
     }
 }

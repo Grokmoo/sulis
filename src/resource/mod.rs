@@ -69,7 +69,7 @@ impl ResourceSet {
 
         let mut areas: HashMap<String, Rc<Area>> = HashMap::new();
         for (id, builder) in builder_set.area_builders {
-            insert_if_ok("area", id, Area::new(builder, &tiles), &mut areas);
+            insert_if_ok("area", id, Area::new(builder, &tiles, &sizes), &mut areas);
         }
 
         Ok(ResourceSet {

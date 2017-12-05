@@ -40,14 +40,17 @@ impl<'a> AreaState<'a> {
 
     pub fn is_passable(&self, requester: Ref<EntityState<'a>>,
                        new_x: usize, new_y: usize) -> bool {
-        requester.points(new_x, new_y).all(|p| self.point_passable(&requester, p.x, p.y))
+        if !self.area.coords_valid(new_x, new_y) { return false; }
+
+        if !self.area.get_path_grid(requester.size()).is_passable(new_x, new_y) { return false; }
+
+        requester.points(new_x, new_y).all(|p| self.point_entities_passable(&requester, p.x, p.y))
     }
 
-    fn point_passable(&self, requester: &Ref<EntityState<'a>>, x: usize, y: usize) -> bool {
+    fn point_entities_passable(&self, requester: &Ref<EntityState<'a>>,
+                               x: usize, y: usize) -> bool {
         if !self.area.coords_valid(x, y) { return false; }
 
-        if !self.area.terrain.is_passable(x, y) { return false; }
-       
         for entity in self.entities.iter() {
             let entity = entity.borrow();
 

@@ -38,7 +38,7 @@ impl Area {
                 return Err(e);
             }
         };
-        
+
         let mut path_grids: HashMap<usize, PathFinderGrid> = HashMap::new();
         for size in sizes.values() {
             path_grids.insert(size.size, PathFinderGrid::new(Rc::clone(size), &terrain));

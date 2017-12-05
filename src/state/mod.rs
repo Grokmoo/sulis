@@ -10,6 +10,8 @@ pub use self::actor_state::ActorState;
 mod location;
 pub use self::location::Location;
 
+mod path_finder;
+
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 use std::cell::{Ref, RefMut, RefCell};
@@ -63,13 +65,13 @@ impl<'a> GameState<'a> {
                                       "Unable to create player character."));
             }
         };
-        
+
         if !area_state.borrow_mut().add_actor(pc, location) {
             eprintln!("Player character starting location must be within area bounds and passable.");
             return Err(Error::new(ErrorKind::InvalidData,
                                   "Unable to add player character to starting area at starting location"));
         }
-        
+
         let pc_state = Rc::clone(area_state.borrow().entities.last().unwrap());
 
         Ok(GameState {
@@ -78,7 +80,7 @@ impl<'a> GameState<'a> {
             pc: pc_state,
         })
     }
-    
+
     pub fn pc(&self) -> Ref<EntityState<'a>> {
         self.pc.borrow()
     }
@@ -118,7 +120,7 @@ impl<'a> GameState<'a> {
             let entity = self.pc();
             let x = x + (*entity).location.x as i32;
             let y = y + (*entity).location.y as i32;
-            
+
             if x < 0 || y < 0 { return false; }
             let x = x as usize;
             let y = y as usize;
@@ -129,6 +131,9 @@ impl<'a> GameState<'a> {
 
             (x, y)
         };
+
+        // let p = self.area_state.borrow_mut().find_path(self.pc(), 10, 10);
+        // println!("{:?}", p);
 
         return (*self.pc_mut()).move_to(x, y);
     }

@@ -1,4 +1,6 @@
-#[derive(Copy, Clone, Debug)]
+use std::fmt;
+
+#[derive(Copy, Clone)]
 pub struct Point {
     pub x: usize,
     pub y: usize,
@@ -24,3 +26,8 @@ impl Point {
     }
 }
 
+impl fmt::Debug for Point {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{{{},{}}}", self.x, self.y)
+    }
+}

@@ -14,7 +14,6 @@ pub struct PathFinderGrid {
 impl fmt::Debug for PathFinderGrid {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "PathFinderGrid of size {}\n  ", self.size.size)?;
-        
         for y in 0..self.height {
             for x in 0..self.width {
                 if *self.passable.get(x + y * self.width).unwrap() {
@@ -67,5 +66,9 @@ impl PathFinderGrid {
 
     pub fn is_passable(&self, x: usize, y: usize) -> bool {
         *self.passable.get(x + y * self.width).unwrap()
+    }
+
+    pub fn is_passable_index(&self, index: usize) -> bool {
+        *self.passable.get(index).unwrap()
     }
 }

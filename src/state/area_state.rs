@@ -1,8 +1,10 @@
 use resource::Area;
 use resource::Actor;
+use resource::Point;
 
 use state::EntityState;
 use state::Location;
+use state::path_finder::PathFinder;
 
 use std::rc::Rc;
 use std::cell::{Ref, RefCell};
@@ -10,13 +12,14 @@ use std::cell::{Ref, RefCell};
 pub struct AreaState<'a> {
     pub area: Rc<Area>,
     pub entities: Vec<Rc<RefCell<EntityState<'a>>>>,
+    pub path_finder: PathFinder,
 
     display: Vec<char>,
 }
 
 impl<'a> PartialEq for AreaState<'a> {
     fn eq(&self, other: &AreaState<'a>) -> bool {
-        self.area == other.area 
+        self.area == other.area
     }
 }
 
@@ -27,11 +30,19 @@ impl<'a> AreaState<'a> {
             *element = area.terrain.display(index);
         }
 
+        let path_finder = PathFinder::new(Rc::clone(&area));
+
         AreaState {
             area,
             entities: Vec::new(),
-            display
+            display,
+            path_finder
         }
+    }
+
+    pub fn find_path(&mut self, requester: Ref<EntityState<'a>>,
+                     dest_x: usize, dest_y: usize) -> Option<Vec<Point>> {
+        self.path_finder.find(requester, dest_x, dest_y)
     }
 
     pub fn get_display(&self, x: usize, y: usize) -> char {

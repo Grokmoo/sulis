@@ -2,6 +2,7 @@ extern crate game;
 
 use std::io;
 use std::error::Error;
+use std::{thread, time};
 
 use game::config;
 use game::resource;
@@ -36,7 +37,9 @@ fn main() {
     };
 
     let mut io = game::io::create(config.display.adapter, stdin, stdout);
-    
+
+    let frame_rate = config.display.frame_rate;
+
     let game_state = GameState::new(config, &resource_set);
     let mut game_state = match game_state {
         Ok(s) => s,
@@ -48,8 +51,18 @@ fn main() {
         }
     };
 
+    let fpms = (1000.0 / (frame_rate as f32)) as u64;
+    let frame_time = time::Duration::from_millis(fpms);
+
     loop {
-        io.render_output(&game_state);
+        let start_time = time::Instant::now();
+
         io.process_input(&mut game_state);
+        io.render_output(&game_state);
+
+        let elapsed = start_time.elapsed();
+        if frame_time > elapsed {
+            thread::sleep(frame_time - elapsed);
+        }
     }
 }

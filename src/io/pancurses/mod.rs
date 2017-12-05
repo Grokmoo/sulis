@@ -1,6 +1,6 @@
 use pancurses::{self, Input};
 
-use io::IO; 
+use io::IO;
 
 use state::GameState;
 
@@ -12,7 +12,8 @@ impl Terminal {
     pub fn new() -> Terminal {
         let window = pancurses::initscr();
         pancurses::resize_term(40, 80);
-        window.nodelay(false);
+        window.nodelay(true);
+        window.keypad(true);
         pancurses::noecho();
         pancurses::curs_set(0);
 
@@ -30,6 +31,7 @@ impl IO for Terminal {
             }
             Some(input) => {
                 self.window.addstr(&format!("{:?}", input));
+                println!("{:?}", input);
             }
             None => (),
         }
@@ -37,7 +39,7 @@ impl IO for Terminal {
 
     fn render_output(&mut self, state: &GameState) {
         self.window.erase();
-        
+
         let ref area = state.area_state().area;
         self.window.printw(&format!("{}\n", area.name));
 

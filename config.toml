@@ -1,5 +1,6 @@
 [display]
 adapter = "Pancurses"
+frame_rate = 60
 
 [resources]
 directory = "data"

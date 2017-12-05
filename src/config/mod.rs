@@ -15,6 +15,7 @@ pub struct Config {
 #[derive(Debug, Deserialize)]
 pub struct DisplayConfig {
     pub adapter: IOAdapter,
+    pub frame_rate: u32,
 }
 
 #[derive(Debug, Deserialize)]
@@ -39,7 +40,6 @@ pub enum InputAction {
 #[derive(Debug, Deserialize, Copy, Clone)]
 pub enum IOAdapter {
     Pancurses,
-    Termion,
 }
 
 impl Config {

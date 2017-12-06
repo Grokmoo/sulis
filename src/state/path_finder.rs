@@ -137,8 +137,8 @@ impl PathFinder {
         let height = self.height as i32;
 
         let top = point - width;
-        let right = point - 1;
-        let left = point + 1;
+        let right = point + 1;
+        let left = point - 1;
         let bottom = point + width;
 
         let mut neighbors: Vec<usize> = Vec::new();
@@ -152,14 +152,17 @@ impl PathFinder {
 
     fn find_lowest_f_score_in_open_set(&self) -> usize {
         let mut lowest = usize::MAX;
+        let mut lowest_index = 0;
 
         for val in self.open.iter() {
-            if val < &lowest {
-                lowest = *val;
+            let f_score = self.f_score.get(*val).unwrap();
+            if f_score < &lowest {
+                lowest = *f_score;
+                lowest_index = *val;
             }
         }
 
-        lowest
+        lowest_index
     }
 
     fn heuristic_cost_estimate(&self, start: usize, end: usize) -> usize {

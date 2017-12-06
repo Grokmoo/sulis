@@ -58,6 +58,7 @@ fn main() {
         let start_time = time::Instant::now();
 
         io.process_input(&mut game_state);
+        game_state.update();
         io.render_output(&game_state);
 
         let elapsed = start_time.elapsed();

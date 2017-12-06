@@ -18,6 +18,7 @@ pub struct Config {
 pub struct DisplayConfig {
     pub adapter: IOAdapter,
     pub frame_rate: u32,
+    pub animation_base_time_millis: u32,
 }
 
 #[derive(Debug, Deserialize)]

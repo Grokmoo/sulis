@@ -15,3 +15,5 @@ pub mod io;
 pub mod state;
 
 pub mod config;
+
+pub mod animation;

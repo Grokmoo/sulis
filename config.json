@@ -1,7 +1,8 @@
 {
     "display": {
         "adapter": "Pancurses",
-        "frame_rate": 60
+        "frame_rate": 60,
+        "animation_base_time_millis": 50
     },
 
     "resources": {

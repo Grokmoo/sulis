@@ -26,8 +26,8 @@ impl<'a> EntityState<'a> {
             actor: actor_state, location, size,
         }
     }
-    
-    pub(in state) fn move_to(&mut self, x: usize, y: usize) -> bool {
+
+    pub fn move_to(&mut self, x: usize, y: usize) -> bool {
         if !self.location.coords_valid(x, y) { return false; }
         if !self.location.coords_valid(x + self.size() - 1, y + self.size() - 1) {
             return false;

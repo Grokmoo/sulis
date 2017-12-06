@@ -24,12 +24,14 @@ use resource::Actor;
 use config::Config;
 use io::KeyboardInput;
 use io::InputAction;
+use animation::{Animation, MoveAnimation};
 
 pub struct GameState<'a> {
     config: Config,
     area_state: Rc<RefCell<AreaState<'a>>>,
     pc: Rc<RefCell<EntityState<'a>>>,
     pub cursor: Cursor,
+    animations: Vec<Box<Animation + 'a>>,
 }
 
 impl<'a> GameState<'a> {
@@ -92,6 +94,7 @@ impl<'a> GameState<'a> {
                 max_x: width,
                 max_y: height,
             },
+            animations: Vec::new(),
         })
     }
 
@@ -109,6 +112,10 @@ impl<'a> GameState<'a> {
 
     pub fn area_state_mut(&mut self) -> RefMut<AreaState<'a>> {
         self.area_state.borrow_mut()
+    }
+
+    pub fn update(&mut self) {
+        self.animations.retain(|anim| anim.update());
     }
 
     pub fn handle_keyboard_input(&mut self, input: KeyboardInput) {
@@ -130,8 +137,9 @@ impl<'a> GameState<'a> {
             return false;
         }
         let path = path.unwrap();
-        println!("{:?}", path);
-
+        let anim = MoveAnimation::new(Rc::clone(&self.pc),
+            path, self.config.display.animation_base_time_millis);
+        self.animations.push(Box::new(anim));
         true
     }
 

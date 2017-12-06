@@ -4,8 +4,6 @@ extern crate serde;
 extern crate serde_json;
 #[macro_use] extern crate serde_derive;
 
-extern crate toml;
-
 // terminal display library
 extern crate termion;
 extern crate pancurses;

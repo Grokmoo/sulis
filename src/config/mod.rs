@@ -2,8 +2,10 @@ use std::io::{Read, Error, ErrorKind};
 use std::fs::File;
 use std::collections::HashMap;
 
-use toml;
+use io::KeyboardInput;
+use io::InputAction;
 
+use serde_json;
 
 #[derive(Debug, Deserialize)]
 pub struct Config {
@@ -25,16 +27,7 @@ pub struct ResourcesConfig {
 
 #[derive(Debug, Deserialize)]
 pub struct InputConfig {
-    pub keybindings: HashMap<char, InputAction>
-}
-
-
-#[derive(Debug, Deserialize, Copy, Clone)]
-pub enum InputAction {
-    MoveUp,
-    MoveDown,
-    MoveLeft,
-    MoveRight,
+    pub keybindings: HashMap<KeyboardInput, InputAction>
 }
 
 #[derive(Debug, Deserialize, Copy, Clone)]
@@ -48,7 +41,7 @@ impl Config {
         let mut file_data = String::new();
         f.read_to_string(&mut file_data)?;
 
-        let config: Result<Config, toml::de::Error> = toml::from_str(&file_data);
+        let config: Result<Config, serde_json::Error> = serde_json::from_str(&file_data);
         match config {
             Ok(config) => Ok(config),
             Err(e) => {
@@ -57,7 +50,7 @@ impl Config {
         }
     }
 
-    pub fn get_input_action(&self, c: char) -> Option<&InputAction> {
-        self.input.keybindings.get(&c)
+    pub fn get_input_action(&self, k: KeyboardInput) -> Option<&InputAction> {
+        self.input.keybindings.get(&k)
     }
 }

@@ -10,6 +10,9 @@ pub use self::actor_state::ActorState;
 mod location;
 pub use self::location::Location;
 
+mod cursor;
+pub use self::cursor::Cursor;
+
 mod path_finder;
 
 use std::io::{Error, ErrorKind};
@@ -19,11 +22,14 @@ use std::cell::{Ref, RefMut, RefCell};
 use resource::ResourceSet;
 use resource::Actor;
 use config::Config;
+use io::KeyboardInput;
+use io::InputAction;
 
 pub struct GameState<'a> {
     config: Config,
     area_state: Rc<RefCell<AreaState<'a>>>,
     pc: Rc<RefCell<EntityState<'a>>>,
+    pub cursor: Cursor,
 }
 
 impl<'a> GameState<'a> {
@@ -39,6 +45,8 @@ impl<'a> GameState<'a> {
                                       "Unable to create starting area."));
             }
         };
+        let width = area.width;
+        let height = area.height;
         let area_state = Rc::new(RefCell::new(AreaState::new(area)));
 
         if game.starting_location.len() != 2 {
@@ -78,6 +86,12 @@ impl<'a> GameState<'a> {
             config: config,
             area_state: area_state,
             pc: pc_state,
+            cursor: Cursor {
+                x: *x,
+                y: *y,
+                max_x: width,
+                max_y: height,
+            },
         })
     }
 
@@ -97,22 +111,28 @@ impl<'a> GameState<'a> {
         self.area_state.borrow_mut()
     }
 
-    pub fn handle_input(&mut self, c: char) {
+    pub fn handle_keyboard_input(&mut self, input: KeyboardInput) {
         let action = {
-            let action = self.config.get_input_action(c);
+            let action = self.config.get_input_action(input);
 
             if let None = action { return; }
 
             *action.unwrap()
         };
 
-        use config::InputAction::*;
-        match action {
-            MoveUp => self.pc_move_by(0, -1),
-            MoveDown => self.pc_move_by(0, 1),
-            MoveRight => self.pc_move_by(-1, 0),
-            MoveLeft => self.pc_move_by(1, 0),
-        };
+        InputAction::fire_action(self, action);
+    }
+
+    pub fn pc_move_to(&mut self, x: usize, y: usize) -> bool {
+        let path = self.area_state.borrow_mut().find_path(self.pc(), x, y);
+
+        if let None = path {
+            return false;
+        }
+        let path = path.unwrap();
+        println!("{:?}", path);
+
+        true
     }
 
     pub fn pc_move_by(&mut self, x: i32, y: i32) -> bool {
@@ -131,9 +151,6 @@ impl<'a> GameState<'a> {
 
             (x, y)
         };
-
-        // let p = self.area_state.borrow_mut().find_path(self.pc(), 10, 10);
-        // println!("{:?}", p);
 
         return (*self.pc_mut()).move_to(x, y);
     }

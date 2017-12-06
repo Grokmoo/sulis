@@ -1,0 +1,24 @@
+{
+    "display": {
+        "adapter": "Pancurses",
+        "frame_rate": 60
+    },
+
+    "resources": {
+        "directory": "data"
+    },
+
+    "input": {
+        "keybindings": {
+            "KeyW": "MoveUp",
+            "KeyA": "MoveLeft",
+            "KeyS": "MoveDown",
+            "KeyD": "MoveRight",
+            "KeyUp": "MoveCursorUp",
+            "KeyDown": "MoveCursorDown",
+            "KeyLeft": "MoveCursorLeft",
+            "KeyRight": "MoveCursorRight",
+            "KeySpace": "MoveToCursor"
+        }
+    }
+}

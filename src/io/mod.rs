@@ -1,5 +1,11 @@
 mod pancurses;
 
+mod keyboard_input;
+pub use self::keyboard_input::KeyboardInput;
+
+mod input_action;
+pub use self::input_action::InputAction;
+
 use std::io::{StdinLock, StdoutLock};
 
 use state::GameState;

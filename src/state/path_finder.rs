@@ -119,6 +119,7 @@ impl PathFinder {
             path.push(self.get_point(current));
         }
 
+        path.reverse();
         path
     }
 

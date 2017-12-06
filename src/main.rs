@@ -14,12 +14,12 @@ fn main() {
     let stdout = stdout.lock();
     let stdin = stdin.lock();
 
-    let config = config::Config::new("config.toml");
+    let config = config::Config::new("config.json");
     let config = match config {
         Ok(c) => c,
         Err(e) => {
             eprintln!("{}", e);
-            eprintln!("There was a fatal error loading the configuration from 'config.toml'");
+            eprintln!("There was a fatal error loading the configuration from 'config.json'");
             eprintln!("Exiting...");
             ::std::process::exit(1);
         }

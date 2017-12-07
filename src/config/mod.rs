@@ -2,8 +2,8 @@ use std::io::{Read, Error, ErrorKind};
 use std::fs::File;
 use std::collections::HashMap;
 
-use io::KeyboardInput;
-use io::InputAction;
+use io::keyboard_event::Key;
+use io::{KeyboardEvent, InputAction};
 
 use serde_json;
 
@@ -19,8 +19,8 @@ pub struct DisplayConfig {
     pub adapter: IOAdapter,
     pub frame_rate: u32,
     pub animation_base_time_millis: u32,
-    pub width: u32,
-    pub height: u32,
+    pub width: i32,
+    pub height: i32,
     pub cursor_char: char,
 }
 
@@ -31,7 +31,7 @@ pub struct ResourcesConfig {
 
 #[derive(Debug, Deserialize)]
 pub struct InputConfig {
-    pub keybindings: HashMap<KeyboardInput, InputAction>
+    pub keybindings: HashMap<Key, InputAction>
 }
 
 #[derive(Debug, Deserialize, Copy, Clone)]
@@ -54,7 +54,7 @@ impl Config {
         }
     }
 
-    pub fn get_input_action(&self, k: KeyboardInput) -> Option<&InputAction> {
-        self.input.keybindings.get(&k)
+    pub fn get_input_action(&self, k: KeyboardEvent) -> Option<&InputAction> {
+        self.input.keybindings.get(&k.key)
     }
 }

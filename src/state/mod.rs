@@ -22,9 +22,10 @@ use std::cell::{Ref, RefMut, RefCell};
 use resource::ResourceSet;
 use resource::Actor;
 use config::Config;
-use io::{KeyboardInput, InputAction, TextRenderer};
+use io::mouse_event;
+use io::{MouseEvent, KeyboardEvent, InputAction, TextRenderer};
 use animation::{Animation, MoveAnimation};
-use ui::WidgetState;
+use ui::WidgetBase;
 
 pub struct GameState<'a> {
     config: Config,
@@ -91,8 +92,8 @@ impl<'a> GameState<'a> {
             area_state: area_state,
             pc: pc_state,
             cursor: Cursor {
-                x: x as u32,
-                y: y as u32,
+                x: x as i32,
+                y: y as i32,
                 max_x: display_width,
                 max_y: display_height,
                 c: cursor_char,
@@ -102,32 +103,36 @@ impl<'a> GameState<'a> {
     }
 
     pub fn draw_text_mode(&self, renderer: &mut TextRenderer,
-                          root: &WidgetState, millis: u32) {
+                          root: Ref<WidgetBase>, millis: u32) {
         root.draw_text_mode(renderer);
 
         self.cursor.draw_text_mode(renderer, millis);
     }
 
-    pub fn cursor_click(&mut self, root: &mut WidgetState) -> bool {
+    pub fn cursor_move_by(&mut self, root: RefMut<WidgetBase>, x: i32, y: i32) -> bool {
+        if self.cursor.move_by(x, y) {
+            let event = MouseEvent::new(mouse_event::Kind::Move(x, y),
+                 self.cursor.x, self.cursor.y);
+            return root.dispatch_event(self, event);
+        }
+
+        false
+    }
+
+    pub fn cursor_click(&mut self, root: RefMut<WidgetBase>) -> bool {
         let x = self.cursor.x;
         let y = self.cursor.y;
 
-        root.dispatch_click(self, x as i32, y as i32)
-    }
-
-    pub fn pc(&self) -> Ref<EntityState<'a>> {
-        self.pc.borrow()
-    }
-
-    pub fn pc_mut(&mut self) -> RefMut<EntityState<'a>> {
-        self.pc.borrow_mut()
+        let event = MouseEvent::new(mouse_event::Kind::LeftClick, x, y);
+        root.dispatch_event(self, event)
     }
 
     pub fn update(&mut self) {
         self.animations.retain(|anim| anim.update());
     }
 
-    pub fn handle_keyboard_input(&mut self, input: KeyboardInput, root: &mut WidgetState) {
+    pub fn handle_keyboard_input(&mut self, input: KeyboardEvent,
+                                 root: RefMut<WidgetBase>) {
         let action = {
             let action = self.config.get_input_action(input);
 
@@ -137,6 +142,14 @@ impl<'a> GameState<'a> {
         };
 
         InputAction::fire_action(action, self, root);
+    }
+
+    pub fn pc(&self) -> Ref<EntityState<'a>> {
+        self.pc.borrow()
+    }
+
+    pub fn pc_mut(&mut self) -> RefMut<EntityState<'a>> {
+        self.pc.borrow_mut()
     }
 
     pub fn pc_move_to(&mut self, x: usize, y: usize) -> bool {

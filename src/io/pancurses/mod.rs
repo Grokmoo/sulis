@@ -1,10 +1,13 @@
 use pancurses;
 
-use io::{IO, KeyboardInput, TextRenderer};
 use std::time::Instant;
+use std::cell::{Ref, RefMut};
+
+use io::keyboard_event::Key;
+use io::{IO, KeyboardEvent, TextRenderer};
 
 use state::GameState;
-use ui::WidgetState;
+use ui::WidgetBase;
 use config::Config;
 use animation;
 
@@ -35,7 +38,7 @@ impl IO for Terminal {
                                config.display.width as i32);
     }
 
-    fn process_input(&mut self, state: &mut GameState, root: &mut WidgetState) {
+    fn process_input(&mut self, state: &mut GameState, root: RefMut<WidgetBase>) {
         let input = self.window.getch();
         if let None = input {
             return;
@@ -45,11 +48,12 @@ impl IO for Terminal {
             pancurses::Input::Character(c) => match_char(c),
             input => match_special(input),
         };
+        let input = KeyboardEvent { key: input };
 
         state.handle_keyboard_input(input, root);
     }
 
-    fn render_output(&mut self, state: &GameState, root: &WidgetState) {
+    fn render_output(&mut self, state: &GameState, root: Ref<WidgetBase>) {
         self.window.erase();
 
         let millis = animation::get_elapsed_millis(self.start_time.elapsed());
@@ -70,13 +74,13 @@ impl TextRenderer for Terminal {
         self.window.addstr(s);
     }
 
-    fn set_cursor_pos(&mut self, x: u32, y: u32) {
-        self.window.mv(y as i32, x as i32);
+    fn set_cursor_pos(&mut self, x: i32, y: i32) {
+        self.window.mv(y, x);
     }
 }
 
-fn match_char(c: char) -> KeyboardInput {
-    use io::KeyboardInput::*;
+fn match_char(c: char) -> Key {
+    use io::keyboard_event::Key::*;
     match c {
         'a' | 'A' => KeyA,
         'b' | 'B' => KeyB,
@@ -139,8 +143,8 @@ fn match_char(c: char) -> KeyboardInput {
     }
 }
 
-fn match_special(c: pancurses::Input) -> KeyboardInput {
-    use io::KeyboardInput::*;
+fn match_special(c: pancurses::Input) -> Key {
+    use io::keyboard_event::Key::*;
     match c {
             pancurses::Input::KeyHome => KeyHome,
             pancurses::Input::KeyEnd => KeyEnd,

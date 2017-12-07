@@ -1,7 +1,10 @@
-
+#[derive(Copy, Clone)]
+pub struct KeyboardEvent {
+    pub key: Key,
+}
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
-pub enum KeyboardInput {
+pub enum Key {
     KeyUnknown,
 
     KeyEscape,
@@ -37,3 +40,4 @@ pub enum KeyboardInput {
 
     Key0, Key1, Key2, Key3, Key4, Key5, Key6, Key7, Key8, Key9,
 }
+

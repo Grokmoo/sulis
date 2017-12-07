@@ -2,10 +2,10 @@ use io::TextRenderer;
 
 pub struct Cursor {
     pub c: char,
-    pub x: u32,
-    pub y: u32,
-    pub max_x: u32,
-    pub max_y: u32,
+    pub x: i32,
+    pub y: i32,
+    pub max_x: i32,
+    pub max_y: i32,
 }
 
 impl Cursor {
@@ -17,8 +17,6 @@ impl Cursor {
             return false;
         }
 
-        let new_x = new_x as u32;
-        let new_y = new_y as u32;
         if new_x >= self.max_x || new_y >= self.max_y {
             return false;
         }

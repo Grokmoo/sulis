@@ -54,7 +54,7 @@ fn main() {
         }
     };
 
-    let mut root = ui::create_ui_tree(Rc::clone(&game_state.area_state), &io);
+    let root = ui::create_ui_tree(Rc::clone(&game_state.area_state), &io);
 
     let fpms = (1000.0 / (frame_rate as f32)) as u64;
     let frame_time = time::Duration::from_millis(fpms);
@@ -62,9 +62,9 @@ fn main() {
     loop {
         let start_time = time::Instant::now();
 
-        io.process_input(&mut game_state, &mut root);
+        io.process_input(&mut game_state, root.borrow_mut());
         game_state.update();
-        io.render_output(&game_state, &root);
+        io.render_output(&game_state, root.borrow());
 
         let elapsed = start_time.elapsed();
         if frame_time > elapsed {

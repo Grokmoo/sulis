@@ -1,4 +1,5 @@
 use state::GameState;
+use ui::WidgetState;
 
 #[derive(Debug, Deserialize, Copy, Clone)]
 pub enum InputAction {
@@ -14,11 +15,12 @@ pub enum InputAction {
 }
 
 impl InputAction {
-    pub fn fire_action(state: &mut GameState, action: InputAction) {
+    pub fn fire_action(action: InputAction, state: &mut GameState, root: &mut WidgetState) {
         // TODO figure out a better way to do this than a huge match statement
         // unable to assign a function or closure to an enum, and trait object approach
         // proved unwieldy at best
         use self::InputAction::*;
+
         match action {
             MoveUp => state.pc_move_by(0, -1),
             MoveDown => state.pc_move_by(0, 1),
@@ -28,11 +30,7 @@ impl InputAction {
             MoveCursorDown => state.cursor.move_by(0, 1),
             MoveCursorLeft => state.cursor.move_by(-1, 0),
             MoveCursorRight => state.cursor.move_by(1, 0),
-            MoveToCursor => {
-                let x = state.cursor.x;
-                let y = state.cursor.y;
-                state.pc_move_to(x, y)
-            }
+            MoveToCursor => state.cursor_click(root),
         };
     }
 }

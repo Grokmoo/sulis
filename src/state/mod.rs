@@ -22,14 +22,14 @@ use std::cell::{Ref, RefMut, RefCell};
 use resource::ResourceSet;
 use resource::Actor;
 use config::Config;
-use io::KeyboardInput;
-use io::InputAction;
+use io::{KeyboardInput, InputAction, TextRenderer};
 use animation::{Animation, MoveAnimation};
+use ui::WidgetState;
 
 pub struct GameState<'a> {
     config: Config,
-    area_state: Rc<RefCell<AreaState<'a>>>,
-    pc: Rc<RefCell<EntityState<'a>>>,
+    pub area_state: Rc<RefCell<AreaState<'a>>>,
+    pub pc: Rc<RefCell<EntityState<'a>>>,
     pub cursor: Cursor,
     animations: Vec<Box<Animation + 'a>>,
 }
@@ -47,8 +47,6 @@ impl<'a> GameState<'a> {
                                       "Unable to create starting area."));
             }
         };
-        let width = area.width;
-        let height = area.height;
         let area_state = Rc::new(RefCell::new(AreaState::new(area)));
 
         if game.starting_location.len() != 2 {
@@ -56,9 +54,9 @@ impl<'a> GameState<'a> {
             return Err(Error::new(ErrorKind::InvalidData,
                                   "Unable to create starting location."));
         }
-        let x = game.starting_location.get(0).unwrap();
-        let y = game.starting_location.get(1).unwrap();
-        let location = Location::new(*x, *y, Rc::clone(&area_state));
+        let x = *game.starting_location.get(0).unwrap();
+        let y = *game.starting_location.get(1).unwrap();
+        let location = Location::new(x, y, Rc::clone(&area_state));
 
         if !location.coords_valid(location.x, location.y) {
             eprintln!("Starting location coordinates must be valid for the starting area.");
@@ -84,18 +82,37 @@ impl<'a> GameState<'a> {
 
         let pc_state = Rc::clone(area_state.borrow().entities.last().unwrap());
 
+        let display_width = config.display.width;
+        let display_height = config.display.height;
+        let cursor_char = config.display.cursor_char;
+
         Ok(GameState {
             config: config,
             area_state: area_state,
             pc: pc_state,
             cursor: Cursor {
-                x: *x,
-                y: *y,
-                max_x: width,
-                max_y: height,
+                x: x as u32,
+                y: y as u32,
+                max_x: display_width,
+                max_y: display_height,
+                c: cursor_char,
             },
             animations: Vec::new(),
         })
+    }
+
+    pub fn draw_text_mode(&self, renderer: &mut TextRenderer,
+                          root: &WidgetState, millis: u32) {
+        root.draw_text_mode(renderer);
+
+        self.cursor.draw_text_mode(renderer, millis);
+    }
+
+    pub fn cursor_click(&mut self, root: &mut WidgetState) -> bool {
+        let x = self.cursor.x;
+        let y = self.cursor.y;
+
+        root.dispatch_click(self, x as i32, y as i32)
     }
 
     pub fn pc(&self) -> Ref<EntityState<'a>> {
@@ -106,19 +123,11 @@ impl<'a> GameState<'a> {
         self.pc.borrow_mut()
     }
 
-    pub fn area_state(&self) -> Ref<AreaState<'a>> {
-        self.area_state.borrow()
-    }
-
-    pub fn area_state_mut(&mut self) -> RefMut<AreaState<'a>> {
-        self.area_state.borrow_mut()
-    }
-
     pub fn update(&mut self) {
         self.animations.retain(|anim| anim.update());
     }
 
-    pub fn handle_keyboard_input(&mut self, input: KeyboardInput) {
+    pub fn handle_keyboard_input(&mut self, input: KeyboardInput, root: &mut WidgetState) {
         let action = {
             let action = self.config.get_input_action(input);
 
@@ -127,7 +136,7 @@ impl<'a> GameState<'a> {
             *action.unwrap()
         };
 
-        InputAction::fire_action(self, action);
+        InputAction::fire_action(action, self, root);
     }
 
     pub fn pc_move_to(&mut self, x: usize, y: usize) -> bool {
@@ -166,6 +175,7 @@ impl<'a> GameState<'a> {
     pub fn add_actor(&mut self, actor: Rc<Actor>, x: usize,
                      y: usize) -> bool {
         let location = Location::new(x, y, Rc::clone(&self.area_state));
-        self.area_state_mut().add_actor(actor, location)
+
+        self.area_state.borrow_mut().add_actor(actor, location)
     }
 }

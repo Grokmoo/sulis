@@ -1,8 +1,11 @@
+use io::TextRenderer;
+
 pub struct Cursor {
-    pub x: usize,
-    pub y: usize,
-    pub max_x: usize,
-    pub max_y: usize,
+    pub c: char,
+    pub x: u32,
+    pub y: u32,
+    pub max_x: u32,
+    pub max_y: u32,
 }
 
 impl Cursor {
@@ -14,8 +17,8 @@ impl Cursor {
             return false;
         }
 
-        let new_x = new_x as usize;
-        let new_y = new_y as usize;
+        let new_x = new_x as u32;
+        let new_y = new_y as u32;
         if new_x >= self.max_x || new_y >= self.max_y {
             return false;
         }
@@ -24,5 +27,12 @@ impl Cursor {
         self.y = new_y;
 
         true
+    }
+
+    pub fn draw_text_mode(&self, renderer: &mut TextRenderer, millis: u32) {
+        if millis % 1_000 < 500 { return; }
+
+        renderer.set_cursor_pos(self.x, self.y);
+        renderer.render_char(self.c);
     }
 }

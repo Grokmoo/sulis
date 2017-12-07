@@ -3,10 +3,12 @@ extern crate game;
 use std::io;
 use std::error::Error;
 use std::{thread, time};
+use std::rc::Rc;
 
 use game::config;
 use game::resource;
 use game::state::GameState;
+use game::ui;
 
 fn main() {
     let stdout = io::stdout();
@@ -37,6 +39,7 @@ fn main() {
     };
 
     let mut io = game::io::create(config.display.adapter, stdin, stdout);
+    io.init(&config);
 
     let frame_rate = config.display.frame_rate;
 
@@ -51,15 +54,17 @@ fn main() {
         }
     };
 
+    let mut root = ui::create_ui_tree(Rc::clone(&game_state.area_state), &io);
+
     let fpms = (1000.0 / (frame_rate as f32)) as u64;
     let frame_time = time::Duration::from_millis(fpms);
 
     loop {
         let start_time = time::Instant::now();
 
-        io.process_input(&mut game_state);
+        io.process_input(&mut game_state, &mut root);
         game_state.update();
-        io.render_output(&game_state);
+        io.render_output(&game_state, &root);
 
         let elapsed = start_time.elapsed();
         if frame_time > elapsed {

@@ -1,8 +1,6 @@
 {
     "id": "floor",
     "name": "Floor",
-    "display": ".",
-    "passable": true,
 
     "width" : 1,
     "height" : 1,

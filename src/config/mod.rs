@@ -19,6 +19,9 @@ pub struct DisplayConfig {
     pub adapter: IOAdapter,
     pub frame_rate: u32,
     pub animation_base_time_millis: u32,
+    pub width: u32,
+    pub height: u32,
+    pub cursor_char: char,
 }
 
 #[derive(Debug, Deserialize)]

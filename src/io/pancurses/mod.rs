@@ -1,18 +1,21 @@
 use pancurses;
 
-use io::IO;
-use io::KeyboardInput;
+use io::{IO, KeyboardInput, TextRenderer};
+use std::time::Instant;
 
 use state::GameState;
+use ui::WidgetState;
+use config::Config;
+use animation;
 
 pub struct Terminal {
-    window: pancurses::Window
+    window: pancurses::Window,
+    start_time: Instant,
 }
 
 impl Terminal {
     pub fn new() -> Terminal {
         let window = pancurses::initscr();
-        pancurses::resize_term(40, 80);
         window.nodelay(true);
         window.keypad(true);
         pancurses::noecho();
@@ -20,13 +23,19 @@ impl Terminal {
         pancurses::nonl();
 
         Terminal {
-            window
+            window,
+            start_time: Instant::now(),
         }
     }
 }
 
 impl IO for Terminal {
-    fn process_input(&mut self, state: &mut GameState) {
+    fn init(&mut self, config: &Config) {
+        pancurses::resize_term(config.display.height as i32,
+                               config.display.width as i32);
+    }
+
+    fn process_input(&mut self, state: &mut GameState, root: &mut WidgetState) {
         let input = self.window.getch();
         if let None = input {
             return;
@@ -37,28 +46,32 @@ impl IO for Terminal {
             input => match_special(input),
         };
 
-        state.handle_keyboard_input(input);
+        state.handle_keyboard_input(input, root);
     }
 
-    fn render_output(&mut self, state: &GameState) {
+    fn render_output(&mut self, state: &GameState, root: &WidgetState) {
         self.window.erase();
 
-        let ref area = state.area_state().area;
-        self.window.printw(&format!("{}\n", area.name));
+        let millis = animation::get_elapsed_millis(self.start_time.elapsed());
+        state.draw_text_mode(self as &mut Terminal, root, millis);
+    }
 
-        for y in 0..area.height {
-            for x in 0..area.width {
-                self.window.printw(&format!("{}", state.area_state().get_display(x, y)));
-            }
-            self.window.printw("\n");
-        }
+    fn get_display_size(&self) -> (i32, i32) {
+        (self.window.get_max_x(), self.window.get_max_y())
+    }
+}
 
-        // offset cursor because of title text
-        // TODO the area should be a widget with a position
-        let cursor_x = (state.cursor.x as i32) + 0;
-        let cursor_y = (state.cursor.y as i32) + 1;
-        self.window.mvaddch(cursor_y, cursor_x, 'X');
+impl TextRenderer for Terminal {
+    fn render_char(&mut self, c: char) {
+        self.window.addch(c);
+    }
 
+    fn render_string(&mut self, s: &str) {
+        self.window.addstr(s);
+    }
+
+    fn set_cursor_pos(&mut self, x: u32, y: u32) {
+        self.window.mv(y as i32, x as i32);
     }
 }
 

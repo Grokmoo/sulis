@@ -7,8 +7,8 @@ use resource::generator;
 use resource::AreaBuilder;
 
 pub struct Terrain {
-    pub width: usize,
-    pub height: usize,
+    pub width: i32,
+    pub height: i32,
     text_display: Vec<char>,
     passable: Vec<bool>,
 }
@@ -16,8 +16,8 @@ pub struct Terrain {
 impl Terrain {
     pub fn new(builder: &AreaBuilder,
                tiles: &HashMap<String, Rc<Tile>>) -> Result<Terrain, Error> {
-        let width = builder.width;
-        let height = builder.height;
+        let width = builder.width as i32;
+        let height = builder.height as i32;
         let layer = if builder.generate {
             let layer = generator::generate_area(tiles, width, height);
 
@@ -32,26 +32,28 @@ impl Terrain {
                 return Err(e);
             }
 
-            let mut layer: Vec<Option<Rc<Tile>>> = vec![None;width * height];
+            let mut layer: Vec<Option<Rc<Tile>>> = vec![None;(width * height) as usize];
 
             for (terrain_type, locations) in &builder.terrain {
                 let tile_ref = tiles.get(terrain_type).unwrap();
 
                 for point in locations.iter() {
-                    *layer.get_mut(point[0] + point[1] * width).unwrap() = Some(Rc::clone(tile_ref));
+                    *layer.get_mut(point[0] + point[1] * width as usize).unwrap() =
+                        Some(Rc::clone(tile_ref));
                 }
             }
 
             layer
         };
-        
+
         if let Err(e) = Terrain::validate_layer(&layer, width, height) {
             return Err(e);
         }
 
-        let mut text_display = vec![' ';width * height];
-        let mut passable = vec![true;width * height];
+        let mut text_display = vec![' ';(width * height) as usize];
+        let mut passable = vec![true;(width * height) as usize];
         for (index, tile) in layer.iter().enumerate() {
+            let index = index as i32;
             if let None = *tile { continue; }
 
             let tile = match tile {
@@ -64,13 +66,13 @@ impl Terrain {
 
             for y in 0..tile.height {
                 for x in 0..tile.width {
-                    *text_display.get_mut(base_x + x + (base_y + y) * width).unwrap() =
+                    *text_display.get_mut((base_x + x + (base_y + y) * width) as usize).unwrap() =
                         tile.get_text_display(x, y);
                 }
             }
 
             for p in tile.impass.iter() {
-                *passable.get_mut(base_x + p.x + (base_y + p.y) * width).unwrap() = false;
+                *passable.get_mut((base_x + p.x + (base_y + p.y) * width) as usize).unwrap() = false;
             }
         }
 
@@ -82,12 +84,13 @@ impl Terrain {
         })
     }
 
-    fn validate_layer(layer: &Vec<Option<Rc<Tile>>>, width: usize,
-                      height: usize) -> Result<(), Error> {
+    fn validate_layer(layer: &Vec<Option<Rc<Tile>>>, width: i32,
+                      height: i32) -> Result<(), Error> {
 
-        let mut refed_by_tile = vec![false;width * height];
-        
+        let mut refed_by_tile = vec![false;(width * height) as usize];
+
         for (index, tile) in layer.iter().enumerate() {
+            let index = index as i32;
             if let None = *tile { continue; }
 
             let tile = match tile {
@@ -108,7 +111,8 @@ impl Terrain {
 
             for x in tile_x..(tile_x + tile.width) {
                 for y in tile_y..(tile_y + tile.height) {
-                    let already_used = refed_by_tile.get_mut(x + y *width).unwrap();
+                    let already_used = refed_by_tile.get_mut((x + y *width) as usize).unwrap();
+
                     if *already_used {
                         return Err(
                             Error::new(ErrorKind::InvalidData,
@@ -123,7 +127,7 @@ impl Terrain {
 
         for y in 0..height {
             for x in 0..width {
-                let refed = refed_by_tile.get(x + y * width).unwrap();
+                let refed = refed_by_tile.get((x + y * width) as usize).unwrap();
 
                 if !refed {
                     return Err(
@@ -163,12 +167,12 @@ impl Terrain {
         Ok(())
     }
 
-    pub fn is_passable(&self, x: usize, y: usize) -> bool {
-        *self.passable.get(x + y * self.width).unwrap()
+    pub fn is_passable(&self, x: i32, y: i32) -> bool {
+        *self.passable.get((x + y * self.width) as usize).unwrap()
     }
 
-    pub fn display_at(&self, x: usize, y: usize) -> char {
-        *self.text_display.get(x + y * self.width).unwrap()
+    pub fn display_at(&self, x: i32, y: i32) -> char {
+        *self.text_display.get((x + y * self.width) as usize).unwrap()
     }
 
     pub fn display(&self, index: usize) -> char {

@@ -9,8 +9,8 @@ use serde_json;
 pub struct Tile {
     pub id: String,
     pub name: String,
-    pub width: usize,
-    pub height: usize,
+    pub width: i32,
+    pub height: i32,
 
     pub text_display: Vec<char>,
     pub impass: Vec<Point>,
@@ -35,7 +35,7 @@ impl Tile {
                                            builder.width))
                         );
                 }
-                display_vec.push(disp); 
+                display_vec.push(disp);
             }
         }
 
@@ -57,21 +57,21 @@ impl Tile {
                     );
             }
 
-            impass_points.push(Point::new(x, y));
+            impass_points.push(Point::new(x as i32, y as i32));
         }
 
         Ok(Tile {
             id: builder.id,
             name: builder.name,
-            width: builder.width,
-            height: builder.height,
+            width: builder.width as i32,
+            height: builder.height as i32,
             text_display: display_vec,
             impass: impass_points,
         })
     }
 
-    pub fn get_text_display(&self, x: usize, y: usize) -> char {
-        *self.text_display.get(x + y * self.width).unwrap()
+    pub fn get_text_display(&self, x: i32, y: i32) -> char {
+        *self.text_display.get((x + y * self.width) as usize).unwrap()
     }
 }
 

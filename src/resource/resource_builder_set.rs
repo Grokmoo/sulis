@@ -22,10 +22,11 @@ pub struct ResourceBuilderSet {
 impl ResourceBuilderSet {
     pub fn new(root: &str) -> Result<ResourceBuilderSet, Error> {
         let game_filename = root.to_owned() + "/game.json";
+        debug!("Reading top level config from {}", game_filename);
         let game = match ResourceBuilderSet::create_game(&game_filename) {
             Ok(g) => g,
             Err(e) => {
-                eprintln!("Unable to load game startup state from {}", game_filename);
+                error!("Unable to load game startup state from {}", game_filename);
                 return Err(e);
             }
         };
@@ -50,21 +51,23 @@ impl ResourceBuilderSet {
 }
 
 fn read_resources<T: ResourceBuilder>(dir: &str) -> HashMap<String, T> {
+    debug!("Reading resources from {}", dir);
     let mut resources: HashMap<String, T> = HashMap::new();
     let dir_entries = fs::read_dir(dir);
     let dir_entries = match dir_entries {
         Ok(entries) => entries,
         Err(_) => {
-            eprintln!("Unable to read directory: {}", dir);
+            warn!("Unable to read directory: {}", dir);
             return resources;
         }
     };
 
     for entry in dir_entries {
+        trace!("Found entry {:?}", entry);
         let entry = match entry {
             Ok(e) => e,
             Err(error) => {
-                eprintln!("Error reading file: {}", error);
+                warn!("Error reading file: {}", error);
                 continue;
             }
         };
@@ -80,34 +83,37 @@ fn read_resources<T: ResourceBuilder>(dir: &str) -> HashMap<String, T> {
         };
         if path.is_file() && extension == "json" {
             let path_str = path.to_string_lossy().into_owned();
+            debug!("Reading file at {}", path_str);
             let f = File::open(path);
             let mut f = match f {
                 Ok(file) => file,
                 Err(error) => {
-                    eprintln!("Error reading file: {}", error);
+                    warn!("Error reading file: {}", error);
                     continue;
                 }
             };
 
             let mut file_data = String::new();
             if f.read_to_string(&mut file_data).is_err() {
-                eprintln!("Error reading file data from file");
+                warn!("Error reading file data from file");
                 continue;
             }
+            trace!("Read file data.");
 
-            let resource = T::new(&file_data); 
+            let resource = T::new(&file_data);
             let resource = match resource {
                 Ok(a) => a,
                 Err(error) => {
-                    eprintln!("Error parsing file data: {:?}", path_str);
-                    eprintln!("  {}", error);
+                    warn!("Error parsing file data: {:?}", path_str);
+                    warn!("  {}", error);
                     continue;
                 }
             };
+            trace!("Created resource.");
 
             let id = resource.owned_id();
             if resources.contains_key(&id) {
-                eprintln!("Error: duplicate resource key: {} in {}", id, dir);
+                warn!("Duplicate resource key: {} in {}", id, dir);
                 continue;
             }
 

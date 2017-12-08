@@ -52,6 +52,7 @@ impl ResourceSet {
     pub fn new(root_directory: &str) -> Result<ResourceSet, Error> {
         let builder_set = ResourceBuilderSet::new(root_directory)?;
 
+        debug!("Creating resource set from parsed data.");
         let mut sizes: HashMap<usize, Rc<Size>> = HashMap::new();
         for (_id_str, builder) in builder_set.size_builders {
             insert_if_ok("size", builder.size, Size::new(builder), &mut sizes);
@@ -120,10 +121,11 @@ impl ResourceSet {
 
 fn insert_if_ok<K: Eq + Hash + Display, V>(type_str: &str, key: K, val: Result<V, Error>,
                                            map: &mut HashMap<K, Rc<V>>) {
+    trace!("Inserting resource of type {} with key {} into resource set.", type_str, key);
     match val {
         Err(e) => {
-            eprintln!("Error in {} with id '{}'", type_str, key);
-            eprintln!("{}", e);
+            warn!("Error in {} with id '{}'", type_str, key);
+            warn!("{}", e);
         },
         Ok(v) => { (*map).insert(key, Rc::new(v)); }
     };

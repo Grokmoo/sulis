@@ -1,5 +1,5 @@
-mod pancurses;
-mod termion_game;
+mod pancurses_adapter;
+mod termion_adapter;
 
 pub mod keyboard_event;
 pub use self::keyboard_event::KeyboardEvent;
@@ -42,10 +42,10 @@ pub trait TextRenderer {
 pub fn create<'a>(adapter: IOAdapter) -> Box<IO + 'a> {
     match adapter{
         IOAdapter::Pancurses => {
-            Box::new(pancurses::Terminal::new())
+            Box::new(pancurses_adapter::Terminal::new())
         },
         IOAdapter::Termion => {
-            Box::new(termion_game::Terminal::new())
+            Box::new(termion_adapter::Terminal::new())
         },
     }
 }

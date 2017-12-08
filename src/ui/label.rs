@@ -32,11 +32,15 @@ impl Label {
 }
 
 impl Widget for Label {
+    fn get_name(&self) -> &str {
+        "Label"
+    }
+
     fn draw_text_mode(&self, renderer: &mut TextRenderer, owner: &WidgetBase) {
         if let Some(ref t) = self.text {
-            let x = owner.x;
-            let y = owner.y;
-            let w = owner.width;
+            let x = owner.position.x as i32;
+            let y = owner.position.y as i32;
+            let w = owner.size.width;
             let len = cmp::min(t.len(), w as usize);
 
             let text = &t[0..len];

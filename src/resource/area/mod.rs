@@ -15,10 +15,10 @@ use serde_json;
 pub struct Area {
     pub id: String,
     pub name: String,
-    pub width: usize,
-    pub height: usize,
+    pub width: i32,
+    pub height: i32,
     pub terrain: Terrain,
-    path_grids: HashMap<usize, PathFinderGrid>,
+    path_grids: HashMap<i32, PathFinderGrid>,
 }
 
 impl PartialEq for Area {
@@ -30,37 +30,41 @@ impl PartialEq for Area {
 impl Area {
     pub fn new(builder: AreaBuilder, tiles: &HashMap<String, Rc<Tile>>,
                sizes: &HashMap<usize, Rc<Size>>) -> Result<Area, Error> {
+        debug!("Creating area {}", builder.id);
         let terrain = Terrain::new(&builder, tiles);
         let terrain = match terrain {
             Ok(l) => l,
             Err(e) => {
-                eprintln!("Unable to generate terrain for area '{}'", builder.id);
+                warn!("Unable to generate terrain for area '{}'", builder.id);
                 return Err(e);
             }
         };
 
-        let mut path_grids: HashMap<usize, PathFinderGrid> = HashMap::new();
+        let mut path_grids: HashMap<i32, PathFinderGrid> = HashMap::new();
         for size in sizes.values() {
-            path_grids.insert(size.size, PathFinderGrid::new(Rc::clone(size), &terrain));
+            let path_grid = PathFinderGrid::new(Rc::clone(size), &terrain);
+            trace!("Generated path grid of size {}", size.size);
+            path_grids.insert(size.size, path_grid);
         }
 
         Ok(Area {
             id: builder.id,
             name: builder.name,
-            width: builder.width,
-            height: builder.height,
+            width: builder.width as i32,
+            height: builder.height as i32,
             terrain: terrain,
             path_grids: path_grids,
         })
     }
 
-    pub fn coords_valid(&self, x: usize, y: usize) -> bool {
+    pub fn coords_valid(&self, x: i32, y: i32) -> bool {
+        if x < 0 || y < 0 { return false; }
         if x >= self.width || y >= self.height { return false; }
 
         true
     }
 
-    pub fn get_path_grid(&self, size: usize) -> &PathFinderGrid {
+    pub fn get_path_grid(&self, size: i32) -> &PathFinderGrid {
         self.path_grids.get(&size).unwrap()
     }
 }

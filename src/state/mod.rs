@@ -41,28 +41,23 @@ impl<'a> GameState<'a> {
     pub fn new(config: Config, resources: &'a ResourceSet) -> Result<GameState<'a>, Error> {
         let game = &resources.game;
 
+        debug!("Setting up area state from {}", &game.starting_area);
         let area = resources.get_area(&game.starting_area);
         let area = match area {
             Some(a) => a,
             None => {
-                eprintln!("Starting area '{}' not found", &game.starting_area);
+                error!("Starting area '{}' not found", &game.starting_area);
                 return Err(Error::new(ErrorKind::NotFound,
                                       "Unable to create starting area."));
             }
         };
         let area_state = Rc::new(RefCell::new(AreaState::new(area)));
 
-        if game.starting_location.len() != 2 {
-            eprintln!("Starting location must be an integer array of length 2.");
-            return Err(Error::new(ErrorKind::InvalidData,
-                                  "Unable to create starting location."));
-        }
-        let x = *game.starting_location.get(0).unwrap();
-        let y = *game.starting_location.get(1).unwrap();
-        let location = Location::new(x, y, Rc::clone(&area_state));
+        debug!("Setting up PC {}, with {:?}", &game.pc, &game.starting_location);
+        let location = Location::from_point(&game.starting_location, Rc::clone(&area_state));
 
         if !location.coords_valid(location.x, location.y) {
-            eprintln!("Starting location coordinates must be valid for the starting area.");
+            error!("Starting location coordinates must be valid for the starting area.");
             return Err(Error::new(ErrorKind::InvalidData,
                                   "Unable to create starting location."));
         }
@@ -71,14 +66,14 @@ impl<'a> GameState<'a> {
         let pc = match pc {
             Some(a) => a,
             None => {
-                eprintln!("Player character '{}' not found", &game.pc);
+                error!("Player character '{}' not found", &game.pc);
                 return Err(Error::new(ErrorKind::NotFound,
                                       "Unable to create player character."));
             }
         };
 
         if !area_state.borrow_mut().add_actor(pc, location) {
-            eprintln!("Player character starting location must be within area bounds and passable.");
+            error!("Player character starting location must be within area bounds and passable.");
             return Err(Error::new(ErrorKind::InvalidData,
                                   "Unable to add player character to starting area at starting location"));
         }
@@ -94,8 +89,8 @@ impl<'a> GameState<'a> {
             area_state: area_state,
             pc: pc_state,
             cursor: Cursor {
-                x: x as i32,
-                y: y as i32,
+                x: 0,
+                y: 0,
                 max_x: display_width,
                 max_y: display_height,
                 c: cursor_char,
@@ -106,6 +101,7 @@ impl<'a> GameState<'a> {
     }
 
     pub fn set_exit(&mut self) -> bool{
+        trace!("Setting state exit flag.");
         self.should_exit = true;
         true
     }
@@ -118,6 +114,7 @@ impl<'a> GameState<'a> {
     }
 
     pub fn cursor_move_by(&mut self, root: RefMut<WidgetBase>, x: i32, y: i32) -> bool {
+        trace!("Move cursor by {}, {}", x, y);
         if self.cursor.move_by(x, y) {
             let event = MouseEvent::new(mouse_event::Kind::Move(x, y),
                  self.cursor.x, self.cursor.y);
@@ -131,6 +128,7 @@ impl<'a> GameState<'a> {
         let x = self.cursor.x;
         let y = self.cursor.y;
 
+        trace!("Emulating cursor click event at {},{} as mouse event", x, y);
         let event = MouseEvent::new(mouse_event::Kind::LeftClick, x, y);
         root.dispatch_event(self, event)
     }
@@ -141,6 +139,8 @@ impl<'a> GameState<'a> {
 
     pub fn handle_keyboard_input(&mut self, input: KeyboardEvent,
                                  root: RefMut<WidgetBase>) {
+
+        debug!("Received {:?}", input);
         let action = {
             let action = self.config.get_input_action(input);
 
@@ -160,7 +160,8 @@ impl<'a> GameState<'a> {
         self.pc.borrow_mut()
     }
 
-    pub fn pc_move_to(&mut self, x: usize, y: usize) -> bool {
+    pub fn pc_move_to(&mut self, x: i32, y: i32) -> bool {
+        trace!("Moving pc to {},{}", x, y);
         let path = self.area_state.borrow_mut().find_path(self.pc(), x, y);
 
         if let None = path {
@@ -174,14 +175,11 @@ impl<'a> GameState<'a> {
     }
 
     pub fn pc_move_by(&mut self, x: i32, y: i32) -> bool {
+        trace!("Moving pc by {}, {}", x, y);
         let (x, y) = {
             let entity = self.pc();
-            let x = x + (*entity).location.x as i32;
-            let y = y + (*entity).location.y as i32;
-
-            if x < 0 || y < 0 { return false; }
-            let x = x as usize;
-            let y = y as usize;
+            let x = x + (*entity).location.x;
+            let y = y + (*entity).location.y;
 
             let area_state = (*entity).location.area_state.borrow();
 
@@ -193,8 +191,8 @@ impl<'a> GameState<'a> {
         return (*self.pc_mut()).move_to(x, y);
     }
 
-    pub fn add_actor(&mut self, actor: Rc<Actor>, x: usize,
-                     y: usize) -> bool {
+    pub fn add_actor(&mut self, actor: Rc<Actor>, x: i32,
+                     y: i32) -> bool {
         let location = Location::new(x, y, Rc::clone(&self.area_state));
 
         self.area_state.borrow_mut().add_actor(actor, location)

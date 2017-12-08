@@ -6,14 +6,14 @@ use resource::Point;
 use serde_json;
 
 pub struct Size {
-    pub size: usize,
+    pub size: i32,
     relative_points: Vec<Point>,
 }
 
 impl Size {
     pub fn new(builder: SizeBuilder) -> Result<Size, Error> {
         let mut points: Vec<Point> = Vec::new();
-        
+
         for p in builder.relative_points.into_iter() {
             if p.len() != 2 {
                 return Err(Error::new(ErrorKind::InvalidData,
@@ -27,11 +27,11 @@ impl Size {
                                               builder.size)));
             }
 
-            points.push(Point::new(x, y));
+            points.push(Point::new(x as i32, y as i32));
         }
 
         Ok(Size {
-            size: builder.size,
+            size: builder.size as i32,
             relative_points: points
         })
     }
@@ -40,7 +40,7 @@ impl Size {
         SizeIterator { size: &self, index: 0, x_offset: 0, y_offset: 0 }
     }
 
-    pub fn points(&self, x: usize, y: usize) -> SizeIterator {
+    pub fn points(&self, x: i32, y: i32) -> SizeIterator {
         SizeIterator { size: &self, index: 0, x_offset: x, y_offset: y }
     }
 }
@@ -48,8 +48,8 @@ impl Size {
 pub struct SizeIterator<'a> {
     size: &'a Size,
     index: usize,
-    x_offset: usize,
-    y_offset: usize,
+    x_offset: i32,
+    y_offset: i32,
 }
 
 impl<'a> Iterator for SizeIterator<'a> {

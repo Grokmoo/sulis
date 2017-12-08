@@ -1,48 +1,79 @@
 use std::rc::Rc;
 use std::cell::RefCell;
+use std::fmt::{Debug, Formatter, Result};
 
-use ui::Widget;
+use ui::{Border, Size, Widget};
 use state::GameState;
 use io::{MouseEvent, TextRenderer};
+
+use resource::Point;
 
 //// The base widget holder class.  Contains the common implementation across all
 //// widgets, and holds an instance of 'Widget' which contains the specific behavior.
 pub struct WidgetBase<'a> {
-    pub x: i32,
-    pub y: i32,
-    pub width: i32,
-    pub height: i32,
+    pub position: Point,
+    pub size: Size,
+    pub border: Border,
     pub children: Vec<Rc<RefCell<WidgetBase<'a>>>>,
     drawable: Rc<RefCell<Widget + 'a>>,
 }
 
+impl<'a> Debug for WidgetBase<'a> {
+    fn fmt(&self, fmt: &mut Formatter) -> Result {
+        write!(fmt, "Widget {} at {:?}", self.drawable.borrow().get_name(),
+            self.position)
+    }
+}
+
 impl<'a> WidgetBase<'a> {
-    pub fn default(drawable: Rc<RefCell<Widget + 'a>>) -> Rc<RefCell<WidgetBase<'a>>> {
+    pub fn with_defaults(drawable: Rc<RefCell<Widget + 'a>>) -> Rc<RefCell<WidgetBase<'a>>> {
         Rc::new(RefCell::new(WidgetBase {
             drawable,
-            x: 0, y: 0,
-            width: 0, height: 0,
+            size: Size::as_zero(),
+            position: Point::as_zero(),
+            border: Border::as_zero(),
             children: Vec::new(),
         }))
     }
 
-    pub fn new(drawable: Rc<RefCell<Widget + 'a>>,
-               pos_x: i32, pos_y: i32,
-               width: i32, height: i32) -> Rc<RefCell<WidgetBase<'a>>> {
+    pub fn with_size(drawable: Rc<RefCell<Widget + 'a>>,
+                     size: Size) -> Rc<RefCell<WidgetBase<'a>>> {
         Rc::new(RefCell::new(WidgetBase {
-            x: pos_x,
-            y: pos_y,
-            width,
-            height,
-            children: Vec::new(),
             drawable,
+            size,
+            position: Point::as_zero(),
+            border: Border::as_zero(),
+            children: Vec::new(),
+        }))
+    }
+
+    pub fn with_position(drawable: Rc<RefCell<Widget + 'a>>, size: Size,
+                         position: Point) -> Rc<RefCell<WidgetBase<'a>>> {
+        Rc::new(RefCell::new(WidgetBase {
+            drawable,
+            size,
+            position,
+            border: Border::as_zero(),
+            children: Vec::new(),
+        }))
+    }
+
+    pub fn with_border(drawable: Rc<RefCell<Widget + 'a>>, size: Size,
+                       position: Point, border: Border) -> Rc<RefCell<WidgetBase<'a>>> {
+        Rc::new(RefCell::new(WidgetBase {
+            drawable,
+            size,
+            position,
+            border,
+            children: Vec::new(),
         }))
     }
 
     pub fn dispatch_event(&self, state: &mut GameState, event: MouseEvent) -> bool {
+        trace!("Dispatching event {:?} in {:?}", event, self);
         for child in self.children.iter() {
             let child = child.borrow();
-            if child.is_in_bounds(event.x as i32, event.y as i32) {
+            if child.in_bounds(event.x as i32, event.y as i32) {
                 if child.dispatch_event(state, event) {
                     return true;
                 }
@@ -60,28 +91,35 @@ impl<'a> WidgetBase<'a> {
         }
     }
 
-    pub fn is_in_bounds(&self, x: i32, y: i32) -> bool {
-        x >= self.x && y >= self.y &&
-            x < self.x + self.width && y < self.y + self.height
+    pub fn inner_position(&self) -> Point {
+        self.position.inner(&self.border)
     }
 
-    pub fn add_child(&mut self, widget: Rc<RefCell<WidgetBase<'a>>>) {
-        self.children.push(widget);
+    pub fn inner_size(&self) -> Size {
+        self.size.inner(&self.border)
+    }
+
+    pub fn in_bounds(&self, x: i32, y: i32) -> bool {
+        self.size.in_bounds(x - self.position.x as i32, y - self.position.y as i32)
     }
 
     pub fn set_position_centered(&mut self, x: i32, y: i32) {
-        self.x = x - (self.width - 1) / 2;
-        self.y = y - (self.height - 1) / 2;
+        self.position = Point::new(
+            x - (self.size.width - 1) / 2,
+            y - (self.size.height - 1) / 2);
     }
 
     pub fn set_position(&mut self, x: i32, y: i32) {
-        self.x = x;
-        self.y = y;
+        self.position = Point::new(x, y);
     }
 
     pub fn set_size(&mut self, width: i32, height: i32) {
-        self.width = width;
-        self.height = height;
+        self.size = Size::new(width, height);
+    }
+
+    pub fn add_child(&mut self, widget: Rc<RefCell<WidgetBase<'a>>>) {
+        trace!("Adding {:?} to {:?}", &widget.borrow(), self);
+        self.children.push(widget);
     }
 
     pub fn draw_text_mode(&self, renderer: &mut TextRenderer) {

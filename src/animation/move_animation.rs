@@ -35,6 +35,7 @@ impl<'a> animation::Animation for MoveAnimation<'a> {
         let p = self.path.get(frame_index).unwrap();
         &self.mover.borrow_mut().move_to(p.x, p.y);
 
+        trace!("Updated move animation at frame {}", frame_index);
         return frame_index != self.path.len() - 1
     }
 }

@@ -1,13 +1,14 @@
 use std::io::Error;
 
 use resource::ResourceBuilder;
+use resource::Point;
 
 use serde_json;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Game {
     pub starting_area: String,
-    pub starting_location: Vec<usize>,
+    pub starting_location: Point,
     pub pc: String,
 }
 

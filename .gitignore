@@ -2,3 +2,4 @@ target/*
 config.json
 *.swp
 *.swo
+log/*

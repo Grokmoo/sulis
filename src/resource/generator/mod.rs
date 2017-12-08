@@ -5,8 +5,11 @@ use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 
 pub fn generate_area(tiles: &HashMap<String, Rc<Tile>>,
-                     width: usize, height: usize) -> Result<Vec<Option<Rc<Tile>>>, Error> {
+                     width: i32, height: i32) -> Result<Vec<Option<Rc<Tile>>>, Error> {
 
+    debug!("Generating area with size {},{}", width, height);
+    let width = width as usize;
+    let height = height as usize;
     // filter down to only tiles of size one
     let tiles: HashMap<String, Rc<Tile>> = tiles.iter().filter_map( |(id, tile)| {
         if tile.width == 1 && tile.height == 1 {
@@ -19,6 +22,8 @@ pub fn generate_area(tiles: &HashMap<String, Rc<Tile>>,
     let (passable_tiles, impassable_tiles):
         (Vec<Rc<Tile>>, Vec<Rc<Tile>>) = tiles.values().
          map(|tile| Rc::clone(tile)).partition(|tile| tile.impass.len() == 0);
+    trace!("Got passable tiles {:?}", passable_tiles);
+    trace!("Got impassable tiles {:?}", impassable_tiles);
 
     if passable_tiles.len() == 0 {
         return Err(Error::new(ErrorKind::InvalidData,
@@ -51,6 +56,8 @@ pub fn generate_area(tiles: &HashMap<String, Rc<Tile>>,
         let cell = terrain.get_mut(width - 1 + y * width).unwrap();
         *cell = Some(Rc::clone(impass));
     }
+
+    trace!("Done generation of area.");
 
     Ok(terrain)
 }

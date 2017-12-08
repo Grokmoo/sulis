@@ -25,7 +25,7 @@ impl<'a> PartialEq for AreaState<'a> {
 
 impl<'a> AreaState<'a> {
     pub fn new(area: Rc<Area>) -> AreaState<'a> {
-        let mut display = vec![' ';area.width * area.height];
+        let mut display = vec![' ';(area.width * area.height) as usize];
         for (index, element) in display.iter_mut().enumerate() {
             *element = area.terrain.display(index);
         }
@@ -41,16 +41,16 @@ impl<'a> AreaState<'a> {
     }
 
     pub fn find_path(&mut self, requester: Ref<EntityState<'a>>,
-                     dest_x: usize, dest_y: usize) -> Option<Vec<Point>> {
+                     dest_x: i32, dest_y: i32) -> Option<Vec<Point>> {
         self.path_finder.find(requester, dest_x, dest_y)
     }
 
-    pub fn get_display(&self, x: usize, y: usize) -> char {
-        *self.display.get(x + y * self.area.width).unwrap()
+    pub fn get_display(&self, x: i32, y: i32) -> char {
+        *self.display.get((x + y * self.area.width) as usize).unwrap()
     }
 
     pub fn is_passable(&self, requester: Ref<EntityState<'a>>,
-                       new_x: usize, new_y: usize) -> bool {
+                       new_x: i32, new_y: i32) -> bool {
         if !self.area.coords_valid(new_x, new_y) { return false; }
 
         if !self.area.get_path_grid(requester.size()).is_passable(new_x, new_y) { return false; }
@@ -59,7 +59,7 @@ impl<'a> AreaState<'a> {
     }
 
     fn point_entities_passable(&self, requester: &Ref<EntityState<'a>>,
-                               x: usize, y: usize) -> bool {
+                               x: i32, y: i32) -> bool {
         if !self.area.coords_valid(x, y) { return false; }
 
         for entity in self.entities.iter() {
@@ -94,7 +94,8 @@ impl<'a> AreaState<'a> {
         true
     }
 
-    pub(in state) fn update_entity_display(&mut self, entity: &EntityState<'a>, new_x: usize, new_y: usize) {
+    pub(in state) fn update_entity_display(&mut self, entity: &EntityState<'a>,
+                                           new_x: i32, new_y: i32) {
         let cur_x = entity.location.x;
         let cur_y = entity.location.y;
 
@@ -107,7 +108,7 @@ impl<'a> AreaState<'a> {
             for_each(|p| self.update_display(p.x, p.y, entity.display()));
     }
 
-    fn update_display(&mut self, x: usize, y: usize, c: char) {
-        *self.display.get_mut(x + y * self.area.width).unwrap() = c;
+    fn update_display(&mut self, x: i32, y: i32, c: char) {
+        *self.display.get_mut((x + y * self.area.width) as usize).unwrap() = c;
     }
 }

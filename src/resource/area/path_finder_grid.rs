@@ -7,8 +7,8 @@ use resource::Terrain;
 pub struct PathFinderGrid {
     pub size: Rc<Size>,
     pub passable: Vec<bool>,
-    pub width: usize,
-    pub height: usize,
+    pub width: i32,
+    pub height: i32,
 }
 
 impl fmt::Debug for PathFinderGrid {
@@ -16,7 +16,7 @@ impl fmt::Debug for PathFinderGrid {
         write!(f, "PathFinderGrid of size {}\n  ", self.size.size)?;
         for y in 0..self.height {
             for x in 0..self.width {
-                if *self.passable.get(x + y * self.width).unwrap() {
+                if *self.passable.get((x + y * self.width) as usize).unwrap() {
                     write!(f, ".")?;
                 } else {
                     write!(f, "X")?;
@@ -33,7 +33,7 @@ impl PathFinderGrid {
         let width = terrain.width;
         let height = terrain.height;
 
-        let mut passable = vec![false;width * height];
+        let mut passable = vec![false;(width * height) as usize];
 
         for y in 0..height {
             for x in 0..width {
@@ -48,7 +48,7 @@ impl PathFinderGrid {
                         break;
                     }
                 }
-                *passable.get_mut(x + y * width).unwrap() = is_passable;
+                *passable.get_mut((x + y * width) as usize).unwrap() = is_passable;
             }
         }
 
@@ -60,15 +60,15 @@ impl PathFinderGrid {
         }
     }
 
-    pub fn size(&self) -> usize {
+    pub fn size(&self) -> i32 {
         self.size.size
     }
 
-    pub fn is_passable(&self, x: usize, y: usize) -> bool {
-        *self.passable.get(x + y * self.width).unwrap()
+    pub fn is_passable(&self, x: i32, y: i32) -> bool {
+        *self.passable.get((x + y * self.width) as usize).unwrap()
     }
 
-    pub fn is_passable_index(&self, index: usize) -> bool {
-        *self.passable.get(index).unwrap()
+    pub fn is_passable_index(&self, index: i32) -> bool {
+        *self.passable.get(index as usize).unwrap()
     }
 }

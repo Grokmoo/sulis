@@ -19,6 +19,7 @@ pub struct Terminal {
 
 impl Terminal {
     pub fn new() -> Terminal {
+        debug!("Initialize Pancurses display adapter.");
         let window = pancurses::initscr();
         window.nodelay(true);
         window.keypad(true);
@@ -46,6 +47,7 @@ impl Terminal {
 
 impl IO for Terminal {
     fn init(&mut self, config: &Config) {
+        trace!("Called init on pancurses adapter.");
         self.size_terminal(config);
     }
 

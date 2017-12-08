@@ -17,10 +17,13 @@ pub struct Terminal {
     stdin: Bytes<termion::AsyncReader>,
     stdout: AlternateScreen<RawTerminal<std::io::Stdout>>,
     start_time: Instant,
+
+    write_buffer: String,
 }
 
 impl Terminal {
     pub fn new() -> Terminal {
+        debug!("Initialize Termion display adapter.");
         let stdout = AlternateScreen::from(stdout().into_raw_mode().unwrap());
         //let stdout = stdout.into_raw_mode().unwrap();
         //let stdin = stdin.keys();
@@ -30,12 +33,21 @@ impl Terminal {
             stdin,
             stdout,
             start_time: Instant::now(),
+            write_buffer: String::new(),
+        }
+    }
+
+    fn write_buffered_text(&mut self) {
+        if self.write_buffer.len() > 0 {
+            write!(self.stdout, "{}", &self.write_buffer).unwrap();
+            self.write_buffer.clear();
         }
     }
 }
 
 impl IO for Terminal {
     fn init(&mut self, _config: &Config) {
+        trace!("Called init on termion adapter");
         write!(self.stdout, "{}", termion::cursor::Hide).unwrap();
     }
 
@@ -59,6 +71,8 @@ impl IO for Terminal {
         let millis = animation::get_elapsed_millis(self.start_time.elapsed());
 
         state.draw_text_mode(self as &mut Terminal, root, millis);
+
+        self.write_buffered_text();
         self.stdout.flush().unwrap();
     }
 
@@ -71,14 +85,18 @@ impl IO for Terminal {
 
 impl TextRenderer for Terminal {
     fn render_char(&mut self, c: char) {
-        write!(self.stdout, "{}", c).unwrap();
+        self.write_buffer.push(c);
+        //write!(self.stdout, "{}", c).unwrap();
     }
 
     fn render_string(&mut self, s: &str) {
-        write!(self.stdout, "{}", s).unwrap();
+        self.write_buffer.push_str(s);
+        //write!(self.stdout, "{}", s).unwrap();
     }
 
     fn set_cursor_pos(&mut self, x: i32, y: i32) {
+        self.write_buffered_text();
+
         write!(self.stdout, "{}",
                termion::cursor::Goto(x as u16 + 1, y as u16 + 1)).unwrap();
     }

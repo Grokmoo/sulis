@@ -7,14 +7,15 @@ use io::{KeyboardEvent, InputAction};
 
 use serde_json;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct Config {
   pub display: DisplayConfig,
   pub resources: ResourcesConfig,
   pub input: InputConfig,
+  pub log_level: String,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct DisplayConfig {
     pub adapter: IOAdapter,
     pub frame_rate: u32,
@@ -24,12 +25,12 @@ pub struct DisplayConfig {
     pub cursor_char: char,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct ResourcesConfig {
     pub directory: String,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct InputConfig {
     pub keybindings: HashMap<Key, InputAction>
 }
@@ -47,11 +48,17 @@ impl Config {
         f.read_to_string(&mut file_data)?;
 
         let config: Result<Config, serde_json::Error> = serde_json::from_str(&file_data);
-        match config {
-            Ok(config) => Ok(config),
+        let config = match config {
+            Ok(config) => config,
             Err(e) => {
-                Err(Error::new(ErrorKind::InvalidData, format!("{}", e)))
+                return Err(Error::new(ErrorKind::InvalidData, format!("{}", e)));
             }
+        };
+
+        match config.log_level.as_ref() {
+            "error" | "warn" | "info" | "debug" | "trace" => Ok(config),
+            _ => Err(Error::new(ErrorKind::InvalidData,
+                    format!("log_level must be one of error, warn, info, debug, or trace")))
         }
     }
 

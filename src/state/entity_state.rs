@@ -27,7 +27,7 @@ impl<'a> EntityState<'a> {
         }
     }
 
-    pub fn move_to(&mut self, x: usize, y: usize) -> bool {
+    pub fn move_to(&mut self, x: i32, y: i32) -> bool {
         if !self.location.coords_valid(x, y) { return false; }
         if !self.location.coords_valid(x + self.size() - 1, y + self.size() - 1) {
             return false;
@@ -42,7 +42,7 @@ impl<'a> EntityState<'a> {
         self.actor.actor.display
     }
 
-    pub fn size(&self) -> usize {
+    pub fn size(&self) -> i32 {
         self.size.size
     }
 
@@ -50,7 +50,7 @@ impl<'a> EntityState<'a> {
         self.size.relative_points()
     }
 
-    pub fn points(&self, x: usize, y: usize) -> SizeIterator {
+    pub fn points(&self, x: i32, y: i32) -> SizeIterator {
         self.size.points(x, y)
     }
 }

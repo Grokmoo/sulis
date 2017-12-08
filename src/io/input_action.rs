@@ -25,6 +25,7 @@ impl InputAction {
         // proved unwieldy at best
         use self::InputAction::*;
 
+        debug!("Firing action {:?}", action);
         match action {
             MoveUp => state.pc_move_by(0, -1),
             MoveDown => state.pc_move_by(0, 1),

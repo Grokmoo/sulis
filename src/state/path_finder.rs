@@ -1,7 +1,7 @@
 use std::rc::Rc;
 use std::cell::Ref;
 use std::collections::{HashMap, HashSet};
-use std::usize;
+use std::i32;
 
 use resource::Area;
 use resource::Point;
@@ -10,14 +10,14 @@ use state::EntityState;
 
 pub struct PathFinder {
     pub area: Rc<Area>,
-    pub width: usize,
-    pub height: usize,
+    pub width: i32,
+    pub height: i32,
 
-    f_score: Vec<usize>,
-    g_score: Vec<usize>,
-    open: HashSet<usize>,
-    closed: HashSet<usize>,
-    came_from: HashMap<usize, usize>,
+    f_score: Vec<i32>,
+    g_score: Vec<i32>,
+    open: HashSet<i32>,
+    closed: HashSet<i32>,
+    came_from: HashMap<i32, i32>,
 }
 
 impl PathFinder {
@@ -25,20 +25,24 @@ impl PathFinder {
         let width = area.width;
         let height = area.height;
 
+        debug!("Initializing pathfinder for {}", area.id);
         PathFinder {
             area,
             width,
             height,
-            f_score: vec![0;width*height],
-            g_score: vec![0;width*height],
+            f_score: vec![0;(width*height) as usize],
+            g_score: vec![0;(width*height) as usize],
             open: HashSet::new(),
             closed: HashSet::new(),
             came_from: HashMap::new(),
         }
     }
 
-    pub fn find(&mut self, requester: Ref<EntityState>, dest_x: usize,
-                dest_y: usize) -> Option<Vec<Point>> {
+    pub fn find(&mut self, requester: Ref<EntityState>, dest_x: i32,
+                dest_y: i32) -> Option<Vec<Point>> {
+        debug!("Finding path from {:?} to {},{}",
+               requester.location, dest_x, dest_y);
+
         let start = requester.location.x + requester.location.y * self.width;
         let goal = dest_x + dest_y * self.width;
 
@@ -56,20 +60,23 @@ impl PathFinder {
             }
         }
 
-        if self.closed.contains(&goal) { return None; }
+        if self.closed.contains(&goal) {
+            trace!("Goal is unreachable, returning None");
+            return None;
+        }
 
         // for each node, the node it can be most efficiently reached from
         self.came_from.clear();
 
         // for each node, cost of getting from start to that node
-        self.g_score.iter_mut().for_each(|v| *v = usize::MAX);
+        self.g_score.iter_mut().for_each(|v| *v = i32::MAX);
 
         // for each node, total cost of getting from start to goal passing by
         // this node
-        self.f_score.iter_mut().for_each(|v| *v = usize::MAX);
+        self.f_score.iter_mut().for_each(|v| *v = i32::MAX);
 
-        *self.g_score.get_mut(start).unwrap() = 0;
-        *self.f_score.get_mut(start).unwrap() =
+        *self.g_score.get_mut(start as usize).unwrap() = 0;
+        *self.f_score.get_mut(start as usize).unwrap() =
             self.heuristic_cost_estimate(start, goal);
 
         while !self.open.is_empty() {
@@ -82,7 +89,9 @@ impl PathFinder {
             self.closed.insert(current);
 
             for neighbor in self.get_neighbors(current) {
+                trace!("Checking neighbor {}", neighbor);
                 if self.closed.contains(&neighbor) {
+                    trace!("Already evaluated.");
                     continue; // neighbor has already been evaluated
                 }
 
@@ -90,15 +99,16 @@ impl PathFinder {
                     self.open.insert(neighbor);
                 }
 
-                let tentative_g_score = self.g_score.get(current).unwrap() +
+                let tentative_g_score = self.g_score.get(current as usize).unwrap() +
                     self.get_cost(current, neighbor);
-                if tentative_g_score >= *self.g_score.get(neighbor).unwrap() {
+                if tentative_g_score >= *self.g_score.get(neighbor as usize).unwrap() {
+                    trace!("G score indicates this neighbor is not preferable.");
                     continue; // this is not a better path
                 }
 
                 self.came_from.insert(neighbor, current);
-                *self.g_score.get_mut(neighbor).unwrap() = tentative_g_score;
-                *self.f_score.get_mut(neighbor).unwrap() = tentative_g_score +
+                *self.g_score.get_mut(neighbor as usize).unwrap() = tentative_g_score;
+                *self.f_score.get_mut(neighbor as usize).unwrap() = tentative_g_score +
                     self.heuristic_cost_estimate(neighbor, goal);
             }
         }
@@ -106,12 +116,15 @@ impl PathFinder {
         None
     }
 
-    fn reconstruct_path(&self, current: usize) -> Vec<Point> {
+    fn reconstruct_path(&self, current: i32) -> Vec<Point> {
+        trace!("Reconstructing path");
+
         let mut path: Vec<Point> = Vec::new();
 
         path.push(self.get_point(current));
         let mut current = current;
         loop {
+            trace!("Current {}", current);
             if let None = self.came_from.get(&current) {
                 break;
             }
@@ -119,64 +132,65 @@ impl PathFinder {
             path.push(self.get_point(current));
         }
 
+        trace!("Path reconstructed.  reversing.");
         path.reverse();
         path
     }
 
-    fn get_point(&self, index: usize) -> Point {
+    fn get_point(&self, index: i32) -> Point {
         Point::new(index % self.width, index / self.width)
     }
 
-    fn get_cost(&self, _from: usize, _to: usize) -> usize {
+    fn get_cost(&self, _from: i32, _to: i32) -> i32 {
         1
     }
 
-    fn get_neighbors(&self, point: usize) -> Vec<usize> {
-        let point = point as i32;
-        let width = self.width as i32;
-        let height = self.height as i32;
+    fn get_neighbors(&self, point: i32) -> Vec<i32> {
+        let width = self.width;
+        let height = self.height;
 
         let top = point - width;
         let right = point + 1;
         let left = point - 1;
         let bottom = point + width;
 
-        let mut neighbors: Vec<usize> = Vec::new();
-        if top > 0 { neighbors.push(top as usize); }
-        if bottom < width * height { neighbors.push(bottom as usize); }
-        if right % width != point % width { neighbors.push(right as usize); }
-        if left % width != point % width { neighbors.push(left as usize); }
+        let mut neighbors: Vec<i32> = Vec::new();
+        if top > 0 { neighbors.push(top); }
+        if bottom < width * height { neighbors.push(bottom); }
+        if right % width != point % width { neighbors.push(right); }
+        if left % width != point % width { neighbors.push(left); }
 
+        trace!("Got neighbors for {}: {:?}", point, neighbors);
         neighbors
     }
 
-    fn find_lowest_f_score_in_open_set(&self) -> usize {
-        let mut lowest = usize::MAX;
+    fn find_lowest_f_score_in_open_set(&self) -> i32 {
+        let mut lowest = i32::MAX;
         let mut lowest_index = 0;
 
         for val in self.open.iter() {
-            let f_score = self.f_score.get(*val).unwrap();
+            let f_score = self.f_score.get(*val as usize).unwrap();
             if f_score < &lowest {
                 lowest = *f_score;
                 lowest_index = *val;
             }
         }
 
+        trace!("Found lowest f score of {} at {}", lowest, lowest_index);
         lowest_index
     }
 
-    fn heuristic_cost_estimate(&self, start: usize, end: usize) -> usize {
+    fn heuristic_cost_estimate(&self, start: i32, end: i32) -> i32 {
         let s_x = start % self.width;
         let s_y = start / self.width;
 
         let e_x = end % self.width;
         let e_y = end / self.width;
 
-        let x_component = if s_x > e_x { s_x - e_x } else { e_x - s_x };
-        let y_component = if s_y > e_y { s_y - e_y } else { e_y - s_y };
+        let x_part = s_x - e_x;
+        let y_part = s_y - e_y;
 
-        // we don't actually need the euclidean distance here; this equal weighted
-        // always positive function is good enough
-        x_component + y_component
+        trace!("Computed cost estimate from {} to {}", start, end);
+        x_part * x_part + y_part * y_part
     }
 }

@@ -22,10 +22,10 @@ impl PartialEq for Actor {
 
 impl Actor {
     pub fn new(builder: ActorBuilder, sizes: &HashMap<usize, Rc<Size>>) -> Result<Actor, Error> {
-        
+
         let default_size = match sizes.get(&builder.default_size) {
             None => {
-                eprintln!("No match found for size '{}'", builder.default_size);
+                warn!("No match found for size '{}'", builder.default_size);
                 return Err(Error::new(ErrorKind::InvalidData,
                                       format!("Unable to create actor '{}'", builder.id)));
             },

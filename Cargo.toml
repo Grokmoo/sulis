@@ -4,7 +4,6 @@ version = "0.1.0"
 authors = ["Jared Stephen <grok_moo@yahoo.com>"]
 
 [dependencies]
-termion = { git = "https://github.com/mcgoo/termion", branch = "windows" }
 pancurses = "0.13.0"
 
 serde = "1.0"

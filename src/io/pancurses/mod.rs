@@ -3,6 +3,7 @@ use pancurses;
 use std::time::Instant;
 use std::cell::{Ref, RefMut};
 
+use io;
 use io::keyboard_event::Key;
 use io::{IO, KeyboardEvent, TextRenderer};
 
@@ -55,7 +56,7 @@ impl IO for Terminal {
         }
 
         let input = match input.unwrap() {
-            pancurses::Input::Character(c) => match_char(c),
+            pancurses::Input::Character(c) => io::match_char(c),
             input => match_special(input),
         };
         let input = KeyboardEvent { key: input };
@@ -86,70 +87,6 @@ impl TextRenderer for Terminal {
 
     fn set_cursor_pos(&mut self, x: i32, y: i32) {
         self.window.mv(y, x);
-    }
-}
-
-fn match_char(c: char) -> Key {
-    use io::keyboard_event::Key::*;
-    match c {
-        'a' | 'A' => KeyA,
-        'b' | 'B' => KeyB,
-        'c' | 'C' => KeyC,
-        'd' | 'D' => KeyD,
-        'e' | 'E' => KeyE,
-        'f' | 'F' => KeyF,
-        'g' | 'G' => KeyG,
-        'h' | 'H' => KeyH,
-        'i' | 'I' => KeyI,
-        'j' | 'J' => KeyJ,
-        'k' | 'K' => KeyK,
-        'l' | 'L' => KeyL,
-        'm' | 'M' => KeyM,
-        'n' | 'N' => KeyN,
-        'o' | 'O' => KeyO,
-        'p' | 'P' => KeyP,
-        'q' | 'Q' => KeyQ,
-        'r' | 'R' => KeyR,
-        's' | 'S' => KeyS,
-        't' | 'T' => KeyT,
-        'u' | 'U' => KeyU,
-        'v' | 'V' => KeyV,
-        'w' | 'W' => KeyW,
-        'x' | 'X' => KeyX,
-        'y' | 'Y' => KeyY,
-        'z' | 'Z' => KeyZ,
-
-        '0' | ')' => Key0,
-        '1' | '!' => Key1,
-        '2' | '@' => Key2,
-        '3' | '#' => Key3,
-        '4' | '$' => Key4,
-        '5' | '%' => Key5,
-        '6' | '^' => Key6,
-        '7' | '&' => Key7,
-        '8' | '*' => Key8,
-        '9' | '(' => Key9,
-
-        '\u{1b}' => KeyEscape,
-        '\u{8}' => KeyBackspace,
-        '\t' => KeyTab,
-        ' ' => KeySpace,
-        '\r' => KeyEnter,
-
-        '~' | '`' => KeyGrave,
-        '-' | '_' => KeyMinus,
-        '=' | '+' => KeyEquals,
-        '[' | '{' => KeyLeftBracket,
-        ']' | '}' => KeyRightBracket,
-        ';' | ':' => KeySemicolon,
-        '\'' | '"' => KeySingleQuote,
-        ',' | '<' => KeyComma,
-        '.' | '>' => KeyPeriod,
-        '/' | '?' => KeySlash,
-        '\\' | '|' => KeyBackslash,
-
-
-        _ => KeyUnknown,
     }
 }
 

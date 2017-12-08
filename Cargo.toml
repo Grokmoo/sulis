@@ -5,6 +5,7 @@ authors = ["Jared Stephen <grok_moo@yahoo.com>"]
 
 [dependencies]
 pancurses = "0.13.0"
+termion = "*"
 
 serde = "1.0"
 serde_json = "1.0"

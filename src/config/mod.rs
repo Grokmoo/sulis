@@ -37,6 +37,7 @@ pub struct InputConfig {
 #[derive(Debug, Deserialize, Copy, Clone)]
 pub enum IOAdapter {
     Pancurses,
+    Termion,
 }
 
 impl Config {

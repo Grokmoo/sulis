@@ -33,6 +33,8 @@ pub struct GameState<'a> {
     pub pc: Rc<RefCell<EntityState<'a>>>,
     pub cursor: Cursor,
     animations: Vec<Box<Animation + 'a>>,
+
+    pub should_exit: bool,
 }
 
 impl<'a> GameState<'a> {
@@ -99,7 +101,13 @@ impl<'a> GameState<'a> {
                 c: cursor_char,
             },
             animations: Vec::new(),
+            should_exit: false,
         })
+    }
+
+    pub fn set_exit(&mut self) -> bool{
+        self.should_exit = true;
+        true
     }
 
     pub fn draw_text_mode(&self, renderer: &mut TextRenderer,

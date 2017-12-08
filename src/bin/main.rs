@@ -66,6 +66,10 @@ fn main() {
         game_state.update();
         io.render_output(&game_state, root.borrow());
 
+        if game_state.should_exit {
+            break;
+        }
+
         let elapsed = start_time.elapsed();
         if frame_time > elapsed {
             thread::sleep(frame_time - elapsed);

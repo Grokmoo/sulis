@@ -1,0 +1,29 @@
+{
+    "display": {
+        "adapter": "Termion",
+        "cursor_char": "X",
+        "width": 80,
+        "height": 30,
+        "frame_rate": 10,
+        "animation_base_time_millis": 50
+    },
+
+    "resources": {
+        "directory": "data"
+    },
+
+    "input": {
+        "keybindings": {
+            "KeyUp": "MoveUp",
+            "KeyLeft": "MoveLeft",
+            "KeyDown": "MoveDown",
+            "KeyRight": "MoveRight",
+            "KeyW": "MoveCursorUp",
+            "KeyS": "MoveCursorDown",
+            "KeyA": "MoveCursorLeft",
+            "KeyD": "MoveCursorRight",
+            "KeySpace": "MoveToCursor",
+            "KeyQ": "Exit"
+        }
+    }
+}

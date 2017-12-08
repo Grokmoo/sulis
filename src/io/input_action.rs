@@ -14,6 +14,7 @@ pub enum InputAction {
     MoveCursorLeft,
     MoveCursorRight,
     MoveToCursor,
+    Exit,
 }
 
 impl InputAction {
@@ -34,6 +35,7 @@ impl InputAction {
             MoveCursorLeft => state.cursor_move_by(root, -1, 0),
             MoveCursorRight => state.cursor_move_by(root, 1, 0),
             MoveToCursor => state.cursor_click(root),
+            Exit => state.set_exit(),
         };
     }
 }

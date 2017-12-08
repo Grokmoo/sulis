@@ -30,12 +30,22 @@ impl Terminal {
             start_time: Instant::now(),
         }
     }
+
+    #[cfg(target_os = "windows")]
+    fn size_terminal(&mut self, config: &Config) {
+        pancurses::resize_term(config.display.height as i32,
+                               config.display.width as i32);
+    }
+
+    #[cfg(not(target_os = "windows"))]
+    fn size_terminal(&mut self, _config: &Config) {
+        // do nothing
+    }
 }
 
 impl IO for Terminal {
     fn init(&mut self, config: &Config) {
-        pancurses::resize_term(config.display.height as i32,
-                               config.display.width as i32);
+        self.size_terminal(config);
     }
 
     fn process_input(&mut self, state: &mut GameState, root: RefMut<WidgetBase>) {

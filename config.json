@@ -1,7 +1,7 @@
 {
     "display": {
         "adapter": "Pancurses",
-        "cursor_char": "█",
+        "cursor_char": "X",
         "width": 80,
         "height": 30,
         "frame_rate": 60,

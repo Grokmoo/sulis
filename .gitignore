@@ -1,4 +1,4 @@
 target/*
-
+config.json
 *.swp
 *.swo

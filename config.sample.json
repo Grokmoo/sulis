@@ -1,6 +1,6 @@
 {
     "display": {
-        "adapter": "Termion",
+        "adapter": "Pancurses",
         "cursor_char": "X",
         "width": 80,
         "height": 30,

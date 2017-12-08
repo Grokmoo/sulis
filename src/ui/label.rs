@@ -40,7 +40,12 @@ impl Widget for Label {
             let len = cmp::min(t.len(), w as usize);
 
             let text = &t[0..len];
-            renderer.set_cursor_pos(x + (w - len as i32) / 2, y);
+
+            let x = x + (w - len as i32) / 2;
+            let y = y;
+            let (max_x, max_y) = renderer.get_display_size();
+            if x < 0 || y < 0 || x >= max_x || y >= max_y { return; }
+            renderer.set_cursor_pos(x, y);
             renderer.render_string(&text);
         }
     }

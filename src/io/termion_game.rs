@@ -1,27 +1,28 @@
-use std::io::{Bytes, Read, Write, StdinLock, StdoutLock};
+use std::io::{Bytes, Read, Write, stdout};
 use std::cell::{Ref, RefMut};
 use std::time::Instant;
+use std;
 
 use config::Config;
-use io::keyboard_event::Key;
 use io::{self, KeyboardEvent, IO, TextRenderer};
 use state::GameState;
 use ui::WidgetBase;
 use animation;
 
+use termion::screen::*;
 use termion::{self, async_stdin};
 use termion::raw::{RawTerminal, IntoRawMode};
-use termion::input::{TermRead, Keys};
 
-pub struct Terminal<'a> {
+pub struct Terminal {
     stdin: Bytes<termion::AsyncReader>,
-    stdout: RawTerminal<StdoutLock<'a>>,
+    stdout: AlternateScreen<RawTerminal<std::io::Stdout>>,
     start_time: Instant,
 }
 
-impl<'a> Terminal<'a> {
-    pub fn new(stdin: StdinLock<'a>, stdout: StdoutLock<'a>) -> Terminal<'a> {
-        let stdout = stdout.into_raw_mode().unwrap();
+impl Terminal {
+    pub fn new() -> Terminal {
+        let stdout = AlternateScreen::from(stdout().into_raw_mode().unwrap());
+        //let stdout = stdout.into_raw_mode().unwrap();
         //let stdin = stdin.keys();
         let stdin = async_stdin().bytes();
 
@@ -33,12 +34,13 @@ impl<'a> Terminal<'a> {
     }
 }
 
-impl<'a> IO for Terminal<'a> {
+impl IO for Terminal {
     fn init(&mut self, _config: &Config) {
         write!(self.stdout, "{}", termion::cursor::Hide).unwrap();
     }
 
     fn process_input(&mut self, state: &mut GameState, root: RefMut<WidgetBase>) {
+        // TODO handle reading multi byte special characters
         let b = self.stdin.next();
         if let None = b { return; }
         let b = b.unwrap();
@@ -49,14 +51,6 @@ impl<'a> IO for Terminal<'a> {
         let input = KeyboardEvent { key: input };
 
         state.handle_keyboard_input(input, root);
-        // use termion::event::Key::*;
-        // let input = match b {
-        //     Char(c) => io::match_char(c),
-        //     input => match_special(input),
-        // };
-        // let input = KeyboardEvent { key: input };
-        //
-        // state.handle_keyboard_input(input, root);
     }
 
     fn render_output(&mut self, state: &GameState, root: Ref<WidgetBase>) {
@@ -75,7 +69,7 @@ impl<'a> IO for Terminal<'a> {
     }
 }
 
-impl<'a> TextRenderer for Terminal<'a> {
+impl TextRenderer for Terminal {
     fn render_char(&mut self, c: char) {
         write!(self.stdout, "{}", c).unwrap();
     }
@@ -88,37 +82,43 @@ impl<'a> TextRenderer for Terminal<'a> {
         write!(self.stdout, "{}",
                termion::cursor::Goto(x as u16 + 1, y as u16 + 1)).unwrap();
     }
-}
 
-fn match_special(input: termion::event::Key) -> Key {
-    use termion::event::Key::*;
-    use io::keyboard_event::Key::*;
-    match input {
-        Backspace => KeyBackspace,
-        Left => KeyLeft,
-        Right => KeyRight,
-        Up => KeyUp,
-        Down => KeyDown,
-        Home => KeyHome,
-        End => KeyEnd,
-        PageUp => KeyPageUp,
-        PageDown => KeyPageDown,
-        Insert => KeyInsert,
-        Esc => KeyEscape,
+    fn get_display_size(&self) -> (i32, i32) {
+        let (w, h) = termion::terminal_size().unwrap();
 
-        F(1) => KeyF1,
-        F(2) => KeyF2,
-        F(3) => KeyF3,
-        F(4) => KeyF4,
-        F(5) => KeyF5,
-        F(6) => KeyF6,
-        F(7) => KeyF7,
-        F(8) => KeyF8,
-        F(9) => KeyF9,
-        F(10) => KeyF10,
-        F(11) => KeyF11,
-        F(12) => KeyF12,
-
-        _ => KeyUnknown,
+        (w as i32, h as i32)
     }
 }
+
+// fn match_special(input: termion::event::Key) -> Key {
+//     use termion::event::Key::*;
+//     use io::keyboard_event::Key::*;
+//     match input {
+//         Backspace => KeyBackspace,
+//         Left => KeyLeft,
+//         Right => KeyRight,
+//         Up => KeyUp,
+//         Down => KeyDown,
+//         Home => KeyHome,
+//         End => KeyEnd,
+//         PageUp => KeyPageUp,
+//         PageDown => KeyPageDown,
+//         Insert => KeyInsert,
+//         Esc => KeyEscape,
+//
+//         F(1) => KeyF1,
+//         F(2) => KeyF2,
+//         F(3) => KeyF3,
+//         F(4) => KeyF4,
+//         F(5) => KeyF5,
+//         F(6) => KeyF6,
+//         F(7) => KeyF7,
+//         F(8) => KeyF8,
+//         F(9) => KeyF9,
+//         F(10) => KeyF10,
+//         F(11) => KeyF11,
+//         F(12) => KeyF12,
+//
+//         _ => KeyUnknown,
+//     }
+// }

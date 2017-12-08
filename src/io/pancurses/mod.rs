@@ -88,6 +88,10 @@ impl TextRenderer for Terminal {
     fn set_cursor_pos(&mut self, x: i32, y: i32) {
         self.window.mv(y, x);
     }
+
+    fn get_display_size(&self) -> (i32, i32) {
+        (self.window.get_max_x(), self.window.get_max_y())
+    }
 }
 
 fn match_special(c: pancurses::Input) -> Key {

@@ -10,7 +10,6 @@ pub use self::mouse_event::MouseEvent;
 mod input_action;
 pub use self::input_action::InputAction;
 
-use std::io::{StdinLock, StdoutLock};
 use std::cell::{RefMut, Ref};
 
 use state::GameState;
@@ -36,16 +35,17 @@ pub trait TextRenderer {
     fn render_string(&mut self, s: &str);
 
     fn set_cursor_pos(&mut self, x: i32, y: i32);
+
+    fn get_display_size(&self) -> (i32, i32);
 }
 
-pub fn create<'a>(adapter: IOAdapter, stdin: StdinLock<'a>,
-                  stdout: StdoutLock<'a>) -> Box<IO + 'a> {
+pub fn create<'a>(adapter: IOAdapter) -> Box<IO + 'a> {
     match adapter{
         IOAdapter::Pancurses => {
             Box::new(pancurses::Terminal::new())
         },
         IOAdapter::Termion => {
-            Box::new(termion_game::Terminal::new(stdin, stdout))
+            Box::new(termion_game::Terminal::new())
         },
     }
 }

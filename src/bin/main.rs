@@ -1,6 +1,5 @@
 extern crate game;
 
-use std::io;
 use std::error::Error;
 use std::{thread, time};
 use std::rc::Rc;
@@ -11,11 +10,6 @@ use game::state::GameState;
 use game::ui;
 
 fn main() {
-    let stdout = io::stdout();
-    let stdin = io::stdin();
-    let stdout = stdout.lock();
-    let stdin = stdin.lock();
-
     let config = config::Config::new("config.json");
     let config = match config {
         Ok(c) => c,
@@ -38,7 +32,7 @@ fn main() {
         }
     };
 
-    let mut io = game::io::create(config.display.adapter, stdin, stdout);
+    let mut io = game::io::create(config.display.adapter);
     io.init(&config);
 
     let frame_rate = config.display.frame_rate;

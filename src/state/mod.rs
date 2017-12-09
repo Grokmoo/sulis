@@ -113,7 +113,8 @@ impl<'a> GameState<'a> {
         self.cursor.draw_text_mode(renderer, millis);
     }
 
-    pub fn cursor_move_by(&mut self, root: RefMut<WidgetBase>, x: i32, y: i32) -> bool {
+    pub fn cursor_move_by(&mut self, mut root: RefMut<WidgetBase>,
+                          x: i32, y: i32) -> bool {
         trace!("Move cursor by {}, {}", x, y);
         if self.cursor.move_by(x, y) {
             let event = MouseEvent::new(mouse_event::Kind::Move(x, y),
@@ -124,7 +125,7 @@ impl<'a> GameState<'a> {
         false
     }
 
-    pub fn cursor_click(&mut self, root: RefMut<WidgetBase>) -> bool {
+    pub fn cursor_click(&mut self, mut root: RefMut<WidgetBase>) -> bool {
         let x = self.cursor.x;
         let y = self.cursor.y;
 

@@ -49,7 +49,7 @@ impl<'a> Widget for AreaWidget<'a> {
         }
     }
 
-    fn on_left_click(&self, parent: &WidgetBase, state: &mut GameState,
+    fn on_left_click(&self, parent: &mut WidgetBase, state: &mut GameState,
                 x: i32, y: i32) -> bool {
         let size = state.pc().size() as i32;
         let x = (x - parent.position.x as i32) - size / 2;
@@ -61,10 +61,16 @@ impl<'a> Widget for AreaWidget<'a> {
         true // consume the event
     }
 
-    fn on_mouse_moved(&self, _parent: &WidgetBase, _state: &mut GameState,
+    fn on_mouse_moved(&self, _parent: &mut WidgetBase, _state: &mut GameState,
                       x: i32, y: i32) -> bool {
         self.mouse_over.top_mut().set_text(&format!("[{},{}]", x, y));
-        //self.mouse_over.base_mut().set_position_centered(x, y + 2);
         true
+    }
+
+    fn on_mouse_exited(&self, parent: &mut WidgetBase, _state: &mut GameState,
+                       _x: i32, _y: i32) -> bool {
+       parent.set_mouse_inside(false);
+       self.mouse_over.top_mut().set_text("");
+       true
     }
 }

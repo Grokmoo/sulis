@@ -13,6 +13,22 @@ impl MouseEvent {
             y: mouse_y,
         }
     }
+
+    pub fn entered_from(event: &MouseEvent) -> MouseEvent {
+        MouseEvent {
+            kind: Kind::Entered,
+            x: event.x,
+            y: event.y,
+        }
+    }
+
+    pub fn exited_from(event: &MouseEvent) -> MouseEvent {
+        MouseEvent {
+            kind: Kind::Exited,
+            x: event.x,
+            y: event.y,
+        }
+    }
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -22,4 +38,6 @@ pub enum Kind {
     MiddleClick,
     Move(i32, i32),
     Scroll(i32),
+    Entered,
+    Exited,
 }

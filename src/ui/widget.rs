@@ -16,23 +16,35 @@ pub trait Widget {
 
     fn get_name(&self) -> &str;
 
-    fn on_left_click(&self, _parent: &WidgetBase, _state: &mut GameState,
+    fn on_left_click(&self, _parent: &mut WidgetBase, _state: &mut GameState,
                 _x: i32, _y: i32) -> bool {
         false
     }
 
-    fn on_middle_click(&self, _parent: &WidgetBase, _state: &mut GameState,
+    fn on_middle_click(&self, _parent: &mut WidgetBase, _state: &mut GameState,
                 _x: i32, _y: i32) -> bool {
         false
     }
 
-    fn on_right_click(&self, _parent: &WidgetBase, _state: &mut GameState,
+    fn on_right_click(&self, _parent: &mut WidgetBase, _state: &mut GameState,
                 _x: i32, _y: i32) -> bool {
         false
     }
 
-    fn on_mouse_moved(&self, _parent: &WidgetBase, _state: &mut GameState,
+    fn on_mouse_moved(&self, _parent: &mut WidgetBase, _state: &mut GameState,
                       _x: i32, _y: i32) -> bool {
         false
+    }
+
+    fn on_mouse_entered(&self, parent: &mut WidgetBase, _state: &mut GameState,
+                        _x: i32, _y: i32) -> bool {
+        parent.set_mouse_inside(true);
+        true
+    }
+
+    fn on_mouse_exited(&self, parent: &mut WidgetBase, _state: &mut GameState,
+                        _x: i32, _y: i32) -> bool {
+        parent.set_mouse_inside(false);
+        true
     }
 }

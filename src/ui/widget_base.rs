@@ -16,6 +16,7 @@ pub struct WidgetBase<'a> {
     pub border: Border,
     pub children: Vec<Rc<RefCell<WidgetBase<'a>>>>,
     drawable: Rc<RefCell<Widget + 'a>>,
+    mouse_is_inside: bool,
 }
 
 impl<'a> Debug for WidgetBase<'a> {
@@ -33,6 +34,7 @@ impl<'a> WidgetBase<'a> {
             position: Point::as_zero(),
             border: Border::as_zero(),
             children: Vec::new(),
+            mouse_is_inside: false,
         }))
     }
 
@@ -44,6 +46,7 @@ impl<'a> WidgetBase<'a> {
             position: Point::as_zero(),
             border: Border::as_zero(),
             children: Vec::new(),
+            mouse_is_inside: false,
         }))
     }
 
@@ -55,6 +58,7 @@ impl<'a> WidgetBase<'a> {
             position,
             border: Border::as_zero(),
             children: Vec::new(),
+            mouse_is_inside: false,
         }))
     }
 
@@ -66,29 +70,43 @@ impl<'a> WidgetBase<'a> {
             position,
             border,
             children: Vec::new(),
+            mouse_is_inside: false,
         }))
     }
 
-    pub fn dispatch_event(&self, state: &mut GameState, event: MouseEvent) -> bool {
+    pub fn dispatch_event(&mut self, state: &mut GameState, event: MouseEvent) -> bool {
         trace!("Dispatching event {:?} in {:?}", event, self);
         for child in self.children.iter() {
-            let child = child.borrow();
+            let mut child = child.borrow_mut();
             if child.in_bounds(event.x as i32, event.y as i32) {
+                if !child.mouse_is_inside {
+                    child.dispatch_event(state, MouseEvent::entered_from(&event));
+                }
+
                 if child.dispatch_event(state, event) {
                     return true;
                 }
+            } else if child.mouse_is_inside {
+                child.dispatch_event(state, MouseEvent::exited_from(&event));
             }
         }
 
-        let drawable = self.drawable.borrow_mut();
+        let drawable = Rc::clone(&self.drawable);
+        let drawable = drawable.borrow();
         use io::mouse_event::Kind::*;
         match event.kind {
-            LeftClick => drawable.on_left_click(&self, state, event.x, event.y),
-            MiddleClick => drawable.on_middle_click(&self, state, event.x, event.y),
-            RightClick => drawable.on_right_click(&self, state, event.x, event.y),
-            Move(_, _) => drawable.on_mouse_moved(&self, state, event.x, event.y),
+            LeftClick => drawable.on_left_click(self, state, event.x, event.y),
+            MiddleClick => drawable.on_middle_click(self, state, event.x, event.y),
+            RightClick => drawable.on_right_click(self, state, event.x, event.y),
+            Move(_, _) => drawable.on_mouse_moved(self, state, event.x, event.y),
+            Entered => drawable.on_mouse_entered(self, state, event.x, event.y),
+            Exited => drawable.on_mouse_exited(self, state, event.x, event.y),
             _ => false,
         }
+    }
+
+    pub(super) fn set_mouse_inside(&mut self, is_inside: bool) {
+        self.mouse_is_inside = is_inside;
     }
 
     pub fn inner_position(&self) -> Point {

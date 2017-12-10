@@ -1,10 +1,12 @@
 use std::io::{Bytes, Read, Write, stdout};
-use std::cell::{Ref, RefMut};
+use std::cell::{Ref, RefCell};
+use std::rc::Rc;
 use std::time::Instant;
 use std;
 
 use config::Config;
 use io::{self, KeyboardEvent, IO, TextRenderer};
+use io::keyboard_event::Key;
 use state::GameState;
 use ui::WidgetBase;
 use animation;
@@ -51,18 +53,34 @@ impl IO for Terminal {
         write!(self.stdout, "{}", termion::cursor::Hide).unwrap();
     }
 
-    fn process_input(&mut self, state: &mut GameState, root: RefMut<WidgetBase>) {
-        // TODO handle reading multi byte special characters
-        let b = self.stdin.next();
-        if let None = b { return; }
-        let b = b.unwrap();
-        if let Err(_) = b { return; }
-        let b = b.unwrap();
+    fn process_input(&mut self, state: &mut GameState, root: Rc<RefCell<WidgetBase>>) {
+        let mut buf: Vec<u8> = Vec::new();
 
-        let input = io::match_char(b as char);
-        let input = KeyboardEvent { key: input };
+        loop {
+            let b = self.stdin.next();
+            if let None = b { break; }
+            let b = b.unwrap();
+            if let Err(_) = b { break; }
+            buf.push(b.unwrap());
+        }
 
-        state.handle_keyboard_input(input, root);
+        if buf.len() == 0 { return; }
+
+        trace!("Processed {} bytes of input: {:?}", buf.len(), buf);
+
+        while buf.len() > 0 {
+            let b = buf.remove(0);
+
+            let input = match b {
+                27 => match_special(&mut buf), // escape character
+                127 => io::keyboard_event::Key::KeyBackspace,
+                _ => io::match_char(b as char),
+            };
+
+            let input = KeyboardEvent { key: input };
+
+            state.handle_keyboard_input(input, root.borrow_mut());
+        }
     }
 
     fn render_output(&mut self, state: &GameState, root: Ref<WidgetBase>) {
@@ -108,35 +126,71 @@ impl TextRenderer for Terminal {
     }
 }
 
-// fn match_special(input: termion::event::Key) -> Key {
-//     use termion::event::Key::*;
-//     use io::keyboard_event::Key::*;
-//     match input {
-//         Backspace => KeyBackspace,
-//         Left => KeyLeft,
-//         Right => KeyRight,
-//         Up => KeyUp,
-//         Down => KeyDown,
-//         Home => KeyHome,
-//         End => KeyEnd,
-//         PageUp => KeyPageUp,
-//         PageDown => KeyPageDown,
-//         Insert => KeyInsert,
-//         Esc => KeyEscape,
-//
-//         F(1) => KeyF1,
-//         F(2) => KeyF2,
-//         F(3) => KeyF3,
-//         F(4) => KeyF4,
-//         F(5) => KeyF5,
-//         F(6) => KeyF6,
-//         F(7) => KeyF7,
-//         F(8) => KeyF8,
-//         F(9) => KeyF9,
-//         F(10) => KeyF10,
-//         F(11) => KeyF11,
-//         F(12) => KeyF12,
-//
-//         _ => KeyUnknown,
-//     }
-// }
+fn match_special(buf: &mut Vec<u8>) -> Key {
+    use io::keyboard_event::Key::*;
+
+    if buf.len() == 0 { return KeyUnknown; }
+
+    match buf.remove(0) {
+        91 => {
+            if buf.len() == 0 { return KeyUnknown; }
+
+            return match buf.remove(0) {
+                65 => KeyUp,
+                66 => KeyDown,
+                67 => KeyRight,
+                68 => KeyLeft,
+
+                49 => {
+                    if buf.len() == 0 { return KeyUnknown; }
+
+                    return match buf.remove(0) {
+                        53 => remove_one_more(KeyF5, buf),
+                        55 => remove_one_more(KeyF6, buf),
+                        56 => remove_one_more(KeyF7, buf),
+                        57 => remove_one_more(KeyF8, buf),
+                        126 => KeyHome,
+                        _ => KeyUnknown,
+                    };
+                },
+                50 => {
+                    if buf.len() == 0 { return KeyUnknown; }
+
+                    return match buf.remove(0) {
+                        48 => remove_one_more(KeyF9, buf),
+                        49 => remove_one_more(KeyF10, buf),
+                        51 => remove_one_more(KeyF11, buf),
+                        52 => remove_one_more(KeyF12, buf),
+                        126 => KeyInsert,
+                        _ => KeyUnknown,
+                    };
+                },
+                51 => remove_one_more(KeyDelete, buf),
+                52 => remove_one_more(KeyEnd, buf),
+                53 => remove_one_more(KeyPageUp, buf),
+                54 => remove_one_more(KeyPageDown, buf),
+                _ => KeyUnknown,
+            };
+        },
+        79 => {
+            if buf.len() == 0 { return KeyUnknown; }
+
+            return match buf.remove(0) {
+                80 => KeyF1,
+                81 => KeyF2,
+                82 => KeyF3,
+                83 => KeyF4,
+                _ => KeyUnknown,
+            };
+        },
+        _ => { return KeyUnknown; }
+    }
+}
+
+fn remove_one_more(key: Key, buf: &mut Vec<u8>) -> Key {
+    if buf.len() != 0 {
+        buf.remove(0);
+    }
+
+    key
+}

@@ -10,7 +10,8 @@ pub use self::mouse_event::MouseEvent;
 mod input_action;
 pub use self::input_action::InputAction;
 
-use std::cell::{RefMut, Ref};
+use std::rc::Rc;
+use std::cell::{Ref, RefCell};
 
 use state::GameState;
 use config::{Config, IOAdapter};
@@ -21,7 +22,7 @@ pub trait IO {
     fn init(&mut self, config: &Config);
 
     fn process_input(&mut self, game_state: &mut GameState,
-                     root: RefMut<WidgetBase>);
+                     root: Rc<RefCell<WidgetBase>>);
 
     fn render_output(&mut self, game_state: &GameState,
                      root: Ref<WidgetBase>);

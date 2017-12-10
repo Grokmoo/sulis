@@ -80,7 +80,7 @@ fn main() {
     loop {
         let start_time = time::Instant::now();
 
-        io.process_input(&mut game_state, root.borrow_mut());
+        io.process_input(&mut game_state, Rc::clone(&root));
         game_state.update();
         io.render_output(&game_state, root.borrow());
 

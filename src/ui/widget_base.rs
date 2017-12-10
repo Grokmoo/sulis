@@ -15,21 +15,21 @@ pub struct WidgetBase<'a> {
     pub size: Size,
     pub border: Border,
     pub children: Vec<Rc<RefCell<WidgetBase<'a>>>>,
-    drawable: Rc<RefCell<Widget + 'a>>,
+    widget: Rc<RefCell<Widget + 'a>>,
     mouse_is_inside: bool,
 }
 
 impl<'a> Debug for WidgetBase<'a> {
     fn fmt(&self, fmt: &mut Formatter) -> Result {
-        write!(fmt, "Widget {} at {:?}", self.drawable.borrow().get_name(),
+        write!(fmt, "Widget {} at {:?}", self.widget.borrow().get_name(),
             self.position)
     }
 }
 
 impl<'a> WidgetBase<'a> {
-    pub fn with_defaults(drawable: Rc<RefCell<Widget + 'a>>) -> Rc<RefCell<WidgetBase<'a>>> {
+    pub fn with_defaults(widget: Rc<RefCell<Widget + 'a>>) -> Rc<RefCell<WidgetBase<'a>>> {
         Rc::new(RefCell::new(WidgetBase {
-            drawable,
+            widget,
             size: Size::as_zero(),
             position: Point::as_zero(),
             border: Border::as_zero(),
@@ -38,10 +38,10 @@ impl<'a> WidgetBase<'a> {
         }))
     }
 
-    pub fn with_size(drawable: Rc<RefCell<Widget + 'a>>,
+    pub fn with_size(widget: Rc<RefCell<Widget + 'a>>,
                      size: Size) -> Rc<RefCell<WidgetBase<'a>>> {
         Rc::new(RefCell::new(WidgetBase {
-            drawable,
+            widget,
             size,
             position: Point::as_zero(),
             border: Border::as_zero(),
@@ -50,10 +50,10 @@ impl<'a> WidgetBase<'a> {
         }))
     }
 
-    pub fn with_position(drawable: Rc<RefCell<Widget + 'a>>, size: Size,
+    pub fn with_position(widget: Rc<RefCell<Widget + 'a>>, size: Size,
                          position: Point) -> Rc<RefCell<WidgetBase<'a>>> {
         Rc::new(RefCell::new(WidgetBase {
-            drawable,
+            widget,
             size,
             position,
             border: Border::as_zero(),
@@ -62,10 +62,10 @@ impl<'a> WidgetBase<'a> {
         }))
     }
 
-    pub fn with_border(drawable: Rc<RefCell<Widget + 'a>>, size: Size,
+    pub fn with_border(widget: Rc<RefCell<Widget + 'a>>, size: Size,
                        position: Point, border: Border) -> Rc<RefCell<WidgetBase<'a>>> {
         Rc::new(RefCell::new(WidgetBase {
-            drawable,
+            widget,
             size,
             position,
             border,
@@ -91,16 +91,16 @@ impl<'a> WidgetBase<'a> {
             }
         }
 
-        let drawable = Rc::clone(&self.drawable);
-        let drawable = drawable.borrow();
+        let widget = Rc::clone(&self.widget);
+        let widget = widget.borrow();
         use io::mouse_event::Kind::*;
         match event.kind {
-            LeftClick => drawable.on_left_click(self, state, event.x, event.y),
-            MiddleClick => drawable.on_middle_click(self, state, event.x, event.y),
-            RightClick => drawable.on_right_click(self, state, event.x, event.y),
-            Move(_, _) => drawable.on_mouse_moved(self, state, event.x, event.y),
-            Entered => drawable.on_mouse_entered(self, state, event.x, event.y),
-            Exited => drawable.on_mouse_exited(self, state, event.x, event.y),
+            LeftClick => widget.on_left_click(self, state, event.x, event.y),
+            MiddleClick => widget.on_middle_click(self, state, event.x, event.y),
+            RightClick => widget.on_right_click(self, state, event.x, event.y),
+            Move(_, _) => widget.on_mouse_moved(self, state, event.x, event.y),
+            Entered => widget.on_mouse_entered(self, state, event.x, event.y),
+            Exited => widget.on_mouse_exited(self, state, event.x, event.y),
             _ => false,
         }
     }
@@ -141,7 +141,7 @@ impl<'a> WidgetBase<'a> {
     }
 
     pub fn draw_text_mode(&self, renderer: &mut TextRenderer) {
-        self.drawable.borrow_mut().draw_text_mode(renderer, &self);
+        self.widget.borrow_mut().draw_text_mode(renderer, &self);
 
         for child in self.children.iter() {
             let child = child.borrow();

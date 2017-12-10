@@ -1,7 +1,8 @@
 use pancurses;
 
 use std::time::Instant;
-use std::cell::{Ref, RefMut};
+use std::cell::{Ref, RefCell};
+use std::rc::Rc;
 
 use io;
 use io::keyboard_event::Key;
@@ -51,7 +52,7 @@ impl IO for Terminal {
         self.size_terminal(config);
     }
 
-    fn process_input(&mut self, state: &mut GameState, root: RefMut<WidgetBase>) {
+    fn process_input(&mut self, state: &mut GameState, root: Rc<RefCell<WidgetBase>>) {
         let input = self.window.getch();
         if let None = input {
             return;
@@ -63,7 +64,7 @@ impl IO for Terminal {
         };
         let input = KeyboardEvent { key: input };
 
-        state.handle_keyboard_input(input, root);
+        state.handle_keyboard_input(input, root.borrow_mut());
     }
 
     fn render_output(&mut self, state: &GameState, root: Ref<WidgetBase>) {

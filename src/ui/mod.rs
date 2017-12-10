@@ -38,7 +38,6 @@ pub fn create_ui_tree<'a>(area_state: Rc<RefCell<AreaState<'a>>>,
 
     root
 }
-
 fn setup_widgets<'a>(ref mut root: RefMut<WidgetBase<'a>>,
                      area_state: Rc<RefCell<AreaState<'a>>>) {
     let area_width = cmp::min(area_state.borrow().area.width, root.size.width);

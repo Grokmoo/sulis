@@ -9,6 +9,9 @@ use io::TextRenderer;
 pub struct AreaWidget<'a> {
     area_state: Rc<RefCell<AreaState<'a>>>,
     mouse_over: WidgetRef<'a, Label>,
+
+    scroll_x: i32,
+    scroll_y: i32,
 }
 
 impl<'a> AreaWidget<'a> {
@@ -17,6 +20,8 @@ impl<'a> AreaWidget<'a> {
         Rc::new(RefCell::new(AreaWidget {
             area_state,
             mouse_over,
+            scroll_x: 0,
+            scroll_y: 0,
         }))
     }
 }
@@ -27,24 +32,22 @@ impl<'a> Widget for AreaWidget<'a> {
     }
 
     fn draw_text_mode(&self, renderer: &mut TextRenderer, owner: &WidgetBase) {
-        let scroll_x = 0;
-        let scroll_y = 0;
-
         let p = owner.inner_position();
         let s = owner.inner_size();
 
         let state = self.area_state.borrow();
         let ref area = state.area;
 
-        let max_x = cmp::min(s.width, area.width - scroll_x);
-        let max_y = cmp::min(s.height, area.height - scroll_y);
+        let max_x = cmp::min(s.width, area.width - self.scroll_x);
+        let max_y = cmp::min(s.height, area.height - self.scroll_y);
 
         renderer.set_cursor_pos(0, 0);
 
         for y in 0..max_y {
             renderer.set_cursor_pos(p.x, p.y + y);
             for x in 0..max_x {
-                renderer.render_char(state.get_display(x + scroll_x, y + scroll_y));
+                renderer.render_char(state.get_display(x + self.scroll_x,
+                                                       y + self.scroll_y));
             }
         }
     }

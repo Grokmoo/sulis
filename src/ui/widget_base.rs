@@ -4,7 +4,7 @@ use std::fmt::{Debug, Formatter, Result};
 
 use ui::{Border, Size, Widget};
 use state::GameState;
-use io::{MouseEvent, TextRenderer};
+use io::{Event, TextRenderer};
 
 use resource::Point;
 
@@ -15,7 +15,7 @@ pub struct WidgetBase<'a> {
     pub size: Size,
     pub border: Border,
     pub children: Vec<Rc<RefCell<WidgetBase<'a>>>>,
-    widget: Rc<RefCell<Widget + 'a>>,
+    widget: Rc<RefCell<Widget<'a> + 'a>>,
     mouse_is_inside: bool,
 }
 
@@ -27,81 +27,72 @@ impl<'a> Debug for WidgetBase<'a> {
 }
 
 impl<'a> WidgetBase<'a> {
-    pub fn with_defaults(widget: Rc<RefCell<Widget + 'a>>) -> Rc<RefCell<WidgetBase<'a>>> {
-        Rc::new(RefCell::new(WidgetBase {
-            widget,
-            size: Size::as_zero(),
-            position: Point::as_zero(),
-            border: Border::as_zero(),
-            children: Vec::new(),
-            mouse_is_inside: false,
-        }))
-    }
+    fn new(widget: Rc<RefCell<Widget<'a> + 'a>>, size: Size, position: Point,
+               border: Border) -> Rc<RefCell<WidgetBase<'a>>> {
 
-    pub fn with_size(widget: Rc<RefCell<Widget + 'a>>,
-                     size: Size) -> Rc<RefCell<WidgetBase<'a>>> {
-        Rc::new(RefCell::new(WidgetBase {
-            widget,
-            size,
-            position: Point::as_zero(),
-            border: Border::as_zero(),
-            children: Vec::new(),
-            mouse_is_inside: false,
-        }))
-    }
-
-    pub fn with_position(widget: Rc<RefCell<Widget + 'a>>, size: Size,
-                         position: Point) -> Rc<RefCell<WidgetBase<'a>>> {
-        Rc::new(RefCell::new(WidgetBase {
-            widget,
-            size,
-            position,
-            border: Border::as_zero(),
-            children: Vec::new(),
-            mouse_is_inside: false,
-        }))
-    }
-
-    pub fn with_border(widget: Rc<RefCell<Widget + 'a>>, size: Size,
-                       position: Point, border: Border) -> Rc<RefCell<WidgetBase<'a>>> {
-        Rc::new(RefCell::new(WidgetBase {
-            widget,
+        let widget_base = Rc::new(RefCell::new(WidgetBase {
+            widget: Rc::clone(&widget),
             size,
             position,
             border,
             children: Vec::new(),
             mouse_is_inside: false,
-        }))
+        }));
+
+        widget.borrow_mut().set_parent(Rc::clone(&widget_base));
+
+        widget_base
     }
 
-    pub fn dispatch_event(&mut self, state: &mut GameState, event: MouseEvent) -> bool {
+    pub fn with_defaults(widget: Rc<RefCell<Widget<'a> + 'a>>) ->
+        Rc<RefCell<WidgetBase<'a>>> {
+        WidgetBase::new(widget, Size::as_zero(), Point::as_zero(), Border::as_zero())
+    }
+
+    pub fn with_size(widget: Rc<RefCell<Widget<'a> + 'a>>,
+                     size: Size) -> Rc<RefCell<WidgetBase<'a>>> {
+        WidgetBase::new(widget, size, Point::as_zero(), Border::as_zero())
+    }
+
+    pub fn with_position(widget: Rc<RefCell<Widget<'a> + 'a>>, size: Size,
+                         position: Point) -> Rc<RefCell<WidgetBase<'a>>> {
+        WidgetBase::new(widget, size, position, Border::as_zero())
+    }
+
+    pub fn with_border(widget: Rc<RefCell<Widget<'a> + 'a>>, size: Size,
+                       position: Point, border: Border) -> Rc<RefCell<WidgetBase<'a>>> {
+        WidgetBase::new(widget, size, position, border)
+    }
+
+    pub fn dispatch_event(&mut self, state: &mut GameState, event: Event) -> bool {
         trace!("Dispatching event {:?} in {:?}", event, self);
         for child in self.children.iter() {
             let mut child = child.borrow_mut();
-            if child.in_bounds(event.x as i32, event.y as i32) {
+            if child.in_bounds(event.mouse) {
                 if !child.mouse_is_inside {
-                    child.dispatch_event(state, MouseEvent::entered_from(&event));
+                    child.dispatch_event(state, Event::entered_from(&event));
                 }
 
                 if child.dispatch_event(state, event) {
                     return true;
                 }
             } else if child.mouse_is_inside {
-                child.dispatch_event(state, MouseEvent::exited_from(&event));
+                child.dispatch_event(state, Event::exited_from(&event));
             }
         }
 
         let widget = Rc::clone(&self.widget);
-        let widget = widget.borrow();
-        use io::mouse_event::Kind::*;
+        let mut widget = widget.borrow_mut();
+        use io::event::Kind::*;
         match event.kind {
-            LeftClick => widget.on_left_click(self, state, event.x, event.y),
-            MiddleClick => widget.on_middle_click(self, state, event.x, event.y),
-            RightClick => widget.on_right_click(self, state, event.x, event.y),
-            Move(_, _) => widget.on_mouse_moved(self, state, event.x, event.y),
-            Entered => widget.on_mouse_entered(self, state, event.x, event.y),
-            Exited => widget.on_mouse_exited(self, state, event.x, event.y),
-            _ => false,
+            MouseClick(kind) => widget.on_mouse_click(self, state, kind, event.mouse),
+            MouseMove { change: _change } => widget.on_mouse_move(self, state,
+                                                                  event.mouse),
+            MouseEnter => widget.on_mouse_enter(self, state, event.mouse),
+            MouseExit => widget.on_mouse_exit(self, state, event.mouse),
+            MouseScroll { scroll } => widget.on_mouse_scroll(self, state,
+                                                          scroll, event.mouse),
+            KeyPress(action) => widget.on_key_press(self, state, action, event.mouse),
         }
     }
 
@@ -117,8 +108,9 @@ impl<'a> WidgetBase<'a> {
         self.size.inner(&self.border)
     }
 
-    pub fn in_bounds(&self, x: i32, y: i32) -> bool {
-        self.size.in_bounds(x - self.position.x as i32, y - self.position.y as i32)
+    pub fn in_bounds(&self, p: Point) -> bool {
+        self.size.in_bounds(p.x - self.position.x as i32,
+                            p.y - self.position.y as i32)
     }
 
     pub fn set_position_centered(&mut self, x: i32, y: i32) {
@@ -129,10 +121,6 @@ impl<'a> WidgetBase<'a> {
 
     pub fn set_position(&mut self, x: i32, y: i32) {
         self.position = Point::new(x, y);
-    }
-
-    pub fn set_size(&mut self, width: i32, height: i32) {
-        self.size = Size::new(width, height);
     }
 
     pub fn add_child(&mut self, widget: Rc<RefCell<WidgetBase<'a>>>) {

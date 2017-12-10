@@ -1,11 +1,15 @@
 extern crate game;
 
+extern crate backtrace;
+use backtrace::Backtrace;
+
 #[macro_use] extern crate log;
 extern crate flexi_logger;
 
 use std::error::Error;
 use std::{thread, time};
 use std::rc::Rc;
+use std::panic;
 
 use game::config;
 use game::resource;
@@ -28,19 +32,7 @@ fn main() {
         }
     };
 
-    Logger::with_str(&config.log_level)
-        .log_to_file()
-        .directory("log")
-        .suppress_timestamp()
-        .duplicate_error()
-        .format(opt_format)
-        .start()
-        .unwrap_or_else(|e| {
-            eprintln!("{}", e);
-            eprintln!("There was a fatal error initializing logging to 'log/'");
-            eprintln!("Exiting...");
-            ::std::process::exit(1);
-        });
+    setup_logger(&config.log_level);
 
     info!("Reading resources from {}", &config.resources.directory);
     let resource_set = resource::ResourceSet::new(&config.resources.directory);
@@ -94,5 +86,33 @@ fn main() {
             thread::sleep(frame_time - elapsed);
         }
     }
+
     info!("Shutting down.");
+}
+
+fn setup_logger(log_level: &str) {
+    Logger::with_str(log_level)
+        .log_to_file()
+        .directory("log")
+        .suppress_timestamp()
+        .duplicate_error()
+        .format(opt_format)
+        .start()
+        .unwrap_or_else(|e| {
+            eprintln!("{}", e);
+            eprintln!("There was a fatal error initializing logging to 'log/'");
+            eprintln!("Exiting...");
+            ::std::process::exit(1);
+        });
+
+    panic::set_hook(Box::new(|p| {
+        error!("Thread main panic.  Exiting.");
+        debug!("with payload: {:?}", p.payload());
+        if let Some(loc) = p.location() {
+           debug!("at {:?}", loc);
+        }
+
+        let bt = Backtrace::new();
+        debug!("{:?}", bt);
+    }));
 }

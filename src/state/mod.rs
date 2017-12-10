@@ -19,11 +19,10 @@ use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 use std::cell::{Ref, RefMut, RefCell};
 
-use resource::ResourceSet;
-use resource::Actor;
+use resource::{Actor, Point, ResourceSet};
 use config::Config;
-use io::mouse_event;
-use io::{MouseEvent, KeyboardEvent, InputAction, TextRenderer};
+use io::event;
+use io::{Event, KeyboardEvent, InputAction, TextRenderer};
 use animation::{Animation, MoveAnimation};
 use ui::WidgetBase;
 
@@ -115,9 +114,9 @@ impl<'a> GameState<'a> {
 
     pub fn cursor_move_by(&mut self, mut root: RefMut<WidgetBase>,
                           x: i32, y: i32) -> bool {
-        trace!("Move cursor by {}, {}", x, y);
+        trace!("Emulating cursor move by {}, {} as mouse event", x, y);
         if self.cursor.move_by(x, y) {
-            let event = MouseEvent::new(mouse_event::Kind::Move(x, y),
+            let event = Event::new(event::Kind::MouseMove { change: Point::new(x, y) },
                  self.cursor.x, self.cursor.y);
             return root.dispatch_event(self, event);
         }
@@ -130,7 +129,7 @@ impl<'a> GameState<'a> {
         let y = self.cursor.y;
 
         trace!("Emulating cursor click event at {},{} as mouse event", x, y);
-        let event = MouseEvent::new(mouse_event::Kind::LeftClick, x, y);
+        let event = Event::new(event::Kind::MouseClick(event::ClickKind::Left), x, y);
         root.dispatch_event(self, event)
     }
 

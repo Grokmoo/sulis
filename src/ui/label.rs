@@ -31,7 +31,7 @@ impl Label {
     }
 }
 
-impl Widget for Label {
+impl<'a> Widget<'a> for Label {
     fn get_name(&self) -> &str {
         "Label"
     }

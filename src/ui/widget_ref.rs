@@ -7,12 +7,12 @@ use ui::{Widget, WidgetBase};
 //// together in a form where both can easily be referenced and modified
 //// from the outside.  The main widget tree cannot use this struct as it
 //// does not know the type of any individual widget in the tree.
-pub struct WidgetRef<'a, T: Widget> {
+pub struct WidgetRef<'a, T: Widget<'a>> {
     widget: Rc<RefCell<T>>,
     base: Rc<RefCell<WidgetBase<'a>>>,
 }
 
-impl<'a, T: Widget> WidgetRef<'a, T> {
+impl<'a, T: Widget<'a>> WidgetRef<'a, T> {
     pub fn new(widget: Rc<RefCell<T>>,
                base: Rc<RefCell<WidgetBase<'a>>>) -> WidgetRef<'a, T> {
 

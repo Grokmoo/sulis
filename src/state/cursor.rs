@@ -1,4 +1,5 @@
 use io::TextRenderer;
+use resource::Point;
 
 pub struct Cursor {
     pub c: char,
@@ -25,6 +26,10 @@ impl Cursor {
         self.y = new_y;
 
         true
+    }
+
+    pub fn get_position(&self) -> Point {
+        Point::new(self.x, self.y)
     }
 
     pub fn draw_text_mode(&self, renderer: &mut TextRenderer, millis: u32) {

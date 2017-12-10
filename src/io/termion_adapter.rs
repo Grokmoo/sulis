@@ -129,12 +129,10 @@ impl TextRenderer for Terminal {
 fn match_special(buf: &mut Vec<u8>) -> Key {
     use io::keyboard_event::Key::*;
 
-    if buf.len() == 0 { return KeyUnknown; }
+    if buf.len() < 2 { return KeyUnknown; }
 
     match buf.remove(0) {
         91 => {
-            if buf.len() == 0 { return KeyUnknown; }
-
             return match buf.remove(0) {
                 65 => KeyUp,
                 66 => KeyDown,
@@ -173,8 +171,6 @@ fn match_special(buf: &mut Vec<u8>) -> Key {
             };
         },
         79 => {
-            if buf.len() == 0 { return KeyUnknown; }
-
             return match buf.remove(0) {
                 80 => KeyF1,
                 81 => KeyF2,

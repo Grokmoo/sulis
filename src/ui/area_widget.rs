@@ -4,7 +4,9 @@ use std::cmp;
 
 use state::{AreaState, GameState};
 use ui::{Widget, WidgetBase, Label, WidgetRef};
-use io::TextRenderer;
+use io::{InputAction, TextRenderer};
+use io::event::ClickKind;
+use resource::Point;
 
 pub struct AreaWidget<'a> {
     area_state: Rc<RefCell<AreaState<'a>>>,
@@ -12,6 +14,8 @@ pub struct AreaWidget<'a> {
 
     scroll_x: i32,
     scroll_y: i32,
+    parent_width: i32,
+    parent_height: i32,
 }
 
 impl<'a> AreaWidget<'a> {
@@ -22,13 +26,40 @@ impl<'a> AreaWidget<'a> {
             mouse_over,
             scroll_x: 0,
             scroll_y: 0,
+            parent_width: 0,
+            parent_height: 0,
         }))
+    }
+
+    pub fn scroll(&mut self, x: i32, y: i32) -> bool {
+        let new_x = self.scroll_x + x;
+        let new_y = self.scroll_y + y;
+
+        if new_x < 0 || new_y < 0 { return false; }
+
+        let width = self.area_state.borrow().area.width;
+        let height = self.area_state.borrow().area.height;
+
+        if new_x >= width - self.parent_width + 1 ||
+            new_y >= height - self.parent_height + 1 {
+            return false;
+        }
+
+        self.scroll_x = new_x;
+        self.scroll_y = new_y;
+
+        true
     }
 }
 
-impl<'a> Widget for AreaWidget<'a> {
+impl<'a> Widget<'a> for AreaWidget<'a> {
     fn get_name(&self) -> &str {
         "Area"
+    }
+
+    fn set_parent(&mut self, parent: Rc<RefCell<WidgetBase<'a>>>) {
+        self.parent_width = parent.borrow().size.width;
+        self.parent_height = parent.borrow().size.height;
     }
 
     fn draw_text_mode(&self, renderer: &mut TextRenderer, owner: &WidgetBase) {
@@ -52,26 +83,41 @@ impl<'a> Widget for AreaWidget<'a> {
         }
     }
 
-    fn on_left_click(&self, parent: &mut WidgetBase, state: &mut GameState,
-                x: i32, y: i32) -> bool {
-        let size = state.pc().size() as i32;
-        let x = (x - parent.position.x as i32) - size / 2;
-        let y = (y - parent.position.y as i32) - size / 2;
+    fn on_key_press(&mut self, _parent: &mut WidgetBase, _state: &mut GameState,
+                    key: InputAction, _mouse_pos: Point) -> bool {
+
+        use io::InputAction::*;
+        match key {
+           ScrollUp => self.scroll(0, -1),
+           ScrollDown => self.scroll(0, 1),
+           ScrollLeft => self.scroll(-1, 0),
+           ScrollRight => self.scroll(1, 0),
+           _ => false,
+        };
+        true
+    }
+
+    fn on_mouse_click(&mut self, parent: &mut WidgetBase, state: &mut GameState,
+                _kind: ClickKind, mouse_pos: Point) -> bool {
+        let size = state.pc().size();
+        let x = (mouse_pos.x - parent.position.x) - size / 2;
+        let y = (mouse_pos.y - parent.position.y) - size / 2;
         if x >= 0 && y >= 0 {
-            state.pc_move_to(x, y);
+            state.pc_move_to(x + self.scroll_x, y + self.scroll_y);
         }
 
         true // consume the event
     }
 
-    fn on_mouse_moved(&self, _parent: &mut WidgetBase, _state: &mut GameState,
-                      x: i32, y: i32) -> bool {
-        self.mouse_over.top_mut().set_text(&format!("[{},{}]", x, y));
+    fn on_mouse_move(&mut self, _parent: &mut WidgetBase, _state: &mut GameState,
+                      mouse_pos: Point) -> bool {
+        self.mouse_over.top_mut().set_text(&format!("[{},{}]",
+                                                    mouse_pos.x, mouse_pos.y));
         true
     }
 
-    fn on_mouse_exited(&self, parent: &mut WidgetBase, _state: &mut GameState,
-                       _x: i32, _y: i32) -> bool {
+    fn on_mouse_exit(&mut self, parent: &mut WidgetBase, _state: &mut GameState,
+                       _mouse_pos: Point) -> bool {
        parent.set_mouse_inside(false);
        self.mouse_over.top_mut().set_text("");
        true

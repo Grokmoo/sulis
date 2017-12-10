@@ -32,8 +32,8 @@ pub fn create_ui_tree<'a>(area_state: Rc<RefCell<AreaState<'a>>>,
                       config: &Config) -> Rc<RefCell<WidgetBase<'a>>> {
 
     debug!("Creating UI tree.");
-    let root = WidgetBase::with_defaults(Rc::new(RefCell::new(EmptyWidget {})));
-    root.borrow_mut().set_size(config.display.width, config.display.height);
+    let root = WidgetBase::with_size(Rc::new(RefCell::new(EmptyWidget {})),
+        Size::new(config.display.width, config.display.height));
     setup_widgets(root.borrow_mut(), area_state);
 
     root

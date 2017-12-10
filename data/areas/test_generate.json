@@ -1,8 +1,8 @@
 {
     "id": "test_generate",
     "name": "Test Generate",
-    "width": 100,
-    "height": 100,
+    "width": 80,
+    "height": 40,
 
     "terrain": { },
     "generate": true

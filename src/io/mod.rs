@@ -4,8 +4,8 @@ mod termion_adapter;
 pub mod keyboard_event;
 pub use self::keyboard_event::KeyboardEvent;
 
-pub mod mouse_event;
-pub use self::mouse_event::MouseEvent;
+pub mod event;
+pub use self::event::Event;
 
 mod input_action;
 pub use self::input_action::InputAction;

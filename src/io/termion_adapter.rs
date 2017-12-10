@@ -112,6 +112,12 @@ impl TextRenderer for Terminal {
         //write!(self.stdout, "{}", s).unwrap();
     }
 
+    fn render_chars(&mut self, cs: &[char]) {
+        for c in cs.iter() {
+            self.write_buffer.push(*c);
+        }
+    }
+
     fn set_cursor_pos(&mut self, x: i32, y: i32) {
         self.write_buffered_text();
 
@@ -128,6 +134,8 @@ impl TextRenderer for Terminal {
 
 fn match_special(buf: &mut Vec<u8>) -> Key {
     use io::keyboard_event::Key::*;
+
+    if buf.len() == 0 { return KeyEscape; }
 
     if buf.len() < 2 { return KeyUnknown; }
 

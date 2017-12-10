@@ -62,7 +62,8 @@ fn main() {
     let mut io = game::io::create(config.display.adapter);
     io.init(&config);
 
-    let root = ui::create_ui_tree(Rc::clone(&game_state.area_state), &config);
+    let root = ui::create_ui_tree(Rc::clone(&game_state.area_state), &config,
+        &resource_set);
 
     let fpms = (1000.0 / (config.display.frame_rate as f32)) as u64;
     let frame_time = time::Duration::from_millis(fpms);

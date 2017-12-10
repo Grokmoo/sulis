@@ -7,6 +7,7 @@ use state::GameState;
 use io::{Event, TextRenderer};
 
 use resource::Point;
+use resource::Image;
 
 //// The base widget holder class.  Contains the common implementation across all
 //// widgets, and holds an instance of 'Widget' which contains the specific behavior.
@@ -17,6 +18,7 @@ pub struct WidgetBase<'a> {
     pub children: Vec<Rc<RefCell<WidgetBase<'a>>>>,
     widget: Rc<RefCell<Widget<'a> + 'a>>,
     mouse_is_inside: bool,
+    background: Option<Rc<Image>>,
 }
 
 impl<'a> Debug for WidgetBase<'a> {
@@ -37,6 +39,7 @@ impl<'a> WidgetBase<'a> {
             border,
             children: Vec::new(),
             mouse_is_inside: false,
+            background: None,
         }));
 
         widget.borrow_mut().set_parent(Rc::clone(&widget_base));
@@ -96,6 +99,10 @@ impl<'a> WidgetBase<'a> {
         }
     }
 
+    pub fn set_background(&mut self, image: Option<Rc<Image>>) {
+        self.background = image;
+    }
+
     pub(super) fn set_mouse_inside(&mut self, is_inside: bool) {
         self.mouse_is_inside = is_inside;
     }
@@ -129,6 +136,11 @@ impl<'a> WidgetBase<'a> {
     }
 
     pub fn draw_text_mode(&self, renderer: &mut TextRenderer) {
+        if let Some(ref image) = self.background {
+            image.fill_text_mode(renderer, self.position.x, self.position.y,
+                                 self.size.width, self.size.height);
+        }
+
         self.widget.borrow_mut().draw_text_mode(renderer, &self);
 
         for child in self.children.iter() {

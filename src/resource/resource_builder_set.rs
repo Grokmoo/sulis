@@ -4,6 +4,8 @@ use resource::TileBuilder;
 use resource::ActorBuilder;
 use resource::ResourceBuilder;
 use resource::area::AreaBuilder;
+use resource::image::SimpleImage;
+use resource::image::composed_image::ComposedImageBuilder;
 
 use std::collections::HashMap;
 use std::fs::{self, File};
@@ -17,6 +19,8 @@ pub struct ResourceBuilderSet {
     pub area_builders: HashMap<String, AreaBuilder>,
     pub tile_builders: HashMap<String, TileBuilder>,
     pub actor_builders: HashMap<String, ActorBuilder>,
+    pub simple_images: HashMap<String, SimpleImage>,
+    pub composed_builders: HashMap<String, ComposedImageBuilder>,
 }
 
 impl ResourceBuilderSet {
@@ -37,6 +41,8 @@ impl ResourceBuilderSet {
             tile_builders: read_resources(&format!("{}/tiles/", root)),
             actor_builders: read_resources(&format!("{}/actors/", root)),
             area_builders: read_resources(&format!("{}/areas/", root)),
+            simple_images: read_resources(&format!("{}/images/simple/", root)),
+            composed_builders: read_resources(&format!("{}/images/composed/", root)),
         })
     }
 
@@ -109,15 +115,16 @@ fn read_resources<T: ResourceBuilder>(dir: &str) -> HashMap<String, T> {
                     continue;
                 }
             };
-            trace!("Created resource.");
 
             let id = resource.owned_id();
+
+            trace!("Created resource '{}'", id);
             if resources.contains_key(&id) {
                 warn!("Duplicate resource key: {} in {}", id, dir);
                 continue;
             }
 
-
+            trace!("Inserted resource.");
             resources.insert(id, resource);
         }
     }

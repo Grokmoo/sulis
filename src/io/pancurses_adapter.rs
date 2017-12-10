@@ -84,6 +84,12 @@ impl TextRenderer for Terminal {
         self.window.addch(c);
     }
 
+    fn render_chars(&mut self, cs: &[char]) {
+        for c in cs.iter() {
+            self.render_char(*c);
+        }
+    }
+
     fn render_string(&mut self, s: &str) {
         self.window.addstr(s);
     }

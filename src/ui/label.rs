@@ -6,7 +6,7 @@ use ui::{Widget, WidgetBase};
 use io::TextRenderer;
 
 pub struct Label {
-    text: Option<String>,
+    pub(in ::ui) text: Option<String>,
 }
 
 impl Label {
@@ -41,12 +41,13 @@ impl<'a> Widget<'a> for Label {
             let x = owner.position.x as i32;
             let y = owner.position.y as i32;
             let w = owner.size.width;
+            let h = owner.size.height;
             let len = cmp::min(t.len(), w as usize);
 
             let text = &t[0..len];
 
             let x = x + (w - len as i32) / 2;
-            let y = y;
+            let y = y + (h - 1) / 2;
             let (max_x, max_y) = renderer.get_display_size();
             if x < 0 || y < 0 || x >= max_x || y >= max_y { return; }
             renderer.set_cursor_pos(x, y);

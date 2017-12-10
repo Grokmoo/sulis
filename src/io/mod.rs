@@ -33,6 +33,8 @@ pub trait IO {
 pub trait TextRenderer {
     fn render_char(&mut self, c: char);
 
+    fn render_chars(&mut self, cs: &[char]);
+
     fn render_string(&mut self, s: &str);
 
     fn set_cursor_pos(&mut self, x: i32, y: i32);

@@ -36,7 +36,7 @@ use resource::actor::ActorBuilder;
 use resource::area::AreaBuilder;
 use resource::tile::TileBuilder;
 use resource::resource_builder_set::ResourceBuilderSet;
-use resource::image::ComposedImage;
+use resource::image::{AnimatedImage, ComposedImage};
 
 pub struct ResourceSet {
     pub game: Game,
@@ -67,6 +67,11 @@ impl ResourceSet {
 
         for (id, image) in builder_set.composed_builders {
             insert_if_ok_boxed("image", id, ComposedImage::new(image, &images),
+                &mut images);
+        }
+
+        for (id, image) in builder_set.animated_builders {
+            insert_if_ok_boxed("image", id, AnimatedImage::new(image, &images),
                 &mut images);
         }
 

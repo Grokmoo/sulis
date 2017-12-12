@@ -1,0 +1,7 @@
+{
+    "id": "background",
+    "states": {
+        "base": "bg_base",
+        "mouseover": "bg_mouseover"
+    }
+}

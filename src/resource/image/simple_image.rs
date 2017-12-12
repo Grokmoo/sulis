@@ -1,16 +1,16 @@
 use std::io::{Error, ErrorKind};
 
-use resource::{Image, ResourceBuilder};
+use resource::{Image, Point, ResourceBuilder};
 use io::TextRenderer;
+use ui::Size;
 
 use serde_json;
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct SimpleImage {
     id: String,
     text_display: Vec<char>,
-    width: i32,
-    height: i32,
+    size: Size,
 }
 
 impl ResourceBuilder for SimpleImage {
@@ -21,7 +21,7 @@ impl ResourceBuilder for SimpleImage {
     fn new(data: &str) -> Result<SimpleImage, Error> {
         let image: SimpleImage = serde_json::from_str(data)?;
 
-        if image.text_display.len() != (image.width * image.height) as usize {
+        if image.text_display.len() != (image.size.product()) as usize {
             return Err(Error::new(ErrorKind::InvalidData,
                 format!("SimpleImage text display must be length*width characters.")));
         }
@@ -31,22 +31,21 @@ impl ResourceBuilder for SimpleImage {
 }
 
 impl Image for SimpleImage {
-    fn draw_text_mode(&self, renderer: &mut TextRenderer, x: i32, y: i32) {
+    fn draw_text_mode(&self, renderer: &mut TextRenderer, _state: &str, position: &Point) {
+        let x = position.x;
+        let y = position.y;
+
         renderer.set_cursor_pos(x, y);
 
-        for y_rel in 0..self.height {
+        for y_rel in 0..self.size.height {
             renderer.set_cursor_pos(x, y + y_rel);
-            let start = (y_rel * self.height) as usize;
-            let end = start + self.width as usize;
+            let start = (y_rel * self.size.height) as usize;
+            let end = start + self.size.height as usize;
             renderer.render_chars(&self.text_display[start..end]);
         }
     }
 
-    fn get_width(&self) -> i32 {
-        self.width
-    }
-
-    fn get_height(&self) -> i32 {
-        self.height
+    fn get_size(&self) -> &Size {
+        &self.size
     }
 }

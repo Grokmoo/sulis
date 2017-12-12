@@ -10,11 +10,17 @@ pub use self::widget::EmptyWidget;
 mod widget_ref;
 pub use self::widget_ref::WidgetRef;
 
+mod base_ref;
+pub use self::base_ref::BaseRef;
+
 mod border;
 pub use self::border::Border;
 
 mod size;
 pub use self::size::Size;
+
+mod animation_state;
+pub use self::animation_state::AnimationState;
 
 mod area_widget;
 pub use self::area_widget::AreaWidget;
@@ -74,12 +80,15 @@ fn setup_widgets<'a>(ref mut root: RefMut<WidgetBase<'a>>,
             Border::as_uniform(0),
             ));
 
+    let button_ref = Button::with_callback("Test", Box::new(|_parent, _state| {
+        debug!("hello from closure");
+    }));
     let button = WidgetBase::with_position(
-            Button::new("Test"),
+            button_ref,
             Size::new(right_pane_width, 3),
             Point::new(area_width + 1, 3),
             );
-    button.borrow_mut().set_background(resource_set.get_image("bg"));
+    button.borrow_mut().set_background(resource_set.get_image("background"));
     root.add_child(button);
 
     root.add_child(mouse_over);

@@ -2,21 +2,21 @@ use std::rc::Rc;
 use std::io::{Error, ErrorKind};
 use std::collections::HashMap;
 
-use resource::{Image, ResourceBuilder};
+use resource::{Image, Point, ResourceBuilder};
 use io::TextRenderer;
+use ui::Size;
 
 use serde_json;
 
 const GRID_DIM: i32 = 3;
 const GRID_LEN: i32 = GRID_DIM * GRID_DIM;
 
+#[derive(Debug)]
 pub struct ComposedImage {
     images: Vec<Rc<Image>>,
 
-    width: i32,
-    height: i32,
-    middle_width: i32,
-    middle_height: i32,
+    size: Size,
+    middle_size: Size,
 }
 
 impl ComposedImage {
@@ -43,11 +43,11 @@ impl ComposedImage {
         let mut total_height = 0;
         for y in 0..GRID_DIM {
             let row_height = images_vec.get((y * GRID_DIM) as usize)
-                .unwrap().get_height();
+                .unwrap().get_size().height;
 
             for x in 0..GRID_DIM {
                 let height = images_vec.get((y * GRID_DIM + x) as usize)
-                    .unwrap().get_height();
+                    .unwrap().get_size().height;
 
                 if height != row_height {
                     return Err(Error::new(ErrorKind::InvalidData,
@@ -60,11 +60,11 @@ impl ComposedImage {
         //verify widths make sense for the grid
         let mut total_width = 0;
         for x in 0..GRID_DIM {
-            let col_width = images_vec.get(x as usize).unwrap().get_width();
+            let col_width = images_vec.get(x as usize).unwrap().get_size().width;
 
             for y in 0..GRID_DIM {
                 let width = images_vec.get((y * GRID_DIM + x) as usize)
-                    .unwrap().get_width();
+                    .unwrap().get_size().width;
 
                 if width != col_width {
                     return Err(Error::new(ErrorKind::InvalidData,
@@ -74,34 +74,31 @@ impl ComposedImage {
             total_width += col_width;
         }
 
-        let middle_width = images_vec.get((GRID_LEN / 2) as usize)
-            .unwrap().get_width();
-        let middle_height = images_vec.get((GRID_LEN / 2) as usize)
-            .unwrap().get_height();
+        let middle_size = *images_vec.get((GRID_LEN / 2) as usize).unwrap().get_size();
 
         Ok(Rc::new(ComposedImage {
             images: images_vec,
-            width: total_width,
-            height: total_height,
-            middle_width,
-            middle_height,
+            size: Size::new(total_width, total_height),
+            middle_size,
         }))
     }
 }
 
 impl Image for ComposedImage {
-    fn draw_text_mode(&self, renderer: &mut TextRenderer, x: i32, y: i32) {
+    fn draw_text_mode(&self, renderer: &mut TextRenderer, state: &str, position: &Point) {
+        let x = position.x;
+        let y = position.y;
         renderer.set_cursor_pos(x, y);
 
         let mut cur_x = x;
         let mut cur_y = y;
         for (index, image) in self.images.iter().enumerate() {
             let index = index as i32;
-            image.draw_text_mode(renderer, cur_x, cur_y);
+            image.draw_text_mode(renderer, state, &Point::new(cur_x, cur_y));
 
             if index % GRID_DIM == GRID_DIM - 1 {
                 cur_x = x;
-                cur_y += image.get_height();
+                cur_y += image.get_size().height;
             }
         }
     }
@@ -109,57 +106,58 @@ impl Image for ComposedImage {
     //// Renders text for this composed image to the given coordinates.
     //// This method assumes that 'GRID_DIM' equals 3 for simplicity
     //// and performance purposes.
-    fn fill_text_mode(&self, renderer: &mut TextRenderer, x: i32, y: i32,
-                      width: i32, height: i32) {
-        let fill_width = width - (self.width - self.middle_width);
-        let fill_height = height - (self.height - self.middle_height);
+    fn fill_text_mode(&self, renderer: &mut TextRenderer, state: &str,
+                      position: &Point, size: &Size) {
+        let fill_size = *size - (self.size - self.middle_size);
+        let mut draw_pos = Point::from(position);
+        let mut draw_size = Size::from(&fill_size);
 
         unsafe {
             let image = self.images.get_unchecked(0);
-            image.draw_text_mode(renderer, x, y);
+            image.draw_text_mode(renderer, state, &draw_pos);
 
-            let cur_x = x + image.get_width();
             let image = self.images.get_unchecked(1);
-            image.fill_text_mode(renderer, cur_x, y, fill_width, image.get_height());
+            draw_size.set_height(image.get_size().height);
+            draw_pos.add_x(image.get_size().width);
+            image.fill_text_mode(renderer, state, &draw_pos, &draw_size);
 
-            let cur_x = cur_x + fill_width;
             let image = self.images.get_unchecked(2);
-            image.draw_text_mode(renderer, cur_x, y);
+            draw_pos.add_x(fill_size.width);
+            image.draw_text_mode(renderer, state, &draw_pos);
 
-            let cur_y = y + image.get_height();
-            let cur_x = x;
             let image = self.images.get_unchecked(3);
-            image.fill_text_mode(renderer, cur_x, cur_y, image.get_width(), fill_height);
+            draw_pos.set_x(position.x);
+            draw_pos.add_y(image.get_size().height);
+            draw_size.set(image.get_size().width, fill_size.height);
+            image.fill_text_mode(renderer, state, &draw_pos, &draw_size);
 
-            let cur_x = cur_x + image.get_width();
             let image = self.images.get_unchecked(4);
-            image.fill_text_mode(renderer, cur_x, cur_y, fill_width, fill_height);
+            draw_pos.add_x(image.get_size().width);
+            image.fill_text_mode(renderer, state, &draw_pos, &fill_size);
 
-            let cur_x = cur_x + fill_width;
             let image = self.images.get_unchecked(5);
-            image.fill_text_mode(renderer, cur_x, cur_y, image.get_width(), fill_height);
+            draw_pos.add_x(fill_size.width);
+            draw_size.set_width(image.get_size().width);
+            image.fill_text_mode(renderer, state, &draw_pos, &draw_size);
 
-            let cur_x = x;
-            let cur_y = cur_y + fill_height;
             let image = self.images.get_unchecked(6);
-            image.draw_text_mode(renderer, cur_x, cur_y);
+            draw_pos.set_x(position.x);
+            draw_pos.add_y(image.get_size().height);
+            image.draw_text_mode(renderer, state, &draw_pos);
 
-            let cur_x = cur_x + image.get_width();
             let image = self.images.get_unchecked(7);
-            image.fill_text_mode(renderer, cur_x, cur_y, fill_width, image.get_height());
+            draw_pos.add_x(image.get_size().width);
+            draw_size.set(fill_size.width, image.get_size().height);
+            image.fill_text_mode(renderer, state, &draw_pos, &draw_size);
 
-            let cur_x = cur_x + fill_width;
             let image = self.images.get_unchecked(8);
-            image.draw_text_mode(renderer, cur_x, cur_y);
+            draw_pos.add_x(fill_size.width);
+            image.draw_text_mode(renderer, state, &draw_pos);
         }
     }
 
-    fn get_width(&self) -> i32 {
-        self.width
-    }
-
-    fn get_height(&self) -> i32 {
-        self.height
+    fn get_size(&self) -> &Size {
+        &self.size
     }
 }
 

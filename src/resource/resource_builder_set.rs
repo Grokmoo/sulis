@@ -6,6 +6,7 @@ use resource::ResourceBuilder;
 use resource::area::AreaBuilder;
 use resource::image::SimpleImage;
 use resource::image::composed_image::ComposedImageBuilder;
+use resource::image::animated_image::AnimatedImageBuilder;
 
 use std::collections::HashMap;
 use std::fs::{self, File};
@@ -21,6 +22,7 @@ pub struct ResourceBuilderSet {
     pub actor_builders: HashMap<String, ActorBuilder>,
     pub simple_images: HashMap<String, SimpleImage>,
     pub composed_builders: HashMap<String, ComposedImageBuilder>,
+    pub animated_builders: HashMap<String, AnimatedImageBuilder>,
 }
 
 impl ResourceBuilderSet {
@@ -43,6 +45,7 @@ impl ResourceBuilderSet {
             area_builders: read_resources(&format!("{}/areas/", root)),
             simple_images: read_resources(&format!("{}/images/simple/", root)),
             composed_builders: read_resources(&format!("{}/images/composed/", root)),
+            animated_builders: read_resources(&format!("{}/images/animated/", root)),
         })
     }
 

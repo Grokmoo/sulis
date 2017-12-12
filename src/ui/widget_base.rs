@@ -2,7 +2,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 use std::fmt::{Debug, Formatter, Result};
 
-use ui::{Border, Size, Widget};
+use ui::{Border, Size, Widget, AnimationState};
 use state::GameState;
 use io::{Event, TextRenderer};
 
@@ -19,6 +19,7 @@ pub struct WidgetBase<'a> {
     widget: Rc<RefCell<Widget<'a> + 'a>>,
     mouse_is_inside: bool,
     background: Option<Rc<Image>>,
+    animation_state: AnimationState,
 }
 
 impl<'a> Debug for WidgetBase<'a> {
@@ -40,9 +41,10 @@ impl<'a> WidgetBase<'a> {
             children: Vec::new(),
             mouse_is_inside: false,
             background: None,
+            animation_state: AnimationState::Base,
         }));
 
-        widget.borrow_mut().set_parent(Rc::clone(&widget_base));
+        widget.borrow_mut().set_parent(&widget_base);
 
         widget_base
     }
@@ -88,15 +90,19 @@ impl<'a> WidgetBase<'a> {
         let mut widget = widget.borrow_mut();
         use io::event::Kind::*;
         match event.kind {
-            MouseClick(kind) => widget.on_mouse_click(self, state, kind, event.mouse),
-            MouseMove { change: _change } => widget.on_mouse_move(self, state,
+            MouseClick(kind) => widget.on_mouse_click(state, kind, event.mouse),
+            MouseMove { change: _change } => widget.on_mouse_move(state,
                                                                   event.mouse),
-            MouseEnter => widget.on_mouse_enter(self, state, event.mouse),
-            MouseExit => widget.on_mouse_exit(self, state, event.mouse),
-            MouseScroll { scroll } => widget.on_mouse_scroll(self, state,
+            MouseEnter => widget.on_mouse_enter(state, event.mouse),
+            MouseExit => widget.on_mouse_exit(state, event.mouse),
+            MouseScroll { scroll } => widget.on_mouse_scroll(state,
                                                           scroll, event.mouse),
-            KeyPress(action) => widget.on_key_press(self, state, action, event.mouse),
+            KeyPress(action) => widget.on_key_press(state, action, event.mouse),
         }
+    }
+
+    pub fn set_animation_state(&mut self, state: AnimationState) {
+        self.animation_state = state;
     }
 
     pub fn set_background(&mut self, image: Option<Rc<Image>>) {
@@ -137,11 +143,11 @@ impl<'a> WidgetBase<'a> {
 
     pub fn draw_text_mode(&self, renderer: &mut TextRenderer) {
         if let Some(ref image) = self.background {
-            image.fill_text_mode(renderer, self.position.x, self.position.y,
-                                 self.size.width, self.size.height);
+            image.fill_text_mode(renderer, self.animation_state.get_text(),
+                &self.position, &self.size);
         }
 
-        self.widget.borrow_mut().draw_text_mode(renderer, &self);
+        self.widget.borrow_mut().draw_text_mode(renderer);
 
         for child in self.children.iter() {
             let child = child.borrow();

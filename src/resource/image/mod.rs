@@ -4,26 +4,32 @@ pub use self::simple_image::SimpleImage;
 pub mod composed_image;
 pub use self::composed_image::ComposedImage;
 
+pub mod animated_image;
+pub use self::animated_image::AnimatedImage;
+
+use std::fmt::Debug;
+
 use io::TextRenderer;
 
-pub trait Image {
-    fn draw_text_mode(&self, renderer: &mut TextRenderer, x: i32, y: i32);
+use ui::Size;
+use resource::Point;
 
-    fn fill_text_mode(&self, renderer: &mut TextRenderer, x: i32, y: i32,
-                      width: i32, height: i32) {
+pub trait Image: Debug {
+    fn draw_text_mode(&self, renderer: &mut TextRenderer, state: &str, position: &Point);
+
+    fn fill_text_mode(&self, renderer: &mut TextRenderer, state: &str, position: &Point,
+                      size: &Size) {
 
         let mut rel_y = 0;
-        while rel_y < height {
+        while rel_y < size.height {
             let mut rel_x = 0;
-            while rel_x < width {
-                self.draw_text_mode(renderer, x + rel_x, y + rel_y);
-                rel_x += self.get_width();
+            while rel_x < size.width {
+                self.draw_text_mode(renderer, state, &position.add(rel_x, rel_y));
+                rel_x += self.get_size().width;
             }
-            rel_y += self.get_height();
+            rel_y += self.get_size().height;
         }
     }
 
-    fn get_width(&self) -> i32;
-
-    fn get_height(&self) -> i32;
+    fn get_size(&self) -> &Size;
 }

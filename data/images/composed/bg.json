@@ -1,8 +1,0 @@
-{
-    "id": "bg",
-    "grid": [
-        "bg_top_left",    "bg_top_middle",    "bg_top_right",
-        "bg_middle_left", "bg_middle",        "bg_middle_right",
-        "bg_bottom_left", "bg_bottom_middle", "bg_bottom_right"
-    ]
-}

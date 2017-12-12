@@ -24,7 +24,7 @@ use config::Config;
 use io::event;
 use io::{Event, KeyboardEvent, InputAction, TextRenderer};
 use animation::{Animation, MoveAnimation};
-use ui::WidgetBase;
+use ui::Widget;
 
 pub struct GameState<'a> {
     config: Config,
@@ -106,13 +106,13 @@ impl<'a> GameState<'a> {
     }
 
     pub fn draw_text_mode(&self, renderer: &mut TextRenderer,
-                          root: Ref<WidgetBase>, millis: u32) {
+                          root: &Widget, millis: u32) {
         root.draw_text_mode(renderer);
 
         self.cursor.draw_text_mode(renderer, millis);
     }
 
-    pub fn cursor_move_by(&mut self, mut root: RefMut<WidgetBase>,
+    pub fn cursor_move_by(&mut self, root: &mut Widget,
                           x: i32, y: i32) -> bool {
         trace!("Emulating cursor move by {}, {} as mouse event", x, y);
         if self.cursor.move_by(x, y) {
@@ -124,7 +124,7 @@ impl<'a> GameState<'a> {
         false
     }
 
-    pub fn cursor_click(&mut self, mut root: RefMut<WidgetBase>) -> bool {
+    pub fn cursor_click(&mut self, root: &mut Widget) -> bool {
         let x = self.cursor.x;
         let y = self.cursor.y;
 
@@ -138,7 +138,7 @@ impl<'a> GameState<'a> {
     }
 
     pub fn handle_keyboard_input(&mut self, input: KeyboardEvent,
-                                 root: RefMut<WidgetBase>) {
+                                 root: &mut Widget) {
 
         debug!("Received {:?}", input);
         let action = {

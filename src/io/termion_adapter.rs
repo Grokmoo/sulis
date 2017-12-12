@@ -1,6 +1,4 @@
 use std::io::{Bytes, Read, Write, stdout};
-use std::cell::{Ref, RefCell};
-use std::rc::Rc;
 use std::time::Instant;
 use std;
 
@@ -8,7 +6,7 @@ use config::Config;
 use io::{self, KeyboardEvent, IO, TextRenderer};
 use io::keyboard_event::Key;
 use state::GameState;
-use ui::WidgetBase;
+use ui::Widget;
 use animation;
 
 use termion::screen::*;
@@ -53,7 +51,7 @@ impl IO for Terminal {
         write!(self.stdout, "{}", termion::cursor::Hide).unwrap();
     }
 
-    fn process_input(&mut self, state: &mut GameState, root: Rc<RefCell<WidgetBase>>) {
+    fn process_input(&mut self, state: &mut GameState, root: &mut Widget) {
         let mut buf: Vec<u8> = Vec::new();
 
         loop {
@@ -79,11 +77,11 @@ impl IO for Terminal {
 
             let input = KeyboardEvent { key: input };
 
-            state.handle_keyboard_input(input, root.borrow_mut());
+            state.handle_keyboard_input(input, root);
         }
     }
 
-    fn render_output(&mut self, state: &GameState, root: Ref<WidgetBase>) {
+    fn render_output(&mut self, state: &GameState, root: &Widget) {
         write!(self.stdout, "{}", termion::clear::All).unwrap();
 
         let millis = animation::get_elapsed_millis(self.start_time.elapsed());

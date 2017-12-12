@@ -10,22 +10,19 @@ pub use self::event::Event;
 mod input_action;
 pub use self::input_action::InputAction;
 
-use std::rc::Rc;
-use std::cell::{Ref, RefCell};
-
 use state::GameState;
 use config::{Config, IOAdapter};
-use ui::WidgetBase;
+use ui::Widget;
 use io::keyboard_event::Key;
 
 pub trait IO {
     fn init(&mut self, config: &Config);
 
     fn process_input(&mut self, game_state: &mut GameState,
-                     root: Rc<RefCell<WidgetBase>>);
+                     root: &mut Widget);
 
     fn render_output(&mut self, game_state: &GameState,
-                     root: Ref<WidgetBase>);
+                     root: &Widget);
 
     fn get_display_size(&self) -> (i32, i32);
 }

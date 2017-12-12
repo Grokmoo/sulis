@@ -1,20 +1,20 @@
 use std::rc::Rc;
 use std::cell::{Ref, RefMut, RefCell};
 
-use ui::{Widget, WidgetBase};
+use ui::{WidgetKind, WidgetState};
 
-//// A convenience struct for holding a 'Widget' and 'WidgetBase' object
+//// A convenience struct for holding a 'Widget' and 'WidgetState' object
 //// together in a form where both can easily be referenced and modified
 //// from the outside.  The main widget tree cannot use this struct as it
 //// does not know the type of any individual widget in the tree.
-pub struct WidgetRef<'a, T: Widget<'a>> {
+pub struct WidgetRef<'a, T: WidgetKind<'a>> {
     widget: Rc<RefCell<T>>,
-    base: Rc<RefCell<WidgetBase<'a>>>,
+    base: Rc<RefCell<WidgetState<'a>>>,
 }
 
-impl<'a, T: Widget<'a>> WidgetRef<'a, T> {
+impl<'a, T: WidgetKind<'a>> WidgetRef<'a, T> {
     pub fn new(widget: Rc<RefCell<T>>,
-               base: Rc<RefCell<WidgetBase<'a>>>) -> WidgetRef<'a, T> {
+               base: Rc<RefCell<WidgetState<'a>>>) -> WidgetRef<'a, T> {
 
         WidgetRef {
             widget,
@@ -30,11 +30,11 @@ impl<'a, T: Widget<'a>> WidgetRef<'a, T> {
         self.widget.borrow_mut()
     }
 
-    pub fn base(&self) -> Ref<WidgetBase<'a>> {
+    pub fn base(&self) -> Ref<WidgetState<'a>> {
         self.base.borrow()
     }
 
-    pub fn base_mut(&self) -> RefMut<WidgetBase<'a>> {
+    pub fn base_mut(&self) -> RefMut<WidgetState<'a>> {
         self.base.borrow_mut()
     }
 }

@@ -1,15 +1,13 @@
 use pancurses;
 
 use std::time::Instant;
-use std::cell::{Ref, RefCell};
-use std::rc::Rc;
 
 use io;
 use io::keyboard_event::Key;
 use io::{IO, KeyboardEvent, TextRenderer};
 
 use state::GameState;
-use ui::WidgetBase;
+use ui::Widget;
 use config::Config;
 use animation;
 
@@ -52,7 +50,7 @@ impl IO for Terminal {
         self.size_terminal(config);
     }
 
-    fn process_input(&mut self, state: &mut GameState, root: Rc<RefCell<WidgetBase>>) {
+    fn process_input(&mut self, state: &mut GameState, root: &mut Widget) {
         let input = self.window.getch();
         if let None = input {
             return;
@@ -64,10 +62,10 @@ impl IO for Terminal {
         };
         let input = KeyboardEvent { key: input };
 
-        state.handle_keyboard_input(input, root.borrow_mut());
+        state.handle_keyboard_input(input, root);
     }
 
-    fn render_output(&mut self, state: &GameState, root: Ref<WidgetBase>) {
+    fn render_output(&mut self, state: &GameState, root: &Widget) {
         self.window.erase();
 
         let millis = animation::get_elapsed_millis(self.start_time.elapsed());

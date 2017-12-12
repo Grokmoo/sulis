@@ -62,7 +62,7 @@ fn main() {
     let mut io = game::io::create(config.display.adapter);
     io.init(&config);
 
-    let root = ui::create_ui_tree(Rc::clone(&game_state.area_state), &config,
+    let mut root = ui::create_ui_tree(Rc::clone(&game_state.area_state), &config,
         &resource_set);
 
     let fpms = (1000.0 / (config.display.frame_rate as f32)) as u64;
@@ -73,9 +73,9 @@ fn main() {
     loop {
         let start_time = time::Instant::now();
 
-        io.process_input(&mut game_state, Rc::clone(&root));
+        io.process_input(&mut game_state, &mut root);
         game_state.update();
-        io.render_output(&game_state, root.borrow());
+        io.render_output(&game_state, &root);
 
         if game_state.should_exit {
             trace!("Exiting main loop.");

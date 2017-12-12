@@ -1,28 +1,23 @@
 use std::rc::Rc;
-use std::cell::RefCell;
-use std::cmp;
 
-use ui::{Widget, WidgetBase, BaseRef};
+use ui::WidgetKind;
 use io::TextRenderer;
 
-pub struct Label<'a> {
+pub struct Label {
     pub(in ::ui) text: Option<String>,
-    pub base_ref: BaseRef<'a>,
 }
 
-impl<'a> Label<'a> {
-    pub fn new(text: &str) -> Rc<RefCell<Label<'a>>> {
-        Rc::new(RefCell::new(Label {
+impl Label {
+    pub fn new(text: &str) -> Rc<Label> {
+        Rc::new(Label {
             text: Some(text.to_string()),
-            base_ref: BaseRef::new(),
-        }))
+        })
     }
 
-    pub fn new_empty() -> Rc<RefCell<Label<'a>>> {
-        Rc::new(RefCell::new(Label {
+    pub fn new_empty() -> Rc<Label> {
+        Rc::new(Label {
             text: None,
-            base_ref: BaseRef::new(),
-        }))
+        })
     }
 
     pub fn set_text(&mut self, text: &str) {
@@ -34,17 +29,13 @@ impl<'a> Label<'a> {
     }
 }
 
-impl<'a> Widget<'a> for Label<'a> {
+impl<'a> WidgetKind<'a> for Label {
     fn get_name(&self) -> &str {
         "Label"
     }
 
-    fn set_parent(&mut self, parent: &Rc<RefCell<WidgetBase<'a>>>) {
-        self.base_ref.set_base(parent);
-    }
-
-    fn draw_text_mode(&self, renderer: &mut TextRenderer) {
-        if let Some(ref t) = self.text {
+    fn draw_text_mode(&self, _renderer: &mut TextRenderer) {
+        //if let Some(ref t) = self.text {
             // let base = self.base_ref.base();
             // let x = base.position.x;
             // let y = base.position.y;
@@ -60,6 +51,6 @@ impl<'a> Widget<'a> for Label<'a> {
             // if x < 0 || y < 0 || x >= max_x || y >= max_y { return; }
             // renderer.set_cursor_pos(x, y);
             // renderer.render_string(&text);
-        }
+       // }
     }
 }

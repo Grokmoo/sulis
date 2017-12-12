@@ -1,7 +1,5 @@
-use std::cell::RefMut;
-
 use state::GameState;
-use ui::WidgetBase;
+use ui::Widget;
 use io::event::Kind;
 use io::Event;
 
@@ -21,7 +19,7 @@ pub enum InputAction {
 
 impl InputAction {
     pub fn fire_action(action: InputAction, state: &mut GameState,
-                       mut root: RefMut<WidgetBase>) {
+                       root: &mut Widget) {
         use self::InputAction::*;
 
         debug!("Firing action {:?}", action);

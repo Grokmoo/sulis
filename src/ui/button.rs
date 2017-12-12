@@ -1,51 +1,25 @@
 use std::rc::Rc;
-use std::cell::{RefCell, RefMut};
 
-use ui::{AnimationState, BaseRef, Label, Widget, WidgetBase};
+use ui::{AnimationState, Label, WidgetKind, WidgetState};
 use io::{event, TextRenderer};
 use state::GameState;
 use resource::Point;
 
-pub struct Button<'a> {
-    label: Label<'a>,
-    callback: Option<Box<FnMut(RefMut<WidgetBase>, &mut GameState)>>,
-    base_ref: BaseRef<'a>,
+pub struct Button {
+    label: Label,
 }
 
-impl<'a> Button<'a> {
-    pub fn new(text: &str) -> Rc<RefCell<Button>> {
-        Rc::new(RefCell::new(Button {
+impl Button {
+    pub fn new(text: &str) -> Rc<Button> {
+        Rc::new(Button {
             label: Label {
                 text: Some(text.to_string()),
-                base_ref: BaseRef::new(),
             },
-            callback: None,
-            base_ref: BaseRef::new(),
-        }))
-    }
-
-    pub fn with_callback(text: &str,
-        callback: Box<FnMut(RefMut<WidgetBase>, &mut GameState)>) -> Rc<RefCell<Button>> {
-        Rc::new(RefCell::new(Button {
-            label: Label {
-                text: Some(text.to_string()),
-                base_ref: BaseRef::new(),
-            },
-            callback: Some(callback),
-            base_ref: BaseRef::new(),
-        }))
-    }
-
-    pub fn set_callback(&mut self, callback: Box<FnMut(RefMut<WidgetBase>, &mut GameState)>) {
-        self.callback = Some(callback);
+        })
     }
 }
 
-impl<'a> Widget<'a> for Button<'a> {
-    fn set_parent(&mut self, parent: &Rc<RefCell<WidgetBase<'a>>>) {
-        self.base_ref.set_base(parent);
-    }
-
+impl<'a> WidgetKind<'a> for Button {
     fn get_name(&self) -> &str {
         "Button"
     }
@@ -54,25 +28,22 @@ impl<'a> Widget<'a> for Button<'a> {
         self.label.draw_text_mode(renderer);
     }
 
-    fn on_mouse_enter(&mut self, _state: &mut GameState,
+    fn on_mouse_enter(&self, _state: &mut GameState,
                       _mouse_pos: Point) -> bool {
-        self.base_ref.base_mut().set_mouse_inside(true);
-        self.base_ref.base_mut().set_animation_state(AnimationState::MouseOver);
+        // self.base_ref.base_mut().set_mouse_inside(true);
+        // self.base_ref.base_mut().set_animation_state(AnimationState::MouseOver);
         true
     }
 
-    fn on_mouse_exit(&mut self, _state: &mut GameState,
+    fn on_mouse_exit(&self, _state: &mut GameState,
                      _mouse_pos: Point) -> bool {
-        self.base_ref.base_mut().set_mouse_inside(false);
-        self.base_ref.base_mut().set_animation_state(AnimationState::Base);
+        // self.base_ref.base_mut().set_mouse_inside(false);
+        // self.base_ref.base_mut().set_animation_state(AnimationState::Base);
         true
     }
 
-    fn on_mouse_click(&mut self, state: &mut GameState,
+    fn on_mouse_click(&self, state: &mut GameState,
                       _kind: event::ClickKind, _mouse_pos: Point) -> bool {
-        if let Some(ref mut cb) = self.callback {
-            cb(self.base_ref.base_mut(), state);
-        }
         true
     }
 }

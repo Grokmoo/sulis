@@ -1,6 +1,8 @@
 mod pancurses_adapter;
 mod termion_adapter;
 
+mod buffered_text_renderer;
+
 pub mod keyboard_event;
 pub use self::keyboard_event::KeyboardEvent;
 
@@ -16,15 +18,11 @@ use ui::Widget;
 use io::keyboard_event::Key;
 
 pub trait IO {
-    fn init(&mut self, config: &Config);
-
     fn process_input(&mut self, game_state: &mut GameState,
                      root: &mut Widget);
 
     fn render_output(&mut self, game_state: &GameState,
-                     root: &Widget);
-
-    fn get_display_size(&self) -> (i32, i32);
+                     root: &Widget, millis: u32);
 }
 
 pub trait TextRenderer {
@@ -35,17 +33,15 @@ pub trait TextRenderer {
     fn render_string(&mut self, s: &str);
 
     fn set_cursor_pos(&mut self, x: i32, y: i32);
-
-    fn get_display_size(&self) -> (i32, i32);
 }
 
-pub fn create<'a>(adapter: IOAdapter) -> Box<IO + 'a> {
-    match adapter{
+pub fn create<'a>(config: &Config) -> Box<IO + 'a> {
+    match config.display.adapter {
         IOAdapter::Pancurses => {
-            Box::new(pancurses_adapter::Terminal::new())
+            Box::new(pancurses_adapter::Terminal::new(config))
         },
         IOAdapter::Termion => {
-            Box::new(termion_adapter::Terminal::new())
+            Box::new(termion_adapter::Terminal::new(config))
         },
     }
 }

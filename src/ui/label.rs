@@ -33,8 +33,6 @@ impl<'a> WidgetKind<'a> for Label {
 
         let x = x + (w - len as i32) / 2;
         let y = y + (h - 1) / 2;
-        let (max_x, max_y) = renderer.get_display_size();
-        if x < 0 || y < 0 || x >= max_x || y >= max_y { return; }
         renderer.set_cursor_pos(x, y);
         renderer.render_string(&text);
     }

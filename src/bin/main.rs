@@ -15,6 +15,7 @@ use game::config;
 use game::resource;
 use game::state::GameState;
 use game::ui;
+use game::animation;
 
 use flexi_logger::{Logger, opt_format};
 
@@ -59,8 +60,7 @@ fn main() {
     };
 
     info!("Setting up display adapter.");
-    let mut io = game::io::create(config.display.adapter);
-    io.init(&config);
+    let mut io = game::io::create(&config);
 
     let mut root = ui::create_ui_tree(Rc::clone(&game_state.area_state), &config,
         &resource_set);
@@ -70,21 +70,25 @@ fn main() {
     trace!("Computed {} frames per milli.", fpms);
 
     info!("Setup complete.");
+    let main_loop_start_time = time::Instant::now();
     loop {
         let start_time = time::Instant::now();
 
         io.process_input(&mut game_state, &mut root);
         game_state.update();
-        io.render_output(&game_state, &root);
+
+        let total_elapsed =
+            animation::get_elapsed_millis(main_loop_start_time.elapsed());
+        io.render_output(&game_state, &root, total_elapsed);
 
         if game_state.should_exit {
             trace!("Exiting main loop.");
             break;
         }
 
-        let elapsed = start_time.elapsed();
-        if frame_time > elapsed {
-            thread::sleep(frame_time - elapsed);
+        let frame_elapsed = start_time.elapsed();
+        if frame_time > frame_elapsed {
+            thread::sleep(frame_time - frame_elapsed);
         }
     }
 

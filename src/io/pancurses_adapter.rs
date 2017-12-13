@@ -1,23 +1,21 @@
 use pancurses;
 
-use std::time::Instant;
-
+use io::buffered_text_renderer::BufferedTextRenderer;
 use io;
 use io::keyboard_event::Key;
-use io::{IO, KeyboardEvent, TextRenderer};
-
+use io::{IO, KeyboardEvent};
 use state::GameState;
-use ui::Widget;
+use ui::{Widget, Size};
 use config::Config;
-use animation;
 
 pub struct Terminal {
     window: pancurses::Window,
-    start_time: Instant,
+    renderer: BufferedTextRenderer,
+    size: Size,
 }
 
 impl Terminal {
-    pub fn new() -> Terminal {
+    pub fn new(config: &Config) -> Terminal {
         debug!("Initialize Pancurses display adapter.");
         let window = pancurses::initscr();
         window.nodelay(true);
@@ -26,30 +24,30 @@ impl Terminal {
         pancurses::curs_set(0);
         pancurses::nonl();
 
+        Terminal::size_terminal(config);
+
+        let size = Size::new(config.display.width, config.display.height);
+
         Terminal {
             window,
-            start_time: Instant::now(),
+            size,
+            renderer: BufferedTextRenderer::new(size),
         }
     }
 
     #[cfg(target_os = "windows")]
-    fn size_terminal(&mut self, config: &Config) {
+    fn size_terminal(config: &Config) {
         pancurses::resize_term(config.display.height as i32,
                                config.display.width as i32);
     }
 
     #[cfg(not(target_os = "windows"))]
-    fn size_terminal(&mut self, _config: &Config) {
+    fn size_terminal(_config: &Config) {
         // do nothing
     }
 }
 
 impl IO for Terminal {
-    fn init(&mut self, config: &Config) {
-        trace!("Called init on pancurses adapter.");
-        self.size_terminal(config);
-    }
-
     fn process_input(&mut self, state: &mut GameState, root: &mut Widget) {
         let input = self.window.getch();
         if let None = input {
@@ -65,39 +63,16 @@ impl IO for Terminal {
         state.handle_keyboard_input(input, root);
     }
 
-    fn render_output(&mut self, state: &GameState, root: &Widget) {
+    fn render_output(&mut self, state: &GameState, root: &Widget, millis: u32) {
         self.window.erase();
+        self.renderer.clear();
 
-        let millis = animation::get_elapsed_millis(self.start_time.elapsed());
-        state.draw_text_mode(self as &mut Terminal, root, millis);
-    }
+        state.draw_text_mode(&mut self.renderer, root, millis);
 
-    fn get_display_size(&self) -> (i32, i32) {
-        (self.window.get_max_x(), self.window.get_max_y())
-    }
-}
-
-impl TextRenderer for Terminal {
-    fn render_char(&mut self, c: char) {
-        self.window.addch(c);
-    }
-
-    fn render_chars(&mut self, cs: &[char]) {
-        for c in cs.iter() {
-            self.render_char(*c);
+        for y in 0..self.size.height {
+            self.window.mv(y, 0);
+            self.window.addstr(&self.renderer.get_line(y));
         }
-    }
-
-    fn render_string(&mut self, s: &str) {
-        self.window.addstr(s);
-    }
-
-    fn set_cursor_pos(&mut self, x: i32, y: i32) {
-        self.window.mv(y, x);
-    }
-
-    fn get_display_size(&self) -> (i32, i32) {
-        (self.window.get_max_x(), self.window.get_max_y())
     }
 }
 

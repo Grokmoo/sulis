@@ -1,13 +1,12 @@
 use std::io::{Bytes, Read, Write, stdout};
-use std::time::Instant;
 use std;
 
 use config::Config;
-use io::{self, KeyboardEvent, IO, TextRenderer};
+use io::{self, KeyboardEvent, IO};
 use io::keyboard_event::Key;
+use io::buffered_text_renderer::BufferedTextRenderer;
 use state::GameState;
-use ui::Widget;
-use animation;
+use ui::{Widget, Size};
 
 use termion::screen::*;
 use termion::{self, async_stdin};
@@ -16,41 +15,29 @@ use termion::raw::{RawTerminal, IntoRawMode};
 pub struct Terminal {
     stdin: Bytes<termion::AsyncReader>,
     stdout: AlternateScreen<RawTerminal<std::io::Stdout>>,
-    start_time: Instant,
-
-    write_buffer: String,
+    renderer: BufferedTextRenderer,
+    size: Size,
 }
 
 impl Terminal {
-    pub fn new() -> Terminal {
+    pub fn new(config: &Config) -> Terminal {
         debug!("Initialize Termion display adapter.");
-        let stdout = AlternateScreen::from(stdout().into_raw_mode().unwrap());
-        //let stdout = stdout.into_raw_mode().unwrap();
-        //let stdin = stdin.keys();
+        let mut stdout = AlternateScreen::from(stdout().into_raw_mode().unwrap());
         let stdin = async_stdin().bytes();
+        let size = Size::new(config.display.width, config.display.height);
+
+        write!(stdout, "{}", termion::cursor::Hide).unwrap();
 
         Terminal {
             stdin,
             stdout,
-            start_time: Instant::now(),
-            write_buffer: String::new(),
-        }
-    }
-
-    fn write_buffered_text(&mut self) {
-        if self.write_buffer.len() > 0 {
-            write!(self.stdout, "{}", &self.write_buffer).unwrap();
-            self.write_buffer.clear();
+            renderer: BufferedTextRenderer::new(size),
+            size: size,
         }
     }
 }
 
 impl IO for Terminal {
-    fn init(&mut self, _config: &Config) {
-        trace!("Called init on termion adapter");
-        write!(self.stdout, "{}", termion::cursor::Hide).unwrap();
-    }
-
     fn process_input(&mut self, state: &mut GameState, root: &mut Widget) {
         let mut buf: Vec<u8> = Vec::new();
 
@@ -81,52 +68,20 @@ impl IO for Terminal {
         }
     }
 
-    fn render_output(&mut self, state: &GameState, root: &Widget) {
+    fn render_output(&mut self, state: &GameState, root: &Widget, millis: u32) {
         write!(self.stdout, "{}", termion::clear::All).unwrap();
+        self.renderer.clear();
 
-        let millis = animation::get_elapsed_millis(self.start_time.elapsed());
+        state.draw_text_mode(&mut self.renderer, root, millis);
 
-        state.draw_text_mode(self as &mut Terminal, root, millis);
+        for y in 0..self.size.height {
+            write!(self.stdout, "{}",
+                   termion::cursor::Goto(1, y as u16 + 1)).unwrap();
 
-        self.write_buffered_text();
-        self.stdout.flush().unwrap();
-    }
-
-    fn get_display_size(&self) -> (i32, i32) {
-        let (w, h) = termion::terminal_size().unwrap();
-
-        (w as i32, h as i32)
-    }
-}
-
-impl TextRenderer for Terminal {
-    fn render_char(&mut self, c: char) {
-        self.write_buffer.push(c);
-        //write!(self.stdout, "{}", c).unwrap();
-    }
-
-    fn render_string(&mut self, s: &str) {
-        self.write_buffer.push_str(s);
-        //write!(self.stdout, "{}", s).unwrap();
-    }
-
-    fn render_chars(&mut self, cs: &[char]) {
-        for c in cs.iter() {
-            self.write_buffer.push(*c);
+            write!(self.stdout, "{}", self.renderer.get_line(y)).unwrap();
         }
-    }
 
-    fn set_cursor_pos(&mut self, x: i32, y: i32) {
-        self.write_buffered_text();
-
-        write!(self.stdout, "{}",
-               termion::cursor::Goto(x as u16 + 1, y as u16 + 1)).unwrap();
-    }
-
-    fn get_display_size(&self) -> (i32, i32) {
-        let (w, h) = termion::terminal_size().unwrap();
-
-        (w as i32, h as i32)
+        self.stdout.flush().unwrap();
     }
 }
 

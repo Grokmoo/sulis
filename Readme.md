@@ -4,7 +4,7 @@ This is a game written in Rust.  It is currently in very early development.
 ## Getting Started
 
 ### Prerequisites
-You'll need recent versions of Rust and Cargo installed.  The game currently works on Stable, but may eventually require nightly.  [Rustup] (https://www.rustup.rs/)
+You'll need recent versions of Rust and Cargo installed.  The game currently works on Stable, but may eventually require nightly.  [Rustup](https://www.rustup.rs/)
 
 ### Installation
 
@@ -15,9 +15,9 @@ You'll need recent versions of Rust and Cargo installed.  The game currently wor
 1. Run the game with `cargo run`
 
 ## Built With
-* [Pancurses]
-* [Termion]
-* [Serde]
+* [Pancurses](https://github.com/ihalila/pancurses)
+* [Termion](https://github.com/ticki/termion)
+* [Serde](https://serde.rs/)
 
 ## Authors
 * **Jared Stephen** - *Initial Development* - [Grokmoo](https://github.com/Grokmoo)

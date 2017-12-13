@@ -72,7 +72,7 @@ impl PartialEq for Size {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct SizeBuilder {
     pub size: usize,
     pub relative_points: Vec<Vec<usize>>,

@@ -69,7 +69,7 @@ impl Area {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct AreaBuilder {
     pub id: String,
     pub name: String,

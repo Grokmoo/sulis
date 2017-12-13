@@ -85,7 +85,7 @@ impl Image for AnimatedImage {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct AnimatedImageBuilder {
     pub id: String,
     pub states: HashMap<String, String>,

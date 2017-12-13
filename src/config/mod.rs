@@ -5,14 +5,20 @@ use std::collections::HashMap;
 use io::keyboard_event::Key;
 use io::{KeyboardEvent, InputAction};
 
-use serde_json;
+use serde_yaml;
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct Config {
   pub display: DisplayConfig,
   pub resources: ResourcesConfig,
   pub input: InputConfig,
-  pub log_level: String,
+  pub logging: LoggingConfig,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct LoggingConfig {
+    pub log_level: String,
+    pub use_timestamps: bool,
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -47,7 +53,7 @@ impl Config {
         let mut file_data = String::new();
         f.read_to_string(&mut file_data)?;
 
-        let config: Result<Config, serde_json::Error> = serde_json::from_str(&file_data);
+        let config: Result<Config, serde_yaml::Error> = serde_yaml::from_str(&file_data);
         let config = match config {
             Ok(config) => config,
             Err(e) => {
@@ -55,7 +61,7 @@ impl Config {
             }
         };
 
-        match config.log_level.as_ref() {
+        match config.logging.log_level.as_ref() {
             "error" | "warn" | "info" | "debug" | "trace" => Ok(config),
             _ => Err(Error::new(ErrorKind::InvalidData,
                     format!("log_level must be one of error, warn, info, debug, or trace")))

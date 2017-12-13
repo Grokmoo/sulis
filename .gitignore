@@ -1,5 +1,5 @@
 target/*
-config.json
+config.yml
 *.swp
 *.swo
 log/*

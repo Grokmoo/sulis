@@ -43,7 +43,7 @@ impl Actor {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct ActorBuilder {
     pub id: String,
     pub player: bool,

@@ -20,20 +20,19 @@ use game::animation;
 use flexi_logger::{Logger, opt_format};
 
 fn main() {
-    info!("Initializing");
-    info!("Parsing configuration file 'config.json'");
-    let config = config::Config::new("config.json");
+    let config = config::Config::new("config.yml");
     let config = match config {
         Ok(c) => c,
         Err(e) => {
             eprintln!("{}", e);
-            eprintln!("There was a fatal error loading the configuration from 'config.json'");
+            eprintln!("Fatal error loading the configuration from 'config.yml'");
             eprintln!("Exiting...");
             ::std::process::exit(1);
         }
     };
 
-    setup_logger(&config.log_level);
+    setup_logger(&config);
+    info!("Setup Logger and read configuration from 'config.yml'");
 
     info!("Reading resources from {}", &config.resources.directory);
     let resource_set = resource::ResourceSet::new(&config.resources.directory);
@@ -104,14 +103,18 @@ fn main() {
     info!("Shutting down.");
 }
 
-fn setup_logger(log_level: &str) {
-    Logger::with_str(log_level)
+fn setup_logger(config: &config::Config) {
+    let mut logger = Logger::with_str(&config.logging.log_level)
         .log_to_file()
         .directory("log")
-        .suppress_timestamp()
         .duplicate_error()
-        .format(opt_format)
-        .start()
+        .format(opt_format);
+
+    if !config.logging.use_timestamps {
+        logger = logger.suppress_timestamp();
+    }
+
+    logger.start()
         .unwrap_or_else(|e| {
             eprintln!("{}", e);
             eprintln!("There was a fatal error initializing logging to 'log/'");

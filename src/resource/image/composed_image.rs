@@ -161,7 +161,7 @@ impl Image for ComposedImage {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct ComposedImageBuilder {
     pub id: String,
     pub grid: Vec<String>,

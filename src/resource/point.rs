@@ -3,7 +3,7 @@ use std::ops;
 
 use ui::Border;
 
-#[derive(Copy, Clone, Serialize, Deserialize)]
+#[derive(Copy, Clone, Deserialize)]
 pub struct Point {
     pub x: i32,
     pub y: i32,

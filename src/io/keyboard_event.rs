@@ -3,7 +3,7 @@ pub struct KeyboardEvent {
     pub key: Key,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, Deserialize)]
 pub enum Key {
     KeyUnknown,
 

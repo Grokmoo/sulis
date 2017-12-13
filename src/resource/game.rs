@@ -5,7 +5,7 @@ use resource::Point;
 
 use serde_json;
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct Game {
     pub starting_area: String,
     pub starting_location: Point,

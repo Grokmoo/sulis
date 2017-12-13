@@ -1,20 +1,10 @@
 ---
 # The main game configuration file.  User preferences are set here.
 
-logging:
-    # Log level may be error, warn, info, debug, or trace
-    # Each level logs progressively more to log/main*.log with
-    # trace logging the most and error logging the least.
-    log_level: trace
-
-    # If set to true, log files are generated with a timestamp,
-    # Meaning each run of the game will generate a unique filename.
-    # If false, each run will simply overwrite the previous.
-    use_timestamps: false
-
 display:
     # Uncomment Pancurses line for Windows, Termion for Unix
-    # adapter: Pancurses
+    # Note that the indentation must be consistent for all values!
+    #adapter: Pancurses
     adapter: Termion
     cursor_char: "█"
 
@@ -45,4 +35,15 @@ input:
         KeyD: MoveCursorRight
         KeySpace: MoveToCursor
         KeyQ: Exit
+
+logging:
+    # Log level may be error, warn, info, debug, or trace
+    # Each level logs progressively more to log/main*.log with
+    # trace logging the most and error logging the least.
+    log_level: trace
+
+    # If set to true, log files are generated with a timestamp,
+    # Meaning each run of the game will generate a unique filename.
+    # If false, each run will simply overwrite the previous.
+    use_timestamps: false
 ...

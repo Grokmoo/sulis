@@ -10,7 +10,7 @@ extern crate serde_json;
 
 // terminal display library
 extern crate pancurses;
-extern crate termion;
+#[cfg(not(windows))] extern crate termion;
 
 pub mod resource;
 

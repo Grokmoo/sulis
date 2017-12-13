@@ -58,7 +58,7 @@ pub fn get_termion_adapter<'a>(config: &Config) -> Result<Box<IO + 'a>, Error> {
 #[cfg(target_os = "windows")]
 pub fn get_termion_adapter<'a>(_config: &Config) -> Result<Box<IO + 'a>, Error> {
     Err(Error::new(ErrorKind::InvalidInput,
-                   "Termion display adapter is not supported on windows."))
+        "Termion display adapter is not supported on windows.  Try 'Pancurses'"))
 }
 
 pub(in::io) fn match_char(c: char) -> Key {

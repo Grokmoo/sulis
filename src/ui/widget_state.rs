@@ -10,10 +10,15 @@ use resource::Image;
 pub struct WidgetState {
     pub position: Point,
     pub size: Size,
+    pub inner_size: Size,
+    pub inner_position: Point,
     pub border: Border,
     pub mouse_is_inside: bool,
     pub background: Option<Rc<Image>>,
     pub animation_state: AnimationState,
+    pub scroll_pos: Point,
+    pub max_scroll_pos: Point,
+    pub text: String,
 }
 
 impl WidgetState {
@@ -27,7 +32,53 @@ impl WidgetState {
             mouse_is_inside: false,
             background: None,
             animation_state: AnimationState::Base,
+            scroll_pos: Point::as_zero(),
+            max_scroll_pos: Point::as_zero(),
+            text: String::new(),
+            inner_size: size.inner(&border),
+            inner_position: position.inner(&border),
         }
+    }
+
+    pub fn scroll(&mut self, x: i32, y: i32) -> bool {
+        trace!("Scrolling by {},{}", x, y);
+        let new_x = self.scroll_pos.x + x;
+        let new_y = self.scroll_pos.y + y;
+
+        if new_x < 0 || new_y < 0 { return false; }
+
+        if new_x >= self.max_scroll_pos.x - self.size.width + 1 ||
+            new_y >= self.max_scroll_pos.y - self.size.height + 1 {
+            return false;
+        }
+
+        self.scroll_pos.set(new_x, new_y);
+
+        true
+    }
+
+    pub fn get_right(&self) -> i32 {
+        self.position.x + self.size.width
+    }
+
+    pub fn get_bottom(&self) -> i32 {
+        self.position.y + self.size.height
+    }
+
+    pub fn get_top(&self) -> i32{
+        self.position.y
+    }
+
+    pub fn get_left(&self) -> i32 {
+        self.position.x
+    }
+
+    pub fn set_max_scroll_pos(&mut self, x: i32, y: i32) {
+        self.max_scroll_pos.set(x, y);
+    }
+
+    pub fn set_text(&mut self, text: &str) {
+        self.text = text.to_string();
     }
 
     pub fn set_animation_state(&mut self, state: AnimationState) {
@@ -42,17 +93,20 @@ impl WidgetState {
         self.mouse_is_inside = is_inside;
     }
 
-    pub fn inner_position(&self) -> Point {
-        self.position.inner(&self.border)
-    }
-
-    pub fn inner_size(&self) -> Size {
-        self.size.inner(&self.border)
-    }
-
     pub fn in_bounds(&self, p: Point) -> bool {
         self.size.in_bounds(p.x - self.position.x as i32,
                             p.y - self.position.y as i32)
+    }
+
+    pub fn set_border(&mut self, border: Border) {
+        self.border = border;
+        self.inner_size = self.size.inner(&border);
+        self.inner_position = self.position.inner(&border);
+    }
+
+    pub fn set_size(&mut self, size: Size) {
+        self.size = size;
+        self.inner_size = self.size.inner(&self.border);
     }
 
     pub fn set_position_centered(&mut self, x: i32, y: i32) {
@@ -63,5 +117,6 @@ impl WidgetState {
 
     pub fn set_position(&mut self, x: i32, y: i32) {
         self.position = Point::new(x, y);
+        self.inner_position = self.position.inner(&self.border);
     }
 }

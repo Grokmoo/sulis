@@ -42,6 +42,8 @@ pub fn create_ui_tree<'a>(area_state: Rc<RefCell<AreaState<'a>>>,
     debug!("Creating UI tree.");
     let mut root = Widget::with_size(Rc::new(EmptyWidget {}),
         Size::new(config.display.width, config.display.height));
+    root.state.set_border(Border::as_uniform(1));
+    root.state.set_background(resource_set.get_image("background"));
     setup_widgets(&mut root, area_state, resource_set);
 
     root
@@ -51,39 +53,40 @@ fn setup_widgets<'a>(root: &mut Widget<'a>,
     let right_pane_width = 20;
 
     let area_width = cmp::min(area_state.borrow().area.width,
-        root.state.size.width - right_pane_width);
+        root.state.inner_size.width - right_pane_width);
     let area_height = cmp::min(area_state.borrow().area.height,
-        root.state.size.height - 1);
-    let area_title = area_state.borrow().area.name.clone();
+        root.state.inner_size.height - 1);
 
-    root.add_child(Widget::with_size(
-            Label::new(&area_title),
-            Size::new(area_width, 1),
-            ));
-
-    let mouse_over_label = Label::new_empty();
-    let mouse_over_label2 = Rc::clone(&mouse_over_label);
-    let mouse_over = Widget::with_position(
-        mouse_over_label,
+    let mouse_over = Rc::new(RefCell::new(Widget::with_size(
+        Label::new(),
         Size::new(right_pane_width, 1),
-        Point::new(area_width + 1, 0),
-        );
+        )));
 
-    // let mouse_over_ref = WidgetRef::new(mouse_over_label2, Rc::clone(&mouse_over));
-    // root.add_child(WidgetState::with_border(
-    //         AreaWidget::new(area_state, mouse_over_ref),
-    //         Size::new(area_width, area_height),
-    //         Point::new(0, 1),
-    //         Border::as_uniform(0),
-    //         ));
+    let area_widget = Widget::with_border(
+            AreaWidget::new(&area_state, Rc::clone(&mouse_over)),
+            Size::new(area_width, area_height),
+            Point::new(root.state.inner_position.x, root.state.inner_position.y + 1),
+            Border::as_uniform(0));
+    let area_right = area_widget.state.get_right();
+    root.add_child(area_widget);
+
+    mouse_over.borrow_mut().state
+        .set_position(area_right + 1, root.state.inner_position.y);
 
     let mut button = Widget::with_position(
-            Button::new("Test"),
-            Size::new(right_pane_width, 3),
-            Point::new(area_width + 1, 3),
-            );
+            Button::new(Box::new(|_w, _s| trace!("Hello world"))),
+            Size::new(right_pane_width - 1, 3),
+            Point::new(area_right + 1, root.state.inner_position.y + 2));
+    button.state.set_text("Test");
     button.state.set_background(resource_set.get_image("background"));
     root.add_child(button);
 
-    root.add_child(mouse_over);
+    let mut area_title = Widget::with_position(
+        Label::new(),
+        Size::new(area_width, 1),
+        root.state.inner_position);
+    area_title.state.set_text(&area_state.borrow().area.name);
+    root.add_child(area_title);
+
+    root.add_child_rc(mouse_over);
 }

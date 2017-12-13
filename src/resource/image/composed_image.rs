@@ -141,8 +141,8 @@ impl Image for ComposedImage {
             image.fill_text_mode(renderer, state, &draw_pos, &draw_size);
 
             let image = self.images.get_unchecked(6);
+            draw_pos.add_y(fill_size.height);
             draw_pos.set_x(position.x);
-            draw_pos.add_y(image.get_size().height);
             image.draw_text_mode(renderer, state, &draw_pos);
 
             let image = self.images.get_unchecked(7);

@@ -1,20 +1,20 @@
 use std::rc::Rc;
 
-use ui::{AnimationState, Label, WidgetKind, WidgetState};
+use ui::{AnimationState, Label, Widget, WidgetKind};
 use io::{event, TextRenderer};
 use state::GameState;
 use resource::Point;
 
 pub struct Button {
-    label: Label,
+    label: Rc<Label>,
+    callback: Box<Fn(&mut Widget, &mut GameState)>,
 }
 
 impl Button {
-    pub fn new(text: &str) -> Rc<Button> {
+    pub fn new(callback: Box<Fn(&mut Widget, &mut GameState)>) -> Rc<Button> {
         Rc::new(Button {
-            label: Label {
-                text: Some(text.to_string()),
-            },
+            label: Label::new(),
+            callback
         })
     }
 }
@@ -24,26 +24,29 @@ impl<'a> WidgetKind<'a> for Button {
         "Button"
     }
 
-    fn draw_text_mode(&self, renderer: &mut TextRenderer) {
-        self.label.draw_text_mode(renderer);
+    fn draw_text_mode(&self, renderer: &mut TextRenderer, widget: &Widget<'a>) {
+        self.super_draw_text_mode(widget);
+
+        self.label.draw_text_mode(renderer, widget);
     }
 
-    fn on_mouse_enter(&self, _state: &mut GameState,
+    fn on_mouse_enter(&self, _state: &mut GameState, widget: &mut Widget<'a>,
                       _mouse_pos: Point) -> bool {
-        // self.base_ref.base_mut().set_mouse_inside(true);
-        // self.base_ref.base_mut().set_animation_state(AnimationState::MouseOver);
+        self.super_on_mouse_enter(widget);
+        widget.state.set_animation_state(AnimationState::MouseOver);
         true
     }
 
-    fn on_mouse_exit(&self, _state: &mut GameState,
+    fn on_mouse_exit(&self, _state: &mut GameState, widget: &mut Widget<'a>,
                      _mouse_pos: Point) -> bool {
-        // self.base_ref.base_mut().set_mouse_inside(false);
-        // self.base_ref.base_mut().set_animation_state(AnimationState::Base);
+        self.super_on_mouse_exit(widget);
+        widget.state.set_animation_state(AnimationState::Base);
         true
     }
 
-    fn on_mouse_click(&self, state: &mut GameState,
+    fn on_mouse_click(&self, state: &mut GameState, widget: &mut Widget<'a>,
                       _kind: event::ClickKind, _mouse_pos: Point) -> bool {
+        (self.callback)(widget, state);
         true
     }
 }

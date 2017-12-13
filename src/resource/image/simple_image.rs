@@ -21,6 +21,10 @@ impl ResourceBuilder for SimpleImage {
     fn new(data: &str) -> Result<SimpleImage, Error> {
         let image: SimpleImage = serde_json::from_str(data)?;
 
+        if image.text_display.len() == 0 {
+            return Ok(image);
+        }
+
         if image.text_display.len() != (image.size.product()) as usize {
             return Err(Error::new(ErrorKind::InvalidData,
                 format!("SimpleImage text display must be length*width characters.")));
@@ -31,7 +35,10 @@ impl ResourceBuilder for SimpleImage {
 }
 
 impl Image for SimpleImage {
-    fn draw_text_mode(&self, renderer: &mut TextRenderer, _state: &str, position: &Point) {
+    fn draw_text_mode(&self, renderer: &mut TextRenderer, _state: &str,
+                      position: &Point) {
+        if self.text_display.len() == 0 { return; }
+
         let x = position.x;
         let y = position.y;
 

@@ -15,10 +15,10 @@
 
     "input": {
         "keybindings": {
-            "KeyUp": "MoveUp",
-            "KeyLeft": "MoveLeft",
-            "KeyDown": "MoveDown",
-            "KeyRight": "MoveRight",
+            "KeyUp": "ScrollUp",
+            "KeyLeft": "ScrollLeft",
+            "KeyDown": "ScrollDown",
+            "KeyRight": "ScrollRight",
             "KeyW": "MoveCursorUp",
             "KeyS": "MoveCursorDown",
             "KeyA": "MoveCursorLeft",

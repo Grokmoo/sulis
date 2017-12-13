@@ -60,7 +60,16 @@ fn main() {
     };
 
     info!("Setting up display adapter.");
-    let mut io = game::io::create(&config);
+    let io = game::io::create(&config);
+    let mut io = match io {
+        Ok(io) => io,
+        Err(e) => {
+            error!("{}", e);
+            error!("There was a fatal error initializing the display.");
+            error!("Exiting...");
+            ::std::process::exit(1);
+        }
+    };
 
     let mut root = ui::create_ui_tree(Rc::clone(&game_state.area_state), &config,
         &resource_set);

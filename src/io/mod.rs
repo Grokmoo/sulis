@@ -1,5 +1,7 @@
 mod pancurses_adapter;
-mod termion_adapter;
+
+#[cfg(not(windows))] mod termion_adapter;
+#[cfg(windows)] use std::io::ErrorKind;
 
 mod buffered_text_renderer;
 
@@ -11,6 +13,8 @@ pub use self::event::Event;
 
 mod input_action;
 pub use self::input_action::InputAction;
+
+use std::io::Error;
 
 use state::GameState;
 use config::{Config, IOAdapter};
@@ -35,15 +39,26 @@ pub trait TextRenderer {
     fn set_cursor_pos(&mut self, x: i32, y: i32);
 }
 
-pub fn create<'a>(config: &Config) -> Box<IO + 'a> {
+pub fn create<'a>(config: &Config) -> Result<Box<IO + 'a>, Error> {
     match config.display.adapter {
         IOAdapter::Pancurses => {
-            Box::new(pancurses_adapter::Terminal::new(config))
+            Ok(Box::new(pancurses_adapter::Terminal::new(config)))
         },
         IOAdapter::Termion => {
-            Box::new(termion_adapter::Terminal::new(config))
+            get_termion_adapter(config)
         },
     }
+}
+
+#[cfg(not(target_os = "windows"))]
+pub fn get_termion_adapter<'a>(config: &Config) -> Result<Box<IO + 'a>, Error> {
+    Ok(Box::new(termion_adapter::Terminal::new(config)))
+}
+
+#[cfg(target_os = "windows")]
+pub fn get_termion_adapter<'a>(_config: &Config) -> Result<Box<IO + 'a>, Error> {
+    Err(Error::new(ErrorKind::InvalidInput,
+                   "Termion display adapter is not supported on windows."))
 }
 
 pub(in::io) fn match_char(c: char) -> Key {

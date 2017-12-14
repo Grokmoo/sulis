@@ -15,6 +15,7 @@ use game::config;
 use game::resource;
 use game::state::GameState;
 use game::ui;
+use game::ui::Widget;
 use game::animation;
 
 use flexi_logger::{Logger, opt_format};
@@ -70,7 +71,7 @@ fn main() {
         }
     };
 
-    let mut root = ui::create_ui_tree(Rc::clone(&game_state.area_state), &config);
+    let root = ui::create_ui_tree(Rc::clone(&game_state.area_state), &config);
 
     let fpms = (1000.0 / (config.display.frame_rate as f32)) as u64;
     let frame_time = time::Duration::from_millis(fpms);
@@ -81,12 +82,13 @@ fn main() {
     loop {
         let start_time = time::Instant::now();
 
-        io.process_input(&mut game_state, &mut root);
+        io.process_input(&mut game_state, Rc::clone(&root));
         game_state.update();
+        Widget::check_children(&root);
 
         let total_elapsed =
             animation::get_elapsed_millis(main_loop_start_time.elapsed());
-        io.render_output(&game_state, &root, total_elapsed);
+        io.render_output(&game_state, root.borrow(), total_elapsed);
 
         if game_state.should_exit {
             trace!("Exiting main loop.");

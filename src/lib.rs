@@ -13,6 +13,8 @@ extern crate serde_yaml;
 extern crate pancurses;
 #[cfg(not(windows))] extern crate termion;
 
+extern crate uuid;
+
 pub mod resource;
 
 pub mod io;

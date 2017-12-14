@@ -29,10 +29,12 @@ impl<'a> WidgetKind<'a> for AreaWidget<'a> {
         "Area"
     }
 
-    fn on_add(&self, widget: &mut Widget) {
+    fn on_add(&self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget<'a>>>> {
         let width = self.area_state.borrow().area.width;
         let height = self.area_state.borrow().area.height;
-        widget.state.set_max_scroll_pos(width, height);
+        widget.borrow_mut().state.set_max_scroll_pos(width, height);
+
+        Vec::with_capacity(0)
     }
 
     fn draw_text_mode(&self, renderer: &mut TextRenderer, widget: &Widget<'a>) {

@@ -1,3 +1,5 @@
+use std::rc::Rc;
+use std::cell::{RefCell, Ref};
 use std::io::{Bytes, Read, Write, stdout};
 use std;
 
@@ -37,8 +39,9 @@ impl Terminal {
     }
 }
 
-impl IO for Terminal {
-    fn process_input(&mut self, state: &mut GameState, root: &mut Widget) {
+impl<'a> IO<'a> for Terminal {
+    fn process_input(&mut self, state: &mut GameState<'a>,
+                     root: Rc<RefCell<Widget<'a>>>) {
         let mut buf: Vec<u8> = Vec::new();
 
         loop {
@@ -64,11 +67,12 @@ impl IO for Terminal {
 
             let input = KeyboardEvent { key: input };
 
-            state.handle_keyboard_input(input, root);
+            state.handle_keyboard_input(input, Rc::clone(&root));
         }
     }
 
-    fn render_output(&mut self, state: &GameState, root: &Widget, millis: u32) {
+    fn render_output(&mut self, state: &GameState<'a>, root: Ref<Widget<'a>>,
+                     millis: u32) {
         write!(self.stdout, "{}", termion::clear::All).unwrap();
         self.renderer.clear();
 

@@ -15,18 +15,20 @@ mod input_action;
 pub use self::input_action::InputAction;
 
 use std::io::Error;
+use std::rc::Rc;
+use std::cell::{RefCell, Ref};
 
 use state::GameState;
 use config::{Config, IOAdapter};
 use ui::Widget;
 use io::keyboard_event::Key;
 
-pub trait IO {
-    fn process_input(&mut self, game_state: &mut GameState,
-                     root: &mut Widget);
+pub trait IO<'a> {
+    fn process_input(&mut self, game_state: &mut GameState<'a>,
+                     root: Rc<RefCell<Widget<'a>>>);
 
-    fn render_output(&mut self, game_state: &GameState,
-                     root: &Widget, millis: u32);
+    fn render_output(&mut self, game_state: &GameState<'a>,
+                     root: Ref<Widget<'a>>, millis: u32);
 }
 
 pub trait TextRenderer {

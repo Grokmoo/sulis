@@ -19,6 +19,7 @@ pub struct WidgetState {
     pub scroll_pos: Point,
     pub max_scroll_pos: Point,
     pub text: String,
+    pub is_modal: bool,
 }
 
 impl WidgetState {
@@ -37,6 +38,7 @@ impl WidgetState {
             text: String::new(),
             inner_size: size.inner(&border),
             inner_position: position.inner(&border),
+            is_modal: false,
         }
     }
 
@@ -55,6 +57,10 @@ impl WidgetState {
         self.scroll_pos.set(new_x, new_y);
 
         true
+    }
+
+    pub fn set_modal(&mut self, modal: bool) {
+        self.is_modal = modal;
     }
 
     pub fn inner_right(&self) -> i32 {

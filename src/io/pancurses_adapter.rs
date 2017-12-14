@@ -1,3 +1,6 @@
+use std::rc::Rc;
+use std::cell::{RefCell, Ref};
+
 use pancurses;
 
 use io::buffered_text_renderer::BufferedTextRenderer;
@@ -47,8 +50,9 @@ impl Terminal {
     }
 }
 
-impl IO for Terminal {
-    fn process_input(&mut self, state: &mut GameState, root: &mut Widget) {
+impl<'a> IO<'a> for Terminal {
+    fn process_input(&mut self, state: &mut GameState<'a>,
+                     root: Rc<RefCell<Widget<'a>>>) {
         let input = self.window.getch();
         if let None = input {
             return;
@@ -63,7 +67,8 @@ impl IO for Terminal {
         state.handle_keyboard_input(input, root);
     }
 
-    fn render_output(&mut self, state: &GameState, root: &Widget, millis: u32) {
+    fn render_output(&mut self, state: &GameState<'a>, root: Ref<Widget<'a>>,
+                     millis: u32) {
         self.window.erase();
         self.renderer.clear();
 

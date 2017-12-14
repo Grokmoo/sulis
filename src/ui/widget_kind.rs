@@ -36,43 +36,43 @@ pub trait WidgetKind<'a> {
         Vec::with_capacity(0)
     }
 
-    fn on_mouse_click(&self, _state: &mut GameState, _widget: &mut Widget<'a>,
+    fn on_mouse_click(&self, _state: &mut GameState, _widget: &Rc<RefCell<Widget<'a>>>,
                       _kind: ClickKind, _mouse_pos: Point) -> bool {
         false
     }
 
-    fn on_mouse_move(&self, _state: &mut GameState, _widget: &mut Widget<'a>,
+    fn on_mouse_move(&self, _state: &mut GameState, _widget: &Rc<RefCell<Widget<'a>>>,
                       _mouse_pos: Point) -> bool {
         false
     }
 
-    fn on_mouse_enter(&self, _state: &mut GameState, widget: &mut Widget<'a>,
+    fn on_mouse_enter(&self, _state: &mut GameState, widget: &Rc<RefCell<Widget<'a>>>,
                       _mouse_pos: Point) -> bool {
         self.super_on_mouse_enter(widget);
         false
     }
 
-    fn on_mouse_exit(&self, _state: &mut GameState, widget: &mut Widget<'a>,
+    fn on_mouse_exit(&self, _state: &mut GameState, widget: &Rc<RefCell<Widget<'a>>>,
                      _mouse_pos: Point) -> bool {
         self.super_on_mouse_exit(widget);
         false
     }
 
-    fn on_mouse_scroll(&self, _state: &mut GameState, _widget: &mut Widget<'a>,
+    fn on_mouse_scroll(&self, _state: &mut GameState, _widget: &Rc<RefCell<Widget<'a>>>,
                          _scroll: i32, _mouse_pos: Point) -> bool {
         false
     }
 
-    fn on_key_press(&self, _state: &mut GameState, _widget: &mut Widget<'a>,
+    fn on_key_press(&self, _state: &mut GameState, _widget: &Rc<RefCell<Widget<'a>>>,
                     _key: InputAction, _mouse_pos: Point) -> bool {
         false
     }
 
-    fn super_on_mouse_enter(&self, widget: &mut Widget<'a>) {
-        widget.state.set_mouse_inside(true);
+    fn super_on_mouse_enter(&self, widget: &Rc<RefCell<Widget<'a>>>) {
+        widget.borrow_mut().state.set_mouse_inside(true);
     }
 
-    fn super_on_mouse_exit(&self, widget: &mut Widget<'a>) {
-        widget.state.set_mouse_inside(false);
+    fn super_on_mouse_exit(&self, widget: &Rc<RefCell<Widget<'a>>>) {
+        widget.borrow_mut().state.set_mouse_inside(false);
     }
 }

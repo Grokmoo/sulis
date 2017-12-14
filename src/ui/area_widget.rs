@@ -58,35 +58,35 @@ impl<'a> WidgetKind<'a> for AreaWidget<'a> {
         }
     }
 
-    fn on_key_press(&self, _state: &mut GameState, widget: &mut Widget<'a>,
+    fn on_key_press(&self, _state: &mut GameState, widget: &Rc<RefCell<Widget<'a>>>,
                     key: InputAction, _mouse_pos: Point) -> bool {
 
         use io::InputAction::*;
         match key {
-           ScrollUp => widget.state.scroll(0, -1),
-           ScrollDown => widget.state.scroll(0, 1),
-           ScrollLeft => widget.state.scroll(-1, 0),
-           ScrollRight => widget.state.scroll(1, 0),
+           ScrollUp => widget.borrow_mut().state.scroll(0, -1),
+           ScrollDown => widget.borrow_mut().state.scroll(0, 1),
+           ScrollLeft => widget.borrow_mut().state.scroll(-1, 0),
+           ScrollRight => widget.borrow_mut().state.scroll(1, 0),
            _ => false,
         };
         true
     }
 
-    fn on_mouse_click(&self, state: &mut GameState, widget: &mut Widget<'a>,
+    fn on_mouse_click(&self, state: &mut GameState, widget: &Rc<RefCell<Widget<'a>>>,
                 _kind: ClickKind, mouse_pos: Point) -> bool {
         let size = state.pc().size();
-        let pos = &widget.state.position;
+        let pos = &widget.borrow().state.position;
         let x = (mouse_pos.x - pos.x) - size / 2;
         let y = (mouse_pos.y - pos.y) - size / 2;
         if x >= 0 && y >= 0 {
-            state.pc_move_to(x + widget.state.scroll_pos.x, y +
-                             widget.state.scroll_pos.y);
+            state.pc_move_to(x + widget.borrow().state.scroll_pos.x, y +
+                             widget.borrow().state.scroll_pos.y);
         }
 
         true
     }
 
-    fn on_mouse_move(&self, _state: &mut GameState, widget: &mut Widget<'a>,
+    fn on_mouse_move(&self, _state: &mut GameState, widget: &Rc<RefCell<Widget<'a>>>,
                       mouse_pos: Point) -> bool {
         self.super_on_mouse_enter(widget);
         self.mouse_over.borrow_mut().state.set_text(&format!("[{},{}]",
@@ -94,7 +94,7 @@ impl<'a> WidgetKind<'a> for AreaWidget<'a> {
         true
     }
 
-    fn on_mouse_exit(&self, _state: &mut GameState, widget: &mut Widget<'a>,
+    fn on_mouse_exit(&self, _state: &mut GameState, widget: &Rc<RefCell<Widget<'a>>>,
                      _mouse_pos: Point) -> bool {
         self.super_on_mouse_exit(widget);
         self.mouse_over.borrow_mut().state.set_text("");

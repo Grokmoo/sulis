@@ -29,8 +29,8 @@ impl<'a> WidgetKind<'a> for Window {
 
         let mut button = Widget::with_border(
             Button::new(Box::new(|widget, _state| {
-                widget.parent.as_ref().unwrap();
-                widget.parent.as_ref().unwrap().borrow().mark_for_removal()
+                let parent = Rc::clone(widget.borrow().parent.as_ref().unwrap());
+                parent.borrow().mark_for_removal();
             })),
             Size::new(3, 3),
             Point::new(widget.borrow().state.inner_right() - 3,

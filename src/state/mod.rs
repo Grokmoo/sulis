@@ -118,7 +118,7 @@ impl<'a> GameState<'a> {
         if self.cursor.move_by(x, y) {
             let event = Event::new(event::Kind::MouseMove { change: Point::new(x, y) },
                  self.cursor.x, self.cursor.y);
-            return root.borrow_mut().dispatch_event(self, event);
+            return Widget::dispatch_event(&root, self, event);
         }
 
         false
@@ -130,7 +130,7 @@ impl<'a> GameState<'a> {
 
         trace!("Emulating cursor click event at {},{} as mouse event", x, y);
         let event = Event::new(event::Kind::MouseClick(event::ClickKind::Left), x, y);
-        root.borrow_mut().dispatch_event(self, event)
+        Widget::dispatch_event(&root, self, event)
     }
 
     pub fn update(&mut self) {

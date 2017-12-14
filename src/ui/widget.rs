@@ -142,45 +142,49 @@ impl<'a> Widget<'a> {
         });
     }
 
-    pub fn dispatch_event(&mut self, state: &mut GameState, event: Event) -> bool {
-        trace!("Dispatching event {:?} in {:?}", event, self.kind.get_name());
+    pub fn dispatch_event(widget: &Rc<RefCell<Widget<'a>>>,
+                          state: &mut GameState, event: Event) -> bool {
+        trace!("Dispatching event {:?} in {:?}", event,
+               widget.borrow().kind.get_name());
 
-        if let Some(ref mut child) = self.modal_child {
-            trace!("Found modal child");
+        // if let Some(ref mut child) = self.modal_child {
+        //     trace!("Found modal child");
+        //
+        //     return child.borrow_mut().dispatch_event(state, event);
+        // }
 
-            return child.borrow_mut().dispatch_event(state, event);
-        }
+        let len = widget.borrow().children.len();
+        for i in (0..len).rev() {
+            let child = Rc::clone(widget.borrow().children.get(i).unwrap());
 
-        for child in self.children.iter_mut() {
-            let mut child = child.borrow_mut();
-            if child.state.in_bounds(event.mouse) {
-                if !child.state.mouse_is_inside {
-                    child.dispatch_event(state, Event::entered_from(&event));
+            if child.borrow().state.in_bounds(event.mouse) {
+                if !child.borrow().state.mouse_is_inside {
+                    Widget::dispatch_event(&child, state, Event::entered_from(&event));
                 }
 
-                if child.dispatch_event(state, event) {
+                if Widget::dispatch_event(&child, state, event) {
                     return true;
                 }
-            } else if child.state.mouse_is_inside {
-                child.dispatch_event(state, Event::exited_from(&event));
+            } else if child.borrow().state.mouse_is_inside {
+                Widget::dispatch_event(&child, state, Event::exited_from(&event));
             }
         }
 
-        let ref widget_kind = Rc::clone(&self.kind);
+        let ref widget_kind = Rc::clone(&widget.borrow().kind);
         use io::event::Kind::*;
         match event.kind {
             MouseClick(kind) =>
-                widget_kind.on_mouse_click(state, self, kind, event.mouse),
+                widget_kind.on_mouse_click(state, widget, kind, event.mouse),
             MouseMove { change: _change } =>
-                widget_kind.on_mouse_move(state, self, event.mouse),
+                widget_kind.on_mouse_move(state, widget, event.mouse),
             MouseEnter =>
-                widget_kind.on_mouse_enter(state, self, event.mouse),
+                widget_kind.on_mouse_enter(state, widget, event.mouse),
             MouseExit =>
-                widget_kind.on_mouse_exit(state, self, event.mouse),
+                widget_kind.on_mouse_exit(state, widget, event.mouse),
             MouseScroll { scroll } =>
-                widget_kind.on_mouse_scroll(state, self, scroll, event.mouse),
+                widget_kind.on_mouse_scroll(state, widget, scroll, event.mouse),
             KeyPress(action) =>
-                widget_kind.on_key_press(state, self, action, event.mouse),
+                widget_kind.on_key_press(state, widget, action, event.mouse),
         }
     }
 

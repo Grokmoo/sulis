@@ -52,7 +52,7 @@ impl InputAction {
             _ => {
                 let event = Event::new(Kind::KeyPress(action),
                                        game_state.cursor.x, game_state.cursor.y);
-                root.borrow_mut().dispatch_event(game_state, event)
+                Widget::dispatch_event(&root, game_state, event)
             },
         };
     }

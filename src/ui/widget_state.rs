@@ -57,20 +57,20 @@ impl WidgetState {
         true
     }
 
-    pub fn get_right(&self) -> i32 {
-        self.position.x + self.size.width
+    pub fn inner_right(&self) -> i32 {
+        self.position.x + self.size.width - self.border.right
     }
 
-    pub fn get_bottom(&self) -> i32 {
-        self.position.y + self.size.height
+    pub fn inner_bottom(&self) -> i32 {
+        self.position.y + self.size.height - self.border.bottom
     }
 
-    pub fn get_top(&self) -> i32{
-        self.position.y
+    pub fn inner_top(&self) -> i32{
+        self.position.y + self.border.top
     }
 
-    pub fn get_left(&self) -> i32 {
-        self.position.x
+    pub fn inner_left(&self) -> i32 {
+        self.position.x + self.border.left
     }
 
     pub fn set_max_scroll_pos(&mut self, x: i32, y: i32) {

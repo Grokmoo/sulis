@@ -10,18 +10,21 @@ pub struct Widget<'a> {
     pub state: WidgetState,
     pub kind: Rc<WidgetKind<'a> + 'a>,
     pub children: Vec<Rc<RefCell<Widget<'a>>>>,
+    pub modal: Option<Rc<RefCell<Widget<'a>>>>,
 }
 
 impl<'a> Widget<'a> {
     fn new(kind: Rc<WidgetKind<'a> + 'a>, size: Size, position: Point,
            border: Border) -> Widget<'a> {
-        let mut state = WidgetState::new(size, position, border);
-        kind.on_add(&mut state);
-        Widget {
-            state,
-            kind,
+        let mut widget = Widget {
+            state: WidgetState::new(size, position, border),
+            kind: Rc::clone(&kind),
             children: Vec::new(),
-        }
+            modal: None,
+        };
+        kind.on_add(&mut widget);
+
+        widget
     }
 
     pub fn with_defaults(widget: Rc<WidgetKind<'a> + 'a>) -> Widget<'a> {
@@ -44,17 +47,33 @@ impl<'a> Widget<'a> {
     }
 
     pub fn add_child(&mut self, widget: Widget<'a>) {
-        self.add_child_rc(Rc::new(RefCell::new(widget)));
+        self.add_child_private(Rc::new(RefCell::new(widget)), false);
     }
 
     pub fn add_child_rc(&mut self, widget: Rc<RefCell<Widget<'a>>>) {
+        self.add_child_private(widget, false);
+    }
+
+    fn add_child_private(&mut self, widget: Rc<RefCell<Widget<'a>>>, modal: bool) {
         trace!("Adding {:?} to {:?}", widget.borrow().kind.get_name(),
             self.kind.get_name());
+        if modal {
+            self.modal = Some(Rc::clone(&widget));
+        }
+
         self.children.push(widget);
+
     }
 
     pub fn dispatch_event(&mut self, state: &mut GameState, event: Event) -> bool {
         trace!("Dispatching event {:?} in {:?}", event, self.kind.get_name());
+
+        if let Some(ref mut child) = self.modal {
+            trace!("Found modal child");
+
+            return child.borrow_mut().dispatch_event(state, event);
+        }
+
         for child in self.children.iter_mut() {
             let mut child = child.borrow_mut();
             if child.state.in_bounds(event.mouse) {

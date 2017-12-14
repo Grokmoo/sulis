@@ -62,10 +62,17 @@ impl Config {
         };
 
         match config.logging.log_level.as_ref() {
-            "error" | "warn" | "info" | "debug" | "trace" => Ok(config),
-            _ => Err(Error::new(ErrorKind::InvalidData,
+            "error" | "warn" | "info" | "debug" | "trace" => (),
+            _ => return Err(Error::new(ErrorKind::InvalidData,
                     format!("log_level must be one of error, warn, info, debug, or trace")))
+        };
+
+        if config.display.width < 80 || config.display.height < 24 {
+            return Err(Error::new(ErrorKind::InvalidData,
+                "Minimum terminal display size is 80x24"));
         }
+
+        Ok(config)
     }
 
     pub fn get_input_action(&self, k: KeyboardEvent) -> Option<&InputAction> {

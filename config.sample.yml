@@ -9,8 +9,8 @@ display:
     cursor_char: "█"
 
     # screen dimensions in characters
-    width: 60
-    height: 20
+    width: 80
+    height: 24
 
     # in frames per second
     frame_rate: 30

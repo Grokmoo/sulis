@@ -28,6 +28,7 @@ pub use self::image::Image;
 
 use std::collections::HashMap;
 use std::rc::Rc;
+use std::cell::RefCell;
 use std::io::Error;
 use std::fmt::Display;
 use std::hash::Hash;
@@ -38,8 +39,12 @@ use resource::tile::TileBuilder;
 use resource::resource_builder_set::ResourceBuilderSet;
 use resource::image::{AnimatedImage, ComposedImage};
 
+thread_local! {
+    static RESOURCE_SET: RefCell<ResourceSet> = RefCell::new(ResourceSet::new());
+}
+
 pub struct ResourceSet {
-    pub game: Game,
+    game: Option<Rc<Game>>,
     areas: HashMap<String, Rc<Area>>,
     tiles: HashMap<String, Rc<Tile>>,
     actors: HashMap<String, Rc<Actor>>,
@@ -54,59 +59,68 @@ pub trait ResourceBuilder where Self: Sized {
 }
 
 impl ResourceSet {
-    pub fn new(root_directory: &str) -> Result<ResourceSet, Error> {
+    pub fn new() -> ResourceSet {
+        ResourceSet {
+            game: None,
+            areas: HashMap::new(),
+            tiles: HashMap::new(),
+            actors: HashMap::new(),
+            sizes: HashMap::new(),
+            images: HashMap::new(),
+        }
+    }
+
+    pub fn init(root_directory: &str) -> Result<(), Error> {
         let builder_set = ResourceBuilderSet::new(root_directory)?;
 
         debug!("Creating resource set from parsed data.");
 
-        let mut images: HashMap<String, Rc<Image>> = HashMap::new();
-        for (id, image) in builder_set.simple_images {
-            insert_if_ok_boxed("image", id, Ok(Rc::new(image) as Rc<Image>),
-                &mut images);
-        }
 
-        for (id, image) in builder_set.composed_builders {
-            insert_if_ok_boxed("image", id, ComposedImage::new(image, &images),
-                &mut images);
-        }
+        RESOURCE_SET.with(|resource_set| {
+            let mut resource_set = resource_set.borrow_mut();
 
-        for (id, image) in builder_set.animated_builders {
-            insert_if_ok_boxed("image", id, AnimatedImage::new(image, &images),
-                &mut images);
-        }
+            resource_set.game = Some(Rc::new(builder_set.game));
 
-        let mut sizes: HashMap<usize, Rc<Size>> = HashMap::new();
-        for (_id_str, builder) in builder_set.size_builders {
-            insert_if_ok("size", builder.size, Size::new(builder), &mut sizes);
-        }
+            for (id, image) in builder_set.simple_images {
+                insert_if_ok_boxed("image", id, Ok(Rc::new(image) as Rc<Image>),
+                    &mut resource_set.images);
+            }
 
-        let mut tiles: HashMap<String, Rc<Tile>> = HashMap::new();
-        for (id, builder) in builder_set.tile_builders {
-            insert_if_ok("tile", id, Tile::new(builder), &mut tiles);
-        }
+            for (id, image) in builder_set.composed_builders {
+                insert_if_ok_boxed("image", id, ComposedImage::new(image,
+                    &resource_set.images), &mut resource_set.images);
+            }
 
-        let mut actors: HashMap<String, Rc<Actor>> = HashMap::new();
-        for (id, builder) in builder_set.actor_builders.into_iter() {
-            insert_if_ok("actor", id, Actor::new(builder, &sizes), &mut actors);
-        }
+            for (id, image) in builder_set.animated_builders {
+                insert_if_ok_boxed("image", id, AnimatedImage::new(image,
+                    &resource_set.images), &mut resource_set.images);
+            }
 
-        let mut areas: HashMap<String, Rc<Area>> = HashMap::new();
-        for (id, builder) in builder_set.area_builders {
-            insert_if_ok("area", id, Area::new(builder, &tiles, &sizes), &mut areas);
-        }
+            for (_id_str, builder) in builder_set.size_builders {
+                insert_if_ok("size", builder.size, Size::new(builder),
+                    &mut resource_set.sizes);
+            }
 
-        Ok(ResourceSet {
-            tiles: tiles,
-            areas: areas,
-            actors: actors,
-            game: builder_set.game,
-            sizes: sizes,
-            images: images,
-        })
+            for (id, builder) in builder_set.tile_builders {
+                insert_if_ok("tile", id, Tile::new(builder),
+                    &mut resource_set.tiles);
+            }
+
+            for (id, builder) in builder_set.actor_builders.into_iter() {
+                insert_if_ok("actor", id, Actor::new(builder, &resource_set.sizes),
+                    &mut resource_set.actors);
+            }
+
+            for (id, builder) in builder_set.area_builders {
+                insert_if_ok("area", id, Area::new(builder,
+                    &resource_set.tiles, &resource_set.sizes), &mut resource_set.areas);
+            }
+        });
+
+        Ok(())
     }
 
-
-    pub fn get_resource<V: ?Sized>(&self, id: &str,
+    fn get_resource<V: ?Sized>(&self, id: &str,
         map: &HashMap<String, Rc<V>>) -> Option<Rc<V>> {
 
         let resource = map.get(id);
@@ -117,29 +131,36 @@ impl ResourceSet {
         }
     }
 
-    pub fn get_image(&self, id: &str) -> Option<Rc<Image>> {
-        self.get_resource(id, &self.images)
+    pub fn get_game() -> Rc<Game> {
+        RESOURCE_SET.with(|r| Rc::clone(r.borrow().game.as_ref().unwrap()))
     }
 
-    pub fn get_area(&self, id: &str) -> Option<Rc<Area>> {
-        self.get_resource(id, &self.areas)
+    pub fn get_actor(id: &str) -> Option<Rc<Actor>> {
+        RESOURCE_SET.with(|r| r.borrow().get_resource(id, &r.borrow().actors))
     }
 
-    pub fn get_actor(&self, id: &str) -> Option<Rc<Actor>> {
-        self.get_resource(id, &self.actors)
+    pub fn get_area(id: &str) -> Option<Rc<Area>> {
+        RESOURCE_SET.with(|r| r.borrow().get_resource(id, &r.borrow().areas))
     }
 
-    pub fn get_tile(&self, id: &str) -> Option<Rc<Tile>> {
-        self.get_resource(id, &self.tiles)
+    pub fn get_image(id: &str) -> Option<Rc<Image>> {
+        RESOURCE_SET.with(|r| r.borrow().get_resource(id, &r.borrow().images))
     }
 
-    pub fn get_size(&self, size: usize) -> Option<Rc<Size>> {
-        let size = self.sizes.get(&size);
+    pub fn get_size(id: usize) -> Option<Rc<Size>> {
+        RESOURCE_SET.with(|r| {
+            let r = r.borrow();
+            let size = r.sizes.get(&id);
 
-        match size {
-            None => None,
-            Some(s) => Some(Rc::clone(s)),
-        }
+            match size {
+                None => None,
+                Some(s) => Some(Rc::clone(s)),
+            }
+        })
+    }
+
+    pub fn get_tile(id: &str) -> Option<Rc<Tile>> {
+        RESOURCE_SET.with(|r| r.borrow().get_resource(id, &r.borrow().tiles))
     }
 }
 

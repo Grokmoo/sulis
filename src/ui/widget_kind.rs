@@ -2,7 +2,7 @@ use state::GameState;
 use io::{InputAction, TextRenderer};
 use io::event::ClickKind;
 use resource::Point;
-use ui::{Widget, WidgetState};
+use ui::Widget;
 
 pub struct EmptyWidget { }
 impl<'a> WidgetKind<'a> for EmptyWidget {
@@ -24,7 +24,7 @@ pub trait WidgetKind<'a> {
 
     fn get_name(&self) -> &str;
 
-    fn on_add(&self, _widget_state: &mut WidgetState) { }
+    fn on_add(&self, _widget: &mut Widget) { }
 
     fn on_mouse_click(&self, _state: &mut GameState, _widget: &mut Widget<'a>,
                       _kind: ClickKind, _mouse_pos: Point) -> bool {

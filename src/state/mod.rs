@@ -37,11 +37,11 @@ pub struct GameState<'a> {
 }
 
 impl<'a> GameState<'a> {
-    pub fn new(config: Config, resources: &'a ResourceSet) -> Result<GameState<'a>, Error> {
-        let game = &resources.game;
+    pub fn new(config: Config) -> Result<GameState<'a>, Error> {
+        let game = ResourceSet::get_game();
 
         debug!("Setting up area state from {}", &game.starting_area);
-        let area = resources.get_area(&game.starting_area);
+        let area = ResourceSet::get_area(&game.starting_area);
         let area = match area {
             Some(a) => a,
             None => {
@@ -61,7 +61,7 @@ impl<'a> GameState<'a> {
                                   "Unable to create starting location."));
         }
 
-        let pc = resources.get_actor(&game.pc);
+        let pc = ResourceSet::get_actor(&game.pc);
         let pc = match pc {
             Some(a) => a,
             None => {

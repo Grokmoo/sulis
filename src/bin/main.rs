@@ -35,9 +35,9 @@ fn main() {
     info!("Setup Logger and read configuration from 'config.yml'");
 
     info!("Reading resources from {}", &config.resources.directory);
-    let resource_set = resource::ResourceSet::new(&config.resources.directory);
-    let resource_set = match resource_set {
-        Ok(r) => r,
+    let resource_set_err = resource::ResourceSet::init(&config.resources.directory);
+    match resource_set_err {
+        Ok(_) => (),
         Err(e) => {
             error!("  {}: {}", e.description(), e);
             error!("There was a fatal error loading resource set from 'data':");
@@ -47,7 +47,7 @@ fn main() {
     };
 
     info!("Initializing game state.");
-    let game_state = GameState::new(config.clone(), &resource_set);
+    let game_state = GameState::new(config.clone());
     let mut game_state = match game_state {
         Ok(s) => s,
         Err(e) => {
@@ -70,8 +70,7 @@ fn main() {
         }
     };
 
-    let mut root = ui::create_ui_tree(Rc::clone(&game_state.area_state), &config,
-        &resource_set);
+    let mut root = ui::create_ui_tree(Rc::clone(&game_state.area_state), &config);
 
     let fpms = (1000.0 / (config.display.frame_rate as f32)) as u64;
     let frame_time = time::Duration::from_millis(fpms);

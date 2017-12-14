@@ -3,7 +3,7 @@ use std::cell::RefCell;
 use std::cmp;
 
 use state::{AreaState, GameState};
-use ui::{WidgetKind, Widget, WidgetState};
+use ui::{WidgetKind, Widget};
 use io::{InputAction, TextRenderer};
 use io::event::ClickKind;
 use resource::Point;
@@ -29,10 +29,10 @@ impl<'a> WidgetKind<'a> for AreaWidget<'a> {
         "Area"
     }
 
-    fn on_add(&self, widget_state: &mut WidgetState) {
+    fn on_add(&self, widget: &mut Widget) {
         let width = self.area_state.borrow().area.width;
         let height = self.area_state.borrow().area.height;
-        widget_state.set_max_scroll_pos(width, height);
+        widget.state.set_max_scroll_pos(width, height);
     }
 
     fn draw_text_mode(&self, renderer: &mut TextRenderer, widget: &Widget<'a>) {

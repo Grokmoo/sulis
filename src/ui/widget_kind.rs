@@ -8,6 +8,13 @@ use resource::Point;
 use ui::Widget;
 
 pub struct EmptyWidget { }
+
+impl EmptyWidget {
+    pub fn new() -> Rc<EmptyWidget> {
+        Rc::new(EmptyWidget {})
+    }
+}
+
 impl<'a> WidgetKind<'a> for EmptyWidget {
     fn get_name(&self) -> &str {
         "Empty"

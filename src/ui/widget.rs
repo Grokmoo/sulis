@@ -11,14 +11,54 @@ use resource::{ResourceSet, Point};
 pub struct Widget<'a> {
     pub state: WidgetState,
     pub kind: Rc<WidgetKind<'a> + 'a>,
-    pub children: Vec<Rc<RefCell<Widget<'a>>>>,
-    pub modal_child: Option<Rc<RefCell<Widget<'a>>>>,
-    pub parent: Option<Rc<RefCell<Widget<'a>>>>,
     pub uuid: Uuid,
+    children: Vec<Rc<RefCell<Widget<'a>>>>,
+    modal_child: Option<Rc<RefCell<Widget<'a>>>>,
+    parent: Option<Rc<RefCell<Widget<'a>>>>,
 }
 
 thread_local! {
     static MARKED_FOR_REMOVAL: RefCell<Vec<Uuid>> = RefCell::new(Vec::new());
+}
+
+impl<'a> Widget<'a> {
+    pub fn draw_text_mode(&self, renderer: &mut TextRenderer) {
+        if let Some(ref image) = self.state.background {
+            image.fill_text_mode(renderer, self.state.animation_state.get_text(),
+                &self.state.position, &self.state.size);
+        }
+
+        self.kind.draw_text_mode(renderer, self);
+
+        for child in self.children.iter() {
+            child.borrow().draw_text_mode(renderer);
+        }
+    }
+
+    pub fn mark_for_removal(&mut self) {
+        trace!("Marked widget for removal '{}'", self.kind.get_name());
+        MARKED_FOR_REMOVAL.with(|list| {
+            list.borrow_mut().push(self.uuid);
+        });
+    }
+
+    pub fn add_child(&mut self, child: Rc<RefCell<Widget<'a>>>) {
+        trace!("Adding {:?} to {:?}", child.borrow().kind.get_name(),
+            self.kind.get_name());
+
+        if child.borrow().state.is_modal {
+            trace!("Adding child as modal widget.");
+            self.modal_child = Some(Rc::clone(&child));
+        }
+
+        self.children.push(child);
+    }
+
+    pub fn add_children(&mut self, children: Vec<Rc<RefCell<Widget<'a>>>>) {
+        for child in children.into_iter() {
+            self.add_child(child);
+        }
+    }
 }
 
 impl<'a> Widget<'a> {
@@ -59,30 +99,16 @@ impl<'a> Widget<'a> {
         Widget::new(widget, size, position, border)
     }
 
+    pub fn get_parent(widget: &Rc<RefCell<Widget<'a>>>) -> Rc<RefCell<Widget<'a>>> {
+        Rc::clone(widget.borrow().parent.as_ref().unwrap())
+    }
+
     pub fn set_background(widget: &mut Rc<RefCell<Widget<'a>>>, image: &str) {
         widget.borrow_mut().state.set_background(ResourceSet::get_image(image));
     }
 
     pub fn set_text(widget: &mut Rc<RefCell<Widget<'a>>>, text: &str) {
         widget.borrow_mut().state.set_text(text);
-    }
-
-    pub fn add_child(&mut self, child: Rc<RefCell<Widget<'a>>>) {
-        trace!("Adding {:?} to {:?}", child.borrow().kind.get_name(),
-            self.kind.get_name());
-
-        if child.borrow().state.is_modal {
-            trace!("Adding child as modal widget.");
-            self.modal_child = Some(Rc::clone(&child));
-        }
-
-        self.children.push(child);
-    }
-
-    pub fn add_children(&mut self, children: Vec<Rc<RefCell<Widget<'a>>>>) {
-        for child in children.into_iter() {
-            self.add_child(child);
-        }
     }
 
     pub fn add_child_to(parent: &Rc<RefCell<Widget<'a>>>,
@@ -135,24 +161,23 @@ impl<'a> Widget<'a> {
         }
     }
 
-    pub fn mark_for_removal(&self) {
-        trace!("Marked widget for removal '{}'", self.kind.get_name());
-        MARKED_FOR_REMOVAL.with(|list| {
-            list.borrow_mut().push(self.uuid);
-        });
-    }
-
     pub fn dispatch_event(widget: &Rc<RefCell<Widget<'a>>>,
                           state: &mut GameState, event: Event) -> bool {
         trace!("Dispatching event {:?} in {:?}", event,
                widget.borrow().kind.get_name());
 
-        // if let Some(ref mut child) = self.modal_child {
-        //     trace!("Found modal child");
-        //
-        //     return child.borrow_mut().dispatch_event(state, event);
-        // }
+        // precompute has modal so we don't have the widget borrowed
+        // for the dispatch below
+        let has_modal = widget.borrow().modal_child.is_some();
+        if has_modal {
+            trace!("Dispatching to modal child.");
+            let child = Rc::clone(widget.borrow().modal_child.as_ref().unwrap());
+            return Widget::dispatch_event(&child, state, event);
+        }
 
+        // iterate in this way using indices so we don't maintain any
+        // borrows except for the active child widget - this will allow
+        // the child to mutate any other widget in the tree
         let len = widget.borrow().children.len();
         for i in (0..len).rev() {
             let child = Rc::clone(widget.borrow().children.get(i).unwrap());
@@ -185,19 +210,6 @@ impl<'a> Widget<'a> {
                 widget_kind.on_mouse_scroll(state, widget, scroll, event.mouse),
             KeyPress(action) =>
                 widget_kind.on_key_press(state, widget, action, event.mouse),
-        }
-    }
-
-    pub fn draw_text_mode(&self, renderer: &mut TextRenderer) {
-        if let Some(ref image) = self.state.background {
-            image.fill_text_mode(renderer, self.state.animation_state.get_text(),
-                &self.state.position, &self.state.size);
-        }
-
-        self.kind.draw_text_mode(renderer, self);
-
-        for child in self.children.iter() {
-            child.borrow().draw_text_mode(renderer);
         }
     }
 }

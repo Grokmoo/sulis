@@ -125,4 +125,12 @@ impl WidgetState {
         self.position = Point::new(x, y);
         self.inner_position = self.position.inner(&self.border);
     }
+
+    //// Returns a point which will cause a widget with the specified
+    //// size to be centered on this widget.  This is useful when
+    //// centering a widget on a larger parent widget.
+    pub fn get_centered_position(&self, width: i32, height: i32) -> Point {
+        Point::new(self.inner_left() + (self.size.width - width) / 2,
+            self.inner_top() + (self.size.height - height) / 2)
+    }
 }

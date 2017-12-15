@@ -2,10 +2,9 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use state::GameState;
-use ui::{Border, Size, Window, Widget};
+use ui::{Border, Size, Window, Widget, EmptyWidget};
 use io::event::Kind;
 use io::Event;
-use resource::Point;
 
 #[derive(Debug, Deserialize, Copy, Clone)]
 pub enum InputAction {
@@ -25,7 +24,6 @@ impl InputAction {
     pub fn fire_action<'a>(action: InputAction, game_state: &mut GameState<'a>,
                        root: Rc<RefCell<Widget<'a>>>) {
         use self::InputAction::*;
-        // use ui::widget::state;
 
         debug!("Firing action {:?}", action);
         match action {
@@ -35,18 +33,8 @@ impl InputAction {
             MoveCursorRight => game_state.cursor_move_by(root, 1, 0),
             MoveToCursor => game_state.cursor_click(root),
             Exit => {
-                let mut window = Widget::with_border(
-                    Window::new("Really Quit?"),
-                    Size::new(20, 10),
-                    Point::new(1, 1),
-                    // Point::new(state(&root).inner_left() +
-                    //            (state(&root).size.width - 20) / 2,
-                    //            state(&root).inner_top() +
-                    //            (state(&root).size.height - 10) / 2),
-                    Border::as_uniform(1));
-                window.borrow_mut().state.set_modal(true);
-                Widget::set_background(&mut window, "background");
-                Widget::add_child_to(&root, window);
+                let exit_window = build_exit_window(&root);
+                Widget::add_children_to(&root, exit_window);
                 true
             }
             _ => {
@@ -56,4 +44,20 @@ impl InputAction {
             },
         };
     }
+}
+
+fn build_exit_window<'a>(root: &Rc<RefCell<Widget<'a>>>) ->
+    Vec<Rc<RefCell<Widget<'a>>>> {
+
+    let ref state = root.borrow().state;
+    let mut window = Widget::with_border(
+        Window::new("Really Quit?",
+                    Widget::with_defaults(EmptyWidget::new())),
+        Size::new(20, 10),
+        state.get_centered_position(20, 10),
+        Border { top: 3, bottom: 1, left: 1, right: 1 });
+    window.borrow_mut().state.set_modal(true);
+    Widget::set_background(&mut window, "background");
+
+    vec![window]
 }

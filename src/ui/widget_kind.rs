@@ -32,6 +32,10 @@ pub trait WidgetKind<'a> {
         self.super_draw_text_mode(widget);
     }
 
+    fn layout(&self, _widget: &Widget<'a>, _parent: &Widget<'a>) {
+
+    }
+
     fn get_name(&self) -> &str;
 
     //// This method is called after this WidgetKind is added to its parent widget.

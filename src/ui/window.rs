@@ -24,23 +24,35 @@ impl<'a> WidgetKind<'a> for Window<'a> {
     }
 
     fn on_add(&self, widget: &Rc<RefCell<Widget<'a>>>) -> Vec<Rc<RefCell<Widget<'a>>>> {
+        let ref state = widget.borrow().state;
+
         let mut label = Widget::with_position(Label::new(),
-            Size::new(widget.borrow().state.size.width, 1),
-            Point::from(&widget.borrow().state.position));
+            Size::new(state.size.width, 1),
+            Point::from(&state.position));
         Widget::set_text(&mut label, &self.title_string);
 
-        let mut button = Widget::with_border(
-            Button::new(Box::new(|widget, _state| {
+        let center = Point::new(state.inner_left() + state.inner_size.width / 2,
+                                state.inner_bottom() - 3);
+
+        let mut cancel = Widget::with_border(
+            Button::new(Box::new(|widget, _game_state| {
                 let parent = Widget::get_parent(&widget);
                 parent.borrow_mut().mark_for_removal();
             })),
-            Size::new(3, 3),
-            Point::new(widget.borrow().state.inner_right() - 3,
-                widget.borrow().state.inner_top()),
+            Size::new(10, 3),
+            Point::new(center.x + 1, center.y),
             Border::as_uniform(1));
-        Widget::set_background(&mut button, "background");
-        Widget::set_text(&mut button, "x");
+        Widget::set_background(&mut cancel, "background");
+        Widget::set_text(&mut cancel, "Cancel");
 
-        vec![Rc::clone(&self.content), label, button]
+        let mut quit = Widget::with_border(
+            Button::new(Box::new(|_widget, game_state| { game_state.set_exit(); })),
+            Size::new(10, 3),
+            Point::new(center.x - 11, center.y),
+            Border::as_uniform(1));
+        Widget::set_background(&mut quit, "background");
+        Widget::set_text(&mut quit, "Quit");
+
+        vec![Rc::clone(&self.content), label, cancel, quit]
     }
 }

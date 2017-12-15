@@ -84,7 +84,7 @@ fn main() {
 
         io.process_input(&mut game_state, Rc::clone(&root));
         game_state.update();
-        Widget::check_children(&root);
+        Widget::update(&root);
 
         let total_elapsed =
             animation::get_elapsed_millis(main_loop_start_time.elapsed());

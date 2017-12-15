@@ -15,6 +15,7 @@ pub struct Widget<'a> {
     children: Vec<Rc<RefCell<Widget<'a>>>>,
     modal_child: Option<Rc<RefCell<Widget<'a>>>>,
     parent: Option<Rc<RefCell<Widget<'a>>>>,
+    needs_layout: bool,
 }
 
 thread_local! {
@@ -22,6 +23,10 @@ thread_local! {
 }
 
 impl<'a> Widget<'a> {
+    pub fn has_modal(&self) -> bool {
+        self.modal_child.is_some()
+    }
+
     pub fn draw_text_mode(&self, renderer: &mut TextRenderer) {
         if let Some(ref image) = self.state.background {
             image.fill_text_mode(renderer, self.state.animation_state.get_text(),
@@ -59,6 +64,24 @@ impl<'a> Widget<'a> {
             self.add_child(child);
         }
     }
+
+    fn layout_children(&mut self) {
+        let len = self.children.len();
+        for i in 0..len {
+            let child = Rc::clone(self.children.get(i).unwrap());
+            child.borrow_mut().layout_widget(self);
+        }
+    }
+
+    fn layout_widget(&mut self, parent: &Widget<'a>) {
+        if self.needs_layout {
+            trace!("Performing layout on widget {:?}", self.kind.get_name());
+            self.kind.layout(self, parent);
+            self.needs_layout = false;
+        }
+
+        self.layout_children();
+    }
 }
 
 impl<'a> Widget<'a> {
@@ -71,6 +94,7 @@ impl<'a> Widget<'a> {
             modal_child: None,
             parent: None,
             uuid: Uuid::new_v4(),
+            needs_layout: true,
         };
 
         let widget = Rc::new(RefCell::new(widget));
@@ -121,6 +145,12 @@ impl<'a> Widget<'a> {
         for child in children.into_iter() {
             Widget::add_child_to(parent, child);
         }
+    }
+
+    pub fn update(root: &Rc<RefCell<Widget<'a>>>) {
+        Widget::check_children(&root);
+
+        root.borrow_mut().layout_children();
     }
 
     pub fn check_children(parent: &Rc<RefCell<Widget<'a>>>) {

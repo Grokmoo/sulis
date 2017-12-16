@@ -14,7 +14,7 @@ pub struct Button {
 impl Button {
     pub fn new(callback: Box<Fn(&Rc<RefCell<Widget>>, &mut GameState)>) -> Rc<Button> {
         Rc::new(Button {
-            label: Label::new(),
+            label: Label::empty(),
             callback
         })
     }
@@ -22,12 +22,10 @@ impl Button {
 
 impl<'a> WidgetKind<'a> for Button {
     fn get_name(&self) -> &str {
-        "Button"
+        "button"
     }
 
     fn draw_text_mode(&self, renderer: &mut TextRenderer, widget: &Widget<'a>) {
-        self.super_draw_text_mode(widget);
-
         self.label.draw_text_mode(renderer, widget);
     }
 

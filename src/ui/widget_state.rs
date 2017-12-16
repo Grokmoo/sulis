@@ -23,21 +23,20 @@ pub struct WidgetState {
 }
 
 impl WidgetState {
-    pub fn new(size: Size, position: Point,
-               border: Border) -> WidgetState {
+    pub fn new() -> WidgetState {
 
         WidgetState {
-            size,
-            position,
-            border,
+            size: Size::as_zero(),
+            position: Point::as_zero(),
+            border: Border::as_zero(),
             mouse_is_inside: false,
             background: None,
             animation_state: AnimationState::Base,
             scroll_pos: Point::as_zero(),
             max_scroll_pos: Point::as_zero(),
             text: String::new(),
-            inner_size: size.inner(&border),
-            inner_position: position.inner(&border),
+            inner_size: Size::as_zero(),
+            inner_position: Point::as_zero(),
             is_modal: false,
         }
     }

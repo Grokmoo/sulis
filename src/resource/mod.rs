@@ -26,6 +26,8 @@ pub use self::point::Point;
 mod image;
 pub use self::image::Image;
 
+use ui::Theme;
+
 use std::collections::HashMap;
 use std::rc::Rc;
 use std::cell::RefCell;
@@ -45,6 +47,7 @@ thread_local! {
 
 pub struct ResourceSet {
     game: Option<Rc<Game>>,
+    theme: Option<Rc<Theme>>,
     areas: HashMap<String, Rc<Area>>,
     tiles: HashMap<String, Rc<Tile>>,
     actors: HashMap<String, Rc<Actor>>,
@@ -62,6 +65,7 @@ impl ResourceSet {
     pub fn new() -> ResourceSet {
         ResourceSet {
             game: None,
+            theme: None,
             areas: HashMap::new(),
             tiles: HashMap::new(),
             actors: HashMap::new(),
@@ -75,11 +79,11 @@ impl ResourceSet {
 
         debug!("Creating resource set from parsed data.");
 
-
         RESOURCE_SET.with(|resource_set| {
             let mut resource_set = resource_set.borrow_mut();
 
             resource_set.game = Some(Rc::new(builder_set.game));
+            resource_set.theme = Some(Rc::new(Theme::new(builder_set.theme_builder)));
 
             for (id, image) in builder_set.simple_images {
                 insert_if_ok_boxed("image", id, Ok(Rc::new(image) as Rc<Image>),
@@ -129,6 +133,10 @@ impl ResourceSet {
             None => None,
             Some(r) => Some(Rc::clone(r)),
         }
+    }
+
+    pub fn get_theme() -> Rc<Theme> {
+        RESOURCE_SET.with(|r| Rc::clone(r.borrow().theme.as_ref().unwrap()))
     }
 
     pub fn get_game() -> Rc<Game> {

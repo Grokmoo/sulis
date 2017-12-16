@@ -26,7 +26,7 @@ impl<'a> AreaWidget<'a> {
 
 impl<'a> WidgetKind<'a> for AreaWidget<'a> {
     fn get_name(&self) -> &str {
-        "Area"
+        "area"
     }
 
     fn on_add(&self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget<'a>>>> {
@@ -35,6 +35,19 @@ impl<'a> WidgetKind<'a> for AreaWidget<'a> {
         widget.borrow_mut().state.set_max_scroll_pos(width, height);
 
         Vec::with_capacity(0)
+    }
+
+    fn layout(&self, widget: &mut Widget<'a>) {
+        widget.do_base_layout();
+
+        // let width = cmp::min(parent.state.inner_size.width - 20,
+        //                      self.area_state.borrow().area.width);
+        // let height = cmp::min(parent.state.inner_size.height - 1,
+        //                       self.area_state.borrow().area.height);
+        //
+        // widget.state.set_size(Size::new(width, height));
+        // widget.state.set_position(parent.state.inner_position.x,
+        //                           parent.state.inner_position.y + 1);
     }
 
     fn draw_text_mode(&self, renderer: &mut TextRenderer, widget: &Widget<'a>) {

@@ -1,4 +1,5 @@
 pub mod theme;
+pub use self::theme::Theme;
 
 pub mod widget;
 pub use self::widget::Widget;
@@ -33,66 +34,46 @@ pub use self::window::Window;
 
 use std::rc::Rc;
 use std::cell::RefCell;
-use std::cmp;
 
 use state::AreaState;
 use config::Config;
-use resource::Point;
+use resource::ResourceSet;
 
 pub fn create_ui_tree<'a>(area_state: Rc<RefCell<AreaState<'a>>>,
     config: &Config) -> Rc<RefCell<Widget<'a>>> {
 
     debug!("Creating UI tree.");
-    let mut root = Widget::with_border(
-        Rc::new(EmptyWidget {}),
-        Size::new(config.display.width, config.display.height),
-        Point::as_zero(),
-        Border::as_uniform(1));
-    Widget::set_background(&mut root, "background");
+    let root = Widget::with_defaults(EmptyWidget::new());
+    root.borrow_mut().state.set_size(Size::new(config.display.width,
+                                               config.display.height));
+    root.borrow_mut().theme = Some(ResourceSet::get_theme());
 
-    let widgets_to_add = setup_widgets(Rc::clone(&root), area_state);
+    let widgets_to_add = setup_widgets(area_state);
     Widget::add_children_to(&root, widgets_to_add);
 
     root
 }
-fn setup_widgets<'a>(root: Rc<RefCell<Widget<'a>>>,
-    area_state: Rc<RefCell<AreaState<'a>>>) -> Vec<Rc<RefCell<Widget<'a>>>> {
+fn setup_widgets<'a>(area_state: Rc<RefCell<AreaState<'a>>>) ->
+    Vec<Rc<RefCell<Widget<'a>>>> {
 
-    let right_pane_width = 20;
 
-    let ref state = root.borrow().state;
-    let area_width = cmp::min(area_state.borrow().area.width,
-        state.inner_size.width - right_pane_width);
-    let area_height = cmp::min(area_state.borrow().area.height,
-        state.inner_size.height - 1);
-    let right_pane_x = state.inner_right() - right_pane_width;
+    let mouse_over = Widget::with_theme(Label::empty(), "mouse_over");
 
-    let mouse_over = Widget::with_size(
-        Label::new(),
-        Size::new(right_pane_width, 1),
-        );
+    let area_widget = Widget::with_defaults(
+        AreaWidget::new(&area_state, Rc::clone(&mouse_over)));
 
-    let area_widget = Widget::with_border(
-            AreaWidget::new(&area_state, Rc::clone(&mouse_over)),
-            Size::new(area_width, area_height),
-            Point::new(state.inner_position.x, state.inner_position.y + 1),
-            Border::as_uniform(0));
-
-    mouse_over.borrow_mut().state
-        .set_position(right_pane_x, state.inner_position.y);
-
-    let mut button = Widget::with_position(
+    let right_pane = Widget::with_theme(EmptyWidget::new(), "right_pane");
+    {
+        let button = Widget::with_theme(
             Button::new(Box::new(|_w, _s| trace!("Hello world"))),
-            Size::new(right_pane_width - 1, 3),
-            Point::new(right_pane_x, state.inner_position.y + 2));
-    Widget::set_text(&mut button, "Test");
-    Widget::set_background(&mut button, "background");
+            "test_button");
 
-    let mut area_title = Widget::with_position(
-        Label::new(),
-        Size::new(area_width, 1),
-        state.inner_position);
-    Widget::set_text(&mut area_title, &area_state.borrow().area.name);
+        let area_title = Widget::with_theme(
+            Label::new(&area_state.borrow().area.name), "title");
+        Widget::add_child_to(&right_pane, mouse_over);
+        Widget::add_child_to(&right_pane, button);
+        Widget::add_child_to(&right_pane, area_title);
+    }
 
-    vec![area_widget, button, area_title, mouse_over]
+    vec![area_widget, right_pane]
 }

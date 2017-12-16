@@ -2,7 +2,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use state::GameState;
-use ui::{Border, Size, Window, Widget, EmptyWidget};
+use ui::{Window, Widget};
 use io::event::Kind;
 use io::Event;
 
@@ -36,7 +36,7 @@ impl InputAction {
                 if root.borrow().has_modal() {
                     false
                 } else {
-                    let exit_window = build_exit_window(&root);
+                    let exit_window = build_exit_window();
                     Widget::add_children_to(&root, exit_window);
                     true
                 }
@@ -50,18 +50,9 @@ impl InputAction {
     }
 }
 
-fn build_exit_window<'a>(root: &Rc<RefCell<Widget<'a>>>) ->
-    Vec<Rc<RefCell<Widget<'a>>>> {
-
-    let ref state = root.borrow().state;
-    let mut window = Widget::with_border(
-        Window::new("Exit Game?",
-                    Widget::with_defaults(EmptyWidget::new())),
-        Size::new(26, 6),
-        state.get_centered_position(20, 10),
-        Border::as_uniform(1));
+fn build_exit_window<'a>() -> Vec<Rc<RefCell<Widget<'a>>>> {
+    let window = Widget::with_theme(Window::new(), "exit_window");
     window.borrow_mut().state.set_modal(true);
-    Widget::set_background(&mut window, "background");
 
     vec![window]
 }

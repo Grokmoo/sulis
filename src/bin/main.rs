@@ -84,7 +84,15 @@ fn main() {
 
         io.process_input(&mut game_state, Rc::clone(&root));
         game_state.update();
-        Widget::update(&root);
+
+        match Widget::update(&root) {
+            Err(e) => {
+                error!("{}", e);
+                error!("There was a fatal error updating the UI tree state.");
+                break;
+            }
+            _ => (),
+        }
 
         let total_elapsed =
             animation::get_elapsed_millis(main_loop_start_time.elapsed());

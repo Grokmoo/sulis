@@ -7,6 +7,7 @@ use resource::area::AreaBuilder;
 use resource::image::SimpleImage;
 use resource::image::composed_image::ComposedImageBuilder;
 use resource::image::animated_image::AnimatedImageBuilder;
+use ui::theme::ThemeBuilder;
 
 use std::collections::HashMap;
 use std::fs::{self, File};
@@ -16,6 +17,7 @@ use std::ffi::OsStr;
 #[derive(Debug)]
 pub struct ResourceBuilderSet {
     pub game: Game,
+    pub theme_builder: ThemeBuilder,
     pub size_builders: HashMap<String, SizeBuilder>,
     pub area_builders: HashMap<String, AreaBuilder>,
     pub tile_builders: HashMap<String, TileBuilder>,
@@ -37,8 +39,19 @@ impl ResourceBuilderSet {
             }
         };
 
+        let theme_filename = root.to_owned() + "/theme.json";
+        debug!("Reading theme from {}", theme_filename);
+        let theme_builder = match ResourceBuilderSet::create_theme(&theme_filename) {
+            Ok(t) => t,
+            Err(e) => {
+                error!("Unable to load theme from {}", theme_filename);
+                return Err(e);
+            }
+        };
+
         Ok(ResourceBuilderSet {
             game,
+            theme_builder,
             size_builders: read_resources(&format!("{}/sizes/", root)),
             tile_builders: read_resources(&format!("{}/tiles/", root)),
             actor_builders: read_resources(&format!("{}/actors/", root)),
@@ -56,6 +69,15 @@ impl ResourceBuilderSet {
         let game = Game::new(&file_data)?;
 
         Ok(game)
+    }
+
+    pub fn create_theme(filename: &str) -> Result<ThemeBuilder, Error> {
+        let mut f = File::open(filename)?;
+        let mut file_data = String::new();
+        f.read_to_string(&mut file_data)?;
+        let theme = ThemeBuilder::new(&file_data)?;
+
+        Ok(theme)
     }
 }
 

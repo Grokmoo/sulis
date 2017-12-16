@@ -1,4 +1,4 @@
-#[derive(Copy, Clone)]
+#[derive(Deserialize, Debug, Copy, Clone)]
 pub struct Border {
     pub top: i32,
     pub bottom: i32,

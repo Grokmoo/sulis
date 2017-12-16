@@ -17,23 +17,17 @@ impl EmptyWidget {
 
 impl<'a> WidgetKind<'a> for EmptyWidget {
     fn get_name(&self) -> &str {
-        "Empty"
+        "content"
     }
 }
 
 //// Trait for implementations of different Widgets.  This is held by a 'WidgetState'
 //// object which contains the common functionality across all Widgets.
 pub trait WidgetKind<'a> {
-    fn super_draw_text_mode(&self, _widget: &Widget<'a>) {
-        // TODO verify the state of the widget in the tree somehow
-    }
+    fn draw_text_mode(&self, _renderer: &mut TextRenderer, _widget: &Widget<'a>) { }
 
-    fn draw_text_mode(&self, _renderer: &mut TextRenderer, widget: &Widget<'a>) {
-        self.super_draw_text_mode(widget);
-    }
-
-    fn layout(&self, _widget: &Widget<'a>, _parent: &Widget<'a>) {
-
+    fn layout(&self, widget: &mut Widget<'a>) {
+        widget.do_base_layout();
     }
 
     fn get_name(&self) -> &str;

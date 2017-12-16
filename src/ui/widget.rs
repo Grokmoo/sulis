@@ -1,12 +1,14 @@
+use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 use std::cell::RefCell;
+use std::cmp;
 
 use uuid::Uuid;
 
 use state::GameState;
 use io::{Event, TextRenderer};
-use ui::{Border, Size, WidgetState, WidgetKind};
-use resource::{ResourceSet, Point};
+use ui::{Size, Theme, WidgetState, WidgetKind};
+use resource::ResourceSet;
 
 pub struct Widget<'a> {
     pub state: WidgetState,
@@ -16,6 +18,9 @@ pub struct Widget<'a> {
     modal_child: Option<Rc<RefCell<Widget<'a>>>>,
     parent: Option<Rc<RefCell<Widget<'a>>>>,
     needs_layout: bool,
+    pub (in ui) theme: Option<Rc<Theme>>,
+    theme_id: String,
+    theme_subname: String,
 }
 
 thread_local! {
@@ -38,6 +43,10 @@ impl<'a> Widget<'a> {
         for child in self.children.iter() {
             child.borrow().draw_text_mode(renderer);
         }
+    }
+
+    pub fn set_theme_name(&mut self, name: &str) {
+        self.theme_subname = name.to_string();
     }
 
     pub fn mark_for_removal(&mut self) {
@@ -65,36 +74,100 @@ impl<'a> Widget<'a> {
         }
     }
 
-    fn layout_children(&mut self) {
-        let len = self.children.len();
-        for i in 0..len {
-            let child = Rc::clone(self.children.get(i).unwrap());
-            child.borrow_mut().layout_widget(self);
+    pub fn do_base_layout(&mut self) {
+        self.do_self_layout();
+        self.do_children_layout();
+    }
+
+    pub fn do_self_layout(&mut self) {
+        let theme = match self.theme {
+            None => return,
+            Some(ref t) => t,
+        };
+
+        if let Some(ref bg) = theme.background {
+            self.state.set_background(ResourceSet::get_image(&bg));
+        }
+
+        self.state.set_border(theme.border.clone());
+
+        if let Some(ref text) = theme.text {
+            self.state.set_text(text);
         }
     }
 
-    fn layout_widget(&mut self, parent: &Widget<'a>) {
+    pub fn do_children_layout(&self) {
+        for child in self.children.iter() {
+            let theme = match child.borrow().theme {
+                None => continue,
+                Some(ref t) => Rc::clone(t),
+            };
+
+            let (w, h) = {
+                use ui::theme::SizeRelative::*;
+                (match theme.width_relative {
+                    Zero => theme.preferred_size.width,
+                    Max => self.state.inner_size.width + theme.preferred_size.width,
+                },
+                match theme.height_relative {
+                    Zero => theme.preferred_size.height,
+                    Max => self.state.inner_size.height + theme.preferred_size.height,
+                })
+            };
+
+            let width = cmp::min(self.state.inner_size.width, w);
+            let height = cmp::min(self.state.inner_size.height, h);
+            child.borrow_mut().state.set_size(Size::new(width, height));
+
+            use ui::theme::PositionRelative::*;
+            let x = match theme.x_relative {
+                Zero => self.state.inner_left(),
+                Center => (self.state.inner_left() + self.state.inner_right() -
+                           width) / 2,
+                Max => self.state.inner_right() - width,
+            };
+            let y = match theme.y_relative {
+                Zero => self.state.inner_top(),
+                Center => (self.state.inner_top() + self.state.inner_bottom() -
+                           height) / 2,
+                Max => self.state.inner_bottom() - height,
+            };
+
+            child.borrow_mut().state.set_position(
+                x + theme.position.x, y + theme.position.y);
+        }
+    }
+
+    fn layout_widget(&mut self) {
         if self.needs_layout {
-            trace!("Performing layout on widget {:?}", self.kind.get_name());
-            self.kind.layout(self, parent);
+            trace!("Performing layout on widget {} with size {:?} at {:?}",
+                   self.theme_id, self.state.size, self.state.position);
+            let kind = Rc::clone(&self.kind);
+            kind.layout(self);
             self.needs_layout = false;
         }
 
-        self.layout_children();
+        let len = self.children.len();
+        for i in 0..len {
+            let child = Rc::clone(self.children.get(i).unwrap());
+            child.borrow_mut().layout_widget();
+        }
     }
 }
 
 impl<'a> Widget<'a> {
-    fn new(kind: Rc<WidgetKind<'a> + 'a>, size: Size, position: Point,
-           border: Border) -> Rc<RefCell<Widget<'a>>> {
+    fn new(kind: Rc<WidgetKind<'a> + 'a>, theme: &str) -> Rc<RefCell<Widget<'a>>> {
         let widget = Widget {
-            state: WidgetState::new(size, position, border),
+            state: WidgetState::new(),
             kind: Rc::clone(&kind),
             children: Vec::new(),
             modal_child: None,
             parent: None,
             uuid: Uuid::new_v4(),
             needs_layout: true,
+            theme: None,
+            theme_id: String::new(),
+            theme_subname: theme.to_string(),
         };
 
         let widget = Rc::new(RefCell::new(widget));
@@ -105,39 +178,23 @@ impl<'a> Widget<'a> {
     }
 
     pub fn with_defaults(widget: Rc<WidgetKind<'a> + 'a>) -> Rc<RefCell<Widget<'a>>> {
-        Widget::new(widget, Size::as_zero(), Point::as_zero(), Border::as_zero())
+        let name = widget.get_name().to_string();
+        Widget::new(widget, &name)
     }
 
-    pub fn with_size(widget: Rc<WidgetKind<'a> + 'a>,
-                     size: Size) -> Rc<RefCell<Widget<'a>>> {
-        Widget::new(widget, size, Point::as_zero(), Border::as_zero())
-    }
-
-    pub fn with_position(widget: Rc<WidgetKind<'a> + 'a>, size: Size,
-                         position: Point) -> Rc<RefCell<Widget<'a>>> {
-        Widget::new(widget, size, position, Border::as_zero())
-    }
-
-    pub fn with_border(widget: Rc<WidgetKind<'a> + 'a>, size: Size,
-                       position: Point, border: Border) -> Rc<RefCell<Widget<'a>>> {
-        Widget::new(widget, size, position, border)
+    pub fn with_theme(widget: Rc<WidgetKind<'a> + 'a>,
+                      theme: &str) -> Rc<RefCell<Widget<'a>>> {
+        Widget::new(widget, theme)
     }
 
     pub fn get_parent(widget: &Rc<RefCell<Widget<'a>>>) -> Rc<RefCell<Widget<'a>>> {
         Rc::clone(widget.borrow().parent.as_ref().unwrap())
     }
 
-    pub fn set_background(widget: &mut Rc<RefCell<Widget<'a>>>, image: &str) {
-        widget.borrow_mut().state.set_background(ResourceSet::get_image(image));
-    }
-
-    pub fn set_text(widget: &mut Rc<RefCell<Widget<'a>>>, text: &str) {
-        widget.borrow_mut().state.set_text(text);
-    }
-
     pub fn add_child_to(parent: &Rc<RefCell<Widget<'a>>>,
                          child: Rc<RefCell<Widget<'a>>>) {
         parent.borrow_mut().add_child(child);
+        parent.borrow_mut().needs_layout = true;
     }
 
     pub fn add_children_to(parent: &Rc<RefCell<Widget<'a>>>,
@@ -147,13 +204,15 @@ impl<'a> Widget<'a> {
         }
     }
 
-    pub fn update(root: &Rc<RefCell<Widget<'a>>>) {
-        Widget::check_children(&root);
+    pub fn update(root: &Rc<RefCell<Widget<'a>>>) -> Result<(), Error> {
+        Widget::check_children(&root)?;
 
-        root.borrow_mut().layout_children();
+        root.borrow_mut().layout_widget();
+
+        Ok(())
     }
 
-    pub fn check_children(parent: &Rc<RefCell<Widget<'a>>>) {
+    pub fn check_children(parent: &Rc<RefCell<Widget<'a>>>) -> Result<(), Error> {
         let mut remove_modal = false;
         if let Some(ref w) = parent.borrow().modal_child {
             MARKED_FOR_REMOVAL.with(|list| {
@@ -174,27 +233,56 @@ impl<'a> Widget<'a> {
             })
         });
 
+        // set up theme
+        if parent.borrow().theme.is_none() {
+            let parent_parent = Widget::get_parent(parent);
+
+            let parent_parent_theme = match parent_parent.borrow().theme {
+                None => return Err(Error::new(ErrorKind::InvalidData,
+                    format!("No theme exists for {}", parent_parent.borrow().kind.get_name()))),
+                Some(ref t) => Rc::clone(&t),
+            };
+
+            let mut parent = parent.borrow_mut();
+            let parent_name = parent.theme_subname.clone();
+            parent.theme_id = format!("{}.{}", &parent_parent.borrow().theme_id,
+                parent_name);
+            let parent_theme = parent_parent_theme.children.get(&parent_name);
+
+            parent.theme = Some(match parent_theme {
+                None => return Err(Error::new(ErrorKind::InvalidData,
+                            format!("No theme exists for {}", parent.theme_id))),
+                Some(ref t) => Rc::clone(&t),
+            });
+
+            trace!("Got theme for {:?}", parent.theme_id);
+        }
+
+        // set up parent references
         let len = parent.borrow().children.len();
         for i in 0..len {
-            {
-                let parent = parent.borrow();
-                if parent.children.get(i).unwrap().borrow().parent.is_some() {
-                    continue;
-                }
-            }
+            let setup_parent = {
+                let children = &parent.borrow().children;
+                let child_parent = &children.get(i).unwrap().borrow().parent;
+                child_parent.is_none()
+            };
+
 
             let child = Rc::clone(parent.borrow().children.get(i).unwrap());
+            if setup_parent {
+                child.borrow_mut().parent = Some(Rc::clone(parent));
+            }
 
-            child.borrow_mut().parent = Some(Rc::clone(parent));
-
-            Widget::check_children(&child);
+            Widget::check_children(&child)?;
         }
+
+        Ok(())
     }
 
     pub fn dispatch_event(widget: &Rc<RefCell<Widget<'a>>>,
                           state: &mut GameState, event: Event) -> bool {
         trace!("Dispatching event {:?} in {:?}", event,
-               widget.borrow().kind.get_name());
+               widget.borrow().theme_id);
 
         // precompute has modal so we don't have the widget borrowed
         // for the dispatch below

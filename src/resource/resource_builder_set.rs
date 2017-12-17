@@ -1,8 +1,5 @@
 use resource::size::SizeBuilder;
-use resource::Game;
-use resource::TileBuilder;
-use resource::ActorBuilder;
-use resource::ResourceBuilder;
+use resource::{Game, TileBuilder, ActorBuilder, ResourceBuilder, ItemBuilder};
 use resource::area::AreaBuilder;
 use resource::image::SimpleImage;
 use resource::image::composed_image::ComposedImageBuilder;
@@ -13,6 +10,7 @@ use std::collections::HashMap;
 use std::fs::{self, File};
 use std::io::{Read, Error};
 use std::ffi::OsStr;
+use std::path::PathBuf;
 
 #[derive(Debug)]
 pub struct ResourceBuilderSet {
@@ -22,6 +20,7 @@ pub struct ResourceBuilderSet {
     pub area_builders: HashMap<String, AreaBuilder>,
     pub tile_builders: HashMap<String, TileBuilder>,
     pub actor_builders: HashMap<String, ActorBuilder>,
+    pub item_builders: HashMap<String, ItemBuilder>,
     pub simple_images: HashMap<String, SimpleImage>,
     pub composed_builders: HashMap<String, ComposedImageBuilder>,
     pub animated_builders: HashMap<String, AnimatedImageBuilder>,
@@ -52,13 +51,14 @@ impl ResourceBuilderSet {
         Ok(ResourceBuilderSet {
             game,
             theme_builder,
-            size_builders: read_resources(&format!("{}/sizes/", root)),
-            tile_builders: read_resources(&format!("{}/tiles/", root)),
-            actor_builders: read_resources(&format!("{}/actors/", root)),
-            area_builders: read_resources(&format!("{}/areas/", root)),
-            simple_images: read_resources(&format!("{}/images/simple/", root)),
-            composed_builders: read_resources(&format!("{}/images/composed/", root)),
-            animated_builders: read_resources(&format!("{}/images/animated/", root)),
+            size_builders: read(root, "sizes"),
+            tile_builders: read(root, "tiles"),
+            actor_builders: read(root, "actors"),
+            item_builders: read(root, "items"),
+            area_builders: read(root, "areas"),
+            simple_images: read(root, "images"),
+            composed_builders: read(root, "composed_images"),
+            animated_builders: read(root, "animated_images"),
         })
     }
 
@@ -81,15 +81,23 @@ impl ResourceBuilderSet {
     }
 }
 
-fn read_resources<T: ResourceBuilder>(dir: &str) -> HashMap<String, T> {
-    debug!("Reading resources from {}", dir);
+fn read<T: ResourceBuilder>(root: &str, dir: &str) -> HashMap<String, T> {
     let mut resources: HashMap<String, T> = HashMap::new();
-    let dir_entries = fs::read_dir(dir);
-    let dir_entries = match dir_entries {
+
+    read_recursive([root, dir].iter().collect(), &mut resources);
+
+    resources
+}
+
+fn read_recursive<T: ResourceBuilder>(dir: PathBuf, resources: &mut HashMap<String, T>) {
+    let dir_str = dir.to_string_lossy().to_string();
+    debug!("Reading resources from {}", dir_str);
+
+    let dir_entries = match fs::read_dir(dir) {
         Ok(entries) => entries,
         Err(_) => {
-            warn!("Unable to read directory: {}", dir);
-            return resources;
+            warn!("Unable to read directory: {}", dir_str);
+            return;
         }
     };
 
@@ -104,55 +112,55 @@ fn read_resources<T: ResourceBuilder>(dir: &str) -> HashMap<String, T> {
         };
 
         let path = entry.path();
-        let path2 = path.clone();
-        let extension: &str = match path2.extension() {
-            Some(ext) => match OsStr::to_str(ext) {
-                Some(str) => str,
-                None => ""
-            },
-            None => ""
-        };
-        if path.is_file() && extension == "json" {
-            let path_str = path.to_string_lossy().into_owned();
-            debug!("Reading file at {}", path_str);
-            let f = File::open(path);
-            let mut f = match f {
-                Ok(file) => file,
-                Err(error) => {
-                    warn!("Error reading file: {}", error);
-                    continue;
-                }
-            };
 
-            let mut file_data = String::new();
-            if f.read_to_string(&mut file_data).is_err() {
-                warn!("Error reading file data from file");
-                continue;
+        if path.is_dir() {
+            read_recursive(path, resources);
+        } else {
+            let extension: String = OsStr::to_str(path.extension().
+                unwrap_or(OsStr::new(""))).unwrap_or("").to_string();
+
+            if path.is_file() && extension == "json" {
+                read_file(path, resources);
             }
-            trace!("Read file data.");
-
-            let resource = T::new(&file_data);
-            let resource = match resource {
-                Ok(a) => a,
-                Err(error) => {
-                    warn!("Error parsing file data: {:?}", path_str);
-                    warn!("  {}", error);
-                    continue;
-                }
-            };
-
-            let id = resource.owned_id();
-
-            trace!("Created resource '{}'", id);
-            if resources.contains_key(&id) {
-                warn!("Duplicate resource key: {} in {}", id, dir);
-                continue;
-            }
-
-            trace!("Inserted resource.");
-            resources.insert(id, resource);
         }
     }
+}
 
-    resources
+fn read_file<T: ResourceBuilder>(path: PathBuf, resources: &mut HashMap<String, T>) {
+    let path_str = path.to_string_lossy().to_string();
+    debug!("Reading file at {}", path_str);
+    let mut file = match File::open(path) {
+        Ok(file) => file,
+        Err(error) => {
+            warn!("Error reading file: {}", error);
+            return;
+        }
+    };
+
+    let mut file_data = String::new();
+    if file.read_to_string(&mut file_data).is_err() {
+        warn!("Error reading file data from file {}", path_str);
+        return;
+    }
+    trace!("Read file data.");
+
+    let resource = match T::new(&file_data) {
+        Ok(a) => a,
+        Err(error) => {
+            warn!("Error parsing file data: {:?}", path_str);
+            warn!("  {}", error);
+            return;
+        }
+    };
+
+    let id = resource.owned_id();
+
+    trace!("Created resource '{}'", id);
+    if resources.contains_key(&id) {
+        //warn!("Duplicate resource key: {} in {}", id, dir);
+        return;
+    }
+
+    trace!("Inserted resource.");
+    resources.insert(id, resource);
 }

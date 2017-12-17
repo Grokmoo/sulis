@@ -16,6 +16,9 @@ pub use self::tile::Tile;
 mod actor;
 pub use self::actor::Actor;
 
+mod item;
+pub use self::item::Item;
+
 mod size;
 pub use self::size::Size;
 pub use self::size::SizeIterator;
@@ -38,6 +41,7 @@ use std::hash::Hash;
 use resource::actor::ActorBuilder;
 use resource::area::AreaBuilder;
 use resource::tile::TileBuilder;
+use resource::item::ItemBuilder;
 use resource::resource_builder_set::ResourceBuilderSet;
 use resource::image::{AnimatedImage, ComposedImage};
 
@@ -51,6 +55,7 @@ pub struct ResourceSet {
     areas: HashMap<String, Rc<Area>>,
     tiles: HashMap<String, Rc<Tile>>,
     actors: HashMap<String, Rc<Actor>>,
+    items: HashMap<String, Rc<Item>>,
     sizes: HashMap<usize, Rc<Size>>,
     images: HashMap<String, Rc<Image>>,
 }
@@ -71,6 +76,7 @@ impl ResourceSet {
             actors: HashMap::new(),
             sizes: HashMap::new(),
             images: HashMap::new(),
+            items: HashMap::new(),
         }
     }
 
@@ -108,6 +114,11 @@ impl ResourceSet {
             for (id, builder) in builder_set.tile_builders {
                 insert_if_ok("tile", id, Tile::new(builder),
                     &mut resource_set.tiles);
+            }
+
+            for (id, builder) in builder_set.item_builders.into_iter() {
+                insert_if_ok("item", id, Item::new(builder, &resource_set.images),
+                    &mut resource_set.items);
             }
 
             for (id, builder) in builder_set.actor_builders.into_iter() {

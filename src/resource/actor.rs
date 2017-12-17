@@ -32,8 +32,6 @@ impl Actor {
             Some(size) => Rc::clone(size)
         };
 
-
-
         Ok(Actor {
             id: builder.id,
             player: builder.player,

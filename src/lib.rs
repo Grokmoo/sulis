@@ -26,3 +26,5 @@ pub mod config;
 pub mod animation;
 
 pub mod ui;
+
+pub mod view;

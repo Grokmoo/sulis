@@ -58,6 +58,27 @@
                     "y_relative": "Max"
                 }
             }
+        },
+        "inventory_window": {
+            "background": "background",
+            "border": [1, 1, 1, 1],
+            "preferred_size": [30, 0],
+            "height_relative": "Max",
+            "x_relative": "Center",
+            "children": {
+                "title": {
+                    "text": "Inventory",
+                    "width_relative": "Max",
+                    "preferred_size": [0, 1]
+                },
+                "close": {
+                    "text": "X",
+                    "background": "background",
+                    "preferred_size": [3, 3],
+                    "position": [1, -1],
+                    "x_relative": "Max"
+                }
+            }
         }
     }
 }

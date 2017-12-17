@@ -6,6 +6,8 @@ display:
     # Note that the indentation must be consistent for all values!
     #adapter: Pancurses
     adapter: Termion
+
+    # display character for the mouse cursor
     cursor_char: "█"
 
     # screen dimensions in characters
@@ -35,6 +37,7 @@ input:
         KeyD: MoveCursorRight
         KeySpace: MoveToCursor
         KeyQ: Exit
+        KeyI: ToggleInventory
 
 logging:
     # Log level may be error, warn, info, debug, or trace
@@ -43,7 +46,7 @@ logging:
     log_level: trace
 
     # If set to true, log files are generated with a timestamp,
-    # Meaning each run of the game will generate a unique filename.
-    # If false, each run will simply overwrite the previous.
+    # Meaning each run of the game will generate a unique log filename.
+    # If false, each run will simply overwrite the previous log file.
     use_timestamps: false
 ...

@@ -5,6 +5,7 @@ use state::GameState;
 use ui::{Window, Widget};
 use io::event::Kind;
 use io::Event;
+use view::InventoryWindow;
 
 #[derive(Debug, Deserialize, Copy, Clone)]
 pub enum InputAction {
@@ -17,6 +18,7 @@ pub enum InputAction {
     MoveCursorLeft,
     MoveCursorRight,
     MoveToCursor,
+    ToggleInventory,
     Exit,
 }
 
@@ -40,7 +42,12 @@ impl InputAction {
                     Widget::add_children_to(&root, exit_window);
                     true
                 }
-            }
+            },
+            ToggleInventory => {
+                let window = Widget::with_defaults(InventoryWindow::new());
+                Widget::add_child_to(&root, window);
+                true
+            },
             _ => {
                 let event = Event::new(Kind::KeyPress(action),
                                        game_state.cursor.x, game_state.cursor.y);

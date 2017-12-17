@@ -1,9 +1,9 @@
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
-use std::collections::HashMap;
 
-use resource::ResourceBuilder;
+use resource::{ResourceBuilder, ResourceSet};
 use resource::Size;
+use resource::Item;
 
 use serde_json;
 
@@ -12,6 +12,7 @@ pub struct Actor {
     pub player: bool,
     pub display: char,
     pub default_size: Rc<Size>,
+    pub items: Vec<Rc<Item>>,
 }
 
 impl PartialEq for Actor {
@@ -21,22 +22,39 @@ impl PartialEq for Actor {
 }
 
 impl Actor {
-    pub fn new(builder: ActorBuilder, sizes: &HashMap<usize, Rc<Size>>) -> Result<Actor, Error> {
+    pub fn new(builder: ActorBuilder, resources: &ResourceSet) -> Result<Actor, Error> {
 
-        let default_size = match sizes.get(&builder.default_size) {
+        let default_size = match resources.sizes.get(&builder.default_size) {
             None => {
                 warn!("No match found for size '{}'", builder.default_size);
                 return Err(Error::new(ErrorKind::InvalidData,
-                                      format!("Unable to create actor '{}'", builder.id)));
+                    format!("Unable to create actor '{}'", builder.id)));
             },
             Some(size) => Rc::clone(size)
         };
 
+
+        let mut items: Vec<Rc<Item>> = Vec::new();
+        if let Some(builder_items) = builder.items {
+            for item_id in builder_items {
+                let item = match resources.items.get(&item_id) {
+                    None => {
+                        warn!("No match found for item ID '{}'", item_id);
+                        return Err(Error::new(ErrorKind::InvalidData,
+                             format!("Unable to create actor '{}'", builder.id)));
+                    },
+                    Some(item) => Rc::clone(item)
+                };
+                items.push(item);
+            }
+        }
+
         Ok(Actor {
             id: builder.id,
-            player: builder.player,
+            player: builder.player.unwrap_or(false),
             display: builder.display,
             default_size: default_size,
+            items,
         })
     }
 }
@@ -44,9 +62,10 @@ impl Actor {
 #[derive(Deserialize, Debug)]
 pub struct ActorBuilder {
     pub id: String,
-    pub player: bool,
+    pub player: Option<bool>,
     pub display: char,
     pub default_size: usize,
+    pub items: Option<Vec<String>>,
 }
 
 impl ResourceBuilder for ActorBuilder {

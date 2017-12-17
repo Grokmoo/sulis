@@ -122,7 +122,7 @@ impl ResourceSet {
             }
 
             for (id, builder) in builder_set.actor_builders.into_iter() {
-                insert_if_ok("actor", id, Actor::new(builder, &resource_set.sizes),
+                insert_if_ok("actor", id, Actor::new(builder, &resource_set),
                     &mut resource_set.actors);
             }
 

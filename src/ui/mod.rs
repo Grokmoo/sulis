@@ -65,7 +65,7 @@ fn setup_widgets<'a>(area_state: Rc<RefCell<AreaState<'a>>>) ->
     let right_pane = Widget::with_theme(EmptyWidget::new(), "right_pane");
     {
         let button = Widget::with_theme(
-            Button::new(Box::new(|_w, _s| trace!("Hello world"))),
+            Button::new(Box::new(|_w, _s| info!("Hello world"))),
             "test_button");
 
         let area_title = Widget::with_theme(

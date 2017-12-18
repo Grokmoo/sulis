@@ -4,7 +4,7 @@ use resource::area::AreaBuilder;
 use resource::image::SimpleImage;
 use resource::image::composed_image::ComposedImageBuilder;
 use resource::image::animated_image::AnimatedImageBuilder;
-use ui::theme::ThemeBuilder;
+use ui::theme::{ThemeBuilder, create_theme};
 
 use std::collections::HashMap;
 use std::fs::{self, File};
@@ -38,15 +38,18 @@ impl ResourceBuilderSet {
             }
         };
 
-        let theme_filename = root.to_owned() + "/theme.json";
+        let theme_filename = root.to_owned() + "/theme/theme.json";
         debug!("Reading theme from {}", theme_filename);
-        let theme_builder = match ResourceBuilderSet::create_theme(&theme_filename) {
+        let mut theme_builder = match create_theme(
+            &format!("{}/theme/", root.to_owned()), "theme.json") {
             Ok(t) => t,
             Err(e) => {
                 error!("Unable to load theme from {}", theme_filename);
                 return Err(e);
             }
         };
+
+        theme_builder.expand_references();
 
         Ok(ResourceBuilderSet {
             game,
@@ -69,15 +72,6 @@ impl ResourceBuilderSet {
         let game = Game::new(&file_data)?;
 
         Ok(game)
-    }
-
-    pub fn create_theme(filename: &str) -> Result<ThemeBuilder, Error> {
-        let mut f = File::open(filename)?;
-        let mut file_data = String::new();
-        f.read_to_string(&mut file_data)?;
-        let theme = ThemeBuilder::new(&file_data)?;
-
-        Ok(theme)
     }
 }
 

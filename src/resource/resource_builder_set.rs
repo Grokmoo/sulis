@@ -1,6 +1,5 @@
+use resource::*;
 use resource::size::SizeBuilder;
-use resource::{BuilderType, Game, TileBuilder, ActorBuilder, ResourceBuilder, ItemBuilder};
-use resource::area::AreaBuilder;
 use resource::image::SimpleImage;
 use resource::image::composed_image::ComposedImageBuilder;
 use resource::image::animated_image::AnimatedImageBuilder;
@@ -24,6 +23,7 @@ pub struct ResourceBuilderSet {
     pub simple_images: HashMap<String, SimpleImage>,
     pub composed_builders: HashMap<String, ComposedImageBuilder>,
     pub animated_builders: HashMap<String, AnimatedImageBuilder>,
+    pub item_adjectives: HashMap<String, ItemAdjective>,
 }
 
 impl ResourceBuilderSet {
@@ -63,6 +63,7 @@ impl ResourceBuilderSet {
             simple_images: read(root, "images"),
             composed_builders: read(root, "composed_images"),
             animated_builders: read(root, "animated_images"),
+            item_adjectives: read(root, "item_adjectives"),
         })
     }
 

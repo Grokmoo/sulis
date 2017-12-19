@@ -19,6 +19,9 @@ pub use self::actor::Actor;
 mod item;
 pub use self::item::Item;
 
+mod item_adjective;
+pub use self::item_adjective::ItemAdjective;
+
 mod size;
 pub use self::size::Size;
 pub use self::size::SizeIterator;
@@ -61,6 +64,7 @@ pub struct ResourceSet {
     areas: HashMap<String, Rc<Area>>,
     tiles: HashMap<String, Rc<Tile>>,
     actors: HashMap<String, Rc<Actor>>,
+    item_adjectives: HashMap<String, Rc<ItemAdjective>>,
     items: HashMap<String, Rc<Item>>,
     sizes: HashMap<usize, Rc<Size>>,
     images: HashMap<String, Rc<Image>>,
@@ -85,6 +89,7 @@ impl ResourceSet {
             sizes: HashMap::new(),
             images: HashMap::new(),
             items: HashMap::new(),
+            item_adjectives: HashMap::new(),
         }
     }
 
@@ -112,6 +117,12 @@ impl ResourceSet {
             for (id, image) in builder_set.animated_builders {
                 insert_if_ok_boxed("image", id, AnimatedImage::new(image,
                     &resource_set.images), &mut resource_set.images);
+            }
+
+            for (id, adj) in builder_set.item_adjectives {
+                trace!("Inserting resource of type item_adjective with key {} \
+                    into resource set.", id);
+                resource_set.item_adjectives.insert(id, Rc::new(adj));
             }
 
             for (_id_str, builder) in builder_set.size_builders {

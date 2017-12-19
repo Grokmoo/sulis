@@ -2,10 +2,9 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use state::GameState;
-use ui::{Window, Widget};
+use ui::Widget;
 use io::event::Kind;
 use io::Event;
-use view::InventoryWindow;
 
 #[derive(Debug, Deserialize, Copy, Clone)]
 pub enum InputAction {
@@ -34,20 +33,6 @@ impl InputAction {
             MoveCursorLeft => game_state.cursor_move_by(root, -1, 0),
             MoveCursorRight => game_state.cursor_move_by(root, 1, 0),
             MoveToCursor => game_state.cursor_click(root),
-            Exit => {
-                if root.borrow().has_modal() {
-                    false
-                } else {
-                    let exit_window = build_exit_window();
-                    Widget::add_children_to(&root, exit_window);
-                    true
-                }
-            },
-            ToggleInventory => {
-                let window = Widget::with_defaults(InventoryWindow::new());
-                Widget::add_child_to(&root, window);
-                true
-            },
             _ => {
                 let event = Event::new(Kind::KeyPress(action),
                                        game_state.cursor.x, game_state.cursor.y);
@@ -55,11 +40,4 @@ impl InputAction {
             },
         };
     }
-}
-
-fn build_exit_window<'a>() -> Vec<Rc<RefCell<Widget<'a>>>> {
-    let window = Widget::with_theme(Window::new(), "exit_window");
-    window.borrow_mut().state.set_modal(true);
-
-    vec![window]
 }

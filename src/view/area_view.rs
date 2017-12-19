@@ -8,15 +8,15 @@ use io::{InputAction, TextRenderer};
 use io::event::ClickKind;
 use resource::Point;
 
-pub struct AreaWidget<'a> {
+pub struct AreaView<'a> {
     area_state: Rc<RefCell<AreaState<'a>>>,
     mouse_over: Rc<RefCell<Widget<'a>>>,
 }
 
-impl<'a> AreaWidget<'a> {
+impl<'a> AreaView<'a> {
     pub fn new(area_state: &Rc<RefCell<AreaState<'a>>>,
-               mouse_over: Rc<RefCell<Widget<'a>>>) -> Rc<AreaWidget<'a>> {
-        Rc::new(AreaWidget {
+               mouse_over: Rc<RefCell<Widget<'a>>>) -> Rc<AreaView<'a>> {
+        Rc::new(AreaView {
             area_state: Rc::clone(area_state),
             mouse_over: mouse_over,
         })
@@ -24,7 +24,7 @@ impl<'a> AreaWidget<'a> {
 
 }
 
-impl<'a> WidgetKind<'a> for AreaWidget<'a> {
+impl<'a> WidgetKind<'a> for AreaView<'a> {
     fn get_name(&self) -> &str {
         "area"
     }
@@ -35,19 +35,6 @@ impl<'a> WidgetKind<'a> for AreaWidget<'a> {
         widget.borrow_mut().state.set_max_scroll_pos(width, height);
 
         Vec::with_capacity(0)
-    }
-
-    fn layout(&self, widget: &mut Widget<'a>) {
-        widget.do_base_layout();
-
-        // let width = cmp::min(parent.state.inner_size.width - 20,
-        //                      self.area_state.borrow().area.width);
-        // let height = cmp::min(parent.state.inner_size.height - 1,
-        //                       self.area_state.borrow().area.height);
-        //
-        // widget.state.set_size(Size::new(width, height));
-        // widget.state.set_position(parent.state.inner_position.x,
-        //                           parent.state.inner_position.y + 1);
     }
 
     fn draw_text_mode(&self, renderer: &mut TextRenderer, widget: &Widget<'a>) {
@@ -80,7 +67,7 @@ impl<'a> WidgetKind<'a> for AreaWidget<'a> {
            ScrollDown => widget.borrow_mut().state.scroll(0, 1),
            ScrollLeft => widget.borrow_mut().state.scroll(-1, 0),
            ScrollRight => widget.borrow_mut().state.scroll(1, 0),
-           _ => false,
+           _ => return false,
         };
         true
     }

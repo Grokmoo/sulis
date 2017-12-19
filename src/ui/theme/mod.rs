@@ -1,12 +1,14 @@
 use std::fs::File;
-use std::io::{Read, Error};
+use std::io::{Read, Error, ErrorKind};
 use std::rc::Rc;
 use std::collections::HashMap;
 
+use resource::BuilderType;
 use resource::Point;
 use ui::{Border, Size};
 
 use serde_json;
+use serde_yaml;
 
 #[derive(Deserialize, Debug, Clone)]
 pub enum PositionRelative {
@@ -175,8 +177,18 @@ impl ThemeBuilder {
         None
     }
 
-    fn new(dir: &str, data: &str) -> Result<ThemeBuilder, Error> {
-        let mut theme: ThemeBuilder = serde_json::from_str(data)?;
+    fn new(dir: &str, data: &str, builder_type: BuilderType) -> Result<ThemeBuilder, Error> {
+        let mut theme = if builder_type == BuilderType::JSON {
+            serde_json::from_str(data)?
+        } else if builder_type == BuilderType::YAML {
+            let resource: Result<ThemeBuilder, serde_yaml::Error> = serde_yaml::from_str(data);
+            match resource {
+                Ok(resource) => resource,
+                Err(error) => return Err(Error::new(ErrorKind::InvalidData, format!("{}", error))),
+            }
+        } else {
+            return Err(Error::new(ErrorKind::InvalidInput, "format not supported"))
+        };
 
         if let None = theme.children {
             theme.children = Some(HashMap::new())
@@ -211,10 +223,21 @@ impl ThemeBuilder {
 }
 
 pub fn create_theme(dir: &str, filename: &str) -> Result<ThemeBuilder, Error> {
-    let mut f = File::open(format!("{}{}", dir, filename))?;
+    let mut builder_type = BuilderType::JSON;
+    let mut file = File::open(format!("{}{}.json", dir, filename));
+    if file.is_err() {
+        file = File::open(format!("{}{}.yml", dir, filename));
+        builder_type = BuilderType::YAML;
+    }
+
+    if file.is_err() {
+        return Err(Error::new(ErrorKind::NotFound,
+            format!("Unable to locate '{}.json' or '{}.yml'", filename, filename)));
+    }
+
     let mut file_data = String::new();
-    f.read_to_string(&mut file_data)?;
-    let theme = ThemeBuilder::new(dir, &file_data)?;
+    file.unwrap().read_to_string(&mut file_data)?;
+    let theme = ThemeBuilder::new(dir, &file_data, builder_type)?;
 
     Ok(theme)
 }

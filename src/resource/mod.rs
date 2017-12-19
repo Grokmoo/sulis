@@ -49,6 +49,12 @@ thread_local! {
     static RESOURCE_SET: RefCell<ResourceSet> = RefCell::new(ResourceSet::new());
 }
 
+#[derive(Debug, PartialEq)]
+pub enum BuilderType {
+    JSON,
+    YAML,
+}
+
 pub struct ResourceSet {
     game: Option<Rc<Game>>,
     theme: Option<Rc<Theme>>,
@@ -63,7 +69,9 @@ pub struct ResourceSet {
 pub trait ResourceBuilder where Self: Sized {
     fn owned_id(& self) -> String;
 
-    fn new(data: &str) -> Result<Self, Error>;
+    fn from_json(data: &str) -> Result<Self, Error>;
+
+    fn from_yaml(data: &str) -> Result<Self, Error>;
 }
 
 impl ResourceSet {

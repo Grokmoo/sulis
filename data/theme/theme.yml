@@ -1,0 +1,68 @@
+include:
+  - widgets
+background: background
+border: [1, 1, 1, 1]
+children:
+  right_pane:
+    border: [0, 0, 1, 1]
+    preferred_size: [20, 0]
+    x_relative: Max
+    height_relative: Max
+    children:
+      mouse_over:
+        preferred_size: [10, 1]
+        position: [0, 1]
+      title:
+        preferred_size: [18, 1]
+        position: [0, 0]
+      test_button:
+        from: .button
+        text: "Test"
+        preferred_size: [18, 3]
+        position: [0, 2]
+  area:
+    preferred_size: [-20, 0]
+    width_relative: Max
+    height_relative: Max
+  exit_window:
+    background: background
+    border: [1, 1, 1, 1]
+    preferred_size: [25, 6]
+    x_relative: Center
+    y_relative: Center
+    children:
+      title:
+        text: "Exit Game?"
+        width_relative: Max
+        preferred_size: [0, 1]
+        preferred_position: [0, 0]
+      cancel:
+        from: .button
+        text: "Cancel"
+        preferred_size: [10, 3]
+        preferred_position: [0, 2]
+        x_relative: Max
+        y_relative: Max
+      quit:
+        from: .button
+        text: "Exit"
+        preferred_size: [10, 3]
+        preferred_position: [0, 2]
+        y_relative: Max
+  inventory_window:
+    background: background
+    border: [1, 1, 1, 1]
+    preferred_size: [30, 0]
+    height_relative: Max
+    x_relative: Center
+    children:
+      title:
+        text: "Inventory"
+        width_relative: Max
+        preferred_size: [0, 1]
+      close:
+        from: .button
+        text: "X"
+        preferred_size: [3, 3]
+        position: [1, -1]
+        x_relative: Max

@@ -6,6 +6,7 @@ use resource::Size;
 use resource::Item;
 
 use serde_json;
+use serde_yaml;
 
 pub struct Actor {
     pub id: String,
@@ -73,8 +74,18 @@ impl ResourceBuilder for ActorBuilder {
         self.id.to_owned()
     }
 
-    fn new(data: &str) -> Result<ActorBuilder, Error> {
-        let actor: ActorBuilder = serde_json::from_str(data)?;
-        Ok(actor)
+    fn from_json(data: &str) -> Result<ActorBuilder, Error> {
+        let resource: ActorBuilder = serde_json::from_str(data)?;
+
+        Ok(resource)
+    }
+
+    fn from_yaml(data: &str) -> Result<ActorBuilder, Error> {
+        let resource: Result<ActorBuilder, serde_yaml::Error> = serde_yaml::from_str(data);
+
+        match resource {
+            Ok(resource) => Ok(resource),
+            Err(error) => Err(Error::new(ErrorKind::InvalidData, format!("{}", error)))
+        }
     }
 }

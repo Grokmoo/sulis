@@ -2,7 +2,7 @@ mod path_finder_grid;
 use self::path_finder_grid::PathFinderGrid;
 
 use std::collections::HashMap;
-use std::io::Error;
+use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 
 use resource::ResourceBuilder;
@@ -11,6 +11,7 @@ use resource::Terrain;
 use resource::Size;
 
 use serde_json;
+use serde_yaml;
 
 pub struct Area {
     pub id: String,
@@ -84,9 +85,18 @@ impl ResourceBuilder for AreaBuilder {
         self.id.to_owned()
     }
 
-    fn new(data: &str) -> Result<AreaBuilder, Error> {
-        let builder: AreaBuilder = serde_json::from_str(data)?;
+    fn from_json(data: &str) -> Result<AreaBuilder, Error> {
+        let resource: AreaBuilder = serde_json::from_str(data)?;
 
-        Ok(builder)
+        Ok(resource)
+    }
+
+    fn from_yaml(data: &str) -> Result<AreaBuilder, Error> {
+        let resource: Result<AreaBuilder, serde_yaml::Error> = serde_yaml::from_str(data);
+
+        match resource {
+            Ok(resource) => Ok(resource),
+            Err(error) => Err(Error::new(ErrorKind::InvalidData, format!("{}", error)))
+        }
     }
 }

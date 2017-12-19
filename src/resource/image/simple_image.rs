@@ -5,6 +5,7 @@ use io::TextRenderer;
 use ui::Size;
 
 use serde_json;
+use serde_yaml;
 
 #[derive(Deserialize, Debug)]
 pub struct SimpleImage {
@@ -13,24 +14,38 @@ pub struct SimpleImage {
     size: Size,
 }
 
+impl SimpleImage {
+    fn validate(resource: SimpleImage) -> Result<SimpleImage, Error> {
+        if resource.text_display.len() == 0 {
+            return Ok(resource);
+        }
+
+        if resource.text_display.len() != (resource.size.product()) as usize {
+            return Err(Error::new(ErrorKind::InvalidData,
+                format!("SimpleImage text display must be length*width characters.")));
+        }
+
+        Ok(resource)
+    }
+}
+
 impl ResourceBuilder for SimpleImage {
     fn owned_id(&self) -> String {
         self.id.to_string()
     }
 
-    fn new(data: &str) -> Result<SimpleImage, Error> {
-        let image: SimpleImage = serde_json::from_str(data)?;
+    fn from_json(data: &str) -> Result<SimpleImage, Error> {
+        let resource: SimpleImage = serde_json::from_str(data)?;
+        SimpleImage::validate(resource)
+    }
 
-        if image.text_display.len() == 0 {
-            return Ok(image);
+    fn from_yaml(data: &str) -> Result<SimpleImage, Error> {
+        let resource: Result<SimpleImage, serde_yaml::Error> = serde_yaml::from_str(data);
+
+        match resource {
+            Ok(resource) => SimpleImage::validate(resource),
+            Err(error) => Err(Error::new(ErrorKind::InvalidData, format!("{}", error)))
         }
-
-        if image.text_display.len() != (image.size.product()) as usize {
-            return Err(Error::new(ErrorKind::InvalidData,
-                format!("SimpleImage text display must be length*width characters.")));
-        }
-
-        Ok(image)
     }
 }
 

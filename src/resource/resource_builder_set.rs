@@ -1,5 +1,5 @@
 use resource::size::SizeBuilder;
-use resource::{Game, TileBuilder, ActorBuilder, ResourceBuilder, ItemBuilder};
+use resource::{BuilderType, Game, TileBuilder, ActorBuilder, ResourceBuilder, ItemBuilder};
 use resource::area::AreaBuilder;
 use resource::image::SimpleImage;
 use resource::image::composed_image::ComposedImageBuilder;
@@ -8,7 +8,7 @@ use ui::theme::{ThemeBuilder, create_theme};
 
 use std::collections::HashMap;
 use std::fs::{self, File};
-use std::io::{Read, Error};
+use std::io::{Read, Error, ErrorKind};
 use std::ffi::OsStr;
 use std::path::PathBuf;
 
@@ -28,8 +28,9 @@ pub struct ResourceBuilderSet {
 
 impl ResourceBuilderSet {
     pub fn new(root: &str) -> Result<ResourceBuilderSet, Error> {
-        let game_filename = root.to_owned() + "/game.json";
+        let game_filename = root.to_owned() + "/game";
         debug!("Reading top level config from {}", game_filename);
+
         let game = match ResourceBuilderSet::create_game(&game_filename) {
             Ok(g) => g,
             Err(e) => {
@@ -38,10 +39,10 @@ impl ResourceBuilderSet {
             }
         };
 
-        let theme_filename = root.to_owned() + "/theme/theme.json";
+        let theme_filename = root.to_owned() + "/theme/theme";
         debug!("Reading theme from {}", theme_filename);
         let mut theme_builder = match create_theme(
-            &format!("{}/theme/", root.to_owned()), "theme.json") {
+            &format!("{}/theme/", root.to_owned()), "theme") {
             Ok(t) => t,
             Err(e) => {
                 error!("Unable to load theme from {}", theme_filename);
@@ -66,12 +67,25 @@ impl ResourceBuilderSet {
     }
 
     pub fn create_game(filename: &str) -> Result<Game, Error> {
-        let mut f = File::open(filename)?;
-        let mut file_data = String::new();
-        f.read_to_string(&mut file_data)?;
-        let game = Game::new(&file_data)?;
+        let mut builder_type = BuilderType::JSON;
+        let mut file = File::open(format!("{}.json", filename));
+        if file.is_err() {
+            file = File::open(format!("{}.yml", filename));
+            builder_type = BuilderType::YAML;
+        }
 
-        Ok(game)
+        if file.is_err() {
+            return Err(Error::new(ErrorKind::NotFound,
+                format!("Unable to locate '{}.json' or '{}.yml'", filename, filename)));
+        }
+
+        let mut file_data = String::new();
+        file.unwrap().read_to_string(&mut file_data)?;
+
+        match builder_type {
+            BuilderType::JSON => Game::from_json(&file_data),
+            BuilderType::YAML => Game::from_yaml(&file_data),
+        }
     }
 }
 
@@ -113,14 +127,23 @@ fn read_recursive<T: ResourceBuilder>(dir: PathBuf, resources: &mut HashMap<Stri
             let extension: String = OsStr::to_str(path.extension().
                 unwrap_or(OsStr::new(""))).unwrap_or("").to_string();
 
-            if path.is_file() && extension == "json" {
-                read_file(path, resources);
+            if !path.is_file() {
+                continue;
             }
+
+            let builder_type = match extension.as_ref() {
+                "json" => BuilderType::JSON,
+                "yml" => BuilderType::YAML,
+                _ => continue,
+            };
+
+            read_file(path, resources, builder_type);
         }
     }
 }
 
-fn read_file<T: ResourceBuilder>(path: PathBuf, resources: &mut HashMap<String, T>) {
+fn read_file<T: ResourceBuilder>(path: PathBuf, resources: &mut HashMap<String, T>,
+                                 builder_type: BuilderType) {
     let path_str = path.to_string_lossy().to_string();
     debug!("Reading file at {}", path_str);
     let mut file = match File::open(path) {
@@ -138,7 +161,12 @@ fn read_file<T: ResourceBuilder>(path: PathBuf, resources: &mut HashMap<String, 
     }
     trace!("Read file data.");
 
-    let resource = match T::new(&file_data) {
+    let resource = match builder_type {
+        BuilderType::JSON => T::from_json(&file_data),
+        BuilderType::YAML => T::from_yaml(&file_data),
+    };
+
+    let resource = match resource {
         Ok(a) => a,
         Err(error) => {
             warn!("Error parsing file data: {:?}", path_str);
@@ -151,10 +179,11 @@ fn read_file<T: ResourceBuilder>(path: PathBuf, resources: &mut HashMap<String, 
 
     trace!("Created resource '{}'", id);
     if resources.contains_key(&id) {
-        //warn!("Duplicate resource key: {} in {}", id, dir);
+        warn!("Duplicate resource key: {} in {}", id, path_str);
         return;
     }
 
     trace!("Inserted resource.");
     resources.insert(id, resource);
 }
+

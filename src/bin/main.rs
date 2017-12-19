@@ -6,7 +6,6 @@ use backtrace::Backtrace;
 #[macro_use] extern crate log;
 extern crate flexi_logger;
 
-use std::error::Error;
 use std::{thread, time};
 use std::rc::Rc;
 use std::panic;
@@ -40,7 +39,7 @@ fn main() {
     match resource_set_err {
         Ok(_) => (),
         Err(e) => {
-            error!("  {}: {}", e.description(), e);
+            error!("  {}", e);
             error!("There was a fatal error loading resource set from 'data':");
             error!("Exiting...");
             ::std::process::exit(1);

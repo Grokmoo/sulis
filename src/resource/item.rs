@@ -6,6 +6,7 @@ use resource::Image;
 use resource::ResourceBuilder;
 
 use serde_json;
+use serde_yaml;
 
 pub struct Item {
     pub id: String,
@@ -48,9 +49,18 @@ impl ResourceBuilder for ItemBuilder {
         self.id.to_owned()
     }
 
-    fn new(data: &str) -> Result<ItemBuilder, Error> {
-        let item: ItemBuilder = serde_json::from_str(data)?;
+    fn from_json(data: &str) -> Result<ItemBuilder, Error> {
+        let resource: ItemBuilder = serde_json::from_str(data)?;
 
-        Ok(item)
+        Ok(resource)
+    }
+
+    fn from_yaml(data: &str) -> Result<ItemBuilder, Error> {
+        let resource: Result<ItemBuilder, serde_yaml::Error> = serde_yaml::from_str(data);
+
+        match resource {
+            Ok(resource) => Ok(resource),
+            Err(error) => Err(Error::new(ErrorKind::InvalidData, format!("{}", error)))
+        }
     }
 }

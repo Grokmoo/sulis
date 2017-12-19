@@ -1,9 +1,10 @@
-use std::io::Error;
+use std::io::{Error, ErrorKind};
 
 use resource::ResourceBuilder;
 use resource::Point;
 
 use serde_json;
+use serde_yaml;
 
 #[derive(Deserialize, Debug)]
 pub struct Game {
@@ -17,9 +18,18 @@ impl ResourceBuilder for Game {
         "Game".to_string()
     }
 
-    fn new(data: &str) -> Result<Game, Error> {
+    fn from_json(data: &str) -> Result<Game, Error> {
         let game: Game = serde_json::from_str(data)?;
 
         Ok(game)
+    }
+
+    fn from_yaml(data: &str) -> Result<Game, Error> {
+        let resource: Result<Game, serde_yaml::Error> = serde_yaml::from_str(data);
+
+        match resource {
+            Ok(resource) => Ok(resource),
+            Err(error) => Err(Error::new(ErrorKind::InvalidData, format!("{}", error)))
+        }
     }
 }

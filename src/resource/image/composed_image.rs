@@ -7,6 +7,7 @@ use io::TextRenderer;
 use ui::Size;
 
 use serde_json;
+use serde_yaml;
 
 const GRID_DIM: i32 = 3;
 const GRID_LEN: i32 = GRID_DIM * GRID_DIM;
@@ -172,9 +173,18 @@ impl ResourceBuilder for ComposedImageBuilder {
         self.id.to_owned()
     }
 
-    fn new(data: &str) -> Result<ComposedImageBuilder, Error> {
-        let image: ComposedImageBuilder = serde_json::from_str(data)?;
+    fn from_json(data: &str) -> Result<ComposedImageBuilder, Error> {
+        let resource: ComposedImageBuilder = serde_json::from_str(data)?;
 
-        Ok(image)
+        Ok(resource)
+    }
+
+    fn from_yaml(data: &str) -> Result<ComposedImageBuilder, Error> {
+        let resource: Result<ComposedImageBuilder, serde_yaml::Error> = serde_yaml::from_str(data);
+
+        match resource {
+            Ok(resource) => Ok(resource),
+            Err(error) => Err(Error::new(ErrorKind::InvalidData, format!("{}", error)))
+        }
     }
 }

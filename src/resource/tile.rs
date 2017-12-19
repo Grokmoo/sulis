@@ -4,6 +4,7 @@ use resource::Point;
 use resource::ResourceBuilder;
 
 use serde_json;
+use serde_yaml;
 
 #[derive(Debug)]
 pub struct Tile {
@@ -97,9 +98,18 @@ impl ResourceBuilder for TileBuilder {
         self.id.to_owned()
     }
 
-    fn new(data: &str) -> Result<TileBuilder, Error> {
-        let tile: TileBuilder = serde_json::from_str(data)?;
+    fn from_json(data: &str) -> Result<TileBuilder, Error> {
+        let resource: TileBuilder = serde_json::from_str(data)?;
 
-        Ok(tile)
+        Ok(resource)
+    }
+
+    fn from_yaml(data: &str) -> Result<TileBuilder, Error> {
+        let resource: Result<TileBuilder, serde_yaml::Error> = serde_yaml::from_str(data);
+
+        match resource {
+            Ok(resource) => Ok(resource),
+            Err(error) => Err(Error::new(ErrorKind::InvalidData, format!("{}", error)))
+        }
     }
 }

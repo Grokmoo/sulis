@@ -4,6 +4,7 @@ use resource::ResourceBuilder;
 use resource::Point;
 
 use serde_json;
+use serde_yaml;
 
 pub struct Size {
     pub size: i32,
@@ -83,10 +84,19 @@ impl ResourceBuilder for SizeBuilder {
         self.size.to_string()
     }
 
-    fn new(data: &str) -> Result<SizeBuilder, Error> {
-        let size: SizeBuilder = serde_json::from_str(data)?;
+    fn from_json(data: &str) -> Result<SizeBuilder, Error> {
+        let resource: SizeBuilder = serde_json::from_str(data)?;
 
-        Ok(size)
+        Ok(resource)
+    }
+
+    fn from_yaml(data: &str) -> Result<SizeBuilder, Error> {
+        let resource: Result<SizeBuilder, serde_yaml::Error> = serde_yaml::from_str(data);
+
+        match resource {
+            Ok(resource) => Ok(resource),
+            Err(error) => Err(Error::new(ErrorKind::InvalidData, format!("{}", error)))
+        }
     }
 }
 

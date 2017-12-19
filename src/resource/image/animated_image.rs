@@ -3,6 +3,7 @@ use std::io::{Error, ErrorKind};
 use std::collections::HashMap;
 
 use serde_json;
+use serde_yaml;
 
 use resource::{Image, Point, ResourceBuilder};
 use io::TextRenderer;
@@ -96,9 +97,18 @@ impl ResourceBuilder for AnimatedImageBuilder {
         self.id.to_owned()
     }
 
-    fn new(data: &str) -> Result<AnimatedImageBuilder, Error> {
-        let image: AnimatedImageBuilder = serde_json::from_str(data)?;
+    fn from_json(data: &str) -> Result<AnimatedImageBuilder, Error> {
+        let resource: AnimatedImageBuilder = serde_json::from_str(data)?;
 
-        Ok(image)
+        Ok(resource)
+    }
+
+    fn from_yaml(data: &str) -> Result<AnimatedImageBuilder, Error> {
+        let resource: Result<AnimatedImageBuilder, serde_yaml::Error> = serde_yaml::from_str(data);
+
+        match resource {
+            Ok(resource) => Ok(resource),
+            Err(error) => Err(Error::new(ErrorKind::InvalidData, format!("{}", error)))
+        }
     }
 }

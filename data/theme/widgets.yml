@@ -2,3 +2,10 @@ children:
   button:
     background: background
     border: [1, 1, 1, 1]
+  list_box:
+    background: background
+    border: [1, 1, 1, 1]
+    children:
+      entry:
+        preferred_size: [0, 1]
+        horizontal_text_alignment: Left

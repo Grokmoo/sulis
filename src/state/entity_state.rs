@@ -6,20 +6,16 @@ use state::ActorState;
 
 use std::rc::Rc;
 
+#[derive(PartialEq)]
 pub struct EntityState<'a> {
     pub actor: ActorState,
     pub(in state) location: Location<'a>,
     size: Rc<Size>,
 }
 
-impl<'a> PartialEq for EntityState<'a> {
-    fn eq(&self, other: &EntityState) -> bool {
-        self.actor == other.actor
-    }
-}
-
 impl<'a> EntityState<'a> {
     pub(in state) fn new(actor: Rc<Actor>, location: Location) -> EntityState {
+        debug!("Creating new entity state for {}", actor.id);
         let size = Rc::clone(&actor.default_size);
         let actor_state = ActorState::new(actor);
         EntityState {

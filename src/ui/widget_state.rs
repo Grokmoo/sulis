@@ -1,6 +1,7 @@
 use std::rc::Rc;
 
 use ui::{Border, Size, AnimationState};
+use ui::theme::{HorizontalTextAlignment, VerticalTextAlignment};
 
 use resource::Point;
 use resource::Image;
@@ -19,6 +20,8 @@ pub struct WidgetState {
     pub scroll_pos: Point,
     pub max_scroll_pos: Point,
     pub text: String,
+    pub horizontal_text_alignment: HorizontalTextAlignment,
+    pub vertical_text_alignment: VerticalTextAlignment,
     pub is_modal: bool,
 }
 
@@ -35,6 +38,8 @@ impl WidgetState {
             scroll_pos: Point::as_zero(),
             max_scroll_pos: Point::as_zero(),
             text: String::new(),
+            horizontal_text_alignment: HorizontalTextAlignment::Center,
+            vertical_text_alignment: VerticalTextAlignment::Center,
             inner_size: Size::as_zero(),
             inner_position: Point::as_zero(),
             is_modal: false,

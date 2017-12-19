@@ -14,7 +14,7 @@ pub struct Widget<'a> {
     pub state: WidgetState,
     pub kind: Rc<WidgetKind<'a> + 'a>,
     pub uuid: Uuid,
-    children: Vec<Rc<RefCell<Widget<'a>>>>,
+    pub children: Vec<Rc<RefCell<Widget<'a>>>>,
     modal_child: Option<Rc<RefCell<Widget<'a>>>>,
     parent: Option<Rc<RefCell<Widget<'a>>>>,
     needs_layout: bool,
@@ -90,6 +90,8 @@ impl<'a> Widget<'a> {
         }
 
         self.state.set_border(theme.border.clone());
+        self.state.horizontal_text_alignment = theme.horizontal_text_alignment;
+        self.state.vertical_text_alignment = theme.vertical_text_alignment;
 
         if let Some(ref text) = theme.text {
             self.state.set_text(text);
@@ -202,6 +204,16 @@ impl<'a> Widget<'a> {
         for child in children.into_iter() {
             Widget::add_child_to(parent, child);
         }
+    }
+
+    pub fn get_child_with_name(widget: &Rc<RefCell<Widget<'a>>>,
+                               name: &str) -> Option<Rc<RefCell<Widget<'a>>>> {
+        for child in widget.borrow().children.iter() {
+            if child.borrow().kind.get_name() == name {
+                return Some(Rc::clone(child));
+            }
+        }
+        None
     }
 
     pub fn update(root: &Rc<RefCell<Widget<'a>>>) -> Result<(), Error> {

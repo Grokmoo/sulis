@@ -10,6 +10,7 @@ use serde_yaml;
 
 pub struct Item {
     pub id: String,
+    pub name: String,
     pub icon: Rc<Image>,
 }
 
@@ -34,6 +35,7 @@ impl Item {
         Ok(Item {
             id: builder.id,
             icon: icon,
+            name: builder.name,
         })
     }
 }
@@ -41,6 +43,7 @@ impl Item {
 #[derive(Deserialize, Debug)]
 pub struct ItemBuilder {
     pub id: String,
+    pub name: String,
     pub icon: String,
 }
 

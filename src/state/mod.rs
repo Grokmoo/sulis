@@ -7,6 +7,12 @@ pub use self::entity_state::EntityState;
 mod actor_state;
 pub use self::actor_state::ActorState;
 
+mod item_state;
+pub use self::item_state::ItemState;
+
+mod inventory;
+pub use self::inventory::Inventory;
+
 mod location;
 pub use self::location::Location;
 
@@ -53,7 +59,8 @@ impl<'a> GameState<'a> {
         let area_state = Rc::new(RefCell::new(AreaState::new(area)));
 
         debug!("Setting up PC {}, with {:?}", &game.pc, &game.starting_location);
-        let location = Location::from_point(&game.starting_location, Rc::clone(&area_state));
+        let location = Location::from_point(&game.starting_location,
+                                            Rc::clone(&area_state));
 
         if !location.coords_valid(location.x, location.y) {
             error!("Starting location coordinates must be valid for the starting area.");
@@ -72,9 +79,10 @@ impl<'a> GameState<'a> {
         };
 
         if !area_state.borrow_mut().add_actor(pc, location) {
-            error!("Player character starting location must be within area bounds and passable.");
+            error!("Player character starting location must be within \
+                   area bounds and passable.");
             return Err(Error::new(ErrorKind::InvalidData,
-                                  "Unable to add player character to starting area at starting location"));
+                "Unable to add player character to starting area at starting location"));
         }
 
         let pc_state = Rc::clone(area_state.borrow().entities.last().unwrap());

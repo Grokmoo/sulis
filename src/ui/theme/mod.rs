@@ -10,17 +10,31 @@ use ui::{Border, Size};
 use serde_json;
 use serde_yaml;
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Deserialize, Debug, Clone, Copy)]
 pub enum PositionRelative {
     Zero,
     Center,
     Max,
 }
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Deserialize, Debug, Clone, Copy)]
 pub enum SizeRelative {
     Zero,
     Max,
+}
+
+#[derive(Deserialize, Debug, Clone, Copy)]
+pub enum HorizontalTextAlignment {
+    Left,
+    Center,
+    Right,
+}
+
+#[derive(Deserialize, Debug, Clone, Copy)]
+pub enum VerticalTextAlignment {
+    Top,
+    Center,
+    Bottom,
 }
 
 #[derive(Debug)]
@@ -35,6 +49,8 @@ pub struct Theme {
     pub y_relative: PositionRelative,
     pub position: Point,
     pub children: HashMap<String, Rc<Theme>>,
+    pub horizontal_text_alignment: HorizontalTextAlignment,
+    pub vertical_text_alignment: VerticalTextAlignment,
 }
 
 impl Theme {
@@ -56,6 +72,10 @@ impl Theme {
         let border = builder.border.unwrap_or(Border::as_zero());
         let position = builder.position.unwrap_or(Point::as_zero());
         let preferred_size = builder.preferred_size.unwrap_or(Size::as_zero());
+        let horizontal_text_alignment =
+            builder.horizontal_text_alignment.unwrap_or(HorizontalTextAlignment::Center);
+        let vertical_text_alignment =
+            builder.vertical_text_alignment.unwrap_or(VerticalTextAlignment::Center);
 
         Theme {
             background: builder.background,
@@ -68,6 +88,8 @@ impl Theme {
             x_relative,
             y_relative,
             children,
+            horizontal_text_alignment,
+            vertical_text_alignment,
         }
     }
 }
@@ -78,6 +100,8 @@ pub struct ThemeBuilder {
     pub border: Option<Border>,
     pub preferred_size: Option<Size>,
     pub text: Option<String>,
+    pub horizontal_text_alignment: Option<HorizontalTextAlignment>,
+    pub vertical_text_alignment: Option<VerticalTextAlignment>,
     pub position: Option<Point>,
     pub x_relative: Option<PositionRelative>,
     pub y_relative: Option<PositionRelative>,
@@ -88,14 +112,16 @@ pub struct ThemeBuilder {
     pub from: Option<String>,
 }
 
+pub const MAX_THEME_DEPTH: i32 = 20;
+
 impl ThemeBuilder {
-    pub fn expand_references(&mut self) {
+    pub fn expand_references(&mut self) -> Result<(), Error> {
         if self.from.is_some() {
             warn!("Ignored 'from' key at root theme level.");
         }
 
         if self.children.is_none() {
-            return;
+            return Ok(());
         }
 
         // take a clone of the whole tree.  this wastes some
@@ -105,12 +131,25 @@ impl ThemeBuilder {
 
         if let Some(ref mut children) = self.children {
             for (_id, child) in children {
-                child.expand_recursive(&builders_clone);
+                match child.expand_recursive(&builders_clone, 0) {
+                    Ok(()) => (),
+                    Err(e) => return Err(e),
+                };
             }
         }
+
+        Ok(())
     }
 
-    fn expand_recursive(&mut self, builders: &ThemeBuilder) {
+    fn expand_recursive(&mut self, builders: &ThemeBuilder,
+                        depth: i32) -> Result<(), Error> {
+        if depth >= MAX_THEME_DEPTH {
+            warn!("Truncated theme expansion at max depth of {}", MAX_THEME_DEPTH);
+            warn!("This is most likely caused by a circular 'from' reference.");
+            return Err(Error::new(ErrorKind::InvalidData,
+                                  "Exceeded maximum theme depth."));
+        }
+
         if self.from.is_some() {
             let from = self.from.as_ref().unwrap().to_string();
             let from_theme = builders.find_theme("", &from);
@@ -124,9 +163,14 @@ impl ThemeBuilder {
 
         if let Some(ref mut children) = self.children {
             for (_id, child) in children {
-                child.expand_recursive(&builders);
+                match child.expand_recursive(&builders, depth + 1) {
+                    Ok(()) => (),
+                    Err(e) => return Err(e),
+                };
             }
         }
+
+        Ok(())
     }
 
     fn copy_from(&mut self, other: ThemeBuilder) {
@@ -139,6 +183,12 @@ impl ThemeBuilder {
         if self.y_relative.is_none() { self.y_relative = other.y_relative; }
         if self.width_relative.is_none() { self.width_relative = other.width_relative; }
         if self.height_relative.is_none() { self.height_relative = other.height_relative; }
+        if self.horizontal_text_alignment.is_none() {
+            self.horizontal_text_alignment = other.horizontal_text_alignment;
+        }
+        if self.vertical_text_alignment.is_none() {
+            self.vertical_text_alignment = other.vertical_text_alignment;
+        }
 
         if let Some(other_children) = other.children {
             if self.children.is_none() {

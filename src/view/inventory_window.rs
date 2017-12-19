@@ -1,23 +1,26 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use ui::{Button, Label, Widget, WidgetKind};
+use state::{EntityState, Inventory};
+use ui::{Button, Label, ListBox, Widget, WidgetKind};
+
+pub const NAME: &str = "inventory_window";
 
 pub struct InventoryWindow {
-
+    inventory: Inventory,
 }
 
-impl InventoryWindow {
-    pub fn new() -> Rc<InventoryWindow> {
+impl<'a> InventoryWindow {
+    pub fn new(entity: &Rc<RefCell<EntityState<'a>>>) -> Rc<InventoryWindow> {
         Rc::new(InventoryWindow {
-
+           inventory: entity.borrow().actor.inventory.clone()
         })
     }
 }
 
 impl<'a> WidgetKind<'a> for InventoryWindow {
     fn get_name(&self) -> &str {
-        "inventory_window"
+        NAME
     }
 
     fn layout(&self, widget: &mut Widget<'a>) {
@@ -34,6 +37,13 @@ impl<'a> WidgetKind<'a> for InventoryWindow {
             })),
             "close");
 
-        vec![title, close]
+        let mut entries: Vec<String> = Vec::new();
+        for item in self.inventory.items.iter() {
+            entries.push(item.item.name.clone());
+        }
+
+        let list = Widget::with_theme(ListBox::new(entries), "inventory");
+
+        vec![title, close, list]
     }
 }

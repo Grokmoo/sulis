@@ -50,7 +50,13 @@ impl ResourceBuilderSet {
             }
         };
 
-        theme_builder.expand_references();
+        match theme_builder.expand_references() {
+            Ok(()) => (),
+            Err(e) => {
+                error!("Unable to load theme from {}", theme_filename);
+                return Err(e);
+            }
+        };
 
         Ok(ResourceBuilderSet {
             game,

@@ -66,3 +66,9 @@ children:
         preferred_size: [3, 3]
         position: [1, -1]
         x_relative: Max
+      inventory:
+        from: .list_box
+        preferred_size: [0, -2]
+        position: [0, 2]
+        width_relative: Max
+        height_relative: Max

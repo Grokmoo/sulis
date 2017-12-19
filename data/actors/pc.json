@@ -3,5 +3,5 @@
     "player": true,
     "display": "@",
     "default_size": 5,
-    "items": [ "sword" ]
+    "items": [ "sword", "backpack", "apple" ]
 }

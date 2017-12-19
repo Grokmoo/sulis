@@ -29,7 +29,7 @@ impl<'a> WidgetKind<'a> for RootView<'a> {
         "root"
     }
 
-    fn on_key_press(&self, _state: &mut GameState, widget: &Rc<RefCell<Widget<'a>>>,
+    fn on_key_press(&self, state: &mut GameState, widget: &Rc<RefCell<Widget<'a>>>,
                     key: InputAction, _mouse_pos: Point) -> bool {
         use io::InputAction::*;
         match key {
@@ -40,8 +40,18 @@ impl<'a> WidgetKind<'a> for RootView<'a> {
                     true
             },
             ToggleInventory => {
-                let window = Widget::with_defaults(InventoryWindow::new());
-                Widget::add_child_to(&widget, window);
+                let window = Widget::get_child_with_name(widget,
+                                self::inventory_window::NAME);
+                match window {
+                    None => {
+                        let window = Widget::with_defaults(
+                            InventoryWindow::new(&state.pc));
+                        Widget::add_child_to(&widget, window);
+                    },
+                    Some(window) => {
+                        window.borrow_mut().mark_for_removal();
+                    }
+                }
                 true
             },
             _ => {

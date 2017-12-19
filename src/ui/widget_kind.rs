@@ -43,29 +43,29 @@ pub trait WidgetKind<'a> {
 
     fn on_mouse_click(&self, _state: &mut GameState, _widget: &Rc<RefCell<Widget<'a>>>,
                       _kind: ClickKind, _mouse_pos: Point) -> bool {
-        false
+        true
     }
 
     fn on_mouse_move(&self, _state: &mut GameState, _widget: &Rc<RefCell<Widget<'a>>>,
                       _mouse_pos: Point) -> bool {
-        false
+        true
     }
 
     fn on_mouse_enter(&self, _state: &mut GameState, widget: &Rc<RefCell<Widget<'a>>>,
                       _mouse_pos: Point) -> bool {
         self.super_on_mouse_enter(widget);
-        false
+        true
     }
 
     fn on_mouse_exit(&self, _state: &mut GameState, widget: &Rc<RefCell<Widget<'a>>>,
                      _mouse_pos: Point) -> bool {
         self.super_on_mouse_exit(widget);
-        false
+        true
     }
 
     fn on_mouse_scroll(&self, _state: &mut GameState, _widget: &Rc<RefCell<Widget<'a>>>,
                          _scroll: i32, _mouse_pos: Point) -> bool {
-        false
+        true
     }
 
     fn on_key_press(&self, _state: &mut GameState, _widget: &Rc<RefCell<Widget<'a>>>,

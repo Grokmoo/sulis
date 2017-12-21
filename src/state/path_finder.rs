@@ -1,15 +1,13 @@
 use std::rc::Rc;
-use std::cell::Ref;
+use std::cell::{Ref, RefCell};
 use std::collections::{HashMap, HashSet};
 use std::i32;
 
-use resource::Area;
 use resource::Point;
+use state::{EntityState, AreaState};
 
-use state::EntityState;
-
-pub struct PathFinder {
-    pub area: Rc<Area>,
+pub struct PathFinder<'a> {
+    area_state: Rc<RefCell<AreaState<'a>>>,
     pub width: i32,
     pub height: i32,
 
@@ -20,14 +18,14 @@ pub struct PathFinder {
     came_from: HashMap<i32, i32>,
 }
 
-impl PathFinder {
-    pub fn new(area: Rc<Area>) -> PathFinder {
-        let width = area.width;
-        let height = area.height;
+impl<'a> PathFinder<'a> {
+    pub fn new(area_state: Rc<RefCell<AreaState<'a>>>) -> PathFinder<'a> {
+        let width = area_state.borrow().area.width;
+        let height = area_state.borrow().area.height;
 
-        debug!("Initializing pathfinder for {}", area.id);
+        debug!("Initializing pathfinder for {}", area_state.borrow().area.id);
         PathFinder {
-            area,
+            area_state,
             width,
             height,
             f_score: vec![0;(width*height) as usize],
@@ -38,7 +36,7 @@ impl PathFinder {
         }
     }
 
-    pub fn find(&mut self, requester: Ref<EntityState>, dest_x: i32,
+    pub fn find(&mut self, requester: Ref<EntityState<'a>>, dest_x: i32,
                 dest_y: i32) -> Option<Vec<Point>> {
         debug!("Finding path from {:?} to {},{}",
                requester.location, dest_x, dest_y);
@@ -54,9 +52,14 @@ impl PathFinder {
         self.closed.clear();
 
         // initialize closed set based on passability
-        for i in 0..(self.width*self.height) {
-            if !self.area.get_path_grid(requester.size()).is_passable_index(i) {
-                self.closed.insert(i);
+        let mut i = 0;
+        for y in 0..self.height {
+            for x in 0..self.width {
+                if !self.area_state.borrow().is_passable(&requester, x, y) {
+                    self.closed.insert(i);
+                }
+
+                i += 1;
             }
         }
 

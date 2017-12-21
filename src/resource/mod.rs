@@ -146,8 +146,8 @@ impl ResourceSet {
             }
 
             for (id, builder) in builder_set.area_builders {
-                insert_if_ok("area", id, Area::new(builder,
-                    &resource_set.tiles, &resource_set.sizes), &mut resource_set.areas);
+                insert_if_ok("area", id, Area::new(builder, &resource_set),
+                    &mut resource_set.areas);
             }
         });
 

@@ -90,7 +90,7 @@ impl<'a> WidgetKind<'a> for AreaView<'a> {
                       mouse_pos: Point) -> bool {
         self.super_on_mouse_enter(widget);
         self.mouse_over.borrow_mut().state.set_text(&format!("[{},{}]",
-            mouse_pos.x, mouse_pos.y));
+            mouse_pos.x - 1, mouse_pos.y - 1));
         true
     }
 

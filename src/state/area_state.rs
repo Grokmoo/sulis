@@ -1,10 +1,7 @@
-use resource::Area;
-use resource::Actor;
-use resource::Point;
+use resource::{Actor, Area, ResourceSet};
 
 use state::EntityState;
 use state::Location;
-use state::path_finder::PathFinder;
 
 use std::rc::Rc;
 use std::cell::{Ref, RefCell};
@@ -12,8 +9,8 @@ use std::cell::{Ref, RefCell};
 pub struct AreaState<'a> {
     pub area: Rc<Area>,
     pub entities: Vec<Rc<RefCell<EntityState<'a>>>>,
-    pub path_finder: PathFinder,
 
+    entity_grid: Vec<Option<usize>>,
     display: Vec<char>,
 }
 
@@ -30,71 +27,92 @@ impl<'a> AreaState<'a> {
             *element = area.terrain.display(index);
         }
 
-        let path_finder = PathFinder::new(Rc::clone(&area));
+        let entity_grid = vec![None;(area.width * area.height) as usize];
 
         AreaState {
             area,
             entities: Vec::new(),
             display,
-            path_finder
+            entity_grid,
         }
     }
 
-    pub fn find_path(&mut self, requester: Ref<EntityState<'a>>,
-                     dest_x: i32, dest_y: i32) -> Option<Vec<Point>> {
-        self.path_finder.find(requester, dest_x, dest_y)
+    /// Adds entities defined in the area definition to this area state
+    pub fn populate(area_state: &Rc<RefCell<AreaState<'a>>>) {
+        let area = Rc::clone(&area_state.borrow().area);
+
+        for actor_data in area.actors.iter() {
+            let actor = match ResourceSet::get_actor(&actor_data.id) {
+                None => {
+                    warn!("No actor with id '{}' found when initializing area '{}'",
+                              actor_data.id, area.id);
+                    continue;
+                },
+                Some(actor_data) => actor_data,
+            };
+
+            let location = Location::from_point(&actor_data.location,
+                                                Rc::clone(&area_state));
+            debug!("Adding actor '{}' at '{:?}'", actor.id, location);
+            area_state.borrow_mut().add_actor(actor, location);
+        }
     }
 
     pub fn get_display(&self, x: i32, y: i32) -> char {
         *self.display.get((x + y * self.area.width) as usize).unwrap()
     }
 
-    pub fn is_passable(&self, requester: Ref<EntityState<'a>>,
+    pub fn is_passable(&self, requester: &Ref<EntityState<'a>>,
                        new_x: i32, new_y: i32) -> bool {
         if !self.area.coords_valid(new_x, new_y) { return false; }
 
-        if !self.area.get_path_grid(requester.size()).is_passable(new_x, new_y) { return false; }
+        if !self.area.get_path_grid(requester.size()).is_passable(new_x, new_y) {
+            return false;
+        }
 
-        requester.points(new_x, new_y).all(|p| self.point_entities_passable(&requester, p.x, p.y))
+        requester.points(new_x, new_y)
+            .all(|p| self.point_entities_passable(&requester, p.x, p.y))
     }
 
     fn point_entities_passable(&self, requester: &Ref<EntityState<'a>>,
                                x: i32, y: i32) -> bool {
         if !self.area.coords_valid(x, y) { return false; }
 
-        for entity in self.entities.iter() {
-            let entity = entity.borrow();
+        let grid_index = self.entity_grid.get((x + y * self.area.width) as usize);
 
-            if *entity == **requester { continue; }
-            if entity.location.equals(x, y) { return false; }
+        match grid_index {
+            None => false, // grid position is invalid
+            Some(&None) => true, // grid position is valid, location is empty
+            Some(&Some(index)) => (index == requester.index),
         }
-
-        true
     }
 
     pub(in state) fn add_actor(&mut self, actor: Rc<Actor>,
                      location: Location<'a>) -> bool {
 
-        let entity = EntityState::new(actor, location);
+        let new_index = self.entities.len();
+        let entity = EntityState::new(actor, location, new_index);
 
         let x = entity.location.x;
         let y = entity.location.y;
 
         let entity = Rc::new(RefCell::new(entity));
 
-        if !self.is_passable(entity.borrow(), x, y) {
+        if !self.is_passable(&entity.borrow(), x, y) {
             return false;
         }
 
-        entity.borrow().points(x, y).
-            for_each(|p| self.update_display(p.x, p.y, entity.borrow().display()));
+        for p in entity.borrow().points(x, y) {
+            self.update_display(p.x, p.y, entity.borrow().display());
+            self.update_entity_grid(p.x, p.y, Some(new_index));
+        }
 
         self.entities.push(entity);
 
         true
     }
 
-    pub(in state) fn update_entity_display(&mut self, entity: &EntityState<'a>,
+    pub(in state) fn update_entity_position(&mut self, entity: &EntityState<'a>,
                                            new_x: i32, new_y: i32) {
         let cur_x = entity.location.x;
         let cur_y = entity.location.y;
@@ -102,10 +120,17 @@ impl<'a> AreaState<'a> {
         for p in entity.points(cur_x, cur_y) {
             let c = self.area.terrain.display_at(p.x, p.y);
             self.update_display(p.x, p.y, c);
+            self.update_entity_grid(p.x, p.y, None);
         }
 
-        entity.points(new_x, new_y).
-            for_each(|p| self.update_display(p.x, p.y, entity.display()));
+        for p in entity.points(new_x, new_y) {
+            self.update_display(p.x, p.y, entity.display());
+            self.update_entity_grid(p.x, p.y, Some(entity.index));
+        }
+    }
+
+    fn update_entity_grid(&mut self, x: i32, y: i32, index: Option<usize>) {
+        *self.entity_grid.get_mut((x + y * self.area.width) as usize).unwrap() = index;
     }
 
     fn update_display(&mut self, x: i32, y: i32, c: char) {

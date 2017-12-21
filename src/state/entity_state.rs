@@ -11,15 +11,19 @@ pub struct EntityState<'a> {
     pub actor: ActorState,
     pub(in state) location: Location<'a>,
     size: Rc<Size>,
+    pub index: usize, // index in vec of the owning area state
 }
 
 impl<'a> EntityState<'a> {
-    pub(in state) fn new(actor: Rc<Actor>, location: Location) -> EntityState {
+    pub(in state) fn new(actor: Rc<Actor>, location: Location, index: usize) -> EntityState {
         debug!("Creating new entity state for {}", actor.id);
         let size = Rc::clone(&actor.default_size);
         let actor_state = ActorState::new(actor);
         EntityState {
-            actor: actor_state, location, size,
+            actor: actor_state,
+            location,
+            size,
+            index
         }
     }
 
@@ -29,7 +33,7 @@ impl<'a> EntityState<'a> {
             return false;
         }
 
-        self.location.area_state.borrow_mut().update_entity_display(&self, x, y);
+        self.location.area_state.borrow_mut().update_entity_position(&self, x, y);
         self.location.move_to(x, y);
         true
     }

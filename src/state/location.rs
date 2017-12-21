@@ -14,7 +14,7 @@ pub struct Location<'a> {
 
 impl<'a> Debug for Location<'a> {
     fn fmt(&self, fmt: &mut Formatter) -> Result {
-        write!(fmt, "Location {},{} in {}", self.x, self.y, self.area_id)
+        write!(fmt, "{{ {},{} in {} }}", self.x, self.y, self.area_id)
     }
 }
 

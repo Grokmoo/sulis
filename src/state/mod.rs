@@ -20,6 +20,7 @@ mod cursor;
 pub use self::cursor::Cursor;
 
 mod path_finder;
+use self::path_finder::PathFinder;
 
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
@@ -35,6 +36,8 @@ use ui::Widget;
 pub struct GameState<'a> {
     config: Config,
     pub area_state: Rc<RefCell<AreaState<'a>>>,
+    path_finder: PathFinder<'a>,
+
     pub pc: Rc<RefCell<EntityState<'a>>>,
     pub cursor: Cursor,
     animations: Vec<Box<Animation + 'a>>,
@@ -57,6 +60,7 @@ impl<'a> GameState<'a> {
             }
         };
         let area_state = Rc::new(RefCell::new(AreaState::new(area)));
+        AreaState::populate(&area_state);
 
         debug!("Setting up PC {}, with {:?}", &game.pc, &game.starting_location);
         let location = Location::from_point(&game.starting_location,
@@ -91,9 +95,12 @@ impl<'a> GameState<'a> {
         let display_height = config.display.height;
         let cursor_char = config.display.cursor_char;
 
+        let path_finder = PathFinder::new(Rc::clone(&area_state));
+
         Ok(GameState {
             config: config,
             area_state: area_state,
+            path_finder: path_finder,
             pc: pc_state,
             cursor: Cursor {
                 x: 0,
@@ -170,7 +177,7 @@ impl<'a> GameState<'a> {
 
     pub fn pc_move_to(&mut self, x: i32, y: i32) -> bool {
         trace!("Moving pc to {},{}", x, y);
-        let path = self.area_state.borrow_mut().find_path(self.pc(), x, y);
+        let path = self.path_finder.find(self.pc.borrow(), x, y);
 
         if let None = path {
             return false;
@@ -191,7 +198,7 @@ impl<'a> GameState<'a> {
 
             let area_state = (*entity).location.area_state.borrow();
 
-            if !area_state.is_passable(self.pc(), x, y) { return false; }
+            if !area_state.is_passable(&self.pc(), x, y) { return false; }
 
             (x, y)
         };

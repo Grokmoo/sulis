@@ -6,12 +6,16 @@ use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 
 use resource::ResourceBuilder;
-use resource::Tile;
-use resource::Terrain;
-use resource::Size;
+use resource::{Point, Terrain, ResourceSet};
 
 use serde_json;
 use serde_yaml;
+
+#[derive(Deserialize, Debug)]
+pub struct ActorData {
+    pub id: String,
+    pub location: Point,
+}
 
 pub struct Area {
     pub id: String,
@@ -20,6 +24,7 @@ pub struct Area {
     pub height: i32,
     pub terrain: Terrain,
     path_grids: HashMap<i32, PathFinderGrid>,
+    pub actors: Vec<ActorData>,
 }
 
 impl PartialEq for Area {
@@ -29,10 +34,9 @@ impl PartialEq for Area {
 }
 
 impl Area {
-    pub fn new(builder: AreaBuilder, tiles: &HashMap<String, Rc<Tile>>,
-               sizes: &HashMap<usize, Rc<Size>>) -> Result<Area, Error> {
+    pub fn new(builder: AreaBuilder, resources: &ResourceSet) -> Result<Area, Error> {
         debug!("Creating area {}", builder.id);
-        let terrain = Terrain::new(&builder, tiles);
+        let terrain = Terrain::new(&builder, &resources.tiles);
         let terrain = match terrain {
             Ok(l) => l,
             Err(e) => {
@@ -42,11 +46,13 @@ impl Area {
         };
 
         let mut path_grids: HashMap<i32, PathFinderGrid> = HashMap::new();
-        for size in sizes.values() {
+        for size in resources.sizes.values() {
             let path_grid = PathFinderGrid::new(Rc::clone(size), &terrain);
             trace!("Generated path grid of size {}", size.size);
             path_grids.insert(size.size, path_grid);
         }
+
+        // TODO validate position of each actor
 
         Ok(Area {
             id: builder.id,
@@ -55,6 +61,7 @@ impl Area {
             height: builder.height as i32,
             terrain: terrain,
             path_grids: path_grids,
+            actors: builder.actors,
         })
     }
 
@@ -78,6 +85,7 @@ pub struct AreaBuilder {
     pub height: usize,
     pub terrain: HashMap<String, Vec<Vec<usize>>>,
     pub generate: bool,
+    actors: Vec<ActorData>,
 }
 
 impl ResourceBuilder for AreaBuilder {
@@ -100,3 +108,4 @@ impl ResourceBuilder for AreaBuilder {
         }
     }
 }
+

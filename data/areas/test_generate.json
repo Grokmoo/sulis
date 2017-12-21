@@ -5,5 +5,6 @@
     "height": 40,
 
     "terrain": { },
+    "actors": [ ],
     "generate": true
 }

@@ -47,6 +47,7 @@ impl<'a> WidgetKind<'a> for ListBox {
         for entry in self.entries.iter() {
             let label = Widget::with_theme(
                 Button::with_text(&entry, Box::new(|_w, _s| {  })),
+                // TODO callback here that interfaces with a listbox overall callback
                 // Button::with_text(&entry, Box::new(|_w, _s| info!("{}", entry))),
                 "entry");
             children.push(label);

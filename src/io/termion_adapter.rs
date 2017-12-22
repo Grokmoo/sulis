@@ -19,6 +19,7 @@ pub struct Terminal {
     stdout: AlternateScreen<RawTerminal<std::io::Stdout>>,
     renderer: BufferedTextRenderer,
     size: Size,
+    prev_terminal_size: (u16, u16),
 }
 
 impl Terminal {
@@ -29,13 +30,24 @@ impl Terminal {
         let size = Size::new(config.display.width, config.display.height);
 
         write!(stdout, "{}", termion::cursor::Hide).unwrap();
+        write!(stdout, "{}", termion::clear::All).unwrap();
 
         Terminal {
             stdin,
             stdout,
             renderer: BufferedTextRenderer::new(size),
             size: size,
+            prev_terminal_size: termion::terminal_size().unwrap(),
         }
+    }
+
+    fn reposition_cursor(&mut self, x: i32, y: i32) {
+        write!(self.stdout, "{}", termion::cursor::Goto(x as u16 + 1,
+                                                        y as u16 + 1)).unwrap();
+    }
+
+    fn write_char(&mut self, c: char) {
+        write!(self.stdout, "{}", c).unwrap();
     }
 }
 
@@ -50,6 +62,15 @@ impl<'a> IO<'a> for Terminal {
             let b = b.unwrap();
             if let Err(_) = b { break; }
             buf.push(b.unwrap());
+        }
+
+        let cur_terminal_size = termion::terminal_size().unwrap();
+        if cur_terminal_size != self.prev_terminal_size {
+            debug!("Detected Termion screen resize, redrawing.");
+            self.prev_terminal_size = cur_terminal_size;
+            // clear the buffer to redraw the screen
+            write!(self.stdout, "{}", termion::clear::All).unwrap();
+            self.renderer.clear();
         }
 
         if buf.len() == 0 { return; }
@@ -73,18 +94,27 @@ impl<'a> IO<'a> for Terminal {
 
     fn render_output(&mut self, state: &GameState<'a>, root: Ref<Widget<'a>>,
                      millis: u32) {
-        write!(self.stdout, "{}", termion::clear::All).unwrap();
-        self.renderer.clear();
-
         state.draw_text_mode(&mut self.renderer, root, millis);
 
+        let mut cursor_needs_repos = true;
         for y in 0..self.size.height {
-            write!(self.stdout, "{}",
-                   termion::cursor::Goto(1, y as u16 + 1)).unwrap();
+            for x in 0..self.size.width {
+                if self.renderer.has_changed(x, y) {
+                    if cursor_needs_repos {
+                        self.reposition_cursor(x, y);
+                        cursor_needs_repos = false;
+                    }
 
-            write!(self.stdout, "{}", self.renderer.get_line(y)).unwrap();
+                    let c = self.renderer.get_char(x, y);
+                    self.write_char(c);
+                } else {
+                    cursor_needs_repos = true;
+                }
+            }
+            cursor_needs_repos = true;
         }
 
+        self.renderer.swap();
         self.stdout.flush().unwrap();
     }
 }

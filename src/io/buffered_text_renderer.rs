@@ -3,6 +3,7 @@ use ui::Size;
 use resource::Point;
 
 pub struct BufferedTextRenderer {
+    last_buffer: Vec<char>,
     buffer: Vec<char>,
     cursor_pos: Point,
     size: Size,
@@ -11,6 +12,7 @@ pub struct BufferedTextRenderer {
 impl BufferedTextRenderer {
     pub fn new(size: Size) -> BufferedTextRenderer {
         BufferedTextRenderer {
+            last_buffer: vec![' ';(size.product() as usize)],
             buffer: vec![' '; (size.product() as usize)],
             cursor_pos: Point::as_zero(),
             size: size,
@@ -28,7 +30,7 @@ impl BufferedTextRenderer {
     }
 
     pub fn clear(&mut self) {
-        self.buffer.iter_mut().for_each(|c| *c = ' ');
+        self.last_buffer.iter_mut().for_each(|c| *c = ' ');
     }
 
     pub fn get_line(&self, y: i32) -> String {
@@ -37,6 +39,21 @@ impl BufferedTextRenderer {
 
         let out: String = s.iter().collect();
         out
+    }
+
+    pub fn get_char(&self, x: i32, y: i32) -> char {
+        self.buffer[(x + y * self.size.width) as usize]
+    }
+
+    pub fn has_changed(&self, x: i32, y: i32) -> bool {
+        let cur = self.buffer[(x + y * self.size.width) as usize];
+        let last = self.last_buffer[(x + y * self.size.width) as usize];
+
+        cur != last
+    }
+
+    pub fn swap(&mut self) {
+        self.last_buffer.copy_from_slice(&self.buffer);
     }
 }
 

@@ -10,7 +10,7 @@ extern crate serde_yaml;
 #[macro_use] extern crate serde_derive;
 
 // terminal display library
-extern crate pancurses;
+#[cfg(windows)] extern crate pancurses;
 #[cfg(not(windows))] extern crate termion;
 
 extern crate uuid;

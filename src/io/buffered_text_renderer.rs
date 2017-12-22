@@ -33,6 +33,7 @@ impl BufferedTextRenderer {
         self.last_buffer.iter_mut().for_each(|c| *c = ' ');
     }
 
+    #[allow(dead_code)] // used on windows, not on unix
     pub fn get_line(&self, y: i32) -> String {
         let s = &self.buffer[(y * self.size.width) as usize..
             ((y + 1) * self.size.width) as usize];

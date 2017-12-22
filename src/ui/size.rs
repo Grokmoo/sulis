@@ -29,8 +29,8 @@ impl Size {
 
     pub fn inner(&self, border: &Border) -> Size {
         Size {
-            width: self.width - border.top - border.bottom,
-            height: self.height - border.left - border.right,
+            width: self.width - border.left - border.right,
+            height: self.height - border.top - border.bottom,
         }
     }
 

@@ -25,14 +25,14 @@ impl<'a> WidgetKind<'a> for Window {
         let label = Widget::with_theme(Label::empty(), "title");
 
         let cancel = Widget::with_theme(
-            Button::new(Box::new(|widget, _game_state| {
+            Button::with_callback(Box::new(|widget, _game_state| {
                 let parent = Widget::get_parent(&widget);
                 parent.borrow_mut().mark_for_removal();
             })),
             "cancel");
 
         let quit = Widget::with_theme(
-            Button::new(Box::new(|_widget, game_state| { game_state.set_exit(); })),
+            Button::with_callback(Box::new(|_widget, game_state| { game_state.set_exit(); })),
             "quit");
 
         vec![cancel, quit, label]

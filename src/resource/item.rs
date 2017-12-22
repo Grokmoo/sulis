@@ -5,6 +5,8 @@ use std::collections::HashMap;
 use resource::Image;
 use resource::ResourceBuilder;
 
+use state::inventory;
+
 use serde_json;
 use serde_yaml;
 
@@ -12,6 +14,7 @@ pub struct Item {
     pub id: String,
     pub name: String,
     pub icon: Rc<Image>,
+    pub slot: Option<inventory::Slot>,
 }
 
 impl PartialEq for Item {
@@ -36,6 +39,7 @@ impl Item {
             id: builder.id,
             icon: icon,
             name: builder.name,
+            slot: builder.slot,
         })
     }
 }
@@ -45,6 +49,7 @@ pub struct ItemBuilder {
     pub id: String,
     pub name: String,
     pub icon: String,
+    pub slot: Option<inventory::Slot>,
 }
 
 impl ResourceBuilder for ItemBuilder {

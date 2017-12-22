@@ -10,7 +10,7 @@ pub use self::actor_state::ActorState;
 mod item_state;
 pub use self::item_state::ItemState;
 
-mod inventory;
+pub mod inventory;
 pub use self::inventory::Inventory;
 
 mod location;

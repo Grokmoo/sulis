@@ -1,11 +1,24 @@
 use std::rc::Rc;
+use std::collections::HashMap;
 
 use resource::Actor;
 use state::ItemState;
 
+#[derive(Deserialize, Debug, Copy, Clone, PartialEq, Eq, Hash)]
+pub enum Slot {
+    Head,
+    Torso,
+    Hands,
+    HeldMain,
+    HeldOff,
+    Legs,
+    Feet,
+}
+
 #[derive(Clone)]
 pub struct Inventory {
     pub items: Vec<ItemState>,
+    pub equipped: HashMap<Slot, usize>,
 }
 
 impl Inventory {
@@ -18,7 +31,35 @@ impl Inventory {
 
         trace!("Populated initial inventory with {} items", items.len());
         Inventory {
-            items
+            items,
+            equipped: HashMap::new(),
         }
+    }
+
+    /// equips the item at the given index.  returns true if the item
+    /// was equipped.  false if the item does not exist
+    pub fn equip(&mut self, index: usize) -> bool {
+        let slot = match self.items.get(index) {
+            None => return false,
+            Some(item) => match &item.item.slot {
+                &None => return false,
+                &Some(slot) => slot,
+            }
+        };
+
+        if !self.unequip(slot) {
+            return false;
+        }
+
+        self.equipped.insert(slot, index);
+        true
+    }
+
+    /// unequips the item in the specified slot.  returns true if the
+    /// slot is empty, or the item is able to be unequipped.  false if
+    /// the item cannot be unequipped.
+    pub fn unequip(&mut self, slot: Slot) -> bool {
+        self.equipped.remove(&slot);
+        true
     }
 }

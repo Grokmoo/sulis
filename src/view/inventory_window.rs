@@ -31,7 +31,7 @@ impl<'a> WidgetKind<'a> for InventoryWindow {
         let title = Widget::with_theme(Label::empty(), "title");
 
         let close = Widget::with_theme(
-            Button::new(Box::new(|widget, _state| {
+            Button::with_callback(Box::new(|widget, _state| {
                 let parent = Widget::get_parent(&widget);
                 parent.borrow_mut().mark_for_removal();
             })),

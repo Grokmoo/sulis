@@ -75,7 +75,7 @@ impl WidgetState {
         self.position.y + self.size.height - self.border.bottom
     }
 
-    pub fn inner_top(&self) -> i32{
+    pub fn inner_top(&self) -> i32 {
         self.position.y + self.border.top
     }
 

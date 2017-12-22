@@ -308,22 +308,28 @@ impl<'a> Widget<'a> {
         // iterate in this way using indices so we don't maintain any
         // borrows except for the active child widget - this will allow
         // the child to mutate any other widget in the tree
+        let mut event_eaten = false;
+
         let len = widget.borrow().children.len();
         for i in (0..len).rev() {
             let child = Rc::clone(widget.borrow().children.get(i).unwrap());
 
             if child.borrow().state.in_bounds(event.mouse) {
                 if !child.borrow().state.mouse_is_inside {
+                    trace!("Dispatch mouse entered to '{}'", child.borrow().theme_id);
                     Widget::dispatch_event(&child, state, Event::entered_from(&event));
                 }
 
-                if Widget::dispatch_event(&child, state, event) {
-                    return true;
+                if !event_eaten && Widget::dispatch_event(&child, state, event) {
+                    event_eaten = true;
                 }
             } else if child.borrow().state.mouse_is_inside {
+                trace!("Dispatch mouse exited to '{}'", child.borrow().theme_id);
                 Widget::dispatch_event(&child, state, Event::exited_from(&event));
             }
         }
+
+        if event_eaten { return true; }
 
         let ref widget_kind = Rc::clone(&widget.borrow().kind);
         use io::event::Kind::*;

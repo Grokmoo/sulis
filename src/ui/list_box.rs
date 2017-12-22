@@ -1,7 +1,7 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use ui::{Label, Size, Widget, WidgetKind};
+use ui::{Button, Size, Widget, WidgetKind};
 
 pub struct ListBox {
     entries: Vec<String>,
@@ -45,7 +45,10 @@ impl<'a> WidgetKind<'a> for ListBox {
             Vec::with_capacity(self.entries.len());
 
         for entry in self.entries.iter() {
-            let label = Widget::with_theme(Label::new(&entry), "entry");
+            let label = Widget::with_theme(
+                Button::with_text(&entry, Box::new(|_w, _s| {  })),
+                // Button::with_text(&entry, Box::new(|_w, _s| info!("{}", entry))),
+                "entry");
             children.push(label);
         }
 

@@ -1,21 +1,37 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use ui::{AnimationState, Label, Widget, WidgetKind};
+use ui::{Label, Widget, WidgetKind};
 use io::{event, TextRenderer};
 use state::GameState;
 use resource::Point;
 
 pub struct Button {
     label: Rc<Label>,
-    callback: Box<Fn(&Rc<RefCell<Widget>>, &mut GameState)>,
+    callback: Option<Box<Fn(&Rc<RefCell<Widget>>, &mut GameState)>>,
 }
 
 impl Button {
-    pub fn new(callback: Box<Fn(&Rc<RefCell<Widget>>, &mut GameState)>) -> Rc<Button> {
+    pub fn empty() -> Rc<Button> {
         Rc::new(Button {
             label: Label::empty(),
-            callback
+            callback: None
+        })
+    }
+
+    pub fn with_callback(callback: Box<Fn(&Rc<RefCell<Widget>>,
+                                          &mut GameState)>) -> Rc<Button> {
+        Rc::new(Button {
+            label: Label::empty(),
+            callback: Some(callback)
+        })
+    }
+
+    pub fn with_text(text: &str, callback: Box<Fn(&Rc<RefCell<Widget>>,
+                                                  &mut GameState)>) -> Rc<Button> {
+        Rc::new(Button {
+            label: Label::new(text),
+            callback: Some(callback)
         })
     }
 }
@@ -29,23 +45,12 @@ impl<'a> WidgetKind<'a> for Button {
         self.label.draw_text_mode(renderer, widget);
     }
 
-    fn on_mouse_enter(&self, _state: &mut GameState, widget: &Rc<RefCell<Widget<'a>>>,
-                      _mouse_pos: Point) -> bool {
-        self.super_on_mouse_enter(widget);
-        widget.borrow_mut().state.set_animation_state(AnimationState::MouseOver);
-        true
-    }
-
-    fn on_mouse_exit(&self, _state: &mut GameState, widget: &Rc<RefCell<Widget<'a>>>,
-                     _mouse_pos: Point) -> bool {
-        self.super_on_mouse_exit(widget);
-        widget.borrow_mut().state.set_animation_state(AnimationState::Base);
-        true
-    }
-
     fn on_mouse_click(&self, state: &mut GameState, widget: &Rc<RefCell<Widget<'a>>>,
                       _kind: event::ClickKind, _mouse_pos: Point) -> bool {
-        (self.callback)(widget, state);
+        match self.callback {
+            Some(ref cb) => (cb)(widget, state),
+            None => (),
+        };
         true
     }
 }

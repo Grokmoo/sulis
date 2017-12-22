@@ -5,7 +5,7 @@ use state::GameState;
 use io::{InputAction, TextRenderer};
 use io::event::ClickKind;
 use resource::Point;
-use ui::Widget;
+use ui::{AnimationState, Widget};
 
 pub struct EmptyWidget { }
 
@@ -75,9 +75,11 @@ pub trait WidgetKind<'a> {
 
     fn super_on_mouse_enter(&self, widget: &Rc<RefCell<Widget<'a>>>) {
         widget.borrow_mut().state.set_mouse_inside(true);
+        widget.borrow_mut().state.set_animation_state(AnimationState::MouseOver);
     }
 
     fn super_on_mouse_exit(&self, widget: &Rc<RefCell<Widget<'a>>>) {
         widget.borrow_mut().state.set_mouse_inside(false);
+        widget.borrow_mut().state.set_animation_state(AnimationState::Base);
     }
 }

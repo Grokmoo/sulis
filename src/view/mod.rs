@@ -71,7 +71,7 @@ impl<'a> WidgetKind<'a> for RootView<'a> {
         let right_pane = Widget::with_theme(EmptyWidget::new(), "right_pane");
         {
             let button = Widget::with_theme(
-                Button::new(Box::new(|_w, _s| info!("Hello world"))),
+                Button::with_callback(Box::new(|_w, _s| info!("Hello world"))),
                 "test_button");
 
             let area_title = Widget::with_theme(

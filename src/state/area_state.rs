@@ -6,22 +6,22 @@ use state::Location;
 use std::rc::Rc;
 use std::cell::{Ref, RefCell};
 
-pub struct AreaState<'a> {
+pub struct AreaState {
     pub area: Rc<Area>,
-    pub entities: Vec<Rc<RefCell<EntityState<'a>>>>,
+    pub entities: Vec<Rc<RefCell<EntityState>>>,
 
     entity_grid: Vec<Option<usize>>,
     display: Vec<char>,
 }
 
-impl<'a> PartialEq for AreaState<'a> {
-    fn eq(&self, other: &AreaState<'a>) -> bool {
+impl PartialEq for AreaState {
+    fn eq(&self, other: &AreaState) -> bool {
         self.area == other.area
     }
 }
 
-impl<'a> AreaState<'a> {
-    pub fn new(area: Rc<Area>) -> AreaState<'a> {
+impl AreaState {
+    pub fn new(area: Rc<Area>) -> AreaState {
         let mut display = vec![' ';(area.width * area.height) as usize];
         for (index, element) in display.iter_mut().enumerate() {
             *element = area.terrain.display(index);
@@ -38,7 +38,7 @@ impl<'a> AreaState<'a> {
     }
 
     /// Adds entities defined in the area definition to this area state
-    pub fn populate(area_state: &Rc<RefCell<AreaState<'a>>>) {
+    pub fn populate(area_state: &Rc<RefCell<AreaState>>) {
         let area = Rc::clone(&area_state.borrow().area);
 
         for actor_data in area.actors.iter() {
@@ -62,7 +62,7 @@ impl<'a> AreaState<'a> {
         *self.display.get((x + y * self.area.width) as usize).unwrap()
     }
 
-    pub fn is_passable(&self, requester: &Ref<EntityState<'a>>,
+    pub fn is_passable(&self, requester: &Ref<EntityState>,
                        new_x: i32, new_y: i32) -> bool {
         if !self.area.coords_valid(new_x, new_y) { return false; }
 
@@ -74,7 +74,7 @@ impl<'a> AreaState<'a> {
             .all(|p| self.point_entities_passable(&requester, p.x, p.y))
     }
 
-    fn point_entities_passable(&self, requester: &Ref<EntityState<'a>>,
+    fn point_entities_passable(&self, requester: &Ref<EntityState>,
                                x: i32, y: i32) -> bool {
         if !self.area.coords_valid(x, y) { return false; }
 
@@ -88,7 +88,7 @@ impl<'a> AreaState<'a> {
     }
 
     pub(in state) fn add_actor(&mut self, actor: Rc<Actor>,
-                     location: Location<'a>) -> bool {
+                     location: Location) -> bool {
 
         let new_index = self.entities.len();
         let entity = EntityState::new(actor, location, new_index);
@@ -112,7 +112,7 @@ impl<'a> AreaState<'a> {
         true
     }
 
-    pub(in state) fn update_entity_position(&mut self, entity: &EntityState<'a>,
+    pub(in state) fn update_entity_position(&mut self, entity: &EntityState,
                                            new_x: i32, new_y: i32) {
         let cur_x = entity.location.x;
         let cur_y = entity.location.y;

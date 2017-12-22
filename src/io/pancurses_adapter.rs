@@ -50,9 +50,9 @@ impl Terminal {
     }
 }
 
-impl<'a> IO<'a> for Terminal {
-    fn process_input(&mut self, state: &mut GameState<'a>,
-                     root: Rc<RefCell<Widget<'a>>>) {
+impl IO for Terminal {
+    fn process_input(&mut self, state: &mut GameState,
+                     root: Rc<RefCell<Widget>>) {
         let input = self.window.getch();
         if let None = input {
             return;
@@ -67,7 +67,7 @@ impl<'a> IO<'a> for Terminal {
         state.handle_keyboard_input(input, root);
     }
 
-    fn render_output(&mut self, state: &GameState<'a>, root: Ref<Widget<'a>>,
+    fn render_output(&mut self, state: &GameState, root: Ref<Widget>,
                      millis: u32) {
         self.window.erase();
         self.renderer.clear();

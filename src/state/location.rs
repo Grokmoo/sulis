@@ -5,21 +5,21 @@ use std::fmt::{Debug, Formatter, Result};
 use resource::Point;
 use state::AreaState;
 
-pub struct Location<'a> {
+pub struct Location {
     pub x: i32,
     pub y: i32,
-    pub area_state: Rc<RefCell<AreaState<'a>>>,
+    pub area_state: Rc<RefCell<AreaState>>,
     pub area_id: String,
 }
 
-impl<'a> Debug for Location<'a> {
+impl Debug for Location {
     fn fmt(&self, fmt: &mut Formatter) -> Result {
         write!(fmt, "{{ {},{} in {} }}", self.x, self.y, self.area_id)
     }
 }
 
-impl<'a> PartialEq for Location<'a> {
-    fn eq(&self, other: &Location<'a>) -> bool {
+impl PartialEq for Location {
+    fn eq(&self, other: &Location) -> bool {
         if self.x != other.x || self.y != other.y { return false; }
 
         if &self.area_state != &other.area_state { return false; }
@@ -28,13 +28,13 @@ impl<'a> PartialEq for Location<'a> {
     }
 }
 
-impl<'a> Location<'a> {
-    pub fn new(x: i32, y: i32, area_state: Rc<RefCell<AreaState<'a>>>) -> Location<'a> {
+impl Location {
+    pub fn new(x: i32, y: i32, area_state: Rc<RefCell<AreaState>>) -> Location {
         let area_id = area_state.borrow().area.id.clone();
         Location { x, y, area_state, area_id }
     }
 
-    pub fn from_point(p: &Point, area_state: Rc<RefCell<AreaState<'a>>>) -> Location<'a> {
+    pub fn from_point(p: &Point, area_state: Rc<RefCell<AreaState>>) -> Location {
         let area_id = area_state.borrow().area.id.clone();
         Location { x: p.x, y: p.y, area_state, area_id }
     }

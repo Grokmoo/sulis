@@ -2,10 +2,12 @@ use std::slice::Iter;
 
 use self::AnimationState::*;
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub enum AnimationState {
     Base,
     MouseOver,
+    MouseDown,
+    Active,
 }
 
 impl AnimationState {
@@ -13,11 +15,18 @@ impl AnimationState {
         match *self {
             Base => "base",
             MouseOver => "mouseover",
+            MouseDown => "mousedown",
+            Active => "active",
         }
     }
 
     pub fn iter() -> Iter<'static, AnimationState> {
-        static STATES: [AnimationState; 2] = [ Base, MouseOver ];
+        static STATES: [AnimationState; 4] = [
+            Base,
+            MouseOver,
+            MouseDown,
+            Active
+        ];
         STATES.iter()
     }
 
@@ -25,6 +34,8 @@ impl AnimationState {
         match text {
             "base" => Some(Base),
             "mouseover" => Some(MouseOver),
+            "mousedown" => Some(MouseDown),
+            "active" => Some(Active),
             _ => None,
         }
     }

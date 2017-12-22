@@ -6,8 +6,8 @@ use std::i32;
 use resource::Point;
 use state::{EntityState, AreaState};
 
-pub struct PathFinder<'a> {
-    area_state: Rc<RefCell<AreaState<'a>>>,
+pub struct PathFinder {
+    area_state: Rc<RefCell<AreaState>>,
     pub width: i32,
     pub height: i32,
 
@@ -18,8 +18,8 @@ pub struct PathFinder<'a> {
     came_from: HashMap<i32, i32>,
 }
 
-impl<'a> PathFinder<'a> {
-    pub fn new(area_state: Rc<RefCell<AreaState<'a>>>) -> PathFinder<'a> {
+impl PathFinder {
+    pub fn new(area_state: Rc<RefCell<AreaState>>) -> PathFinder {
         let width = area_state.borrow().area.width;
         let height = area_state.borrow().area.height;
 
@@ -36,7 +36,7 @@ impl<'a> PathFinder<'a> {
         }
     }
 
-    pub fn find(&mut self, requester: Ref<EntityState<'a>>, dest_x: i32,
+    pub fn find(&mut self, requester: Ref<EntityState>, dest_x: i32,
                 dest_y: i32) -> Option<Vec<Point>> {
         debug!("Finding path from {:?} to {},{}",
                requester.location, dest_x, dest_y);

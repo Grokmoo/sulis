@@ -22,8 +22,8 @@ pub enum InputAction {
 }
 
 impl InputAction {
-    pub fn fire_action<'a>(action: InputAction, game_state: &mut GameState<'a>,
-                       root: Rc<RefCell<Widget<'a>>>) {
+    pub fn fire_action(action: InputAction, game_state: &mut GameState,
+                       root: Rc<RefCell<Widget>>) {
         use self::InputAction::*;
 
         debug!("Firing action {:?}", action);

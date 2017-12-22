@@ -10,13 +10,13 @@ use io::{Event, TextRenderer};
 use ui::{Size, Theme, WidgetState, WidgetKind};
 use resource::ResourceSet;
 
-pub struct Widget<'a> {
+pub struct Widget {
     pub state: WidgetState,
-    pub kind: Rc<WidgetKind<'a> + 'a>,
+    pub kind: Rc<WidgetKind>,
     pub uuid: Uuid,
-    pub children: Vec<Rc<RefCell<Widget<'a>>>>,
-    modal_child: Option<Rc<RefCell<Widget<'a>>>>,
-    parent: Option<Rc<RefCell<Widget<'a>>>>,
+    pub children: Vec<Rc<RefCell<Widget>>>,
+    modal_child: Option<Rc<RefCell<Widget>>>,
+    parent: Option<Rc<RefCell<Widget>>>,
     needs_layout: bool,
     pub (in ui) theme: Option<Rc<Theme>>,
     theme_id: String,
@@ -27,7 +27,7 @@ thread_local! {
     static MARKED_FOR_REMOVAL: RefCell<Vec<Uuid>> = RefCell::new(Vec::new());
 }
 
-impl<'a> Widget<'a> {
+impl Widget {
     pub fn has_modal(&self) -> bool {
         self.modal_child.is_some()
     }
@@ -56,7 +56,16 @@ impl<'a> Widget<'a> {
         });
     }
 
-    pub fn add_child(&mut self, child: Rc<RefCell<Widget<'a>>>) {
+    /// Causes this widget and all of its children to be layed out
+    /// again on the next UI update.
+    /// TODO if this is called in code during the layout process
+    /// will create a loop where the widget is layed out every
+    /// frame.  detect and prevent this
+    pub fn invalidate_layout(&mut self) {
+        self.needs_layout = true;
+    }
+
+    pub fn add_child(&mut self, child: Rc<RefCell<Widget>>) {
         trace!("Adding {:?} to {:?}", child.borrow().kind.get_name(),
             self.kind.get_name());
 
@@ -68,7 +77,7 @@ impl<'a> Widget<'a> {
         self.children.push(child);
     }
 
-    pub fn add_children(&mut self, children: Vec<Rc<RefCell<Widget<'a>>>>) {
+    pub fn add_children(&mut self, children: Vec<Rc<RefCell<Widget>>>) {
         for child in children.into_iter() {
             self.add_child(child);
         }
@@ -157,8 +166,8 @@ impl<'a> Widget<'a> {
     }
 }
 
-impl<'a> Widget<'a> {
-    fn new(kind: Rc<WidgetKind<'a> + 'a>, theme: &str) -> Rc<RefCell<Widget<'a>>> {
+impl Widget {
+    fn new(kind: Rc<WidgetKind>, theme: &str) -> Rc<RefCell<Widget>> {
         let widget = Widget {
             state: WidgetState::new(),
             kind: Rc::clone(&kind),
@@ -179,35 +188,35 @@ impl<'a> Widget<'a> {
         widget
     }
 
-    pub fn with_defaults(widget: Rc<WidgetKind<'a> + 'a>) -> Rc<RefCell<Widget<'a>>> {
+    pub fn with_defaults(widget: Rc<WidgetKind>) -> Rc<RefCell<Widget>> {
         let name = widget.get_name().to_string();
         Widget::new(widget, &name)
     }
 
-    pub fn with_theme(widget: Rc<WidgetKind<'a> + 'a>,
-                      theme: &str) -> Rc<RefCell<Widget<'a>>> {
+    pub fn with_theme(widget: Rc<WidgetKind>,
+                      theme: &str) -> Rc<RefCell<Widget>> {
         Widget::new(widget, theme)
     }
 
-    pub fn get_parent(widget: &Rc<RefCell<Widget<'a>>>) -> Rc<RefCell<Widget<'a>>> {
+    pub fn get_parent(widget: &Rc<RefCell<Widget>>) -> Rc<RefCell<Widget>> {
         Rc::clone(widget.borrow().parent.as_ref().unwrap())
     }
 
-    pub fn add_child_to(parent: &Rc<RefCell<Widget<'a>>>,
-                         child: Rc<RefCell<Widget<'a>>>) {
+    pub fn add_child_to(parent: &Rc<RefCell<Widget>>,
+                         child: Rc<RefCell<Widget>>) {
         parent.borrow_mut().add_child(child);
         parent.borrow_mut().needs_layout = true;
     }
 
-    pub fn add_children_to(parent: &Rc<RefCell<Widget<'a>>>,
-                        children: Vec<Rc<RefCell<Widget<'a>>>>) {
+    pub fn add_children_to(parent: &Rc<RefCell<Widget>>,
+                        children: Vec<Rc<RefCell<Widget>>>) {
         for child in children.into_iter() {
             Widget::add_child_to(parent, child);
         }
     }
 
-    pub fn get_child_with_name(widget: &Rc<RefCell<Widget<'a>>>,
-                               name: &str) -> Option<Rc<RefCell<Widget<'a>>>> {
+    pub fn get_child_with_name(widget: &Rc<RefCell<Widget>>,
+                               name: &str) -> Option<Rc<RefCell<Widget>>> {
         for child in widget.borrow().children.iter() {
             if child.borrow().kind.get_name() == name {
                 return Some(Rc::clone(child));
@@ -216,7 +225,7 @@ impl<'a> Widget<'a> {
         None
     }
 
-    pub fn update(root: &Rc<RefCell<Widget<'a>>>) -> Result<(), Error> {
+    pub fn update(root: &Rc<RefCell<Widget>>) -> Result<(), Error> {
         Widget::check_children(&root)?;
 
         root.borrow_mut().layout_widget();
@@ -224,7 +233,7 @@ impl<'a> Widget<'a> {
         Ok(())
     }
 
-    pub fn check_children(parent: &Rc<RefCell<Widget<'a>>>) -> Result<(), Error> {
+    pub fn check_children(parent: &Rc<RefCell<Widget>>) -> Result<(), Error> {
         let mut remove_modal = false;
         if let Some(ref w) = parent.borrow().modal_child {
             MARKED_FOR_REMOVAL.with(|list| {
@@ -291,7 +300,7 @@ impl<'a> Widget<'a> {
         Ok(())
     }
 
-    pub fn dispatch_event(widget: &Rc<RefCell<Widget<'a>>>,
+    pub fn dispatch_event(widget: &Rc<RefCell<Widget>>,
                           state: &mut GameState, event: Event) -> bool {
         trace!("Dispatching event {:?} in {:?}", event,
                widget.borrow().theme_id);

@@ -21,12 +21,12 @@ use config::{Config, IOAdapter};
 use ui::Widget;
 use io::keyboard_event::Key;
 
-pub trait IO<'a> {
-    fn process_input(&mut self, game_state: &mut GameState<'a>,
-                     root: Rc<RefCell<Widget<'a>>>);
+pub trait IO {
+    fn process_input(&mut self, game_state: &mut GameState,
+                     root: Rc<RefCell<Widget>>);
 
-    fn render_output(&mut self, game_state: &GameState<'a>,
-                     root: Ref<Widget<'a>>, millis: u32);
+    fn render_output(&mut self, game_state: &GameState,
+                     root: Ref<Widget>, millis: u32);
 }
 
 pub trait TextRenderer {
@@ -39,7 +39,7 @@ pub trait TextRenderer {
     fn set_cursor_pos(&mut self, x: i32, y: i32);
 }
 
-pub fn create<'a>(config: &Config) -> Result<Box<IO + 'a>, Error> {
+pub fn create(config: &Config) -> Result<Box<IO>, Error> {
     match config.display.adapter {
         IOAdapter::Pancurses => get_pancurses_adapter(config),
         IOAdapter::Termion => get_termion_adapter(config)
@@ -47,24 +47,24 @@ pub fn create<'a>(config: &Config) -> Result<Box<IO + 'a>, Error> {
 }
 
 #[cfg(not(target_os = "windows"))]
-pub fn get_termion_adapter<'a>(config: &Config) -> Result<Box<IO + 'a>, Error> {
+pub fn get_termion_adapter(config: &Config) -> Result<Box<IO>, Error> {
     Ok(Box::new(termion_adapter::Terminal::new(config)))
 }
 
 #[cfg(not(target_os = "windows"))]
-pub fn get_pancurses_adapter<'a>(_config: &Config) -> Result<Box<IO + 'a>, Error> {
+pub fn get_pancurses_adapter(_config: &Config) -> Result<Box<IO>, Error> {
     Err(Error::new(ErrorKind::InvalidInput,
                    "Pancurses display adapter is only support on windows.  Try 'Termion'"))
 }
 
 #[cfg(target_os = "windows")]
-pub fn get_termion_adapter<'a>(_config: &Config) -> Result<Box<IO + 'a>, Error> {
+pub fn get_termion_adapter(_config: &Config) -> Result<Box<IO>, Error> {
     Err(Error::new(ErrorKind::InvalidInput,
                    "Termion display adapter is not supported on windows.  Try 'Pancurses'"))
 }
 
 #[cfg(target_os = "windows")]
-pub fn get_pancurses_adapter<'a>(config: &Config) -> Result<Box<IO + 'a>, Error> {
+pub fn get_pancurses_adapter(config: &Config) -> Result<Box<IO>, Error> {
     Ok(Box::new(pancurses_adapter::Terminal::new(config)))
 }
 

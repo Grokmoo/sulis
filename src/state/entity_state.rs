@@ -7,14 +7,14 @@ use state::ActorState;
 use std::rc::Rc;
 
 #[derive(PartialEq)]
-pub struct EntityState<'a> {
+pub struct EntityState {
     pub actor: ActorState,
-    pub(in state) location: Location<'a>,
+    pub(in state) location: Location,
     size: Rc<Size>,
     pub index: usize, // index in vec of the owning area state
 }
 
-impl<'a> EntityState<'a> {
+impl EntityState {
     pub(in state) fn new(actor: Rc<Actor>, location: Location, index: usize) -> EntityState {
         debug!("Creating new entity state for {}", actor.id);
         let size = Rc::clone(&actor.default_size);

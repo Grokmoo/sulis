@@ -1,35 +1,51 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use ui::{Button, Callback, Size, Widget, WidgetKind};
+use ui::{AnimationState, Button, Callback, Size, Widget, WidgetKind};
+
+pub struct Entry {
+    text: String,
+    callback: Option<Callback<Button>>,
+    animation_state: AnimationState,
+}
+
+impl Entry {
+    pub fn new(text: &str, callback: Option<Callback<Button>>) -> Entry {
+       Entry {
+           text: text.to_string(),
+           callback,
+           animation_state: AnimationState::Base,
+       }
+    }
+
+    pub fn with_state(text: &str, callback: Option<Callback<Button>>,
+                      animation_state: AnimationState) -> Entry {
+        Entry {
+            text: text.to_string(),
+            callback,
+            animation_state,
+        }
+    }
+}
 
 pub struct ListBox {
-    entries: Vec<String>,
-    callback: Option<Callback>,
+    entries: Vec<Entry>,
 }
 
 impl ListBox {
-    pub fn new(entries: Vec<String>) -> Rc<ListBox> {
+    pub fn new(entries: Vec<Entry>) -> Rc<ListBox> {
         Rc::new(ListBox {
             entries,
-            callback: None,
-        })
-    }
-
-    pub fn with_callback(callback: Callback, entries: Vec<String>) -> Rc<ListBox> {
-        Rc::new(ListBox {
-            entries,
-            callback: Some(callback),
         })
     }
 }
 
-impl<'a> WidgetKind<'a> for ListBox {
+impl WidgetKind for ListBox {
     fn get_name(&self) -> &str {
         "list_box"
     }
 
-    fn layout(&self, widget: &mut Widget<'a>) {
+    fn layout(&self, widget: &mut Widget) {
         widget.do_self_layout();
 
         let width = widget.state.inner_size.width;
@@ -48,17 +64,19 @@ impl<'a> WidgetKind<'a> for ListBox {
         }
     }
 
-    fn on_add(&self, _widget: &Rc<RefCell<Widget<'a>>>) -> Vec<Rc<RefCell<Widget<'a>>>> {
-
-        let mut children: Vec<Rc<RefCell<Widget<'a>>>> =
+    fn on_add(&self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+        let mut children: Vec<Rc<RefCell<Widget>>> =
             Vec::with_capacity(self.entries.len());
 
         for entry in self.entries.iter() {
-            let label = Widget::with_theme(
-                // TODO pass a callback here
-                //Button::new(&entry, self.callback), "entry");
-                Button::with_text(&entry), "entry");
-            children.push(label);
+            let kind = match &entry.callback {
+                &Some(ref cb) => Button::new(&entry.text, Rc::clone(&cb)),
+                &None => Button::with_text(&entry.text),
+            };
+
+            let widget = Widget::with_theme(kind, "entry");
+            widget.borrow_mut().state.set_animation_state(entry.animation_state);
+            children.push(widget);
         }
 
         children

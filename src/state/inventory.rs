@@ -36,9 +36,9 @@ impl Inventory {
         }
     }
 
-    /// equips the item at the given index.  returns true if the item
-    /// was equipped.  false if the item does not exist
-    pub fn equip(&mut self, index: usize) -> bool {
+    /// checks whether the item at the given index is equipped.
+    /// returns true if it is, false otherwise
+    pub fn is_equipped(&self, index: usize) -> bool {
         let slot = match self.items.get(index) {
             None => return false,
             Some(item) => match &item.item.slot {
@@ -47,10 +47,27 @@ impl Inventory {
             }
         };
 
+        self.equipped.get(&slot) == Some(&index)
+    }
+
+    /// equips the item at the given index.  returns true if the item
+    /// was equipped.  false if the item does not exist
+    pub fn equip(&mut self, index: usize) -> bool {
+        trace!("Attempting equip of item at '{}", index);
+        let slot = match self.items.get(index) {
+            None => return false,
+            Some(item) => match &item.item.slot {
+                &None => return false,
+                &Some(slot) => slot,
+            }
+        };
+        trace!("Found matching slot '{:?}'", slot);
+
         if !self.unequip(slot) {
             return false;
         }
 
+        debug!("Equipping item at '{}' into '{:?}'", index, slot);
         self.equipped.insert(slot, index);
         true
     }

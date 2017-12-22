@@ -23,12 +23,12 @@ impl Label {
     }
 }
 
-impl<'a> WidgetKind<'a> for Label {
+impl WidgetKind for Label {
     fn get_name(&self) -> &str {
         "label"
     }
 
-    fn layout(&self, widget: &mut Widget<'a>) {
+    fn layout(&self, widget: &mut Widget) {
         widget.do_base_layout();
 
         if let Some(ref text) = self.text {
@@ -36,7 +36,7 @@ impl<'a> WidgetKind<'a> for Label {
         }
     }
 
-    fn draw_text_mode(&self, renderer: &mut TextRenderer, widget: &Widget<'a>) {
+    fn draw_text_mode(&self, renderer: &mut TextRenderer, widget: &Widget) {
         let text = &widget.state.text;
         let x = widget.state.inner_left();
         let y = widget.state.inner_top();

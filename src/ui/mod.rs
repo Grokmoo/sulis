@@ -26,7 +26,7 @@ pub use self::label::Label;
 mod button;
 pub use self::button::Button;
 
-mod list_box;
+pub mod list_box;
 pub use self::list_box::ListBox;
 
 mod window;
@@ -40,10 +40,10 @@ use config::Config;
 use resource::ResourceSet;
 use view::RootView;
 
-type Callback = Box<Fn(&Rc<RefCell<Widget>>, &mut GameState)>;
+pub type Callback<T> = Rc<Fn(&T, &Rc<RefCell<Widget>>, &mut GameState)>;
 
-pub fn create_ui_tree<'a>(area_state: Rc<RefCell<AreaState<'a>>>,
-    config: &Config) -> Rc<RefCell<Widget<'a>>> {
+pub fn create_ui_tree(area_state: Rc<RefCell<AreaState>>,
+    config: &Config) -> Rc<RefCell<Widget>> {
 
     debug!("Creating UI tree.");
     let root = Widget::with_defaults(RootView::new(area_state));

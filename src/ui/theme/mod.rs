@@ -5,7 +5,7 @@ use std::collections::HashMap;
 
 use resource::BuilderType;
 use resource::Point;
-use ui::{Border, Size};
+use ui::{AnimationState, Border, Size};
 
 use serde_json;
 use serde_yaml;
@@ -37,6 +37,14 @@ pub enum VerticalTextAlignment {
     Bottom,
 }
 
+#[derive(Deserialize, Debug, Clone, Copy)]
+pub enum TextFormat {
+    Normal,
+    Bold,
+    Italic,
+    Underline,
+}
+
 #[derive(Debug)]
 pub struct Theme {
     pub text: Option<String>,
@@ -51,11 +59,11 @@ pub struct Theme {
     pub children: HashMap<String, Rc<Theme>>,
     pub horizontal_text_alignment: HorizontalTextAlignment,
     pub vertical_text_alignment: VerticalTextAlignment,
+    pub text_format: HashMap<AnimationState, TextFormat>,
 }
 
 impl Theme {
-    pub fn new(builder: ThemeBuilder)
-        -> Theme {
+    pub fn new(builder: ThemeBuilder) -> Theme {
 
         let mut children: HashMap<String, Rc<Theme>> = HashMap::new();
 
@@ -63,6 +71,24 @@ impl Theme {
             for (id, child) in builder_children {
                 children.insert(id, Rc::new(Theme::new(child)));
             }
+        }
+
+        let mut text_format: HashMap<AnimationState, TextFormat> = HashMap::new();
+        if let Some(builder_text_format) = builder.text_format {
+            for (state_str, format) in builder_text_format {
+                match AnimationState::find(&state_str) {
+                    Some(state) => { text_format.insert(state, format); }
+                    None => warn!("The animation state '{}' does not exist \
+                                  for the text_format '{:?}'", state_str, format),
+                };
+            }
+        }
+
+        // fill in default for unspecified states
+        for state in AnimationState::iter() {
+            if let Some(_) = text_format.get(state) { continue; }
+
+            text_format.insert(*state, TextFormat::Normal);
         }
 
         let x_relative = builder.x_relative.unwrap_or(PositionRelative::Zero);
@@ -90,6 +116,7 @@ impl Theme {
             children,
             horizontal_text_alignment,
             vertical_text_alignment,
+            text_format,
         }
     }
 }
@@ -102,6 +129,7 @@ pub struct ThemeBuilder {
     pub text: Option<String>,
     pub horizontal_text_alignment: Option<HorizontalTextAlignment>,
     pub vertical_text_alignment: Option<VerticalTextAlignment>,
+    pub text_format: Option<HashMap<String, TextFormat>>,
     pub position: Option<Point>,
     pub x_relative: Option<PositionRelative>,
     pub y_relative: Option<PositionRelative>,
@@ -190,6 +218,20 @@ impl ThemeBuilder {
             self.vertical_text_alignment = other.vertical_text_alignment;
         }
 
+        // copy over only those states which aren't specified in this theme
+        if let Some(other_text_format) = other.text_format {
+            if self.text_format.is_none() {
+                self.text_format = Some(HashMap::new());
+            }
+
+            for (state, format) in other_text_format {
+                if !self.text_format.as_ref().unwrap().contains_key(&state) {
+                    self.text_format.as_mut().unwrap().insert(state, format);
+                }
+            }
+        }
+
+        // copy over only those children which aren't specified in this theme
         if let Some(other_children) = other.children {
             if self.children.is_none() {
                 self.children = Some(HashMap::new());

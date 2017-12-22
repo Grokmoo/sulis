@@ -12,27 +12,29 @@ impl Window {
     }
 }
 
-impl<'a> WidgetKind<'a> for Window {
+impl WidgetKind for Window {
     fn get_name(&self) -> &str {
         "window"
     }
 
-    fn layout(&self, widget: &mut Widget<'a>) {
+    fn layout(&self, widget: &mut Widget) {
         widget.do_base_layout();
     }
 
-    fn on_add(&self, _widget: &Rc<RefCell<Widget<'a>>>) -> Vec<Rc<RefCell<Widget<'a>>>> {
+    fn on_add(&self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let label = Widget::with_theme(Label::empty(), "title");
 
         let cancel = Widget::with_theme(
-            Button::with_callback(Box::new(|widget, _game_state| {
+            Button::with_callback(Rc::new(|_kind, widget, _game_state| {
                 let parent = Widget::get_parent(&widget);
                 parent.borrow_mut().mark_for_removal();
             })),
             "cancel");
 
         let quit = Widget::with_theme(
-            Button::with_callback(Box::new(|_widget, game_state| { game_state.set_exit(); })),
+            Button::with_callback(Rc::new(|_kind, _widget, game_state| {
+                game_state.set_exit();
+            })),
             "quit");
 
         vec![cancel, quit, label]

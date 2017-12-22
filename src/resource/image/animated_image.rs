@@ -49,19 +49,21 @@ impl AnimatedImage {
             }
         }
 
-        // check that all states are accounted for
-        for state in AnimationState::iter() {
-            let entry = images_map.get(state.get_text());
-
-            if let None = entry {
-                return Err(Error::new(ErrorKind::InvalidData,
-                    format!("AnimatedImage must be specified for state '{}'", state.get_text())));
+        let base_entry = {
+            let entry = images_map.get(AnimationState::Base.get_text());
+            match entry {
+                Some(ref entry) => Rc::clone(&entry),
+                None => return Err(Error::new(ErrorKind::InvalidData,
+                    format!("AnimatedImage must be specified for the base \
+                            state '{}'", AnimationState::Base.get_text()))),
             }
-        }
+        };
 
-        if images_map.is_empty() {
-            return Err(Error::new(ErrorKind::InvalidData,
-                format!("Cannot have an empty animated image.")));
+        // fill in any other empty states with the base state
+        for state in AnimationState::iter() {
+            if let Some(_) = images_map.get(state.get_text()) { continue; }
+
+            images_map.insert(state.get_text().to_string(), Rc::clone(&base_entry));
         }
 
         Ok(Rc::new(AnimatedImage {

@@ -91,6 +91,10 @@ impl WidgetState {
         self.text = text.to_string();
     }
 
+    pub fn append_text(&mut self, text: &str) {
+        self.text.push_str(text);
+    }
+
     pub fn set_animation_state(&mut self, state: AnimationState) {
         self.animation_state = state;
     }

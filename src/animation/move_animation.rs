@@ -6,16 +6,16 @@ use state::EntityState;
 use resource::Point;
 use animation;
 
-pub struct MoveAnimation<'a> {
-   mover: Rc<RefCell<EntityState<'a>>>,
+pub struct MoveAnimation {
+   mover: Rc<RefCell<EntityState>>,
    path: Vec<Point>,
    start_time: Instant,
    frame_time_millis: u32,
 }
 
-impl<'a> MoveAnimation<'a> {
-    pub fn new(mover: Rc<RefCell<EntityState<'a>>>,
-               path: Vec<Point>, frame_time_millis: u32) -> MoveAnimation<'a> {
+impl MoveAnimation {
+    pub fn new(mover: Rc<RefCell<EntityState>>,
+               path: Vec<Point>, frame_time_millis: u32) -> MoveAnimation {
 
         MoveAnimation {
             mover,
@@ -27,7 +27,7 @@ impl<'a> MoveAnimation<'a> {
 
 }
 
-impl<'a> animation::Animation for MoveAnimation<'a> {
+impl animation::Animation for MoveAnimation {
     fn update(&self) -> bool {
         let frame_index = animation::get_current_frame(self.start_time.elapsed(),
             self.frame_time_millis, self.path.len() - 1);

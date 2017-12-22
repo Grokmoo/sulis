@@ -51,9 +51,9 @@ impl Terminal {
     }
 }
 
-impl<'a> IO<'a> for Terminal {
-    fn process_input(&mut self, state: &mut GameState<'a>,
-                     root: Rc<RefCell<Widget<'a>>>) {
+impl IO for Terminal {
+    fn process_input(&mut self, state: &mut GameState,
+                     root: Rc<RefCell<Widget>>) {
         let mut buf: Vec<u8> = Vec::new();
 
         loop {
@@ -92,7 +92,7 @@ impl<'a> IO<'a> for Terminal {
         }
     }
 
-    fn render_output(&mut self, state: &GameState<'a>, root: Ref<Widget<'a>>,
+    fn render_output(&mut self, state: &GameState, root: Ref<Widget>,
                      millis: u32) {
         state.draw_text_mode(&mut self.renderer, root, millis);
 

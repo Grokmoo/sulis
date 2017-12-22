@@ -12,24 +12,24 @@ use resource::Point;
 use ui::{Button, EmptyWidget, Label, Widget, WidgetKind, Window};
 use state::{AreaState, GameState};
 
-pub struct RootView<'a> {
-    area_state: Rc<RefCell<AreaState<'a>>>,
+pub struct RootView {
+    area_state: Rc<RefCell<AreaState>>,
 }
 
-impl<'a> RootView<'a> {
-    pub fn new(area_state: Rc<RefCell<AreaState<'a>>>) -> Rc<RootView<'a>> {
+impl RootView {
+    pub fn new(area_state: Rc<RefCell<AreaState>>) -> Rc<RootView> {
         Rc::new(RootView {
             area_state,
         })
     }
 }
 
-impl<'a> WidgetKind<'a> for RootView<'a> {
+impl WidgetKind for RootView {
     fn get_name(&self) -> &str {
         "root"
     }
 
-    fn on_key_press(&self, state: &mut GameState, widget: &Rc<RefCell<Widget<'a>>>,
+    fn on_key_press(&self, state: &mut GameState, widget: &Rc<RefCell<Widget>>,
                     key: InputAction, _mouse_pos: Point) -> bool {
         use io::InputAction::*;
         match key {
@@ -60,7 +60,7 @@ impl<'a> WidgetKind<'a> for RootView<'a> {
         }
     }
 
-    fn on_add(&self, _widget: &Rc<RefCell<Widget<'a>>>) -> Vec<Rc<RefCell<Widget<'a>>>> {
+    fn on_add(&self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         debug!("Adding to root widget.");
 
         let mouse_over = Widget::with_theme(Label::empty(), "mouse_over");
@@ -71,7 +71,7 @@ impl<'a> WidgetKind<'a> for RootView<'a> {
         let right_pane = Widget::with_theme(EmptyWidget::new(), "right_pane");
         {
             let button = Widget::with_theme(
-                Button::with_callback(Box::new(|_w, _s| info!("Hello world"))),
+                Button::with_callback(Rc::new(|_k, _w, _s| info!("Hello world"))),
                 "test_button");
 
             let area_title = Widget::with_theme(

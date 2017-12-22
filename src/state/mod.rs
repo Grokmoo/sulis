@@ -33,20 +33,20 @@ use io::{Event, KeyboardEvent, InputAction, TextRenderer};
 use animation::{Animation, MoveAnimation};
 use ui::Widget;
 
-pub struct GameState<'a> {
+pub struct GameState {
     config: Config,
-    pub area_state: Rc<RefCell<AreaState<'a>>>,
-    path_finder: PathFinder<'a>,
+    pub area_state: Rc<RefCell<AreaState>>,
+    path_finder: PathFinder,
 
-    pub pc: Rc<RefCell<EntityState<'a>>>,
+    pub pc: Rc<RefCell<EntityState>>,
     pub cursor: Cursor,
-    animations: Vec<Box<Animation + 'a>>,
+    animations: Vec<Box<Animation>>,
 
     pub should_exit: bool,
 }
 
-impl<'a> GameState<'a> {
-    pub fn new(config: Config) -> Result<GameState<'a>, Error> {
+impl GameState {
+    pub fn new(config: Config) -> Result<GameState, Error> {
         let game = ResourceSet::get_game();
 
         debug!("Setting up area state from {}", &game.starting_area);
@@ -121,7 +121,7 @@ impl<'a> GameState<'a> {
     }
 
     pub fn draw_text_mode(&self, renderer: &mut TextRenderer,
-                          root: Ref<Widget<'a>>, millis: u32) {
+                          root: Ref<Widget>, millis: u32) {
         root.draw_text_mode(renderer);
 
         self.cursor.draw_text_mode(renderer, millis);
@@ -139,7 +139,7 @@ impl<'a> GameState<'a> {
         false
     }
 
-    pub fn cursor_click(&mut self, root: Rc<RefCell<Widget<'a>>>) -> bool {
+    pub fn cursor_click(&mut self, root: Rc<RefCell<Widget>>) -> bool {
         let x = self.cursor.x;
         let y = self.cursor.y;
 
@@ -153,7 +153,7 @@ impl<'a> GameState<'a> {
     }
 
     pub fn handle_keyboard_input(&mut self, input: KeyboardEvent,
-                                 root: Rc<RefCell<Widget<'a>>>) {
+                                 root: Rc<RefCell<Widget>>) {
 
         debug!("Received {:?}", input);
         let action = {
@@ -167,11 +167,11 @@ impl<'a> GameState<'a> {
         InputAction::fire_action(action, self, root);
     }
 
-    pub fn pc(&self) -> Ref<EntityState<'a>> {
+    pub fn pc(&self) -> Ref<EntityState> {
         self.pc.borrow()
     }
 
-    pub fn pc_mut(&mut self) -> RefMut<EntityState<'a>> {
+    pub fn pc_mut(&mut self) -> RefMut<EntityState> {
         self.pc.borrow_mut()
     }
 

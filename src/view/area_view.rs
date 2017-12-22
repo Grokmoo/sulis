@@ -8,14 +8,14 @@ use io::{InputAction, TextRenderer};
 use io::event::ClickKind;
 use resource::Point;
 
-pub struct AreaView<'a> {
-    area_state: Rc<RefCell<AreaState<'a>>>,
-    mouse_over: Rc<RefCell<Widget<'a>>>,
+pub struct AreaView {
+    area_state: Rc<RefCell<AreaState>>,
+    mouse_over: Rc<RefCell<Widget>>,
 }
 
-impl<'a> AreaView<'a> {
-    pub fn new(area_state: &Rc<RefCell<AreaState<'a>>>,
-               mouse_over: Rc<RefCell<Widget<'a>>>) -> Rc<AreaView<'a>> {
+impl AreaView {
+    pub fn new(area_state: &Rc<RefCell<AreaState>>,
+               mouse_over: Rc<RefCell<Widget>>) -> Rc<AreaView> {
         Rc::new(AreaView {
             area_state: Rc::clone(area_state),
             mouse_over: mouse_over,
@@ -24,12 +24,12 @@ impl<'a> AreaView<'a> {
 
 }
 
-impl<'a> WidgetKind<'a> for AreaView<'a> {
+impl WidgetKind for AreaView {
     fn get_name(&self) -> &str {
         "area"
     }
 
-    fn on_add(&self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget<'a>>>> {
+    fn on_add(&self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let width = self.area_state.borrow().area.width;
         let height = self.area_state.borrow().area.height;
         widget.borrow_mut().state.set_max_scroll_pos(width, height);
@@ -37,7 +37,7 @@ impl<'a> WidgetKind<'a> for AreaView<'a> {
         Vec::with_capacity(0)
     }
 
-    fn draw_text_mode(&self, renderer: &mut TextRenderer, widget: &Widget<'a>) {
+    fn draw_text_mode(&self, renderer: &mut TextRenderer, widget: &Widget) {
         let p = widget.state.inner_position;
         let s = widget.state.inner_size;
 
@@ -58,7 +58,7 @@ impl<'a> WidgetKind<'a> for AreaView<'a> {
         }
     }
 
-    fn on_key_press(&self, _state: &mut GameState, widget: &Rc<RefCell<Widget<'a>>>,
+    fn on_key_press(&self, _state: &mut GameState, widget: &Rc<RefCell<Widget>>,
                     key: InputAction, _mouse_pos: Point) -> bool {
 
         use io::InputAction::*;
@@ -72,7 +72,7 @@ impl<'a> WidgetKind<'a> for AreaView<'a> {
         true
     }
 
-    fn on_mouse_click(&self, state: &mut GameState, widget: &Rc<RefCell<Widget<'a>>>,
+    fn on_mouse_click(&self, state: &mut GameState, widget: &Rc<RefCell<Widget>>,
                 _kind: ClickKind, mouse_pos: Point) -> bool {
         let size = state.pc().size();
         let pos = &widget.borrow().state.position;
@@ -86,7 +86,7 @@ impl<'a> WidgetKind<'a> for AreaView<'a> {
         true
     }
 
-    fn on_mouse_move(&self, _state: &mut GameState, widget: &Rc<RefCell<Widget<'a>>>,
+    fn on_mouse_move(&self, _state: &mut GameState, widget: &Rc<RefCell<Widget>>,
                       mouse_pos: Point) -> bool {
         self.super_on_mouse_enter(widget);
         self.mouse_over.borrow_mut().state.set_text(&format!("[{},{}]",
@@ -94,7 +94,7 @@ impl<'a> WidgetKind<'a> for AreaView<'a> {
         true
     }
 
-    fn on_mouse_exit(&self, _state: &mut GameState, widget: &Rc<RefCell<Widget<'a>>>,
+    fn on_mouse_exit(&self, _state: &mut GameState, widget: &Rc<RefCell<Widget>>,
                      _mouse_pos: Point) -> bool {
         self.super_on_mouse_exit(widget);
         self.mouse_over.borrow_mut().state.set_text("");

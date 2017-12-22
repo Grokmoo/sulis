@@ -6,7 +6,7 @@ use ui::{Widget, WidgetKind};
 use io::TextRenderer;
 
 pub struct Label {
-    text: Option<String>,
+    pub text: Option<String>,
 }
 
 impl Label {

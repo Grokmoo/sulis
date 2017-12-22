@@ -1,16 +1,25 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use ui::{Button, Size, Widget, WidgetKind};
+use ui::{Button, Callback, Size, Widget, WidgetKind};
 
 pub struct ListBox {
     entries: Vec<String>,
+    callback: Option<Callback>,
 }
 
 impl ListBox {
     pub fn new(entries: Vec<String>) -> Rc<ListBox> {
         Rc::new(ListBox {
-            entries
+            entries,
+            callback: None,
+        })
+    }
+
+    pub fn with_callback(callback: Callback, entries: Vec<String>) -> Rc<ListBox> {
+        Rc::new(ListBox {
+            entries,
+            callback: Some(callback),
         })
     }
 }
@@ -46,10 +55,9 @@ impl<'a> WidgetKind<'a> for ListBox {
 
         for entry in self.entries.iter() {
             let label = Widget::with_theme(
-                Button::with_text(&entry, Box::new(|_w, _s| {  })),
-                // TODO callback here that interfaces with a listbox overall callback
-                // Button::with_text(&entry, Box::new(|_w, _s| info!("{}", entry))),
-                "entry");
+                // TODO pass a callback here
+                //Button::new(&entry, self.callback), "entry");
+                Button::with_text(&entry), "entry");
             children.push(label);
         }
 

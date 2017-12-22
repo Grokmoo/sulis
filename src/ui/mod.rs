@@ -35,10 +35,12 @@ pub use self::window::Window;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use state::AreaState;
+use state::{AreaState, GameState};
 use config::Config;
 use resource::ResourceSet;
 use view::RootView;
+
+type Callback = Box<Fn(&Rc<RefCell<Widget>>, &mut GameState)>;
 
 pub fn create_ui_tree<'a>(area_state: Rc<RefCell<AreaState<'a>>>,
     config: &Config) -> Rc<RefCell<Widget<'a>>> {

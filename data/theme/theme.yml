@@ -17,7 +17,6 @@ children:
         position: [0, 0]
       test_button:
         from: .button
-        text: "Test"
         preferred_size: [18, 3]
         position: [0, 2]
   area:

@@ -42,10 +42,12 @@ impl BufferedTextRenderer {
         out
     }
 
+    #[allow(dead_code)] // used on unix, not windows
     pub fn get_char(&self, x: i32, y: i32) -> char {
         self.buffer[(x + y * self.size.width) as usize]
     }
 
+    #[allow(dead_code)] // used on unix, not windows
     pub fn has_changed(&self, x: i32, y: i32) -> bool {
         let cur = self.buffer[(x + y * self.size.width) as usize];
         let last = self.last_buffer[(x + y * self.size.width) as usize];
@@ -53,6 +55,7 @@ impl BufferedTextRenderer {
         cur != last
     }
 
+    #[allow(dead_code)] // used on unix, not windows
     pub fn swap(&mut self) {
         self.last_buffer.copy_from_slice(&self.buffer);
     }

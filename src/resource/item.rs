@@ -10,6 +10,7 @@ use state::inventory;
 use serde_json;
 use serde_yaml;
 
+#[derive(Debug)]
 pub struct Item {
     pub id: String,
     pub name: String,

@@ -76,19 +76,15 @@ impl Theme {
         let mut text_format: HashMap<AnimationState, TextFormat> = HashMap::new();
         if let Some(builder_text_format) = builder.text_format {
             for (state_str, format) in builder_text_format {
-                match AnimationState::find(&state_str) {
-                    Some(state) => { text_format.insert(state, format); }
-                    None => warn!("The animation state '{}' does not exist \
-                                  for the text_format '{:?}'", state_str, format),
+                match AnimationState::parse(&state_str) {
+                    Ok(state) => { text_format.insert(state, format); }
+                    Err(e) => {
+                        warn!("The animation state '{}' could not be parsed \
+                              for the text_format '{:?}'", state_str, format);
+                        warn!("{}", e);
+                    }
                 };
             }
-        }
-
-        // fill in default for unspecified states
-        for state in AnimationState::iter() {
-            if let Some(_) = text_format.get(state) { continue; }
-
-            text_format.insert(*state, TextFormat::Normal);
         }
 
         let x_relative = builder.x_relative.unwrap_or(PositionRelative::Zero);

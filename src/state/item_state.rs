@@ -2,7 +2,7 @@ use resource::Item;
 
 use std::rc::Rc;
 
-#[derive(Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct ItemState {
     pub item: Rc<Item>,
 }

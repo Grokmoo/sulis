@@ -1,4 +1,6 @@
 id: fill
 states:
-  base: fill_empty
-  mouseover: fill_active
+  normal: fill_empty
+  hover: fill_hover
+  active: fill_active
+  hover + active: fill_active

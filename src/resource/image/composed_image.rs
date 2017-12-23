@@ -4,7 +4,7 @@ use std::collections::HashMap;
 
 use resource::{Image, Point, ResourceBuilder};
 use io::TextRenderer;
-use ui::Size;
+use ui::{AnimationState, Size};
 
 use serde_json;
 use serde_yaml;
@@ -86,7 +86,8 @@ impl ComposedImage {
 }
 
 impl Image for ComposedImage {
-    fn draw_text_mode(&self, renderer: &mut TextRenderer, state: &str, position: &Point) {
+    fn draw_text_mode(&self, renderer: &mut TextRenderer, state: &AnimationState,
+                      position: &Point) {
         let x = position.x;
         let y = position.y;
         renderer.set_cursor_pos(x, y);
@@ -107,7 +108,7 @@ impl Image for ComposedImage {
     //// Renders text for this composed image to the given coordinates.
     //// This method assumes that 'GRID_DIM' equals 3 for simplicity
     //// and performance purposes.
-    fn fill_text_mode(&self, renderer: &mut TextRenderer, state: &str,
+    fn fill_text_mode(&self, renderer: &mut TextRenderer, state: &AnimationState,
                       position: &Point, size: &Size) {
         let fill_size = *size - (self.size - self.middle_size);
         let mut draw_pos = Point::from(position);

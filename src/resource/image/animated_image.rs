@@ -11,7 +11,7 @@ use ui::{AnimationState, Size};
 
 #[derive(Debug)]
 pub struct AnimatedImage {
-    images: HashMap<String, Rc<Image>>,
+    images: HashMap<AnimationState, Rc<Image>>,
 
     size: Size,
 }
@@ -19,16 +19,12 @@ pub struct AnimatedImage {
 impl AnimatedImage {
     pub fn new(builder: AnimatedImageBuilder,
                images: &HashMap<String, Rc<Image>>) -> Result<Rc<Image>, Error> {
-        let mut images_map: HashMap<String, Rc<Image>> = HashMap::new();
+        let mut images_map: HashMap<AnimationState, Rc<Image>> = HashMap::new();
 
         let mut size: Option<Size> = None;
         for (state_str, image_id) in builder.states {
             // check that the state string exists
-            let state = AnimationState::find(&state_str);
-            if let None = state {
-                return Err(Error::new(ErrorKind::InvalidData,
-                    format!("Attempted to set non-existant state '{}'", state_str)));
-            }
+            let state = AnimationState::parse(&state_str)?;
 
             let image = images.get(&image_id);
             if let None = image {
@@ -37,7 +33,7 @@ impl AnimatedImage {
             }
 
             let image = image.unwrap();
-            images_map.insert(state_str, Rc::clone(image));
+            images_map.insert(state, Rc::clone(image));
 
             if let None = size {
                 size = Some(*image.get_size());
@@ -49,23 +45,6 @@ impl AnimatedImage {
             }
         }
 
-        let base_entry = {
-            let entry = images_map.get(AnimationState::Base.get_text());
-            match entry {
-                Some(ref entry) => Rc::clone(&entry),
-                None => return Err(Error::new(ErrorKind::InvalidData,
-                    format!("AnimatedImage must be specified for the base \
-                            state '{}'", AnimationState::Base.get_text()))),
-            }
-        };
-
-        // fill in any other empty states with the base state
-        for state in AnimationState::iter() {
-            if let Some(_) = images_map.get(state.get_text()) { continue; }
-
-            images_map.insert(state.get_text().to_string(), Rc::clone(&base_entry));
-        }
-
         Ok(Rc::new(AnimatedImage {
             images: images_map,
             size: size.unwrap(),
@@ -74,13 +53,16 @@ impl AnimatedImage {
 }
 
 impl Image for AnimatedImage {
-    fn draw_text_mode(&self, renderer: &mut TextRenderer, state: &str, position: &Point) {
-        self.images.get(state).unwrap().draw_text_mode(renderer, state, position);
+    fn draw_text_mode(&self, renderer: &mut TextRenderer,
+                      state: &AnimationState, position: &Point) {
+        AnimationState::find_match(&self.images, state)
+            .draw_text_mode(renderer, state, position);
     }
 
-    fn fill_text_mode(&self, renderer: &mut TextRenderer, state: &str,
+    fn fill_text_mode(&self, renderer: &mut TextRenderer, state: &AnimationState,
                       position: &Point, size: &Size) {
-        self.images.get(state).unwrap().fill_text_mode(renderer, state, position, size);
+        AnimationState::find_match(&self.images, state)
+            .fill_text_mode(renderer, state, position, size);
     }
 
     fn get_size(&self) -> &Size {

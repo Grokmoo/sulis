@@ -1,3 +1,5 @@
+#[macro_use] extern crate lazy_static;
+
 // logger functionality
 #[macro_use] extern crate log;
 extern crate flexi_logger;
@@ -12,8 +14,6 @@ extern crate serde_yaml;
 // terminal display library
 #[cfg(windows)] extern crate pancurses;
 #[cfg(not(windows))] extern crate termion;
-
-extern crate uuid;
 
 pub mod resource;
 

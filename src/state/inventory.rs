@@ -69,6 +69,7 @@ impl Inventory {
 
         debug!("Equipping item at '{}' into '{:?}'", index, slot);
         self.equipped.insert(slot, index);
+
         true
     }
 

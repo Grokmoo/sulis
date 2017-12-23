@@ -11,14 +11,15 @@ use std::fmt::Debug;
 
 use io::TextRenderer;
 
-use ui::Size;
+use ui::{AnimationState, Size};
 use resource::Point;
 
 pub trait Image: Debug {
-    fn draw_text_mode(&self, renderer: &mut TextRenderer, state: &str, position: &Point);
+    fn draw_text_mode(&self, renderer: &mut TextRenderer, state: &AnimationState,
+                      position: &Point);
 
-    fn fill_text_mode(&self, renderer: &mut TextRenderer, state: &str, position: &Point,
-                      size: &Size) {
+    fn fill_text_mode(&self, renderer: &mut TextRenderer, state: &AnimationState,
+                      position: &Point, size: &Size) {
 
         let mut rel_y = 0;
         while rel_y < size.height {

@@ -2,11 +2,12 @@ use resource::Actor;
 use state::Inventory;
 
 use std::rc::Rc;
+use std::cell::RefCell;
 
 #[derive(Clone)]
 pub struct ActorState {
     pub actor: Rc<Actor>,
-    pub inventory: Inventory,
+    pub inventory: Rc<RefCell<Inventory>>,
 }
 
 impl PartialEq for ActorState {
@@ -18,7 +19,7 @@ impl PartialEq for ActorState {
 impl ActorState {
     pub fn new(actor: Rc<Actor>) -> ActorState {
         trace!("Creating new actor state for {}", actor.id);
-        let inventory = Inventory::new(&actor);
+        let inventory = Rc::new(RefCell::new(Inventory::new(&actor)));
         ActorState {
             actor,
             inventory,

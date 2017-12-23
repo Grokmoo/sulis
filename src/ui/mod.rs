@@ -17,7 +17,7 @@ pub use self::border::Border;
 mod size;
 pub use self::size::Size;
 
-mod animation_state;
+pub mod animation_state;
 pub use self::animation_state::AnimationState;
 
 mod label;

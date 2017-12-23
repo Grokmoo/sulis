@@ -34,7 +34,7 @@ impl WidgetState {
             border: Border::as_zero(),
             mouse_is_inside: false,
             background: None,
-            animation_state: AnimationState::Base,
+            animation_state: AnimationState::default(),
             scroll_pos: Point::as_zero(),
             max_scroll_pos: Point::as_zero(),
             text: String::new(),
@@ -95,8 +95,8 @@ impl WidgetState {
         self.text.push_str(text);
     }
 
-    pub fn set_animation_state(&mut self, state: AnimationState) {
-        self.animation_state = state;
+    pub fn set_animation_state(&mut self, state: &AnimationState) {
+        self.animation_state = state.clone();
     }
 
     pub fn set_background(&mut self, image: Option<Rc<Image>>) {

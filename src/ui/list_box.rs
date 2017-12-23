@@ -14,7 +14,7 @@ impl Entry {
        Entry {
            text: text.to_string(),
            callback,
-           animation_state: AnimationState::Base,
+           animation_state: AnimationState::default(),
        }
     }
 
@@ -75,7 +75,7 @@ impl WidgetKind for ListBox {
             };
 
             let widget = Widget::with_theme(kind, "entry");
-            widget.borrow_mut().state.set_animation_state(entry.animation_state);
+            widget.borrow_mut().state.set_animation_state(&entry.animation_state);
             children.push(widget);
         }
 

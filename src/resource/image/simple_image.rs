@@ -2,7 +2,7 @@ use std::io::{Error, ErrorKind};
 
 use resource::{Image, Point, ResourceBuilder};
 use io::TextRenderer;
-use ui::Size;
+use ui::{AnimationState, Size};
 
 use serde_json;
 use serde_yaml;
@@ -50,7 +50,7 @@ impl ResourceBuilder for SimpleImage {
 }
 
 impl Image for SimpleImage {
-    fn draw_text_mode(&self, renderer: &mut TextRenderer, _state: &str,
+    fn draw_text_mode(&self, renderer: &mut TextRenderer, _state: &AnimationState,
                       position: &Point) {
         if self.text_display.len() == 0 { return; }
 

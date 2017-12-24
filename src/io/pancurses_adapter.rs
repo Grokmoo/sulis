@@ -6,8 +6,7 @@ use pancurses;
 use io::buffered_text_renderer::BufferedTextRenderer;
 use io;
 use io::keyboard_event::Key;
-use io::{IO, KeyboardEvent};
-use state::GameState;
+use io::{InputAction, IO, KeyboardEvent};
 use ui::{Widget, Size};
 use config::CONFIG;
 

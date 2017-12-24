@@ -7,7 +7,7 @@ use io::buffered_text_renderer::BufferedTextRenderer;
 use io;
 use io::keyboard_event::Key;
 use io::{InputAction, IO, KeyboardEvent};
-use ui::{Widget, Size};
+use ui::{Cursor, Widget, Size};
 use config::CONFIG;
 
 pub struct Terminal {
@@ -70,6 +70,8 @@ impl IO for Terminal {
         self.renderer.clear();
 
         root.draw_text_mode(&mut self.renderer, millis);
+
+        Cursor::draw_text_mode(&mut self.renderer, millis);
 
         for y in 0..self.size.height {
             self.window.mv(y, 0);

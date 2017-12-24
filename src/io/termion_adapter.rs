@@ -7,7 +7,7 @@ use config::CONFIG;
 use io::{self, InputAction, KeyboardEvent, IO};
 use io::keyboard_event::Key;
 use io::buffered_text_renderer::BufferedTextRenderer;
-use ui::{Widget, Size};
+use ui::{Cursor, Widget, Size};
 
 use termion::screen::*;
 use termion::{self, async_stdin};
@@ -92,6 +92,8 @@ impl IO for Terminal {
 
     fn render_output(&mut self, root: Ref<Widget>, millis: u32) {
         root.draw_text_mode(&mut self.renderer, millis);
+
+        Cursor::draw_text_mode(&mut self.renderer, millis);
 
         let mut cursor_needs_repos = true;
         for y in 0..self.size.height {

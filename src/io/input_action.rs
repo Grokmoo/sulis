@@ -29,12 +29,21 @@ impl InputAction {
         let action = {
             let action = CONFIG.get_input_action(input);
 
-            if let None = action { return; }
-
-            *action.unwrap()
+            match action {
+                None => return,
+                Some(action) => *action
+            }
         };
 
-        InputAction::fire_action(action, root);
+        use io::InputAction::*;
+        match action {
+            MoveCursorUp => Cursor::move_by(root, 0, -1),
+            MoveCursorDown => Cursor::move_by(root, 0, 1),
+            MoveCursorLeft => Cursor::move_by(root, -1, 0),
+            MoveCursorRight => Cursor::move_by(root, 1, 0),
+            ClickCursor => Cursor::click(root),
+            _ => InputAction::fire_action(action, root),
+        }
     }
 
     fn fire_action(action: InputAction, root: Rc<RefCell<Widget>>) {

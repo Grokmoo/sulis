@@ -1,7 +1,7 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use io::{Event, InputAction, TextRenderer};
+use io::{InputAction, TextRenderer};
 use io::event::ClickKind;
 use resource::Point;
 use ui::{animation_state, Widget};
@@ -40,18 +40,6 @@ pub trait WidgetKind {
     fn on_add(&self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         Vec::with_capacity(0)
     }
-
-    /// called by the owning widget before it does any event handling on the specified
-    /// event.  If this method returns true, the event is not dispatched any further
-    /// and is considered handled by this `WidgetKind`
-    fn before_dispatch_event(&self, _widget: &Rc<RefCell<Widget>>, _event: Event) -> bool {
-        false
-    }
-
-    /// called by the owning widget after it has completed all rendering (including
-    /// children).  useful to draw something on top of the widget and all children
-    fn after_draw_text_mode(&self, _renderer: &mut TextRenderer,
-                            _widget: &Widget, _millis: u32) { }
 
     fn on_mouse_click(&self, _widget: &Rc<RefCell<Widget>>,
                       _kind: ClickKind, _mouse_pos: Point) -> bool {

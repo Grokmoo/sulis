@@ -39,8 +39,6 @@ impl Widget {
         for child in self.children.iter() {
             child.borrow().draw_text_mode(renderer, millis);
         }
-
-        self.kind.after_draw_text_mode(renderer, self, millis);
     }
 
     pub fn set_theme_name(&mut self, name: &str) {
@@ -332,9 +330,6 @@ impl Widget {
                widget.borrow().theme_id);
 
         let ref widget_kind = Rc::clone(&widget.borrow().kind);
-        if widget_kind.before_dispatch_event(&widget, event) {
-            return true;
-        }
 
         // precompute has modal so we don't have the widget borrowed
         // for the dispatch below

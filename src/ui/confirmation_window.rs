@@ -1,21 +1,23 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use state::GameState;
-use ui::{Button, Label, Widget, WidgetKind};
+use ui::{Button, Callback, Label, Widget, WidgetKind};
 
-pub struct Window { }
+pub struct ConfirmationWindow {
+    accept_callback: Callback<Button>,
+}
 
-impl Window {
-    pub fn new() -> Rc<Window> {
-        Rc::new(Window {
+impl ConfirmationWindow {
+    pub fn new(accept_callback: Callback<Button>) -> Rc<ConfirmationWindow> {
+        Rc::new(ConfirmationWindow {
+            accept_callback
         })
     }
 }
 
-impl WidgetKind for Window {
+impl WidgetKind for ConfirmationWindow {
     fn get_name(&self) -> &str {
-        "window"
+        "confirmation_window"
     }
 
     fn layout(&self, widget: &mut Widget) {
@@ -33,10 +35,8 @@ impl WidgetKind for Window {
             "cancel");
 
         let quit = Widget::with_theme(
-            Button::with_callback(Rc::new(|_kind, _widget| {
-                GameState::set_exit();
-            })),
-            "quit");
+            Button::with_callback(Rc::clone(&self.accept_callback)),
+            "accept");
 
         vec![cancel, quit, label]
     }

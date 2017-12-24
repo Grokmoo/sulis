@@ -29,8 +29,8 @@ pub use self::button::Button;
 pub mod list_box;
 pub use self::list_box::ListBox;
 
-mod window;
-pub use self::window::Window;
+mod confirmation_window;
+pub use self::confirmation_window::ConfirmationWindow;
 
 mod cursor;
 pub use self::cursor::Cursor;

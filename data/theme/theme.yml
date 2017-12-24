@@ -23,7 +23,7 @@ children:
     preferred_size: [-20, 0]
     width_relative: Max
     height_relative: Max
-  exit_window:
+  exit_confirmation_window:
     background: bg_base
     border: [1, 1, 1, 1]
     preferred_size: [25, 6]
@@ -42,7 +42,7 @@ children:
         preferred_position: [0, 2]
         x_relative: Max
         y_relative: Max
-      quit:
+      accept:
         from: .button
         text: "Exit"
         preferred_size: [10, 3]

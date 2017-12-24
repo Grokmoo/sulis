@@ -1,7 +1,10 @@
 use std::cell::RefCell;
+use std::rc::Rc;
 
-use io::TextRenderer;
+use io::{event, Event, TextRenderer};
 use config::CONFIG;
+use ui::Widget;
+use resource::Point;
 
 pub struct Cursor {
     pub c: char,
@@ -22,7 +25,26 @@ thread_local! {
 }
 
 impl Cursor {
-    pub fn move_by(x: i32, y: i32) -> bool {
+    pub fn move_by(root: Rc<RefCell<Widget>>, x: i32, y: i32) {
+        trace!("Emulating cursor move by {}, {} as mouse event", x, y);
+        if !Cursor::move_by_internal(x, y) {
+            return;
+        }
+
+        let event = Event::new(event::Kind::MouseMove { change: Point::new(x, y) },
+            Cursor::get_x(), Cursor::get_y());
+        Widget::dispatch_event(&root, event);
+    }
+
+    pub fn click(root: Rc<RefCell<Widget>>) {
+        let (x, y) = Cursor::get_position();
+
+        trace!("Emulating cursor click event at {},{} as mouse event", x, y);
+        let event = Event::new(event::Kind::MouseClick(event::ClickKind::Left), x, y);
+        Widget::dispatch_event(&root, event);
+    }
+
+    pub fn move_by_internal(x: i32, y: i32) -> bool {
         CURSOR.with(|c| {
             let mut cursor = c.borrow_mut();
 

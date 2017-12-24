@@ -16,17 +16,14 @@ use std::io::{ErrorKind, Error};
 use std::rc::Rc;
 use std::cell::{RefCell, Ref};
 
-use state::GameState;
-use config::{Config, IOAdapter};
+use config::{CONFIG, IOAdapter};
 use ui::Widget;
 use io::keyboard_event::Key;
 
 pub trait IO {
-    fn process_input(&mut self, game_state: &mut GameState,
-                     root: Rc<RefCell<Widget>>);
+    fn process_input(&mut self, root: Rc<RefCell<Widget>>);
 
-    fn render_output(&mut self, game_state: &GameState,
-                     root: Ref<Widget>, millis: u32);
+    fn render_output(&mut self, root: Ref<Widget>, millis: u32);
 }
 
 pub trait TextRenderer {
@@ -39,33 +36,33 @@ pub trait TextRenderer {
     fn set_cursor_pos(&mut self, x: i32, y: i32);
 }
 
-pub fn create(config: &Config) -> Result<Box<IO>, Error> {
-    match config.display.adapter {
-        IOAdapter::Pancurses => get_pancurses_adapter(config),
-        IOAdapter::Termion => get_termion_adapter(config)
+pub fn create() -> Result<Box<IO>, Error> {
+    match CONFIG.display.adapter {
+        IOAdapter::Pancurses => get_pancurses_adapter(),
+        IOAdapter::Termion => get_termion_adapter()
     }
 }
 
 #[cfg(not(target_os = "windows"))]
-pub fn get_termion_adapter(config: &Config) -> Result<Box<IO>, Error> {
-    Ok(Box::new(termion_adapter::Terminal::new(config)))
+pub fn get_termion_adapter() -> Result<Box<IO>, Error> {
+    Ok(Box::new(termion_adapter::Terminal::new()))
 }
 
 #[cfg(not(target_os = "windows"))]
-pub fn get_pancurses_adapter(_config: &Config) -> Result<Box<IO>, Error> {
+pub fn get_pancurses_adapter() -> Result<Box<IO>, Error> {
     Err(Error::new(ErrorKind::InvalidInput,
-                   "Pancurses display adapter is only support on windows.  Try 'Termion'"))
+                   "Pancurses display adapter is only supported on windows.  Try 'Termion'"))
 }
 
 #[cfg(target_os = "windows")]
-pub fn get_termion_adapter(_config: &Config) -> Result<Box<IO>, Error> {
+pub fn get_termion_adapter() -> Result<Box<IO>, Error> {
     Err(Error::new(ErrorKind::InvalidInput,
                    "Termion display adapter is not supported on windows.  Try 'Pancurses'"))
 }
 
 #[cfg(target_os = "windows")]
-pub fn get_pancurses_adapter(config: &Config) -> Result<Box<IO>, Error> {
-    Ok(Box::new(pancurses_adapter::Terminal::new(config)))
+pub fn get_pancurses_adapter() -> Result<Box<IO>, Error> {
+    Ok(Box::new(pancurses_adapter::Terminal::new()))
 }
 
 pub(in::io) fn match_char(c: char) -> Key {

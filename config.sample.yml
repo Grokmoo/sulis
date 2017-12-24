@@ -35,7 +35,7 @@ input:
         KeyS: MoveCursorDown
         KeyA: MoveCursorLeft
         KeyD: MoveCursorRight
-        KeySpace: MoveToCursor
+        KeySpace: ClickCursor
         KeyQ: Exit
         KeyI: ToggleInventory
 

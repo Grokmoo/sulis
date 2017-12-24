@@ -37,7 +37,8 @@ impl WidgetKind for AreaView {
         Vec::with_capacity(0)
     }
 
-    fn draw_text_mode(&self, renderer: &mut TextRenderer, widget: &Widget) {
+    fn draw_text_mode(&self, renderer: &mut TextRenderer,
+                      widget: &Widget, _millis: u32) {
         let p = widget.state.inner_position;
         let s = widget.state.inner_size;
 
@@ -58,7 +59,7 @@ impl WidgetKind for AreaView {
         }
     }
 
-    fn on_key_press(&self, _state: &mut GameState, widget: &Rc<RefCell<Widget>>,
+    fn on_key_press(&self, widget: &Rc<RefCell<Widget>>,
                     key: InputAction, _mouse_pos: Point) -> bool {
 
         use io::InputAction::*;
@@ -72,21 +73,22 @@ impl WidgetKind for AreaView {
         true
     }
 
-    fn on_mouse_click(&self, state: &mut GameState, widget: &Rc<RefCell<Widget>>,
+    fn on_mouse_click(&self, widget: &Rc<RefCell<Widget>>,
                 _kind: ClickKind, mouse_pos: Point) -> bool {
-        let size = state.pc().size();
+        let pc = GameState::pc();
+        let size = pc.borrow().size();
         let pos = &widget.borrow().state.position;
         let x = (mouse_pos.x - pos.x) - size / 2;
         let y = (mouse_pos.y - pos.y) - size / 2;
         if x >= 0 && y >= 0 {
-            state.pc_move_to(x + widget.borrow().state.scroll_pos.x, y +
+            GameState::pc_move_to(x + widget.borrow().state.scroll_pos.x, y +
                              widget.borrow().state.scroll_pos.y);
         }
 
         true
     }
 
-    fn on_mouse_move(&self, _state: &mut GameState, widget: &Rc<RefCell<Widget>>,
+    fn on_mouse_move(&self, widget: &Rc<RefCell<Widget>>,
                       mouse_pos: Point) -> bool {
         self.super_on_mouse_enter(widget);
         self.mouse_over.borrow_mut().state.set_text(&format!("[{},{}]",
@@ -94,7 +96,7 @@ impl WidgetKind for AreaView {
         true
     }
 
-    fn on_mouse_exit(&self, _state: &mut GameState, widget: &Rc<RefCell<Widget>>,
+    fn on_mouse_exit(&self, widget: &Rc<RefCell<Widget>>,
                      _mouse_pos: Point) -> bool {
         self.super_on_mouse_exit(widget);
         self.mouse_over.borrow_mut().state.set_text("");

@@ -10,7 +10,7 @@ use std::{thread, time};
 use std::rc::Rc;
 use std::panic;
 
-use game::config;
+use game::config::CONFIG;
 use game::resource;
 use game::state::GameState;
 use game::ui;
@@ -20,22 +20,13 @@ use game::animation;
 use flexi_logger::{Logger, opt_format};
 
 fn main() {
-    let config = config::Config::new("config.yml");
-    let config = match config {
-        Ok(c) => c,
-        Err(e) => {
-            eprintln!("{}", e);
-            eprintln!("Fatal error loading the configuration from 'config.yml'");
-            eprintln!("Exiting...");
-            ::std::process::exit(1);
-        }
-    };
-
-    setup_logger(&config);
+    // CONFIG will be lazily initialized here; if it fails it
+    // prints and error and exits
+    setup_logger();
     info!("Setup Logger and read configuration from 'config.yml'");
 
-    info!("Reading resources from {}", &config.resources.directory);
-    let resource_set_err = resource::ResourceSet::init(&config.resources.directory);
+    info!("Reading resources from {}", CONFIG.resources.directory);
+    let resource_set_err = resource::ResourceSet::init(&CONFIG.resources.directory);
     match resource_set_err {
         Ok(_) => (),
         Err(e) => {
@@ -47,9 +38,8 @@ fn main() {
     };
 
     info!("Initializing game state.");
-    let game_state = GameState::new(config.clone());
-    let mut game_state = match game_state {
-        Ok(s) => s,
+    match GameState::init() {
+        Ok(_) => {},
         Err(e) => {
             error!("{}",  e);
             error!("There was a fatal error creating the game state.");
@@ -59,7 +49,7 @@ fn main() {
     };
 
     info!("Setting up display adapter.");
-    let io = game::io::create(&config);
+    let io = game::io::create();
     let mut io = match io {
         Ok(io) => io,
         Err(e) => {
@@ -70,9 +60,9 @@ fn main() {
         }
     };
 
-    let root = ui::create_ui_tree(Rc::clone(&game_state.area_state), &config);
+    let root = ui::create_ui_tree();
 
-    let fpms = (1000.0 / (config.display.frame_rate as f32)) as u64;
+    let fpms = (1000.0 / (CONFIG.display.frame_rate as f32)) as u64;
     let frame_time = time::Duration::from_millis(fpms);
     trace!("Computed {} frames per milli.", fpms);
 
@@ -81,8 +71,8 @@ fn main() {
     loop {
         let start_time = time::Instant::now();
 
-        io.process_input(&mut game_state, Rc::clone(&root));
-        game_state.update();
+        io.process_input(Rc::clone(&root));
+        GameState::update();
 
         match Widget::update(&root) {
             Err(e) => {
@@ -95,9 +85,9 @@ fn main() {
 
         let total_elapsed =
             animation::get_elapsed_millis(main_loop_start_time.elapsed());
-        io.render_output(&game_state, root.borrow(), total_elapsed);
+        io.render_output(root.borrow(), total_elapsed);
 
-        if game_state.should_exit {
+        if GameState::is_exit() {
             trace!("Exiting main loop.");
             break;
         }
@@ -111,14 +101,14 @@ fn main() {
     info!("Shutting down.");
 }
 
-fn setup_logger(config: &config::Config) {
-    let mut logger = Logger::with_str(&config.logging.log_level)
+fn setup_logger() {
+    let mut logger = Logger::with_str(&CONFIG.logging.log_level)
         .log_to_file()
         .directory("log")
         .duplicate_error()
         .format(opt_format);
 
-    if !config.logging.use_timestamps {
+    if !CONFIG.logging.use_timestamps {
         logger = logger.suppress_timestamp();
     }
 

@@ -32,23 +32,24 @@ pub use self::list_box::ListBox;
 mod window;
 pub use self::window::Window;
 
+mod cursor;
+pub use self::cursor::Cursor;
+
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use state::{AreaState, GameState};
-use config::Config;
+use config::CONFIG;
 use resource::ResourceSet;
 use view::RootView;
 
-pub type Callback<T> = Rc<Fn(&T, &Rc<RefCell<Widget>>, &mut GameState)>;
+pub type Callback<T> = Rc<Fn(&T, &Rc<RefCell<Widget>>)>;
 
-pub fn create_ui_tree(area_state: Rc<RefCell<AreaState>>,
-    config: &Config) -> Rc<RefCell<Widget>> {
+pub fn create_ui_tree() -> Rc<RefCell<Widget>> {
 
     debug!("Creating UI tree.");
-    let root = Widget::with_defaults(RootView::new(area_state));
-    root.borrow_mut().state.set_size(Size::new(config.display.width,
-                                               config.display.height));
+    let root = Widget::with_defaults(RootView::new());
+    root.borrow_mut().state.set_size(Size::new(CONFIG.display.width,
+                                               CONFIG.display.height));
     root.borrow_mut().theme = Some(ResourceSet::get_theme());
 
     root

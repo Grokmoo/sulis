@@ -3,7 +3,6 @@ use std::cell::RefCell;
 
 use ui::{Callback, Label, Widget, WidgetKind};
 use io::{event, TextRenderer};
-use state::GameState;
 use resource::Point;
 
 pub struct Button {
@@ -47,14 +46,15 @@ impl WidgetKind for Button {
         Vec::with_capacity(0)
     }
 
-    fn draw_text_mode(&self, renderer: &mut TextRenderer, widget: &Widget) {
-        self.label.draw_text_mode(renderer, widget);
+    fn draw_text_mode(&self, renderer: &mut TextRenderer,
+                      widget: &Widget, millis: u32) {
+        self.label.draw_text_mode(renderer, widget, millis);
     }
 
-    fn on_mouse_click(&self, state: &mut GameState, widget: &Rc<RefCell<Widget>>,
+    fn on_mouse_click(&self, widget: &Rc<RefCell<Widget>>,
                       _kind: event::ClickKind, _mouse_pos: Point) -> bool {
         match self.callback {
-            Some(ref cb) => (cb)(self, widget, state),
+            Some(ref cb) => (cb)(self, widget),
             None => (),
         };
         true

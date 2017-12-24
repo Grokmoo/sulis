@@ -3,7 +3,6 @@ use std::rc::Rc;
 use std::cell::RefCell;
 use std::cmp;
 
-use state::GameState;
 use io::{Event, TextRenderer};
 use ui::{Size, Theme, WidgetState, WidgetKind};
 use resource::ResourceSet;
@@ -29,17 +28,19 @@ impl Widget {
         self.modal_child.is_some()
     }
 
-    pub fn draw_text_mode(&self, renderer: &mut TextRenderer) {
+    pub fn draw_text_mode(&self, renderer: &mut TextRenderer, millis: u32) {
         if let Some(ref image) = self.state.background {
             image.fill_text_mode(renderer, &self.state.animation_state,
                 &self.state.position, &self.state.size);
         }
 
-        self.kind.draw_text_mode(renderer, self);
+        self.kind.draw_text_mode(renderer, self, millis);
 
         for child in self.children.iter() {
-            child.borrow().draw_text_mode(renderer);
+            child.borrow().draw_text_mode(renderer, millis);
         }
+
+        self.kind.after_draw_text_mode(renderer, self, millis);
     }
 
     pub fn set_theme_name(&mut self, name: &str) {
@@ -326,10 +327,14 @@ impl Widget {
         Ok(())
     }
 
-    pub fn dispatch_event(widget: &Rc<RefCell<Widget>>,
-                          state: &mut GameState, event: Event) -> bool {
+    pub fn dispatch_event(widget: &Rc<RefCell<Widget>>, event: Event) -> bool {
         trace!("Dispatching event {:?} in {:?}", event,
                widget.borrow().theme_id);
+
+        let ref widget_kind = Rc::clone(&widget.borrow().kind);
+        if widget_kind.before_dispatch_event(&widget, event) {
+            return true;
+        }
 
         // precompute has modal so we don't have the widget borrowed
         // for the dispatch below
@@ -337,7 +342,7 @@ impl Widget {
         if has_modal {
             trace!("Dispatching to modal child.");
             let child = Rc::clone(widget.borrow().modal_child.as_ref().unwrap());
-            return Widget::dispatch_event(&child, state, event);
+            return Widget::dispatch_event(&child, event);
         }
 
         // iterate in this way using indices so we don't maintain any
@@ -352,35 +357,34 @@ impl Widget {
             if child.borrow().state.in_bounds(event.mouse) {
                 if !child.borrow().state.mouse_is_inside {
                     trace!("Dispatch mouse entered to '{}'", child.borrow().theme_id);
-                    Widget::dispatch_event(&child, state, Event::entered_from(&event));
+                    Widget::dispatch_event(&child, Event::entered_from(&event));
                 }
 
-                if !event_eaten && Widget::dispatch_event(&child, state, event) {
+                if !event_eaten && Widget::dispatch_event(&child, event) {
                     event_eaten = true;
                 }
             } else if child.borrow().state.mouse_is_inside {
                 trace!("Dispatch mouse exited to '{}'", child.borrow().theme_id);
-                Widget::dispatch_event(&child, state, Event::exited_from(&event));
+                Widget::dispatch_event(&child, Event::exited_from(&event));
             }
         }
 
         if event_eaten { return true; }
 
-        let ref widget_kind = Rc::clone(&widget.borrow().kind);
         use io::event::Kind::*;
         match event.kind {
             MouseClick(kind) =>
-                widget_kind.on_mouse_click(state, widget, kind, event.mouse),
+                widget_kind.on_mouse_click(widget, kind, event.mouse),
             MouseMove { change: _change } =>
-                widget_kind.on_mouse_move(state, widget, event.mouse),
+                widget_kind.on_mouse_move(widget, event.mouse),
             MouseEnter =>
-                widget_kind.on_mouse_enter(state, widget, event.mouse),
+                widget_kind.on_mouse_enter(widget, event.mouse),
             MouseExit =>
-                widget_kind.on_mouse_exit(state, widget, event.mouse),
+                widget_kind.on_mouse_exit(widget, event.mouse),
             MouseScroll { scroll } =>
-                widget_kind.on_mouse_scroll(state, widget, scroll, event.mouse),
+                widget_kind.on_mouse_scroll(widget, scroll, event.mouse),
             KeyPress(action) =>
-                widget_kind.on_key_press(state, widget, action, event.mouse),
+                widget_kind.on_key_press(widget, action, event.mouse),
         }
     }
 }

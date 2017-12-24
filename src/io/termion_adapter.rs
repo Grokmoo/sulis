@@ -3,11 +3,10 @@ use std::cell::{RefCell, Ref};
 use std::io::{Bytes, Read, Write, stdout};
 use std;
 
-use config::Config;
-use io::{self, KeyboardEvent, IO};
+use config::CONFIG;
+use io::{self, InputAction, KeyboardEvent, IO};
 use io::keyboard_event::Key;
 use io::buffered_text_renderer::BufferedTextRenderer;
-use state::GameState;
 use ui::{Widget, Size};
 
 use termion::screen::*;
@@ -23,11 +22,11 @@ pub struct Terminal {
 }
 
 impl Terminal {
-    pub fn new(config: &Config) -> Terminal {
+    pub fn new() -> Terminal {
         debug!("Initialize Termion display adapter.");
         let mut stdout = AlternateScreen::from(stdout().into_raw_mode().unwrap());
         let stdin = async_stdin().bytes();
-        let size = Size::new(config.display.width, config.display.height);
+        let size = Size::new(CONFIG.display.width, CONFIG.display.height);
 
         write!(stdout, "{}", termion::cursor::Hide).unwrap();
         write!(stdout, "{}", termion::clear::All).unwrap();
@@ -52,8 +51,7 @@ impl Terminal {
 }
 
 impl IO for Terminal {
-    fn process_input(&mut self, state: &mut GameState,
-                     root: Rc<RefCell<Widget>>) {
+    fn process_input(&mut self, root: Rc<RefCell<Widget>>) {
         let mut buf: Vec<u8> = Vec::new();
 
         loop {
@@ -88,13 +86,12 @@ impl IO for Terminal {
 
             let input = KeyboardEvent { key: input };
 
-            state.handle_keyboard_input(input, Rc::clone(&root));
+            InputAction::handle_keyboard_input(input, Rc::clone(&root));
         }
     }
 
-    fn render_output(&mut self, state: &GameState, root: Ref<Widget>,
-                     millis: u32) {
-        state.draw_text_mode(&mut self.renderer, root, millis);
+    fn render_output(&mut self, root: Ref<Widget>, millis: u32) {
+        root.draw_text_mode(&mut self.renderer, millis);
 
         let mut cursor_needs_repos = true;
         for y in 0..self.size.height {

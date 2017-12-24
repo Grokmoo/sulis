@@ -1,7 +1,7 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use state::{EntityState, Inventory};
+use state::{EntityState, GameState, Inventory};
 use ui::{AnimationState, Callback, Button, Label, ListBox, Widget, WidgetKind};
 use ui::{list_box, animation_state};
 
@@ -32,7 +32,7 @@ impl WidgetKind for InventoryWindow {
         let title = Widget::with_theme(Label::empty(), "title");
 
         let close = Widget::with_theme(
-            Button::with_callback(Rc::new(|_kind, widget, _state| {
+            Button::with_callback(Rc::new(|_kind, widget| {
                 let parent = Widget::get_parent(&widget);
                 parent.borrow_mut().mark_for_removal();
             })),
@@ -40,8 +40,9 @@ impl WidgetKind for InventoryWindow {
 
         let mut entries: Vec<list_box::Entry> = Vec::new();
         for (index, item) in self.inventory.borrow().items.iter().enumerate() {
-            let cb: Callback<Button> = Rc::new(move |_, widget, state| {
-                let pc = state.pc_mut();
+            let cb: Callback<Button> = Rc::new(move |_, widget| {
+                let pc = GameState::pc();
+                let pc = pc.borrow_mut();
                 if pc.actor.inventory.borrow_mut().equip(index) {
                     let window = Widget::go_up_tree(widget, 2);
                     window.borrow_mut().invalidate_children();

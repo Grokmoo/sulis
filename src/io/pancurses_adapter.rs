@@ -9,7 +9,7 @@ use io::keyboard_event::Key;
 use io::{IO, KeyboardEvent};
 use state::GameState;
 use ui::{Widget, Size};
-use config::Config;
+use config::CONFIG;
 
 pub struct Terminal {
     window: pancurses::Window,
@@ -18,7 +18,7 @@ pub struct Terminal {
 }
 
 impl Terminal {
-    pub fn new(config: &Config) -> Terminal {
+    pub fn new() -> Terminal {
         debug!("Initialize Pancurses display adapter.");
         let window = pancurses::initscr();
         window.nodelay(true);
@@ -27,9 +27,9 @@ impl Terminal {
         pancurses::curs_set(0);
         pancurses::nonl();
 
-        Terminal::size_terminal(config);
+        Terminal::size_terminal();
 
-        let size = Size::new(config.display.width, config.display.height);
+        let size = Size::new(CONFIG.display.width, CONFIG.display.height);
 
         Terminal {
             window,
@@ -39,20 +39,19 @@ impl Terminal {
     }
 
     #[cfg(target_os = "windows")]
-    fn size_terminal(config: &Config) {
-        pancurses::resize_term(config.display.height as i32,
-                               config.display.width as i32);
+    fn size_terminal() {
+        pancurses::resize_term(CONFIG.display.height as i32,
+                               CONFIG.display.width as i32);
     }
 
     #[cfg(not(target_os = "windows"))]
-    fn size_terminal(_config: &Config) {
+    fn size_terminal() {
         // do nothing
     }
 }
 
 impl IO for Terminal {
-    fn process_input(&mut self, state: &mut GameState,
-                     root: Rc<RefCell<Widget>>) {
+    fn process_input(&mut self, root: Rc<RefCell<Widget>>) {
         let input = self.window.getch();
         if let None = input {
             return;
@@ -64,15 +63,14 @@ impl IO for Terminal {
         };
         let input = KeyboardEvent { key: input };
 
-        state.handle_keyboard_input(input, root);
+        InputAction::handle_keyboard_input(input, root);
     }
 
-    fn render_output(&mut self, state: &GameState, root: Ref<Widget>,
-                     millis: u32) {
+    fn render_output(&mut self, root: Ref<Widget>, millis: u32) {
         self.window.erase();
         self.renderer.clear();
 
-        state.draw_text_mode(&mut self.renderer, root, millis);
+        root.draw_text_mode(&mut self.renderer, millis);
 
         for y in 0..self.size.height {
             self.window.mv(y, 0);

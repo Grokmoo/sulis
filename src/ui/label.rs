@@ -36,7 +36,8 @@ impl WidgetKind for Label {
         }
     }
 
-    fn draw_text_mode(&self, renderer: &mut TextRenderer, widget: &Widget) {
+    fn draw_text_mode(&self, renderer: &mut TextRenderer, widget: &Widget,
+                      _millis: u32) {
         let text = &widget.state.text;
         let x = widget.state.inner_left();
         let y = widget.state.inner_top();

@@ -1,10 +1,10 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use state::GameState;
-use ui::Widget;
+use ui::{Cursor, Widget};
 use io::event::Kind;
-use io::Event;
+use io::{Event, KeyboardEvent};
+use config::CONFIG;
 
 #[derive(Debug, Deserialize, Copy, Clone)]
 pub enum InputAction {
@@ -16,28 +16,31 @@ pub enum InputAction {
     MoveCursorDown,
     MoveCursorLeft,
     MoveCursorRight,
-    MoveToCursor,
+    ClickCursor,
     ToggleInventory,
     Exit,
 }
 
 impl InputAction {
-    pub fn fire_action(action: InputAction, game_state: &mut GameState,
-                       root: Rc<RefCell<Widget>>) {
-        use self::InputAction::*;
+    pub fn handle_keyboard_input(input: KeyboardEvent,
+                                 root: Rc<RefCell<Widget>>) {
 
-        debug!("Firing action {:?}", action);
-        match action {
-            MoveCursorUp => game_state.cursor_move_by(root, 0, -1),
-            MoveCursorDown => game_state.cursor_move_by(root, 0, 1),
-            MoveCursorLeft => game_state.cursor_move_by(root, -1, 0),
-            MoveCursorRight => game_state.cursor_move_by(root, 1, 0),
-            MoveToCursor => game_state.cursor_click(root),
-            _ => {
-                let event = Event::new(Kind::KeyPress(action),
-                                       game_state.cursor.x, game_state.cursor.y);
-                Widget::dispatch_event(&root, game_state, event)
-            },
+        debug!("Received {:?}", input);
+        let action = {
+            let action = CONFIG.get_input_action(input);
+
+            if let None = action { return; }
+
+            *action.unwrap()
         };
+
+        InputAction::fire_action(action, root);
+    }
+
+    fn fire_action(action: InputAction, root: Rc<RefCell<Widget>>) {
+        debug!("Firing action {:?}", action);
+
+        let event = Event::new(Kind::KeyPress(action), Cursor::get_x(), Cursor::get_y());
+        Widget::dispatch_event(&root, event);
     }
 }

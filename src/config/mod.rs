@@ -47,8 +47,25 @@ pub enum IOAdapter {
     Termion,
 }
 
+lazy_static! {
+    pub static ref CONFIG: Config = Config::init("config.yml");
+}
+
 impl Config {
-    pub fn new(filename: &str) -> Result<Config, Error> {
+    fn init(filename: &str) -> Config {
+        let config = Config::new(filename);
+        match config {
+            Ok(c) => c,
+            Err(e) => {
+                eprintln!("{}", e);
+                eprintln!("Fatal error loading the configuration from 'config.yml'");
+                eprintln!("Exiting...");
+                ::std::process::exit(1);
+            }
+        }
+    }
+
+    fn new(filename: &str) -> Result<Config, Error> {
         let mut f = File::open(filename)?;
         let mut file_data = String::new();
         f.read_to_string(&mut file_data)?;

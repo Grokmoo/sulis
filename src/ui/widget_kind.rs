@@ -1,8 +1,7 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use state::GameState;
-use io::{InputAction, TextRenderer};
+use io::{Event, InputAction, TextRenderer};
 use io::event::ClickKind;
 use resource::Point;
 use ui::{animation_state, Widget};
@@ -24,7 +23,8 @@ impl WidgetKind for EmptyWidget {
 /// Trait for implementations of different Widgets.  This is held by a 'WidgetState'
 /// object which contains the common functionality across all Widgets.
 pub trait WidgetKind {
-    fn draw_text_mode(&self, _renderer: &mut TextRenderer, _widget: &Widget) { }
+    fn draw_text_mode(&self, _renderer: &mut TextRenderer,
+                      _widget: &Widget, _millis: u32) { }
 
     fn layout(&self, widget: &mut Widget) {
         widget.do_base_layout();
@@ -41,34 +41,46 @@ pub trait WidgetKind {
         Vec::with_capacity(0)
     }
 
-    fn on_mouse_click(&self, _state: &mut GameState, _widget: &Rc<RefCell<Widget>>,
+    /// called by the owning widget before it does any event handling on the specified
+    /// event.  If this method returns true, the event is not dispatched any further
+    /// and is considered handled by this `WidgetKind`
+    fn before_dispatch_event(&self, _widget: &Rc<RefCell<Widget>>, _event: Event) -> bool {
+        false
+    }
+
+    /// called by the owning widget after it has completed all rendering (including
+    /// children).  useful to draw something on top of the widget and all children
+    fn after_draw_text_mode(&self, _renderer: &mut TextRenderer,
+                            _widget: &Widget, _millis: u32) { }
+
+    fn on_mouse_click(&self, _widget: &Rc<RefCell<Widget>>,
                       _kind: ClickKind, _mouse_pos: Point) -> bool {
         true
     }
 
-    fn on_mouse_move(&self, _state: &mut GameState, _widget: &Rc<RefCell<Widget>>,
+    fn on_mouse_move(&self, _widget: &Rc<RefCell<Widget>>,
                       _mouse_pos: Point) -> bool {
         true
     }
 
-    fn on_mouse_enter(&self, _state: &mut GameState, widget: &Rc<RefCell<Widget>>,
+    fn on_mouse_enter(&self, widget: &Rc<RefCell<Widget>>,
                       _mouse_pos: Point) -> bool {
         self.super_on_mouse_enter(widget);
         true
     }
 
-    fn on_mouse_exit(&self, _state: &mut GameState, widget: &Rc<RefCell<Widget>>,
+    fn on_mouse_exit(&self, widget: &Rc<RefCell<Widget>>,
                      _mouse_pos: Point) -> bool {
         self.super_on_mouse_exit(widget);
         true
     }
 
-    fn on_mouse_scroll(&self, _state: &mut GameState, _widget: &Rc<RefCell<Widget>>,
+    fn on_mouse_scroll(&self, _widget: &Rc<RefCell<Widget>>,
                          _scroll: i32, _mouse_pos: Point) -> bool {
         true
     }
 
-    fn on_key_press(&self, _state: &mut GameState, _widget: &Rc<RefCell<Widget>>,
+    fn on_key_press(&self, _widget: &Rc<RefCell<Widget>>,
                     _key: InputAction, _mouse_pos: Point) -> bool {
         false
     }

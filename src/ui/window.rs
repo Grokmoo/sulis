@@ -1,6 +1,7 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
+use state::GameState;
 use ui::{Button, Label, Widget, WidgetKind};
 
 pub struct Window { }
@@ -25,15 +26,15 @@ impl WidgetKind for Window {
         let label = Widget::with_theme(Label::empty(), "title");
 
         let cancel = Widget::with_theme(
-            Button::with_callback(Rc::new(|_kind, widget, _game_state| {
+            Button::with_callback(Rc::new(|_kind, widget| {
                 let parent = Widget::get_parent(&widget);
                 parent.borrow_mut().mark_for_removal();
             })),
             "cancel");
 
         let quit = Widget::with_theme(
-            Button::with_callback(Rc::new(|_kind, _widget, game_state| {
-                game_state.set_exit();
+            Button::with_callback(Rc::new(|_kind, _widget| {
+                GameState::set_exit();
             })),
             "quit");
 

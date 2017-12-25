@@ -2,10 +2,9 @@
 # The main game configuration file.  User preferences are set here.
 
 display:
-    # Uncomment Pancurses line for Windows, Termion for Unix
-    # Note that the indentation must be consistent for all values!
-    #adapter: Pancurses
-    adapter: Termion
+    # Auto should select the right adapter.  Other options include Termion and
+    # Pancurses
+    adapter: Auto
 
     # display character for the mouse cursor
     cursor_char: "█"

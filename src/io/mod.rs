@@ -39,8 +39,14 @@ pub trait TextRenderer {
 pub fn create() -> Result<Box<IO>, Error> {
     match CONFIG.display.adapter {
         IOAdapter::Pancurses => get_pancurses_adapter(),
-        IOAdapter::Termion => get_termion_adapter()
+        IOAdapter::Termion => get_termion_adapter(),
+        IOAdapter::Auto => get_auto_adapter(),
     }
+}
+
+#[cfg(not(target_os = "windows"))]
+pub fn get_auto_adapter() -> Result<Box<IO>, Error> {
+    get_termion_adapter()
 }
 
 #[cfg(not(target_os = "windows"))]
@@ -52,6 +58,11 @@ pub fn get_termion_adapter() -> Result<Box<IO>, Error> {
 pub fn get_pancurses_adapter() -> Result<Box<IO>, Error> {
     Err(Error::new(ErrorKind::InvalidInput,
                    "Pancurses display adapter is only supported on windows.  Try 'Termion'"))
+}
+
+#[cfg(target_os = "windows")]
+pub fn get_auto_adapter() -> Result<Box<IO>, Error> {
+    get_pancurses_adapter()
 }
 
 #[cfg(target_os = "windows")]

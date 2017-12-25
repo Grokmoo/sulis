@@ -1,5 +1,6 @@
 use std::io::{Read, Error, ErrorKind};
-use std::fs::File;
+use std::path::Path;
+use std::fs::{self, File};
 use std::collections::HashMap;
 
 use io::keyboard_event::Key;
@@ -43,6 +44,7 @@ pub struct InputConfig {
 
 #[derive(Debug, Deserialize, Copy, Clone)]
 pub enum IOAdapter {
+    Auto,
     Pancurses,
     Termion,
 }
@@ -51,14 +53,32 @@ lazy_static! {
     pub static ref CONFIG: Config = Config::init("config.yml");
 }
 
+const CONFIG_BASE: &str = "config.sample.yml";
+
 impl Config {
     fn init(filename: &str) -> Config {
+        let config_path = Path::new(filename);
+        let config_base_path = Path::new(CONFIG_BASE);
+
+        if !config_path.is_file() {
+            println!("{} not found, attempting to create it from {}", filename, CONFIG_BASE);
+            match fs::copy(config_base_path, config_path) {
+                Err(e) => {
+                    eprintln!("{}", e);
+                    eprintln!("Unable to create configuration file '{}'", filename);
+                    eprintln!("Exiting...");
+                    ::std::process::exit(1);
+                }
+                _ => {}
+            }
+        }
+
         let config = Config::new(filename);
         match config {
             Ok(c) => c,
             Err(e) => {
                 eprintln!("{}", e);
-                eprintln!("Fatal error loading the configuration from 'config.yml'");
+                eprintln!("Fatal error loading the configuration from '{}'", filename);
                 eprintln!("Exiting...");
                 ::std::process::exit(1);
             }

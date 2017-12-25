@@ -40,14 +40,13 @@ use std::cell::RefCell;
 
 use config::CONFIG;
 use resource::ResourceSet;
-use view::RootView;
 
 pub type Callback<T> = Rc<Fn(&T, &Rc<RefCell<Widget>>)>;
 
-pub fn create_ui_tree() -> Rc<RefCell<Widget>> {
+pub fn create_ui_tree(kind: Rc<WidgetKind>) -> Rc<RefCell<Widget>> {
 
     debug!("Creating UI tree.");
-    let root = Widget::with_defaults(RootView::new());
+    let root = Widget::with_defaults(kind);
     root.borrow_mut().state.set_size(Size::new(CONFIG.display.width,
                                                CONFIG.display.height));
     root.borrow_mut().theme = Some(ResourceSet::get_theme());

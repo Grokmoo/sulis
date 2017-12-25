@@ -16,12 +16,13 @@ use game::state::GameState;
 use game::ui;
 use game::ui::Widget;
 use game::animation;
+use game::view::RootView;
 
 use flexi_logger::{Logger, opt_format};
 
 fn main() {
     // CONFIG will be lazily initialized here; if it fails it
-    // prints and error and exits
+    // prints an error and exits
     setup_logger();
     info!("Setup Logger and read configuration from 'config.yml'");
 
@@ -60,7 +61,7 @@ fn main() {
         }
     };
 
-    let root = ui::create_ui_tree();
+    let root = ui::create_ui_tree(RootView::new());
 
     let fpms = (1000.0 / (CONFIG.display.frame_rate as f32)) as u64;
     let frame_time = time::Duration::from_millis(fpms);

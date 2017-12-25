@@ -26,9 +26,6 @@ mod size;
 pub use self::size::Size;
 pub use self::size::SizeIterator;
 
-mod point;
-pub use self::point::Point;
-
 mod image;
 pub use self::image::Image;
 
@@ -52,12 +49,6 @@ thread_local! {
     static RESOURCE_SET: RefCell<ResourceSet> = RefCell::new(ResourceSet::new());
 }
 
-#[derive(Debug, PartialEq)]
-pub enum BuilderType {
-    JSON,
-    YAML,
-}
-
 pub struct ResourceSet {
     game: Option<Rc<Game>>,
     theme: Option<Rc<Theme>>,
@@ -68,14 +59,6 @@ pub struct ResourceSet {
     items: HashMap<String, Rc<Item>>,
     sizes: HashMap<usize, Rc<Size>>,
     images: HashMap<String, Rc<Image>>,
-}
-
-pub trait ResourceBuilder where Self: Sized {
-    fn owned_id(& self) -> String;
-
-    fn from_json(data: &str) -> Result<Self, Error>;
-
-    fn from_yaml(data: &str) -> Result<Self, Error>;
 }
 
 impl ResourceSet {

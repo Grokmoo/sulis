@@ -12,7 +12,7 @@ use std::fmt::Debug;
 use io::TextRenderer;
 
 use ui::{AnimationState, Size};
-use resource::Point;
+use util::Point;
 
 pub trait Image: Debug {
     fn draw_text_mode(&self, renderer: &mut TextRenderer, state: &AnimationState,

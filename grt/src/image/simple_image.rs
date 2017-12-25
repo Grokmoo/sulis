@@ -1,6 +1,8 @@
 use std::io::{Error, ErrorKind};
 
-use resource::{Image, Point, ResourceBuilder};
+use image::Image;
+use util::Point;
+use resource::ResourceBuilder;
 use io::TextRenderer;
 use ui::{AnimationState, Size};
 

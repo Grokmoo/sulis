@@ -3,8 +3,8 @@ use std::rc::Rc;
 use ui::{Border, Size, AnimationState};
 use ui::theme::{HorizontalTextAlignment, VerticalTextAlignment};
 
-use resource::Point;
-use resource::Image;
+use util::Point;
+use image::Image;
 
 //// The base widget holder class.  Contains the common implementation across all
 //// widgets, and holds an instance of 'Widget' which contains the specific behavior.

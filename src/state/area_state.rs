@@ -1,4 +1,4 @@
-use resource::{Actor, Area, ResourceSet};
+use grt::resource::{Actor, Area, ResourceSet};
 
 use state::EntityState;
 use state::Location;

@@ -7,9 +7,9 @@ pub use self::area_view::AreaView;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use io::InputAction;
-use resource::Point;
-use ui::{Button, ConfirmationWindow, EmptyWidget, Label, Widget, WidgetKind};
+use grt::io::InputAction;
+use grt::util::Point;
+use grt::ui::{Button, ConfirmationWindow, EmptyWidget, Label, Widget, WidgetKind};
 use state::{AreaState, GameState};
 
 pub struct RootView {
@@ -31,7 +31,7 @@ impl WidgetKind for RootView {
 
     fn on_key_press(&self, widget: &Rc<RefCell<Widget>>,
                     key: InputAction, _mouse_pos: Point) -> bool {
-        use io::InputAction::*;
+        use grt::io::InputAction::*;
         match key {
             Exit => {
                     let exit_window = Widget::with_theme(

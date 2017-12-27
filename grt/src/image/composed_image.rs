@@ -2,9 +2,11 @@ use std::rc::Rc;
 use std::io::{Error, ErrorKind};
 use std::collections::HashMap;
 
-use resource::{Image, Point, ResourceBuilder};
+use image::Image;
+use resource::ResourceBuilder;
 use io::TextRenderer;
 use ui::{AnimationState, Size};
+use util::Point;
 
 use serde_json;
 use serde_yaml;

@@ -1,6 +1,6 @@
 use io::InputAction;
 
-use resource::Point;
+use util::Point;
 
 #[derive(Copy, Clone, Debug)]
 pub struct Event {

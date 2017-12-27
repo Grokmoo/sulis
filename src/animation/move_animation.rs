@@ -3,7 +3,7 @@ use std::rc::Rc;
 use std::time::Instant;
 
 use state::EntityState;
-use resource::Point;
+use grt::util::Point;
 use animation;
 
 pub struct MoveAnimation {

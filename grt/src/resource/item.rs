@@ -5,17 +5,26 @@ use std::collections::HashMap;
 use resource::Image;
 use resource::ResourceBuilder;
 
-use state::inventory;
-
 use serde_json;
 use serde_yaml;
+
+#[derive(Deserialize, Debug, Copy, Clone, PartialEq, Eq, Hash)]
+pub enum Slot {
+    Head,
+    Torso,
+    Hands,
+    HeldMain,
+    HeldOff,
+    Legs,
+    Feet,
+}
 
 #[derive(Debug)]
 pub struct Item {
     pub id: String,
     pub name: String,
     pub icon: Rc<Image>,
-    pub slot: Option<inventory::Slot>,
+    pub slot: Option<Slot>,
 }
 
 impl PartialEq for Item {
@@ -50,7 +59,7 @@ pub struct ItemBuilder {
     pub id: String,
     pub name: String,
     pub icon: String,
-    pub slot: Option<inventory::Slot>,
+    pub slot: Option<Slot>,
 }
 
 impl ResourceBuilder for ItemBuilder {

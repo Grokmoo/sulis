@@ -4,7 +4,7 @@ use std::rc::Rc;
 use io::{event, Event, TextRenderer};
 use config::CONFIG;
 use ui::Widget;
-use resource::Point;
+use util::Point;
 
 pub struct Cursor {
     pub c: char,

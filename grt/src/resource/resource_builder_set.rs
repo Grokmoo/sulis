@@ -1,8 +1,8 @@
 use resource::*;
 use resource::size::SizeBuilder;
-use resource::image::SimpleImage;
-use resource::image::composed_image::ComposedImageBuilder;
-use resource::image::animated_image::AnimatedImageBuilder;
+use image::SimpleImage;
+use image::composed_image::ComposedImageBuilder;
+use image::animated_image::AnimatedImageBuilder;
 use ui::theme::{ThemeBuilder, create_theme};
 
 use std::collections::HashMap;

@@ -5,9 +5,11 @@ use std::collections::HashMap;
 use serde_json;
 use serde_yaml;
 
-use resource::{Image, Point, ResourceBuilder};
+use image::Image;
+use resource::ResourceBuilder;
 use io::TextRenderer;
 use ui::{AnimationState, Size};
+use util::Point;
 
 #[derive(Debug)]
 pub struct AnimatedImage {

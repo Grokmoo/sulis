@@ -3,7 +3,7 @@ use std::cell::RefCell;
 
 use io::{InputAction, TextRenderer};
 use io::event::ClickKind;
-use resource::Point;
+use util::Point;
 use ui::{animation_state, Widget};
 
 pub struct EmptyWidget { }

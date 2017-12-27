@@ -1,4 +1,4 @@
-use resource::Actor;
+use grt::resource::Actor;
 use state::Inventory;
 
 use std::rc::Rc;

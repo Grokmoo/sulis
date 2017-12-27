@@ -3,7 +3,7 @@ use std::cell::RefCell;
 
 use ui::{Callback, Label, Widget, WidgetKind};
 use io::{event, TextRenderer};
-use resource::Point;
+use util::Point;
 
 pub struct Button {
     label: Rc<Label>,

@@ -3,10 +3,10 @@ use std::cell::RefCell;
 use std::cmp;
 
 use state::{AreaState, GameState};
-use ui::{WidgetKind, Widget};
-use io::{InputAction, TextRenderer};
-use io::event::ClickKind;
-use resource::Point;
+use grt::ui::{WidgetKind, Widget};
+use grt::io::{InputAction, TextRenderer};
+use grt::io::event::ClickKind;
+use grt::util::Point;
 
 pub struct AreaView {
     area_state: Rc<RefCell<AreaState>>,
@@ -62,7 +62,7 @@ impl WidgetKind for AreaView {
     fn on_key_press(&self, widget: &Rc<RefCell<Widget>>,
                     key: InputAction, _mouse_pos: Point) -> bool {
 
-        use io::InputAction::*;
+        use grt::io::InputAction::*;
         match key {
            ScrollUp => widget.borrow_mut().state.scroll(0, -1),
            ScrollDown => widget.borrow_mut().state.scroll(0, 1),

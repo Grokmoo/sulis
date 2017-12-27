@@ -4,7 +4,7 @@ use std::rc::Rc;
 use std::collections::HashMap;
 
 use resource::BuilderType;
-use resource::Point;
+use util::Point;
 use ui::{AnimationState, Border, Size};
 
 use serde_json;

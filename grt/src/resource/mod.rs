@@ -16,7 +16,7 @@ pub use self::tile::Tile;
 mod actor;
 pub use self::actor::Actor;
 
-mod item;
+pub mod item;
 pub use self::item::Item;
 
 mod item_adjective;
@@ -25,12 +25,6 @@ pub use self::item_adjective::ItemAdjective;
 mod size;
 pub use self::size::Size;
 pub use self::size::SizeIterator;
-
-mod point;
-pub use self::point::Point;
-
-mod image;
-pub use self::image::Image;
 
 use ui::Theme;
 
@@ -46,7 +40,7 @@ use resource::area::AreaBuilder;
 use resource::tile::TileBuilder;
 use resource::item::ItemBuilder;
 use resource::resource_builder_set::ResourceBuilderSet;
-use resource::image::{AnimatedImage, ComposedImage};
+use image::{Image, AnimatedImage, ComposedImage};
 
 thread_local! {
     static RESOURCE_SET: RefCell<ResourceSet> = RefCell::new(ResourceSet::new());
@@ -56,6 +50,14 @@ thread_local! {
 pub enum BuilderType {
     JSON,
     YAML,
+}
+
+pub trait ResourceBuilder where Self: Sized {
+    fn owned_id(& self) -> String;
+
+    fn from_json(data: &str) -> Result<Self, Error>;
+
+    fn from_yaml(data: &str) -> Result<Self, Error>;
 }
 
 pub struct ResourceSet {
@@ -68,14 +70,6 @@ pub struct ResourceSet {
     items: HashMap<String, Rc<Item>>,
     sizes: HashMap<usize, Rc<Size>>,
     images: HashMap<String, Rc<Image>>,
-}
-
-pub trait ResourceBuilder where Self: Sized {
-    fn owned_id(& self) -> String;
-
-    fn from_json(data: &str) -> Result<Self, Error>;
-
-    fn from_yaml(data: &str) -> Result<Self, Error>;
 }
 
 impl ResourceSet {

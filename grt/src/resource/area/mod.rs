@@ -6,7 +6,8 @@ use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 
 use resource::ResourceBuilder;
-use resource::{Point, Terrain, ResourceSet};
+use resource::{Terrain, ResourceSet};
+use util::Point;
 
 use serde_json;
 use serde_yaml;

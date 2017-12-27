@@ -2,8 +2,8 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use state::{EntityState, GameState, Inventory};
-use ui::{AnimationState, Callback, Button, Label, ListBox, Widget, WidgetKind};
-use ui::{list_box, animation_state};
+use grt::ui::{AnimationState, Callback, Button, Label, ListBox, Widget, WidgetKind};
+use grt::ui::{list_box, animation_state};
 
 pub const NAME: &str = "inventory_window";
 

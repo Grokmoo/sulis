@@ -1,6 +1,4 @@
-use resource::Actor;
-use resource::Size;
-use resource::SizeIterator;
+use grt::resource::{Actor, Size, SizeIterator};
 use state::Location;
 use state::ActorState;
 

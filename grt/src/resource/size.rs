@@ -1,7 +1,7 @@
 use std::io::{Error, ErrorKind};
 
 use resource::ResourceBuilder;
-use resource::Point;
+use util::Point;
 
 use serde_json;
 use serde_yaml;

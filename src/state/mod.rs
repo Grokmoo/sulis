@@ -23,8 +23,8 @@ use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use resource::{Actor, ResourceSet};
-use config::CONFIG;
+use grt::resource::{Actor, ResourceSet};
+use grt::config::CONFIG;
 use animation::{Animation, MoveAnimation};
 
 thread_local! {

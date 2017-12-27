@@ -1,19 +1,9 @@
 use std::rc::Rc;
 use std::collections::HashMap;
 
-use resource::Actor;
+use grt::resource::Actor;
+use grt::resource::item::Slot;
 use state::ItemState;
-
-#[derive(Deserialize, Debug, Copy, Clone, PartialEq, Eq, Hash)]
-pub enum Slot {
-    Head,
-    Torso,
-    Hands,
-    HeldMain,
-    HeldOff,
-    Legs,
-    Feet,
-}
 
 #[derive(Clone)]
 pub struct Inventory {

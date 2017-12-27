@@ -3,7 +3,7 @@ use std::cell::{Ref, RefCell};
 use std::collections::{HashMap, HashSet};
 use std::i32;
 
-use resource::Point;
+use grt::util::Point;
 use state::{EntityState, AreaState};
 
 pub struct PathFinder {

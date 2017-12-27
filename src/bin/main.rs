@@ -1,3 +1,4 @@
+extern crate grt;
 extern crate game;
 
 extern crate backtrace;
@@ -10,11 +11,11 @@ use std::{thread, time};
 use std::rc::Rc;
 use std::panic;
 
-use game::config::CONFIG;
-use game::resource;
+use grt::config::CONFIG;
+use grt::resource;
 use game::state::GameState;
-use game::ui;
-use game::ui::Widget;
+use grt::ui;
+use grt::ui::Widget;
 use game::animation;
 use game::view::RootView;
 
@@ -50,7 +51,7 @@ fn main() {
     };
 
     info!("Setting up display adapter.");
-    let io = game::io::create();
+    let io = grt::io::create();
     let mut io = match io {
         Ok(io) => io,
         Err(e) => {

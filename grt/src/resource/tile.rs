@@ -1,6 +1,6 @@
 use std::io::{Error, ErrorKind};
 
-use resource::Point;
+use util::Point;
 use resource::ResourceBuilder;
 
 use serde_json;

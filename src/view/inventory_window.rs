@@ -32,22 +32,19 @@ impl WidgetKind for InventoryWindow {
         let title = Widget::with_theme(Label::empty(), "title");
 
         let close = Widget::with_theme(
-            Button::with_callback(Rc::new(|_kind, widget| {
-                let parent = Widget::get_parent(&widget);
-                parent.borrow_mut().mark_for_removal();
-            })),
+            Button::with_callback(Callback::remove_parent()),
             "close");
 
         let mut entries: Vec<list_box::Entry> = Vec::new();
         for (index, item) in self.inventory.borrow().items.iter().enumerate() {
-            let cb: Callback<Button> = Rc::new(move |_, widget| {
+            let cb: Callback<Button> = Callback::new(Rc::new(move |_, widget| {
                 let pc = GameState::pc();
                 let pc = pc.borrow_mut();
                 if pc.actor.inventory.borrow_mut().equip(index) {
                     let window = Widget::go_up_tree(widget, 2);
                     window.borrow_mut().invalidate_children();
                 }
-            });
+            }));
 
             let entry = if self.inventory.borrow().is_equipped(index) {
                 list_box::Entry::with_state(&item.item.name, Some(cb),

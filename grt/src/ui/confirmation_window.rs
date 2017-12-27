@@ -28,14 +28,11 @@ impl WidgetKind for ConfirmationWindow {
         let label = Widget::with_theme(Label::empty(), "title");
 
         let cancel = Widget::with_theme(
-            Button::with_callback(Rc::new(|_kind, widget| {
-                let parent = Widget::get_parent(&widget);
-                parent.borrow_mut().mark_for_removal();
-            })),
+            Button::with_callback(Callback::remove_parent()),
             "cancel");
 
         let quit = Widget::with_theme(
-            Button::with_callback(Rc::clone(&self.accept_callback)),
+            Button::with_callback(self.accept_callback.clone()),
             "accept");
 
         vec![cancel, quit, label]

@@ -37,6 +37,7 @@ input:
         KeySpace: ClickCursor
         KeyQ: Exit
         KeyI: ToggleInventory
+        KeyC: ToggleCharacter
 
 logging:
     # Log level may be error, warn, info, debug, or trace

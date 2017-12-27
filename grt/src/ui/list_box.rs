@@ -70,7 +70,7 @@ impl WidgetKind for ListBox {
 
         for entry in self.entries.iter() {
             let kind = match &entry.callback {
-                &Some(ref cb) => Button::new(&entry.text, Rc::clone(&cb)),
+                &Some(ref cb) => Button::new(&entry.text, cb.clone()),
                 &None => Button::with_text(&entry.text),
             };
 

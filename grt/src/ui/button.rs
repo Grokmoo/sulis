@@ -54,7 +54,7 @@ impl WidgetKind for Button {
     fn on_mouse_click(&self, widget: &Rc<RefCell<Widget>>,
                       _kind: event::ClickKind, _mouse_pos: Point) -> bool {
         match self.callback {
-            Some(ref cb) => (cb)(self, widget),
+            Some(ref cb) => cb.call(self, widget),
             None => (),
         };
         true

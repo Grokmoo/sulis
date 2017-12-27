@@ -18,6 +18,7 @@ pub enum InputAction {
     MoveCursorRight,
     ClickCursor,
     ToggleInventory,
+    ToggleCharacter,
     Exit,
 }
 

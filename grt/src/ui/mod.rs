@@ -35,13 +35,14 @@ pub use self::confirmation_window::ConfirmationWindow;
 mod cursor;
 pub use self::cursor::Cursor;
 
+mod callback;
+pub use self::callback::Callback;
+
 use std::rc::Rc;
 use std::cell::RefCell;
 
 use config::CONFIG;
 use resource::ResourceSet;
-
-pub type Callback<T> = Rc<Fn(&T, &Rc<RefCell<Widget>>)>;
 
 pub fn create_ui_tree(kind: Rc<WidgetKind>) -> Rc<RefCell<Widget>> {
 

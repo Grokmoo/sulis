@@ -1,3 +1,6 @@
+mod character_window;
+pub use self::character_window::CharacterWindow;
+
 mod inventory_window;
 pub use self::inventory_window::InventoryWindow;
 
@@ -9,7 +12,7 @@ use std::cell::RefCell;
 
 use grt::io::InputAction;
 use grt::util::Point;
-use grt::ui::{Button, ConfirmationWindow, EmptyWidget, Label, Widget, WidgetKind};
+use grt::ui::{Button, Callback, ConfirmationWindow, EmptyWidget, Label, Widget, WidgetKind};
 use state::{AreaState, GameState};
 
 pub struct RootView {
@@ -35,11 +38,10 @@ impl WidgetKind for RootView {
         match key {
             Exit => {
                     let exit_window = Widget::with_theme(
-                        ConfirmationWindow::new(Rc::new(|_k, _w| { GameState::set_exit(); })),
+                        ConfirmationWindow::new(Callback::with(Box::new(|| { GameState::set_exit(); }))),
                         "exit_confirmation_window");
                     exit_window.borrow_mut().state.set_modal(true);
                     Widget::add_child_to(&widget, exit_window);
-                    true
             },
             ToggleInventory => {
                 let window = Widget::get_child_with_name(widget,
@@ -50,16 +52,26 @@ impl WidgetKind for RootView {
                             InventoryWindow::new(&GameState::pc()));
                         Widget::add_child_to(&widget, window);
                     },
-                    Some(window) => {
-                        window.borrow_mut().mark_for_removal();
-                    }
+                    Some(window) => window.borrow_mut().mark_for_removal(),
                 }
-                true
             },
-            _ => {
-                false
-            }
+            ToggleCharacter => {
+                let window = Widget::get_child_with_name(widget,
+                                                         self::character_window::NAME);
+                match window {
+                    None => {
+                        let window = Widget::with_defaults(
+                            CharacterWindow::new(&GameState::pc()));
+                        Widget::add_child_to(&widget, window);
+                    },
+                    Some(window) => window.borrow_mut().mark_for_removal(),
+                }
+            },
+            _ => return false,
+
         }
+
+        true
     }
 
     fn on_add(&self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
@@ -73,7 +85,7 @@ impl WidgetKind for RootView {
         let right_pane = Widget::with_theme(EmptyWidget::new(), "right_pane");
         {
             let button = Widget::with_theme(
-                Button::with_callback(Rc::new(|_k, _w| info!("Hello world"))),
+                Button::with_callback(Callback::with(Box::new(|| { info!("Hello world"); }))),
                 "test_button");
 
             let area_title = Widget::with_theme(

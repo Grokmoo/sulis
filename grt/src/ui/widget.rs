@@ -6,6 +6,7 @@ use std::cmp;
 use io::{Event, TextRenderer};
 use ui::{Cursor, Size, Theme, WidgetState, WidgetKind};
 use resource::ResourceSet;
+use util::Point;
 
 pub struct Widget {
     pub state: WidgetState,
@@ -132,9 +133,9 @@ impl Widget {
 
             let x;
             let y;
-            if child.borrow().state.is_mouse_over {
-                x = Cursor::get_x() + 1;
-                y = Cursor::get_y() + 1;
+            if let Some(p) = child.borrow().state.position_absolute {
+                x = p.x;
+                y = p.y;
             } else {
                 use ui::theme::PositionRelative::*;
                 x = match theme.x_relative {
@@ -250,6 +251,7 @@ impl Widget {
     }
 
     pub fn remove_mouse_over(root: &Rc<RefCell<Widget>>) {
+        trace!("Remove all mouse overs.");
         for child in root.borrow().children.iter() {
             if !child.borrow().state.is_mouse_over {
                 continue;
@@ -262,8 +264,12 @@ impl Widget {
         let root = Widget::get_root(widget);
         Widget::remove_mouse_over(&root);
 
+        trace!("Add mouse over from '{}'", widget.borrow().theme_id);
         let child = Widget::with_theme(mouse_over, "mouse_over");
         child.borrow_mut().state.is_mouse_over = true;
+        child.borrow_mut().state.position_absolute = Some(Point::new(
+                Cursor::get_x() - ,
+                Cursor::get_y() + 1));
         Widget::add_child_to(&root, child);
     }
 
@@ -357,6 +363,8 @@ impl Widget {
     }
 
     pub fn dispatch_event(widget: &Rc<RefCell<Widget>>, event: Event) -> bool {
+        if widget.borrow().state.is_mouse_over { return false; }
+
         trace!("Dispatching event {:?} in {:?}", event,
                widget.borrow().theme_id);
 

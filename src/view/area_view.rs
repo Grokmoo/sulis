@@ -3,10 +3,9 @@ use std::cell::RefCell;
 use std::cmp;
 
 use state::{AreaState, GameState};
-use grt::ui::{WidgetKind, Widget};
+use grt::ui::{Cursor, Label, WidgetKind, Widget};
 use grt::io::{InputAction, TextRenderer};
 use grt::io::event::ClickKind;
-use grt::util::Point;
 
 pub struct AreaView {
     area_state: Rc<RefCell<AreaState>>,
@@ -61,8 +60,7 @@ impl WidgetKind for AreaView {
         }
     }
 
-    fn on_key_press(&self, widget: &Rc<RefCell<Widget>>,
-                    key: InputAction, _mouse_pos: Point) -> bool {
+    fn on_key_press(&self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
 
         use grt::io::InputAction::*;
         match key {
@@ -75,13 +73,12 @@ impl WidgetKind for AreaView {
         true
     }
 
-    fn on_mouse_click(&self, widget: &Rc<RefCell<Widget>>,
-                _kind: ClickKind, mouse_pos: Point) -> bool {
+    fn on_mouse_click(&self, widget: &Rc<RefCell<Widget>>, _kind: ClickKind) -> bool {
         let pc = GameState::pc();
         let size = pc.borrow().size();
         let pos = &widget.borrow().state.position;
-        let x = (mouse_pos.x - pos.x) - size / 2;
-        let y = (mouse_pos.y - pos.y) - size / 2;
+        let x = (Cursor::get_x() - pos.x) - size / 2;
+        let y = (Cursor::get_y() - pos.y) - size / 2;
         if x >= 0 && y >= 0 {
             GameState::pc_move_to(x + widget.borrow().state.scroll_pos.x, y +
                              widget.borrow().state.scroll_pos.y);
@@ -90,21 +87,26 @@ impl WidgetKind for AreaView {
         true
     }
 
-    fn on_mouse_move(&self, widget: &Rc<RefCell<Widget>>,
-                      mouse_pos: Point) -> bool {
+    fn on_mouse_move(&self, widget: &Rc<RefCell<Widget>>) -> bool {
+        let area_x = Cursor::get_x() - 1;
+        let area_y = Cursor::get_y() - 1;
+
         self.super_on_mouse_enter(widget);
         {
             let ref mut state = self.mouse_over.borrow_mut().state;
             state.clear_text_params();
-            state.add_text_param(&format!("{}", mouse_pos.x - 1));
-            state.add_text_param(&format!("{}", mouse_pos.y - 1));
+            state.add_text_param(&format!("{}", area_x));
+            state.add_text_param(&format!("{}", area_y));
         }
         self.mouse_over.borrow_mut().invalidate_layout();
+
+        if let Some(entity) = self.area_state.borrow().get_entity_at(area_x, area_y) {
+            Widget::set_mouse_over(widget, Label::new(&entity.borrow().actor.actor.id));
+        }
         true
     }
 
-    fn on_mouse_exit(&self, widget: &Rc<RefCell<Widget>>,
-                     _mouse_pos: Point) -> bool {
+    fn on_mouse_exit(&self, widget: &Rc<RefCell<Widget>>) -> bool {
         self.super_on_mouse_exit(widget);
         self.mouse_over.borrow_mut().state.clear_text_params();
         true

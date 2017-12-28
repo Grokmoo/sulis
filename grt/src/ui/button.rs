@@ -3,7 +3,6 @@ use std::cell::RefCell;
 
 use ui::{Callback, Label, Widget, WidgetKind};
 use io::{event, TextRenderer};
-use util::Point;
 
 pub struct Button {
     label: Rc<Label>,
@@ -59,7 +58,7 @@ impl WidgetKind for Button {
     }
 
     fn on_mouse_click(&self, widget: &Rc<RefCell<Widget>>,
-                      _kind: event::ClickKind, _mouse_pos: Point) -> bool {
+                      _kind: event::ClickKind) -> bool {
         match self.callback {
             Some(ref cb) => cb.call(self, widget),
             None => (),

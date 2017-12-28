@@ -31,8 +31,7 @@ impl Cursor {
             return;
         }
 
-        let event = Event::new(event::Kind::MouseMove { change: Point::new(x, y) },
-            Cursor::get_x(), Cursor::get_y());
+        let event = Event::new(event::Kind::MouseMove { change: Point::new(x, y) });
         Widget::dispatch_event(&root, event);
     }
 
@@ -40,7 +39,7 @@ impl Cursor {
         let (x, y) = Cursor::get_position();
 
         trace!("Emulating cursor click event at {},{} as mouse event", x, y);
-        let event = Event::new(event::Kind::MouseClick(event::ClickKind::Left), x, y);
+        let event = Event::new(event::Kind::MouseClick(event::ClickKind::Left));
         Widget::dispatch_event(&root, event);
     }
 

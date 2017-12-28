@@ -5,28 +5,24 @@ use util::Point;
 #[derive(Copy, Clone, Debug)]
 pub struct Event {
     pub kind: Kind,
-    pub mouse: Point
 }
 
 impl Event {
-    pub fn new(kind: Kind, mouse_x: i32, mouse_y: i32) -> Event {
+    pub fn new(kind: Kind) -> Event {
         Event {
             kind,
-            mouse: Point::new(mouse_x, mouse_y),
         }
     }
 
-    pub fn entered_from(event: &Event) -> Event {
+    pub fn entered_from(_event: &Event) -> Event {
         Event {
             kind: Kind::MouseEnter,
-            mouse: event.mouse,
         }
     }
 
-    pub fn exited_from(event: &Event) -> Event {
+    pub fn exited_from(_event: &Event) -> Event {
         Event {
             kind: Kind::MouseExit,
-            mouse: event.mouse,
         }
     }
 }

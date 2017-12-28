@@ -11,7 +11,6 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use grt::io::InputAction;
-use grt::util::Point;
 use grt::ui::{Button, Callback, ConfirmationWindow, EmptyWidget, Label, Widget, WidgetKind};
 use state::{AreaState, GameState};
 
@@ -32,8 +31,7 @@ impl WidgetKind for RootView {
         "root"
     }
 
-    fn on_key_press(&self, widget: &Rc<RefCell<Widget>>,
-                    key: InputAction, _mouse_pos: Point) -> bool {
+    fn on_key_press(&self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
         use grt::io::InputAction::*;
         match key {
             Exit => {

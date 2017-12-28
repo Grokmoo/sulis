@@ -74,6 +74,17 @@ impl AreaState {
             .all(|p| self.point_entities_passable(&requester, p.x, p.y))
     }
 
+    pub fn get_entity_at(&self, x: i32, y: i32) -> Option<&Rc<RefCell<EntityState>>> {
+        if !self.area.coords_valid(x, y) { return None; }
+
+        let index = match self.entity_grid.get((x + y * self.area.width) as usize).unwrap() {
+            &None => return None,
+            &Some(index) => index,
+        };
+
+        self.entities.get(index)
+    }
+
     fn point_entities_passable(&self, requester: &Ref<EntityState>,
                                x: i32, y: i32) -> bool {
         if !self.area.coords_valid(x, y) { return false; }

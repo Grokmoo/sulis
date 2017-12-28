@@ -4,7 +4,7 @@ use std::cell::RefCell;
 use std::cmp;
 
 use io::{Event, TextRenderer};
-use ui::{Size, Theme, WidgetState, WidgetKind};
+use ui::{Cursor, Size, Theme, WidgetState, WidgetKind};
 use resource::ResourceSet;
 
 pub struct Widget {
@@ -130,19 +130,26 @@ impl Widget {
             let height = cmp::min(self.state.inner_size.height, h);
             child.borrow_mut().state.set_size(Size::new(width, height));
 
-            use ui::theme::PositionRelative::*;
-            let x = match theme.x_relative {
-                Zero => self.state.inner_left(),
-                Center => (self.state.inner_left() + self.state.inner_right() -
-                           width) / 2,
-                Max => self.state.inner_right() - width,
-            };
-            let y = match theme.y_relative {
-                Zero => self.state.inner_top(),
-                Center => (self.state.inner_top() + self.state.inner_bottom() -
-                           height) / 2,
-                Max => self.state.inner_bottom() - height,
-            };
+            let x;
+            let y;
+            if child.borrow().state.is_mouse_over {
+                x = Cursor::get_x() + 1;
+                y = Cursor::get_y() + 1;
+            } else {
+                use ui::theme::PositionRelative::*;
+                x = match theme.x_relative {
+                    Zero => self.state.inner_left(),
+                    Center => (self.state.inner_left() + self.state.inner_right() -
+                               width) / 2,
+                    Max => self.state.inner_right() - width,
+                };
+                y = match theme.y_relative {
+                    Zero => self.state.inner_top(),
+                    Center => (self.state.inner_top() + self.state.inner_bottom() -
+                               height) / 2,
+                    Max => self.state.inner_bottom() - height,
+                };
+            }
 
             child.borrow_mut().state.set_position(
                 x + theme.position.x, y + theme.position.y);
@@ -211,6 +218,14 @@ impl Widget {
         Rc::clone(widget.borrow().parent.as_ref().unwrap())
     }
 
+    pub fn get_root(widget: &Rc<RefCell<Widget>>) -> Rc<RefCell<Widget>> {
+        if widget.borrow().parent.is_none() {
+            return Rc::clone(widget);
+        } else {
+            return Widget::get_root(&Widget::get_parent(widget));
+        }
+    }
+
     pub fn add_child_to(parent: &Rc<RefCell<Widget>>,
                          child: Rc<RefCell<Widget>>) {
         parent.borrow_mut().add_child(child);
@@ -232,6 +247,24 @@ impl Widget {
             }
         }
         None
+    }
+
+    pub fn remove_mouse_over(root: &Rc<RefCell<Widget>>) {
+        for child in root.borrow().children.iter() {
+            if !child.borrow().state.is_mouse_over {
+                continue;
+            }
+            child.borrow_mut().mark_for_removal();
+        }
+    }
+
+    pub fn set_mouse_over(widget: &Rc<RefCell<Widget>>, mouse_over: Rc<WidgetKind>) {
+        let root = Widget::get_root(widget);
+        Widget::remove_mouse_over(&root);
+
+        let child = Widget::with_theme(mouse_over, "mouse_over");
+        child.borrow_mut().state.is_mouse_over = true;
+        Widget::add_child_to(&root, child);
     }
 
     pub fn update(root: &Rc<RefCell<Widget>>) -> Result<(), Error> {
@@ -347,7 +380,7 @@ impl Widget {
         for i in (0..len).rev() {
             let child = Rc::clone(widget.borrow().children.get(i).unwrap());
 
-            if child.borrow().state.in_bounds(event.mouse) {
+            if child.borrow().state.in_bounds(Cursor::get_x(), Cursor::get_y()) {
                 if !child.borrow().state.mouse_is_inside {
                     trace!("Dispatch mouse entered to '{}'", child.borrow().theme_id);
                     Widget::dispatch_event(&child, Event::entered_from(&event));
@@ -367,17 +400,17 @@ impl Widget {
         use io::event::Kind::*;
         match event.kind {
             MouseClick(kind) =>
-                widget_kind.on_mouse_click(widget, kind, event.mouse),
+                widget_kind.on_mouse_click(widget, kind),
             MouseMove { change: _change } =>
-                widget_kind.on_mouse_move(widget, event.mouse),
+                widget_kind.on_mouse_move(widget),
             MouseEnter =>
-                widget_kind.on_mouse_enter(widget, event.mouse),
+                widget_kind.on_mouse_enter(widget),
             MouseExit =>
-                widget_kind.on_mouse_exit(widget, event.mouse),
+                widget_kind.on_mouse_exit(widget),
             MouseScroll { scroll } =>
-                widget_kind.on_mouse_scroll(widget, scroll, event.mouse),
+                widget_kind.on_mouse_scroll(widget, scroll),
             KeyPress(action) =>
-                widget_kind.on_key_press(widget, action, event.mouse),
+                widget_kind.on_key_press(widget, action),
         }
     }
 }

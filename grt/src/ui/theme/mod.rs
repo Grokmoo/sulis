@@ -48,6 +48,7 @@ pub enum TextFormat {
 #[derive(Debug)]
 pub struct Theme {
     pub text: Option<String>,
+    pub name: String,
     pub background: Option<String>,
     pub border: Border,
     pub preferred_size: Size,
@@ -63,13 +64,13 @@ pub struct Theme {
 }
 
 impl Theme {
-    pub fn new(builder: ThemeBuilder) -> Theme {
+    pub fn new(name: &str, builder: ThemeBuilder) -> Theme {
 
         let mut children: HashMap<String, Rc<Theme>> = HashMap::new();
 
         if let Some(builder_children) = builder.children {
             for (id, child) in builder_children {
-                children.insert(id, Rc::new(Theme::new(child)));
+                children.insert(id.to_string(), Rc::new(Theme::new(&id, child)));
             }
         }
 
@@ -100,6 +101,7 @@ impl Theme {
             builder.vertical_text_alignment.unwrap_or(VerticalTextAlignment::Center);
 
         Theme {
+            name: name.to_string(),
             background: builder.background,
             border,
             preferred_size,

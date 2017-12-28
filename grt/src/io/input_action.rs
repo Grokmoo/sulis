@@ -36,6 +36,7 @@ impl InputAction {
             }
         };
 
+        Widget::remove_mouse_over(&root);
         use io::InputAction::*;
         match action {
             MoveCursorUp => Cursor::move_by(root, 0, -1),
@@ -50,7 +51,7 @@ impl InputAction {
     fn fire_action(action: InputAction, root: Rc<RefCell<Widget>>) {
         debug!("Firing action {:?}", action);
 
-        let event = Event::new(Kind::KeyPress(action), Cursor::get_x(), Cursor::get_y());
+        let event = Event::new(Kind::KeyPress(action));
         Widget::dispatch_event(&root, event);
     }
 }

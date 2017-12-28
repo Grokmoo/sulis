@@ -96,7 +96,7 @@ impl ResourceSet {
             let mut resource_set = resource_set.borrow_mut();
 
             resource_set.game = Some(Rc::new(builder_set.game));
-            resource_set.theme = Some(Rc::new(Theme::new(builder_set.theme_builder)));
+            resource_set.theme = Some(Rc::new(Theme::new("", builder_set.theme_builder)));
 
             for (id, image) in builder_set.simple_images {
                 insert_if_ok_boxed("image", id, Ok(Rc::new(image) as Rc<Image>),

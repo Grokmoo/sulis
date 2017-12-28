@@ -3,6 +3,11 @@ include:
 background: bg_base
 border: [1, 1, 1, 1]
 children:
+  mouse_over:
+    border: [1, 1, 1, 1]
+    background: bg_base
+    text: "#0"
+    preferred_size: [10, 3]
   right_pane:
     border: [0, 0, 1, 1]
     preferred_size: [20, 0]

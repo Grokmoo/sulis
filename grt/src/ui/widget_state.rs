@@ -24,6 +24,7 @@ pub struct WidgetState {
     pub horizontal_text_alignment: HorizontalTextAlignment,
     pub vertical_text_alignment: VerticalTextAlignment,
     pub is_modal: bool,
+    pub is_mouse_over: bool,
 
     pub text_params: Vec<String>,
 }
@@ -47,6 +48,7 @@ impl WidgetState {
             inner_size: Size::as_zero(),
             inner_position: Point::as_zero(),
             is_modal: false,
+            is_mouse_over: false,
         }
     }
 
@@ -129,9 +131,8 @@ impl WidgetState {
         self.mouse_is_inside = is_inside;
     }
 
-    pub fn in_bounds(&self, p: Point) -> bool {
-        self.size.in_bounds(p.x - self.position.x as i32,
-                            p.y - self.position.y as i32)
+    pub fn in_bounds(&self, x: i32, y: i32) -> bool {
+        self.size.in_bounds(x - self.position.x, y - self.position.y)
     }
 
     pub fn set_border(&mut self, border: Border) {

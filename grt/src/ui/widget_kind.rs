@@ -3,7 +3,6 @@ use std::cell::RefCell;
 
 use io::{InputAction, TextRenderer};
 use io::event::ClickKind;
-use util::Point;
 use ui::{animation_state, Widget};
 
 pub struct EmptyWidget { }
@@ -41,35 +40,29 @@ pub trait WidgetKind {
         Vec::with_capacity(0)
     }
 
-    fn on_mouse_click(&self, _widget: &Rc<RefCell<Widget>>,
-                      _kind: ClickKind, _mouse_pos: Point) -> bool {
+    fn on_mouse_click(&self, _widget: &Rc<RefCell<Widget>>, _kind: ClickKind) -> bool {
         true
     }
 
-    fn on_mouse_move(&self, _widget: &Rc<RefCell<Widget>>,
-                      _mouse_pos: Point) -> bool {
+    fn on_mouse_move(&self, _widget: &Rc<RefCell<Widget>>) -> bool {
         true
     }
 
-    fn on_mouse_enter(&self, widget: &Rc<RefCell<Widget>>,
-                      _mouse_pos: Point) -> bool {
+    fn on_mouse_enter(&self, widget: &Rc<RefCell<Widget>>) -> bool {
         self.super_on_mouse_enter(widget);
         true
     }
 
-    fn on_mouse_exit(&self, widget: &Rc<RefCell<Widget>>,
-                     _mouse_pos: Point) -> bool {
+    fn on_mouse_exit(&self, widget: &Rc<RefCell<Widget>>) -> bool {
         self.super_on_mouse_exit(widget);
         true
     }
 
-    fn on_mouse_scroll(&self, _widget: &Rc<RefCell<Widget>>,
-                         _scroll: i32, _mouse_pos: Point) -> bool {
+    fn on_mouse_scroll(&self, _widget: &Rc<RefCell<Widget>>, _scroll: i32) -> bool {
         true
     }
 
-    fn on_key_press(&self, _widget: &Rc<RefCell<Widget>>,
-                    _key: InputAction, _mouse_pos: Point) -> bool {
+    fn on_key_press(&self, _widget: &Rc<RefCell<Widget>>, _key: InputAction) -> bool {
         false
     }
 

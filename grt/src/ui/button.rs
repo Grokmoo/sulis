@@ -38,13 +38,20 @@ impl WidgetKind for Button {
         "button"
     }
 
-    fn on_add(&self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn layout(&self, widget: &mut Widget) {
         if let Some(ref text) = self.label.text {
-            widget.borrow_mut().state.set_text(&text);
+            widget.state.add_text_param(text);
         }
-
-        Vec::with_capacity(0)
+        widget.do_base_layout();
     }
+
+    // fn on_add(&self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    //     if let Some(ref text) = self.label.text {
+    //         widget.borrow_mut().state.set_text(&text);
+    //     }
+    //
+    //     Vec::with_capacity(0)
+    // }
 
     fn draw_text_mode(&self, renderer: &mut TextRenderer,
                       widget: &Widget, millis: u32) {

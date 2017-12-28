@@ -8,6 +8,7 @@ children:
     border: [1, 1, 1, 1]
     children:
       entry:
+        text: "#0"
         background: fill
         border: { top: 0, bottom: 0, left: 1, right: 0 }
         preferred_size: [0, 1]

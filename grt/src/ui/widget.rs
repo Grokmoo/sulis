@@ -104,9 +104,7 @@ impl Widget {
         self.state.horizontal_text_alignment = theme.horizontal_text_alignment;
         self.state.vertical_text_alignment = theme.vertical_text_alignment;
 
-        if let Some(ref text) = theme.text {
-            self.state.set_text(text);
-        }
+        theme.apply_text(&mut self.state);
     }
 
     pub fn do_children_layout(&self) {

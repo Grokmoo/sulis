@@ -10,13 +10,16 @@ children:
     height_relative: Max
     children:
       mouse_over:
+        text: "{#0,#1}"
         preferred_size: [10, 1]
         position: [0, 1]
       title:
+        text: "#0"
         preferred_size: [18, 1]
         position: [0, 0]
       test_button:
         from: .button
+        text: "Test"
         preferred_size: [18, 3]
         position: [0, 2]
   area:
@@ -48,30 +51,7 @@ children:
         preferred_size: [10, 3]
         preferred_position: [0, 2]
         y_relative: Max
-  inventory_window:
-    background: bg_base
-    border: [1, 1, 1, 1]
-    preferred_size: [30, 0]
-    height_relative: Max
-    x_relative: Max
-    children:
-      title:
-        text: "Inventory"
-        width_relative: Max
-        preferred_size: [0, 1]
-      close:
-        from: .button
-        text: "X"
-        preferred_size: [3, 3]
-        position: [1, -1]
-        x_relative: Max
-      inventory:
-        from: .list_box
-        preferred_size: [0, -2]
-        position: [0, 2]
-        width_relative: Max
-        height_relative: Max
-  character_window:
+  window:
     background: bg_base
     border: [1, 1, 1, 1]
     preferred_size: [30, 0]
@@ -79,6 +59,28 @@ children:
     x_relative: Zero
     children:
       title:
-        text: "Character"
         width_relative: Max
         preferred_size: [0, 1]
+      close:
+        from: .button
+        preferred_size: [3, 3]
+        text: "X"
+        position: [1, -1]
+        x_relative: Max
+  inventory_window:
+    from: .window
+    position: [30, 0]
+    children:
+      title:
+        text: "Inventory"
+      inventory:
+        from: .list_box
+        preferred_size: [0, -2]
+        position: [0, 2]
+        width_relative: Max
+        height_relative: Max
+  character_window:
+    from: .window
+    children:
+      title:
+        text: "Character for #0"

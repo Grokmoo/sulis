@@ -5,7 +5,7 @@ use std::collections::HashMap;
 
 use resource::BuilderType;
 use util::Point;
-use ui::{AnimationState, Border, Size};
+use ui::{AnimationState, Border, Size, WidgetState};
 
 use serde_json;
 use serde_yaml;
@@ -114,6 +114,48 @@ impl Theme {
             vertical_text_alignment,
             text_format,
         }
+    }
+
+    pub fn apply_text(&self, state: &mut WidgetState) {
+        let text = match self.text {
+            None => return,
+            Some(ref text) => text,
+        };
+
+        let mut out = String::new();
+        let mut param_next = false;
+        for c in text.chars() {
+            if param_next {
+                if c == '#' {
+                    // ## code just gives a #
+                    out.push(c);
+                } else {
+                    let param_index = match c.to_digit(10) {
+                        None => {
+                            warn!("Invalid format string for text: '{}'", text);
+                            return;
+                        },
+                        Some(index) => index,
+                    };
+
+                    let text_param = match state.get_text_param(param_index) {
+                        None => {
+                            warn!("Non existant text param '{}' in text '{}'", param_index, text);
+                            return;
+                        },
+                        Some(param) => param,
+                    };
+                    out.push_str(text_param);
+                }
+                param_next = false;
+            } else if c == '#' {
+                param_next = true;
+            } else {
+                out.push(c);
+            }
+        }
+
+        state.set_text_content(out);
     }
 }
 

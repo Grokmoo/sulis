@@ -33,6 +33,8 @@ impl WidgetKind for AreaView {
         let width = self.area_state.borrow().area.width;
         let height = self.area_state.borrow().area.height;
         widget.borrow_mut().state.set_max_scroll_pos(width, height);
+        self.mouse_over.borrow_mut().state.add_text_param("");
+        self.mouse_over.borrow_mut().state.add_text_param("");
 
         Vec::with_capacity(0)
     }
@@ -91,15 +93,20 @@ impl WidgetKind for AreaView {
     fn on_mouse_move(&self, widget: &Rc<RefCell<Widget>>,
                       mouse_pos: Point) -> bool {
         self.super_on_mouse_enter(widget);
-        self.mouse_over.borrow_mut().state.set_text(&format!("[{},{}]",
-            mouse_pos.x - 1, mouse_pos.y - 1));
+        {
+            let ref mut state = self.mouse_over.borrow_mut().state;
+            state.clear_text_params();
+            state.add_text_param(&format!("{}", mouse_pos.x - 1));
+            state.add_text_param(&format!("{}", mouse_pos.y - 1));
+        }
+        self.mouse_over.borrow_mut().invalidate_layout();
         true
     }
 
     fn on_mouse_exit(&self, widget: &Rc<RefCell<Widget>>,
                      _mouse_pos: Point) -> bool {
         self.super_on_mouse_exit(widget);
-        self.mouse_over.borrow_mut().state.set_text("");
+        self.mouse_over.borrow_mut().state.clear_text_params();
         true
     }
 }

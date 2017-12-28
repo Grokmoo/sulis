@@ -29,11 +29,10 @@ impl WidgetKind for Label {
     }
 
     fn layout(&self, widget: &mut Widget) {
-        widget.do_base_layout();
-
         if let Some(ref text) = self.text {
-            widget.state.set_text(&text);
+            widget.state.add_text_param(text);
         }
+        widget.do_base_layout();
     }
 
     fn draw_text_mode(&self, renderer: &mut TextRenderer, widget: &Widget,

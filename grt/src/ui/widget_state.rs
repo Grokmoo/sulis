@@ -1,4 +1,5 @@
 use std::rc::Rc;
+use std::option::Option;
 
 use ui::{Border, Size, AnimationState};
 use ui::theme::{HorizontalTextAlignment, VerticalTextAlignment};
@@ -23,6 +24,8 @@ pub struct WidgetState {
     pub horizontal_text_alignment: HorizontalTextAlignment,
     pub vertical_text_alignment: VerticalTextAlignment,
     pub is_modal: bool,
+
+    pub text_params: Vec<String>,
 }
 
 impl WidgetState {
@@ -38,6 +41,7 @@ impl WidgetState {
             scroll_pos: Point::as_zero(),
             max_scroll_pos: Point::as_zero(),
             text: String::new(),
+            text_params: Vec::new(),
             horizontal_text_alignment: HorizontalTextAlignment::Center,
             vertical_text_alignment: VerticalTextAlignment::Center,
             inner_size: Size::as_zero(),
@@ -87,8 +91,26 @@ impl WidgetState {
         self.max_scroll_pos.set(x, y);
     }
 
-    pub fn set_text(&mut self, text: &str) {
-        self.text = text.to_string();
+    /// Adds a text param to the list of text params stored in this
+    /// state.  When building the output text for the owning widget,
+    /// this is accessed by #n in the text format string, where n is
+    /// an integer 0 to 9.  Use '##' to produce one '#' character in
+    /// the output
+    pub fn add_text_param(&mut self, param: &str) {
+        self.text_params.push(param.to_string());
+    }
+
+    /// clears all current text params, see `add_text_param`
+    pub fn clear_text_params(&mut self) {
+        self.text_params.clear();
+    }
+
+    pub fn get_text_param(&self, index: u32) -> Option<&str> {
+        self.text_params.get(index as usize).map(|x| String::as_str(x))
+    }
+
+    pub fn set_text_content(&mut self, text: String) {
+        self.text = text;
     }
 
     pub fn append_text(&mut self, text: &str) {

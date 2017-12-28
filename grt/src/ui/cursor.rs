@@ -35,11 +35,11 @@ impl Cursor {
         Widget::dispatch_event(&root, event);
     }
 
-    pub fn click(root: Rc<RefCell<Widget>>) {
+    pub fn click(root: Rc<RefCell<Widget>>, kind: event::ClickKind) {
         let (x, y) = Cursor::get_position();
 
         trace!("Emulating cursor click event at {},{} as mouse event", x, y);
-        let event = Event::new(event::Kind::MouseClick(event::ClickKind::Left));
+        let event = Event::new(event::Kind::MouseClick(kind));
         Widget::dispatch_event(&root, event);
     }
 

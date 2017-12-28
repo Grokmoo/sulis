@@ -2,10 +2,12 @@ use std::rc::Rc;
 use std::cell::RefCell;
 use std::cmp;
 
-use state::{AreaState, GameState};
 use grt::ui::{Cursor, Label, WidgetKind, Widget};
 use grt::io::{InputAction, TextRenderer};
 use grt::io::event::ClickKind;
+
+use view::ActionMenu;
+use state::{AreaState, GameState};
 
 pub struct AreaView {
     area_state: Rc<RefCell<AreaState>>,
@@ -73,15 +75,22 @@ impl WidgetKind for AreaView {
         true
     }
 
-    fn on_mouse_click(&self, widget: &Rc<RefCell<Widget>>, _kind: ClickKind) -> bool {
-        let pc = GameState::pc();
-        let size = pc.borrow().size();
-        let pos = &widget.borrow().state.position;
-        let x = (Cursor::get_x() - pos.x) - size / 2;
-        let y = (Cursor::get_y() - pos.y) - size / 2;
-        if x >= 0 && y >= 0 {
+    fn on_mouse_click(&self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
+        let pos = widget.borrow().state.position;
+        let x = Cursor::get_x() - pos.x;
+        let y = Cursor::get_y() - pos.y;
+        if x < 0 || y < 0 { return true; }
+
+        if kind == ClickKind::Left {
+            let pc = GameState::pc();
+            let size = pc.borrow().size();
+            let x = x - size / 2;
+            let y = y - size / 2;
             GameState::pc_move_to(x + widget.borrow().state.scroll_pos.x, y +
-                             widget.borrow().state.scroll_pos.y);
+                                  widget.borrow().state.scroll_pos.y);
+        } else if kind == ClickKind::Right {
+            Widget::add_child_to(widget, Widget::with_defaults(
+                    ActionMenu::new(Rc::clone(&self.area_state), x, y)));
         }
 
         true

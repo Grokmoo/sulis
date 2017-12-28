@@ -10,7 +10,6 @@ use image::Image;
 //// The base widget holder class.  Contains the common implementation across all
 //// widgets, and holds an instance of 'Widget' which contains the specific behavior.
 pub struct WidgetState {
-    pub position_absolute: Option<Point>,
     pub position: Point,
     pub size: Size,
     pub inner_size: Size,
@@ -35,7 +34,6 @@ impl WidgetState {
 
         WidgetState {
             size: Size::as_zero(),
-            position_absolute: None,
             position: Point::as_zero(),
             border: Border::as_zero(),
             mouse_is_inside: false,

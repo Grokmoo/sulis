@@ -2,7 +2,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use ui::{Cursor, Widget};
-use io::event::Kind;
+use io::event::{ClickKind, Kind};
 use io::{Event, KeyboardEvent};
 use config::CONFIG;
 
@@ -17,6 +17,7 @@ pub enum InputAction {
     MoveCursorLeft,
     MoveCursorRight,
     ClickCursor,
+    RightClickCursor,
     ToggleInventory,
     ToggleCharacter,
     Exit,
@@ -43,7 +44,8 @@ impl InputAction {
             MoveCursorDown => Cursor::move_by(root, 0, 1),
             MoveCursorLeft => Cursor::move_by(root, -1, 0),
             MoveCursorRight => Cursor::move_by(root, 1, 0),
-            ClickCursor => Cursor::click(root),
+            ClickCursor => Cursor::click(root, ClickKind::Left),
+            RightClickCursor => Cursor::click(root, ClickKind::Right),
             _ => InputAction::fire_action(action, root),
         }
     }

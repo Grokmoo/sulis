@@ -6,7 +6,6 @@ use std::cmp;
 use io::{Event, TextRenderer};
 use ui::{Cursor, Size, Theme, WidgetState, WidgetKind};
 use resource::ResourceSet;
-use util::Point;
 
 pub struct Widget {
     pub state: WidgetState,
@@ -131,26 +130,21 @@ impl Widget {
             let height = cmp::min(self.state.inner_size.height, h);
             child.borrow_mut().state.set_size(Size::new(width, height));
 
-            let x;
-            let y;
-            if let Some(p) = child.borrow().state.position_absolute {
-                x = p.x;
-                y = p.y;
-            } else {
-                use ui::theme::PositionRelative::*;
-                x = match theme.x_relative {
-                    Zero => self.state.inner_left(),
-                    Center => (self.state.inner_left() + self.state.inner_right() -
-                               width) / 2,
-                    Max => self.state.inner_right() - width,
-                };
-                y = match theme.y_relative {
-                    Zero => self.state.inner_top(),
-                    Center => (self.state.inner_top() + self.state.inner_bottom() -
-                               height) / 2,
-                    Max => self.state.inner_bottom() - height,
-                };
-            }
+            use ui::theme::PositionRelative::*;
+            let x = match theme.x_relative {
+                Zero => self.state.inner_left(),
+                Center => (self.state.inner_left() + self.state.inner_right() -
+                           width) / 2,
+                Max => self.state.inner_right() - width,
+                Cursor => ::ui::Cursor::get_x(),
+            };
+            let y = match theme.y_relative {
+                Zero => self.state.inner_top(),
+                Center => (self.state.inner_top() + self.state.inner_bottom() -
+                           height) / 2,
+                Max => self.state.inner_bottom() - height,
+                Cursor => ::ui::Cursor::get_y(),
+            };
 
             child.borrow_mut().state.set_position(
                 x + theme.position.x, y + theme.position.y);
@@ -267,9 +261,6 @@ impl Widget {
         trace!("Add mouse over from '{}'", widget.borrow().theme_id);
         let child = Widget::with_theme(mouse_over, "mouse_over");
         child.borrow_mut().state.is_mouse_over = true;
-        child.borrow_mut().state.position_absolute = Some(Point::new(
-                Cursor::get_x() - ,
-                Cursor::get_y() + 1));
         Widget::add_child_to(&root, child);
     }
 

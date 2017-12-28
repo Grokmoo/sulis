@@ -14,6 +14,7 @@ use serde_yaml;
 pub enum PositionRelative {
     Zero,
     Center,
+    Cursor,
     Max,
 }
 

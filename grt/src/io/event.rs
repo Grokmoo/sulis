@@ -37,7 +37,7 @@ pub enum Kind {
     KeyPress(InputAction),
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub enum ClickKind {
     Left,
     Right,

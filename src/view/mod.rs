@@ -7,6 +7,9 @@ pub use self::inventory_window::InventoryWindow;
 mod area_view;
 pub use self::area_view::AreaView;
 
+mod action_menu;
+pub use self::action_menu::ActionMenu;
+
 use std::rc::Rc;
 use std::cell::RefCell;
 

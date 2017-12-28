@@ -7,7 +7,10 @@ children:
     border: [1, 1, 1, 1]
     background: bg_base
     text: "#0"
-    preferred_size: [10, 3]
+    preferred_size: [11, 3]
+    x_relative: Cursor
+    y_relative: Cursor
+    position: [-5, 1]
   right_pane:
     border: [0, 0, 1, 1]
     preferred_size: [20, 0]
@@ -31,6 +34,20 @@ children:
     preferred_size: [-20, 0]
     width_relative: Max
     height_relative: Max
+    children:
+      action_menu:
+        border: [1, 1, 1, 1]
+        background: bg_base
+        preferred_size: [10, 10]
+        x_relative: Cursor
+        y_relative: Cursor
+        children:
+          title:
+            text: "Actions"
+            width_relative: Max
+            horizontal_text_alignment: Center
+            preferred_size: [0, 1]
+            preferred_position: [0, 0]
   exit_confirmation_window:
     background: bg_base
     border: [1, 1, 1, 1]

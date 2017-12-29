@@ -10,6 +10,13 @@ pub struct Button {
 }
 
 impl Button {
+    pub fn empty() -> Rc<Button> {
+        Rc::new(Button {
+            label: Label::empty(),
+            callback: None
+        })
+    }
+
     pub fn new(text: &str, callback: Callback<Button>) -> Rc<Button> {
         Rc::new(Button {
             label: Label::new(text),
@@ -43,14 +50,6 @@ impl WidgetKind for Button {
         }
         widget.do_base_layout();
     }
-
-    // fn on_add(&self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
-    //     if let Some(ref text) = self.label.text {
-    //         widget.borrow_mut().state.set_text(&text);
-    //     }
-    //
-    //     Vec::with_capacity(0)
-    // }
 
     fn draw_text_mode(&self, renderer: &mut TextRenderer,
                       widget: &Widget, millis: u32) {

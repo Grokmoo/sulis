@@ -6,6 +6,8 @@ children:
   list_box:
     background: bg_base
     border: [1, 1, 1, 1]
+    width_relative: ChildMax
+    height_relative: ChildSum
     children:
       entry:
         text: "#0"

@@ -10,7 +10,7 @@ use ui::{AnimationState, Border, Size, WidgetState};
 use serde_json;
 use serde_yaml;
 
-#[derive(Deserialize, Debug, Clone, Copy)]
+#[derive(Deserialize, Debug, Clone, Copy, PartialEq)]
 pub enum PositionRelative {
     Zero,
     Center,
@@ -18,27 +18,29 @@ pub enum PositionRelative {
     Max,
 }
 
-#[derive(Deserialize, Debug, Clone, Copy)]
+#[derive(Deserialize, Debug, Clone, Copy, PartialEq)]
 pub enum SizeRelative {
     Zero,
     Max,
+    ChildMax,
+    ChildSum,
 }
 
-#[derive(Deserialize, Debug, Clone, Copy)]
+#[derive(Deserialize, Debug, Clone, Copy, PartialEq)]
 pub enum HorizontalTextAlignment {
     Left,
     Center,
     Right,
 }
 
-#[derive(Deserialize, Debug, Clone, Copy)]
+#[derive(Deserialize, Debug, Clone, Copy, PartialEq)]
 pub enum VerticalTextAlignment {
     Top,
     Center,
     Bottom,
 }
 
-#[derive(Deserialize, Debug, Clone, Copy)]
+#[derive(Deserialize, Debug, Clone, Copy, PartialEq)]
 pub enum TextFormat {
     Normal,
     Bold,
@@ -119,6 +121,9 @@ impl Theme {
         }
     }
 
+    /// Sets the text for the `WidgetState` based on the defined theme text.
+    /// References such as '#0' are expanded to the corresponding text param
+    /// stored in the WidgetState.  See `WidgetState#add_text_param`
     pub fn apply_text(&self, state: &mut WidgetState) {
         let text = match self.text {
             None => return,

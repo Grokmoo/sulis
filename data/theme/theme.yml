@@ -36,18 +36,22 @@ children:
     height_relative: Max
     children:
       action_menu:
-        border: [1, 1, 1, 1]
-        background: bg_base
-        preferred_size: [10, 10]
+        from: .list_box
         x_relative: Cursor
         y_relative: Cursor
+        position: [-1, -1]
         children:
           title:
             text: "Actions"
-            width_relative: Max
             horizontal_text_alignment: Center
-            preferred_size: [0, 1]
-            preferred_position: [0, 0]
+            preferred_size: [10, 1]
+            position: [0, 0]
+          actions:
+            from: .list_box
+            background: none
+            border: [0, 0, 0, 0]
+            width_relative: Max
+            position: [0, 1]
   exit_confirmation_window:
     background: bg_base
     border: [1, 1, 1, 1]

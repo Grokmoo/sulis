@@ -1,10 +1,11 @@
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
-use std::cell::RefCell;
+use std::cell::{RefCell, RefMut};
 use std::cmp;
 
 use io::{Event, TextRenderer};
 use ui::{Cursor, Size, Theme, WidgetState, WidgetKind};
+use ui::theme::SizeRelative;
 use resource::ResourceSet;
 
 pub struct Widget {
@@ -109,46 +110,103 @@ impl Widget {
 
     pub fn do_children_layout(&self) {
         for child in self.children.iter() {
-            let theme = match child.borrow().theme {
-                None => continue,
-                Some(ref t) => Rc::clone(t),
-            };
-
-            let (w, h) = {
-                use ui::theme::SizeRelative::*;
-                (match theme.width_relative {
-                    Zero => theme.preferred_size.width,
-                    Max => self.state.inner_size.width + theme.preferred_size.width,
-                },
-                match theme.height_relative {
-                    Zero => theme.preferred_size.height,
-                    Max => self.state.inner_size.height + theme.preferred_size.height,
-                })
-            };
-
-            let width = cmp::min(self.state.inner_size.width, w);
-            let height = cmp::min(self.state.inner_size.height, h);
-            child.borrow_mut().state.set_size(Size::new(width, height));
-
-            use ui::theme::PositionRelative::*;
-            let x = match theme.x_relative {
-                Zero => self.state.inner_left(),
-                Center => (self.state.inner_left() + self.state.inner_right() -
-                           width) / 2,
-                Max => self.state.inner_right() - width,
-                Cursor => ::ui::Cursor::get_x(),
-            };
-            let y = match theme.y_relative {
-                Zero => self.state.inner_top(),
-                Center => (self.state.inner_top() + self.state.inner_bottom() -
-                           height) / 2,
-                Max => self.state.inner_bottom() - height,
-                Cursor => ::ui::Cursor::get_y(),
-            };
-
-            child.borrow_mut().state.set_position(
-                x + theme.position.x, y + theme.position.y);
+            self.do_child_layout(&mut child.borrow_mut());
         }
+    }
+
+    fn do_child_layout(&self, child: &mut RefMut<Widget>) {
+        let theme = match child.theme {
+            None => return,
+            Some(ref t) => Rc::clone(&t),
+        };
+
+        let mut size = Size::new(Widget::get_preferred_width_recursive(child),
+            Widget::get_preferred_height_recursive(child));
+        if theme.width_relative == SizeRelative::Max {
+            size.add_width(self.state.inner_size.width);
+        }
+
+        if theme.height_relative == SizeRelative::Max {
+            size.add_height(self.state.inner_size.height);
+        }
+
+        size.min_from(&self.state.inner_size);
+        child.state.set_size(size);
+
+        use ui::theme::PositionRelative::*;
+        let x = match theme.x_relative {
+            Zero => self.state.inner_left(),
+            Center => (self.state.inner_left() + self.state.inner_right() -
+                       size.width) / 2,
+            Max => self.state.inner_right() - size.width,
+            Cursor => ::ui::Cursor::get_x(),
+        };
+        let y = match theme.y_relative {
+            Zero => self.state.inner_top(),
+            Center => (self.state.inner_top() + self.state.inner_bottom() -
+                       size.height) / 2,
+            Max => self.state.inner_bottom() - size.height,
+            Cursor => ::ui::Cursor::get_y(),
+        };
+
+        child.state.set_position(
+            x + theme.position.x, y + theme.position.y);
+    }
+
+    fn get_preferred_height_recursive(widget: &RefMut<Widget>) -> i32 {
+        let theme = match widget.theme {
+            None => return 0,
+            Some(ref t) => t,
+        };
+
+        let mut height = 0;
+
+        use ui::theme::SizeRelative::*;
+        match theme.height_relative {
+            ChildMax => {
+                for child in widget.children.iter() {
+                    height = cmp::max(height, Widget::get_preferred_height_recursive(&child.borrow_mut()));
+                }
+                height += theme.border.vertical()
+            },
+            ChildSum => {
+                for child in widget.children.iter() {
+                    height += Widget::get_preferred_height_recursive(&child.borrow_mut());
+                }
+                height += theme.border.vertical()
+            },
+            _ => {},
+        };
+
+        height + theme.preferred_size.height
+    }
+
+    fn get_preferred_width_recursive(widget: &RefMut<Widget>) -> i32 {
+        let theme = match widget.theme {
+            None => return 0,
+            Some(ref t) => t,
+        };
+
+        let mut width = 0;
+
+        use ui::theme::SizeRelative::*;
+        match theme.width_relative {
+            ChildMax => {
+                for child in widget.children.iter() {
+                    width = cmp::max(width, Widget::get_preferred_width_recursive(&child.borrow_mut()));
+                }
+                width += theme.border.horizontal()
+            },
+            ChildSum => {
+                for child in widget.children.iter() {
+                    width += Widget::get_preferred_width_recursive(&child.borrow_mut());
+                }
+                width += theme.border.horizontal()
+            },
+            _ => {},
+        };
+
+        width + theme.preferred_size.width
     }
 
     fn layout_widget(&mut self) {
@@ -207,6 +265,14 @@ impl Widget {
             return Rc::clone(widget);
         }
         Widget::go_up_tree(&Widget::get_parent(widget), levels - 1)
+    }
+
+    pub fn mark_removal_up_tree(widget: &Rc<RefCell<Widget>>, levels: usize) {
+        if levels == 0 {
+            widget.borrow_mut().mark_for_removal();
+        } else {
+            Widget::mark_removal_up_tree(&Widget::get_parent(widget), levels - 1);
+        }
     }
 
     pub fn get_parent(widget: &Rc<RefCell<Widget>>) -> Rc<RefCell<Widget>> {
@@ -394,22 +460,31 @@ impl Widget {
             }
         }
 
+        use io::event::Kind::*;
+        // always pass mouse entered and exited to the widget kind
+        let enter_exit_retval = match event.kind {
+            MouseEnter =>
+                widget_kind.on_mouse_enter(widget),
+            MouseExit =>
+                widget_kind.on_mouse_exit(widget),
+            _ => false,
+        };
+
+        // don't pass events other than mouse enter, exit to the widget kind
+        // if a child ate the event
         if event_eaten { return true; }
 
-        use io::event::Kind::*;
         match event.kind {
             MouseClick(kind) =>
                 widget_kind.on_mouse_click(widget, kind),
             MouseMove { change: _change } =>
                 widget_kind.on_mouse_move(widget),
-            MouseEnter =>
-                widget_kind.on_mouse_enter(widget),
-            MouseExit =>
-                widget_kind.on_mouse_exit(widget),
             MouseScroll { scroll } =>
                 widget_kind.on_mouse_scroll(widget, scroll),
             KeyPress(action) =>
                 widget_kind.on_key_press(widget, action),
+            MouseEnter => enter_exit_retval,
+            MouseExit => enter_exit_retval,
         }
     }
 }

@@ -24,4 +24,12 @@ impl Border {
             right: border,
         }
     }
+
+    pub fn vertical(&self) -> i32 {
+        self.top + self.bottom
+    }
+
+    pub fn horizontal(&self) -> i32 {
+        self.right + self.left
+    }
 }

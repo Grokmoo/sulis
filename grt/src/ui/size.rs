@@ -1,4 +1,5 @@
 use std::ops;
+use std::cmp;
 
 use ui::Border;
 
@@ -47,6 +48,22 @@ impl Size {
         self.height += height;
     }
 
+    pub fn add_width(&mut self, width: i32) {
+        self.width += width;
+    }
+
+    pub fn add_height(&mut self, height: i32) {
+        self.height += height;
+    }
+
+    pub fn add_width_from(&mut self, size: &Size) {
+        self.width += size.width;
+    }
+
+    pub fn add_height_from(&mut self, size: &Size) {
+        self.height += size.height;
+    }
+
     pub fn set(&mut self, width: i32, height: i32) {
         self.width = width;
         self.height = height;
@@ -58,6 +75,26 @@ impl Size {
 
     pub fn set_height(&mut self, height: i32) {
         self.height = height;
+    }
+
+    pub fn max_from(&mut self, other: &Size) {
+        self.width = cmp::max(self.width, other.width);
+        self.height = cmp::max(self.height, other.height);
+    }
+
+    pub fn min_from(&mut self, other: &Size) {
+        self.width = cmp::min(self.width, other.width);
+        self.height = cmp::min(self.height, other.height);
+    }
+
+    pub fn max(&mut self, width: i32, height: i32) {
+        self.width = cmp::max(self.width, width);
+        self.height = cmp::max(self.height, height);
+    }
+
+    pub fn min(&mut self, width: i32, height: i32) {
+        self.width = cmp::min(self.width, width);
+        self.height = cmp::min(self.height, height);
     }
 }
 

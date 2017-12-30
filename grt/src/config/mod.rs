@@ -47,6 +47,7 @@ pub enum IOAdapter {
     Auto,
     Pancurses,
     Termion,
+    Glium,
 }
 
 lazy_static! {
@@ -112,7 +113,16 @@ impl Config {
         Ok(config)
     }
 
-    pub fn get_input_action(&self, k: KeyboardEvent) -> Option<&InputAction> {
-        self.input.keybindings.get(&k.key)
+    pub fn get_input_action(&self, k: Option<KeyboardEvent>) -> Option<InputAction> {
+        match k {
+            None => None,
+            Some(k) => {
+                debug!("Got keyboard input '{:?}'", k);
+                match self.input.keybindings.get(&k.key) {
+                    None => None,
+                    Some(action) => Some(*action),
+                }
+            }
+        }
     }
 }

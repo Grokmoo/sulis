@@ -3,8 +3,7 @@ use std::cell::RefCell;
 
 use ui::{Cursor, Widget};
 use io::event::{ClickKind, Kind};
-use io::{Event, KeyboardEvent};
-use config::CONFIG;
+use io::Event;
 
 #[derive(Debug, Deserialize, Copy, Clone)]
 pub enum InputAction {
@@ -24,18 +23,13 @@ pub enum InputAction {
 }
 
 impl InputAction {
-    pub fn handle_keyboard_input(input: KeyboardEvent,
-                                 root: Rc<RefCell<Widget>>) {
-
-        debug!("Received {:?}", input);
-        let action = {
-            let action = CONFIG.get_input_action(input);
-
-            match action {
-                None => return,
-                Some(action) => *action
-            }
+    pub fn handle_action(action: Option<InputAction>, root: Rc<RefCell<Widget>>) {
+        let action = match action {
+            None => return,
+            Some(action) => action
         };
+
+        debug!("Received action {:?}", action);
 
         Widget::remove_mouse_over(&root);
         use io::InputAction::*;

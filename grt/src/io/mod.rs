@@ -1,5 +1,6 @@
 #[cfg(windows)] mod pancurses_adapter;
 #[cfg(not(windows))] mod termion_adapter;
+mod glium_adapter;
 
 mod buffered_text_renderer;
 
@@ -41,12 +42,17 @@ pub fn create() -> Result<Box<IO>, Error> {
         IOAdapter::Pancurses => get_pancurses_adapter(),
         IOAdapter::Termion => get_termion_adapter(),
         IOAdapter::Auto => get_auto_adapter(),
+        IOAdapter::Glium => get_glium_adapter(),
     }
 }
 
 #[cfg(not(target_os = "windows"))]
 pub fn get_auto_adapter() -> Result<Box<IO>, Error> {
     get_termion_adapter()
+}
+
+pub fn get_glium_adapter() -> Result<Box<IO>, Error> {
+    Ok(Box::new(glium_adapter::GliumDisplay::new()))
 }
 
 #[cfg(not(target_os = "windows"))]

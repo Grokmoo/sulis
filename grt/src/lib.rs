@@ -14,6 +14,8 @@ extern crate serde_yaml;
 #[cfg(windows)] extern crate pancurses;
 #[cfg(not(windows))] extern crate termion;
 
+extern crate glium;
+
 pub mod config;
 pub mod image;
 pub mod io;

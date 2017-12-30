@@ -62,7 +62,7 @@ impl IO for Terminal {
         };
         let input = KeyboardEvent { key: input };
 
-        InputAction::handle_keyboard_input(input, root);
+        InputAction::handle_action(CONFIG.get_input_action(Some(input)), Rc::clone(&root));
     }
 
     fn render_output(&mut self, root: Ref<Widget>, millis: u32) {

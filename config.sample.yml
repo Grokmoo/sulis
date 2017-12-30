@@ -35,6 +35,7 @@ input:
         KeyA: MoveCursorLeft
         KeyD: MoveCursorRight
         KeySpace: ClickCursor
+        KeyZ: RightClickCursor
         KeyQ: Exit
         KeyI: ToggleInventory
         KeyC: ToggleCharacter

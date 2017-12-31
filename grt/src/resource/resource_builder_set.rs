@@ -1,5 +1,6 @@
 use resource::*;
 use resource::size::SizeBuilder;
+use resource::spritesheet::SpritesheetBuilder;
 use image::SimpleImage;
 use image::composed_image::ComposedImageBuilder;
 use image::animated_image::AnimatedImageBuilder;
@@ -24,6 +25,8 @@ pub struct ResourceBuilderSet {
     pub composed_builders: HashMap<String, ComposedImageBuilder>,
     pub animated_builders: HashMap<String, AnimatedImageBuilder>,
     pub item_adjectives: HashMap<String, ItemAdjective>,
+    pub spritesheet_builders: HashMap<String, SpritesheetBuilder>,
+    pub spritesheets_dir: String,
 }
 
 impl ResourceBuilderSet {
@@ -70,6 +73,8 @@ impl ResourceBuilderSet {
             composed_builders: read(root, "composed_images"),
             animated_builders: read(root, "animated_images"),
             item_adjectives: read(root, "item_adjectives"),
+            spritesheet_builders: read(root, "spritesheets"),
+            spritesheets_dir: format!("{}/spritesheets/", root),
         })
     }
 

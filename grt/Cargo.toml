@@ -4,6 +4,7 @@ version = "0.1.0"
 authors = ["Jared Stephen <grok_moo@yahoo.com>"]
 
 [dependencies]
+image = "0.18"
 glium = "0.19"
 lazy_static = "1.0"
 log = "0.3"

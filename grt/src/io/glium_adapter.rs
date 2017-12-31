@@ -42,7 +42,7 @@ impl IO for GliumDisplay {
 
     fn render_output(&mut self, _root: Ref<Widget>, _millis: u32) {
         let mut target = self.display.draw();
-        target.clear_color(0.0, 0.0, 1.0, 1.0);
+        target.clear_color(0.0, 0.0, 0.0, 1.0);
         target.finish().unwrap();
     }
 }

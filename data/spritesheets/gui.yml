@@ -1,0 +1,43 @@
+id: gui
+src: "gui.png"
+size: [ 256, 256 ]
+groups:
+  bg_base:
+    size: [5, 5]
+    position: [0, 0]
+    areas:
+      bg_top_left_base:      [0,  0]
+      bg_top_middle_base:    [5,  0]
+      bg_top_right_base:     [10, 0]
+      bg_middle_left_base:   [0,  5]
+      bg_middle_base:        [5,  5]
+      bg_middle_right_base:  [10, 5]
+      bg_bottom_left_base:   [0, 10]
+      bg_bottom_middle_base: [5, 10]
+      bg_bottom_right_base:  [10, 10]
+  bg_hover:
+    size: [5, 5]
+    position: [0, 15]
+    areas:
+      bg_top_left_hover:      [0,  0]
+      bg_top_middle_hover:    [5,  0]
+      bg_top_right_hover:     [10, 0]
+      bg_middle_left_hover:   [0,  5]
+      bg_middle_hover:        [5,  5]
+      bg_middle_right_hover:  [10, 5]
+      bg_bottom_left_hover:   [0, 10]
+      bg_bottom_middle_hover: [5, 10]
+      bg_bottom_right_hover:  [10, 10]
+  bg_pressed:
+    size: [5, 5]
+    position: [0, 30]
+    areas:
+      bg_top_left_pressed:      [0,  0]
+      bg_top_middle_pressed:    [5,  0]
+      bg_top_right_pressed:     [10, 0]
+      bg_middle_left_pressed:   [0,  5]
+      bg_middle_pressed:        [5,  5]
+      bg_middle_right_pressed:  [10, 5]
+      bg_bottom_left_pressed:   [0, 10]
+      bg_bottom_middle_pressed: [5, 10]
+      bg_bottom_right_pressed:  [10, 10]

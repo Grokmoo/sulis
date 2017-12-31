@@ -19,6 +19,9 @@ pub use self::actor::Actor;
 pub mod item;
 pub use self::item::Item;
 
+mod spritesheet;
+pub use self::spritesheet::Spritesheet;
+
 mod item_adjective;
 pub use self::item_adjective::ItemAdjective;
 
@@ -70,6 +73,7 @@ pub struct ResourceSet {
     items: HashMap<String, Rc<Item>>,
     sizes: HashMap<usize, Rc<Size>>,
     images: HashMap<String, Rc<Image>>,
+    spritesheets: HashMap<String, Rc<Spritesheet>>,
 }
 
 impl ResourceSet {
@@ -84,6 +88,7 @@ impl ResourceSet {
             images: HashMap::new(),
             items: HashMap::new(),
             item_adjectives: HashMap::new(),
+            spritesheets: HashMap::new(),
         }
     }
 
@@ -97,6 +102,12 @@ impl ResourceSet {
 
             resource_set.game = Some(Rc::new(builder_set.game));
             resource_set.theme = Some(Rc::new(Theme::new("", builder_set.theme_builder)));
+
+            let sheets_dir = &builder_set.spritesheets_dir;
+            for (id, sheet) in builder_set.spritesheet_builders {
+                insert_if_ok_boxed("spritesheet", id, Spritesheet::new(sheets_dir, sheet),
+                    &mut resource_set.spritesheets);
+            }
 
             for (id, image) in builder_set.simple_images {
                 insert_if_ok_boxed("image", id, Ok(Rc::new(image) as Rc<Image>),
@@ -173,6 +184,10 @@ impl ResourceSet {
 
     pub fn get_area(id: &str) -> Option<Rc<Area>> {
         RESOURCE_SET.with(|r| r.borrow().get_resource(id, &r.borrow().areas))
+    }
+
+    pub fn get_spritesheet(id: &str) -> Option<Rc<Spritesheet>> {
+        RESOURCE_SET.with(|r| r.borrow().get_resource(id, &r.borrow().spritesheets))
     }
 
     pub fn get_image(id: &str) -> Option<Rc<Image>> {

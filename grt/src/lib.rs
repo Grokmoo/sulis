@@ -15,6 +15,7 @@ extern crate serde_yaml;
 #[cfg(not(windows))] extern crate termion;
 
 extern crate glium;
+extern crate image as extern_image;
 
 pub mod config;
 pub mod image;

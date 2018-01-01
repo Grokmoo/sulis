@@ -1,3 +1,4 @@
 id: fill_active
 size: [1, 1]
 text_display: [ "=" ]
+image_display: "gui/bg_middle_pressed"

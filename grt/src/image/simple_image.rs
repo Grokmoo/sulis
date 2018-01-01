@@ -1,53 +1,65 @@
+use std::rc::Rc;
 use std::io::{Error, ErrorKind};
 
 use image::Image;
 use util::Point;
-use resource::ResourceBuilder;
+use resource::{ResourceBuilder, ResourceSet, Sprite};
 use io::TextRenderer;
 use ui::{AnimationState, Size};
 
 use serde_json;
 use serde_yaml;
 
-#[derive(Deserialize, Debug)]
+#[derive(Debug)]
 pub struct SimpleImage {
     id: String,
     text_display: Vec<char>,
+    image_display: Rc<Sprite>,
     size: Size,
 }
 
 impl SimpleImage {
-    fn validate(resource: SimpleImage) -> Result<SimpleImage, Error> {
-        if resource.text_display.len() == 0 {
-            return Ok(resource);
+    pub fn new(builder: SimpleImageBuilder, resources: &ResourceSet) -> Result<Rc<Image>, Error> {
+        if builder.text_display.len() != 0 {
+            if builder.text_display.len() != (builder.size.product()) as usize {
+                return Err(Error::new(ErrorKind::InvalidData,
+                                      format!("SimpleImage text display must be length*width characters.")));
+            }
         }
 
-        if resource.text_display.len() != (resource.size.product()) as usize {
-            return Err(Error::new(ErrorKind::InvalidData,
-                format!("SimpleImage text display must be length*width characters.")));
+        let format_error = Err(Error::new(ErrorKind::InvalidData,
+                            "SimpleImage image display must be of format {SHEET_ID}/{SPRITE_ID}"));
+
+        let split_index = match builder.image_display.find('/') {
+            None => return format_error,
+            Some(index) => index,
+        };
+
+        let (spritesheet_id, sprite_id) = builder.image_display.split_at(split_index);
+        if sprite_id.len() == 0 {
+            return format_error;
         }
+        let sprite_id = &sprite_id[1..];
 
-        Ok(resource)
-    }
-}
+        let sheet = match resources.spritesheets.get(spritesheet_id) {
+            None => return Err(Error::new(ErrorKind::InvalidData,
+                                          format!("Unable to location spritesheet '{}'", spritesheet_id))),
+            Some(sheet) => sheet,
+        };
 
-impl ResourceBuilder for SimpleImage {
-    fn owned_id(&self) -> String {
-        self.id.to_string()
-    }
+        let sprite = match sheet.sprites.get(sprite_id) {
+            None => return Err(Error::new(ErrorKind::InvalidData,
+                                          format!("Unable to location sprite '{}' in spritesheet '{}'",
+                                                  sprite_id, spritesheet_id))),
+            Some(ref sprite) => Rc::clone(sprite),
+        };
 
-    fn from_json(data: &str) -> Result<SimpleImage, Error> {
-        let resource: SimpleImage = serde_json::from_str(data)?;
-        SimpleImage::validate(resource)
-    }
-
-    fn from_yaml(data: &str) -> Result<SimpleImage, Error> {
-        let resource: Result<SimpleImage, serde_yaml::Error> = serde_yaml::from_str(data);
-
-        match resource {
-            Ok(resource) => SimpleImage::validate(resource),
-            Err(error) => Err(Error::new(ErrorKind::InvalidData, format!("{}", error)))
-        }
+        Ok(Rc::new(SimpleImage {
+            id: builder.id,
+            text_display: builder.text_display,
+            size: builder.size,
+            image_display: sprite,
+        }))
     }
 }
 
@@ -73,3 +85,33 @@ impl Image for SimpleImage {
         &self.size
     }
 }
+
+#[derive(Deserialize, Debug)]
+pub struct SimpleImageBuilder {
+    id: String,
+    text_display: Vec<char>,
+    image_display: String,
+    size: Size,
+}
+
+impl ResourceBuilder for SimpleImageBuilder {
+    fn owned_id(&self) -> String {
+        self.id.to_string()
+    }
+
+    fn from_json(data: &str) -> Result<SimpleImageBuilder, Error> {
+        let resource: SimpleImageBuilder = serde_json::from_str(data)?;
+
+        Ok(resource)
+    }
+
+    fn from_yaml(data: &str) -> Result<SimpleImageBuilder, Error> {
+        let resource: Result<SimpleImageBuilder, serde_yaml::Error> = serde_yaml::from_str(data);
+
+        match resource {
+            Ok(resource) => Ok(resource),
+            Err(error) => Err(Error::new(ErrorKind::InvalidData, format!("{}", error)))
+        }
+    }
+}
+

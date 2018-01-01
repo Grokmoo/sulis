@@ -4,6 +4,7 @@ use std::rc::Rc;
 use config::CONFIG;
 use io::{InputAction, KeyboardEvent, IO};
 use io::keyboard_event::Key;
+use resource::ResourceSet;
 use ui::Widget;
 
 use glium::{self, Surface, glutin};
@@ -12,21 +13,56 @@ use glium::glutin::VirtualKeyCode;
 pub struct GliumDisplay {
     display: glium::Display,
     events_loop: glium::glutin::EventsLoop,
+    program: glium::Program,
 }
+
+#[derive(Copy, Clone)]
+struct Vertex {
+    position: [f32; 2],
+    tex_coords: [f32; 2],
+}
+
+implement_vertex!(Vertex, position, tex_coords);
+
+const VERTEX_SHADER_SRC: &'static str = r#"
+  #version 140
+  in vec2 position;
+  in vec2 tex_coords;
+  out vec2 v_tex_coords;
+  void main() {
+    v_tex_coords = tex_coords;
+    gl_Position = vec4(position, 0.0, 1.0);
+  }
+"#;
+
+const FRAGMENT_SHADER_SRC: &'static str = r#"
+  #version 140
+  in vec2 v_tex_coords;
+  out vec4 color;
+  uniform sampler2D tex;
+  void main() {
+    color = texture(tex, v_tex_coords);
+  }
+"#;
 
 impl GliumDisplay {
     pub fn new() -> GliumDisplay {
         debug!("Initialize Glium Display adapter.");
         let events_loop = glium::glutin::EventsLoop::new();
         let window = glium::glutin::WindowBuilder::new()
-            .with_dimensions(1024, 768)
+            .with_dimensions(800, 600)
             .with_title("Hello world");
         let context = glium::glutin::ContextBuilder::new();
         let display = glium::Display::new(window, context, &events_loop).unwrap();
 
+        let program = glium::Program::from_source(&display, VERTEX_SHADER_SRC,
+                                                  FRAGMENT_SHADER_SRC, None).unwrap();
+
+
         GliumDisplay {
             display,
             events_loop,
+            program,
         }
     }
 }
@@ -41,8 +77,32 @@ impl IO for GliumDisplay {
     }
 
     fn render_output(&mut self, _root: Ref<Widget>, _millis: u32) {
+        let vertex1 = Vertex { position: [ 0.0,  0.0], tex_coords: [0.0, 0.9] };
+        let vertex2 = Vertex { position: [ 0.0,  0.5], tex_coords: [0.0, 1.0] };
+        let vertex3 = Vertex { position: [ 0.5,  0.0], tex_coords: [0.1, 0.9] };
+        let vertex4 = Vertex { position: [ 0.5,  0.5], tex_coords: [0.1, 1.0] };
+        let shape = vec![vertex1, vertex2, vertex3, vertex4];
+
+        let image = ResourceSet::get_spritesheet("gui").unwrap().image.clone();
+        let image_dimensions = image.dimensions();
+        let image = glium::texture::RawImage2d::from_raw_rgba_reversed(&image.into_raw(), image_dimensions);
+        let texture = glium::texture::Texture2d::new(&self.display, image).unwrap();
+
+        let vertex_buffer = glium::VertexBuffer::new(&self.display, &shape).unwrap();
+        let indices = glium::index::NoIndices(glium::index::PrimitiveType::TriangleStrip);
+        let uniforms = uniform! {
+            tex: &texture,
+        };
+
+        let params = glium::DrawParameters {
+            blend: glium::draw_parameters::Blend::alpha_blending(),
+            smooth: Some(glium::draw_parameters::Smooth::Nicest),
+            .. Default::default()
+        };
         let mut target = self.display.draw();
         target.clear_color(0.0, 0.0, 0.0, 1.0);
+        target.draw(&vertex_buffer, &indices, &self.program, &uniforms,
+                    &params).unwrap();
         target.finish().unwrap();
     }
 }

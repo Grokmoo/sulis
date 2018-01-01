@@ -21,6 +21,7 @@ pub use self::item::Item;
 
 mod spritesheet;
 pub use self::spritesheet::Spritesheet;
+pub use self::spritesheet::Sprite;
 
 mod item_adjective;
 pub use self::item_adjective::ItemAdjective;
@@ -43,7 +44,7 @@ use resource::area::AreaBuilder;
 use resource::tile::TileBuilder;
 use resource::item::ItemBuilder;
 use resource::resource_builder_set::ResourceBuilderSet;
-use image::{Image, AnimatedImage, ComposedImage};
+use image::{Image, SimpleImage, AnimatedImage, ComposedImage};
 
 thread_local! {
     static RESOURCE_SET: RefCell<ResourceSet> = RefCell::new(ResourceSet::new());
@@ -73,7 +74,7 @@ pub struct ResourceSet {
     items: HashMap<String, Rc<Item>>,
     sizes: HashMap<usize, Rc<Size>>,
     images: HashMap<String, Rc<Image>>,
-    spritesheets: HashMap<String, Rc<Spritesheet>>,
+    pub spritesheets: HashMap<String, Rc<Spritesheet>>,
 }
 
 impl ResourceSet {
@@ -109,8 +110,8 @@ impl ResourceSet {
                     &mut resource_set.spritesheets);
             }
 
-            for (id, image) in builder_set.simple_images {
-                insert_if_ok_boxed("image", id, Ok(Rc::new(image) as Rc<Image>),
+            for (id, image) in builder_set.simple_builders {
+                insert_if_ok_boxed("image", id, SimpleImage::new(image, &resource_set),
                     &mut resource_set.images);
             }
 

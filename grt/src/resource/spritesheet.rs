@@ -12,20 +12,33 @@ use serde_yaml;
 use extern_image::{self, ImageBuffer, Rgba};
 
 pub struct Spritesheet {
-    image: ImageBuffer<Rgba<u8>, Vec<u8>>,
-    sprites: HashMap<String, Sprite>,
+    pub image: ImageBuffer<Rgba<u8>, Vec<u8>>,
+    pub sprites: HashMap<String, Rc<Sprite>>,
 }
 
-struct Sprite {
+#[derive(Debug)]
+pub struct Sprite {
     position: Point,
     size: Size,
+    tex_coords: [f32; 8],
 }
 
 impl Sprite {
-    fn new(position: Point, size: Size) -> Sprite {
+    fn new(image_size: &Size, position: Point, size: Size) -> Sprite {
+        let image_width = image_size.width as f32;
+        let image_height = image_size.height as f32;
+        let x_min = (position.x as f32) / image_width;
+        let y_min = (image_height - (position.y + size.height) as f32) / image_height;
+        let x_max = (position.x + size.width) as f32 / image_width;
+        let y_max = (image_height - position.y as f32) / image_height;
+
         Sprite {
             position,
-            size
+            size,
+            tex_coords: [ x_min, y_min,
+                          x_min, y_max,
+                          x_max, y_min,
+                          x_max, y_max ],
         }
     }
 }
@@ -44,13 +57,14 @@ impl Spritesheet {
 
         let image = image.to_rgba();
         let (image_width, image_height) = image.dimensions();
+        let image_size = Size::new(image_width as i32, image_height as i32);
 
-        let mut sprites: HashMap<String, Sprite> = HashMap::new();
+        let mut sprites: HashMap<String, Rc<Sprite>> = HashMap::new();
         for (_id, group) in builder.groups {
             let size = group.size;
             let base_pos = group.position;
             for (id, area_pos) in group.areas {
-                let sprite = Sprite::new(area_pos + base_pos, size);
+                let sprite = Sprite::new(&image_size, area_pos + base_pos, size);
 
                 if sprites.contains_key(&id) {
                     warn!("Duplicate sprite ID in sheet '{}': '{}'", builder.id, id);
@@ -65,7 +79,7 @@ impl Spritesheet {
                         continue;
                     }
 
-                sprites.insert(id, sprite);
+                sprites.insert(id, Rc::new(sprite));
             }
         }
 

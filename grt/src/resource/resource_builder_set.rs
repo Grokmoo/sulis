@@ -1,7 +1,7 @@
 use resource::*;
 use resource::size::SizeBuilder;
 use resource::spritesheet::SpritesheetBuilder;
-use image::SimpleImage;
+use image::simple_image::SimpleImageBuilder;
 use image::composed_image::ComposedImageBuilder;
 use image::animated_image::AnimatedImageBuilder;
 use ui::theme::{ThemeBuilder, create_theme};
@@ -21,7 +21,7 @@ pub struct ResourceBuilderSet {
     pub tile_builders: HashMap<String, TileBuilder>,
     pub actor_builders: HashMap<String, ActorBuilder>,
     pub item_builders: HashMap<String, ItemBuilder>,
-    pub simple_images: HashMap<String, SimpleImage>,
+    pub simple_builders: HashMap<String, SimpleImageBuilder>,
     pub composed_builders: HashMap<String, ComposedImageBuilder>,
     pub animated_builders: HashMap<String, AnimatedImageBuilder>,
     pub item_adjectives: HashMap<String, ItemAdjective>,
@@ -69,7 +69,7 @@ impl ResourceBuilderSet {
             actor_builders: read(root, "actors"),
             item_builders: read(root, "items"),
             area_builders: read(root, "areas"),
-            simple_images: read(root, "images"),
+            simple_builders: read(root, "images"),
             composed_builders: read(root, "composed_images"),
             animated_builders: read(root, "animated_images"),
             item_adjectives: read(root, "item_adjectives"),

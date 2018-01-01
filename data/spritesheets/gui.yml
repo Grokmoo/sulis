@@ -41,3 +41,8 @@ groups:
       bg_bottom_left_pressed:   [0, 10]
       bg_bottom_middle_pressed: [5, 10]
       bg_bottom_right_pressed:  [10, 10]
+  special:
+    size: [5, 5]
+    position: [0, 0]
+    areas:
+      empty: [15, 0]

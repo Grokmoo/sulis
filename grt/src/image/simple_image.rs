@@ -4,7 +4,7 @@ use std::io::{Error, ErrorKind};
 use image::Image;
 use util::Point;
 use resource::{ResourceBuilder, ResourceSet, Sprite};
-use io::TextRenderer;
+use io::{TextRenderer, Vertex, Quad};
 use ui::{AnimationState, Size};
 
 use serde_json;
@@ -64,6 +64,22 @@ impl SimpleImage {
 }
 
 impl Image for SimpleImage {
+    fn get_quads(&self, _state: &AnimationState, position: &Point, size: &Size) -> Vec<Quad> {
+        let tc = &self.image_display.tex_coords;
+        let x_min = position.x as f32;
+        let y_min = 24.0 - position.y as f32;
+        let x_max = (position.x + size.width) as f32;
+        let y_max = 24.0 - (position.y + size.height) as f32;
+        vec![Quad {
+            vertices: [
+                Vertex { position: [ x_min, y_max ], tex_coords: [tc[0], tc[1]] },
+                Vertex { position: [ x_min, y_min ], tex_coords: [tc[2], tc[3]] },
+                Vertex { position: [ x_max, y_max ], tex_coords: [tc[4], tc[5]] },
+                Vertex { position: [ x_max, y_min ], tex_coords: [tc[6], tc[7]] },
+           ]
+        }]
+    }
+
     fn draw_text_mode(&self, renderer: &mut TextRenderer, _state: &AnimationState,
                       position: &Point) {
         if self.text_display.len() == 0 { return; }

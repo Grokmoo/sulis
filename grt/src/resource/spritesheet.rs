@@ -18,9 +18,9 @@ pub struct Spritesheet {
 
 #[derive(Debug)]
 pub struct Sprite {
-    position: Point,
-    size: Size,
-    tex_coords: [f32; 8],
+    pub position: Point,
+    pub size: Size,
+    pub tex_coords: [f32; 8],
 }
 
 impl Sprite {

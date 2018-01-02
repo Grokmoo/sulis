@@ -23,6 +23,9 @@ mod spritesheet;
 pub use self::spritesheet::Spritesheet;
 pub use self::spritesheet::Sprite;
 
+mod font;
+pub use self::font::Font;
+
 mod item_adjective;
 pub use self::item_adjective::ItemAdjective;
 
@@ -75,6 +78,7 @@ pub struct ResourceSet {
     sizes: HashMap<usize, Rc<Size>>,
     images: HashMap<String, Rc<Image>>,
     pub spritesheets: HashMap<String, Rc<Spritesheet>>,
+    fonts: HashMap<String, Rc<Font>>,
 }
 
 impl ResourceSet {
@@ -90,6 +94,7 @@ impl ResourceSet {
             items: HashMap::new(),
             item_adjectives: HashMap::new(),
             spritesheets: HashMap::new(),
+            fonts: HashMap::new(),
         }
     }
 
@@ -108,6 +113,12 @@ impl ResourceSet {
             for (id, sheet) in builder_set.spritesheet_builders {
                 insert_if_ok_boxed("spritesheet", id, Spritesheet::new(sheets_dir, sheet),
                     &mut resource_set.spritesheets);
+            }
+
+            let fonts_dir = &builder_set.fonts_dir;
+            for (id, font) in builder_set.font_builders {
+                insert_if_ok_boxed("font", id, Font::new(fonts_dir, font),
+                &mut resource_set.fonts);
             }
 
             for (id, image) in builder_set.simple_builders {
@@ -189,6 +200,10 @@ impl ResourceSet {
 
     pub fn get_spritesheet(id: &str) -> Option<Rc<Spritesheet>> {
         RESOURCE_SET.with(|r| r.borrow().get_resource(id, &r.borrow().spritesheets))
+    }
+
+    pub fn get_font(id: &str) -> Option<Rc<Font>> {
+        RESOURCE_SET.with(|r| r.borrow().get_resource(id, &r.borrow().fonts))
     }
 
     pub fn get_image(id: &str) -> Option<Rc<Image>> {

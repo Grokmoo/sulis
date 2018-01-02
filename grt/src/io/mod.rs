@@ -37,6 +37,19 @@ pub trait TextRenderer {
     fn set_cursor_pos(&mut self, x: i32, y: i32);
 }
 
+#[derive(Copy, Clone)]
+pub struct Quad {
+    pub vertices: [Vertex; 4],
+}
+
+#[derive(Copy, Clone)]
+pub struct Vertex {
+    pub position: [f32; 2],
+    pub tex_coords: [f32; 2],
+}
+
+implement_vertex!(Vertex, position, tex_coords);
+
 pub fn create() -> Result<Box<IO>, Error> {
     match CONFIG.display.adapter {
         IOAdapter::Pancurses => get_pancurses_adapter(),

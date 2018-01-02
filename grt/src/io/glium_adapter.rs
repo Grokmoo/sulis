@@ -10,28 +10,23 @@ use ui::Widget;
 use glium::{self, Surface, glutin};
 use glium::glutin::VirtualKeyCode;
 
-pub struct GliumDisplay {
+pub struct GliumDisplay<'a> {
     display: glium::Display,
     events_loop: glium::glutin::EventsLoop,
     program: glium::Program,
+    params: glium::DrawParameters<'a>,
+    texture: glium::texture::SrgbTexture2d,
 }
-
-#[derive(Copy, Clone)]
-struct Vertex {
-    position: [f32; 2],
-    tex_coords: [f32; 2],
-}
-
-implement_vertex!(Vertex, position, tex_coords);
 
 const VERTEX_SHADER_SRC: &'static str = r#"
   #version 140
   in vec2 position;
   in vec2 tex_coords;
   out vec2 v_tex_coords;
+  uniform mat4 matrix;
   void main() {
     v_tex_coords = tex_coords;
-    gl_Position = vec4(position, 0.0, 1.0);
+    gl_Position = matrix * vec4(position, 0.0, 1.0);
   }
 "#;
 
@@ -45,8 +40,8 @@ const FRAGMENT_SHADER_SRC: &'static str = r#"
   }
 "#;
 
-impl GliumDisplay {
-    pub fn new() -> GliumDisplay {
+impl<'a> GliumDisplay<'a> {
+    pub fn new() -> GliumDisplay<'a> {
         debug!("Initialize Glium Display adapter.");
         let events_loop = glium::glutin::EventsLoop::new();
         let window = glium::glutin::WindowBuilder::new()
@@ -58,16 +53,55 @@ impl GliumDisplay {
         let program = glium::Program::from_source(&display, VERTEX_SHADER_SRC,
                                                   FRAGMENT_SHADER_SRC, None).unwrap();
 
+        let params = glium::DrawParameters {
+            blend: glium::draw_parameters::Blend::alpha_blending(),
+            .. Default::default()
+        };
+
+        let image = ResourceSet::get_spritesheet("gui").unwrap().image.clone();
+        let image_dimensions = image.dimensions();
+        let image = glium::texture::RawImage2d::from_raw_rgba_reversed(&image.into_raw(), image_dimensions);
+        let texture = glium::texture::SrgbTexture2d::new(&display, image).unwrap();
 
         GliumDisplay {
             display,
             events_loop,
             program,
+            params,
+            texture,
+        }
+    }
+
+    fn draw_widget(&self, widget: Ref<Widget>, target: &mut glium::Frame) {
+        if let Some(ref image) = widget.state.background {
+            let uniforms = uniform! {
+                matrix: [
+                    [1.0 / 40.0, 0.0, 0.0, 0.0],
+                    [0.0, 1.0 / 12.00, 0.0, 0.0],
+                    [0.0, 0.0, 1.0, 0.0],
+                    [-1.0 , -1.0, 0.0, 1.0f32],
+                ],
+                tex: self.texture.sampled().magnify_filter(glium::uniforms::MagnifySamplerFilter::Nearest),
+            };
+
+            let pos = &widget.state.position;
+            let size = &widget.state.size;
+            let quads = image.get_quads(&widget.state.animation_state, pos, size);
+
+            for quad in quads {
+                let vertex_buffer = glium::VertexBuffer::new(&self.display, &quad.vertices).unwrap();
+                let indices = glium::index::NoIndices(glium::index::PrimitiveType::TriangleStrip);
+                target.draw(&vertex_buffer, &indices, &self.program, &uniforms, &self.params).unwrap();
+            }
+        }
+
+        for child in widget.children.iter() {
+            self.draw_widget(child.borrow(), target);
         }
     }
 }
 
-impl IO for GliumDisplay {
+impl<'a> IO for GliumDisplay<'a> {
     fn process_input(&mut self, root: Rc<RefCell<Widget>>) {
         self.events_loop.poll_events(|event| {
             if let glutin::Event::WindowEvent { event, .. } = event {
@@ -76,33 +110,10 @@ impl IO for GliumDisplay {
         });
     }
 
-    fn render_output(&mut self, _root: Ref<Widget>, _millis: u32) {
-        let vertex1 = Vertex { position: [ 0.0,  0.0], tex_coords: [0.0, 0.9] };
-        let vertex2 = Vertex { position: [ 0.0,  0.5], tex_coords: [0.0, 1.0] };
-        let vertex3 = Vertex { position: [ 0.5,  0.0], tex_coords: [0.1, 0.9] };
-        let vertex4 = Vertex { position: [ 0.5,  0.5], tex_coords: [0.1, 1.0] };
-        let shape = vec![vertex1, vertex2, vertex3, vertex4];
-
-        let image = ResourceSet::get_spritesheet("gui").unwrap().image.clone();
-        let image_dimensions = image.dimensions();
-        let image = glium::texture::RawImage2d::from_raw_rgba_reversed(&image.into_raw(), image_dimensions);
-        let texture = glium::texture::Texture2d::new(&self.display, image).unwrap();
-
-        let vertex_buffer = glium::VertexBuffer::new(&self.display, &shape).unwrap();
-        let indices = glium::index::NoIndices(glium::index::PrimitiveType::TriangleStrip);
-        let uniforms = uniform! {
-            tex: &texture,
-        };
-
-        let params = glium::DrawParameters {
-            blend: glium::draw_parameters::Blend::alpha_blending(),
-            smooth: Some(glium::draw_parameters::Smooth::Nicest),
-            .. Default::default()
-        };
+    fn render_output(&mut self, root: Ref<Widget>, _millis: u32) {
         let mut target = self.display.draw();
         target.clear_color(0.0, 0.0, 0.0, 1.0);
-        target.draw(&vertex_buffer, &indices, &self.program, &uniforms,
-                    &params).unwrap();
+        self.draw_widget(root, &mut target);
         target.finish().unwrap();
     }
 }

@@ -1,6 +1,7 @@
 use resource::*;
 use resource::size::SizeBuilder;
 use resource::spritesheet::SpritesheetBuilder;
+use resource::font::FontBuilder;
 use image::simple_image::SimpleImageBuilder;
 use image::composed_image::ComposedImageBuilder;
 use image::animated_image::AnimatedImageBuilder;
@@ -27,6 +28,8 @@ pub struct ResourceBuilderSet {
     pub item_adjectives: HashMap<String, ItemAdjective>,
     pub spritesheet_builders: HashMap<String, SpritesheetBuilder>,
     pub spritesheets_dir: String,
+    pub font_builders: HashMap<String, FontBuilder>,
+    pub fonts_dir: String,
 }
 
 impl ResourceBuilderSet {
@@ -75,6 +78,8 @@ impl ResourceBuilderSet {
             item_adjectives: read(root, "item_adjectives"),
             spritesheet_builders: read(root, "spritesheets"),
             spritesheets_dir: format!("{}/spritesheets/", root),
+            font_builders: read(root, "fonts"),
+            fonts_dir: format!("{}/fonts/", root),
         })
     }
 

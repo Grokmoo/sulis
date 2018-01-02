@@ -9,7 +9,7 @@ pub use self::animated_image::AnimatedImage;
 
 use std::fmt::Debug;
 
-use io::TextRenderer;
+use io::{TextRenderer, Quad};
 
 use ui::{AnimationState, Size};
 use util::Point;
@@ -31,6 +31,8 @@ pub trait Image: Debug {
             rel_y += self.get_size().height;
         }
     }
+
+    fn get_quads(&self, state: &AnimationState, position: &Point, size: &Size) -> Vec<Quad>;
 
     fn get_size(&self) -> &Size;
 }

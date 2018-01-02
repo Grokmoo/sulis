@@ -3,7 +3,8 @@ use std::cmp;
 
 use ui::theme::{HorizontalTextAlignment, VerticalTextAlignment};
 use ui::{Widget, WidgetKind};
-use io::TextRenderer;
+use io::{TextRenderer, Quad};
+use util::Point;
 
 pub struct Label {
     pub text: Option<String>,
@@ -21,22 +22,8 @@ impl Label {
             text: Some(text.to_string()),
         })
     }
-}
 
-impl WidgetKind for Label {
-    fn get_name(&self) -> &str {
-        "label"
-    }
-
-    fn layout(&self, widget: &mut Widget) {
-        if let Some(ref text) = self.text {
-            widget.state.add_text_param(text);
-        }
-        widget.do_base_layout();
-    }
-
-    fn draw_text_mode(&self, renderer: &mut TextRenderer, widget: &Widget,
-                      _millis: u32) {
+    fn get_draw_params(widget: &Widget) -> (i32, i32, &str) {
         let text = &widget.state.text;
         let x = widget.state.inner_left();
         let y = widget.state.inner_top();
@@ -56,7 +43,36 @@ impl WidgetKind for Label {
             VerticalTextAlignment::Bottom => y + h - 1,
         };
 
-        let text = &text[0..len];
+        (x, y, &text[0..len])
+    }
+}
+
+impl WidgetKind for Label {
+    fn get_name(&self) -> &str {
+        "label"
+    }
+
+    fn layout(&self, widget: &mut Widget) {
+        if let Some(ref text) = self.text {
+            widget.state.add_text_param(text);
+        }
+
+        widget.do_base_layout();
+    }
+
+    fn get_quads(&self, widget: &Widget, _millis: u32) -> Vec<Quad> {
+        let font = match &widget.state.font {
+            &None => return Vec::new(),
+            &Some(ref font) => font,
+        };
+        let (x, y, text) = Label::get_draw_params(widget);
+
+        font.get_quads(text, &Point::new(x, y), 1.0)
+    }
+
+    fn draw_text_mode(&self, renderer: &mut TextRenderer, widget: &Widget,
+                      _millis: u32) {
+        let (x, y, text) = Label::get_draw_params(widget);
         renderer.set_cursor_pos(x, y);
         renderer.render_string(&text);
     }

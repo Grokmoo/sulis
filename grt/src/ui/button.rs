@@ -2,7 +2,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use ui::{Callback, Label, Widget, WidgetKind};
-use io::{event, TextRenderer};
+use io::{event, TextRenderer, Quad};
 
 pub struct Button {
     label: Rc<Label>,
@@ -54,6 +54,10 @@ impl WidgetKind for Button {
     fn draw_text_mode(&self, renderer: &mut TextRenderer,
                       widget: &Widget, millis: u32) {
         self.label.draw_text_mode(renderer, widget, millis);
+    }
+
+    fn get_quads(&self, widget: &Widget, millis: u32) -> Vec<Quad> {
+        self.label.get_quads(widget, millis)
     }
 
     fn on_mouse_click(&self, widget: &Rc<RefCell<Widget>>,

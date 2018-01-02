@@ -75,7 +75,8 @@ impl Spritesheet {
 
                 if !sprite.position.in_bounds(image_width as i32, image_height as i32) ||
                     !upper_bound_pos.in_bounds(image_width as i32, image_height as i32) {
-                        warn!("Sprite '{}' in sheet '{}' coordinates fall outside image bounds", id, builder.id);
+                        warn!("Sprite '{}' in sheet '{}' coordinates fall outside image bounds",
+                              id, builder.id);
                         continue;
                     }
 

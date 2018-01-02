@@ -101,6 +101,12 @@ impl Widget {
             self.state.set_background(ResourceSet::get_image(&bg));
         }
 
+        if let Some(font) = ResourceSet::get_font(&theme.font) {
+            self.state.set_font(Some(font));
+        } else if theme.text.is_some() {
+            warn!("Font '{}' not found for widget '{}' which has text.", theme.font, self.theme_id);
+        }
+
         self.state.set_border(theme.border.clone());
         self.state.horizontal_text_alignment = theme.horizontal_text_alignment;
         self.state.vertical_text_alignment = theme.vertical_text_alignment;

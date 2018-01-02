@@ -10,14 +10,6 @@ use ui::Widget;
 use glium::{self, Surface, glutin};
 use glium::glutin::VirtualKeyCode;
 
-pub struct GliumDisplay<'a> {
-    display: glium::Display,
-    events_loop: glium::glutin::EventsLoop,
-    program: glium::Program,
-    params: glium::DrawParameters<'a>,
-    texture: glium::texture::SrgbTexture2d,
-}
-
 const VERTEX_SHADER_SRC: &'static str = r#"
   #version 140
   in vec2 position;
@@ -40,13 +32,24 @@ const FRAGMENT_SHADER_SRC: &'static str = r#"
   }
 "#;
 
+pub struct GliumDisplay<'a> {
+    display: glium::Display,
+    events_loop: glium::glutin::EventsLoop,
+    program: glium::Program,
+    params: glium::DrawParameters<'a>,
+    texture: glium::texture::SrgbTexture2d,
+    font_tex: glium::texture::SrgbTexture2d,
+
+    matrix: [[f32; 4]; 4],
+}
+
 impl<'a> GliumDisplay<'a> {
     pub fn new() -> GliumDisplay<'a> {
         debug!("Initialize Glium Display adapter.");
         let events_loop = glium::glutin::EventsLoop::new();
         let window = glium::glutin::WindowBuilder::new()
-            .with_dimensions(800, 600)
-            .with_title("Hello world");
+            .with_dimensions(CONFIG.display.width_pixels, CONFIG.display.height_pixels)
+            .with_title("Rust Game");
         let context = glium::glutin::ContextBuilder::new();
         let display = glium::Display::new(window, context, &events_loop).unwrap();
 
@@ -63,24 +66,31 @@ impl<'a> GliumDisplay<'a> {
         let image = glium::texture::RawImage2d::from_raw_rgba_reversed(&image.into_raw(), image_dimensions);
         let texture = glium::texture::SrgbTexture2d::new(&display, image).unwrap();
 
+        let font_image = ResourceSet::get_font("large").unwrap().image.clone();
+        let font_image_dim = font_image.dimensions();
+        let font_image = glium::texture::RawImage2d::from_raw_rgba_reversed(&font_image.into_raw(), font_image_dim);
+        let font_tex = glium::texture::SrgbTexture2d::new(&display, font_image).unwrap();
+
         GliumDisplay {
             display,
             events_loop,
             program,
             params,
             texture,
+            font_tex,
+            matrix: [
+                [2.0 / CONFIG.display.width as f32, 0.0, 0.0, 0.0],
+                [0.0, 2.0 / CONFIG.display.height as f32, 0.0, 0.0],
+                [0.0, 0.0, 1.0, 0.0],
+                [-1.0 , -1.0, 0.0, 1.0f32],
+            ],
         }
     }
 
     fn draw_widget(&self, widget: Ref<Widget>, target: &mut glium::Frame) {
         if let Some(ref image) = widget.state.background {
             let uniforms = uniform! {
-                matrix: [
-                    [1.0 / 40.0, 0.0, 0.0, 0.0],
-                    [0.0, 1.0 / 12.00, 0.0, 0.0],
-                    [0.0, 0.0, 1.0, 0.0],
-                    [-1.0 , -1.0, 0.0, 1.0f32],
-                ],
+                matrix: self.matrix,
                 tex: self.texture.sampled().magnify_filter(glium::uniforms::MagnifySamplerFilter::Nearest),
             };
 
@@ -93,6 +103,16 @@ impl<'a> GliumDisplay<'a> {
                 let indices = glium::index::NoIndices(glium::index::PrimitiveType::TriangleStrip);
                 target.draw(&vertex_buffer, &indices, &self.program, &uniforms, &self.params).unwrap();
             }
+        }
+
+        let uniforms = uniform! {
+            matrix: self.matrix,
+            tex: self.font_tex.sampled().minify_filter(glium::uniforms::MinifySamplerFilter::Linear),
+        };
+        for quad in widget.kind.get_quads(&widget, 0) {
+            let vertex_buffer = glium::VertexBuffer::new(&self.display, &quad.vertices).unwrap();
+            let indices = glium::index::NoIndices(glium::index::PrimitiveType::TriangleStrip);
+            target.draw(&vertex_buffer, &indices, &self.program, &uniforms, &self.params).unwrap();
         }
 
         for child in widget.children.iter() {

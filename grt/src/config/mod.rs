@@ -30,6 +30,8 @@ pub struct DisplayConfig {
     pub width: i32,
     pub height: i32,
     pub cursor_char: char,
+    pub width_pixels: u32,
+    pub height_pixels: u32,
 }
 
 #[derive(Debug, Deserialize, Clone)]

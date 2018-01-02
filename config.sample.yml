@@ -2,14 +2,18 @@
 # The main game configuration file.  User preferences are set here.
 
 display:
-    # Auto should select the right adapter.  Other options include Termion and
-    # Pancurses
+    # Auto should select the right adapter.  Other options include Termion,
+    # Pancurses, Glium
     adapter: Auto
 
     # display character for the mouse cursor
     cursor_char: "█"
 
-    # screen dimensions in characters
+    # size of the graphical display in pixels
+    width_pixels: 800
+    height_pixels: 600
+
+    # terminal screen dimensions - these also scale the graphical display
     width: 80
     height: 24
 

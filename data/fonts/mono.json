@@ -1,6 +1,5 @@
 {
   "id" : "mono",
-  "name" : "Mono",
   "src" : "mono.png",
   "line_height" : 16,
   "base" : 13,

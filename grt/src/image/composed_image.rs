@@ -169,53 +169,44 @@ impl Image for ComposedImage {
         unsafe {
             let image = self.images.get_unchecked(0);
             quads.append(&mut image.get_quads(state, &draw_pos, image.get_size()));
-            // image.draw_text_mode(renderer, state, &draw_pos);
 
             let image = self.images.get_unchecked(1);
             draw_size.set_height(image.get_size().height);
             draw_pos.add_x(image.get_size().width);
             quads.append(&mut image.get_quads(state, &draw_pos, &draw_size));
-            // image.fill_text_mode(renderer, state, &draw_pos, &draw_size);
 
             let image = self.images.get_unchecked(2);
             draw_pos.add_x(fill_size.width);
             quads.append(&mut image.get_quads(state, &draw_pos, image.get_size()));
-            // image.draw_text_mode(renderer, state, &draw_pos);
 
             let image = self.images.get_unchecked(3);
             draw_pos.set_x(position.x);
             draw_pos.add_y(image.get_size().height);
             draw_size.set(image.get_size().width, fill_size.height);
             quads.append(&mut image.get_quads(state, &draw_pos, &draw_size));
-            // image.fill_text_mode(renderer, state, &draw_pos, &draw_size);
 
             let image = self.images.get_unchecked(4);
             draw_pos.add_x(image.get_size().width);
             quads.append(&mut image.get_quads(state, &draw_pos, &fill_size));
-            // image.fill_text_mode(renderer, state, &draw_pos, &fill_size);
 
             let image = self.images.get_unchecked(5);
             draw_pos.add_x(fill_size.width);
             draw_size.set_width(image.get_size().width);
             quads.append(&mut image.get_quads(state, &draw_pos, &draw_size));
-            // image.fill_text_mode(renderer, state, &draw_pos, &draw_size);
 
             let image = self.images.get_unchecked(6);
             draw_pos.add_y(fill_size.height);
             draw_pos.set_x(position.x);
             quads.append(&mut image.get_quads(state, &draw_pos, image.get_size()));
-            // image.draw_text_mode(renderer, state, &draw_pos);
 
             let image = self.images.get_unchecked(7);
             draw_pos.add_x(image.get_size().width);
             draw_size.set(fill_size.width, image.get_size().height);
             quads.append(&mut image.get_quads(state, &draw_pos, &draw_size));
-            // image.fill_text_mode(renderer, state, &draw_pos, &draw_size);
 
             let image = self.images.get_unchecked(8);
             draw_pos.add_x(fill_size.width);
             quads.append(&mut image.get_quads(state, &draw_pos, image.get_size()));
-            // image.draw_text_mode(renderer, state, &draw_pos);
         }
 
         quads

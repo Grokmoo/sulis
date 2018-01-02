@@ -1,6 +1,5 @@
 {
   "id" : "medium",
-  "name" : "Medium",
   "src" : "medium.png",
   "line_height" : 20,
   "base" : 16,

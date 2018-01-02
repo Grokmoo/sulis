@@ -3,9 +3,11 @@ use std::rc::Rc;
 use std::char;
 use std::collections::HashMap;
 
+use io::{Quad, Vertex};
 use resource::ResourceBuilder;
 use ui::Size;
 use util::{invalid_data_error, Point};
+use config::CONFIG;
 
 use serde_json;
 use serde_yaml;
@@ -13,23 +15,69 @@ use serde_yaml;
 use extern_image::{self, ImageBuffer, Rgba};
 
 pub struct Font {
-    id: String,
-    name: String,
     line_height: u32,
-    base: u32,
+    _base: u32,
     characters: HashMap<char, FontChar>,
-    image: ImageBuffer<Rgba<u8>, Vec<u8>>,
+    pub image: ImageBuffer<Rgba<u8>, Vec<u8>>,
 }
 
 pub struct FontChar {
-    id: char,
-    position: Point,
     size: Size,
     offset: Point,
     x_advance: u32,
+    tex_coords: [f32; 8],
 }
 
 impl Font {
+    pub fn get_width(&self, text: &str) -> i32 {
+        let mut width: i32 = 0;
+        for c in text.chars() {
+            let font_char = match self.characters.get(&c) {
+                None => continue,
+                Some(font_char) => font_char,
+            };
+
+            width += font_char.x_advance as i32;
+        }
+
+        width
+    }
+
+    pub fn get_quads(&self, text: &str, position: &Point, line_height: f32) -> Vec<Quad> {
+        let scale_factor = line_height / self.line_height as f32;
+        let mut quads: Vec<Quad> = Vec::new();
+
+        let mut x = position.x as f32;
+        let y = position.y as f32;
+        for c in text.chars() {
+            let font_char = match self.characters.get(&c) {
+                None => continue,
+                Some(font_char) => font_char,
+            };
+
+            let tc = &font_char.tex_coords;
+            let x_char = x + scale_factor * font_char.offset.x as f32;
+            let y_char = y + scale_factor * font_char.offset.y as f32;
+            let x_min = x_char;
+            let y_min = CONFIG.display.height as f32 - y_char;
+            let x_max = x_char + scale_factor * font_char.size.width as f32;
+            let y_max = CONFIG.display.height as f32
+                - (y_char + scale_factor * font_char.size.height as f32);
+            quads.push(Quad {
+                vertices: [
+                    Vertex { position: [ x_min, y_max ], tex_coords: [tc[0], tc[1]] },
+                    Vertex { position: [ x_min, y_min ], tex_coords: [tc[2], tc[3]] },
+                    Vertex { position: [ x_max, y_max ], tex_coords: [tc[4], tc[5]] },
+                    Vertex { position: [ x_max, y_min ], tex_coords: [tc[6], tc[7]] },
+                ]
+            });
+
+            x += scale_factor * font_char.x_advance as f32;
+        }
+
+        quads
+    }
+
     pub fn new(dir: &str, builder: FontBuilder) -> Result<Rc<Font>, Error> {
         let filename = format!("{}{}", dir, builder.src);
         let image = match extern_image::open(&filename) {
@@ -41,6 +89,8 @@ impl Font {
             }
         };
         let image = image.to_rgba();
+        let (image_width, image_height) = image.dimensions();
+        let image_size = Size::new(image_width as i32, image_height as i32);
 
         let mut characters: HashMap<char, FontChar> = HashMap::new();
         for char_builder in builder.characters {
@@ -53,20 +103,26 @@ impl Font {
             let position = Point::new(char_builder.xywh[0] as i32, char_builder.xywh[1] as i32);
             let size = Size::new(char_builder.xywh[2] as i32, char_builder.xywh[3] as i32);
 
+            let image_width = image_size.width as f32;
+            let image_height = image_size.height as f32;
+            let x_min = (position.x as f32) / image_width;
+            let y_min = (image_height - (position.y + size.height) as f32) / image_height;
+            let x_max = (position.x + size.width) as f32 / image_width;
+            let y_max = (image_height - position.y as f32) / image_height;
             characters.insert(id, FontChar {
-                id,
-                position,
                 size,
                 offset: char_builder.offset,
                 x_advance: char_builder.x_advance,
+                tex_coords: [ x_min, y_min,
+                              x_min, y_max,
+                              x_max, y_min,
+                              x_max, y_max ],
             });
         }
 
         Ok(Rc::new(Font {
-            id: builder.id,
-            name: builder.name,
             line_height: builder.line_height,
-            base: builder.base,
+            _base: builder.base,
             characters,
             image,
         }))
@@ -76,7 +132,6 @@ impl Font {
 #[derive(Debug, Deserialize)]
 pub struct FontBuilder {
     id: String,
-    name: String,
     src: String,
     line_height: u32,
     base: u32,

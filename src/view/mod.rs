@@ -14,7 +14,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use grt::io::InputAction;
-use grt::ui::{Button, Callback, ConfirmationWindow, EmptyWidget, Label, Widget, WidgetKind};
+use grt::ui::{Button, Callback, EmptyWidget, Label, Widget, WidgetKind};
 use state::{AreaState, GameState};
 
 pub struct RootView {
@@ -38,11 +38,15 @@ impl WidgetKind for RootView {
         use grt::io::InputAction::*;
         match key {
             Exit => {
-                    let exit_window = Widget::with_theme(
-                        ConfirmationWindow::new(Callback::with(Box::new(|| { GameState::set_exit(); }))),
-                        "exit_confirmation_window");
-                    exit_window.borrow_mut().state.set_modal(true);
-                    Widget::add_child_to(&widget, exit_window);
+                // TODO re-enable confirmation here at some point, need
+                // to handle glium window close event
+                // let exit_window = Widget::with_theme(
+                //     ConfirmationWindow::new(Callback::with(
+                //             Box::new(|| { GameState::set_exit(); }))),
+                //     "exit_confirmation_window");
+                // exit_window.borrow_mut().state.set_modal(true);
+                // Widget::add_child_to(&widget, exit_window);
+                GameState::set_exit();
             },
             ToggleInventory => {
                 let window = Widget::get_child_with_name(widget,

@@ -70,6 +70,9 @@ fn main() {
 
     info!("Setup complete.");
     let main_loop_start_time = time::Instant::now();
+
+    let mut frames = 0;
+    let mut render_time = time::Duration::from_secs(0);
     loop {
         let start_time = time::Instant::now();
 
@@ -98,7 +101,14 @@ fn main() {
         if frame_time > frame_elapsed {
             thread::sleep(frame_time - frame_elapsed);
         }
+
+        render_time += frame_elapsed;
+        frames += 1;
     }
+
+    let secs = render_time.as_secs() as f64 + render_time.subsec_nanos() as f64 * 1e-9;
+    info!("Rendered {} frames with total render time {:.4} seconds", frames, secs);
+    info!("Average frame render time: {:.6} seconds", secs / frames as f64);
 
     info!("Shutting down.");
 }

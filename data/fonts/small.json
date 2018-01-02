@@ -1,6 +1,5 @@
 {
   "id" : "small",
-  "name" : "Small",
   "src" : "small.png",
   "line_height" : 14,
   "base" : 12,

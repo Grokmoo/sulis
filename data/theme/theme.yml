@@ -4,6 +4,7 @@ background: bg_base
 border: [1, 1, 1, 1]
 children:
   mouse_over:
+    from: .label
     border: [1, 1, 1, 1]
     background: bg_base
     text: "#0"
@@ -18,10 +19,12 @@ children:
     height_relative: Max
     children:
       mouse_over:
+        from: .label
         text: "{#0,#1}"
         preferred_size: [10, 1]
         position: [0, 1]
       title:
+        from: .label
         text: "#0"
         preferred_size: [18, 1]
         position: [0, 0]
@@ -42,6 +45,7 @@ children:
         position: [-1, -1]
         children:
           title:
+            from: .label
             text: "Actions"
             horizontal_text_alignment: Center
             preferred_size: [10, 1]
@@ -61,6 +65,7 @@ children:
     children:
       title:
         text: "Exit Game?"
+        from: .label
         width_relative: Max
         preferred_size: [0, 1]
         preferred_position: [0, 0]
@@ -85,6 +90,7 @@ children:
     x_relative: Zero
     children:
       title:
+        from: .label
         width_relative: Max
         preferred_size: [0, 1]
       close:

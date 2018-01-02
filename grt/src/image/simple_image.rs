@@ -6,6 +6,8 @@ use util::Point;
 use resource::{ResourceBuilder, ResourceSet, Sprite};
 use io::{TextRenderer, Vertex, Quad};
 use ui::{AnimationState, Size};
+use util::invalid_data_error;
+use config::CONFIG;
 
 use serde_json;
 use serde_yaml;
@@ -22,13 +24,13 @@ impl SimpleImage {
     pub fn new(builder: SimpleImageBuilder, resources: &ResourceSet) -> Result<Rc<Image>, Error> {
         if builder.text_display.len() != 0 {
             if builder.text_display.len() != (builder.size.product()) as usize {
-                return Err(Error::new(ErrorKind::InvalidData,
-                                      format!("SimpleImage text display must be length*width characters.")));
+                return invalid_data_error("SimpleImage text display must be \
+                                          length*width characters.");
             }
         }
 
-        let format_error = Err(Error::new(ErrorKind::InvalidData,
-                            "SimpleImage image display must be of format {SHEET_ID}/{SPRITE_ID}"));
+        let format_error = invalid_data_error("SimpleImage image display must be \
+                                              of format {SHEET_ID}/{SPRITE_ID}");
 
         let split_index = match builder.image_display.find('/') {
             None => return format_error,
@@ -42,15 +44,15 @@ impl SimpleImage {
         let sprite_id = &sprite_id[1..];
 
         let sheet = match resources.spritesheets.get(spritesheet_id) {
-            None => return Err(Error::new(ErrorKind::InvalidData,
-                                          format!("Unable to location spritesheet '{}'", spritesheet_id))),
+            None => return invalid_data_error(&format!("Unable to location spritesheet '{}'",
+                                                       spritesheet_id)),
             Some(sheet) => sheet,
         };
 
         let sprite = match sheet.sprites.get(sprite_id) {
-            None => return Err(Error::new(ErrorKind::InvalidData,
-                                          format!("Unable to location sprite '{}' in spritesheet '{}'",
-                                                  sprite_id, spritesheet_id))),
+            None => return invalid_data_error(
+                &format!("Unable to location sprite '{}' in spritesheet '{}'",
+                         sprite_id, spritesheet_id)),
             Some(ref sprite) => Rc::clone(sprite),
         };
 
@@ -67,9 +69,9 @@ impl Image for SimpleImage {
     fn get_quads(&self, _state: &AnimationState, position: &Point, size: &Size) -> Vec<Quad> {
         let tc = &self.image_display.tex_coords;
         let x_min = position.x as f32;
-        let y_min = 24.0 - position.y as f32;
+        let y_min = CONFIG.display.height as f32 - position.y as f32;
         let x_max = (position.x + size.width) as f32;
-        let y_max = 24.0 - (position.y + size.height) as f32;
+        let y_max = CONFIG.display.height as f32 - (position.y + size.height) as f32;
         vec![Quad {
             vertices: [
                 Vertex { position: [ x_min, y_max ], tex_coords: [tc[0], tc[1]] },

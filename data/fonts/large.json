@@ -1,6 +1,5 @@
 {
   "id" : "large",
-  "name" : "Large",
   "src" : "large.png",
   "line_height" : 25,
   "base" : 20,

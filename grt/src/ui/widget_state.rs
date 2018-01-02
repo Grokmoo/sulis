@@ -6,6 +6,7 @@ use ui::theme::{HorizontalTextAlignment, VerticalTextAlignment};
 
 use util::Point;
 use image::Image;
+use resource::Font;
 
 //// The base widget holder class.  Contains the common implementation across all
 //// widgets, and holds an instance of 'Widget' which contains the specific behavior.
@@ -21,6 +22,7 @@ pub struct WidgetState {
     pub scroll_pos: Point,
     pub max_scroll_pos: Point,
     pub text: String,
+    pub font: Option<Rc<Font>>,
     pub horizontal_text_alignment: HorizontalTextAlignment,
     pub vertical_text_alignment: VerticalTextAlignment,
     pub is_modal: bool,
@@ -41,6 +43,7 @@ impl WidgetState {
             animation_state: AnimationState::default(),
             scroll_pos: Point::as_zero(),
             max_scroll_pos: Point::as_zero(),
+            font: None,
             text: String::new(),
             text_params: Vec::new(),
             horizontal_text_alignment: HorizontalTextAlignment::Center,
@@ -54,19 +57,33 @@ impl WidgetState {
 
     pub fn scroll(&mut self, x: i32, y: i32) -> bool {
         trace!("Scrolling by {},{}", x, y);
-        let new_x = self.scroll_pos.x + x;
+        // make sure both components are attempted independently
+        let x_bool = self.scroll_x(x);
+        let y_bool = self.scroll_y(y);
+
+        x_bool && y_bool
+    }
+
+    pub fn scroll_y(&mut self, y: i32) -> bool {
         let new_y = self.scroll_pos.y + y;
 
-        if new_x < 0 || new_y < 0 { return false; }
-
-        if new_x >= self.max_scroll_pos.x - self.size.width + 1 ||
-            new_y >= self.max_scroll_pos.y - self.size.height + 1 {
-            return false;
+        if new_y < 0 || new_y >= self.max_scroll_pos.y - self.size.height + 1 {
+            false
+        } else {
+            self.scroll_pos.set_y(new_y);
+            true
         }
+    }
 
-        self.scroll_pos.set(new_x, new_y);
+    pub fn scroll_x(&mut self, x: i32) -> bool {
+        let new_x = self.scroll_pos.x + x;
 
-        true
+        if new_x < 0 || new_x >= self.max_scroll_pos.x - self.size.width + 1 {
+            false
+        } else {
+            self.scroll_pos.set_x(new_x);
+            true
+        }
     }
 
     pub fn set_modal(&mut self, modal: bool) {
@@ -125,6 +142,10 @@ impl WidgetState {
 
     pub fn set_background(&mut self, image: Option<Rc<Image>>) {
         self.background = image;
+    }
+
+    pub fn set_font(&mut self, font: Option<Rc<Font>>) {
+        self.font = font;
     }
 
     pub(super) fn set_mouse_inside(&mut self, is_inside: bool) {

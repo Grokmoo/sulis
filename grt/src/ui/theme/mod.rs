@@ -51,6 +51,7 @@ pub enum TextFormat {
 #[derive(Debug)]
 pub struct Theme {
     pub text: Option<String>,
+    pub font: String,
     pub name: String,
     pub background: Option<String>,
     pub border: Border,
@@ -102,6 +103,7 @@ impl Theme {
             builder.horizontal_text_alignment.unwrap_or(HorizontalTextAlignment::Center);
         let vertical_text_alignment =
             builder.vertical_text_alignment.unwrap_or(VerticalTextAlignment::Center);
+        let font = builder.font.unwrap_or("default".to_string());
 
         Theme {
             name: name.to_string(),
@@ -111,6 +113,7 @@ impl Theme {
             width_relative,
             height_relative,
             text: builder.text,
+            font,
             position,
             x_relative,
             y_relative,
@@ -173,6 +176,7 @@ pub struct ThemeBuilder {
     pub border: Option<Border>,
     pub preferred_size: Option<Size>,
     pub text: Option<String>,
+    pub font: Option<String>,
     pub horizontal_text_alignment: Option<HorizontalTextAlignment>,
     pub vertical_text_alignment: Option<VerticalTextAlignment>,
     pub text_format: Option<HashMap<String, TextFormat>>,
@@ -225,14 +229,7 @@ impl ThemeBuilder {
         }
 
         if self.from.is_some() {
-            let from = self.from.as_ref().unwrap().to_string();
-            let from_theme = builders.find_theme("", &from);
-
-            if let Some(from_theme) = from_theme {
-                self.copy_from(from_theme);
-            } else {
-                warn!("Unable to expand from reference to theme '{}'", from);
-            }
+            self.expand_self(builders);
         }
 
         if let Some(ref mut children) = self.children {
@@ -247,10 +244,27 @@ impl ThemeBuilder {
         Ok(())
     }
 
-    fn copy_from(&mut self, other: ThemeBuilder) {
+    fn expand_self(&mut self, builders: &ThemeBuilder) {
+        let from = self.from.as_ref().unwrap().to_string();
+        let from_theme = builders.find_theme("", &from);
+
+        if let Some(mut from_theme) = from_theme {
+            if from_theme.from.is_some() {
+                from_theme.expand_self(builders);
+            }
+            self.copy_from(from_theme, builders);
+        } else {
+            warn!("Unable to expand from reference to theme '{}'", from);
+        }
+        // mark as already expanded
+        self.from = None;
+    }
+
+    fn copy_from(&mut self, other: ThemeBuilder, builders: &ThemeBuilder) {
         if self.background.is_none() { self.background = other.background; }
         if self.border.is_none() { self.border = other.border; }
         if self.preferred_size.is_none() { self.preferred_size = other.preferred_size; }
+        if self.font.is_none() { self.font = other.font; }
         if self.text.is_none() { self.text = other.text; }
         if self.position.is_none() { self.position = other.position; }
         if self.x_relative.is_none() { self.x_relative = other.x_relative; }
@@ -278,9 +292,16 @@ impl ThemeBuilder {
         }
 
         // copy over only those children which aren't specified in this theme
-        if let Some(other_children) = other.children {
+        if let Some(mut other_children) = other.children {
             if self.children.is_none() {
                 self.children = Some(HashMap::new());
+            }
+
+            // expand any refs in children before copying them over
+            for (_, mut child) in other_children.iter_mut() {
+                if child.from.is_some() {
+                    child.expand_self(builders);
+                }
             }
 
             for (id, child) in other_children {
@@ -289,7 +310,7 @@ impl ThemeBuilder {
                 } else {
                     let mut self_child = self.children.as_mut().unwrap().get_mut(&id);
                     let mut self_child_unwrapped = self_child.as_mut().unwrap();
-                    self_child_unwrapped.copy_from(child);
+                    self_child_unwrapped.copy_from(child, builders);
                 }
             }
         }

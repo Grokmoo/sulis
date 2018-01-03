@@ -1,9 +1,7 @@
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 
-use resource::{ResourceBuilder, ResourceSet};
-use resource::Size;
-use resource::Item;
+use resource::{Item, ResourceBuilder, ResourceSet, EntitySize, Sprite};
 
 use serde_json;
 use serde_yaml;
@@ -12,7 +10,8 @@ pub struct Actor {
     pub id: String,
     pub player: bool,
     pub display: char,
-    pub default_size: Rc<Size>,
+    pub image_display: Rc<Sprite>,
+    pub default_size: Rc<EntitySize>,
     pub items: Vec<Rc<Item>>,
 }
 
@@ -50,10 +49,13 @@ impl Actor {
             }
         }
 
+        let sprite = resources.get_sprite(&builder.image_display)?;
+
         Ok(Actor {
             id: builder.id,
             player: builder.player.unwrap_or(false),
             display: builder.display,
+            image_display: sprite,
             default_size: default_size,
             items,
         })
@@ -65,6 +67,7 @@ pub struct ActorBuilder {
     pub id: String,
     pub player: Option<bool>,
     pub display: char,
+    pub image_display: String,
     pub default_size: usize,
     pub items: Option<Vec<String>>,
 }

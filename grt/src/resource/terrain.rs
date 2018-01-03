@@ -4,14 +4,13 @@ use std::rc::Rc;
 
 use resource::{AreaBuilder, Sprite, Tile};
 use resource::generator;
-use util::Point;
-use ui::Size;
 
 pub struct Terrain {
     pub width: i32,
     pub height: i32,
     text_display: Vec<char>,
-    image_display: Vec<Rc<Sprite>>,
+    image_display: Vec<Option<Rc<Sprite>>>,
+    tiles: Vec<Option<Rc<Tile>>>,
     passable: Vec<bool>,
 }
 
@@ -52,14 +51,8 @@ impl Terrain {
             return Err(e);
         }
 
-        let empty = Rc::new(Sprite {
-            id: String::new(),
-            position: Point::as_zero(),
-            size: Size::as_zero(),
-            tex_coords: [0.0;8],
-        });
-
-        let mut image_display: Vec<Rc<Sprite>> = vec![Rc::clone(&empty);(width * height) as usize];
+        let mut tiles: Vec<Option<Rc<Tile>>> = vec![None;(width * height) as usize];
+        let mut image_display: Vec<Option<Rc<Sprite>>> = vec![None;(width * height) as usize];
         let mut text_display = vec![' ';(width * height) as usize];
         let mut passable = vec![true;(width * height) as usize];
         for (index, tile) in layer.iter().enumerate() {
@@ -74,13 +67,15 @@ impl Terrain {
             let base_x = index % width;
             let base_y = index / width;
 
+            *tiles.get_mut((base_x + base_y * width) as usize).unwrap() =
+                Some(Rc::clone(&tile));
+            *image_display.get_mut((base_x + base_y * width) as usize).unwrap() =
+                Some(Rc::clone(&tile.image_display));
+
             for y in 0..tile.height {
                 for x in 0..tile.width {
                     *text_display.get_mut((base_x + x + (base_y + y) * width) as usize).unwrap() =
                         tile.get_text_display(x, y);
-
-                   *image_display.get_mut((base_x + x + (base_y + y) * width) as usize).unwrap() =
-                        Rc::clone(&tile.image_display);
                 }
             }
 
@@ -92,6 +87,7 @@ impl Terrain {
         Ok(Terrain {
             width,
             height,
+            tiles,
             text_display,
             image_display,
             passable,
@@ -185,7 +181,11 @@ impl Terrain {
         *self.passable.get((x + y * self.width) as usize).unwrap()
     }
 
-    pub fn image_at(&self, x: i32, y: i32) -> &Rc<Sprite> {
+    pub fn tile_at(&self, x: i32, y: i32) -> &Option<Rc<Tile>> {
+        self.tiles.get((x + y * self.width) as usize).unwrap()
+    }
+
+    pub fn image_at(&self, x: i32, y: i32) -> &Option<Rc<Sprite>> {
         self.image_display.get((x + y * self.width) as usize).unwrap()
     }
 

@@ -20,6 +20,7 @@ use std::cell::{RefCell, Ref};
 use config::{CONFIG, IOAdapter};
 use ui::Widget;
 use io::keyboard_event::Key;
+use resource::Sprite;
 
 pub trait IO {
     fn process_input(&mut self, root: Rc<RefCell<Widget>>);
@@ -45,37 +46,58 @@ pub enum DrawListKind {
 
 pub struct DrawList {
     pub quads: Vec<[Vertex; 4]>,
-    pub texture: Option<String>,
+    pub texture: String,
     pub kind: DrawListKind,
 }
 
 impl DrawList {
-    pub fn empty() -> DrawList {
+    /// Creates an empty DrawList.  Attempting to draw an empty DrawList will most
+    /// likely result in a panic, you must use `append` to add vertices to this list
+    /// if you intend to draw it.
+    pub fn empty_sprite() -> DrawList {
         DrawList {
             quads: Vec::new(),
-            texture: None,
+            texture: String::new(),
             kind: DrawListKind::Sprite,
         }
     }
 
     pub fn from_font(texture: &str, quads: Vec<[Vertex; 4]>) -> DrawList {
         DrawList {
-            texture: Some(texture.to_string()),
+            texture: texture.to_string(),
             quads,
             kind: DrawListKind::Font,
         }
     }
 
-    pub fn from_sprite(texture: &str, quads: Vec<[Vertex; 4]>) -> DrawList {
+    pub fn from_sprite(sprite: &Rc<Sprite>, x: i32, y: i32, w: i32, h: i32) -> DrawList {
+        let x_min = x as f32;
+        let y_max = (CONFIG.display.height - y) as f32;
+        let x_max = x_min + w as f32;
+        let y_min = y_max - h as f32;
+        let tc = &sprite.tex_coords;
+
+        let quads = vec![[
+            Vertex { position: [ x_min, y_max ], tex_coords: [tc[0], tc[1]] },
+            Vertex { position: [ x_min, y_min ], tex_coords: [tc[2], tc[3]] },
+            Vertex { position: [ x_max, y_max ], tex_coords: [tc[4], tc[5]] },
+            Vertex { position: [ x_max, y_min ], tex_coords: [tc[6], tc[7]] },
+        ]];
+
         DrawList {
-            texture: Some(texture.to_string()),
+            texture: sprite.id.to_string(),
             quads,
             kind: DrawListKind::Sprite,
         }
     }
 
+    /// appends the contents of the other drawlist to this one, moving
+    /// the vertex data out into this DrawList's vertex data.
     pub fn append(&mut self, other: &mut DrawList) {
         self.quads.append(&mut other.quads);
+        if self.texture.is_empty() {
+            self.texture = other.texture.to_string();
+        }
     }
 }
 

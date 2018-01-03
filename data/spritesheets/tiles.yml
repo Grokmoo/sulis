@@ -1,10 +1,18 @@
 id: tiles
 src: "tiles.png"
-size: [ 64, 32 ]
+size: [ 256, 256 ]
 groups:
-  base:
-    size: [32, 32]
-    position: [0, 0]
+  1by1:
+    size: [16, 16]
     areas:
       floor: [0, 0]
-      wall: [32, 0]
+      wall: [16, 0]
+  3by3:
+    size: [48, 48]
+    areas:
+      goblin: [80, 0]
+  5by5:
+    size: [80, 80]
+    areas:
+      floor5: [0, 16]
+      pc: [0, 96]

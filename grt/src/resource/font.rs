@@ -5,8 +5,7 @@ use std::collections::HashMap;
 
 use io::{DrawList, Vertex};
 use resource::ResourceBuilder;
-use ui::Size;
-use util::{invalid_data_error, Point};
+use util::{invalid_data_error, Point, Size};
 use config::CONFIG;
 
 use serde_json;

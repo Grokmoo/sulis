@@ -1,18 +1,20 @@
 use std::io::{Error, ErrorKind};
+use std::rc::Rc;
 
-use resource::ResourceBuilder;
+use resource::{ResourceBuilder, ResourceSet, Sprite};
 use util::Point;
 
 use serde_json;
 use serde_yaml;
 
-pub struct Size {
+pub struct EntitySize {
     pub size: i32,
+    pub cursor_sprite: Rc<Sprite>,
     relative_points: Vec<Point>,
 }
 
-impl Size {
-    pub fn new(builder: SizeBuilder) -> Result<Size, Error> {
+impl EntitySize {
+    pub fn new(builder: EntitySizeBuilder, resources: &ResourceSet) -> Result<EntitySize, Error> {
         let mut points: Vec<Point> = Vec::new();
 
         for p in builder.relative_points.into_iter() {
@@ -31,29 +33,32 @@ impl Size {
             points.push(Point::new(x as i32, y as i32));
         }
 
-        Ok(Size {
+        let sprite = resources.get_sprite(&builder.cursor_image)?;
+
+        Ok(EntitySize {
             size: builder.size as i32,
-            relative_points: points
+            cursor_sprite: sprite,
+            relative_points: points,
         })
     }
 
-    pub fn relative_points(&self) -> SizeIterator {
-        SizeIterator { size: &self, index: 0, x_offset: 0, y_offset: 0 }
+    pub fn relative_points(&self) -> EntitySizeIterator {
+        EntitySizeIterator { size: &self, index: 0, x_offset: 0, y_offset: 0 }
     }
 
-    pub fn points(&self, x: i32, y: i32) -> SizeIterator {
-        SizeIterator { size: &self, index: 0, x_offset: x, y_offset: y }
+    pub fn points(&self, x: i32, y: i32) -> EntitySizeIterator {
+        EntitySizeIterator { size: &self, index: 0, x_offset: x, y_offset: y }
     }
 }
 
-pub struct SizeIterator<'a> {
-    size: &'a Size,
+pub struct EntitySizeIterator<'a> {
+    size: &'a EntitySize,
     index: usize,
     x_offset: i32,
     y_offset: i32,
 }
 
-impl<'a> Iterator for SizeIterator<'a> {
+impl<'a> Iterator for EntitySizeIterator<'a> {
     type Item = Point;
     fn next(&mut self) -> Option<Point> {
         let next = self.size.relative_points.get(self.index);
@@ -67,31 +72,32 @@ impl<'a> Iterator for SizeIterator<'a> {
     }
 }
 
-impl PartialEq for Size {
-    fn eq(&self, other: &Size) -> bool {
+impl PartialEq for EntitySize {
+    fn eq(&self, other: &EntitySize) -> bool {
         self.size == other.size
     }
 }
 
 #[derive(Deserialize, Debug)]
-pub struct SizeBuilder {
+pub struct EntitySizeBuilder {
     pub size: usize,
+    pub cursor_image: String,
     pub relative_points: Vec<Vec<usize>>,
 }
 
-impl ResourceBuilder for SizeBuilder {
+impl ResourceBuilder for EntitySizeBuilder {
     fn owned_id(&self) -> String {
         self.size.to_string()
     }
 
-    fn from_json(data: &str) -> Result<SizeBuilder, Error> {
-        let resource: SizeBuilder = serde_json::from_str(data)?;
+    fn from_json(data: &str) -> Result<EntitySizeBuilder, Error> {
+        let resource: EntitySizeBuilder = serde_json::from_str(data)?;
 
         Ok(resource)
     }
 
-    fn from_yaml(data: &str) -> Result<SizeBuilder, Error> {
-        let resource: Result<SizeBuilder, serde_yaml::Error> = serde_yaml::from_str(data);
+    fn from_yaml(data: &str) -> Result<EntitySizeBuilder, Error> {
+        let resource: Result<EntitySizeBuilder, serde_yaml::Error> = serde_yaml::from_str(data);
 
         match resource {
             Ok(resource) => Ok(resource),

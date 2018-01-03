@@ -10,9 +10,8 @@ pub use self::animated_image::AnimatedImage;
 use std::fmt::Debug;
 
 use io::{DrawList, TextRenderer};
-
-use ui::{AnimationState, Size};
-use util::Point;
+use ui::AnimationState;
+use util::{Point, Size};
 
 pub trait Image: Debug {
     fn draw_text_mode(&self, renderer: &mut TextRenderer, state: &AnimationState,

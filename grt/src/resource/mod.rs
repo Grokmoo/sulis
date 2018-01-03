@@ -29,9 +29,9 @@ pub use self::font::Font;
 mod item_adjective;
 pub use self::item_adjective::ItemAdjective;
 
-mod size;
-pub use self::size::Size;
-pub use self::size::SizeIterator;
+mod entity_size;
+pub use self::entity_size::EntitySize;
+pub use self::entity_size::EntitySizeIterator;
 
 use ui::Theme;
 
@@ -76,7 +76,7 @@ pub struct ResourceSet {
     actors: HashMap<String, Rc<Actor>>,
     item_adjectives: HashMap<String, Rc<ItemAdjective>>,
     items: HashMap<String, Rc<Item>>,
-    sizes: HashMap<usize, Rc<Size>>,
+    sizes: HashMap<usize, Rc<EntitySize>>,
     images: HashMap<String, Rc<Image>>,
     pub spritesheets: HashMap<String, Rc<Spritesheet>>,
     fonts: HashMap<String, Rc<Font>>,
@@ -144,7 +144,7 @@ impl ResourceSet {
             }
 
             for (_id_str, builder) in builder_set.size_builders {
-                insert_if_ok("size", builder.size, Size::new(builder),
+                insert_if_ok("size", builder.size, EntitySize::new(builder, &resource_set),
                     &mut resource_set.sizes);
             }
 
@@ -211,7 +211,7 @@ impl ResourceSet {
         RESOURCE_SET.with(|r| r.borrow().get_resource(id, &r.borrow().images))
     }
 
-    pub fn get_size(id: usize) -> Option<Rc<Size>> {
+    pub fn get_entity_size(id: usize) -> Option<Rc<EntitySize>> {
         RESOURCE_SET.with(|r| {
             let r = r.borrow();
             let size = r.sizes.get(&id);

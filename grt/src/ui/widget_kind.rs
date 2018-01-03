@@ -25,8 +25,8 @@ pub trait WidgetKind {
     fn draw_text_mode(&self, _renderer: &mut TextRenderer,
                       _widget: &Widget, _millis: u32) { }
 
-    fn get_draw_list(&self, _widget: &Widget, _millis: u32) -> DrawList {
-        DrawList::empty()
+    fn get_draw_lists(&self, _widget: &Widget, _millis: u32) -> Vec<DrawList> {
+        Vec::new()
     }
 
     fn layout(&self, widget: &mut Widget) {

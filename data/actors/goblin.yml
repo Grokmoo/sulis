@@ -1,4 +1,5 @@
 id: goblin
 player: false
 display: g
+image_display: "tiles/goblin"
 default_size: 3

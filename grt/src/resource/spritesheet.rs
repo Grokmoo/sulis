@@ -3,8 +3,7 @@ use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 
 use resource::ResourceBuilder;
-use ui::Size;
-use util::Point;
+use util::{Point, Size};
 
 use serde_json;
 use serde_yaml;
@@ -39,10 +38,10 @@ impl Sprite {
             id: id.to_string(),
             position,
             size,
-            tex_coords: [ x_min, y_min,
-                          x_min, y_max,
-                          x_max, y_min,
-                          x_max, y_max ],
+            tex_coords: [ x_min, y_max,
+                          x_min, y_min,
+                          x_max, y_max,
+                          x_max, y_min ],
         }
     }
 }
@@ -65,10 +64,20 @@ impl Spritesheet {
 
         let mut sprites: HashMap<String, Rc<Sprite>> = HashMap::new();
         for (_id, group) in builder.groups {
-            let size = group.size;
-            let base_pos = group.position;
+            let base_size = group.get_size();
+            let base_pos = group.get_position();
             for (id, area_pos) in group.areas {
-                let sprite = Sprite::new(&builder.id, &image_size, area_pos + base_pos, size);
+                let (pos, size) = match area_pos.len() {
+                    2 => (base_pos.add(area_pos[0], area_pos[1]), base_size),
+                    4 => (base_pos.add(area_pos[0], area_pos[1]), base_size.add(area_pos[2], area_pos[3])),
+                    _ => {
+                        warn!("Error in definition for sprite '{}' in sheet '{}'", id, builder.id);
+                        warn!("Coordinates must either by [x, y] or [x, y, w, h]");
+                        continue;
+                    }
+                };
+
+                let sprite = Sprite::new(&builder.id, &image_size, pos, size);
 
                 if sprites.contains_key(&id) {
                     warn!("Duplicate sprite ID in sheet '{}': '{}'", builder.id, id);
@@ -106,9 +115,19 @@ pub struct SpritesheetBuilder {
 
 #[derive(Deserialize, Debug)]
 struct SpritesheetGroup {
-    pub size: Size,
-    pub position: Point,
-    pub areas: HashMap<String, Point>,
+    pub size: Option<Size>,
+    pub position: Option<Point>,
+    pub areas: HashMap<String, Vec<i32>>,
+}
+
+impl SpritesheetGroup {
+    fn get_size(&self) -> Size {
+        self.size.unwrap_or(Size::as_zero())
+    }
+
+    fn get_position(&self) -> Point {
+        self.position.unwrap_or(Point::as_zero())
+    }
 }
 
 impl ResourceBuilder for SpritesheetBuilder {

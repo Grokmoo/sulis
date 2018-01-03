@@ -11,6 +11,6 @@
 		[".", ".", ".", ".", "."],
 		[".", ".", ".", ".", "."]
 	],
-    "image_display": "tiles/floor",
+    "image_display": "tiles/floor5",
     "impass": []
 }

@@ -14,9 +14,6 @@ pub use self::widget_kind::EmptyWidget;
 mod border;
 pub use self::border::Border;
 
-mod size;
-pub use self::size::Size;
-
 pub mod animation_state;
 pub use self::animation_state::AnimationState;
 
@@ -43,6 +40,7 @@ use std::cell::RefCell;
 
 use config::CONFIG;
 use resource::ResourceSet;
+use util::Size;
 
 pub fn create_ui_tree(kind: Rc<WidgetKind>) -> Rc<RefCell<Widget>> {
 

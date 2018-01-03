@@ -3,12 +3,11 @@ use std::cell::RefCell;
 use std::cmp;
 
 use grt::ui::{Cursor, Label, WidgetKind, Widget};
-use grt::io::{DrawList, InputAction, TextRenderer, Vertex};
+use grt::io::{DrawList, InputAction, TextRenderer};
 use grt::io::event::ClickKind;
-use grt::config::CONFIG;
 
 use view::ActionMenu;
-use state::{AreaState};
+use state::{AreaState, GameState};
 
 pub struct AreaView {
     area_state: Rc<RefCell<AreaState>>,
@@ -63,7 +62,7 @@ impl WidgetKind for AreaView {
         }
     }
 
-    fn get_draw_list(&self, widget: &Widget, _millis: u32) -> DrawList {
+    fn get_draw_lists(&self, widget: &Widget, _millis: u32) -> Vec<DrawList> {
         let p = widget.state.inner_position;
         let s = widget.state.inner_size;
 
@@ -73,27 +72,37 @@ impl WidgetKind for AreaView {
         let max_x = cmp::min(s.width, area.width - widget.state.scroll_pos.x);
         let max_y = cmp::min(s.height, area.height - widget.state.scroll_pos.y);
 
-        let texture_id = &area.terrain.image_at(0, 0).id;
-
-        let mut quads: Vec<[Vertex; 4]> = Vec::new();
+        let mut draw_list = DrawList::empty_sprite();
         for y in 0..max_y {
             for x in 0..max_x {
-               let tc = &area.terrain.image_at(x + widget.state.scroll_pos.x,
-                                               y + widget.state.scroll_pos.y).tex_coords;
-               let x_min = (p.x + x) as f32;
-               let y_min = CONFIG.display.height as f32 - (p.y + y) as f32;
-               let x_max = x_min + 1.0;
-               let y_max = y_min + 1.0;
-               quads.push([
-                          Vertex { position: [ x_min, y_max ], tex_coords: [tc[0], tc[1]] },
-                          Vertex { position: [ x_min, y_min ], tex_coords: [tc[2], tc[3]] },
-                          Vertex { position: [ x_max, y_max ], tex_coords: [tc[4], tc[5]] },
-                          Vertex { position: [ x_max, y_min ], tex_coords: [tc[6], tc[7]] }
-               ]);
+                let area_x = x + widget.state.scroll_pos.x;
+                let area_y = y + widget.state.scroll_pos.y;
+
+                let tile = match area.terrain.tile_at(area_x, area_y) {
+                    &None => continue,
+                    &Some(ref tile) => tile,
+                };
+
+                draw_list.append(&mut DrawList::from_sprite(&tile.image_display,
+                                                            p.x + x, p.y + y,
+                                                            tile.width, tile.height));
             }
         }
 
-        DrawList::from_sprite(texture_id, quads)
+        for entity in state.entities.iter() {
+            let entity = entity.borrow();
+            draw_list.append(&mut DrawList::from_sprite(&entity.actor.actor.image_display,
+                                                        entity.location.x, entity.location.y,
+                                                        entity.size(), entity.size()));
+        }
+
+        let pc = GameState::pc();
+        let size = pc.borrow().size();
+        let cursors = DrawList::from_sprite(&pc.borrow().size.cursor_sprite
+                                            , Cursor::get_x() - size / 2, Cursor::get_y() - size / 2
+                                            , size, size);
+
+        vec![draw_list, cursors]
     }
 
     fn on_key_press(&self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
@@ -127,8 +136,9 @@ impl WidgetKind for AreaView {
     }
 
     fn on_mouse_move(&self, widget: &Rc<RefCell<Widget>>) -> bool {
-        let area_x = Cursor::get_x() - 1;
-        let area_y = Cursor::get_y() - 1;
+        let pos = widget.borrow().state.position;
+        let area_x = Cursor::get_x() - pos.x + widget.borrow().state.scroll_pos.x;
+        let area_y = Cursor::get_y() - pos.y + widget.borrow().state.scroll_pos.y;
 
         {
             let ref mut state = self.mouse_over.borrow_mut().state;
@@ -139,7 +149,11 @@ impl WidgetKind for AreaView {
         self.mouse_over.borrow_mut().invalidate_layout();
 
         if let Some(entity) = self.area_state.borrow().get_entity_at(area_x, area_y) {
-            Widget::set_mouse_over(widget, Label::new(&entity.borrow().actor.actor.id));
+            let index = entity.borrow().index;
+            let pc = GameState::pc();
+            if index != pc.borrow().index {
+                Widget::set_mouse_over(widget, Label::new(&entity.borrow().actor.actor.id));
+            }
         }
         true
     }

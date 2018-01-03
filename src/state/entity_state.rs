@@ -1,4 +1,4 @@
-use grt::resource::{Actor, Size, SizeIterator};
+use grt::resource::{Actor, EntitySize, EntitySizeIterator};
 use state::Location;
 use state::ActorState;
 
@@ -7,8 +7,8 @@ use std::rc::Rc;
 #[derive(PartialEq)]
 pub struct EntityState {
     pub actor: ActorState,
-    pub(in state) location: Location,
-    size: Rc<Size>,
+    pub location: Location,
+    pub size: Rc<EntitySize>,
     pub index: usize, // index in vec of the owning area state
 }
 
@@ -44,11 +44,11 @@ impl EntityState {
         self.size.size
     }
 
-    pub fn relative_points(&self) -> SizeIterator {
+    pub fn relative_points(&self) -> EntitySizeIterator {
         self.size.relative_points()
     }
 
-    pub fn points(&self, x: i32, y: i32) -> SizeIterator {
+    pub fn points(&self, x: i32, y: i32) -> EntitySizeIterator {
         self.size.points(x, y)
     }
 }

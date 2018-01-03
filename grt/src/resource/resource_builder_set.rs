@@ -1,5 +1,5 @@
 use resource::*;
-use resource::size::SizeBuilder;
+use resource::entity_size::EntitySizeBuilder;
 use resource::spritesheet::SpritesheetBuilder;
 use resource::font::FontBuilder;
 use image::simple_image::SimpleImageBuilder;
@@ -17,7 +17,7 @@ use std::path::PathBuf;
 pub struct ResourceBuilderSet {
     pub game: Game,
     pub theme_builder: ThemeBuilder,
-    pub size_builders: HashMap<String, SizeBuilder>,
+    pub size_builders: HashMap<String, EntitySizeBuilder>,
     pub area_builders: HashMap<String, AreaBuilder>,
     pub tile_builders: HashMap<String, TileBuilder>,
     pub actor_builders: HashMap<String, ActorBuilder>,

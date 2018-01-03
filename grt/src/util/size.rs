@@ -41,6 +41,11 @@ impl Size {
 
     pub fn product(&self) -> i32 {
         self.width * self.height
+
+    }
+
+    pub fn add(&self, w: i32, h: i32) -> Size {
+        Size::new(self.width + w, self.height + h)
     }
 
     pub fn add_mut(&mut self, width: i32, height: i32) {

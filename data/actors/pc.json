@@ -2,6 +2,7 @@
     "id": "pc",
     "player": true,
     "display": "@",
+    "image_display": "tiles/pc",
     "default_size": 5,
     "items": [ "sword", "backpack", "apple" ]
 }

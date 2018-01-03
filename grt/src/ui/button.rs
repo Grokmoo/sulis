@@ -56,8 +56,8 @@ impl WidgetKind for Button {
         self.label.draw_text_mode(renderer, widget, millis);
     }
 
-    fn get_draw_list(&self, widget: &Widget, millis: u32) -> DrawList {
-        self.label.get_draw_list(widget, millis)
+    fn get_draw_lists(&self, widget: &Widget, millis: u32) -> Vec<DrawList> {
+        self.label.get_draw_lists(widget, millis)
     }
 
     fn on_mouse_release(&self, widget: &Rc<RefCell<Widget>>, kind: event::ClickKind) -> bool {

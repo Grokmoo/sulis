@@ -26,17 +26,17 @@ thread_local! {
 
 impl Cursor {
     pub fn move_by(root: &Rc<RefCell<Widget>>, x: i32, y: i32) {
-        trace!("Cursor move by {}, {}", x, y);
         if !Cursor::move_by_internal(x, y) {
             return;
         }
+
+        trace!("Cursor move by {}, {}", x, y);
 
         let event = Event::new(event::Kind::MouseMove { change: Point::new(x, y) });
         Widget::dispatch_event(&root, event);
     }
 
     pub fn move_to(root: &Rc<RefCell<Widget>>, x: i32, y: i32) {
-        trace!("Moving cursor to {}, {}", x, y);
         let (cur_x, cur_y) = Cursor::get_position();
         Cursor::move_by(root, x - cur_x, y - cur_y);
     }

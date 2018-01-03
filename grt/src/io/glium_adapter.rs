@@ -7,7 +7,7 @@ use io::{DrawList, DrawListKind, InputAction, KeyboardEvent, IO};
 use io::keyboard_event::Key;
 use io::event::ClickKind;
 use resource::ResourceSet;
-use ui::Widget;
+use ui::{Cursor, Widget};
 
 use glium::{self, Surface, glutin};
 use glium::glutin::VirtualKeyCode;
@@ -100,7 +100,10 @@ impl<'a> GliumDisplay<'a> {
         let texture = SrgbTexture2d::new(&self.display, image).unwrap();
         let sampler_fn: Box<Fn(Sampler<SrgbTexture2d>) -> Sampler<SrgbTexture2d>> = match kind {
             DrawListKind::Sprite =>
-                Box::new(|sampler| sampler.magnify_filter(MagnifySamplerFilter::Nearest)),
+                Box::new(|sampler| {
+                    sampler.magnify_filter(MagnifySamplerFilter::Nearest)
+                        .minify_filter(MinifySamplerFilter::NearestMipmapLinear)
+                }),
             DrawListKind::Font =>
                 Box::new(|sampler| sampler.minify_filter(MinifySamplerFilter::Linear)),
         };
@@ -109,13 +112,9 @@ impl<'a> GliumDisplay<'a> {
     }
 
     fn draw(&mut self, target: &mut glium::Frame, draw_list: DrawList) {
-        let texture_id = match draw_list.texture {
-            None => return,
-            Some(ref texture_id) => texture_id,
-        };
-        self.create_texture_if_missing(texture_id, draw_list.kind);
+        self.create_texture_if_missing(&draw_list.texture, draw_list.kind);
 
-        let glium_texture = match self.textures.get(texture_id) {
+        let glium_texture = match self.textures.get(&draw_list.texture) {
             None => return,
             Some(texture) => texture,
         };
@@ -140,7 +139,9 @@ impl<'a> GliumDisplay<'a> {
                                                   &widget.state.size));
         }
 
-        self.draw(target, widget.kind.get_draw_list(&widget, millis));
+        for draw_list in widget.kind.get_draw_lists(&widget, millis) {
+            self.draw(target, draw_list);
+        }
 
         for child in widget.children.iter() {
             self.draw_widget_tree(child.borrow(), target, millis);
@@ -159,7 +160,11 @@ fn process_window_event(event: glutin::WindowEvent,
             let mouse_x = (CONFIG.display.width as f64 * position.0 / width as f64) as i32;
             let mouse_y = (CONFIG.display.height as f64 * position.1 / height as f64) as i32;
 
-            Some(InputAction::MouseMove(mouse_x, mouse_y))
+            if mouse_x == Cursor::get_x() && mouse_y == Cursor::get_y() {
+                None
+            } else {
+                Some(InputAction::MouseMove(mouse_x, mouse_y))
+            }
         },
         MouseInput { state, button, .. } => {
             let kind = match button {

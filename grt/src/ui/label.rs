@@ -60,14 +60,14 @@ impl WidgetKind for Label {
         widget.do_base_layout();
     }
 
-    fn get_draw_list(&self, widget: &Widget, _millis: u32) -> DrawList {
+    fn get_draw_lists(&self, widget: &Widget, _millis: u32) -> Vec<DrawList> {
         let font = match &widget.state.font {
-            &None => return DrawList::empty(),
+            &None => return Vec::new(),
             &Some(ref font) => font,
         };
         let (x, y, text) = Label::get_draw_params(widget);
 
-        font.get_draw_list(text, &Point::new(x, y), 1.0)
+        vec![font.get_draw_list(text, &Point::new(x, y), 1.0)]
     }
 
     fn draw_text_mode(&self, renderer: &mut TextRenderer, widget: &Widget,

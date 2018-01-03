@@ -8,8 +8,8 @@ use serde_yaml;
 use image::Image;
 use resource::ResourceBuilder;
 use io::{DrawList, TextRenderer};
-use ui::{AnimationState, Size};
-use util::Point;
+use ui::AnimationState;
+use util::{Point, Size};
 
 #[derive(Debug)]
 pub struct AnimatedImage {

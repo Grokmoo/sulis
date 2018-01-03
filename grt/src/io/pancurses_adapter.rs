@@ -7,7 +7,8 @@ use io::buffered_text_renderer::BufferedTextRenderer;
 use io;
 use io::keyboard_event::Key;
 use io::{InputAction, IO, KeyboardEvent};
-use ui::{Cursor, Widget, Size};
+use ui::{Cursor, Widget};
+use util::Size;
 use config::CONFIG;
 
 pub struct Terminal {

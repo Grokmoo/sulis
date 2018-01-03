@@ -42,7 +42,10 @@ groups:
       bg_bottom_middle_pressed: [5, 10]
       bg_bottom_right_pressed:  [10, 10]
   special:
-    size: [5, 5]
-    position: [0, 0]
     areas:
-      empty: [15, 0]
+      empty: [0, 45, 5, 5]
+      cursor5x5: [ 16, 0, 80, 80]
+      cursor4x4: [ 96, 0, 64, 64]
+      cursor3x3: [160, 0, 48, 48]
+      cursor2x2: [208, 0, 32, 32]
+      cursor1x1: [240, 0, 16, 16]

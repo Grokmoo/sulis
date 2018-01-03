@@ -1,11 +1,11 @@
 use std::rc::Rc;
 use std::fmt;
 
-use resource::Size;
+use resource::EntitySize;
 use resource::Terrain;
 
 pub struct PathFinderGrid {
-    pub size: Rc<Size>,
+    pub size: Rc<EntitySize>,
     pub passable: Vec<bool>,
     pub width: i32,
     pub height: i32,
@@ -29,7 +29,7 @@ impl fmt::Debug for PathFinderGrid {
 }
 
 impl PathFinderGrid {
-    pub fn new(size: Rc<Size>, terrain: &Terrain) -> PathFinderGrid {
+    pub fn new(size: Rc<EntitySize>, terrain: &Terrain) -> PathFinderGrid {
         let width = terrain.width;
         let height = terrain.height;
 

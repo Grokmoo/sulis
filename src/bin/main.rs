@@ -108,7 +108,7 @@ fn main() {
 
     let secs = render_time.as_secs() as f64 + render_time.subsec_nanos() as f64 * 1e-9;
     info!("Rendered {} frames with total render time {:.4} seconds", frames, secs);
-    info!("Average frame render time: {:.6} seconds", secs / frames as f64);
+    info!("Average frame render time: {:.2} milliseconds", 1000.0 * secs / frames as f64);
 
     info!("Shutting down.");
 }

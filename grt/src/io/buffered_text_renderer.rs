@@ -1,6 +1,5 @@
 use io::TextRenderer;
-use ui::Size;
-use util::Point;
+use util::{Point, Size};
 
 pub struct BufferedTextRenderer {
     last_buffer: Vec<char>,

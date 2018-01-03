@@ -3,8 +3,9 @@ use std::cell::RefCell;
 use std::cmp;
 
 use grt::ui::{Cursor, Label, WidgetKind, Widget};
-use grt::io::{InputAction, TextRenderer};
+use grt::io::{DrawList, InputAction, TextRenderer, Vertex};
 use grt::io::event::ClickKind;
+use grt::config::CONFIG;
 
 use view::ActionMenu;
 use state::{AreaState};
@@ -60,6 +61,39 @@ impl WidgetKind for AreaView {
                                                        y + widget.state.scroll_pos.y));
             }
         }
+    }
+
+    fn get_draw_list(&self, widget: &Widget, _millis: u32) -> DrawList {
+        let p = widget.state.inner_position;
+        let s = widget.state.inner_size;
+
+        let state = self.area_state.borrow();
+        let ref area = state.area;
+
+        let max_x = cmp::min(s.width, area.width - widget.state.scroll_pos.x);
+        let max_y = cmp::min(s.height, area.height - widget.state.scroll_pos.y);
+
+        let texture_id = &area.terrain.image_at(0, 0).id;
+
+        let mut quads: Vec<[Vertex; 4]> = Vec::new();
+        for y in 0..max_y {
+            for x in 0..max_x {
+               let tc = &area.terrain.image_at(x + widget.state.scroll_pos.x,
+                                               y + widget.state.scroll_pos.y).tex_coords;
+               let x_min = (p.x + x) as f32;
+               let y_min = CONFIG.display.height as f32 - (p.y + y) as f32;
+               let x_max = x_min + 1.0;
+               let y_max = y_min + 1.0;
+               quads.push([
+                          Vertex { position: [ x_min, y_max ], tex_coords: [tc[0], tc[1]] },
+                          Vertex { position: [ x_min, y_min ], tex_coords: [tc[2], tc[3]] },
+                          Vertex { position: [ x_max, y_max ], tex_coords: [tc[4], tc[5]] },
+                          Vertex { position: [ x_max, y_min ], tex_coords: [tc[6], tc[7]] }
+               ]);
+            }
+        }
+
+        DrawList::from_sprite(texture_id, quads)
     }
 
     fn on_key_press(&self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {

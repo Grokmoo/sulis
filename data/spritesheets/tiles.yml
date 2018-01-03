@@ -1,0 +1,10 @@
+id: tiles
+src: "tiles.png"
+size: [ 64, 32 ]
+groups:
+  base:
+    size: [32, 32]
+    position: [0, 0]
+    areas:
+      floor: [0, 0]
+      wall: [32, 0]

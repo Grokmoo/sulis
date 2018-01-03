@@ -48,6 +48,7 @@ use resource::tile::TileBuilder;
 use resource::item::ItemBuilder;
 use resource::resource_builder_set::ResourceBuilderSet;
 use image::{Image, SimpleImage, AnimatedImage, ComposedImage};
+use util::invalid_data_error;
 
 thread_local! {
     static RESOURCE_SET: RefCell<ResourceSet> = RefCell::new(ResourceSet::new());
@@ -148,7 +149,7 @@ impl ResourceSet {
             }
 
             for (id, builder) in builder_set.tile_builders {
-                insert_if_ok("tile", id, Tile::new(builder),
+                insert_if_ok("tile", id, Tile::new(builder, &resource_set),
                     &mut resource_set.tiles);
             }
 
@@ -224,6 +225,39 @@ impl ResourceSet {
 
     pub fn get_tile(id: &str) -> Option<Rc<Tile>> {
         RESOURCE_SET.with(|r| r.borrow().get_resource(id, &r.borrow().tiles))
+    }
+
+    /// Parses the `id` string to get a sprite from a spritesheet.  The string
+    /// must be of the form {SPRITE_SHEET_ID}/{SPRITE_ID}
+    pub fn get_sprite(&self, id: &str) -> Result<Rc<Sprite>, Error> {
+        let format_error = invalid_data_error("Image display must be \
+                                              of format {SHEET_ID}/{SPRITE_ID}");
+
+        let split_index = match id.find('/') {
+            None => return format_error,
+            Some(index) => index,
+        };
+
+        let (spritesheet_id, sprite_id) = id.split_at(split_index);
+        if sprite_id.len() == 0 {
+            return format_error;
+        }
+        let sprite_id = &sprite_id[1..];
+
+        let sheet = match self.spritesheets.get(spritesheet_id) {
+            None => return invalid_data_error(&format!("Unable to location spritesheet '{}'",
+                                                       spritesheet_id)),
+            Some(sheet) => sheet,
+        };
+
+        let sprite = match sheet.sprites.get(sprite_id) {
+            None => return invalid_data_error(
+                &format!("Unable to location sprite '{}' in spritesheet '{}'",
+                         sprite_id, spritesheet_id)),
+            Some(ref sprite) => Rc::clone(sprite),
+        };
+
+        Ok(sprite)
     }
 }
 

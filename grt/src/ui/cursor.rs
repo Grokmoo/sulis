@@ -58,6 +58,10 @@ impl Cursor {
     }
 
     pub fn move_by_internal(x: i32, y: i32) -> bool {
+        if x == 0 && y == 0 {
+            return false;
+        }
+
         CURSOR.with(|c| {
             let mut cursor = c.borrow_mut();
 

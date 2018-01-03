@@ -2,14 +2,16 @@ use std::collections::HashMap;
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 
-use resource::Tile;
+use resource::{AreaBuilder, Sprite, Tile};
 use resource::generator;
-use resource::AreaBuilder;
+use util::Point;
+use ui::Size;
 
 pub struct Terrain {
     pub width: i32,
     pub height: i32,
     text_display: Vec<char>,
+    image_display: Vec<Rc<Sprite>>,
     passable: Vec<bool>,
 }
 
@@ -50,6 +52,14 @@ impl Terrain {
             return Err(e);
         }
 
+        let empty = Rc::new(Sprite {
+            id: String::new(),
+            position: Point::as_zero(),
+            size: Size::as_zero(),
+            tex_coords: [0.0;8],
+        });
+
+        let mut image_display: Vec<Rc<Sprite>> = vec![Rc::clone(&empty);(width * height) as usize];
         let mut text_display = vec![' ';(width * height) as usize];
         let mut passable = vec![true;(width * height) as usize];
         for (index, tile) in layer.iter().enumerate() {
@@ -68,6 +78,9 @@ impl Terrain {
                 for x in 0..tile.width {
                     *text_display.get_mut((base_x + x + (base_y + y) * width) as usize).unwrap() =
                         tile.get_text_display(x, y);
+
+                   *image_display.get_mut((base_x + x + (base_y + y) * width) as usize).unwrap() =
+                        Rc::clone(&tile.image_display);
                 }
             }
 
@@ -80,6 +93,7 @@ impl Terrain {
             width,
             height,
             text_display,
+            image_display,
             passable,
         })
     }
@@ -169,6 +183,10 @@ impl Terrain {
 
     pub fn is_passable(&self, x: i32, y: i32) -> bool {
         *self.passable.get((x + y * self.width) as usize).unwrap()
+    }
+
+    pub fn image_at(&self, x: i32, y: i32) -> &Rc<Sprite> {
+        self.image_display.get((x + y * self.width) as usize).unwrap()
     }
 
     pub fn display_at(&self, x: i32, y: i32) -> char {

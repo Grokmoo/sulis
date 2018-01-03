@@ -4,18 +4,18 @@
 display:
     # Auto should select the right adapter.  Other options include Termion,
     # Pancurses, Glium
-    adapter: Auto
+    adapter: Glium
 
     # display character for the mouse cursor
     cursor_char: "█"
 
     # size of the graphical display in pixels
-    width_pixels: 800
-    height_pixels: 600
+    width_pixels: 1600
+    height_pixels: 900
 
     # terminal screen dimensions - these also scale the graphical display
     width: 80
-    height: 24
+    height: 45
 
     # in frames per second
     frame_rate: 30

@@ -11,6 +11,7 @@ use serde_yaml;
 
 use extern_image::{self, ImageBuffer, Rgba};
 
+#[derive(Debug)]
 pub struct Spritesheet {
     pub id: String,
     pub image: ImageBuffer<Rgba<u8>, Vec<u8>>,
@@ -76,8 +77,8 @@ impl Spritesheet {
 
                 let upper_bound_pos = sprite.position.add(sprite.size.width, sprite.size.height);
 
-                if !sprite.position.in_bounds(image_width as i32, image_height as i32) ||
-                    !upper_bound_pos.in_bounds(image_width as i32, image_height as i32) {
+                if !sprite.position.in_bounds(image_width as i32 + 1, image_height as i32 + 1) ||
+                    !upper_bound_pos.in_bounds(image_width as i32 + 1, image_height as i32 + 1) {
                         warn!("Sprite '{}' in sheet '{}' coordinates fall outside image bounds",
                               id, builder.id);
                         continue;

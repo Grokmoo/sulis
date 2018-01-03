@@ -1,7 +1,8 @@
 use std::io::{Error, ErrorKind};
+use std::rc::Rc;
 
 use util::Point;
-use resource::ResourceBuilder;
+use resource::{Sprite, ResourceBuilder, ResourceSet};
 
 use serde_json;
 use serde_yaml;
@@ -14,11 +15,12 @@ pub struct Tile {
     pub height: i32,
 
     pub text_display: Vec<char>,
+    pub image_display: Rc<Sprite>,
     pub impass: Vec<Point>,
 }
 
 impl Tile {
-    pub fn new(builder: TileBuilder) -> Result<Tile, Error> {
+    pub fn new(builder: TileBuilder, resources: &ResourceSet) -> Result<Tile, Error> {
         let mut display_vec: Vec<char> = Vec::new();
         let mut impass_points: Vec<Point> = Vec::new();
 
@@ -52,7 +54,7 @@ impl Tile {
             let y = *p.get(1).unwrap();
             if x >= builder.width || y >= builder.height {
                 return Err(
-                    Error::new(ErrorKind::InvalidData, 
+                    Error::new(ErrorKind::InvalidData,
                                format!("Impass point has coordinate greater than size '{}, {}'",
                                        builder.width, builder.height))
                     );
@@ -61,12 +63,15 @@ impl Tile {
             impass_points.push(Point::new(x as i32, y as i32));
         }
 
+        let sprite = resources.get_sprite(&builder.image_display)?;
+
         Ok(Tile {
             id: builder.id,
             name: builder.name,
             width: builder.width as i32,
             height: builder.height as i32,
             text_display: display_vec,
+            image_display: sprite,
             impass: impass_points,
         })
     }
@@ -90,6 +95,7 @@ pub struct TileBuilder {
     pub height: usize,
 
     pub text_display: Vec<Vec<char>>,
+    image_display: String,
     pub impass: Vec<Vec<usize>>,
 }
 

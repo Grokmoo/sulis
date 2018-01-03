@@ -29,32 +29,7 @@ impl SimpleImage {
             }
         }
 
-        let format_error = invalid_data_error("SimpleImage image display must be \
-                                              of format {SHEET_ID}/{SPRITE_ID}");
-
-        let split_index = match builder.image_display.find('/') {
-            None => return format_error,
-            Some(index) => index,
-        };
-
-        let (spritesheet_id, sprite_id) = builder.image_display.split_at(split_index);
-        if sprite_id.len() == 0 {
-            return format_error;
-        }
-        let sprite_id = &sprite_id[1..];
-
-        let sheet = match resources.spritesheets.get(spritesheet_id) {
-            None => return invalid_data_error(&format!("Unable to location spritesheet '{}'",
-                                                       spritesheet_id)),
-            Some(sheet) => sheet,
-        };
-
-        let sprite = match sheet.sprites.get(sprite_id) {
-            None => return invalid_data_error(
-                &format!("Unable to location sprite '{}' in spritesheet '{}'",
-                         sprite_id, spritesheet_id)),
-            Some(ref sprite) => Rc::clone(sprite),
-        };
+        let sprite = resources.get_sprite(&builder.image_display)?;
 
         Ok(Rc::new(SimpleImage {
             id: builder.id,

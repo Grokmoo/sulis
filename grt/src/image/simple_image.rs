@@ -4,7 +4,7 @@ use std::io::{Error, ErrorKind};
 use image::Image;
 use util::Point;
 use resource::{ResourceBuilder, ResourceSet, Sprite};
-use io::{TextRenderer, Vertex, Quad};
+use io::{DrawList, TextRenderer, Vertex};
 use ui::{AnimationState, Size};
 use util::invalid_data_error;
 use config::CONFIG;
@@ -66,20 +66,19 @@ impl SimpleImage {
 }
 
 impl Image for SimpleImage {
-    fn get_quads(&self, _state: &AnimationState, position: &Point, size: &Size) -> Vec<Quad> {
+    fn get_draw_list(&self, _state: &AnimationState, position: &Point, size: &Size) -> DrawList {
         let tc = &self.image_display.tex_coords;
         let x_min = position.x as f32;
         let y_min = CONFIG.display.height as f32 - position.y as f32;
         let x_max = (position.x + size.width) as f32;
         let y_max = CONFIG.display.height as f32 - (position.y + size.height) as f32;
-        vec![Quad {
-            vertices: [
-                Vertex { position: [ x_min, y_max ], tex_coords: [tc[0], tc[1]] },
-                Vertex { position: [ x_min, y_min ], tex_coords: [tc[2], tc[3]] },
-                Vertex { position: [ x_max, y_max ], tex_coords: [tc[4], tc[5]] },
-                Vertex { position: [ x_max, y_min ], tex_coords: [tc[6], tc[7]] },
-           ]
-        }]
+
+        DrawList::from_sprite(&self.image_display.id, vec![[
+                      Vertex { position: [ x_min, y_max ], tex_coords: [tc[0], tc[1]] },
+                      Vertex { position: [ x_min, y_min ], tex_coords: [tc[2], tc[3]] },
+                      Vertex { position: [ x_max, y_max ], tex_coords: [tc[4], tc[5]] },
+                      Vertex { position: [ x_max, y_min ], tex_coords: [tc[6], tc[7]] },
+        ]])
     }
 
     fn draw_text_mode(&self, renderer: &mut TextRenderer, _state: &AnimationState,

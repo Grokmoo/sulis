@@ -1,14 +1,17 @@
+use std::collections::HashMap;
 use std::cell::{Ref, RefCell};
 use std::rc::Rc;
 
 use config::CONFIG;
-use io::{InputAction, KeyboardEvent, IO};
+use io::{DrawList, DrawListKind, InputAction, KeyboardEvent, IO};
 use io::keyboard_event::Key;
 use resource::ResourceSet;
 use ui::Widget;
 
 use glium::{self, Surface, glutin};
 use glium::glutin::VirtualKeyCode;
+use glium::texture::{RawImage2d, SrgbTexture2d};
+use glium::uniforms::{MinifySamplerFilter, MagnifySamplerFilter, Sampler};
 
 const VERTEX_SHADER_SRC: &'static str = r#"
   #version 140
@@ -37,10 +40,13 @@ pub struct GliumDisplay<'a> {
     events_loop: glium::glutin::EventsLoop,
     program: glium::Program,
     params: glium::DrawParameters<'a>,
-    texture: glium::texture::SrgbTexture2d,
-    font_tex: glium::texture::SrgbTexture2d,
-
     matrix: [[f32; 4]; 4],
+    textures: HashMap<String, GliumTexture>,
+}
+
+struct GliumTexture {
+    texture: SrgbTexture2d,
+    sampler_fn: Box<Fn(Sampler<SrgbTexture2d>) -> Sampler<SrgbTexture2d>>,
 }
 
 impl<'a> GliumDisplay<'a> {
@@ -61,62 +67,82 @@ impl<'a> GliumDisplay<'a> {
             .. Default::default()
         };
 
-        let image = ResourceSet::get_spritesheet("gui").unwrap().image.clone();
-        let image_dimensions = image.dimensions();
-        let image = glium::texture::RawImage2d::from_raw_rgba_reversed(&image.into_raw(), image_dimensions);
-        let texture = glium::texture::SrgbTexture2d::new(&display, image).unwrap();
-
-        let font_image = ResourceSet::get_font("large").unwrap().image.clone();
-        let font_image_dim = font_image.dimensions();
-        let font_image = glium::texture::RawImage2d::from_raw_rgba_reversed(&font_image.into_raw(), font_image_dim);
-        let font_tex = glium::texture::SrgbTexture2d::new(&display, font_image).unwrap();
-
         GliumDisplay {
             display,
             events_loop,
             program,
             params,
-            texture,
-            font_tex,
             matrix: [
                 [2.0 / CONFIG.display.width as f32, 0.0, 0.0, 0.0],
                 [0.0, 2.0 / CONFIG.display.height as f32, 0.0, 0.0],
                 [0.0, 0.0, 1.0, 0.0],
                 [-1.0 , -1.0, 0.0, 1.0f32],
             ],
+            textures: HashMap::new(),
         }
     }
 
-    fn draw_widget(&self, widget: Ref<Widget>, target: &mut glium::Frame) {
-        if let Some(ref image) = widget.state.background {
-            let uniforms = uniform! {
-                matrix: self.matrix,
-                tex: self.texture.sampled().magnify_filter(glium::uniforms::MagnifySamplerFilter::Nearest),
-            };
-
-            let pos = &widget.state.position;
-            let size = &widget.state.size;
-            let quads = image.get_quads(&widget.state.animation_state, pos, size);
-
-            for quad in quads {
-                let vertex_buffer = glium::VertexBuffer::new(&self.display, &quad.vertices).unwrap();
-                let indices = glium::index::NoIndices(glium::index::PrimitiveType::TriangleStrip);
-                target.draw(&vertex_buffer, &indices, &self.program, &uniforms, &self.params).unwrap();
-            }
+    fn create_texture_if_missing(&mut self, texture_id: &str, kind: DrawListKind) {
+        if self.textures.get(texture_id).is_some() {
+            return;
         }
+
+        let image = match kind {
+            DrawListKind::Sprite => ResourceSet::get_spritesheet(&texture_id)
+                .unwrap().image.clone(),
+            DrawListKind::Font => ResourceSet::get_font(&texture_id)
+                .unwrap().image.clone(),
+        };
+        let dims = image.dimensions();
+        let image = RawImage2d::from_raw_rgba_reversed(&image.into_raw()
+                                                                       , dims);
+        let texture = SrgbTexture2d::new(&self.display, image).unwrap();
+        let sampler_fn: Box<Fn(Sampler<SrgbTexture2d>) -> Sampler<SrgbTexture2d>> = match kind {
+            DrawListKind::Sprite =>
+                Box::new(|sampler| sampler.magnify_filter(MagnifySamplerFilter::Nearest)),
+            DrawListKind::Font =>
+                Box::new(|sampler| sampler.minify_filter(MinifySamplerFilter::Linear)),
+        };
+
+        self.textures.insert(texture_id.to_string(), GliumTexture { texture, sampler_fn });
+    }
+
+    fn draw(&mut self, target: &mut glium::Frame, draw_list: DrawList) {
+        let texture_id = match draw_list.texture {
+            None => return,
+            Some(ref texture_id) => texture_id,
+        };
+        self.create_texture_if_missing(texture_id, draw_list.kind);
+
+        let glium_texture = match self.textures.get(texture_id) {
+            None => return,
+            Some(texture) => texture,
+        };
 
         let uniforms = uniform! {
             matrix: self.matrix,
-            tex: self.font_tex.sampled().minify_filter(glium::uniforms::MinifySamplerFilter::Linear),
+            tex: (glium_texture.sampler_fn)(glium_texture.texture.sampled()),
         };
-        for quad in widget.kind.get_quads(&widget, 0) {
-            let vertex_buffer = glium::VertexBuffer::new(&self.display, &quad.vertices).unwrap();
+
+        for quad in draw_list.quads {
+            let vertex_buffer = glium::VertexBuffer::new(&self.display, &quad).unwrap();
             let indices = glium::index::NoIndices(glium::index::PrimitiveType::TriangleStrip);
-            target.draw(&vertex_buffer, &indices, &self.program, &uniforms, &self.params).unwrap();
+            target.draw(&vertex_buffer, &indices, &self.program,
+                        &uniforms, &self.params).unwrap();
+        }
+    }
+
+    fn draw_widget_tree(&mut self, widget: Ref<Widget>, target: &mut glium::Frame, millis: u32) {
+        if let Some(ref image) = widget.state.background {
+            self.draw(target, image.get_draw_list(&widget.state.animation_state,
+                                                  &widget.state.position,
+                                                  &widget.state.size));
         }
 
+        self.draw(target, widget.kind.get_draw_list(&widget, millis));
+
         for child in widget.children.iter() {
-            self.draw_widget(child.borrow(), target);
+            self.draw_widget_tree(child.borrow(), target, millis);
         }
     }
 }
@@ -130,10 +156,10 @@ impl<'a> IO for GliumDisplay<'a> {
         });
     }
 
-    fn render_output(&mut self, root: Ref<Widget>, _millis: u32) {
+    fn render_output(&mut self, root: Ref<Widget>, millis: u32) {
         let mut target = self.display.draw();
         target.clear_color(0.0, 0.0, 0.0, 1.0);
-        self.draw_widget(root, &mut target);
+        self.draw_widget_tree(root, &mut target, millis);
         target.finish().unwrap();
     }
 }

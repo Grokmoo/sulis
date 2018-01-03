@@ -9,7 +9,7 @@ pub use self::animated_image::AnimatedImage;
 
 use std::fmt::Debug;
 
-use io::{TextRenderer, Quad};
+use io::{DrawList, TextRenderer};
 
 use ui::{AnimationState, Size};
 use util::Point;
@@ -32,7 +32,7 @@ pub trait Image: Debug {
         }
     }
 
-    fn get_quads(&self, state: &AnimationState, position: &Point, size: &Size) -> Vec<Quad>;
+    fn get_draw_list(&self, state: &AnimationState, position: &Point, size: &Size) -> DrawList;
 
     fn get_size(&self) -> &Size;
 }

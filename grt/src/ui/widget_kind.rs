@@ -1,7 +1,7 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use io::{InputAction, TextRenderer, Quad};
+use io::{DrawList, InputAction, TextRenderer};
 use io::event::ClickKind;
 use ui::{animation_state, Widget};
 
@@ -25,7 +25,9 @@ pub trait WidgetKind {
     fn draw_text_mode(&self, _renderer: &mut TextRenderer,
                       _widget: &Widget, _millis: u32) { }
 
-    fn get_quads(&self, _widget: &Widget, _millis: u32) -> Vec<Quad> { Vec::new() }
+    fn get_draw_list(&self, _widget: &Widget, _millis: u32) -> DrawList {
+        DrawList::empty()
+    }
 
     fn layout(&self, widget: &mut Widget) {
         widget.do_base_layout();

@@ -37,9 +37,46 @@ pub trait TextRenderer {
     fn set_cursor_pos(&mut self, x: i32, y: i32);
 }
 
-#[derive(Copy, Clone)]
-pub struct Quad {
-    pub vertices: [Vertex; 4],
+#[derive(Debug)]
+pub enum DrawListKind {
+    Font,
+    Sprite,
+}
+
+pub struct DrawList {
+    pub quads: Vec<[Vertex; 4]>,
+    pub texture: Option<String>,
+    pub kind: DrawListKind,
+}
+
+impl DrawList {
+    pub fn empty() -> DrawList {
+        DrawList {
+            quads: Vec::new(),
+            texture: None,
+            kind: DrawListKind::Sprite,
+        }
+    }
+
+    pub fn from_font(texture: &str, quads: Vec<[Vertex; 4]>) -> DrawList {
+        DrawList {
+            texture: Some(texture.to_string()),
+            quads,
+            kind: DrawListKind::Font,
+        }
+    }
+
+    pub fn from_sprite(texture: &str, quads: Vec<[Vertex; 4]>) -> DrawList {
+        DrawList {
+            texture: Some(texture.to_string()),
+            quads,
+            kind: DrawListKind::Sprite,
+        }
+    }
+
+    pub fn append(&mut self, other: &mut DrawList) {
+        self.quads.append(&mut other.quads);
+    }
 }
 
 #[derive(Copy, Clone)]

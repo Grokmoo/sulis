@@ -3,7 +3,7 @@ use std::rc::Rc;
 use std::char;
 use std::collections::HashMap;
 
-use io::{Quad, Vertex};
+use io::{DrawList, Vertex};
 use resource::ResourceBuilder;
 use ui::Size;
 use util::{invalid_data_error, Point};
@@ -15,6 +15,7 @@ use serde_yaml;
 use extern_image::{self, ImageBuffer, Rgba};
 
 pub struct Font {
+    pub id: String,
     line_height: u32,
     _base: u32,
     characters: HashMap<char, FontChar>,
@@ -43,9 +44,9 @@ impl Font {
         width
     }
 
-    pub fn get_quads(&self, text: &str, position: &Point, line_height: f32) -> Vec<Quad> {
+    pub fn get_draw_list(&self, text: &str, position: &Point, line_height: f32) -> DrawList {
         let scale_factor = line_height / self.line_height as f32;
-        let mut quads: Vec<Quad> = Vec::new();
+        let mut quads: Vec<[Vertex; 4]> = Vec::new();
 
         let mut x = position.x as f32;
         let y = position.y as f32;
@@ -63,19 +64,18 @@ impl Font {
             let x_max = x_char + scale_factor * font_char.size.width as f32;
             let y_max = CONFIG.display.height as f32
                 - (y_char + scale_factor * font_char.size.height as f32);
-            quads.push(Quad {
-                vertices: [
+            quads.push([
                     Vertex { position: [ x_min, y_max ], tex_coords: [tc[0], tc[1]] },
                     Vertex { position: [ x_min, y_min ], tex_coords: [tc[2], tc[3]] },
                     Vertex { position: [ x_max, y_max ], tex_coords: [tc[4], tc[5]] },
                     Vertex { position: [ x_max, y_min ], tex_coords: [tc[6], tc[7]] },
                 ]
-            });
+            );
 
             x += scale_factor * font_char.x_advance as f32;
         }
 
-        quads
+        DrawList::from_font(&self.id, quads)
     }
 
     pub fn new(dir: &str, builder: FontBuilder) -> Result<Rc<Font>, Error> {
@@ -121,6 +121,7 @@ impl Font {
         }
 
         Ok(Rc::new(Font {
+            id: builder.id,
             line_height: builder.line_height,
             _base: builder.base,
             characters,

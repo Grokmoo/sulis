@@ -7,7 +7,7 @@ use serde_yaml;
 
 use image::Image;
 use resource::ResourceBuilder;
-use io::{TextRenderer, Quad};
+use io::{DrawList, TextRenderer};
 use ui::{AnimationState, Size};
 use util::Point;
 
@@ -55,9 +55,8 @@ impl AnimatedImage {
 }
 
 impl Image for AnimatedImage {
-    fn get_quads(&self, state: &AnimationState, position: &Point, size: &Size) -> Vec<Quad> {
-        AnimationState::find_match(&self.images, state)
-            .get_quads(state, position, size)
+    fn get_draw_list(&self, state: &AnimationState, position: &Point, size: &Size) -> DrawList {
+        AnimationState::find_match(&self.images, state).get_draw_list(state, position, size)
     }
 
     fn draw_text_mode(&self, renderer: &mut TextRenderer,

@@ -12,19 +12,21 @@ use serde_yaml;
 use extern_image::{self, ImageBuffer, Rgba};
 
 pub struct Spritesheet {
+    pub id: String,
     pub image: ImageBuffer<Rgba<u8>, Vec<u8>>,
     pub sprites: HashMap<String, Rc<Sprite>>,
 }
 
 #[derive(Debug)]
 pub struct Sprite {
+    pub id: String,
     pub position: Point,
     pub size: Size,
     pub tex_coords: [f32; 8],
 }
 
 impl Sprite {
-    fn new(image_size: &Size, position: Point, size: Size) -> Sprite {
+    fn new(id: &str, image_size: &Size, position: Point, size: Size) -> Sprite {
         let image_width = image_size.width as f32;
         let image_height = image_size.height as f32;
         let x_min = (position.x as f32) / image_width;
@@ -33,6 +35,7 @@ impl Sprite {
         let y_max = (image_height - position.y as f32) / image_height;
 
         Sprite {
+            id: id.to_string(),
             position,
             size,
             tex_coords: [ x_min, y_min,
@@ -64,7 +67,7 @@ impl Spritesheet {
             let size = group.size;
             let base_pos = group.position;
             for (id, area_pos) in group.areas {
-                let sprite = Sprite::new(&image_size, area_pos + base_pos, size);
+                let sprite = Sprite::new(&builder.id, &image_size, area_pos + base_pos, size);
 
                 if sprites.contains_key(&id) {
                     warn!("Duplicate sprite ID in sheet '{}': '{}'", builder.id, id);
@@ -85,6 +88,7 @@ impl Spritesheet {
         }
 
         Ok(Rc::new(Spritesheet {
+            id: builder.id,
             image,
             sprites,
         }))

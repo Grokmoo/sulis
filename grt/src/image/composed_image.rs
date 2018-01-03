@@ -4,7 +4,7 @@ use std::collections::HashMap;
 
 use image::Image;
 use resource::ResourceBuilder;
-use io::{TextRenderer, Quad};
+use io::{DrawList, TextRenderer};
 use ui::{AnimationState, Size};
 use util::Point;
 
@@ -160,56 +160,56 @@ impl Image for ComposedImage {
         }
     }
 
-    fn get_quads(&self, state: &AnimationState, position: &Point, size: &Size) -> Vec<Quad> {
+    fn get_draw_list(&self, state: &AnimationState, position: &Point, size: &Size) -> DrawList {
         let fill_size = *size - (self.size - self.middle_size);
         let mut draw_pos = Point::from(position);
         let mut draw_size = Size::from(&fill_size);
 
-        let mut quads: Vec<Quad> = Vec::with_capacity(9);
+        let mut draw_list;
         unsafe {
             let image = self.images.get_unchecked(0);
-            quads.append(&mut image.get_quads(state, &draw_pos, image.get_size()));
+            draw_list = image.get_draw_list(state, &draw_pos, image.get_size());
 
             let image = self.images.get_unchecked(1);
             draw_size.set_height(image.get_size().height);
             draw_pos.add_x(image.get_size().width);
-            quads.append(&mut image.get_quads(state, &draw_pos, &draw_size));
+            draw_list.append(&mut image.get_draw_list(state, &draw_pos, &draw_size));
 
             let image = self.images.get_unchecked(2);
             draw_pos.add_x(fill_size.width);
-            quads.append(&mut image.get_quads(state, &draw_pos, image.get_size()));
+            draw_list.append(&mut image.get_draw_list(state, &draw_pos, image.get_size()));
 
             let image = self.images.get_unchecked(3);
             draw_pos.set_x(position.x);
             draw_pos.add_y(image.get_size().height);
             draw_size.set(image.get_size().width, fill_size.height);
-            quads.append(&mut image.get_quads(state, &draw_pos, &draw_size));
+            draw_list.append(&mut image.get_draw_list(state, &draw_pos, &draw_size));
 
             let image = self.images.get_unchecked(4);
             draw_pos.add_x(image.get_size().width);
-            quads.append(&mut image.get_quads(state, &draw_pos, &fill_size));
+            draw_list.append(&mut image.get_draw_list(state, &draw_pos, &fill_size));
 
             let image = self.images.get_unchecked(5);
             draw_pos.add_x(fill_size.width);
             draw_size.set_width(image.get_size().width);
-            quads.append(&mut image.get_quads(state, &draw_pos, &draw_size));
+            draw_list.append(&mut image.get_draw_list(state, &draw_pos, &draw_size));
 
             let image = self.images.get_unchecked(6);
             draw_pos.add_y(fill_size.height);
             draw_pos.set_x(position.x);
-            quads.append(&mut image.get_quads(state, &draw_pos, image.get_size()));
+            draw_list.append(&mut image.get_draw_list(state, &draw_pos, image.get_size()));
 
             let image = self.images.get_unchecked(7);
             draw_pos.add_x(image.get_size().width);
             draw_size.set(fill_size.width, image.get_size().height);
-            quads.append(&mut image.get_quads(state, &draw_pos, &draw_size));
+            draw_list.append(&mut image.get_draw_list(state, &draw_pos, &draw_size));
 
             let image = self.images.get_unchecked(8);
             draw_pos.add_x(fill_size.width);
-            quads.append(&mut image.get_quads(state, &draw_pos, image.get_size()));
+            draw_list.append(&mut image.get_draw_list(state, &draw_pos, image.get_size()));
         }
 
-        quads
+        draw_list
     }
 
     fn get_size(&self) -> &Size {

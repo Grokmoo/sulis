@@ -3,7 +3,7 @@ use std::cmp;
 
 use ui::theme::{HorizontalTextAlignment, VerticalTextAlignment};
 use ui::{Widget, WidgetKind};
-use io::{TextRenderer, Quad};
+use io::{DrawList, TextRenderer};
 use util::Point;
 
 pub struct Label {
@@ -60,14 +60,14 @@ impl WidgetKind for Label {
         widget.do_base_layout();
     }
 
-    fn get_quads(&self, widget: &Widget, _millis: u32) -> Vec<Quad> {
+    fn get_draw_list(&self, widget: &Widget, _millis: u32) -> DrawList {
         let font = match &widget.state.font {
-            &None => return Vec::new(),
+            &None => return DrawList::empty(),
             &Some(ref font) => font,
         };
         let (x, y, text) = Label::get_draw_params(widget);
 
-        font.get_quads(text, &Point::new(x, y), 1.0)
+        font.get_draw_list(text, &Point::new(x, y), 1.0)
     }
 
     fn draw_text_mode(&self, renderer: &mut TextRenderer, widget: &Widget,

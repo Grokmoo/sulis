@@ -44,7 +44,21 @@ pub trait WidgetKind {
         Vec::with_capacity(0)
     }
 
-    fn on_mouse_click(&self, _widget: &Rc<RefCell<Widget>>, _kind: ClickKind) -> bool {
+    fn super_on_mouse_press(&self, widget: &Rc<RefCell<Widget>>, _kind: ClickKind) {
+        widget.borrow_mut().state.animation_state.add(animation_state::Kind::Pressed);
+    }
+
+    fn super_on_mouse_release(&self, widget: &Rc<RefCell<Widget>>, _kind: ClickKind) {
+        widget.borrow_mut().state.animation_state.remove(animation_state::Kind::Pressed);
+    }
+
+    fn on_mouse_press(&self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
+        self.super_on_mouse_press(widget, kind);
+        true
+    }
+
+    fn on_mouse_release(&self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
+        self.super_on_mouse_release(widget, kind);
         true
     }
 
@@ -80,6 +94,7 @@ pub trait WidgetKind {
     fn super_on_mouse_exit(&self, widget: &Rc<RefCell<Widget>>) {
         widget.borrow_mut().state.set_mouse_inside(false);
         widget.borrow_mut().state.animation_state.remove(animation_state::Kind::Hover);
+        widget.borrow_mut().state.animation_state.remove(animation_state::Kind::Pressed);
         trace!("Mouse exited '{}', anim state: '{:?}'",
                widget.borrow().theme_id, widget.borrow().state.animation_state);
     }

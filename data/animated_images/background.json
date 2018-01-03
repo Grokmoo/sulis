@@ -1,7 +1,0 @@
-{
-    "id": "background",
-    "states": {
-        "normal": "bg_base",
-        "hover": "bg_mouseover"
-    }
-}

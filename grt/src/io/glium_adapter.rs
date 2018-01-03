@@ -5,6 +5,7 @@ use std::rc::Rc;
 use config::CONFIG;
 use io::{DrawList, DrawListKind, InputAction, KeyboardEvent, IO};
 use io::keyboard_event::Key;
+use io::event::ClickKind;
 use resource::ResourceSet;
 use ui::Widget;
 
@@ -147,11 +148,42 @@ impl<'a> GliumDisplay<'a> {
     }
 }
 
+fn process_window_event(event: glutin::WindowEvent,
+                        display_size: Option<(u32, u32)>) -> Option<InputAction> {
+    use glium::glutin::WindowEvent::*;
+    match event {
+        Closed => Some(InputAction::Exit),
+        KeyboardInput { input, .. } => CONFIG.get_input_action(process_keyboard_input(input)),
+        CursorMoved { position, .. } => {
+            let (width, height) = display_size.unwrap();
+            let mouse_x = (CONFIG.display.width as f64 * position.0 / width as f64) as i32;
+            let mouse_y = (CONFIG.display.height as f64 * position.1 / height as f64) as i32;
+
+            Some(InputAction::MouseMove(mouse_x, mouse_y))
+        },
+        MouseInput { state, button, .. } => {
+            let kind = match button {
+                glium::glutin::MouseButton::Left => ClickKind::Left,
+                glium::glutin::MouseButton::Right => ClickKind::Right,
+                glium::glutin::MouseButton::Middle => ClickKind::Middle,
+                _ => return None,
+            };
+
+            match state {
+                glium::glutin::ElementState::Pressed => Some(InputAction::MouseDown(kind)),
+                glium::glutin::ElementState::Released => Some(InputAction::MouseUp(kind)),
+            }
+        },
+        _ => None,
+    }
+}
+
 impl<'a> IO for GliumDisplay<'a> {
     fn process_input(&mut self, root: Rc<RefCell<Widget>>) {
+        let display_size = self.display.gl_window().get_inner_size();
         self.events_loop.poll_events(|event| {
             if let glutin::Event::WindowEvent { event, .. } = event {
-                InputAction::handle_action(process_window_event(event), Rc::clone(&root));
+                InputAction::handle_action(process_window_event(event, display_size), Rc::clone(&root));
             }
         });
     }
@@ -164,16 +196,6 @@ impl<'a> IO for GliumDisplay<'a> {
     }
 }
 
-fn process_window_event(event: glutin::WindowEvent) -> Option<InputAction> {
-    use glium::glutin::WindowEvent::*;
-    match event {
-        Closed => Some(InputAction::Exit),
-        KeyboardInput { input, .. } => {
-            CONFIG.get_input_action(process_keyboard_input(input))
-        }
-        _ => None,
-    }
-}
 
 fn process_keyboard_input(input: glutin::KeyboardInput) -> Option<KeyboardEvent> {
     if input.state != glutin::ElementState::Pressed { return None; }

@@ -29,7 +29,8 @@ impl Event {
 
 #[derive(Copy, Clone, Debug)]
 pub enum Kind {
-    MouseClick(ClickKind),
+    MousePress(ClickKind),
+    MouseRelease(ClickKind),
     MouseMove { change: Point },
     MouseScroll { scroll: i32 },
     MouseEnter,
@@ -37,7 +38,7 @@ pub enum Kind {
     KeyPress(InputAction),
 }
 
-#[derive(Copy, Clone, Debug, PartialEq)]
+#[derive(Deserialize, Copy, Clone, Debug, PartialEq)]
 pub enum ClickKind {
     Left,
     Right,

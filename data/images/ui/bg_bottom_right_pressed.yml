@@ -1,0 +1,4 @@
+id: bg_bottom_right_pressed
+size: [1, 1]
+text_display: [ "+" ]
+image_display: "gui/bg_bottom_right_pressed"

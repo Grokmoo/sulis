@@ -1,0 +1,4 @@
+id: bg_middle_right_pressed
+size: [1, 1]
+text_display: [ "+" ]
+image_display: "gui/bg_middle_right_pressed"

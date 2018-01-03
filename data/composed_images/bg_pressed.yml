@@ -1,0 +1,6 @@
+id: bg_pressed
+grid: [ bg_top_left_pressed,    bg_top_middle_pressed,    bg_top_right_pressed,
+        bg_middle_left_pressed, bg_middle_pressed,        bg_middle_right_pressed,
+        bg_bottom_left_pressed, bg_bottom_middle_pressed, bg_bottom_right_pressed
+      ]
+

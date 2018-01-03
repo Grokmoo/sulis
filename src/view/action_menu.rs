@@ -63,7 +63,8 @@ impl WidgetKind for ActionMenu {
         vec![title, actions]
     }
 
-    fn on_mouse_click(&self, widget: &Rc<RefCell<Widget>>, _kind: ClickKind) -> bool {
+    fn on_mouse_release(&self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
+        self.super_on_mouse_release(widget, kind);
         if !widget.borrow().state.in_bounds(Cursor::get_x(), Cursor::get_y()) {
             widget.borrow_mut().mark_for_removal();
         }

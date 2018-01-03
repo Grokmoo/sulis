@@ -75,7 +75,8 @@ impl WidgetKind for AreaView {
         true
     }
 
-    fn on_mouse_click(&self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
+    fn on_mouse_release(&self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
+        self.super_on_mouse_release(widget, kind);
         let pos = widget.borrow().state.position;
         let x = Cursor::get_x() - pos.x + widget.borrow().state.scroll_pos.x;
         let y = Cursor::get_y() - pos.y + widget.borrow().state.scroll_pos.y;

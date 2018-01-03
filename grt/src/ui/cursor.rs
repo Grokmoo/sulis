@@ -25,8 +25,8 @@ thread_local! {
 }
 
 impl Cursor {
-    pub fn move_by(root: Rc<RefCell<Widget>>, x: i32, y: i32) {
-        trace!("Emulating cursor move by {}, {} as mouse event", x, y);
+    pub fn move_by(root: &Rc<RefCell<Widget>>, x: i32, y: i32) {
+        trace!("Cursor move by {}, {}", x, y);
         if !Cursor::move_by_internal(x, y) {
             return;
         }
@@ -35,11 +35,25 @@ impl Cursor {
         Widget::dispatch_event(&root, event);
     }
 
-    pub fn click(root: Rc<RefCell<Widget>>, kind: event::ClickKind) {
+    pub fn move_to(root: &Rc<RefCell<Widget>>, x: i32, y: i32) {
+        trace!("Moving cursor to {}, {}", x, y);
+        let (cur_x, cur_y) = Cursor::get_position();
+        Cursor::move_by(root, x - cur_x, y - cur_y);
+    }
+
+    pub fn press(root: &Rc<RefCell<Widget>>, kind: event::ClickKind) {
         let (x, y) = Cursor::get_position();
 
-        trace!("Emulating cursor click event at {},{} as mouse event", x, y);
-        let event = Event::new(event::Kind::MouseClick(kind));
+        trace!("Cursor pressed at {},{}", x, y);
+        let event = Event::new(event::Kind::MousePress(kind));
+        Widget::dispatch_event(&root, event);
+    }
+
+    pub fn release(root: &Rc<RefCell<Widget>>, kind: event::ClickKind) {
+        let (x, y) = Cursor::get_position();
+
+        trace!("Cursor released at {},{}", x, y);
+        let event = Event::new(event::Kind::MouseRelease(kind));
         Widget::dispatch_event(&root, event);
     }
 

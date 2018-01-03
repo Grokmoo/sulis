@@ -60,8 +60,8 @@ impl WidgetKind for Button {
         self.label.get_draw_list(widget, millis)
     }
 
-    fn on_mouse_click(&self, widget: &Rc<RefCell<Widget>>,
-                      _kind: event::ClickKind) -> bool {
+    fn on_mouse_release(&self, widget: &Rc<RefCell<Widget>>, kind: event::ClickKind) -> bool {
+        self.super_on_mouse_release(widget, kind);
         match self.callback {
             Some(ref cb) => cb.call(self, widget),
             None => (),

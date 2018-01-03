@@ -481,8 +481,10 @@ impl Widget {
         if event_eaten { return true; }
 
         match event.kind {
-            MouseClick(kind) =>
-                widget_kind.on_mouse_click(widget, kind),
+            MousePress(kind) =>
+                widget_kind.on_mouse_press(widget, kind),
+            MouseRelease(kind) =>
+                widget_kind.on_mouse_release(widget, kind),
             MouseMove { change: _change } =>
                 widget_kind.on_mouse_move(widget),
             MouseScroll { scroll } =>

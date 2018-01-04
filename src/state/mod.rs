@@ -131,6 +131,16 @@ impl GameState {
         STATE.with(|s| Rc::clone(&s.borrow().as_ref().unwrap().pc))
     }
 
+    pub fn can_pc_move_to(x: i32, y: i32) -> bool {
+        STATE.with(|s| {
+            let mut state = s.borrow_mut();
+            let state = state.as_mut().unwrap();
+            let path = state.path_finder.find(state.pc.borrow(), x, y);
+
+            path.is_some()
+        })
+    }
+
     pub fn pc_move_to(x: i32, y: i32) -> bool {
         STATE.with(|s| {
             let mut state = s.borrow_mut();
@@ -142,8 +152,12 @@ impl GameState {
                 return false;
             }
             let path = path.unwrap();
-            let anim = MoveAnimation::new(Rc::clone(&state.pc),
-            path, CONFIG.display.animation_base_time_millis);
+            let entity = Rc::clone(&state.pc);
+            for anim in state.animations.iter_mut() {
+                anim.check(&entity);
+            }
+            let anim = MoveAnimation::new(entity, path,
+                                          CONFIG.display.animation_base_time_millis);
             state.animations.push(Box::new(anim));
             true
         })

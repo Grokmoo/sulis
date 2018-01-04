@@ -91,9 +91,11 @@ impl WidgetKind for AreaView {
 
         for entity in state.entities.iter() {
             let entity = entity.borrow();
-            draw_list.append(&mut DrawList::from_sprite(&entity.actor.actor.image_display,
-                                                        entity.location.x, entity.location.y,
-                                                        entity.size(), entity.size()));
+            draw_list.append(&mut DrawList::from_sprite(
+                    &entity.actor.actor.image_display,
+                    entity.location.x + p.x - widget.state.scroll_pos.x,
+                    entity.location.y + p.y - widget.state.scroll_pos.y,
+                    entity.size(), entity.size()));
         }
 
 
@@ -163,16 +165,22 @@ impl WidgetKind for AreaView {
         }
 
         self.area_state.borrow_mut().clear_cursors();
-        if let Some(cursor_draw_list) = cursor_draw_list {
+        if let Some(mut cursor_draw_list) = cursor_draw_list {
+            cursor_draw_list.set_color(1.0, 0.0, 0.0, 1.0);
             self.area_state.borrow_mut().add_cursor(cursor_draw_list);
-        }
+        } else {
+            let pc = GameState::pc();
+            let size = pc.borrow().size();
+            let mut draw_list = DrawList::from_sprite(&pc.borrow().size.cursor_sprite,
+                Cursor::get_x() - size / 2, Cursor::get_y() - size / 2, size, size);
 
-        let pc = GameState::pc();
-        let size = pc.borrow().size();
-        self.area_state.borrow_mut().add_cursor(
-            DrawList::from_sprite(&pc.borrow().size.cursor_sprite
-                                  , Cursor::get_x() - size / 2, Cursor::get_y() - size / 2
-                                  , size, size));
+            let action_menu = ActionMenu::new(Rc::clone(&self.area_state), area_x, area_y);
+            if !action_menu.is_default_callback_valid() {
+                draw_list.set_color(1.0, 0.0, 0.0, 1.0);
+            }
+
+            self.area_state.borrow_mut().add_cursor(draw_list);
+        }
         true
     }
 

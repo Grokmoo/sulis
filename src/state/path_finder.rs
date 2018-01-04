@@ -38,6 +38,9 @@ impl PathFinder {
 
     pub fn find(&mut self, requester: Ref<EntityState>, dest_x: i32,
                 dest_y: i32) -> Option<Vec<Point>> {
+        if !Point::new(dest_x, dest_y).in_bounds(self.width, self.height) {
+            return None;
+        }
         debug!("Finding path from {:?} to {},{}",
                requester.location, dest_x, dest_y);
 

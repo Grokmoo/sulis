@@ -31,8 +31,9 @@ const FRAGMENT_SHADER_SRC: &'static str = r#"
   in vec2 v_tex_coords;
   out vec4 color;
   uniform sampler2D tex;
+  uniform vec4 color_filter;
   void main() {
-    color = texture(tex, v_tex_coords);
+    color = color_filter * texture(tex, v_tex_coords);
   }
 "#;
 
@@ -122,6 +123,7 @@ impl<'a> GliumDisplay<'a> {
         let uniforms = uniform! {
             matrix: self.matrix,
             tex: (glium_texture.sampler_fn)(glium_texture.texture.sampled()),
+            color_filter: draw_list.color_filter,
         };
 
         for quad in draw_list.quads {

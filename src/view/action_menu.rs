@@ -20,6 +20,12 @@ impl ActionMenu {
         })
     }
 
+    pub fn is_move_valid(&self) -> bool {
+        let pc = GameState::pc();
+        let size = pc.borrow().size();
+        GameState::can_pc_move_to(self.area_pos.x - size / 2, self.area_pos.y - size / 2)
+    }
+
     pub fn move_callback(&self) -> Box<Fn()> {
         let pc = GameState::pc();
         let size = pc.borrow().size();
@@ -39,6 +45,10 @@ impl ActionMenu {
 
     pub fn fire_default_callback(&self) {
         (self.move_callback())();
+    }
+
+    pub fn is_default_callback_valid(&self) -> bool {
+        self.is_move_valid()
     }
 }
 

@@ -11,6 +11,7 @@ pub struct MoveAnimation {
    path: Vec<Point>,
    start_time: Instant,
    frame_time_millis: u32,
+   marked_for_removal: bool,
 }
 
 impl MoveAnimation {
@@ -22,6 +23,7 @@ impl MoveAnimation {
             path,
             start_time: Instant::now(),
             frame_time_millis,
+            marked_for_removal: false,
         }
     }
 
@@ -29,6 +31,10 @@ impl MoveAnimation {
 
 impl animation::Animation for MoveAnimation {
     fn update(&self) -> bool {
+        if self.marked_for_removal {
+            return false;
+        }
+
         let frame_index = animation::get_current_frame(self.start_time.elapsed(),
             self.frame_time_millis, self.path.len() - 1);
 
@@ -37,5 +43,11 @@ impl animation::Animation for MoveAnimation {
 
         trace!("Updated move animation at frame {}", frame_index);
         return frame_index != self.path.len() - 1
+    }
+
+    fn check(&mut self, entity: &Rc<RefCell<EntityState>>) {
+        if self.mover.borrow().index == entity.borrow().index {
+            self.marked_for_removal = true;
+        }
     }
 }

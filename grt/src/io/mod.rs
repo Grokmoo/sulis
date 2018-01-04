@@ -49,6 +49,7 @@ pub struct DrawList {
     pub quads: Vec<[Vertex; 4]>,
     pub texture: String,
     pub kind: DrawListKind,
+    pub color_filter: [f32; 4],
 }
 
 impl DrawList {
@@ -60,6 +61,7 @@ impl DrawList {
             quads: Vec::new(),
             texture: String::new(),
             kind: DrawListKind::Sprite,
+            color_filter: [1.0, 1.0, 1.0, 1.0],
         }
     }
 
@@ -68,6 +70,7 @@ impl DrawList {
             texture: texture.to_string(),
             quads,
             kind: DrawListKind::Font,
+            color_filter: [1.0, 1.0, 1.0, 1.0],
         }
     }
 
@@ -89,7 +92,12 @@ impl DrawList {
             texture: sprite.id.to_string(),
             quads,
             kind: DrawListKind::Sprite,
+            color_filter: [1.0, 1.0, 1.0, 1.0],
         }
+    }
+
+    pub fn set_color(&mut self, red: f32, green: f32, blue: f32, alpha: f32) {
+        self.color_filter = [red, green, blue, alpha];
     }
 
     /// appends the contents of the other drawlist to this one, moving

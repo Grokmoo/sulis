@@ -38,12 +38,13 @@ pub trait TextRenderer {
     fn set_cursor_pos(&mut self, x: i32, y: i32);
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum DrawListKind {
     Font,
     Sprite,
 }
 
+#[derive(Debug, Clone)]
 pub struct DrawList {
     pub quads: Vec<[Vertex; 4]>,
     pub texture: String,
@@ -101,7 +102,7 @@ impl DrawList {
     }
 }
 
-#[derive(Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 pub struct Vertex {
     pub position: [f32; 2],
     pub tex_coords: [f32; 2],

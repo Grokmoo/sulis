@@ -96,13 +96,13 @@ impl WidgetKind for AreaView {
                                                         entity.size(), entity.size()));
         }
 
-        let pc = GameState::pc();
-        let size = pc.borrow().size();
-        let cursors = DrawList::from_sprite(&pc.borrow().size.cursor_sprite
-                                            , Cursor::get_x() - size / 2, Cursor::get_y() - size / 2
-                                            , size, size);
 
-        vec![draw_list, cursors]
+        let mut draw_lists = vec![draw_list];
+        if let &Some(ref cursor) = self.area_state.borrow().get_cursors() {
+            draw_lists.push(cursor.clone());
+        }
+
+        draw_lists
     }
 
     fn on_key_press(&self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
@@ -148,19 +148,38 @@ impl WidgetKind for AreaView {
         }
         self.mouse_over.borrow_mut().invalidate_layout();
 
+        let mut cursor_draw_list: Option<DrawList> = None;
         if let Some(entity) = self.area_state.borrow().get_entity_at(area_x, area_y) {
             let index = entity.borrow().index;
             let pc = GameState::pc();
             if index != pc.borrow().index {
                 Widget::set_mouse_over(widget, Label::new(&entity.borrow().actor.actor.id));
+                let sprite = &entity.borrow().size.cursor_sprite;
+                let x = entity.borrow().location.x;
+                let y = entity.borrow().location.y;
+                let size = entity.borrow().size();
+                cursor_draw_list = Some(DrawList::from_sprite(sprite, x, y, size, size));
             }
         }
+
+        self.area_state.borrow_mut().clear_cursors();
+        if let Some(cursor_draw_list) = cursor_draw_list {
+            self.area_state.borrow_mut().add_cursor(cursor_draw_list);
+        }
+
+        let pc = GameState::pc();
+        let size = pc.borrow().size();
+        self.area_state.borrow_mut().add_cursor(
+            DrawList::from_sprite(&pc.borrow().size.cursor_sprite
+                                  , Cursor::get_x() - size / 2, Cursor::get_y() - size / 2
+                                  , size, size));
         true
     }
 
     fn on_mouse_exit(&self, widget: &Rc<RefCell<Widget>>) -> bool {
         self.super_on_mouse_exit(widget);
         self.mouse_over.borrow_mut().state.clear_text_params();
+        self.area_state.borrow_mut().clear_cursors();
         true
     }
 }

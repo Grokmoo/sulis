@@ -1,4 +1,5 @@
 use grt::resource::{Actor, Area, ResourceSet};
+use grt::io::DrawList;
 
 use state::EntityState;
 use state::Location;
@@ -12,6 +13,8 @@ pub struct AreaState {
 
     entity_grid: Vec<Option<usize>>,
     display: Vec<char>,
+
+    cursors: Option<DrawList>,
 }
 
 impl PartialEq for AreaState {
@@ -34,6 +37,7 @@ impl AreaState {
             entities: Vec::new(),
             display,
             entity_grid,
+            cursors: None,
         }
     }
 
@@ -56,6 +60,21 @@ impl AreaState {
             debug!("Adding actor '{}' at '{:?}'", actor.id, location);
             area_state.borrow_mut().add_actor(actor, location);
         }
+    }
+
+    pub fn clear_cursors(&mut self) {
+        self.cursors = None;
+    }
+
+    pub fn add_cursor(&mut self, mut cursor: DrawList) {
+        match self.cursors {
+            None => self.cursors = Some(cursor),
+            Some(ref mut c) => c.append(&mut cursor),
+        };
+    }
+
+    pub fn get_cursors(&self) -> &Option<DrawList> {
+        &self.cursors
     }
 
     pub fn get_display(&self, x: i32, y: i32) -> char {

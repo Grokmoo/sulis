@@ -5,19 +5,33 @@ use grt::ui::{Button, Callback, Cursor, Label, list_box, ListBox, Widget, Widget
 use grt::io::event::ClickKind;
 use grt::util::Point;
 
-use state::{AreaState, GameState};
+use state::{AreaState, GameState, EntityState};
 
 pub struct ActionMenu {
     _area_state: Rc<RefCell<AreaState>>,
+    hovered_entity: Option<Rc<RefCell<EntityState>>>,
+    is_hover_pc: bool,
     area_pos: Point,
 }
 
 impl ActionMenu {
     pub fn new(area_state: Rc<RefCell<AreaState>>, x: i32, y: i32) -> Rc<ActionMenu> {
+        let (hovered_entity, is_hover_pc) =
+            if let Some(ref entity) = area_state.borrow().get_entity_at(x, y) {
+                (Some(Rc::clone(entity)), EntityState::is_pc(entity))
+            } else {
+                (None, false)
+            };
         Rc::new(ActionMenu {
             _area_state: area_state,
             area_pos: Point::new(x, y),
+            hovered_entity,
+            is_hover_pc,
         })
+    }
+
+    pub fn attack_callback(&self) -> Box<Fn()> {
+        Box::new( || { })
     }
 
     pub fn is_move_valid(&self) -> bool {
@@ -63,11 +77,23 @@ impl WidgetKind for ActionMenu {
         let title = Widget::with_theme(Label::empty(), "title");
 
         let mut entries: Vec<list_box::Entry> = Vec::new();
-        entries.push(list_box::Entry::new(
-                "Move",
-                ActionMenu::callback_with_removal(self.move_callback())
-                ));
+        if self.is_move_valid() {
+            entries.push(list_box::Entry::new(
+                    "Move", ActionMenu::callback_with_removal(self.move_callback())));
 
+        }
+
+        if let Some(ref _entity) = self.hovered_entity {
+            if !self.is_hover_pc {
+                entries.push(list_box::Entry::new(
+                        "Attack", ActionMenu::callback_with_removal(self.attack_callback())));
+            }
+        }
+
+        if entries.is_empty() {
+            entries.push(list_box::Entry::new(
+                    "None", ActionMenu::callback_with_removal(Box::new(|| { }))));
+        }
         let actions = Widget::with_theme(ListBox::new(entries), "actions");
 
         vec![title, actions]

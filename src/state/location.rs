@@ -22,7 +22,7 @@ impl PartialEq for Location {
     fn eq(&self, other: &Location) -> bool {
         if self.x != other.x || self.y != other.y { return false; }
 
-        if &self.area_state != &other.area_state { return false; }
+        if &self.area_id != &other.area_id { return false; }
 
         true
     }

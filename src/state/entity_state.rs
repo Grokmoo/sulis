@@ -1,8 +1,8 @@
 use grt::resource::{Actor, EntitySize, EntitySizeIterator};
-use state::Location;
-use state::ActorState;
+use state::{ActorState, GameState, Location};
 
 use std::rc::Rc;
+use std::cell::RefCell;
 
 #[derive(PartialEq)]
 pub struct EntityState {
@@ -50,6 +50,21 @@ impl EntityState {
 
     pub fn points(&self, x: i32, y: i32) -> EntitySizeIterator {
         self.size.points(x, y)
+    }
+
+    /// Returns true if `e1` and `e2` refer to the same EntityState, false
+    /// otherwise
+    pub fn equals(e1: &Rc<RefCell<EntityState>>, e2: &Rc<RefCell<EntityState>>) -> bool {
+        if e1.borrow().location != e2.borrow().location {
+            return false;
+        }
+
+        e1.borrow().index == e2.borrow().index
+    }
+
+    /// Returns true if `e` refers to the current selected PC, false otherwise
+    pub fn is_pc(e: &Rc<RefCell<EntityState>>) -> bool {
+        EntityState::equals(e, &GameState::pc())
     }
 }
 

@@ -55,8 +55,8 @@ impl AnimatedImage {
 }
 
 impl Image for AnimatedImage {
-    fn get_draw_list(&self, state: &AnimationState, position: &Point, size: &Size) -> DrawList {
-        AnimationState::find_match(&self.images, state).get_draw_list(state, position, size)
+    fn get_draw_list(&self, state: &AnimationState, x: f32, y: f32, w: f32, h: f32) -> DrawList {
+        AnimationState::find_match(&self.images, state).get_draw_list(state, x, y, w, h)
     }
 
     fn draw_text_mode(&self, renderer: &mut TextRenderer,
@@ -69,6 +69,14 @@ impl Image for AnimatedImage {
                       position: &Point, size: &Size) {
         AnimationState::find_match(&self.images, state)
             .fill_text_mode(renderer, state, position, size);
+    }
+
+    fn get_width_f32(&self) -> f32 {
+        self.size.width as f32
+    }
+
+    fn get_height_f32(&self) -> f32 {
+        self.size.height as f32
     }
 
     fn get_size(&self) -> &Size {

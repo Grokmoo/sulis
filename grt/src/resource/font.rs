@@ -43,12 +43,12 @@ impl Font {
         width
     }
 
-    pub fn get_draw_list(&self, text: &str, position: &Point, line_height: f32) -> DrawList {
+    pub fn get_draw_list(&self, text: &str, pos_x: f32, pos_y: f32, line_height: f32) -> DrawList {
         let scale_factor = line_height / self.line_height as f32;
         let mut quads: Vec<[Vertex; 4]> = Vec::new();
 
-        let mut x = position.x as f32;
-        let y = position.y as f32;
+        let mut x = pos_x;
+        let y = pos_y;
         for c in text.chars() {
             let font_char = match self.characters.get(&c) {
                 None => continue,

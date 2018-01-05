@@ -136,9 +136,11 @@ impl<'a> GliumDisplay<'a> {
 
     fn draw_widget_tree(&mut self, widget: Ref<Widget>, target: &mut glium::Frame, millis: u32) {
         if let Some(ref image) = widget.state.background {
-            self.draw(target, image.get_draw_list(&widget.state.animation_state,
-                                                  &widget.state.position,
-                                                  &widget.state.size));
+            let x = widget.state.position.x as f32;
+            let y = widget.state.position.y as f32;
+            let w = widget.state.size.width as f32;
+            let h = widget.state.size.height as f32;
+            self.draw(target, image.get_draw_list(&widget.state.animation_state, x, y, w, h));
         }
 
         for draw_list in widget.kind.get_draw_lists(&widget, millis) {

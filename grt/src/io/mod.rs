@@ -52,6 +52,9 @@ pub struct DrawList {
     pub color_filter: [f32; 4],
 }
 
+pub const GFX_BORDER_SCALE: f32 = 0.75;
+pub const TEXT_BORDER_SCALE: f32 = 0.0;
+
 impl DrawList {
     /// Creates an empty DrawList.  Attempting to draw an empty DrawList will most
     /// likely result in a panic, you must use `append` to add vertices to this list
@@ -74,11 +77,11 @@ impl DrawList {
         }
     }
 
-    pub fn from_sprite(sprite: &Rc<Sprite>, x: i32, y: i32, w: i32, h: i32) -> DrawList {
-        let x_min = x as f32;
-        let y_max = (CONFIG.display.height - y) as f32;
-        let x_max = x_min + w as f32;
-        let y_min = y_max - h as f32;
+    pub fn from_sprite_f32(sprite: &Rc<Sprite>, x: f32, y: f32, w: f32, h: f32) -> DrawList {
+        let x_min = x;
+        let y_max = CONFIG.display.height as f32 - y;
+        let x_max = x_min + w;
+        let y_min = y_max - h;
         let tc = &sprite.tex_coords;
 
         let quads = vec![[
@@ -94,6 +97,10 @@ impl DrawList {
             kind: DrawListKind::Sprite,
             color_filter: [1.0, 1.0, 1.0, 1.0],
         }
+    }
+
+    pub fn from_sprite(sprite: &Rc<Sprite>, x: i32, y: i32, w: i32, h: i32) -> DrawList {
+        DrawList::from_sprite_f32(sprite, x as f32, y as f32, w as f32, h as f32)
     }
 
     pub fn set_color(&mut self, red: f32, green: f32, blue: f32, alpha: f32) {

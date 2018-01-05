@@ -39,8 +39,8 @@ impl SimpleImage {
 }
 
 impl Image for SimpleImage {
-    fn get_draw_list(&self, _state: &AnimationState, position: &Point, size: &Size) -> DrawList {
-        DrawList::from_sprite(&self.image_display, position.x, position.y, size.width, size.height)
+    fn get_draw_list(&self, _state: &AnimationState, x: f32, y: f32, w: f32, h: f32) -> DrawList {
+        DrawList::from_sprite_f32(&self.image_display, x, y, w, h)
     }
 
     fn draw_text_mode(&self, renderer: &mut TextRenderer, _state: &AnimationState,
@@ -58,6 +58,14 @@ impl Image for SimpleImage {
             let end = start + self.size.height as usize;
             renderer.render_chars(&self.text_display[start..end]);
         }
+    }
+
+    fn get_width_f32(&self) -> f32 {
+        self.size.width as f32
+    }
+
+    fn get_height_f32(&self) -> f32 {
+        self.size.height as f32
     }
 
     fn get_size(&self) -> &Size {

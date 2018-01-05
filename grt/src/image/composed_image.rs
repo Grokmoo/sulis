@@ -4,7 +4,7 @@ use std::collections::HashMap;
 
 use image::Image;
 use resource::ResourceBuilder;
-use io::{DrawList, TextRenderer};
+use io::{self, DrawList, TextRenderer};
 use ui::AnimationState;
 use util::{Point, Size};
 
@@ -85,6 +85,14 @@ impl ComposedImage {
             middle_size,
         }))
     }
+
+    fn get_border_image_w(&self, image: &Rc<Image>) -> f32 {
+        image.get_width_f32() - io::GFX_BORDER_SCALE
+    }
+
+    fn get_border_image_h(&self, image: &Rc<Image>) -> f32 {
+        image.get_height_f32() - io::GFX_BORDER_SCALE
+    }
 }
 
 impl Image for ComposedImage {
@@ -160,56 +168,72 @@ impl Image for ComposedImage {
         }
     }
 
-    fn get_draw_list(&self, state: &AnimationState, position: &Point, size: &Size) -> DrawList {
-        let fill_size = *size - (self.size - self.middle_size);
-        let mut draw_pos = Point::from(position);
-        let mut draw_size = Size::from(&fill_size);
+    fn get_draw_list(&self, state: &AnimationState, x: f32, y: f32, w: f32, h: f32) -> DrawList {
+        let fill_width = 2.0 * io::GFX_BORDER_SCALE
+            + w - (self.size.width - self.middle_size.width) as f32;
+        let fill_height = 2.0 * io::GFX_BORDER_SCALE
+            + h - (self.size.height - self.middle_size.height) as f32;
 
-        let mut draw_list;
-        unsafe {
-            let image = self.images.get_unchecked(0);
-            draw_list = image.get_draw_list(state, &draw_pos, image.get_size());
+        let image = &self.images[0];
+        let mut draw_x = x;
+        let mut draw_y = y;
+        let mut draw_w = self.get_border_image_w(image);
+        let mut draw_h = self.get_border_image_h(image);
+        let mut draw_list = image.get_draw_list(state, draw_x, draw_y, draw_w, draw_h);
 
-            let image = self.images.get_unchecked(1);
-            draw_size.set_height(image.get_size().height);
-            draw_pos.add_x(image.get_size().width);
-            draw_list.append(&mut image.get_draw_list(state, &draw_pos, &draw_size));
+        draw_x += self.get_border_image_w(image);
+        let image = &self.images[1];
+        draw_w = fill_width;
+        draw_list.append(&mut image.get_draw_list(state, draw_x, draw_y, draw_w, draw_h));
 
-            let image = self.images.get_unchecked(2);
-            draw_pos.add_x(fill_size.width);
-            draw_list.append(&mut image.get_draw_list(state, &draw_pos, image.get_size()));
+        draw_x += fill_width;
+        let image = &self.images[2];
+        draw_w = self.get_border_image_w(image);
+        draw_list.append(&mut image.get_draw_list(state, draw_x, draw_y, draw_w, draw_h));
 
-            let image = self.images.get_unchecked(3);
-            draw_pos.set_x(position.x);
-            draw_pos.add_y(image.get_size().height);
-            draw_size.set(image.get_size().width, fill_size.height);
-            draw_list.append(&mut image.get_draw_list(state, &draw_pos, &draw_size));
+        draw_x = x;
+        draw_y += self.get_border_image_h(image);
+        let image = &self.images[3];
+        draw_w = self.get_border_image_w(image);
+        draw_h = fill_height;
+        draw_list.append(&mut image.get_draw_list(state, draw_x, draw_y, draw_w, draw_h));
 
-            let image = self.images.get_unchecked(4);
-            draw_pos.add_x(image.get_size().width);
-            draw_list.append(&mut image.get_draw_list(state, &draw_pos, &fill_size));
+        draw_x += self.get_border_image_w(image);
+        let image = &self.images[4];
+        draw_w = fill_width;
+        draw_list.append(&mut image.get_draw_list(state, draw_x, draw_y, draw_w, draw_h));
 
-            let image = self.images.get_unchecked(5);
-            draw_pos.add_x(fill_size.width);
-            draw_size.set_width(image.get_size().width);
-            draw_list.append(&mut image.get_draw_list(state, &draw_pos, &draw_size));
+        draw_x += fill_width;
+        let image = &self.images[5];
+        draw_w = self.get_border_image_w(image);
+        draw_list.append(&mut image.get_draw_list(state, draw_x, draw_y, draw_w, draw_h));
 
-            let image = self.images.get_unchecked(6);
-            draw_pos.add_y(fill_size.height);
-            draw_pos.set_x(position.x);
-            draw_list.append(&mut image.get_draw_list(state, &draw_pos, image.get_size()));
+        draw_x = x;
+        draw_y += fill_height;
+        let image = &self.images[6];
+        draw_w = self.get_border_image_w(image);
+        draw_h = self.get_border_image_h(image);
+        draw_list.append(&mut image.get_draw_list(state, draw_x, draw_y, draw_w, draw_h));
 
-            let image = self.images.get_unchecked(7);
-            draw_pos.add_x(image.get_size().width);
-            draw_size.set(fill_size.width, image.get_size().height);
-            draw_list.append(&mut image.get_draw_list(state, &draw_pos, &draw_size));
+        draw_x += self.get_border_image_w(image);
+        let image = &self.images[7];
+        draw_w = fill_width;
+        draw_list.append(&mut image.get_draw_list(state, draw_x, draw_y, draw_w, draw_h));
 
-            let image = self.images.get_unchecked(8);
-            draw_pos.add_x(fill_size.width);
-            draw_list.append(&mut image.get_draw_list(state, &draw_pos, image.get_size()));
-        }
+        draw_x += fill_width;
+        let image = &self.images[8];
+        draw_w = self.get_border_image_w(image);
+        draw_list.append(&mut image.get_draw_list(state, draw_x, draw_y, draw_w, draw_h));
 
         draw_list
+    }
+
+    fn get_width_f32(&self) -> f32 {
+        self.size.width as f32
+    }
+
+    fn get_height_f32(&self) -> f32 {
+        self.size.height as f32
     }
 
     fn get_size(&self) -> &Size {

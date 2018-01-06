@@ -39,10 +39,6 @@ impl Location {
         Location { x: p.x, y: p.y, area_state, area_id }
     }
 
-    pub fn equals(&self, x: i32, y: i32) -> bool {
-        return self.x == x && self.y == y
-    }
-
     pub fn move_to(&mut self, x: i32, y: i32) {
         self.x = x;
         self.y = y;

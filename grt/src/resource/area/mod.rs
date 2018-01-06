@@ -110,3 +110,8 @@ impl ResourceBuilder for AreaBuilder {
     }
 }
 
+#[derive(Deserialize, Debug)]
+pub struct AreaPosition {
+    pub area_id: String,
+    pub position: Point,
+}

@@ -54,36 +54,11 @@ children:
             border: [0, 0, 0, 0]
             width_relative: Max
             position: [0, 1]
-  exit_confirmation_window:
-    background: bg_base
-    border: [1, 1, 1, 1]
-    preferred_size: [25, 6]
-    x_relative: Center
-    y_relative: Center
-    children:
-      title:
-        text: "Exit Game?"
-        from: .label
-        width_relative: Max
-        preferred_size: [0, 1]
-        preferred_position: [0, 0]
-      cancel:
-        from: .button
-        text: "Cancel"
-        preferred_size: [10, 3]
-        preferred_position: [0, 2]
-        x_relative: Max
-        y_relative: Max
-      accept:
-        from: .button
-        text: "Exit"
-        preferred_size: [10, 3]
-        preferred_position: [0, 2]
-        y_relative: Max
   window:
     background: bg_base
     border: [1, 1, 1, 1]
-    preferred_size: [30, 0]
+    preferred_size: [30, -2]
+    position: [0, 1]
     height_relative: Max
     x_relative: Zero
     children:
@@ -99,7 +74,7 @@ children:
         x_relative: Max
   inventory_window:
     from: .window
-    position: [30, 0]
+    position: [30, 1]
     children:
       title:
         text: "Inventory"

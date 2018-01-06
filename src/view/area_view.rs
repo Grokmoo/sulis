@@ -3,7 +3,7 @@ use std::cell::RefCell;
 use std::cmp;
 
 use grt::ui::{Cursor, Label, WidgetKind, Widget};
-use grt::io::{DrawList, InputAction, TextRenderer};
+use grt::io::{DrawList, InputAction, TextRenderer, TextureMagFilter};
 use grt::io::event::ClickKind;
 use grt::util::Point;
 
@@ -44,16 +44,26 @@ impl AreaView {
         *self.cursors.borrow_mut() = Some(cursor);
     }
 
-    fn get_internal_cursor_pos(&self, widget: &Rc<RefCell<Widget>>) -> (i32, i32) {
+    fn get_cursor_pos_no_scroll(&self, widget: &Rc<RefCell<Widget>>) -> (i32, i32) {
+        self.get_cursor_pos_scaled(widget.borrow().state.position.x,
+            widget.borrow().state.position.y)
+    }
+
+    fn get_cursor_pos(&self, widget: &Rc<RefCell<Widget>>) -> (i32, i32) {
         let pos = widget.borrow().state.position;
-        let x = Cursor::get_x() - pos.x + widget.borrow().state.scroll_pos.x;
-        let y = Cursor::get_y() - pos.y + widget.borrow().state.scroll_pos.y;
+        self.get_cursor_pos_scaled(pos.x - widget.borrow().state.scroll_pos.x
+                                   , pos.y - widget.borrow().state.scroll_pos.y)
+    }
+
+    fn get_cursor_pos_scaled(&self, pos_x: i32, pos_y: i32) -> (i32, i32) {
+        let mut x = Cursor::get_x_f32() - pos_x as f32;
+        let mut y = Cursor::get_y_f32() - pos_y as f32;
 
         let (scale_x, scale_y) = *self.scale.borrow();
-        let xf = x as f32 / scale_x;
-        let yf = y as f32 / scale_y;
+        x = x / scale_x;
+        y = y / scale_y;
 
-        (xf.round() as i32, yf.round() as i32)
+        (x as i32, y as i32)
     }
 }
 
@@ -111,6 +121,7 @@ impl WidgetKind for AreaView {
 
         let mut draw_list = DrawList::empty_sprite();
         draw_list.set_scale(scale_x, scale_y);
+        draw_list.texture_mag_filter = TextureMagFilter::Nearest;
         for y in 0..max_y {
             for x in 0..max_x {
                 let area_x = x + widget.state.scroll_pos.x;
@@ -162,7 +173,7 @@ impl WidgetKind for AreaView {
 
     fn on_mouse_release(&self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
         self.super_on_mouse_release(widget, kind);
-        let (x, y) = self.get_internal_cursor_pos(widget);
+        let (x, y) = self.get_cursor_pos(widget);
         if x < 0 || y < 0 { return true; }
 
         let action_menu = ActionMenu::new(Rc::clone(&self.area_state), x, y);
@@ -176,7 +187,7 @@ impl WidgetKind for AreaView {
     }
 
     fn on_mouse_move(&self, widget: &Rc<RefCell<Widget>>) -> bool {
-        let (area_x, area_y) = self.get_internal_cursor_pos(widget);
+        let (area_x, area_y) = self.get_cursor_pos(widget);
 
         {
             let ref mut state = self.mouse_over.borrow_mut().state;
@@ -207,8 +218,10 @@ impl WidgetKind for AreaView {
         } else {
             let pc = GameState::pc();
             let size = pc.borrow().size();
+
+            let (c_x, c_y) = self.get_cursor_pos_no_scroll(widget);
             let mut draw_list = DrawList::from_sprite(&pc.borrow().size.cursor_sprite,
-                area_x - size / 2, area_y - size / 2, size, size);
+                c_x - size / 2, c_y - size / 2, size, size);
 
             let action_menu = ActionMenu::new(Rc::clone(&self.area_state), area_x, area_y);
             if !action_menu.is_default_callback_valid() {

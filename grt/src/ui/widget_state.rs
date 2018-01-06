@@ -108,6 +108,7 @@ impl WidgetState {
 
     pub fn set_max_scroll_pos(&mut self, x: i32, y: i32) {
         self.max_scroll_pos.set(x, y);
+        self.scroll_pos.min(x, y);
     }
 
     /// Adds a text param to the list of text params stored in this

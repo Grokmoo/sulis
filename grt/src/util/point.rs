@@ -1,5 +1,6 @@
 use std::fmt;
 use std::ops;
+use std::cmp;
 
 use ui::Border;
 
@@ -54,6 +55,16 @@ impl Point {
 
     pub fn set_y(&mut self, y: i32) {
         self.y = y;
+    }
+
+    pub fn min(&mut self, x: i32, y: i32) {
+        self.x = cmp::min(self.x, x);
+        self.y = cmp::min(self.y, y);
+    }
+
+    pub fn max(&mut self, x: i32, y: i32) {
+        self.x = cmp::max(self.x, x);
+        self.y = cmp::max(self.y, y);
     }
 
     pub fn new_vec(data: Vec<(i32, i32)>) -> Vec<Point> {

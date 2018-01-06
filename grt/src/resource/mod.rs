@@ -4,7 +4,7 @@ mod generator;
 mod game;
 pub use self::game::Game;
 
-mod area;
+pub mod area;
 pub use self::area::Area;
 
 mod terrain;

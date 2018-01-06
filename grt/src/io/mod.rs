@@ -38,7 +38,23 @@ pub trait TextRenderer {
     fn set_cursor_pos(&mut self, x: i32, y: i32);
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Copy, Clone)]
+pub enum TextureMagFilter {
+    Nearest,
+    Linear,
+}
+
+#[derive(Debug, Copy, Clone)]
+pub enum TextureMinFilter {
+    Nearest,
+    Linear,
+    NearestMipmapNearest,
+    LinearMipmapNearest,
+    NearestMipmapLinear,
+    LinearMipmapLinear,
+}
+
+#[derive(Debug, Copy, Clone)]
 pub enum DrawListKind {
     Font,
     Sprite,
@@ -48,6 +64,8 @@ pub enum DrawListKind {
 pub struct DrawList {
     pub quads: Vec<[Vertex; 4]>,
     pub texture: String,
+    pub texture_mag_filter: TextureMagFilter,
+    pub texture_min_filter: TextureMinFilter,
     pub kind: DrawListKind,
     pub color_filter: [f32; 4],
     pub scale: [f32; 2],
@@ -56,18 +74,26 @@ pub struct DrawList {
 pub const GFX_BORDER_SCALE: f32 = 0.75;
 pub const TEXT_BORDER_SCALE: f32 = 0.0;
 
+impl Default for DrawList {
+    fn default() -> DrawList {
+        DrawList {
+            quads: Vec::new(),
+            texture: String::new(),
+            texture_mag_filter: TextureMagFilter::Linear,
+            texture_min_filter: TextureMinFilter::Linear,
+            kind: DrawListKind::Sprite,
+            color_filter: [1.0, 1.0, 1.0, 1.0],
+            scale: [1.0, 1.0],
+        }
+    }
+}
+
 impl DrawList {
     /// Creates an empty DrawList.  Attempting to draw an empty DrawList will most
     /// likely result in a panic, you must use `append` to add vertices to this list
     /// if you intend to draw it.
     pub fn empty_sprite() -> DrawList {
-        DrawList {
-            quads: Vec::new(),
-            texture: String::new(),
-            kind: DrawListKind::Sprite,
-            color_filter: [1.0, 1.0, 1.0, 1.0],
-            scale: [1.0, 1.0],
-        }
+        Default::default()
     }
 
     pub fn from_font(texture: &str, quads: Vec<[Vertex; 4]>) -> DrawList {
@@ -75,8 +101,7 @@ impl DrawList {
             texture: texture.to_string(),
             quads,
             kind: DrawListKind::Font,
-            color_filter: [1.0, 1.0, 1.0, 1.0],
-            scale: [1.0, 1.0],
+            ..Default::default()
         }
     }
 
@@ -97,9 +122,7 @@ impl DrawList {
         DrawList {
             texture: sprite.id.to_string(),
             quads,
-            kind: DrawListKind::Sprite,
-            color_filter: [1.0, 1.0, 1.0, 1.0],
-            scale: [1.0, 1.0],
+            ..Default::default()
         }
     }
 

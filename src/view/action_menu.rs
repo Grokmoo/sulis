@@ -8,7 +8,7 @@ use grt::util::Point;
 use state::{AreaState, GameState, EntityState};
 
 pub struct ActionMenu {
-    _area_state: Rc<RefCell<AreaState>>,
+    area_state: Rc<RefCell<AreaState>>,
     hovered_entity: Option<Rc<RefCell<EntityState>>>,
     is_hover_pc: bool,
     area_pos: Point,
@@ -23,7 +23,7 @@ impl ActionMenu {
                 (None, false)
             };
         Rc::new(ActionMenu {
-            _area_state: area_state,
+            area_state: area_state,
             area_pos: Point::new(x, y),
             hovered_entity,
             is_hover_pc,
@@ -37,7 +37,10 @@ impl ActionMenu {
     pub fn is_move_valid(&self) -> bool {
         let pc = GameState::pc();
         let size = pc.borrow().size();
-        GameState::can_pc_move_to(self.area_pos.x - size / 2, self.area_pos.y - size / 2)
+        let ok = self.area_state.borrow().is_passable(&pc.borrow(),
+            self.area_pos.x - size / 2,
+            self.area_pos.y - size / 2);
+        ok
     }
 
     pub fn move_callback(&self) -> Box<Fn()> {

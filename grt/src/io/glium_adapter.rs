@@ -3,7 +3,7 @@ use std::cell::{Ref, RefCell};
 use std::rc::Rc;
 
 use config::CONFIG;
-use io::{DrawList, DrawListKind, InputAction, KeyboardEvent, IO};
+use io::{DrawList, DrawListKind, InputAction, KeyboardEvent, IO, TextureMinFilter, TextureMagFilter};
 use io::keyboard_event::Key;
 use io::event::ClickKind;
 use resource::ResourceSet;
@@ -86,12 +86,12 @@ impl<'a> GliumDisplay<'a> {
         }
     }
 
-    fn create_texture_if_missing(&mut self, texture_id: &str, kind: DrawListKind) {
+    fn create_texture_if_missing(&mut self, texture_id: &str, draw_list: &DrawList) {
         if self.textures.get(texture_id).is_some() {
             return;
         }
 
-        let image = match kind {
+        let image = match draw_list.kind {
             DrawListKind::Sprite => ResourceSet::get_spritesheet(&texture_id)
                 .unwrap().image.clone(),
             DrawListKind::Font => ResourceSet::get_font(&texture_id)
@@ -101,21 +101,30 @@ impl<'a> GliumDisplay<'a> {
         let image = RawImage2d::from_raw_rgba_reversed(&image.into_raw()
                                                                        , dims);
         let texture = SrgbTexture2d::new(&self.display, image).unwrap();
-        let sampler_fn: Box<Fn(Sampler<SrgbTexture2d>) -> Sampler<SrgbTexture2d>> = match kind {
-            DrawListKind::Sprite =>
-                Box::new(|sampler| {
-                    sampler.magnify_filter(MagnifySamplerFilter::Nearest)
-                        .minify_filter(MinifySamplerFilter::NearestMipmapLinear)
-                }),
-            DrawListKind::Font =>
-                Box::new(|sampler| sampler.minify_filter(MinifySamplerFilter::Linear)),
-        };
+
+        let mag_filter = draw_list.texture_mag_filter;
+        let min_filter = draw_list.texture_min_filter;
+        let sampler_fn: Box<Fn(Sampler<SrgbTexture2d>) -> Sampler<SrgbTexture2d>> =
+            Box::new(move |sampler| {
+                sampler.magnify_filter(get_mag_filter(mag_filter))
+                    .minify_filter(get_min_filter(min_filter))
+            });
+
+        // let sampler_fn: Box<Fn(Sampler<SrgbTexture2d>) -> Sampler<SrgbTexture2d>> = match kind {
+        //     DrawListKind::Sprite =>
+        //         Box::new(|sampler| {
+        //             sampler.magnify_filter(MagnifySamplerFilter::Nearest)
+        //                 .minify_filter(MinifySamplerFilter::NearestMipmapLinear)
+        //         }),
+        //     DrawListKind::Font =>
+        //         Box::new(|sampler| sampler.minify_filter(MinifySamplerFilter::Linear)),
+        // };
 
         self.textures.insert(texture_id.to_string(), GliumTexture { texture, sampler_fn });
     }
 
     fn draw(&mut self, target: &mut glium::Frame, draw_list: DrawList) {
-        self.create_texture_if_missing(&draw_list.texture, draw_list.kind);
+        self.create_texture_if_missing(&draw_list.texture, &draw_list);
 
         let glium_texture = match self.textures.get(&draw_list.texture) {
             None => return,
@@ -160,6 +169,24 @@ impl<'a> GliumDisplay<'a> {
         for child in widget.children.iter() {
             self.draw_widget_tree(child.borrow(), target, millis);
         }
+    }
+}
+
+fn get_mag_filter(filter: TextureMagFilter) -> MagnifySamplerFilter {
+    match filter {
+        TextureMagFilter::Nearest => MagnifySamplerFilter::Nearest,
+        TextureMagFilter::Linear => MagnifySamplerFilter::Linear,
+    }
+}
+
+fn get_min_filter(filter: TextureMinFilter) -> MinifySamplerFilter {
+    match filter {
+        TextureMinFilter::Nearest => MinifySamplerFilter::Nearest,
+        TextureMinFilter::Linear => MinifySamplerFilter::Linear,
+        TextureMinFilter::NearestMipmapNearest => MinifySamplerFilter::NearestMipmapNearest,
+        TextureMinFilter::LinearMipmapNearest => MinifySamplerFilter::LinearMipmapNearest,
+        TextureMinFilter::NearestMipmapLinear => MinifySamplerFilter::NearestMipmapLinear,
+        TextureMinFilter::LinearMipmapLinear => MinifySamplerFilter::LinearMipmapLinear,
     }
 }
 

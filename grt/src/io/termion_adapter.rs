@@ -7,7 +7,8 @@ use config::CONFIG;
 use io::{self, InputAction, KeyboardEvent, IO};
 use io::keyboard_event::Key;
 use io::buffered_text_renderer::BufferedTextRenderer;
-use ui::{Cursor, Widget, Size};
+use ui::{Cursor, Widget};
+use util::Size;
 
 use termion::screen::*;
 use termion::{self, async_stdin};

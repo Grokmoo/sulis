@@ -1,4 +1,5 @@
 use grt::resource::{Actor, Area, ResourceSet};
+use grt::resource::area::Transition;
 
 use state::EntityState;
 use state::Location;
@@ -11,6 +12,7 @@ pub struct AreaState {
     pub entities: Vec<Rc<RefCell<EntityState>>>,
 
     entity_grid: Vec<Option<usize>>,
+    transition_grid: Vec<Option<usize>>,
     display: Vec<char>,
 }
 
@@ -28,10 +30,12 @@ impl AreaState {
         }
 
         let entity_grid = vec![None;(area.width * area.height) as usize];
+        let transition_grid = vec![None;(area.width * area.height) as usize];
 
         AreaState {
             area,
             entities: Vec::new(),
+            transition_grid,
             display,
             entity_grid,
         }
@@ -55,6 +59,16 @@ impl AreaState {
                                                 Rc::clone(&area_state));
             debug!("Adding actor '{}' at '{:?}'", actor.id, location);
             area_state.borrow_mut().add_actor(actor, location);
+        }
+
+        for (index, transition) in area.transitions.iter().enumerate() {
+            debug!("Adding transition '{}' at '{:?}'", index, transition.from);
+            for y in 0..transition.size.height {
+                for x in 0..transition.size.width {
+                    area_state.borrow_mut().transition_grid[(transition.from.x + x +
+                        (transition.from.y + y) * area.width) as usize] = Some(index);
+                }
+            }
         }
     }
 
@@ -83,6 +97,17 @@ impl AreaState {
         };
 
         self.entities.get(index)
+    }
+
+    pub fn get_transition_at(&self, x: i32, y: i32) -> Option<&Transition> {
+        if !self.area.coords_valid(x, y) { return None; }
+
+        let index = match self.transition_grid[(x + y * self.area.width) as usize] {
+            None => return None,
+            Some(index) => index,
+        };
+
+        self.area.transitions.get(index)
     }
 
     fn point_entities_passable(&self, requester: &Ref<EntityState>,

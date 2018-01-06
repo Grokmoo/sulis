@@ -6,5 +6,6 @@
 
     "terrain": { },
     "actors": [ ],
+    "transitions": [ ],
     "generate": true
 }

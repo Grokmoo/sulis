@@ -9,7 +9,7 @@ use serde_yaml;
 pub struct Actor {
     pub id: String,
     pub player: bool,
-    pub display: char,
+    pub text_display: char,
     pub image_display: Rc<Sprite>,
     pub default_size: Rc<EntitySize>,
     pub items: Vec<Rc<Item>>,
@@ -54,7 +54,7 @@ impl Actor {
         Ok(Actor {
             id: builder.id,
             player: builder.player.unwrap_or(false),
-            display: builder.display,
+            text_display: builder.text_display,
             image_display: sprite,
             default_size: default_size,
             items,
@@ -66,7 +66,7 @@ impl Actor {
 pub struct ActorBuilder {
     pub id: String,
     pub player: Option<bool>,
-    pub display: char,
+    pub text_display: char,
     pub image_display: String,
     pub default_size: usize,
     pub items: Option<Vec<String>>,

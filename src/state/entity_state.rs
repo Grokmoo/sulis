@@ -37,7 +37,7 @@ impl EntityState {
     }
 
     pub(in state) fn display(&self) -> char {
-        self.actor.actor.display
+        self.actor.actor.text_display
     }
 
     pub fn size(&self) -> i32 {

@@ -138,6 +138,14 @@ impl WidgetKind for AreaView {
             }
         }
 
+        for transition in area.transitions.iter() {
+            draw_list.append(&mut DrawList::from_sprite(
+                    &transition.image_display,
+                    transition.from.x + p.x - widget.state.scroll_pos.x,
+                    transition.from.y + p.y - widget.state.scroll_pos.y,
+                    transition.size.width, transition.size.height));
+        }
+
         for entity in state.entities.iter() {
             let entity = entity.borrow();
             draw_list.append(&mut DrawList::from_sprite(

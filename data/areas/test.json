@@ -43,5 +43,15 @@
         "id": "goblin",
         "location": [ 24, 5 ]
       }
+    ],
+    "transitions": [
+      {
+        "from": [ 10, 10 ],
+        "size": [ 2, 2],
+        "to": [ 5, 5],
+        "to_area": "test_generate",
+        "image_display": "tiles/transition",
+        "text_display": "*"
+      }
     ]
 }

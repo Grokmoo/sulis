@@ -30,6 +30,10 @@ impl ActionMenu {
         })
     }
 
+    pub fn transition_callback(&self) -> Box<Fn()> {
+        Box::new( || { })
+    }
+
     pub fn attack_callback(&self) -> Box<Fn()> {
         Box::new( || { })
     }
@@ -91,6 +95,12 @@ impl WidgetKind for ActionMenu {
                 entries.push(list_box::Entry::new(
                         "Attack", ActionMenu::callback_with_removal(self.attack_callback())));
             }
+        }
+
+        if let Some(ref transition) = self.area_state.borrow()
+            .get_transition_at(self.area_pos.x, self.area_pos.y) {
+            entries.push(list_box::Entry::new(
+                    "Transition", ActionMenu::callback_with_removal(self.transition_callback())));
         }
 
         if entries.is_empty() {

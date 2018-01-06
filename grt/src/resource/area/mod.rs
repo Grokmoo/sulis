@@ -5,12 +5,21 @@ use std::collections::HashMap;
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 
-use resource::ResourceBuilder;
-use resource::{Terrain, ResourceSet};
-use util::Point;
+use resource::{Terrain, ResourceBuilder, ResourceSet, Sprite};
+use util::{Point, Size};
 
 use serde_json;
 use serde_yaml;
+
+#[derive(Debug)]
+pub struct Transition {
+    pub from: Point,
+    pub size: Size,
+    pub to: Point,
+    pub to_area: Option<String>,
+    pub image_display: Rc<Sprite>,
+    pub text_display: char,
+}
 
 #[derive(Deserialize, Debug)]
 pub struct ActorData {
@@ -26,6 +35,7 @@ pub struct Area {
     pub terrain: Terrain,
     path_grids: HashMap<i32, PathFinderGrid>,
     pub actors: Vec<ActorData>,
+    pub transitions: Vec<Transition>,
 }
 
 impl PartialEq for Area {
@@ -55,6 +65,32 @@ impl Area {
 
         // TODO validate position of each actor
 
+        let mut transitions: Vec<Transition> = Vec::new();
+        for (index, t_builder) in builder.transitions.into_iter().enumerate() {
+            let sprite = resources.get_sprite(&t_builder.image_display)?;
+
+            let mut p = t_builder.from;
+            if !p.in_bounds(builder.width as i32, builder.height as i32) {
+                warn!("Transition {} falls outside area bounds", index);
+                continue;
+            }
+            p.add(t_builder.size.width, t_builder.size.height);
+            if !p.in_bounds(builder.width as i32, builder.height as i32) {
+                warn!("Transition {} falls outside area bounds", index);
+                continue;
+            }
+
+            let transition = Transition {
+                from: t_builder.from,
+                to: t_builder.to,
+                size: t_builder.size,
+                to_area: t_builder.to_area,
+                text_display: t_builder.text_display,
+                image_display: sprite,
+            };
+            transitions.push(transition);
+        }
+
         Ok(Area {
             id: builder.id,
             name: builder.name,
@@ -63,6 +99,7 @@ impl Area {
             terrain: terrain,
             path_grids: path_grids,
             actors: builder.actors,
+            transitions,
         })
     }
 
@@ -87,6 +124,7 @@ pub struct AreaBuilder {
     pub terrain: HashMap<String, Vec<Vec<usize>>>,
     pub generate: bool,
     actors: Vec<ActorData>,
+    transitions: Vec<TransitionBuilder>,
 }
 
 impl ResourceBuilder for AreaBuilder {
@@ -111,7 +149,11 @@ impl ResourceBuilder for AreaBuilder {
 }
 
 #[derive(Deserialize, Debug)]
-pub struct AreaPosition {
-    pub area_id: String,
-    pub position: Point,
+pub struct TransitionBuilder {
+    pub from: Point,
+    pub size: Size,
+    pub to: Point,
+    pub to_area: Option<String>,
+    pub image_display: String,
+    pub text_display: char,
 }

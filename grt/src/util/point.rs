@@ -22,6 +22,10 @@ impl Point {
         Point { x: other.x, y: other.y }
     }
 
+    pub fn from_tuple(other: (u32, u32)) -> Point {
+        Point { x: other.0 as i32, y: other.1 as i32 }
+    }
+
     pub fn add(&self, x: i32, y: i32) -> Point {
         Point { x: &self.x + x, y: &self.y + y }
     }

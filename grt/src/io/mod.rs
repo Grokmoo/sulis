@@ -50,6 +50,7 @@ pub struct DrawList {
     pub texture: String,
     pub kind: DrawListKind,
     pub color_filter: [f32; 4],
+    pub scale: [f32; 2],
 }
 
 pub const GFX_BORDER_SCALE: f32 = 0.75;
@@ -65,6 +66,7 @@ impl DrawList {
             texture: String::new(),
             kind: DrawListKind::Sprite,
             color_filter: [1.0, 1.0, 1.0, 1.0],
+            scale: [1.0, 1.0],
         }
     }
 
@@ -74,6 +76,7 @@ impl DrawList {
             quads,
             kind: DrawListKind::Font,
             color_filter: [1.0, 1.0, 1.0, 1.0],
+            scale: [1.0, 1.0],
         }
     }
 
@@ -96,11 +99,16 @@ impl DrawList {
             quads,
             kind: DrawListKind::Sprite,
             color_filter: [1.0, 1.0, 1.0, 1.0],
+            scale: [1.0, 1.0],
         }
     }
 
     pub fn from_sprite(sprite: &Rc<Sprite>, x: i32, y: i32, w: i32, h: i32) -> DrawList {
         DrawList::from_sprite_f32(sprite, x as f32, y as f32, w as f32, h as f32)
+    }
+
+    pub fn set_scale(&mut self, scale_x: f32, scale_y: f32) {
+        self.scale = [scale_x, scale_y];
     }
 
     pub fn set_color(&mut self, red: f32, green: f32, blue: f32, alpha: f32) {

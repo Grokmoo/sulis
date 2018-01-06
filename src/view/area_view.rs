@@ -5,6 +5,7 @@ use std::cmp;
 use grt::ui::{Cursor, Label, WidgetKind, Widget};
 use grt::io::{DrawList, InputAction, TextRenderer};
 use grt::io::event::ClickKind;
+use grt::util::Point;
 
 use view::ActionMenu;
 use state::{AreaState, GameState};
@@ -12,6 +13,8 @@ use state::{AreaState, GameState};
 pub struct AreaView {
     area_state: Rc<RefCell<AreaState>>,
     mouse_over: Rc<RefCell<Widget>>,
+    scale: RefCell<(f32, f32)>,
+    cursors: RefCell<Option<DrawList>>,
 }
 
 impl AreaView {
@@ -20,9 +23,38 @@ impl AreaView {
         Rc::new(AreaView {
             area_state: Rc::clone(area_state),
             mouse_over: mouse_over,
+            scale: RefCell::new((1.0, 1.0)),
+            cursors: RefCell::new(None),
         })
     }
 
+    pub fn clear_cursors(&self) {
+        *self.cursors.borrow_mut() = None;
+    }
+
+    pub fn add_cursor(&self, mut cursor: DrawList) {
+        match *self.cursors.borrow_mut() {
+            Some(ref mut c) => {
+                c.append(&mut cursor);
+                return;
+            },
+            None => {},
+        };
+
+        *self.cursors.borrow_mut() = Some(cursor);
+    }
+
+    fn get_internal_cursor_pos(&self, widget: &Rc<RefCell<Widget>>) -> (i32, i32) {
+        let pos = widget.borrow().state.position;
+        let x = Cursor::get_x() - pos.x + widget.borrow().state.scroll_pos.x;
+        let y = Cursor::get_y() - pos.y + widget.borrow().state.scroll_pos.y;
+
+        let (scale_x, scale_y) = *self.scale.borrow();
+        let xf = x as f32 / scale_x;
+        let yf = y as f32 / scale_y;
+
+        (xf.round() as i32, yf.round() as i32)
+    }
 }
 
 impl WidgetKind for AreaView {
@@ -62,17 +94,23 @@ impl WidgetKind for AreaView {
         }
     }
 
-    fn get_draw_lists(&self, widget: &Widget, _millis: u32) -> Vec<DrawList> {
+    fn get_draw_lists(&self, widget: &Widget, pixel_size: Point, _millis: u32) -> Vec<DrawList> {
+        let scale_x = 1600.0 / (pixel_size.x as f32);
+        let scale_y = 900.0 / (pixel_size.y as f32);
+        *self.scale.borrow_mut() = (scale_x, scale_y);
+
         let p = widget.state.inner_position;
-        let s = widget.state.inner_size;
+        let inner_width = (widget.state.inner_size.width as f32 / scale_x).round() as i32;
+        let inner_height = (widget.state.inner_size.height as f32 / scale_y).round() as i32;
 
         let state = self.area_state.borrow();
         let ref area = state.area;
 
-        let max_x = cmp::min(s.width, area.width - widget.state.scroll_pos.x);
-        let max_y = cmp::min(s.height, area.height - widget.state.scroll_pos.y);
+        let max_x = cmp::min(inner_width, area.width - widget.state.scroll_pos.x);
+        let max_y = cmp::min(inner_height, area.height - widget.state.scroll_pos.y);
 
         let mut draw_list = DrawList::empty_sprite();
+        draw_list.set_scale(scale_x, scale_y);
         for y in 0..max_y {
             for x in 0..max_x {
                 let area_x = x + widget.state.scroll_pos.x;
@@ -100,15 +138,16 @@ impl WidgetKind for AreaView {
 
 
         let mut draw_lists = vec![draw_list];
-        if let &Some(ref cursor) = self.area_state.borrow().get_cursors() {
-            draw_lists.push(cursor.clone());
+        if let Some(ref cursor) = *self.cursors.borrow() {
+            let mut draw_list = cursor.clone();
+            draw_list.set_scale(scale_x, scale_y);
+            draw_lists.push(draw_list);
         }
 
         draw_lists
     }
 
     fn on_key_press(&self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
-
         use grt::io::InputAction::*;
         match key {
            ScrollUp => widget.borrow_mut().state.scroll(0, -1),
@@ -120,11 +159,10 @@ impl WidgetKind for AreaView {
         true
     }
 
+
     fn on_mouse_release(&self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
         self.super_on_mouse_release(widget, kind);
-        let pos = widget.borrow().state.position;
-        let x = Cursor::get_x() - pos.x + widget.borrow().state.scroll_pos.x;
-        let y = Cursor::get_y() - pos.y + widget.borrow().state.scroll_pos.y;
+        let (x, y) = self.get_internal_cursor_pos(widget);
         if x < 0 || y < 0 { return true; }
 
         let action_menu = ActionMenu::new(Rc::clone(&self.area_state), x, y);
@@ -138,9 +176,7 @@ impl WidgetKind for AreaView {
     }
 
     fn on_mouse_move(&self, widget: &Rc<RefCell<Widget>>) -> bool {
-        let pos = widget.borrow().state.position;
-        let area_x = Cursor::get_x() - pos.x + widget.borrow().state.scroll_pos.x;
-        let area_y = Cursor::get_y() - pos.y + widget.borrow().state.scroll_pos.y;
+        let (area_x, area_y) = self.get_internal_cursor_pos(widget);
 
         {
             let ref mut state = self.mouse_over.borrow_mut().state;
@@ -164,22 +200,22 @@ impl WidgetKind for AreaView {
             }
         }
 
-        self.area_state.borrow_mut().clear_cursors();
+        self.clear_cursors();
         if let Some(mut cursor_draw_list) = cursor_draw_list {
             cursor_draw_list.set_color(1.0, 0.0, 0.0, 1.0);
-            self.area_state.borrow_mut().add_cursor(cursor_draw_list);
+            self.add_cursor(cursor_draw_list);
         } else {
             let pc = GameState::pc();
             let size = pc.borrow().size();
             let mut draw_list = DrawList::from_sprite(&pc.borrow().size.cursor_sprite,
-                Cursor::get_x() - size / 2, Cursor::get_y() - size / 2, size, size);
+                area_x - size / 2, area_y - size / 2, size, size);
 
             let action_menu = ActionMenu::new(Rc::clone(&self.area_state), area_x, area_y);
             if !action_menu.is_default_callback_valid() {
                 draw_list.set_color(1.0, 0.0, 0.0, 1.0);
             }
 
-            self.area_state.borrow_mut().add_cursor(draw_list);
+            self.add_cursor(draw_list);
         }
         true
     }
@@ -187,7 +223,7 @@ impl WidgetKind for AreaView {
     fn on_mouse_exit(&self, widget: &Rc<RefCell<Widget>>) -> bool {
         self.super_on_mouse_exit(widget);
         self.mouse_over.borrow_mut().state.clear_text_params();
-        self.area_state.borrow_mut().clear_cursors();
+        self.clear_cursors();
         true
     }
 }

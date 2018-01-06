@@ -20,7 +20,7 @@ pub enum InputAction {
     ToggleInventory,
     ToggleCharacter,
     Exit,
-    MouseMove(i32, i32),
+    MouseMove(f32, f32),
     MouseDown(ClickKind),
     MouseUp(ClickKind),
 }
@@ -37,10 +37,10 @@ impl InputAction {
         Widget::remove_mouse_over(&root);
         use io::InputAction::*;
         match action {
-            MoveCursorUp => Cursor::move_by(&root, 0, -1),
-            MoveCursorDown => Cursor::move_by(&root, 0, 1),
-            MoveCursorLeft => Cursor::move_by(&root, -1, 0),
-            MoveCursorRight => Cursor::move_by(&root, 1, 0),
+            MoveCursorUp => Cursor::move_by(&root, 0.0, -1.0),
+            MoveCursorDown => Cursor::move_by(&root, 0.0, 1.0),
+            MoveCursorLeft => Cursor::move_by(&root, -1.0, 0.0),
+            MoveCursorRight => Cursor::move_by(&root, 1.0, 0.0),
             ClickCursor => {
                 Cursor::press(&root, ClickKind::Left);
                 Cursor::release(&root, ClickKind::Left)

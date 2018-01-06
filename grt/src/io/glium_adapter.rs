@@ -7,7 +7,8 @@ use io::{DrawList, DrawListKind, InputAction, KeyboardEvent, IO};
 use io::keyboard_event::Key;
 use io::event::ClickKind;
 use resource::ResourceSet;
-use ui::{Cursor, Widget};
+use ui::Widget;
+use util::Point;
 
 use glium::{self, Surface, glutin};
 use glium::glutin::VirtualKeyCode;
@@ -20,9 +21,10 @@ const VERTEX_SHADER_SRC: &'static str = r#"
   in vec2 tex_coords;
   out vec2 v_tex_coords;
   uniform mat4 matrix;
+  uniform mat4 scale;
   void main() {
     v_tex_coords = tex_coords;
-    gl_Position = matrix * vec4(position, 0.0, 1.0);
+    gl_Position = scale * matrix * vec4(position, 0.0, 1.0);
   }
 "#;
 
@@ -124,6 +126,12 @@ impl<'a> GliumDisplay<'a> {
             matrix: self.matrix,
             tex: (glium_texture.sampler_fn)(glium_texture.texture.sampled()),
             color_filter: draw_list.color_filter,
+            scale: [
+                [draw_list.scale[0], 0.0, 0.0, 0.0],
+                [0.0, draw_list.scale[1], 0.0, 0.0],
+                [0.0, 0.0, 1.0, 0.0],
+                [draw_list.scale[0] - 1.0, 1.0 - draw_list.scale[1], 0.0, 1.0f32],
+            ],
         };
 
         for quad in draw_list.quads {
@@ -135,6 +143,8 @@ impl<'a> GliumDisplay<'a> {
     }
 
     fn draw_widget_tree(&mut self, widget: Ref<Widget>, target: &mut glium::Frame, millis: u32) {
+        let pixel_size = Point::from_tuple(target.get_dimensions());
+
         if let Some(ref image) = widget.state.background {
             let x = widget.state.position.x as f32;
             let y = widget.state.position.y as f32;
@@ -143,7 +153,7 @@ impl<'a> GliumDisplay<'a> {
             self.draw(target, image.get_draw_list(&widget.state.animation_state, x, y, w, h));
         }
 
-        for draw_list in widget.kind.get_draw_lists(&widget, millis) {
+        for draw_list in widget.kind.get_draw_lists(&widget, pixel_size, millis) {
             self.draw(target, draw_list);
         }
 
@@ -161,14 +171,10 @@ fn process_window_event(event: glutin::WindowEvent,
         KeyboardInput { input, .. } => CONFIG.get_input_action(process_keyboard_input(input)),
         CursorMoved { position, .. } => {
             let (width, height) = display_size.unwrap();
-            let mouse_x = (CONFIG.display.width as f64 * position.0 / width as f64) as i32;
-            let mouse_y = (CONFIG.display.height as f64 * position.1 / height as f64) as i32;
+            let mouse_x = (CONFIG.display.width as f64 * position.0 / width as f64) as f32;
+            let mouse_y = (CONFIG.display.height as f64 * position.1 / height as f64) as f32;
 
-            if mouse_x == Cursor::get_x() && mouse_y == Cursor::get_y() {
-                None
-            } else {
-                Some(InputAction::MouseMove(mouse_x, mouse_y))
-            }
+            Some(InputAction::MouseMove(mouse_x, mouse_y))
         },
         MouseInput { state, button, .. } => {
             let kind = match button {

@@ -3,7 +3,8 @@ use std::cmp;
 
 use ui::theme::{HorizontalTextAlignment, VerticalTextAlignment};
 use ui::{Widget, WidgetKind};
-use io::{self, DrawList, TextRenderer};
+use io::{DrawList, TextRenderer};
+use util::Point;
 
 pub struct Label {
     pub text: Option<String>,
@@ -59,20 +60,21 @@ impl WidgetKind for Label {
         widget.do_base_layout();
     }
 
-    fn get_draw_lists(&self, widget: &Widget, _millis: u32) -> Vec<DrawList> {
+    fn get_draw_lists(&self, widget: &Widget, _pixel_size: Point, _millis: u32) -> Vec<DrawList> {
         let font = match &widget.state.font {
             &None => return Vec::new(),
             &Some(ref font) => font,
         };
         let (x, y, text) = Label::get_draw_params(widget);
-        let b_scale_l = io::GFX_BORDER_SCALE * widget.state.border.left as f32;
-        let _b_scale_r = io::GFX_BORDER_SCALE * widget.state.border.right as f32;
-        let b_scale_t = io::GFX_BORDER_SCALE * widget.state.border.top as f32;
-        let b_scale_b = io::GFX_BORDER_SCALE * widget.state.border.bottom as f32;
-
-        vec![font.get_draw_list(text, x as f32 - b_scale_l,
-                                y as f32 - b_scale_t,
-                                1.0 + b_scale_t + b_scale_b)]
+        vec![font.get_draw_list(text, x as f32, y as f32, 1.0)]
+        // let b_scale_l = io::GFX_BORDER_SCALE * widget.state.border.left as f32;
+        // let _b_scale_r = io::GFX_BORDER_SCALE * widget.state.border.right as f32;
+        // let b_scale_t = io::GFX_BORDER_SCALE * widget.state.border.top as f32;
+        // let b_scale_b = io::GFX_BORDER_SCALE * widget.state.border.bottom as f32;
+        //
+        // vec![font.get_draw_list(text, x as f32 - b_scale_l,
+        //                         y as f32 - b_scale_t,
+        //                         1.0 + b_scale_t + b_scale_b)]
     }
 
     fn draw_text_mode(&self, renderer: &mut TextRenderer, widget: &Widget,

@@ -3,6 +3,7 @@ use std::cell::RefCell;
 
 use ui::{Callback, Label, Widget, WidgetKind};
 use io::{event, DrawList, TextRenderer};
+use util::Point;
 
 pub struct Button {
     label: Rc<Label>,
@@ -56,8 +57,8 @@ impl WidgetKind for Button {
         self.label.draw_text_mode(renderer, widget, millis);
     }
 
-    fn get_draw_lists(&self, widget: &Widget, millis: u32) -> Vec<DrawList> {
-        self.label.get_draw_lists(widget, millis)
+    fn get_draw_lists(&self, widget: &Widget, pixel_size: Point, millis: u32) -> Vec<DrawList> {
+        self.label.get_draw_lists(widget, pixel_size, millis)
     }
 
     fn on_mouse_release(&self, widget: &Rc<RefCell<Widget>>, kind: event::ClickKind) -> bool {

@@ -273,6 +273,14 @@ impl Widget {
         Widget::go_up_tree(&Widget::get_parent(widget), levels - 1)
     }
 
+    pub fn get_root(widget: &Rc<RefCell<Widget>>) -> Rc<RefCell<Widget>> {
+        let is_root = widget.borrow().parent.is_none();
+
+        if is_root { return Rc::clone(widget); }
+
+        Widget::get_root(&Widget::get_parent(widget))
+    }
+
     pub fn mark_removal_up_tree(widget: &Rc<RefCell<Widget>>, levels: usize) {
         if levels == 0 {
             widget.borrow_mut().mark_for_removal();
@@ -283,14 +291,6 @@ impl Widget {
 
     pub fn get_parent(widget: &Rc<RefCell<Widget>>) -> Rc<RefCell<Widget>> {
         Rc::clone(widget.borrow().parent.as_ref().unwrap())
-    }
-
-    pub fn get_root(widget: &Rc<RefCell<Widget>>) -> Rc<RefCell<Widget>> {
-        if widget.borrow().parent.is_none() {
-            return Rc::clone(widget);
-        } else {
-            return Widget::get_root(&Widget::get_parent(widget));
-        }
     }
 
     pub fn add_child_to(parent: &Rc<RefCell<Widget>>,

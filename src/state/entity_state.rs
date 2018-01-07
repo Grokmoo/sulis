@@ -4,12 +4,18 @@ use state::{ActorState, GameState, Location};
 use std::rc::Rc;
 use std::cell::RefCell;
 
-#[derive(PartialEq)]
 pub struct EntityState {
     pub actor: ActorState,
     pub location: Location,
     pub size: Rc<EntitySize>,
     pub index: usize, // index in vec of the owning area state
+}
+
+impl PartialEq for EntityState {
+    fn eq(&self, other: &EntityState) -> bool {
+        self.location.area_id == other.location.area_id &&
+            self.index == other.index
+    }
 }
 
 impl EntityState {

@@ -8,20 +8,17 @@ use grt::io::event::ClickKind;
 use grt::util::Point;
 
 use view::ActionMenu;
-use state::{AreaState, GameState};
+use state::GameState;
 
 pub struct AreaView {
-    area_state: Rc<RefCell<AreaState>>,
     mouse_over: Rc<RefCell<Widget>>,
     scale: RefCell<(f32, f32)>,
     cursors: RefCell<Option<DrawList>>,
 }
 
 impl AreaView {
-    pub fn new(area_state: &Rc<RefCell<AreaState>>,
-               mouse_over: Rc<RefCell<Widget>>) -> Rc<AreaView> {
+    pub fn new(mouse_over: Rc<RefCell<Widget>>) -> Rc<AreaView> {
         Rc::new(AreaView {
-            area_state: Rc::clone(area_state),
             mouse_over: mouse_over,
             scale: RefCell::new((1.0, 1.0)),
             cursors: RefCell::new(None),
@@ -73,8 +70,11 @@ impl WidgetKind for AreaView {
     }
 
     fn on_add(&self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
-        let width = self.area_state.borrow().area.width;
-        let height = self.area_state.borrow().area.height;
+        self.clear_cursors();
+        let area_state = GameState::area_state();
+
+        let width = area_state.borrow().area.width;
+        let height = area_state.borrow().area.height;
         widget.borrow_mut().state.set_max_scroll_pos(width, height);
         self.mouse_over.borrow_mut().state.add_text_param("");
         self.mouse_over.borrow_mut().state.add_text_param("");
@@ -86,20 +86,21 @@ impl WidgetKind for AreaView {
                       widget: &Widget, _millis: u32) {
         let p = widget.state.inner_position;
         let s = widget.state.inner_size;
+        let scroll = widget.state.scroll_pos;
 
-        let state = self.area_state.borrow();
-        let ref area = state.area;
+        let area_state = GameState::area_state();
+        let ref area = area_state.borrow().area;
 
-        let max_x = cmp::min(s.width, area.width - widget.state.scroll_pos.x);
-        let max_y = cmp::min(s.height, area.height - widget.state.scroll_pos.y);
+        let max_x = cmp::min(s.width, area.width - scroll.x);
+        let max_y = cmp::min(s.height, area.height - scroll.y);
 
         renderer.set_cursor_pos(0, 0);
 
         for y in 0..max_y {
             renderer.set_cursor_pos(p.x, p.y + y);
             for x in 0..max_x {
-                renderer.render_char(state.get_display(x + widget.state.scroll_pos.x,
-                                                       y + widget.state.scroll_pos.y));
+                renderer.render_char(area_state.borrow().get_display(x + scroll.x,
+                                                                     y + scroll.y));
             }
         }
     }
@@ -113,7 +114,8 @@ impl WidgetKind for AreaView {
         let inner_width = (widget.state.inner_size.width as f32 / scale_x).round() as i32;
         let inner_height = (widget.state.inner_size.height as f32 / scale_y).round() as i32;
 
-        let state = self.area_state.borrow();
+        let area_state = GameState::area_state();
+        let state = area_state.borrow();
         let ref area = state.area;
 
         let max_x = cmp::min(inner_width, area.width - widget.state.scroll_pos.x);
@@ -184,7 +186,7 @@ impl WidgetKind for AreaView {
         let (x, y) = self.get_cursor_pos(widget);
         if x < 0 || y < 0 { return true; }
 
-        let action_menu = ActionMenu::new(Rc::clone(&self.area_state), x, y);
+        let action_menu = ActionMenu::new(GameState::area_state(), x, y);
         if kind == ClickKind::Left {
             action_menu.fire_default_callback();
         } else if kind == ClickKind::Right {
@@ -196,6 +198,7 @@ impl WidgetKind for AreaView {
 
     fn on_mouse_move(&self, widget: &Rc<RefCell<Widget>>) -> bool {
         let (area_x, area_y) = self.get_cursor_pos(widget);
+        let area_state = GameState::area_state();
 
         {
             let ref mut state = self.mouse_over.borrow_mut().state;
@@ -206,7 +209,7 @@ impl WidgetKind for AreaView {
         self.mouse_over.borrow_mut().invalidate_layout();
 
         let mut cursor_draw_list: Option<DrawList> = None;
-        if let Some(entity) = self.area_state.borrow().get_entity_at(area_x, area_y) {
+        if let Some(entity) = area_state.borrow().get_entity_at(area_x, area_y) {
             let index = entity.borrow().index;
             let pc = GameState::pc();
             if index != pc.borrow().index {
@@ -231,7 +234,7 @@ impl WidgetKind for AreaView {
             let mut draw_list = DrawList::from_sprite(&pc.borrow().size.cursor_sprite,
                 c_x - size / 2, c_y - size / 2, size, size);
 
-            let action_menu = ActionMenu::new(Rc::clone(&self.area_state), area_x, area_y);
+            let action_menu = ActionMenu::new(Rc::clone(&area_state), area_x, area_y);
             if !action_menu.is_default_callback_valid() {
                 draw_list.set_color(1.0, 0.0, 0.0, 1.0);
             }

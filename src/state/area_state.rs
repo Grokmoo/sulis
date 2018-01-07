@@ -123,6 +123,9 @@ impl AreaState {
         }
     }
 
+    pub(in state) fn remove_entity(&mut self, entity: &Rc<RefCell<EntityState>>) {
+    }
+
     pub(in state) fn add_actor(&mut self, actor: Rc<Actor>,
                      location: Location) -> bool {
 

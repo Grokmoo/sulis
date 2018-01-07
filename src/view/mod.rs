@@ -15,16 +15,14 @@ use std::cell::RefCell;
 
 use grt::io::InputAction;
 use grt::ui::{Button, Callback, EmptyWidget, Label, Widget, WidgetKind};
-use state::{AreaState, GameState};
+use state::GameState;
 
 pub struct RootView {
-    area_state: Rc<RefCell<AreaState>>,
 }
 
 impl RootView {
     pub fn new() -> Rc<RootView> {
         Rc::new(RootView {
-            area_state: GameState::area_state(),
         })
     }
 }
@@ -85,7 +83,7 @@ impl WidgetKind for RootView {
         let mouse_over = Widget::with_theme(Label::empty(), "mouse_over");
 
         let area_widget = Widget::with_defaults(
-            AreaView::new(&self.area_state, Rc::clone(&mouse_over)));
+            AreaView::new(Rc::clone(&mouse_over)));
 
         let right_pane = Widget::with_theme(EmptyWidget::new(), "right_pane");
         {
@@ -93,8 +91,9 @@ impl WidgetKind for RootView {
                 Button::with_callback(Callback::with(Box::new(|| { info!("Hello world"); }))),
                 "test_button");
 
+            let area_state = GameState::area_state();
             let area_title = Widget::with_theme(
-                Label::new(&self.area_state.borrow().area.name), "title");
+                Label::new(&area_state.borrow().area.name), "title");
             Widget::add_child_to(&right_pane, mouse_over);
             Widget::add_child_to(&right_pane, button);
             Widget::add_child_to(&right_pane, area_title);

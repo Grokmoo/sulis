@@ -25,6 +25,7 @@ use std::cell::RefCell;
 
 use grt::resource::{Actor, ResourceSet};
 use grt::config::CONFIG;
+use grt::util::Point;
 use animation::{Animation, MoveAnimation};
 
 thread_local! {
@@ -51,21 +52,71 @@ impl GameState {
         Ok(())
     }
 
-    fn new() -> Result<GameState, Error> {
-        let game = ResourceSet::get_game();
+    pub fn transition(area_id: &Option<String>, x: i32, y: i32) {
+        let p = Point::new(x, y);
+        info!("Area transition to {:?} at {},{}", area_id, x, y);
 
-        debug!("Setting up area state from {}", &game.starting_area);
-        let area = ResourceSet::get_area(&game.starting_area);
+        if let &Some(ref area_id) = area_id {
+            let area_state = match GameState::setup_area_state(area_id) {
+                Ok(state) => state,
+                Err(_) => {
+                    error!("Unable to transition to '{}'", &area_id);
+                    return;
+                }
+            };
+
+            if !GameState::check_location(&p, &area_state) {
+                return;
+            }
+
+            STATE.with(|state| {
+                let path_finder = PathFinder::new(Rc::clone(&area_state));
+                state.borrow_mut().as_mut().unwrap().path_finder = path_finder;
+                state.borrow_mut().as_mut().unwrap().area_state = area_state;
+            });
+        } else {
+            if !GameState::check_location(&p, &GameState::area_state()) {
+                return;
+            }
+        }
+
+        STATE.with(|state| {
+            let mut state = state.borrow_mut();
+            let state = state.as_mut().unwrap();
+        });
+    }
+
+    fn check_location(p: &Point, area_state: &Rc<RefCell<AreaState>>) -> bool {
+        let location = Location::from_point(p, Rc::clone(area_state));
+        if !location.coords_valid(location.x, location.y) {
+            error!("Location coordinates {},{} are not valid for area {}",
+                   location.x, location.y, location.area_id);
+            return false;
+        }
+
+        true
+    }
+
+    fn setup_area_state(area_id: &str) -> Result<Rc<RefCell<AreaState>>, Error> {
+        debug!("Setting up area state from {}", &area_id);
+        let area = ResourceSet::get_area(&area_id);
         let area = match area {
             Some(a) => a,
             None => {
-                error!("Starting area '{}' not found", &game.starting_area);
-                return Err(Error::new(ErrorKind::NotFound,
-                                      "Unable to create starting area."));
+                error!("Area '{}' not found", &area_id);
+                return Err(Error::new(ErrorKind::NotFound, "Unable to create area."));
             }
         };
         let area_state = Rc::new(RefCell::new(AreaState::new(area)));
         AreaState::populate(&area_state);
+
+        Ok(area_state)
+    }
+
+    fn new() -> Result<GameState, Error> {
+        let game = ResourceSet::get_game();
+
+        let area_state = GameState::setup_area_state(&game.starting_area)?;
 
         debug!("Setting up PC {}, with {:?}", &game.pc, &game.starting_location);
         let location = Location::from_point(&game.starting_location,

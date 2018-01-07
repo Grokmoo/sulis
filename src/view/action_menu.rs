@@ -1,6 +1,7 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
+use grt::resource::area::Transition;
 use grt::ui::{Button, Callback, Cursor, Label, list_box, ListBox, Widget, WidgetKind};
 use grt::io::event::ClickKind;
 use grt::util::Point;
@@ -30,8 +31,17 @@ impl ActionMenu {
         })
     }
 
-    pub fn transition_callback(&self) -> Box<Fn()> {
-        Box::new( || { })
+    pub fn transition_callback(&self, transition: &Transition) -> Option<Callback<Button>> {
+        let area_id = transition.to_area.clone();
+        let x = transition.to.x;
+        let y = transition.to.y;
+
+        Some(Callback::new(Rc::new( move |_kind, widget| {
+            GameState::transition(&area_id, x, y);
+            Widget::mark_removal_up_tree(&widget, 2);
+            let root = Widget::get_root(&widget);
+            root.borrow_mut().invalidate_children();
+        })))
     }
 
     pub fn attack_callback(&self) -> Box<Fn()> {
@@ -100,7 +110,7 @@ impl WidgetKind for ActionMenu {
         if let Some(ref transition) = self.area_state.borrow()
             .get_transition_at(self.area_pos.x, self.area_pos.y) {
             entries.push(list_box::Entry::new(
-                    "Transition", ActionMenu::callback_with_removal(self.transition_callback())));
+                    "Transition", self.transition_callback(transition)));
         }
 
         if entries.is_empty() {

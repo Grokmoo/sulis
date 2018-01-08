@@ -80,9 +80,18 @@ impl GameState {
             }
         }
 
+        {
+            let pc = GameState::pc();
+            let old_area_state = &pc.borrow().location.area_state;
+            old_area_state.borrow_mut().remove_entity(&pc);
+        }
+
         STATE.with(|state| {
             let mut state = state.borrow_mut();
             let state = state.as_mut().unwrap();
+
+            let location = Location::new(x, y, Rc::clone(&state.area_state));
+            state.area_state.borrow_mut().add_entity(Rc::clone(&state.pc), location);
         });
     }
 
@@ -145,7 +154,7 @@ impl GameState {
                 "Unable to add player character to starting area at starting location"));
         }
 
-        let pc_state = Rc::clone(area_state.borrow().entities.last().unwrap());
+        let pc_state = Rc::clone(area_state.borrow().get_last_entity().unwrap());
 
         let path_finder = PathFinder::new(Rc::clone(&area_state));
 

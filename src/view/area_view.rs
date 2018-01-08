@@ -148,7 +148,7 @@ impl WidgetKind for AreaView {
                     transition.size.width, transition.size.height));
         }
 
-        for entity in state.entities.iter() {
+        for entity in state.entity_iter() {
             let entity = entity.borrow();
             draw_list.append(&mut DrawList::from_sprite(
                     &entity.actor.actor.image_display,

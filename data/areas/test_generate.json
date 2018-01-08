@@ -6,6 +6,15 @@
 
     "terrain": { },
     "actors": [ ],
-    "transitions": [ ],
-    "generate": true
+    "generate": true,
+    "transitions": [
+      {
+        "from": [ 10, 10 ],
+        "size": [2, 2],
+        "to": [ 10, 10],
+        "to_area": "test_area",
+        "image_display": "tiles/transition",
+        "text_display": "*"
+      }
+    ]
 }

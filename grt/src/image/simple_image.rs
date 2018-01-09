@@ -3,7 +3,7 @@ use std::io::{Error, ErrorKind};
 
 use image::Image;
 use resource::{ResourceBuilder, ResourceSet, Sprite};
-use io::{DrawList, TextRenderer};
+use io::{DrawList, GraphicsRenderer, TextRenderer};
 use ui::AnimationState;
 use util::{invalid_data_error, Point, Size};
 
@@ -39,8 +39,9 @@ impl SimpleImage {
 }
 
 impl Image for SimpleImage {
-    fn get_draw_list(&self, _state: &AnimationState, x: f32, y: f32, w: f32, h: f32) -> DrawList {
-        DrawList::from_sprite_f32(&self.image_display, x, y, w, h)
+    fn draw_graphics_mode(&self, renderer: &mut GraphicsRenderer, _state: &AnimationState,
+                          x: f32, y: f32, w: f32, h: f32) {
+        renderer.draw(DrawList::from_sprite_f32(&self.image_display, x, y, w, h));
     }
 
     fn draw_text_mode(&self, renderer: &mut TextRenderer, _state: &AnimationState,

@@ -1,7 +1,7 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use io::{DrawList, InputAction, TextRenderer};
+use io::{GraphicsRenderer, InputAction, TextRenderer};
 use io::event::ClickKind;
 use ui::{animation_state, Widget};
 use util::Point;
@@ -26,9 +26,8 @@ pub trait WidgetKind {
     fn draw_text_mode(&self, _renderer: &mut TextRenderer,
                       _widget: &Widget, _millis: u32) { }
 
-    fn get_draw_lists(&self, _widget: &Widget, _pixel_size: Point, _millis: u32) -> Vec<DrawList> {
-        Vec::new()
-    }
+    fn draw_graphics_mode(&self, _renderer: &mut GraphicsRenderer, _pixel_size: Point,
+                          _widget: &Widget, _millis: u32) { }
 
     fn layout(&self, widget: &mut Widget) {
         widget.do_base_layout();

@@ -3,7 +3,7 @@ use std::cell::{Ref, RefCell};
 use std::rc::Rc;
 
 use config::CONFIG;
-use io::{DrawList, DrawListKind, InputAction, KeyboardEvent, IO, TextureMinFilter, TextureMagFilter};
+use io::*;
 use io::keyboard_event::Key;
 use io::event::ClickKind;
 use resource::ResourceSet;
@@ -39,11 +39,11 @@ const FRAGMENT_SHADER_SRC: &'static str = r#"
   }
 "#;
 
-pub struct GliumDisplay<'a> {
+pub struct GliumDisplay {
     display: glium::Display,
     events_loop: glium::glutin::EventsLoop,
     program: glium::Program,
-    params: glium::DrawParameters<'a>,
+    //params: glium::DrawParameters<'a>,
     matrix: [[f32; 4]; 4],
     textures: HashMap<String, GliumTexture>,
 }
@@ -53,41 +53,28 @@ struct GliumTexture {
     sampler_fn: Box<Fn(Sampler<SrgbTexture2d>) -> Sampler<SrgbTexture2d>>,
 }
 
-impl<'a> GliumDisplay<'a> {
-    pub fn new() -> GliumDisplay<'a> {
-        debug!("Initialize Glium Display adapter.");
-        let events_loop = glium::glutin::EventsLoop::new();
-        let window = glium::glutin::WindowBuilder::new()
-            .with_dimensions(CONFIG.display.width_pixels, CONFIG.display.height_pixels)
-            .with_title("Rust Game");
-        let context = glium::glutin::ContextBuilder::new();
-        let display = glium::Display::new(window, context, &events_loop).unwrap();
+pub struct GliumRenderer<'a> {
+    target: &'a mut glium::Frame,
+    display: &'a mut GliumDisplay,
+    params: glium::DrawParameters<'a>,
+}
 
-        let program = glium::Program::from_source(&display, VERTEX_SHADER_SRC,
-                                                  FRAGMENT_SHADER_SRC, None).unwrap();
-
+impl<'a> GliumRenderer<'a> {
+    fn new(target: &'a mut glium::Frame, display: &'a mut GliumDisplay) -> GliumRenderer<'a> {
         let params = glium::DrawParameters {
             blend: glium::draw_parameters::Blend::alpha_blending(),
             .. Default::default()
         };
 
-        GliumDisplay {
+        GliumRenderer {
+            target,
             display,
-            events_loop,
-            program,
             params,
-            matrix: [
-                [2.0 / CONFIG.display.width as f32, 0.0, 0.0, 0.0],
-                [0.0, 2.0 / CONFIG.display.height as f32, 0.0, 0.0],
-                [0.0, 0.0, 1.0, 0.0],
-                [-1.0 , -1.0, 0.0, 1.0f32],
-            ],
-            textures: HashMap::new(),
         }
     }
 
     fn create_texture_if_missing(&mut self, texture_id: &str, draw_list: &DrawList) {
-        if self.textures.get(texture_id).is_some() {
+        if self.display.textures.get(texture_id).is_some() {
             return;
         }
 
@@ -97,42 +84,60 @@ impl<'a> GliumDisplay<'a> {
             DrawListKind::Font => ResourceSet::get_font(&texture_id)
                 .unwrap().image.clone(),
         };
-        let dims = image.dimensions();
-        let image = RawImage2d::from_raw_rgba_reversed(&image.into_raw()
-                                                                       , dims);
-        let texture = SrgbTexture2d::new(&self.display, image).unwrap();
 
-        let mag_filter = draw_list.texture_mag_filter;
-        let min_filter = draw_list.texture_min_filter;
+        self.register_texture(texture_id, image, draw_list.texture_min_filter, draw_list.texture_mag_filter);
+    }
+
+    fn draw_widget_tree(&mut self, widget: Ref<Widget>, millis: u32) {
+        let pixel_size = Point::from_tuple(self.target.get_dimensions());
+
+        if let Some(ref image) = widget.state.background {
+            let x = widget.state.position.x as f32;
+            let y = widget.state.position.y as f32;
+            let w = widget.state.size.width as f32;
+            let h = widget.state.size.height as f32;
+            image.draw_graphics_mode(self, &widget.state.animation_state, x, y, w, h);
+        }
+
+        widget.kind.draw_graphics_mode(self, pixel_size, &widget, millis);
+
+        for child in widget.children.iter() {
+            self.draw_widget_tree(child.borrow(), millis);
+        }
+    }
+}
+
+impl<'a> GraphicsRenderer for GliumRenderer<'a> {
+    fn register_texture(&mut self, id: &str, image: ImageBuffer<Rgba<u8>, Vec<u8>>,
+                        min_filter: TextureMinFilter, mag_filter: TextureMagFilter) {
+
+        let dims = image.dimensions();
+        let image = RawImage2d::from_raw_rgba_reversed(&image.into_raw(), dims);
+        let texture = SrgbTexture2d::new(&self.display.display, image).unwrap();
+
         let sampler_fn: Box<Fn(Sampler<SrgbTexture2d>) -> Sampler<SrgbTexture2d>> =
             Box::new(move |sampler| {
                 sampler.magnify_filter(get_mag_filter(mag_filter))
                     .minify_filter(get_min_filter(min_filter))
             });
 
-        // let sampler_fn: Box<Fn(Sampler<SrgbTexture2d>) -> Sampler<SrgbTexture2d>> = match kind {
-        //     DrawListKind::Sprite =>
-        //         Box::new(|sampler| {
-        //             sampler.magnify_filter(MagnifySamplerFilter::Nearest)
-        //                 .minify_filter(MinifySamplerFilter::NearestMipmapLinear)
-        //         }),
-        //     DrawListKind::Font =>
-        //         Box::new(|sampler| sampler.minify_filter(MinifySamplerFilter::Linear)),
-        // };
-
-        self.textures.insert(texture_id.to_string(), GliumTexture { texture, sampler_fn });
+        self.display.textures.insert(id.to_string(), GliumTexture { texture, sampler_fn });
     }
 
-    fn draw(&mut self, target: &mut glium::Frame, draw_list: DrawList) {
+    fn deregister_texture(&mut self, id: &str) {
+        self.display.textures.remove(id);
+    }
+
+    fn draw(&mut self, draw_list: DrawList) {
         self.create_texture_if_missing(&draw_list.texture, &draw_list);
 
-        let glium_texture = match self.textures.get(&draw_list.texture) {
+        let glium_texture = match self.display.textures.get(&draw_list.texture) {
             None => return,
             Some(texture) => texture,
         };
 
         let uniforms = uniform! {
-            matrix: self.matrix,
+            matrix: self.display.matrix,
             tex: (glium_texture.sampler_fn)(glium_texture.texture.sampled()),
             color_filter: draw_list.color_filter,
             scale: [
@@ -144,31 +149,60 @@ impl<'a> GliumDisplay<'a> {
         };
 
         for quad in draw_list.quads {
-            let vertex_buffer = glium::VertexBuffer::new(&self.display, &quad).unwrap();
+            let vertex_buffer = glium::VertexBuffer::new(&self.display.display, &quad).unwrap();
             let indices = glium::index::NoIndices(glium::index::PrimitiveType::TriangleStrip);
-            target.draw(&vertex_buffer, &indices, &self.program,
+            self.target.draw(&vertex_buffer, &indices, &self.display.program,
                         &uniforms, &self.params).unwrap();
         }
     }
+}
 
-    fn draw_widget_tree(&mut self, widget: Ref<Widget>, target: &mut glium::Frame, millis: u32) {
-        let pixel_size = Point::from_tuple(target.get_dimensions());
+impl GliumDisplay {
+    pub fn new() -> GliumDisplay {
+        debug!("Initialize Glium Display adapter.");
+        let events_loop = glium::glutin::EventsLoop::new();
+        let window = glium::glutin::WindowBuilder::new()
+            .with_dimensions(CONFIG.display.width_pixels, CONFIG.display.height_pixels)
+            .with_title("Rust Game");
+        let context = glium::glutin::ContextBuilder::new();
+        let display = glium::Display::new(window, context, &events_loop).unwrap();
 
-        if let Some(ref image) = widget.state.background {
-            let x = widget.state.position.x as f32;
-            let y = widget.state.position.y as f32;
-            let w = widget.state.size.width as f32;
-            let h = widget.state.size.height as f32;
-            self.draw(target, image.get_draw_list(&widget.state.animation_state, x, y, w, h));
+        let program = glium::Program::from_source(&display, VERTEX_SHADER_SRC,
+                                                  FRAGMENT_SHADER_SRC, None).unwrap();
+
+        GliumDisplay {
+            display,
+            events_loop,
+            program,
+            matrix: [
+                [2.0 / CONFIG.display.width as f32, 0.0, 0.0, 0.0],
+                [0.0, 2.0 / CONFIG.display.height as f32, 0.0, 0.0],
+                [0.0, 0.0, 1.0, 0.0],
+                [-1.0 , -1.0, 0.0, 1.0f32],
+            ],
+            textures: HashMap::new(),
         }
+    }
+}
 
-        for draw_list in widget.kind.get_draw_lists(&widget, pixel_size, millis) {
-            self.draw(target, draw_list);
-        }
+impl IO for GliumDisplay {
+    fn process_input(&mut self, root: Rc<RefCell<Widget>>) {
+        let display_size = self.display.gl_window().get_inner_size();
+        self.events_loop.poll_events(|event| {
+            if let glutin::Event::WindowEvent { event, .. } = event {
+                InputAction::handle_action(process_window_event(event, display_size), Rc::clone(&root));
+            }
+        });
+    }
 
-        for child in widget.children.iter() {
-            self.draw_widget_tree(child.borrow(), target, millis);
+    fn render_output(&mut self, root: Ref<Widget>, millis: u32) {
+        let mut target = self.display.draw();
+        target.clear_color(0.0, 0.0, 0.0, 1.0);
+        {
+            let mut renderer = GliumRenderer::new(&mut target, self);
+            renderer.draw_widget_tree(root, millis);
         }
+        target.finish().unwrap();
     }
 }
 
@@ -219,25 +253,6 @@ fn process_window_event(event: glutin::WindowEvent,
         _ => None,
     }
 }
-
-impl<'a> IO for GliumDisplay<'a> {
-    fn process_input(&mut self, root: Rc<RefCell<Widget>>) {
-        let display_size = self.display.gl_window().get_inner_size();
-        self.events_loop.poll_events(|event| {
-            if let glutin::Event::WindowEvent { event, .. } = event {
-                InputAction::handle_action(process_window_event(event, display_size), Rc::clone(&root));
-            }
-        });
-    }
-
-    fn render_output(&mut self, root: Ref<Widget>, millis: u32) {
-        let mut target = self.display.draw();
-        target.clear_color(0.0, 0.0, 0.0, 1.0);
-        self.draw_widget_tree(root, &mut target, millis);
-        target.finish().unwrap();
-    }
-}
-
 
 fn process_keyboard_input(input: glutin::KeyboardInput) -> Option<KeyboardEvent> {
     if input.state != glutin::ElementState::Pressed { return None; }

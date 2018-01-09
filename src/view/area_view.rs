@@ -3,7 +3,7 @@ use std::cell::RefCell;
 use std::cmp;
 
 use grt::ui::{Cursor, Label, WidgetKind, Widget};
-use grt::io::{DrawList, InputAction, TextRenderer, TextureMagFilter};
+use grt::io::{DrawList, GraphicsRenderer, InputAction, TextRenderer, TextureMagFilter};
 use grt::io::event::ClickKind;
 use grt::util::Point;
 
@@ -105,7 +105,8 @@ impl WidgetKind for AreaView {
         }
     }
 
-    fn get_draw_lists(&self, widget: &Widget, pixel_size: Point, _millis: u32) -> Vec<DrawList> {
+    fn draw_graphics_mode(&self, renderer: &mut GraphicsRenderer, pixel_size: Point,
+                          widget: &Widget, _millis: u32) {
         let scale_x = 1600.0 / (pixel_size.x as f32);
         let scale_y = 900.0 / (pixel_size.y as f32);
         *self.scale.borrow_mut() = (scale_x, scale_y);
@@ -157,15 +158,14 @@ impl WidgetKind for AreaView {
                     entity.size(), entity.size()));
         }
 
+        renderer.draw(draw_list);
 
-        let mut draw_lists = vec![draw_list];
         if let Some(ref cursor) = *self.cursors.borrow() {
             let mut draw_list = cursor.clone();
             draw_list.set_scale(scale_x, scale_y);
-            draw_lists.push(draw_list);
+            renderer.draw(draw_list);
         }
 
-        draw_lists
     }
 
     fn on_key_press(&self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {

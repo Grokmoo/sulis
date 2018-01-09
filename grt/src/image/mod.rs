@@ -9,7 +9,7 @@ pub use self::animated_image::AnimatedImage;
 
 use std::fmt::Debug;
 
-use io::{DrawList, TextRenderer};
+use io::{GraphicsRenderer, TextRenderer};
 use ui::AnimationState;
 use util::{Point, Size};
 
@@ -31,7 +31,8 @@ pub trait Image: Debug {
         }
     }
 
-    fn get_draw_list(&self, state: &AnimationState, x: f32, y: f32, w: f32, h: f32) -> DrawList;
+    fn draw_graphics_mode(&self, renderer: &mut GraphicsRenderer, state: &AnimationState,
+                          x: f32, y: f32, w: f32, h: f32);
 
     fn get_width_f32(&self) -> f32;
     fn get_height_f32(&self) -> f32;

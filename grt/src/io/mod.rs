@@ -17,6 +17,8 @@ use std::io::{ErrorKind, Error};
 use std::rc::Rc;
 use std::cell::{RefCell, Ref};
 
+use extern_image::{ImageBuffer, Rgba};
+
 use config::{CONFIG, IOAdapter};
 use ui::Widget;
 use io::keyboard_event::Key;
@@ -36,6 +38,15 @@ pub trait TextRenderer {
     fn render_string(&mut self, s: &str);
 
     fn set_cursor_pos(&mut self, x: i32, y: i32);
+}
+
+pub trait GraphicsRenderer {
+    fn draw(&mut self, draw_list: DrawList);
+
+    fn register_texture(&mut self, id: &str, image: ImageBuffer<Rgba<u8>, Vec<u8>>,
+                        min_filter: TextureMinFilter, mag_filter: TextureMagFilter);
+
+    fn deregister_texture(&mut self, id: &str);
 }
 
 #[derive(Debug, Copy, Clone)]

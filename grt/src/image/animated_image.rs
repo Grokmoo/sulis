@@ -7,7 +7,7 @@ use serde_yaml;
 
 use image::Image;
 use resource::ResourceBuilder;
-use io::{DrawList, TextRenderer};
+use io::{GraphicsRenderer, TextRenderer};
 use ui::AnimationState;
 use util::{Point, Size};
 
@@ -55,8 +55,9 @@ impl AnimatedImage {
 }
 
 impl Image for AnimatedImage {
-    fn get_draw_list(&self, state: &AnimationState, x: f32, y: f32, w: f32, h: f32) -> DrawList {
-        AnimationState::find_match(&self.images, state).get_draw_list(state, x, y, w, h)
+    fn draw_graphics_mode(&self, renderer: &mut GraphicsRenderer, state: &AnimationState,
+                          x: f32, y: f32, w: f32, h: f32) {
+        AnimationState::find_match(&self.images, state).draw_graphics_mode(renderer, state, x, y, w, h);
     }
 
     fn draw_text_mode(&self, renderer: &mut TextRenderer,

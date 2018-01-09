@@ -2,7 +2,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use ui::{Callback, Label, Widget, WidgetKind};
-use io::{event, DrawList, TextRenderer};
+use io::{event, GraphicsRenderer, TextRenderer};
 use util::Point;
 
 pub struct Button {
@@ -57,8 +57,9 @@ impl WidgetKind for Button {
         self.label.draw_text_mode(renderer, widget, millis);
     }
 
-    fn get_draw_lists(&self, widget: &Widget, pixel_size: Point, millis: u32) -> Vec<DrawList> {
-        self.label.get_draw_lists(widget, pixel_size, millis)
+    fn draw_graphics_mode(&self, renderer: &mut GraphicsRenderer, pixel_size: Point,
+                          widget: &Widget, millis: u32) {
+        self.label.draw_graphics_mode(renderer, pixel_size, widget, millis);
     }
 
     fn on_mouse_release(&self, widget: &Rc<RefCell<Widget>>, kind: event::ClickKind) -> bool {

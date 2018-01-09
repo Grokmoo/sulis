@@ -19,6 +19,7 @@ pub use self::location::Location;
 mod path_finder;
 use self::path_finder::PathFinder;
 
+use std::collections::HashMap;
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 use std::cell::RefCell;
@@ -33,10 +34,10 @@ thread_local! {
 }
 
 pub struct GameState {
-    pub area_state: Rc<RefCell<AreaState>>,
-    pub pc: Rc<RefCell<EntityState>>,
-    pub should_exit: bool,
-
+    areas: HashMap<String, Rc<RefCell<AreaState>>>,
+    area_state: Rc<RefCell<AreaState>>,
+    pc: Rc<RefCell<EntityState>>,
+    should_exit: bool,
     animations: Vec<Box<Animation>>,
     path_finder: PathFinder,
 }
@@ -57,11 +58,18 @@ impl GameState {
         info!("Area transition to {:?} at {},{}", area_id, x, y);
 
         if let &Some(ref area_id) = area_id {
-            let area_state = match GameState::setup_area_state(area_id) {
-                Ok(state) => state,
-                Err(_) => {
-                    error!("Unable to transition to '{}'", &area_id);
-                    return;
+            // check if area state has already been loaded
+            let area_state = GameState::get_area_state(area_id);
+            let area_state = match area_state {
+                Some(area_state) => area_state,
+                None => match GameState::setup_area_state(area_id) {
+                    // area state has not already been loaded, try to load it
+                    Ok(area_state) => area_state,
+                    Err(e) => {
+                        error!("Unable to transition to '{}'", &area_id);
+                        error!("{}", e);
+                        return;
+                    }
                 }
             };
 
@@ -108,6 +116,7 @@ impl GameState {
 
     fn setup_area_state(area_id: &str) -> Result<Rc<RefCell<AreaState>>, Error> {
         debug!("Setting up area state from {}", &area_id);
+
         let area = ResourceSet::get_area(&area_id);
         let area = match area {
             Some(a) => a,
@@ -158,12 +167,25 @@ impl GameState {
 
         let path_finder = PathFinder::new(Rc::clone(&area_state));
 
+        let mut areas: HashMap<String, Rc<RefCell<AreaState>>> = HashMap::new();
+        areas.insert(game.starting_area.to_string(), Rc::clone(&area_state));
+
         Ok(GameState {
+            areas,
             area_state: area_state,
             path_finder: path_finder,
             pc: pc_state,
             animations: Vec::new(),
             should_exit: false,
+        })
+    }
+
+    fn get_area_state(id: &str) -> Option<Rc<RefCell<AreaState>>> {
+        STATE.with(|s| {
+            match s.borrow().as_ref().unwrap().areas.get(id) {
+                None => None,
+                Some(area_state) => Some(Rc::clone(&area_state)),
+            }
         })
     }
 

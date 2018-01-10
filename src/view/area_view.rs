@@ -218,6 +218,13 @@ impl WidgetKind for AreaView {
     }
 
     fn on_key_press(&self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
+        let area_state = GameState::area_state();
+        let width = area_state.borrow().area.width;
+        let height = area_state.borrow().area.height;
+        let (scale_x, scale_y) = *self.scale.borrow();
+        widget.borrow_mut().state.set_max_scroll_pos((width as f32 * scale_x).ceil() as i32
+                                                     , (height as f32 * scale_y).ceil() as i32);
+
         use grt::io::InputAction::*;
         match key {
            ScrollUp => widget.borrow_mut().state.scroll(0, -1),

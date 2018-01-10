@@ -43,7 +43,6 @@ pub struct GliumDisplay {
     display: glium::Display,
     events_loop: glium::glutin::EventsLoop,
     program: glium::Program,
-    //params: glium::DrawParameters<'a>,
     matrix: [[f32; 4]; 4],
     textures: HashMap<String, GliumTexture>,
 }

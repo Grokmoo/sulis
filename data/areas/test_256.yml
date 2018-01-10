@@ -1,0 +1,16 @@
+id: test_256
+name: "Test 256"
+width: 256
+height: 256
+
+terrain: { }
+actors: [ ]
+generate: true
+
+transitions:
+  - from: [5, 5]
+    size: [2, 2]
+    to: [15, 5]
+    to_area: "test_area"
+    image_display: "tiles/transition"
+    text_display: "*"

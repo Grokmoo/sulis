@@ -15,8 +15,8 @@ use extern_image::{self, ImageBuffer, Rgba};
 
 pub struct Font {
     pub id: String,
-    line_height: u32,
-    _base: u32,
+    pub line_height: u32,
+    pub base: u32,
     characters: HashMap<char, FontChar>,
     pub image: ImageBuffer<Rgba<u8>, Vec<u8>>,
 }
@@ -122,7 +122,7 @@ impl Font {
         Ok(Rc::new(Font {
             id: builder.id,
             line_height: builder.line_height,
-            _base: builder.base,
+            base: builder.base,
             characters,
             image,
         }))

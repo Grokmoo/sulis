@@ -3,9 +3,12 @@ use std::cell::RefCell;
 use std::cmp;
 
 use grt::ui::{Cursor, Label, WidgetKind, Widget};
-use grt::io::{DrawList, GraphicsRenderer, InputAction, TextRenderer, TextureMagFilter};
+use grt::io::*;
 use grt::io::event::ClickKind;
 use grt::util::Point;
+use grt::resource::ResourceSet;
+
+use extern_image::{ImageBuffer, Rgba};
 
 use view::ActionMenu;
 use state::GameState;
@@ -14,7 +17,12 @@ pub struct AreaView {
     mouse_over: Rc<RefCell<Widget>>,
     scale: RefCell<(f32, f32)>,
     cursors: RefCell<Option<DrawList>>,
+    buffer: RefCell<ImageBuffer<Rgba<u8>, Vec<u8>>>,
+    cache_invalid: RefCell<bool>,
+    current_area_id: RefCell<String>,
 }
+
+const TILE_CACHE_TEXTURE_SIZE: u32 = 1024;
 
 impl AreaView {
     pub fn new(mouse_over: Rc<RefCell<Widget>>) -> Rc<AreaView> {
@@ -22,6 +30,9 @@ impl AreaView {
             mouse_over: mouse_over,
             scale: RefCell::new((1.0, 1.0)),
             cursors: RefCell::new(None),
+            buffer: RefCell::new(ImageBuffer::new(0, 0)),
+            cache_invalid: RefCell::new(true),
+            current_area_id: RefCell::new(String::new()),
         })
     }
 
@@ -62,6 +73,39 @@ impl AreaView {
 
         (x as i32, y as i32)
     }
+
+    fn draw_tiles_to_buffer(&self, buffer: &mut ImageBuffer<Rgba<u8>, Vec<u8>>) {
+        let area_state = GameState::area_state();
+        let state = area_state.borrow();
+        let ref area = state.area;
+        let max_tile_x = cmp::min(buffer.width() as i32 / 16, area.width);
+        let max_tile_y = cmp::min(buffer.height() as i32 / 16, area.height);
+        let spritesheet = ResourceSet::get_spritesheet("tiles").unwrap();
+        let source = &spritesheet.image;
+        trace!("Generating cached tiles for '{}'", area.id);
+
+        for tile_y in 0..max_tile_y {
+            for tile_x in 0..max_tile_x {
+                let dest_x = 16 * tile_x as u32;
+                let dest_y = 16 * tile_y as u32;
+
+                let tile = match area.terrain.tile_at(tile_x, tile_y) {
+                    &None => continue,
+                    &Some(ref tile) => tile,
+                };
+
+                let sprite = &tile.image_display;
+                let src_x = sprite.position.x as u32;
+                let src_y = sprite.position.y as u32;
+                for y in 0..sprite.size.height {
+                    for x in 0..sprite.size.width {
+                        buffer.put_pixel(dest_x + x as u32, dest_y + y as u32,
+                                         *source.get_pixel(src_x + x as u32, src_y + y as u32));
+                    }
+                }
+            }
+        }
+    }
 }
 
 impl WidgetKind for AreaView {
@@ -78,6 +122,12 @@ impl WidgetKind for AreaView {
         widget.borrow_mut().state.set_max_scroll_pos(width, height);
         self.mouse_over.borrow_mut().state.add_text_param("");
         self.mouse_over.borrow_mut().state.add_text_param("");
+
+        let mut buffer: ImageBuffer<Rgba<u8>, Vec<u8>> = ImageBuffer::new(TILE_CACHE_TEXTURE_SIZE,
+                                                                          TILE_CACHE_TEXTURE_SIZE);
+        self.draw_tiles_to_buffer(&mut buffer);
+        *self.buffer.borrow_mut() = buffer;
+        *self.cache_invalid.borrow_mut() = true;
 
         Vec::with_capacity(0)
     }
@@ -119,27 +169,48 @@ impl WidgetKind for AreaView {
         let state = area_state.borrow();
         let ref area = state.area;
 
-        let max_x = cmp::min(inner_width, area.width - widget.state.scroll_pos.x);
-        let max_y = cmp::min(inner_height, area.height - widget.state.scroll_pos.y);
+        if *self.cache_invalid.borrow() {
+            renderer.deregister_texture(&self.current_area_id.borrow());
+
+            trace!("Register cached tiles texture for '{}'", area.id);
+            renderer.register_texture(&area.id, self.buffer.borrow().clone()
+                                      , TextureMinFilter::Nearest, TextureMagFilter::Nearest);
+            *self.cache_invalid.borrow_mut() = false;
+            *self.current_area_id.borrow_mut() = area.id.to_string();
+        }
+
+        // let max_x = cmp::min(inner_width, area.width - widget.state.scroll_pos.x);
+        // let max_y = cmp::min(inner_height, area.height - widget.state.scroll_pos.y);
+        //
+        // for y in 0..max_y {
+        //     for x in 0..max_x {
+        //         let area_x = x + widget.state.scroll_pos.x;
+        //         let area_y = y + widget.state.scroll_pos.y;
+        //
+        //         let tile = match area.terrain.tile_at(area_x, area_y) {
+        //             &None => continue,
+        //             &Some(ref tile) => tile,
+        //         };
+        //
+        //         draw_list.append(&mut DrawList::from_sprite(&tile.image_display,
+        //                                                     p.x + x, p.y + y,
+        //                                                     tile.width, tile.height));
+        //     }
+        // }
+
+        let tex_coords: [f32; 8] = [ 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0 ];
+
+        let mut draw_list = DrawList::from_texture_id(&area.id, &tex_coords,
+                                                      (p.x - widget.state.scroll_pos.x) as f32,
+                                                      (p.y - widget.state.scroll_pos.y) as f32,
+                                                      TILE_CACHE_TEXTURE_SIZE as f32 / 16.0,
+                                                      TILE_CACHE_TEXTURE_SIZE as f32 / 16.0);
+        draw_list.set_scale(scale_x, scale_y);
+        renderer.draw(draw_list);
 
         let mut draw_list = DrawList::empty_sprite();
         draw_list.set_scale(scale_x, scale_y);
         draw_list.texture_mag_filter = TextureMagFilter::Nearest;
-        for y in 0..max_y {
-            for x in 0..max_x {
-                let area_x = x + widget.state.scroll_pos.x;
-                let area_y = y + widget.state.scroll_pos.y;
-
-                let tile = match area.terrain.tile_at(area_x, area_y) {
-                    &None => continue,
-                    &Some(ref tile) => tile,
-                };
-
-                draw_list.append(&mut DrawList::from_sprite(&tile.image_display,
-                                                            p.x + x, p.y + y,
-                                                            tile.width, tile.height));
-            }
-        }
 
         for transition in area.transitions.iter() {
             draw_list.append(&mut DrawList::from_sprite(

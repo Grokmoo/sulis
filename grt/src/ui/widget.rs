@@ -64,7 +64,11 @@ impl Widget {
     /// then the widget re-built on the next UI update.
     /// TODO loop potential, see `invalidate_layout`
     pub fn invalidate_children(&mut self) {
+        trace!("Invalidated widget '{}'", self.kind.get_name());
         self.marked_for_readd = true;
+        for child in self.children.iter_mut() {
+            child.borrow_mut().invalidate_children();
+        }
         self.marked_for_layout = true;
     }
 
@@ -217,11 +221,13 @@ impl Widget {
 
     fn layout_widget(&mut self) {
         if self.marked_for_layout {
-            trace!("Performing layout on widget {} with size {:?} at {:?}",
-                   self.theme_id, self.state.size, self.state.position);
+            trace!("Performing layout on widget '{}' of type '{}'  with size {:?} at {:?}",
+                   self.theme_id, self.kind.get_name(), self.state.size, self.state.position);
             let kind = Rc::clone(&self.kind);
             kind.layout(self);
             self.marked_for_layout = false;
+
+            self.children.iter_mut().for_each(|child| child.borrow_mut().marked_for_layout = true);
         }
 
         let len = self.children.len();
@@ -346,18 +352,18 @@ impl Widget {
     }
 
     pub fn check_readd(parent: &Rc<RefCell<Widget>>) {
-        let len = parent.borrow().children.len();
-        for i in 0..len {
-            let child = Rc::clone(parent.borrow().children.get(i).unwrap());
-            let readd = child.borrow().marked_for_readd;
-
-            if readd {
-                child.borrow_mut().children.clear();
-                let kind = Rc::clone(&child.borrow().kind);
-                child.borrow_mut().add_children(kind.on_add(&child));
-                child.borrow_mut().marked_for_readd = false;
-                parent.borrow_mut().marked_for_layout = true;
-            } else {
+        let readd = parent.borrow().marked_for_readd;
+        if readd {
+            parent.borrow_mut().children.clear();
+            let kind = Rc::clone(&parent.borrow().kind);
+            let children = kind.on_add(&parent);
+            parent.borrow_mut().add_children(children);
+            parent.borrow_mut().marked_for_readd = false;
+            parent.borrow_mut().marked_for_layout = true;
+        } else {
+            let len = parent.borrow().children.len();
+            for i in 0..len {
+                let child = Rc::clone(parent.borrow().children.get(i).unwrap());
                 Widget::check_readd(&child);
             }
         }

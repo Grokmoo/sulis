@@ -64,8 +64,15 @@ impl GameState {
                 Some(area_state) => area_state,
                 None => match GameState::setup_area_state(area_id) {
                     // area state has not already been loaded, try to load it
-                    Ok(area_state) => area_state,
-                    Err(e) => {
+                    Ok(area_state) => {
+                        STATE.with(|state| {
+                            let mut state = state.borrow_mut();
+                            let state = state.as_mut().unwrap();
+                            state.areas.insert(area_id.to_string(), Rc::clone(&area_state));
+                        });
+
+                        area_state
+                    }, Err(e) => {
                         error!("Unable to transition to '{}'", &area_id);
                         error!("{}", e);
                         return;

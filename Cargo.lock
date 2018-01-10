@@ -300,6 +300,7 @@ dependencies = [
  "backtrace 0.3.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "flexi_logger 0.6.9 (registry+https://github.com/rust-lang/crates.io-index)",
  "grt 0.1.0",
+ "image 0.18.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.3.8 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 

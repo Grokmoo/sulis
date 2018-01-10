@@ -3,6 +3,8 @@
 
 extern crate grt;
 
+extern crate image as extern_image;
+
 pub mod state;
 
 pub mod animation;

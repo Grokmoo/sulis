@@ -116,12 +116,13 @@ impl DrawList {
         }
     }
 
-    pub fn from_sprite_f32(sprite: &Rc<Sprite>, x: f32, y: f32, w: f32, h: f32) -> DrawList {
+    pub fn from_texture_id(id: &str, tex_coords: &[f32; 8], x: f32,
+                           y: f32, w: f32, h: f32) -> DrawList {
         let x_min = x;
         let y_max = CONFIG.display.height as f32 - y;
         let x_max = x_min + w;
         let y_min = y_max - h;
-        let tc = &sprite.tex_coords;
+        let tc = tex_coords;
 
         let quads = vec![[
             Vertex { position: [ x_min, y_max ], tex_coords: [tc[0], tc[1]] },
@@ -131,10 +132,14 @@ impl DrawList {
         ]];
 
         DrawList {
-            texture: sprite.id.to_string(),
+            texture: id.to_string(),
             quads,
             ..Default::default()
         }
+    }
+
+    pub fn from_sprite_f32(sprite: &Rc<Sprite>, x: f32, y: f32, w: f32, h: f32) -> DrawList {
+        DrawList::from_texture_id(&sprite.id, &sprite.tex_coords, x, y, w, h)
     }
 
     pub fn from_sprite(sprite: &Rc<Sprite>, x: i32, y: i32, w: i32, h: i32) -> DrawList {

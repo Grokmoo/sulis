@@ -77,6 +77,7 @@ impl Spritesheet {
                     }
                 };
 
+                trace!("Creating sprite with id '{}' in '{}'", id, builder.id);
                 let sprite = Sprite::new(&builder.id, &image_size, pos, size);
 
                 if sprites.contains_key(&id) {

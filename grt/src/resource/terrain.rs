@@ -2,8 +2,9 @@ use std::collections::HashMap;
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 
-use resource::{AreaBuilder, Sprite, Tile};
+use resource::{AreaBuilder, ResourceSet, Sprite, Spritesheet, Tile};
 use resource::generator;
+use util::invalid_data_error;
 
 pub struct Terrain {
     pub width: i32,
@@ -12,6 +13,7 @@ pub struct Terrain {
     image_display: Vec<Option<Rc<Sprite>>>,
     tiles: Vec<Option<Rc<Tile>>>,
     passable: Vec<bool>,
+    spritesheet_id: String,
 }
 
 impl Terrain {
@@ -51,6 +53,7 @@ impl Terrain {
             return Err(e);
         }
 
+        let mut spritesheet_id: Option<String> = None;
         let mut tiles: Vec<Option<Rc<Tile>>> = vec![None;(width * height) as usize];
         let mut image_display: Vec<Option<Rc<Sprite>>> = vec![None;(width * height) as usize];
         let mut text_display = vec![' ';(width * height) as usize];
@@ -63,6 +66,16 @@ impl Terrain {
                 &None => continue,
                 &Some(ref t) => Rc::clone(&t),
             };
+
+            match spritesheet_id {
+                None => spritesheet_id = Some(tile.image_display.id.to_string()),
+                Some(ref id) => {
+                    if id != &tile.image_display.id {
+                        return invalid_data_error(&format!("All tiles in a layer must be from the \
+                                                          same spritesheet: '{}' vs '{}'", id, tile.id));
+                    }
+                }
+            }
 
             let base_x = index % width;
             let base_y = index / width;
@@ -84,6 +97,11 @@ impl Terrain {
             }
         }
 
+        let spritesheet_id = match spritesheet_id {
+            None => return invalid_data_error("Empty terrain"),
+            Some(id) => id,
+        };
+
         Ok(Terrain {
             width,
             height,
@@ -91,6 +109,7 @@ impl Terrain {
             text_display,
             image_display,
             passable,
+            spritesheet_id,
         })
     }
 
@@ -175,6 +194,10 @@ impl Terrain {
         }
 
         Ok(())
+    }
+
+    pub fn get_spritesheet(&self) -> Rc<Spritesheet> {
+        ResourceSet::get_spritesheet(&self.spritesheet_id).unwrap()
     }
 
     pub fn is_passable(&self, x: i32, y: i32) -> bool {

@@ -6,7 +6,6 @@ use grt::ui::{Cursor, Label, WidgetKind, Widget};
 use grt::io::*;
 use grt::io::event::ClickKind;
 use grt::util::Point;
-use grt::resource::ResourceSet;
 
 use extern_image::{ImageBuffer, Rgba};
 
@@ -22,7 +21,8 @@ pub struct AreaView {
     current_area_id: RefCell<String>,
 }
 
-const TILE_CACHE_TEXTURE_SIZE: u32 = 1024;
+const TILE_CACHE_TEXTURE_SIZE: u32 = 4096;
+const TILE_SIZE: u32 = 16;
 
 impl AreaView {
     pub fn new(mouse_over: Rc<RefCell<Widget>>) -> Rc<AreaView> {
@@ -78,16 +78,16 @@ impl AreaView {
         let area_state = GameState::area_state();
         let state = area_state.borrow();
         let ref area = state.area;
-        let max_tile_x = cmp::min(buffer.width() as i32 / 16, area.width);
-        let max_tile_y = cmp::min(buffer.height() as i32 / 16, area.height);
-        let spritesheet = ResourceSet::get_spritesheet("tiles").unwrap();
+        let max_tile_x = cmp::min((buffer.width() / TILE_SIZE) as i32, area.width);
+        let max_tile_y = cmp::min((buffer.height() / TILE_SIZE) as i32, area.height);
+        let spritesheet = area.terrain.get_spritesheet();
         let source = &spritesheet.image;
         trace!("Generating cached tiles for '{}'", area.id);
 
         for tile_y in 0..max_tile_y {
             for tile_x in 0..max_tile_x {
-                let dest_x = 16 * tile_x as u32;
-                let dest_y = 16 * tile_y as u32;
+                let dest_x = TILE_SIZE * tile_x as u32;
+                let dest_y = TILE_SIZE * tile_y as u32;
 
                 let tile = match area.terrain.tile_at(tile_x, tile_y) {
                     &None => continue,
@@ -161,10 +161,6 @@ impl WidgetKind for AreaView {
         let scale_y = 900.0 / (pixel_size.y as f32);
         *self.scale.borrow_mut() = (scale_x, scale_y);
 
-        let p = widget.state.inner_position;
-        let inner_width = (widget.state.inner_size.width as f32 / scale_x).round() as i32;
-        let inner_height = (widget.state.inner_size.height as f32 / scale_y).round() as i32;
-
         let area_state = GameState::area_state();
         let state = area_state.borrow();
         let ref area = state.area;
@@ -179,32 +175,14 @@ impl WidgetKind for AreaView {
             *self.current_area_id.borrow_mut() = area.id.to_string();
         }
 
-        // let max_x = cmp::min(inner_width, area.width - widget.state.scroll_pos.x);
-        // let max_y = cmp::min(inner_height, area.height - widget.state.scroll_pos.y);
-        //
-        // for y in 0..max_y {
-        //     for x in 0..max_x {
-        //         let area_x = x + widget.state.scroll_pos.x;
-        //         let area_y = y + widget.state.scroll_pos.y;
-        //
-        //         let tile = match area.terrain.tile_at(area_x, area_y) {
-        //             &None => continue,
-        //             &Some(ref tile) => tile,
-        //         };
-        //
-        //         draw_list.append(&mut DrawList::from_sprite(&tile.image_display,
-        //                                                     p.x + x, p.y + y,
-        //                                                     tile.width, tile.height));
-        //     }
-        // }
-
+        let p = widget.state.inner_position;
         let tex_coords: [f32; 8] = [ 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0 ];
 
         let mut draw_list = DrawList::from_texture_id(&area.id, &tex_coords,
                                                       (p.x - widget.state.scroll_pos.x) as f32,
                                                       (p.y - widget.state.scroll_pos.y) as f32,
-                                                      TILE_CACHE_TEXTURE_SIZE as f32 / 16.0,
-                                                      TILE_CACHE_TEXTURE_SIZE as f32 / 16.0);
+                                                      (TILE_CACHE_TEXTURE_SIZE / TILE_SIZE) as f32,
+                                                      (TILE_CACHE_TEXTURE_SIZE / TILE_SIZE) as f32);
         draw_list.set_scale(scale_x, scale_y);
         renderer.draw(draw_list);
 

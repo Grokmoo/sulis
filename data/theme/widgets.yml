@@ -1,11 +1,13 @@
 ---
 children:
   label:
-    font: "large"
+    text_params:
+      font: "large"
   button:
     background: background
     border: [1, 1, 1, 1]
-    font: "large"
+    text_params:
+      font: "large"
   list_box:
     background: bg_base
     border: [1, 1, 1, 1]
@@ -14,10 +16,10 @@ children:
     children:
       entry:
         text: "#0"
-        font: "large"
+        text_params:
+          font: "large"
+          horizontal_alignment: Left
         background: fill
         border: { top: 0, bottom: 0, left: 0, right: 0 }
         preferred_size: [0, 1]
-        horizontal_text_alignment: Left
-        text_format: { active: Underline }
 ...

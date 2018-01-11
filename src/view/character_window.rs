@@ -25,7 +25,7 @@ impl WidgetKind for CharacterWindow {
 
     fn on_add(&self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let title = Widget::with_theme(Label::empty(), "title");
-        title.borrow_mut().state.add_text_param(&self.character.borrow().actor.actor.id);
+        title.borrow_mut().state.add_text_arg(&self.character.borrow().actor.actor.id);
 
         let close = Widget::with_theme(Button::with_callback(Callback::remove_parent()), "close");
 

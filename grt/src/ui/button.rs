@@ -47,7 +47,7 @@ impl WidgetKind for Button {
 
     fn layout(&self, widget: &mut Widget) {
         if let Some(ref text) = self.label.text {
-            widget.state.add_text_param(text);
+            widget.state.add_text_arg(text);
         }
         widget.do_base_layout();
     }

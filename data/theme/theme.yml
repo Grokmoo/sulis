@@ -29,7 +29,9 @@ children:
       test_button:
         from: .button
         text: "Test"
-        text_color: [ 1.0, 0.0, 0.0, 1.0 ]
+        text_params:
+          scale: 2.0
+          color: [ 1.0, 0.0, 0.0, 1.0 ]
         preferred_size: [18, 3]
         position: [0, 2]
   area:
@@ -46,7 +48,8 @@ children:
           title:
             from: .label
             text: "Actions"
-            horizontal_text_alignment: Center
+            text_params:
+              horizontal_alignment: Center
             preferred_size: [6, 1]
             position: [0, 0]
           actions:
@@ -67,9 +70,12 @@ children:
         from: .label
         width_relative: Max
         preferred_size: [0, 1]
+        text_params:
+          scale: 1.3
       close:
         from: .button
-        horizontal_text_alignment: Center
+        text_params:
+          horizontal_alignment: Center
         border: [0, 0, 0, 0]
         preferred_size: [2, 1]
         text: "X"

@@ -5,7 +5,7 @@ use std::collections::HashMap;
 
 use resource::BuilderType;
 use util::Point;
-use ui::{Border, Color, Size, WidgetState};
+use ui::{Border, color, Color, Size, WidgetState};
 
 use serde_json;
 use serde_yaml;
@@ -40,10 +40,43 @@ pub enum VerticalTextAlignment {
     Bottom,
 }
 
+#[derive(Debug, Clone, PartialEq)]
+pub struct TextParams {
+    pub horizontal_alignment: HorizontalTextAlignment,
+    pub vertical_alignment: VerticalTextAlignment,
+    pub color: Color,
+    pub scale: f32,
+    pub font: String,
+}
+
+impl Default for TextParams {
+    fn default() -> TextParams {
+        TextParams::from(None)
+    }
+}
+
+impl TextParams {
+    fn from(builder: Option<TextParamsBuilder>) -> TextParams {
+        let src = if builder.is_some() {
+            builder.unwrap()
+        } else {
+            TextParamsBuilder::as_none()
+        };
+
+        TextParams {
+            horizontal_alignment: src.horizontal_alignment.unwrap_or(HorizontalTextAlignment::Center),
+            vertical_alignment: src.vertical_alignment.unwrap_or(VerticalTextAlignment::Center),
+            color: src.color.unwrap_or(color::WHITE),
+            scale: src.scale.unwrap_or(1.0),
+            font: src.font.unwrap_or("default".to_string()),
+        }
+    }
+}
+
 #[derive(Debug)]
 pub struct Theme {
     pub text: Option<String>,
-    pub font: String,
+    pub text_params: TextParams,
     pub name: String,
     pub background: Option<String>,
     pub border: Border,
@@ -54,9 +87,6 @@ pub struct Theme {
     pub y_relative: PositionRelative,
     pub position: Point,
     pub children: HashMap<String, Rc<Theme>>,
-    pub horizontal_text_alignment: HorizontalTextAlignment,
-    pub vertical_text_alignment: VerticalTextAlignment,
-    pub text_color: Color,
 }
 
 impl Theme {
@@ -77,12 +107,7 @@ impl Theme {
         let border = builder.border.unwrap_or(Border::as_zero());
         let position = builder.position.unwrap_or(Point::as_zero());
         let preferred_size = builder.preferred_size.unwrap_or(Size::as_zero());
-        let horizontal_text_alignment =
-            builder.horizontal_text_alignment.unwrap_or(HorizontalTextAlignment::Center);
-        let vertical_text_alignment =
-            builder.vertical_text_alignment.unwrap_or(VerticalTextAlignment::Center);
-        let font = builder.font.unwrap_or("default".to_string());
-        let text_color = builder.text_color.unwrap_or(Color { r: 1.0, g: 1.0, b: 1.0, a: 1.0 });
+        let text_params = TextParams::from(builder.text_params);
 
         Theme {
             name: name.to_string(),
@@ -92,20 +117,17 @@ impl Theme {
             width_relative,
             height_relative,
             text: builder.text,
-            font,
             position,
             x_relative,
             y_relative,
             children,
-            horizontal_text_alignment,
-            vertical_text_alignment,
-            text_color,
+            text_params,
         }
     }
 
     /// Sets the text for the `WidgetState` based on the defined theme text.
-    /// References such as '#0' are expanded to the corresponding text param
-    /// stored in the WidgetState.  See `WidgetState#add_text_param`
+    /// References such as '#0' are expanded to the corresponding text argm
+    /// stored in the WidgetState.  See `WidgetState#add_text_arg`
     pub fn apply_text(&self, state: &mut WidgetState) {
         let text = match self.text {
             None => return,
@@ -113,14 +135,14 @@ impl Theme {
         };
 
         let mut out = String::new();
-        let mut param_next = false;
+        let mut arg_next = false;
         for c in text.chars() {
-            if param_next {
+            if arg_next {
                 if c == '#' {
                     // ## code just gives a #
                     out.push(c);
                 } else {
-                    let param_index = match c.to_digit(10) {
+                    let arg_index = match c.to_digit(10) {
                         None => {
                             warn!("Invalid format string for text: '{}'", text);
                             return;
@@ -128,18 +150,18 @@ impl Theme {
                         Some(index) => index,
                     };
 
-                    let text_param = match state.get_text_param(param_index) {
+                    let text_arg = match state.get_text_arg(arg_index) {
                         None => {
-                            warn!("Non existant text param '{}' in text '{}'", param_index, text);
+                            warn!("Non existant text arg '{}' in text '{}'", arg_index, text);
                             return;
                         },
-                        Some(param) => param,
+                        Some(arg) => arg,
                     };
-                    out.push_str(text_param);
+                    out.push_str(text_arg);
                 }
-                param_next = false;
+                arg_next = false;
             } else if c == '#' {
-                param_next = true;
+                arg_next = true;
             } else {
                 out.push(c);
             }
@@ -150,15 +172,33 @@ impl Theme {
 }
 
 #[derive(Deserialize, Debug, Clone)]
+struct TextParamsBuilder {
+    horizontal_alignment: Option<HorizontalTextAlignment>,
+    vertical_alignment: Option<VerticalTextAlignment>,
+    color: Option<Color>,
+    scale: Option<f32>,
+    font: Option<String>,
+}
+
+impl TextParamsBuilder {
+    fn as_none() -> TextParamsBuilder {
+        TextParamsBuilder {
+            horizontal_alignment: None,
+            vertical_alignment: None,
+            color: None,
+            scale: None,
+            font: None,
+        }
+    }
+}
+
+#[derive(Deserialize, Debug, Clone)]
 pub struct ThemeBuilder {
     pub background: Option<String>,
     pub border: Option<Border>,
     pub preferred_size: Option<Size>,
     pub text: Option<String>,
-    pub font: Option<String>,
-    pub horizontal_text_alignment: Option<HorizontalTextAlignment>,
-    pub vertical_text_alignment: Option<VerticalTextAlignment>,
-    pub text_color: Option<Color>,
+    text_params: Option<TextParamsBuilder>,
     pub position: Option<Point>,
     pub x_relative: Option<PositionRelative>,
     pub y_relative: Option<PositionRelative>,
@@ -243,19 +283,28 @@ impl ThemeBuilder {
         if self.background.is_none() { self.background = other.background; }
         if self.border.is_none() { self.border = other.border; }
         if self.preferred_size.is_none() { self.preferred_size = other.preferred_size; }
-        if self.font.is_none() { self.font = other.font; }
         if self.text.is_none() { self.text = other.text; }
         if self.position.is_none() { self.position = other.position; }
         if self.x_relative.is_none() { self.x_relative = other.x_relative; }
         if self.y_relative.is_none() { self.y_relative = other.y_relative; }
         if self.width_relative.is_none() { self.width_relative = other.width_relative; }
         if self.height_relative.is_none() { self.height_relative = other.height_relative; }
-        if self.text_color.is_none() { self.text_color = other.text_color; }
-        if self.horizontal_text_alignment.is_none() {
-            self.horizontal_text_alignment = other.horizontal_text_alignment;
-        }
-        if self.vertical_text_alignment.is_none() {
-            self.vertical_text_alignment = other.vertical_text_alignment;
+
+        if let Some(other_text_params) = other.text_params {
+            match self.text_params {
+                None => self.text_params = Some(other_text_params),
+                Some(ref mut text_params) => {
+                    if text_params.horizontal_alignment.is_none() {
+                        text_params.horizontal_alignment = other_text_params.horizontal_alignment;
+                    }
+                    if text_params.vertical_alignment.is_none() {
+                        text_params.vertical_alignment = other_text_params.vertical_alignment;
+                    }
+                    if text_params.color.is_none() { text_params.color = other_text_params.color; }
+                    if text_params.scale.is_none() { text_params.scale = other_text_params.scale; }
+                    if text_params.font.is_none() { text_params.font = other_text_params.font; }
+                }
+            }
         }
 
         // copy over only those children which aren't specified in this theme

@@ -1,8 +1,8 @@
 use std::rc::Rc;
 use std::option::Option;
 
-use ui::{Border, color, Color, Size, AnimationState};
-use ui::theme::{HorizontalTextAlignment, VerticalTextAlignment};
+use ui::{Border, Size, AnimationState};
+use ui::theme::TextParams;
 
 use util::Point;
 use image::Image;
@@ -22,19 +22,16 @@ pub struct WidgetState {
     pub scroll_pos: Point,
     pub max_scroll_pos: Point,
     pub text: String,
-    pub text_color: Color,
+    pub text_params: TextParams,
     pub font: Option<Rc<Font>>,
-    pub horizontal_text_alignment: HorizontalTextAlignment,
-    pub vertical_text_alignment: VerticalTextAlignment,
     pub is_modal: bool,
     pub is_mouse_over: bool,
 
-    pub text_params: Vec<String>,
+    pub text_args: Vec<String>,
 }
 
 impl WidgetState {
     pub fn new() -> WidgetState {
-
         WidgetState {
             size: Size::as_zero(),
             position: Point::as_zero(),
@@ -46,10 +43,8 @@ impl WidgetState {
             max_scroll_pos: Point::as_zero(),
             font: None,
             text: String::new(),
-            text_color: color::WHITE,
-            text_params: Vec::new(),
-            horizontal_text_alignment: HorizontalTextAlignment::Center,
-            vertical_text_alignment: VerticalTextAlignment::Center,
+            text_params: TextParams::default(),
+            text_args: Vec::new(),
             inner_size: Size::as_zero(),
             inner_position: Point::as_zero(),
             is_modal: false,
@@ -113,22 +108,22 @@ impl WidgetState {
         self.scroll_pos.min(x, y);
     }
 
-    /// Adds a text param to the list of text params stored in this
+    /// Adds a text argument to the list of text args stored in this
     /// state.  When building the output text for the owning widget,
     /// this is accessed by #n in the text format string, where n is
     /// an integer 0 to 9.  Use '##' to produce one '#' character in
     /// the output
-    pub fn add_text_param(&mut self, param: &str) {
-        self.text_params.push(param.to_string());
+    pub fn add_text_arg(&mut self, param: &str) {
+        self.text_args.push(param.to_string());
     }
 
     /// clears all current text params, see `add_text_param`
-    pub fn clear_text_params(&mut self) {
-        self.text_params.clear();
+    pub fn clear_text_args(&mut self) {
+        self.text_args.clear();
     }
 
-    pub fn get_text_param(&self, index: u32) -> Option<&str> {
-        self.text_params.get(index as usize).map(|x| String::as_str(x))
+    pub fn get_text_arg(&self, index: u32) -> Option<&str> {
+        self.text_args.get(index as usize).map(|x| String::as_str(x))
     }
 
     pub fn set_text_content(&mut self, text: String) {
@@ -145,10 +140,6 @@ impl WidgetState {
 
     pub fn set_background(&mut self, image: Option<Rc<Image>>) {
         self.background = image;
-    }
-
-    pub fn set_font(&mut self, font: Option<Rc<Font>>) {
-        self.font = font;
     }
 
     pub(super) fn set_mouse_inside(&mut self, is_inside: bool) {

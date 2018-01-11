@@ -105,16 +105,15 @@ impl Widget {
             self.state.set_background(ResourceSet::get_image(&bg));
         }
 
-        if let Some(font) = ResourceSet::get_font(&theme.font) {
-            self.state.set_font(Some(font));
+        if let Some(font) = ResourceSet::get_font(&theme.text_params.font) {
+            self.state.font = Some(font);
         } else if theme.text.is_some() {
-            warn!("Font '{}' not found for widget '{}' which has text.", theme.font, self.theme_id);
+            warn!("Font '{}' not found for widget '{}' which has text.",
+                  theme.text_params.font, self.theme_id);
         }
 
         self.state.set_border(theme.border.clone());
-        self.state.horizontal_text_alignment = theme.horizontal_text_alignment;
-        self.state.vertical_text_alignment = theme.vertical_text_alignment;
-        self.state.text_color = theme.text_color;
+        self.state.text_params = theme.text_params.clone();
 
         theme.apply_text(&mut self.state);
     }

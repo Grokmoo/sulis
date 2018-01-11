@@ -120,8 +120,8 @@ impl WidgetKind for AreaView {
         let width = area_state.borrow().area.width;
         let height = area_state.borrow().area.height;
         widget.borrow_mut().state.set_max_scroll_pos(width, height);
-        self.mouse_over.borrow_mut().state.add_text_param("");
-        self.mouse_over.borrow_mut().state.add_text_param("");
+        self.mouse_over.borrow_mut().state.add_text_arg("");
+        self.mouse_over.borrow_mut().state.add_text_arg("");
 
         let mut buffer: ImageBuffer<Rgba<u8>, Vec<u8>> = ImageBuffer::new(TILE_CACHE_TEXTURE_SIZE,
                                                                           TILE_CACHE_TEXTURE_SIZE);
@@ -258,9 +258,9 @@ impl WidgetKind for AreaView {
 
         {
             let ref mut state = self.mouse_over.borrow_mut().state;
-            state.clear_text_params();
-            state.add_text_param(&format!("{}", area_x));
-            state.add_text_param(&format!("{}", area_y));
+            state.clear_text_args();
+            state.add_text_arg(&format!("{}", area_x));
+            state.add_text_arg(&format!("{}", area_y));
         }
         self.mouse_over.borrow_mut().invalidate_layout();
 
@@ -302,7 +302,7 @@ impl WidgetKind for AreaView {
 
     fn on_mouse_exit(&self, widget: &Rc<RefCell<Widget>>) -> bool {
         self.super_on_mouse_exit(widget);
-        self.mouse_over.borrow_mut().state.clear_text_params();
+        self.mouse_over.borrow_mut().state.clear_text_args();
         self.clear_cursors();
         true
     }

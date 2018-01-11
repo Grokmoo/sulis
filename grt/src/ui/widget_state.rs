@@ -1,7 +1,7 @@
 use std::rc::Rc;
 use std::option::Option;
 
-use ui::{Border, Size, AnimationState};
+use ui::{Border, color, Color, Size, AnimationState};
 use ui::theme::{HorizontalTextAlignment, VerticalTextAlignment};
 
 use util::Point;
@@ -22,6 +22,7 @@ pub struct WidgetState {
     pub scroll_pos: Point,
     pub max_scroll_pos: Point,
     pub text: String,
+    pub text_color: Color,
     pub font: Option<Rc<Font>>,
     pub horizontal_text_alignment: HorizontalTextAlignment,
     pub vertical_text_alignment: VerticalTextAlignment,
@@ -45,6 +46,7 @@ impl WidgetState {
             max_scroll_pos: Point::as_zero(),
             font: None,
             text: String::new(),
+            text_color: color::WHITE,
             text_params: Vec::new(),
             horizontal_text_alignment: HorizontalTextAlignment::Center,
             vertical_text_alignment: VerticalTextAlignment::Center,

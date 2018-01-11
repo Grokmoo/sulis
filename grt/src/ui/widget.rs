@@ -114,6 +114,7 @@ impl Widget {
         self.state.set_border(theme.border.clone());
         self.state.horizontal_text_alignment = theme.horizontal_text_alignment;
         self.state.vertical_text_alignment = theme.vertical_text_alignment;
+        self.state.text_color = theme.text_color;
 
         theme.apply_text(&mut self.state);
     }

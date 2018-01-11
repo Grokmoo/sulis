@@ -20,7 +20,7 @@ use std::cell::{RefCell, Ref};
 use extern_image::{ImageBuffer, Rgba};
 
 use config::{CONFIG, IOAdapter};
-use ui::Widget;
+use ui::{Widget, Color};
 use io::keyboard_event::Key;
 use resource::Sprite;
 
@@ -150,8 +150,8 @@ impl DrawList {
         self.scale = [scale_x, scale_y];
     }
 
-    pub fn set_color(&mut self, red: f32, green: f32, blue: f32, alpha: f32) {
-        self.color_filter = [red, green, blue, alpha];
+    pub fn set_color(&mut self, color: Color) {
+        self.color_filter = [color.r, color.g, color.b, color.a];
     }
 
     /// appends the contents of the other drawlist to this one, moving

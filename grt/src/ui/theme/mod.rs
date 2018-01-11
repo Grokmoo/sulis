@@ -5,7 +5,7 @@ use std::collections::HashMap;
 
 use resource::BuilderType;
 use util::Point;
-use ui::{AnimationState, Border, Size, WidgetState};
+use ui::{Border, Color, Size, WidgetState};
 
 use serde_json;
 use serde_yaml;
@@ -40,14 +40,6 @@ pub enum VerticalTextAlignment {
     Bottom,
 }
 
-#[derive(Deserialize, Debug, Clone, Copy, PartialEq)]
-pub enum TextFormat {
-    Normal,
-    Bold,
-    Italic,
-    Underline,
-}
-
 #[derive(Debug)]
 pub struct Theme {
     pub text: Option<String>,
@@ -64,7 +56,7 @@ pub struct Theme {
     pub children: HashMap<String, Rc<Theme>>,
     pub horizontal_text_alignment: HorizontalTextAlignment,
     pub vertical_text_alignment: VerticalTextAlignment,
-    pub text_format: HashMap<AnimationState, TextFormat>,
+    pub text_color: Color,
 }
 
 impl Theme {
@@ -75,20 +67,6 @@ impl Theme {
         if let Some(builder_children) = builder.children {
             for (id, child) in builder_children {
                 children.insert(id.to_string(), Rc::new(Theme::new(&id, child)));
-            }
-        }
-
-        let mut text_format: HashMap<AnimationState, TextFormat> = HashMap::new();
-        if let Some(builder_text_format) = builder.text_format {
-            for (state_str, format) in builder_text_format {
-                match AnimationState::parse(&state_str) {
-                    Ok(state) => { text_format.insert(state, format); }
-                    Err(e) => {
-                        warn!("The animation state '{}' could not be parsed \
-                              for the text_format '{:?}'", state_str, format);
-                        warn!("{}", e);
-                    }
-                };
             }
         }
 
@@ -104,6 +82,7 @@ impl Theme {
         let vertical_text_alignment =
             builder.vertical_text_alignment.unwrap_or(VerticalTextAlignment::Center);
         let font = builder.font.unwrap_or("default".to_string());
+        let text_color = builder.text_color.unwrap_or(Color { r: 1.0, g: 1.0, b: 1.0, a: 1.0 });
 
         Theme {
             name: name.to_string(),
@@ -120,7 +99,7 @@ impl Theme {
             children,
             horizontal_text_alignment,
             vertical_text_alignment,
-            text_format,
+            text_color,
         }
     }
 
@@ -179,7 +158,7 @@ pub struct ThemeBuilder {
     pub font: Option<String>,
     pub horizontal_text_alignment: Option<HorizontalTextAlignment>,
     pub vertical_text_alignment: Option<VerticalTextAlignment>,
-    pub text_format: Option<HashMap<String, TextFormat>>,
+    pub text_color: Option<Color>,
     pub position: Option<Point>,
     pub x_relative: Option<PositionRelative>,
     pub y_relative: Option<PositionRelative>,
@@ -271,24 +250,12 @@ impl ThemeBuilder {
         if self.y_relative.is_none() { self.y_relative = other.y_relative; }
         if self.width_relative.is_none() { self.width_relative = other.width_relative; }
         if self.height_relative.is_none() { self.height_relative = other.height_relative; }
+        if self.text_color.is_none() { self.text_color = other.text_color; }
         if self.horizontal_text_alignment.is_none() {
             self.horizontal_text_alignment = other.horizontal_text_alignment;
         }
         if self.vertical_text_alignment.is_none() {
             self.vertical_text_alignment = other.vertical_text_alignment;
-        }
-
-        // copy over only those states which aren't specified in this theme
-        if let Some(other_text_format) = other.text_format {
-            if self.text_format.is_none() {
-                self.text_format = Some(HashMap::new());
-            }
-
-            for (state, format) in other_text_format {
-                if !self.text_format.as_ref().unwrap().contains_key(&state) {
-                    self.text_format.as_mut().unwrap().insert(state, format);
-                }
-            }
         }
 
         // copy over only those children which aren't specified in this theme

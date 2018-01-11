@@ -2,7 +2,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 use std::cmp;
 
-use grt::ui::{Cursor, Label, WidgetKind, Widget};
+use grt::ui::{color, Cursor, Label, WidgetKind, Widget};
 use grt::io::*;
 use grt::io::event::ClickKind;
 use grt::util::Point;
@@ -21,7 +21,7 @@ pub struct AreaView {
     current_area_id: RefCell<String>,
 }
 
-const TILE_CACHE_TEXTURE_SIZE: u32 = 4096;
+const TILE_CACHE_TEXTURE_SIZE: u32 = 1024;
 const TILE_SIZE: u32 = 16;
 
 impl AreaView {
@@ -280,7 +280,7 @@ impl WidgetKind for AreaView {
 
         self.clear_cursors();
         if let Some(mut cursor_draw_list) = cursor_draw_list {
-            cursor_draw_list.set_color(1.0, 0.0, 0.0, 1.0);
+            cursor_draw_list.set_color(color::RED);
             self.add_cursor(cursor_draw_list);
         } else {
             let pc = GameState::pc();
@@ -292,7 +292,7 @@ impl WidgetKind for AreaView {
 
             let action_menu = ActionMenu::new(Rc::clone(&area_state), area_x, area_y);
             if !action_menu.is_default_callback_valid() {
-                draw_list.set_color(1.0, 0.0, 0.0, 1.0);
+                draw_list.set_color(color::RED);
             }
 
             self.add_cursor(draw_list);

@@ -6,7 +6,7 @@ children:
     border: [1, 1, 1, 1]
     background: bg_base
     text: "#0"
-    preferred_size: [10, 3]
+    preferred_size: [8, 3]
     x_relative: Cursor
     y_relative: Cursor
     position: [-5, -4]
@@ -29,6 +29,7 @@ children:
       test_button:
         from: .button
         text: "Test"
+        text_color: [ 1.0, 0.0, 0.0, 1.0 ]
         preferred_size: [18, 3]
         position: [0, 2]
   area:
@@ -46,7 +47,7 @@ children:
             from: .label
             text: "Actions"
             horizontal_text_alignment: Center
-            preferred_size: [10, 1]
+            preferred_size: [6, 1]
             position: [0, 0]
           actions:
             from: .list_box
@@ -68,9 +69,11 @@ children:
         preferred_size: [0, 1]
       close:
         from: .button
-        preferred_size: [3, 3]
+        horizontal_text_alignment: Center
+        border: [0, 0, 0, 0]
+        preferred_size: [2, 1]
         text: "X"
-        position: [1, -1]
+        position: [0, 0]
         x_relative: Max
   inventory_window:
     from: .window

@@ -1,6 +1,9 @@
 pub mod theme;
 pub use self::theme::Theme;
 
+pub mod color;
+pub use self::color::Color;
+
 pub mod widget;
 pub use self::widget::Widget;
 

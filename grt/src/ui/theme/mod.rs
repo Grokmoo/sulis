@@ -126,7 +126,7 @@ impl Theme {
     }
 
     /// Sets the text for the `WidgetState` based on the defined theme text.
-    /// References such as '#0' are expanded to the corresponding text argm
+    /// References such as '#0#' are expanded to the corresponding text arg
     /// stored in the WidgetState.  See `WidgetState#add_text_arg`
     pub fn apply_text(&self, state: &mut WidgetState) {
         let text = match self.text {
@@ -135,36 +135,46 @@ impl Theme {
         };
 
         let mut out = String::new();
-        let mut arg_next = false;
+        let mut cur_arg = String::new();
+        let mut arg_accum = false;
         for c in text.chars() {
-            if arg_next {
-                if c == '#' {
-                    // ## code just gives a #
-                    out.push(c);
+            if arg_accum {
+                if c.is_whitespace() {
+                } else if c == '#' {
+                    if cur_arg.len() == 0 {
+                        // ## code just gives a #
+                        out.push(c);
+                    } else {
+                        let text_arg = match state.get_text_arg(&cur_arg) {
+                            None => {
+                                warn!("Non existant text arg '{}' in text '{}'", cur_arg, text);
+                                return;
+                            },
+                            Some(arg) => arg,
+                        };
+                        out.push_str(text_arg);
+                    }
+                    arg_accum = false;
+                    cur_arg.clear();
                 } else {
-                    let arg_index = match c.to_digit(10) {
-                        None => {
-                            warn!("Invalid format string for text: '{}'", text);
-                            return;
-                        },
-                        Some(index) => index,
-                    };
-
-                    let text_arg = match state.get_text_arg(arg_index) {
-                        None => {
-                            warn!("Non existant text arg '{}' in text '{}'", arg_index, text);
-                            return;
-                        },
-                        Some(arg) => arg,
-                    };
-                    out.push_str(text_arg);
+                    cur_arg.push(c);
                 }
-                arg_next = false;
             } else if c == '#' {
-                arg_next = true;
+                arg_accum = true;
             } else {
                 out.push(c);
             }
+        }
+
+        if cur_arg.len() > 0 {
+            let text_arg = match state.get_text_arg(&cur_arg) {
+                None => {
+                    warn!("Non existant text arg '{}' in text '{}'", cur_arg, text);
+                    return;
+                },
+                Some(arg) => arg,
+            };
+            out.push_str(text_arg);
         }
 
         state.set_text_content(out);

@@ -29,6 +29,9 @@ pub use self::button::Button;
 pub mod list_box;
 pub use self::list_box::ListBox;
 
+pub mod text_area;
+pub use self::text_area::TextArea;
+
 mod confirmation_window;
 pub use self::confirmation_window::ConfirmationWindow;
 
@@ -37,6 +40,11 @@ pub use self::cursor::Cursor;
 
 mod callback;
 pub use self::callback::Callback;
+
+mod font_renderer;
+pub use self::font_renderer::FontRenderer;
+pub use self::font_renderer::LineRenderer;
+pub use self::font_renderer::MarkupRenderer;
 
 use std::rc::Rc;
 use std::cell::RefCell;

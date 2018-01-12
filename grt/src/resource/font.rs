@@ -3,7 +3,7 @@ use std::rc::Rc;
 use std::char;
 use std::collections::HashMap;
 
-use io::{DrawList, Vertex};
+use io::Vertex;
 use resource::ResourceBuilder;
 use util::{invalid_data_error, Point, Size};
 use config::CONFIG;
@@ -43,38 +43,35 @@ impl Font {
         width
     }
 
-    pub fn get_draw_list(&self, text: &str, pos_x: f32, pos_y: f32, line_height: f32) -> DrawList {
+    /// Adds a quad for the given character to the quads list if the
+    /// character can be found in the font.  If not, does nothing.
+    /// Returns the position that the next character in the line should
+    /// be drawn at (i.e. pos_x plus x_advance for the font character)
+    /// `line_height` scales the drawing, 1.0 for no scaling
+    pub fn get_quad(&self, quads: &mut Vec<[Vertex; 4]>, c: char,
+                    pos_x: f32, pos_y: f32, line_height: f32) -> f32 {
+        let font_char = match self.characters.get(&c) {
+            None => return pos_x,
+            Some(font_char) => font_char,
+        };
         let scale_factor = line_height / self.line_height as f32;
-        let mut quads: Vec<[Vertex; 4]> = Vec::new();
 
-        let mut x = pos_x;
-        let y = pos_y;
-        for c in text.chars() {
-            let font_char = match self.characters.get(&c) {
-                None => continue,
-                Some(font_char) => font_char,
-            };
-
-            let tc = &font_char.tex_coords;
-            let x_char = x + scale_factor * font_char.offset.x as f32;
-            let y_char = y + scale_factor * font_char.offset.y as f32;
-            let x_min = x_char;
-            let y_min = CONFIG.display.height as f32 - y_char;
-            let x_max = x_char + scale_factor * font_char.size.width as f32;
-            let y_max = CONFIG.display.height as f32
-                - (y_char + scale_factor * font_char.size.height as f32);
-            quads.push([
-                    Vertex { position: [ x_min, y_max ], tex_coords: [tc[0], tc[1]] },
-                    Vertex { position: [ x_min, y_min ], tex_coords: [tc[2], tc[3]] },
-                    Vertex { position: [ x_max, y_max ], tex_coords: [tc[4], tc[5]] },
-                    Vertex { position: [ x_max, y_min ], tex_coords: [tc[6], tc[7]] },
-                ]
-            );
-
-            x += scale_factor * font_char.x_advance as f32;
-        }
-
-        DrawList::from_font(&self.id, quads)
+        let tc = &font_char.tex_coords;
+        let x_char = pos_x + scale_factor * font_char.offset.x as f32;
+        let y_char = pos_y + scale_factor * font_char.offset.y as f32;
+        let x_min = x_char;
+        let y_min = CONFIG.display.height as f32 - y_char;
+        let x_max = x_char + scale_factor * font_char.size.width as f32;
+        let y_max = CONFIG.display.height as f32
+            - (y_char + scale_factor * font_char.size.height as f32);
+        quads.push([
+                   Vertex { position: [ x_min, y_max ], tex_coords: [tc[0], tc[1]] },
+                   Vertex { position: [ x_min, y_min ], tex_coords: [tc[2], tc[3]] },
+                   Vertex { position: [ x_max, y_max ], tex_coords: [tc[4], tc[5]] },
+                   Vertex { position: [ x_max, y_min ], tex_coords: [tc[6], tc[7]] },
+        ]
+        );
+        pos_x + scale_factor * (font_char.x_advance as f32)
     }
 
     pub fn new(dir: &str, builder: FontBuilder) -> Result<Rc<Font>, Error> {

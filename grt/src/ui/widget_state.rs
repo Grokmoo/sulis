@@ -1,7 +1,8 @@
 use std::rc::Rc;
 use std::option::Option;
+use std::collections::HashMap;
 
-use ui::{Border, Size, AnimationState};
+use ui::{AnimationState, Border, FontRenderer, Size};
 use ui::theme::TextParams;
 
 use util::Point;
@@ -23,11 +24,12 @@ pub struct WidgetState {
     pub max_scroll_pos: Point,
     pub text: String,
     pub text_params: TextParams,
+    pub text_renderer: Option<Box<FontRenderer>>,
     pub font: Option<Rc<Font>>,
     pub is_modal: bool,
     pub is_mouse_over: bool,
 
-    pub text_args: Vec<String>,
+    pub text_args: HashMap<String, String>,
 }
 
 impl WidgetState {
@@ -44,7 +46,8 @@ impl WidgetState {
             font: None,
             text: String::new(),
             text_params: TextParams::default(),
-            text_args: Vec::new(),
+            text_renderer: None,
+            text_args: HashMap::new(),
             inner_size: Size::as_zero(),
             inner_position: Point::as_zero(),
             is_modal: false,
@@ -110,11 +113,10 @@ impl WidgetState {
 
     /// Adds a text argument to the list of text args stored in this
     /// state.  When building the output text for the owning widget,
-    /// this is accessed by #n in the text format string, where n is
-    /// an integer 0 to 9.  Use '##' to produce one '#' character in
-    /// the output
-    pub fn add_text_arg(&mut self, param: &str) {
-        self.text_args.push(param.to_string());
+    /// this is accessed by #id in the text format string.  Use
+    /// '##' to produce one '#' character in the output
+    pub fn add_text_arg(&mut self, id: &str, param: &str) {
+        self.text_args.insert(id.to_string(), param.to_string());
     }
 
     /// clears all current text params, see `add_text_param`
@@ -122,8 +124,8 @@ impl WidgetState {
         self.text_args.clear();
     }
 
-    pub fn get_text_arg(&self, index: u32) -> Option<&str> {
-        self.text_args.get(index as usize).map(|x| String::as_str(x))
+    pub fn get_text_arg(&self, id: &str) -> Option<&str> {
+        self.text_args.get(id).map(|x| String::as_str(x))
     }
 
     pub fn set_text_content(&mut self, text: String) {

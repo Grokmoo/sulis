@@ -120,8 +120,8 @@ impl WidgetKind for AreaView {
         let width = area_state.borrow().area.width;
         let height = area_state.borrow().area.height;
         widget.borrow_mut().state.set_max_scroll_pos(width, height);
-        self.mouse_over.borrow_mut().state.add_text_arg("");
-        self.mouse_over.borrow_mut().state.add_text_arg("");
+        self.mouse_over.borrow_mut().state.add_text_arg("0", "");
+        self.mouse_over.borrow_mut().state.add_text_arg("1", "");
 
         let mut buffer: ImageBuffer<Rgba<u8>, Vec<u8>> = ImageBuffer::new(TILE_CACHE_TEXTURE_SIZE,
                                                                           TILE_CACHE_TEXTURE_SIZE);
@@ -259,8 +259,8 @@ impl WidgetKind for AreaView {
         {
             let ref mut state = self.mouse_over.borrow_mut().state;
             state.clear_text_args();
-            state.add_text_arg(&format!("{}", area_x));
-            state.add_text_arg(&format!("{}", area_y));
+            state.add_text_arg("0", &format!("{}", area_x));
+            state.add_text_arg("1", &format!("{}", area_y));
         }
         self.mouse_over.borrow_mut().invalidate_layout();
 

@@ -1,7 +1,7 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use ui::{Callback, Label, Widget, WidgetKind};
+use ui::{Callback, Label, LineRenderer, Widget, WidgetKind};
 use io::{event, GraphicsRenderer, TextRenderer};
 use util::Point;
 
@@ -47,9 +47,13 @@ impl WidgetKind for Button {
 
     fn layout(&self, widget: &mut Widget) {
         if let Some(ref text) = self.label.text {
-            widget.state.add_text_arg(text);
+            widget.state.add_text_arg("0", text);
         }
         widget.do_base_layout();
+
+        if let Some(ref font) = widget.state.font {
+            widget.state.text_renderer = Some(Box::new(LineRenderer::new(font)));
+        }
     }
 
     fn draw_text_mode(&self, renderer: &mut TextRenderer,

@@ -1,3 +1,4 @@
+---
 include:
   - widgets
 children:
@@ -5,7 +6,7 @@ children:
     from: .label
     border: [1, 1, 1, 1]
     background: bg_base
-    text: "#0"
+    text: "#0#"
     preferred_size: [8, 3]
     x_relative: Cursor
     y_relative: Cursor
@@ -18,12 +19,12 @@ children:
     children:
       mouse_over:
         from: .label
-        text: "{#0,#1}"
+        text: "{#0#,#1#}"
         preferred_size: [10, 1]
         position: [0, 1]
       title:
         from: .label
-        text: "#0"
+        text: "#0#"
         preferred_size: [18, 1]
         position: [0, 0]
       test_button:
@@ -97,4 +98,19 @@ children:
     from: .window
     children:
       title:
-        text: "Character for #0"
+        text: "Character for #name#"
+      details:
+        from: .text_area
+        text: |
+          [h1]{This is a test title}
+          [h2]{This is another test title}
+          This is a test very long [h4]{string} that should have plenty of line breaks for testing
+          purposes.  Depending on the yaml string type, inline newlines can cause a line
+          break or not.
+
+          This is an additional paragraph.
+        preferred_size: [0, -2]
+        position: [0, 2]
+        width_relative: Max
+        height_relative: Max
+...

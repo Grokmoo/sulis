@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use ui::theme::{HorizontalTextAlignment, VerticalTextAlignment};
-use ui::{Widget, WidgetKind};
+use ui::{LineRenderer, Widget, WidgetKind};
 use io::{GraphicsRenderer, TextRenderer};
 use util::Point;
 
@@ -58,23 +58,29 @@ impl WidgetKind for Label {
 
     fn layout(&self, widget: &mut Widget) {
         if let Some(ref text) = self.text {
-            widget.state.add_text_arg(text);
+            widget.state.add_text_arg("0", text);
         }
 
         widget.do_base_layout();
+
+        if let Some(ref font) = widget.state.font {
+            widget.state.text_renderer = Some(Box::new(LineRenderer::new(font)));
+        }
     }
 
     fn draw_graphics_mode(&self, renderer: &mut GraphicsRenderer, _pixel_size: Point,
                           widget: &Widget, _millis: u32) {
-        let font = match &widget.state.font {
+        let font_rend = match &widget.state.text_renderer {
             &None => return,
-            &Some(ref font) => font,
+            &Some(ref renderer) => renderer,
         };
+
+        let font = font_rend.get_font();
         let scale = widget.state.text_params.scale;
         let width = font.get_width(&widget.state.text) as f32 * scale / font.base as f32;
         let (x, y, text) = Label::get_draw_params(width, scale, widget);
 
-        let mut draw_list = font.get_draw_list(text, x, y, scale);
+        let mut draw_list = font_rend.render(text, x, y, scale);
         draw_list.set_color(widget.state.text_params.color);
 
         renderer.draw(draw_list);

@@ -15,11 +15,15 @@ children:
     height_relative: ChildSum
     children:
       entry:
-        text: "#0"
+        text: "#0#"
         text_params:
           font: "large"
           horizontal_alignment: Left
         background: fill
         border: { top: 0, bottom: 0, left: 0, right: 0 }
         preferred_size: [0, 1]
+  text_area:
+    text_params:
+      font: "large"
+      vertical_alignment: Top
 ...

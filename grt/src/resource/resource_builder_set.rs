@@ -2,6 +2,7 @@ use resource::*;
 use resource::entity_size::EntitySizeBuilder;
 use resource::spritesheet::SpritesheetBuilder;
 use resource::font::FontBuilder;
+use resource::race::RaceBuilder;
 use image::simple_image::SimpleImageBuilder;
 use image::composed_image::ComposedImageBuilder;
 use image::animated_image::AnimatedImageBuilder;
@@ -20,6 +21,7 @@ pub struct ResourceBuilderSet {
     pub size_builders: HashMap<String, EntitySizeBuilder>,
     pub area_builders: HashMap<String, AreaBuilder>,
     pub tile_builders: HashMap<String, TileBuilder>,
+    pub race_builders: HashMap<String, RaceBuilder>,
     pub actor_builders: HashMap<String, ActorBuilder>,
     pub item_builders: HashMap<String, ItemBuilder>,
     pub simple_builders: HashMap<String, SimpleImageBuilder>,
@@ -70,6 +72,7 @@ impl ResourceBuilderSet {
             size_builders: read(root, "sizes"),
             tile_builders: read(root, "tiles"),
             actor_builders: read(root, "actors"),
+            race_builders: read(root, "races"),
             item_builders: read(root, "items"),
             area_builders: read(root, "areas"),
             simple_builders: read(root, "images"),

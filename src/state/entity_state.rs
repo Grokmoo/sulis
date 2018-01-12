@@ -21,7 +21,7 @@ impl PartialEq for EntityState {
 impl EntityState {
     pub(in state) fn new(actor: Rc<Actor>, location: Location, index: usize) -> EntityState {
         debug!("Creating new entity state for {}", actor.id);
-        let size = Rc::clone(&actor.default_size);
+        let size = Rc::clone(&actor.race.size);
         let actor_state = ActorState::new(actor);
         EntityState {
             actor: actor_state,

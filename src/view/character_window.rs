@@ -35,6 +35,8 @@ impl WidgetKind for CharacterWindow {
             let pc = self.character.borrow();
             let state = &mut details.borrow_mut().state;
             state.add_text_arg("name", &pc.actor.actor.name);
+            state.add_text_arg("race", &pc.actor.actor.race.name);
+            state.add_text_arg("sex", &pc.actor.actor.sex.to_string());
 
             for attribute in Attribute::iter() {
                 state.add_text_arg(attribute.short_name(), &pc.actor.attributes.get(attribute).to_string())

@@ -15,9 +15,13 @@ pub use self::tile::Tile;
 
 mod actor;
 pub use self::actor::Actor;
+pub use self::actor::Sex;
 
 pub mod item;
 pub use self::item::Item;
+
+pub mod race;
+pub use self::race::Race;
 
 mod spritesheet;
 pub use self::spritesheet::Spritesheet;
@@ -73,6 +77,7 @@ pub struct ResourceSet {
     theme: Option<Rc<Theme>>,
     areas: HashMap<String, Rc<Area>>,
     tiles: HashMap<String, Rc<Tile>>,
+    races: HashMap<String, Rc<Race>>,
     actors: HashMap<String, Rc<Actor>>,
     item_adjectives: HashMap<String, Rc<ItemAdjective>>,
     items: HashMap<String, Rc<Item>>,
@@ -90,6 +95,7 @@ impl ResourceSet {
             areas: HashMap::new(),
             tiles: HashMap::new(),
             actors: HashMap::new(),
+            races: HashMap::new(),
             sizes: HashMap::new(),
             images: HashMap::new(),
             items: HashMap::new(),
@@ -158,6 +164,10 @@ impl ResourceSet {
                     &mut resource_set.items);
             }
 
+            for (id, builder) in builder_set.race_builders.into_iter() {
+                insert_if_ok("race", id, Race::new(builder, &resource_set), &mut resource_set.races);
+            }
+
             for (id, builder) in builder_set.actor_builders.into_iter() {
                 insert_if_ok("actor", id, Actor::new(builder, &resource_set),
                     &mut resource_set.actors);
@@ -189,6 +199,10 @@ impl ResourceSet {
 
     pub fn get_game() -> Rc<Game> {
         RESOURCE_SET.with(|r| Rc::clone(r.borrow().game.as_ref().unwrap()))
+    }
+
+    pub fn get_race(id: &str) -> Option<Rc<Race>> {
+        RESOURCE_SET.with(|r| r.borrow().get_resource(id, &r.borrow().races))
     }
 
     pub fn get_actor(id: &str) -> Option<Rc<Actor>> {

@@ -3,4 +3,4 @@ name: Goblin
 player: false
 text_display: g
 image_display: "tiles/goblin"
-default_size: 3
+race: goblin

@@ -1,0 +1,8 @@
+id: pc
+name: "PC Name"
+player: true
+text_display: "@"
+image_display: tiles/pc
+race: human
+sex: Female
+items: [ sword, backpack, apple ]

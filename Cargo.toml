@@ -9,8 +9,9 @@ members = [
 ]
 
 [dependencies]
-image = "0.18"
 grt = { path = "grt" }
-backtrace = "0.3.4"
+
+backtrace = "0.3"
 flexi_logger = "0.6"
-log = "0.3"
+image = "0.18"
+log = "0.4"

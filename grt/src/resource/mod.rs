@@ -78,7 +78,7 @@ pub struct ResourceSet {
     items: HashMap<String, Rc<Item>>,
     sizes: HashMap<usize, Rc<EntitySize>>,
     images: HashMap<String, Rc<Image>>,
-    pub spritesheets: HashMap<String, Rc<Spritesheet>>,
+    spritesheets: HashMap<String, Rc<Spritesheet>>,
     fonts: HashMap<String, Rc<Font>>,
 }
 

@@ -1,6 +1,7 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
+use rules::Attribute;
 use state::{EntityState};
 use grt::ui::{Button, Callback, Label, TextArea, Widget, WidgetKind};
 
@@ -30,7 +31,15 @@ impl WidgetKind for CharacterWindow {
         let close = Widget::with_theme(Button::with_callback(Callback::remove_parent()), "close");
 
         let details = Widget::with_theme(TextArea::empty(), "details");
+        {
+            let pc = self.character.borrow();
+            let state = &mut details.borrow_mut().state;
+            state.add_text_arg("name", &pc.actor.actor.name);
 
+            for attribute in Attribute::iter() {
+                state.add_text_arg(attribute.short_name(), &pc.actor.attributes.get(attribute).to_string())
+            }
+        }
         vec![title, close, details]
     }
 }

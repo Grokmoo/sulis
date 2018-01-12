@@ -1,5 +1,6 @@
 use grt::resource::Actor;
 use state::Inventory;
+use rules::AttributeList;
 
 use std::rc::Rc;
 use std::cell::RefCell;
@@ -8,6 +9,7 @@ use std::cell::RefCell;
 pub struct ActorState {
     pub actor: Rc<Actor>,
     pub inventory: Rc<RefCell<Inventory>>,
+    pub attributes: AttributeList,
 }
 
 impl PartialEq for ActorState {
@@ -23,6 +25,7 @@ impl ActorState {
         ActorState {
             actor,
             inventory,
+            attributes: AttributeList::new(),
         }
     }
 }

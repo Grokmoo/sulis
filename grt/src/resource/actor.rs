@@ -8,6 +8,7 @@ use serde_yaml;
 
 pub struct Actor {
     pub id: String,
+    pub name: String,
     pub player: bool,
     pub text_display: char,
     pub image_display: Rc<Sprite>,
@@ -53,6 +54,7 @@ impl Actor {
 
         Ok(Actor {
             id: builder.id,
+            name: builder.name,
             player: builder.player.unwrap_or(false),
             text_display: builder.text_display,
             image_display: sprite,
@@ -65,6 +67,7 @@ impl Actor {
 #[derive(Deserialize, Debug)]
 pub struct ActorBuilder {
     pub id: String,
+    pub name: String,
     pub player: Option<bool>,
     pub text_display: char,
     pub image_display: String,

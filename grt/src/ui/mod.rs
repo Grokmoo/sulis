@@ -1,6 +1,9 @@
 pub mod theme;
 pub use self::theme::Theme;
 
+pub mod markup_renderer;
+pub use self::markup_renderer::MarkupRenderer;
+
 pub mod color;
 pub use self::color::Color;
 
@@ -44,7 +47,6 @@ pub use self::callback::Callback;
 mod font_renderer;
 pub use self::font_renderer::FontRenderer;
 pub use self::font_renderer::LineRenderer;
-pub use self::font_renderer::MarkupRenderer;
 
 use std::rc::Rc;
 use std::cell::RefCell;

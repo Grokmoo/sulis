@@ -102,20 +102,13 @@ children:
       details:
         from: .text_area
         text: |
-          [s=2.0;c=0f0|This is a test title]
-          [s=1.5|This is another test title]
-
-
-          This is a test very long [s=1.25|string] that should have plenty of line breaks for testing
-          purposes.  Depending on the yaml string type, inline newlines can cause a line
-          break or not.
-
-          This is an [c=000aff|additional] paragraph.
-
-          [x=0|Table col 1][x=10|Table col 2]
-          [x=0|Another][x=10;c=f00|And another][c=0f0| This]
-          [f=mono;s=0.75|Monospaced font]
-          [x=15;y=0;s=5.0;i=tiles/pc|]
+          [s=1.5|Attributes]
+          [s=1.25|[x=0|Strength][x=10|#str#]
+                  [x=0|Dexterity][x=10|#dex#]
+                  [x=0|Endurance][x=10|#end#]
+                  [x=0|Perception][x=10|#per#]
+                  [x=0|Intellect][x=10|#int#]
+                  [x=0|Wisdom][x=10|#wis#]]
         preferred_size: [0, -2]
         position: [0, 2]
         width_relative: Max

@@ -25,5 +25,4 @@ children:
   text_area:
     text_params:
       font: "large"
-      vertical_alignment: Top
 ...

@@ -79,11 +79,7 @@ impl WidgetKind for Label {
         let scale = widget.state.text_params.scale;
         let width = font.get_width(&widget.state.text) as f32 * scale / font.base as f32;
         let (x, y, text) = Label::get_draw_params(width, scale, widget);
-
-        let mut draw_list = font_rend.render(text, x, y, scale);
-        draw_list.set_color(widget.state.text_params.color);
-
-        renderer.draw(draw_list);
+        font_rend.render(renderer, text, x, y, &widget.state.text_params);
     }
 
     fn draw_text_mode(&self, renderer: &mut TextRenderer, widget: &Widget,

@@ -48,13 +48,8 @@ impl WidgetKind for TextArea {
             &Some(ref renderer) => renderer,
         };
 
-        let scale = widget.state.text_params.scale;
         let x = widget.state.inner_left() as f32;
         let y = widget.state.inner_top() as f32;
-
-        let mut draw_list = font_rend.render(&widget.state.text, x, y, scale);
-        draw_list.set_color(widget.state.text_params.color);
-
-        renderer.draw(draw_list);
+        font_rend.render(renderer, &widget.state.text, x, y, &widget.state.text_params);
     }
 }

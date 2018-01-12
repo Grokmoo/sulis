@@ -203,6 +203,13 @@ impl ResourceSet {
         RESOURCE_SET.with(|r| r.borrow().get_resource(id, &r.borrow().spritesheets))
     }
 
+    pub fn get_sprite_from(id: &str) -> Option<Rc<Sprite>> {
+        match RESOURCE_SET.with(|r| r.borrow().get_sprite(id)) {
+            Err(_) => None,
+            Ok(s) => Some(s),
+        }
+    }
+
     pub fn get_font(id: &str) -> Option<Rc<Font>> {
         RESOURCE_SET.with(|r| r.borrow().get_resource(id, &r.borrow().fonts))
     }

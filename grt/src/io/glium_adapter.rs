@@ -77,6 +77,7 @@ impl<'a> GliumRenderer<'a> {
             return;
         }
 
+        trace!("Creating texture for ID '{}' of type '{:?}'", texture_id, draw_list.kind);
         let image = match draw_list.kind {
             DrawListKind::Sprite => ResourceSet::get_spritesheet(&texture_id)
                 .unwrap().image.clone(),

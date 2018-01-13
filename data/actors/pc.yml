@@ -5,4 +5,6 @@ text_display: "@"
 image_display: tiles/pc
 race: human
 sex: Female
+levels:
+  fighter: 1
 items: [ sword, backpack, apple ]

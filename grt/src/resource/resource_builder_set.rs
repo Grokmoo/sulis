@@ -3,6 +3,7 @@ use resource::entity_size::EntitySizeBuilder;
 use resource::spritesheet::SpritesheetBuilder;
 use resource::font::FontBuilder;
 use resource::race::RaceBuilder;
+use resource::class::ClassBuilder;
 use image::simple_image::SimpleImageBuilder;
 use image::composed_image::ComposedImageBuilder;
 use image::animated_image::AnimatedImageBuilder;
@@ -22,6 +23,7 @@ pub struct ResourceBuilderSet {
     pub area_builders: HashMap<String, AreaBuilder>,
     pub tile_builders: HashMap<String, TileBuilder>,
     pub race_builders: HashMap<String, RaceBuilder>,
+    pub class_builders: HashMap<String, ClassBuilder>,
     pub actor_builders: HashMap<String, ActorBuilder>,
     pub item_builders: HashMap<String, ItemBuilder>,
     pub simple_builders: HashMap<String, SimpleImageBuilder>,
@@ -73,6 +75,7 @@ impl ResourceBuilderSet {
             tile_builders: read(root, "tiles"),
             actor_builders: read(root, "actors"),
             race_builders: read(root, "races"),
+            class_builders: read(root, "classes"),
             item_builders: read(root, "items"),
             area_builders: read(root, "areas"),
             simple_builders: read(root, "images"),

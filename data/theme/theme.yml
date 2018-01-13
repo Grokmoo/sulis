@@ -102,7 +102,8 @@ children:
       details:
         from: .text_area
         text: |
-          [s=1.5|[c=f00|#race#] [c=0ff|#sex#]]
+          [s=1.5|[c=f00|#race#] #sex#]
+          [s=1.25|Level #level_0# #class_0#]
           [s=1.5|]
           [s=1.25|[x=0|Strength][x=10|#str#]
                   [x=0|Dexterity][x=10|#dex#]

@@ -23,6 +23,9 @@ pub use self::item::Item;
 pub mod race;
 pub use self::race::Race;
 
+pub mod class;
+pub use self::class::Class;
+
 mod spritesheet;
 pub use self::spritesheet::Spritesheet;
 pub use self::spritesheet::Sprite;
@@ -78,6 +81,7 @@ pub struct ResourceSet {
     areas: HashMap<String, Rc<Area>>,
     tiles: HashMap<String, Rc<Tile>>,
     races: HashMap<String, Rc<Race>>,
+    classes: HashMap<String, Rc<Class>>,
     actors: HashMap<String, Rc<Actor>>,
     item_adjectives: HashMap<String, Rc<ItemAdjective>>,
     items: HashMap<String, Rc<Item>>,
@@ -96,6 +100,7 @@ impl ResourceSet {
             tiles: HashMap::new(),
             actors: HashMap::new(),
             races: HashMap::new(),
+            classes: HashMap::new(),
             sizes: HashMap::new(),
             images: HashMap::new(),
             items: HashMap::new(),
@@ -130,7 +135,7 @@ impl ResourceSet {
 
             for (id, image) in builder_set.simple_builders {
                 insert_if_ok_boxed("image", id, SimpleImage::new(image, &resource_set),
-                    &mut resource_set.images);
+                &mut resource_set.images);
             }
 
             for (id, image) in builder_set.composed_builders {
@@ -168,6 +173,10 @@ impl ResourceSet {
                 insert_if_ok("race", id, Race::new(builder, &resource_set), &mut resource_set.races);
             }
 
+            for (id, builder) in builder_set.class_builders.into_iter() {
+                insert_if_ok("class", id, Class::new(builder, &resource_set), &mut resource_set.classes);
+            }
+
             for (id, builder) in builder_set.actor_builders.into_iter() {
                 insert_if_ok("actor", id, Actor::new(builder, &resource_set),
                     &mut resource_set.actors);
@@ -203,6 +212,10 @@ impl ResourceSet {
 
     pub fn get_race(id: &str) -> Option<Rc<Race>> {
         RESOURCE_SET.with(|r| r.borrow().get_resource(id, &r.borrow().races))
+    }
+
+    pub fn get_class(id: &str) -> Option<Rc<Class>> {
+        RESOURCE_SET.with(|r| r.borrow().get_resource(id, &r.borrow().classes))
     }
 
     pub fn get_actor(id: &str) -> Option<Rc<Actor>> {

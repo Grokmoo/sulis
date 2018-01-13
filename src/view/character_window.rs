@@ -41,6 +41,14 @@ impl WidgetKind for CharacterWindow {
             for attribute in Attribute::iter() {
                 state.add_text_arg(attribute.short_name(), &pc.actor.attributes.get(attribute).to_string())
             }
+
+            let mut index = 0;
+            for &(ref class, level) in pc.actor.actor.levels.iter() {
+                state.add_text_arg(&format!("class_{}", index), &class.name);
+                state.add_text_arg(&format!("level_{}", index), &level.to_string());
+
+                index += 1;
+            }
         }
         vec![title, close, details]
     }

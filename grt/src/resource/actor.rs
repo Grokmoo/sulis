@@ -1,8 +1,9 @@
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 use std::fmt;
+use std::collections::HashMap;
 
-use resource::{Item, Race, ResourceBuilder, ResourceSet, Sprite};
+use resource::{Class, Item, Race, ResourceBuilder, ResourceSet, Sprite};
 use util::invalid_data_error;
 
 use serde_json;
@@ -29,6 +30,7 @@ pub struct Actor {
     pub text_display: char,
     pub image_display: Rc<Sprite>,
     pub items: Vec<Rc<Item>>,
+    pub levels: Vec<(Rc<Class>, u8)>,
 }
 
 impl PartialEq for Actor {
@@ -66,6 +68,18 @@ impl Actor {
             Some(sex) => sex,
         };
 
+        let mut levels: Vec<(Rc<Class>, u8)> = Vec::new();
+        for (class_id, level) in builder.levels {
+            let class = match resources.classes.get(&class_id) {
+                None => {
+                    warn!("No match for class '{}'", class_id);
+                    return invalid_data_error(&format!("Unable to create actor '{}'", builder.id));
+                }, Some(class) => Rc::clone(class)
+            };
+
+            levels.push((class, level));
+        }
+
         let sprite = resources.get_sprite(&builder.image_display)?;
 
         Ok(Actor {
@@ -76,6 +90,7 @@ impl Actor {
             image_display: sprite,
             race,
             sex,
+            levels,
             items,
         })
     }
@@ -91,6 +106,7 @@ pub struct ActorBuilder {
     pub text_display: char,
     pub image_display: String,
     pub items: Option<Vec<String>>,
+    pub levels: HashMap<String, u8>,
 }
 
 impl ResourceBuilder for ActorBuilder {

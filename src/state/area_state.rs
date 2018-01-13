@@ -1,6 +1,5 @@
-use grt::resource::{Actor, Area, ResourceSet};
-use grt::resource::area::Transition;
-
+use module::{Actor, Area, Module};
+use module::area::Transition;
 use state::EntityState;
 use state::Location;
 
@@ -46,7 +45,7 @@ impl AreaState {
         let area = Rc::clone(&area_state.borrow().area);
 
         for actor_data in area.actors.iter() {
-            let actor = match ResourceSet::get_actor(&actor_data.id) {
+            let actor = match Module::get_actor(&actor_data.id) {
                 None => {
                     warn!("No actor with id '{}' found when initializing area '{}'",
                               actor_data.id, area.id);

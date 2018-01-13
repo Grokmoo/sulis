@@ -27,7 +27,7 @@ impl SimpleImage {
             }
         }
 
-        let sprite = resources.get_sprite(&builder.image_display)?;
+        let sprite = resources.get_sprite_internal(&builder.image_display)?;
 
         Ok(Rc::new(SimpleImage {
             id: builder.id,

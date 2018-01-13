@@ -5,11 +5,12 @@ use std::collections::HashMap;
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 
-use resource::{Terrain, ResourceBuilder, ResourceSet, Sprite};
-use util::{Point, Size};
+use grt::resource::{ResourceBuilder, ResourceSet, Sprite};
+use grt::util::{Point, Size};
+use grt::serde_json;
+use grt::serde_yaml;
 
-use serde_json;
-use serde_yaml;
+use module::{Module, Terrain};
 
 #[derive(Debug)]
 pub struct Transition {
@@ -45,9 +46,9 @@ impl PartialEq for Area {
 }
 
 impl Area {
-    pub fn new(builder: AreaBuilder, resources: &ResourceSet) -> Result<Area, Error> {
+    pub fn new(builder: AreaBuilder, module: &Module) -> Result<Area, Error> {
         debug!("Creating area {}", builder.id);
-        let terrain = Terrain::new(&builder, &resources.tiles);
+        let terrain = Terrain::new(&builder, module);
         let terrain = match terrain {
             Ok(l) => l,
             Err(e) => {
@@ -57,17 +58,18 @@ impl Area {
         };
 
         let mut path_grids: HashMap<i32, PathFinderGrid> = HashMap::new();
-        for size in resources.sizes.values() {
+        for (_, size) in module.sizes.iter() {
+            let int_size = size.size;
             let path_grid = PathFinderGrid::new(Rc::clone(size), &terrain);
-            trace!("Generated path grid of size {}", size.size);
-            path_grids.insert(size.size, path_grid);
+            trace!("Generated path grid of size {}", int_size);
+            path_grids.insert(int_size, path_grid);
         }
 
         // TODO validate position of each actor
 
         let mut transitions: Vec<Transition> = Vec::new();
         for (index, t_builder) in builder.transitions.into_iter().enumerate() {
-            let sprite = resources.get_sprite(&t_builder.image_display)?;
+            let sprite = ResourceSet::get_sprite(&t_builder.image_display)?;
 
             let mut p = t_builder.from;
             if !p.in_bounds(builder.width as i32, builder.height as i32) {

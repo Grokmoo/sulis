@@ -1,12 +1,10 @@
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
-use std::collections::HashMap;
 
-use resource::Image;
-use resource::ResourceBuilder;
-
-use serde_json;
-use serde_yaml;
+use grt::image::Image;
+use grt::resource::{ResourceBuilder, ResourceSet};
+use grt::serde_json;
+use grt::serde_yaml;
 
 #[derive(Deserialize, Debug, Copy, Clone, PartialEq, Eq, Hash)]
 pub enum Slot {
@@ -34,15 +32,14 @@ impl PartialEq for Item {
 }
 
 impl Item {
-    pub fn new(builder: ItemBuilder,
-               images: &HashMap<String, Rc<Image>>) -> Result<Item, Error> {
-        let icon = match images.get(&builder.icon) {
+    pub fn new(builder: ItemBuilder) -> Result<Item, Error> {
+        let icon = match ResourceSet::get_image(&builder.icon) {
             None => {
                 warn!("No image found for icon '{}'", builder.icon);
                 return Err(Error::new(ErrorKind::InvalidData,
                                       format!("Unable to create item '{}'", builder.id)));
             },
-            Some(icon) => Rc::clone(icon)
+            Some(icon) => icon
         };
 
         Ok(Item {

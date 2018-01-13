@@ -1,10 +1,11 @@
-use std::collections::HashMap;
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 
-use resource::{AreaBuilder, ResourceSet, Sprite, Spritesheet, Tile};
-use resource::generator;
-use util::invalid_data_error;
+use grt::resource::{ResourceSet, Sprite, Spritesheet};
+use grt::util::invalid_data_error;
+
+use module::area::AreaBuilder;
+use module::{Module, Tile, generator};
 
 pub struct Terrain {
     pub width: i32,
@@ -17,12 +18,11 @@ pub struct Terrain {
 }
 
 impl Terrain {
-    pub fn new(builder: &AreaBuilder,
-               tiles: &HashMap<String, Rc<Tile>>) -> Result<Terrain, Error> {
+    pub fn new(builder: &AreaBuilder, module: &Module) -> Result<Terrain, Error> {
         let width = builder.width as i32;
         let height = builder.height as i32;
         let layer = if builder.generate {
-            let layer = generator::generate_area(tiles, width, height);
+            let layer = generator::generate_area(width, height, module);
 
             match layer {
                 Ok(l) => l,
@@ -31,18 +31,18 @@ impl Terrain {
                 }
             }
         } else {
-            if let Err(e) = Terrain::validate_tiles(builder, tiles) {
+            if let Err(e) = Terrain::validate_tiles(builder, module) {
                 return Err(e);
             }
 
             let mut layer: Vec<Option<Rc<Tile>>> = vec![None;(width * height) as usize];
 
             for (terrain_type, locations) in &builder.terrain {
-                let tile_ref = tiles.get(terrain_type).unwrap();
+                let tile_ref = module.tiles.get(terrain_type).unwrap();
 
                 for point in locations.iter() {
                     *layer.get_mut(point[0] + point[1] * width as usize).unwrap() =
-                        Some(Rc::clone(tile_ref));
+                        Some(Rc::clone(&tile_ref));
                 }
             }
 
@@ -170,10 +170,9 @@ impl Terrain {
         Ok(())
     }
 
-    fn validate_tiles(builder: &AreaBuilder,
-                      tiles: &HashMap<String, Rc<Tile>>) -> Result<(), Error> {
+    fn validate_tiles(builder: &AreaBuilder, module: &Module) -> Result<(), Error> {
         for (tile_id, locations) in &builder.terrain {
-            let tile_ref = tiles.get(tile_id);
+            let tile_ref = module.tiles.get(tile_id);
             match tile_ref {
                 Some(t) => t,
                 None => {

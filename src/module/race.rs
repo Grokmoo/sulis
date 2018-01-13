@@ -1,11 +1,12 @@
 use std::io::Error;
 use std::rc::Rc;
 
-use resource::{ResourceBuilder, ResourceSet, EntitySize};
-use util::invalid_data_error;
+use grt::resource::ResourceBuilder;
+use grt::util::invalid_data_error;
+use grt::serde_json;
+use grt::serde_yaml;
 
-use serde_json;
-use serde_yaml;
+use module::{EntitySize, Module};
 
 pub struct Race {
     pub id: String,
@@ -20,8 +21,8 @@ impl PartialEq for Race {
 }
 
 impl Race {
-    pub fn new(builder: RaceBuilder, resources: &ResourceSet) -> Result<Race, Error> {
-        let size = match resources.sizes.get(&builder.size) {
+    pub fn new(builder: RaceBuilder, module: &Module) -> Result<Race, Error> {
+        let size = match module.sizes.get(&builder.size) {
             None => {
                 warn!("No match found for size '{}'", builder.size);
                 return invalid_data_error(&format!("Unable to create race '{}'", builder.id));

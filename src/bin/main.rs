@@ -11,13 +11,14 @@ use std::{thread, time};
 use std::rc::Rc;
 use std::panic;
 
+use grt::ui::{self, Widget};
 use grt::config::CONFIG;
 use grt::resource;
+
 use game::state::GameState;
-use grt::ui;
-use grt::ui::Widget;
 use game::animation;
 use game::view::RootView;
+use game::module::Module;
 
 use flexi_logger::{Logger, opt_format};
 
@@ -32,8 +33,19 @@ fn main() {
     match resource_set_err {
         Ok(_) => (),
         Err(e) => {
-            error!("  {}", e);
+            error!("{}", e);
             error!("There was a fatal error loading resource set from 'data':");
+            error!("Exiting...");
+            ::std::process::exit(1);
+        }
+    };
+
+    info!("Reading module from {}", CONFIG.resources.directory);
+    match Module::init(&CONFIG.resources.directory) {
+        Ok(_) => (),
+        Err(e) => {
+            error!("{}", e);
+            error!("There was a fatal error setting up the module.");
             error!("Exiting...");
             ::std::process::exit(1);
         }

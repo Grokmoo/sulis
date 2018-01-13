@@ -24,10 +24,10 @@ use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use grt::resource::{Actor, ResourceSet};
 use grt::config::CONFIG;
 use grt::util::Point;
 use animation::{Animation, MoveAnimation};
+use module::{Actor, Module};
 
 thread_local! {
     static STATE: RefCell<Option<GameState>> = RefCell::new(None);
@@ -124,7 +124,7 @@ impl GameState {
     fn setup_area_state(area_id: &str) -> Result<Rc<RefCell<AreaState>>, Error> {
         debug!("Setting up area state from {}", &area_id);
 
-        let area = ResourceSet::get_area(&area_id);
+        let area = Module::get_area(&area_id);
         let area = match area {
             Some(a) => a,
             None => {
@@ -139,7 +139,7 @@ impl GameState {
     }
 
     fn new() -> Result<GameState, Error> {
-        let game = ResourceSet::get_game();
+        let game = Module::get_game();
 
         let area_state = GameState::setup_area_state(&game.starting_area)?;
 
@@ -153,7 +153,7 @@ impl GameState {
                                   "Unable to create starting location."));
         }
 
-        let pc = ResourceSet::get_actor(&game.pc);
+        let pc = Module::get_actor(&game.pc);
         let pc = match pc {
             Some(a) => a,
             None => {

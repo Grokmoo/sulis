@@ -1,9 +1,8 @@
 use std::io::{Error, ErrorKind};
 
-use resource::ResourceBuilder;
-
-use serde_json;
-use serde_yaml;
+use grt::resource::ResourceBuilder;
+use grt::serde_json;
+use grt::serde_yaml;
 
 /// An adjective is a modifier that affects the stats of
 /// an item in a given way.  Items can have zero, one, or

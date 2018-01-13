@@ -1,10 +1,9 @@
 use std::io::Error;
 
-use resource::{ResourceBuilder, ResourceSet};
-use util::invalid_data_error;
-
-use serde_json;
-use serde_yaml;
+use grt::resource::ResourceBuilder;
+use grt::util::invalid_data_error;
+use grt::serde_json;
+use grt::serde_yaml;
 
 pub struct Class {
     pub id: String,
@@ -18,7 +17,7 @@ impl PartialEq for Class {
 }
 
 impl Class {
-    pub fn new(builder: ClassBuilder, _resources: &ResourceSet) -> Result<Class, Error> {
+    pub fn new(builder: ClassBuilder) -> Result<Class, Error> {
         Ok(Class {
             id: builder.id,
             name: builder.name,

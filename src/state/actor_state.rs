@@ -1,4 +1,4 @@
-use grt::resource::Actor;
+use module::Actor;
 use state::Inventory;
 use rules::AttributeList;
 

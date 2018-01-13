@@ -1,7 +1,7 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use grt::resource::area::Transition;
+use module::area::Transition;
 use grt::ui::{Button, Callback, Cursor, Label, list_box, ListBox, Widget, WidgetKind};
 use grt::io::event::ClickKind;
 use grt::util::Point;

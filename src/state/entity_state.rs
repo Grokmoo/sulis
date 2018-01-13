@@ -1,4 +1,4 @@
-use grt::resource::{Actor, EntitySize, EntitySizeIterator};
+use module::{Actor, EntitySize, EntitySizeIterator};
 use state::{ActorState, GameState, Location};
 
 use std::rc::Rc;

@@ -1,4 +1,4 @@
-use grt::resource::Item;
+use module::Item;
 
 use std::rc::Rc;
 

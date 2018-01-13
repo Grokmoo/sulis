@@ -1,8 +1,7 @@
 use std::rc::Rc;
 use std::fmt;
 
-use resource::EntitySize;
-use resource::Terrain;
+use module::{EntitySize, Terrain};
 
 pub struct PathFinderGrid {
     pub size: Rc<EntitySize>,

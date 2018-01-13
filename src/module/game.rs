@@ -1,10 +1,9 @@
 use std::io::{Error, ErrorKind};
 
-use resource::ResourceBuilder;
-use util::Point;
-
-use serde_json;
-use serde_yaml;
+use grt::resource::ResourceBuilder;
+use grt::util::Point;
+use grt::serde_json;
+use grt::serde_yaml;
 
 #[derive(Deserialize, Debug)]
 pub struct Game {

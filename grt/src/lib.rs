@@ -5,9 +5,8 @@
 
 // json parser library for use in data
 extern crate serde;
-extern crate serde_json;
-extern crate serde_yaml;
-
+pub extern crate serde_json;
+pub extern crate serde_yaml;
 #[macro_use] extern crate serde_derive;
 
 // terminal display library
@@ -15,7 +14,7 @@ extern crate serde_yaml;
 #[cfg(not(windows))] extern crate termion;
 
 #[macro_use] extern crate glium;
-extern crate image as extern_image;
+pub extern crate image as extern_image;
 
 pub mod config;
 pub mod image;

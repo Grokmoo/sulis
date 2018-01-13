@@ -3,11 +3,11 @@ use std::rc::Rc;
 use std::fmt;
 use std::collections::HashMap;
 
-use resource::{Class, Item, Race, ResourceBuilder, ResourceSet, Sprite};
-use util::invalid_data_error;
+use grt::resource::{ResourceBuilder, ResourceSet, Sprite};
+use grt::util::invalid_data_error;
+use grt::{serde_json, serde_yaml};
 
-use serde_json;
-use serde_yaml;
+use module::{Class, Item, Module, Race};
 
 #[derive(Deserialize, Debug)]
 pub enum Sex {
@@ -40,7 +40,7 @@ impl PartialEq for Actor {
 }
 
 impl Actor {
-    pub fn new(builder: ActorBuilder, resources: &ResourceSet) -> Result<Actor, Error> {
+    pub fn new(builder: ActorBuilder, resources: &Module) -> Result<Actor, Error> {
         let race = match resources.races.get(&builder.race) {
             None => {
                 warn!("No match found for race '{}'", builder.race);
@@ -80,7 +80,7 @@ impl Actor {
             levels.push((class, level));
         }
 
-        let sprite = resources.get_sprite(&builder.image_display)?;
+        let sprite = ResourceSet::get_sprite(&builder.image_display)?;
 
         Ok(Actor {
             id: builder.id,

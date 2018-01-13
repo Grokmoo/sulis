@@ -203,12 +203,12 @@ fn draw_current(renderer: &mut GraphicsRenderer, quads: Vec<[Vertex; 4]>, markup
 
 fn draw_sprite(renderer: &mut GraphicsRenderer, image: &str,
                markup: &Markup, x: f32, y: f32) {
-    let sprite = match ResourceSet::get_sprite_from(image) {
-        None => {
+    let sprite = match ResourceSet::get_sprite(image) {
+        Err(_) => {
             warn!("Unable to find image '{}'", image);
             return;
         },
-        Some(sprite) => sprite,
+        Ok(sprite) => sprite,
     };
 
     let x_over_y = sprite.size.width as f32 / sprite.size.height as f32;

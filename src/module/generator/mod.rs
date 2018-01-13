@@ -1,27 +1,19 @@
-use resource::Tile;
-
-use std::collections::HashMap;
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 
-pub fn generate_area(tiles: &HashMap<String, Rc<Tile>>,
-                     width: i32, height: i32) -> Result<Vec<Option<Rc<Tile>>>, Error> {
+use module::{Module, Tile};
 
+pub fn generate_area(width: i32, height: i32, module: &Module) -> Result<Vec<Option<Rc<Tile>>>, Error> {
     debug!("Generating area with size {},{}", width, height);
     let width = width as usize;
     let height = height as usize;
     // filter down to only tiles of size one
-    let tiles: HashMap<String, Rc<Tile>> = tiles.iter().filter_map( |(id, tile)| {
-        if tile.width == 1 && tile.height == 1 {
-            Some((id.clone(), Rc::clone(tile)))
-        } else {
-            None
-        }
-    }).collect();
+    let tiles: Vec<Rc<Tile>> = module.tiles.iter().filter(|&(_, tile)| {
+        tile.width == 1 && tile.height == 1
+    }).map(|(_, tile)| Rc::clone(tile)).collect();
 
     let (passable_tiles, impassable_tiles):
-        (Vec<Rc<Tile>>, Vec<Rc<Tile>>) = tiles.values().
-         map(|tile| Rc::clone(tile)).partition(|tile| tile.impass.len() == 0);
+        (Vec<Rc<Tile>>, Vec<Rc<Tile>>) = tiles.into_iter().partition(|ref tile| tile.impass.len() == 0);
     trace!("Got passable tiles {:?}", passable_tiles);
     trace!("Got impassable tiles {:?}", impassable_tiles);
 

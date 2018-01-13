@@ -1,11 +1,10 @@
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 
-use resource::{ResourceBuilder, ResourceSet, Sprite};
-use util::Point;
-
-use serde_json;
-use serde_yaml;
+use grt::resource::{ResourceBuilder, ResourceSet, Sprite};
+use grt::util::Point;
+use grt::serde_json;
+use grt::serde_yaml;
 
 pub struct EntitySize {
     pub size: i32,
@@ -14,7 +13,7 @@ pub struct EntitySize {
 }
 
 impl EntitySize {
-    pub fn new(builder: EntitySizeBuilder, resources: &ResourceSet) -> Result<EntitySize, Error> {
+    pub fn new(builder: EntitySizeBuilder) -> Result<EntitySize, Error> {
         let mut points: Vec<Point> = Vec::new();
 
         for p in builder.relative_points.into_iter() {
@@ -33,7 +32,7 @@ impl EntitySize {
             points.push(Point::new(x as i32, y as i32));
         }
 
-        let sprite = resources.get_sprite(&builder.cursor_image)?;
+        let sprite = ResourceSet::get_sprite(&builder.cursor_image)?;
 
         Ok(EntitySize {
             size: builder.size as i32,

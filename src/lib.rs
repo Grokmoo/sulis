@@ -1,10 +1,17 @@
-#[macro_use] extern crate log;
-
 extern crate image as extern_image;
 
 extern crate grt;
 
+// TODO ideally these should be re-exported from grt so
+// we don't have to worry about version mismatch
+// json parser library for use in data
+extern crate serde;
+#[macro_use] extern crate log;
+#[macro_use] extern crate serde_derive;
+
 pub mod animation;
+
+pub mod module;
 
 pub mod rules;
 

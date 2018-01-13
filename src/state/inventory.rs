@@ -1,8 +1,8 @@
 use std::rc::Rc;
 use std::collections::HashMap;
 
-use grt::resource::Actor;
-use grt::resource::item::Slot;
+use module::Actor;
+use module::item::Slot;
 use state::ItemState;
 
 #[derive(Clone)]

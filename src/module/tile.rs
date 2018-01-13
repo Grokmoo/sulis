@@ -1,11 +1,10 @@
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 
-use util::Point;
-use resource::{Sprite, ResourceBuilder, ResourceSet};
-
-use serde_json;
-use serde_yaml;
+use grt::util::Point;
+use grt::resource::{Sprite, ResourceBuilder, ResourceSet};
+use grt::serde_json;
+use grt::serde_yaml;
 
 #[derive(Debug)]
 pub struct Tile {
@@ -20,7 +19,7 @@ pub struct Tile {
 }
 
 impl Tile {
-    pub fn new(builder: TileBuilder, resources: &ResourceSet) -> Result<Tile, Error> {
+    pub fn new(builder: TileBuilder) -> Result<Tile, Error> {
         let mut display_vec: Vec<char> = Vec::new();
         let mut impass_points: Vec<Point> = Vec::new();
 
@@ -63,7 +62,7 @@ impl Tile {
             impass_points.push(Point::new(x as i32, y as i32));
         }
 
-        let sprite = resources.get_sprite(&builder.image_display)?;
+        let sprite = ResourceSet::get_sprite(&builder.image_display)?;
 
         Ok(Tile {
             id: builder.id,

@@ -9,18 +9,22 @@ extern crate flexi_logger;
 
 use std::{thread, time};
 use std::rc::Rc;
+use std::cell::RefCell;
 use std::panic;
+use std::io::Error;
+
+use flexi_logger::{Logger, opt_format};
 
 use grt::ui::{self, Widget};
+use grt::io::{IO, MainLoopUpdater};
 use grt::config::CONFIG;
-use grt::resource;
+use grt::resource::ResourceSet;
 
-use game::state::GameState;
+use game::state::{GameStateMainLoopUpdater, GameState};
 use game::animation;
 use game::view::RootView;
 use game::module::Module;
-
-use flexi_logger::{Logger, opt_format};
+use game::main_menu::{MainMenuView, MainMenuLoopUpdater};
 
 fn main() {
     // CONFIG will be lazily initialized here; if it fails it
@@ -29,42 +33,15 @@ fn main() {
     info!("Setup Logger and read configuration from 'config.yml'");
 
     info!("Reading resources from {}", CONFIG.resources.directory);
-    let resource_set_err = resource::ResourceSet::init(&CONFIG.resources.directory);
-    match resource_set_err {
-        Ok(_) => (),
-        Err(e) => {
-            error!("{}", e);
-            error!("There was a fatal error loading resource set from 'data':");
-            error!("Exiting...");
-            ::std::process::exit(1);
-        }
-    };
-
-    info!("Reading module from {}", CONFIG.resources.directory);
-    match Module::init(&CONFIG.resources.directory) {
-        Ok(_) => (),
-        Err(e) => {
-            error!("{}", e);
-            error!("There was a fatal error setting up the module.");
-            error!("Exiting...");
-            ::std::process::exit(1);
-        }
-    };
-
-    info!("Initializing game state.");
-    match GameState::init() {
-        Ok(_) => {},
-        Err(e) => {
-            error!("{}",  e);
-            error!("There was a fatal error creating the game state.");
-            error!("Exiting...");
-            ::std::process::exit(1);
-        }
+    if let Err(e) = ResourceSet::init(&CONFIG.resources.directory) {
+        error!("{}", e);
+        error!("There was a fatal error loading resource set from 'data':");
+        error!("Exiting...");
+        ::std::process::exit(1);
     };
 
     info!("Setting up display adapter.");
-    let io = grt::io::create();
-    let mut io = match io {
+    let mut io = match grt::io::create() {
         Ok(io) => io,
         Err(e) => {
             error!("{}", e);
@@ -74,13 +51,59 @@ fn main() {
         }
     };
 
+    {
+        let main_menu_view = MainMenuView::new();
+        let loop_updater = MainMenuLoopUpdater::new(&main_menu_view);
+        let main_menu_root = ui::create_ui_tree(main_menu_view);
+        match ResourceSet::get_theme().children.get("main_menu") {
+            None => warn!("No theme found for 'main_menu"),
+            Some(ref theme) => {
+                main_menu_root.borrow_mut().theme = Some(Rc::clone(theme));
+                main_menu_root.borrow_mut().theme_id = ".main_menu".to_string();
+                main_menu_root.borrow_mut().theme_subname = "main_menu".to_string();
+            }
+        }
+
+        if let Err(e) = main_loop(&mut io, main_menu_root, Box::new(loop_updater)) {
+            error!("{}", e);
+            error!("Error in main menu.  Exiting...");
+            ::std::process::exit(1);
+        }
+    }
+
+    info!("Reading module from {}", CONFIG.resources.directory);
+    if let Err(e) =  Module::init(&CONFIG.resources.directory) {
+        error!("{}", e);
+        error!("There was a fatal error setting up the module.");
+        error!("Exiting...");
+        ::std::process::exit(1);
+    };
+
+    info!("Initializing game state.");
+    if let Err(e) = GameState::init() {
+        error!("{}",  e);
+        error!("There was a fatal error creating the game state.");
+        error!("Exiting...");
+        ::std::process::exit(1);
+    };
+
     let root = ui::create_ui_tree(RootView::new());
 
+    if let Err(e) = main_loop(&mut io, root, Box::new(GameStateMainLoopUpdater { })) {
+        error!("{}", e);
+        error!("Error in main loop.  Exiting...");
+    }
+
+    info!("Shutting down.");
+}
+
+fn main_loop(io: &mut Box<IO>, root: Rc<RefCell<Widget>>,
+             updater: Box<MainLoopUpdater>) -> Result<(), Error> {
     let fpms = (1000.0 / (CONFIG.display.frame_rate as f32)) as u64;
     let frame_time = time::Duration::from_millis(fpms);
     trace!("Computed {} frames per milli.", fpms);
 
-    info!("Setup complete.");
+    info!("Starting main loop.");
     let main_loop_start_time = time::Instant::now();
 
     let mut frames = 0;
@@ -89,22 +112,18 @@ fn main() {
         let start_time = time::Instant::now();
 
         io.process_input(Rc::clone(&root));
-        GameState::update();
+        updater.update();
 
-        match Widget::update(&root) {
-            Err(e) => {
-                error!("{}", e);
-                error!("There was a fatal error updating the UI tree state.");
-                break;
-            }
-            _ => (),
+        if let Err(e) = Widget::update(&root) {
+            error!("There was a fatal error updating the UI tree state.");
+            return Err(e);
         }
 
         let total_elapsed =
             animation::get_elapsed_millis(main_loop_start_time.elapsed());
         io.render_output(root.borrow(), total_elapsed);
 
-        if GameState::is_exit() {
+        if updater.is_exit() {
             trace!("Exiting main loop.");
             break;
         }
@@ -122,7 +141,7 @@ fn main() {
     info!("Rendered {} frames with total render time {:.4} seconds", frames, secs);
     info!("Average frame render time: {:.2} milliseconds", 1000.0 * secs / frames as f64);
 
-    info!("Shutting down.");
+    Ok(())
 }
 
 fn setup_logger() {

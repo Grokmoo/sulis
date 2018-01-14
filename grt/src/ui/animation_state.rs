@@ -53,6 +53,16 @@ pub struct AnimationState {
 }
 
 impl AnimationState {
+    /// Adds the specified kind if it is not present, removes it
+    /// if it is.  See `add` and `remove`
+    pub fn toggle(&mut self, kind: Kind) {
+        if !self.kinds.contains(&kind) {
+            self.add(kind);
+        } else {
+            self.remove(kind);
+        }
+    }
+
     /// Adds the specified kind to this animation state, if it is not
     /// already present.  Removes `Kind::Normal` if it is present, as
     /// it may only ever be in an otherwise empty AnimationState
@@ -73,6 +83,11 @@ impl AnimationState {
         if self.kinds.len() == 0 {
             self.kinds.push(Kind::Normal);
         }
+    }
+
+    /// Returns true if the state contains this kind, false otherwise
+    pub fn contains(&self, kind: Kind) -> bool {
+        self.kinds.contains(&kind)
     }
 }
 

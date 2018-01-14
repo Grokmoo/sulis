@@ -1,0 +1,26 @@
+---
+children:
+  main_menu:
+    children:
+      title:
+        from: .label
+        text_params:
+          scale: 2.0
+        text: "Main Menu"
+        x_relative: Center
+        preferred_size: [10, 1]
+        position: [0, 1]
+      play_button:
+        from: .button
+        text: "Play"
+        text_params:
+          scale: 2.0
+        preferred_size: [10, 3]
+        x_relative: Center
+        position: [0, 12]
+      modules_list:
+        from: .list_box
+        preferred_size: [10, 5]
+        position: [0, 3]
+        x_relative: Center
+...

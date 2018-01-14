@@ -11,6 +11,8 @@ extern crate serde;
 
 pub mod animation;
 
+pub mod main_menu;
+
 pub mod module;
 
 pub mod rules;

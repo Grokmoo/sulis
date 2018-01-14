@@ -1,6 +1,7 @@
 ---
 include:
   - widgets
+  - main_menu
 children:
   mouse_over:
     from: .label

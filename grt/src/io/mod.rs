@@ -24,6 +24,12 @@ use ui::{Widget, Color};
 use io::keyboard_event::Key;
 use resource::Sprite;
 
+pub trait MainLoopUpdater {
+    fn update(&self);
+
+    fn is_exit(&self) -> bool;
+}
+
 pub trait IO {
     fn process_input(&mut self, root: Rc<RefCell<Widget>>);
 

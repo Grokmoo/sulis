@@ -12,7 +12,7 @@ pub struct Widget {
     pub state: WidgetState,
     pub kind: Rc<WidgetKind>,
     pub children: Vec<Rc<RefCell<Widget>>>,
-    pub (in ui) theme: Option<Rc<Theme>>,
+    pub theme: Option<Rc<Theme>>,
     pub theme_id: String,
     pub theme_subname: String,
 

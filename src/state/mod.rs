@@ -26,11 +26,24 @@ use std::cell::RefCell;
 
 use grt::config::CONFIG;
 use grt::util::Point;
+use grt::io::MainLoopUpdater;
 use animation::{Animation, MoveAnimation};
 use module::{Actor, Module};
 
 thread_local! {
     static STATE: RefCell<Option<GameState>> = RefCell::new(None);
+}
+
+pub struct GameStateMainLoopUpdater { }
+
+impl MainLoopUpdater for GameStateMainLoopUpdater {
+    fn update(&self) {
+        GameState::update();
+    }
+
+    fn is_exit(&self) -> bool {
+        GameState::is_exit()
+    }
 }
 
 pub struct GameState {

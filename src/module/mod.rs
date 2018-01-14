@@ -107,7 +107,7 @@ impl Module {
             }
         });
 
-        let game = read_single_resource(&format!("{}/game", root_dir))?;
+        let game = read_single_resource(&format!("{}/module", root_dir))?;
 
         MODULE.with(move |m| {
             let mut m = m.borrow_mut();

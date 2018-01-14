@@ -25,11 +25,13 @@ impl MainLoopUpdater for MainMenuLoopUpdater {
 }
 
 pub struct MainMenuView {
+    modules: Vec<String>,
 }
 
 impl MainMenuView {
-    pub fn new() -> Rc<MainMenuView> {
+    pub fn new(modules: Vec<String>) -> Rc<MainMenuView> {
         Rc::new(MainMenuView {
+            modules,
         })
     }
 
@@ -51,15 +53,16 @@ impl WidgetKind for MainMenuView {
         debug!("Adding to main menu widget");
 
         let title = Widget::with_theme(Label::empty(), "title");
-
+        let modules_title = Widget::with_theme(Label::empty(), "modules_title");
 
         let mut entries: Vec<list_box::Entry> = Vec::new();
         let cb: Callback<Button> = Callback::new(Rc::new( |_, widget| {
             widget.borrow_mut().state.animation_state.toggle(animation_state::Kind::Active);
         }));
-
-        let entry = list_box::Entry::new("test1", Some(cb));
-        entries.push(entry);
+        for module in self.modules.iter() {
+            let entry = list_box::Entry::new(&module, Some(cb.clone()));
+            entries.push(entry);
+        }
 
         let modules_list = Widget::with_theme(ListBox::new(entries), "modules_list");
 
@@ -73,7 +76,8 @@ impl WidgetKind for MainMenuView {
             }
         }));
         let play = Widget::with_theme(Button::with_callback(cb), "play_button");
+        play.borrow_mut().state.animation_state.add(animation_state::Kind::Disabled);
 
-        vec![title, play, modules_list]
+        vec![title, modules_title, play, modules_list]
     }
 }

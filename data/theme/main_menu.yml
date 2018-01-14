@@ -17,10 +17,18 @@ children:
           scale: 2.0
         preferred_size: [10, 3]
         x_relative: Center
-        position: [0, 12]
+        position: [10, 8]
+      modules_title:
+        from: .label
+        text: "Select a Module"
+        x_relative: Center
+        preferred_size: [10, 1]
+        position: [-10, 4]
       modules_list:
         from: .list_box
-        preferred_size: [10, 5]
-        position: [0, 3]
+        preferred_size: [20, 10]
+        position: [-10, 5]
         x_relative: Center
+        height_relative: Zero
+        width_relative: Zero
 ...

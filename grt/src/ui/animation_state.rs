@@ -10,6 +10,7 @@ pub enum Kind {
     Hover,
     Pressed,
     Active,
+    Disabled,
 }
 
 impl Kind {
@@ -19,15 +20,17 @@ impl Kind {
             Hover => "hover",
             Pressed => "pressed",
             Active => "active",
+            Disabled => "disabled",
         }
     }
 
     pub fn iter() -> Iter<'static, Kind> {
-        static STATES: [Kind; 4] = [
+        static STATES: [Kind; 5] = [
             Normal,
             Hover,
             Pressed,
-            Active
+            Active,
+            Disabled,
         ];
         STATES.iter()
     }
@@ -38,6 +41,7 @@ impl Kind {
             "hover" => Some(Hover),
             "pressed" => Some(Pressed),
             "active" => Some(Active),
+            "disabled" => Some(Disabled),
             _ => None,
         }
     }

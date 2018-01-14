@@ -51,8 +51,10 @@ fn main() {
         }
     };
 
+    let modules_list = vec!["Module1".to_string(), "Module2".to_string(), "TestCampaign".to_string()];
+
     {
-        let main_menu_view = MainMenuView::new();
+        let main_menu_view = MainMenuView::new(modules_list);
         let loop_updater = MainMenuLoopUpdater::new(&main_menu_view);
         let main_menu_root = ui::create_ui_tree(main_menu_view);
         match ResourceSet::get_theme().children.get("main_menu") {

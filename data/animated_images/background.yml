@@ -3,3 +3,6 @@ states:
     normal: bg_base
     hover: bg_mouseover
     pressed + hover: bg_pressed
+    disabled: bg_disabled
+    disabled + hover: bg_disabled
+    disabled + pressed + hover: bg_disabled

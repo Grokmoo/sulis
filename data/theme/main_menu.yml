@@ -31,4 +31,6 @@ children:
         x_relative: Center
         height_relative: Zero
         width_relative: Zero
+      exit_confirmation_window:
+        from: .exit_confirmation_window
 ...

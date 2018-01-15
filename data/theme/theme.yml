@@ -116,4 +116,33 @@ children:
         position: [0, 2]
         width_relative: Max
         height_relative: Max
+  exit_confirmation_window:
+    background: bg_base
+    border: [1, 1, 1, 1]
+    preferred_size: [17, 7]
+    x_relative: Center
+    y_relative: Center
+    position: [0, -5]
+    children:
+      title:
+        from: .label
+        width_relative: Max
+        preferred_size: [0, 1]
+        text_params:
+          scale: 1.3
+        text: "Exit the Game?"
+      cancel:
+        from: .button
+        preferred_size: [6, 3]
+        text: "Cancel"
+        text_params:
+          scale: 1.3
+        position: [0, 2]
+      accept:
+        from: .button
+        preferred_size: [6, 3]
+        text: "Exit"
+        text_params:
+          scale: 1.3
+        position: [9, 2]
 ...

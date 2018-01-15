@@ -40,6 +40,7 @@ use std::fmt::{self, Display};
 use std::path::PathBuf;
 use std::fs;
 
+use grt::config::CONFIG;
 use grt::resource::{read, read_single_resource, get_resource, insert_if_ok};
 
 use self::actor::ActorBuilder;
@@ -262,15 +263,16 @@ struct ModuleBuilder {
 
 impl ModuleBuilder {
     fn new(root_dir: &str) -> ModuleBuilder {
+        let root_dirs: Vec<&str> = vec![&CONFIG.resources.directory, root_dir];
         ModuleBuilder {
-            actor_builders: read(root_dir, "actors"),
-            area_builders: read(root_dir, "areas"),
-            class_builders: read(root_dir, "classes"),
-            item_builders: read(root_dir, "items"),
-            item_adjectives: read(root_dir, "item_adjectives"),
-            race_builders: read(root_dir, "races"),
-            size_builders: read(root_dir, "sizes"),
-            tile_builders: read(root_dir, "tiles"),
+            actor_builders: read(&root_dirs, "actors"),
+            area_builders: read(&root_dirs, "areas"),
+            class_builders: read(&root_dirs, "classes"),
+            item_builders: read(&root_dirs, "items"),
+            item_adjectives: read(&root_dirs, "item_adjectives"),
+            race_builders: read(&root_dirs, "races"),
+            size_builders: read(&root_dirs, "sizes"),
+            tile_builders: read(&root_dirs, "tiles"),
         }
     }
 }

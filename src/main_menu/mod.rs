@@ -1,8 +1,8 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use grt::io::MainLoopUpdater;
-use grt::ui::{animation_state, Button, Callback, Label, list_box, ListBox, WidgetKind, Widget};
+use grt::io::{InputAction, MainLoopUpdater};
+use grt::ui::*;
 
 use module::ModuleInfo;
 
@@ -59,6 +59,23 @@ thread_local! {
 impl WidgetKind for MainMenuView {
     fn get_name(&self) -> &str {
         "root"
+    }
+
+    fn on_key_press(&self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
+        use grt::io::InputAction::*;
+        match key {
+            Exit => {
+                let exit_window = Widget::with_theme(
+                    ConfirmationWindow::new(Callback::with(
+                            Box::new(|| { EXIT.with(|exit| *exit.borrow_mut() = true); }))),
+                    "exit_confirmation_window");
+                exit_window.borrow_mut().state.set_modal(true);
+                Widget::add_child_to(&widget, exit_window);
+            },
+            _ => return false,
+        }
+
+        true
     }
 
     fn on_add(&self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {

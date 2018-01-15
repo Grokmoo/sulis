@@ -26,17 +26,6 @@ pub struct ResourceBuilderSet {
 
 impl ResourceBuilderSet {
     pub fn new(root: &str) -> Result<ResourceBuilderSet, Error> {
-        // let game_filename = root.to_owned() + "/game";
-        // debug!("Reading top level config from {}", game_filename);
-        //
-        // let game = match ResourceBuilderSet::create_game(&game_filename) {
-        //     Ok(g) => g,
-        //     Err(e) => {
-        //         error!("Unable to load game startup state from {}", game_filename);
-        //         return Err(e);
-        //     }
-        // };
-
         let theme_filename = root.to_owned() + "/theme/theme";
         debug!("Reading theme from {}", theme_filename);
         let mut theme_builder = match create_theme(
@@ -56,14 +45,15 @@ impl ResourceBuilderSet {
             }
         };
 
+        let root_dirs: Vec<&str> = vec![root];
         Ok(ResourceBuilderSet {
             theme_builder,
-            simple_builders: read(root, "images"),
-            composed_builders: read(root, "composed_images"),
-            animated_builders: read(root, "animated_images"),
-            spritesheet_builders: read(root, "spritesheets"),
+            simple_builders: read(&root_dirs, "images"),
+            composed_builders: read(&root_dirs, "composed_images"),
+            animated_builders: read(&root_dirs, "animated_images"),
+            spritesheet_builders: read(&root_dirs, "spritesheets"),
             spritesheets_dir: format!("{}/spritesheets/", root),
-            font_builders: read(root, "fonts"),
+            font_builders: read(&root_dirs, "fonts"),
             fonts_dir: format!("{}/fonts/", root),
         })
     }
@@ -91,11 +81,12 @@ pub fn read_single_resource<T: ResourceBuilder>(filename: &str) -> Result<T, Err
     }
 }
 
-pub fn read<T: ResourceBuilder>(root: &str, dir: &str) -> HashMap<String, T> {
+pub fn read<T: ResourceBuilder>(root_dirs: &Vec<&str>, dir: &str) -> HashMap<String, T> {
     let mut resources: HashMap<String, T> = HashMap::new();
 
-    read_recursive([root, dir].iter().collect(), &mut resources);
-
+    for root in root_dirs.iter() {
+        read_recursive([root, dir].iter().collect(), &mut resources);
+    }
     resources
 }
 
@@ -181,7 +172,7 @@ fn read_file<T: ResourceBuilder>(path: PathBuf, resources: &mut HashMap<String, 
 
     trace!("Created resource '{}'", id);
     if resources.contains_key(&id) {
-        warn!("Duplicate resource key: {} in {}", id, path_str);
+        debug!("Overwriting resource with key: {} in {}", id, path_str);
         return;
     }
 

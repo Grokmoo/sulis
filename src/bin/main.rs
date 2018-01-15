@@ -76,7 +76,7 @@ fn main() {
 
     let module_info = match selected_module {
         None => {
-            error_and_exit("No module selected in main menu.");
+            ok_and_exit("No module selected in main menu.");
             unreachable!();
         },
         Some(module) => module,
@@ -101,7 +101,7 @@ fn main() {
         error!("Error in main loop.  Exiting...");
     }
 
-    info!("Shutting down.");
+    ok_and_exit("Main loop complete.");
 }
 
 fn main_loop(io: &mut Box<IO>, root: Rc<RefCell<Widget>>,
@@ -149,6 +149,12 @@ fn main_loop(io: &mut Box<IO>, root: Rc<RefCell<Widget>>,
     info!("Average frame render time: {:.2} milliseconds", 1000.0 * secs / frames as f64);
 
     Ok(())
+}
+
+fn ok_and_exit(message: &str) {
+    info!("{}", message);
+    info!("Exiting...");
+    ::std::process::exit(0)
 }
 
 fn error_and_exit(error: &str) {

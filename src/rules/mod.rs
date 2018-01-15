@@ -39,6 +39,7 @@ impl AttributeList {
 
 pub struct StatList {
     pub damage: Damage,
+    pub max_hp: u32,
 }
 
 
@@ -46,6 +47,7 @@ impl Default for StatList {
     fn default() -> StatList {
         StatList {
             damage: Damage::default(),
+            max_hp: 0,
         }
     }
 }

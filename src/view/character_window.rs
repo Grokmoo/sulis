@@ -65,6 +65,9 @@ impl WidgetKind for CharacterWindow {
 
             state.add_text_arg("damage_min", &pc.actor.stats.damage.min.to_string());
             state.add_text_arg("damage_max", &pc.actor.stats.damage.max.to_string());
+
+            state.add_text_arg("cur_hp", &pc.actor.hp().to_string());
+            state.add_text_arg("max_hp", &pc.actor.stats.max_hp.to_string());
         }
         vec![title, close, details]
     }

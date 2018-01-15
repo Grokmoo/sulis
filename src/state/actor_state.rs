@@ -11,6 +11,7 @@ pub struct ActorState {
     pub attributes: AttributeList,
     pub stats: StatList,
     change_listeners: Vec<ChangeListener<ActorState>>,
+    hp: u32,
 }
 
 impl PartialEq for ActorState {
@@ -29,6 +30,7 @@ impl ActorState {
             attributes: AttributeList::default(),
             stats: StatList::default(),
             change_listeners: Vec::new(),
+            hp: 0,
         }
     }
 
@@ -59,6 +61,14 @@ impl ActorState {
         self.inventory.borrow()
     }
 
+    pub fn hp(&self) -> u32 {
+        self.hp
+    }
+
+    pub fn init(&mut self) {
+        self.hp = self.stats.max_hp;
+    }
+
     pub fn compute_stats(&mut self) {
         for listener in self.change_listeners.iter() {
             listener.call(&self);
@@ -78,5 +88,11 @@ impl ActorState {
         }
 
         self.stats.damage = max_damage;
+
+        let mut max_hp: u32 = 0;
+        for &(ref class, level) in self.actor.levels.iter() {
+            max_hp += class.hp_per_level * level;
+        }
+        self.stats.max_hp = max_hp;
     }
 }

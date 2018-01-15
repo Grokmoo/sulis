@@ -139,6 +139,7 @@ impl AreaState {
         }
 
         entity.borrow_mut().actor.compute_stats();
+        entity.borrow_mut().actor.init();
 
         let new_index = self.find_index_to_add();
         entity.borrow_mut().index = new_index;

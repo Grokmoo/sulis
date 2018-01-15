@@ -4,14 +4,15 @@ include:
   - main_menu
 children:
   mouse_over:
-    from: .label
-    border: [1, 1, 1, 1]
+    from: .text_area
     background: bg_base
-    text: "#0#"
+    text: |
+      [x=0.5;y=0.5;s=1.25|#name#]
+      [x=0.5|#cur_hp# / #max_hp#]
     preferred_size: [8, 3]
     x_relative: Cursor
     y_relative: Cursor
-    position: [-5, -4]
+    position: [0, -4]
   right_pane:
     background: bg_base
     border: [0, 0, 1, 1]
@@ -107,8 +108,8 @@ children:
           [s=1.5|[c=f00|#race#] #sex#]
           [s=1.25|Level #level_0# #class_0#]
           [s=1.5|]
-          [s=1.25|Attack]
-          [s=1.0|Damage: #damage_min# to #damage_max#]
+          [s=1.25;x=0|Attack][s=1.25;x=15|Hit Points]
+          [s=1.0;x=0|Damage: #damage_min# to #damage_max#][x=15| #cur_hp# / #max_hp#]
           [s=1.5|]
           [s=1.25|[x=0|Strength][x=10|#str#]
                   [x=0|Dexterity][x=10|#dex#]

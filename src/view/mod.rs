@@ -4,6 +4,9 @@ pub use self::character_window::CharacterWindow;
 mod inventory_window;
 pub use self::inventory_window::InventoryWindow;
 
+mod entity_mouseover;
+pub use self::entity_mouseover::EntityMouseover;
+
 mod area_view;
 pub use self::area_view::AreaView;
 

@@ -31,7 +31,7 @@ pub struct Actor {
     pub text_display: char,
     pub image_display: Rc<Sprite>,
     pub items: Vec<Rc<Item>>,
-    pub levels: Vec<(Rc<Class>, u8)>,
+    pub levels: Vec<(Rc<Class>, u32)>,
 }
 
 impl PartialEq for Actor {
@@ -69,7 +69,7 @@ impl Actor {
             Some(sex) => sex,
         };
 
-        let mut levels: Vec<(Rc<Class>, u8)> = Vec::new();
+        let mut levels: Vec<(Rc<Class>, u32)> = Vec::new();
         for (class_id, level) in builder.levels {
             let class = match resources.classes.get(&class_id) {
                 None => {
@@ -108,7 +108,7 @@ pub struct ActorBuilder {
     pub text_display: char,
     pub image_display: String,
     pub items: Option<Vec<String>>,
-    pub levels: HashMap<String, u8>,
+    pub levels: HashMap<String, u32>,
 }
 
 impl ResourceBuilder for ActorBuilder {

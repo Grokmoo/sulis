@@ -2,14 +2,14 @@ use std::rc::Rc;
 use std::cell::RefCell;
 use std::cmp;
 
-use grt::ui::{color, Cursor, Label, WidgetKind, Widget};
+use grt::ui::{color, Cursor, WidgetKind, Widget};
 use grt::io::*;
 use grt::io::event::ClickKind;
 use grt::util::Point;
 
 use extern_image::{ImageBuffer, Rgba};
 
-use view::ActionMenu;
+use view::{ActionMenu, EntityMouseover};
 use state::GameState;
 
 pub struct AreaView {
@@ -269,7 +269,7 @@ impl WidgetKind for AreaView {
             let index = entity.borrow().index;
             let pc = GameState::pc();
             if index != pc.borrow().index {
-                Widget::set_mouse_over(widget, Label::new(&entity.borrow().actor.actor.id));
+                Widget::set_mouse_over(widget, EntityMouseover::new(&entity));
                 let sprite = &entity.borrow().size.cursor_sprite;
                 let x = entity.borrow().location.x;
                 let y = entity.borrow().location.y;

@@ -107,10 +107,12 @@ impl WidgetKind for ActionMenu {
             }
         }
 
-        if let Some(ref transition) = self.area_state.borrow()
-            .get_transition_at(self.area_pos.x, self.area_pos.y) {
-            entries.push(list_box::Entry::new(
-                    "Transition".to_string(), self.transition_callback(transition)));
+        if self.is_hover_pc {
+            if let Some(ref transition) = self.area_state.borrow()
+                .get_transition_at(self.area_pos.x, self.area_pos.y) {
+                    entries.push(list_box::Entry::new(
+                            "Transition".to_string(), self.transition_callback(transition)));
+                }
         }
 
         if entries.is_empty() {

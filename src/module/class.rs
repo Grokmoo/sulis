@@ -8,6 +8,7 @@ use grt::serde_yaml;
 pub struct Class {
     pub id: String,
     pub name: String,
+    pub hp_per_level: u32,
 }
 
 impl PartialEq for Class {
@@ -21,6 +22,7 @@ impl Class {
         Ok(Class {
             id: builder.id,
             name: builder.name,
+            hp_per_level: builder.hp_per_level,
         })
     }
 }
@@ -30,6 +32,7 @@ impl Class {
 pub struct ClassBuilder {
     pub id: String,
     pub name: String,
+    pub hp_per_level: u32,
 }
 
 impl ResourceBuilder for ClassBuilder {

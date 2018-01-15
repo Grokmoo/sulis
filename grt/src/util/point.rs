@@ -5,6 +5,7 @@ use std::cmp;
 use ui::Border;
 
 #[derive(Copy, Clone, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Point {
     pub x: i32,
     pub y: i32,

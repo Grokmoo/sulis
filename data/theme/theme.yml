@@ -13,6 +13,7 @@ children:
     y_relative: Cursor
     position: [-5, -4]
   right_pane:
+    background: bg_base
     border: [0, 0, 1, 1]
     preferred_size: [20, 0]
     x_relative: Max
@@ -106,6 +107,9 @@ children:
           [s=1.5|[c=f00|#race#] #sex#]
           [s=1.25|Level #level_0# #class_0#]
           [s=1.5|]
+          [s=1.25|Attack]
+          [s=1.0|Damage: #damage_min# to #damage_max#]
+          [s=1.5|]
           [s=1.25|[x=0|Strength][x=10|#str#]
                   [x=0|Dexterity][x=10|#dex#]
                   [x=0|Endurance][x=10|#end#]
@@ -119,7 +123,7 @@ children:
   exit_confirmation_window:
     background: bg_base
     border: [1, 1, 1, 1]
-    preferred_size: [17, 7]
+    preferred_size: [15, 7]
     x_relative: Center
     y_relative: Center
     position: [0, -5]
@@ -144,5 +148,5 @@ children:
         text: "Exit"
         text_params:
           scale: 1.3
-        position: [9, 2]
+        position: [7, 2]
 ...

@@ -1,4 +1,8 @@
 id: sword
 name: Sword
 icon: sword
-slot: HeldMain
+equippable:
+  slot: HeldMain
+  damage:
+    min: 4
+    max: 6

@@ -1,15 +1,16 @@
-use module::Actor;
-use state::Inventory;
-use rules::AttributeList;
+use module::{item, Actor};
+use state::{ChangeListener, Inventory};
+use rules::{AttributeList, Damage, StatList};
 
 use std::rc::Rc;
-use std::cell::RefCell;
+use std::cell::{Ref, RefCell};
 
-#[derive(Clone)]
 pub struct ActorState {
     pub actor: Rc<Actor>,
-    pub inventory: Rc<RefCell<Inventory>>,
+    inventory: Rc<RefCell<Inventory>>,
     pub attributes: AttributeList,
+    pub stats: StatList,
+    change_listeners: Vec<ChangeListener<ActorState>>,
 }
 
 impl PartialEq for ActorState {
@@ -25,7 +26,57 @@ impl ActorState {
         ActorState {
             actor,
             inventory,
-            attributes: AttributeList::new(),
+            attributes: AttributeList::default(),
+            stats: StatList::default(),
+            change_listeners: Vec::new(),
         }
+    }
+
+    /// Removes all change listeners from this state with the given ID
+    pub fn remove_change_listeners(&mut self, id: &'static str) {
+        self.change_listeners.retain(|listener| listener.id() != id);
+    }
+
+    pub fn add_change_listener(&mut self, listener: ChangeListener<ActorState>) {
+        self.change_listeners.push(listener);
+    }
+
+    pub fn equip(&mut self, index: usize) -> bool {
+        let result = self.inventory.borrow_mut().equip(index);
+        self.compute_stats();
+
+        result
+    }
+
+    pub fn unequip(&mut self, slot: item::Slot) -> bool {
+        let result = self.inventory.borrow_mut().unequip(slot);
+        self.compute_stats();
+
+        result
+    }
+
+    pub fn inventory(&self) -> Ref<Inventory> {
+        self.inventory.borrow()
+    }
+
+    pub fn compute_stats(&mut self) {
+        for listener in self.change_listeners.iter() {
+            listener.call(&self);
+        }
+
+        let mut max_damage = Damage::default();
+
+        for item_state in self.inventory.borrow().equipped_iter() {
+            let equippable = match item_state.item.equippable {
+                None => continue,
+                Some(equippable) => equippable,
+            };
+
+            if let Some(damage) = equippable.damage {
+                max_damage = Damage::max(damage, max_damage);
+            }
+        }
+
+        self.stats.damage = max_damage;
     }
 }

@@ -9,6 +9,7 @@ use io::{KeyboardEvent, InputAction};
 use serde_yaml;
 
 #[derive(Debug, Deserialize, Clone)]
+#[serde(deny_unknown_fields)]
 pub struct Config {
   pub display: DisplayConfig,
   pub resources: ResourcesConfig,
@@ -17,12 +18,14 @@ pub struct Config {
 }
 
 #[derive(Debug, Deserialize, Clone)]
+#[serde(deny_unknown_fields)]
 pub struct LoggingConfig {
     pub log_level: String,
     pub use_timestamps: bool,
 }
 
 #[derive(Debug, Deserialize, Clone)]
+#[serde(deny_unknown_fields)]
 pub struct DisplayConfig {
     pub adapter: IOAdapter,
     pub frame_rate: u32,
@@ -35,16 +38,19 @@ pub struct DisplayConfig {
 }
 
 #[derive(Debug, Deserialize, Clone)]
+#[serde(deny_unknown_fields)]
 pub struct ResourcesConfig {
     pub directory: String,
 }
 
 #[derive(Debug, Deserialize, Clone)]
+#[serde(deny_unknown_fields)]
 pub struct InputConfig {
     pub keybindings: HashMap<Key, InputAction>
 }
 
 #[derive(Debug, Deserialize, Copy, Clone)]
+#[serde(deny_unknown_fields)]
 pub enum IOAdapter {
     Auto,
     Pancurses,

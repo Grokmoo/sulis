@@ -124,27 +124,9 @@ impl AreaState {
 
     pub(in state) fn add_actor(&mut self, actor: Rc<Actor>,
                      location: Location) -> bool {
-
-        let new_index = self.find_index_to_add();
-        let entity = EntityState::new(actor, location, new_index);
-
-        let x = entity.location.x;
-        let y = entity.location.y;
-
+        let entity = EntityState::new(actor, location.clone(), 0);
         let entity = Rc::new(RefCell::new(entity));
-
-        if !self.is_passable(&entity.borrow(), x, y) {
-            return false;
-        }
-
-        for p in entity.borrow().points(x, y) {
-            self.update_display(p.x, p.y, entity.borrow().display());
-            self.update_entity_grid(p.x, p.y, Some(new_index));
-        }
-
-        self.entities[new_index] = Some(entity);
-
-        true
+        self.add_entity(entity, location)
     }
 
     pub(in state) fn add_entity(&mut self, entity: Rc<RefCell<EntityState>>,
@@ -155,6 +137,8 @@ impl AreaState {
         if !self.is_passable(&entity.borrow(), x, y) {
             return false;
         }
+
+        entity.borrow_mut().actor.compute_stats();
 
         let new_index = self.find_index_to_add();
         entity.borrow_mut().index = new_index;

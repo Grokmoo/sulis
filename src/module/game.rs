@@ -6,6 +6,7 @@ use grt::serde_json;
 use grt::serde_yaml;
 
 #[derive(Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
 pub struct Game {
     pub starting_area: String,
     pub starting_location: Point,

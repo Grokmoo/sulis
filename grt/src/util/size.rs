@@ -4,6 +4,7 @@ use std::cmp;
 use ui::Border;
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Size {
     pub width: i32,
     pub height: i32,

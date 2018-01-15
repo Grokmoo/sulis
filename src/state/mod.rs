@@ -1,6 +1,9 @@
 mod area_state;
 pub use self::area_state::AreaState;
 
+mod change_listener;
+pub use self::change_listener::ChangeListener;
+
 mod entity_state;
 pub use self::entity_state::EntityState;
 

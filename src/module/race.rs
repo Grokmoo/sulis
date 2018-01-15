@@ -38,6 +38,7 @@ impl Race {
 }
 
 #[derive(Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
 pub struct RaceBuilder {
     pub id: String,
     pub name: String,

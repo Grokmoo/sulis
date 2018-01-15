@@ -2,7 +2,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use rules::Attribute;
-use state::{EntityState};
+use state::{ChangeListener, EntityState};
 use grt::ui::{Button, Callback, Label, TextArea, Widget, WidgetKind};
 
 pub const NAME: &str = "character_window";
@@ -24,7 +24,19 @@ impl WidgetKind for CharacterWindow {
         NAME
     }
 
-    fn on_add(&self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn layout(&self, widget: &mut Widget) {
+        widget.do_base_layout();
+    }
+
+    fn on_remove(&self) {
+        self.character.borrow_mut().actor.remove_change_listeners(NAME);
+        debug!("Removed character window.");
+    }
+
+    fn on_add(&self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+        self.character.borrow_mut().actor.add_change_listener(
+            ChangeListener::invalidate(NAME, widget));
+
         let title = Widget::with_theme(Label::empty(), "title");
         title.borrow_mut().state.add_text_arg("name", &self.character.borrow().actor.actor.id);
 
@@ -50,6 +62,9 @@ impl WidgetKind for CharacterWindow {
 
                 index += 1;
             }
+
+            state.add_text_arg("damage_min", &pc.actor.stats.damage.min.to_string());
+            state.add_text_arg("damage_max", &pc.actor.stats.damage.max.to_string());
         }
         vec![title, close, details]
     }

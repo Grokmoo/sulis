@@ -12,6 +12,9 @@ pub mod entity_size;
 pub use self::entity_size::EntitySize;
 pub use self::entity_size::EntitySizeIterator;
 
+pub mod equippable;
+pub use self::equippable::Equippable;
+
 pub mod game;
 pub use self::game::Game;
 

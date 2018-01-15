@@ -10,6 +10,7 @@ use grt::{serde_json, serde_yaml};
 use module::{Class, Item, Module, Race};
 
 #[derive(Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
 pub enum Sex {
     Male,
     Female,
@@ -97,6 +98,7 @@ impl Actor {
 }
 
 #[derive(Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
 pub struct ActorBuilder {
     pub id: String,
     pub name: String,

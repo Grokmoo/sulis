@@ -5,6 +5,7 @@ use std::fmt::{Debug, Formatter, Result};
 use grt::util::Point;
 use state::AreaState;
 
+#[derive(Clone)]
 pub struct Location {
     pub x: i32,
     pub y: i32,

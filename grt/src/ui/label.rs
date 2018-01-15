@@ -29,7 +29,7 @@ impl Label {
         let w = widget.state.inner_size.width as f32;
         let h = widget.state.inner_size.height as f32;
 
-        let len = if width > w as f32 {
+        let len = if width > w {
             w
         } else {
             width
@@ -38,7 +38,7 @@ impl Label {
         let x = match widget.state.text_params.horizontal_alignment {
             HorizontalTextAlignment::Left => x,
             HorizontalTextAlignment::Center => (x + (w - len) / 2.0),
-            HorizontalTextAlignment::Right => x - len,
+            HorizontalTextAlignment::Right => x +w - len,
         };
 
         let y = match widget.state.text_params.vertical_alignment {
@@ -77,7 +77,7 @@ impl WidgetKind for Label {
 
         let font = font_rend.get_font();
         let scale = widget.state.text_params.scale;
-        let width = font.get_width(&widget.state.text) as f32 * scale / font.base as f32;
+        let width = font.get_width(&widget.state.text) as f32 * scale / font.line_height as f32;
         let (x, y, text) = Label::get_draw_params(width, scale, widget);
         font_rend.render(renderer, text, x, y, &widget.state.text_params);
     }

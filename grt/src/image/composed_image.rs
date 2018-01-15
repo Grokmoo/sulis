@@ -241,6 +241,7 @@ impl Image for ComposedImage {
 }
 
 #[derive(Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
 pub struct ComposedImageBuilder {
     pub id: String,
     pub grid: Vec<String>,

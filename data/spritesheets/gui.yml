@@ -17,7 +17,7 @@ groups:
       bg_bottom_right_base:  [10, 10]
   bg_hover:
     size: [5, 5]
-    position: [0, 15]
+    position: [0, 17]
     areas:
       bg_top_left_hover:      [0,  0]
       bg_top_middle_hover:    [5,  0]
@@ -30,7 +30,7 @@ groups:
       bg_bottom_right_hover:  [10, 10]
   bg_pressed:
     size: [5, 5]
-    position: [0, 30]
+    position: [0, 34]
     areas:
       bg_top_left_pressed:      [0,  0]
       bg_top_middle_pressed:    [5,  0]
@@ -43,7 +43,7 @@ groups:
       bg_bottom_right_pressed:  [10, 10]
   bg_disabled:
     size: [5, 5]
-    position: [0, 45]
+    position: [0, 51]
     areas:
       bg_top_left_disabled:      [0,  0]
       bg_top_middle_disabled:    [5,  0]
@@ -56,9 +56,10 @@ groups:
       bg_bottom_right_disabled:  [10, 10]
   special:
     areas:
-      empty: [0, 45, 5, 5]
-      cursor5x5: [ 16, 0, 80, 80]
-      cursor4x4: [ 96, 0, 64, 64]
-      cursor3x3: [160, 0, 48, 48]
-      cursor2x2: [208, 0, 32, 32]
-      cursor1x1: [240, 0, 16, 16]
+      empty: [0, 68, 5, 5]
+      cursor6x6: [  0, 80, 96, 96]
+      cursor5x5: [ 17,  0, 80, 80]
+      cursor4x4: [102,  0, 64, 64]
+      cursor3x3: [170,  0, 48, 48]
+      cursor2x2: [221,  0, 32, 32]
+      cursor1x1: [170, 51, 16, 16]

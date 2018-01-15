@@ -6,6 +6,7 @@ use io::event::{ClickKind, Kind};
 use io::Event;
 
 #[derive(Debug, Deserialize, Copy, Clone)]
+#[serde(deny_unknown_fields)]
 pub enum InputAction {
     ScrollUp,
     ScrollDown,

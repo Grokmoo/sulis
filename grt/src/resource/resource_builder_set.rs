@@ -87,6 +87,11 @@ pub fn read<T: ResourceBuilder>(root_dirs: &Vec<&str>, dir: &str) -> HashMap<Str
     for root in root_dirs.iter() {
         read_recursive([root, dir].iter().collect(), &mut resources);
     }
+
+    if resources.is_empty() {
+        warn!("Unable to read any resources from directories: '{:?}'", root_dirs);
+    }
+
     resources
 }
 
@@ -97,7 +102,7 @@ fn read_recursive<T: ResourceBuilder>(dir: PathBuf, resources: &mut HashMap<Stri
     let dir_entries = match fs::read_dir(dir) {
         Ok(entries) => entries,
         Err(_) => {
-            warn!("Unable to read directory: {}", dir_str);
+            debug!("Unable to read directory: {}", dir_str);
             return;
         }
     };

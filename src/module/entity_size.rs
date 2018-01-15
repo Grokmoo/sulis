@@ -78,6 +78,7 @@ impl PartialEq for EntitySize {
 }
 
 #[derive(Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
 pub struct EntitySizeBuilder {
     pub size: usize,
     pub cursor_image: String,

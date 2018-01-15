@@ -1,20 +1,20 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use state::{EntityState, GameState, Inventory};
+use state::{EntityState, ChangeListener, GameState};
 use grt::ui::{AnimationState, Callback, Button, Label, ListBox, Widget, WidgetKind};
 use grt::ui::{list_box, animation_state};
 
 pub const NAME: &str = "inventory_window";
 
 pub struct InventoryWindow {
-    inventory: Rc<RefCell<Inventory>>,
+    entity: Rc<RefCell<EntityState>>,
 }
 
 impl InventoryWindow {
     pub fn new(entity: &Rc<RefCell<EntityState>>) -> Rc<InventoryWindow> {
         Rc::new(InventoryWindow {
-           inventory: Rc::clone(&entity.borrow().actor.inventory)
+            entity: Rc::clone(entity)
         })
     }
 }
@@ -28,24 +28,26 @@ impl WidgetKind for InventoryWindow {
         widget.do_base_layout();
     }
 
-    fn on_add(&self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+        self.entity.borrow_mut().actor.add_change_listener(
+            ChangeListener::invalidate(NAME, widget));
+
         let title = Widget::with_theme(Label::empty(), "title");
 
         let close = Widget::with_theme(Button::empty(), "close");
         close.borrow_mut().state.add_callback(Callback::remove_parent());
 
+        let ref actor = self.entity.borrow().actor;
+
         let mut entries: Vec<list_box::Entry<String>> = Vec::new();
-        for (index, item) in self.inventory.borrow().items.iter().enumerate() {
-            let cb: Callback = Callback::new(Rc::new(move |widget| {
+        for (index, item) in actor.inventory().items.iter().enumerate() {
+            let cb: Callback = Callback::with(Box::new(move || {
                 let pc = GameState::pc();
-                let pc = pc.borrow_mut();
-                if pc.actor.inventory.borrow_mut().equip(index) {
-                    let window = Widget::go_up_tree(widget, 2);
-                    window.borrow_mut().invalidate_children();
-                }
+                let mut pc = pc.borrow_mut();
+                pc.actor.equip(index);
             }));
 
-            let entry = if self.inventory.borrow().is_equipped(index) {
+            let entry = if actor.inventory().is_equipped(index) {
                 list_box::Entry::with_state(item.item.name.to_string(), Some(cb),
                     AnimationState::with(animation_state::Kind::Active))
             } else {

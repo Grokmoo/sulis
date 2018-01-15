@@ -26,6 +26,7 @@ impl Class {
 }
 
 #[derive(Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
 pub struct ClassBuilder {
     pub id: String,
     pub name: String,

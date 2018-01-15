@@ -107,6 +107,7 @@ impl Spritesheet {
 }
 
 #[derive(Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
 pub struct SpritesheetBuilder {
     pub id: String,
     pub src: String,
@@ -115,6 +116,7 @@ pub struct SpritesheetBuilder {
 }
 
 #[derive(Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
 struct SpritesheetGroup {
     pub size: Option<Size>,
     pub position: Option<Point>,

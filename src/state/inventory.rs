@@ -2,7 +2,7 @@ use std::rc::Rc;
 use std::collections::HashMap;
 
 use module::Actor;
-use module::item::Slot;
+use module::item::{Slot, SlotIterator};
 use state::ItemState;
 
 #[derive(Clone)]
@@ -26,14 +26,21 @@ impl Inventory {
         }
     }
 
+    pub fn equipped_iter(&self) -> EquippedIterator {
+        EquippedIterator {
+            slot_iterator: SlotIterator::default(),
+            inventory: &self,
+        }
+    }
+
     /// checks whether the item at the given index is equipped.
     /// returns true if it is, false otherwise
     pub fn is_equipped(&self, index: usize) -> bool {
         let slot = match self.items.get(index) {
             None => return false,
-            Some(item) => match &item.item.slot {
+            Some(item) => match &item.item.equippable {
                 &None => return false,
-                &Some(slot) => slot,
+                &Some(equippable) => equippable.slot,
             }
         };
 
@@ -46,9 +53,9 @@ impl Inventory {
         trace!("Attempting equip of item at '{}", index);
         let slot = match self.items.get(index) {
             None => return false,
-            Some(item) => match &item.item.slot {
+            Some(item) => match &item.item.equippable {
                 &None => return false,
-                &Some(slot) => slot,
+                &Some(equippable) => equippable.slot,
             }
         };
         trace!("Found matching slot '{:?}'", slot);
@@ -69,5 +76,29 @@ impl Inventory {
     pub fn unequip(&mut self, slot: Slot) -> bool {
         self.equipped.remove(&slot);
         true
+    }
+}
+
+pub struct EquippedIterator<'a> {
+    slot_iterator: SlotIterator,
+    inventory: &'a Inventory,
+}
+
+impl<'a> Iterator for EquippedIterator<'a> {
+    type Item = &'a ItemState;
+    fn next(&mut self) -> Option<&'a ItemState> {
+        loop {
+            let slot = match self.slot_iterator.next() {
+                None => return None,
+                Some(slot) => slot,
+            };
+
+            let index = match self.inventory.equipped.get(&slot) {
+                None => continue,
+                Some(index) => *index,
+            };
+
+            return Some(&self.inventory.items[index]);
+        }
     }
 }

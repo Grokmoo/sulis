@@ -23,6 +23,7 @@ pub struct Transition {
 }
 
 #[derive(Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
 pub struct ActorData {
     pub id: String,
     pub location: Point,
@@ -118,6 +119,7 @@ impl Area {
 }
 
 #[derive(Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
 pub struct AreaBuilder {
     pub id: String,
     pub name: String,
@@ -151,6 +153,7 @@ impl ResourceBuilder for AreaBuilder {
 }
 
 #[derive(Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
 pub struct TransitionBuilder {
     pub from: Point,
     pub size: Size,

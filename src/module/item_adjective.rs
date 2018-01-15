@@ -8,6 +8,7 @@ use grt::serde_yaml;
 /// an item in a given way.  Items can have zero, one, or
 /// many adjectives.
 #[derive(Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
 pub struct ItemAdjective {
     pub id: String,
     pub name: String,

@@ -44,6 +44,13 @@ pub trait WidgetKind {
         Vec::with_capacity(0)
     }
 
+    /// This method is called just prior to the owning widget being removed from
+    /// the widget tree.  It is used for any cleanup that needs to be done
+    /// when a widget is removed from the tree.  Note that this is called when
+    /// the actual removal takes place, not when the widget is first marked
+    /// for removal.
+    fn on_remove(&self) { }
+
     fn super_on_mouse_press(&self, widget: &Rc<RefCell<Widget>>, _kind: ClickKind) {
         widget.borrow_mut().state.animation_state.add(animation_state::Kind::Pressed);
     }

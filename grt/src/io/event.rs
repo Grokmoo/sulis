@@ -39,6 +39,7 @@ pub enum Kind {
 }
 
 #[derive(Deserialize, Copy, Clone, Debug, PartialEq)]
+#[serde(deny_unknown_fields)]
 pub enum ClickKind {
     Left,
     Right,

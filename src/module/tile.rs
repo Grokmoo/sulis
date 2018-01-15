@@ -87,6 +87,7 @@ impl PartialEq for Tile {
 }
 
 #[derive(Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
 pub struct TileBuilder {
     pub id: String,
     pub name: String,

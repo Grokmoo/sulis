@@ -75,6 +75,7 @@ impl Image for SimpleImage {
 }
 
 #[derive(Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
 pub struct SimpleImageBuilder {
     id: String,
     text_display: Vec<char>,

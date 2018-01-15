@@ -127,6 +127,7 @@ impl Font {
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct FontBuilder {
     id: String,
     src: String,
@@ -136,6 +137,7 @@ pub struct FontBuilder {
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 struct FontCharBuilder {
     id: u32,
     xywh: [u32; 4],

@@ -375,8 +375,12 @@ impl Widget {
     pub fn check_readd(parent: &Rc<RefCell<Widget>>) {
         let readd = parent.borrow().marked_for_readd;
         if readd {
+            for child in parent.borrow_mut().children.iter() {
+                child.borrow_mut().kind.on_remove();
+            }
             parent.borrow_mut().children.clear();
             let kind = Rc::clone(&parent.borrow().kind);
+            kind.on_remove();
             let children = kind.on_add(&parent);
             parent.borrow_mut().add_children(children);
             parent.borrow_mut().marked_for_readd = false;
@@ -403,7 +407,14 @@ impl Widget {
             parent.borrow_mut().modal_child = None;
         }
 
-        parent.borrow_mut().children.retain(|w| !w.borrow().marked_for_removal);
+        parent.borrow_mut().children.retain(|widget| {
+            if widget.borrow().marked_for_removal {
+                widget.borrow().kind.on_remove();
+                false
+            } else {
+                true
+            }
+        });
 
         // set up theme
         if parent.borrow().theme.is_none() {

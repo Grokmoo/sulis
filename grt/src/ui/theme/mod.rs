@@ -11,6 +11,7 @@ use serde_json;
 use serde_yaml;
 
 #[derive(Deserialize, Debug, Clone, Copy, PartialEq)]
+#[serde(deny_unknown_fields)]
 pub enum PositionRelative {
     Zero,
     Center,
@@ -19,6 +20,7 @@ pub enum PositionRelative {
 }
 
 #[derive(Deserialize, Debug, Clone, Copy, PartialEq)]
+#[serde(deny_unknown_fields)]
 pub enum SizeRelative {
     Zero,
     Max,
@@ -27,6 +29,7 @@ pub enum SizeRelative {
 }
 
 #[derive(Deserialize, Debug, Clone, Copy, PartialEq)]
+#[serde(deny_unknown_fields)]
 pub enum HorizontalTextAlignment {
     Left,
     Center,
@@ -34,6 +37,7 @@ pub enum HorizontalTextAlignment {
 }
 
 #[derive(Deserialize, Debug, Clone, Copy, PartialEq)]
+#[serde(deny_unknown_fields)]
 pub enum VerticalTextAlignment {
     Top,
     Center,
@@ -182,6 +186,7 @@ impl Theme {
 }
 
 #[derive(Deserialize, Debug, Clone)]
+#[serde(deny_unknown_fields)]
 struct TextParamsBuilder {
     horizontal_alignment: Option<HorizontalTextAlignment>,
     vertical_alignment: Option<VerticalTextAlignment>,
@@ -203,6 +208,7 @@ impl TextParamsBuilder {
 }
 
 #[derive(Deserialize, Debug, Clone)]
+#[serde(deny_unknown_fields)]
 pub struct ThemeBuilder {
     pub background: Option<String>,
     pub border: Option<Border>,

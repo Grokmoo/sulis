@@ -1,4 +1,5 @@
 #[derive(Deserialize, Debug, Clone, Copy, PartialEq)]
+#[serde(deny_unknown_fields)]
 pub struct Color {
     pub r: f32,
     pub g: f32,

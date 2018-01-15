@@ -1,4 +1,5 @@
 #[derive(Deserialize, Debug, Copy, Clone)]
+#[serde(deny_unknown_fields)]
 pub struct Border {
     pub top: i32,
     pub bottom: i32,

@@ -1,46 +1,62 @@
+use std::fmt::Display;
 use std::rc::Rc;
+use std::slice::Iter;
 use std::cell::RefCell;
 
 use ui::{AnimationState, Button, Callback, Size, Widget, WidgetKind};
 
-pub struct Entry {
-    text: String,
-    callback: Option<Callback<Button>>,
+pub struct Entry<T: Display> {
+    item: T,
+    callback: Option<Callback>,
     animation_state: AnimationState,
 }
 
-impl Entry {
-    pub fn new(text: &str, callback: Option<Callback<Button>>) -> Entry {
+impl<T: Display> Entry<T> {
+    pub fn item(&self) -> &T {
+        &self.item
+    }
+}
+
+impl<T: Display> Entry<T> {
+    pub fn new(item: T, callback: Option<Callback>) -> Entry<T> {
        Entry {
-           text: text.to_string(),
+           item,
            callback,
            animation_state: AnimationState::default(),
        }
     }
 
-    pub fn with_state(text: &str, callback: Option<Callback<Button>>,
-                      animation_state: AnimationState) -> Entry {
+    pub fn with_state(item: T, callback: Option<Callback>,
+                      animation_state: AnimationState) -> Entry<T> {
         Entry {
-            text: text.to_string(),
+            item,
             callback,
             animation_state,
         }
     }
 }
 
-pub struct ListBox {
-    entries: Vec<Entry>,
+pub struct ListBox<T: Display> {
+    entries: Vec<Entry<T>>,
 }
 
-impl ListBox {
-    pub fn new(entries: Vec<Entry>) -> Rc<ListBox> {
+impl<T: Display> ListBox<T> {
+    pub fn new(entries: Vec<Entry<T>>) -> Rc<ListBox<T>> {
         Rc::new(ListBox {
             entries,
         })
     }
+
+    pub fn iter(&self) -> Iter<Entry<T>> {
+        self.entries.iter()
+    }
+
+    pub fn get(&self, index: usize) -> Option<&Entry<T>> {
+        self.entries.get(index)
+    }
 }
 
-impl WidgetKind for ListBox {
+impl<T: Display> WidgetKind for ListBox<T> {
     fn get_name(&self) -> &str {
         "list_box"
     }
@@ -69,13 +85,11 @@ impl WidgetKind for ListBox {
             Vec::with_capacity(self.entries.len());
 
         for entry in self.entries.iter() {
-            let kind = match &entry.callback {
-                &Some(ref cb) => Button::new(&entry.text, cb.clone()),
-                &None => Button::with_text(&entry.text),
-            };
-
-            let widget = Widget::with_theme(kind, "entry");
+            let widget = Widget::with_theme(Button::with_text(&entry.item.to_string()), "entry");
             widget.borrow_mut().state.set_animation_state(&entry.animation_state);
+            if let Some(ref cb) = entry.callback {
+                widget.borrow_mut().state.add_callback(cb.clone());
+            }
             children.push(widget);
         }
 

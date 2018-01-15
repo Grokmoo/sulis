@@ -4,6 +4,8 @@ use std::cell::RefCell;
 use grt::io::MainLoopUpdater;
 use grt::ui::{animation_state, Button, Callback, Label, list_box, ListBox, WidgetKind, Widget};
 
+use module::ModuleInfo;
+
 pub struct MainMenuLoopUpdater {
     main_menu_view: Rc<MainMenuView>,
 }
@@ -25,11 +27,11 @@ impl MainLoopUpdater for MainMenuLoopUpdater {
 }
 
 pub struct MainMenuView {
-    modules: Vec<String>,
+    modules: Vec<ModuleInfo>,
 }
 
 impl MainMenuView {
-    pub fn new(modules: Vec<String>) -> Rc<MainMenuView> {
+    pub fn new(modules: Vec<ModuleInfo>) -> Rc<MainMenuView> {
         Rc::new(MainMenuView {
             modules,
         })
@@ -38,10 +40,20 @@ impl MainMenuView {
     pub fn is_exit(&self) -> bool {
         EXIT.with(|exit| *exit.borrow())
     }
+
+    pub fn get_selected_module(&self) -> Option<ModuleInfo> {
+        SELECTED_MODULE.with(|m| {
+            match m.borrow().as_ref() {
+                None => None,
+                Some(module) => Some(module.clone()),
+            }
+        })
+    }
 }
 
 thread_local! {
     static EXIT: RefCell<bool> = RefCell::new(false);
+    static SELECTED_MODULE: RefCell<Option<ModuleInfo>> = RefCell::new(None);
 }
 
 impl WidgetKind for MainMenuView {
@@ -54,29 +66,44 @@ impl WidgetKind for MainMenuView {
 
         let title = Widget::with_theme(Label::empty(), "title");
         let modules_title = Widget::with_theme(Label::empty(), "modules_title");
+        let play = Widget::with_theme(Button::empty(), "play_button");
+        let mut entries: Vec<list_box::Entry<ModuleInfo>> = Vec::new();
 
-        let mut entries: Vec<list_box::Entry> = Vec::new();
-        let cb: Callback<Button> = Callback::new(Rc::new( |_, widget| {
+        let play_ref = Rc::clone(&play);
+        let cb: Callback = Callback::new(Rc::new(move |widget| {
+            let parent = Widget::get_parent(widget);
+            let cur_state = widget.borrow_mut().state.animation_state.contains(animation_state::Kind::Active);
+            if !cur_state {
+                for child in parent.borrow_mut().children.iter() {
+                    child.borrow_mut().state.animation_state.remove(animation_state::Kind::Active);
+                }
+                play_ref.borrow_mut().enable();
+            } else {
+                play_ref.borrow_mut().disable();
+            }
             widget.borrow_mut().state.animation_state.toggle(animation_state::Kind::Active);
         }));
         for module in self.modules.iter() {
-            let entry = list_box::Entry::new(&module, Some(cb.clone()));
+            let entry = list_box::Entry::new(module.clone(), Some(cb.clone()));
             entries.push(entry);
         }
 
-        let modules_list = Widget::with_theme(ListBox::new(entries), "modules_list");
+        let list_box = ListBox::new(entries);
+        // using Rc::clone complains of type mismatch here
+        let modules_list = Widget::with_theme(list_box.clone(), "modules_list");
 
         let modules_list_ref = Rc::clone(&modules_list);
-        let cb: Callback<Button> = Callback::new(Rc::new(move |_, _| {
-            for child in modules_list_ref.borrow().children.iter() {
+        play.borrow_mut().state.add_callback(Callback::new(Rc::new(move |_| {
+            for (index, child) in modules_list_ref.borrow().children.iter().enumerate() {
                 if child.borrow().state.animation_state.contains(animation_state::Kind::Active) {
-                    trace!("Found active module");
+                    let entry = list_box.get(index).unwrap();
                     EXIT.with(|exit| *exit.borrow_mut() = true);
+                    SELECTED_MODULE.with(|m| *m.borrow_mut() = Some(entry.item().clone()));
+                    info!("Found active module {}", entry.item().name );
                 }
             }
-        }));
-        let play = Widget::with_theme(Button::with_callback(cb), "play_button");
-        play.borrow_mut().state.animation_state.add(animation_state::Kind::Disabled);
+        })));
+        play.borrow_mut().disable();
 
         vec![title, modules_title, play, modules_list]
     }

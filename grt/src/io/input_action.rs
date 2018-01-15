@@ -32,7 +32,11 @@ impl InputAction {
             Some(action) => action
         };
 
-        debug!("Received action {:?}", action);
+        // don't spam tons of mouse move actions in the event logs
+        match action {
+            MouseMove(_, _) => (),
+            _ => debug!("Received action {:?}", action),
+        }
 
         Widget::remove_mouse_over(&root);
         use io::InputAction::*;

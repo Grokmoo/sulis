@@ -87,9 +87,8 @@ impl WidgetKind for RootView {
 
         let right_pane = Widget::with_theme(EmptyWidget::new(), "right_pane");
         {
-            let button = Widget::with_theme(
-                Button::with_callback(Callback::with(Box::new(|| { info!("Hello world"); }))),
-                "test_button");
+            let button = Widget::with_theme(Button::empty(), "test_button");
+            button.borrow_mut().state.add_callback(Callback::with(Box::new(|| { info!("Hello world"); })));
 
             let area_state = GameState::area_state();
             let area_title = Widget::with_theme(

@@ -4,7 +4,7 @@ use std::cell::{RefCell, RefMut};
 use std::cmp;
 
 use io::{Event, TextRenderer};
-use ui::{Cursor, Size, Theme, WidgetState, WidgetKind};
+use ui::{animation_state, Cursor, Size, Theme, WidgetState, WidgetKind};
 use ui::theme::SizeRelative;
 use resource::ResourceSet;
 
@@ -25,6 +25,18 @@ pub struct Widget {
 }
 
 impl Widget {
+    pub fn disable(&mut self) {
+        self.state.animation_state.add(animation_state::Kind::Disabled);
+    }
+
+    pub fn enable(&mut self) {
+        self.state.animation_state.remove(animation_state::Kind::Disabled);
+    }
+
+    pub fn is_enabled(&self) -> bool {
+        !self.state.animation_state.contains(animation_state::Kind::Disabled)
+    }
+
     pub fn has_modal(&self) -> bool {
         self.modal_child.is_some()
     }
@@ -322,6 +334,15 @@ impl Widget {
         None
     }
 
+    pub fn fire_callback(widget: &Rc<RefCell<Widget>>) {
+        let cb = match widget.borrow().state.callback {
+            None => return,
+            Some(ref cb) => cb.clone(),
+        };
+
+        (cb).call(widget);
+    }
+
     pub fn remove_mouse_over(root: &Rc<RefCell<Widget>>) {
         trace!("Remove all mouse overs.");
         for child in root.borrow().children.iter() {
@@ -456,6 +477,10 @@ impl Widget {
         let len = widget.borrow().children.len();
         for i in (0..len).rev() {
             let child = Rc::clone(widget.borrow().children.get(i).unwrap());
+
+            if !child.borrow().is_enabled() {
+                continue;
+            }
 
             if child.borrow().state.in_bounds(Cursor::get_x(), Cursor::get_y()) {
                 if !child.borrow().state.mouse_is_inside {

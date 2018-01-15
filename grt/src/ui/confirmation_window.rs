@@ -4,11 +4,11 @@ use std::cell::RefCell;
 use ui::{Button, Callback, Label, Widget, WidgetKind};
 
 pub struct ConfirmationWindow {
-    accept_callback: Callback<Button>,
+    accept_callback: Callback,
 }
 
 impl ConfirmationWindow {
-    pub fn new(accept_callback: Callback<Button>) -> Rc<ConfirmationWindow> {
+    pub fn new(accept_callback: Callback) -> Rc<ConfirmationWindow> {
         Rc::new(ConfirmationWindow {
             accept_callback
         })
@@ -27,14 +27,12 @@ impl WidgetKind for ConfirmationWindow {
     fn on_add(&self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let label = Widget::with_theme(Label::empty(), "title");
 
-        let cancel = Widget::with_theme(
-            Button::with_callback(Callback::remove_parent()),
-            "cancel");
+        let cancel = Widget::with_theme(Button::empty(), "cancel");
+        cancel.borrow_mut().state.add_callback(Callback::remove_parent());
 
-        let quit = Widget::with_theme(
-            Button::with_callback(self.accept_callback.clone()),
-            "accept");
+        let accept = Widget::with_theme(Button::empty(), "accept");
+        accept.borrow_mut().state.add_callback(self.accept_callback.clone());
 
-        vec![cancel, quit, label]
+        vec![cancel, accept, label]
     }
 }

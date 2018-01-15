@@ -35,9 +35,7 @@ fn main() {
     info!("Reading resources from {}", CONFIG.resources.directory);
     if let Err(e) = ResourceSet::init(&CONFIG.resources.directory) {
         error!("{}", e);
-        error!("There was a fatal error loading resource set from 'data':");
-        error!("Exiting...");
-        ::std::process::exit(1);
+        error_and_exit("There was a fatal error initializing the display.");
     };
 
     info!("Setting up display adapter.");
@@ -45,18 +43,20 @@ fn main() {
         Ok(io) => io,
         Err(e) => {
             error!("{}", e);
-            error!("There was a fatal error initializing the display.");
-            error!("Exiting...");
-            ::std::process::exit(1);
+            error_and_exit("There was a fatal error initializing the display.");
+            unreachable!();
         }
     };
 
-    let modules_list = vec!["Module1".to_string(), "Module2".to_string(), "TestCampaign".to_string()];
+    let modules_list = Module::get_available_modules("modules");
+    if modules_list.len() == 0 {
+        error_and_exit("No valid modules found.");
+    }
 
-    {
+    let selected_module = {
         let main_menu_view = MainMenuView::new(modules_list);
         let loop_updater = MainMenuLoopUpdater::new(&main_menu_view);
-        let main_menu_root = ui::create_ui_tree(main_menu_view);
+        let main_menu_root = ui::create_ui_tree(main_menu_view.clone());
         match ResourceSet::get_theme().children.get("main_menu") {
             None => warn!("No theme found for 'main_menu"),
             Some(ref theme) => {
@@ -68,25 +68,30 @@ fn main() {
 
         if let Err(e) = main_loop(&mut io, main_menu_root, Box::new(loop_updater)) {
             error!("{}", e);
-            error!("Error in main menu.  Exiting...");
-            ::std::process::exit(1);
+            error_and_exit("Error in main menu.");
         }
-    }
 
-    info!("Reading module from {}", CONFIG.resources.directory);
-    if let Err(e) =  Module::init(&CONFIG.resources.directory) {
+        main_menu_view.get_selected_module()
+    };
+
+    let module_info = match selected_module {
+        None => {
+            error_and_exit("No module selected in main menu.");
+            unreachable!();
+        },
+        Some(module) => module,
+    };
+
+    info!("Reading module from {}", module_info.dir);
+    if let Err(e) =  Module::init(&module_info.dir) {
         error!("{}", e);
-        error!("There was a fatal error setting up the module.");
-        error!("Exiting...");
-        ::std::process::exit(1);
+        error_and_exit("There was a fatal error setting up the module.");
     };
 
     info!("Initializing game state.");
     if let Err(e) = GameState::init() {
         error!("{}",  e);
-        error!("There was a fatal error creating the game state.");
-        error!("Exiting...");
-        ::std::process::exit(1);
+        error_and_exit("There was a fatal error creating the game state.");
     };
 
     let root = ui::create_ui_tree(RootView::new());
@@ -144,6 +149,12 @@ fn main_loop(io: &mut Box<IO>, root: Rc<RefCell<Widget>>,
     info!("Average frame render time: {:.2} milliseconds", 1000.0 * secs / frames as f64);
 
     Ok(())
+}
+
+fn error_and_exit(error: &str) {
+    error!("{}", error);
+    error!("Exiting...");
+    ::std::process::exit(1)
 }
 
 fn setup_logger() {

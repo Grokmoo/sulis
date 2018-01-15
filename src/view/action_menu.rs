@@ -2,7 +2,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use module::area::Transition;
-use grt::ui::{Button, Callback, Cursor, Label, list_box, ListBox, Widget, WidgetKind};
+use grt::ui::{Callback, Cursor, Label, list_box, ListBox, Widget, WidgetKind};
 use grt::io::event::ClickKind;
 use grt::util::Point;
 
@@ -31,12 +31,12 @@ impl ActionMenu {
         })
     }
 
-    pub fn transition_callback(&self, transition: &Transition) -> Option<Callback<Button>> {
+    pub fn transition_callback(&self, transition: &Transition) -> Option<Callback> {
         let area_id = transition.to_area.clone();
         let x = transition.to.x;
         let y = transition.to.y;
 
-        Some(Callback::new(Rc::new( move |_kind, widget| {
+        Some(Callback::new(Rc::new( move |widget| {
             GameState::transition(&area_id, x, y);
             Widget::mark_removal_up_tree(&widget, 2);
             let root = Widget::get_root(&widget);
@@ -67,8 +67,8 @@ impl ActionMenu {
         })
     }
 
-    fn callback_with_removal(f: Box<Fn()>) -> Option<Callback<Button>> {
-        Some(Callback::new(Rc::new(move |_kind, widget| {
+    fn callback_with_removal(f: Box<Fn()>) -> Option<Callback> {
+        Some(Callback::new(Rc::new(move |widget| {
             f();
             Widget::mark_removal_up_tree(&widget, 2);
         })))
@@ -93,29 +93,29 @@ impl WidgetKind for ActionMenu {
 
         let title = Widget::with_theme(Label::empty(), "title");
 
-        let mut entries: Vec<list_box::Entry> = Vec::new();
+        let mut entries: Vec<list_box::Entry<String>> = Vec::new();
         if self.is_move_valid() {
             entries.push(list_box::Entry::new(
-                    "Move", ActionMenu::callback_with_removal(self.move_callback())));
+                    "Move".to_string(), ActionMenu::callback_with_removal(self.move_callback())));
 
         }
 
         if let Some(ref _entity) = self.hovered_entity {
             if !self.is_hover_pc {
                 entries.push(list_box::Entry::new(
-                        "Attack", ActionMenu::callback_with_removal(self.attack_callback())));
+                        "Attack".to_string(), ActionMenu::callback_with_removal(self.attack_callback())));
             }
         }
 
         if let Some(ref transition) = self.area_state.borrow()
             .get_transition_at(self.area_pos.x, self.area_pos.y) {
             entries.push(list_box::Entry::new(
-                    "Transition", self.transition_callback(transition)));
+                    "Transition".to_string(), self.transition_callback(transition)));
         }
 
         if entries.is_empty() {
             entries.push(list_box::Entry::new(
-                    "None", ActionMenu::callback_with_removal(Box::new(|| { }))));
+                    "None".to_string(), ActionMenu::callback_with_removal(Box::new(|| { }))));
         }
         let actions = Widget::with_theme(ListBox::new(entries), "actions");
 

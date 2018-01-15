@@ -10,6 +10,7 @@ pub struct Game {
     pub starting_area: String,
     pub starting_location: Point,
     pub pc: String,
+    pub name: String,
 }
 
 impl ResourceBuilder for Game {

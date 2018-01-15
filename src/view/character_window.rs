@@ -28,7 +28,8 @@ impl WidgetKind for CharacterWindow {
         let title = Widget::with_theme(Label::empty(), "title");
         title.borrow_mut().state.add_text_arg("name", &self.character.borrow().actor.actor.id);
 
-        let close = Widget::with_theme(Button::with_callback(Callback::remove_parent()), "close");
+        let close = Widget::with_theme(Button::empty(), "close");
+        close.borrow_mut().state.add_callback(Callback::remove_parent());
 
         let details = Widget::with_theme(TextArea::empty(), "details");
         {

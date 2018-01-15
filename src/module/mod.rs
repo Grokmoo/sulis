@@ -36,6 +36,9 @@ use std::collections::HashMap;
 use std::rc::Rc;
 use std::io::Error;
 use std::cell::RefCell;
+use std::fmt::{self, Display};
+use std::path::PathBuf;
+use std::fs;
 
 use grt::resource::{read, read_single_resource, get_resource, insert_if_ok};
 
@@ -63,7 +66,75 @@ pub struct Module {
     tiles: HashMap<String, Rc<Tile>>,
 }
 
+#[derive(Clone)]
+pub struct ModuleInfo {
+    pub dir: String,
+    pub name: String,
+}
+
+impl ModuleInfo {
+    fn from_dir(path: PathBuf) -> Result<ModuleInfo, Error> {
+        let path_str = path.to_string_lossy().to_string();
+        debug!("Checking module at '{}'", path_str);
+
+        let game: Game = read_single_resource(&format!("{}/module", path_str))?;
+
+        Ok(ModuleInfo {
+            dir: path_str,
+            name: game.name,
+        })
+    }
+}
+
+impl Display for ModuleInfo {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.name)
+    }
+}
+
 impl Module {
+    pub fn get_available_modules(root_dir: &str) -> Vec<ModuleInfo> {
+        let mut modules: Vec<ModuleInfo> = Vec::new();
+        let path = PathBuf::from(root_dir);
+
+        let dir_entries = match fs::read_dir(path) {
+            Ok(entries) => entries,
+            Err(_) => {
+                warn!("Unable to read directory: {}", root_dir);
+                return modules;
+            }
+        };
+
+        for entry in dir_entries {
+            trace!("Found entry {:?}", entry);
+            let entry = match entry {
+                Ok(e) => e,
+                Err(e) => {
+                    warn!("Error reading entry: {}", e);
+                    continue;
+                }
+            };
+
+            if entry.path().is_dir() {
+                let module = match ModuleInfo::from_dir(entry.path()) {
+                    Ok(module) => module,
+                    Err(e) => {
+                        warn!("Unable to read module from '{:?}'", entry.path());
+                        warn!("{}", e);
+                        continue;
+                    }
+                };
+                modules.push(module);
+            }
+        }
+
+        vec![ModuleInfo {dir: "test1".to_string(), name: "Test 1".to_string()},
+        ModuleInfo {dir: "test2".to_string(), name: "Test 2".to_string()},
+        ModuleInfo {dir: "blarg".to_string(), name: "Blarg".to_string()}];
+
+        modules
+    }
+
     pub fn init(root_dir: &str) -> Result<(), Error> {
         let builder_set = ModuleBuilder::new(root_dir);
 

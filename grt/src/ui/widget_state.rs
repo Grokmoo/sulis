@@ -2,15 +2,13 @@ use std::rc::Rc;
 use std::option::Option;
 use std::collections::HashMap;
 
-use ui::{AnimationState, Border, FontRenderer, Size};
+use ui::{AnimationState, Border, Callback, FontRenderer, Size};
 use ui::theme::TextParams;
 
 use util::Point;
 use image::Image;
 use resource::Font;
 
-//// The base widget holder class.  Contains the common implementation across all
-//// widgets, and holds an instance of 'Widget' which contains the specific behavior.
 pub struct WidgetState {
     pub position: Point,
     pub size: Size,
@@ -28,13 +26,15 @@ pub struct WidgetState {
     pub font: Option<Rc<Font>>,
     pub is_modal: bool,
     pub is_mouse_over: bool,
-
     pub text_args: HashMap<String, String>,
+
+    pub (in ui) callback: Option<Callback>,
 }
 
 impl WidgetState {
     pub fn new() -> WidgetState {
         WidgetState {
+            callback: None,
             size: Size::as_zero(),
             position: Point::as_zero(),
             border: Border::as_zero(),
@@ -53,6 +53,10 @@ impl WidgetState {
             is_modal: false,
             is_mouse_over: false,
         }
+    }
+
+    pub fn add_callback(&mut self, callback: Callback) {
+        self.callback = Some(callback);
     }
 
     pub fn scroll(&mut self, x: i32, y: i32) -> bool {

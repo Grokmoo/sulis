@@ -28,8 +28,13 @@ impl WidgetKind for InventoryWindow {
         widget.do_base_layout();
     }
 
+    fn on_remove(&self) {
+        self.entity.borrow_mut().actor.listeners.remove(NAME);
+        debug!("Removed inventory window.");
+    }
+
     fn on_add(&self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
-        self.entity.borrow_mut().actor.add_change_listener(
+        self.entity.borrow_mut().actor.listeners.add(
             ChangeListener::invalidate(NAME, widget));
 
         let title = Widget::with_theme(Label::empty(), "title");
@@ -41,17 +46,28 @@ impl WidgetKind for InventoryWindow {
 
         let mut entries: Vec<list_box::Entry<String>> = Vec::new();
         for (index, item) in actor.inventory().items.iter().enumerate() {
-            let cb: Callback = Callback::with(Box::new(move || {
-                let pc = GameState::pc();
-                let mut pc = pc.borrow_mut();
-                pc.actor.equip(index);
-            }));
+            let cb = match item.item.equippable {
+                Some(equippable) => {
+                    let slot = equippable.slot;
+                    Some(Callback::with(Box::new(move || {
+                        let pc = GameState::pc();
+                        let mut pc = pc.borrow_mut();
+
+                        if pc.actor.inventory().is_equipped(index) {
+                            pc.actor.unequip(slot);
+                        } else {
+                            pc.actor.equip(index);
+                        }
+                    })))
+                },
+                None => None,
+            };
 
             let entry = if actor.inventory().is_equipped(index) {
-                list_box::Entry::with_state(item.item.name.to_string(), Some(cb),
+                list_box::Entry::with_state(item.item.name.to_string(), cb,
                     AnimationState::with(animation_state::Kind::Active))
             } else {
-                list_box::Entry::new(item.item.name.to_string(), Some(cb))
+                list_box::Entry::new(item.item.name.to_string(), cb)
             };
 
             entries.push(entry);

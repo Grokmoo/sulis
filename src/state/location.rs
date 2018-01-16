@@ -40,12 +40,20 @@ impl Location {
         Location { x: p.x, y: p.y, area_state, area_id }
     }
 
+    pub fn to_point(&self) -> Point {
+        Point { x: self.x, y: self.y }
+    }
+
     pub fn move_to(&mut self, x: i32, y: i32) {
         self.x = x;
         self.y = y;
     }
 
-    pub fn coords_valid(&self, x: i32, y: i32) -> bool{
+    pub fn coords_valid(&self, x: i32, y: i32) -> bool {
         self.area_state.borrow().area.coords_valid(x, y)
+    }
+
+    pub fn is_in(&self, area_state: &AreaState) -> bool {
+        self.area_id == area_state.area.id
     }
 }

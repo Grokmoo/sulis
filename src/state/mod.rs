@@ -3,6 +3,7 @@ pub use self::area_state::AreaState;
 
 mod change_listener;
 pub use self::change_listener::ChangeListener;
+pub use self::change_listener::ChangeListenerList;
 
 mod entity_state;
 pub use self::entity_state::EntityState;
@@ -228,7 +229,10 @@ impl GameState {
 
     pub fn update() {
         STATE.with(|s| {
-            s.borrow_mut().as_mut().unwrap().animations.retain(|anim| anim.update());
+            let mut state = s.borrow_mut();
+            state.as_mut().unwrap().animations.retain(|anim| anim.update());
+
+            state.as_ref().unwrap().area_state.borrow_mut().update();
         });
     }
 

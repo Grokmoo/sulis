@@ -82,13 +82,19 @@ impl Point {
         Point { x: self.x + border.left, y: self.y + border.top }
     }
 
-    //// Returns true if this point's x coordinate is in
-    //// the interval [0, max_x) and the y coordinate is in
-    //// the interval [0, max_y).  Returns false otherwise.
+    /// Returns true if this point's x coordinate is in
+    /// the interval [0, max_x) and the y coordinate is in
+    /// the interval [0, max_y).  Returns false otherwise.
     pub fn in_bounds(&self, max_x: i32, max_y: i32) -> bool {
         if self.x < 0 || self.y < 0 { return false; }
         if self.x >= max_x || self.y >= max_y { return false; }
         true
+    }
+
+    /// Returns the eucliden distance between these two points
+    pub fn dist(&self, other: &Point) -> f32 {
+        (((self.x - other.x) * (self.x - other.x) +
+            (self.y - other.y) * (self.y - other.y)) as f32).sqrt()
     }
 }
 

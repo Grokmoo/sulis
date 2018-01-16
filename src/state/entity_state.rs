@@ -1,4 +1,5 @@
 use module::{Actor, EntitySize, EntitySizeIterator};
+use module::area::Transition;
 use state::{ActorState, GameState, Location};
 
 use std::rc::Rc;
@@ -9,6 +10,8 @@ pub struct EntityState {
     pub location: Location,
     pub size: Rc<EntitySize>,
     pub index: usize, // index in vec of the owning area state
+
+    marked_for_removal: bool,
 }
 
 impl PartialEq for EntityState {
@@ -27,7 +30,21 @@ impl EntityState {
             actor: actor_state,
             location,
             size,
-            index
+            index,
+            marked_for_removal: false,
+        }
+    }
+
+    pub (in state) fn is_marked_for_removal(&self) -> bool {
+        self.marked_for_removal
+    }
+
+    pub fn remove_hp(&mut self, hp: u32) {
+        self.actor.remove_hp(hp);
+
+        if self.actor.hp() <= 0 {
+            debug!("Entity '{}' has zero hit points.  Marked to remove.", self.actor.actor.name);
+            self.marked_for_removal = true;
         }
     }
 
@@ -40,6 +57,36 @@ impl EntityState {
         self.location.area_state.borrow_mut().update_entity_position(&self, x, y);
         self.location.move_to(x, y);
         true
+    }
+
+    fn dist(&self, to_x: i32, to_y: i32, to_size: i32) -> f32 {
+        let self_half_size = self.size() as f32 / 2.0;
+        let other_half_size = to_size as f32 / 2.0;
+        let from_x = self.location.x as f32 + self_half_size;
+        let from_y = self.location.y as f32 + self_half_size;
+        let to_x = to_x as f32 + other_half_size;
+        let to_y = to_y as f32 + other_half_size;
+
+        ((from_x - to_x) * (from_x - to_x) + (from_y - to_y) * (from_y - to_y)).sqrt()
+            - self_half_size - other_half_size
+    }
+
+    pub fn dist_to_entity(&self, other: &Rc<RefCell<EntityState>>) -> f32 {
+        let value = self.dist(other.borrow().location.x, other.borrow().location.y, other.borrow().size());
+
+        trace!("Computed distance from '{}' at {:?} to '{}' at {:?} = {}", self.actor.actor.name,
+               self.location, other.borrow().actor.actor.name, other.borrow().location, value);
+
+        value
+    }
+
+    pub fn dist_to_transition(&self, other: &Transition) -> f32 {
+        let value = self.dist(other.from.x, other.from.y, other.size.width);
+
+        trace!("Computed distance from '{}' at {:?} to transition at {:?} = {}",
+               self.actor.actor.name, self.location, other.from, value);
+
+        value
     }
 
     pub(in state) fn display(&self) -> char {

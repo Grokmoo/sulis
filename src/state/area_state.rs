@@ -1,13 +1,13 @@
 use module::{Actor, Area, Module};
 use module::area::Transition;
-use state::EntityState;
-use state::Location;
+use state::{ChangeListenerList, EntityState, Location};
 
 use std::rc::Rc;
 use std::cell::{Ref, RefCell};
 
 pub struct AreaState {
     pub area: Rc<Area>,
+    pub listeners: ChangeListenerList<AreaState>,
     entities: Vec<Option<Rc<RefCell<EntityState>>>>,
 
     entity_grid: Vec<Option<usize>>,
@@ -37,6 +37,7 @@ impl AreaState {
             transition_grid,
             display,
             entity_grid,
+            listeners: ChangeListenerList::default(),
         }
     }
 
@@ -151,6 +152,7 @@ impl AreaState {
         }
         self.entities[new_index] = Some(entity);
 
+        self.listeners.notify(&self);
         true
     }
 
@@ -203,25 +205,41 @@ impl AreaState {
         Rc::clone(&entity.as_ref().unwrap())
     }
 
-    pub(in state) fn remove_entity(&mut self, entity: &Rc<RefCell<EntityState>>) {
-        let mut match_index = None;
-        for (index, item) in self.entities.iter_mut().enumerate() {
-            if let &mut Some(ref other_entity) = item {
-                if *other_entity.borrow() == *entity.borrow() {
-                    match_index = Some(index);
-                    break;
-                }
-            }
+    pub (in state) fn update(&mut self) {
+        // removal does not shuffle the vector around, so we can safely just iterate
+        let mut notify = false;
+        let len = self.entities.len();
+        for index in 0..len {
+            let entity = match &self.entities[index].as_ref() {
+                &None => continue,
+                &Some(entity) => Rc::clone(entity),
+            };
+            if !entity.borrow().is_marked_for_removal() { continue; }
+
+            self.remove_entity_at_index(&entity, index);
+            notify = true;
         }
 
-        if let Some(index) = match_index {
-            self.clear_entity_points(&*entity.borrow());
-            self.entities[index] = None;
-            return;
-        } else {
-            warn!("Unable to remove entity '{}' from area '{}' as it was not found",
+        if notify {
+            self.listeners.notify(&self);
+        }
+    }
+
+    pub(in state) fn remove_entity(&mut self, entity: &Rc<RefCell<EntityState>>) {
+        if !entity.borrow().location.is_in(&self) {
+            warn!("Unable to remove entity '{}' from area '{}' as it is not in the area.",
                   entity.borrow().actor.actor.id, self.area.id);
         }
+
+        let index = entity.borrow().index;
+        self.remove_entity_at_index(entity, index);
+        self.listeners.notify(&self);
+    }
+
+    fn remove_entity_at_index(&mut self, entity: &Rc<RefCell<EntityState>>, index: usize) {
+        trace!("Removing entity '{}' with index '{}'", entity.borrow().actor.actor.name, index);
+        self.clear_entity_points(&*entity.borrow());
+        self.entities[index] = None;
     }
 
     fn find_index_to_add(&mut self) -> usize {
@@ -244,15 +262,17 @@ pub struct EntityIterator<'a> {
 impl<'a> Iterator for EntityIterator<'a> {
     type Item = Rc<RefCell<EntityState>>;
     fn next(&mut self) -> Option<Rc<RefCell<EntityState>>> {
-        let next = self.area_state.entities.get(self.index);
+        loop {
+            let next = self.area_state.entities.get(self.index);
 
-        self.index += 1;
+            self.index += 1;
 
-        match next {
-            None => None,
-            Some(e) => match e {
-                &None => None,
-                &Some(ref entity) => Some(Rc::clone(entity))
+            match next {
+                None => return None,
+                Some(e) => match e {
+                    &None => continue,
+                    &Some(ref entity) => return Some(Rc::clone(entity))
+                }
             }
         }
     }

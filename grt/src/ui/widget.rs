@@ -3,7 +3,7 @@ use std::rc::Rc;
 use std::cell::{RefCell, RefMut};
 use std::cmp;
 
-use io::{Event, TextRenderer};
+use io::{event, Event, TextRenderer};
 use ui::{animation_state, Cursor, Size, Theme, WidgetState, WidgetKind};
 use ui::theme::SizeRelative;
 use resource::ResourceSet;
@@ -344,7 +344,6 @@ impl Widget {
     }
 
     pub fn remove_mouse_over(root: &Rc<RefCell<Widget>>) {
-        trace!("Remove all mouse overs.");
         for child in root.borrow().children.iter() {
             if !child.borrow().state.is_mouse_over {
                 continue;
@@ -466,8 +465,10 @@ impl Widget {
     pub fn dispatch_event(widget: &Rc<RefCell<Widget>>, event: Event) -> bool {
         if widget.borrow().state.is_mouse_over { return false; }
 
-        trace!("Dispatching event {:?} in {:?}", event,
-               widget.borrow().theme_id);
+        match event.kind {
+            event::Kind::MouseMove{ .. } => (),
+            _ => trace!("Dispatching event {:?} in {:?}", event, widget.borrow().theme_id),
+        }
 
         let ref widget_kind = Rc::clone(&widget.borrow().kind);
 

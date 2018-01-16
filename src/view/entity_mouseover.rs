@@ -1,11 +1,11 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use grt::ui::{TextArea, MarkupRenderer, Widget, WidgetKind};
+use grt::ui::{MarkupRenderer, TextArea, Widget, WidgetKind};
 use grt::io::{GraphicsRenderer};
 use grt::util::Point;
 
-use state::EntityState;
+use state::{ChangeListener, EntityState};
 
 const NAME: &'static str = "entity_mouseover";
 
@@ -26,6 +26,18 @@ impl EntityMouseover {
 impl WidgetKind for EntityMouseover {
     fn get_name(&self) -> &str {
         NAME
+    }
+
+    fn on_remove(&self) {
+        self.entity.borrow_mut().actor.listeners.remove(NAME);
+        trace!("Removed entity mouseover");
+    }
+
+    fn on_add(&self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+        self.entity.borrow_mut().actor.listeners.add(
+            ChangeListener::invalidate_layout(NAME, widget));
+
+        Vec::new()
     }
 
     fn layout(&self, widget: &mut Widget) {

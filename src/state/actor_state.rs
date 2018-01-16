@@ -1,5 +1,5 @@
 use module::{item, Actor};
-use state::{ChangeListener, Inventory};
+use state::{ChangeListenerList, EntityState, Inventory};
 use rules::{AttributeList, Damage, StatList};
 
 use std::rc::Rc;
@@ -10,7 +10,7 @@ pub struct ActorState {
     inventory: Rc<RefCell<Inventory>>,
     pub attributes: AttributeList,
     pub stats: StatList,
-    change_listeners: Vec<ChangeListener<ActorState>>,
+    pub listeners: ChangeListenerList<ActorState>,
     hp: u32,
 }
 
@@ -29,18 +29,20 @@ impl ActorState {
             inventory,
             attributes: AttributeList::default(),
             stats: StatList::default(),
-            change_listeners: Vec::new(),
+            listeners: ChangeListenerList::default(),
             hp: 0,
         }
     }
 
-    /// Removes all change listeners from this state with the given ID
-    pub fn remove_change_listeners(&mut self, id: &'static str) {
-        self.change_listeners.retain(|listener| listener.id() != id);
+    pub fn can_attack(&self, target: &Rc<RefCell<EntityState>>) -> bool {
+        true
     }
 
-    pub fn add_change_listener(&mut self, listener: ChangeListener<ActorState>) {
-        self.change_listeners.push(listener);
+    pub fn attack(&mut self, target: &Rc<RefCell<EntityState>>) {
+        let amount = self.stats.damage.roll();
+        info!("'{}' attacks '{}' for {} damage", self.actor.name,
+              target.borrow().actor.actor.name, amount);
+        target.borrow_mut().remove_hp(amount);
     }
 
     pub fn equip(&mut self, index: usize) -> bool {
@@ -65,15 +67,21 @@ impl ActorState {
         self.hp
     }
 
+    pub fn remove_hp(&mut self, hp: u32) {
+        if hp > self.hp {
+            self.hp = 0;
+        } else {
+            self.hp -= hp;
+        }
+
+        self.listeners.notify(&self);
+    }
+
     pub fn init(&mut self) {
         self.hp = self.stats.max_hp;
     }
 
     pub fn compute_stats(&mut self) {
-        for listener in self.change_listeners.iter() {
-            listener.call(&self);
-        }
-
         let mut max_damage = Damage::default();
 
         for item_state in self.inventory.borrow().equipped_iter() {
@@ -94,5 +102,7 @@ impl ActorState {
             max_hp += class.hp_per_level * level;
         }
         self.stats.max_hp = max_hp;
+
+        self.listeners.notify(&self);
     }
 }

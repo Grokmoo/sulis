@@ -29,12 +29,12 @@ impl WidgetKind for CharacterWindow {
     }
 
     fn on_remove(&self) {
-        self.character.borrow_mut().actor.remove_change_listeners(NAME);
+        self.character.borrow_mut().actor.listeners.remove(NAME);
         debug!("Removed character window.");
     }
 
     fn on_add(&self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
-        self.character.borrow_mut().actor.add_change_listener(
+        self.character.borrow_mut().actor.listeners.add(
             ChangeListener::invalidate(NAME, widget));
 
         let title = Widget::with_theme(Label::empty(), "title");

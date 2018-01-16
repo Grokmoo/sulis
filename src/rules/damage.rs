@@ -1,3 +1,5 @@
+use rand::{self, Rng};
+
 #[derive(Deserialize, Debug, Copy, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct Damage {
@@ -16,6 +18,10 @@ impl Damage {
 
     pub fn average(&self) -> f32 {
         (self.min as f32 + self.max as f32) / 2.0
+    }
+
+    pub fn roll(&self) -> u32 {
+        rand::thread_rng().gen_range(self.min, self.max + 1)
     }
 }
 

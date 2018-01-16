@@ -23,6 +23,9 @@ pub use self::location::Location;
 mod path_finder;
 use self::path_finder::PathFinder;
 
+mod turn_timer;
+pub use self::turn_timer::TurnTimer;
+
 use std::collections::HashMap;
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
@@ -102,7 +105,7 @@ impl GameState {
             }
 
             STATE.with(|state| {
-                let path_finder = PathFinder::new(Rc::clone(&area_state));
+                let path_finder = PathFinder::new(&area_state.borrow().area);
                 state.borrow_mut().as_mut().unwrap().path_finder = path_finder;
                 state.borrow_mut().as_mut().unwrap().area_state = area_state;
             });
@@ -112,23 +115,22 @@ impl GameState {
             }
         }
 
-        {
-            let pc = GameState::pc();
-            let old_area_state = &pc.borrow().location.area_state;
-            old_area_state.borrow_mut().remove_entity(&pc);
-        }
-
         STATE.with(|state| {
             let mut state = state.borrow_mut();
             let state = state.as_mut().unwrap();
 
-            let location = Location::new(x, y, Rc::clone(&state.area_state));
+            {
+                let area_id = state.pc.borrow().location.area_id.to_string();
+                state.areas.get(&area_id).unwrap().borrow_mut().remove_entity(&state.pc);
+            }
+
+            let location = Location::new(x, y, &state.area_state.borrow().area);
             state.area_state.borrow_mut().add_entity(Rc::clone(&state.pc), location);
         });
     }
 
     fn check_location(p: &Point, area_state: &Rc<RefCell<AreaState>>) -> bool {
-        let location = Location::from_point(p, Rc::clone(area_state));
+        let location = Location::from_point(p, &area_state.borrow().area);
         if !location.coords_valid(location.x, location.y) {
             error!("Location coordinates {},{} are not valid for area {}",
                    location.x, location.y, location.area_id);
@@ -141,7 +143,7 @@ impl GameState {
     fn setup_area_state(area_id: &str) -> Result<Rc<RefCell<AreaState>>, Error> {
         debug!("Setting up area state from {}", &area_id);
 
-        let area = Module::get_area(&area_id);
+        let area = Module::area(&area_id);
         let area = match area {
             Some(a) => a,
             None => {
@@ -150,19 +152,18 @@ impl GameState {
             }
         };
         let area_state = Rc::new(RefCell::new(AreaState::new(area)));
-        AreaState::populate(&area_state);
+        area_state.borrow_mut().populate();
 
         Ok(area_state)
     }
 
     fn new() -> Result<GameState, Error> {
-        let game = Module::get_game();
+        let game = Module::game();
 
         let area_state = GameState::setup_area_state(&game.starting_area)?;
 
         debug!("Setting up PC {}, with {:?}", &game.pc, &game.starting_location);
-        let location = Location::from_point(&game.starting_location,
-                                            Rc::clone(&area_state));
+        let location = Location::from_point(&game.starting_location, &area_state.borrow().area);
 
         if !location.coords_valid(location.x, location.y) {
             error!("Starting location coordinates must be valid for the starting area.");
@@ -170,7 +171,7 @@ impl GameState {
                                   "Unable to create starting location."));
         }
 
-        let pc = Module::get_actor(&game.pc);
+        let pc = Module::actor(&game.pc);
         let pc = match pc {
             Some(a) => a,
             None => {
@@ -189,7 +190,7 @@ impl GameState {
 
         let pc_state = Rc::clone(area_state.borrow().get_last_entity().unwrap());
 
-        let path_finder = PathFinder::new(Rc::clone(&area_state));
+        let path_finder = PathFinder::new(&area_state.borrow().area);
 
         let mut areas: HashMap<String, Rc<RefCell<AreaState>>> = HashMap::new();
         areas.insert(game.starting_area.to_string(), Rc::clone(&area_state));
@@ -230,9 +231,12 @@ impl GameState {
     pub fn update() {
         STATE.with(|s| {
             let mut state = s.borrow_mut();
-            state.as_mut().unwrap().animations.retain(|anim| anim.update());
+            let state = state.as_mut().unwrap();
 
-            state.as_ref().unwrap().area_state.borrow_mut().update();
+            let mut area_state = state.area_state.borrow_mut();
+            state.animations.retain(|anim| anim.update(&mut area_state));
+
+            area_state.update();
         });
     }
 
@@ -244,7 +248,8 @@ impl GameState {
         STATE.with(|s| {
             let mut state = s.borrow_mut();
             let state = state.as_mut().unwrap();
-            let path = state.path_finder.find(state.pc.borrow(), x, y);
+            let area_state = state.area_state.borrow();
+            let path = state.path_finder.find(&area_state, state.pc.borrow(), x, y);
 
             path.is_some()
         })
@@ -254,8 +259,9 @@ impl GameState {
         STATE.with(|s| {
             let mut state = s.borrow_mut();
             let state = state.as_mut().unwrap();
+            let area_state = state.area_state.borrow();
             trace!("Moving pc to {},{}", x, y);
-            let path = state.path_finder.find(state.pc.borrow(), x, y);
+            let path = state.path_finder.find(&area_state, state.pc.borrow(), x, y);
 
             if let None = path {
                 return false;
@@ -275,7 +281,7 @@ impl GameState {
     pub fn add_actor(actor: Rc<Actor>, x: i32, y: i32) -> bool {
         STATE.with(|s| {
             let area_state = Rc::clone(&s.borrow_mut().as_mut().unwrap().area_state);
-            let location = Location::new(x, y, Rc::clone(&area_state));
+            let location = Location::new(x, y, &area_state.borrow().area);
 
             let result = area_state.borrow_mut().add_actor(actor, location);
             result

@@ -6,5 +6,6 @@ use module::item::Slot;
 pub struct Equippable {
     pub slot: Slot,
     pub damage: Option<Damage>,
+    pub reach: Option<f32>,
 }
 

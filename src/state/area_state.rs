@@ -1,6 +1,6 @@
 use module::{Actor, Area, Module};
 use module::area::Transition;
-use state::{ChangeListenerList, EntityState, Location};
+use state::{ChangeListenerList, EntityState, Location, TurnTimer};
 
 use std::rc::Rc;
 use std::cell::{Ref, RefCell};
@@ -9,6 +9,7 @@ pub struct AreaState {
     pub area: Rc<Area>,
     pub listeners: ChangeListenerList<AreaState>,
     entities: Vec<Option<Rc<RefCell<EntityState>>>>,
+    turn_timer: TurnTimer,
 
     entity_grid: Vec<Option<usize>>,
     transition_grid: Vec<Option<usize>>,
@@ -34,6 +35,7 @@ impl AreaState {
         AreaState {
             area,
             entities: Vec::new(),
+            turn_timer: TurnTimer::default(),
             transition_grid,
             display,
             entity_grid,
@@ -42,31 +44,33 @@ impl AreaState {
     }
 
     /// Adds entities defined in the area definition to this area state
-    pub fn populate(area_state: &Rc<RefCell<AreaState>>) {
-        let area = Rc::clone(&area_state.borrow().area);
-
+    pub fn populate(&mut self) {
+        let area = Rc::clone(&self.area);
         for actor_data in area.actors.iter() {
-            let actor = match Module::get_actor(&actor_data.id) {
+            let actor = match Module::actor(&actor_data.id) {
                 None => {
                     warn!("No actor with id '{}' found when initializing area '{}'",
-                              actor_data.id, area.id);
+                              actor_data.id, self.area.id);
                     continue;
                 },
                 Some(actor_data) => actor_data,
             };
 
-            let location = Location::from_point(&actor_data.location,
-                                                Rc::clone(&area_state));
+            let location = Location::from_point(&actor_data.location, &self.area);
             debug!("Adding actor '{}' at '{:?}'", actor.id, location);
-            area_state.borrow_mut().add_actor(actor, location);
+            self.add_actor(actor, location);
         }
 
-        for (index, transition) in area.transitions.iter().enumerate() {
+        let turn_timer = TurnTimer::new(&self);
+        self.turn_timer = turn_timer;
+        trace!("Set up turn timer for area.");
+
+        for (index, transition) in self.area.transitions.iter().enumerate() {
             debug!("Adding transition '{}' at '{:?}'", index, transition.from);
             for y in 0..transition.size.height {
                 for x in 0..transition.size.width {
-                    area_state.borrow_mut().transition_grid[(transition.from.x + x +
-                        (transition.from.y + y) * area.width) as usize] = Some(index);
+                    self.transition_grid[(transition.from.x + x +
+                        (transition.from.y + y) * self.area.width) as usize] = Some(index);
                 }
             }
         }
@@ -240,6 +244,7 @@ impl AreaState {
         trace!("Removing entity '{}' with index '{}'", entity.borrow().actor.actor.name, index);
         self.clear_entity_points(&*entity.borrow());
         self.entities[index] = None;
+        self.turn_timer.remove(entity);
     }
 
     fn find_index_to_add(&mut self) -> usize {

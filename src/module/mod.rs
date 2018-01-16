@@ -29,6 +29,9 @@ pub use self::item_adjective::ItemAdjective;
 pub mod race;
 pub use self::race::Race;
 
+pub mod rules;
+pub use self::rules::Rules;
+
 pub mod terrain;
 pub use self::terrain::Terrain;
 
@@ -59,6 +62,7 @@ thread_local! {
 }
 
 pub struct Module {
+    rules: Option<Rc<Rules>>,
     game: Option<Rc<Game>>,
     actors: HashMap<String, Rc<Actor>>,
     areas: HashMap<String, Rc<Area>>,
@@ -132,10 +136,6 @@ impl Module {
             }
         }
 
-        vec![ModuleInfo {dir: "test1".to_string(), name: "Test 1".to_string()},
-        ModuleInfo {dir: "test2".to_string(), name: "Test 2".to_string()},
-        ModuleInfo {dir: "blarg".to_string(), name: "Blarg".to_string()}];
-
         modules
     }
 
@@ -183,24 +183,26 @@ impl Module {
         });
 
         let game = read_single_resource(&format!("{}/module", root_dir))?;
+        let rules = read_single_resource(&format!("{}/rules", root_dir))?;
 
         MODULE.with(move |m| {
             let mut m = m.borrow_mut();
             m.game = Some(Rc::new(game));
+            m.rules = Some(Rc::new(rules));
         });
 
         Ok(())
     }
 
-    pub fn get_actor(id: &str) -> Option<Rc<Actor>> {
+    pub fn actor(id: &str) -> Option<Rc<Actor>> {
         MODULE.with(|r| get_resource(id, &r.borrow().actors))
     }
 
-    pub fn get_area(id: &str) -> Option<Rc<Area>> {
+    pub fn area(id: &str) -> Option<Rc<Area>> {
         MODULE.with(|m| get_resource(id, &m.borrow().areas))
     }
 
-    pub fn get_entity_size(id: usize) -> Option<Rc<EntitySize>> {
+    pub fn entity_size(id: usize) -> Option<Rc<EntitySize>> {
         MODULE.with(|r| {
             let r = r.borrow();
             let size = r.sizes.get(&id);
@@ -212,27 +214,31 @@ impl Module {
         })
     }
 
-    pub fn get_all_entity_sizes() -> Vec<Rc<EntitySize>> {
+    pub fn all_entity_sizes() -> Vec<Rc<EntitySize>> {
         MODULE.with(|r| r.borrow().sizes.iter().map(|ref s| Rc::clone(s.1)).collect())
     }
 
-    pub fn get_class(id: &str) -> Option<Rc<Class>> {
+    pub fn class(id: &str) -> Option<Rc<Class>> {
         MODULE.with(|r| get_resource(id, &r.borrow().classes))
     }
 
-    pub fn get_game() -> Rc<Game> {
+    pub fn game() -> Rc<Game> {
         MODULE.with(|m| Rc::clone(m.borrow().game.as_ref().unwrap()))
     }
 
-    pub fn get_race(id: &str) -> Option<Rc<Race>> {
+    pub fn race(id: &str) -> Option<Rc<Race>> {
         MODULE.with(|r| get_resource(id, &r.borrow().races))
     }
 
-    pub fn get_tile(id: &str) -> Option<Rc<Tile>> {
+    pub fn rules() -> Rc<Rules> {
+        MODULE.with(|m| Rc::clone(m.borrow().rules.as_ref().unwrap()))
+    }
+
+    pub fn tile(id: &str) -> Option<Rc<Tile>> {
         MODULE.with(|r| get_resource(id, &r.borrow().tiles))
     }
 
-    pub fn get_all_tiles() -> Vec<Rc<Tile>> {
+    pub fn all_tiles() -> Vec<Rc<Tile>> {
         MODULE.with(|r| r.borrow().tiles.iter().map(|ref t| Rc::clone(t.1)).collect())
     }
 }
@@ -240,6 +246,7 @@ impl Module {
 impl Default for Module {
     fn default() -> Module {
         Module {
+            rules: None,
             game: None,
             actors: HashMap::new(),
             areas: HashMap::new(),

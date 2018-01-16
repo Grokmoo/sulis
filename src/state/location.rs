@@ -1,16 +1,17 @@
-use std::rc::Rc;
-use std::cell::RefCell;
 use std::fmt::{Debug, Formatter, Result};
 
 use grt::util::Point;
 use state::AreaState;
+use module::Area;
 
 #[derive(Clone)]
 pub struct Location {
     pub x: i32,
     pub y: i32,
-    pub area_state: Rc<RefCell<AreaState>>,
     pub area_id: String,
+
+    area_width: i32,
+    area_height: i32,
 }
 
 impl Debug for Location {
@@ -30,14 +31,24 @@ impl PartialEq for Location {
 }
 
 impl Location {
-    pub fn new(x: i32, y: i32, area_state: Rc<RefCell<AreaState>>) -> Location {
-        let area_id = area_state.borrow().area.id.clone();
-        Location { x, y, area_state, area_id }
+    pub fn new(x: i32, y: i32, area: &Area) -> Location {
+        Location {
+            x,
+            y,
+            area_id: area.id.clone(),
+            area_width: area.width,
+            area_height: area.height,
+        }
     }
 
-    pub fn from_point(p: &Point, area_state: Rc<RefCell<AreaState>>) -> Location {
-        let area_id = area_state.borrow().area.id.clone();
-        Location { x: p.x, y: p.y, area_state, area_id }
+    pub fn from_point(p: &Point, area: &Area) -> Location {
+        Location {
+            x: p.x,
+            y: p.y,
+            area_id: area.id.clone(),
+            area_width: area.width,
+            area_height: area.height,
+        }
     }
 
     pub fn to_point(&self) -> Point {
@@ -50,7 +61,10 @@ impl Location {
     }
 
     pub fn coords_valid(&self, x: i32, y: i32) -> bool {
-        self.area_state.borrow().area.coords_valid(x, y)
+        if x < 0 || y < 0 { return false; }
+        if x >= self.area_width || y >= self.area_height { return false; }
+
+        true
     }
 
     pub fn is_in(&self, area_state: &AreaState) -> bool {

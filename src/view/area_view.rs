@@ -242,7 +242,7 @@ impl WidgetKind for AreaView {
         let (x, y) = self.get_cursor_pos(widget);
         if x < 0 || y < 0 { return true; }
 
-        let action_menu = ActionMenu::new(GameState::area_state(), x, y);
+        let action_menu = ActionMenu::new(x, y);
         if kind == ClickKind::Left {
             action_menu.fire_default_callback();
         } else if kind == ClickKind::Right {
@@ -290,7 +290,7 @@ impl WidgetKind for AreaView {
             let mut draw_list = DrawList::from_sprite(&pc.borrow().size.cursor_sprite,
                 c_x - size / 2, c_y - size / 2, size, size);
 
-            let action_menu = ActionMenu::new(Rc::clone(&area_state), area_x, area_y);
+            let action_menu = ActionMenu::new(area_x, area_y);
             if !action_menu.is_default_callback_valid() {
                 draw_list.set_color(color::RED);
             }

@@ -190,7 +190,8 @@ impl IO for GliumDisplay {
         let display_size = self.display.gl_window().get_inner_size();
         self.events_loop.poll_events(|event| {
             if let glutin::Event::WindowEvent { event, .. } = event {
-                InputAction::handle_action(process_window_event(event, display_size), Rc::clone(&root));
+                InputAction::handle_action(process_window_event(event, display_size),
+                    Rc::clone(&root));
             }
         });
     }

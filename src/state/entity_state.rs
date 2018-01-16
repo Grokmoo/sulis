@@ -1,6 +1,6 @@
 use module::{Actor, EntitySize, EntitySizeIterator};
 use module::area::Transition;
-use state::{ActorState, GameState, Location};
+use state::{ActorState, AreaState, GameState, Location};
 
 use std::rc::Rc;
 use std::cell::RefCell;
@@ -39,6 +39,16 @@ impl EntityState {
         self.marked_for_removal
     }
 
+    pub fn can_attack(&self, target: &Rc<RefCell<EntityState>>) -> bool {
+        let dist = self.dist_to_entity(target);
+
+        self.actor.can_attack(target, dist)
+    }
+
+    pub fn attack(&mut self, target: &Rc<RefCell<EntityState>>) {
+        self.actor.attack(target);
+    }
+
     pub fn remove_hp(&mut self, hp: u32) {
         self.actor.remove_hp(hp);
 
@@ -48,13 +58,13 @@ impl EntityState {
         }
     }
 
-    pub fn move_to(&mut self, x: i32, y: i32) -> bool {
+    pub fn move_to(&mut self, area_state: &mut AreaState, x: i32, y: i32) -> bool {
         if !self.location.coords_valid(x, y) { return false; }
         if !self.location.coords_valid(x + self.size() - 1, y + self.size() - 1) {
             return false;
         }
 
-        self.location.area_state.borrow_mut().update_entity_position(&self, x, y);
+        area_state.update_entity_position(&self, x, y);
         self.location.move_to(x, y);
         true
     }

@@ -2,7 +2,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use std::time::Instant;
 
-use state::EntityState;
+use state::{AreaState, EntityState};
 use grt::util::Point;
 use animation;
 
@@ -30,7 +30,7 @@ impl MoveAnimation {
 }
 
 impl animation::Animation for MoveAnimation {
-    fn update(&self) -> bool {
+    fn update(&self, area_state: &mut AreaState) -> bool {
         if self.marked_for_removal {
             return false;
         }
@@ -39,7 +39,7 @@ impl animation::Animation for MoveAnimation {
             self.frame_time_millis, self.path.len() - 1);
 
         let p = self.path.get(frame_index).unwrap();
-        &self.mover.borrow_mut().move_to(p.x, p.y);
+        &self.mover.borrow_mut().move_to(area_state, p.x, p.y);
 
         trace!("Updated move animation at frame {}", frame_index);
         return frame_index != self.path.len() - 1

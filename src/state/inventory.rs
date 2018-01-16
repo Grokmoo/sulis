@@ -26,6 +26,18 @@ impl Inventory {
         }
     }
 
+    pub fn get(&self, slot: Slot) -> Option<&ItemState> {
+        let index = match self.equipped.get(&slot) {
+            None => return None,
+            Some(index) => *index,
+        };
+
+        self.items.get(index)
+    }
+
+    /// Returns an iterator traversing all equipped items
+    /// in this inventory.  This will only include slots that actually
+    /// have an item equipped
     pub fn equipped_iter(&self) -> EquippedIterator {
         EquippedIterator {
             slot_iterator: SlotIterator::default(),

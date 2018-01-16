@@ -6,10 +6,10 @@ use std::cell::RefCell;
 mod move_animation;
 pub use self::move_animation::MoveAnimation;
 
-use state::EntityState;
+use state::{AreaState, EntityState};
 
 pub trait Animation {
-    fn update(&self) -> bool;
+    fn update(&self, area_state: &mut AreaState) -> bool;
 
     /// this method is called whenever another animation is added for the
     /// given entity.  This can be used to cancel this animation if the

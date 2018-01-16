@@ -1,7 +1,7 @@
-use std::io::{Error, ErrorKind};
+use std::io::Error;
 
 use grt::resource::ResourceBuilder;
-use grt::util::Point;
+use grt::util::{invalid_data_error, Point};
 use grt::serde_json;
 use grt::serde_yaml;
 
@@ -30,7 +30,7 @@ impl ResourceBuilder for Game {
 
         match resource {
             Ok(resource) => Ok(resource),
-            Err(error) => Err(Error::new(ErrorKind::InvalidData, format!("{}", error)))
+            Err(e) => invalid_data_error(&format!("{}", e)),
         }
     }
 }

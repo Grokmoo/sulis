@@ -1,13 +1,12 @@
-use std::rc::Rc;
-use std::cell::{Ref, RefCell};
+use std::cell::Ref;
 use std::collections::{HashMap, HashSet};
 use std::i32;
 
 use grt::util::Point;
+use module::Area;
 use state::{EntityState, AreaState};
 
 pub struct PathFinder {
-    area_state: Rc<RefCell<AreaState>>,
     pub width: i32,
     pub height: i32,
 
@@ -19,13 +18,12 @@ pub struct PathFinder {
 }
 
 impl PathFinder {
-    pub fn new(area_state: Rc<RefCell<AreaState>>) -> PathFinder {
-        let width = area_state.borrow().area.width;
-        let height = area_state.borrow().area.height;
+    pub fn new(area: &Area) -> PathFinder {
+        let width = area.width;
+        let height = area.height;
 
-        debug!("Initializing pathfinder for {}", area_state.borrow().area.id);
+        debug!("Initializing pathfinder for {}", area.id);
         PathFinder {
-            area_state,
             width,
             height,
             f_score: vec![0;(width*height) as usize],
@@ -36,8 +34,8 @@ impl PathFinder {
         }
     }
 
-    pub fn find(&mut self, requester: Ref<EntityState>, dest_x: i32,
-                dest_y: i32) -> Option<Vec<Point>> {
+    pub fn find(&mut self, area_state: &AreaState,
+                requester: Ref<EntityState>, dest_x: i32, dest_y: i32) -> Option<Vec<Point>> {
         if !Point::new(dest_x, dest_y).in_bounds(self.width, self.height) {
             return None;
         }
@@ -58,7 +56,7 @@ impl PathFinder {
         let mut i = 0;
         for y in 0..self.height {
             for x in 0..self.width {
-                if !self.area_state.borrow().is_passable(&requester, x, y) {
+                if !area_state.is_passable(&requester, x, y) {
                     self.closed.insert(i);
                 }
 

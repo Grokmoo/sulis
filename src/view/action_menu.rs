@@ -5,19 +5,19 @@ use grt::ui::{Callback, Cursor, Label, list_box, ListBox, Widget, WidgetKind};
 use grt::io::event::ClickKind;
 use grt::util::Point;
 
-use state::{AreaState, ChangeListener, GameState, EntityState};
+use state::{ChangeListener, GameState, EntityState};
 
 const NAME: &'static str = "action_menu";
 
 pub struct ActionMenu {
-    area_state: Rc<RefCell<AreaState>>,
     hovered_entity: Option<Rc<RefCell<EntityState>>>,
     is_hover_pc: bool,
     area_pos: Point,
 }
 
 impl ActionMenu {
-    pub fn new(area_state: Rc<RefCell<AreaState>>, x: i32, y: i32) -> Rc<ActionMenu> {
+    pub fn new(x: i32, y: i32) -> Rc<ActionMenu> {
+        let area_state = GameState::area_state();
         let (hovered_entity, is_hover_pc) =
             if let Some(ref entity) = area_state.borrow().get_entity_at(x, y) {
                 (Some(Rc::clone(entity)), EntityState::is_pc(entity))
@@ -25,7 +25,6 @@ impl ActionMenu {
                 (None, false)
             };
         Rc::new(ActionMenu {
-            area_state: area_state,
             area_pos: Point::new(x, y),
             hovered_entity,
             is_hover_pc,
@@ -33,7 +32,8 @@ impl ActionMenu {
     }
 
     pub fn is_transition_valid(&self) -> bool {
-        if let Some(transition) = self.area_state.borrow()
+        let area_state = GameState::area_state();
+        if let Some(transition) = area_state.borrow()
             .get_transition_at(self.area_pos.x, self.area_pos.y) {
                 let pc = GameState::pc();
                 return pc.borrow().dist_to_transition(transition) < 2.5;
@@ -42,7 +42,8 @@ impl ActionMenu {
     }
 
     pub fn transition_callback(&self) -> Option<Callback> {
-        let (area_id, x, y) = match self.area_state.borrow()
+        let area_state = GameState::area_state();
+        let (area_id, x, y) = match area_state.borrow()
             .get_transition_at(self.area_pos.x, self.area_pos.y) {
                 None => return None,
                 Some(transition) => (transition.to_area.clone(), transition.to.x, transition.to.y)
@@ -63,7 +64,7 @@ impl ActionMenu {
 
         match self.hovered_entity {
             None => false,
-            Some(ref entity) => pc.borrow().actor.can_attack(entity),
+            Some(ref entity) => pc.borrow().can_attack(entity),
         }
     }
 
@@ -73,7 +74,7 @@ impl ActionMenu {
             Box::new(move || {
                 trace!("Firing attack callback.");
                 let pc = GameState::pc();
-                pc.borrow_mut().actor.attack(&entity_ref);
+                pc.borrow_mut().attack(&entity_ref);
             })
         } else {
             Box::new(|| { })
@@ -83,7 +84,8 @@ impl ActionMenu {
     pub fn is_move_valid(&self) -> bool {
         let pc = GameState::pc();
         let size = pc.borrow().size();
-        let ok = self.area_state.borrow().is_passable(&pc.borrow(),
+        let area_state = GameState::area_state();
+        let ok = area_state.borrow().is_passable(&pc.borrow(),
             self.area_pos.x - size / 2,
             self.area_pos.y - size / 2);
         ok

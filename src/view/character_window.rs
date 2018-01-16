@@ -68,6 +68,9 @@ impl WidgetKind for CharacterWindow {
 
             state.add_text_arg("cur_hp", &pc.actor.hp().to_string());
             state.add_text_arg("max_hp", &pc.actor.stats.max_hp.to_string());
+            state.add_text_arg("cur_ap", &pc.actor.ap().to_string());
+
+            state.add_text_arg("initiative", &pc.actor.stats.initiative.to_string());
         }
         vec![title, close, details]
     }

@@ -12,6 +12,7 @@ use state::{AreaState, ChangeListenerList, EntityState};
 pub struct TurnTimer {
     entities: VecDeque<Rc<RefCell<EntityState>>>,
     pub listeners: ChangeListenerList<TurnTimer>,
+    active: bool,
 }
 
 impl Default for TurnTimer {
@@ -19,6 +20,7 @@ impl Default for TurnTimer {
         TurnTimer {
             entities: VecDeque::new(),
             listeners: ChangeListenerList::default(),
+            active: true,
         }
     }
 }
@@ -49,6 +51,13 @@ impl TurnTimer {
         }
     }
 
+    pub fn set_active(&mut self, active: bool) {
+        if active != self.active {
+            debug!("Set turn timer active = {}", active);
+            self.active = active;
+        }
+    }
+
     pub fn add(&mut self, entity: &Rc<RefCell<EntityState>>) {
         trace!("Added entity to turn timer: '{}'", entity.borrow().actor.actor.name);
         self.entities.push_back(Rc::clone(entity));
@@ -62,11 +71,13 @@ impl TurnTimer {
     }
 
     pub fn current(&self) -> Option<&Rc<RefCell<EntityState>>> {
+        if !self.active { return None; }
+
         self.entities.front()
     }
 
     pub fn next(&mut self) {
-        if self.entities.front().is_none() { return; }
+        if !self.active || self.entities.front().is_none() { return; }
 
         let front = self.entities.pop_front().unwrap();
         front.borrow_mut().actor.end_turn();
@@ -75,6 +86,7 @@ impl TurnTimer {
 
         if let Some(current) = self.entities.front() {
             current.borrow_mut().actor.init_turn();
+            debug!("'{}' now has the active turn.", current.borrow().actor.actor.name);
         }
     }
 

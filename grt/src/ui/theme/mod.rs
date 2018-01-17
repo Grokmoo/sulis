@@ -5,7 +5,7 @@ use std::collections::HashMap;
 
 use resource::BuilderType;
 use util::Point;
-use ui::{Border, color, Color, Size, WidgetState};
+use ui::{Border, color, Color, LayoutKind, Size, WidgetState};
 
 use serde_json;
 use serde_yaml;
@@ -79,6 +79,7 @@ impl TextParams {
 
 #[derive(Debug)]
 pub struct Theme {
+    pub layout: LayoutKind,
     pub text: Option<String>,
     pub text_params: TextParams,
     pub name: String,
@@ -112,8 +113,10 @@ impl Theme {
         let position = builder.position.unwrap_or(Point::as_zero());
         let preferred_size = builder.preferred_size.unwrap_or(Size::as_zero());
         let text_params = TextParams::from(builder.text_params);
+        let layout = builder.layout.unwrap_or(LayoutKind::Normal);
 
         Theme {
+            layout,
             name: name.to_string(),
             background: builder.background,
             border,
@@ -210,19 +213,20 @@ impl TextParamsBuilder {
 #[derive(Deserialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct ThemeBuilder {
-    pub background: Option<String>,
-    pub border: Option<Border>,
-    pub preferred_size: Option<Size>,
-    pub text: Option<String>,
+    background: Option<String>,
+    border: Option<Border>,
+    preferred_size: Option<Size>,
+    text: Option<String>,
     text_params: Option<TextParamsBuilder>,
-    pub position: Option<Point>,
-    pub x_relative: Option<PositionRelative>,
-    pub y_relative: Option<PositionRelative>,
-    pub width_relative: Option<SizeRelative>,
-    pub height_relative: Option<SizeRelative>,
-    pub children: Option<HashMap<String, ThemeBuilder>>,
-    pub include: Option<Vec<String>>,
-    pub from: Option<String>,
+    layout: Option<LayoutKind>,
+    position: Option<Point>,
+    x_relative: Option<PositionRelative>,
+    y_relative: Option<PositionRelative>,
+    width_relative: Option<SizeRelative>,
+    height_relative: Option<SizeRelative>,
+    children: Option<HashMap<String, ThemeBuilder>>,
+    include: Option<Vec<String>>,
+    from: Option<String>,
 }
 
 pub const MAX_THEME_DEPTH: i32 = 20;
@@ -301,6 +305,7 @@ impl ThemeBuilder {
         if self.preferred_size.is_none() { self.preferred_size = other.preferred_size; }
         if self.text.is_none() { self.text = other.text; }
         if self.position.is_none() { self.position = other.position; }
+        if self.layout.is_none() { self.layout = other.layout; }
         if self.x_relative.is_none() { self.x_relative = other.x_relative; }
         if self.y_relative.is_none() { self.y_relative = other.y_relative; }
         if self.width_relative.is_none() { self.width_relative = other.width_relative; }

@@ -1,12 +1,11 @@
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
-use std::cell::{RefCell, RefMut};
-use std::cmp;
+use std::cell::RefCell;
 
-use io::{event, Event, TextRenderer};
-use ui::{animation_state, Cursor, Size, Theme, WidgetState, WidgetKind};
-use ui::theme::SizeRelative;
+use io::{event, Event, GraphicsRenderer, TextRenderer};
+use ui::{Cursor, Theme, WidgetState, WidgetKind};
 use resource::ResourceSet;
+use util::Point;
 
 pub struct Widget {
     pub state: WidgetState,
@@ -25,27 +24,6 @@ pub struct Widget {
 }
 
 impl Widget {
-    pub fn disable(&mut self) {
-        self.state.animation_state.add(animation_state::Kind::Disabled);
-        self.state.animation_state.remove(animation_state::Kind::Hover);
-    }
-
-    pub fn enable(&mut self) {
-        self.state.animation_state.remove(animation_state::Kind::Disabled);
-    }
-
-    pub fn set_enabled(&mut self, enabled: bool) {
-        if enabled {
-            self.enable();
-        } else {
-            self.disable();
-        }
-    }
-
-    pub fn is_enabled(&self) -> bool {
-        !self.state.animation_state.contains(animation_state::Kind::Disabled)
-    }
-
     pub fn has_modal(&self) -> bool {
         self.modal_child.is_some()
     }
@@ -60,6 +38,24 @@ impl Widget {
 
         for child in self.children.iter() {
             child.borrow().draw_text_mode(renderer, millis);
+        }
+    }
+
+    pub fn draw_graphics_mode(&self, renderer: &mut GraphicsRenderer, pixel_size: Point, millis: u32) {
+        if !self.state.visible { return; }
+
+        if let Some(ref image) = self.state.background {
+            let x = self.state.position.x as f32;
+            let y = self.state.position.y as f32;
+            let w = self.state.size.width as f32;
+            let h = self.state.size.height as f32;
+            image.draw_graphics_mode(renderer, &self.state.animation_state, x, y, w, h);
+        }
+
+        self.kind.draw_graphics_mode(renderer, pixel_size, &self, millis);
+
+        for child in self.children.iter() {
+            child.borrow().draw_graphics_mode(renderer, pixel_size, millis);
         }
     }
 
@@ -140,104 +136,12 @@ impl Widget {
     }
 
     pub fn do_children_layout(&self) {
-        for child in self.children.iter() {
-            self.do_child_layout(&mut child.borrow_mut());
-        }
-    }
-
-    fn do_child_layout(&self, child: &mut RefMut<Widget>) {
-        let theme = match child.theme {
+        let theme = match self.theme {
             None => return,
-            Some(ref t) => Rc::clone(&t),
+            Some(ref t) => Rc::clone(t),
         };
 
-        let mut size = Size::new(Widget::get_preferred_width_recursive(child),
-            Widget::get_preferred_height_recursive(child));
-        if theme.width_relative == SizeRelative::Max {
-            size.add_width(self.state.inner_size.width);
-        }
-
-        if theme.height_relative == SizeRelative::Max {
-            size.add_height(self.state.inner_size.height);
-        }
-
-        size.min_from(&self.state.inner_size);
-        child.state.set_size(size);
-
-        use ui::theme::PositionRelative::*;
-        let x = match theme.x_relative {
-            Zero => self.state.inner_left(),
-            Center => (self.state.inner_left() + self.state.inner_right() -
-                       size.width) / 2,
-            Max => self.state.inner_right() - size.width,
-            Cursor => ::ui::Cursor::get_x(),
-        };
-        let y = match theme.y_relative {
-            Zero => self.state.inner_top(),
-            Center => (self.state.inner_top() + self.state.inner_bottom() -
-                       size.height) / 2,
-            Max => self.state.inner_bottom() - size.height,
-            Cursor => ::ui::Cursor::get_y(),
-        };
-
-        child.state.set_position(
-            x + theme.position.x, y + theme.position.y);
-    }
-
-    fn get_preferred_height_recursive(widget: &RefMut<Widget>) -> i32 {
-        let theme = match widget.theme {
-            None => return 0,
-            Some(ref t) => t,
-        };
-
-        let mut height = 0;
-
-        use ui::theme::SizeRelative::*;
-        match theme.height_relative {
-            ChildMax => {
-                for child in widget.children.iter() {
-                    height = cmp::max(height, Widget::get_preferred_height_recursive(&child.borrow_mut()));
-                }
-                height += theme.border.vertical()
-            },
-            ChildSum => {
-                for child in widget.children.iter() {
-                    height += Widget::get_preferred_height_recursive(&child.borrow_mut());
-                }
-                height += theme.border.vertical()
-            },
-            _ => {},
-        };
-
-        height + theme.preferred_size.height
-    }
-
-    fn get_preferred_width_recursive(widget: &RefMut<Widget>) -> i32 {
-        let theme = match widget.theme {
-            None => return 0,
-            Some(ref t) => t,
-        };
-
-        let mut width = 0;
-
-        use ui::theme::SizeRelative::*;
-        match theme.width_relative {
-            ChildMax => {
-                for child in widget.children.iter() {
-                    width = cmp::max(width, Widget::get_preferred_width_recursive(&child.borrow_mut()));
-                }
-                width += theme.border.horizontal()
-            },
-            ChildSum => {
-                for child in widget.children.iter() {
-                    width += Widget::get_preferred_width_recursive(&child.borrow_mut());
-                }
-                width += theme.border.horizontal()
-            },
-            _ => {},
-        };
-
-        width + theme.preferred_size.width
+        theme.layout.layout(self);
     }
 
     fn layout_widget(&mut self) {
@@ -372,12 +276,25 @@ impl Widget {
     }
 
     pub fn update(root: &Rc<RefCell<Widget>>) -> Result<(), Error> {
+        Widget::update_kind_recursive(&root);
+
         Widget::check_readd(&root);
         Widget::check_children(&root)?;
 
         root.borrow_mut().layout_widget();
 
         Ok(())
+    }
+
+    fn update_kind_recursive(widget: &Rc<RefCell<Widget>>) {
+        let kind = Rc::clone(&widget.borrow().kind);
+        kind.update(&widget);
+
+        let len = widget.borrow().children.len();
+        for i in 0..len {
+            let child = Rc::clone(&widget.borrow().children[i]);
+            Widget::update_kind_recursive(&child);
+        }
     }
 
     pub fn check_readd(parent: &Rc<RefCell<Widget>>) {
@@ -499,7 +416,7 @@ impl Widget {
         for i in (0..len).rev() {
             let child = Rc::clone(widget.borrow().children.get(i).unwrap());
 
-            if !child.borrow().is_enabled() {
+            if !child.borrow().state.is_enabled() || !child.borrow().state.visible {
                 continue;
             }
 

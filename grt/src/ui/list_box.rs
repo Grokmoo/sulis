@@ -3,7 +3,8 @@ use std::rc::Rc;
 use std::slice::Iter;
 use std::cell::RefCell;
 
-use ui::{AnimationState, Button, Callback, Size, Widget, WidgetKind};
+use ui::{AnimationState, Button, Callback, Widget, WidgetKind};
+use util::Size;
 
 pub struct Entry<T: Display> {
     item: T,

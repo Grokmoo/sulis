@@ -1,6 +1,6 @@
 use std::cell::Ref;
 use std::collections::{HashMap, HashSet};
-use std::i32;
+use std::f32;
 
 use grt::util::Point;
 use module::Area;
@@ -10,11 +10,16 @@ pub struct PathFinder {
     pub width: i32,
     pub height: i32,
 
-    f_score: Vec<i32>,
-    g_score: Vec<i32>,
+    f_score: Vec<f32>,
+    g_score: Vec<f32>,
     open: HashSet<i32>,
     closed: HashSet<i32>,
     came_from: HashMap<i32, i32>,
+
+    goal_x: f32,
+    goal_y: f32,
+    requester_center_x: f32,
+    requester_center_y: f32,
 }
 
 impl PathFinder {
@@ -26,24 +31,41 @@ impl PathFinder {
         PathFinder {
             width,
             height,
-            f_score: vec![0;(width*height) as usize],
-            g_score: vec![0;(width*height) as usize],
+            f_score: vec![0.0;(width*height) as usize],
+            g_score: vec![0.0;(width*height) as usize],
             open: HashSet::new(),
             closed: HashSet::new(),
             came_from: HashMap::new(),
+            goal_x: 0.0,
+            goal_y: 0.0,
+            requester_center_x: 0.0,
+            requester_center_y: 0.0,
         }
     }
 
-    pub fn find(&mut self, area_state: &AreaState,
-                requester: Ref<EntityState>, dest_x: i32, dest_y: i32) -> Option<Vec<Point>> {
-        if !Point::new(dest_x, dest_y).in_bounds(self.width, self.height) {
-            return None;
-        }
-        debug!("Finding path from {:?} to {},{}",
-               requester.location, dest_x, dest_y);
+    /// Finds a path within the given `AreaState`, from the position of `requester`
+    /// to the specified destination.  `dest_dist` allows points within that distance
+    /// of the destination to also be allowable goals.
+    ///
+    /// Returns a vec of `Point`s; which is the path that requester should take
+    /// in order to reach within `dest_dist` of the destination in the most
+    /// efficient manner.  Returns `None` if no path exists to reach the destination.
+    /// Will return a vec of length zero if the dest is already reached by the
+    /// requester.
+    pub fn find(&mut self, area_state: &AreaState, requester: Ref<EntityState>,
+                dest_x: f32, dest_y: f32, dest_dist: f32) -> Option<Vec<Point>> {
+        if dest_x < 0.0 || dest_y < 0.0 { return None; }
+        if dest_x >= self.width as f32 || dest_y >= self.height as f32 { return None; }
 
+        debug!("Finding path from {:?} to within {} of {},{}",
+               requester.location, dest_dist, dest_x, dest_y);
+
+        self.goal_x = dest_x;
+        self.goal_y = dest_y;
+        self.requester_center_x = requester.size.size as f32 / 2.0 - 0.5;
+        self.requester_center_y = requester.size.size as f32 / 2.0 - 0.5;
+        let dest_dist_squared = dest_dist * dest_dist;
         let start = requester.location.x + requester.location.y * self.width;
-        let goal = dest_x + dest_y * self.width;
 
         // the set of discovered nodes that are not evaluated yet
         self.open.clear();
@@ -64,28 +86,22 @@ impl PathFinder {
             }
         }
 
-        if self.closed.contains(&goal) {
-            trace!("Goal is unreachable, returning None");
-            return None;
-        }
-
         // for each node, the node it can be most efficiently reached from
         self.came_from.clear();
 
         // for each node, cost of getting from start to that node
-        self.g_score.iter_mut().for_each(|v| *v = i32::MAX);
+        self.g_score.iter_mut().for_each(|v| *v = f32::INFINITY);
 
         // for each node, total cost of getting from start to goal passing by
         // this node
-        self.f_score.iter_mut().for_each(|v| *v = i32::MAX);
+        self.f_score.iter_mut().for_each(|v| *v = f32::INFINITY);
 
-        *self.g_score.get_mut(start as usize).unwrap() = 0;
-        *self.f_score.get_mut(start as usize).unwrap() =
-            self.heuristic_cost_estimate(start, goal);
+        *self.g_score.get_mut(start as usize).unwrap() = 0.0;
+        *self.f_score.get_mut(start as usize).unwrap() = self.dist_squared(start);
 
         while !self.open.is_empty() {
             let current = self.find_lowest_f_score_in_open_set();
-            if current == goal {
+            if self.is_goal(current, dest_dist_squared) {
                 return Some(self.reconstruct_path(current));
             }
 
@@ -113,11 +129,15 @@ impl PathFinder {
                 self.came_from.insert(neighbor, current);
                 *self.g_score.get_mut(neighbor as usize).unwrap() = tentative_g_score;
                 *self.f_score.get_mut(neighbor as usize).unwrap() = tentative_g_score +
-                    self.heuristic_cost_estimate(neighbor, goal);
+                    self.dist_squared(neighbor);
             }
         }
 
         None
+    }
+
+    fn is_goal(&self, current: i32, dest_dist_squared: f32) -> bool {
+        self.dist_squared(current) <= dest_dist_squared
     }
 
     fn reconstruct_path(&self, current: i32) -> Vec<Point> {
@@ -148,8 +168,8 @@ impl PathFinder {
         Point::new(index % self.width, index / self.width)
     }
 
-    fn get_cost(&self, _from: i32, _to: i32) -> i32 {
-        1
+    fn get_cost(&self, _from: i32, _to: i32) -> f32 {
+        1.0
     }
 
     fn get_neighbors(&self, point: i32) -> Vec<i32> {
@@ -172,7 +192,7 @@ impl PathFinder {
     }
 
     fn find_lowest_f_score_in_open_set(&self) -> i32 {
-        let mut lowest = i32::MAX;
+        let mut lowest = f32::INFINITY;
         let mut lowest_index = 0;
 
         for val in self.open.iter() {
@@ -187,17 +207,13 @@ impl PathFinder {
         lowest_index
     }
 
-    fn heuristic_cost_estimate(&self, start: i32, end: i32) -> i32 {
+    fn dist_squared(&self, start: i32) -> f32 {
         let s_x = start % self.width;
         let s_y = start / self.width;
 
-        let e_x = end % self.width;
-        let e_y = end / self.width;
+        let x_part = s_x as f32 + self.requester_center_x - self.goal_x;
+        let y_part = s_y as f32 + self.requester_center_y - self.goal_y;
 
-        let x_part = s_x - e_x;
-        let y_part = s_y - e_y;
-
-        trace!("Computed cost estimate from {} to {}", start, end);
         x_part * x_part + y_part * y_part
     }
 }

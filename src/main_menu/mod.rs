@@ -94,9 +94,9 @@ impl WidgetKind for MainMenuView {
                 for child in parent.borrow_mut().children.iter() {
                     child.borrow_mut().state.animation_state.remove(animation_state::Kind::Active);
                 }
-                play_ref.borrow_mut().enable();
+                play_ref.borrow_mut().state.enable();
             } else {
-                play_ref.borrow_mut().disable();
+                play_ref.borrow_mut().state.disable();
             }
             widget.borrow_mut().state.animation_state.toggle(animation_state::Kind::Active);
         }));
@@ -120,7 +120,7 @@ impl WidgetKind for MainMenuView {
                 }
             }
         })));
-        play.borrow_mut().disable();
+        play.borrow_mut().state.disable();
 
         vec![title, modules_title, play, modules_list]
     }

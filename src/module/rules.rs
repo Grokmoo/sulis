@@ -10,6 +10,7 @@ use grt::serde_yaml;
 pub struct Rules {
     pub base_ap: u32,
     pub movement_ap: u32,
+    pub attack_ap: u32,
     pub base_initiative: u32,
 }
 

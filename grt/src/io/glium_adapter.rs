@@ -87,24 +87,6 @@ impl<'a> GliumRenderer<'a> {
 
         self.register_texture(texture_id, image, draw_list.texture_min_filter, draw_list.texture_mag_filter);
     }
-
-    fn draw_widget_tree(&mut self, widget: Ref<Widget>, millis: u32) {
-        let pixel_size = Point::from_tuple(self.target.get_dimensions());
-
-        if let Some(ref image) = widget.state.background {
-            let x = widget.state.position.x as f32;
-            let y = widget.state.position.y as f32;
-            let w = widget.state.size.width as f32;
-            let h = widget.state.size.height as f32;
-            image.draw_graphics_mode(self, &widget.state.animation_state, x, y, w, h);
-        }
-
-        widget.kind.draw_graphics_mode(self, pixel_size, &widget, millis);
-
-        for child in widget.children.iter() {
-            self.draw_widget_tree(child.borrow(), millis);
-        }
-    }
 }
 
 impl<'a> GraphicsRenderer for GliumRenderer<'a> {
@@ -201,7 +183,8 @@ impl IO for GliumDisplay {
         target.clear_color(0.0, 0.0, 0.0, 1.0);
         {
             let mut renderer = GliumRenderer::new(&mut target, self);
-            renderer.draw_widget_tree(root, millis);
+            let pixel_size = Point::from_tuple(renderer.target.get_dimensions());
+            root.draw_graphics_mode(&mut renderer, pixel_size, millis);
         }
         target.finish().unwrap();
     }

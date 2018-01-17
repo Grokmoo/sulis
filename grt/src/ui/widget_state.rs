@@ -2,7 +2,7 @@ use std::rc::Rc;
 use std::option::Option;
 use std::collections::HashMap;
 
-use ui::{AnimationState, Border, Callback, FontRenderer, Size};
+use ui::{animation_state, AnimationState, Border, Callback, FontRenderer, Size};
 use ui::theme::TextParams;
 
 use util::Point;
@@ -10,6 +10,7 @@ use image::Image;
 use resource::Font;
 
 pub struct WidgetState {
+    pub visible: bool,
     pub position: Point,
     pub size: Size,
     pub inner_size: Size,
@@ -34,6 +35,7 @@ pub struct WidgetState {
 impl WidgetState {
     pub fn new() -> WidgetState {
         WidgetState {
+            visible: true,
             callback: None,
             size: Size::as_zero(),
             position: Point::as_zero(),
@@ -53,6 +55,27 @@ impl WidgetState {
             is_modal: false,
             is_mouse_over: false,
         }
+    }
+
+    pub fn disable(&mut self) {
+        self.animation_state.add(animation_state::Kind::Disabled);
+        self.animation_state.remove(animation_state::Kind::Hover);
+    }
+
+    pub fn enable(&mut self) {
+        self.animation_state.remove(animation_state::Kind::Disabled);
+    }
+
+    pub fn set_enabled(&mut self, enabled: bool) {
+        if enabled {
+            self.enable();
+        } else {
+            self.disable();
+        }
+    }
+
+    pub fn is_enabled(&self) -> bool {
+        !self.animation_state.contains(animation_state::Kind::Disabled)
     }
 
     pub fn add_callback(&mut self, callback: Callback) {

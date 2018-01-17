@@ -1,10 +1,11 @@
 id: pc
-name: "PC Name"
+name: "Grokmoo"
 player: true
 text_display: "@"
 image_display: tiles/pc
 race: human
-sex: Female
+sex: Male
 levels:
   fighter: 1
-items: [ sword, backpack, apple ]
+items: [ sword, club, backpack, apple ]
+equipped: [ 0 ]

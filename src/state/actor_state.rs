@@ -1,6 +1,6 @@
 use module::{item, Actor, Module};
 use state::{ChangeListenerList, EntityState, Inventory};
-use rules::{AttributeList, StatList};
+use rules::{AttributeList, Damage, StatList};
 
 use std::rc::Rc;
 use std::cell::{RefCell};
@@ -24,7 +24,10 @@ impl PartialEq for ActorState {
 impl ActorState {
     pub fn new(actor: Rc<Actor>) -> ActorState {
         trace!("Creating new actor state for {}", actor.id);
-        let inventory = Inventory::new(&actor);
+        let mut inventory = Inventory::new(&actor);
+        for index in actor.to_equip.iter() {
+            inventory.equip(*index);
+        }
         ActorState {
             actor,
             inventory,
@@ -40,6 +43,10 @@ impl ActorState {
     pub(in state) fn can_attack(&self, _target: &Rc<RefCell<EntityState>>, dist: f32) -> bool {
         trace!("Checking can attack for '{}' with reach of {}.  Distance to target is {}",
                self.actor.name, self.stats.reach, dist);
+
+        let attack_ap = Module::rules().attack_ap;
+        if self.ap < attack_ap { return false; }
+
         dist < self.stats.reach
     }
 
@@ -49,6 +56,7 @@ impl ActorState {
         info!("'{}' attacks '{}' for {} damage", self.actor.name,
               target.borrow().actor.actor.name, amount);
         target.borrow_mut().remove_hp(amount);
+        self.remove_ap(Module::rules().attack_ap);
     }
 
     pub fn equip(&mut self, index: usize) -> bool {
@@ -67,6 +75,10 @@ impl ActorState {
 
     pub fn inventory(&self) -> &Inventory {
         &self.inventory
+    }
+
+    pub fn is_dead(&self) -> bool {
+        self.hp <= 0
     }
 
     pub fn hp(&self) -> u32 {
@@ -115,6 +127,7 @@ impl ActorState {
     pub fn compute_stats(&mut self) {
         let rules = Module::rules();
 
+        debug!("Compute stats for '{}'", self.actor.name);
         if let Some(ref item_state) = self.inventory.get(item::Slot::HeldMain) {
             if let Some(equippable) = item_state.item.equippable {
                 if let Some(damage) = equippable.damage {
@@ -125,6 +138,8 @@ impl ActorState {
                     self.stats.reach = reach;
                 }
             }
+        } else {
+            self.stats.damage = Damage::default();
         }
 
         // for item_state in self.inventory.borrow().equipped_iter() {

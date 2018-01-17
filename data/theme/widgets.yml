@@ -13,6 +13,7 @@ children:
     border: [1, 1, 1, 1]
     width_relative: ChildMax
     height_relative: ChildSum
+    layout: BoxVertical
     children:
       entry:
         text: "#0#"

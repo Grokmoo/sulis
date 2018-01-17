@@ -44,6 +44,7 @@ children:
         border: [1, 1, 1, 1]
         width_relative: Max
         height_relative: ChildSum
+        layout: BoxVertical
         position: [0, 10]
         children:
           entry:
@@ -77,12 +78,12 @@ children:
             from: .label
             text: "Actions"
             text_params:
+              scale: 1.25
               horizontal_alignment: Center
             preferred_size: [6, 1]
             position: [0, 0]
           actions:
             from: .list_box
-            background: none
             border: [0, 0, 0, 0]
             width_relative: Max
             position: [0, 1]
@@ -176,4 +177,26 @@ children:
         text_params:
           scale: 1.3
         position: [7, 2]
+  game_over_menu:
+    background: bg_base
+    border: [1, 1, 1, 1]
+    preferred_size: [10, 7]
+    x_relative: Center
+    y_relative: Center
+    position: [0, -5]
+    children:
+      title:
+        from: .label
+        width_relative: Max
+        preferred_size: [1, 1]
+        text_params:
+          scale: 1.3
+        text: "Game Over"
+      exit:
+        from: .button
+        preferred_size: [6, 3]
+        text: "Exit"
+        text_params:
+          scale: 1.3
+        position: [1, 2]
 ...

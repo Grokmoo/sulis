@@ -6,3 +6,5 @@ image_display: "tiles/goblin"
 race: goblin
 levels:
   fighter: 1
+items: [ club ]
+equipped: [ 0 ]

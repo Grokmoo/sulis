@@ -1,39 +1,17 @@
-pub mod theme;
-pub use self::theme::Theme;
-
-pub mod markup_renderer;
-pub use self::markup_renderer::MarkupRenderer;
-
-pub mod color;
-pub use self::color::Color;
-
-pub mod widget;
-pub use self::widget::Widget;
-
-mod widget_state;
-pub use self::widget_state::WidgetState;
-
-mod widget_kind;
-pub use self::widget_kind::WidgetKind;
-pub use self::widget_kind::EmptyWidget;
+pub mod animation_state;
+pub use self::animation_state::AnimationState;
 
 mod border;
 pub use self::border::Border;
 
-pub mod animation_state;
-pub use self::animation_state::AnimationState;
-
-mod label;
-pub use self::label::Label;
-
 mod button;
 pub use self::button::Button;
 
-pub mod list_box;
-pub use self::list_box::ListBox;
+mod callback;
+pub use self::callback::Callback;
 
-pub mod text_area;
-pub use self::text_area::TextArea;
+pub mod color;
+pub use self::color::Color;
 
 mod confirmation_window;
 pub use self::confirmation_window::ConfirmationWindow;
@@ -41,12 +19,37 @@ pub use self::confirmation_window::ConfirmationWindow;
 mod cursor;
 pub use self::cursor::Cursor;
 
-mod callback;
-pub use self::callback::Callback;
-
 mod font_renderer;
 pub use self::font_renderer::FontRenderer;
 pub use self::font_renderer::LineRenderer;
+
+mod label;
+pub use self::label::Label;
+
+mod layout_kind;
+pub use self::layout_kind::LayoutKind;
+
+pub mod list_box;
+pub use self::list_box::ListBox;
+
+pub mod markup_renderer;
+pub use self::markup_renderer::MarkupRenderer;
+
+pub mod text_area;
+pub use self::text_area::TextArea;
+
+pub mod theme;
+pub use self::theme::Theme;
+
+pub mod widget;
+pub use self::widget::Widget;
+
+mod widget_kind;
+pub use self::widget_kind::WidgetKind;
+pub use self::widget_kind::EmptyWidget;
+
+mod widget_state;
+pub use self::widget_state::WidgetState;
 
 use std::rc::Rc;
 use std::cell::RefCell;

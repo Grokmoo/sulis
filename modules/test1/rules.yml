@@ -1,5 +1,6 @@
 ---
 base_ap: 40
 movement_ap: 1
+attack_ap: 20
 base_initiative: 10
 ...

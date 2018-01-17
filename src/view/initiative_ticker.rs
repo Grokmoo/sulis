@@ -2,7 +2,6 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use grt::ui::{Label, Widget, WidgetKind};
-use grt::util::Size;
 use state::{ChangeListener, GameState};
 
 pub const NAME: &str = "initiative_ticker";
@@ -20,25 +19,6 @@ impl InitiativeTicker {
 impl WidgetKind for InitiativeTicker {
     fn get_name(&self) -> &str {
         NAME
-    }
-
-    fn layout(&self, widget: &mut Widget) {
-        widget.do_self_layout();
-
-        let width = widget.state.inner_size.width;
-        let x = widget.state.inner_left();
-        let mut current_y = widget.state.inner_top();
-
-        for child in widget.children.iter() {
-            let theme = match child.borrow().theme {
-                None => continue,
-                Some(ref t) => Rc::clone(t),
-            };
-            let height = theme.preferred_size.height;
-            child.borrow_mut().state.set_size(Size::new(width, height));
-            child.borrow_mut().state.set_position(x, current_y);
-            current_y += height;
-        }
     }
 
     fn on_remove(&self) {

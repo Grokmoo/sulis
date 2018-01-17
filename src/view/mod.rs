@@ -10,6 +10,9 @@ pub use self::character_window::CharacterWindow;
 mod entity_mouseover;
 pub use self::entity_mouseover::EntityMouseover;
 
+mod game_over_menu;
+pub use self::game_over_menu::GameOverMenu;
+
 mod initiative_ticker;
 pub use self::initiative_ticker::InitiativeTicker;
 
@@ -85,9 +88,12 @@ impl WidgetKind for RootView {
     fn on_remove(&self) {
         let area_state = GameState::area_state();
         area_state.borrow_mut().listeners.remove(NAME);
+
+        let pc = GameState::pc();
+        pc.borrow_mut().actor.listeners.remove(NAME);
     }
 
-    fn on_add(&self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         debug!("Adding to root widget.");
 
         let mouse_over = Widget::with_theme(Label::empty(), "mouse_over");
@@ -104,7 +110,7 @@ impl WidgetKind for RootView {
                     area_state.borrow_mut().turn_timer.next();
                 }
             })));
-            button.borrow_mut().disable();
+            button.borrow_mut().state.set_enabled(GameState::is_pc_current());
 
             let button_ref = Rc::clone(&button);
             let area_state = GameState::area_state();
@@ -114,7 +120,7 @@ impl WidgetKind for RootView {
                         None => false,
                         Some(entity) => entity.borrow().is_pc(),
                     };
-                    button_ref.borrow_mut().set_enabled(enabled);
+                    button_ref.borrow_mut().state.set_enabled(enabled);
                 })));
 
             let area_state = GameState::area_state();
@@ -127,6 +133,15 @@ impl WidgetKind for RootView {
             let ticker = Widget::with_defaults(InitiativeTicker::new());
             Widget::add_child_to(&right_pane, ticker);
         }
+
+        let widget_ref = Rc::clone(&widget);
+        let pc = GameState::pc();
+        pc.borrow_mut().actor.listeners.add(ChangeListener::new(NAME, Box::new(move |pc| {
+            if pc.is_dead() {
+                let menu = Widget::with_defaults(GameOverMenu::new());
+                Widget::add_child_to(&widget_ref, menu);
+            }
+        })));
 
         vec![area_widget, right_pane]
     }

@@ -23,6 +23,9 @@ impl WidgetKind for EmptyWidget {
 /// Trait for implementations of different Widgets.  This is held by a 'WidgetState'
 /// object which contains the common functionality across all Widgets.
 pub trait WidgetKind {
+    /// called every frame
+    fn update(&self, _widget: &Rc<RefCell<Widget>>) { }
+
     fn draw_text_mode(&self, _renderer: &mut TextRenderer,
                       _widget: &Widget, _millis: u32) { }
 

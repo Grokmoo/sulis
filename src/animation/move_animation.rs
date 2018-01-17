@@ -33,9 +33,7 @@ impl MoveAnimation {
 
 impl animation::Animation for MoveAnimation {
     fn update(&mut self, area_state: &mut AreaState) -> bool {
-        if self.marked_for_removal {
-            return false;
-        }
+        if self.marked_for_removal || self.path.is_empty() { return false; }
 
         let frame_index = animation::get_current_frame(self.start_time.elapsed(),
             self.frame_time_millis, self.path.len() - 1);

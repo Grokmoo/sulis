@@ -31,6 +31,7 @@ pub struct Actor {
     pub text_display: char,
     pub image_display: Rc<Sprite>,
     pub items: Vec<Rc<Item>>,
+    pub to_equip: Vec<usize>,
     pub levels: Vec<(Rc<Class>, u32)>,
 }
 
@@ -81,6 +82,24 @@ impl Actor {
             levels.push((class, level));
         }
 
+        let mut to_equip: Vec<usize> = Vec::new();
+        if let Some(builder_equipped) = builder.equipped {
+            for index in builder_equipped {
+                let index = index as usize;
+                if index >= items.len() {
+                    warn!("No item exists to equip at index {}", index);
+                    return invalid_data_error(&format!("Unable to create actor '{}'", builder.id));
+                }
+
+                if items[index].equippable.is_none() {
+                    warn!("Item at index {}: {} is not equippable.", index, items[index].name);
+                    return invalid_data_error(&format!("Unable to create actor '{}'", builder.id));
+                }
+
+                to_equip.push(index);
+            }
+        }
+
         let sprite = ResourceSet::get_sprite(&builder.image_display)?;
 
         Ok(Actor {
@@ -93,6 +112,7 @@ impl Actor {
             sex,
             levels,
             items,
+            to_equip,
         })
     }
 }
@@ -100,15 +120,16 @@ impl Actor {
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct ActorBuilder {
-    pub id: String,
-    pub name: String,
-    pub race: String,
-    pub sex: Option<Sex>,
-    pub player: Option<bool>,
-    pub text_display: char,
-    pub image_display: String,
-    pub items: Option<Vec<String>>,
-    pub levels: HashMap<String, u32>,
+    id: String,
+    name: String,
+    race: String,
+    sex: Option<Sex>,
+    player: Option<bool>,
+    text_display: char,
+    image_display: String,
+    items: Option<Vec<String>>,
+    equipped: Option<Vec<u32>>,
+    levels: HashMap<String, u32>,
 }
 
 impl ResourceBuilder for ActorBuilder {

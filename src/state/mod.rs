@@ -251,10 +251,16 @@ impl GameState {
                 }
             }
 
-            match area_state.update() {
+            let result = match area_state.update() {
                 None => Rc::clone(&state.pc),
                 Some(entity) => Rc::clone(entity),
+            };
+
+            if state.pc.borrow().actor.is_dead() {
+                area_state.turn_timer.set_active(false);
             }
+
+            result
         });
 
         AI.with(|ai| {
@@ -300,39 +306,39 @@ impl GameState {
         STATE.with(|s| Rc::clone(&s.borrow().as_ref().unwrap().pc))
     }
 
-    pub fn can_pc_move_to(x: i32, y: i32) -> bool {
-        STATE.with(|s| {
-            let mut state = s.borrow_mut();
-            let state = state.as_mut().unwrap();
+    pub fn entity_move_towards(entity: &Rc<RefCell<EntityState>>, target: &Rc<RefCell<EntityState>>) -> bool {
+        let (target_x, target_y) = {
+            let target = target.borrow();
+            (target.location.x + target.size.size / 2, target.location.y + target.size.size / 2)
+        };
 
-            let area_state = state.area_state.borrow();
-            let path = state.path_finder.find(&area_state, state.pc.borrow(), x, y);
-
-            path.is_some()
-        })
+        let dist = entity.borrow().size.size / 2 + target.borrow().size.size / 2 + 1;
+        GameState::entity_move_to_internal(entity, target_x as f32, target_y as f32, dist as f32)
     }
 
-    pub fn pc_move_to(x: i32, y: i32) -> bool {
+    pub fn entity_move_to(entity: &Rc<RefCell<EntityState>>, x: i32, y: i32) -> bool {
+        GameState::entity_move_to_internal(entity, x as f32, y as f32, 0.0)
+    }
+
+    fn entity_move_to_internal(entity: &Rc<RefCell<EntityState>>, x: f32, y: f32, dist: f32) -> bool {
         STATE.with(|s| {
             let mut state = s.borrow_mut();
             let state = state.as_mut().unwrap();
             let area_state = state.area_state.borrow();
-            trace!("Moving pc to {},{}", x, y);
+            trace!("Moving '{}' to {},{}", entity.borrow().actor.actor.name, x, y);
 
             let start_time = time::Instant::now();
-            let path = state.path_finder.find(&area_state, state.pc.borrow(), x, y);
-            info!("Path finding complete in {} secs", animation::format_elapsed_secs(start_time.elapsed()));
+            let path = match state.path_finder.find(&area_state, entity.borrow(), x, y, dist) {
+                None => return false,
+                Some(path) => path,
+            };
+            debug!("Path finding complete in {} secs", animation::format_elapsed_secs(start_time.elapsed()));
 
-            if let None = path {
-                return false;
-            }
-            let path = path.unwrap();
-            let entity = Rc::clone(&state.pc);
             for anim in state.animations.iter_mut() {
-                anim.check(&entity);
+                anim.check(entity);
             }
-            let anim = MoveAnimation::new(entity, path,
-                                          CONFIG.display.animation_base_time_millis);
+            let entity = Rc::clone(entity);
+            let anim = MoveAnimation::new(entity, path, CONFIG.display.animation_base_time_millis);
             state.animations.push(Box::new(anim));
             true
         })

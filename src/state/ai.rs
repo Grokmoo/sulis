@@ -17,7 +17,10 @@ impl AI {
     }
 
     pub fn update(&mut self, entity: Rc<RefCell<EntityState>>) {
-        if entity.borrow().is_pc() { return; }
+        if entity.borrow().is_pc() {
+            self.entity_ai = None;
+            return;
+        }
 
         let assign = match self.entity_ai {
             None => true,
@@ -31,6 +34,7 @@ impl AI {
         };
 
         if assign {
+            debug!("Initialize round AI for '{}'", entity.borrow().actor.actor.name);
             self.entity_ai = Some(EntityAI::new(entity));
         }
 
@@ -43,6 +47,8 @@ impl AI {
 struct EntityAI {
     entity: Rc<RefCell<EntityState>>,
     initial_wait_done: bool,
+    move_done: bool,
+    attack_done: bool,
 }
 
 impl EntityAI {
@@ -50,6 +56,8 @@ impl EntityAI {
         EntityAI {
             entity,
             initial_wait_done: false,
+            move_done: false,
+            attack_done: false,
         }
     }
 
@@ -67,6 +75,26 @@ impl EntityAI {
             let anim = WaitAnimation::new(&self.entity, wait_time);
             GameState::add_animation(Box::new(anim));
             self.initial_wait_done = true;
+            return;
+        }
+
+        if !self.move_done {
+            let pc = GameState::pc();
+            GameState::entity_move_towards(&self.entity, &pc);
+            self.move_done = true;
+            return;
+        }
+
+        if !self.attack_done {
+            let pc = GameState::pc();
+            if !self.entity.borrow().can_attack(&pc) {
+                self.attack_done = true;
+                return;
+            }
+
+            self.entity.borrow_mut().attack(&pc);
+            let anim = WaitAnimation::new(&self.entity, CONFIG.display.animation_base_time_millis * 20);
+            GameState::add_animation(Box::new(anim));
             return;
         }
 

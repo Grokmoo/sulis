@@ -98,12 +98,11 @@ impl ActionMenu {
 
     pub fn move_callback(&self) -> Box<Fn()> {
         let pc = GameState::pc();
-        let size = pc.borrow().size();
-        let x = self.area_pos.x - size / 2;
-        let y = self.area_pos.y - size / 2;
+        let x = self.area_pos.x;
+        let y = self.area_pos.y;
         Box::new(move || {
             trace!("Firing move callback.");
-            GameState::pc_move_to(x, y);
+            GameState::entity_move_to(&pc, x, y);
         })
     }
 

@@ -8,8 +8,8 @@ use std::cell::{Ref, RefCell};
 pub struct AreaState {
     pub area: Rc<Area>,
     pub listeners: ChangeListenerList<AreaState>,
+    pub turn_timer: TurnTimer,
     entities: Vec<Option<Rc<RefCell<EntityState>>>>,
-    turn_timer: TurnTimer,
 
     entity_grid: Vec<Option<usize>>,
     transition_grid: Vec<Option<usize>>,
@@ -58,7 +58,7 @@ impl AreaState {
 
             let location = Location::from_point(&actor_data.location, &self.area);
             debug!("Adding actor '{}' at '{:?}'", actor.id, location);
-            self.add_actor(actor, location);
+            self.add_actor(actor, location, false);
         }
 
         let turn_timer = TurnTimer::new(&self);
@@ -128,8 +128,8 @@ impl AreaState {
     }
 
     pub(in state) fn add_actor(&mut self, actor: Rc<Actor>,
-                     location: Location) -> bool {
-        let entity = EntityState::new(actor, location.clone(), 0);
+                     location: Location, is_pc: bool) -> bool {
+        let entity = EntityState::new(actor, location.clone(), 0, is_pc);
         let entity = Rc::new(RefCell::new(entity));
         self.add_entity(entity, location)
     }
@@ -154,6 +154,8 @@ impl AreaState {
             self.update_display(p.x, p.y, entity.borrow().display());
             self.update_entity_grid(p.x, p.y, Some(new_index));
         }
+
+        self.turn_timer.add(&entity);
         self.entities[new_index] = Some(entity);
 
         self.listeners.notify(&self);
@@ -209,7 +211,7 @@ impl AreaState {
         Rc::clone(&entity.as_ref().unwrap())
     }
 
-    pub (in state) fn update(&mut self) {
+    pub (in state) fn update(&mut self) -> Option<&Rc<RefCell<EntityState>>> {
         // removal does not shuffle the vector around, so we can safely just iterate
         let mut notify = false;
         let len = self.entities.len();
@@ -227,6 +229,8 @@ impl AreaState {
         if notify {
             self.listeners.notify(&self);
         }
+
+        self.turn_timer.current()
     }
 
     pub(in state) fn remove_entity(&mut self, entity: &Rc<RefCell<EntityState>>) {

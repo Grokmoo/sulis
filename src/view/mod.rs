@@ -1,24 +1,29 @@
-mod character_window;
-pub use self::character_window::CharacterWindow;
-
-mod inventory_window;
-pub use self::inventory_window::InventoryWindow;
-
-mod entity_mouseover;
-pub use self::entity_mouseover::EntityMouseover;
+mod action_menu;
+pub use self::action_menu::ActionMenu;
 
 mod area_view;
 pub use self::area_view::AreaView;
 
-mod action_menu;
-pub use self::action_menu::ActionMenu;
+mod character_window;
+pub use self::character_window::CharacterWindow;
+
+mod entity_mouseover;
+pub use self::entity_mouseover::EntityMouseover;
+
+mod initiative_ticker;
+pub use self::initiative_ticker::InitiativeTicker;
+
+mod inventory_window;
+pub use self::inventory_window::InventoryWindow;
 
 use std::rc::Rc;
 use std::cell::RefCell;
 
 use grt::io::InputAction;
 use grt::ui::{Button, Callback, ConfirmationWindow, EmptyWidget, Label, Widget, WidgetKind};
-use state::GameState;
+use state::{ChangeListener, GameState};
+
+const NAME: &str = "root";
 
 pub struct RootView {
 }
@@ -32,7 +37,7 @@ impl RootView {
 
 impl WidgetKind for RootView {
     fn get_name(&self) -> &str {
-        "root"
+        NAME
     }
 
     fn on_key_press(&self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
@@ -77,6 +82,11 @@ impl WidgetKind for RootView {
         true
     }
 
+    fn on_remove(&self) {
+        let area_state = GameState::area_state();
+        area_state.borrow_mut().listeners.remove(NAME);
+    }
+
     fn on_add(&self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         debug!("Adding to root widget.");
 
@@ -87,8 +97,25 @@ impl WidgetKind for RootView {
 
         let right_pane = Widget::with_theme(EmptyWidget::new(), "right_pane");
         {
-            let button = Widget::with_theme(Button::empty(), "test_button");
-            button.borrow_mut().state.add_callback(Callback::with(Box::new(|| { info!("Hello world"); })));
+            let button = Widget::with_theme(Button::empty(), "end_turn_button");
+            button.borrow_mut().state.add_callback(Callback::with(Box::new(|| {
+                if GameState::is_pc_current() {
+                    let area_state = GameState::area_state();
+                    area_state.borrow_mut().turn_timer.next();
+                }
+            })));
+            button.borrow_mut().disable();
+
+            let button_ref = Rc::clone(&button);
+            let area_state = GameState::area_state();
+            area_state.borrow_mut().turn_timer.listeners.add(
+                ChangeListener::new(NAME, Box::new(move |timer| {
+                    let enabled = match timer.current() {
+                        None => false,
+                        Some(entity) => entity.borrow().is_pc(),
+                    };
+                    button_ref.borrow_mut().set_enabled(enabled);
+                })));
 
             let area_state = GameState::area_state();
             let area_title = Widget::with_theme(
@@ -96,6 +123,9 @@ impl WidgetKind for RootView {
             Widget::add_child_to(&right_pane, mouse_over);
             Widget::add_child_to(&right_pane, button);
             Widget::add_child_to(&right_pane, area_title);
+
+            let ticker = Widget::with_defaults(InitiativeTicker::new());
+            Widget::add_child_to(&right_pane, ticker);
         }
 
         vec![area_widget, right_pane]

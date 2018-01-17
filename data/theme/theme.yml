@@ -15,7 +15,7 @@ children:
     position: [0, -4]
   right_pane:
     background: bg_base
-    border: [0, 0, 1, 1]
+    border: [1, 1, 1, 1]
     preferred_size: [20, 0]
     x_relative: Max
     height_relative: Max
@@ -30,14 +30,38 @@ children:
         text: "#0#"
         preferred_size: [18, 1]
         position: [0, 0]
-      test_button:
+      end_turn_button:
         from: .button
-        text: "Test"
+        text: "End Turn"
         text_params:
           scale: 2.0
           color: [ 1.0, 0.0, 0.0, 1.0 ]
         preferred_size: [18, 3]
-        position: [0, 2]
+        y_relative: Max
+        position: [0, 0]
+      initiative_ticker:
+        background: bg_base
+        border: [1, 1, 1, 1]
+        width_relative: Max
+        height_relative: ChildSum
+        position: [0, 10]
+        children:
+          entry:
+            from: .label
+            text: "#0#"
+            text_params:
+              horizontal_alignment: Left
+            preferred_size: [0, 1]
+            width_relative: Max
+          current_entry:
+            from: .label
+            text: "#0#"
+            text_params:
+              horizontal_alignment: Left
+              color: [1.0, 0.0, 0.0, 1.0]
+              scale: 1.5
+            preferred_size: [0, 2]
+            width_relative: Max
   area:
     preferred_size: [-20, 0]
     width_relative: Max

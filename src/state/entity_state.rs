@@ -1,6 +1,6 @@
 use module::{Actor, EntitySize, EntitySizeIterator};
 use module::area::Transition;
-use state::{ActorState, AreaState, GameState, Location};
+use state::{ActorState, AreaState, Location};
 
 use std::rc::Rc;
 use std::cell::RefCell;
@@ -11,6 +11,7 @@ pub struct EntityState {
     pub size: Rc<EntitySize>,
     pub index: usize, // index in vec of the owning area state
 
+    is_pc: bool,
     marked_for_removal: bool,
 }
 
@@ -22,7 +23,8 @@ impl PartialEq for EntityState {
 }
 
 impl EntityState {
-    pub(in state) fn new(actor: Rc<Actor>, location: Location, index: usize) -> EntityState {
+    pub(in state) fn new(actor: Rc<Actor>, location: Location,
+                         index: usize, is_pc: bool) -> EntityState {
         debug!("Creating new entity state for {}", actor.id);
         let size = Rc::clone(&actor.race.size);
         let actor_state = ActorState::new(actor);
@@ -31,8 +33,13 @@ impl EntityState {
             location,
             size,
             index,
+            is_pc,
             marked_for_removal: false,
         }
+    }
+
+    pub fn is_pc(&self) -> bool {
+        self.is_pc
     }
 
     pub (in state) fn is_marked_for_removal(&self) -> bool {
@@ -58,14 +65,24 @@ impl EntityState {
         }
     }
 
-    pub fn move_to(&mut self, area_state: &mut AreaState, x: i32, y: i32) -> bool {
+    pub fn move_to(&mut self, area_state: &mut AreaState, x: i32, y: i32, ap_cost: u32) -> bool {
+        trace!("Move to {},{}", x, y);
         if !self.location.coords_valid(x, y) { return false; }
         if !self.location.coords_valid(x + self.size() - 1, y + self.size() - 1) {
             return false;
         }
 
+        if x == self.location.x && y == self.location.y {
+            return false;
+        }
+
+        if self.actor.ap() < ap_cost {
+            return false;
+        }
+
         area_state.update_entity_position(&self, x, y);
         self.location.move_to(x, y);
+        self.actor.remove_ap(ap_cost);
         true
     }
 
@@ -123,11 +140,6 @@ impl EntityState {
         }
 
         e1.borrow().index == e2.borrow().index
-    }
-
-    /// Returns true if `e` refers to the current selected PC, false otherwise
-    pub fn is_pc(e: &Rc<RefCell<EntityState>>) -> bool {
-        EntityState::equals(e, &GameState::pc())
     }
 }
 

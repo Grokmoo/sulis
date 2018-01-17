@@ -1,3 +1,6 @@
+mod ai;
+pub use self::ai::AI;
+
 mod area_state;
 pub use self::area_state::AreaState;
 
@@ -26,6 +29,7 @@ use self::path_finder::PathFinder;
 mod turn_timer;
 pub use self::turn_timer::TurnTimer;
 
+use std::time;
 use std::collections::HashMap;
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
@@ -34,11 +38,12 @@ use std::cell::RefCell;
 use grt::config::CONFIG;
 use grt::util::Point;
 use grt::io::MainLoopUpdater;
-use animation::{Animation, MoveAnimation};
-use module::{Actor, Module};
+use animation::{self, Animation, MoveAnimation};
+use module::Module;
 
 thread_local! {
     static STATE: RefCell<Option<GameState>> = RefCell::new(None);
+    static AI: RefCell<AI> = RefCell::new(AI::new());
 }
 
 pub struct GameStateMainLoopUpdater { }
@@ -181,7 +186,7 @@ impl GameState {
             }
         };
 
-        if !area_state.borrow_mut().add_actor(pc, location) {
+        if !area_state.borrow_mut().add_actor(pc, location, true) {
             error!("Player character starting location must be within \
                    area bounds and passable.");
             return Err(Error::new(ErrorKind::InvalidData,
@@ -229,15 +234,66 @@ impl GameState {
     }
 
     pub fn update() {
-        STATE.with(|s| {
+        let active_entity = STATE.with(|s| {
             let mut state = s.borrow_mut();
             let state = state.as_mut().unwrap();
 
             let mut area_state = state.area_state.borrow_mut();
-            state.animations.retain(|anim| anim.update(&mut area_state));
 
-            area_state.update();
+            let mut i = 0;
+            while i < state.animations.len() {
+                let retain = state.animations[i].update(&mut area_state);
+
+                if retain {
+                    i += 1;
+                } else {
+                    state.animations.remove(i);
+                }
+            }
+
+            match area_state.update() {
+                None => Rc::clone(&state.pc),
+                Some(entity) => Rc::clone(entity),
+            }
         });
+
+        AI.with(|ai| {
+            let mut ai = ai.borrow_mut();
+            ai.update(active_entity);
+        });
+    }
+
+    pub fn has_active_animations(entity: &Rc<RefCell<EntityState>>) -> bool {
+        STATE.with(|s| {
+            let state = s.borrow();
+            let state = state.as_ref().unwrap();
+
+            for anim in state.animations.iter() {
+                if *anim.get_owner().borrow() == *entity.borrow() {
+                    return true;
+                }
+            }
+            false
+        })
+    }
+
+    pub fn add_animation(anim: Box<Animation>) {
+        STATE.with(|s| {
+            let mut state = s.borrow_mut();
+            let state = state.as_mut().unwrap();
+
+            state.animations.push(anim);
+        });
+    }
+
+    /// Returns true if the PC has the current turn, false otherwise
+    pub fn is_pc_current() -> bool {
+        let area_state = GameState::area_state();
+        let area_state = area_state.borrow();
+        if let Some(entity) = area_state.turn_timer.current() {
+            return entity.borrow().is_pc();
+        }
+        false
     }
 
     pub fn pc() -> Rc<RefCell<EntityState>> {
@@ -248,6 +304,7 @@ impl GameState {
         STATE.with(|s| {
             let mut state = s.borrow_mut();
             let state = state.as_mut().unwrap();
+
             let area_state = state.area_state.borrow();
             let path = state.path_finder.find(&area_state, state.pc.borrow(), x, y);
 
@@ -261,7 +318,10 @@ impl GameState {
             let state = state.as_mut().unwrap();
             let area_state = state.area_state.borrow();
             trace!("Moving pc to {},{}", x, y);
+
+            let start_time = time::Instant::now();
             let path = state.path_finder.find(&area_state, state.pc.borrow(), x, y);
+            info!("Path finding complete in {} secs", animation::format_elapsed_secs(start_time.elapsed()));
 
             if let None = path {
                 return false;
@@ -275,16 +335,6 @@ impl GameState {
                                           CONFIG.display.animation_base_time_millis);
             state.animations.push(Box::new(anim));
             true
-        })
-    }
-
-    pub fn add_actor(actor: Rc<Actor>, x: i32, y: i32) -> bool {
-        STATE.with(|s| {
-            let area_state = Rc::clone(&s.borrow_mut().as_mut().unwrap().area_state);
-            let location = Location::new(x, y, &area_state.borrow().area);
-
-            let result = area_state.borrow_mut().add_actor(actor, location);
-            result
         })
     }
 }

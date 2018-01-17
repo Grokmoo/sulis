@@ -27,10 +27,19 @@ pub struct Widget {
 impl Widget {
     pub fn disable(&mut self) {
         self.state.animation_state.add(animation_state::Kind::Disabled);
+        self.state.animation_state.remove(animation_state::Kind::Hover);
     }
 
     pub fn enable(&mut self) {
         self.state.animation_state.remove(animation_state::Kind::Disabled);
+    }
+
+    pub fn set_enabled(&mut self, enabled: bool) {
+        if enabled {
+            self.enable();
+        } else {
+            self.disable();
+        }
     }
 
     pub fn is_enabled(&self) -> bool {

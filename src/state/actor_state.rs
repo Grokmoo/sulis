@@ -7,12 +7,12 @@ use std::cell::{RefCell};
 
 pub struct ActorState {
     pub actor: Rc<Actor>,
-    inventory: Inventory,
     pub attributes: AttributeList,
     pub stats: StatList,
     pub listeners: ChangeListenerList<ActorState>,
     hp: u32,
     ap: u32,
+    inventory: Inventory,
 }
 
 impl PartialEq for ActorState {
@@ -77,6 +77,16 @@ impl ActorState {
         self.ap
     }
 
+    pub(in state) fn remove_ap(&mut self, ap: u32) {
+        if ap > self.ap {
+            self.ap = 0;
+        } else {
+            self.ap -= ap;
+        }
+
+        self.listeners.notify(&self);
+    }
+
     pub(in state) fn remove_hp(&mut self, hp: u32) {
         if hp > self.hp {
             self.hp = 0;
@@ -89,13 +99,17 @@ impl ActorState {
 
     pub fn init(&mut self) {
         self.hp = self.stats.max_hp;
-        self.init_turn();
     }
 
     pub fn init_turn(&mut self) {
         let rules = Module::rules();
 
         self.ap = rules.base_ap;
+        self.listeners.notify(&self);
+    }
+
+    pub fn end_turn(&mut self) {
+        self.ap = 0;
     }
 
     pub fn compute_stats(&mut self) {

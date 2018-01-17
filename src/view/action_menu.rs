@@ -5,6 +5,7 @@ use grt::ui::{Callback, Cursor, Label, list_box, ListBox, Widget, WidgetKind};
 use grt::io::event::ClickKind;
 use grt::util::Point;
 
+use module::Module;
 use state::{ChangeListener, GameState, EntityState};
 
 const NAME: &'static str = "action_menu";
@@ -20,7 +21,7 @@ impl ActionMenu {
         let area_state = GameState::area_state();
         let (hovered_entity, is_hover_pc) =
             if let Some(ref entity) = area_state.borrow().get_entity_at(x, y) {
-                (Some(Rc::clone(entity)), EntityState::is_pc(entity))
+                (Some(Rc::clone(entity)), entity.borrow().is_pc())
             } else {
                 (None, false)
             };
@@ -83,6 +84,10 @@ impl ActionMenu {
 
     pub fn is_move_valid(&self) -> bool {
         let pc = GameState::pc();
+        if pc.borrow().actor.ap() < Module::rules().movement_ap {
+            return false;
+        }
+
         let size = pc.borrow().size();
         let area_state = GameState::area_state();
         let ok = area_state.borrow().is_passable(&pc.borrow(),

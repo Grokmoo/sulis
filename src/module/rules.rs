@@ -9,6 +9,7 @@ use grt::serde_yaml;
 #[serde(deny_unknown_fields)]
 pub struct Rules {
     pub base_ap: u32,
+    pub movement_ap: u32,
     pub base_initiative: u32,
 }
 

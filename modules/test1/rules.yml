@@ -1,4 +1,5 @@
 ---
-base_ap: 4
+base_ap: 40
+movement_ap: 1
 base_initiative: 10
 ...

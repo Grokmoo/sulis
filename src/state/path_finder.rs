@@ -129,15 +129,18 @@ impl PathFinder {
         let mut current = current;
         loop {
             trace!("Current {}", current);
-            if let None = self.came_from.get(&current) {
-                break;
-            }
-            current = *self.came_from.get(&current).unwrap();
+            current = match self.came_from.get(&current) {
+                None => break,
+                Some(point) => *point,
+            };
             path.push(self.get_point(current));
         }
 
+        // remove the last point which is the entity start pos
+        path.pop();
         trace!("Path reconstructed.  reversing.");
         path.reverse();
+        debug!("Found path: {:?}", path);
         path
     }
 

@@ -82,14 +82,12 @@ impl AreaState {
 
     pub fn is_passable(&self, requester: &Ref<EntityState>,
                        new_x: i32, new_y: i32) -> bool {
-        if !self.area.coords_valid(new_x, new_y) { return false; }
-
         if !self.area.get_path_grid(requester.size()).is_passable(new_x, new_y) {
             return false;
         }
 
         requester.points(new_x, new_y)
-            .all(|p| self.point_entities_passable(&requester, p.x, p.y))
+           .all(|p| self.point_entities_passable(&requester, p.x, p.y))
     }
 
     pub fn get_entity_at(&self, x: i32, y: i32) -> Option<Rc<RefCell<EntityState>>> {
@@ -118,12 +116,11 @@ impl AreaState {
                                x: i32, y: i32) -> bool {
         if !self.area.coords_valid(x, y) { return false; }
 
-        let grid_index = self.entity_grid.get((x + y * self.area.width) as usize);
+        let grid_index = self.entity_grid[(x + y * self.area.width) as usize];
 
         match grid_index {
-            None => false, // grid position is invalid
-            Some(&None) => true, // grid position is valid, location is empty
-            Some(&Some(index)) => (index == requester.index),
+            None => true, // grid position is empty
+            Some(index) => (index == requester.index),
         }
     }
 
@@ -139,9 +136,9 @@ impl AreaState {
         let x = location.x;
         let y = location.y;
 
-        if !self.is_passable(&entity.borrow(), x, y) {
-            return false;
-        }
+        if !self.area.coords_valid(x, y) { return false; }
+
+        if !self.is_passable(&entity.borrow(), x, y) { return false; }
 
         entity.borrow_mut().actor.compute_stats();
         entity.borrow_mut().actor.init();

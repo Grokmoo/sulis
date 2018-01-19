@@ -29,7 +29,6 @@ use self::path_finder::PathFinder;
 mod turn_timer;
 pub use self::turn_timer::TurnTimer;
 
-use std::time;
 use std::collections::HashMap;
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
@@ -37,8 +36,8 @@ use std::cell::RefCell;
 
 use grt::config::CONFIG;
 use grt::util::Point;
-use grt::io::MainLoopUpdater;
-use animation::{self, Animation, MoveAnimation};
+use grt::io::{GraphicsRenderer, MainLoopUpdater};
+use animation::{Animation, MoveAnimation};
 use module::Module;
 
 thread_local! {
@@ -269,6 +268,17 @@ impl GameState {
         });
     }
 
+    pub fn draw_graphics_mode(renderer: &mut GraphicsRenderer, pixel_size: Point) {
+        STATE.with(|s| {
+            let state = s.borrow();
+            let state = state.as_ref().unwrap();
+
+            for anim in state.animations.iter() {
+                anim.draw_graphics_mode(renderer, pixel_size);
+            }
+        })
+    }
+
     pub fn has_active_animations(entity: &Rc<RefCell<EntityState>>) -> bool {
         STATE.with(|s| {
             let state = s.borrow();
@@ -306,33 +316,48 @@ impl GameState {
         STATE.with(|s| Rc::clone(&s.borrow().as_ref().unwrap().pc))
     }
 
-    pub fn entity_move_towards(entity: &Rc<RefCell<EntityState>>, target: &Rc<RefCell<EntityState>>) -> bool {
+    fn get_target(entity: &Rc<RefCell<EntityState>>,
+                  target: &Rc<RefCell<EntityState>>) -> (f32, f32, f32) {
         let (target_x, target_y) = {
             let target = target.borrow();
             (target.location.x + target.size.size / 2, target.location.y + target.size.size / 2)
         };
 
         let dist = entity.borrow().size.size / 2 + target.borrow().size.size / 2 + 1;
-        GameState::entity_move_to_internal(entity, target_x as f32, target_y as f32, dist as f32)
+        (target_x as f32, target_y as f32, dist as f32 + entity.borrow().actor.stats.reach)
     }
 
-    pub fn entity_move_to(entity: &Rc<RefCell<EntityState>>, x: i32, y: i32) -> bool {
-        GameState::entity_move_to_internal(entity, x as f32, y as f32, 0.0)
+    pub fn can_move_towards(entity: &Rc<RefCell<EntityState>>, target: &Rc<RefCell<EntityState>>) -> bool {
+        let (x, y, dist) = GameState::get_target(entity, target);
+        GameState::can_move_to_internal(entity, x, y, dist)
     }
 
-    fn entity_move_to_internal(entity: &Rc<RefCell<EntityState>>, x: f32, y: f32, dist: f32) -> bool {
+    pub fn move_towards(entity: &Rc<RefCell<EntityState>>, target: &Rc<RefCell<EntityState>>) -> bool {
+        let (x, y, dist) = GameState::get_target(entity, target);
+        GameState::move_to_internal(entity, x, y, dist)
+    }
+
+    pub fn can_move_to(entity: &Rc<RefCell<EntityState>>, x: i32, y: i32) -> bool {
+        GameState::can_move_to_internal(entity, x as f32, y as f32, 0.0)
+    }
+
+    pub fn move_to(entity: &Rc<RefCell<EntityState>>, x: i32, y: i32) -> bool {
+        GameState::move_to_internal(entity, x as f32, y as f32, 0.0)
+    }
+
+    fn move_to_internal(entity: &Rc<RefCell<EntityState>>, x: f32, y: f32, dist: f32) -> bool {
         STATE.with(|s| {
             let mut state = s.borrow_mut();
             let state = state.as_mut().unwrap();
             let area_state = state.area_state.borrow();
-            trace!("Moving '{}' to {},{}", entity.borrow().actor.actor.name, x, y);
+            debug!("Moving '{}' to {},{}", entity.borrow().actor.actor.name, x, y);
 
-            let start_time = time::Instant::now();
+            // let start_time = time::Instant::now();
             let path = match state.path_finder.find(&area_state, entity.borrow(), x, y, dist) {
                 None => return false,
                 Some(path) => path,
             };
-            debug!("Path finding complete in {} secs", animation::format_elapsed_secs(start_time.elapsed()));
+            // info!("Path finding complete in {} secs", animation::format_elapsed_secs(start_time.elapsed()));
 
             for anim in state.animations.iter_mut() {
                 anim.check(entity);
@@ -341,6 +366,23 @@ impl GameState {
             let anim = MoveAnimation::new(entity, path, CONFIG.display.animation_base_time_millis);
             state.animations.push(Box::new(anim));
             true
+        })
+    }
+
+    fn can_move_to_internal(entity: &Rc<RefCell<EntityState>>, x: f32, y: f32, dist: f32) -> bool {
+        STATE.with(|s| {
+            let mut state = s.borrow_mut();
+            let state = state.as_mut().unwrap();
+            let area_state = state.area_state.borrow();
+
+            // let start_time = time::Instant::now();
+            let val = match state.path_finder.find(&area_state, entity.borrow(), x, y, dist) {
+                None => false,
+                Some(_) => true,
+            };
+            // info!("Path finding complete in {} secs", animation::format_elapsed_secs(start_time.elapsed()));
+
+            val
         })
     }
 }

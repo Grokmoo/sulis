@@ -75,7 +75,7 @@ impl ActionMenu {
             Box::new(move || {
                 trace!("Firing attack callback.");
                 let pc = GameState::pc();
-                pc.borrow_mut().attack(&entity_ref);
+                EntityState::attack(&pc, &entity_ref);
             })
         } else {
             Box::new(|| { })
@@ -88,12 +88,7 @@ impl ActionMenu {
             return false;
         }
 
-        let size = pc.borrow().size();
-        let area_state = GameState::area_state();
-        let ok = area_state.borrow().is_passable(&pc.borrow(),
-            self.area_pos.x - size / 2,
-            self.area_pos.y - size / 2);
-        ok
+        GameState::can_move_to(&pc, self.area_pos.x, self.area_pos.y)
     }
 
     pub fn move_callback(&self) -> Box<Fn()> {
@@ -102,7 +97,7 @@ impl ActionMenu {
         let y = self.area_pos.y;
         Box::new(move || {
             trace!("Firing move callback.");
-            GameState::entity_move_to(&pc, x, y);
+            GameState::move_to(&pc, x, y);
         })
     }
 
@@ -122,7 +117,7 @@ impl ActionMenu {
     }
 
     pub fn is_default_callback_valid(&self) -> bool {
-        self.is_move_valid()
+        self.is_attack_valid() || self.is_move_valid()
     }
 }
 

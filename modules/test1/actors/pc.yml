@@ -6,6 +6,6 @@ image_display: tiles/pc
 race: human
 sex: Male
 levels:
-  fighter: 1
+  fighter: 3
 items: [ sword, club, backpack, apple ]
 equipped: [ 0 ]

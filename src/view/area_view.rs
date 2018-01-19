@@ -200,11 +200,11 @@ impl WidgetKind for AreaView {
 
         for entity in state.entity_iter() {
             let entity = entity.borrow();
-            draw_list.append(&mut DrawList::from_sprite(
-                    &entity.actor.actor.image_display,
-                    entity.location.x + p.x - widget.state.scroll_pos.x,
-                    entity.location.y + p.y - widget.state.scroll_pos.y,
-                    entity.size(), entity.size()));
+            let size = entity.size() as f32;
+            let x = (entity.location.x + p.x - widget.state.scroll_pos.x) as f32 + entity.sub_pos.0;
+            let y = (entity.location.y + p.y - widget.state.scroll_pos.y) as f32 + entity.sub_pos.1;
+            draw_list.append(&mut DrawList::from_sprite_f32(
+                    &entity.actor.actor.image_display, x, y, size, size));
         }
 
         renderer.draw(draw_list);
@@ -215,6 +215,7 @@ impl WidgetKind for AreaView {
             renderer.draw(draw_list);
         }
 
+        GameState::draw_graphics_mode(renderer, pixel_size);
     }
 
     fn on_key_press(&self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
@@ -242,9 +243,15 @@ impl WidgetKind for AreaView {
         let (x, y) = self.get_cursor_pos(widget);
         if x < 0 || y < 0 { return true; }
 
+        let area_state = GameState::area_state();
         let action_menu = ActionMenu::new(x, y);
         if kind == ClickKind::Left {
             action_menu.fire_default_callback();
+
+            if let Some(entity) = area_state.borrow().get_entity_at(x, y) {
+                Widget::set_mouse_over(widget, EntityMouseover::new(&entity));
+            }
+
         } else if kind == ClickKind::Right {
             Widget::add_child_to(widget, Widget::with_defaults(action_menu));
         }
@@ -263,40 +270,38 @@ impl WidgetKind for AreaView {
             state.add_text_arg("1", &format!("{}", area_y));
         }
         self.mouse_over.borrow_mut().invalidate_layout();
+        self.clear_cursors();
 
-        let mut cursor_draw_list: Option<DrawList> = None;
         if let Some(entity) = area_state.borrow().get_entity_at(area_x, area_y) {
-            let index = entity.borrow().index;
+            Widget::set_mouse_over(widget, EntityMouseover::new(&entity));
+
             let pc = GameState::pc();
-            if index != pc.borrow().index {
-                Widget::set_mouse_over(widget, EntityMouseover::new(&entity));
+            if *pc.borrow() != *entity.borrow() {
                 let sprite = &entity.borrow().size.cursor_sprite;
                 let x = entity.borrow().location.x;
                 let y = entity.borrow().location.y;
                 let size = entity.borrow().size();
-                cursor_draw_list = Some(DrawList::from_sprite(sprite, x, y, size, size));
+
+                let mut cursor = DrawList::from_sprite(sprite, x, y, size, size);
+                cursor.set_color(color::RED);
+                self.add_cursor(cursor);
             }
         }
 
-        self.clear_cursors();
-        if let Some(mut cursor_draw_list) = cursor_draw_list {
-            cursor_draw_list.set_color(color::RED);
-            self.add_cursor(cursor_draw_list);
-        } else {
-            let pc = GameState::pc();
-            let size = pc.borrow().size();
+        let pc = GameState::pc();
+        let size = pc.borrow().size();
 
-            let (c_x, c_y) = self.get_cursor_pos_no_scroll(widget);
-            let mut draw_list = DrawList::from_sprite(&pc.borrow().size.cursor_sprite,
-                c_x - size / 2, c_y - size / 2, size, size);
+        let (c_x, c_y) = self.get_cursor_pos_no_scroll(widget);
+        let mut draw_list = DrawList::from_sprite(&pc.borrow().size.cursor_sprite,
+        c_x - size / 2, c_y - size / 2, size, size);
 
-            let action_menu = ActionMenu::new(area_x, area_y);
-            if !action_menu.is_default_callback_valid() {
-                draw_list.set_color(color::RED);
-            }
-
-            self.add_cursor(draw_list);
+        let action_menu = ActionMenu::new(area_x, area_y);
+        if !action_menu.is_default_callback_valid() {
+            draw_list.set_color(color::RED);
         }
+
+        self.add_cursor(draw_list);
+
         true
     }
 

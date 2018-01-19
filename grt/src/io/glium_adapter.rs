@@ -169,13 +169,25 @@ impl GliumDisplay {
 
 impl IO for GliumDisplay {
     fn process_input(&mut self, root: Rc<RefCell<Widget>>) {
-        let display_size = self.display.gl_window().get_inner_size();
+        let mut mouse_move: Option<(f32, f32)> = None;
+        let (width, height) = self.display.gl_window().get_inner_size().unwrap();
         self.events_loop.poll_events(|event| {
             if let glutin::Event::WindowEvent { event, .. } = event {
-                InputAction::handle_action(process_window_event(event, display_size),
-                    Rc::clone(&root));
+                match event {
+                    glium::glutin::WindowEvent::CursorMoved { position, .. } => {
+                        let mouse_x = (CONFIG.display.width as f64 * position.0 / width as f64) as f32;
+                        let mouse_y = (CONFIG.display.height as f64 * position.1 / height as f64) as f32;
+                        mouse_move = Some((mouse_x, mouse_y));
+                    },
+                    _ => InputAction::handle_action(process_window_event(event), Rc::clone(&root)),
+                }
             }
         });
+
+        // merge all mouse move events into at most one per frame
+        if let Some((mouse_x, mouse_y)) = mouse_move {
+            InputAction::handle_action(Some(InputAction::MouseMove(mouse_x, mouse_y)), Rc::clone(&root));
+        }
     }
 
     fn render_output(&mut self, root: Ref<Widget>, millis: u32) {
@@ -208,19 +220,11 @@ fn get_min_filter(filter: TextureMinFilter) -> MinifySamplerFilter {
     }
 }
 
-fn process_window_event(event: glutin::WindowEvent,
-                        display_size: Option<(u32, u32)>) -> Option<InputAction> {
+fn process_window_event(event: glutin::WindowEvent) -> Option<InputAction> {
     use glium::glutin::WindowEvent::*;
     match event {
         Closed => Some(InputAction::Exit),
         KeyboardInput { input, .. } => CONFIG.get_input_action(process_keyboard_input(input)),
-        CursorMoved { position, .. } => {
-            let (width, height) = display_size.unwrap();
-            let mouse_x = (CONFIG.display.width as f64 * position.0 / width as f64) as f32;
-            let mouse_y = (CONFIG.display.height as f64 * position.1 / height as f64) as f32;
-
-            Some(InputAction::MouseMove(mouse_x, mouse_y))
-        },
         MouseInput { state, button, .. } => {
             let kind = match button {
                 glium::glutin::MouseButton::Left => ClickKind::Left,

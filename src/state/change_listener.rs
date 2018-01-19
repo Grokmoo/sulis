@@ -17,6 +17,7 @@ impl<T> Default for ChangeListenerList<T> {
 
 impl<T> ChangeListenerList<T> {
     pub fn add(&mut self, listener: ChangeListener<T>) {
+        self.remove(listener.id);
         self.listeners.push(listener);
     }
 

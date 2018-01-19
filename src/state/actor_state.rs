@@ -39,7 +39,10 @@ impl ActorState {
         }
     }
 
-    /// this method is only to be called by `EntityState#can_attack`
+    pub fn can_reach(&self, dist: f32) -> bool {
+        dist < self.stats.reach
+    }
+
     pub(in state) fn can_attack(&self, _target: &Rc<RefCell<EntityState>>, dist: f32) -> bool {
         trace!("Checking can attack for '{}' with reach of {}.  Distance to target is {}",
                self.actor.name, self.stats.reach, dist);
@@ -47,11 +50,10 @@ impl ActorState {
         let attack_ap = Module::rules().attack_ap;
         if self.ap < attack_ap { return false; }
 
-        dist < self.stats.reach
+        self.can_reach(dist)
     }
 
-    /// this method is only to be called by `EntityState#attack`
-    pub(in state) fn attack(&mut self, target: &Rc<RefCell<EntityState>>) {
+    pub fn attack(&mut self, target: &Rc<RefCell<EntityState>>) {
         let amount = self.stats.damage.roll();
         info!("'{}' attacks '{}' for {} damage", self.actor.name,
               target.borrow().actor.actor.name, amount);
@@ -87,6 +89,11 @@ impl ActorState {
 
     pub fn ap(&self) -> u32 {
         self.ap
+    }
+
+    pub fn get_move_ap_cost(&self, squares: u32) -> u32 {
+        let rules = Module::rules();
+        rules.movement_ap * squares
     }
 
     pub(in state) fn remove_ap(&mut self, ap: u32) {

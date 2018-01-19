@@ -1,15 +1,19 @@
-use module::{Actor, EntitySize, EntitySizeIterator};
-use module::area::Transition;
-use state::{ActorState, AreaState, Location};
-
 use std::rc::Rc;
 use std::cell::RefCell;
+
+use grt::config::CONFIG;
+
+use animation::AttackAnimation;
+use module::{Actor, EntitySize, EntitySizeIterator};
+use module::area::Transition;
+use state::{ActorState, AreaState, GameState, Location};
 
 pub struct EntityState {
     pub actor: ActorState,
     pub location: Location,
     pub size: Rc<EntitySize>,
     pub index: usize, // index in vec of the owning area state
+    pub sub_pos: (f32, f32),
 
     is_pc: bool,
     marked_for_removal: bool,
@@ -31,6 +35,7 @@ impl EntityState {
         EntityState {
             actor: actor_state,
             location,
+            sub_pos: (0.0, 0.0),
             size,
             index,
             is_pc,
@@ -46,14 +51,30 @@ impl EntityState {
         self.marked_for_removal
     }
 
+    /// Returns true if this entity has enough AP to move at least 1 square,
+    /// false otherwise
+    pub fn can_move(&self) -> bool {
+        self.actor.ap() >= self.actor.get_move_ap_cost(1)
+    }
+
+    /// Returns true if this entity can reach the specified target with its
+    /// current weapon, without moving, false otherwise
+    pub fn can_reach(&self, target: &Rc<RefCell<EntityState>>) -> bool {
+        self.actor.can_reach(self.dist_to_entity(target))
+    }
+
+    /// Returns true if this entity can attack the specified target with its
+    /// current weapon, without moving
     pub fn can_attack(&self, target: &Rc<RefCell<EntityState>>) -> bool {
         let dist = self.dist_to_entity(target);
 
         self.actor.can_attack(target, dist)
     }
 
-    pub fn attack(&mut self, target: &Rc<RefCell<EntityState>>) {
-        self.actor.attack(target);
+    pub fn attack(entity: &Rc<RefCell<EntityState>>, target: &Rc<RefCell<EntityState>>) {
+        let anim = AttackAnimation::new(entity, target,
+                                        CONFIG.display.animation_base_time_millis * 5);
+        GameState::add_animation(Box::new(anim));
     }
 
     pub fn remove_hp(&mut self, hp: u32) {
@@ -65,7 +86,7 @@ impl EntityState {
         }
     }
 
-    pub fn move_to(&mut self, area_state: &mut AreaState, x: i32, y: i32, ap_cost: u32) -> bool {
+    pub fn move_to(&mut self, area_state: &mut AreaState, x: i32, y: i32, squares: u32) -> bool {
         trace!("Move to {},{}", x, y);
         if !self.location.coords_valid(x, y) { return false; }
         if !self.location.coords_valid(x + self.size() - 1, y + self.size() - 1) {
@@ -76,6 +97,7 @@ impl EntityState {
             return false;
         }
 
+        let ap_cost = self.actor.get_move_ap_cost(squares);
         if self.actor.ap() < ap_cost {
             return false;
         }

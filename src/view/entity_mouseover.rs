@@ -29,8 +29,7 @@ impl WidgetKind for EntityMouseover {
     }
 
     fn on_remove(&self) {
-        self.entity.borrow_mut().actor.listeners.remove(NAME);
-        trace!("Removed entity mouseover");
+        //self.entity.borrow_mut().actor.listeners.remove(NAME);
     }
 
     fn on_add(&self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
@@ -41,6 +40,7 @@ impl WidgetKind for EntityMouseover {
     }
 
     fn layout(&self, widget: &mut Widget) {
+        info!("Layout entity mouseover");
         widget.state.add_text_arg("name", &self.entity.borrow().actor.actor.name);
         widget.state.add_text_arg("cur_hp", &self.entity.borrow().actor.hp().to_string());
         widget.state.add_text_arg("max_hp", &self.entity.borrow().actor.stats.max_hp.to_string());

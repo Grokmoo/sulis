@@ -3,6 +3,9 @@ use std::cmp;
 use std::rc::Rc;
 use std::cell::RefCell;
 
+mod attack_animation;
+pub use self::attack_animation::AttackAnimation;
+
 mod move_animation;
 pub use self::move_animation::MoveAnimation;
 
@@ -10,6 +13,9 @@ mod wait_animation;
 pub use self::wait_animation::WaitAnimation;
 
 use state::{AreaState, EntityState};
+
+use grt::io::GraphicsRenderer;
+use grt::util::Point;
 
 pub trait Animation {
     fn update(&mut self, area_state: &mut AreaState) -> bool;
@@ -20,6 +26,8 @@ pub trait Animation {
     fn check(&mut self, _entity: &Rc<RefCell<EntityState>>) { }
 
     fn get_owner(&self) -> &Rc<RefCell<EntityState>>;
+
+    fn draw_graphics_mode(&self, _renderer: &mut GraphicsRenderer, _pixel_size: Point) { }
 }
 
 /// Helper function to return the number of milliseconds elapsed in

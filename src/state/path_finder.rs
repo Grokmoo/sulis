@@ -1,6 +1,6 @@
 use std::cell::Ref;
 use std::collections::{HashMap, HashSet};
-use std::f32;
+use std::{f32, ptr};
 
 use grt::util::Point;
 use module::Area;
@@ -60,6 +60,7 @@ impl PathFinder {
         debug!("Finding path from {:?} to within {} of {},{}",
                requester.location, dest_dist, dest_x, dest_y);
 
+        // let start_time = time::Instant::now();
         self.goal_x = dest_x;
         self.goal_y = dest_y;
         self.requester_center_x = requester.size.size as f32 / 2.0 - 0.5;
@@ -74,34 +75,35 @@ impl PathFinder {
         // the set of nodes that have already been evaluated
         self.closed.clear();
 
-        // initialize closed set based on passability
-        let mut i = 0;
-        for y in 0..self.height {
-            for x in 0..self.width {
-                if !area_state.is_passable(&requester, x, y) {
-                    self.closed.insert(i);
-                }
-
-                i += 1;
-            }
-        }
-
         // for each node, the node it can be most efficiently reached from
         self.came_from.clear();
 
+        // let f_g_init_time = time::Instant::now();
+        unsafe {
+            // memset g_score and f_score to a large floating point number
+            // benchmarking revealed that setting these values using the naive
+            // approach below is the majority of time spent for most
+            // path finds
+            ptr::write_bytes(self.g_score.as_mut_ptr(), 127, self.g_score.len() - 1);
+            ptr::write_bytes(self.f_score.as_mut_ptr(), 127, self.f_score.len() - 1);
+        }
+
         // for each node, cost of getting from start to that node
-        self.g_score.iter_mut().for_each(|v| *v = f32::INFINITY);
+        // self.g_score.iter_mut().for_each(|v| *v = f32::INFINITY);
+        // for each node, total cost of getting from start to goal passing by this node
+        // self.f_score.iter_mut().for_each(|v| *v = f32::INFINITY);
 
-        // for each node, total cost of getting from start to goal passing by
-        // this node
-        self.f_score.iter_mut().for_each(|v| *v = f32::INFINITY);
+        self.g_score[start as usize] = 0.0;
+        self.f_score[start as usize] = self.dist_squared(start);
+        // info!("F and G score init: {}", animation::format_elapsed_secs(f_g_init_time.elapsed()));
 
-        *self.g_score.get_mut(start as usize).unwrap() = 0.0;
-        *self.f_score.get_mut(start as usize).unwrap() = self.dist_squared(start);
+        // info!("Spent {} secs in path find init", animation::format_elapsed_secs(start_time.elapsed()));
 
+        // let loop_start_time = time::Instant::now();
         while !self.open.is_empty() {
             let current = self.find_lowest_f_score_in_open_set();
             if self.is_goal(current, dest_dist_squared) {
+                // info!("Path find loop time: {}", animation::format_elapsed_secs(loop_start_time.elapsed()));
                 return Some(self.reconstruct_path(current));
             }
 
@@ -115,21 +117,29 @@ impl PathFinder {
                     continue; // neighbor has already been evaluated
                 }
 
+                // we compute the passability of each point as needed here
+                let neighbor_x = neighbor % self.width;
+                let neighbor_y = neighbor / self.width;
+                if !area_state.is_passable(&requester, neighbor_x, neighbor_y) {
+                    self.closed.insert(neighbor);
+                    trace!("Not passable");
+                    continue;
+                }
+
                 if !self.open.contains(&neighbor) {
                     self.open.insert(neighbor);
                 }
 
-                let tentative_g_score = self.g_score.get(current as usize).unwrap() +
+                let tentative_g_score = self.g_score[current as usize] +
                     self.get_cost(current, neighbor);
-                if tentative_g_score >= *self.g_score.get(neighbor as usize).unwrap() {
+                if tentative_g_score >= self.g_score[neighbor as usize] {
                     trace!("G score indicates this neighbor is not preferable.");
                     continue; // this is not a better path
                 }
 
                 self.came_from.insert(neighbor, current);
-                *self.g_score.get_mut(neighbor as usize).unwrap() = tentative_g_score;
-                *self.f_score.get_mut(neighbor as usize).unwrap() = tentative_g_score +
-                    self.dist_squared(neighbor);
+                self.g_score[neighbor as usize] = tentative_g_score;
+                self.f_score[neighbor as usize] = tentative_g_score + self.dist_squared(neighbor);
             }
         }
 
@@ -143,6 +153,7 @@ impl PathFinder {
     fn reconstruct_path(&self, current: i32) -> Vec<Point> {
         trace!("Reconstructing path");
 
+        // let path_reconstruct_time = time::Instant::now();
         let mut path: Vec<Point> = Vec::new();
 
         path.push(self.get_point(current));
@@ -158,9 +169,9 @@ impl PathFinder {
 
         // remove the last point which is the entity start pos
         path.pop();
-        trace!("Path reconstructed.  reversing.");
         path.reverse();
         debug!("Found path: {:?}", path);
+        // info!("Reconstruct path time: {}", animation::format_elapsed_secs(path_reconstruct_time.elapsed()));
         path
     }
 
@@ -196,7 +207,7 @@ impl PathFinder {
         let mut lowest_index = 0;
 
         for val in self.open.iter() {
-            let f_score = self.f_score.get(*val as usize).unwrap();
+            let f_score = &self.f_score[*val as usize];
             if f_score < &lowest {
                 lowest = *f_score;
                 lowest_index = *val;

@@ -15,7 +15,7 @@ impl fmt::Debug for PathFinderGrid {
         write!(f, "PathFinderGrid of size {}\n  ", self.size.size)?;
         for y in 0..self.height {
             for x in 0..self.width {
-                if *self.passable.get((x + y * self.width) as usize).unwrap() {
+                if self.passable[(x + y * self.width) as usize] {
                     write!(f, ".")?;
                 } else {
                     write!(f, "X")?;
@@ -47,7 +47,7 @@ impl PathFinderGrid {
                         break;
                     }
                 }
-                *passable.get_mut((x + y * width) as usize).unwrap() = is_passable;
+                passable[(x + y * width) as usize] = is_passable;
             }
         }
 
@@ -64,10 +64,10 @@ impl PathFinderGrid {
     }
 
     pub fn is_passable(&self, x: i32, y: i32) -> bool {
-        *self.passable.get((x + y * self.width) as usize).unwrap()
+        self.passable[(x + y * self.width) as usize]
     }
 
     pub fn is_passable_index(&self, index: i32) -> bool {
-        *self.passable.get(index as usize).unwrap()
+        self.passable[index as usize]
     }
 }

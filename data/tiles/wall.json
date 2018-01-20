@@ -1,9 +1,0 @@
-{
-    "id": "wall",
-    "name": "Wall",
-    "layer": "base",
-    "width": 1,
-    "height": 1,
-    "image_display": "tiles/wall",
-    "impass": [[0, 0]]
-}

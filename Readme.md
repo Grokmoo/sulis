@@ -1,5 +1,5 @@
 # Sulis
-This is a game and game engine written in Rust.  It is currently in very early development.
+Sulis is a game and game engine written in Rust.  It is currently in very early development.
 
 ## Getting Started
 
@@ -21,7 +21,7 @@ You'll need recent versions of Rust and Cargo installed.  The game currently req
 * [Glium](https://github.com/glium/glium)
 
 ## Authors
-* **Jared Stephen** - *Initial Development* - [Grokmoo](https://github.com/Grokmoo)
+* **Jared Stephen** - *Development* - [Grokmoo](https://github.com/Grokmoo)
 
 ## Licensing
 

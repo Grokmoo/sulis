@@ -77,7 +77,7 @@ impl PathFinder {
                requester.location, dest_dist, dest_x, dest_y);
 
         // if we are looking for an exact goal, check to see if it is passable first
-        if dest_dist == 0.0 && !area_state.is_passable(&requester, dest_x as i32, dest_y as i32) {
+        if dest_dist < 1.0 && !area_state.is_passable(&requester, dest_x as i32, dest_y as i32) {
             trace!("Goal is not passable.");
             return None;
         }

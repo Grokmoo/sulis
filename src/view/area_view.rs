@@ -75,8 +75,8 @@ impl AreaView {
 
     fn get_cursor_pos(&self, widget: &Rc<RefCell<Widget>>) -> (i32, i32) {
         let pos = widget.borrow().state.position;
-        self.get_cursor_pos_scaled(pos.x - widget.borrow().state.scroll_pos.x
-                                   , pos.y - widget.borrow().state.scroll_pos.y)
+        let (x, y) = self.get_cursor_pos_scaled(pos.x, pos.y);
+        (x + widget.borrow().state.scroll_pos.x, y + widget.borrow().state.scroll_pos.y)
     }
 
     fn get_cursor_pos_scaled(&self, pos_x: i32, pos_y: i32) -> (i32, i32) {

@@ -18,7 +18,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use ui::{Label, LineRenderer, Widget, WidgetKind};
-use io::{event, GraphicsRenderer, TextRenderer};
+use io::{event, GraphicsRenderer};
 use util::Point;
 
 pub struct Button {
@@ -53,11 +53,6 @@ impl WidgetKind for Button {
         if let Some(ref font) = widget.state.font {
             widget.state.text_renderer = Some(Box::new(LineRenderer::new(font)));
         }
-    }
-
-    fn draw_text_mode(&self, renderer: &mut TextRenderer,
-                      widget: &Widget, millis: u32) {
-        self.label.draw_text_mode(renderer, widget, millis);
     }
 
     fn draw_graphics_mode(&self, renderer: &mut GraphicsRenderer, pixel_size: Point,

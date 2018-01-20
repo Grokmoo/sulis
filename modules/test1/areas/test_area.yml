@@ -26,10 +26,8 @@ transitions:
     to: [5, 5]
     to_area: "test_generate"
     image_display: "creatures/transition"
-    text_display: "*"
   - from: [15, 5]
     size: [2, 2]
     to: [5, 5]
     to_area: "test_256"
     image_display: "creatures/transition"
-    text_display: "*"

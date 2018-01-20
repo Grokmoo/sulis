@@ -4,12 +4,6 @@
     "layer": "base",
     "width" : 4,
     "height" : 4,
-    "text_display" : [
-		[".", ".", ".", "."],
-		[".", ".", ".", "."],
-		[".", ".", ".", "."],
-		[".", ".", ".", "."]
-	],
     "image_display": "tiles/grass4",
     "impass": []
 }

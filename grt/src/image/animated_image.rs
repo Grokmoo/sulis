@@ -23,9 +23,9 @@ use serde_yaml;
 
 use image::Image;
 use resource::ResourceBuilder;
-use io::{GraphicsRenderer, TextRenderer};
+use io::{GraphicsRenderer};
 use ui::AnimationState;
-use util::{Point, Size};
+use util::Size;
 
 #[derive(Debug)]
 pub struct AnimatedImage {
@@ -74,18 +74,6 @@ impl Image for AnimatedImage {
     fn draw_graphics_mode(&self, renderer: &mut GraphicsRenderer, state: &AnimationState,
                           x: f32, y: f32, w: f32, h: f32) {
         AnimationState::find_match(&self.images, state).draw_graphics_mode(renderer, state, x, y, w, h);
-    }
-
-    fn draw_text_mode(&self, renderer: &mut TextRenderer,
-                      state: &AnimationState, position: &Point) {
-        AnimationState::find_match(&self.images, state)
-            .draw_text_mode(renderer, state, position);
-    }
-
-    fn fill_text_mode(&self, renderer: &mut TextRenderer, state: &AnimationState,
-                      position: &Point, size: &Size) {
-        AnimationState::find_match(&self.images, state)
-            .fill_text_mode(renderer, state, position, size);
     }
 
     fn get_width_f32(&self) -> f32 {

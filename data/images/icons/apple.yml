@@ -1,4 +1,3 @@
 id: apple
 size: [1, 1]
-text_display: [ "@" ]
 image_display: "gui/empty"

@@ -16,4 +16,3 @@ transitions:
     to: [15, 5]
     to_area: "test_area"
     image_display: "creatures/transition"
-    text_display: "*"

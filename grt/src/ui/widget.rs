@@ -18,7 +18,7 @@ use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use io::{event, Event, GraphicsRenderer, TextRenderer};
+use io::{event, Event, GraphicsRenderer};
 use ui::{Cursor, Theme, WidgetState, WidgetKind};
 use resource::ResourceSet;
 use util::Point;
@@ -42,19 +42,6 @@ pub struct Widget {
 impl Widget {
     pub fn has_modal(&self) -> bool {
         self.modal_child.is_some()
-    }
-
-    pub fn draw_text_mode(&self, renderer: &mut TextRenderer, millis: u32) {
-        if let Some(ref image) = self.state.background {
-            image.fill_text_mode(renderer, &self.state.animation_state,
-                &self.state.position, &self.state.size);
-        }
-
-        self.kind.draw_text_mode(renderer, self, millis);
-
-        for child in self.children.iter() {
-            child.borrow().draw_text_mode(renderer, millis);
-        }
     }
 
     pub fn draw_graphics_mode(&self, renderer: &mut GraphicsRenderer, pixel_size: Point, millis: u32) {

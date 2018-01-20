@@ -112,7 +112,6 @@ pub struct Theme {
 
 impl Theme {
     pub fn new(name: &str, builder: ThemeBuilder) -> Theme {
-
         let mut children: HashMap<String, Rc<Theme>> = HashMap::new();
 
         if let Some(builder_children) = builder.children {

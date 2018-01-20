@@ -15,8 +15,6 @@ You'll need recent versions of Rust and Cargo installed.  The game currently req
 1. Run the game with `cargo run`
 
 ## Built With
-* [Pancurses](https://github.com/ihalila/pancurses)
-* [Termion](https://github.com/ticki/termion)
 * [Serde](https://serde.rs/)
 * [Glium](https://github.com/glium/glium)
 

@@ -29,33 +29,13 @@ pub struct Tile {
     pub width: i32,
     pub height: i32,
     pub layer: String,
-    pub text_display: Vec<char>,
     pub image_display: Rc<Sprite>,
     pub impass: Vec<Point>,
 }
 
 impl Tile {
     pub fn new(builder: TileBuilder) -> Result<Tile, Error> {
-        let mut display_vec: Vec<char> = Vec::new();
         let mut impass_points: Vec<Point> = Vec::new();
-
-        for (y, xs) in builder.text_display.into_iter().enumerate() {
-            if y >= builder.height {
-                return Err(Error::new(ErrorKind::InvalidData,
-                                      format!("Text display has too many rows, must have '{}'",
-                                              builder.height)));
-            }
-            for (x, disp) in xs.into_iter().enumerate() {
-                if x >= builder.width {
-                    return Err(
-                        Error::new(ErrorKind::InvalidData,
-                                   format!("Text display row has too many columns, must have '{}'",
-                                           builder.width))
-                        );
-                }
-                display_vec.push(disp);
-            }
-        }
 
         for p in builder.impass.into_iter() {
             // allow an empty vector (no impass points)
@@ -86,14 +66,9 @@ impl Tile {
             layer: builder.layer,
             width: builder.width as i32,
             height: builder.height as i32,
-            text_display: display_vec,
             image_display: sprite,
             impass: impass_points,
         })
-    }
-
-    pub fn get_text_display(&self, x: i32, y: i32) -> char {
-        *self.text_display.get((x + y * self.width) as usize).unwrap()
     }
 }
 
@@ -111,7 +86,6 @@ pub struct TileBuilder {
     pub width: usize,
     pub height: usize,
     pub layer: String,
-    pub text_display: Vec<Vec<char>>,
     image_display: String,
     pub impass: Vec<Vec<usize>>,
 }

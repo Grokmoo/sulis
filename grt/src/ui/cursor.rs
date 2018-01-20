@@ -17,13 +17,12 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use io::{event, Event, TextRenderer};
+use io::{event, Event};
 use config::CONFIG;
 use ui::Widget;
 use util::Point;
 
 pub struct Cursor {
-    pub c: char,
     pub x: i32,
     pub y: i32,
     pub max_x: i32,
@@ -39,7 +38,6 @@ thread_local! {
         y: 0,
         max_x: CONFIG.display.width,
         max_y: CONFIG.display.height,
-        c: CONFIG.display.cursor_char,
         xf: 0.0,
         yf: 0.0,
     });
@@ -128,15 +126,5 @@ impl Cursor {
 
     pub fn get_y_f32() -> f32 {
         CURSOR.with(|c| c.borrow().yf)
-    }
-
-    pub fn draw_text_mode(renderer: &mut TextRenderer, millis: u32) {
-        if millis % 1_000 < 500 { return; }
-
-        CURSOR.with(|c| {
-            let cursor = c.borrow();
-            renderer.set_cursor_pos(cursor.x, cursor.y);
-            renderer.render_char(cursor.c);
-        });
     }
 }

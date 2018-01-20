@@ -18,7 +18,7 @@ use std::rc::Rc;
 
 use ui::theme::{HorizontalTextAlignment, VerticalTextAlignment};
 use ui::{LineRenderer, Widget, WidgetKind};
-use io::{GraphicsRenderer, TextRenderer};
+use io::GraphicsRenderer;
 use util::Point;
 
 pub struct Label {
@@ -96,12 +96,5 @@ impl WidgetKind for Label {
         let width = font.get_width(&widget.state.text) as f32 * scale / font.line_height as f32;
         let (x, y, text) = Label::get_draw_params(width, scale, widget);
         font_rend.render(renderer, text, x, y, &widget.state.text_params);
-    }
-
-    fn draw_text_mode(&self, renderer: &mut TextRenderer, widget: &Widget,
-                      _millis: u32) {
-        let (x, y, text) = Label::get_draw_params(widget.state.text.len() as f32, 1.0, widget);
-        renderer.set_cursor_pos(x as i32, y as i32);
-        renderer.render_string(&text);
     }
 }

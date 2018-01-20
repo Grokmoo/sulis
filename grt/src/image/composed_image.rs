@@ -20,9 +20,9 @@ use std::collections::HashMap;
 
 use image::Image;
 use resource::ResourceBuilder;
-use io::{self, GraphicsRenderer, TextRenderer};
+use io::{self, GraphicsRenderer};
 use ui::AnimationState;
-use util::{Point, Size};
+use util::Size;
 
 use serde_json;
 use serde_yaml;
@@ -112,78 +112,6 @@ impl ComposedImage {
 }
 
 impl Image for ComposedImage {
-    fn draw_text_mode(&self, renderer: &mut TextRenderer, state: &AnimationState,
-                      position: &Point) {
-        let x = position.x;
-        let y = position.y;
-        renderer.set_cursor_pos(x, y);
-
-        let mut cur_x = x;
-        let mut cur_y = y;
-        for (index, image) in self.images.iter().enumerate() {
-            let index = index as i32;
-            image.draw_text_mode(renderer, state, &Point::new(cur_x, cur_y));
-
-            if index % GRID_DIM == GRID_DIM - 1 {
-                cur_x = x;
-                cur_y += image.get_size().height;
-            }
-        }
-    }
-
-    //// Renders text for this composed image to the given coordinates.
-    //// This method assumes that 'GRID_DIM' equals 3 for simplicity
-    //// and performance purposes.
-    fn fill_text_mode(&self, renderer: &mut TextRenderer, state: &AnimationState,
-                      position: &Point, size: &Size) {
-        let fill_size = *size - (self.size - self.middle_size);
-        let mut draw_pos = Point::from(position);
-        let mut draw_size = Size::from(&fill_size);
-
-        unsafe {
-            let image = self.images.get_unchecked(0);
-            image.draw_text_mode(renderer, state, &draw_pos);
-
-            let image = self.images.get_unchecked(1);
-            draw_size.set_height(image.get_size().height);
-            draw_pos.add_x(image.get_size().width);
-            image.fill_text_mode(renderer, state, &draw_pos, &draw_size);
-
-            let image = self.images.get_unchecked(2);
-            draw_pos.add_x(fill_size.width);
-            image.draw_text_mode(renderer, state, &draw_pos);
-
-            let image = self.images.get_unchecked(3);
-            draw_pos.set_x(position.x);
-            draw_pos.add_y(image.get_size().height);
-            draw_size.set(image.get_size().width, fill_size.height);
-            image.fill_text_mode(renderer, state, &draw_pos, &draw_size);
-
-            let image = self.images.get_unchecked(4);
-            draw_pos.add_x(image.get_size().width);
-            image.fill_text_mode(renderer, state, &draw_pos, &fill_size);
-
-            let image = self.images.get_unchecked(5);
-            draw_pos.add_x(fill_size.width);
-            draw_size.set_width(image.get_size().width);
-            image.fill_text_mode(renderer, state, &draw_pos, &draw_size);
-
-            let image = self.images.get_unchecked(6);
-            draw_pos.add_y(fill_size.height);
-            draw_pos.set_x(position.x);
-            image.draw_text_mode(renderer, state, &draw_pos);
-
-            let image = self.images.get_unchecked(7);
-            draw_pos.add_x(image.get_size().width);
-            draw_size.set(fill_size.width, image.get_size().height);
-            image.fill_text_mode(renderer, state, &draw_pos, &draw_size);
-
-            let image = self.images.get_unchecked(8);
-            draw_pos.add_x(fill_size.width);
-            image.draw_text_mode(renderer, state, &draw_pos);
-        }
-    }
-
     fn draw_graphics_mode(&self, renderer: &mut GraphicsRenderer, state: &AnimationState,
                           x: f32, y: f32, w: f32, h: f32) {
         let fill_width = 2.0 * io::GFX_BORDER_SCALE

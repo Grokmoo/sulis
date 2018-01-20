@@ -1,6 +1,5 @@
 {
     "id": "bg_top_left_base",
     "size": [ 1, 1 ],
-    "text_display": [ "┌" ],
     "image_display": "gui/bg_top_left_base"
 }

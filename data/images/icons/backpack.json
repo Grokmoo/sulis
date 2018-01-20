@@ -1,6 +1,5 @@
 {
   "id": "backpack",
   "size": [1, 1],
-  "text_display": [ "B" ],
   "image_display": "gui/empty"
 }

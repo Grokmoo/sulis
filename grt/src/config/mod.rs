@@ -48,7 +48,6 @@ pub struct DisplayConfig {
     pub animation_base_time_millis: u32,
     pub width: i32,
     pub height: i32,
-    pub cursor_char: char,
     pub width_pixels: u32,
     pub height_pixels: u32,
 }
@@ -69,8 +68,6 @@ pub struct InputConfig {
 #[serde(deny_unknown_fields)]
 pub enum IOAdapter {
     Auto,
-    Pancurses,
-    Termion,
     Glium,
 }
 

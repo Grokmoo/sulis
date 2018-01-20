@@ -1,6 +1,5 @@
 {
     "id": "bg_bottom_left_mouseover",
     "size": [ 1, 1 ],
-    "text_display": [ "╚" ],
     "image_display": "gui/bg_bottom_left_hover"
 }

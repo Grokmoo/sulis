@@ -4,7 +4,6 @@
     "layer": "base",
     "width": 1,
     "height": 1,
-    "text_display": [["╬"]],
     "image_display": "tiles/wall",
     "impass": [[0, 0]]
 }

@@ -38,7 +38,6 @@ pub struct Transition {
     pub to: Point,
     pub to_area: Option<String>,
     pub image_display: Rc<Sprite>,
-    pub text_display: char,
 }
 
 #[derive(Deserialize, Debug)]
@@ -107,7 +106,6 @@ impl Area {
                 to: t_builder.to,
                 size: t_builder.size,
                 to_area: t_builder.to_area,
-                text_display: t_builder.text_display,
                 image_display: sprite,
             };
             transitions.push(transition);
@@ -181,5 +179,4 @@ pub struct TransitionBuilder {
     pub to: Point,
     pub to_area: Option<String>,
     pub image_display: String,
-    pub text_display: char,
 }

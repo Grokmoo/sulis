@@ -1,0 +1,35 @@
+id: test_area
+name: "Test Area"
+width: 40
+height: 20
+generate: false
+layers:
+  - base
+  - object
+entity_layer: 0
+terrain:
+  grass4: [
+    [0, 0], [4, 0], [8, 0], [12, 0], [16, 0], [20, 0], [24, 0], [28, 0], [32, 0], [36, 0],
+    [0, 4], [4, 4], [8, 4], [12, 4], [16, 4], [20, 4], [24, 4], [28, 4], [32, 4], [36, 4],
+    [0, 8], [4, 8], [8, 8], [12, 8], [16, 8], [20, 8], [24, 8], [28, 8], [32, 8], [36, 8],
+    [0, 12], [4, 12], [8, 12], [12, 12], [16, 12], [20, 12], [24, 12], [28, 12], [32, 12], [36, 12],
+    [0, 16], [4, 16], [8, 16], [12, 16], [16, 16], [20, 16], [24, 16], [28, 16], [32, 16], [36, 16] ]
+  tree01: [ [15, 8], [24, 2] ]
+actors:
+  - id: goblin
+    location: [15, 15]
+  - id: goblin
+    location: [24, 5]
+transitions:
+  - from: [10, 10]
+    size: [2, 2]
+    to: [5, 5]
+    to_area: "test_generate"
+    image_display: "creatures/transition"
+    text_display: "*"
+  - from: [15, 5]
+    size: [2, 2]
+    to: [5, 5]
+    to_area: "test_256"
+    image_display: "creatures/transition"
+    text_display: "*"

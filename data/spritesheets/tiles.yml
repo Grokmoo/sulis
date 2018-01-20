@@ -1,19 +1,43 @@
 id: tiles
 src: "tiles.png"
-size: [ 256, 256 ]
+size: [ 512, 512 ]
 groups:
   1by1:
     size: [16, 16]
     areas:
-      floor: [0, 0]
-      wall: [16, 0]
-      transition: [32, 0]
-  3by3:
-    size: [48, 48]
+      floor: [480, 0]
+      wall: [496, 0]
+  2by2:
+    size: [32, 32]
     areas:
-      goblin: [80, 0]
-  5by5:
-    size: [80, 80]
+      grass2: [0, 0]
+      dirt2: [0, 64]
+      grass_to_dirt_se: [64, 0]
+      grass_to_dirt_sw: [96, 0]
+      grass_to_dirt_ne: [64, 32]
+      grass_to_dirt_nw: [96, 32]
+      dirt_to_grass_se: [128, 0]
+      dirt_to_grass_sw: [160, 0]
+      dirt_to_grass_ne: [128, 32]
+      dirt_to_grass_nw: [160, 32]
+      grass_to_dirt_s: [192, 0]
+      grass_to_dirt_n: [224, 0]
+      grass_to_dirt_e: [192, 32]
+      grass_to_dirt_w: [224, 32]
+      grass_to_dirt_02_se: [256, 0]
+      grass_to_dirt_02_sw: [288, 0]
+      grass_to_dirt_02_ne: [256, 32]
+      grass_to_dirt_02_nw: [288, 32]
+  4by4:
+    size: [64, 64]
     areas:
-      floor5: [0, 16]
-      pc: [0, 96]
+      grass4: [0, 0]
+      dirt4: [0, 64]
+  6by6:
+    size: [96, 96]
+    areas:
+      dirt6: [0, 64]
+  big:
+    areas:
+      tree01: [0, 160, 128, 176]
+      tree02: [128, 160, 128, 176]

@@ -1,5 +1,5 @@
-# rust-game
-This is a game written in Rust.  It is currently in very early development.
+# Sulis
+This is a game and game engine written in Rust.  It is currently in very early development.
 
 ## Getting Started
 
@@ -23,7 +23,10 @@ You'll need recent versions of Rust and Cargo installed.  The game currently req
 ## Authors
 * **Jared Stephen** - *Initial Development* - [Grokmoo](https://github.com/Grokmoo)
 
-## License
+## Licensing
 
-This project is licensed under the GPLv3 - see the [LICENSE](LICENSE) file for details
+This project's source code is licensed under the Gnu Public License version 3 - see the [License](docs/GPLv3-LICENSE) file.  This includes, but is not limited to all .rs, .yml, and .json files.
 
+Most image assets in this project are licensed under the Creative Commons Attribution 3.0 Unported (CC-BY 3.0) and Creative Commons Attribution Unported 4.0 (CC-BY 4.0) Licenses.  To view a copy of these licenses, visit [CC-BY 3.0](http://creativecommons.org/licenses/by/3.0) and [CC-BY 4.0](http://creativecommons.org/licenses/by/4.0).
+
+To view attribution for each specific file used, please see the [Attribution Sheet](docs/attribution.csv).

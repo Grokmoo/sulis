@@ -1,3 +1,19 @@
+//  This file is part of Sulis, a turn based RPG written in Rust.
+//  Copyright 2018 Jared Stephen
+//
+//  Sulis is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  Sulis is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License//
+//  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
+
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 
@@ -12,7 +28,7 @@ pub struct Tile {
     pub name: String,
     pub width: i32,
     pub height: i32,
-
+    pub layer: String,
     pub text_display: Vec<char>,
     pub image_display: Rc<Sprite>,
     pub impass: Vec<Point>,
@@ -67,6 +83,7 @@ impl Tile {
         Ok(Tile {
             id: builder.id,
             name: builder.name,
+            layer: builder.layer,
             width: builder.width as i32,
             height: builder.height as i32,
             text_display: display_vec,
@@ -93,7 +110,7 @@ pub struct TileBuilder {
     pub name: String,
     pub width: usize,
     pub height: usize,
-
+    pub layer: String,
     pub text_display: Vec<Vec<char>>,
     image_display: String,
     pub impass: Vec<Vec<usize>>,

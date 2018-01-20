@@ -1,173 +1,127 @@
-use std::io::{Error, ErrorKind};
-use std::rc::Rc;
+//  This file is part of Sulis, a turn based RPG written in Rust.
+//  Copyright 2018 Jared Stephen
+//
+//  Sulis is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  Sulis is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License//
+//  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use grt::resource::{ResourceSet, Sprite, Spritesheet};
+use std::io::Error;
+use std::rc::Rc;
+use std::collections::HashMap;
+
 use grt::util::invalid_data_error;
 
-use module::area::AreaBuilder;
+use module::area::{AreaBuilder, Layer};
 use module::{Module, Tile, generator};
 
 pub struct Terrain {
     pub width: i32,
     pub height: i32,
-    text_display: Vec<char>,
-    image_display: Vec<Option<Rc<Sprite>>>,
-    tiles: Vec<Option<Rc<Tile>>>,
+    pub layers: Vec<Layer>,
+    pub entity_layer_index: usize,
     passable: Vec<bool>,
-    spritesheet_id: String,
 }
 
 impl Terrain {
     pub fn new(builder: &AreaBuilder, module: &Module) -> Result<Terrain, Error> {
         let width = builder.width as i32;
         let height = builder.height as i32;
-        let layer = if builder.generate {
-            let layer = generator::generate_area(width, height, module);
+        let dim = (width * height) as usize;
 
-            match layer {
-                Ok(l) => l,
-                Err(e) => {
-                    return Err(e);
-                }
-            }
+        let mut layers = if builder.generate {
+            let (id, tiles) = generator::generate_area(width, height, module)?;
+
+            let layer = Layer::new(builder, id, tiles)?;
+            vec![layer]
         } else {
-            if let Err(e) = Terrain::validate_tiles(builder, module) {
-                return Err(e);
-            }
+            Terrain::validate_tiles(builder, module)?;
 
-            let mut layer: Vec<Option<Rc<Tile>>> = vec![None;(width * height) as usize];
+            let mut layer_tiles: HashMap<String, Vec<Option<Rc<Tile>>>> = HashMap::new();
 
-            for (terrain_type, locations) in &builder.terrain {
-                let tile_ref = module.tiles.get(terrain_type).unwrap();
+            for (tile_id, locations) in &builder.terrain {
+                let tile = module.tiles.get(tile_id).unwrap();
 
+                if !layer_tiles.contains_key(&tile.layer) {
+                    layer_tiles.insert(tile.layer.to_string(), vec![None;dim]);
+                }
+
+                let mut cur_layer = layer_tiles.get_mut(&tile.layer).unwrap();
                 for point in locations.iter() {
-                    *layer.get_mut(point[0] + point[1] * width as usize).unwrap() =
-                        Some(Rc::clone(&tile_ref));
+                    cur_layer[point[0] + point[1] * width as usize] = Some(Rc::clone(&tile));
                 }
             }
 
-            layer
+            let mut layers: Vec<Layer> = Vec::new();
+            for (id, tiles) in layer_tiles {
+                let layer = Layer::new(builder, id, tiles)?;
+                layers.push(layer);
+            }
+
+            layers
         };
 
-        if let Err(e) = Terrain::validate_layer(&layer, width, height) {
-            return Err(e);
+        if layers.is_empty() {
+            return invalid_data_error("No tiles in area terrain");
         }
 
-        let mut spritesheet_id: Option<String> = None;
-        let mut tiles: Vec<Option<Rc<Tile>>> = vec![None;(width * height) as usize];
-        let mut image_display: Vec<Option<Rc<Sprite>>> = vec![None;(width * height) as usize];
-        let mut text_display = vec![' ';(width * height) as usize];
-        let mut passable = vec![true;(width * height) as usize];
-        for (index, tile) in layer.iter().enumerate() {
-            let index = index as i32;
-            if let None = *tile { continue; }
+        let mut layers_sorted: Vec<Layer> = Vec::new();
+        for id in builder.layers.iter() {
+            let mut layer_index: Option<usize> = None;
+            for (index, layer) in layers.iter().enumerate() {
+                if &layer.id == id {
+                    layer_index = Some(index);
+                    break;
+                }
+            }
 
-            let tile = match tile {
-                &None => continue,
-                &Some(ref t) => Rc::clone(&t),
+            let index = match layer_index {
+                None => return invalid_data_error(&format!("Layer '{}' is specified in area,\
+                                                  but no tiles have that layer.", id)),
+                Some(index) => index,
             };
 
-            match spritesheet_id {
-                None => spritesheet_id = Some(tile.image_display.id.to_string()),
-                Some(ref id) => {
-                    if id != &tile.image_display.id {
-                        return invalid_data_error(&format!("All tiles in a layer must be from the \
-                                                          same spritesheet: '{}' vs '{}'", id, tile.id));
-                    }
+            let layer = layers.remove(index);
+            layers_sorted.push(layer);
+        }
+
+        if layers.len() > 0 {
+            return invalid_data_error(&format!("One or more tiles has layer '{}', but it is not\
+                present in the area definition", layers[0].id));
+        }
+
+        let layers = layers_sorted;
+        trace!("Created terrain for '{}' with {} layers.", builder.id, layers.len());
+        let mut passable = vec![true;dim];
+        for layer in layers.iter() {
+            for index in 0..dim {
+                if !layer.is_passable_index(index) {
+                    passable[index] = false;
                 }
-            }
-
-            let base_x = index % width;
-            let base_y = index / width;
-
-            *tiles.get_mut((base_x + base_y * width) as usize).unwrap() =
-                Some(Rc::clone(&tile));
-            *image_display.get_mut((base_x + base_y * width) as usize).unwrap() =
-                Some(Rc::clone(&tile.image_display));
-
-            for y in 0..tile.height {
-                for x in 0..tile.width {
-                    *text_display.get_mut((base_x + x + (base_y + y) * width) as usize).unwrap() =
-                        tile.get_text_display(x, y);
-                }
-            }
-
-            for p in tile.impass.iter() {
-                *passable.get_mut((base_x + p.x + (base_y + p.y) * width) as usize).unwrap() = false;
             }
         }
 
-        let spritesheet_id = match spritesheet_id {
-            None => return invalid_data_error("Empty terrain"),
-            Some(id) => id,
-        };
+        let entity_layer_index = builder.entity_layer;
+        if entity_layer_index >= layers.len() {
+            return invalid_data_error(
+                &format!("Entity layer of {} is invalid.", entity_layer_index));
+        }
 
         Ok(Terrain {
             width,
             height,
-            tiles,
-            text_display,
-            image_display,
+            layers,
+            entity_layer_index,
             passable,
-            spritesheet_id,
         })
-    }
-
-    fn validate_layer(layer: &Vec<Option<Rc<Tile>>>, width: i32,
-                      height: i32) -> Result<(), Error> {
-
-        let mut refed_by_tile = vec![false;(width * height) as usize];
-
-        for (index, tile) in layer.iter().enumerate() {
-            let index = index as i32;
-            if let None = *tile { continue; }
-
-            let tile = match tile {
-                &None => continue,
-                &Some(ref t) => Rc::clone(&t),
-            };
-
-            let tile_x = index % width;
-            let tile_y = index / width;
-
-            if tile_x + tile.width > width || tile_y + tile.height > height {
-                return Err(
-                    Error::new(ErrorKind::InvalidData,
-                               format!("Tile '{}' at [{}, {}] extends past area boundary.",
-                                       tile.id, tile_x, tile_y))
-                    );
-            }
-
-            for x in tile_x..(tile_x + tile.width) {
-                for y in tile_y..(tile_y + tile.height) {
-                    let already_used = refed_by_tile.get_mut((x + y *width) as usize).unwrap();
-
-                    if *already_used {
-                        return Err(
-                            Error::new(ErrorKind::InvalidData,
-                                       format!("Tile '{}' at [{}, {}] uses point [{}, {}], but that point has already been used by another tile.", tile.id, tile_x, tile_y, x, y))
-                            );
-                    }
-
-                    *already_used = true;
-                }
-            }
-        }
-
-        for y in 0..height {
-            for x in 0..width {
-                let refed = refed_by_tile.get((x + y * width) as usize).unwrap();
-
-                if !refed {
-                    return Err(
-                        Error::new(ErrorKind::InvalidData,
-                                   format!("Point at [{}, {}] is empty.", x, y))
-                        );
-                }
-            }
-        }
-
-        Ok(())
     }
 
     fn validate_tiles(builder: &AreaBuilder, module: &Module) -> Result<(), Error> {
@@ -176,18 +130,14 @@ impl Terrain {
             match tile_ref {
                 Some(t) => t,
                 None => {
-                    return Err(Error::new(ErrorKind::InvalidData,
-                                          format!("Tile not found '{}'", tile_id)));
+                    return invalid_data_error(&format!("Tile not found '{}'", tile_id));
                 }
             };
 
             for point in locations.iter() {
-                if point.len() != 2 {
-                    return Err(
-                        Error::new(ErrorKind::InvalidData,
-                                   format!("Point array is not 2 coordinates in '{}'", tile_id))
-                        );
-                }
+                if point.len() == 2 { continue; }
+
+                return invalid_data_error(&format!("Point array length is not 2 in '{}'", tile_id));
             }
 
         }
@@ -195,27 +145,7 @@ impl Terrain {
         Ok(())
     }
 
-    pub fn get_spritesheet(&self) -> Rc<Spritesheet> {
-        ResourceSet::get_spritesheet(&self.spritesheet_id).unwrap()
-    }
-
     pub fn is_passable(&self, x: i32, y: i32) -> bool {
         *self.passable.get((x + y * self.width) as usize).unwrap()
-    }
-
-    pub fn tile_at(&self, x: i32, y: i32) -> &Option<Rc<Tile>> {
-        self.tiles.get((x + y * self.width) as usize).unwrap()
-    }
-
-    pub fn image_at(&self, x: i32, y: i32) -> &Option<Rc<Sprite>> {
-        self.image_display.get((x + y * self.width) as usize).unwrap()
-    }
-
-    pub fn display_at(&self, x: i32, y: i32) -> char {
-        *self.text_display.get((x + y * self.width) as usize).unwrap()
-    }
-
-    pub fn display(&self, index: usize) -> char {
-        *self.text_display.get(index).unwrap()
     }
 }

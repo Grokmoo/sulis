@@ -2,12 +2,12 @@
 children:
   label:
     text_params:
-      font: "large"
+      font: "normal"
   button:
     background: background
     border: [1, 1, 1, 1]
     text_params:
-      font: "large"
+      font: "normal"
   list_box:
     background: bg_base
     border: [1, 1, 1, 1]
@@ -18,12 +18,12 @@ children:
       entry:
         text: "#0#"
         text_params:
-          font: "large"
+          font: "normal"
           horizontal_alignment: Left
         background: fill
         border: { top: 0, bottom: 0, left: 0, right: 0 }
         preferred_size: [0, 1]
   text_area:
     text_params:
-      font: "large"
+      font: "normal"
 ...

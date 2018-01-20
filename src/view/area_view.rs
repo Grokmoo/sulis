@@ -1,3 +1,19 @@
+//  This file is part of Sulis, a turn based RPG written in Rust.
+//  Copyright 2018 Jared Stephen
+//
+//  Sulis is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  Sulis is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License//
+//  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
+
 use std::rc::Rc;
 use std::cell::RefCell;
 use std::cmp;
@@ -8,7 +24,7 @@ use grt::io::event::ClickKind;
 use grt::util::Point;
 
 use extern_image::{ImageBuffer, Rgba};
-
+use module::area::Layer;
 use view::{ActionMenu, EntityMouseover};
 use state::GameState;
 
@@ -16,13 +32,14 @@ pub struct AreaView {
     mouse_over: Rc<RefCell<Widget>>,
     scale: RefCell<(f32, f32)>,
     cursors: RefCell<Option<DrawList>>,
-    buffer: RefCell<ImageBuffer<Rgba<u8>, Vec<u8>>>,
     cache_invalid: RefCell<bool>,
-    current_area_id: RefCell<String>,
+
+    layers: RefCell<Vec<(String, ImageBuffer<Rgba<u8>, Vec<u8>>)>>,
 }
 
 const TILE_CACHE_TEXTURE_SIZE: u32 = 1024;
 const TILE_SIZE: u32 = 16;
+const TEX_COORDS: [f32; 8] = [ 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0 ];
 
 impl AreaView {
     pub fn new(mouse_over: Rc<RefCell<Widget>>) -> Rc<AreaView> {
@@ -30,9 +47,8 @@ impl AreaView {
             mouse_over: mouse_over,
             scale: RefCell::new((1.0, 1.0)),
             cursors: RefCell::new(None),
-            buffer: RefCell::new(ImageBuffer::new(0, 0)),
             cache_invalid: RefCell::new(true),
-            current_area_id: RefCell::new(String::new()),
+            layers: RefCell::new(Vec::new()),
         })
     }
 
@@ -74,27 +90,22 @@ impl AreaView {
         (x as i32, y as i32)
     }
 
-    fn draw_tiles_to_buffer(&self, buffer: &mut ImageBuffer<Rgba<u8>, Vec<u8>>) {
-        let area_state = GameState::area_state();
-        let state = area_state.borrow();
-        let ref area = state.area;
-        let max_tile_x = cmp::min((buffer.width() / TILE_SIZE) as i32, area.width);
-        let max_tile_y = cmp::min((buffer.height() / TILE_SIZE) as i32, area.height);
-        let spritesheet = area.terrain.get_spritesheet();
+    fn draw_tiles_to_buffer(&self, layer: &Layer, buffer: &mut ImageBuffer<Rgba<u8>, Vec<u8>>) {
+        let max_tile_x = cmp::min((buffer.width() / TILE_SIZE) as i32, layer.width);
+        let max_tile_y = cmp::min((buffer.height() / TILE_SIZE) as i32, layer.height);
+        let spritesheet = layer.get_spritesheet();
         let source = &spritesheet.image;
-        trace!("Generating cached tiles for '{}'", area.id);
 
         for tile_y in 0..max_tile_y {
             for tile_x in 0..max_tile_x {
                 let dest_x = TILE_SIZE * tile_x as u32;
                 let dest_y = TILE_SIZE * tile_y as u32;
 
-                let tile = match area.terrain.tile_at(tile_x, tile_y) {
+                let sprite = match layer.image_at(tile_x, tile_y) {
                     &None => continue,
-                    &Some(ref tile) => tile,
+                    &Some(ref image) => image,
                 };
 
-                let sprite = &tile.image_display;
                 let src_x = sprite.position.x as u32;
                 let src_y = sprite.position.y as u32;
                 for y in 0..sprite.size.height {
@@ -105,6 +116,20 @@ impl AreaView {
                 }
             }
         }
+    }
+
+    fn draw_layer(&self, renderer: &mut GraphicsRenderer, scale_x: f32, scale_y: f32,
+                  widget: &Widget, id: &String) {
+        let p = widget.state.inner_position;
+        let s = widget.state.scroll_pos;
+        let mut draw_list =
+            DrawList::from_texture_id(&id, &TEX_COORDS,
+                                      (p.x - s.x) as f32,
+                                      (p.y - s.y) as f32,
+                                      (TILE_CACHE_TEXTURE_SIZE / TILE_SIZE) as f32,
+                                      (TILE_CACHE_TEXTURE_SIZE / TILE_SIZE) as f32);
+        draw_list.set_scale(scale_x, scale_y);
+        renderer.draw(draw_list);
     }
 }
 
@@ -123,36 +148,20 @@ impl WidgetKind for AreaView {
         self.mouse_over.borrow_mut().state.add_text_arg("0", "");
         self.mouse_over.borrow_mut().state.add_text_arg("1", "");
 
-        let mut buffer: ImageBuffer<Rgba<u8>, Vec<u8>> = ImageBuffer::new(TILE_CACHE_TEXTURE_SIZE,
-                                                                          TILE_CACHE_TEXTURE_SIZE);
-        self.draw_tiles_to_buffer(&mut buffer);
-        *self.buffer.borrow_mut() = buffer;
+        let area_state = GameState::area_state();
+        let area = &area_state.borrow().area;
+
+        trace!("Rendering area tiles to texture for '{}'", area.id);
+        for layer in area.terrain.layers.iter() {
+            let mut buffer: ImageBuffer<Rgba<u8>, Vec<u8>> =
+                ImageBuffer::new(TILE_CACHE_TEXTURE_SIZE, TILE_CACHE_TEXTURE_SIZE);
+            self.draw_tiles_to_buffer(&layer, &mut buffer);
+            let id = format!("_{}_{}", area.id, layer.id);
+            self.layers.borrow_mut().push((id, buffer));
+        }
         *self.cache_invalid.borrow_mut() = true;
 
         Vec::with_capacity(0)
-    }
-
-    fn draw_text_mode(&self, renderer: &mut TextRenderer,
-                      widget: &Widget, _millis: u32) {
-        let p = widget.state.inner_position;
-        let s = widget.state.inner_size;
-        let scroll = widget.state.scroll_pos;
-
-        let area_state = GameState::area_state();
-        let ref area = area_state.borrow().area;
-
-        let max_x = cmp::min(s.width, area.width - scroll.x);
-        let max_y = cmp::min(s.height, area.height - scroll.y);
-
-        renderer.set_cursor_pos(0, 0);
-
-        for y in 0..max_y {
-            renderer.set_cursor_pos(p.x, p.y + y);
-            for x in 0..max_x {
-                renderer.render_char(area_state.borrow().get_display(x + scroll.x,
-                                                                     y + scroll.y));
-            }
-        }
     }
 
     fn draw_graphics_mode(&self, renderer: &mut GraphicsRenderer, pixel_size: Point,
@@ -166,25 +175,25 @@ impl WidgetKind for AreaView {
         let ref area = state.area;
 
         if *self.cache_invalid.borrow() {
-            renderer.deregister_texture(&self.current_area_id.borrow());
-
-            trace!("Register cached tiles texture for '{}'", area.id);
-            renderer.register_texture(&area.id, self.buffer.borrow().clone()
-                                      , TextureMinFilter::Nearest, TextureMagFilter::Nearest);
+            for &(ref id, ref layer) in self.layers.borrow().iter() {
+                if !renderer.has_texture(&id) {
+                    trace!("Register cached tiles texture for '{}'", &id);
+                    renderer.register_texture(&id, layer.clone(),
+                        TextureMinFilter::Nearest, TextureMagFilter::Nearest);
+                }
+            }
             *self.cache_invalid.borrow_mut() = false;
-            *self.current_area_id.borrow_mut() = area.id.to_string();
         }
 
         let p = widget.state.inner_position;
-        let tex_coords: [f32; 8] = [ 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0 ];
+        let num_layers = self.layers.borrow().len();
+        let mut layer_index = 0;
 
-        let mut draw_list = DrawList::from_texture_id(&area.id, &tex_coords,
-                                                      (p.x - widget.state.scroll_pos.x) as f32,
-                                                      (p.y - widget.state.scroll_pos.y) as f32,
-                                                      (TILE_CACHE_TEXTURE_SIZE / TILE_SIZE) as f32,
-                                                      (TILE_CACHE_TEXTURE_SIZE / TILE_SIZE) as f32);
-        draw_list.set_scale(scale_x, scale_y);
-        renderer.draw(draw_list);
+        while layer_index <= area.terrain.entity_layer_index {
+            self.draw_layer(renderer, scale_x, scale_y, widget,
+                            &self.layers.borrow()[layer_index].0);
+            layer_index += 1;
+        }
 
         let mut draw_list = DrawList::empty_sprite();
         draw_list.set_scale(scale_x, scale_y);
@@ -208,6 +217,12 @@ impl WidgetKind for AreaView {
         }
 
         renderer.draw(draw_list);
+
+        while layer_index < num_layers {
+            self.draw_layer(renderer, scale_x, scale_y, widget,
+                            &self.layers.borrow()[layer_index].0);
+            layer_index += 1;
+        }
 
         if let Some(ref cursor) = *self.cursors.borrow() {
             let mut draw_list = cursor.clone();

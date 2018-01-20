@@ -7,13 +7,15 @@
     "terrain": { },
     "actors": [ ],
     "generate": true,
+	"layers": [ "base" ],
+	"entity_layer": 0,
     "transitions": [
       {
         "from": [ 10, 10 ],
         "size": [2, 2],
         "to": [ 10, 10],
         "to_area": "test_area",
-        "image_display": "tiles/transition",
+        "image_display": "creatures/transition",
         "text_display": "*"
       }
     ]

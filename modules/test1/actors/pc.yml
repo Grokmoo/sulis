@@ -2,7 +2,7 @@ id: pc
 name: "Grokmoo"
 player: true
 text_display: "@"
-image_display: tiles/pc
+image_display: creatures/pc
 race: human
 sex: Male
 levels:

@@ -1,3 +1,19 @@
+//  This file is part of Sulis, a turn based RPG written in Rust.
+//  Copyright 2018 Jared Stephen
+//
+//  Sulis is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  Sulis is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License//
+//  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
+
 use std::collections::HashMap;
 use std::cell::{Ref, RefCell};
 use std::rc::Rc;
@@ -106,8 +122,8 @@ impl<'a> GraphicsRenderer for GliumRenderer<'a> {
         self.display.textures.insert(id.to_string(), GliumTexture { texture, sampler_fn });
     }
 
-    fn deregister_texture(&mut self, id: &str) {
-        self.display.textures.remove(id);
+    fn has_texture(&self, id: &str) -> bool {
+        self.display.textures.contains_key(id)
     }
 
     fn draw(&mut self, draw_list: DrawList) {
@@ -145,7 +161,7 @@ impl GliumDisplay {
         let events_loop = glium::glutin::EventsLoop::new();
         let window = glium::glutin::WindowBuilder::new()
             .with_dimensions(CONFIG.display.width_pixels, CONFIG.display.height_pixels)
-            .with_title("Rust Game");
+            .with_title("Sulis");
         let context = glium::glutin::ContextBuilder::new();
         let display = glium::Display::new(window, context, &events_loop).unwrap();
 

@@ -1,3 +1,19 @@
+//  This file is part of Sulis, a turn based RPG written in Rust.
+//  Copyright 2018 Jared Stephen
+//
+//  Sulis is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  Sulis is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License//
+//  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
+
 use module::{Actor, Area, Module};
 use module::area::Transition;
 use state::{ChangeListenerList, EntityState, Location, TurnTimer};
@@ -13,7 +29,6 @@ pub struct AreaState {
 
     entity_grid: Vec<Option<usize>>,
     transition_grid: Vec<Option<usize>>,
-    display: Vec<char>,
 }
 
 impl PartialEq for AreaState {
@@ -24,11 +39,6 @@ impl PartialEq for AreaState {
 
 impl AreaState {
     pub fn new(area: Rc<Area>) -> AreaState {
-        let mut display = vec![' ';(area.width * area.height) as usize];
-        for (index, element) in display.iter_mut().enumerate() {
-            *element = area.terrain.display(index);
-        }
-
         let entity_grid = vec![None;(area.width * area.height) as usize];
         let transition_grid = vec![None;(area.width * area.height) as usize];
 
@@ -37,7 +47,6 @@ impl AreaState {
             entities: Vec::new(),
             turn_timer: TurnTimer::default(),
             transition_grid,
-            display,
             entity_grid,
             listeners: ChangeListenerList::default(),
         }
@@ -76,12 +85,10 @@ impl AreaState {
         }
     }
 
-    pub fn get_display(&self, x: i32, y: i32) -> char {
-        *self.display.get((x + y * self.area.width) as usize).unwrap()
-    }
-
     pub fn is_passable(&self, requester: &Ref<EntityState>,
                        new_x: i32, new_y: i32) -> bool {
+        if !self.area.coords_valid(new_x, new_y) { return false; }
+
         if !self.area.get_path_grid(requester.size()).is_passable(new_x, new_y) {
             return false;
         }
@@ -148,7 +155,6 @@ impl AreaState {
         entity.borrow_mut().location = location;
 
         for p in entity.borrow().points(x, y) {
-            self.update_display(p.x, p.y, entity.borrow().display());
             self.update_entity_grid(p.x, p.y, Some(new_index));
         }
 
@@ -164,7 +170,6 @@ impl AreaState {
         self.clear_entity_points(entity);
 
         for p in entity.points(new_x, new_y) {
-            self.update_display(p.x, p.y, entity.display());
             self.update_entity_grid(p.x, p.y, Some(entity.index));
         }
     }
@@ -174,18 +179,12 @@ impl AreaState {
         let cur_y = entity.location.y;
 
         for p in entity.points(cur_x, cur_y) {
-            let c = self.area.terrain.display_at(p.x, p.y);
-            self.update_display(p.x, p.y, c);
             self.update_entity_grid(p.x, p.y, None);
         }
     }
 
     fn update_entity_grid(&mut self, x: i32, y: i32, index: Option<usize>) {
         *self.entity_grid.get_mut((x + y * self.area.width) as usize).unwrap() = index;
-    }
-
-    fn update_display(&mut self, x: i32, y: i32, c: char) {
-        *self.display.get_mut((x + y * self.area.width) as usize).unwrap() = c;
     }
 
     pub fn get_last_entity(&self) -> Option<&Rc<RefCell<EntityState>>> {

@@ -1,0 +1,16 @@
+id: creatures
+src: "creatures.png"
+size: [ 256, 256 ]
+groups:
+  1by1:
+    size: [16, 16]
+    areas:
+      transition: [48, 0]
+  3by3:
+    size: [48, 48]
+    areas:
+      goblin: [0, 0]
+  5by5:
+    size: [80, 80]
+    areas:
+      pc: [0, 48]

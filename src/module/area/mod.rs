@@ -54,6 +54,7 @@ pub struct Area {
     pub height: i32,
     pub terrain: Terrain,
     path_grids: HashMap<i32, PathFinderGrid>,
+    pub visibility_tile: Rc<Sprite>,
     pub actors: Vec<ActorData>,
     pub transitions: Vec<Transition>,
 }
@@ -111,6 +112,8 @@ impl Area {
             transitions.push(transition);
         }
 
+        let visibility_tile = ResourceSet::get_sprite(&builder.visibility_tile)?;
+
         Ok(Area {
             id: builder.id,
             name: builder.name,
@@ -119,6 +122,7 @@ impl Area {
             terrain: terrain,
             path_grids: path_grids,
             actors: builder.actors,
+            visibility_tile,
             transitions,
         })
     }
@@ -148,6 +152,7 @@ pub struct AreaBuilder {
     pub entity_layer: usize,
     actors: Vec<ActorData>,
     transitions: Vec<TransitionBuilder>,
+    visibility_tile: String,
 }
 
 impl ResourceBuilder for AreaBuilder {

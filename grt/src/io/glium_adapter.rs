@@ -105,6 +105,33 @@ impl<'a> GliumRenderer<'a> {
     }
 }
 
+fn draw_to_surface<T: glium::Surface>(surface: &mut T, draw_list: DrawList,
+                                      display: &GliumDisplay, params: &glium::DrawParameters) {
+    let glium_texture = match display.textures.get(&draw_list.texture) {
+        None => return,
+        Some(texture) => texture,
+    };
+
+    let uniforms = uniform! {
+        matrix: display.matrix,
+        tex: (glium_texture.sampler_fn)(glium_texture.texture.sampled()),
+        color_filter: draw_list.color_filter,
+        scale: [
+            [draw_list.scale[0], 0.0, 0.0, 0.0],
+            [0.0, draw_list.scale[1], 0.0, 0.0],
+            [0.0, 0.0, 1.0, 0.0],
+            [draw_list.scale[0] - 1.0, 1.0 - draw_list.scale[1], 0.0, 1.0f32],
+        ],
+    };
+
+    for quad in draw_list.quads {
+        let vertex_buffer = glium::VertexBuffer::new(&display.display, &quad).unwrap();
+        let indices = glium::index::NoIndices(glium::index::PrimitiveType::TriangleStrip);
+        surface.draw(&vertex_buffer, &indices, &display.program,
+                     &uniforms, params).unwrap();
+    }
+}
+
 impl<'a> GraphicsRenderer for GliumRenderer<'a> {
     fn register_texture(&mut self, id: &str, image: ImageBuffer<Rgba<u8>, Vec<u8>>,
                         min_filter: TextureMinFilter, mag_filter: TextureMagFilter) {
@@ -126,32 +153,18 @@ impl<'a> GraphicsRenderer for GliumRenderer<'a> {
         self.display.textures.contains_key(id)
     }
 
+    fn draw_to_texture(&mut self, texture_id: &str, draw_list: DrawList) {
+        let texture = self.display.textures.get(texture_id).unwrap();
+        let mut framebuffer = glium::framebuffer::SimpleFrameBuffer::new(&self.display.display,
+                                                                     &texture.texture).unwrap();
+
+        draw_to_surface(&mut framebuffer, draw_list, &self.display, &self.params);
+    }
+
     fn draw(&mut self, draw_list: DrawList) {
         self.create_texture_if_missing(&draw_list.texture, &draw_list);
 
-        let glium_texture = match self.display.textures.get(&draw_list.texture) {
-            None => return,
-            Some(texture) => texture,
-        };
-
-        let uniforms = uniform! {
-            matrix: self.display.matrix,
-            tex: (glium_texture.sampler_fn)(glium_texture.texture.sampled()),
-            color_filter: draw_list.color_filter,
-            scale: [
-                [draw_list.scale[0], 0.0, 0.0, 0.0],
-                [0.0, draw_list.scale[1], 0.0, 0.0],
-                [0.0, 0.0, 1.0, 0.0],
-                [draw_list.scale[0] - 1.0, 1.0 - draw_list.scale[1], 0.0, 1.0f32],
-            ],
-        };
-
-        for quad in draw_list.quads {
-            let vertex_buffer = glium::VertexBuffer::new(&self.display.display, &quad).unwrap();
-            let indices = glium::index::NoIndices(glium::index::PrimitiveType::TriangleStrip);
-            self.target.draw(&vertex_buffer, &indices, &self.display.program,
-                        &uniforms, &self.params).unwrap();
-        }
+        draw_to_surface(self.target, draw_list, &self.display, &self.params);
     }
 }
 

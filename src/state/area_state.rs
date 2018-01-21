@@ -123,13 +123,12 @@ impl AreaState {
                                x: i32, y: i32) -> bool {
         if !self.area.coords_valid(x, y) { return false; }
 
-        true
-        // let grid_index = self.entity_grid[(x + y * self.area.width) as usize];
-        //
-        // match grid_index {
-        //     None => true, // grid position is empty
-        //     Some(index) => (index == requester.index),
-        // }
+        let grid_index = self.entity_grid[(x + y * self.area.width) as usize];
+
+        match grid_index {
+            None => true, // grid position is empty
+            Some(index) => (index == requester.index),
+        }
     }
 
     pub(in state) fn add_actor(&mut self, actor: Rc<Actor>,

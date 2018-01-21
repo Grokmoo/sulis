@@ -1,5 +1,6 @@
 id: "test_generate"
 name: "Test Generate"
+visibility_tile: "gui/area_invis"
 width: 80
 height: 40
 terrain: { }

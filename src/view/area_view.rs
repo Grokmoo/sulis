@@ -22,6 +22,7 @@ use grt::ui::{color, Cursor, WidgetKind, Widget};
 use grt::io::*;
 use grt::io::event::ClickKind;
 use grt::util::Point;
+use grt::config::CONFIG;
 
 use extern_image::{ImageBuffer, Rgba};
 use module::area::Layer;
@@ -32,14 +33,20 @@ pub struct AreaView {
     mouse_over: Rc<RefCell<Widget>>,
     scale: RefCell<(f32, f32)>,
     cursors: RefCell<Option<DrawList>>,
+
     cache_invalid: RefCell<bool>,
+    vis_cache_invalid: RefCell<bool>,
 
     layers: RefCell<Vec<(String, ImageBuffer<Rgba<u8>, Vec<u8>>)>>,
 }
 
+const SCALE_X_BASE: f32 = 1600.0;
+const SCALE_Y_BASE: f32 = 900.0;
 const TILE_CACHE_TEXTURE_SIZE: u32 = 1024;
 const TILE_SIZE: u32 = 16;
 const TEX_COORDS: [f32; 8] = [ 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0 ];
+
+const VISIBILITY_TEX_ID: &'static str = "__visibility__";
 
 impl AreaView {
     pub fn new(mouse_over: Rc<RefCell<Widget>>) -> Rc<AreaView> {
@@ -48,6 +55,7 @@ impl AreaView {
             scale: RefCell::new((1.0, 1.0)),
             cursors: RefCell::new(None),
             cache_invalid: RefCell::new(true),
+            vis_cache_invalid: RefCell::new(true),
             layers: RefCell::new(Vec::new()),
         })
     }
@@ -118,8 +126,31 @@ impl AreaView {
         }
     }
 
+    fn cache_visibility(&self, renderer: &mut GraphicsRenderer) {
+        let area_state = GameState::area_state();
+        let area = &area_state.borrow().area;
+        let sprite = &area.visibility_tile;
+        let max_tile_x = cmp::min((TILE_CACHE_TEXTURE_SIZE / TILE_SIZE) as i32, area.width);
+        let max_tile_y = cmp::min((TILE_CACHE_TEXTURE_SIZE / TILE_SIZE) as i32, area.height);
+
+        let mut draw_list = DrawList::empty_sprite();
+        draw_list.texture_mag_filter = TextureMagFilter::Linear;
+
+        for tile_y in 0..max_tile_y {
+            for tile_x in 0..max_tile_x {
+                let x = (tile_x) as f32;
+                let y = (tile_y) as f32;
+                draw_list.append(&mut DrawList::from_sprite_f32(sprite, x, y, 1.0, 1.0));
+            }
+        }
+
+        draw_list.set_scale(TILE_SIZE as f32 / TILE_CACHE_TEXTURE_SIZE as f32 * CONFIG.display.width as f32,
+                            TILE_SIZE as f32 / TILE_CACHE_TEXTURE_SIZE as f32 * CONFIG.display.height as f32);
+        renderer.draw_to_texture(VISIBILITY_TEX_ID, draw_list);
+    }
+
     fn draw_layer(&self, renderer: &mut GraphicsRenderer, scale_x: f32, scale_y: f32,
-                  widget: &Widget, id: &String) {
+                  widget: &Widget, id: &str) {
         let p = widget.state.inner_position;
         let s = widget.state.scroll_pos;
         let mut draw_list =
@@ -166,8 +197,8 @@ impl WidgetKind for AreaView {
 
     fn draw_graphics_mode(&self, renderer: &mut GraphicsRenderer, pixel_size: Point,
                           widget: &Widget, _millis: u32) {
-        let scale_x = 1600.0 / (pixel_size.x as f32);
-        let scale_y = 900.0 / (pixel_size.y as f32);
+        let scale_x = SCALE_X_BASE / (pixel_size.x as f32);
+        let scale_y = SCALE_Y_BASE / (pixel_size.y as f32);
         *self.scale.borrow_mut() = (scale_x, scale_y);
 
         let area_state = GameState::area_state();
@@ -182,7 +213,19 @@ impl WidgetKind for AreaView {
                         TextureMinFilter::Nearest, TextureMagFilter::Nearest);
                 }
             }
+
+            if !renderer.has_texture(VISIBILITY_TEX_ID) {
+                renderer.register_texture(VISIBILITY_TEX_ID,
+                                          ImageBuffer::new(TILE_CACHE_TEXTURE_SIZE, TILE_CACHE_TEXTURE_SIZE),
+                                          TextureMinFilter::Nearest,
+                                          TextureMagFilter::Nearest);
+            }
             *self.cache_invalid.borrow_mut() = false;
+        }
+
+        if *self.vis_cache_invalid.borrow() {
+            self.cache_visibility(renderer);
+            *self.vis_cache_invalid.borrow_mut() = false;
         }
 
         let p = widget.state.inner_position;
@@ -223,6 +266,8 @@ impl WidgetKind for AreaView {
                             &self.layers.borrow()[layer_index].0);
             layer_index += 1;
         }
+
+        self.draw_layer(renderer, scale_x, scale_y, widget, VISIBILITY_TEX_ID);
 
         if let Some(ref cursor) = *self.cursors.borrow() {
             let mut draw_list = cursor.clone();

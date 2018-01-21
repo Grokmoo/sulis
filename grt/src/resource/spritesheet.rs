@@ -18,7 +18,7 @@ use std::collections::HashMap;
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 
-use resource::ResourceBuilder;
+use resource::{ResourceBuilder, ResourceSet};
 use util::{Point, Size};
 
 use serde_json;
@@ -59,6 +59,10 @@ impl Sprite {
                           x_max, y_max,
                           x_max, y_min ],
         }
+    }
+
+    pub fn get_spritesheet(&self) -> Rc<Spritesheet> {
+        ResourceSet::get_spritesheet(&self.id).unwrap()
     }
 }
 

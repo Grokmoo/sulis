@@ -1,5 +1,6 @@
 id: test_256
 name: "Test 256"
+visibility_tile: "gui/area_invis"
 width: 256
 height: 256
 

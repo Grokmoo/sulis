@@ -63,3 +63,4 @@ groups:
       cursor3x3: [170,  0, 48, 48]
       cursor2x2: [221,  0, 32, 32]
       cursor1x1: [170, 51, 16, 16]
+      area_invis: [0, 67, 16, 16]

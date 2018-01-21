@@ -3,6 +3,7 @@ name: "Test Area"
 width: 60
 height: 40
 generate: false
+visibility_tile: "gui/area_invis"
 layers:
   - base
   - object

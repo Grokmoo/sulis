@@ -50,6 +50,8 @@ pub trait IO {
 pub trait GraphicsRenderer {
     fn draw(&mut self, draw_list: DrawList);
 
+    fn draw_to_texture(&mut self, texture_id: &str, draw_list: DrawList);
+
     fn register_texture(&mut self, id: &str, image: ImageBuffer<Rgba<u8>, Vec<u8>>,
                         min_filter: TextureMinFilter, mag_filter: TextureMagFilter);
 

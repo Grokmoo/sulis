@@ -135,8 +135,8 @@ fn draw_to_surface<T: glium::Surface>(surface: &mut T, draw_list: DrawList,
 impl<'a> GraphicsRenderer for GliumRenderer<'a> {
     fn register_texture(&mut self, id: &str, image: ImageBuffer<Rgba<u8>, Vec<u8>>,
                         min_filter: TextureMinFilter, mag_filter: TextureMagFilter) {
-
         let dims = image.dimensions();
+        trace!("Registering texture '{}', {}x{}", id, dims.0, dims.1);
         let image = RawImage2d::from_raw_rgba_reversed(&image.into_raw(), dims);
         let texture = SrgbTexture2d::new(&self.display.display, image).unwrap();
 
@@ -154,6 +154,7 @@ impl<'a> GraphicsRenderer for GliumRenderer<'a> {
     }
 
     fn draw_to_texture(&mut self, texture_id: &str, draw_list: DrawList) {
+        self.create_texture_if_missing(&draw_list.texture, &draw_list);
         let texture = self.display.textures.get(texture_id).unwrap();
         let mut framebuffer = glium::framebuffer::SimpleFrameBuffer::new(&self.display.display,
                                                                      &texture.texture).unwrap();

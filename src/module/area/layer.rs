@@ -17,7 +17,7 @@
 use std::rc::Rc;
 use std::io::Error;
 
-use grt::resource::{ResourceSet, Sprite, Spritesheet};
+use grt::resource::{ResourceSet, Spritesheet};
 use grt::util::invalid_data_error;
 use module::area::AreaBuilder;
 use module::Tile;
@@ -26,7 +26,7 @@ pub struct Layer {
     pub id: String,
     pub width: i32,
     pub height: i32,
-    display: Vec<Option<Rc<Sprite>>>,
+    display: Vec<Option<Rc<Tile>>>,
     passable: Vec<bool>,
     spritesheet_id: String,
 }
@@ -38,7 +38,7 @@ impl Layer {
         let height = builder.height as i32;
         let dim = (width * height) as usize;
 
-        let mut display: Vec<Option<Rc<Sprite>>> = vec![None;dim];
+        let mut display: Vec<Option<Rc<Tile>>> = vec![None;dim];
         let mut passable: Vec<bool> = vec![true;dim];
         let mut spritesheet_id: Option<String> = None;
 
@@ -59,7 +59,7 @@ impl Layer {
                 }
             }
 
-            display[index] = Some(Rc::clone(&tile.image_display));
+            display[index] = Some(Rc::clone(&tile));
 
             let base_x = (index as i32) % width;
             let base_y = (index as i32) / width;
@@ -102,7 +102,7 @@ impl Layer {
         self.passable[index]
     }
 
-    pub fn image_at(&self, x: i32, y: i32) -> &Option<Rc<Sprite>> {
-        self.display.get((x + y * self.width) as usize).unwrap()
+    pub fn tile_at(&self, x: i32, y: i32) -> &Option<Rc<Tile>> {
+        &self.display[(x + y * self.width) as usize]
     }
 }

@@ -17,7 +17,8 @@
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 
-use module::{Module, Tile};
+use module::Module;
+use module::area::Tile;
 
 pub fn generate_area(width: i32, height: i32, module: &Module) ->
         Result<(String, Vec<Option<Rc<Tile>>>), Error> {

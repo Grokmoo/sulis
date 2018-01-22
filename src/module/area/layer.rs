@@ -19,8 +19,7 @@ use std::io::Error;
 
 use grt::resource::{ResourceSet, Spritesheet};
 use grt::util::invalid_data_error;
-use module::area::AreaBuilder;
-use module::Tile;
+use module::area::{AreaBuilder, Tile};
 
 pub struct Layer {
     pub id: String,
@@ -28,6 +27,7 @@ pub struct Layer {
     pub height: i32,
     display: Vec<Option<Rc<Tile>>>,
     passable: Vec<bool>,
+    visible: Vec<bool>,
     spritesheet_id: String,
 }
 
@@ -40,6 +40,7 @@ impl Layer {
 
         let mut display: Vec<Option<Rc<Tile>>> = vec![None;dim];
         let mut passable: Vec<bool> = vec![true;dim];
+        let mut visible: Vec<bool> = vec![true;dim];
         let mut spritesheet_id: Option<String> = None;
 
         trace!("Creating layer '{}' with size: {} x {}", id, width, height);
@@ -68,6 +69,10 @@ impl Layer {
                 passable[(base_x + p.x + (base_y + p.y) * width) as usize] = false;
             }
 
+            for p in tile.invis.iter() {
+                visible[(base_x + p.x + (base_y + p.y) * width) as usize] = false;
+            }
+
             if base_x + tile.width > width || base_y + tile.height > height {
                 return invalid_data_error(
                     &format!("Tile '{}' at [{}, {}] extends past area boundary.",
@@ -86,12 +91,21 @@ impl Layer {
             height,
             display,
             passable,
+            visible,
             spritesheet_id,
         })
     }
 
     pub fn get_spritesheet(&self) -> Rc<Spritesheet> {
         ResourceSet::get_spritesheet(&self.spritesheet_id).unwrap()
+    }
+
+    pub fn is_visible(&self, x: i32, y: i32) -> bool {
+        self.visible[(x + y * self.width) as usize]
+    }
+
+    pub fn is_visible_index(&self, index: usize) -> bool {
+        self.visible[index]
     }
 
     pub fn is_passable(&self, x: i32, y: i32) -> bool {

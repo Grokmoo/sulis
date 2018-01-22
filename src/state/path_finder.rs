@@ -22,6 +22,8 @@ use grt::util::Point;
 use module::Area;
 use state::{EntityState, AreaState};
 
+const MAX_ITERATIONS: i32 = 200;
+
 pub struct PathFinder {
     pub width: i32,
     pub height: i32,
@@ -116,7 +118,9 @@ impl PathFinder {
         // info!("Spent {} secs in path find init", animation::format_elapsed_secs(start_time.elapsed()));
 
         // let loop_start_time = time::Instant::now();
-        while !self.open.is_empty() {
+
+        let mut iterations = 0;
+        while iterations < MAX_ITERATIONS && !self.open.is_empty() {
             let current = self.find_lowest_f_score_in_open_set();
             if self.is_goal(current, dest_dist_squared) {
                 // info!("Path find loop time: {}", animation::format_elapsed_secs(loop_start_time.elapsed()));
@@ -127,9 +131,9 @@ impl PathFinder {
             self.closed.insert(current);
 
             for neighbor in self.get_neighbors(current) {
-                trace!("Checking neighbor {}", neighbor);
+                //trace!("Checking neighbor {}", neighbor);
                 if self.closed.contains(&neighbor) {
-                    trace!("Already evaluated.");
+                    //trace!("Already evaluated.");
                     continue; // neighbor has already been evaluated
                 }
 
@@ -138,7 +142,7 @@ impl PathFinder {
                 let neighbor_y = neighbor / self.width;
                 if !area_state.is_passable(&requester, neighbor_x, neighbor_y) {
                     self.closed.insert(neighbor);
-                    trace!("Not passable");
+                    //trace!("Not passable");
                     continue;
                 }
 
@@ -149,7 +153,7 @@ impl PathFinder {
                 let tentative_g_score = self.g_score[current as usize] +
                     self.get_cost(current, neighbor);
                 if tentative_g_score >= self.g_score[neighbor as usize] {
-                    trace!("G score indicates this neighbor is not preferable.");
+                    //trace!("G score indicates this neighbor is not preferable.");
                     continue; // this is not a better path
                 }
 
@@ -157,6 +161,8 @@ impl PathFinder {
                 self.g_score[neighbor as usize] = tentative_g_score;
                 self.f_score[neighbor as usize] = tentative_g_score + self.dist_squared(neighbor);
             }
+
+            iterations += 1;
         }
 
         None
@@ -175,7 +181,7 @@ impl PathFinder {
         path.push(self.get_point(current));
         let mut current = current;
         loop {
-            trace!("Current {}", current);
+            //trace!("Current {}", current);
             current = match self.came_from.get(&current) {
                 None => break,
                 Some(point) => *point,
@@ -214,7 +220,7 @@ impl PathFinder {
         if right % width != point % width { neighbors.push(right); }
         if left % width != point % width { neighbors.push(left); }
 
-        trace!("Got neighbors for {}: {:?}", point, neighbors);
+        //trace!("Got neighbors for {}: {:?}", point, neighbors);
         neighbors
     }
 
@@ -230,7 +236,7 @@ impl PathFinder {
             }
         }
 
-        trace!("Found lowest f score of {} at {}", lowest, lowest_index);
+        //trace!("Found lowest f score of {} at {}", lowest, lowest_index);
         lowest_index
     }
 

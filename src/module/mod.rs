@@ -48,12 +48,6 @@ pub use self::race::Race;
 pub mod rules;
 pub use self::rules::Rules;
 
-pub mod terrain;
-pub use self::terrain::Terrain;
-
-pub mod tile;
-pub use self::tile::Tile;
-
 use std::collections::HashMap;
 use std::rc::Rc;
 use std::io::Error;
@@ -65,13 +59,14 @@ use std::fs;
 use grt::config::CONFIG;
 use grt::resource::{read, read_single_resource, get_resource, insert_if_ok};
 
+use self::area::Tile;
 use self::actor::ActorBuilder;
 use self::area::AreaBuilder;
 use self::class::ClassBuilder;
 use self::item::ItemBuilder;
 use self::race::RaceBuilder;
 use self::entity_size::EntitySizeBuilder;
-use self::tile::TileBuilder;
+use self::area::TileBuilder;
 
 thread_local! {
     static MODULE: RefCell<Module> = RefCell::new(Module::default());

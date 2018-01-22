@@ -4,4 +4,3 @@ layer: base
 width: 4
 height: 4
 image_display: "tiles/grass4"
-impass: []

@@ -20,8 +20,8 @@ use std::collections::HashMap;
 
 use grt::util::invalid_data_error;
 
-use module::area::{AreaBuilder, Layer};
-use module::{Module, Tile, generator};
+use module::area::{AreaBuilder, Layer, Tile};
+use module::{Module, generator};
 
 pub struct Terrain {
     pub width: i32,
@@ -29,6 +29,7 @@ pub struct Terrain {
     pub layers: Vec<Layer>,
     pub entity_layer_index: usize,
     passable: Vec<bool>,
+    visible: Vec<bool>,
 }
 
 impl Terrain {
@@ -101,10 +102,15 @@ impl Terrain {
         let layers = layers_sorted;
         trace!("Created terrain for '{}' with {} layers.", builder.id, layers.len());
         let mut passable = vec![true;dim];
+        let mut visible = vec![true;dim];
         for layer in layers.iter() {
             for index in 0..dim {
                 if !layer.is_passable_index(index) {
                     passable[index] = false;
+                }
+
+                if !layer.is_visible_index(index) {
+                    visible[index] = false;
                 }
             }
         }
@@ -121,6 +127,7 @@ impl Terrain {
             layers,
             entity_layer_index,
             passable,
+            visible,
         })
     }
 
@@ -146,6 +153,10 @@ impl Terrain {
     }
 
     pub fn is_passable(&self, x: i32, y: i32) -> bool {
-        *self.passable.get((x + y * self.width) as usize).unwrap()
+        self.passable[(x + y * self.width) as usize]
+    }
+
+    pub fn is_visible(&self, x: i32, y: i32) -> bool {
+        self.visible[(x + y * self.width) as usize]
     }
 }

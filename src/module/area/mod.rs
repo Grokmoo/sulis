@@ -20,6 +20,13 @@ pub use self::layer::Layer;
 mod path_finder_grid;
 use self::path_finder_grid::PathFinderGrid;
 
+mod terrain;
+pub use self::terrain::Terrain;
+
+mod tile;
+pub use self::tile::Tile;
+pub use self::tile::TileBuilder;
+
 use std::collections::HashMap;
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
@@ -29,7 +36,7 @@ use grt::util::{Point, Size};
 use grt::serde_json;
 use grt::serde_yaml;
 
-use module::{Module, Terrain};
+use module::Module;
 
 #[derive(Debug)]
 pub struct Transition {

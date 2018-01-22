@@ -26,7 +26,7 @@ use grt::config::CONFIG;
 use grt::resource::Sprite;
 
 use extern_image::ImageBuffer;
-use module::area::Layer;
+use module::area::{Layer, Terrain};
 use view::{ActionMenu, EntityMouseover};
 use state::GameState;
 
@@ -102,8 +102,6 @@ impl AreaView {
     fn draw_layer_to_texture(&self, renderer: &mut GraphicsRenderer, layer: &Layer) {
         let (max_tile_x, max_tile_y) = AreaView::get_texture_cache_max(layer.width, layer.height);
         let mut draw_list = DrawList::empty_sprite();
-        draw_list.texture_mag_filter = TextureMagFilter::Linear;
-        draw_list.texture_min_filter = TextureMinFilter::Linear;
 
         for tile_y in 0..max_tile_y {
             for tile_x in 0..max_tile_x {
@@ -121,14 +119,14 @@ impl AreaView {
     }
 
     fn draw_visibility_to_texture(&self, renderer: &mut GraphicsRenderer, sprite: &Rc<Sprite>,
-                                  width: i32, height: i32) {
-        let (max_tile_x, max_tile_y) = AreaView::get_texture_cache_max(width, height);
+                                  terrain: &Terrain) {
+        let (max_tile_x, max_tile_y) = AreaView::get_texture_cache_max(terrain.width, terrain.height);
 
         let mut draw_list = DrawList::empty_sprite();
-        draw_list.texture_mag_filter = TextureMagFilter::Linear;
 
         for tile_y in 0..max_tile_y {
             for tile_x in 0..max_tile_x {
+                if terrain.is_visible(tile_x, tile_y) { continue; }
                 draw_list.append(&mut DrawList::from_sprite(sprite, tile_x, tile_y, 1, 1));
             }
         }
@@ -138,6 +136,8 @@ impl AreaView {
 
     fn draw_list_to_texture(renderer: &mut GraphicsRenderer, draw_list: DrawList, texture_id: &str) {
         let mut draw_list = draw_list;
+        draw_list.texture_mag_filter = TextureMagFilter::Linear;
+        draw_list.texture_min_filter = TextureMinFilter::Linear;
         draw_list.set_scale(TILE_SIZE as f32 / TILE_CACHE_TEXTURE_SIZE as f32 * CONFIG.display.width as f32,
                             TILE_SIZE as f32 / TILE_CACHE_TEXTURE_SIZE as f32 * CONFIG.display.height as f32);
         renderer.draw_to_texture(texture_id, draw_list);
@@ -228,7 +228,7 @@ impl WidgetKind for AreaView {
         }
 
         if *self.vis_cache_invalid.borrow() {
-            self.draw_visibility_to_texture(renderer, &area.visibility_tile, area.width, area.height);
+            self.draw_visibility_to_texture(renderer, &area.visibility_tile, &area.terrain);
             *self.vis_cache_invalid.borrow_mut() = false;
         }
 

@@ -17,7 +17,7 @@
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 
-use grt::util::Point;
+use grt::util::{invalid_data_error, Point};
 use grt::resource::{Sprite, ResourceBuilder, ResourceSet};
 use grt::serde_json;
 use grt::serde_yaml;
@@ -31,31 +31,27 @@ pub struct Tile {
     pub layer: String,
     pub image_display: Rc<Sprite>,
     pub impass: Vec<Point>,
+    pub invis: Vec<Point>,
 }
 
 impl Tile {
     pub fn new(builder: TileBuilder) -> Result<Tile, Error> {
+        let (width, height) = (builder.width, builder.height);
         let mut impass_points: Vec<Point> = Vec::new();
+        let mut invis_points: Vec<Point> = Vec::new();
 
-        for p in builder.impass.into_iter() {
-            // allow an empty vector (no impass points)
-            if p.len() == 0 { continue; }
-
-            if p.len() != 2 {
-                return Err(Error::new(ErrorKind::InvalidData,
-                                      "Impass point array length is not equal to 2."));
+        if let Some(impass) = builder.impass {
+            for p in impass {
+                let (x, y) = verify_point("impass", width, height, p)?;
+                impass_points.push(Point::new(x, y));
             }
-            let x = *p.get(0).unwrap();
-            let y = *p.get(1).unwrap();
-            if x >= builder.width || y >= builder.height {
-                return Err(
-                    Error::new(ErrorKind::InvalidData,
-                               format!("Impass point has coordinate greater than size '{}, {}'",
-                                       builder.width, builder.height))
-                    );
-            }
+        }
 
-            impass_points.push(Point::new(x as i32, y as i32));
+        if let Some(invis) = builder.invis {
+            for p in invis {
+                let (x, y) = verify_point("invis", width, height, p)?;
+                invis_points.push(Point::new(x, y));
+            }
         }
 
         let sprite = ResourceSet::get_sprite(&builder.image_display)?;
@@ -68,8 +64,23 @@ impl Tile {
             height: builder.height as i32,
             image_display: sprite,
             impass: impass_points,
+            invis: invis_points,
         })
     }
+}
+
+fn verify_point(kind: &str, width: usize, height: usize, p: Vec<usize>) -> Result<(i32, i32), Error> {
+    if p.len() != 2 {
+        return invalid_data_error(&format!("{} point array length is not equal to 2", kind));
+    }
+
+    let x = p[0];
+    let y = p[1];
+    if x > width || y >= height {
+        return invalid_data_error(&format!("{} point has coordiantes greater than size {},{}",
+                                           kind, width, height));
+    }
+    Ok((x as i32, y as i32))
 }
 
 impl PartialEq for Tile {
@@ -87,7 +98,8 @@ pub struct TileBuilder {
     pub height: usize,
     pub layer: String,
     image_display: String,
-    pub impass: Vec<Vec<usize>>,
+    pub impass: Option<Vec<Vec<usize>>>,
+    pub invis: Option<Vec<Vec<usize>>>,
 }
 
 impl ResourceBuilder for TileBuilder {

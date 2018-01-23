@@ -57,10 +57,11 @@ impl TurnTimer {
             .map(|(_initiative, entity)| entity).collect();
 
         if let Some(entity) = entities.front() {
+            debug!("Starting turn for '{}'", entity.borrow().actor.actor.name);
             entity.borrow_mut().actor.init_turn();
         }
 
-        trace!("Got {} entities for turn timer", entities.len());
+        debug!("Got {} entities for turn timer", entities.len());
         TurnTimer {
             entities,
             ..Default::default()
@@ -77,6 +78,10 @@ impl TurnTimer {
     pub fn add(&mut self, entity: &Rc<RefCell<EntityState>>) {
         trace!("Added entity to turn timer: '{}'", entity.borrow().actor.actor.name);
         self.entities.push_back(Rc::clone(entity));
+        if self.entities.len() == 1 {
+            // we just pushed the only entity
+            entity.borrow_mut().actor.init_turn();
+        }
         self.listeners.notify(&self);
     }
 

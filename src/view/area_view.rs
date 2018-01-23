@@ -15,8 +15,9 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::rc::Rc;
-use std::cell::RefCell;
+use std::cell::{RefCell, RefMut};
 use std::cmp;
+use std::time;
 
 use grt::ui::{color, Cursor, WidgetKind, Widget};
 use grt::io::*;
@@ -26,24 +27,24 @@ use grt::config::CONFIG;
 use grt::resource::Sprite;
 
 use extern_image::ImageBuffer;
-use module::area::{Layer, Terrain};
+use module::area::Layer;
 use view::{ActionMenu, EntityMouseover};
-use state::GameState;
+use state::{AreaState, GameState};
+use animation;
+
+const NAME: &'static str = "area";
 
 pub struct AreaView {
     mouse_over: Rc<RefCell<Widget>>,
     scale: RefCell<(f32, f32)>,
     cursors: RefCell<Option<DrawList>>,
-
     cache_invalid: RefCell<bool>,
-    vis_cache_invalid: RefCell<bool>,
-
     layers: RefCell<Vec<String>>,
 }
 
 const SCALE_X_BASE: f32 = 1600.0;
 const SCALE_Y_BASE: f32 = 900.0;
-const TILE_CACHE_TEXTURE_SIZE: u32 = 1024;
+const TILE_CACHE_TEXTURE_SIZE: u32 = 2048;
 const TILE_SIZE: u32 = 16;
 const TEX_COORDS: [f32; 8] = [ 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0 ];
 
@@ -56,7 +57,6 @@ impl AreaView {
             scale: RefCell::new((1.0, 1.0)),
             cursors: RefCell::new(None),
             cache_invalid: RefCell::new(true),
-            vis_cache_invalid: RefCell::new(true),
             layers: RefCell::new(Vec::new()),
         })
     }
@@ -111,7 +111,8 @@ impl AreaView {
                 };
                 let sprite = &tile.image_display;
 
-                draw_list.append(&mut DrawList::from_sprite(sprite, tile_x, tile_y, tile.width, tile.height));
+                draw_list.append(&mut DrawList::from_sprite(sprite, tile_x, tile_y,
+                                                            tile.width, tile.height));
             }
         }
 
@@ -119,27 +120,35 @@ impl AreaView {
     }
 
     fn draw_visibility_to_texture(&self, renderer: &mut GraphicsRenderer, sprite: &Rc<Sprite>,
-                                  terrain: &Terrain) {
-        let (max_tile_x, max_tile_y) = AreaView::get_texture_cache_max(terrain.width, terrain.height);
+                                  area_state: &RefMut<AreaState>) {
+        let start_time = time::Instant::now();
+        renderer.clear_texture(VISIBILITY_TEX_ID);
+        let (max_tile_x, max_tile_y) = AreaView::get_texture_cache_max(area_state.area.width,
+                                                                       area_state.area.height);
 
         let mut draw_list = DrawList::empty_sprite();
 
         for tile_y in 0..max_tile_y {
             for tile_x in 0..max_tile_x {
-                if terrain.is_visible(tile_x, tile_y) { continue; }
+                if area_state.is_pc_visible(tile_x, tile_y) { continue; }
                 draw_list.append(&mut DrawList::from_sprite(sprite, tile_x, tile_y, 1, 1));
             }
         }
 
         AreaView::draw_list_to_texture(renderer, draw_list, VISIBILITY_TEX_ID);
+        trace!("Visibility render to texture time: {}",
+              animation::format_elapsed_secs(start_time.elapsed()));
     }
 
     fn draw_list_to_texture(renderer: &mut GraphicsRenderer, draw_list: DrawList, texture_id: &str) {
+        renderer.clear_texture(texture_id);
         let mut draw_list = draw_list;
         draw_list.texture_mag_filter = TextureMagFilter::Linear;
         draw_list.texture_min_filter = TextureMinFilter::Linear;
-        draw_list.set_scale(TILE_SIZE as f32 / TILE_CACHE_TEXTURE_SIZE as f32 * CONFIG.display.width as f32,
-                            TILE_SIZE as f32 / TILE_CACHE_TEXTURE_SIZE as f32 * CONFIG.display.height as f32);
+        draw_list.set_scale(TILE_SIZE as f32 / TILE_CACHE_TEXTURE_SIZE as f32 *
+                            CONFIG.display.width as f32,
+                            TILE_SIZE as f32 / TILE_CACHE_TEXTURE_SIZE as f32 *
+                            CONFIG.display.height as f32);
         renderer.draw_to_texture(texture_id, draw_list);
     }
 
@@ -167,7 +176,7 @@ impl AreaView {
 
 impl WidgetKind for AreaView {
     fn get_name(&self) -> &str {
-        "area"
+        NAME
     }
 
     fn on_add(&self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
@@ -198,11 +207,10 @@ impl WidgetKind for AreaView {
         *self.scale.borrow_mut() = (scale_x, scale_y);
 
         let area_state = GameState::area_state();
-        let state = area_state.borrow();
-        let ref area = state.area;
+        let mut state = area_state.borrow_mut();
 
         if *self.cache_invalid.borrow() {
-            debug!("Caching area '{}' layers to texture", area.id);
+            debug!("Caching area '{}' layers to texture", state.area.id);
 
             if !renderer.has_texture(VISIBILITY_TEX_ID) {
                 renderer.register_texture(VISIBILITY_TEX_ID,
@@ -211,12 +219,13 @@ impl WidgetKind for AreaView {
                                           TextureMagFilter::Nearest);
             }
 
-            for layer in area.terrain.layers.iter() {
+            for layer in state.area.terrain.layers.iter() {
                 let id = &layer.id;
                 trace!("Caching layer '{}'", id);
                 if !renderer.has_texture(&id) {
                     renderer.register_texture(&id,
-                                              ImageBuffer::new(TILE_CACHE_TEXTURE_SIZE, TILE_CACHE_TEXTURE_SIZE),
+                                              ImageBuffer::new(TILE_CACHE_TEXTURE_SIZE,
+                                                               TILE_CACHE_TEXTURE_SIZE),
                                               TextureMinFilter::Nearest,
                                               TextureMagFilter::Nearest);
                 }
@@ -227,16 +236,17 @@ impl WidgetKind for AreaView {
             *self.cache_invalid.borrow_mut() = false;
         }
 
-        if *self.vis_cache_invalid.borrow() {
-            self.draw_visibility_to_texture(renderer, &area.visibility_tile, &area.terrain);
-            *self.vis_cache_invalid.borrow_mut() = false;
+        if state.pc_vis_cache_invalid {
+            trace!("Redrawing PC visibility to texture");
+            self.draw_visibility_to_texture(renderer, &state.area.visibility_tile, &state);
+            state.pc_vis_cache_invalid = false;
         }
 
         let p = widget.state.inner_position;
         let num_layers = self.layers.borrow().len();
         let mut layer_index = 0;
 
-        while layer_index <= area.terrain.entity_layer_index {
+        while layer_index <= state.area.terrain.entity_layer_index {
             self.draw_layer(renderer, scale_x, scale_y, widget,
                             &self.layers.borrow()[layer_index]);
             layer_index += 1;
@@ -246,7 +256,7 @@ impl WidgetKind for AreaView {
         draw_list.set_scale(scale_x, scale_y);
         draw_list.texture_mag_filter = TextureMagFilter::Nearest;
 
-        for transition in area.transitions.iter() {
+        for transition in state.area.transitions.iter() {
             draw_list.append(&mut DrawList::from_sprite(
                     &transition.image_display,
                     transition.from.x + p.x - widget.state.scroll_pos.x,

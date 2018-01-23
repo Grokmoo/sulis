@@ -22,7 +22,7 @@ use grt::config::CONFIG;
 use animation::AttackAnimation;
 use module::{Actor, EntitySize, EntitySizeIterator};
 use module::area::Transition;
-use state::{ActorState, AreaState, GameState, Location};
+use state::{ActorState, AreaState, ChangeListenerList, GameState, Location};
 
 pub struct EntityState {
     pub actor: ActorState,
@@ -30,6 +30,7 @@ pub struct EntityState {
     pub size: Rc<EntitySize>,
     pub index: usize, // index in vec of the owning area state
     pub sub_pos: (f32, f32),
+    pub listeners: ChangeListenerList<EntityState>,
 
     is_pc: bool,
     marked_for_removal: bool,
@@ -54,6 +55,7 @@ impl EntityState {
             sub_pos: (0.0, 0.0),
             size,
             index,
+            listeners: ChangeListenerList::default(),
             is_pc,
             marked_for_removal: false,
         }
@@ -118,9 +120,10 @@ impl EntityState {
             return false;
         }
 
-        area_state.update_entity_position(&self, x, y);
         self.location.move_to(x, y);
+        area_state.update_entity_position(&self, x, y);
         self.actor.remove_ap(ap_cost);
+        self.listeners.notify(&self);
         true
     }
 

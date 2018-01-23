@@ -55,6 +55,8 @@ pub trait GraphicsRenderer {
     fn register_texture(&mut self, id: &str, image: ImageBuffer<Rgba<u8>, Vec<u8>>,
                         min_filter: TextureMinFilter, mag_filter: TextureMagFilter);
 
+    fn clear_texture(&mut self, id: &str);
+
     fn has_texture(&self, id: &str) -> bool;
 }
 

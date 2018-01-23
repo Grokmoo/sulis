@@ -124,12 +124,23 @@ fn draw_to_surface<T: glium::Surface>(surface: &mut T, draw_list: DrawList,
         ],
     };
 
+    // TODO do this in a more efficient manner
+    let mut quads: Vec<Vertex> = Vec::new();
     for quad in draw_list.quads {
-        let vertex_buffer = glium::VertexBuffer::new(&display.display, &quad).unwrap();
-        let indices = glium::index::NoIndices(glium::index::PrimitiveType::TriangleStrip);
-        surface.draw(&vertex_buffer, &indices, &display.program,
-                     &uniforms, params).unwrap();
+        quads.extend_from_slice(&quad);
+        quads.push(quad[1]);
+        quads.push(quad[2]);
     }
+
+    let vertex_buffer = glium::VertexBuffer::new(&display.display, &quads).unwrap();
+    let indices = glium::index::NoIndices(glium::index::PrimitiveType::TrianglesList);
+    surface.draw(&vertex_buffer, &indices, &display.program, &uniforms, params).unwrap();
+    // for quad in draw_list.quads {
+    //     let vertex_buffer = glium::VertexBuffer::new(&display.display, &quad).unwrap();
+    //     let indices = glium::index::NoIndices(glium::index::PrimitiveType::TriangleStrip);
+    //     surface.draw(&vertex_buffer, &indices, &display.program,
+    //                  &uniforms, params).unwrap();
+    // }
 }
 
 impl<'a> GraphicsRenderer for GliumRenderer<'a> {
@@ -147,6 +158,14 @@ impl<'a> GraphicsRenderer for GliumRenderer<'a> {
             });
 
         self.display.textures.insert(id.to_string(), GliumTexture { texture, sampler_fn });
+    }
+
+    fn clear_texture(&mut self, id: &str) {
+        let texture = self.display.textures.get(id).unwrap();
+        let mut framebuffer = glium::framebuffer::SimpleFrameBuffer::new(&self.display.display,
+                                                                         &texture.texture).unwrap();
+
+        framebuffer.clear_color(1.0, 1.0, 1.0, 0.0);
     }
 
     fn has_texture(&self, id: &str) -> bool {

@@ -17,9 +17,14 @@
 use module::{Actor, Area, Module};
 use module::area::Transition;
 use state::{ChangeListenerList, EntityState, Location, TurnTimer};
+use animation;
 
+use std::cmp;
+use std::time;
 use std::rc::Rc;
 use std::cell::{Ref, RefCell};
+
+const VIS_TILES: i32 = 18;
 
 pub struct AreaState {
     pub area: Rc<Area>,
@@ -29,6 +34,9 @@ pub struct AreaState {
 
     entity_grid: Vec<Option<usize>>,
     transition_grid: Vec<Option<usize>>,
+
+    pub pc_vis_cache_invalid: bool,
+    pc_vis: Vec<bool>,
 }
 
 impl PartialEq for AreaState {
@@ -39,8 +47,10 @@ impl PartialEq for AreaState {
 
 impl AreaState {
     pub fn new(area: Rc<Area>) -> AreaState {
-        let entity_grid = vec![None;(area.width * area.height) as usize];
-        let transition_grid = vec![None;(area.width * area.height) as usize];
+        let dim = (area.width * area.height) as usize;
+        let entity_grid = vec![None;dim];
+        let transition_grid = vec![None;dim];
+        let pc_vis = vec![false;dim];
 
         AreaState {
             area,
@@ -49,6 +59,8 @@ impl AreaState {
             transition_grid,
             entity_grid,
             listeners: ChangeListenerList::default(),
+            pc_vis,
+            pc_vis_cache_invalid: true,
         }
     }
 
@@ -119,6 +131,50 @@ impl AreaState {
         self.area.transitions.get(index)
     }
 
+    fn compute_pc_visibility(&mut self, entity: &EntityState) {
+        let start_time = time::Instant::now();
+        let entity_x = entity.location.x + entity.size.size / 2;
+        let entity_y = entity.location.y + entity.size.size / 2;
+
+        let min_x = cmp::max(0, entity_x - VIS_TILES - 2);
+        let max_x = cmp::min(self.area.width, entity_x + VIS_TILES + 2);
+        let min_y = cmp::max(0, entity_y - VIS_TILES - 2);
+        let max_y = cmp::min(self.area.height, entity_y + VIS_TILES + 2);
+
+        let e_x = entity_x as f32;
+        let e_y = entity_y as f32;
+
+        for y in min_y..max_y {
+            for x in min_x..max_x {
+                let index = (x + y * self.area.width) as usize;
+                if !self.area.terrain.is_visible_index(index) {
+                    self.pc_vis[index] = false;
+                    continue;
+                }
+
+                let xf = x as f32;
+                let yf = y as f32;
+                let dist_squared = (xf - e_x) * (xf - e_x) + (yf - e_y) * (yf - e_y);
+
+                if dist_squared < (VIS_TILES * VIS_TILES) as f32 {
+                    self.pc_vis[index] = true;
+                } else {
+                    self.pc_vis[index] = false;
+                }
+            }
+        }
+
+        self.pc_vis_cache_invalid = true;
+
+        trace!("Visibility compute time: {}", animation::format_elapsed_secs(start_time.elapsed()));
+    }
+
+    /// whether the pc has current visibility to the specified coordinations
+    /// No bounds checking is done on the `x` and `y` arguments
+    pub fn is_pc_visible(&self, x: i32, y: i32) -> bool {
+        self.pc_vis[(x + y * self.area.width) as usize]
+    }
+
     fn point_entities_passable(&self, requester: &Ref<EntityState>,
                                x: i32, y: i32) -> bool {
         if !self.area.coords_valid(x, y) { return false; }
@@ -135,7 +191,7 @@ impl AreaState {
                      location: Location, is_pc: bool) -> bool {
         let entity = EntityState::new(actor, location.clone(), 0, is_pc);
         let entity = Rc::new(RefCell::new(entity));
-        self.add_entity(entity, location)
+        self.add_entity(Rc::clone(&entity), location)
     }
 
     pub(in state) fn add_entity(&mut self, entity: Rc<RefCell<EntityState>>,
@@ -158,6 +214,10 @@ impl AreaState {
             self.update_entity_grid(p.x, p.y, Some(new_index));
         }
 
+        if entity.borrow().is_pc() {
+            self.compute_pc_visibility(&entity.borrow());
+        }
+
         self.turn_timer.add(&entity);
         self.entities[new_index] = Some(entity);
 
@@ -171,6 +231,10 @@ impl AreaState {
 
         for p in entity.points(new_x, new_y) {
             self.update_entity_grid(p.x, p.y, Some(entity.index));
+        }
+
+        if entity.is_pc() {
+            self.compute_pc_visibility(entity);
         }
     }
 

@@ -368,15 +368,17 @@ impl GameState {
         STATE.with(|s| {
             let mut state = s.borrow_mut();
             let state = state.as_mut().unwrap();
-            let area_state = state.area_state.borrow();
             debug!("Moving '{}' to {},{}", entity.borrow().actor.actor.name, x, y);
 
             let start_time = time::Instant::now();
-            let path = match state.path_finder.find(&area_state, entity.borrow(), x, y, dist) {
-                None => return false,
-                Some(path) => path,
+            let path = {
+                let area_state = state.area_state.borrow();
+                match state.path_finder.find(&area_state, entity.borrow(), x, y, dist) {
+                    None => return false,
+                    Some(path) => path,
+                }
             };
-            info!("Path finding complete in {} secs",
+            debug!("Path finding complete in {} secs",
                   animation::format_elapsed_secs(start_time.elapsed()));
 
             for anim in state.animations.iter_mut() {
@@ -400,7 +402,7 @@ impl GameState {
                 None => false,
                 Some(_) => true,
             };
-            info!("Path finding complete in {} secs",
+            debug!("Path finding complete in {} secs",
                   animation::format_elapsed_secs(start_time.elapsed()));
 
             val

@@ -159,4 +159,8 @@ impl Terrain {
     pub fn is_visible(&self, x: i32, y: i32) -> bool {
         self.visible[(x + y * self.width) as usize]
     }
+
+    pub fn is_visible_index(&self, index: usize) -> bool {
+        self.visible[index]
+    }
 }

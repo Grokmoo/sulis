@@ -14,8 +14,10 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-extern crate grt;
-extern crate game;
+extern crate sulis_engine;
+extern crate sulis_module;
+extern crate sulis_state;
+extern crate sulis_view;
 
 extern crate backtrace;
 use backtrace::Backtrace;
@@ -31,16 +33,14 @@ use std::io::Error;
 
 use flexi_logger::{Logger, opt_format};
 
-use grt::ui::{self, Widget};
-use grt::io::{IO, MainLoopUpdater};
-use grt::config::CONFIG;
-use grt::resource::ResourceSet;
-
-use game::state::{GameStateMainLoopUpdater, GameState};
-use game::animation;
-use game::view::RootView;
-use game::module::Module;
-use game::main_menu::{MainMenuView, MainMenuLoopUpdater};
+use sulis_engine::ui::{self, Widget};
+use sulis_engine::io::{IO, MainLoopUpdater};
+use sulis_engine::config::CONFIG;
+use sulis_engine::resource::ResourceSet;
+use sulis_module::Module;
+use sulis_state::{animation, GameStateMainLoopUpdater, GameState};
+use sulis_view::RootView;
+use sulis_view::main_menu::{MainMenuView, MainMenuLoopUpdater};
 
 fn main() {
     // CONFIG will be lazily initialized here; if it fails it
@@ -55,7 +55,7 @@ fn main() {
     };
 
     info!("Setting up display adapter.");
-    let mut io = match grt::io::create() {
+    let mut io = match sulis_engine::io::create() {
         Ok(io) => io,
         Err(e) => {
             error!("{}", e);

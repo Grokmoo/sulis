@@ -1,0 +1,14 @@
+[package]
+name = "sulis_engine"
+version = "0.1.0"
+authors = ["Jared Stephen <grok_moo@yahoo.com>"]
+
+[dependencies]
+image = "0.18"
+glium = "0.19"
+lazy_static = "1.0"
+log = "0.4"
+serde = "1.0"
+serde_json = "1.0"
+serde_derive = "1.0"
+serde_yaml = "0.7"

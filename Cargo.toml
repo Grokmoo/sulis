@@ -1,20 +1,24 @@
 [package]
-name = "game"
+name = "sulis"
 version = "0.1.0"
 authors = ["Jared Stephen <grok_moo@yahoo.com>"]
 
 [workspace]
 members = [
-    "grt",
+    "sulis_engine",
+	"sulis_rules",
+	"sulis_module",
+	"sulis_state",
+	"sulis_view",
 ]
 
 [dependencies]
-grt = { path = "grt" }
+sulis_engine = { path = "sulis_engine" }
+sulis_rules = { path = "sulis_rules" }
+sulis_module = { path = "sulis_module" }
+sulis_state = { path = "sulis_state" }
+sulis_view = { path = "sulis_view" }
 
 backtrace = "0.3"
 flexi_logger = "0.6"
-image = "0.18"
 log = "0.4"
-rand = "0.4"
-serde = "1.0"
-serde_derive = "1.0"

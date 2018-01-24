@@ -147,10 +147,10 @@ impl AreaState {
         for y in min_y..max_y {
             for x in min_x..max_x {
                 let index = (x + y * self.area.width) as usize;
-                if !self.area.terrain.is_visible_index(index) {
-                    self.pc_vis[index] = false;
-                    continue;
-                }
+                // if !self.area.terrain.is_visible_index(index) {
+                //     self.pc_vis[index] = false;
+                //     continue;
+                // }
 
                 let xf = x as f32;
                 let yf = y as f32;
@@ -226,10 +226,10 @@ impl AreaState {
     }
 
     pub(in state) fn update_entity_position(&mut self, entity: &EntityState,
-                                           new_x: i32, new_y: i32) {
-        self.clear_entity_points(entity);
+                                           old_x: i32, old_y: i32) {
+        self.clear_entity_points(entity, old_x, old_y);
 
-        for p in entity.points(new_x, new_y) {
+        for p in entity.location_points() {
             self.update_entity_grid(p.x, p.y, Some(entity.index));
         }
 
@@ -238,11 +238,8 @@ impl AreaState {
         }
     }
 
-    fn clear_entity_points(&mut self, entity: &EntityState) {
-        let cur_x = entity.location.x;
-        let cur_y = entity.location.y;
-
-        for p in entity.points(cur_x, cur_y) {
+    fn clear_entity_points(&mut self, entity: &EntityState, x: i32, y: i32) {
+        for p in entity.points(x, y) {
             self.update_entity_grid(p.x, p.y, None);
         }
     }
@@ -306,7 +303,9 @@ impl AreaState {
 
     fn remove_entity_at_index(&mut self, entity: &Rc<RefCell<EntityState>>, index: usize) {
         trace!("Removing entity '{}' with index '{}'", entity.borrow().actor.actor.name, index);
-        self.clear_entity_points(&*entity.borrow());
+        let x = entity.borrow().location.x;
+        let y = entity.borrow().location.y;
+        self.clear_entity_points(&*entity.borrow(), x, y);
         self.entities[index] = None;
         self.turn_timer.remove(entity);
     }

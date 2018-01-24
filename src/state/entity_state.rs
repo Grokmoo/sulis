@@ -120,8 +120,10 @@ impl EntityState {
             return false;
         }
 
+        let old_x = self.location.x;
+        let old_y = self.location.y;
         self.location.move_to(x, y);
-        area_state.update_entity_position(&self, x, y);
+        area_state.update_entity_position(&self, old_x, old_y);
         self.actor.remove_ap(ap_cost);
         self.listeners.notify(&self);
         true
@@ -163,6 +165,10 @@ impl EntityState {
 
     pub fn relative_points(&self) -> EntitySizeIterator {
         self.size.relative_points()
+    }
+
+    pub fn location_points(&self) -> EntitySizeIterator {
+        self.size.points(self.location.x, self.location.y)
     }
 
     pub fn points(&self, x: i32, y: i32) -> EntitySizeIterator {

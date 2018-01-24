@@ -68,7 +68,7 @@ impl TurnTimer {
         }
     }
 
-    pub fn check_ai_activation(&mut self, pc: &EntityState) {
+    pub fn check_ai_activation(&mut self, pc: &Rc<RefCell<EntityState>>) {
         let mut updated = false;
         for entity in self.entities.iter() {
             if entity.borrow().is_pc() { continue; }
@@ -82,6 +82,7 @@ impl TurnTimer {
 
         if updated {
             self.set_active(true);
+            self.activate_current();
         }
     }
 
@@ -96,6 +97,8 @@ impl TurnTimer {
 
             if !active {
                 self.entities.iter().for_each(|e| if e.borrow().is_pc() { e.borrow_mut().actor.init_turn(); });
+            } else {
+                self.entities.iter().for_each(|e| e.borrow_mut().actor.end_turn());
             }
         }
         self.listeners.notify(&self);
@@ -131,17 +134,26 @@ impl TurnTimer {
     pub fn next(&mut self) {
         if !self.active || self.entities.front().is_none() { return; }
 
-        loop {
-            let front = self.entities.pop_front().unwrap();
-            front.borrow_mut().actor.end_turn();
-            self.entities.push_back(front);
+        let front = self.entities.pop_front().unwrap();
+        front.borrow_mut().actor.end_turn();
+        self.entities.push_back(front);
 
-            let new_front = self.entities.front().unwrap();
-            if new_front.borrow().is_pc() || new_front.borrow().is_ai_active() {
-                break;
-            }
-        }
+        self.activate_current();
         self.listeners.notify(&self);
+    }
+
+    fn activate_current(&mut self) {
+        loop {
+            {
+                let front = self.entities.front().unwrap();
+                if front.borrow().is_pc() || front.borrow().is_ai_active() {
+                    break;
+                }
+            }
+
+            let front = self.entities.pop_front().unwrap();
+            self.entities.push_back(front);
+        }
 
         if let Some(current) = self.entities.front() {
             current.borrow_mut().actor.init_turn();

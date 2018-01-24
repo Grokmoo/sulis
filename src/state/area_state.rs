@@ -237,18 +237,16 @@ impl AreaState {
 
     fn update_entity_position(&mut self, entity: &Rc<RefCell<EntityState>>,
                                            old_x: i32, old_y: i32) {
-        let entity = entity.borrow();
+        self.clear_entity_points(&*entity.borrow(), old_x, old_y);
 
-        self.clear_entity_points(&*entity, old_x, old_y);
-
-        for p in entity.location_points() {
-            self.update_entity_grid(p.x, p.y, Some(entity.index));
+        for p in entity.borrow().location_points() {
+            self.update_entity_grid(p.x, p.y, Some(entity.borrow().index));
         }
 
-        if entity.is_pc() {
-            self.compute_pc_visibility(&*entity);
+        if entity.borrow().is_pc() {
+            self.compute_pc_visibility(&*entity.borrow());
 
-            self.turn_timer.check_ai_activation(&*entity);
+            self.turn_timer.check_ai_activation(entity);
         }
     }
 

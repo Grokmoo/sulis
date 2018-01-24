@@ -140,8 +140,10 @@ impl EntityState {
         true
     }
 
-    pub fn has_visibility(&self, other: &EntityState) -> bool {
-        let dist = self.dist(other.location.x, other.location.y, other.size());
+    pub fn has_visibility(&self, other: &Rc<RefCell<EntityState>>) -> bool {
+        let x = other.borrow().location.x;
+        let y = other.borrow().location.y;
+        let dist = self.dist(x, y, other.borrow().size());
 
         dist < area_state::VIS_TILES as f32
     }

@@ -24,7 +24,7 @@ use std::time;
 use std::rc::Rc;
 use std::cell::{Ref, RefCell};
 
-const VIS_TILES: i32 = 18;
+pub const VIS_TILES: i32 = 18;
 
 pub struct AreaState {
     pub area: Rc<Area>,
@@ -225,16 +225,30 @@ impl AreaState {
         true
     }
 
-    pub(in state) fn update_entity_position(&mut self, entity: &EntityState,
+    pub fn move_entity(&mut self, entity: &Rc<RefCell<EntityState>>, x: i32, y: i32, squares: u32) -> bool {
+        let old_x = entity.borrow().location.x;
+        let old_y = entity.borrow().location.y;
+        if !entity.borrow_mut().move_to(self, x, y, squares) { return false; }
+
+        self.update_entity_position(entity, old_x, old_y);
+
+        true
+    }
+
+    fn update_entity_position(&mut self, entity: &Rc<RefCell<EntityState>>,
                                            old_x: i32, old_y: i32) {
-        self.clear_entity_points(entity, old_x, old_y);
+        let entity = entity.borrow();
+
+        self.clear_entity_points(&*entity, old_x, old_y);
 
         for p in entity.location_points() {
             self.update_entity_grid(p.x, p.y, Some(entity.index));
         }
 
         if entity.is_pc() {
-            self.compute_pc_visibility(entity);
+            self.compute_pc_visibility(&*entity);
+
+            self.turn_timer.check_ai_activation(&*entity);
         }
     }
 

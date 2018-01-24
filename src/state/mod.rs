@@ -210,6 +210,7 @@ impl GameState {
         }
 
         let pc_state = Rc::clone(area_state.borrow().get_last_entity().unwrap());
+        pc_state.borrow_mut().actor.init_turn();
 
         let path_finder = PathFinder::new(&area_state.borrow().area);
 
@@ -317,6 +318,13 @@ impl GameState {
 
             state.animations.push(anim);
         });
+    }
+
+    /// Returns true if the game is currently in turn mode, false otherwise
+    pub fn is_in_turn_mode() -> bool {
+        let area_state = GameState::area_state();
+        let area_state = area_state.borrow();
+        area_state.turn_timer.is_active()
     }
 
     /// Returns true if the PC has the current turn, false otherwise

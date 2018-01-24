@@ -23,11 +23,11 @@ terrain:
     ]
   tree01: [ [24, 2], [30, 10] ]
   tree02: [ [38, 6] ]
-actors: [ ]
-  #- id: goblin
-  #  location: [15, 15]
-  #- id: goblin
-  #  location: [24, 5]
+actors:
+  - id: goblin
+    location: [45, 30]
+  - id: goblin
+    location: [50, 25]
 transitions:
   - from: [10, 10]
     size: [2, 2]

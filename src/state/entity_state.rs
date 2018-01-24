@@ -22,7 +22,7 @@ use grt::config::CONFIG;
 use animation::AttackAnimation;
 use module::{Actor, EntitySize, EntitySizeIterator};
 use module::area::Transition;
-use state::{ActorState, AreaState, ChangeListenerList, GameState, Location};
+use state::{ActorState, area_state, AreaState, ChangeListenerList, GameState, Location};
 
 pub struct EntityState {
     pub actor: ActorState,
@@ -33,6 +33,7 @@ pub struct EntityState {
     pub listeners: ChangeListenerList<EntityState>,
 
     is_pc: bool,
+    ai_active: bool,
     marked_for_removal: bool,
 }
 
@@ -57,8 +58,19 @@ impl EntityState {
             index,
             listeners: ChangeListenerList::default(),
             is_pc,
+            ai_active: false,
             marked_for_removal: false,
         }
+    }
+
+    pub fn set_ai_active(&mut self) {
+        if self.is_pc() { return; }
+
+        self.ai_active = true;
+    }
+
+    pub fn is_ai_active(&self) -> bool {
+        self.ai_active
     }
 
     pub fn is_pc(&self) -> bool {
@@ -115,18 +127,23 @@ impl EntityState {
             return false;
         }
 
-        let ap_cost = self.actor.get_move_ap_cost(squares);
-        if self.actor.ap() < ap_cost {
-            return false;
+        if area_state.turn_timer.is_active() {
+            let ap_cost = self.actor.get_move_ap_cost(squares);
+            if self.actor.ap() < ap_cost {
+                return false;
+            }
+            self.actor.remove_ap(ap_cost);
         }
 
-        let old_x = self.location.x;
-        let old_y = self.location.y;
         self.location.move_to(x, y);
-        area_state.update_entity_position(&self, old_x, old_y);
-        self.actor.remove_ap(ap_cost);
         self.listeners.notify(&self);
         true
+    }
+
+    pub fn has_visibility(&self, other: &EntityState) -> bool {
+        let dist = self.dist(other.location.x, other.location.y, other.size());
+
+        dist < area_state::VIS_TILES as f32
     }
 
     fn dist(&self, to_x: i32, to_y: i32, to_size: i32) -> f32 {

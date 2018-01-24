@@ -51,7 +51,7 @@ impl WidgetKind for InitiativeTicker {
 
         let mut widgets: Vec<Rc<RefCell<Widget>>> = Vec::new();
         let mut first = true;
-        for entity in timer.iter() {
+        for entity in timer.active_iter() {
             let theme = match first {
                 true => "current_entry",
                 false => "entry",

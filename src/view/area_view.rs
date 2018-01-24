@@ -266,11 +266,14 @@ impl WidgetKind for AreaView {
 
         for entity in state.entity_iter() {
             let entity = entity.borrow();
-            let size = entity.size() as f32;
-            let x = (entity.location.x + p.x - widget.state.scroll_pos.x) as f32 + entity.sub_pos.0;
-            let y = (entity.location.y + p.y - widget.state.scroll_pos.y) as f32 + entity.sub_pos.1;
-            draw_list.append(&mut DrawList::from_sprite_f32(
-                    &entity.actor.actor.image_display, x, y, size, size));
+
+            if entity.location_points().any(|p| state.is_pc_visible(p.x, p.y)) {
+                let size = entity.size() as f32;
+                let x = (entity.location.x + p.x - widget.state.scroll_pos.x) as f32 + entity.sub_pos.0;
+                let y = (entity.location.y + p.y - widget.state.scroll_pos.y) as f32 + entity.sub_pos.1;
+                draw_list.append(&mut DrawList::from_sprite_f32(
+                        &entity.actor.actor.image_display, x, y, size, size));
+            }
         }
 
         renderer.draw(draw_list);

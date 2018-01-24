@@ -61,7 +61,7 @@ impl animation::Animation for MoveAnimation {
         self.last_frame_index = frame_index as i32;
 
         let p = self.path[frame_index];
-        if !&self.mover.borrow_mut().move_to(area_state, p.x, p.y, move_ap as u32) {
+        if !area_state.move_entity(&self.mover, p.x, p.y, move_ap as u32) {
             return false;
         }
 

@@ -36,7 +36,7 @@ impl Default for TurnTimer {
         TurnTimer {
             entities: VecDeque::new(),
             listeners: ChangeListenerList::default(),
-            active: true,
+            active: false,
         }
     }
 }
@@ -68,11 +68,37 @@ impl TurnTimer {
         }
     }
 
+    pub fn check_ai_activation(&mut self, pc: &EntityState) {
+        let mut updated = false;
+        for entity in self.entities.iter() {
+            if entity.borrow().is_pc() { continue; }
+            if entity.borrow().is_ai_active() { continue; }
+
+            if !entity.borrow().has_visibility(pc) { continue; }
+
+            entity.borrow_mut().set_ai_active();
+            updated = true;
+        }
+
+        if updated {
+            self.set_active(true);
+        }
+    }
+
+    pub fn is_active(&self) -> bool {
+        self.active
+    }
+
     pub fn set_active(&mut self, active: bool) {
         if active != self.active {
             debug!("Set turn timer active = {}", active);
             self.active = active;
+
+            if !active {
+                self.entities.iter().for_each(|e| if e.borrow().is_pc() { e.borrow_mut().actor.init_turn(); });
+            }
         }
+        self.listeners.notify(&self);
     }
 
     pub fn add(&mut self, entity: &Rc<RefCell<EntityState>>) {
@@ -88,7 +114,12 @@ impl TurnTimer {
     pub fn remove(&mut self, entity: &Rc<RefCell<EntityState>>) {
         trace!("Removing entity from turn timer: '{}'", entity.borrow().actor.actor.name);
         self.entities.retain(|other| *entity.borrow() != *other.borrow());
-        self.listeners.notify(&self);
+
+        if self.entities.iter().all(|e| !e.borrow().is_ai_active()) {
+            self.set_active(false);
+        } else {
+            self.listeners.notify(&self);
+        }
     }
 
     pub fn current(&self) -> Option<&Rc<RefCell<EntityState>>> {
@@ -100,9 +131,16 @@ impl TurnTimer {
     pub fn next(&mut self) {
         if !self.active || self.entities.front().is_none() { return; }
 
-        let front = self.entities.pop_front().unwrap();
-        front.borrow_mut().actor.end_turn();
-        self.entities.push_back(front);
+        loop {
+            let front = self.entities.pop_front().unwrap();
+            front.borrow_mut().actor.end_turn();
+            self.entities.push_back(front);
+
+            let new_front = self.entities.front().unwrap();
+            if new_front.borrow().is_pc() || new_front.borrow().is_ai_active() {
+                break;
+            }
+        }
         self.listeners.notify(&self);
 
         if let Some(current) = self.entities.front() {
@@ -111,7 +149,33 @@ impl TurnTimer {
         }
     }
 
-    pub fn iter(&self) -> Iter<Rc<RefCell<EntityState>>> {
-        self.entities.iter()
+    pub fn active_iter(&self) -> ActiveEntityIterator {
+        ActiveEntityIterator {
+            entity_iter: self.entities.iter(),
+            turn_timer: self,
+        }
+    }
+}
+
+pub struct ActiveEntityIterator<'a> {
+    entity_iter: Iter<'a, Rc<RefCell<EntityState>>>,
+    turn_timer: &'a TurnTimer,
+}
+
+impl<'a> Iterator for ActiveEntityIterator<'a> {
+    type Item = &'a Rc<RefCell<EntityState>>;
+    fn next(&mut self) -> Option<&'a Rc<RefCell<EntityState>>> {
+        if !self.turn_timer.active { return None; }
+
+        loop {
+            match self.entity_iter.next() {
+                None => return None,
+                Some(entity) => {
+                    if entity.borrow().is_pc() || entity.borrow().is_ai_active() {
+                        return Some(entity);
+                    }
+                }
+            }
+        }
     }
 }

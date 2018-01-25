@@ -60,7 +60,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_core::config::CONFIG;
-use sulis_core::util::Point;
+use sulis_core::util::{self, Point};
 use sulis_core::io::{GraphicsRenderer, MainLoopUpdater};
 use sulis_module::Module;
 
@@ -394,7 +394,7 @@ impl GameState {
                 }
             };
             debug!("Path finding complete in {} secs",
-                  animation::format_elapsed_secs(start_time.elapsed()));
+                  util::format_elapsed_secs(start_time.elapsed()));
 
             for anim in state.animations.iter_mut() {
                 anim.check(entity);
@@ -418,7 +418,7 @@ impl GameState {
                 Some(_) => true,
             };
             debug!("Path finding complete in {} secs",
-                  animation::format_elapsed_secs(start_time.elapsed()));
+                  util::format_elapsed_secs(start_time.elapsed()));
 
             val
         })

@@ -6,6 +6,7 @@ authors = ["Jared Stephen <grok_moo@yahoo.com>"]
 [workspace]
 members = [
     "sulis_core",
+    "sulis_editor",
 	"sulis_rules",
 	"sulis_module",
 	"sulis_state",
@@ -21,6 +22,4 @@ sulis_state = { path = "sulis_state" }
 sulis_view = { path = "sulis_view" }
 sulis_widgets = { path = "sulis_widgets" }
 
-backtrace = "0.3"
-flexi_logger = "0.6"
 log = "0.4"

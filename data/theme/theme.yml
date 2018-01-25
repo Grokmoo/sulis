@@ -2,6 +2,7 @@
 include:
   - widgets
   - main_menu
+  - editor
 children:
   mouse_over:
     from: .text_area

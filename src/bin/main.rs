@@ -19,39 +19,29 @@ extern crate sulis_module;
 extern crate sulis_state;
 extern crate sulis_view;
 
-extern crate backtrace;
-use backtrace::Backtrace;
-
 #[macro_use] extern crate log;
-extern crate flexi_logger;
 
-use std::{thread, time};
 use std::rc::Rc;
-use std::cell::RefCell;
-use std::panic;
-use std::io::Error;
 
-use flexi_logger::{Logger, opt_format};
-
-use sulis_core::ui::{self, Widget};
-use sulis_core::io::{IO, MainLoopUpdater};
+use sulis_core::ui;
 use sulis_core::config::CONFIG;
 use sulis_core::resource::ResourceSet;
+use sulis_core::util;
 use sulis_module::Module;
-use sulis_state::{animation, GameStateMainLoopUpdater, GameState};
+use sulis_state::{GameStateMainLoopUpdater, GameState};
 use sulis_view::RootView;
 use sulis_view::main_menu::{MainMenuView, MainMenuLoopUpdater};
 
 fn main() {
     // CONFIG will be lazily initialized here; if it fails it
     // prints an error and exits
-    setup_logger();
+    util::setup_logger();
     info!("Setup Logger and read configuration from 'config.yml'");
 
     info!("Reading resources from {}", CONFIG.resources.directory);
     if let Err(e) = ResourceSet::init(&CONFIG.resources.directory) {
         error!("{}", e);
-        error_and_exit("There was a fatal error initializing the display.");
+        util::error_and_exit("There was a fatal error reading resources..");
     };
 
     info!("Setting up display adapter.");
@@ -59,14 +49,14 @@ fn main() {
         Ok(io) => io,
         Err(e) => {
             error!("{}", e);
-            error_and_exit("There was a fatal error initializing the display.");
+            util::error_and_exit("There was a fatal error initializing the display.");
             unreachable!();
         }
     };
 
     let modules_list = Module::get_available_modules("modules");
     if modules_list.len() == 0 {
-        error_and_exit("No valid modules found.");
+        util::error_and_exit("No valid modules found.");
     }
 
     let selected_module = {
@@ -82,9 +72,9 @@ fn main() {
             }
         }
 
-        if let Err(e) = main_loop(&mut io, main_menu_root, Box::new(loop_updater)) {
+        if let Err(e) = util::main_loop(&mut io, main_menu_root, Box::new(loop_updater)) {
             error!("{}", e);
-            error_and_exit("Error in main menu.");
+            util::error_and_exit("Error in main menu.");
         }
 
         main_menu_view.get_selected_module()
@@ -92,7 +82,7 @@ fn main() {
 
     let module_info = match selected_module {
         None => {
-            ok_and_exit("No module selected in main menu.");
+            util::ok_and_exit("No module selected in main menu.");
             unreachable!();
         },
         Some(module) => module,
@@ -101,111 +91,21 @@ fn main() {
     info!("Reading module from {}", module_info.dir);
     if let Err(e) =  Module::init(&module_info.dir) {
         error!("{}", e);
-        error_and_exit("There was a fatal error setting up the module.");
+        util::error_and_exit("There was a fatal error setting up the module.");
     };
 
     info!("Initializing game state.");
     if let Err(e) = GameState::init() {
         error!("{}",  e);
-        error_and_exit("There was a fatal error creating the game state.");
+        util::error_and_exit("There was a fatal error creating the game state.");
     };
 
     let root = ui::create_ui_tree(RootView::new());
 
-    if let Err(e) = main_loop(&mut io, root, Box::new(GameStateMainLoopUpdater { })) {
+    if let Err(e) = util::main_loop(&mut io, root, Box::new(GameStateMainLoopUpdater { })) {
         error!("{}", e);
         error!("Error in main loop.  Exiting...");
     }
 
-    ok_and_exit("Main loop complete.");
-}
-
-fn main_loop(io: &mut Box<IO>, root: Rc<RefCell<Widget>>,
-             updater: Box<MainLoopUpdater>) -> Result<(), Error> {
-    let fpms = (1000.0 / (CONFIG.display.frame_rate as f32)) as u64;
-    let frame_time = time::Duration::from_millis(fpms);
-    trace!("Computed {} frames per milli.", fpms);
-
-    info!("Starting main loop.");
-    let main_loop_start_time = time::Instant::now();
-
-    let mut frames = 0;
-    let mut render_time = time::Duration::from_secs(0);
-    loop {
-        let start_time = time::Instant::now();
-
-        io.process_input(Rc::clone(&root));
-        updater.update();
-
-        if let Err(e) = Widget::update(&root) {
-            error!("There was a fatal error updating the UI tree state.");
-            return Err(e);
-        }
-
-        let total_elapsed =
-            animation::get_elapsed_millis(main_loop_start_time.elapsed());
-        io.render_output(root.borrow(), total_elapsed);
-
-        if updater.is_exit() {
-            trace!("Exiting main loop.");
-            break;
-        }
-
-        let frame_elapsed = start_time.elapsed();
-        if frame_time > frame_elapsed {
-            thread::sleep(frame_time - frame_elapsed);
-        }
-
-        render_time += frame_elapsed;
-        frames += 1;
-    }
-
-    let secs = render_time.as_secs() as f64 + render_time.subsec_nanos() as f64 * 1e-9;
-    info!("Rendered {} frames with total render time {:.4} seconds", frames, secs);
-    info!("Average frame render time: {:.2} milliseconds", 1000.0 * secs / frames as f64);
-
-    Ok(())
-}
-
-fn ok_and_exit(message: &str) {
-    info!("{}", message);
-    info!("Exiting...");
-    ::std::process::exit(0)
-}
-
-fn error_and_exit(error: &str) {
-    error!("{}", error);
-    error!("Exiting...");
-    ::std::process::exit(1)
-}
-
-fn setup_logger() {
-    let mut logger = Logger::with_str(&CONFIG.logging.log_level)
-        .log_to_file()
-        .directory("log")
-        .duplicate_error()
-        .format(opt_format);
-
-    if !CONFIG.logging.use_timestamps {
-        logger = logger.suppress_timestamp();
-    }
-
-    logger.start()
-        .unwrap_or_else(|e| {
-            eprintln!("{}", e);
-            eprintln!("There was a fatal error initializing logging to 'log/'");
-            eprintln!("Exiting...");
-            ::std::process::exit(1);
-        });
-
-    panic::set_hook(Box::new(|p| {
-        error!("Thread main panic.  Exiting.");
-        debug!("with payload: {:?}", p.payload());
-        if let Some(loc) = p.location() {
-           debug!("at {:?}", loc);
-        }
-
-        let bt = Backtrace::new();
-        debug!("{:?}", bt);
-    }));
+    util::ok_and_exit("Main loop complete.");
 }

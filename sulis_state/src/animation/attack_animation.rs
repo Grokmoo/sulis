@@ -18,6 +18,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 use std::time::Instant;
 
+use sulis_core::util;
 use {animation, AreaState, EntityState};
 
 pub struct AttackAnimation {
@@ -57,7 +58,7 @@ impl animation::Animation for AttackAnimation {
             return false;
         }
 
-        let millis = animation::get_elapsed_millis(self.start_time.elapsed());
+        let millis = util::get_elapsed_millis(self.start_time.elapsed());
         let frac = millis as f32 / self.total_time_millis as f32;
         let mut attacker = self.attacker.borrow_mut();
 

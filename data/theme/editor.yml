@@ -1,0 +1,15 @@
+---
+children:
+  editor:
+    children:
+      title:
+        from: .label
+        text_params:
+          scale: 2.0
+        text: "Editor"
+        x_relative: Center
+        preferred_size: [10, 1]
+        position: [0, 1]
+      exit_confirmation_window:
+        from: .exit_confirmation_window
+...

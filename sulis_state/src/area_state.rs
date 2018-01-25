@@ -14,9 +14,10 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use sulis_core::util;
 use sulis_module::{Actor, Area, Module};
 use sulis_module::area::Transition;
-use {animation, ChangeListenerList, EntityState, Location, TurnTimer};
+use {ChangeListenerList, EntityState, Location, TurnTimer};
 
 use std::cmp;
 use std::time;
@@ -165,7 +166,7 @@ impl AreaState {
 
         self.pc_vis_cache_invalid = true;
 
-        trace!("Visibility compute time: {}", animation::format_elapsed_secs(start_time.elapsed()));
+        trace!("Visibility compute time: {}", util::format_elapsed_secs(start_time.elapsed()));
     }
 
     /// whether the pc has current visibility to the specified coordinations

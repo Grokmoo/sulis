@@ -22,12 +22,12 @@ use std::time;
 use sulis_core::ui::{color, Cursor, WidgetKind, Widget};
 use sulis_core::io::*;
 use sulis_core::io::event::ClickKind;
-use sulis_core::util::Point;
+use sulis_core::util::{self, Point};
 use sulis_core::config::CONFIG;
 use sulis_core::resource::Sprite;
 use sulis_core::extern_image::ImageBuffer;
 use sulis_module::area::Layer;
-use sulis_state::{animation, AreaState, GameState};
+use sulis_state::{AreaState, GameState};
 
 use {ActionMenu, EntityMouseover};
 
@@ -136,7 +136,7 @@ impl AreaView {
 
         AreaView::draw_list_to_texture(renderer, draw_list, VISIBILITY_TEX_ID);
         trace!("Visibility render to texture time: {}",
-              animation::format_elapsed_secs(start_time.elapsed()));
+              util::format_elapsed_secs(start_time.elapsed()));
     }
 
     fn draw_list_to_texture(renderer: &mut GraphicsRenderer, draw_list: DrawList, texture_id: &str) {

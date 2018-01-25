@@ -18,6 +18,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use std::time::Instant;
 
+use sulis_core::util;
 use {animation, AreaState, EntityState};
 
 /// an animation that does nothing, but causes the AI to wait for a
@@ -40,7 +41,7 @@ impl WaitAnimation {
 
 impl animation::Animation for WaitAnimation {
     fn update(&mut self, _: &mut AreaState) -> bool {
-        animation::get_elapsed_millis(self.start_time.elapsed()) < self.duration
+        util::get_elapsed_millis(self.start_time.elapsed()) < self.duration
     }
 
     fn get_owner(&self) -> &Rc<RefCell<EntityState>> {

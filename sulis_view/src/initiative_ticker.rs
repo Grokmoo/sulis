@@ -17,8 +17,9 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_engine::ui::{Label, Widget, WidgetKind};
+use sulis_engine::ui::{Widget, WidgetKind};
 use sulis_state::{ChangeListener, GameState};
+use sulis_widgets::Label;
 
 pub const NAME: &str = "initiative_ticker";
 

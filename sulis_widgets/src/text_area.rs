@@ -16,9 +16,10 @@
 
 use std::rc::Rc;
 
-use ui::{MarkupRenderer, Widget, WidgetKind};
-use io::GraphicsRenderer;
-use util::Point;
+use sulis_engine::ui::{Widget, WidgetKind};
+use sulis_engine::io::GraphicsRenderer;
+use sulis_engine::util::Point;
+use MarkupRenderer;
 
 pub struct TextArea {
     pub text: Option<String>,

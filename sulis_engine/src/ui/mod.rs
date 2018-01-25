@@ -20,17 +20,11 @@ pub use self::animation_state::AnimationState;
 mod border;
 pub use self::border::Border;
 
-mod button;
-pub use self::button::Button;
-
 mod callback;
 pub use self::callback::Callback;
 
 pub mod color;
 pub use self::color::Color;
-
-mod confirmation_window;
-pub use self::confirmation_window::ConfirmationWindow;
 
 mod cursor;
 pub use self::cursor::Cursor;
@@ -39,20 +33,8 @@ mod font_renderer;
 pub use self::font_renderer::FontRenderer;
 pub use self::font_renderer::LineRenderer;
 
-mod label;
-pub use self::label::Label;
-
 mod layout_kind;
 pub use self::layout_kind::LayoutKind;
-
-pub mod list_box;
-pub use self::list_box::ListBox;
-
-pub mod markup_renderer;
-pub use self::markup_renderer::MarkupRenderer;
-
-pub mod text_area;
-pub use self::text_area::TextArea;
 
 pub mod theme;
 pub use self::theme::Theme;

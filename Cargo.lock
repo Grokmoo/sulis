@@ -802,6 +802,7 @@ dependencies = [
  "sulis_rules 0.1.0",
  "sulis_state 0.1.0",
  "sulis_view 0.1.0",
+ "sulis_widgets 0.1.0",
 ]
 
 [[package]]
@@ -858,6 +859,15 @@ dependencies = [
  "sulis_module 0.1.0",
  "sulis_rules 0.1.0",
  "sulis_state 0.1.0",
+ "sulis_widgets 0.1.0",
+]
+
+[[package]]
+name = "sulis_widgets"
+version = "0.1.0"
+dependencies = [
+ "log 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sulis_engine 0.1.0",
 ]
 
 [[package]]

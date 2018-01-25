@@ -19,7 +19,8 @@ use std::cell::RefCell;
 
 use sulis_rules::Attribute;
 use sulis_state::{ChangeListener, EntityState};
-use sulis_engine::ui::{Button, Callback, Label, TextArea, Widget, WidgetKind};
+use sulis_engine::ui::{Callback, Widget, WidgetKind};
+use sulis_widgets::{Button, Label, TextArea};
 
 pub const NAME: &str = "character_window";
 

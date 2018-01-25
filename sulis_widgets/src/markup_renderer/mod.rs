@@ -101,10 +101,10 @@ use self::markup_tag::Markup;
 
 use std::rc::Rc;
 
-use io::{DrawList, GraphicsRenderer, Vertex};
-use resource::{Font, ResourceSet};
-use ui::FontRenderer;
-use ui::theme::TextParams;
+use sulis_engine::io::{DrawList, GraphicsRenderer, Vertex};
+use sulis_engine::resource::{Font, ResourceSet};
+use sulis_engine::ui::FontRenderer;
+use sulis_engine::ui::theme::TextParams;
 
 pub struct MarkupRenderer {
     font: Rc<Font>,

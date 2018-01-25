@@ -17,10 +17,10 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_engine::ui::{MarkupRenderer, TextArea, Widget, WidgetKind};
+use sulis_engine::ui::{Widget, WidgetKind};
 use sulis_engine::io::{GraphicsRenderer};
 use sulis_engine::util::Point;
-
+use sulis_widgets::{MarkupRenderer, TextArea};
 use sulis_state::{ChangeListener, EntityState};
 
 const NAME: &'static str = "entity_mouseover";

@@ -8,5 +8,6 @@ sulis_engine = { path = "../sulis_engine" }
 sulis_rules = { path = "../sulis_rules" }
 sulis_module = { path = "../sulis_module" }
 sulis_state = { path = "../sulis_state" }
+sulis_widgets = { path = "../sulis_widgets" }
 
 log = "0.4"

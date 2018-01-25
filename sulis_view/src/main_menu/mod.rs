@@ -19,7 +19,7 @@ use std::cell::RefCell;
 
 use sulis_engine::io::{InputAction, MainLoopUpdater};
 use sulis_engine::ui::*;
-
+use sulis_widgets::{Button, ConfirmationWindow, Label, list_box, ListBox};
 use sulis_module::ModuleInfo;
 
 pub struct MainMenuLoopUpdater {

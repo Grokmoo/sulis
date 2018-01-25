@@ -17,11 +17,12 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_engine::ui::{Callback, Cursor, Label, list_box, ListBox, Widget, WidgetKind};
+use sulis_engine::ui::{Callback, Cursor, Widget, WidgetKind};
 use sulis_engine::io::event::ClickKind;
 use sulis_engine::util::Point;
 use sulis_module::Module;
 use sulis_state::{ChangeListener, GameState, EntityState};
+use sulis_widgets::{Label, list_box, ListBox};
 
 const NAME: &'static str = "action_menu";
 

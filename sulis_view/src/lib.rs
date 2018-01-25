@@ -18,6 +18,7 @@ extern crate sulis_engine;
 extern crate sulis_rules;
 extern crate sulis_module;
 extern crate sulis_state;
+extern crate sulis_widgets;
 
 #[macro_use] extern crate log;
 
@@ -48,8 +49,9 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_engine::io::InputAction;
-use sulis_engine::ui::{Button, Callback, ConfirmationWindow, EmptyWidget, Label, Widget, WidgetKind};
+use sulis_engine::ui::{Callback, EmptyWidget, Widget, WidgetKind};
 use sulis_state::{ChangeListener, GameState};
+use sulis_widgets::{Button, ConfirmationWindow, Label};
 
 const NAME: &str = "root";
 

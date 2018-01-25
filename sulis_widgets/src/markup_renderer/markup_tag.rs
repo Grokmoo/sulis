@@ -17,10 +17,10 @@
 use std::rc::Rc;
 use std::str::FromStr;
 
-use io::Vertex;
-use resource::{Font, ResourceSet};
-use ui::{self, Color};
-use ui::theme::TextParams;
+use sulis_engine::io::Vertex;
+use sulis_engine::resource::{Font, ResourceSet};
+use sulis_engine::ui::{self, Color};
+use sulis_engine::ui::theme::TextParams;
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 enum MarkupKind {

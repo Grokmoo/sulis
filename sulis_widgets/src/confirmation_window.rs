@@ -17,7 +17,8 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use ui::{Button, Callback, Label, Widget, WidgetKind};
+use {Button, Label};
+use sulis_engine::ui::{Callback, Widget, WidgetKind};
 
 pub struct ConfirmationWindow {
     accept_callback: Callback,

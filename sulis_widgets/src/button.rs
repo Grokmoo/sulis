@@ -17,9 +17,10 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use ui::{Label, LineRenderer, Widget, WidgetKind};
-use io::{event, GraphicsRenderer};
-use util::Point;
+use sulis_engine::ui::{LineRenderer, Widget, WidgetKind};
+use sulis_engine::io::{event, GraphicsRenderer};
+use sulis_engine::util::Point;
+use Label;
 
 pub struct Button {
     label: Rc<Label>,

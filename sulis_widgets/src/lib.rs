@@ -16,7 +16,7 @@
 
 #[macro_use] extern crate log;
 
-extern crate sulis_engine;
+extern crate sulis_core;
 
 pub mod button;
 pub use self::button::Button;

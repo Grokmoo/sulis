@@ -16,10 +16,10 @@
 
 use std::rc::Rc;
 
-use sulis_engine::ui::theme::{HorizontalTextAlignment, VerticalTextAlignment};
-use sulis_engine::ui::{LineRenderer, Widget, WidgetKind};
-use sulis_engine::io::GraphicsRenderer;
-use sulis_engine::util::Point;
+use sulis_core::ui::theme::{HorizontalTextAlignment, VerticalTextAlignment};
+use sulis_core::ui::{LineRenderer, Widget, WidgetKind};
+use sulis_core::io::GraphicsRenderer;
+use sulis_core::util::Point;
 
 pub struct Label {
     pub text: Option<String>,

@@ -17,10 +17,10 @@
 use std::io::Error;
 use std::rc::Rc;
 
-use sulis_engine::resource::ResourceBuilder;
-use sulis_engine::util::invalid_data_error;
-use sulis_engine::serde_json;
-use sulis_engine::serde_yaml;
+use sulis_core::resource::ResourceBuilder;
+use sulis_core::util::invalid_data_error;
+use sulis_core::serde_json;
+use sulis_core::serde_yaml;
 
 use {EntitySize, Module};
 

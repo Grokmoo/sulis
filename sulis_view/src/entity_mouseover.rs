@@ -17,9 +17,9 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_engine::ui::{Widget, WidgetKind};
-use sulis_engine::io::{GraphicsRenderer};
-use sulis_engine::util::Point;
+use sulis_core::ui::{Widget, WidgetKind};
+use sulis_core::io::{GraphicsRenderer};
+use sulis_core::util::Point;
 use sulis_widgets::{MarkupRenderer, TextArea};
 use sulis_state::{ChangeListener, EntityState};
 

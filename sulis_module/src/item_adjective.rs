@@ -16,9 +16,9 @@
 
 use std::io::{Error, ErrorKind};
 
-use sulis_engine::resource::ResourceBuilder;
-use sulis_engine::serde_json;
-use sulis_engine::serde_yaml;
+use sulis_core::resource::ResourceBuilder;
+use sulis_core::serde_json;
+use sulis_core::serde_yaml;
 
 /// An adjective is a modifier that affects the stats of
 /// an item in a given way.  Items can have zero, one, or

@@ -18,7 +18,7 @@ use std::io::Error;
 use std::rc::Rc;
 use std::collections::HashMap;
 
-use sulis_engine::util::invalid_data_error;
+use sulis_core::util::invalid_data_error;
 
 use area::{AreaBuilder, Layer, Tile};
 use {Module, generator};

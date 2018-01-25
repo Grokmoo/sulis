@@ -17,9 +17,9 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_engine::ui::{LineRenderer, Widget, WidgetKind};
-use sulis_engine::io::{event, GraphicsRenderer};
-use sulis_engine::util::Point;
+use sulis_core::ui::{LineRenderer, Widget, WidgetKind};
+use sulis_core::io::{event, GraphicsRenderer};
+use sulis_core::util::Point;
 use Label;
 
 pub struct Button {

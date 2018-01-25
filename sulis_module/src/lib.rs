@@ -14,7 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-extern crate sulis_engine;
+extern crate sulis_core;
 extern crate sulis_rules;
 
 #[macro_use] extern crate log;
@@ -62,8 +62,8 @@ use std::fmt::{self, Display};
 use std::path::PathBuf;
 use std::fs;
 
-use sulis_engine::config::CONFIG;
-use sulis_engine::resource::{read, read_single_resource, get_resource, insert_if_ok};
+use sulis_core::config::CONFIG;
+use sulis_core::resource::{read, read_single_resource, get_resource, insert_if_ok};
 
 use self::area::Tile;
 use self::actor::ActorBuilder;

@@ -19,13 +19,13 @@ use std::cell::{RefCell, RefMut};
 use std::cmp;
 use std::time;
 
-use sulis_engine::ui::{color, Cursor, WidgetKind, Widget};
-use sulis_engine::io::*;
-use sulis_engine::io::event::ClickKind;
-use sulis_engine::util::Point;
-use sulis_engine::config::CONFIG;
-use sulis_engine::resource::Sprite;
-use sulis_engine::extern_image::ImageBuffer;
+use sulis_core::ui::{color, Cursor, WidgetKind, Widget};
+use sulis_core::io::*;
+use sulis_core::io::event::ClickKind;
+use sulis_core::util::Point;
+use sulis_core::config::CONFIG;
+use sulis_core::resource::Sprite;
+use sulis_core::extern_image::ImageBuffer;
 use sulis_module::area::Layer;
 use sulis_state::{animation, AreaState, GameState};
 
@@ -302,7 +302,7 @@ impl WidgetKind for AreaView {
         widget.borrow_mut().state.set_max_scroll_pos((width as f32 * scale_x).ceil() as i32
                                                      , (height as f32 * scale_y).ceil() as i32);
 
-        use sulis_engine::io::InputAction::*;
+        use sulis_core::io::InputAction::*;
         match key {
            ScrollUp => widget.borrow_mut().state.scroll(0, -1),
            ScrollDown => widget.borrow_mut().state.scroll(0, 1),

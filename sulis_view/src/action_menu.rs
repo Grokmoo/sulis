@@ -17,9 +17,9 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_engine::ui::{Callback, Cursor, Widget, WidgetKind};
-use sulis_engine::io::event::ClickKind;
-use sulis_engine::util::Point;
+use sulis_core::ui::{Callback, Cursor, Widget, WidgetKind};
+use sulis_core::io::event::ClickKind;
+use sulis_core::util::Point;
 use sulis_module::Module;
 use sulis_state::{ChangeListener, GameState, EntityState};
 use sulis_widgets::{Label, list_box, ListBox};

@@ -31,10 +31,10 @@ use std::collections::HashMap;
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 
-use sulis_engine::resource::{ResourceBuilder, ResourceSet, Sprite};
-use sulis_engine::util::{Point, Size};
-use sulis_engine::serde_json;
-use sulis_engine::serde_yaml;
+use sulis_core::resource::{ResourceBuilder, ResourceSet, Sprite};
+use sulis_core::util::{Point, Size};
+use sulis_core::serde_json;
+use sulis_core::serde_yaml;
 
 use Module;
 

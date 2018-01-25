@@ -16,10 +16,10 @@
 
 use std::io::Error;
 
-use sulis_engine::resource::ResourceBuilder;
-use sulis_engine::util::{invalid_data_error, Point};
-use sulis_engine::serde_json;
-use sulis_engine::serde_yaml;
+use sulis_core::resource::ResourceBuilder;
+use sulis_core::util::{invalid_data_error, Point};
+use sulis_core::serde_json;
+use sulis_core::serde_yaml;
 
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]

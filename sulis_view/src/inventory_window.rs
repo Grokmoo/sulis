@@ -18,7 +18,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_state::{EntityState, ChangeListener, GameState};
-use sulis_engine::ui::{animation_state, AnimationState, Callback, Widget, WidgetKind};
+use sulis_core::ui::{animation_state, AnimationState, Callback, Widget, WidgetKind};
 use sulis_widgets::{Button, Label, list_box, ListBox};
 
 pub const NAME: &str = "inventory_window";

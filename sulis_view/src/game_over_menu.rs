@@ -17,7 +17,7 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_engine::ui::{Callback, Widget, WidgetKind};
+use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_state::GameState;
 use sulis_widgets::{Button, Label};
 

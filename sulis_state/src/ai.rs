@@ -18,7 +18,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use animation::WaitAnimation;
-use sulis_engine::config::CONFIG;
+use sulis_core::config::CONFIG;
 use {EntityState, GameState};
 
 pub struct AI {

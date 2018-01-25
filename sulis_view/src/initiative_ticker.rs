@@ -17,7 +17,7 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_engine::ui::{Widget, WidgetKind};
+use sulis_core::ui::{Widget, WidgetKind};
 use sulis_state::{ChangeListener, GameState};
 use sulis_widgets::Label;
 

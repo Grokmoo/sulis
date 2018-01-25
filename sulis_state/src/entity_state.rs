@@ -17,7 +17,7 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_engine::config::CONFIG;
+use sulis_core::config::CONFIG;
 
 use animation::AttackAnimation;
 use sulis_module::{Actor, EntitySize, EntitySizeIterator};

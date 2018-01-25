@@ -17,7 +17,7 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_engine::ui::Widget;
+use sulis_core::ui::Widget;
 
 pub struct ChangeListenerList<T> {
    listeners: Vec<ChangeListener<T>>,

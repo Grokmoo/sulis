@@ -17,10 +17,10 @@
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 
-use sulis_engine::image::Image;
-use sulis_engine::resource::{ResourceBuilder, ResourceSet};
-use sulis_engine::serde_json;
-use sulis_engine::serde_yaml;
+use sulis_core::image::Image;
+use sulis_core::resource::{ResourceBuilder, ResourceSet};
+use sulis_core::serde_json;
+use sulis_core::serde_yaml;
 
 use Equippable;
 

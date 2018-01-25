@@ -5,7 +5,7 @@ authors = ["Jared Stephen <grok_moo@yahoo.com>"]
 
 [workspace]
 members = [
-    "sulis_engine",
+    "sulis_core",
 	"sulis_rules",
 	"sulis_module",
 	"sulis_state",
@@ -14,7 +14,7 @@ members = [
 ]
 
 [dependencies]
-sulis_engine = { path = "sulis_engine" }
+sulis_core = { path = "sulis_core" }
 sulis_rules = { path = "sulis_rules" }
 sulis_module = { path = "sulis_module" }
 sulis_state = { path = "sulis_state" }

@@ -17,8 +17,8 @@
 use std::rc::Rc;
 use std::io::Error;
 
-use sulis_engine::resource::{ResourceSet, Spritesheet};
-use sulis_engine::util::invalid_data_error;
+use sulis_core::resource::{ResourceSet, Spritesheet};
+use sulis_core::util::invalid_data_error;
 use area::{AreaBuilder, Tile};
 
 pub struct Layer {

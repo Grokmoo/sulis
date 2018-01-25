@@ -30,8 +30,8 @@ pub use self::wait_animation::WaitAnimation;
 
 use {AreaState, EntityState};
 
-use sulis_engine::io::GraphicsRenderer;
-use sulis_engine::util::Point;
+use sulis_core::io::GraphicsRenderer;
+use sulis_core::util::Point;
 
 pub trait Animation {
     fn update(&mut self, area_state: &mut AreaState) -> bool;

@@ -14,7 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-extern crate sulis_engine;
+extern crate sulis_core;
 extern crate sulis_rules;
 extern crate sulis_module;
 extern crate sulis_state;
@@ -48,8 +48,8 @@ pub mod main_menu;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_engine::io::InputAction;
-use sulis_engine::ui::{Callback, EmptyWidget, Widget, WidgetKind};
+use sulis_core::io::InputAction;
+use sulis_core::ui::{Callback, EmptyWidget, Widget, WidgetKind};
 use sulis_state::{ChangeListener, GameState};
 use sulis_widgets::{Button, ConfirmationWindow, Label};
 
@@ -71,7 +71,7 @@ impl WidgetKind for RootView {
     }
 
     fn on_key_press(&self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
-        use sulis_engine::io::InputAction::*;
+        use sulis_core::io::InputAction::*;
         match key {
             Exit => {
                 let exit_window = Widget::with_theme(

@@ -18,7 +18,7 @@ use std::cell::Ref;
 use std::collections::{HashMap, HashSet};
 use std::{f32, ptr};
 
-use sulis_engine::util::Point;
+use sulis_core::util::Point;
 use sulis_module::Area;
 use {EntityState, AreaState};
 

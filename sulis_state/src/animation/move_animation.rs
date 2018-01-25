@@ -19,7 +19,7 @@ use std::rc::Rc;
 use std::time::Instant;
 
 use {animation, AreaState, EntityState};
-use sulis_engine::util::Point;
+use sulis_core::util::Point;
 
 pub struct MoveAnimation {
    mover: Rc<RefCell<EntityState>>,

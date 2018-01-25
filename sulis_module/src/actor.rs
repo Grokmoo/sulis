@@ -19,9 +19,9 @@ use std::rc::Rc;
 use std::fmt;
 use std::collections::HashMap;
 
-use sulis_engine::resource::{ResourceBuilder, ResourceSet, Sprite};
-use sulis_engine::util::invalid_data_error;
-use sulis_engine::{serde_json, serde_yaml};
+use sulis_core::resource::{ResourceBuilder, ResourceSet, Sprite};
+use sulis_core::util::invalid_data_error;
+use sulis_core::{serde_json, serde_yaml};
 
 use {Class, Item, Module, Race};
 

@@ -19,8 +19,8 @@ use std::rc::Rc;
 use std::slice::Iter;
 use std::cell::RefCell;
 
-use sulis_engine::ui::{AnimationState, Callback, Widget, WidgetKind};
-use sulis_engine::util::Size;
+use sulis_core::ui::{AnimationState, Callback, Widget, WidgetKind};
+use sulis_core::util::Size;
 use Button;
 
 pub struct Entry<T: Display> {

@@ -14,7 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-extern crate sulis_engine;
+extern crate sulis_core;
 extern crate sulis_module;
 extern crate sulis_rules;
 #[macro_use] extern crate log;
@@ -59,9 +59,9 @@ use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_engine::config::CONFIG;
-use sulis_engine::util::Point;
-use sulis_engine::io::{GraphicsRenderer, MainLoopUpdater};
+use sulis_core::config::CONFIG;
+use sulis_core::util::Point;
+use sulis_core::io::{GraphicsRenderer, MainLoopUpdater};
 use sulis_module::Module;
 
 thread_local! {

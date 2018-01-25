@@ -16,7 +16,7 @@
 
 use std::fmt::{Debug, Formatter, Result};
 
-use sulis_engine::util::Point;
+use sulis_core::util::Point;
 use AreaState;
 use sulis_module::Area;
 

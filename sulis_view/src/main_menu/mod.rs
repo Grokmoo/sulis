@@ -17,8 +17,8 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_engine::io::{InputAction, MainLoopUpdater};
-use sulis_engine::ui::*;
+use sulis_core::io::{InputAction, MainLoopUpdater};
+use sulis_core::ui::*;
 use sulis_widgets::{Button, ConfirmationWindow, Label, list_box, ListBox};
 use sulis_module::ModuleInfo;
 
@@ -78,7 +78,7 @@ impl WidgetKind for MainMenuView {
     }
 
     fn on_key_press(&self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
-        use sulis_engine::io::InputAction::*;
+        use sulis_core::io::InputAction::*;
         match key {
             Exit => {
                 let exit_window = Widget::with_theme(

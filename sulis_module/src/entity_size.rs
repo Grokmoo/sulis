@@ -17,10 +17,10 @@
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 
-use sulis_engine::resource::{ResourceBuilder, ResourceSet, Sprite};
-use sulis_engine::util::Point;
-use sulis_engine::serde_json;
-use sulis_engine::serde_yaml;
+use sulis_core::resource::{ResourceBuilder, ResourceSet, Sprite};
+use sulis_core::util::Point;
+use sulis_core::serde_json;
+use sulis_core::serde_yaml;
 
 pub struct EntitySize {
     pub size: i32,

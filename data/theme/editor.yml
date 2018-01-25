@@ -10,6 +10,19 @@ children:
         x_relative: Center
         preferred_size: [10, 1]
         position: [0, 1]
+      tile_picker:
+        background: bg_base
+        border: [1, 1, 1, 1]
+        preferred_size: [25, 0]
+        x_relative: Max
+        height_relative: Max
+        layout: Grid
+        layout_spacing: [0, 1, 0, 1]
+        children:
+          tile_button:
+            from: .button
+            text: "#0#"
+            preferred_size: [5, 5]
       exit_confirmation_window:
         from: .exit_confirmation_window
 ...

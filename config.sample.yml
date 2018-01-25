@@ -50,4 +50,7 @@ logging:
     # Meaning each run of the game will generate a unique log filename.
     # If false, each run will simply overwrite the previous log file.
     use_timestamps: false
+
+editor:
+  module: "test1"
 ...

@@ -62,7 +62,6 @@ use std::fmt::{self, Display};
 use std::path::PathBuf;
 use std::fs;
 
-use sulis_core::config::CONFIG;
 use sulis_core::resource::{read, read_single_resource, get_resource, insert_if_ok};
 
 use self::area::Tile;
@@ -156,8 +155,8 @@ impl Module {
         modules
     }
 
-    pub fn init(root_dir: &str) -> Result<(), Error> {
-        let builder_set = ModuleBuilder::new(root_dir);
+    pub fn init(data_dir: &str, root_dir: &str) -> Result<(), Error> {
+        let builder_set = ModuleBuilder::new(data_dir, root_dir);
 
         debug!("Creating module from parsed data.");
 
@@ -289,8 +288,8 @@ struct ModuleBuilder {
 }
 
 impl ModuleBuilder {
-    fn new(root_dir: &str) -> ModuleBuilder {
-        let root_dirs: Vec<&str> = vec![&CONFIG.resources.directory, root_dir];
+    fn new(data_dir: &str, root_dir: &str) -> ModuleBuilder {
+        let root_dirs: Vec<&str> = vec![data_dir, root_dir];
         ModuleBuilder {
             actor_builders: read(&root_dirs, "actors"),
             area_builders: read(&root_dirs, "areas"),

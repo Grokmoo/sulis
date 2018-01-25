@@ -27,6 +27,7 @@ use sulis_core::ui;
 use sulis_core::config::CONFIG;
 use sulis_core::resource::ResourceSet;
 use sulis_core::util;
+use sulis_module::Module;
 
 use sulis_editor::{EditorView, EditorMainLoopUpdater};
 
@@ -37,9 +38,16 @@ fn main() {
     info!("Setup Logger and read configuration from 'config.yml'");
 
     info!("Reading resources from {}", CONFIG.resources.directory);
-    if let Err(e) = ResourceSet::init(&format!("../{}", CONFIG.resources.directory)) {
+    let data_dir = format!("../{}", CONFIG.resources.directory);
+    if let Err(e) = ResourceSet::init(&data_dir) {
         error!("{}", e);
         util::error_and_exit("There was a fatal error reading resources.");
+    };
+
+    info!("Reading module from {}", CONFIG.editor.module);
+    if let Err(e) =  Module::init(&data_dir, &format!("../modules/{}", CONFIG.editor.module)) {
+        error!("{}", e);
+        util::error_and_exit("There was a fatal error setting up the module.");
     };
 
     info!("Setting up display adapter.");

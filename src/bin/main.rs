@@ -89,7 +89,7 @@ fn main() {
     };
 
     info!("Reading module from {}", module_info.dir);
-    if let Err(e) =  Module::init(&module_info.dir) {
+    if let Err(e) =  Module::init(&CONFIG.resources.directory, &module_info.dir) {
         error!("{}", e);
         util::error_and_exit("There was a fatal error setting up the module.");
     };

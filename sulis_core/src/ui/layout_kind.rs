@@ -19,48 +19,86 @@ use std::cell::RefMut;
 use std::cmp;
 
 use ui::{Size, Widget};
-use ui::theme::SizeRelative;
+use ui::theme::{Theme, SizeRelative};
 
 #[derive(Deserialize, Debug, Clone, Copy, PartialEq)]
 pub enum LayoutKind {
     Normal,
     BoxVertical,
     BoxHorizontal,
+    Grid,
 }
 
 impl LayoutKind {
     pub fn layout(&self, widget: &Widget) {
+        let theme = match widget.theme {
+            None => return,
+            Some(ref t) => Rc::clone(&t),
+        };
+
         use self::LayoutKind::*;
         match *self {
             Normal => LayoutKind::layout_normal(widget),
-            BoxVertical => LayoutKind::layout_box_vertical(widget),
-            BoxHorizontal => LayoutKind::layout_box_horizontal(widget),
+            BoxVertical => LayoutKind::layout_box_vertical(widget, theme),
+            BoxHorizontal => LayoutKind::layout_box_horizontal(widget, theme),
+            Grid => LayoutKind::layout_grid(widget, theme),
         }
     }
 
-    fn layout_box_horizontal(widget: &Widget) {
+    fn layout_grid(widget: &Widget, theme: Rc<Theme>) {
+        let mut current_x = widget.state.inner_left();
+        let mut current_y = widget.state.inner_top();
+
+        let mut max_height = 0;
+        current_y += theme.layout_spacing.top;
+
+        for child in widget.children.iter() {
+            current_x += theme.layout_spacing.left;
+
+            let width = LayoutKind::get_preferred_width_recursive(&child.borrow_mut());
+            let height = LayoutKind::get_preferred_height_recursive(&child.borrow_mut());
+            max_height = cmp::max(max_height, height);
+            child.borrow_mut().state.set_size(Size::new(width, height));
+
+            if current_x + width + theme.layout_spacing.right > widget.state.inner_right() {
+                current_x = widget.state.inner_left() + theme.layout_spacing.left;
+                current_y += max_height;
+                current_y += theme.layout_spacing.top + theme.layout_spacing.bottom;
+                max_height = 0;
+            }
+
+            child.borrow_mut().state.set_position(current_x, current_y);
+            current_x += width + theme.layout_spacing.right;
+        }
+    }
+
+    fn layout_box_horizontal(widget: &Widget, theme: Rc<Theme>) {
         let height = widget.state.inner_size.height;
         let y = widget.state.inner_top();
         let mut current_x = widget.state.inner_left();
 
         for child in widget.children.iter() {
+            current_x += theme.layout_spacing.left;
             let width = LayoutKind::get_preferred_width_recursive(&child.borrow_mut());
             child.borrow_mut().state.set_size(Size::new(width, height));
             child.borrow_mut().state.set_position(current_x, y);
             current_x += width;
+            current_x += theme.layout_spacing.right;
         }
     }
 
-    fn layout_box_vertical(widget: &Widget) {
+    fn layout_box_vertical(widget: &Widget, theme: Rc<Theme>) {
         let width = widget.state.inner_size.width;
         let x = widget.state.inner_left();
         let mut current_y = widget.state.inner_top();
 
         for child in widget.children.iter() {
+            current_y += theme.layout_spacing.top;
             let height = LayoutKind::get_preferred_height_recursive(&child.borrow_mut());
             child.borrow_mut().state.set_size(Size::new(width, height));
             child.borrow_mut().state.set_position(x, current_y);
             current_y += height;
+            current_y += theme.layout_spacing.bottom;
         }
     }
 

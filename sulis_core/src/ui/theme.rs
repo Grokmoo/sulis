@@ -96,6 +96,7 @@ impl TextParams {
 #[derive(Debug)]
 pub struct Theme {
     pub layout: LayoutKind,
+    pub layout_spacing: Border,
     pub text: Option<String>,
     pub text_params: TextParams,
     pub name: String,
@@ -129,9 +130,11 @@ impl Theme {
         let preferred_size = builder.preferred_size.unwrap_or(Size::as_zero());
         let text_params = TextParams::from(builder.text_params);
         let layout = builder.layout.unwrap_or(LayoutKind::Normal);
+        let layout_spacing = builder.layout_spacing.unwrap_or(Border::as_zero());
 
         Theme {
             layout,
+            layout_spacing,
             name: name.to_string(),
             background: builder.background,
             border,
@@ -234,6 +237,7 @@ pub struct ThemeBuilder {
     text: Option<String>,
     text_params: Option<TextParamsBuilder>,
     layout: Option<LayoutKind>,
+    layout_spacing: Option<Border>,
     position: Option<Point>,
     x_relative: Option<PositionRelative>,
     y_relative: Option<PositionRelative>,
@@ -321,6 +325,7 @@ impl ThemeBuilder {
         if self.text.is_none() { self.text = other.text; }
         if self.position.is_none() { self.position = other.position; }
         if self.layout.is_none() { self.layout = other.layout; }
+        if self.layout_spacing.is_none() { self.layout_spacing = other.layout_spacing; }
         if self.x_relative.is_none() { self.x_relative = other.x_relative; }
         if self.y_relative.is_none() { self.y_relative = other.y_relative; }
         if self.width_relative.is_none() { self.width_relative = other.width_relative; }

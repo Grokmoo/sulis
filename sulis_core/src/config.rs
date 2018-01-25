@@ -31,6 +31,13 @@ pub struct Config {
   pub resources: ResourcesConfig,
   pub input: InputConfig,
   pub logging: LoggingConfig,
+  pub editor: EditorConfig,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct EditorConfig {
+    pub module: String,
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -85,14 +92,22 @@ impl Config {
         if !config_path.is_file() {
             println!("{} not found, attempting to create it from {}", filename, CONFIG_BASE);
             match fs::copy(config_base_path, config_path) {
-                Err(e) => {
-                    eprintln!("{}", e);
-                    eprintln!("Unable to create configuration file '{}'", filename);
-                    eprintln!("Exiting...");
-                    ::std::process::exit(1);
-                }
+                Err(_) => {
+                    let config_base_str = format!("../{}", CONFIG_BASE);
+                    let config_base_path = Path::new(&config_base_str);
+                    match fs::copy(config_base_path, config_path) {
+                        Err(e) => {
+                            eprintln!("{}", e);
+                            eprintln!("Unable to create configuration file '{}'", filename);
+                            eprintln!("Exiting...");
+                            ::std::process::exit(1);
+                        },
+                        _ => {}
+                    }
+                },
                 _ => {}
             }
+
         }
 
         let config = Config::new(filename);

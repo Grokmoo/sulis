@@ -14,9 +14,13 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+mod tile_picker;
+use tile_picker::TilePicker;
+
 #[macro_use] extern crate log;
 
 extern crate sulis_core;
+extern crate sulis_module;
 extern crate sulis_widgets;
 
 use std::rc::Rc;
@@ -81,6 +85,8 @@ impl WidgetKind for EditorView {
 
         let title = Widget::with_theme(Label::empty(), "title");
 
-        vec![title]
+        let tile_picker = Widget::with_defaults(TilePicker::new());
+
+        vec![title, tile_picker]
     }
 }

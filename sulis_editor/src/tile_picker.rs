@@ -50,13 +50,15 @@ impl WidgetKind for TilePicker {
                     child.borrow_mut().state.set_active(false);
                 }
                 widget.borrow_mut().state.set_active(true);
+
+                parent.borrow_mut().state.add_text_arg("current_tile", &widget.borrow().state.text);
             } else {
                 widget.borrow_mut().state.set_active(false);
             }
         }));
 
         for tile in Module::all_tiles() {
-            let button = Widget::with_theme(Button::with_text(&tile.name), "tile_button");
+            let button = Widget::with_theme(Button::with_text(&tile.id), "tile_button");
             button.borrow_mut().state.add_callback(cb.clone());
             widgets.push(button);
         }

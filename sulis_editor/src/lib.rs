@@ -90,7 +90,7 @@ impl WidgetKind for EditorView {
 
         let tile_picker = Widget::with_defaults(TilePicker::new());
 
-        let area_editor = Widget::with_defaults(AreaEditor::new(20, 20));
+        let area_editor = Widget::with_defaults(AreaEditor::new(&tile_picker));
 
         vec![title, tile_picker, area_editor]
     }

@@ -13,7 +13,8 @@ children:
       area_editor:
         width_relative: Max
         height_relative: Max
-        preferred_size: [-25, 0]
+        preferred_size: [-25, 2]
+        position: [0, 2]
       tile_picker:
         background: bg_base
         border: [1, 1, 1, 1]

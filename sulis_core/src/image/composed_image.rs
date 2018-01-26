@@ -16,13 +16,13 @@
 
 use std::rc::Rc;
 use std::io::{Error, ErrorKind};
-use std::collections::HashMap;
 
-use image::Image;
-use resource::ResourceBuilder;
+use image::{Image, SimpleImage};
+use image::simple_image::SimpleImageBuilder;
+use resource::{ResourceBuilder, ResourceSet};
 use io::{self, GraphicsRenderer};
 use ui::AnimationState;
-use util::Size;
+use util::{invalid_data_error, Size};
 
 use serde_json;
 use serde_yaml;
@@ -38,25 +38,54 @@ pub struct ComposedImage {
     middle_size: Size,
 }
 
+fn get_images_from_grid(grid: Vec<String>,
+                        resources: &ResourceSet) -> Result<Vec<Rc<Image>>, Error> {
+    let mut images_vec: Vec<Rc<Image>> = Vec::new();
+    for id in grid {
+        let image = resources.images.get(&id);
+        if let None = image {
+            return invalid_data_error(&format!("Unable to locate sub image {}", id));
+        }
+
+        let image = image.unwrap();
+        images_vec.push(Rc::clone(image));
+    }
+
+    Ok(images_vec)
+}
+
+fn get_images_from_inline(grid: Vec<String>, sub_image_data: SubImageData,
+                          resources: &mut ResourceSet) -> Result<Vec<Rc<Image>>, Error> {
+    let size = sub_image_data.size;
+    let spritesheet = sub_image_data.spritesheet;
+
+    let mut images: Vec<Rc<Image>> = Vec::new();
+    for id in grid {
+        let image_display = format!("{}/{}", spritesheet, id);
+        let builder = SimpleImageBuilder {
+            id: id.clone(),
+            image_display,
+            size
+        };
+        let image = SimpleImage::new(builder, resources)?;
+        resources.images.insert(id, Rc::clone(&image));
+        images.push(image);
+    }
+
+    Ok(images)
+}
+
 impl ComposedImage {
     pub fn new(builder: ComposedImageBuilder,
-               images: &HashMap<String, Rc<Image>>) -> Result<Rc<Image>, Error> {
+               resources: &mut ResourceSet) -> Result<Rc<Image>, Error> {
         if builder.grid.len() as i32 != GRID_LEN {
-            return Err(Error::new(ErrorKind::InvalidData,
-                format!("Composed image grid must be length {}", GRID_LEN)));
+            return invalid_data_error(&format!("Composed image grid must be length {}", GRID_LEN));
         }
 
-        let mut images_vec: Vec<Rc<Image>> = Vec::new();
-        for id in builder.grid {
-           let image = images.get(&id);
-           if let None = image {
-                return Err(Error::new(ErrorKind::InvalidData,
-                    format!("Unable to locate sub image {}", id)));
-           }
-
-           let image = image.unwrap();
-           images_vec.push(Rc::clone(image));
-        }
+        let images_vec = match builder.generate_sub_images {
+            Some(sub_image_data) => get_images_from_inline(builder.grid, sub_image_data, resources)?,
+            None => get_images_from_grid(builder.grid, resources)?,
+        };
 
         // verify heights make sense for the grid
         let mut total_height = 0;
@@ -184,11 +213,20 @@ impl Image for ComposedImage {
     }
 }
 
+
+#[derive(Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
+struct SubImageData {
+    size: Size,
+    spritesheet: String,
+}
+
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct ComposedImageBuilder {
-    pub id: String,
-    pub grid: Vec<String>,
+    id: String,
+    grid: Vec<String>,
+    generate_sub_images: Option<SubImageData>,
 }
 
 impl ResourceBuilder for ComposedImageBuilder {

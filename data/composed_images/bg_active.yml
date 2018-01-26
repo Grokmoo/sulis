@@ -1,0 +1,9 @@
+id: bg_active
+generate_sub_images:
+  size: [1, 1]
+  spritesheet: "gui"
+grid: [ bg_top_left_active,    bg_top_middle_active,    bg_top_right_active,
+        bg_middle_left_active, bg_middle_active,        bg_middle_right_active,
+        bg_bottom_left_active, bg_bottom_middle_active, bg_bottom_right_active
+      ]
+

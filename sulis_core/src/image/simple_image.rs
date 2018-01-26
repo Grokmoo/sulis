@@ -67,9 +67,9 @@ impl Image for SimpleImage {
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct SimpleImageBuilder {
-    id: String,
-    image_display: String,
-    size: Size,
+    pub (crate) id: String,
+    pub (crate) image_display: String,
+    pub (crate) size: Size,
 }
 
 impl ResourceBuilder for SimpleImageBuilder {

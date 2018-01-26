@@ -43,8 +43,8 @@ pub struct WidgetState {
     pub font: Option<Rc<Font>>,
     pub is_modal: bool,
     pub is_mouse_over: bool,
-    pub text_args: HashMap<String, String>,
 
+    text_args: HashMap<String, String>,
     pub (in ui) callback: Option<Callback>,
 }
 
@@ -70,6 +70,18 @@ impl WidgetState {
             inner_position: Point::as_zero(),
             is_modal: false,
             is_mouse_over: false,
+        }
+    }
+
+    pub fn is_active(&self) -> bool {
+        self.animation_state.contains(animation_state::Kind::Active)
+    }
+
+    pub fn set_active(&mut self, active: bool) {
+        if active {
+            self.animation_state.add(animation_state::Kind::Active);
+        } else {
+            self.animation_state.remove(animation_state::Kind::Active);
         }
     }
 

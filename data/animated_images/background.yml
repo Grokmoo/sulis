@@ -1,7 +1,9 @@
 id: background
 states:
     normal: bg_base
-    hover: bg_mouseover
+    hover: bg_hover
+    active: bg_active
+    active + hover: bg_active
     pressed + hover: bg_pressed
     disabled: bg_disabled
     disabled + hover: bg_disabled

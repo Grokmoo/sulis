@@ -14,6 +14,9 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+mod area_editor;
+use area_editor::AreaEditor;
+
 mod tile_picker;
 use tile_picker::TilePicker;
 
@@ -87,6 +90,8 @@ impl WidgetKind for EditorView {
 
         let tile_picker = Widget::with_defaults(TilePicker::new());
 
-        vec![title, tile_picker]
+        let area_editor = Widget::with_defaults(AreaEditor::new(20, 20));
+
+        vec![title, tile_picker, area_editor]
     }
 }

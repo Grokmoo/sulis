@@ -17,7 +17,7 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use sulis_core::ui::{Widget, WidgetKind};
+use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_module::Module;
 use sulis_widgets::Button;
 
@@ -40,8 +40,24 @@ impl WidgetKind for TilePicker {
 
     fn on_add(&self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let mut widgets: Vec<Rc<RefCell<Widget>>> = Vec::new();
+
+        let cb: Callback = Callback::new(Rc::new(move |widget| {
+            let parent = Widget::get_parent(widget);
+            let cur_state = widget.borrow_mut().state.is_active();
+            if !cur_state {
+                trace!("Set active: {}", widget.borrow().state.text);
+                for child in parent.borrow_mut().children.iter() {
+                    child.borrow_mut().state.set_active(false);
+                }
+                widget.borrow_mut().state.set_active(true);
+            } else {
+                widget.borrow_mut().state.set_active(false);
+            }
+        }));
+
         for tile in Module::all_tiles() {
             let button = Widget::with_theme(Button::with_text(&tile.name), "tile_button");
+            button.borrow_mut().state.add_callback(cb.clone());
             widgets.push(button);
         }
 

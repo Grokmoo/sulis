@@ -1,4 +1,0 @@
-id: "bg_mouseover"
-grid: [ "bg_top_left_mouseover",    "bg_top_middle_mouseover",    "bg_top_right_mouseover",
-        "bg_middle_left_mouseover", "bg_middle_mouseover",        "bg_middle_right_mouseover",
-        "bg_bottom_left_mouseover", "bg_bottom_middle_mouseover", "bg_bottom_right_mouseover" ]

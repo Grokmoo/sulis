@@ -55,10 +55,10 @@ pub trait ResourceBuilder where Self: Sized {
 }
 
 pub struct ResourceSet {
-    theme: Option<Rc<Theme>>,
-    images: HashMap<String, Rc<Image>>,
-    spritesheets: HashMap<String, Rc<Spritesheet>>,
-    fonts: HashMap<String, Rc<Font>>,
+    pub (crate) theme: Option<Rc<Theme>>,
+    pub (crate) images: HashMap<String, Rc<Image>>,
+    pub (crate) spritesheets: HashMap<String, Rc<Spritesheet>>,
+    pub (crate) fonts: HashMap<String, Rc<Font>>,
 }
 
 impl ResourceSet {
@@ -100,7 +100,7 @@ impl ResourceSet {
 
             for (id, image) in builder_set.composed_builders {
                 insert_if_ok_boxed("image", id, ComposedImage::new(image,
-                    &resource_set.images), &mut resource_set.images);
+                    &mut resource_set), &mut resource_set.images);
             }
 
             for (id, image) in builder_set.animated_builders {

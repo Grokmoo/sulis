@@ -55,9 +55,8 @@ pub struct EditorView {
 }
 
 impl EditorView {
-    pub fn new() -> Rc<EditorView> {
-        Rc::new(EditorView {
-        })
+    pub fn new() -> Rc<RefCell<EditorView>> {
+        Rc::new(RefCell::new(EditorView { }))
     }
 }
 
@@ -66,7 +65,7 @@ impl WidgetKind for EditorView {
         NAME
     }
 
-    fn on_key_press(&self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
+    fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
         use InputAction::*;
         match key {
             Exit => {
@@ -83,7 +82,7 @@ impl WidgetKind for EditorView {
         true
     }
 
-    fn on_add(&self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         debug!("Adding to editor widget");
 
         let title = Widget::with_theme(Label::empty(), "title");

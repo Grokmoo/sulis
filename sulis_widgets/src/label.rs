@@ -15,6 +15,7 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::rc::Rc;
+use std::cell::RefCell;
 
 use sulis_core::ui::theme::{HorizontalTextAlignment, VerticalTextAlignment};
 use sulis_core::ui::{LineRenderer, Widget, WidgetKind};
@@ -26,16 +27,16 @@ pub struct Label {
 }
 
 impl Label {
-    pub fn empty() -> Rc<Label> {
-        Rc::new(Label {
+    pub fn empty() -> Rc<RefCell<Label>> {
+        Rc::new(RefCell::new(Label {
             text: None,
-        })
+        }))
     }
 
-    pub fn new(text: &str) -> Rc<Label> {
-        Rc::new(Label {
+    pub fn new(text: &str) -> Rc<RefCell<Label>> {
+        Rc::new(RefCell::new(Label {
             text: Some(text.to_string()),
-        })
+        }))
     }
 
     fn get_draw_params(width: f32, height: f32, widget: &Widget) -> (f32, f32, &str) {
@@ -84,7 +85,7 @@ impl WidgetKind for Label {
         }
     }
 
-    fn draw_graphics_mode(&self, renderer: &mut GraphicsRenderer, _pixel_size: Point,
+    fn draw_graphics_mode(&mut self, renderer: &mut GraphicsRenderer, _pixel_size: Point,
                           widget: &Widget, _millis: u32) {
         let font_rend = match &widget.state.text_renderer {
             &None => return,

@@ -26,10 +26,8 @@ const NAME: &str = "tile_picker";
 pub struct TilePicker { }
 
 impl TilePicker {
-    pub fn new() -> Rc<TilePicker> {
-        Rc::new(TilePicker {
-
-        })
+    pub fn new() -> Rc<RefCell<TilePicker>> {
+        Rc::new(RefCell::new(TilePicker { }))
     }
 }
 
@@ -38,7 +36,7 @@ impl WidgetKind for TilePicker {
         NAME
     }
 
-    fn on_add(&self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let mut widgets: Vec<Rc<RefCell<Widget>>> = Vec::new();
 
         let cb: Callback = Callback::new(Rc::new(move |widget| {

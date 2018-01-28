@@ -25,8 +25,8 @@ use util::Point;
 pub struct EmptyWidget { }
 
 impl EmptyWidget {
-    pub fn new() -> Rc<EmptyWidget> {
-        Rc::new(EmptyWidget {})
+    pub fn new() -> Rc<RefCell<EmptyWidget>> {
+        Rc::new(RefCell::new(EmptyWidget {}))
     }
 }
 
@@ -42,7 +42,7 @@ pub trait WidgetKind {
     /// called every frame
     fn update(&self, _widget: &Rc<RefCell<Widget>>) { }
 
-    fn draw_graphics_mode(&self, _renderer: &mut GraphicsRenderer, _pixel_size: Point,
+    fn draw_graphics_mode(&mut self, _renderer: &mut GraphicsRenderer, _pixel_size: Point,
                           _widget: &Widget, _millis: u32) { }
 
     fn layout(&self, widget: &mut Widget) {
@@ -56,7 +56,7 @@ pub trait WidgetKind {
     /// parent widget.  If you implement this but do not need to add any children,
     /// returning 'Vec::with_capacity(0)' is best.
     /// Widgets are added according to their order in the vector.
-    fn on_add(&self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         Vec::with_capacity(0)
     }
 
@@ -65,7 +65,7 @@ pub trait WidgetKind {
     /// when a widget is removed from the tree.  Note that this is called when
     /// the actual removal takes place, not when the widget is first marked
     /// for removal.
-    fn on_remove(&self) { }
+    fn on_remove(&mut self) { }
 
     fn super_on_mouse_press(&self, widget: &Rc<RefCell<Widget>>, _kind: ClickKind) {
         widget.borrow_mut().state.animation_state.add(animation_state::Kind::Pressed);
@@ -75,35 +75,35 @@ pub trait WidgetKind {
         widget.borrow_mut().state.animation_state.remove(animation_state::Kind::Pressed);
     }
 
-    fn on_mouse_press(&self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
+    fn on_mouse_press(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
         self.super_on_mouse_press(widget, kind);
         true
     }
 
-    fn on_mouse_release(&self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
+    fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
         self.super_on_mouse_release(widget, kind);
         true
     }
 
-    fn on_mouse_move(&self, _widget: &Rc<RefCell<Widget>>) -> bool {
+    fn on_mouse_move(&mut self, _widget: &Rc<RefCell<Widget>>) -> bool {
         true
     }
 
-    fn on_mouse_enter(&self, widget: &Rc<RefCell<Widget>>) -> bool {
+    fn on_mouse_enter(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
         self.super_on_mouse_enter(widget);
         true
     }
 
-    fn on_mouse_exit(&self, widget: &Rc<RefCell<Widget>>) -> bool {
+    fn on_mouse_exit(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
         self.super_on_mouse_exit(widget);
         true
     }
 
-    fn on_mouse_scroll(&self, _widget: &Rc<RefCell<Widget>>, _scroll: i32) -> bool {
+    fn on_mouse_scroll(&mut self, _widget: &Rc<RefCell<Widget>>, _scroll: i32) -> bool {
         true
     }
 
-    fn on_key_press(&self, _widget: &Rc<RefCell<Widget>>, _key: InputAction) -> bool {
+    fn on_key_press(&mut self, _widget: &Rc<RefCell<Widget>>, _key: InputAction) -> bool {
         false
     }
 

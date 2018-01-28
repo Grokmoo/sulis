@@ -28,10 +28,10 @@ pub struct InventoryWindow {
 }
 
 impl InventoryWindow {
-    pub fn new(entity: &Rc<RefCell<EntityState>>) -> Rc<InventoryWindow> {
-        Rc::new(InventoryWindow {
+    pub fn new(entity: &Rc<RefCell<EntityState>>) -> Rc<RefCell<InventoryWindow>> {
+        Rc::new(RefCell::new(InventoryWindow {
             entity: Rc::clone(entity)
-        })
+        }))
     }
 }
 
@@ -44,12 +44,12 @@ impl WidgetKind for InventoryWindow {
         widget.do_base_layout();
     }
 
-    fn on_remove(&self) {
+    fn on_remove(&mut self) {
         self.entity.borrow_mut().actor.listeners.remove(NAME);
         debug!("Removed inventory window.");
     }
 
-    fn on_add(&self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         self.entity.borrow_mut().actor.listeners.add(
             ChangeListener::invalidate(NAME, widget));
 

@@ -28,10 +28,8 @@ pub struct GameOverMenu {
 }
 
 impl GameOverMenu {
-    pub fn new() -> Rc<GameOverMenu> {
-        Rc::new(GameOverMenu {
-
-        })
+    pub fn new() -> Rc<RefCell<GameOverMenu>> {
+        Rc::new(RefCell::new(GameOverMenu {}))
     }
 }
 
@@ -40,7 +38,7 @@ impl WidgetKind for GameOverMenu {
         NAME
     }
 
-    fn on_add(&self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         widget.borrow_mut().state.set_modal(true);
 
         let label = Widget::with_theme(Label::empty(), "title");

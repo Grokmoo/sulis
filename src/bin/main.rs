@@ -77,7 +77,8 @@ fn main() {
             util::error_and_exit("Error in main menu.");
         }
 
-        main_menu_view.get_selected_module()
+        let mmv_ref = main_menu_view.borrow();
+        mmv_ref.get_selected_module()
     };
 
     let module_info = match selected_module {

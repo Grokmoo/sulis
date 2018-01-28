@@ -59,9 +59,8 @@ pub struct RootView {
 }
 
 impl RootView {
-    pub fn new() -> Rc<RootView> {
-        Rc::new(RootView {
-        })
+    pub fn new() -> Rc<RefCell<RootView>> {
+        Rc::new(RefCell::new(RootView { }))
     }
 }
 
@@ -70,7 +69,7 @@ impl WidgetKind for RootView {
         NAME
     }
 
-    fn on_key_press(&self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
+    fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
         use sulis_core::io::InputAction::*;
         match key {
             Exit => {
@@ -112,7 +111,7 @@ impl WidgetKind for RootView {
         true
     }
 
-    fn on_remove(&self) {
+    fn on_remove(&mut self) {
         let area_state = GameState::area_state();
         area_state.borrow_mut().listeners.remove(NAME);
 
@@ -120,7 +119,7 @@ impl WidgetKind for RootView {
         pc.borrow_mut().actor.listeners.remove(NAME);
     }
 
-    fn on_add(&self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         debug!("Adding to root widget.");
 
         let mouse_over = Widget::with_theme(Label::empty(), "mouse_over");

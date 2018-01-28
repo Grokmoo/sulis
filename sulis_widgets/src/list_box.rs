@@ -59,10 +59,10 @@ pub struct ListBox<T: Display> {
 }
 
 impl<T: Display> ListBox<T> {
-    pub fn new(entries: Vec<Entry<T>>) -> Rc<ListBox<T>> {
-        Rc::new(ListBox {
+    pub fn new(entries: Vec<Entry<T>>) -> Rc<RefCell<ListBox<T>>> {
+        Rc::new(RefCell::new(ListBox {
             entries,
-        })
+        }))
     }
 
     pub fn iter(&self) -> Iter<Entry<T>> {
@@ -98,7 +98,7 @@ impl<T: Display> WidgetKind for ListBox<T> {
         }
     }
 
-    fn on_add(&self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let mut children: Vec<Rc<RefCell<Widget>>> =
             Vec::with_capacity(self.entries.len());
 

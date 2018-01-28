@@ -35,10 +35,10 @@ const NAME: &'static str = "area";
 
 pub struct AreaView {
     mouse_over: Rc<RefCell<Widget>>,
-    scale: RefCell<(f32, f32)>,
-    cursors: RefCell<Option<DrawList>>,
-    cache_invalid: RefCell<bool>,
-    layers: RefCell<Vec<String>>,
+    scale: (f32, f32),
+    cursors: Option<DrawList>,
+    cache_invalid: bool,
+    layers: Vec<String>,
 }
 
 const SCALE_X_BASE: f32 = 1600.0;
@@ -50,22 +50,22 @@ const TEX_COORDS: [f32; 8] = [ 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0 ];
 const VISIBILITY_TEX_ID: &'static str = "__visibility__";
 
 impl AreaView {
-    pub fn new(mouse_over: Rc<RefCell<Widget>>) -> Rc<AreaView> {
-        Rc::new(AreaView {
+    pub fn new(mouse_over: Rc<RefCell<Widget>>) -> Rc<RefCell<AreaView>> {
+        Rc::new(RefCell::new(AreaView {
             mouse_over: mouse_over,
-            scale: RefCell::new((1.0, 1.0)),
-            cursors: RefCell::new(None),
-            cache_invalid: RefCell::new(true),
-            layers: RefCell::new(Vec::new()),
-        })
+            scale: (1.0, 1.0),
+            cursors: None,
+            cache_invalid: true,
+            layers: Vec::new(),
+        }))
     }
 
-    pub fn clear_cursors(&self) {
-        *self.cursors.borrow_mut() = None;
+    pub fn clear_cursors(&mut self) {
+        self.cursors = None;
     }
 
-    pub fn add_cursor(&self, mut cursor: DrawList) {
-        match *self.cursors.borrow_mut() {
+    pub fn add_cursor(&mut self, mut cursor: DrawList) {
+        match self.cursors {
             Some(ref mut c) => {
                 c.append(&mut cursor);
                 return;
@@ -73,7 +73,7 @@ impl AreaView {
             None => {},
         };
 
-        *self.cursors.borrow_mut() = Some(cursor);
+        self.cursors = Some(cursor);
     }
 
     fn get_cursor_pos_no_scroll(&self, widget: &Rc<RefCell<Widget>>) -> (i32, i32) {
@@ -91,7 +91,7 @@ impl AreaView {
         let mut x = Cursor::get_x_f32() - pos_x as f32;
         let mut y = Cursor::get_y_f32() - pos_y as f32;
 
-        let (scale_x, scale_y) = *self.scale.borrow();
+        let (scale_x, scale_y) = self.scale;
         x = x / scale_x;
         y = y / scale_y;
 
@@ -178,7 +178,7 @@ impl WidgetKind for AreaView {
         NAME
     }
 
-    fn on_add(&self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         self.clear_cursors();
         let area_state = GameState::area_state();
 
@@ -192,23 +192,23 @@ impl WidgetKind for AreaView {
         let area = &area_state.borrow().area;
 
         for layer in area.terrain.layers.iter() {
-            self.layers.borrow_mut().push(layer.id.to_string());
+            self.layers.push(layer.id.to_string());
         }
-        *self.cache_invalid.borrow_mut() = true;
+        self.cache_invalid = true;
 
         Vec::with_capacity(0)
     }
 
-    fn draw_graphics_mode(&self, renderer: &mut GraphicsRenderer, pixel_size: Point,
+    fn draw_graphics_mode(&mut self, renderer: &mut GraphicsRenderer, pixel_size: Point,
                           widget: &Widget, _millis: u32) {
         let scale_x = SCALE_X_BASE / (pixel_size.x as f32);
         let scale_y = SCALE_Y_BASE / (pixel_size.y as f32);
-        *self.scale.borrow_mut() = (scale_x, scale_y);
+        self.scale = (scale_x, scale_y);
 
         let area_state = GameState::area_state();
         let mut state = area_state.borrow_mut();
 
-        if *self.cache_invalid.borrow() {
+        if self.cache_invalid {
             debug!("Caching area '{}' layers to texture", state.area.id);
 
             if !renderer.has_texture(VISIBILITY_TEX_ID) {
@@ -232,7 +232,7 @@ impl WidgetKind for AreaView {
                 self.draw_layer_to_texture(renderer, &layer);
             }
 
-            *self.cache_invalid.borrow_mut() = false;
+            self.cache_invalid = false;
         }
 
         if state.pc_vis_cache_invalid {
@@ -242,12 +242,12 @@ impl WidgetKind for AreaView {
         }
 
         let p = widget.state.inner_position;
-        let num_layers = self.layers.borrow().len();
+        let num_layers = self.layers.len();
         let mut layer_index = 0;
 
         while layer_index <= state.area.terrain.entity_layer_index {
             self.draw_layer(renderer, scale_x, scale_y, widget,
-                            &self.layers.borrow()[layer_index]);
+                            &self.layers[layer_index]);
             layer_index += 1;
         }
 
@@ -279,13 +279,13 @@ impl WidgetKind for AreaView {
 
         while layer_index < num_layers {
             self.draw_layer(renderer, scale_x, scale_y, widget,
-                            &self.layers.borrow()[layer_index]);
+                            &self.layers[layer_index]);
             layer_index += 1;
         }
 
         self.draw_layer(renderer, scale_x, scale_y, widget, VISIBILITY_TEX_ID);
 
-        if let Some(ref cursor) = *self.cursors.borrow() {
+        if let Some(ref cursor) = self.cursors {
             let mut draw_list = cursor.clone();
             draw_list.set_scale(scale_x, scale_y);
             renderer.draw(draw_list);
@@ -294,11 +294,11 @@ impl WidgetKind for AreaView {
         GameState::draw_graphics_mode(renderer, pixel_size);
     }
 
-    fn on_key_press(&self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
+    fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
         let area_state = GameState::area_state();
         let width = area_state.borrow().area.width;
         let height = area_state.borrow().area.height;
-        let (scale_x, scale_y) = *self.scale.borrow();
+        let (scale_x, scale_y) = self.scale;
         widget.borrow_mut().state.set_max_scroll_pos((width as f32 * scale_x).ceil() as i32
                                                      , (height as f32 * scale_y).ceil() as i32);
 
@@ -313,8 +313,7 @@ impl WidgetKind for AreaView {
         true
     }
 
-
-    fn on_mouse_release(&self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
+    fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
         self.super_on_mouse_release(widget, kind);
         let (x, y) = self.get_cursor_pos(widget);
         if x < 0 || y < 0 { return true; }
@@ -322,7 +321,7 @@ impl WidgetKind for AreaView {
         let area_state = GameState::area_state();
         let action_menu = ActionMenu::new(x, y);
         if kind == ClickKind::Left {
-            action_menu.fire_default_callback();
+            action_menu.borrow().fire_default_callback();
 
             if let Some(entity) = area_state.borrow().get_entity_at(x, y) {
                 Widget::set_mouse_over(widget, EntityMouseover::new(&entity));
@@ -335,7 +334,7 @@ impl WidgetKind for AreaView {
         true
     }
 
-    fn on_mouse_move(&self, widget: &Rc<RefCell<Widget>>) -> bool {
+    fn on_mouse_move(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
         let (area_x, area_y) = self.get_cursor_pos(widget);
         let area_state = GameState::area_state();
 
@@ -372,7 +371,7 @@ impl WidgetKind for AreaView {
         c_x - size / 2, c_y - size / 2, size, size);
 
         let action_menu = ActionMenu::new(area_x, area_y);
-        if !action_menu.is_default_callback_valid() {
+        if !action_menu.borrow().is_default_callback_valid() {
             draw_list.set_color(color::RED);
         }
 
@@ -381,7 +380,7 @@ impl WidgetKind for AreaView {
         true
     }
 
-    fn on_mouse_exit(&self, widget: &Rc<RefCell<Widget>>) -> bool {
+    fn on_mouse_exit(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
         self.super_on_mouse_exit(widget);
         self.mouse_over.borrow_mut().state.clear_text_args();
         self.clear_cursors();

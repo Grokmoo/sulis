@@ -28,19 +28,19 @@ const NAME: &str = "area_editor";
 
 pub struct AreaEditor {
     tile_picker: Rc<RefCell<Widget>>,
-    tiles: RefCell<Vec<(Point, Rc<Tile>)>>,
+    tiles: Vec<(Point, Rc<Tile>)>,
 }
 
 impl AreaEditor {
-    pub fn new(tile_picker: &Rc<RefCell<Widget>>) -> Rc<AreaEditor> {
+    pub fn new(tile_picker: &Rc<RefCell<Widget>>) -> Rc<RefCell<AreaEditor>> {
         let mut tiles: Vec<(Point, Rc<Tile>)> = Vec::new();
         let tile = Module::tile("grass4").unwrap();
         tiles.push((Point::new(0, 0), Rc::clone(&tile)));
 
-        Rc::new(AreaEditor {
-            tiles: RefCell::new(tiles),
+        Rc::new(RefCell::new(AreaEditor {
+            tiles,
             tile_picker: Rc::clone(tile_picker),
-        })
+        }))
     }
 }
 
@@ -49,15 +49,13 @@ impl WidgetKind for AreaEditor {
         NAME
     }
 
-    fn draw_graphics_mode(&self, renderer: &mut GraphicsRenderer, _pixel_size: Point,
+    fn draw_graphics_mode(&mut self, renderer: &mut GraphicsRenderer, _pixel_size: Point,
                           widget: &Widget, _millis: u32) {
         let p = widget.state.inner_position;
         let s = widget.state.scroll_pos;
 
-        let tiles = self.tiles.borrow();
-
         let mut draw_list = DrawList::empty_sprite();
-        for &(pos, ref tile) in tiles.iter() {
+        for &(pos, ref tile) in self.tiles.iter() {
             let sprite = &tile.image_display;
             let x = pos.x + p.x + s.x;
             let y = pos.y + p.y + s.y;
@@ -67,7 +65,7 @@ impl WidgetKind for AreaEditor {
         renderer.draw(draw_list);
     }
 
-    fn on_mouse_release(&self, widget: &Rc<RefCell<Widget>>, _kind: ClickKind) -> bool {
+    fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, _kind: ClickKind) -> bool {
         let x = Cursor::get_x() - widget.borrow().state.position.x;
         let y = Cursor::get_y() - widget.borrow().state.position.y;
 
@@ -81,7 +79,7 @@ impl WidgetKind for AreaEditor {
             }
         };
 
-        self.tiles.borrow_mut().push((Point::new(x, y), cur_tile));
+        self.tiles.push((Point::new(x, y), cur_tile));
         true
     }
 }

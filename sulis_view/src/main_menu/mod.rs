@@ -23,11 +23,11 @@ use sulis_widgets::{Button, ConfirmationWindow, Label, list_box, ListBox};
 use sulis_module::ModuleInfo;
 
 pub struct MainMenuLoopUpdater {
-    main_menu_view: Rc<MainMenuView>,
+    main_menu_view: Rc<RefCell<MainMenuView>>,
 }
 
 impl MainMenuLoopUpdater {
-    pub fn new(main_menu_view: &Rc<MainMenuView>) -> MainMenuLoopUpdater {
+    pub fn new(main_menu_view: &Rc<RefCell<MainMenuView>>) -> MainMenuLoopUpdater {
         MainMenuLoopUpdater {
             main_menu_view: Rc::clone(main_menu_view),
         }
@@ -38,7 +38,7 @@ impl MainLoopUpdater for MainMenuLoopUpdater {
     fn update(&self) { }
 
     fn is_exit(&self) -> bool {
-        self.main_menu_view.is_exit()
+        self.main_menu_view.borrow().is_exit()
     }
 }
 
@@ -47,10 +47,10 @@ pub struct MainMenuView {
 }
 
 impl MainMenuView {
-    pub fn new(modules: Vec<ModuleInfo>) -> Rc<MainMenuView> {
-        Rc::new(MainMenuView {
+    pub fn new(modules: Vec<ModuleInfo>) -> Rc<RefCell<MainMenuView>> {
+        Rc::new(RefCell::new(MainMenuView {
             modules,
-        })
+        }))
     }
 
     pub fn is_exit(&self) -> bool {
@@ -77,7 +77,7 @@ impl WidgetKind for MainMenuView {
         "root"
     }
 
-    fn on_key_press(&self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
+    fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
         use sulis_core::io::InputAction::*;
         match key {
             Exit => {
@@ -94,7 +94,7 @@ impl WidgetKind for MainMenuView {
         true
     }
 
-    fn on_add(&self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         debug!("Adding to main menu widget");
 
         let title = Widget::with_theme(Label::empty(), "title");
@@ -129,7 +129,8 @@ impl WidgetKind for MainMenuView {
         play.borrow_mut().state.add_callback(Callback::new(Rc::new(move |_| {
             for (index, child) in modules_list_ref.borrow().children.iter().enumerate() {
                 if child.borrow().state.animation_state.contains(animation_state::Kind::Active) {
-                    let entry = list_box.get(index).unwrap();
+                    let list_box_ref = list_box.borrow();
+                    let entry = list_box_ref.get(index).unwrap();
                     EXIT.with(|exit| *exit.borrow_mut() = true);
                     SELECTED_MODULE.with(|m| *m.borrow_mut() = Some(entry.item().clone()));
                     info!("Found active module {}", entry.item().name );

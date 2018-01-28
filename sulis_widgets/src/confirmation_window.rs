@@ -25,10 +25,10 @@ pub struct ConfirmationWindow {
 }
 
 impl ConfirmationWindow {
-    pub fn new(accept_callback: Callback) -> Rc<ConfirmationWindow> {
-        Rc::new(ConfirmationWindow {
+    pub fn new(accept_callback: Callback) -> Rc<RefCell<ConfirmationWindow>> {
+        Rc::new(RefCell::new(ConfirmationWindow {
             accept_callback
-        })
+        }))
     }
 }
 
@@ -41,7 +41,7 @@ impl WidgetKind for ConfirmationWindow {
         widget.do_base_layout();
     }
 
-    fn on_add(&self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let label = Widget::with_theme(Label::empty(), "title");
 
         let cancel = Widget::with_theme(Button::empty(), "cancel");

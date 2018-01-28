@@ -29,10 +29,10 @@ pub struct CharacterWindow {
 }
 
 impl CharacterWindow {
-    pub fn new(character: &Rc<RefCell<EntityState>>) -> Rc<CharacterWindow> {
-        Rc::new(CharacterWindow {
+    pub fn new(character: &Rc<RefCell<EntityState>>) -> Rc<RefCell<CharacterWindow>> {
+        Rc::new(RefCell::new(CharacterWindow {
             character: Rc::clone(character)
-        })
+        }))
     }
 }
 
@@ -45,12 +45,12 @@ impl WidgetKind for CharacterWindow {
         widget.do_base_layout();
     }
 
-    fn on_remove(&self) {
+    fn on_remove(&mut self) {
         self.character.borrow_mut().actor.listeners.remove(NAME);
         debug!("Removed character window.");
     }
 
-    fn on_add(&self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         self.character.borrow_mut().actor.listeners.add(
             ChangeListener::invalidate(NAME, widget));
 

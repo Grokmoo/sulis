@@ -33,7 +33,7 @@ pub struct ActionMenu {
 }
 
 impl ActionMenu {
-    pub fn new(x: i32, y: i32) -> Rc<ActionMenu> {
+    pub fn new(x: i32, y: i32) -> Rc<RefCell<ActionMenu>> {
         let area_state = GameState::area_state();
         let (hovered_entity, is_hover_pc) =
             if let Some(ref entity) = area_state.borrow().get_entity_at(x, y) {
@@ -41,11 +41,11 @@ impl ActionMenu {
             } else {
                 (None, false)
             };
-        Rc::new(ActionMenu {
+        Rc::new(RefCell::new(ActionMenu {
             area_pos: Point::new(x, y),
             hovered_entity,
             is_hover_pc,
-        })
+        }))
     }
 
     pub fn is_transition_valid(&self) -> bool {
@@ -142,12 +142,12 @@ impl WidgetKind for ActionMenu {
         NAME
     }
 
-    fn on_remove(&self) {
+    fn on_remove(&mut self) {
         let area_state = GameState::area_state();
         area_state.borrow_mut().listeners.remove(NAME);
     }
 
-    fn on_add(&self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let area_state = GameState::area_state();
         area_state.borrow_mut().listeners.add(ChangeListener::remove_widget(NAME, widget));
 
@@ -181,7 +181,7 @@ impl WidgetKind for ActionMenu {
         vec![title, actions]
     }
 
-    fn on_mouse_release(&self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
+    fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
         self.super_on_mouse_release(widget, kind);
         if !widget.borrow().state.in_bounds(Cursor::get_x(), Cursor::get_y()) {
             widget.borrow_mut().mark_for_removal();

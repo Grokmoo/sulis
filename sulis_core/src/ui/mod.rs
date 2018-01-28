@@ -56,7 +56,7 @@ use config::CONFIG;
 use resource::ResourceSet;
 use util::Size;
 
-pub fn create_ui_tree(kind: Rc<WidgetKind>) -> Rc<RefCell<Widget>> {
+pub fn create_ui_tree(kind: Rc<RefCell<WidgetKind>>) -> Rc<RefCell<Widget>> {
 
     debug!("Creating UI tree.");
     let root = Widget::with_defaults(kind);

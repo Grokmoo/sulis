@@ -27,15 +27,15 @@ const NAME: &'static str = "entity_mouseover";
 
 pub struct EntityMouseover {
     entity: Rc<RefCell<EntityState>>,
-    text_area: Rc<TextArea>,
+    text_area: Rc<RefCell<TextArea>>,
 }
 
 impl EntityMouseover {
-    pub fn new(entity: &Rc<RefCell<EntityState>>) -> Rc<EntityMouseover> {
-        Rc::new(EntityMouseover {
+    pub fn new(entity: &Rc<RefCell<EntityState>>) -> Rc<RefCell<EntityMouseover>> {
+        Rc::new(RefCell::new(EntityMouseover {
             entity: Rc::clone(entity),
             text_area: TextArea::empty(),
-        })
+        }))
     }
 }
 
@@ -44,11 +44,11 @@ impl WidgetKind for EntityMouseover {
         NAME
     }
 
-    fn on_remove(&self) {
+    fn on_remove(&mut self) {
         //self.entity.borrow_mut().actor.listeners.remove(NAME);
     }
 
-    fn on_add(&self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         self.entity.borrow_mut().actor.listeners.add(
             ChangeListener::invalidate_layout(NAME, widget));
 
@@ -69,8 +69,8 @@ impl WidgetKind for EntityMouseover {
         }
     }
 
-    fn draw_graphics_mode(&self, renderer: &mut GraphicsRenderer, pixel_size: Point,
+    fn draw_graphics_mode(&mut self, renderer: &mut GraphicsRenderer, pixel_size: Point,
                           widget: &Widget, millis: u32) {
-        self.text_area.draw_graphics_mode(renderer, pixel_size, widget, millis);
+        self.text_area.borrow_mut().draw_graphics_mode(renderer, pixel_size, widget, millis);
     }
 }

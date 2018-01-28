@@ -23,20 +23,20 @@ use sulis_core::util::Point;
 use Label;
 
 pub struct Button {
-    label: Rc<Label>,
+    label: Rc<RefCell<Label>>,
 }
 
 impl Button {
-    pub fn empty() -> Rc<Button> {
-        Rc::new(Button {
+    pub fn empty() -> Rc<RefCell<Button>> {
+        Rc::new(RefCell::new(Button {
             label: Label::empty(),
-        })
+        }))
     }
 
-    pub fn with_text(text: &str) -> Rc<Button> {
-        Rc::new(Button {
+    pub fn with_text(text: &str) -> Rc<RefCell<Button>> {
+        Rc::new(RefCell::new(Button {
             label: Label::new(text),
-        })
+        }))
     }
 }
 
@@ -46,7 +46,7 @@ impl WidgetKind for Button {
     }
 
     fn layout(&self, widget: &mut Widget) {
-        if let Some(ref text) = self.label.text {
+        if let Some(ref text) = self.label.borrow().text {
             widget.state.add_text_arg("0", text);
         }
         widget.do_base_layout();
@@ -56,12 +56,12 @@ impl WidgetKind for Button {
         }
     }
 
-    fn draw_graphics_mode(&self, renderer: &mut GraphicsRenderer, pixel_size: Point,
+    fn draw_graphics_mode(&mut self, renderer: &mut GraphicsRenderer, pixel_size: Point,
                           widget: &Widget, millis: u32) {
-        self.label.draw_graphics_mode(renderer, pixel_size, widget, millis);
+        self.label.borrow_mut().draw_graphics_mode(renderer, pixel_size, widget, millis);
     }
 
-    fn on_mouse_release(&self, widget: &Rc<RefCell<Widget>>, kind: event::ClickKind) -> bool {
+    fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: event::ClickKind) -> bool {
         self.super_on_mouse_release(widget, kind);
         Widget::fire_callback(widget);
         true

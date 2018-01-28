@@ -21,11 +21,11 @@ use std::cell::RefCell;
 use io::{event, Event, GraphicsRenderer};
 use ui::{Cursor, Theme, WidgetState, WidgetKind};
 use resource::ResourceSet;
-use util::Point;
+use util::{invalid_data_error, Point};
 
 pub struct Widget {
     pub state: WidgetState,
-    pub kind: Rc<WidgetKind>,
+    pub kind: Rc<RefCell<WidgetKind>>,
     pub children: Vec<Rc<RefCell<Widget>>>,
     pub theme: Option<Rc<Theme>>,
     pub theme_id: String,
@@ -55,7 +55,7 @@ impl Widget {
             image.draw_graphics_mode(renderer, &self.state.animation_state, x, y, w, h);
         }
 
-        self.kind.draw_graphics_mode(renderer, pixel_size, &self, millis);
+        self.kind.borrow_mut().draw_graphics_mode(renderer, pixel_size, &self, millis);
 
         for child in self.children.iter() {
             child.borrow().draw_graphics_mode(renderer, pixel_size, millis);
@@ -67,7 +67,7 @@ impl Widget {
     }
 
     pub fn mark_for_removal(&mut self) {
-        trace!("Marked widget for removal '{}'", self.kind.get_name());
+        trace!("Marked widget for removal '{}'", self.theme_id);
         self.marked_for_removal = true;
     }
 
@@ -84,7 +84,7 @@ impl Widget {
     /// then the widget re-built on the next UI update.
     /// TODO loop potential, see `invalidate_layout`
     pub fn invalidate_children(&mut self) {
-        trace!("Invalidated widget '{}'", self.kind.get_name());
+        trace!("Invalidated widget '{}'", self.theme_id);
         self.marked_for_readd = true;
         for child in self.children.iter_mut() {
             child.borrow_mut().invalidate_children();
@@ -93,14 +93,16 @@ impl Widget {
     }
 
     pub fn add_child(&mut self, child: Rc<RefCell<Widget>>) {
-        trace!("Adding {:?} to {:?}", child.borrow().kind.get_name(),
-            self.kind.get_name());
+        {
+            let child_ref = child.borrow();
+            trace!("Adding {:?} to {:?}", child_ref.kind.borrow().get_name(),
+            self.theme_id);
 
-        if child.borrow().state.is_modal {
-            trace!("Adding child as modal widget.");
-            self.modal_child = Some(Rc::clone(&child));
+            if child_ref.state.is_modal {
+                trace!("Adding child as modal widget.");
+                self.modal_child = Some(Rc::clone(&child));
+            }
         }
-
         self.children.push(child);
     }
 
@@ -149,10 +151,10 @@ impl Widget {
 
     fn layout_widget(&mut self) {
         if self.marked_for_layout {
-            trace!("Performing layout on widget '{}' of type '{}'  with size {:?} at {:?}",
-                   self.theme_id, self.kind.get_name(), self.state.size, self.state.position);
+            trace!("Performing layout on widget '{}' with size {:?} at {:?}",
+                   self.theme_id, self.state.size, self.state.position);
             let kind = Rc::clone(&self.kind);
-            kind.layout(self);
+            kind.borrow().layout(self);
             self.marked_for_layout = false;
 
             self.children.iter_mut().for_each(|child| child.borrow_mut().marked_for_layout = true);
@@ -167,7 +169,7 @@ impl Widget {
 }
 
 impl Widget {
-    fn new(kind: Rc<WidgetKind>, theme: &str) -> Rc<RefCell<Widget>> {
+    fn new(kind: Rc<RefCell<WidgetKind>>, theme: &str) -> Rc<RefCell<Widget>> {
         let widget = Widget {
             state: WidgetState::new(),
             kind: Rc::clone(&kind),
@@ -183,18 +185,18 @@ impl Widget {
         };
 
         let widget = Rc::new(RefCell::new(widget));
-        let children = kind.on_add(&widget);
+        let children = kind.borrow_mut().on_add(&widget);
         widget.borrow_mut().add_children(children);
 
         widget
     }
 
-    pub fn with_defaults(widget: Rc<WidgetKind>) -> Rc<RefCell<Widget>> {
-        let name = widget.get_name().to_string();
+    pub fn with_defaults(widget: Rc<RefCell<WidgetKind>>) -> Rc<RefCell<Widget>> {
+        let name = widget.borrow().get_name().to_string();
         Widget::new(widget, &name)
     }
 
-    pub fn with_theme(widget: Rc<WidgetKind>,
+    pub fn with_theme(widget: Rc<RefCell<WidgetKind>>,
                       theme: &str) -> Rc<RefCell<Widget>> {
         Widget::new(widget, theme)
     }
@@ -243,7 +245,8 @@ impl Widget {
     pub fn get_child_with_name(widget: &Rc<RefCell<Widget>>,
                                name: &str) -> Option<Rc<RefCell<Widget>>> {
         for child in widget.borrow().children.iter() {
-            if child.borrow().kind.get_name() == name {
+            let child_ref = child.borrow();
+            if child_ref.kind.borrow().get_name() == name {
                 return Some(Rc::clone(child));
             }
         }
@@ -268,7 +271,7 @@ impl Widget {
         }
     }
 
-    pub fn set_mouse_over(widget: &Rc<RefCell<Widget>>, mouse_over: Rc<WidgetKind>) {
+    pub fn set_mouse_over(widget: &Rc<RefCell<Widget>>, mouse_over: Rc<RefCell<WidgetKind>>) {
         let root = Widget::get_root(widget);
         Widget::remove_mouse_over(&root);
 
@@ -291,7 +294,7 @@ impl Widget {
 
     fn update_kind_recursive(widget: &Rc<RefCell<Widget>>) {
         let kind = Rc::clone(&widget.borrow().kind);
-        kind.update(&widget);
+        kind.borrow().update(&widget);
 
         let len = widget.borrow().children.len();
         for i in 0..len {
@@ -304,12 +307,13 @@ impl Widget {
         let readd = parent.borrow().marked_for_readd;
         if readd {
             for child in parent.borrow_mut().children.iter() {
-                child.borrow_mut().kind.on_remove();
+                let child_ref = child.borrow_mut();
+                child_ref.kind.borrow_mut().on_remove();
             }
             parent.borrow_mut().children.clear();
             let kind = Rc::clone(&parent.borrow().kind);
-            kind.on_remove();
-            let children = kind.on_add(&parent);
+            kind.borrow_mut().on_remove();
+            let children = kind.borrow_mut().on_add(&parent);
             parent.borrow_mut().add_children(children);
             parent.borrow_mut().marked_for_readd = false;
             parent.borrow_mut().marked_for_layout = true;
@@ -336,8 +340,9 @@ impl Widget {
         }
 
         parent.borrow_mut().children.retain(|widget| {
-            if widget.borrow().marked_for_removal {
-                widget.borrow().kind.on_remove();
+            let widget_ref = widget.borrow();
+            if widget_ref.marked_for_removal {
+                widget_ref.kind.borrow_mut().on_remove();
                 false
             } else {
                 true
@@ -349,10 +354,11 @@ impl Widget {
             let parent_parent = Widget::get_parent(parent);
 
             let parent_parent_theme = match parent_parent.borrow().theme {
-                None => return Err(Error::new(ErrorKind::InvalidData,
-                    format!("No theme exists for {}",
-                            parent_parent.borrow().kind.get_name()))),
-                Some(ref t) => Rc::clone(&t),
+                None => {
+                    let parent_parent_ref = parent_parent.borrow();
+                    return invalid_data_error(&format!("No theme exists for {}",
+                            parent_parent_ref.kind.borrow().get_name()));
+                }, Some(ref t) => Rc::clone(&t),
             };
 
             let mut parent = parent.borrow_mut();
@@ -442,9 +448,9 @@ impl Widget {
         // always pass mouse entered and exited to the widget kind
         let enter_exit_retval = match event.kind {
             MouseEnter =>
-                widget_kind.on_mouse_enter(widget),
+                widget_kind.borrow_mut().on_mouse_enter(widget),
             MouseExit =>
-                widget_kind.on_mouse_exit(widget),
+                widget_kind.borrow_mut().on_mouse_exit(widget),
             _ => false,
         };
 
@@ -454,15 +460,15 @@ impl Widget {
 
         match event.kind {
             MousePress(kind) =>
-                widget_kind.on_mouse_press(widget, kind),
+                widget_kind.borrow_mut().on_mouse_press(widget, kind),
             MouseRelease(kind) =>
-                widget_kind.on_mouse_release(widget, kind),
+                widget_kind.borrow_mut().on_mouse_release(widget, kind),
             MouseMove { change: _change } =>
-                widget_kind.on_mouse_move(widget),
+                widget_kind.borrow_mut().on_mouse_move(widget),
             MouseScroll { scroll } =>
-                widget_kind.on_mouse_scroll(widget, scroll),
+                widget_kind.borrow_mut().on_mouse_scroll(widget, scroll),
             KeyPress(action) =>
-                widget_kind.on_key_press(widget, action),
+                widget_kind.borrow_mut().on_key_press(widget, action),
             MouseEnter => enter_exit_retval,
             MouseExit => enter_exit_retval,
         }

@@ -15,6 +15,7 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::rc::Rc;
+use std::cell::RefCell;
 
 use sulis_core::ui::{Widget, WidgetKind};
 use sulis_core::io::GraphicsRenderer;
@@ -26,16 +27,16 @@ pub struct TextArea {
 }
 
 impl TextArea {
-    pub fn empty() -> Rc<TextArea> {
-        Rc::new(TextArea {
+    pub fn empty() -> Rc<RefCell<TextArea>> {
+        Rc::new(RefCell::new(TextArea {
             text: None,
-        })
+        }))
     }
 
-    pub fn new(text: &str) -> Rc<TextArea> {
-        Rc::new(TextArea {
+    pub fn new(text: &str) -> Rc<RefCell<TextArea>> {
+        Rc::new(RefCell::new(TextArea {
             text: Some(text.to_string()),
-        })
+        }))
     }
 }
 
@@ -58,7 +59,7 @@ impl WidgetKind for TextArea {
         }
     }
 
-    fn draw_graphics_mode(&self, renderer: &mut GraphicsRenderer, _pixel_size: Point,
+    fn draw_graphics_mode(&mut self, renderer: &mut GraphicsRenderer, _pixel_size: Point,
                           widget: &Widget, _millis: u32) {
         let font_rend = match &widget.state.text_renderer {
             &None => return,

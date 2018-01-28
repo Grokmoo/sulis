@@ -26,10 +26,8 @@ pub const NAME: &str = "initiative_ticker";
 pub struct InitiativeTicker { }
 
 impl InitiativeTicker {
-    pub fn new() -> Rc<InitiativeTicker> {
-        Rc::new(InitiativeTicker {
-
-        })
+    pub fn new() -> Rc<RefCell<InitiativeTicker>> {
+        Rc::new(RefCell::new(InitiativeTicker { }))
     }
 }
 
@@ -38,13 +36,13 @@ impl WidgetKind for InitiativeTicker {
         NAME
     }
 
-    fn on_remove(&self) {
+    fn on_remove(&mut self) {
         let area_state = GameState::area_state();
         let mut area_state = area_state.borrow_mut();
         area_state.turn_timer.listeners.remove(NAME);
     }
 
-    fn on_add(&self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let area_state = GameState::area_state();
         let mut area_state = area_state.borrow_mut();
         let timer = &mut area_state.turn_timer;

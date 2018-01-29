@@ -20,23 +20,19 @@ use std::fmt::Display;
 use std::slice::Iter;
 
 use list_box::Entry;
-use sulis_core::io::{event, GraphicsRenderer};
-use sulis_core::ui::{LineRenderer, Widget, WidgetKind};
-use sulis_core::util::Point;
-use {Label, ListBox};
+use sulis_core::ui::{Callback, Widget, WidgetKind};
+use {Button, ListBox};
 
 const NAME: &str = "drop_down";
 
 pub struct DropDown<T: Display + Clone + 'static> {
     entries: Vec<Entry<T>>,
-    label: Rc<RefCell<Label>>,
 }
 
 impl<T: Display + Clone + 'static> DropDown<T> {
     pub fn new(entries: Vec<Entry<T>>) -> Rc<RefCell<DropDown<T>>> {
         Rc::new(RefCell::new(DropDown {
             entries,
-            label: Label::empty(),
         }))
     }
 
@@ -54,28 +50,18 @@ impl<T: Display + Clone + 'static> WidgetKind for DropDown<T> {
         NAME
     }
 
-    fn layout(&self, widget: &mut Widget) {
-        widget.do_base_layout();
-
-        if let Some(ref font) = widget.state.font {
-            widget.state.text_renderer = Some(Box::new(LineRenderer::new(font)));
-        }
-    }
-
-    fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: event::ClickKind) -> bool {
-        self.super_on_mouse_release(widget, kind);
-        let list_box = Widget::with_theme(ListBox::new(self.entries.clone()), "list");
-
-        Widget::add_child_to(widget, list_box);
-        true
-    }
-
-    fn draw_graphics_mode(&mut self, renderer: &mut GraphicsRenderer, pixel_size: Point,
-                          widget: &Widget, millis: u32) {
-        self.label.borrow_mut().draw_graphics_mode(renderer, pixel_size, widget, millis);
-    }
-
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
-        Vec::new()
+        let button = Widget::with_defaults(Button::empty());
+        let entries_clone = self.entries.clone();
+        let cb = Callback::new(Rc::new(move |widget| {
+            let list_box = Widget::with_theme(ListBox::new(entries_clone.clone()), "list");
+            list_box.borrow_mut().state.set_modal(true);
+            list_box.borrow_mut().state.modal_remove_on_click_outside = true;
+            let parent = Widget::get_parent(widget);
+            Widget::add_child_to(&parent, list_box);
+        }));
+        button.borrow_mut().state.add_callback(cb);
+
+        vec![button]
     }
 }

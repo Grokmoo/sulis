@@ -92,26 +92,6 @@ impl Widget {
         self.marked_for_layout = true;
     }
 
-    pub fn add_child(&mut self, child: Rc<RefCell<Widget>>) {
-        {
-            let child_ref = child.borrow();
-            trace!("Adding {:?} to {:?}", child_ref.kind.borrow().get_name(),
-            self.theme_id);
-
-            if child_ref.state.is_modal {
-                trace!("Adding child as modal widget.");
-                self.modal_child = Some(Rc::clone(&child));
-            }
-        }
-        self.children.push(child);
-    }
-
-    pub fn add_children(&mut self, children: Vec<Rc<RefCell<Widget>>>) {
-        for child in children.into_iter() {
-            self.add_child(child);
-        }
-    }
-
     pub fn do_base_layout(&mut self) {
         self.do_self_layout();
         self.do_children_layout();
@@ -186,7 +166,7 @@ impl Widget {
 
         let widget = Rc::new(RefCell::new(widget));
         let children = kind.borrow_mut().on_add(&widget);
-        widget.borrow_mut().add_children(children);
+        Widget::add_children_to(&widget, children);
 
         widget
     }
@@ -233,9 +213,18 @@ impl Widget {
         Rc::clone(widget.borrow().parent.as_ref().unwrap())
     }
 
-    pub fn add_child_to(parent: &Rc<RefCell<Widget>>,
-                         child: Rc<RefCell<Widget>>) {
-        parent.borrow_mut().add_child(child);
+    pub fn add_child_to(parent: &Rc<RefCell<Widget>>, child: Rc<RefCell<Widget>>) {
+        {
+            let child_ref = child.borrow();
+            trace!("Adding {:?} to {:?}", child_ref.kind.borrow().get_name(), parent.borrow().theme_id);
+
+            if child_ref.state.is_modal {
+                trace!("Adding child as modal widget.");
+                let root = Widget::get_root(parent);
+                root.borrow_mut().modal_child = Some(Rc::clone(&child));
+            }
+        }
+        parent.borrow_mut().children.push(child);
         parent.borrow_mut().marked_for_layout = true;
     }
 
@@ -318,7 +307,7 @@ impl Widget {
             let kind = Rc::clone(&parent.borrow().kind);
             kind.borrow_mut().on_remove();
             let children = kind.borrow_mut().on_add(&parent);
-            parent.borrow_mut().add_children(children);
+            Widget::add_children_to(parent, children);
             parent.borrow_mut().marked_for_readd = false;
             parent.borrow_mut().marked_for_layout = true;
         } else {

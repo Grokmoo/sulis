@@ -47,7 +47,7 @@ pub struct Transition {
     pub image_display: Rc<Sprite>,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct ActorData {
     pub id: String,
@@ -146,7 +146,7 @@ impl Area {
     }
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct AreaBuilder {
     pub id: String,
@@ -183,7 +183,7 @@ impl ResourceBuilder for AreaBuilder {
     }
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct TransitionBuilder {
     pub from: Point,

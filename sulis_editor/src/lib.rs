@@ -31,7 +31,7 @@ use std::cell::RefCell;
 
 use sulis_core::io::{InputAction, MainLoopUpdater};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_widgets::{ConfirmationWindow, DropDown};
+use sulis_widgets::{ConfirmationWindow, DropDown, list_box};
 
 thread_local! {
     static EXIT: RefCell<bool> = RefCell::new(false);
@@ -85,18 +85,30 @@ impl WidgetKind for EditorView {
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         debug!("Adding to editor widget");
 
+        let tile_picker = Widget::with_defaults(TilePicker::new());
+
+        let area_editor_kind = AreaEditor::new(&tile_picker);
+
         let top_bar = Widget::empty("top_bar");
         {
-            let drop_down: Rc<RefCell<DropDown<String>>> = DropDown::new(Vec::new());
+            let mut entries: Vec<list_box::Entry<String>> = Vec::new();
+
+            let area_editor_kind_ref = Rc::clone(&area_editor_kind);
+            let save = list_box::Entry::new("Save".to_string(), Some(Callback::new(Rc::new(move |widget| {
+                let parent = Widget::get_parent(widget);
+                area_editor_kind_ref.borrow().save("test.yml");
+                parent.borrow_mut().mark_for_removal();
+            }))));
+            entries.push(save);
+
+            let drop_down = DropDown::new(entries);
             let menu = Widget::with_theme(drop_down, "menu");
 
             Widget::add_child_to(&top_bar, menu);
         }
 
-        let tile_picker = Widget::with_defaults(TilePicker::new());
+        let area_editor = Widget::with_defaults(area_editor_kind);
 
-        let area_editor = Widget::with_defaults(AreaEditor::new(&tile_picker));
-
-        vec![top_bar, tile_picker, area_editor]
+        vec![tile_picker, area_editor, top_bar]
     }
 }

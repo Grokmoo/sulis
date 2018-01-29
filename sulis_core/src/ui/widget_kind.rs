@@ -19,7 +19,7 @@ use std::cell::RefCell;
 
 use io::{GraphicsRenderer, InputAction};
 use io::event::ClickKind;
-use ui::{animation_state, Widget};
+use ui::{animation_state, Cursor, Widget};
 use util::Point;
 
 pub (crate) struct EmptyWidget { }
@@ -73,6 +73,14 @@ pub trait WidgetKind {
 
     fn super_on_mouse_release(&self, widget: &Rc<RefCell<Widget>>, _kind: ClickKind) {
         widget.borrow_mut().state.animation_state.remove(animation_state::Kind::Pressed);
+
+        if !widget.borrow().state.modal_remove_on_click_outside || !widget.borrow().state.is_modal {
+            return;
+        }
+
+        if !widget.borrow().state.in_bounds(Cursor::get_x(), Cursor::get_y()) {
+            widget.borrow_mut().mark_for_removal();
+        }
     }
 
     fn on_mouse_press(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {

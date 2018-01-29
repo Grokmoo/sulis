@@ -42,6 +42,7 @@ pub struct WidgetState {
     pub text_renderer: Option<Box<FontRenderer>>,
     pub font: Option<Rc<Font>>,
     pub is_modal: bool,
+    pub modal_remove_on_click_outside: bool,
     pub is_mouse_over: bool,
 
     text_args: HashMap<String, String>,
@@ -69,6 +70,7 @@ impl WidgetState {
             inner_size: Size::as_zero(),
             inner_position: Point::as_zero(),
             is_modal: false,
+            modal_remove_on_click_outside: false,
             is_mouse_over: false,
         }
     }

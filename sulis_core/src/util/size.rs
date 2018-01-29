@@ -19,7 +19,7 @@ use std::cmp;
 
 use ui::Border;
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Deserialize)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Size {
     pub width: i32,

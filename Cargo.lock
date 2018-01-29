@@ -824,6 +824,7 @@ name = "sulis_editor"
 version = "0.1.0"
 dependencies = [
  "log 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde 1.0.27 (registry+https://github.com/rust-lang/crates.io-index)",
  "sulis_core 0.1.0",
  "sulis_module 0.1.0",
  "sulis_state 0.1.0",

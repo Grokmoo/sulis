@@ -9,10 +9,20 @@ children:
         position: [0, 0]
         children:
           menu:
-            from: .button
-            text: "Menu"
-            preferred_size: [4, 1]
-            position: [0, 0]
+            background: bg_base
+            width_relative: ChildMax
+            height_relative: ChildSum
+            layout: BoxVertical
+            children:
+              button:
+                from: .button
+                text: "Menu"
+                preferred_size: [5, 1]
+              list:
+                from: .list_box
+                border: { top: 1, bottom: 1, left: 1, right: 1 }
+                background: bg_base
+                position: [0, 1]
       area_editor:
         width_relative: Max
         height_relative: Max
@@ -34,4 +44,7 @@ children:
             preferred_size: [5, 5]
       exit_confirmation_window:
         from: .exit_confirmation_window
+        children:
+          title:
+            text: "Exit the Editor?"
 ...

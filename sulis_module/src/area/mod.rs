@@ -157,9 +157,9 @@ pub struct AreaBuilder {
     pub generate: bool,
     pub layers: Vec<String>,
     pub entity_layer: usize,
-    actors: Vec<ActorData>,
-    transitions: Vec<TransitionBuilder>,
-    visibility_tile: String,
+    pub actors: Vec<ActorData>,
+    pub transitions: Vec<TransitionBuilder>,
+    pub visibility_tile: String,
 }
 
 impl ResourceBuilder for AreaBuilder {

@@ -23,6 +23,14 @@ pub struct Callback {
     cb: Rc<Fn(&Rc<RefCell<Widget>>)>
 }
 
+impl Clone for Callback {
+    fn clone(&self) -> Callback {
+        Callback {
+            cb: Rc::clone(&self.cb),
+        }
+    }
+}
+
 impl Callback {
     pub fn new(f: Rc<Fn(&Rc<RefCell<Widget>>)>) -> Callback {
         Callback {
@@ -53,11 +61,5 @@ impl Callback {
 
     pub fn call(&self, widget: &Rc<RefCell<Widget>>) {
         (self.cb)(widget);
-    }
-
-    pub fn clone(&self) -> Callback {
-        Callback {
-            cb: Rc::clone(&self.cb),
-        }
     }
 }

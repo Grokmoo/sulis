@@ -20,9 +20,9 @@ use std::slice::Iter;
 use std::cell::RefCell;
 
 use sulis_core::ui::{AnimationState, Callback, Widget, WidgetKind};
-use sulis_core::util::Size;
 use Button;
 
+#[derive(Clone)]
 pub struct Entry<T: Display> {
     item: T,
     callback: Option<Callback>,
@@ -77,25 +77,6 @@ impl<T: Display> ListBox<T> {
 impl<T: Display> WidgetKind for ListBox<T> {
     fn get_name(&self) -> &str {
         "list_box"
-    }
-
-    fn layout(&self, widget: &mut Widget) {
-        widget.do_self_layout();
-
-        let width = widget.state.inner_size.width;
-        let x = widget.state.inner_left();
-        let mut current_y = widget.state.inner_top();
-
-        for child in widget.children.iter() {
-            let theme = match child.borrow().theme {
-                None => continue,
-                Some(ref t) => Rc::clone(t),
-            };
-            let height = theme.preferred_size.height;
-            child.borrow_mut().state.set_size(Size::new(width, height));
-            child.borrow_mut().state.set_position(x, current_y);
-            current_y += height;
-        }
     }
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {

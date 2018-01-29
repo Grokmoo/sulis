@@ -22,7 +22,7 @@ use io::event::ClickKind;
 use ui::{animation_state, Widget};
 use util::Point;
 
-pub struct EmptyWidget { }
+pub (crate) struct EmptyWidget { }
 
 impl EmptyWidget {
     pub fn new() -> Rc<RefCell<EmptyWidget>> {

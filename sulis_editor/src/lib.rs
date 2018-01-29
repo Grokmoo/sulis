@@ -31,7 +31,7 @@ use std::cell::RefCell;
 
 use sulis_core::io::{InputAction, MainLoopUpdater};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_widgets::{ConfirmationWindow, Label};
+use sulis_widgets::{ConfirmationWindow, DropDown};
 
 thread_local! {
     static EXIT: RefCell<bool> = RefCell::new(false);
@@ -85,12 +85,18 @@ impl WidgetKind for EditorView {
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         debug!("Adding to editor widget");
 
-        let title = Widget::with_theme(Label::empty(), "title");
+        let top_bar = Widget::empty("top_bar");
+        {
+            let drop_down: Rc<RefCell<DropDown<String>>> = DropDown::new(Vec::new());
+            let menu = Widget::with_theme(drop_down, "menu");
+
+            Widget::add_child_to(&top_bar, menu);
+        }
 
         let tile_picker = Widget::with_defaults(TilePicker::new());
 
         let area_editor = Widget::with_defaults(AreaEditor::new(&tile_picker));
 
-        vec![title, tile_picker, area_editor]
+        vec![top_bar, tile_picker, area_editor]
     }
 }

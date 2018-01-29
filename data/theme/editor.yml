@@ -2,25 +2,29 @@
 children:
   editor:
     children:
-      title:
-        from: .label
-        text_params:
-          scale: 2.0
-        text: "Editor"
-        x_relative: Center
-        preferred_size: [10, 1]
-        position: [0, 1]
+      top_bar:
+        background: bg_base
+        width_relative: Max
+        preferred_size: [0, 1]
+        position: [0, 0]
+        children:
+          menu:
+            from: .button
+            text: "Menu"
+            preferred_size: [4, 1]
+            position: [0, 0]
       area_editor:
         width_relative: Max
         height_relative: Max
-        preferred_size: [-25, 2]
-        position: [0, 2]
+        preferred_size: [-25, -1]
+        position: [0, 1]
       tile_picker:
         background: bg_base
         border: [1, 1, 1, 1]
-        preferred_size: [25, 0]
+        preferred_size: [25, -1]
         x_relative: Max
         height_relative: Max
+        position: [0, 1]
         layout: Grid
         layout_spacing: [0, 1, 0, 1]
         children:

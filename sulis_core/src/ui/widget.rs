@@ -19,7 +19,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use io::{event, Event, GraphicsRenderer};
-use ui::{Cursor, Theme, WidgetState, WidgetKind};
+use ui::{Cursor, EmptyWidget, Theme, WidgetState, WidgetKind};
 use resource::ResourceSet;
 use util::{invalid_data_error, Point};
 
@@ -199,6 +199,10 @@ impl Widget {
     pub fn with_theme(widget: Rc<RefCell<WidgetKind>>,
                       theme: &str) -> Rc<RefCell<Widget>> {
         Widget::new(widget, theme)
+    }
+
+    pub fn empty(theme: &str) -> Rc<RefCell<Widget>> {
+        Widget::new(EmptyWidget::new(), theme)
     }
 
     pub fn go_up_tree(widget: &Rc<RefCell<Widget>>,

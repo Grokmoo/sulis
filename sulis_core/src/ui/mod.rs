@@ -44,7 +44,7 @@ pub use self::widget::Widget;
 
 mod widget_kind;
 pub use self::widget_kind::WidgetKind;
-pub use self::widget_kind::EmptyWidget;
+pub (crate) use self::widget_kind::EmptyWidget;
 
 mod widget_state;
 pub use self::widget_state::WidgetState;

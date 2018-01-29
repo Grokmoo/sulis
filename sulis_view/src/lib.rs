@@ -49,7 +49,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_core::io::InputAction;
-use sulis_core::ui::{Callback, EmptyWidget, Widget, WidgetKind};
+use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_state::{ChangeListener, GameState};
 use sulis_widgets::{Button, ConfirmationWindow, Label};
 
@@ -127,7 +127,7 @@ impl WidgetKind for RootView {
         let area_widget = Widget::with_defaults(
             AreaView::new(Rc::clone(&mouse_over)));
 
-        let right_pane = Widget::with_theme(EmptyWidget::new(), "right_pane");
+        let right_pane = Widget::empty("right_pane");
         {
             let button = Widget::with_theme(Button::empty(), "end_turn_button");
             button.borrow_mut().state.add_callback(Callback::with(Box::new(|| {

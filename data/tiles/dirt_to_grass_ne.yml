@@ -1,0 +1,6 @@
+id: dirt_to_grass_ne
+name: d_to_g_ne
+layer: base
+width: 2
+height: 2
+image_display: "tiles/dirt_to_grass_ne"

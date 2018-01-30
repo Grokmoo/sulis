@@ -1,0 +1,6 @@
+id: dirt6
+name: dirt6x6
+layer: base
+width: 6
+height: 6
+image_display: "tiles/dirt6"

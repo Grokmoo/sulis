@@ -1,0 +1,6 @@
+id: grass2
+name: Grass2x2
+layer: base
+width: 2
+height: 2
+image_display: "tiles/grass2"

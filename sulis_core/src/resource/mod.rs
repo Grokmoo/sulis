@@ -83,7 +83,7 @@ impl ResourceSet {
 
             let sheets_dir = &builder_set.spritesheets_dir;
             for (id, sheet) in builder_set.spritesheet_builders {
-                insert_if_ok_boxed("spritesheet", id, Spritesheet::new(sheets_dir, sheet),
+                insert_if_ok_boxed("spritesheet", id, Spritesheet::new(sheets_dir, sheet, &mut resource_set),
                     &mut resource_set.spritesheets);
             }
 

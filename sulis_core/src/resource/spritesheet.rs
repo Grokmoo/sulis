@@ -18,6 +18,7 @@ use std::collections::HashMap;
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 
+use image::SimpleImage;
 use resource::{ResourceBuilder, ResourceSet};
 use util::{Point, Size};
 
@@ -67,7 +68,8 @@ impl Sprite {
 }
 
 impl Spritesheet {
-    pub fn new(dir: &str, builder: SpritesheetBuilder) -> Result<Rc<Spritesheet>, Error> {
+    pub fn new(dir: &str, builder: SpritesheetBuilder,
+               resources: &mut ResourceSet) -> Result<Rc<Spritesheet>, Error> {
         let filename = format!("{}{}", dir, builder.src);
         let image = match extern_image::open(&filename) {
             Ok(image) => image,
@@ -114,7 +116,20 @@ impl Spritesheet {
                         continue;
                     }
 
-                sprites.insert(id, Rc::new(sprite));
+                let sprite = Rc::new(sprite);
+                if let Some(scale) = builder.simple_image_gen_scale {
+                    let scale = scale as i32;
+                    let full_id = format!("{}/{}", builder.id, id);
+                    let simple_image = SimpleImage {
+                        id: full_id.clone(),
+                        size: Size::new(sprite.size.width / scale, sprite.size.height / scale),
+                        image_display: Rc::clone(&sprite),
+                    };
+                    trace!("Generated image with ID '{}' for sprite.", full_id);
+                    resources.images.insert(full_id, Rc::new(simple_image));
+                }
+
+                sprites.insert(id, sprite);
             }
         }
 
@@ -132,6 +147,7 @@ pub struct SpritesheetBuilder {
     pub id: String,
     pub src: String,
     pub size: Size,
+    pub simple_image_gen_scale: Option<u32>,
     groups: HashMap<String, SpritesheetGroup>,
 }
 

@@ -28,9 +28,9 @@ use serde_yaml;
 
 #[derive(Debug)]
 pub struct SimpleImage {
-    id: String,
-    image_display: Rc<Sprite>,
-    size: Size,
+    pub id: String,
+    pub image_display: Rc<Sprite>,
+    pub size: Size,
 }
 
 impl SimpleImage {

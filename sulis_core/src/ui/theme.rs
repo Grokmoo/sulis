@@ -19,7 +19,7 @@ use std::io::{Read, Error, ErrorKind};
 use std::rc::Rc;
 use std::collections::HashMap;
 
-use resource::BuilderType;
+use resource::{BuilderType, ResourceSet};
 use util::Point;
 use ui::{Border, color, Color, LayoutKind, Size, WidgetState};
 
@@ -101,6 +101,7 @@ pub struct Theme {
     pub text_params: TextParams,
     pub name: String,
     pub background: Option<String>,
+    pub foreground: Option<String>,
     pub border: Border,
     pub preferred_size: Size,
     pub width_relative: SizeRelative,
@@ -137,6 +138,7 @@ impl Theme {
             layout_spacing,
             name: name.to_string(),
             background: builder.background,
+            foreground: builder.foreground,
             border,
             preferred_size,
             width_relative,
@@ -152,58 +154,82 @@ impl Theme {
 
     /// Sets the text for the `WidgetState` based on the defined theme text.
     /// References such as '#0#' are expanded to the corresponding text arg
-    /// stored in the WidgetState.  See `WidgetState#add_text_arg`
+    /// stored in the WidgetState.  See `WidgetState#add_text_arg` and
+    /// `expand_text_args`
     pub fn apply_text(&self, state: &mut WidgetState) {
-        let text = match self.text {
-            None => return,
-            Some(ref text) => text,
-        };
-
-        let mut out = String::new();
-        let mut cur_arg = String::new();
-        let mut arg_accum = false;
-        for c in text.chars() {
-            if arg_accum {
-                if c.is_whitespace() {
-                } else if c == '#' {
-                    if cur_arg.len() == 0 {
-                        // ## code just gives a #
-                        out.push(c);
-                    } else {
-                        let text_arg = match state.get_text_arg(&cur_arg) {
-                            None => {
-                                warn!("Non existant text arg '{}' in text '{}'", cur_arg, text);
-                                return;
-                            },
-                            Some(arg) => arg,
-                        };
-                        out.push_str(text_arg);
-                    }
-                    arg_accum = false;
-                    cur_arg.clear();
-                } else {
-                    cur_arg.push(c);
-                }
-            } else if c == '#' {
-                arg_accum = true;
-            } else {
-                out.push(c);
-            }
-        }
-
-        if cur_arg.len() > 0 {
-            let text_arg = match state.get_text_arg(&cur_arg) {
-                None => {
-                    warn!("Non existant text arg '{}' in text '{}'", cur_arg, text);
-                    return;
-                },
-                Some(arg) => arg,
-            };
-            out.push_str(text_arg);
-        }
+        let out = expand_text_args(&self.text, state);
 
         state.set_text_content(out);
     }
+
+    /// Sets the foreground image for the `WidgetState` based on the
+    /// defined theme image.  References are expanded.  See `WidgetState#add_text_arg`
+    /// and `expand_text_args`
+    pub fn apply_foreground(&self, state: &mut WidgetState) {
+        if self.foreground.is_some() {
+            let out = expand_text_args(&self.foreground, state);
+            match ResourceSet::get_image(&out) {
+                None => warn!("Unable to find image {}", out),
+                Some(image) => state.set_foreground(Some(image)),
+            }
+        }
+    }
+}
+
+/// Expands all references to text args in the given string. Text args are
+/// surrounded by `#` before and after.  A `##` produces just one `#` in the output.
+/// For example, if the text arg `name` is set to `John Doe`, then the String
+/// `Hello, #name# ##1` will be expanded to `Hello, John Doe #1`
+pub fn expand_text_args(text: &Option<String>, state: &WidgetState) -> String {
+    let text = match text {
+        &None => return String::new(),
+        &Some(ref text) => text,
+    };
+
+    let mut out = String::new();
+    let mut cur_arg = String::new();
+    let mut arg_accum = false;
+    for c in text.chars() {
+        if arg_accum {
+            if c.is_whitespace() {
+            } else if c == '#' {
+                if cur_arg.len() == 0 {
+                    // ## code just gives a #
+                    out.push(c);
+                } else {
+                    let text_arg = match state.get_text_arg(&cur_arg) {
+                        None => {
+                            warn!("Non existant text arg '{}' in text '{}'", cur_arg, text);
+                            ""
+                        },
+                        Some(arg) => arg,
+                    };
+                    out.push_str(text_arg);
+                }
+                arg_accum = false;
+                cur_arg.clear();
+            } else {
+                cur_arg.push(c);
+            }
+        } else if c == '#' {
+            arg_accum = true;
+        } else {
+            out.push(c);
+        }
+    }
+
+    if cur_arg.len() > 0 {
+        let text_arg = match state.get_text_arg(&cur_arg) {
+            None => {
+                warn!("Non existant text arg '{}' in text '{}'", cur_arg, text);
+                ""
+            },
+            Some(arg) => arg,
+        };
+        out.push_str(text_arg);
+    }
+
+    out
 }
 
 #[derive(Deserialize, Debug, Clone)]
@@ -232,6 +258,7 @@ impl TextParamsBuilder {
 #[serde(deny_unknown_fields)]
 pub struct ThemeBuilder {
     background: Option<String>,
+    foreground: Option<String>,
     border: Option<Border>,
     preferred_size: Option<Size>,
     text: Option<String>,
@@ -320,6 +347,7 @@ impl ThemeBuilder {
 
     fn copy_from(&mut self, other: ThemeBuilder, builders: &ThemeBuilder) {
         if self.background.is_none() { self.background = other.background; }
+        if self.foreground.is_none() { self.foreground = other.foreground; }
         if self.border.is_none() { self.border = other.border; }
         if self.preferred_size.is_none() { self.preferred_size = other.preferred_size; }
         if self.text.is_none() { self.text = other.text; }

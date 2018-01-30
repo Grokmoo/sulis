@@ -55,9 +55,14 @@ impl WidgetKind for TilePicker {
             }
         }));
 
-        for tile in Module::all_tiles() {
-            let button = Widget::with_theme(Button::with_text(&tile.id), "tile_button");
+        let mut all_tiles = Module::all_tiles();
+        all_tiles.sort_by(|a, b| a.id.cmp(&b.id));
+
+        for tile in all_tiles {
+            let button = Widget::with_theme(Button::with_text(&tile.name), "tile_button");
             button.borrow_mut().state.add_callback(cb.clone());
+            let sprite_id = format!("{}/{}", tile.image_display.id, tile.id);
+            button.borrow_mut().state.add_text_arg("icon", &sprite_id);
             widgets.push(button);
         }
 

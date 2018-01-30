@@ -36,6 +36,7 @@ pub struct AreaEditor {
     tile_picker: Rc<RefCell<Widget>>,
     tiles: Vec<(Point, Rc<Tile>)>,
     cur_tile: Option<(Point, Rc<Tile>)>,
+    removal_tiles: Vec<(Point, Rc<Tile>)>,
 }
 
 impl AreaEditor {
@@ -44,6 +45,7 @@ impl AreaEditor {
             tiles: Vec::new(),
             tile_picker: Rc::clone(tile_picker),
             cur_tile: None,
+            removal_tiles: Vec::new(),
         }))
     }
 
@@ -94,10 +96,14 @@ impl AreaEditor {
         }
     }
 
-    fn get_cursor_pos(&self, widget: &Rc<RefCell<Widget>>) -> (i32, i32) {
-        let x = Cursor::get_x() - widget.borrow().state.position.x;
-        let y = Cursor::get_y() - widget.borrow().state.position.y;
-        (x, y)
+    fn get_cursor_pos(&self, widget: &Rc<RefCell<Widget>>, tile: &Rc<Tile>) -> (i32, i32) {
+        let x = widget.borrow().state.position.x - widget.borrow().state.scroll_pos.x;
+        let y = widget.borrow().state.position.y - widget.borrow().state.scroll_pos.y;
+
+        let x = Cursor::get_x_f32() - x as f32 - tile.width as f32 / 2.0;
+        let y = Cursor::get_y_f32() - y as f32 - tile.height as f32 / 2.0;
+
+        (x.round() as i32, y.round() as i32)
     }
 
     fn get_current_tile(&self) -> Option<Rc<Tile>> {
@@ -105,6 +111,33 @@ impl AreaEditor {
             None => None,
             Some(tile) => Module::tile(tile),
         }
+    }
+
+    fn add_cur_tile(&mut self, widget: &Rc<RefCell<Widget>>) {
+        let cur_tile = match self.get_current_tile() {
+            None => return,
+            Some(tile) => tile,
+        };
+
+        let (x, y) = self.get_cursor_pos(widget, &cur_tile);
+        if x < 0 || y < 0 { return; }
+
+        self.tiles.push((Point::new(x, y), cur_tile));
+    }
+
+    fn remove_cur_tiles(&mut self, widget: &Rc<RefCell<Widget>>) {
+        let cur_tile = match self.get_current_tile() {
+            None => return,
+            Some(tile) => tile,
+        };
+
+        let (x, y) = self.get_cursor_pos(widget, &cur_tile);
+        if x < 0 || y < 0 { return; }
+
+        self.removal_tiles.clear();
+        self.tiles.retain(|&(pos, ref tile)| {
+            !is_removal(pos, tile, x, y, cur_tile.width, cur_tile.height)
+        });
     }
 }
 
@@ -127,22 +160,35 @@ impl WidgetKind for AreaEditor {
         let p = widget.state.inner_position;
         let s = widget.state.scroll_pos;
 
-        if self.tiles.is_empty() { return; }
+        if !self.tiles.is_empty() {
+            let mut draw_list = DrawList::empty_sprite();
+            for &(pos, ref tile) in self.tiles.iter() {
+                let sprite = &tile.image_display;
+                let x = pos.x + p.x + s.x;
+                let y = pos.y + p.y + s.y;
+                draw_list.append(&mut DrawList::from_sprite(sprite, x, y, tile.width, tile.height));
+            }
 
-        let mut draw_list = DrawList::empty_sprite();
-        for &(pos, ref tile) in self.tiles.iter() {
-            let sprite = &tile.image_display;
-            let x = pos.x + p.x + s.x;
-            let y = pos.y + p.y + s.y;
-            draw_list.append(&mut DrawList::from_sprite(sprite, x, y, tile.width, tile.height));
+            renderer.draw(draw_list);
         }
 
-        renderer.draw(draw_list);
+        if !self.removal_tiles.is_empty() {
+            let mut draw_list = DrawList::empty_sprite();
+            for &(pos, ref tile) in self.removal_tiles.iter() {
+                let sprite = &tile.image_display;
+                let x = pos.x + p.x + s.x;
+                let y = pos.y + p.y + s.y;
+                draw_list.append(&mut DrawList::from_sprite(sprite, x, y, tile.width, tile.height));
+            }
+
+            draw_list.set_color(Color::from_string("FF000088"));
+            renderer.draw(draw_list);
+        }
 
         if let Some((cur_tile_pos, ref cur_tile)) = self.cur_tile {
             let sprite = &cur_tile.image_display;
             let x = cur_tile_pos.x + p.x + s.x;
-            let y = cur_tile_pos.y + p.x + s.y;
+            let y = cur_tile_pos.y + p.y + s.y;
             let mut draw_list = DrawList::from_sprite(sprite, x, y, cur_tile.width, cur_tile.height);
             draw_list.set_color(Color::from_string("FFFFFF88"));
 
@@ -150,30 +196,55 @@ impl WidgetKind for AreaEditor {
         }
     }
 
-    fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, _kind: ClickKind) -> bool {
-        let (x, y) = self.get_cursor_pos(widget);
-
+    fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
         trace!("Getting tile {:?}", self.tile_picker.borrow().state.get_text_arg("current_tile"));
 
-        let cur_tile = match self.get_current_tile() {
-            None => return true,
-            Some(tile) => tile,
+        match kind {
+            ClickKind::Left => self.add_cur_tile(widget),
+            ClickKind::Right => self.remove_cur_tiles(widget),
+            _ => (),
         };
 
-        self.tiles.push((Point::new(x, y), cur_tile));
         true
     }
 
     fn on_mouse_move(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
-        let (x, y) = self.get_cursor_pos(widget);
-
         let cur_tile = match self.get_current_tile() {
             None => return true,
             Some(tile) => tile,
         };
 
+        let (x, y) = self.get_cursor_pos(widget, &cur_tile);
+        if x < 0 || y < 0 { return true; }
+
+        let w = cur_tile.width;
+        let h = cur_tile.height;
         self.cur_tile = Some((Point::new(x, y), cur_tile));
+
+        self.removal_tiles.clear();
+        for &(pos, ref tile) in self.tiles.iter() {
+
+            if is_removal(pos, tile, x, y, w, h) {
+                self.removal_tiles.push((pos, Rc::clone(tile)));
+            }
+        }
 
         true
     }
+}
+
+fn is_removal(pos: Point, tile: &Rc<Tile>, x: i32, y: i32, w: i32, h: i32) -> bool {
+    let min_x = x;
+    let min_y = y;
+    let max_x = x + w;
+    let max_y = y + h;
+
+    in_bounds(pos.x, pos.y, min_x, min_y, max_x, max_y) ||
+        in_bounds(pos.x + tile.width - 1, pos.y, min_x, min_y, max_x, max_y) ||
+        in_bounds(pos.x, pos.y + tile.height - 1, min_x, min_y, max_x, max_y) ||
+        in_bounds(pos.x + tile.width - 1, pos.y + tile.height - 1, min_x, min_y, max_x, max_y)
+}
+
+fn in_bounds(x: i32, y: i32, min_x: i32, min_y: i32, max_x: i32, max_y: i32) -> bool {
+    x >= min_x && y >= min_y && x < max_x && y < max_y
 }

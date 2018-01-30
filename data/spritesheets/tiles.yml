@@ -1,6 +1,7 @@
 id: tiles
 src: "tiles.png"
 size: [ 512, 512 ]
+simple_image_gen_scale: 16
 groups:
   1by1:
     size: [16, 16]

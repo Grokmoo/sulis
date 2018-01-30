@@ -94,7 +94,6 @@ pub struct DrawList {
 }
 
 pub const GFX_BORDER_SCALE: f32 = 0.75;
-pub const TEXT_BORDER_SCALE: f32 = 0.0;
 
 impl Default for DrawList {
     fn default() -> DrawList {

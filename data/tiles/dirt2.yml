@@ -1,0 +1,6 @@
+id: dirt2
+name: dirt2x2
+layer: base
+width: 2
+height: 2
+image_display: "tiles/dirt2"

@@ -55,6 +55,14 @@ impl Widget {
             image.draw_graphics_mode(renderer, &self.state.animation_state, x, y, w, h);
         }
 
+        if let Some(ref image) = self.state.foreground {
+            let x = self.state.inner_position.x as f32;
+            let y = self.state.inner_position.y as f32;
+            let w = self.state.inner_size.width as f32;
+            let h = self.state.inner_size.height as f32;
+            image.draw_graphics_mode(renderer, &self.state.animation_state, x, y, w, h);
+        }
+
         self.kind.borrow_mut().draw_graphics_mode(renderer, pixel_size, &self, millis);
 
         for child in self.children.iter() {
@@ -106,6 +114,8 @@ impl Widget {
         if let Some(ref bg) = theme.background {
             self.state.set_background(ResourceSet::get_image(&bg));
         }
+
+        theme.apply_foreground(&mut self.state);
 
         if let Some(font) = ResourceSet::get_font(&theme.text_params.font) {
             self.state.font = Some(font);

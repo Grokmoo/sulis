@@ -34,6 +34,7 @@ pub struct WidgetState {
     pub border: Border,
     pub mouse_is_inside: bool,
     pub background: Option<Rc<Image>>,
+    pub foreground: Option<Rc<Image>>,
     pub animation_state: AnimationState,
     pub scroll_pos: Point,
     pub max_scroll_pos: Point,
@@ -59,6 +60,7 @@ impl WidgetState {
             border: Border::as_zero(),
             mouse_is_inside: false,
             background: None,
+            foreground: None,
             animation_state: AnimationState::default(),
             scroll_pos: Point::as_zero(),
             max_scroll_pos: Point::as_zero(),
@@ -199,6 +201,10 @@ impl WidgetState {
 
     pub fn set_background(&mut self, image: Option<Rc<Image>>) {
         self.background = image;
+    }
+
+    pub fn set_foreground(&mut self, image: Option<Rc<Image>>) {
+        self.foreground = image;
     }
 
     pub(super) fn set_mouse_inside(&mut self, is_inside: bool) {

@@ -273,17 +273,15 @@ impl WidgetKind for AreaEditor {
 }
 
 fn is_removal(pos: Point, tile: &Rc<Tile>, x: i32, y: i32, w: i32, h: i32) -> bool {
-    let min_x = x;
-    let min_y = y;
-    let max_x = x + w;
-    let max_y = y + h;
+    // if one rectangle is on left side of the other
+    if pos.x >= x + w || x >= pos.x + tile.width {
+        return false;
+    }
 
-    in_bounds(pos.x, pos.y, min_x, min_y, max_x, max_y) ||
-        in_bounds(pos.x + tile.width - 1, pos.y, min_x, min_y, max_x, max_y) ||
-        in_bounds(pos.x, pos.y + tile.height - 1, min_x, min_y, max_x, max_y) ||
-        in_bounds(pos.x + tile.width - 1, pos.y + tile.height - 1, min_x, min_y, max_x, max_y)
-}
+    // if one rectangle is above the other
+    if pos.y >= y + h || y >= pos.y + tile.height {
+        return false
+    }
 
-fn in_bounds(x: i32, y: i32, min_x: i32, min_y: i32, max_x: i32, max_y: i32) -> bool {
-    x >= min_x && y >= min_y && x < max_x && y < max_y
+    true
 }

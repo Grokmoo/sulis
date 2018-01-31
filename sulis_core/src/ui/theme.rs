@@ -110,6 +110,7 @@ pub struct Theme {
     pub y_relative: PositionRelative,
     pub position: Point,
     pub children: HashMap<String, Rc<Theme>>,
+    pub custom: HashMap<String, String>,
 }
 
 impl Theme {
@@ -132,6 +133,7 @@ impl Theme {
         let text_params = TextParams::from(builder.text_params);
         let layout = builder.layout.unwrap_or(LayoutKind::Normal);
         let layout_spacing = builder.layout_spacing.unwrap_or(Border::as_zero());
+        let custom = builder.custom.unwrap_or(HashMap::new());
 
         Theme {
             layout,
@@ -149,6 +151,7 @@ impl Theme {
             y_relative,
             children,
             text_params,
+            custom,
         }
     }
 
@@ -273,6 +276,7 @@ pub struct ThemeBuilder {
     children: Option<HashMap<String, ThemeBuilder>>,
     include: Option<Vec<String>>,
     from: Option<String>,
+    custom: Option<HashMap<String, String>>,
 }
 
 pub const MAX_THEME_DEPTH: i32 = 20;
@@ -358,6 +362,19 @@ impl ThemeBuilder {
         if self.y_relative.is_none() { self.y_relative = other.y_relative; }
         if self.width_relative.is_none() { self.width_relative = other.width_relative; }
         if self.height_relative.is_none() { self.height_relative = other.height_relative; }
+
+        if let Some(other_custom) = other.custom {
+            match self.custom {
+                None => self.custom = Some(other_custom),
+                Some(ref mut self_custom) => {
+                    for (key, value) in other_custom {
+                        if !self_custom.contains_key(&key) {
+                            self_custom.insert(key, value);
+                        }
+                    }
+                }
+            }
+        }
 
         if let Some(other_text_params) = other.text_params {
             match self.text_params {

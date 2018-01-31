@@ -145,7 +145,7 @@ impl Widget {
             trace!("Performing layout on widget '{}' with size {:?} at {:?}",
                    self.theme_id, self.state.size, self.state.position);
             let kind = Rc::clone(&self.kind);
-            kind.borrow().layout(self);
+            kind.borrow_mut().layout(self);
             self.marked_for_layout = false;
 
             self.children.iter_mut().for_each(|child| child.borrow_mut().marked_for_layout = true);

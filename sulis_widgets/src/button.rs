@@ -54,7 +54,7 @@ impl WidgetKind for Button {
         self
     }
 
-    fn layout(&self, widget: &mut Widget) {
+    fn layout(&mut self, widget: &mut Widget) {
         if let Some(ref text) = self.label.borrow().text {
             widget.state.add_text_arg("0", text);
         }

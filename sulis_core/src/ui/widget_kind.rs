@@ -54,7 +54,7 @@ pub trait WidgetKind {
     fn draw_graphics_mode(&mut self, _renderer: &mut GraphicsRenderer, _pixel_size: Point,
                           _widget: &Widget, _millis: u32) { }
 
-    fn layout(&self, widget: &mut Widget) {
+    fn layout(&mut self, widget: &mut Widget) {
         widget.do_base_layout();
     }
 

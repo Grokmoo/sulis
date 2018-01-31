@@ -14,10 +14,14 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::f32;
+use std::str::FromStr;
 use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
+use sulis_core::resource::ResourceSet;
+use sulis_core::image::Image;
 use sulis_core::ui::{LineRenderer, Widget, WidgetKind};
 use sulis_core::io::{GraphicsRenderer};
 use sulis_core::util::Point;
@@ -28,6 +32,9 @@ const NAME: &str = "input_field";
 pub struct InputField {
     pub text: String,
     label: Rc<RefCell<Label>>,
+    carat: Option<Rc<Image>>,
+    carat_width: f32,
+    carat_height: f32,
 }
 
 impl InputField {
@@ -35,6 +42,9 @@ impl InputField {
         Rc::new(RefCell::new(InputField {
             text: String::new(),
             label: Label::empty(),
+            carat: None,
+            carat_width: 1.0,
+            carat_height: 1.0,
         }))
     }
 }
@@ -46,7 +56,7 @@ impl WidgetKind for InputField {
 
     fn wants_keyboard_focus(&self) -> bool { true }
 
-    fn layout(&self, widget: &mut Widget) {
+    fn layout(&mut self, widget: &mut Widget) {
         if let Some(ref text) = self.label.borrow().text {
             widget.state.add_text_arg("0", text);
         }
@@ -54,6 +64,26 @@ impl WidgetKind for InputField {
 
         if let Some(ref font) = widget.state.font {
             widget.state.text_renderer = Some(Box::new(LineRenderer::new(font)));
+        }
+
+        if let Some(ref theme) = widget.theme {
+            if let Some(ref image_id) = theme.custom.get("carat_image") {
+                self.carat = ResourceSet::get_image(image_id);
+            }
+
+            if let Some(ref carat_width_str) = theme.custom.get("carat_width") {
+                match f32::from_str(carat_width_str) {
+                    Err(_) => warn!("Unable to parse carat width from {}", carat_width_str),
+                    Ok(width) => self.carat_width = width,
+                }
+            }
+
+            if let Some(ref carat_height_str) = theme.custom.get("carat_height") {
+                match f32::from_str(carat_height_str) {
+                    Err(_) => warn!("Unable to parse carat height from {}", carat_height_str),
+                    Ok(height) => self.carat_height = height,
+                }
+            }
         }
     }
 
@@ -71,5 +101,14 @@ impl WidgetKind for InputField {
     fn draw_graphics_mode(&mut self, renderer: &mut GraphicsRenderer, pixel_size: Point,
                           widget: &Widget, millis: u32) {
         self.label.borrow_mut().draw_graphics_mode(renderer, pixel_size, widget, millis);
+
+        if let Some(ref carat) = self.carat {
+            let x = widget.state.inner_left() as f32 + 0.5;
+            let y = widget.state.inner_top() as f32 +
+                (widget.state.inner_size.height as f32 - self.carat_height) / 2.0;
+            let w = self.carat_width;
+            let h = self.carat_height;
+            carat.draw_graphics_mode(renderer, &widget.state.animation_state, x, y, w, h, millis);
+        }
     }
 }

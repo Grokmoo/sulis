@@ -46,7 +46,7 @@ impl WidgetKind for ConfirmationWindow {
         self
     }
 
-    fn layout(&self, widget: &mut Widget) {
+    fn layout(&mut self, widget: &mut Widget) {
         widget.do_base_layout();
     }
 

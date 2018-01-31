@@ -31,4 +31,8 @@ children:
     text_params:
       font: "normal"
     text: "#0#"
+    custom:
+      carat_image: carat
+      carat_height: "0.7"
+      carat_width: "0.15"
 ...

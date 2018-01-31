@@ -1,0 +1,5 @@
+id: carat
+frame_time_millis: 500
+frames:
+  - "carat_off"
+  - "carat_on"

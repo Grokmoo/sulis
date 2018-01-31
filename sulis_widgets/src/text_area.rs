@@ -54,7 +54,7 @@ impl WidgetKind for TextArea {
         self
     }
 
-    fn layout(&self, widget: &mut Widget) {
+    fn layout(&mut self, widget: &mut Widget) {
         if let Some(ref text) = self.text {
             widget.state.add_text_arg("0", text);
         }

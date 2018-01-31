@@ -32,6 +32,7 @@ pub struct Widget {
     pub theme_subname: String,
 
     modal_child: Option<Rc<RefCell<Widget>>>,
+    pub (crate) keyboard_focus_child: Option<Rc<RefCell<Widget>>>,
     parent: Option<Rc<RefCell<Widget>>>,
 
     marked_for_removal: bool,
@@ -52,7 +53,7 @@ impl Widget {
             let y = self.state.position.y as f32;
             let w = self.state.size.width as f32;
             let h = self.state.size.height as f32;
-            image.draw_graphics_mode(renderer, &self.state.animation_state, x, y, w, h);
+            image.draw_graphics_mode(renderer, &self.state.animation_state, x, y, w, h, millis);
         }
 
         if let Some(ref image) = self.state.foreground {
@@ -60,7 +61,7 @@ impl Widget {
             let y = self.state.inner_position.y as f32;
             let w = self.state.inner_size.width as f32;
             let h = self.state.inner_size.height as f32;
-            image.draw_graphics_mode(renderer, &self.state.animation_state, x, y, w, h);
+            image.draw_graphics_mode(renderer, &self.state.animation_state, x, y, w, h, millis);
         }
 
         self.kind.borrow_mut().draw_graphics_mode(renderer, pixel_size, &self, millis);
@@ -165,6 +166,7 @@ impl Widget {
             kind: Rc::clone(&kind),
             children: Vec::new(),
             modal_child: None,
+            keyboard_focus_child: None,
             parent: None,
             marked_for_layout: true,
             theme: None,
@@ -254,6 +256,18 @@ impl Widget {
             }
         }
         None
+    }
+
+    pub fn grab_keyboard_focus(widget: &Rc<RefCell<Widget>>) {
+        let root = Widget::get_root(widget);
+        root.borrow_mut().keyboard_focus_child = Some(Rc::clone(widget));
+        trace!("Keyboard focus to {}", widget.borrow().theme_id);
+    }
+
+    pub fn clear_keyboard_focus(widget: &Rc<RefCell<Widget>>) {
+        let root = Widget::get_root(widget);
+        root.borrow_mut().keyboard_focus_child = None;
+        trace!("Cleared keyboard focus");
     }
 
     pub fn fire_callback(widget: &Rc<RefCell<Widget>>) {
@@ -419,6 +433,24 @@ impl Widget {
             return Widget::dispatch_event(&child, event);
         }
 
+        let has_keyboard_child = widget.borrow().keyboard_focus_child.is_some();
+        if has_keyboard_child {
+            let child = Rc::clone(widget.borrow().keyboard_focus_child.as_ref().unwrap());
+            let child_kind = Rc::clone(&child.borrow().kind);
+            match event.kind {
+                event::Kind::CharTyped(c) => {
+                    return child_kind.borrow_mut().on_char_typed(&child, c);
+                },
+                event::Kind::KeyPress(_) => return false, // eat all other keyboard actions
+                _ => (),
+            }
+        } else {
+            match event.kind {
+                event::Kind::CharTyped(_) => return false,
+                _ => (),
+            }
+        }
+
         // iterate in this way using indices so we don't maintain any
         // borrows except for the active child widget - this will allow
         // the child to mutate any other widget in the tree
@@ -476,6 +508,7 @@ impl Widget {
                 widget_kind.borrow_mut().on_key_press(widget, action),
             MouseEnter => enter_exit_retval,
             MouseExit => enter_exit_retval,
+            _ => false,
         }
     }
 }

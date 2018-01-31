@@ -14,69 +14,70 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::collections::HashMap;
 use std::rc::Rc;
 use std::io::{Error, ErrorKind};
-use std::collections::HashMap;
 
 use serde_json;
 use serde_yaml;
 
 use image::Image;
 use resource::ResourceBuilder;
-use io::{GraphicsRenderer};
+use io::GraphicsRenderer;
 use ui::AnimationState;
 use util::{invalid_data_error, Size};
 
 #[derive(Debug)]
-pub struct AnimatedImage {
-    images: HashMap<AnimationState, Rc<Image>>,
+pub struct TimerImage {
+    frames: Vec<Rc<Image>>,
+    frame_time_millis: u32,
     size: Size,
 }
 
-impl AnimatedImage {
-    pub fn new(builder: AnimatedImageBuilder,
+impl TimerImage {
+    pub fn new(builder: TimerImageBuilder,
                images: &HashMap<String, Rc<Image>>) -> Result<Rc<Image>, Error> {
-        let mut images_map: HashMap<AnimationState, Rc<Image>> = HashMap::new();
+        let mut frames: Vec<Rc<Image>> = Vec::new();
 
-        if builder.states.is_empty() {
-            return invalid_data_error("Animated image must have 1 or more sub images.");
+        if builder.frames.is_empty() {
+            return invalid_data_error("Timer image must have 1 or more frames.");
         }
 
         let mut size: Option<Size> = None;
-        for (state_str, image_id) in builder.states {
-            // check that the state string exists
-            let state = AnimationState::parse(&state_str)?;
+        for id in builder.frames {
+            let image = match images.get(&id) {
+                None => return invalid_data_error(&format!("Unable to locate frame {}", id)),
+                Some(image) => image,
+            };
 
-            let image = images.get(&image_id);
-            if let None = image {
-                return Err(Error::new(ErrorKind::InvalidData,
-                    format!("Unable to locate sub image {}", image_id)));
-            }
-
-            let image = image.unwrap();
-            images_map.insert(state, Rc::clone(image));
-
-            if let None = size {
-                size = Some(*image.get_size());
-            } else {
-                if size.unwrap() != *image.get_size() {
-                    return Err(Error::new(ErrorKind::InvalidData,
-                        format!("All images in an animated image must have the same size.")));
+            match size {
+                None => size = Some(*image.get_size()),
+                Some(size) => {
+                    if size != *image.get_size() {
+                        return invalid_data_error(&format!("All frames in a timer image must have the\
+                                                           same size."));
+                    }
                 }
             }
+
+            frames.push(Rc::clone(&image));
         }
 
-        Ok(Rc::new(AnimatedImage {
-            images: images_map,
+        Ok(Rc::new(TimerImage {
+            frames,
             size: size.unwrap(),
+            frame_time_millis: builder.frame_time_millis,
         }))
     }
 }
 
-impl Image for AnimatedImage {
+impl Image for TimerImage {
     fn draw_graphics_mode(&self, renderer: &mut GraphicsRenderer, state: &AnimationState,
                           x: f32, y: f32, w: f32, h: f32, millis: u32) {
-        AnimationState::find_match(&self.images, state).draw_graphics_mode(renderer, state, x, y, w, h, millis);
+        let total_frame_time = self.frame_time_millis * self.frames.len() as u32;
+        let offset = millis % total_frame_time;
+        let index = (offset / self.frame_time_millis) as usize;
+        self.frames[index].draw_graphics_mode(renderer, state, x, y, w, h, millis);
     }
 
     fn get_width_f32(&self) -> f32 {
@@ -94,24 +95,25 @@ impl Image for AnimatedImage {
 
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
-pub struct AnimatedImageBuilder {
-    pub id: String,
-    pub states: HashMap<String, String>,
+pub struct TimerImageBuilder {
+    id: String,
+    frames: Vec<String>,
+    frame_time_millis: u32,
 }
 
-impl ResourceBuilder for AnimatedImageBuilder {
+impl ResourceBuilder for TimerImageBuilder {
     fn owned_id(&self) -> String {
         self.id.to_owned()
     }
 
-    fn from_json(data: &str) -> Result<AnimatedImageBuilder, Error> {
-        let resource: AnimatedImageBuilder = serde_json::from_str(data)?;
+    fn from_json(data: &str) -> Result<TimerImageBuilder, Error> {
+        let resource: TimerImageBuilder = serde_json::from_str(data)?;
 
         Ok(resource)
     }
 
-    fn from_yaml(data: &str) -> Result<AnimatedImageBuilder, Error> {
-        let resource: Result<AnimatedImageBuilder, serde_yaml::Error> = serde_yaml::from_str(data);
+    fn from_yaml(data: &str) -> Result<TimerImageBuilder, Error> {
+        let resource: Result<TimerImageBuilder, serde_yaml::Error> = serde_yaml::from_str(data);
 
         match resource {
             Ok(resource) => Ok(resource),

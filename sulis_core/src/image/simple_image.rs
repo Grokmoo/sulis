@@ -47,7 +47,7 @@ impl SimpleImage {
 
 impl Image for SimpleImage {
     fn draw_graphics_mode(&self, renderer: &mut GraphicsRenderer, _state: &AnimationState,
-                          x: f32, y: f32, w: f32, h: f32) {
+                          x: f32, y: f32, w: f32, h: f32, _millis: u32) {
         renderer.draw(DrawList::from_sprite_f32(&self.image_display, x, y, w, h));
     }
 

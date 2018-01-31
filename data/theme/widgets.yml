@@ -26,4 +26,9 @@ children:
   text_area:
     text_params:
       font: "normal"
+  input_field:
+    background: bg_text_box
+    text_params:
+      font: "normal"
+    text: "#0#"
 ...

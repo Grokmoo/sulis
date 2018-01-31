@@ -32,7 +32,7 @@ use std::fmt::Display;
 use std::hash::Hash;
 
 use resource::resource_builder_set::ResourceBuilderSet;
-use image::{Image, SimpleImage, AnimatedImage, ComposedImage};
+use image::{Image, SimpleImage, AnimatedImage, ComposedImage, TimerImage};
 use util::invalid_data_error;
 use ui::Theme;
 
@@ -101,6 +101,11 @@ impl ResourceSet {
             for (id, image) in builder_set.composed_builders {
                 insert_if_ok_boxed("image", id, ComposedImage::new(image,
                     &mut resource_set), &mut resource_set.images);
+            }
+
+            for (id, image) in builder_set.timer_builders {
+                insert_if_ok_boxed("image", id, TimerImage::new(image,
+                    &resource_set.images), &mut resource_set.images);
             }
 
             for (id, image) in builder_set.animated_builders {

@@ -61,6 +61,11 @@ impl Size {
 
     }
 
+    pub fn mult_mut(&mut self, val: i32) {
+        self.width *= val;
+        self.height *= val;
+    }
+
     pub fn add(&self, w: i32, h: i32) -> Size {
         Size::new(self.width + w, self.height + h)
     }

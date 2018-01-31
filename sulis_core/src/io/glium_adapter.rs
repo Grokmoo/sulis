@@ -273,6 +273,7 @@ fn process_window_event(event: glutin::WindowEvent) -> Option<InputAction> {
     use glium::glutin::WindowEvent::*;
     match event {
         Closed => Some(InputAction::Exit),
+        ReceivedCharacter(c) => Some(InputAction::CharReceived(c)),
         KeyboardInput { input, .. } => CONFIG.get_input_action(process_keyboard_input(input)),
         MouseInput { state, button, .. } => {
             let kind = match button {

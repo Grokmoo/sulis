@@ -33,7 +33,7 @@ use std::cell::RefCell;
 use sulis_core::config::CONFIG;
 use sulis_core::io::{InputAction, MainLoopUpdater};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_widgets::{ConfirmationWindow, DropDown, list_box};
+use sulis_widgets::{ConfirmationWindow, DropDown, InputField, list_box};
 
 thread_local! {
     static EXIT: RefCell<bool> = RefCell::new(false);
@@ -116,6 +116,9 @@ impl WidgetKind for EditorView {
             let menu = Widget::with_theme(drop_down, "menu");
 
             Widget::add_child_to(&top_bar, menu);
+
+            let name = Widget::with_theme(InputField::new(), "name");
+            Widget::add_child_to(&top_bar, name);
         }
 
         let area_editor = Widget::with_defaults(area_editor_kind);

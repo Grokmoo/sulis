@@ -1,0 +1,9 @@
+id: bg_text_box
+generate_sub_images:
+  size: [1, 1]
+  spritesheet: "gui"
+grid: [ bg_top_left_text_box,    bg_top_middle_text_box,    bg_top_right_text_box,
+        bg_middle_left_text_box, bg_middle_text_box,        bg_middle_right_text_box,
+        bg_bottom_left_text_box, bg_bottom_middle_text_box, bg_bottom_right_text_box
+      ]
+

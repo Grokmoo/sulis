@@ -67,6 +67,19 @@ groups:
       bg_bottom_left_active:   [0, 10]
       bg_bottom_middle_active: [5, 10]
       bg_bottom_right_active:  [10, 10]
+  bg_text_box:
+    size: [5, 5]
+    position: [0, 85]
+    areas:
+      bg_top_left_text_box:      [0,  0]
+      bg_top_middle_text_box:    [5,  0]
+      bg_top_right_text_box:     [10, 0]
+      bg_middle_left_text_box:   [0,  5]
+      bg_middle_text_box:        [5,  5]
+      bg_middle_right_text_box:  [10, 5]
+      bg_bottom_left_text_box:   [0, 10]
+      bg_bottom_middle_text_box: [5, 10]
+      bg_bottom_right_text_box:  [10, 10]
   special:
     areas:
       empty: [0, 68, 5, 5]
@@ -76,4 +89,5 @@ groups:
       cursor3x3: [170,  0, 48, 48]
       cursor2x2: [221,  0, 32, 32]
       cursor1x1: [170, 51, 16, 16]
-      area_invis: [189, 51, 16, 16]
+      area_invis: [187, 51, 16, 16]
+      cursor3x3_f2: [ 204, 51, 48, 48]

@@ -64,6 +64,12 @@ pub trait WidgetKind {
 
     fn as_any_mut(&mut self) -> &mut Any;
 
+    /// Whether this Widget kind wants keyboard focus.  When a widget is receiving keyboard
+    /// focus, it gets character events, allowing the user to type into the widget.  By default,
+    /// a widget will receive keyboard focus when clicked and lose it when another widget is
+    /// clicked.
+    fn wants_keyboard_focus(&self) -> bool { false }
+
     /// This method is called after this WidgetKind is added to its parent widget.
     /// It returns a vector of 'Widget's that will be added as children to the
     /// parent widget.  If you implement this but do not need to add any children,
@@ -82,6 +88,12 @@ pub trait WidgetKind {
 
     fn super_on_mouse_press(&self, widget: &Rc<RefCell<Widget>>, _kind: ClickKind) {
         widget.borrow_mut().state.animation_state.add(animation_state::Kind::Pressed);
+
+        if self.wants_keyboard_focus() {
+            Widget::grab_keyboard_focus(widget);
+        } else {
+            Widget::clear_keyboard_focus(widget);
+        }
     }
 
     fn super_on_mouse_release(&self, widget: &Rc<RefCell<Widget>>, _kind: ClickKind) {
@@ -131,6 +143,10 @@ pub trait WidgetKind {
     }
 
     fn on_key_press(&mut self, _widget: &Rc<RefCell<Widget>>, _key: InputAction) -> bool {
+        false
+    }
+
+    fn on_char_typed(&mut self, _widget: &Rc<RefCell<Widget>>, _c: char) -> bool {
         false
     }
 

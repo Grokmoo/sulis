@@ -1,0 +1,5 @@
+id: bg_timer
+frame_time_millis: 500
+frames:
+  - "bg_base"
+  - "bg_active"

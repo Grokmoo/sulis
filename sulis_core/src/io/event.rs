@@ -50,6 +50,7 @@ pub enum Kind {
     MouseScroll { scroll: i32 },
     MouseEnter,
     MouseExit,
+    CharTyped(char),
     KeyPress(InputAction),
 }
 

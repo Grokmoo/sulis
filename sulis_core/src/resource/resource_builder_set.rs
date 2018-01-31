@@ -19,6 +19,7 @@ use resource::spritesheet::SpritesheetBuilder;
 use resource::font::FontBuilder;
 use image::simple_image::SimpleImageBuilder;
 use image::composed_image::ComposedImageBuilder;
+use image::timer_image::TimerImageBuilder;
 use image::animated_image::AnimatedImageBuilder;
 use ui::theme::{ThemeBuilder, create_theme};
 
@@ -33,6 +34,7 @@ pub struct ResourceBuilderSet {
     pub theme_builder: ThemeBuilder,
     pub simple_builders: HashMap<String, SimpleImageBuilder>,
     pub composed_builders: HashMap<String, ComposedImageBuilder>,
+    pub timer_builders: HashMap<String, TimerImageBuilder>,
     pub animated_builders: HashMap<String, AnimatedImageBuilder>,
     pub spritesheet_builders: HashMap<String, SpritesheetBuilder>,
     pub spritesheets_dir: String,
@@ -66,6 +68,7 @@ impl ResourceBuilderSet {
             theme_builder,
             simple_builders: read(&root_dirs, "images"),
             composed_builders: read(&root_dirs, "composed_images"),
+            timer_builders: read(&root_dirs, "timer_images"),
             animated_builders: read(&root_dirs, "animated_images"),
             spritesheet_builders: read(&root_dirs, "spritesheets"),
             spritesheets_dir: format!("{}/spritesheets/", root),

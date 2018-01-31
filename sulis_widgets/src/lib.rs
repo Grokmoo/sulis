@@ -27,6 +27,9 @@ pub use self::confirmation_window::ConfirmationWindow;
 pub mod drop_down;
 pub use self::drop_down::DropDown;
 
+pub mod input_field;
+pub use self::input_field::InputField;
+
 pub mod label;
 pub use self::label::Label;
 

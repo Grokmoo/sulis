@@ -23,6 +23,9 @@ pub use self::composed_image::ComposedImage;
 pub mod animated_image;
 pub use self::animated_image::AnimatedImage;
 
+pub mod timer_image;
+pub use self::timer_image::TimerImage;
+
 use std::fmt::Debug;
 
 use io::{GraphicsRenderer};
@@ -31,7 +34,7 @@ use util::Size;
 
 pub trait Image: Debug {
     fn draw_graphics_mode(&self, renderer: &mut GraphicsRenderer, state: &AnimationState,
-                          x: f32, y: f32, w: f32, h: f32);
+                          x: f32, y: f32, w: f32, h: f32, millis: u32);
 
     fn get_width_f32(&self) -> f32;
 

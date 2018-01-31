@@ -142,7 +142,7 @@ impl ComposedImage {
 
 impl Image for ComposedImage {
     fn draw_graphics_mode(&self, renderer: &mut GraphicsRenderer, state: &AnimationState,
-                          x: f32, y: f32, w: f32, h: f32) {
+                          x: f32, y: f32, w: f32, h: f32, millis: u32) {
         let fill_width = 2.0 * io::GFX_BORDER_SCALE
             + w - (self.size.width - self.middle_size.width) as f32;
         let fill_height = 2.0 * io::GFX_BORDER_SCALE
@@ -153,51 +153,51 @@ impl Image for ComposedImage {
         let mut draw_y = y;
         let mut draw_w = self.get_border_image_w(image);
         let mut draw_h = self.get_border_image_h(image);
-        image.draw_graphics_mode(renderer, state, draw_x, draw_y, draw_w, draw_h);
+        image.draw_graphics_mode(renderer, state, draw_x, draw_y, draw_w, draw_h, millis);
 
         draw_x += self.get_border_image_w(image);
         let image = &self.images[1];
         draw_w = fill_width;
-        image.draw_graphics_mode(renderer, state, draw_x, draw_y, draw_w, draw_h);
+        image.draw_graphics_mode(renderer, state, draw_x, draw_y, draw_w, draw_h, millis);
 
         draw_x += fill_width;
         let image = &self.images[2];
         draw_w = self.get_border_image_w(image);
-        image.draw_graphics_mode(renderer, state, draw_x, draw_y, draw_w, draw_h);
+        image.draw_graphics_mode(renderer, state, draw_x, draw_y, draw_w, draw_h, millis);
 
         draw_x = x;
         draw_y += self.get_border_image_h(image);
         let image = &self.images[3];
         draw_w = self.get_border_image_w(image);
         draw_h = fill_height;
-        image.draw_graphics_mode(renderer, state, draw_x, draw_y, draw_w, draw_h);
+        image.draw_graphics_mode(renderer, state, draw_x, draw_y, draw_w, draw_h, millis);
 
         draw_x += self.get_border_image_w(image);
         let image = &self.images[4];
         draw_w = fill_width;
-        image.draw_graphics_mode(renderer, state, draw_x, draw_y, draw_w, draw_h);
+        image.draw_graphics_mode(renderer, state, draw_x, draw_y, draw_w, draw_h, millis);
 
         draw_x += fill_width;
         let image = &self.images[5];
         draw_w = self.get_border_image_w(image);
-        image.draw_graphics_mode(renderer, state, draw_x, draw_y, draw_w, draw_h);
+        image.draw_graphics_mode(renderer, state, draw_x, draw_y, draw_w, draw_h, millis);
 
         draw_x = x;
         draw_y += fill_height;
         let image = &self.images[6];
         draw_w = self.get_border_image_w(image);
         draw_h = self.get_border_image_h(image);
-        image.draw_graphics_mode(renderer, state, draw_x, draw_y, draw_w, draw_h);
+        image.draw_graphics_mode(renderer, state, draw_x, draw_y, draw_w, draw_h, millis);
 
         draw_x += self.get_border_image_w(image);
         let image = &self.images[7];
         draw_w = fill_width;
-        image.draw_graphics_mode(renderer, state, draw_x, draw_y, draw_w, draw_h);
+        image.draw_graphics_mode(renderer, state, draw_x, draw_y, draw_w, draw_h, millis);
 
         draw_x += fill_width;
         let image = &self.images[8];
         draw_w = self.get_border_image_w(image);
-        image.draw_graphics_mode(renderer, state, draw_x, draw_y, draw_w, draw_h);
+        image.draw_graphics_mode(renderer, state, draw_x, draw_y, draw_w, draw_h, millis);
     }
 
     fn get_width_f32(&self) -> f32 {

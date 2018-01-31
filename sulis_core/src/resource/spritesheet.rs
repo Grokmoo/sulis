@@ -83,13 +83,14 @@ impl Spritesheet {
         let image = image.to_rgba();
         let (image_width, image_height) = image.dimensions();
         let image_size = Size::new(image_width as i32, image_height as i32);
+        let multiplier = builder.grid_multiplier.unwrap_or(1) as i32;
 
         let mut sprites: HashMap<String, Rc<Sprite>> = HashMap::new();
         for (_id, group) in builder.groups {
             let base_size = group.get_size();
             let base_pos = group.get_position();
             for (id, area_pos) in group.areas {
-                let (pos, size) = match area_pos.len() {
+                let (mut pos, mut size) = match area_pos.len() {
                     2 => (base_pos.add(area_pos[0], area_pos[1]), base_size),
                     4 => (base_pos.add(area_pos[0], area_pos[1]), base_size.add(area_pos[2], area_pos[3])),
                     _ => {
@@ -99,6 +100,8 @@ impl Spritesheet {
                     }
                 };
 
+                pos.mult_mut(multiplier);
+                size.mult_mut(multiplier);
                 trace!("Creating sprite with id '{}' in '{}'", id, builder.id);
                 let sprite = Sprite::new(&builder.id, &image_size, pos, size);
 
@@ -148,6 +151,7 @@ pub struct SpritesheetBuilder {
     pub src: String,
     pub size: Size,
     pub simple_image_gen_scale: Option<u32>,
+    pub grid_multiplier: Option<u32>,
     groups: HashMap<String, SpritesheetGroup>,
 }
 

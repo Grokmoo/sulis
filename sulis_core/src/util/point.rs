@@ -44,6 +44,11 @@ impl Point {
         Point { x: other.0 as i32, y: other.1 as i32 }
     }
 
+    pub fn mult_mut(&mut self, val: i32) {
+        self.x *= val;
+        self.y *= val;
+    }
+
     pub fn add(&self, x: i32, y: i32) -> Point {
         Point { x: &self.x + x, y: &self.y + y }
     }

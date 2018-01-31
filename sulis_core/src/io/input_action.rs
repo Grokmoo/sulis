@@ -40,6 +40,7 @@ pub enum InputAction {
     MouseMove(f32, f32),
     MouseDown(ClickKind),
     MouseUp(ClickKind),
+    CharReceived(char),
 }
 
 impl InputAction {
@@ -63,8 +64,12 @@ impl InputAction {
             MoveCursorLeft => Cursor::move_by(&root, -1.0, 0.0),
             MoveCursorRight => Cursor::move_by(&root, 1.0, 0.0),
             ClickCursor => {
-                Cursor::press(&root, ClickKind::Left);
-                Cursor::release(&root, ClickKind::Left)
+                if root.borrow_mut().keyboard_focus_child.is_none() {
+                    // don't fire keyboard emulated click event while a widget has keyboard
+                    // focus
+                    Cursor::press(&root, ClickKind::Left);
+                    Cursor::release(&root, ClickKind::Left)
+                }
             }
             RightClickCursor => {
                 Cursor::press(&root, ClickKind::Right);
@@ -73,6 +78,7 @@ impl InputAction {
             MouseMove(x, y) => Cursor::move_to(&root, x, y),
             MouseDown(kind) => Cursor::press(&root, kind),
             MouseUp(kind) => Cursor::release(&root, kind),
+            CharReceived(c) => { Widget::dispatch_event(&root, Event::new(Kind::CharTyped(c))); },
             _ => InputAction::fire_action(action, root),
         }
     }

@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
@@ -43,6 +44,14 @@ impl TextArea {
 impl WidgetKind for TextArea {
     fn get_name(&self) -> &str {
         "text_area"
+    }
+
+    fn as_any(&self) -> &Any {
+        self
+    }
+
+    fn as_any_mut(&mut self) -> &mut Any {
+        self
     }
 
     fn layout(&self, widget: &mut Widget) {

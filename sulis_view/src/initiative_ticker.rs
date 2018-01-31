@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
@@ -34,6 +35,14 @@ impl InitiativeTicker {
 impl WidgetKind for InitiativeTicker {
     fn get_name(&self) -> &str {
         NAME
+    }
+
+    fn as_any(&self) -> &Any {
+        self
+    }
+
+    fn as_any_mut(&mut self) -> &mut Any {
+        self
     }
 
     fn on_remove(&mut self) {

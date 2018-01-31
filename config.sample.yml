@@ -53,4 +53,9 @@ logging:
 
 editor:
   module: "test1"
+  area:
+    filename: "editor_test"
+    id: "editor_test"
+    name: "Editor Test"
+    visibility_tile: "gui/area_invis"
 ...

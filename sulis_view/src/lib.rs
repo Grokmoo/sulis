@@ -45,6 +45,7 @@ pub use self::inventory_window::InventoryWindow;
 
 pub mod main_menu;
 
+use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
@@ -67,6 +68,14 @@ impl RootView {
 impl WidgetKind for RootView {
     fn get_name(&self) -> &str {
         NAME
+    }
+
+    fn as_any(&self) -> &Any {
+        self
+    }
+
+    fn as_any_mut(&mut self) -> &mut Any {
+        self
     }
 
     fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {

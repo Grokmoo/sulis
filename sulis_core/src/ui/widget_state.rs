@@ -114,6 +114,33 @@ impl WidgetState {
         self.callback = Some(callback);
     }
 
+    pub fn set_scroll(&mut self, x: i32, y: i32) -> bool {
+        trace!("Setting scroll to {},{}", x, y);
+
+        let x_result = self.set_scroll_x(x);
+        let y_result = self.set_scroll_y(y);
+
+        x_result && y_result
+    }
+
+    pub fn set_scroll_y(&mut self, y: i32) -> bool {
+        if y < 0 || y >= self.max_scroll_pos.y - self.size.height + 1 {
+            false
+        } else {
+            self.scroll_pos.set_y(y);
+            true
+        }
+    }
+
+    pub fn set_scroll_x(&mut self, x: i32) -> bool {
+        if x < 0 || x >= self.max_scroll_pos.x - self.size.width + 1 {
+            false
+        } else {
+            self.scroll_pos.set_x(x);
+            true
+        }
+    }
+
     pub fn scroll(&mut self, x: i32, y: i32) -> bool {
         trace!("Scrolling by {},{}", x, y);
         // make sure both components are attempted independently
@@ -125,24 +152,12 @@ impl WidgetState {
 
     pub fn scroll_y(&mut self, y: i32) -> bool {
         let new_y = self.scroll_pos.y + y;
-
-        if new_y < 0 || new_y >= self.max_scroll_pos.y - self.size.height + 1 {
-            false
-        } else {
-            self.scroll_pos.set_y(new_y);
-            true
-        }
+        self.set_scroll_y(new_y)
     }
 
     pub fn scroll_x(&mut self, x: i32) -> bool {
         let new_x = self.scroll_pos.x + x;
-
-        if new_x < 0 || new_x >= self.max_scroll_pos.x - self.size.width + 1 {
-            false
-        } else {
-            self.scroll_pos.set_x(new_x);
-            true
-        }
+        self.set_scroll_x(new_x)
     }
 
     pub fn set_modal(&mut self, modal: bool) {

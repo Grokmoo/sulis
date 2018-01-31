@@ -17,10 +17,10 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
+use io::event::ClickKind;
 use io::{event, Event};
 use config::CONFIG;
 use ui::Widget;
-use util::Point;
 
 pub struct Cursor {
     pub x: i32,
@@ -30,6 +30,8 @@ pub struct Cursor {
 
     pub xf: f32,
     pub yf: f32,
+
+    pub button_down: Option<ClickKind>,
 }
 
 thread_local! {
@@ -40,6 +42,7 @@ thread_local! {
         max_y: CONFIG.display.height,
         xf: 0.0,
         yf: 0.0,
+        button_down: None,
     });
 }
 
@@ -51,8 +54,19 @@ impl Cursor {
 
         trace!("Cursor move by {}, {}", x, y);
 
-        let event = Event::new(event::Kind::MouseMove { change: Point::new(x as i32, y as i32) });
+        let event = Event::new(event::Kind::MouseMove { delta_x: x, delta_y: y });
         Widget::dispatch_event(&root, event);
+
+        match Cursor::button_down() {
+            Some(kind) => {
+                trace!("Cursor {:?} drag.", kind);
+                let event = Event::new(event::Kind::MouseDrag {
+                    button: kind, delta_x: x, delta_y: y
+                });
+                Widget::dispatch_event(&root, event);
+            },
+            None => (),
+        }
     }
 
     pub fn move_to(root: &Rc<RefCell<Widget>>, x: f32, y: f32) {
@@ -61,6 +75,7 @@ impl Cursor {
     }
 
     pub fn press(root: &Rc<RefCell<Widget>>, kind: event::ClickKind) {
+        Cursor::set_button_down(Some(kind));
         let (x, y) = Cursor::get_position();
 
         trace!("Cursor pressed at {},{}", x, y);
@@ -69,6 +84,7 @@ impl Cursor {
     }
 
     pub fn release(root: &Rc<RefCell<Widget>>, kind: event::ClickKind) {
+        Cursor::set_button_down(None);
         let (x, y) = Cursor::get_position();
 
         trace!("Cursor released at {},{}", x, y);
@@ -126,5 +142,16 @@ impl Cursor {
 
     pub fn get_y_f32() -> f32 {
         CURSOR.with(|c| c.borrow().yf)
+    }
+
+    pub fn button_down() -> Option<ClickKind> {
+        CURSOR.with(|c| c.borrow().button_down)
+    }
+
+    fn set_button_down(button_down: Option<ClickKind>) {
+        CURSOR.with(|c| {
+            let mut cursor = c.borrow_mut();
+            cursor.button_down = button_down;
+        });
     }
 }

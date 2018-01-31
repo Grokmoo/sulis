@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::any::Any;
 use std::cell::RefCell;
 use std::rc::Rc;
 use std::collections::HashMap;
@@ -23,37 +24,43 @@ use std::cmp;
 
 use sulis_core::serde_yaml;
 
+use sulis_core::config::CONFIG;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::io::event::ClickKind;
 use sulis_core::ui::{Color, Cursor, Widget, WidgetKind};
 use sulis_core::util::{invalid_data_error, Point};
-use sulis_module::Module;
 use sulis_module::area::{AreaBuilder, Tile};
+
+use TilePicker;
 
 const NAME: &str = "area_editor";
 
 pub struct AreaEditor {
-    tile_picker: Rc<RefCell<Widget>>,
+    tile_picker: Rc<RefCell<TilePicker>>,
     tiles: Vec<(Point, Rc<Tile>)>,
     cur_tile: Option<(Point, Rc<Tile>)>,
     removal_tiles: Vec<(Point, Rc<Tile>)>,
+    scroll_x_f32: f32,
+    scroll_y_f32: f32,
 }
 
 impl AreaEditor {
-    pub fn new(tile_picker: &Rc<RefCell<Widget>>) -> Rc<RefCell<AreaEditor>> {
+    pub fn new(tile_picker: &Rc<RefCell<TilePicker>>) -> Rc<RefCell<AreaEditor>> {
         Rc::new(RefCell::new(AreaEditor {
             tiles: Vec::new(),
             tile_picker: Rc::clone(tile_picker),
             cur_tile: None,
             removal_tiles: Vec::new(),
+            scroll_x_f32: 0.0,
+            scroll_y_f32: 0.0,
         }))
     }
 
     pub fn save(&self, filename: &str) {
         debug!("Saving current area state to {}", filename);
-        let id = "test1".to_string();
-        let name = "Test1".to_string();
-        let visibility_tile = "gui/area_invis".to_string();
+        let id = CONFIG.editor.area.id.clone();
+        let name = CONFIG.editor.area.name.clone();
+        let visibility_tile = CONFIG.editor.area.visibility_tile.clone();
 
         let mut width = 0;
         let mut height = 0;
@@ -107,10 +114,7 @@ impl AreaEditor {
     }
 
     fn get_current_tile(&self) -> Option<Rc<Tile>> {
-        match self.tile_picker.borrow().state.get_text_arg("current_tile") {
-            None => None,
-            Some(tile) => Module::tile(tile),
-        }
+        self.tile_picker.borrow().get_cur_tile()
     }
 
     fn add_cur_tile(&mut self, widget: &Rc<RefCell<Widget>>) {
@@ -155,6 +159,20 @@ impl WidgetKind for AreaEditor {
         NAME
     }
 
+    fn as_any(&self) -> &Any {
+        self
+    }
+
+    fn as_any_mut(&mut self) -> &mut Any {
+        self
+    }
+
+    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+        widget.borrow_mut().state.set_max_scroll_pos(256, 256);
+
+        Vec::new()
+    }
+
     fn draw_graphics_mode(&mut self, renderer: &mut GraphicsRenderer, _pixel_size: Point,
                           widget: &Widget, _millis: u32) {
         let p = widget.state.inner_position;
@@ -164,8 +182,8 @@ impl WidgetKind for AreaEditor {
             let mut draw_list = DrawList::empty_sprite();
             for &(pos, ref tile) in self.tiles.iter() {
                 let sprite = &tile.image_display;
-                let x = pos.x + p.x + s.x;
-                let y = pos.y + p.y + s.y;
+                let x = pos.x + p.x - s.x;
+                let y = pos.y + p.y - s.y;
                 draw_list.append(&mut DrawList::from_sprite(sprite, x, y, tile.width, tile.height));
             }
 
@@ -176,8 +194,8 @@ impl WidgetKind for AreaEditor {
             let mut draw_list = DrawList::empty_sprite();
             for &(pos, ref tile) in self.removal_tiles.iter() {
                 let sprite = &tile.image_display;
-                let x = pos.x + p.x + s.x;
-                let y = pos.y + p.y + s.y;
+                let x = pos.x + p.x - s.x;
+                let y = pos.y + p.y - s.y;
                 draw_list.append(&mut DrawList::from_sprite(sprite, x, y, tile.width, tile.height));
             }
 
@@ -187,8 +205,8 @@ impl WidgetKind for AreaEditor {
 
         if let Some((cur_tile_pos, ref cur_tile)) = self.cur_tile {
             let sprite = &cur_tile.image_display;
-            let x = cur_tile_pos.x + p.x + s.x;
-            let y = cur_tile_pos.y + p.y + s.y;
+            let x = cur_tile_pos.x + p.x - s.x;
+            let y = cur_tile_pos.y + p.y - s.y;
             let mut draw_list = DrawList::from_sprite(sprite, x, y, cur_tile.width, cur_tile.height);
             draw_list.set_color(Color::from_string("FFFFFF88"));
 
@@ -197,8 +215,6 @@ impl WidgetKind for AreaEditor {
     }
 
     fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
-        trace!("Getting tile {:?}", self.tile_picker.borrow().state.get_text_arg("current_tile"));
-
         match kind {
             ClickKind::Left => self.add_cur_tile(widget),
             ClickKind::Right => self.remove_cur_tiles(widget),
@@ -208,7 +224,30 @@ impl WidgetKind for AreaEditor {
         true
     }
 
-    fn on_mouse_move(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
+    fn on_mouse_drag(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind,
+                     delta_x: f32, delta_y: f32) -> bool {
+        match kind {
+            ClickKind::Left => {
+                if self.removal_tiles.is_empty() {
+                    self.add_cur_tile(widget);
+                }
+            }, ClickKind::Right => {
+                self.remove_cur_tiles(widget);
+            }, ClickKind::Middle => {
+                self.scroll_x_f32 -= delta_x;
+                self.scroll_y_f32 -= delta_y;
+                if self.scroll_x_f32 < 0.0 { self.scroll_x_f32 = 0.0; }
+                if self.scroll_y_f32 < 0.0 { self.scroll_y_f32 = 0.0; }
+                widget.borrow_mut().state.set_scroll(self.scroll_x_f32 as i32,
+                                                     self.scroll_y_f32 as i32);
+            }
+        }
+
+        true
+    }
+
+    fn on_mouse_move(&mut self, widget: &Rc<RefCell<Widget>>,
+                     _delta_x: f32, _delta_y: f32) -> bool {
         let cur_tile = match self.get_current_tile() {
             None => return true,
             Some(tile) => tile,

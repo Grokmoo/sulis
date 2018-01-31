@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::any::Any;
 use std::fmt::Display;
 use std::rc::Rc;
 use std::slice::Iter;
@@ -23,19 +24,19 @@ use sulis_core::ui::{AnimationState, Callback, Widget, WidgetKind};
 use Button;
 
 #[derive(Clone)]
-pub struct Entry<T: Display> {
+pub struct Entry<T: Display + 'static> {
     item: T,
     callback: Option<Callback>,
     animation_state: AnimationState,
 }
 
-impl<T: Display> Entry<T> {
+impl<T: Display + 'static> Entry<T> {
     pub fn item(&self) -> &T {
         &self.item
     }
 }
 
-impl<T: Display> Entry<T> {
+impl<T: Display + 'static> Entry<T> {
     pub fn new(item: T, callback: Option<Callback>) -> Entry<T> {
        Entry {
            item,
@@ -54,11 +55,11 @@ impl<T: Display> Entry<T> {
     }
 }
 
-pub struct ListBox<T: Display> {
+pub struct ListBox<T: Display + 'static> {
     entries: Vec<Entry<T>>,
 }
 
-impl<T: Display> ListBox<T> {
+impl<T: Display + 'static> ListBox<T> {
     pub fn new(entries: Vec<Entry<T>>) -> Rc<RefCell<ListBox<T>>> {
         Rc::new(RefCell::new(ListBox {
             entries,
@@ -77,6 +78,14 @@ impl<T: Display> ListBox<T> {
 impl<T: Display> WidgetKind for ListBox<T> {
     fn get_name(&self) -> &str {
         "list_box"
+    }
+
+    fn as_any(&self) -> &Any {
+        self
+    }
+
+    fn as_any_mut(&mut self) -> &mut Any {
+        self
     }
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {

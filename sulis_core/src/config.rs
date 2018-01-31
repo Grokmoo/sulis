@@ -38,6 +38,16 @@ pub struct Config {
 #[serde(deny_unknown_fields)]
 pub struct EditorConfig {
     pub module: String,
+    pub area: EditorAreaConfig,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct EditorAreaConfig {
+    pub filename: String,
+    pub id: String,
+    pub name: String,
+    pub visibility_tile: String,
 }
 
 #[derive(Debug, Deserialize, Clone)]

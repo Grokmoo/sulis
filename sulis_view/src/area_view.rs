@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::any::Any;
 use std::rc::Rc;
 use std::cell::{RefCell, RefMut};
 use std::cmp;
@@ -178,6 +179,14 @@ impl WidgetKind for AreaView {
         NAME
     }
 
+    fn as_any(&self) -> &Any {
+        self
+    }
+
+    fn as_any_mut(&mut self) -> &mut Any {
+        self
+    }
+
     fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         self.clear_cursors();
         let area_state = GameState::area_state();
@@ -334,7 +343,8 @@ impl WidgetKind for AreaView {
         true
     }
 
-    fn on_mouse_move(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
+    fn on_mouse_move(&mut self, widget: &Rc<RefCell<Widget>>,
+                     _delta_x: f32, _delta_y: f32) -> bool {
         let (area_x, area_y) = self.get_cursor_pos(widget);
         let area_state = GameState::area_state();
 

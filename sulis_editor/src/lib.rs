@@ -26,9 +26,11 @@ extern crate sulis_core;
 extern crate sulis_module;
 extern crate sulis_widgets;
 
+use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
+use sulis_core::config::CONFIG;
 use sulis_core::io::{InputAction, MainLoopUpdater};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{ConfirmationWindow, DropDown, list_box};
@@ -65,6 +67,14 @@ impl WidgetKind for EditorView {
         NAME
     }
 
+    fn as_any(&self) -> &Any {
+        self
+    }
+
+    fn as_any_mut(&mut self) -> &mut Any {
+        self
+    }
+
     fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
         use InputAction::*;
         match key {
@@ -85,9 +95,8 @@ impl WidgetKind for EditorView {
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         debug!("Adding to editor widget");
 
-        let tile_picker = Widget::with_defaults(TilePicker::new());
-
-        let area_editor_kind = AreaEditor::new(&tile_picker);
+        let tile_picker_kind = TilePicker::new();
+        let area_editor_kind = AreaEditor::new(&tile_picker_kind);
 
         let top_bar = Widget::empty("top_bar");
         {
@@ -96,7 +105,9 @@ impl WidgetKind for EditorView {
             let area_editor_kind_ref = Rc::clone(&area_editor_kind);
             let save = list_box::Entry::new("Save".to_string(), Some(Callback::new(Rc::new(move |widget| {
                 let parent = Widget::get_parent(widget);
-                area_editor_kind_ref.borrow().save("test.yml");
+                let filename = format!("../modules/{}/areas/{}.yml", CONFIG.editor.module,
+                                       CONFIG.editor.area.filename);
+                area_editor_kind_ref.borrow().save(&filename);
                 parent.borrow_mut().mark_for_removal();
             }))));
             entries.push(save);
@@ -108,7 +119,8 @@ impl WidgetKind for EditorView {
         }
 
         let area_editor = Widget::with_defaults(area_editor_kind);
+        let tile_picker = Widget::with_defaults(tile_picker_kind);
 
-        vec![tile_picker, area_editor, top_bar]
+        vec![area_editor, tile_picker, top_bar]
     }
 }

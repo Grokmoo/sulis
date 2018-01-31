@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
@@ -34,6 +35,14 @@ impl WidgetKind for EmptyWidget {
     fn get_name(&self) -> &str {
         "content"
     }
+
+    fn as_any(&self) -> &Any {
+        self
+    }
+
+    fn as_any_mut(&mut self) -> &mut Any {
+        self
+    }
 }
 
 /// Trait for implementations of different Widgets.  This is held by a 'WidgetState'
@@ -50,6 +59,10 @@ pub trait WidgetKind {
     }
 
     fn get_name(&self) -> &str;
+
+    fn as_any(&self) -> &Any;
+
+    fn as_any_mut(&mut self) -> &mut Any;
 
     /// This method is called after this WidgetKind is added to its parent widget.
     /// It returns a vector of 'Widget's that will be added as children to the
@@ -93,7 +106,13 @@ pub trait WidgetKind {
         true
     }
 
-    fn on_mouse_move(&mut self, _widget: &Rc<RefCell<Widget>>) -> bool {
+    fn on_mouse_move(&mut self, _widget: &Rc<RefCell<Widget>>,
+                     _delta_x: f32, _delta_y: f32) -> bool {
+        true
+    }
+
+    fn on_mouse_drag(&mut self, _widget: &Rc<RefCell<Widget>>, _kind: ClickKind,
+                     _delta_x: f32, _delta_y: f32) -> bool {
         true
     }
 

@@ -16,8 +16,6 @@
 
 use io::InputAction;
 
-use util::Point;
-
 #[derive(Copy, Clone, Debug)]
 pub struct Event {
     pub kind: Kind,
@@ -47,7 +45,8 @@ impl Event {
 pub enum Kind {
     MousePress(ClickKind),
     MouseRelease(ClickKind),
-    MouseMove { change: Point },
+    MouseMove { delta_x: f32, delta_y: f32 },
+    MouseDrag { button: ClickKind, delta_x: f32, delta_y: f32 },
     MouseScroll { scroll: i32 },
     MouseEnter,
     MouseExit,

@@ -24,21 +24,21 @@ use sulis_widgets::{Button, InputField, Label};
 
 use AreaEditor;
 
-pub const NAME: &str = "properties_window";
+pub const NAME: &str = "save_window";
 
-pub struct PropertiesWindow {
+pub struct SaveWindow {
     area_editor: Rc<RefCell<AreaEditor>>,
 }
 
-impl PropertiesWindow {
-    pub fn new(area_editor: Rc<RefCell<AreaEditor>>) -> Rc<RefCell<PropertiesWindow>> {
-        Rc::new(RefCell::new(PropertiesWindow {
+impl SaveWindow {
+    pub fn new(area_editor: Rc<RefCell<AreaEditor>>) -> Rc<RefCell<SaveWindow>> {
+        Rc::new(RefCell::new(SaveWindow {
             area_editor
         }))
     }
 }
 
-impl WidgetKind for PropertiesWindow {
+impl WidgetKind for SaveWindow {
     fn get_name(&self) -> &str {
         NAME
     }

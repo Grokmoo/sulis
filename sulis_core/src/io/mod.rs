@@ -110,6 +110,10 @@ impl Default for DrawList {
 }
 
 impl DrawList {
+    pub fn is_empty(&self) -> bool {
+        self.quads.is_empty()
+    }
+
     /// Creates an empty DrawList.  Attempting to draw an empty DrawList will most
     /// likely result in a panic, you must use `append` to add vertices to this list
     /// if you intend to draw it.

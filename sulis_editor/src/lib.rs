@@ -17,8 +17,11 @@
 mod area_editor;
 use area_editor::AreaEditor;
 
-mod properties_window;
-use properties_window::PropertiesWindow;
+mod load_window;
+use load_window::LoadWindow;
+
+mod save_window;
+use save_window::SaveWindow;
 
 mod tile_picker;
 use tile_picker::TilePicker;
@@ -105,17 +108,29 @@ impl WidgetKind for EditorView {
             let mut entries: Vec<list_box::Entry<String>> = Vec::new();
 
             let area_editor_kind_ref = Rc::clone(&area_editor_kind);
-            let properties = list_box::Entry::new("Area...".to_string(),
+            let save = list_box::Entry::new("Save".to_string(),
             Some(Callback::with_widget(Rc::new(move |widget| {
                 let root = Widget::get_root(widget);
-                let properties_window = Widget::with_defaults(
-                    PropertiesWindow::new(Rc::clone(&area_editor_kind_ref)));
-                Widget::add_child_to(&root, properties_window);
+                let save_window = Widget::with_defaults(
+                    SaveWindow::new(Rc::clone(&area_editor_kind_ref)));
+                Widget::add_child_to(&root, save_window);
 
                 let parent = Widget::get_parent(widget);
                 parent.borrow_mut().mark_for_removal();
             }))));
-            entries.push(properties);
+            entries.push(save);
+
+            let area_editor_kind_ref = Rc::clone(&area_editor_kind);
+            let load = list_box::Entry::new("Load".to_string(),
+            Some(Callback::with_widget(Rc::new(move |widget| {
+                let root = Widget::get_root(widget);
+                let load_window = Widget::with_defaults(LoadWindow::new(Rc::clone(&area_editor_kind_ref)));
+                Widget::add_child_to(&root, load_window);
+
+                let parent = Widget::get_parent(widget);
+                parent.borrow_mut().mark_for_removal();
+            }))));
+            entries.push(load);
 
             let drop_down = DropDown::new(entries);
             let menu = Widget::with_theme(drop_down, "menu");

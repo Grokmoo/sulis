@@ -65,7 +65,27 @@ children:
         children:
           title:
             text: "Exit the Editor?"
-      properties_window:
+      load_window:
+        from: .window
+        height_relative: Zero
+        preferred_size: [21, 21]
+        x_relative: Center
+        y_relative: Center
+        children:
+          title:
+            text: "Load Area"
+          areas_list:
+            from: .list_box
+            preferred_size: [17, 14]
+            position: [1, 2]
+            height_relative: Zero
+            width_relative: Zero
+          load_button:
+            from: .button
+            preferred_size: [4, 1]
+            position: [14, 17]
+            text: "Load"
+      save_window:
         from: .window
         height_relative: Zero
         preferred_size: [21, 12]
@@ -73,7 +93,7 @@ children:
         y_relative: Center
         children:
           title:
-            text: "Area Properties"
+            text: "Save Area"
           id_label:
             from: .label
             text: "ID"

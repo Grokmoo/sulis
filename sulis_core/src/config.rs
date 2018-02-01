@@ -48,6 +48,7 @@ pub struct EditorAreaConfig {
     pub id: String,
     pub name: String,
     pub visibility_tile: String,
+    pub layers: Vec<String>,
 }
 
 #[derive(Debug, Deserialize, Clone)]

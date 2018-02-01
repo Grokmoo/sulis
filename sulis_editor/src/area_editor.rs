@@ -27,6 +27,8 @@ use sulis_core::serde_yaml;
 use sulis_core::config::CONFIG;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::io::event::ClickKind;
+use sulis_module::Module;
+use sulis_core::resource::read_single_resource;
 use sulis_core::ui::{Color, Cursor, Widget, WidgetKind};
 use sulis_core::util::{invalid_data_error, Point};
 use sulis_module::area::{AreaBuilder, Tile};
@@ -37,21 +39,27 @@ const NAME: &str = "area_editor";
 
 pub struct AreaEditor {
     tile_picker: Rc<RefCell<TilePicker>>,
-    tiles: Vec<(Point, Rc<Tile>)>,
     cur_tile: Option<(Point, Rc<Tile>)>,
     removal_tiles: Vec<(Point, Rc<Tile>)>,
     scroll_x_f32: f32,
     scroll_y_f32: f32,
 
+    tiles: Vec<(String, Vec<(Point, Rc<Tile>)>)>,
     pub id: String,
     pub name: String,
     pub filename: String,
+    pub visibility_tile: String,
 }
 
 impl AreaEditor {
     pub fn new(tile_picker: &Rc<RefCell<TilePicker>>) -> Rc<RefCell<AreaEditor>> {
+        let mut tiles: Vec<(String, Vec<(Point, Rc<Tile>)>)> = Vec::new();
+        for ref layer_id in CONFIG.editor.area.layers.iter() {
+            tiles.push((layer_id.to_string(), Vec::new()));
+        }
+
         Rc::new(RefCell::new(AreaEditor {
-            tiles: Vec::new(),
+            tiles,
             tile_picker: Rc::clone(tile_picker),
             cur_tile: None,
             removal_tiles: Vec::new(),
@@ -60,11 +68,66 @@ impl AreaEditor {
             id: CONFIG.editor.area.id.clone(),
             name: CONFIG.editor.area.name.clone(),
             filename: CONFIG.editor.area.filename.clone(),
+            visibility_tile: CONFIG.editor.area.visibility_tile.clone(),
         }))
     }
 
+    fn create_layer_if_missing(&mut self, layer_id: &str) -> usize {
+        for (index, &(ref id, _)) in self.tiles.iter().enumerate() {
+            if id == layer_id {
+                return index;
+            }
+        }
+
+        self.tiles.push((layer_id.to_string(), Vec::new()));
+        self.tiles.len() - 1
+    }
+
+    pub fn load(&mut self, filename_prefix: &str, filename: &str) {
+        self.removal_tiles.clear();
+        self.cur_tile = None;
+
+        let path = format!("{}/{}", filename_prefix, filename);
+        debug!("Loading area state from {}", filename);
+
+        let area_builder: AreaBuilder = match read_single_resource(&path) {
+            Err(e) => {
+                warn!("Unable to load area from {}", path);
+                warn!("{}", e);
+                return;
+            }, Ok(builder) => builder,
+        };
+
+        self.id = area_builder.id;
+        self.name = area_builder.name;
+        self.filename = filename.to_string();
+        self.visibility_tile = area_builder.visibility_tile;
+
+        self.tiles.clear();
+        for (tile_id, positions) in area_builder.terrain {
+            let tile = match Module::tile(&tile_id) {
+                None => {
+                    warn!("No tile with ID {} found", tile_id);
+                    continue;
+                }, Some(tile) => tile,
+            };
+
+            for position in positions {
+                if position.len() != 2 {
+                    warn!("tile position vector is not length 2.");
+                    continue;
+                }
+
+                let p = Point::new(position[0] as i32, position[1] as i32);
+
+                let index = self.create_layer_if_missing(&tile.layer);
+                self.tiles[index].1.push((p, Rc::clone(&tile)));
+            }
+        }
+    }
+
     pub fn save(&self, filename_prefix: &str) {
-        let filename = format!("{}/{}", filename_prefix, self.filename);
+        let filename = format!("{}/{}.yml", filename_prefix, self.filename);
         debug!("Saving current area state to {}", filename);
         let visibility_tile = CONFIG.editor.area.visibility_tile.clone();
 
@@ -73,18 +136,17 @@ impl AreaEditor {
         let mut layers: Vec<String> = Vec::new();
         let mut terrain: HashMap<String, Vec<Vec<usize>>> = HashMap::new();
 
-        for &(position, ref tile) in self.tiles.iter() {
-            width = cmp::max(width, position.x + tile.width);
-            height = cmp::max(height, position.y + tile.height);
+        for &(ref layer_id, ref tiles) in self.tiles.iter() {
+            layers.push(layer_id.to_string());
+            for &(position, ref tile) in tiles.iter() {
+                width = cmp::max(width, position.x + tile.width);
+                height = cmp::max(height, position.y + tile.height);
 
-            if !layers.contains(&tile.layer) {
-                layers.push(tile.layer.to_string());
+                let tiles_vec = terrain.entry(tile.id.to_string()).or_insert(Vec::new());
+                tiles_vec.push(vec![position.x as usize, position.y as usize]);
             }
-
-            let tiles_vec = terrain.entry(tile.id.to_string()).or_insert(Vec::new());
-            tiles_vec.push(vec![position.x as usize, position.y as usize]);
         }
-        let entity_layer = cmp::max(layers.len(), 1) - 1;
+        let entity_layer = 0;
 
         let area_builder = AreaBuilder {
             id: self.id.clone(),
@@ -132,7 +194,8 @@ impl AreaEditor {
         let (x, y) = self.get_cursor_pos(widget, &cur_tile);
         if x < 0 || y < 0 { return; }
 
-        self.tiles.push((Point::new(x, y), cur_tile));
+        let index = self.create_layer_if_missing(&cur_tile.layer);
+        self.tiles[index].1.push((Point::new(x, y), cur_tile));
     }
 
     fn remove_cur_tiles(&mut self, widget: &Rc<RefCell<Widget>>) {
@@ -145,9 +208,11 @@ impl AreaEditor {
         if x < 0 || y < 0 { return; }
 
         self.removal_tiles.clear();
-        self.tiles.retain(|&(pos, ref tile)| {
-            !is_removal(pos, tile, x, y, cur_tile.width, cur_tile.height)
-        });
+        for &mut (_, ref mut tiles) in self.tiles.iter_mut() {
+            tiles.retain(|&(pos, ref tile)| {
+                !is_removal(pos, tile, x, y, cur_tile.width, cur_tile.height)
+            });
+        }
     }
 }
 
@@ -184,15 +249,16 @@ impl WidgetKind for AreaEditor {
         let p = widget.state.inner_position;
         let s = widget.state.scroll_pos;
 
-        if !self.tiles.is_empty() {
-            let mut draw_list = DrawList::empty_sprite();
-            for &(pos, ref tile) in self.tiles.iter() {
+        let mut draw_list = DrawList::empty_sprite();
+        for &(_, ref tiles) in self.tiles.iter() {
+            for &(pos, ref tile) in tiles {
                 let sprite = &tile.image_display;
                 let x = pos.x + p.x - s.x;
                 let y = pos.y + p.y - s.y;
                 draw_list.append(&mut DrawList::from_sprite(sprite, x, y, tile.width, tile.height));
             }
-
+        }
+        if !draw_list.is_empty() {
             renderer.draw(draw_list);
         }
 
@@ -267,10 +333,11 @@ impl WidgetKind for AreaEditor {
         self.cur_tile = Some((Point::new(x, y), cur_tile));
 
         self.removal_tiles.clear();
-        for &(pos, ref tile) in self.tiles.iter() {
-
-            if is_removal(pos, tile, x, y, w, h) {
-                self.removal_tiles.push((pos, Rc::clone(tile)));
+        for &(_, ref tiles) in self.tiles.iter() {
+            for &(pos, ref tile) in tiles {
+                if is_removal(pos, tile, x, y, w, h) {
+                    self.removal_tiles.push((pos, Rc::clone(tile)));
+                }
             }
         }
 

@@ -68,7 +68,9 @@ children:
       properties_window:
         from: .window
         height_relative: Zero
-        preferred_size: [25, 10]
+        preferred_size: [21, 12]
+        x_relative: Center
+        y_relative: Center
         children:
           title:
             text: "Area Properties"
@@ -76,22 +78,38 @@ children:
             from: .label
             text: "ID"
             position: [0, 3]
-            preferred_size: [3, 1]
+            preferred_size: [5, 1]
             text_params:
               horizontal_alignment: Right
           id_field:
             from: .input_field
-            preferred_size: [5, 1]
-            position: [4, 3]
+            preferred_size: [10, 1]
+            position: [6, 3]
           name_label:
             from: .label
             text: "Name"
             position: [0, 5]
-            preferred_size: [3, 1]
+            preferred_size: [5, 1]
             text_params:
               horizontal_alignment: Right
           name_field:
             from: .input_field
+            preferred_size: [10, 1]
+            position: [6, 5]
+          filename_label:
+            from: .label
+            text: "Filename:"
+            position: [0, 7]
             preferred_size: [5, 1]
-            position: [4, 5]
+            text_params:
+              horizontal_alignment: Right
+          filename_field:
+            from: .input_field
+            preferred_size: [10, 1]
+            position: [6, 7]
+          save_button:
+            from: .button
+            preferred_size: [4, 1]
+            position: [6, 9]
+            text: "Save"
 ...

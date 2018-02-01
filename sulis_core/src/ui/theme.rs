@@ -14,6 +14,9 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::f32;
+use std::i32;
+use std::str::FromStr;
 use std::fs::File;
 use std::io::{Read, Error, ErrorKind};
 use std::rc::Rc;
@@ -174,6 +177,21 @@ impl Theme {
             match ResourceSet::get_image(&out) {
                 None => warn!("Unable to find image {}", out),
                 Some(image) => state.set_foreground(Some(image)),
+            }
+        }
+    }
+
+    pub fn get_custom_or_default<T: Copy + FromStr>(&self, key: &str, default: T) -> T {
+        match self.custom.get(key) {
+            None => default,
+            Some(ref value) => {
+                match <T>::from_str(value) {
+                    Err(_) => {
+                        warn!("Unable to parse value {} from key {}", value, key);
+                        default
+                    },
+                    Ok(value) => value
+                }
             }
         }
     }

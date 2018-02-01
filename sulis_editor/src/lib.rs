@@ -33,7 +33,6 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_core::config::CONFIG;
 use sulis_core::io::{InputAction, MainLoopUpdater};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{ConfirmationWindow, DropDown, list_box};
@@ -106,17 +105,7 @@ impl WidgetKind for EditorView {
             let mut entries: Vec<list_box::Entry<String>> = Vec::new();
 
             let area_editor_kind_ref = Rc::clone(&area_editor_kind);
-            let save = list_box::Entry::new("Save".to_string(), Some(Callback::new(Rc::new(move |widget| {
-                let parent = Widget::get_parent(widget);
-                let filename = format!("../modules/{}/areas/{}.yml", CONFIG.editor.module,
-                                       CONFIG.editor.area.filename);
-                area_editor_kind_ref.borrow().save(&filename);
-                parent.borrow_mut().mark_for_removal();
-            }))));
-            entries.push(save);
-
-            let area_editor_kind_ref = Rc::clone(&area_editor_kind);
-            let properties = list_box::Entry::new("Properties".to_string(),
+            let properties = list_box::Entry::new("Area...".to_string(),
             Some(Callback::new(Rc::new(move |widget| {
                 let root = Widget::get_root(widget);
                 let properties_window = Widget::with_defaults(

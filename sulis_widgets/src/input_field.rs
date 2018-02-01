@@ -14,8 +14,6 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::f32;
-use std::str::FromStr;
 use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
@@ -35,16 +33,18 @@ pub struct InputField {
     carat: Option<Rc<Image>>,
     carat_width: f32,
     carat_height: f32,
+    carat_offset: f32,
 }
 
 impl InputField {
-    pub fn new() -> Rc<RefCell<InputField>> {
+    pub fn new(text: &str) -> Rc<RefCell<InputField>> {
         Rc::new(RefCell::new(InputField {
-            text: String::new(),
-            label: Label::empty(),
+            text: text.to_string(),
+            label: Label::new(text),
             carat: None,
             carat_width: 1.0,
             carat_height: 1.0,
+            carat_offset: 0.0,
         }))
     }
 }
@@ -71,19 +71,9 @@ impl WidgetKind for InputField {
                 self.carat = ResourceSet::get_image(image_id);
             }
 
-            if let Some(ref carat_width_str) = theme.custom.get("carat_width") {
-                match f32::from_str(carat_width_str) {
-                    Err(_) => warn!("Unable to parse carat width from {}", carat_width_str),
-                    Ok(width) => self.carat_width = width,
-                }
-            }
-
-            if let Some(ref carat_height_str) = theme.custom.get("carat_height") {
-                match f32::from_str(carat_height_str) {
-                    Err(_) => warn!("Unable to parse carat height from {}", carat_height_str),
-                    Ok(height) => self.carat_height = height,
-                }
-            }
+            self.carat_width = theme.get_custom_or_default("carat_width", 1.0);
+            self.carat_height = theme.get_custom_or_default("carat_height", 1.0);
+            self.carat_offset = theme.get_custom_or_default("carat_offset", 0.0);
         }
     }
 
@@ -92,7 +82,7 @@ impl WidgetKind for InputField {
             '\u{8}' => {
                 self.text.pop();
             }, _ => {
-                if self.label.borrow().text_draw_end_x + 0.8 >
+                if self.label.borrow().text_draw_end_x >
                     widget.borrow().state.inner_right() as f32 {
                     return true;
                 }
@@ -103,6 +93,7 @@ impl WidgetKind for InputField {
 
         self.label.borrow_mut().text = Some(self.text.clone());
         widget.borrow_mut().invalidate_layout();
+        Widget::fire_callback(widget);
         true
     }
 
@@ -113,7 +104,7 @@ impl WidgetKind for InputField {
         if !widget.state.has_keyboard_focus() { return; }
 
         if let Some(ref carat) = self.carat {
-            let x = self.label.borrow().text_draw_end_x + 0.1;
+            let x = self.label.borrow().text_draw_end_x + self.carat_offset;
             let y = widget.state.inner_top() as f32 +
                 (widget.state.inner_size.height as f32 - self.carat_height) / 2.0;
             let w = self.carat_width;

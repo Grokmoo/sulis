@@ -42,6 +42,10 @@ pub struct AreaEditor {
     removal_tiles: Vec<(Point, Rc<Tile>)>,
     scroll_x_f32: f32,
     scroll_y_f32: f32,
+
+    pub id: String,
+    pub name: String,
+    pub filename: String,
 }
 
 impl AreaEditor {
@@ -53,13 +57,15 @@ impl AreaEditor {
             removal_tiles: Vec::new(),
             scroll_x_f32: 0.0,
             scroll_y_f32: 0.0,
+            id: CONFIG.editor.area.id.clone(),
+            name: CONFIG.editor.area.name.clone(),
+            filename: CONFIG.editor.area.filename.clone(),
         }))
     }
 
-    pub fn save(&self, filename: &str) {
+    pub fn save(&self, filename_prefix: &str) {
+        let filename = format!("{}/{}", filename_prefix, self.filename);
         debug!("Saving current area state to {}", filename);
-        let id = CONFIG.editor.area.id.clone();
-        let name = CONFIG.editor.area.name.clone();
         let visibility_tile = CONFIG.editor.area.visibility_tile.clone();
 
         let mut width = 0;
@@ -78,11 +84,11 @@ impl AreaEditor {
             let tiles_vec = terrain.entry(tile.id.to_string()).or_insert(Vec::new());
             tiles_vec.push(vec![position.x as usize, position.y as usize]);
         }
-        let entity_layer = layers.len() - 1;
+        let entity_layer = cmp::max(layers.len(), 1) - 1;
 
         let area_builder = AreaBuilder {
-            id,
-            name,
+            id: self.id.clone(),
+            name: self.name.clone(),
             terrain,
             layers,
             visibility_tile,
@@ -94,7 +100,7 @@ impl AreaEditor {
             transitions: Vec::new(),
         };
 
-        match write_to_file(filename, &area_builder) {
+        match write_to_file(&filename, &area_builder) {
             Err(e) => {
                 error!("Unable to save area state to file {}", filename);
                 error!("{}", e);

@@ -18,6 +18,7 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
+use sulis_core::config::CONFIG;
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{Button, InputField, Label};
 
@@ -57,11 +58,38 @@ impl WidgetKind for PropertiesWindow {
         close.borrow_mut().state.add_callback(Callback::remove_parent());
 
         let id_label = Widget::with_theme(Label::empty(), "id_label");
-        let id_field = Widget::with_theme(InputField::new(), "id_field");
+        let id_field = Widget::with_theme(
+            InputField::new(&CONFIG.editor.area.id), "id_field");
+
+        let area_editor_ref = Rc::clone(&self.area_editor);
+        id_field.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget| {
+            let kind = &widget.borrow().kind;
+            let mut kind = kind.borrow_mut();
+            let input_field = match kind.as_any_mut().downcast_mut::<InputField>() {
+                Some(mut input_field) => input_field,
+                None => unreachable!("Failed to downcast to InputField"),
+            };
+            area_editor_ref.borrow_mut().id = input_field.text.clone();
+        })));
 
         let name_label = Widget::with_theme(Label::empty(), "name_label");
-        let name_field = Widget::with_theme(InputField::new(), "name_field");
+        let name_field = Widget::with_theme(
+            InputField::new(&CONFIG.editor.area.name), "name_field");
 
-        vec![title, close, id_label, id_field, name_label, name_field]
+        let filename_label = Widget::with_theme(Label::empty(), "filename_label");
+        let filename_field = Widget::with_theme(
+            InputField::new(&CONFIG.editor.area.filename), "filename_field");
+        let save_button = Widget::with_theme(Button::empty(), "save_button");
+
+        let area_editor_kind_ref = Rc::clone(&self.area_editor);
+        save_button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget| {
+            let parent = Widget::get_parent(widget);
+            let filename_prefix = format!("../modules/{}/areas/", CONFIG.editor.module);
+            area_editor_kind_ref.borrow().save(&filename_prefix);
+            parent.borrow_mut().mark_for_removal();
+        })));
+
+        vec![title, close, id_label, id_field, name_label, name_field,
+            filename_label, filename_field, save_button]
     }
 }

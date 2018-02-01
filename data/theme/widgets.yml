@@ -28,6 +28,7 @@ children:
       font: "normal"
   input_field:
     background: bg_text_box
+    border: { top: 0, bottom: 0, left: 1, right: 1 }
     text_params:
       font: "normal"
       horizontal_alignment: Left
@@ -36,6 +37,7 @@ children:
       carat_image: carat
       carat_height: "0.7"
       carat_width: "0.15"
+      carat_offset: "0.1"
   window:
     background: bg_base
     border: [1, 1, 1, 1]

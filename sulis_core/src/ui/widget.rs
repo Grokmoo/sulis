@@ -284,13 +284,13 @@ impl Widget {
         root.keyboard_focus_child = None;
     }
 
-    pub fn fire_callback(widget: &Rc<RefCell<Widget>>) {
+    pub fn fire_callback(widget: &Rc<RefCell<Widget>>, kind: &mut WidgetKind) {
         let cb = match widget.borrow().state.callback {
             None => return,
             Some(ref cb) => cb.clone(),
         };
 
-        (cb).call(widget);
+        (cb).call(widget, kind);
     }
 
     pub fn remove_mouse_over(root: &Rc<RefCell<Widget>>) {

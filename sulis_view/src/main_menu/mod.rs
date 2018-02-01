@@ -112,7 +112,7 @@ impl WidgetKind for MainMenuView {
         let mut entries: Vec<list_box::Entry<ModuleInfo>> = Vec::new();
 
         let play_ref = Rc::clone(&play);
-        let cb: Callback = Callback::new(Rc::new(move |widget| {
+        let cb: Callback = Callback::new(Rc::new(move |widget, _kind| {
             let parent = Widget::get_parent(widget);
             let cur_state = widget.borrow_mut().state.animation_state.contains(animation_state::Kind::Active);
             if !cur_state {
@@ -135,7 +135,7 @@ impl WidgetKind for MainMenuView {
         let modules_list = Widget::with_theme(list_box.clone(), "modules_list");
 
         let modules_list_ref = Rc::clone(&modules_list);
-        play.borrow_mut().state.add_callback(Callback::new(Rc::new(move |_| {
+        play.borrow_mut().state.add_callback(Callback::new(Rc::new(move |_, _| {
             for (index, child) in modules_list_ref.borrow().children.iter().enumerate() {
                 if child.borrow().state.animation_state.contains(animation_state::Kind::Active) {
                     let list_box_ref = list_box.borrow();

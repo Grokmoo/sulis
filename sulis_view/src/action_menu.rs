@@ -67,7 +67,7 @@ impl ActionMenu {
                 Some(transition) => (transition.to_area.clone(), transition.to.x, transition.to.y)
             };
 
-        Some(Callback::new(Rc::new( move |widget| {
+        Some(Callback::new(Rc::new( move |widget, _kind| {
             trace!("Firing transition callback.");
             GameState::transition(&area_id, x, y);
             Widget::mark_removal_up_tree(&widget, 2);
@@ -119,7 +119,7 @@ impl ActionMenu {
     }
 
     fn callback_with_removal(f: Box<Fn()>) -> Option<Callback> {
-        Some(Callback::new(Rc::new(move |widget| {
+        Some(Callback::new(Rc::new(move |widget, _kind| {
             f();
             Widget::mark_removal_up_tree(&widget, 2);
         })))

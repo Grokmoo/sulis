@@ -72,7 +72,7 @@ impl WidgetKind for Button {
 
     fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: event::ClickKind) -> bool {
         self.super_on_mouse_release(widget, kind);
-        Widget::fire_callback(widget);
+        Widget::fire_callback(widget, self);
         true
     }
 }

@@ -74,7 +74,7 @@ impl WidgetKind for TilePicker {
         for layer in layers {
             let button = Widget::with_theme(Button::with_text(&layer), "layer_button");
             let layer_ref = layer.clone();
-            button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget| {
+            button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
                 let parent = Widget::go_up_tree(widget, 2);
 
                 {
@@ -105,7 +105,7 @@ impl WidgetKind for TilePicker {
             let sprite_id = format!("{}/{}", tile.image_display.id, tile.id);
             button.borrow_mut().state.add_text_arg("icon", &sprite_id);
 
-            let cb: Callback = Callback::new(Rc::new(move |widget| {
+            let cb: Callback = Callback::new(Rc::new(move |widget, _kind| {
                 let parent = Widget::get_parent(widget);
                 let cur_state = widget.borrow_mut().state.is_active();
                 if !cur_state {

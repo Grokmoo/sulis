@@ -17,10 +17,10 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use ui::Widget;
+use ui::{Widget, WidgetKind};
 
 pub struct Callback {
-    cb: Rc<Fn(&Rc<RefCell<Widget>>)>
+    cb: Rc<Fn(&Rc<RefCell<Widget>>, &mut WidgetKind)>
 }
 
 impl Clone for Callback {
@@ -32,34 +32,40 @@ impl Clone for Callback {
 }
 
 impl Callback {
-    pub fn new(f: Rc<Fn(&Rc<RefCell<Widget>>)>) -> Callback {
+    pub fn new(f: Rc<Fn(&Rc<RefCell<Widget>>, &mut WidgetKind)>) -> Callback {
         Callback {
             cb: f,
         }
     }
 
+    pub fn with_widget(f: Rc<Fn(&Rc<RefCell<Widget>>)>) -> Callback {
+        Callback {
+            cb: Rc::new(move |widget, _kind| { f(widget) }),
+        }
+    }
+
     pub fn with(f: Box<Fn()>) -> Callback {
         Callback {
-            cb: Rc::new(move |_w| { f() }),
+            cb: Rc::new(move |_w, _k| { f() }),
         }
     }
 
     pub fn remove_self() -> Callback {
         Callback {
-            cb: Rc::new(|widget| { widget.borrow_mut().mark_for_removal() }),
+            cb: Rc::new(|widget, _kind| { widget.borrow_mut().mark_for_removal() }),
         }
     }
 
     pub fn remove_parent() -> Callback {
         Callback {
-            cb: Rc::new(|widget| {
+            cb: Rc::new(|widget, _kind| {
                 let parent = Widget::get_parent(&widget);
                 parent.borrow_mut().mark_for_removal();
             }),
         }
     }
 
-    pub fn call(&self, widget: &Rc<RefCell<Widget>>) {
-        (self.cb)(widget);
+    pub fn call(&self, widget: &Rc<RefCell<Widget>>, kind: &mut WidgetKind) {
+        (self.cb)(widget, kind);
     }
 }

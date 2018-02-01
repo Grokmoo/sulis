@@ -106,7 +106,7 @@ impl WidgetKind for EditorView {
 
             let area_editor_kind_ref = Rc::clone(&area_editor_kind);
             let properties = list_box::Entry::new("Area...".to_string(),
-            Some(Callback::new(Rc::new(move |widget| {
+            Some(Callback::with_widget(Rc::new(move |widget| {
                 let root = Widget::get_root(widget);
                 let properties_window = Widget::with_defaults(
                     PropertiesWindow::new(Rc::clone(&area_editor_kind_ref)));

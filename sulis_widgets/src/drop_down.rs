@@ -62,7 +62,7 @@ impl<T: Display + Clone + 'static> WidgetKind for DropDown<T> {
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let button = Widget::with_defaults(Button::empty());
         let entries_clone = self.entries.clone();
-        let cb = Callback::new(Rc::new(move |widget| {
+        let cb = Callback::new(Rc::new(move |widget, _kind| {
             let list_box = Widget::with_theme(ListBox::new(entries_clone.clone()), "list");
             list_box.borrow_mut().state.set_modal(true);
             list_box.borrow_mut().state.modal_remove_on_click_outside = true;

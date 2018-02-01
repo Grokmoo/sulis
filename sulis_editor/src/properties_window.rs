@@ -59,12 +59,10 @@ impl WidgetKind for PropertiesWindow {
 
         let id_label = Widget::with_theme(Label::empty(), "id_label");
         let id_field = Widget::with_theme(
-            InputField::new(&CONFIG.editor.area.id), "id_field");
+            InputField::new(&self.area_editor.borrow().id), "id_field");
 
         let area_editor_ref = Rc::clone(&self.area_editor);
-        id_field.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget| {
-            let kind = &widget.borrow().kind;
-            let mut kind = kind.borrow_mut();
+        id_field.borrow_mut().state.add_callback(Callback::new(Rc::new(move |_widget, kind| {
             let input_field = match kind.as_any_mut().downcast_mut::<InputField>() {
                 Some(mut input_field) => input_field,
                 None => unreachable!("Failed to downcast to InputField"),
@@ -74,15 +72,34 @@ impl WidgetKind for PropertiesWindow {
 
         let name_label = Widget::with_theme(Label::empty(), "name_label");
         let name_field = Widget::with_theme(
-            InputField::new(&CONFIG.editor.area.name), "name_field");
+            InputField::new(&self.area_editor.borrow().name), "name_field");
+
+        let area_editor_ref = Rc::clone(&self.area_editor);
+        name_field.borrow_mut().state.add_callback(Callback::new(Rc::new(move |_widget, kind| {
+            let input_field = match kind.as_any_mut().downcast_mut::<InputField>() {
+                Some(mut input_field) => input_field,
+                None => unreachable!("Failed to downcast to InputField"),
+            };
+            area_editor_ref.borrow_mut().name = input_field.text.clone();
+        })));
 
         let filename_label = Widget::with_theme(Label::empty(), "filename_label");
         let filename_field = Widget::with_theme(
-            InputField::new(&CONFIG.editor.area.filename), "filename_field");
+            InputField::new(&self.area_editor.borrow().filename), "filename_field");
+
+        let area_editor_ref = Rc::clone(&self.area_editor);
+        filename_field.borrow_mut().state.add_callback(Callback::new(Rc::new(move |_widget, kind| {
+            let input_field = match kind.as_any_mut().downcast_mut::<InputField>() {
+                Some(mut input_field) => input_field,
+                None => unreachable!("Failed to downcast to InputField"),
+            };
+            area_editor_ref.borrow_mut().filename = input_field.text.clone();
+        })));
+
         let save_button = Widget::with_theme(Button::empty(), "save_button");
 
         let area_editor_kind_ref = Rc::clone(&self.area_editor);
-        save_button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget| {
+        save_button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _kind| {
             let parent = Widget::get_parent(widget);
             let filename_prefix = format!("../modules/{}/areas/", CONFIG.editor.module);
             area_editor_kind_ref.borrow().save(&filename_prefix);

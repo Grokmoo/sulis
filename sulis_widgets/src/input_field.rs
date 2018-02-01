@@ -93,7 +93,7 @@ impl WidgetKind for InputField {
 
         self.label.borrow_mut().text = Some(self.text.clone());
         widget.borrow_mut().invalidate_layout();
-        Widget::fire_callback(widget);
+        Widget::fire_callback(widget, self);
         true
     }
 

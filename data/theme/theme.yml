@@ -74,6 +74,9 @@ children:
         x_relative: Cursor
         y_relative: Cursor
         position: [-1, -1]
+        preferred_size: [6, 0]
+        height_relative: ChildSum
+        width_relative: Zero
         children:
           title:
             from: .label
@@ -81,36 +84,14 @@ children:
             text_params:
               scale: 1.25
               horizontal_alignment: Center
-            preferred_size: [6, 1]
+            preferred_size: [0, 1]
+            width_relative: Max
             position: [0, 0]
           actions:
             from: .list_box
             border: [0, 0, 0, 0]
             width_relative: Max
             position: [0, 1]
-  window:
-    background: bg_base
-    border: [1, 1, 1, 1]
-    preferred_size: [30, -2]
-    position: [0, 1]
-    height_relative: Max
-    x_relative: Zero
-    children:
-      title:
-        from: .label
-        width_relative: Max
-        preferred_size: [0, 1]
-        text_params:
-          scale: 1.3
-      close:
-        from: .button
-        text_params:
-          horizontal_alignment: Center
-        border: [0, 0, 0, 0]
-        preferred_size: [2, 1]
-        text: "X"
-        position: [0, 0]
-        x_relative: Max
   inventory_window:
     from: .window
     position: [30, 1]

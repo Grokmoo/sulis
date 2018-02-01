@@ -131,12 +131,12 @@ pub fn setup_logger() {
 
     panic::set_hook(Box::new(|p| {
         error!("Thread main panic.  Exiting.");
-        debug!("with payload: {:?}", p.payload());
+        warn!("with payload: {:?}", p.payload());
         if let Some(loc) = p.location() {
-           debug!("at {:?}", loc);
+           warn!("at {:?}", loc);
         }
 
         let bt = Backtrace::new();
-        debug!("{:?}", bt);
+        warn!("{:?}", bt);
     }));
 }

@@ -64,7 +64,7 @@ impl WidgetKind for EntityMouseover {
         Vec::new()
     }
 
-    fn layout(&self, widget: &mut Widget) {
+    fn layout(&mut self, widget: &mut Widget) {
         info!("Layout entity mouseover");
         widget.state.add_text_arg("name", &self.entity.borrow().actor.actor.name);
         widget.state.add_text_arg("cur_hp", &self.entity.borrow().actor.hp().to_string());

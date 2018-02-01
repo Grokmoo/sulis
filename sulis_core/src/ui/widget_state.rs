@@ -48,6 +48,7 @@ pub struct WidgetState {
 
     text_args: HashMap<String, String>,
     pub (in ui) callback: Option<Callback>,
+    pub (in ui) has_keyboard_focus: bool,
 }
 
 impl WidgetState {
@@ -74,7 +75,12 @@ impl WidgetState {
             is_modal: false,
             modal_remove_on_click_outside: false,
             is_mouse_over: false,
+            has_keyboard_focus: false,
         }
+    }
+
+    pub fn has_keyboard_focus(&self) -> bool {
+        self.has_keyboard_focus
     }
 
     pub fn is_active(&self) -> bool {

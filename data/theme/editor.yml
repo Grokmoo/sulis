@@ -23,10 +23,6 @@ children:
                 border: { top: 1, bottom: 1, left: 1, right: 1 }
                 background: bg_base
                 position: [0, 1]
-          name:
-            from: .input_field
-            preferred_size: [5, 1]
-            position: [10, 0]
       area_editor:
         width_relative: Max
         height_relative: Max
@@ -69,4 +65,33 @@ children:
         children:
           title:
             text: "Exit the Editor?"
+      properties_window:
+        from: .window
+        height_relative: Zero
+        preferred_size: [25, 10]
+        children:
+          title:
+            text: "Area Properties"
+          id_label:
+            from: .label
+            text: "ID"
+            position: [0, 3]
+            preferred_size: [3, 1]
+            text_params:
+              horizontal_alignment: Right
+          id_field:
+            from: .input_field
+            preferred_size: [5, 1]
+            position: [4, 3]
+          name_label:
+            from: .label
+            text: "Name"
+            position: [0, 5]
+            preferred_size: [3, 1]
+            text_params:
+              horizontal_alignment: Right
+          name_field:
+            from: .input_field
+            preferred_size: [5, 1]
+            position: [4, 5]
 ...

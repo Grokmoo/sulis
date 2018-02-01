@@ -89,8 +89,16 @@ impl WidgetKind for InputField {
 
     fn on_char_typed(&mut self, widget: &Rc<RefCell<Widget>>, c: char) -> bool {
         match c {
-            '\u{8}' => { self.text.pop(); },
-            _ => self.text.push(c),
+            '\u{8}' => {
+                self.text.pop();
+            }, _ => {
+                if self.label.borrow().text_draw_end_x + 0.8 >
+                    widget.borrow().state.inner_right() as f32 {
+                    return true;
+                }
+
+                self.text.push(c);
+            }
         }
 
         self.label.borrow_mut().text = Some(self.text.clone());
@@ -102,8 +110,10 @@ impl WidgetKind for InputField {
                           widget: &Widget, millis: u32) {
         self.label.borrow_mut().draw_graphics_mode(renderer, pixel_size, widget, millis);
 
+        if !widget.state.has_keyboard_focus() { return; }
+
         if let Some(ref carat) = self.carat {
-            let x = widget.state.inner_left() as f32 + 0.5;
+            let x = self.label.borrow().text_draw_end_x + 0.1;
             let y = widget.state.inner_top() as f32 +
                 (widget.state.inner_size.height as f32 - self.carat_height) / 2.0;
             let w = self.carat_width;

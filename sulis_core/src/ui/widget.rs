@@ -260,14 +260,28 @@ impl Widget {
 
     pub fn grab_keyboard_focus(widget: &Rc<RefCell<Widget>>) {
         let root = Widget::get_root(widget);
+        Widget::remove_old_keyboard_focus(&root);
         root.borrow_mut().keyboard_focus_child = Some(Rc::clone(widget));
+        widget.borrow_mut().state.has_keyboard_focus = true;
         trace!("Keyboard focus to {}", widget.borrow().theme_id);
     }
 
     pub fn clear_keyboard_focus(widget: &Rc<RefCell<Widget>>) {
         let root = Widget::get_root(widget);
-        root.borrow_mut().keyboard_focus_child = None;
+        Widget::remove_old_keyboard_focus(&root);
         trace!("Cleared keyboard focus");
+    }
+
+    fn remove_old_keyboard_focus(root: &Rc<RefCell<Widget>>) {
+        let mut root = root.borrow_mut();
+
+        if root.keyboard_focus_child.is_none() { return; }
+
+        {
+            let child = &root.keyboard_focus_child.as_ref().unwrap();
+            child.borrow_mut().state.has_keyboard_focus = false;
+        }
+        root.keyboard_focus_child = None;
     }
 
     pub fn fire_callback(widget: &Rc<RefCell<Widget>>) {

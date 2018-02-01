@@ -17,6 +17,9 @@
 mod area_editor;
 use area_editor::AreaEditor;
 
+mod properties_window;
+use properties_window::PropertiesWindow;
+
 mod tile_picker;
 use tile_picker::TilePicker;
 
@@ -33,7 +36,7 @@ use std::cell::RefCell;
 use sulis_core::config::CONFIG;
 use sulis_core::io::{InputAction, MainLoopUpdater};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_widgets::{ConfirmationWindow, DropDown, InputField, list_box};
+use sulis_widgets::{ConfirmationWindow, DropDown, list_box};
 
 thread_local! {
     static EXIT: RefCell<bool> = RefCell::new(false);
@@ -112,13 +115,23 @@ impl WidgetKind for EditorView {
             }))));
             entries.push(save);
 
+            let area_editor_kind_ref = Rc::clone(&area_editor_kind);
+            let properties = list_box::Entry::new("Properties".to_string(),
+            Some(Callback::new(Rc::new(move |widget| {
+                let root = Widget::get_root(widget);
+                let properties_window = Widget::with_defaults(
+                    PropertiesWindow::new(Rc::clone(&area_editor_kind_ref)));
+                Widget::add_child_to(&root, properties_window);
+
+                let parent = Widget::get_parent(widget);
+                parent.borrow_mut().mark_for_removal();
+            }))));
+            entries.push(properties);
+
             let drop_down = DropDown::new(entries);
             let menu = Widget::with_theme(drop_down, "menu");
 
             Widget::add_child_to(&top_bar, menu);
-
-            let name = Widget::with_theme(InputField::new(), "name");
-            Widget::add_child_to(&top_bar, name);
         }
 
         let area_editor = Widget::with_defaults(area_editor_kind);

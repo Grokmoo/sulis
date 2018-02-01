@@ -49,7 +49,7 @@ impl WidgetKind for InventoryWindow {
         self
     }
 
-    fn layout(&self, widget: &mut Widget) {
+    fn layout(&mut self, widget: &mut Widget) {
         widget.do_base_layout();
     }
 

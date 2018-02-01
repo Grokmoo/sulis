@@ -25,18 +25,24 @@ use sulis_core::util::Point;
 
 pub struct Label {
     pub text: Option<String>,
+    pub text_draw_end_x: f32,
+    pub text_draw_end_y: f32,
 }
 
 impl Label {
     pub fn empty() -> Rc<RefCell<Label>> {
         Rc::new(RefCell::new(Label {
             text: None,
+            text_draw_end_x: 0.0,
+            text_draw_end_y: 0.0,
         }))
     }
 
     pub fn new(text: &str) -> Rc<RefCell<Label>> {
         Rc::new(RefCell::new(Label {
             text: Some(text.to_string()),
+            text_draw_end_x: 0.0,
+            text_draw_end_y: 0.0,
         }))
     }
 
@@ -106,5 +112,8 @@ impl WidgetKind for Label {
         let width = font.get_width(&widget.state.text) as f32 * scale / font.line_height as f32;
         let (x, y, text) = Label::get_draw_params(width, scale, widget);
         font_rend.render(renderer, text, x, y, &widget.state.text_params);
+
+        self.text_draw_end_x = x + width;
+        self.text_draw_end_y = y;
     }
 }

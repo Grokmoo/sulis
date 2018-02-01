@@ -37,6 +37,15 @@ use TilePicker;
 
 const NAME: &str = "area_editor";
 
+fn is_current_layer(tile_picker: &Rc<RefCell<TilePicker>>, layer_id: &str) -> bool {
+    let tile_picker = tile_picker.borrow();
+
+    match tile_picker.get_cur_layer() {
+        None => false,
+        Some(id) => id == layer_id,
+    }
+}
+
 pub struct AreaEditor {
     tile_picker: Rc<RefCell<TilePicker>>,
     cur_tile: Option<(Point, Rc<Tile>)>,
@@ -208,7 +217,11 @@ impl AreaEditor {
         if x < 0 || y < 0 { return; }
 
         self.removal_tiles.clear();
-        for &mut (_, ref mut tiles) in self.tiles.iter_mut() {
+        for &mut (ref layer_id, ref mut tiles) in self.tiles.iter_mut() {
+            if !is_current_layer(&self.tile_picker, layer_id) {
+                continue;
+            }
+
             tiles.retain(|&(pos, ref tile)| {
                 !is_removal(pos, tile, x, y, cur_tile.width, cur_tile.height)
             });
@@ -333,7 +346,11 @@ impl WidgetKind for AreaEditor {
         self.cur_tile = Some((Point::new(x, y), cur_tile));
 
         self.removal_tiles.clear();
-        for &(_, ref tiles) in self.tiles.iter() {
+        for &(ref layer_id, ref tiles) in self.tiles.iter() {
+            if !is_current_layer(&self.tile_picker, layer_id) {
+                continue;
+            }
+
             for &(pos, ref tile) in tiles {
                 if is_removal(pos, tile, x, y, w, h) {
                     self.removal_tiles.push((pos, Rc::clone(tile)));

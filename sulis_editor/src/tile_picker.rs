@@ -38,6 +38,13 @@ impl TilePicker {
         }))
     }
 
+    pub fn get_cur_layer(&self) -> Option<&str> {
+        match self.cur_layer {
+            None => None,
+            Some(ref layer) => Some(layer),
+        }
+    }
+
     pub fn get_cur_tile(&self) -> Option<Rc<Tile>> {
         match self.cur_tile {
             None => None,

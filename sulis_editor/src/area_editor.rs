@@ -27,11 +27,11 @@ use sulis_core::serde_yaml;
 use sulis_core::config::CONFIG;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::io::event::ClickKind;
-use sulis_module::Module;
-use sulis_core::resource::read_single_resource;
+use sulis_module::{Actor, Module};
+use sulis_core::resource::{ResourceSet, read_single_resource};
 use sulis_core::ui::{Color, Cursor, Widget, WidgetKind};
 use sulis_core::util::{invalid_data_error, Point};
-use sulis_module::area::{AreaBuilder, Tile};
+use sulis_module::area::{ActorData, AreaBuilder, Tile, Transition, TransitionBuilder};
 
 use TilePicker;
 
@@ -54,6 +54,9 @@ pub struct AreaEditor {
     scroll_y_f32: f32,
 
     tiles: Vec<(String, Vec<(Point, Rc<Tile>)>)>,
+    actors: Vec<(Point, Rc<Actor>)>,
+    transitions: Vec<Transition>,
+
     pub id: String,
     pub name: String,
     pub filename: String,
@@ -69,6 +72,8 @@ impl AreaEditor {
 
         Rc::new(RefCell::new(AreaEditor {
             tiles,
+            actors: Vec::new(),
+            transitions: Vec::new(),
             tile_picker: Rc::clone(tile_picker),
             cur_tile: None,
             removal_tiles: Vec::new(),
@@ -112,6 +117,7 @@ impl AreaEditor {
         self.filename = filename.to_string();
         self.visibility_tile = area_builder.visibility_tile;
 
+        trace!("Loading area terrain.");
         self.tiles.clear();
         for (tile_id, positions) in area_builder.terrain {
             let tile = match Module::tile(&tile_id) {
@@ -133,6 +139,38 @@ impl AreaEditor {
                 self.tiles[index].1.push((p, Rc::clone(&tile)));
             }
         }
+
+        trace!("Loading area actors.");
+        self.actors.clear();
+        for actor_data in area_builder.actors {
+            let actor = match Module::actor(&actor_data.id) {
+                None => {
+                    warn!("No actor with ID {} found", actor_data.id);
+                    continue;
+                }, Some(actor) => actor,
+            };
+
+            self.actors.push((actor_data.location, actor));
+        }
+
+        trace!("Loading area transitions.");
+        self.transitions.clear();
+        for transition_builder in area_builder.transitions {
+            let sprite = match ResourceSet::get_sprite(&transition_builder.image_display) {
+                Err(_) => {
+                    warn!("No image with ID {} found.", transition_builder.image_display);
+                    continue;
+                }, Ok(sprite) => sprite,
+            };
+
+            self.transitions.push(Transition {
+                from: transition_builder.from,
+                to: transition_builder.to,
+                size: transition_builder.size,
+                to_area: transition_builder.to_area,
+                image_display: sprite,
+            });
+        }
     }
 
     pub fn save(&self, filename_prefix: &str) {
@@ -145,6 +183,7 @@ impl AreaEditor {
         let mut layers: Vec<String> = Vec::new();
         let mut terrain: HashMap<String, Vec<Vec<usize>>> = HashMap::new();
 
+        trace!("Saving terrain.");
         for &(ref layer_id, ref tiles) in self.tiles.iter() {
             layers.push(layer_id.to_string());
             for &(position, ref tile) in tiles.iter() {
@@ -157,6 +196,24 @@ impl AreaEditor {
         }
         let entity_layer = 0;
 
+        trace!("Saving actors.");
+        let mut actors: Vec<ActorData> = Vec::new();
+        for &(pos, ref actor) in self.actors.iter() {
+            actors.push(ActorData { id: actor.id.to_string(), location: pos });
+        }
+
+        trace!("Saving transitions");
+        let mut transitions: Vec<TransitionBuilder> = Vec::new();
+        for ref transition in self.transitions.iter() {
+            transitions.push(TransitionBuilder {
+                from: transition.from,
+                size: transition.size,
+                to: transition.to,
+                to_area: transition.to_area.clone(),
+                image_display: transition.image_display.full_id(),
+            });
+        }
+
         let area_builder = AreaBuilder {
             id: self.id.clone(),
             name: self.name.clone(),
@@ -167,10 +224,11 @@ impl AreaEditor {
             height: height as usize,
             generate: false,
             entity_layer,
-            actors: Vec::new(),
-            transitions: Vec::new(),
+            actors,
+            transitions,
         };
 
+        trace!("Writing to file {}", filename);
         match write_to_file(&filename, &area_builder) {
             Err(e) => {
                 error!("Unable to save area state to file {}", filename);
@@ -271,6 +329,33 @@ impl WidgetKind for AreaEditor {
                 draw_list.append(&mut DrawList::from_sprite(sprite, x, y, tile.width, tile.height));
             }
         }
+        if !draw_list.is_empty() {
+            renderer.draw(draw_list);
+        }
+
+        let mut draw_list = DrawList::empty_sprite();
+        for &(pos, ref actor) in self.actors.iter() {
+            let sprite = &actor.image_display;
+            let x = pos.x + p.x - s.x;
+            let y = pos.y + p.y - s.y;
+            let s = actor.race.size.size;
+            draw_list.append(&mut DrawList::from_sprite(sprite, x, y, s, s));
+        }
+
+        if !draw_list.is_empty() {
+            renderer.draw(draw_list);
+        }
+
+        let mut draw_list = DrawList::empty_sprite();
+        for ref transition in self.transitions.iter() {
+            let sprite = &transition.image_display;
+            let x = transition.from.x + p.x - s.x;
+            let y = transition.from.y + p.y - s.y;
+            let w = transition.size.width;
+            let h = transition.size.height;
+            draw_list.append(&mut DrawList::from_sprite(sprite, x, y, w, h));
+        }
+
         if !draw_list.is_empty() {
             renderer.draw(draw_list);
         }

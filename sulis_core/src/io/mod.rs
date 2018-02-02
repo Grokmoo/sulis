@@ -153,7 +153,7 @@ impl DrawList {
     }
 
     pub fn from_sprite_f32(sprite: &Rc<Sprite>, x: f32, y: f32, w: f32, h: f32) -> DrawList {
-        DrawList::from_texture_id(&sprite.id, &sprite.tex_coords, x, y, w, h)
+        DrawList::from_texture_id(&sprite.sheet_id, &sprite.tex_coords, x, y, w, h)
     }
 
     pub fn from_sprite(sprite: &Rc<Sprite>, x: i32, y: i32, w: i32, h: i32) -> DrawList {

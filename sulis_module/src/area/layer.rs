@@ -51,9 +51,9 @@ impl Layer {
             };
 
             match spritesheet_id {
-                None => spritesheet_id = Some(tile.image_display.id.to_string()),
+                None => spritesheet_id = Some(tile.image_display.sheet_id.to_string()),
                 Some(ref id) => {
-                    if id != &tile.image_display.id {
+                    if id != &tile.image_display.sheet_id {
                         return invalid_data_error(&format!("All tiles in a layer must be from the same \
                                                            spritesheet: '{}' vs '{}'", id, tile.id));
                     }

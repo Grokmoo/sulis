@@ -36,14 +36,16 @@ pub struct Spritesheet {
 
 #[derive(Debug)]
 pub struct Sprite {
-    pub id: String,
+    pub sheet_id: String,
+    pub sprite_id: String,
     pub position: Point,
     pub size: Size,
     pub tex_coords: [f32; 8],
 }
 
 impl Sprite {
-    fn new(id: &str, image_size: &Size, position: Point, size: Size) -> Sprite {
+    fn new(sheet_id: &str, sprite_id: &str, image_size: &Size,
+           position: Point, size: Size) -> Sprite {
         let image_width = image_size.width as f32;
         let image_height = image_size.height as f32;
         let x_min = (position.x as f32) / image_width;
@@ -52,7 +54,8 @@ impl Sprite {
         let y_max = (image_height - position.y as f32) / image_height;
 
         Sprite {
-            id: id.to_string(),
+            sheet_id: sheet_id.to_string(),
+            sprite_id: sprite_id.to_string(),
             position,
             size,
             tex_coords: [ x_min, y_max,
@@ -62,8 +65,12 @@ impl Sprite {
         }
     }
 
+    pub fn full_id(&self) -> String {
+        format!("{}/{}", self.sheet_id, self.sprite_id)
+    }
+
     pub fn get_spritesheet(&self) -> Rc<Spritesheet> {
-        ResourceSet::get_spritesheet(&self.id).unwrap()
+        ResourceSet::get_spritesheet(&self.sheet_id).unwrap()
     }
 }
 
@@ -103,7 +110,7 @@ impl Spritesheet {
                 pos.mult_mut(multiplier);
                 size.mult_mut(multiplier);
                 trace!("Creating sprite with id '{}' in '{}'", id, builder.id);
-                let sprite = Sprite::new(&builder.id, &image_size, pos, size);
+                let sprite = Sprite::new(&builder.id, &id, &image_size, pos, size);
 
                 if sprites.contains_key(&id) {
                     warn!("Duplicate sprite ID in sheet '{}': '{}'", builder.id, id);

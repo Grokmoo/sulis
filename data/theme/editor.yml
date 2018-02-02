@@ -13,16 +13,22 @@ children:
             width_relative: ChildMax
             height_relative: ChildSum
             layout: BoxVertical
+            position: [0, 0]
             children:
               button:
                 from: .button
                 text: "Menu"
-                preferred_size: [5, 1]
+                preferred_size: [6, 1]
               list:
                 from: .list_box
                 border: { top: 1, bottom: 1, left: 1, right: 1 }
                 background: bg_base
                 position: [0, 1]
+          transitions:
+            from: .button
+            preferred_size: [6, 1]
+            text: "Transitions"
+            position: [7, 0]
       area_editor:
         width_relative: Max
         height_relative: Max
@@ -65,6 +71,15 @@ children:
         children:
           title:
             text: "Exit the Editor?"
+      transition_window:
+        from: .window
+        height_relative: Zero
+        preferred_size: [21, 12]
+        x_relative: Center
+        y_relative: Center
+        children:
+          title:
+            text: "Transition Editor"
       load_window:
         from: .window
         height_relative: Zero

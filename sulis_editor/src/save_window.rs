@@ -39,17 +39,11 @@ impl SaveWindow {
 }
 
 impl WidgetKind for SaveWindow {
-    fn get_name(&self) -> &str {
-        NAME
-    }
+    fn get_name(&self) -> &str { NAME }
 
-    fn as_any(&self) -> &Any {
-        self
-    }
+    fn as_any(&self) -> &Any { self }
 
-    fn as_any_mut(&mut self) -> &mut Any {
-        self
-    }
+    fn as_any_mut(&mut self) -> &mut Any { self }
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let title = Widget::with_theme(Label::empty(), "title");

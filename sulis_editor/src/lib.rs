@@ -26,6 +26,9 @@ use save_window::SaveWindow;
 mod tile_picker;
 use tile_picker::TilePicker;
 
+mod transition_window;
+use transition_window::TransitionWindow;
+
 #[macro_use] extern crate log;
 
 extern crate sulis_core;
@@ -38,7 +41,7 @@ use std::cell::RefCell;
 
 use sulis_core::io::{InputAction, MainLoopUpdater};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_widgets::{ConfirmationWindow, DropDown, list_box};
+use sulis_widgets::{Button, ConfirmationWindow, DropDown, list_box};
 
 thread_local! {
     static EXIT: RefCell<bool> = RefCell::new(false);
@@ -135,7 +138,18 @@ impl WidgetKind for EditorView {
             let drop_down = DropDown::new(entries);
             let menu = Widget::with_theme(drop_down, "menu");
 
+            let transitions = Widget::with_theme(Button::empty(), "transitions");
+
+            let area_editor_kind_ref = Rc::clone(&area_editor_kind);
+            transitions.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
+                let root = Widget::get_root(widget);
+                let transition_window = Widget::with_defaults(
+                    TransitionWindow::new(Rc::clone(&area_editor_kind_ref)));
+                Widget::add_child_to(&root, transition_window);
+            })));
+
             Widget::add_child_to(&top_bar, menu);
+            Widget::add_child_to(&top_bar, transitions);
         }
 
         let area_editor = Widget::with_defaults(area_editor_kind);

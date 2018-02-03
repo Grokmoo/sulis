@@ -83,6 +83,14 @@ impl WidgetState {
         self.has_keyboard_focus
     }
 
+    pub fn is_visible(&self) -> bool {
+        self.visible
+    }
+
+    pub fn set_visible(&mut self, visible: bool) {
+        self.visible = visible;
+    }
+
     pub fn is_active(&self) -> bool {
         self.animation_state.contains(animation_state::Kind::Active)
     }

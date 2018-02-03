@@ -38,7 +38,7 @@ use sulis_core::serde_yaml;
 
 use Module;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Transition {
     pub from: Point,
     pub size: Size,

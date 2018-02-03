@@ -45,6 +45,13 @@ impl Size {
         }
     }
 
+    pub fn from_tuple(vals: (i32, i32)) -> Size {
+        Size {
+            width: vals.0,
+            height: vals.1,
+        }
+    }
+
     pub fn inner(&self, border: &Border) -> Size {
         Size {
             width: self.width - border.left - border.right,

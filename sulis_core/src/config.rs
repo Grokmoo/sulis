@@ -21,6 +21,7 @@ use std::collections::HashMap;
 
 use io::keyboard_event::Key;
 use io::{KeyboardEvent, InputAction};
+use util::Size;
 
 use serde_yaml;
 
@@ -38,6 +39,8 @@ pub struct Config {
 #[serde(deny_unknown_fields)]
 pub struct EditorConfig {
     pub module: String,
+    pub transition_sprite: String,
+    pub transition_size: Size,
     pub area: EditorAreaConfig,
 }
 

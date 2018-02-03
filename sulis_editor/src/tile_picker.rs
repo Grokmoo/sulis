@@ -129,8 +129,6 @@ impl WidgetKind for TilePicker {
                         None => unreachable!("Failed to downcast to tilepicker"),
                     };
                     tile_picker.cur_tile = Some(Rc::clone(&tile));
-                } else {
-                    widget.borrow_mut().state.set_active(false);
                 }
             }));
 

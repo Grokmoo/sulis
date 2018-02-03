@@ -29,11 +29,36 @@ children:
             preferred_size: [6, 1]
             text: "Transitions"
             position: [7, 0]
+          actors:
+            from: .button
+            preferred_size: [6, 1]
+            text: "Actors"
+            position: [48, 0]
+          tiles:
+            from: .button
+            preferred_size: [6, 1]
+            text: "Tiles"
+            position: [55, 0]
       area_editor:
         width_relative: Max
         height_relative: Max
         preferred_size: [-32, -1]
         position: [0, 1]
+      actor_picker:
+        background: bg_base
+        border: [1, 1, 1, 1]
+        preferred_size: [32, -1]
+        x_relative: Max
+        height_relative: Max
+        position: [0, 1]
+        layout: Grid
+        layout_spacing: [0, 1, 0, 1]
+        children:
+          actor_button:
+            from: .button
+            text: "#0#"
+            foreground: "#icon#"
+            preferred_size: [5, 5]
       tile_picker:
         background: bg_base
         border: [1, 1, 1, 1]
@@ -74,12 +99,66 @@ children:
       transition_window:
         from: .window
         height_relative: Zero
-        preferred_size: [21, 12]
+        preferred_size: [30, 14]
         x_relative: Center
         y_relative: Center
         children:
           title:
             text: "Transition Editor"
+          apply_button:
+            from: .button
+            preferred_size: [4, 1]
+            text: "Apply"
+            position: [24, 11]
+          new_button:
+            from: .button
+            preferred_size: [4, 1]
+            text: "New"
+            position: [12, 11]
+          delete_button:
+            from: .button
+            preferred_size: [4, 1]
+            text: "Delete"
+            position: [17, 11]
+          transitions_list:
+            from: .list_box
+            preferred_size: [10, 10]
+            position: [0, 2]
+            height_relative: Zero
+            width_relative: Zero
+          from_label:
+            from: .label
+            text: "From Point"
+            text_params:
+              horizontal_alignment: Right
+            preferred_size: [4, 1]
+            position: [12, 2]
+          to_label:
+            from: .label
+            text: "To Point"
+            text_params:
+              horizontal_alignment: Right
+            preferred_size: [4, 1]
+            position: [12, 4]
+          to_area_label:
+            from: .label
+            text: "To Area ID"
+            text_params:
+              horizontal_alignment: Right
+            preferred_size: [4, 1]
+            position: [12, 6]
+          from:
+            from: .input_field
+            preferred_size: [8, 1]
+            position: [17, 2]
+          to:
+            from: .input_field
+            preferred_size: [8, 1]
+            position: [17, 4]
+          to_area:
+            from: .input_field
+            preferred_size: [10, 1]
+            position: [17, 6]
       load_window:
         from: .window
         height_relative: Zero

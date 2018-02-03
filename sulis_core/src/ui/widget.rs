@@ -234,6 +234,7 @@ impl Widget {
                 trace!("Adding child as modal widget.");
                 let root = Widget::get_root(parent);
                 root.borrow_mut().modal_child = Some(Rc::clone(&child));
+                root.borrow_mut().keyboard_focus_child = None;
             }
         }
         parent.borrow_mut().children.push(child);
@@ -438,15 +439,6 @@ impl Widget {
 
         let ref widget_kind = Rc::clone(&widget.borrow().kind);
 
-        // precompute has modal so we don't have the widget borrowed
-        // for the dispatch below
-        let has_modal = widget.borrow().modal_child.is_some();
-        if has_modal {
-            trace!("Dispatching to modal child.");
-            let child = Rc::clone(widget.borrow().modal_child.as_ref().unwrap());
-            return Widget::dispatch_event(&child, event);
-        }
-
         let has_keyboard_child = widget.borrow().keyboard_focus_child.is_some();
         if has_keyboard_child {
             let child = Rc::clone(widget.borrow().keyboard_focus_child.as_ref().unwrap());
@@ -463,6 +455,13 @@ impl Widget {
                 event::Kind::CharTyped(_) => return false,
                 _ => (),
             }
+        }
+
+        let has_modal = widget.borrow().modal_child.is_some();
+        if has_modal {
+            trace!("Dispatching to modal child.");
+            let child = Rc::clone(widget.borrow().modal_child.as_ref().unwrap());
+            return Widget::dispatch_event(&child, event);
         }
 
         // iterate in this way using indices so we don't maintain any

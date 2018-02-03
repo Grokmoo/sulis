@@ -40,6 +40,10 @@ impl Point {
         Point { x: other.x, y: other.y }
     }
 
+    pub fn from_tuple_i32(vals: (i32, i32)) -> Point {
+        Point { x: vals.0, y: vals.1 }
+    }
+
     pub fn from_tuple(other: (u32, u32)) -> Point {
         Point { x: other.0 as i32, y: other.1 as i32 }
     }

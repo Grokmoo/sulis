@@ -20,6 +20,7 @@ use std::rc::Rc;
 use std::collections::HashMap;
 use std::io::Error;
 use std::fs::File;
+use std::slice::Iter;
 use std::cmp;
 
 use sulis_core::serde_yaml;
@@ -33,7 +34,12 @@ use sulis_core::ui::{Color, Cursor, Widget, WidgetKind};
 use sulis_core::util::{invalid_data_error, Point};
 use sulis_module::area::{ActorData, AreaBuilder, Tile, Transition, TransitionBuilder};
 
-use TilePicker;
+use {ActorPicker, TilePicker};
+
+pub enum Mode {
+    Tiles,
+    Actors,
+}
 
 const NAME: &str = "area_editor";
 
@@ -48,6 +54,11 @@ fn is_current_layer(tile_picker: &Rc<RefCell<TilePicker>>, layer_id: &str) -> bo
 
 pub struct AreaEditor {
     tile_picker: Rc<RefCell<TilePicker>>,
+    actor_picker: Rc<RefCell<ActorPicker>>,
+    mode: Mode,
+
+    cur_actor: Option<(Point, Rc<Actor>)>,
+    removal_actors: Vec<(Point, Rc<Actor>)>,
     cur_tile: Option<(Point, Rc<Tile>)>,
     removal_tiles: Vec<(Point, Rc<Tile>)>,
     scroll_x_f32: f32,
@@ -64,19 +75,24 @@ pub struct AreaEditor {
 }
 
 impl AreaEditor {
-    pub fn new(tile_picker: &Rc<RefCell<TilePicker>>) -> Rc<RefCell<AreaEditor>> {
+    pub fn new(actor_picker: &Rc<RefCell<ActorPicker>>,
+               tile_picker: &Rc<RefCell<TilePicker>>) -> Rc<RefCell<AreaEditor>> {
         let mut tiles: Vec<(String, Vec<(Point, Rc<Tile>)>)> = Vec::new();
         for ref layer_id in CONFIG.editor.area.layers.iter() {
             tiles.push((layer_id.to_string(), Vec::new()));
         }
 
         Rc::new(RefCell::new(AreaEditor {
+            mode: Mode::Tiles,
             tiles,
             actors: Vec::new(),
             transitions: Vec::new(),
             tile_picker: Rc::clone(tile_picker),
+            actor_picker: Rc::clone(actor_picker),
+            cur_actor: None,
             cur_tile: None,
             removal_tiles: Vec::new(),
+            removal_actors: Vec::new(),
             scroll_x_f32: 0.0,
             scroll_y_f32: 0.0,
             id: CONFIG.editor.area.id.clone(),
@@ -84,6 +100,49 @@ impl AreaEditor {
             filename: CONFIG.editor.area.filename.clone(),
             visibility_tile: CONFIG.editor.area.visibility_tile.clone(),
         }))
+    }
+
+    pub fn set_mode(&mut self, mode: Mode) {
+        self.mode = mode;
+        self.cur_tile = None;
+        self.cur_actor = None;
+        self.removal_tiles.clear();
+        self.removal_actors.clear();
+    }
+
+    pub fn new_transition(&mut self) -> Option<usize> {
+        let sprite = match ResourceSet::get_sprite(&CONFIG.editor.transition_sprite) {
+            Err(_) => {
+                warn!("No image with ID {} found.", CONFIG.editor.transition_sprite);
+                return None;
+            }, Ok(sprite) => sprite,
+        };
+
+        self.transitions.push(Transition {
+            from: Point::new(1, 1),
+            to: Point::new(1, 1),
+            to_area: None,
+            size: CONFIG.editor.transition_size,
+            image_display: sprite,
+        });
+
+        Some(self.transitions.len() - 1)
+    }
+
+    pub fn delete_transition(&mut self, index: usize) {
+        self.transitions.remove(index);
+    }
+
+    pub fn transitions_iter(&self) -> Iter<Transition> {
+        self.transitions.iter()
+    }
+
+    pub fn transition(&self, index: usize) -> &Transition {
+        &self.transitions[index]
+    }
+
+    pub fn transition_mut(&mut self, index: usize) -> &mut Transition {
+        &mut self.transitions[index]
     }
 
     fn create_layer_if_missing(&mut self, layer_id: &str) -> usize {
@@ -238,12 +297,12 @@ impl AreaEditor {
         }
     }
 
-    fn get_cursor_pos(&self, widget: &Rc<RefCell<Widget>>, tile: &Rc<Tile>) -> (i32, i32) {
+    fn get_cursor_pos(&self, widget: &Rc<RefCell<Widget>>, width: i32, height: i32) -> (i32, i32) {
         let x = widget.borrow().state.position.x - widget.borrow().state.scroll_pos.x;
         let y = widget.borrow().state.position.y - widget.borrow().state.scroll_pos.y;
 
-        let x = Cursor::get_x_f32() - x as f32 - tile.width as f32 / 2.0;
-        let y = Cursor::get_y_f32() - y as f32 - tile.height as f32 / 2.0;
+        let x = Cursor::get_x_f32() - x as f32 - width as f32 / 2.0;
+        let y = Cursor::get_y_f32() - y as f32 - height as f32 / 2.0;
 
         (x.round() as i32, y.round() as i32)
     }
@@ -258,7 +317,7 @@ impl AreaEditor {
             Some(tile) => tile,
         };
 
-        let (x, y) = self.get_cursor_pos(widget, &cur_tile);
+        let (x, y) = self.get_cursor_pos(widget, cur_tile.width, cur_tile.height);
         if x < 0 || y < 0 { return; }
 
         let index = self.create_layer_if_missing(&cur_tile.layer);
@@ -271,7 +330,7 @@ impl AreaEditor {
             Some(tile) => tile,
         };
 
-        let (x, y) = self.get_cursor_pos(widget, &cur_tile);
+        let (x, y) = self.get_cursor_pos(widget, cur_tile.width, cur_tile.height);
         if x < 0 || y < 0 { return; }
 
         self.removal_tiles.clear();
@@ -281,8 +340,85 @@ impl AreaEditor {
             }
 
             tiles.retain(|&(pos, ref tile)| {
-                !is_removal(pos, tile, x, y, cur_tile.width, cur_tile.height)
+                !is_removal(pos, tile.width, tile.height, x, y, cur_tile.width, cur_tile.height)
             });
+        }
+    }
+
+    fn mouse_move_tiles_mode(&mut self, widget: &Rc<RefCell<Widget>>) {
+        let cur_tile = match self.get_current_tile() {
+            None => return,
+            Some(tile) => tile,
+        };
+
+        let (x, y) = self.get_cursor_pos(widget, cur_tile.width, cur_tile.height);
+        if x < 0 || y < 0 { return; }
+
+        let w = cur_tile.width;
+        let h = cur_tile.height;
+        self.cur_tile = Some((Point::new(x, y), cur_tile));
+
+        self.removal_tiles.clear();
+        for &(ref layer_id, ref tiles) in self.tiles.iter() {
+            if !is_current_layer(&self.tile_picker, layer_id) {
+                continue;
+            }
+
+            for &(pos, ref tile) in tiles {
+                if is_removal(pos, tile.width, tile.height, x, y, w, h) {
+                    self.removal_tiles.push((pos, Rc::clone(tile)));
+                }
+            }
+        }
+    }
+
+    fn add_cur_actor(&mut self, widget: &Rc<RefCell<Widget>>) {
+        let cur_actor = match self.actor_picker.borrow().get_cur_actor() {
+            None => return,
+            Some(actor) => actor,
+        };
+
+        let s = cur_actor.race.size.size;
+        let (x, y) = self.get_cursor_pos(widget, s, s);
+        if x < 0 || y < 0 { return; }
+
+        self.actors.push((Point::new(x, y), cur_actor));
+    }
+
+    fn remove_cur_actors(&mut self, widget: &Rc<RefCell<Widget>>) {
+        let cur_actor = match self.actor_picker.borrow().get_cur_actor() {
+            None => return,
+            Some(actor) => actor,
+        };
+
+        let s = cur_actor.race.size.size;
+        let (x, y) = self.get_cursor_pos(widget, s, s);
+        if x < 0 || y < 0 { return; }
+
+        self.removal_actors.clear();
+        self.actors.retain(|&(pos, ref actor)| {
+            let pos_s = actor.race.size.size;
+            !is_removal(pos, pos_s, pos_s, x, y, s, s)
+        });
+    }
+
+    fn mouse_move_actors_mode(&mut self, widget: &Rc<RefCell<Widget>>) {
+        let cur_actor = match self.actor_picker.borrow().get_cur_actor() {
+            None => return,
+            Some(actor) => actor,
+        };
+
+        let w = cur_actor.race.size.size;
+        let h = cur_actor.race.size.size;
+        let (x, y) = self.get_cursor_pos(widget, w, h);
+        self.cur_actor = Some((Point::new(x, y), cur_actor));
+
+        self.removal_actors.clear();
+        for &(pos, ref actor) in self.actors.iter() {
+            let s = actor.race.size.size;
+            if is_removal(pos, s, s, x, y, w, h) {
+                self.removal_actors.push((pos, Rc::clone(actor)));
+            }
         }
     }
 }
@@ -297,21 +433,14 @@ fn write_to_file(filename: &str, builder: &AreaBuilder) -> Result<(), Error> {
 }
 
 impl WidgetKind for AreaEditor {
-    fn get_name(&self) -> &str {
-        NAME
-    }
+    fn get_name(&self) -> &str { NAME }
 
-    fn as_any(&self) -> &Any {
-        self
-    }
+    fn as_any(&self) -> &Any { self }
 
-    fn as_any_mut(&mut self) -> &mut Any {
-        self
-    }
+    fn as_any_mut(&mut self) -> &mut Any { self }
 
     fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         widget.borrow_mut().state.set_max_scroll_pos(256, 256);
-
         Vec::new()
     }
 
@@ -373,6 +502,20 @@ impl WidgetKind for AreaEditor {
             renderer.draw(draw_list);
         }
 
+        if !self.removal_actors.is_empty() {
+            let mut draw_list = DrawList::empty_sprite();
+            for &(pos, ref actor) in self.removal_actors.iter() {
+                let sprite = &actor.image_display;
+                let x = pos.x + p.x - s.x;
+                let y = pos.y + p.y - s.y;
+                let s = actor.race.size.size;
+                draw_list.append(&mut DrawList::from_sprite(sprite, x, y, s, s));
+            }
+
+            draw_list.set_color(Color::from_string("FF000088"));
+            renderer.draw(draw_list);
+        }
+
         if let Some((cur_tile_pos, ref cur_tile)) = self.cur_tile {
             let sprite = &cur_tile.image_display;
             let x = cur_tile_pos.x + p.x - s.x;
@@ -382,20 +525,45 @@ impl WidgetKind for AreaEditor {
 
             renderer.draw(draw_list);
         }
+
+        if let Some((cur_actor_pos, ref cur_actor)) = self.cur_actor {
+            let sprite = &cur_actor.image_display;
+            let x = cur_actor_pos.x + p.x - s.x;
+            let y = cur_actor_pos.y + p.y - s.y;
+            let s = cur_actor.race.size.size;
+            let mut draw_list = DrawList::from_sprite(sprite, x, y, s, s);
+            draw_list.set_color(Color::from_string("FFFFFF88"));
+            renderer.draw(draw_list);
+        }
     }
 
     fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
-        match kind {
-            ClickKind::Left => self.add_cur_tile(widget),
-            ClickKind::Right => self.remove_cur_tiles(widget),
-            _ => (),
-        };
+        match self.mode {
+            Mode::Tiles => {
+                match kind {
+                    ClickKind::Left => self.add_cur_tile(widget),
+                    ClickKind::Right => self.remove_cur_tiles(widget),
+                    _ => (),
+                }
+            }, Mode::Actors => {
+                match kind {
+                    ClickKind::Left => self.add_cur_actor(widget),
+                    ClickKind::Right => self.remove_cur_actors(widget),
+                    _ => (),
+                }
+            },
+        }
 
         true
     }
 
     fn on_mouse_drag(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind,
                      delta_x: f32, delta_y: f32) -> bool {
+        match self.mode {
+            Mode::Tiles => (),
+            _ => return true,
+        }
+
         match kind {
             ClickKind::Left => {
                 if self.removal_tiles.is_empty() {
@@ -418,43 +586,23 @@ impl WidgetKind for AreaEditor {
 
     fn on_mouse_move(&mut self, widget: &Rc<RefCell<Widget>>,
                      _delta_x: f32, _delta_y: f32) -> bool {
-        let cur_tile = match self.get_current_tile() {
-            None => return true,
-            Some(tile) => tile,
-        };
-
-        let (x, y) = self.get_cursor_pos(widget, &cur_tile);
-        if x < 0 || y < 0 { return true; }
-
-        let w = cur_tile.width;
-        let h = cur_tile.height;
-        self.cur_tile = Some((Point::new(x, y), cur_tile));
-
-        self.removal_tiles.clear();
-        for &(ref layer_id, ref tiles) in self.tiles.iter() {
-            if !is_current_layer(&self.tile_picker, layer_id) {
-                continue;
-            }
-
-            for &(pos, ref tile) in tiles {
-                if is_removal(pos, tile, x, y, w, h) {
-                    self.removal_tiles.push((pos, Rc::clone(tile)));
-                }
-            }
+        match self.mode {
+            Mode::Tiles => self.mouse_move_tiles_mode(widget),
+            Mode::Actors => self.mouse_move_actors_mode(widget),
         }
 
         true
     }
 }
 
-fn is_removal(pos: Point, tile: &Rc<Tile>, x: i32, y: i32, w: i32, h: i32) -> bool {
+fn is_removal(pos: Point, pos_w: i32, pos_h: i32, x: i32, y: i32, w: i32, h: i32) -> bool {
     // if one rectangle is on left side of the other
-    if pos.x >= x + w || x >= pos.x + tile.width {
+    if pos.x >= x + w || x >= pos.x + pos_w {
         return false;
     }
 
     // if one rectangle is above the other
-    if pos.y >= y + h || y >= pos.y + tile.height {
+    if pos.y >= y + h || y >= pos.y + pos_h {
         return false
     }
 

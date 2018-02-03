@@ -214,6 +214,10 @@ impl Module {
         MODULE.with(|r| get_resource(id, &r.borrow().actors))
     }
 
+    pub fn all_actors() -> Vec<Rc<Actor>> {
+        MODULE.with(|r| r.borrow().actors.iter().map(|ref a| Rc::clone(a.1)).collect())
+    }
+
     pub fn area(id: &str) -> Option<Rc<Area>> {
         MODULE.with(|m| get_resource(id, &m.borrow().areas))
     }

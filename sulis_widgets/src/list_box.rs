@@ -20,7 +20,7 @@ use std::rc::Rc;
 use std::slice::Iter;
 use std::cell::RefCell;
 
-use sulis_core::ui::{AnimationState, Callback, Widget, WidgetKind};
+use sulis_core::ui::{animation_state, AnimationState, Callback, Widget, WidgetKind};
 use Button;
 
 #[derive(Clone)]
@@ -53,6 +53,14 @@ impl<T: Display + 'static> Entry<T> {
             animation_state,
         }
     }
+
+    pub fn with_active(item: T, callback: Option<Callback>) -> Entry<T> {
+        Entry {
+            item,
+            callback,
+            animation_state: AnimationState::with(animation_state::Kind::Active),
+        }
+    }
 }
 
 pub struct ListBox<T: Display + 'static> {
@@ -76,17 +84,11 @@ impl<T: Display + 'static> ListBox<T> {
 }
 
 impl<T: Display> WidgetKind for ListBox<T> {
-    fn get_name(&self) -> &str {
-        "list_box"
-    }
+    fn get_name(&self) -> &str { "list_box" }
 
-    fn as_any(&self) -> &Any {
-        self
-    }
+    fn as_any(&self) -> &Any { self }
 
-    fn as_any_mut(&mut self) -> &mut Any {
-        self
-    }
+    fn as_any_mut(&mut self) -> &mut Any { self }
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let mut children: Vec<Rc<RefCell<Widget>>> =

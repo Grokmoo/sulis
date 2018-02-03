@@ -1,0 +1,6 @@
+id: water2
+name: water2x2
+layer: base
+width: 2
+height: 2
+image_display: "tiles/water2"

@@ -1,0 +1,6 @@
+id: grass_to_water_n
+name: g_to_w_n
+layer: base
+width: 2
+height: 2
+image_display: "tiles/grass_to_water_n"

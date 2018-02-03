@@ -1,0 +1,6 @@
+id: water_to_dirt_ne
+name: w_to_d_ne
+layer: base
+width: 2
+height: 2
+image_display: "tiles/water_to_dirt_ne"

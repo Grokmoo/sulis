@@ -4,3 +4,4 @@ layer: base
 width: 2
 height: 2
 image_display: "tiles/water_to_grass_nw"
+impass: [ [1, 0], [0, 1], [1, 1] ]

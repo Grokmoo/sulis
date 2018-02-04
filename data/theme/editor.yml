@@ -84,7 +84,7 @@ children:
             position: [0, 1]
             preferred_size: [0, -1]
             layout: Grid
-            layout_spacing: [0, 1, 0, 1]
+            layout_spacing: [0, 0, 0, 0]
             children:
               tile_button:
                 from: .button

@@ -59,7 +59,7 @@ groups:
       dirt_to_water_s: [27, 14]
       dirt_to_water_sw: [29, 14]
       dirt_to_water_e: [25, 16]
-      dirt_to_water_w: [31, 16]
+      dirt_to_water_w: [29, 16]
       dirt_to_water_ne: [25, 18]
       dirt_to_water_n: [27, 18]
       dirt_to_water_nw: [29, 18]

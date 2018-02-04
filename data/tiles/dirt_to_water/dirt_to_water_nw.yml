@@ -4,3 +4,4 @@ layer: base
 width: 2
 height: 2
 image_display: "tiles/dirt_to_water_nw"
+impass: [ [0, 0] ]

@@ -4,11 +4,6 @@ size: [ 512, 512 ]
 simple_image_gen_scale: 16
 grid_multiplier: 16
 groups:
-  1by1:
-    size: [1, 1]
-    areas:
-      floor: [0, 5]
-      wall: [2, 5]
   2by2:
     size: [2, 2]
     areas:
@@ -63,6 +58,11 @@ groups:
       dirt_to_water_ne: [25, 18]
       dirt_to_water_n: [27, 18]
       dirt_to_water_nw: [29, 18]
+      
+      rock01: [0, 16]
+      rock02: [3, 16]
+      rock03: [6, 16]
+      rock04: [9, 16]
   4by4:
     size: [4, 4]
     areas:
@@ -74,5 +74,5 @@ groups:
       dirt6: [25, 0]
   big:
     areas:
-      tree01: [0, 7, 8, 11]
-      tree02: [8, 7, 8, 11]
+      tree01: [0, 4, 8, 11]
+      tree02: [8, 4, 8, 11]

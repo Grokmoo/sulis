@@ -1,0 +1,8 @@
+id: rock01
+name: Rock01
+layer: object
+width: 2
+height: 2
+image_display: "tiles/rock01"
+impass: [ [0,0], [0,1], [1,0], [1,1] ]
+invis: [ [0,0], [0,1], [1,0], [1,1] ]

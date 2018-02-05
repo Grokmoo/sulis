@@ -51,6 +51,11 @@ impl Image for SimpleImage {
         renderer.draw(DrawList::from_sprite_f32(&self.image_display, x, y, w, h));
     }
 
+    fn append_to_draw_list(&self, draw_list: &mut DrawList, _state: &AnimationState,
+                           x: f32, y: f32, w: f32, h: f32, _millis: u32) {
+        draw_list.append(&mut DrawList::from_sprite_f32(&self.image_display, x, y, w, h));
+    }
+
     fn get_width_f32(&self) -> f32 {
         self.size.width as f32
     }

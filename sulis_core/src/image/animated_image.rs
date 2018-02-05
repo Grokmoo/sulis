@@ -23,7 +23,7 @@ use serde_yaml;
 
 use image::Image;
 use resource::ResourceBuilder;
-use io::{GraphicsRenderer};
+use io::{DrawList, GraphicsRenderer};
 use ui::AnimationState;
 use util::{invalid_data_error, Size};
 
@@ -77,6 +77,12 @@ impl Image for AnimatedImage {
     fn draw_graphics_mode(&self, renderer: &mut GraphicsRenderer, state: &AnimationState,
                           x: f32, y: f32, w: f32, h: f32, millis: u32) {
         AnimationState::find_match(&self.images, state).draw_graphics_mode(renderer, state, x, y, w, h, millis);
+    }
+
+    fn append_to_draw_list(&self, draw_list: &mut DrawList, state: &AnimationState,
+                           x: f32, y: f32, w: f32, h: f32, millis: u32) {
+        AnimationState::find_match(&self.images, state).append_to_draw_list(draw_list, state,
+                                                                            x, y, w, h, millis);
     }
 
     fn get_width_f32(&self) -> f32 {

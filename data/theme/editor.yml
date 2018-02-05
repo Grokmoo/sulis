@@ -56,7 +56,6 @@ children:
         children:
           actor_button:
             from: .button
-            text: "#0#"
             foreground: "#icon#"
             preferred_size: [5, 5]
       tile_picker:
@@ -88,7 +87,6 @@ children:
             children:
               tile_button:
                 from: .button
-                text: "#0#"
                 foreground: "#icon#"
                 preferred_size: [5, 5]
       exit_confirmation_window:

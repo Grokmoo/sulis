@@ -23,7 +23,7 @@ use serde_yaml;
 
 use image::Image;
 use resource::ResourceBuilder;
-use io::GraphicsRenderer;
+use io::{DrawList, GraphicsRenderer};
 use ui::AnimationState;
 use util::{invalid_data_error, Size};
 
@@ -69,15 +69,25 @@ impl TimerImage {
             frame_time_millis: builder.frame_time_millis,
         }))
     }
+
+    fn get_cur_frame(&self, millis: u32) -> &Rc<Image> {
+        let total_frame_time = self.frame_time_millis * self.frames.len() as u32;
+        let offset = millis % total_frame_time;
+        let index = (offset / self.frame_time_millis) as usize;
+
+        &self.frames[index]
+    }
 }
 
 impl Image for TimerImage {
     fn draw_graphics_mode(&self, renderer: &mut GraphicsRenderer, state: &AnimationState,
                           x: f32, y: f32, w: f32, h: f32, millis: u32) {
-        let total_frame_time = self.frame_time_millis * self.frames.len() as u32;
-        let offset = millis % total_frame_time;
-        let index = (offset / self.frame_time_millis) as usize;
-        self.frames[index].draw_graphics_mode(renderer, state, x, y, w, h, millis);
+        self.get_cur_frame(millis).draw_graphics_mode(renderer, state, x, y, w, h, millis);
+    }
+
+    fn append_to_draw_list(&self, draw_list: &mut DrawList, state: &AnimationState,
+                           x: f32, y: f32, w: f32, h: f32, millis: u32) {
+        self.get_cur_frame(millis).append_to_draw_list(draw_list, state, x, y, w, h, millis);
     }
 
     fn get_width_f32(&self) -> f32 {

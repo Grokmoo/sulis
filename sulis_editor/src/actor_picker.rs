@@ -56,7 +56,7 @@ impl WidgetKind for ActorPicker {
 
         let mut widgets: Vec<Rc<RefCell<Widget>>> = Vec::new();
         for actor in all_actors {
-            let button = Widget::with_theme(Button::with_text(&actor.name), "actor_button");
+            let button = Widget::with_theme(Button::empty(), "actor_button");
             button.borrow_mut().state.add_text_arg("icon", &actor.image_display.full_id());
             button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
                 let parent = Widget::get_parent(widget);

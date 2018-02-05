@@ -108,7 +108,7 @@ impl WidgetKind for TilePicker {
         for tile in all_tiles {
             if &tile.layer != cur_layer { continue; }
 
-            let button = Widget::with_theme(Button::with_text(&tile.name), "tile_button");
+            let button = Widget::with_theme(Button::empty(), "tile_button");
             button.borrow_mut().state.add_text_arg("icon", &tile.image_display.full_id());
 
             let cb: Callback = Callback::new(Rc::new(move |widget, _kind| {

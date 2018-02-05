@@ -18,7 +18,7 @@ use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use io::{event, Event, GraphicsRenderer};
+use io::{DrawList, event, Event, GraphicsRenderer};
 use ui::{Cursor, EmptyWidget, Theme, WidgetState, WidgetKind};
 use resource::ResourceSet;
 use util::{invalid_data_error, Point};
@@ -56,18 +56,24 @@ impl Widget {
             image.draw_graphics_mode(renderer, &self.state.animation_state, x, y, w, h, millis);
         }
 
-        if let Some(ref image) = self.state.foreground {
-            let x = self.state.inner_position.x as f32;
-            let y = self.state.inner_position.y as f32;
-            let w = self.state.inner_size.width as f32;
-            let h = self.state.inner_size.height as f32;
-            image.draw_graphics_mode(renderer, &self.state.animation_state, x, y, w, h, millis);
-        }
-
         self.kind.borrow_mut().draw_graphics_mode(renderer, pixel_size, &self, millis);
 
+        let mut fg_draw_list = DrawList::empty_sprite();
         for child in self.children.iter() {
             child.borrow().draw_graphics_mode(renderer, pixel_size, millis);
+
+            let child = child.borrow();
+            if let Some(ref image) = child.state.foreground {
+                let x = child.state.inner_position.x as f32;
+                let y = child.state.inner_position.y as f32;
+                let w = child.state.inner_size.width as f32;
+                let h = child.state.inner_size.height as f32;
+                image.append_to_draw_list(&mut fg_draw_list, &child.state.animation_state, x, y, w, h, millis);
+            }
+        }
+
+        if !fg_draw_list.is_empty() {
+            renderer.draw(fg_draw_list);
         }
     }
 

@@ -40,6 +40,9 @@ pub struct AreaView {
     cursors: Option<DrawList>,
     cache_invalid: bool,
     layers: Vec<String>,
+
+    scroll_x_f32: f32,
+    scroll_y_f32: f32,
 }
 
 const SCALE_X_BASE: f32 = 1600.0;
@@ -58,6 +61,8 @@ impl AreaView {
             cursors: None,
             cache_invalid: true,
             layers: Vec::new(),
+            scroll_x_f32: 0.0,
+            scroll_y_f32: 0.0,
         }))
     }
 
@@ -171,6 +176,16 @@ impl AreaView {
                                       (TILE_CACHE_TEXTURE_SIZE / TILE_SIZE) as f32);
         draw_list.set_scale(scale_x, scale_y);
         renderer.draw(draw_list);
+    }
+
+    fn recompute_max_scroll(&mut self, widget: &Rc<RefCell<Widget>>) {
+        let area_state = GameState::area_state();
+        let width = area_state.borrow().area.width;
+        let height = area_state.borrow().area.height;
+        let (scale_x, scale_y) = self.scale;
+        // TODO fix this
+        widget.borrow_mut().state.set_max_scroll_pos((width as f32 * scale_x).ceil() as i32
+                                                     , (height as f32 * scale_y).ceil() as i32);
     }
 }
 
@@ -304,12 +319,7 @@ impl WidgetKind for AreaView {
     }
 
     fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
-        let area_state = GameState::area_state();
-        let width = area_state.borrow().area.width;
-        let height = area_state.borrow().area.height;
-        let (scale_x, scale_y) = self.scale;
-        widget.borrow_mut().state.set_max_scroll_pos((width as f32 * scale_x).ceil() as i32
-                                                     , (height as f32 * scale_y).ceil() as i32);
+        self.recompute_max_scroll(widget);
 
         use sulis_core::io::InputAction::*;
         match key {
@@ -338,6 +348,31 @@ impl WidgetKind for AreaView {
 
         } else if kind == ClickKind::Right {
             Widget::add_child_to(widget, Widget::with_defaults(action_menu));
+        }
+
+        true
+    }
+
+    fn on_mouse_drag(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind,
+                     delta_x: f32, delta_y: f32) -> bool {
+        self.recompute_max_scroll(widget);
+
+        match kind {
+            ClickKind::Middle => {
+                let max_x = widget.borrow().state.max_scroll_pos.x as f32;
+                let max_y = widget.borrow().state.max_scroll_pos.y as f32;
+
+                self.scroll_x_f32 -= delta_x;
+                self.scroll_y_f32 -= delta_y;
+                if self.scroll_x_f32 < 0.0 { self.scroll_x_f32 = 0.0; }
+                if self.scroll_y_f32 < 0.0 { self.scroll_y_f32 = 0.0; }
+                if self.scroll_x_f32 > max_x { self.scroll_x_f32 = max_x; }
+                if self.scroll_y_f32 > max_y { self.scroll_y_f32 = max_y; }
+
+                widget.borrow_mut().state.set_scroll(self.scroll_x_f32 as i32,
+                                                     self.scroll_y_f32 as i32);
+           },
+            _ => (),
         }
 
         true

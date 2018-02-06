@@ -100,8 +100,7 @@ impl PathFinder {
         unsafe {
             // memset g_score and f_score to a large floating point number
             // benchmarking revealed that setting these values using the naive
-            // approach below is the majority of time spent for most
-            // path finds
+            // approach is the majority of time spent for most path finds
             ptr::write_bytes(self.g_score.as_mut_ptr(), 127, self.g_score.len() - 1);
             ptr::write_bytes(self.f_score.as_mut_ptr(), 127, self.f_score.len() - 1);
         }

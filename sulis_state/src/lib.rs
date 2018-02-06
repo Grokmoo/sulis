@@ -47,6 +47,9 @@ pub use self::inventory::Inventory;
 mod location;
 pub use self::location::Location;
 
+mod los_calculator;
+pub use self::los_calculator::calculate_los;
+
 mod path_finder;
 use self::path_finder::PathFinder;
 

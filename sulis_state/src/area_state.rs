@@ -14,17 +14,14 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use sulis_core::util;
 use sulis_module::{Actor, Area, Module};
 use sulis_module::area::Transition;
-use {ChangeListenerList, EntityState, Location, TurnTimer};
+use {calculate_los, ChangeListenerList, EntityState, Location, TurnTimer};
 
-use std::cmp;
-use std::time;
 use std::rc::Rc;
 use std::cell::{Ref, RefCell};
 
-pub const VIS_TILES: i32 = 18;
+pub const VIS_TILES: i32 = 20;
 
 pub struct AreaState {
     pub area: Rc<Area>,
@@ -132,41 +129,8 @@ impl AreaState {
     }
 
     fn compute_pc_visibility(&mut self, entity: &EntityState) {
-        let start_time = time::Instant::now();
-        let entity_x = entity.location.x + entity.size.size / 2;
-        let entity_y = entity.location.y + entity.size.size / 2;
-
-        let min_x = cmp::max(0, entity_x - VIS_TILES - 2);
-        let max_x = cmp::min(self.area.width, entity_x + VIS_TILES + 2);
-        let min_y = cmp::max(0, entity_y - VIS_TILES - 2);
-        let max_y = cmp::min(self.area.height, entity_y + VIS_TILES + 2);
-
-        let e_x = entity_x as f32;
-        let e_y = entity_y as f32;
-
-        for y in min_y..max_y {
-            for x in min_x..max_x {
-                let index = (x + y * self.area.width) as usize;
-                // if !self.area.terrain.is_visible_index(index) {
-                //     self.pc_vis[index] = false;
-                //     continue;
-                // }
-
-                let xf = x as f32;
-                let yf = y as f32;
-                let dist_squared = (xf - e_x) * (xf - e_x) + (yf - e_y) * (yf - e_y);
-
-                if dist_squared < (VIS_TILES * VIS_TILES) as f32 {
-                    self.pc_vis[index] = true;
-                } else {
-                    self.pc_vis[index] = false;
-                }
-            }
-        }
-
+        calculate_los(&mut self.pc_vis, &self.area, entity);
         self.pc_vis_cache_invalid = true;
-
-        trace!("Visibility compute time: {}", util::format_elapsed_secs(start_time.elapsed()));
     }
 
     /// whether the pc has current visibility to the specified coordinations

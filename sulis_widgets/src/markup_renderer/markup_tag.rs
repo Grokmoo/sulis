@@ -99,7 +99,7 @@ impl Markup {
         markup
     }
 
-    pub fn add_quad_and_advance(&self, quads: &mut Vec<[Vertex; 4]>, c: char, x: f32, y: f32) -> f32 {
+    pub fn add_quad_and_advance(&self, quads: &mut Vec<Vertex>, c: char, x: f32, y: f32) -> f32 {
         self.font.get_quad(quads, c, x, y - self.y_offset(), self.scale)
     }
 

@@ -124,15 +124,7 @@ fn draw_to_surface<T: glium::Surface>(surface: &mut T, draw_list: DrawList,
         ],
     };
 
-    // TODO do this in a more efficient manner
-    let mut quads: Vec<Vertex> = Vec::new();
-    for quad in draw_list.quads {
-        quads.extend_from_slice(&quad);
-        quads.push(quad[1]);
-        quads.push(quad[2]);
-    }
-
-    let vertex_buffer = glium::VertexBuffer::new(&display.display, &quads).unwrap();
+    let vertex_buffer = glium::VertexBuffer::new(&display.display, &draw_list.quads).unwrap();
     let indices = glium::index::NoIndices(glium::index::PrimitiveType::TrianglesList);
     surface.draw(&vertex_buffer, &indices, &display.program, &uniforms, params).unwrap();
     // for quad in draw_list.quads {

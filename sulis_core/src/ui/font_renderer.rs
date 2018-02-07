@@ -41,7 +41,7 @@ impl LineRenderer {
 impl FontRenderer for LineRenderer {
     fn render(&self, renderer: &mut GraphicsRenderer, text: &str, pos_x: f32, pos_y: f32,
               defaults: &TextParams) {
-        let mut quads: Vec<[Vertex; 4]> = Vec::new();
+        let mut quads: Vec<Vertex> = Vec::new();
         let mut x = pos_x;
         for c in text.chars() {
             x = self.font.get_quad(&mut quads, c, x, pos_y, defaults.scale);

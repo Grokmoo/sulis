@@ -84,7 +84,7 @@ pub enum DrawListKind {
 
 #[derive(Debug, Clone)]
 pub struct DrawList {
-    pub quads: Vec<[Vertex; 4]>,
+    pub quads: Vec<Vertex>,
     pub texture: String,
     pub texture_mag_filter: TextureMagFilter,
     pub texture_min_filter: TextureMinFilter,
@@ -121,7 +121,7 @@ impl DrawList {
         Default::default()
     }
 
-    pub fn from_font(texture: &str, quads: Vec<[Vertex; 4]>) -> DrawList {
+    pub fn from_font(texture: &str, quads: Vec<Vertex>) -> DrawList {
         DrawList {
             texture: texture.to_string(),
             quads,
@@ -138,12 +138,14 @@ impl DrawList {
         let y_min = y_max - h;
         let tc = tex_coords;
 
-        let quads = vec![[
+        let quads = vec![
             Vertex { position: [ x_min, y_max ], tex_coords: [tc[0], tc[1]] },
             Vertex { position: [ x_min, y_min ], tex_coords: [tc[2], tc[3]] },
             Vertex { position: [ x_max, y_max ], tex_coords: [tc[4], tc[5]] },
             Vertex { position: [ x_max, y_min ], tex_coords: [tc[6], tc[7]] },
-        ]];
+            Vertex { position: [ x_min, y_min ], tex_coords: [tc[2], tc[3]] },
+            Vertex { position: [ x_max, y_max ], tex_coords: [tc[4], tc[5]] },
+        ];
 
         DrawList {
             texture: id.to_string(),

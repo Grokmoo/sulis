@@ -134,7 +134,7 @@ impl FontRenderer for MarkupRenderer {
 
         let mut markup_stack: Vec<Markup> = Vec::new();
         let mut cur_markup = Markup::from_text_params(defaults, &self.font);
-        let mut quads: Vec<[Vertex; 4]> = Vec::new();
+        let mut quads: Vec<Vertex> = Vec::new();
         let mut markup_buf = String::new();
 
         let mut x = pos_x;
@@ -211,7 +211,7 @@ impl FontRenderer for MarkupRenderer {
     }
 }
 
-fn draw_current(renderer: &mut GraphicsRenderer, quads: Vec<[Vertex; 4]>, markup: &Markup) {
+fn draw_current(renderer: &mut GraphicsRenderer, quads: Vec<Vertex>, markup: &Markup) {
         let mut draw_list = DrawList::from_font(&markup.font.id, quads);
         draw_list.set_color(markup.color);
         renderer.draw(draw_list);

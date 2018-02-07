@@ -39,7 +39,7 @@ pub struct Config {
 #[serde(deny_unknown_fields)]
 pub struct EditorConfig {
     pub module: String,
-    pub transition_sprite: String,
+    pub transition_image: String,
     pub transition_size: Size,
     pub area: EditorAreaConfig,
 }

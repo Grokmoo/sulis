@@ -188,8 +188,6 @@ impl PathFinder {
             path.push(self.get_point(current));
         }
 
-        // remove the last point which is the entity start pos
-        path.pop();
         path.reverse();
         debug!("Found path: {:?}", path);
         // info!("Reconstruct path time: {}", animation::format_elapsed_secs(path_reconstruct_time.elapsed()));

@@ -31,6 +31,7 @@ use std::collections::HashMap;
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 
+use sulis_core::image::Image;
 use sulis_core::resource::{ResourceBuilder, ResourceSet, Sprite};
 use sulis_core::util::{Point, Size};
 use sulis_core::serde_json;
@@ -44,7 +45,7 @@ pub struct Transition {
     pub size: Size,
     pub to: Point,
     pub to_area: Option<String>,
-    pub image_display: Rc<Sprite>,
+    pub image_display: Rc<Image>,
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -96,7 +97,13 @@ impl Area {
 
         let mut transitions: Vec<Transition> = Vec::new();
         for (index, t_builder) in builder.transitions.into_iter().enumerate() {
-            let sprite = ResourceSet::get_sprite(&t_builder.image_display)?;
+            let image = match ResourceSet::get_image(&t_builder.image_display) {
+                None => {
+                    warn!("Image '{}' not found for transition.", t_builder.image_display);
+                    continue;
+                },
+                Some(image) => image,
+            };
 
             let mut p = t_builder.from;
             if !p.in_bounds(builder.width as i32, builder.height as i32) {
@@ -114,7 +121,7 @@ impl Area {
                 to: t_builder.to,
                 size: t_builder.size,
                 to_area: t_builder.to_area,
-                image_display: sprite,
+                image_display: image,
             };
             transitions.push(transition);
         }

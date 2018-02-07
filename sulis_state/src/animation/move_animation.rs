@@ -14,12 +14,13 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::cmp;
 use std::cell::RefCell;
 use std::rc::Rc;
 use std::time::Instant;
 
 use {animation, AreaState, EntityState};
-use sulis_core::util::Point;
+use sulis_core::util::{self, Point};
 
 pub struct MoveAnimation {
    mover: Rc<RefCell<EntityState>>,
@@ -40,7 +41,7 @@ impl MoveAnimation {
             start_time: Instant::now(),
             frame_time_millis,
             marked_for_removal: false,
-            last_frame_index: -1,
+            last_frame_index: 0, // start at index 0 which is the initial pos
         }
     }
 
@@ -48,10 +49,21 @@ impl MoveAnimation {
 
 impl animation::Animation for MoveAnimation {
     fn update(&mut self, area_state: &mut AreaState) -> bool {
-        if self.marked_for_removal || self.path.is_empty() { return false; }
+        if self.marked_for_removal || self.path.is_empty() {
+            self.mover.borrow_mut().sub_pos = (0.0, 0.0);
+            return false;
+        }
 
-        let frame_index = animation::get_current_frame(self.start_time.elapsed(),
-            self.frame_time_millis, self.path.len() - 1);
+        let millis = util::get_elapsed_millis(self.start_time.elapsed());
+        let frame_index = cmp::min((millis / self.frame_time_millis) as usize, self.path.len() - 1);
+        let frame_frac = (millis % self.frame_time_millis) as f32 / self.frame_time_millis as f32;
+
+        if frame_index != self.path.len() - 1 {
+            let frame_delta_x = self.path[frame_index + 1].x - self.path[frame_index].x;
+            let frame_delta_y = self.path[frame_index + 1].y - self.path[frame_index].y;
+            self.mover.borrow_mut().sub_pos = (frame_delta_x as f32 * frame_frac,
+                                               frame_delta_y as f32 * frame_frac);
+        }
 
         if frame_index as i32 == self.last_frame_index {
             return true;
@@ -65,7 +77,13 @@ impl animation::Animation for MoveAnimation {
         }
 
         trace!("Updated move animation at frame {}", frame_index);
-        return frame_index != self.path.len() - 1
+        if frame_index == self.path.len() - 1 {
+            self.mover.borrow_mut().sub_pos = (0.0, 0.0);
+            return false;
+        }
+
+
+        true
     }
 
     fn check(&mut self, entity: &Rc<RefCell<EntityState>>) {

@@ -111,11 +111,11 @@ impl AreaEditor {
     }
 
     pub fn new_transition(&mut self) -> Option<usize> {
-        let sprite = match ResourceSet::get_sprite(&CONFIG.editor.transition_sprite) {
-            Err(_) => {
-                warn!("No image with ID {} found.", CONFIG.editor.transition_sprite);
+        let sprite = match ResourceSet::get_image(&CONFIG.editor.transition_image) {
+            None => {
+                warn!("No image with ID {} found.", CONFIG.editor.transition_image);
                 return None;
-            }, Ok(sprite) => sprite,
+            }, Some(image) => image,
         };
 
         self.transitions.push(Transition {
@@ -215,11 +215,11 @@ impl AreaEditor {
         trace!("Loading area transitions.");
         self.transitions.clear();
         for transition_builder in area_builder.transitions {
-            let sprite = match ResourceSet::get_sprite(&transition_builder.image_display) {
-                Err(_) => {
+            let image = match ResourceSet::get_image(&transition_builder.image_display) {
+                None => {
                     warn!("No image with ID {} found.", transition_builder.image_display);
                     continue;
-                }, Ok(sprite) => sprite,
+                }, Some(image) => image,
             };
 
             self.transitions.push(Transition {
@@ -227,7 +227,7 @@ impl AreaEditor {
                 to: transition_builder.to,
                 size: transition_builder.size,
                 to_area: transition_builder.to_area,
-                image_display: sprite,
+                image_display: image,
             });
         }
     }
@@ -269,7 +269,7 @@ impl AreaEditor {
                 size: transition.size,
                 to: transition.to,
                 to_area: transition.to_area.clone(),
-                image_display: transition.image_display.full_id(),
+                image_display: CONFIG.editor.transition_image.clone(),
             });
         }
 
@@ -445,7 +445,7 @@ impl WidgetKind for AreaEditor {
     }
 
     fn draw_graphics_mode(&mut self, renderer: &mut GraphicsRenderer, _pixel_size: Point,
-                          widget: &Widget, _millis: u32) {
+                          widget: &Widget, millis: u32) {
         let p = widget.state.inner_position;
         let s = widget.state.scroll_pos;
 
@@ -475,18 +475,14 @@ impl WidgetKind for AreaEditor {
             renderer.draw(draw_list);
         }
 
-        let mut draw_list = DrawList::empty_sprite();
         for ref transition in self.transitions.iter() {
-            let sprite = &transition.image_display;
+            let image = &transition.image_display;
             let x = transition.from.x + p.x - s.x;
             let y = transition.from.y + p.y - s.y;
             let w = transition.size.width;
             let h = transition.size.height;
-            draw_list.append(&mut DrawList::from_sprite(sprite, x, y, w, h));
-        }
-
-        if !draw_list.is_empty() {
-            renderer.draw(draw_list);
+            image.draw_graphics_mode(renderer, &widget.state.animation_state,
+                                     x as f32, y as f32, w as f32, h as f32, millis);
         }
 
         if !self.removal_tiles.is_empty() {

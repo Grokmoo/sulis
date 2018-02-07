@@ -37,6 +37,10 @@ fn get_component(text: &str, max: f32) -> f32 {
 }
 
 impl Color {
+    pub fn new(r: f32, g: f32, b: f32, a: f32) -> Color {
+        Color {r, g, b, a}
+    }
+
     pub fn from_string(text: &str) -> Color {
         if text.len() == 3 || text.len() == 4 {
             let r = get_component(&text[0..1], 16.0);

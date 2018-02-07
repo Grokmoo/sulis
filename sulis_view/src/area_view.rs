@@ -20,7 +20,7 @@ use std::cell::{RefCell, RefMut};
 use std::cmp;
 use std::time;
 
-use sulis_core::ui::{color, Cursor, WidgetKind, Widget};
+use sulis_core::ui::{color, Color, Cursor, WidgetKind, Widget};
 use sulis_core::io::*;
 use sulis_core::io::event::ClickKind;
 use sulis_core::util::{self, Point};
@@ -187,6 +187,22 @@ impl AreaView {
         widget.borrow_mut().state.set_max_scroll_pos((width as f32 * scale_x).ceil() as i32
                                                      , (height as f32 * scale_y).ceil() as i32);
     }
+
+    fn draw_entities(&self, widget: &Widget, state: &AreaState, draw_list: &mut DrawList) {
+        let p = widget.state.inner_position;
+        let s = widget.state.scroll_pos;
+        for entity in state.entity_iter() {
+            let entity = entity.borrow();
+
+            if entity.location_points().any(|p| state.is_pc_visible(p.x, p.y)) {
+                let size = entity.size() as f32;
+                let x = (entity.location.x + p.x - s.x) as f32 + entity.sub_pos.0;
+                let y = (entity.location.y + p.y - s.y) as f32 + entity.sub_pos.1;
+                draw_list.append(&mut DrawList::from_sprite_f32(
+                        &entity.actor.actor.image_display, x, y, size, size));
+            }
+        }
+    }
 }
 
 impl WidgetKind for AreaView {
@@ -224,7 +240,7 @@ impl WidgetKind for AreaView {
     }
 
     fn draw_graphics_mode(&mut self, renderer: &mut GraphicsRenderer, pixel_size: Point,
-                          widget: &Widget, _millis: u32) {
+                          widget: &Widget, millis: u32) {
         let scale_x = SCALE_X_BASE / (pixel_size.x as f32);
         let scale_y = SCALE_Y_BASE / (pixel_size.y as f32);
         self.scale = (scale_x, scale_y);
@@ -266,6 +282,7 @@ impl WidgetKind for AreaView {
         }
 
         let p = widget.state.inner_position;
+        let s = widget.state.scroll_pos;
         let num_layers = self.layers.len();
         let mut layer_index = 0;
 
@@ -275,29 +292,19 @@ impl WidgetKind for AreaView {
             layer_index += 1;
         }
 
-        let mut draw_list = DrawList::empty_sprite();
-        draw_list.set_scale(scale_x, scale_y);
-        draw_list.texture_mag_filter = TextureMagFilter::Nearest;
 
         for transition in state.area.transitions.iter() {
-            draw_list.append(&mut DrawList::from_sprite(
-                    &transition.image_display,
-                    transition.from.x + p.x - widget.state.scroll_pos.x,
-                    transition.from.y + p.y - widget.state.scroll_pos.y,
-                    transition.size.width, transition.size.height));
+            transition.image_display.draw_graphics_mode(renderer, &widget.state.animation_state,
+                                                        (transition.from.x + p.x - s.x) as f32,
+                                                        (transition.from.y + p.y - s.y) as f32,
+                                                        transition.size.width as f32,
+                                                        transition.size.height as f32,
+                                                        millis);
         }
 
-        for entity in state.entity_iter() {
-            let entity = entity.borrow();
-
-            if entity.location_points().any(|p| state.is_pc_visible(p.x, p.y)) {
-                let size = entity.size() as f32;
-                let x = (entity.location.x + p.x - widget.state.scroll_pos.x) as f32 + entity.sub_pos.0;
-                let y = (entity.location.y + p.y - widget.state.scroll_pos.y) as f32 + entity.sub_pos.1;
-                draw_list.append(&mut DrawList::from_sprite_f32(
-                        &entity.actor.actor.image_display, x, y, size, size));
-            }
-        }
+        let mut draw_list = DrawList::empty_sprite();
+        draw_list.set_scale(scale_x, scale_y);
+        self.draw_entities(widget, &state, &mut draw_list);
 
         renderer.draw(draw_list);
 
@@ -308,6 +315,13 @@ impl WidgetKind for AreaView {
         }
 
         self.draw_layer(renderer, scale_x, scale_y, widget, VISIBILITY_TEX_ID);
+
+        // draw transparent version of each actor for when they are obscured behind objects
+        let mut draw_list = DrawList::empty_sprite();
+        draw_list.set_color(Color::new(1.0, 1.0, 1.0, 0.4));
+        draw_list.set_scale(scale_x, scale_y);
+        self.draw_entities(widget, &state, &mut draw_list);
+        renderer.draw(draw_list);
 
         if let Some(ref cursor) = self.cursors {
             let mut draw_list = cursor.clone();
@@ -398,8 +412,8 @@ impl WidgetKind for AreaView {
             let pc = GameState::pc();
             if *pc.borrow() != *entity.borrow() {
                 let sprite = &entity.borrow().size.cursor_sprite;
-                let x = entity.borrow().location.x;
-                let y = entity.borrow().location.y;
+                let x = entity.borrow().location.x - widget.borrow().state.scroll_pos.x;
+                let y = entity.borrow().location.y - widget.borrow().state.scroll_pos.y;
                 let size = entity.borrow().size();
 
                 let mut cursor = DrawList::from_sprite(sprite, x, y, size, size);

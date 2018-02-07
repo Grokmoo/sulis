@@ -53,7 +53,7 @@ logging:
 
 editor:
   module: "test1"
-  transition_sprite: creatures/transition
+  transition_image: transition
   transition_size: [2, 2]
   area:
     filename: "editor_test"

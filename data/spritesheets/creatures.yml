@@ -4,10 +4,15 @@ size: [ 256, 256 ]
 simple_image_gen_scale: 16
 grid_multiplier: 16
 groups:
-  1by1:
-    size: [1, 1]
+  2by2:
+    size: [2, 2]
     areas:
-      transition: [3, 0]
+      transition0: [3, 0]
+      transition1: [5, 0]
+      transition2: [7, 0]
+      transition3: [9, 0]
+      transition4: [11, 0]
+      transition5: [13, 0]
   3by3:
     size: [3, 3]
     areas:

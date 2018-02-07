@@ -89,10 +89,14 @@ fn cast_high(area: &Rc<Area>, start_x: i32, start_y: i32, end_x: i32, end_y: i32
         1
     };
 
+    // don't check the first point
+    let mut first = true;
     let mut d = 2 * delta_x - delta_y;
     let mut x = start_x;
     for y in start_y..end_y {
-        if !check(area, x, y) {
+        if first {
+            first = false;
+        } else if !check(area, x, y) {
             return false;
         }
 
@@ -117,10 +121,14 @@ fn cast_low(area: &Rc<Area>, start_x: i32, start_y: i32, end_x: i32, end_y: i32)
         1
     };
 
+    // don't check the first point
+    let mut first = true;
     let mut d = 2 * delta_y - delta_x;
     let mut y = start_y;
     for x in start_x..end_x {
-        if !check(area, x, y) {
+        if first {
+            first = false;
+        } else if !check(area, x, y) {
             return false;
         }
 

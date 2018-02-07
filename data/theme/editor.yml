@@ -56,7 +56,7 @@ children:
         children:
           actor_button:
             from: .button
-            foreground: "#icon#"
+            text: "#name#"
             preferred_size: [5, 5]
       tile_picker:
         background: bg_base

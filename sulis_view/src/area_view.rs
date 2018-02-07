@@ -188,18 +188,17 @@ impl AreaView {
                                                      , (height as f32 * scale_y).ceil() as i32);
     }
 
-    fn draw_entities(&self, widget: &Widget, state: &AreaState, draw_list: &mut DrawList) {
+    fn draw_entities(&self, widget: &Widget, state: &AreaState,
+                     draw_list: &mut DrawList, millis: u32) {
         let p = widget.state.inner_position;
         let s = widget.state.scroll_pos;
         for entity in state.entity_iter() {
             let entity = entity.borrow();
 
             if entity.location_points().any(|p| state.is_pc_visible(p.x, p.y)) {
-                let size = entity.size() as f32;
                 let x = (entity.location.x + p.x - s.x) as f32 + entity.sub_pos.0;
                 let y = (entity.location.y + p.y - s.y) as f32 + entity.sub_pos.1;
-                draw_list.append(&mut DrawList::from_sprite_f32(
-                        &entity.actor.actor.image_display, x, y, size, size));
+                entity.actor.actor.append_to_draw_list(draw_list, x, y, millis);
             }
         }
     }
@@ -304,7 +303,7 @@ impl WidgetKind for AreaView {
 
         let mut draw_list = DrawList::empty_sprite();
         draw_list.set_scale(scale_x, scale_y);
-        self.draw_entities(widget, &state, &mut draw_list);
+        self.draw_entities(widget, &state, &mut draw_list, millis);
 
         renderer.draw(draw_list);
 
@@ -320,7 +319,7 @@ impl WidgetKind for AreaView {
         let mut draw_list = DrawList::empty_sprite();
         draw_list.set_color(Color::new(1.0, 1.0, 1.0, 0.4));
         draw_list.set_scale(scale_x, scale_y);
-        self.draw_entities(widget, &state, &mut draw_list);
+        self.draw_entities(widget, &state, &mut draw_list, millis);
         renderer.draw(draw_list);
 
         if let Some(ref cursor) = self.cursors {

@@ -464,11 +464,7 @@ impl WidgetKind for AreaEditor {
 
         let mut draw_list = DrawList::empty_sprite();
         for &(pos, ref actor) in self.actors.iter() {
-            let sprite = &actor.image_display;
-            let x = pos.x + p.x - s.x;
-            let y = pos.y + p.y - s.y;
-            let s = actor.race.size.size;
-            draw_list.append(&mut DrawList::from_sprite(sprite, x, y, s, s));
+            actor.append_to_draw_list_i32(&mut draw_list, pos.x + p.x - s.x, pos.y + p.y - s.y, millis);
         }
 
         if !draw_list.is_empty() {
@@ -501,11 +497,7 @@ impl WidgetKind for AreaEditor {
         if !self.removal_actors.is_empty() {
             let mut draw_list = DrawList::empty_sprite();
             for &(pos, ref actor) in self.removal_actors.iter() {
-                let sprite = &actor.image_display;
-                let x = pos.x + p.x - s.x;
-                let y = pos.y + p.y - s.y;
-                let s = actor.race.size.size;
-                draw_list.append(&mut DrawList::from_sprite(sprite, x, y, s, s));
+                actor.append_to_draw_list_i32(&mut draw_list, pos.x + p.x - s.x, pos.y + p.y - s.y, millis);
             }
 
             draw_list.set_color(Color::from_string("FF000088"));
@@ -523,11 +515,9 @@ impl WidgetKind for AreaEditor {
         }
 
         if let Some((cur_actor_pos, ref cur_actor)) = self.cur_actor {
-            let sprite = &cur_actor.image_display;
-            let x = cur_actor_pos.x + p.x - s.x;
-            let y = cur_actor_pos.y + p.y - s.y;
-            let s = cur_actor.race.size.size;
-            let mut draw_list = DrawList::from_sprite(sprite, x, y, s, s);
+            let mut draw_list = DrawList::empty_sprite();
+            cur_actor.append_to_draw_list_i32(&mut draw_list, cur_actor_pos.x + p.x - s.x,
+                                          cur_actor_pos.y + p.y - s.y, millis);
             draw_list.set_color(Color::from_string("FFFFFF88"));
             renderer.draw(draw_list);
         }

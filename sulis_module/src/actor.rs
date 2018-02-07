@@ -19,7 +19,10 @@ use std::rc::Rc;
 use std::fmt;
 use std::collections::HashMap;
 
-use sulis_core::resource::{ResourceBuilder, ResourceSet, Sprite};
+use sulis_core::image::Image;
+use sulis_core::io::DrawList;
+use sulis_core::resource::{ResourceBuilder, ResourceSet};
+use sulis_core::ui::animation_state;
 use sulis_core::util::invalid_data_error;
 use sulis_core::{serde_json, serde_yaml};
 
@@ -44,7 +47,7 @@ pub struct Actor {
     pub player: bool,
     pub race: Rc<Race>,
     pub sex: Sex,
-    pub image_display: Rc<Sprite>,
+    image_display: Rc<Image>,
     pub items: Vec<Rc<Item>>,
     pub to_equip: Vec<usize>,
     pub levels: Vec<(Rc<Class>, u32)>,
@@ -115,19 +118,34 @@ impl Actor {
             }
         }
 
-        let sprite = ResourceSet::get_sprite(&builder.image_display)?;
+        let image = match ResourceSet::get_image(&builder.image_display) {
+            None => {
+                warn!("Image {} not found.", builder.image_display);
+                return invalid_data_error(&format!("Unable to create actor '{}'", builder.id));
+            }, Some(image) => image,
+        };
 
         Ok(Actor {
             id: builder.id,
             name: builder.name,
             player: builder.player.unwrap_or(false),
-            image_display: sprite,
+            image_display: image,
             race,
             sex,
             levels,
             items,
             to_equip,
         })
+    }
+
+    pub fn append_to_draw_list_i32(&self, draw_list: &mut DrawList, x: i32, y: i32, millis: u32) {
+        self.append_to_draw_list(draw_list, x as f32, y as f32, millis);
+    }
+
+    pub fn append_to_draw_list(&self, draw_list: &mut DrawList, x: f32, y: f32, millis: u32) {
+        let size = self.race.size.size as f32;
+        self.image_display.append_to_draw_list(draw_list, &animation_state::NORMAL,
+                                               x, y, size, size, millis);
     }
 }
 

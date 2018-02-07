@@ -64,7 +64,7 @@ impl Kind {
 }
 
 lazy_static! {
-    static ref NORMAL: AnimationState = AnimationState::default();
+    pub static ref NORMAL: AnimationState = AnimationState::default();
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]

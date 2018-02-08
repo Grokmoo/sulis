@@ -33,7 +33,7 @@ pub struct Race {
     pub size: Rc<EntitySize>,
 
     default_images: ImageLayerSet,
-    image_layer_offsets: HashMap<ImageLayer, Point>,
+    image_layer_offsets: HashMap<ImageLayer, (f32, f32)>,
 }
 
 impl PartialEq for Race {
@@ -51,6 +51,12 @@ impl Race {
             }, Some(size) => Rc::clone(size)
         };
 
+        let mut offsets = HashMap::new();
+        let scale = builder.image_layer_offset_scale as f32;
+        for (layer, p) in builder.image_layer_offsets {
+            offsets.insert(layer, (p.x as f32 / scale, p.y as f32 / scale));
+        }
+
         let default_images = ImageLayerSet::new(builder.default_images)?;
 
         Ok(Race {
@@ -58,12 +64,12 @@ impl Race {
             name: builder.name,
             size,
             default_images,
-            image_layer_offsets: builder.image_layer_offsets,
+            image_layer_offsets: offsets,
         })
     }
 
-    pub fn get_image_layer_offset(&self, layer: ImageLayer) -> Point {
-        *self.image_layer_offsets.get(&layer).unwrap_or(&Point::new(0, 0))
+    pub fn get_image_layer_offset(&self, layer: ImageLayer) -> (f32, f32) {
+        *self.image_layer_offsets.get(&layer).unwrap_or(&(0.0, 0.0))
     }
 
     pub fn default_images(&self) -> &ImageLayerSet {
@@ -79,6 +85,7 @@ pub struct RaceBuilder {
     pub size: usize,
     pub default_images: HashMap<Sex, HashMap<ImageLayer, String>>,
     image_layer_offsets: HashMap<ImageLayer, Point>,
+    image_layer_offset_scale: i32,
 }
 
 impl ResourceBuilder for RaceBuilder {

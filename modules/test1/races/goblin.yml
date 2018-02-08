@@ -6,5 +6,6 @@ default_images:
     Background: creatures/goblin0
   Female:
     Background: creatures/goblin1
+image_layer_offset_scale: 16
 image_layer_offsets:
-  HeldMain: [1, 1]
+  HeldMain: [-10, -7]

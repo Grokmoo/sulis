@@ -14,9 +14,8 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use sulis_core::image::{Image, LayeredImage};
+use sulis_core::image::{LayeredImage};
 use sulis_core::io::DrawList;
-use sulis_core::ui::animation_state;
 use sulis_module::{item, Actor, Module};
 use {ChangeListenerList, EntityState, Inventory};
 use sulis_rules::{AttributeList, Damage, StatList};
@@ -64,9 +63,8 @@ impl ActorState {
     }
 
     pub fn append_to_draw_list(&self, draw_list: &mut DrawList, x: f32, y: f32, millis: u32) {
-        let size = self.actor.race.size.size as f32;
-        self.image.append_to_draw_list(draw_list, &animation_state::NORMAL,
-                                       x, y, size, size, millis);
+        self.image.append_to(draw_list, x, y, millis);
+        self.actor.check_add_swap_hue(draw_list);
     }
 
     pub fn can_reach(&self, dist: f32) -> bool {
@@ -163,7 +161,7 @@ impl ActorState {
 
     pub fn compute_stats(&mut self) {
         let image = LayeredImage::new(self.actor.image_layers()
-                                      .get_list_with(self.actor.sex,
+                                      .get_list_with(self.actor.sex, &self.actor.race,
                                                      self.inventory.get_image_layers()));
         self.image = image;
 

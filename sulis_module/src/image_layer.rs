@@ -23,6 +23,7 @@ use sulis_core::image::Image;
 use sulis_core::resource::ResourceSet;
 use sulis_core::util::invalid_data_error;
 use actor::Sex;
+use Race;
 
 #[derive(Deserialize, Debug, Copy, Clone, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
@@ -88,7 +89,7 @@ impl ImageLayerSet {
 
     /// Gets the list of images from this ImageLayerSet for the given Sex.
     /// The images are ordered based on the iteration order of ImageLayer
-    pub fn get_list(&self, sex: Sex) -> Vec<Rc<Image>> {
+    pub fn get_list(&self, sex: Sex) -> Vec<(f32, f32, Rc<Image>)> {
         let mut list = Vec::new();
 
         match self.images.get(&sex) {
@@ -100,7 +101,7 @@ impl ImageLayerSet {
                         Some(ref image) => Rc::clone(image),
                     };
 
-                    list.push(image);
+                    list.push((0.0, 0.0, image));
                 }
             }
         }
@@ -110,31 +111,34 @@ impl ImageLayerSet {
 
     /// Gets the list of images from this ImageLayerSet for the given Sex,
     /// with the additional images inserted
-    pub fn get_list_with(&self, sex: Sex, insert: HashMap<ImageLayer, Rc<Image>>) -> Vec<Rc<Image>> {
+    pub fn get_list_with(&self, sex: Sex, race: &Rc<Race>,
+                         insert: HashMap<ImageLayer, Rc<Image>>) -> Vec<(f32, f32, Rc<Image>)> {
         let mut list = Vec::new();
 
         match self.images.get(&sex) {
             Some(sex_map) => {
                 for layer in ImageLayer::iter() {
+                    let (x, y) = race.get_image_layer_offset(*layer);
                     match insert.get(&layer) {
                         Some(ref image) => {
-                            list.push(Rc::clone(image));
+                            list.push((x, y, Rc::clone(image)));
                             continue;
                         }, None => (),
                     }
 
                     match sex_map.get(&layer) {
                         Some(ref image) => {
-                            list.push(Rc::clone(image));
+                            list.push((x, y, Rc::clone(image)));
                             continue;
                         }, None => (),
                     }
                 }
             }, None => {
                 for layer in ImageLayer::iter() {
+                    let (x, y) = race.get_image_layer_offset(*layer);
                     match insert.get(&layer) {
                         Some(ref image) => {
-                            list.push(Rc::clone(image));
+                            list.push((x, y, Rc::clone(image)));
                             continue;
                         }, None => (),
                     }

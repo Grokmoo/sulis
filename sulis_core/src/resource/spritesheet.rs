@@ -109,7 +109,7 @@ impl Spritesheet {
 
                 pos.mult_mut(multiplier);
                 size.mult_mut(multiplier);
-                trace!("Creating sprite with id '{}' in '{}'", id, builder.id);
+                trace!("Creating sprite with id '{}' in '{}', {:?}", id, builder.id, size);
                 let sprite = Sprite::new(&builder.id, &id, &image_size, pos, size);
 
                 if sprites.contains_key(&id) {

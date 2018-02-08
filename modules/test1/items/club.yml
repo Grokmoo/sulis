@@ -7,4 +7,6 @@ equippable:
     min: 2
     max: 4
   reach: 1.5
-image: {}
+image:
+  HeldMain:
+    creatures/club

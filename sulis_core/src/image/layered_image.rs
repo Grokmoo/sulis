@@ -18,21 +18,21 @@ use std::rc::Rc;
 
 use image::Image;
 use io::{DrawList, GraphicsRenderer};
-use ui::AnimationState;
+use ui::{AnimationState, animation_state};
 use util::Size;
 
 #[derive(Debug)]
 pub struct LayeredImage {
-    layers: Vec<Rc<Image>>,
+    layers: Vec<(f32, f32, Rc<Image>)>,
     size: Size,
 }
 
 impl LayeredImage {
-    pub fn new(images: Vec<Rc<Image>>) -> LayeredImage {
+    pub fn new(images: Vec<(f32, f32, Rc<Image>)>) -> LayeredImage {
         let mut max_x = 0.0;
         let mut max_y = 0.0;
 
-        for image in images.iter() {
+        for &(_x, _y, ref image) in images.iter() {
             if image.get_width_f32() > max_x {
                 max_x = image.get_width_f32();
             }
@@ -47,13 +47,20 @@ impl LayeredImage {
             size: Size::new(max_x as i32, max_y as i32),
         }
     }
+
+    pub fn append_to(&self, draw_list: &mut DrawList, x: f32, y: f32, millis: u32) {
+        for &(offset_x, offset_y, ref image) in self.layers.iter() {
+            image.append_to_draw_list(draw_list, &animation_state::NORMAL, x + offset_x, y + offset_y,
+                                      image.get_width_f32(), image.get_height_f32(), millis);
+        }
+    }
 }
 
 impl Image for LayeredImage {
     fn append_to_draw_list(&self, draw_list: &mut DrawList, state: &AnimationState,
                            x: f32, y: f32, w: f32, h: f32, millis: u32) {
-        for image in self.layers.iter() {
-            image.append_to_draw_list(draw_list, state, x, y, w, h, millis);
+        for &(offset_x, offset_y, ref image) in self.layers.iter() {
+            image.append_to_draw_list(draw_list, state, x + offset_x, y + offset_y, w, h, millis);
         }
     }
 

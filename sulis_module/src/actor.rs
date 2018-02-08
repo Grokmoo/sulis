@@ -51,6 +51,7 @@ pub struct Actor {
     pub to_equip: Vec<usize>,
     pub levels: Vec<(Rc<Class>, u32)>,
 
+    hue: Option<f32>,
     image_layers: ImageLayerSet,
     image: LayeredImage,
 }
@@ -135,7 +136,15 @@ impl Actor {
             to_equip,
             image_layers,
             image,
+            hue: builder.hue,
         })
+    }
+
+    pub fn check_add_swap_hue(&self, draw_list: &mut DrawList) {
+        match self.hue {
+            Some(hue) => draw_list.set_swap_hue(hue),
+            None => (),
+        }
     }
 
     pub fn image_layers(&self) -> &ImageLayerSet {
@@ -162,6 +171,7 @@ pub struct ActorBuilder {
     sex: Option<Sex>,
     player: Option<bool>,
     images: HashMap<Sex, HashMap<ImageLayer, String>>,
+    hue: Option<f32>,
     items: Option<Vec<String>>,
     equipped: Option<Vec<u32>>,
     levels: HashMap<String, u32>,

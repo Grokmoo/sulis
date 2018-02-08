@@ -91,6 +91,8 @@ pub struct DrawList {
     pub kind: DrawListKind,
     pub color_filter: [f32; 4],
     pub scale: [f32; 2],
+    pub color_swap_enabled: bool,
+    pub swap_hue: f32,
 }
 
 pub const GFX_BORDER_SCALE: f32 = 0.75;
@@ -105,6 +107,8 @@ impl Default for DrawList {
             kind: DrawListKind::Sprite,
             color_filter: [1.0, 1.0, 1.0, 1.0],
             scale: [1.0, 1.0],
+            color_swap_enabled: false,
+            swap_hue: 0.0,
         }
     }
 }
@@ -168,6 +172,13 @@ impl DrawList {
 
     pub fn set_color(&mut self, color: Color) {
         self.color_filter = [color.r, color.g, color.b, color.a];
+    }
+
+    /// enables color swapping for this draw list and sets the hue that the
+    /// swap hue will be swapped to
+    pub fn set_swap_hue(&mut self, hue: f32) {
+        self.color_swap_enabled = true;
+        self.swap_hue = hue;
     }
 
     /// appends the contents of the other drawlist to this one, moving

@@ -25,6 +25,6 @@ You'll need recent versions of Rust and Cargo installed.  The game currently req
 
 This project's source code is licensed under the Gnu Public License version 3 - see the [License](docs/GPLv3-LICENSE) file.  This includes, but is not limited to all .rs, .yml, and .json files.
 
-Most image assets in this project are licensed under the Creative Commons Attribution 3.0 Unported (CC-BY 3.0) and Creative Commons Attribution Unported 4.0 (CC-BY 4.0) Licenses.  To view a copy of these licenses, visit [CC-BY 3.0](http://creativecommons.org/licenses/by/3.0) and [CC-BY 4.0](http://creativecommons.org/licenses/by/4.0).
+Most image assets in this project are licensed under the Creative Commons Attribution 3.0 Unported (CC-BY 3.0) and Creative Commons Attribution Unported 4.0 (CC-BY 4.0) Licenses.  To view a copy of these licenses, visit [CC-BY 3.0](http://creativecommons.org/licenses/by/3.0) and [CC-BY 4.0](http://creativecommons.org/licenses/by/4.0).  Some art assets are proprietary and may only be redistributed as part of Sulis.
 
-To view attribution for each specific file used, please see the [Attribution Sheet](docs/attribution.csv).
+To view attribution and licensing information for each specific file used, please see the [Attribution Sheet](docs/attribution.csv).

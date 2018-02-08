@@ -75,6 +75,7 @@ impl TimerImage {
         let offset = millis % total_frame_time;
         let index = (offset / self.frame_time_millis) as usize;
 
+        trace!("Got cur frame {:?}", &self.frames[index]);
         &self.frames[index]
     }
 }

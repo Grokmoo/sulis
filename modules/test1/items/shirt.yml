@@ -1,0 +1,8 @@
+id: shirt
+name: Shirt
+icon: sword
+equippable:
+  slot: Torso
+image:
+  Torso:
+    creatures/shirt

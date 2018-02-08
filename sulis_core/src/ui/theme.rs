@@ -440,7 +440,6 @@ impl ThemeBuilder {
         if let Some(ref children) = self.children {
             for (child_id, child) in children {
                 let child_path = format!("{}.{}", cur_path, child_id);
-                trace!("Expanding theme references in {}", child_path);
                 if child_path == id {
                     return Some(child.clone());
                 }
@@ -514,6 +513,7 @@ pub fn create_theme(dir: &str, filename: &str) -> Result<ThemeBuilder, Error> {
             format!("Unable to locate '{}.json' or '{}.yml'", filename, filename)));
     }
 
+    debug!("Creating theme from '{}'", filename);
     let mut file_data = String::new();
     file.unwrap().read_to_string(&mut file_data)?;
     let theme = ThemeBuilder::new(dir, &file_data, builder_type)?;

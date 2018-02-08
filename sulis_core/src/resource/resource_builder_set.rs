@@ -45,7 +45,7 @@ pub struct ResourceBuilderSet {
 impl ResourceBuilderSet {
     pub fn new(root: &str) -> Result<ResourceBuilderSet, Error> {
         let theme_filename = root.to_owned() + "/theme/theme";
-        debug!("Reading theme from {}", theme_filename);
+        info!("Reading theme from {}", theme_filename);
         let mut theme_builder = match create_theme(
             &format!("{}/theme/", root.to_owned()), "theme") {
             Ok(t) => t,

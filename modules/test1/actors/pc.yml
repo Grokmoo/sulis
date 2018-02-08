@@ -7,5 +7,5 @@ race: human
 sex: Male
 levels:
   fighter: 3
-items: [ sword, club, backpack, apple ]
+items: [ sword, club, backpack, apple, gloves_leather, boots_leather, pants, shirt ]
 equipped: [ 0 ]

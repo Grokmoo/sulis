@@ -1,0 +1,8 @@
+id: pants
+name: Pants
+icon: sword
+equippable:
+  slot: Legs
+image:
+  Legs:
+    creatures/pants

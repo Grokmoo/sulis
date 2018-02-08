@@ -75,7 +75,7 @@ impl PartialEq for Area {
 
 impl Area {
     pub fn new(builder: AreaBuilder, module: &Module) -> Result<Area, Error> {
-        debug!("Creating area {}", builder.id);
+        info!("Creating area {}", builder.id);
         let terrain = Terrain::new(&builder, module);
         let terrain = match terrain {
             Ok(l) => l,
@@ -89,7 +89,7 @@ impl Area {
         for (_, size) in module.sizes.iter() {
             let int_size = size.size;
             let path_grid = PathFinderGrid::new(Rc::clone(size), &terrain);
-            trace!("Generated path grid of size {}", int_size);
+            debug!("Generated path grid of size {}", int_size);
             path_grids.insert(int_size, path_grid);
         }
 
@@ -116,6 +116,7 @@ impl Area {
                 continue;
             }
 
+            debug!("Created transition to '{:?}' at {},{}", t_builder.to_area, t_builder.from.x, t_builder.from.y);
             let transition = Transition {
                 from: t_builder.from,
                 to: t_builder.to,

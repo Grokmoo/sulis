@@ -49,6 +49,7 @@ impl AreaState {
         let transition_grid = vec![None;dim];
         let pc_vis = vec![false;dim];
 
+        info!("Initializing area state for '{}'", area.name);
         AreaState {
             area,
             entities: Vec::new(),

@@ -1,0 +1,8 @@
+id: boots_leather
+name: Leather Boots
+icon: sword
+equippable:
+  slot: Feet
+image:
+  Feet:
+    creatures/boots_leather

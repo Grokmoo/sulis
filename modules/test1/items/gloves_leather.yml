@@ -1,0 +1,8 @@
+id: gloves_leather
+name: Leather Gloves
+icon: sword
+equippable:
+  slot: Hands
+image:
+  Hands:
+    creatures/gloves_leather

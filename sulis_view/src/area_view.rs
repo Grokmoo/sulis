@@ -20,6 +20,7 @@ use std::cell::{RefCell, RefMut};
 use std::cmp;
 use std::time;
 
+use sulis_core::ui::animation_state;
 use sulis_core::ui::{color, Color, Cursor, WidgetKind, Widget};
 use sulis_core::io::*;
 use sulis_core::io::event::ClickKind;
@@ -297,13 +298,19 @@ impl WidgetKind for AreaView {
         }
 
 
+        let mut draw_list = DrawList::empty_sprite();
         for transition in state.area.transitions.iter() {
-            transition.image_display.draw_graphics_mode(renderer, &widget.state.animation_state,
+            draw_list.set_scale(scale_x, scale_y);
+            transition.image_display.append_to_draw_list(&mut draw_list, &animation_state::NORMAL,
                                                         (transition.from.x + p.x - s.x) as f32,
                                                         (transition.from.y + p.y - s.y) as f32,
                                                         transition.size.width as f32,
                                                         transition.size.height as f32,
                                                         millis);
+        }
+
+        if !draw_list.is_empty() {
+            renderer.draw(draw_list);
         }
 
         self.draw_entities(renderer, scale_x, scale_y, 1.0, widget, &state, millis);

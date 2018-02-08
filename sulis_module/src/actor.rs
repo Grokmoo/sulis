@@ -19,16 +19,16 @@ use std::rc::Rc;
 use std::fmt;
 use std::collections::HashMap;
 
-use sulis_core::image::Image;
+use sulis_core::image::{Image, LayeredImage};
 use sulis_core::io::DrawList;
-use sulis_core::resource::{ResourceBuilder, ResourceSet};
+use sulis_core::resource::ResourceBuilder;
 use sulis_core::ui::animation_state;
 use sulis_core::util::invalid_data_error;
 use sulis_core::{serde_json, serde_yaml};
 
-use {Class, Item, Module, Race};
+use {Class, ImageLayer, ImageLayerSet, Item, Module, Race};
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Copy, Clone, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub enum Sex {
     Male,
@@ -47,10 +47,12 @@ pub struct Actor {
     pub player: bool,
     pub race: Rc<Race>,
     pub sex: Sex,
-    image_display: Rc<Image>,
     pub items: Vec<Rc<Item>>,
     pub to_equip: Vec<usize>,
     pub levels: Vec<(Rc<Class>, u32)>,
+
+    image_layers: ImageLayerSet,
+    image: LayeredImage,
 }
 
 impl PartialEq for Actor {
@@ -118,34 +120,36 @@ impl Actor {
             }
         }
 
-        let image = match ResourceSet::get_image(&builder.image_display) {
-            None => {
-                warn!("Image {} not found.", builder.image_display);
-                return invalid_data_error(&format!("Unable to create actor '{}'", builder.id));
-            }, Some(image) => image,
-        };
+        let image_layers = ImageLayerSet::merge(race.default_images(), builder.images)?;
+        let images_list = image_layers.get_list(sex);
+        let image = LayeredImage::new(images_list);
 
         Ok(Actor {
             id: builder.id,
             name: builder.name,
             player: builder.player.unwrap_or(false),
-            image_display: image,
             race,
             sex,
             levels,
             items,
             to_equip,
+            image_layers,
+            image,
         })
+    }
+
+    pub fn image_layers(&self) -> &ImageLayerSet {
+        &self.image_layers
     }
 
     pub fn append_to_draw_list_i32(&self, draw_list: &mut DrawList, x: i32, y: i32, millis: u32) {
         self.append_to_draw_list(draw_list, x as f32, y as f32, millis);
     }
 
-    pub fn append_to_draw_list(&self, draw_list: &mut DrawList, x: f32, y: f32, millis: u32) {
+    fn append_to_draw_list(&self, draw_list: &mut DrawList, x: f32, y: f32, millis: u32) {
         let size = self.race.size.size as f32;
-        self.image_display.append_to_draw_list(draw_list, &animation_state::NORMAL,
-                                               x, y, size, size, millis);
+        self.image.append_to_draw_list(draw_list, &animation_state::NORMAL,
+                                       x, y, size, size, millis);
     }
 }
 
@@ -157,7 +161,7 @@ pub struct ActorBuilder {
     race: String,
     sex: Option<Sex>,
     player: Option<bool>,
-    image_display: String,
+    images: HashMap<Sex, HashMap<ImageLayer, String>>,
     items: Option<Vec<String>>,
     equipped: Option<Vec<u32>>,
     levels: HashMap<String, u32>,

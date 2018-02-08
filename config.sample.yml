@@ -44,7 +44,7 @@ logging:
     # Log level may be error, warn, info, debug, or trace
     # Each level logs progressively more to log/main*.log with
     # trace logging the most and error logging the least.
-    log_level: warn
+    log_level: info
 
     # If set to true, log files are generated with a timestamp,
     # Meaning each run of the game will generate a unique log filename.

@@ -17,7 +17,8 @@
 use std::rc::Rc;
 use std::collections::HashMap;
 
-use sulis_module::Actor;
+use sulis_core::image::Image;
+use sulis_module::{Actor, ImageLayer};
 use sulis_module::item::{Slot, SlotIterator};
 use ItemState;
 
@@ -104,6 +105,35 @@ impl Inventory {
     pub fn unequip(&mut self, slot: Slot) -> bool {
         self.equipped.remove(&slot);
         true
+    }
+
+    pub fn get_image_layers(&self) -> HashMap<ImageLayer, Rc<Image>> {
+        let mut layers = HashMap::new();
+
+        for (slot, index) in self.equipped.iter() {
+            let item_state = &self.items[*index];
+
+            let layer = slot_to_layer(*slot);
+            match item_state.item.image_for_layer(layer) {
+                None => continue,
+                Some(ref image) => layers.insert(layer, Rc::clone(image)),
+            };
+        }
+
+        layers
+    }
+}
+
+fn slot_to_layer(slot: Slot) -> ImageLayer {
+    use sulis_module::item::Slot::*;
+    match slot {
+        Head => ImageLayer::Head,
+        Torso => ImageLayer::Torso,
+        Hands => ImageLayer::Hands,
+        HeldMain => ImageLayer::HeldMain,
+        HeldOff => ImageLayer::HeldOff,
+        Legs => ImageLayer::Legs,
+        Feet => ImageLayer::Feet,
     }
 }
 

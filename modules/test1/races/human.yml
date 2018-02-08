@@ -1,3 +1,14 @@
 id: human
 name: Human
-size: 5
+size: 3
+default_images:
+  Male:
+    Foreground: creatures/human_male_fg
+    Background: creatures/human_male_bg
+    Torso: creatures/human_male_torso
+  Female:
+    Foreground: creatures/human_female_fg
+    Background: creatures/human_female_bg
+    Torso: creatures/human_female_torso
+image_layer_offsets:
+  HeldMain: [1, 1]

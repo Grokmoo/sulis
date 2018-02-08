@@ -198,7 +198,7 @@ impl AreaView {
             if entity.location_points().any(|p| state.is_pc_visible(p.x, p.y)) {
                 let x = (entity.location.x + p.x - s.x) as f32 + entity.sub_pos.0;
                 let y = (entity.location.y + p.y - s.y) as f32 + entity.sub_pos.1;
-                entity.actor.actor.append_to_draw_list(draw_list, x, y, millis);
+                entity.actor.append_to_draw_list(draw_list, x, y, millis);
             }
         }
     }
@@ -303,6 +303,7 @@ impl WidgetKind for AreaView {
 
         let mut draw_list = DrawList::empty_sprite();
         draw_list.set_scale(scale_x, scale_y);
+        draw_list.texture_mag_filter = TextureMagFilter::Nearest;
         self.draw_entities(widget, &state, &mut draw_list, millis);
 
         renderer.draw(draw_list);

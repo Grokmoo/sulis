@@ -358,8 +358,8 @@ impl GameState {
             (target.location.x + target.size.size / 2, target.location.y + target.size.size / 2)
         };
 
-        let dist = entity.borrow().size.size / 2 + target.borrow().size.size / 2 + 1;
-        (target_x as f32, target_y as f32, dist as f32 + entity.borrow().actor.stats.reach)
+        let dist = entity.borrow().size.size as f32 / 2.0 + target.borrow().size.size as f32 / 2.0;
+        (target_x as f32, target_y as f32, dist + entity.borrow().actor.stats.reach)
     }
 
     pub fn can_move_towards(entity: &Rc<RefCell<EntityState>>,

@@ -1,3 +1,10 @@
 id: goblin
 name: Goblin
-size: 3
+size: 2
+default_images:
+  Male:
+    Background: creatures/goblin0
+  Female:
+    Background: creatures/goblin1
+image_layer_offsets:
+  HeldMain: [1, 1]

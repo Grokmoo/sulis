@@ -42,6 +42,10 @@ pub use self::game::Game;
 
 mod generator;
 
+pub mod image_layer;
+pub use self::image_layer::ImageLayer;
+pub use self::image_layer::ImageLayerSet;
+
 pub mod item;
 pub use self::item::Item;
 

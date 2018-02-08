@@ -1,7 +1,7 @@
 id: goblin
 name: Goblin
 player: false
-image_display: "creatures/goblin"
+images: {}
 race: goblin
 levels:
   fighter: 1

@@ -14,14 +14,18 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-pub mod simple_image;
-pub use self::simple_image::SimpleImage;
+
+pub mod animated_image;
+pub use self::animated_image::AnimatedImage;
 
 pub mod composed_image;
 pub use self::composed_image::ComposedImage;
 
-pub mod animated_image;
-pub use self::animated_image::AnimatedImage;
+pub mod layered_image;
+pub use self::layered_image::LayeredImage;
+
+pub mod simple_image;
+pub use self::simple_image::SimpleImage;
 
 pub mod timer_image;
 pub use self::timer_image::TimerImage;

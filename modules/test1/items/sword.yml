@@ -7,3 +7,6 @@ equippable:
     min: 4
     max: 6
   reach: 2.5
+image:
+  HeldMain:
+    creatures/sword

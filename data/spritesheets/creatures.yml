@@ -1,6 +1,6 @@
 id: creatures
 src: "creatures.png"
-size: [ 256, 256 ]
+size: [ 1024, 1024 ]
 simple_image_gen_scale: 16
 grid_multiplier: 16
 groups:

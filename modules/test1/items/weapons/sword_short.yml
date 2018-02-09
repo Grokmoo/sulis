@@ -1,6 +1,6 @@
-id: sword
-name: Sword
-icon: sword
+id: sword_short
+name: Short Sword
+icon: inventory/weapon_sword_short
 equippable:
   slot: HeldMain
   damage:

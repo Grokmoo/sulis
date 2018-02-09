@@ -5,29 +5,29 @@ children:
       title:
         from: .label
         text_params:
-          scale: 2.0
+          scale: 8.0
         text: "Main Menu"
         x_relative: Center
-        preferred_size: [10, 1]
-        position: [0, 1]
+        preferred_size: [40, 4]
+        position: [0, 4]
       play_button:
         from: .button
         text: "Play"
         text_params:
-          scale: 2.0
-        preferred_size: [10, 3]
+          scale: 8.0
+        preferred_size: [40, 12]
         x_relative: Center
-        position: [10, 8]
+        position: [40, 32]
       modules_title:
         from: .label
         text: "Select a Module"
         x_relative: Center
-        preferred_size: [10, 1]
-        position: [-10, 4]
+        preferred_size: [40, 4]
+        position: [-40, 16]
       modules_list:
         from: .list_box
-        preferred_size: [20, 10]
-        position: [-10, 5]
+        preferred_size: [80, 40]
+        position: [-40, 20]
         x_relative: Center
         height_relative: Zero
         width_relative: Zero

@@ -1,0 +1,22 @@
+id: inventory
+src: "inventory.png"
+size: [ 1024, 1024 ]
+simple_image_gen_scale: 128
+grid_multiplier: 128
+groups:
+  1by1:
+    size: [1, 1]
+    areas:
+      weapon_sword_short: [0, 0]
+      weapon_sword_long: [1, 0]
+      weapon_sword_great: [2, 0]
+      weapon_club: [3, 0]
+      
+      gloves_leather: [0, 1]
+      boots_leather: [1, 1]
+      helm_leather: [2, 1]
+      torso_leather: [3, 1]
+      legs_leather: [4, 1]
+      torso_shirt: [5, 1]
+      legs_pants: [6, 1]
+      misc_apple: [7, 1]

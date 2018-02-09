@@ -95,8 +95,6 @@ pub struct DrawList {
     pub swap_hue: f32,
 }
 
-pub const GFX_BORDER_SCALE: f32 = 0.75;
-
 impl Default for DrawList {
     fn default() -> DrawList {
         DrawList {

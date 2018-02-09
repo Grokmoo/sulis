@@ -18,9 +18,10 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
+use sulis_module::item::Slot;
 use sulis_state::{EntityState, ChangeListener, GameState};
-use sulis_core::ui::{animation_state, AnimationState, Callback, Widget, WidgetKind};
-use sulis_widgets::{Button, Label, list_box, ListBox};
+use sulis_core::ui::{Callback, Widget, WidgetKind};
+use sulis_widgets::{Button, Label};
 
 pub const NAME: &str = "inventory_window";
 
@@ -69,37 +70,51 @@ impl WidgetKind for InventoryWindow {
 
         let ref actor = self.entity.borrow().actor;
 
-        let mut entries: Vec<list_box::Entry<String>> = Vec::new();
+        let list_content = Widget::empty("items_list");
         for (index, item) in actor.inventory().items.iter().enumerate() {
-            let cb = match item.item.equippable {
-                Some(equippable) => {
-                    let slot = equippable.slot;
-                    Some(Callback::with(Box::new(move || {
+            if actor.inventory().is_equipped(index) {
+                continue;
+            }
+
+            let button = Widget::with_theme(Button::empty(), "item_button");
+            button.borrow_mut().state.add_text_arg("icon", &item.item.icon.id());
+
+            match item.item.equippable {
+                Some(_) => {
+                    button.borrow_mut().state.add_callback(Callback::with(Box::new(move || {
                         let pc = GameState::pc();
                         let mut pc = pc.borrow_mut();
 
-                        if pc.actor.inventory().is_equipped(index) {
-                            pc.actor.unequip(slot);
-                        } else {
-                            pc.actor.equip(index);
-                        }
-                    })))
+                        pc.actor.equip(index);
+                    })));
                 },
-                None => None,
+                None => (),
             };
 
-            let entry = if actor.inventory().is_equipped(index) {
-                list_box::Entry::with_state(item.item.name.to_string(), cb,
-                    AnimationState::with(animation_state::Kind::Active))
-            } else {
-                list_box::Entry::new(item.item.name.to_string(), cb)
-            };
-
-            entries.push(entry);
+            Widget::add_child_to(&list_content, button);
         }
 
-        let list = Widget::with_theme(ListBox::new(entries), "inventory");
+        let equipped_area = Widget::empty("equipped_area");
+        for slot in Slot::iter() {
+            let theme_id = format!("{:?}_button", slot).to_lowercase();
+            let button = Widget::with_theme(Button::empty(), &theme_id);
 
-        vec![title, close, list]
+            button.borrow_mut().state.add_callback(Callback::with(Box::new(move || {
+                let pc = GameState::pc();
+                let mut pc = pc.borrow_mut();
+
+                pc.actor.unequip(*slot);
+            })));
+            match actor.inventory().get(*slot) {
+                None => button.borrow_mut().state.disable(),
+                Some(ref item_state) => {
+                    button.borrow_mut().state.add_text_arg("icon", &item_state.item.icon.id());
+                }
+            }
+
+            Widget::add_child_to(&equipped_area, button);
+        }
+
+        vec![title, close, equipped_area, list_content]
     }
 }

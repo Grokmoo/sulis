@@ -1,6 +1,6 @@
-id: shirt
+id: torso_shirt
 name: Shirt
-icon: sword
+icon: inventory/torso_shirt
 equippable:
   slot: Torso
 image:

@@ -1,0 +1,8 @@
+id: bg_large
+generate_sub_images:
+  size: [12, 12]
+  spritesheet: "gui"
+grid: [ bg_large_top_left,    bg_large_top_middle,    bg_large_top_right,
+        bg_large_middle_left, bg_large_middle,        bg_large_middle_right,
+        bg_large_bottom_left, bg_large_bottom_middle, bg_large_bottom_right
+      ]

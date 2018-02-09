@@ -1,0 +1,7 @@
+id: background_transparent
+states:
+    normal: bg_transparent_base
+    hover: bg_transparent_hover
+    active: bg_transparent_active
+    active + hover: bg_transparent_active
+    pressed + hover: bg_transparent_active

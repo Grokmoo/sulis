@@ -175,7 +175,7 @@ impl Theme {
         if self.foreground.is_some() {
             let out = expand_text_args(&self.foreground, state);
             match ResourceSet::get_image(&out) {
-                None => warn!("Unable to find image {}", out),
+                None => warn!("Unable to find image '{}'", out),
                 Some(image) => state.set_foreground(Some(image)),
             }
         }

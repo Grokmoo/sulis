@@ -1,6 +1,6 @@
 id: boots_leather
 name: Leather Boots
-icon: sword
+icon: inventory/boots_leather
 equippable:
   slot: Feet
 image:

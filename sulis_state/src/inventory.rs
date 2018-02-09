@@ -14,12 +14,13 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::slice::Iter;
 use std::rc::Rc;
 use std::collections::HashMap;
 
 use sulis_core::image::Image;
 use sulis_module::{Actor, ImageLayer};
-use sulis_module::item::{Slot, SlotIterator};
+use sulis_module::item::Slot;
 use ItemState;
 
 #[derive(Clone)]
@@ -57,7 +58,7 @@ impl Inventory {
     /// have an item equipped
     pub fn equipped_iter(&self) -> EquippedIterator {
         EquippedIterator {
-            slot_iterator: SlotIterator::default(),
+            slot_iterator: Slot::iter(),
             inventory: &self,
         }
     }
@@ -138,7 +139,7 @@ fn slot_to_layer(slot: Slot) -> ImageLayer {
 }
 
 pub struct EquippedIterator<'a> {
-    slot_iterator: SlotIterator,
+    slot_iterator: Iter<'static, Slot>,
     inventory: &'a Inventory,
 }
 

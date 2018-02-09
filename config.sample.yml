@@ -10,8 +10,8 @@ display:
     height_pixels: 900
 
     # UI scaling dimensions
-    width: 80
-    height: 45
+    width: 320
+    height: 180
 
     # in frames per second
     frame_rate: 30

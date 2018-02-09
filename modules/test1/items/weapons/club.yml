@@ -1,6 +1,6 @@
 id: club
 name: Club
-icon: club
+icon: inventory/weapon_club
 equippable:
   slot: HeldMain
   damage:

@@ -1,6 +1,6 @@
 id: gui
 src: "gui.png"
-size: [ 256, 256 ]
+size: [ 1024, 1024 ]
 groups:
   bg_base:
     size: [5, 5]
@@ -80,6 +80,71 @@ groups:
       bg_bottom_left_text_box:   [0, 10]
       bg_bottom_middle_text_box: [5, 10]
       bg_bottom_right_text_box:  [10, 10]
+  bg_transparent_base:
+    size: [5, 5]
+    position: [0, 102]
+    areas:
+      bg_top_left_transparent_base:      [0,  0]
+      bg_top_middle_transparent_base:    [5,  0]
+      bg_top_right_transparent_base:     [10, 0]
+      bg_middle_left_transparent_base:   [0,  5]
+      bg_middle_transparent_base:        [5,  5]
+      bg_middle_right_transparent_base:  [10, 5]
+      bg_bottom_left_transparent_base:   [0, 10]
+      bg_bottom_middle_transparent_base: [5, 10]
+      bg_bottom_right_transparent_base:  [10, 10]
+  bg_transparent_hover:
+    size: [5, 5]
+    position: [0, 119]
+    areas:
+      bg_top_left_transparent_hover:      [0,  0]
+      bg_top_middle_transparent_hover:    [5,  0]
+      bg_top_right_transparent_hover:     [10, 0]
+      bg_middle_left_transparent_hover:   [0,  5]
+      bg_middle_transparent_hover:        [5,  5]
+      bg_middle_right_transparent_hover:  [10, 5]
+      bg_bottom_left_transparent_hover:   [0, 10]
+      bg_bottom_middle_transparent_hover: [5, 10]
+      bg_bottom_right_transparent_hover:  [10, 10]
+  bg_transparent_active:
+    size: [5, 5]
+    position: [0, 136]
+    areas:
+      bg_top_left_transparent_active:      [0,  0]
+      bg_top_middle_transparent_active:    [5,  0]
+      bg_top_right_transparent_active:     [10, 0]
+      bg_middle_left_transparent_active:   [0,  5]
+      bg_middle_transparent_active:        [5,  5]
+      bg_middle_right_transparent_active:  [10, 5]
+      bg_bottom_left_transparent_active:   [0, 10]
+      bg_bottom_middle_transparent_active: [5, 10]
+      bg_bottom_right_transparent_active:  [10, 10]
+  bg_large:
+    size: [64, 64]
+    position: [256, 0]
+    areas:
+      bg_large_top_left:      [0,  0]
+      bg_large_top_middle:    [64,  0]
+      bg_large_top_right:     [128, 0]
+      bg_large_middle_left:   [0,  64]
+      bg_large_middle:        [64,  64]
+      bg_large_middle_right:  [128, 64]
+      bg_large_bottom_left:   [0, 128]
+      bg_large_bottom_middle: [64, 128]
+      bg_large_bottom_right:  [128, 128]
+  bg_medium:
+    size: [24, 24]
+    position: [128, 68]
+    areas:
+      bg_medium_top_left:      [0,  0]
+      bg_medium_top_middle:    [24,  0]
+      bg_medium_top_right:     [48, 0]
+      bg_medium_middle_left:   [0,  24]
+      bg_medium_middle:        [24,  24]
+      bg_medium_middle_right:  [48, 24]
+      bg_medium_bottom_left:   [0, 48]
+      bg_medium_bottom_middle: [24, 48]
+      bg_medium_bottom_right:  [48, 48]
   special:
     areas:
       empty: [0, 68, 5, 5]
@@ -92,3 +157,5 @@ groups:
       area_invis: [187, 51, 16, 16]
       carat_on: [ 204, 51, 2, 16]
       carat_off: [ 207, 51, 2, 16]
+      inventory_paper_doll: [ 512, 0, 512, 512]
+      

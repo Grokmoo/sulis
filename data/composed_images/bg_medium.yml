@@ -1,0 +1,8 @@
+id: bg_medium
+generate_sub_images:
+  size: [4, 4]
+  spritesheet: "gui"
+grid: [ bg_medium_top_left,    bg_medium_top_middle,    bg_medium_top_right,
+        bg_medium_middle_left, bg_medium_middle,        bg_medium_middle_right,
+        bg_medium_bottom_left, bg_medium_bottom_middle, bg_medium_bottom_right
+      ]

@@ -5,7 +5,7 @@ children:
       top_bar:
         background: bg_base
         width_relative: Max
-        preferred_size: [0, 1]
+        preferred_size: [0, 4]
         position: [0, 0]
         children:
           menu:
@@ -18,77 +18,77 @@ children:
               button:
                 from: .button
                 text: "Menu"
-                preferred_size: [6, 1]
+                preferred_size: [24, 4]
               list:
                 from: .list_box
                 border: { top: 1, bottom: 1, left: 1, right: 1 }
                 background: bg_base
-                position: [0, 1]
+                position: [0, 4]
           transitions:
             from: .button
-            preferred_size: [6, 1]
+            preferred_size: [24, 4]
             text: "Transitions"
-            position: [7, 0]
+            position: [28, 0]
           actors:
             from: .button
-            preferred_size: [6, 1]
+            preferred_size: [24, 4]
             text: "Actors"
-            position: [48, 0]
+            position: [192, 0]
           tiles:
             from: .button
-            preferred_size: [6, 1]
+            preferred_size: [24, 4]
             text: "Tiles"
-            position: [55, 0]
+            position: [220, 0]
       area_editor:
         width_relative: Max
         height_relative: Max
-        preferred_size: [-32, -1]
-        position: [0, 1]
+        preferred_size: [-128, -4]
+        position: [0, 4]
       actor_picker:
         background: bg_base
         border: [1, 1, 1, 1]
-        preferred_size: [32, -1]
+        preferred_size: [128, -4]
         x_relative: Max
         height_relative: Max
-        position: [0, 1]
+        position: [0, 4]
         layout: Grid
         layout_spacing: [0, 1, 0, 1]
         children:
           actor_button:
             from: .button
             text: "#name#"
-            preferred_size: [5, 5]
+            preferred_size: [20, 20]
       tile_picker:
         background: bg_base
         border: [1, 1, 1, 1]
-        preferred_size: [32, -1]
+        preferred_size: [128, -4]
         x_relative: Max
         height_relative: Max
-        position: [0, 1]
+        position: [0, 4]
         layout: BoxVertical
         layout_spacing: { top: 0, bottom: 1, left: 0, right: 0 }
         children:
           layers_content:
             width_relative: Max
-            preferred_size: [0, 1]
+            preferred_size: [0, 4]
             layout: BoxHorizontal
             children:
               layer_button:
                 from: .button
                 text: "#0#"
-                preferred_size: [4, 1]
+                preferred_size: [16, 4]
           tiles_content:
             height_relative: Max
             width_relative: Max
-            position: [0, 1]
-            preferred_size: [0, -1]
+            position: [0, 4]
+            preferred_size: [0, -4]
             layout: Grid
             layout_spacing: [0, 0, 0, 0]
             children:
               tile_button:
                 from: .button
                 foreground: "#icon#"
-                preferred_size: [5, 5]
+                preferred_size: [20, 20]
       exit_confirmation_window:
         from: .exit_confirmation_window
         children:
@@ -97,7 +97,7 @@ children:
       transition_window:
         from: .window
         height_relative: Zero
-        preferred_size: [30, 14]
+        preferred_size: [120, 56]
         x_relative: Center
         y_relative: Center
         children:
@@ -105,23 +105,23 @@ children:
             text: "Transition Editor"
           apply_button:
             from: .button
-            preferred_size: [4, 1]
+            preferred_size: [16, 4]
             text: "Apply"
-            position: [24, 11]
+            position: [96, 44]
           new_button:
             from: .button
-            preferred_size: [4, 1]
+            preferred_size: [16, 4]
             text: "New"
-            position: [12, 11]
+            position: [48, 44]
           delete_button:
             from: .button
-            preferred_size: [4, 1]
+            preferred_size: [16, 4]
             text: "Delete"
-            position: [17, 11]
+            position: [68, 44]
           transitions_list:
             from: .list_box
-            preferred_size: [10, 10]
-            position: [0, 2]
+            preferred_size: [40, 40]
+            position: [0, 8]
             height_relative: Zero
             width_relative: Zero
           from_label:
@@ -129,38 +129,38 @@ children:
             text: "From Point"
             text_params:
               horizontal_alignment: Right
-            preferred_size: [4, 1]
-            position: [12, 2]
+            preferred_size: [8, 4]
+            position: [48, 8]
           to_label:
             from: .label
             text: "To Point"
             text_params:
               horizontal_alignment: Right
-            preferred_size: [4, 1]
-            position: [12, 4]
+            preferred_size: [16, 4]
+            position: [48, 16]
           to_area_label:
             from: .label
             text: "To Area ID"
             text_params:
               horizontal_alignment: Right
-            preferred_size: [4, 1]
-            position: [12, 6]
+            preferred_size: [16, 4]
+            position: [48, 24]
           from:
             from: .input_field
-            preferred_size: [8, 1]
-            position: [17, 2]
+            preferred_size: [32, 4]
+            position: [68, 8]
           to:
             from: .input_field
-            preferred_size: [8, 1]
-            position: [17, 4]
+            preferred_size: [32, 4]
+            position: [68, 16]
           to_area:
             from: .input_field
-            preferred_size: [10, 1]
-            position: [17, 6]
+            preferred_size: [40, 4]
+            position: [68, 24]
       load_window:
         from: .window
         height_relative: Zero
-        preferred_size: [21, 21]
+        preferred_size: [84, 84]
         x_relative: Center
         y_relative: Center
         children:
@@ -168,19 +168,19 @@ children:
             text: "Load Area"
           areas_list:
             from: .list_box
-            preferred_size: [17, 14]
-            position: [1, 2]
+            preferred_size: [68, 56]
+            position: [4, 8]
             height_relative: Zero
             width_relative: Zero
           load_button:
             from: .button
-            preferred_size: [4, 1]
-            position: [14, 17]
+            preferred_size: [16, 4]
+            position: [56, 68]
             text: "Load"
       save_window:
         from: .window
         height_relative: Zero
-        preferred_size: [21, 12]
+        preferred_size: [84, 48]
         x_relative: Center
         y_relative: Center
         children:
@@ -189,39 +189,39 @@ children:
           id_label:
             from: .label
             text: "ID"
-            position: [0, 3]
-            preferred_size: [5, 1]
+            position: [0, 12]
+            preferred_size: [20, 4]
             text_params:
               horizontal_alignment: Right
           id_field:
             from: .input_field
-            preferred_size: [10, 1]
-            position: [6, 3]
+            preferred_size: [40, 4]
+            position: [24, 12]
           name_label:
             from: .label
             text: "Name"
-            position: [0, 5]
-            preferred_size: [5, 1]
+            position: [0, 20]
+            preferred_size: [20, 4]
             text_params:
               horizontal_alignment: Right
           name_field:
             from: .input_field
-            preferred_size: [10, 1]
-            position: [6, 5]
+            preferred_size: [40, 4]
+            position: [24, 20]
           filename_label:
             from: .label
             text: "Filename:"
-            position: [0, 7]
-            preferred_size: [5, 1]
+            position: [0, 28]
+            preferred_size: [20, 4]
             text_params:
               horizontal_alignment: Right
           filename_field:
             from: .input_field
-            preferred_size: [10, 1]
-            position: [6, 7]
+            preferred_size: [40, 4]
+            position: [24, 28]
           save_button:
             from: .button
-            preferred_size: [4, 1]
-            position: [6, 9]
+            preferred_size: [16, 4]
+            position: [24, 36]
             text: "Save"
 ...

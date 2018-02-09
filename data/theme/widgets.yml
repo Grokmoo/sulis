@@ -3,11 +3,13 @@ children:
   label:
     text_params:
       font: "normal"
+      scale: 4.0
   button:
     background: background
     border: [1, 1, 1, 1]
     text_params:
       font: "normal"
+      scale: 4.0
   list_box:
     background: bg_base
     border: [1, 1, 1, 1]
@@ -20,45 +22,48 @@ children:
         text_params:
           font: "normal"
           horizontal_alignment: Left
+          scale: 4.0
         background: fill
         border: { top: 0, bottom: 0, left: 0, right: 0 }
-        preferred_size: [0, 1]
+        preferred_size: [0, 4]
   text_area:
     text_params:
       font: "normal"
+      scale: 4.0
   input_field:
     background: bg_text_box
     border: { top: 0, bottom: 0, left: 1, right: 1 }
     text_params:
       font: "normal"
       horizontal_alignment: Left
+      scale: 4.0
     text: "#0#"
     custom:
       carat_image: carat
-      carat_height: "0.7"
-      carat_width: "0.15"
-      carat_offset: "0.1"
+      carat_height: "2.8"
+      carat_width: "0.6"
+      carat_offset: "0.4"
   window:
-    background: bg_base
-    border: [1, 1, 1, 1]
-    preferred_size: [30, -2]
-    position: [0, 1]
+    background: bg_large
+    border: [4, 4, 4, 4]
+    preferred_size: [120, -8]
+    position: [0, 4]
     height_relative: Max
     x_relative: Zero
     children:
       title:
         from: .label
         width_relative: Max
-        preferred_size: [0, 1]
+        preferred_size: [0, 4]
         text_params:
-          scale: 1.3
+          scale: 5.5
       close:
         from: .button
         text_params:
           horizontal_alignment: Center
         border: [0, 0, 0, 0]
-        preferred_size: [2, 1]
+        preferred_size: [8, 4]
         text: "X"
-        position: [0, 0]
+        position: [3, -3]
         x_relative: Max
 ...

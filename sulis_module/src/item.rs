@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::slice::Iter;
 use std::io::{Error, ErrorKind};
 use std::collections::HashMap;
 use std::rc::Rc;
@@ -38,32 +39,15 @@ pub enum Slot {
     Feet,
 }
 
+impl Slot {
+    pub fn iter() -> Iter<'static, Slot> {
+        SLOTS_LIST.iter()
+    }
+}
+
 use self::Slot::*;
 
 const SLOTS_LIST: [Slot; 7] = [Feet, Legs, Torso, Hands, Head, HeldOff, HeldMain];
-
-pub struct SlotIterator {
-    index: usize,
-}
-
-impl Default for SlotIterator {
-    fn default() -> SlotIterator {
-        SlotIterator { index: 0 }
-    }
-}
-
-impl Iterator for SlotIterator {
-    type Item = Slot;
-    fn next(&mut self) -> Option<Slot> {
-        if self.index == SLOTS_LIST.len() {
-            None
-        } else {
-            let next = SLOTS_LIST[self.index];
-            self.index += 1;
-            Some(next)
-        }
-    }
-}
 
 #[derive(Debug)]
 pub struct Item {

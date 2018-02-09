@@ -1,6 +1,6 @@
-id: pants
+id: legs_pants
 name: Pants
-icon: sword
+icon: inventory/legs_pants
 equippable:
   slot: Legs
 image:

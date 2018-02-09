@@ -20,7 +20,7 @@ use std::io::{Error, ErrorKind};
 use image::{Image, SimpleImage};
 use image::simple_image::SimpleImageBuilder;
 use resource::{ResourceBuilder, ResourceSet};
-use io::{self, DrawList, GraphicsRenderer};
+use io::{DrawList, GraphicsRenderer};
 use ui::AnimationState;
 use util::{invalid_data_error, Size};
 
@@ -131,73 +131,63 @@ impl ComposedImage {
             id: builder.id,
         }))
     }
-
-    fn get_border_image_w(&self, image: &Rc<Image>) -> f32 {
-        image.get_width_f32() - io::GFX_BORDER_SCALE
-    }
-
-    fn get_border_image_h(&self, image: &Rc<Image>) -> f32 {
-        image.get_height_f32() - io::GFX_BORDER_SCALE
-    }
 }
 
 impl Image for ComposedImage {
     fn append_to_draw_list(&self, draw_list: &mut DrawList, state: &AnimationState,
                            x: f32, y: f32, w: f32, h: f32, millis: u32) {
-        let fill_width = 2.0 * io::GFX_BORDER_SCALE
-            + w - (self.size.width - self.middle_size.width) as f32;
-        let fill_height = 2.0 * io::GFX_BORDER_SCALE
-            + h - (self.size.height - self.middle_size.height) as f32;
+        let fill_width = w - (self.size.width - self.middle_size.width) as f32;
+        let fill_height = h - (self.size.height - self.middle_size.height) as f32;
 
         let image = &self.images[0];
         let mut draw_x = x;
         let mut draw_y = y;
-        let mut draw_w = self.get_border_image_w(image);
-        let mut draw_h = self.get_border_image_h(image);
+        let mut draw_w = image.get_width_f32();
+        let mut draw_h = image.get_height_f32();
         image.append_to_draw_list(draw_list, state, draw_x, draw_y, draw_w, draw_h, millis);
 
-        draw_x += self.get_border_image_w(image);
+        draw_x += image.get_width_f32();
         let image = &self.images[1];
         draw_w = fill_width;
         image.append_to_draw_list(draw_list, state, draw_x, draw_y, draw_w, draw_h, millis);
 
         draw_x += fill_width;
         let image = &self.images[2];
-        draw_w = self.get_border_image_w(image);
+        draw_w = image.get_width_f32();
         image.append_to_draw_list(draw_list, state, draw_x, draw_y, draw_w, draw_h, millis);
 
         draw_x = x;
-        draw_y += self.get_border_image_h(image);
+        draw_y += image.get_height_f32();
         let image = &self.images[3];
-        draw_w = self.get_border_image_w(image);
+        draw_w = image.get_width_f32();
         draw_h = fill_height;
         image.append_to_draw_list(draw_list, state, draw_x, draw_y, draw_w, draw_h, millis);
 
-        draw_x += self.get_border_image_w(image);
+        draw_x += image.get_width_f32();
         let image = &self.images[4];
         draw_w = fill_width;
         image.append_to_draw_list(draw_list, state, draw_x, draw_y, draw_w, draw_h, millis);
 
         draw_x += fill_width;
         let image = &self.images[5];
-        draw_w = self.get_border_image_w(image);
+        draw_w = image.get_width_f32();
         image.append_to_draw_list(draw_list, state, draw_x, draw_y, draw_w, draw_h, millis);
 
         draw_x = x;
         draw_y += fill_height;
         let image = &self.images[6];
-        draw_w = self.get_border_image_w(image);
-        draw_h = self.get_border_image_h(image);
+        draw_w = image.get_width_f32();
+        draw_h = image.get_height_f32();
         image.append_to_draw_list(draw_list, state, draw_x, draw_y, draw_w, draw_h, millis);
 
-        draw_x += self.get_border_image_w(image);
+        draw_x += image.get_width_f32();
         let image = &self.images[7];
         draw_w = fill_width;
         image.append_to_draw_list(draw_list, state, draw_x, draw_y, draw_w, draw_h, millis);
 
         draw_x += fill_width;
         let image = &self.images[8];
-        draw_w = self.get_border_image_w(image);
+        draw_w = image.get_width_f32();
         image.append_to_draw_list(draw_list, state, draw_x, draw_y, draw_w, draw_h, millis);
     }
 

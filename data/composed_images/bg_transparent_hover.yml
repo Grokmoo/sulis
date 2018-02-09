@@ -1,0 +1,9 @@
+id: bg_transparent_hover
+generate_sub_images:
+  size: [1, 1]
+  spritesheet: "gui"
+grid: [ bg_top_left_transparent_hover,    bg_top_middle_transparent_hover,    bg_top_right_transparent_hover,
+        bg_middle_left_transparent_hover, bg_middle_transparent_hover,        bg_middle_right_transparent_hover,
+        bg_bottom_left_transparent_hover, bg_bottom_middle_transparent_hover, bg_bottom_right_transparent_hover
+      ]
+

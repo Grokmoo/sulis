@@ -8,36 +8,36 @@ children:
     from: .text_area
     background: bg_base
     text: |
-      [x=0.5;y=0.5;s=1.25|#name#]
-      [x=0.5|#cur_hp# / #max_hp#]
-    preferred_size: [8, 3]
+      [x=2.0;y=4.0;s=5.0|#name#]
+      [x=2.0|#cur_hp# / #max_hp#]
+    preferred_size: [20, 12]
     x_relative: Cursor
     y_relative: Cursor
-    position: [0, -4]
+    position: [-10, 5]
   right_pane:
     background: bg_base
     border: [1, 1, 1, 1]
-    preferred_size: [20, 0]
+    preferred_size: [80, 0]
     x_relative: Max
     height_relative: Max
     children:
       mouse_over:
         from: .label
         text: "{#0#,#1#}"
-        preferred_size: [10, 1]
-        position: [0, 1]
+        preferred_size: [40, 4]
+        position: [0, 4]
       title:
         from: .label
         text: "#0#"
-        preferred_size: [18, 1]
+        preferred_size: [72, 4]
         position: [0, 0]
       end_turn_button:
         from: .button
         text: "End Turn"
         text_params:
-          scale: 2.0
+          scale: 8.0
           color: [ 1.0, 0.0, 0.0, 1.0 ]
-        preferred_size: [18, 3]
+        preferred_size: [72, 12]
         y_relative: Max
         position: [0, 0]
       initiative_ticker:
@@ -46,14 +46,14 @@ children:
         width_relative: Max
         height_relative: ChildSum
         layout: BoxVertical
-        position: [0, 10]
+        position: [0, 40]
         children:
           entry:
             from: .label
             text: "#0#"
             text_params:
               horizontal_alignment: Left
-            preferred_size: [0, 1]
+            preferred_size: [0, 4]
             width_relative: Max
           current_entry:
             from: .label
@@ -61,11 +61,11 @@ children:
             text_params:
               horizontal_alignment: Left
               color: [1.0, 0.0, 0.0, 1.0]
-              scale: 1.5
-            preferred_size: [0, 2]
+              scale: 6.0
+            preferred_size: [0, 8]
             width_relative: Max
   area:
-    preferred_size: [-20, 0]
+    preferred_size: [-80, 0]
     width_relative: Max
     height_relative: Max
     children:
@@ -74,7 +74,7 @@ children:
         x_relative: Cursor
         y_relative: Cursor
         position: [-1, -1]
-        preferred_size: [6, 0]
+        preferred_size: [24, 0]
         height_relative: ChildSum
         width_relative: Zero
         children:
@@ -82,28 +82,62 @@ children:
             from: .label
             text: "Actions"
             text_params:
-              scale: 1.25
+              scale: 5.0
               horizontal_alignment: Center
-            preferred_size: [0, 1]
+            preferred_size: [0, 4]
             width_relative: Max
             position: [0, 0]
           actions:
             from: .list_box
             border: [0, 0, 0, 0]
             width_relative: Max
-            position: [0, 1]
+            position: [0, 4]
   inventory_window:
     from: .window
-    position: [30, 1]
+    position: [120, 4]
     children:
       title:
         text: "Inventory"
-      inventory:
-        from: .list_box
-        preferred_size: [0, -2]
-        position: [0, 2]
+      equipped_area:
+        background: inventory_paper_doll
+        preferred_size: [84, 84]
+        position: [12, 8]
+        children:
+          head_button:
+            from: .inventory_window.items_list.item_button
+            position: [36, 3]
+          torso_button:
+            from: .inventory_window.items_list.item_button
+            position: [36, 18]
+          hands_button:
+            from: .inventory_window.items_list.item_button
+            position: [23, 24]
+          legs_button:
+            from: .inventory_window.items_list.item_button
+            position: [36, 42]
+          feet_button:
+            from: .inventory_window.items_list.item_button
+            position: [36, 64]
+          heldmain_button:
+            from: .inventory_window.items_list.item_button
+            position: [20, 37]
+          heldoff_button:
+            from: .inventory_window.items_list.item_button
+            position: [56, 37]
+      items_list:
+        preferred_size: [0, -93]
+        position: [0, 93]
         width_relative: Max
         height_relative: Max
+        layout: Grid
+        layout_spacing: [0, 1, 0, 1]
+        children:
+          item_button:
+            from: .button
+            background: background_transparent
+            border: [0, 0, 0, 0]
+            foreground: "#icon#"
+            preferred_size: [12, 12]
   character_window:
     from: .window
     children:
@@ -112,73 +146,74 @@ children:
       details:
         from: .text_area
         text: |
-          [s=1.5|[c=f00|#race#] #sex#]
-          [s=1.25|Level #level_0# #class_0#]
-          [s=1.5|]
-          [s=1.25|[x=0|Attack][x=10|Hit Points][x=20|Action Points]]
-          [s=1.0;x=0|Damage: #damage_min# to #damage_max#][x=10| #cur_hp# / #max_hp#][x=20| #cur_ap#]
-          [s=1.5|]
-          [s=1.25|[x=0|Strength][x=10|#str#]
-                  [x=0|Dexterity][x=10|#dex#]
-                  [x=0|Endurance][x=10|#end#]
-                  [x=0|Perception][x=10|#per#]
-                  [x=0|Intellect][x=10|#int#]
-                  [x=0|Wisdom][x=10|#wis#]]
-          [s=1.5|]
-          [x=0|Initiative][x=10|#initiative#]
-        preferred_size: [0, -2]
-        position: [0, 2]
+          [s=6|[c=f00|#race#] #sex#]
+          [s=5|Level #level_0# #class_0#]
+          [s=6|]
+          [s=5|[x=0|Attack][x=40|Hit Points][x=80|Action Points]]
+          [s=4;x=0|Damage: #damage_min# to #damage_max#][x=40| #cur_hp# / #max_hp#][x=80| #cur_ap#]
+          [s=6|]
+          [s=5|[x=0|Strength][x=40|#str#]
+                  [x=0|Dexterity][x=40|#dex#]
+                  [x=0|Endurance][x=40|#end#]
+                  [x=0|Perception][x=40|#per#]
+                  [x=0|Intellect][x=40|#int#]
+                  [x=0|Wisdom][x=40|#wis#]]
+          [s=6|]
+          [x=0|Initiative][x=40|#initiative#]
+        preferred_size: [0, -8]
+        position: [0, 8]
         width_relative: Max
         height_relative: Max
   exit_confirmation_window:
     background: bg_base
     border: [1, 1, 1, 1]
-    preferred_size: [15, 7]
+    preferred_size: [60, 28]
     x_relative: Center
     y_relative: Center
-    position: [0, -5]
+    position: [0, -20]
     children:
       title:
         from: .label
         width_relative: Max
-        preferred_size: [0, 1]
+        preferred_size: [0, 4]
+        position: [0, 3]
         text_params:
-          scale: 1.3
+          scale: 5.5
         text: "Exit the Game?"
       cancel:
         from: .button
-        preferred_size: [6, 3]
+        preferred_size: [24, 12]
         text: "Cancel"
         text_params:
-          scale: 1.3
-        position: [0, 2]
+          scale: 5.5
+        position: [3, 11]
       accept:
         from: .button
-        preferred_size: [6, 3]
+        preferred_size: [24, 12]
         text: "Exit"
         text_params:
-          scale: 1.3
-        position: [7, 2]
+          scale: 5.5
+        position: [31, 11]
   game_over_menu:
     background: bg_base
     border: [1, 1, 1, 1]
-    preferred_size: [10, 7]
+    preferred_size: [40, 28]
     x_relative: Center
     y_relative: Center
-    position: [0, -5]
+    position: [0, -20]
     children:
       title:
         from: .label
         width_relative: Max
-        preferred_size: [1, 1]
+        preferred_size: [4, 4]
         text_params:
-          scale: 1.3
+          scale: 5.5
         text: "Game Over"
       exit:
         from: .button
-        preferred_size: [6, 3]
+        preferred_size: [24, 12]
         text: "Exit"
         text_params:
-          scale: 1.3
-        position: [1, 2]
+          scale: 5.5
+        position: [4, 8]
 ...

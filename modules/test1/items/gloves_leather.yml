@@ -1,6 +1,6 @@
 id: gloves_leather
 name: Leather Gloves
-icon: sword
+icon: inventory/gloves_leather
 equippable:
   slot: Hands
 image:

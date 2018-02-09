@@ -29,6 +29,7 @@ use util::{invalid_data_error, Size};
 
 #[derive(Debug)]
 pub struct TimerImage {
+    id: String,
     frames: Vec<Rc<Image>>,
     frame_time_millis: u32,
     size: Size,
@@ -67,6 +68,7 @@ impl TimerImage {
             frames,
             size: size.unwrap(),
             frame_time_millis: builder.frame_time_millis,
+            id: builder.id,
         }))
     }
 
@@ -81,6 +83,8 @@ impl TimerImage {
 }
 
 impl Image for TimerImage {
+    fn id(&self) -> String { self.id.clone() }
+
     fn draw_graphics_mode(&self, renderer: &mut GraphicsRenderer, state: &AnimationState,
                           x: f32, y: f32, w: f32, h: f32, millis: u32) {
         self.get_cur_frame(millis).draw_graphics_mode(renderer, state, x, y, w, h, millis);

@@ -67,6 +67,8 @@ impl Image for SimpleImage {
     fn get_size(&self) -> &Size {
         &self.size
     }
+
+    fn id(&self) -> String { self.id.clone() }
 }
 
 #[derive(Deserialize, Debug)]

@@ -33,7 +33,7 @@ const GRID_LEN: i32 = GRID_DIM * GRID_DIM;
 #[derive(Debug)]
 pub struct ComposedImage {
     images: Vec<Rc<Image>>,
-
+    id: String,
     size: Size,
     middle_size: Size,
 }
@@ -128,6 +128,7 @@ impl ComposedImage {
             images: images_vec,
             size: Size::new(total_width, total_height),
             middle_size,
+            id: builder.id,
         }))
     }
 
@@ -218,6 +219,8 @@ impl Image for ComposedImage {
     fn get_size(&self) -> &Size {
         &self.size
     }
+
+    fn id(&self) -> String { self.id.clone() }
 }
 
 

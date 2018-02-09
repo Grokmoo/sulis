@@ -18,7 +18,8 @@ use std::io::Error;
 use std::rc::Rc;
 use std::collections::HashMap;
 
-use sulis_core::resource::ResourceBuilder;
+use sulis_core::image::Image;
+use sulis_core::resource::{ResourceBuilder, ResourceSet};
 use sulis_core::util::{invalid_data_error, Point};
 use sulis_core::serde_json;
 use sulis_core::serde_yaml;
@@ -34,6 +35,7 @@ pub struct Race {
 
     default_images: ImageLayerSet,
     image_layer_offsets: HashMap<ImageLayer, (f32, f32)>,
+    image_layer_postfix: HashMap<Sex, String>,
 }
 
 impl PartialEq for Race {
@@ -65,7 +67,21 @@ impl Race {
             size,
             default_images,
             image_layer_offsets: offsets,
+            image_layer_postfix: builder.image_layer_postfix,
         })
+    }
+
+    pub fn image_for_sex(&self, sex: Sex, image: &Rc<Image>) -> Rc<Image> {
+        match self.image_layer_postfix.get(&sex) {
+            None => Rc::clone(image),
+            Some(ref postfix) => {
+                let id = image.id() + postfix;
+                match ResourceSet::get_image(&id) {
+                    None => Rc::clone(image),
+                    Some(ref new_image) => Rc::clone(new_image),
+                }
+            }
+        }
     }
 
     pub fn get_image_layer_offset(&self, layer: ImageLayer) -> (f32, f32) {
@@ -86,6 +102,7 @@ pub struct RaceBuilder {
     pub default_images: HashMap<Sex, HashMap<ImageLayer, String>>,
     image_layer_offsets: HashMap<ImageLayer, Point>,
     image_layer_offset_scale: i32,
+    image_layer_postfix: HashMap<Sex, String>,
 }
 
 impl ResourceBuilder for RaceBuilder {

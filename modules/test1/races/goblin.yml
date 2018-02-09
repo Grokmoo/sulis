@@ -9,3 +9,4 @@ default_images:
 image_layer_offset_scale: 16
 image_layer_offsets:
   HeldMain: [-10, -7]
+image_layer_postfix: {}

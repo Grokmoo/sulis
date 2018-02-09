@@ -48,4 +48,6 @@ pub trait Image: Debug {
     fn get_height_f32(&self) -> f32;
 
     fn get_size(&self) -> &Size;
+
+    fn id(&self) -> String;
 }

@@ -118,30 +118,20 @@ impl ImageLayerSet {
         match self.images.get(&sex) {
             Some(sex_map) => {
                 for layer in ImageLayer::iter() {
-                    let (x, y) = race.get_image_layer_offset(*layer);
-                    match insert.get(&layer) {
-                        Some(ref image) => {
-                            list.push((x, y, Rc::clone(image)));
-                            continue;
-                        }, None => (),
+                    if insert_for_race_sex(&mut list, &insert, sex, race, *layer) {
+                        continue;
                     }
 
+                    let (x, y) = race.get_image_layer_offset(*layer);
                     match sex_map.get(&layer) {
                         Some(ref image) => {
                             list.push((x, y, Rc::clone(image)));
-                            continue;
                         }, None => (),
                     }
                 }
             }, None => {
                 for layer in ImageLayer::iter() {
-                    let (x, y) = race.get_image_layer_offset(*layer);
-                    match insert.get(&layer) {
-                        Some(ref image) => {
-                            list.push((x, y, Rc::clone(image)));
-                            continue;
-                        }, None => (),
-                    }
+                    insert_for_race_sex(&mut list, &insert, sex, race, *layer);
                 }
             }
         }
@@ -167,5 +157,18 @@ impl ImageLayerSet {
         }
 
         Ok(())
+    }
+}
+
+fn insert_for_race_sex(list: &mut Vec<(f32, f32, Rc<Image>)>, insert: &HashMap<ImageLayer, Rc<Image>>,
+                       sex: Sex, race: &Rc<Race>, layer: ImageLayer) -> bool {
+    let (x, y) = race.get_image_layer_offset(layer);
+    match insert.get(&layer) {
+        Some(ref image) => {
+            list.push((x, y, race.image_for_sex(sex, image)));
+            true
+        }, None => {
+            false
+        }
     }
 }

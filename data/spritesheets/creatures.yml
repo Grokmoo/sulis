@@ -22,6 +22,8 @@ groups:
       boots_leather: [9, 0]
       pants: [36, 0]
       shirt: [39, 0]
+      pants_female: [36, 3]
+      shirt_female: [39, 3]
       
       human_male_ears: [18, 0]
       human_male_fg: [21, 0]

@@ -4,8 +4,8 @@ player: true
 images: {}
 hue: 0.19
 race: human
-sex: Male
+sex: Female
 levels:
   fighter: 3
 items: [ sword, club, backpack, apple, gloves_leather, boots_leather, pants, shirt ]
-equipped: [ 0 ]
+equipped: [ 0, 4, 5, 6, 7 ]

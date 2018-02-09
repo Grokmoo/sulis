@@ -82,4 +82,8 @@ impl Image for LayeredImage {
     fn get_height_f32(&self) -> f32 {
         self.size.height as f32
     }
+
+    fn id(&self) -> String {
+        String::new()
+    }
 }

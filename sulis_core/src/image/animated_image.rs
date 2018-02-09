@@ -29,6 +29,7 @@ use util::{invalid_data_error, Size};
 
 #[derive(Debug)]
 pub struct AnimatedImage {
+    id: String,
     images: HashMap<AnimationState, Rc<Image>>,
     size: Size,
 }
@@ -69,11 +70,16 @@ impl AnimatedImage {
         Ok(Rc::new(AnimatedImage {
             images: images_map,
             size: size.unwrap(),
+            id: builder.id,
         }))
     }
 }
 
 impl Image for AnimatedImage {
+    fn id(&self) -> String {
+        self.id.clone()
+    }
+
     fn draw_graphics_mode(&self, renderer: &mut GraphicsRenderer, state: &AnimationState,
                           x: f32, y: f32, w: f32, h: f32, millis: u32) {
         AnimationState::find_match(&self.images, state).draw_graphics_mode(renderer, state, x, y, w, h, millis);

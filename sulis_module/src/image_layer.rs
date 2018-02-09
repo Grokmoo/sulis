@@ -61,17 +61,19 @@ impl ImageLayerSet {
     pub fn new(image_refs: HashMap<Sex, HashMap<ImageLayer, String>>) -> Result<ImageLayerSet, Error> {
         let mut images = HashMap::new();
 
-        ImageLayerSet::append(&mut images, image_refs)?;
+        for (sex, layers_map) in image_refs {
+            ImageLayerSet::append(&mut images, sex, layers_map)?;
+        }
 
         Ok(ImageLayerSet {
             images
         })
     }
 
-    pub fn merge(base: &ImageLayerSet,
-                 append: HashMap<Sex, HashMap<ImageLayer, String>>) -> Result<ImageLayerSet, Error> {
+    pub fn merge(base: &ImageLayerSet, sex: Sex,
+                 append: HashMap<ImageLayer, String>) -> Result<ImageLayerSet, Error> {
         let mut images = base.images.clone();
-        ImageLayerSet::append(&mut images, append)?;
+        ImageLayerSet::append(&mut images, sex, append)?;
 
         Ok(ImageLayerSet {
             images
@@ -139,21 +141,17 @@ impl ImageLayerSet {
     }
 
     fn append(images: &mut HashMap<Sex, HashMap<ImageLayer, Rc<Image>>>,
-              refs: HashMap<Sex, HashMap<ImageLayer, String>>) -> Result<(), Error>{
-        for (sex, layers_map) in refs {
-            let mut sex_map = HashMap::new();
-            for (image_layer, image_str) in layers_map {
-                let image = match ResourceSet::get_image(&image_str) {
-                    None => {
-                        warn!("Image '{}' not found for layer '{:?}'", image_str, image_layer);
-                        return invalid_data_error(&format!("Unable to create image_layer_set"));
-                    }, Some(image) => image,
-                };
+              sex: Sex, refs: HashMap<ImageLayer, String>) -> Result<(), Error> {
+        let sex_map = images.entry(sex).or_insert(HashMap::new());
 
-                sex_map.insert(image_layer, image);
-            }
-
-            images.insert(sex, sex_map);
+        for (image_layer, image_str) in refs {
+            let image = match ResourceSet::get_image(&image_str) {
+                None => {
+                    warn!("Image '{}' not found for layer '{:?}'", image_str, image_layer);
+                    return invalid_data_error(&format!("Unable to create image_layer_set"));
+                }, Some(image) => image,
+            };
+            sex_map.insert(image_layer, image);
         }
 
         Ok(())

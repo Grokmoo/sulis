@@ -121,7 +121,7 @@ impl Actor {
             }
         }
 
-        let image_layers = ImageLayerSet::merge(race.default_images(), builder.images)?;
+        let image_layers = ImageLayerSet::merge(race.default_images(), sex, builder.images)?;
         let images_list = image_layers.get_list(sex);
         let image = LayeredImage::new(images_list);
 
@@ -170,7 +170,7 @@ pub struct ActorBuilder {
     race: String,
     sex: Option<Sex>,
     player: Option<bool>,
-    images: HashMap<Sex, HashMap<ImageLayer, String>>,
+    images: HashMap<ImageLayer, String>,
     hue: Option<f32>,
     items: Option<Vec<String>>,
     equipped: Option<Vec<u32>>,

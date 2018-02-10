@@ -76,6 +76,8 @@
 //! Note that drawing an image does not advance the writing cursor.  You will probably
 //! want to scale your image with `s`
 //! * **f** - Writes using another defined font.
+//! * **?** - Checks for the existance of a text argument.  If the argument is not
+//! present, this tag is ignored when producing the output.
 //!
 //! # Line Wrapping
 //! The character '\n' is treated as a line break, and causes wrap around to the
@@ -103,8 +105,7 @@ use std::rc::Rc;
 
 use sulis_core::io::{DrawList, GraphicsRenderer, Vertex};
 use sulis_core::resource::{Font, ResourceSet};
-use sulis_core::ui::FontRenderer;
-use sulis_core::ui::theme::TextParams;
+use sulis_core::ui::{FontRenderer, WidgetState};
 
 pub struct MarkupRenderer {
     font: Rc<Font>,
@@ -125,8 +126,11 @@ impl MarkupRenderer {
 }
 
 impl FontRenderer for MarkupRenderer {
-    fn render(&self, renderer: &mut GraphicsRenderer, text: &str, pos_x: f32, pos_y: f32,
-              defaults: &TextParams) {
+    fn render(&self, renderer: &mut GraphicsRenderer, pos_x: f32, pos_y: f32,
+              widget_state: &WidgetState) {
+        let text = &widget_state.text;
+        let defaults = &widget_state.text_params;
+
         let max_x = pos_x + self.width;
 
         let mut escaped = false;
@@ -156,7 +160,8 @@ impl FontRenderer for MarkupRenderer {
                     }, '|' => {
                         in_markup_tag = false;
                         markup_stack.push(cur_markup);
-                        cur_markup = Markup::from_string(&markup_buf, &markup_stack.last().unwrap());
+                        cur_markup = Markup::from_string(&markup_buf, &markup_stack.last().unwrap(),
+                            widget_state);
                         markup_buf.clear();
                         if let Some(markup_x) = cur_markup.pos_x {
                             x = pos_x + markup_x;
@@ -212,13 +217,17 @@ impl FontRenderer for MarkupRenderer {
 }
 
 fn draw_current(renderer: &mut GraphicsRenderer, quads: Vec<Vertex>, markup: &Markup) {
-        let mut draw_list = DrawList::from_font(&markup.font.id, quads);
-        draw_list.set_color(markup.color);
-        renderer.draw(draw_list);
+    if markup.ignore { return; }
+
+    let mut draw_list = DrawList::from_font(&markup.font.id, quads);
+    draw_list.set_color(markup.color);
+    renderer.draw(draw_list);
 }
 
 fn draw_sprite(renderer: &mut GraphicsRenderer, image: &str,
                markup: &Markup, x: f32, y: f32) {
+    if markup.ignore { return; }
+
     let sprite = match ResourceSet::get_sprite(image) {
         Err(_) => {
             warn!("Unable to find image '{}'", image);

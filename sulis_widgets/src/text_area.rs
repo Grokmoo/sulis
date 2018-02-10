@@ -77,6 +77,6 @@ impl WidgetKind for TextArea {
 
         let x = widget.state.inner_left() as f32;
         let y = widget.state.inner_top() as f32;
-        font_rend.render(renderer, &widget.state.text, x, y, &widget.state.text_params);
+        font_rend.render(renderer, x, y, &widget.state);
     }
 }

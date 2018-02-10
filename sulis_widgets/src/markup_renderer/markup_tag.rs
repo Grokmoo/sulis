@@ -19,7 +19,7 @@ use std::str::FromStr;
 
 use sulis_core::io::Vertex;
 use sulis_core::resource::{Font, ResourceSet};
-use sulis_core::ui::{self, Color};
+use sulis_core::ui::{self, Color, WidgetState};
 use sulis_core::ui::theme::TextParams;
 
 #[derive(Debug, PartialEq, Copy, Clone)]
@@ -30,6 +30,7 @@ enum MarkupKind {
     PosY,
     Image,
     Font,
+    If,
 }
 
 pub struct Markup {
@@ -39,6 +40,7 @@ pub struct Markup {
     pub pos_y: Option<f32>,
     pub image: Option<String>,
     pub font: Rc<Font>,
+    pub ignore: bool,
 }
 
 impl Markup {
@@ -50,6 +52,7 @@ impl Markup {
             pos_y: None,
             image: None,
             font: Rc::clone(font),
+            ignore: false,
         }
     }
 
@@ -61,10 +64,11 @@ impl Markup {
             pos_y: None,
             image: None,
             font: Rc::clone(&other.font),
+            ignore: other.ignore,
         }
     }
 
-    pub fn from_string(text: &str, defaults: &Markup) -> Markup {
+    pub fn from_string(text: &str, defaults: &Markup, widget_state: &WidgetState) -> Markup {
         let mut markup = Markup::from_other(defaults);
         let mut markup_kind: Option<MarkupKind> = None;
         let mut cur_buf = String::new();
@@ -78,12 +82,13 @@ impl Markup {
                     'y' => Some(PosY),
                     'i' => Some(Image),
                     'f' => Some(Font),
+                    '?' => Some(If),
                     _ => None,
                 }, Some(kind) => match c {
                     '=' | ' ' => {
                         // skip
                     }, ';' => {
-                        markup.parse_buf(&cur_buf, kind);
+                        markup.parse_buf(&cur_buf, kind, widget_state);
                         cur_buf.clear();
                         markup_kind = None;
                     }, _ => {
@@ -94,7 +99,7 @@ impl Markup {
         }
 
         if let Some(kind) = markup_kind {
-            markup.parse_buf(&cur_buf, kind);
+            markup.parse_buf(&cur_buf, kind, widget_state);
         }
         markup
     }
@@ -107,7 +112,7 @@ impl Markup {
         (self.scale - 1.0) * self.font.base as f32 / self.font.line_height as f32
     }
 
-    fn parse_buf(&mut self, buf: &str, kind: MarkupKind) {
+    fn parse_buf(&mut self, buf: &str, kind: MarkupKind, widget_state: &WidgetState) {
         use self::MarkupKind::*;
         match kind {
             Color => self.color = ui::Color::from_string(buf),
@@ -119,6 +124,7 @@ impl Markup {
                 None => warn!("Font not found '{}'", buf),
                 Some(font) => self.font = font,
             },
+            If => self.ignore = !widget_state.has_text_arg(buf),
         }
     }
 }

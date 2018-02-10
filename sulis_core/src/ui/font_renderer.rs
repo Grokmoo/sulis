@@ -17,11 +17,11 @@
 use std::rc::Rc;
 use io::{DrawList, GraphicsRenderer, Vertex};
 use resource::Font;
-use ui::theme::TextParams;
+use ui::WidgetState;
 
 pub trait FontRenderer {
-    fn render(&self, renderer: &mut GraphicsRenderer, text: &str,
-              pos_x: f32, pos_y: f32, defaults: &TextParams);
+    fn render(&self, renderer: &mut GraphicsRenderer,
+              pos_x: f32, pos_y: f32, widget_state: &WidgetState);
 
     fn get_font(&self) -> &Rc<Font>;
 }
@@ -39,8 +39,11 @@ impl LineRenderer {
 }
 
 impl FontRenderer for LineRenderer {
-    fn render(&self, renderer: &mut GraphicsRenderer, text: &str, pos_x: f32, pos_y: f32,
-              defaults: &TextParams) {
+    fn render(&self, renderer: &mut GraphicsRenderer, pos_x: f32, pos_y: f32,
+              widget_state: &WidgetState) {
+        let text = &widget_state.text;
+        let defaults = &widget_state.text_params;
+
         let mut quads: Vec<Vertex> = Vec::new();
         let mut x = pos_x;
         for c in text.chars() {

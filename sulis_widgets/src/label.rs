@@ -46,8 +46,7 @@ impl Label {
         }))
     }
 
-    fn get_draw_params(width: f32, height: f32, widget: &Widget) -> (f32, f32, &str) {
-        let text = &widget.state.text;
+    fn get_draw_params(width: f32, height: f32, widget: &Widget) -> (f32, f32) {
         let x = widget.state.inner_left() as f32;
         let y = widget.state.inner_top() as f32;
         let w = widget.state.inner_size.width as f32;
@@ -71,7 +70,7 @@ impl Label {
             VerticalTextAlignment::Bottom => y + h - height,
         };
 
-        (x, y, &text)
+        (x, y)
     }
 }
 
@@ -110,8 +109,8 @@ impl WidgetKind for Label {
         let font = font_rend.get_font();
         let scale = widget.state.text_params.scale;
         let width = font.get_width(&widget.state.text) as f32 * scale / font.line_height as f32;
-        let (x, y, text) = Label::get_draw_params(width, scale, widget);
-        font_rend.render(renderer, text, x, y, &widget.state.text_params);
+        let (x, y) = Label::get_draw_params(width, scale, widget);
+        font_rend.render(renderer, x, y, &widget.state);
 
         self.text_draw_end_x = x + width;
         self.text_draw_end_y = y;

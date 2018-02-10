@@ -212,6 +212,10 @@ impl WidgetState {
         self.text_args.clear();
     }
 
+    pub fn has_text_arg(&self, id: &str) -> bool {
+        self.text_args.contains_key(id)
+    }
+
     pub fn get_text_arg(&self, id: &str) -> Option<&str> {
         self.text_args.get(id).map(|x| String::as_str(x))
     }

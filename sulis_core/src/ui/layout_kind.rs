@@ -130,6 +130,7 @@ impl LayoutKind {
                        size.width) / 2,
             Max => widget.state.inner_right() - size.width,
             Cursor => ::ui::Cursor::get_x(),
+            Custom => child.state.position.x,
         };
         let y = match theme.y_relative {
             Zero => widget.state.inner_top(),
@@ -137,6 +138,7 @@ impl LayoutKind {
                        size.height) / 2,
             Max => widget.state.inner_bottom() - size.height,
             Cursor => ::ui::Cursor::get_y(),
+            Custom => child.state.position.y,
         };
 
         child.state.set_position(

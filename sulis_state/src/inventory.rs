@@ -44,6 +44,13 @@ impl Inventory {
         }
     }
 
+    pub fn get_index(&self, slot: Slot) -> Option<usize> {
+        match self.equipped.get(&slot) {
+            None => None,
+            Some(index) => Some(*index),
+        }
+    }
+
     pub fn get(&self, slot: Slot) -> Option<&ItemState> {
         let index = match self.equipped.get(&slot) {
             None => return None,

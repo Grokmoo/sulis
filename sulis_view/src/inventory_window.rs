@@ -20,8 +20,9 @@ use std::cell::RefCell;
 
 use sulis_module::item::Slot;
 use sulis_state::{EntityState, ChangeListener, GameState};
+use sulis_core::io::event;
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_widgets::{Button, Label};
+use sulis_widgets::{Button, Label, TextArea};
 
 pub const NAME: &str = "inventory_window";
 
@@ -76,7 +77,7 @@ impl WidgetKind for InventoryWindow {
                 continue;
             }
 
-            let button = Widget::with_theme(Button::empty(), "item_button");
+            let button = Widget::with_defaults(ItemButton::new(Some(index)));
             button.borrow_mut().state.add_text_arg("icon", &item.item.icon.id());
 
             match item.item.equippable {
@@ -97,7 +98,7 @@ impl WidgetKind for InventoryWindow {
         let equipped_area = Widget::empty("equipped_area");
         for slot in Slot::iter() {
             let theme_id = format!("{:?}_button", slot).to_lowercase();
-            let button = Widget::with_theme(Button::empty(), &theme_id);
+            let button = Widget::with_theme(ItemButton::new(actor.inventory().get_index(*slot)), &theme_id);
 
             button.borrow_mut().state.add_callback(Callback::with(Box::new(move || {
                 let pc = GameState::pc();
@@ -116,5 +117,87 @@ impl WidgetKind for InventoryWindow {
         }
 
         vec![title, close, equipped_area, list_content]
+    }
+}
+
+struct ItemButton {
+    button: Rc<RefCell<Button>>,
+    item_window: Option<Rc<RefCell<Widget>>>,
+    item_index: Option<usize>,
+}
+
+const ITEM_BUTTON_NAME: &str = "item_button";
+
+impl ItemButton {
+    pub fn new(index: Option<usize>) -> Rc<RefCell<ItemButton>> {
+        Rc::new(RefCell::new(ItemButton {
+            button: Button::empty(),
+            item_window: None,
+            item_index: index,
+        }))
+    }
+
+    fn remove_item_window(&mut self) {
+        if self.item_window.is_some() {
+            self.item_window.as_ref().unwrap().borrow_mut().mark_for_removal();
+            self.item_window = None;
+        }
+    }
+}
+
+impl WidgetKind for ItemButton {
+    fn get_name(&self) -> &str { ITEM_BUTTON_NAME }
+    fn as_any(&self) -> &Any { self }
+    fn as_any_mut(&mut self) -> &mut Any { self }
+
+    fn on_mouse_enter(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
+        self.super_on_mouse_enter(widget);
+
+        if self.item_index.is_some() && self.item_window.is_none() {
+            let pc = GameState::pc();
+            let pc = pc.borrow_mut();
+            let item_state = &pc.actor.inventory().items[self.item_index.unwrap()];
+
+            let item_window = Widget::with_theme(TextArea::empty(), "item_window");
+            {
+                let mut item_window = item_window.borrow_mut();
+                item_window.state.disable();
+                item_window.state.set_position(widget.borrow().state.inner_right(),
+                (widget.borrow().state.inner_top() + widget.borrow().state.inner_bottom()) / 2);
+
+                item_window.state.add_text_arg("name", &item_state.item.name);
+
+                let equippable = match item_state.item.equippable {
+                    None => "",
+                    Some(_) => "Equippable",
+                };
+                item_window.state.add_text_arg("equippable", equippable);
+
+                let damage = match item_state.item.equippable {
+                    None => String::new(),
+                    Some(equip) => match equip.damage {
+                        None => String::new(),
+                        Some(damage) => format!("Damage: {} to {}", damage.min, damage.max),
+                    }
+                };
+                item_window.state.add_text_arg("damage", &damage);
+            }
+            let root = Widget::get_root(widget);
+            Widget::add_child_to(&root, Rc::clone(&item_window));
+            self.item_window = Some(item_window);
+        }
+        true
+    }
+
+    fn on_mouse_exit(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
+        self.super_on_mouse_exit(widget);
+
+        self.remove_item_window();
+        true
+    }
+
+    fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: event::ClickKind) -> bool {
+        self.remove_item_window();
+        self.button.borrow_mut().on_mouse_release(widget, kind)
     }
 }

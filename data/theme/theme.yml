@@ -134,6 +134,18 @@ children:
         children:
           item_button:
             from: .item_button
+  item_window:
+    from: .text_area
+    border: { top: 3, bottom: 3, left: 2, right: 2 }
+    background: bg_base
+    text: |
+      [s=5.0;c=f00|#name#]
+      [s=3.8|#equippable#]
+      [s=3.8|#damage#]
+    preferred_size: [40, 14]
+    position: [0, -7]
+    x_relative: Custom
+    y_relative: Custom
   character_window:
     from: .window
     children:

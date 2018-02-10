@@ -36,6 +36,7 @@ pub enum PositionRelative {
     Center,
     Cursor,
     Max,
+    Custom,
 }
 
 #[derive(Deserialize, Debug, Clone, Copy, PartialEq)]

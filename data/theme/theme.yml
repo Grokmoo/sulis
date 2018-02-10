@@ -104,25 +104,25 @@ children:
         position: [12, 8]
         children:
           head_button:
-            from: .inventory_window.items_list.item_button
+            from: .item_button
             position: [36, 3]
           torso_button:
-            from: .inventory_window.items_list.item_button
+            from: .item_button
             position: [36, 18]
           hands_button:
-            from: .inventory_window.items_list.item_button
+            from: .item_button
             position: [23, 24]
           legs_button:
-            from: .inventory_window.items_list.item_button
+            from: .item_button
             position: [36, 42]
           feet_button:
-            from: .inventory_window.items_list.item_button
+            from: .item_button
             position: [36, 64]
           heldmain_button:
-            from: .inventory_window.items_list.item_button
+            from: .item_button
             position: [20, 37]
           heldoff_button:
-            from: .inventory_window.items_list.item_button
+            from: .item_button
             position: [56, 37]
       items_list:
         preferred_size: [0, -93]
@@ -133,11 +133,7 @@ children:
         layout_spacing: [0, 1, 0, 1]
         children:
           item_button:
-            from: .button
-            background: background_transparent
-            border: [0, 0, 0, 0]
-            foreground: "#icon#"
-            preferred_size: [12, 12]
+            from: .item_button
   character_window:
     from: .window
     children:

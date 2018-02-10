@@ -26,8 +26,9 @@ use resource::ResourceSet;
 use ui::Widget;
 use util::Point;
 
-use glium::{self, Surface, glutin};
-use glium::glutin::VirtualKeyCode;
+use glium::{self, CapabilitiesSource, Surface, glutin};
+use glium::backend::Facade;
+use glium::glutin::{ContextBuilder, Robustness, VirtualKeyCode};
 use glium::texture::{RawImage2d, SrgbTexture2d};
 use glium::uniforms::{MinifySamplerFilter, MagnifySamplerFilter, Sampler};
 
@@ -45,6 +46,18 @@ const VERTEX_SHADER_SRC: &'static str = r#"
 "#;
 
 const FRAGMENT_SHADER_SRC: &'static str = r#"
+  #version 140
+  in vec2 v_tex_coords;
+  out vec4 color;
+  uniform sampler2D tex;
+  uniform vec4 color_filter;
+
+  void main() {
+    color = color_filter * texture(tex, v_tex_coords);
+  }
+"#;
+
+const SWAP_FRAGMENT_SHADER_SRC: &'static str = r#"
   #version 140
   in vec2 v_tex_coords;
   out vec4 color;
@@ -72,16 +85,12 @@ const FRAGMENT_SHADER_SRC: &'static str = r#"
   void main() {
     vec4 tex_color = texture(tex, v_tex_coords);
 
-    if (color_swap_enabled) {
-      vec3 hsv = rgb2hsv(tex_color.rgb);
-      if (hsv.x < 0.9 && hsv.x > 0.8 ) {
-        vec3 rgb = hsv2rgb(vec3(swap_hue, hsv.y, hsv.z));
-        color = vec4(rgb.r, rgb.g, rgb.b, tex_color.a);
-      } else {
-        color = color_filter * tex_color;
-      }
+    vec3 hsv = rgb2hsv(tex_color.rgb);
+    if (hsv.x < 0.9 && hsv.x > 0.8 ) {
+      vec3 rgb = hsv2rgb(vec3(swap_hue, hsv.y, hsv.z));
+      color = vec4(rgb.r, rgb.g, rgb.b, tex_color.a);
     } else {
-        color = color_filter * tex_color;
+      color = color_filter * tex_color;
     }
   }
 "#;
@@ -89,7 +98,8 @@ const FRAGMENT_SHADER_SRC: &'static str = r#"
 pub struct GliumDisplay {
     display: glium::Display,
     events_loop: glium::glutin::EventsLoop,
-    program: glium::Program,
+    base_program: glium::Program,
+    swap_program: glium::Program,
     matrix: [[f32; 4]; 4],
     textures: HashMap<String, GliumTexture>,
 }
@@ -147,7 +157,6 @@ fn draw_to_surface<T: glium::Surface>(surface: &mut T, draw_list: DrawList,
         matrix: display.matrix,
         tex: (glium_texture.sampler_fn)(glium_texture.texture.sampled()),
         color_filter: draw_list.color_filter,
-        color_swap_enabled: draw_list.color_swap_enabled,
         swap_hue: draw_list.swap_hue,
         scale: [
             [draw_list.scale[0], 0.0, 0.0, 0.0],
@@ -159,13 +168,14 @@ fn draw_to_surface<T: glium::Surface>(surface: &mut T, draw_list: DrawList,
 
     let vertex_buffer = glium::VertexBuffer::new(&display.display, &draw_list.quads).unwrap();
     let indices = glium::index::NoIndices(glium::index::PrimitiveType::TrianglesList);
-    surface.draw(&vertex_buffer, &indices, &display.program, &uniforms, params).unwrap();
-    // for quad in draw_list.quads {
-    //     let vertex_buffer = glium::VertexBuffer::new(&display.display, &quad).unwrap();
-    //     let indices = glium::index::NoIndices(glium::index::PrimitiveType::TriangleStrip);
-    //     surface.draw(&vertex_buffer, &indices, &display.program,
-    //                  &uniforms, params).unwrap();
-    // }
+
+    let program = if draw_list.color_swap_enabled {
+        &display.swap_program
+    } else {
+        &display.base_program
+    };
+
+    surface.draw(&vertex_buffer, &indices, program, &uniforms, params).unwrap();
 }
 
 impl<'a> GraphicsRenderer for GliumRenderer<'a> {
@@ -220,16 +230,26 @@ impl GliumDisplay {
         let window = glium::glutin::WindowBuilder::new()
             .with_dimensions(CONFIG.display.width_pixels, CONFIG.display.height_pixels)
             .with_title("Sulis");
-        let context = glium::glutin::ContextBuilder::new();
+        let context = ContextBuilder::new().with_gl_robustness(Robustness::NotRobust);
         let display = glium::Display::new(window, context, &events_loop).unwrap();
-
-        let program = glium::Program::from_source(&display, VERTEX_SHADER_SRC,
+        info!("Initialized glium adapter:");
+        info!("Version: {}", display.get_opengl_version_string());
+        info!("Vendor: {}", display.get_opengl_vendor_string());
+        info!("Renderer: {}", display.get_opengl_renderer_string());
+        info!("Max viewport: {:?}", display.get_max_viewport_dimensions());
+        info!("Video memory available: {:?}", display.get_free_video_memory());
+        trace!("Extensions: {:#?}", display.get_context().get_extensions());
+        trace!("Capabilities: {:?}", display.get_context().get_capabilities());
+        let base_program = glium::Program::from_source(&display, VERTEX_SHADER_SRC,
                                                   FRAGMENT_SHADER_SRC, None).unwrap();
+        let swap_program = glium::Program::from_source(&display, VERTEX_SHADER_SRC,
+                                                       SWAP_FRAGMENT_SHADER_SRC, None).unwrap();
 
         GliumDisplay {
             display,
             events_loop,
-            program,
+            base_program,
+            swap_program,
             matrix: [
                 [2.0 / CONFIG.display.width as f32, 0.0, 0.0, 0.0],
                 [0.0, 2.0 / CONFIG.display.height as f32, 0.0, 0.0],

@@ -53,8 +53,10 @@ children:
     children:
       title:
         from: .label
-        width_relative: Max
-        preferred_size: [0, 4]
+        background: bg_base
+        x_relative: Center
+        preferred_size: [40, 5]
+        position: [0, -3]
         text_params:
           scale: 5.5
       close:
@@ -66,4 +68,10 @@ children:
         text: "X"
         position: [3, -3]
         x_relative: Max
+  item_button:
+    from: .button
+    background: background_transparent
+    border: [0, 0, 0, 0]
+    foreground: "#icon#"
+    preferred_size: [12, 12]
 ...

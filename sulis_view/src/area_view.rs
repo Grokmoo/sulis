@@ -48,7 +48,7 @@ pub struct AreaView {
 
 const SCALE_Y_BASE: f32 = 3600.0;
 const SCALE_X_BASE: f32 = SCALE_Y_BASE * 16.0 / 9.0;
-const TILE_CACHE_TEXTURE_SIZE: u32 = 2048;
+const TILE_CACHE_TEXTURE_SIZE: u32 = 1024;
 const TILE_SIZE: u32 = 16;
 const TEX_COORDS: [f32; 8] = [ 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0 ];
 

@@ -23,6 +23,7 @@ pub use self::attribute::Attribute;
 
 pub mod damage;
 pub use self::damage::Damage;
+pub use self::damage::DamageKind;
 
 use self::attribute::Attribute::*;
 

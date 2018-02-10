@@ -14,13 +14,35 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::fmt::{self, Display};
 use rand::{self, Rng};
+
+#[derive(Deserialize, Debug, Clone, Copy)]
+#[serde(deny_unknown_fields)]
+pub enum DamageKind {
+    Slashing,
+    Piercing,
+    Crushing,
+    Acid,
+    Cold,
+    Electrical,
+    Fire,
+    Sonic,
+    Raw,
+}
+
+impl Display for DamageKind {
+    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
+        write!(fmt, "{:?}", self)
+    }
+}
 
 #[derive(Deserialize, Debug, Copy, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct Damage {
     pub min: u32,
     pub max: u32,
+    pub kind: DamageKind,
 }
 
 impl Damage {
@@ -46,6 +68,7 @@ impl Default for Damage {
         Damage {
             min: 0,
             max: 0,
+            kind: DamageKind::Raw,
         }
     }
 }

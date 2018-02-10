@@ -175,6 +175,8 @@ impl Theme {
     pub fn apply_foreground(&self, state: &mut WidgetState) {
         if self.foreground.is_some() {
             let out = expand_text_args(&self.foreground, state);
+            if out.is_empty() { return; }
+
             match ResourceSet::get_image(&out) {
                 None => warn!("Unable to find image '{}'", out),
                 Some(image) => state.set_foreground(Some(image)),
@@ -221,7 +223,7 @@ pub fn expand_text_args(text: &Option<String>, state: &WidgetState) -> String {
                 } else {
                     let text_arg = match state.get_text_arg(&cur_arg) {
                         None => {
-                            warn!("Non existant text arg '{}' in text '{}'", cur_arg, text);
+                            trace!("No text arg '{}' for text '{}'", cur_arg, text);
                             ""
                         },
                         Some(arg) => arg,

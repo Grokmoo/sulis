@@ -6,6 +6,7 @@ equippable:
   damage:
     min: 2
     max: 4
+    kind: Crushing
   reach: 1.5
 image:
   HeldMain:

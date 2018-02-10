@@ -140,8 +140,7 @@ children:
     background: bg_base
     text: |
       [s=5.0;c=f00|#name#]
-      [s=3.8|#equippable#]
-      [s=3.8|#damage#]
+      [?min_damage|[s=4.0|Damage: #min_damage# to #max_damage# [c=f00|#damage_kind#]]]
     preferred_size: [40, 14]
     position: [0, -7]
     x_relative: Custom

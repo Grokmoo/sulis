@@ -6,6 +6,7 @@ equippable:
   damage:
     min: 4
     max: 6
+    kind: Slashing
   reach: 2.5
 image:
   HeldMain:

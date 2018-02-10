@@ -18,10 +18,11 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
+use sulis_module::Equippable;
 use sulis_module::item::Slot;
 use sulis_state::{EntityState, ChangeListener, GameState};
 use sulis_core::io::event;
-use sulis_core::ui::{Callback, Widget, WidgetKind};
+use sulis_core::ui::{Callback, Widget, WidgetKind, WidgetState};
 use sulis_widgets::{Button, Label, TextArea};
 
 pub const NAME: &str = "inventory_window";
@@ -167,20 +168,12 @@ impl WidgetKind for ItemButton {
 
                 item_window.state.add_text_arg("name", &item_state.item.name);
 
-                let equippable = match item_state.item.equippable {
-                    None => "",
-                    Some(_) => "Equippable",
-                };
-                item_window.state.add_text_arg("equippable", equippable);
-
-                let damage = match item_state.item.equippable {
-                    None => String::new(),
-                    Some(equip) => match equip.damage {
-                        None => String::new(),
-                        Some(damage) => format!("Damage: {} to {}", damage.min, damage.max),
-                    }
-                };
-                item_window.state.add_text_arg("damage", &damage);
+                match item_state.item.equippable {
+                    None => (),
+                    Some(equippable) => {
+                        add_equippable_text_args(&equippable, &mut item_window.state);
+                    },
+                }
             }
             let root = Widget::get_root(widget);
             Widget::add_child_to(&root, Rc::clone(&item_window));
@@ -199,5 +192,13 @@ impl WidgetKind for ItemButton {
     fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: event::ClickKind) -> bool {
         self.remove_item_window();
         self.button.borrow_mut().on_mouse_release(widget, kind)
+    }
+}
+
+fn add_equippable_text_args(equippable: &Equippable, widget_state: &mut WidgetState) {
+    if let Some(damage) = equippable.damage {
+        widget_state.add_text_arg("min_damage", &damage.min.to_string());
+        widget_state.add_text_arg("max_damage", &damage.max.to_string());
+        widget_state.add_text_arg("damage_kind", &damage.kind.to_string());
     }
 }

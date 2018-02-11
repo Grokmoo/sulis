@@ -77,7 +77,7 @@ impl Inventory {
             None => return false,
             Some(item) => match &item.item.equippable {
                 &None => return false,
-                &Some(equippable) => equippable.slot,
+                &Some(ref equippable) => equippable.slot,
             }
         };
 
@@ -92,7 +92,7 @@ impl Inventory {
             None => return false,
             Some(item) => match &item.item.equippable {
                 &None => return false,
-                &Some(equippable) => equippable.slot,
+                &Some(ref equippable) => equippable.slot,
             }
         };
         trace!("Found matching slot '{:?}'", slot);

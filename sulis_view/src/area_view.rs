@@ -46,9 +46,9 @@ pub struct AreaView {
     scroll_y_f32: f32,
 }
 
-const SCALE_Y_BASE: f32 = 3600.0;
+const SCALE_Y_BASE: f32 = 3200.0;
 const SCALE_X_BASE: f32 = SCALE_Y_BASE * 16.0 / 9.0;
-const TILE_CACHE_TEXTURE_SIZE: u32 = 1024;
+const TILE_CACHE_TEXTURE_SIZE: u32 = 2048;
 const TILE_SIZE: u32 = 16;
 const TEX_COORDS: [f32; 8] = [ 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0 ];
 
@@ -324,7 +324,7 @@ impl WidgetKind for AreaView {
         self.draw_layer(renderer, scale_x, scale_y, widget, VISIBILITY_TEX_ID);
 
         //draw transparent version of each actor for when they are obscured behind objects
-        self.draw_entities(renderer, scale_x, scale_y, 0.4, widget, &state, millis);
+        // self.draw_entities(renderer, scale_x, scale_y, 0.4, widget, &state, millis);
 
         if let Some(ref cursor) = self.cursors {
             let mut draw_list = cursor.clone();

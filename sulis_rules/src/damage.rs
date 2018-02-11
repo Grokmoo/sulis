@@ -17,7 +17,7 @@
 use std::fmt::{self, Display};
 use rand::{self, Rng};
 
-#[derive(Deserialize, Debug, Clone, Copy)]
+#[derive(Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
 pub enum DamageKind {
     Slashing,

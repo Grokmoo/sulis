@@ -34,8 +34,12 @@ groups:
       boots_leather: [9, 3]
       pants: [36, 3]
       shirt: [39, 3]
+      legs_leather: [42, 3]
+      torso_leather: [45, 3]
       pants_female: [36, 6]
       shirt_female: [39, 6]
+      legs_leather_female: [42, 6]
+      torso_leather_female: [45, 6]
       
       human_male_ears: [18, 3]
       human_male_fg: [21, 3]

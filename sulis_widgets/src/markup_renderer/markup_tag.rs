@@ -105,6 +105,8 @@ impl Markup {
     }
 
     pub fn add_quad_and_advance(&self, quads: &mut Vec<Vertex>, c: char, x: f32, y: f32) -> f32 {
+        if self.ignore { return x; }
+
         self.font.get_quad(quads, c, x, y - self.y_offset(), self.scale)
     }
 

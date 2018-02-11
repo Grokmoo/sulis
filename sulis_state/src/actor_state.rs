@@ -18,7 +18,7 @@ use sulis_core::image::{LayeredImage};
 use sulis_core::io::DrawList;
 use sulis_module::{item, Actor, Module};
 use {ChangeListenerList, EntityState, Inventory};
-use sulis_rules::{AttributeList, Damage, StatList};
+use sulis_rules::{Armor, AttributeList, Damage, StatList};
 
 use std::rc::Rc;
 use std::cell::{RefCell};
@@ -169,7 +169,7 @@ impl ActorState {
 
         debug!("Compute stats for '{}'", self.actor.name);
         if let Some(ref item_state) = self.inventory.get(item::Slot::HeldMain) {
-            if let Some(equippable) = item_state.item.equippable {
+            if let Some(ref equippable) = item_state.item.equippable {
                 if let Some(damage) = equippable.damage {
                     self.stats.damage = damage;
                 }
@@ -182,12 +182,17 @@ impl ActorState {
             self.stats.damage = Damage::default();
         }
 
-        // for item_state in self.inventory.borrow().equipped_iter() {
-        //     let equippable = match item_state.item.equippable {
-        //         None => continue,
-        //         Some(equippable) => equippable,
-        //     };
-        // }
+        self.stats.armor = Armor::default();
+        for ref item_state in self.inventory.equipped_iter() {
+            let equippable = match item_state.item.equippable {
+                None => continue,
+                Some(ref equippable) => equippable,
+            };
+
+            if let Some(ref armor) = equippable.armor {
+                self.stats.armor = Armor::sum(&self.stats.armor, armor);
+            }
+        }
 
         let mut max_hp: u32 = 0;
         for &(ref class, level) in self.actor.levels.iter() {

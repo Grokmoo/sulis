@@ -188,9 +188,12 @@ impl FontRenderer for MarkupRenderer {
                             max_last_line_height = cur_markup.scale;
                         }
                     }, '\n' => {
-                        x = pos_x;
-                        y += max_last_line_height;
-                        max_last_line_height = cur_markup.scale;
+                        if !cur_markup.ignore {
+                            let factor = cur_markup.font.base as f32 / cur_markup.font.line_height as f32;
+                            x = pos_x;
+                            y += max_last_line_height * factor;
+                            max_last_line_height = cur_markup.scale;
+                        }
                     }, _ => {
                         if in_markup_tag {
                             markup_buf.push(c);
@@ -202,8 +205,9 @@ impl FontRenderer for MarkupRenderer {
             }
 
             if x > max_x {
+                let factor = cur_markup.font.base as f32 / cur_markup.font.line_height as f32;
                 x = pos_x;
-                y += max_last_line_height;
+                y += max_last_line_height * factor;
                 max_last_line_height = cur_markup.scale;
             }
         }

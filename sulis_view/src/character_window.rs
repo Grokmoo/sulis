@@ -97,6 +97,11 @@ impl WidgetKind for CharacterWindow {
             state.add_text_arg("cur_ap", &pc.actor.ap().to_string());
 
             state.add_text_arg("initiative", &pc.actor.stats.initiative.to_string());
+
+            state.add_text_arg("armor", &pc.actor.stats.armor.base.to_string());
+            for &(kind, amount) in pc.actor.stats.armor.kinds.iter() {
+                state.add_text_arg(&format!("armor_{}", kind).to_lowercase(), &amount.to_string());
+            }
         }
         vec![title, close, details]
     }

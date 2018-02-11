@@ -18,6 +18,9 @@ extern crate rand;
 
 #[macro_use] extern crate serde_derive;
 
+pub mod armor;
+pub use self::armor::Armor;
+
 pub mod attribute;
 pub use self::attribute::Attribute;
 
@@ -60,6 +63,7 @@ impl AttributeList {
 
 pub struct StatList {
     pub damage: Damage,
+    pub armor: Armor,
     pub reach: f32,
     pub max_hp: u32,
     pub initiative: u32,
@@ -70,6 +74,7 @@ impl Default for StatList {
     fn default() -> StatList {
         StatList {
             damage: Damage::default(),
+            armor: Armor::default(),
             max_hp: 0,
             reach: 0.0,
             initiative: 0,

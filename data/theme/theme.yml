@@ -139,9 +139,12 @@ children:
     border: { top: 3, bottom: 3, left: 2, right: 2 }
     background: bg_base
     text: |
-      [s=5.0;c=f00|#name#]
-      [?min_damage|[s=4.0|Damage: #min_damage# to #max_damage# [c=f00|#damage_kind#]]]
-    preferred_size: [40, 14]
+      [s=5.0;c=f00|#name#
+      ][?min_damage|[s=4.0|Damage: #min_damage# to #max_damage# [c=f00|#damage_kind#]]
+      ][?reach|[s=3.0|Reach: #reach#]
+      ][?armor|[s=4.0|Armor: #armor#][?armor_slashing;s=3.0| (Slashing: #armor_slashing#)][?armor_piercing;s=3.0| (Piercing: #armor_piercing#)][?armor_crushing;s=3.0| (Crushing: #armor_crushing#)][?armor_acid;s=3.0| (Acid: #armor_acid#)][?armor_cold;s=3.0| (Cold: #armor_cold#)][?armor_electrical;s=3.0| (Electrical: #armor_electrical#)][?armor_fire;s=3.0| (Fire: #armor_fire#)][?armor_sonic;s=3.0| (Sonic: #armor_sonic#)]
+      ]
+    preferred_size: [50, 14]
     position: [0, -7]
     x_relative: Custom
     y_relative: Custom
@@ -158,6 +161,8 @@ children:
           [s=6|]
           [s=5|[x=0|Attack][x=40|Hit Points][x=80|Action Points]]
           [s=4;x=0|Damage: #damage_min# to #damage_max#][x=40| #cur_hp# / #max_hp#][x=80| #cur_ap#]
+          [s=6|]
+          [s=5.0;x=0|Armor: #armor#][?armor_slashing;s=3.0| (Slashing: #armor_slashing#)][?armor_piercing;s=3.0| (Piercing: #armor_piercing#)][?armor_crushing;s=3.0| (Crushing: #armor_crushing#)][?armor_acid;s=3.0| (Acid: #armor_acid#)][?armor_cold;s=3.0| (Cold: #armor_cold#)][?armor_electrical;s=3.0| (Electrical: #armor_electrical#)][?armor_fire;s=3.0| (Fire: #armor_fire#)][?armor_sonic;s=3.0| (Sonic: #armor_sonic#)]
           [s=6|]
           [s=5|[x=0|Strength][x=40|#str#]
                   [x=0|Dexterity][x=40|#dex#]

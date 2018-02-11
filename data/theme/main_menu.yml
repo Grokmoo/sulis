@@ -15,6 +15,7 @@ children:
         text: "Play"
         text_params:
           scale: 8.0
+          vertical_alignment: Center
         preferred_size: [40, 12]
         x_relative: Center
         position: [40, 32]

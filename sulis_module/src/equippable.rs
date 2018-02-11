@@ -14,13 +14,14 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use sulis_rules::Damage;
+use sulis_rules::{Armor, Damage};
 use item::Slot;
 
-#[derive(Deserialize, Debug, Copy, Clone)]
+#[derive(Deserialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct Equippable {
     pub slot: Slot,
+    pub armor: Option<Armor>,
     pub damage: Option<Damage>,
     pub reach: Option<f32>,
 }

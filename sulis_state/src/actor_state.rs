@@ -14,14 +14,14 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::rc::Rc;
+use std::cell::{RefCell};
+
 use sulis_core::image::{LayeredImage};
 use sulis_core::io::DrawList;
 use sulis_module::{item, Actor, Module};
 use {ChangeListenerList, EntityState, Inventory};
 use sulis_rules::{Armor, AttributeList, Damage, StatList};
-
-use std::rc::Rc;
-use std::cell::{RefCell};
 
 pub struct ActorState {
     pub actor: Rc<Actor>,
@@ -83,9 +83,12 @@ impl ActorState {
 
     pub fn attack(&mut self, target: &Rc<RefCell<EntityState>>) {
         let amount = self.stats.damage.roll();
-        info!("'{}' attacks '{}' for {} damage", self.actor.name,
-              target.borrow().actor.actor.name, amount);
-        target.borrow_mut().remove_hp(amount);
+        let armor = target.borrow().actor.stats.armor.amount(self.stats.damage.kind);
+        info!("'{}' attacks '{}' for {} damage vs {} armor", self.actor.name,
+              target.borrow().actor.actor.name, amount, armor);
+        if amount > armor {
+            target.borrow_mut().remove_hp(amount - armor);
+        }
         self.remove_ap(Module::rules().attack_ap);
     }
 

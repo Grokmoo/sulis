@@ -9,4 +9,4 @@ sex: Male
 levels:
   fighter: 3
 items: [ sword_short, club, misc_apple, gloves_leather, boots_leather, legs_pants, torso_shirt, torso_leather, legs_leather ]
-equipped: [ 0, 3, 4, 5, 6 ]
+equipped: [ 0, 3, 4, 7, 8 ]

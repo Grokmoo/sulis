@@ -151,6 +151,10 @@ impl WidgetKind for ItemButton {
     fn as_any(&self) -> &Any { self }
     fn as_any_mut(&mut self) -> &mut Any { self }
 
+    fn on_remove(&mut self) {
+        self.remove_item_window();
+    }
+
     fn on_mouse_enter(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
         self.super_on_mouse_enter(widget);
 

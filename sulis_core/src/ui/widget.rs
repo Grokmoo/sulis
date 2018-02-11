@@ -16,7 +16,7 @@
 
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
-use std::cell::RefCell;
+use std::cell::{Ref, RefCell};
 
 use io::{DrawList, event, Event, GraphicsRenderer};
 use ui::{Cursor, EmptyWidget, Theme, WidgetState, WidgetKind};
@@ -367,6 +367,16 @@ impl Widget {
         }
     }
 
+    fn recursive_on_remove(widget_ref: &Ref<Widget>) {
+        let len = widget_ref.children.len();
+        for i in 0..len {
+            let child = Rc::clone(&widget_ref.children[i]);
+            Widget::recursive_on_remove(&child.borrow());
+        }
+
+        widget_ref.kind.borrow_mut().on_remove();
+    }
+
     pub fn check_children(parent: &Rc<RefCell<Widget>>) -> Result<(), Error> {
         let mut remove_modal = false;
         if let Some(ref w) = parent.borrow().modal_child {
@@ -383,7 +393,7 @@ impl Widget {
         parent.borrow_mut().children.retain(|widget| {
             let widget_ref = widget.borrow();
             if widget_ref.marked_for_removal {
-                widget_ref.kind.borrow_mut().on_remove();
+                Widget::recursive_on_remove(&widget_ref);
                 false
             } else {
                 true

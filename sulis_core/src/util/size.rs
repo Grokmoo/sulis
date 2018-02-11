@@ -19,6 +19,8 @@ use std::cmp;
 
 use ui::Border;
 
+pub static ZERO_SIZE: Size = Size { width: 0, height: 0 };
+
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Size {

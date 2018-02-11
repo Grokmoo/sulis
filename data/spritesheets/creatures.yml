@@ -29,6 +29,7 @@ groups:
       hair09: [24, 0]
       hair10: [27, 0]
       hair11: [30, 0]
+      helm_leather: [33, 0]
     
       gloves_leather: [0, 3]
       boots_leather: [9, 3]

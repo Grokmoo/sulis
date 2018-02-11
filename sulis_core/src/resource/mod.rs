@@ -32,7 +32,7 @@ use std::fmt::Display;
 use std::hash::Hash;
 
 use resource::resource_builder_set::ResourceBuilderSet;
-use image::{Image, SimpleImage, AnimatedImage, ComposedImage, TimerImage};
+use image::{Image, EmptyImage, SimpleImage, AnimatedImage, ComposedImage, TimerImage};
 use util::invalid_data_error;
 use ui::Theme;
 
@@ -92,6 +92,9 @@ impl ResourceSet {
                 insert_if_ok_boxed("font", id, Font::new(fonts_dir, font),
                 &mut resource_set.fonts);
             }
+
+            let empty = Rc::new(EmptyImage { });
+            resource_set.images.insert(empty.id(), empty);
 
             for (id, image) in builder_set.simple_builders {
                 insert_if_ok_boxed("image", id, SimpleImage::new(image, &resource_set),

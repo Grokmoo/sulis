@@ -34,7 +34,7 @@ use std::fmt::Debug;
 
 use io::{DrawList, GraphicsRenderer};
 use ui::AnimationState;
-use util::Size;
+use util::{size, Size};
 
 pub trait Image: Debug {
     fn draw_graphics_mode(&self, renderer: &mut GraphicsRenderer, state: &AnimationState,
@@ -50,4 +50,24 @@ pub trait Image: Debug {
     fn get_size(&self) -> &Size;
 
     fn id(&self) -> String;
+}
+
+#[derive(Debug)]
+pub struct EmptyImage {}
+
+impl Image for EmptyImage {
+    fn draw_graphics_mode(&self, _renderer: &mut GraphicsRenderer, _state: &AnimationState,
+                          _x: f32, _y: f32, _w: f32, _h: f32, _millis: u32) {
+
+    }
+
+    fn append_to_draw_list(&self, _draw_list: &mut DrawList, _state: &AnimationState,
+                           _x: f32, _y: f32, _w: f32, _h: f32, _millis: u32) {
+
+    }
+
+    fn get_width_f32(&self) -> f32 { 0.0 }
+    fn get_height_f32(&self) -> f32 { 0.0 }
+    fn get_size(&self) -> &Size { &size::ZERO_SIZE }
+    fn id(&self) -> String { "empty".to_string() }
 }

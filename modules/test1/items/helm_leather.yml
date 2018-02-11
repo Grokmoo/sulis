@@ -1,0 +1,15 @@
+id: helm_leather
+name: Leather Helm
+icon: inventory/helm_leather
+equippable:
+  slot: Head
+  armor:
+    base: 1
+    kinds:
+      - [Acid, 2]
+      - [Electrical, 2]
+image:
+  Head:
+    creatures/helm_leather
+  Hair:
+    empty

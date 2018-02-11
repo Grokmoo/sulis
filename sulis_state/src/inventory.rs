@@ -118,30 +118,15 @@ impl Inventory {
     pub fn get_image_layers(&self) -> HashMap<ImageLayer, Rc<Image>> {
         let mut layers = HashMap::new();
 
-        for (slot, index) in self.equipped.iter() {
+        for (_, index) in self.equipped.iter() {
             let item_state = &self.items[*index];
 
-            let layer = slot_to_layer(*slot);
-            match item_state.item.image_for_layer(layer) {
-                None => continue,
-                Some(ref image) => layers.insert(layer, Rc::clone(image)),
-            };
+            for (layer, ref image) in item_state.item.image.iter() {
+                layers.insert(*layer, Rc::clone(image));
+            }
         }
 
         layers
-    }
-}
-
-fn slot_to_layer(slot: Slot) -> ImageLayer {
-    use sulis_module::item::Slot::*;
-    match slot {
-        Head => ImageLayer::Head,
-        Torso => ImageLayer::Torso,
-        Hands => ImageLayer::Hands,
-        HeldMain => ImageLayer::HeldMain,
-        HeldOff => ImageLayer::HeldOff,
-        Legs => ImageLayer::Legs,
-        Feet => ImageLayer::Feet,
     }
 }
 

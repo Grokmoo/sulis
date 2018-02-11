@@ -17,7 +17,7 @@
 mod point;
 pub use self::point::Point;
 
-mod size;
+pub mod size;
 pub use self::size::Size;
 
 use std::rc::Rc;

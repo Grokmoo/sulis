@@ -33,13 +33,12 @@ impl Default for Armor {
 }
 
 impl Armor {
-    pub fn sum(this: &Armor, other: &Armor) -> Armor {
-        let base = this.base + other.base;
-        let mut kinds = this.kinds.clone();
+    pub fn add(&mut self, other: &Armor) {
+        self.base += other.base;
 
         for &(other_kind, other_amount) in other.kinds.iter() {
             let mut found_index: Option<usize> = None;
-            for (index, &(this_kind, _)) in kinds.iter().enumerate() {
+            for (index, &(this_kind, _)) in self.kinds.iter().enumerate() {
                 if other_kind == this_kind {
                     found_index = Some(index);
                     break;
@@ -47,14 +46,9 @@ impl Armor {
             }
 
             match found_index {
-                Some(index) => kinds[index] = (other_kind, kinds[index].1 + other_amount),
-                None => kinds.push((other_kind, other_amount)),
+                Some(index) => self.kinds[index] = (other_kind, self.kinds[index].1 + other_amount),
+                None => self.kinds.push((other_kind, other_amount)),
             }
-        }
-
-        Armor {
-            base,
-            kinds,
         }
     }
 

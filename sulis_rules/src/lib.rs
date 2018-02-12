@@ -24,6 +24,9 @@ pub use self::armor::Armor;
 pub mod attribute;
 pub use self::attribute::Attribute;
 
+mod bonus_list;
+pub use self::bonus_list::BonusList;
+
 pub mod damage;
 pub use self::damage::Damage;
 pub use self::damage::DamageKind;
@@ -65,10 +68,35 @@ pub struct StatList {
     pub damage: Damage,
     pub armor: Armor,
     pub reach: f32,
-    pub max_hp: u32,
-    pub initiative: u32,
+    pub max_hp: i32,
+    pub initiative: i32,
+    pub accuracy: i32,
+    pub dodge: i32,
+    pub fortitude: i32,
+    pub reflex: i32,
+    pub will: i32,
 }
 
+impl StatList {
+    pub fn add(&mut self, bonuses: &BonusList) {
+        if let Some(ref armor) = bonuses.armor {
+            self.armor.add(armor);
+        }
+
+        if let Some(damage) = bonuses.damage {
+            self.damage = Damage::max(self.damage, damage);
+        }
+
+        if let Some(reach) = bonuses.reach { self.reach += reach; }
+        if let Some(hit_points) = bonuses.hit_points { self.max_hp += hit_points; }
+        if let Some(initiative) = bonuses.initiative { self.initiative += initiative; }
+        if let Some(accuracy) = bonuses.accuracy { self.accuracy += accuracy; }
+        if let Some(dodge) = bonuses.dodge { self.dodge += dodge; }
+        if let Some(fortitude) = bonuses.fortitude { self.fortitude += fortitude; }
+        if let Some(reflex) = bonuses.reflex { self.reflex += reflex; }
+        if let Some(will) = bonuses.will { self.will += will; }
+    }
+}
 
 impl Default for StatList {
     fn default() -> StatList {
@@ -78,6 +106,11 @@ impl Default for StatList {
             max_hp: 0,
             reach: 0.0,
             initiative: 0,
+            accuracy: 0,
+            dodge: 0,
+            fortitude: 0,
+            reflex: 0,
+            will: 0,
         }
     }
 }

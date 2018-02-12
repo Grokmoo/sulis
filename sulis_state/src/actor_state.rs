@@ -21,14 +21,14 @@ use sulis_core::image::{LayeredImage};
 use sulis_core::io::DrawList;
 use sulis_module::{item, Actor, Module};
 use {ChangeListenerList, EntityState, Inventory};
-use sulis_rules::{Armor, AttributeList, Damage, StatList};
+use sulis_rules::{AttributeList, StatList};
 
 pub struct ActorState {
     pub actor: Rc<Actor>,
     pub attributes: AttributeList,
     pub stats: StatList,
     pub listeners: ChangeListenerList<ActorState>,
-    hp: u32,
+    hp: i32,
     ap: u32,
     inventory: Inventory,
     image: LayeredImage,
@@ -114,7 +114,7 @@ impl ActorState {
         self.hp <= 0
     }
 
-    pub fn hp(&self) -> u32 {
+    pub fn hp(&self) -> i32 {
         self.hp
     }
 
@@ -138,10 +138,10 @@ impl ActorState {
     }
 
     pub(crate) fn remove_hp(&mut self, hp: u32) {
-        if hp > self.hp {
+        if hp as i32 > self.hp {
             self.hp = 0;
         } else {
-            self.hp -= hp;
+            self.hp -= hp as i32;
         }
 
         self.listeners.notify(&self);
@@ -163,47 +163,27 @@ impl ActorState {
     }
 
     pub fn compute_stats(&mut self) {
-        let image = LayeredImage::new(self.actor.image_layers()
+        debug!("Compute stats for '{}'", self.actor.name);
+        self.stats = StatList::default();
+
+        self.image = LayeredImage::new(self.actor.image_layers()
                                       .get_list_with(self.actor.sex, &self.actor.race,
                                                      self.inventory.get_image_layers()));
-        self.image = image;
 
         let rules = Module::rules();
-
-        debug!("Compute stats for '{}'", self.actor.name);
-        if let Some(ref item_state) = self.inventory.get(item::Slot::HeldMain) {
-            if let Some(ref equippable) = item_state.item.equippable {
-                if let Some(damage) = equippable.damage {
-                    self.stats.damage = damage;
-                }
-
-                if let Some(reach)= equippable.reach {
-                    self.stats.reach = reach;
-                }
-            }
-        } else {
-            self.stats.damage = Damage::default();
+        self.stats.initiative = rules.base_initiative;
+        for &(ref class, level) in self.actor.levels.iter() {
+            self.stats.max_hp += (class.hp_per_level * level) as i32;
         }
 
-        self.stats.armor = Armor::default();
         for ref item_state in self.inventory.equipped_iter() {
             let equippable = match item_state.item.equippable {
                 None => continue,
                 Some(ref equippable) => equippable,
             };
 
-            if let Some(ref armor) = equippable.armor {
-                self.stats.armor = Armor::sum(&self.stats.armor, armor);
-            }
+            self.stats.add(&equippable.bonuses);
         }
-
-        let mut max_hp: u32 = 0;
-        for &(ref class, level) in self.actor.levels.iter() {
-            max_hp += class.hp_per_level * level;
-        }
-        self.stats.max_hp = max_hp;
-
-        self.stats.initiative = rules.base_initiative;
 
         self.listeners.notify(&self);
     }

@@ -3,11 +3,12 @@ name: Club
 icon: inventory/weapon_club
 equippable:
   slot: HeldMain
-  damage:
-    min: 2
-    max: 4
-    kind: Crushing
-  reach: 1.5
+  bonuses:
+    damage:
+      min: 2
+      max: 4
+      kind: Crushing
+    reach: 1.5
 image:
   HeldMain:
     creatures/club

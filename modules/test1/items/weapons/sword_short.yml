@@ -3,11 +3,12 @@ name: Short Sword
 icon: inventory/weapon_sword_short
 equippable:
   slot: HeldMain
-  damage:
-    min: 4
-    max: 6
-    kind: Slashing
-  reach: 2.5
+  bonuses:
+    damage:
+     min: 4
+     max: 6
+     kind: Slashing
+    reach: 2.5
 image:
   HeldMain:
     creatures/sword

@@ -27,7 +27,7 @@ pub struct Rules {
     pub base_ap: u32,
     pub movement_ap: u32,
     pub attack_ap: u32,
-    pub base_initiative: u32,
+    pub base_initiative: i32,
 }
 
 impl ResourceBuilder for Rules {

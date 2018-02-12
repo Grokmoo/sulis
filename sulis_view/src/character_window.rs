@@ -73,6 +73,7 @@ impl WidgetKind for CharacterWindow {
         {
             let pc = self.character.borrow();
             let state = &mut details.borrow_mut().state;
+            let stats = &pc.actor.stats;
             state.add_text_arg("name", &pc.actor.actor.name);
             state.add_text_arg("race", &pc.actor.actor.race.name);
             state.add_text_arg("sex", &pc.actor.actor.sex.to_string());
@@ -89,19 +90,25 @@ impl WidgetKind for CharacterWindow {
                 index += 1;
             }
 
-            state.add_text_arg("damage_min", &pc.actor.stats.damage.min.to_string());
-            state.add_text_arg("damage_max", &pc.actor.stats.damage.max.to_string());
+            state.add_text_arg("damage_min", &stats.damage.min.to_string());
+            state.add_text_arg("damage_max", &stats.damage.max.to_string());
 
             state.add_text_arg("cur_hp", &pc.actor.hp().to_string());
-            state.add_text_arg("max_hp", &pc.actor.stats.max_hp.to_string());
+            state.add_text_arg("max_hp", &stats.max_hp.to_string());
             state.add_text_arg("cur_ap", &pc.actor.ap().to_string());
 
-            state.add_text_arg("initiative", &pc.actor.stats.initiative.to_string());
+            state.add_text_arg("initiative", &stats.initiative.to_string());
 
-            state.add_text_arg("armor", &pc.actor.stats.armor.base.to_string());
-            for &(kind, amount) in pc.actor.stats.armor.kinds.iter() {
+            state.add_text_arg("armor", &stats.armor.base.to_string());
+            for &(kind, amount) in stats.armor.kinds.iter() {
                 state.add_text_arg(&format!("armor_{}", kind).to_lowercase(), &amount.to_string());
             }
+
+            state.add_text_arg("accuracy", &stats.accuracy.to_string());
+            state.add_text_arg("dodge", &stats.dodge.to_string());
+            state.add_text_arg("fortitude", &stats.fortitude.to_string());
+            state.add_text_arg("reflex", &stats.reflex.to_string());
+            state.add_text_arg("will", &stats.will.to_string());
         }
         vec![title, close, details]
     }

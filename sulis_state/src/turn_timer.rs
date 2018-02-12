@@ -43,7 +43,7 @@ impl Default for TurnTimer {
 
 impl TurnTimer {
     pub fn new(area_state: &AreaState) -> TurnTimer {
-        let mut entities: Vec<(u32, Rc<RefCell<EntityState>>)> = Vec::new();
+        let mut entities: Vec<(i32, Rc<RefCell<EntityState>>)> = Vec::new();
 
         for entity in area_state.entity_iter() {
             let initiative = entity.borrow().actor.stats.initiative;

@@ -200,17 +200,19 @@ impl WidgetKind for ItemButton {
 }
 
 fn add_equippable_text_args(equippable: &Equippable, widget_state: &mut WidgetState) {
-    if let Some(ref damage) = equippable.damage {
+    let bonuses = &equippable.bonuses;
+
+    if let Some(ref damage) = bonuses.damage {
         widget_state.add_text_arg("min_damage", &damage.min.to_string());
         widget_state.add_text_arg("max_damage", &damage.max.to_string());
         widget_state.add_text_arg("damage_kind", &damage.kind.to_string());
     }
 
-    if let Some(reach) = equippable.reach {
+    if let Some(reach) = bonuses.reach {
         widget_state.add_text_arg("reach", &reach.to_string());
     }
 
-    if let Some(ref armor) = equippable.armor {
+    if let Some(ref armor) = bonuses.armor {
         widget_state.add_text_arg("armor", &armor.base.to_string());
 
         for &(kind, amount) in armor.kinds.iter() {

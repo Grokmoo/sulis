@@ -3,11 +3,12 @@ name: Leather Pants
 icon: inventory/legs_leather
 equippable:
   slot: Legs
-  armor:
-    base: 2
-    kinds:
-      - [Acid, 4]
-      - [Electrical, 4]
+  bonuses:
+    armor:
+      base: 2
+      kinds:
+        - [Acid, 4]
+        - [Electrical, 4]
 image:
   Legs:
     creatures/legs_leather

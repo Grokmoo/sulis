@@ -19,5 +19,6 @@ default_images:
     Background: creatures/goblin1
 image_layer_offset_scale: 16
 image_layer_offsets:
-  HeldMain: [-35, -24]
+  HeldMain: [-26, -15]
+  HeldOff: [8, -13]
 image_layer_postfix: {}

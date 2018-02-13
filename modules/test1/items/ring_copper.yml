@@ -1,0 +1,7 @@
+id: ring_copper
+name: Copper Ring
+icon: inventory/ring_01
+equippable:
+  slot: FingerMain
+  alternate_slot: FingerOff
+  bonuses: {}

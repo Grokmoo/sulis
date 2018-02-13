@@ -40,11 +40,11 @@ pub enum ImageLayer {
     Legs,
     Feet,
     Background,
-
+    Cloak,
 }
 
 use self::ImageLayer::*;
-const IMAGE_LAYERS_LIST: [ImageLayer; 12] = [Background, Feet, Legs, Torso, Foreground, Hands,
+const IMAGE_LAYERS_LIST: [ImageLayer; 13] = [Cloak, Background, Feet, Legs, Torso, Foreground, Hands,
     Beard, Hair, Head, Ears, HeldOff, HeldMain];
 
 impl ImageLayer {

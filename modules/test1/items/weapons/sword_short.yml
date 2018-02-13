@@ -3,6 +3,7 @@ name: Short Sword
 icon: inventory/weapon_sword_short
 equippable:
   slot: HeldMain
+  alternate_slot: HeldOff
   bonuses:
     damage:
      min: 20
@@ -12,3 +13,6 @@ equippable:
 image:
   HeldMain:
     creatures/sword_short
+alternate_image:
+  HeldOff:
+    creatures/sword_short_off

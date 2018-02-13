@@ -23,3 +23,27 @@ groups:
       
       shield_small: [0, 4]
       shield_large: [1, 4]
+      
+      belt_01: [0, 5]
+      belt_02: [1, 5]
+      belt_03: [2, 5]
+      belt_04: [3, 5]
+      belt_05: [4, 5]
+      ring_01: [5, 5]
+      ring_02: [6, 5]
+      ring_03: [7, 5]
+      
+      cloak_01: [0, 6]
+      cloak_02: [1, 6]
+      cloak_03: [2, 6]
+      cloak_04: [3, 6]
+      cloak_05: [4, 6]
+      ring_04: [5, 6]
+      ring_05: [6, 6]
+      ring_06: [7, 6]
+      
+      amulet_01: [0, 7]
+      amulet_02: [1, 7]
+      amulet_03: [2, 7]
+      amulet_04: [3, 7]
+      amulet_05: [4, 7]

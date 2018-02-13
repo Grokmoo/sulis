@@ -1,0 +1,6 @@
+id: belt_leather
+name: Leather Belt
+icon: inventory/belt_03
+equippable:
+  slot: Waist
+  bonuses: {}

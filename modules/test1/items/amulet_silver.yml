@@ -1,0 +1,6 @@
+id: amulet_silver
+name: Silver Amulet
+icon: inventory/amulet_03
+equippable:
+  slot: Neck
+  bonuses: {}

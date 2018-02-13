@@ -1,0 +1,7 @@
+id: ring_silver
+name: Silver Ring
+icon: inventory/ring_02
+equippable:
+  slot: FingerMain
+  alternate_slot: FingerOff
+  bonuses: {}

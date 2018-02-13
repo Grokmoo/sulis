@@ -103,27 +103,49 @@ children:
         preferred_size: [84, 84]
         position: [12, 8]
         children:
+          cloak_button:
+            from: .item_button
+            position: [16, 12]
+            preferred_size: [16, 16]
           head_button:
             from: .item_button
             position: [36, 3]
           torso_button:
             from: .item_button
-            position: [36, 18]
+            position: [35, 17]
+            preferred_size: [14, 14]
           hands_button:
             from: .item_button
-            position: [23, 24]
+            position: [47, 32]
           legs_button:
             from: .item_button
-            position: [36, 42]
+            position: [36, 47]
           feet_button:
             from: .item_button
             position: [36, 64]
           heldmain_button:
             from: .item_button
-            position: [20, 37]
+            position: [10, 32]
+            preferred_size: [16, 16]
           heldoff_button:
             from: .item_button
-            position: [56, 37]
+            position: [60, 32]
+            preferred_size: [16, 16]
+          waist_button:
+            from: .item_button
+            position: [35, 32]
+          neck_button:
+            from: .item_button
+            position: [50, 12]
+            preferred_size: [8, 8]
+          fingermain_button:
+            from: .item_button
+            position: [28, 45]
+            preferred_size: [6, 6]
+          fingeroff_button:
+            from: .item_button
+            position: [50, 45]
+            preferred_size: [6, 6]
       items_list:
         preferred_size: [0, -93]
         position: [0, 93]
@@ -148,7 +170,7 @@ children:
       ][?accuracy|[s=4.0|Accuracy: #accuracy#]
       ][?dodge|[s=4.0|Dodge: #dodge#]
       ][?fortitude|[s=4.0|Fortitude: #fortitude#]
-      ][?reflex][s=4.0|Reflex: #reflex#]
+      ][?reflex|[s=4.0|Reflex: #reflex#]
       ][?will|[s=4.0|Will: #will#]
       ]
     preferred_size: [50, 14]

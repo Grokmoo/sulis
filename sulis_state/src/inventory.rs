@@ -73,36 +73,90 @@ impl Inventory {
     /// checks whether the item at the given index is equipped.
     /// returns true if it is, false otherwise
     pub fn is_equipped(&self, index: usize) -> bool {
-        let slot = match self.items.get(index) {
+        let (slot, alt_slot) = match self.items.get(index) {
             None => return false,
             Some(item) => match &item.item.equippable {
                 &None => return false,
-                &Some(ref equippable) => equippable.slot,
+                &Some(ref equippable) => (equippable.slot, equippable.alternate_slot),
             }
         };
 
-        self.equipped.get(&slot) == Some(&index)
+        if self.equipped.get(&slot) == Some(&index) { return true; }
+
+        if let Some(alt_slot) = alt_slot {
+            if self.equipped.get(&alt_slot) == Some(&index) { return true; }
+        }
+
+        false
     }
 
     /// equips the item at the given index.  returns true if the item
     /// was equipped.  false if the item does not exist
     pub fn equip(&mut self, index: usize) -> bool {
         trace!("Attempting equip of item at '{}", index);
-        let slot = match self.items.get(index) {
+
+        let (slot, alt_slot, blocked_slot) = match self.items.get(index) {
             None => return false,
             Some(item) => match &item.item.equippable {
                 &None => return false,
-                &Some(ref equippable) => equippable.slot,
+                &Some(ref equippable) => {
+                    trace!("Found matching slot '{:?}'", equippable.slot);
+
+                    (equippable.slot, equippable.alternate_slot, equippable.blocks_slot)
+                }
             }
         };
-        trace!("Found matching slot '{:?}'", slot);
 
-        if !self.unequip(slot) {
-            return false;
+        // determine blocking slots that will need to be removed for primary and
+        // alt, depending on which one we pick
+        let mut to_remove_primary = None;
+        let mut to_remove_alt = None;
+        for item in self.equipped_iter() {
+            if let Some(ref equippable) = item.item.equippable {
+                if let Some(ref blocked_slot) = equippable.blocks_slot {
+                    if *blocked_slot == slot {
+                        to_remove_primary = Some(equippable.slot);
+                    }
+
+                    if alt_slot.is_some() && *blocked_slot == alt_slot.unwrap() {
+                        to_remove_alt = Some(equippable.slot);
+                    }
+                }
+            }
         }
 
-        debug!("Equipping item at '{}' into '{:?}'", index, slot);
-        self.equipped.insert(slot, index);
+        // now determine whether to go with primary or alt based on how many
+        // items need to be removed from each.  prefer primary in a tie
+        let slot_to_use = if alt_slot.is_none() {
+            slot
+        } else {
+            let alt_slot = alt_slot.unwrap();
+            let mut alt_count = 0;
+            let mut primary_count = 0;
+            if to_remove_primary.is_some() { primary_count += 1; }
+            if self.equipped.get(&slot).is_some() { primary_count += 1; }
+            if to_remove_alt.is_some() { alt_count += 1; }
+            if self.equipped.get(&alt_slot).is_some() { alt_count += 1; }
+
+            if alt_count < primary_count {
+                alt_slot
+            } else {
+                slot
+            }
+        };
+
+        if let Some(slot) = to_remove_primary {
+            if !self.unequip(slot) { return false; }
+        }
+
+        if !self.unequip(slot_to_use) { return false; }
+
+        if let Some(blocked_slot) = blocked_slot {
+            if !self.unequip(blocked_slot) { return false; }
+        }
+
+        debug!("Equipping item at '{}' into '{:?}'", index, slot_to_use);
+        self.equipped.insert(slot_to_use, index);
 
         true
     }
@@ -112,16 +166,36 @@ impl Inventory {
     /// the item cannot be unequipped.
     pub fn unequip(&mut self, slot: Slot) -> bool {
         self.equipped.remove(&slot);
+
         true
     }
 
     pub fn get_image_layers(&self) -> HashMap<ImageLayer, Rc<Image>> {
         let mut layers = HashMap::new();
 
-        for (_, index) in self.equipped.iter() {
+        for (slot, index) in self.equipped.iter() {
             let item_state = &self.items[*index];
 
-            for (layer, ref image) in item_state.item.image.iter() {
+            let equippable = match item_state.item.equippable {
+                None => continue,
+                Some(ref equippable) => equippable,
+            };
+
+            let iter = if equippable.slot == *slot {
+                // the item is in it's primary slot
+                match item_state.item.image_iter() {
+                    None => continue,
+                    Some(iter) => iter,
+                }
+            } else {
+                // the item must be in it's secondary slot
+                match item_state.item.alt_image_iter() {
+                    None => continue,
+                    Some(iter) => iter,
+                }
+            };
+
+            for (layer, ref image) in iter {
                 layers.insert(*layer, Rc::clone(image));
             }
         }

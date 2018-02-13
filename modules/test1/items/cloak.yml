@@ -1,0 +1,9 @@
+id: cloak
+name: Cloak
+icon: inventory/cloak_01
+equippable:
+  slot: Cloak
+  bonuses: {}
+image:
+  Cloak:
+    creatures/cloak

@@ -21,6 +21,8 @@ use item::Slot;
 #[serde(deny_unknown_fields)]
 pub struct Equippable {
     pub slot: Slot,
+    pub alternate_slot: Option<Slot>,
+    pub blocks_slot: Option<Slot>,
     pub bonuses: BonusList,
 }
 

@@ -1,0 +1,7 @@
+id: ring_gold
+name: Gold Ring
+icon: inventory/ring_03
+equippable:
+  slot: FingerMain
+  alternate_slot: FingerOff
+  bonuses: {}

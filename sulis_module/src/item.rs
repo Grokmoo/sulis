@@ -14,8 +14,8 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::slice::Iter;
 use std::io::{Error, ErrorKind};
+use std::collections::hash_map::Iter;
 use std::collections::HashMap;
 use std::rc::Rc;
 
@@ -30,6 +30,7 @@ use {Equippable, ImageLayer};
 #[derive(Deserialize, Debug, Copy, Clone, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub enum Slot {
+    Cloak,
     Head,
     Torso,
     Hands,
@@ -37,17 +38,21 @@ pub enum Slot {
     HeldOff,
     Legs,
     Feet,
+    Waist,
+    Neck,
+    FingerMain,
+    FingerOff,
 }
 
 impl Slot {
-    pub fn iter() -> Iter<'static, Slot> {
+    pub fn iter() -> ::std::slice::Iter<'static, Slot> {
         SLOTS_LIST.iter()
     }
 }
 
 use self::Slot::*;
 
-const SLOTS_LIST: [Slot; 7] = [Feet, Legs, Torso, Hands, Head, HeldOff, HeldMain];
+const SLOTS_LIST: [Slot; 12] = [Cloak, Feet, Legs, Torso, Hands, Head, HeldOff, HeldMain, Waist, Neck, FingerMain, FingerOff];
 
 #[derive(Debug)]
 pub struct Item {
@@ -55,12 +60,34 @@ pub struct Item {
     pub name: String,
     pub icon: Rc<Image>,
     pub equippable: Option<Equippable>,
-    pub image: HashMap<ImageLayer, Rc<Image>>,
+    image: Option<HashMap<ImageLayer, Rc<Image>>>,
+    alternate_image: Option<HashMap<ImageLayer, Rc<Image>>>,
 }
 
 impl PartialEq for Item {
     fn eq(&self, other: &Item) -> bool {
         self.id == other.id
+    }
+}
+
+fn build_hash_map(id: &str, input: Option<HashMap<ImageLayer, String>>)
+    -> Result<Option<HashMap<ImageLayer, Rc<Image>>>, Error> {
+    match input {
+        Some(input_images) => {
+            let mut output = HashMap::new();
+            for (layer, image_str) in input_images {
+                let image = match ResourceSet::get_image(&image_str) {
+                    None => {
+                        warn!("No image found for image '{}'", image_str);
+                        return invalid_data_error(&format!("Unable to create item '{}'", id));
+                    }, Some(image) => image,
+                };
+
+                output.insert(layer, image);
+            }
+
+            Ok(Some(output))
+        }, None => Ok(None),
     }
 }
 
@@ -75,29 +102,32 @@ impl Item {
             Some(icon) => icon
         };
 
-        let mut images = HashMap::new();
-        for (layer, image_str) in builder.image {
-            let image = match ResourceSet::get_image(&image_str) {
-                None => {
-                    warn!("No image found for image '{}'", image_str);
-                    return invalid_data_error(&format!("Unable to create item '{}'", builder.id));
-                }, Some(image) => image,
-            };
 
-            images.insert(layer, image);
-        }
+        let images = build_hash_map(&builder.id, builder.image)?;
+        let alt_images = build_hash_map(&builder.id, builder.alternate_image)?;
 
         Ok(Item {
             id: builder.id,
             icon: icon,
             image: images,
+            alternate_image: alt_images,
             name: builder.name,
             equippable: builder.equippable,
         })
     }
 
-    pub fn image_for_layer(&self, layer: ImageLayer) -> Option<&Rc<Image>> {
-        self.image.get(&layer)
+    pub fn alt_image_iter(&self) -> Option<Iter<ImageLayer, Rc<Image>>> {
+        match self.alternate_image {
+            None => None,
+            Some(ref image) => Some(image.iter()),
+        }
+    }
+
+    pub fn image_iter(&self) -> Option<Iter<ImageLayer, Rc<Image>>> {
+        match self.image {
+            None => None,
+            Some(ref image) => Some(image.iter()),
+        }
     }
 }
 
@@ -108,7 +138,8 @@ pub struct ItemBuilder {
     pub name: String,
     pub icon: String,
     pub equippable: Option<Equippable>,
-    pub image: HashMap<ImageLayer, String>,
+    pub image: Option<HashMap<ImageLayer, String>>,
+    pub alternate_image: Option<HashMap<ImageLayer, String>>,
 }
 
 impl ResourceBuilder for ItemBuilder {

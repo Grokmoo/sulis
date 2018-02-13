@@ -2,12 +2,13 @@ id: pc
 name: "Grokmoo"
 player: true
 images:
-  Hair: creatures/hair06
+  Hair: creatures/hair09
 hue: 0.6
 race: human
 sex: Female
 levels:
   fighter: 3
 items: [ sword_long, misc_apple, gloves_leather, boots_leather, torso_leather,
-    legs_leather, helm_leather, shield_large ]
-equipped: [ 0, 2, 3, 4, 5, 6, 7 ]
+    legs_leather, helm_leather, shield_large, sword_great, belt_leather, cloak,
+    amulet_silver, ring_silver, ring_copper, sword_short ]
+equipped: [ 0, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13 ]

@@ -3,6 +3,7 @@ name: Club
 icon: inventory/weapon_club
 equippable:
   slot: HeldMain
+  alternate_slot: HeldOff
   bonuses:
     damage:
       min: 20
@@ -12,3 +13,6 @@ equippable:
 image:
   HeldMain:
     creatures/club
+alternate_image:
+  HeldOff:
+    creatures/club_off

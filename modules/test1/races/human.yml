@@ -21,6 +21,7 @@ default_images:
     Background: creatures/human_female_bg
 image_layer_offset_scale: 16
 image_layer_offsets:
-  HeldMain: [-25, -17]
+  HeldMain: [-15, -8]
+  HeldOff: [17, -6]
 image_layer_postfix:
   Female: "_female"

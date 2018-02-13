@@ -53,9 +53,7 @@ thread_local! {
 pub struct EditorMainLoopUpdater { }
 
 impl MainLoopUpdater for EditorMainLoopUpdater {
-    fn update(&self) {
-
-    }
+    fn update(&self, _root: &Rc<RefCell<Widget>>) { }
 
     fn is_exit(&self) -> bool {
         EXIT.with(|exit| *exit.borrow())

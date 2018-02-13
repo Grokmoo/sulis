@@ -1,6 +1,17 @@
 id: goblin
 name: Goblin
 size: 2
+base_stats:
+  accuracy: 30
+  dodge: 30
+  fortitude: 30
+  reflex: 30
+  will: 30
+  damage:
+    min: 10
+    max: 15
+    kind: Crushing
+  reach: 0.5
 default_images:
   Male:
     Background: creatures/goblin0
@@ -8,5 +19,5 @@ default_images:
     Background: creatures/goblin1
 image_layer_offset_scale: 16
 image_layer_offsets:
-  HeldMain: [-10, -7]
+  HeldMain: [-35, -24]
 image_layer_postfix: {}

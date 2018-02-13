@@ -65,7 +65,6 @@ impl WidgetKind for EntityMouseover {
     }
 
     fn layout(&mut self, widget: &mut Widget) {
-        info!("Layout entity mouseover");
         widget.state.add_text_arg("name", &self.entity.borrow().actor.actor.name);
         widget.state.add_text_arg("cur_hp", &self.entity.borrow().actor.hp().to_string());
         widget.state.add_text_arg("max_hp", &self.entity.borrow().actor.stats.max_hp.to_string());

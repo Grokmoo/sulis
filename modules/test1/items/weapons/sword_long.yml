@@ -1,0 +1,14 @@
+id: sword_long
+name: Long Sword
+icon: inventory/weapon_sword_long
+equippable:
+  slot: HeldMain
+  bonuses:
+    damage:
+     min: 25
+     max: 35
+     kind: Slashing
+    reach: 2.0
+image:
+  HeldMain:
+    creatures/sword_long

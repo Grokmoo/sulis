@@ -1,3 +1,9 @@
 id: fighter
 name: Fighter
-hp_per_level: 10
+bonuses_per_level:
+  hit_points: 50
+  accuracy: 5
+  dodge: 3
+  fortitude: 3
+  reflex: 3
+  will: 2

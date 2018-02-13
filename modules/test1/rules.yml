@@ -3,3 +3,10 @@ base_ap: 40
 movement_ap: 1
 attack_ap: 20
 base_initiative: 10
+graze_percentile: 20
+hit_percentile: 60
+crit_percentile: 100
+
+graze_damage_multiplier: 0.5
+hit_damage_multiplier: 1.0
+crit_damage_multiplier: 1.5

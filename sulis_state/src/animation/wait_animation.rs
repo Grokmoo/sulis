@@ -19,6 +19,7 @@ use std::rc::Rc;
 use std::time::Instant;
 
 use sulis_core::util;
+use sulis_core::ui::Widget;
 use {animation, AreaState, EntityState};
 
 /// an animation that does nothing, but causes the AI to wait for a
@@ -40,7 +41,7 @@ impl WaitAnimation {
 }
 
 impl animation::Animation for WaitAnimation {
-    fn update(&mut self, _: &mut AreaState) -> bool {
+    fn update(&mut self, _state: &mut AreaState, _root: &Rc<RefCell<Widget>>) -> bool {
         util::get_elapsed_millis(self.start_time.elapsed()) < self.duration
     }
 

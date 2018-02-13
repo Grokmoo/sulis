@@ -33,6 +33,14 @@ pub use self::damage::DamageKind;
 
 use self::attribute::Attribute::*;
 
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum HitKind {
+    Miss,
+    Graze,
+    Hit,
+    Crit,
+}
+
 #[derive(Clone)]
 pub struct AttributeList([(Attribute, u8); 6]);
 
@@ -78,7 +86,17 @@ pub struct StatList {
 }
 
 impl StatList {
+    /// Adds the bonuses from the specified BonusList to this stat list.
     pub fn add(&mut self, bonuses: &BonusList) {
+        self.add_multiple(bonuses, 1);
+    }
+
+    /// Adds the specified bonuses to this StatList the specified number of times.
+    /// Note that non-numeric bonuses are only added once regardless of the value of
+    /// times
+    pub fn add_multiple(&mut self, bonuses: &BonusList, times: u32) {
+        if times == 0 { return; }
+
         if let Some(ref armor) = bonuses.armor {
             self.armor.add(armor);
         }
@@ -87,14 +105,16 @@ impl StatList {
             self.damage = Damage::max(self.damage, damage);
         }
 
-        if let Some(reach) = bonuses.reach { self.reach += reach; }
-        if let Some(hit_points) = bonuses.hit_points { self.max_hp += hit_points; }
-        if let Some(initiative) = bonuses.initiative { self.initiative += initiative; }
-        if let Some(accuracy) = bonuses.accuracy { self.accuracy += accuracy; }
-        if let Some(dodge) = bonuses.dodge { self.dodge += dodge; }
-        if let Some(fortitude) = bonuses.fortitude { self.fortitude += fortitude; }
-        if let Some(reflex) = bonuses.reflex { self.reflex += reflex; }
-        if let Some(will) = bonuses.will { self.will += will; }
+        let times_f32 = times as f32;
+        let times_i32 = times as i32;
+        if let Some(reach) = bonuses.reach { self.reach += reach * times_f32; }
+        if let Some(hit_points) = bonuses.hit_points { self.max_hp += hit_points * times_i32; }
+        if let Some(initiative) = bonuses.initiative { self.initiative += initiative * times_i32; }
+        if let Some(accuracy) = bonuses.accuracy { self.accuracy += accuracy * times_i32; }
+        if let Some(dodge) = bonuses.dodge { self.dodge += dodge * times_i32; }
+        if let Some(fortitude) = bonuses.fortitude { self.fortitude += fortitude * times_i32; }
+        if let Some(reflex) = bonuses.reflex { self.reflex += reflex * times_i32; }
+        if let Some(will) = bonuses.will { self.will += will * times_i32; }
     }
 }
 

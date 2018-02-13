@@ -1,0 +1,11 @@
+id: shield_large
+name: Large Shield
+icon: inventory/shield_large
+equippable:
+  slot: HeldOff
+  bonuses:
+    dodge: 15
+    accuracy: -5
+image:
+  HeldOff:
+    creatures/shield_large

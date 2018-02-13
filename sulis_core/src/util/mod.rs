@@ -79,7 +79,7 @@ pub fn main_loop(io: &mut Box<IO>, root: Rc<RefCell<Widget>>,
         let start_time = time::Instant::now();
 
         io.process_input(Rc::clone(&root));
-        updater.update();
+        updater.update(&root);
 
         if let Err(e) = Widget::update(&root) {
             error!("There was a fatal error updating the UI tree state.");

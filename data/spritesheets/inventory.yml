@@ -20,3 +20,6 @@ groups:
       torso_shirt: [5, 1]
       legs_pants: [6, 1]
       misc_apple: [7, 1]
+      
+      shield_small: [0, 4]
+      shield_large: [1, 4]

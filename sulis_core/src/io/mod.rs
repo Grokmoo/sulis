@@ -36,7 +36,7 @@ use ui::{Widget, Color};
 use resource::Sprite;
 
 pub trait MainLoopUpdater {
-    fn update(&self);
+    fn update(&self, root: &Rc<RefCell<Widget>>);
 
     fn is_exit(&self) -> bool;
 }
@@ -114,6 +114,16 @@ impl Default for DrawList {
 impl DrawList {
     pub fn is_empty(&self) -> bool {
         self.quads.is_empty()
+    }
+
+    /// Creates an empty DrawList.  Attempting to draw an empty DrawList will most
+    /// likely result in a panic.  You must use `append` to add vertices to this
+    /// list if you intend to draw it.
+    pub fn empty_font() -> DrawList {
+        DrawList {
+            kind: DrawListKind::Font,
+            ..Default::default()
+        }
     }
 
     /// Creates an empty DrawList.  Attempting to draw an empty DrawList will most

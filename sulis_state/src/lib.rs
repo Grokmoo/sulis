@@ -25,6 +25,9 @@ pub use self::ai::AI;
 pub mod animation;
 use self::animation::{Animation, MoveAnimation};
 
+mod area_feedback_text;
+use self::area_feedback_text::AreaFeedbackText;
+
 mod area_state;
 pub use self::area_state::AreaState;
 
@@ -65,6 +68,7 @@ use std::cell::RefCell;
 use sulis_core::config::CONFIG;
 use sulis_core::util::{self, Point};
 use sulis_core::io::{GraphicsRenderer, MainLoopUpdater};
+use sulis_core::ui::Widget;
 use sulis_module::Module;
 
 thread_local! {
@@ -75,8 +79,8 @@ thread_local! {
 pub struct GameStateMainLoopUpdater { }
 
 impl MainLoopUpdater for GameStateMainLoopUpdater {
-    fn update(&self) {
-        GameState::update();
+    fn update(&self, root: &Rc<RefCell<Widget>>) {
+        GameState::update(root);
     }
 
     fn is_exit(&self) -> bool {
@@ -260,7 +264,7 @@ impl GameState {
         STATE.with(|s| Rc::clone(&s.borrow().as_ref().unwrap().area_state))
     }
 
-    pub fn update() {
+    pub fn update(root: &Rc<RefCell<Widget>>) {
         let active_entity = STATE.with(|s| {
             let mut state = s.borrow_mut();
             let state = state.as_mut().unwrap();
@@ -269,7 +273,7 @@ impl GameState {
 
             let mut i = 0;
             while i < state.animations.len() {
-                let retain = state.animations[i].update(&mut area_state);
+                let retain = state.animations[i].update(&mut area_state, root);
 
                 if retain {
                     i += 1;

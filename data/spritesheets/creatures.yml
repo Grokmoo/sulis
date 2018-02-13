@@ -70,6 +70,9 @@ groups:
       dracon_fg: [30, 12]
       dracon_bg: [33, 12]
 
-      sword: [0, 15]
+      sword_short: [0, 15]
       club: [3, 15]
+      sword_long: [6, 15]
       
+      shield_small: [0, 18]
+      shield_large: [3, 18]

@@ -19,9 +19,10 @@ use std::cell::{RefCell};
 
 use sulis_core::image::{LayeredImage};
 use sulis_core::io::DrawList;
+use sulis_core::ui::{color, Color};
 use sulis_module::{item, Actor, Module};
 use {ChangeListenerList, EntityState, Inventory};
-use sulis_rules::{AttributeList, StatList};
+use sulis_rules::{AttributeList, HitKind, StatList};
 
 pub struct ActorState {
     pub actor: Rc<Actor>,
@@ -81,15 +82,40 @@ impl ActorState {
         self.can_reach(dist)
     }
 
-    pub fn attack(&mut self, target: &Rc<RefCell<EntityState>>) {
-        let amount = self.stats.damage.roll();
-        let armor = target.borrow().actor.stats.armor.amount(self.stats.damage.kind);
-        info!("'{}' attacks '{}' for {} damage vs {} armor", self.actor.name,
-              target.borrow().actor.actor.name, amount, armor);
-        if amount > armor {
-            target.borrow_mut().remove_hp(amount - armor);
-        }
+    pub fn attack(&mut self, target: &Rc<RefCell<EntityState>>) -> (String, Color) {
         self.remove_ap(Module::rules().attack_ap);
+        info!("'{}' attacks '{}'", self.actor.name, target.borrow().actor.actor.name);
+        let rules = Module::rules();
+
+        let accuracy = self.stats.accuracy;
+        let defense = target.borrow().actor.stats.dodge;
+        let hit_kind = rules.attack_roll(accuracy, defense);
+
+        let damage_roll = self.stats.damage.roll();
+        let armor = target.borrow().actor.stats.armor.amount(self.stats.damage.kind);
+
+        let damage_multiplier = match hit_kind {
+            HitKind::Miss => {
+                debug!("Miss.");
+                return ("Miss".to_string(), color::GRAY);
+            },
+            HitKind::Graze => rules.graze_damage_multiplier,
+            HitKind::Hit => rules.hit_damage_multiplier,
+            HitKind::Crit => rules.crit_damage_multiplier,
+        };
+
+        let damage_amount = (damage_roll as f32 * damage_multiplier) as u32;
+        debug!("{:?}. {} damage vs {} armor", hit_kind, damage_amount, armor);
+
+        let (damage, color) = if damage_amount > armor {
+            let damage = damage_amount - armor;
+            target.borrow_mut().remove_hp(damage);
+            (damage, color::RED)
+        } else {
+            (0, color::GRAY)
+        };
+
+        (format!("{:?}: {} damage", hit_kind, damage), color)
     }
 
     pub fn equip(&mut self, index: usize) -> bool {
@@ -172,8 +198,9 @@ impl ActorState {
 
         let rules = Module::rules();
         self.stats.initiative = rules.base_initiative;
+        self.stats.add(&self.actor.race.base_stats);
         for &(ref class, level) in self.actor.levels.iter() {
-            self.stats.max_hp += (class.hp_per_level * level) as i32;
+            self.stats.add_multiple(&class.bonuses_per_level, level);
         }
 
         for ref item_state in self.inventory.equipped_iter() {

@@ -23,6 +23,7 @@ use sulis_core::resource::{ResourceBuilder, ResourceSet};
 use sulis_core::util::{invalid_data_error, Point};
 use sulis_core::serde_json;
 use sulis_core::serde_yaml;
+use sulis_rules::BonusList;
 
 use actor::{Sex};
 
@@ -32,6 +33,7 @@ pub struct Race {
     pub id: String,
     pub name: String,
     pub size: Rc<EntitySize>,
+    pub base_stats: BonusList,
 
     default_images: ImageLayerSet,
     image_layer_offsets: HashMap<ImageLayer, (f32, f32)>,
@@ -65,6 +67,7 @@ impl Race {
             id: builder.id,
             name: builder.name,
             size,
+            base_stats: builder.base_stats,
             default_images,
             image_layer_offsets: offsets,
             image_layer_postfix: builder.image_layer_postfix,
@@ -99,6 +102,7 @@ pub struct RaceBuilder {
     pub id: String,
     pub name: String,
     pub size: usize,
+    pub base_stats: BonusList,
     pub default_images: HashMap<Sex, HashMap<ImageLayer, String>>,
     image_layer_offsets: HashMap<ImageLayer, Point>,
     image_layer_offset_scale: i32,

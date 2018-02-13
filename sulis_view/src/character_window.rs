@@ -92,6 +92,7 @@ impl WidgetKind for CharacterWindow {
 
             state.add_text_arg("damage_min", &stats.damage.min.to_string());
             state.add_text_arg("damage_max", &stats.damage.max.to_string());
+            state.add_text_arg("reach", &stats.reach.to_string());
 
             state.add_text_arg("cur_hp", &pc.actor.hp().to_string());
             state.add_text_arg("max_hp", &stats.max_hp.to_string());

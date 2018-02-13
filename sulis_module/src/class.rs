@@ -20,11 +20,12 @@ use sulis_core::resource::ResourceBuilder;
 use sulis_core::util::invalid_data_error;
 use sulis_core::serde_json;
 use sulis_core::serde_yaml;
+use sulis_rules::BonusList;
 
 pub struct Class {
     pub id: String,
     pub name: String,
-    pub hp_per_level: u32,
+    pub bonuses_per_level: BonusList,
 }
 
 impl PartialEq for Class {
@@ -38,7 +39,7 @@ impl Class {
         Ok(Class {
             id: builder.id,
             name: builder.name,
-            hp_per_level: builder.hp_per_level,
+            bonuses_per_level: builder.bonuses_per_level,
         })
     }
 }
@@ -48,7 +49,7 @@ impl Class {
 pub struct ClassBuilder {
     pub id: String,
     pub name: String,
-    pub hp_per_level: u32,
+    pub bonuses_per_level: BonusList,
 }
 
 impl ResourceBuilder for ClassBuilder {

@@ -219,4 +219,18 @@ fn add_equippable_text_args(equippable: &Equippable, widget_state: &mut WidgetSt
             widget_state.add_text_arg(&format!("armor_{}", kind).to_lowercase(), &amount.to_string());
         }
     }
+
+    add_if_present(widget_state, "initiative", bonuses.initiative);
+    add_if_present(widget_state, "hit_points", bonuses.hit_points);
+    add_if_present(widget_state, "accuracy", bonuses.accuracy);
+    add_if_present(widget_state, "dodge", bonuses.dodge);
+    add_if_present(widget_state, "fortitude", bonuses.fortitude);
+    add_if_present(widget_state, "reflex", bonuses.reflex);
+    add_if_present(widget_state, "will", bonuses.will);
+}
+
+fn add_if_present(widget_state: &mut WidgetState, text: &str, val: Option<i32>) {
+    if let Some(val) = val {
+        widget_state.add_text_arg(text, &val.to_string());
+    }
 }

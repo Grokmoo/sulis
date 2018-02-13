@@ -332,6 +332,11 @@ impl WidgetKind for AreaView {
             renderer.draw(draw_list);
         }
 
+        for feedback_text in state.feedback_text_iter() {
+            feedback_text.draw(renderer, p.x - s.x, p.y - s.y, scale_x, scale_y);
+        }
+
+
         GameState::draw_graphics_mode(renderer, pixel_size);
     }
 

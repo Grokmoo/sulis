@@ -5,8 +5,8 @@ equippable:
   slot: HeldMain
   bonuses:
     damage:
-      min: 2
-      max: 4
+      min: 20
+      max: 30
       kind: Crushing
     reach: 1.5
 image:

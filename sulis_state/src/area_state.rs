@@ -14,10 +14,12 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use sulis_core::ui::Color;
 use sulis_module::{Actor, Area, Module};
 use sulis_module::area::Transition;
-use {calculate_los, ChangeListenerList, EntityState, Location, TurnTimer};
+use {AreaFeedbackText, calculate_los, ChangeListenerList, EntityState, Location, TurnTimer};
 
+use std::slice::Iter;
 use std::rc::Rc;
 use std::cell::{Ref, RefCell};
 
@@ -34,6 +36,8 @@ pub struct AreaState {
 
     pub pc_vis_cache_invalid: bool,
     pc_vis: Vec<bool>,
+
+    feedback_text: Vec<AreaFeedbackText>,
 }
 
 impl PartialEq for AreaState {
@@ -59,6 +63,7 @@ impl AreaState {
             listeners: ChangeListenerList::default(),
             pc_vis,
             pc_vis_cache_invalid: true,
+            feedback_text: Vec::new(),
         }
     }
 
@@ -260,6 +265,9 @@ impl AreaState {
             notify = true;
         }
 
+        self.feedback_text.iter_mut().for_each(|f| f.update());
+        self.feedback_text.retain(|f| f.retain());
+
         if notify {
             self.listeners.notify(&self);
         }
@@ -296,6 +304,19 @@ impl AreaState {
 
         self.entities.push(None);
         self.entities.len() - 1
+    }
+
+    pub fn add_feedback_text(&mut self, text: String, target: &Rc<RefCell<EntityState>>,
+                             scale: f32, color: Color) {
+        let width = target.borrow().size.size as f32;
+        let pos_x = target.borrow().location.x as f32 + width / 2.0;
+        let pos_y = target.borrow().location.y as f32 - 1.5;
+
+        self.feedback_text.push(AreaFeedbackText::new(text, pos_x, pos_y, scale, color));
+    }
+
+    pub fn feedback_text_iter(&self) -> Iter<AreaFeedbackText> {
+        self.feedback_text.iter()
     }
 }
 

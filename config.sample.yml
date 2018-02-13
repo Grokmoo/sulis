@@ -19,6 +19,9 @@ display:
     # This scales the overall speed of all game animations, in milliseconds
     animation_base_time_millis: 50
 
+    # The name of the default font used to render text when no font is specified
+    default_font: "normal"
+
 resources:
     # all resources are subdirectories under this
     directory: data

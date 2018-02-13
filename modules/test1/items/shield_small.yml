@@ -1,0 +1,10 @@
+id: shield_small
+name: Small Shield
+icon: inventory/shield_small
+equippable:
+  slot: HeldOff
+  bonuses:
+    dodge: 10
+image:
+  HeldOff:
+    creatures/shield_small

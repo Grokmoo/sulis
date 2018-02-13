@@ -20,6 +20,7 @@ use std::rc::Rc;
 use std::time::Instant;
 
 use {animation, AreaState, EntityState};
+use sulis_core::ui::Widget;
 use sulis_core::util::{self, Point};
 
 pub struct MoveAnimation {
@@ -48,7 +49,7 @@ impl MoveAnimation {
 }
 
 impl animation::Animation for MoveAnimation {
-    fn update(&mut self, area_state: &mut AreaState) -> bool {
+    fn update(&mut self, area_state: &mut AreaState, _root: &Rc<RefCell<Widget>>) -> bool {
         if self.marked_for_removal || self.path.is_empty() {
             self.mover.borrow_mut().sub_pos = (0.0, 0.0);
             return false;

@@ -31,10 +31,11 @@ pub use self::wait_animation::WaitAnimation;
 use {AreaState, EntityState};
 
 use sulis_core::io::GraphicsRenderer;
+use sulis_core::ui::Widget;
 use sulis_core::util::{self, Point};
 
 pub trait Animation {
-    fn update(&mut self, area_state: &mut AreaState) -> bool;
+    fn update(&mut self, area_state: &mut AreaState, root: &Rc<RefCell<Widget>>) -> bool;
 
     /// this method is called whenever another animation is added for the
     /// given entity.  This can be used to cancel this animation if the

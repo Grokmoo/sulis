@@ -19,6 +19,7 @@ use std::cell::RefCell;
 use std::time::Instant;
 
 use sulis_core::util;
+use sulis_core::ui::Widget;
 use {animation, AreaState, EntityState};
 
 pub struct AttackAnimation {
@@ -52,7 +53,7 @@ impl AttackAnimation {
 }
 
 impl animation::Animation for AttackAnimation {
-    fn update(&mut self, _area_state: &mut AreaState) -> bool {
+    fn update(&mut self, area_state: &mut AreaState, _root: &Rc<RefCell<Widget>>) -> bool {
         if self.marked_for_removal {
             self.attacker.borrow_mut().sub_pos = (0.0, 0.0);
             return false;
@@ -63,7 +64,10 @@ impl animation::Animation for AttackAnimation {
         let mut attacker = self.attacker.borrow_mut();
 
         if !self.has_attacked && frac > 0.5 {
-            attacker.actor.attack(&self.defender);
+            let (text, color) = attacker.actor.attack(&self.defender);
+
+            let scale = 1.2;
+            area_state.add_feedback_text(text, &self.defender, scale, color);
             self.has_attacked = true;
         }
 

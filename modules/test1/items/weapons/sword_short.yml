@@ -5,10 +5,10 @@ equippable:
   slot: HeldMain
   bonuses:
     damage:
-     min: 4
-     max: 6
+     min: 20
+     max: 30
      kind: Slashing
-    reach: 2.5
+    reach: 1.5
 image:
   HeldMain:
-    creatures/sword
+    creatures/sword_short

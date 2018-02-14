@@ -20,7 +20,7 @@ use std::collections::HashMap;
 
 use sulis_core::image::Image;
 use sulis_core::resource::{ResourceBuilder, ResourceSet};
-use sulis_core::util::{invalid_data_error, Point};
+use sulis_core::util::{invalid_data_error, unable_to_create_error, Point};
 use sulis_core::serde_json;
 use sulis_core::serde_yaml;
 use sulis_rules::BonusList;
@@ -51,7 +51,7 @@ impl Race {
         let size = match module.sizes.get(&builder.size) {
             None => {
                 warn!("No match found for size '{}'", builder.size);
-                return invalid_data_error(&format!("Unable to create race '{}'", builder.id));
+                return unable_to_create_error("race", &builder.id);
             }, Some(size) => Rc::clone(size)
         };
 
@@ -62,6 +62,18 @@ impl Race {
         }
 
         let default_images = ImageLayerSet::new(builder.default_images)?;
+
+        match builder.base_stats.base_damage {
+            None => {
+                warn!("You must specify a base_damage for each race.");
+                return unable_to_create_error("race", &builder.id);
+            }, Some(damage) => {
+                if damage.kind.is_none() {
+                    warn!("Base damage must always have a kind specified.");
+                    return unable_to_create_error("race", &builder.id);
+                }
+            }
+        }
 
         Ok(Race {
             id: builder.id,

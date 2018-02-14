@@ -1,18 +1,18 @@
-id: club
-name: Club
-icon: inventory/weapon_club
+id: mace
+name: Mace
+icon: inventory/weapon_mace
 equippable:
   slot: HeldMain
   alternate_slot: HeldOff
   bonuses:
     base_damage:
-      min: 15
-      max: 25
+      min: 20
+      max: 30
       kind: Crushing
     base_reach: 1.0
 image:
   HeldMain:
-    creatures/club
+    creatures/mace
 alternate_image:
   HeldOff:
-    creatures/club_off
+    creatures/mace_off

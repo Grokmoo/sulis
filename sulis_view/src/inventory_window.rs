@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::fmt::Display;
 use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
@@ -202,34 +203,43 @@ impl WidgetKind for ItemButton {
 fn add_equippable_text_args(equippable: &Equippable, widget_state: &mut WidgetState) {
     let bonuses = &equippable.bonuses;
 
-    if let Some(ref damage) = bonuses.damage {
+    if let Some(ref damage) = bonuses.base_damage {
         widget_state.add_text_arg("min_damage", &damage.min.to_string());
         widget_state.add_text_arg("max_damage", &damage.max.to_string());
-        widget_state.add_text_arg("damage_kind", &damage.kind.to_string());
+        if let Some(kind) = damage.kind {
+            widget_state.add_text_arg("damage_kind", &kind.to_string());
+        }
     }
 
-    if let Some(reach) = bonuses.reach {
-        widget_state.add_text_arg("reach", &reach.to_string());
+    if let Some(ref damage) = bonuses.bonus_damage {
+        widget_state.add_text_arg("min_bonus_damage", &damage.min.to_string());
+        widget_state.add_text_arg("max_bonus_damage", &damage.max.to_string());
+        if let Some(kind) = damage.kind {
+            widget_state.add_text_arg("bonus_damage_kind", &kind.to_string());
+        }
     }
 
     if let Some(ref armor) = bonuses.armor {
         widget_state.add_text_arg("armor", &armor.base.to_string());
 
         for &(kind, amount) in armor.kinds.iter() {
-            widget_state.add_text_arg(&format!("armor_{}", kind).to_lowercase(), &amount.to_string());
+            widget_state.add_text_arg(&format!("armor_{}", kind).to_lowercase(),
+                                               &amount.to_string());
         }
     }
 
+    add_if_present(widget_state, "base_reach", bonuses.base_reach);
+    add_if_present(widget_state, "bonus_reach", bonuses.bonus_reach);
     add_if_present(widget_state, "initiative", bonuses.initiative);
     add_if_present(widget_state, "hit_points", bonuses.hit_points);
     add_if_present(widget_state, "accuracy", bonuses.accuracy);
-    add_if_present(widget_state, "dodge", bonuses.dodge);
+    add_if_present(widget_state, "defense", bonuses.defense);
     add_if_present(widget_state, "fortitude", bonuses.fortitude);
     add_if_present(widget_state, "reflex", bonuses.reflex);
     add_if_present(widget_state, "will", bonuses.will);
 }
 
-fn add_if_present(widget_state: &mut WidgetState, text: &str, val: Option<i32>) {
+fn add_if_present<T: Display>(widget_state: &mut WidgetState, text: &str, val: Option<T>) {
     if let Some(val) = val {
         widget_state.add_text_arg(text, &val.to_string());
     }

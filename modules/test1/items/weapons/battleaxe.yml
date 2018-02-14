@@ -1,0 +1,14 @@
+id: battleaxe
+name: Battleaxe
+icon: inventory/weapon_battleaxe
+equippable:
+  slot: HeldMain
+  bonuses:
+    base_damage:
+     min: 25
+     max: 35
+     kind: Slashing
+    base_reach: 1.5
+image:
+  HeldMain:
+    creatures/battleaxe

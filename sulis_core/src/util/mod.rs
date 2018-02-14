@@ -38,6 +38,10 @@ pub fn invalid_data_error<T>(str: &str) -> Result<T, Error> {
     Err(Error::new(ErrorKind::InvalidData, str))
 }
 
+pub fn unable_to_create_error<T>(kind: &str, id: &str) -> Result<T, Error> {
+    Err(Error::new(ErrorKind::InvalidData, format!("Unable to create {} '{}'", kind, id)))
+}
+
 /// Helper function to return the number of milliseconds elapsed in
 /// the given duration.
 pub fn get_elapsed_millis(elapsed: Duration) -> u32 {

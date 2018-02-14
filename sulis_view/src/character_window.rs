@@ -90,8 +90,8 @@ impl WidgetKind for CharacterWindow {
                 index += 1;
             }
 
-            state.add_text_arg("damage_min", &stats.damage.min.to_string());
-            state.add_text_arg("damage_max", &stats.damage.max.to_string());
+            state.add_text_arg("damage_min", &stats.damage.min().to_string());
+            state.add_text_arg("damage_max", &stats.damage.max().to_string());
             state.add_text_arg("reach", &stats.reach.to_string());
 
             state.add_text_arg("cur_hp", &pc.actor.hp().to_string());
@@ -106,7 +106,7 @@ impl WidgetKind for CharacterWindow {
             }
 
             state.add_text_arg("accuracy", &stats.accuracy.to_string());
-            state.add_text_arg("dodge", &stats.dodge.to_string());
+            state.add_text_arg("defense", &stats.defense.to_string());
             state.add_text_arg("fortitude", &stats.fortitude.to_string());
             state.add_text_arg("reflex", &stats.reflex.to_string());
             state.add_text_arg("will", &stats.will.to_string());

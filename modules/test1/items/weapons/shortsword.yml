@@ -1,18 +1,18 @@
-id: sword_short
+id: shortsword
 name: Short Sword
-icon: inventory/weapon_sword_short
+icon: inventory/weapon_shortsword
 equippable:
   slot: HeldMain
   alternate_slot: HeldOff
   bonuses:
-    damage:
+    base_damage:
      min: 20
      max: 30
      kind: Slashing
-    reach: 1.5
+    base_reach: 1.5
 image:
   HeldMain:
-    creatures/sword_short
+    creatures/shortsword
 alternate_image:
   HeldOff:
-    creatures/sword_short_off
+    creatures/shortsword_off

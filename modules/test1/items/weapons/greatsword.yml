@@ -1,0 +1,15 @@
+id: greatsword
+name: Greatsword
+icon: inventory/weapon_greatsword
+equippable:
+  slot: HeldMain
+  blocks_slot: HeldOff
+  bonuses:
+    base_damage:
+      min: 35
+      max: 45
+      kind: Slashing
+    base_reach: 3.0
+image:
+  HeldMain:
+    creatures/greatsword

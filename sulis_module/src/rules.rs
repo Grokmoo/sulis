@@ -21,7 +21,7 @@ use sulis_core::resource::ResourceBuilder;
 use sulis_core::util::invalid_data_error;
 use sulis_core::serde_json;
 use sulis_core::serde_yaml;
-use sulis_rules::HitKind;
+use sulis_rules::{Damage, HitKind};
 
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
@@ -30,6 +30,7 @@ pub struct Rules {
     pub movement_ap: u32,
     pub attack_ap: u32,
     pub base_initiative: i32,
+
     pub graze_percentile: u32,
     pub hit_percentile: u32,
     pub crit_percentile: u32,
@@ -37,6 +38,8 @@ pub struct Rules {
     pub graze_damage_multiplier: f32,
     pub hit_damage_multiplier: f32,
     pub crit_damage_multiplier: f32,
+
+    pub dual_wield_damage_multiplier: f32,
 }
 
 impl Rules {
@@ -56,6 +59,24 @@ impl Rules {
             HitKind::Graze
         } else {
             HitKind::Miss
+        }
+    }
+
+    pub fn compute_damage_from(&self, mut list: Vec<Damage>) -> Damage {
+        if list.is_empty() {
+            warn!("Unable to compute damage as list is empty");
+            return Damage::default();
+        }
+
+        if list.len() == 1 {
+            list[0]
+        } else {
+            let mut damage = list[0].mult_f32(self.dual_wield_damage_multiplier);
+            for i in 1..list.len() {
+                damage.add(list[i].mult_f32(self.dual_wield_damage_multiplier));
+            }
+
+            damage
         }
     }
 }

@@ -4,7 +4,7 @@ icon: inventory/shield_large
 equippable:
   slot: HeldOff
   bonuses:
-    dodge: 15
+    defense: 15
     accuracy: -5
 image:
   HeldOff:

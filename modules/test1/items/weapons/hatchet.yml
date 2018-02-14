@@ -1,0 +1,18 @@
+id: hatchet
+name: Hatchet
+icon: inventory/weapon_hatchet
+equippable:
+  slot: HeldMain
+  alternate_slot: HeldOff
+  bonuses:
+    base_damage:
+     min: 20
+     max: 30
+     kind: Slashing
+    base_reach: 1.0
+image:
+  HeldMain:
+    creatures/hatchet
+alternate_image:
+  HeldOff:
+    creatures/hatchet_off

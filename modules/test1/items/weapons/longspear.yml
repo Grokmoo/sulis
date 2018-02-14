@@ -1,0 +1,15 @@
+id: longspear
+name: Long Spear
+icon: inventory/weapon_longspear
+equippable:
+  slot: HeldMain
+  blocks_slot: HeldOff
+  bonuses:
+    base_damage:
+     min: 25
+     max: 35
+     kind: Piercing
+    base_reach: 4.0
+image:
+  HeldMain:
+    creatures/longspear

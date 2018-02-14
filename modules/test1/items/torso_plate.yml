@@ -1,0 +1,13 @@
+id: torso_plate
+name: Plate Armor
+icon: inventory/torso_plate
+equippable:
+  slot: Torso
+  bonuses:
+    armor:
+      base: 7
+      kinds:
+        - [Slashing, 9]
+image:
+  Torso:
+    creatures/torso_plate

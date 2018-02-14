@@ -1,0 +1,14 @@
+id: longsword
+name: Longsword
+icon: inventory/weapon_longsword
+equippable:
+  slot: HeldMain
+  bonuses:
+    base_damage:
+     min: 25
+     max: 35
+     kind: Slashing
+    base_reach: 2.0
+image:
+  HeldMain:
+    creatures/longsword

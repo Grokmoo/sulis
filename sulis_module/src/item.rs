@@ -23,7 +23,7 @@ use sulis_core::image::Image;
 use sulis_core::resource::{ResourceBuilder, ResourceSet};
 use sulis_core::serde_json;
 use sulis_core::serde_yaml;
-use sulis_core::util::invalid_data_error;
+use sulis_core::util::unable_to_create_error;
 
 use {Equippable, ImageLayer};
 
@@ -79,7 +79,7 @@ fn build_hash_map(id: &str, input: Option<HashMap<ImageLayer, String>>)
                 let image = match ResourceSet::get_image(&image_str) {
                     None => {
                         warn!("No image found for image '{}'", image_str);
-                        return invalid_data_error(&format!("Unable to create item '{}'", id));
+                        return unable_to_create_error("item", id);
                     }, Some(image) => image,
                 };
 
@@ -96,12 +96,20 @@ impl Item {
         let icon = match ResourceSet::get_image(&builder.icon) {
             None => {
                 warn!("No image found for icon '{}'", builder.icon);
-                return Err(Error::new(ErrorKind::InvalidData,
-                                      format!("Unable to create item '{}'", builder.id)));
+                return unable_to_create_error("item", &builder.id);
             },
             Some(icon) => icon
         };
 
+
+        if let &Some(ref equippable) = &builder.equippable {
+            if let Some(damage) = equippable.bonuses.base_damage {
+                if damage.kind.is_none() {
+                    warn!("Kind must be specified for base damage");
+                    return unable_to_create_error("item", &builder.id);
+                }
+            }
+        }
 
         let images = build_hash_map(&builder.id, builder.image)?;
         let alt_images = build_hash_map(&builder.id, builder.alternate_image)?;

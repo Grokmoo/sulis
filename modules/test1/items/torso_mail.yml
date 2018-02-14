@@ -1,0 +1,13 @@
+id: torso_mail
+name: Mail Armor
+icon: inventory/torso_mail
+equippable:
+  slot: Torso
+  bonuses:
+    armor:
+      base: 5
+      kinds:
+        - [Slashing, 7]
+image:
+  Torso:
+    creatures/torso_mail

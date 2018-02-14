@@ -1,0 +1,13 @@
+id: boots_plate
+name: Plate Boots
+icon: inventory/boots_plate
+equippable:
+  slot: Feet
+  bonuses:
+    armor:
+      base: 3
+      kinds:
+        - [Slashing, 4]
+image:
+  Feet:
+    creatures/boots_plate

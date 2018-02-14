@@ -1,0 +1,15 @@
+id: helm_mail
+name: Mail Helm
+icon: inventory/helm_mail
+equippable:
+  slot: Head
+  bonuses:
+    armor:
+      base: 2
+      kinds:
+        - [Slashing, 3]
+image:
+  Head:
+    creatures/helm_mail
+  Hair:
+    empty

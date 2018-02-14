@@ -1,18 +1,18 @@
-id: club
-name: Club
-icon: inventory/weapon_club
+id: dagger
+name: Dagger
+icon: inventory/weapon_dagger
 equippable:
   slot: HeldMain
   alternate_slot: HeldOff
   bonuses:
     base_damage:
-      min: 15
-      max: 25
-      kind: Crushing
+     min: 15
+     max: 25
+     kind: Piercing
     base_reach: 1.0
 image:
   HeldMain:
-    creatures/club
+    creatures/dagger
 alternate_image:
   HeldOff:
-    creatures/club_off
+    creatures/dagger_off

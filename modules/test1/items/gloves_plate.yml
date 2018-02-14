@@ -1,0 +1,13 @@
+id: gloves_plate
+name: Plate Gloves
+icon: inventory/gloves_plate
+equippable:
+  slot: Hands
+  bonuses:
+    armor:
+      base: 3
+      kinds:
+        - [Slashing, 4]
+image:
+  Hands:
+    creatures/gloves_plate

@@ -1,0 +1,13 @@
+id: gloves_mail
+name: Mail Gloves
+icon: inventory/gloves_mail
+equippable:
+  slot: Hands
+  bonuses:
+    armor:
+      base: 2
+      kinds:
+        - [Slashing, 3]
+image:
+  Hands:
+    creatures/gloves_mail

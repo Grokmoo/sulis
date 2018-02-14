@@ -1,0 +1,13 @@
+id: legs_mail
+name: Mail Pants
+icon: inventory/legs_mail
+equippable:
+  slot: Legs
+  bonuses:
+    armor:
+      base: 4
+      kinds:
+        - [Slashing, 5]
+image:
+  Legs:
+    creatures/legs_mail

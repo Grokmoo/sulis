@@ -36,6 +36,11 @@ impl PartialEq for Class {
 
 impl Class {
     pub fn new(builder: ClassBuilder) -> Result<Class, Error> {
+        if builder.bonuses_per_level.base_damage.is_some() {
+            warn!("Must not specify a base damage for a class.");
+            return invalid_data_error(&format!("Unable to create class '{}'", builder.id));
+        }
+
         Ok(Class {
             id: builder.id,
             name: builder.name,

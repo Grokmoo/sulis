@@ -1,0 +1,13 @@
+id: boots_mail
+name: Mail Boots
+icon: inventory/boots_mail
+equippable:
+  slot: Feet
+  bonuses:
+    armor:
+      base: 2
+      kinds:
+        - [Slashing, 3]
+image:
+  Feet:
+    creatures/boots_mail

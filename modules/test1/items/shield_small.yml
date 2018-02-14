@@ -4,7 +4,7 @@ icon: inventory/shield_small
 equippable:
   slot: HeldOff
   bonuses:
-    dodge: 10
+    defense: 10
 image:
   HeldOff:
     creatures/shield_small

@@ -1,0 +1,13 @@
+id: legs_plate
+name: Plate Pants
+icon: inventory/legs_plate
+equippable:
+  slot: Legs
+  bonuses:
+    armor:
+      base: 5
+      kinds:
+        - [Slashing, 6]
+image:
+  Legs:
+    creatures/legs_plate

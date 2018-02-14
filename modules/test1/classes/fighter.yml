@@ -1,9 +1,9 @@
 id: fighter
 name: Fighter
 bonuses_per_level:
-  hit_points: 50
+  hit_points: 15
   accuracy: 5
-  dodge: 3
+  defense: 3
   fortitude: 3
   reflex: 3
   will: 2

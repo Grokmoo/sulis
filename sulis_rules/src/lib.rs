@@ -17,6 +17,7 @@
 extern crate rand;
 
 #[macro_use] extern crate serde_derive;
+#[macro_use] extern crate log;
 
 pub mod armor;
 pub use self::armor::Armor;
@@ -30,6 +31,7 @@ pub use self::bonus_list::BonusList;
 pub mod damage;
 pub use self::damage::Damage;
 pub use self::damage::DamageKind;
+pub use self::damage::DamageList;
 
 use self::attribute::Attribute::*;
 
@@ -73,13 +75,17 @@ impl AttributeList {
 }
 
 pub struct StatList {
-    pub damage: Damage,
+    bonus_damage: Vec<Damage>,
+    bonus_reach: f32,
+    base_reach: f32,
+
+    pub damage: DamageList,
     pub armor: Armor,
     pub reach: f32,
     pub max_hp: i32,
     pub initiative: i32,
     pub accuracy: i32,
-    pub dodge: i32,
+    pub defense: i32,
     pub fortitude: i32,
     pub reflex: i32,
     pub will: i32,
@@ -101,33 +107,48 @@ impl StatList {
             self.armor.add(armor);
         }
 
-        if let Some(damage) = bonuses.damage {
-            self.damage = Damage::max(self.damage, damage);
+        if let Some(bonus_damage) = bonuses.bonus_damage {
+            self.bonus_damage.push(bonus_damage.mult(times));
         }
 
         let times_f32 = times as f32;
         let times_i32 = times as i32;
-        if let Some(reach) = bonuses.reach { self.reach += reach * times_f32; }
+        if let Some(reach) = bonuses.bonus_reach { self.bonus_reach += reach * times_f32; }
+        if let Some(reach) = bonuses.base_reach {
+            if reach > self.base_reach {
+                self.base_reach = reach;
+            }
+        }
         if let Some(hit_points) = bonuses.hit_points { self.max_hp += hit_points * times_i32; }
         if let Some(initiative) = bonuses.initiative { self.initiative += initiative * times_i32; }
         if let Some(accuracy) = bonuses.accuracy { self.accuracy += accuracy * times_i32; }
-        if let Some(dodge) = bonuses.dodge { self.dodge += dodge * times_i32; }
+        if let Some(defense) = bonuses.defense { self.defense += defense * times_i32; }
         if let Some(fortitude) = bonuses.fortitude { self.fortitude += fortitude * times_i32; }
         if let Some(reflex) = bonuses.reflex { self.reflex += reflex * times_i32; }
         if let Some(will) = bonuses.will { self.will += will * times_i32; }
+    }
+
+    pub fn finalize(&mut self, base_damage: Damage) {
+        self.damage.create(base_damage, &self.bonus_damage);
+
+        self.reach = self.bonus_reach + self.base_reach;
     }
 }
 
 impl Default for StatList {
     fn default() -> StatList {
         StatList {
-            damage: Damage::default(),
+            bonus_damage: Vec::new(),
+            bonus_reach: 0.0,
+            base_reach: 0.0,
+
+            damage: DamageList::new(),
             armor: Armor::default(),
             max_hp: 0,
             reach: 0.0,
             initiative: 0,
             accuracy: 0,
-            dodge: 0,
+            defense: 0,
             fortitude: 0,
             reflex: 0,
             will: 0,

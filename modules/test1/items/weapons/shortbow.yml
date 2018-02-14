@@ -1,0 +1,15 @@
+id: shortbow
+name: Shortbow
+icon: inventory/weapon_shortbow
+equippable:
+  slot: HeldMain
+  blocks_slot: HeldOff
+  bonuses:
+    base_damage:
+      min: 25
+      max: 35
+      kind: Piercing
+    base_reach: 30.0
+image:
+  HeldOff:
+    creatures/shortbow

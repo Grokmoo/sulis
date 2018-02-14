@@ -1,0 +1,15 @@
+id: helm_plate
+name: Plate Helm
+icon: inventory/helm_plate
+equippable:
+  slot: Head
+  bonuses:
+    armor:
+      base: 3
+      kinds:
+        - [Slashing, 4]
+image:
+  Head:
+    creatures/helm_plate
+  Hair:
+    empty

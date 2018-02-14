@@ -34,8 +34,6 @@ impl Default for Armor {
 
 impl Armor {
     pub fn add(&mut self, other: &Armor) {
-        self.base += other.base;
-
         for &(other_kind, other_amount) in other.kinds.iter() {
             let mut found_index: Option<usize> = None;
             for (index, &(this_kind, _)) in self.kinds.iter().enumerate() {
@@ -47,9 +45,11 @@ impl Armor {
 
             match found_index {
                 Some(index) => self.kinds[index] = (other_kind, self.kinds[index].1 + other_amount),
-                None => self.kinds.push((other_kind, other_amount)),
+                None => self.kinds.push((other_kind, other_amount + self.base)),
             }
         }
+
+        self.base += other.base;
     }
 
     /// Returns the amount of damage resistance that this armor value

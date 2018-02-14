@@ -44,7 +44,7 @@ pub enum ImageLayer {
 }
 
 use self::ImageLayer::*;
-const IMAGE_LAYERS_LIST: [ImageLayer; 13] = [Cloak, Background, Feet, Legs, Torso, Foreground, Hands,
+const IMAGE_LAYERS_LIST: [ImageLayer; 13] = [Cloak, Background, Feet, Legs, Foreground, Hands, Torso,
     Beard, Hair, Head, Ears, HeldOff, HeldMain];
 
 impl ImageLayer {

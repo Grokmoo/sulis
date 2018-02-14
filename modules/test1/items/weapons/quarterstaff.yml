@@ -1,0 +1,15 @@
+id: quarterstaff
+name: Quarterstaff
+icon: inventory/weapon_quarterstaff
+equippable:
+  slot: HeldMain
+  blocks_slot: HeldOff
+  bonuses:
+    base_damage:
+     min: 20
+     max: 30
+     kind: Crushing
+    base_reach: 2.5
+image:
+  HeldMain:
+    creatures/quarterstaff

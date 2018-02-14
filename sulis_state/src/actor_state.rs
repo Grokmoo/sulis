@@ -88,11 +88,8 @@ impl ActorState {
         let rules = Module::rules();
 
         let accuracy = self.stats.accuracy;
-        let defense = target.borrow().actor.stats.dodge;
+        let defense = target.borrow().actor.stats.defense;
         let hit_kind = rules.attack_roll(accuracy, defense);
-
-        let damage_roll = self.stats.damage.roll();
-        let armor = target.borrow().actor.stats.armor.amount(self.stats.damage.kind);
 
         let damage_multiplier = match hit_kind {
             HitKind::Miss => {
@@ -104,15 +101,20 @@ impl ActorState {
             HitKind::Crit => rules.crit_damage_multiplier,
         };
 
-        let damage_amount = (damage_roll as f32 * damage_multiplier) as u32;
-        debug!("{:?}. {} damage vs {} armor", hit_kind, damage_amount, armor);
+        let damage = self.stats.damage.roll(&target.borrow().actor.stats.armor
+                                                   , damage_multiplier);
 
-        let (damage, color) = if damage_amount > armor {
-            let damage = damage_amount - armor;
-            target.borrow_mut().remove_hp(damage);
-            (damage, color::RED)
-        } else {
+        debug!("{:?}. {:?} damage", hit_kind, damage);
+
+        let (damage, color) = if damage.is_empty() {
             (0, color::GRAY)
+        } else {
+            let mut total = 0;
+            for (_kind, amount) in damage {
+                total += amount;
+            }
+            target.borrow_mut().remove_hp(total);
+            (total, color::RED)
         };
 
         (format!("{:?}: {} damage", hit_kind, damage), color)
@@ -203,14 +205,31 @@ impl ActorState {
             self.stats.add_multiple(&class.bonuses_per_level, level);
         }
 
+        let mut damage_list = Vec::new();
         for ref item_state in self.inventory.equipped_iter() {
             let equippable = match item_state.item.equippable {
                 None => continue,
-                Some(ref equippable) => equippable,
+                Some(ref equippable) => {
+                    if let Some(damage) = equippable.bonuses.base_damage {
+                        damage_list.push(damage);
+                    }
+
+                    equippable
+                }
             };
 
             self.stats.add(&equippable.bonuses);
         }
+
+        if damage_list.is_empty() {
+            if let Some(damage) = self.actor.race.base_stats.base_damage {
+                damage_list.push(damage);
+            }
+        }
+
+        let base_damage = rules.compute_damage_from(damage_list);
+
+        self.stats.finalize(base_damage);
 
         self.listeners.notify(&self);
     }

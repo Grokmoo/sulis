@@ -2,16 +2,17 @@ id: human
 name: Human
 size: 3
 base_stats:
+  hit_points: 40
   accuracy: 30
-  dodge: 30
+  defense: 30
   fortitude: 30
   reflex: 30
   will: 30
-  damage:
+  base_damage:
     min: 10
     max: 15
     kind: Crushing
-  reach: 1.0
+  bonus_reach: 1.0
 default_images:
   Male:
     Foreground: creatures/human_male_fg
@@ -21,7 +22,7 @@ default_images:
     Background: creatures/human_female_bg
 image_layer_offset_scale: 16
 image_layer_offsets:
-  HeldMain: [-15, -8]
+  HeldMain: [-16, -8]
   HeldOff: [17, -6]
 image_layer_postfix:
   Female: "_female"

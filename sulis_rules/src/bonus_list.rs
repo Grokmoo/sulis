@@ -20,12 +20,14 @@ use {Armor, Damage};
 #[serde(deny_unknown_fields)]
 pub struct BonusList {
     pub armor: Option<Armor>,
-    pub damage: Option<Damage>,
-    pub reach: Option<f32>,
+    pub bonus_damage: Option<Damage>,
+    pub base_damage: Option<Damage>,
+    pub base_reach: Option<f32>,
+    pub bonus_reach: Option<f32>,
     pub initiative: Option<i32>,
     pub hit_points: Option<i32>,
     pub accuracy: Option<i32>,
-    pub dodge: Option<i32>,
+    pub defense: Option<i32>,
     pub fortitude: Option<i32>,
     pub reflex: Option<i32>,
     pub will: Option<i32>,

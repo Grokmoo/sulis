@@ -4,11 +4,10 @@ icon: inventory/boots_leather
 equippable:
   slot: Feet
   bonuses:
-    armor:
-      base: 1
-      kinds:
-        - [Acid, 2]
-        - [Electrical, 2]
+    base_armor: 1
+    armor_kinds:
+      Acid: 2
+      Electrical: 2
 image:
   Feet:
     creatures/boots_leather

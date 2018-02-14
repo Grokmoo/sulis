@@ -4,10 +4,9 @@ icon: inventory/torso_plate
 equippable:
   slot: Torso
   bonuses:
-    armor:
-      base: 7
-      kinds:
-        - [Slashing, 9]
+    base_armor: 7
+    armor_kinds:
+      Slashing: 9
 image:
   Torso:
     creatures/torso_plate

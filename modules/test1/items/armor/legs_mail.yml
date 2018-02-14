@@ -4,10 +4,7 @@ icon: inventory/legs_mail
 equippable:
   slot: Legs
   bonuses:
-    armor:
-      base: 4
-      kinds:
-        - [Slashing, 5]
+    base_armor: 4
 image:
   Legs:
     creatures/legs_mail

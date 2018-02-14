@@ -14,12 +14,15 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use {Armor, Damage};
+use std::collections::HashMap;
+
+use {Damage, DamageKind};
 
 #[derive(Deserialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct BonusList {
-    pub armor: Option<Armor>,
+    pub base_armor: Option<u32>,
+    pub armor_kinds: Option<HashMap<DamageKind, u32>>,
     pub bonus_damage: Option<Damage>,
     pub base_damage: Option<Damage>,
     pub base_reach: Option<f32>,

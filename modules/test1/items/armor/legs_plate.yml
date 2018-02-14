@@ -4,10 +4,9 @@ icon: inventory/legs_plate
 equippable:
   slot: Legs
   bonuses:
-    armor:
-      base: 5
-      kinds:
-        - [Slashing, 6]
+    base_armor: 5
+    armor_kinds:
+      Slashing: 6
 image:
   Legs:
     creatures/legs_plate

@@ -18,7 +18,7 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_rules::Attribute;
+use sulis_rules::{Attribute, DamageKind};
 use sulis_state::{ChangeListener, EntityState};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{Button, Label, TextArea};
@@ -100,9 +100,12 @@ impl WidgetKind for CharacterWindow {
 
             state.add_text_arg("initiative", &stats.initiative.to_string());
 
-            state.add_text_arg("armor", &stats.armor.base.to_string());
-            for &(kind, amount) in stats.armor.kinds.iter() {
-                state.add_text_arg(&format!("armor_{}", kind).to_lowercase(), &amount.to_string());
+            state.add_text_arg("armor", &stats.armor.base().to_string());
+            for kind in DamageKind::iter() {
+                if !stats.armor.differs_from_base(*kind) { continue; }
+
+                state.add_text_arg(&format!("armor_{}", kind).to_lowercase(),
+                    &stats.armor.amount(*kind).to_string());
             }
 
             state.add_text_arg("accuracy", &stats.accuracy.to_string());

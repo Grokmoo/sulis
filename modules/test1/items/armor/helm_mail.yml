@@ -4,10 +4,7 @@ icon: inventory/helm_mail
 equippable:
   slot: Head
   bonuses:
-    armor:
-      base: 2
-      kinds:
-        - [Slashing, 3]
+    base_armor: 2
 image:
   Head:
     creatures/helm_mail

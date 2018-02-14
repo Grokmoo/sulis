@@ -4,10 +4,7 @@ icon: inventory/torso_mail
 equippable:
   slot: Torso
   bonuses:
-    armor:
-      base: 5
-      kinds:
-        - [Slashing, 7]
+    base_armor: 5
 image:
   Torso:
     creatures/torso_mail

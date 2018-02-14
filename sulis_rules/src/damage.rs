@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::slice::Iter;
 use std::fmt::{self, Display};
 use rand::{self, Rng};
 
@@ -125,7 +126,7 @@ impl DamageList {
     pub fn max(&self) -> u32 { self.max }
 }
 
-#[derive(Deserialize, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Deserialize, Debug, Clone, Copy, Hash, PartialEq, Eq, PartialOrd, Ord)]
 #[serde(deny_unknown_fields)]
 pub enum DamageKind {
     Slashing,
@@ -137,6 +138,34 @@ pub enum DamageKind {
     Fire,
     Sonic,
     Raw,
+}
+
+use DamageKind::*;
+
+// This array MUST be in the same order as the ordering on the DamageKind enum
+// This is top to bottom declaration order for derived.
+const DAMAGE_KINDS: [DamageKind; 9] = [Slashing, Piercing, Crushing, Acid, Cold,
+    Electrical, Fire, Sonic, Raw];
+
+impl DamageKind {
+    pub fn iter() -> Iter<'static, DamageKind> {
+        DAMAGE_KINDS.iter()
+    }
+
+    pub fn index(&self) -> usize {
+        use DamageKind::*;
+        match self {
+            &Slashing => 0,
+            &Piercing => 1,
+            &Crushing => 2,
+            &Acid => 3,
+            &Cold => 4,
+            &Electrical => 5,
+            &Fire => 6,
+            &Sonic => 7,
+            &Raw => 8,
+        }
+    }
 }
 
 impl Display for DamageKind {

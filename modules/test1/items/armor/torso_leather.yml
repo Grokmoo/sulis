@@ -4,11 +4,10 @@ icon: inventory/torso_leather
 equippable:
   slot: Torso
   bonuses:
-    armor:
-      base: 3
-      kinds:
-        - [Acid, 6]
-        - [Electrical, 6]
+    base_armor: 3
+    armor_kinds:
+      Acid: 5
+      Electrical: 5
 image:
   Torso:
     creatures/torso_leather

@@ -4,11 +4,10 @@ icon: inventory/legs_leather
 equippable:
   slot: Legs
   bonuses:
-    armor:
-      base: 2
-      kinds:
-        - [Acid, 4]
-        - [Electrical, 4]
+    base_armor: 2
+    armor_kinds:
+      Acid: 3
+      Electrical: 3
 image:
   Legs:
     creatures/legs_leather

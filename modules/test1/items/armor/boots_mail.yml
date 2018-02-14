@@ -4,10 +4,7 @@ icon: inventory/boots_mail
 equippable:
   slot: Feet
   bonuses:
-    armor:
-      base: 2
-      kinds:
-        - [Slashing, 3]
+    base_armor: 2
 image:
   Feet:
     creatures/boots_mail

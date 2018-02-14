@@ -4,11 +4,10 @@ icon: inventory/gloves_leather
 equippable:
   slot: Hands
   bonuses:
-    armor:
-      base: 1
-      kinds:
-        - [Acid, 2]
-        - [Electrical, 2]
+    base_armor: 1
+    armor_kinds:
+      Acid: 2
+      Electrical: 2
 image:
   Hands:
     creatures/gloves_leather

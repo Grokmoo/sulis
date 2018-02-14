@@ -4,10 +4,7 @@ icon: inventory/gloves_mail
 equippable:
   slot: Hands
   bonuses:
-    armor:
-      base: 2
-      kinds:
-        - [Slashing, 3]
+    base_armor: 2
 image:
   Hands:
     creatures/gloves_mail

@@ -219,10 +219,18 @@ fn add_equippable_text_args(equippable: &Equippable, widget_state: &mut WidgetSt
         }
     }
 
-    if let Some(ref armor) = bonuses.armor {
-        widget_state.add_text_arg("armor", &armor.base.to_string());
+    let mut armor_arg_added = false;
+    if let Some(ref base_armor) = bonuses.base_armor {
+        widget_state.add_text_arg("armor", &base_armor.to_string());
+        armor_arg_added = true;
+    }
 
-        for &(kind, amount) in armor.kinds.iter() {
+    if let Some(ref armor_kinds) = bonuses.armor_kinds {
+        if !armor_arg_added {
+            widget_state.add_text_arg("armor", "0");
+        }
+
+        for (kind, amount) in armor_kinds.iter() {
             widget_state.add_text_arg(&format!("armor_{}", kind).to_lowercase(),
                                                &amount.to_string());
         }

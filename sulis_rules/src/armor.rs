@@ -14,42 +14,49 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::collections::HashMap;
+
 use DamageKind;
 
 #[derive(Deserialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct Armor {
-    pub base: u32,
-    pub kinds: Vec<(DamageKind, u32)>,
+    base: u32,
+    kinds: [u32; 8],
 }
 
 impl Default for Armor {
     fn default() -> Armor {
         Armor {
             base: 0,
-            kinds: Vec::new(),
+            kinds: [0; 8],
         }
     }
 }
 
 impl Armor {
-    pub fn add(&mut self, other: &Armor) {
-        for &(other_kind, other_amount) in other.kinds.iter() {
-            let mut found_index: Option<usize> = None;
-            for (index, &(this_kind, _)) in self.kinds.iter().enumerate() {
-                if other_kind == this_kind {
-                    found_index = Some(index);
-                    break;
-                }
-            }
+    pub fn add(&mut self, base_armor: Option<u32>, kinds: &Option<HashMap<DamageKind, u32>>) {
+        let other_base = match base_armor {
+            None => 0,
+            Some(base) => base,
+        };
 
-            match found_index {
-                Some(index) => self.kinds[index] = (other_kind, self.kinds[index].1 + other_amount),
-                None => self.kinds.push((other_kind, other_amount + self.base)),
-            }
+        let kinds = match kinds {
+            &None => {
+                self.kinds.iter_mut().for_each(|amount| *amount += other_base);
+                self.base += other_base;
+                return;
+            },
+            &Some(ref kinds) => kinds,
+        };
+
+        for kind in DamageKind::iter() {
+            if *kind == DamageKind::Raw { continue; }
+            let amount = kinds.get(kind).unwrap_or(&other_base);
+            self.kinds[kind.index()] += amount;
         }
 
-        self.base += other.base;
+        self.base += other_base;
     }
 
     /// Returns the amount of damage resistance that this armor value
@@ -57,10 +64,16 @@ impl Armor {
     pub fn amount(&self, check_kind: DamageKind) -> u32 {
         if check_kind == DamageKind::Raw { return 0; }
 
-        for &(kind, amount) in self.kinds.iter() {
-            if kind == check_kind { return amount; }
-        }
+        return self.kinds[check_kind.index()]
+    }
 
+    pub fn base(&self) -> u32 {
         self.base
+    }
+
+    pub fn differs_from_base(&self, kind: DamageKind) -> bool {
+        if kind == DamageKind::Raw { return true; }
+
+        return self.kinds[kind.index()] != self.base
     }
 }

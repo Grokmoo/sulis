@@ -103,9 +103,7 @@ impl StatList {
     pub fn add_multiple(&mut self, bonuses: &BonusList, times: u32) {
         if times == 0 { return; }
 
-        if let Some(ref armor) = bonuses.armor {
-            self.armor.add(armor);
-        }
+        self.armor.add(bonuses.base_armor, &bonuses.armor_kinds);
 
         if let Some(bonus_damage) = bonuses.bonus_damage {
             self.bonus_damage.push(bonus_damage.mult(times));

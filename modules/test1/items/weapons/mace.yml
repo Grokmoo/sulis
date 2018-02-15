@@ -5,11 +5,13 @@ equippable:
   slot: HeldMain
   alternate_slot: HeldOff
   bonuses:
-    base_damage:
-      min: 20
-      max: 30
-      kind: Crushing
-    base_reach: 1.0
+    attack:
+      damage:
+        min: 20
+        max: 30
+        kind: Crushing
+      kind: # Melee
+        reach: 1.0
 image:
   HeldMain:
     creatures/mace

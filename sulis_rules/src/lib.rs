@@ -22,11 +22,16 @@ extern crate rand;
 pub mod armor;
 pub use self::armor::Armor;
 
+pub mod attack;
+pub use self::attack::Attack;
+pub use self::attack::AttackKind;
+
 pub mod attribute;
 pub use self::attribute::Attribute;
 
 mod bonus_list;
 pub use self::bonus_list::BonusList;
+use self::bonus_list::AttackBuilder;
 
 pub mod damage;
 pub use self::damage::Damage;
@@ -77,11 +82,11 @@ impl AttributeList {
 pub struct StatList {
     bonus_damage: Vec<Damage>,
     bonus_reach: f32,
-    base_reach: f32,
+    bonus_range: f32,
 
-    pub damage: DamageList,
+    attack_range: f32,
+    pub attacks: Vec<Attack>,
     pub armor: Armor,
-    pub reach: f32,
     pub max_hp: i32,
     pub initiative: i32,
     pub accuracy: i32,
@@ -92,6 +97,12 @@ pub struct StatList {
 }
 
 impl StatList {
+    /// Returns the maximum distance that this StatList's
+    /// attacks can reach
+    pub fn attack_distance(&self) -> f32 {
+        self.attack_range
+    }
+
     /// Adds the bonuses from the specified BonusList to this stat list.
     pub fn add(&mut self, bonuses: &BonusList) {
         self.add_multiple(bonuses, 1);
@@ -112,11 +123,7 @@ impl StatList {
         let times_f32 = times as f32;
         let times_i32 = times as i32;
         if let Some(reach) = bonuses.bonus_reach { self.bonus_reach += reach * times_f32; }
-        if let Some(reach) = bonuses.base_reach {
-            if reach > self.base_reach {
-                self.base_reach = reach;
-            }
-        }
+        if let Some(range) = bonuses.bonus_range { self.bonus_range += range * times_f32; }
         if let Some(hit_points) = bonuses.hit_points { self.max_hp += hit_points * times_i32; }
         if let Some(initiative) = bonuses.initiative { self.initiative += initiative * times_i32; }
         if let Some(accuracy) = bonuses.accuracy { self.accuracy += accuracy * times_i32; }
@@ -126,10 +133,29 @@ impl StatList {
         if let Some(will) = bonuses.will { self.will += will * times_i32; }
     }
 
-    pub fn finalize(&mut self, base_damage: Damage) {
-        self.damage.create(base_damage, &self.bonus_damage);
+    pub fn finalize(&mut self, attacks: Vec<&AttackBuilder>, multiplier: f32) {
+        if attacks.is_empty() {
+            warn!("Finalized stats with no attacks");
+            return;
+        }
 
-        self.reach = self.bonus_reach + self.base_reach;
+        let mut attack_range = None;
+        for builder in attacks {
+            let attack = Attack::new(builder, &self).mult(multiplier);
+
+            if attack_range.is_none() {
+                attack_range = Some(attack.distance());
+            } else {
+                let cur_range = attack_range.unwrap();
+                if attack.distance() < cur_range {
+                    attack_range = Some(attack.distance());
+                }
+            }
+
+            self.attacks.push(attack);
+        }
+
+        self.attack_range = attack_range.unwrap();
     }
 }
 
@@ -138,12 +164,12 @@ impl Default for StatList {
         StatList {
             bonus_damage: Vec::new(),
             bonus_reach: 0.0,
-            base_reach: 0.0,
+            bonus_range: 0.0,
 
-            damage: DamageList::new(),
+            attack_range: 0.0,
+            attacks: Vec::new(),
             armor: Armor::default(),
             max_hp: 0,
-            reach: 0.0,
             initiative: 0,
             accuracy: 0,
             defense: 0,

@@ -8,10 +8,13 @@ base_stats:
   fortitude: 30
   reflex: 30
   will: 30
-  base_damage:
-    min: 10
-    max: 15
-    kind: Crushing
+  attack:
+    damage:
+      min: 10
+      max: 15
+      kind: Crushing
+    kind: #Melee
+      reach: 0.5
   bonus_reach: 1.0
 default_images:
   Male:

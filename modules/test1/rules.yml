@@ -12,4 +12,4 @@ graze_damage_multiplier: 0.5
 hit_damage_multiplier: 1.0
 crit_damage_multiplier: 1.5
 
-dual_wield_damage_multiplier: 0.65
+dual_wield_damage_multiplier: 0.75

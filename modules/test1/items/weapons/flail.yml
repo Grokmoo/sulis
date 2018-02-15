@@ -4,11 +4,13 @@ icon: inventory/weapon_flail
 equippable:
   slot: HeldMain
   bonuses:
-    base_damage:
-      min: 28
-      max: 38
-      kind: Crushing
-    base_reach: 1.5
+    attack:
+      damage:
+        min: 28
+        max: 38
+        kind: Crushing
+      kind: # Melee
+        reach: 1.5
     accuracy: -5
 image:
   HeldMain:

@@ -90,10 +90,14 @@ impl WidgetKind for CharacterWindow {
                 index += 1;
             }
 
-            state.add_text_arg("damage_min", &stats.damage.min().to_string());
-            state.add_text_arg("damage_max", &stats.damage.max().to_string());
-            state.add_text_arg("reach", &stats.reach.to_string());
+            for (index, attack) in stats.attacks.iter().enumerate() {
+                state.add_text_arg(&format!("{}_damage_min", index)
+                                   , &attack.damage.min().to_string());
+                state.add_text_arg(&format!("{}_damage_max", index)
+                                   , &attack.damage.max().to_string());
+            }
 
+            state.add_text_arg("reach", &stats.attack_distance().to_string());
             state.add_text_arg("cur_hp", &pc.actor.hp().to_string());
             state.add_text_arg("max_hp", &stats.max_hp.to_string());
             state.add_text_arg("cur_ap", &pc.actor.ap().to_string());

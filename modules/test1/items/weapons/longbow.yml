@@ -5,11 +5,13 @@ equippable:
   slot: HeldMain
   blocks_slot: HeldOff
   bonuses:
-    base_damage:
-      min: 30
-      max: 40
-      kind: Piercing
-    base_reach: 30.0
+    attack:
+      damage:
+        min: 30
+        max: 40
+        kind: Piercing
+      kind: # Ranged
+        range: 30.0
 image:
   HeldOff:
     creatures/longbow

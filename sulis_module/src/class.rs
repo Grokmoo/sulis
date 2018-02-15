@@ -17,7 +17,7 @@
 use std::io::Error;
 
 use sulis_core::resource::ResourceBuilder;
-use sulis_core::util::invalid_data_error;
+use sulis_core::util::{invalid_data_error, unable_to_create_error};
 use sulis_core::serde_json;
 use sulis_core::serde_yaml;
 use sulis_rules::BonusList;
@@ -36,9 +36,9 @@ impl PartialEq for Class {
 
 impl Class {
     pub fn new(builder: ClassBuilder) -> Result<Class, Error> {
-        if builder.bonuses_per_level.base_damage.is_some() {
-            warn!("Must not specify a base damage for a class.");
-            return invalid_data_error(&format!("Unable to create class '{}'", builder.id));
+        if builder.bonuses_per_level.attack.is_some() {
+            warn!("Must not specify an attack for a class.");
+            return unable_to_create_error("class", &builder.id);
         }
 
         Ok(Class {

@@ -69,12 +69,12 @@ impl ActorState {
     }
 
     pub fn can_reach(&self, dist: f32) -> bool {
-        dist < self.stats.reach
+        dist < self.stats.attack_distance()
     }
 
     pub(crate) fn can_attack(&self, _target: &Rc<RefCell<EntityState>>, dist: f32) -> bool {
-        trace!("Checking can attack for '{}' with reach of {}.  Distance to target is {}",
-               self.actor.name, self.stats.reach, dist);
+        trace!("Checking can attack for '{}'.  Distance to target is {}",
+               self.actor.name, dist);
 
         let attack_ap = Module::rules().attack_ap;
         if self.ap < attack_ap { return false; }
@@ -87,37 +87,48 @@ impl ActorState {
         info!("'{}' attacks '{}'", self.actor.name, target.borrow().actor.actor.name);
         let rules = Module::rules();
 
-        let accuracy = self.stats.accuracy;
-        let defense = target.borrow().actor.stats.defense;
-        let hit_kind = rules.attack_roll(accuracy, defense);
+        let mut color = color::GRAY;
+        let mut damage_str = String::new();
+        let mut not_first = false;
 
-        let damage_multiplier = match hit_kind {
-            HitKind::Miss => {
-                debug!("Miss.");
-                return ("Miss".to_string(), color::GRAY);
-            },
-            HitKind::Graze => rules.graze_damage_multiplier,
-            HitKind::Hit => rules.hit_damage_multiplier,
-            HitKind::Crit => rules.crit_damage_multiplier,
-        };
+        for ref attack in self.stats.attacks.iter() {
+            if not_first { damage_str.push_str(", "); }
 
-        let damage = self.stats.damage.roll(&target.borrow().actor.stats.armor
-                                                   , damage_multiplier);
+            let accuracy = self.stats.accuracy;
+            let defense = target.borrow().actor.stats.defense;
+            let hit_kind = rules.attack_roll(accuracy, defense);
 
-        debug!("{:?}. {:?} damage", hit_kind, damage);
+            let damage_multiplier = match hit_kind {
+                HitKind::Miss => {
+                    debug!("Miss");
+                    damage_str.push_str("Miss");
+                    not_first = true;
+                    continue;
+                },
+                HitKind::Graze => rules.graze_damage_multiplier,
+                HitKind::Hit => rules.hit_damage_multiplier,
+                HitKind::Crit => rules.crit_damage_multiplier,
+            };
 
-        let (damage, color) = if damage.is_empty() {
-            (0, color::GRAY)
-        } else {
-            let mut total = 0;
-            for (_kind, amount) in damage {
-                total += amount;
+            let damage = attack.roll_damage(&target.borrow().actor.stats.armor, damage_multiplier);
+
+            debug!("{:?}. {:?} damage", hit_kind, damage);
+
+            if !damage.is_empty() {
+                color = color::RED;
+                let mut total = 0;
+                for (_kind, amount) in damage {
+                    total += amount;
+                }
+
+                target.borrow_mut().remove_hp(total);
+                damage_str.push_str(&format!("{:?}: {}", hit_kind, total));
             }
-            target.borrow_mut().remove_hp(total);
-            (total, color::RED)
-        };
 
-        (format!("{:?}: {} damage", hit_kind, damage), color)
+            not_first = true;
+        }
+
+        (damage_str, color)
     }
 
     pub fn equip(&mut self, index: usize) -> bool {
@@ -205,13 +216,13 @@ impl ActorState {
             self.stats.add_multiple(&class.bonuses_per_level, level);
         }
 
-        let mut damage_list = Vec::new();
+        let mut attacks_list = Vec::new();
         for ref item_state in self.inventory.equipped_iter() {
             let equippable = match item_state.item.equippable {
                 None => continue,
                 Some(ref equippable) => {
-                    if let Some(damage) = equippable.bonuses.base_damage {
-                        damage_list.push(damage);
+                    if let Some(ref attack) = equippable.bonuses.attack {
+                        attacks_list.push(attack);
                     }
 
                     equippable
@@ -221,15 +232,19 @@ impl ActorState {
             self.stats.add(&equippable.bonuses);
         }
 
-        if damage_list.is_empty() {
-            if let Some(damage) = self.actor.race.base_stats.base_damage {
-                damage_list.push(damage);
+        let multiplier = if attacks_list.is_empty() {
+            if let Some(ref attack) = self.actor.race.base_stats.attack {
+                attacks_list.push(attack);
             }
-        }
 
-        let base_damage = rules.compute_damage_from(damage_list);
+            1.0
+        } else if attacks_list.len() > 1 {
+            rules.dual_wield_damage_multiplier
+        } else {
+            1.0
+        };
 
-        self.stats.finalize(base_damage);
+        self.stats.finalize(attacks_list, multiplier);
 
         self.listeners.notify(&self);
     }

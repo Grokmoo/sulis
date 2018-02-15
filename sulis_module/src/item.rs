@@ -52,7 +52,9 @@ impl Slot {
 
 use self::Slot::*;
 
-const SLOTS_LIST: [Slot; 12] = [Cloak, Feet, Legs, Torso, Hands, Head, HeldOff, HeldMain, Waist, Neck, FingerMain, FingerOff];
+// The sort order of this list is important
+const SLOTS_LIST: [Slot; 12] = [Cloak, Feet, Legs, Torso, Hands, Head, HeldMain, HeldOff, Waist,
+                                Neck, FingerMain, FingerOff];
 
 #[derive(Debug)]
 pub struct Item {
@@ -103,9 +105,9 @@ impl Item {
 
 
         if let &Some(ref equippable) = &builder.equippable {
-            if let Some(damage) = equippable.bonuses.base_damage {
-                if damage.kind.is_none() {
-                    warn!("Kind must be specified for base damage");
+            if let Some(ref attack) = equippable.bonuses.attack {
+                if attack.damage.kind.is_none() {
+                    warn!("Kind must be specified for attack damage.");
                     return unable_to_create_error("item", &builder.id);
                 }
             }

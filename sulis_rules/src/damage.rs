@@ -27,7 +27,7 @@ pub struct DamageList {
 }
 
 impl DamageList {
-    pub fn new() -> DamageList {
+    pub fn empty() -> DamageList {
         DamageList {
             damage: Vec::new(),
             min: 0,
@@ -35,15 +35,16 @@ impl DamageList {
         }
     }
 
-    pub fn create(&mut self, base_damage: Damage, bonus_damage: &Vec<Damage>) {
+    pub fn new(base_damage: Damage, bonus_damage: &Vec<Damage>) -> DamageList {
         if base_damage.kind.is_none() {
             warn!("Attempted to create damage list with no base damage kind");
-            return;
+            return DamageList::empty();
         }
 
+        let mut damage_list = Vec::new();
         let mut min = base_damage.min;
         let mut max = base_damage.max;
-        self.damage.push(base_damage);
+        damage_list.push(base_damage);
 
         let mut bonus_damage = bonus_damage.clone();
         bonus_damage.sort_by_key(|d| d.kind);
@@ -53,8 +54,8 @@ impl DamageList {
             min += damage.min;
             max += damage.max;
 
-            if damage.kind.is_none() || damage.kind == self.damage[0].kind {
-                self.damage[0].add(damage);
+            if damage.kind.is_none() || damage.kind == damage_list[0].kind {
+                damage_list[0].add(damage);
                 continue;
             }
 
@@ -66,7 +67,7 @@ impl DamageList {
                         cur_damage_unwrapped.add(damage);
                     } else {
                         assert!(cur_damage_unwrapped.kind.is_some());
-                        self.damage.push(cur_damage_unwrapped);
+                        damage_list.push(cur_damage_unwrapped);
                         cur_damage = Some(damage);
                     }
                 }
@@ -75,16 +76,19 @@ impl DamageList {
 
         if let Some(cur_damage) = cur_damage {
             assert!(cur_damage.kind.is_some());
-            self.damage.push(cur_damage);
+            damage_list.push(cur_damage);
         }
 
-        self.min = min;
-        self.max = max;
-
-        debug!("Created damage list {} to {}, base kind {}", self.min,
-               self.max, self.damage[0].kind.unwrap());
-        for damage in self.damage.iter() {
+        debug!("Created damage list {} to {}, base kind {}", min,
+               max, damage_list[0].kind.unwrap());
+        for damage in damage_list.iter() {
             trace!("Component: {} to {}, kind {:?}", damage.min, damage.max, damage.kind);
+        }
+
+        DamageList {
+            damage: damage_list,
+            min,
+            max,
         }
     }
 
@@ -124,6 +128,24 @@ impl DamageList {
     pub fn min(&self) -> u32 { self.min }
 
     pub fn max(&self) -> u32 { self.max }
+
+    pub fn mult(&self, multiplier: f32) -> DamageList {
+        let mut damage_vec = Vec::new();
+        let mut min = 0;
+        let mut max = 0;
+        for damage in self.damage.iter() {
+            let new_damage = damage.clone().mult_f32(multiplier);
+            min += new_damage.min;
+            max += new_damage.max;
+            damage_vec.push(new_damage);
+        }
+
+        DamageList {
+            damage: damage_vec,
+            min,
+            max,
+        }
+    }
 }
 
 #[derive(Deserialize, Debug, Clone, Copy, Hash, PartialEq, Eq, PartialOrd, Ord)]

@@ -5,11 +5,13 @@ equippable:
   slot: HeldMain
   blocks_slot: HeldOff
   bonuses:
-    base_damage:
-      min: 35
-      max: 45
-      kind: Crushing
-    base_reach: 2.0
+    attack:
+      damage:
+        min: 35
+        max: 45
+        kind: Crushing
+      kind: # Melee
+        reach: 2.0
 image:
   HeldMain:
     creatures/greathammer

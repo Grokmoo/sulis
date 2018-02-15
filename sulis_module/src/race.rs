@@ -63,13 +63,13 @@ impl Race {
 
         let default_images = ImageLayerSet::new(builder.default_images)?;
 
-        match builder.base_stats.base_damage {
+        match builder.base_stats.attack {
             None => {
                 warn!("You must specify a base_damage for each race.");
                 return unable_to_create_error("race", &builder.id);
-            }, Some(damage) => {
-                if damage.kind.is_none() {
-                    warn!("Base damage must always have a kind specified.");
+            }, Some(ref attack) => {
+                if attack.damage.kind.is_none() {
+                    warn!("Attack must always have a damage kind specified.");
                     return unable_to_create_error("race", &builder.id);
                 }
             }

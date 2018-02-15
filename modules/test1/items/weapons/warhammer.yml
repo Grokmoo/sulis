@@ -4,11 +4,13 @@ icon: inventory/weapon_warhammer
 equippable:
   slot: HeldMain
   bonuses:
-    base_damage:
-      min: 25
-      max: 35
-      kind: Crushing
-    base_reach: 1.5
+    attack:
+      damage:
+        min: 25
+        max: 35
+        kind: Crushing
+      kind: # Melee
+        reach: 1.5
 image:
   HeldMain:
     creatures/warhammer

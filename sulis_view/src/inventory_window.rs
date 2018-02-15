@@ -25,6 +25,7 @@ use sulis_state::{EntityState, ChangeListener, GameState};
 use sulis_core::io::event;
 use sulis_core::ui::{Callback, Widget, WidgetKind, WidgetState};
 use sulis_widgets::{Button, Label, TextArea};
+use sulis_rules::AttackKind;
 
 pub const NAME: &str = "inventory_window";
 
@@ -203,11 +204,16 @@ impl WidgetKind for ItemButton {
 fn add_equippable_text_args(equippable: &Equippable, widget_state: &mut WidgetState) {
     let bonuses = &equippable.bonuses;
 
-    if let Some(ref damage) = bonuses.base_damage {
-        widget_state.add_text_arg("min_damage", &damage.min.to_string());
-        widget_state.add_text_arg("max_damage", &damage.max.to_string());
-        if let Some(kind) = damage.kind {
-            widget_state.add_text_arg("damage_kind", &kind.to_string());
+    if let Some(ref attack) = bonuses.attack {
+        widget_state.add_text_arg("min_damage", &attack.damage.min.to_string());
+        widget_state.add_text_arg("max_damage", &attack.damage.max.to_string());
+        add_if_present(widget_state, "damage_kind", attack.damage.kind);
+
+        match attack.kind {
+            AttackKind::Melee { reach } =>
+                widget_state.add_text_arg("reach", &reach.to_string()),
+            AttackKind::Ranged { range } =>
+                widget_state.add_text_arg("range", &range.to_string()),
         }
     }
 
@@ -236,8 +242,8 @@ fn add_equippable_text_args(equippable: &Equippable, widget_state: &mut WidgetSt
         }
     }
 
-    add_if_present(widget_state, "base_reach", bonuses.base_reach);
     add_if_present(widget_state, "bonus_reach", bonuses.bonus_reach);
+    add_if_present(widget_state, "bonus_range", bonuses.bonus_range);
     add_if_present(widget_state, "initiative", bonuses.initiative);
     add_if_present(widget_state, "hit_points", bonuses.hit_points);
     add_if_present(widget_state, "accuracy", bonuses.accuracy);

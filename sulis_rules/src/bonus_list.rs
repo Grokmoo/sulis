@@ -16,17 +16,17 @@
 
 use std::collections::HashMap;
 
-use {Damage, DamageKind};
+use {AttackKind, Damage, DamageKind};
 
 #[derive(Deserialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct BonusList {
+    pub attack: Option<AttackBuilder>,
     pub base_armor: Option<u32>,
     pub armor_kinds: Option<HashMap<DamageKind, u32>>,
     pub bonus_damage: Option<Damage>,
-    pub base_damage: Option<Damage>,
-    pub base_reach: Option<f32>,
     pub bonus_reach: Option<f32>,
+    pub bonus_range: Option<f32>,
     pub initiative: Option<i32>,
     pub hit_points: Option<i32>,
     pub accuracy: Option<i32>,
@@ -36,3 +36,25 @@ pub struct BonusList {
     pub will: Option<i32>,
 }
 
+#[derive(Deserialize, Debug, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct AttackBuilder {
+    pub damage: Damage,
+    pub kind: AttackKind,
+}
+
+impl AttackBuilder {
+    pub fn distance(&self) -> f32 {
+        match self.kind {
+            AttackKind::Melee { reach } => reach,
+            AttackKind::Ranged { range } => range,
+        }
+    }
+
+    pub fn mult(&mut self, multiplier: f32) -> AttackBuilder {
+        AttackBuilder {
+            damage: self.damage.mult_f32(multiplier),
+            kind: self.kind,
+        }
+    }
+}

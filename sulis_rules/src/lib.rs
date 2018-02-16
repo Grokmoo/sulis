@@ -14,6 +14,8 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+extern crate sulis_core;
+
 extern crate rand;
 
 #[macro_use] extern crate serde_derive;
@@ -29,7 +31,7 @@ pub use self::attack::AttackKind;
 pub mod attribute;
 pub use self::attribute::Attribute;
 
-mod bonus_list;
+pub mod bonus_list;
 pub use self::bonus_list::BonusList;
 use self::bonus_list::AttackBuilder;
 
@@ -39,6 +41,10 @@ pub use self::damage::DamageKind;
 pub use self::damage::DamageList;
 
 use self::attribute::Attribute::*;
+
+use std::rc::Rc;
+
+use sulis_core::image::Image;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum HitKind {
@@ -97,6 +103,24 @@ pub struct StatList {
 }
 
 impl StatList {
+    pub fn attack_is_melee(&self) -> bool {
+        if self.attacks.is_empty() { return false; }
+
+        self.attacks[0].is_melee()
+    }
+
+    pub fn attack_is_ranged(&self) -> bool {
+        if self.attacks.is_empty() { return false; }
+
+        self.attacks[0].is_ranged()
+    }
+
+    pub fn get_ranged_projectile(&self) -> Option<Rc<Image>> {
+        if !self.attack_is_ranged() { return None; }
+
+        self.attacks[0].get_ranged_projectile()
+    }
+
     /// Returns the maximum distance that this StatList's
     /// attacks can reach
     pub fn attack_distance(&self) -> f32 {

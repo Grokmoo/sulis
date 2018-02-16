@@ -122,6 +122,8 @@ groups:
       shortspear_off: [39, 18]
       longspear_off: [42, 18]
       quarterstaff_off: [45, 18]
+      projectile_crossbow: [48, 18]
+      projectile_bow: [51, 18]
       
       shield_small: [0, 21]
       shield_large: [3, 21]

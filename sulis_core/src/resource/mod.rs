@@ -126,6 +126,10 @@ impl ResourceSet {
         })
     }
 
+    pub fn get_empty_image() -> Rc<Image> {
+        RESOURCE_SET.with(|r| get_resource("empty", &r.borrow().images)).unwrap()
+    }
+
     pub fn get_default_font() -> Rc<Font> {
         RESOURCE_SET.with(|r| get_resource(&CONFIG.display.default_font, &r.borrow().fonts)).unwrap()
     }

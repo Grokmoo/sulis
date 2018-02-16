@@ -19,7 +19,7 @@ use std::cell::RefCell;
 
 use sulis_core::config::CONFIG;
 
-use animation::AttackAnimation;
+use animation::{MeleeAttackAnimation, RangedAttackAnimation};
 use sulis_module::{Actor, EntitySize, EntitySizeIterator};
 use sulis_module::area::Transition;
 use {ActorState, area_state, AreaState, ChangeListenerList, GameState, Location};
@@ -102,9 +102,15 @@ impl EntityState {
     }
 
     pub fn attack(entity: &Rc<RefCell<EntityState>>, target: &Rc<RefCell<EntityState>>) {
-        let anim = AttackAnimation::new(entity, target,
-                                        CONFIG.display.animation_base_time_millis * 5);
-        GameState::add_animation(Box::new(anim));
+        if entity.borrow().actor.stats.attack_is_melee() {
+            let anim = MeleeAttackAnimation::new(entity, target,
+                                                 CONFIG.display.animation_base_time_millis * 5);
+            GameState::add_animation(Box::new(anim));
+        } else if entity.borrow().actor.stats.attack_is_ranged() {
+            let anim = RangedAttackAnimation::new(entity, target,
+                                                  CONFIG.display.animation_base_time_millis);
+            GameState::add_animation(Box::new(anim));
+        }
     }
 
     pub fn remove_hp(&mut self, hp: u32) {

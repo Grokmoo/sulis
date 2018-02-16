@@ -19,11 +19,14 @@ use std::cmp;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-mod attack_animation;
-pub use self::attack_animation::AttackAnimation;
+mod melee_attack_animation;
+pub use self::melee_attack_animation::MeleeAttackAnimation;
 
 mod move_animation;
 pub use self::move_animation::MoveAnimation;
+
+mod ranged_attack_animation;
+pub use self::ranged_attack_animation::RangedAttackAnimation;
 
 mod wait_animation;
 pub use self::wait_animation::WaitAnimation;

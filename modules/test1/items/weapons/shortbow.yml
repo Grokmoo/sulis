@@ -12,6 +12,7 @@ equippable:
         kind: Piercing
       kind: # Ranged
         range: 30.0
+        projectile: creatures/projectile_bow
 image:
   HeldOff:
     creatures/shortbow

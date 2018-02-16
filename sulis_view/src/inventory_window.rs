@@ -25,7 +25,7 @@ use sulis_state::{EntityState, ChangeListener, GameState};
 use sulis_core::io::event;
 use sulis_core::ui::{Callback, Widget, WidgetKind, WidgetState};
 use sulis_widgets::{Button, Label, TextArea};
-use sulis_rules::AttackKind;
+use sulis_rules::bonus_list::AttackKindBuilder;
 
 pub const NAME: &str = "inventory_window";
 
@@ -210,9 +210,9 @@ fn add_equippable_text_args(equippable: &Equippable, widget_state: &mut WidgetSt
         add_if_present(widget_state, "damage_kind", attack.damage.kind);
 
         match attack.kind {
-            AttackKind::Melee { reach } =>
+            AttackKindBuilder::Melee { reach } =>
                 widget_state.add_text_arg("reach", &reach.to_string()),
-            AttackKind::Ranged { range } =>
+            AttackKindBuilder::Ranged { range, .. } =>
                 widget_state.add_text_arg("range", &range.to_string()),
         }
     }

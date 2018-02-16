@@ -16,7 +16,7 @@
 
 use std::collections::HashMap;
 
-use {AttackKind, Damage, DamageKind};
+use {Damage, DamageKind};
 
 #[derive(Deserialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
@@ -40,21 +40,33 @@ pub struct BonusList {
 #[serde(deny_unknown_fields)]
 pub struct AttackBuilder {
     pub damage: Damage,
-    pub kind: AttackKind,
+    pub kind: AttackKindBuilder,
 }
 
 impl AttackBuilder {
     pub fn distance(&self) -> f32 {
         match self.kind {
-            AttackKind::Melee { reach } => reach,
-            AttackKind::Ranged { range } => range,
+            AttackKindBuilder::Melee { reach } => reach,
+            AttackKindBuilder::Ranged { range, .. } => range,
         }
     }
 
     pub fn mult(&mut self, multiplier: f32) -> AttackBuilder {
         AttackBuilder {
             damage: self.damage.mult_f32(multiplier),
-            kind: self.kind,
+            kind: self.kind.clone(),
         }
     }
+}
+
+#[derive(Deserialize, Debug, Clone)]
+#[serde(deny_unknown_fields, untagged)]
+pub enum AttackKindBuilder {
+    Melee {
+        reach: f32,
+    },
+    Ranged {
+        range: f32,
+        projectile: String,
+    },
 }

@@ -22,7 +22,7 @@ use sulis_core::util;
 use sulis_core::ui::Widget;
 use {animation, AreaState, EntityState};
 
-pub struct AttackAnimation {
+pub struct MeleeAttackAnimation {
     attacker: Rc<RefCell<EntityState>>,
     defender: Rc<RefCell<EntityState>>,
     vector: (f32, f32),
@@ -32,15 +32,15 @@ pub struct AttackAnimation {
     has_attacked: bool,
 }
 
-impl AttackAnimation {
+impl MeleeAttackAnimation {
     pub fn new(attacker: &Rc<RefCell<EntityState>>, defender: &Rc<RefCell<EntityState>>,
-               total_time_millis: u32) -> AttackAnimation {
+               total_time_millis: u32) -> MeleeAttackAnimation {
         let x = defender.borrow().location.x + defender.borrow().size.size / 2
             - attacker.borrow().location.x - attacker.borrow().size.size / 2;
         let y = defender.borrow().location.y + defender.borrow().size.size / 2
             - attacker.borrow().location.y - attacker.borrow().size.size / 2;
 
-        AttackAnimation {
+        MeleeAttackAnimation {
             attacker: Rc::clone(attacker),
             defender: Rc::clone(defender),
             vector: (x as f32, y as f32),
@@ -52,7 +52,7 @@ impl AttackAnimation {
     }
 }
 
-impl animation::Animation for AttackAnimation {
+impl animation::Animation for MeleeAttackAnimation {
     fn update(&mut self, area_state: &mut AreaState, _root: &Rc<RefCell<Widget>>) -> bool {
         if self.marked_for_removal {
             self.attacker.borrow_mut().sub_pos = (0.0, 0.0);

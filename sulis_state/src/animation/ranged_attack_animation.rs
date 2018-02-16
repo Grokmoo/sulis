@@ -21,7 +21,7 @@ use std::time::Instant;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::image::Image;
 use sulis_core::ui::{animation_state, Widget};
-use sulis_core::util::{self, Point};
+use sulis_core::util;
 use {AreaState, EntityState};
 use animation::Animation;
 
@@ -73,18 +73,17 @@ impl RangedAttackAnimation {
 }
 
 impl Animation for RangedAttackAnimation {
-    fn draw_graphics_mode(&self, renderer: &mut GraphicsRenderer, pixel_size: Point) {
+    fn draw_graphics_mode(&self, renderer: &mut GraphicsRenderer, offset_x: f32, offset_y: f32,
+                          scale_x: f32, scale_y: f32, millis: u32) {
         if let Some(ref projectile) = self.projectile {
-            // TODO fix this
-            let scale_x = (3200.0 * 16.0 / 9.0) / (pixel_size.x as f32);
-            let scale_y = 3200.0 / (pixel_size.y as f32);
-
             let mut draw_list = DrawList::empty_sprite();
             projectile.append_to_draw_list(&mut draw_list, &animation_state::NORMAL,
-                                           self.cur_pos.0, self.cur_pos.1,
+                                           self.cur_pos.0 + offset_x,
+                                           self.cur_pos.1 + offset_y,
                                            projectile.get_width_f32(),
-                                           projectile.get_height_f32(), 0);
+                                           projectile.get_height_f32(), millis);
             draw_list.set_scale(scale_x, scale_y);
+            // TODO rotate the projectile
             renderer.draw(draw_list);
         }
     }

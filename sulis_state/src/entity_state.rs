@@ -18,11 +18,12 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_core::config::CONFIG;
+use sulis_module::Area;
 
 use animation::{MeleeAttackAnimation, RangedAttackAnimation};
 use sulis_module::{Actor, EntitySize, EntitySizeIterator};
 use sulis_module::area::Transition;
-use {ActorState, area_state, AreaState, ChangeListenerList, GameState, Location};
+use {ActorState, AreaState, ChangeListenerList, GameState, has_visibility, Location};
 
 pub struct EntityState {
     pub actor: ActorState,
@@ -146,12 +147,8 @@ impl EntityState {
         true
     }
 
-    pub fn has_visibility(&self, other: &Rc<RefCell<EntityState>>) -> bool {
-        let x = other.borrow().location.x;
-        let y = other.borrow().location.y;
-        let dist = self.dist(x, y, other.borrow().size());
-
-        dist < area_state::VIS_TILES as f32
+    pub fn has_visibility(&self, other: &Rc<RefCell<EntityState>>, area: &Rc<Area>) -> bool {
+        has_visibility(area, &self, &other.borrow())
     }
 
     fn dist(&self, to_x: i32, to_y: i32, to_size: i32) -> f32 {

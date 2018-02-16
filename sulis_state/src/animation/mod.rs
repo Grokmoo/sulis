@@ -35,7 +35,7 @@ use {AreaState, EntityState};
 
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::ui::Widget;
-use sulis_core::util::{self, Point};
+use sulis_core::util;
 
 pub trait Animation {
     fn update(&mut self, area_state: &mut AreaState, root: &Rc<RefCell<Widget>>) -> bool;
@@ -47,7 +47,8 @@ pub trait Animation {
 
     fn get_owner(&self) -> &Rc<RefCell<EntityState>>;
 
-    fn draw_graphics_mode(&self, _renderer: &mut GraphicsRenderer, _pixel_size: Point) { }
+    fn draw_graphics_mode(&self, _renderer: &mut GraphicsRenderer, _offset_x: f32, _offset_y: f32,
+                          _scale_x: f32, _scale_y: f32, _millis: u32) { }
 }
 
 /// Helper function to return the number of frames elapsed for the 'elapsed'

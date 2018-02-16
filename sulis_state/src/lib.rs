@@ -52,6 +52,7 @@ pub use self::location::Location;
 
 mod los_calculator;
 pub use self::los_calculator::calculate_los;
+pub use self::los_calculator::has_visibility;
 
 mod path_finder;
 use self::path_finder::PathFinder;
@@ -300,13 +301,15 @@ impl GameState {
         });
     }
 
-    pub fn draw_graphics_mode(renderer: &mut GraphicsRenderer, pixel_size: Point) {
+    pub fn draw_graphics_mode(renderer: &mut GraphicsRenderer, offset_x: i32, offset_y: i32,
+                              scale_x: f32, scale_y: f32, millis: u32) {
         STATE.with(|s| {
             let state = s.borrow();
             let state = state.as_ref().unwrap();
 
             for anim in state.animations.iter() {
-                anim.draw_graphics_mode(renderer, pixel_size);
+                anim.draw_graphics_mode(renderer, offset_x as f32, offset_y as f32,
+                                        scale_x, scale_y, millis);
             }
         })
     }

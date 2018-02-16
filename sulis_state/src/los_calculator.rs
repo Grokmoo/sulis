@@ -56,7 +56,22 @@ pub fn calculate_los(los: &mut Vec<bool>, area: &Rc<Area>, entity: &EntityState)
     trace!("Visibility compute time: {}", util::format_elapsed_secs(start_time.elapsed()));
 }
 
-fn cast_ray(area: &Rc<Area>, start_x: i32, start_y: i32, end_x: i32, end_y: i32) -> bool{
+pub fn has_visibility(area: &Rc<Area>, entity: &EntityState, target: &EntityState) -> bool {
+    let max_dist_squared = area_state::VIS_TILES * area_state::VIS_TILES;
+    let start_x = entity.location.x + entity.size.size / 2;
+    let start_y = entity.location.y + entity.size.size / 2;
+
+    for p in target.location_points() {
+        if (start_x - p.x) * (start_x - p.x) + (start_y - p.y) * (start_y - p.y) > max_dist_squared {
+            continue;
+        }
+        if cast_ray(area, start_x, start_y, p.x, p.y) { return true; }
+    }
+
+    false
+}
+
+fn cast_ray(area: &Rc<Area>, start_x: i32, start_y: i32, end_x: i32, end_y: i32) -> bool {
     if (end_y - start_y).abs() < (end_x - start_x).abs() {
         if start_x > end_x {
             cast_low(area, end_x, end_y, start_x, start_y)
@@ -78,7 +93,7 @@ fn check(area: &Rc<Area>, x: i32, y: i32) -> bool {
     area.terrain.is_visible_index(index)
 }
 
-fn cast_high(area: &Rc<Area>, start_x: i32, start_y: i32, end_x: i32, end_y: i32) -> bool{
+fn cast_high(area: &Rc<Area>, start_x: i32, start_y: i32, end_x: i32, end_y: i32) -> bool {
     let mut delta_x = end_x - start_x;
     let delta_y = end_y - start_y;
 

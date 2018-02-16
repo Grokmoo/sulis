@@ -216,7 +216,7 @@ impl AreaState {
         if entity.borrow().is_pc() {
             self.compute_pc_visibility(&*entity.borrow());
 
-            self.turn_timer.check_ai_activation(entity);
+            self.turn_timer.check_ai_activation(entity, &self.area);
         }
     }
 

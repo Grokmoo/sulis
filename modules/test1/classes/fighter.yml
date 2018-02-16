@@ -7,3 +7,4 @@ bonuses_per_level:
   fortitude: 3
   reflex: 3
   will: 2
+  initiative: 1

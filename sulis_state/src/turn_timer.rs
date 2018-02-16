@@ -19,6 +19,8 @@ use std::cell::RefCell;
 use std::collections::VecDeque;
 pub use std::collections::vec_deque::Iter;
 
+use sulis_module::Area;
+
 use {AreaState, ChangeListenerList, EntityState};
 
 /// `TurnTimer` maintains a list of all entities in a given `AreaState`.  The
@@ -43,18 +45,7 @@ impl Default for TurnTimer {
 
 impl TurnTimer {
     pub fn new(area_state: &AreaState) -> TurnTimer {
-        let mut entities: Vec<(i32, Rc<RefCell<EntityState>>)> = Vec::new();
-
-        for entity in area_state.entity_iter() {
-            let initiative = entity.borrow().actor.stats.initiative;
-            entities.push((initiative, entity));
-        }
-
-        // sort by initiative
-        entities.sort_by(|a, b| b.0.cmp(&a.0));
-
-        let entities: VecDeque<Rc<RefCell<EntityState>>> = entities.into_iter()
-            .map(|(_initiative, entity)| entity).collect();
+        let entities: VecDeque<Rc<RefCell<EntityState>>> = area_state.entity_iter().collect();
 
         if let Some(entity) = entities.front() {
             debug!("Starting turn for '{}'", entity.borrow().actor.actor.name);
@@ -68,13 +59,13 @@ impl TurnTimer {
         }
     }
 
-    pub fn check_ai_activation(&mut self, pc: &Rc<RefCell<EntityState>>) {
+    pub fn check_ai_activation(&mut self, pc: &Rc<RefCell<EntityState>>, area: &Rc<Area>) {
         let mut updated = false;
         for entity in self.entities.iter() {
             if entity.borrow().is_pc() { continue; }
             if entity.borrow().is_ai_active() { continue; }
 
-            if !entity.borrow().has_visibility(pc) { continue; }
+            if !entity.borrow().has_visibility(pc, area) { continue; }
 
             entity.borrow_mut().set_ai_active();
             updated = true;
@@ -84,6 +75,22 @@ impl TurnTimer {
             self.set_active(true);
             self.activate_current();
         }
+    }
+
+    pub fn roll_initiative(&mut self) {
+        let mut entities: Vec<(i32, Rc<RefCell<EntityState>>)> = Vec::new();
+        for ref entity in self.entities.iter() {
+            let initiative = entity.borrow().actor.stats.initiative;
+            entities.push((initiative, Rc::clone(entity)));
+        }
+        entities.sort_by_key(|e| e.0);
+
+        self.entities.clear();
+        for (_initiative, entity) in entities {
+            self.entities.push_front(entity);
+        }
+
+        self.entities.iter().for_each(|e| e.borrow_mut().actor.end_turn());
     }
 
     pub fn is_active(&self) -> bool {
@@ -98,7 +105,7 @@ impl TurnTimer {
             if !active {
                 self.entities.iter().for_each(|e| if e.borrow().is_pc() { e.borrow_mut().actor.init_turn(); });
             } else {
-                self.entities.iter().for_each(|e| e.borrow_mut().actor.end_turn());
+                self.roll_initiative();
             }
         }
         self.listeners.notify(&self);

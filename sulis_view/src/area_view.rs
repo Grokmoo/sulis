@@ -337,7 +337,8 @@ impl WidgetKind for AreaView {
         }
 
 
-        GameState::draw_graphics_mode(renderer, pixel_size);
+        GameState::draw_graphics_mode(renderer, p.x - s.x, p.y - s.y,
+                                      scale_x, scale_y, millis);
     }
 
     fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {

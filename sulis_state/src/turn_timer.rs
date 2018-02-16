@@ -21,7 +21,7 @@ pub use std::collections::vec_deque::Iter;
 
 use sulis_module::Area;
 
-use {AreaState, ChangeListenerList, EntityState};
+use {AreaState, ChangeListenerList, EntityState, GameState};
 
 /// `TurnTimer` maintains a list of all entities in a given `AreaState`.  The
 /// list proceed in initiative order, with the front of the list always containing
@@ -91,6 +91,7 @@ impl TurnTimer {
         }
 
         self.entities.iter().for_each(|e| e.borrow_mut().actor.end_turn());
+        GameState::set_entering_combat();
     }
 
     pub fn is_active(&self) -> bool {

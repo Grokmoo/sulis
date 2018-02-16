@@ -75,6 +75,7 @@ use sulis_module::Module;
 thread_local! {
     static STATE: RefCell<Option<GameState>> = RefCell::new(None);
     static AI: RefCell<AI> = RefCell::new(AI::new());
+    static ENTERING_COMBAT: RefCell<bool> = RefCell::new(false);
 }
 
 pub struct GameStateMainLoopUpdater { }
@@ -242,6 +243,21 @@ impl GameState {
         })
     }
 
+    fn check_clear_entering_combat() -> bool {
+        ENTERING_COMBAT.with(|c| {
+            let retval = {
+                *c.borrow()
+            };
+
+            *c.borrow_mut() = false;
+            retval
+        })
+    }
+
+    pub fn set_entering_combat() {
+        ENTERING_COMBAT.with(|c| *c.borrow_mut() = true);
+    }
+
     fn get_area_state(id: &str) -> Option<Rc<RefCell<AreaState>>> {
         STATE.with(|s| {
             match s.borrow().as_ref().unwrap().areas.get(id) {
@@ -290,6 +306,11 @@ impl GameState {
 
             if state.pc.borrow().actor.is_dead() {
                 area_state.turn_timer.set_active(false);
+            }
+
+            // clear animations for the active entity when entering combat
+            if GameState::check_clear_entering_combat() {
+                state.animations.iter_mut().for_each(|a| a.check(&result));
             }
 
             result

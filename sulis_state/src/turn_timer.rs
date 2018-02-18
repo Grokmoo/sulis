@@ -65,7 +65,7 @@ impl TurnTimer {
             if entity.borrow().is_pc() { continue; }
             if entity.borrow().is_ai_active() { continue; }
 
-            if !entity.borrow().has_visibility(pc, area) { continue; }
+            if !pc.borrow().has_visibility(entity, area) { continue; }
 
             entity.borrow_mut().set_ai_active();
             updated = true;

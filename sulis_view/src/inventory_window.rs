@@ -242,6 +242,12 @@ fn add_equippable_text_args(equippable: &Equippable, widget_state: &mut WidgetSt
         }
     }
 
+    if let Some(ref attributes) = bonuses.attributes {
+        for &(attr, value) in attributes.iter() {
+            widget_state.add_text_arg(&attr.short_name(), &value.to_string());
+        }
+    }
+
     add_if_present(widget_state, "bonus_reach", bonuses.bonus_reach);
     add_if_present(widget_state, "bonus_range", bonuses.bonus_range);
     add_if_present(widget_state, "initiative", bonuses.initiative);

@@ -21,7 +21,7 @@ use std::cell::RefCell;
 use sulis_core::ui::{Callback, Cursor, Widget, WidgetKind};
 use sulis_core::io::event::ClickKind;
 use sulis_core::util::Point;
-use sulis_module::Module;
+use sulis_module::{Area, Module};
 use sulis_state::{ChangeListener, GameState, EntityState};
 use sulis_widgets::{Label, list_box, ListBox};
 
@@ -30,20 +30,25 @@ const NAME: &'static str = "action_menu";
 pub struct ActionMenu {
     hovered_entity: Option<Rc<RefCell<EntityState>>>,
     is_hover_pc: bool,
+    area: Rc<Area>,
     area_pos: Point,
 }
 
 impl ActionMenu {
     pub fn new(x: i32, y: i32) -> Rc<RefCell<ActionMenu>> {
         let area_state = GameState::area_state();
+        let area_state = area_state.borrow();
         let (hovered_entity, is_hover_pc) =
-            if let Some(ref entity) = area_state.borrow().get_entity_at(x, y) {
+            if let Some(ref entity) = area_state.get_entity_at(x, y) {
                 (Some(Rc::clone(entity)), entity.borrow().is_pc())
             } else {
                 (None, false)
             };
+
+
         Rc::new(RefCell::new(ActionMenu {
             area_pos: Point::new(x, y),
+            area: Rc::clone(&area_state.area),
             hovered_entity,
             is_hover_pc,
         }))
@@ -82,7 +87,7 @@ impl ActionMenu {
 
         match self.hovered_entity {
             None => false,
-            Some(ref entity) => pc.borrow().can_attack(entity),
+            Some(ref entity) => pc.borrow().can_attack(entity, &self.area),
         }
     }
 

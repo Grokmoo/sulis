@@ -22,11 +22,10 @@ use sulis_core::io::DrawList;
 use sulis_core::ui::{color, Color};
 use sulis_module::{item, Actor, Module};
 use {ChangeListenerList, EntityState, Inventory};
-use sulis_rules::{AttributeList, HitKind, StatList};
+use sulis_rules::{HitKind, StatList};
 
 pub struct ActorState {
     pub actor: Rc<Actor>,
-    pub attributes: AttributeList,
     pub stats: StatList,
     pub listeners: ChangeListenerList<ActorState>,
     hp: i32,
@@ -50,12 +49,12 @@ impl ActorState {
         }
 
         let image = LayeredImage::new(actor.image_layers().get_list(actor.sex));
+        let attrs = actor.attributes;
 
         ActorState {
             actor,
             inventory,
-            attributes: AttributeList::default(),
-            stats: StatList::default(),
+            stats: StatList::new(attrs),
             listeners: ChangeListenerList::default(),
             hp: 0,
             ap: 0,
@@ -203,7 +202,7 @@ impl ActorState {
 
     pub fn compute_stats(&mut self) {
         debug!("Compute stats for '{}'", self.actor.name);
-        self.stats = StatList::default();
+        self.stats = StatList::new(self.actor.attributes);
 
         self.image = LayeredImage::new(self.actor.image_layers()
                                       .get_list_with(self.actor.sex, &self.actor.race,

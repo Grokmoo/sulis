@@ -24,19 +24,19 @@ use sulis_core::ui::{animation_state, AnimationState, Callback, Widget, WidgetKi
 use Button;
 
 #[derive(Clone)]
-pub struct Entry<T: Display + 'static> {
+pub struct Entry<T: Display + Clone + 'static> {
     item: T,
     callback: Option<Callback>,
     animation_state: AnimationState,
 }
 
-impl<T: Display + 'static> Entry<T> {
+impl<T: Display + Clone + 'static> Entry<T> {
     pub fn item(&self) -> &T {
         &self.item
     }
 }
 
-impl<T: Display + 'static> Entry<T> {
+impl<T: Display + Clone + 'static> Entry<T> {
     pub fn new(item: T, callback: Option<Callback>) -> Entry<T> {
        Entry {
            item,
@@ -63,11 +63,11 @@ impl<T: Display + 'static> Entry<T> {
     }
 }
 
-pub struct ListBox<T: Display + 'static> {
-    entries: Vec<Entry<T>>,
+pub struct ListBox<T: Display + Clone + 'static> {
+    pub (crate) entries: Vec<Entry<T>>,
 }
 
-impl<T: Display + 'static> ListBox<T> {
+impl<T: Display + Clone + 'static> ListBox<T> {
     pub fn new(entries: Vec<Entry<T>>) -> Rc<RefCell<ListBox<T>>> {
         Rc::new(RefCell::new(ListBox {
             entries,
@@ -83,11 +83,11 @@ impl<T: Display + 'static> ListBox<T> {
     }
 }
 
-impl<T: Display> WidgetKind for ListBox<T> {
-    fn get_name(&self) -> &str { "list_box" }
+pub const NAME: &str = "list_box";
 
+impl<T: Display + Clone> WidgetKind for ListBox<T> {
+    fn get_name(&self) -> &str { NAME }
     fn as_any(&self) -> &Any { self }
-
     fn as_any_mut(&mut self) -> &mut Any { self }
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {

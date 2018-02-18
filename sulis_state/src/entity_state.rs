@@ -96,10 +96,12 @@ impl EntityState {
 
     /// Returns true if this entity can attack the specified target with its
     /// current weapon, without moving
-    pub fn can_attack(&self, target: &Rc<RefCell<EntityState>>) -> bool {
+    pub fn can_attack(&self, target: &Rc<RefCell<EntityState>>, area: &Rc<Area>) -> bool {
         let dist = self.dist_to_entity(target);
 
-        self.actor.can_attack(target, dist)
+        if !self.actor.can_attack(target, dist) { return false; }
+
+        self.has_visibility(target, area)
     }
 
     pub fn attack(entity: &Rc<RefCell<EntityState>>, target: &Rc<RefCell<EntityState>>) {

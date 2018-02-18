@@ -3,6 +3,7 @@ include:
   - widgets
   - main_menu
   - editor
+  - character_builder
 children:
   mouse_over:
     from: .text_area
@@ -162,6 +163,12 @@ children:
     background: bg_base
     text: |
       [s=5.0;c=f00|#name#
+      ][?str|Strength: #str#
+      ][?dex|Dexterity: #dex#
+      ][?end|Endurance: #end#
+      ][?per|Perception: #per#
+      ][?int|Intelligence: #int#
+      ][?wis|Wisdom: #wis#
       ][?min_damage|[s=4.0|Damage: #min_damage# to #max_damage# [c=f00|#damage_kind#]]
       ][?min_bonus_damage|[s=4.0|Damage: #min_bonus_damage# to #max_bonus_damage# [?bonus_damage_kind;c=f00|#bonus_damage_kind#]]
       ][?reach|[s=4.0|Reach: #reach#]

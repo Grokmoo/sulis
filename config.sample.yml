@@ -42,6 +42,7 @@ input:
         KeyQ: Exit
         KeyI: ToggleInventory
         KeyC: ToggleCharacter
+        KeyB: ToggleCharacterBuilder
 
 logging:
     # Log level may be error, warn, info, debug, or trace

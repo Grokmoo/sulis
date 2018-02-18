@@ -39,5 +39,8 @@ pub use self::list_box::ListBox;
 pub mod markup_renderer;
 pub use self::markup_renderer::MarkupRenderer;
 
+pub mod mutually_exclusive_list_box;
+pub use self::mutually_exclusive_list_box::MutuallyExclusiveListBox;
+
 pub mod text_area;
 pub use self::text_area::TextArea;

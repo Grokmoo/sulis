@@ -79,7 +79,7 @@ impl WidgetKind for CharacterWindow {
             state.add_text_arg("sex", &pc.actor.actor.sex.to_string());
 
             for attribute in Attribute::iter() {
-                state.add_text_arg(attribute.short_name(), &pc.actor.attributes.get(attribute).to_string())
+                state.add_text_arg(attribute.short_name(), &stats.attributes.get(*attribute).to_string())
             }
 
             let mut index = 0;

@@ -25,6 +25,7 @@ use sulis_core::resource::ResourceBuilder;
 use sulis_core::ui::animation_state;
 use sulis_core::util::invalid_data_error;
 use sulis_core::{serde_json, serde_yaml};
+use sulis_rules::AttributeList;
 
 use {Class, ImageLayer, ImageLayerSet, Item, Module, Race};
 
@@ -47,6 +48,7 @@ pub struct Actor {
     pub player: bool,
     pub race: Rc<Race>,
     pub sex: Sex,
+    pub attributes: AttributeList,
     pub items: Vec<Rc<Item>>,
     pub to_equip: Vec<usize>,
     pub levels: Vec<(Rc<Class>, u32)>,
@@ -131,6 +133,7 @@ impl Actor {
             player: builder.player.unwrap_or(false),
             race,
             sex,
+            attributes: builder.attributes.unwrap_or(AttributeList::default()),
             levels,
             items,
             to_equip,
@@ -169,6 +172,7 @@ pub struct ActorBuilder {
     name: String,
     race: String,
     sex: Option<Sex>,
+    attributes: Option<AttributeList>,
     player: Option<bool>,
     images: HashMap<ImageLayer, String>,
     hue: Option<f32>,

@@ -30,21 +30,18 @@ pub use self::attack::AttackKind;
 
 pub mod attribute;
 pub use self::attribute::Attribute;
+pub use self::attribute::AttributeList;
 
 pub mod bonus_list;
 pub use self::bonus_list::BonusList;
-use self::bonus_list::AttackBuilder;
 
 pub mod damage;
 pub use self::damage::Damage;
 pub use self::damage::DamageKind;
 pub use self::damage::DamageList;
 
-use self::attribute::Attribute::*;
-
-use std::rc::Rc;
-
-use sulis_core::image::Image;
+pub mod stat_list;
+pub use self::stat_list::StatList;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum HitKind {
@@ -52,154 +49,4 @@ pub enum HitKind {
     Graze,
     Hit,
     Crit,
-}
-
-#[derive(Clone)]
-pub struct AttributeList([(Attribute, u8); 6]);
-
-impl Default for AttributeList {
-    fn default() -> AttributeList {
-        AttributeList([
-            (Strength, attribute::BASE_VALUE),
-            (Dexterity, attribute::BASE_VALUE),
-            (Endurance, attribute::BASE_VALUE),
-            (Perception, attribute::BASE_VALUE),
-            (Intellect, attribute::BASE_VALUE),
-            (Wisdom, attribute::BASE_VALUE),
-        ])
-    }
-}
-
-impl AttributeList {
-    pub fn get(&self, attr: Attribute) -> u8 {
-        match self.0.iter().find(|a| a.0 == attr) {
-            Some(val) => val.1,
-            None => 0,
-        }
-    }
-
-    pub fn set(&mut self, attr: Attribute, value: u8) {
-        if let Some(attr) = self.0.iter_mut().find(|a| a.0 == attr) {
-            attr.1 = value;
-        }
-    }
-}
-
-pub struct StatList {
-    bonus_damage: Vec<Damage>,
-    bonus_reach: f32,
-    bonus_range: f32,
-
-    attack_range: f32,
-    pub attacks: Vec<Attack>,
-    pub armor: Armor,
-    pub max_hp: i32,
-    pub initiative: i32,
-    pub accuracy: i32,
-    pub defense: i32,
-    pub fortitude: i32,
-    pub reflex: i32,
-    pub will: i32,
-}
-
-impl StatList {
-    pub fn attack_is_melee(&self) -> bool {
-        if self.attacks.is_empty() { return false; }
-
-        self.attacks[0].is_melee()
-    }
-
-    pub fn attack_is_ranged(&self) -> bool {
-        if self.attacks.is_empty() { return false; }
-
-        self.attacks[0].is_ranged()
-    }
-
-    pub fn get_ranged_projectile(&self) -> Option<Rc<Image>> {
-        if !self.attack_is_ranged() { return None; }
-
-        self.attacks[0].get_ranged_projectile()
-    }
-
-    /// Returns the maximum distance that this StatList's
-    /// attacks can reach
-    pub fn attack_distance(&self) -> f32 {
-        self.attack_range
-    }
-
-    /// Adds the bonuses from the specified BonusList to this stat list.
-    pub fn add(&mut self, bonuses: &BonusList) {
-        self.add_multiple(bonuses, 1);
-    }
-
-    /// Adds the specified bonuses to this StatList the specified number of times.
-    /// Note that non-numeric bonuses are only added once regardless of the value of
-    /// times
-    pub fn add_multiple(&mut self, bonuses: &BonusList, times: u32) {
-        if times == 0 { return; }
-
-        self.armor.add(bonuses.base_armor, &bonuses.armor_kinds);
-
-        if let Some(bonus_damage) = bonuses.bonus_damage {
-            self.bonus_damage.push(bonus_damage.mult(times));
-        }
-
-        let times_f32 = times as f32;
-        let times_i32 = times as i32;
-        if let Some(reach) = bonuses.bonus_reach { self.bonus_reach += reach * times_f32; }
-        if let Some(range) = bonuses.bonus_range { self.bonus_range += range * times_f32; }
-        if let Some(hit_points) = bonuses.hit_points { self.max_hp += hit_points * times_i32; }
-        if let Some(initiative) = bonuses.initiative { self.initiative += initiative * times_i32; }
-        if let Some(accuracy) = bonuses.accuracy { self.accuracy += accuracy * times_i32; }
-        if let Some(defense) = bonuses.defense { self.defense += defense * times_i32; }
-        if let Some(fortitude) = bonuses.fortitude { self.fortitude += fortitude * times_i32; }
-        if let Some(reflex) = bonuses.reflex { self.reflex += reflex * times_i32; }
-        if let Some(will) = bonuses.will { self.will += will * times_i32; }
-    }
-
-    pub fn finalize(&mut self, attacks: Vec<&AttackBuilder>, multiplier: f32) {
-        if attacks.is_empty() {
-            warn!("Finalized stats with no attacks");
-            return;
-        }
-
-        let mut attack_range = None;
-        for builder in attacks {
-            let attack = Attack::new(builder, &self).mult(multiplier);
-
-            if attack_range.is_none() {
-                attack_range = Some(attack.distance());
-            } else {
-                let cur_range = attack_range.unwrap();
-                if attack.distance() < cur_range {
-                    attack_range = Some(attack.distance());
-                }
-            }
-
-            self.attacks.push(attack);
-        }
-
-        self.attack_range = attack_range.unwrap();
-    }
-}
-
-impl Default for StatList {
-    fn default() -> StatList {
-        StatList {
-            bonus_damage: Vec::new(),
-            bonus_reach: 0.0,
-            bonus_range: 0.0,
-
-            attack_range: 0.0,
-            attacks: Vec::new(),
-            armor: Armor::default(),
-            max_hp: 0,
-            initiative: 0,
-            accuracy: 0,
-            defense: 0,
-            fortitude: 0,
-            reflex: 0,
-            will: 0,
-        }
-    }
 }

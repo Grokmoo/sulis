@@ -1,0 +1,9 @@
+---
+children:
+  character_builder:
+    preferred_size: [240, -8]
+    from: .window
+    children:
+      title:
+        text: "Character Builder"
+...

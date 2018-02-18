@@ -20,7 +20,7 @@ use std::cell::RefCell;
 
 use sulis_core::io::{InputAction, MainLoopUpdater};
 use sulis_core::ui::*;
-use sulis_widgets::{Button, ConfirmationWindow, Label, list_box, ListBox};
+use sulis_widgets::{Button, ConfirmationWindow, Label, list_box, MutuallyExclusiveListBox};
 use sulis_module::ModuleInfo;
 
 pub struct MainMenuLoopUpdater {
@@ -112,39 +112,30 @@ impl WidgetKind for MainMenuView {
         let mut entries: Vec<list_box::Entry<ModuleInfo>> = Vec::new();
 
         let play_ref = Rc::clone(&play);
-        let cb: Callback = Callback::new(Rc::new(move |widget, _kind| {
-            let parent = Widget::get_parent(widget);
-            let cur_state = widget.borrow_mut().state.animation_state.contains(animation_state::Kind::Active);
-            if !cur_state {
-                for child in parent.borrow_mut().children.iter() {
-                    child.borrow_mut().state.animation_state.remove(animation_state::Kind::Active);
-                }
-                play_ref.borrow_mut().state.enable();
-            } else {
-                play_ref.borrow_mut().state.disable();
-            }
-            widget.borrow_mut().state.animation_state.toggle(animation_state::Kind::Active);
-        }));
+        let cb: Rc<Fn(Option<&list_box::Entry<ModuleInfo>>)> = Rc::new(move |active_entry| {
+            play_ref.borrow_mut().state.set_enabled(active_entry.is_some());
+        });
         for module in self.modules.iter() {
-            let entry = list_box::Entry::new(module.clone(), Some(cb.clone()));
+            let entry = list_box::Entry::new(module.clone(), None);
             entries.push(entry);
         }
 
-        let list_box = ListBox::new(entries);
-        // using Rc::clone complains of type mismatch here
-        let modules_list = Widget::with_theme(list_box.clone(), "modules_list");
+        let list_box = MutuallyExclusiveListBox::with_callback(entries, cb);
+        let list_box_ref = Rc::clone(&list_box);
+        let modules_list = Widget::with_theme(list_box, "modules_list");
 
-        let modules_list_ref = Rc::clone(&modules_list);
         play.borrow_mut().state.add_callback(Callback::new(Rc::new(move |_, _| {
-            for (index, child) in modules_list_ref.borrow().children.iter().enumerate() {
-                if child.borrow().state.animation_state.contains(animation_state::Kind::Active) {
-                    let list_box_ref = list_box.borrow();
-                    let entry = list_box_ref.get(index).unwrap();
-                    EXIT.with(|exit| *exit.borrow_mut() = true);
-                    SELECTED_MODULE.with(|m| *m.borrow_mut() = Some(entry.item().clone()));
-                    info!("Found active module {}", entry.item().name );
-                }
-            }
+            let list_box_ref = list_box_ref.borrow();
+            let entry = match list_box_ref.active_entry() {
+                None => {
+                    warn!("Play pressed with no active entry");
+                    return;
+                }, Some(entry) => entry,
+            };
+
+            EXIT.with(|exit| *exit.borrow_mut() = true);
+            SELECTED_MODULE.with(|m| *m.borrow_mut() = Some(entry.item().clone()));
+            info!("Selected module {}", entry.item().name);
         })));
         play.borrow_mut().state.disable();
 

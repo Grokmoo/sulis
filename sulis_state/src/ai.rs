@@ -104,10 +104,12 @@ impl EntityAI {
 
         let entity = self.entity.borrow();
         let pc = GameState::pc();
+        let area_state = GameState::area_state();
+        let area = Rc::clone(&area_state.borrow().area);
 
         if !entity.can_reach(&pc) && GameState::can_move_towards(&self.entity, &pc) {
             State::Move
-        } else if entity.can_attack(&pc) {
+        } else if entity.can_attack(&pc, &area) {
             State::Attack
         } else {
             State::End

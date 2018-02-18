@@ -45,6 +45,9 @@ pub use self::inventory_window::InventoryWindow;
 
 pub mod main_menu;
 
+pub mod character_builder;
+pub use self::character_builder::CharacterBuilder;
+
 use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
@@ -90,8 +93,7 @@ impl WidgetKind for RootView {
                 Widget::add_child_to(&widget, exit_window);
             },
             ToggleInventory => {
-                let window = Widget::get_child_with_name(widget,
-                                self::inventory_window::NAME);
+                let window = Widget::get_child_with_name(widget, self::inventory_window::NAME);
                 match window {
                     None => {
                         let window = Widget::with_defaults(
@@ -102,8 +104,7 @@ impl WidgetKind for RootView {
                 }
             },
             ToggleCharacter => {
-                let window = Widget::get_child_with_name(widget,
-                                                         self::character_window::NAME);
+                let window = Widget::get_child_with_name(widget, self::character_window::NAME);
                 match window {
                     None => {
                         let window = Widget::with_defaults(
@@ -113,8 +114,15 @@ impl WidgetKind for RootView {
                     Some(window) => window.borrow_mut().mark_for_removal(),
                 }
             },
+            ToggleCharacterBuilder => {
+                let window = Widget::get_child_with_name(widget,
+                                                         self::character_builder::NAME);
+                match window {
+                    None => Widget::add_child_to(&widget, Widget::with_defaults(CharacterBuilder::new())),
+                    Some(window) => window.borrow_mut().mark_for_removal(),
+                }
+            },
             _ => return false,
-
         }
 
         true

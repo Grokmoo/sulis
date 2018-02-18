@@ -36,6 +36,7 @@ pub enum InputAction {
     RightClickCursor,
     ToggleInventory,
     ToggleCharacter,
+    ToggleCharacterBuilder,
     Exit,
     MouseMove(f32, f32),
     MouseDown(ClickKind),

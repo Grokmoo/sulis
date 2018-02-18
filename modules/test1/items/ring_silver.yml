@@ -4,4 +4,6 @@ icon: inventory/ring_02
 equippable:
   slot: FingerMain
   alternate_slot: FingerOff
-  bonuses: {}
+  bonuses:
+    attributes:
+      - [Perception, 2]

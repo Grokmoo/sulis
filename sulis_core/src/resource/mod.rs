@@ -188,6 +188,10 @@ impl ResourceSet {
     }
 }
 
+pub fn all_resources<V: ?Sized>(map: &HashMap<String, Rc<V>>) -> Vec<Rc<V>> {
+    map.iter().map(|ref res| Rc::clone(res.1)).collect()
+}
+
 pub fn get_resource<V: ?Sized>(id: &str, map: &HashMap<String, Rc<V>>) -> Option<Rc<V>> {
     let resource = map.get(id);
 

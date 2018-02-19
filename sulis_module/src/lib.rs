@@ -67,7 +67,7 @@ use std::fmt::{self, Display};
 use std::path::PathBuf;
 use std::fs;
 
-use sulis_core::resource::{read, read_single_resource, get_resource, insert_if_ok};
+use sulis_core::resource::{all_resources, read, read_single_resource, get_resource, insert_if_ok};
 
 use self::area::Tile;
 use self::actor::ActorBuilder;
@@ -220,7 +220,7 @@ impl Module {
     }
 
     pub fn all_actors() -> Vec<Rc<Actor>> {
-        MODULE.with(|r| r.borrow().actors.iter().map(|ref a| Rc::clone(a.1)).collect())
+        MODULE.with(|r| all_resources(&r.borrow().actors))
     }
 
     pub fn area(id: &str) -> Option<Rc<Area>> {
@@ -247,12 +247,20 @@ impl Module {
         MODULE.with(|r| get_resource(id, &r.borrow().classes))
     }
 
+    pub fn all_classes() -> Vec<Rc<Class>> {
+        MODULE.with(|r| all_resources(&r.borrow().classes))
+    }
+
     pub fn game() -> Rc<Game> {
         MODULE.with(|m| Rc::clone(m.borrow().game.as_ref().unwrap()))
     }
 
     pub fn race(id: &str) -> Option<Rc<Race>> {
         MODULE.with(|r| get_resource(id, &r.borrow().races))
+    }
+
+    pub fn all_races() -> Vec<Rc<Race>> {
+        MODULE.with(|r| all_resources(&r.borrow().races))
     }
 
     pub fn rules() -> Rc<Rules> {
@@ -264,7 +272,7 @@ impl Module {
     }
 
     pub fn all_tiles() -> Vec<Rc<Tile>> {
-        MODULE.with(|r| r.borrow().tiles.iter().map(|ref t| Rc::clone(t.1)).collect())
+        MODULE.with(|r| all_resources(&r.borrow().tiles))
     }
 }
 

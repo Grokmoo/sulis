@@ -62,6 +62,10 @@ impl<T: Display + Clone + 'static> MutuallyExclusiveListBox<T> {
     pub fn active_entry(&self) -> Option<&Entry<T>> {
         self.active_entry.as_ref()
     }
+
+    pub fn has_active_entry(&self) -> bool {
+        self.active_entry.is_some()
+    }
 }
 
 impl<T: Display + Clone> WidgetKind for MutuallyExclusiveListBox<T> {

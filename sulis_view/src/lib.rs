@@ -28,8 +28,14 @@ pub use self::action_menu::ActionMenu;
 mod area_view;
 pub use self::area_view::AreaView;
 
+pub mod character_builder;
+pub use self::character_builder::CharacterBuilder;
+
 mod character_window;
 pub use self::character_window::CharacterWindow;
+
+mod class_pane;
+pub use self::class_pane::ClassPane;
 
 mod entity_mouseover;
 pub use self::entity_mouseover::EntityMouseover;
@@ -45,8 +51,8 @@ pub use self::inventory_window::InventoryWindow;
 
 pub mod main_menu;
 
-pub mod character_builder;
-pub use self::character_builder::CharacterBuilder;
+mod race_pane;
+pub use self::race_pane::RacePane;
 
 use std::any::Any;
 use std::rc::Rc;

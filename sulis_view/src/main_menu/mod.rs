@@ -74,17 +74,9 @@ thread_local! {
 }
 
 impl WidgetKind for MainMenuView {
-    fn get_name(&self) -> &str {
-        "root"
-    }
-
-    fn as_any(&self) -> &Any {
-        self
-    }
-
-    fn as_any_mut(&mut self) -> &mut Any {
-        self
-    }
+    fn get_name(&self) -> &str { "root" }
+    fn as_any(&self) -> &Any { self }
+    fn as_any_mut(&mut self) -> &mut Any { self }
 
     fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
         use sulis_core::io::InputAction::*;

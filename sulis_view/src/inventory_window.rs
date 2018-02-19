@@ -19,7 +19,7 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_module::Equippable;
+use sulis_rules::BonusList;
 use sulis_module::item::Slot;
 use sulis_state::{EntityState, ChangeListener, GameState};
 use sulis_core::io::event;
@@ -177,7 +177,7 @@ impl WidgetKind for ItemButton {
                 match item_state.item.equippable {
                     None => (),
                     Some(ref equippable) => {
-                        add_equippable_text_args(equippable, &mut item_window.state);
+                        add_bonus_text_args(&equippable.bonuses, &mut item_window.state);
                     },
                 }
             }
@@ -201,9 +201,7 @@ impl WidgetKind for ItemButton {
     }
 }
 
-fn add_equippable_text_args(equippable: &Equippable, widget_state: &mut WidgetState) {
-    let bonuses = &equippable.bonuses;
-
+pub fn add_bonus_text_args(bonuses: &BonusList, widget_state: &mut WidgetState) {
     if let Some(ref attack) = bonuses.attack {
         widget_state.add_text_arg("min_damage", &attack.damage.min.to_string());
         widget_state.add_text_arg("max_damage", &attack.damage.max.to_string());

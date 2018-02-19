@@ -2,8 +2,84 @@
 children:
   character_builder:
     preferred_size: [240, -8]
+    border: { top: 8, bottom: 5, right: 5, left: 5 }
     from: .window
     children:
       title:
         text: "Character Builder"
+        position: [0, -7]
+      close:
+        position: [3, -7]
+      next:
+        from: .button
+        text: "Next >>"
+        text_params:
+          scale: 6.0
+        y_relative: Max
+        position: [38, 0]
+        preferred_size: [35, 10]
+      previous:
+        from: .button
+        text: "<< Previous"
+        text_params:
+          scale: 6.0
+        y_relative: Max
+        position: [0, 0]
+        preferred_size: [35, 10]
+      race_selector_pane:
+        width_relative: Max
+        height_relative: Max
+        position: [0, 0]
+        preferred_size: [0, -13]
+        children:
+          title:
+            from: .label
+            text: "Select a Race"
+            preferred_size: [80, 5]
+            position: [0, 0]
+            text_params:
+              scale: 5.5
+          races_list:
+            from: .list_box
+            preferred_size: [80, -5]
+            position: [0, 5]
+            height_relative: Max
+            children:
+              entry:
+                text_params:
+                  scale: 6.0
+                preferred_size: [0, 6]
+          race_pane:
+            from: .race_pane
+            position: [85, 0]
+            height_relative: Max
+            width_relative: Max
+            preferred_size: [-85, 0]
+      class_selector_pane:
+        width_relative: Max
+        height_relative: Max
+        preferred_size: [0, -13]
+        children:
+          title:
+            from: .label
+            text: "Select a Class"
+            preferred_size: [80, 5]
+            text_params:
+              scale: 5.5
+          classes_list:
+            from: .list_box
+            preferred_size: [80, -5]
+            position: [0, 5]
+            height_relative: Max
+            children:
+              entry:
+                text_params:
+                  scale: 6.0
+                preferred_size: [0, 6]
+          class_pane:
+            from: .class_pane
+            position: [85, 0]
+            height_relative: Max
+            width_relative: Max
+            preferred_size: [-85, 0]
 ...

@@ -6,6 +6,13 @@ images:
 hue: 0.6
 race: human
 sex: Female
+attributes:
+  str: 16
+  dex: 12
+  end: 15
+  per: 12
+  int: 9
+  wis: 11
 levels:
   fighter: 3
 items: [ longsword, misc_apple, gloves_leather, boots_leather, torso_leather,

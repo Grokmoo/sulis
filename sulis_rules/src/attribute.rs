@@ -40,20 +40,11 @@ pub struct AttributeList {
     wisdom: u8,
 }
 
-impl Default for AttributeList {
-    fn default() -> AttributeList {
-        AttributeList {
-            strength: BASE_VALUE,
-            dexterity: BASE_VALUE,
-            endurance: BASE_VALUE,
-            perception: BASE_VALUE,
-            intellect: BASE_VALUE,
-            wisdom: BASE_VALUE,
-        }
-    }
-}
-
 impl AttributeList {
+    pub fn bonus(&self, attr: Attribute, base_attr: i32) -> i32 {
+        (self.get(attr) as i32 - base_attr)
+    }
+
     pub fn get(&self, attr: Attribute) -> u8 {
         match attr {
             Strength => self.strength,
@@ -63,10 +54,6 @@ impl AttributeList {
             Intellect => self.intellect,
             Wisdom => self.wisdom,
         }
-    }
-
-    pub fn bonus(&self, attr: Attribute) -> i32 {
-        (self.get(attr) as i32 - BASE_VALUE as i32)
     }
 
     pub fn set(&mut self, attr: Attribute, value: u8) {
@@ -109,7 +96,7 @@ impl AttributeList {
     }
 }
 
-#[derive(Deserialize, Debug, Copy, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 #[serde(deny_unknown_fields)]
 pub enum Attribute {
     Strength,
@@ -121,8 +108,6 @@ pub enum Attribute {
 }
 
 const ATTRS_LIST: [Attribute; 6] = [ Strength, Dexterity, Endurance, Perception, Intellect, Wisdom ];
-
-pub const BASE_VALUE: u8 = 10;
 
 impl Attribute {
     pub fn from(text: &str) -> Option<Attribute> {

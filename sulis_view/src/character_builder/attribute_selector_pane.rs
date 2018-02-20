@@ -17,9 +17,11 @@
 use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
+use std::collections::HashMap;
 
 use sulis_rules::Attribute;
 use sulis_core::ui::{Callback, Widget, WidgetKind};
+use sulis_module::Module;
 use sulis_widgets::{Label, Spinner};
 
 use CharacterBuilder;
@@ -29,27 +31,45 @@ pub const NAME: &str = "attribute_selector_pane";
 
 pub struct AttributeSelectorPane {
     available: i32,
-    points_label: Rc<RefCell<Widget>>,
-    attrs_spinners: Vec<Rc<RefCell<Spinner>>>,
+    attrs: HashMap<Attribute, i32>,
 }
 
 impl AttributeSelectorPane {
     pub fn new() -> Rc<RefCell<AttributeSelectorPane>> {
-        let points_label = Widget::with_theme(Label::empty(), "points_label");
-        let attrs_spinners = Vec::new();
+        let rules = Module::rules();
+        let mut attrs = HashMap::new();
+
+        let mut total = 0;
+        for attr in Attribute::iter() {
+            attrs.insert(*attr, rules.base_attribute);
+            total += rules.base_attribute;
+        }
+
+        let available = rules.builder_attribute_points - total;
 
         Rc::new(RefCell::new(AttributeSelectorPane {
-            points_label,
-            attrs_spinners,
-            available: 10,
+            attrs,
+            available,
         }))
+    }
+
+    fn calculate_available(&mut self) {
+        let rules = Module::rules();
+
+        let mut total = 0;
+        for attr in Attribute::iter() {
+            let value = *self.attrs.get(attr).unwrap_or(&rules.base_attribute);
+            total += value;
+        }
+        self.available = rules.builder_attribute_points - total;
     }
 }
 
 impl BuilderPane for AttributeSelectorPane {
     fn on_selected(&mut self, builder: &mut CharacterBuilder) {
         builder.prev.borrow_mut().state.set_enabled(true);
-        builder.next.borrow_mut().state.set_enabled(false);
+        self.calculate_available();
+        builder.next.borrow_mut().state.set_enabled(self.available == 0);
     }
 
     fn next(&mut self, _builder: &mut CharacterBuilder, _widget: Rc<RefCell<Widget>>) {
@@ -66,34 +86,44 @@ impl WidgetKind for AttributeSelectorPane {
     fn as_any(&self) -> &Any { self }
     fn as_any_mut(&mut self) -> &mut Any { self }
 
-    fn layout(&mut self, widget: &mut Widget) {
-        let mut total = 0;
-        for spinner in self.attrs_spinners.iter() {
-            total += spinner.borrow().value();
-        }
-        self.available = 90 - total;
-
-        self.points_label.borrow_mut().state.add_text_arg("points", &self.available.to_string());
-        widget.do_base_layout();
-    }
-
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+        let rules = Module::rules();
         let mut children = Vec::new();
 
         let title = Widget::with_theme(Label::empty(), "title");
         children.push(title);
 
-        self.attrs_spinners.clear();
         for attr in Attribute::iter() {
-            let spinner = Spinner::new(10, 3, 18);
-            self.attrs_spinners.push(Rc::clone(&spinner));
+            let value = *self.attrs.get(attr).unwrap_or(&rules.base_attribute);
+            let max = if self.available > 0 {
+                rules.builder_max_attribute
+            } else {
+                value
+            };
+
+            let spinner = Spinner::new(value, rules.builder_min_attribute, max);
             let widget = Widget::with_theme(spinner, &format!("{}_spinner", attr.short_name()));
-            widget.borrow_mut().state.add_callback(Callback::invalidate_parent_layout());
+            widget.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, kind| {
+                let value = Widget::downcast_mut::<Spinner>(kind).value();
+
+                let parent = Widget::get_parent(&widget);
+                parent.borrow_mut().invalidate_children();
+
+                let pane = Widget::downcast_kind_mut::<AttributeSelectorPane>(&parent);
+                pane.attrs.insert(*attr, value);
+                pane.calculate_available();
+
+                let builder_widget = Widget::get_parent(&parent);
+                let builder = Widget::downcast_kind_mut::<CharacterBuilder>(&builder_widget);
+                builder.next.borrow_mut().state.set_enabled(pane.available == 0);
+            })));
             children.push(widget);
             children.push(Widget::with_theme(Label::empty(), &format!("{}_label", attr.short_name())));
         }
 
-        children.push(Rc::clone(&self.points_label));
+        let points_label = Widget::with_theme(Label::empty(), "points_label");
+        points_label.borrow_mut().state.add_text_arg("points", &self.available.to_string());
+        children.push(points_label);
 
         children
     }

@@ -40,6 +40,11 @@ pub struct Rules {
     pub crit_damage_multiplier: f32,
 
     pub dual_wield_damage_multiplier: f32,
+
+    pub base_attribute: i32,
+    pub builder_max_attribute: i32,
+    pub builder_min_attribute: i32,
+    pub builder_attribute_points: i32,
 }
 
 impl Rules {

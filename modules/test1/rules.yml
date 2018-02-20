@@ -13,3 +13,8 @@ hit_damage_multiplier: 1.0
 crit_damage_multiplier: 1.5
 
 dual_wield_damage_multiplier: 0.75
+
+base_attribute: 10
+builder_max_attribute: 20
+builder_min_attribute: 8
+builder_attribute_points: 90

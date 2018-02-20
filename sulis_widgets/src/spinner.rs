@@ -47,6 +47,14 @@ impl Spinner {
     pub fn value(&self) -> i32 {
         self.value
     }
+
+    pub fn set_max(&mut self, max: i32) {
+        self.max = max;
+    }
+
+    pub fn set_min(&mut self, min: i32) {
+        self.min = min;
+    }
 }
 
 impl WidgetKind for Spinner {

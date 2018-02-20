@@ -3,6 +3,13 @@ name: Goblin
 player: false
 images: {}
 race: goblin
+attributes:
+  str: 9
+  dex: 13
+  end: 8
+  per: 12
+  int: 7
+  wis: 9
 levels:
   fighter: 1
 items: [ club ]

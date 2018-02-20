@@ -231,6 +231,20 @@ impl Widget {
         }
     }
 
+    pub fn downcast<'a, T: WidgetKind + 'static>(kind: &'a WidgetKind) -> &'a T {
+        match kind.as_any().downcast_ref::<T>() {
+            None => panic!("Failed to downcast kind"),
+            Some(result) => result,
+        }
+    }
+
+    pub fn downcast_mut<'a, T: WidgetKind + 'static>(kind: &'a mut WidgetKind) -> &'a mut T {
+        match kind.as_any_mut().downcast_mut::<T>() {
+            None => panic!("Failed to downcast kind"),
+            Some(result) => result,
+        }
+    }
+
     pub fn downcast_kind<'a, T: WidgetKind + 'static>(widget: &'a Rc<RefCell<Widget>>)
         -> &'a T {
         let kind = Rc::clone(&widget.borrow().kind);

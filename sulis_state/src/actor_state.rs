@@ -243,7 +243,7 @@ impl ActorState {
             1.0
         };
 
-        self.stats.finalize(attacks_list, multiplier);
+        self.stats.finalize(attacks_list, multiplier, rules.base_attribute);
 
         self.listeners.notify(&self);
     }

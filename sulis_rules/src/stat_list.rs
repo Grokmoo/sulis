@@ -17,7 +17,6 @@
 use std::rc::Rc;
 
 use sulis_core::image::Image;
-
 use {Armor, AttributeList, Attack, BonusList, Damage};
 use bonus_list::AttackBuilder;
 
@@ -117,7 +116,7 @@ impl StatList {
         }
     }
 
-    pub fn finalize(&mut self, attacks: Vec<&AttackBuilder>, multiplier: f32) {
+    pub fn finalize(&mut self, attacks: Vec<&AttackBuilder>, multiplier: f32, base_attr: i32) {
         if attacks.is_empty() {
             warn!("Finalized stats with no attacks");
         }
@@ -142,12 +141,12 @@ impl StatList {
 
         use Attribute::*;
         let attrs = &self.attributes;
-        self.initiative += attrs.bonus(Perception) / 2;
-        self.accuracy += attrs.bonus(Perception);
-        self.defense += attrs.bonus(Dexterity);
-        self.fortitude += attrs.bonus(Endurance);
-        self.reflex += attrs.bonus(Dexterity);
-        self.will += attrs.bonus(Wisdom);
+        self.initiative += attrs.bonus(Perception, base_attr) / 2;
+        self.accuracy += attrs.bonus(Perception, base_attr);
+        self.defense += attrs.bonus(Dexterity, base_attr);
+        self.fortitude += attrs.bonus(Endurance, base_attr);
+        self.reflex += attrs.bonus(Dexterity, base_attr);
+        self.will += attrs.bonus(Wisdom, base_attr);
     }
 }
 

@@ -25,6 +25,8 @@ const NAME: &str = "spinner";
 
 pub struct Spinner {
     label: Rc<RefCell<Widget>>,
+    down: Rc<RefCell<Widget>>,
+    up: Rc<RefCell<Widget>>,
     value: i32,
     min: i32,
     max: i32,
@@ -34,10 +36,16 @@ impl Spinner {
     pub fn new(value: i32, min: i32, max: i32) -> Rc<RefCell<Spinner>> {
         Rc::new(RefCell::new(Spinner {
             label: Widget::with_defaults(Label::empty()),
+            down: Widget::with_theme(Button::empty(), "down"),
+            up: Widget::with_theme(Button::empty(), "up"),
             value,
             min,
             max,
         }))
+    }
+
+    pub fn value(&self) -> i32 {
+        self.value
     }
 }
 
@@ -53,21 +61,21 @@ impl WidgetKind for Spinner {
     }
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
-        let down = Widget::with_theme(Button::empty(), "down");
-        down.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+        self.down.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
             let parent = Widget::get_parent(widget);
             {
                 let spinner = Widget::downcast_kind_mut::<Spinner>(&parent);
-
                 if spinner.value > spinner.min {
                     spinner.value -= 1;
                 }
             }
             parent.borrow_mut().invalidate_layout();
+            let kind = Rc::clone(&parent.borrow().kind);
+            let mut kind = kind.borrow_mut();
+            Widget::fire_callback(&parent, &mut *kind);
         })));
 
-        let up = Widget::with_theme(Button::empty(), "up");
-        up.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+        self.up.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
             let parent = Widget::get_parent(widget);
             {
                 let spinner = Widget::downcast_kind_mut::<Spinner>(&parent);
@@ -76,8 +84,11 @@ impl WidgetKind for Spinner {
                 }
             }
             parent.borrow_mut().invalidate_layout();
+            let kind = Rc::clone(&parent.borrow().kind);
+            let mut kind = kind.borrow_mut();
+            Widget::fire_callback(&parent, &mut *kind);
         })));
 
-        vec![down, up, Rc::clone(&self.label)]
+        vec![Rc::clone(&self.down), Rc::clone(&self.up), Rc::clone(&self.label)]
     }
 }

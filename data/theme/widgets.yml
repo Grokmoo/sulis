@@ -84,6 +84,8 @@ children:
         preferred_size: [10, 10]
         position: [7, 0]
         text: "#value#"
+        text_params:
+          scale: 5.0
       down:
         from: .button
         preferred_size: [7, 5]

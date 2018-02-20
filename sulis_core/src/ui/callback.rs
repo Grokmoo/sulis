@@ -50,6 +50,21 @@ impl Callback {
         }
     }
 
+    pub fn invalidate_self_layout() -> Callback {
+        Callback {
+            cb: Rc::new(|widget, _kind| { widget.borrow_mut().invalidate_layout() }),
+        }
+    }
+
+    pub fn invalidate_parent_layout() -> Callback {
+        Callback {
+            cb: Rc::new(|widget, _kind| {
+                let parent = Widget::get_parent(&widget);
+                parent.borrow_mut().invalidate_layout();
+            }),
+        }
+    }
+
     pub fn remove_self() -> Callback {
         Callback {
             cb: Rc::new(|widget, _kind| { widget.borrow_mut().mark_for_removal() }),

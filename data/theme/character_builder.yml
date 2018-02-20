@@ -93,22 +93,59 @@ children:
             preferred_size: [80, 5]
             text_params:
               scale: 5.5
+          attr_label:
+            from: .label
+            preferred_size: [24, 12]
+            text_params:
+              scale: 5.0
+              horizontal_alignment: Right
+          points_label:
+            from: .label
+            preferred_size: [50, 12]
+            text_params:
+              scale: 6.0
+            text: "Points Left: #points#"
+            position: [0, 110]
+          str_label:
+            from: .character_builder.attribute_selector_pane.attr_label
+            position: [0, 10]
+            text: "Strength"
           str_spinner:
             from: .spinner
-            position: [0, 10]
+            position: [25, 10]
+          dex_label:
+            from: .character_builder.attribute_selector_pane.attr_label
+            position: [0, 25]
+            text: "Dexterity"
           dex_spinner:
             from: .spinner
-            position: [0, 25]
+            position: [25, 25]
+          end_label:
+            from: .character_builder.attribute_selector_pane.attr_label
+            position: [0, 40]
+            text: "Endurance"
           end_spinner:
             from: .spinner
-            position: [0, 40]
+            position: [25, 40]
+          per_label:
+            from: .character_builder.attribute_selector_pane.attr_label
+            position: [0, 55]
+            text: "Perception"
           per_spinner:
             from: .spinner
-            position: [0, 55]
+            position: [25, 55]
+          int_label:
+            from: .character_builder.attribute_selector_pane.attr_label
+            position: [0, 70]
+            text: "Intelligence"
           int_spinner:
             from: .spinner
-            position: [0, 70]
+            position: [25, 70]
+          wis_label:
+            from: .character_builder.attribute_selector_pane.attr_label
+            position: [0, 85]
+            text: "Wisdom"
           wis_spinner:
             from: .spinner
-            position: [0, 85]
+            position: [25, 85]
 ...

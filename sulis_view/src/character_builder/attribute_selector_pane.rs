@@ -19,7 +19,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_rules::Attribute;
-use sulis_core::ui::{Widget, WidgetKind};
+use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{Label, Spinner};
 
 use CharacterBuilder;
@@ -28,13 +28,20 @@ use character_builder::BuilderPane;
 pub const NAME: &str = "attribute_selector_pane";
 
 pub struct AttributeSelectorPane {
-
+    available: i32,
+    points_label: Rc<RefCell<Widget>>,
+    attrs_spinners: Vec<Rc<RefCell<Spinner>>>,
 }
 
 impl AttributeSelectorPane {
     pub fn new() -> Rc<RefCell<AttributeSelectorPane>> {
-        Rc::new(RefCell::new(AttributeSelectorPane {
+        let points_label = Widget::with_theme(Label::empty(), "points_label");
+        let attrs_spinners = Vec::new();
 
+        Rc::new(RefCell::new(AttributeSelectorPane {
+            points_label,
+            attrs_spinners,
+            available: 10,
         }))
     }
 }
@@ -59,16 +66,34 @@ impl WidgetKind for AttributeSelectorPane {
     fn as_any(&self) -> &Any { self }
     fn as_any_mut(&mut self) -> &mut Any { self }
 
+    fn layout(&mut self, widget: &mut Widget) {
+        let mut total = 0;
+        for spinner in self.attrs_spinners.iter() {
+            total += spinner.borrow().value();
+        }
+        self.available = 90 - total;
+
+        self.points_label.borrow_mut().state.add_text_arg("points", &self.available.to_string());
+        widget.do_base_layout();
+    }
+
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let mut children = Vec::new();
 
         let title = Widget::with_theme(Label::empty(), "title");
         children.push(title);
 
+        self.attrs_spinners.clear();
         for attr in Attribute::iter() {
             let spinner = Spinner::new(10, 3, 18);
-            children.push(Widget::with_theme(spinner, &format!("{}_spinner", attr.short_name())));
+            self.attrs_spinners.push(Rc::clone(&spinner));
+            let widget = Widget::with_theme(spinner, &format!("{}_spinner", attr.short_name()));
+            widget.borrow_mut().state.add_callback(Callback::invalidate_parent_layout());
+            children.push(widget);
+            children.push(Widget::with_theme(Label::empty(), &format!("{}_label", attr.short_name())));
         }
+
+        children.push(Rc::clone(&self.points_label));
 
         children
     }

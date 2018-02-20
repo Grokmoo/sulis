@@ -82,4 +82,33 @@ children:
             height_relative: Max
             width_relative: Max
             preferred_size: [-85, 0]
+      attribute_selector_pane:
+        width_relative: Max
+        height_relative: Max
+        preferred_size: [0, -13]
+        children:
+          title:
+            from: .label
+            text: "Select your Attributes"
+            preferred_size: [80, 5]
+            text_params:
+              scale: 5.5
+          str_spinner:
+            from: .spinner
+            position: [0, 10]
+          dex_spinner:
+            from: .spinner
+            position: [0, 25]
+          end_spinner:
+            from: .spinner
+            position: [0, 40]
+          per_spinner:
+            from: .spinner
+            position: [0, 55]
+          int_spinner:
+            from: .spinner
+            position: [0, 70]
+          wis_spinner:
+            from: .spinner
+            position: [0, 85]
 ...

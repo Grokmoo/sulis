@@ -59,7 +59,7 @@ impl WidgetKind for SaveWindow {
         id_field.borrow_mut().state.add_callback(Callback::new(Rc::new(move |_widget, kind| {
             let input_field = match kind.as_any_mut().downcast_mut::<InputField>() {
                 Some(mut input_field) => input_field,
-                None => unreachable!("Failed to downcast to InputField"),
+                None => panic!("Failed to downcast to InputField"),
             };
             area_editor_ref.borrow_mut().id = input_field.text.clone();
         })));
@@ -72,7 +72,7 @@ impl WidgetKind for SaveWindow {
         name_field.borrow_mut().state.add_callback(Callback::new(Rc::new(move |_widget, kind| {
             let input_field = match kind.as_any_mut().downcast_mut::<InputField>() {
                 Some(mut input_field) => input_field,
-                None => unreachable!("Failed to downcast to InputField"),
+                None => panic!("Failed to downcast to InputField"),
             };
             area_editor_ref.borrow_mut().name = input_field.text.clone();
         })));
@@ -85,7 +85,7 @@ impl WidgetKind for SaveWindow {
         filename_field.borrow_mut().state.add_callback(Callback::new(Rc::new(move |_widget, kind| {
             let input_field = match kind.as_any_mut().downcast_mut::<InputField>() {
                 Some(mut input_field) => input_field,
-                None => unreachable!("Failed to downcast to InputField"),
+                None => panic!("Failed to downcast to InputField"),
             };
             area_editor_ref.borrow_mut().filename = input_field.text.clone();
         })));

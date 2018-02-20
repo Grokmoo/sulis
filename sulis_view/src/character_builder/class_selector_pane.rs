@@ -29,25 +29,30 @@ use character_builder::BuilderPane;
 pub const NAME: &str = "class_selector_pane";
 
 pub struct ClassSelectorPane {
-
+    list_box: Option<Rc<RefCell<MutuallyExclusiveListBox<ClassInfo>>>>,
 }
 
 impl ClassSelectorPane {
     pub fn new() -> Rc<RefCell<ClassSelectorPane>> {
         Rc::new(RefCell::new(ClassSelectorPane {
-
+            list_box: None,
         }))
     }
 }
 
 impl BuilderPane for ClassSelectorPane {
     fn on_selected(&mut self, builder: &mut CharacterBuilder) {
+        let next = match self.list_box {
+            None => false,
+            Some(ref list_box) => list_box.borrow().has_active_entry(),
+        };
+
         builder.prev.borrow_mut().state.set_enabled(true);
-        builder.next.borrow_mut().state.set_enabled(false);
+        builder.next.borrow_mut().state.set_enabled(next);
     }
 
-    fn next(&mut self, _builder: &mut CharacterBuilder, _widget: Rc<RefCell<Widget>>) {
-        //builder.next(&widget);
+    fn next(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
+        builder.next(&widget);
     }
 
     fn prev(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
@@ -75,13 +80,22 @@ impl WidgetKind for ClassSelectorPane {
         let class_pane_widget_ref = Rc::clone(&class_pane_widget);
 
         let list_box = MutuallyExclusiveListBox::with_callback(entries, Rc::new(move |active_entry| {
-            let entry = match active_entry {
-                None => return,
-                Some(entry) => entry,
+            let parent = Widget::go_up_tree(&class_pane_widget_ref, 2);
+            let builder = Widget::downcast_kind_mut::<CharacterBuilder>(&parent);
+
+            match active_entry {
+                None => {
+                    class_pane_ref.borrow_mut().clear_class();
+                    builder.next.borrow_mut().state.set_enabled(false);
+                },
+                Some(entry) => {
+                    class_pane_ref.borrow_mut().set_class(Rc::clone(&entry.item().class));
+                    builder.next.borrow_mut().state.set_enabled(true);
+                },
             };
-            class_pane_ref.borrow_mut().set_class(Rc::clone(&entry.item().class));
             class_pane_widget_ref.borrow_mut().invalidate_children();
         }));
+        self.list_box = Some(list_box.clone());
         let classes_list = Widget::with_theme(list_box, "classes_list");
 
         vec![title, classes_list, class_pane_widget]

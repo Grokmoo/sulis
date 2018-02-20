@@ -74,4 +74,24 @@ children:
     border: [0, 0, 0, 0]
     foreground: "#icon#"
     preferred_size: [12, 12]
+  spinner:
+    background: bg_base
+    border: [1, 1, 1, 1]
+    preferred_size: [19, 12]
+    children:
+      label:
+        from: .label
+        preferred_size: [10, 10]
+        position: [7, 0]
+        text: "#value#"
+      down:
+        from: .button
+        preferred_size: [7, 5]
+        text: "-"
+        position: [0, 5]
+      up:
+        from: .button
+        preferred_size: [7, 5]
+        text: "+"
+        position: [0, 0]
 ...

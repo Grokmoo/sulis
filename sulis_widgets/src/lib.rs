@@ -42,5 +42,8 @@ pub use self::markup_renderer::MarkupRenderer;
 pub mod mutually_exclusive_list_box;
 pub use self::mutually_exclusive_list_box::MutuallyExclusiveListBox;
 
+pub mod spinner;
+pub use self::spinner::Spinner;
+
 pub mod text_area;
 pub use self::text_area::TextArea;

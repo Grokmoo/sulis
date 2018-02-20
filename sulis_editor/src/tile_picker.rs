@@ -85,12 +85,7 @@ impl WidgetKind for TilePicker {
                 let parent = Widget::go_up_tree(widget, 2);
 
                 {
-                    let kind = &parent.borrow().kind;
-                    let mut kind = kind.borrow_mut();
-                    let tile_picker = match kind.as_any_mut().downcast_mut::<TilePicker>() {
-                        Some(mut tile_picker) => tile_picker,
-                        None => unreachable!("Failed to downcast to tilepicker"),
-                    };
+                    let tile_picker = Widget::downcast_kind_mut::<TilePicker>(&parent);
                     tile_picker.cur_layer = Some(layer_ref.clone());
                 }
                 parent.borrow_mut().invalidate_children();
@@ -122,12 +117,7 @@ impl WidgetKind for TilePicker {
                     widget.borrow_mut().state.set_active(true);
 
                     let parent = Widget::get_parent(&parent);
-                    let kind = &parent.borrow().kind;
-                    let mut kind = kind.borrow_mut();
-                    let tile_picker = match kind.as_any_mut().downcast_mut::<TilePicker>() {
-                        Some(mut tile_picker) => tile_picker,
-                        None => unreachable!("Failed to downcast to tilepicker"),
-                    };
+                    let tile_picker = Widget::downcast_kind_mut::<TilePicker>(&parent);
                     tile_picker.cur_tile = Some(Rc::clone(&tile));
                 }
             }));

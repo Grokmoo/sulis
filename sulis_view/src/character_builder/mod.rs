@@ -14,6 +14,9 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+mod attribute_selector_pane;
+use self::attribute_selector_pane::AttributeSelectorPane;
+
 mod class_selector_pane;
 use self::class_selector_pane::ClassSelectorPane;
 
@@ -51,29 +54,17 @@ impl CharacterBuilder {
         let next = Widget::with_theme(Button::empty(), "next");
         next.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
             let parent = Widget::get_parent(widget);
-            let kind = Rc::clone(&parent.borrow().kind);
-            let mut kind = kind.borrow_mut();
-            let builder = match kind.as_any_mut().downcast_mut::<CharacterBuilder>() {
-                None => panic!("Failed to downcast to CharacterBuilder"),
-                Some(mut builder) => builder,
-            };
-
+            let builder = Widget::downcast_kind_mut::<CharacterBuilder>(&parent);
             let cur_pane = Rc::clone(&builder.builder_panes[builder.builder_pane_index]);
-            cur_pane.borrow_mut().next(builder, parent);
+            cur_pane.borrow_mut().next(builder, Rc::clone(&parent));
         })));
 
         let prev = Widget::with_theme(Button::empty(), "previous");
         prev.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
             let parent = Widget::get_parent(widget);
-            let kind = Rc::clone(&parent.borrow().kind);
-            let mut kind = kind.borrow_mut();
-            let builder = match kind.as_any_mut().downcast_mut::<CharacterBuilder>() {
-                None => panic!("Failed to downcast to CharacterBuilder"),
-                Some(mut builder) => builder,
-            };
-
+            let builder = Widget::downcast_kind_mut::<CharacterBuilder>(&parent);
             let cur_pane = Rc::clone(&builder.builder_panes[builder.builder_pane_index]);
-            cur_pane.borrow_mut().prev(builder, parent);
+            cur_pane.borrow_mut().prev(builder, Rc::clone(&parent));
         })));
 
         Rc::new(RefCell::new(CharacterBuilder {
@@ -118,18 +109,22 @@ impl WidgetKind for CharacterBuilder {
 
         let race_selector_pane = RaceSelectorPane::new();
         let class_selector_pane = ClassSelectorPane::new();
+        let attribute_selector_pane = AttributeSelectorPane::new();
         let race_sel_widget = Widget::with_defaults(race_selector_pane.clone());
         let class_sel_widget = Widget::with_defaults(class_selector_pane.clone());
+        let attr_sel_widget = Widget::with_defaults(attribute_selector_pane.clone());
         class_sel_widget.borrow_mut().state.set_visible(false);
+        attr_sel_widget.borrow_mut().state.set_visible(false);
 
         self.builder_panes.clear();
         self.builder_pane_index = 0;
         self.builder_panes.push(race_selector_pane.clone());
         self.builder_panes.push(class_selector_pane.clone());
+        self.builder_panes.push(attribute_selector_pane.clone());
 
         race_selector_pane.borrow_mut().on_selected(self);
 
-        vec![race_sel_widget, class_sel_widget, title, close,
+        vec![race_sel_widget, class_sel_widget, attr_sel_widget, title, close,
             Rc::clone(&self.next), Rc::clone(&self.prev)]
     }
 }

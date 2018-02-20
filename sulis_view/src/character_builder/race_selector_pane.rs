@@ -78,12 +78,7 @@ impl WidgetKind for RaceSelectorPane {
 
         let list_box = MutuallyExclusiveListBox::with_callback(entries, Rc::new(move |active_entry| {
             let parent = Widget::go_up_tree(&race_pane_widget_ref, 2);
-            let kind = &parent.borrow().kind;
-            let mut kind = kind.borrow_mut();
-            let builder = match kind.as_any_mut().downcast_mut::<CharacterBuilder>() {
-                None => panic!("Failed to downcast to CharacterBuilder"),
-                Some(mut builder) => builder,
-            };
+            let builder = Widget::downcast_kind_mut::<CharacterBuilder>(&parent);
 
             match active_entry {
                 None => {

@@ -69,12 +69,7 @@ impl WidgetKind for ActorPicker {
                     widget.borrow_mut().state.set_active(true);
                 }
 
-                let kind = &parent.borrow().kind;
-                let mut kind = kind.borrow_mut();
-                let actor_picker = match kind.as_any_mut().downcast_mut::<ActorPicker>() {
-                    None => unreachable!("Failed to downcast to actor picker"),
-                    Some(mut actor_picker) => actor_picker,
-                };
+                let actor_picker = Widget::downcast_kind_mut::<ActorPicker>(&parent);
                 actor_picker.cur_actor = Some(Rc::clone(&actor));
             })));
 

@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::mem;
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 use std::cell::{Ref, RefCell};
@@ -227,6 +228,32 @@ impl Widget {
             widget.borrow_mut().mark_for_removal();
         } else {
             Widget::mark_removal_up_tree(&Widget::get_parent(widget), levels - 1);
+        }
+    }
+
+    pub fn downcast_kind<'a, T: WidgetKind + 'static>(widget: &'a Rc<RefCell<Widget>>)
+        -> &'a T {
+        let kind = Rc::clone(&widget.borrow().kind);
+        let kind = kind.borrow();
+        let result = match kind.as_any().downcast_ref::<T>() {
+            None => panic!("Failed to downcast Kind"),
+            Some(result) => result,
+        };
+        unsafe {
+            mem::transmute::<&T, &'a T>(result)
+        }
+    }
+
+    pub fn downcast_kind_mut<'a, T: WidgetKind + 'static>(widget: &'a Rc<RefCell<Widget>>)
+        -> &'a mut T {
+        let kind = Rc::clone(&widget.borrow().kind);
+        let mut kind = kind.borrow_mut();
+        let result = match kind.as_any_mut().downcast_mut::<T>() {
+            None => panic!("Failed to downcast_mut Kind"),
+            Some(mut result) => result,
+        };
+        unsafe {
+            mem::transmute::<&mut T, &'a mut T>(result)
         }
     }
 

@@ -78,12 +78,7 @@ impl<T: Display + Clone> WidgetKind for MutuallyExclusiveListBox<T> {
         for widget in self.list_box.on_add(widget) {
             widget.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _kind| {
                 let parent = Widget::get_parent(widget);
-                let kind = &parent.borrow().kind;
-                let mut kind = kind.borrow_mut();
-                let parent_list_box = match kind.as_any_mut().downcast_mut::<MutuallyExclusiveListBox<T>>() {
-                    Some(mut list_box) => list_box,
-                    None => panic!("Failed to downcast to mutually_exclusive_list_box"),
-                };
+                let parent_list_box = Widget::downcast_kind_mut::<MutuallyExclusiveListBox<T>>(&parent);
 
                 let cur_state = widget.borrow_mut().state.is_active();
                 if !cur_state {

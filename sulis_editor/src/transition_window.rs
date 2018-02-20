@@ -123,13 +123,7 @@ impl WidgetKind for TransitionWindow {
                 let window = Widget::get_parent(widget);
                 window.borrow_mut().invalidate_children();
 
-                let kind = &window.borrow().kind;
-                let mut kind = kind.borrow_mut();
-                let transition_window = match kind.as_any_mut().downcast_mut::<TransitionWindow>() {
-                    Some(window) => window,
-                    None => unreachable!("Unable to downcast to transition window."),
-                };
-
+                let transition_window = Widget::downcast_kind_mut::<TransitionWindow>(&window);
                 let cur_index = match transition_window.selected_transition {
                     Some(index) => index,
                     None => return,
@@ -149,13 +143,7 @@ impl WidgetKind for TransitionWindow {
                 let window = Widget::get_parent(widget);
                 window.borrow_mut().invalidate_children();
 
-                let kind = &window.borrow().kind;
-                let mut kind = kind.borrow_mut();
-                let transition_window = match kind.as_any_mut().downcast_mut::<TransitionWindow>() {
-                    Some(window) => window,
-                    None => unreachable!("Unable to downcast to transition window."),
-                };
-
+                let transition_window = Widget::downcast_kind_mut::<TransitionWindow>(&window);
                 let cur_index = match transition_window.selected_transition {
                     Some(index) => index,
                     None => return,
@@ -175,12 +163,7 @@ impl WidgetKind for TransitionWindow {
                 let window = Widget::go_up_tree(widget, 2);
                 window.borrow_mut().invalidate_children();
 
-                let kind = &window.borrow().kind;
-                let mut kind = kind.borrow_mut();
-                let transition_window = match kind.as_any_mut().downcast_mut::<TransitionWindow>() {
-                    Some(window) => window,
-                    None => unreachable!("Unable to downcast to transition window."),
-                };
+                let transition_window = Widget::downcast_kind_mut::<TransitionWindow>(&window);
                 transition_window.selected_transition = Some(index);
             }));
 

@@ -20,6 +20,9 @@ use self::attribute_selector_pane::AttributeSelectorPane;
 mod class_selector_pane;
 use self::class_selector_pane::ClassSelectorPane;
 
+mod cosmetic_selector_pane;
+use self::cosmetic_selector_pane::CosmeticSelectorPane;
+
 mod race_selector_pane;
 use self::race_selector_pane::RaceSelectorPane;
 
@@ -43,6 +46,7 @@ trait BuilderPane {
 pub struct CharacterBuilder {
     pub (in character_builder) next: Rc<RefCell<Widget>>,
     pub (in character_builder) prev: Rc<RefCell<Widget>>,
+    pub (in character_builder) finish: Rc<RefCell<Widget>>,
     builder_panes: Vec<Rc<RefCell<BuilderPane>>>,
     builder_pane_index: usize,
     // we rely on the builder panes in the above vec having the same
@@ -67,9 +71,15 @@ impl CharacterBuilder {
             cur_pane.borrow_mut().prev(builder, Rc::clone(&parent));
         })));
 
+        let finish = Widget::with_theme(Button::empty(), "finish");
+        finish.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+
+        })));
+
         Rc::new(RefCell::new(CharacterBuilder {
             next,
             prev,
+            finish,
             builder_panes: Vec::new(),
             builder_pane_index: 0,
         }))
@@ -110,21 +120,26 @@ impl WidgetKind for CharacterBuilder {
         let race_selector_pane = RaceSelectorPane::new();
         let class_selector_pane = ClassSelectorPane::new();
         let attribute_selector_pane = AttributeSelectorPane::new();
+        let cosmetic_selector_pane = CosmeticSelectorPane::new();
         let race_sel_widget = Widget::with_defaults(race_selector_pane.clone());
         let class_sel_widget = Widget::with_defaults(class_selector_pane.clone());
         let attr_sel_widget = Widget::with_defaults(attribute_selector_pane.clone());
+        let cosmetic_sel_widget = Widget::with_defaults(cosmetic_selector_pane.clone());
         class_sel_widget.borrow_mut().state.set_visible(false);
         attr_sel_widget.borrow_mut().state.set_visible(false);
+        cosmetic_sel_widget.borrow_mut().state.set_visible(false);
+        self.finish.borrow_mut().state.set_visible(false);
 
         self.builder_panes.clear();
         self.builder_pane_index = 0;
         self.builder_panes.push(race_selector_pane.clone());
         self.builder_panes.push(class_selector_pane.clone());
         self.builder_panes.push(attribute_selector_pane.clone());
+        self.builder_panes.push(cosmetic_selector_pane.clone());
 
         race_selector_pane.borrow_mut().on_selected(self);
 
-        vec![race_sel_widget, class_sel_widget, attr_sel_widget, title, close,
-            Rc::clone(&self.next), Rc::clone(&self.prev)]
+        vec![race_sel_widget, class_sel_widget, attr_sel_widget, cosmetic_sel_widget, title, close,
+            Rc::clone(&self.next), Rc::clone(&self.prev), Rc::clone(&self.finish)]
     }
 }

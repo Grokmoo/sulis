@@ -17,9 +17,8 @@
 use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
-use std::collections::HashMap;
 
-use sulis_rules::Attribute;
+use sulis_rules::{Attribute, AttributeList};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_module::Module;
 use sulis_widgets::{Label, Spinner};
@@ -31,20 +30,15 @@ pub const NAME: &str = "attribute_selector_pane";
 
 pub struct AttributeSelectorPane {
     available: i32,
-    attrs: HashMap<Attribute, i32>,
+    attrs: AttributeList,
 }
 
 impl AttributeSelectorPane {
     pub fn new() -> Rc<RefCell<AttributeSelectorPane>> {
         let rules = Module::rules();
-        let mut attrs = HashMap::new();
+        let attrs = AttributeList::new(rules.base_attribute as u8);
 
-        let mut total = 0;
-        for attr in Attribute::iter() {
-            attrs.insert(*attr, rules.base_attribute);
-            total += rules.base_attribute;
-        }
-
+        let total = rules.base_attribute * (Attribute::iter().count() as i32);
         let available = rules.builder_attribute_points - total;
 
         Rc::new(RefCell::new(AttributeSelectorPane {
@@ -58,8 +52,7 @@ impl AttributeSelectorPane {
 
         let mut total = 0;
         for attr in Attribute::iter() {
-            let value = *self.attrs.get(attr).unwrap_or(&rules.base_attribute);
-            total += value;
+            total += self.attrs.get(*attr) as i32;
         }
         self.available = rules.builder_attribute_points - total;
     }
@@ -72,8 +65,8 @@ impl BuilderPane for AttributeSelectorPane {
         builder.next.borrow_mut().state.set_enabled(self.available == 0);
     }
 
-    fn next(&mut self, _builder: &mut CharacterBuilder, _widget: Rc<RefCell<Widget>>) {
-        //builder.next(&widget);
+    fn next(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
+        builder.next(&widget);
     }
 
     fn prev(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
@@ -94,7 +87,7 @@ impl WidgetKind for AttributeSelectorPane {
         children.push(title);
 
         for attr in Attribute::iter() {
-            let value = *self.attrs.get(attr).unwrap_or(&rules.base_attribute);
+            let value = self.attrs.get(*attr) as i32;
             let max = if self.available > 0 {
                 rules.builder_max_attribute
             } else {
@@ -110,7 +103,7 @@ impl WidgetKind for AttributeSelectorPane {
                 parent.borrow_mut().invalidate_children();
 
                 let pane = Widget::downcast_kind_mut::<AttributeSelectorPane>(&parent);
-                pane.attrs.insert(*attr, value);
+                pane.attrs.set(*attr, value as u8);
                 pane.calculate_available();
 
                 let builder_widget = Widget::get_parent(&parent);

@@ -26,6 +26,14 @@ children:
         y_relative: Max
         position: [0, 0]
         preferred_size: [35, 10]
+      finish:
+        from: .button
+        text: "Finish"
+        y_relative: Max
+        text_params:
+          scale: 6.0
+        position: [38, 0]
+        preferred_size: [35, 10]
       race_selector_pane:
         width_relative: Max
         height_relative: Max
@@ -148,4 +156,15 @@ children:
           wis_spinner:
             from: .spinner
             position: [25, 85]
+      cosmetic_selector_pane:
+        width_relative: Max
+        height_relative: Max
+        preferred_size: [0, -13]
+        children:
+          title:
+            from: .label
+            text: "Customize your Appearance"
+            preferred_size: [80, 5]
+            text_params:
+              scale: 5.5
 ...

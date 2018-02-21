@@ -41,6 +41,17 @@ pub struct AttributeList {
 }
 
 impl AttributeList {
+    pub fn new(base_value: u8) -> AttributeList {
+        AttributeList {
+            strength: base_value,
+            dexterity: base_value,
+            endurance: base_value,
+            perception: base_value,
+            intellect: base_value,
+            wisdom: base_value,
+        }
+    }
+
     pub fn bonus(&self, attr: Attribute, base_attr: i32) -> i32 {
         (self.get(attr) as i32 - base_attr)
     }

@@ -24,6 +24,7 @@ extern crate rand;
 pub mod actor;
 pub use self::actor::Actor;
 pub use self::actor::Sex;
+pub use self::actor::ActorBuilder;
 
 pub mod area;
 pub use self::area::Area;
@@ -70,7 +71,6 @@ use std::fs;
 use sulis_core::resource::{all_resources, read, read_single_resource, get_resource, insert_if_ok};
 
 use self::area::Tile;
-use self::actor::ActorBuilder;
 use self::area::AreaBuilder;
 use self::class::ClassBuilder;
 use self::item::ItemBuilder;

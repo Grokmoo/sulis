@@ -18,20 +18,16 @@ use std::any::Any;
 use std::cell::RefCell;
 use std::rc::Rc;
 use std::collections::HashMap;
-use std::io::Error;
-use std::fs::File;
 use std::slice::Iter;
 use std::cmp;
-
-use sulis_core::serde_yaml;
 
 use sulis_core::config::CONFIG;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::io::event::ClickKind;
 use sulis_module::{Actor, Module};
-use sulis_core::resource::{ResourceSet, read_single_resource};
+use sulis_core::resource::{ResourceSet, read_single_resource, write_to_file};
 use sulis_core::ui::{Color, Cursor, Widget, WidgetKind};
-use sulis_core::util::{invalid_data_error, Point};
+use sulis_core::util::{Point};
 use sulis_module::area::{ActorData, AreaBuilder, Tile, Transition, TransitionBuilder};
 
 use {ActorPicker, TilePicker};
@@ -420,15 +416,6 @@ impl AreaEditor {
                 self.removal_actors.push((pos, Rc::clone(actor)));
             }
         }
-    }
-}
-
-fn write_to_file(filename: &str, builder: &AreaBuilder) -> Result<(), Error> {
-    let file = File::create(filename)?;
-
-    match serde_yaml::to_writer(file, builder) {
-        Err(e) => invalid_data_error(&format!("{}", e)),
-        Ok(()) => Ok(()),
     }
 }
 

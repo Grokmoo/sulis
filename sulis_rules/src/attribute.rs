@@ -18,7 +18,7 @@ use std::slice::Iter;
 
 use self::Attribute::*;
 
-#[derive(Deserialize, Debug, Copy, Clone)]
+#[derive(Deserialize, Serialize, Debug, Copy, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct AttributeList {
     #[serde(rename="str")]

@@ -61,6 +61,8 @@ impl WidgetKind for CosmeticSelectorPane {
     fn as_any_mut(&mut self) -> &mut Any { self }
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+        // TODO select hue, hair style, beard style, portrait, name
+
         let title = Widget::with_theme(Label::empty(), "title");
         vec![title]
     }

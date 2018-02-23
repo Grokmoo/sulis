@@ -29,7 +29,7 @@ use sulis_rules::AttributeList;
 
 use {Class, ImageLayer, ImageLayerSet, Item, Module, Race};
 
-#[derive(Deserialize, Debug, Copy, Clone, PartialEq, Eq, Hash)]
+#[derive(Deserialize, Serialize, Debug, Copy, Clone, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub enum Sex {
     Male,
@@ -165,20 +165,20 @@ impl Actor {
     }
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct ActorBuilder {
-    id: String,
-    name: String,
-    race: String,
-    sex: Option<Sex>,
-    attributes: AttributeList,
-    player: Option<bool>,
-    images: HashMap<ImageLayer, String>,
-    hue: Option<f32>,
-    items: Option<Vec<String>>,
-    equipped: Option<Vec<u32>>,
-    levels: HashMap<String, u32>,
+    pub id: String,
+    pub name: String,
+    pub race: String,
+    pub sex: Option<Sex>,
+    pub attributes: AttributeList,
+    pub player: Option<bool>,
+    pub images: HashMap<ImageLayer, String>,
+    pub hue: Option<f32>,
+    pub items: Option<Vec<String>>,
+    pub equipped: Option<Vec<u32>>,
+    pub levels: HashMap<String, u32>,
 }
 
 impl ResourceBuilder for ActorBuilder {

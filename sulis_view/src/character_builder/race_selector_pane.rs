@@ -42,6 +42,7 @@ impl RaceSelectorPane {
 
 impl BuilderPane for RaceSelectorPane {
     fn on_selected(&mut self, builder: &mut CharacterBuilder) {
+        builder.race = None;
         let next = match self.list_box {
             None => false,
             Some(ref list_box) => list_box.borrow().has_active_entry(),
@@ -51,7 +52,15 @@ impl BuilderPane for RaceSelectorPane {
     }
 
     fn next(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
-        builder.next(&widget);
+        match self.list_box {
+            Some(ref list_box) => {
+                builder.race = match list_box.borrow().active_entry() {
+                    Some(ref entry) => Some(Rc::clone(&entry.item().race)),
+                    None => None,
+                };
+                builder.next(&widget);
+            }, None => (),
+        }
     }
 
     fn prev(&mut self, _builder: &mut CharacterBuilder, _widget: Rc<RefCell<Widget>>) { }

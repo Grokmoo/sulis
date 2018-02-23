@@ -14,6 +14,9 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use serde;
+use serde_yaml;
+
 use resource::*;
 use resource::spritesheet::SpritesheetBuilder;
 use resource::font::FontBuilder;
@@ -75,6 +78,15 @@ impl ResourceBuilderSet {
             font_builders: read(&root_dirs, "fonts"),
             fonts_dir: format!("{}/fonts/", root),
         })
+    }
+}
+
+pub fn write_to_file<T: serde::ser::Serialize>(filename: &str, data: &T) -> Result<(), Error> {
+    let file = File::create(filename)?;
+
+    match serde_yaml::to_writer(file, data) {
+        Err(e) => invalid_data_error(&format!("{}", e)),
+        Ok(()) => Ok(()),
     }
 }
 

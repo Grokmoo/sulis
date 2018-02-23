@@ -60,12 +60,14 @@ impl AttributeSelectorPane {
 
 impl BuilderPane for AttributeSelectorPane {
     fn on_selected(&mut self, builder: &mut CharacterBuilder) {
+        builder.attributes = None;
         builder.prev.borrow_mut().state.set_enabled(true);
         self.calculate_available();
         builder.next.borrow_mut().state.set_enabled(self.available == 0);
     }
 
     fn next(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
+        builder.attributes = Some(self.attrs);
         builder.next(&widget);
     }
 

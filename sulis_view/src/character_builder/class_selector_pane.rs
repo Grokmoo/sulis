@@ -42,6 +42,7 @@ impl ClassSelectorPane {
 
 impl BuilderPane for ClassSelectorPane {
     fn on_selected(&mut self, builder: &mut CharacterBuilder) {
+        builder.class = None;
         let next = match self.list_box {
             None => false,
             Some(ref list_box) => list_box.borrow().has_active_entry(),
@@ -52,7 +53,16 @@ impl BuilderPane for ClassSelectorPane {
     }
 
     fn next(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
-        builder.next(&widget);
+        match self.list_box {
+            None => (),
+            Some(ref list_box) => {
+                builder.class = match list_box.borrow().active_entry() {
+                    Some(ref entry) => Some(Rc::clone(&entry.item().class)),
+                    None => None,
+                };
+                builder.next(&widget);
+            },
+        }
     }
 
     fn prev(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {

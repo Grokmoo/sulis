@@ -1,4 +1,5 @@
 target/*
+characters/*
 config.yml
 *.swp
 *.swo

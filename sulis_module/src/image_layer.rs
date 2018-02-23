@@ -25,7 +25,7 @@ use sulis_core::util::invalid_data_error;
 use actor::Sex;
 use Race;
 
-#[derive(Deserialize, Debug, Copy, Clone, PartialEq, Eq, Hash)]
+#[derive(Deserialize, Serialize, Debug, Copy, Clone, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub enum ImageLayer {
     HeldMain,

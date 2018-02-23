@@ -26,12 +26,18 @@ use self::cosmetic_selector_pane::CosmeticSelectorPane;
 mod race_selector_pane;
 use self::race_selector_pane::RaceSelectorPane;
 
+use std::collections::HashMap;
+use std::fs;
+use std::time::{SystemTime, UNIX_EPOCH};
 use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
+use sulis_core::resource::write_to_file;
 use sulis_widgets::{Button, Label};
+use sulis_module::{ActorBuilder, Class, Race};
+use sulis_rules::{AttributeList};
 
 pub const NAME: &str = "character_builder";
 
@@ -51,6 +57,10 @@ pub struct CharacterBuilder {
     builder_pane_index: usize,
     // we rely on the builder panes in the above vec having the same
     // index in the children vec of this widget
+
+    pub race: Option<Rc<Race>>,
+    pub class: Option<Rc<Class>>,
+    pub attributes: Option<AttributeList>,
 }
 
 impl CharacterBuilder {
@@ -73,7 +83,11 @@ impl CharacterBuilder {
 
         let finish = Widget::with_theme(Button::empty(), "finish");
         finish.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+            let parent = Widget::get_parent(&widget);
+            parent.borrow_mut().mark_for_removal();
 
+            let builder = Widget::downcast_kind_mut::<CharacterBuilder>(&parent);
+            builder.save_character();
         })));
 
         Rc::new(RefCell::new(CharacterBuilder {
@@ -82,7 +96,59 @@ impl CharacterBuilder {
             finish,
             builder_panes: Vec::new(),
             builder_pane_index: 0,
+            race: None,
+            class: None,
+            attributes: None,
         }))
+    }
+
+    fn save_character(&mut self) {
+        let cur_time = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
+
+        let dir = "characters";
+        let id = format!("player_{:?}", cur_time);
+        // TODO fix the ID to be better
+        let filename = format!("{}/{}", dir, id);
+
+        info!("Saving character {}", id);
+
+        if let Err(e) = fs::create_dir_all(dir) {
+            error!("Unable to create characters directory '{}'", dir);
+            error!("{}", e);
+            return;
+        }
+
+        if self.race.is_none() || self.class.is_none() || self.attributes.is_none() {
+            warn!("Unable to save character with undefined stats");
+            return;
+        }
+
+        let mut levels = HashMap::new();
+        levels.insert(self.class.as_ref().unwrap().id.to_string(), 1);
+
+        // TODO fully implement
+        let actor = ActorBuilder {
+            id,
+            name: "Test Name".to_string(),
+            race: self.race.as_ref().unwrap().id.to_string(),
+            sex: None,
+            attributes: self.attributes.unwrap(),
+            player: Some(true),
+            images: HashMap::new(),
+            hue: None,
+            items: None,
+            equipped: None,
+            levels,
+        };
+
+        info!("Writing character to {}", filename);
+        match write_to_file(&filename, &actor) {
+            Err(e) => {
+                error!("Unable to write actor to file {}", filename);
+                error!("{}", e);
+            },
+            Ok(()) => (),
+        }
     }
 
     pub fn next(&mut self, widget: &Rc<RefCell<Widget>>) {

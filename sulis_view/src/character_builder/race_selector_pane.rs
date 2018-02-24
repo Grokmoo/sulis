@@ -41,7 +41,7 @@ impl RaceSelectorPane {
 }
 
 impl BuilderPane for RaceSelectorPane {
-    fn on_selected(&mut self, builder: &mut CharacterBuilder) {
+    fn on_selected(&mut self, builder: &mut CharacterBuilder, _widget: Rc<RefCell<Widget>>) {
         builder.race = None;
         let next = match self.list_box {
             None => false,

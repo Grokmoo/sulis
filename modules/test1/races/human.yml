@@ -30,6 +30,15 @@ image_layer_offsets:
   HeldOff: [17, -6]
 image_layer_postfix:
   Female: "_female"
+portrait_selections:
+  - portraits/human01
+  - portraits/human02
+  - portraits/human03
+  - portraits/human04
+  - portraits/human05
+  - portraits/human06
+  - portraits/human07
+  - portraits/human08
 hair_selections:
   - creatures/hair01
   - creatures/hair02
@@ -50,3 +59,14 @@ beard_selections:
   - creatures/beard05
   - creatures/beard06
   - creatures/beard07
+hair_colors : [
+  "FFFFFF", "C0C0C0", "808080", "545454",
+  "545454", "000000", "EEE685", "FFFF00", 
+  "CC9900", "D98719", "FFA500", "EE7600",
+  "FF0000", "C00000", "800000", "CD853F",
+  "8B5A2B", "8B5A00", "8B4513", "5C3317" ]
+skin_colors : [
+  "F9F4C8", "F6D39B", "F8E088", "F6D39B",
+  "EDAE67", "CE9452", "734A29", "422110",
+  "2F1010", "FFC794", "D48661", "80412B",
+  "501002" ]

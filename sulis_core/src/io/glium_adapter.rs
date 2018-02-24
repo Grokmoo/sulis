@@ -217,6 +217,7 @@ impl<'a> GraphicsRenderer for GliumRenderer<'a> {
     }
 
     fn draw(&mut self, draw_list: DrawList) {
+        if draw_list.texture.is_empty() { return; }
         self.create_texture_if_missing(&draw_list.texture, &draw_list);
 
         draw_to_surface(self.target, draw_list, &self.display, &self.params);

@@ -19,8 +19,9 @@ use std::rc::Rc;
 use std::cell::RefCell;
 use std::collections::HashMap;
 
-use sulis_core::io::{DrawList, GraphicsRenderer};
+use sulis_core::io::{GraphicsRenderer};
 use sulis_core::image::{Image, LayeredImage};
+use sulis_core::resource::ResourceSet;
 use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
 use sulis_core::util::Point;
 use sulis_module::actor::Sex;
@@ -40,9 +41,12 @@ pub struct CosmeticSelectorPane {
     name: String,
     hair_index: Option<usize>,
     beard_index: Option<usize>,
+    hair_color: Option<Color>,
+    skin_color: Option<Color>,
     hue: Option<f32>,
+    portrait: Option<Rc<Image>>,
 
-    preview_image: Option<Rc<Image>>,
+    preview_image: Option<Rc<LayeredImage>>,
 }
 
 impl CosmeticSelectorPane {
@@ -55,6 +59,9 @@ impl CosmeticSelectorPane {
             hair_index: None,
             beard_index: None,
             hue: Some(0.0),
+            hair_color: None,
+            skin_color: None,
+            portrait: None,
             preview,
             preview_image: None,
         }))
@@ -86,8 +93,8 @@ impl CosmeticSelectorPane {
             }
         }
 
-        let images_list = image_layers.get_list_with(self.sex, &race, insert);
-        self.preview_image = Some(Rc::new(LayeredImage::new(images_list)));
+        let images_list = image_layers.get_list_with(self.sex, &race, self.hair_color, self.skin_color, insert);
+        self.preview_image = Some(Rc::new(LayeredImage::new(images_list, self.hue)));
     }
 
     fn build_images(&self) -> HashMap<ImageLayer, String> {
@@ -113,13 +120,14 @@ impl CosmeticSelectorPane {
 }
 
 impl BuilderPane for CosmeticSelectorPane {
-    fn on_selected(&mut self, builder: &mut CharacterBuilder) {
+    fn on_selected(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
         self.race = builder.race.clone();
         builder.prev.borrow_mut().state.set_enabled(true);
         builder.next.borrow_mut().state.set_enabled(false);
         builder.next.borrow_mut().state.set_visible(false);
         builder.finish.borrow_mut().state.set_visible(true);
         self.build_preview();
+        widget.borrow_mut().invalidate_children();
     }
 
     // since this is the last pane, this is called prior to saving
@@ -128,6 +136,12 @@ impl BuilderPane for CosmeticSelectorPane {
         builder.name = self.name.to_string();
         builder.images = self.build_images();
         builder.hue = self.hue;
+        builder.skin_color = self.skin_color;
+        builder.hair_color = self.hair_color;
+        builder.portrait = match self.portrait {
+            None => None,
+            Some(ref image) => Some(image.id()),
+        };
     }
 
     fn prev(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
@@ -150,17 +164,11 @@ impl WidgetKind for CosmeticSelectorPane {
         };
 
         let child = self.preview.borrow();
-        let x = child.state.inner_position.x as f32;
-        let y = child.state.inner_position.y as f32;
-        let w = child.state.inner_size.width as f32;
-        let h = child.state.inner_size.height as f32;
-
-        let mut draw_list = DrawList::empty_sprite();
-        preview.append_to_draw_list(&mut draw_list, &child.state.animation_state, x, y, w, h, millis);
-        if let Some(hue) = self.hue {
-            draw_list.set_swap_hue(hue);
-        }
-        renderer.draw(draw_list);
+        let scale_x = child.state.inner_size.width as f32 / preview.get_width_f32();
+        let scale_y = child.state.inner_size.height as f32 / preview.get_height_f32();
+        let x = child.state.inner_position.x as f32 / scale_x;
+        let y = child.state.inner_position.y as f32 / scale_y;
+        preview.draw(renderer, scale_x, scale_y, x, y, millis);
     }
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
@@ -313,10 +321,72 @@ impl WidgetKind for CosmeticSelectorPane {
             }
         }
 
-        // TODO portrait, hair color, skin color
+        let skin_color_label = Widget::with_theme(Label::empty(), "skin_color_label");
+        let skin_color_panel = Widget::empty("skin_color_panel");
+        if let Some(ref race) = self.race {
+            for color in race.skin_colors.iter() {
+                let color = *color;
+                let color_button = Widget::with_defaults(ColorButton::new(color));
+                color_button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
+                    let parent = Widget::go_up_tree(&widget, 2);
+                    let cosmetic_pane = Widget::downcast_kind_mut::<CosmeticSelectorPane>(&parent);
+                    cosmetic_pane.skin_color = Some(color);
+                    parent.borrow_mut().invalidate_children();
+                })));
+                Widget::add_child_to(&skin_color_panel, color_button);
+            }
+        }
+
+        let hair_color_label = Widget::with_theme(Label::empty(), "hair_color_label");
+        let hair_color_panel = Widget::empty("hair_color_panel");
+        if let Some(ref race) = self.race {
+            for color in race.hair_colors.iter() {
+                let color = *color;
+                let color_button = Widget::with_defaults(ColorButton::new(color));
+                color_button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
+                    let parent = Widget::go_up_tree(&widget, 2);
+                    let cosmetic_pane = Widget::downcast_kind_mut::<CosmeticSelectorPane>(&parent);
+                    cosmetic_pane.hair_color = Some(color);
+                    parent.borrow_mut().invalidate_children();
+                })));
+                Widget::add_child_to(&hair_color_panel, color_button);
+            }
+        }
+
+        let portrait_button = Widget::with_theme(Button::empty(), "portrait_button");
+        if let Some(ref image) = self.portrait {
+            portrait_button.borrow_mut().state.foreground = Some(Rc::clone(&image));
+        }
+        if let Some(ref race) = self.race {
+            let race = Rc::clone(race);
+            portrait_button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
+                let pop_up = Widget::empty("portrait_selector");
+                pop_up.borrow_mut().state.set_modal(true);
+                pop_up.borrow_mut().state.modal_remove_on_click_outside = true;
+                for portrait_id in race.portrait_selections.iter() {
+                    let portrait = match ResourceSet::get_image(portrait_id) {
+                        None => {
+                            warn!("Invalid race portrait selection '{}'", portrait_id);
+                            continue;
+                        },
+                        Some(portrait) => portrait,
+                    };
+
+                    let button = Widget::with_theme(Button::empty(), "portrait_button");
+                    button.borrow_mut().state.add_callback(portrait_selector_button_callback(&portrait));
+                    button.borrow_mut().state.foreground = Some(portrait);
+                    Widget::add_child_to(&pop_up, button);
+                }
+
+                let parent = Widget::get_parent(&widget);
+                Widget::add_child_to(&parent, pop_up);
+            })));
+        }
+
         vec![title, name_field, name_label, Rc::clone(&self.preview),
             male_button, female_button, hair_label, next_hair, prev_hair, beard_label,
-            next_beard, prev_beard, color_label, color_panel]
+            next_beard, prev_beard, color_label, color_panel, skin_color_panel, skin_color_label,
+            hair_color_label, hair_color_panel, portrait_button]
     }
 }
 
@@ -331,4 +401,17 @@ fn hue_to_color(hue: f32) -> Color {
     res.iter_mut().for_each(|e| if *e > 1.0 { *e = 1.0; } else if *e < 0.0 { *e = 0.0; });
 
     Color::new(res[0], res[1], res[2], 1.0)
+}
+
+fn portrait_selector_button_callback(portrait: &Rc<Image>) -> Callback {
+    let image = Rc::clone(portrait);
+    Callback::new(Rc::new(move |widget, _| {
+        let parent = Widget::go_up_tree(&widget, 2);
+        let cosmetic_pane = Widget::downcast_kind_mut::<CosmeticSelectorPane>(&parent);
+        cosmetic_pane.portrait = Some(Rc::clone(&image));
+        parent.borrow_mut().invalidate_children();
+
+        let parent = Widget::get_parent(&widget);
+        parent.borrow_mut().mark_for_removal();
+    }))
 }

@@ -17,8 +17,8 @@
 use std::rc::Rc;
 use std::cell::{RefCell};
 
+use sulis_core::io::GraphicsRenderer;
 use sulis_core::image::{LayeredImage};
-use sulis_core::io::DrawList;
 use sulis_core::ui::{color, Color};
 use sulis_module::{item, Actor, Module};
 use {ChangeListenerList, EntityState, Inventory};
@@ -48,7 +48,9 @@ impl ActorState {
             inventory.equip(*index);
         }
 
-        let image = LayeredImage::new(actor.image_layers().get_list(actor.sex));
+        let image = LayeredImage::new(actor.image_layers().get_list(actor.sex,
+                                                                    actor.hair_color,
+                                                                    actor.skin_color), actor.hue);
         let attrs = actor.attributes;
 
         ActorState {
@@ -62,9 +64,9 @@ impl ActorState {
         }
     }
 
-    pub fn append_to_draw_list(&self, draw_list: &mut DrawList, x: f32, y: f32, millis: u32) {
-        self.image.append_to(draw_list, x, y, millis);
-        self.actor.check_add_swap_hue(draw_list);
+    pub fn draw_graphics_mode(&self, renderer: &mut GraphicsRenderer, scale_x: f32, scale_y: f32,
+                              x: f32, y: f32, millis: u32) {
+        self.image.draw(renderer, scale_x, scale_y, x, y, millis);
     }
 
     pub fn can_reach(&self, dist: f32) -> bool {
@@ -204,9 +206,10 @@ impl ActorState {
         debug!("Compute stats for '{}'", self.actor.name);
         self.stats = StatList::new(self.actor.attributes);
 
-        self.image = LayeredImage::new(self.actor.image_layers()
-                                      .get_list_with(self.actor.sex, &self.actor.race,
-                                                     self.inventory.get_image_layers()));
+        let layers = self.actor.image_layers().get_list_with(self.actor.sex, &self.actor.race,
+                                                             self.actor.hair_color, self.actor.skin_color,
+                                                             self.inventory.get_image_layers());
+        self.image = LayeredImage::new(layers, self.actor.hue);
 
         let rules = Module::rules();
         self.stats.initiative = rules.base_initiative;

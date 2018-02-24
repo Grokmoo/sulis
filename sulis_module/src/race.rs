@@ -18,6 +18,7 @@ use std::io::Error;
 use std::rc::Rc;
 use std::collections::HashMap;
 
+use sulis_core::ui::Color;
 use sulis_core::image::Image;
 use sulis_core::resource::{ResourceBuilder, ResourceSet};
 use sulis_core::util::{invalid_data_error, unable_to_create_error, Point};
@@ -37,6 +38,9 @@ pub struct Race {
     pub base_stats: BonusList,
     pub hair_selections: Vec<String>,
     pub beard_selections: Vec<String>,
+    pub portrait_selections: Vec<String>,
+    pub hair_colors: Vec<Color>,
+    pub skin_colors: Vec<Color>,
 
     default_images: ImageLayerSet,
     image_layer_offsets: HashMap<ImageLayer, (f32, f32)>,
@@ -78,6 +82,16 @@ impl Race {
             }
         }
 
+        let mut hair_colors = Vec::new();
+        let mut skin_colors = Vec::new();
+        for color_str in builder.hair_colors.unwrap_or(Vec::new()).iter() {
+            hair_colors.push(Color::from_string(color_str));
+        }
+
+        for color_str in builder.skin_colors.unwrap_or(Vec::new()).iter() {
+            skin_colors.push(Color::from_string(color_str));
+        }
+
         Ok(Race {
             id: builder.id,
             name: builder.name,
@@ -89,6 +103,9 @@ impl Race {
             image_layer_postfix: builder.image_layer_postfix,
             hair_selections: builder.hair_selections.unwrap_or(Vec::new()),
             beard_selections: builder.beard_selections.unwrap_or(Vec::new()),
+            portrait_selections: builder.portrait_selections.unwrap_or(Vec::new()),
+            hair_colors,
+            skin_colors,
         })
     }
 
@@ -125,6 +142,9 @@ pub struct RaceBuilder {
     pub default_images: HashMap<Sex, HashMap<ImageLayer, String>>,
     pub hair_selections: Option<Vec<String>>,
     pub beard_selections: Option<Vec<String>>,
+    pub portrait_selections: Option<Vec<String>>,
+    pub hair_colors: Option<Vec<String>>,
+    pub skin_colors: Option<Vec<String>>,
     image_layer_offsets: HashMap<ImageLayer, Point>,
     image_layer_offset_scale: i32,
     image_layer_postfix: HashMap<Sex, String>,

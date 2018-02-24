@@ -1,12 +1,13 @@
-Asset Location,Sub Asset Description,Sub Asset Pixel Coordinates,Author,License,License Link,Original Title,Source,Additional
-data/fonts/mono.png,,,,CC0 - Public Domain,http://creativecommons.org/publicdomain/zero/1.0/,,,
-data/fonts/normal.png,,,,CC0 - Public Domain,http://creativecommons.org/publicdomain/zero/1.0/,,,
-data/spritesheets/gui.png,Armored Figure,"512,0 to 1024, 512",yd,CC0 - Public Domain,http://creativecommons.org/publicdomain/zero/1.0/,GUI Elements,https://opengameart.org/content/gui-elements,
-data/spritesheets/gui.png,White Cursor Outlines,,Jared Stephen,CC-BY 4.0,http://creativecommons.org/licenses/by/4.0,,,
-data/spritesheets/gui.png,"Dark ""Gothic"" Style Elements","0,0 to 448,192",Wyrmheart,CC0 - Public Domain,http://creativecommons.org/publicdomain/zero/1.0/,RPG Game UI,https://opengameart.org/content/rpg-game-ui,
-data/spritesheets/tiles.png,,,Leonard Pabin,CC-BY 3.0,http://creativecommons.org/licenses/by/3.0,Whispers of Avalon: Grassland Tileset,https://opengameart.org/content/whispers-of-avalon-grassland-tileset,
-data/spritesheets/creatures.png,player character sub-sprites,"0,0 to 1024,240",Battle for Wesnoth,GPL v2,https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html,Battle for Wesnoth various creature images,https://www.wesnoth.org/,
-data/spritesheets/creatures.png,weapon sprites,"0,240 to 1024,288",Proprietary,GameDevMarket Pro,https://www.gamedevmarket.net/terms-conditions/#pro-licence,Fantasy RPG Item Set,https://www.gamedevmarket.net/asset/fantasy-rpg-item-set-9726/,
-data/spritesheets/creatures.png,Creature / monster sprites,"0,432 to 1024, 480",Battle for Wesnoth,GPL Vv2,https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html,Battle for Wesnoth various creature images,https://www.wesnoth.org/,
-data/spritesheets/inventory.png,Weapon and armor icons,,Proprietary,GameDevMarket Pro,https://www.gamedevmarket.net/terms-conditions/#pro-licence,Weapon Armor and Equipment Icons,https://www.gamedevmarket.net/asset/rpg-weapons-armor-and-equipment-8543/,
-data/spritesheets/inventory.png,Miscellaneous icons,,Proprietary,GameDevMarket Pro,https://www.gamedevmarket.net/terms-conditions/#pro-licence,Resource and Tool Icons,https://www.gamedevmarket.net/asset/resource-and-tool-icons-5856/,
+Asset Location,Sub Asset Description,Sub Asset Pixel Coordinates,Author,License,License Link,Original Title,Source
+data/fonts/mono.png,,,,CC0 - Public Domain,http://creativecommons.org/publicdomain/zero/1.0/,,
+data/fonts/normal.png,,,,CC0 - Public Domain,http://creativecommons.org/publicdomain/zero/1.0/,,
+data/spritesheets/gui.png,Armored Figure,"512,0 to 1024, 512",yd,CC0 - Public Domain,http://creativecommons.org/publicdomain/zero/1.0/,GUI Elements,https://opengameart.org/content/gui-elements
+data/spritesheets/gui.png,White Cursor Outlines,,Jared Stephen,CC-BY 4.0,http://creativecommons.org/licenses/by/4.0,,
+data/spritesheets/gui.png,"Dark ""Gothic"" Style Elements","0,0 to 448,192",Wyrmheart,CC0 - Public Domain,http://creativecommons.org/publicdomain/zero/1.0/,RPG Game UI,https://opengameart.org/content/rpg-game-ui
+data/spritesheets/tiles.png,,,Leonard Pabin,CC-BY 3.0,http://creativecommons.org/licenses/by/3.0,Whispers of Avalon: Grassland Tileset,https://opengameart.org/content/whispers-of-avalon-grassland-tileset
+data/spritesheets/creatures.png,player character sub-sprites,"0,0 to 1024,240",Battle for Wesnoth,GPL v2,https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html,Battle for Wesnoth various creature images,https://www.wesnoth.org/
+data/spritesheets/creatures.png,weapon sprites,"0,240 to 1024,288",Proprietary,GameDevMarket Pro,https://www.gamedevmarket.net/terms-conditions/#pro-licence,Fantasy RPG Item Set,https://www.gamedevmarket.net/asset/fantasy-rpg-item-set-9726/
+data/spritesheets/creatures.png,Creature / monster sprites,"0,432 to 1024, 480",Battle for Wesnoth,GPL Vv2,https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html,Battle for Wesnoth various creature images,https://www.wesnoth.org/
+data/spritesheets/inventory.png,Weapon and armor icons,,Proprietary,GameDevMarket Pro,https://www.gamedevmarket.net/terms-conditions/#pro-licence,Weapon Armor and Equipment Icons,https://www.gamedevmarket.net/asset/rpg-weapons-armor-and-equipment-8543/
+data/spritesheets/inventory.png,Miscellaneous icons,,Proprietary,GameDevMarket Pro,https://www.gamedevmarket.net/terms-conditions/#pro-licence,Resource and Tool Icons,https://www.gamedevmarket.net/asset/resource-and-tool-icons-5856/
+data/spritesheets/portraits.png,,,Jared Stephen,CC0 - Public Domain,http://creativecommons.org/publicdomain/zero/1.0/,,

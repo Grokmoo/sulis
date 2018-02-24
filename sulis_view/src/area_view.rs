@@ -21,7 +21,7 @@ use std::cmp;
 use std::time;
 
 use sulis_core::ui::animation_state;
-use sulis_core::ui::{color, Color, Cursor, WidgetKind, Widget};
+use sulis_core::ui::{color, Cursor, WidgetKind, Widget};
 use sulis_core::io::*;
 use sulis_core::io::event::ClickKind;
 use sulis_core::util::{self, Point};
@@ -190,7 +190,7 @@ impl AreaView {
     }
 
     fn draw_entities(&self, renderer: &mut GraphicsRenderer, scale_x: f32, scale_y: f32,
-                     alpha: f32, widget: &Widget, state: &AreaState, millis: u32) {
+                     _alpha: f32, widget: &Widget, state: &AreaState, millis: u32) {
         let p = widget.state.inner_position;
         let s = widget.state.scroll_pos;
         for entity in state.entity_iter() {
@@ -200,11 +200,9 @@ impl AreaView {
                 let x = (entity.location.x + p.x - s.x) as f32 + entity.sub_pos.0;
                 let y = (entity.location.y + p.y - s.y) as f32 + entity.sub_pos.1;
 
-                let mut draw_list = DrawList::empty_sprite();
-                draw_list.set_color(Color::new(1.0, 1.0, 1.0, alpha));
-                entity.actor.append_to_draw_list(&mut draw_list, x, y, millis);
-                draw_list.set_scale(scale_x, scale_y);
-                renderer.draw(draw_list);
+                // TODO implement drawing with alpha
+                entity.actor.draw_graphics_mode(renderer, scale_x, scale_y,
+                                                x, y, millis);
             }
         }
     }

@@ -59,7 +59,7 @@ impl AttributeSelectorPane {
 }
 
 impl BuilderPane for AttributeSelectorPane {
-    fn on_selected(&mut self, builder: &mut CharacterBuilder) {
+    fn on_selected(&mut self, builder: &mut CharacterBuilder, _widget: Rc<RefCell<Widget>>) {
         builder.attributes = None;
         builder.prev.borrow_mut().state.set_enabled(true);
         self.calculate_available();

@@ -18,21 +18,22 @@ use std::rc::Rc;
 
 use image::Image;
 use io::{DrawList, GraphicsRenderer};
-use ui::{AnimationState, animation_state};
+use ui::{animation_state, AnimationState, Color};
 use util::Size;
 
 #[derive(Debug)]
 pub struct LayeredImage {
-    layers: Vec<(f32, f32, Rc<Image>)>,
+    layers: Vec<(f32, f32, Option<Color>, Rc<Image>)>,
+    hue: Option<f32>,
     size: Size,
 }
 
 impl LayeredImage {
-    pub fn new(images: Vec<(f32, f32, Rc<Image>)>) -> LayeredImage {
+    pub fn new(images: Vec<(f32, f32, Option<Color>, Rc<Image>)>, swap_hue: Option<f32>) -> LayeredImage {
         let mut max_x = 0.0;
         let mut max_y = 0.0;
 
-        for &(_x, _y, ref image) in images.iter() {
+        for &(_x, _y, _color, ref image) in images.iter() {
             if image.get_width_f32() > max_x {
                 max_x = image.get_width_f32();
             }
@@ -44,31 +45,40 @@ impl LayeredImage {
 
         LayeredImage {
             layers: images,
+            hue: swap_hue,
             size: Size::new(max_x as i32, max_y as i32),
         }
     }
 
-    pub fn append_to(&self, draw_list: &mut DrawList, x: f32, y: f32, millis: u32) {
-        for &(offset_x, offset_y, ref image) in self.layers.iter() {
-            image.append_to_draw_list(draw_list, &animation_state::NORMAL, x + offset_x, y + offset_y,
-                                      image.get_width_f32(), image.get_height_f32(), millis);
+    pub fn draw(&self, renderer: &mut GraphicsRenderer, scale_x: f32, scale_y: f32,
+            x: f32, y: f32, millis: u32) {
+        let state = &animation_state::NORMAL;
+        for &(offset_x, offset_y, color, ref image) in self.layers.iter() {
+            let mut draw_list = DrawList::empty_sprite();
+            let w = image.get_width_f32();
+            let h = image.get_height_f32();
+            image.append_to_draw_list(&mut draw_list, state, x + offset_x, y + offset_y, w, h, millis);
+            if let Some(color) = color {
+                draw_list.set_color(color);
+            }
+            if let Some(hue) = self.hue {
+                draw_list.set_swap_hue(hue);
+            }
+            draw_list.set_scale(scale_x, scale_y);
+            renderer.draw(draw_list);
         }
     }
 }
 
 impl Image for LayeredImage {
-    fn append_to_draw_list(&self, draw_list: &mut DrawList, state: &AnimationState,
-                           x: f32, y: f32, w: f32, h: f32, millis: u32) {
-        for &(offset_x, offset_y, ref image) in self.layers.iter() {
-            image.append_to_draw_list(draw_list, state, x + offset_x, y + offset_y, w, h, millis);
-        }
+    fn append_to_draw_list(&self, _draw_list: &mut DrawList, _state: &AnimationState,
+                           _x: f32, _y: f32, _w: f32, _h: f32, _millis: u32) {
+        panic!("LayeredImage must be drawn directly");
     }
 
-    fn draw_graphics_mode(&self, renderer: &mut GraphicsRenderer, state: &AnimationState,
-                          x: f32, y: f32, w: f32, h: f32, millis: u32) {
-        let mut draw_list = DrawList::empty_sprite();
-        self.append_to_draw_list(&mut draw_list, state, x, y, w, h, millis);
-        renderer.draw(draw_list);
+    fn draw_graphics_mode(&self, _renderer: &mut GraphicsRenderer, _state: &AnimationState,
+                          _x: f32, _y: f32, _w: f32, _h: f32, _millis: u32) {
+        panic!("LayeredImage must be drawn directly");
     }
 
     fn get_size(&self) -> &Size {

@@ -41,7 +41,7 @@ impl ClassSelectorPane {
 }
 
 impl BuilderPane for ClassSelectorPane {
-    fn on_selected(&mut self, builder: &mut CharacterBuilder) {
+    fn on_selected(&mut self, builder: &mut CharacterBuilder, _widget: Rc<RefCell<Widget>>) {
         builder.class = None;
         let next = match self.list_box {
             None => false,

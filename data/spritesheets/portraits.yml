@@ -1,0 +1,17 @@
+id: portraits
+src: "portraits.png"
+size: [ 1024, 1024 ]
+simple_image_gen_scale: 256
+grid_multiplier: 256
+groups:
+  1by1:
+    size: [1, 1]
+    areas:
+      human01: [0, 0]
+      human02: [1, 0]
+      human03: [2, 0]
+      human04: [3, 0]
+      human05: [0, 1]
+      human06: [1, 1]
+      human07: [2, 1]
+      human08: [3, 1]

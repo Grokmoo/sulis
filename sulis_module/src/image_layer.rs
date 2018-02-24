@@ -19,6 +19,7 @@ use std::slice::Iter;
 use std::collections::HashMap;
 use std::rc::Rc;
 
+use sulis_core::ui::Color;
 use sulis_core::image::Image;
 use sulis_core::resource::ResourceSet;
 use sulis_core::util::invalid_data_error;
@@ -91,7 +92,8 @@ impl ImageLayerSet {
 
     /// Gets the list of images from this ImageLayerSet for the given Sex.
     /// The images are ordered based on the iteration order of ImageLayer
-    pub fn get_list(&self, sex: Sex) -> Vec<(f32, f32, Rc<Image>)> {
+    pub fn get_list(&self, sex: Sex, hair: Option<Color>, skin: Option<Color>)
+        -> Vec<(f32, f32, Option<Color>, Rc<Image>)> {
         let mut list = Vec::new();
 
         match self.images.get(&sex) {
@@ -103,7 +105,7 @@ impl ImageLayerSet {
                         Some(ref image) => Rc::clone(image),
                     };
 
-                    list.push((0.0, 0.0, image));
+                    list.push((0.0, 0.0, get_color(*layer, hair, skin), image));
                 }
             }
         }
@@ -113,8 +115,9 @@ impl ImageLayerSet {
 
     /// Gets the list of images from this ImageLayerSet for the given Sex,
     /// with the additional images inserted
-    pub fn get_list_with(&self, sex: Sex, race: &Rc<Race>,
-                         insert: HashMap<ImageLayer, Rc<Image>>) -> Vec<(f32, f32, Rc<Image>)> {
+    pub fn get_list_with(&self, sex: Sex, race: &Rc<Race>, hair: Option<Color>, skin: Option<Color>,
+                         insert: HashMap<ImageLayer, Rc<Image>>)
+        -> Vec<(f32, f32, Option<Color>, Rc<Image>)> {
         let mut list = Vec::new();
 
         match self.images.get(&sex) {
@@ -127,7 +130,7 @@ impl ImageLayerSet {
                     let (x, y) = race.get_image_layer_offset(*layer);
                     match sex_map.get(&layer) {
                         Some(ref image) => {
-                            list.push((x, y, Rc::clone(image)));
+                            list.push((x, y, get_color(*layer, hair, skin), Rc::clone(image)));
                         }, None => (),
                     }
                 }
@@ -158,12 +161,21 @@ impl ImageLayerSet {
     }
 }
 
-fn insert_for_race_sex(list: &mut Vec<(f32, f32, Rc<Image>)>, insert: &HashMap<ImageLayer, Rc<Image>>,
+fn get_color(layer: ImageLayer, hair: Option<Color>, skin: Option<Color>) -> Option<Color> {
+    match layer {
+        Hair | Beard => hair,
+        Background | Foreground => skin,
+        _ => None,
+    }
+}
+
+fn insert_for_race_sex(list: &mut Vec<(f32, f32, Option<Color>, Rc<Image>)>,
+                       insert: &HashMap<ImageLayer, Rc<Image>>,
                        sex: Sex, race: &Rc<Race>, layer: ImageLayer) -> bool {
     let (x, y) = race.get_image_layer_offset(layer);
     match insert.get(&layer) {
         Some(ref image) => {
-            list.push((x, y, race.image_for_sex(sex, image)));
+            list.push((x, y, None, race.image_for_sex(sex, image)));
             true
         }, None => {
             false

@@ -37,7 +37,7 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_core::ui::{Callback, Widget, WidgetKind};
+use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
 use sulis_core::resource::write_to_file;
 use sulis_widgets::{Button, Label};
 use sulis_module::actor::Sex;
@@ -47,7 +47,7 @@ use sulis_rules::{AttributeList};
 pub const NAME: &str = "character_builder";
 
 trait BuilderPane {
-    fn on_selected(&mut self, builder: &mut CharacterBuilder);
+    fn on_selected(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>);
 
     fn prev(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>);
 
@@ -70,6 +70,9 @@ pub struct CharacterBuilder {
     pub name: String,
     pub images: HashMap<ImageLayer, String>,
     pub hue: Option<f32>,
+    pub skin_color: Option<Color>,
+    pub hair_color: Option<Color>,
+    pub portrait: Option<String>,
 }
 
 impl CharacterBuilder {
@@ -112,7 +115,10 @@ impl CharacterBuilder {
             race: None,
             class: None,
             hue: None,
+            skin_color: None,
+            hair_color: None,
             attributes: None,
+            portrait: None,
             images: HashMap::new(),
         }))
     }
@@ -143,12 +149,15 @@ impl CharacterBuilder {
         let actor = ActorBuilder {
             id,
             name: self.name.to_string(),
+            portrait: self.portrait.clone(),
             race: self.race.as_ref().unwrap().id.to_string(),
             sex: self.sex,
             attributes: self.attributes.unwrap(),
             player: Some(true),
             images: self.images.clone(),
             hue: self.hue,
+            hair_color: self.hair_color,
+            skin_color: self.skin_color,
             items: None,
             equipped: None,
             levels,
@@ -173,16 +182,14 @@ impl CharacterBuilder {
     }
 
     fn change_index(&mut self, widget: &Rc<RefCell<Widget>>, delta: i32) {
-        self.set_cur_child_visible(widget, false);
+        let cur_child = Rc::clone(&widget.borrow().children[self.builder_pane_index]);
+        cur_child.borrow_mut().state.set_visible(false);
+
         self.builder_pane_index = (self.builder_pane_index as i32 + delta) as usize;
         let cur_pane = Rc::clone(&self.builder_panes[self.builder_pane_index]);
-        cur_pane.borrow_mut().on_selected(self);
-        self.set_cur_child_visible(widget, true);
-    }
-
-    fn set_cur_child_visible(&self, widget: &Rc<RefCell<Widget>>, vis: bool) {
         let cur_child = Rc::clone(&widget.borrow().children[self.builder_pane_index]);
-        cur_child.borrow_mut().state.set_visible(vis);
+        cur_child.borrow_mut().state.set_visible(true);
+        cur_pane.borrow_mut().on_selected(self, cur_child);
     }
 }
 
@@ -216,7 +223,7 @@ impl WidgetKind for CharacterBuilder {
         self.builder_panes.push(attribute_selector_pane.clone());
         self.builder_panes.push(cosmetic_selector_pane.clone());
 
-        race_selector_pane.borrow_mut().on_selected(self);
+        race_selector_pane.borrow_mut().on_selected(self, Rc::clone(&race_sel_widget));
 
         vec![race_sel_widget, class_sel_widget, attr_sel_widget, cosmetic_sel_widget, title, close,
             Rc::clone(&self.next), Rc::clone(&self.prev), Rc::clone(&self.finish)]

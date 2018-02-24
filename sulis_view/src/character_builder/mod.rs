@@ -20,15 +20,19 @@ use self::attribute_selector_pane::AttributeSelectorPane;
 mod class_selector_pane;
 use self::class_selector_pane::ClassSelectorPane;
 
+mod color_button;
+use self::color_button::ColorButton;
+
 mod cosmetic_selector_pane;
 use self::cosmetic_selector_pane::CosmeticSelectorPane;
 
 mod race_selector_pane;
 use self::race_selector_pane::RaceSelectorPane;
 
+use chrono::prelude::*;
+
 use std::collections::HashMap;
 use std::fs;
-use std::time::{SystemTime, UNIX_EPOCH};
 use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
@@ -36,7 +40,8 @@ use std::cell::RefCell;
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::resource::write_to_file;
 use sulis_widgets::{Button, Label};
-use sulis_module::{ActorBuilder, Class, Race};
+use sulis_module::actor::Sex;
+use sulis_module::{ActorBuilder, Class, ImageLayer, Race};
 use sulis_rules::{AttributeList};
 
 pub const NAME: &str = "character_builder";
@@ -61,6 +66,10 @@ pub struct CharacterBuilder {
     pub race: Option<Rc<Race>>,
     pub class: Option<Rc<Class>>,
     pub attributes: Option<AttributeList>,
+    pub sex: Option<Sex>,
+    pub name: String,
+    pub images: HashMap<ImageLayer, String>,
+    pub hue: Option<f32>,
 }
 
 impl CharacterBuilder {
@@ -87,6 +96,8 @@ impl CharacterBuilder {
             parent.borrow_mut().mark_for_removal();
 
             let builder = Widget::downcast_kind_mut::<CharacterBuilder>(&parent);
+            let cur_pane = Rc::clone(&builder.builder_panes[builder.builder_pane_index]);
+            cur_pane.borrow_mut().next(builder, Rc::clone(&parent));
             builder.save_character();
         })));
 
@@ -96,19 +107,22 @@ impl CharacterBuilder {
             finish,
             builder_panes: Vec::new(),
             builder_pane_index: 0,
+            name: String::new(),
+            sex: None,
             race: None,
             class: None,
+            hue: None,
             attributes: None,
+            images: HashMap::new(),
         }))
     }
 
     fn save_character(&mut self) {
-        let cur_time = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
+        let utc: DateTime<Utc> = Utc::now();
 
         let dir = "characters";
-        let id = format!("player_{:?}", cur_time);
-        // TODO fix the ID to be better
-        let filename = format!("{}/{}", dir, id);
+        let id = format!("pc_{}_{}", self.name, utc.format("%Y%m%d-%H%M%S"));
+        let filename = format!("{}/{}.yaml", dir, id);
 
         info!("Saving character {}", id);
 
@@ -126,16 +140,15 @@ impl CharacterBuilder {
         let mut levels = HashMap::new();
         levels.insert(self.class.as_ref().unwrap().id.to_string(), 1);
 
-        // TODO fully implement
         let actor = ActorBuilder {
             id,
-            name: "Test Name".to_string(),
+            name: self.name.to_string(),
             race: self.race.as_ref().unwrap().id.to_string(),
-            sex: None,
+            sex: self.sex,
             attributes: self.attributes.unwrap(),
             player: Some(true),
-            images: HashMap::new(),
-            hue: None,
+            images: self.images.clone(),
+            hue: self.hue,
             items: None,
             equipped: None,
             levels,

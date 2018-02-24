@@ -76,6 +76,7 @@ impl WidgetKind for RaceSelectorPane {
 
         let mut entries = Vec::new();
         for race in Module::all_races() {
+            if !race.player { continue; }
             let race_info = RaceInfo { race };
             entries.push(list_box::Entry::new(race_info, None));
         }

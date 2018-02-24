@@ -20,6 +20,7 @@ extern crate sulis_module;
 extern crate sulis_state;
 extern crate sulis_widgets;
 
+extern crate chrono;
 #[macro_use] extern crate log;
 
 mod action_menu;

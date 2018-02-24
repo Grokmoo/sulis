@@ -1,5 +1,6 @@
 id: human
 name: Human
+player: true
 size: 3
 base_stats:
   hit_points: 40
@@ -29,3 +30,23 @@ image_layer_offsets:
   HeldOff: [17, -6]
 image_layer_postfix:
   Female: "_female"
+hair_selections:
+  - creatures/hair01
+  - creatures/hair02
+  - creatures/hair03
+  - creatures/hair04
+  - creatures/hair05
+  - creatures/hair06
+  - creatures/hair07
+  - creatures/hair08
+  - creatures/hair09
+  - creatures/hair10
+  - creatures/hair11
+beard_selections:
+  - creatures/beard01
+  - creatures/beard02
+  - creatures/beard03
+  - creatures/beard04
+  - creatures/beard05
+  - creatures/beard06
+  - creatures/beard07

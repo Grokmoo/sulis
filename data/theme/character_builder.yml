@@ -1,8 +1,9 @@
 ---
 children:
   character_builder:
-    preferred_size: [240, -8]
+    preferred_size: [200, -8]
     border: { top: 8, bottom: 5, right: 5, left: 5 }
+    x_relative: Center
     from: .window
     children:
       title:
@@ -98,7 +99,8 @@ children:
           title:
             from: .label
             text: "Select your Attributes"
-            preferred_size: [80, 5]
+            preferred_size: [0, 5]
+            width_relative: Max
             text_params:
               scale: 5.5
           attr_label:
@@ -109,11 +111,12 @@ children:
               horizontal_alignment: Right
           points_label:
             from: .label
-            preferred_size: [50, 12]
+            preferred_size: [0, 12]
+            width_relative: Max
             text_params:
               scale: 6.0
             text: "Points Left: #points#"
-            position: [0, 110]
+            position: [0, 100]
           str_label:
             from: .character_builder.attribute_selector_pane.attr_label
             position: [0, 10]
@@ -164,7 +167,78 @@ children:
           title:
             from: .label
             text: "Customize your Appearance"
-            preferred_size: [80, 5]
+            preferred_size: [0, 5]
+            width_relative: Max
             text_params:
               scale: 5.5
+          preview:
+            background: bg_transparent_base
+            preferred_size: [20, 20]
+            x_relative: Center
+            position: [0, 10]
+          name_label:
+            from: .label
+            text: "Name"
+            preferred_size: [10, 5]
+            position: [0, 10]
+            text_params:
+              horizontal_alignment: Left
+          name_field:
+            from: .input_field
+            preferred_size: [40, 5]
+            position: [12, 10]
+          male_button:
+            from: .button
+            text: "Male"
+            preferred_size: [20, 5]
+            position: [0, 20]
+          female_button:
+            from: .button
+            text: "Female"
+            preferred_size: [20, 5]
+            position: [22, 20]
+          hair_label:
+            from: .label
+            text: "Hair"
+            preferred_size: [15, 5]
+            position: [5, 30]
+          next_hair:
+            from: .button
+            text: ">"
+            preferred_size: [5, 5]
+            position: [20, 30]
+          prev_hair:
+            from: .button
+            text: "<"
+            preferred_size: [5, 5]
+            position: [0, 30]
+          beard_label:
+            from: .label
+            text: "Beard"
+            preferred_size: [15, 5]
+            position: [5, 40]
+          next_beard:
+            from: .button
+            text: ">"
+            preferred_size: [5, 5]
+            position: [20, 40]
+          prev_beard:
+            from: .button
+            text: "<"
+            preferred_size: [5, 5]
+            position: [0, 40]
+          color_label:
+            from: .label
+            text: "Color"
+            preferred_size: [10, 12]
+            position: [0, 50]
+          color_panel:
+            position: [12, 50]
+            preferred_size: [60, 12]
+            layout: Grid
+            layout_spacing: { top: 0, bottom: 1, left: 0, right: 1 }
+            children:
+              color_button:
+                from: .color_button
+                preferred_size: [5, 5]
 ...

@@ -148,6 +148,7 @@ groups:
   special:
     areas:
       empty: [0, 68, 5, 5]
+      white: [207, 51, 16, 16]
       cursor6x6: [ 17, 85, 96, 96]
       cursor5x5: [ 17,  0, 80, 80]
       cursor4x4: [102,  0, 64, 64]

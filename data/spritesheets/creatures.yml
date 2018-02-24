@@ -32,6 +32,13 @@ groups:
       helm_leather: [33, 0]
       helm_mail: [36, 0]
       helm_plate: [39, 0]
+      beard01: [42, 0]
+      beard02: [45, 0]
+      beard03: [48, 0]
+      beard04: [51, 0]
+      beard05: [54, 0]
+      beard06: [57, 0]
+      beard07: [60, 0]
     
       gloves_leather: [0, 3]
       gloves_mail: [3, 3]

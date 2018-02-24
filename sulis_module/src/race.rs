@@ -33,7 +33,10 @@ pub struct Race {
     pub id: String,
     pub name: String,
     pub size: Rc<EntitySize>,
+    pub player: bool,
     pub base_stats: BonusList,
+    pub hair_selections: Vec<String>,
+    pub beard_selections: Vec<String>,
 
     default_images: ImageLayerSet,
     image_layer_offsets: HashMap<ImageLayer, (f32, f32)>,
@@ -79,10 +82,13 @@ impl Race {
             id: builder.id,
             name: builder.name,
             size,
+            player: builder.player.unwrap_or(false),
             base_stats: builder.base_stats,
             default_images,
             image_layer_offsets: offsets,
             image_layer_postfix: builder.image_layer_postfix,
+            hair_selections: builder.hair_selections.unwrap_or(Vec::new()),
+            beard_selections: builder.beard_selections.unwrap_or(Vec::new()),
         })
     }
 
@@ -114,8 +120,11 @@ pub struct RaceBuilder {
     pub id: String,
     pub name: String,
     pub size: usize,
+    pub player: Option<bool>,
     pub base_stats: BonusList,
     pub default_images: HashMap<Sex, HashMap<ImageLayer, String>>,
+    pub hair_selections: Option<Vec<String>>,
+    pub beard_selections: Option<Vec<String>>,
     image_layer_offsets: HashMap<ImageLayer, Point>,
     image_layer_offset_scale: i32,
     image_layer_postfix: HashMap<Sex, String>,

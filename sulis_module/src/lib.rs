@@ -255,6 +255,10 @@ impl Module {
         MODULE.with(|m| Rc::clone(m.borrow().game.as_ref().unwrap()))
     }
 
+    pub fn item(id: &str) -> Option<Rc<Item>> {
+        MODULE.with(|r| get_resource(id, &r.borrow().items))
+    }
+
     pub fn race(id: &str) -> Option<Rc<Race>> {
         MODULE.with(|r| get_resource(id, &r.borrow().races))
     }

@@ -10,6 +10,11 @@ children:
     text_params:
       font: "normal"
       scale: 4.0
+  color_button:
+    background: background
+    border: [1, 1, 1, 1]
+    custom:
+      icon: white
   list_box:
     background: bg_base
     border: [1, 1, 1, 1]

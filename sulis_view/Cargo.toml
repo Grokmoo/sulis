@@ -11,3 +11,4 @@ sulis_state = { path = "../sulis_state" }
 sulis_widgets = { path = "../sulis_widgets" }
 
 log = "0.4"
+chrono = "0.4"

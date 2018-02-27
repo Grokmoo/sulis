@@ -30,6 +30,7 @@ use sulis_core::util;
 use sulis_module::Module;
 use sulis_state::{GameStateMainLoopUpdater, GameState};
 use sulis_view::RootView;
+use sulis_view::character_selector::{self, CharacterSelector};
 use sulis_view::main_menu::{MainMenuView, MainMenuLoopUpdater};
 
 fn main() {
@@ -95,8 +96,38 @@ fn main() {
         util::error_and_exit("There was a fatal error setting up the module.");
     };
 
+    let pc_actor = {
+        let view = CharacterSelector::new();
+        let loop_updater = character_selector::LoopUpdater::new(&view);
+        let root = ui::create_ui_tree(view.clone());
+        match ResourceSet::get_theme().children.get("character_selector") {
+            None => warn!("No theme found for 'character_selector'"),
+            Some(ref theme) => {
+                root.borrow_mut().theme = Some(Rc::clone(theme));
+                root.borrow_mut().theme_id = ".character_selector".to_string();
+                root.borrow_mut().theme_subname = "character_selector".to_string();
+            }
+        }
+
+        if let Err(e) = util::main_loop(&mut io, root, Box::new(loop_updater)) {
+            error!("{}", e);
+            util::error_and_exit("Error in character selector.");
+        }
+
+        let view = view.borrow();
+        view.selected()
+    };
+
+    let pc_actor = match pc_actor {
+        None => {
+            util::ok_and_exit("No actor selected in main menu.");
+            unreachable!();
+        },
+        Some(actor) => actor,
+    };
+
     info!("Initializing game state.");
-    if let Err(e) = GameState::init() {
+    if let Err(e) = GameState::init(pc_actor) {
         error!("{}",  e);
         util::error_and_exit("There was a fatal error creating the game state.");
     };

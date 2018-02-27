@@ -6,7 +6,7 @@ children:
         from: .label
         text_params:
           scale: 8.0
-        text: "Main Menu"
+        text: "Select a Module"
         x_relative: Center
         preferred_size: [40, 4]
         position: [0, 4]
@@ -32,6 +32,73 @@ children:
         x_relative: Center
         height_relative: Zero
         width_relative: Zero
+      exit_confirmation_window:
+        from: .exit_confirmation_window
+  character_selector:
+    children:
+      title:
+        from: .label
+        text_params:
+          scale: 8
+        text: "Select a Character"
+        x_relative: Center
+        preferred_size: [40, 10]
+        position: [0, 10]
+      characters_title:
+        from: .label
+        text_params:
+          scale: 6
+          horizontal_alignment: Left
+        text: "Available Characters"
+        x_relative: Center
+        position: [-50, 30]
+        preferred_size: [80, 10]
+      new_character_button:
+        from: .button
+        text: "Create New"
+        x_relative: Center
+        position: [-20, 30]
+        preferred_size: [20, 10]
+      characters_pane:
+        background: bg_base
+        x_relative: Center
+        preferred_size: [120, 120]
+        position: [-70, 42]
+        layout: Grid
+        layout_spacing: { top: 0, bottom: 1, right: 1, left: 0 }
+        children:
+          character_button:
+            from: .button
+            text: "#name#"
+            foreground: "#portrait#"
+            preferred_size: [28, 28]
+      play_button:
+        from: .button
+        text: "Play"
+        text_params:
+          scale: 8
+        x_relative: Center
+        position: [20, 152]
+        preferred_size: [40, 10]
+      selected_name:
+        from: .label
+        text: "#name#"
+        text_params:
+          scale: 6
+        x_relative: Center
+        position: [60, 30]
+        preferred_size: [120, 12]
+      details:
+        from: .character_window.details
+        border: [4, 4, 4, 4]
+        background: bg_base
+        x_relative: Center
+        width_relative: Zero
+        height_relative: Zero
+        preferred_size: [120, 108]
+        position: [60, 42]
+      character_builder:
+        from: .character_builder
       exit_confirmation_window:
         from: .exit_confirmation_window
 ...

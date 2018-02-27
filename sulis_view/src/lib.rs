@@ -52,6 +52,8 @@ pub use self::inventory_window::InventoryWindow;
 
 pub mod main_menu;
 
+pub mod character_selector;
+
 mod race_pane;
 pub use self::race_pane::RacePane;
 

@@ -67,6 +67,7 @@ use std::cell::RefCell;
 use std::fmt::{self, Display};
 use std::path::PathBuf;
 use std::fs;
+use std::ffi::OsStr;
 
 use sulis_core::resource::{all_resources, read, read_single_resource, get_resource, insert_if_ok};
 
@@ -158,6 +159,57 @@ impl Module {
         }
 
         modules
+    }
+
+    pub fn get_available_characters(root_dir: &str) -> Vec<Actor> {
+        let mut actors = Vec::new();
+
+        debug!("Reading list of available characters");
+        let path = PathBuf::from(root_dir);
+        let dir_entries = match fs::read_dir(path) {
+            Ok(entries) => entries,
+            Err(_) => {
+                warn!("Unable to read directory: '{}'", root_dir);
+                return actors;
+            }
+        };
+
+        for entry in dir_entries {
+            trace!("Found entry {:?}", entry);
+            let entry = match entry {
+                Ok(entry) => entry,
+                Err(e) => { warn!("Error reading entry: {}", e); continue; }
+            };
+
+            if !entry.path().is_file() { continue; }
+
+            let extension: String = OsStr::to_str(entry.path().extension()
+                                                  .unwrap_or(OsStr::new(""))).unwrap_or("").to_string();
+
+            if extension != "yml" { continue; }
+
+            let mut path = entry.path().to_path_buf();
+            path.set_extension("");
+            let actor_builder: ActorBuilder = match read_single_resource(&path
+                                                        .to_string_lossy().to_string()) {
+                Ok(entry) => entry,
+                Err(e) => { warn!("Error reading actor: {}", e); continue; }
+            };
+
+            let actor = MODULE.with(|module| {
+                let module = module.borrow();
+                match Actor::new(actor_builder, &module) {
+                    Err(e) => { warn!("Error reading actor: {}", e); None },
+                    Ok(actor) => Some(actor),
+                }
+            });
+
+            if let Some(actor) = actor {
+                actors.push(actor);
+            }
+        }
+
+        actors
     }
 
     pub fn init(data_dir: &str, root_dir: &str) -> Result<(), Error> {

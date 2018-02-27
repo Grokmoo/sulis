@@ -22,6 +22,7 @@ use sulis_rules::{Attribute, DamageKind};
 use sulis_state::{ChangeListener, EntityState};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{Button, Label, TextArea};
+use sulis_state::ActorState;
 
 pub const NAME: &str = "character_window";
 
@@ -69,55 +70,60 @@ impl WidgetKind for CharacterWindow {
         let close = Widget::with_theme(Button::empty(), "close");
         close.borrow_mut().state.add_callback(Callback::remove_parent());
 
-        let details = Widget::with_theme(TextArea::empty(), "details");
-        {
-            let pc = self.character.borrow();
-            let state = &mut details.borrow_mut().state;
-            let stats = &pc.actor.stats;
-            state.add_text_arg("name", &pc.actor.actor.name);
-            state.add_text_arg("race", &pc.actor.actor.race.name);
-            state.add_text_arg("sex", &pc.actor.actor.sex.to_string());
-
-            for attribute in Attribute::iter() {
-                state.add_text_arg(attribute.short_name(), &stats.attributes.get(*attribute).to_string())
-            }
-
-            let mut index = 0;
-            for &(ref class, level) in pc.actor.actor.levels.iter() {
-                state.add_text_arg(&format!("class_{}", index), &class.name);
-                state.add_text_arg(&format!("level_{}", index), &level.to_string());
-
-                index += 1;
-            }
-
-            for (index, attack) in stats.attacks.iter().enumerate() {
-                state.add_text_arg(&format!("{}_damage_min", index)
-                                   , &attack.damage.min().to_string());
-                state.add_text_arg(&format!("{}_damage_max", index)
-                                   , &attack.damage.max().to_string());
-            }
-
-            state.add_text_arg("reach", &stats.attack_distance().to_string());
-            state.add_text_arg("cur_hp", &pc.actor.hp().to_string());
-            state.add_text_arg("max_hp", &stats.max_hp.to_string());
-            state.add_text_arg("cur_ap", &pc.actor.ap().to_string());
-
-            state.add_text_arg("initiative", &stats.initiative.to_string());
-
-            state.add_text_arg("armor", &stats.armor.base().to_string());
-            for kind in DamageKind::iter() {
-                if !stats.armor.differs_from_base(*kind) { continue; }
-
-                state.add_text_arg(&format!("armor_{}", kind).to_lowercase(),
-                    &stats.armor.amount(*kind).to_string());
-            }
-
-            state.add_text_arg("accuracy", &stats.accuracy.to_string());
-            state.add_text_arg("defense", &stats.defense.to_string());
-            state.add_text_arg("fortitude", &stats.fortitude.to_string());
-            state.add_text_arg("reflex", &stats.reflex.to_string());
-            state.add_text_arg("will", &stats.will.to_string());
-        }
+        let details = create_details_text_box(&self.character.borrow().actor);
         vec![title, close, details]
     }
+}
+
+pub fn create_details_text_box(pc: &ActorState) -> Rc<RefCell<Widget>> {
+    let details = Widget::with_theme(TextArea::empty(), "details");
+    {
+        let state = &mut details.borrow_mut().state;
+        let stats = &pc.stats;
+
+        state.add_text_arg("name", &pc.actor.name);
+        state.add_text_arg("race", &pc.actor.race.name);
+        state.add_text_arg("sex", &pc.actor.sex.to_string());
+
+        for attribute in Attribute::iter() {
+            state.add_text_arg(attribute.short_name(), &stats.attributes.get(*attribute).to_string())
+        }
+
+        let mut index = 0;
+        for &(ref class, level) in pc.actor.levels.iter() {
+            state.add_text_arg(&format!("class_{}", index), &class.name);
+            state.add_text_arg(&format!("level_{}", index), &level.to_string());
+
+            index += 1;
+        }
+
+        for (index, attack) in stats.attacks.iter().enumerate() {
+            state.add_text_arg(&format!("{}_damage_min", index)
+                               , &attack.damage.min().to_string());
+            state.add_text_arg(&format!("{}_damage_max", index)
+                               , &attack.damage.max().to_string());
+        }
+
+        state.add_text_arg("reach", &stats.attack_distance().to_string());
+        state.add_text_arg("cur_hp", &pc.hp().to_string());
+        state.add_text_arg("max_hp", &stats.max_hp.to_string());
+        state.add_text_arg("cur_ap", &pc.ap().to_string());
+
+        state.add_text_arg("initiative", &stats.initiative.to_string());
+
+        state.add_text_arg("armor", &stats.armor.base().to_string());
+        for kind in DamageKind::iter() {
+            if !stats.armor.differs_from_base(*kind) { continue; }
+
+            state.add_text_arg(&format!("armor_{}", kind).to_lowercase(),
+            &stats.armor.amount(*kind).to_string());
+        }
+
+        state.add_text_arg("accuracy", &stats.accuracy.to_string());
+        state.add_text_arg("defense", &stats.defense.to_string());
+        state.add_text_arg("fortitude", &stats.fortitude.to_string());
+        state.add_text_arg("reflex", &stats.reflex.to_string());
+        state.add_text_arg("will", &stats.will.to_string());
+    }
+    details
 }

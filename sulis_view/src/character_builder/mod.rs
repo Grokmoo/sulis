@@ -41,7 +41,7 @@ use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
 use sulis_core::resource::write_to_file;
 use sulis_widgets::{Button, Label};
 use sulis_module::actor::Sex;
-use sulis_module::{ActorBuilder, Class, ImageLayer, Race};
+use sulis_module::{ActorBuilder, Class, ImageLayer, Module, Race};
 use sulis_rules::{AttributeList};
 
 pub const NAME: &str = "character_builder";
@@ -102,6 +102,9 @@ impl CharacterBuilder {
             let cur_pane = Rc::clone(&builder.builder_panes[builder.builder_pane_index]);
             cur_pane.borrow_mut().next(builder, Rc::clone(&parent));
             builder.save_character();
+
+            let root = Widget::get_root(&parent);
+            root.borrow_mut().invalidate_children();
         })));
 
         Rc::new(RefCell::new(CharacterBuilder {
@@ -128,7 +131,7 @@ impl CharacterBuilder {
 
         let dir = "characters";
         let id = format!("pc_{}_{}", self.name, utc.format("%Y%m%d-%H%M%S"));
-        let filename = format!("{}/{}.yaml", dir, id);
+        let filename = format!("{}/{}.yml", dir, id);
 
         info!("Saving character {}", id);
 
@@ -146,6 +149,13 @@ impl CharacterBuilder {
         let mut levels = HashMap::new();
         levels.insert(self.class.as_ref().unwrap().id.to_string(), 1);
 
+        let mut items: Vec<String> = Vec::new();
+        let mut equipped = Vec::new();
+        for (index, ref item_id) in Module::rules().builder_base_items.iter().enumerate() {
+            items.push(item_id.to_string());
+            equipped.push(index as u32);
+        }
+
         let actor = ActorBuilder {
             id,
             name: self.name.to_string(),
@@ -158,8 +168,8 @@ impl CharacterBuilder {
             hue: self.hue,
             hair_color: self.hair_color,
             skin_color: self.skin_color,
-            items: None,
-            equipped: None,
+            items: Some(items),
+            equipped: Some(equipped),
             levels,
         };
 

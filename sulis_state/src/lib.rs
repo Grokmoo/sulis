@@ -70,7 +70,7 @@ use sulis_core::config::CONFIG;
 use sulis_core::util::{self, Point};
 use sulis_core::io::{GraphicsRenderer, MainLoopUpdater};
 use sulis_core::ui::Widget;
-use sulis_module::Module;
+use sulis_module::{Actor, Module};
 
 thread_local! {
     static STATE: RefCell<Option<GameState>> = RefCell::new(None);
@@ -100,8 +100,8 @@ pub struct GameState {
 }
 
 impl GameState {
-    pub fn init() -> Result<(), Error> {
-        let game_state = GameState::new()?;
+    pub fn init(pc_actor: Rc<Actor>) -> Result<(), Error> {
+        let game_state = GameState::new(pc_actor)?;
 
         STATE.with(|state| {
             *state.borrow_mut() = Some(game_state);
@@ -194,7 +194,7 @@ impl GameState {
         Ok(area_state)
     }
 
-    fn new() -> Result<GameState, Error> {
+    fn new(pc: Rc<Actor>) -> Result<GameState, Error> {
         let game = Module::game();
 
         let area_state = GameState::setup_area_state(&game.starting_area)?;
@@ -207,16 +207,6 @@ impl GameState {
             return Err(Error::new(ErrorKind::InvalidData,
                                   "Unable to create starting location."));
         }
-
-        let pc = Module::actor(&game.pc);
-        let pc = match pc {
-            Some(a) => a,
-            None => {
-                error!("Player character '{}' not found", &game.pc);
-                return Err(Error::new(ErrorKind::NotFound,
-                                      "Unable to create player character."));
-            }
-        };
 
         if !area_state.borrow_mut().add_actor(pc, location, true) {
             error!("Player character starting location must be within \

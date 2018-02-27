@@ -6,32 +6,47 @@ children:
         from: .label
         text_params:
           scale: 8.0
-        text: "Select a Module"
+        text: "Sulis"
         x_relative: Center
-        preferred_size: [40, 4]
-        position: [0, 4]
+        preferred_size: [40, 10]
+        position: [0, 10]
       play_button:
         from: .button
-        text: "Play"
+        text: "Select"
         text_params:
-          scale: 8.0
+          scale: 6.0
           vertical_alignment: Center
-        preferred_size: [40, 12]
+        preferred_size: [40, 10]
         x_relative: Center
-        position: [40, 32]
+        position: [-30, 140]
       modules_title:
         from: .label
-        text: "Select a Module"
+        text: "Available Modules"
+        text_params:
+          scale: 6.0
         x_relative: Center
-        preferred_size: [40, 4]
-        position: [-40, 16]
+        preferred_size: [120, 10]
+        position: [-70, 30]
       modules_list:
         from: .list_box
-        preferred_size: [80, 40]
-        position: [-40, 20]
+        preferred_size: [120, 100]
+        position: [-70, 38]
         x_relative: Center
         height_relative: Zero
         width_relative: Zero
+        children:
+          entry:
+            text_params:
+              scale: 6.0
+            preferred_size: [0, 6]
+      details:
+        from: .text_area
+        border: [4, 4, 4, 4]
+        background: bg_base
+        x_relative: Center
+        preferred_size: [120, 120]
+        position: [60, 30]
+        text: "#description#"
       exit_confirmation_window:
         from: .exit_confirmation_window
   character_selector:
@@ -55,15 +70,15 @@ children:
         preferred_size: [80, 10]
       new_character_button:
         from: .button
-        text: "Create New"
+        text: "Create New Character"
         x_relative: Center
-        position: [-20, 30]
-        preferred_size: [20, 10]
+        position: [-110, 140]
+        preferred_size: [40, 10]
       characters_pane:
         background: bg_base
         x_relative: Center
-        preferred_size: [120, 120]
-        position: [-70, 42]
+        preferred_size: [120, 100]
+        position: [-70, 38]
         layout: Grid
         layout_spacing: { top: 0, bottom: 1, right: 1, left: 0 }
         children:
@@ -76,18 +91,10 @@ children:
         from: .button
         text: "Play"
         text_params:
-          scale: 8
-        x_relative: Center
-        position: [20, 152]
-        preferred_size: [40, 10]
-      selected_name:
-        from: .label
-        text: "#name#"
-        text_params:
           scale: 6
         x_relative: Center
-        position: [60, 30]
-        preferred_size: [120, 12]
+        position: [-30, 140]
+        preferred_size: [40, 10]
       details:
         from: .character_window.details
         border: [4, 4, 4, 4]
@@ -95,8 +102,8 @@ children:
         x_relative: Center
         width_relative: Zero
         height_relative: Zero
-        preferred_size: [120, 108]
-        position: [60, 42]
+        preferred_size: [120, 120]
+        position: [60, 30]
       character_builder:
         from: .character_builder
       exit_confirmation_window:

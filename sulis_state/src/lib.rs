@@ -199,7 +199,7 @@ impl GameState {
 
         let area_state = GameState::setup_area_state(&game.starting_area)?;
 
-        debug!("Setting up PC {}, with {:?}", &game.pc, &game.starting_location);
+        debug!("Setting up PC {}, with {:?}", &pc.name, &game.starting_location);
         let location = Location::from_point(&game.starting_location, &area_state.borrow().area);
 
         if !location.coords_valid(location.x, location.y) {

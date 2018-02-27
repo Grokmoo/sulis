@@ -192,13 +192,17 @@ children:
     from: .window
     children:
       title:
-        text: "Character for #name#"
+        text: "#name#"
       details:
         from: .text_area
         text: |
-          [s=6|[c=f00|#race#] #sex#][s=5|[x=50|Hit Points][x=80|Action Points]]
-          [s=5|Level #level_0# #class_0#][x=50|#cur_hp# / #max_hp#][x=80|#cur_ap#]
-          [s=6|]
+          [s=6|#name# - #race# #sex#]
+          [s=4|]
+          [s=5|[x=0|Hit Points][x=50|Action Points]]
+          [x=0|#cur_hp# / #max_hp#][x=50|#cur_ap#]
+          [s=4|]
+          [s=5|Level #level_0# #class_0#]
+          [s=5|]
           [?0_damage_min;s=5;x=0|Main Hand][?1_damage_min;s=5;x=40|Off Hand]
           [?0_damage_min;s=4;x=0|Damage: #0_damage_min# to #0_damage_max#][?1_damage_min;s=4;x=40|Damage: #1_damage_min# to #1_damage_max#]
           [s=2|]
@@ -216,6 +220,7 @@ children:
                   [x=0|Wisdom][x=40|#wis#]]
           [s=6|]
           [x=0|Initiative][x=40|#initiative#]
+          [x=80;y=0;i=#portrait#;s=30.0|]
         preferred_size: [0, -8]
         position: [0, 8]
         width_relative: Max
@@ -303,7 +308,7 @@ children:
         position: [0, 3]
         text_params:
           scale: 5.5
-        text: "Exit the Game?"
+        text: "Exit Sulis?"
       cancel:
         from: .button
         preferred_size: [24, 12]

@@ -65,7 +65,7 @@ impl WidgetKind for CharacterWindow {
             ChangeListener::invalidate(NAME, widget));
 
         let title = Widget::with_theme(Label::empty(), "title");
-        title.borrow_mut().state.add_text_arg("name", &self.character.borrow().actor.actor.id);
+        title.borrow_mut().state.add_text_arg("name", &self.character.borrow().actor.actor.name);
 
         let close = Widget::with_theme(Button::empty(), "close");
         close.borrow_mut().state.add_callback(Callback::remove_parent());
@@ -84,6 +84,10 @@ pub fn create_details_text_box(pc: &ActorState) -> Rc<RefCell<Widget>> {
         state.add_text_arg("name", &pc.actor.name);
         state.add_text_arg("race", &pc.actor.race.name);
         state.add_text_arg("sex", &pc.actor.sex.to_string());
+
+        if let Some(ref portrait) = pc.actor.portrait {
+            state.add_text_arg("portrait", &portrait.id());
+        }
 
         for attribute in Attribute::iter() {
             state.add_text_arg(attribute.short_name(), &stats.attributes.get(*attribute).to_string())

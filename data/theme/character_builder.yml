@@ -278,7 +278,7 @@ children:
           portrait_selector:
             background: bg_base
             border: [2, 2, 2, 2]
-            preferred_size: [85, 85]
+            preferred_size: [115, 115]
             width_relative: Zero
             height_relative: Zero
             x_relative: Center

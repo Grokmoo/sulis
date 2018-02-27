@@ -100,6 +100,7 @@ pub struct Module {
 pub struct ModuleInfo {
     pub dir: String,
     pub name: String,
+    pub description: String,
 }
 
 impl ModuleInfo {
@@ -112,6 +113,7 @@ impl ModuleInfo {
         Ok(ModuleInfo {
             dir: path_str,
             name: game.name,
+            description: game.description,
         })
     }
 }

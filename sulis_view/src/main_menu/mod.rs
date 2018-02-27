@@ -20,7 +20,7 @@ use std::cell::RefCell;
 
 use sulis_core::io::{InputAction, MainLoopUpdater};
 use sulis_core::ui::*;
-use sulis_widgets::{Button, ConfirmationWindow, Label, list_box, MutuallyExclusiveListBox};
+use sulis_widgets::{Button, ConfirmationWindow, Label, list_box, MutuallyExclusiveListBox, TextArea};
 use sulis_module::ModuleInfo;
 
 pub struct MainMenuLoopUpdater {
@@ -103,9 +103,18 @@ impl WidgetKind for MainMenuView {
         let play = Widget::with_theme(Button::empty(), "play_button");
         let mut entries: Vec<list_box::Entry<ModuleInfo>> = Vec::new();
 
+        let details = Widget::with_theme(TextArea::empty(), "details");
+
+        let details_ref = Rc::clone(&details);
         let play_ref = Rc::clone(&play);
         let cb: Rc<Fn(Option<&list_box::Entry<ModuleInfo>>)> = Rc::new(move |active_entry| {
             play_ref.borrow_mut().state.set_enabled(active_entry.is_some());
+            if let Some(entry) = active_entry {
+                details_ref.borrow_mut().state.add_text_arg("description", &entry.item().description);
+            } else {
+                details_ref.borrow_mut().state.clear_text_args();
+            }
+            details_ref.borrow_mut().invalidate_layout();
         });
         for module in self.modules.iter() {
             let entry = list_box::Entry::new(module.clone(), None);
@@ -131,6 +140,6 @@ impl WidgetKind for MainMenuView {
         })));
         play.borrow_mut().state.disable();
 
-        vec![title, modules_title, play, modules_list]
+        vec![title, modules_title, play, modules_list, details]
     }
 }

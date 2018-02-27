@@ -141,21 +141,17 @@ impl WidgetKind for CharacterSelector {
             EXIT.with(|exit| *exit.borrow_mut() = true);
         })));
 
-        let (details, name) = if let Some(ref actor) = self.selected {
-            let name = Widget::with_theme(Label::empty(), "selected_name");
-            name.borrow_mut().state.add_text_arg("name", &actor.name);
-
+        let details = if let Some(ref actor) = self.selected {
             let mut actor_state = ActorState::new(Rc::clone(actor));
             actor_state.compute_stats();
             actor_state.init();
             actor_state.init_turn();
-            (create_details_text_box(&actor_state), name)
+            create_details_text_box(&actor_state)
         } else {
-            (Widget::with_theme(TextArea::empty(), "details"),
-            Widget::with_theme(Label::empty(), "selected_name"))
+            Widget::with_theme(TextArea::empty(), "details")
         };
 
-        vec![title, chars_title, characters_pane, new_character_button, play_button, details, name]
+        vec![title, chars_title, characters_pane, new_character_button, play_button, details]
     }
 }
 

@@ -1,4 +1,6 @@
 starting_area: test_area
 starting_location: [2, 2]
-pc: pc
 name: "Test Module 1"
+description: |
+  This is the test module for Sulis.
+  Pick your [c=F00|character] and begin play.

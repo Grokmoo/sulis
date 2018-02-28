@@ -23,7 +23,7 @@ use sulis_module::Area;
 use animation::{MeleeAttackAnimation, RangedAttackAnimation};
 use sulis_module::{Actor, EntitySize, EntitySizeIterator};
 use sulis_module::area::Transition;
-use {ActorState, AreaState, ChangeListenerList, GameState, has_visibility, Location};
+use {ActorState, AreaState, ChangeListenerList, GameState, has_visibility, Location, PropState};
 
 pub struct EntityState {
     pub actor: ActorState,
@@ -153,20 +153,22 @@ impl EntityState {
         has_visibility(area, &self, &other.borrow())
     }
 
-    fn dist(&self, to_x: i32, to_y: i32, to_size: i32) -> f32 {
+    fn dist(&self, to_x: i32, to_y: i32, to_width: i32, to_height: i32) -> f32 {
         let self_half_size = self.size() as f32 / 2.0;
-        let other_half_size = to_size as f32 / 2.0;
+        let other_half_width = to_width as f32 / 2.0;
+        let other_half_height = to_height as f32 / 2.0;
         let from_x = self.location.x as f32 + self_half_size;
         let from_y = self.location.y as f32 + self_half_size;
-        let to_x = to_x as f32 + other_half_size;
-        let to_y = to_y as f32 + other_half_size;
+        let to_x = to_x as f32 + other_half_width;
+        let to_y = to_y as f32 + other_half_height;
 
         ((from_x - to_x) * (from_x - to_x) + (from_y - to_y) * (from_y - to_y)).sqrt()
-            - self_half_size - other_half_size
+            - self_half_size - (other_half_width + other_half_height) / 2.0
     }
 
     pub fn dist_to_entity(&self, other: &Rc<RefCell<EntityState>>) -> f32 {
-        let value = self.dist(other.borrow().location.x, other.borrow().location.y, other.borrow().size());
+        let value = self.dist(other.borrow().location.x, other.borrow().location.y,
+            other.borrow().size(), other.borrow().size());
 
         trace!("Computed distance from '{}' at {:?} to '{}' at {:?} = {}", self.actor.actor.name,
                self.location, other.borrow().actor.actor.name, other.borrow().location, value);
@@ -175,10 +177,17 @@ impl EntityState {
     }
 
     pub fn dist_to_transition(&self, other: &Transition) -> f32 {
-        let value = self.dist(other.from.x, other.from.y, other.size.width);
+        let value = self.dist(other.from.x, other.from.y, other.size.width, other.size.height);
 
         trace!("Computed distance from '{}' at {:?} to transition at {:?} = {}",
                self.actor.actor.name, self.location, other.from, value);
+
+        value
+    }
+
+    pub fn dist_to_prop(&self, other: &PropState) -> f32 {
+        let value = self.dist(other.location.x, other.location.y,
+                              other.prop.width as i32, other.prop.height as i32);
 
         value
     }

@@ -50,6 +50,12 @@ pub use self::initiative_ticker::InitiativeTicker;
 mod inventory_window;
 pub use self::inventory_window::InventoryWindow;
 
+mod prop_mouseover;
+pub use self::prop_mouseover::PropMouseover;
+
+mod prop_window;
+pub use self::prop_window::PropWindow;
+
 pub mod main_menu;
 
 pub mod character_selector;
@@ -75,20 +81,57 @@ impl RootView {
     pub fn new() -> Rc<RefCell<RootView>> {
         Rc::new(RefCell::new(RootView { }))
     }
+
+    pub fn toggle_prop_window(&mut self, widget: &Rc<RefCell<Widget>>,
+                              desired_state: bool, prop_index: usize) {
+        self.toggle_window(widget, self::prop_window::NAME, desired_state, &|| {
+            PropWindow::new(prop_index)
+        });
+
+        self.toggle_inventory_window(widget, desired_state);
+    }
+
+    pub fn toggle_inventory_window(&mut self, widget: &Rc<RefCell<Widget>>, desired_state: bool) {
+        self.toggle_window(widget, self::inventory_window::NAME, desired_state, &|| {
+            InventoryWindow::new(&GameState::pc())
+        });
+    }
+
+    pub fn toggle_character_window(&mut self, widget: &Rc<RefCell<Widget>>, desired_state: bool) {
+        self.toggle_window(widget, self::character_window::NAME, desired_state, &|| {
+            CharacterWindow::new(&GameState::pc())
+        });
+    }
+
+    pub fn toggle_character_builder(&mut self, widget: &Rc<RefCell<Widget>>, desired_state: bool) {
+        self.toggle_window(widget, self::character_builder::NAME, desired_state, &|| {
+            CharacterBuilder::new()
+        });
+    }
+
+    fn toggle_window(&mut self, widget: &Rc<RefCell<Widget>>, name: &str, desired_state: bool,
+                     cb: &Fn() -> Rc<RefCell<WidgetKind>>) {
+        match Widget::get_child_with_name(widget, name) {
+            None => {
+                if desired_state {
+                    let window = Widget::with_defaults(cb());
+                    Widget::add_child_to(&widget, window);
+                }
+            }, Some(ref window) => {
+                if !desired_state {
+                    window.borrow_mut().mark_for_removal();
+                }
+            }
+        }
+    }
 }
 
 impl WidgetKind for RootView {
-    fn get_name(&self) -> &str {
-        NAME
-    }
+    fn get_name(&self) -> &str { NAME }
 
-    fn as_any(&self) -> &Any {
-        self
-    }
+    fn as_any(&self) -> &Any { self }
 
-    fn as_any_mut(&mut self) -> &mut Any {
-        self
-    }
+    fn as_any_mut(&mut self) -> &mut Any { self }
 
     fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
         use sulis_core::io::InputAction::*;
@@ -102,34 +145,16 @@ impl WidgetKind for RootView {
                 Widget::add_child_to(&widget, exit_window);
             },
             ToggleInventory => {
-                let window = Widget::get_child_with_name(widget, self::inventory_window::NAME);
-                match window {
-                    None => {
-                        let window = Widget::with_defaults(
-                            InventoryWindow::new(&GameState::pc()));
-                        Widget::add_child_to(&widget, window);
-                    },
-                    Some(window) => window.borrow_mut().mark_for_removal(),
-                }
+                let desired_state = !Widget::has_child_with_name(widget, self::inventory_window::NAME);
+                self.toggle_inventory_window(widget, desired_state);
             },
             ToggleCharacter => {
-                let window = Widget::get_child_with_name(widget, self::character_window::NAME);
-                match window {
-                    None => {
-                        let window = Widget::with_defaults(
-                            CharacterWindow::new(&GameState::pc()));
-                        Widget::add_child_to(&widget, window);
-                    },
-                    Some(window) => window.borrow_mut().mark_for_removal(),
-                }
+                let desired_state = !Widget::has_child_with_name(widget, self::character_window::NAME);
+                self.toggle_character_window(widget, desired_state);
             },
             ToggleCharacterBuilder => {
-                let window = Widget::get_child_with_name(widget,
-                                                         self::character_builder::NAME);
-                match window {
-                    None => Widget::add_child_to(&widget, Widget::with_defaults(CharacterBuilder::new())),
-                    Some(window) => window.borrow_mut().mark_for_removal(),
-                }
+                let desired_state = !Widget::has_child_with_name(widget, self::character_builder::NAME);
+                self.toggle_character_builder(widget, desired_state);
             },
             _ => return false,
         }

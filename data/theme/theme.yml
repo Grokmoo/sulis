@@ -10,11 +10,11 @@ children:
     background: bg_base
     text: |
       [x=2.0;y=4.0;s=5.0|#name#]
-      [x=2.0|#cur_hp# / #max_hp#]
+      [?cur_hp;x=2.0|#cur_hp# / #max_hp#]
     preferred_size: [20, 12]
-    x_relative: Cursor
-    y_relative: Cursor
-    position: [-10, 5]
+    x_relative: Custom
+    y_relative: Custom
+    position: [-10, 0]
   right_pane:
     background: bg_base
     border: [1, 1, 1, 1]
@@ -93,6 +93,35 @@ children:
             border: [0, 0, 0, 0]
             width_relative: Max
             position: [0, 4]
+  prop_window:
+    from: .window
+    position: [4, 4]
+    preferred_size: [100, 100]
+    height_relative: Zero
+    children:
+      title:
+        text: "#name#"
+      icon:
+        preferred_size: [20, 20]
+        background: bg_base
+        position: [0, 5]
+      take_all:
+        from: .button
+        text: "Take All"
+        text_params:
+          scale: 5.0
+        preferred_size: [25, 10]
+        position: [25, 10]
+      items_list:
+        preferred_size: [0, -28]
+        position: [0, 28]
+        width_relative: Max
+        height_relative: Max
+        layout: Grid
+        layout_spacing: [0, 1, 0, 1]
+        children:
+          item_button:
+            from: .item_button
   inventory_window:
     from: .window
     position: [120, 4]
@@ -220,7 +249,7 @@ children:
                   [x=0|Wisdom][x=40|#wis#]]
           [s=6|]
           [x=0|Initiative][x=40|#initiative#]
-          [x=80;y=0;i=#portrait#;s=30.0|]
+          [?portrait;x=80;y=0;i=#portrait#;s=30.0|]
         preferred_size: [0, -8]
         position: [0, 8]
         width_relative: Max

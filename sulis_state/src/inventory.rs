@@ -44,6 +44,10 @@ impl Inventory {
         }
     }
 
+    pub fn add(&mut self, item_state: ItemState) {
+        self.items.push(item_state);
+    }
+
     pub fn get_index(&self, slot: Slot) -> Option<usize> {
         match self.equipped.get(&slot) {
             None => None,

@@ -42,17 +42,11 @@ impl InventoryWindow {
 }
 
 impl WidgetKind for InventoryWindow {
-    fn get_name(&self) -> &str {
-        NAME
-    }
+    fn get_name(&self) -> &str { NAME }
 
-    fn as_any(&self) -> &Any {
-        self
-    }
+    fn as_any(&self) -> &Any { self }
 
-    fn as_any_mut(&mut self) -> &mut Any {
-        self
-    }
+    fn as_any_mut(&mut self) -> &mut Any { self }
 
     fn layout(&mut self, widget: &mut Widget) {
         widget.do_base_layout();
@@ -80,7 +74,7 @@ impl WidgetKind for InventoryWindow {
                 continue;
             }
 
-            let button = Widget::with_defaults(ItemButton::new(Some(index)));
+            let button = Widget::with_defaults(ItemButton::new(Some(index), None));
             button.borrow_mut().state.add_text_arg("icon", &item.item.icon.id());
 
             match item.item.equippable {
@@ -101,7 +95,8 @@ impl WidgetKind for InventoryWindow {
         let equipped_area = Widget::empty("equipped_area");
         for slot in Slot::iter() {
             let theme_id = format!("{:?}_button", slot).to_lowercase();
-            let button = Widget::with_theme(ItemButton::new(actor.inventory().get_index(*slot)), &theme_id);
+            let button = Widget::with_theme(ItemButton::new(actor.inventory().get_index(*slot), None),
+                &theme_id);
 
             button.borrow_mut().state.add_callback(Callback::with(Box::new(move || {
                 let pc = GameState::pc();
@@ -123,20 +118,22 @@ impl WidgetKind for InventoryWindow {
     }
 }
 
-struct ItemButton {
+pub struct ItemButton {
     button: Rc<RefCell<Button>>,
     item_window: Option<Rc<RefCell<Widget>>>,
     item_index: Option<usize>,
+    prop_index: Option<usize>,
 }
 
 const ITEM_BUTTON_NAME: &str = "item_button";
 
 impl ItemButton {
-    pub fn new(index: Option<usize>) -> Rc<RefCell<ItemButton>> {
+    pub fn new(index: Option<usize>, prop_index: Option<usize>) -> Rc<RefCell<ItemButton>> {
         Rc::new(RefCell::new(ItemButton {
             button: Button::empty(),
             item_window: None,
             item_index: index,
+            prop_index,
         }))
     }
 
@@ -162,8 +159,17 @@ impl WidgetKind for ItemButton {
 
         if self.item_index.is_some() && self.item_window.is_none() {
             let pc = GameState::pc();
-            let pc = pc.borrow_mut();
-            let item_state = &pc.actor.inventory().items[self.item_index.unwrap()];
+            let pc = pc.borrow();
+            let area_state = GameState::area_state();
+            let area_state = area_state.borrow();
+
+            let item_state = match self.prop_index {
+                None => {
+                    &pc.actor.inventory().items[self.item_index.unwrap()]
+                }, Some(prop_index) => {
+                    &area_state.props[prop_index].items[self.item_index.unwrap()]
+                }
+            };
 
             let item_window = Widget::with_theme(TextArea::empty(), "item_window");
             {

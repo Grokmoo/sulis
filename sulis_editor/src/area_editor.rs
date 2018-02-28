@@ -24,11 +24,11 @@ use std::cmp;
 use sulis_core::config::CONFIG;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::io::event::ClickKind;
-use sulis_module::{Actor, Module};
+use sulis_module::{Actor, Module, Prop};
 use sulis_core::resource::{ResourceSet, read_single_resource, write_to_file};
 use sulis_core::ui::{Color, Cursor, Widget, WidgetKind};
 use sulis_core::util::{Point};
-use sulis_module::area::{ActorData, AreaBuilder, Tile, Transition, TransitionBuilder};
+use sulis_module::area::{ActorData, AreaBuilder, PropData, Tile, Transition, TransitionBuilder};
 
 use {ActorPicker, TilePicker};
 
@@ -62,6 +62,7 @@ pub struct AreaEditor {
 
     tiles: Vec<(String, Vec<(Point, Rc<Tile>)>)>,
     actors: Vec<(Point, Rc<Actor>)>,
+    props: Vec<(Point, Rc<Prop>)>,
     transitions: Vec<Transition>,
 
     pub id: String,
@@ -82,6 +83,7 @@ impl AreaEditor {
             mode: Mode::Tiles,
             tiles,
             actors: Vec::new(),
+            props: Vec::new(),
             transitions: Vec::new(),
             tile_picker: Rc::clone(tile_picker),
             actor_picker: Rc::clone(actor_picker),
@@ -208,6 +210,19 @@ impl AreaEditor {
             self.actors.push((actor_data.location, actor));
         }
 
+        trace!("Loading area props.");
+        self.props.clear();
+        for prop_data in area_builder.props {
+            let prop = match Module::prop(&prop_data.id) {
+                None => {
+                    warn!("No prop with ID {} found", prop_data.id);
+                    continue;
+                }, Some(prop) => prop,
+            };
+
+            self.props.push((prop_data.location, prop));
+        }
+
         trace!("Loading area transitions.");
         self.transitions.clear();
         for transition_builder in area_builder.transitions {
@@ -257,6 +272,12 @@ impl AreaEditor {
             actors.push(ActorData { id: actor.id.to_string(), location: pos });
         }
 
+        trace!("Saving props.");
+        let mut props: Vec<PropData> = Vec::new();
+        for &(pos, ref prop) in self.props.iter() {
+            props.push(PropData { id: prop.id.to_string(), location: pos });
+        }
+
         trace!("Saving transitions");
         let mut transitions: Vec<TransitionBuilder> = Vec::new();
         for ref transition in self.transitions.iter() {
@@ -280,6 +301,7 @@ impl AreaEditor {
             generate: false,
             entity_layer,
             actors,
+            props,
             transitions,
         };
 
@@ -433,6 +455,9 @@ impl WidgetKind for AreaEditor {
 
     fn draw_graphics_mode(&mut self, renderer: &mut GraphicsRenderer, _pixel_size: Point,
                           widget: &Widget, millis: u32) {
+        let scale_x = 1.0;
+        let scale_y = 1.0;
+
         let p = widget.state.inner_position;
         let s = widget.state.scroll_pos;
 
@@ -449,13 +474,9 @@ impl WidgetKind for AreaEditor {
             renderer.draw(draw_list);
         }
 
-        let mut draw_list = DrawList::empty_sprite();
         for &(pos, ref actor) in self.actors.iter() {
-            actor.append_to_draw_list_i32(&mut draw_list, pos.x + p.x - s.x, pos.y + p.y - s.y, millis);
-        }
-
-        if !draw_list.is_empty() {
-            renderer.draw(draw_list);
+            actor.draw(renderer, scale_x, scale_y,
+                       (pos.x + p.x - s.x) as f32, (pos.y + p.y - s.y) as f32, millis);
         }
 
         for ref transition in self.transitions.iter() {
@@ -482,13 +503,14 @@ impl WidgetKind for AreaEditor {
         }
 
         if !self.removal_actors.is_empty() {
-            let mut draw_list = DrawList::empty_sprite();
-            for &(pos, ref actor) in self.removal_actors.iter() {
-                actor.append_to_draw_list_i32(&mut draw_list, pos.x + p.x - s.x, pos.y + p.y - s.y, millis);
-            }
-
-            draw_list.set_color(Color::from_string("FF000088"));
-            renderer.draw(draw_list);
+            // TODO implement
+            // let mut draw_list = DrawList::empty_sprite();
+            // for &(pos, ref actor) in self.removal_actors.iter() {
+            //     actor.append_to_draw_list_i32(&mut draw_list, pos.x + p.x - s.x, pos.y + p.y - s.y, millis);
+            // }
+            //
+            // draw_list.set_color(Color::from_string("FF000088"));
+            // renderer.draw(draw_list);
         }
 
         if let Some((cur_tile_pos, ref cur_tile)) = self.cur_tile {
@@ -502,11 +524,12 @@ impl WidgetKind for AreaEditor {
         }
 
         if let Some((cur_actor_pos, ref cur_actor)) = self.cur_actor {
-            let mut draw_list = DrawList::empty_sprite();
-            cur_actor.append_to_draw_list_i32(&mut draw_list, cur_actor_pos.x + p.x - s.x,
-                                          cur_actor_pos.y + p.y - s.y, millis);
-            draw_list.set_color(Color::from_string("FFFFFF88"));
-            renderer.draw(draw_list);
+            // TODO implement
+            // let mut draw_list = DrawList::empty_sprite();
+            // cur_actor.append_to_draw_list_i32(&mut draw_list, cur_actor_pos.x + p.x - s.x,
+            //                               cur_actor_pos.y + p.y - s.y, millis);
+            // draw_list.set_color(Color::from_string("FFFFFF88"));
+            // renderer.draw(draw_list);
         }
     }
 

@@ -1,0 +1,4 @@
+id: props/chest
+states:
+  normal: creatures/chest_closed
+  active: creatures/chest_open

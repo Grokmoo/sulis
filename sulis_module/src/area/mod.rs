@@ -37,7 +37,7 @@ use sulis_core::util::{Point, Size};
 use sulis_core::serde_json;
 use sulis_core::serde_yaml;
 
-use Module;
+use {Module, Prop};
 
 #[derive(Debug, Clone)]
 pub struct Transition {
@@ -55,6 +55,13 @@ pub struct ActorData {
     pub location: Point,
 }
 
+#[derive(Deserialize, Serialize, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct PropData {
+    pub id: String,
+    pub location: Point,
+}
+
 pub struct Area {
     pub id: String,
     pub name: String,
@@ -64,6 +71,7 @@ pub struct Area {
     path_grids: HashMap<i32, PathFinderGrid>,
     pub visibility_tile: Rc<Sprite>,
     pub actors: Vec<ActorData>,
+    pub props: Vec<(Rc<Prop>, Point)>,
     pub transitions: Vec<Transition>,
 }
 
@@ -75,8 +83,23 @@ impl PartialEq for Area {
 
 impl Area {
     pub fn new(builder: AreaBuilder, module: &Module) -> Result<Area, Error> {
+        // TODO validate prop position
+
+        let mut props = Vec::new();
+        for prop_data in builder.props.iter() {
+            let prop = match module.props.get(&prop_data.id) {
+                None => {
+                    warn!("No prop '{}' found for area '{}'",
+                          prop_data.id, builder.id);
+                    continue;
+                }, Some(prop) => Rc::clone(prop),
+            };
+
+            props.push((prop, prop_data.location));
+        }
+
         info!("Creating area {}", builder.id);
-        let terrain = Terrain::new(&builder, module);
+        let terrain = Terrain::new(&builder, module, &props);
         let terrain = match terrain {
             Ok(l) => l,
             Err(e) => {
@@ -137,6 +160,7 @@ impl Area {
             terrain: terrain,
             path_grids: path_grids,
             actors: builder.actors,
+            props,
             visibility_tile,
             transitions,
         })
@@ -166,6 +190,7 @@ pub struct AreaBuilder {
     pub layers: Vec<String>,
     pub entity_layer: usize,
     pub actors: Vec<ActorData>,
+    pub props: Vec<PropData>,
     pub transitions: Vec<TransitionBuilder>,
     pub visibility_tile: String,
 }

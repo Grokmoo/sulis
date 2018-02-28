@@ -21,7 +21,7 @@ use sulis_core::io::GraphicsRenderer;
 use sulis_core::image::{LayeredImage};
 use sulis_core::ui::{color, Color};
 use sulis_module::{item, Actor, Module};
-use {ChangeListenerList, EntityState, Inventory};
+use {ChangeListenerList, EntityState, GameState, Inventory};
 use sulis_rules::{HitKind, StatList};
 
 pub struct ActorState {
@@ -130,6 +130,33 @@ impl ActorState {
         }
 
         (damage_str, color)
+    }
+
+    pub fn take_all(&mut self, prop_index: usize) {
+        let area_state = GameState::area_state();
+        let prop_state = &mut area_state.borrow_mut().props[prop_index];
+
+        if prop_state.num_items() > 0 {
+            let mut i = prop_state.num_items() - 1;
+            loop {
+                let item_state = prop_state.remove_item(i);
+                self.inventory.add(item_state);
+
+                if i == 0 { break; }
+
+                i -= 1;
+            }
+            self.listeners.notify(&self);
+        }
+    }
+
+    pub fn take(&mut self, prop_index: usize, item_index: usize) {
+        let area_state = GameState::area_state();
+        let prop_state = &mut area_state.borrow_mut().props[prop_index];
+
+        let item_state = prop_state.remove_item(item_index);
+        self.inventory.add(item_state);
+        self.listeners.notify(&self);
     }
 
     pub fn equip(&mut self, index: usize) -> bool {

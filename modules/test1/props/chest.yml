@@ -1,0 +1,9 @@
+id: chest
+name: Chest
+icon: inventory/misc_crate
+image: props/chest
+width: 3
+height: 3
+visible: true
+passable: false
+items: [shortsword, shortbow]

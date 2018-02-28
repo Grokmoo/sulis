@@ -298,11 +298,46 @@ impl Widget {
         }
     }
 
+    /// gets the child of the specified widget with the specified kind name, if it
+    /// exists.  note that this uses try_borrow and will not check a widget kind
+    /// that is already borrowed (typically by the caller).
+    /// returns true if the child exists, false otherwise
+    pub fn has_child_with_name(widget: &Rc<RefCell<Widget>>, name: &str) -> bool {
+        for child in widget.borrow().children.iter() {
+            let child_ref = match child.try_borrow() {
+                Err(_) => continue,
+                Ok(child) => child,
+            };
+
+            let kind = match child_ref.kind.try_borrow() {
+                Err(_) => continue,
+                Ok(kind) => kind,
+            };
+
+            if kind.get_name() == name {
+                return true;
+            }
+        }
+        false
+    }
+
+    /// gets the child of the specified widget with the specified kind name, if it
+    /// exists.  note that this uses try_borrow and will not check a widget kind
+    /// that is already borrowed (typically by the caller)
     pub fn get_child_with_name(widget: &Rc<RefCell<Widget>>,
                                name: &str) -> Option<Rc<RefCell<Widget>>> {
         for child in widget.borrow().children.iter() {
-            let child_ref = child.borrow();
-            if child_ref.kind.borrow().get_name() == name {
+            let child_ref = match child.try_borrow() {
+                Err(_) => continue,
+                Ok(child) => child,
+            };
+
+            let kind = match child_ref.kind.try_borrow() {
+                Err(_) => continue,
+                Ok(kind) => kind,
+            };
+
+            if kind.get_name() == name {
                 return Some(Rc::clone(child));
             }
         }
@@ -353,13 +388,15 @@ impl Widget {
         }
     }
 
-    pub fn set_mouse_over(widget: &Rc<RefCell<Widget>>, mouse_over: Rc<RefCell<WidgetKind>>) {
+    pub fn set_mouse_over(widget: &Rc<RefCell<Widget>>, mouse_over: Rc<RefCell<WidgetKind>>,
+                          x: i32, y: i32) {
         let root = Widget::get_root(widget);
         Widget::remove_mouse_over(&root);
 
         trace!("Add mouse over from '{}'", widget.borrow().theme_id);
         let child = Widget::with_theme(mouse_over, "mouse_over");
         child.borrow_mut().state.is_mouse_over = true;
+        child.borrow_mut().state.position = Point::new(x, y);
         Widget::add_child_to(&root, child);
     }
 

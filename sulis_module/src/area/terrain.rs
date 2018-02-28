@@ -18,10 +18,10 @@ use std::io::Error;
 use std::rc::Rc;
 use std::collections::HashMap;
 
-use sulis_core::util::invalid_data_error;
+use sulis_core::util::{invalid_data_error, Point};
 
 use area::{AreaBuilder, Layer, Tile};
-use {Module, generator};
+use {Module, Prop, generator};
 
 pub struct Terrain {
     pub width: i32,
@@ -33,7 +33,8 @@ pub struct Terrain {
 }
 
 impl Terrain {
-    pub fn new(builder: &AreaBuilder, module: &Module) -> Result<Terrain, Error> {
+    pub fn new(builder: &AreaBuilder, module: &Module, props: &Vec<(Rc<Prop>, Point)>)
+        -> Result<Terrain, Error> {
         let width = builder.width as i32;
         let height = builder.height as i32;
         let dim = (width * height) as usize;
@@ -111,6 +112,29 @@ impl Terrain {
 
                 if !layer.is_visible_index(index) {
                     visible[index] = false;
+                }
+            }
+        }
+
+        for &(ref prop, position) in props.iter() {
+            let start_x = position.x as usize;
+            let start_y = position.y as usize;
+            let end_x = start_x + prop.width as usize;
+            let end_y = start_y + prop.height as usize;
+
+            if !prop.passable {
+                for y in start_y..end_y {
+                    for x in start_x..end_x {
+                        passable[x + y * width as usize] = false;
+                    }
+                }
+            }
+
+            if !prop.visible {
+                for y in start_y..end_y {
+                    for x in start_x..end_x {
+                        visible[x + y * width as usize] = false;
+                    }
                 }
             }
         }

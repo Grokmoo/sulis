@@ -134,3 +134,6 @@ groups:
       
       shield_small: [0, 21]
       shield_large: [3, 21]
+      
+      chest_closed: [6, 27]
+      chest_open: [9, 27]

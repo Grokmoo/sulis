@@ -31,7 +31,7 @@ children:
         preferred_size: [35, 10]
       finish:
         from: .button
-        text: "Finish"
+        text: "Save"
         y_relative: Max
         text_params:
           scale: 6.0

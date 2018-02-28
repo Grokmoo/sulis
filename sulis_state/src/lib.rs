@@ -57,6 +57,9 @@ pub use self::los_calculator::has_visibility;
 mod path_finder;
 use self::path_finder::PathFinder;
 
+mod prop_state;
+pub use self::prop_state::PropState;
+
 mod turn_timer;
 pub use self::turn_timer::TurnTimer;
 

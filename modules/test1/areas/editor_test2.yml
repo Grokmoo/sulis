@@ -647,5 +647,6 @@ layers:
   - object
 entity_layer: 0
 actors: []
+props: []
 transitions: []
 visibility_tile: gui/area_invis

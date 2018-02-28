@@ -22,25 +22,25 @@ use sulis_core::ui::{Widget, WidgetKind};
 use sulis_core::io::{GraphicsRenderer};
 use sulis_core::util::Point;
 use sulis_widgets::{MarkupRenderer, TextArea};
-use sulis_state::{ChangeListener, EntityState};
+use sulis_state::{GameState};
 
-const NAME: &'static str = "entity_mouseover";
+const NAME: &'static str = "prop_mouseover";
 
-pub struct EntityMouseover {
-    entity: Rc<RefCell<EntityState>>,
+pub struct PropMouseover {
+    prop_index: usize,
     text_area: Rc<RefCell<TextArea>>,
 }
 
-impl EntityMouseover {
-    pub fn new(entity: &Rc<RefCell<EntityState>>) -> Rc<RefCell<EntityMouseover>> {
-        Rc::new(RefCell::new(EntityMouseover {
-            entity: Rc::clone(entity),
+impl PropMouseover {
+    pub fn new(prop_index: usize) -> Rc<RefCell<PropMouseover>> {
+        Rc::new(RefCell::new(PropMouseover {
+            prop_index,
             text_area: TextArea::empty(),
         }))
     }
 }
 
-impl WidgetKind for EntityMouseover {
+impl WidgetKind for PropMouseover {
     fn get_name(&self) -> &str { NAME }
 
     fn as_any(&self) -> &Any { self }
@@ -48,20 +48,26 @@ impl WidgetKind for EntityMouseover {
     fn as_any_mut(&mut self) -> &mut Any { self }
 
     fn on_remove(&mut self) {
-        //self.entity.borrow_mut().actor.listeners.remove(NAME);
+        // let area_state = GameState::area_state();
+        // let prop = &mut area_state.borrow_mut().props[self.prop_index];
+        //
+        // prop.listeners.remove(NAME);
     }
 
-    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
-        self.entity.borrow_mut().actor.listeners.add(
-            ChangeListener::invalidate_layout(NAME, widget));
+    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+        // let area_state = GameState::area_state();
+        // let prop = &mut area_state.borrow_mut().props[self.prop_index];
+        //
+        // prop.listeners.add(ChangeListener::invalidate_layout(NAME, widget));
 
         Vec::new()
     }
 
     fn layout(&mut self, widget: &mut Widget) {
-        widget.state.add_text_arg("name", &self.entity.borrow().actor.actor.name);
-        widget.state.add_text_arg("cur_hp", &self.entity.borrow().actor.hp().to_string());
-        widget.state.add_text_arg("max_hp", &self.entity.borrow().actor.stats.max_hp.to_string());
+        let area_state = GameState::area_state();
+        let prop = &mut area_state.borrow_mut().props[self.prop_index];
+
+        widget.state.add_text_arg("name", &prop.prop.name);
 
         widget.do_base_layout();
 

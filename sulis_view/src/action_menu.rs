@@ -25,10 +25,13 @@ use sulis_module::{Area, Module};
 use sulis_state::{ChangeListener, GameState, EntityState};
 use sulis_widgets::{Label, list_box, ListBox};
 
+use {RootView};
+
 const NAME: &'static str = "action_menu";
 
 pub struct ActionMenu {
     hovered_entity: Option<Rc<RefCell<EntityState>>>,
+    hovered_prop: Option<usize>,
     is_hover_pc: bool,
     area: Rc<Area>,
     area_pos: Point,
@@ -45,40 +48,43 @@ impl ActionMenu {
                 (None, false)
             };
 
+        let hovered_prop = area_state.prop_index_at(x, y);
 
         Rc::new(RefCell::new(ActionMenu {
             area_pos: Point::new(x, y),
             area: Rc::clone(&area_state.area),
             hovered_entity,
             is_hover_pc,
+            hovered_prop,
         }))
     }
 
     pub fn is_transition_valid(&self) -> bool {
+        let max_dist = Module::rules().max_transition_distance;
+
         let area_state = GameState::area_state();
         if let Some(transition) = area_state.borrow()
             .get_transition_at(self.area_pos.x, self.area_pos.y) {
                 let pc = GameState::pc();
-                return pc.borrow().dist_to_transition(transition) < 2.5;
+                return pc.borrow().dist_to_transition(transition) < max_dist;
             }
         false
     }
 
-    pub fn transition_callback(&self) -> Option<Callback> {
+    pub fn transition_callback(&self) -> Callback {
         let area_state = GameState::area_state();
         let (area_id, x, y) = match area_state.borrow()
             .get_transition_at(self.area_pos.x, self.area_pos.y) {
-                None => return None,
+                None => return Callback::empty(),
                 Some(transition) => (transition.to_area.clone(), transition.to.x, transition.to.y)
             };
 
-        Some(Callback::new(Rc::new( move |widget, _kind| {
+        Callback::new(Rc::new( move |widget, _kind| {
             trace!("Firing transition callback.");
             GameState::transition(&area_id, x, y);
-            Widget::mark_removal_up_tree(&widget, 2);
             let root = Widget::get_root(&widget);
             root.borrow_mut().invalidate_children();
-        })))
+        }))
     }
 
     pub fn is_attack_valid(&self) -> bool {
@@ -91,16 +97,16 @@ impl ActionMenu {
         }
     }
 
-    pub fn attack_callback(&self) -> Box<Fn()> {
+    pub fn attack_callback(&self) -> Callback {
         if let Some(ref entity) = self.hovered_entity {
             let entity_ref = Rc::clone(entity);
-            Box::new(move || {
+            Callback::new(Rc::new(move |_, _| {
                 trace!("Firing attack callback.");
                 let pc = GameState::pc();
                 EntityState::attack(&pc, &entity_ref);
-            })
+            }))
         } else {
-            Box::new(|| { })
+            Callback::empty()
         }
     }
 
@@ -113,48 +119,85 @@ impl ActionMenu {
         GameState::can_move_to(&pc, self.area_pos.x, self.area_pos.y)
     }
 
-    pub fn move_callback(&self) -> Box<Fn()> {
+    pub fn move_callback(&self) -> Callback {
         let pc = GameState::pc();
         let x = self.area_pos.x;
         let y = self.area_pos.y;
-        Box::new(move || {
+        Callback::new(Rc::new(move |widget, _| {
             trace!("Firing move callback.");
             GameState::move_to(&pc, x, y);
-        })
+
+            let root = Widget::get_root(&widget);
+            let view = Widget::downcast_kind_mut::<RootView>(&root);
+            view.toggle_prop_window(&root, false, 0);
+        }))
     }
 
-    fn callback_with_removal(f: Box<Fn()>) -> Option<Callback> {
-        Some(Callback::new(Rc::new(move |widget, _kind| {
-            f();
+    pub fn is_prop_valid(&self) -> bool {
+        let prop_index = match self.hovered_prop {
+            None => return false,
+            Some(index) => index,
+        };
+
+        let max_dist = Module::rules().max_prop_distance;
+        let area_state = GameState::area_state();
+        let prop_state = &area_state.borrow().props[prop_index];
+        let pc = GameState::pc();
+        let pc = pc.borrow();
+
+        pc.dist_to_prop(prop_state) < max_dist
+    }
+
+    pub fn prop_callback(&self) -> Callback {
+        if self.hovered_prop.is_none() {
+            return Callback::empty();
+        }
+
+        let index = self.hovered_prop.unwrap();
+        Callback::new(Rc::new(move |widget, _| {
+            let active = {
+                let area_state = GameState::area_state();
+                let mut area_state = area_state.borrow_mut();
+                area_state.props[index].toggle_active();
+                area_state.props[index].is_active()
+            };
+
+            let root = Widget::get_root(&widget);
+            let view = Widget::downcast_kind_mut::<RootView>(&root);
+            view.toggle_prop_window(&root, active, index);
+        }))
+    }
+
+    fn callback_add_removal(cb: Callback) -> Option<Callback> {
+        Some(Callback::new(Rc::new(move |widget, kind| {
+            cb.call(widget, kind);
             Widget::mark_removal_up_tree(&widget, 2);
         })))
     }
 
-    pub fn fire_default_callback(&self) {
+    pub fn fire_default_callback(&self, widget: &Rc<RefCell<Widget>>, kind: &mut WidgetKind) {
         if self.is_attack_valid() {
-            (self.attack_callback())();
+            self.attack_callback().call(widget, kind);
+        } else if self.is_transition_valid() {
+            self.transition_callback().call(widget, kind);
         } else if self.is_move_valid() {
-            (self.move_callback())();
+            self.move_callback().call(widget, kind);
+        } else if self.is_prop_valid() {
+            self.prop_callback().call(widget, kind);
         }
     }
 
     pub fn is_default_callback_valid(&self) -> bool {
-        self.is_attack_valid() || self.is_move_valid()
+        self.is_attack_valid() || self.is_move_valid() || self.is_prop_valid()
     }
 }
 
 impl WidgetKind for ActionMenu {
-    fn get_name(&self) -> &str {
-        NAME
-    }
+    fn get_name(&self) -> &str { NAME }
 
-    fn as_any(&self) -> &Any {
-        self
-    }
+    fn as_any(&self) -> &Any { self }
 
-    fn as_any_mut(&mut self) -> &mut Any {
-        self
-    }
+    fn as_any_mut(&mut self) -> &mut Any { self }
 
     fn on_remove(&mut self) {
         let area_state = GameState::area_state();
@@ -172,23 +215,28 @@ impl WidgetKind for ActionMenu {
         let mut entries: Vec<list_box::Entry<String>> = Vec::new();
         if self.is_move_valid() {
             entries.push(list_box::Entry::new(
-                    "Move".to_string(), ActionMenu::callback_with_removal(self.move_callback())));
+                    "Move".to_string(), ActionMenu::callback_add_removal(self.move_callback())));
 
         }
 
         if self.is_attack_valid() {
             entries.push(list_box::Entry::new(
-                    "Attack".to_string(), ActionMenu::callback_with_removal(self.attack_callback())));
+                    "Attack".to_string(), ActionMenu::callback_add_removal(self.attack_callback())));
         }
 
         if self.is_transition_valid() {
             entries.push(list_box::Entry::new(
-                    "Transition".to_string(), self.transition_callback()));
+                    "Transition".to_string(), ActionMenu::callback_add_removal(self.transition_callback())));
+        }
+
+        if self.is_prop_valid() {
+            entries.push(list_box::Entry::new(
+                    "Activate".to_string(), ActionMenu::callback_add_removal(self.prop_callback())));
         }
 
         if entries.is_empty() {
             entries.push(list_box::Entry::new(
-                    "None".to_string(), ActionMenu::callback_with_removal(Box::new(|| { }))));
+                    "None".to_string(), ActionMenu::callback_add_removal(Callback::empty())));
         }
         let actions = Widget::with_theme(ListBox::new(entries), "actions");
 

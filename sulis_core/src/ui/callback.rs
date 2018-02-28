@@ -32,6 +32,12 @@ impl Clone for Callback {
 }
 
 impl Callback {
+    pub fn empty() -> Callback {
+        Callback {
+            cb: Rc::new(|_, _| {}),
+        }
+    }
+
     pub fn new(f: Rc<Fn(&Rc<RefCell<Widget>>, &mut WidgetKind)>) -> Callback {
         Callback {
             cb: f,

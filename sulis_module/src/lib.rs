@@ -54,6 +54,9 @@ pub use self::item::Item;
 pub mod item_adjective;
 pub use self::item_adjective::ItemAdjective;
 
+pub mod prop;
+pub use self::prop::Prop;
+
 pub mod race;
 pub use self::race::Race;
 
@@ -75,6 +78,7 @@ use self::area::Tile;
 use self::area::AreaBuilder;
 use self::class::ClassBuilder;
 use self::item::ItemBuilder;
+use self::prop::PropBuilder;
 use self::race::RaceBuilder;
 use self::entity_size::EntitySizeBuilder;
 use self::area::TileBuilder;
@@ -91,6 +95,7 @@ pub struct Module {
     classes: HashMap<String, Rc<Class>>,
     items: HashMap<String, Rc<Item>>,
     item_adjectives: HashMap<String, Rc<ItemAdjective>>,
+    props: HashMap<String, Rc<Prop>>,
     races: HashMap<String, Rc<Race>>,
     sizes: HashMap<usize, Rc<EntitySize>>,
     tiles: HashMap<String, Rc<Tile>>,
@@ -240,6 +245,10 @@ impl Module {
                 insert_if_ok("item", id, Item::new(builder), &mut module.items);
             }
 
+            for (id, builder) in builder_set.prop_builders {
+                insert_if_ok("prop", id, Prop::new(builder, &module), &mut module.props);
+            }
+
             for (id, builder) in builder_set.race_builders.into_iter() {
                 insert_if_ok("race", id, Race::new(builder, &module), &mut module.races);
             }
@@ -313,6 +322,10 @@ impl Module {
         MODULE.with(|r| get_resource(id, &r.borrow().items))
     }
 
+    pub fn prop(id: &str) -> Option<Rc<Prop>> {
+        MODULE.with(|r| get_resource(id, &r.borrow().props))
+    }
+
     pub fn race(id: &str) -> Option<Rc<Race>> {
         MODULE.with(|r| get_resource(id, &r.borrow().races))
     }
@@ -343,6 +356,7 @@ impl Default for Module {
             areas: HashMap::new(),
             classes: HashMap::new(),
             items: HashMap::new(),
+            props: HashMap::new(),
             item_adjectives: HashMap::new(),
             races: HashMap::new(),
             sizes: HashMap::new(),
@@ -357,6 +371,7 @@ struct ModuleBuilder {
     class_builders: HashMap<String, ClassBuilder>,
     item_builders: HashMap<String, ItemBuilder>,
     item_adjectives: HashMap<String, ItemAdjective>,
+    prop_builders: HashMap<String, PropBuilder>,
     race_builders: HashMap<String, RaceBuilder>,
     size_builders: HashMap<String, EntitySizeBuilder>,
     tile_builders: HashMap<String, TileBuilder>,
@@ -371,6 +386,7 @@ impl ModuleBuilder {
             class_builders: read(&root_dirs, "classes"),
             item_builders: read(&root_dirs, "items"),
             item_adjectives: read(&root_dirs, "item_adjectives"),
+            prop_builders: read(&root_dirs, "props"),
             race_builders: read(&root_dirs, "races"),
             size_builders: read(&root_dirs, "sizes"),
             tile_builders: read(&root_dirs, "tiles"),

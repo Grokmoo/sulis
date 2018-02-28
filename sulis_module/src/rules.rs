@@ -46,6 +46,9 @@ pub struct Rules {
     pub builder_min_attribute: i32,
     pub builder_attribute_points: i32,
     pub builder_base_items: Vec<String>,
+
+    pub max_transition_distance: f32,
+    pub max_prop_distance: f32,
 }
 
 impl Rules {

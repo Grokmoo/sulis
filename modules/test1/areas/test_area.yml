@@ -860,6 +860,9 @@ layers:
   - base
   - object
 entity_layer: 0
+props:
+  - id: chest
+    location: [10, 10]
 actors:
   - id: goblin
     location:

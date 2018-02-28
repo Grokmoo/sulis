@@ -73,5 +73,5 @@ groups:
       amulet_03: [2, 7]
       amulet_04: [3, 7]
       amulet_05: [4, 7]
-      
+      misc_crate: [6, 7]
       misc_apple: [7, 7]

@@ -31,7 +31,7 @@ use sulis_core::extern_image::ImageBuffer;
 use sulis_module::area::Layer;
 use sulis_state::{AreaState, GameState};
 
-use {ActionMenu, EntityMouseover};
+use {ActionMenu, EntityMouseover, PropMouseover};
 
 const NAME: &'static str = "area";
 
@@ -65,6 +65,16 @@ impl AreaView {
             scroll_x_f32: 0.0,
             scroll_y_f32: 0.0,
         }))
+    }
+
+    pub fn get_mouseover_pos(&self, widget: &Rc<RefCell<Widget>>,
+                             x: i32, y: i32, width: i32, height: i32) -> (i32, i32) {
+        let x = x as f32 + width as f32 / 2.0;
+        let y = y as f32 + height as f32;
+        let x = ((x - widget.borrow().state.scroll_pos.x as f32) * self.scale.0).round() as i32;
+        let y = ((y - widget.borrow().state.scroll_pos.y as f32) * self.scale.1).round() as i32;
+
+        (x, y)
     }
 
     pub fn clear_cursors(&mut self) {
@@ -193,6 +203,19 @@ impl AreaView {
                      _alpha: f32, widget: &Widget, state: &AreaState, millis: u32) {
         let p = widget.state.inner_position;
         let s = widget.state.scroll_pos;
+
+        let mut draw_list = DrawList::empty_sprite();
+        draw_list.set_scale(scale_x, scale_y);
+        for prop_state in state.prop_iter() {
+            let x = (prop_state.location.x + p.x - s.x) as f32;
+            let y = (prop_state.location.y + p.y - s.y) as f32;
+            prop_state.append_to_draw_list(&mut draw_list, x, y, millis);
+        }
+
+        if !draw_list.is_empty() {
+            renderer.draw(draw_list);
+        }
+
         for entity in state.entity_iter() {
             let entity = entity.borrow();
 
@@ -361,10 +384,15 @@ impl WidgetKind for AreaView {
         let area_state = GameState::area_state();
         let action_menu = ActionMenu::new(x, y);
         if kind == ClickKind::Left {
-            action_menu.borrow().fire_default_callback();
+            action_menu.borrow().fire_default_callback(&widget, self);
 
             if let Some(entity) = area_state.borrow().get_entity_at(x, y) {
-                Widget::set_mouse_over(widget, EntityMouseover::new(&entity));
+                let (x, y) = {
+                    let entity = entity.borrow();
+                    self.get_mouseover_pos(widget, entity.location.x, entity.location.y,
+                        entity.size.size, entity.size.size)
+                };
+                Widget::set_mouse_over(widget, EntityMouseover::new(&entity), x, y);
             }
 
         } else if kind == ClickKind::Right {
@@ -414,7 +442,12 @@ impl WidgetKind for AreaView {
         self.clear_cursors();
 
         if let Some(entity) = area_state.borrow().get_entity_at(area_x, area_y) {
-            Widget::set_mouse_over(widget, EntityMouseover::new(&entity));
+            let (x, y) = {
+                let entity = entity.borrow();
+                self.get_mouseover_pos(widget, entity.location.x, entity.location.y,
+                    entity.size.size, entity.size.size)
+            };
+            Widget::set_mouse_over(widget, EntityMouseover::new(&entity), x, y);
 
             let pc = GameState::pc();
             if *pc.borrow() != *entity.borrow() {
@@ -427,6 +460,13 @@ impl WidgetKind for AreaView {
                 cursor.set_color(color::RED);
                 self.add_cursor(cursor);
             }
+        } else if let Some(index) = area_state.borrow().prop_index_at(area_x, area_y) {
+            let (x, y) = {
+                let prop_state = &area_state.borrow().props[index];
+                self.get_mouseover_pos(widget, prop_state.location.x, prop_state.location.y,
+                                       prop_state.prop.width as i32, prop_state.prop.height as i32)
+            };
+            Widget::set_mouse_over(widget, PropMouseover::new(index), x, y);
         }
 
         let pc = GameState::pc();

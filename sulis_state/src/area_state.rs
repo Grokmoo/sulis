@@ -15,9 +15,9 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use sulis_core::ui::Color;
-use sulis_module::{Actor, Area, Module};
+use sulis_module::{Actor, Area, Module, Prop};
 use sulis_module::area::Transition;
-use {AreaFeedbackText, calculate_los, ChangeListenerList, EntityState, Location, TurnTimer};
+use {AreaFeedbackText, calculate_los, ChangeListenerList, EntityState, Location, PropState, TurnTimer};
 
 use std::slice::Iter;
 use std::rc::Rc;
@@ -30,7 +30,9 @@ pub struct AreaState {
     pub listeners: ChangeListenerList<AreaState>,
     pub turn_timer: TurnTimer,
     entities: Vec<Option<Rc<RefCell<EntityState>>>>,
+    pub props: Vec<PropState>,
 
+    prop_grid: Vec<Option<usize>>,
     entity_grid: Vec<Option<usize>>,
     transition_grid: Vec<Option<usize>>,
 
@@ -51,15 +53,18 @@ impl AreaState {
         let dim = (area.width * area.height) as usize;
         let entity_grid = vec![None;dim];
         let transition_grid = vec![None;dim];
+        let prop_grid = vec![None;dim];
         let pc_vis = vec![false;dim];
 
         info!("Initializing area state for '{}'", area.name);
         AreaState {
             area,
             entities: Vec::new(),
+            props: Vec::new(),
             turn_timer: TurnTimer::default(),
             transition_grid,
             entity_grid,
+            prop_grid,
             listeners: ChangeListenerList::default(),
             pc_vis,
             pc_vis_cache_invalid: true,
@@ -83,6 +88,12 @@ impl AreaState {
             let location = Location::from_point(&actor_data.location, &self.area);
             debug!("Adding actor '{}' at '{:?}'", actor.id, location);
             self.add_actor(actor, location, false);
+        }
+
+        for &(ref prop, point) in area.props.iter() {
+            let location = Location::from_point(&point, &area);
+            debug!("Adding prop '{}' at '{:?}'", prop.id, location);
+            self.add_prop(Rc::clone(prop), location);
         }
 
         let turn_timer = TurnTimer::new(&self);
@@ -110,6 +121,14 @@ impl AreaState {
 
         requester.points(new_x, new_y)
            .all(|p| self.point_entities_passable(&requester, p.x, p.y))
+    }
+
+    pub fn prop_index_at(&self, x: i32, y: i32) -> Option<usize> {
+        if !self.area.coords_valid(x, y) { return None; }
+
+        let x = x as usize;
+        let y = y as usize;
+        self.prop_grid[x + y * self.area.width as usize]
     }
 
     pub fn get_entity_at(&self, x: i32, y: i32) -> Option<Rc<RefCell<EntityState>>> {
@@ -155,6 +174,31 @@ impl AreaState {
             None => true, // grid position is empty
             Some(index) => (index == requester.index),
         }
+    }
+
+    pub(crate) fn add_prop(&mut self, prop: Rc<Prop>, location: Location) -> bool {
+        if !self.area.coords_valid(location.x, location.y) { return false; }
+        if !self.area.coords_valid(location.x + prop.width as i32, location.y + prop.height as i32) {
+            return false;
+        }
+
+        let prop_state = PropState::new(prop, location);
+
+        let start_x = prop_state.location.x as usize;
+        let start_y = prop_state.location.y as usize;
+        let end_x = start_x + prop_state.prop.width as usize;
+        let end_y = start_y + prop_state.prop.height as usize;
+
+        let index = self.props.len();
+        for y in start_y..end_y {
+            for x in start_x..end_x {
+                self.prop_grid[x + y * self.area.width as usize] = Some(index);
+            }
+        }
+
+        self.props.push(prop_state);
+
+        true
     }
 
     pub(crate) fn add_actor(&mut self, actor: Rc<Actor>,
@@ -238,6 +282,10 @@ impl AreaState {
         }
 
         None
+    }
+
+    pub fn prop_iter<'a>(&'a self) -> Iter<'a, PropState> {
+        self.props.iter()
     }
 
     pub fn entity_iter(&self) -> EntityIterator {

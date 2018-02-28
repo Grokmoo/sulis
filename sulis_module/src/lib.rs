@@ -326,6 +326,10 @@ impl Module {
         MODULE.with(|r| get_resource(id, &r.borrow().props))
     }
 
+    pub fn all_props() -> Vec<Rc<Prop>> {
+        MODULE.with(|r| all_resources(&r.borrow().props))
+    }
+
     pub fn race(id: &str) -> Option<Rc<Race>> {
         MODULE.with(|r| get_resource(id, &r.borrow().races))
     }

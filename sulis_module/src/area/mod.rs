@@ -33,11 +33,11 @@ use std::rc::Rc;
 
 use sulis_core::image::Image;
 use sulis_core::resource::{ResourceBuilder, ResourceSet, Sprite};
-use sulis_core::util::{Point, Size};
+use sulis_core::util::{Point, Size, unable_to_create_error};
 use sulis_core::serde_json;
 use sulis_core::serde_yaml;
 
-use {Module, Prop};
+use {Item, Module, Prop};
 
 #[derive(Debug, Clone)]
 pub struct Transition {
@@ -55,11 +55,10 @@ pub struct ActorData {
     pub location: Point,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
-#[serde(deny_unknown_fields)]
 pub struct PropData {
-    pub id: String,
+    pub prop: Rc<Prop>,
     pub location: Point,
+    pub items: Vec<Rc<Item>>,
 }
 
 pub struct Area {
@@ -71,7 +70,7 @@ pub struct Area {
     path_grids: HashMap<i32, PathFinderGrid>,
     pub visibility_tile: Rc<Sprite>,
     pub actors: Vec<ActorData>,
-    pub props: Vec<(Rc<Prop>, Point)>,
+    pub props: Vec<PropData>,
     pub transitions: Vec<Transition>,
 }
 
@@ -86,16 +85,9 @@ impl Area {
         // TODO validate prop position
 
         let mut props = Vec::new();
-        for prop_data in builder.props.iter() {
-            let prop = match module.props.get(&prop_data.id) {
-                None => {
-                    warn!("No prop '{}' found for area '{}'",
-                          prop_data.id, builder.id);
-                    continue;
-                }, Some(prop) => Rc::clone(prop),
-            };
-
-            props.push((prop, prop_data.location));
+        for prop_builder in builder.props.iter() {
+            let prop_data = create_prop(prop_builder, module)?;
+            props.push(prop_data);
         }
 
         info!("Creating area {}", builder.id);
@@ -190,7 +182,7 @@ pub struct AreaBuilder {
     pub layers: Vec<String>,
     pub entity_layer: usize,
     pub actors: Vec<ActorData>,
-    pub props: Vec<PropData>,
+    pub props: Vec<PropDataBuilder>,
     pub transitions: Vec<TransitionBuilder>,
     pub visibility_tile: String,
 }
@@ -224,4 +216,40 @@ pub struct TransitionBuilder {
     pub to: Point,
     pub to_area: Option<String>,
     pub image_display: String,
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct PropDataBuilder {
+    pub id: String,
+    pub location: Point,
+    pub items: Option<Vec<String>>,
+}
+
+pub fn create_prop(builder: &PropDataBuilder, module: &Module) -> Result<PropData, Error> {
+    let prop = match module.props.get(&builder.id) {
+        None => return unable_to_create_error("prop", &builder.id),
+        Some(prop) => Rc::clone(prop),
+    };
+
+    let location = builder.location;
+
+    let mut items = Vec::new();
+    if let Some(ref builder_items) = builder.items.as_ref() {
+        for item_id in builder_items.iter() {
+            let item = match module.items.get(item_id) {
+                None => {
+                    warn!("No item with ID '{}' found", item_id);
+                    return unable_to_create_error("prop", &builder.id);
+                }, Some(item) => Rc::clone(item),
+            };
+            items.push(item);
+        }
+    }
+
+    Ok(PropData {
+        prop,
+        location,
+        items,
+    })
 }

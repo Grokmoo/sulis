@@ -20,7 +20,7 @@ use std::cell::{RefCell, RefMut};
 use std::cmp;
 use std::time;
 
-use sulis_core::ui::animation_state;
+use sulis_core::ui::{compute_area_scaling, animation_state};
 use sulis_core::ui::{color, Cursor, WidgetKind, Widget};
 use sulis_core::io::*;
 use sulis_core::io::event::ClickKind;
@@ -46,8 +46,6 @@ pub struct AreaView {
     scroll_y_f32: f32,
 }
 
-const SCALE_Y_BASE: f32 = 3200.0;
-const SCALE_X_BASE: f32 = SCALE_Y_BASE * 16.0 / 9.0;
 const TILE_CACHE_TEXTURE_SIZE: u32 = 2048;
 const TILE_SIZE: u32 = 16;
 const TEX_COORDS: [f32; 8] = [ 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0 ];
@@ -232,17 +230,11 @@ impl AreaView {
 }
 
 impl WidgetKind for AreaView {
-    fn get_name(&self) -> &str {
-        NAME
-    }
+    fn get_name(&self) -> &str { NAME }
 
-    fn as_any(&self) -> &Any {
-        self
-    }
+    fn as_any(&self) -> &Any { self }
 
-    fn as_any_mut(&mut self) -> &mut Any {
-        self
-    }
+    fn as_any_mut(&mut self) -> &mut Any { self }
 
     fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         self.clear_cursors();
@@ -267,9 +259,8 @@ impl WidgetKind for AreaView {
 
     fn draw_graphics_mode(&mut self, renderer: &mut GraphicsRenderer, pixel_size: Point,
                           widget: &Widget, millis: u32) {
-        let scale_x = SCALE_X_BASE / (pixel_size.x as f32);
-        let scale_y = SCALE_Y_BASE / (pixel_size.y as f32);
-        self.scale = (scale_x, scale_y);
+        self.scale = compute_area_scaling(pixel_size);
+        let (scale_x, scale_y) = self.scale;
 
         let area_state = GameState::area_state();
         let mut state = area_state.borrow_mut();

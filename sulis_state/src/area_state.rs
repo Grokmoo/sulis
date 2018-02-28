@@ -15,8 +15,8 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use sulis_core::ui::Color;
-use sulis_module::{Actor, Area, Module, Prop};
-use sulis_module::area::Transition;
+use sulis_module::{Actor, Area, Module};
+use sulis_module::area::{PropData, Transition};
 use {AreaFeedbackText, calculate_los, ChangeListenerList, EntityState, Location, PropState, TurnTimer};
 
 use std::slice::Iter;
@@ -90,10 +90,10 @@ impl AreaState {
             self.add_actor(actor, location, false);
         }
 
-        for &(ref prop, point) in area.props.iter() {
-            let location = Location::from_point(&point, &area);
-            debug!("Adding prop '{}' at '{:?}'", prop.id, location);
-            self.add_prop(Rc::clone(prop), location);
+        for prop_data in area.props.iter() {
+            let location = Location::from_point(&prop_data.location, &area);
+            debug!("Adding prop '{}' at '{:?}'", prop_data.prop.id, location);
+            self.add_prop(prop_data, location);
         }
 
         let turn_timer = TurnTimer::new(&self);
@@ -176,13 +176,15 @@ impl AreaState {
         }
     }
 
-    pub(crate) fn add_prop(&mut self, prop: Rc<Prop>, location: Location) -> bool {
+    pub(crate) fn add_prop(&mut self, prop_data: &PropData, location: Location) -> bool {
+        let prop = &prop_data.prop;
+
         if !self.area.coords_valid(location.x, location.y) { return false; }
         if !self.area.coords_valid(location.x + prop.width as i32, location.y + prop.height as i32) {
             return false;
         }
 
-        let prop_state = PropState::new(prop, location);
+        let prop_state = PropState::new(prop_data, location);
 
         let start_x = prop_state.location.x as usize;
         let start_y = prop_state.location.y as usize;

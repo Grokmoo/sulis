@@ -25,7 +25,7 @@ use sulis_core::serde_yaml;
 use sulis_core::resource::{ResourceBuilder, ResourceSet};
 use sulis_core::util::unable_to_create_error;
 
-use {Item, Module};
+use Module;
 
 #[derive(Debug)]
 pub struct Prop {
@@ -37,11 +37,10 @@ pub struct Prop {
     pub height: u32,
     pub passable: bool,
     pub visible: bool,
-    pub items: Vec<Rc<Item>>,
 }
 
 impl Prop {
-    pub fn new(builder: PropBuilder, module: &Module) -> Result<Prop, Error> {
+    pub fn new(builder: PropBuilder, _module: &Module) -> Result<Prop, Error> {
         let icon = match ResourceSet::get_image(&builder.icon) {
             None => {
                     warn!("No image found for icon '{}'", builder.icon);
@@ -56,19 +55,6 @@ impl Prop {
             }, Some(image) => image,
         };
 
-        let mut items = Vec::new();
-        if let Some(builder_items) = builder.items {
-            for item_id in builder_items {
-                let item = match module.items.get(&item_id) {
-                    None => {
-                        warn!("No item with ID '{}' found", item_id);
-                        return unable_to_create_error("prop", &builder.id);
-                    }, Some(item) => Rc::clone(item),
-                };
-                items.push(item);
-            }
-        }
-
         Ok(Prop {
             id: builder.id,
             name: builder.name,
@@ -78,7 +64,6 @@ impl Prop {
             height: builder.height,
             passable: builder.passable,
             visible: builder.visible,
-            items,
         })
     }
 
@@ -102,7 +87,6 @@ pub struct PropBuilder {
     pub height: u32,
     pub passable: bool,
     pub visible: bool,
-    pub items: Option<Vec<String>>,
 }
 
 impl ResourceBuilder for PropBuilder {

@@ -23,6 +23,9 @@ use area_editor::AreaEditor;
 mod load_window;
 use load_window::LoadWindow;
 
+mod prop_picker;
+use prop_picker::PropPicker;
+
 mod save_window;
 use save_window::SaveWindow;
 
@@ -100,7 +103,8 @@ impl WidgetKind for EditorView {
 
         let tile_picker_kind = TilePicker::new();
         let actor_picker_kind = ActorPicker::new();
-        let area_editor_kind = AreaEditor::new(&actor_picker_kind, &tile_picker_kind);
+        let prop_picker_kind = PropPicker::new();
+        let area_editor_kind = AreaEditor::new(&actor_picker_kind, &tile_picker_kind, &prop_picker_kind);
 
         let top_bar = Widget::empty("top_bar");
         {
@@ -165,16 +169,20 @@ impl WidgetKind for EditorView {
 
         let tile_picker = Widget::with_defaults(tile_picker_kind);
         let actor_picker = Widget::with_defaults(actor_picker_kind);
+        let prop_picker = Widget::with_defaults(prop_picker_kind);
         actor_picker.borrow_mut().state.set_visible(false);
+        prop_picker.borrow_mut().state.set_visible(false);
 
         let tiles = Widget::with_theme(Button::empty(), "tiles");
 
         let tile_picker_ref = Rc::clone(&tile_picker);
         let actor_picker_ref = Rc::clone(&actor_picker);
+        let prop_picker_ref = Rc::clone(&prop_picker);
         let area_editor_ref = Rc::clone(&area_editor_kind);
         tiles.borrow_mut().state.add_callback(Callback::new(Rc::new(move |_, _| {
             tile_picker_ref.borrow_mut().state.set_visible(true);
             actor_picker_ref.borrow_mut().state.set_visible(false);
+            prop_picker_ref.borrow_mut().state.set_visible(false);
             area_editor_ref.borrow_mut().set_mode(area_editor::Mode::Tiles);
         })));
 
@@ -182,18 +190,34 @@ impl WidgetKind for EditorView {
 
         let tile_picker_ref = Rc::clone(&tile_picker);
         let actor_picker_ref = Rc::clone(&actor_picker);
+        let prop_picker_ref = Rc::clone(&prop_picker);
         let area_editor_ref = Rc::clone(&area_editor_kind);
         actors.borrow_mut().state.add_callback(Callback::new(Rc::new(move |_, _| {
             tile_picker_ref.borrow_mut().state.set_visible(false);
             actor_picker_ref.borrow_mut().state.set_visible(true);
+            prop_picker_ref.borrow_mut().state.set_visible(false);
             area_editor_ref.borrow_mut().set_mode(area_editor::Mode::Actors);
+        })));
+
+        let props = Widget::with_theme(Button::empty(), "props");
+
+        let tile_picker_ref = Rc::clone(&tile_picker);
+        let actor_picker_ref = Rc::clone(&actor_picker);
+        let prop_picker_ref = Rc::clone(&prop_picker);
+        let area_editor_ref = Rc::clone(&area_editor_kind);
+        props.borrow_mut().state.add_callback(Callback::new(Rc::new(move |_, _| {
+            tile_picker_ref.borrow_mut().state.set_visible(false);
+            actor_picker_ref.borrow_mut().state.set_visible(false);
+            prop_picker_ref.borrow_mut().state.set_visible(true);
+            area_editor_ref.borrow_mut().set_mode(area_editor::Mode::Props);
         })));
 
         let area_editor = Widget::with_defaults(area_editor_kind);
 
         Widget::add_child_to(&top_bar, tiles);
         Widget::add_child_to(&top_bar, actors);
+        Widget::add_child_to(&top_bar, props);
 
-        vec![area_editor, actor_picker, tile_picker, top_bar]
+        vec![area_editor, actor_picker, tile_picker, prop_picker, top_bar]
     }
 }

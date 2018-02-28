@@ -26,15 +26,16 @@ use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::io::event::ClickKind;
 use sulis_module::{Actor, Module, Prop};
 use sulis_core::resource::{ResourceSet, read_single_resource, write_to_file};
-use sulis_core::ui::{Color, Cursor, Widget, WidgetKind};
+use sulis_core::ui::{animation_state, compute_area_scaling, Color, Cursor, Widget, WidgetKind};
 use sulis_core::util::{Point};
-use sulis_module::area::{ActorData, AreaBuilder, PropData, Tile, Transition, TransitionBuilder};
+use sulis_module::area::*;
 
-use {ActorPicker, TilePicker};
+use {ActorPicker, PropPicker, TilePicker};
 
 pub enum Mode {
     Tiles,
     Actors,
+    Props,
 }
 
 const NAME: &str = "area_editor";
@@ -51,29 +52,35 @@ fn is_current_layer(tile_picker: &Rc<RefCell<TilePicker>>, layer_id: &str) -> bo
 pub struct AreaEditor {
     tile_picker: Rc<RefCell<TilePicker>>,
     actor_picker: Rc<RefCell<ActorPicker>>,
+    prop_picker: Rc<RefCell<PropPicker>>,
     mode: Mode,
 
     cur_actor: Option<(Point, Rc<Actor>)>,
     removal_actors: Vec<(Point, Rc<Actor>)>,
     cur_tile: Option<(Point, Rc<Tile>)>,
     removal_tiles: Vec<(Point, Rc<Tile>)>,
-    scroll_x_f32: f32,
-    scroll_y_f32: f32,
+    cur_prop: Option<(Point, Rc<Prop>)>,
+    removal_props: Vec<(Point, Rc<Prop>)>,
 
     tiles: Vec<(String, Vec<(Point, Rc<Tile>)>)>,
     actors: Vec<(Point, Rc<Actor>)>,
-    props: Vec<(Point, Rc<Prop>)>,
+    props: Vec<PropData>,
     transitions: Vec<Transition>,
 
     pub id: String,
     pub name: String,
     pub filename: String,
     pub visibility_tile: String,
+
+    scroll_x_f32: f32,
+    scroll_y_f32: f32,
+    scale: (f32, f32),
 }
 
 impl AreaEditor {
     pub fn new(actor_picker: &Rc<RefCell<ActorPicker>>,
-               tile_picker: &Rc<RefCell<TilePicker>>) -> Rc<RefCell<AreaEditor>> {
+               tile_picker: &Rc<RefCell<TilePicker>>,
+               prop_picker: &Rc<RefCell<PropPicker>>) -> Rc<RefCell<AreaEditor>> {
         let mut tiles: Vec<(String, Vec<(Point, Rc<Tile>)>)> = Vec::new();
         for ref layer_id in CONFIG.editor.area.layers.iter() {
             tiles.push((layer_id.to_string(), Vec::new()));
@@ -87,16 +94,20 @@ impl AreaEditor {
             transitions: Vec::new(),
             tile_picker: Rc::clone(tile_picker),
             actor_picker: Rc::clone(actor_picker),
+            prop_picker: Rc::clone(prop_picker),
             cur_actor: None,
             cur_tile: None,
+            cur_prop: None,
             removal_tiles: Vec::new(),
             removal_actors: Vec::new(),
+            removal_props: Vec::new(),
             scroll_x_f32: 0.0,
             scroll_y_f32: 0.0,
             id: CONFIG.editor.area.id.clone(),
             name: CONFIG.editor.area.name.clone(),
             filename: CONFIG.editor.area.filename.clone(),
             visibility_tile: CONFIG.editor.area.visibility_tile.clone(),
+            scale: (1.0, 1.0),
         }))
     }
 
@@ -104,8 +115,10 @@ impl AreaEditor {
         self.mode = mode;
         self.cur_tile = None;
         self.cur_actor = None;
+        self.cur_prop = None;
         self.removal_tiles.clear();
         self.removal_actors.clear();
+        self.removal_props.clear();
     }
 
     pub fn new_transition(&mut self) -> Option<usize> {
@@ -212,15 +225,34 @@ impl AreaEditor {
 
         trace!("Loading area props.");
         self.props.clear();
-        for prop_data in area_builder.props {
-            let prop = match Module::prop(&prop_data.id) {
+        for prop_builder in area_builder.props {
+            let prop = match Module::prop(&prop_builder.id) {
                 None => {
-                    warn!("No prop with ID {} found", prop_data.id);
+                    warn!("No prop with ID {} found", prop_builder.id);
                     continue;
                 }, Some(prop) => prop,
             };
 
-            self.props.push((prop_data.location, prop));
+            let mut items = Vec::new();
+            if let Some(ref builder_items) = prop_builder.items.as_ref() {
+                for item_id in builder_items.iter() {
+                    let item = match Module::item(item_id) {
+                        None => {
+                            warn!("No item with ID '{}' found", item_id);
+                            continue;
+                        }, Some(item) => item,
+                    };
+                    items.push(item);
+                }
+            }
+
+            let prop_data = PropData {
+                prop,
+                location: prop_builder.location,
+                items,
+            };
+
+            self.props.push(prop_data);
         }
 
         trace!("Loading area transitions.");
@@ -273,9 +305,19 @@ impl AreaEditor {
         }
 
         trace!("Saving props.");
-        let mut props: Vec<PropData> = Vec::new();
-        for &(pos, ref prop) in self.props.iter() {
-            props.push(PropData { id: prop.id.to_string(), location: pos });
+        let mut props: Vec<PropDataBuilder> = Vec::new();
+        for prop_data in self.props.iter() {
+            let mut items = Vec::new();
+            for item in prop_data.items.iter() {
+                items.push(item.id.to_string());
+            }
+
+            let builder = PropDataBuilder {
+                id: prop_data.prop.id.to_string(),
+                location: prop_data.location,
+                items: Some(items),
+            };
+            props.push(builder);
         }
 
         trace!("Saving transitions");
@@ -316,13 +358,19 @@ impl AreaEditor {
     }
 
     fn get_cursor_pos(&self, widget: &Rc<RefCell<Widget>>, width: i32, height: i32) -> (i32, i32) {
-        let x = widget.borrow().state.position.x - widget.borrow().state.scroll_pos.x;
-        let y = widget.borrow().state.position.y - widget.borrow().state.scroll_pos.y;
+        let x = widget.borrow().state.position.x;
+        let y = widget.borrow().state.position.y;
 
-        let x = Cursor::get_x_f32() - x as f32 - width as f32 / 2.0;
-        let y = Cursor::get_y_f32() - y as f32 - height as f32 / 2.0;
+        let mut x = Cursor::get_x_f32() - x as f32;
+        let mut y = Cursor::get_y_f32() - y as f32;
 
-        (x.round() as i32, y.round() as i32)
+        x /= self.scale.0;
+        y /= self.scale.1;
+        x -= width as f32 / 2.0;
+        y -= height as f32 / 2.0;
+
+        (x.round() as i32 + widget.borrow().state.scroll_pos.x,
+            y.round() as i32 + widget.borrow().state.scroll_pos.y)
     }
 
     fn get_current_tile(&self) -> Option<Rc<Tile>> {
@@ -439,6 +487,60 @@ impl AreaEditor {
             }
         }
     }
+
+    fn add_cur_prop(&mut self, widget: &Rc<RefCell<Widget>>) {
+        let cur_prop = match self.prop_picker.borrow().get_cur_prop() {
+            None => return,
+            Some(prop) => prop,
+        };
+
+        let (x, y) = self.get_cursor_pos(widget, cur_prop.width as i32, cur_prop.height as i32);
+        if x < 0 || y < 0 { return; }
+
+        let prop_data = PropData {
+            prop: cur_prop,
+            location: Point::new(x, y),
+            items: Vec::new(),
+        };
+        self.props.push(prop_data);
+    }
+
+    fn remove_cur_props(&mut self, widget: &Rc<RefCell<Widget>>) {
+        let cur_prop = match self.prop_picker.borrow().get_cur_prop() {
+            None => return,
+            Some(prop) => prop,
+        };
+
+        let (x, y) = self.get_cursor_pos(widget, cur_prop.width as i32, cur_prop.height as i32);
+        if x < 0 || y < 0 { return; }
+
+        self.removal_props.clear();
+        self.props.retain(|prop_data| {
+            let w = prop_data.prop.width as i32;
+            let h = prop_data.prop.height as i32;
+            !is_removal(prop_data.location, w, h, x, y, cur_prop.width as i32, cur_prop.height as i32)
+        });
+    }
+    fn mouse_move_props_mode(&mut self, widget: &Rc<RefCell<Widget>>) {
+        let cur_prop = match self.prop_picker.borrow().get_cur_prop() {
+            None => return,
+            Some(prop) => prop,
+        };
+
+        let w = cur_prop.width as i32;
+        let h = cur_prop.height as i32;
+        let (x, y) = self.get_cursor_pos(widget, w, h);
+        self.cur_prop = Some((Point::new(x, y), cur_prop));
+
+        self.removal_props.clear();
+        for prop_data in self.props.iter() {
+            let prop = &prop_data.prop;
+            let pos = prop_data.location;
+            if is_removal(pos, prop.width as i32, prop.height as i32, x, y, w, h) {
+                self.removal_props.push((pos, Rc::clone(prop)));
+            }
+        }
+    }
 }
 
 impl WidgetKind for AreaEditor {
@@ -453,13 +555,16 @@ impl WidgetKind for AreaEditor {
         Vec::new()
     }
 
-    fn draw_graphics_mode(&mut self, renderer: &mut GraphicsRenderer, _pixel_size: Point,
+    fn draw_graphics_mode(&mut self, renderer: &mut GraphicsRenderer, pixel_size: Point,
                           widget: &Widget, millis: u32) {
-        let scale_x = 1.0;
-        let scale_y = 1.0;
+        self.scale = compute_area_scaling(pixel_size);
+        let (scale_x, scale_y) = self.scale;
 
-        let p = widget.state.inner_position;
+        let p = widget.state.position;
         let s = widget.state.scroll_pos;
+
+        // TODO fix this hack
+        let p = Point::new(p.x / 4, p.y / 4);
 
         let mut draw_list = DrawList::empty_sprite();
         for &(_, ref tiles) in self.tiles.iter() {
@@ -471,6 +576,17 @@ impl WidgetKind for AreaEditor {
             }
         }
         if !draw_list.is_empty() {
+            draw_list.set_scale(scale_x, scale_y);
+            renderer.draw(draw_list);
+        }
+
+        for prop_data in self.props.iter() {
+            let x = prop_data.location.x + p.x - s.x;
+            let y = prop_data.location.y + p.x - s.y;
+            let mut draw_list = DrawList::empty_sprite();
+            prop_data.prop.append_to_draw_list(&mut draw_list, &animation_state::NORMAL,
+                                               x as f32, y as f32, millis);
+            draw_list.set_scale(scale_x, scale_y);
             renderer.draw(draw_list);
         }
 
@@ -485,8 +601,11 @@ impl WidgetKind for AreaEditor {
             let y = transition.from.y + p.y - s.y;
             let w = transition.size.width;
             let h = transition.size.height;
-            image.draw_graphics_mode(renderer, &widget.state.animation_state,
+            let mut draw_list = DrawList::empty_sprite();
+            image.append_to_draw_list(&mut draw_list, &widget.state.animation_state,
                                      x as f32, y as f32, w as f32, h as f32, millis);
+            draw_list.set_scale(scale_x, scale_y);
+            renderer.draw(draw_list);
         }
 
         if !self.removal_tiles.is_empty() {
@@ -499,18 +618,13 @@ impl WidgetKind for AreaEditor {
             }
 
             draw_list.set_color(Color::from_string("FF000088"));
+            draw_list.set_scale(scale_x, scale_y);
             renderer.draw(draw_list);
         }
 
-        if !self.removal_actors.is_empty() {
-            // TODO implement
-            // let mut draw_list = DrawList::empty_sprite();
-            // for &(pos, ref actor) in self.removal_actors.iter() {
-            //     actor.append_to_draw_list_i32(&mut draw_list, pos.x + p.x - s.x, pos.y + p.y - s.y, millis);
-            // }
-            //
-            // draw_list.set_color(Color::from_string("FF000088"));
-            // renderer.draw(draw_list);
+        for &(pos, ref actor) in self.removal_actors.iter() {
+            actor.draw(renderer, scale_x, scale_y,
+                       (pos.x + p.x - s.x) as f32, (pos.y + p.y - s.y) as f32, millis);
         }
 
         if let Some((cur_tile_pos, ref cur_tile)) = self.cur_tile {
@@ -519,17 +633,39 @@ impl WidgetKind for AreaEditor {
             let y = cur_tile_pos.y + p.y - s.y;
             let mut draw_list = DrawList::from_sprite(sprite, x, y, cur_tile.width, cur_tile.height);
             draw_list.set_color(Color::from_string("FFFFFF88"));
-
+            draw_list.set_scale(scale_x, scale_y);
             renderer.draw(draw_list);
         }
 
         if let Some((cur_actor_pos, ref cur_actor)) = self.cur_actor {
-            // TODO implement
-            // let mut draw_list = DrawList::empty_sprite();
-            // cur_actor.append_to_draw_list_i32(&mut draw_list, cur_actor_pos.x + p.x - s.x,
-            //                               cur_actor_pos.y + p.y - s.y, millis);
-            // draw_list.set_color(Color::from_string("FFFFFF88"));
-            // renderer.draw(draw_list);
+            cur_actor.draw(renderer, scale_x, scale_y,
+                           (cur_actor_pos.x + p.x - s.x) as f32,
+                           (cur_actor_pos.y + p.y - s.y) as f32, millis);
+        }
+
+        if !self.removal_props.is_empty() {
+            let mut draw_list = DrawList::empty_sprite();
+            for &(pos, ref prop) in self.removal_props.iter() {
+                let x = pos.x + p.x - s.x;
+                let y = pos.y + p.y - s.y;
+                prop.append_to_draw_list(&mut draw_list, &animation_state::NORMAL,
+                                         x as f32, y as f32, millis);
+            }
+
+            draw_list.set_color(Color::from_string("F008"));
+            draw_list.set_scale(scale_x, scale_y);
+            renderer.draw(draw_list);
+        }
+
+        if let Some((cur_prop_pos, ref cur_prop)) = self.cur_prop {
+            let x = cur_prop_pos.x + p.x - s.x;
+            let y = cur_prop_pos.y + p.y - s.y;
+            let mut draw_list = DrawList::empty_sprite();
+            cur_prop.append_to_draw_list(&mut draw_list, &animation_state::NORMAL,
+                                         x as f32, y as f32, millis);
+            draw_list.set_color(Color::from_string("FFF8"));
+            draw_list.set_scale(scale_x, scale_y);
+            renderer.draw(draw_list);
         }
     }
 
@@ -545,6 +681,12 @@ impl WidgetKind for AreaEditor {
                 match kind {
                     ClickKind::Left => self.add_cur_actor(widget),
                     ClickKind::Right => self.remove_cur_actors(widget),
+                    _ => (),
+                }
+            }, Mode::Props => {
+                match kind {
+                    ClickKind::Left => self.add_cur_prop(widget),
+                    ClickKind::Right => self.remove_cur_props(widget),
                     _ => (),
                 }
             },
@@ -585,6 +727,7 @@ impl WidgetKind for AreaEditor {
         match self.mode {
             Mode::Tiles => self.mouse_move_tiles_mode(widget),
             Mode::Actors => self.mouse_move_actors_mode(widget),
+            Mode::Props => self.mouse_move_props_mode(widget),
         }
 
         true

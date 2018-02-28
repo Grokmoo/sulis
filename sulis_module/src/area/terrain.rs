@@ -18,10 +18,10 @@ use std::io::Error;
 use std::rc::Rc;
 use std::collections::HashMap;
 
-use sulis_core::util::{invalid_data_error, Point};
+use sulis_core::util::{invalid_data_error};
 
-use area::{AreaBuilder, Layer, Tile};
-use {Module, Prop, generator};
+use area::{AreaBuilder, Layer, PropData, Tile};
+use {Module, generator};
 
 pub struct Terrain {
     pub width: i32,
@@ -33,7 +33,7 @@ pub struct Terrain {
 }
 
 impl Terrain {
-    pub fn new(builder: &AreaBuilder, module: &Module, props: &Vec<(Rc<Prop>, Point)>)
+    pub fn new(builder: &AreaBuilder, module: &Module, props: &Vec<PropData>)
         -> Result<Terrain, Error> {
         let width = builder.width as i32;
         let height = builder.height as i32;
@@ -116,9 +116,10 @@ impl Terrain {
             }
         }
 
-        for &(ref prop, position) in props.iter() {
-            let start_x = position.x as usize;
-            let start_y = position.y as usize;
+        for ref prop_data in props.iter() {
+            let prop = &prop_data.prop;
+            let start_x = prop_data.location.x as usize;
+            let start_y = prop_data.location.y as usize;
             let end_x = start_x + prop.width as usize;
             let end_y = start_y + prop.height as usize;
 

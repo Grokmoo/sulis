@@ -20,6 +20,7 @@ use std::rc::Rc;
 use sulis_core::io::DrawList;
 use sulis_core::ui::{animation_state, AnimationState};
 use sulis_module::Prop;
+use sulis_module::area::PropData;
 use {ChangeListenerList, ItemState, Location};
 
 pub struct PropState {
@@ -38,14 +39,14 @@ impl fmt::Debug for PropState {
 }
 
 impl PropState {
-    pub(crate) fn new(prop: Rc<Prop>, location: Location) -> PropState {
+    pub(crate) fn new(prop_data: &PropData, location: Location) -> PropState {
         let mut items = Vec::new();
-        for item in prop.items.iter() {
+        for item in prop_data.items.iter() {
             items.push(ItemState::new(Rc::clone(item)));
         }
 
         PropState {
-            prop,
+            prop: Rc::clone(&prop_data.prop),
             location,
             animation_state: AnimationState::default(),
             items,

@@ -54,7 +54,7 @@ use std::cell::RefCell;
 
 use config::CONFIG;
 use resource::ResourceSet;
-use util::Size;
+use util::{Point, Size};
 
 pub fn create_ui_tree(kind: Rc<RefCell<WidgetKind>>) -> Rc<RefCell<Widget>> {
 
@@ -65,4 +65,14 @@ pub fn create_ui_tree(kind: Rc<RefCell<WidgetKind>>) -> Rc<RefCell<Widget>> {
     root.borrow_mut().theme = Some(ResourceSet::get_theme());
 
     root
+}
+
+const SCALE_Y_BASE: f32 = 3200.0;
+const SCALE_X_BASE: f32 = SCALE_Y_BASE * 16.0 / 9.0;
+
+pub fn compute_area_scaling(pixel_size: Point) -> (f32, f32) {
+    let scale_x = SCALE_X_BASE / (pixel_size.x as f32);
+    let scale_y = SCALE_Y_BASE / (pixel_size.y as f32);
+
+    (scale_x, scale_y)
 }

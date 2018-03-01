@@ -14,29 +14,174 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::collections::{HashMap, HashSet};
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 
-use sulis_core::util::{invalid_data_error, Point};
+use sulis_core::util::{invalid_data_error, unable_to_create_error, Point};
 use sulis_core::resource::{Sprite, ResourceBuilder, ResourceSet};
 use sulis_core::serde_json;
 use sulis_core::serde_yaml;
 
+#[derive(Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct UniformSet {
+    pub size: [usize;2],
+    pub layer: String,
+    pub sprite_prefix: String,
+    pub impass: Vec<Vec<usize>>,
+    pub invis: Vec<Vec<usize>>,
+    pub tiles: Vec<String>,
+}
+
+#[derive(Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct NonUniformSet {
+    pub size: [usize;2],
+    pub layer: String,
+    pub sprite_prefix: String,
+    pub tiles: HashMap<String, ImpassInvis>,
+}
+
+#[derive(Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct ImpassInvis {
+    pub impass: Option<Vec<Vec<usize>>>,
+    pub invis: Option<Vec<Vec<usize>>>,
+}
+
+#[derive(Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct TileBuilder {
+    pub size: [usize;2],
+    pub layer: String,
+    pub sprite: String,
+    pub impass: Option<Vec<Vec<usize>>>,
+    pub invis: Option<Vec<Vec<usize>>>,
+    pub pass: Option<Vec<Vec<usize>>>,
+    pub vis: Option<Vec<Vec<usize>>>,
+    pub override_impass: Option<bool>,
+}
+
+#[derive(Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct TilesList {
+    pub id: String,
+    pub tiles: HashMap<String, TileBuilder>,
+    pub uniform_sets: HashMap<String, UniformSet>,
+    pub non_uniform_sets: HashMap<String, NonUniformSet>,
+}
+
+impl TilesList {
+    fn move_tiles(&mut self) {
+        self.move_uniform();
+        self.move_non_uniform();
+    }
+
+    fn move_uniform(&mut self) {
+        for (_, ref uniform) in self.uniform_sets.iter() {
+            let size = uniform.size;
+            let layer = &uniform.layer;
+            let prefix = &uniform.sprite_prefix;
+            let impass = if uniform.impass.is_empty() {
+                None
+            } else {
+                Some(uniform.impass.clone())
+            };
+            let invis = if uniform.invis.is_empty() {
+                None
+            } else {
+                Some(uniform.invis.clone())
+            };
+            for tile_id in uniform.tiles.iter() {
+                let tile = TileBuilder {
+                    size: size,
+                    layer: layer.to_string(),
+                    sprite: format!("{}{}", prefix, tile_id),
+                    impass: impass.clone(),
+                    invis: invis.clone(),
+                    pass: None,
+                    vis: None,
+                    override_impass: None,
+                };
+
+                self.tiles.insert(tile_id.to_string(), tile);
+            }
+        }
+    }
+
+    fn move_non_uniform(&mut self) {
+        for (_, ref non_uniform) in self.non_uniform_sets.iter() {
+            let size = non_uniform.size;
+            let layer = &non_uniform.layer;
+            let prefix = &non_uniform.sprite_prefix;
+            for (tile_id, impass_invis) in non_uniform.tiles.iter() {
+                let tile = TileBuilder {
+                    size: size,
+                    layer: layer.to_string(),
+                    sprite: format!("{}{}", prefix, tile_id),
+                    impass: impass_invis.impass.clone(),
+                    invis: impass_invis.invis.clone(),
+                    pass: None,
+                    vis: None,
+                    override_impass: None,
+                };
+
+                self.tiles.insert(tile_id.to_string(), tile);
+            }
+        }
+    }
+}
+
+impl ResourceBuilder for TilesList {
+    fn owned_id(&self) -> String {
+        self.id.to_owned()
+    }
+
+    fn from_json(data: &str) -> Result<TilesList, Error> {
+        let mut resource: TilesList = serde_json::from_str(data)?;
+        resource.move_tiles();
+        Ok(resource)
+    }
+
+    fn from_yaml(data: &str) -> Result<TilesList, Error> {
+        let resource: Result<TilesList, serde_yaml::Error> = serde_yaml::from_str(data);
+
+        match resource {
+            Ok(mut resource) => {
+                resource.move_tiles();
+                Ok(resource)
+            },
+            Err(error) => Err(Error::new(ErrorKind::InvalidData, format!("{}", error)))
+        }
+    }
+}
+
 #[derive(Debug)]
 pub struct Tile {
     pub id: String,
-    pub name: String,
     pub width: i32,
     pub height: i32,
     pub layer: String,
     pub image_display: Rc<Sprite>,
     pub impass: Vec<Point>,
     pub invis: Vec<Point>,
+    pub override_impass: bool,
 }
 
 impl Tile {
-    pub fn new(builder: TileBuilder) -> Result<Tile, Error> {
-        let (width, height) = (builder.width, builder.height);
+    pub fn new(id: String, builder: TileBuilder) -> Result<Tile, Error> {
+        if builder.impass.is_some() && builder.pass.is_some() {
+            warn!("Cannot specify both pass and impass for a tile");
+            return unable_to_create_error("tile", &id);
+        }
+
+        if builder.invis.is_some() && builder.vis.is_some() {
+            warn!("Cannot specify both vis and invis for a tile");
+            return unable_to_create_error("tile", &id);
+        }
+
+        let (width, height) = (builder.size[0], builder.size[1]);
         let mut impass_points: Vec<Point> = Vec::new();
         let mut invis_points: Vec<Point> = Vec::new();
 
@@ -45,6 +190,21 @@ impl Tile {
                 let (x, y) = verify_point("impass", width, height, p)?;
                 impass_points.push(Point::new(x, y));
             }
+        } else if let Some(pass) = builder.pass {
+            let mut pass_points = HashSet::new();
+            for p in pass {
+                let (x, y) = verify_point("pass", width, height, p)?;
+                pass_points.insert(Point::new(x, y));
+            }
+
+            for x in 0..width {
+                for y in 0..height {
+                    let p = Point::new(x as i32, y as i32);
+                    if pass_points.contains(&p) { continue; }
+
+                    impass_points.push(p);
+                }
+            }
         }
 
         if let Some(invis) = builder.invis {
@@ -52,19 +212,34 @@ impl Tile {
                 let (x, y) = verify_point("invis", width, height, p)?;
                 invis_points.push(Point::new(x, y));
             }
+        } else if let Some(vis) = builder.vis {
+            let mut vis_points = HashSet::new();
+            for p in vis {
+                let (x, y) = verify_point("vis", width, height, p)?;
+                vis_points.insert(Point::new(x, y));
+            }
+
+            for x in 0..width {
+                for y in 0..height {
+                    let p = Point::new(x as i32, y as i32);
+                    if vis_points.contains(&p) { continue; }
+
+                    invis_points.push(p);
+                }
+            }
         }
 
-        let sprite = ResourceSet::get_sprite(&builder.image_display)?;
+        let sprite = ResourceSet::get_sprite(&builder.sprite)?;
 
         Ok(Tile {
-            id: builder.id,
-            name: builder.name,
+            id,
             layer: builder.layer,
-            width: builder.width as i32,
-            height: builder.height as i32,
+            width: builder.size[0] as i32,
+            height: builder.size[1] as i32,
             image_display: sprite,
             impass: impass_points,
             invis: invis_points,
+            override_impass: builder.override_impass.unwrap_or(false),
         })
     }
 }
@@ -86,39 +261,5 @@ fn verify_point(kind: &str, width: usize, height: usize, p: Vec<usize>) -> Resul
 impl PartialEq for Tile {
     fn eq(&self, other: &Tile) -> bool {
         self.id == other.id
-    }
-}
-
-#[derive(Deserialize, Debug)]
-#[serde(deny_unknown_fields)]
-pub struct TileBuilder {
-    pub id: String,
-    pub name: String,
-    pub width: usize,
-    pub height: usize,
-    pub layer: String,
-    image_display: String,
-    pub impass: Option<Vec<Vec<usize>>>,
-    pub invis: Option<Vec<Vec<usize>>>,
-}
-
-impl ResourceBuilder for TileBuilder {
-    fn owned_id(&self) -> String {
-        self.id.to_owned()
-    }
-
-    fn from_json(data: &str) -> Result<TileBuilder, Error> {
-        let resource: TileBuilder = serde_json::from_str(data)?;
-
-        Ok(resource)
-    }
-
-    fn from_yaml(data: &str) -> Result<TileBuilder, Error> {
-        let resource: Result<TileBuilder, serde_yaml::Error> = serde_yaml::from_str(data);
-
-        match resource {
-            Ok(resource) => Ok(resource),
-            Err(error) => Err(Error::new(ErrorKind::InvalidData, format!("{}", error)))
-        }
     }
 }

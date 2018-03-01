@@ -188,7 +188,9 @@ impl AreaEditor {
         self.visibility_tile = area_builder.visibility_tile;
 
         trace!("Loading area terrain.");
-        self.tiles.clear();
+        for &mut (_, ref mut vec) in self.tiles.iter_mut() {
+            vec.clear();
+        }
         for (tile_id, positions) in area_builder.terrain {
             let tile = match Module::tile(&tile_id) {
                 None => {
@@ -296,7 +298,7 @@ impl AreaEditor {
                 tiles_vec.push(vec![position.x as usize, position.y as usize]);
             }
         }
-        let entity_layer = 0;
+        let entity_layer = CONFIG.editor.area.entity_layer;
 
         trace!("Saving actors.");
         let mut actors: Vec<ActorData> = Vec::new();

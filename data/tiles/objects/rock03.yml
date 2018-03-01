@@ -1,7 +1,0 @@
-id: rock03
-name: Rock03
-layer: object
-width: 2
-height: 2
-image_display: "tiles/rock03"
-impass: [ [0,0], [0,1], [1,0], [1,1] ]

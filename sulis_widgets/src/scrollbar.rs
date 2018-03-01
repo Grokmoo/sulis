@@ -53,7 +53,6 @@ impl Scrollbar {
         if self.cur_y < self.min_y { self.cur_y = self.min_y }
         else if self.cur_y > self.max_y { self.cur_y = self.max_y }
 
-        info!("Scroll at {} within {},{}", self.cur_y, self.min_y, self.max_y);
         update_children_recursive(parent, old_y - self.cur_y);
     }
 

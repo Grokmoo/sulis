@@ -1,7 +1,0 @@
-id: water_to_dirt_nw
-name: w_to_d_nw
-layer: base
-width: 2
-height: 2
-image_display: "tiles/water_to_dirt_nw"
-impass: [ [0, 0], [0, 1], [1, 1] ]

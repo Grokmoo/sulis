@@ -116,6 +116,27 @@ impl Terrain {
             }
         }
 
+        for ref layer in layers.iter() {
+            for &(point, ref tile) in layer.impass_override_tiles.iter() {
+                let start_x = point.x;
+                let start_y = point.y;
+                let end_x = start_x + tile.width;
+                let end_y = start_y + tile.height;
+
+                for y in start_y..end_y {
+                    for x in start_x..end_x {
+                        passable[(x + y * width) as usize] = true;
+                    }
+                }
+
+                for p in tile.impass.iter() {
+                    let x = p.x + start_x;
+                    let y = p.y + start_y;
+                    passable[(x + y * width) as usize] = false;
+                }
+            }
+        }
+
         for ref prop_data in props.iter() {
             let prop = &prop_data.prop;
             let start_x = prop_data.location.x as usize;

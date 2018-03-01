@@ -113,7 +113,7 @@ impl AreaView {
         (x as i32, y as i32)
     }
 
-    fn draw_layer_to_texture(&self, renderer: &mut GraphicsRenderer, layer: &Layer) {
+    fn draw_layer_to_texture(&self, renderer: &mut GraphicsRenderer, layer: &Layer, texture_id: &str) {
         let (max_tile_x, max_tile_y) = AreaView::get_texture_cache_max(layer.width, layer.height);
         let mut draw_list = DrawList::empty_sprite();
 
@@ -130,7 +130,7 @@ impl AreaView {
             }
         }
 
-        AreaView::draw_list_to_texture(renderer, draw_list, &layer.id);
+        AreaView::draw_list_to_texture(renderer, draw_list, texture_id);
     }
 
     fn draw_visibility_to_texture(&self, renderer: &mut GraphicsRenderer, sprite: &Rc<Sprite>,
@@ -155,7 +155,6 @@ impl AreaView {
     }
 
     fn draw_list_to_texture(renderer: &mut GraphicsRenderer, draw_list: DrawList, texture_id: &str) {
-        renderer.clear_texture(texture_id);
         let mut draw_list = draw_list;
         draw_list.texture_mag_filter = TextureMagFilter::Linear;
         draw_list.texture_min_filter = TextureMinFilter::Linear;
@@ -229,6 +228,9 @@ impl AreaView {
     }
 }
 
+const BASE_LAYER_ID: &str = "base_layer";
+const AERIAL_LAYER_ID: &str = "aerial_layer";
+
 impl WidgetKind for AreaView {
     fn get_name(&self) -> &str { NAME }
 
@@ -275,18 +277,22 @@ impl WidgetKind for AreaView {
                                           TextureMagFilter::Nearest);
             }
 
-            for layer in state.area.terrain.layers.iter() {
-                let id = &layer.id;
-                trace!("Caching layer '{}'", id);
-                if !renderer.has_texture(&id) {
-                    renderer.register_texture(&id,
+            for (index, layer) in state.area.terrain.layers.iter().enumerate() {
+                let texture_id = if index <= state.area.terrain.entity_layer_index {
+                    BASE_LAYER_ID
+                } else {
+                    AERIAL_LAYER_ID
+                };
+                trace!("Caching layer '{}'", layer.id);
+                if !renderer.has_texture(texture_id) {
+                    renderer.register_texture(texture_id,
                                               ImageBuffer::new(TILE_CACHE_TEXTURE_SIZE,
                                                                TILE_CACHE_TEXTURE_SIZE),
                                               TextureMinFilter::Nearest,
                                               TextureMagFilter::Nearest);
                 }
 
-                self.draw_layer_to_texture(renderer, &layer);
+                self.draw_layer_to_texture(renderer, &layer, texture_id);
             }
 
             self.cache_invalid = false;
@@ -300,15 +306,8 @@ impl WidgetKind for AreaView {
 
         let p = widget.state.inner_position;
         let s = widget.state.scroll_pos;
-        let num_layers = self.layers.len();
-        let mut layer_index = 0;
 
-        while layer_index <= state.area.terrain.entity_layer_index {
-            self.draw_layer(renderer, scale_x, scale_y, widget,
-                            &self.layers[layer_index]);
-            layer_index += 1;
-        }
-
+        self.draw_layer(renderer, scale_x, scale_y, widget, BASE_LAYER_ID);
 
         let mut draw_list = DrawList::empty_sprite();
         for transition in state.area.transitions.iter() {
@@ -327,11 +326,7 @@ impl WidgetKind for AreaView {
 
         self.draw_entities(renderer, scale_x, scale_y, 1.0, widget, &state, millis);
 
-        while layer_index < num_layers {
-            self.draw_layer(renderer, scale_x, scale_y, widget,
-                            &self.layers[layer_index]);
-            layer_index += 1;
-        }
+        self.draw_layer(renderer, scale_x, scale_y, widget, AERIAL_LAYER_ID);
 
         self.draw_layer(renderer, scale_x, scale_y, widget, VISIBILITY_TEX_ID);
 

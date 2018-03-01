@@ -20,7 +20,7 @@ use std::cmp;
 
 use ui::Border;
 
-#[derive(Copy, Clone, Deserialize, Serialize)]
+#[derive(Copy, Clone, Deserialize, Serialize, Eq, Hash, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub struct Point {
     pub x: i32,

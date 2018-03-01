@@ -81,7 +81,7 @@ use self::item::ItemBuilder;
 use self::prop::PropBuilder;
 use self::race::RaceBuilder;
 use self::entity_size::EntitySizeBuilder;
-use self::area::TileBuilder;
+use self::area::TilesList;
 
 thread_local! {
     static MODULE: RefCell<Module> = RefCell::new(Module::default());
@@ -237,8 +237,10 @@ impl Module {
                 insert_if_ok("size", builder.size, EntitySize::new(builder), &mut module.sizes);
             }
 
-            for (id, builder) in builder_set.tile_builders {
-                insert_if_ok("tile", id, Tile::new(builder), &mut module.tiles);
+            for (_, tiles_list) in builder_set.tile_builders {
+                for (id, tile_builder) in tiles_list.tiles {
+                    insert_if_ok("tile", id.to_string(), Tile::new(id, tile_builder), &mut module.tiles);
+                }
             }
 
             for (id, builder) in builder_set.item_builders.into_iter() {
@@ -378,7 +380,7 @@ struct ModuleBuilder {
     prop_builders: HashMap<String, PropBuilder>,
     race_builders: HashMap<String, RaceBuilder>,
     size_builders: HashMap<String, EntitySizeBuilder>,
-    tile_builders: HashMap<String, TileBuilder>,
+    tile_builders: HashMap<String, TilesList>,
 }
 
 impl ModuleBuilder {

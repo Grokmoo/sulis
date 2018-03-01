@@ -1,7 +1,0 @@
-id: dirt_to_water_s
-name: d_to_w_s
-layer: base
-width: 2
-height: 2
-image_display: "tiles/dirt_to_water_s"
-impass: [ [0, 1], [1, 1] ]

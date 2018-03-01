@@ -1,4 +1,4 @@
-starting_area: test_area
+starting_area: area_01
 starting_location: [2, 2]
 name: "Test Module 1"
 description: |

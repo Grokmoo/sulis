@@ -18,7 +18,7 @@ use std::rc::Rc;
 use std::io::Error;
 
 use sulis_core::resource::{ResourceSet, Spritesheet};
-use sulis_core::util::invalid_data_error;
+use sulis_core::util::{invalid_data_error, Point};
 use area::{AreaBuilder, Tile};
 
 pub struct Layer {
@@ -29,6 +29,7 @@ pub struct Layer {
     passable: Vec<bool>,
     visible: Vec<bool>,
     spritesheet_id: String,
+    pub (in area) impass_override_tiles: Vec<(Point, Rc<Tile>)>,
 }
 
 impl Layer {
@@ -38,6 +39,7 @@ impl Layer {
         let height = builder.height as i32;
         let dim = (width * height) as usize;
 
+        let mut impass_overrides = Vec::new();
         let mut display: Vec<Option<Rc<Tile>>> = vec![None;dim];
         let mut passable: Vec<bool> = vec![true;dim];
         let mut visible: Vec<bool> = vec![true;dim];
@@ -78,6 +80,10 @@ impl Layer {
                     &format!("Tile '{}' at [{}, {}] extends past area boundary.",
                              tile.id, base_x, base_y));
             }
+
+            if tile.override_impass {
+                impass_overrides.push((Point::new(base_x, base_y), Rc::clone(&tile)));
+            }
         }
 
         let spritesheet_id = match spritesheet_id {
@@ -93,6 +99,7 @@ impl Layer {
             passable,
             visible,
             spritesheet_id,
+            impass_override_tiles: impass_overrides,
         })
     }
 

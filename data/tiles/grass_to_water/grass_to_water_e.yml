@@ -1,7 +1,0 @@
-id: grass_to_water_e
-name: g_to_w_e
-layer: base
-width: 2
-height: 2
-image_display: "tiles/grass_to_water_e"
-impass: [ [1, 0], [1, 1] ]

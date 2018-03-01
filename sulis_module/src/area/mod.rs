@@ -25,7 +25,7 @@ pub use self::terrain::Terrain;
 
 mod tile;
 pub use self::tile::Tile;
-pub use self::tile::TileBuilder;
+pub use self::tile::TilesList;
 
 use std::collections::HashMap;
 use std::io::{Error, ErrorKind};

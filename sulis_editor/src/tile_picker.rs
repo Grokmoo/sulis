@@ -21,7 +21,7 @@ use std::rc::Rc;
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_module::Module;
 use sulis_module::area::Tile;
-use sulis_widgets::Button;
+use sulis_widgets::{Button, Scrollbar};
 
 const NAME: &str = "tile_picker";
 
@@ -126,6 +126,8 @@ impl WidgetKind for TilePicker {
             Widget::add_child_to(&tiles_content, button);
         }
 
-        vec![layers_content, tiles_content]
+        let scrollbar = Widget::with_defaults(Scrollbar::new(&tiles_content));
+
+        vec![tiles_content, layers_content, scrollbar]
     }
 }

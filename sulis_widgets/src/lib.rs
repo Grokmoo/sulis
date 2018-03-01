@@ -42,6 +42,9 @@ pub use self::markup_renderer::MarkupRenderer;
 pub mod mutually_exclusive_list_box;
 pub use self::mutually_exclusive_list_box::MutuallyExclusiveListBox;
 
+pub mod scrollbar;
+pub use self::scrollbar::Scrollbar;
+
 pub mod spinner;
 pub use self::spinner::Spinner;
 

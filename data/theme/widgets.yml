@@ -4,6 +4,27 @@ children:
     text_params:
       font: "normal"
       scale: 4.0
+  scrollbar:
+    background: bg_base
+    preferred_size: [5, 0]
+    x_relative: Max
+    height_relative: Max
+    custom:
+      scroll_delta: "10"
+    children:
+      up:
+        from: .button
+        width_relative: Max
+        preferred_size: [0, 5]
+        position: [0, 0]
+        foreground: icon_up
+      down:
+        from: .button
+        width_relative: Max
+        preferred_size: [0, 5]
+        y_relative: Max
+        position: [0, 0]
+        foreground: icon_down
   button:
     background: background
     border: [1, 1, 1, 1]

@@ -159,4 +159,6 @@ groups:
       carat_on: [ 204, 51, 2, 16]
       carat_off: [ 207, 51, 2, 16]
       inventory_paper_doll: [ 512, 0, 512, 512]
+      icon_up: [0, 153, 15, 15]
+      icon_down: [0, 170, 15, 15]
       

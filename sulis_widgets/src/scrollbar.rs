@@ -17,6 +17,7 @@
 use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
+use std::cmp;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use {Button};
@@ -26,6 +27,10 @@ const NAME: &str = "scrollbar";
 pub struct Scrollbar {
     widget: Rc<RefCell<Widget>>,
     delta: u32,
+
+    min_y: i32,
+    cur_y: i32,
+    max_y: i32,
 }
 
 impl Scrollbar {
@@ -33,7 +38,50 @@ impl Scrollbar {
         Rc::new(RefCell::new(Scrollbar {
             widget: Rc::clone(widget_to_scroll),
             delta: 1,
+            cur_y: 0,
+            min_y: 0,
+            max_y: 0,
         }))
+    }
+
+    fn update_children_position(&mut self, parent: &Rc<RefCell<Widget>>, dir: i32) {
+        self.compute_min_max_y(parent);
+
+        let old_y = self.cur_y;
+        self.cur_y += dir * self.delta as i32;
+
+        if self.cur_y < self.min_y { self.cur_y = self.min_y }
+        else if self.cur_y > self.max_y { self.cur_y = self.max_y }
+
+        info!("Scroll at {} within {},{}", self.cur_y, self.min_y, self.max_y);
+        update_children_recursive(parent, old_y - self.cur_y);
+    }
+
+    fn compute_min_max_y(&mut self, widget: &Rc<RefCell<Widget>>) {
+        let mut max_y = 0;
+
+        let len = widget.borrow().children.len();
+        for i in 0..len {
+            let child = Rc::clone(&widget.borrow().children[i]);
+
+            max_y = cmp::max(max_y, child.borrow().state.position.y + child.borrow().state.size.height);
+        }
+
+        self.max_y = max_y + self.cur_y - widget.borrow().state.inner_size.height;
+
+        if self.max_y < self.min_y { self.max_y = self.min_y }
+    }
+}
+
+fn update_children_recursive(parent: &Rc<RefCell<Widget>>, delta: i32) {
+    let len = parent.borrow().children.len();
+    for i in 0..len {
+        let child = Rc::clone(&parent.borrow().children[i]);
+        let cur_x = child.borrow().state.position.x;
+        let cur_y = child.borrow().state.position.y;
+        child.borrow_mut().state.set_position(cur_x, cur_y + delta);
+
+        update_children_recursive(&child, delta);
     }
 }
 
@@ -58,8 +106,8 @@ impl WidgetKind for Scrollbar {
         let widget_ref = Rc::clone(&self.widget);
         up.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
             let parent = Widget::get_parent(&widget);
-            let kind = Widget::downcast_kind::<Scrollbar>(&parent);
-            update_children_position(&widget_ref, 0, kind.delta as i32);
+            let kind = Widget::downcast_kind_mut::<Scrollbar>(&parent);
+            kind.update_children_position(&widget_ref, -1);
         })));
 
         let down = Widget::with_theme(Button::empty(), "down");
@@ -67,22 +115,10 @@ impl WidgetKind for Scrollbar {
         let widget_ref = Rc::clone(&self.widget);
         down.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
             let parent = Widget::get_parent(&widget);
-            let kind = Widget::downcast_kind::<Scrollbar>(&parent);
-            update_children_position(&widget_ref, 0, -(kind.delta as i32));
+            let kind = Widget::downcast_kind_mut::<Scrollbar>(&parent);
+            kind.update_children_position(&widget_ref, 1);
         })));
 
         vec![up, down]
-    }
-}
-
-fn update_children_position(parent: &Rc<RefCell<Widget>>, delta_x: i32, delta_y: i32) {
-    let len = parent.borrow().children.len();
-    for i in 0..len {
-        let child = Rc::clone(&parent.borrow().children[i]);
-        let cur_x = child.borrow().state.position.x;
-        let cur_y = child.borrow().state.position.y;
-        child.borrow_mut().state.set_position(cur_x + delta_x, cur_y + delta_y);
-
-        update_children_position(&child, delta_x, delta_y);
     }
 }

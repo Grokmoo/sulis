@@ -29,6 +29,9 @@ use prop_picker::PropPicker;
 mod save_window;
 use save_window::SaveWindow;
 
+mod shift_tiles_window;
+use shift_tiles_window::ShiftTilesWindow;
+
 mod tile_picker;
 use tile_picker::TilePicker;
 
@@ -163,8 +166,19 @@ impl WidgetKind for EditorView {
                 Widget::add_child_to(&root, transition_window);
             })));
 
+            let area_editor_kind_ref = Rc::clone(&area_editor_kind);
+            let shift_tiles = Widget::with_theme(Button::empty(), "shift_tiles");
+            shift_tiles.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
+                let root = Widget::get_root(widget);
+                let shift_tiles_window = Widget::with_defaults(
+                    ShiftTilesWindow::new(Rc::clone(&area_editor_kind_ref)));
+                shift_tiles_window.borrow_mut().state.set_modal(true);
+                Widget::add_child_to(&root, shift_tiles_window);
+            })));
+
             Widget::add_child_to(&top_bar, menu);
             Widget::add_child_to(&top_bar, transitions);
+            Widget::add_child_to(&top_bar, shift_tiles);
         }
 
         let tile_picker = Widget::with_defaults(tile_picker_kind);

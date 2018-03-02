@@ -312,7 +312,7 @@ tiles:
     size: [2, 6]
     sprite: grassland/tree_canopy_c
   tree_canopy_w:
-    layer: object
+    layer: aerial
     size: [4, 6]
     sprite: grassland/tree_canopy_w
   tree_canopy_e:
@@ -356,7 +356,7 @@ tiles:
              [0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2],
                      [1, 3], [2, 3], [3, 3], [4, 3]        ]
   waterfall:
-    layer: base
+    layer: base2
     size: [16, 12]
     sprite: grassland/waterfall
     pass: []
@@ -379,7 +379,7 @@ tiles:
            [6, 0], [6, 1], [6, 2], [6, 3], [7, 0], [7, 1], [7, 2], [7, 3]]
   cave_entrance_e:
     layer: base2
-    size: [12, 8]
+    size: [8, 12]
     sprite: grassland/cave_entrance_e
     pass: [[0, 4], [0, 5], [0, 6], [0, 7], [1, 4], [1, 5], [1, 6], [1, 7],
            [2, 4], [2, 5], [2, 6], [2, 7], [3, 4], [3, 5], [3, 6], [3, 7]]
@@ -387,7 +387,7 @@ tiles:
            [2, 4], [2, 5], [2, 6], [2, 7], [3, 4], [3, 5], [3, 6], [3, 7]]
   cave_entrance_w:
     layer: base2
-    size: [12, 8]
+    size: [8, 12]
     sprite: grassland/cave_entrance_w
     pass: [[4, 4], [4, 5], [4, 6], [4, 7], [5, 4], [5, 5], [5, 6], [5, 7],
            [6, 4], [6, 5], [6, 6], [6, 7], [7, 4], [7, 5], [7, 6], [7, 7]]

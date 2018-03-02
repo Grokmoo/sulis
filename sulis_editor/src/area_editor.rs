@@ -39,7 +39,7 @@ pub enum Mode {
 }
 
 const NAME: &str = "area_editor";
-const MAX_AREA_SIZE: i32 = 128;
+pub (crate) const MAX_AREA_SIZE: i32 = 128;
 
 fn is_current_layer(tile_picker: &Rc<RefCell<TilePicker>>, layer_id: &str) -> bool {
     let tile_picker = tile_picker.borrow();
@@ -63,7 +63,7 @@ pub struct AreaEditor {
     cur_prop: Option<(Point, Rc<Prop>)>,
     removal_props: Vec<(Point, Rc<Prop>)>,
 
-    tiles: Vec<(String, Vec<(Point, Rc<Tile>)>)>,
+    pub (crate) tiles: Vec<(String, Vec<(Point, Rc<Tile>)>)>,
     actors: Vec<(Point, Rc<Actor>)>,
     props: Vec<PropData>,
     transitions: Vec<Transition>,

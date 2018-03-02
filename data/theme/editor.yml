@@ -29,6 +29,11 @@ children:
             preferred_size: [24, 4]
             text: "Transitions"
             position: [28, 0]
+          shift_tiles:
+            from: .button
+            preferred_size: [24, 4]
+            text: "Shift Tiles"
+            position: [54, 0]
           tiles:
             from: .button
             preferred_size: [24, 4]
@@ -115,6 +120,37 @@ children:
         children:
           title:
             text: "Exit the Editor?"
+      shift_tiles_window:
+        from: .window
+        height_relative: Zero
+        preferred_size: [70, 50]
+        x_relative: Center
+        y_relative: Center
+        children:
+          title:
+            text: "Shift Tiles"
+          x_label:
+            from: .label
+            text: "X"
+            position: [0, 10]
+            preferred_size: [10, 12]
+          x_spinner:
+            from: .spinner
+            position: [10, 10]
+          y_label:
+            from: .label
+            text: "Y"
+            position: [30, 10]
+            preferred_size: [10, 12]
+          y_spinner:
+            from: .spinner
+            position: [40, 10]
+          apply_button:
+            from: .button
+            preferred_size: [16, 4]
+            text: "Apply"
+            position: [0, 30]
+            x_relative: Center
       transition_window:
         from: .window
         height_relative: Zero

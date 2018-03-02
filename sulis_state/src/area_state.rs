@@ -38,6 +38,7 @@ pub struct AreaState {
 
     pub pc_vis_cache_invalid: bool,
     pc_vis: Vec<bool>,
+    pc_explored: Vec<bool>,
 
     feedback_text: Vec<AreaFeedbackText>,
     scroll_to_callback: Option<Rc<RefCell<EntityState>>>,
@@ -64,6 +65,7 @@ impl AreaState {
         let transition_grid = vec![None;dim];
         let prop_grid = vec![None;dim];
         let pc_vis = vec![false;dim];
+        let pc_explored = vec![false;dim];
 
         info!("Initializing area state for '{}'", area.name);
         AreaState {
@@ -76,6 +78,7 @@ impl AreaState {
             prop_grid,
             listeners: ChangeListenerList::default(),
             pc_vis,
+            pc_explored,
             pc_vis_cache_invalid: true,
             feedback_text: Vec::new(),
             scroll_to_callback: None,
@@ -164,7 +167,7 @@ impl AreaState {
     }
 
     fn compute_pc_visibility(&mut self, entity: &EntityState) {
-        calculate_los(&mut self.pc_vis, &self.area, entity);
+        calculate_los(&mut self.pc_vis, &mut self.pc_explored, &self.area, entity);
         self.pc_vis_cache_invalid = true;
     }
 
@@ -172,6 +175,12 @@ impl AreaState {
     /// No bounds checking is done on the `x` and `y` arguments
     pub fn is_pc_visible(&self, x: i32, y: i32) -> bool {
         self.pc_vis[(x + y * self.area.width) as usize]
+    }
+
+    /// whether the pc has current explored vis to the specified coordinates
+    /// No bounds checking is done
+    pub fn is_pc_explored(&self, x: i32, y: i32) -> bool {
+        self.pc_explored[(x + y * self.area.width) as usize]
     }
 
     fn point_entities_passable(&self, requester: &Ref<EntityState>,

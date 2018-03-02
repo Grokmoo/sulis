@@ -280,6 +280,7 @@ impl AreaEditor {
         let filename = format!("{}/{}.yml", filename_prefix, self.filename);
         debug!("Saving current area state to {}", filename);
         let visibility_tile = CONFIG.editor.area.visibility_tile.clone();
+        let explored_tile = CONFIG.editor.area.explored_tile.clone();
 
         let mut width = 0;
         let mut height = 0;
@@ -339,6 +340,7 @@ impl AreaEditor {
             terrain,
             layers,
             visibility_tile,
+            explored_tile,
             width: width as usize,
             height: height as usize,
             generate: false,

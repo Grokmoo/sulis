@@ -60,6 +60,7 @@ editor:
     id: "editor_test"
     name: "Editor Test"
     visibility_tile: "gui/area_invis"
+    explored_tile: "gui/area_unexplored"
     entity_layer: 2
     layers:
       - base

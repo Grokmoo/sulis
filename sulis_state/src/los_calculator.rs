@@ -22,7 +22,8 @@ use sulis_core::util;
 use sulis_module::Area;
 use {area_state, EntityState};
 
-pub fn calculate_los(los: &mut Vec<bool>, area: &Rc<Area>, entity: &EntityState) {
+pub fn calculate_los(los: &mut Vec<bool>, exp: &mut Vec<bool>,
+                     area: &Rc<Area>, entity: &EntityState) {
     let start_time = time::Instant::now();
 
     let max_dist = area_state::VIS_TILES;
@@ -47,6 +48,7 @@ pub fn calculate_los(los: &mut Vec<bool>, area: &Rc<Area>, entity: &EntityState)
 
             if dist_squared < (max_dist * max_dist) as f32 {
                 los[index] = cast_ray(area, entity_x, entity_y, x, y);
+                if los[index] { exp[index] = true; }
             } else {
                 los[index] = false;
             }

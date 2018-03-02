@@ -1493,3 +1493,4 @@ transitions:
     to_area: area_02
     image_display: transition
 visibility_tile: gui/area_invis
+explored_tile: gui/area_unexplored

@@ -156,6 +156,7 @@ groups:
       cursor2x2: [221,  0, 32, 32]
       cursor1x1: [170, 51, 16, 16]
       area_invis: [187, 51, 16, 16]
+      area_unexplored: [224, 51, 16, 16]
       carat_on: [ 204, 51, 2, 16]
       carat_off: [ 207, 51, 2, 16]
       inventory_paper_doll: [ 512, 0, 512, 512]

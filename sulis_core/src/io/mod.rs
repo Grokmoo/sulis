@@ -96,6 +96,7 @@ pub struct DrawList {
 }
 
 impl Default for DrawList {
+    #[inline]
     fn default() -> DrawList {
         DrawList {
             quads: Vec::new(),
@@ -112,6 +113,7 @@ impl Default for DrawList {
 }
 
 impl DrawList {
+    #[inline]
     pub fn is_empty(&self) -> bool {
         self.quads.is_empty()
     }
@@ -119,6 +121,7 @@ impl DrawList {
     /// Creates an empty DrawList.  Attempting to draw an empty DrawList will most
     /// likely result in a panic.  You must use `append` to add vertices to this
     /// list if you intend to draw it.
+    #[inline]
     pub fn empty_font() -> DrawList {
         DrawList {
             kind: DrawListKind::Font,
@@ -129,10 +132,12 @@ impl DrawList {
     /// Creates an empty DrawList.  Attempting to draw an empty DrawList will most
     /// likely result in a panic, you must use `append` to add vertices to this list
     /// if you intend to draw it.
+    #[inline]
     pub fn empty_sprite() -> DrawList {
         Default::default()
     }
 
+    #[inline]
     pub fn from_font(texture: &str, quads: Vec<Vertex>) -> DrawList {
         DrawList {
             texture: texture.to_string(),
@@ -142,6 +147,7 @@ impl DrawList {
         }
     }
 
+    #[inline]
     pub fn from_texture_id(id: &str, tex_coords: &[f32; 8], x: f32,
                            y: f32, w: f32, h: f32) -> DrawList {
         let x_min = x;
@@ -166,24 +172,29 @@ impl DrawList {
         }
     }
 
+    #[inline]
     pub fn from_sprite_f32(sprite: &Rc<Sprite>, x: f32, y: f32, w: f32, h: f32) -> DrawList {
         DrawList::from_texture_id(&sprite.sheet_id, &sprite.tex_coords, x, y, w, h)
     }
 
+    #[inline]
     pub fn from_sprite(sprite: &Rc<Sprite>, x: i32, y: i32, w: i32, h: i32) -> DrawList {
         DrawList::from_sprite_f32(sprite, x as f32, y as f32, w as f32, h as f32)
     }
 
+    #[inline]
     pub fn set_scale(&mut self, scale_x: f32, scale_y: f32) {
         self.scale = [scale_x, scale_y];
     }
 
+    #[inline]
     pub fn set_color(&mut self, color: Color) {
         self.color_filter = [color.r, color.g, color.b, color.a];
     }
 
     /// enables color swapping for this draw list and sets the hue that the
     /// swap hue will be swapped to
+    #[inline]
     pub fn set_swap_hue(&mut self, hue: f32) {
         self.color_swap_enabled = true;
         self.swap_hue = hue;
@@ -191,6 +202,7 @@ impl DrawList {
 
     /// appends the contents of the other drawlist to this one, moving
     /// the vertex data out into this DrawList's vertex data.
+    #[inline]
     pub fn append(&mut self, other: &mut DrawList) {
         self.quads.append(&mut other.quads);
         if self.texture.is_empty() {

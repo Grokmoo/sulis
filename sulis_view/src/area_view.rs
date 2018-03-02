@@ -131,9 +131,14 @@ impl AreaView {
         AreaView::draw_list_to_texture(renderer, draw_list, texture_id);
     }
 
-    fn draw_visibility_to_texture(&self, renderer: &mut GraphicsRenderer, sprite: &Rc<Sprite>,
-                                  area_state: &RefMut<AreaState>) {
+    fn draw_visibility_to_texture(&self, renderer: &mut GraphicsRenderer, vis_sprite: &Rc<Sprite>,
+                                  explored_sprite: &Rc<Sprite>, area_state: &RefMut<AreaState>) {
         let start_time = time::Instant::now();
+        // TODO use glScissor to only clear the part of the texture near the PC
+        // GL.Enable (ScissorTest);
+        // GL.Scissor (ViewportX, ViewportY, ViewportWidth, ViewportHeight);
+        // GL.Clear (ClearBufferMask.ColorBufferBit);
+        // GL.Disable (ScissorTest);
         renderer.clear_texture(VISIBILITY_TEX_ID);
         let (max_tile_x, max_tile_y) = AreaView::get_texture_cache_max(area_state.area.width,
                                                                        area_state.area.height);
@@ -143,7 +148,10 @@ impl AreaView {
         for tile_y in 0..max_tile_y {
             for tile_x in 0..max_tile_x {
                 if area_state.is_pc_visible(tile_x, tile_y) { continue; }
-                draw_list.append(&mut DrawList::from_sprite(sprite, tile_x, tile_y, 1, 1));
+                draw_list.append(&mut DrawList::from_sprite(vis_sprite, tile_x, tile_y, 1, 1));
+
+                if area_state.is_pc_explored(tile_x, tile_y) { continue; }
+                draw_list.append(&mut DrawList::from_sprite(explored_sprite, tile_x, tile_y, 1, 1));
             }
         }
 
@@ -284,7 +292,8 @@ impl WidgetKind for AreaView {
 
         if state.pc_vis_cache_invalid {
             trace!("Redrawing PC visibility to texture");
-            self.draw_visibility_to_texture(renderer, &state.area.visibility_tile, &state);
+            self.draw_visibility_to_texture(renderer, &state.area.visibility_tile,
+                                            &state.area.explored_tile, &state);
             state.pc_vis_cache_invalid = false;
         }
 

@@ -40,6 +40,7 @@ pub struct AreaState {
     pc_vis: Vec<bool>,
 
     feedback_text: Vec<AreaFeedbackText>,
+    scroll_to_callback: Option<Rc<RefCell<EntityState>>>,
 }
 
 impl PartialEq for AreaState {
@@ -49,6 +50,14 @@ impl PartialEq for AreaState {
 }
 
 impl AreaState {
+    pub fn push_scroll_to_callback(&mut self, entity: Rc<RefCell<EntityState>>) {
+        self.scroll_to_callback = Some(entity);
+    }
+
+    pub fn pop_scroll_to_callback(&mut self) -> Option<Rc<RefCell<EntityState>>> {
+        self.scroll_to_callback.take()
+    }
+
     pub fn new(area: Rc<Area>) -> AreaState {
         let dim = (area.width * area.height) as usize;
         let entity_grid = vec![None;dim];
@@ -69,6 +78,7 @@ impl AreaState {
             pc_vis,
             pc_vis_cache_invalid: true,
             feedback_text: Vec::new(),
+            scroll_to_callback: None,
         }
     }
 

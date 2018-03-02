@@ -166,6 +166,7 @@ impl GameState {
 
             let location = Location::new(x, y, &state.area_state.borrow().area);
             state.area_state.borrow_mut().add_entity(Rc::clone(&state.pc), location);
+            state.area_state.borrow_mut().push_scroll_to_callback(Rc::clone(&state.pc));
         });
     }
 

@@ -29,7 +29,7 @@ use sulis_core::config::CONFIG;
 use sulis_core::resource::Sprite;
 use sulis_core::extern_image::ImageBuffer;
 use sulis_module::area::Layer;
-use sulis_state::{AreaState, GameState};
+use sulis_state::{AreaState, EntityState, GameState};
 
 use {ActionMenu, EntityMouseover, PropMouseover};
 
@@ -79,13 +79,35 @@ impl AreaView {
         }))
     }
 
-    fn recompute_max_scroll(&mut self, widget: &Rc<RefCell<Widget>>) {
-        let area_state = GameState::area_state();
-        let width = area_state.borrow().area.width;
-        let height = area_state.borrow().area.height;
+    pub fn center_scroll_on(&mut self, entity: &Rc<RefCell<EntityState>>, area_width: i32,
+                            area_height: i32, inner_width: i32, inner_height: i32) {
+        self.recompute_max_scroll(area_width, area_height, inner_width, inner_height);
         let (scale_x, scale_y) = self.scale;
-        self.max_scroll_x = width as f32 - widget.borrow().state.inner_width() as f32 / scale_x;
-        self.max_scroll_y = height as f32 - widget.borrow().state.inner_height() as f32 / scale_y;
+
+        let x = entity.borrow().location.x as f32 + entity.borrow().size.size as f32 / 2.0;
+        let y = entity.borrow().location.y as f32 + entity.borrow().size.size as f32 / 2.0;
+        let x = x - inner_width as f32 / scale_x / 2.0;
+        let y = y - inner_height as f32 / scale_y / 2.0;
+
+        self.set_scroll(x, y);
+    }
+
+    pub fn set_scroll(&mut self, mut scroll_x: f32, mut scroll_y: f32) {
+        if scroll_x < 0.0 { scroll_x = 0.0; }
+        else if scroll_x > self.max_scroll_x { scroll_x = self.max_scroll_x; }
+
+        if scroll_y < 0.0 { scroll_y = 0.0; }
+        else if scroll_y > self.max_scroll_y { scroll_y = self.max_scroll_y; }
+
+        self.scroll_x = scroll_x;
+        self.scroll_y = scroll_y;
+    }
+
+    fn recompute_max_scroll(&mut self, area_width: i32, area_height: i32,
+                            inner_width: i32, inner_height: i32) {
+        let (scale_x, scale_y) = self.scale;
+        self.max_scroll_x = area_width as f32 - inner_width as f32 / scale_x;
+        self.max_scroll_y = area_height as f32 - inner_height as f32 / scale_y;
         if self.max_scroll_x < 0.0 { self.max_scroll_x = 0.0; }
         if self.max_scroll_y < 0.0 { self.max_scroll_y = 0.0; }
     }
@@ -253,6 +275,12 @@ impl WidgetKind for AreaView {
         let area_state = GameState::area_state();
         let mut state = area_state.borrow_mut();
 
+        match state.pop_scroll_to_callback() {
+            None => (),
+            Some(entity) => self.center_scroll_on(&entity, state.area.width, state.area.height,
+                                                  widget.state.inner_width(), widget.state.inner_height()),
+        }
+
         if self.cache_invalid {
             debug!("Caching area '{}' layers to texture", state.area.id);
 
@@ -364,17 +392,18 @@ impl WidgetKind for AreaView {
 
     fn on_mouse_drag(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind,
                      delta_x: f32, delta_y: f32) -> bool {
-        self.recompute_max_scroll(widget);
+        let area_state = GameState::area_state();
+        let area_width = area_state.borrow().area.width;
+        let area_height = area_state.borrow().area.height;
+        self.recompute_max_scroll(area_width, area_height, widget.borrow().state.inner_width(),
+            widget.borrow().state.inner_height());
 
         match kind {
             ClickKind::Middle => {
-                self.scroll_x -= delta_x;
-                self.scroll_y -= delta_y;
-                if self.scroll_x < 0.0 { self.scroll_x = 0.0; }
-                if self.scroll_y < 0.0 { self.scroll_y = 0.0; }
-                if self.scroll_x > self.max_scroll_x { self.scroll_x = self.max_scroll_x; }
-                if self.scroll_y > self.max_scroll_y { self.scroll_y = self.max_scroll_x; }
-           },
+                let x = self.scroll_x - delta_x;
+                let y = self.scroll_y - delta_y;
+                self.set_scroll(x, y);
+            },
             _ => (),
         }
 

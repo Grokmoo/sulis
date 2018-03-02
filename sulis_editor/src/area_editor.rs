@@ -26,7 +26,7 @@ use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::io::event::ClickKind;
 use sulis_module::{Actor, Module, Prop};
 use sulis_core::resource::{ResourceSet, read_single_resource, write_to_file};
-use sulis_core::ui::{animation_state, compute_area_scaling, Color, Cursor, Widget, WidgetKind};
+use sulis_core::ui::{animation_state, compute_area_scaling, Color, Cursor, Scrollable, Widget, WidgetKind};
 use sulis_core::util::{Point};
 use sulis_module::area::*;
 
@@ -39,6 +39,7 @@ pub enum Mode {
 }
 
 const NAME: &str = "area_editor";
+const MAX_AREA_SIZE: i32 = 128;
 
 fn is_current_layer(tile_picker: &Rc<RefCell<TilePicker>>, layer_id: &str) -> bool {
     let tile_picker = tile_picker.borrow();
@@ -72,8 +73,7 @@ pub struct AreaEditor {
     pub filename: String,
     pub visibility_tile: String,
 
-    scroll_x_f32: f32,
-    scroll_y_f32: f32,
+    scroll: Scrollable,
     scale: (f32, f32),
 }
 
@@ -101,12 +101,11 @@ impl AreaEditor {
             removal_tiles: Vec::new(),
             removal_actors: Vec::new(),
             removal_props: Vec::new(),
-            scroll_x_f32: 0.0,
-            scroll_y_f32: 0.0,
             id: CONFIG.editor.area.id.clone(),
             name: CONFIG.editor.area.name.clone(),
             filename: CONFIG.editor.area.filename.clone(),
             visibility_tile: CONFIG.editor.area.visibility_tile.clone(),
+            scroll: Scrollable::new(),
             scale: (1.0, 1.0),
         }))
     }
@@ -360,19 +359,15 @@ impl AreaEditor {
     }
 
     fn get_cursor_pos(&self, widget: &Rc<RefCell<Widget>>, width: i32, height: i32) -> (i32, i32) {
-        let x = widget.borrow().state.position.x;
-        let y = widget.borrow().state.position.y;
-
-        let mut x = Cursor::get_x_f32() - x as f32;
-        let mut y = Cursor::get_y_f32() - y as f32;
+        let mut x = Cursor::get_x_f32() - widget.borrow().state.inner_position.x as f32;
+        let mut y = Cursor::get_y_f32() - widget.borrow().state.inner_position.y as f32;
 
         x /= self.scale.0;
         y /= self.scale.1;
         x -= width as f32 / 2.0;
         y -= height as f32 / 2.0;
 
-        (x.round() as i32 + widget.borrow().state.scroll_pos.x,
-            y.round() as i32 + widget.borrow().state.scroll_pos.y)
+        ((x + self.scroll.x()).round() as i32, (y + self.scroll.y()).round() as i32)
     }
 
     fn get_current_tile(&self) -> Option<Rc<Tile>> {
@@ -552,19 +547,12 @@ impl WidgetKind for AreaEditor {
 
     fn as_any_mut(&mut self) -> &mut Any { self }
 
-    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
-        widget.borrow_mut().state.set_max_scroll_pos(256, 256);
-        Vec::new()
-    }
-
     fn draw_graphics_mode(&mut self, renderer: &mut GraphicsRenderer, pixel_size: Point,
                           widget: &Widget, millis: u32) {
         self.scale = compute_area_scaling(pixel_size);
         let (scale_x, scale_y) = self.scale;
 
         let p = widget.state.position;
-        let s = widget.state.scroll_pos;
-
         // TODO fix this hack
         let p = Point::new(p.x / 4, p.y / 4);
 
@@ -572,9 +560,10 @@ impl WidgetKind for AreaEditor {
         for &(_, ref tiles) in self.tiles.iter() {
             for &(pos, ref tile) in tiles {
                 let sprite = &tile.image_display;
-                let x = pos.x + p.x - s.x;
-                let y = pos.y + p.y - s.y;
-                draw_list.append(&mut DrawList::from_sprite(sprite, x, y, tile.width, tile.height));
+                let x = (pos.x + p.x) as f32 - self.scroll.x();
+                let y = (pos.y + p.y) as f32 - self.scroll.y();
+                draw_list.append(&mut DrawList::from_sprite_f32(sprite, x, y,
+                                                                tile.width as f32, tile.height as f32));
             }
         }
         if !draw_list.is_empty() {
@@ -583,29 +572,30 @@ impl WidgetKind for AreaEditor {
         }
 
         for prop_data in self.props.iter() {
-            let x = prop_data.location.x + p.x - s.x;
-            let y = prop_data.location.y + p.x - s.y;
+            let x = (prop_data.location.x + p.x) as f32 - self.scroll.x();
+            let y = (prop_data.location.y + p.y) as f32 - self.scroll.y();
             let mut draw_list = DrawList::empty_sprite();
             prop_data.prop.append_to_draw_list(&mut draw_list, &animation_state::NORMAL,
-                                               x as f32, y as f32, millis);
+                                               x, y, millis);
             draw_list.set_scale(scale_x, scale_y);
             renderer.draw(draw_list);
         }
 
         for &(pos, ref actor) in self.actors.iter() {
-            actor.draw(renderer, scale_x, scale_y,
-                       (pos.x + p.x - s.x) as f32, (pos.y + p.y - s.y) as f32, millis);
+            let x = (pos.x + p.x) as f32 - self.scroll.x();
+            let y = (pos.y + p.y) as f32 - self.scroll.y();
+            actor.draw(renderer, scale_x, scale_y, x, y, millis);
         }
 
         for ref transition in self.transitions.iter() {
             let image = &transition.image_display;
-            let x = transition.from.x + p.x - s.x;
-            let y = transition.from.y + p.y - s.y;
+            let x = (transition.from.x + p.x) as f32 - self.scroll.x();
+            let y = (transition.from.y + p.y) as f32 - self.scroll.y();
             let w = transition.size.width;
             let h = transition.size.height;
             let mut draw_list = DrawList::empty_sprite();
             image.append_to_draw_list(&mut draw_list, &widget.state.animation_state,
-                                     x as f32, y as f32, w as f32, h as f32, millis);
+                                     x, y, w as f32, h as f32, millis);
             draw_list.set_scale(scale_x, scale_y);
             renderer.draw(draw_list);
         }
@@ -614,9 +604,10 @@ impl WidgetKind for AreaEditor {
             let mut draw_list = DrawList::empty_sprite();
             for &(pos, ref tile) in self.removal_tiles.iter() {
                 let sprite = &tile.image_display;
-                let x = pos.x + p.x - s.x;
-                let y = pos.y + p.y - s.y;
-                draw_list.append(&mut DrawList::from_sprite(sprite, x, y, tile.width, tile.height));
+                let x = (pos.x + p.x) as f32 - self.scroll.x();
+                let y = (pos.y + p.y) as f32 - self.scroll.y();
+                draw_list.append(&mut DrawList::from_sprite_f32(sprite, x, y,
+                                                                tile.width as f32, tile.height as f32));
             }
 
             draw_list.set_color(Color::from_string("FF000088"));
@@ -625,33 +616,35 @@ impl WidgetKind for AreaEditor {
         }
 
         for &(pos, ref actor) in self.removal_actors.iter() {
-            actor.draw(renderer, scale_x, scale_y,
-                       (pos.x + p.x - s.x) as f32, (pos.y + p.y - s.y) as f32, millis);
+            let x = (pos.x + p.x) as f32 - self.scroll.x();
+            let y = (pos.y + p.y) as f32 - self.scroll.y();
+            actor.draw(renderer, scale_x, scale_y, x, y, millis);
         }
 
         if let Some((cur_tile_pos, ref cur_tile)) = self.cur_tile {
             let sprite = &cur_tile.image_display;
-            let x = cur_tile_pos.x + p.x - s.x;
-            let y = cur_tile_pos.y + p.y - s.y;
-            let mut draw_list = DrawList::from_sprite(sprite, x, y, cur_tile.width, cur_tile.height);
+            let x = (cur_tile_pos.x + p.x) as f32 - self.scroll.x();
+            let y = (cur_tile_pos.y + p.y) as f32 - self.scroll.y();
+            let mut draw_list = DrawList::from_sprite_f32(sprite, x, y,
+                                                          cur_tile.width as f32, cur_tile.height as f32);
             draw_list.set_color(Color::from_string("FFFFFF88"));
             draw_list.set_scale(scale_x, scale_y);
             renderer.draw(draw_list);
         }
 
         if let Some((cur_actor_pos, ref cur_actor)) = self.cur_actor {
-            cur_actor.draw(renderer, scale_x, scale_y,
-                           (cur_actor_pos.x + p.x - s.x) as f32,
-                           (cur_actor_pos.y + p.y - s.y) as f32, millis);
+            let x = (cur_actor_pos.x + p.x) as f32 - self.scroll.x();
+            let y = (cur_actor_pos.y + p.y) as f32 - self.scroll.y();
+            cur_actor.draw(renderer, scale_x, scale_y, x, y, millis);
         }
 
         if !self.removal_props.is_empty() {
             let mut draw_list = DrawList::empty_sprite();
             for &(pos, ref prop) in self.removal_props.iter() {
-                let x = pos.x + p.x - s.x;
-                let y = pos.y + p.y - s.y;
+                let x = (pos.x + p.x) as f32 - self.scroll.x();
+                let y = (pos.y + p.y) as f32 - self.scroll.y();
                 prop.append_to_draw_list(&mut draw_list, &animation_state::NORMAL,
-                                         x as f32, y as f32, millis);
+                                         x, y, millis);
             }
 
             draw_list.set_color(Color::from_string("F008"));
@@ -660,11 +653,11 @@ impl WidgetKind for AreaEditor {
         }
 
         if let Some((cur_prop_pos, ref cur_prop)) = self.cur_prop {
-            let x = cur_prop_pos.x + p.x - s.x;
-            let y = cur_prop_pos.y + p.y - s.y;
+            let x = (cur_prop_pos.x + p.x) as f32 - self.scroll.x();
+            let y = (cur_prop_pos.y + p.y) as f32 - self.scroll.y();
             let mut draw_list = DrawList::empty_sprite();
             cur_prop.append_to_draw_list(&mut draw_list, &animation_state::NORMAL,
-                                         x as f32, y as f32, millis);
+                                         x, y, millis);
             draw_list.set_color(Color::from_string("FFF8"));
             draw_list.set_scale(scale_x, scale_y);
             renderer.draw(draw_list);
@@ -699,6 +692,8 @@ impl WidgetKind for AreaEditor {
 
     fn on_mouse_drag(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind,
                      delta_x: f32, delta_y: f32) -> bool {
+        self.scroll.compute_max(&*widget.borrow(), MAX_AREA_SIZE, MAX_AREA_SIZE, self.scale.0, self.scale.1);
+
         match self.mode {
             Mode::Tiles => (),
             _ => return true,
@@ -712,12 +707,7 @@ impl WidgetKind for AreaEditor {
             }, ClickKind::Right => {
                 self.remove_cur_tiles(widget);
             }, ClickKind::Middle => {
-                self.scroll_x_f32 -= delta_x;
-                self.scroll_y_f32 -= delta_y;
-                if self.scroll_x_f32 < 0.0 { self.scroll_x_f32 = 0.0; }
-                if self.scroll_y_f32 < 0.0 { self.scroll_y_f32 = 0.0; }
-                widget.borrow_mut().state.set_scroll(self.scroll_x_f32 as i32,
-                                                     self.scroll_y_f32 as i32);
+                self.scroll.change(delta_x, delta_y);
             }
         }
 

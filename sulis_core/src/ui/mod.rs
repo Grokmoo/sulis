@@ -76,3 +76,50 @@ pub fn compute_area_scaling(pixel_size: Point) -> (f32, f32) {
 
     (scale_x, scale_y)
 }
+
+pub struct Scrollable {
+    x: f32,
+    y: f32,
+    max_x: f32,
+    max_y: f32,
+}
+
+impl Scrollable {
+    pub fn new() -> Scrollable {
+        Scrollable {
+            x: 0.0,
+            y: 0.0,
+            max_x: 0.0,
+            max_y: 0.0,
+        }
+    }
+
+    pub fn compute_max(&mut self, widget: &Widget, area_width: i32, area_height: i32,
+                    scale_x: f32, scale_y: f32) {
+        self.max_x = area_width as f32 - widget.state.inner_width() as f32 / scale_x;
+        self.max_y = area_height as f32 - widget.state.inner_height() as f32 / scale_y;
+        if self.max_x < 0.0 { self.max_x = 0.0; }
+        if self.max_y < 0.0 { self.max_y = 0.0; }
+    }
+
+    pub fn change(&mut self, delta_x: f32, delta_y: f32) {
+        let x = self.x - delta_x;
+        let y = self.y - delta_y;
+        self.set(x, y);
+    }
+
+    pub fn set(&mut self, mut scroll_x: f32, mut scroll_y: f32) {
+        if scroll_x < 0.0 { scroll_x = 0.0; }
+        else if scroll_x > self.max_x { scroll_x = self.max_x; }
+
+        if scroll_y < 0.0 { scroll_y = 0.0; }
+        else if scroll_y > self.max_y { scroll_y = self.max_y; }
+
+        self.x = scroll_x;
+        self.y = scroll_y;
+    }
+
+    pub fn x(&self) -> f32 { self.x }
+
+    pub fn y(&self) -> f32 { self.y }
+}

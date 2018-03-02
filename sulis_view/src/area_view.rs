@@ -21,7 +21,7 @@ use std::cmp;
 use std::time;
 
 use sulis_core::ui::{compute_area_scaling, animation_state};
-use sulis_core::ui::{color, Cursor, WidgetKind, Widget};
+use sulis_core::ui::{color, Cursor, Scrollable, WidgetKind, Widget};
 use sulis_core::io::*;
 use sulis_core::io::event::ClickKind;
 use sulis_core::util::{self, Point};
@@ -50,11 +50,7 @@ pub struct AreaView {
     cache_invalid: bool,
     layers: Vec<String>,
 
-    scroll_x: f32,
-    scroll_y: f32,
-    max_scroll_x: f32,
-    max_scroll_y: f32,
-
+    scroll: Scrollable,
     hover_sprite: Option<HoverSprite>,
 }
 
@@ -72,51 +68,28 @@ impl AreaView {
             hover_sprite: None,
             cache_invalid: true,
             layers: Vec::new(),
-            scroll_x: 0.0,
-            scroll_y: 0.0,
-            max_scroll_x: 0.0,
-            max_scroll_y: 0.0,
+            scroll: Scrollable::new(),
         }))
     }
 
     pub fn center_scroll_on(&mut self, entity: &Rc<RefCell<EntityState>>, area_width: i32,
-                            area_height: i32, inner_width: i32, inner_height: i32) {
-        self.recompute_max_scroll(area_width, area_height, inner_width, inner_height);
+                            area_height: i32, widget: &Widget) {
         let (scale_x, scale_y) = self.scale;
+        self.scroll.compute_max(widget, area_width, area_height, scale_x, scale_y);
 
         let x = entity.borrow().location.x as f32 + entity.borrow().size.size as f32 / 2.0;
         let y = entity.borrow().location.y as f32 + entity.borrow().size.size as f32 / 2.0;
-        let x = x - inner_width as f32 / scale_x / 2.0;
-        let y = y - inner_height as f32 / scale_y / 2.0;
+        let x = x - widget.state.inner_width() as f32 / scale_x / 2.0;
+        let y = y - widget.state.inner_height() as f32 / scale_y / 2.0;
 
-        self.set_scroll(x, y);
-    }
-
-    pub fn set_scroll(&mut self, mut scroll_x: f32, mut scroll_y: f32) {
-        if scroll_x < 0.0 { scroll_x = 0.0; }
-        else if scroll_x > self.max_scroll_x { scroll_x = self.max_scroll_x; }
-
-        if scroll_y < 0.0 { scroll_y = 0.0; }
-        else if scroll_y > self.max_scroll_y { scroll_y = self.max_scroll_y; }
-
-        self.scroll_x = scroll_x;
-        self.scroll_y = scroll_y;
-    }
-
-    fn recompute_max_scroll(&mut self, area_width: i32, area_height: i32,
-                            inner_width: i32, inner_height: i32) {
-        let (scale_x, scale_y) = self.scale;
-        self.max_scroll_x = area_width as f32 - inner_width as f32 / scale_x;
-        self.max_scroll_y = area_height as f32 - inner_height as f32 / scale_y;
-        if self.max_scroll_x < 0.0 { self.max_scroll_x = 0.0; }
-        if self.max_scroll_y < 0.0 { self.max_scroll_y = 0.0; }
+        self.scroll.set(x, y);
     }
 
     pub fn get_mouseover_pos(&self, x: i32, y: i32, width: i32, height: i32) -> (i32, i32) {
         let x = x as f32 + width as f32 / 2.0;
         let y = y as f32 + height as f32;
-        let x = ((x - self.scroll_x) * self.scale.0).round() as i32;
-        let y = ((y - self.scroll_y) * self.scale.1).round() as i32;
+        let x = ((x - self.scroll.x()) * self.scale.0).round() as i32;
+        let y = ((y - self.scroll.y()) * self.scale.1).round() as i32;
 
         (x, y)
     }
@@ -124,7 +97,7 @@ impl AreaView {
     fn get_cursor_pos(&self, widget: &Rc<RefCell<Widget>>) -> (i32, i32) {
         let pos = widget.borrow().state.inner_position;
         let (x, y) = self.get_cursor_pos_scaled(pos.x, pos.y);
-        ((x + self.scroll_x) as i32, (y + self.scroll_y) as i32)
+        ((x + self.scroll.x()) as i32, (y + self.scroll.y()) as i32)
     }
 
     fn get_cursor_pos_scaled(&self, pos_x: i32, pos_y: i32) -> (f32, f32) {
@@ -202,8 +175,8 @@ impl AreaView {
         let p = widget.state.inner_position;
         let mut draw_list =
             DrawList::from_texture_id(&id, &TEX_COORDS,
-                                      p.x as f32 - self.scroll_x,
-                                      p.y as f32 - self.scroll_y,
+                                      p.x as f32 - self.scroll.x(),
+                                      p.y as f32 - self.scroll.y(),
                                       (TILE_CACHE_TEXTURE_SIZE / TILE_SIZE) as f32,
                                       (TILE_CACHE_TEXTURE_SIZE / TILE_SIZE) as f32);
         draw_list.set_scale(scale_x, scale_y);
@@ -217,8 +190,8 @@ impl AreaView {
         let mut draw_list = DrawList::empty_sprite();
         draw_list.set_scale(scale_x, scale_y);
         for prop_state in state.prop_iter() {
-            let x = (prop_state.location.x + p.x) as f32 - self.scroll_x;
-            let y = (prop_state.location.y + p.y) as f32 - self.scroll_y;
+            let x = (prop_state.location.x + p.x) as f32 - self.scroll.x();
+            let y = (prop_state.location.y + p.y) as f32 - self.scroll.y();
             prop_state.append_to_draw_list(&mut draw_list, x, y, millis);
         }
 
@@ -230,8 +203,8 @@ impl AreaView {
             let entity = entity.borrow();
 
             if entity.location_points().any(|p| state.is_pc_visible(p.x, p.y)) {
-                let x = (entity.location.x + p.x) as f32 - self.scroll_x + entity.sub_pos.0;
-                let y = (entity.location.y + p.y) as f32 - self.scroll_y + entity.sub_pos.1;
+                let x = (entity.location.x + p.x) as f32 - self.scroll.x() + entity.sub_pos.0;
+                let y = (entity.location.y + p.y) as f32 - self.scroll.y() + entity.sub_pos.1;
 
                 // TODO implement drawing with alpha
                 entity.actor.draw_graphics_mode(renderer, scale_x, scale_y,
@@ -277,8 +250,7 @@ impl WidgetKind for AreaView {
 
         match state.pop_scroll_to_callback() {
             None => (),
-            Some(entity) => self.center_scroll_on(&entity, state.area.width, state.area.height,
-                                                  widget.state.inner_width(), widget.state.inner_height()),
+            Some(entity) => self.center_scroll_on(&entity, state.area.width, state.area.height, widget),
         }
 
         if self.cache_invalid {
@@ -324,8 +296,8 @@ impl WidgetKind for AreaView {
         for transition in state.area.transitions.iter() {
             draw_list.set_scale(scale_x, scale_y);
             transition.image_display.append_to_draw_list(&mut draw_list, &animation_state::NORMAL,
-                                                        (transition.from.x + p.x) as f32 - self.scroll_x,
-                                                        (transition.from.y + p.y) as f32 - self.scroll_y,
+                                                        (transition.from.x + p.x) as f32 - self.scroll.x(),
+                                                        (transition.from.y + p.y) as f32 - self.scroll.y(),
                                                         transition.size.width as f32,
                                                         transition.size.height as f32,
                                                         millis);
@@ -346,8 +318,8 @@ impl WidgetKind for AreaView {
 
         if let Some(ref hover) = self.hover_sprite {
             let mut draw_list = DrawList::from_sprite_f32(&hover.sprite,
-                                                          (hover.x + p.x) as f32 - self.scroll_x,
-                                                          (hover.y + p.y) as f32 - self.scroll_y,
+                                                          (hover.x + p.x) as f32 - self.scroll.x(),
+                                                          (hover.y + p.y) as f32 - self.scroll.y(),
                                                           hover.w as f32, hover.h as f32);
             if !hover.left_click_action_valid { draw_list.set_color(color::RED); }
             draw_list.set_scale(scale_x, scale_y);
@@ -355,12 +327,12 @@ impl WidgetKind for AreaView {
         }
 
         for feedback_text in state.feedback_text_iter() {
-            feedback_text.draw(renderer, p.x as f32 - self.scroll_x, p.y as f32- self.scroll_y,
+            feedback_text.draw(renderer, p.x as f32 - self.scroll.x(), p.y as f32- self.scroll.y(),
                                scale_x, scale_y);
         }
 
 
-        GameState::draw_graphics_mode(renderer, p.x as f32 - self.scroll_x, p.y as f32- self.scroll_y,
+        GameState::draw_graphics_mode(renderer, p.x as f32 - self.scroll.x(), p.y as f32- self.scroll.y(),
                                       scale_x, scale_y, millis);
     }
 
@@ -395,15 +367,10 @@ impl WidgetKind for AreaView {
         let area_state = GameState::area_state();
         let area_width = area_state.borrow().area.width;
         let area_height = area_state.borrow().area.height;
-        self.recompute_max_scroll(area_width, area_height, widget.borrow().state.inner_width(),
-            widget.borrow().state.inner_height());
+        self.scroll.compute_max(&*widget.borrow(), area_width, area_height, self.scale.0, self.scale.1);
 
         match kind {
-            ClickKind::Middle => {
-                let x = self.scroll_x - delta_x;
-                let y = self.scroll_y - delta_y;
-                self.set_scroll(x, y);
-            },
+            ClickKind::Middle => self.scroll.change(delta_x, delta_y),
             _ => (),
         }
 
@@ -435,8 +402,8 @@ impl WidgetKind for AreaView {
             // let pc = GameState::pc();
             // if *pc.borrow() != *entity.borrow() {
             //     let sprite = &entity.borrow().size.cursor_sprite;
-            //     let x = entity.borrow().location.x as f32 - self.scroll_x;
-            //     let y = entity.borrow().location.y as f32 - self.scroll_y;
+            //     let x = entity.borrow().location.x as f32 - self.scroll.x();
+            //     let y = entity.borrow().location.y as f32 - self.scroll.y();
             //     let size = entity.borrow().size() as f32;
             //
             //     let mut cursor = DrawList::from_sprite_f32(sprite, x, y, size, size);

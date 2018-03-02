@@ -75,8 +75,9 @@ impl Terrain {
             return invalid_data_error("No tiles in area terrain");
         }
 
+        let mut entity_layer_index = builder.entity_layer;
         let mut layers_sorted: Vec<Layer> = Vec::new();
-        for id in builder.layers.iter() {
+        for (orig_index, id) in builder.layers.iter().enumerate() {
             let mut layer_index: Option<usize> = None;
             for (index, layer) in layers.iter().enumerate() {
                 if &layer.id == id {
@@ -86,8 +87,12 @@ impl Terrain {
             }
 
             let index = match layer_index {
-                None => return invalid_data_error(&format!("Layer '{}' is specified in area,\
-                                                  but no tiles have that layer.", id)),
+                None => {
+                    if orig_index <= entity_layer_index {
+                        entity_layer_index -= 1;
+                    }
+                    continue;
+                }
                 Some(index) => index,
             };
 
@@ -161,7 +166,6 @@ impl Terrain {
             }
         }
 
-        let entity_layer_index = builder.entity_layer;
         if entity_layer_index >= layers.len() {
             return invalid_data_error(
                 &format!("Entity layer of {} is invalid.", entity_layer_index));

@@ -74,11 +74,11 @@ impl AreaFeedbackText {
         self.alpha > 0.0
     }
 
-    pub fn draw(&self, renderer: &mut GraphicsRenderer, offset_x: i32, offset_y: i32,
+    pub fn draw(&self, renderer: &mut GraphicsRenderer, offset_x: f32, offset_y: f32,
                 scale_x: f32, scale_y: f32) {
         // TODO font, color and text size at a minimum should be configurable via text configuration
-        let pos_x = offset_x as f32 + self.pos_x - self.text_width / 2.0;
-        let pos_y = offset_y as f32 + self.pos_y - self.hover_y;
+        let pos_x = offset_x + self.pos_x - self.text_width / 2.0;
+        let pos_y = offset_y + self.pos_y - self.hover_y;
 
         let mut draw_list = self.font_renderer.get_draw_list(&self.text, pos_x, pos_y, self.scale);
         draw_list.set_scale(scale_x, scale_y);

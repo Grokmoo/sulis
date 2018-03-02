@@ -33,17 +33,29 @@ use sulis_state::{AreaState, GameState};
 
 use {ActionMenu, EntityMouseover, PropMouseover};
 
+struct HoverSprite {
+    pub sprite: Rc<Sprite>,
+    pub x: i32,
+    pub y: i32,
+    pub w: i32,
+    pub h: i32,
+    pub left_click_action_valid: bool,
+}
+
 const NAME: &'static str = "area";
 
 pub struct AreaView {
     mouse_over: Rc<RefCell<Widget>>,
     scale: (f32, f32),
-    cursors: Option<DrawList>,
     cache_invalid: bool,
     layers: Vec<String>,
 
-    scroll_x_f32: f32,
-    scroll_y_f32: f32,
+    scroll_x: f32,
+    scroll_y: f32,
+    max_scroll_x: f32,
+    max_scroll_y: f32,
+
+    hover_sprite: Option<HoverSprite>,
 }
 
 const TILE_CACHE_TEXTURE_SIZE: u32 = 2048;
@@ -57,52 +69,43 @@ impl AreaView {
         Rc::new(RefCell::new(AreaView {
             mouse_over: mouse_over,
             scale: (1.0, 1.0),
-            cursors: None,
+            hover_sprite: None,
             cache_invalid: true,
             layers: Vec::new(),
-            scroll_x_f32: 0.0,
-            scroll_y_f32: 0.0,
+            scroll_x: 0.0,
+            scroll_y: 0.0,
+            max_scroll_x: 0.0,
+            max_scroll_y: 0.0,
         }))
     }
 
-    pub fn get_mouseover_pos(&self, widget: &Rc<RefCell<Widget>>,
-                             x: i32, y: i32, width: i32, height: i32) -> (i32, i32) {
+    fn recompute_max_scroll(&mut self, widget: &Rc<RefCell<Widget>>) {
+        let area_state = GameState::area_state();
+        let width = area_state.borrow().area.width;
+        let height = area_state.borrow().area.height;
+        let (scale_x, scale_y) = self.scale;
+        self.max_scroll_x = width as f32 - widget.borrow().state.inner_width() as f32 / scale_x;
+        self.max_scroll_y = height as f32 - widget.borrow().state.inner_height() as f32 / scale_y;
+        if self.max_scroll_x < 0.0 { self.max_scroll_x = 0.0; }
+        if self.max_scroll_y < 0.0 { self.max_scroll_y = 0.0; }
+    }
+
+    pub fn get_mouseover_pos(&self, x: i32, y: i32, width: i32, height: i32) -> (i32, i32) {
         let x = x as f32 + width as f32 / 2.0;
         let y = y as f32 + height as f32;
-        let x = ((x - widget.borrow().state.scroll_pos.x as f32) * self.scale.0).round() as i32;
-        let y = ((y - widget.borrow().state.scroll_pos.y as f32) * self.scale.1).round() as i32;
+        let x = ((x - self.scroll_x) * self.scale.0).round() as i32;
+        let y = ((y - self.scroll_y) * self.scale.1).round() as i32;
 
         (x, y)
     }
 
-    pub fn clear_cursors(&mut self) {
-        self.cursors = None;
-    }
-
-    pub fn add_cursor(&mut self, mut cursor: DrawList) {
-        match self.cursors {
-            Some(ref mut c) => {
-                c.append(&mut cursor);
-                return;
-            },
-            None => {},
-        };
-
-        self.cursors = Some(cursor);
-    }
-
-    fn get_cursor_pos_no_scroll(&self, widget: &Rc<RefCell<Widget>>) -> (i32, i32) {
-        self.get_cursor_pos_scaled(widget.borrow().state.position.x,
-            widget.borrow().state.position.y)
-    }
-
     fn get_cursor_pos(&self, widget: &Rc<RefCell<Widget>>) -> (i32, i32) {
-        let pos = widget.borrow().state.position;
+        let pos = widget.borrow().state.inner_position;
         let (x, y) = self.get_cursor_pos_scaled(pos.x, pos.y);
-        (x + widget.borrow().state.scroll_pos.x, y + widget.borrow().state.scroll_pos.y)
+        ((x + self.scroll_x) as i32, (y + self.scroll_y) as i32)
     }
 
-    fn get_cursor_pos_scaled(&self, pos_x: i32, pos_y: i32) -> (i32, i32) {
+    fn get_cursor_pos_scaled(&self, pos_x: i32, pos_y: i32) -> (f32, f32) {
         let mut x = Cursor::get_x_f32() - pos_x as f32;
         let mut y = Cursor::get_y_f32() - pos_y as f32;
 
@@ -110,7 +113,7 @@ impl AreaView {
         x = x / scale_x;
         y = y / scale_y;
 
-        (x as i32, y as i32)
+        (x, y)
     }
 
     fn draw_layer_to_texture(&self, renderer: &mut GraphicsRenderer, layer: &Layer, texture_id: &str) {
@@ -175,37 +178,25 @@ impl AreaView {
     fn draw_layer(&self, renderer: &mut GraphicsRenderer, scale_x: f32, scale_y: f32,
                   widget: &Widget, id: &str) {
         let p = widget.state.inner_position;
-        let s = widget.state.scroll_pos;
         let mut draw_list =
             DrawList::from_texture_id(&id, &TEX_COORDS,
-                                      (p.x - s.x) as f32,
-                                      (p.y - s.y) as f32,
+                                      p.x as f32 - self.scroll_x,
+                                      p.y as f32 - self.scroll_y,
                                       (TILE_CACHE_TEXTURE_SIZE / TILE_SIZE) as f32,
                                       (TILE_CACHE_TEXTURE_SIZE / TILE_SIZE) as f32);
         draw_list.set_scale(scale_x, scale_y);
         renderer.draw(draw_list);
     }
 
-    fn recompute_max_scroll(&mut self, widget: &Rc<RefCell<Widget>>) {
-        let area_state = GameState::area_state();
-        let width = area_state.borrow().area.width;
-        let height = area_state.borrow().area.height;
-        let (scale_x, scale_y) = self.scale;
-        // TODO fix this
-        widget.borrow_mut().state.set_max_scroll_pos((width as f32 * scale_x).ceil() as i32
-                                                     , (height as f32 * scale_y).ceil() as i32);
-    }
-
     fn draw_entities(&self, renderer: &mut GraphicsRenderer, scale_x: f32, scale_y: f32,
                      _alpha: f32, widget: &Widget, state: &AreaState, millis: u32) {
         let p = widget.state.inner_position;
-        let s = widget.state.scroll_pos;
 
         let mut draw_list = DrawList::empty_sprite();
         draw_list.set_scale(scale_x, scale_y);
         for prop_state in state.prop_iter() {
-            let x = (prop_state.location.x + p.x - s.x) as f32;
-            let y = (prop_state.location.y + p.y - s.y) as f32;
+            let x = (prop_state.location.x + p.x) as f32 - self.scroll_x;
+            let y = (prop_state.location.y + p.y) as f32 - self.scroll_y;
             prop_state.append_to_draw_list(&mut draw_list, x, y, millis);
         }
 
@@ -217,8 +208,8 @@ impl AreaView {
             let entity = entity.borrow();
 
             if entity.location_points().any(|p| state.is_pc_visible(p.x, p.y)) {
-                let x = (entity.location.x + p.x - s.x) as f32 + entity.sub_pos.0;
-                let y = (entity.location.y + p.y - s.y) as f32 + entity.sub_pos.1;
+                let x = (entity.location.x + p.x) as f32 - self.scroll_x + entity.sub_pos.0;
+                let y = (entity.location.y + p.y) as f32 - self.scroll_y + entity.sub_pos.1;
 
                 // TODO implement drawing with alpha
                 entity.actor.draw_graphics_mode(renderer, scale_x, scale_y,
@@ -238,13 +229,8 @@ impl WidgetKind for AreaView {
 
     fn as_any_mut(&mut self) -> &mut Any { self }
 
-    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
-        self.clear_cursors();
-        let area_state = GameState::area_state();
-
-        let width = area_state.borrow().area.width;
-        let height = area_state.borrow().area.height;
-        widget.borrow_mut().state.set_max_scroll_pos(width, height);
+    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+        self.hover_sprite = None;
         self.mouse_over.borrow_mut().state.add_text_arg("0", "");
         self.mouse_over.borrow_mut().state.add_text_arg("1", "");
 
@@ -270,11 +256,16 @@ impl WidgetKind for AreaView {
         if self.cache_invalid {
             debug!("Caching area '{}' layers to texture", state.area.id);
 
-            if !renderer.has_texture(VISIBILITY_TEX_ID) {
-                renderer.register_texture(VISIBILITY_TEX_ID,
-                                          ImageBuffer::new(TILE_CACHE_TEXTURE_SIZE, TILE_CACHE_TEXTURE_SIZE),
-                                          TextureMinFilter::Nearest,
-                                          TextureMagFilter::Nearest);
+            let texture_ids = vec![VISIBILITY_TEX_ID, BASE_LAYER_ID, AERIAL_LAYER_ID];
+            for texture_id in texture_ids {
+                if renderer.has_texture(texture_id) {
+                    renderer.clear_texture(texture_id);
+                } else {
+                    renderer.register_texture(texture_id,
+                                              ImageBuffer::new(TILE_CACHE_TEXTURE_SIZE, TILE_CACHE_TEXTURE_SIZE),
+                                              TextureMinFilter::Nearest,
+                                              TextureMagFilter::Nearest);
+                }
             }
 
             for (index, layer) in state.area.terrain.layers.iter().enumerate() {
@@ -284,13 +275,6 @@ impl WidgetKind for AreaView {
                     AERIAL_LAYER_ID
                 };
                 trace!("Caching layer '{}'", layer.id);
-                if !renderer.has_texture(texture_id) {
-                    renderer.register_texture(texture_id,
-                                              ImageBuffer::new(TILE_CACHE_TEXTURE_SIZE,
-                                                               TILE_CACHE_TEXTURE_SIZE),
-                                              TextureMinFilter::Nearest,
-                                              TextureMagFilter::Nearest);
-                }
 
                 self.draw_layer_to_texture(renderer, &layer, texture_id);
             }
@@ -305,7 +289,6 @@ impl WidgetKind for AreaView {
         }
 
         let p = widget.state.inner_position;
-        let s = widget.state.scroll_pos;
 
         self.draw_layer(renderer, scale_x, scale_y, widget, BASE_LAYER_ID);
 
@@ -313,8 +296,8 @@ impl WidgetKind for AreaView {
         for transition in state.area.transitions.iter() {
             draw_list.set_scale(scale_x, scale_y);
             transition.image_display.append_to_draw_list(&mut draw_list, &animation_state::NORMAL,
-                                                        (transition.from.x + p.x - s.x) as f32,
-                                                        (transition.from.y + p.y - s.y) as f32,
+                                                        (transition.from.x + p.x) as f32 - self.scroll_x,
+                                                        (transition.from.y + p.y) as f32 - self.scroll_y,
                                                         transition.size.width as f32,
                                                         transition.size.height as f32,
                                                         millis);
@@ -333,33 +316,24 @@ impl WidgetKind for AreaView {
         //draw transparent version of each actor for when they are obscured behind objects
         // self.draw_entities(renderer, scale_x, scale_y, 0.4, widget, &state, millis);
 
-        if let Some(ref cursor) = self.cursors {
-            let mut draw_list = cursor.clone();
+        if let Some(ref hover) = self.hover_sprite {
+            let mut draw_list = DrawList::from_sprite_f32(&hover.sprite,
+                                                          (hover.x + p.x) as f32 - self.scroll_x,
+                                                          (hover.y + p.y) as f32 - self.scroll_y,
+                                                          hover.w as f32, hover.h as f32);
+            if !hover.left_click_action_valid { draw_list.set_color(color::RED); }
             draw_list.set_scale(scale_x, scale_y);
             renderer.draw(draw_list);
         }
 
         for feedback_text in state.feedback_text_iter() {
-            feedback_text.draw(renderer, p.x - s.x, p.y - s.y, scale_x, scale_y);
+            feedback_text.draw(renderer, p.x as f32 - self.scroll_x, p.y as f32- self.scroll_y,
+                               scale_x, scale_y);
         }
 
 
-        GameState::draw_graphics_mode(renderer, p.x - s.x, p.y - s.y,
+        GameState::draw_graphics_mode(renderer, p.x as f32 - self.scroll_x, p.y as f32- self.scroll_y,
                                       scale_x, scale_y, millis);
-    }
-
-    fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
-        self.recompute_max_scroll(widget);
-
-        use sulis_core::io::InputAction::*;
-        match key {
-           ScrollUp => widget.borrow_mut().state.scroll(0, -1),
-           ScrollDown => widget.borrow_mut().state.scroll(0, 1),
-           ScrollLeft => widget.borrow_mut().state.scroll(-1, 0),
-           ScrollRight => widget.borrow_mut().state.scroll(1, 0),
-           _ => return false,
-        };
-        true
     }
 
     fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
@@ -375,7 +349,7 @@ impl WidgetKind for AreaView {
             if let Some(entity) = area_state.borrow().get_entity_at(x, y) {
                 let (x, y) = {
                     let entity = entity.borrow();
-                    self.get_mouseover_pos(widget, entity.location.x, entity.location.y,
+                    self.get_mouseover_pos(entity.location.x, entity.location.y,
                         entity.size.size, entity.size.size)
                 };
                 Widget::set_mouse_over(widget, EntityMouseover::new(&entity), x, y);
@@ -394,18 +368,12 @@ impl WidgetKind for AreaView {
 
         match kind {
             ClickKind::Middle => {
-                let max_x = widget.borrow().state.max_scroll_pos.x as f32;
-                let max_y = widget.borrow().state.max_scroll_pos.y as f32;
-
-                self.scroll_x_f32 -= delta_x;
-                self.scroll_y_f32 -= delta_y;
-                if self.scroll_x_f32 < 0.0 { self.scroll_x_f32 = 0.0; }
-                if self.scroll_y_f32 < 0.0 { self.scroll_y_f32 = 0.0; }
-                if self.scroll_x_f32 > max_x { self.scroll_x_f32 = max_x; }
-                if self.scroll_y_f32 > max_y { self.scroll_y_f32 = max_y; }
-
-                widget.borrow_mut().state.set_scroll(self.scroll_x_f32 as i32,
-                                                     self.scroll_y_f32 as i32);
+                self.scroll_x -= delta_x;
+                self.scroll_y -= delta_y;
+                if self.scroll_x < 0.0 { self.scroll_x = 0.0; }
+                if self.scroll_y < 0.0 { self.scroll_y = 0.0; }
+                if self.scroll_x > self.max_scroll_x { self.scroll_x = self.max_scroll_x; }
+                if self.scroll_y > self.max_scroll_y { self.scroll_y = self.max_scroll_x; }
            },
             _ => (),
         }
@@ -425,49 +393,50 @@ impl WidgetKind for AreaView {
             state.add_text_arg("1", &format!("{}", area_y));
         }
         self.mouse_over.borrow_mut().invalidate_layout();
-        self.clear_cursors();
+        self.hover_sprite = None;
 
         if let Some(entity) = area_state.borrow().get_entity_at(area_x, area_y) {
             let (x, y) = {
                 let entity = entity.borrow();
-                self.get_mouseover_pos(widget, entity.location.x, entity.location.y,
+                self.get_mouseover_pos(entity.location.x, entity.location.y,
                     entity.size.size, entity.size.size)
             };
             Widget::set_mouse_over(widget, EntityMouseover::new(&entity), x, y);
 
-            let pc = GameState::pc();
-            if *pc.borrow() != *entity.borrow() {
-                let sprite = &entity.borrow().size.cursor_sprite;
-                let x = entity.borrow().location.x - widget.borrow().state.scroll_pos.x;
-                let y = entity.borrow().location.y - widget.borrow().state.scroll_pos.y;
-                let size = entity.borrow().size();
-
-                let mut cursor = DrawList::from_sprite(sprite, x, y, size, size);
-                cursor.set_color(color::RED);
-                self.add_cursor(cursor);
-            }
+            // let pc = GameState::pc();
+            // if *pc.borrow() != *entity.borrow() {
+            //     let sprite = &entity.borrow().size.cursor_sprite;
+            //     let x = entity.borrow().location.x as f32 - self.scroll_x;
+            //     let y = entity.borrow().location.y as f32 - self.scroll_y;
+            //     let size = entity.borrow().size() as f32;
+            //
+            //     let mut cursor = DrawList::from_sprite_f32(sprite, x, y, size, size);
+            //     cursor.set_color(color::RED);
+            //     self.add_cursor(cursor);
+            // }
         } else if let Some(index) = area_state.borrow().prop_index_at(area_x, area_y) {
             let (x, y) = {
                 let prop_state = &area_state.borrow().props[index];
-                self.get_mouseover_pos(widget, prop_state.location.x, prop_state.location.y,
+                self.get_mouseover_pos(prop_state.location.x, prop_state.location.y,
                                        prop_state.prop.width as i32, prop_state.prop.height as i32)
             };
             Widget::set_mouse_over(widget, PropMouseover::new(index), x, y);
         }
 
         let pc = GameState::pc();
-        let size = pc.borrow().size();
-
-        let (c_x, c_y) = self.get_cursor_pos_no_scroll(widget);
-        let mut draw_list = DrawList::from_sprite(&pc.borrow().size.cursor_sprite,
-        c_x - size / 2, c_y - size / 2, size, size);
-
+        let size = &pc.borrow().size;
         let action_menu = ActionMenu::new(area_x, area_y);
-        if !action_menu.borrow().is_default_callback_valid() {
-            draw_list.set_color(color::RED);
-        }
+        let left_click_action_valid = action_menu.borrow().is_default_callback_valid();
 
-        self.add_cursor(draw_list);
+        let hover_sprite = HoverSprite {
+            sprite: Rc::clone(&size.cursor_sprite),
+            x: area_x - size.size / 2,
+            y: area_y - size.size / 2,
+            w: size.size,
+            h: size.size,
+            left_click_action_valid,
+        };
+        self.hover_sprite = Some(hover_sprite);
 
         true
     }
@@ -475,7 +444,7 @@ impl WidgetKind for AreaView {
     fn on_mouse_exit(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
         self.super_on_mouse_exit(widget);
         self.mouse_over.borrow_mut().state.clear_text_args();
-        self.clear_cursors();
+        self.hover_sprite = None;
         true
     }
 }

@@ -315,14 +315,14 @@ impl GameState {
         });
     }
 
-    pub fn draw_graphics_mode(renderer: &mut GraphicsRenderer, offset_x: i32, offset_y: i32,
+    pub fn draw_graphics_mode(renderer: &mut GraphicsRenderer, offset_x: f32, offset_y: f32,
                               scale_x: f32, scale_y: f32, millis: u32) {
         STATE.with(|s| {
             let state = s.borrow();
             let state = state.as_ref().unwrap();
 
             for anim in state.animations.iter() {
-                anim.draw_graphics_mode(renderer, offset_x as f32, offset_y as f32,
+                anim.draw_graphics_mode(renderer, offset_x, offset_y,
                                         scale_x, scale_y, millis);
             }
         })

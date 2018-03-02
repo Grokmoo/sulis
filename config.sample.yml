@@ -29,10 +29,6 @@ resources:
 input:
     # a mapping of keyboard characters to game actions
     keybindings:
-        KeyUp: ScrollUp
-        KeyLeft: ScrollLeft
-        KeyDown: ScrollDown
-        KeyRight: ScrollRight
         KeyW: MoveCursorUp
         KeyS: MoveCursorDown
         KeyA: MoveCursorLeft

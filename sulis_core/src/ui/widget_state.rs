@@ -36,8 +36,6 @@ pub struct WidgetState {
     pub background: Option<Rc<Image>>,
     pub foreground: Option<Rc<Image>>,
     pub animation_state: AnimationState,
-    pub scroll_pos: Point,
-    pub max_scroll_pos: Point,
     pub text: String,
     pub text_params: TextParams,
     pub text_renderer: Option<Box<FontRenderer>>,
@@ -63,8 +61,6 @@ impl WidgetState {
             background: None,
             foreground: None,
             animation_state: AnimationState::default(),
-            scroll_pos: Point::as_zero(),
-            max_scroll_pos: Point::as_zero(),
             font: None,
             text: String::new(),
             text_params: TextParams::default(),
@@ -128,54 +124,16 @@ impl WidgetState {
         self.callback = Some(callback);
     }
 
-    pub fn set_scroll(&mut self, x: i32, y: i32) -> bool {
-        trace!("Setting scroll to {},{}", x, y);
-
-        let x_result = self.set_scroll_x(x);
-        let y_result = self.set_scroll_y(y);
-
-        x_result && y_result
-    }
-
-    pub fn set_scroll_y(&mut self, y: i32) -> bool {
-        if y < 0 || y >= self.max_scroll_pos.y - self.size.height + 1 {
-            false
-        } else {
-            self.scroll_pos.set_y(y);
-            true
-        }
-    }
-
-    pub fn set_scroll_x(&mut self, x: i32) -> bool {
-        if x < 0 || x >= self.max_scroll_pos.x - self.size.width + 1 {
-            false
-        } else {
-            self.scroll_pos.set_x(x);
-            true
-        }
-    }
-
-    pub fn scroll(&mut self, x: i32, y: i32) -> bool {
-        trace!("Scrolling by {},{}", x, y);
-        // make sure both components are attempted independently
-        let x_bool = self.scroll_x(x);
-        let y_bool = self.scroll_y(y);
-
-        x_bool && y_bool
-    }
-
-    pub fn scroll_y(&mut self, y: i32) -> bool {
-        let new_y = self.scroll_pos.y + y;
-        self.set_scroll_y(new_y)
-    }
-
-    pub fn scroll_x(&mut self, x: i32) -> bool {
-        let new_x = self.scroll_pos.x + x;
-        self.set_scroll_x(new_x)
-    }
-
     pub fn set_modal(&mut self, modal: bool) {
         self.is_modal = modal;
+    }
+
+    pub fn inner_width(&self) -> i32 {
+        self.inner_size.width
+    }
+
+    pub fn inner_height(&self) -> i32 {
+        self.inner_size.height
     }
 
     pub fn inner_right(&self) -> i32 {
@@ -192,11 +150,6 @@ impl WidgetState {
 
     pub fn inner_left(&self) -> i32 {
         self.position.x + self.border.left
-    }
-
-    pub fn set_max_scroll_pos(&mut self, x: i32, y: i32) {
-        self.max_scroll_pos.set(x, y);
-        self.scroll_pos.min(x, y);
     }
 
     /// Adds a text argument to the list of text args stored in this

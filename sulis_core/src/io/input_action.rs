@@ -24,10 +24,6 @@ use io::Event;
 #[derive(Debug, Deserialize, Copy, Clone)]
 #[serde(deny_unknown_fields)]
 pub enum InputAction {
-    ScrollUp,
-    ScrollDown,
-    ScrollLeft,
-    ScrollRight,
     MoveCursorUp,
     MoveCursorDown,
     MoveCursorLeft,

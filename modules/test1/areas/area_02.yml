@@ -1,0 +1,99 @@
+---
+id: area_02
+name: Area 02
+width: 32
+height: 125
+terrain:
+  dirt2:
+    - - 0
+      - 0
+    - - 0
+      - 34
+    - - 0
+      - 54
+    - - 0
+      - 73
+    - - 0
+      - 92
+  water1:
+    - - 0
+      - 121
+    - - 0
+      - 117
+    - - 0
+      - 113
+    - - 0
+      - 109
+    - - 0
+      - 105
+  cliffs_to_grass_se:
+    - - 8
+      - 109
+  grass1:
+    - - 8
+      - 121
+    - - 16
+      - 121
+    - - 8
+      - 117
+    - - 8
+      - 113
+    - - 8
+      - 109
+    - - 16
+      - 117
+    - - 20
+      - 117
+    - - 20
+      - 121
+    - - 24
+      - 121
+    - - 24
+      - 117
+    - - 28
+      - 117
+    - - 28
+      - 121
+  grass_to_cliffs_nw:
+    - - 16
+      - 109
+  grass_to_water_w1:
+    - - 4
+      - 121
+    - - 4
+      - 117
+    - - 4
+      - 113
+    - - 4
+      - 109
+  cliffs_to_grass_e1:
+    - - 8
+      - 117
+  cliffs_to_grass_e2:
+    - - 8
+      - 121
+  water_to_grass_se:
+    - - 4
+      - 105
+generate: false
+layers:
+  - base
+  - base2
+  - object
+  - aerial
+entity_layer: 2
+actors: []
+props: []
+transitions:
+  - from:
+      x: 20
+      "y": 121
+    size:
+      width: 2
+      height: 2
+    to:
+      x: 79
+      "y": 1
+    to_area: area_01
+    image_display: transition
+visibility_tile: gui/area_invis

@@ -50,6 +50,9 @@ pub use self::initiative_ticker::InitiativeTicker;
 mod inventory_window;
 pub use self::inventory_window::InventoryWindow;
 
+mod loading_screen;
+pub use self::loading_screen::LoadingScreen;
+
 mod prop_mouseover;
 pub use self::prop_mouseover::PropMouseover;
 

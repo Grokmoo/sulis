@@ -72,7 +72,8 @@ impl Layer {
             }
 
             for p in tile.invis.iter() {
-                visible[(base_x + p.x + (base_y + p.y) * width) as usize] = false;
+                let p_index = (base_x + p.x + (base_y + p.y) * width) as usize;
+                visible[p_index] = false;
             }
 
             if base_x + tile.width > width || base_y + tile.height > height {

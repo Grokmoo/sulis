@@ -202,14 +202,17 @@ impl Terrain {
         Ok(())
     }
 
+    #[inline]
     pub fn is_passable(&self, x: i32, y: i32) -> bool {
         self.passable[(x + y * self.width) as usize]
     }
 
+    #[inline]
     pub fn is_visible(&self, x: i32, y: i32) -> bool {
         self.visible[(x + y * self.width) as usize]
     }
 
+    #[inline]
     pub fn is_visible_index(&self, index: usize) -> bool {
         self.visible[index]
     }

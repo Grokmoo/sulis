@@ -277,7 +277,7 @@ impl Widget {
         Rc::clone(widget.borrow().parent.as_ref().unwrap())
     }
 
-    pub fn add_child_to(parent: &Rc<RefCell<Widget>>, child: Rc<RefCell<Widget>>) {
+    fn add_child_to_internal(parent: &Rc<RefCell<Widget>>, child: &Rc<RefCell<Widget>>) {
         {
             let child_ref = child.borrow();
             trace!("Adding {:?} to {:?}", child_ref.kind.borrow().get_name(), parent.borrow().theme_id);
@@ -289,8 +289,17 @@ impl Widget {
                 root.borrow_mut().keyboard_focus_child = None;
             }
         }
-        parent.borrow_mut().children.push(child);
         parent.borrow_mut().marked_for_layout = true;
+    }
+
+    pub fn add_child_to(parent: &Rc<RefCell<Widget>>, child: Rc<RefCell<Widget>>) {
+        Widget::add_child_to_internal(parent, &child);
+        parent.borrow_mut().children.push(child);
+    }
+
+    pub fn add_child_to_front(parent: &Rc<RefCell<Widget>>, child: Rc<RefCell<Widget>>) {
+        Widget::add_child_to_internal(parent, &child);
+        parent.borrow_mut().children.insert(0, child);
     }
 
     pub fn add_children_to(parent: &Rc<RefCell<Widget>>,

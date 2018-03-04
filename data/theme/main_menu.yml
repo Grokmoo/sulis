@@ -1,7 +1,25 @@
 ---
 children:
+  loading_screen:
+    background: bg_base
+    width_relative: Max
+    height_relative: Max
+    children:
+      loading_label:
+        from: label
+        text_params:
+          scale: 8.0
+          horizontal_alignment: Center
+        text: "Loading..."
+        x_relative: Center
+        y_relative: Max
+        width_relative: Max
+        preferred_size: [0, 10]
+        position: [0, -20]
   main_menu:
     children:
+      loading_screen:
+        from: .loading_screen
       title:
         from: .label
         text_params:
@@ -51,6 +69,8 @@ children:
         from: .exit_confirmation_window
   character_selector:
     children:
+      loading_screen:
+        from: .loading_screen
       title:
         from: .label
         text_params:

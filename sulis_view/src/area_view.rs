@@ -59,6 +59,8 @@ const TILE_SIZE: u32 = 16;
 const TEX_COORDS: [f32; 8] = [ 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0 ];
 
 const VISIBILITY_TEX_ID: &'static str = "__visibility__";
+const BASE_LAYER_ID: &str = "__base_layer__";
+const AERIAL_LAYER_ID: &str = "__aerial_layer__";
 
 impl AreaView {
     pub fn new(mouse_over: Rc<RefCell<Widget>>) -> Rc<RefCell<AreaView>> {
@@ -222,9 +224,6 @@ impl AreaView {
     }
 }
 
-const BASE_LAYER_ID: &str = "base_layer";
-const AERIAL_LAYER_ID: &str = "aerial_layer";
-
 impl WidgetKind for AreaView {
     fn get_name(&self) -> &str { NAME }
 
@@ -271,7 +270,7 @@ impl WidgetKind for AreaView {
                 } else {
                     renderer.register_texture(texture_id,
                                               ImageBuffer::new(TILE_CACHE_TEXTURE_SIZE, TILE_CACHE_TEXTURE_SIZE),
-                                              TextureMinFilter::Nearest,
+                                              TextureMinFilter::NearestMipmapNearest,
                                               TextureMagFilter::Nearest);
                 }
             }

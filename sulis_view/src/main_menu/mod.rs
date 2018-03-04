@@ -23,6 +23,8 @@ use sulis_core::ui::*;
 use sulis_widgets::{Button, ConfirmationWindow, Label, list_box, MutuallyExclusiveListBox, TextArea};
 use sulis_module::ModuleInfo;
 
+use LoadingScreen;
+
 pub struct MainMenuLoopUpdater {
     main_menu_view: Rc<RefCell<MainMenuView>>,
 }
@@ -125,7 +127,7 @@ impl WidgetKind for MainMenuView {
         let list_box_ref = Rc::clone(&list_box);
         let modules_list = Widget::with_theme(list_box, "modules_list");
 
-        play.borrow_mut().state.add_callback(Callback::new(Rc::new(move |_, _| {
+        play.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
             let list_box_ref = list_box_ref.borrow();
             let entry = match list_box_ref.active_entry() {
                 None => {
@@ -137,6 +139,11 @@ impl WidgetKind for MainMenuView {
             EXIT.with(|exit| *exit.borrow_mut() = true);
             SELECTED_MODULE.with(|m| *m.borrow_mut() = Some(entry.item().clone()));
             info!("Selected module {}", entry.item().name);
+
+            let root = Widget::get_root(&widget);
+            let loading_screen = Widget::with_defaults(LoadingScreen::new());
+            loading_screen.borrow_mut().state.set_modal(true);
+            Widget::add_child_to(&root, loading_screen);
         })));
         play.borrow_mut().state.disable();
 

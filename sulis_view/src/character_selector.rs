@@ -25,7 +25,7 @@ use sulis_module::{Actor, Module};
 use sulis_widgets::{Button, ConfirmationWindow, Label, TextArea};
 
 use character_window::create_details_text_box;
-use CharacterBuilder;
+use {CharacterBuilder, LoadingScreen};
 
 pub struct LoopUpdater {
     view: Rc<RefCell<CharacterSelector>>,
@@ -137,8 +137,13 @@ impl WidgetKind for CharacterSelector {
 
         let play_button = Widget::with_theme(Button::empty(), "play_button");
         play_button.borrow_mut().state.set_enabled(self.selected.is_some());
-        play_button.borrow_mut().state.add_callback(Callback::new(Rc::new(|_, _| {
+        play_button.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
             EXIT.with(|exit| *exit.borrow_mut() = true);
+
+            let root = Widget::get_root(&widget);
+            let loading_screen = Widget::with_defaults(LoadingScreen::new());
+            loading_screen.borrow_mut().state.set_modal(true);
+            Widget::add_child_to(&root, loading_screen);
         })));
 
         let details = if let Some(ref actor) = self.selected {

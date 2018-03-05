@@ -18,16 +18,22 @@ use std::any::Any;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use sulis_core::ui::{Callback, Widget, WidgetKind};
+use sulis_core::io::{DrawList, GraphicsRenderer};
+use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
+use sulis_core::util::Point;
 use sulis_module::Module;
 use sulis_module::area::Tile;
 use sulis_widgets::{Button, Scrollbar};
+
+use {AreaModel, EditorMode};
 
 const NAME: &str = "tile_picker";
 
 pub struct TilePicker {
     cur_tile: Option<Rc<Tile>>,
     cur_layer: Option<String>,
+    removal_tiles: Vec<(Point, Rc<Tile>)>,
+    cursor_pos: Option<Point>,
 }
 
 impl TilePicker {
@@ -35,36 +41,102 @@ impl TilePicker {
         Rc::new(RefCell::new(TilePicker {
             cur_tile: None,
             cur_layer: None,
+            cursor_pos: None,
+            removal_tiles: Vec::new(),
         }))
     }
+}
 
-    pub fn get_cur_layer(&self) -> Option<&str> {
-        match self.cur_layer {
-            None => None,
-            Some(ref layer) => Some(layer),
+impl EditorMode for TilePicker {
+    fn draw(&mut self, renderer: &mut GraphicsRenderer, x: f32, y: f32,
+            scale_x: f32, scale_y: f32, _millis: u32) {
+
+        if !self.removal_tiles.is_empty() {
+            let mut draw_list = DrawList::empty_sprite();
+            for &(pos, ref tile) in self.removal_tiles.iter() {
+                let x = x + pos.x as f32;
+                let y = y + pos.y as f32;
+                draw_list.append(&mut DrawList::from_sprite_f32(&tile.image_display, x, y,
+                                                                tile.width as f32, tile.height as f32));
+            }
+
+            draw_list.set_color(Color::from_string("F008"));
+            draw_list.set_scale(scale_x, scale_y);
+            renderer.draw(draw_list);
+        }
+
+        let tile = match self.cur_tile {
+            None => return,
+            Some(ref tile) => tile,
+        };
+
+        let pos = match self.cursor_pos {
+            None => return,
+            Some(pos) => pos,
+        };
+
+        let x = x + pos.x as f32;
+        let y = y + pos.y as f32;
+        let mut draw_list = DrawList::from_sprite_f32(&tile.image_display, x, y, tile.width as f32,
+                                                      tile.height as f32);
+        draw_list.set_color(Color::from_string("FFF8"));
+        draw_list.set_scale(scale_x, scale_y);
+        renderer.draw(draw_list);
+    }
+
+    fn cursor_size(&self) -> (i32, i32) {
+        match self.cur_tile {
+            None => (0, 0),
+            Some(ref tile) => (tile.width as i32, tile.height as i32),
         }
     }
 
-    pub fn get_cur_tile(&self) -> Option<Rc<Tile>> {
-        match self.cur_tile {
-            None => None,
-            Some(ref tile) => Some(Rc::clone(tile)),
-        }
+    fn mouse_move(&mut self, model: &mut AreaModel, x: i32, y: i32) {
+        self.cursor_pos = Some(Point::new(x, y));
+
+        let tile = match self.cur_tile {
+            None => return,
+            Some(ref tile) => tile,
+        };
+
+        let layer_id = match self.cur_layer {
+            None => return,
+            Some(ref layer) => layer,
+        };
+        self.removal_tiles = model.tiles_within(layer_id, x, y, tile.width, tile.height);
+    }
+
+    fn left_click(&mut self, model: &mut AreaModel, x: i32, y: i32) {
+        let tile = match self.cur_tile {
+            None => return,
+            Some(ref tile) => tile,
+        };
+
+        model.add_tile(Rc::clone(tile), x, y);
+    }
+
+    fn right_click(&mut self, model: &mut AreaModel, x: i32, y: i32) {
+        let tile = match self.cur_tile {
+            None => return,
+            Some(ref tile) => tile,
+        };
+
+        let layer_id = match self.cur_layer {
+            None => return,
+            Some(ref layer) => layer,
+        };
+
+        self.removal_tiles.clear();
+        model.remove_tiles_within(layer_id, x, y, tile.width, tile.height);
     }
 }
 
 impl WidgetKind for TilePicker {
-    fn get_name(&self) -> &str {
-        NAME
-    }
+    fn get_name(&self) -> &str { NAME }
 
-    fn as_any(&self) -> &Any {
-        self
-    }
+    fn as_any(&self) -> &Any { self }
 
-    fn as_any_mut(&mut self) -> &mut Any {
-        self
-    }
+    fn as_any_mut(&mut self) -> &mut Any { self }
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let mut all_tiles = Module::all_tiles();

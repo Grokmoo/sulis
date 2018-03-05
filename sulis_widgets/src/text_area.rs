@@ -20,7 +20,7 @@ use std::cell::RefCell;
 
 use sulis_core::ui::{Widget, WidgetKind};
 use sulis_core::io::GraphicsRenderer;
-use sulis_core::util::Point;
+use sulis_core::util::{Point};
 use MarkupRenderer;
 
 pub struct TextArea {
@@ -42,17 +42,11 @@ impl TextArea {
 }
 
 impl WidgetKind for TextArea {
-    fn get_name(&self) -> &str {
-        "text_area"
-    }
+    fn get_name(&self) -> &str { "text_area" }
 
-    fn as_any(&self) -> &Any {
-        self
-    }
+    fn as_any(&self) -> &Any { self }
 
-    fn as_any_mut(&mut self) -> &mut Any {
-        self
-    }
+    fn as_any_mut(&mut self) -> &mut Any { self }
 
     fn layout(&mut self, widget: &mut Widget) {
         if let Some(ref text) = self.text {
@@ -62,9 +56,9 @@ impl WidgetKind for TextArea {
         widget.do_base_layout();
 
         if let Some(ref font) = widget.state.font {
-            widget.state.text_renderer = Some(Box::new(
-                    MarkupRenderer::new(font, widget.state.inner_size.width)
-                    ));
+            let mut renderer = MarkupRenderer::new(font, widget.state.inner_size.width);
+            renderer.render_to_cache(&widget.state);
+            widget.state.text_renderer = Some(Box::new(renderer));
         }
     }
 
@@ -75,8 +69,10 @@ impl WidgetKind for TextArea {
             &Some(ref renderer) => renderer,
         };
 
+        // let start_time = time::Instant::now();
         let x = widget.state.inner_left() as f32;
         let y = widget.state.inner_top() as f32;
         font_rend.render(renderer, x, y, &widget.state);
+        // info!("Text Area render time: {}", util::format_elapsed_secs(start_time.elapsed()));
     }
 }

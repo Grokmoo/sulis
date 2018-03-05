@@ -18,28 +18,88 @@ use std::any::Any;
 use std::cell::RefCell;
 use std::rc::Rc;
 
+use sulis_core::io::{GraphicsRenderer};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
+use sulis_core::util::Point;
 use sulis_module::{Actor, Module};
 use sulis_widgets::Button;
+
+use {AreaModel, EditorMode};
 
 const NAME: &str = "actor_picker";
 
 pub struct ActorPicker {
     cur_actor: Option<Rc<Actor>>,
+    removal_actors: Vec<(Point, Rc<Actor>)>,
+    cursor_pos: Option<Point>,
 }
 
 impl ActorPicker {
     pub fn new() -> Rc<RefCell<ActorPicker>> {
         Rc::new(RefCell::new(ActorPicker {
             cur_actor: None,
+            removal_actors: Vec::new(),
+            cursor_pos: None,
         }))
     }
+}
 
-    pub fn get_cur_actor(&self) -> Option<Rc<Actor>> {
-        match self.cur_actor {
-            None => None,
-            Some(ref actor) => Some(Rc::clone(actor)),
+impl EditorMode for ActorPicker {
+    fn draw(&mut self, renderer: &mut GraphicsRenderer, x: f32, y: f32,
+            scale_x: f32, scale_y: f32, millis: u32) {
+
+        for &(pos, ref actor) in self.removal_actors.iter() {
+            actor.draw(renderer, scale_x, scale_y, x + pos.x as f32, y + pos.y as f32, millis);
         }
+
+        let actor = match self.cur_actor {
+            None => return,
+            Some(ref actor) => actor,
+        };
+
+        let pos = match self.cursor_pos {
+            None => return,
+            Some(pos) => pos,
+        };
+
+        actor.draw(renderer, scale_x, scale_y, x + pos.x as f32, y + pos.y as f32, millis);
+    }
+
+    fn cursor_size(&self) -> (i32, i32) {
+        match self.cur_actor {
+            None => (0, 0),
+            Some(ref actor) => (actor.race.size.size, actor.race.size.size),
+        }
+    }
+
+    fn mouse_move(&mut self, model: &mut AreaModel, x: i32, y: i32) {
+        self.cursor_pos = Some(Point::new(x, y));
+
+        let actor = match self.cur_actor {
+            None => return,
+            Some(ref actor) => actor,
+        };
+
+        self.removal_actors = model.actors_within(x, y, actor.race.size.size);
+    }
+
+    fn left_click(&mut self, model: &mut AreaModel, x: i32, y: i32) {
+        let actor = match self.cur_actor {
+            None => return,
+            Some(ref actor) => actor,
+        };
+
+        model.add_actor(Rc::clone(actor), x, y);
+    }
+
+    fn right_click(&mut self, model: &mut AreaModel, x: i32, y: i32) {
+        let actor = match self.cur_actor {
+            None => return,
+            Some(ref actor) => actor,
+        };
+
+        self.removal_actors.clear();
+        model.remove_actors_within(x, y, actor.race.size.size);
     }
 }
 

@@ -247,7 +247,6 @@ impl WidgetKind for CosmeticSelectorPane {
             let parent = Widget::get_parent(&widget);
             let cosmetic_pane = Widget::downcast_kind_mut::<CosmeticSelectorPane>(&parent);
 
-            info!("Next");
             let race = match cosmetic_pane.race {
                 None => return,
                 Some(ref race) => race,
@@ -414,6 +413,18 @@ impl WidgetKind for CosmeticSelectorPane {
                 let parent = Widget::get_parent(&widget);
                 Widget::add_child_to(&parent, pop_up);
             })));
+        }
+
+        if let Some(ref race) = self.race {
+            if race.hair_selections.is_empty() {
+                next_hair.borrow_mut().state.set_enabled(false);
+                prev_hair.borrow_mut().state.set_enabled(false);
+            }
+
+            if race.beard_selections.is_empty() {
+                next_beard.borrow_mut().state.set_enabled(false);
+                prev_beard.borrow_mut().state.set_enabled(false);
+            }
         }
 
         vec![title, name_field, name_label, Rc::clone(&self.preview),

@@ -20,6 +20,9 @@ use actor_picker::ActorPicker;
 mod area_editor;
 use area_editor::AreaEditor;
 
+mod area_model;
+use area_model::AreaModel;
+
 mod load_window;
 use load_window::LoadWindow;
 
@@ -48,7 +51,7 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_core::io::{InputAction, MainLoopUpdater};
+use sulis_core::io::{GraphicsRenderer, InputAction, MainLoopUpdater};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{Button, ConfirmationWindow, DropDown, list_box};
 
@@ -66,10 +69,22 @@ impl MainLoopUpdater for EditorMainLoopUpdater {
     }
 }
 
+pub trait EditorMode: WidgetKind {
+    fn draw(&mut self, renderer: &mut GraphicsRenderer, x: f32, y: f32,
+            scale_x: f32, scale_y: f32, millis: u32);
+
+    fn cursor_size(&self) -> (i32, i32);
+
+    fn mouse_move(&mut self, model: &mut AreaModel, x: i32, y: i32);
+
+    fn left_click(&mut self, model: &mut AreaModel, x: i32, y: i32);
+
+    fn right_click(&mut self, model: &mut AreaModel, x: i32, y: i32);
+}
+
 const NAME: &str = "editor";
 
-pub struct EditorView {
-}
+pub struct EditorView { }
 
 impl EditorView {
     pub fn new() -> Rc<RefCell<EditorView>> {
@@ -104,10 +119,7 @@ impl WidgetKind for EditorView {
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         debug!("Adding to editor widget");
 
-        let tile_picker_kind = TilePicker::new();
-        let actor_picker_kind = ActorPicker::new();
-        let prop_picker_kind = PropPicker::new();
-        let area_editor_kind = AreaEditor::new(&actor_picker_kind, &tile_picker_kind, &prop_picker_kind);
+        let area_editor_kind = AreaEditor::new();
 
         let top_bar = Widget::empty("top_bar");
         {
@@ -181,57 +193,50 @@ impl WidgetKind for EditorView {
             Widget::add_child_to(&top_bar, shift_tiles);
         }
 
-        let tile_picker = Widget::with_defaults(tile_picker_kind);
-        let actor_picker = Widget::with_defaults(actor_picker_kind);
-        let prop_picker = Widget::with_defaults(prop_picker_kind);
-        actor_picker.borrow_mut().state.set_visible(false);
-        prop_picker.borrow_mut().state.set_visible(false);
+        let tile_picker_kind = TilePicker::new();
+        let actor_picker_kind = ActorPicker::new();
+        let prop_picker_kind = PropPicker::new();
 
-        let tiles = Widget::with_theme(Button::empty(), "tiles");
+        let mut pickers = Vec::new();
+        pickers.push(Widget::with_defaults(tile_picker_kind.clone()));
+        pickers.push(Widget::with_defaults(actor_picker_kind.clone()));
+        pickers.push(Widget::with_defaults(prop_picker_kind.clone()));
+        for picker in pickers.iter() {
+            picker.borrow_mut().state.set_visible(false);
+        }
 
-        let tile_picker_ref = Rc::clone(&tile_picker);
-        let actor_picker_ref = Rc::clone(&actor_picker);
-        let prop_picker_ref = Rc::clone(&prop_picker);
-        let area_editor_ref = Rc::clone(&area_editor_kind);
-        tiles.borrow_mut().state.add_callback(Callback::new(Rc::new(move |_, _| {
-            tile_picker_ref.borrow_mut().state.set_visible(true);
-            actor_picker_ref.borrow_mut().state.set_visible(false);
-            prop_picker_ref.borrow_mut().state.set_visible(false);
-            area_editor_ref.borrow_mut().set_mode(area_editor::Mode::Tiles);
-        })));
+        let picker_kinds: Vec<Rc<RefCell<EditorMode>>> =
+            vec![tile_picker_kind, actor_picker_kind, prop_picker_kind];
 
-        let actors = Widget::with_theme(Button::empty(), "actors");
+        let buttons = vec![Widget::with_theme(Button::empty(), "tiles"),
+            Widget::with_theme(Button::empty(), "actors"),
+            Widget::with_theme(Button::empty(), "props")];
 
-        let tile_picker_ref = Rc::clone(&tile_picker);
-        let actor_picker_ref = Rc::clone(&actor_picker);
-        let prop_picker_ref = Rc::clone(&prop_picker);
-        let area_editor_ref = Rc::clone(&area_editor_kind);
-        actors.borrow_mut().state.add_callback(Callback::new(Rc::new(move |_, _| {
-            tile_picker_ref.borrow_mut().state.set_visible(false);
-            actor_picker_ref.borrow_mut().state.set_visible(true);
-            prop_picker_ref.borrow_mut().state.set_visible(false);
-            area_editor_ref.borrow_mut().set_mode(area_editor::Mode::Actors);
-        })));
+        // Any new pickers need to be added in all 3 places
+        assert!(buttons.len() == picker_kinds.len());
+        assert!(buttons.len() == pickers.len());
 
-        let props = Widget::with_theme(Button::empty(), "props");
-
-        let tile_picker_ref = Rc::clone(&tile_picker);
-        let actor_picker_ref = Rc::clone(&actor_picker);
-        let prop_picker_ref = Rc::clone(&prop_picker);
-        let area_editor_ref = Rc::clone(&area_editor_kind);
-        props.borrow_mut().state.add_callback(Callback::new(Rc::new(move |_, _| {
-            tile_picker_ref.borrow_mut().state.set_visible(false);
-            actor_picker_ref.borrow_mut().state.set_visible(false);
-            prop_picker_ref.borrow_mut().state.set_visible(true);
-            area_editor_ref.borrow_mut().set_mode(area_editor::Mode::Props);
-        })));
+        for (index, button) in buttons.into_iter().enumerate() {
+            let pickers_ref = pickers.clone();
+            let picker_kinds_ref = picker_kinds.clone();
+            let area_editor_ref = Rc::clone(&area_editor_kind);
+            button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |_, _| {
+                for picker in pickers_ref.iter() {
+                    picker.borrow_mut().state.set_visible(false);
+                }
+                pickers_ref[index].borrow_mut().state.set_visible(true);
+                area_editor_ref.borrow_mut().set_editor(picker_kinds_ref[index].clone());
+            })));
+            Widget::add_child_to(&top_bar, button);
+        }
 
         let area_editor = Widget::with_defaults(area_editor_kind);
 
-        Widget::add_child_to(&top_bar, tiles);
-        Widget::add_child_to(&top_bar, actors);
-        Widget::add_child_to(&top_bar, props);
+        let mut children = Vec::new();
+        children.push(area_editor);
+        children.extend_from_slice(&pickers);
+        children.push(top_bar);
 
-        vec![area_editor, actor_picker, tile_picker, prop_picker, top_bar]
+        children
     }
 }

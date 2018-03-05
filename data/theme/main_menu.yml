@@ -6,7 +6,7 @@ children:
     height_relative: Max
     children:
       loading_label:
-        from: label
+        from: .label
         text_params:
           scale: 8.0
           horizontal_alignment: Center

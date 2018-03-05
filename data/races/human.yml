@@ -1,7 +1,7 @@
 id: human
 name: Human
 description: |
-  Tough and adaptable, humans have colonized much of the world, often at the expense of other races.  Human adventures of all types can frequently be found throughout the Five Corners and beyond. 
+  Tough and adaptable, humans have colonized much of the world, often at the expense of other races.  Human adventurers of all types can frequently be found throughout the Five Corners and beyond. 
 size: 3
 base_stats:
   hit_points: 40

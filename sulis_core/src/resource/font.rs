@@ -45,6 +45,13 @@ pub struct FontChar {
 }
 
 impl Font {
+    pub fn get_char_width(&self, c: char) -> u32 {
+        match self.characters.get(&c) {
+            None => 0,
+            Some(font_char) => font_char.x_advance,
+        }
+    }
+
     pub fn get_width(&self, text: &str) -> i32 {
         let mut width: i32 = 0;
         for c in text.chars() {

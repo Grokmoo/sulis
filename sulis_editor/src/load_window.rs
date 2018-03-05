@@ -92,7 +92,7 @@ impl WidgetKind for LoadWindow {
             let area = &active_child.borrow().state.text;
             info!("Selected area to load: {}", area);
 
-            area_editor_ref.borrow_mut().load(&dir_str, area);
+            area_editor_ref.borrow_mut().model.load(&dir_str, area);
 
             let parent = Widget::get_parent(widget);
             parent.borrow_mut().mark_for_removal();

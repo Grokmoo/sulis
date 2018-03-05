@@ -81,9 +81,8 @@
 //!
 //! # Line Wrapping
 //! The character '\n' is treated as a line break, and causes wrap around to the
-//! next line.  Lines that are too long will also be wrapped, but currently this is
-//! only done on a per character basis (so words will be split).  You can preserve
-//! line break characters in yaml using '|', i.e:
+//! next line.  Lines that are too long will also be wrapped, with basic whitespace
+//! splitting.  You can preserve line break characters in yaml using '|', i.e:
 //!
 //! text: |
 //!   Some long text with preserved line breaks.
@@ -103,59 +102,63 @@ use self::markup_tag::Markup;
 
 use std::rc::Rc;
 
-use sulis_core::io::{DrawList, GraphicsRenderer, Vertex};
+use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::resource::{Font, ResourceSet};
 use sulis_core::ui::{FontRenderer, WidgetState};
 
 pub struct MarkupRenderer {
     font: Rc<Font>,
     width: f32,
+    draw_lists: Vec<DrawList>,
 }
 
 /// Struct for rendering text that is marked up with the simple
 /// Markup language described in the `markup_tag` module documentation
 impl MarkupRenderer {
     pub fn new(font: &Rc<Font>, width: i32) -> MarkupRenderer {
-        // TODO pass the text, x, and y here.  all parsing can be
-        // done at this stage and the DrawLists can be cached
+        let draw_lists = Vec::new();
         MarkupRenderer {
             font: Rc::clone(font),
             width: width as f32,
+            draw_lists,
         }
     }
-}
 
-impl FontRenderer for MarkupRenderer {
-    fn render(&self, renderer: &mut GraphicsRenderer, pos_x: f32, pos_y: f32,
-              widget_state: &WidgetState) {
+    /// This sets up the drawing cache for this renderer.  it should be
+    /// called when laying out the widget, once its position, size, and
+    /// text are set.
+    pub fn render_to_cache(&mut self, widget_state: &WidgetState) {
         let text = &widget_state.text;
         let defaults = &widget_state.text_params;
 
-        let max_x = pos_x + self.width;
-
         let mut escaped = false;
         let mut in_markup_tag = false;
-
         let mut markup_stack: Vec<Markup> = Vec::new();
         let mut cur_markup = Markup::from_text_params(defaults, &self.font);
-        let mut quads: Vec<Vertex> = Vec::new();
         let mut markup_buf = String::new();
-
+        let mut word_buf = String::new();
+        let mut word_width = 0;
+        let pos_x = widget_state.inner_left() as f32;
+        let pos_y = widget_state.inner_top() as f32 + cur_markup.scale / 2.0;
+        let max_x = pos_x + self.width;
         let mut x = pos_x;
-        let mut y = pos_y + cur_markup.scale;
-        let mut max_last_line_height = cur_markup.scale;
+        let mut y = pos_y;
 
         for c in text.chars() {
             if escaped {
-                x = cur_markup.add_quad_and_advance(&mut quads, c, x, y);
+                word_buf.push(c);
+                word_width += cur_markup.font.get_char_width(c);
                 escaped = false;
             } else {
                 match c {
                     '\\' => {
                         escaped = true;
                     }, '[' => {
-                        draw_current(renderer, quads, &cur_markup);
-                        quads = Vec::new();
+                        let (x1, y1) = self.draw_current(&mut word_buf, &cur_markup,
+                                                    x, y, pos_x, max_x, word_width);
+                        x = x1;
+                        y = y1;
+                        word_width = 0;
                         in_markup_tag = true;
                     }, '|' => {
                         in_markup_tag = false;
@@ -168,81 +171,120 @@ impl FontRenderer for MarkupRenderer {
                         }
                         if let Some(markup_y) = cur_markup.pos_y {
                             y = pos_y + markup_y;
-                            max_last_line_height = cur_markup.scale;
                         }
                         if let Some(ref image) = cur_markup.image {
-                            draw_sprite(renderer, &image, &cur_markup, x, y);
-                        }
-                        if cur_markup.scale > max_last_line_height {
-                            max_last_line_height = cur_markup.scale;
+                            self.draw_sprite(&image, &cur_markup, x, y);
                         }
                     }, ']' => {
-                        draw_current(renderer, quads, &cur_markup);
-                        quads = Vec::new();
+                        let (x1, y1) = self.draw_current(&mut word_buf, &cur_markup,
+                                                    x, y, pos_x, max_x, word_width);
+                        x = x1;
+                        y = y1;
+                        word_width = 0;
 
                         match markup_stack.pop() {
                             Some(markup) => cur_markup = markup,
                             None => warn!("Invalid ']' in markup"),
                         }
-                        if cur_markup.scale > max_last_line_height {
-                            max_last_line_height = cur_markup.scale;
-                        }
-                    }, '\n' => {
-                        if !cur_markup.ignore {
-                            let factor = cur_markup.font.base as f32 / cur_markup.font.line_height as f32;
-                            x = pos_x;
-                            y += max_last_line_height * factor;
-                            max_last_line_height = cur_markup.scale;
+                    }, ' ' | '\n' => {
+                        if !in_markup_tag {
+                            word_buf.push(c);
+                            let (x1, y1) = self.draw_current(&mut word_buf, &cur_markup,
+                                                        x, y, pos_x, max_x, word_width);
+                            x = x1;
+                            y = y1;
+                            word_width = 0;
                         }
                     }, _ => {
                         if in_markup_tag {
                             markup_buf.push(c);
                         } else {
-                            x = cur_markup.add_quad_and_advance(&mut quads, c, x, y);
+                            word_buf.push(c);
+                            word_width += cur_markup.font.get_char_width(c);
                         }
                     }
                 }
             }
-
-            if x > max_x {
-                let factor = cur_markup.font.base as f32 / cur_markup.font.line_height as f32;
-                x = pos_x;
-                y += max_last_line_height * factor;
-                max_last_line_height = cur_markup.scale;
-            }
         }
 
-        draw_current(renderer, quads, &cur_markup);
+        self.draw_current(&mut word_buf, &cur_markup, x, y, pos_x, max_x, word_width);
+    }
+
+    fn draw_current(&mut self, word_buf: &mut String, markup: &Markup, mut x: f32, mut y: f32,
+                    start_x: f32, max_x: f32, word_width: u32) -> (f32, f32) {
+        if markup.ignore {
+            word_buf.clear();
+            return (x, y);
+        }
+
+        let width = word_width as f32 * markup.scale / markup.font.line_height as f32;
+        if x + width > max_x {
+            let factor = markup.font.base as f32 / markup.font.line_height as f32;
+            x = start_x;
+            y += markup.scale * factor;
+        }
+
+        let mut quads = Vec::with_capacity(word_buf.len());
+        for c in word_buf.chars() {
+            match c {
+                '\n' => {
+                    let factor = markup.font.base as f32 / markup.font.line_height as f32;
+                    x = start_x;
+                    y += markup.scale * factor;
+                }, _ => {
+                    x = markup.add_quad_and_advance(&mut quads, c, x, y);
+                }
+            }
+        }
+        let mut draw_list = DrawList::from_font(&markup.font.id, quads);
+        draw_list.set_color(markup.color);
+        self.append_to_draw_lists(draw_list);
+
+        word_buf.clear();
+        (x, y)
+    }
+
+    fn draw_sprite(&mut self, image: &str, markup: &Markup, x: f32, y: f32) {
+        if markup.ignore { return; }
+
+        let sprite = match ResourceSet::get_sprite(image) {
+            Err(_) => {
+                warn!("Unable to find image '{}'", image);
+                return;
+            },
+            Ok(sprite) => sprite,
+        };
+
+        let x_over_y = sprite.size.width as f32 / sprite.size.height as f32;
+        let mut draw_list = DrawList::from_sprite_f32(&sprite, x, y,
+                                                      markup.scale * x_over_y, markup.scale);
+        draw_list.set_color(markup.color);
+        self.append_to_draw_lists(draw_list);
+    }
+
+    fn append_to_draw_lists(&mut self, mut draw_list: DrawList) {
+        let mut added = false;
+        for list in self.draw_lists.iter_mut() {
+            if draw_list.texture == list.texture && draw_list.color_filter == list.color_filter {
+                list.append(&mut draw_list);
+                added = true;
+            }
+        }
+        if !added {
+            self.draw_lists.push(draw_list);
+        }
+    }
+}
+
+impl FontRenderer for MarkupRenderer {
+    fn render(&self, renderer: &mut GraphicsRenderer, _pos_x: f32, _pos_y: f32,
+              _widget_state: &WidgetState) {
+        for draw_list in self.draw_lists.iter() {
+            renderer.draw(draw_list.clone());
+        }
     }
 
     fn get_font(&self) -> &Rc<Font> {
         &self.font
     }
-}
-
-fn draw_current(renderer: &mut GraphicsRenderer, quads: Vec<Vertex>, markup: &Markup) {
-    if markup.ignore { return; }
-
-    let mut draw_list = DrawList::from_font(&markup.font.id, quads);
-    draw_list.set_color(markup.color);
-    renderer.draw(draw_list);
-}
-
-fn draw_sprite(renderer: &mut GraphicsRenderer, image: &str,
-               markup: &Markup, x: f32, y: f32) {
-    if markup.ignore { return; }
-
-    let sprite = match ResourceSet::get_sprite(image) {
-        Err(_) => {
-            warn!("Unable to find image '{}'", image);
-            return;
-        },
-        Ok(sprite) => sprite,
-    };
-
-    let x_over_y = sprite.size.width as f32 / sprite.size.height as f32;
-    let mut draw_list = DrawList::from_sprite_f32(&sprite, x, y,
-                                                  markup.scale * x_over_y, markup.scale);
-    draw_list.set_color(markup.color);
-    renderer.draw(draw_list);
 }

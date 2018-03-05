@@ -21,7 +21,7 @@ use std::cell::RefCell;
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{Button, Label, Spinner};
 
-use {area_editor, AreaEditor};
+use {AreaEditor};
 
 pub const NAME: &str = "shift_tiles_window";
 
@@ -65,33 +65,12 @@ impl WidgetKind for ShiftTilesWindow {
             let delta_x = x_spinner.borrow().value();
             let delta_y = y_spinner.borrow().value();
             info!("Shifting tiles in area by {},{}", delta_x, delta_y);
-            shift_tiles(&mut *area_editor_ref.borrow_mut(), delta_x, delta_y);
+            area_editor_ref.borrow_mut().model.shift_tiles(delta_x, delta_y);
 
             let parent = Widget::get_parent(&widget);
             parent.borrow_mut().mark_for_removal();
         })));
 
         vec![title, close, x_label, y_label, x_spinner_widget, y_spinner_widget, accept]
-    }
-}
-
-fn shift_tiles(area_editor: &mut AreaEditor, delta_x: i32, delta_y: i32) {
-    for &mut (_, ref mut layer) in area_editor.tiles.iter_mut() {
-        for &mut (ref mut point, ref tile) in layer.iter_mut() {
-            if point.x + delta_x < 0
-                || point.y + delta_y < 0
-                || point.x + delta_x + tile.width > area_editor::MAX_AREA_SIZE
-                || point.y + delta_y + tile.height > area_editor::MAX_AREA_SIZE {
-                warn!("Invalid tile shift parameters: {},{}", delta_x, delta_y);
-                return;
-            }
-        }
-    }
-
-    for &mut (_, ref mut layer) in area_editor.tiles.iter_mut() {
-        for &mut (ref mut point, _) in layer.iter_mut() {
-            point.x += delta_x;
-            point.y += delta_y;
-        }
     }
 }

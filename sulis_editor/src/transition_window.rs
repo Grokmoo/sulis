@@ -80,7 +80,7 @@ impl WidgetKind for TransitionWindow {
 
         if let Some(index) = self.selected_transition {
             let area_editor = self.area_editor.borrow();
-            let transition = area_editor.transition(index);
+            let transition = area_editor.model.transition(index);
 
             let from_str = format!("{},{}", transition.from.x, transition.from.y);
             let to_str = format!("{},{}", transition.to.x, transition.to.y);
@@ -130,7 +130,7 @@ impl WidgetKind for TransitionWindow {
                 };
 
                 let mut area_editor = area_editor_ref.borrow_mut();
-                let transition = area_editor.transition_mut(cur_index);
+                let transition = area_editor.model.transition_mut(cur_index);
                 transition.from = from;
                 transition.to = to;
                 transition.to_area = to_area;
@@ -149,7 +149,7 @@ impl WidgetKind for TransitionWindow {
                     None => return,
                 };
 
-                area_editor_ref.borrow_mut().delete_transition(cur_index);
+                area_editor_ref.borrow_mut().model.delete_transition(cur_index);
                 transition_window.selected_transition = None;
             })));
 
@@ -158,7 +158,7 @@ impl WidgetKind for TransitionWindow {
         }
 
         let mut entries: Vec<list_box::Entry<String>> = Vec::new();
-        for (index, ref transition) in self.area_editor.borrow().transitions_iter().enumerate() {
+        for (index, ref transition) in self.area_editor.borrow().model.transitions_iter().enumerate() {
             let cb = Callback::new(Rc::new(move |widget, _| {
                 let window = Widget::go_up_tree(widget, 2);
                 window.borrow_mut().invalidate_children();
@@ -192,7 +192,7 @@ impl WidgetKind for TransitionWindow {
             let window = Widget::get_parent(widget);
             window.borrow_mut().invalidate_children();
 
-            let index = match area_editor_ref.borrow_mut().new_transition() {
+            let index = match area_editor_ref.borrow_mut().model.new_transition() {
                 None => return,
                 Some(index) => index,
             };

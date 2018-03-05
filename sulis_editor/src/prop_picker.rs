@@ -18,28 +18,100 @@ use std::any::Any;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use sulis_core::ui::{Callback, Widget, WidgetKind};
+use sulis_core::io::{DrawList, GraphicsRenderer};
+use sulis_core::ui::{animation_state, Callback, Color, Widget, WidgetKind};
+use sulis_core::util::Point;
 use sulis_module::{Prop, Module};
 use sulis_widgets::Button;
+
+use {AreaModel, EditorMode};
 
 const NAME: &str = "prop_picker";
 
 pub struct PropPicker {
     cur_prop: Option<Rc<Prop>>,
+    removal_props: Vec<(Point, Rc<Prop>)>,
+    cursor_pos: Option<Point>,
 }
 
 impl PropPicker {
     pub fn new() -> Rc<RefCell<PropPicker>> {
         Rc::new(RefCell::new(PropPicker {
             cur_prop: None,
+            removal_props: Vec::new(),
+            cursor_pos: None,
         }))
     }
+}
 
-    pub fn get_cur_prop(&self) -> Option<Rc<Prop>> {
-        match self.cur_prop {
-            None => None,
-            Some(ref prop) => Some(Rc::clone(prop)),
+impl EditorMode for PropPicker {
+    fn draw(&mut self, renderer: &mut GraphicsRenderer, x: f32, y: f32,
+            scale_x: f32, scale_y: f32, millis: u32) {
+
+        for &(pos, ref prop) in self.removal_props.iter() {
+            let x = x + pos.x as f32;
+            let y = y + pos.y as f32;
+            let mut draw_list = DrawList::empty_sprite();
+            prop.append_to_draw_list(&mut draw_list, &animation_state::NORMAL, x, y, millis);
+            draw_list.set_color(Color::from_string("FFF8"));
+            draw_list.set_scale(scale_x, scale_y);
+            renderer.draw(draw_list);
         }
+
+        let prop = match self.cur_prop {
+            None => return,
+            Some(ref prop) => prop,
+        };
+
+        let pos = match self.cursor_pos {
+            None => return,
+            Some(pos) => pos,
+        };
+
+        let mut draw_list = DrawList::empty_sprite();
+        let x = x + pos.x as f32;
+        let y = y + pos.y as f32;
+        prop.append_to_draw_list(&mut draw_list, &animation_state::NORMAL, x, y, millis);
+        draw_list.set_color(Color::from_string("FFF8"));
+        draw_list.set_scale(scale_x, scale_y);
+        renderer.draw(draw_list);
+    }
+
+    fn cursor_size(&self) -> (i32, i32) {
+        match self.cur_prop {
+            None => (0, 0),
+            Some(ref prop) => (prop.width as i32, prop.height as i32),
+        }
+    }
+
+    fn mouse_move(&mut self, model: &mut AreaModel, x: i32, y: i32) {
+        self.cursor_pos = Some(Point::new(x, y));
+
+        let prop = match self.cur_prop {
+            None => return,
+            Some(ref prop) => prop,
+        };
+
+        self.removal_props = model.props_within(x, y, prop.width as i32, prop.height as i32);
+    }
+
+    fn left_click(&mut self, model: &mut AreaModel, x: i32, y: i32) {
+        let prop = match self.cur_prop {
+            None => return,
+            Some(ref prop) => prop,
+        };
+
+        model.add_prop(Rc::clone(prop), x, y);
+    }
+
+    fn right_click(&mut self, model: &mut AreaModel, x: i32, y: i32) {
+        let prop = match self.cur_prop {
+            None => return,
+            Some(ref prop) => prop,
+        };
+
+        self.removal_props.clear();
+        model.remove_props_within(x, y, prop.width as i32, prop.height as i32);
     }
 }
 

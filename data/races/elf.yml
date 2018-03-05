@@ -1,8 +1,7 @@
-id: elven
-name: Elven
+id: elf
+name: Elf
 description: |
-  This is some descriptive text about elves.
-player: true
+  Boasting perhaps the oldest of the known civilizations, the empire of the Elves stretched across most of the known world at its peak.  While those days are long gone, individual elves can still be formidable foes.  They are best used off the front line, as magic users, rogues, or archers.
 size: 3
 base_stats:
   hit_points: 40
@@ -35,38 +34,34 @@ image_layer_offsets:
 image_layer_postfix:
   Female: "_female"
 portrait_selections:
-  - portraits/human01
-  - portraits/human02
-  - portraits/human03
-  - portraits/human04
-  - portraits/human05
-  - portraits/human06
-  - portraits/human07
-  - portraits/human08
-  - portraits/human09
-  - portraits/human10
-  - portraits/human11
-  - portraits/human12
-  - portraits/human13
-  - portraits/human14
-  - portraits/human15
-  - portraits/human16
+  - portraits/elf01
+  - portraits/elf02
+  - portraits/elf03
+  - portraits/elf04
+  - portraits/elf05
+  - portraits/elf06
+  - portraits/elf07
+  - portraits/elf08
+  - portraits/elf09
+  - portraits/elf10
+  - portraits/elf11
+  - portraits/elf12
 hair_selections:
+  - creatures/hair06
   - creatures/hair01
   - creatures/hair02
   - creatures/hair03
   - creatures/hair04
   - creatures/hair05
-  - creatures/hair06
   - creatures/hair07
   - creatures/hair08
   - creatures/hair09
   - creatures/hair10
   - creatures/hair11
 hair_colors : [
-  "FFFFFF", "C0C0C0", "808080", "545454",
+  "FFA500", "FFFFFF", "C0C0C0", "808080", "545454",
   "545454", "000000", "EEE685", "FFFF00", 
-  "CC9900", "D98719", "FFA500", "EE7600",
+  "CC9900", "D98719", "EE7600",
   "FF0000", "C00000", "800000", "CD853F",
   "8B5A2B", "8B5A00", "8B4513", "5C3317" ]
 skin_colors : [

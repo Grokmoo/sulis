@@ -1,8 +1,7 @@
 id: human
 name: Human
 description: |
-  This is some descriptive text about humans.
-player: true
+  Tough and adaptable, humans have colonized much of the world, often at the expense of other races.  Human adventures of all types can frequently be found throughout the Five Corners and beyond. 
 size: 3
 base_stats:
   hit_points: 40
@@ -50,8 +49,8 @@ portrait_selections:
   - portraits/human15
   - portraits/human16
 hair_selections:
-  - creatures/hair01
   - creatures/hair02
+  - creatures/hair01
   - creatures/hair03
   - creatures/hair04
   - creatures/hair05
@@ -70,11 +69,11 @@ beard_selections:
   - creatures/beard06
   - creatures/beard07
 hair_colors : [
-  "FFFFFF", "C0C0C0", "808080", "545454",
+  "8B4513", "FFFFFF", "C0C0C0", "808080", "545454",
   "545454", "000000", "EEE685", "FFFF00", 
   "CC9900", "D98719", "FFA500", "EE7600",
   "FF0000", "C00000", "800000", "CD853F",
-  "8B5A2B", "8B5A00", "8B4513", "5C3317" ]
+  "8B5A2B", "8B5A00", "5C3317" ]
 skin_colors : [
   "F9F4C8", "F6D39B", "F8E088", "F6D39B",
   "EDAE67", "CE9452", "734A29", "422110",

@@ -64,14 +64,14 @@ children:
             x_relative: Center
             position: [0, 10]
             layout: BoxHorizontal
-            layout_spacing: { top: 0, bottom: 0, left: 0, right: 2 }
+            layout_spacing: { top: 0, bottom: 0, left: 0, right: 5 }
             children:
               race_button:
                 from: .button
                 text_params:
                   scale: 5.0
                 text: "#name#"
-                preferred_size: [25, 10]
+                preferred_size: [30, 10]
       class_selector_pane:
         width_relative: Max
         height_relative: Max
@@ -98,14 +98,14 @@ children:
             x_relative: Center
             position: [0, 10]
             layout: BoxHorizontal
-            layout_spacing: { top: 0, bottom: 0, left: 0, right: 2 }
+            layout_spacing: { top: 0, bottom: 0, left: 0, right: 5 }
             children:
               class_button:
                 from: .button
                 text_params:
                   scale: 5.0
                 text: "#name#"
-                preferred_size: [25, 10]
+                preferred_size: [30, 10]
       attribute_selector_pane:
         width_relative: Max
         height_relative: Max
@@ -132,14 +132,14 @@ children:
             x_relative: Center
             position: [0, 10]
             layout: BoxHorizontal
-            layout_spacing: { top: 0, bottom: 0, left: 0, right: 2 }
+            layout_spacing: { top: 0, bottom: 0, left: 0, right: 5 }
             children:
               kit_button:
                 from: .button
                 text_params:
                   scale: 5.0
                 text: "#name#"
-                preferred_size: [25, 10]
+                preferred_size: [30, 10]
           attr_label:
             from: .label
             preferred_size: [24, 12]

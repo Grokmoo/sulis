@@ -1,0 +1,73 @@
+id: merling
+name: Merling
+description: |
+  An ancient and proud people, their massive cities are cloistered away far from prying eyes in the ocean depths.  Occasionally, however, some wanderlusted Merlings make their way into the realms of the other races.  They are well suited to be magic users or warriors.
+size: 3
+base_stats:
+  hit_points: 35
+  accuracy: 30
+  defense: 32
+  fortitude: 30
+  reflex: 30
+  will: 30
+  attack:
+    damage:
+      min: 10
+      max: 15
+      kind: Crushing
+    kind: #Melee
+      reach: 0.5
+  bonus_reach: 1.0
+default_images:
+  Male:
+    Foreground: creatures/merling_male_fg
+    Background: creatures/merling_male_bg
+    Ears: creatures/merling_male_ears
+  Female:
+    Foreground: creatures/merling_female_fg
+    Background: creatures/merling_female_bg
+    Ears: creatures/merling_female_ears
+image_layer_offset_scale: 16
+image_layer_offsets:
+  HeldMain: [-16, -8]
+  HeldOff: [17, -6]
+image_layer_postfix:
+  Female: "_female"
+portrait_selections:
+  - portraits/merling01
+  - portraits/merling02
+  - portraits/merling03
+  - portraits/merling04
+  - portraits/merling05
+  - portraits/merling06
+  - portraits/merling07
+  - portraits/merling08
+hair_selections:
+  - creatures/hair06
+  - creatures/hair01
+  - creatures/hair02
+  - creatures/hair03
+  - creatures/hair04
+  - creatures/hair05
+  - creatures/hair07
+  - creatures/hair08
+  - creatures/hair09
+  - creatures/hair10
+  - creatures/hair11
+beard_selections:
+  - creatures/beard01
+  - creatures/beard02
+  - creatures/beard03
+  - creatures/beard04
+  - creatures/beard05
+  - creatures/beard06
+  - creatures/beard07
+hair_colors : [
+  "309164", "FFFFFF", "C0C0C0", "808080",
+  "545454", "000000", "F3FCBB", "C7FCD0",
+  "93CC7A", "346452", "C5C5FF",
+  "6E3F89", "4D146E" ]
+skin_colors : [
+  "6DA2E2", "CDF8F8", "ADD8F8", "2D58AD",
+  "1D3971", "C4FFCB", "93CC7A", "6C9D71",
+  "309164", "278162", "007777" ]

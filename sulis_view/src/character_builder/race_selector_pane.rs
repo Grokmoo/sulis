@@ -68,8 +68,13 @@ impl WidgetKind for RaceSelectorPane {
         let title = Widget::with_theme(Label::empty(), "title");
 
         let races_pane = Widget::empty("races_pane");
-        for race in Module::all_races() {
-            if !race.player { continue; }
+        for race_id in Module::rules().selectable_races.iter() {
+            let race = match Module::race(race_id) {
+                None => {
+                    warn!("Selectable race '{}' not found", race_id);
+                    continue;
+                }, Some(race) => race,
+            };
 
             let race_button = Widget::with_theme(Button::empty(), "race_button");
             race_button.borrow_mut().state.add_text_arg("name", &race.name);

@@ -69,7 +69,14 @@ impl WidgetKind for ClassSelectorPane {
         let title = Widget::with_theme(Label::empty(), "title");
 
         let classes_pane = Widget::empty("classes_pane");
-        for class in Module::all_classes() {
+        for class_id in Module::rules().selectable_classes.iter() {
+            let class = match Module::class(class_id) {
+                None => {
+                    warn!("Selectable class '{}' not found", class_id);
+                    continue;
+                }, Some(class) => class,
+            };
+
             let class_button = Widget::with_theme(Button::empty(), "class_button");
             class_button.borrow_mut().state.add_text_arg("name", &class.name);
             if let Some(ref selected_class) = self.selected_class {

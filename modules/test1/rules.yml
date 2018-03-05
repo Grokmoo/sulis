@@ -21,3 +21,6 @@ builder_attribute_points: 80
 
 max_transition_distance: 2.5
 max_prop_distance: 2.5
+
+selectable_races: [ human, elf, merling ]
+selectable_classes: [ fighter, rogue ]

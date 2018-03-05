@@ -1,13 +1,14 @@
 id: fighter
 name: Fighter
 description: |
-  This is some descriptive text about fighters.
+  Fighters are experts in all forms of martial combat, and, as they gain experience, frequently masters in more than one.  They have solid training in a large variety of weapons and equipment.
+  On the battlefield, they will often protect more fragile comrades as well as leap into the fray themselves.
 bonuses_per_level:
   hit_points: 15
   accuracy: 5
   defense: 3
   fortitude: 3
-  reflex: 3
+  reflex: 2
   will: 2
   initiative: 1
 kits:
@@ -21,7 +22,7 @@ kits:
       wis: 10
     starting_equipment: [ battleaxe, boots_leather, torso_leather, legs_pants ]
     description: |
-      The description of the Brawler kit goes here.
+      A battle hardened warrior who prefers large weapons and close quarters combat.  They can deal out tremendous damage to any foes who dare to enter the melee.
   - name: Archer
     default_attributes:
       str: 13
@@ -32,7 +33,7 @@ kits:
       wis: 10
     starting_equipment: [ shortbow, boots_leather, torso_leather, legs_pants ]
     description: |
-      The description of the Archer kit goes here.
+      An expert with range weapons, who prefers to keep their distance from enemies where possible, using their skills to take down the most dangerous targets from afar.
   - name: Defender
     default_attributes:
       str: 16
@@ -43,5 +44,5 @@ kits:
       wis: 10
     starting_equipment: [ shortsword, shield_small, boots_leather, torso_leather, legs_leather ]
     description: |
-      The description of the Defender kit goes here.
+      A fighter who will typically wear heavy armor and a large shield.  While certainly capable of dishing out punishment, their primary role on the battlefield is often to protect their compatriots.
   

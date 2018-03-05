@@ -48,6 +48,9 @@ pub struct Rules {
 
     pub max_transition_distance: f32,
     pub max_prop_distance: f32,
+
+    pub selectable_races: Vec<String>,
+    pub selectable_classes: Vec<String>,
 }
 
 impl Rules {

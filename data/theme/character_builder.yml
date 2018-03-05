@@ -45,27 +45,33 @@ children:
         children:
           title:
             from: .label
-            text: "Select a Race"
-            preferred_size: [80, 5]
-            position: [0, 0]
+            text: "Select your Race"
+            preferred_size: [0, 5]
+            width_relative: Max
             text_params:
               scale: 5.5
-          races_list:
-            from: .list_box
-            preferred_size: [80, -5]
-            position: [0, 5]
-            height_relative: Max
-            children:
-              entry:
-                text_params:
-                  scale: 6.0
-                preferred_size: [0, 6]
           race_pane:
             from: .race_pane
-            position: [85, 0]
-            height_relative: Max
+            background: bg_base
+            border: [1, 1, 1, 1]
             width_relative: Max
-            preferred_size: [-85, 0]
+            preferred_size: [0, 100]
+            position: [0, 25]
+          races_pane:
+            border: [1, 1, 1, 1]
+            preferred_size: [0, 12]
+            width_relative: ChildSum
+            x_relative: Center
+            position: [0, 10]
+            layout: BoxHorizontal
+            layout_spacing: { top: 0, bottom: 0, left: 0, right: 2 }
+            children:
+              race_button:
+                from: .button
+                text_params:
+                  scale: 5.0
+                text: "#name#"
+                preferred_size: [25, 10]
       class_selector_pane:
         width_relative: Max
         height_relative: Max
@@ -73,26 +79,33 @@ children:
         children:
           title:
             from: .label
-            text: "Select a Class"
-            preferred_size: [80, 5]
+            text: "Select your Class"
+            preferred_size: [0, 5]
+            width_relative: Max
             text_params:
               scale: 5.5
-          classes_list:
-            from: .list_box
-            preferred_size: [80, -5]
-            position: [0, 5]
-            height_relative: Max
-            children:
-              entry:
-                text_params:
-                  scale: 6.0
-                preferred_size: [0, 6]
           class_pane:
             from: .class_pane
-            position: [85, 0]
-            height_relative: Max
+            background: bg_base
+            border: [1, 1, 1, 1]
             width_relative: Max
-            preferred_size: [-85, 0]
+            preferred_size: [0, 100]
+            position: [0, 25]
+          classes_pane:
+            border: [1, 1, 1, 1]
+            preferred_size: [0, 12]
+            width_relative: ChildSum
+            x_relative: Center
+            position: [0, 10]
+            layout: BoxHorizontal
+            layout_spacing: { top: 0, bottom: 0, left: 0, right: 2 }
+            children:
+              class_button:
+                from: .button
+                text_params:
+                  scale: 5.0
+                text: "#name#"
+                preferred_size: [25, 10]
       attribute_selector_pane:
         width_relative: Max
         height_relative: Max
@@ -100,11 +113,33 @@ children:
         children:
           title:
             from: .label
-            text: "Select your Attributes"
+            text: "Customize your Class"
             preferred_size: [0, 5]
             width_relative: Max
             text_params:
               scale: 5.5
+          kit_area:
+            from: .text_area
+            background: bg_base
+            border: [1, 1, 1, 1]
+            preferred_size: [100, 100]
+            position: [0, 25]
+            text: "#description#"
+          kits_pane:
+            border: [1, 1, 1, 1]
+            preferred_size: [0, 12]
+            width_relative: ChildSum
+            x_relative: Center
+            position: [0, 10]
+            layout: BoxHorizontal
+            layout_spacing: { top: 0, bottom: 0, left: 0, right: 2 }
+            children:
+              kit_button:
+                from: .button
+                text_params:
+                  scale: 5.0
+                text: "#name#"
+                preferred_size: [25, 10]
           attr_label:
             from: .label
             preferred_size: [24, 12]
@@ -113,54 +148,53 @@ children:
               horizontal_alignment: Right
           points_label:
             from: .label
-            preferred_size: [0, 12]
-            width_relative: Max
+            preferred_size: [50, 12]
             text_params:
-              scale: 6.0
+              scale: 5.0
             text: "Points Left: #points#"
-            position: [0, 100]
+            position: [100, 115]
           str_label:
             from: .character_builder.attribute_selector_pane.attr_label
-            position: [0, 10]
+            position: [100, 25]
             text: "Strength"
           str_spinner:
             from: .spinner
-            position: [25, 10]
+            position: [125, 25]
           dex_label:
             from: .character_builder.attribute_selector_pane.attr_label
-            position: [0, 25]
+            position: [100, 40]
             text: "Dexterity"
           dex_spinner:
             from: .spinner
-            position: [25, 25]
+            position: [125, 40]
           end_label:
             from: .character_builder.attribute_selector_pane.attr_label
-            position: [0, 40]
+            position: [100, 55]
             text: "Endurance"
           end_spinner:
             from: .spinner
-            position: [25, 40]
+            position: [125, 55]
           per_label:
             from: .character_builder.attribute_selector_pane.attr_label
-            position: [0, 55]
+            position: [100, 70]
             text: "Perception"
           per_spinner:
             from: .spinner
-            position: [25, 55]
+            position: [125, 70]
           int_label:
             from: .character_builder.attribute_selector_pane.attr_label
-            position: [0, 70]
+            position: [100, 85]
             text: "Intelligence"
           int_spinner:
             from: .spinner
-            position: [25, 70]
+            position: [125, 85]
           wis_label:
             from: .character_builder.attribute_selector_pane.attr_label
-            position: [0, 85]
+            position: [100, 100]
             text: "Wisdom"
           wis_spinner:
             from: .spinner
-            position: [25, 85]
+            position: [125, 100]
       cosmetic_selector_pane:
         width_relative: Max
         height_relative: Max
@@ -177,39 +211,40 @@ children:
             from: .button
             text: "Select Portrait"
             preferred_size: [30, 30]
-            position: [120, 10]
+            position: [120, 20]
           preview:
             background: bg_transparent_base
-            preferred_size: [15, 15]
-            position: [127, 45]
+            border: [3, 3, 3, 3]
+            preferred_size: [21, 21]
+            position: [124, 55]
           name_label:
             from: .label
             text: "Name"
             preferred_size: [10, 5]
-            position: [0, 5]
+            position: [0, 15]
             text_params:
               horizontal_alignment: Right
           name_field:
             from: .input_field
             preferred_size: [40, 5]
-            position: [11, 5]
+            position: [11, 15]
           male_button:
             from: .button
             text: "Male"
             preferred_size: [20, 5]
-            position: [0, 20]
+            position: [0, 30]
           female_button:
             from: .button
             text: "Female"
             preferred_size: [20, 5]
-            position: [0, 27]
+            position: [0, 37]
           skin_color_label:
             from: .label
             text: "Skin Color"
             preferred_size: [48, 5]
-            position: [25, 16]
+            position: [25, 26]
           skin_color_panel:
-            position: [25, 21]
+            position: [25, 31]
             preferred_size: [48, 12]
             layout: Grid
             layout_spacing: { top: 0, bottom: 1, left: 0, right: 1 }
@@ -221,39 +256,39 @@ children:
             from: .label
             text: "Hair"
             preferred_size: [15, 5]
-            position: [5, 40]
+            position: [5, 50]
           next_hair:
             from: .button
             text: ">"
             preferred_size: [5, 5]
-            position: [20, 40]
+            position: [20, 50]
           prev_hair:
             from: .button
             text: "<"
             preferred_size: [5, 5]
-            position: [0, 40]
+            position: [0, 50]
           beard_label:
             from: .label
             text: "Beard"
             preferred_size: [15, 5]
-            position: [5, 50]
+            position: [5, 60]
           next_beard:
             from: .button
             text: ">"
             preferred_size: [5, 5]
-            position: [20, 50]
+            position: [20, 60]
           prev_beard:
             from: .button
             text: "<"
             preferred_size: [5, 5]
-            position: [0, 50]
+            position: [0, 60]
           hair_color_label:
             from: .label
             text: "Hair Color"
             preferred_size: [60, 5]
-            position: [30, 38]
+            position: [30, 48]
           hair_color_panel:
-            position: [30, 43]
+            position: [30, 53]
             preferred_size: [60, 12]
             layout: Grid
             layout_spacing: { top: 0, bottom: 1, left: 0, right: 1 }
@@ -265,9 +300,9 @@ children:
             from: .label
             text: "Clothing Color"
             preferred_size: [60, 5]
-            position: [0, 60]
+            position: [0, 70]
           color_panel:
-            position: [0, 65]
+            position: [0, 75]
             preferred_size: [60, 12]
             layout: Grid
             layout_spacing: { top: 0, bottom: 1, left: 0, right: 1 }

@@ -33,6 +33,7 @@ use {EntitySize, ImageLayer, ImageLayerSet, Module};
 pub struct Race {
     pub id: String,
     pub name: String,
+    pub description: String,
     pub size: Rc<EntitySize>,
     pub player: bool,
     pub base_stats: BonusList,
@@ -95,6 +96,7 @@ impl Race {
         Ok(Race {
             id: builder.id,
             name: builder.name,
+            description: builder.description,
             size,
             player: builder.player.unwrap_or(false),
             base_stats: builder.base_stats,
@@ -136,6 +138,7 @@ impl Race {
 pub struct RaceBuilder {
     pub id: String,
     pub name: String,
+    pub description: String,
     pub size: usize,
     pub player: Option<bool>,
     pub base_stats: BonusList,

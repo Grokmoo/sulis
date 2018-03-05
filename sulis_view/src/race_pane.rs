@@ -68,6 +68,7 @@ impl WidgetKind for RacePane {
             let state = &mut details.borrow_mut().state;
             state.add_text_arg("name", &race.name);
             state.add_text_arg("size", &race.size.size.to_string());
+            state.add_text_arg("description", &race.description);
 
             add_bonus_text_args(&race.base_stats, state);
         }

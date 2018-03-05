@@ -1,5 +1,7 @@
 id: fighter
 name: Fighter
+description: |
+  This is some descriptive text about fighters.
 bonuses_per_level:
   hit_points: 15
   accuracy: 5
@@ -8,3 +10,38 @@ bonuses_per_level:
   reflex: 3
   will: 2
   initiative: 1
+kits:
+  - name: Brawler
+    default_attributes:
+      str: 18
+      dex: 14
+      end: 16
+      per: 12
+      int: 10
+      wis: 10
+    starting_equipment: [ battleaxe, boots_leather, torso_leather, legs_pants ]
+    description: |
+      The description of the Brawler kit goes here.
+  - name: Archer
+    default_attributes:
+      str: 13
+      dex: 18
+      end: 15
+      per: 14
+      int: 10
+      wis: 10
+    starting_equipment: [ shortbow, boots_leather, torso_leather, legs_pants ]
+    description: |
+      The description of the Archer kit goes here.
+  - name: Defender
+    default_attributes:
+      str: 16
+      dex: 14
+      end: 17
+      per: 13
+      int: 10
+      wis: 10
+    starting_equipment: [ shortsword, shield_small, boots_leather, torso_leather, legs_leather ]
+    description: |
+      The description of the Defender kit goes here.
+  

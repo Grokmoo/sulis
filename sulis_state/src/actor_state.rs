@@ -34,12 +34,6 @@ pub struct ActorState {
     image: LayeredImage,
 }
 
-impl PartialEq for ActorState {
-    fn eq(&self, other: &ActorState) -> bool {
-        Rc::ptr_eq(&self.actor, &other.actor)
-    }
-}
-
 impl ActorState {
     pub fn new(actor: Rc<Actor>) -> ActorState {
         trace!("Creating new actor state for {}", actor.id);

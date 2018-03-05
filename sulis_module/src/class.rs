@@ -20,12 +20,23 @@ use sulis_core::resource::ResourceBuilder;
 use sulis_core::util::{invalid_data_error, unable_to_create_error};
 use sulis_core::serde_json;
 use sulis_core::serde_yaml;
-use sulis_rules::BonusList;
+use sulis_rules::{AttributeList, BonusList};
+
+#[derive(Deserialize, Serialize, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct Kit {
+    pub name: String,
+    pub description: String,
+    pub default_attributes: AttributeList,
+    pub starting_equipment: Vec<String>,
+}
 
 pub struct Class {
     pub id: String,
     pub name: String,
+    pub description: String,
     pub bonuses_per_level: BonusList,
+    pub kits: Vec<Kit>,
 }
 
 impl PartialEq for Class {
@@ -44,7 +55,9 @@ impl Class {
         Ok(Class {
             id: builder.id,
             name: builder.name,
+            description: builder.description,
             bonuses_per_level: builder.bonuses_per_level,
+            kits: builder.kits,
         })
     }
 }
@@ -54,7 +67,9 @@ impl Class {
 pub struct ClassBuilder {
     pub id: String,
     pub name: String,
+    pub description: String,
     pub bonuses_per_level: BonusList,
+    pub kits: Vec<Kit>,
 }
 
 impl ResourceBuilder for ClassBuilder {

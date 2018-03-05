@@ -17,10 +17,9 @@
 use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
-use std::fmt::{self, Display};
 
-use sulis_core::ui::{Widget, WidgetKind};
-use sulis_widgets::{Label, list_box, MutuallyExclusiveListBox};
+use sulis_core::ui::{Callback, Widget, WidgetKind};
+use sulis_widgets::{Button, Label};
 use sulis_module::{Module, Race};
 
 use {CharacterBuilder, RacePane};
@@ -29,13 +28,13 @@ use character_builder::BuilderPane;
 pub const NAME: &str = "race_selector_pane";
 
 pub struct RaceSelectorPane {
-    list_box: Option<Rc<RefCell<MutuallyExclusiveListBox<RaceInfo>>>>,
+    selected_race: Option<Rc<Race>>,
 }
 
 impl RaceSelectorPane {
     pub fn new() -> Rc<RefCell<RaceSelectorPane>> {
         Rc::new(RefCell::new(RaceSelectorPane {
-            list_box: None,
+            selected_race: None,
         }))
     }
 }
@@ -43,24 +42,18 @@ impl RaceSelectorPane {
 impl BuilderPane for RaceSelectorPane {
     fn on_selected(&mut self, builder: &mut CharacterBuilder, _widget: Rc<RefCell<Widget>>) {
         builder.race = None;
-        let next = match self.list_box {
-            None => false,
-            Some(ref list_box) => list_box.borrow().has_active_entry(),
-        };
         builder.prev.borrow_mut().state.set_enabled(false);
-        builder.next.borrow_mut().state.set_enabled(next);
+        builder.next.borrow_mut().state.set_enabled(self.selected_race.is_some());
     }
 
     fn next(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
-        match self.list_box {
-            Some(ref list_box) => {
-                builder.race = match list_box.borrow().active_entry() {
-                    Some(ref entry) => Some(Rc::clone(&entry.item().race)),
-                    None => None,
-                };
-                builder.next(&widget);
-            }, None => (),
-        }
+        let race = match self.selected_race {
+            None => return,
+            Some(ref race) => race,
+        };
+
+        builder.race = Some(Rc::clone(race));
+        builder.next(&widget);
     }
 
     fn prev(&mut self, _builder: &mut CharacterBuilder, _widget: Rc<RefCell<Widget>>) { }
@@ -74,49 +67,40 @@ impl WidgetKind for RaceSelectorPane {
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let title = Widget::with_theme(Label::empty(), "title");
 
-        let mut entries = Vec::new();
+        let races_pane = Widget::empty("races_pane");
         for race in Module::all_races() {
             if !race.player { continue; }
-            let race_info = RaceInfo { race };
-            entries.push(list_box::Entry::new(race_info, None));
-        }
 
-        let race_pane = RacePane::empty();
-        let race_pane_ref = Rc::clone(&race_pane);
-        let race_pane_widget = Widget::with_defaults(race_pane);
-        let race_pane_widget_ref = Rc::clone(&race_pane_widget);
-
-        let list_box = MutuallyExclusiveListBox::with_callback(entries, Rc::new(move |active_entry| {
-            let parent = Widget::go_up_tree(&race_pane_widget_ref, 2);
-            let builder = Widget::downcast_kind_mut::<CharacterBuilder>(&parent);
-
-            match active_entry {
-                None => {
-                    race_pane_ref.borrow_mut().clear_race();
-                    builder.next.borrow_mut().state.set_enabled(false);
-                },
-                Some(entry) => {
-                    race_pane_ref.borrow_mut().set_race(Rc::clone(&entry.item().race));
-                    builder.next.borrow_mut().state.set_enabled(true);
-                },
+            let race_button = Widget::with_theme(Button::empty(), "race_button");
+            race_button.borrow_mut().state.add_text_arg("name", &race.name);
+            if let Some(ref selected_race) = self.selected_race {
+                race_button.borrow_mut().state.set_active(race == *selected_race);
             }
 
-            race_pane_widget_ref.borrow_mut().invalidate_children();
-        }));
-        self.list_box = Some(list_box.clone());
-        let races_list = Widget::with_theme(list_box, "races_list");
+            let race_ref = Rc::clone(&race);
+            race_button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
+                let parent = Widget::go_up_tree(&widget, 2);
+                let pane = Widget::downcast_kind_mut::<RaceSelectorPane>(&parent);
+                pane.selected_race = Some(Rc::clone(&race_ref));
+                parent.borrow_mut().invalidate_children();
 
-        vec![title, races_list, race_pane_widget]
-    }
-}
+                let builder_widget = Widget::get_parent(&parent);
+                let builder = Widget::downcast_kind_mut::<CharacterBuilder>(&builder_widget);
+                builder.next.borrow_mut().state.set_enabled(true);
+            })));
 
-#[derive(Clone)]
-struct RaceInfo {
-    race: Rc<Race>,
-}
+            Widget::add_child_to(&races_pane, race_button);
+        }
 
-impl Display for RaceInfo {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.race.name)
+        let race = match self.selected_race {
+            None => return vec![title, races_pane],
+            Some(ref race) => race,
+        };
+
+        let race_pane = RacePane::empty();
+        race_pane.borrow_mut().set_race(Rc::clone(race));
+        let race_pane_widget = Widget::with_defaults(race_pane);
+
+        vec![title, race_pane_widget, races_pane]
     }
 }

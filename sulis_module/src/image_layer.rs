@@ -164,7 +164,7 @@ impl ImageLayerSet {
 fn get_color(layer: ImageLayer, hair: Option<Color>, skin: Option<Color>) -> Option<Color> {
     match layer {
         Hair | Beard => hair,
-        Background | Foreground => skin,
+        Background | Foreground | Ears => skin,
         _ => None,
     }
 }

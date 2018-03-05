@@ -41,7 +41,7 @@ use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
 use sulis_core::resource::write_to_file;
 use sulis_widgets::{Button, Label};
 use sulis_module::actor::Sex;
-use sulis_module::{ActorBuilder, Class, ImageLayer, Module, Race};
+use sulis_module::{ActorBuilder, Class, ImageLayer, Race};
 use sulis_rules::{AttributeList};
 
 pub const NAME: &str = "character_builder";
@@ -66,6 +66,7 @@ pub struct CharacterBuilder {
     pub race: Option<Rc<Race>>,
     pub class: Option<Rc<Class>>,
     pub attributes: Option<AttributeList>,
+    pub items: Option<Vec<String>>,
     pub sex: Option<Sex>,
     pub name: String,
     pub images: HashMap<ImageLayer, String>,
@@ -121,6 +122,7 @@ impl CharacterBuilder {
             skin_color: None,
             hair_color: None,
             attributes: None,
+            items: None,
             portrait: None,
             images: HashMap::new(),
         }))
@@ -149,11 +151,11 @@ impl CharacterBuilder {
         let mut levels = HashMap::new();
         levels.insert(self.class.as_ref().unwrap().id.to_string(), 1);
 
-        let mut items: Vec<String> = Vec::new();
         let mut equipped = Vec::new();
-        for (index, ref item_id) in Module::rules().builder_base_items.iter().enumerate() {
-            items.push(item_id.to_string());
-            equipped.push(index as u32);
+        if let Some(ref items) = self.items {
+            for (index, _) in items.iter().enumerate() {
+                equipped.push(index as u32);
+            }
         }
 
         let actor = ActorBuilder {
@@ -168,7 +170,7 @@ impl CharacterBuilder {
             hue: self.hue,
             hair_color: self.hair_color,
             skin_color: self.skin_color,
-            items: Some(items),
+            items: self.items.clone(),
             equipped: Some(equipped),
             levels,
         };

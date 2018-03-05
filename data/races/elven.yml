@@ -1,16 +1,16 @@
-id: human
-name: Human
+id: elven
+name: Elven
 description: |
-  This is some descriptive text about humans.
+  This is some descriptive text about elves.
 player: true
 size: 3
 base_stats:
   hit_points: 40
   accuracy: 30
   defense: 30
-  fortitude: 30
+  fortitude: 25
   reflex: 30
-  will: 30
+  will: 35
   attack:
     damage:
       min: 10
@@ -23,9 +23,11 @@ default_images:
   Male:
     Foreground: creatures/human_male_fg
     Background: creatures/human_male_bg
+    Ears: creatures/elf_male_ears
   Female:
     Foreground: creatures/human_female_fg
     Background: creatures/human_female_bg
+    Ears: creatures/elf_female_ears
 image_layer_offset_scale: 16
 image_layer_offsets:
   HeldMain: [-16, -8]
@@ -61,14 +63,6 @@ hair_selections:
   - creatures/hair09
   - creatures/hair10
   - creatures/hair11
-beard_selections:
-  - creatures/beard01
-  - creatures/beard02
-  - creatures/beard03
-  - creatures/beard04
-  - creatures/beard05
-  - creatures/beard06
-  - creatures/beard07
 hair_colors : [
   "FFFFFF", "C0C0C0", "808080", "545454",
   "545454", "000000", "EEE685", "FFFF00", 

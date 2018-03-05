@@ -262,7 +262,6 @@ children:
       details:
         from: .text_area
         text: |
-          [s=3|]
           [s=6|#name#]
           [s=4|Size: #size#]
           [s=6|]
@@ -288,6 +287,7 @@ children:
           ][?reflex|[s=4.0|Reflex: #reflex#]
           ][?will|[s=4.0|Will: #will#]
           ]
+          #description#
         width_relative: Max
         height_relative: Max
   class_pane:
@@ -298,7 +298,6 @@ children:
       details:
         from: .text_area
         text: |
-          [s=3|]
           [s=6|#name#]
           [s=6|]
           [s=5|Bonuses per Level]
@@ -320,6 +319,7 @@ children:
           ][?reflex|[s=4.0|Reflex: #reflex#]
           ][?will|[s=4.0|Will: #will#]
           ]
+          #description#
         width_relative: Max
         height_relative: Max
   exit_confirmation_window:

@@ -142,7 +142,7 @@ impl FontRenderer for MarkupRenderer {
         let mut markup_buf = String::new();
 
         let mut x = pos_x;
-        let mut y = pos_y;
+        let mut y = pos_y + cur_markup.scale;
         let mut max_last_line_height = cur_markup.scale;
 
         for c in text.chars() {

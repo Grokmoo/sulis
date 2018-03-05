@@ -37,6 +37,7 @@ pub struct CosmeticSelectorPane {
     preview: Rc<RefCell<Widget>>,
 
     race: Option<Rc<Race>>,
+    items: Vec<String>,
     sex: Sex,
     name: String,
     hair_index: Option<usize>,
@@ -55,6 +56,7 @@ impl CosmeticSelectorPane {
         Rc::new(RefCell::new(CosmeticSelectorPane {
             sex: Sex::Male,
             race: None,
+            items: Vec::new(),
             name: String::new(),
             hair_index: None,
             beard_index: None,
@@ -80,7 +82,7 @@ impl CosmeticSelectorPane {
         };
 
         let mut insert: HashMap<ImageLayer, Rc<Image>> = HashMap::new();
-        for ref item_id in Module::rules().builder_base_items.iter() {
+        for ref item_id in self.items.iter() {
             let item = match Module::item(item_id) {
                 None => {
                     warn!("No item found for builder base item '{}'", item_id);
@@ -117,15 +119,27 @@ impl CosmeticSelectorPane {
 
         images
     }
+
+    fn set_finish_enabled(&self, widget: &Rc<RefCell<Widget>>) {
+        let parent = Widget::get_parent(widget);
+        let builder = Widget::downcast_kind_mut::<CharacterBuilder>(&parent);
+        builder.finish.borrow_mut().state.set_enabled(self.name.len() > 1 && self.portrait.is_some());
+    }
 }
 
 impl BuilderPane for CosmeticSelectorPane {
     fn on_selected(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
         self.race = builder.race.clone();
+
+        if let Some(ref items) = builder.items {
+            self.items = items.clone();
+        }
+
         builder.prev.borrow_mut().state.set_enabled(true);
         builder.next.borrow_mut().state.set_enabled(false);
         builder.next.borrow_mut().state.set_visible(false);
         builder.finish.borrow_mut().state.set_visible(true);
+        builder.finish.borrow_mut().state.set_enabled(self.name.len() > 1 && self.portrait.is_some());
         self.build_preview();
         widget.borrow_mut().invalidate_children();
     }
@@ -187,6 +201,7 @@ impl WidgetKind for CosmeticSelectorPane {
             };
 
             cosmetic_pane.name = field.text.to_string();
+            cosmetic_pane.set_finish_enabled(&parent);
         })));
 
         let male_button = Widget::with_theme(Button::empty(), "male_button");
@@ -410,6 +425,7 @@ fn portrait_selector_button_callback(portrait: &Rc<Image>) -> Callback {
         let cosmetic_pane = Widget::downcast_kind_mut::<CosmeticSelectorPane>(&parent);
         cosmetic_pane.portrait = Some(Rc::clone(&image));
         parent.borrow_mut().invalidate_children();
+        cosmetic_pane.set_finish_enabled(&parent);
 
         let parent = Widget::get_parent(&widget);
         parent.borrow_mut().mark_for_removal();

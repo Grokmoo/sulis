@@ -18,9 +18,6 @@ base_attribute: 10
 builder_max_attribute: 20
 builder_min_attribute: 8
 builder_attribute_points: 80
-builder_base_items:
-  - torso_shirt
-  - legs_pants
 
 max_transition_distance: 2.5
 max_prop_distance: 2.5

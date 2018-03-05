@@ -67,6 +67,7 @@ impl WidgetKind for ClassPane {
         {
             let state = &mut details.borrow_mut().state;
             state.add_text_arg("name", &class.name);
+            state.add_text_arg("description", &class.description);
 
             add_bonus_text_args(&class.bonuses_per_level, state);
         }

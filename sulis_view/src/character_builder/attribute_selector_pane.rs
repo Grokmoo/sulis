@@ -20,8 +20,8 @@ use std::cell::RefCell;
 
 use sulis_rules::{Attribute, AttributeList};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_module::Module;
-use sulis_widgets::{Label, Spinner};
+use sulis_module::{Class, Module};
+use sulis_widgets::{Button, Label, Spinner, TextArea};
 
 use CharacterBuilder;
 use character_builder::BuilderPane;
@@ -31,6 +31,8 @@ pub const NAME: &str = "attribute_selector_pane";
 pub struct AttributeSelectorPane {
     available: i32,
     attrs: AttributeList,
+    selected_class: Option<Rc<Class>>,
+    selected_kit: Option<usize>,
 }
 
 impl AttributeSelectorPane {
@@ -44,6 +46,8 @@ impl AttributeSelectorPane {
         Rc::new(RefCell::new(AttributeSelectorPane {
             attrs,
             available,
+            selected_class: None,
+            selected_kit: None,
         }))
     }
 
@@ -56,18 +60,39 @@ impl AttributeSelectorPane {
         }
         self.available = rules.builder_attribute_points - total;
     }
+
+    fn set_next_enabled(&mut self, widget: &Rc<RefCell<Widget>>) {
+        self.calculate_available();
+
+        let builder_widget = Widget::get_parent(&widget);
+        let builder = Widget::downcast_kind_mut::<CharacterBuilder>(&builder_widget);
+        builder.next.borrow_mut().state.set_enabled(self.available == 0 && self.selected_kit.is_some());
+    }
 }
 
 impl BuilderPane for AttributeSelectorPane {
-    fn on_selected(&mut self, builder: &mut CharacterBuilder, _widget: Rc<RefCell<Widget>>) {
+    fn on_selected(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
+        self.selected_class = builder.class.clone();
         builder.attributes = None;
         builder.prev.borrow_mut().state.set_enabled(true);
         self.calculate_available();
-        builder.next.borrow_mut().state.set_enabled(self.available == 0);
+        builder.next.borrow_mut().state.set_enabled(self.available == 0 && self.selected_kit.is_some());
+        widget.borrow_mut().invalidate_children();
     }
 
     fn next(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
+        let ref class = match self.selected_class {
+            None => return,
+            Some(ref class) => class,
+        };
+
+        let ref kit = match self.selected_kit {
+            None => return,
+            Some(index) => &class.kits[index],
+        };
+
         builder.attributes = Some(self.attrs);
+        builder.items = Some(kit.starting_equipment.clone());
         builder.next(&widget);
     }
 
@@ -88,6 +113,41 @@ impl WidgetKind for AttributeSelectorPane {
         let title = Widget::with_theme(Label::empty(), "title");
         children.push(title);
 
+        let ref class = match self.selected_class {
+            None => return children,
+            Some(ref class) => class,
+        };
+
+        let kits_pane = Widget::empty("kits_pane");
+        for (index, ref kit) in class.kits.iter().enumerate() {
+            let kit_button = Widget::with_theme(Button::empty(), "kit_button");
+            kit_button.borrow_mut().state.add_text_arg("name", &kit.name);
+            if let Some(selected_index) = self.selected_kit {
+                kit_button.borrow_mut().state.set_active(selected_index == index);
+            }
+            let class_ref = Rc::clone(class);
+            kit_button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
+                let parent = Widget::go_up_tree(&widget, 2);
+                let pane = Widget::downcast_kind_mut::<AttributeSelectorPane>(&parent);
+                pane.selected_kit = Some(index);
+                pane.attrs = class_ref.kits[index].default_attributes.clone();
+                pane.set_next_enabled(&parent);
+
+                parent.borrow_mut().invalidate_children();
+            })));
+            Widget::add_child_to(&kits_pane, kit_button);
+        }
+        children.push(kits_pane);
+
+        let ref selected_kit = match self.selected_kit {
+            None => return children,
+            Some(index) => &class.kits[index],
+        };
+
+        let kit_area = Widget::with_theme(TextArea::empty(), "kit_area");
+        kit_area.borrow_mut().state.add_text_arg("description", &selected_kit.description);
+        children.push(kit_area);
+
         for attr in Attribute::iter() {
             let value = self.attrs.get(*attr) as i32;
             let max = if self.available > 0 {
@@ -106,14 +166,12 @@ impl WidgetKind for AttributeSelectorPane {
 
                 let pane = Widget::downcast_kind_mut::<AttributeSelectorPane>(&parent);
                 pane.attrs.set(*attr, value as u8);
-                pane.calculate_available();
-
-                let builder_widget = Widget::get_parent(&parent);
-                let builder = Widget::downcast_kind_mut::<CharacterBuilder>(&builder_widget);
-                builder.next.borrow_mut().state.set_enabled(pane.available == 0);
+                pane.set_next_enabled(&parent);
             })));
             children.push(widget);
-            children.push(Widget::with_theme(Label::empty(), &format!("{}_label", attr.short_name())));
+
+            let label = Widget::with_theme(Label::empty(), &format!("{}_label", attr.short_name()));
+            children.push(label);
         }
 
         let points_label = Widget::with_theme(Label::empty(), "points_label");

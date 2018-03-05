@@ -1,5 +1,6 @@
 id: goblin
 name: Goblin
+description: "Monster"
 size: 2
 base_stats:
   hit_points: 40

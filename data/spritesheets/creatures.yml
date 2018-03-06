@@ -7,12 +7,6 @@ groups:
   2by2:
     size: [2, 2]
     areas:
-      transition0: [0, 30]
-      transition1: [2, 30]
-      transition2: [4, 30]
-      transition3: [6, 30]
-      transition4: [8, 30]
-      transition5: [10, 30]
       goblin0: [0, 28]
       goblin1: [2, 28]
   3by3:
@@ -134,6 +128,3 @@ groups:
       
       shield_small: [0, 21]
       shield_large: [3, 21]
-      
-      chest_closed: [6, 27]
-      chest_open: [9, 27]

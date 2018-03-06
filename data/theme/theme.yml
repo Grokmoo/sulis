@@ -9,7 +9,7 @@ children:
     from: .text_area
     background: bg_base
     text: |
-      [x=2.0;y=4.0;s=5.0|#name#]
+      [x=2.0;y=1.0;s=5.0|#name#]
       [?cur_hp;x=2.0|#cur_hp# / #max_hp#]
     preferred_size: [20, 12]
     x_relative: Custom

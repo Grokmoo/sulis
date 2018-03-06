@@ -57,6 +57,8 @@ pub trait GraphicsRenderer {
 
     fn clear_texture(&mut self, id: &str);
 
+    fn clear_texture_region(&mut self, id: &str, min_x: i32, min_y: i32, max_x: i32, max_y: i32);
+
     fn has_texture(&self, id: &str) -> bool;
 }
 

@@ -480,6 +480,8 @@ impl AreaModel {
             actors,
             props,
             transitions,
+            max_vis_distance: 20,
+            max_vis_up_one_distance: 6,
         };
 
         trace!("Writing to file {}", filename);

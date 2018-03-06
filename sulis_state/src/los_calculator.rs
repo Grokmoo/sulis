@@ -20,37 +20,29 @@ use std::cmp;
 
 use sulis_core::util;
 use sulis_module::Area;
-use {area_state, EntityState};
+use {EntityState};
 
 pub fn calculate_los(los: &mut Vec<bool>, exp: &mut Vec<bool>,
                      area: &Rc<Area>, entity: &EntityState) {
     let start_time = time::Instant::now();
 
-    let max_dist = area_state::VIS_TILES;
+    let max_dist = area.vis_dist;
     let entity_x = entity.location.x + entity.size.size / 2;
     let entity_y = entity.location.y + entity.size.size / 2;
 
     let min_x = cmp::max(0, entity_x - max_dist - 2);
-    let max_x = cmp::min(area.width, entity_x + max_dist + 2);
+    let max_x = cmp::min(area.width, entity_x + max_dist + 3);
     let min_y = cmp::max(0, entity_y - max_dist - 2);
-    let max_y = cmp::min(area.height, entity_y + max_dist + 2);
-
-    let e_x = entity_x as f32;
-    let e_y = entity_y as f32;
+    let max_y = cmp::min(area.height, entity_y + max_dist + 3);
 
     let src_elev = area.terrain.elevation(entity_x, entity_y);
 
     for y in min_y..max_y {
         for x in min_x..max_x {
             let index = (x + y * area.width) as usize;
-
-            let xf = x as f32;
-            let yf = y as f32;
-            let dist_squared = (xf - e_x) * (xf - e_x) + (yf - e_y) * (yf - e_y);
-
-            if dist_squared < (max_dist * max_dist) as f32 {
-                los[index] = cast_ray(area, entity_x, entity_y, x, y, src_elev);
-                if los[index] { exp[index] = true; }
+            if check_vis(area, entity_x, entity_y, x, y, src_elev) {
+                los[index] = true;
+                exp[index] = true;
             } else {
                 los[index] = false;
             }
@@ -61,19 +53,27 @@ pub fn calculate_los(los: &mut Vec<bool>, exp: &mut Vec<bool>,
 }
 
 pub fn has_visibility(area: &Rc<Area>, entity: &EntityState, target: &EntityState) -> bool {
-    let max_dist_squared = area_state::VIS_TILES * area_state::VIS_TILES;
     let start_x = entity.location.x + entity.size.size / 2;
     let start_y = entity.location.y + entity.size.size / 2;
     let src_elev = area.terrain.elevation(start_x, start_y);
 
     for p in target.location_points() {
-        if (start_x - p.x) * (start_x - p.x) + (start_y - p.y) * (start_y - p.y) > max_dist_squared {
-            continue;
-        }
-        if cast_ray(area, start_x, start_y, p.x, p.y, src_elev) { return true; }
+        if check_vis(area, start_x, start_y, p.x, p.y, src_elev) { return true; }
     }
 
     false
+}
+
+fn check_vis(area: &Rc<Area>, start_x: i32, start_y: i32, end_x: i32, end_y: i32, src_elev: u8) -> bool {
+    let dist_squared = (start_x - end_x) * (start_x - end_x) + (start_y - end_y) * (start_y - end_y);
+
+    if dist_squared < area.vis_dist_up_one_squared {
+        cast_ray(area, start_x, start_y, end_x, end_y, src_elev + 1)
+    } else if dist_squared < area.vis_dist_squared {
+        cast_ray(area, start_x, start_y, end_x, end_y, src_elev)
+    } else {
+        false
+    }
 }
 
 fn cast_ray(area: &Rc<Area>, start_x: i32, start_y: i32, end_x: i32, end_y: i32, src_elev: u8) -> bool {

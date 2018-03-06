@@ -136,19 +136,34 @@ impl AreaView {
     fn draw_visibility_to_texture(&self, renderer: &mut GraphicsRenderer, vis_sprite: &Rc<Sprite>,
                                   explored_sprite: &Rc<Sprite>, area_state: &RefMut<AreaState>) {
         let start_time = time::Instant::now();
-        // TODO use glScissor to only clear the part of the texture near the PC
-        // GL.Enable (ScissorTest);
-        // GL.Scissor (ViewportX, ViewportY, ViewportWidth, ViewportHeight);
-        // GL.Clear (ClearBufferMask.ColorBufferBit);
-        // GL.Disable (ScissorTest);
-        renderer.clear_texture(VISIBILITY_TEX_ID);
         let (max_tile_x, max_tile_y) = AreaView::get_texture_cache_max(area_state.area.width,
                                                                        area_state.area.height);
 
+        let vis_dist = area_state.area.vis_dist;
+        let pc = GameState::pc();
+        let c_x = pc.borrow().location.x + pc.borrow().size.size / 2;
+        let c_y = pc.borrow().location.y + pc.borrow().size.size / 2;
+        let min_x = cmp::max(0, c_x - vis_dist - 2);
+        let max_x = cmp::min(max_tile_x, c_x + vis_dist + 3);
+        let min_y = cmp::max(0, c_y - vis_dist - 2);
+        let max_y = cmp::min(max_tile_y, c_y + vis_dist + 3);
+
+        let scale = TILE_SIZE as i32;
+        renderer.clear_texture_region(VISIBILITY_TEX_ID, min_x * scale, min_y * scale,
+                                      max_x * scale, max_y * scale);
+        self.draw_vis_to_texture(renderer, vis_sprite, explored_sprite, area_state,
+                                 min_x, min_y, max_x, max_y);
+        trace!("Visibility render to texture time: {}",
+              util::format_elapsed_secs(start_time.elapsed()));
+    }
+
+    fn draw_vis_to_texture(&self, renderer: &mut GraphicsRenderer, vis_sprite: &Rc<Sprite>,
+                           explored_sprite: &Rc<Sprite>, area_state: &RefMut<AreaState>,
+                           min_x: i32, min_y: i32, max_x: i32, max_y: i32) {
         let mut draw_list = DrawList::empty_sprite();
 
-        for tile_y in 0..max_tile_y {
-            for tile_x in 0..max_tile_x {
+        for tile_y in min_y..max_y {
+            for tile_x in min_x..max_x {
                 if area_state.is_pc_visible(tile_x, tile_y) { continue; }
                 draw_list.append(&mut DrawList::from_sprite(vis_sprite, tile_x, tile_y, 1, 1));
 
@@ -158,8 +173,6 @@ impl AreaView {
         }
 
         AreaView::draw_list_to_texture(renderer, draw_list, VISIBILITY_TEX_ID);
-        trace!("Visibility render to texture time: {}",
-              util::format_elapsed_secs(start_time.elapsed()));
     }
 
     fn draw_list_to_texture(renderer: &mut GraphicsRenderer, draw_list: DrawList, texture_id: &str) {
@@ -286,7 +299,11 @@ impl WidgetKind for AreaView {
                 self.draw_layer_to_texture(renderer, &layer, texture_id);
             }
 
+            let (max_x, max_y) = AreaView::get_texture_cache_max(state.area.width, state.area.height);
+            self.draw_vis_to_texture(renderer, &state.area.visibility_tile, &state.area.explored_tile,
+                                     &state, 0, 0, max_x, max_y);
             self.cache_invalid = false;
+            state.pc_vis_cache_invalid = false;
         }
 
         if state.pc_vis_cache_invalid {
@@ -419,12 +436,15 @@ impl WidgetKind for AreaView {
             //     self.add_cursor(cursor);
             // }
         } else if let Some(index) = area_state.borrow().prop_index_at(area_x, area_y) {
-            let (x, y) = {
-                let prop_state = &area_state.borrow().props[index];
-                self.get_mouseover_pos(prop_state.location.x, prop_state.location.y,
-                                       prop_state.prop.width as i32, prop_state.prop.height as i32)
-            };
-            Widget::set_mouse_over(widget, PropMouseover::new(index), x, y);
+            let interactive = area_state.borrow().props[index].prop.interactive;
+            if interactive {
+                let (x, y) = {
+                    let prop_state = &area_state.borrow().props[index];
+                    self.get_mouseover_pos(prop_state.location.x, prop_state.location.y,
+                                           prop_state.prop.width as i32, prop_state.prop.height as i32)
+                };
+                Widget::set_mouse_over(widget, PropMouseover::new(index), x, y);
+            }
         }
 
         let pc = GameState::pc();

@@ -37,6 +37,7 @@ pub struct Prop {
     pub height: u32,
     pub passable: bool,
     pub visible: bool,
+    pub interactive: bool,
 }
 
 impl Prop {
@@ -64,6 +65,7 @@ impl Prop {
             height: builder.height,
             passable: builder.passable,
             visible: builder.visible,
+            interactive: builder.interactive,
         })
     }
 
@@ -87,6 +89,7 @@ pub struct PropBuilder {
     pub height: u32,
     pub passable: bool,
     pub visible: bool,
+    pub interactive: bool,
 }
 
 impl ResourceBuilder for PropBuilder {

@@ -1,0 +1,30 @@
+id: props
+src: "props.png"
+size: [ 1024, 1024 ]
+simple_image_gen_scale: 16
+grid_multiplier: 16
+groups:
+  2by2:
+    size: [2, 2]
+    areas:
+      transition0: [51, 0]
+      transition1: [53, 0]
+      transition2: [55, 0]
+      transition3: [57, 0]
+      transition4: [59, 0]
+      transition5: [61, 0]
+  misc:
+    areas:
+      chest_closed: [0, 0, 3, 3]
+      chest_open: [0, 3, 3, 3]
+  waterfall:
+    size: [16, 12]
+    areas:
+      waterfall0: [0, 40]
+      waterfall1: [16, 40]
+      waterfall2: [32, 40]
+      waterfall3: [48, 40]
+      waterfall4: [0, 52]
+      waterfall5: [16, 52]
+      waterfall6: [32, 52]
+      waterfall7: [48, 52]

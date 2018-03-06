@@ -23,8 +23,6 @@ use std::slice::Iter;
 use std::rc::Rc;
 use std::cell::{Ref, RefCell};
 
-pub const VIS_TILES: i32 = 20;
-
 pub struct AreaState {
     pub area: Rc<Area>,
     pub listeners: ChangeListenerList<AreaState>,

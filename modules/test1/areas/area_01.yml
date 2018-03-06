@@ -3,6 +3,8 @@ id: area_01
 name: Area 01
 width: 111
 height: 84
+max_vis_distance: 20
+max_vis_up_one_distance: 6
 terrain:
   grass_to_dirt_e3:
     - - 36

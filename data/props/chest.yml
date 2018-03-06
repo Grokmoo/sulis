@@ -6,3 +6,4 @@ width: 3
 height: 3
 visible: true
 passable: false
+interactive: true

@@ -1,9 +1,9 @@
 id: transition
 frame_time_millis: 100
 frames:
-  - "creatures/transition0"
-  - "creatures/transition1"
-  - "creatures/transition2"
-  - "creatures/transition3"
-  - "creatures/transition4"
-  - "creatures/transition5"
+  - "props/transition0"
+  - "props/transition1"
+  - "props/transition2"
+  - "props/transition3"
+  - "props/transition4"
+  - "props/transition5"

@@ -73,6 +73,9 @@ pub struct Area {
     pub actors: Vec<ActorData>,
     pub props: Vec<PropData>,
     pub transitions: Vec<Transition>,
+    pub vis_dist: i32,
+    pub vis_dist_squared: i32,
+    pub vis_dist_up_one_squared: i32,
 }
 
 impl PartialEq for Area {
@@ -158,6 +161,9 @@ impl Area {
             visibility_tile,
             explored_tile,
             transitions,
+            vis_dist: builder.max_vis_distance,
+            vis_dist_squared: builder.max_vis_distance * builder.max_vis_distance,
+            vis_dist_up_one_squared: builder.max_vis_up_one_distance * builder.max_vis_up_one_distance,
         })
     }
 
@@ -190,6 +196,8 @@ pub struct AreaBuilder {
     pub transitions: Vec<TransitionBuilder>,
     pub visibility_tile: String,
     pub explored_tile: String,
+    pub max_vis_distance: i32,
+    pub max_vis_up_one_distance: i32,
 }
 
 impl ResourceBuilder for AreaBuilder {

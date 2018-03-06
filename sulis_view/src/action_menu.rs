@@ -48,7 +48,17 @@ impl ActionMenu {
                 (None, false)
             };
 
-        let hovered_prop = area_state.prop_index_at(x, y);
+        let hovered_prop = match area_state.prop_index_at(x, y) {
+            None => None,
+            Some(index) => {
+                let prop_state = &area_state.props[index];
+                if prop_state.prop.interactive {
+                    Some(index)
+                } else {
+                    None
+                }
+            }
+        };
 
         Rc::new(RefCell::new(ActionMenu {
             area_pos: Point::new(x, y),

@@ -66,8 +66,9 @@ impl WidgetKind for EntityMouseover {
         widget.do_base_layout();
 
         if let Some(ref font) = widget.state.font {
-            widget.state.text_renderer = Some(Box::new(
-                    MarkupRenderer::new(font, widget.state.inner_size.width)));
+            let mut renderer = MarkupRenderer::new(font, widget.state.inner_size.width);
+            renderer.render_to_cache(&widget.state);
+            widget.state.text_renderer = Some(Box::new(renderer));
         }
     }
 

@@ -26,7 +26,7 @@ use resource::ResourceSet;
 use ui::Widget;
 use util::Point;
 
-use glium::{self, CapabilitiesSource, Surface, glutin};
+use glium::{self, CapabilitiesSource, Surface, glutin, Rect};
 use glium::backend::Facade;
 use glium::glutin::{ContextBuilder, Robustness, VirtualKeyCode};
 use glium::texture::{RawImage2d, SrgbTexture2d};
@@ -193,6 +193,22 @@ impl<'a> GraphicsRenderer for GliumRenderer<'a> {
             });
 
         self.display.textures.insert(id.to_string(), GliumTexture { texture, sampler_fn });
+    }
+
+    fn clear_texture_region(&mut self, id: &str, min_x: i32, min_y: i32, max_x: i32, max_y: i32) {
+        let texture = self.display.textures.get(id).unwrap();
+        let tex_height = texture.texture.height();
+        let mut framebuffer = glium::framebuffer::SimpleFrameBuffer::new(&self.display.display,
+                                                                         &texture.texture).unwrap();
+
+        let rect = Rect {
+            left: min_x as u32,
+            bottom: tex_height - max_y as u32,
+            width: (max_x - min_x) as u32,
+            height: (max_y - min_y) as u32,
+        };
+
+        framebuffer.clear(Some(&rect), Some((1.0, 1.0, 1.0, 0.0)), true, None, None);
     }
 
     fn clear_texture(&mut self, id: &str) {

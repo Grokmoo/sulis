@@ -181,6 +181,7 @@ pub struct AreaBuilder {
     pub width: usize,
     pub height: usize,
     pub terrain: HashMap<String, Vec<Vec<usize>>>,
+    pub elevation: Option<Vec<u8>>,
     pub generate: bool,
     pub layers: Vec<String>,
     pub entity_layer: usize,

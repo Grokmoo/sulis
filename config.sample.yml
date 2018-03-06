@@ -55,6 +55,7 @@ editor:
   module: "test1"
   transition_image: transition
   transition_size: [2, 2]
+  cursor: "gui/white"
   area:
     filename: "editor_test"
     id: "editor_test"
@@ -67,4 +68,12 @@ editor:
       - base2
       - object
       - aerial
+    elev_tiles:
+      - gui/elev_lowest
+      - gui/elev_lower
+      - gui/elev_low
+      - gui/elev_mid
+      - gui/elev_high
+      - gui/elev_higher
+      - gui/elev_highest
 ...

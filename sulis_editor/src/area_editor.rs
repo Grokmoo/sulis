@@ -83,7 +83,7 @@ impl WidgetKind for AreaEditor {
 
         if let Some(ref editor) = self.cur_editor {
             let mut editor = editor.borrow_mut();
-            editor.draw(renderer, p.x as f32 - self.scroll.x(), p.y as f32 - self.scroll.y(),
+            editor.draw(renderer, &self.model, p.x as f32 - self.scroll.x(), p.y as f32 - self.scroll.y(),
             scale_x, scale_y, millis);
         }
     }

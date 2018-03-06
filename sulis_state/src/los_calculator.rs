@@ -38,6 +38,8 @@ pub fn calculate_los(los: &mut Vec<bool>, exp: &mut Vec<bool>,
     let e_x = entity_x as f32;
     let e_y = entity_y as f32;
 
+    let src_elev = area.terrain.elevation(entity_x, entity_y);
+
     for y in min_y..max_y {
         for x in min_x..max_x {
             let index = (x + y * area.width) as usize;
@@ -47,7 +49,7 @@ pub fn calculate_los(los: &mut Vec<bool>, exp: &mut Vec<bool>,
             let dist_squared = (xf - e_x) * (xf - e_x) + (yf - e_y) * (yf - e_y);
 
             if dist_squared < (max_dist * max_dist) as f32 {
-                los[index] = cast_ray(area, entity_x, entity_y, x, y);
+                los[index] = cast_ray(area, entity_x, entity_y, x, y, src_elev);
                 if los[index] { exp[index] = true; }
             } else {
                 los[index] = false;
@@ -62,40 +64,41 @@ pub fn has_visibility(area: &Rc<Area>, entity: &EntityState, target: &EntityStat
     let max_dist_squared = area_state::VIS_TILES * area_state::VIS_TILES;
     let start_x = entity.location.x + entity.size.size / 2;
     let start_y = entity.location.y + entity.size.size / 2;
+    let src_elev = area.terrain.elevation(start_x, start_y);
 
     for p in target.location_points() {
         if (start_x - p.x) * (start_x - p.x) + (start_y - p.y) * (start_y - p.y) > max_dist_squared {
             continue;
         }
-        if cast_ray(area, start_x, start_y, p.x, p.y) { return true; }
+        if cast_ray(area, start_x, start_y, p.x, p.y, src_elev) { return true; }
     }
 
     false
 }
 
-fn cast_ray(area: &Rc<Area>, start_x: i32, start_y: i32, end_x: i32, end_y: i32) -> bool {
+fn cast_ray(area: &Rc<Area>, start_x: i32, start_y: i32, end_x: i32, end_y: i32, src_elev: u8) -> bool {
     if (end_y - start_y).abs() < (end_x - start_x).abs() {
         if start_x > end_x {
-            cast_low(area, end_x, end_y, start_x, start_y)
+            cast_low(area, end_x, end_y, start_x, start_y, src_elev)
         } else {
-            cast_low(area, start_x, start_y, end_x, end_y)
+            cast_low(area, start_x, start_y, end_x, end_y, src_elev)
         }
     } else {
         if start_y > end_y {
-            cast_high(area, end_x, end_y, start_x, start_y)
+            cast_high(area, end_x, end_y, start_x, start_y, src_elev)
         } else {
-            cast_high(area, start_x, start_y, end_x, end_y)
+            cast_high(area, start_x, start_y, end_x, end_y, src_elev)
         }
     }
 }
 
-fn check(area: &Rc<Area>, x: i32, y: i32) -> bool {
+fn check(area: &Rc<Area>, x: i32, y: i32, src_elev: u8) -> bool {
     let index = (x + y * area.width) as usize;
 
-    area.terrain.is_visible_index(index)
+    area.terrain.is_visible_index(index) && area.terrain.elevation_index(index) <= src_elev
 }
 
-fn cast_high(area: &Rc<Area>, start_x: i32, start_y: i32, end_x: i32, end_y: i32) -> bool {
+fn cast_high(area: &Rc<Area>, start_x: i32, start_y: i32, end_x: i32, end_y: i32, src_elev: u8) -> bool {
     let mut delta_x = end_x - start_x;
     let delta_y = end_y - start_y;
 
@@ -113,7 +116,7 @@ fn cast_high(area: &Rc<Area>, start_x: i32, start_y: i32, end_x: i32, end_y: i32
     for y in start_y..end_y {
         if first {
             first = false;
-        } else if !check(area, x, y) {
+        } else if !check(area, x, y, src_elev) {
             return false;
         }
 
@@ -127,7 +130,7 @@ fn cast_high(area: &Rc<Area>, start_x: i32, start_y: i32, end_x: i32, end_y: i32
     true
 }
 
-fn cast_low(area: &Rc<Area>, start_x: i32, start_y: i32, end_x: i32, end_y: i32) -> bool {
+fn cast_low(area: &Rc<Area>, start_x: i32, start_y: i32, end_x: i32, end_y: i32, src_elev: u8) -> bool {
     let delta_x = end_x - start_x;
     let mut delta_y = end_y - start_y;
 
@@ -145,7 +148,7 @@ fn cast_low(area: &Rc<Area>, start_x: i32, start_y: i32, end_x: i32, end_y: i32)
     for x in start_x..end_x {
         if first {
             first = false;
-        } else if !check(area, x, y) {
+        } else if !check(area, x, y, src_elev) {
             return false;
         }
 

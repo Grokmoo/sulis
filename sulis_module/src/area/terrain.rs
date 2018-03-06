@@ -28,6 +28,7 @@ pub struct Terrain {
     pub height: i32,
     pub layers: Vec<Layer>,
     pub entity_layer_index: usize,
+    elevation: Vec<u8>,
     passable: Vec<bool>,
     visible: Vec<bool>,
 }
@@ -171,6 +172,16 @@ impl Terrain {
                 &format!("Entity layer of {} is invalid.", entity_layer_index));
         }
 
+        let elevation = match builder.elevation {
+            None => vec![0;dim],
+            Some(ref elev) => {
+                if elev.len() != dim {
+                    return invalid_data_error("Elevation array must be dimension length*width");
+                }
+                elev.clone()
+            }
+        };
+
         Ok(Terrain {
             width,
             height,
@@ -178,6 +189,7 @@ impl Terrain {
             entity_layer_index,
             passable,
             visible,
+            elevation,
         })
     }
 
@@ -200,6 +212,16 @@ impl Terrain {
         }
 
         Ok(())
+    }
+
+    #[inline]
+    pub fn elevation(&self, x: i32, y: i32) -> u8 {
+        self.elevation[(x + y * self.width) as usize]
+    }
+
+    #[inline]
+    pub fn elevation_index(&self, index: usize) -> u8 {
+        self.elevation[index]
     }
 
     #[inline]

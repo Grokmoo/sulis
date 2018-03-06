@@ -34,6 +34,7 @@ pub struct AreaModel {
     actors: Vec<(Point, Rc<Actor>)>,
     props: Vec<PropData>,
     transitions: Vec<Transition>,
+    elevation: Vec<u8>,
 
     id: String,
     name: String,
@@ -47,8 +48,11 @@ impl AreaModel {
             tiles.push((layer_id.to_string(), Vec::new()));
         }
 
+        let elevation = vec![0;(MAX_AREA_SIZE * MAX_AREA_SIZE) as usize];
+
         AreaModel {
             tiles,
+            elevation,
             actors: Vec::new(),
             props: Vec::new(),
             transitions: Vec::new(),
@@ -72,6 +76,18 @@ impl AreaModel {
 
     pub fn set_filename(&mut self, filename: &str) {
         self.filename = filename.to_string();
+    }
+
+    pub fn elevation(&self, x: i32, y: i32) -> u8 {
+        if x < 0 || y < 0 { return 0; }
+
+        self.elevation[(x + y * MAX_AREA_SIZE) as usize]
+    }
+
+    pub fn set_elevation(&mut self, elev: u8, x: i32, y: i32) {
+        if x < 0 || y < 0 { return; }
+
+        self.elevation[(x + y * MAX_AREA_SIZE) as usize] = elev;
     }
 
     pub fn add_tile(&mut self, tile: Rc<Tile>, x: i32, y: i32) {
@@ -368,6 +384,18 @@ impl AreaModel {
                 image_display: image,
             });
         }
+
+        trace!("Loading area elevation.");
+        if let Some(ref elev) = area_builder.elevation {
+            for y in 0..area_builder.height {
+                for x in 0..area_builder.width {
+                    let val = elev[x + y * area_builder.width];
+                    self.elevation[x + y * MAX_AREA_SIZE as usize] = val;
+                }
+            }
+        } else {
+            self.elevation = vec![0;(MAX_AREA_SIZE * MAX_AREA_SIZE) as usize];
+        }
     }
 
     pub fn save(&self, filename_prefix: &str) {
@@ -428,9 +456,19 @@ impl AreaModel {
             });
         }
 
+        trace!("Saving elevation");
+        let mut elevation = Vec::new();
+        for y in 0..height {
+            for x in 0..width {
+                let val = self.elevation[(x + y * MAX_AREA_SIZE) as usize];
+                elevation.push(val);
+            }
+        }
+
         let area_builder = AreaBuilder {
             id: self.id.clone(),
             name: self.name.clone(),
+            elevation: Some(elevation),
             terrain,
             layers,
             visibility_tile,

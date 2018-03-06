@@ -45,7 +45,7 @@ impl ActorPicker {
 }
 
 impl EditorMode for ActorPicker {
-    fn draw(&mut self, renderer: &mut GraphicsRenderer, x: f32, y: f32,
+    fn draw(&mut self, renderer: &mut GraphicsRenderer, _model: &AreaModel, x: f32, y: f32,
             scale_x: f32, scale_y: f32, millis: u32) {
 
         for &(pos, ref actor) in self.removal_actors.iter() {

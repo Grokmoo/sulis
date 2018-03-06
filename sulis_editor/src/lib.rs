@@ -23,6 +23,9 @@ use area_editor::AreaEditor;
 mod area_model;
 use area_model::AreaModel;
 
+mod elev_picker;
+use elev_picker::ElevPicker;
+
 mod load_window;
 use load_window::LoadWindow;
 
@@ -70,7 +73,7 @@ impl MainLoopUpdater for EditorMainLoopUpdater {
 }
 
 pub trait EditorMode: WidgetKind {
-    fn draw(&mut self, renderer: &mut GraphicsRenderer, x: f32, y: f32,
+    fn draw(&mut self, renderer: &mut GraphicsRenderer, model: &AreaModel, x: f32, y: f32,
             scale_x: f32, scale_y: f32, millis: u32);
 
     fn cursor_size(&self) -> (i32, i32);
@@ -196,21 +199,24 @@ impl WidgetKind for EditorView {
         let tile_picker_kind = TilePicker::new();
         let actor_picker_kind = ActorPicker::new();
         let prop_picker_kind = PropPicker::new();
+        let elev_picker_kind = ElevPicker::new();
 
         let mut pickers = Vec::new();
         pickers.push(Widget::with_defaults(tile_picker_kind.clone()));
         pickers.push(Widget::with_defaults(actor_picker_kind.clone()));
         pickers.push(Widget::with_defaults(prop_picker_kind.clone()));
+        pickers.push(Widget::with_defaults(elev_picker_kind.clone()));
         for picker in pickers.iter() {
             picker.borrow_mut().state.set_visible(false);
         }
 
         let picker_kinds: Vec<Rc<RefCell<EditorMode>>> =
-            vec![tile_picker_kind, actor_picker_kind, prop_picker_kind];
+            vec![tile_picker_kind, actor_picker_kind, prop_picker_kind, elev_picker_kind];
 
         let buttons = vec![Widget::with_theme(Button::empty(), "tiles"),
             Widget::with_theme(Button::empty(), "actors"),
-            Widget::with_theme(Button::empty(), "props")];
+            Widget::with_theme(Button::empty(), "props"),
+            Widget::with_theme(Button::empty(), "elevation")];
 
         // Any new pickers need to be added in all 3 places
         assert!(buttons.len() == picker_kinds.len());

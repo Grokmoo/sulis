@@ -39,6 +39,7 @@ pub struct Config {
 #[serde(deny_unknown_fields)]
 pub struct EditorConfig {
     pub module: String,
+    pub cursor: String,
     pub transition_image: String,
     pub transition_size: Size,
     pub area: EditorAreaConfig,
@@ -53,6 +54,7 @@ pub struct EditorAreaConfig {
     pub visibility_tile: String,
     pub explored_tile: String,
     pub layers: Vec<String>,
+    pub elev_tiles: Vec<String>,
     pub entity_layer: usize,
 }
 

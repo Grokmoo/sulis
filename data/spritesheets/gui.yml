@@ -145,6 +145,17 @@ groups:
       bg_medium_bottom_left:   [0, 48]
       bg_medium_bottom_middle: [24, 48]
       bg_medium_bottom_right:  [48, 48]
+  elev:
+    size: [16, 16]
+    position: [128, 144]
+    areas:
+      elev_lowest: [0, 0]
+      elev_lower: [16, 0]
+      elev_low: [32, 0]
+      elev_mid: [48, 0]
+      elev_high: [64, 0]
+      elev_higher: [80, 0]
+      elev_highest: [96, 0]
   special:
     areas:
       empty: [0, 68, 5, 5]

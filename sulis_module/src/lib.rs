@@ -32,9 +32,9 @@ pub use self::area::Area;
 pub mod class;
 pub use self::class::Class;
 
-pub mod entity_size;
-pub use self::entity_size::EntitySize;
-pub use self::entity_size::EntitySizeIterator;
+pub mod object_size;
+pub use self::object_size::ObjectSize;
+pub use self::object_size::ObjectSizeIterator;
 
 pub mod equippable;
 pub use self::equippable::Equippable;
@@ -80,7 +80,7 @@ use self::class::ClassBuilder;
 use self::item::ItemBuilder;
 use self::prop::PropBuilder;
 use self::race::RaceBuilder;
-use self::entity_size::EntitySizeBuilder;
+use self::object_size::ObjectSizeBuilder;
 use self::area::TilesList;
 
 thread_local! {
@@ -97,7 +97,7 @@ pub struct Module {
     item_adjectives: HashMap<String, Rc<ItemAdjective>>,
     props: HashMap<String, Rc<Prop>>,
     races: HashMap<String, Rc<Race>>,
-    sizes: HashMap<usize, Rc<EntitySize>>,
+    sizes: HashMap<String, Rc<ObjectSize>>,
     tiles: HashMap<String, Rc<Tile>>,
 }
 
@@ -233,8 +233,8 @@ impl Module {
                 module.item_adjectives.insert(id, Rc::new(adj));
             }
 
-            for (_id_str, builder) in builder_set.size_builders {
-                insert_if_ok("size", builder.size, EntitySize::new(builder), &mut module.sizes);
+            for (id, builder) in builder_set.size_builders {
+                insert_if_ok("size", id, ObjectSize::new(builder), &mut module.sizes);
             }
 
             for (_, tiles_list) in builder_set.tile_builders {
@@ -292,19 +292,11 @@ impl Module {
         MODULE.with(|m| get_resource(id, &m.borrow().areas))
     }
 
-    pub fn entity_size(id: usize) -> Option<Rc<EntitySize>> {
-        MODULE.with(|r| {
-            let r = r.borrow();
-            let size = r.sizes.get(&id);
-
-            match size {
-                None => None,
-                Some(s) => Some(Rc::clone(s)),
-            }
-        })
+    pub fn object_size(id: &str) -> Option<Rc<ObjectSize>> {
+        MODULE.with(|r| get_resource(id, &r.borrow().sizes))
     }
 
-    pub fn all_entity_sizes() -> Vec<Rc<EntitySize>> {
+    pub fn all_object_sizes() -> Vec<Rc<ObjectSize>> {
         MODULE.with(|r| r.borrow().sizes.iter().map(|ref s| Rc::clone(s.1)).collect())
     }
 
@@ -379,7 +371,7 @@ struct ModuleBuilder {
     item_adjectives: HashMap<String, ItemAdjective>,
     prop_builders: HashMap<String, PropBuilder>,
     race_builders: HashMap<String, RaceBuilder>,
-    size_builders: HashMap<String, EntitySizeBuilder>,
+    size_builders: HashMap<String, ObjectSizeBuilder>,
     tile_builders: HashMap<String, TilesList>,
 }
 

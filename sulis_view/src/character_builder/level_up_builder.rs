@@ -48,7 +48,7 @@ impl BuilderSet for LevelUpBuilder {
         vec![class_sel_widget, level_up_finish_widget]
     }
 
-    fn finish(&self, builder: &mut CharacterBuilder) {
+    fn finish(&self, builder: &mut CharacterBuilder, _widget: &Rc<RefCell<Widget>>) {
         let class = match builder.class {
             None => return,
             Some(ref class) => Rc::clone(class),

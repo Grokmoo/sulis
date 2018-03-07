@@ -1,7 +1,7 @@
 id: goblin
 name: Goblin
 description: "Monster"
-size: 2
+size: 2by2
 base_stats:
   hit_points: 20
   accuracy: 30

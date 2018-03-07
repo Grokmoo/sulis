@@ -21,14 +21,15 @@ use sulis_core::config::CONFIG;
 use sulis_module::Area;
 
 use animation::{MeleeAttackAnimation, RangedAttackAnimation};
-use sulis_module::{Actor, EntitySize, EntitySizeIterator, Module};
+use sulis_core::io::GraphicsRenderer;
+use sulis_module::{Actor, ObjectSize, ObjectSizeIterator, Module};
 use sulis_module::area::Transition;
 use {ActorState, AreaState, ChangeListenerList, GameState, has_visibility, Location, PropState};
 
 pub struct EntityState {
     pub actor: ActorState,
     pub location: Location,
-    pub size: Rc<EntitySize>,
+    pub size: Rc<ObjectSize>,
     pub index: usize, // index in vec of the owning area state
     pub sub_pos: (f32, f32),
     pub listeners: ChangeListenerList<EntityState>,
@@ -134,7 +135,7 @@ impl EntityState {
     pub fn move_to(&mut self, area_state: &mut AreaState, x: i32, y: i32, squares: u32) -> bool {
         trace!("Move to {},{}", x, y);
         if !self.location.coords_valid(x, y) { return false; }
-        if !self.location.coords_valid(x + self.size() - 1, y + self.size() - 1) {
+        if !self.location.coords_valid(x + self.size.width - 1, y + self.size.height - 1) {
             return false;
         }
 
@@ -160,7 +161,7 @@ impl EntityState {
     }
 
     fn dist(&self, to_x: i32, to_y: i32, to_width: i32, to_height: i32) -> f32 {
-        let self_half_size = self.size() as f32 / 2.0;
+        let self_half_size = self.size.diagonal as f32 / 2.0;
         let other_half_width = to_width as f32 / 2.0;
         let other_half_height = to_height as f32 / 2.0;
         let from_x = self.location.x as f32 + self_half_size;
@@ -174,7 +175,7 @@ impl EntityState {
 
     pub fn dist_to_entity(&self, other: &Rc<RefCell<EntityState>>) -> f32 {
         let value = self.dist(other.borrow().location.x, other.borrow().location.y,
-            other.borrow().size(), other.borrow().size());
+            other.borrow().size.width, other.borrow().size.height);
 
         trace!("Computed distance from '{}' at {:?} to '{}' at {:?} = {}", self.actor.actor.name,
                self.location, other.borrow().actor.actor.name, other.borrow().location, value);
@@ -192,25 +193,23 @@ impl EntityState {
     }
 
     pub fn dist_to_prop(&self, other: &PropState) -> f32 {
-        let value = self.dist(other.location.x, other.location.y,
-                              other.prop.width as i32, other.prop.height as i32);
-
-        value
+        self.dist(other.location.x, other.location.y,
+                  other.prop.size.width, other.prop.size.height)
     }
 
-    pub fn size(&self) -> i32 {
-        self.size.size
+    pub fn size(&self) -> &str {
+        &self.size.id
     }
 
-    pub fn relative_points(&self) -> EntitySizeIterator {
+    pub fn relative_points(&self) -> ObjectSizeIterator {
         self.size.relative_points()
     }
 
-    pub fn location_points(&self) -> EntitySizeIterator {
+    pub fn location_points(&self) -> ObjectSizeIterator {
         self.size.points(self.location.x, self.location.y)
     }
 
-    pub fn points(&self, x: i32, y: i32) -> EntitySizeIterator {
+    pub fn points(&self, x: i32, y: i32) -> ObjectSizeIterator {
         self.size.points(x, y)
     }
 
@@ -225,3 +224,22 @@ impl EntityState {
     }
 }
 
+pub trait AreaDrawable {
+    fn draw(&self, renderer: &mut GraphicsRenderer, scale_x: f32, scale_y: f32, x: f32, y: f32,
+            millis: u32);
+
+    fn location(&self) -> &Location;
+}
+
+impl AreaDrawable for EntityState {
+    fn draw(&self, renderer: &mut GraphicsRenderer, scale_x: f32, scale_y: f32, x: f32, y: f32,
+            millis: u32) {
+        let x = x + self.location.x as f32 + self.sub_pos.0;
+        let y = y + self.location.y as f32 + self.sub_pos.1;
+        self.actor.draw_graphics_mode(renderer, scale_x, scale_y, x, y, millis);
+    }
+
+    fn location(&self) -> &Location {
+        &self.location
+    }
+}

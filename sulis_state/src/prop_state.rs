@@ -17,11 +17,12 @@
 use std::fmt;
 use std::rc::Rc;
 
-use sulis_core::io::DrawList;
+use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{animation_state, AnimationState};
 use sulis_module::Prop;
 use sulis_module::area::PropData;
 use {ChangeListenerList, ItemState, Location};
+use entity_state::AreaDrawable;
 
 pub struct PropState {
     pub prop: Rc<Prop>,
@@ -77,5 +78,22 @@ impl PropState {
 
     pub fn append_to_draw_list(&self, draw_list: &mut DrawList, x: f32, y: f32, millis: u32) {
         self.prop.append_to_draw_list(draw_list, &self.animation_state, x, y, millis);
+    }
+}
+
+impl AreaDrawable for PropState {
+    fn draw(&self, renderer: &mut GraphicsRenderer, scale_x: f32, scale_y: f32, x: f32, y: f32,
+                millis: u32) {
+        let x = x + self.location.x as f32;
+        let y = y + self.location.y as f32;
+
+        let mut draw_list = DrawList::empty_sprite();
+        draw_list.set_scale(scale_x, scale_y);
+        self.append_to_draw_list(&mut draw_list, x, y, millis);
+        renderer.draw(draw_list);
+    }
+
+    fn location(&self) -> &Location {
+        &self.location
     }
 }

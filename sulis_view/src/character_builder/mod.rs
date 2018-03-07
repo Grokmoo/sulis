@@ -121,10 +121,7 @@ impl CharacterBuilder {
             cur_pane.borrow_mut().next(builder, Rc::clone(&parent));
 
             let builder_set = Rc::clone(&builder.builder_set);
-            builder_set.finish(builder);
-
-            let root = Widget::get_root(&parent);
-            root.borrow_mut().invalidate_children();
+            builder_set.finish(builder, &parent);
         })));
 
         Rc::new(RefCell::new(CharacterBuilder {
@@ -219,7 +216,7 @@ impl BuilderSet for CharacterCreator {
         vec![race_sel_widget, class_sel_widget, attr_sel_widget, cosmetic_sel_widget]
     }
 
-    fn finish(&self, builder: &mut CharacterBuilder) {
+    fn finish(&self, builder: &mut CharacterBuilder, widget: &Rc<RefCell<Widget>>) {
         let utc: DateTime<Utc> = Utc::now();
 
         let dir = "characters";
@@ -276,6 +273,9 @@ impl BuilderSet for CharacterCreator {
             },
             Ok(()) => (),
         }
+
+        let root = Widget::get_root(&widget);
+        root.borrow_mut().invalidate_children();
     }
 }
 
@@ -283,5 +283,5 @@ pub trait BuilderSet {
     fn on_add(&self, builder: &mut CharacterBuilder,
               widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>>;
 
-    fn finish(&self, builder: &mut CharacterBuilder);
+    fn finish(&self, builder: &mut CharacterBuilder, widget: &Rc<RefCell<Widget>>);
 }

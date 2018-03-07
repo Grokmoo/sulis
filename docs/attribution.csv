@@ -2,8 +2,8 @@ Asset Location,Sub Asset Description,Sub Asset Pixel Coordinates,Author,License,
 data/fonts/mono.png,,,,CC0 - Public Domain,http://creativecommons.org/publicdomain/zero/1.0/,,
 data/fonts/normal.png,,,,CC0 - Public Domain,http://creativecommons.org/publicdomain/zero/1.0/,,
 data/spritesheets/gui.png,Armored Figure,"512,0 to 1024, 512",yd,CC0 - Public Domain,http://creativecommons.org/publicdomain/zero/1.0/,GUI Elements,https://opengameart.org/content/gui-elements
-data/spritesheets/gui.png,White Cursor Outlines,,Jared Stephen,CC-BY 4.0,http://creativecommons.org/licenses/by/4.0,,
-data/spritesheets/gui.png,"Dark ""Gothic"" Style Elements","0,0 to 448,192",Wyrmheart,CC0 - Public Domain,http://creativecommons.org/publicdomain/zero/1.0/,RPG Game UI,https://opengameart.org/content/rpg-game-ui
+data/spritesheets/gui.png,Cursors and simple UI elements,"0,512 to 0, 1024",Jared Stephen,CC-BY 4.0,http://creativecommons.org/licenses/by/4.0,,
+data/spritesheets/gui.png,"Dark ""Gothic"" Style Elements","0,0 to 512, 512",Wyrmheart,CC0 - Public Domain,http://creativecommons.org/publicdomain/zero/1.0/,RPG Game UI,https://opengameart.org/content/rpg-game-ui
 data/spritesheets/creatures.png,player character sub-sprites,"0,0 to 1024,240",Battle for Wesnoth,GPL v2,https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html,Battle for Wesnoth various creature images,https://www.wesnoth.org/
 data/spritesheets/creatures.png,weapon sprites,"0,240 to 1024,288",Proprietary,GameDevMarket Pro,https://www.gamedevmarket.net/terms-conditions/#pro-licence,Fantasy RPG Item Set,https://www.gamedevmarket.net/asset/fantasy-rpg-item-set-9726/
 data/spritesheets/creatures.png,Creature / monster sprites,"0,432 to 1024, 480",Battle for Wesnoth,GPL Vv2,https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html,Battle for Wesnoth various creature images,https://www.wesnoth.org/
@@ -12,7 +12,7 @@ data/spritesheets/inventory.png,Miscellaneous icons,,Proprietary,GameDevMarket P
 data/spritesheets/portraits.png,,,Battle for Wesnoth,GPL v2,https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html,Battle for Wesnoth various portraits,https://www.wesnoth.org/
 data/spritesheets/grassland.png,grassland tiles,,Proprietary,GameDevMarket Pro,https://www.gamedevmarket.net/terms-conditions/#pro-licence,2d hand painted grassland tileset,https://www.gamedevmarket.net/asset/2d-hand-painted-grassland-tileset-6628/
 data/spritesheet/props.png,Various Props,"0,160 to 512,512",Battle for Wesnoth,GPL v2,https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html,Battle for Wesnoth various items and props,https://www.wesnoth.org/
-data/spritesheet/props.png,Spinning Animation,"816,0 to 1024, 48",Jared Stephen,CC0 – Public Domain,http://creativecommons.org/publicdomain/zero/1.0/,,
+data/spritesheet/props.png,Spinning Circle,"384,0 to 1024, 48",Jared Stephen,CC0 – Public Domain,http://creativecommons.org/publicdomain/zero/1.0/,,https://opengameart.org/content/4-summoning-circles
 data/spritesheets/props.png,Waterfall animation,"0,640 to 1024, 1024",Proprietary,GameDevMarket Pro,https://www.gamedevmarket.net/terms-conditions/#pro-licence,2d hand painted grassland tileset,https://www.gamedevmarket.net/asset/2d-hand-painted-grassland-tileset-6628/
 data/spritesheets/props.png,Campfire animation,"0,0 to 160, 64",Zabin and Zetrel,CC-BY-SA 3.0,https://creativecommons.org/licenses/by-sa/3.0/,Campfire animations for RPGs,https://opengameart.org/content/camp-fire-animation-finished
 data/spritesheets/props.png,Various Props,"0,64 to 512, 160",rubberduck,CC0 - Public Domain,http://creativecommons.org/publicdomain/zero/1.0/,Isometric Parts,https://opengameart.org/content/more-isometric-parts

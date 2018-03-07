@@ -27,8 +27,8 @@ pub fn calculate_los(los: &mut Vec<bool>, exp: &mut Vec<bool>,
     let start_time = time::Instant::now();
 
     let max_dist = area.vis_dist;
-    let entity_x = entity.location.x + entity.size.size / 2;
-    let entity_y = entity.location.y + entity.size.size / 2;
+    let entity_x = entity.location.x + entity.size.width / 2;
+    let entity_y = entity.location.y + entity.size.height / 2;
 
     let min_x = cmp::max(0, entity_x - max_dist - 2);
     let max_x = cmp::min(area.width, entity_x + max_dist + 3);
@@ -53,8 +53,8 @@ pub fn calculate_los(los: &mut Vec<bool>, exp: &mut Vec<bool>,
 }
 
 pub fn has_visibility(area: &Rc<Area>, entity: &EntityState, target: &EntityState) -> bool {
-    let start_x = entity.location.x + entity.size.size / 2;
-    let start_y = entity.location.y + entity.size.size / 2;
+    let start_x = entity.location.x + entity.size.width / 2;
+    let start_y = entity.location.y + entity.size.height / 2;
     let src_elev = area.terrain.elevation(start_x, start_y);
 
     for p in target.location_points() {

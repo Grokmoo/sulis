@@ -68,7 +68,7 @@ impl EditorMode for ActorPicker {
     fn cursor_size(&self) -> (i32, i32) {
         match self.cur_actor {
             None => (0, 0),
-            Some(ref actor) => (actor.race.size.size, actor.race.size.size),
+            Some(ref actor) => (actor.race.size.width, actor.race.size.height),
         }
     }
 
@@ -80,7 +80,7 @@ impl EditorMode for ActorPicker {
             Some(ref actor) => actor,
         };
 
-        self.removal_actors = model.actors_within(x, y, actor.race.size.size);
+        self.removal_actors = model.actors_within(x, y, actor.race.size.width, actor.race.size.height);
     }
 
     fn left_click(&mut self, model: &mut AreaModel, x: i32, y: i32) {
@@ -99,7 +99,7 @@ impl EditorMode for ActorPicker {
         };
 
         self.removal_actors.clear();
-        model.remove_actors_within(x, y, actor.race.size.size);
+        model.remove_actors_within(x, y, actor.race.size.width, actor.race.size.height);
     }
 }
 

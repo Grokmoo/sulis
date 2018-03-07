@@ -4,15 +4,19 @@ size: [ 1024, 1024 ]
 simple_image_gen_scale: 16
 grid_multiplier: 16
 groups:
+  transition:
+    size: [4, 3]
+    position: [40, 0]
+    areas:
+      transition0: [0, 0]
+      transition1: [4, 0]
+      transition2: [8, 0]
+      transition3: [12, 0]
+      transition4: [16, 0]
+      transition5: [20, 0]
   2by2:
     size: [2, 2]
     areas:
-      transition0: [51, 0]
-      transition1: [53, 0]
-      transition2: [55, 0]
-      transition3: [57, 0]
-      transition4: [59, 0]
-      transition5: [61, 0]
       chest_small_closed: [0, 4]
       chest_small_open: [2, 4]
       boxes01: [0, 6]

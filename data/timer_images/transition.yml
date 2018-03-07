@@ -1,5 +1,5 @@
 id: transition
-frame_time_millis: 100
+frame_time_millis: 200
 frames:
   - "props/transition0"
   - "props/transition1"

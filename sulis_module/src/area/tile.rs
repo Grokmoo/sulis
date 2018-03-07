@@ -244,7 +244,7 @@ impl Tile {
     }
 }
 
-fn verify_point(kind: &str, width: usize, height: usize, p: Vec<usize>) -> Result<(i32, i32), Error> {
+pub fn verify_point(kind: &str, width: usize, height: usize, p: Vec<usize>) -> Result<(i32, i32), Error> {
     if p.len() != 2 {
         return invalid_data_error(&format!("{} point array length is not equal to 2", kind));
     }

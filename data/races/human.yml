@@ -2,7 +2,7 @@ id: human
 name: Human
 description: |
   Tough and adaptable, humans have colonized much of the world, often at the expense of other races.  Human adventurers of all types can frequently be found throughout the Five Corners and beyond. 
-size: 3
+size: 3by3
 base_stats:
   hit_points: 40
   accuracy: 30

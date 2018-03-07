@@ -81,8 +81,8 @@ impl PathFinder {
         // let start_time = time::Instant::now();
         self.goal_x = dest_x;
         self.goal_y = dest_y;
-        self.requester_center_x = requester.size.size as f32 / 2.0 - 0.5;
-        self.requester_center_y = requester.size.size as f32 / 2.0 - 0.5;
+        self.requester_center_x = requester.size.width as f32 / 2.0 - 0.5;
+        self.requester_center_y = requester.size.height as f32 / 2.0 - 0.5;
         let dest_dist_squared = dest_dist * dest_dist;
         let start = requester.location.x + requester.location.y * self.width;
 

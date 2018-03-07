@@ -151,18 +151,18 @@ impl AreaModel {
         self.actors.push((Point::new(x, y), actor));
     }
 
-    pub fn remove_actors_within(&mut self, x: i32, y: i32, size: i32) {
+    pub fn remove_actors_within(&mut self, x: i32, y: i32, width: i32, height: i32) {
         self.actors.retain(|&(pos, ref actor)| {
-            let pos_s = actor.race.size.size;
-            !is_removal(pos, pos_s, pos_s, x, y, size, size)
+            !is_removal(pos, actor.race.size.width, actor.race.size.height, x, y, width, height)
         });
     }
 
-    pub fn actors_within(&self, x: i32, y: i32, size: i32) -> Vec<(Point, Rc<Actor>)> {
+    pub fn actors_within(&self, x: i32, y: i32, width: i32, height: i32) -> Vec<(Point, Rc<Actor>)> {
         let mut actors = Vec::new();
         for &(pos, ref actor) in self.actors.iter() {
-            let s = actor.race.size.size;
-            if !is_removal(pos, s, s, x, y, size, size) { continue; }
+            if !is_removal(pos, actor.race.size.width, actor.race.size.height, x, y, width, height) {
+                continue;
+            }
 
             actors.push((pos, Rc::clone(actor)));
         }
@@ -183,8 +183,8 @@ impl AreaModel {
 
     pub fn remove_props_within(&mut self, x: i32, y: i32, width: i32, height: i32) {
         self.props.retain(|prop_data| {
-            let w = prop_data.prop.width as i32;
-            let h = prop_data.prop.height as i32;
+            let w = prop_data.prop.size.width;
+            let h = prop_data.prop.size.height;
             !is_removal(prop_data.location, w, h, x, y, width, height)
         });
     }
@@ -194,7 +194,7 @@ impl AreaModel {
         for prop_data in self.props.iter() {
             let prop = &prop_data.prop;
             let pos = prop_data.location;
-            if !is_removal(pos, prop.width as i32, prop.height as i32, x, y, width, height) { continue; }
+            if !is_removal(pos, prop.size.width, prop.size.height, x, y, width, height) { continue; }
 
             within.push((pos, Rc::clone(prop)));
         }
@@ -210,11 +210,18 @@ impl AreaModel {
             }, Some(image) => image,
         };
 
+        let size = match Module::object_size(&CONFIG.editor.transition_size) {
+            None => {
+                warn!("No size with ID '{}' found.", CONFIG.editor.transition_size);
+                return None;
+            }, Some(ref size) => Rc::clone(size),
+        };
+
         self.transitions.push(Transition {
             from: Point::new(1, 1),
             to: Point::new(1, 1),
             to_area: None,
-            size: CONFIG.editor.transition_size,
+            size,
             image_display: sprite,
         });
 
@@ -376,10 +383,17 @@ impl AreaModel {
                 }, Some(image) => image,
             };
 
+            let size = match Module::object_size(&transition_builder.size) {
+                None => {
+                    warn!("No size with ID '{}' found.", transition_builder.size);
+                    continue;
+                }, Some(ref size) => Rc::clone(size),
+            };
+
             self.transitions.push(Transition {
                 from: transition_builder.from,
                 to: transition_builder.to,
-                size: transition_builder.size,
+                size,
                 to_area: transition_builder.to_area,
                 image_display: image,
             });
@@ -449,7 +463,7 @@ impl AreaModel {
         for ref transition in self.transitions.iter() {
             transitions.push(TransitionBuilder {
                 from: transition.from,
-                size: transition.size,
+                size: transition.size.id.to_string(),
                 to: transition.to,
                 to_area: transition.to_area.clone(),
                 image_display: CONFIG.editor.transition_image.clone(),

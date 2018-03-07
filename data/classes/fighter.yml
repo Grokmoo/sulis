@@ -42,7 +42,7 @@ kits:
       per: 13
       int: 10
       wis: 10
-    starting_equipment: [ shortsword, shield_small, boots_leather, torso_leather, legs_leather ]
+    starting_equipment: [ shortsword, shield_small, boots_leather, torso_mail, legs_leather, gloves_leather ]
     description: |
-      A fighter who will typically wear heavy armor and a large shield.  While certainly capable of dishing out punishment, their primary role on the battlefield is often to protect their compatriots.
+      A fighter who will typically use heavy armor and a large shield.  While certainly capable of dishing out punishment, their primary role on the battlefield is often to protect their compatriots.
   

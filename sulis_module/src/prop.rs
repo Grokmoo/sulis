@@ -23,9 +23,10 @@ use sulis_core::image::Image;
 use sulis_core::serde_json;
 use sulis_core::serde_yaml;
 use sulis_core::resource::{ResourceBuilder, ResourceSet};
-use sulis_core::util::unable_to_create_error;
+use sulis_core::util::{Point, unable_to_create_error};
 
-use Module;
+use {Module, ObjectSize};
+use area::tile::verify_point;
 
 #[derive(Debug)]
 pub struct Prop {
@@ -33,15 +34,14 @@ pub struct Prop {
     pub name: String,
     pub icon: Rc<Image>,
     pub image: Rc<Image>,
-    pub width: u32,
-    pub height: u32,
-    pub passable: bool,
-    pub visible: bool,
+    pub size: Rc<ObjectSize>,
+    pub impass: Vec<Point>,
+    pub invis: Vec<Point>,
     pub interactive: bool,
 }
 
 impl Prop {
-    pub fn new(builder: PropBuilder, _module: &Module) -> Result<Prop, Error> {
+    pub fn new(builder: PropBuilder, module: &Module) -> Result<Prop, Error> {
         let icon = match ResourceSet::get_image(&builder.icon) {
             None => {
                     warn!("No image found for icon '{}'", builder.icon);
@@ -56,25 +56,71 @@ impl Prop {
             }, Some(image) => image,
         };
 
-        // TODO props need per square passability
+        let size = match module.sizes.get(&builder.size) {
+            None => {
+                warn!("No size found with id '{}'", builder.size);
+                return unable_to_create_error("prop", &builder.id);
+            }, Some(ref size) => Rc::clone(size),
+        };
+
+        if builder.passable.is_some() && builder.impass.is_some() {
+            warn!("Cannot specify both overall passable and impass array");
+            return unable_to_create_error("prop", &builder.id);
+        }
+
+        if builder.visible.is_some() && builder.invis.is_some() {
+            warn!("Cannot specify both overall visible and invis array");
+            return unable_to_create_error("prop", &builder.id);
+        }
+
+        let mut impass = Vec::new();
+        if let Some(pass) = builder.passable {
+            if !pass {
+                for y in 0..size.height {
+                    for x in 0..size.width {
+                        impass.push(Point::new(x, y));
+                    }
+                }
+            }
+        } else if let Some(builder_impass) = builder.impass {
+            for p in builder_impass {
+                let (x, y) = verify_point("impass", size.width as usize, size.height as usize, p)?;
+                impass.push(Point::new(x, y));
+            }
+        }
+
+        let mut invis = Vec::new();
+        if let Some(vis) = builder.visible {
+            if !vis {
+                for y in 0..size.height {
+                    for x in 0..size.width {
+                        invis.push(Point::new(x, y));
+                    }
+                }
+            }
+        } else if let Some(builder_invis) = builder.invis {
+            for p in builder_invis {
+                let (x, y) = verify_point("invis", size.width as usize, size.height as usize, p)?;
+                invis.push(Point::new(x, y));
+            }
+        }
 
         Ok(Prop {
             id: builder.id,
             name: builder.name,
             icon,
             image,
-            width: builder.width,
-            height: builder.height,
-            passable: builder.passable,
-            visible: builder.visible,
+            size,
+            impass,
+            invis,
             interactive: builder.interactive,
         })
     }
 
     pub fn append_to_draw_list(&self, draw_list: &mut DrawList, state: &AnimationState,
                                x: f32, y: f32, millis: u32) {
-        let w = self.width as f32;
-        let h = self.height as f32;
+        let w = self.size.width as f32;
+        let h = self.size.height as f32;
 
         self.image.append_to_draw_list(draw_list, state, x, y, w, h, millis);
     }
@@ -87,10 +133,11 @@ pub struct PropBuilder {
     pub name: String,
     pub icon: String,
     pub image: String,
-    pub width: u32,
-    pub height: u32,
-    pub passable: bool,
-    pub visible: bool,
+    pub size: String,
+    pub passable: Option<bool>,
+    pub impass: Option<Vec<Vec<usize>>>,
+    pub invis: Option<Vec<Vec<usize>>>,
+    pub visible: Option<bool>,
     pub interactive: bool,
 }
 

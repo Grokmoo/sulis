@@ -211,7 +211,38 @@ impl DrawList {
             self.texture = other.texture.to_string();
         }
     }
-}
+
+    /// rotates the vertices in this drawlist by the given angle,
+    /// about the center of the drawlist.  this
+    /// is done in software, prior to sending the vertices to the GPU,
+    /// so it should be used sparingly
+    #[inline]
+    pub fn rotate(&mut self, angle: f32) {
+        let sin = angle.sin();
+        let cos = angle.cos();
+
+        let mut avg_x = 0.0;
+        let mut avg_y = 0.0;
+        for ref vertex in self.quads.iter() {
+            avg_x += vertex.position[0];
+            avg_y += vertex.position[1];
+        }
+
+        avg_x /= self.quads.len() as f32;
+        avg_y /= self.quads.len() as f32;
+
+        for ref mut vertex in self.quads.iter_mut() {
+            let x = vertex.position[0] - avg_x;
+            let y = vertex.position[1] - avg_y;
+
+            let new_x = x * cos - y * sin;
+            let new_y = x * sin + y * cos;
+
+            vertex.position[0] = new_x + avg_x;
+            vertex.position[1] = -new_y + avg_y;
+        }
+    }
+    }
 
 #[derive(Debug, Copy, Clone)]
 pub struct Vertex {

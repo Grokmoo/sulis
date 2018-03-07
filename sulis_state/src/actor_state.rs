@@ -308,7 +308,7 @@ impl ActorState {
 
         self.stats.finalize(attacks_list, multiplier, rules.base_attribute);
 
-        self.has_level_up = rules.get_xp_for_next_level(self.actor.total_level) < self.xp;
+        self.has_level_up = rules.get_xp_for_next_level(self.actor.total_level) <= self.xp;
 
         self.listeners.notify(&self);
     }

@@ -1,0 +1,6 @@
+id: 3by2
+width: 3
+height: 2
+cursor_image: "gui/cursor3by2"
+relative_points: [[0, 0], [1, 0], [2, 0],
+                  [0, 1], [1, 1], [2, 1]]

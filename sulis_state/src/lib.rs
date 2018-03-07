@@ -37,6 +37,7 @@ pub use self::change_listener::ChangeListenerList;
 
 mod entity_state;
 pub use self::entity_state::EntityState;
+pub use self::entity_state::AreaDrawable;
 
 mod actor_state;
 pub use self::actor_state::ActorState;
@@ -377,10 +378,10 @@ impl GameState {
                   target: &Rc<RefCell<EntityState>>) -> (f32, f32, f32) {
         let (target_x, target_y) = {
             let target = target.borrow();
-            (target.location.x + target.size.size / 2, target.location.y + target.size.size / 2)
+            (target.location.x + target.size.width / 2, target.location.y + target.size.height / 2)
         };
 
-        let dist = entity.borrow().size.size as f32 / 2.0 + target.borrow().size.size as f32 / 2.0;
+        let dist = entity.borrow().size.width as f32 / 2.0 + target.borrow().size.height as f32 / 2.0;
         (target_x as f32, target_y as f32, dist + entity.borrow().actor.stats.attack_distance())
     }
 

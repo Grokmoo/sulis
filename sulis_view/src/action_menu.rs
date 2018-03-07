@@ -21,7 +21,7 @@ use std::cell::RefCell;
 use sulis_core::ui::{Callback, Cursor, Widget, WidgetKind};
 use sulis_core::io::event::ClickKind;
 use sulis_core::util::Point;
-use sulis_module::{Area, Module};
+use sulis_module::{Area, Module, ObjectSize};
 use sulis_state::{ChangeListener, GameState, EntityState};
 use sulis_widgets::{Label, list_box, ListBox};
 
@@ -190,15 +190,40 @@ impl ActionMenu {
             self.attack_callback().call(widget, kind);
         } else if self.is_transition_valid() {
             self.transition_callback().call(widget, kind);
-        } else if self.is_move_valid() {
-            self.move_callback().call(widget, kind);
         } else if self.is_prop_valid() {
             self.prop_callback().call(widget, kind);
+        } else if self.is_move_valid() {
+            self.move_callback().call(widget, kind);
         }
     }
 
     pub fn is_default_callback_valid(&self) -> bool {
-        self.is_attack_valid() || self.is_move_valid() || self.is_prop_valid()
+        self.is_attack_valid() || self.is_transition_valid() ||
+            self.is_prop_valid() || self.is_move_valid()
+    }
+
+    pub fn get_cursor(&self) -> (Rc<ObjectSize>, Point) {
+        let x = self.area_pos.x;
+        let y = self.area_pos.y;
+
+        let state = GameState::area_state();
+        let state = state.borrow();
+
+        if let Some(ref entity) = self.hovered_entity {
+            let size = Rc::clone(&entity.borrow().size);
+            (size, entity.borrow().location.to_point())
+        } else if let Some(ref transition) = state.get_transition_at(x, y) {
+            (Rc::clone(&transition.size), transition.from)
+        } else if let Some(index) = self.hovered_prop {
+            let prop = &state.props[index];
+            (Rc::clone(&prop.prop.size), prop.location.to_point())
+        } else {
+            let pc = GameState::pc();
+            let size = Rc::clone(&pc.borrow().size);
+            let pos = Point::new(self.area_pos.x - size.width / 2,
+                                 self.area_pos.y - size.height / 2);
+            (size, pos)
+        }
     }
 }
 

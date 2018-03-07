@@ -19,6 +19,7 @@ use std::rc::Rc;
 use std::cell::{RefCell, RefMut};
 use std::cmp;
 use std::time;
+use std::mem;
 
 use sulis_core::ui::{compute_area_scaling, animation_state};
 use sulis_core::ui::{color, Cursor, Scrollable, WidgetKind, Widget};
@@ -29,7 +30,7 @@ use sulis_core::config::CONFIG;
 use sulis_core::resource::Sprite;
 use sulis_core::extern_image::ImageBuffer;
 use sulis_module::area::Layer;
-use sulis_state::{AreaState, EntityState, GameState};
+use sulis_state::{AreaDrawable, AreaState, EntityState, GameState};
 
 use {ActionMenu, EntityMouseover, PropMouseover};
 
@@ -79,8 +80,8 @@ impl AreaView {
         let (scale_x, scale_y) = self.scale;
         self.scroll.compute_max(widget, area_width, area_height, scale_x, scale_y);
 
-        let x = entity.borrow().location.x as f32 + entity.borrow().size.size as f32 / 2.0;
-        let y = entity.borrow().location.y as f32 + entity.borrow().size.size as f32 / 2.0;
+        let x = entity.borrow().location.x as f32 + entity.borrow().size.width as f32 / 2.0;
+        let y = entity.borrow().location.y as f32 + entity.borrow().size.height as f32 / 2.0;
         let x = x - widget.state.inner_width() as f32 / scale_x / 2.0;
         let y = y - widget.state.inner_height() as f32 / scale_y / 2.0;
 
@@ -141,8 +142,8 @@ impl AreaView {
 
         let vis_dist = area_state.area.vis_dist;
         let pc = GameState::pc();
-        let c_x = pc.borrow().location.x + pc.borrow().size.size / 2;
-        let c_y = pc.borrow().location.y + pc.borrow().size.size / 2;
+        let c_x = pc.borrow().location.x + pc.borrow().size.width / 2;
+        let c_y = pc.borrow().location.y + pc.borrow().size.height / 2;
         let min_x = cmp::max(0, c_x - vis_dist - 2);
         let max_x = cmp::min(max_tile_x, c_x + vis_dist + 3);
         let min_y = cmp::max(0, c_y - vis_dist - 2);
@@ -206,34 +207,37 @@ impl AreaView {
         renderer.draw(draw_list);
     }
 
-    fn draw_entities(&self, renderer: &mut GraphicsRenderer, scale_x: f32, scale_y: f32,
+    fn draw_entities_props(&self, renderer: &mut GraphicsRenderer, scale_x: f32, scale_y: f32,
                      _alpha: f32, widget: &Widget, state: &AreaState, millis: u32) {
-        let p = widget.state.inner_position;
+        // let start_time = time::Instant::now();
+        let mut to_draw: Vec<&AreaDrawable> = Vec::new();
 
-        let mut draw_list = DrawList::empty_sprite();
-        draw_list.set_scale(scale_x, scale_y);
         for prop_state in state.prop_iter() {
-            let x = (prop_state.location.x + p.x) as f32 - self.scroll.x();
-            let y = (prop_state.location.y + p.y) as f32 - self.scroll.y();
-            prop_state.append_to_draw_list(&mut draw_list, x, y, millis);
-        }
-
-        if !draw_list.is_empty() {
-            renderer.draw(draw_list);
+            to_draw.push(&*prop_state);
         }
 
         for entity in state.entity_iter() {
-            let entity = entity.borrow();
-
-            if entity.location_points().any(|p| state.is_pc_visible(p.x, p.y)) {
-                let x = (entity.location.x + p.x) as f32 - self.scroll.x() + entity.sub_pos.0;
-                let y = (entity.location.y + p.y) as f32 - self.scroll.y() + entity.sub_pos.1;
-
-                // TODO implement drawing with alpha
-                entity.actor.draw_graphics_mode(renderer, scale_x, scale_y,
-                                                x, y, millis);
+            if !entity.borrow().location_points().any(|p| state.is_pc_visible(p.x, p.y)) {
+                continue;
             }
+
+            let entity = entity.borrow();
+            let entity = unsafe {
+                mem::transmute::<&EntityState, &'static EntityState>(&*entity)
+            };
+
+            to_draw.push(entity);
         }
+
+        to_draw.sort_by_key(|k| k.location());
+
+        for drawable in to_draw {
+            let x = widget.state.inner_position.x as f32 - self.scroll.x();
+            let y = widget.state.inner_position.y as f32 - self.scroll.y();
+            drawable.draw(renderer, scale_x, scale_y, x, y, millis);
+        }
+
+        // info!("Entity & Prop draw time: {}", util::format_elapsed_secs(start_time.elapsed()));
     }
 }
 
@@ -332,7 +336,7 @@ impl WidgetKind for AreaView {
             renderer.draw(draw_list);
         }
 
-        self.draw_entities(renderer, scale_x, scale_y, 1.0, widget, &state, millis);
+        self.draw_entities_props(renderer, scale_x, scale_y, 1.0, widget, &state, millis);
 
         self.draw_layer(renderer, scale_x, scale_y, widget, AERIAL_LAYER_ID);
 
@@ -375,7 +379,7 @@ impl WidgetKind for AreaView {
                 let (x, y) = {
                     let entity = entity.borrow();
                     self.get_mouseover_pos(entity.location.x, entity.location.y,
-                        entity.size.size, entity.size.size)
+                        entity.size.width, entity.size.height)
                 };
                 Widget::set_mouse_over(widget, EntityMouseover::new(&entity), x, y);
             }
@@ -420,44 +424,31 @@ impl WidgetKind for AreaView {
             let (x, y) = {
                 let entity = entity.borrow();
                 self.get_mouseover_pos(entity.location.x, entity.location.y,
-                    entity.size.size, entity.size.size)
+                    entity.size.width, entity.size.height)
             };
             Widget::set_mouse_over(widget, EntityMouseover::new(&entity), x, y);
-
-            // let pc = GameState::pc();
-            // if *pc.borrow() != *entity.borrow() {
-            //     let sprite = &entity.borrow().size.cursor_sprite;
-            //     let x = entity.borrow().location.x as f32 - self.scroll.x();
-            //     let y = entity.borrow().location.y as f32 - self.scroll.y();
-            //     let size = entity.borrow().size() as f32;
-            //
-            //     let mut cursor = DrawList::from_sprite_f32(sprite, x, y, size, size);
-            //     cursor.set_color(color::RED);
-            //     self.add_cursor(cursor);
-            // }
         } else if let Some(index) = area_state.borrow().prop_index_at(area_x, area_y) {
             let interactive = area_state.borrow().props[index].prop.interactive;
             if interactive {
                 let (x, y) = {
                     let prop_state = &area_state.borrow().props[index];
                     self.get_mouseover_pos(prop_state.location.x, prop_state.location.y,
-                                           prop_state.prop.width as i32, prop_state.prop.height as i32)
+                                           prop_state.prop.size.width, prop_state.prop.size.height)
                 };
                 Widget::set_mouse_over(widget, PropMouseover::new(index), x, y);
             }
         }
 
-        let pc = GameState::pc();
-        let size = &pc.borrow().size;
         let action_menu = ActionMenu::new(area_x, area_y);
         let left_click_action_valid = action_menu.borrow().is_default_callback_valid();
+        let (size, pos) = action_menu.borrow().get_cursor();
 
         let hover_sprite = HoverSprite {
             sprite: Rc::clone(&size.cursor_sprite),
-            x: area_x - size.size / 2,
-            y: area_y - size.size / 2,
-            w: size.size,
-            h: size.size,
+            x: pos.x,
+            y: pos.y,
+            w: size.width,
+            h: size.height,
             left_click_action_valid,
         };
         self.hover_sprite = Some(hover_sprite);

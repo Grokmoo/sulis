@@ -28,13 +28,13 @@ use sulis_rules::BonusList;
 
 use actor::{Sex};
 
-use {EntitySize, ImageLayer, ImageLayerSet, Module};
+use {ObjectSize, ImageLayer, ImageLayerSet, Module};
 
 pub struct Race {
     pub id: String,
     pub name: String,
     pub description: String,
-    pub size: Rc<EntitySize>,
+    pub size: Rc<ObjectSize>,
     pub base_stats: BonusList,
     pub hair_selections: Vec<String>,
     pub beard_selections: Vec<String>,
@@ -137,7 +137,7 @@ pub struct RaceBuilder {
     pub id: String,
     pub name: String,
     pub description: String,
-    pub size: usize,
+    pub size: String,
     pub base_stats: BonusList,
     pub default_images: HashMap<Sex, HashMap<ImageLayer, String>>,
     pub hair_selections: Option<Vec<String>>,

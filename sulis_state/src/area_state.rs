@@ -197,7 +197,7 @@ impl AreaState {
         let prop = &prop_data.prop;
 
         if !self.area.coords_valid(location.x, location.y) { return false; }
-        if !self.area.coords_valid(location.x + prop.width as i32, location.y + prop.height as i32) {
+        if !self.area.coords_valid(location.x + prop.size.width, location.y + prop.size.height) {
             return false;
         }
 
@@ -205,8 +205,8 @@ impl AreaState {
 
         let start_x = prop_state.location.x as usize;
         let start_y = prop_state.location.y as usize;
-        let end_x = start_x + prop_state.prop.width as usize;
-        let end_y = start_y + prop_state.prop.height as usize;
+        let end_x = start_x + prop_state.prop.size.width as usize;
+        let end_y = start_y + prop_state.prop.size.height as usize;
 
         let index = self.props.len();
         for y in start_y..end_y {
@@ -375,7 +375,7 @@ impl AreaState {
 
     pub fn add_feedback_text(&mut self, text: String, target: &Rc<RefCell<EntityState>>,
                              scale: f32, color: Color) {
-        let width = target.borrow().size.size as f32;
+        let width = target.borrow().size.width as f32;
         let pos_x = target.borrow().location.x as f32 + width / 2.0;
         let pos_y = target.borrow().location.y as f32 - 1.5;
 

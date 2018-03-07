@@ -29,6 +29,7 @@ pub struct RangedAttackAnimation {
     attacker: Rc<RefCell<EntityState>>,
     defender: Rc<RefCell<EntityState>>,
 
+    angle: f32,
     vec: (f32, f32),
     start_pos: (f32, f32),
     cur_pos: (f32, f32),
@@ -44,10 +45,10 @@ pub struct RangedAttackAnimation {
 impl RangedAttackAnimation {
     pub fn new(attacker: &Rc<RefCell<EntityState>>, defender: &Rc<RefCell<EntityState>>,
                base_time_millis: u32) -> RangedAttackAnimation {
-        let mut start_pos = ((attacker.borrow().location.x + attacker.borrow().size.size / 2) as f32,
-            (attacker.borrow().location.y + attacker.borrow().size.size / 2) as f32);
-        let x = (defender.borrow().location.x + defender.borrow().size.size / 2) as f32 - start_pos.0;
-        let y = (defender.borrow().location.y + defender.borrow().size.size / 2) as f32 - start_pos.1;
+        let mut start_pos = ((attacker.borrow().location.x + attacker.borrow().size.width / 2) as f32,
+            (attacker.borrow().location.y + attacker.borrow().size.height / 2) as f32);
+        let x = (defender.borrow().location.x + defender.borrow().size.width / 2) as f32 - start_pos.0;
+        let y = (defender.borrow().location.y + defender.borrow().size.height / 2) as f32 - start_pos.1;
         let dist = (x * x + y * y).sqrt();
 
         let projectile = attacker.borrow().actor.stats.get_ranged_projectile();
@@ -56,6 +57,7 @@ impl RangedAttackAnimation {
             start_pos.1 -= projectile.get_height_f32() / 2.0;
         }
 
+        let angle = y.atan2(x);
 
         RangedAttackAnimation {
             attacker: Rc::clone(attacker),
@@ -64,6 +66,7 @@ impl RangedAttackAnimation {
             start_time: Instant::now(),
             start_pos,
             cur_pos: (0.0, 0.0),
+            angle,
             vec: (x, y),
             total_time_millis: base_time_millis as f32 * dist,
             has_attacked: false,
@@ -83,7 +86,7 @@ impl Animation for RangedAttackAnimation {
                                            projectile.get_width_f32(),
                                            projectile.get_height_f32(), millis);
             draw_list.set_scale(scale_x, scale_y);
-            // TODO rotate the projectile
+            draw_list.rotate(self.angle);
             renderer.draw(draw_list);
         }
     }

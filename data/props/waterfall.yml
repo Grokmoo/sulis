@@ -2,8 +2,7 @@ id: waterfall
 name: Waterfall
 icon: inventory/misc_crate
 image: waterfall
-width: 16
-height: 12
+size: 16by12
 visible: true
 passable: false
 interactive: false

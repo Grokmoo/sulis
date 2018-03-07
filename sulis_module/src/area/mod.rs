@@ -23,7 +23,7 @@ use self::path_finder_grid::PathFinderGrid;
 mod terrain;
 pub use self::terrain::Terrain;
 
-mod tile;
+pub mod tile;
 pub use self::tile::Tile;
 pub use self::tile::TilesList;
 
@@ -33,16 +33,16 @@ use std::rc::Rc;
 
 use sulis_core::image::Image;
 use sulis_core::resource::{ResourceBuilder, ResourceSet, Sprite};
-use sulis_core::util::{Point, Size, unable_to_create_error};
+use sulis_core::util::{Point, unable_to_create_error};
 use sulis_core::serde_json;
 use sulis_core::serde_yaml;
 
-use {Item, Module, Prop};
+use {Item, Module, ObjectSize, Prop};
 
 #[derive(Debug, Clone)]
 pub struct Transition {
     pub from: Point,
-    pub size: Size,
+    pub size: Rc<ObjectSize>,
     pub to: Point,
     pub to_area: Option<String>,
     pub image_display: Rc<Image>,
@@ -67,7 +67,7 @@ pub struct Area {
     pub width: i32,
     pub height: i32,
     pub terrain: Terrain,
-    path_grids: HashMap<i32, PathFinderGrid>,
+    path_grids: HashMap<String, PathFinderGrid>,
     pub visibility_tile: Rc<Sprite>,
     pub explored_tile: Rc<Sprite>,
     pub actors: Vec<ActorData>,
@@ -104,12 +104,11 @@ impl Area {
             }
         };
 
-        let mut path_grids: HashMap<i32, PathFinderGrid> = HashMap::new();
+        let mut path_grids = HashMap::new();
         for (_, size) in module.sizes.iter() {
-            let int_size = size.size;
             let path_grid = PathFinderGrid::new(Rc::clone(size), &terrain);
-            debug!("Generated path grid of size {}", int_size);
-            path_grids.insert(int_size, path_grid);
+            debug!("Generated path grid for size {}", size.id);
+            path_grids.insert(size.id.to_string(), path_grid);
         }
 
         // TODO validate position of each actor
@@ -124,12 +123,19 @@ impl Area {
                 Some(image) => image,
             };
 
+            let size = match module.sizes.get(&t_builder.size) {
+                None => {
+                    warn!("Size '{}' not found for transition.", t_builder.size);
+                    continue;
+                }, Some(ref size) => Rc::clone(size),
+            };
+
             let mut p = t_builder.from;
             if !p.in_bounds(builder.width as i32, builder.height as i32) {
                 warn!("Transition {} falls outside area bounds", index);
                 continue;
             }
-            p.add(t_builder.size.width, t_builder.size.height);
+            p.add(size.width, size.height);
             if !p.in_bounds(builder.width as i32, builder.height as i32) {
                 warn!("Transition {} falls outside area bounds", index);
                 continue;
@@ -139,7 +145,7 @@ impl Area {
             let transition = Transition {
                 from: t_builder.from,
                 to: t_builder.to,
-                size: t_builder.size,
+                size,
                 to_area: t_builder.to_area,
                 image_display: image,
             };
@@ -174,8 +180,8 @@ impl Area {
         true
     }
 
-    pub fn get_path_grid(&self, size: i32) -> &PathFinderGrid {
-        self.path_grids.get(&size).unwrap()
+    pub fn get_path_grid(&self, size_id: &str) -> &PathFinderGrid {
+        self.path_grids.get(size_id).unwrap()
     }
 }
 
@@ -225,7 +231,7 @@ impl ResourceBuilder for AreaBuilder {
 #[serde(deny_unknown_fields)]
 pub struct TransitionBuilder {
     pub from: Point,
-    pub size: Size,
+    pub size: String,
     pub to: Point,
     pub to_area: Option<String>,
     pub image_display: String,

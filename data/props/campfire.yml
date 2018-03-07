@@ -2,8 +2,7 @@ id: campfire
 name: Campfire
 icon: inventory/misc_crate
 image: campfire
-width: 2
-height: 4
+size: 2by4
 visible: true
-passable: false
 interactive: false
+impass: [[0, 2], [1, 2], [0, 3], [1, 3]]

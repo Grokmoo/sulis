@@ -17,11 +17,11 @@
 use std::rc::Rc;
 use std::fmt;
 
-use EntitySize;
+use ObjectSize;
 use area::Terrain;
 
 pub struct PathFinderGrid {
-    pub size: Rc<EntitySize>,
+    pub size: Rc<ObjectSize>,
     pub passable: Vec<bool>,
     pub width: i32,
     pub height: i32,
@@ -29,7 +29,7 @@ pub struct PathFinderGrid {
 
 impl fmt::Debug for PathFinderGrid {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "PathFinderGrid of size {}\n  ", self.size.size)?;
+        write!(f, "PathFinderGrid of size {}\n  ", self.size.id)?;
         for y in 0..self.height {
             for x in 0..self.width {
                 if self.passable[(x + y * self.width) as usize] {
@@ -45,7 +45,7 @@ impl fmt::Debug for PathFinderGrid {
 }
 
 impl PathFinderGrid {
-    pub fn new(size: Rc<EntitySize>, terrain: &Terrain) -> PathFinderGrid {
+    pub fn new(size: Rc<ObjectSize>, terrain: &Terrain) -> PathFinderGrid {
         let width = terrain.width;
         let height = terrain.height;
 
@@ -76,8 +76,8 @@ impl PathFinderGrid {
         }
     }
 
-    pub fn size(&self) -> i32 {
-        self.size.size
+    pub fn size(&self) -> &str {
+        &self.size.id
     }
 
     pub fn is_passable(&self, x: i32, y: i32) -> bool {

@@ -35,10 +35,10 @@ pub struct MeleeAttackAnimation {
 impl MeleeAttackAnimation {
     pub fn new(attacker: &Rc<RefCell<EntityState>>, defender: &Rc<RefCell<EntityState>>,
                total_time_millis: u32) -> MeleeAttackAnimation {
-        let x = defender.borrow().location.x + defender.borrow().size.size / 2
-            - attacker.borrow().location.x - attacker.borrow().size.size / 2;
-        let y = defender.borrow().location.y + defender.borrow().size.size / 2
-            - attacker.borrow().location.y - attacker.borrow().size.size / 2;
+        let x = defender.borrow().location.x + defender.borrow().size.width / 2
+            - attacker.borrow().location.x - attacker.borrow().size.width / 2;
+        let y = defender.borrow().location.y + defender.borrow().size.height / 2
+            - attacker.borrow().location.y - attacker.borrow().size.height / 2;
 
         MeleeAttackAnimation {
             attacker: Rc::clone(attacker),

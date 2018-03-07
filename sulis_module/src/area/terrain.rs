@@ -147,23 +147,17 @@ impl Terrain {
             let prop = &prop_data.prop;
             let start_x = prop_data.location.x as usize;
             let start_y = prop_data.location.y as usize;
-            let end_x = start_x + prop.width as usize;
-            let end_y = start_y + prop.height as usize;
 
-            if !prop.passable {
-                for y in start_y..end_y {
-                    for x in start_x..end_x {
-                        passable[x + y * width as usize] = false;
-                    }
-                }
+            for p in prop.impass.iter() {
+                let x = start_x + p.x as usize;
+                let y = start_y + p.y as usize;
+                passable[x + y * width as usize] = false;
             }
 
-            if !prop.visible {
-                for y in start_y..end_y {
-                    for x in start_x..end_x {
-                        visible[x + y * width as usize] = false;
-                    }
-                }
+            for p in prop.invis.iter() {
+                let x = start_x + p.x as usize;
+                let y = start_y + p.y as usize;
+                visible[x + y * width as usize] = false;
             }
         }
 

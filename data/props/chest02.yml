@@ -2,8 +2,7 @@ id: chest02
 name: Chest
 icon: inventory/misc_crate
 image: props/chest02
-width: 3
-height: 3
+size: 3by3
 visible: true
 passable: false
 interactive: true

@@ -147,7 +147,7 @@ groups:
       bg_medium_bottom_right:  [48, 48]
   elev:
     size: [16, 16]
-    position: [128, 144]
+    position: [74, 512]
     areas:
       elev_lowest: [0, 0]
       elev_lower: [16, 0]
@@ -158,19 +158,26 @@ groups:
       elev_highest: [96, 0]
   special:
     areas:
-      empty: [0, 68, 5, 5]
-      white: [207, 51, 16, 16]
-      cursor6x6: [ 17, 85, 96, 96]
-      cursor5x5: [ 17,  0, 80, 80]
-      cursor4x4: [102,  0, 64, 64]
-      cursor3x3: [170,  0, 48, 48]
-      cursor2x2: [221,  0, 32, 32]
-      cursor1x1: [170, 51, 16, 16]
-      area_invis: [187, 51, 16, 16]
-      area_unexplored: [224, 51, 16, 16]
-      carat_on: [ 204, 51, 2, 16]
-      carat_off: [ 207, 51, 2, 16]
+      empty: [0, 512, 5, 5]
+      white: [17, 512, 16, 16]
+
+      carat_on: [ 34, 512, 2, 16]
+      carat_off: [ 37, 512, 2, 16]
+      area_invis: [40, 512, 16, 16]
+      area_unexplored: [57, 512, 16, 16]
+      
       inventory_paper_doll: [ 512, 0, 512, 512]
       icon_up: [0, 153, 15, 15]
       icon_down: [0, 170, 15, 15]
       
+      cursor1by1: [0, 529, 16, 16]
+      cursor2by2: [17, 529, 32, 32]
+      cursor3by2: [50, 529, 48, 32]
+      cursor2by3: [99, 529, 32, 48]
+      cursor3by3: [132, 529, 48, 48]
+      cursor4by4round: [181,529, 64, 64]
+      cursor5by5round: [ 0, 562, 80, 80]
+      cursor6by6round: [ 81,578, 96, 96]
+      cursor3by4: [178, 594, 48, 64]
+      cursor4by3: [0, 643, 64, 48]
+      cursor5by3: [65, 675, 80, 48]

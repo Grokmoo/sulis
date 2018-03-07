@@ -21,7 +21,6 @@ use std::collections::HashMap;
 
 use io::keyboard_event::Key;
 use io::{KeyboardEvent, InputAction};
-use util::Size;
 
 use serde_yaml;
 
@@ -41,7 +40,7 @@ pub struct EditorConfig {
     pub module: String,
     pub cursor: String,
     pub transition_image: String,
-    pub transition_size: Size,
+    pub transition_size: String,
     pub area: EditorAreaConfig,
 }
 

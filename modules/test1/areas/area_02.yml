@@ -10758,7 +10758,7 @@ layers:
   - base2
   - object
   - aerial
-entity_layer: 2
+entity_layer: 3
 actors: []
 props:
   - id: waterfall
@@ -10770,9 +10770,7 @@ transitions:
   - from:
       x: 20
       "y": 121
-    size:
-      width: 2
-      height: 2
+    size: 4by3
     to:
       x: 79
       "y": 1

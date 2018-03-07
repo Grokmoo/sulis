@@ -2,7 +2,7 @@ id: merling
 name: Merling
 description: |
   An ancient and proud people, their massive cities are cloistered away far from prying eyes in the ocean depths.  Occasionally, however, some wanderlusted Merlings make their way into the realms of the other races.  They are well suited to be magic users or warriors.
-size: 3
+size: 3by3
 base_stats:
   hit_points: 35
   accuracy: 30

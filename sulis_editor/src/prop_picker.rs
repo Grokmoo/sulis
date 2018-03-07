@@ -80,7 +80,7 @@ impl EditorMode for PropPicker {
     fn cursor_size(&self) -> (i32, i32) {
         match self.cur_prop {
             None => (0, 0),
-            Some(ref prop) => (prop.width as i32, prop.height as i32),
+            Some(ref prop) => (prop.size.width, prop.size.height),
         }
     }
 
@@ -92,7 +92,7 @@ impl EditorMode for PropPicker {
             Some(ref prop) => prop,
         };
 
-        self.removal_props = model.props_within(x, y, prop.width as i32, prop.height as i32);
+        self.removal_props = model.props_within(x, y, prop.size.width, prop.size.height);
     }
 
     fn left_click(&mut self, model: &mut AreaModel, x: i32, y: i32) {
@@ -111,7 +111,7 @@ impl EditorMode for PropPicker {
         };
 
         self.removal_props.clear();
-        model.remove_props_within(x, y, prop.width as i32, prop.height as i32);
+        model.remove_props_within(x, y, prop.size.width, prop.size.height);
     }
 }
 

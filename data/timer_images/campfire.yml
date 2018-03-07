@@ -1,0 +1,8 @@
+id: campfire
+frame_time_millis: 150
+frames:
+  - "props/campfire0"
+  - "props/campfire1"
+  - "props/campfire2"
+  - "props/campfire3"
+  - "props/campfire4"

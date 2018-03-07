@@ -45,6 +45,28 @@ uniform_sets:
     invis: []
     tiles: [ fence_s_e_w, fence_misc_01, fence_misc_02, fence_e_s, fence_w_s, fence_n_s1, fence_n_s2, fence_e_n,
              fence_e_w, fence_w_n ]
+  2by2prop:
+    layer: prop
+    size: [2, 2]
+    sprite_prefix: "props/"
+    impass: [[0, 0], [0, 1], [1, 0], [1, 1]]
+    invis: []
+    tiles: [ boxes01, boxes02, coffin1, boxes03, boxes04, boxes05]
+  3by3prop:
+    layer: prop
+    size: [3, 3]
+    sprite_prefix: "props/"
+    impass: [[0, 0], [1, 0], [2, 0], [0, 1], [1, 1], [2, 1], [0, 2], [1, 2], [2, 2]]
+    invis: []
+    tiles: [ barricade, altar, target, barrel, vase, scarecrow, hay01, hay02, anvil, dummy]
+  4by4prop:
+    layer: prop
+    size: [4, 4]
+    sprite_prefix: "props/"
+    impass: [[0, 0], [1, 0], [2, 0], [3, 0], [0, 1], [1, 1], [2, 1], [3, 1],
+      [0, 2], [1, 2], [2, 2], [3, 2], [0, 3], [1, 3], [2, 3], [3, 3]]
+    invis: []
+    tiles: [ well, barrels, nest_empty, nest, bonestack, bonespike ]
 non_uniform_sets:
   base_impass:
     layer: base
@@ -332,3 +354,39 @@ tiles:
     sprite: grassland/cave_entrance_w
     pass: [[4, 4], [4, 5], [4, 6], [4, 7], [5, 4], [5, 5], [5, 6], [5, 7],
            [6, 4], [6, 5], [6, 6], [6, 7], [7, 4], [7, 5], [7, 6], [7, 7]]
+  armor_statue:
+    layer: prop
+    size: [2, 3]
+    sprite: props/armor_statue
+    impass: [[0, 1], [1, 1], [0, 2], [1, 2]]
+  boxes06:
+    layer: prop
+    size: [3, 2]
+    sprite: props/boxes06
+    pass: []
+  boxes07:
+    layer: prop
+    size: [3, 2]
+    sprite: props/boxes07
+    pass: []
+  brazier_unlit:
+    layer: prop
+    size: [3, 4]
+    sprite: props/brazier_unlit
+    impass: [[1, 2]]
+  coins_small:
+    layer: prop
+    size: [3, 3]
+    sprite: props/coins_small
+  coins_medium:
+    layer: prop
+    size: [4, 4]
+    sprite: props/coins_medium
+  coins_large:
+    layer: prop
+    size: [4, 4]
+    sprite: props/coins_large
+  bones:
+    layer: prop
+    size: [4, 4]
+    sprite: props/bones

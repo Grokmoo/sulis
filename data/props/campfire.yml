@@ -1,0 +1,9 @@
+id: campfire
+name: Campfire
+icon: inventory/misc_crate
+image: campfire
+width: 2
+height: 4
+visible: true
+passable: false
+interactive: false

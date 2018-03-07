@@ -1,0 +1,9 @@
+id: chest_small
+name: Chest
+icon: inventory/misc_crate
+image: props/chest_small
+width: 2
+height: 2
+visible: true
+passable: false
+interactive: true

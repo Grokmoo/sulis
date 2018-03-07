@@ -1,0 +1,9 @@
+id: backpack
+name: Backpack
+icon: inventory/misc_crate
+image: props/backpack
+width: 2
+height: 2
+visible: true
+passable: true
+interactive: true

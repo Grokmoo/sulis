@@ -1,0 +1,9 @@
+id: brazier
+name: Brazier
+icon: inventory/misc_crate
+image: brazier
+width: 3
+height: 4
+visible: true
+passable: false
+interactive: false

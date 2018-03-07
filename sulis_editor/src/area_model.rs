@@ -239,17 +239,17 @@ impl AreaModel {
 
     pub fn draw(&self, renderer: &mut GraphicsRenderer, x: f32, y: f32, scale_x: f32, scale_y: f32,
                 millis: u32) {
-        let mut draw_list = DrawList::empty_sprite();
         for &(_, ref tiles) in self.tiles.iter() {
+            let mut draw_list = DrawList::empty_sprite();
             for &(pos, ref tile) in tiles {
                 let sprite = &tile.image_display;
                 draw_list.append(&mut DrawList::from_sprite_f32(sprite, x + pos.x as f32, y + pos.y as f32,
                                                                 tile.width as f32, tile.height as f32));
             }
-        }
-        if !draw_list.is_empty() {
-            draw_list.set_scale(scale_x, scale_y);
-            renderer.draw(draw_list);
+            if !draw_list.is_empty() {
+                draw_list.set_scale(scale_x, scale_y);
+                renderer.draw(draw_list);
+            }
         }
 
         for prop_data in self.props.iter() {

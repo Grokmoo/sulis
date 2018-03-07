@@ -89,7 +89,8 @@ impl ActorState {
     }
 
     pub fn attack(&mut self, target: &Rc<RefCell<EntityState>>) -> (String, Color) {
-        self.remove_ap(Module::rules().attack_ap);
+        if target.borrow_mut().actor.hp() <= 0 { return ("Miss".to_string(), color::GRAY); }
+
         info!("'{}' attacks '{}'", self.actor.name, target.borrow().actor.actor.name);
         let rules = Module::rules();
 

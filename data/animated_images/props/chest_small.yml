@@ -1,0 +1,4 @@
+id: props/chest_small
+states:
+  normal: props/chest_small_closed
+  active: props/chest_small_open

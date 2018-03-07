@@ -66,6 +66,7 @@ editor:
     layers:
       - base
       - base2
+      - prop
       - object
       - aerial
     elev_tiles:

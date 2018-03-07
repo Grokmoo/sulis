@@ -21,7 +21,7 @@ use sulis_core::config::CONFIG;
 use sulis_module::Area;
 
 use animation::{MeleeAttackAnimation, RangedAttackAnimation};
-use sulis_module::{Actor, EntitySize, EntitySizeIterator};
+use sulis_module::{Actor, EntitySize, EntitySizeIterator, Module};
 use sulis_module::area::Transition;
 use {ActorState, AreaState, ChangeListenerList, GameState, has_visibility, Location, PropState};
 
@@ -114,6 +114,8 @@ impl EntityState {
                                                   CONFIG.display.animation_base_time_millis);
             GameState::add_animation(Box::new(anim));
         }
+
+        entity.borrow_mut().actor.remove_ap(Module::rules().attack_ap);
     }
 
     pub fn add_xp(&mut self, xp: u32) {

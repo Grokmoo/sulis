@@ -56,6 +56,8 @@ impl Prop {
             }, Some(image) => image,
         };
 
+        // TODO props need per square passability
+
         Ok(Prop {
             id: builder.id,
             name: builder.name,

@@ -52,12 +52,16 @@ pub struct Actor {
     pub attributes: AttributeList,
     pub items: Vec<Rc<Item>>,
     pub to_equip: Vec<usize>,
+    pub xp: u32,
+    pub total_level: u32,
     pub levels: Vec<(Rc<Class>, u32)>,
     pub hue: Option<f32>,
     pub hair_color: Option<Color>,
     pub skin_color: Option<Color>,
     image_layers: ImageLayerSet,
     image: LayeredImage,
+
+    pub reward: Option<Reward>,
 }
 
 impl PartialEq for Actor {
@@ -67,6 +71,46 @@ impl PartialEq for Actor {
 }
 
 impl Actor {
+    pub fn from(other: &Actor, class_to_add: Rc<Class>, xp: u32) -> Actor {
+        let mut added = false;
+        let mut levels = other.levels.clone();
+        for &mut (ref existing_class, ref mut level) in levels.iter_mut() {
+            if *existing_class == class_to_add {
+                *level += 1;
+                added = true;
+            }
+        }
+
+        if !added {
+            levels.push((class_to_add, 1));
+        }
+
+        let image_layers = other.image_layers.clone();
+        let images_list = image_layers.get_list(other.sex, other.hair_color, other.skin_color);
+        let image = LayeredImage::new(images_list, other.hue);
+
+        Actor {
+            id: other.id.to_string(),
+            name: other.name.to_string(),
+            player: other.player,
+            portrait: other.portrait.clone(),
+            race: Rc::clone(&other.race),
+            sex: other.sex,
+            attributes: other.attributes,
+            items: other.items.clone(),
+            to_equip: other.to_equip.clone(),
+            xp,
+            total_level: other.total_level + 1,
+            levels,
+            hue: other.hue,
+            hair_color: other.hair_color,
+            skin_color: other.skin_color,
+            image_layers,
+            image,
+            reward: other.reward.clone(),
+        }
+    }
+
     pub fn new(builder: ActorBuilder, resources: &Module) -> Result<Actor, Error> {
         let race = match resources.races.get(&builder.race) {
             None => {
@@ -95,6 +139,7 @@ impl Actor {
             Some(sex) => sex,
         };
 
+        let mut total_level = 0;
         let mut levels: Vec<(Rc<Class>, u32)> = Vec::new();
         for (class_id, level) in builder.levels {
             let class = match resources.classes.get(&class_id) {
@@ -104,6 +149,7 @@ impl Actor {
                 }, Some(class) => Rc::clone(class)
             };
 
+            total_level += level;
             levels.push((class, level));
         }
 
@@ -148,6 +194,9 @@ impl Actor {
             sex,
             attributes: builder.attributes,
             levels,
+            total_level,
+            xp: builder.xp.unwrap_or(0),
+            reward: builder.reward,
             items,
             to_equip,
             image_layers,
@@ -158,6 +207,10 @@ impl Actor {
         })
     }
 
+    pub fn base_class(&self) -> Rc<Class> {
+        Rc::clone(&self.levels[0].0)
+    }
+
     pub fn image_layers(&self) -> &ImageLayerSet {
         &self.image_layers
     }
@@ -165,6 +218,20 @@ impl Actor {
     pub fn draw(&self, renderer: &mut GraphicsRenderer, scale_x: f32, scale_y: f32,
                 x: f32, y: f32, millis: u32) {
         self.image.draw(renderer, scale_x, scale_y, x, y, millis);
+    }
+}
+
+#[derive(Deserialize, Debug, Serialize, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct Reward {
+    pub xp: u32,
+}
+
+impl Default for Reward {
+    fn default() -> Reward {
+        Reward {
+            xp: 0,
+        }
     }
 }
 
@@ -185,6 +252,8 @@ pub struct ActorBuilder {
     pub items: Option<Vec<String>>,
     pub equipped: Option<Vec<u32>>,
     pub levels: HashMap<String, u32>,
+    pub xp: Option<u32>,
+    pub reward: Option<Reward>,
 }
 
 impl ResourceBuilder for ActorBuilder {

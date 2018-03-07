@@ -3,7 +3,7 @@ name: Goblin
 description: "Monster"
 size: 2
 base_stats:
-  hit_points: 40
+  hit_points: 20
   accuracy: 30
   defense: 30
   fortitude: 30
@@ -27,3 +27,4 @@ image_layer_offsets:
   HeldMain: [-26, -15]
   HeldOff: [8, -13]
 image_layer_postfix: {}
+

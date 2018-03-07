@@ -25,8 +25,6 @@ use sulis_widgets::{Button, Label, TextArea};
 use sulis_module::Module;
 use sulis_state::ActorState;
 
-use CharacterBuilder;
-
 pub const NAME: &str = "character_window";
 
 pub struct CharacterWindow {
@@ -71,7 +69,7 @@ impl WidgetKind for CharacterWindow {
         level_up.borrow_mut().state.set_visible(self.character.borrow_mut().actor.has_level_up());
         level_up.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
             let root = Widget::get_root(&widget);
-            let window = Widget::with_defaults(CharacterBuilder::level_up());
+            let window = CharacterBuilder::level_up();
             window.borrow_mut().state.set_modal(true);
             Widget::add_child_to(&root, window);
         })));

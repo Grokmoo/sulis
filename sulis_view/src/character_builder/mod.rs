@@ -26,6 +26,12 @@ use self::color_button::ColorButton;
 mod cosmetic_selector_pane;
 use self::cosmetic_selector_pane::CosmeticSelectorPane;
 
+mod level_up_builder;
+use self::level_up_builder::LevelUpBuilder;
+
+mod level_up_finish_pane;
+use self::level_up_finish_pane::LevelUpFinishPane;
+
 mod race_selector_pane;
 use self::race_selector_pane::RaceSelectorPane;
 
@@ -41,8 +47,9 @@ use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
 use sulis_core::resource::write_to_file;
 use sulis_widgets::{Button, Label};
 use sulis_module::actor::Sex;
-use sulis_module::{ActorBuilder, Class, ImageLayer, Race};
+use sulis_module::{ActorBuilder, Class, ImageLayer, Module, Race};
 use sulis_rules::{AttributeList};
+use sulis_state::GameState;
 
 pub const NAME: &str = "character_builder";
 
@@ -63,6 +70,8 @@ pub struct CharacterBuilder {
     // we rely on the builder panes in the above vec having the same
     // index in the children vec of this widget
 
+    builder_set: Rc<BuilderSet>,
+
     pub race: Option<Rc<Race>>,
     pub class: Option<Rc<Class>>,
     pub attributes: Option<AttributeList>,
@@ -78,6 +87,14 @@ pub struct CharacterBuilder {
 
 impl CharacterBuilder {
     pub fn new() -> Rc<RefCell<CharacterBuilder>> {
+        CharacterBuilder::with(Rc::new(CharacterCreator {}))
+    }
+
+    pub fn level_up() -> Rc<RefCell<CharacterBuilder>> {
+        CharacterBuilder::with(Rc::new(LevelUpBuilder { pc: GameState::pc() }))
+    }
+
+    fn with(builder_set: Rc<BuilderSet>) -> Rc<RefCell<CharacterBuilder>> {
         let next = Widget::with_theme(Button::empty(), "next");
         next.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
             let parent = Widget::get_parent(widget);
@@ -102,13 +119,16 @@ impl CharacterBuilder {
             let builder = Widget::downcast_kind_mut::<CharacterBuilder>(&parent);
             let cur_pane = Rc::clone(&builder.builder_panes[builder.builder_pane_index]);
             cur_pane.borrow_mut().next(builder, Rc::clone(&parent));
-            builder.save_character();
+
+            let builder_set = Rc::clone(&builder.builder_set);
+            builder_set.finish(builder);
 
             let root = Widget::get_root(&parent);
             root.borrow_mut().invalidate_children();
         })));
 
         Rc::new(RefCell::new(CharacterBuilder {
+            builder_set,
             next,
             prev,
             finish,
@@ -126,63 +146,6 @@ impl CharacterBuilder {
             portrait: None,
             images: HashMap::new(),
         }))
-    }
-
-    fn save_character(&mut self) {
-        let utc: DateTime<Utc> = Utc::now();
-
-        let dir = "characters";
-        let id = format!("pc_{}_{}", self.name, utc.format("%Y%m%d-%H%M%S"));
-        let filename = format!("{}/{}.yml", dir, id);
-
-        info!("Saving character {}", id);
-
-        if let Err(e) = fs::create_dir_all(dir) {
-            error!("Unable to create characters directory '{}'", dir);
-            error!("{}", e);
-            return;
-        }
-
-        if self.race.is_none() || self.class.is_none() || self.attributes.is_none() {
-            warn!("Unable to save character with undefined stats");
-            return;
-        }
-
-        let mut levels = HashMap::new();
-        levels.insert(self.class.as_ref().unwrap().id.to_string(), 1);
-
-        let mut equipped = Vec::new();
-        if let Some(ref items) = self.items {
-            for (index, _) in items.iter().enumerate() {
-                equipped.push(index as u32);
-            }
-        }
-
-        let actor = ActorBuilder {
-            id,
-            name: self.name.to_string(),
-            portrait: self.portrait.clone(),
-            race: self.race.as_ref().unwrap().id.to_string(),
-            sex: self.sex,
-            attributes: self.attributes.unwrap(),
-            player: Some(true),
-            images: self.images.clone(),
-            hue: self.hue,
-            hair_color: self.hair_color,
-            skin_color: self.skin_color,
-            items: self.items.clone(),
-            equipped: Some(equipped),
-            levels,
-        };
-
-        info!("Writing character to {}", filename);
-        match write_to_file(&filename, &actor) {
-            Err(e) => {
-                error!("Unable to write actor to file {}", filename);
-                error!("{}", e);
-            },
-            Ok(()) => (),
-        }
     }
 
     pub fn next(&mut self, widget: &Rc<RefCell<Widget>>) {
@@ -210,13 +173,29 @@ impl WidgetKind for CharacterBuilder {
     fn as_any(&self) -> &Any { self }
     fn as_any_mut(&mut self) -> &mut Any { self }
 
-    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let title = Widget::with_theme(Label::empty(), "title");
         let close = Widget::with_theme(Button::empty(), "close");
         close.borrow_mut().state.add_callback(Callback::remove_parent());
 
+        let builder_set = Rc::clone(&self.builder_set);
+        let mut children = builder_set.on_add(self, widget);
+
+        children.append(&mut vec![title, close, Rc::clone(&self.next),
+            Rc::clone(&self.prev), Rc::clone(&self.finish)]);
+        children
+    }
+}
+
+struct CharacterCreator {}
+
+impl BuilderSet for CharacterCreator {
+    fn on_add(&self, builder: &mut CharacterBuilder,
+              _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+        let class_choices = Module::rules().selectable_classes.clone();
+
         let race_selector_pane = RaceSelectorPane::new();
-        let class_selector_pane = ClassSelectorPane::new();
+        let class_selector_pane = ClassSelectorPane::new(class_choices, true);
         let attribute_selector_pane = AttributeSelectorPane::new();
         let cosmetic_selector_pane = CosmeticSelectorPane::new();
         let race_sel_widget = Widget::with_defaults(race_selector_pane.clone());
@@ -226,18 +205,83 @@ impl WidgetKind for CharacterBuilder {
         class_sel_widget.borrow_mut().state.set_visible(false);
         attr_sel_widget.borrow_mut().state.set_visible(false);
         cosmetic_sel_widget.borrow_mut().state.set_visible(false);
-        self.finish.borrow_mut().state.set_visible(false);
+        builder.finish.borrow_mut().state.set_visible(false);
 
-        self.builder_panes.clear();
-        self.builder_pane_index = 0;
-        self.builder_panes.push(race_selector_pane.clone());
-        self.builder_panes.push(class_selector_pane.clone());
-        self.builder_panes.push(attribute_selector_pane.clone());
-        self.builder_panes.push(cosmetic_selector_pane.clone());
+        builder.builder_panes.clear();
+        builder.builder_pane_index = 0;
+        builder.builder_panes.push(race_selector_pane.clone());
+        builder.builder_panes.push(class_selector_pane.clone());
+        builder.builder_panes.push(attribute_selector_pane.clone());
+        builder.builder_panes.push(cosmetic_selector_pane.clone());
 
-        race_selector_pane.borrow_mut().on_selected(self, Rc::clone(&race_sel_widget));
+        race_selector_pane.borrow_mut().on_selected(builder, Rc::clone(&race_sel_widget));
 
-        vec![race_sel_widget, class_sel_widget, attr_sel_widget, cosmetic_sel_widget, title, close,
-            Rc::clone(&self.next), Rc::clone(&self.prev), Rc::clone(&self.finish)]
+        vec![race_sel_widget, class_sel_widget, attr_sel_widget, cosmetic_sel_widget]
     }
+
+    fn finish(&self, builder: &mut CharacterBuilder) {
+        let utc: DateTime<Utc> = Utc::now();
+
+        let dir = "characters";
+        let id = format!("pc_{}_{}", builder.name, utc.format("%Y%m%d-%H%M%S"));
+        let filename = format!("{}/{}.yml", dir, id);
+
+        info!("Saving character {}", id);
+
+        if let Err(e) = fs::create_dir_all(dir) {
+            error!("Unable to create characters directory '{}'", dir);
+            error!("{}", e);
+            return;
+        }
+
+        if builder.race.is_none() || builder.class.is_none() || builder.attributes.is_none() {
+            warn!("Unable to save character with undefined stats");
+            return;
+        }
+
+        let mut levels = HashMap::new();
+        levels.insert(builder.class.as_ref().unwrap().id.to_string(), 1);
+
+        let mut equipped = Vec::new();
+        if let Some(ref items) = builder.items {
+            for (index, _) in items.iter().enumerate() {
+                equipped.push(index as u32);
+            }
+        }
+
+        let actor = ActorBuilder {
+            id,
+            name: builder.name.to_string(),
+            portrait: builder.portrait.clone(),
+            race: builder.race.as_ref().unwrap().id.to_string(),
+            sex: builder.sex,
+            attributes: builder.attributes.unwrap(),
+            player: Some(true),
+            images: builder.images.clone(),
+            hue: builder.hue,
+            hair_color: builder.hair_color,
+            skin_color: builder.skin_color,
+            items: builder.items.clone(),
+            equipped: Some(equipped),
+            levels,
+            xp: None,
+            reward: None,
+        };
+
+        info!("Writing character to {}", filename);
+        match write_to_file(&filename, &actor) {
+            Err(e) => {
+                error!("Unable to write actor to file {}", filename);
+                error!("{}", e);
+            },
+            Ok(()) => (),
+        }
+    }
+}
+
+pub trait BuilderSet {
+    fn on_add(&self, builder: &mut CharacterBuilder,
+              widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>>;
+
+    fn finish(&self, builder: &mut CharacterBuilder);
 }

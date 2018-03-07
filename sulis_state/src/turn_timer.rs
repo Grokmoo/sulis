@@ -94,6 +94,17 @@ impl TurnTimer {
         GameState::set_entering_combat();
     }
 
+    pub fn end_combat(&mut self) {
+        for entity in self.entities.iter() {
+            if !entity.borrow().is_pc() { continue; }
+
+            entity.borrow_mut().actor.init_turn();
+
+            // TODO don't just heal at the end of combat
+            entity.borrow_mut().actor.init();
+        }
+    }
+
     pub fn is_active(&self) -> bool {
         self.active
     }
@@ -104,7 +115,7 @@ impl TurnTimer {
             self.active = active;
 
             if !active {
-                self.entities.iter().for_each(|e| if e.borrow().is_pc() { e.borrow_mut().actor.init_turn(); });
+                self.end_combat();
             } else {
                 self.roll_initiative();
             }

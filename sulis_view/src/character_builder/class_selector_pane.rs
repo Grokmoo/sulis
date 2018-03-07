@@ -28,13 +28,17 @@ use character_builder::BuilderPane;
 pub const NAME: &str = "class_selector_pane";
 
 pub struct ClassSelectorPane {
+    class_choices: Vec<String>,
+    allow_prev: bool,
     selected_class: Option<Rc<Class>>,
 }
 
 impl ClassSelectorPane {
-    pub fn new() -> Rc<RefCell<ClassSelectorPane>> {
+    pub fn new(choices: Vec<String>, allow_prev: bool) -> Rc<RefCell<ClassSelectorPane>> {
         Rc::new(RefCell::new(ClassSelectorPane {
             selected_class: None,
+            class_choices: choices,
+            allow_prev,
         }))
     }
 }
@@ -42,7 +46,7 @@ impl ClassSelectorPane {
 impl BuilderPane for ClassSelectorPane {
     fn on_selected(&mut self, builder: &mut CharacterBuilder, _widget: Rc<RefCell<Widget>>) {
         builder.class = None;
-        builder.prev.borrow_mut().state.set_enabled(true);
+        builder.prev.borrow_mut().state.set_enabled(self.allow_prev);
         builder.next.borrow_mut().state.set_enabled(self.selected_class.is_some());
     }
 
@@ -56,7 +60,9 @@ impl BuilderPane for ClassSelectorPane {
     }
 
     fn prev(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
-        builder.prev(&widget);
+        if self.allow_prev {
+            builder.prev(&widget);
+        }
     }
 }
 
@@ -69,7 +75,7 @@ impl WidgetKind for ClassSelectorPane {
         let title = Widget::with_theme(Label::empty(), "title");
 
         let classes_pane = Widget::empty("classes_pane");
-        for class_id in Module::rules().selectable_classes.iter() {
+        for class_id in self.class_choices.iter() {
             let class = match Module::class(class_id) {
                 None => {
                     warn!("Selectable class '{}' not found", class_id);

@@ -227,8 +227,8 @@ children:
         text: |
           [s=6|#name# - #race# #sex#]
           [s=4|]
-          [s=5|[x=0|Hit Points][x=50|Action Points]]
-          [x=0|#cur_hp# / #max_hp#][x=50|#cur_ap#]
+          [s=5|[x=0|Hit Points][x=25|Action Points][x=55|Experience]]
+          [x=0|#cur_hp# / #max_hp#][x=25|#cur_ap#][x=55|#cur_xp# / #next_xp#]
           [s=4|]
           [s=5|Level #level_0# #class_0#]
           [s=5|]
@@ -252,8 +252,17 @@ children:
           [?portrait;x=80;y=0;i=#portrait#;s=30.0|]
         preferred_size: [0, -8]
         position: [0, 8]
+
         width_relative: Max
         height_relative: Max
+      level_up:
+        from: .button
+        text: "Level Up"
+        text_params:
+          scale: 6.0
+        x_relative: Max
+        preferred_size: [25, 8]
+        position: [-5, 4]
   race_pane:
     preferred_size: [40, 40]
     background: bg_base

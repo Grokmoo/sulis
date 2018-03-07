@@ -116,6 +116,10 @@ impl EntityState {
         }
     }
 
+    pub fn add_xp(&mut self, xp: u32) {
+        self.actor.add_xp(xp);
+    }
+
     pub fn remove_hp(&mut self, hp: u32) {
         self.actor.remove_hp(hp);
 

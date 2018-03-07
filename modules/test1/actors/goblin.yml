@@ -11,6 +11,8 @@ attributes:
   int: 7
   wis: 9
 levels:
-  fighter: 1
+  rogue: 1
 items: [ club ]
 equipped: [ 0 ]
+reward:
+  xp: 10

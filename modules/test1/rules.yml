@@ -24,3 +24,5 @@ max_prop_distance: 2.5
 
 selectable_races: [ human, elf, merling ]
 selectable_classes: [ fighter, rogue ]
+
+experience_for_level: [100, 300, 600, 1000, 1500, 2100, 2800]

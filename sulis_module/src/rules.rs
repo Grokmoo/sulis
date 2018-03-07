@@ -51,9 +51,18 @@ pub struct Rules {
 
     pub selectable_races: Vec<String>,
     pub selectable_classes: Vec<String>,
+
+    pub experience_for_level: Vec<u32>,
 }
 
 impl Rules {
+    pub fn get_xp_for_next_level(&self, cur_level: u32) -> u32 {
+        if cur_level < 1 { return 0; }
+        if cur_level - 1 >= self.experience_for_level.len() as u32 { return 0; }
+
+        self.experience_for_level[(cur_level - 1) as usize]
+    }
+
     pub fn attack_roll(&self, accuracy: i32, defense: i32) -> HitKind {
         let roll = rand::thread_rng().gen_range(1, 101);
         debug!("Attack roll: {} with accuracy {} against {}", roll, accuracy, defense);

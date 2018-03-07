@@ -30,6 +30,8 @@ pub struct ActorState {
     pub listeners: ChangeListenerList<ActorState>,
     hp: i32,
     ap: u32,
+    xp: u32,
+    has_level_up: bool,
     inventory: Inventory,
     image: LayeredImage,
 }
@@ -47,6 +49,7 @@ impl ActorState {
                                                                     actor.skin_color), actor.hue);
         let attrs = actor.attributes;
 
+        let xp = actor.xp;
         ActorState {
             actor,
             inventory,
@@ -54,8 +57,16 @@ impl ActorState {
             listeners: ChangeListenerList::default(),
             hp: 0,
             ap: 0,
+            xp,
+            has_level_up: false,
             image,
         }
+    }
+
+    pub fn level_up(&mut self, new_actor: Actor) {
+        self.actor = Rc::new(new_actor);
+        self.compute_stats();
+        self.init();
     }
 
     pub fn draw_graphics_mode(&self, renderer: &mut GraphicsRenderer, scale_x: f32, scale_y: f32,
@@ -123,6 +134,7 @@ impl ActorState {
             not_first = true;
         }
 
+        self.check_death(target);
         (damage_str, color)
     }
 
@@ -173,6 +185,31 @@ impl ActorState {
 
     pub fn is_dead(&self) -> bool {
         self.hp <= 0
+    }
+
+    pub fn check_death(&mut self, target: &Rc<RefCell<EntityState>>) {
+        if target.borrow().actor.hp() > 0 { return; }
+
+        let target = target.borrow();
+        let reward = match target.actor.actor.reward {
+            None => return,
+            Some(ref reward) => reward,
+        };
+
+        self.add_xp(reward.xp);
+    }
+
+    pub fn has_level_up(&self) -> bool {
+        self.has_level_up
+    }
+
+    pub fn add_xp(&mut self, xp: u32) {
+        self.xp += xp;
+        self.compute_stats();
+    }
+
+    pub fn xp(&self) -> u32 {
+        self.xp
     }
 
     pub fn hp(&self) -> i32 {
@@ -235,6 +272,7 @@ impl ActorState {
         let rules = Module::rules();
         self.stats.initiative = rules.base_initiative;
         self.stats.add(&self.actor.race.base_stats);
+
         for &(ref class, level) in self.actor.levels.iter() {
             self.stats.add_multiple(&class.bonuses_per_level, level);
         }
@@ -268,6 +306,8 @@ impl ActorState {
         };
 
         self.stats.finalize(attacks_list, multiplier, rules.base_attribute);
+
+        self.has_level_up = rules.get_xp_for_next_level(self.actor.total_level) < self.xp;
 
         self.listeners.notify(&self);
     }

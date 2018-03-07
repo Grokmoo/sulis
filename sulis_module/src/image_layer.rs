@@ -54,6 +54,7 @@ impl ImageLayer {
     }
 }
 
+#[derive(Clone, Debug)]
 pub struct ImageLayerSet {
     images: HashMap<Sex, HashMap<ImageLayer, Rc<Image>>>,
 }

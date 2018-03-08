@@ -43,6 +43,7 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
+use sulis_core::config;
 use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
 use sulis_core::resource::write_to_file;
 use sulis_widgets::{Button, Label};
@@ -219,14 +220,16 @@ impl BuilderSet for CharacterCreator {
     fn finish(&self, builder: &mut CharacterBuilder, widget: &Rc<RefCell<Widget>>) {
         let utc: DateTime<Utc> = Utc::now();
 
-        let dir = "characters";
+        let mut path = config::USER_DIR.clone();
+        path.push("characters");
+        let dir = path.as_path();
         let id = format!("pc_{}_{}", builder.name, utc.format("%Y%m%d-%H%M%S"));
-        let filename = format!("{}/{}.yml", dir, id);
+        let filename = format!("{}/{}.yml", dir.to_string_lossy(), id);
 
         info!("Saving character {}", id);
 
         if let Err(e) = fs::create_dir_all(dir) {
-            error!("Unable to create characters directory '{}'", dir);
+            error!("Unable to create characters directory '{}'", dir.to_string_lossy());
             error!("{}", e);
             return;
         }

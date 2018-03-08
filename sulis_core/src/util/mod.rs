@@ -30,7 +30,7 @@ use std::panic;
 use backtrace::Backtrace;
 use flexi_logger::{Logger, opt_format};
 
-use config::CONFIG;
+use config::{self, CONFIG};
 use ui::Widget;
 use io::{IO, MainLoopUpdater};
 
@@ -115,9 +115,13 @@ pub fn main_loop(io: &mut Box<IO>, root: Rc<RefCell<Widget>>,
 }
 
 pub fn setup_logger() {
+    let mut path = config::USER_DIR.clone();
+    path.push("log");
+    let log_dir = path.to_string_lossy();
+
     let mut logger = Logger::with_str(&CONFIG.logging.log_level)
         .log_to_file()
-        .directory("log")
+        .directory(log_dir)
         .duplicate_error()
         .format(opt_format);
 

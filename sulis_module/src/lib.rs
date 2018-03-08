@@ -72,6 +72,7 @@ use std::path::PathBuf;
 use std::fs;
 use std::ffi::OsStr;
 
+use sulis_core::config;
 use sulis_core::resource::{all_resources, read, read_single_resource, get_resource, insert_if_ok};
 
 use self::area::Tile;
@@ -168,15 +169,22 @@ impl Module {
         modules
     }
 
-    pub fn get_available_characters(root_dir: &str) -> Vec<Actor> {
+    pub fn get_available_characters() -> Vec<Actor> {
+        let mut path = config::USER_DIR.clone();
+        path.push("characters");
+
         let mut actors = Vec::new();
 
+        if let Err(_) = fs::create_dir_all(&path) {
+            warn!("Unable to create directory: '{}'", path.to_string_lossy());
+            return actors;
+        }
+
         debug!("Reading list of available characters");
-        let path = PathBuf::from(root_dir);
-        let dir_entries = match fs::read_dir(path) {
+        let dir_entries = match fs::read_dir(&path) {
             Ok(entries) => entries,
             Err(_) => {
-                warn!("Unable to read directory: '{}'", root_dir);
+                warn!("Unable to read directory: '{}'", path.to_string_lossy());
                 return actors;
             }
         };

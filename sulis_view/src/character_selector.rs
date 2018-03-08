@@ -114,7 +114,7 @@ impl WidgetKind for CharacterSelector {
 
         let characters_pane = Widget::empty("characters_pane");
         {
-            let characters = Module::get_available_characters("characters");
+            let characters = Module::get_available_characters();
             for actor in characters {
                 trace!("Adding button for {}", actor.id);
                 let actor_button = Widget::with_theme(Button::empty(), "character_button");

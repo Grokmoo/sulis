@@ -7,14 +7,17 @@ include:
 children:
   mouse_over:
     from: .text_area
+    border: { top: 1, bottom: 1, left: 2, right: 2 }
     background: bg_base
     text: |
-      [x=2.0;y=1.0;s=5.0|#name#]
-      [?cur_hp;x=2.0|#cur_hp# / #max_hp#]
+      [c=f00;s=5.0|#name#]
+      [?cur_hp|#cur_hp# / #max_hp#]
     preferred_size: [20, 12]
+    width_relative: Custom
+    height_relative: Custom
     x_relative: Custom
     y_relative: Custom
-    position: [-10, 0]
+    position: [0, 0]
   right_pane:
     background: bg_base
     border: [1, 1, 1, 1]
@@ -188,7 +191,7 @@ children:
             from: .item_button
   item_window:
     from: .text_area
-    border: { top: 3, bottom: 3, left: 2, right: 2 }
+    border: { top: 1, bottom: 1, left: 1, right: 1 }
     background: bg_base
     text: |
       [s=5.0;c=f00|#name#
@@ -213,8 +216,10 @@ children:
       ][?reflex|[s=4.0|Reflex: #reflex#]
       ][?will|[s=4.0|Will: #will#]
       ]
+    width_relative: Custom
+    height_relative: Custom
     preferred_size: [50, 14]
-    position: [0, -7]
+    position: [0, 0]
     x_relative: Custom
     y_relative: Custom
   character_window:

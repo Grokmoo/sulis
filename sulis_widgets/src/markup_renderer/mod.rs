@@ -110,6 +110,8 @@ pub struct MarkupRenderer {
     font: Rc<Font>,
     width: f32,
     draw_lists: Vec<DrawList>,
+    bottom_y: f32,
+    right_x: f32,
 }
 
 /// Struct for rendering text that is marked up with the simple
@@ -121,7 +123,17 @@ impl MarkupRenderer {
             font: Rc::clone(font),
             width: width as f32,
             draw_lists,
+            bottom_y: 0.0,
+            right_x: 0.0,
         }
+    }
+
+    pub fn text_bottom(&self) -> i32 {
+        self.bottom_y as i32
+    }
+
+    pub fn text_right(&self) -> i32 {
+        self.right_x.ceil() as i32
     }
 
     /// This sets up the drawing cache for this renderer.  it should be
@@ -208,10 +220,20 @@ impl MarkupRenderer {
         }
 
         self.draw_current(&mut word_buf, &cur_markup, x, y, pos_x, max_x, word_width);
+
+        if self.bottom_y < widget_state.inner_top() as f32 {
+            self.bottom_y = widget_state.inner_top() as f32;
+        }
+
+        if self.right_x < widget_state.inner_left() as f32 {
+            self.right_x = widget_state.inner_left() as f32;
+        }
     }
 
     fn draw_current(&mut self, word_buf: &mut String, markup: &Markup, mut x: f32, mut y: f32,
                     start_x: f32, max_x: f32, word_width: u32) -> (f32, f32) {
+        let factor = markup.font.base as f32 / markup.font.line_height as f32;
+
         if markup.ignore {
             word_buf.clear();
             return (x, y);
@@ -219,7 +241,6 @@ impl MarkupRenderer {
 
         let width = word_width as f32 * markup.scale / markup.font.line_height as f32;
         if x + width > max_x {
-            let factor = markup.font.base as f32 / markup.font.line_height as f32;
             x = start_x;
             y += markup.scale * factor;
         }
@@ -228,11 +249,19 @@ impl MarkupRenderer {
         for c in word_buf.chars() {
             match c {
                 '\n' => {
-                    let factor = markup.font.base as f32 / markup.font.line_height as f32;
                     x = start_x;
                     y += markup.scale * factor;
                 }, _ => {
                     x = markup.add_quad_and_advance(&mut quads, c, x, y);
+
+                    let bottom_y = y + (markup.scale - 1.0) * factor;
+                    if bottom_y > self.bottom_y {
+                        self.bottom_y = bottom_y;
+                    }
+
+                    if x > self.right_x {
+                        self.right_x = x;
+                    }
                 }
             }
         }

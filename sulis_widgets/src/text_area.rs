@@ -18,9 +18,10 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
+use sulis_core::ui::theme::SizeRelative;
 use sulis_core::ui::{Widget, WidgetKind};
 use sulis_core::io::GraphicsRenderer;
-use sulis_core::util::{Point};
+use sulis_core::util::{Point, Size};
 use MarkupRenderer;
 
 pub struct TextArea {
@@ -55,10 +56,29 @@ impl WidgetKind for TextArea {
 
         widget.do_base_layout();
 
+        let mut right = widget.state.inner_right();
+        let mut bottom = widget.state.inner_top();
         if let Some(ref font) = widget.state.font {
             let mut renderer = MarkupRenderer::new(font, widget.state.inner_size.width);
             renderer.render_to_cache(&widget.state);
+            bottom = renderer.text_bottom();
+            right = renderer.text_right();
             widget.state.text_renderer = Some(Box::new(renderer));
+        }
+
+        if let Some(ref theme) = widget.theme {
+            let mut height = widget.state.size.height;
+            let mut width = widget.state.size.width;
+
+            if theme.height_relative == SizeRelative::Custom {
+                height = bottom - widget.state.position.y + widget.state.border.bottom;
+            }
+
+            if theme.width_relative == SizeRelative::Custom {
+                width = right - widget.state.position.x + widget.state.border.right;
+            }
+
+            widget.state.set_size(Size::new(width, height));
         }
     }
 

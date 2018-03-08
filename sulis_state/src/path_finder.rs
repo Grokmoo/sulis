@@ -22,7 +22,7 @@ use sulis_core::util::Point;
 use sulis_module::Area;
 use {EntityState, AreaState};
 
-const MAX_ITERATIONS: i32 = 200;
+const MAX_ITERATIONS: i32 = 400;
 
 pub struct PathFinder {
     pub width: i32,

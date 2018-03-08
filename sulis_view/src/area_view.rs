@@ -88,8 +88,9 @@ impl AreaView {
         self.scroll.set(x, y);
     }
 
-    pub fn get_mouseover_pos(&self, x: i32, y: i32, width: i32, height: i32) -> (i32, i32) {
-        let x = x as f32 + width as f32 / 2.0;
+    pub fn get_mouseover_pos(&self, x: i32, y: i32, _width: i32, height: i32) -> (i32, i32) {
+        // let x = x as f32 + width as f32 / 2.0;
+        let x = x as f32;
         let y = y as f32 + height as f32;
         let x = ((x - self.scroll.x()) * self.scale.0).round() as i32;
         let y = ((y - self.scroll.y()) * self.scale.1).round() as i32;

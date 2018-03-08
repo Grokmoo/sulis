@@ -47,6 +47,7 @@ pub enum SizeRelative {
     Max,
     ChildMax,
     ChildSum,
+    Custom,
 }
 
 #[derive(Deserialize, Debug, Clone, Copy, PartialEq)]

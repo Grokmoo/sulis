@@ -21,7 +21,7 @@ use std::cell::RefCell;
 use sulis_core::ui::{Widget, WidgetKind};
 use sulis_core::io::{GraphicsRenderer};
 use sulis_core::util::Point;
-use sulis_widgets::{MarkupRenderer, TextArea};
+use sulis_widgets::{TextArea};
 use sulis_state::{GameState};
 
 const NAME: &'static str = "prop_mouseover";
@@ -69,13 +69,7 @@ impl WidgetKind for PropMouseover {
 
         widget.state.add_text_arg("name", &prop.prop.name);
 
-        widget.do_base_layout();
-
-        if let Some(ref font) = widget.state.font {
-            let mut renderer = MarkupRenderer::new(font, widget.state.inner_size.width);
-            renderer.render_to_cache(&widget.state);
-            widget.state.text_renderer = Some(Box::new(renderer));
-        }
+        self.text_area.borrow_mut().layout(widget);
     }
 
     fn draw_graphics_mode(&mut self, renderer: &mut GraphicsRenderer, pixel_size: Point,

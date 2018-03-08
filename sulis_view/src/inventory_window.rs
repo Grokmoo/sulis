@@ -176,7 +176,7 @@ impl WidgetKind for ItemButton {
                 let mut item_window = item_window.borrow_mut();
                 item_window.state.disable();
                 item_window.state.set_position(widget.borrow().state.inner_right(),
-                (widget.borrow().state.inner_top() + widget.borrow().state.inner_bottom()) / 2);
+                    widget.borrow().state.inner_top());
 
                 item_window.state.add_text_arg("name", &item_state.item.name);
 

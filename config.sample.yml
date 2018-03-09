@@ -23,7 +23,7 @@ display:
     default_font: "normal"
     
     # The default mouse pointer
-    default_cursor: "mouse_default"
+    default_cursor: "mouse"
 
 resources:
     # all resources are subdirectories under this

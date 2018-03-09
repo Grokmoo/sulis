@@ -22,7 +22,7 @@ use io::event::ClickKind;
 use io::{event, Event, GraphicsRenderer};
 use config::CONFIG;
 use resource::ResourceSet;
-use ui::{animation_state, Widget};
+use ui::{animation_state, AnimationState, Widget};
 
 pub struct Cursor {
     pub x: i32,
@@ -35,6 +35,7 @@ pub struct Cursor {
 
     pub button_down: Option<ClickKind>,
     pub image: Option<Rc<Image>>,
+    pub state: AnimationState,
 }
 
 thread_local! {
@@ -47,6 +48,7 @@ thread_local! {
         yf: 0.0,
         button_down: None,
         image: None,
+        state: AnimationState::default(),
     });
 }
 
@@ -68,8 +70,22 @@ impl Cursor {
 
             let w = image.get_width_f32();
             let h = image.get_height_f32();
-            image.draw_graphics_mode(renderer, &animation_state::NORMAL, cursor.xf - w / 2.0,
+            image.draw_graphics_mode(renderer, &cursor.state, cursor.xf - w / 2.0,
                                      cursor.yf - h / 2.0, w, h, millis);
+        });
+    }
+
+    pub fn set_cursor_state(kind: animation_state::Kind) {
+        CURSOR.with(|cursor| {
+            let mut cursor = cursor.borrow_mut();
+            cursor.state = AnimationState::with(kind);
+        });
+    }
+
+    pub fn set_cursor_image(image: Option<Rc<Image>>) {
+        CURSOR.with(|cursor| {
+            let mut cursor = cursor.borrow_mut();
+            cursor.image = image;
         });
     }
 
@@ -136,6 +152,10 @@ impl Cursor {
             if new_x as i32 >= cursor.max_x || new_y as i32 >= cursor.max_y {
                 return false;
             }
+
+            // reset cursor to default every time it moves.  area view
+            // will then set it to the correct state if appropriate
+            cursor.state = AnimationState::default();
 
             cursor.xf = new_x;
             cursor.yf = new_y;

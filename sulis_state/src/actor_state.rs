@@ -132,6 +132,8 @@ impl ActorState {
 
                 target.borrow_mut().remove_hp(total);
                 damage_str.push_str(&format!("{:?}: {}", hit_kind, total));
+            } else {
+                damage_str.push_str(&format!("{:?}: {}", hit_kind, 0));
             }
 
             not_first = true;

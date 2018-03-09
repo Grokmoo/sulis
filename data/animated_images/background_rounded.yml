@@ -1,0 +1,10 @@
+id: background_rounded
+states:
+    normal: bg_rounded
+    hover: bg_rounded_hover
+    active: bg_rounded_pressed
+    active + hover: bg_rounded_pressed
+    pressed + hover: bg_rounded_pressed
+    disabled: bg_rounded_disabled
+    disabled + hover: bg_rounded_disabled
+    disabled + pressed + hover: bg_rounded_disabled

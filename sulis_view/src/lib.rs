@@ -53,6 +53,9 @@ pub use self::inventory_window::InventoryWindow;
 mod loading_screen;
 pub use self::loading_screen::LoadingScreen;
 
+mod portrait_view;
+pub use self::portrait_view::PortraitView;
+
 mod prop_mouseover;
 pub use self::prop_mouseover::PropMouseover;
 
@@ -245,8 +248,10 @@ impl WidgetKind for RootView {
                 view.show_menu(&parent);
             })));
 
+            let portrait = Widget::with_defaults(PortraitView::new(GameState::pc()));
+
             Widget::add_children_to(&right_pane, vec![inv_button, cha_button, map_button,
-                                    log_button, men_button]);
+                                    log_button, men_button, portrait]);
         }
 
         let widget_ref = Rc::clone(&widget);

@@ -14,7 +14,6 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::slice::Iter;
 use std::io::{Error, ErrorKind};
 use std::collections::HashMap;
 
@@ -27,6 +26,13 @@ pub enum Kind {
     Pressed,
     Active,
     Disabled,
+
+    MouseMove,
+    MouseActivate,
+    MouseAttack,
+    MouseTravel,
+    MouseSelect,
+    MouseInvalid,
 }
 
 impl Kind {
@@ -37,29 +43,30 @@ impl Kind {
             Pressed => "pressed",
             Active => "active",
             Disabled => "disabled",
+            MouseMove => "mouse_move",
+            MouseActivate => "mouse_activate",
+            MouseAttack => "mouse_attack",
+            MouseTravel => "mouse_travel",
+            MouseSelect => "mouse_select",
+            MouseInvalid => "mouse_invalid",
         }
-    }
-
-    pub fn iter() -> Iter<'static, Kind> {
-        static STATES: [Kind; 5] = [
-            Normal,
-            Hover,
-            Pressed,
-            Active,
-            Disabled,
-        ];
-        STATES.iter()
     }
 
     pub fn find(text: &str) -> Option<Kind> {
-        match text {
-            "normal" => Some(Normal),
-            "hover" => Some(Hover),
-            "pressed" => Some(Pressed),
-            "active" => Some(Active),
-            "disabled" => Some(Disabled),
-            _ => None,
-        }
+        Some(match text {
+            "normal" => Normal,
+            "hover" => Hover,
+            "pressed" => Pressed,
+            "active" => Active,
+            "disabled" => Disabled,
+            "mouse_move" => MouseMove,
+            "mouse_activate" => MouseActivate,
+            "mouse_attack" => MouseAttack,
+            "mouse_travel" => MouseTravel,
+            "mouse_select" => MouseSelect,
+            "mouse_invalid" => MouseInvalid,
+            _ => return None,
+        })
     }
 }
 

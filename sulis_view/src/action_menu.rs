@@ -18,7 +18,7 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_core::ui::{Callback, Cursor, Widget, WidgetKind};
+use sulis_core::ui::{animation_state, Callback, Cursor, Widget, WidgetKind};
 use sulis_core::io::event::ClickKind;
 use sulis_core::util::Point;
 use sulis_module::{Area, Module, ObjectSize};
@@ -210,14 +210,22 @@ impl ActionMenu {
         let state = state.borrow();
 
         if let Some(ref entity) = self.hovered_entity {
+            if entity.borrow().is_pc() {
+                Cursor::set_cursor_state(animation_state::Kind::MouseSelect);
+            } else {
+                Cursor::set_cursor_state(animation_state::Kind::MouseAttack);
+            }
             let size = Rc::clone(&entity.borrow().size);
             (size, entity.borrow().location.to_point())
         } else if let Some(ref transition) = state.get_transition_at(x, y) {
+            Cursor::set_cursor_state(animation_state::Kind::MouseTravel);
             (Rc::clone(&transition.size), transition.from)
         } else if let Some(index) = self.hovered_prop {
+            Cursor::set_cursor_state(animation_state::Kind::MouseActivate);
             let prop = &state.props[index];
             (Rc::clone(&prop.prop.size), prop.location.to_point())
         } else {
+            Cursor::set_cursor_state(animation_state::Kind::MouseMove);
             let pc = GameState::pc();
             let size = Rc::clone(&pc.borrow().size);
             let pos = Point::new(self.area_pos.x - size.width / 2,

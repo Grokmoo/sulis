@@ -1,0 +1,8 @@
+id: bg_rounded_pressed
+generate_sub_images:
+  size: [4, 4]
+  spritesheet: "gui"
+grid: [ bg_rounded_pressed_top_left,    bg_rounded_pressed_top_middle,    bg_rounded_pressed_top_right,
+        bg_rounded_pressed_middle_left, bg_rounded_pressed_middle,        bg_rounded_pressed_middle_right,
+        bg_rounded_pressed_bottom_left, bg_rounded_pressed_bottom_middle, bg_rounded_pressed_bottom_right
+      ]

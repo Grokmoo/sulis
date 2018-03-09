@@ -220,6 +220,23 @@ impl AreaState {
         true
     }
 
+    pub(crate) fn remove_prop(&mut self, index: usize) {
+        trace!("Removing prop '{}'", self.props[index].prop.id);
+
+        let start_x = self.props[index].location.x as usize;
+        let start_y = self.props[index].location.y as usize;
+        let end_x = start_x + self.props[index].prop.size.width as usize;
+        let end_y = start_y + self.props[index].prop.size.height as usize;
+
+        for y in start_y..end_y {
+            for x in start_x..end_x {
+                self.prop_grid[x + y * self.area.width as usize] = None;
+            }
+        }
+
+        self.props.remove(index);
+    }
+
     pub(crate) fn add_actor(&mut self, actor: Rc<Actor>,
                      location: Location, is_pc: bool) -> bool {
         let entity = EntityState::new(actor, location.clone(), 0, is_pc);
@@ -335,8 +352,7 @@ impl AreaState {
         let mut index = self.props.len() - 1;
         while index > 0 {
             if self.props[index].is_marked_for_removal() {
-                trace!("Removing prop '{}'", self.props[index].prop.id);
-                self.props.remove(index);
+                self.remove_prop(index);
                 notify = true;
             }
             index -= 1;

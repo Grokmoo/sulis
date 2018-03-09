@@ -433,6 +433,10 @@ impl WidgetKind for AreaView {
         let left_click_action_valid = action_menu.borrow().is_default_callback_valid();
         let (size, pos) = action_menu.borrow().get_cursor();
 
+        if !left_click_action_valid {
+            Cursor::set_cursor_state(animation_state::Kind::MouseInvalid);
+        }
+
         let hover_sprite = HoverSprite {
             sprite: Rc::clone(&size.cursor_sprite),
             x: pos.x,

@@ -25,8 +25,39 @@ children:
     x_relative: Max
     height_relative: Max
     children:
+      portrait_view:
+        background: bg_rounded
+        x_relative: Max
+        preferred_size: [40, 53]
+        border: [1, 1, 1, 1]
+        children:
+          portrait:
+            width_relative: Max
+            height_relative: Max
+            preferred_size: [0, -13]
+            foreground: "#image#"
+          ap_bar:
+            text: "AP: #cur_ap#"
+            text_params:
+              scale: 4.0
+              horizontal_alignment: Center
+            background: bg_base
+            width_relative: Max
+            y_relative: Max
+            preferred_size: [0, 6]
+          hp_bar:
+            text: "HP: #cur_hp# / #max_hp#"
+            text_params:
+              scale: 4.0
+              horizontal_alignment: Center
+            background: bg_base
+            width_relative: Max
+            y_relative: Max
+            preferred_size: [0, 6]
+            position: [0, -7]
       end_turn_button:
         from: .button
+        background: background_rounded
         preferred_size: [28, 28]
         y_relative: Max
         x_relative: Max
@@ -56,6 +87,7 @@ children:
             width_relative: Max
       window_button:
         from: .button
+        background: background_rounded
         border: [1, 1, 1, 1]
         preferred_size: [13, 13]
         y_relative: Max

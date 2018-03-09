@@ -579,7 +579,7 @@ impl Widget {
 
         let len = widget.borrow().children.len();
         for i in (0..len).rev() {
-            let child = Rc::clone(widget.borrow().children.get(i).unwrap());
+            let child = Rc::clone(&widget.borrow().children[i]);
 
             if !child.borrow().state.is_enabled() || !child.borrow().state.visible {
                 continue;

@@ -134,7 +134,7 @@ groups:
       bg_large_bottom_right:  [128, 128]
   bg_medium:
     size: [24, 24]
-    position: [128, 68]
+    position: [53, 0]
     areas:
       bg_medium_top_left:      [0,  0]
       bg_medium_top_middle:    [24,  0]
@@ -145,6 +145,58 @@ groups:
       bg_medium_bottom_left:   [0, 48]
       bg_medium_bottom_middle: [24, 48]
       bg_medium_bottom_right:  [48, 48]
+  bg_rounded:
+    size: [12, 12]
+    position: [16, 0]
+    areas:
+      bg_rounded_top_left:      [0,  0]
+      bg_rounded_top_middle:    [12,  0]
+      bg_rounded_top_right:     [24, 0]
+      bg_rounded_middle_left:   [0,  12]
+      bg_rounded_middle:        [12,  12]
+      bg_rounded_middle_right:  [24, 12]
+      bg_rounded_bottom_left:   [0, 24]
+      bg_rounded_bottom_middle: [12, 24]
+      bg_rounded_bottom_right:  [24, 24]
+  bg_rounded_hover:
+    size: [12, 12]
+    position: [16, 37]
+    areas:
+      bg_rounded_hover_top_left:      [0,  0]
+      bg_rounded_hover_top_middle:    [12,  0]
+      bg_rounded_hover_top_right:     [24, 0]
+      bg_rounded_hover_middle_left:   [0,  12]
+      bg_rounded_hover_middle:        [12,  12]
+      bg_rounded_hover_middle_right:  [24, 12]
+      bg_rounded_hover_bottom_left:   [0, 24]
+      bg_rounded_hover_bottom_middle: [12, 24]
+      bg_rounded_hover_bottom_right:  [24, 24]
+  bg_rounded_pressed:
+    size: [12, 12]
+    position: [16, 74]
+    areas:
+      bg_rounded_pressed_top_left:      [0,  0]
+      bg_rounded_pressed_top_middle:    [12,  0]
+      bg_rounded_pressed_top_right:     [24, 0]
+      bg_rounded_pressed_middle_left:   [0,  12]
+      bg_rounded_pressed_middle:        [12,  12]
+      bg_rounded_pressed_middle_right:  [24, 12]
+      bg_rounded_pressed_bottom_left:   [0, 24]
+      bg_rounded_pressed_bottom_middle: [12, 24]
+      bg_rounded_pressed_bottom_right:  [24, 24]
+  bg_rounded_disabled:
+    size: [12, 12]
+    position: [16, 111]
+    areas:
+      bg_rounded_disabled_top_left:      [0,  0]
+      bg_rounded_disabled_top_middle:    [12,  0]
+      bg_rounded_disabled_top_right:     [24, 0]
+      bg_rounded_disabled_middle_left:   [0,  12]
+      bg_rounded_disabled_middle:        [12,  12]
+      bg_rounded_disabled_middle_right:  [24, 12]
+      bg_rounded_disabled_bottom_left:   [0, 24]
+      bg_rounded_disabled_bottom_middle: [12, 24]
+      bg_rounded_disabled_bottom_right:  [24, 24]
   elev:
     size: [16, 16]
     position: [74, 512]
@@ -171,6 +223,12 @@ groups:
     position: [512, 640]
     areas:
       mouse_default: [0, 0]
+      mouse_move: [128, 0]
+      mouse_container: [256, 0]
+      mouse_attack: [384, 0]
+      mouse_travel: [0, 128]
+      mouse_select: [128, 128]
+      mouse_invalid: [256, 128]
   special:
     areas:
       empty: [0, 512, 5, 5]
@@ -196,3 +254,5 @@ groups:
       cursor3by4: [178, 594, 48, 64]
       cursor4by3: [0, 643, 64, 48]
       cursor5by3: [65, 675, 80, 48]
+      
+      ball: [53, 74, 71, 71]

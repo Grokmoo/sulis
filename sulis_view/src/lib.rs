@@ -73,7 +73,7 @@ use std::cell::RefCell;
 use sulis_core::io::InputAction;
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_state::{ChangeListener, GameState};
-use sulis_widgets::{Button, ConfirmationWindow, Label};
+use sulis_widgets::{Button, ConfirmationWindow};
 
 const NAME: &str = "root";
 
@@ -85,34 +85,28 @@ impl RootView {
         Rc::new(RefCell::new(RootView { }))
     }
 
-    pub fn toggle_prop_window(&mut self, widget: &Rc<RefCell<Widget>>,
+    pub fn set_prop_window(&mut self, widget: &Rc<RefCell<Widget>>,
                               desired_state: bool, prop_index: usize) {
-        self.toggle_window(widget, self::prop_window::NAME, desired_state, &|| {
+        self.set_window(widget, self::prop_window::NAME, desired_state, &|| {
             PropWindow::new(prop_index)
         });
 
-        self.toggle_inventory_window(widget, desired_state);
+        self.set_inventory_window(widget, desired_state);
     }
 
-    pub fn toggle_inventory_window(&mut self, widget: &Rc<RefCell<Widget>>, desired_state: bool) {
-        self.toggle_window(widget, self::inventory_window::NAME, desired_state, &|| {
+    pub fn set_inventory_window(&mut self, widget: &Rc<RefCell<Widget>>, desired_state: bool) {
+        self.set_window(widget, self::inventory_window::NAME, desired_state, &|| {
             InventoryWindow::new(&GameState::pc())
         });
     }
 
-    pub fn toggle_character_window(&mut self, widget: &Rc<RefCell<Widget>>, desired_state: bool) {
-        self.toggle_window(widget, self::character_window::NAME, desired_state, &|| {
+    pub fn set_character_window(&mut self, widget: &Rc<RefCell<Widget>>, desired_state: bool) {
+        self.set_window(widget, self::character_window::NAME, desired_state, &|| {
             CharacterWindow::new(&GameState::pc())
         });
     }
 
-    pub fn toggle_character_builder(&mut self, widget: &Rc<RefCell<Widget>>, desired_state: bool) {
-        self.toggle_window(widget, self::character_builder::NAME, desired_state, &|| {
-            CharacterBuilder::new()
-        });
-    }
-
-    fn toggle_window(&mut self, widget: &Rc<RefCell<Widget>>, name: &str, desired_state: bool,
+    fn set_window(&mut self, widget: &Rc<RefCell<Widget>>, name: &str, desired_state: bool,
                      cb: &Fn() -> Rc<RefCell<WidgetKind>>) {
         match Widget::get_child_with_name(widget, name) {
             None => {
@@ -127,6 +121,32 @@ impl RootView {
             }
         }
     }
+
+    pub fn toggle_inventory_window(&mut self, widget: &Rc<RefCell<Widget>>) {
+        let desired_state = !Widget::has_child_with_name(widget, self::inventory_window::NAME);
+        self.set_inventory_window(widget, desired_state);
+    }
+
+    pub fn toggle_character_window(&mut self, widget: &Rc<RefCell<Widget>>) {
+        let desired_state = !Widget::has_child_with_name(widget, self::character_window::NAME);
+        self.set_character_window(widget, desired_state);
+    }
+
+    pub fn show_menu(&mut self, widget: &Rc<RefCell<Widget>>) {
+        let exit_window = Widget::with_theme(
+            ConfirmationWindow::new(Callback::with(
+                    Box::new(|| { GameState::set_exit(); }))),
+                    "exit_confirmation_window");
+        exit_window.borrow_mut().state.set_modal(true);
+        Widget::add_child_to(&widget, exit_window);
+    }
+
+    pub fn end_turn(&self) {
+        if GameState::is_pc_current() {
+            let area_state = GameState::area_state();
+            area_state.borrow_mut().turn_timer.next();
+        }
+    }
 }
 
 impl WidgetKind for RootView {
@@ -139,25 +159,19 @@ impl WidgetKind for RootView {
     fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
         use sulis_core::io::InputAction::*;
         match key {
-            Exit => {
-                let exit_window = Widget::with_theme(
-                    ConfirmationWindow::new(Callback::with(
-                            Box::new(|| { GameState::set_exit(); }))),
-                    "exit_confirmation_window");
-                exit_window.borrow_mut().state.set_modal(true);
-                Widget::add_child_to(&widget, exit_window);
+            ShowMenu => {
+                self.show_menu(widget);
             },
             ToggleInventory => {
                 let desired_state = !Widget::has_child_with_name(widget, self::inventory_window::NAME);
-                self.toggle_inventory_window(widget, desired_state);
+                self.set_inventory_window(widget, desired_state);
             },
             ToggleCharacter => {
                 let desired_state = !Widget::has_child_with_name(widget, self::character_window::NAME);
-                self.toggle_character_window(widget, desired_state);
+                self.set_character_window(widget, desired_state);
             },
-            ToggleCharacterBuilder => {
-                let desired_state = !Widget::has_child_with_name(widget, self::character_builder::NAME);
-                self.toggle_character_builder(widget, desired_state);
+            EndTurn => {
+                self.end_turn();
             },
             _ => return false,
         }
@@ -176,23 +190,19 @@ impl WidgetKind for RootView {
     fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         debug!("Adding to root widget.");
 
-        let mouse_over = Widget::with_theme(Label::empty(), "mouse_over");
-
-        let area_widget = Widget::with_defaults(
-            AreaView::new(Rc::clone(&mouse_over)));
+        let area_widget = Widget::with_defaults(AreaView::new());
 
         let right_pane = Widget::empty("right_pane");
         {
-            let button = Widget::with_theme(Button::empty(), "end_turn_button");
-            button.borrow_mut().state.add_callback(Callback::with(Box::new(|| {
-                if GameState::is_pc_current() {
-                    let area_state = GameState::area_state();
-                    area_state.borrow_mut().turn_timer.next();
-                }
+            let end_turn_button = Widget::with_theme(Button::empty(), "end_turn_button");
+            end_turn_button.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+                let root = Widget::get_root(&widget);
+                let view = Widget::downcast_kind_mut::<RootView>(&root);
+                view.end_turn();
             })));
-            button.borrow_mut().state.set_enabled(GameState::is_pc_current());
+            end_turn_button.borrow_mut().state.set_enabled(GameState::is_pc_current());
 
-            let button_ref = Rc::clone(&button);
+            let end_turn_button_ref = Rc::clone(&end_turn_button);
             let area_state = GameState::area_state();
             area_state.borrow_mut().turn_timer.listeners.add(
                 ChangeListener::new(NAME, Box::new(move |timer| {
@@ -200,18 +210,43 @@ impl WidgetKind for RootView {
                         None => false,
                         Some(entity) => entity.borrow().is_pc(),
                     };
-                    button_ref.borrow_mut().state.set_enabled(enabled);
+                    end_turn_button_ref.borrow_mut().state.set_enabled(enabled);
                 })));
 
-            let area_state = GameState::area_state();
-            let area_title = Widget::with_theme(
-                Label::new(&area_state.borrow().area.name), "title");
-            Widget::add_child_to(&right_pane, mouse_over);
-            Widget::add_child_to(&right_pane, button);
-            Widget::add_child_to(&right_pane, area_title);
+            Widget::add_child_to(&right_pane, end_turn_button);
 
             let ticker = Widget::with_defaults(InitiativeTicker::new());
             Widget::add_child_to(&right_pane, ticker);
+
+            let inv_button = Widget::with_theme(Button::empty(), "inventory_button");
+            inv_button.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+                let parent = Widget::get_root(&widget);
+                let view = Widget::downcast_kind_mut::<RootView>(&parent);
+                view.toggle_inventory_window(&parent);
+            })));
+
+            let cha_button = Widget::with_theme(Button::empty(), "character_button");
+            cha_button.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+                let parent = Widget::get_root(&widget);
+                let view = Widget::downcast_kind_mut::<RootView>(&parent);
+                view.toggle_character_window(&parent);
+            })));
+
+            let map_button = Widget::with_theme(Button::empty(), "map_button");
+            map_button.borrow_mut().state.set_enabled(false);
+
+            let log_button = Widget::with_theme(Button::empty(), "log_button");
+            log_button.borrow_mut().state.set_enabled(false);
+
+            let men_button = Widget::with_theme(Button::empty(), "menu_button");
+            men_button.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+                let parent = Widget::get_root(&widget);
+                let view = Widget::downcast_kind_mut::<RootView>(&parent);
+                view.show_menu(&parent);
+            })));
+
+            Widget::add_children_to(&right_pane, vec![inv_button, cha_button, map_button,
+                                    log_button, men_button]);
         }
 
         let widget_ref = Rc::clone(&widget);

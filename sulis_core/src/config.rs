@@ -77,6 +77,7 @@ pub struct DisplayConfig {
     pub width_pixels: u32,
     pub height_pixels: u32,
     pub default_font: String,
+    pub default_cursor: String,
 }
 
 #[derive(Debug, Deserialize, Clone)]

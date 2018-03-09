@@ -17,10 +17,12 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
+use image::Image;
 use io::event::ClickKind;
-use io::{event, Event};
+use io::{event, Event, GraphicsRenderer};
 use config::CONFIG;
-use ui::Widget;
+use resource::ResourceSet;
+use ui::{animation_state, Widget};
 
 pub struct Cursor {
     pub x: i32,
@@ -32,6 +34,7 @@ pub struct Cursor {
     pub yf: f32,
 
     pub button_down: Option<ClickKind>,
+    pub image: Option<Rc<Image>>,
 }
 
 thread_local! {
@@ -43,10 +46,33 @@ thread_local! {
         xf: 0.0,
         yf: 0.0,
         button_down: None,
+        image: None,
     });
 }
 
 impl Cursor {
+    pub fn draw(renderer: &mut GraphicsRenderer, millis: u32) {
+        CURSOR.with(|cursor| {
+            let mut cursor = cursor.borrow_mut();
+
+            if cursor.image.is_none() {
+                cursor.image = ResourceSet::get_image(&CONFIG.display.default_cursor);
+            }
+
+            let image = match cursor.image {
+                None => {
+                    warn!("No cursor image found!");
+                    return;
+                }, Some(ref image) => image,
+            };
+
+            let w = image.get_width_f32();
+            let h = image.get_height_f32();
+            image.draw_graphics_mode(renderer, &animation_state::NORMAL, cursor.xf - w / 2.0,
+                                     cursor.yf - h / 2.0, w, h, millis);
+        });
+    }
+
     pub fn move_by(root: &Rc<RefCell<Widget>>, x: f32, y: f32) {
         if !Cursor::move_by_internal(x, y) {
             return;

@@ -105,7 +105,7 @@ impl WidgetKind for EditorView {
     fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
         use InputAction::*;
         match key {
-            Exit => {
+            ShowMenu => {
                 let exit_window = Widget::with_theme(ConfirmationWindow::new(Callback::with(
                             Box::new(|| { EXIT.with(|exit| *exit.borrow_mut() = true); }))),
                             "exit_confirmation_window");

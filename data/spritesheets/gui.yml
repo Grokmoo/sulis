@@ -156,6 +156,21 @@ groups:
       elev_high: [64, 0]
       elev_higher: [80, 0]
       elev_highest: [96, 0]
+  menu_items:
+    size: [128, 128]
+    position: [384, 512]
+    areas:
+      menu_icon: [0, 0]
+      char_icon: [128, 0]
+      inv_icon: [256, 0]
+      log_icon: [384, 0]
+      map_icon: [512, 0]
+      end_turn_icon: [0, 128]
+  mouse_cursors:
+    size: [128, 128]
+    position: [512, 640]
+    areas:
+      mouse_default: [0, 0]
   special:
     areas:
       empty: [0, 512, 5, 5]

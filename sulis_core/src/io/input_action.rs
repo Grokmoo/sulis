@@ -24,16 +24,10 @@ use io::Event;
 #[derive(Debug, Deserialize, Copy, Clone)]
 #[serde(deny_unknown_fields)]
 pub enum InputAction {
-    MoveCursorUp,
-    MoveCursorDown,
-    MoveCursorLeft,
-    MoveCursorRight,
-    ClickCursor,
-    RightClickCursor,
     ToggleInventory,
     ToggleCharacter,
-    ToggleCharacterBuilder,
-    Exit,
+    ShowMenu,
+    EndTurn,
     MouseMove(f32, f32),
     MouseDown(ClickKind),
     MouseUp(ClickKind),
@@ -56,22 +50,6 @@ impl InputAction {
         Widget::remove_mouse_over(&root);
         use io::InputAction::*;
         match action {
-            MoveCursorUp => Cursor::move_by(&root, 0.0, -1.0),
-            MoveCursorDown => Cursor::move_by(&root, 0.0, 1.0),
-            MoveCursorLeft => Cursor::move_by(&root, -1.0, 0.0),
-            MoveCursorRight => Cursor::move_by(&root, 1.0, 0.0),
-            ClickCursor => {
-                if root.borrow_mut().keyboard_focus_child.is_none() {
-                    // don't fire keyboard emulated click event while a widget has keyboard
-                    // focus
-                    Cursor::press(&root, ClickKind::Left);
-                    Cursor::release(&root, ClickKind::Left)
-                }
-            }
-            RightClickCursor => {
-                Cursor::press(&root, ClickKind::Right);
-                Cursor::release(&root, ClickKind::Right)
-            },
             MouseMove(x, y) => Cursor::move_to(&root, x, y),
             MouseDown(kind) => Cursor::press(&root, kind),
             MouseUp(kind) => Cursor::release(&root, kind),

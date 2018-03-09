@@ -99,7 +99,7 @@ impl WidgetKind for PropWindow {
 
             let root = Widget::get_root(&parent);
             let view = Widget::downcast_kind_mut::<RootView>(&root);
-            view.toggle_inventory_window(&root, false);
+            view.set_inventory_window(&root, false);
         })));
 
         let list_content = Widget::empty("items_list");

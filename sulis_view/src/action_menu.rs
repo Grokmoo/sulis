@@ -139,7 +139,7 @@ impl ActionMenu {
 
             let root = Widget::get_root(&widget);
             let view = Widget::downcast_kind_mut::<RootView>(&root);
-            view.toggle_prop_window(&root, false, 0);
+            view.set_prop_window(&root, false, 0);
         }))
     }
 
@@ -174,7 +174,7 @@ impl ActionMenu {
 
             let root = Widget::get_root(&widget);
             let view = Widget::downcast_kind_mut::<RootView>(&root);
-            view.toggle_prop_window(&root, active, index);
+            view.set_prop_window(&root, active, index);
         }))
     }
 

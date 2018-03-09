@@ -23,12 +23,12 @@ use io::*;
 use io::keyboard_event::Key;
 use io::event::ClickKind;
 use resource::ResourceSet;
-use ui::Widget;
+use ui::{Cursor, Widget};
 use util::Point;
 
 use glium::{self, CapabilitiesSource, Surface, glutin, Rect};
 use glium::backend::Facade;
-use glium::glutin::{ContextBuilder, Robustness, VirtualKeyCode};
+use glium::glutin::{ContextBuilder, CursorState, Robustness, VirtualKeyCode};
 use glium::texture::{RawImage2d, SrgbTexture2d};
 use glium::uniforms::{MinifySamplerFilter, MagnifySamplerFilter, Sampler};
 
@@ -247,6 +247,7 @@ impl GliumDisplay {
         let window = glium::glutin::WindowBuilder::new()
             .with_dimensions(CONFIG.display.width_pixels, CONFIG.display.height_pixels)
             .with_title("Sulis");
+
         let context = ContextBuilder::new().with_gl_robustness(Robustness::NotRobust);
         let display = glium::Display::new(window, context, &events_loop).unwrap();
         info!("Initialized glium adapter:");
@@ -261,6 +262,8 @@ impl GliumDisplay {
                                                   FRAGMENT_SHADER_SRC, None).unwrap();
         let swap_program = glium::Program::from_source(&display, VERTEX_SHADER_SRC,
                                                        SWAP_FRAGMENT_SHADER_SRC, None).unwrap();
+
+        display.gl_window().set_cursor_state(CursorState::Hide).unwrap();
 
         GliumDisplay {
             display,
@@ -308,6 +311,8 @@ impl IO for GliumDisplay {
             let mut renderer = GliumRenderer::new(&mut target, self);
             let pixel_size = Point::from_tuple(renderer.target.get_dimensions());
             root.draw_graphics_mode(&mut renderer, pixel_size, millis);
+
+            Cursor::draw(&mut renderer, millis);
         }
         target.finish().unwrap();
     }
@@ -334,7 +339,7 @@ fn get_min_filter(filter: TextureMinFilter) -> MinifySamplerFilter {
 fn process_window_event(event: glutin::WindowEvent) -> Option<InputAction> {
     use glium::glutin::WindowEvent::*;
     match event {
-        Closed => Some(InputAction::Exit),
+        Closed => Some(InputAction::ShowMenu),
         ReceivedCharacter(c) => Some(InputAction::CharReceived(c)),
         KeyboardInput { input, .. } => CONFIG.get_input_action(process_keyboard_input(input)),
         MouseInput { state, button, .. } => {

@@ -46,7 +46,6 @@ struct HoverSprite {
 const NAME: &'static str = "area";
 
 pub struct AreaView {
-    mouse_over: Rc<RefCell<Widget>>,
     scale: (f32, f32),
     cache_invalid: bool,
     layers: Vec<String>,
@@ -64,9 +63,8 @@ const BASE_LAYER_ID: &str = "__base_layer__";
 const AERIAL_LAYER_ID: &str = "__aerial_layer__";
 
 impl AreaView {
-    pub fn new(mouse_over: Rc<RefCell<Widget>>) -> Rc<RefCell<AreaView>> {
+    pub fn new() -> Rc<RefCell<AreaView>> {
         Rc::new(RefCell::new(AreaView {
-            mouse_over: mouse_over,
             scale: (1.0, 1.0),
             hover_sprite: None,
             cache_invalid: true,
@@ -251,8 +249,6 @@ impl WidgetKind for AreaView {
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         self.hover_sprite = None;
-        self.mouse_over.borrow_mut().state.add_text_arg("0", "");
-        self.mouse_over.borrow_mut().state.add_text_arg("1", "");
 
         let area_state = GameState::area_state();
         let area = &area_state.borrow().area;
@@ -412,13 +408,6 @@ impl WidgetKind for AreaView {
         let (area_x, area_y) = self.get_cursor_pos(widget);
         let area_state = GameState::area_state();
 
-        {
-            let ref mut state = self.mouse_over.borrow_mut().state;
-            state.clear_text_args();
-            state.add_text_arg("0", &format!("{}", area_x));
-            state.add_text_arg("1", &format!("{}", area_y));
-        }
-        self.mouse_over.borrow_mut().invalidate_layout();
         self.hover_sprite = None;
 
         if let Some(entity) = area_state.borrow().get_entity_at(area_x, area_y) {
@@ -459,7 +448,6 @@ impl WidgetKind for AreaView {
 
     fn on_mouse_exit(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
         self.super_on_mouse_exit(widget);
-        self.mouse_over.borrow_mut().state.clear_text_args();
         self.hover_sprite = None;
         true
     }

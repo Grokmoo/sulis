@@ -20,37 +20,23 @@ children:
     position: [0, 0]
   right_pane:
     background: bg_base
-    border: [1, 1, 1, 1]
+    border: [3, 3, 3, 3]
     preferred_size: [80, 0]
     x_relative: Max
     height_relative: Max
     children:
-      mouse_over:
-        from: .label
-        text: "{#0#,#1#}"
-        preferred_size: [40, 4]
-        position: [0, 4]
-      title:
-        from: .label
-        text: "#0#"
-        preferred_size: [72, 4]
-        position: [0, 0]
       end_turn_button:
         from: .button
-        text: "End Turn"
-        text_params:
-          scale: 8.0
-          color: [ 1.0, 0.0, 0.0, 1.0 ]
-        preferred_size: [72, 12]
+        preferred_size: [28, 28]
         y_relative: Max
-        position: [0, 0]
+        x_relative: Max
+        foreground: end_turn_icon
       initiative_ticker:
-        background: bg_base
         border: [1, 1, 1, 1]
         width_relative: Max
         height_relative: ChildSum
         layout: BoxVertical
-        position: [0, 40]
+        position: [0, 0]
         children:
           entry:
             from: .label
@@ -68,6 +54,32 @@ children:
               scale: 6.0
             preferred_size: [0, 8]
             width_relative: Max
+      window_button:
+        from: .button
+        border: [1, 1, 1, 1]
+        preferred_size: [13, 13]
+        y_relative: Max
+        x_relative: Max
+      map_button:
+        from: .right_pane.window_button
+        position: [-30, 0]
+        foreground: map_icon
+      log_button:
+        from: .right_pane.window_button
+        position: [-30, -15]
+        foreground: log_icon
+      character_button:
+        from: .right_pane.window_button
+        position: [-30, -30]
+        foreground: char_icon
+      inventory_button:
+        from: .right_pane.window_button
+        position: [-15, -30]
+        foreground: inv_icon
+      menu_button:
+        from: .right_pane.window_button
+        position: [0, -30]
+        foreground: menu_icon
   area:
     preferred_size: [-80, 0]
     width_relative: Max
@@ -226,7 +238,7 @@ children:
     from: .window
     children:
       title:
-        text: "#name#"
+        text: "Character Sheet"
       details:
         from: .text_area
         text: |

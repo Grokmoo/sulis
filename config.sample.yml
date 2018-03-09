@@ -21,6 +21,9 @@ display:
 
     # The name of the default font used to render text when no font is specified
     default_font: "normal"
+    
+    # The default mouse pointer
+    default_cursor: "mouse_default"
 
 resources:
     # all resources are subdirectories under this
@@ -29,16 +32,10 @@ resources:
 input:
     # a mapping of keyboard characters to game actions
     keybindings:
-        KeyW: MoveCursorUp
-        KeyS: MoveCursorDown
-        KeyA: MoveCursorLeft
-        KeyD: MoveCursorRight
-        KeySpace: ClickCursor
-        KeyZ: RightClickCursor
-        KeyQ: Exit
+        KeyEscape: ShowMenu
         KeyI: ToggleInventory
         KeyC: ToggleCharacter
-        KeyB: ToggleCharacterBuilder
+        KeySpace: EndTurn
 
 logging:
     # Log level may be error, warn, info, debug, or trace
@@ -55,7 +52,7 @@ logging:
 editor:
   # The ID of the module that the editor will load
   module: "test1"
-  
+
   transition_image: transition
   transition_size: 4by3
   cursor: "gui/white"

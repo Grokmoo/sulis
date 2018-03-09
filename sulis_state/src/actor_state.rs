@@ -21,8 +21,9 @@ use sulis_core::io::GraphicsRenderer;
 use sulis_core::image::{LayeredImage};
 use sulis_core::ui::{color, Color};
 use sulis_module::{item, Actor, Module};
-use {ChangeListenerList, EntityState, GameState, Inventory};
+use sulis_module::area::PropData;
 use sulis_rules::{HitKind, StatList};
+use {AreaState, ChangeListenerList, EntityState, GameState, Inventory};
 
 pub struct ActorState {
     pub actor: Rc<Actor>,
@@ -88,7 +89,8 @@ impl ActorState {
         self.can_reach(dist)
     }
 
-    pub fn attack(&mut self, target: &Rc<RefCell<EntityState>>) -> (String, Color) {
+    pub fn attack(&mut self, target: &Rc<RefCell<EntityState>>,
+                  area_state: &mut AreaState) -> (String, Color) {
         if target.borrow_mut().actor.hp() <= 0 { return ("Miss".to_string(), color::GRAY); }
 
         info!("'{}' attacks '{}'", self.actor.name, target.borrow().actor.actor.name);
@@ -135,7 +137,7 @@ impl ActorState {
             not_first = true;
         }
 
-        self.check_death(target);
+        self.check_death(target, area_state);
         (damage_str, color)
     }
 
@@ -188,7 +190,7 @@ impl ActorState {
         self.hp <= 0
     }
 
-    pub fn check_death(&mut self, target: &Rc<RefCell<EntityState>>) {
+    pub fn check_death(&mut self, target: &Rc<RefCell<EntityState>>, area_state: &mut AreaState) {
         if target.borrow().actor.hp() > 0 { return; }
 
         let target = target.borrow();
@@ -197,7 +199,33 @@ impl ActorState {
             Some(ref reward) => reward,
         };
 
+        debug!("Adding XP {} to '{}'", reward.xp, self.actor.id);
         self.add_xp(reward.xp);
+
+        let loot = match reward.loot {
+            None => return,
+            Some(ref loot) => loot,
+        };
+
+        let prop = match Module::prop(&Module::rules().loot_drop_prop) {
+            None => {
+                warn!("Unable to drop loot as loot drop prop does not exist.");
+                return;
+            }, Some(prop) => prop,
+        };
+
+        trace!("Checking for loot drop.");
+        let items = loot.generate_with_chance(reward.loot_chance);
+        if items.is_empty() { return; }
+
+        trace!("Dropping loot with {} items", items.len());
+        let location = target.location.clone();
+        let prop_data = PropData {
+            prop,
+            location: location.to_point(),
+            items,
+        };
+        area_state.add_prop(&prop_data, location, true);
     }
 
     pub fn has_level_up(&self) -> bool {

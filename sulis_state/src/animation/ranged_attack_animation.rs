@@ -101,7 +101,7 @@ impl Animation for RangedAttackAnimation {
 
         if frac > 1.0 {
             if !self.has_attacked {
-                let (text, color) = self.attacker.borrow_mut().actor.attack(&self.defender);
+                let (text, color) = self.attacker.borrow_mut().actor.attack(&self.defender, area_state);
 
                 let scale = 1.2;
                 area_state.add_feedback_text(text, &self.defender, scale, color);

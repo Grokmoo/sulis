@@ -51,17 +51,30 @@ impl WidgetKind for PropWindow {
 
     fn on_remove(&mut self) {
         let area_state = GameState::area_state();
-        let prop = &mut area_state.borrow_mut().props[self.prop_index];
+        let mut area_state = area_state.borrow_mut();
+
+        let prop = match area_state.props.get_mut(self.prop_index) {
+            None => return,
+            Some(prop) => prop,
+        };
+
         prop.listeners.remove(NAME);
         if prop.is_active() {
             prop.toggle_active();
         }
-        debug!("Removed prop window.");
     }
 
     fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let area_state = GameState::area_state();
-        let prop = &mut area_state.borrow_mut().props[self.prop_index];
+        let mut area_state = area_state.borrow_mut();
+        let prop = match area_state.props.get_mut(self.prop_index) {
+            None => {
+                // prop is invalid or has been removed.  close the window
+                widget.borrow_mut().mark_for_removal();
+                return Vec::new();
+            }, Some(prop) => prop,
+        };
+
         prop.listeners.add(ChangeListener::invalidate(NAME, widget));
 
         let title = Widget::with_theme(Label::empty(), "title");

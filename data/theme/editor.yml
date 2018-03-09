@@ -110,7 +110,9 @@ children:
           prop_button:
             from: .button
             text: "#name#"
-            preferred_size: [20, 20]
+            text_params:
+              scale: 3.0
+            preferred_size: [40, 6]
       tile_picker:
         background: bg_base
         border: [1, 1, 1, 1]

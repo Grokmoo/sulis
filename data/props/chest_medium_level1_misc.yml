@@ -1,0 +1,9 @@
+id: chest_medium_level1_misc
+name: Chest
+icon: inventory/misc_crate
+image: props/chest02
+size: 3by3
+visible: true
+passable: false
+interactive: true
+loot: level1_misc

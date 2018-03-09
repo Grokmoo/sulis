@@ -29,6 +29,9 @@ groups:
   3by3:
     size: [3, 3]
     areas:
+      chest03_closed: [10, 0]
+      chest03_open: [13, 0]
+    
       barricade: [6, 4]
       chest_large_closed: [0, 10]
       chest_large_open: [3, 10]

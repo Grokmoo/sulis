@@ -25,7 +25,7 @@ use sulis_core::serde_yaml;
 use sulis_core::resource::{ResourceBuilder, ResourceSet};
 use sulis_core::util::{Point, unable_to_create_error};
 
-use {Module, ObjectSize};
+use {LootList, Module, ObjectSize};
 use area::tile::verify_point;
 
 #[derive(Debug)]
@@ -38,6 +38,7 @@ pub struct Prop {
     pub impass: Vec<Point>,
     pub invis: Vec<Point>,
     pub interactive: bool,
+    pub loot: Option<Rc<LootList>>,
 }
 
 impl Prop {
@@ -105,6 +106,18 @@ impl Prop {
             }
         }
 
+        let loot = match builder.loot {
+            None => None,
+            Some(builder_loot) => {
+                match module.loot_lists.get(&builder_loot) {
+                    None => {
+                        warn!("Unable to find loot list '{}'", builder_loot);
+                        return unable_to_create_error("prop", &builder.id);
+                    }, Some(loot) => Some(Rc::clone(loot))
+                }
+            }
+        };
+
         Ok(Prop {
             id: builder.id,
             name: builder.name,
@@ -114,6 +127,7 @@ impl Prop {
             impass,
             invis,
             interactive: builder.interactive,
+            loot,
         })
     }
 
@@ -139,6 +153,7 @@ pub struct PropBuilder {
     pub invis: Option<Vec<Vec<usize>>>,
     pub visible: Option<bool>,
     pub interactive: bool,
+    pub loot: Option<String>,
 }
 
 impl ResourceBuilder for PropBuilder {

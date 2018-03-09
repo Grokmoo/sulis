@@ -1,0 +1,39 @@
+id: level1_armor
+# format is number of items: weight
+# i.e. 2: 1 means generate 2 items with weight 1
+generate:
+  1: 4
+  2: 2
+  3: 1
+entries:
+  boots_leather:
+    weight: 10
+  boots_mail:
+    weight: 3
+  boots_plate:
+    weight: 1
+  gloves_leather:
+    weight: 10
+  gloves_mail:
+    weight: 3
+  gloves_plate:
+    weight: 1
+  helm_leather:
+    weight: 10
+  helm_mail:
+    weight: 3
+  helm_plate:
+    weight: 1
+  legs_leather:
+    weight: 10
+  legs_mail:
+    weight: 3
+  legs_plate:
+    weight: 1
+  torso_leather:
+    weight: 10
+  torso_mail:
+    weight: 3
+  torso_plate:
+    weight: 1
+

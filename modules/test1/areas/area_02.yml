@@ -4,19 +4,95 @@ name: Area 02
 width: 76
 height: 124
 terrain:
-  grass_to_grassdark_se:
-    - - 20
-      - 56
-  grass_to_dirt_s1:
-    - - 20
+  cliffs_to_grass_n1:
+    - - 28
       - 20
-  leaves1:
-    - - 13
-      - 54
+  bridge_vertical_c:
+    - - 28
+      - 42
+    - - 28
+      - 44
+    - - 28
+      - 46
+    - - 28
+      - 48
+  dirt_to_water_w1:
     - - 48
-      - 68
-    - - 53
-      - 65
+      - 32
+  grass_to_water_e1:
+    - - 52
+      - 92
+  water8:
+    - - 8
+      - 96
+    - - 52
+      - 44
+  grass_to_water_s2:
+    - - 72
+      - 80
+  dirt_to_water_nw:
+    - - 4
+      - 12
+    - - 8
+      - 8
+    - - 56
+      - 24
+    - - 52
+      - 28
+    - - 16
+      - 0
+  cliffs_to_grass_e1:
+    - - 8
+      - 116
+    - - 68
+      - 120
+    - - 16
+      - 104
+    - - 28
+      - 88
+    - - 8
+      - 76
+    - - 68
+      - 108
+    - - 68
+      - 112
+    - - 68
+      - 116
+    - - 28
+      - 120
+    - - 20
+      - 16
+  dirt_to_water_ne:
+    - - 48
+      - 0
+    - - 60
+      - 4
+    - - 64
+      - 8
+  grass_to_dirt_nw:
+    - - 60
+      - 76
+  dirt_to_water_e1:
+    - - 32
+      - 36
+    - - 48
+      - 16
+    - - 48
+      - 12
+    - - 68
+      - 16
+    - - 68
+      - 12
+  tree_base02:
+    - - 16
+      - 53
+  water2:
+    - - 52
+      - 120
+    - - 68
+      - 4
+    - - 68
+      - 4
   grass_to_water_w1:
     - - 4
       - 120
@@ -48,38 +124,56 @@ terrain:
       - 44
     - - 0
       - 88
-  dirt_to_water_e2:
-    - - 68
-      - 20
-  cliffs_to_grass_e1:
-    - - 8
-      - 116
-    - - 68
-      - 120
+  rock1:
     - - 16
-      - 104
-    - - 28
-      - 88
-    - - 8
-      - 76
-    - - 68
-      - 108
-    - - 68
-      - 112
-    - - 68
-      - 116
-    - - 28
-      - 120
-    - - 20
-      - 16
-  stairs_up_c:
-    - - 20
-      - 80
-  dirt_to_water_n1:
+      - 72
+  cliffs_to_grass_nw:
+    - - 32
+      - 20
+    - - 40
+      - 12
+  water_to_grass_ne:
+    - - 0
+      - 92
+  grass_to_water_e2:
     - - 52
-      - 0
-    - - 12
-      - 0
+      - 88
+  grass_to_grassdark_s1:
+    - - 24
+      - 56
+    - - 28
+      - 56
+    - - 28
+      - 56
+  cliffs_to_grass_s2:
+    - - 24
+      - 92
+    - - 16
+      - 64
+    - - 20
+      - 64
+    - - 28
+      - 64
+    - - 32
+      - 64
+    - - 36
+      - 64
+    - - 52
+      - 56
+    - - 56
+      - 56
+    - - 68
+      - 44
+    - - 72
+      - 44
+  flowers2:
+    - - 24
+      - 88
+    - - 28
+      - 16
+  waterfall:
+    - - 52
+      - 96
   water_to_dirt_nw:
     - - 32
       - 40
@@ -99,49 +193,23 @@ terrain:
       - 32
     - - 68
       - 24
-  cave_entrance_e:
-    - - 68
-      - 60
-    - - 20
-      - 0
-  grass_to_water_n2:
-    - - 68
-      - 92
-    - - 20
-      - 48
-    - - 24
-      - 48
-    - - 28
-      - 48
-    - - 40
-      - 52
-    - - 44
-      - 52
-    - - 48
-      - 52
-    - - 52
-      - 52
-    - - 60
-      - 40
-    - - 64
-      - 40
-    - - 68
-      - 40
-  waterfall:
-    - - 52
-      - 96
-  grass_to_dirt_s3:
-    - - 56
-      - 68
-  dirt_to_grass_sw:
-    - - 56
-      - 72
-  cliffs_to_grass_sw:
+  water_to_grass_sw:
     - - 36
-      - 108
-  bridge_vertical_n:
-    - - 28
-      - 40
+      - 48
+  grass_to_dirt_w2:
+    - - 60
+      - 72
+  flowers3:
+    - - 35
+      - 50
+    - - 17
+      - 15
+  grass_to_dirt_n3:
+    - - 20
+      - 12
+  stairs_up_c:
+    - - 20
+      - 80
   water_to_dirt_sw:
     - - 68
       - 8
@@ -149,154 +217,24 @@ terrain:
       - 4
     - - 60
       - 0
-  dirt_to_water_w2:
-    - - 0
-      - 24
-    - - 0
-      - 20
-    - - 0
-      - 16
-    - - 8
-      - 4
+  grass_to_dirt_se:
     - - 52
-      - 12
-    - - 56
-      - 20
-  dirt_to_water_s1:
-    - - 28
-      - 40
-    - - 4
-      - 28
-  grass_to_dirt_ne:
-    - - 56
-      - 76
-    - - 52
-      - 72
-  dirt_to_water_se:
-    - - 32
-      - 32
-    - - 36
-      - 28
-    - - 40
-      - 24
-    - - 44
-      - 20
-    - - 48
-      - 8
-    - - 56
-      - 32
-    - - 60
-      - 28
-    - - 64
-      - 24
-  tree_base02:
-    - - 16
-      - 53
-  grass_to_water_ne:
-    - - 36
-      - 52
-  rock1:
-    - - 16
-      - 72
-  grass_to_grassdark_ne:
-    - - 20
-      - 60
+      - 68
+  cliffs_to_grass_s1:
     - - 24
       - 64
-  water_to_dirt_ne:
-    - - 24
-      - 40
-    - - 0
-      - 28
-    - - 8
-      - 32
-    - - 20
-      - 36
-    - - 52
-      - 16
     - - 48
-      - 36
-    - - 48
-      - 36
-  water6:
-    - - 4
-      - 52
-    - - 32
-      - 44
-    - - 20
-      - 40
-  grassdark2:
-    - - 28
-      - 60
-  dirt_to_water_w1:
-    - - 48
-      - 32
-  cliffs_to_grass_w1:
-    - - 44
-      - 104
-    - - 44
-      - 112
-    - - 36
-      - 116
-    - - 36
-      - 120
-  rock3:
-    - - 16
-      - 0
-  water5:
-    - - 8
-      - 36
-    - - 52
-      - 20
-  cliffs_to_grass_ne:
-    - - 8
-      - 80
-    - - 68
-      - 72
-    - - 20
-      - 20
-  cliffs_to_grass_e2:
-    - - 8
-      - 120
-    - - 16
-      - 100
-    - - 8
-      - 72
-    - - 60
-      - 52
-    - - 68
-      - 104
-    - - 28
-      - 116
-    - - 20
-      - 12
-  dirt1:
-    - - 60
-      - 12
-    - - 28
-      - 32
-    - - 8
-      - 20
-    - - 16
-      - 4
-  grass_to_water_n1:
-    - - 16
-      - 48
-    - - 32
-      - 48
-    - - 32
-      - 48
-    - - 72
-      - 40
-  grass_to_water_e1:
-    - - 52
+      - 56
+  grass_to_water_sw:
+    - - 12
       - 92
-  water3:
-    - - 68
-      - 32
-  stairs_up_w:
-    - - 16
-      - 80
+  water4:
+    - - 56
+      - 112
+    - - 60
+      - 92
+    - - 4
+      - 4
   grass1:
     - - 8
       - 120
@@ -628,137 +566,54 @@ terrain:
       - 16
     - - 20
       - 16
-  grass_to_dirt_w3:
-    - - 16
-      - 16
-  water_to_grass_se:
-    - - 4
+  water3:
+    - - 68
+      - 32
+  cliffs_to_grass_w1:
+    - - 44
       - 104
-    - - 8
-      - 100
-    - - 72
-      - 88
-    - - 64
-      - 92
-    - - 64
-      - 92
-    - - 0
-      - 60
-    - - 4
-      - 56
-    - - 8
-      - 52
-    - - 12
-      - 48
-    - - 56
-      - 40
-  water_to_grass_sw:
-    - - 36
-      - 48
-  dirt_to_water_ne:
-    - - 48
-      - 0
-    - - 60
-      - 4
-    - - 64
-      - 8
-  grass_to_dirt_w2:
-    - - 60
-      - 72
-  water_to_dirt_se:
-    - - 0
-      - 12
-    - - 4
-      - 8
-    - - 52
-      - 24
-    - - 48
-      - 28
-    - - 8
-      - 0
-  water4:
-    - - 56
-      - 112
-    - - 60
-      - 92
-    - - 4
-      - 4
-  cliffs_to_grass_w2:
     - - 44
+      - 112
+    - - 36
       - 116
-    - - 44
-      - 120
-    - - 44
-      - 108
-  tree_canopy_w:
-    - - 45
-      - 58
-    - - 45
-      - 58
-    - - 14
-      - 47
-  flowers3:
-    - - 35
-      - 50
-    - - 17
-      - 15
-  grass_to_water_e2:
-    - - 52
-      - 88
-  grass_to_grassdark_sw:
-    - - 32
-      - 56
-  grass_to_dirt_sw:
-    - - 60
-      - 68
-  rock2:
-    - - 35
-      - 59
-  tree_base01:
-    - - 47
-      - 64
-  cliffs_to_grass_s1:
-    - - 24
-      - 64
-    - - 48
-      - 56
-  tree_canopy_c:
-    - - 49
-      - 58
-    - - 18
-      - 47
-  grass3:
-    - - 28
-      - 112
-    - - 40
-      - 88
-    - - 44
-      - 76
     - - 36
-      - 76
-    - - 20
-      - 72
-    - - 4
-      - 88
-  grass_to_dirt_nw:
-    - - 60
-      - 76
-  tree_canopy_e:
-    - - 51
-      - 58
-    - - 20
-      - 47
-  grassdark_to_grass_sw:
-    - - 24
+      - 120
+  cave_entrance_e:
+    - - 68
       - 60
-  grass_to_water_sw:
-    - - 12
-      - 92
+    - - 20
+      - 0
   grass2:
     - - 52
       - 64
     - - 32
       - 100
+  grass_to_grassdark_w1:
+    - - 32
+      - 60
+    - - 32
+      - 60
+    - - 32
+      - 64
+  water6:
+    - - 4
+      - 52
+    - - 32
+      - 44
+    - - 20
+      - 40
+  grass_to_dirt_s1:
+    - - 20
+      - 20
+  rock3:
+    - - 16
+      - 0
+  water_to_grass_nw:
+    - - 64
+      - 84
+  grass_to_grassdark_se:
+    - - 20
+      - 56
   water1:
     - - 0
       - 120
@@ -998,88 +853,77 @@ terrain:
       - 8
     - - 72
       - 32
-  dirt_to_water_e1:
-    - - 32
-      - 36
-    - - 48
-      - 16
-    - - 48
-      - 12
-    - - 68
-      - 16
-    - - 68
-      - 12
-  grass_to_water_s1:
-    - - 8
-      - 92
-    - - 56
-      - 84
-    - - 60
-      - 84
-    - - 68
-      - 80
+  rock2:
+    - - 35
+      - 59
+  water_to_grass_se:
     - - 4
-      - 92
-  bridge_vertical_s:
-    - - 28
-      - 50
-  bridge_vertical_c:
-    - - 28
-      - 42
-    - - 28
-      - 44
-    - - 28
-      - 46
-    - - 28
-      - 48
-  flowers2:
-    - - 24
+      - 104
+    - - 8
+      - 100
+    - - 72
       - 88
+    - - 64
+      - 92
+    - - 64
+      - 92
+    - - 0
+      - 60
+    - - 4
+      - 56
+    - - 8
+      - 52
+    - - 12
+      - 48
+    - - 56
+      - 40
+  grassdark1:
     - - 28
-      - 16
-  dirt_to_grass_se:
-    - - 16
-      - 12
+      - 64
+  grass_to_dirt_s3:
+    - - 56
+      - 68
   grass_to_water_se:
     - - 64
       - 80
     - - 52
       - 84
-  grass_to_cliffs_se:
-    - - 44
-      - 96
-    - - 32
-      - 12
-  grass_to_dirt_n3:
+  grass_to_grassdark_ne:
     - - 20
-      - 12
-  stairs_up_e:
+      - 60
     - - 24
-      - 80
-  cliffs_to_grass_s2:
-    - - 24
-      - 92
-    - - 16
       - 64
-    - - 20
-      - 64
+  bridge_vertical_n:
     - - 28
+      - 40
+  bush1:
+    - - 72
+      - 80
+    - - 42
+      - 72
+    - - 40
+      - 104
+  cliffs_to_grass_se:
+    - - 8
+      - 108
+    - - 16
+      - 92
+    - - 8
       - 64
-    - - 32
-      - 64
-    - - 36
-      - 64
-    - - 52
-      - 56
-    - - 56
+    - - 40
       - 56
     - - 68
+      - 52
+    - - 60
       - 44
-    - - 72
-      - 44
-  dirt_to_grass_ne:
-    - - 16
-      - 20
+    - - 28
+      - 108
+  tree_base01:
+    - - 47
+      - 64
+  dirt_to_water_n2:
+    - - 56
+      - 0
   dirt_to_water_sw:
     - - 24
       - 36
@@ -1091,6 +935,167 @@ terrain:
       - 8
     - - 56
       - 16
+  tree_canopy_c:
+    - - 49
+      - 58
+    - - 18
+      - 47
+  cliffs_to_grass_sw:
+    - - 36
+      - 108
+  grass_to_dirt_sw:
+    - - 60
+      - 68
+  cliffs_to_grass_ne:
+    - - 8
+      - 80
+    - - 68
+      - 72
+    - - 20
+      - 20
+  leaves1:
+    - - 13
+      - 54
+    - - 48
+      - 68
+    - - 53
+      - 65
+  water5:
+    - - 8
+      - 36
+    - - 52
+      - 20
+  stairs_up_e:
+    - - 24
+      - 80
+  grass_to_water_n2:
+    - - 68
+      - 92
+    - - 20
+      - 48
+    - - 24
+      - 48
+    - - 28
+      - 48
+    - - 40
+      - 52
+    - - 44
+      - 52
+    - - 48
+      - 52
+    - - 52
+      - 52
+    - - 60
+      - 40
+    - - 64
+      - 40
+    - - 68
+      - 40
+  water_to_dirt_se:
+    - - 0
+      - 12
+    - - 4
+      - 8
+    - - 52
+      - 24
+    - - 48
+      - 28
+    - - 8
+      - 0
+  stairs_up_w:
+    - - 16
+      - 80
+  grass_to_dirt_w3:
+    - - 16
+      - 16
+  dirt_to_grass_se:
+    - - 16
+      - 12
+  dirt_to_water_s2:
+    - - 16
+      - 32
+    - - 12
+      - 32
+    - - 52
+      - 36
+  dirt_to_water_w2:
+    - - 0
+      - 24
+    - - 0
+      - 20
+    - - 0
+      - 16
+    - - 8
+      - 4
+    - - 52
+      - 12
+    - - 56
+      - 20
+  dirt3:
+    - - 12
+      - 16
+    - - 64
+      - 16
+  cliffs_to_grass_e2:
+    - - 8
+      - 120
+    - - 16
+      - 100
+    - - 8
+      - 72
+    - - 60
+      - 52
+    - - 68
+      - 104
+    - - 28
+      - 116
+    - - 20
+      - 12
+  dirt1:
+    - - 60
+      - 12
+    - - 28
+      - 32
+    - - 8
+      - 20
+    - - 16
+      - 4
+  grass_to_grassdark_sw:
+    - - 32
+      - 56
+  grassdark2:
+    - - 28
+      - 60
+  grass_to_water_n1:
+    - - 16
+      - 48
+    - - 32
+      - 48
+    - - 32
+      - 48
+    - - 72
+      - 40
+  grass_to_cliffs_se:
+    - - 44
+      - 96
+    - - 32
+      - 12
+  dirt_to_water_e2:
+    - - 68
+      - 20
+  grass3:
+    - - 28
+      - 112
+    - - 40
+      - 88
+    - - 44
+      - 76
+    - - 36
+      - 76
+    - - 20
+      - 72
+    - - 4
+      - 88
   grass_to_cliffs_sw:
     - - 28
       - 80
@@ -1098,13 +1103,65 @@ terrain:
       - 80
     - - 68
       - 96
-  bush1:
-    - - 72
-      - 80
-    - - 42
-      - 72
-    - - 40
+  dirt_to_water_n1:
+    - - 52
+      - 0
+    - - 12
+      - 0
+  grass_to_water_nw:
+    - - 8
       - 104
+    - - 12
+      - 100
+    - - 72
+      - 92
+    - - 4
+      - 60
+    - - 8
+      - 56
+    - - 12
+      - 52
+    - - 56
+      - 52
+  bridge_vertical_s:
+    - - 28
+      - 50
+  grass_to_water_ne:
+    - - 36
+      - 52
+  grassdark_to_grass_sw:
+    - - 24
+      - 60
+  cave_entrance_w:
+    - - 40
+      - 0
+  tree_canopy_w:
+    - - 45
+      - 58
+    - - 45
+      - 58
+    - - 14
+      - 47
+  dirt_to_grass_ne:
+    - - 16
+      - 20
+  dirt_to_water_se:
+    - - 32
+      - 32
+    - - 36
+      - 28
+    - - 40
+      - 24
+    - - 44
+      - 20
+    - - 48
+      - 8
+    - - 56
+      - 32
+    - - 60
+      - 28
+    - - 64
+      - 24
   dirt2:
     - - 44
       - 16
@@ -1210,104 +1267,6 @@ terrain:
       - 4
     - - 20
       - 0
-  water8:
-    - - 8
-      - 96
-    - - 52
-      - 44
-  dirt3:
-    - - 12
-      - 16
-    - - 64
-      - 16
-  dirt_to_water_n2:
-    - - 56
-      - 0
-  water_to_grass_ne:
-    - - 0
-      - 92
-  water_to_grass_nw:
-    - - 64
-      - 84
-  cliffs_to_grass_n1:
-    - - 28
-      - 20
-  grass_to_grassdark_s1:
-    - - 24
-      - 56
-    - - 28
-      - 56
-    - - 28
-      - 56
-  grass_to_water_s2:
-    - - 72
-      - 80
-  grass_to_water_nw:
-    - - 8
-      - 104
-    - - 12
-      - 100
-    - - 72
-      - 92
-    - - 4
-      - 60
-    - - 8
-      - 56
-    - - 12
-      - 52
-    - - 56
-      - 52
-  cave_entrance_w:
-    - - 40
-      - 0
-  cliffs_to_grass_se:
-    - - 8
-      - 108
-    - - 16
-      - 92
-    - - 8
-      - 64
-    - - 40
-      - 56
-    - - 68
-      - 52
-    - - 60
-      - 44
-    - - 28
-      - 108
-  cliffs_to_grass_nw:
-    - - 32
-      - 20
-    - - 40
-      - 12
-  water2:
-    - - 52
-      - 120
-    - - 68
-      - 4
-    - - 68
-      - 4
-  grass_to_grassdark_w1:
-    - - 32
-      - 60
-    - - 32
-      - 60
-    - - 32
-      - 64
-  dirt_to_water_nw:
-    - - 4
-      - 12
-    - - 8
-      - 8
-    - - 56
-      - 24
-    - - 52
-      - 28
-    - - 16
-      - 0
-  grassdark1:
-    - - 28
-      - 64
   grass_to_cliffs_nw:
     - - 16
       - 108
@@ -1317,16 +1276,57 @@ terrain:
       - 64
     - - 60
       - 56
-  grass_to_dirt_se:
-    - - 52
-      - 68
-  dirt_to_water_s2:
-    - - 16
+  tree_canopy_e:
+    - - 51
+      - 58
+    - - 20
+      - 47
+  water_to_dirt_ne:
+    - - 24
+      - 40
+    - - 0
+      - 28
+    - - 8
       - 32
-    - - 12
-      - 32
-    - - 52
+    - - 20
       - 36
+    - - 52
+      - 16
+    - - 48
+      - 36
+    - - 48
+      - 36
+  dirt_to_water_s1:
+    - - 28
+      - 40
+    - - 4
+      - 28
+  cliffs_to_grass_w2:
+    - - 44
+      - 116
+    - - 44
+      - 120
+    - - 44
+      - 108
+  dirt_to_grass_sw:
+    - - 56
+      - 72
+  grass_to_water_s1:
+    - - 8
+      - 92
+    - - 56
+      - 84
+    - - 60
+      - 84
+    - - 68
+      - 80
+    - - 4
+      - 92
+  grass_to_dirt_ne:
+    - - 56
+      - 76
+    - - 52
+      - 72
 elevation:
   - 0
   - 0
@@ -10756,15 +10756,81 @@ generate: false
 layers:
   - base
   - base2
+  - prop
   - object
   - aerial
 entity_layer: 3
-actors: []
+actors:
+  - id: goblin
+    location:
+      x: 36
+      "y": 98
+  - id: goblin
+    location:
+      x: 42
+      "y": 101
+  - id: goblin
+    location:
+      x: 37
+      "y": 92
+  - id: goblin
+    location:
+      x: 62
+      "y": 64
+  - id: goblin
+    location:
+      x: 64
+      "y": 70
+  - id: goblin
+    location:
+      x: 27
+      "y": 54
+  - id: goblin
+    location:
+      x: 33
+      "y": 57
+  - id: goblin
+    location:
+      x: 34
+      "y": 52
+  - id: goblin
+    location:
+      x: 11
+      "y": 10
+  - id: goblin
+    location:
+      x: 15
+      "y": 10
 props:
   - id: waterfall
     location:
       x: 52
       "y": 96
+    items: []
+  - id: chest_big_level1_misc
+    location:
+      x: 23
+      "y": 51
+    items: []
+  - id: chest_xl_level1_weapons
+    location:
+      x: 65
+      "y": 73
+    items: []
+  - id: chest_xl_level1_armor
+    location:
+      x: 58
+      "y": 64
+    items: []
+  - id: chest_medium_level1_misc
+    location:
+      x: 12
+      "y": 3
+    items: []
+  - id: chest_big_level1_misc
+    location:
+      x: 17
+      "y": 9
     items: []
 transitions:
   - from:

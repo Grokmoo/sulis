@@ -1,6 +1,6 @@
 id: backpack
 name: Backpack
-icon: inventory/misc_crate
+icon: inventory/misc_backpack
 image: props/backpack
 size: 2by2
 visible: true

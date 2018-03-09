@@ -54,6 +54,9 @@ pub use self::item::Item;
 pub mod item_adjective;
 pub use self::item_adjective::ItemAdjective;
 
+pub mod loot_list;
+pub use self::loot_list::LootList;
+
 pub mod prop;
 pub use self::prop::Prop;
 
@@ -79,6 +82,7 @@ use self::area::Tile;
 use self::area::AreaBuilder;
 use self::class::ClassBuilder;
 use self::item::ItemBuilder;
+use self::loot_list::LootListBuilder;
 use self::prop::PropBuilder;
 use self::race::RaceBuilder;
 use self::object_size::ObjectSizeBuilder;
@@ -96,6 +100,7 @@ pub struct Module {
     classes: HashMap<String, Rc<Class>>,
     items: HashMap<String, Rc<Item>>,
     item_adjectives: HashMap<String, Rc<ItemAdjective>>,
+    loot_lists: HashMap<String, Rc<LootList>>,
     props: HashMap<String, Rc<Prop>>,
     races: HashMap<String, Rc<Race>>,
     sizes: HashMap<String, Rc<ObjectSize>>,
@@ -255,6 +260,10 @@ impl Module {
                 insert_if_ok("item", id, Item::new(builder), &mut module.items);
             }
 
+            for (id, builder) in builder_set.loot_builders.into_iter() {
+                insert_if_ok("loot list", id, LootList::new(builder, &module), &mut module.loot_lists);
+            }
+
             for (id, builder) in builder_set.prop_builders {
                 insert_if_ok("prop", id, Prop::new(builder, &module), &mut module.props);
             }
@@ -324,6 +333,10 @@ impl Module {
         MODULE.with(|r| get_resource(id, &r.borrow().items))
     }
 
+    pub fn loot_list(id: &str) -> Option<Rc<LootList>> {
+        MODULE.with(|r| get_resource(id, &r.borrow().loot_lists))
+    }
+
     pub fn prop(id: &str) -> Option<Rc<Prop>> {
         MODULE.with(|r| get_resource(id, &r.borrow().props))
     }
@@ -364,6 +377,7 @@ impl Default for Module {
             items: HashMap::new(),
             props: HashMap::new(),
             item_adjectives: HashMap::new(),
+            loot_lists: HashMap::new(),
             races: HashMap::new(),
             sizes: HashMap::new(),
             tiles: HashMap::new(),
@@ -377,6 +391,7 @@ struct ModuleBuilder {
     class_builders: HashMap<String, ClassBuilder>,
     item_builders: HashMap<String, ItemBuilder>,
     item_adjectives: HashMap<String, ItemAdjective>,
+    loot_builders: HashMap<String, LootListBuilder>,
     prop_builders: HashMap<String, PropBuilder>,
     race_builders: HashMap<String, RaceBuilder>,
     size_builders: HashMap<String, ObjectSizeBuilder>,
@@ -392,6 +407,7 @@ impl ModuleBuilder {
             class_builders: read(&root_dirs, "classes"),
             item_builders: read(&root_dirs, "items"),
             item_adjectives: read(&root_dirs, "item_adjectives"),
+            loot_builders: read(&root_dirs, "loot_lists"),
             prop_builders: read(&root_dirs, "props"),
             race_builders: read(&root_dirs, "races"),
             size_builders: read(&root_dirs, "sizes"),

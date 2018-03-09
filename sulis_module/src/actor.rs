@@ -23,11 +23,28 @@ use sulis_core::io::GraphicsRenderer;
 use sulis_core::image::{Image, LayeredImage};
 use sulis_core::resource::{ResourceBuilder, ResourceSet};
 use sulis_core::ui::{Color};
-use sulis_core::util::invalid_data_error;
+use sulis_core::util::{unable_to_create_error};
 use sulis_core::{serde_json, serde_yaml};
 use sulis_rules::AttributeList;
 
-use {Class, ImageLayer, ImageLayerSet, Item, Module, Race};
+use {Class, ImageLayer, ImageLayerSet, Item, LootList, Module, Race};
+
+#[derive(Debug, Clone)]
+pub struct Reward {
+    pub xp: u32,
+    pub loot: Option<Rc<LootList>>,
+    pub loot_chance: u32,
+}
+
+impl Default for Reward {
+    fn default() -> Reward {
+        Reward {
+            xp: 0,
+            loot: None,
+            loot_chance: 100,
+        }
+    }
+}
 
 #[derive(Deserialize, Serialize, Debug, Copy, Clone, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
@@ -115,7 +132,7 @@ impl Actor {
         let race = match resources.races.get(&builder.race) {
             None => {
                 warn!("No match found for race '{}'", builder.race);
-                return invalid_data_error(&format!("Unable to create actor '{}'", builder.id));
+                return unable_to_create_error("actor", &builder.id);
             }, Some(race) => Rc::clone(race)
         };
 
@@ -125,8 +142,7 @@ impl Actor {
                 let item = match resources.items.get(&item_id) {
                     None => {
                         warn!("No match found for item ID '{}'", item_id);
-                        return Err(Error::new(ErrorKind::InvalidData,
-                             format!("Unable to create actor '{}'", builder.id)));
+                        return unable_to_create_error("actor", &builder.id);
                     },
                     Some(item) => Rc::clone(item)
                 };
@@ -145,7 +161,7 @@ impl Actor {
             let class = match resources.classes.get(&class_id) {
                 None => {
                     warn!("No match for class '{}'", class_id);
-                    return invalid_data_error(&format!("Unable to create actor '{}'", builder.id));
+                    return unable_to_create_error("actor", &builder.id);
                 }, Some(class) => Rc::clone(class)
             };
 
@@ -159,12 +175,12 @@ impl Actor {
                 let index = index as usize;
                 if index >= items.len() {
                     warn!("No item exists to equip at index {}", index);
-                    return invalid_data_error(&format!("Unable to create actor '{}'", builder.id));
+                    return unable_to_create_error("actor", &builder.id);
                 }
 
                 if items[index].equippable.is_none() {
                     warn!("Item at index {}: {} is not equippable.", index, items[index].name);
-                    return invalid_data_error(&format!("Unable to create actor '{}'", builder.id));
+                    return unable_to_create_error("actor", &builder.id);
                 }
 
                 to_equip.push(index);
@@ -176,7 +192,7 @@ impl Actor {
             Some(ref image) => match ResourceSet::get_image(image) {
                 None => {
                     warn!("Unable to find image for portrait '{}'", image);
-                    None
+                    return unable_to_create_error("actor", &builder.id);
                 }, Some(image) => Some(image),
             }
         };
@@ -184,6 +200,30 @@ impl Actor {
         let image_layers = ImageLayerSet::merge(race.default_images(), sex, builder.images)?;
         let images_list = image_layers.get_list(sex, builder.hair_color, builder.skin_color);
         let image = LayeredImage::new(images_list, builder.hue);
+
+        let reward = match builder.reward {
+            None => None,
+            Some(reward) => {
+                let xp = reward.xp;
+                let loot = match reward.loot {
+                    None => None,
+                    Some(id) => {
+                        Some(match resources.loot_lists.get(&id) {
+                            None => {
+                                warn!("No loot list found with id '{}'", id);
+                                return unable_to_create_error("actor", &builder.id);
+                            }, Some(list) => Rc::clone(list),
+                        })
+                    }
+                };
+
+                Some(Reward {
+                    xp,
+                    loot,
+                    loot_chance: reward.loot_chance.unwrap_or(100),
+                })
+            }
+        };
 
         Ok(Actor {
             id: builder.id,
@@ -196,7 +236,7 @@ impl Actor {
             levels,
             total_level,
             xp: builder.xp.unwrap_or(0),
-            reward: builder.reward,
+            reward,
             items,
             to_equip,
             image_layers,
@@ -223,16 +263,10 @@ impl Actor {
 
 #[derive(Deserialize, Debug, Serialize, Clone)]
 #[serde(deny_unknown_fields)]
-pub struct Reward {
-    pub xp: u32,
-}
-
-impl Default for Reward {
-    fn default() -> Reward {
-        Reward {
-            xp: 0,
-        }
-    }
+pub struct RewardBuilder {
+    xp: u32,
+    loot: Option<String>,
+    loot_chance: Option<u32>,
 }
 
 #[derive(Deserialize, Debug, Serialize)]
@@ -253,7 +287,7 @@ pub struct ActorBuilder {
     pub equipped: Option<Vec<u32>>,
     pub levels: HashMap<String, u32>,
     pub xp: Option<u32>,
-    pub reward: Option<Reward>,
+    pub reward: Option<RewardBuilder>,
 }
 
 impl ResourceBuilder for ActorBuilder {

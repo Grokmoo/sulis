@@ -64,7 +64,7 @@ impl animation::Animation for MeleeAttackAnimation {
         let mut attacker = self.attacker.borrow_mut();
 
         if !self.has_attacked && frac > 0.5 {
-            let (text, color) = attacker.actor.attack(&self.defender);
+            let (text, color) = attacker.actor.attack(&self.defender, area_state);
 
             let scale = 1.2;
             area_state.add_feedback_text(text, &self.defender, scale, color);

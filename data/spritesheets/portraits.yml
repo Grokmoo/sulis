@@ -1,6 +1,6 @@
 id: portraits
 src: "portraits.png"
-size: [ 1024, 1024 ]
+size: [ 2048, 2048 ]
 simple_image_gen_scale: 256
 grid_multiplier: 256
 groups:
@@ -46,3 +46,28 @@ groups:
       merling06: [5, 0]
       merling07: [6, 0]
       merling08: [7, 0]
+      
+      merling09: [4, 1]
+      merling10: [5, 1]
+      merling11: [6, 1]
+      merling12: [7, 1]
+      
+      human17: [4, 2]
+      human18: [5, 2]
+      human19: [6, 2]
+      human20: [7, 2]
+      
+      human21: [4, 3]
+      human22: [5, 3]
+      human23: [6, 3]
+      human24: [7, 3]
+      
+      elf13: [4, 4]
+      elf14: [5, 4]
+      elf15: [6, 4]
+      elf16: [7, 4]
+      
+      human25: [4, 5]
+      human26: [5, 5]
+      human27: [6, 5]
+      human28: [7, 5]

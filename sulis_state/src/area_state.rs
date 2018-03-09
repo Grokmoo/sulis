@@ -104,7 +104,7 @@ impl AreaState {
         for prop_data in area.props.iter() {
             let location = Location::from_point(&prop_data.location, &area);
             debug!("Adding prop '{}' at '{:?}'", prop_data.prop.id, location);
-            self.add_prop(prop_data, location);
+            self.add_prop(prop_data, location, false);
         }
 
         let turn_timer = TurnTimer::new(&self);
@@ -193,7 +193,7 @@ impl AreaState {
         }
     }
 
-    pub(crate) fn add_prop(&mut self, prop_data: &PropData, location: Location) -> bool {
+    pub(crate) fn add_prop(&mut self, prop_data: &PropData, location: Location, temporary: bool) -> bool {
         let prop = &prop_data.prop;
 
         if !self.area.coords_valid(location.x, location.y) { return false; }
@@ -201,7 +201,7 @@ impl AreaState {
             return false;
         }
 
-        let prop_state = PropState::new(prop_data, location);
+        let prop_state = PropState::new(prop_data, location, temporary);
 
         let start_x = prop_state.location.x as usize;
         let start_y = prop_state.location.y as usize;
@@ -330,6 +330,16 @@ impl AreaState {
 
             self.remove_entity_at_index(&entity, index);
             notify = true;
+        }
+
+        let mut index = self.props.len() - 1;
+        while index > 0 {
+            if self.props[index].is_marked_for_removal() {
+                trace!("Removing prop '{}'", self.props[index].prop.id);
+                self.props.remove(index);
+                notify = true;
+            }
+            index -= 1;
         }
 
         self.feedback_text.iter_mut().for_each(|f| f.update());

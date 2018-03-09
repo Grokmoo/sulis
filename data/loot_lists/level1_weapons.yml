@@ -1,0 +1,46 @@
+id: level1_weapons
+# format is number of items: weight
+# i.e. 2: 1 means generate 2 items with weight 1
+generate:
+  1: 4
+  2: 1
+entries:
+  battleaxe:
+    weight: 5
+  club:
+    weight: 10
+  crossbow:
+    weight: 2
+  dagger:
+    weight: 10
+  flail:
+    weight: 2
+  greataxe:
+    weight: 1
+  greathammer:
+    weight: 1
+  greatsword:
+    weight: 1
+  hatchet:
+    weight: 10
+  longbow:
+    weight: 1
+  longspear:
+    weight: 2
+  longsword:
+    weight: 2
+  mace:
+    weight: 5
+  morningstar:
+    weight: 2
+  quarterstaff:
+    weight: 10
+  shortbow:
+    weight: 5
+  shortspear:
+    weight: 10
+  shortsword:
+    weight: 5
+  warhammer:
+    weight: 5
+

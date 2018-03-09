@@ -16,3 +16,5 @@ items: [ club ]
 equipped: [ 0 ]
 reward:
   xp: 25
+  loot: level1_misc
+  loot_chance: 35

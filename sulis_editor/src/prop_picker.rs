@@ -129,7 +129,7 @@ impl WidgetKind for PropPicker {
         let mut widgets: Vec<Rc<RefCell<Widget>>> = Vec::new();
         for prop in all_props {
             let button = Widget::with_theme(Button::empty(), "prop_button");
-            button.borrow_mut().state.add_text_arg("name", &prop.name);
+            button.borrow_mut().state.add_text_arg("name", &prop.id);
             button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
                 let parent = Widget::get_parent(widget);
                 let cur_state = widget.borrow_mut().state.is_active();

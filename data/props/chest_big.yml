@@ -1,0 +1,8 @@
+id: chest_big
+name: Chest
+icon: inventory/misc_crate
+image: props/chest_large
+size: 3by3
+visible: true
+passable: false
+interactive: true

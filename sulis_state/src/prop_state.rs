@@ -30,6 +30,10 @@ pub struct PropState {
     pub animation_state: AnimationState,
     pub items: Vec<ItemState>,
     pub listeners: ChangeListenerList<PropState>,
+    can_generate_loot: bool,
+
+    temporary: bool,
+    marked_for_removal: bool,
 }
 
 impl fmt::Debug for PropState {
@@ -40,11 +44,13 @@ impl fmt::Debug for PropState {
 }
 
 impl PropState {
-    pub(crate) fn new(prop_data: &PropData, location: Location) -> PropState {
+    pub(crate) fn new(prop_data: &PropData, location: Location, temporary: bool) -> PropState {
         let mut items = Vec::new();
         for item in prop_data.items.iter() {
             items.push(ItemState::new(Rc::clone(item)));
         }
+
+        let can_generate_loot = prop_data.prop.loot.is_some();
 
         PropState {
             prop: Rc::clone(&prop_data.prop),
@@ -52,13 +58,29 @@ impl PropState {
             animation_state: AnimationState::default(),
             items,
             listeners: ChangeListenerList::default(),
+            can_generate_loot,
+            temporary,
+            marked_for_removal: false,
         }
     }
 
-    pub fn toggle_active(&mut self) {
-        let kind = animation_state::Kind::Active;
+    pub (crate) fn is_marked_for_removal(&self) -> bool {
+        self.marked_for_removal
+    }
 
-        self.animation_state.toggle(kind);
+    pub fn toggle_active(&mut self) {
+        if !self.is_active() && self.can_generate_loot {
+            if let Some(ref loot) = self.prop.loot {
+                let items = loot.generate();
+                for item in items {
+                    self.items.push(ItemState::new(item));
+                }
+            }
+
+            self.can_generate_loot = false;
+        }
+
+        self.animation_state.toggle(animation_state::Kind::Active);
     }
 
     pub fn is_active(&self) -> bool {
@@ -69,6 +91,11 @@ impl PropState {
     pub fn remove_item(&mut self, index: usize) -> ItemState {
         let item = self.items.remove(index);
         self.listeners.notify(&self);
+
+        if self.temporary && self.items.is_empty() {
+            self.marked_for_removal = true;
+        }
+
         item
     }
 

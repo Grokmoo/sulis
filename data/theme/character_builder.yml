@@ -9,12 +9,13 @@ children:
       title:
         from: .label
         preferred_size: [0, 5]
+        position: [0, 3]
         width_relative: Max
         text_params:
           scale: 5.5
   character_builder:
     preferred_size: [180, 150]
-    border: { top: 8, bottom: 5, right: 5, left: 5 }
+    border: { top: 6, bottom: 8, right: 6, left: 6 }
     x_relative: Center
     y_relative: Center
     height_relative: Zero
@@ -22,9 +23,9 @@ children:
     children:
       title:
         text: "Character Builder"
-        position: [0, -7]
+        position: [0, -3]
       close:
-        position: [3, -7]
+        position: [3, -3]
       next:
         from: .button
         text: "Next >>"

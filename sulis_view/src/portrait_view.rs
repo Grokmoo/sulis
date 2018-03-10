@@ -20,9 +20,12 @@ use std::cell::RefCell;
 
 use sulis_state::{ChangeListener, EntityState};
 use sulis_core::ui::{Widget, WidgetKind};
-use sulis_widgets::{Label};
+use sulis_module::Module;
+use sulis_widgets::{Label, ProgressBar};
 
 pub const NAME: &str = "portrait_view";
+
+const AP_BALLS: u32 = 4;
 
 pub struct PortraitView {
     entity: Rc<RefCell<EntityState>>,
@@ -52,10 +55,26 @@ impl WidgetKind for PortraitView {
             portrait.borrow_mut().state.add_text_arg("image", &image.id());
         }
 
-        let ap_bar = Widget::with_theme(Label::empty(), "ap_bar");
-        ap_bar.borrow_mut().state.add_text_arg("cur_ap", &entity.actor.ap().to_string());
+        let ap_bar = Widget::empty("ap_bar");
+        {
+            let base_ap = Module::rules().base_ap;
+            let cur_ap = entity.actor.ap();
+            let ap_per_ball = base_ap / AP_BALLS;
+            let active_balls = cur_ap / ap_per_ball;
 
-        let hp_bar = Widget::with_theme(Label::empty(), "hp_bar");
+            let mut i = AP_BALLS;
+            loop {
+                i -= 1;
+                let ball = Widget::with_theme(Label::empty(), "ball");
+                ball.borrow_mut().state.set_active(i < active_balls);
+                Widget::add_child_to(&ap_bar, ball);
+
+                if i == 0 { break; }
+            }
+        }
+
+        let frac = entity.actor.hp() as f32 / entity.actor.stats.max_hp as f32;
+        let hp_bar = Widget::with_theme(ProgressBar::new(frac), "hp_bar");
         hp_bar.borrow_mut().state.add_text_arg("cur_hp", &entity.actor.hp().to_string());
         hp_bar.borrow_mut().state.add_text_arg("max_hp", &entity.actor.stats.max_hp.to_string());
 

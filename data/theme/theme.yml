@@ -28,33 +28,36 @@ children:
       portrait_view:
         background: bg_rounded
         x_relative: Max
-        preferred_size: [40, 53]
+        preferred_size: [48, 46]
         border: [1, 1, 1, 1]
         children:
           portrait:
             width_relative: Max
             height_relative: Max
-            preferred_size: [0, -13]
+            preferred_size: [-8, -6]
+            position: [8, 0]
             foreground: "#image#"
           ap_bar:
-            text: "AP: #cur_ap#"
-            text_params:
-              scale: 4.0
-              horizontal_alignment: Center
             background: bg_base
-            width_relative: Max
-            y_relative: Max
-            preferred_size: [0, 6]
+            height_relative: Max
+            preferred_size: [8, 0]
+            border: [1, 1, 1, 1]
+            layout: BoxVertical
+            layout_spacing: { top: 1, bottom: 0, left: 0, right: 0 }
+            children:
+              ball:
+                background: ball_animated
+                preferred_size: [6, 6]
           hp_bar:
-            text: "HP: #cur_hp# / #max_hp#"
-            text_params:
-              scale: 4.0
-              horizontal_alignment: Center
-            background: bg_base
+            from: .progress_bar
             width_relative: Max
             y_relative: Max
-            preferred_size: [0, 6]
-            position: [0, -7]
+            preferred_size: [-9, 6]
+            position: [9, 0]
+            text: "#cur_hp# / #max_hp#"
+            text_params:
+              scale: 5.0
+              horizontal_alignment: Center
       end_turn_button:
         from: .button
         background: background_rounded
@@ -420,15 +423,17 @@ children:
       title:
         from: .label
         width_relative: Max
-        preferred_size: [4, 4]
+        preferred_size: [0, 4]
+        position: [0, 2]
         text_params:
           scale: 5.5
         text: "Game Over"
       exit:
         from: .button
-        preferred_size: [24, 12]
+        preferred_size: [20, 10]
         text: "Exit"
         text_params:
           scale: 5.5
-        position: [4, 8]
+        x_relative: Center
+        position: [0, 12]
 ...

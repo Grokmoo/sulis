@@ -74,8 +74,12 @@ impl TurnTimer {
         }
 
         if updated {
-            self.set_active(true);
-            self.activate_current();
+            if !self.active {
+                self.set_active(true);
+                self.activate_current();
+            } else {
+                self.listeners.notify(&self);
+            }
         }
     }
 

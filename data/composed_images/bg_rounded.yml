@@ -1,6 +1,6 @@
 id: bg_rounded
 generate_sub_images:
-  size: [4, 4]
+  size: [2, 2]
   spritesheet: "gui"
 grid: [ bg_rounded_top_left,    bg_rounded_top_middle,    bg_rounded_top_right,
         bg_rounded_middle_left, bg_rounded_middle,        bg_rounded_middle_right,

@@ -71,7 +71,7 @@ children:
       carat_offset: "0.4"
   window:
     background: bg_large
-    border: [4, 4, 4, 4]
+    border: { top: 6, bottom: 8, left: 6, right: 6 }
     preferred_size: [120, -8]
     position: [0, 4]
     height_relative: Max
@@ -100,6 +100,11 @@ children:
     border: [0, 0, 0, 0]
     foreground: "#icon#"
     preferred_size: [12, 12]
+  progress_bar:
+    background: bg_base
+    border: [1, 1, 1, 1]
+    custom:
+      bar_image: red_fill
   spinner:
     background: bg_base
     border: [1, 1, 1, 1]

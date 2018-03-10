@@ -289,6 +289,7 @@ impl ActorState {
 
     pub fn end_turn(&mut self) {
         self.ap = 0;
+        self.listeners.notify(&self);
     }
 
     pub fn compute_stats(&mut self) {

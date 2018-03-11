@@ -21,10 +21,10 @@ use std::collections::HashMap;
 
 use sulis_core::config::CONFIG;
 use sulis_core::io::{DrawList, GraphicsRenderer};
-use sulis_core::resource::{ResourceSet, read_single_resource, write_to_file};
-use sulis_core::ui::animation_state;
-use sulis_core::util::Point;
-use sulis_module::{Actor, Module, Prop};
+use sulis_core::resource::{Sprite, ResourceSet, read_single_resource, write_to_file};
+use sulis_core::ui::{animation_state, LineRenderer};
+use sulis_core::util::{Point, Size};
+use sulis_module::{Actor, Encounter, Module, Prop};
 use sulis_module::area::*;
 
 pub (crate) const MAX_AREA_SIZE: i32 = 128;
@@ -33,8 +33,12 @@ pub struct AreaModel {
     tiles: Vec<(String, Vec<(Point, Rc<Tile>)>)>,
     actors: Vec<(Point, Rc<Actor>)>,
     props: Vec<PropData>,
+    encounters: Vec<EncounterData>,
     transitions: Vec<Transition>,
     elevation: Vec<u8>,
+
+    encounter_sprite: Option<Rc<Sprite>>,
+    font_renderer: Option<LineRenderer>,
 
     id: String,
     name: String,
@@ -43,6 +47,21 @@ pub struct AreaModel {
 
 impl AreaModel {
     pub fn new() -> AreaModel {
+        let encounter_sprite = match ResourceSet::get_sprite(&CONFIG.editor.area.encounter_tile) {
+            Ok(sprite) => Some(sprite),
+            Err(_) => {
+                warn!("Encounter tile '{}' not found", CONFIG.editor.area.encounter_tile);
+                None
+            },
+        };
+
+        let font_renderer = match ResourceSet::get_font(&CONFIG.display.default_font) {
+            None => {
+                warn!("Font '{}' not found", CONFIG.display.default_font);
+                None
+            }, Some(font) => Some(LineRenderer::new(&font)),
+        };
+
         let mut tiles = Vec::new();
         for ref layer_id in CONFIG.editor.area.layers.iter() {
             tiles.push((layer_id.to_string(), Vec::new()));
@@ -55,7 +74,10 @@ impl AreaModel {
             elevation,
             actors: Vec::new(),
             props: Vec::new(),
+            encounters: Vec::new(),
             transitions: Vec::new(),
+            encounter_sprite,
+            font_renderer,
             id: CONFIG.editor.area.id.clone(),
             name: CONFIG.editor.area.name.clone(),
             filename: CONFIG.editor.area.filename.clone(),
@@ -145,6 +167,16 @@ impl AreaModel {
         }
     }
 
+    pub fn add_encounter(&mut self, encounter: Rc<Encounter>, x: i32, y: i32, w: i32, h: i32) {
+        if x < 0 || y < 0 { return; }
+
+        self.encounters.push(EncounterData {
+            encounter,
+            location: Point::new(x, y),
+            size: Size::new(w, h),
+        });
+    }
+
     pub fn add_actor(&mut self, actor: Rc<Actor>, x: i32, y: i32) {
         if x < 0 || y < 0 { return; }
 
@@ -200,6 +232,14 @@ impl AreaModel {
         }
 
         within
+    }
+
+    pub fn remove_encounters_within(&mut self, x: i32, y: i32, width: i32, height: i32) {
+        self.encounters.retain(|enc_data| {
+            let w = enc_data.size.width;
+            let h = enc_data.size.height;
+            !is_removal(enc_data.location, w, h, x, y, width, height)
+        });
     }
 
     pub fn new_transition(&mut self) -> Option<usize> {
@@ -285,6 +325,28 @@ impl AreaModel {
             draw_list.set_scale(scale_x, scale_y);
             renderer.draw(draw_list);
         }
+
+        let font_renderer = match self.font_renderer {
+            None => return,
+            Some(ref font) => font,
+        };
+
+        if let Some(ref encounter_sprite) = self.encounter_sprite {
+            for ref encounter_data in self.encounters.iter() {
+                let x = encounter_data.location.x as f32 + x;
+                let y = encounter_data.location.y as f32 + y;
+                let w = encounter_data.size.width as f32;
+                let h = encounter_data.size.height as f32;
+                let mut draw_list = DrawList::from_sprite_f32(encounter_sprite, x, y, w, h);
+                draw_list.set_scale(scale_x, scale_y);
+                renderer.draw(draw_list);
+
+                let text = format!("{}", encounter_data.encounter.id);
+                let mut draw_list = font_renderer.get_draw_list(&text, x, y, 1.0);
+                draw_list.set_scale(scale_x, scale_y);
+                renderer.draw(draw_list);
+            }
+        }
     }
 
     pub fn load(&mut self, filename_prefix: &str, filename: &str) {
@@ -339,6 +401,24 @@ impl AreaModel {
             };
 
             self.actors.push((actor_data.location, actor));
+        }
+
+        trace!("Loading area encounters.");
+        self.encounters.clear();
+        for enc_builder in area_builder.encounters {
+            let enc = match Module::encounter(&enc_builder.id) {
+                None => {
+                    warn!("No encounter '{}' found", enc_builder.id);
+                    continue;
+                }, Some(encounter) => encounter,
+            };
+
+            let enc_data = EncounterData {
+                encounter: enc,
+                location: enc_builder.location,
+                size: enc_builder.size,
+            };
+            self.encounters.push(enc_data);
         }
 
         trace!("Loading area props.");
@@ -458,6 +538,17 @@ impl AreaModel {
             props.push(builder);
         }
 
+        trace!("Saving encounters.");
+        let mut encounters: Vec<EncounterDataBuilder> = Vec::new();
+        for enc_data in self.encounters.iter() {
+            let builder = EncounterDataBuilder {
+                id: enc_data.encounter.id.to_string(),
+                location: enc_data.location,
+                size: enc_data.size,
+            };
+            encounters.push(builder);
+        }
+
         trace!("Saving transitions");
         let mut transitions: Vec<TransitionBuilder> = Vec::new();
         for ref transition in self.transitions.iter() {
@@ -493,6 +584,7 @@ impl AreaModel {
             entity_layer,
             actors,
             props,
+            encounters,
             transitions,
             max_vis_distance: 20,
             max_vis_up_one_distance: 6,

@@ -238,6 +238,7 @@ groups:
       carat_off: [ 37, 512, 2, 16]
       area_invis: [40, 512, 16, 16]
       area_unexplored: [57, 512, 16, 16]
+      editor_encounter: [187, 513, 14, 14]
       
       inventory_paper_doll: [ 512, 0, 512, 512]
       icon_up: [0, 153, 15, 15]

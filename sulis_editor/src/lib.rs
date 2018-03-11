@@ -26,6 +26,9 @@ use area_model::AreaModel;
 mod elev_picker;
 use elev_picker::ElevPicker;
 
+mod encounter_picker;
+use encounter_picker::EncounterPicker;
+
 mod load_window;
 use load_window::LoadWindow;
 
@@ -200,23 +203,27 @@ impl WidgetKind for EditorView {
         let actor_picker_kind = ActorPicker::new();
         let prop_picker_kind = PropPicker::new();
         let elev_picker_kind = ElevPicker::new();
+        let encounter_picker_kind = EncounterPicker::new();
 
         let mut pickers = Vec::new();
         pickers.push(Widget::with_defaults(tile_picker_kind.clone()));
         pickers.push(Widget::with_defaults(actor_picker_kind.clone()));
         pickers.push(Widget::with_defaults(prop_picker_kind.clone()));
         pickers.push(Widget::with_defaults(elev_picker_kind.clone()));
+        pickers.push(Widget::with_defaults(encounter_picker_kind.clone()));
         for picker in pickers.iter() {
             picker.borrow_mut().state.set_visible(false);
         }
 
         let picker_kinds: Vec<Rc<RefCell<EditorMode>>> =
-            vec![tile_picker_kind, actor_picker_kind, prop_picker_kind, elev_picker_kind];
+            vec![tile_picker_kind, actor_picker_kind, prop_picker_kind,
+            elev_picker_kind, encounter_picker_kind];
 
         let buttons = vec![Widget::with_theme(Button::empty(), "tiles"),
             Widget::with_theme(Button::empty(), "actors"),
             Widget::with_theme(Button::empty(), "props"),
-            Widget::with_theme(Button::empty(), "elevation")];
+            Widget::with_theme(Button::empty(), "elevation"),
+            Widget::with_theme(Button::empty(), "encounters")];
 
         // Any new pickers need to be added in all 3 places
         assert!(buttons.len() == picker_kinds.len());

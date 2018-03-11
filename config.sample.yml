@@ -60,6 +60,7 @@ editor:
     filename: "editor_test"
     id: "editor_test"
     name: "Editor Test"
+    encounter_tile: "gui/editor_encounter"
     visibility_tile: "gui/area_invis"
     explored_tile: "gui/area_unexplored"
     entity_layer: 3

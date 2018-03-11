@@ -1,5 +1,5 @@
-id: goblin
-name: Goblin
+id: goblin_archer
+name: Goblin Archer
 player: false
 images: {}
 race: goblin
@@ -12,7 +12,7 @@ attributes:
   wis: 9
 levels:
   rogue: 1
-items: [ shortspear ]
+items: [ shortbow ]
 equipped: [ 0 ]
 reward:
   xp: 25

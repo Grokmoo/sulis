@@ -37,6 +37,8 @@ pub struct ActionMenu {
     area_pos: Point,
 }
 
+// TODO refactor this with a trait implemented by each action type
+
 impl ActionMenu {
     pub fn new(x: i32, y: i32) -> Rc<RefCell<ActionMenu>> {
         let area_state = GameState::area_state();

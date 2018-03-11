@@ -36,6 +36,9 @@ pub mod object_size;
 pub use self::object_size::ObjectSize;
 pub use self::object_size::ObjectSizeIterator;
 
+pub mod encounter;
+pub use self::encounter::Encounter;
+
 pub mod equippable;
 pub use self::equippable::Equippable;
 
@@ -81,6 +84,7 @@ use sulis_core::resource::{all_resources, read, read_single_resource, get_resour
 use self::area::Tile;
 use self::area::AreaBuilder;
 use self::class::ClassBuilder;
+use self::encounter::EncounterBuilder;
 use self::item::ItemBuilder;
 use self::loot_list::LootListBuilder;
 use self::prop::PropBuilder;
@@ -98,6 +102,7 @@ pub struct Module {
     actors: HashMap<String, Rc<Actor>>,
     areas: HashMap<String, Rc<Area>>,
     classes: HashMap<String, Rc<Class>>,
+    encounters: HashMap<String, Rc<Encounter>>,
     items: HashMap<String, Rc<Item>>,
     item_adjectives: HashMap<String, Rc<ItemAdjective>>,
     loot_lists: HashMap<String, Rc<LootList>>,
@@ -280,6 +285,10 @@ impl Module {
                 insert_if_ok("actor", id, Actor::new(builder, &module), &mut module.actors);
             }
 
+            for (id, builder) in builder_set.encounter_builders.into_iter() {
+                insert_if_ok("encounter", id, Encounter::new(builder, &module), &mut module.encounters);
+            }
+
             for (id, builder) in builder_set.area_builders {
                  insert_if_ok("area", id, Area::new(builder, &module), &mut module.areas);
             }
@@ -329,6 +338,14 @@ impl Module {
         MODULE.with(|m| Rc::clone(m.borrow().game.as_ref().unwrap()))
     }
 
+    pub fn all_encounters() -> Vec<Rc<Encounter>> {
+        MODULE.with(|r| all_resources(&r.borrow().encounters))
+    }
+
+    pub fn encounter(id: &str) -> Option<Rc<Encounter>> {
+        MODULE.with(|r| get_resource(id, &r.borrow().encounters))
+    }
+
     pub fn item(id: &str) -> Option<Rc<Item>> {
         MODULE.with(|r| get_resource(id, &r.borrow().items))
     }
@@ -375,6 +392,7 @@ impl Default for Module {
             areas: HashMap::new(),
             classes: HashMap::new(),
             items: HashMap::new(),
+            encounters: HashMap::new(),
             props: HashMap::new(),
             item_adjectives: HashMap::new(),
             loot_lists: HashMap::new(),
@@ -389,6 +407,7 @@ struct ModuleBuilder {
     actor_builders: HashMap<String, ActorBuilder>,
     area_builders: HashMap<String, AreaBuilder>,
     class_builders: HashMap<String, ClassBuilder>,
+    encounter_builders: HashMap<String, EncounterBuilder>,
     item_builders: HashMap<String, ItemBuilder>,
     item_adjectives: HashMap<String, ItemAdjective>,
     loot_builders: HashMap<String, LootListBuilder>,
@@ -405,6 +424,7 @@ impl ModuleBuilder {
             actor_builders: read(&root_dirs, "actors"),
             area_builders: read(&root_dirs, "areas"),
             class_builders: read(&root_dirs, "classes"),
+            encounter_builders: read(&root_dirs, "encounters"),
             item_builders: read(&root_dirs, "items"),
             item_adjectives: read(&root_dirs, "item_adjectives"),
             loot_builders: read(&root_dirs, "loot_lists"),

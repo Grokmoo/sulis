@@ -3,6 +3,7 @@ id: area_02
 name: Area 02
 width: 76
 height: 124
+encounters: []
 terrain:
   cliffs_to_grass_n1:
     - - 28

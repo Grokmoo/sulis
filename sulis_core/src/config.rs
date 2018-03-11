@@ -54,6 +54,7 @@ pub struct EditorAreaConfig {
     pub name: String,
     pub visibility_tile: String,
     pub explored_tile: String,
+    pub encounter_tile: String,
     pub layers: Vec<String>,
     pub elev_tiles: Vec<String>,
     pub entity_layer: usize,

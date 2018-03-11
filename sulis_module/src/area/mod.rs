@@ -33,11 +33,11 @@ use std::rc::Rc;
 
 use sulis_core::image::Image;
 use sulis_core::resource::{ResourceBuilder, ResourceSet, Sprite};
-use sulis_core::util::{Point, unable_to_create_error};
+use sulis_core::util::{Point, Size, unable_to_create_error};
 use sulis_core::serde_json;
 use sulis_core::serde_yaml;
 
-use {Item, Module, ObjectSize, Prop};
+use {Encounter, Item, Module, ObjectSize, Prop};
 
 #[derive(Debug, Clone)]
 pub struct Transition {
@@ -61,6 +61,12 @@ pub struct PropData {
     pub items: Vec<Rc<Item>>,
 }
 
+pub struct EncounterData {
+    pub encounter: Rc<Encounter>,
+    pub location: Point,
+    pub size: Size,
+}
+
 pub struct Area {
     pub id: String,
     pub name: String,
@@ -73,6 +79,7 @@ pub struct Area {
     pub actors: Vec<ActorData>,
     pub props: Vec<PropData>,
     pub transitions: Vec<Transition>,
+    pub encounters: Vec<EncounterData>,
     pub vis_dist: i32,
     pub vis_dist_squared: i32,
     pub vis_dist_up_one_squared: i32,
@@ -86,8 +93,6 @@ impl PartialEq for Area {
 
 impl Area {
     pub fn new(builder: AreaBuilder, module: &Module) -> Result<Area, Error> {
-        // TODO validate prop position
-
         let mut props = Vec::new();
         for prop_builder in builder.props.iter() {
             let prop_data = create_prop(prop_builder, module)?;
@@ -111,7 +116,23 @@ impl Area {
             path_grids.insert(size.id.to_string(), path_grid);
         }
 
-        // TODO validate position of each actor
+        let mut encounters = Vec::new();
+        for encounter_builder in builder.encounters {
+            let encounter = match module.encounters.get(&encounter_builder.id) {
+                None => {
+                    warn!("No encounter '{}' found", &encounter_builder.id);
+                    return unable_to_create_error("area", &builder.id);
+                }, Some(encounter) => Rc::clone(encounter),
+            };
+
+            encounters.push(EncounterData {
+                encounter,
+                location: encounter_builder.location,
+                size: encounter_builder.size,
+            });
+        }
+
+        // TODO validate position of all actors, props, encounters
 
         let mut transitions: Vec<Transition> = Vec::new();
         for (index, t_builder) in builder.transitions.into_iter().enumerate() {
@@ -163,6 +184,7 @@ impl Area {
             terrain: terrain,
             path_grids: path_grids,
             actors: builder.actors,
+            encounters,
             props,
             visibility_tile,
             explored_tile,
@@ -199,6 +221,7 @@ pub struct AreaBuilder {
     pub entity_layer: usize,
     pub actors: Vec<ActorData>,
     pub props: Vec<PropDataBuilder>,
+    pub encounters: Vec<EncounterDataBuilder>,
     pub transitions: Vec<TransitionBuilder>,
     pub visibility_tile: String,
     pub explored_tile: String,
@@ -235,6 +258,14 @@ pub struct TransitionBuilder {
     pub to: Point,
     pub to_area: Option<String>,
     pub image_display: String,
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct EncounterDataBuilder {
+    pub id: String,
+    pub location: Point,
+    pub size: Size,
 }
 
 #[derive(Deserialize, Serialize, Debug)]

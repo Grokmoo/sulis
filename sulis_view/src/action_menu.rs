@@ -53,11 +53,9 @@ impl ActionMenu {
         let hovered_prop = match area_state.prop_index_at(x, y) {
             None => None,
             Some(index) => {
-                let prop_state = &area_state.props[index];
-                if prop_state.prop.interactive {
-                    Some(index)
-                } else {
-                    None
+                match area_state.get_prop(index).prop.interactive {
+                    true => Some(index),
+                    false => None,
                 }
             }
         };
@@ -153,7 +151,8 @@ impl ActionMenu {
 
         let max_dist = Module::rules().max_prop_distance;
         let area_state = GameState::area_state();
-        let prop_state = &area_state.borrow().props[prop_index];
+        let area_state = area_state.borrow();
+        let prop_state = area_state.get_prop(prop_index);
         let pc = GameState::pc();
         let pc = pc.borrow();
 
@@ -170,8 +169,9 @@ impl ActionMenu {
             let active = {
                 let area_state = GameState::area_state();
                 let mut area_state = area_state.borrow_mut();
-                area_state.props[index].toggle_active();
-                area_state.props[index].is_active()
+                let prop_state = area_state.get_prop_mut(index);
+                prop_state.toggle_active();
+                prop_state.is_active()
             };
 
             let root = Widget::get_root(&widget);
@@ -224,7 +224,7 @@ impl ActionMenu {
             (Rc::clone(&transition.size), transition.from)
         } else if let Some(index) = self.hovered_prop {
             Cursor::set_cursor_state(animation_state::Kind::MouseActivate);
-            let prop = &state.props[index];
+            let prop = state.get_prop(index);
             (Rc::clone(&prop.prop.size), prop.location.to_point())
         } else {
             Cursor::set_cursor_state(animation_state::Kind::MouseMove);

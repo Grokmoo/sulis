@@ -179,6 +179,21 @@ impl Module {
         modules
     }
 
+    pub fn delete_character(id: &str) {
+        // TODO don't assume ID = filename
+        let mut path = config::USER_DIR.clone();
+        path.push("characters");
+        path.push(id);
+        path.set_extension("yml");
+        info!("Deleting character at '{:?}'", path);
+
+        match std::fs::remove_file(path.as_path()) {
+            Err(e) => {
+                warn!("Unable to delete file {:?}: {}", path, e);
+            }, Ok(()) => (),
+        }
+    }
+
     pub fn get_available_characters() -> Vec<Actor> {
         let mut path = config::USER_DIR.clone();
         path.push("characters");

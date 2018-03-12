@@ -436,6 +436,7 @@ impl Widget {
     pub fn check_readd(parent: &Rc<RefCell<Widget>>) {
         let readd = parent.borrow().marked_for_readd;
         if readd {
+            parent.borrow_mut().modal_child = None;
             for child in parent.borrow_mut().children.iter() {
                 let child_ref = child.borrow_mut();
                 child_ref.kind.borrow_mut().on_remove();

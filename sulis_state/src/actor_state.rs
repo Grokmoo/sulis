@@ -145,7 +145,8 @@ impl ActorState {
 
     pub fn take_all(&mut self, prop_index: usize) {
         let area_state = GameState::area_state();
-        let prop_state = &mut area_state.borrow_mut().props[prop_index];
+        let mut area_state = area_state.borrow_mut();
+        let prop_state = area_state.get_prop_mut(prop_index);
 
         if prop_state.num_items() > 0 {
             let mut i = prop_state.num_items() - 1;
@@ -163,7 +164,8 @@ impl ActorState {
 
     pub fn take(&mut self, prop_index: usize, item_index: usize) {
         let area_state = GameState::area_state();
-        let prop_state = &mut area_state.borrow_mut().props[prop_index];
+        let mut area_state = area_state.borrow_mut();
+        let prop_state = area_state.get_prop_mut(prop_index);
 
         let item_state = prop_state.remove_item(item_index);
         self.inventory.add(item_state);

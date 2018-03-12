@@ -68,6 +68,10 @@ impl PropState {
         self.marked_for_removal
     }
 
+    pub fn might_contain_items(&self) -> bool {
+        !self.items.is_empty() || self.can_generate_loot
+    }
+
     pub fn toggle_active(&mut self) {
         if !self.is_active() && self.can_generate_loot {
             if let Some(ref loot) = self.prop.loot {

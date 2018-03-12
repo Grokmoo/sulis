@@ -31,7 +31,7 @@ pub struct AreaState {
     pub listeners: ChangeListenerList<AreaState>,
     pub turn_timer: TurnTimer,
     entities: Vec<Option<Rc<RefCell<EntityState>>>>,
-    pub props: Vec<PropState>,
+    props: Vec<Option<PropState>>,
 
     prop_grid: Vec<Option<usize>>,
     entity_grid: Vec<Option<usize>>,
@@ -198,12 +198,27 @@ impl AreaState {
            .all(|p| self.point_entities_passable(&requester, p.x, p.y))
     }
 
+    pub fn prop_index_valid(&self, index: usize) -> bool {
+        if index >= self.props.len() { return false; }
+
+        self.props[index].is_some()
+    }
+
     pub fn prop_index_at(&self, x: i32, y: i32) -> Option<usize> {
         if !self.area.coords_valid(x, y) { return None; }
 
         let x = x as usize;
         let y = y as usize;
         self.prop_grid[x + y * self.area.width as usize]
+    }
+
+    pub fn prop_at(&self, x: i32, y: i32) -> Option<&PropState> {
+        let index = match self.prop_index_at(x, y) {
+            None => return None,
+            Some(index) => index,
+        };
+
+        Some(self.get_prop(index))
     }
 
     pub fn get_entity_at(&self, x: i32, y: i32) -> Option<Rc<RefCell<EntityState>>> {
@@ -272,33 +287,39 @@ impl AreaState {
         let end_x = start_x + prop_state.prop.size.width as usize;
         let end_y = start_y + prop_state.prop.size.height as usize;
 
-        let index = self.props.len();
+        let index = self.find_prop_index_to_add();
         for y in start_y..end_y {
             for x in start_x..end_x {
                 self.prop_grid[x + y * self.area.width as usize] = Some(index);
             }
         }
 
-        self.props.push(prop_state);
+        self.props[index] = Some(prop_state);
 
         true
     }
 
     pub(crate) fn remove_prop(&mut self, index: usize) {
-        trace!("Removing prop '{}'", self.props[index].prop.id);
+        {
+            let prop = match self.props[index] {
+                None => return,
+                Some(ref prop) => prop,
+            };
+            trace!("Removing prop '{}'", prop.prop.id);
 
-        let start_x = self.props[index].location.x as usize;
-        let start_y = self.props[index].location.y as usize;
-        let end_x = start_x + self.props[index].prop.size.width as usize;
-        let end_y = start_y + self.props[index].prop.size.height as usize;
+            let start_x = prop.location.x as usize;
+            let start_y = prop.location.y as usize;
+            let end_x = start_x + prop.prop.size.width as usize;
+            let end_y = start_y + prop.prop.size.height as usize;
 
-        for y in start_y..end_y {
-            for x in start_x..end_x {
-                self.prop_grid[x + y * self.area.width as usize] = None;
+            for y in start_y..end_y {
+                for x in start_x..end_x {
+                    self.prop_grid[x + y * self.area.width as usize] = None;
+                }
             }
         }
 
-        self.props.remove(index);
+        self.props[index] = None;
     }
 
     pub(crate) fn add_actor(&mut self, actor: Rc<Actor>, location: Location,
@@ -323,7 +344,7 @@ impl AreaState {
         entity.borrow_mut().actor.compute_stats();
         entity.borrow_mut().actor.init();
 
-        let new_index = self.find_index_to_add();
+        let new_index = self.find_entity_index_to_add();
         entity.borrow_mut().index = new_index;
         entity.borrow_mut().location = location;
 
@@ -387,8 +408,17 @@ impl AreaState {
         None
     }
 
-    pub fn prop_iter<'a>(&'a self) -> Iter<'a, PropState> {
-        self.props.iter()
+    pub fn prop_iter<'a>(&'a self) -> PropIterator {
+        PropIterator { area_state: &self, index: 0 }
+    }
+
+    pub fn get_prop<'a>(&'a self, index: usize) -> &'a PropState {
+        &self.props[index].as_ref().unwrap()
+    }
+
+    pub fn get_prop_mut<'a>(&'a mut self, index: usize) -> &'a mut PropState {
+        let prop_ref = self.props[index].as_mut();
+        prop_ref.unwrap()
     }
 
     pub fn entity_iter(&self) -> EntityIterator {
@@ -416,13 +446,19 @@ impl AreaState {
             notify = true;
         }
 
-        let mut index = self.props.len() - 1;
-        while index > 0 {
-            if self.props[index].is_marked_for_removal() {
-                self.remove_prop(index);
-                notify = true;
+        let len = self.props.len();
+        for index in 0..len {
+            {
+                let prop = match self.props[index] {
+                    None => continue,
+                    Some(ref prop) => prop,
+                };
+
+                if !prop.is_marked_for_removal() { continue; }
             }
-            index -= 1;
+
+            self.remove_prop(index);
+            notify = true;
         }
 
         self.feedback_text.iter_mut().for_each(|f| f.update());
@@ -455,7 +491,16 @@ impl AreaState {
         self.turn_timer.remove(entity);
     }
 
-    fn find_index_to_add(&mut self) -> usize {
+    fn find_prop_index_to_add(&mut self) -> usize {
+        for (index, item) in self.props.iter().enumerate() {
+            if item.is_none() { return index; }
+        }
+
+        self.props.push(None);
+        self.props.len() - 1
+    }
+
+    fn find_entity_index_to_add(&mut self) -> usize {
         for (index, item) in self.entities.iter().enumerate() {
             if item.is_none() {
                 return index;
@@ -477,6 +522,29 @@ impl AreaState {
 
     pub fn feedback_text_iter(&self) -> Iter<AreaFeedbackText> {
         self.feedback_text.iter()
+    }
+}
+
+pub struct PropIterator<'a> {
+    area_state: &'a AreaState,
+    index: usize,
+}
+
+impl<'a> Iterator for PropIterator<'a> {
+    type Item = &'a PropState;
+    fn next(&mut self) -> Option<&'a PropState> {
+        loop {
+            let next = self.area_state.props.get(self.index);
+            self.index += 1;
+
+            match next {
+                None => return None,
+                Some(prop) => match prop {
+                    &None => continue,
+                    &Some(ref prop) => return Some(prop),
+                }
+            }
+        }
     }
 }
 

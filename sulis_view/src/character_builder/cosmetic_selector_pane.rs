@@ -385,6 +385,8 @@ impl WidgetKind for CosmeticSelectorPane {
             }
         }
 
+        let portrait_label = Widget::with_theme(Label::empty(), "portrait_label");
+
         let portrait_button = Widget::with_theme(Button::empty(), "portrait_button");
         if let Some(ref image) = self.portrait {
             portrait_button.borrow_mut().state.foreground = Some(Rc::clone(&image));
@@ -432,7 +434,7 @@ impl WidgetKind for CosmeticSelectorPane {
         vec![title, name_field, name_label, Rc::clone(&self.preview),
             male_button, female_button, hair_label, next_hair, prev_hair, beard_label,
             next_beard, prev_beard, color_label, color_panel, skin_color_panel, skin_color_label,
-            hair_color_label, hair_color_panel, portrait_button]
+            hair_color_label, hair_color_panel, portrait_button, portrait_label]
     }
 }
 

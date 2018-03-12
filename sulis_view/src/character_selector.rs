@@ -49,12 +49,15 @@ impl MainLoopUpdater for LoopUpdater {
 
 pub struct CharacterSelector {
     selected: Option<Rc<Actor>>,
+
+    to_select: Option<String>,
 }
 
 impl CharacterSelector {
     pub fn new() -> Rc<RefCell<CharacterSelector>> {
         Rc::new(RefCell::new(CharacterSelector {
             selected: None,
+            to_select: None,
         }))
     }
 
@@ -64,6 +67,10 @@ impl CharacterSelector {
 
     pub fn selected(&self) -> Option<Rc<Actor>> {
         self.selected.clone()
+    }
+
+    pub fn set_to_select(&mut self, id: &str) {
+        self.to_select = Some(id.to_string());
     }
 }
 
@@ -112,11 +119,57 @@ impl WidgetKind for CharacterSelector {
             Widget::add_child_to(&parent, builder);
         })));
 
+        let delete_character_button = Widget::with_theme(Button::empty(), "delete_character_button");
+
+        let (actor_name, actor_id) = match self.selected {
+            None => (String::new(), String::new()),
+            Some(ref actor) => (actor.name.to_string(), actor.id.to_string()),
+        };
+        delete_character_button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
+            let root = Widget::get_root(&widget);
+
+            let actor_id = actor_id.clone();
+            let window = ConfirmationWindow::new(Callback::new(Rc::new(move |widget, _| {
+                Module::delete_character(&actor_id);
+                widget.borrow_mut().mark_for_removal();
+
+                let root = Widget::get_root(&widget);
+                let selector = Widget::downcast_kind_mut::<CharacterSelector>(&root);
+                selector.selected = None;
+                root.borrow_mut().invalidate_children();
+            })));
+            {
+                let window = window.borrow();
+                window.title().borrow_mut().state.add_text_arg("name", &actor_name);
+            }
+            let window_widget = Widget::with_theme(window, "delete_character_confirmation_window");
+            window_widget.borrow_mut().state.set_modal(true);
+            Widget::add_child_to(&root, window_widget);
+        })));
+        delete_character_button.borrow_mut().state.set_enabled(self.selected.is_some());
+
         let characters_pane = Widget::empty("characters_pane");
         {
             let characters = Module::get_available_characters();
             for actor in characters {
+                let actor = Rc::new(actor);
                 trace!("Adding button for {}", actor.id);
+
+                let select = if let Some(ref to_select_id) = self.to_select {
+                    if &actor.id == to_select_id {
+                        true
+                    } else {
+                        false
+                    }
+                } else {
+                    false
+                };
+
+                if select {
+                    self.selected = Some(Rc::clone(&actor));
+                    self.to_select = None;
+                }
+
                 let actor_button = Widget::with_theme(Button::empty(), "character_button");
                 actor_button.borrow_mut().state.add_text_arg("name", &actor.name);
                 if let Some(ref portrait) = actor.portrait {
@@ -156,16 +209,16 @@ impl WidgetKind for CharacterSelector {
             Widget::with_theme(TextArea::empty(), "details")
         };
 
-        vec![title, chars_title, characters_pane, new_character_button, play_button, details]
+        vec![title, chars_title, characters_pane, new_character_button,
+            delete_character_button, play_button, details]
     }
 }
 
-fn actor_callback(actor: Actor) -> Callback {
-    let actor_ref = Rc::new(actor);
+fn actor_callback(actor: Rc<Actor>) -> Callback {
     Callback::new(Rc::new(move |widget, _| {
         let parent = Widget::go_up_tree(&widget, 2);
         let selector = Widget::downcast_kind_mut::<CharacterSelector>(&parent);
-        selector.selected = Some(Rc::clone(&actor_ref));
+        selector.selected = Some(Rc::clone(&actor));
         parent.borrow_mut().invalidate_children();
     }))
 }

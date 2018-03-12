@@ -47,26 +47,15 @@ impl WidgetKind for PropMouseover {
 
     fn as_any_mut(&mut self) -> &mut Any { self }
 
-    fn on_remove(&mut self) {
-        // let area_state = GameState::area_state();
-        // let prop = &mut area_state.borrow_mut().props[self.prop_index];
-        //
-        // prop.listeners.remove(NAME);
-    }
-
-    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
-        // let area_state = GameState::area_state();
-        // let prop = &mut area_state.borrow_mut().props[self.prop_index];
-        //
-        // prop.listeners.add(ChangeListener::invalidate_layout(NAME, widget));
-
-        Vec::new()
-    }
-
     fn layout(&mut self, widget: &mut Widget) {
         let area_state = GameState::area_state();
-        let prop = &mut area_state.borrow_mut().props[self.prop_index];
+        let area_state = area_state.borrow();
+        let prop = area_state.get_prop(self.prop_index);
 
+        widget.state.clear_text_args();
+        if !prop.might_contain_items() {
+            widget.state.add_text_arg("empty", "true");
+        }
         widget.state.add_text_arg("name", &prop.prop.name);
 
         self.text_area.borrow_mut().layout(widget);

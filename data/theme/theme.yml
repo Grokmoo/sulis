@@ -11,8 +11,10 @@ children:
     background: bg_base
     text: |
       [c=f00;s=5.0|#name#]
-      [?cur_hp|#cur_hp# / #max_hp#]
-    preferred_size: [20, 12]
+      [?cur_hp|#cur_hp# / #max_hp#
+      ][?empty;c=888|Empty
+      ]
+    preferred_size: [100, 12]
     width_relative: Custom
     height_relative: Custom
     x_relative: Custom
@@ -58,6 +60,13 @@ children:
             text_params:
               scale: 5.0
               horizontal_alignment: Center
+          level_up:
+            from: .button
+            text: "+"
+            text_params:
+              scale: 6.0
+            x_relative: Max
+            preferred_size: [7, 7]
       end_turn_button:
         from: .button
         background: background_rounded
@@ -277,7 +286,7 @@ children:
       details:
         from: .text_area
         text: |
-          [s=6|#name# - #race# #sex#]
+          [?name|[s=6|#name# - #race# #sex#]
           [s=4|]
           [s=5|[x=0|Hit Points][x=25|Action Points][x=55|Experience]]
           [x=0|#cur_hp# / #max_hp#][x=25|#cur_ap#][x=55|#cur_xp# / #next_xp#]
@@ -301,7 +310,7 @@ children:
                   [x=0|Wisdom][x=40|#wis#]]
           [s=6|]
           [x=0|Initiative][x=40|#initiative#]
-          [?portrait;x=80;y=0;i=#portrait#;s=30.0|]
+          [?portrait;x=80;y=0;i=#portrait#;s=30.0|]]
         preferred_size: [0, -8]
         position: [0, 8]
 
@@ -383,35 +392,10 @@ children:
         width_relative: Max
         height_relative: Max
   exit_confirmation_window:
-    background: bg_base
-    border: [1, 1, 1, 1]
-    preferred_size: [60, 28]
-    x_relative: Center
-    y_relative: Center
-    position: [0, -20]
+    from: .confirmation_window
     children:
       title:
-        from: .label
-        width_relative: Max
-        preferred_size: [0, 4]
-        position: [0, 3]
-        text_params:
-          scale: 5.5
         text: "Exit Sulis?"
-      cancel:
-        from: .button
-        preferred_size: [24, 12]
-        text: "Cancel"
-        text_params:
-          scale: 5.5
-        position: [3, 11]
-      accept:
-        from: .button
-        preferred_size: [24, 12]
-        text: "Exit"
-        text_params:
-          scale: 5.5
-        position: [31, 11]
   game_over_menu:
     background: bg_base
     border: [1, 1, 1, 1]

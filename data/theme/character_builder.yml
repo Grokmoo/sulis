@@ -23,7 +23,7 @@ children:
     children:
       title:
         text: "Character Builder"
-        position: [0, -3]
+        position: [0, -5]
       close:
         position: [3, -3]
       next:
@@ -204,9 +204,13 @@ children:
         children:
           title:
             text: "Customize your Appearance"
+          portrait_label:
+            from: .label
+            text: "Select a Portrait"
+            preferred_size: [30, 5]
+            position: [120, 15]
           portrait_button:
             from: .button
-            text: "Select Portrait"
             preferred_size: [30, 30]
             position: [120, 20]
           preview:

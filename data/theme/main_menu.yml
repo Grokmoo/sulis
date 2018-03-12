@@ -94,7 +94,14 @@ children:
         x_relative: Center
         position: [-110, 140]
         preferred_size: [40, 10]
+      delete_character_button:
+        from: .button
+        text: "Delete"
+        x_relative: Center
+        position: [-77, 140]
+        preferred_size: [20, 10]
       characters_pane:
+        border: [1, 1, 1, 1]
         background: bg_base
         x_relative: Center
         preferred_size: [120, 100]
@@ -104,7 +111,6 @@ children:
         children:
           character_button:
             from: .button
-            text: "#name#"
             foreground: "#portrait#"
             preferred_size: [28, 28]
       play_button:
@@ -130,4 +136,11 @@ children:
         from: .exit_confirmation_window
       portrait_selector:
         from: .portrait_selector
+      delete_character_confirmation_window:
+        from: .confirmation_window
+        children:
+          title:
+            text: "Delete #name#?"
+          accept:
+            text: "Delete"
 ...

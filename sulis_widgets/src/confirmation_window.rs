@@ -23,42 +23,42 @@ use sulis_core::ui::{Callback, Widget, WidgetKind};
 
 pub struct ConfirmationWindow {
     accept_callback: Callback,
+    title: Rc<RefCell<Widget>>,
 }
 
 impl ConfirmationWindow {
     pub fn new(accept_callback: Callback) -> Rc<RefCell<ConfirmationWindow>> {
+        let title = Widget::with_theme(Label::empty(), "title");
+
         Rc::new(RefCell::new(ConfirmationWindow {
-            accept_callback
+            accept_callback,
+            title,
         }))
+    }
+
+    pub fn title(&self) -> &Rc<RefCell<Widget>> {
+        &self.title
     }
 }
 
 impl WidgetKind for ConfirmationWindow {
-    fn get_name(&self) -> &str {
-        "confirmation_window"
-    }
+    fn get_name(&self) -> &str { "confirmation_window" }
 
-    fn as_any(&self) -> &Any {
-        self
-    }
+    fn as_any(&self) -> &Any { self }
 
-    fn as_any_mut(&mut self) -> &mut Any {
-        self
-    }
+    fn as_any_mut(&mut self) -> &mut Any { self }
 
     fn layout(&mut self, widget: &mut Widget) {
         widget.do_base_layout();
     }
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
-        let label = Widget::with_theme(Label::empty(), "title");
-
         let cancel = Widget::with_theme(Button::empty(), "cancel");
         cancel.borrow_mut().state.add_callback(Callback::remove_parent());
 
         let accept = Widget::with_theme(Button::empty(), "accept");
         accept.borrow_mut().state.add_callback(self.accept_callback.clone());
 
-        vec![cancel, accept, label]
+        vec![cancel, accept, Rc::clone(&self.title)]
     }
 }

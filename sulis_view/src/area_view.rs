@@ -418,10 +418,15 @@ impl WidgetKind for AreaView {
             };
             Widget::set_mouse_over(widget, EntityMouseover::new(&entity), x, y);
         } else if let Some(index) = area_state.borrow().prop_index_at(area_x, area_y) {
-            let interactive = area_state.borrow().props[index].prop.interactive;
+            let interactive = {
+                let area_state = area_state.borrow();
+                area_state.get_prop(index).prop.interactive
+            };
+
             if interactive {
                 let (x, y) = {
-                    let prop_state = &area_state.borrow().props[index];
+                    let area_state = area_state.borrow();
+                    let prop_state = area_state.get_prop(index);
                     self.get_mouseover_pos(prop_state.location.x, prop_state.location.y,
                                            prop_state.prop.size.width, prop_state.prop.size.height)
                 };

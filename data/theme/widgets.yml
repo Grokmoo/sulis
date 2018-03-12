@@ -82,7 +82,7 @@ children:
         background: bg_base
         x_relative: Center
         preferred_size: [40, 5]
-        position: [0, -3]
+        position: [0, -5]
         text_params:
           scale: 5.5
       close:
@@ -127,4 +127,33 @@ children:
         preferred_size: [7, 5]
         text: "+"
         position: [0, 0]
+  confirmation_window:
+    background: bg_base
+    border: [1, 1, 1, 1]
+    preferred_size: [60, 28]
+    x_relative: Center
+    y_relative: Center
+    position: [0, -20]
+    children:
+      title:
+        from: .label
+        width_relative: Max
+        preferred_size: [0, 4]
+        position: [0, 3]
+        text_params:
+          scale: 5.5
+      cancel:
+        from: .button
+        preferred_size: [24, 12]
+        text: "Cancel"
+        text_params:
+          scale: 5.5
+        position: [3, 11]
+      accept:
+        from: .button
+        preferred_size: [24, 12]
+        text: "Exit"
+        text_params:
+          scale: 5.5
+        position: [31, 11]
 ...

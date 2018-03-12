@@ -19,9 +19,11 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_state::{ChangeListener, EntityState};
-use sulis_core::ui::{Widget, WidgetKind};
+use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_module::Module;
-use sulis_widgets::{Label, ProgressBar};
+use sulis_widgets::{Button, Label, ProgressBar};
+
+use CharacterBuilder;
 
 pub const NAME: &str = "portrait_view";
 
@@ -78,6 +80,15 @@ impl WidgetKind for PortraitView {
         hp_bar.borrow_mut().state.add_text_arg("cur_hp", &entity.actor.hp().to_string());
         hp_bar.borrow_mut().state.add_text_arg("max_hp", &entity.actor.stats.max_hp.to_string());
 
-        vec![portrait, ap_bar, hp_bar]
+        let level_up = Widget::with_theme(Button::empty(), "level_up");
+        level_up.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+            let root = Widget::get_root(&widget);
+            let window = Widget::with_defaults(CharacterBuilder::level_up());
+            window.borrow_mut().state.set_modal(true);
+            Widget::add_child_to(&root, window);
+        })));
+        level_up.borrow_mut().state.set_visible(entity.actor.has_level_up());
+
+        vec![portrait, ap_bar, hp_bar, level_up]
     }
 }

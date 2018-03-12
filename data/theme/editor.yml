@@ -101,7 +101,7 @@ children:
           actor_button:
             from: .button
             text: "#name#"
-            preferred_size: [20, 20]
+            preferred_size: [40, 6]
       prop_picker:
         background: bg_base
         border: [1, 1, 1, 1]
@@ -116,7 +116,7 @@ children:
             from: .button
             text: "#name#"
             text_params:
-              scale: 3.0
+              scale: 4.0
             preferred_size: [40, 6]
       encounter_picker:
         background: bg_base
@@ -148,7 +148,7 @@ children:
               encounter_button:
                 from: .button
                 text: "#name#"
-                preferred_size: [40, 10]
+                preferred_size: [40, 6]
       tile_picker:
         background: bg_base
         border: [1, 1, 1, 1]

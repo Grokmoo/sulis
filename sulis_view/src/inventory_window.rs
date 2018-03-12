@@ -167,7 +167,7 @@ impl WidgetKind for ItemButton {
                 None => {
                     &pc.actor.inventory().items[self.item_index.unwrap()]
                 }, Some(prop_index) => {
-                    &area_state.props[prop_index].items[self.item_index.unwrap()]
+                    &area_state.get_prop(prop_index).items[self.item_index.unwrap()]
                 }
             };
 

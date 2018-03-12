@@ -16,6 +16,7 @@
 
 use std::rc::Rc;
 use std::cell::RefCell;
+use std::collections::HashSet;
 use std::collections::VecDeque;
 pub use std::collections::vec_deque::Iter;
 
@@ -60,6 +61,7 @@ impl TurnTimer {
     }
 
     pub fn check_ai_activation(&mut self, pc: &Rc<RefCell<EntityState>>, area: &Rc<Area>) {
+        let mut groups_to_activate: HashSet<usize> = HashSet::new();
         let mut updated = false;
         for entity in self.entities.iter() {
             if entity.borrow().is_pc() { continue; }
@@ -69,8 +71,25 @@ impl TurnTimer {
                 continue;
             }
 
+            if let Some(ai_group) = entity.borrow().ai_group() {
+                groups_to_activate.insert(ai_group);
+            }
             entity.borrow_mut().set_ai_active();
             updated = true;
+        }
+
+        for entity in self.entities.iter() {
+            if entity.borrow().is_pc() { continue; }
+            if entity.borrow().is_ai_active() { continue; }
+
+            let ai_group = match entity.borrow().ai_group() {
+                None => continue,
+                Some(ai_group) => ai_group,
+            };
+
+            if groups_to_activate.contains(&ai_group) {
+                entity.borrow_mut().set_ai_active();
+            }
         }
 
         if updated {

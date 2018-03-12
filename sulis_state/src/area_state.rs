@@ -14,9 +14,12 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use rand::{self, Rng};
 use sulis_core::ui::Color;
 use sulis_module::{Actor, Area, Module};
-use sulis_module::area::{PropData, Transition};
+use sulis_module::area::{EncounterData, PropData, Transition};
+use sulis_core::util::Point;
+
 use {AreaFeedbackText, calculate_los, ChangeListenerList, EntityState, Location, PropState, TurnTimer};
 
 use std::slice::Iter;
@@ -98,7 +101,7 @@ impl AreaState {
 
             let location = Location::from_point(&actor_data.location, &self.area);
             debug!("Adding actor '{}' at '{:?}'", actor.id, location);
-            self.add_actor(actor, location, false);
+            self.add_actor(actor, location, false, None);
         }
 
         for prop_data in area.props.iter() {
@@ -120,6 +123,67 @@ impl AreaState {
                 }
             }
         }
+
+        for (enc_index, enc_data) in area.encounters.iter().enumerate() {
+            let encounter = &enc_data.encounter;
+
+            let actors = encounter.gen_actors();
+            for actor in actors {
+                let location = match self.gen_location(&actor, &enc_data) {
+                    None => {
+                        warn!("Unable to generate location for encounter '{}'", encounter.id);
+                        continue;
+                    }, Some(location) => location,
+                };
+
+                self.add_actor(actor, location, false, Some(enc_index));
+            }
+        }
+    }
+
+    fn gen_location(&self, actor: &Rc<Actor>, data: &EncounterData) -> Option<Location> {
+        let available = self.get_available_locations(actor, data);
+        if available.is_empty() { return None; }
+
+        let roll = rand::thread_rng().gen_range(0, available.len());
+
+        let point = available[roll];
+        let location = Location::from_point(&point, &self.area);
+        Some(location)
+    }
+
+    fn get_available_locations(&self, actor: &Rc<Actor>, data: &EncounterData) -> Vec<Point> {
+        let mut locations = Vec::new();
+
+        let min_x = data.location.x;
+        let min_y = data.location.y;
+        let max_x = data.location.x + data.size.width - actor.race.size.width + 1;
+        let max_y = data.location.y + data.size.height - actor.race.size.height + 1;
+
+        for y in min_y..max_y {
+            for x in min_x..max_x {
+                if !self.area.coords_valid(x, y) { continue; }
+
+                if !self.area.get_path_grid(&actor.race.size.id).is_passable(x, y) { continue; }
+
+                let mut impass = false;
+                for y in y..(y + actor.race.size.height) {
+                    for x in x..(x + actor.race.size.width) {
+                        let index = (x + y * self.area.width) as usize;
+                        if self.entity_grid[index].is_some() {
+                            impass = true;
+                            break;
+                        }
+                    }
+                }
+
+                if impass { continue; }
+
+                locations.push(Point::new(x, y));
+            }
+        }
+
+        locations
     }
 
     pub fn is_passable(&self, requester: &Ref<EntityState>,
@@ -237,11 +301,14 @@ impl AreaState {
         self.props.remove(index);
     }
 
-    pub(crate) fn add_actor(&mut self, actor: Rc<Actor>,
-                     location: Location, is_pc: bool) -> bool {
-        let entity = EntityState::new(actor, location.clone(), 0, is_pc);
-        let entity = Rc::new(RefCell::new(entity));
-        self.add_entity(Rc::clone(&entity), location)
+    pub(crate) fn add_actor(&mut self, actor: Rc<Actor>, location: Location,
+                            is_pc: bool, ai_group: Option<usize>) -> bool {
+        let entity = Rc::new(RefCell::new(EntityState::new(actor,
+                                                           location.clone(),
+                                                           0,
+                                                           is_pc,
+                                                           ai_group)));
+        self.add_entity(entity, location)
     }
 
     pub(crate) fn add_entity(&mut self, entity: Rc<RefCell<EntityState>>,

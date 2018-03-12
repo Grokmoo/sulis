@@ -107,6 +107,9 @@ impl EntityAI {
         let area_state = GameState::area_state();
         let area = Rc::clone(&area_state.borrow().area);
 
+        // TODO handle the case where ai is in range but cannot actually attack due to visibility
+        // or other restrictions - find a path to the target, check each point along the path until
+        // a good one is found
         if !entity.can_reach(&pc) && GameState::can_move_towards(&self.entity, &pc) {
             State::Move
         } else if entity.can_attack(&pc, &area) {

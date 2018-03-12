@@ -14,6 +14,8 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+extern crate rand;
+
 extern crate sulis_core;
 extern crate sulis_module;
 extern crate sulis_rules;
@@ -213,7 +215,7 @@ impl GameState {
                                   "Unable to create starting location."));
         }
 
-        if !area_state.borrow_mut().add_actor(pc, location, true) {
+        if !area_state.borrow_mut().add_actor(pc, location, true, None) {
             error!("Player character starting location must be within \
                    area bounds and passable.");
             return Err(Error::new(ErrorKind::InvalidData,
@@ -382,7 +384,16 @@ impl GameState {
         };
 
         let dist = entity.borrow().size.width as f32 / 2.0 + target.borrow().size.height as f32 / 2.0;
-        (target_x as f32, target_y as f32, dist + entity.borrow().actor.stats.attack_distance())
+        let mut range = dist + entity.borrow().actor.stats.attack_distance();
+
+        let area = GameState::area_state();
+        let vis_dist = area.borrow().area.vis_dist as f32;
+        if range > vis_dist {
+            range = vis_dist;
+        }
+
+        trace!("Getting move target at {}, {} within {}", target_x, target_y, range);
+        (target_x as f32, target_y as f32, range)
     }
 
     pub fn can_move_towards(entity: &Rc<RefCell<EntityState>>,

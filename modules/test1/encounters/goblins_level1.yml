@@ -1,8 +1,6 @@
 id: goblins_level1
-min_actors: 3
-max_actors: 4
+min_actors: 2
+max_actors: 2
 entries:
   goblin:
-    weight: 2
-  goblin_archer:
     weight: 1

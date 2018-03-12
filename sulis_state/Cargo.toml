@@ -9,3 +9,4 @@ sulis_module = { path = "../sulis_module" }
 sulis_rules = { path = "../sulis_rules" }
 
 log = "0.4"
+rand = "0.4"

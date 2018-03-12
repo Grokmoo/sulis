@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use rand::{self, Rng};
 use std::io::{Error, ErrorKind};
 use std::collections::HashMap;
 use std::rc::Rc;
@@ -35,11 +36,18 @@ pub struct Encounter {
     min_actors: u32,
     max_actors: u32,
     entries: Vec<Entry>,
+    total_weight: u32,
 }
 
 impl Encounter {
     pub fn new(builder: EncounterBuilder, module: &Module) -> Result<Encounter, Error> {
+        if builder.entries.len() == 0 {
+            warn!("Cannot have an encounter with no entries");
+            return unable_to_create_error("encounter", &builder.id);
+        }
+
         let mut entries = Vec::new();
+        let mut total_weight = 0;
         for (actor_id, entry) in builder.entries {
             let actor = match module.actors.get(&actor_id) {
                 None => {
@@ -48,6 +56,7 @@ impl Encounter {
                 }, Some(actor) => Rc::clone(actor),
             };
 
+            total_weight += entry.weight;
             entries.push(Entry {
                 actor,
                 weight: entry.weight,
@@ -59,7 +68,39 @@ impl Encounter {
             min_actors: builder.min_actors,
             max_actors: builder.max_actors,
             entries,
+            total_weight,
         })
+    }
+
+    fn gen_actor(&self) -> Option<Rc<Actor>> {
+        let roll = rand::thread_rng().gen_range(0, self.total_weight);
+        let mut cur_weight = 0;
+        for entry in self.entries.iter() {
+            cur_weight += entry.weight;
+            if roll < cur_weight {
+                return Some(Rc::clone(&entry.actor));
+            }
+        }
+
+        None
+    }
+
+    pub fn gen_actors(&self) -> Vec<Rc<Actor>> {
+        let mut actors = Vec::new();
+
+        let num = rand::thread_rng().gen_range(self.min_actors, self.max_actors + 1);
+        for _ in 0..num {
+            match self.gen_actor() {
+                None => {
+                    warn!("Unable to generate actor for encounter '{}'", self.id);
+                    continue;
+                }, Some(actor) => {
+                    actors.push(actor);
+                }
+            }
+        }
+
+        actors
     }
 }
 

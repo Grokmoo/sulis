@@ -34,6 +34,7 @@ pub struct EntityState {
     pub sub_pos: (f32, f32),
     pub listeners: ChangeListenerList<EntityState>,
 
+    ai_group: Option<usize>,
     is_pc: bool,
     ai_active: bool,
     marked_for_removal: bool,
@@ -48,7 +49,7 @@ impl PartialEq for EntityState {
 
 impl EntityState {
     pub(crate) fn new(actor: Rc<Actor>, location: Location,
-                         index: usize, is_pc: bool) -> EntityState {
+                         index: usize, is_pc: bool, ai_group: Option<usize>) -> EntityState {
         debug!("Creating new entity state for {}", actor.id);
         let size = Rc::clone(&actor.race.size);
         let actor_state = ActorState::new(actor);
@@ -62,7 +63,12 @@ impl EntityState {
             is_pc,
             ai_active: false,
             marked_for_removal: false,
+            ai_group,
         }
+    }
+
+    pub fn ai_group(&self) -> Option<usize> {
+        self.ai_group
     }
 
     pub fn set_ai_active(&mut self) {
@@ -92,7 +98,15 @@ impl EntityState {
     /// Returns true if this entity can reach the specified target with its
     /// current weapon, without moving, false otherwise
     pub fn can_reach(&self, target: &Rc<RefCell<EntityState>>) -> bool {
-        self.actor.can_reach(self.dist_to_entity(target))
+        let dist = self.dist_to_entity(target);
+        let area = GameState::area_state();
+        let vis_dist = area.borrow().area.vis_dist as f32;
+
+        if dist > vis_dist {
+            false
+        } else {
+            self.actor.can_reach(self.dist_to_entity(target))
+        }
     }
 
     /// Returns true if this entity can attack the specified target with its

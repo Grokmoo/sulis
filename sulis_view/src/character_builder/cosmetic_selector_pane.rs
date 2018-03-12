@@ -392,6 +392,8 @@ impl WidgetKind for CosmeticSelectorPane {
         if let Some(ref race) = self.race {
             let race = Rc::clone(race);
             portrait_button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
+                let parent = Widget::get_parent(&widget);
+
                 let pop_up = Widget::empty("portrait_selector");
                 pop_up.borrow_mut().state.set_modal(true);
                 pop_up.borrow_mut().state.modal_remove_on_click_outside = true;
@@ -405,13 +407,13 @@ impl WidgetKind for CosmeticSelectorPane {
                     };
 
                     let button = Widget::with_theme(Button::empty(), "portrait_button");
-                    button.borrow_mut().state.add_callback(portrait_selector_button_callback(&portrait));
+                    button.borrow_mut().state.add_callback(portrait_selector_button_callback(&portrait, &parent));
                     button.borrow_mut().state.foreground = Some(portrait);
                     Widget::add_child_to(&pop_up, button);
                 }
 
-                let parent = Widget::get_parent(&widget);
-                Widget::add_child_to(&parent, pop_up);
+                let root = Widget::get_root(&widget);
+                Widget::add_child_to(&root, pop_up);
             })));
         }
 
@@ -447,14 +449,14 @@ fn hue_to_color(hue: f32) -> Color {
     Color::new(res[0], res[1], res[2], 1.0)
 }
 
-fn portrait_selector_button_callback(portrait: &Rc<Image>) -> Callback {
+fn portrait_selector_button_callback(portrait: &Rc<Image>, pane_widget: &Rc<RefCell<Widget>>) -> Callback {
+    let pane_widget_ref = Rc::clone(pane_widget);
     let image = Rc::clone(portrait);
     Callback::new(Rc::new(move |widget, _| {
-        let parent = Widget::go_up_tree(&widget, 2);
-        let cosmetic_pane = Widget::downcast_kind_mut::<CosmeticSelectorPane>(&parent);
+        let cosmetic_pane = Widget::downcast_kind_mut::<CosmeticSelectorPane>(&pane_widget_ref);
         cosmetic_pane.portrait = Some(Rc::clone(&image));
-        parent.borrow_mut().invalidate_children();
-        cosmetic_pane.set_finish_enabled(&parent);
+        pane_widget_ref.borrow_mut().invalidate_children();
+        cosmetic_pane.set_finish_enabled(&pane_widget_ref);
 
         let parent = Widget::get_parent(&widget);
         parent.borrow_mut().mark_for_removal();

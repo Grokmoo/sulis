@@ -28,7 +28,7 @@ children:
       portrait_view:
         background: bg_rounded
         x_relative: Max
-        preferred_size: [48, 46]
+        preferred_size: [38, 36]
         border: [1, 1, 1, 1]
         children:
           portrait:

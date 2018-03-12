@@ -307,18 +307,18 @@ children:
               color_button:
                 from: .color_button
                 preferred_size: [5, 5]
-          portrait_selector:
-            background: bg_base
-            border: [2, 2, 2, 2]
-            preferred_size: [195, 115]
-            width_relative: Zero
-            height_relative: Zero
-            x_relative: Center
-            y_relative: Center
-            layout: Grid
-            children:
-              portrait_button:
-                from: .button
-                preferred_size: [25, 25]
-            layout_spacing: { top: 0, bottom: 2, left: 0, right: 2 }
+  portrait_selector:
+    background: bg_base
+    border: [2, 2, 2, 2]
+    preferred_size: [250, 115]
+    width_relative: Zero
+    height_relative: Zero
+    x_relative: Center
+    y_relative: Center
+    layout: Grid
+    children:
+      portrait_button:
+        from: .button
+        preferred_size: [20, 20]
+    layout_spacing: { top: 0, bottom: 2, left: 0, right: 2 }
 ...

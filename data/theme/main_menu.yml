@@ -128,4 +128,6 @@ children:
         from: .character_builder
       exit_confirmation_window:
         from: .exit_confirmation_window
+      portrait_selector:
+        from: .portrait_selector
 ...

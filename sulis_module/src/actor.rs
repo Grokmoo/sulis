@@ -27,7 +27,7 @@ use sulis_core::util::{unable_to_create_error};
 use sulis_core::{serde_json, serde_yaml};
 use sulis_rules::AttributeList;
 
-use {Class, ImageLayer, ImageLayerSet, Item, LootList, Module, Race};
+use {Ability, Class, ImageLayer, ImageLayerSet, Item, LootList, Module, Race};
 
 #[derive(Debug, Clone)]
 pub struct Reward {
@@ -79,6 +79,7 @@ pub struct Actor {
     image: LayeredImage,
 
     pub reward: Option<Reward>,
+    pub abilities: Vec<Rc<Ability>>,
 }
 
 impl PartialEq for Actor {
@@ -88,7 +89,8 @@ impl PartialEq for Actor {
 }
 
 impl Actor {
-    pub fn from(other: &Actor, class_to_add: Rc<Class>, xp: u32) -> Actor {
+    pub fn from(other: &Actor, class_to_add: Rc<Class>, xp: u32,
+                mut abilities_to_add: Vec<Rc<Ability>>) -> Actor {
         let mut added = false;
         let mut levels = other.levels.clone();
         for &mut (ref existing_class, ref mut level) in levels.iter_mut() {
@@ -105,6 +107,9 @@ impl Actor {
         let image_layers = other.image_layers.clone();
         let images_list = image_layers.get_list(other.sex, other.hair_color, other.skin_color);
         let image = LayeredImage::new(images_list, other.hue);
+
+        let mut abilities = other.abilities.clone();
+        abilities.append(&mut abilities_to_add);
 
         Actor {
             id: other.id.to_string(),
@@ -125,6 +130,7 @@ impl Actor {
             image_layers,
             image,
             reward: other.reward.clone(),
+            abilities,
         }
     }
 
@@ -225,6 +231,19 @@ impl Actor {
             }
         };
 
+        let mut abilities = Vec::new();
+        if let Some(ref builder_abilities) = builder.abilities {
+            for ability_id in builder_abilities {
+                let ability = match resources.abilities.get(ability_id) {
+                    None => {
+                        warn!("No ability found for '{}'", ability_id);
+                        return unable_to_create_error("actor", &builder.id);
+                    }, Some(ref ability) => Rc::clone(ability),
+                };
+                abilities.push(ability);
+            }
+        }
+
         Ok(Actor {
             id: builder.id,
             name: builder.name,
@@ -244,6 +263,7 @@ impl Actor {
             hue: builder.hue,
             skin_color: builder.skin_color,
             hair_color: builder.hair_color,
+            abilities,
         })
     }
 
@@ -288,6 +308,7 @@ pub struct ActorBuilder {
     pub levels: HashMap<String, u32>,
     pub xp: Option<u32>,
     pub reward: Option<RewardBuilder>,
+    pub abilities: Option<Vec<String>>,
 }
 
 impl ResourceBuilder for ActorBuilder {

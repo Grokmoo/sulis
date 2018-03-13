@@ -14,6 +14,9 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+mod ability_selector_pane;
+use self::ability_selector_pane::AbilitySelectorPane;
+
 mod attribute_selector_pane;
 use self::attribute_selector_pane::AttributeSelectorPane;
 
@@ -48,7 +51,7 @@ use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
 use sulis_core::resource::write_to_file;
 use sulis_widgets::{Button, Label};
 use sulis_module::actor::Sex;
-use sulis_module::{ActorBuilder, Class, ImageLayer, Module, Race};
+use sulis_module::{Ability, ActorBuilder, Class, ImageLayer, Module, Race};
 use sulis_rules::{AttributeList};
 use sulis_state::GameState;
 
@@ -86,6 +89,8 @@ pub struct CharacterBuilder {
     pub skin_color: Option<Color>,
     pub hair_color: Option<Color>,
     pub portrait: Option<String>,
+
+    pub abilities: Vec<Rc<Ability>>,
 }
 
 impl CharacterBuilder {
@@ -145,6 +150,7 @@ impl CharacterBuilder {
             items: None,
             portrait: None,
             images: HashMap::new(),
+            abilities: Vec::new(),
         }))
     }
 
@@ -268,6 +274,7 @@ impl BuilderSet for CharacterCreator {
             levels,
             xp: None,
             reward: None,
+            abilities: None,
         };
 
         info!("Writing character to {}", filename);

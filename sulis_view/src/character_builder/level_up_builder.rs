@@ -21,7 +21,7 @@ use sulis_core::ui::{Widget};
 use sulis_module::Actor;
 use sulis_state::EntityState;
 
-use character_builder::{BuilderPane, BuilderSet, CharacterBuilder, ClassSelectorPane, LevelUpFinishPane};
+use character_builder::*;
 
 pub struct LevelUpBuilder {
     pub pc: Rc<RefCell<EntityState>>,
@@ -30,22 +30,42 @@ pub struct LevelUpBuilder {
 impl BuilderSet for LevelUpBuilder {
     fn on_add(&self, builder: &mut CharacterBuilder,
               _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+        let mut children = Vec::new();
+
         let choices = vec![self.pc.borrow().actor.actor.base_class().id.to_string()];
         let class_selector_pane = ClassSelectorPane::new(choices, false);
         let level_up_finish_pane = LevelUpFinishPane::new();
         let class_sel_widget = Widget::with_defaults(class_selector_pane.clone());
         let level_up_finish_widget = Widget::with_defaults(level_up_finish_pane.clone());
+
+        let class_sel_widget_ref = Rc::clone(&class_sel_widget);
+        let class_selector_pane_ref = Rc::clone(&class_selector_pane);
+
         class_sel_widget.borrow_mut().state.set_visible(true);
         level_up_finish_widget.borrow_mut().state.set_visible(false);
         builder.finish.borrow_mut().state.set_visible(false);
 
         builder.builder_panes.clear();
         builder.builder_pane_index = 0;
-        builder.builder_panes.push(class_selector_pane.clone());
-        builder.builder_panes.push(level_up_finish_pane.clone());
-        class_selector_pane.borrow_mut().on_selected(builder, Rc::clone(&class_sel_widget));
+        builder.builder_panes.push(class_selector_pane);
+        children.push(class_sel_widget);
 
-        vec![class_sel_widget, level_up_finish_widget]
+        let actor = &self.pc.borrow().actor.actor;
+        let level = actor.total_level + 1;
+        for (index, ability_list) in actor.base_class().ability_choices(level).into_iter().enumerate() {
+            let pane = AbilitySelectorPane::new(ability_list, index);
+            let widget = Widget::with_defaults(pane.clone());
+            widget.borrow_mut().state.set_visible(false);
+
+            builder.builder_panes.push(pane);
+            children.push(widget);
+        }
+
+        builder.builder_panes.push(level_up_finish_pane.clone());
+        children.push(level_up_finish_widget);
+
+        class_selector_pane_ref.borrow_mut().on_selected(builder, Rc::clone(&class_sel_widget_ref));
+        children
     }
 
     fn finish(&self, builder: &mut CharacterBuilder, _widget: &Rc<RefCell<Widget>>) {
@@ -57,7 +77,7 @@ impl BuilderSet for LevelUpBuilder {
         let mut pc = self.pc.borrow_mut();
         let state = &mut pc.actor;
 
-        let new_actor = Actor::from(&state.actor, class, state.xp());
+        let new_actor = Actor::from(&state.actor, class, state.xp(), builder.abilities.clone());
         state.level_up(new_actor);
     }
 }

@@ -14,6 +14,8 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::rc::Rc;
+use std::collections::HashMap;
 use std::io::Error;
 
 use sulis_core::resource::ResourceBuilder;
@@ -21,6 +23,8 @@ use sulis_core::util::{invalid_data_error, unable_to_create_error};
 use sulis_core::serde_json;
 use sulis_core::serde_yaml;
 use sulis_rules::{AttributeList, BonusList};
+
+use {Ability, Module};
 
 #[derive(Deserialize, Serialize, Debug)]
 #[serde(deny_unknown_fields)]
@@ -36,6 +40,7 @@ pub struct Class {
     pub name: String,
     pub description: String,
     pub bonuses_per_level: BonusList,
+    ability_choices: HashMap<u32, Vec<Vec<Rc<Ability>>>>,
     pub kits: Vec<Kit>,
 }
 
@@ -46,10 +51,35 @@ impl PartialEq for Class {
 }
 
 impl Class {
-    pub fn new(builder: ClassBuilder) -> Result<Class, Error> {
+    pub fn new(builder: ClassBuilder, module: &Module) -> Result<Class, Error> {
         if builder.bonuses_per_level.attack.is_some() {
             warn!("Must not specify an attack for a class.");
             return unable_to_create_error("class", &builder.id);
+        }
+
+        let mut ability_choices = HashMap::new();
+        for (level, list_vec) in builder.ability_choices {
+            let mut vec = Vec::new();
+
+            for list in list_vec {
+                let mut abilities = Vec::new();
+
+                for ability_id in list {
+                    let ability = match module.abilities.get(&ability_id) {
+                        None => {
+                            warn!("Unable to find ability '{}'", ability_id);
+                            return unable_to_create_error("class", &builder.id);
+                        }, Some(ref ability) => Rc::clone(ability),
+                    };
+
+                    abilities.push(ability);
+                }
+
+                vec.push(abilities);
+            }
+
+
+            ability_choices.insert(level, vec);
         }
 
         Ok(Class {
@@ -58,7 +88,15 @@ impl Class {
             description: builder.description,
             bonuses_per_level: builder.bonuses_per_level,
             kits: builder.kits,
+            ability_choices,
         })
+    }
+
+    pub fn ability_choices(&self, level: u32) -> Vec<Vec<Rc<Ability>>> {
+        match self.ability_choices.get(&level) {
+            None => Vec::new(),
+            Some(choices) => choices.clone(),
+        }
     }
 }
 
@@ -69,6 +107,7 @@ pub struct ClassBuilder {
     pub name: String,
     pub description: String,
     pub bonuses_per_level: BonusList,
+    pub ability_choices: HashMap<u32, Vec<Vec<String>>>,
     pub kits: Vec<Kit>,
 }
 

@@ -1,0 +1,5 @@
+id: mighty_blow
+name: "Mighty Blow"
+icon: abilities/mighty_blow
+description: "You unleash a powerful blow upon a single enemy in melee range."
+active: true

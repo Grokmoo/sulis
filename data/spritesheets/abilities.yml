@@ -1,0 +1,11 @@
+id: abilities
+src: "abilities.png"
+size: [ 512, 512 ]
+simple_image_gen_scale: 128
+grid_multiplier: 128
+groups:
+  1by1:
+    size: [1, 1]
+    areas:
+      mighty_blow: [0, 0]
+      impenetrable_defense: [1, 0]

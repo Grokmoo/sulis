@@ -11,6 +11,11 @@ bonuses_per_level:
   reflex: 2
   will: 2
   initiative: 1
+ability_choices:
+  2: 
+    - [ mighty_blow, impenetrable_defense ]
+  3:
+    - [ mighty_blow, impenetrable_defense ]
 kits:
   - name: Brawler
     default_attributes:

@@ -27,6 +27,20 @@ children:
     x_relative: Max
     height_relative: Max
     children:
+      abilities_bar:
+        border: [1, 1, 1, 1]
+        background: bg_base
+        x_relative: Max
+        height_relative: Max
+        position: [0, 40]
+        preferred_size: [40, -100]
+        layout: Grid
+        layout_spacing: { top: 0, bottom: 0, left: 0, right: 1 }
+        children:
+          ability_button:
+            from: .button
+            foreground: "#icon#"
+            preferred_size: [10, 10]
       portrait_view:
         background: bg_rounded
         x_relative: Max
@@ -359,10 +373,25 @@ children:
           #description#
         width_relative: Max
         height_relative: Max
+  ability_pane:
+    preferred_size: [40, 40]
+    background: bg_base
+    border: [2, 2, 2, 2]
+    children:
+      details:
+        from: .text_area
+        width_relative: Max
+        height_relative: Max
+        text: |
+          [s=6|#name#]
+          [s=6|]
+          [?active;s=5;c=f00|Active][?passive;s=5;c=00f|Passive]
+          [s=4|#description#]
+          
   class_pane:
     preferred_size: [40, 40]
     background: bg_base
-    border: [1, 1, 1, 1]
+    border: [2, 2, 2, 2]
     children:
       details:
         from: .text_area

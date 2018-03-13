@@ -1,6 +1,6 @@
 id: inventory
 src: "inventory.png"
-size: [ 1024, 1024 ]
+size: [ 1024, 2048 ]
 simple_image_gen_scale: 128
 grid_multiplier: 128
 groups:

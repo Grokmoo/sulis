@@ -20,7 +20,7 @@ use std::cell::RefCell;
 
 use sulis_core::ui::{Widget, WidgetKind};
 use sulis_widgets::{Label, TextArea};
-use sulis_module::{Class};
+use sulis_module::{Ability, Class};
 
 use {CharacterBuilder};
 use character_builder::BuilderPane;
@@ -29,12 +29,14 @@ pub const NAME: &str = "level_up_finish_pane";
 
 pub struct LevelUpFinishPane {
     class: Option<Rc<Class>>,
+    abilities: Vec<Rc<Ability>>,
 }
 
 impl LevelUpFinishPane {
     pub fn new() -> Rc<RefCell<LevelUpFinishPane>> {
         Rc::new(RefCell::new(LevelUpFinishPane {
             class: None,
+            abilities: Vec::new(),
         }))
     }
 }
@@ -51,6 +53,8 @@ impl BuilderPane for LevelUpFinishPane {
             None => None,
             Some(ref class) => Some(Rc::clone(class)),
         };
+
+        self.abilities = builder.abilities.clone();
 
         widget.borrow_mut().invalidate_children();
     }
@@ -75,9 +79,15 @@ impl WidgetKind for LevelUpFinishPane {
 
         let details = Widget::with_theme(TextArea::empty(), "details");
 
-        if let Some(ref class) = self.class {
+        {
             let state = &mut details.borrow_mut().state;
-            state.add_text_arg("class", &class.name);
+            if let Some(ref class) = self.class {
+                state.add_text_arg("class", &class.name);
+            }
+
+            for (index, ability) in self.abilities.iter().enumerate() {
+                state.add_text_arg(&format!("ability_name_{}", index), &ability.name);
+            }
         }
 
         vec![title, details]

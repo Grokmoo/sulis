@@ -23,6 +23,12 @@ extern crate sulis_widgets;
 extern crate chrono;
 #[macro_use] extern crate log;
 
+mod abilities_bar;
+pub use self::abilities_bar::AbilitiesBar;
+
+mod ability_pane;
+pub use self::ability_pane::AbilityPane;
+
 mod action_menu;
 pub use self::action_menu::ActionMenu;
 
@@ -249,9 +255,9 @@ impl WidgetKind for RootView {
             })));
 
             let portrait = Widget::with_defaults(PortraitView::new(GameState::pc()));
-
+            let abilities = Widget::with_defaults(AbilitiesBar::new(GameState::pc()));
             Widget::add_children_to(&right_pane, vec![inv_button, cha_button, map_button,
-                                    log_button, men_button, portrait]);
+                                    log_button, men_button, portrait, abilities]);
         }
 
         let widget_ref = Rc::clone(&widget);

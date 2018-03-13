@@ -58,11 +58,18 @@ children:
           details:
             from: .text_area
             background: bg_base
+            border: [2, 2, 2, 2]
             preferred_size: [0, 100]
             width_relative: Max
             position: [0, 15]
             text: |
-              [x=2;y=2;s=5|Class: #class#]
+              [s=5|Class: #class#]
+              [s=4|]
+              [?ability_name_0|Ability: #ability_name_0#]
+              [?ability_name_1|Ability: #ability_name_1#]
+              [?ability_name_2|Ability: #ability_name_2#]
+              [?ability_name_3|Ability: #ability_name_3#]
+              [?ability_name_4|Ability: #ability_name_4#]
       race_selector_pane:
         from: .builder_pane
         children:
@@ -90,6 +97,29 @@ children:
                   scale: 5.0
                 text: "#name#"
                 preferred_size: [30, 10]
+      ability_selector_pane:
+        from: .builder_pane
+        children:
+          title:
+            text: "Select an Ability"
+          ability_pane:
+            from: .ability_pane
+            position: [60, 10]
+            preferred_size: [-60, -10]
+            width_relative: Max
+            height_relative: Max
+          abilities_pane:
+            border: [1, 1, 1, 1]
+            preferred_size: [50, -10]
+            position: [0, 10]
+            height_relative: Max
+            layout: Grid
+            layout_spacing: { top: 0, bottom: 0, left: 0, right: 2 }
+            children:
+              ability_button:
+                from: .button
+                foreground: "#icon#"
+                preferred_size: [20, 20]
       class_selector_pane:
         from: .builder_pane
         children:

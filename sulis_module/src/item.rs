@@ -21,7 +21,6 @@ use std::rc::Rc;
 
 use sulis_core::image::Image;
 use sulis_core::resource::{ResourceBuilder, ResourceSet};
-use sulis_core::serde_json;
 use sulis_core::serde_yaml;
 use sulis_core::util::unable_to_create_error;
 
@@ -155,12 +154,6 @@ pub struct ItemBuilder {
 impl ResourceBuilder for ItemBuilder {
     fn owned_id(&self) -> String {
         self.id.to_owned()
-    }
-
-    fn from_json(data: &str) -> Result<ItemBuilder, Error> {
-        let resource: ItemBuilder = serde_json::from_str(data)?;
-
-        Ok(resource)
     }
 
     fn from_yaml(data: &str) -> Result<ItemBuilder, Error> {

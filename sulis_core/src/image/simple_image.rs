@@ -23,7 +23,6 @@ use io::{DrawList, GraphicsRenderer};
 use ui::AnimationState;
 use util::Size;
 
-use serde_json;
 use serde_yaml;
 
 #[derive(Debug)]
@@ -82,12 +81,6 @@ pub struct SimpleImageBuilder {
 impl ResourceBuilder for SimpleImageBuilder {
     fn owned_id(&self) -> String {
         self.id.to_string()
-    }
-
-    fn from_json(data: &str) -> Result<SimpleImageBuilder, Error> {
-        let resource: SimpleImageBuilder = serde_json::from_str(data)?;
-
-        Ok(resource)
     }
 
     fn from_yaml(data: &str) -> Result<SimpleImageBuilder, Error> {

@@ -20,7 +20,6 @@ use std::io::Error;
 
 use sulis_core::resource::ResourceBuilder;
 use sulis_core::util::{invalid_data_error, unable_to_create_error};
-use sulis_core::serde_json;
 use sulis_core::serde_yaml;
 use sulis_rules::{AttributeList, BonusList};
 
@@ -114,12 +113,6 @@ pub struct ClassBuilder {
 impl ResourceBuilder for ClassBuilder {
     fn owned_id(&self) -> String {
         self.id.to_owned()
-    }
-
-    fn from_json(data: &str) -> Result<ClassBuilder, Error> {
-        let resource: ClassBuilder = serde_json::from_str(data)?;
-
-        Ok(resource)
     }
 
     fn from_yaml(data: &str) -> Result<ClassBuilder, Error> {

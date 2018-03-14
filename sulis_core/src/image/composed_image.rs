@@ -24,7 +24,6 @@ use io::{DrawList, GraphicsRenderer};
 use ui::AnimationState;
 use util::{invalid_data_error, Size};
 
-use serde_json;
 use serde_yaml;
 
 const GRID_DIM: i32 = 3;
@@ -232,12 +231,6 @@ pub struct ComposedImageBuilder {
 impl ResourceBuilder for ComposedImageBuilder {
     fn owned_id(&self) -> String {
         self.id.to_owned()
-    }
-
-    fn from_json(data: &str) -> Result<ComposedImageBuilder, Error> {
-        let resource: ComposedImageBuilder = serde_json::from_str(data)?;
-
-        Ok(resource)
     }
 
     fn from_yaml(data: &str) -> Result<ComposedImageBuilder, Error> {

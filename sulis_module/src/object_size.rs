@@ -19,7 +19,6 @@ use std::rc::Rc;
 
 use sulis_core::resource::{ResourceBuilder, ResourceSet, Sprite};
 use sulis_core::util::{invalid_data_error, Point};
-use sulis_core::serde_json;
 use sulis_core::serde_yaml;
 
 #[derive(Debug)]
@@ -116,12 +115,6 @@ pub struct ObjectSizeBuilder {
 impl ResourceBuilder for ObjectSizeBuilder {
     fn owned_id(&self) -> String {
         self.id.to_string()
-    }
-
-    fn from_json(data: &str) -> Result<ObjectSizeBuilder, Error> {
-        let resource: ObjectSizeBuilder = serde_json::from_str(data)?;
-
-        Ok(resource)
     }
 
     fn from_yaml(data: &str) -> Result<ObjectSizeBuilder, Error> {

@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+extern crate rlua;
 extern crate rand;
 
 extern crate sulis_core;
@@ -103,9 +104,69 @@ pub struct GameState {
     should_exit: bool,
     animations: Vec<Box<Animation>>,
     path_finder: PathFinder,
+    lua: Lua,
+}
+
+use rlua::{Function, Lua, UserData, UserDataMethods};
+
+struct ScriptInterface { }
+
+impl UserData for ScriptInterface {
+    fn add_methods(methods: &mut UserDataMethods<Self>) {
+        methods.add_method("log", |_, _, val: String| {
+            info!("Lua Log: {}", val);
+
+            Ok(())
+        });
+    }
+}
+
+struct ScriptParentEntity { }
+
+impl UserData for ScriptParentEntity {
+    fn add_methods(methods: &mut UserDataMethods<Self>) {
+        methods.add_method("get_visible", |_, _, ()| {
+            Ok(vec![0i32, 1, 1])
+        });
+    }
 }
 
 impl GameState {
+    pub fn execute_script(script: &str, function: &str) {
+        let start_time = time::Instant::now();
+
+        let result: Result<(), rlua::Error> = STATE.with(|state| {
+            let state = state.borrow();
+            let state = state.as_ref().unwrap();
+
+            let globals = state.lua.globals();
+            globals.set("game", ScriptInterface {})?;
+            globals.set("parent", ScriptParentEntity {})?;
+
+            debug!("Loading script for '{}'", function);
+
+            let script = format!("{}\n{}()", script, function);
+            let func: Function = state.lua.load(&script, Some(function))?;
+
+            debug!("Calling script function '{}'", function);
+
+            func.call::<_, ()>("")?;
+
+            Ok(())
+        });
+
+        match result {
+            Ok(_) => (),
+            Err(e) => {
+                warn!("Error executing lua script function '{}'", function);
+                warn!("{}", e);
+                debug!("\n===SCRIPT===\n{}\n===END SCRIPT===", script);
+            },
+        };
+
+        info!("Script execution time: {}", util::format_elapsed_secs(start_time.elapsed()));
+    }
+
     pub fn init(pc_actor: Rc<Actor>) -> Result<(), Error> {
         let game_state = GameState::new(pc_actor)?;
 
@@ -235,6 +296,7 @@ impl GameState {
             area_state: area_state,
             path_finder: path_finder,
             pc: pc_state,
+            lua: Lua::new(),
             animations: Vec::new(),
             should_exit: false,
         })

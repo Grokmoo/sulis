@@ -22,7 +22,6 @@ extern crate backtrace;
 extern crate flexi_logger;
 
 extern crate serde;
-pub extern crate serde_json;
 pub extern crate serde_yaml;
 #[macro_use] extern crate serde_derive;
 

@@ -18,7 +18,6 @@ use std::rc::Rc;
 use std::io::{Error, ErrorKind};
 use std::collections::HashMap;
 
-use serde_json;
 use serde_yaml;
 
 use image::Image;
@@ -114,12 +113,6 @@ pub struct AnimatedImageBuilder {
 impl ResourceBuilder for AnimatedImageBuilder {
     fn owned_id(&self) -> String {
         self.id.to_owned()
-    }
-
-    fn from_json(data: &str) -> Result<AnimatedImageBuilder, Error> {
-        let resource: AnimatedImageBuilder = serde_json::from_str(data)?;
-
-        Ok(resource)
     }
 
     fn from_yaml(data: &str) -> Result<AnimatedImageBuilder, Error> {

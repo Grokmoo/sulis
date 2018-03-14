@@ -24,7 +24,7 @@ use sulis_core::image::{Image, LayeredImage};
 use sulis_core::resource::{ResourceBuilder, ResourceSet};
 use sulis_core::ui::{Color};
 use sulis_core::util::{unable_to_create_error};
-use sulis_core::{serde_json, serde_yaml};
+use sulis_core::{serde_yaml};
 use sulis_rules::AttributeList;
 
 use {Ability, Class, ImageLayer, ImageLayerSet, Item, LootList, Module, Race};
@@ -314,12 +314,6 @@ pub struct ActorBuilder {
 impl ResourceBuilder for ActorBuilder {
     fn owned_id(&self) -> String {
         self.id.to_owned()
-    }
-
-    fn from_json(data: &str) -> Result<ActorBuilder, Error> {
-        let resource: ActorBuilder = serde_json::from_str(data)?;
-
-        Ok(resource)
     }
 
     fn from_yaml(data: &str) -> Result<ActorBuilder, Error> {

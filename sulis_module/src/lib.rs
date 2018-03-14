@@ -82,7 +82,7 @@ use std::fs;
 use std::ffi::OsStr;
 
 use sulis_core::config;
-use sulis_core::resource::{all_resources, read, read_single_resource, get_resource, insert_if_ok};
+use sulis_core::resource::*;
 
 use self::area::Tile;
 use self::ability::AbilityBuilder;
@@ -115,6 +115,7 @@ pub struct Module {
     races: HashMap<String, Rc<Race>>,
     sizes: HashMap<String, Rc<ObjectSize>>,
     tiles: HashMap<String, Rc<Tile>>,
+    scripts: HashMap<String, String>,
 }
 
 #[derive(Clone)]
@@ -264,6 +265,8 @@ impl Module {
 
         MODULE.with(|module| {
             let mut module = module.borrow_mut();
+
+            module.scripts = read_to_string(&vec![data_dir, root_dir], "scripts");
 
             for (id, adj) in builder_set.item_adjectives {
                 trace!("Inserting resource of type item_adjective with key {} \
@@ -428,6 +431,7 @@ impl Default for Module {
             races: HashMap::new(),
             sizes: HashMap::new(),
             tiles: HashMap::new(),
+            scripts: HashMap::new(),
         }
     }
 }

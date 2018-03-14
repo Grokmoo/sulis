@@ -15,7 +15,7 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 mod resource_builder_set;
-pub use self::resource_builder_set::{read, read_single_resource, write_to_file};
+pub use self::resource_builder_set::{read, read_single_resource, read_to_string, write_to_file};
 
 mod spritesheet;
 pub use self::spritesheet::Spritesheet;
@@ -41,16 +41,8 @@ thread_local! {
     static RESOURCE_SET: RefCell<ResourceSet> = RefCell::new(ResourceSet::new());
 }
 
-#[derive(Debug, PartialEq)]
-pub enum BuilderType {
-    JSON,
-    YAML,
-}
-
 pub trait ResourceBuilder where Self: Sized {
     fn owned_id(& self) -> String;
-
-    fn from_json(data: &str) -> Result<Self, Error>;
 
     fn from_yaml(data: &str) -> Result<Self, Error>;
 }

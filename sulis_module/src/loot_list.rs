@@ -20,7 +20,6 @@ use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 
 use sulis_core::resource::{ResourceBuilder};
-use sulis_core::serde_json;
 use sulis_core::serde_yaml;
 use sulis_core::util::unable_to_create_error;
 
@@ -154,12 +153,6 @@ pub struct LootListBuilder {
 impl ResourceBuilder for LootListBuilder {
     fn owned_id(&self) -> String {
         self.id.to_owned()
-    }
-
-    fn from_json(data: &str) -> Result<LootListBuilder, Error> {
-        let resource: LootListBuilder = serde_json::from_str(data)?;
-
-        Ok(resource)
     }
 
     fn from_yaml(data: &str) -> Result<LootListBuilder, Error> {

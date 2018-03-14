@@ -18,7 +18,6 @@ use std::collections::HashMap;
 use std::rc::Rc;
 use std::io::{Error, ErrorKind};
 
-use serde_json;
 use serde_yaml;
 
 use image::Image;
@@ -118,12 +117,6 @@ pub struct TimerImageBuilder {
 impl ResourceBuilder for TimerImageBuilder {
     fn owned_id(&self) -> String {
         self.id.to_owned()
-    }
-
-    fn from_json(data: &str) -> Result<TimerImageBuilder, Error> {
-        let resource: TimerImageBuilder = serde_json::from_str(data)?;
-
-        Ok(resource)
     }
 
     fn from_yaml(data: &str) -> Result<TimerImageBuilder, Error> {

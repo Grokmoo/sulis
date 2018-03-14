@@ -20,7 +20,6 @@ use std::io::{Error, ErrorKind};
 use sulis_core::ui::{AnimationState};
 use sulis_core::io::DrawList;
 use sulis_core::image::Image;
-use sulis_core::serde_json;
 use sulis_core::serde_yaml;
 use sulis_core::resource::{ResourceBuilder, ResourceSet};
 use sulis_core::util::{Point, unable_to_create_error};
@@ -159,12 +158,6 @@ pub struct PropBuilder {
 impl ResourceBuilder for PropBuilder {
     fn owned_id(&self) -> String {
         self.id.to_owned()
-    }
-
-    fn from_json(data: &str) -> Result<PropBuilder, Error> {
-        let resource: PropBuilder = serde_json::from_str(data)?;
-
-        Ok(resource)
     }
 
     fn from_yaml(data: &str) -> Result<PropBuilder, Error> {

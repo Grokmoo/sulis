@@ -3,3 +3,4 @@ name: "Impenetrable Defense"
 icon: abilities/impenetrable_defense
 description: "Using all your skill and concentration, you become incredibly difficult to hit or damage."
 active: true
+script: "impenetrable_defense"

@@ -18,7 +18,6 @@ use std::io::Error;
 
 use sulis_core::resource::ResourceBuilder;
 use sulis_core::util::{invalid_data_error, Point};
-use sulis_core::serde_json;
 use sulis_core::serde_yaml;
 
 #[derive(Deserialize, Debug)]
@@ -33,12 +32,6 @@ pub struct Game {
 impl ResourceBuilder for Game {
     fn owned_id(&self) -> String {
         "Game".to_string()
-    }
-
-    fn from_json(data: &str) -> Result<Game, Error> {
-        let game: Game = serde_json::from_str(data)?;
-
-        Ok(game)
     }
 
     fn from_yaml(data: &str) -> Result<Game, Error> {

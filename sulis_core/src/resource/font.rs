@@ -24,7 +24,6 @@ use resource::ResourceBuilder;
 use util::{invalid_data_error, Point, Size};
 use config::CONFIG;
 
-use serde_json;
 use serde_yaml;
 
 use extern_image::{self, ImageBuffer, Rgba};
@@ -172,12 +171,6 @@ struct FontCharBuilder {
 impl ResourceBuilder for FontBuilder {
     fn owned_id(&self) -> String {
         self.id.to_owned()
-    }
-
-    fn from_json(data: &str) -> Result<FontBuilder, Error> {
-        let resource: FontBuilder = serde_json::from_str(data)?;
-
-        Ok(resource)
     }
 
     fn from_yaml(data: &str) -> Result<FontBuilder, Error> {

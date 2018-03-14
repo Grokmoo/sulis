@@ -22,7 +22,6 @@ use sulis_core::ui::Color;
 use sulis_core::image::Image;
 use sulis_core::resource::{ResourceBuilder, ResourceSet};
 use sulis_core::util::{invalid_data_error, unable_to_create_error, Point};
-use sulis_core::serde_json;
 use sulis_core::serde_yaml;
 use sulis_rules::BonusList;
 
@@ -153,12 +152,6 @@ pub struct RaceBuilder {
 impl ResourceBuilder for RaceBuilder {
     fn owned_id(&self) -> String {
         self.id.to_owned()
-    }
-
-    fn from_json(data: &str) -> Result<RaceBuilder, Error> {
-        let resource: RaceBuilder = serde_json::from_str(data)?;
-
-        Ok(resource)
     }
 
     fn from_yaml(data: &str) -> Result<RaceBuilder, Error> {

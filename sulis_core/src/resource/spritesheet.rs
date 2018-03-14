@@ -22,7 +22,6 @@ use image::SimpleImage;
 use resource::{ResourceBuilder, ResourceSet};
 use util::{Point, Size};
 
-use serde_json;
 use serde_yaml;
 
 use extern_image::{self, ImageBuffer, Rgba};
@@ -183,12 +182,6 @@ impl SpritesheetGroup {
 impl ResourceBuilder for SpritesheetBuilder {
     fn owned_id(&self) -> String {
         self.id.to_owned()
-    }
-
-    fn from_json(data: &str) -> Result<SpritesheetBuilder, Error> {
-        let resource: SpritesheetBuilder = serde_json::from_str(data)?;
-
-        Ok(resource)
     }
 
     fn from_yaml(data: &str) -> Result<SpritesheetBuilder, Error> {

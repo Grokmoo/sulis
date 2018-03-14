@@ -19,7 +19,6 @@ use rand::{self, Rng};
 
 use sulis_core::resource::ResourceBuilder;
 use sulis_core::util::invalid_data_error;
-use sulis_core::serde_json;
 use sulis_core::serde_yaml;
 use sulis_rules::{HitKind};
 
@@ -88,12 +87,6 @@ impl Rules {
 impl ResourceBuilder for Rules {
     fn owned_id(&self) -> String {
         "Rules".to_string()
-    }
-
-    fn from_json(data: &str) -> Result<Rules, Error> {
-        let rules: Rules = serde_json::from_str(data)?;
-
-        Ok(rules)
     }
 
     fn from_yaml(data: &str) -> Result<Rules, Error> {

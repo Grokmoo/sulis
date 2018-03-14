@@ -23,11 +23,10 @@ use std::rc::Rc;
 use std::collections::HashMap;
 
 use config::CONFIG;
-use resource::{BuilderType, ResourceSet};
+use resource::{ResourceSet};
 use util::Point;
 use ui::{Border, color, Color, LayoutKind, Size, WidgetState};
 
-use serde_json;
 use serde_yaml;
 
 #[derive(Deserialize, Debug, Clone, Copy, PartialEq)]
@@ -460,17 +459,10 @@ impl ThemeBuilder {
         None
     }
 
-    fn new(dir: &str, data: &str, builder_type: BuilderType) -> Result<ThemeBuilder, Error> {
-        let mut theme = if builder_type == BuilderType::JSON {
-            serde_json::from_str(data)?
-        } else if builder_type == BuilderType::YAML {
-            let resource: Result<ThemeBuilder, serde_yaml::Error> = serde_yaml::from_str(data);
-            match resource {
-                Ok(resource) => resource,
-                Err(error) => return Err(Error::new(ErrorKind::InvalidData, format!("{}", error))),
-            }
-        } else {
-            return Err(Error::new(ErrorKind::InvalidInput, "format not supported"))
+    fn new(dir: &str, data: &str) -> Result<ThemeBuilder, Error> {
+        let mut theme: ThemeBuilder = match serde_yaml::from_str(data) {
+            Ok(theme) => theme,
+            Err(error) => return Err(Error::new(ErrorKind::InvalidData, format!("{}", error))),
         };
 
         if let None = theme.children {
@@ -506,11 +498,9 @@ impl ThemeBuilder {
 }
 
 pub fn create_theme(dir: &str, filename: &str) -> Result<ThemeBuilder, Error> {
-    let mut builder_type = BuilderType::JSON;
     let mut file = File::open(format!("{}{}.json", dir, filename));
     if file.is_err() {
         file = File::open(format!("{}{}.yml", dir, filename));
-        builder_type = BuilderType::YAML;
     }
 
     if file.is_err() {
@@ -521,7 +511,7 @@ pub fn create_theme(dir: &str, filename: &str) -> Result<ThemeBuilder, Error> {
     debug!("Creating theme from '{}'", filename);
     let mut file_data = String::new();
     file.unwrap().read_to_string(&mut file_data)?;
-    let theme = ThemeBuilder::new(dir, &file_data, builder_type)?;
+    let theme = ThemeBuilder::new(dir, &file_data)?;
 
     Ok(theme)
 }

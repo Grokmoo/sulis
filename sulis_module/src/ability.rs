@@ -20,7 +20,6 @@ use std::io::Error;
 use sulis_core::image::Image;
 use sulis_core::resource::{ResourceBuilder, ResourceSet};
 use sulis_core::util::{invalid_data_error, unable_to_create_error};
-use sulis_core::serde_json;
 use sulis_core::serde_yaml;
 
 use {Module};
@@ -31,6 +30,7 @@ pub struct Ability {
     pub description: String,
     pub icon: Rc<Image>,
     pub active: bool,
+    pub script: Option<String>,
 }
 
 impl PartialEq for Ability {
@@ -40,7 +40,7 @@ impl PartialEq for Ability {
 }
 
 impl Ability {
-    pub fn new(builder: AbilityBuilder, _module: &Module) -> Result<Ability, Error> {
+    pub fn new(builder: AbilityBuilder, module: &Module) -> Result<Ability, Error> {
         let icon = match ResourceSet::get_image(&builder.icon) {
             None => {
                 warn!("No image found for icon '{}'", builder.icon);
@@ -49,12 +49,23 @@ impl Ability {
             Some(icon) => icon
         };
 
+        let script = match builder.script {
+            None => None,
+            Some(ref src) => match module.scripts.get(src) {
+                None => {
+                    warn!("No script found with id '{}'", src);
+                    return unable_to_create_error("ability", &builder.id);
+                }, Some(ref script) => Some(script.to_string()),
+            }
+        };
+
         Ok(Ability {
             id: builder.id,
             name: builder.name,
             description: builder.description,
             icon,
             active: builder.active,
+            script,
         })
     }
 }
@@ -67,17 +78,12 @@ pub struct AbilityBuilder {
     pub description: String,
     pub icon: String,
     pub active: bool,
+    pub script: Option<String>,
 }
 
 impl ResourceBuilder for AbilityBuilder {
     fn owned_id(&self) -> String {
         self.id.to_owned()
-    }
-
-    fn from_json(data: &str) -> Result<AbilityBuilder, Error> {
-        let resource: AbilityBuilder = serde_json::from_str(data)?;
-
-        Ok(resource)
     }
 
     fn from_yaml(data: &str) -> Result<AbilityBuilder, Error> {

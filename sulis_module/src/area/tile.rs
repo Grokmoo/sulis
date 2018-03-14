@@ -20,7 +20,6 @@ use std::rc::Rc;
 
 use sulis_core::util::{invalid_data_error, unable_to_create_error, Point};
 use sulis_core::resource::{Sprite, ResourceBuilder, ResourceSet};
-use sulis_core::serde_json;
 use sulis_core::serde_yaml;
 
 #[derive(Deserialize, Debug)]
@@ -136,12 +135,6 @@ impl TilesList {
 impl ResourceBuilder for TilesList {
     fn owned_id(&self) -> String {
         self.id.to_owned()
-    }
-
-    fn from_json(data: &str) -> Result<TilesList, Error> {
-        let mut resource: TilesList = serde_json::from_str(data)?;
-        resource.move_tiles();
-        Ok(resource)
     }
 
     fn from_yaml(data: &str) -> Result<TilesList, Error> {

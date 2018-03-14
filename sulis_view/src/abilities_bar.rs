@@ -18,7 +18,7 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_state::{ChangeListener, EntityState};
+use sulis_state::{ChangeListener, EntityState, GameState};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{Button};
 
@@ -53,7 +53,16 @@ impl WidgetKind for AbilitiesBar {
 
             let button = Widget::with_theme(Button::empty(), "ability_button");
             button.borrow_mut().state.add_text_arg("icon", &ability.icon.id());
-            // TODO activate callback
+
+            let ability_ref = Rc::clone(ability);
+            button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |_widget, _| {
+                let script_src = match ability_ref.script {
+                    None => return,
+                    Some(ref script) => script,
+                };
+
+                GameState::execute_script(script_src, "on_activate");
+            })));
 
             children.push(button);
         }

@@ -91,11 +91,9 @@ pub fn write_to_file<T: serde::ser::Serialize>(filename: &str, data: &T) -> Resu
 }
 
 pub fn read_single_resource<T: ResourceBuilder>(filename: &str) -> Result<T, Error> {
-    let mut builder_type = BuilderType::JSON;
     let mut file = File::open(format!("{}.json", filename));
     if file.is_err() {
         file = File::open(format!("{}.yml", filename));
-        builder_type = BuilderType::YAML;
     }
 
     if file.is_err() {
@@ -106,17 +104,14 @@ pub fn read_single_resource<T: ResourceBuilder>(filename: &str) -> Result<T, Err
     let mut file_data = String::new();
     file.unwrap().read_to_string(&mut file_data)?;
 
-    match builder_type {
-        BuilderType::JSON => T::from_json(&file_data),
-        BuilderType::YAML => T::from_yaml(&file_data),
-    }
+    T::from_yaml(&file_data)
 }
 
 pub fn read<T: ResourceBuilder>(root_dirs: &Vec<&str>, dir: &str) -> HashMap<String, T> {
     let mut resources: HashMap<String, T> = HashMap::new();
 
     for root in root_dirs.iter() {
-        read_recursive([root, dir].iter().collect(), &mut resources);
+        read_recursive([root, dir].iter().collect(), &mut resources, &load_resource_builder);
     }
 
     if resources.is_empty() {
@@ -126,7 +121,22 @@ pub fn read<T: ResourceBuilder>(root_dirs: &Vec<&str>, dir: &str) -> HashMap<Str
     resources
 }
 
-fn read_recursive<T: ResourceBuilder>(dir: PathBuf, resources: &mut HashMap<String, T>) {
+pub fn read_to_string(root_dirs: &Vec<&str>, dir: &str) -> HashMap<String, String> {
+    let mut resources = HashMap::new();
+
+    for root in root_dirs.iter() {
+        read_recursive([root, dir].iter().collect(), &mut resources, &load_resource_to_string);
+    }
+
+    if resources.is_empty() {
+        warn!("Unable to read any resources from directories: '{:?}'", root_dirs);
+    }
+
+    resources
+}
+
+fn read_recursive<T>(dir: PathBuf, resources: &mut HashMap<String, T>,
+                                      func: &Fn(&str, String, &mut HashMap<String, T>)) {
     let dir_str = dir.to_string_lossy().to_string();
     debug!("Reading resources from {}", dir_str);
 
@@ -151,29 +161,20 @@ fn read_recursive<T: ResourceBuilder>(dir: PathBuf, resources: &mut HashMap<Stri
         let path = entry.path();
 
         if path.is_dir() {
-            read_recursive(path, resources);
-        } else {
-            let extension: String = OsStr::to_str(path.extension().
-                unwrap_or(OsStr::new(""))).unwrap_or("").to_string();
-
-            if !path.is_file() {
-                continue;
-            }
-
-            let builder_type = match extension.as_ref() {
-                "json" => BuilderType::JSON,
-                "yml" => BuilderType::YAML,
-                _ => continue,
-            };
-
-            read_file(path, resources, builder_type);
+            read_recursive(path, resources, func);
+        } else if path.is_file() {
+            read_file(path, resources, func);
         }
     }
 }
 
-fn read_file<T: ResourceBuilder>(path: PathBuf, resources: &mut HashMap<String, T>,
-                                 builder_type: BuilderType) {
+fn read_file<T>(path: PathBuf, resources: &mut HashMap<String, T>,
+                                 func: &Fn(&str, String, &mut HashMap<String, T>)) {
     let path_str = path.to_string_lossy().to_string();
+
+    // don't attempt to parse image fileV
+    if path_str.ends_with("png") { return; }
+
     debug!("Reading file at {}", path_str);
     let mut file = match File::open(path) {
         Ok(file) => file,
@@ -190,15 +191,29 @@ fn read_file<T: ResourceBuilder>(path: PathBuf, resources: &mut HashMap<String, 
     }
     trace!("Read file data.");
 
-    let resource = match builder_type {
-        BuilderType::JSON => T::from_json(&file_data),
-        BuilderType::YAML => T::from_yaml(&file_data),
-    };
+    (func)(&path_str, file_data, resources);
+}
 
-    let resource = match resource {
-        Ok(a) => a,
+fn load_resource_to_string(path: &str, file_data: String,
+                           resources: &mut HashMap<String, String>) {
+    let path_buf = PathBuf::from(path);
+
+    let id: String = path_buf.file_stem().unwrap_or(OsStr::new("")).to_string_lossy().to_string();
+
+    trace!("Created string resource '{}'", id);
+    if resources.contains_key(&id) {
+        debug!("Overwriting resource with key: {} in {}", id, path);
+    }
+
+    resources.insert(id, file_data);
+}
+
+fn load_resource_builder<T: ResourceBuilder>(path: &str, file_data: String,
+                                             resources: &mut HashMap<String, T>) {
+    let resource = match T::from_yaml(&file_data) {
+        Ok(res) => res,
         Err(error) => {
-            warn!("Error parsing file data: {:?}", path_str);
+            warn!("Error parsing file data: {:?}", path);
             warn!("  {}", error);
             return;
         }
@@ -208,11 +223,8 @@ fn read_file<T: ResourceBuilder>(path: PathBuf, resources: &mut HashMap<String, 
 
     trace!("Created resource '{}'", id);
     if resources.contains_key(&id) {
-        debug!("Overwriting resource with key: {} in {}", id, path_str);
-        return;
+        debug!("Overwriting resource with key: {} in {}", id, path);
     }
 
-    trace!("Inserted resource.");
     resources.insert(id, resource);
 }
-

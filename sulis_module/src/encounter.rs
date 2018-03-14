@@ -20,7 +20,6 @@ use std::collections::HashMap;
 use std::rc::Rc;
 
 use sulis_core::resource::{ResourceBuilder};
-use sulis_core::serde_json;
 use sulis_core::serde_yaml;
 use sulis_core::util::unable_to_create_error;
 
@@ -122,12 +121,6 @@ pub struct EntryBuilder {
 impl ResourceBuilder for EncounterBuilder {
     fn owned_id(&self) -> String {
         self.id.to_owned()
-    }
-
-    fn from_json(data: &str) -> Result<EncounterBuilder, Error> {
-        let resource: EncounterBuilder = serde_json::from_str(data)?;
-
-        Ok(resource)
     }
 
     fn from_yaml(data: &str) -> Result<EncounterBuilder, Error> {

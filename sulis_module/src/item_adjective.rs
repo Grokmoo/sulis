@@ -17,7 +17,6 @@
 use std::io::{Error, ErrorKind};
 
 use sulis_core::resource::ResourceBuilder;
-use sulis_core::serde_json;
 use sulis_core::serde_yaml;
 
 /// An adjective is a modifier that affects the stats of
@@ -39,12 +38,6 @@ impl PartialEq for ItemAdjective {
 impl ResourceBuilder for ItemAdjective {
     fn owned_id(&self) -> String {
         self.id.to_string()
-    }
-
-    fn from_json(data: &str) -> Result<ItemAdjective, Error> {
-        let resource: ItemAdjective = serde_json::from_str(data)?;
-
-        Ok(resource)
     }
 
     fn from_yaml(data: &str) -> Result<ItemAdjective, Error> {

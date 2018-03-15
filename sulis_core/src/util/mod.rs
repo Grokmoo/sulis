@@ -81,16 +81,16 @@ pub fn main_loop(io: &mut Box<IO>, root: Rc<RefCell<Widget>>,
     let mut render_time = time::Duration::from_secs(0);
     loop {
         let start_time = time::Instant::now();
+        let total_elapsed = get_elapsed_millis(main_loop_start_time.elapsed());
 
         io.process_input(Rc::clone(&root));
-        updater.update(&root);
+        updater.update(&root, total_elapsed);
 
         if let Err(e) = Widget::update(&root) {
             error!("There was a fatal error updating the UI tree state.");
             return Err(e);
         }
 
-        let total_elapsed = get_elapsed_millis(main_loop_start_time.elapsed());
         io.render_output(root.borrow(), total_elapsed);
 
         if updater.is_exit() {

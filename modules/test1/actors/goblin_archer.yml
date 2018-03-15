@@ -1,6 +1,6 @@
 id: goblin_archer
 name: Goblin Archer
-player: false
+faction: Hostile
 images: {}
 race: goblin
 attributes:

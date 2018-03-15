@@ -37,6 +37,27 @@ pub struct BonusList {
     pub will: Option<i32>,
 }
 
+impl Default for BonusList {
+    fn default() -> BonusList {
+        BonusList {
+            attributes: None,
+            attack: None,
+            base_armor: None,
+            armor_kinds: None,
+            bonus_damage: None,
+            bonus_range: None,
+            bonus_reach: None,
+            initiative: None,
+            hit_points: None,
+            accuracy: None,
+            defense: None,
+            fortitude: None,
+            reflex: None,
+            will: None,
+        }
+    }
+}
+
 #[derive(Deserialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct AttackBuilder {

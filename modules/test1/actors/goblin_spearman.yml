@@ -1,6 +1,6 @@
 id: goblin_spearman
 name: Goblin Spearman
-player: false
+faction: Hostile
 images: {}
 race: goblin
 attributes:

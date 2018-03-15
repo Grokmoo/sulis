@@ -23,7 +23,7 @@ use sulis_core::ui::{color, Color};
 use sulis_module::{item, Actor, Module};
 use sulis_module::area::PropData;
 use sulis_rules::{HitKind, StatList};
-use {AreaState, ChangeListenerList, EntityState, GameState, Inventory};
+use {AreaState, ChangeListenerList, Effect, EntityState, GameState, Inventory};
 
 pub struct ActorState {
     pub actor: Rc<Actor>,
@@ -34,6 +34,7 @@ pub struct ActorState {
     xp: u32,
     has_level_up: bool,
     inventory: Inventory,
+    effects: Vec<Effect>,
     image: LayeredImage,
 }
 
@@ -61,6 +62,7 @@ impl ActorState {
             xp,
             has_level_up: false,
             image,
+            effects: Vec::new(),
         }
     }
 
@@ -278,20 +280,42 @@ impl ActorState {
         self.listeners.notify(&self);
     }
 
+    pub fn update(&mut self, _millis: u32) {
+        let start_len = self.effects.len();
+
+        self.effects.retain(|e| e.update());
+
+        if start_len != self.effects.len() {
+            self.compute_stats();
+        }
+    }
+
+    pub fn add_effect(&mut self, effect: Effect) {
+        debug!("Adding effect with duration {} to '{}'", effect.duration_millis(),
+            self.actor.name);
+
+        self.effects.push(effect);
+        self.compute_stats();
+    }
+
     pub fn init(&mut self) {
         self.hp = self.stats.max_hp;
     }
 
     pub fn init_turn(&mut self) {
-        let rules = Module::rules();
+        let base_ap = Module::rules().base_ap;
 
-        self.ap = rules.base_ap;
-        self.listeners.notify(&self);
+        if self.ap != base_ap {
+            self.ap = base_ap;
+            self.listeners.notify(&self);
+        }
     }
 
     pub fn end_turn(&mut self) {
-        self.ap = 0;
-        self.listeners.notify(&self);
+        if self.ap != 0 {
+            self.ap = 0;
+            self.listeners.notify(&self);
+        }
     }
 
     pub fn compute_stats(&mut self) {
@@ -338,6 +362,10 @@ impl ActorState {
         } else {
             1.0
         };
+
+        for effect in self.effects.iter() {
+            self.stats.add(effect.bonuses());
+        }
 
         self.stats.finalize(attacks_list, multiplier, rules.base_attribute);
 

@@ -24,13 +24,17 @@ use sulis_core::serde_yaml;
 
 use {Module};
 
+pub struct Active {
+    pub script: String,
+    pub ap: u32,
+}
+
 pub struct Ability {
     pub id: String,
     pub name: String,
     pub description: String,
     pub icon: Rc<Image>,
-    pub active: bool,
-    pub script: Option<String>,
+    pub active: Option<Active>,
 }
 
 impl PartialEq for Ability {
@@ -49,14 +53,21 @@ impl Ability {
             Some(icon) => icon
         };
 
-        let script = match builder.script {
+        let active = match builder.active {
             None => None,
-            Some(ref src) => match module.scripts.get(src) {
-                None => {
-                    warn!("No script found with id '{}'", src);
-                    return unable_to_create_error("ability", &builder.id);
-                }, Some(ref script) => Some(script.to_string()),
-            }
+            Some(active) => {
+                let script = match module.scripts.get(&active.script) {
+                    None => {
+                        warn!("No script found with id '{}'", active.script);
+                        return unable_to_create_error("ability", &builder.id);
+                    }, Some(ref script) => script.to_string(),
+                };
+
+                Some(Active {
+                    script,
+                    ap: active.ap,
+                })
+            },
         };
 
         Ok(Ability {
@@ -64,10 +75,16 @@ impl Ability {
             name: builder.name,
             description: builder.description,
             icon,
-            active: builder.active,
-            script,
+            active,
         })
     }
+}
+
+#[derive(Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct ActiveBuilder {
+    script: String,
+    ap: u32,
 }
 
 #[derive(Deserialize, Debug)]
@@ -77,8 +94,7 @@ pub struct AbilityBuilder {
     pub name: String,
     pub description: String,
     pub icon: String,
-    pub active: bool,
-    pub script: Option<String>,
+    pub active: Option<ActiveBuilder>,
 }
 
 impl ResourceBuilder for AbilityBuilder {

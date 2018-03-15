@@ -38,7 +38,7 @@ impl MainMenuLoopUpdater {
 }
 
 impl MainLoopUpdater for MainMenuLoopUpdater {
-    fn update(&self, _root: &Rc<RefCell<Widget>>) { }
+    fn update(&self, _root: &Rc<RefCell<Widget>>, _millis: u32) { }
 
     fn is_exit(&self) -> bool {
         self.main_menu_view.borrow().is_exit()

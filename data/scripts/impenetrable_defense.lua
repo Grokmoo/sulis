@@ -1,11 +1,12 @@
-function on_activate()
-  targets = parent:get_visible()
-  game:log("on_activate from lua")
-  for i = 1, #targets do
-    game:log(tostring(targets[i]))
-  end
-end
-
-function on_target_select()
-  game:log("on target select")
+function on_activate(parent, ability)
+  game:log("Parent: " .. parent:to_string())
+  
+  effect = parent:create_effect(2)
+  effect:add_num_bonus("defense", 20)
+  effect:add_num_bonus("reflex", 10)
+  effect:add_num_bonus("fortitude", 10)
+  effect:add_num_bonus("will", 10)
+  effect:apply()
+  
+  ability:remove_ap(parent)
 end

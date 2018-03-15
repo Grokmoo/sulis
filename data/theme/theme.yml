@@ -385,7 +385,9 @@ children:
         text: |
           [s=6|#name#]
           [s=6|]
-          [?active;s=5;c=f00|Active][?passive;s=5;c=00f|Passive]
+          [?active;s=5;c=f00|Active
+          AP: #activate_ap#
+          ][?passive;s=5;c=00f|Passive]
           [s=4|#description#]
           
   class_pane:

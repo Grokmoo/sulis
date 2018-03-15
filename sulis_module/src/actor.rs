@@ -29,6 +29,13 @@ use sulis_rules::AttributeList;
 
 use {Ability, Class, ImageLayer, ImageLayerSet, Item, LootList, Module, Race};
 
+#[derive(Deserialize, Serialize, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[serde(deny_unknown_fields)]
+pub enum Faction {
+    Friendly,
+    Hostile,
+}
+
 #[derive(Debug, Clone)]
 pub struct Reward {
     pub xp: u32,
@@ -62,7 +69,7 @@ impl fmt::Display for Sex {
 pub struct Actor {
     pub id: String,
     pub name: String,
-    pub player: bool,
+    pub faction: Faction,
     pub portrait: Option<Rc<Image>>,
     pub race: Rc<Race>,
     pub sex: Sex,
@@ -114,7 +121,7 @@ impl Actor {
         Actor {
             id: other.id.to_string(),
             name: other.name.to_string(),
-            player: other.player,
+            faction: other.faction,
             portrait: other.portrait.clone(),
             race: Rc::clone(&other.race),
             sex: other.sex,
@@ -247,7 +254,7 @@ impl Actor {
         Ok(Actor {
             id: builder.id,
             name: builder.name,
-            player: builder.player.unwrap_or(false),
+            faction: builder.faction.unwrap_or(Faction::Hostile),
             portrait,
             race,
             sex,
@@ -298,7 +305,7 @@ pub struct ActorBuilder {
     pub sex: Option<Sex>,
     pub portrait: Option<String>,
     pub attributes: AttributeList,
-    pub player: Option<bool>,
+    pub faction: Option<Faction>,
     pub images: HashMap<ImageLayer, String>,
     pub hue: Option<f32>,
     pub hair_color: Option<Color>,

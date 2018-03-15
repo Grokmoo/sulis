@@ -1,6 +1,6 @@
 id: goblin
 name: Goblin
-player: false
+faction: Hostile
 images: {}
 race: goblin
 attributes:

@@ -49,19 +49,24 @@ impl WidgetKind for AbilitiesBar {
 
         let mut children = Vec::new();
         for ability in entity.actor.actor.abilities.iter() {
-            if !ability.active { continue; }
+            let active = match ability.active {
+                None => continue,
+                Some(ref active) => active,
+            };
 
             let button = Widget::with_theme(Button::empty(), "ability_button");
             button.borrow_mut().state.add_text_arg("icon", &ability.icon.id());
+            button.borrow_mut().state.set_enabled(entity.actor.ap() >= active.ap);
 
             let ability_ref = Rc::clone(ability);
             button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |_widget, _| {
-                let script_src = match ability_ref.script {
+                let active = match ability_ref.active {
                     None => return,
-                    Some(ref script) => script,
+                    Some(ref active) => active,
                 };
 
-                GameState::execute_script(script_src, "on_activate");
+                GameState::execute_ability_script(&GameState::pc(), &ability_ref,
+                    &active.script, "on_activate");
             })));
 
             children.push(button);

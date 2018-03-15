@@ -28,6 +28,7 @@ pub mod actor;
 pub use self::actor::Actor;
 pub use self::actor::Sex;
 pub use self::actor::ActorBuilder;
+pub use self::actor::Faction;
 
 pub mod area;
 pub use self::area::Area;

@@ -40,7 +40,7 @@ impl LoopUpdater {
 }
 
 impl MainLoopUpdater for LoopUpdater {
-    fn update(&self, _root: &Rc<RefCell<Widget>>) { }
+    fn update(&self, _root: &Rc<RefCell<Widget>>, _millis: u32) { }
 
     fn is_exit(&self) -> bool {
         self.view.borrow().is_exit()

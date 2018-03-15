@@ -38,6 +38,9 @@ mod change_listener;
 pub use self::change_listener::ChangeListener;
 pub use self::change_listener::ChangeListenerList;
 
+mod effect;
+pub use self::effect::Effect;
+
 mod entity_state;
 pub use self::entity_state::EntityState;
 pub use self::entity_state::AreaDrawable;
@@ -64,6 +67,9 @@ use self::path_finder::PathFinder;
 mod prop_state;
 pub use self::prop_state::PropState;
 
+mod script;
+pub use self::script::ScriptState;
+
 mod turn_timer;
 pub use self::turn_timer::TurnTimer;
 
@@ -77,19 +83,20 @@ use sulis_core::config::CONFIG;
 use sulis_core::util::{self, Point};
 use sulis_core::io::{GraphicsRenderer, MainLoopUpdater};
 use sulis_core::ui::Widget;
-use sulis_module::{Actor, Module};
+use sulis_module::{Ability, Actor, Module};
 
 thread_local! {
     static STATE: RefCell<Option<GameState>> = RefCell::new(None);
     static AI: RefCell<AI> = RefCell::new(AI::new());
     static ENTERING_COMBAT: RefCell<bool> = RefCell::new(false);
+    static SCRIPT: ScriptState = ScriptState::new();
 }
 
 pub struct GameStateMainLoopUpdater { }
 
 impl MainLoopUpdater for GameStateMainLoopUpdater {
-    fn update(&self, root: &Rc<RefCell<Widget>>) {
-        GameState::update(root);
+    fn update(&self, root: &Rc<RefCell<Widget>>, millis: u32) {
+        GameState::update(root, millis);
     }
 
     fn is_exit(&self) -> bool {
@@ -104,65 +111,22 @@ pub struct GameState {
     should_exit: bool,
     animations: Vec<Box<Animation>>,
     path_finder: PathFinder,
-    lua: Lua,
-}
-
-use rlua::{Function, Lua, UserData, UserDataMethods};
-
-struct ScriptInterface { }
-
-impl UserData for ScriptInterface {
-    fn add_methods(methods: &mut UserDataMethods<Self>) {
-        methods.add_method("log", |_, _, val: String| {
-            info!("Lua Log: {}", val);
-
-            Ok(())
-        });
-    }
-}
-
-struct ScriptParentEntity { }
-
-impl UserData for ScriptParentEntity {
-    fn add_methods(methods: &mut UserDataMethods<Self>) {
-        methods.add_method("get_visible", |_, _, ()| {
-            Ok(vec![0i32, 1, 1])
-        });
-    }
 }
 
 impl GameState {
-    pub fn execute_script(script: &str, function: &str) {
+    pub fn execute_ability_script(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>,
+                                  script: &str, function: &str) {
         let start_time = time::Instant::now();
 
-        let result: Result<(), rlua::Error> = STATE.with(|state| {
-            let state = state.borrow();
-            let state = state.as_ref().unwrap();
-
-            let globals = state.lua.globals();
-            globals.set("game", ScriptInterface {})?;
-            globals.set("parent", ScriptParentEntity {})?;
-
-            debug!("Loading script for '{}'", function);
-
-            let script = format!("{}\n{}()", script, function);
-            let func: Function = state.lua.load(&script, Some(function))?;
-
-            debug!("Calling script function '{}'", function);
-
-            func.call::<_, ()>("")?;
-
-            Ok(())
+        let result: Result<(), rlua::Error> = SCRIPT.with(|script_state| {
+            script_state.execute_ability_script(parent, ability, script, function)
         });
 
-        match result {
-            Ok(_) => (),
-            Err(e) => {
-                warn!("Error executing lua script function '{}'", function);
-                warn!("{}", e);
-                debug!("\n===SCRIPT===\n{}\n===END SCRIPT===", script);
-            },
-        };
+        if let Err(e) = result {
+            warn!("Error executing lua script function '{}'", function);
+            warn!("{}", e);
+            debug!("\n===SCRIPT===\n{}\n===END SCRIPT===", script);
+        }
 
         info!("Script execution time: {}", util::format_elapsed_secs(start_time.elapsed()));
     }
@@ -296,7 +260,6 @@ impl GameState {
             area_state: area_state,
             path_finder: path_finder,
             pc: pc_state,
-            lua: Lua::new(),
             animations: Vec::new(),
             should_exit: false,
         })
@@ -340,7 +303,7 @@ impl GameState {
         STATE.with(|s| Rc::clone(&s.borrow().as_ref().unwrap().area_state))
     }
 
-    pub fn update(root: &Rc<RefCell<Widget>>) {
+    pub fn update(root: &Rc<RefCell<Widget>>, millis: u32) {
         let active_entity = STATE.with(|s| {
             let mut state = s.borrow_mut();
             let state = state.as_mut().unwrap();
@@ -358,7 +321,7 @@ impl GameState {
                 }
             }
 
-            let result = match area_state.update() {
+            let result = match area_state.update(millis) {
                 None => Rc::clone(&state.pc),
                 Some(entity) => Rc::clone(entity),
             };

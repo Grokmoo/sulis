@@ -67,8 +67,9 @@ impl WidgetKind for AbilityPane {
             state.add_text_arg("name", &ability.name);
             state.add_text_arg("description", &ability.description);
 
-            if ability.active {
+            if let Some(ref active) = ability.active {
                 state.add_text_arg("active", "true");
+                state.add_text_arg("activate_ap", &active.ap.to_string());
             } else {
                 state.add_text_arg("passive", "true");
             }

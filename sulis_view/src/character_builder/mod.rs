@@ -51,7 +51,7 @@ use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
 use sulis_core::resource::write_to_file;
 use sulis_widgets::{Button, Label};
 use sulis_module::actor::Sex;
-use sulis_module::{Ability, ActorBuilder, Class, ImageLayer, Module, Race};
+use sulis_module::{Ability, ActorBuilder, Class, Faction, ImageLayer, Module, Race};
 use sulis_rules::{AttributeList};
 use sulis_state::GameState;
 
@@ -264,7 +264,7 @@ impl BuilderSet for CharacterCreator {
             race: builder.race.as_ref().unwrap().id.to_string(),
             sex: builder.sex,
             attributes: builder.attributes.unwrap(),
-            player: Some(true),
+            faction: Some(Faction::Friendly),
             images: builder.images.clone(),
             hue: builder.hue,
             hair_color: builder.hair_color,

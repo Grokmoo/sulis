@@ -2,3 +2,5 @@ id: ball_animated
 states:
     normal: ball
     active: ball_active
+    hover: ball
+    active + hover: ball_active

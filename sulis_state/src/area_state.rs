@@ -425,22 +425,29 @@ impl AreaState {
         EntityIterator { area_state: &self, index: 0 }
     }
 
-    fn get_entity(&self, index: usize) -> Rc<RefCell<EntityState>> {
+    pub fn get_entity(&self, index: usize) -> Rc<RefCell<EntityState>> {
         let entity = &self.entities[index];
 
         Rc::clone(&entity.as_ref().unwrap())
     }
 
-    pub (crate) fn update(&mut self) -> Option<&Rc<RefCell<EntityState>>> {
+    pub (crate) fn update(&mut self, millis: u32) -> Option<&Rc<RefCell<EntityState>>> {
         // removal does not shuffle the vector around, so we can safely just iterate
         let mut notify = false;
         let len = self.entities.len();
         for index in 0..len {
-            let entity = match &self.entities[index].as_ref() {
-                &None => continue,
-                &Some(entity) => Rc::clone(entity),
+            let entity = {
+                let entity = match &self.entities[index].as_ref() {
+                    &None => continue,
+                    &Some(entity) => entity,
+                };
+
+                entity.borrow_mut().actor.update(millis);
+
+                if !entity.borrow().is_marked_for_removal() { continue; }
+
+                Rc::clone(entity)
             };
-            if !entity.borrow().is_marked_for_removal() { continue; }
 
             self.remove_entity_at_index(&entity, index);
             notify = true;

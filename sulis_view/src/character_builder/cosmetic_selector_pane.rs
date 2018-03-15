@@ -292,7 +292,6 @@ impl WidgetKind for CosmeticSelectorPane {
             let parent = Widget::get_parent(&widget);
             let cosmetic_pane = Widget::downcast_kind_mut::<CosmeticSelectorPane>(&parent);
 
-            info!("Next");
             let race = match cosmetic_pane.race {
                 None => return,
                 Some(ref race) => race,

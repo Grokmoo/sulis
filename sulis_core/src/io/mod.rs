@@ -36,7 +36,7 @@ use ui::{Widget, Color};
 use resource::Sprite;
 
 pub trait MainLoopUpdater {
-    fn update(&self, root: &Rc<RefCell<Widget>>);
+    fn update(&self, root: &Rc<RefCell<Widget>>, millis: u32);
 
     fn is_exit(&self) -> bool;
 }

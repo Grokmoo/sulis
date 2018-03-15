@@ -47,8 +47,10 @@ impl UserData for ScriptEntity {
             Ok(entity.index.to_string())
         });
 
-        methods.add_method("create_effect", |_, entity, duration: u32| {
-            Ok(ScriptEffect::new(entity.index, duration))
+        methods.add_method("create_effect", |_, entity, args: (String, u32)| {
+            let duration = args.1;
+            let ability = args.0;
+            Ok(ScriptEffect::new(entity.index, &ability, duration))
         });
     }
 }

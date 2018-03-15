@@ -43,6 +43,8 @@ pub struct AreaState {
 
     feedback_text: Vec<AreaFeedbackText>,
     scroll_to_callback: Option<Rc<RefCell<EntityState>>>,
+
+    last_time_millis: u32,
 }
 
 impl PartialEq for AreaState {
@@ -83,6 +85,7 @@ impl AreaState {
             pc_vis_cache_invalid: true,
             feedback_text: Vec::new(),
             scroll_to_callback: None,
+            last_time_millis: 0,
         }
     }
 
@@ -432,6 +435,11 @@ impl AreaState {
     }
 
     pub (crate) fn update(&mut self, millis: u32) -> Option<&Rc<RefCell<EntityState>>> {
+        let elapsed_millis = millis - self.last_time_millis;
+        self.last_time_millis = millis;
+
+        let real_time = !self.turn_timer.is_active();
+
         // removal does not shuffle the vector around, so we can safely just iterate
         let mut notify = false;
         let len = self.entities.len();
@@ -442,7 +450,9 @@ impl AreaState {
                     &Some(entity) => entity,
                 };
 
-                entity.borrow_mut().actor.update(millis);
+                if real_time {
+                    entity.borrow_mut().actor.update(elapsed_millis);
+                }
 
                 if !entity.borrow().is_marked_for_removal() { continue; }
 

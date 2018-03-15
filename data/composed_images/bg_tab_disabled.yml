@@ -1,0 +1,8 @@
+id: bg_tab_disabled
+generate_sub_images:
+  size: [2, 2]
+  spritesheet: "gui"
+grid: [ bg_tab_disabled_top_left,    bg_tab_disabled_top_middle,    bg_tab_disabled_top_right,
+        bg_tab_disabled_middle_left, bg_tab_disabled_middle,        bg_tab_disabled_middle_right,
+        bg_tab_disabled_bottom_left, bg_tab_disabled_bottom_middle, bg_tab_disabled_bottom_right
+      ]

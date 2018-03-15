@@ -26,17 +26,21 @@ use sulis_module::Module;
 use sulis_state::ActorState;
 
 use CharacterBuilder;
+use inventory_window::add_bonus_text_args;
 
 pub const NAME: &str = "character_window";
 
 pub struct CharacterWindow {
     character: Rc<RefCell<EntityState>>,
+
+    char_pane_active: bool,
 }
 
 impl CharacterWindow {
     pub fn new(character: &Rc<RefCell<EntityState>>) -> Rc<RefCell<CharacterWindow>> {
         Rc::new(RefCell::new(CharacterWindow {
-            character: Rc::clone(character)
+            character: Rc::clone(character),
+            char_pane_active: true,
         }))
     }
 }
@@ -76,9 +80,50 @@ impl WidgetKind for CharacterWindow {
             Widget::add_child_to(&root, window);
         })));
 
-        let details = create_details_text_box(&self.character.borrow().actor);
-        vec![title, close, details, level_up]
+        let char_pane = Widget::with_theme(Button::empty(), "char_pane_button");
+        char_pane.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+            let parent = Widget::get_parent(&widget);
+            let window = Widget::downcast_kind_mut::<CharacterWindow>(&parent);
+            window.char_pane_active = true;
+            parent.borrow_mut().invalidate_children();
+        })));
+
+        let effects_pane = Widget::with_theme(Button::empty(), "effects_pane_button");
+        effects_pane.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+            let parent = Widget::get_parent(&widget);
+            let window = Widget::downcast_kind_mut::<CharacterWindow>(&parent);
+            window.char_pane_active = false;
+            parent.borrow_mut().invalidate_children();
+        })));
+
+        let cur_pane = if self.char_pane_active {
+            char_pane.borrow_mut().state.set_active(true);
+            create_details_text_box(&self.character.borrow().actor)
+        } else {
+            effects_pane.borrow_mut().state.set_active(true);
+            create_effects_pane(&self.character.borrow().actor)
+        };
+
+        vec![title, close, cur_pane, level_up, char_pane, effects_pane]
     }
+}
+
+pub fn create_effects_pane(pc: &ActorState) -> Rc<RefCell<Widget>> {
+    let effects = Widget::empty("effects");
+
+    for effect in pc.effects_iter() {
+        let widget = Widget::with_theme(TextArea::empty(), "effect");
+
+        widget.borrow_mut().state.add_text_arg("name", effect.name());
+        widget.borrow_mut().state.add_text_arg("total_duration",
+                                               &effect.total_duration_rounds().to_string());
+        widget.borrow_mut().state.add_text_arg("remaining_duration",
+                                               &effect.remaining_duration_rounds().to_string());
+        add_bonus_text_args(&effect.bonuses(), &mut widget.borrow_mut().state);
+        Widget::add_child_to(&effects, widget);
+    }
+
+    effects
 }
 
 pub fn create_details_text_box(pc: &ActorState) -> Rc<RefCell<Widget>> {

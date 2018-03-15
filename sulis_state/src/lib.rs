@@ -25,6 +25,9 @@ extern crate sulis_rules;
 mod ai;
 pub use self::ai::AI;
 
+mod ability_state;
+pub use self::ability_state::AbilityState;
+
 pub mod animation;
 use self::animation::{Animation, MoveAnimation};
 
@@ -72,6 +75,7 @@ pub use self::script::ScriptState;
 
 mod turn_timer;
 pub use self::turn_timer::TurnTimer;
+pub use self::turn_timer::ROUND_TIME_MILLIS;
 
 use std::time;
 use std::collections::HashMap;

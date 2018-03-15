@@ -26,7 +26,7 @@ use std::cell::RefCell;
 
 use rlua::{self, Function, Lua, UserData, UserDataMethods};
 
-use sulis_module::{Ability, Module};
+use sulis_module::{Ability};
 use {EntityState, GameState};
 
 type Result<T> = std::result::Result<T, rlua::Error>;
@@ -89,32 +89,45 @@ impl UserData for ScriptInterface {
     }
 }
 
-struct ScriptAbility {
+pub struct ScriptAbility {
     id: String,
+    name: String,
+    duration: u32,
+    ap: u32,
 }
 
 impl ScriptAbility {
     fn from(ability: &Rc<Ability>) -> ScriptAbility {
+        assert!(ability.active.is_some());
+
         ScriptAbility {
             id: ability.id.to_string(),
+            name: ability.name.to_string(),
+            duration: ability.active.as_ref().unwrap().duration,
+            ap: ability.active.as_ref().unwrap().ap,
         }
     }
 }
 
 impl UserData for ScriptAbility {
     fn add_methods(methods: &mut UserDataMethods<Self>) {
-        methods.add_method("remove_ap", &remove_ap);
+        methods.add_method("activate", &activate);
+        methods.add_method("name", |_, ability, ()| {
+            Ok(ability.name.to_string())
+        });
+        methods.add_method("duration", |_, ability, ()| Ok(ability.duration))
     }
 }
 
-fn remove_ap(_lua: &Lua, ability: &ScriptAbility, target: ScriptEntity) -> Result<()> {
+fn activate(_lua: &Lua, ability: &ScriptAbility, target: ScriptEntity) -> Result<()> {
     let area_state = GameState::area_state();
     let entity = area_state.borrow().get_entity(target.index);
 
-    let ability = Module::ability(&ability.id).unwrap();
-    if let Some(ref active) = ability.active {
-        entity.borrow_mut().actor.remove_ap(active.ap);
+    if area_state.borrow().turn_timer.is_active() {
+        entity.borrow_mut().actor.remove_ap(ability.ap);
     }
+
+    entity.borrow_mut().actor.activate_ability_state(&ability.id);
 
     Ok(())
 }

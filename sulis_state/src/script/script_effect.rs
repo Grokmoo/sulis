@@ -24,14 +24,16 @@ use {Effect, GameState};
 #[derive(Clone)]
 pub struct ScriptEffect {
     parent: usize,
+    name: String,
     duration: u32,
     pub bonuses: BonusList,
 }
 
 impl ScriptEffect {
-    pub fn new(parent: usize, duration: u32) -> ScriptEffect {
+    pub fn new(parent: usize, name: &str, duration: u32) -> ScriptEffect {
         ScriptEffect {
             parent,
+            name: name.to_string(),
             duration,
             bonuses: BonusList::default(),
         }
@@ -77,7 +79,7 @@ fn apply(_lua: &Lua, effect_data: &ScriptEffect, _args: ()) -> Result<()> {
     let duration = effect_data.duration * TURNS_TO_MILLIS;
 
     trace!("Apply effect to '{}'", entity.borrow().actor.actor.name);
-    let effect = Effect::new(duration, effect_data.bonuses.clone());
+    let effect = Effect::new(&effect_data.name, duration, effect_data.bonuses.clone());
     entity.borrow_mut().actor.add_effect(effect);
 
     Ok(())

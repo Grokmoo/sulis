@@ -5,4 +5,5 @@ description: "You unleash a powerful blow upon a single enemy in melee range."
 active:
   script: "mighty_blow"
   ap: 20
+  duration: 0
 

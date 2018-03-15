@@ -48,24 +48,30 @@ impl WidgetKind for AbilitiesBar {
         entity.actor.listeners.add(ChangeListener::invalidate(NAME, widget));
 
         let mut children = Vec::new();
-        for ability in entity.actor.actor.abilities.iter() {
-            let active = match ability.active {
+        for ability in entity.actor.actor.abilities.clone().iter() {
+            match entity.actor.ability_state(&ability.id) {
                 None => continue,
-                Some(ref active) => active,
+                Some(ref mut state) => {
+                    state.listeners.add(ChangeListener::invalidate(NAME, widget));
+                },
             };
 
             let button = Widget::with_theme(Button::empty(), "ability_button");
             button.borrow_mut().state.add_text_arg("icon", &ability.icon.id());
-            button.borrow_mut().state.set_enabled(entity.actor.ap() >= active.ap);
+            button.borrow_mut().state.set_enabled(entity.actor.can_activate(&ability.id));
 
             let ability_ref = Rc::clone(ability);
             button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |_widget, _| {
+                let pc = GameState::pc();
+
+                if !pc.borrow().actor.can_activate(&ability_ref.id) { return; }
+
                 let active = match ability_ref.active {
                     None => return,
                     Some(ref active) => active,
                 };
 
-                GameState::execute_ability_script(&GameState::pc(), &ability_ref,
+                GameState::execute_ability_script(&pc, &ability_ref,
                     &active.script, "on_activate");
             })));
 

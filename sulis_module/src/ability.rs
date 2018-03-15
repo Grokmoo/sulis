@@ -27,6 +27,7 @@ use {Module};
 pub struct Active {
     pub script: String,
     pub ap: u32,
+    pub duration: u32,
 }
 
 pub struct Ability {
@@ -66,6 +67,7 @@ impl Ability {
                 Some(Active {
                     script,
                     ap: active.ap,
+                    duration: active.duration,
                 })
             },
         };
@@ -85,6 +87,7 @@ impl Ability {
 pub struct ActiveBuilder {
     script: String,
     ap: u32,
+    duration: u32,
 }
 
 #[derive(Deserialize, Debug)]

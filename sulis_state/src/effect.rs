@@ -14,36 +14,43 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::time::Instant;
-
-use sulis_core::util;
 use sulis_rules::BonusList;
 
+use ROUND_TIME_MILLIS;
+
 pub struct Effect {
-    start_time: Instant,
-    duration: u32,
+    name: String,
+    cur_duration: u32,
+    total_duration: u32,
 
     bonuses: BonusList,
 }
 
 impl Effect {
-    pub fn new(duration: u32, bonuses: BonusList) -> Effect {
+    pub fn new(name: &str, duration: u32, bonuses: BonusList) -> Effect {
         Effect {
-            start_time: Instant::now(),
-            duration,
+            name: name.to_string(),
+            cur_duration: 0,
+            total_duration: duration,
             bonuses,
         }
     }
 
-    pub fn update(&self) -> bool {
-        let millis = util::get_elapsed_millis(self.start_time.elapsed());
+    pub fn update(&mut self, millis_elapsed: u32) {
+        self.cur_duration += millis_elapsed;
+    }
 
-        if millis < self.duration {
-            true
+    pub fn is_removal(&self) -> bool {
+        if self.cur_duration < self.total_duration {
+            false
         } else {
             debug!("Removing effect");
-            false
+            true
         }
+    }
+
+    pub fn name(&self) -> &str {
+        &self.name
     }
 
     pub fn bonuses(&self) -> &BonusList {
@@ -51,6 +58,14 @@ impl Effect {
     }
 
     pub fn duration_millis(&self) -> u32 {
-        self.duration
+        self.total_duration
+    }
+
+    pub fn total_duration_rounds(&self) -> u32 {
+        ((self.total_duration / ROUND_TIME_MILLIS) as f32).ceil() as u32
+    }
+
+    pub fn remaining_duration_rounds(&self) -> u32 {
+        (((self.total_duration - self.cur_duration) / ROUND_TIME_MILLIS) as f32).ceil() as u32
     }
 }

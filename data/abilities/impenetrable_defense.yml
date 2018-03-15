@@ -5,3 +5,4 @@ description: "Using all your skill and concentration, you become incredibly diff
 active:
   script: "impenetrable_defense"
   ap: 20
+  duration: 2

@@ -24,6 +24,8 @@ use sulis_module::Area;
 
 use {AreaState, ChangeListenerList, EntityState, GameState};
 
+pub const ROUND_TIME_MILLIS: u32 = 5000;
+
 /// `TurnTimer` maintains a list of all entities in a given `AreaState`.  The
 /// list proceed in initiative order, with the front of the list always containing
 /// the currently active entity.  Once an entity's turn is up, it is moved to the
@@ -201,6 +203,7 @@ impl TurnTimer {
 
         if let Some(current) = self.entities.front() {
             current.borrow_mut().actor.init_turn();
+            current.borrow_mut().actor.update(ROUND_TIME_MILLIS);
             debug!("'{}' now has the active turn.", current.borrow().actor.actor.name);
         }
     }

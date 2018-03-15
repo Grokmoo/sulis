@@ -14,8 +14,10 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::slice::Iter;
 use std::rc::Rc;
 use std::cell::{RefCell};
+use std::collections::HashMap;
 
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::image::{LayeredImage};
@@ -23,7 +25,7 @@ use sulis_core::ui::{color, Color};
 use sulis_module::{item, Actor, Module};
 use sulis_module::area::PropData;
 use sulis_rules::{HitKind, StatList};
-use {AreaState, ChangeListenerList, Effect, EntityState, GameState, Inventory};
+use {AbilityState, AreaState, ChangeListenerList, Effect, EntityState, GameState, Inventory};
 
 pub struct ActorState {
     pub actor: Rc<Actor>,
@@ -36,6 +38,7 @@ pub struct ActorState {
     inventory: Inventory,
     effects: Vec<Effect>,
     image: LayeredImage,
+    ability_states: HashMap<String, AbilityState>,
 }
 
 impl ActorState {
@@ -51,6 +54,13 @@ impl ActorState {
                                                                     actor.skin_color), actor.hue);
         let attrs = actor.attributes;
 
+        let mut ability_states = HashMap::new();
+        for ability in actor.abilities.iter() {
+            if ability.active.is_none() { continue; }
+
+            ability_states.insert(ability.id.to_string(), AbilityState::new(ability));
+        }
+
         let xp = actor.xp;
         ActorState {
             actor,
@@ -63,11 +73,45 @@ impl ActorState {
             has_level_up: false,
             image,
             effects: Vec::new(),
+            ability_states,
         }
+    }
+
+    pub fn ability_state(&mut self, id: &str) -> Option<&mut AbilityState> {
+        self.ability_states.get_mut(id)
+    }
+
+    pub fn can_activate(&self, id: &str) -> bool {
+        match self.ability_states.get(id) {
+            None => false,
+            Some(ref state) => {
+                if self.ap < state.activate_ap() { return false; }
+
+                state.is_available()
+            }
+        }
+    }
+
+    pub fn activate_ability_state(&mut self, id: &str) {
+        match self.ability_states.get_mut(id) {
+            None => (),
+            Some(ref mut state) => state.activate(),
+        }
+    }
+
+    pub fn effects_iter<'a>(&'a self) -> Iter<'a, Effect> {
+        self.effects.iter()
     }
 
     pub fn level_up(&mut self, new_actor: Actor) {
         self.actor = Rc::new(new_actor);
+
+        for ability in self.actor.abilities.iter() {
+            if ability.active.is_none() { continue; }
+
+            self.ability_states.insert(ability.id.to_string(), AbilityState::new(ability));
+        }
+
         self.compute_stats();
         self.init();
     }
@@ -280,10 +324,18 @@ impl ActorState {
         self.listeners.notify(&self);
     }
 
-    pub fn update(&mut self, _millis: u32) {
+    pub fn update(&mut self, millis_elapsed: u32) {
         let start_len = self.effects.len();
 
-        self.effects.retain(|e| e.update());
+        for effect in self.effects.iter_mut() {
+            effect.update(millis_elapsed);
+        }
+
+        self.effects.retain(|e| !e.is_removal());
+
+        for (_, ability_state) in self.ability_states.iter_mut() {
+            ability_state.update(millis_elapsed);
+        }
 
         if start_len != self.effects.len() {
             self.compute_stats();

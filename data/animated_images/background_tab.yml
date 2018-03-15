@@ -1,0 +1,10 @@
+id: background_tab
+states:
+    normal: bg_tab
+    hover: bg_tab_hover
+    active: bg_tab_pressed
+    active + hover: bg_tab_pressed
+    pressed + hover: bg_tab_pressed
+    disabled: bg_tab_disabled
+    disabled + hover: bg_tab_disabled
+    disabled + pressed + hover: bg_tab_disabled

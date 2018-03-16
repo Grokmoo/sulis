@@ -23,6 +23,7 @@ use {Armor, DamageKind, DamageList, StatList};
 
 use AttackKind::*;
 
+#[derive(Clone)]
 pub struct Attack {
     pub damage: DamageList,
     pub kind: AttackKind,
@@ -36,13 +37,13 @@ impl Attack {
             AttackKindBuilder::Melee { reach } =>
                 Melee { reach: reach + stats.bonus_reach },
             AttackKindBuilder::Ranged { range, ref projectile } => {
-                let image = match ResourceSet::get_image(projectile) {
+                let projectile = match ResourceSet::get_image(projectile) {
                     None => {
                         warn!("No image found for projectile '{}'", projectile);
-                        ResourceSet::get_empty_image()
-                    }, Some(image) => image,
+                        "empty".to_string()
+                    }, Some(_) => projectile.to_string(),
                 };
-                Ranged { range: range + stats.bonus_range, projectile: image }
+                Ranged { range: range + stats.bonus_range, projectile }
             }
         };
 
@@ -69,7 +70,9 @@ impl Attack {
     pub fn get_ranged_projectile(&self) -> Option<Rc<Image>> {
         match self.kind {
             Melee { .. } => None,
-            Ranged { ref projectile, .. } => Some(Rc::clone(projectile))
+            Ranged { ref projectile, .. } => {
+                ResourceSet::get_image(projectile)
+            }
         }
     }
 
@@ -97,5 +100,5 @@ impl Attack {
 #[derive(Debug, Clone)]
 pub enum AttackKind {
     Melee { reach: f32 },
-    Ranged { range: f32, projectile: Rc<Image> },
+    Ranged { range: f32, projectile: String },
 }

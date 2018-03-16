@@ -129,4 +129,5 @@ groups:
       dwarf18: [5, 9]
       dwarf19: [6, 9]
       
+      frame: [11, 11]
 

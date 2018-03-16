@@ -72,6 +72,8 @@ pub use self::prop_state::PropState;
 
 mod script;
 pub use self::script::ScriptState;
+pub use self::script::targeter::Targeter;
+pub use self::script::ScriptCallback;
 
 mod turn_timer;
 pub use self::turn_timer::TurnTimer;
@@ -94,6 +96,7 @@ thread_local! {
     static AI: RefCell<AI> = RefCell::new(AI::new());
     static ENTERING_COMBAT: RefCell<bool> = RefCell::new(false);
     static SCRIPT: ScriptState = ScriptState::new();
+    static ANIMATIONS: RefCell<Vec<Box<Animation>>> = RefCell::new(Vec::new());
 }
 
 pub struct GameStateMainLoopUpdater { }
@@ -113,23 +116,53 @@ pub struct GameState {
     area_state: Rc<RefCell<AreaState>>,
     pc: Rc<RefCell<EntityState>>,
     should_exit: bool,
-    animations: Vec<Box<Animation>>,
+    // animations: Vec<Box<Animation>>,
     path_finder: PathFinder,
 }
 
 impl GameState {
-    pub fn execute_ability_script(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>,
-                                  script: &str, function: &str) {
+    pub fn execute_ability_on_activate(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>) {
         let start_time = time::Instant::now();
 
         let result: Result<(), rlua::Error> = SCRIPT.with(|script_state| {
-            script_state.execute_ability_script(parent, ability, script, function)
+            script_state.ability_on_activate(parent, ability)
         });
 
         if let Err(e) = result {
-            warn!("Error executing lua script function '{}'", function);
+            warn!("Error executing lua script function on_activate for ability");
             warn!("{}", e);
-            debug!("\n===SCRIPT===\n{}\n===END SCRIPT===", script);
+        }
+
+        info!("Script execution time: {}", util::format_elapsed_secs(start_time.elapsed()));
+    }
+
+    pub fn execute_ability_on_target_select(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>,
+                                            targets: Vec<Rc<RefCell<EntityState>>>) {
+        let start_time = time::Instant::now();
+
+        let result: Result<(), rlua::Error> = SCRIPT.with(|script_state| {
+            script_state.ability_on_target_select(parent, ability, targets)
+        });
+
+        if let Err(e) = result {
+            warn!("Error executing lua script function on_activate for ability");
+            warn!("{}", e);
+        }
+
+        info!("Script execution time: {}", util::format_elapsed_secs(start_time.elapsed()));
+    }
+
+    pub fn execute_ability_script(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>,
+                                  targets: Vec<Rc<RefCell<EntityState>>>, func: &str) {
+        let start_time = time::Instant::now();
+
+        let result: Result<(), rlua::Error> = SCRIPT.with(|script_state| {
+            script_state.ability_script(parent, ability, targets, func)
+        });
+
+        if let Err(e) = result {
+            warn!("Error executing lua script function on_activate for ability");
+            warn!("{}", e);
         }
 
         info!("Script execution time: {}", util::format_elapsed_secs(start_time.elapsed()));
@@ -264,7 +297,6 @@ impl GameState {
             area_state: area_state,
             path_finder: path_finder,
             pc: pc_state,
-            animations: Vec::new(),
             should_exit: false,
         })
     }
@@ -308,22 +340,25 @@ impl GameState {
     }
 
     pub fn update(root: &Rc<RefCell<Widget>>, millis: u32) {
-        let active_entity = STATE.with(|s| {
-            let mut state = s.borrow_mut();
-            let state = state.as_mut().unwrap();
-
-            let mut area_state = state.area_state.borrow_mut();
+        ANIMATIONS.with(|a| {
+            let mut anims = a.borrow_mut();
 
             let mut i = 0;
-            while i < state.animations.len() {
-                let retain = state.animations[i].update(&mut area_state, root);
+            while i < anims.len() {
+                let retain = anims[i].update(root);
 
                 if retain {
                     i += 1;
                 } else {
-                    state.animations.remove(i);
+                    anims.remove(i);
                 }
             }
+        });
+
+        let active_entity = STATE.with(|s| {
+            let mut state = s.borrow_mut();
+            let state = state.as_mut().unwrap();
+            let mut area_state = state.area_state.borrow_mut();
 
             let result = match area_state.update(millis) {
                 None => Rc::clone(&state.pc),
@@ -333,14 +368,16 @@ impl GameState {
             if state.pc.borrow().actor.is_dead() {
                 area_state.turn_timer.set_active(false);
             }
-
-            // clear animations for the active entity when entering combat
-            if GameState::check_clear_entering_combat() {
-                state.animations.iter_mut().for_each(|a| a.check(&result));
-            }
-
             result
         });
+
+        // clear animations for the active entity when entering combat
+        if GameState::check_clear_entering_combat() {
+            ANIMATIONS.with(|a| {
+                let mut anims = a.borrow_mut();
+                anims.iter_mut().for_each(|a| a.check(&active_entity));
+            });
+        }
 
         AI.with(|ai| {
             let mut ai = ai.borrow_mut();
@@ -350,23 +387,20 @@ impl GameState {
 
     pub fn draw_graphics_mode(renderer: &mut GraphicsRenderer, offset_x: f32, offset_y: f32,
                               scale_x: f32, scale_y: f32, millis: u32) {
-        STATE.with(|s| {
-            let state = s.borrow();
-            let state = state.as_ref().unwrap();
+        ANIMATIONS.with(|a| {
+            let anims = a.borrow();
 
-            for anim in state.animations.iter() {
-                anim.draw_graphics_mode(renderer, offset_x, offset_y,
-                                        scale_x, scale_y, millis);
+            for anim in anims.iter() {
+                anim.draw_graphics_mode(renderer, offset_x, offset_y, scale_x, scale_y, millis);
             }
         })
     }
 
     pub fn has_active_animations(entity: &Rc<RefCell<EntityState>>) -> bool {
-        STATE.with(|s| {
-            let state = s.borrow();
-            let state = state.as_ref().unwrap();
+        ANIMATIONS.with(|a| {
+            let anims = a.borrow();
 
-            for anim in state.animations.iter() {
+            for anim in anims.iter() {
                 if *anim.get_owner().borrow() == *entity.borrow() {
                     return true;
                 }
@@ -376,11 +410,10 @@ impl GameState {
     }
 
     pub fn add_animation(anim: Box<Animation>) {
-        STATE.with(|s| {
-            let mut state = s.borrow_mut();
-            let state = state.as_mut().unwrap();
+        ANIMATIONS.with(|a| {
+            let mut anims = a.borrow_mut();
 
-            state.animations.push(anim);
+            anims.push(anim);
         });
     }
 
@@ -446,7 +479,7 @@ impl GameState {
     }
 
     fn move_to_internal(entity: &Rc<RefCell<EntityState>>, x: f32, y: f32, dist: f32) -> bool {
-        STATE.with(|s| {
+        let anim = STATE.with(|s| {
             let mut state = s.borrow_mut();
             let state = state.as_mut().unwrap();
             debug!("Moving '{}' to {},{}", entity.borrow().actor.actor.name, x, y);
@@ -455,21 +488,30 @@ impl GameState {
             let path = {
                 let area_state = state.area_state.borrow();
                 match state.path_finder.find(&area_state, entity.borrow(), x, y, dist) {
-                    None => return false,
+                    None => return None,
                     Some(path) => path,
                 }
             };
             debug!("Path finding complete in {} secs",
                   util::format_elapsed_secs(start_time.elapsed()));
 
-            for anim in state.animations.iter_mut() {
-                anim.check(entity);
-            }
             let entity = Rc::clone(entity);
-            let anim = MoveAnimation::new(entity, path, CONFIG.display.animation_base_time_millis);
-            state.animations.push(Box::new(anim));
-            true
-        })
+            Some(MoveAnimation::new(entity, path, CONFIG.display.animation_base_time_millis))
+        });
+
+        match anim {
+            None => false,
+            Some(anim) => {
+                ANIMATIONS.with(|a| {
+                    let mut anims = a.borrow_mut();
+                    for anim in anims.iter_mut() {
+                        anim.check(entity);
+                    }
+                    anims.push(Box::new(anim));
+                });
+                true
+            }
+        }
     }
 
     fn can_move_to_internal(entity: &Rc<RefCell<EntityState>>, x: f32, y: f32, dist: f32) -> bool {

@@ -1,0 +1,7 @@
+id: "bg_inner_hover"
+generate_sub_images:
+  size: [1, 1]
+  spritesheet: "gui"
+grid: [ "bg_inner_top_left_hover",    "bg_inner_top_middle_hover",    "bg_inner_top_right_hover",
+        "bg_inner_middle_left_hover", "bg_middle_hover",        "bg_inner_middle_right_hover",
+        "bg_inner_bottom_left_hover", "bg_inner_bottom_middle_hover", "bg_inner_bottom_right_hover" ]

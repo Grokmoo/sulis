@@ -19,7 +19,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use std::time::Instant;
 
-use {animation, AreaState, EntityState};
+use {animation, EntityState, GameState, ScriptCallback};
 use sulis_core::ui::Widget;
 use sulis_core::util::{self, Point};
 
@@ -30,6 +30,7 @@ pub struct MoveAnimation {
    start_time: Instant,
    frame_time_millis: u32,
    marked_for_removal: bool,
+   callback: Option<Box<ScriptCallback>>,
 }
 
 impl MoveAnimation {
@@ -43,13 +44,18 @@ impl MoveAnimation {
             frame_time_millis,
             marked_for_removal: false,
             last_frame_index: 0, // start at index 0 which is the initial pos
+            callback: None,
         }
     }
 
 }
 
 impl animation::Animation for MoveAnimation {
-    fn update(&mut self, area_state: &mut AreaState, _root: &Rc<RefCell<Widget>>) -> bool {
+    fn set_callback(&mut self, callback: Option<Box<ScriptCallback>>) {
+        self.callback = callback;
+    }
+
+    fn update(&mut self, _root: &Rc<RefCell<Widget>>) -> bool {
         if self.marked_for_removal || self.path.is_empty() {
             self.mover.borrow_mut().sub_pos = (0.0, 0.0);
             return false;
@@ -73,7 +79,9 @@ impl animation::Animation for MoveAnimation {
         self.last_frame_index = frame_index as i32;
 
         let p = self.path[frame_index];
-        if !area_state.move_entity(&self.mover, p.x, p.y, move_ap as u32) {
+        let area_state = GameState::area_state();
+
+        if !area_state.borrow_mut().move_entity(&self.mover, p.x, p.y, move_ap as u32) {
             return false;
         }
 

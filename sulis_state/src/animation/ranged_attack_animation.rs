@@ -22,7 +22,7 @@ use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::image::Image;
 use sulis_core::ui::{animation_state, Widget};
 use sulis_core::util;
-use {AreaState, EntityState};
+use {EntityState, GameState, ScriptCallback};
 use animation::Animation;
 
 pub struct RangedAttackAnimation {
@@ -40,6 +40,8 @@ pub struct RangedAttackAnimation {
     has_attacked: bool,
 
     projectile: Option<Rc<Image>>,
+
+    callback: Option<Box<ScriptCallback>>,
 }
 
 impl RangedAttackAnimation {
@@ -71,11 +73,16 @@ impl RangedAttackAnimation {
             total_time_millis: base_time_millis as f32 * dist,
             has_attacked: false,
             projectile,
+            callback: None,
         }
     }
 }
 
 impl Animation for RangedAttackAnimation {
+    fn set_callback(&mut self, callback: Option<Box<ScriptCallback>>) {
+        self.callback = callback;
+    }
+
     fn draw_graphics_mode(&self, renderer: &mut GraphicsRenderer, offset_x: f32, offset_y: f32,
                           scale_x: f32, scale_y: f32, millis: u32) {
         if let Some(ref projectile) = self.projectile {
@@ -91,7 +98,7 @@ impl Animation for RangedAttackAnimation {
         }
     }
 
-    fn update(&mut self, area_state: &mut AreaState, _root: &Rc<RefCell<Widget>>) -> bool {
+    fn update(&mut self, _root: &Rc<RefCell<Widget>>) -> bool {
         if self.marked_for_removal {
             return false;
         }
@@ -101,7 +108,14 @@ impl Animation for RangedAttackAnimation {
 
         if frac > 1.0 {
             if !self.has_attacked {
-                let (text, color) = self.attacker.borrow_mut().actor.attack(&self.defender, area_state);
+                if let Some(ref cb) = self.callback.as_ref() {
+                    cb.call();
+                }
+
+                let area_state = GameState::area_state();
+                let mut area_state = area_state.borrow_mut();
+
+                let (text, color) = self.attacker.borrow_mut().actor.attack(&self.defender, &mut area_state);
 
                 let scale = 1.2;
                 area_state.add_feedback_text(text, &self.defender, scale, color);

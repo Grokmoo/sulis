@@ -16,7 +16,7 @@
 
 use rlua::{Lua, UserData, UserDataMethods};
 
-use sulis_rules::BonusList;
+use sulis_rules::{BonusList, Damage, DamageKind};
 
 use script::Result;
 use {Effect, GameState};
@@ -44,6 +44,15 @@ impl UserData for ScriptEffect {
     fn add_methods(methods: &mut UserDataMethods<Self>) {
         methods.add_method("apply", &apply);
         methods.add_method_mut("add_num_bonus", &add_num_bonus);
+        methods.add_method_mut("add_damage", |_, effect, (min, max): (u32, u32)| {
+            effect.bonuses.bonus_damage = Some(Damage { min, max, kind: None });
+            Ok(())
+        });
+        methods.add_method_mut("add_damage_of_kind", |_, effect, (min, max, kind): (u32, u32, String)| {
+            let kind = DamageKind::from_str(&kind);
+            effect.bonuses.bonus_damage = Some(Damage { min, max, kind: Some(kind) });
+            Ok(())
+        });
     }
 }
 
@@ -54,6 +63,7 @@ fn add_num_bonus(_lua: &Lua, effect: &mut ScriptEffect, args: (String, f32)) -> 
 
     trace!("Adding numeric bonus {} to '{}'", amount, name);
     match name.as_ref() {
+        "armor" => effect.bonuses.base_armor = Some(amount as u32),
         "reach" => effect.bonuses.bonus_reach = Some(amount),
         "range" => effect.bonuses.bonus_range = Some(amount),
         "initiative" => effect.bonuses.initiative = Some(amount_int),

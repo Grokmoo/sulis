@@ -357,9 +357,12 @@ impl WidgetKind for AreaView {
                                scale_x, scale_y);
         }
 
-
         GameState::draw_graphics_mode(renderer, p.x as f32 - self.scroll.x(), p.y as f32- self.scroll.y(),
                                       scale_x, scale_y, millis);
+
+        if let Some(ref targeter) = state.targeter() {
+            targeter.borrow().draw(renderer, self.scroll.x(), self.scroll.y(), scale_x, scale_y);
+        }
     }
 
     fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
@@ -368,6 +371,14 @@ impl WidgetKind for AreaView {
         if x < 0 || y < 0 { return true; }
 
         let area_state = GameState::area_state();
+        let has_targeter = area_state.borrow().targeter().is_some();
+
+        if has_targeter {
+            let targeter = Rc::clone(area_state.borrow().targeter().unwrap());
+            targeter.borrow_mut().on_mouse_release();
+            return true;
+        }
+
         let action_menu = ActionMenu::new(x, y);
         if kind == ClickKind::Left {
             action_menu.borrow().fire_default_callback(&widget, self);
@@ -406,9 +417,13 @@ impl WidgetKind for AreaView {
     fn on_mouse_move(&mut self, widget: &Rc<RefCell<Widget>>,
                      _delta_x: f32, _delta_y: f32) -> bool {
         let (area_x, area_y) = self.get_cursor_pos(widget);
-        let area_state = GameState::area_state();
-
         self.hover_sprite = None;
+
+        let area_state = GameState::area_state();
+        if let Some(ref targeter) = area_state.borrow_mut().targeter() {
+            targeter.borrow_mut().on_mouse_move(area_x, area_y);
+            return true;
+        }
 
         if let Some(entity) = area_state.borrow().get_entity_at(area_x, area_y) {
             let (x, y) = {

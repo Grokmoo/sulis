@@ -1,0 +1,7 @@
+id: bg_inner_base
+generate_sub_images:
+  size: [1, 1]
+  spritesheet: "gui"
+grid: [ "bg_inner_top_left_base",    "bg_inner_top_middle_base",    "bg_inner_top_right_base",
+        "bg_inner_middle_left_base", "bg_middle_base",        "bg_inner_middle_right_base",
+        "bg_inner_bottom_left_base", "bg_inner_bottom_middle_base", "bg_inner_bottom_right_base" ]

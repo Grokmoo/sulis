@@ -111,6 +111,7 @@ children:
         children:
           character_button:
             from: .button
+            background: background_inner
             foreground: "#portrait#"
             preferred_size: [28, 28]
       play_button:

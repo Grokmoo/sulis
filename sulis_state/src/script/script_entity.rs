@@ -20,9 +20,10 @@ use std::cell::RefCell;
 
 use rlua::{Lua, UserData, UserDataMethods};
 
+use sulis_rules::StatList;
 use sulis_module::Faction;
 use {EntityState, GameState};
-use script::{Result, ScriptEffect};
+use script::{CallbackData, Result, ScriptAbility, ScriptEffect, TargeterData};
 
 #[derive(Clone)]
 pub struct ScriptEntity {
@@ -52,13 +53,64 @@ impl UserData for ScriptEntity {
             let ability = args.0;
             Ok(ScriptEffect::new(entity.index, &ability, duration))
         });
+
+        methods.add_method("create_targeter", |_, entity, ability: ScriptAbility| {
+            Ok(TargeterData::new(entity.index, &ability.id))
+        });
+
+        methods.add_method("attack", |_, entity, (target, callback): (ScriptEntity, CallbackData)| {
+            let area_state = GameState::area_state();
+            let target = area_state.borrow().get_entity(target.index);
+            let parent = area_state.borrow().get_entity(entity.index);
+
+            EntityState::attack(&parent, &target, Some(Box::new(callback)));
+            Ok(())
+        });
+
+        methods.add_method("remove_ap", |_, entity, ap| {
+            let area_state = GameState::area_state();
+            let entity = area_state.borrow().get_entity(entity.index);
+            entity.borrow_mut().actor.remove_ap(ap);
+            Ok(())
+        });
+
+        methods.add_method("stats", |_, entity, ()| {
+            let area_state = GameState::area_state();
+            let parent = area_state.borrow().get_entity(entity.index);
+
+            let stats = parent.borrow().actor.stats.clone();
+
+            Ok(ScriptEntityStats { stats })
+        });
+    }
+}
+
+#[derive(Clone)]
+pub struct ScriptEntityStats {
+    stats: StatList,
+}
+
+impl UserData for ScriptEntityStats {
+    fn add_methods(methods: &mut UserDataMethods<Self>) {
+
     }
 }
 
 #[derive(Clone)]
 pub struct ScriptEntitySet {
-    parent: usize,
-    indices: Vec<usize>,
+    pub parent: usize,
+    pub indices: Vec<usize>,
+}
+
+impl ScriptEntitySet {
+    pub fn new(parent: &Rc<RefCell<EntityState>>, entities: &Vec<Rc<RefCell<EntityState>>>) -> ScriptEntitySet {
+        let parent = parent.borrow().index;
+        let indices = entities.iter().map(|e| e.borrow().index).collect();
+        ScriptEntitySet {
+            parent,
+            indices,
+        }
+    }
 }
 
 impl UserData for ScriptEntitySet {
@@ -67,6 +119,14 @@ impl UserData for ScriptEntitySet {
             let table: Vec<ScriptEntity> = set.indices.iter().map(|i| ScriptEntity::new(*i)).collect();
 
             Ok(table)
+        });
+
+        methods.add_method("first", |_, set, ()| {
+            if set.indices.is_empty() {
+                panic!("EntitySet is empty");
+            }
+
+            Ok(ScriptEntity::new(*set.indices.first().unwrap()))
         });
 
         methods.add_method("visible_within", &visible_within);

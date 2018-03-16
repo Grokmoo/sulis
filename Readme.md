@@ -22,6 +22,7 @@ You'll need recent versions of Rust and Cargo installed.  The game currently req
 * [Serde](https://serde.rs/)
 * [Glium](https://github.com/glium/glium)
 * [Image](https://github.com/PistonDevelopers/image)
+* [rLua](https://github.com/chucklefish/rlua)
 * [Flexi Logger](https://github.com/emabee/flexi_logger)
 
 ## Authors

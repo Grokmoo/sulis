@@ -20,6 +20,7 @@ use rand::{self, Rng};
 
 use Armor;
 
+#[derive(Clone)]
 pub struct DamageList {
     damage: Vec<Damage>,
     min: u32,
@@ -186,6 +187,24 @@ impl DamageKind {
             &Fire => 6,
             &Sonic => 7,
             &Raw => 8,
+        }
+    }
+
+    pub fn from_str(s: &str) -> DamageKind {
+        match s {
+            "Slashing" => DamageKind::Slashing,
+            "Piercing" => DamageKind::Piercing,
+            "Crushing" => DamageKind::Crushing,
+            "Acid" => DamageKind::Acid,
+            "Cold" => DamageKind::Cold,
+            "Electrical" => DamageKind::Electrical,
+            "Fire" => DamageKind::Fire,
+            "Sonic" => DamageKind::Sonic,
+            "Raw" => DamageKind::Raw,
+            _ => {
+                warn!("Unable to parse '{}' as damage kind", s);
+                DamageKind::Raw
+            }
         }
     }
 }

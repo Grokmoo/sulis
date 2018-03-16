@@ -278,7 +278,7 @@ impl MarkupRenderer {
 
         let sprite = match ResourceSet::get_sprite(image) {
             Err(_) => {
-                warn!("Unable to find image '{}'", image);
+                warn!("Unable to find sprite '{}'", image);
                 return;
             },
             Ok(sprite) => sprite,

@@ -33,11 +33,11 @@ impl<T> Default for ChangeListenerList<T> {
 
 impl<T> ChangeListenerList<T> {
     pub fn add(&mut self, listener: ChangeListener<T>) {
-        self.remove(listener.id);
+        self.remove(&listener.id);
         self.listeners.push(listener);
     }
 
-    pub fn remove(&mut self, id: &'static str) {
+    pub fn remove(&mut self, id: &str) {
         self.listeners.retain(|listener| listener.id() != id);
     }
 
@@ -50,44 +50,44 @@ impl<T> ChangeListenerList<T> {
 
 pub struct ChangeListener<T> {
     cb: Box<Fn(&T)>,
-    id: &'static str,
+    id: String,
 }
 
 impl<T> ChangeListener<T> {
-    pub fn new(id: &'static str, cb: Box<Fn(&T)>) -> ChangeListener<T> {
+    pub fn new(id: &str, cb: Box<Fn(&T)>) -> ChangeListener<T> {
         ChangeListener {
             cb,
-            id,
+            id: id.to_string(),
         }
     }
 
-    pub fn remove_widget(id: &'static str, widget: &Rc<RefCell<Widget>>) -> ChangeListener<T> {
+    pub fn remove_widget(id: &str, widget: &Rc<RefCell<Widget>>) -> ChangeListener<T> {
         let widget_ref = Rc::clone(widget);
         ChangeListener {
             cb: Box::new(move |_t| {
                 widget_ref.borrow_mut().mark_for_removal();
             }),
-            id,
+            id: id.to_string(),
         }
     }
 
-    pub fn invalidate(id: &'static str, widget: &Rc<RefCell<Widget>>) -> ChangeListener<T> {
+    pub fn invalidate(id: &str, widget: &Rc<RefCell<Widget>>) -> ChangeListener<T> {
         let widget_ref = Rc::clone(widget);
         ChangeListener {
             cb: Box::new(move |_t| {
                 widget_ref.borrow_mut().invalidate_children();
             }),
-            id,
+            id: id.to_string(),
         }
     }
 
-    pub fn invalidate_layout(id: &'static str, widget: &Rc<RefCell<Widget>>) -> ChangeListener<T> {
+    pub fn invalidate_layout(id: &str, widget: &Rc<RefCell<Widget>>) -> ChangeListener<T> {
         let widget_ref = Rc::clone(widget);
         ChangeListener {
             cb: Box::new(move |_t| {
                 widget_ref.borrow_mut().invalidate_layout();
             }),
-            id,
+            id: id.to_string(),
         }
     }
 
@@ -95,7 +95,7 @@ impl<T> ChangeListener<T> {
         (self.cb)(t);
     }
 
-    pub fn id(&self) -> &'static str {
-        self.id
+    pub fn id(&self) -> &str {
+        &self.id
     }
 }

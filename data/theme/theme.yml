@@ -39,8 +39,23 @@ children:
         children:
           ability_button:
             from: .button
-            foreground: "#icon#"
-            preferred_size: [10, 10]
+            background: background_inner
+            foreground: "greyed_out"
+            preferred_size: [12, 12]
+            children:
+              duration_label:
+                from: .label
+                text: "#duration#"
+                text_params:
+                  horizontal_alignment: Right
+                  vertical_alignment: Top
+                  color: { r: 1.0, g: 0.0, b: 0.0, a: 1.0 }
+                width_relative: Max
+                height_relative: Max
+              icon:
+                foreground: "#icon#"
+                width_relative: Max
+                height_relative: Max
       portrait_view:
         background: bg_rounded
         x_relative: Max
@@ -313,8 +328,8 @@ children:
         text: |
           [?name|[s=6|#name# - #race# #sex#]
           [s=4|]
-          [s=5|[x=0|Hit Points][x=25|Action Points][x=55|Experience]]
-          [x=0|#cur_hp# / #max_hp#][x=25|#cur_ap#][x=55|#cur_xp# / #next_xp#]
+          [s=5|[x=0|Hit Points][x=30|Experience]]
+          [x=0|#cur_hp# / #max_hp#][x=30|#cur_xp# / #next_xp#]
           [s=4|]
           [s=5|Level #level_0# #class_0#]
           [s=5|]
@@ -335,7 +350,8 @@ children:
                   [x=0|Wisdom][x=40|#wis#]]
           [s=6|]
           [x=0|Initiative][x=40|#initiative#]
-          [?portrait;x=75;y=0;i=#portrait#;s=30.0|]]
+          [?portrait;x=75;y=-3;i=#portrait#;s=30.0|]
+          [?portrait;x=75;y=-3;i=portraits/frame;s=30.0|]]
       level_up:
         from: .button
         text: "Level Up"
@@ -343,7 +359,7 @@ children:
           scale: 6.0
         x_relative: Max
         preferred_size: [25, 8]
-        position: [-5, 4]
+        position: [-4, 11]
   race_pane:
     preferred_size: [40, 40]
     background: bg_base

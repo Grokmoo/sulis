@@ -20,7 +20,7 @@ use sulis_module::{Actor, Area, Module};
 use sulis_module::area::{EncounterData, PropData, Transition};
 use sulis_core::util::Point;
 
-use {AreaFeedbackText, calculate_los, ChangeListenerList, EntityState, Location, PropState, TurnTimer};
+use {AreaFeedbackText, calculate_los, ChangeListenerList, EntityState, Location, PropState, Targeter, TurnTimer};
 
 use std::slice::Iter;
 use std::rc::Rc;
@@ -45,6 +45,8 @@ pub struct AreaState {
     scroll_to_callback: Option<Rc<RefCell<EntityState>>>,
 
     last_time_millis: u32,
+
+    targeter: Option<Rc<RefCell<Targeter>>>,
 }
 
 impl PartialEq for AreaState {
@@ -54,6 +56,14 @@ impl PartialEq for AreaState {
 }
 
 impl AreaState {
+    pub fn targeter(&self) -> Option<&Rc<RefCell<Targeter>>> {
+        self.targeter.as_ref()
+    }
+
+    pub (crate) fn set_targeter(&mut self, targeter: Targeter) {
+        self.targeter = Some(Rc::new(RefCell::new(targeter)));
+    }
+
     pub fn push_scroll_to_callback(&mut self, entity: Rc<RefCell<EntityState>>) {
         self.scroll_to_callback = Some(entity);
     }
@@ -86,6 +96,7 @@ impl AreaState {
             feedback_text: Vec::new(),
             scroll_to_callback: None,
             last_time_millis: 0,
+            targeter: None,
         }
     }
 
@@ -452,6 +463,8 @@ impl AreaState {
 
                 if real_time {
                     entity.borrow_mut().actor.update(elapsed_millis);
+                } else {
+                    entity.borrow_mut().actor.check_removal();
                 }
 
                 if !entity.borrow().is_marked_for_removal() { continue; }
@@ -480,6 +493,12 @@ impl AreaState {
 
         self.feedback_text.iter_mut().for_each(|f| f.update());
         self.feedback_text.retain(|f| f.retain());
+
+        if self.targeter.is_some() {
+            if self.targeter.as_ref().unwrap().borrow().cancel() {
+                self.targeter = None;
+            }
+        }
 
         if notify {
             self.listeners.notify(&self);

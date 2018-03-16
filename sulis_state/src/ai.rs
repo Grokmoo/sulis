@@ -153,7 +153,7 @@ impl EntityAI {
     fn do_attack(&self) {
         debug!("AI for '{}' is attacking.", self.entity.borrow().actor.actor.name);
         let pc = GameState::pc();
-        EntityState::attack(&self.entity, &pc);
+        EntityState::attack(&self.entity, &pc, None);
     }
 
     fn do_end(&self) {

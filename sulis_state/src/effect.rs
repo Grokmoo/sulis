@@ -15,6 +15,7 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use sulis_rules::BonusList;
+use ChangeListenerList;
 
 use ROUND_TIME_MILLIS;
 
@@ -24,6 +25,8 @@ pub struct Effect {
     total_duration: u32,
 
     bonuses: BonusList,
+
+    pub listeners: ChangeListenerList<Effect>,
 }
 
 impl Effect {
@@ -33,11 +36,18 @@ impl Effect {
             cur_duration: 0,
             total_duration: duration,
             bonuses,
+            listeners: ChangeListenerList::default(),
         }
     }
 
     pub fn update(&mut self, millis_elapsed: u32) {
+        let cur_mod = self.cur_duration % ROUND_TIME_MILLIS;
+
         self.cur_duration += millis_elapsed;
+
+        if cur_mod != self.cur_duration % ROUND_TIME_MILLIS {
+            self.listeners.notify(&self);
+        }
     }
 
     pub fn is_removal(&self) -> bool {
@@ -62,10 +72,12 @@ impl Effect {
     }
 
     pub fn total_duration_rounds(&self) -> u32 {
-        ((self.total_duration / ROUND_TIME_MILLIS) as f32).ceil() as u32
+        (self.total_duration as f32 / ROUND_TIME_MILLIS as f32).ceil() as u32
     }
 
     pub fn remaining_duration_rounds(&self) -> u32 {
-        (((self.total_duration - self.cur_duration) / ROUND_TIME_MILLIS) as f32).ceil() as u32
+        if self.cur_duration > self.total_duration { return 0; }
+
+        ((self.total_duration - self.cur_duration) as f32 / ROUND_TIME_MILLIS as f32).ceil() as u32
     }
 }

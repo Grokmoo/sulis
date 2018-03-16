@@ -20,7 +20,8 @@ use std::time::Instant;
 
 use sulis_core::util;
 use sulis_core::ui::Widget;
-use {animation, AreaState, EntityState};
+use ScriptCallback;
+use {animation, EntityState, GameState};
 
 pub struct MeleeAttackAnimation {
     attacker: Rc<RefCell<EntityState>>,
@@ -30,6 +31,7 @@ pub struct MeleeAttackAnimation {
     total_time_millis: u32,
     marked_for_removal: bool,
     has_attacked: bool,
+    callback: Option<Box<ScriptCallback>>,
 }
 
 impl MeleeAttackAnimation {
@@ -48,12 +50,17 @@ impl MeleeAttackAnimation {
             total_time_millis,
             marked_for_removal: false,
             has_attacked: false,
+            callback: None,
         }
     }
 }
 
 impl animation::Animation for MeleeAttackAnimation {
-    fn update(&mut self, area_state: &mut AreaState, _root: &Rc<RefCell<Widget>>) -> bool {
+    fn set_callback(&mut self, callback: Option<Box<ScriptCallback>>) {
+        self.callback = callback;
+    }
+
+    fn update(&mut self, _root: &Rc<RefCell<Widget>>) -> bool {
         if self.marked_for_removal {
             self.attacker.borrow_mut().sub_pos = (0.0, 0.0);
             return false;
@@ -61,16 +68,23 @@ impl animation::Animation for MeleeAttackAnimation {
 
         let millis = util::get_elapsed_millis(self.start_time.elapsed());
         let frac = millis as f32 / self.total_time_millis as f32;
-        let mut attacker = self.attacker.borrow_mut();
 
         if !self.has_attacked && frac > 0.5 {
-            let (text, color) = attacker.actor.attack(&self.defender, area_state);
+            if let Some(ref cb) = self.callback.as_ref() {
+                cb.call();
+            }
+
+            let area_state = GameState::area_state();
+            let mut area_state = area_state.borrow_mut();
+
+            let (text, color) = self.attacker.borrow_mut().actor.attack(&self.defender, &mut area_state);
 
             let scale = 1.2;
             area_state.add_feedback_text(text, &self.defender, scale, color);
             self.has_attacked = true;
         }
 
+        let mut attacker = self.attacker.borrow_mut();
         if frac > 1.0 {
             attacker.sub_pos = (0.0, 0.0);
             return false;

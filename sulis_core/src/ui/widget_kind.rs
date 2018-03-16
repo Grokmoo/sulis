@@ -32,16 +32,18 @@ impl EmptyWidget {
 }
 
 impl WidgetKind for EmptyWidget {
-    fn get_name(&self) -> &str {
-        "content"
+    fn get_name(&self) -> &str { "content" }
+
+    fn as_any(&self) -> &Any { self }
+
+    fn as_any_mut(&mut self) -> &mut Any { self }
+
+    fn on_mouse_enter(&mut self, _widget: &Rc<RefCell<Widget>>) -> bool {
+        false
     }
 
-    fn as_any(&self) -> &Any {
-        self
-    }
-
-    fn as_any_mut(&mut self) -> &mut Any {
-        self
+    fn on_mouse_exit(&mut self, _widget: &Rc<RefCell<Widget>>) -> bool {
+        false
     }
 }
 
@@ -110,12 +112,12 @@ pub trait WidgetKind {
 
     fn on_mouse_press(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
         self.super_on_mouse_press(widget, kind);
-        true
+        false
     }
 
     fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
         self.super_on_mouse_release(widget, kind);
-        true
+        false
     }
 
     fn on_mouse_move(&mut self, _widget: &Rc<RefCell<Widget>>,
@@ -125,7 +127,7 @@ pub trait WidgetKind {
 
     fn on_mouse_drag(&mut self, _widget: &Rc<RefCell<Widget>>, _kind: ClickKind,
                      _delta_x: f32, _delta_y: f32) -> bool {
-        true
+        false
     }
 
     fn on_mouse_enter(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {

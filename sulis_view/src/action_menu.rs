@@ -113,7 +113,7 @@ impl ActionMenu {
             Callback::new(Rc::new(move |_, _| {
                 trace!("Firing attack callback.");
                 let pc = GameState::pc();
-                EntityState::attack(&pc, &entity_ref);
+                EntityState::attack(&pc, &entity_ref, None);
             }))
         } else {
             Callback::empty()

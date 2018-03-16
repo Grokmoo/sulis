@@ -31,14 +31,14 @@ pub use self::ranged_attack_animation::RangedAttackAnimation;
 mod wait_animation;
 pub use self::wait_animation::WaitAnimation;
 
-use {AreaState, EntityState};
+use {EntityState, ScriptCallback};
 
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::ui::Widget;
 use sulis_core::util;
 
 pub trait Animation {
-    fn update(&mut self, area_state: &mut AreaState, root: &Rc<RefCell<Widget>>) -> bool;
+    fn update(&mut self, root: &Rc<RefCell<Widget>>) -> bool;
 
     /// this method is called whenever another animation is added for the
     /// given entity.  This can be used to cancel this animation if the
@@ -49,6 +49,8 @@ pub trait Animation {
 
     fn draw_graphics_mode(&self, _renderer: &mut GraphicsRenderer, _offset_x: f32, _offset_y: f32,
                           _scale_x: f32, _scale_y: f32, _millis: u32) { }
+
+    fn set_callback(&mut self, callback: Option<Box<ScriptCallback>>);
 }
 
 /// Helper function to return the number of frames elapsed for the 'elapsed'

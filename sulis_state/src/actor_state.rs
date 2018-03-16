@@ -14,7 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::slice::Iter;
+use std::slice::{Iter, IterMut};
 use std::rc::Rc;
 use std::cell::{RefCell};
 use std::collections::HashMap;
@@ -99,6 +99,10 @@ impl ActorState {
         }
     }
 
+    pub fn effects_iter_mut<'a>(&'a mut self) -> IterMut<'a, Effect> {
+        self.effects.iter_mut()
+    }
+
     pub fn effects_iter<'a>(&'a self) -> Iter<'a, Effect> {
         self.effects.iter()
     }
@@ -164,6 +168,8 @@ impl ActorState {
                 HitKind::Hit => rules.hit_damage_multiplier,
                 HitKind::Crit => rules.crit_damage_multiplier,
             };
+
+            debug!("Accuracy {} vs defense {}: {:?}", accuracy, defense, hit_kind);
 
             let damage = attack.roll_damage(&target.borrow().actor.stats.armor, damage_multiplier);
 
@@ -324,22 +330,26 @@ impl ActorState {
         self.listeners.notify(&self);
     }
 
-    pub fn update(&mut self, millis_elapsed: u32) {
+    pub fn check_removal(&mut self) {
         let start_len = self.effects.len();
 
+        self.effects.retain(|e| !e.is_removal());
+
+        if start_len != self.effects.len() {
+            self.compute_stats();
+        }
+    }
+
+    pub fn update(&mut self, millis_elapsed: u32) {
         for effect in self.effects.iter_mut() {
             effect.update(millis_elapsed);
         }
-
-        self.effects.retain(|e| !e.is_removal());
 
         for (_, ability_state) in self.ability_states.iter_mut() {
             ability_state.update(millis_elapsed);
         }
 
-        if start_len != self.effects.len() {
-            self.compute_stats();
-        }
+        self.check_removal();
     }
 
     pub fn add_effect(&mut self, effect: Effect) {

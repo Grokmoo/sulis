@@ -20,10 +20,10 @@ use std::cell::RefCell;
 
 use sulis_rules::{Attribute, DamageKind};
 use sulis_state::{ChangeListener, EntityState};
-use sulis_core::ui::{Callback, Widget, WidgetKind};
+use sulis_core::ui::{Callback, Widget, WidgetKind, WidgetState};
 use sulis_widgets::{Button, Label, TextArea};
 use sulis_module::Module;
-use sulis_state::ActorState;
+use sulis_state::{ActorState, Effect};
 
 use CharacterBuilder;
 use inventory_window::add_bonus_text_args;
@@ -101,29 +101,40 @@ impl WidgetKind for CharacterWindow {
             create_details_text_box(&self.character.borrow().actor)
         } else {
             effects_pane.borrow_mut().state.set_active(true);
-            create_effects_pane(&self.character.borrow().actor)
+            create_effects_pane(&mut self.character.borrow_mut().actor)
         };
 
         vec![title, close, cur_pane, level_up, char_pane, effects_pane]
     }
 }
 
-pub fn create_effects_pane(pc: &ActorState) -> Rc<RefCell<Widget>> {
+pub fn create_effects_pane(pc: &mut ActorState) -> Rc<RefCell<Widget>> {
     let effects = Widget::empty("effects");
 
-    for effect in pc.effects_iter() {
+    for effect in pc.effects_iter_mut() {
         let widget = Widget::with_theme(TextArea::empty(), "effect");
 
-        widget.borrow_mut().state.add_text_arg("name", effect.name());
-        widget.borrow_mut().state.add_text_arg("total_duration",
-                                               &effect.total_duration_rounds().to_string());
-        widget.borrow_mut().state.add_text_arg("remaining_duration",
-                                               &effect.remaining_duration_rounds().to_string());
-        add_bonus_text_args(&effect.bonuses(), &mut widget.borrow_mut().state);
+        add_effect_text_args(&effect, &mut widget.borrow_mut().state);
+
+        let widget_ref = Rc::clone(&widget);
+        effect.listeners.add(ChangeListener::new("effects", Box::new(move |effect| {
+            add_effect_text_args(effect, &mut widget_ref.borrow_mut().state);
+            widget_ref.borrow_mut().invalidate_layout();
+        })));
+
         Widget::add_child_to(&effects, widget);
     }
 
     effects
+}
+
+fn add_effect_text_args(effect: &Effect, widget_state: &mut WidgetState) {
+    widget_state.add_text_arg("name", effect.name());
+    widget_state.add_text_arg("total_duration",
+                              &effect.total_duration_rounds().to_string());
+    widget_state.add_text_arg("remaining_duration",
+                              &effect.remaining_duration_rounds().to_string());
+    add_bonus_text_args(&effect.bonuses(), widget_state);
 }
 
 pub fn create_details_text_box(pc: &ActorState) -> Rc<RefCell<Widget>> {

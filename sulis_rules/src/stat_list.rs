@@ -20,6 +20,7 @@ use sulis_core::image::Image;
 use {Armor, AttributeList, Attack, BonusList, Damage};
 use bonus_list::AttackBuilder;
 
+#[derive(Clone)]
 pub struct StatList {
     attack_range: f32,
 

@@ -1,0 +1,10 @@
+id: background_inner
+states:
+    normal: bg_inner_base
+    hover: bg_inner_hover
+    active: bg_inner_active
+    active + hover: bg_inner_active
+    pressed + hover: bg_inner_pressed
+    disabled: bg_inner_disabled
+    disabled + hover: bg_inner_disabled
+    disabled + pressed + hover: bg_inner_disabled

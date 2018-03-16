@@ -18,9 +18,11 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
+use sulis_module::Ability;
 use sulis_state::{ChangeListener, EntityState, GameState};
-use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_widgets::{Button};
+use sulis_core::io::event;
+use sulis_core::ui::{Widget, WidgetKind};
+use sulis_widgets::{Label};
 
 pub const NAME: &str = "abilities_bar";
 
@@ -44,40 +46,85 @@ impl WidgetKind for AbilitiesBar {
     fn as_any_mut(&mut self) -> &mut Any { self }
 
     fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>>  {
-        let mut entity = self.entity.borrow_mut();
-        entity.actor.listeners.add(ChangeListener::invalidate(NAME, widget));
+        {
+            let mut entity = self.entity.borrow_mut();
+            entity.actor.listeners.add(ChangeListener::invalidate(NAME, widget));
+        }
 
         let mut children = Vec::new();
-        for ability in entity.actor.actor.abilities.clone().iter() {
-            match entity.actor.ability_state(&ability.id) {
-                None => continue,
-                Some(ref mut state) => {
-                    state.listeners.add(ChangeListener::invalidate(NAME, widget));
-                },
-            };
+        let abilities = self.entity.borrow().actor.actor.abilities.clone();
+        for ability in abilities.iter() {
+            if self.entity.borrow_mut().actor.ability_state(&ability.id).is_none() { continue; }
 
-            let button = Widget::with_theme(Button::empty(), "ability_button");
-            button.borrow_mut().state.add_text_arg("icon", &ability.icon.id());
-            button.borrow_mut().state.set_enabled(entity.actor.can_activate(&ability.id));
-
-            let ability_ref = Rc::clone(ability);
-            button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |_widget, _| {
-                let pc = GameState::pc();
-
-                if !pc.borrow().actor.can_activate(&ability_ref.id) { return; }
-
-                let active = match ability_ref.active {
-                    None => return,
-                    Some(ref active) => active,
-                };
-
-                GameState::execute_ability_script(&pc, &ability_ref,
-                    &active.script, "on_activate");
-            })));
-
+            let button = Widget::with_defaults(AbilityButton::new(&ability, &self.entity));
             children.push(button);
         }
 
         children
+    }
+}
+
+struct AbilityButton {
+    entity: Rc<RefCell<EntityState>>,
+    ability: Rc<Ability>,
+}
+
+impl AbilityButton {
+    fn new(ability: &Rc<Ability>, entity: &Rc<RefCell<EntityState>>) -> Rc<RefCell<AbilityButton>> {
+        Rc::new(RefCell::new(AbilityButton {
+            ability: Rc::clone(ability),
+            entity: Rc::clone(entity),
+        }))
+    }
+}
+
+impl WidgetKind for AbilityButton {
+    fn get_name(&self) -> &str { "ability_button" }
+
+    fn as_any(&self) -> &Any { self }
+
+    fn as_any_mut(&mut self) -> &mut Any { self }
+
+    fn layout(&mut self, widget: &mut Widget) {
+        widget.do_base_layout();
+
+        widget.state.set_enabled(self.entity.borrow().actor.can_activate(&self.ability.id));
+
+        if let Some(ref mut state) = self.entity.borrow_mut().actor.ability_state(&self.ability.id) {
+            let rounds = state.remaining_duration_rounds();
+
+            if rounds == 0 {
+                widget.children[1].borrow_mut().state.clear_text_args();
+            } else {
+                widget.children[1].borrow_mut().state.add_text_arg("duration", &rounds.to_string());
+            }
+        }
+    }
+
+    fn on_remove(&mut self) {
+        if let Some(ref mut state) = self.entity.borrow_mut().actor.ability_state(&self.ability.id) {
+            state.listeners.remove(&self.ability.id);
+        }
+    }
+
+    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>>  {
+        if let Some(ref mut state) = self.entity.borrow_mut().actor.ability_state(&self.ability.id) {
+            state.listeners.add(ChangeListener::invalidate_layout(&self.ability.id, widget));
+        }
+
+        let duration_label = Widget::with_theme(Label::empty(), "duration_label");
+        let icon = Widget::empty("icon");
+        icon.borrow_mut().state.add_text_arg("icon", &self.ability.icon.id());
+
+        vec![icon, duration_label]
+    }
+
+    fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: event::ClickKind) -> bool {
+        self.super_on_mouse_release(widget, kind);
+
+        if !self.entity.borrow().actor.can_activate(&self.ability.id) { return true; }
+
+        GameState::execute_ability_on_activate(&self.entity, &self.ability);
+        true
     }
 }

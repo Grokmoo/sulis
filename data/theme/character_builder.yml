@@ -241,6 +241,7 @@ children:
             position: [120, 15]
           portrait_button:
             from: .button
+            background: background_inner
             preferred_size: [30, 30]
             position: [120, 20]
           preview:

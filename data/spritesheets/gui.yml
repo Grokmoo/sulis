@@ -249,6 +249,68 @@ groups:
       bg_tab_disabled_bottom_left:   [0, 24]
       bg_tab_disabled_bottom_middle: [12, 24]
       bg_tab_disabled_bottom_right:  [24, 24]
+  # don't use the middle part of the images because then the borders
+  # get stretched into the center part.  instead use the middle parts above
+  bg_inner_base:
+    size: [5, 5]
+    position: [0, 220]
+    areas:
+      bg_inner_top_left_base:      [0,  0]
+      bg_inner_top_middle_base:    [5,  0]
+      bg_inner_top_right_base:     [10, 0]
+      bg_inner_middle_left_base:   [0,  5]
+      bg_inner_middle_right_base:  [10, 5]
+      bg_inner_bottom_left_base:   [0, 10]
+      bg_inner_bottom_middle_base: [5, 10]
+      bg_inner_bottom_right_base:  [10, 10]
+  bg_inner_hover:
+    size: [5, 5]
+    position: [0, 237]
+    areas:
+      bg_inner_top_left_hover:      [0,  0]
+      bg_inner_top_middle_hover:    [5,  0]
+      bg_inner_top_right_hover:     [10, 0]
+      bg_inner_middle_left_hover:   [0,  5]
+      bg_inner_middle_right_hover:  [10, 5]
+      bg_inner_bottom_left_hover:   [0, 10]
+      bg_inner_bottom_middle_hover: [5, 10]
+      bg_inner_bottom_right_hover:  [10, 10]
+  bg_inner_pressed:
+    size: [5, 5]
+    position: [0, 254]
+    areas:
+      bg_inner_top_left_pressed:      [0,  0]
+      bg_inner_top_middle_pressed:    [5,  0]
+      bg_inner_top_right_pressed:     [10, 0]
+      bg_inner_middle_left_pressed:   [0,  5]
+      bg_inner_middle_right_pressed:  [10, 5]
+      bg_inner_bottom_left_pressed:   [0, 10]
+      bg_inner_bottom_middle_pressed: [5, 10]
+      bg_inner_bottom_right_pressed:  [10, 10]
+  bg_inner_disabled:
+    size: [5, 5]
+    position: [0, 271]
+    areas:
+      bg_inner_top_left_disabled:      [0,  0]
+      bg_inner_top_middle_disabled:    [5,  0]
+      bg_inner_top_right_disabled:     [10, 0]
+      bg_inner_middle_left_disabled:   [0,  5]
+      bg_inner_middle_right_disabled:  [10, 5]
+      bg_inner_bottom_left_disabled:   [0, 10]
+      bg_inner_bottom_middle_disabled: [5, 10]
+      bg_inner_bottom_right_disabled:  [10, 10]
+  bg_inner_active:
+    size: [5, 5]
+    position: [0, 288]
+    areas:
+      bg_inner_top_left_active:      [0,  0]
+      bg_inner_top_middle_active:    [5,  0]
+      bg_inner_top_right_active:     [10, 0]
+      bg_inner_middle_left_active:   [0,  5]
+      bg_inner_middle_right_active:  [10, 5]
+      bg_inner_bottom_left_active:   [0, 10]
+      bg_inner_bottom_middle_active: [5, 10]
+      bg_inner_bottom_right_active:  [10, 10]
   elev:
     size: [16, 16]
     position: [74, 512]
@@ -311,4 +373,13 @@ groups:
       ball: [16, 148, 32, 32]
       ball_active: [16, 181, 32, 32]
       
-      red_fill: [1, 188, 13, 13]
+      red_fill: [5, 73, 5, 5]
+      20_transparent_fill: [1, 187, 5, 5]
+      40_transparent_fill: [9, 187, 5, 5]
+      60_transparent_fill: [1, 195, 5, 5]
+      80_transparent_fill: [9, 195, 5, 5]
+      
+      20_red_transparent_fill: [1, 203, 5, 5]
+      40_red_transparent_fill: [9, 203, 5, 5]
+      60_red_transparent_fill: [1, 211, 5, 5]
+      80_red_transparent_fill: [9, 211, 5, 5]

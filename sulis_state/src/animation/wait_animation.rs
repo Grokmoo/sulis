@@ -20,7 +20,7 @@ use std::time::Instant;
 
 use sulis_core::util;
 use sulis_core::ui::Widget;
-use {animation, AreaState, EntityState};
+use {animation, EntityState, ScriptCallback};
 
 /// an animation that does nothing, but causes the AI to wait for a
 /// specified time
@@ -28,6 +28,7 @@ pub struct WaitAnimation {
     owner: Rc<RefCell<EntityState>>,
     start_time: Instant,
     duration: u32,
+    callback: Option<Box<ScriptCallback>>,
 }
 
 impl WaitAnimation {
@@ -36,12 +37,17 @@ impl WaitAnimation {
             owner: Rc::clone(owner),
             start_time: Instant::now(),
             duration,
+            callback: None,
         }
     }
 }
 
 impl animation::Animation for WaitAnimation {
-    fn update(&mut self, _state: &mut AreaState, _root: &Rc<RefCell<Widget>>) -> bool {
+    fn set_callback(&mut self, callback: Option<Box<ScriptCallback>>) {
+        self.callback = callback;
+    }
+
+    fn update(&mut self, _root: &Rc<RefCell<Widget>>) -> bool {
         util::get_elapsed_millis(self.start_time.elapsed()) < self.duration
     }
 

@@ -20,11 +20,11 @@ use std::cell::RefCell;
 use sulis_core::config::CONFIG;
 use sulis_module::Area;
 
-use animation::{MeleeAttackAnimation, RangedAttackAnimation};
+use animation::{Animation, MeleeAttackAnimation, RangedAttackAnimation};
 use sulis_core::io::GraphicsRenderer;
 use sulis_module::{Actor, ObjectSize, ObjectSizeIterator, Module};
 use sulis_module::area::Transition;
-use {ActorState, AreaState, ChangeListenerList, GameState, has_visibility, Location, PropState};
+use {ActorState, AreaState, ChangeListenerList, GameState, has_visibility, Location, PropState, ScriptCallback};
 
 pub struct EntityState {
     pub actor: ActorState,
@@ -119,14 +119,17 @@ impl EntityState {
         self.has_visibility(target, area)
     }
 
-    pub fn attack(entity: &Rc<RefCell<EntityState>>, target: &Rc<RefCell<EntityState>>) {
+    pub fn attack(entity: &Rc<RefCell<EntityState>>, target: &Rc<RefCell<EntityState>>,
+                  callback: Option<Box<ScriptCallback>>) {
         if entity.borrow().actor.stats.attack_is_melee() {
-            let anim = MeleeAttackAnimation::new(entity, target,
+            let mut anim = MeleeAttackAnimation::new(entity, target,
                                                  CONFIG.display.animation_base_time_millis * 5);
+            anim.set_callback(callback);
             GameState::add_animation(Box::new(anim));
         } else if entity.borrow().actor.stats.attack_is_ranged() {
-            let anim = RangedAttackAnimation::new(entity, target,
+            let mut anim = RangedAttackAnimation::new(entity, target,
                                                   CONFIG.display.animation_base_time_millis);
+            anim.set_callback(callback);
             GameState::add_animation(Box::new(anim));
         }
 

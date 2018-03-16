@@ -42,17 +42,11 @@ impl Button {
 }
 
 impl WidgetKind for Button {
-    fn get_name(&self) -> &str {
-        "button"
-    }
+    fn get_name(&self) -> &str { "button" }
 
-    fn as_any(&self) -> &Any {
-        self
-    }
+    fn as_any(&self) -> &Any { self }
 
-    fn as_any_mut(&mut self) -> &mut Any {
-        self
-    }
+    fn as_any_mut(&mut self) -> &mut Any { self }
 
     fn layout(&mut self, widget: &mut Widget) {
         if let Some(ref text) = self.label.borrow().text {

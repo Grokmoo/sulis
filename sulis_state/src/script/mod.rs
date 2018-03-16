@@ -14,11 +14,19 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+mod script_callback;
+use self::script_callback::CallbackData;
+pub use self::script_callback::ScriptCallback;
+
 mod script_effect;
 use self::script_effect::ScriptEffect;
 
 mod script_entity;
 use self::script_entity::ScriptEntity;
+use self::script_entity::ScriptEntitySet;
+
+pub mod targeter;
+use self::targeter::TargeterData;
 
 use std;
 use std::rc::Rc;
@@ -70,11 +78,36 @@ impl ScriptState {
         Ok(())
     }
 
-    pub fn execute_ability_script(&self, parent: &Rc<RefCell<EntityState>>,
-                                  ability: &Rc<Ability>, script: &str, function: &str) -> Result<()> {
-        self.lua.globals().set("ability", ScriptAbility::from(ability))?;
+    pub fn ability_on_activate(&self, parent: &Rc<RefCell<EntityState>>,
+                                       ability: &Rc<Ability>) -> Result<()> {
+        self.ability_script(parent, ability, Vec::new(), "on_activate")
+    }
 
-        self.execute_script(parent, "(parent, ability)", script, function)
+    pub fn ability_on_target_select(&self, parent: &Rc<RefCell<EntityState>>,
+                                            ability: &Rc<Ability>,
+                                            targets: Vec<Rc<RefCell<EntityState>>>) -> Result<()> {
+        self.ability_script(parent, ability, targets, "on_target_select")
+    }
+
+    pub fn ability_script(&self, parent: &Rc<RefCell<EntityState>>,
+                                  ability: &Rc<Ability>,
+                                  targets: Vec<Rc<RefCell<EntityState>>>,
+                                  func: &str) -> Result<()> {
+        let script = get_script(ability)?;
+        self.lua.globals().set("ability", ScriptAbility::from(ability))?;
+        self.lua.globals().set("targets", ScriptEntitySet::new(parent, &targets))?;
+        self.execute_script(parent, "(parent, ability, targets)", script, func)
+    }
+}
+
+fn get_script(ability: &Rc<Ability>) -> Result<&str> {
+    match ability.active {
+        None => Err(rlua::Error::ToLuaConversionError {
+            from: "Rc<Ability>",
+            to: "ScriptAbility",
+            message: Some("The Ability is not active".to_string()),
+        }),
+        Some(ref active) => Ok(&active.script),
     }
 }
 
@@ -89,6 +122,7 @@ impl UserData for ScriptInterface {
     }
 }
 
+#[derive(Clone)]
 pub struct ScriptAbility {
     id: String,
     name: String,
@@ -115,7 +149,12 @@ impl UserData for ScriptAbility {
         methods.add_method("name", |_, ability, ()| {
             Ok(ability.name.to_string())
         });
-        methods.add_method("duration", |_, ability, ()| Ok(ability.duration))
+        methods.add_method("duration", |_, ability, ()| Ok(ability.duration));
+
+        methods.add_method("create_callback", |_, ability, (parent, func): (ScriptEntity, String)| {
+            let cb_data = CallbackData::new(parent.index, &ability.id, &func);
+            Ok(cb_data)
+        });
     }
 }
 

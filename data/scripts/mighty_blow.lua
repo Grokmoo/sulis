@@ -1,4 +1,9 @@
 function on_activate(parent, ability)
+  stats = parent:stats()
+  if not stats.attack_is_melee then
+    return
+  end
+
   targets = parent:targets():hostile():attackable()
   
   targeter = parent:create_targeter(ability)
@@ -9,8 +14,9 @@ end
 function on_target_select(parent, ability, targets)
   target = targets:first()
   
-  cb = ability:create_callback(parent, "on_attack")
+  cb = ability:create_callback(parent)
   cb:add_target(target)
+  cb:register_fn("before_attack")
   
   -- Remove an additional point of AP beyond the standard attack
   parent:remove_ap(10)
@@ -18,7 +24,7 @@ function on_target_select(parent, ability, targets)
   parent:attack(target, cb)
 end
 
-function on_attack(parent, ability, targets)
+function before_attack(parent, ability, targets)
   stats = parent:stats()
 
   effect = parent:create_effect(ability:name(), 0)

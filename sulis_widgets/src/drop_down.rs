@@ -47,17 +47,11 @@ impl<T: Display + Clone + 'static> DropDown<T> {
 }
 
 impl<T: Display + Clone + 'static> WidgetKind for DropDown<T> {
-    fn get_name(&self) -> &str {
-        NAME
-    }
+    fn get_name(&self) -> &str { NAME }
 
-    fn as_any(&self) -> &Any {
-        self
-    }
+    fn as_any(&self) -> &Any { self }
 
-    fn as_any_mut(&mut self) -> &mut Any {
-        self
-    }
+    fn as_any_mut(&mut self) -> &mut Any { self }
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let button = Widget::with_defaults(Button::empty());
@@ -66,7 +60,7 @@ impl<T: Display + Clone + 'static> WidgetKind for DropDown<T> {
             let list_box = Widget::with_theme(ListBox::new(entries_clone.clone()), "list");
             list_box.borrow_mut().state.set_modal(true);
             list_box.borrow_mut().state.modal_remove_on_click_outside = true;
-            let parent = Widget::get_parent(widget);
+            let parent = Widget::get_root(widget);
             Widget::add_child_to(&parent, list_box);
         }));
         button.borrow_mut().state.add_callback(cb);

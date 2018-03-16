@@ -31,11 +31,40 @@ pub struct MoveAnimation {
    frame_time_millis: u32,
    marked_for_removal: bool,
    callback: Option<Box<ScriptCallback>>,
+
+   smoothed_path: Vec<(f32, f32)>,
 }
 
 impl MoveAnimation {
     pub fn new(mover: Rc<RefCell<EntityState>>,
                path: Vec<Point>, frame_time_millis: u32) -> MoveAnimation {
+
+        let mut smoothed_path = Vec::new();
+        let mut prev2 = path[0];
+        let mut prev = path[0];
+        let mut next = path[path.len() - 1];
+        let mut next2 = path[path.len() - 1];
+
+        for i in 0..path.len() {
+            let cur: Point = path[i];
+            if i < path.len() - 2 {
+                next = path[i + 1];
+                next2 = path[i + 2];
+            } if i < path.len() - 1 {
+                next = path[i + 1];
+                // next2 is already set to the final point
+            } else {
+                // next and next2 are already set to the final point
+            }
+
+            let mut avg_x = (prev2.x + prev.x + cur.x + next.x + next2.x) as f32 / 5.0;
+            let mut avg_y = (prev2.y + prev.y + cur.y + next.y + next2.y) as f32 / 5.0;
+
+            smoothed_path.push((avg_x, avg_y));
+
+            prev2 = prev;
+            prev = cur;
+        }
 
         MoveAnimation {
             mover,
@@ -45,6 +74,7 @@ impl MoveAnimation {
             marked_for_removal: false,
             last_frame_index: 0, // start at index 0 which is the initial pos
             callback: None,
+            smoothed_path,
         }
     }
 
@@ -66,11 +96,26 @@ impl animation::Animation for MoveAnimation {
         let frame_frac = (millis % self.frame_time_millis) as f32 / self.frame_time_millis as f32;
 
         if frame_index != self.path.len() - 1 {
-            let frame_delta_x = self.path[frame_index + 1].x - self.path[frame_index].x;
-            let frame_delta_y = self.path[frame_index + 1].y - self.path[frame_index].y;
-            self.mover.borrow_mut().sub_pos = (frame_delta_x as f32 * frame_frac,
-                                               frame_delta_y as f32 * frame_frac);
+            let dx = self.smoothed_path[frame_index + 1].0 - self.smoothed_path[frame_index].0;
+            let dy = self.smoothed_path[frame_index + 1].1 - self.smoothed_path[frame_index].1;
+
+            let dx = dx * frame_frac;
+            let dy = dy * frame_frac;
+
+            let offset_x = self.smoothed_path[frame_index].0 - self.path[frame_index].x as f32;
+            let offset_y = self.smoothed_path[frame_index].1 - self.path[frame_index].y as f32;
+
+            self.mover.borrow_mut().sub_pos = (dx + offset_x, dy + offset_y);
         }
+
+        // if frame_index != self.path.len() - 1 {
+        //     let frame_delta_x = self.path[frame_index + 1].x - self.path[frame_index].x;
+        //     let frame_delta_y = self.path[frame_index + 1].y - self.path[frame_index].y;
+        //
+        //     let delta_x = frame_delta_x as f32;
+        //     let delta_y = frame_delta_y as f32;
+        //     self.mover.borrow_mut().sub_pos = (delta_x * frame_frac, delta_y * frame_frac);
+        // }
 
         if frame_index as i32 == self.last_frame_index {
             return true;

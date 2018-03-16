@@ -28,6 +28,7 @@ use character_builder::BuilderPane;
 pub const NAME: &str = "ability_selector_pane";
 
 pub struct AbilitySelectorPane {
+    already_selected: Vec<Rc<Ability>>,
     choices: Vec<Rc<Ability>>,
     selected_ability: Option<Rc<Ability>>,
     index: usize,
@@ -39,15 +40,21 @@ impl AbilitySelectorPane {
             selected_ability: None,
             index,
             choices,
+            already_selected: Vec::new(),
         }))
     }
 }
 
 impl BuilderPane for AbilitySelectorPane {
-    fn on_selected(&mut self, builder: &mut CharacterBuilder, _widget: Rc<RefCell<Widget>>) {
+    fn on_selected(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
         // remove any abilities selected by this pane and subsequent ability panes
         builder.abilities.truncate(self.index);
         builder.prev.borrow_mut().state.set_enabled(true);
+
+        self.already_selected = builder.abilities.clone();
+
+        widget.borrow_mut().invalidate_children();
+
         builder.next.borrow_mut().state.set_enabled(self.selected_ability.is_some());
     }
 
@@ -61,6 +68,7 @@ impl BuilderPane for AbilitySelectorPane {
     }
 
     fn prev(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
+        self.selected_ability = None;
         builder.prev(&widget);
     }
 }
@@ -75,6 +83,14 @@ impl WidgetKind for AbilitySelectorPane {
 
         let abilities_pane = Widget::empty("abilities_pane");
         for ability in self.choices.iter() {
+            let mut already_selected = false;
+            for already_ability in self.already_selected.iter() {
+                if already_ability == ability {
+                    already_selected = true;
+                }
+            }
+            if already_selected { continue; }
+
             let ability_button = Widget::with_theme(Button::empty(), "ability_button");
             ability_button.borrow_mut().state.add_text_arg("icon", &ability.icon.id());
             if let Some(ref selected_ability) = self.selected_ability {

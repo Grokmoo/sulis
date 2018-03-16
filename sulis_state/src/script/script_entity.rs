@@ -18,9 +18,9 @@ use std;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use rlua::{Lua, UserData, UserDataMethods};
+use rlua::{self, Lua, UserData, UserDataMethods};
 
-use sulis_rules::StatList;
+use sulis_rules::{DamageKind};
 use sulis_module::Faction;
 use {EntityState, GameState};
 use script::{CallbackData, Result, ScriptAbility, ScriptEffect, TargeterData};
@@ -74,26 +74,45 @@ impl UserData for ScriptEntity {
             Ok(())
         });
 
-        methods.add_method("stats", |_, entity, ()| {
-            let area_state = GameState::area_state();
-            let parent = area_state.borrow().get_entity(entity.index);
-
-            let stats = parent.borrow().actor.stats.clone();
-
-            Ok(ScriptEntityStats { stats })
-        });
+        methods.add_method("stats", &create_stats_table);
     }
 }
 
-#[derive(Clone)]
-pub struct ScriptEntityStats {
-    stats: StatList,
-}
+fn create_stats_table<'a>(lua: &'a Lua, parent: &ScriptEntity, _args: ()) -> Result<rlua::Table<'a>> {
+    let area_state = GameState::area_state();
+    let parent = area_state.borrow().get_entity(parent.index);
+    let src = &parent.borrow().actor.stats;
 
-impl UserData for ScriptEntityStats {
-    fn add_methods(methods: &mut UserDataMethods<Self>) {
+    let stats = lua.create_table()?;
+    stats.set("strength", src.attributes.strength)?;
+    stats.set("dexterity", src.attributes.dexterity)?;
+    stats.set("endurance", src.attributes.endurance)?;
+    stats.set("perception", src.attributes.perception)?;
+    stats.set("intellect", src.attributes.intellect)?;
+    stats.set("wisdom", src.attributes.wisdom)?;
 
+    stats.set("base_armor", src.armor.base())?;
+    let armor = lua.create_table()?;
+    for kind in DamageKind::iter() {
+        armor.set(kind.to_str(), src.armor.amount(*kind))?;
     }
+    stats.set("armor", armor)?;
+
+    stats.set("bonus_reach", src.bonus_reach)?;
+    stats.set("bonus_range", src.bonus_range)?;
+    stats.set("max_hp", src.max_hp)?;
+    stats.set("initiative", src.initiative)?;
+    stats.set("accuracy", src.accuracy)?;
+    stats.set("defense", src.defense)?;
+    stats.set("fortitude", src.fortitude)?;
+    stats.set("reflex", src.reflex)?;
+    stats.set("will", src.will)?;
+
+    stats.set("attack_distance", src.attack_distance())?;
+    stats.set("attack_is_melee", src.attack_is_melee())?;
+    stats.set("attack_is_ranged", src.attack_is_ranged())?;
+
+    Ok(stats)
 }
 
 #[derive(Clone)]

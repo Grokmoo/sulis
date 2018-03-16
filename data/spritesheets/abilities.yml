@@ -9,3 +9,6 @@ groups:
     areas:
       mighty_blow: [0, 0]
       impenetrable_defense: [1, 0]
+      tenacious_soul: [2, 0]
+      resilient_body: [3, 0]
+      lightning_reflexes: [0, 1]

@@ -397,6 +397,10 @@ impl ActorState {
             self.stats.add_multiple(&class.bonuses_per_level, level);
         }
 
+        for ability in self.actor.abilities.iter() {
+            self.stats.add(&ability.bonuses);
+        }
+
         let mut attacks_list = Vec::new();
         for ref item_state in self.inventory.equipped_iter() {
             let equippable = match item_state.item.equippable {

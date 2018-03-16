@@ -104,8 +104,9 @@ impl WidgetKind for PropWindow {
 
         let list_content = Widget::empty("items_list");
         for (index, item) in prop.items.iter().enumerate() {
-            let button = Widget::with_defaults(ItemButton::new(Some(index), Some(self.prop_index)));
-            button.borrow_mut().state.add_text_arg("icon", &item.item.icon.id());
+            let item_button = ItemButton::new(Some(item.item.icon.id()), 1,
+                Some(index), Some(self.prop_index));
+            let button = Widget::with_defaults(item_button);
 
             button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |_, _| {
                 let pc = GameState::pc();

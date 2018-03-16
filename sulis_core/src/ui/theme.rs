@@ -224,7 +224,7 @@ pub fn expand_text_args(text: &Option<String>, state: &WidgetState) -> String {
                 } else {
                     let text_arg = match state.get_text_arg(&cur_arg) {
                         None => {
-                            trace!("No text arg '{}' for text '{}'", cur_arg, text);
+                            // trace!("No text arg '{}' for text '{}'", cur_arg, text);
                             ""
                         },
                         Some(arg) => arg,

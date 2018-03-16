@@ -18,9 +18,15 @@ use sulis_module::Item;
 
 use std::rc::Rc;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct ItemState {
     pub item: Rc<Item>,
+}
+
+impl PartialEq for ItemState {
+    fn eq(&self, other: &ItemState) -> bool {
+        self.item == other.item
+    }
 }
 
 impl ItemState {

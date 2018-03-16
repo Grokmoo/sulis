@@ -17,6 +17,7 @@
 use std::rc::Rc;
 use std::io::Error;
 
+use sulis_rules::BonusList;
 use sulis_core::image::Image;
 use sulis_core::resource::{ResourceBuilder, ResourceSet};
 use sulis_core::util::{invalid_data_error, unable_to_create_error};
@@ -36,6 +37,7 @@ pub struct Ability {
     pub description: String,
     pub icon: Rc<Image>,
     pub active: Option<Active>,
+    pub bonuses: BonusList,
 }
 
 impl PartialEq for Ability {
@@ -78,6 +80,7 @@ impl Ability {
             description: builder.description,
             icon,
             active,
+            bonuses: builder.bonuses.unwrap_or_default(),
         })
     }
 }
@@ -98,6 +101,7 @@ pub struct AbilityBuilder {
     pub description: String,
     pub icon: String,
     pub active: Option<ActiveBuilder>,
+    pub bonuses: Option<BonusList>,
 }
 
 impl ResourceBuilder for AbilityBuilder {

@@ -20,6 +20,7 @@ use std::cell::RefCell;
 
 use sulis_core::ui::theme::{HorizontalTextAlignment, VerticalTextAlignment};
 use sulis_core::ui::{LineRenderer, Widget, WidgetKind};
+use sulis_core::io::event::ClickKind;
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::util::Point;
 
@@ -75,16 +76,29 @@ impl Label {
 }
 
 impl WidgetKind for Label {
-    fn get_name(&self) -> &str {
-        "label"
+    fn get_name(&self) -> &str { "label" }
+
+    fn as_any(&self) -> &Any { self }
+
+    fn as_any_mut(&mut self) -> &mut Any { self }
+
+    fn on_mouse_press(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
+        self.super_on_mouse_press(widget, kind);
+        false
     }
 
-    fn as_any(&self) -> &Any {
-        self
+    fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
+        self.super_on_mouse_release(widget, kind);
+        false
     }
 
-    fn as_any_mut(&mut self) -> &mut Any {
-        self
+    fn on_mouse_drag(&mut self, _widget: &Rc<RefCell<Widget>>, _kind: ClickKind,
+                     _delta_x: f32, _delta_y: f32) -> bool {
+        false
+    }
+
+    fn on_mouse_scroll(&mut self, _widget: &Rc<RefCell<Widget>>, _scroll: i32) -> bool {
+        false
     }
 
     fn layout(&mut self, widget: &mut Widget) {

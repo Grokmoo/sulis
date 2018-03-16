@@ -25,27 +25,38 @@ use ItemState;
 
 #[derive(Clone)]
 pub struct Inventory {
-    pub items: Vec<ItemState>,
+    pub items: Vec<(u32, ItemState)>,
     pub equipped: HashMap<Slot, usize>,
 }
 
 impl Inventory {
     pub fn new(actor: &Rc<Actor>) -> Inventory {
-        let mut items: Vec<ItemState> = Vec::new();
+        let mut inv = Inventory {
+            items: Vec::new(),
+            equipped: HashMap::new(),
+        };
 
         for item in actor.items.iter() {
-            items.push(ItemState::new(Rc::clone(item)));
+            inv.add(ItemState::new(Rc::clone(item)));
         }
 
-        trace!("Populated initial inventory with {} items", items.len());
-        Inventory {
-            items,
-            equipped: HashMap::new(),
-        }
+        trace!("Populated initial inventory with {} items", inv.items.len());
+        inv
     }
 
     pub fn add(&mut self, item_state: ItemState) {
-        self.items.push(item_state);
+        let mut index = None;
+        for (i, &(_, ref item)) in self.items.iter().enumerate() {
+            if item == &item_state {
+                index = Some(i);
+                break;
+            }
+        }
+
+        match index {
+            Some(index) => self.items[index].0 += 1,
+            None => self.items.push((1, item_state)),
+        }
     }
 
     pub fn get_index(&self, slot: Slot) -> Option<usize> {
@@ -61,7 +72,7 @@ impl Inventory {
             Some(index) => *index,
         };
 
-        self.items.get(index)
+        Some(&self.items[index].1)
     }
 
     /// Returns an iterator traversing all equipped items
@@ -74,24 +85,31 @@ impl Inventory {
         }
     }
 
-    /// checks whether the item at the given index is equipped.
-    /// returns true if it is, false otherwise
-    pub fn is_equipped(&self, index: usize) -> bool {
+    /// Returns the number of times the item at the index is equipped.
+    /// This can be more than 1 if the item has a quantity greater than 1
+    /// and is equipped to both slot and alt slot
+    pub fn equipped_quantity(&self, index: usize) -> u32 {
         let (slot, alt_slot) = match self.items.get(index) {
-            None => return false,
-            Some(item) => match &item.item.equippable {
-                &None => return false,
+            None => return 0,
+            Some(&(_, ref item)) => match &item.item.equippable {
+                &None => return 0,
                 &Some(ref equippable) => (equippable.slot, equippable.alternate_slot),
             }
         };
 
-        if self.equipped.get(&slot) == Some(&index) { return true; }
-
+        let mut count = 0;
+        if self.equipped.get(&slot) == Some(&index) { count += 1; }
         if let Some(alt_slot) = alt_slot {
-            if self.equipped.get(&alt_slot) == Some(&index) { return true; }
+            if self.equipped.get(&alt_slot) == Some(&index) { count += 1; }
         }
 
-        false
+        count
+    }
+
+    /// checks whether the item at the given index is equipped.
+    /// returns true if it is, false otherwise
+    pub fn is_equipped(&self, index: usize) -> bool {
+        self.equipped_quantity(index) > 0
     }
 
     /// equips the item at the given index.  returns true if the item
@@ -101,7 +119,7 @@ impl Inventory {
 
         let (slot, alt_slot, blocked_slot) = match self.items.get(index) {
             None => return false,
-            Some(item) => match &item.item.equippable {
+            Some(&(_, ref item)) => match &item.item.equippable {
                 &None => return false,
                 &Some(ref equippable) => {
                     trace!("Found matching slot '{:?}'", equippable.slot);
@@ -178,7 +196,7 @@ impl Inventory {
         let mut layers = HashMap::new();
 
         for (slot, index) in self.equipped.iter() {
-            let item_state = &self.items[*index];
+            let item_state = &self.items[*index].1;
 
             let equippable = match item_state.item.equippable {
                 None => continue,
@@ -227,7 +245,7 @@ impl<'a> Iterator for EquippedIterator<'a> {
                 Some(index) => *index,
             };
 
-            return Some(&self.inventory.items[index]);
+            return Some(&self.inventory.items[index].1);
         }
     }
 }

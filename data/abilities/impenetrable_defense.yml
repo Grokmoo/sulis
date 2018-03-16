@@ -1,7 +1,9 @@
 id: impenetrable_defense
 name: "Impenetrable Defense"
 icon: abilities/impenetrable_defense
-description: "Using all your skill and concentration, you become incredibly difficult to hit or damage."
+description: |
+  Using all your skill and concentration, you become incredibly difficult to hit or damage.
+  You gain a bonus of +20 to your Defense, and +10 to Reflex, Fortitude, and Will for 2 turns.
 active:
   script: "impenetrable_defense"
   ap: 20

@@ -151,8 +151,8 @@ impl UserData for ScriptAbility {
         });
         methods.add_method("duration", |_, ability, ()| Ok(ability.duration));
 
-        methods.add_method("create_callback", |_, ability, (parent, func): (ScriptEntity, String)| {
-            let cb_data = CallbackData::new(parent.index, &ability.id, &func);
+        methods.add_method("create_callback", |_, ability, parent: ScriptEntity| {
+            let cb_data = CallbackData::new(parent.index, &ability.id);
             Ok(cb_data)
         });
     }

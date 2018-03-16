@@ -14,14 +14,21 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::collections::HashSet;
+
 use rlua::{UserData, UserDataMethods};
 
 use sulis_module::Module;
 use script::{ScriptEntity, ScriptEntitySet};
 use GameState;
 
+const BEFORE_ATTACK: &str = "before_attack";
+const AFTER_ATTACK: &str = "after_attack";
+
 pub trait ScriptCallback {
-    fn call(&self);
+    fn before_attack(&self) { }
+
+    fn after_attack(&self) { }
 }
 
 #[derive(Clone)]
@@ -29,28 +36,40 @@ pub struct CallbackData {
     parent: usize,
     ability_id: String,
     targets: Vec<usize>,
-    func: String,
+    funcs: HashSet<String>,
 }
 
 impl CallbackData {
-    pub fn new(parent: usize, ability_id: &str, func: &str) -> CallbackData {
+    pub fn new(parent: usize, ability_id: &str) -> CallbackData {
         CallbackData {
             parent,
             ability_id: ability_id.to_string(),
             targets: Vec::new(),
-            func: func.to_string(),
+            funcs: HashSet::new(),
         }
     }
-}
 
-impl ScriptCallback for CallbackData {
-    fn call(&self) {
+    fn do_callback(&self, func: &str) {
         let area_state = GameState::area_state();
         let parent = area_state.borrow().get_entity(self.parent);
         let ability = Module::ability(&self.ability_id).unwrap();
         let targets = self.targets.iter().map(|t| area_state.borrow().get_entity(*t)).collect();
 
-        GameState::execute_ability_script(&parent, &ability, targets, &self.func);
+        GameState::execute_ability_script(&parent, &ability, targets, &func);
+    }
+}
+
+impl ScriptCallback for CallbackData {
+    fn before_attack(&self) {
+        if self.funcs.contains(BEFORE_ATTACK) {
+            self.do_callback(BEFORE_ATTACK);
+        }
+    }
+
+    fn after_attack(&self) {
+        if self.funcs.contains(AFTER_ATTACK) {
+            self.do_callback(AFTER_ATTACK);
+        }
     }
 }
 
@@ -63,6 +82,11 @@ impl UserData for CallbackData {
 
         methods.add_method_mut("add_targets", |_, cb, targets: ScriptEntitySet| {
             cb.targets.append(&mut targets.indices.clone());
+            Ok(())
+        });
+
+        methods.add_method_mut("register_fn", |_, cb, func: String| {
+            cb.funcs.insert(func);
             Ok(())
         });
     }

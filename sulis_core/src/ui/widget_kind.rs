@@ -38,11 +38,22 @@ impl WidgetKind for EmptyWidget {
 
     fn as_any_mut(&mut self) -> &mut Any { self }
 
-    fn on_mouse_enter(&mut self, _widget: &Rc<RefCell<Widget>>) -> bool {
+    fn on_mouse_press(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
+        self.super_on_mouse_press(widget, kind);
         false
     }
 
-    fn on_mouse_exit(&mut self, _widget: &Rc<RefCell<Widget>>) -> bool {
+    fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
+        self.super_on_mouse_release(widget, kind);
+        false
+    }
+
+    fn on_mouse_drag(&mut self, _widget: &Rc<RefCell<Widget>>, _kind: ClickKind,
+                     _delta_x: f32, _delta_y: f32) -> bool {
+        false
+    }
+
+    fn on_mouse_scroll(&mut self, _widget: &Rc<RefCell<Widget>>, _scroll: i32) -> bool {
         false
     }
 }
@@ -112,22 +123,26 @@ pub trait WidgetKind {
 
     fn on_mouse_press(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
         self.super_on_mouse_press(widget, kind);
-        false
+        true
     }
 
     fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
         self.super_on_mouse_release(widget, kind);
-        false
-    }
-
-    fn on_mouse_move(&mut self, _widget: &Rc<RefCell<Widget>>,
-                     _delta_x: f32, _delta_y: f32) -> bool {
         true
     }
 
     fn on_mouse_drag(&mut self, _widget: &Rc<RefCell<Widget>>, _kind: ClickKind,
                      _delta_x: f32, _delta_y: f32) -> bool {
-        false
+        true
+    }
+
+    fn on_mouse_scroll(&mut self, _widget: &Rc<RefCell<Widget>>, _scroll: i32) -> bool {
+        true
+    }
+
+    fn on_mouse_move(&mut self, _widget: &Rc<RefCell<Widget>>,
+                     _delta_x: f32, _delta_y: f32) -> bool {
+        true
     }
 
     fn on_mouse_enter(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
@@ -137,10 +152,6 @@ pub trait WidgetKind {
 
     fn on_mouse_exit(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
         self.super_on_mouse_exit(widget);
-        true
-    }
-
-    fn on_mouse_scroll(&mut self, _widget: &Rc<RefCell<Widget>>, _scroll: i32) -> bool {
         true
     }
 

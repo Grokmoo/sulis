@@ -207,6 +207,20 @@ impl DamageKind {
             }
         }
     }
+
+    pub fn to_str(&self) -> &'static str {
+        match self {
+            &Slashing => "Slashing",
+            &Piercing => "Piercing",
+            &Crushing => "Crushing",
+            &Acid => "Acid",
+            &Cold => "Cold",
+            &Electrical => "Electrical",
+            &Fire => "Fire",
+            &Sonic => "Sonic",
+            &Raw => "Raw",
+        }
+    }
 }
 
 impl Display for DamageKind {

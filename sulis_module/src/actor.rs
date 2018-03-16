@@ -274,6 +274,14 @@ impl Actor {
         })
     }
 
+    pub fn has_ability(&self, other: &Rc<Ability>) -> bool {
+        for ability in self.abilities.iter() {
+            if ability == other { return true; }
+        }
+
+        false
+    }
+
     pub fn base_class(&self) -> Rc<Class> {
         Rc::clone(&self.levels[0].0)
     }

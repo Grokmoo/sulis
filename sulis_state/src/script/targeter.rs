@@ -80,25 +80,28 @@ impl Targeter {
                                   target.size.height as f32)
     }
 
-    pub fn on_mouse_move(&mut self, cursor_x: i32, cursor_y: i32) {
+    pub fn on_mouse_move(&mut self, cursor_x: i32, cursor_y: i32) -> Option<&Rc<RefCell<EntityState>>> {
         for target in self.targets.iter() {
             {
                 let target = target.borrow();
                 let x1 = target.location.x;
                 let y1 = target.location.y;
-                let x2 = x1 + target.size.width;
-                let y2 = y1 + target.size.height;
+                let x2 = x1 + target.size.width - 1;
+                let y2 = y1 + target.size.height - 1;
 
                 if cursor_x < x1 || cursor_x > x2 || cursor_y < y1 || cursor_y > y2 { continue; }
             }
 
             self.cur_target = Some(Rc::clone(target));
             Cursor::set_cursor_state(animation_state::Kind::MouseSelect);
-            return;
+
+            return self.cur_target.as_ref();
         }
 
         self.cur_target = None;
         Cursor::set_cursor_state(animation_state::Kind::MouseInvalid);
+
+        self.cur_target.as_ref()
     }
 
     pub fn on_mouse_release(&mut self) {

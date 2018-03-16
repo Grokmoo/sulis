@@ -109,17 +109,21 @@ impl Animation for RangedAttackAnimation {
         if frac > 1.0 {
             if !self.has_attacked {
                 if let Some(ref cb) = self.callback.as_ref() {
-                    cb.call();
+                    cb.before_attack();
                 }
 
                 let area_state = GameState::area_state();
-                let mut area_state = area_state.borrow_mut();
 
-                let (text, color) = self.attacker.borrow_mut().actor.attack(&self.defender, &mut area_state);
+                let (text, color) = self.attacker.borrow_mut().actor
+                    .attack(&self.defender, &mut area_state.borrow_mut());
 
                 let scale = 1.2;
-                area_state.add_feedback_text(text, &self.defender, scale, color);
+                area_state.borrow_mut().add_feedback_text(text, &self.defender, scale, color);
                 self.has_attacked = true;
+
+                if let Some(ref cb) = self.callback.as_ref() {
+                    cb.after_attack();
+                }
             }
             false
         } else {

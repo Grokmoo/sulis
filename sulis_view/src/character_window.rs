@@ -26,21 +26,28 @@ use sulis_module::Module;
 use sulis_state::{ActorState, Effect};
 
 use CharacterBuilder;
+use ability_pane::add_ability_text_args;
 use inventory_window::add_bonus_text_args;
 
 pub const NAME: &str = "character_window";
 
+enum ActivePane {
+    Character,
+    Ability,
+    Effect,
+}
+
 pub struct CharacterWindow {
     character: Rc<RefCell<EntityState>>,
 
-    char_pane_active: bool,
+    active_pane: ActivePane,
 }
 
 impl CharacterWindow {
     pub fn new(character: &Rc<RefCell<EntityState>>) -> Rc<RefCell<CharacterWindow>> {
         Rc::new(RefCell::new(CharacterWindow {
             character: Rc::clone(character),
-            char_pane_active: true,
+            active_pane: ActivePane::Character,
         }))
     }
 }
@@ -84,7 +91,15 @@ impl WidgetKind for CharacterWindow {
         char_pane.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
             let parent = Widget::get_parent(&widget);
             let window = Widget::downcast_kind_mut::<CharacterWindow>(&parent);
-            window.char_pane_active = true;
+            window.active_pane = ActivePane::Character;
+            parent.borrow_mut().invalidate_children();
+        })));
+
+        let abilities_pane = Widget::with_theme(Button::empty(), "abilities_pane_button");
+        abilities_pane.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+            let parent = Widget::get_parent(&widget);
+            let window = Widget::downcast_kind_mut::<CharacterWindow>(&parent);
+            window.active_pane = ActivePane::Ability;
             parent.borrow_mut().invalidate_children();
         })));
 
@@ -92,20 +107,50 @@ impl WidgetKind for CharacterWindow {
         effects_pane.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
             let parent = Widget::get_parent(&widget);
             let window = Widget::downcast_kind_mut::<CharacterWindow>(&parent);
-            window.char_pane_active = false;
+            window.active_pane = ActivePane::Effect;
             parent.borrow_mut().invalidate_children();
         })));
 
-        let cur_pane = if self.char_pane_active {
-            char_pane.borrow_mut().state.set_active(true);
-            create_details_text_box(&self.character.borrow().actor)
-        } else {
-            effects_pane.borrow_mut().state.set_active(true);
-            create_effects_pane(&mut self.character.borrow_mut().actor)
+        let cur_pane = match self.active_pane {
+            ActivePane::Character => {
+                char_pane.borrow_mut().state.set_active(true);
+                create_details_text_box(&self.character.borrow().actor)
+            }, ActivePane::Ability => {
+                abilities_pane.borrow_mut().state.set_active(true);
+                create_abilities_pane(&self.character.borrow().actor)
+            }, ActivePane::Effect => {
+                effects_pane.borrow_mut().state.set_active(true);
+                create_effects_pane(&mut self.character.borrow_mut().actor)
+            }
         };
 
-        vec![title, close, cur_pane, level_up, char_pane, effects_pane]
+        vec![title, close, cur_pane, level_up, char_pane, abilities_pane, effects_pane]
     }
+}
+
+pub fn create_abilities_pane(pc: &ActorState) -> Rc<RefCell<Widget>> {
+    let abilities = Widget::empty("abilities");
+
+    let details = Widget::with_theme(TextArea::empty(), "details");
+
+    let list = Widget::empty("list");
+    for ability in pc.actor.abilities.iter() {
+        let button = Widget::with_theme(Button::empty(), "ability_button");
+        button.borrow_mut().state.add_text_arg("icon", &ability.icon.id());
+
+        let ability_ref = Rc::clone(&ability);
+        let details_ref = Rc::clone(&details);
+        button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |_, _| {
+            add_ability_text_args(&mut details_ref.borrow_mut().state, &ability_ref);
+            details_ref.borrow_mut().invalidate_layout();
+        })));
+
+        Widget::add_child_to(&list, button);
+    }
+
+    Widget::add_child_to(&abilities, list);
+    Widget::add_child_to(&abilities, details);
+    abilities
 }
 
 pub fn create_effects_pane(pc: &mut ActorState) -> Rc<RefCell<Widget>> {

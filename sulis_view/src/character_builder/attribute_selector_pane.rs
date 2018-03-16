@@ -97,6 +97,9 @@ impl BuilderPane for AttributeSelectorPane {
     }
 
     fn prev(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
+        let rules = Module::rules();
+        self.attrs = AttributeList::new(rules.base_attribute as u8);
+        self.selected_kit = None;
         builder.prev(&widget);
     }
 }

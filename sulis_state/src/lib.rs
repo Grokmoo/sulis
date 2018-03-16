@@ -57,6 +57,9 @@ pub use self::item_state::ItemState;
 pub mod inventory;
 pub use self::inventory::Inventory;
 
+pub mod item_list;
+pub use self::item_list::ItemList;
+
 mod location;
 pub use self::location::Location;
 

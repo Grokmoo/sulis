@@ -44,10 +44,11 @@ impl ClassSelectorPane {
 }
 
 impl BuilderPane for ClassSelectorPane {
-    fn on_selected(&mut self, builder: &mut CharacterBuilder, _widget: Rc<RefCell<Widget>>) {
+    fn on_selected(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
         builder.class = None;
         builder.prev.borrow_mut().state.set_enabled(self.allow_prev);
         builder.next.borrow_mut().state.set_enabled(self.selected_class.is_some());
+        widget.borrow_mut().invalidate_children();
     }
 
     fn next(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
@@ -61,6 +62,7 @@ impl BuilderPane for ClassSelectorPane {
 
     fn prev(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
         if self.allow_prev {
+            self.selected_class = None;
             builder.prev(&widget);
         }
     }

@@ -1,0 +1,99 @@
+//  This file is part of Sulis, a turn based RPG written in Rust.
+//  Copyright 2018 Jared Stephen
+//
+//  Sulis is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  Sulis is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
+
+use std::ops::Index;
+use std::slice::Iter;
+
+use ItemState;
+
+#[derive(Clone)]
+pub struct ItemList {
+    items: Vec<(u32, ItemState)>,
+}
+
+impl Index<usize> for ItemList {
+    type Output = (u32, ItemState);
+    fn index(&self, index: usize) -> &(u32, ItemState) {
+        &self.items[index]
+    }
+}
+
+impl ItemList {
+    pub fn new() -> ItemList {
+        ItemList {
+            items: Vec::new(),
+        }
+    }
+
+    pub fn iter<'a>(&'a self) -> Iter<'a, (u32, ItemState)> {
+        self.items.iter()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.items.len() == 0
+    }
+
+    pub fn len(&self) -> usize {
+        self.items.len()
+    }
+
+    pub fn get(&self, index: usize) -> Option<&(u32, ItemState)> {
+        self.items.get(index)
+    }
+
+    fn find_index(&self, state: &ItemState) -> Option<usize> {
+        for (i, &(_, ref item)) in self.items.iter().enumerate() {
+            if item == state { return Some(i); }
+        }
+
+        None
+    }
+
+    pub fn add_quantity(&mut self, (qty, item_state) : (u32, ItemState)) {
+        match self.find_index(&item_state) {
+            Some(index) => self.items[index].0 += qty,
+            None => self.items.push((qty, item_state)),
+        }
+    }
+
+    pub fn add(&mut self, item_state: ItemState) {
+        self.add_quantity((1, item_state));
+    }
+
+    /// Removes the entire quantity of items at the specified index and returns it
+    pub fn remove_all_at(&mut self, index: usize) -> Option<(u32, ItemState)> {
+        if index >= self.items.len() { return None; }
+
+        Some(self.items.remove(index))
+    }
+
+    /// Remove an item from the list at the specified index and returns it.
+    /// Only removes one count, so the item may still exist if there is more
+    /// than one
+    pub fn remove(&mut self, index: usize) -> Option<ItemState> {
+        if index >= self.items.len() { return None; }
+
+        if self.items[index].0 == 1 {
+            let (_, item_state) = self.items.remove(index);
+
+            Some(item_state)
+        } else {
+            self.items[index].0 -= 1;
+            Some(self.items[index].1.clone())
+        }
+    }
+}
+

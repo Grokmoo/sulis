@@ -1,0 +1,7 @@
+id: resilient_body
+name: "Resilient Body"
+icon: abilities/resilient_body
+description: |
+  Your body is especially tough and hardy.  You gain +10 to Fortitude Defense
+bonuses:
+  fortitude: 10

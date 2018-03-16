@@ -21,14 +21,15 @@ use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{animation_state, AnimationState};
 use sulis_module::Prop;
 use sulis_module::area::PropData;
-use {ChangeListenerList, ItemState, Location};
+
 use entity_state::AreaDrawable;
+use {ChangeListenerList, ItemList, ItemState, Location};
 
 pub struct PropState {
     pub prop: Rc<Prop>,
     pub location: Location,
     pub animation_state: AnimationState,
-    pub items: Vec<ItemState>,
+    items: ItemList,
     pub listeners: ChangeListenerList<PropState>,
     can_generate_loot: bool,
 
@@ -45,9 +46,9 @@ impl fmt::Debug for PropState {
 
 impl PropState {
     pub(crate) fn new(prop_data: &PropData, location: Location, temporary: bool) -> PropState {
-        let mut items = Vec::new();
+        let mut items = ItemList::new();
         for item in prop_data.items.iter() {
-            items.push(ItemState::new(Rc::clone(item)));
+            items.add(ItemState::new(Rc::clone(item)));
         }
 
         let can_generate_loot = prop_data.prop.loot.is_some();
@@ -75,9 +76,10 @@ impl PropState {
     pub fn toggle_active(&mut self) {
         if !self.is_active() && self.can_generate_loot {
             if let Some(ref loot) = self.prop.loot {
+                info!("Generating loot for prop from '{}'", loot.id);
                 let items = loot.generate();
                 for item in items {
-                    self.items.push(ItemState::new(item));
+                    self.items.add(ItemState::new(item));
                 }
             }
 
@@ -87,24 +89,36 @@ impl PropState {
         self.animation_state.toggle(animation_state::Kind::Active);
     }
 
-    pub fn is_active(&self) -> bool {
-        self.animation_state.contains(animation_state::Kind::Active)
+    pub fn items(&self) -> &ItemList {
+        &self.items
     }
 
-    /// Removes an item from this Prop at the specified index and returns it
-    pub fn remove_item(&mut self, index: usize) -> ItemState {
-        let item = self.items.remove(index);
+    fn notify_and_check(&mut self) {
         self.listeners.notify(&self);
 
         if self.temporary && self.items.is_empty() {
             self.marked_for_removal = true;
         }
+    }
+
+    pub fn remove_all_at(&mut self, index: usize) -> Option<(u32, ItemState)> {
+        let item = self.items.remove_all_at(index);
+
+        self.notify_and_check();
 
         item
     }
 
-    pub fn num_items(&self) -> usize {
-        self.items.len()
+    pub fn remove_one_at(&mut self, index: usize) -> Option<ItemState> {
+        let item = self.items.remove(index);
+
+        self.notify_and_check();
+
+        item
+    }
+
+    pub fn is_active(&self) -> bool {
+        self.animation_state.contains(animation_state::Kind::Active)
     }
 
     pub fn append_to_draw_list(&self, draw_list: &mut DrawList, x: f32, y: f32, millis: u32) {

@@ -407,6 +407,7 @@ impl Widget {
     }
 
     pub fn update(root: &Rc<RefCell<Widget>>) -> Result<(), Error> {
+        Widget::check_children_removal(&root);
         Widget::update_kind_recursive(&root);
 
         Widget::check_readd(&root);
@@ -462,7 +463,7 @@ impl Widget {
         widget_ref.kind.borrow_mut().on_remove();
     }
 
-    pub fn check_children(parent: &Rc<RefCell<Widget>>) -> Result<(), Error> {
+    pub fn check_children_removal(parent: &Rc<RefCell<Widget>>) {
         let mut remove_modal = false;
         if let Some(ref w) = parent.borrow().modal_child {
             if w.borrow().marked_for_removal {
@@ -484,7 +485,9 @@ impl Widget {
                 true
             }
         });
+    }
 
+    pub fn check_children(parent: &Rc<RefCell<Widget>>) -> Result<(), Error> {
         // set up theme
         if parent.borrow().theme.is_none() {
             let parent_parent = Widget::get_parent(parent);

@@ -22,22 +22,22 @@ use self::Attribute::*;
 #[serde(deny_unknown_fields)]
 pub struct AttributeList {
     #[serde(rename="str")]
-    strength: u8,
+    pub strength: u8,
 
     #[serde(rename="dex")]
-    dexterity: u8,
+    pub dexterity: u8,
 
     #[serde(rename="end")]
-    endurance: u8,
+    pub endurance: u8,
 
     #[serde(rename="per")]
-    perception: u8,
+    pub perception: u8,
 
     #[serde(rename="int")]
-    intellect: u8,
+    pub intellect: u8,
 
     #[serde(rename="wis")]
-    wisdom: u8,
+    pub wisdom: u8,
 }
 
 impl AttributeList {

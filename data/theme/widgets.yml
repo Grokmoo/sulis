@@ -31,6 +31,15 @@ children:
     text_params:
       font: "normal"
       scale: 4.0
+  tab_button:
+    from: .button
+    background: background_tab
+    preferred_size: [20, 6]
+  tab_pane:
+    background: bg_rounded
+    border: [2, 2, 2, 2]
+    width_relative: Max
+    height_relative: Max
   color_button:
     background: background
     border: [1, 1, 1, 1]
@@ -96,10 +105,25 @@ children:
         x_relative: Max
   item_button:
     from: .button
-    background: background_transparent
+    background: empty
+    foreground: background_transparent
     border: [0, 0, 0, 0]
-    foreground: "#icon#"
     preferred_size: [12, 12]
+    children:
+      quantity_label:
+        from: .label
+        text: "#quantity#"
+        text_params:
+          horizontal_alignment: Right
+          vertical_alignment: Top
+          color: { r: 1.0, g: 0.0, b: 0.0, a: 1.0 }
+        width_relative: Max
+        height_relative: Max
+        preferred_size: [-1, 0]
+      icon:
+        foreground: "#icon#"
+        width_relative: Max
+        height_relative: Max
   progress_bar:
     background: bg_base
     border: [1, 1, 1, 1]

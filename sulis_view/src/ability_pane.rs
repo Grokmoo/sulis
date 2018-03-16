@@ -18,7 +18,7 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_core::ui::{Widget, WidgetKind};
+use sulis_core::ui::{Widget, WidgetKind, WidgetState};
 use sulis_widgets::{TextArea};
 use sulis_module::Ability;
 
@@ -62,18 +62,19 @@ impl WidgetKind for AbilityPane {
         };
 
         let details = Widget::with_theme(TextArea::empty(), "details");
-        {
-            let state = &mut details.borrow_mut().state;
-            state.add_text_arg("name", &ability.name);
-            state.add_text_arg("description", &ability.description);
-
-            if let Some(ref active) = ability.active {
-                state.add_text_arg("active", "true");
-                state.add_text_arg("activate_ap", &active.ap.to_string());
-            } else {
-                state.add_text_arg("passive", "true");
-            }
-        }
+        add_ability_text_args(&mut details.borrow_mut().state, &ability);
         vec![details]
+    }
+}
+
+pub fn add_ability_text_args(state: &mut WidgetState, ability: &Rc<Ability>) {
+    state.add_text_arg("name", &ability.name);
+    state.add_text_arg("description", &ability.description);
+
+    if let Some(ref active) = ability.active {
+        state.add_text_arg("active", "true");
+        state.add_text_arg("activate_ap", &active.ap.to_string());
+    } else {
+        state.add_text_arg("passive", "true");
     }
 }

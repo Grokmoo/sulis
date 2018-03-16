@@ -421,7 +421,18 @@ impl WidgetKind for AreaView {
 
         let area_state = GameState::area_state();
         if let Some(ref targeter) = area_state.borrow_mut().targeter() {
-            targeter.borrow_mut().on_mouse_move(area_x, area_y);
+            let mut targeter = targeter.borrow_mut();
+            let mouse_over = targeter.on_mouse_move(area_x, area_y);
+
+            if let Some(ref entity) = mouse_over {
+                let (x, y) = {
+                    let entity = entity.borrow();
+                    self.get_mouseover_pos(entity.location.x, entity.location.y,
+                                           entity.size.width, entity.size.height)
+                };
+                Widget::set_mouse_over(widget, EntityMouseover::new(entity), x, y);
+            }
+
             return true;
         }
 

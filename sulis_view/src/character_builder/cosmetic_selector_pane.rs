@@ -177,6 +177,8 @@ impl BuilderPane for CosmeticSelectorPane {
     }
 
     fn prev(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
+        self.portrait = None;
+        self.hue = Some(0.0);
         builder.next.borrow_mut().state.set_visible(true);
         builder.finish.borrow_mut().state.set_visible(false);
         builder.prev(&widget);

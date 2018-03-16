@@ -2,6 +2,12 @@
 children:
   editor:
     children:
+      list:
+        from: .list_box
+        border: { top: 1, bottom: 1, left: 1, right: 1 }
+        background: bg_base
+        position: [0, 4]
+        preferred_size: [24, 0]
       top_bar:
         background: bg_base
         width_relative: Max
@@ -19,11 +25,6 @@ children:
                 from: .button
                 text: "Menu"
                 preferred_size: [24, 4]
-              list:
-                from: .list_box
-                border: { top: 1, bottom: 1, left: 1, right: 1 }
-                background: bg_base
-                position: [0, 4]
           transitions:
             from: .button
             preferred_size: [24, 4]
@@ -190,7 +191,7 @@ children:
       shift_tiles_window:
         from: .window
         height_relative: Zero
-        preferred_size: [70, 50]
+        preferred_size: [75, 50]
         x_relative: Center
         y_relative: Center
         children:
@@ -221,7 +222,7 @@ children:
       transition_window:
         from: .window
         height_relative: Zero
-        preferred_size: [120, 56]
+        preferred_size: [125, 61]
         x_relative: Center
         y_relative: Center
         children:

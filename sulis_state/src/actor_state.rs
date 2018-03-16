@@ -200,11 +200,12 @@ impl ActorState {
         let mut area_state = area_state.borrow_mut();
         let prop_state = area_state.get_prop_mut(prop_index);
 
-        if prop_state.num_items() > 0 {
-            let mut i = prop_state.num_items() - 1;
+        if prop_state.items().len() > 0 {
+            let mut i = prop_state.items().len() - 1;
             loop {
-                let item_state = prop_state.remove_item(i);
-                self.inventory.add(item_state);
+                let item_state = prop_state.remove_all_at(i);
+
+                self.inventory.items.add_quantity(item_state.unwrap());
 
                 if i == 0 { break; }
 
@@ -219,8 +220,8 @@ impl ActorState {
         let mut area_state = area_state.borrow_mut();
         let prop_state = area_state.get_prop_mut(prop_index);
 
-        let item_state = prop_state.remove_item(item_index);
-        self.inventory.add(item_state);
+        let item_state = prop_state.remove_one_at(item_index);
+        self.inventory.items.add(item_state.unwrap());
         self.listeners.notify(&self);
     }
 
@@ -395,6 +396,10 @@ impl ActorState {
 
         for &(ref class, level) in self.actor.levels.iter() {
             self.stats.add_multiple(&class.bonuses_per_level, level);
+        }
+
+        for ability in self.actor.abilities.iter() {
+            self.stats.add(&ability.bonuses);
         }
 
         let mut attacks_list = Vec::new();

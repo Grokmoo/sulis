@@ -190,10 +190,17 @@ impl WidgetKind for ItemButton {
                 }, Some(prop_index) => {
                     if !area_state.prop_index_valid(prop_index) { return true; }
 
+<<<<<<< HEAD
                     if item_index >= area_state.get_prop(prop_index).items().len() {
                         return true;
                     }
                     &area_state.get_prop(prop_index).items()[item_index].1
+=======
+                    if item_index >= area_state.get_prop(prop_index).items.len() {
+                        return true;
+                    }
+                    &area_state.get_prop(prop_index).items[item_index]
+>>>>>>> 733719d402f783191bdc2a77d7c5d55617823faa
                 }
             };
 

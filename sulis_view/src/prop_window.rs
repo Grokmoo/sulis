@@ -103,8 +103,13 @@ impl WidgetKind for PropWindow {
         })));
 
         let list_content = Widget::empty("items_list");
+<<<<<<< HEAD
         for (index, &(qty, ref item)) in prop.items().iter().enumerate() {
             let item_button = ItemButton::new(Some(item.item.icon.id()), qty,
+=======
+        for (index, item) in prop.items.iter().enumerate() {
+            let item_button = ItemButton::new(Some(item.item.icon.id()), 1,
+>>>>>>> 733719d402f783191bdc2a77d7c5d55617823faa
                 Some(index), Some(self.prop_index));
             let button = Widget::with_defaults(item_button);
 

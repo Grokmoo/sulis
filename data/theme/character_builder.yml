@@ -115,13 +115,15 @@ children:
             preferred_size: [100, -10]
             position: [0, 10]
             height_relative: Max
-            layout: Grid
-            layout_spacing: { top: 0, bottom: 0, left: 0, right: 2 }
+            custom:
+              grid_size: 15
             children:
               ability_button:
                 from: .button
                 foreground: "#icon#"
                 preferred_size: [12, 12]
+                x_relative: Custom
+                y_relative: Custom
       class_selector_pane:
         from: .builder_pane
         children:

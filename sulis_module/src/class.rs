@@ -23,7 +23,7 @@ use sulis_core::util::{invalid_data_error, unable_to_create_error};
 use sulis_core::serde_yaml;
 use sulis_rules::{AttributeList, BonusList};
 
-use {Ability, Module};
+use {AbilityList, Module};
 
 #[derive(Deserialize, Serialize, Debug)]
 #[serde(deny_unknown_fields)]
@@ -39,7 +39,7 @@ pub struct Class {
     pub name: String,
     pub description: String,
     pub bonuses_per_level: BonusList,
-    ability_choices: HashMap<u32, Vec<Vec<Rc<Ability>>>>,
+    ability_choices: HashMap<u32, Vec<Rc<AbilityList>>>,
     pub kits: Vec<Kit>,
 }
 
@@ -57,26 +57,19 @@ impl Class {
         }
 
         let mut ability_choices = HashMap::new();
-        for (level, list_vec) in builder.ability_choices {
+        for (level, list) in builder.ability_choices {
             let mut vec = Vec::new();
 
-            for list in list_vec {
-                let mut abilities = Vec::new();
+            for ability_list_id in list {
+                let ability_list = match module.ability_lists.get(&ability_list_id) {
+                    None => {
+                        warn!("Unable to find ability list '{}'", ability_list_id);
+                        return unable_to_create_error("class", &builder.id);
+                    }, Some(ref ability_list) => Rc::clone(ability_list),
+                };
 
-                for ability_id in list {
-                    let ability = match module.abilities.get(&ability_id) {
-                        None => {
-                            warn!("Unable to find ability '{}'", ability_id);
-                            return unable_to_create_error("class", &builder.id);
-                        }, Some(ref ability) => Rc::clone(ability),
-                    };
-
-                    abilities.push(ability);
-                }
-
-                vec.push(abilities);
+                vec.push(ability_list);
             }
-
 
             ability_choices.insert(level, vec);
         }
@@ -91,7 +84,7 @@ impl Class {
         })
     }
 
-    pub fn ability_choices(&self, level: u32) -> Vec<Vec<Rc<Ability>>> {
+    pub fn ability_choices(&self, level: u32) -> Vec<Rc<AbilityList>> {
         match self.ability_choices.get(&level) {
             None => Vec::new(),
             Some(choices) => choices.clone(),
@@ -106,7 +99,7 @@ pub struct ClassBuilder {
     pub name: String,
     pub description: String,
     pub bonuses_per_level: BonusList,
-    pub ability_choices: HashMap<u32, Vec<Vec<String>>>,
+    pub ability_choices: HashMap<u32, Vec<String>>,
     pub kits: Vec<Kit>,
 }
 

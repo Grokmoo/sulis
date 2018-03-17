@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::slice::Iter;
 use std::rc::Rc;
 use std::io::Error;
 
@@ -23,9 +24,9 @@ use sulis_core::serde_yaml;
 
 use {Ability, Module};
 
-struct Entry {
-    ability: Rc<Ability>,
-    position: Point,
+pub struct Entry {
+    pub ability: Rc<Ability>,
+    pub position: Point,
 }
 
 pub struct AbilityList {
@@ -51,6 +52,10 @@ impl AbilityList {
             id: builder.id,
             entries,
         })
+    }
+
+    pub fn iter<'a>(&'a self) -> Iter<'a, Entry> {
+        self.entries.iter()
     }
 }
 

@@ -17,10 +17,12 @@
 use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
+use std::collections::HashSet;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
+use sulis_core::util::Point;
 use sulis_widgets::{Button, Label};
-use sulis_module::{Ability};
+use sulis_module::{Ability, AbilityList};
 
 use {AbilityPane, CharacterBuilder};
 use character_builder::BuilderPane;
@@ -28,19 +30,20 @@ use character_builder::BuilderPane;
 pub const NAME: &str = "ability_selector_pane";
 
 pub struct AbilitySelectorPane {
-    already_selected: Vec<Rc<Ability>>,
-    choices: Vec<Rc<Ability>>,
+    already_selected: HashSet<Rc<Ability>>,
+    choices: Rc<AbilityList>,
     selected_ability: Option<Rc<Ability>>,
     index: usize,
 }
 
 impl AbilitySelectorPane {
-    pub fn new(choices: Vec<Rc<Ability>>, index: usize) -> Rc<RefCell<AbilitySelectorPane>> {
+    pub fn new(choices: Rc<AbilityList>, index: usize,
+               already_selected: Vec<Rc<Ability>>) -> Rc<RefCell<AbilitySelectorPane>> {
         Rc::new(RefCell::new(AbilitySelectorPane {
             selected_ability: None,
             index,
             choices,
-            already_selected: Vec::new(),
+            already_selected: already_selected.into_iter().collect(),
         }))
     }
 }
@@ -51,7 +54,9 @@ impl BuilderPane for AbilitySelectorPane {
         builder.abilities.truncate(self.index);
         builder.prev.borrow_mut().state.set_enabled(true);
 
-        self.already_selected = builder.abilities.clone();
+        for ability in builder.abilities.iter() {
+            self.already_selected.insert(Rc::clone(ability));
+        }
 
         widget.borrow_mut().invalidate_children();
 
@@ -69,7 +74,36 @@ impl BuilderPane for AbilitySelectorPane {
 
     fn prev(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
         self.selected_ability = None;
+        for ability in builder.abilities.iter() {
+            self.already_selected.remove(ability);
+        }
         builder.prev(&widget);
+    }
+}
+
+struct AbilitiesPane {
+    positions: Vec<Point>,
+}
+
+impl WidgetKind for AbilitiesPane {
+    fn get_name(&self) -> &str { "abilities_pane" }
+    fn as_any(&self) -> &Any { self }
+    fn as_any_mut(&mut self) -> &mut Any { self }
+
+    fn layout(&mut self, widget: &mut Widget) {
+        let mut grid_size = 10;
+        if let Some(ref theme) = widget.theme {
+            grid_size = theme.get_custom_or_default("grid_size", 10);
+        }
+
+        widget.do_self_layout();
+        for (index, child) in widget.children.iter().enumerate() {
+            let position = self.positions[index];
+            child.borrow_mut().state.set_position(widget.state.inner_position.x + position.x * grid_size,
+                                                  widget.state.inner_position.y + position.y * grid_size);
+        }
+
+        widget.do_children_layout();
     }
 }
 
@@ -81,17 +115,25 @@ impl WidgetKind for AbilitySelectorPane {
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let title = Widget::with_theme(Label::empty(), "title");
 
-        let abilities_pane = Widget::empty("abilities_pane");
-        for ability in self.choices.iter() {
+        let pane = Rc::new(RefCell::new(AbilitiesPane { positions: Vec::new() }));
+        let abilities_pane = Widget::with_defaults(pane.clone());
+        for entry in self.choices.iter() {
+            let ability = &entry.ability;
+            let position = entry.position;
+            pane.borrow_mut().positions.push(position);
+
             let mut already_selected = false;
             for already_ability in self.already_selected.iter() {
                 if already_ability == ability {
                     already_selected = true;
                 }
             }
-            if already_selected { continue; }
 
             let ability_button = Widget::with_theme(Button::empty(), "ability_button");
+            if already_selected {
+                ability_button.borrow_mut().state.set_enabled(false);
+            }
+
             ability_button.borrow_mut().state.add_text_arg("icon", &ability.icon.id());
             if let Some(ref selected_ability) = self.selected_ability {
                 ability_button.borrow_mut().state.set_active(*ability == *selected_ability);

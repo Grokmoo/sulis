@@ -12,14 +12,10 @@ bonuses_per_level:
   will: 2
   initiative: 1
 ability_choices:
-  2: 
-    - [ mighty_blow, impenetrable_defense, resilient_body, lightning_reflexes, tenacious_soul ]
-  3:
-    - [ mighty_blow, impenetrable_defense, resilient_body, lightning_reflexes, tenacious_soul ]
-  4:
-    - [ mighty_blow, impenetrable_defense, resilient_body, lightning_reflexes, tenacious_soul ]
-  5:
-    - [ mighty_blow, impenetrable_defense, resilient_body, lightning_reflexes, tenacious_soul ]
+  2: [ fighter ]
+  3: [ fighter ]
+  4: [ fighter ]
+  5: [ fighter ]
 kits:
   - name: Brawler
     default_attributes:

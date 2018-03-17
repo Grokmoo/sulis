@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::hash::{Hash, Hasher};
 use std::rc::Rc;
 use std::io::Error;
 
@@ -38,6 +39,14 @@ pub struct Ability {
     pub icon: Rc<Image>,
     pub active: Option<Active>,
     pub bonuses: BonusList,
+}
+
+impl Eq for Ability { }
+
+impl Hash for Ability {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.id.hash(state);
+    }
 }
 
 impl PartialEq for Ability {

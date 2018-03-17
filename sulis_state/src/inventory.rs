@@ -25,53 +25,23 @@ use {ItemList, ItemState};
 
 #[derive(Clone)]
 pub struct Inventory {
-<<<<<<< HEAD
     pub items: ItemList,
-=======
-    pub items: Vec<(u32, ItemState)>,
->>>>>>> 733719d402f783191bdc2a77d7c5d55617823faa
     pub equipped: HashMap<Slot, usize>,
 }
 
 impl Inventory {
     pub fn new(actor: &Rc<Actor>) -> Inventory {
         let mut inv = Inventory {
-<<<<<<< HEAD
             items: ItemList::new(),
-=======
-            items: Vec::new(),
->>>>>>> 733719d402f783191bdc2a77d7c5d55617823faa
             equipped: HashMap::new(),
         };
 
         for item in actor.items.iter() {
-<<<<<<< HEAD
             inv.items.add(ItemState::new(Rc::clone(item)));
-=======
-            inv.add(ItemState::new(Rc::clone(item)));
->>>>>>> 733719d402f783191bdc2a77d7c5d55617823faa
         }
 
         trace!("Populated initial inventory with {} items", inv.items.len());
         inv
-<<<<<<< HEAD
-=======
-    }
-
-    pub fn add(&mut self, item_state: ItemState) {
-        let mut index = None;
-        for (i, &(_, ref item)) in self.items.iter().enumerate() {
-            if item == &item_state {
-                index = Some(i);
-                break;
-            }
-        }
-
-        match index {
-            Some(index) => self.items[index].0 += 1,
-            None => self.items.push((1, item_state)),
-        }
->>>>>>> 733719d402f783191bdc2a77d7c5d55617823faa
     }
 
     pub fn get_index(&self, slot: Slot) -> Option<usize> {

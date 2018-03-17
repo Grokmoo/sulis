@@ -14,6 +14,18 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+#[macro_use]
+pub mod macros {
+    #[macro_export]
+    macro_rules! widget_kind {
+        ($name:expr) => {
+            fn as_any(&self) -> &Any { self }
+            fn as_any_mut(&mut self) -> &mut Any { self }
+            fn get_name(&self) -> &str { $name }
+        }
+    }
+}
+
 pub mod animation_state;
 pub use self::animation_state::AnimationState;
 

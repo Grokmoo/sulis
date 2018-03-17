@@ -86,9 +86,7 @@ struct AbilitiesPane {
 }
 
 impl WidgetKind for AbilitiesPane {
-    fn get_name(&self) -> &str { "abilities_pane" }
-    fn as_any(&self) -> &Any { self }
-    fn as_any_mut(&mut self) -> &mut Any { self }
+    widget_kind!["abilities_pane"];
 
     fn layout(&mut self, widget: &mut Widget) {
         let mut grid_size = 10;
@@ -108,9 +106,7 @@ impl WidgetKind for AbilitiesPane {
 }
 
 impl WidgetKind for AbilitySelectorPane {
-    fn get_name(&self) -> &str { NAME }
-    fn as_any(&self) -> &Any { self }
-    fn as_any_mut(&mut self) -> &mut Any { self }
+    widget_kind![NAME];
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let title = Widget::with_theme(Label::empty(), "title");

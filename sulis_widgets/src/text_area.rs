@@ -43,11 +43,7 @@ impl TextArea {
 }
 
 impl WidgetKind for TextArea {
-    fn get_name(&self) -> &str { "text_area" }
-
-    fn as_any(&self) -> &Any { self }
-
-    fn as_any_mut(&mut self) -> &mut Any { self }
+    widget_kind!["text_area"];
 
     fn layout(&mut self, widget: &mut Widget) {
         if let Some(ref text) = self.text {

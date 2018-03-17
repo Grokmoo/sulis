@@ -32,11 +32,7 @@ impl EmptyWidget {
 }
 
 impl WidgetKind for EmptyWidget {
-    fn get_name(&self) -> &str { "content" }
-
-    fn as_any(&self) -> &Any { self }
-
-    fn as_any_mut(&mut self) -> &mut Any { self }
+    widget_kind!["content"];
 
     fn on_mouse_press(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
         self.super_on_mouse_press(widget, kind);

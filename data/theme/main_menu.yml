@@ -36,21 +36,22 @@ children:
           vertical_alignment: Center
         preferred_size: [40, 10]
         x_relative: Center
-        position: [-30, 140]
+        y_relative: Max
+        position: [-30, -20]
       modules_title:
         from: .label
         text: "Available Modules"
         text_params:
           scale: 6.0
         x_relative: Center
-        preferred_size: [120, 10]
-        position: [-70, 30]
+        preferred_size: [80, 10]
+        position: [-50, 30]
       modules_list:
         from: .list_box
-        preferred_size: [120, 100]
-        position: [-70, 38]
+        preferred_size: [80, -73]
+        position: [-50, 38]
         x_relative: Center
-        height_relative: Zero
+        height_relative: Max
         width_relative: Zero
         children:
           entry:
@@ -62,8 +63,9 @@ children:
         border: [4, 4, 4, 4]
         background: bg_base
         x_relative: Center
-        preferred_size: [120, 120]
-        position: [60, 30]
+        height_relative: Max
+        preferred_size: [100, -50]
+        position: [45, 30]
         text: "#description#"
       exit_confirmation_window:
         from: .exit_confirmation_window
@@ -86,26 +88,29 @@ children:
           horizontal_alignment: Left
         text: "Available Characters"
         x_relative: Center
-        position: [-50, 30]
+        position: [-40, 30]
         preferred_size: [80, 10]
       new_character_button:
         from: .button
-        text: "Create New Character"
+        text: "New Character"
         x_relative: Center
-        position: [-110, 140]
-        preferred_size: [40, 10]
+        y_relative: Max
+        position: [-95, -15]
+        preferred_size: [30, 10]
       delete_character_button:
         from: .button
         text: "Delete"
         x_relative: Center
-        position: [-77, 140]
+        y_relative: Max
+        position: [-67, -15]
         preferred_size: [20, 10]
       characters_pane:
         border: [1, 1, 1, 1]
         background: bg_base
         x_relative: Center
-        preferred_size: [120, 100]
-        position: [-70, 38]
+        height_relative: Max
+        preferred_size: [100, -65]
+        position: [-60, 38]
         layout: Grid
         layout_spacing: { top: 0, bottom: 1, right: 1, left: 0 }
         children:
@@ -120,7 +125,8 @@ children:
         text_params:
           scale: 6
         x_relative: Center
-        position: [-30, 140]
+        y_relative: Max
+        position: [-30, -15]
         preferred_size: [40, 10]
       details:
         from: .character_window.details
@@ -128,9 +134,9 @@ children:
         background: bg_base
         x_relative: Center
         width_relative: Zero
-        height_relative: Zero
-        preferred_size: [120, 120]
-        position: [60, 30]
+        height_relative: Max
+        preferred_size: [115, -45]
+        position: [50, 30]
       character_builder:
         from: .character_builder
       exit_confirmation_window:

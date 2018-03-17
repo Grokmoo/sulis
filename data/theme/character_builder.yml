@@ -1,10 +1,10 @@
 ---
 children:
   builder_pane:
-    width_relative: Max
     height_relative: Max
+    x_relative: Center
+    preferred_size: [180, -13]
     position: [0, 0]
-    preferred_size: [0, -13]
     children:
       title:
         from: .label
@@ -14,7 +14,7 @@ children:
         text_params:
           scale: 5.5
   character_builder:
-    preferred_size: [180, 150]
+    preferred_size: [240, 150]
     border: { top: 6, bottom: 8, right: 6, left: 6 }
     x_relative: Center
     y_relative: Center
@@ -32,7 +32,7 @@ children:
         text_params:
           scale: 6.0
         y_relative: Max
-        position: [38, 0]
+        position: [62, 0]
         preferred_size: [35, 10]
       previous:
         from: .button
@@ -40,7 +40,7 @@ children:
         text_params:
           scale: 6.0
         y_relative: Max
-        position: [0, 0]
+        position: [24, 0]
         preferred_size: [35, 10]
       finish:
         from: .button
@@ -48,7 +48,7 @@ children:
         y_relative: Max
         text_params:
           scale: 6.0
-        position: [38, 0]
+        position: [62, 0]
         preferred_size: [35, 10]
       level_up_finish_pane:
         from: .builder_pane
@@ -99,18 +99,20 @@ children:
                 preferred_size: [30, 10]
       ability_selector_pane:
         from: .builder_pane
+        width_relative: Max
+        preferred_size: [0, -13]
         children:
           title:
             text: "Select an Ability"
           ability_pane:
             from: .ability_pane
-            position: [60, 10]
-            preferred_size: [-60, -10]
+            position: [110, 10]
+            preferred_size: [-110, -10]
             width_relative: Max
             height_relative: Max
           abilities_pane:
             border: [1, 1, 1, 1]
-            preferred_size: [50, -10]
+            preferred_size: [100, -10]
             position: [0, 10]
             height_relative: Max
             layout: Grid
@@ -119,7 +121,7 @@ children:
               ability_button:
                 from: .button
                 foreground: "#icon#"
-                preferred_size: [20, 20]
+                preferred_size: [12, 12]
       class_selector_pane:
         from: .builder_pane
         children:
@@ -156,7 +158,8 @@ children:
             from: .text_area
             background: bg_base
             border: [1, 1, 1, 1]
-            preferred_size: [100, 100]
+            preferred_size: [-50, 100]
+            width_relative: Max
             position: [0, 25]
             text: "#description#"
           kits_pane:
@@ -180,55 +183,74 @@ children:
             text_params:
               scale: 5.0
               horizontal_alignment: Right
+            x_relative: Max
           points_label:
             from: .label
-            preferred_size: [50, 12]
+            preferred_size: [24, 12]
             text_params:
               scale: 5.0
-            text: "Points Left: #points#"
-            position: [100, 115]
+              horizontal_alignment: Right
+            text: "Points Left"
+            x_relative: Max
+            position: [-20, 115]
+          amount_label:
+            from: .label
+            background: bg_base
+            text: "#points#     "
+            position: [0, 115]
+            preferred_size: [19, 12]
+            x_relative: Max
+            text_params:
+              scale: 5.0
+              horizontal_alignment: Right
           str_label:
             from: .character_builder.attribute_selector_pane.attr_label
-            position: [100, 25]
+            position: [-20, 25]
             text: "Strength"
           str_spinner:
             from: .spinner
-            position: [125, 25]
+            position: [0, 25]
+            x_relative: Max
           dex_label:
             from: .character_builder.attribute_selector_pane.attr_label
-            position: [100, 40]
+            position: [-20, 40]
             text: "Dexterity"
           dex_spinner:
             from: .spinner
-            position: [125, 40]
+            position: [0, 40]
+            x_relative: Max
           end_label:
             from: .character_builder.attribute_selector_pane.attr_label
-            position: [100, 55]
+            position: [-20, 55]
             text: "Endurance"
           end_spinner:
             from: .spinner
-            position: [125, 55]
+            position: [0, 55]
+            x_relative: Max
           per_label:
             from: .character_builder.attribute_selector_pane.attr_label
-            position: [100, 70]
+            position: [-20, 70]
             text: "Perception"
           per_spinner:
             from: .spinner
-            position: [125, 70]
+            position: [0, 70]
+            x_relative: Max
           int_label:
             from: .character_builder.attribute_selector_pane.attr_label
-            position: [100, 85]
+            position: [-20, 85]
             text: "Intelligence"
           int_spinner:
             from: .spinner
-            position: [125, 85]
+            position: [0, 85]
+            x_relative: Max
           wis_label:
             from: .character_builder.attribute_selector_pane.attr_label
-            position: [100, 100]
+            position: [-20, 100]
             text: "Wisdom"
           wis_spinner:
             from: .spinner
-            position: [125, 100]
+            position: [0, 100]
+            x_relative: Max
       cosmetic_selector_pane:
         from: .builder_pane
         children:
@@ -345,7 +367,7 @@ children:
   portrait_selector:
     background: bg_base
     border: [2, 2, 2, 2]
-    preferred_size: [250, 115]
+    preferred_size: [215, 100]
     width_relative: Zero
     height_relative: Zero
     x_relative: Center
@@ -354,6 +376,6 @@ children:
     children:
       portrait_button:
         from: .button
-        preferred_size: [20, 20]
-    layout_spacing: { top: 0, bottom: 2, left: 0, right: 2 }
+        preferred_size: [18, 18]
+    layout_spacing: { top: 0, bottom: 1, left: 0, right: 1 }
 ...

@@ -9,9 +9,17 @@ display:
     width_pixels: 1600
     height_pixels: 900
 
-    # UI scaling dimensions
+    # UI scaling - Standard
     width: 320
     height: 180
+    
+    # UI scaling - Large
+    # width: 256
+    # height: 144
+    
+    # UI scaling - Small
+    # width: 368
+    # height: 207
 
     # in frames per second
     frame_rate: 30

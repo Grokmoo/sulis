@@ -24,6 +24,9 @@ extern crate rand;
 pub mod ability;
 pub use self::ability::Ability;
 
+pub mod ability_list;
+pub use self::ability_list::AbilityList;
+
 pub mod actor;
 pub use self::actor::Actor;
 pub use self::actor::Sex;
@@ -87,6 +90,7 @@ use sulis_core::resource::*;
 
 use self::area::Tile;
 use self::ability::AbilityBuilder;
+use self::ability_list::AbilityListBuilder;
 use self::area::AreaBuilder;
 use self::class::ClassBuilder;
 use self::encounter::EncounterBuilder;
@@ -105,6 +109,7 @@ pub struct Module {
     rules: Option<Rc<Rules>>,
     game: Option<Rc<Game>>,
     abilities: HashMap<String, Rc<Ability>>,
+    ability_lists: HashMap<String, Rc<AbilityList>>,
     actors: HashMap<String, Rc<Actor>>,
     areas: HashMap<String, Rc<Area>>,
     classes: HashMap<String, Rc<Class>>,
@@ -289,6 +294,10 @@ impl Module {
                 insert_if_ok("ability", id, Ability::new(builder, &module), &mut module.abilities);
             }
 
+            for (id, builder) in builder_set.ability_list_builders {
+                insert_if_ok("ability_list", id, AbilityList::new(builder, &module), &mut module.ability_lists);
+            }
+
             for (id, builder) in builder_set.item_builders.into_iter() {
                 insert_if_ok("item", id, Item::new(builder), &mut module.items);
             }
@@ -336,6 +345,10 @@ impl Module {
 
     pub fn ability(id: &str) -> Option<Rc<Ability>> {
         MODULE.with(|r| get_resource(id, &r.borrow().abilities))
+    }
+
+    pub fn ability_list(id: &str) -> Option<Rc<AbilityList>> {
+        MODULE.with(|r| get_resource(id, &r.borrow().ability_lists))
     }
 
     pub fn actor(id: &str) -> Option<Rc<Actor>> {
@@ -421,6 +434,7 @@ impl Default for Module {
             rules: None,
             game: None,
             abilities: HashMap::new(),
+            ability_lists: HashMap::new(),
             actors: HashMap::new(),
             areas: HashMap::new(),
             classes: HashMap::new(),
@@ -439,6 +453,7 @@ impl Default for Module {
 
 struct ModuleBuilder {
     ability_builders: HashMap<String, AbilityBuilder>,
+    ability_list_builders: HashMap<String, AbilityListBuilder>,
     actor_builders: HashMap<String, ActorBuilder>,
     area_builders: HashMap<String, AreaBuilder>,
     class_builders: HashMap<String, ClassBuilder>,
@@ -457,6 +472,7 @@ impl ModuleBuilder {
         let root_dirs: Vec<&str> = vec![data_dir, root_dir];
         ModuleBuilder {
             ability_builders: read(&root_dirs, "abilities"),
+            ability_list_builders: read(&root_dirs, "ability_lists"),
             actor_builders: read(&root_dirs, "actors"),
             area_builders: read(&root_dirs, "areas"),
             class_builders: read(&root_dirs, "classes"),

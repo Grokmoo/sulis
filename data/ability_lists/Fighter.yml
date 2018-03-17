@@ -1,0 +1,12 @@
+id: fighter
+abilities:
+  - id: impenetrable_defense
+    position: [0, 0]
+  - id: mighty_blow
+    position: [0, 2]
+  - id: resilient_body
+    position: [0, 4]
+  - id: lightning_reflexes
+    position: [0, 5]
+  - id: tenacious_soul
+    position: [0, 6]

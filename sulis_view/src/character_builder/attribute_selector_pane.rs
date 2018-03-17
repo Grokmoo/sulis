@@ -181,6 +181,10 @@ impl WidgetKind for AttributeSelectorPane {
         points_label.borrow_mut().state.add_text_arg("points", &self.available.to_string());
         children.push(points_label);
 
+        let amount_label = Widget::with_theme(Label::empty(), "amount_label");
+        amount_label.borrow_mut().state.add_text_arg("points", &self.available.to_string());
+        children.push(amount_label);
+
         children
     }
 }

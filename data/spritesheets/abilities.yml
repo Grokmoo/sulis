@@ -12,3 +12,6 @@ groups:
       tenacious_soul: [2, 0]
       resilient_body: [3, 0]
       lightning_reflexes: [0, 1]
+      tough_skin: [0, 2]
+      elemental_defense: [1, 2]
+      improved_initiative: [2, 2]

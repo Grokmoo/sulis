@@ -1,0 +1,7 @@
+id: improved_initiative
+name: "Improved Initiative"
+icon: abilities/improved_initiative
+description: |
+  Your reactions are just a bit faster than everyone else.  You gain +3 to Initiative.
+bonuses:
+  initiative: 3

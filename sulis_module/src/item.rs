@@ -24,7 +24,7 @@ use sulis_core::resource::{ResourceBuilder, ResourceSet};
 use sulis_core::serde_yaml;
 use sulis_core::util::unable_to_create_error;
 
-use {Equippable, ImageLayer};
+use {Equippable, ImageLayer, Module};
 
 #[derive(Deserialize, Debug, Copy, Clone, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
@@ -93,7 +93,7 @@ fn build_hash_map(id: &str, input: Option<HashMap<ImageLayer, String>>)
 }
 
 impl Item {
-    pub fn new(builder: ItemBuilder) -> Result<Item, Error> {
+    pub fn new(builder: ItemBuilder, _module: &Module) -> Result<Item, Error> {
         let icon = match ResourceSet::get_image(&builder.icon) {
             None => {
                 warn!("No image found for icon '{}'", builder.icon);

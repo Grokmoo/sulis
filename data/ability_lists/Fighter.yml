@@ -6,7 +6,13 @@ abilities:
     position: [0, 2]
   - id: resilient_body
     position: [0, 4]
+  - id: tough_skin
+    position: [1, 4]
   - id: lightning_reflexes
     position: [0, 5]
+  - id: improved_initiative
+    position: [1, 5]
   - id: tenacious_soul
     position: [0, 6]
+  - id: elemental_defense
+    position: [1, 6]

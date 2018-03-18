@@ -299,7 +299,7 @@ impl Module {
             }
 
             for (id, builder) in builder_set.item_builders.into_iter() {
-                insert_if_ok("item", id, Item::new(builder), &mut module.items);
+                insert_if_ok("item", id, Item::new(builder, &module), &mut module.items);
             }
 
             for (id, builder) in builder_set.loot_builders.into_iter() {

@@ -120,6 +120,7 @@ children:
             children:
               ability_button:
                 from: .button
+                background: background_inner
                 foreground: ability_overlay
                 preferred_size: [12, 12]
                 x_relative: Custom

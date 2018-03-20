@@ -39,7 +39,7 @@ pub struct Ability {
     pub icon: Rc<Image>,
     pub active: Option<Active>,
     pub bonuses: BonusList,
-    prereqs: Option<PrereqList>,
+    pub prereqs: Option<PrereqList>,
 }
 
 impl Eq for Ability { }

@@ -24,11 +24,11 @@ use sulis_core::util::unable_to_create_error;
 use {Actor, Class, Module, Race};
 
 pub struct PrereqList {
-    attributes: Option<Vec<(Attribute, u8)>>,
-    levels: Vec<(Rc<Class>, u32)>,
-    total_level: Option<u32>,
-    race: Option<Rc<Race>>,
-    abilities: Vec<String>, // we can't store the actual ability here because it might
+    pub attributes: Option<Vec<(Attribute, u8)>>,
+    pub levels: Vec<(Rc<Class>, u32)>,
+    pub total_level: Option<u32>,
+    pub race: Option<Rc<Race>>,
+    pub abilities: Vec<String>, // we can't store the actual ability here because it might
                             // not be parsed yet
 }
 

@@ -66,6 +66,11 @@ impl AnimatedImage {
             images_vec.push((state, image));
         }
 
+        images_vec.sort_unstable_by(|a, b| {
+            a.0.cmp(&b.0)
+        });
+        // images_vec.sort_unstable_by_key(|&(ref state, _)| state);
+
         Ok(Rc::new(AnimatedImage {
             images: images_vec,
             size: size.unwrap(),

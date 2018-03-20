@@ -89,7 +89,7 @@ lazy_static! {
     pub static ref NORMAL: AnimationState = AnimationState::default();
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Ord, PartialOrd)]
 pub struct AnimationState {
     kinds: Vec<Kind>,
 }

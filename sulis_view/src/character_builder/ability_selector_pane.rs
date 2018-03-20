@@ -138,10 +138,6 @@ impl WidgetKind for AbilitySelectorPane {
                 ability_button.borrow_mut().state.animation_state.add(animation_state::Kind::Custom2);
             }
 
-            // if self.already_selected.contains(ability) || self.prereqs_not_met.contains(ability) {
-            //     ability_button.borrow_mut().state.set_enabled(false);
-            // }
-
             let icon = Widget::with_theme(Label::empty(), "icon");
             icon.borrow_mut().state.add_text_arg("icon", &ability.icon.id());
             Widget::add_child_to(&ability_button, icon);
@@ -150,6 +146,7 @@ impl WidgetKind for AbilitySelectorPane {
                 ability_button.borrow_mut().state.set_active(*ability == *selected_ability);
             }
 
+            let enable_next = self.already_selected.contains(ability) || self.prereqs_not_met.contains(ability);
             let ability_ref = Rc::clone(&ability);
             ability_button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
                 let parent = Widget::go_up_tree(&widget, 2);
@@ -159,7 +156,7 @@ impl WidgetKind for AbilitySelectorPane {
 
                 let builder_widget = Widget::get_parent(&parent);
                 let builder = Widget::downcast_kind_mut::<CharacterBuilder>(&builder_widget);
-                builder.next.borrow_mut().state.set_enabled(true);
+                builder.next.borrow_mut().state.set_enabled(!enable_next);
             })));
 
             Widget::add_child_to(&abilities_pane, ability_button);
@@ -172,7 +169,16 @@ impl WidgetKind for AbilitySelectorPane {
 
         let ability_pane = AbilityPane::empty();
         ability_pane.borrow_mut().set_ability(Rc::clone(ability));
-        let ability_pane_widget = Widget::with_defaults(ability_pane);
+        let ability_pane_widget = Widget::with_defaults(ability_pane.clone());
+
+        let details = &ability_pane.borrow().details;
+        if self.prereqs_not_met.contains(ability) {
+            details.borrow_mut().state.add_text_arg("prereqs_not_met", "true");
+        }
+
+        if self.already_selected.contains(ability) {
+            details.borrow_mut().state.add_text_arg("already_owned", "true");
+        }
 
         vec![title, ability_pane_widget, abilities_pane]
     }

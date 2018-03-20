@@ -20,24 +20,29 @@ use std::cell::RefCell;
 
 use sulis_core::ui::{Widget, WidgetKind, WidgetState};
 use sulis_widgets::{TextArea};
-use sulis_module::Ability;
+use sulis_module::{Ability, Module};
+
+use inventory_window::add_bonus_text_args;
 
 pub const NAME: &str = "ability_pane";
 
 pub struct AbilityPane {
     ability: Option<Rc<Ability>>,
+    pub details: Rc<RefCell<Widget>>,
 }
 
 impl AbilityPane {
     pub fn empty() -> Rc<RefCell<AbilityPane>> {
         Rc::new(RefCell::new(AbilityPane {
             ability: None,
+            details: Widget::with_theme(TextArea::empty(), "details"),
         }))
     }
 
     pub fn new(ability: Rc<Ability>) -> Rc<RefCell<AbilityPane>> {
         Rc::new(RefCell::new(AbilityPane {
             ability: Some(ability),
+            details: Widget::with_theme(TextArea::empty(), "details"),
         }))
     }
 
@@ -61,9 +66,9 @@ impl WidgetKind for AbilityPane {
             Some(ref ability) => ability,
         };
 
-        let details = Widget::with_theme(TextArea::empty(), "details");
-        add_ability_text_args(&mut details.borrow_mut().state, &ability);
-        vec![details]
+        add_ability_text_args(&mut self.details.borrow_mut().state, &ability);
+
+        vec![Rc::clone(&self.details)]
     }
 }
 
@@ -76,5 +81,41 @@ pub fn add_ability_text_args(state: &mut WidgetState, ability: &Rc<Ability>) {
         state.add_text_arg("activate_ap", &active.ap.to_string());
     } else {
         state.add_text_arg("passive", "true");
+    }
+
+    add_bonus_text_args(&ability.bonuses, state);
+
+    if let Some(ref prereqs) = ability.prereqs {
+        state.add_text_arg("prereqs", "true");
+
+        if let Some(ref attrs) = prereqs.attributes {
+            for &(attr, amount) in attrs.iter() {
+                state.add_text_arg(&format!("prereq_{}", attr.short_name()), &amount.to_string());
+            }
+        }
+
+        for (index, &(ref class, level)) in prereqs.levels.iter().enumerate() {
+            state.add_text_arg(&format!("prereq_class_{}", index), &class.id);
+            state.add_text_arg(&format!("prereq_level_{}", index), &level.to_string());
+        }
+
+        if let Some(total_level) = prereqs.total_level {
+            state.add_text_arg("prereq_total_level", &total_level.to_string());
+        }
+
+        if let Some(ref race) = prereqs.race {
+            state.add_text_arg("prereq_race", &race.id);
+        }
+
+        for (index, ref ability_id) in prereqs.abilities.iter().enumerate() {
+            let ability = match Module::ability(ability_id) {
+                None => {
+                    warn!("No ability '{}' found for prereq list", ability_id);
+                    continue;
+                }, Some(ability) => ability,
+            };
+
+            state.add_text_arg(&format!("prereq_ability_{}", index), &ability.name);
+        }
     }
 }

@@ -28,6 +28,10 @@ pub struct LevelUpBuilder {
 }
 
 impl BuilderSet for LevelUpBuilder {
+    fn prereqs_met(&self, ability: &Rc<Ability>) -> bool {
+        ability.meets_prereqs(&self.pc.borrow().actor.actor)
+    }
+
     fn on_add(&self, builder: &mut CharacterBuilder,
               _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let mut children = Vec::new();

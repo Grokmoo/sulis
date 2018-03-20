@@ -29,14 +29,14 @@ use util::{invalid_data_error, Size};
 #[derive(Debug)]
 pub struct AnimatedImage {
     id: String,
-    images: HashMap<AnimationState, Rc<Image>>,
+    images: Vec<(AnimationState, Rc<Image>)>,
     size: Size,
 }
 
 impl AnimatedImage {
     pub fn new(builder: AnimatedImageBuilder,
                images: &HashMap<String, Rc<Image>>) -> Result<Rc<Image>, Error> {
-        let mut images_map: HashMap<AnimationState, Rc<Image>> = HashMap::new();
+        let mut images_vec = Vec::new();
 
         if builder.states.is_empty() {
             return invalid_data_error("Animated image must have 1 or more sub images.");
@@ -47,27 +47,27 @@ impl AnimatedImage {
             // check that the state string exists
             let state = AnimationState::parse(&state_str)?;
 
-            let image = images.get(&image_id);
-            if let None = image {
-                return Err(Error::new(ErrorKind::InvalidData,
-                    format!("Unable to locate sub image {}", image_id)));
-            }
+            let image = match images.get(&image_id) {
+                None => return invalid_data_error(&format!("Unable to locate sub \
+                                                           image '{}'", image_id)),
+                Some(ref image) => Rc::clone(image),
+            };
 
-            let image = image.unwrap();
-            images_map.insert(state, Rc::clone(image));
-
-            if let None = size {
-                size = Some(*image.get_size());
-            } else {
-                if size.unwrap() != *image.get_size() {
-                    return Err(Error::new(ErrorKind::InvalidData,
-                        format!("All images in an animated image must have the same size.")));
+            match size {
+                None => size = Some(*image.get_size()),
+                Some(ref size) => {
+                    if *size != *image.get_size() {
+                        return invalid_data_error(&format!("All images in an animated image \
+                                                           must have the same size."));
+                    }
                 }
             }
+
+            images_vec.push((state, image));
         }
 
         Ok(Rc::new(AnimatedImage {
-            images: images_map,
+            images: images_vec,
             size: size.unwrap(),
             id: builder.id,
         }))
@@ -81,13 +81,14 @@ impl Image for AnimatedImage {
 
     fn draw_graphics_mode(&self, renderer: &mut GraphicsRenderer, state: &AnimationState,
                           x: f32, y: f32, w: f32, h: f32, millis: u32) {
-        AnimationState::find_match(&self.images, state).draw_graphics_mode(renderer, state, x, y, w, h, millis);
+        AnimationState::find_match_in_vec(state, &self.images)
+            .draw_graphics_mode(renderer, state, x, y, w, h, millis);
     }
 
     fn append_to_draw_list(&self, draw_list: &mut DrawList, state: &AnimationState,
                            x: f32, y: f32, w: f32, h: f32, millis: u32) {
-        AnimationState::find_match(&self.images, state).append_to_draw_list(draw_list, state,
-                                                                            x, y, w, h, millis);
+        AnimationState::find_match_in_vec(state, &self.images)
+            .append_to_draw_list(draw_list, state, x, y, w, h, millis);
     }
 
     fn get_width_f32(&self) -> f32 {

@@ -24,7 +24,7 @@ use sulis_core::resource::{ResourceBuilder, ResourceSet};
 use sulis_core::util::{invalid_data_error, unable_to_create_error};
 use sulis_core::serde_yaml;
 
-use {Module};
+use {Actor, Module, PrereqList, PrereqListBuilder};
 
 pub struct Active {
     pub script: String,
@@ -39,6 +39,7 @@ pub struct Ability {
     pub icon: Rc<Image>,
     pub active: Option<Active>,
     pub bonuses: BonusList,
+    prereqs: Option<PrereqList>,
 }
 
 impl Eq for Ability { }
@@ -83,6 +84,11 @@ impl Ability {
             },
         };
 
+        let prereqs = match builder.prereqs {
+            None => None,
+            Some(prereqs) => Some(PrereqList::new(prereqs, module)?),
+        };
+
         Ok(Ability {
             id: builder.id,
             name: builder.name,
@@ -90,7 +96,15 @@ impl Ability {
             icon,
             active,
             bonuses: builder.bonuses.unwrap_or_default(),
+            prereqs,
         })
+    }
+
+    pub fn meets_prereqs(&self, actor: &Rc<Actor>) -> bool {
+        match self.prereqs {
+            None => true,
+            Some(ref prereqs) => prereqs.meets(actor),
+        }
     }
 }
 
@@ -111,6 +125,7 @@ pub struct AbilityBuilder {
     pub icon: String,
     pub active: Option<ActiveBuilder>,
     pub bonuses: Option<BonusList>,
+    pub prereqs: Option<PrereqListBuilder>,
 }
 
 impl ResourceBuilder for AbilityBuilder {

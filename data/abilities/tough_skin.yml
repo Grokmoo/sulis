@@ -8,3 +8,5 @@ bonuses:
     Slashing: 3
     Piercing: 3
     Crushing: 3
+prereqs:
+  abilities: [ resilient_body ]

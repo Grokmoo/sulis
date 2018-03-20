@@ -3,4 +3,5 @@ states:
   normal: fill_empty
   hover: fill_hover
   active: fill_active
+  hover + pressed: fill_active
   hover + active: fill_active

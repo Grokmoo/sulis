@@ -120,10 +120,15 @@ children:
             children:
               ability_button:
                 from: .button
-                foreground: "#icon#"
+                foreground: ability_overlay
                 preferred_size: [12, 12]
                 x_relative: Custom
                 y_relative: Custom
+                children:
+                  icon:
+                    foreground: "#icon#"
+                    width_relative: Max
+                    height_relative: Max
       class_selector_pane:
         from: .builder_pane
         children:

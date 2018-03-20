@@ -19,7 +19,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 use std::collections::HashSet;
 
-use sulis_core::ui::{Callback, Widget, WidgetKind};
+use sulis_core::ui::{animation_state, Callback, Widget, WidgetKind};
 use sulis_core::util::Point;
 use sulis_widgets::{Button, Label};
 use sulis_module::{Ability, AbilityList};
@@ -31,6 +31,7 @@ pub const NAME: &str = "ability_selector_pane";
 
 pub struct AbilitySelectorPane {
     already_selected: HashSet<Rc<Ability>>,
+    prereqs_not_met: HashSet<Rc<Ability>>,
     choices: Rc<AbilityList>,
     selected_ability: Option<Rc<Ability>>,
     index: usize,
@@ -44,6 +45,7 @@ impl AbilitySelectorPane {
             index,
             choices,
             already_selected: already_selected.into_iter().collect(),
+            prereqs_not_met: HashSet::new(),
         }))
     }
 }
@@ -56,6 +58,14 @@ impl BuilderPane for AbilitySelectorPane {
 
         for ability in builder.abilities.iter() {
             self.already_selected.insert(Rc::clone(ability));
+        }
+
+        self.prereqs_not_met.clear();
+        for entry in self.choices.iter() {
+            let ability = &entry.ability;
+            if !builder.prereqs_met(ability) {
+                self.prereqs_not_met.insert(Rc::clone(ability));
+            }
         }
 
         widget.borrow_mut().invalidate_children();
@@ -118,19 +128,24 @@ impl WidgetKind for AbilitySelectorPane {
             let position = entry.position;
             pane.borrow_mut().positions.push(position);
 
-            let mut already_selected = false;
-            for already_ability in self.already_selected.iter() {
-                if already_ability == ability {
-                    already_selected = true;
-                }
-            }
-
             let ability_button = Widget::with_theme(Button::empty(), "ability_button");
-            if already_selected {
-                ability_button.borrow_mut().state.set_enabled(false);
+
+            if self.already_selected.contains(ability) {
+                ability_button.borrow_mut().state.animation_state.add(animation_state::Kind::Custom1);
             }
 
-            ability_button.borrow_mut().state.add_text_arg("icon", &ability.icon.id());
+            if self.prereqs_not_met.contains(ability) {
+                ability_button.borrow_mut().state.animation_state.add(animation_state::Kind::Custom2);
+            }
+
+            // if self.already_selected.contains(ability) || self.prereqs_not_met.contains(ability) {
+            //     ability_button.borrow_mut().state.set_enabled(false);
+            // }
+
+            let icon = Widget::with_theme(Label::empty(), "icon");
+            icon.borrow_mut().state.add_text_arg("icon", &ability.icon.id());
+            Widget::add_child_to(&ability_button, icon);
+
             if let Some(ref selected_ability) = self.selected_ability {
                 ability_button.borrow_mut().state.set_active(*ability == *selected_ability);
             }

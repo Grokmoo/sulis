@@ -274,6 +274,24 @@ impl Actor {
         })
     }
 
+    pub fn levels(&self, other_class: &Rc<Class>) -> u32 {
+        for &(ref class, level) in self.levels.iter() {
+            if class == other_class { return level; }
+        }
+
+        0
+    }
+
+    pub fn has_ability_with_id(&self, id: &str) -> bool {
+        for ability in self.abilities.iter() {
+            if ability.id == id {
+                return true;
+            }
+        }
+
+        false
+    }
+
     pub fn has_ability(&self, other: &Rc<Ability>) -> bool {
         for ability in self.abilities.iter() {
             if ability == other { return true; }

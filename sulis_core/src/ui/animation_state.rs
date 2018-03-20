@@ -15,7 +15,6 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::io::{Error, ErrorKind};
-use std::collections::HashMap;
 
 use self::Kind::*;
 
@@ -26,6 +25,12 @@ pub enum Kind {
     Pressed,
     Active,
     Disabled,
+
+    Custom1,
+    Custom2,
+    Custom3,
+    Custom4,
+    Custom5,
 
     MouseMove,
     MouseActivate,
@@ -43,6 +48,11 @@ impl Kind {
             Pressed => "pressed",
             Active => "active",
             Disabled => "disabled",
+            Custom1 => "custom1",
+            Custom2 => "custom2",
+            Custom3 => "custom3",
+            Custom4 => "custom4",
+            Custom5 => "custom5",
             MouseMove => "mouse_move",
             MouseActivate => "mouse_activate",
             MouseAttack => "mouse_attack",
@@ -59,6 +69,11 @@ impl Kind {
             "pressed" => Pressed,
             "active" => Active,
             "disabled" => Disabled,
+            "custom1" => Custom1,
+            "custom2" => Custom2,
+            "custom3" => Custom3,
+            "custom4" => Custom4,
+            "custom5" => Custom5,
             "mouse_move" => MouseMove,
             "mouse_activate" => MouseActivate,
             "mouse_attack" => MouseAttack,
@@ -185,23 +200,34 @@ impl AnimationState {
         Ok(())
     }
 
-    /// Finds the `AnimationState` within the specified mapping that closest
-    /// matches `other`, and returns the corresponding `T`.
-    /// In order to be simple and efficient, this does not do exhaustive checking.
-    /// Rather, it checks a few simple rules, in order:
-    /// First, return an exact match if it exists
-    /// Next, return the `Kind::Normal` state if it exists
-    /// Finally, return any state at random in the mapping
-    pub fn find_match<'a, T>(mapping: &'a HashMap<AnimationState, T>,
-                         other: &'a AnimationState) -> &'a T {
-        if let Some(t) = mapping.get(other) {
-            return t;
+    /// Finds the `AnimationState` within the set of `choices` that closest
+    /// matches the `desired_state`.  Each animation state is ranked according to
+    /// what fraction of its kinds match the desired state kind, and what fraction
+    /// of the desired state's kinds match the animation state's kind.  The state
+    /// with the highest rank is chosen and the associated `T` is returned.
+    pub fn find_match_in_vec<'a, T>(desired_state: &'a AnimationState,
+                             choices: &'a Vec<(AnimationState, T)>) -> &'a T {
+
+        // TODO each animation state is sorted, so we can do this with a single
+        // lock step loop instead of double loop
+        let num_desired_kinds = desired_state.kinds.len() as f32;
+        let mut best_index = 0;
+        let mut best_rank = 0.0;
+        for (index, &(ref state, _)) in choices.iter().enumerate() {
+            let mut cur_rank = 0.0;
+            for kind in desired_state.kinds.iter() {
+                if state.contains(*kind) { cur_rank += 1.0; }
+            }
+
+            cur_rank = cur_rank / num_desired_kinds + cur_rank / (state.kinds.len() as f32);
+            if cur_rank > best_rank {
+                best_index = index;
+                best_rank = cur_rank;
+
+                if best_rank > 1.99 { break; }
+            }
         }
 
-        if let Some(t) = mapping.get(&NORMAL) {
-            return t;
-        }
-
-        return mapping.get(mapping.keys().next().unwrap()).unwrap()
+        &choices[best_index].1
     }
 }

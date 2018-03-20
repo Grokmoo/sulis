@@ -1,0 +1,9 @@
+id: bg_transparent_disabled
+generate_sub_images:
+  size: [1, 1]
+  spritesheet: "gui"
+grid: [ bg_top_left_transparent_disabled,    bg_top_middle_transparent_disabled,    bg_top_right_transparent_disabled,
+        bg_middle_left_transparent_disabled, bg_middle_transparent_disabled,        bg_middle_right_transparent_disabled,
+        bg_bottom_left_transparent_disabled, bg_bottom_middle_transparent_disabled, bg_bottom_right_transparent_disabled
+      ]
+

@@ -9,3 +9,5 @@ bonuses:
     Cold: 3
     Electrical: 3
     Fire: 3
+prereqs:
+  abilities: [ tenacious_soul ]

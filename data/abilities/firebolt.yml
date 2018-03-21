@@ -1,0 +1,10 @@
+id: firebolt
+name: "Firebolt"
+icon: abilities/firebolt
+description: |
+  You launch a bolt of elemental fire at a single enemy target.
+active:
+  script: "firebolt"
+  ap: 20
+  duration: 0
+

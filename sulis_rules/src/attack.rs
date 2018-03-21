@@ -19,7 +19,7 @@ use std::rc::Rc;
 use sulis_core::image::Image;
 use sulis_core::resource::ResourceSet;
 use bonus_list::{AttackBuilder, AttackKindBuilder};
-use {Armor, DamageKind, DamageList, StatList};
+use {Armor, Damage, DamageKind, DamageList, StatList};
 
 use AttackKind::*;
 
@@ -30,6 +30,22 @@ pub struct Attack {
 }
 
 impl Attack {
+    pub fn special(min_damage: u32, max_damage: u32,
+                   damage_kind: DamageKind, attack_kind: AttackKind) -> Attack {
+        let damage = Damage {
+            min: min_damage,
+            max: max_damage,
+            kind: Some(damage_kind),
+        };
+
+        let damage_list = DamageList::from(damage);
+
+        Attack {
+            damage: damage_list,
+            kind: attack_kind,
+        }
+    }
+
     pub fn new(builder: &AttackBuilder, stats: &StatList) -> Attack {
         let damage = DamageList::new(builder.damage, &stats.bonus_damage);
 
@@ -56,23 +72,23 @@ impl Attack {
     pub fn is_melee(&self) -> bool {
         match self.kind {
             Melee { .. } => true,
-            Ranged { .. } => false,
+            _ => false,
         }
     }
 
     pub fn is_ranged(&self) -> bool {
         match self.kind {
-            Melee { .. } => false,
             Ranged { .. } => true,
+            _ => false,
         }
     }
 
     pub fn get_ranged_projectile(&self) -> Option<Rc<Image>> {
         match self.kind {
-            Melee { .. } => None,
             Ranged { ref projectile, .. } => {
                 ResourceSet::get_image(projectile)
-            }
+            },
+            _ => None,
         }
     }
 
@@ -93,6 +109,21 @@ impl Attack {
         match self.kind {
             Melee { reach } => reach,
             Ranged { range, .. } => range,
+            _ => 0.0,
+        }
+    }
+}
+
+impl AttackKind {
+    pub fn from_str(s: &str) -> AttackKind {
+        match s {
+            "Fortitude" => AttackKind::Fortitude,
+            "Reflex" => AttackKind::Reflex,
+            "Will" => AttackKind::Will,
+            _ => {
+                warn!("Unable to parse string '{}' into attack kind", s);
+                AttackKind::Will
+            }
         }
     }
 }
@@ -101,4 +132,7 @@ impl Attack {
 pub enum AttackKind {
     Melee { reach: f32 },
     Ranged { range: f32, projectile: String },
+    Fortitude,
+    Reflex,
+    Will,
 }

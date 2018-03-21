@@ -20,7 +20,7 @@ use std::cell::RefCell;
 
 use rlua::{self, Lua, UserData, UserDataMethods};
 
-use sulis_rules::{DamageKind};
+use sulis_rules::{AttackKind, DamageKind, Attack};
 use sulis_module::Faction;
 use {EntityState, GameState};
 use script::{CallbackData, Result, ScriptAbility, ScriptEffect, TargeterData};
@@ -58,12 +58,33 @@ impl UserData for ScriptEntity {
             Ok(TargeterData::new(entity.index, &ability.id))
         });
 
-        methods.add_method("attack", |_, entity, (target, callback): (ScriptEntity, CallbackData)| {
+        methods.add_method("weapon_attack", |_, entity, (target, callback): (ScriptEntity, CallbackData)| {
             let area_state = GameState::area_state();
             let target = area_state.borrow().get_entity(target.index);
             let parent = area_state.borrow().get_entity(entity.index);
 
             EntityState::attack(&parent, &target, Some(Box::new(callback)));
+            Ok(())
+        });
+
+        methods.add_method("special_attack", |_, entity,
+                           (target, attack_kind, min_damage, max_damage, damage_kind):
+                           (ScriptEntity, String, u32, u32, String)| {
+            let area_state = GameState::area_state();
+
+            let target = area_state.borrow().get_entity(target.index);
+            let parent = area_state.borrow().get_entity(entity.index);
+
+            let damage_kind = DamageKind::from_str(&damage_kind);
+            let attack_kind = AttackKind::from_str(&attack_kind);
+
+            let attack = Attack::special(min_damage, max_damage, damage_kind, attack_kind);
+
+            let (text, color) = parent.borrow_mut().actor.attack(&target, &attack);
+
+            let scale = 1.2;
+            area_state.borrow_mut().add_feedback_text(text, &target, scale, color);
+
             Ok(())
         });
 

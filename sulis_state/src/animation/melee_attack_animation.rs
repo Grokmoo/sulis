@@ -76,8 +76,7 @@ impl animation::Animation for MeleeAttackAnimation {
 
             let area_state = GameState::area_state();
 
-            let (text, color) = self.attacker.borrow_mut().actor
-                .attack(&self.defender, &mut area_state.borrow_mut());
+            let (text, color) = self.attacker.borrow_mut().actor.weapon_attack(&self.defender);
 
             let scale = 1.2;
             area_state.borrow_mut().add_feedback_text(text, &self.defender, scale, color);

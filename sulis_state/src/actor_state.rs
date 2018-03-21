@@ -24,8 +24,8 @@ use sulis_core::image::{LayeredImage};
 use sulis_core::ui::{color, Color};
 use sulis_module::{item, Actor, Module};
 use sulis_module::area::PropData;
-use sulis_rules::{HitKind, StatList};
-use {AbilityState, AreaState, ChangeListenerList, Effect, EntityState, GameState, Inventory};
+use sulis_rules::{Attack, AttackKind, HitKind, StatList};
+use {AbilityState, ChangeListenerList, Effect, EntityState, GameState, Inventory};
 
 pub struct ActorState {
     pub actor: Rc<Actor>,
@@ -129,7 +129,7 @@ impl ActorState {
         dist < self.stats.attack_distance()
     }
 
-    pub(crate) fn can_attack(&self, _target: &Rc<RefCell<EntityState>>, dist: f32) -> bool {
+    pub(crate) fn can_weapon_attack(&self, _target: &Rc<RefCell<EntityState>>, dist: f32) -> bool {
         trace!("Checking can attack for '{}'.  Distance to target is {}",
                self.actor.name, dist);
 
@@ -139,12 +139,10 @@ impl ActorState {
         self.can_reach(dist)
     }
 
-    pub fn attack(&mut self, target: &Rc<RefCell<EntityState>>,
-                  area_state: &mut AreaState) -> (String, Color) {
+    pub fn weapon_attack(&mut self, target: &Rc<RefCell<EntityState>>) -> (String, Color) {
         if target.borrow_mut().actor.hp() <= 0 { return ("Miss".to_string(), color::GRAY); }
 
         info!("'{}' attacks '{}'", self.actor.name, target.borrow().actor.actor.name);
-        let rules = Module::rules();
 
         let mut color = color::GRAY;
         let mut damage_str = String::new();
@@ -153,46 +151,74 @@ impl ActorState {
         for ref attack in self.stats.attacks.iter() {
             if not_first { damage_str.push_str(", "); }
 
-            let accuracy = self.stats.accuracy;
-            let defense = target.borrow().actor.stats.defense;
-            let hit_kind = rules.attack_roll(accuracy, defense);
-
-            let damage_multiplier = match hit_kind {
-                HitKind::Miss => {
-                    debug!("Miss");
-                    damage_str.push_str("Miss");
-                    not_first = true;
-                    continue;
-                },
-                HitKind::Graze => rules.graze_damage_multiplier,
-                HitKind::Hit => rules.hit_damage_multiplier,
-                HitKind::Crit => rules.crit_damage_multiplier,
-            };
-
-            debug!("Accuracy {} vs defense {}: {:?}", accuracy, defense, hit_kind);
-
-            let damage = attack.roll_damage(&target.borrow().actor.stats.armor, damage_multiplier);
-
-            debug!("{:?}. {:?} damage", hit_kind, damage);
-
-            if !damage.is_empty() {
-                color = color::RED;
-                let mut total = 0;
-                for (_kind, amount) in damage {
-                    total += amount;
-                }
-
-                target.borrow_mut().remove_hp(total);
-                damage_str.push_str(&format!("{:?}: {}", hit_kind, total));
-            } else {
-                damage_str.push_str(&format!("{:?}: {}", hit_kind, 0));
+            let (attack_result, attack_color) = self.attack_internal(target, attack);
+            if attack_color != color::GRAY {
+                color = attack_color;
             }
+
+            damage_str.push_str(&attack_result);
 
             not_first = true;
         }
 
-        self.check_death(target, area_state);
+        self.check_death(target);
         (damage_str, color)
+    }
+
+    pub fn attack(&mut self, target: &Rc<RefCell<EntityState>>, attack: &Attack) -> (String, Color) {
+        if target.borrow_mut().actor.hp() <= 0 { return ("Miss".to_string(), color::GRAY); }
+
+        info!("'{}' attacks '{}'", self.actor.name, target.borrow().actor.actor.name);
+
+        let result = self.attack_internal(target, attack);
+
+        self.check_death(target);
+        result
+    }
+
+    fn attack_internal(&self, target: &Rc<RefCell<EntityState>>, attack: &Attack) -> (String, Color) {
+        let rules = Module::rules();
+        let accuracy = self.stats.accuracy;
+
+        let defense = {
+            let target_stats = &target.borrow().actor.stats;
+            match attack.kind {
+                AttackKind::Fortitude => target_stats.fortitude,
+                AttackKind::Reflex => target_stats.reflex,
+                AttackKind::Will => target_stats.will,
+                AttackKind::Melee { .. } | AttackKind::Ranged { .. } => target_stats.defense,
+            }
+        };
+
+        let hit_kind = rules.attack_roll(accuracy, defense);
+
+        let damage_multiplier = match hit_kind {
+            HitKind::Miss => {
+                debug!("Miss");
+                return ("Miss".to_string(), color::GRAY);
+            },
+            HitKind::Graze => rules.graze_damage_multiplier,
+            HitKind::Hit => rules.hit_damage_multiplier,
+            HitKind::Crit => rules.crit_damage_multiplier,
+        };
+
+        debug!("Accuracy {} vs defense {}: {:?}", accuracy, defense, hit_kind);
+
+        let damage = attack.roll_damage(&target.borrow().actor.stats.armor, damage_multiplier);
+
+        debug!("{:?}. {:?} damage", hit_kind, damage);
+
+        if !damage.is_empty() {
+            let mut total = 0;
+            for (_kind, amount) in damage {
+                total += amount;
+            }
+
+            target.borrow_mut().remove_hp(total);
+            return (format!("{:?}: {}", hit_kind, total), color::RED);
+        } else {
+            return (format!("{:?}: {}", hit_kind, 0), color::GRAY);
+        }
     }
 
     pub fn take_all(&mut self, prop_index: usize) {
@@ -247,7 +273,7 @@ impl ActorState {
         self.hp <= 0
     }
 
-    pub fn check_death(&mut self, target: &Rc<RefCell<EntityState>>, area_state: &mut AreaState) {
+    pub fn check_death(&mut self, target: &Rc<RefCell<EntityState>>) {
         if target.borrow().actor.hp() > 0 { return; }
 
         let target = target.borrow();
@@ -282,7 +308,9 @@ impl ActorState {
             location: location.to_point(),
             items,
         };
-        area_state.add_prop(&prop_data, location, true);
+
+        let area_state = GameState::area_state();
+        area_state.borrow_mut().add_prop(&prop_data, location, true);
     }
 
     pub fn has_level_up(&self) -> bool {

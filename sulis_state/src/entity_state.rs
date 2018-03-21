@@ -114,7 +114,7 @@ impl EntityState {
     pub fn can_attack(&self, target: &Rc<RefCell<EntityState>>, area: &Rc<Area>) -> bool {
         let dist = self.dist_to_entity(target);
 
-        if !self.actor.can_attack(target, dist) { return false; }
+        if !self.actor.can_weapon_attack(target, dist) { return false; }
 
         self.has_visibility(target, area)
     }

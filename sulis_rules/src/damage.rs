@@ -36,6 +36,22 @@ impl DamageList {
         }
     }
 
+    pub fn from(damage: Damage) -> DamageList {
+        if damage.kind.is_none() {
+            warn!("Attempted to create damage list with no base damage kind");
+            return DamageList::empty();
+        }
+
+        let min = damage.min;
+        let max = damage.max;
+
+        DamageList {
+            damage: vec![damage],
+            min,
+            max,
+        }
+    }
+
     pub fn new(base_damage: Damage, bonus_damage: &Vec<Damage>) -> DamageList {
         if base_damage.kind.is_none() {
             warn!("Attempted to create damage list with no base damage kind");

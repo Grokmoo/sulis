@@ -21,7 +21,7 @@ function on_target_select(parent, ability, targets)
   -- Remove an additional point of AP beyond the standard attack
   parent:remove_ap(10)
   -- ability:activate(parent)
-  parent:attack(target, cb)
+  parent:weapon_attack(target, cb)
 end
 
 function before_attack(parent, ability, targets)

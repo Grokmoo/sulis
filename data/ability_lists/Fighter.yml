@@ -16,3 +16,5 @@ abilities:
     position: [0, 6]
   - id: elemental_defense
     position: [1, 6]
+  - id: firebolt
+    position: [2, 0]

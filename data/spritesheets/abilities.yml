@@ -15,6 +15,7 @@ groups:
       tough_skin: [0, 2]
       elemental_defense: [1, 2]
       improved_initiative: [2, 2]
+      firebolt: [3, 2]
 
       already_selected: [0, 3]
       prereqs_not_met: [1, 3]

@@ -27,6 +27,7 @@ pub struct Effect {
     bonuses: BonusList,
 
     pub listeners: ChangeListenerList<Effect>,
+    pub removal_listeners: ChangeListenerList<Effect>,
 }
 
 impl Effect {
@@ -37,6 +38,7 @@ impl Effect {
             total_duration: duration,
             bonuses,
             listeners: ChangeListenerList::default(),
+            removal_listeners: ChangeListenerList::default(),
         }
     }
 
@@ -54,6 +56,7 @@ impl Effect {
         if self.cur_duration < self.total_duration {
             false
         } else {
+            self.removal_listeners.notify(&self);
             debug!("Removing effect");
             true
         }

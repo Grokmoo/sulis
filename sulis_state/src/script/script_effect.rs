@@ -18,7 +18,7 @@ use rlua::{Lua, UserData, UserDataMethods};
 
 use sulis_rules::{BonusList, Damage, DamageKind};
 
-use script::Result;
+use script::{Result, script_particle_generator, ScriptParticleGenerator};
 use {Effect, GameState};
 
 #[derive(Clone)]
@@ -80,7 +80,7 @@ fn add_num_bonus(_lua: &Lua, effect: &mut ScriptEffect, args: (String, f32)) -> 
 
 const TURNS_TO_MILLIS: u32 = 5000;
 
-fn apply(_lua: &Lua, effect_data: &ScriptEffect, _args: ()) -> Result<()> {
+fn apply(_lua: &Lua, effect_data: &ScriptEffect, pgen: Option<ScriptParticleGenerator>) -> Result<()> {
     let area_state = GameState::area_state();
     let area_state = area_state.borrow();
 
@@ -89,7 +89,14 @@ fn apply(_lua: &Lua, effect_data: &ScriptEffect, _args: ()) -> Result<()> {
     let duration = effect_data.duration * TURNS_TO_MILLIS;
 
     trace!("Apply effect to '{}'", entity.borrow().actor.actor.name);
-    let effect = Effect::new(&effect_data.name, duration, effect_data.bonuses.clone());
+    let mut effect = Effect::new(&effect_data.name, duration, effect_data.bonuses.clone());
+
+    if let Some(ref pgen) = pgen {
+        let pgen = script_particle_generator::create_pgen(&pgen)?;
+        pgen.add_removal_listener(&mut effect);
+        GameState::add_animation(Box::new(pgen));
+    }
+
     entity.borrow_mut().actor.add_effect(effect);
 
     Ok(())

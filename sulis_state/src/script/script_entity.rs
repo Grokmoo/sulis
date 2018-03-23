@@ -15,6 +15,7 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std;
+use std::f32;
 use std::rc::Rc;
 use std::cell::RefCell;
 
@@ -49,13 +50,14 @@ impl UserData for ScriptEntity {
         });
 
         methods.add_method("create_effect", |_, entity, args: (String, u32)| {
+            info!("Got here");
             let duration = args.1;
             let ability = args.0;
             Ok(ScriptEffect::new(entity.index, &ability, duration))
         });
 
-        methods.add_method("create_particle_generator", |_, entity, args: (String, f32)| {
-            let duration_secs = args.1;
+        methods.add_method("create_particle_generator", |_, entity, args: (String, Option<f32>)| {
+            let duration_secs = args.1.unwrap_or(f32::INFINITY);
             let sprite = args.0;
             Ok(ScriptParticleGenerator::new(entity.index, sprite, duration_secs))
         });

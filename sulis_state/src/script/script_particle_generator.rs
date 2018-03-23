@@ -20,39 +20,31 @@ use sulis_core::resource::ResourceSet;
 
 use {GameState};
 use animation::{Animation, ParticleGenerator};
-use animation::particle_generator::{Dist, Param, DistParam};
+use animation::particle_generator::{Dist, Param, DistParam, GeneratorModel};
 use script::{CallbackData, Result};
-
 
 #[derive(Clone)]
 pub struct ScriptParticleGenerator {
     parent: usize,
-    sprite: String,
-    duration_secs: f32,
-
-    gen_rate: Option<Param>,
-    position: Option<(Param, Param)>,
+    image: String,
     callback: Option<CallbackData>,
-
-    particle_x_dist: Option<DistParam>,
-    particle_y_dist: Option<DistParam>,
-    particle_duration_dist: Option<Dist>,
-    particle_size_dist: Option<(Dist, Dist)>,
+    model: GeneratorModel,
 }
 
 impl ScriptParticleGenerator {
-    pub fn new(parent: usize, sprite: String, duration_secs: f32) -> ScriptParticleGenerator {
+    pub fn new(parent: usize, image: String, duration_secs: f32) -> ScriptParticleGenerator {
+        let area_state = GameState::area_state();
+        let owner = area_state.borrow().get_entity(parent);
+        let x = owner.borrow().location.x as f32 + owner.borrow().size.width as f32 / 2.0;
+        let y = owner.borrow().location.y as f32 + owner.borrow().size.height as f32 / 2.0;
+
+        let model = GeneratorModel::new(duration_secs, x, y);
+
         ScriptParticleGenerator {
             parent,
-            sprite,
-            duration_secs,
-            gen_rate: None,
-            position: None,
+            image,
             callback: None,
-            particle_x_dist: None,
-            particle_y_dist: None,
-            particle_duration_dist: None,
-            particle_size_dist: None,
+            model,
         }
     }
 }
@@ -60,94 +52,106 @@ impl ScriptParticleGenerator {
 impl UserData for ScriptParticleGenerator {
     fn add_methods(methods: &mut UserDataMethods<Self>) {
         methods.add_method("activate", &activate);
-        methods.add_method("fixed_param", |_, _, value: f32| Ok(Param::fixed(value)));
-        methods.add_method("speed_param", |_, _, (value, dt): (f32, f32)| Ok(Param::with_speed(value, dt)));
-        methods.add_method("accel_param", |_, _, (value, dt, d2t): (f32, f32, f32)| {
-            Ok(Param::with_accel(value, dt, d2t))
-        });
+        methods.add_method("param", &param);
+        methods.add_method("dist_param", &dist_param);
         methods.add_method("zero_dist", |_, _, _: ()| Ok(Dist::create_fixed(0.0)));
         methods.add_method("fixed_dist", |_, _, value: f32| Ok(Dist::create_fixed(value)));
         methods.add_method("uniform_dist", |_, _, (min, max): (f32, f32)| Ok(Dist::create_uniform(min, max)));
+        methods.add_method_mut("set_initial_gen", |_, gen, value: f32| {
+            gen.model.initial_overflow = value;
+            Ok(())
+        });
+        methods.add_method_mut("set_moves_with_parent", |_, gen, _args: ()| {
+            gen.model.moves_with_parent = true;
+            Ok(())
+        });
         methods.add_method_mut("set_gen_rate", |_, gen, rate: Param| {
-            gen.gen_rate = Some(rate);
+            gen.model.gen_rate = rate;
             Ok(())
         });
         methods.add_method_mut("set_position", |_, gen, (x, y): (Param, Param)| {
-            gen.position = Some((x, y));
+            gen.model.position = (x, y);
             Ok(())
         });
         methods.add_method_mut("set_callback", |_, gen, cb: CallbackData| {
             gen.callback = Some(cb);
             Ok(())
         });
-        methods.add_method_mut("set_particle_x_dist", |_, gen, (value, dt, d2t): (Dist, Dist, Dist)| {
-            gen.particle_x_dist = Some(DistParam::new(value, dt, d2t));
+        methods.add_method_mut("set_particle_x_dist", |_, gen, value: DistParam| {
+            gen.model.particle_x_dist = Some(value);
             Ok(())
         });
-        methods.add_method_mut("set_particle_y_dist", |_, gen, (value, dt, d2t): (Dist, Dist, Dist)| {
-            gen.particle_y_dist = Some(DistParam::new(value, dt, d2t));
+        methods.add_method_mut("set_particle_y_dist", |_, gen, value: DistParam| {
+            gen.model.particle_y_dist = Some(value);
             Ok(())
         });
         methods.add_method_mut("set_particle_duration_dist", |_, gen, value: Dist| {
-            gen.particle_duration_dist = Some(value);
+            gen.model.particle_duration_dist = Some(value);
             Ok(())
         });
         methods.add_method_mut("set_particle_size_dist", |_, gen, (width, height): (Dist, Dist)| {
-            gen.particle_size_dist = Some((width, height));
+            gen.model.particle_size_dist = Some((width, height));
             Ok(())
         });
     }
 }
 
-fn activate(_lua: &Lua, gen: &ScriptParticleGenerator, _args: ()) -> Result<()> {
-    let area_state = GameState::area_state();
+fn dist_param(_lua: &Lua, _: &ScriptParticleGenerator,
+              (value, dt, d2t, d3t) : (Dist, Option<Dist>, Option<Dist>, Option<Dist>)) -> Result<DistParam> {
+    if dt.is_none() {
+        Ok(DistParam::new(value, Dist::create_fixed(0.0), Dist::create_fixed(0.0), Dist::create_fixed(0.0)))
+    } else if d2t.is_none() {
+        Ok(DistParam::new(value, dt.unwrap(), Dist::create_fixed(0.0), Dist::create_fixed(0.0)))
+    } else if d3t.is_none() {
+        Ok(DistParam::new(value, dt.unwrap(), d2t.unwrap(), Dist::create_fixed(0.0)))
+    } else {
+        Ok(DistParam::new(value, dt.unwrap(), d2t.unwrap(), d3t.unwrap()))
+    }
+}
 
+fn param(_lua: &Lua, _: &ScriptParticleGenerator,
+         (value, dt, d2t, d3t): (f32, Option<f32>, Option<f32>, Option<f32>)) -> Result<Param> {
+    if dt.is_none() {
+        Ok(Param::fixed(value))
+    } else if d2t.is_none() {
+        Ok(Param::with_speed(value, dt.unwrap()))
+    } else if d3t.is_none() {
+        Ok(Param::with_accel(value, dt.unwrap(), d2t.unwrap()))
+    } else {
+        Ok(Param::with_jerk(value, dt.unwrap(), d2t.unwrap(), d3t.unwrap()))
+    }
+}
+
+fn activate(_lua: &Lua, gen: &ScriptParticleGenerator, _args: ()) -> Result<()> {
+    let pgen = create_pgen(gen)?;
+
+    GameState::add_animation(Box::new(pgen));
+
+    Ok(())
+}
+
+pub fn create_pgen(gen: &ScriptParticleGenerator) -> Result<ParticleGenerator> {
+    let area_state = GameState::area_state();
     let parent = area_state.borrow().get_entity(gen.parent);
-    let sprite = match ResourceSet::get_sprite(&gen.sprite) {
-        Ok(sprite) => sprite,
-        Err(_) => {
-            warn!("Unable to locate sprite '{}' for particle generator", gen.sprite);
+
+    let image = match ResourceSet::get_image(&gen.image) {
+        Some(image) => image,
+        None => {
+            warn!("Unable to locate image '{}' for particle generator", gen.image);
             return Err(rlua::Error::FromLuaConversionError {
                 from: "ScriptParticleGenerator",
                 to: "ParticleGenerator",
-                message: Some("Sprite not found".to_string()),
+                message: Some("Image not found".to_string()),
             });
         }
     };
-    let duration = (gen.duration_secs * 1000.0) as u32;
 
-    let mut pgen = ParticleGenerator::new(parent, duration, sprite);
-
-    if let Some(ref rate) = gen.gen_rate {
-        pgen.set_gen_rate(rate.clone());
-    }
-
-    if let Some(&(ref x, ref y)) = gen.position.as_ref() {
-        pgen.set_position(x.clone(), y.clone());
-    }
+    let mut pgen = ParticleGenerator::new(parent, image, gen.model.clone());
 
     if let Some(ref cb) = gen.callback {
         pgen.set_callback(Some(Box::new(cb.clone())));
     }
 
-    if let Some(ref dist) = gen.particle_x_dist {
-        pgen.set_particle_x_dist(dist.clone());
-    }
-
-    if let Some(ref dist) = gen.particle_y_dist {
-        pgen.set_particle_y_dist(dist.clone());
-    }
-
-    if let Some(ref dist) = gen.particle_duration_dist {
-        pgen.set_particle_duration_dist(dist.clone());
-    }
-
-    if let Some(&(ref width, ref height)) = gen.particle_size_dist.as_ref() {
-        pgen.set_particle_size_dist(width.clone(), height.clone());
-    }
-
-    GameState::add_animation(Box::new(pgen));
-
-    Ok(())
+    Ok(pgen)
 }
 

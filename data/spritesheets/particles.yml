@@ -1,9 +1,22 @@
 id: particles
 src: "particles.png"
 size: [ 128, 128 ]
+simple_image_gen_scale: 4
 groups:
   misc:
     areas:
       circle16: [0, 0, 16, 16]
       circle4: [4, 20, 4, 4]
       circle8: [0, 28, 8, 8]
+  firebolt:
+    size: [8, 8]
+    position: [20, 0]
+    areas:
+      firebolt1: [0, 0]
+      firebolt2: [8, 0]
+      firebolt3: [16, 0]
+      firebolt4: [24, 0]
+      firebolt5: [32, 0]
+      firebolt6: [40, 0]
+      firebolt7: [48, 0]
+      firebolt8: [56, 0]

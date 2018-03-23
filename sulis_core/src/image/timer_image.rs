@@ -46,7 +46,7 @@ impl TimerImage {
         let mut size: Option<Size> = None;
         for id in builder.frames {
             let image = match images.get(&id) {
-                None => return invalid_data_error(&format!("Unable to locate frame {}", id)),
+                None => return invalid_data_error(&format!("Unable to locate image for frame {}", id)),
                 Some(image) => image,
             };
 

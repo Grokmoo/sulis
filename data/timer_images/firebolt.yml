@@ -1,0 +1,11 @@
+id: firebolt
+frame_time_millis: 76
+frames:
+  - particles/firebolt1
+  - particles/firebolt2
+  - particles/firebolt3
+  - particles/firebolt4
+  - particles/firebolt5
+  - particles/firebolt6
+  - particles/firebolt7
+  - particles/firebolt8

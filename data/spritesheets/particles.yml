@@ -1,0 +1,9 @@
+id: particles
+src: "particles.png"
+size: [ 128, 128 ]
+groups:
+  misc:
+    areas:
+      circle16: [0, 0, 16, 16]
+      circle4: [4, 20, 4, 4]
+      circle8: [0, 28, 8, 8]

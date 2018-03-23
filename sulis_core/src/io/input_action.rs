@@ -28,9 +28,12 @@ pub enum InputAction {
     ToggleCharacter,
     ShowMenu,
     EndTurn,
+    ScrollUp,
+    ScrollDown,
     MouseMove(f32, f32),
     MouseDown(ClickKind),
     MouseUp(ClickKind),
+    MouseScroll(i32),
     CharReceived(char),
 }
 
@@ -53,7 +56,16 @@ impl InputAction {
             MouseMove(x, y) => Cursor::move_to(&root, x, y),
             MouseDown(kind) => Cursor::press(&root, kind),
             MouseUp(kind) => Cursor::release(&root, kind),
-            CharReceived(c) => { Widget::dispatch_event(&root, Event::new(Kind::CharTyped(c))); },
+            MouseScroll(scroll) => {
+                if scroll > 0 {
+                    InputAction::fire_action(ScrollUp, root);
+                } else {
+                    InputAction::fire_action(ScrollDown, root);
+                }
+            },
+            CharReceived(c) => {
+                Widget::dispatch_event(&root, Event::new(Kind::CharTyped(c)));
+            },
             _ => InputAction::fire_action(action, root),
         }
     }

@@ -4,6 +4,12 @@
 display:
     # Glium is the only choice for now
     adapter: Glium
+    
+    # Display Mode - Fullscreen, BorderlessWindow, Window
+    mode: Window
+    
+    # Which monitor to display on, starting from 0
+    monitor: 0
 
     # size of the graphical display in pixels
     width_pixels: 1600
@@ -44,6 +50,8 @@ input:
         KeyI: ToggleInventory
         KeyC: ToggleCharacter
         KeySpace: EndTurn
+        KeyMinus: ScrollDown
+        KeyEquals: ScrollUp
 
 logging:
     # Log level may be error, warn, info, debug, or trace

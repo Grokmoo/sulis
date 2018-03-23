@@ -25,6 +25,9 @@ pub use self::melee_attack_animation::MeleeAttackAnimation;
 mod move_animation;
 pub use self::move_animation::MoveAnimation;
 
+pub mod particle_generator;
+pub use self::particle_generator::ParticleGenerator;
+
 mod ranged_attack_animation;
 pub use self::ranged_attack_animation::RangedAttackAnimation;
 

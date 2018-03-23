@@ -622,8 +622,6 @@ impl Widget {
                 widget_kind.borrow_mut().on_mouse_move(widget, delta_x, delta_y),
             MouseDrag { button: kind, delta_x, delta_y } =>
                 widget_kind.borrow_mut().on_mouse_drag(widget, kind, delta_x, delta_y),
-            MouseScroll { scroll } =>
-                widget_kind.borrow_mut().on_mouse_scroll(widget, scroll),
             KeyPress(action) =>
                 widget_kind.borrow_mut().on_key_press(widget, action),
             MouseEnter => enter_exit_retval,

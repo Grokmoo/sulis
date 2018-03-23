@@ -14,11 +14,12 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::io::{Error, ErrorKind};
 use std::collections::HashMap;
 use std::cell::{Ref, RefCell};
 use std::rc::Rc;
 
-use config::CONFIG;
+use config::{CONFIG, DisplayMode};
 use io::*;
 use io::keyboard_event::Key;
 use io::event::ClickKind;
@@ -240,16 +241,53 @@ impl<'a> GraphicsRenderer for GliumRenderer<'a> {
     }
 }
 
+fn glium_error<E: ::std::fmt::Display>(e: E) -> Result<GliumDisplay, Error> {
+    Err(Error::new(ErrorKind::Other, format!("{}", e)))
+}
+
+fn get_monitor(events_loop: &glium::glutin::EventsLoop) -> Option<glium::glutin::MonitorId> {
+    let target_monitor = CONFIG.display.monitor;
+    for (index, monitor) in events_loop.get_available_monitors().enumerate() {
+        if index == target_monitor { return Some(monitor); }
+    }
+    warn!("Unable to find a monitor with configured index {}", target_monitor);
+    None
+}
+
 impl GliumDisplay {
-    pub fn new() -> GliumDisplay {
+    pub fn new() -> Result<GliumDisplay, Error> {
         debug!("Initialize Glium Display adapter.");
         let events_loop = glium::glutin::EventsLoop::new();
+        let monitor = get_monitor(&events_loop);
+
+        let (fullscreen, decorations) = match CONFIG.display.mode {
+            DisplayMode::Window => (None, true),
+            DisplayMode::BorderlessWindow => (None, false),
+            DisplayMode::Fullscreen => (monitor.clone(), false),
+        };
+
         let window = glium::glutin::WindowBuilder::new()
             .with_dimensions(CONFIG.display.width_pixels, CONFIG.display.height_pixels)
-            .with_title("Sulis");
+            .with_title("Sulis")
+            .with_decorations(decorations)
+            .with_fullscreen(fullscreen);
 
-        let context = ContextBuilder::new().with_gl_robustness(Robustness::NotRobust);
-        let display = glium::Display::new(window, context, &events_loop).unwrap();
+        let context = ContextBuilder::new()
+            .with_gl_robustness(Robustness::NoError)
+            .with_gl_debug_flag(false)
+            .with_multisampling(0)
+            .with_pixel_format(24, 8);
+
+        let display = match glium::Display::new(window, context, &events_loop) {
+            Ok(display) => display,
+            Err(e) => return glium_error(e),
+        };
+
+        if let Some(ref monitor) = monitor {
+            let (x, y) = monitor.get_position();
+            display.gl_window().set_position(x, y);
+        }
+
         info!("Initialized glium adapter:");
         info!("Version: {}", display.get_opengl_version_string());
         info!("Vendor: {}", display.get_opengl_vendor_string());
@@ -258,14 +296,25 @@ impl GliumDisplay {
         info!("Video memory available: {:?}", display.get_free_video_memory());
         trace!("Extensions: {:#?}", display.get_context().get_extensions());
         trace!("Capabilities: {:?}", display.get_context().get_capabilities());
-        let base_program = glium::Program::from_source(&display, VERTEX_SHADER_SRC,
-                                                  FRAGMENT_SHADER_SRC, None).unwrap();
-        let swap_program = glium::Program::from_source(&display, VERTEX_SHADER_SRC,
-                                                       SWAP_FRAGMENT_SHADER_SRC, None).unwrap();
 
-        display.gl_window().set_cursor_state(CursorState::Hide).unwrap();
+        let base_program = match glium::Program::from_source(&display, VERTEX_SHADER_SRC,
+                                                  FRAGMENT_SHADER_SRC, None) {
+            Ok(prog) => prog,
+            Err(e) => return glium_error(e),
+        };
 
-        GliumDisplay {
+        let swap_program = match glium::Program::from_source(&display, VERTEX_SHADER_SRC,
+                                                       SWAP_FRAGMENT_SHADER_SRC, None) {
+            Ok(prog) => prog,
+            Err(e) => return glium_error(e),
+        };
+
+        match display.gl_window().set_cursor_state(CursorState::Hide) {
+            Ok(()) => (),
+            Err(e) => return glium_error(e),
+        };
+
+        Ok(GliumDisplay {
             display,
             events_loop,
             base_program,
@@ -277,7 +326,7 @@ impl GliumDisplay {
                 [-1.0 , -1.0, 0.0, 1.0f32],
             ],
             textures: HashMap::new(),
-        }
+        })
     }
 }
 
@@ -355,6 +404,23 @@ fn process_window_event(event: glutin::WindowEvent) -> Option<InputAction> {
                 glium::glutin::ElementState::Released => Some(InputAction::MouseUp(kind)),
             }
         },
+        MouseWheel { delta, .. } => {
+            let amount = match delta {
+                glium::glutin::MouseScrollDelta::LineDelta(_, y) => y,
+                glium::glutin::MouseScrollDelta::PixelDelta(_, y) => y,
+            };
+
+            // scrolling the mouse wheeel seems to be buggy at the moment, only take some events
+            let amount = if amount == 1.0 {
+                1
+            } else if amount == -1.0 {
+                -1
+            } else {
+                return None;
+            };
+
+            Some(InputAction::MouseScroll(amount))
+        }
         _ => None,
     }
 }
@@ -413,7 +479,7 @@ fn process_keyboard_input(input: glutin::KeyboardInput) -> Option<KeyboardEvent>
         Space => KeySpace,
         Return => KeyEnter,
         Grave => KeyGrave,
-        Minus => KeyMinus,
+        Minus | Subtract => KeyMinus,
         Equals => KeyEquals,
         LBracket => KeyLeftBracket,
         RBracket => KeyRightBracket,

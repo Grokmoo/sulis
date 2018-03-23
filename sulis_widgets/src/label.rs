@@ -93,10 +93,6 @@ impl WidgetKind for Label {
         false
     }
 
-    fn on_mouse_scroll(&mut self, _widget: &Rc<RefCell<Widget>>, _scroll: i32) -> bool {
-        false
-    }
-
     fn layout(&mut self, widget: &mut Widget) {
         if let Some(ref text) = self.text {
             widget.state.add_text_arg("0", text);

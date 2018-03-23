@@ -46,6 +46,7 @@ struct HoverSprite {
 const NAME: &'static str = "area";
 
 pub struct AreaView {
+    user_scale: f32,
     scale: (f32, f32),
     cache_invalid: bool,
     layers: Vec<String>,
@@ -65,6 +66,7 @@ const AERIAL_LAYER_ID: &str = "__aerial_layer__";
 impl AreaView {
     pub fn new() -> Rc<RefCell<AreaView>> {
         Rc::new(RefCell::new(AreaView {
+            user_scale: 1.0,
             scale: (1.0, 1.0),
             hover_sprite: None,
             cache_invalid: true,
@@ -75,11 +77,17 @@ impl AreaView {
 
     pub fn center_scroll_on(&mut self, entity: &Rc<RefCell<EntityState>>, area_width: i32,
                             area_height: i32, widget: &Widget) {
+        let x = entity.borrow().location.x as f32 + entity.borrow().size.width as f32 / 2.0;
+        let y = entity.borrow().location.y as f32 + entity.borrow().size.height as f32 / 2.0;
+
+        self.center_scroll_on_point(x, y, area_width, area_height, widget);
+    }
+
+    fn center_scroll_on_point(&mut self, x: f32, y: f32, area_width: i32,
+                              area_height: i32, widget: &Widget) {
         let (scale_x, scale_y) = self.scale;
         self.scroll.compute_max(widget, area_width, area_height, scale_x, scale_y);
 
-        let x = entity.borrow().location.x as f32 + entity.borrow().size.width as f32 / 2.0;
-        let y = entity.borrow().location.y as f32 + entity.borrow().size.height as f32 / 2.0;
         let x = x - widget.state.inner_width() as f32 / scale_x / 2.0;
         let y = y - widget.state.inner_height() as f32 / scale_y / 2.0;
 
@@ -261,9 +269,45 @@ impl WidgetKind for AreaView {
         Vec::with_capacity(0)
     }
 
+    fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
+        use sulis_core::io::InputAction::*;
+        let delta = match key {
+            ScrollUp => 0.1,
+            ScrollDown => -0.1,
+            _ => return false,
+        };
+
+        let old_user_scale = self.user_scale;
+
+        self.user_scale += delta;
+        if self.user_scale < 0.7 { self.user_scale = 0.7; }
+        else if self.user_scale > 1.8 { self.user_scale = 1.8; }
+
+        // recenter the view based on the scroll change
+        let (old_scale_x, old_scale_y) = self.scale;
+        self.scale = (old_scale_x / old_user_scale * self.user_scale,
+                      old_scale_y / old_user_scale * self.user_scale);
+
+        let width = widget.borrow().state.inner_width() as f32;
+        let height = widget.borrow().state.inner_height() as f32;
+
+        let x = self.scroll.x() + width / old_scale_x / 2.0;
+        let y = self.scroll.y() + height / old_scale_y / 2.0;
+
+        let area_state = GameState::area_state();
+        let area_width = area_state.borrow().area.width;
+        let area_height = area_state.borrow().area.height;
+        self.center_scroll_on_point(x, y, area_width, area_height, &*widget.borrow());
+        true
+    }
+
     fn draw_graphics_mode(&mut self, renderer: &mut GraphicsRenderer, pixel_size: Point,
                           widget: &Widget, millis: u32) {
-        self.scale = compute_area_scaling(pixel_size);
+        {
+            let (sx, sy) = compute_area_scaling(pixel_size);
+            self.scale = (sx * self.user_scale, sy * self.user_scale);
+        }
+
         let (scale_x, scale_y) = self.scale;
 
         let area_state = GameState::area_state();

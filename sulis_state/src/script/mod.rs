@@ -25,6 +25,9 @@ mod script_entity;
 use self::script_entity::ScriptEntity;
 use self::script_entity::ScriptEntitySet;
 
+mod script_particle_generator;
+use self::script_particle_generator::ScriptParticleGenerator;
+
 pub mod targeter;
 use self::targeter::TargeterData;
 

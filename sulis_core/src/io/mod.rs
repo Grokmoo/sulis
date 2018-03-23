@@ -265,7 +265,9 @@ pub fn get_auto_adapter() -> Result<Box<IO>, Error> {
 }
 
 pub fn get_glium_adapter() -> Result<Box<IO>, Error> {
-    Ok(Box::new(glium_adapter::GliumDisplay::new()))
+    let adapter = glium_adapter::GliumDisplay::new()?;
+
+    Ok(Box::new(adapter))
 }
 
 #[cfg(target_os = "windows")]

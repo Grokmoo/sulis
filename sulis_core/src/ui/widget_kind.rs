@@ -48,10 +48,6 @@ impl WidgetKind for EmptyWidget {
                      _delta_x: f32, _delta_y: f32) -> bool {
         false
     }
-
-    fn on_mouse_scroll(&mut self, _widget: &Rc<RefCell<Widget>>, _scroll: i32) -> bool {
-        false
-    }
 }
 
 /// Trait for implementations of different Widgets.  This is held by a 'WidgetState'
@@ -129,10 +125,6 @@ pub trait WidgetKind {
 
     fn on_mouse_drag(&mut self, _widget: &Rc<RefCell<Widget>>, _kind: ClickKind,
                      _delta_x: f32, _delta_y: f32) -> bool {
-        true
-    }
-
-    fn on_mouse_scroll(&mut self, _widget: &Rc<RefCell<Widget>>, _scroll: i32) -> bool {
         true
     }
 

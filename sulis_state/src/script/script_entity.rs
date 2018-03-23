@@ -23,7 +23,7 @@ use rlua::{self, Lua, UserData, UserDataMethods};
 use sulis_rules::{AttackKind, DamageKind, Attack};
 use sulis_module::Faction;
 use {EntityState, GameState};
-use script::{CallbackData, Result, ScriptAbility, ScriptEffect, TargeterData};
+use script::{CallbackData, Result, ScriptAbility, ScriptEffect, ScriptParticleGenerator, TargeterData};
 
 #[derive(Clone)]
 pub struct ScriptEntity {
@@ -52,6 +52,12 @@ impl UserData for ScriptEntity {
             let duration = args.1;
             let ability = args.0;
             Ok(ScriptEffect::new(entity.index, &ability, duration))
+        });
+
+        methods.add_method("create_particle_generator", |_, entity, args: (String, f32)| {
+            let duration_secs = args.1;
+            let sprite = args.0;
+            Ok(ScriptParticleGenerator::new(entity.index, sprite, duration_secs))
         });
 
         methods.add_method("create_targeter", |_, entity, ability: ScriptAbility| {
@@ -96,6 +102,28 @@ impl UserData for ScriptEntity {
         });
 
         methods.add_method("stats", &create_stats_table);
+
+        methods.add_method("x", |_, entity, ()| {
+            let area_state = GameState::area_state();
+            let entity = area_state.borrow().get_entity(entity.index);
+            let x = entity.borrow().location.x as f32 + entity.borrow().size.width as f32 / 2.0;
+            Ok(x)
+        });
+
+        methods.add_method("y", |_, entity, ()| {
+            let area_state = GameState::area_state();
+            let entity = area_state.borrow().get_entity(entity.index);
+            let y = entity.borrow().location.y as f32 + entity.borrow().size.height as f32 / 2.0;
+            Ok(y)
+        });
+
+        methods.add_method("dist", |_, entity, target: ScriptEntity| {
+            let area_state = GameState::area_state();
+            let entity = area_state.borrow().get_entity(entity.index);
+            let target = area_state.borrow().get_entity(target.index);
+            let entity = entity.borrow();
+            Ok(entity.dist_to_entity(&target))
+        });
     }
 }
 

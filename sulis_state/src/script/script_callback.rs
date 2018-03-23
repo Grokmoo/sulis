@@ -24,11 +24,14 @@ use GameState;
 
 const BEFORE_ATTACK: &str = "before_attack";
 const AFTER_ATTACK: &str = "after_attack";
+const ON_ANIM_COMPLETE: &str = "on_anim_complete";
 
 pub trait ScriptCallback {
     fn before_attack(&self) { }
 
     fn after_attack(&self) { }
+
+    fn on_anim_complete(&self) { }
 }
 
 #[derive(Clone)]
@@ -69,6 +72,12 @@ impl ScriptCallback for CallbackData {
     fn after_attack(&self) {
         if self.funcs.contains(AFTER_ATTACK) {
             self.do_callback(AFTER_ATTACK);
+        }
+    }
+
+    fn on_anim_complete(&self) {
+        if self.funcs.contains(ON_ANIM_COMPLETE) {
+            self.do_callback(ON_ANIM_COMPLETE);
         }
     }
 }

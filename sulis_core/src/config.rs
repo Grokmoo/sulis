@@ -71,6 +71,8 @@ pub struct LoggingConfig {
 #[serde(deny_unknown_fields)]
 pub struct DisplayConfig {
     pub adapter: IOAdapter,
+    pub mode: DisplayMode,
+    pub monitor: usize,
     pub frame_rate: u32,
     pub animation_base_time_millis: u32,
     pub width: i32,
@@ -79,6 +81,14 @@ pub struct DisplayConfig {
     pub height_pixels: u32,
     pub default_font: String,
     pub default_cursor: String,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+#[serde(deny_unknown_fields)]
+pub enum DisplayMode {
+    Window,
+    BorderlessWindow,
+    Fullscreen,
 }
 
 #[derive(Debug, Deserialize, Clone)]

@@ -127,6 +127,7 @@ impl animation::Animation for MoveAnimation {
         let area_state = GameState::area_state();
 
         if !area_state.borrow_mut().move_entity(&self.mover, p.x, p.y, move_ap as u32) {
+            self.mover.borrow_mut().sub_pos = (0.0, 0.0);
             return false;
         }
 

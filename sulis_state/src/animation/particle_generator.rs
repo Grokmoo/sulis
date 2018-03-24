@@ -150,7 +150,7 @@ impl GeneratorModel {
             blue: Param::fixed(1.0),
             alpha: Param::fixed(1.0),
             moves_with_parent: false,
-            gen_rate: Param::fixed(1.0),
+            gen_rate: Param::fixed(0.0),
             initial_overflow: 0.0,
             particle_x_dist: None,
             particle_y_dist: None,

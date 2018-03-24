@@ -33,10 +33,9 @@ function before_attack(parent, ability, targets)
   effect:add_damage(10, 15)
   effect:apply()
   
-  gen = target:create_anim("slash", 1.0)
+  gen = target:create_anim("burst", 0.15)
   gen:set_moves_with_parent()
   gen:set_position(gen:param(-0.75), gen:param(-0.75))
   gen:set_particle_size_dist(gen:fixed_dist(1.5), gen:fixed_dist(1.5))
-  gen:set_color(gen:param(1.0), gen:param(0.1), gen:param(0.1))
   gen:activate()
 end

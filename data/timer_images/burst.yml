@@ -1,5 +1,5 @@
-id: slash
-frame_time_millis: 200
+id: burst
+frame_time_millis: 30
 frames:
   - particles/slash1
   - particles/slash2

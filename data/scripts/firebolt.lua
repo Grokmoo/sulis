@@ -11,7 +11,7 @@ function on_target_select(parent, ability, targets)
   
   speed = 10.0
   dist = parent:dist(target)
-  duration = dist / speed
+  duration = 0.5 + dist / speed
   vx = (target:x() - parent:x()) / duration
   vy = (target:y() - parent:y()) / duration
   
@@ -36,4 +36,13 @@ end
 function on_anim_complete(parent, ability, targets)
   target = targets:first()
   parent:special_attack(target, "Reflex", 20, 30, "Fire")
+  
+  gen = target:create_particle_generator("fire_particle", 0.6)
+  gen:set_initial_gen(50.0)
+  gen:set_position(gen:param(target:x()), gen:param(target:y()))
+  gen:set_particle_size_dist(gen:fixed_dist(0.3), gen:fixed_dist(0.3))
+  gen:set_particle_x_dist(gen:dist_param(gen:uniform_dist(-0.2, 0.2), gen:uniform_dist(-5.0, 5.0)))
+  gen:set_particle_y_dist(gen:dist_param(gen:uniform_dist(-0.2, 0.2), gen:uniform_dist(-5.0, 5.0), gen:fixed_dist(10.0)))
+  gen:set_particle_duration_dist(gen:fixed_dist(0.6))
+  gen:activate()
 end

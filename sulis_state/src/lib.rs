@@ -100,6 +100,7 @@ thread_local! {
     static ENTERING_COMBAT: RefCell<bool> = RefCell::new(false);
     static SCRIPT: ScriptState = ScriptState::new();
     static ANIMATIONS: RefCell<Vec<Box<Animation>>> = RefCell::new(Vec::new());
+    static ANIMS_TO_ADD: RefCell<Vec<Box<Animation>>> = RefCell::new(Vec::new());
 }
 
 pub struct GameStateMainLoopUpdater { }
@@ -119,7 +120,6 @@ pub struct GameState {
     area_state: Rc<RefCell<AreaState>>,
     pc: Rc<RefCell<EntityState>>,
     should_exit: bool,
-    // animations: Vec<Box<Animation>>,
     path_finder: PathFinder,
 }
 
@@ -343,8 +343,18 @@ impl GameState {
     }
 
     pub fn update(root: &Rc<RefCell<Widget>>, millis: u32) {
+        let mut anims_to_add: Vec<Box<Animation>> = ANIMS_TO_ADD.with(|a| {
+            let mut anims = a.borrow_mut();
+
+            let to_add = anims.drain(0..).collect();
+
+            to_add
+        });
+
         ANIMATIONS.with(|a| {
             let mut anims = a.borrow_mut();
+
+            anims.append(&mut anims_to_add);
 
             let mut i = 0;
             while i < anims.len() {
@@ -413,7 +423,7 @@ impl GameState {
     }
 
     pub fn add_animation(anim: Box<Animation>) {
-        ANIMATIONS.with(|a| {
+        ANIMS_TO_ADD.with(|a| {
             let mut anims = a.borrow_mut();
 
             anims.push(anim);

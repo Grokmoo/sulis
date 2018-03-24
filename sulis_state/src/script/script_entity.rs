@@ -62,6 +62,11 @@ impl UserData for ScriptEntity {
             Ok(ScriptParticleGenerator::new(entity.index, sprite, duration_secs))
         });
 
+        methods.add_method("create_anim", |_, entity, (image, duration): (String, Option<f32>)| {
+            let duration = duration.unwrap_or(f32::INFINITY);
+            Ok(ScriptParticleGenerator::new_anim(entity.index, image, duration))
+        });
+
         methods.add_method("create_targeter", |_, entity, ability: ScriptAbility| {
             Ok(TargeterData::new(entity.index, &ability.id))
         });

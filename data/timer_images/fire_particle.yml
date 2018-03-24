@@ -1,0 +1,11 @@
+id: fire_particle
+frame_time_millis: 76
+frames:
+  - particles/fire1
+  - particles/fire2
+  - particles/fire3
+  - particles/fire4
+  - particles/fire5
+  - particles/fire6
+  - particles/fire7
+  - particles/fire8

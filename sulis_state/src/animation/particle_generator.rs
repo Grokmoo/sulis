@@ -23,7 +23,7 @@ use std::time::Instant;
 
 use sulis_core::image::Image;
 use sulis_core::io::{DrawList, GraphicsRenderer};
-use sulis_core::ui::{animation_state, Widget};
+use sulis_core::ui::{animation_state, Color, Widget};
 use sulis_core::util;
 
 use {animation, ChangeListener, Effect, EntityState, ScriptCallback};
@@ -124,6 +124,10 @@ impl Param {
 #[derive(Clone)]
 pub struct GeneratorModel {
     pub position: (Param, Param),
+    pub red: Param,
+    pub green: Param,
+    pub blue: Param,
+    pub alpha: Param,
     pub moves_with_parent: bool,
     pub duration_secs: f32,
     pub gen_rate: Param,
@@ -141,6 +145,10 @@ impl GeneratorModel {
         GeneratorModel {
             duration_secs,
             position: (Param::fixed(x), Param::fixed(y)),
+            red: Param::fixed(1.0),
+            green: Param::fixed(1.0),
+            blue: Param::fixed(1.0),
+            alpha: Param::fixed(1.0),
             moves_with_parent: false,
             gen_rate: Param::fixed(1.0),
             initial_overflow: 0.0,
@@ -274,6 +282,10 @@ impl animation::Animation for ParticleGenerator {
         self.model.gen_rate.update(v_term, a_term, j_term);
         self.model.position.0.update(v_term, a_term, j_term);
         self.model.position.1.update(v_term, a_term, j_term);
+        self.model.red.update(v_term, a_term, j_term);
+        self.model.green.update(v_term, a_term, j_term);
+        self.model.blue.update(v_term, a_term, j_term);
+        self.model.alpha.update(v_term, a_term, j_term);
 
         let mut i = self.particles.len();
         loop {
@@ -323,6 +335,8 @@ impl animation::Animation for ParticleGenerator {
 
         if !draw_list.is_empty() {
             draw_list.set_scale(scale_x, scale_y);
+            draw_list.set_color(Color::new(self.model.red.value, self.model.green.value,
+                                           self.model.blue.value, self.model.alpha.value));
             renderer.draw(draw_list);
         }
     }

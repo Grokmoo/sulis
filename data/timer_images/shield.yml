@@ -1,0 +1,11 @@
+id: shield
+frame_time_millis: 200
+frames:
+  - particles/shield1
+  - particles/shield2
+  - particles/shield3
+  - particles/shield4
+  - particles/shield5
+  - particles/shield4
+  - particles/shield3
+  - particles/shield2

@@ -47,6 +47,13 @@ impl ScriptParticleGenerator {
             model,
         }
     }
+
+    pub fn new_anim(parent: usize, image: String, duration_secs: f32) -> ScriptParticleGenerator {
+        let mut pgen = ScriptParticleGenerator::new(parent, image, duration_secs);
+        pgen.model.initial_overflow = 1.0;
+        pgen.model.gen_rate = Param::fixed(0.0);
+        pgen
+    }
 }
 
 impl UserData for ScriptParticleGenerator {
@@ -71,6 +78,15 @@ impl UserData for ScriptParticleGenerator {
         });
         methods.add_method_mut("set_position", |_, gen, (x, y): (Param, Param)| {
             gen.model.position = (x, y);
+            Ok(())
+        });
+        methods.add_method_mut("set_color", |_, gen, (r, g, b, a): (Param, Param, Param, Option<Param>)| {
+            gen.model.red = r;
+            gen.model.green = g;
+            gen.model.blue = b;
+            if let Some(a) = a {
+                gen.model.alpha = a;
+            }
             Ok(())
         });
         methods.add_method_mut("set_callback", |_, gen, cb: CallbackData| {

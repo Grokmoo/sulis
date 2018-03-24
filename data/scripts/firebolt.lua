@@ -19,7 +19,7 @@ function on_target_select(parent, ability, targets)
   cb:add_target(target)
   cb:register_fn("on_anim_complete")
   
-  gen = parent:create_particle_generator("firebolt", duration)
+  gen = parent:create_particle_generator("fire_particle", duration)
   gen:set_position(gen:param(parent:x(), vx), gen:param(parent:y(), vy))
   gen:set_gen_rate(gen:param(70.0))
   gen:set_initial_gen(35.0)

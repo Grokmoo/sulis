@@ -33,6 +33,7 @@ pub struct ActorState {
     pub listeners: ChangeListenerList<ActorState>,
     hp: i32,
     ap: u32,
+    overflow_ap: i32,
     xp: u32,
     has_level_up: bool,
     inventory: Inventory,
@@ -69,6 +70,7 @@ impl ActorState {
             listeners: ChangeListenerList::default(),
             hp: 0,
             ap: 0,
+            overflow_ap: 0,
             xp,
             has_level_up: false,
             image,
@@ -339,6 +341,28 @@ impl ActorState {
         rules.movement_ap * squares
     }
 
+    pub fn set_overflow_ap(&mut self, ap: i32) {
+        let rules = Module::rules();
+        self.overflow_ap = ap;
+
+        if self.overflow_ap > rules.max_overflow_ap {
+            self.overflow_ap = rules.max_overflow_ap;
+        } else if self.overflow_ap < rules.min_overflow_ap {
+            self.overflow_ap = rules.min_overflow_ap;
+        }
+    }
+
+    pub fn change_overflow_ap(&mut self, ap: i32) {
+        let rules = Module::rules();
+        self.overflow_ap += ap;
+
+        if self.overflow_ap > rules.max_overflow_ap {
+            self.overflow_ap = rules.max_overflow_ap;
+        } else if self.overflow_ap < rules.min_overflow_ap {
+            self.overflow_ap = rules.min_overflow_ap;
+        }
+    }
+
     pub(crate) fn remove_ap(&mut self, ap: u32) {
         if ap > self.ap {
             self.ap = 0;
@@ -394,19 +418,30 @@ impl ActorState {
     }
 
     pub fn init_turn(&mut self) {
-        let base_ap = Module::rules().base_ap;
+        let rules = Module::rules();
 
-        if self.ap != base_ap {
-            self.ap = base_ap;
-            self.listeners.notify(&self);
+        let mut ap = rules.base_ap as i32 + self.overflow_ap;
+
+        if ap < 0 {
+            ap = 0;
+            self.overflow_ap += rules.base_ap as i32;
+        } else {
+            self.overflow_ap = 0;
         }
+
+        self.ap = ap as u32;
+        self.listeners.notify(&self);
     }
 
     pub fn end_turn(&mut self) {
-        if self.ap != 0 {
-            self.ap = 0;
-            self.listeners.notify(&self);
+        let max_overflow_ap = Module::rules().max_overflow_ap;
+        self.overflow_ap += self.ap as i32;
+        if self.overflow_ap > max_overflow_ap {
+            self.overflow_ap = max_overflow_ap;
         }
+
+        self.ap = 0;
+        self.listeners.notify(&self);
     }
 
     pub fn compute_stats(&mut self) {

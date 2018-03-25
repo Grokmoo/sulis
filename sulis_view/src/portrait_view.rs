@@ -20,14 +20,11 @@ use std::cell::RefCell;
 
 use sulis_state::{ChangeListener, EntityState};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_module::Module;
 use sulis_widgets::{Button, Label, ProgressBar};
 
-use CharacterBuilder;
+use {CharacterBuilder};
 
 pub const NAME: &str = "portrait_view";
-
-const AP_BALLS: u32 = 4;
 
 pub struct PortraitView {
     entity: Rc<RefCell<EntityState>>,
@@ -42,11 +39,7 @@ impl PortraitView {
 }
 
 impl WidgetKind for PortraitView {
-    fn get_name(&self) -> &str { NAME }
-
-    fn as_any(&self) -> &Any { self }
-
-    fn as_any_mut(&mut self) -> &mut Any { self }
+    widget_kind!(NAME);
 
     fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>>  {
         let mut entity = self.entity.borrow_mut();
@@ -55,24 +48,6 @@ impl WidgetKind for PortraitView {
         let portrait = Widget::with_theme(Label::empty(), "portrait");
         if let Some(ref image) = entity.actor.actor.portrait {
             portrait.borrow_mut().state.add_text_arg("image", &image.id());
-        }
-
-        let ap_bar = Widget::empty("ap_bar");
-        {
-            let base_ap = Module::rules().base_ap;
-            let cur_ap = entity.actor.ap();
-            let ap_per_ball = base_ap / AP_BALLS;
-            let active_balls = cur_ap / ap_per_ball;
-
-            let mut i = AP_BALLS;
-            loop {
-                i -= 1;
-                let ball = Widget::with_theme(Label::empty(), "ball");
-                ball.borrow_mut().state.set_active(i < active_balls);
-                Widget::add_child_to(&ap_bar, ball);
-
-                if i == 0 { break; }
-            }
         }
 
         let frac = entity.actor.hp() as f32 / entity.actor.stats.max_hp as f32;
@@ -89,6 +64,6 @@ impl WidgetKind for PortraitView {
         })));
         level_up.borrow_mut().state.set_visible(entity.actor.has_level_up());
 
-        vec![portrait, ap_bar, hp_bar, level_up]
+        vec![portrait, hp_bar, level_up]
     }
 }

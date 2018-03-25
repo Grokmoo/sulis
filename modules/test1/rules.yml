@@ -1,5 +1,8 @@
 ---
+display_ap: 10
 base_ap: 40
+max_overflow_ap: 20
+min_overflow_ap: -40
 movement_ap: 1
 attack_ap: 20
 base_initiative: 10

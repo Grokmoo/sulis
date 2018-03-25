@@ -20,6 +20,18 @@ children:
     x_relative: Custom
     y_relative: Custom
     position: [0, 0]
+  ap_bar:
+    y_relative: Max
+    position: [80, 0]
+    preferred_size: [0, 8]
+    width_relative: ChildSum
+    border: [1, 1, 1, 1]
+    layout: BoxHorizontal
+    layout_spacing: { top: 0, bottom: 0, left: 1, right: 0 }
+    children:
+      ball:
+        background: ball_animated
+        preferred_size: [6, 6]
   right_pane:
     background: bg_base
     border: [3, 3, 3, 3]
@@ -59,32 +71,19 @@ children:
       portrait_view:
         background: bg_rounded
         x_relative: Max
-        preferred_size: [38, 36]
+        preferred_size: [30, 36]
         border: [1, 1, 1, 1]
         children:
           portrait:
             width_relative: Max
             height_relative: Max
-            preferred_size: [-8, -6]
-            position: [8, 0]
+            preferred_size: [0, -6]
             foreground: "#image#"
-          ap_bar:
-            background: bg_base
-            height_relative: Max
-            preferred_size: [8, 0]
-            border: [1, 1, 1, 1]
-            layout: BoxVertical
-            layout_spacing: { top: 1, bottom: 0, left: 0, right: 0 }
-            children:
-              ball:
-                background: ball_animated
-                preferred_size: [6, 6]
           hp_bar:
             from: .progress_bar
             width_relative: Max
             y_relative: Max
-            preferred_size: [-9, 6]
-            position: [9, 0]
+            preferred_size: [0, 6]
             text: "#cur_hp# / #max_hp#"
             text_params:
               scale: 5.0

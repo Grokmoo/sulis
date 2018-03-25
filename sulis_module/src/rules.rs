@@ -26,8 +26,11 @@ use sulis_rules::{HitKind};
 #[serde(deny_unknown_fields)]
 pub struct Rules {
     pub base_ap: u32,
+    pub max_overflow_ap: i32,
+    pub min_overflow_ap: i32,
     pub movement_ap: u32,
     pub attack_ap: u32,
+    pub display_ap: u32,
     pub base_initiative: i32,
 
     pub graze_percentile: u32,

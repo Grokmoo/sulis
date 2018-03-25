@@ -447,6 +447,15 @@ impl GameState {
         false
     }
 
+    pub fn is_current(entity: &Rc<RefCell<EntityState>>) -> bool {
+        let area_state = GameState::area_state();
+        let area_state = area_state.borrow();
+        if let Some(ref current) = area_state.turn_timer.current() {
+            return Rc::ptr_eq(current, entity);
+        }
+        false
+    }
+
     pub fn pc() -> Rc<RefCell<EntityState>> {
         STATE.with(|s| Rc::clone(&s.borrow().as_ref().unwrap().pc))
     }

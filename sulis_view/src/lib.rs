@@ -32,6 +32,9 @@ pub use self::ability_pane::AbilityPane;
 mod action_menu;
 pub use self::action_menu::ActionMenu;
 
+mod ap_bar;
+pub use self::ap_bar::ApBar;
+
 mod area_view;
 pub use self::area_view::AreaView;
 
@@ -269,6 +272,8 @@ impl WidgetKind for RootView {
             }
         })));
 
-        vec![area_widget, right_pane]
+        let ap_bar = Widget::with_defaults(ApBar::new(pc));
+
+        vec![area_widget, right_pane, ap_bar]
     }
 }

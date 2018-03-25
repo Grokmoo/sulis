@@ -117,7 +117,10 @@ impl TurnTimer {
             self.entities.push_front(entity);
         }
 
-        self.entities.iter().for_each(|e| e.borrow_mut().actor.end_turn());
+        self.entities.iter().for_each(|e| {
+            e.borrow_mut().actor.end_turn();
+            e.borrow_mut().actor.set_overflow_ap(0);
+        });
         GameState::set_entering_combat();
     }
 

@@ -101,6 +101,13 @@ impl UserData for ScriptEntity {
             Ok(())
         });
 
+        methods.add_method("change_overflow_ap", |_, entity, ap| {
+            let area_state = GameState::area_state();
+            let entity = area_state.borrow().get_entity(entity.index);
+            entity.borrow_mut().actor.change_overflow_ap(ap);
+            Ok(())
+        });
+
         methods.add_method("remove_ap", |_, entity, ap| {
             let area_state = GameState::area_state();
             let entity = area_state.borrow().get_entity(entity.index);

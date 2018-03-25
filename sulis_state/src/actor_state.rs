@@ -423,13 +423,22 @@ impl ActorState {
         let mut ap = rules.base_ap as i32 + self.overflow_ap;
 
         if ap < 0 {
-            ap = 0;
             self.overflow_ap += rules.base_ap as i32;
         } else {
             self.overflow_ap = 0;
         }
 
-        self.ap = ap as u32;
+        ap += self.stats.bonus_ap;
+        if ap < 0 {
+            ap = 0;
+        }
+
+        let mut ap = ap as u32;
+        if ap > rules.max_ap {
+            ap = rules.max_ap;
+        }
+
+        self.ap = ap;
         self.listeners.notify(&self);
     }
 

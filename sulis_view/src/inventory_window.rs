@@ -278,6 +278,7 @@ pub fn add_bonus_text_args(bonuses: &BonusList, widget_state: &mut WidgetState) 
         }
     }
 
+    add_if_present(widget_state, "bonus_ap", bonuses.ap);
     add_if_present(widget_state, "bonus_reach", bonuses.bonus_reach);
     add_if_present(widget_state, "bonus_range", bonuses.bonus_range);
     add_if_present(widget_state, "initiative", bonuses.initiative);

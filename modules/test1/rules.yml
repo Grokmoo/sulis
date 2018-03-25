@@ -1,6 +1,7 @@
 ---
 display_ap: 10
 base_ap: 40
+max_ap: 80
 max_overflow_ap: 20
 min_overflow_ap: -40
 movement_ap: 1

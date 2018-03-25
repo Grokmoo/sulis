@@ -22,6 +22,7 @@ use {Attribute, Damage, DamageKind};
 #[serde(deny_unknown_fields)]
 pub struct BonusList {
     pub attributes: Option<Vec<(Attribute, u8)>>,
+    pub ap: Option<i32>,
     pub attack: Option<AttackBuilder>,
     pub base_armor: Option<u32>,
     pub armor_kinds: Option<HashMap<DamageKind, u32>>,
@@ -41,6 +42,7 @@ impl Default for BonusList {
     fn default() -> BonusList {
         BonusList {
             attributes: None,
+            ap: None,
             attack: None,
             base_armor: None,
             armor_kinds: None,

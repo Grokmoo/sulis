@@ -64,6 +64,7 @@ fn add_num_bonus(_lua: &Lua, effect: &mut ScriptEffect, args: (String, f32)) -> 
     trace!("Adding numeric bonus {} to '{}'", amount, name);
     match name.as_ref() {
         "armor" => effect.bonuses.base_armor = Some(amount as u32),
+        "ap" => effect.bonuses.ap = Some(amount_int),
         "reach" => effect.bonuses.bonus_reach = Some(amount),
         "range" => effect.bonuses.bonus_range = Some(amount),
         "initiative" => effect.bonuses.initiative = Some(amount_int),

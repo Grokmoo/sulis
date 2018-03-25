@@ -25,6 +25,7 @@ pub struct StatList {
     attack_range: f32,
 
     pub attributes: AttributeList,
+    pub bonus_ap: i32,
     pub bonus_damage: Vec<Damage>,
     pub bonus_reach: f32,
     pub bonus_range: f32,
@@ -43,6 +44,7 @@ impl StatList {
     pub fn new(attrs: AttributeList) -> StatList {
         StatList {
             attributes: attrs,
+            bonus_ap: 0,
             bonus_damage: Vec::new(),
             bonus_reach: 0.0,
             bonus_range: 0.0,
@@ -102,6 +104,7 @@ impl StatList {
 
         let times_f32 = times as f32;
         let times_i32 = times as i32;
+        if let Some(ap) = bonuses.ap { self.bonus_ap += ap * times_i32; }
         if let Some(reach) = bonuses.bonus_reach { self.bonus_reach += reach * times_f32; }
         if let Some(range) = bonuses.bonus_range { self.bonus_range += range * times_f32; }
         if let Some(hit_points) = bonuses.hit_points { self.max_hp += hit_points * times_i32; }

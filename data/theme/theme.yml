@@ -378,7 +378,7 @@ children:
           scale: 6.0
         x_relative: Max
         preferred_size: [25, 8]
-        position: [-4, 11]
+        position: [-4, 1]
   race_pane:
     preferred_size: [40, 40]
     background: bg_base
@@ -399,6 +399,7 @@ children:
           ][?per|Perception: #per#
           ][?int|Intelligence: #int#
           ][?wis|Wisdom: #wis#
+          ][?bonus_ap|AP: #bonus_ap#
           ][?min_bonus_damage|[s=4.0|Damage: #min_bonus_damage# to #max_bonus_damage# [?bonus_damage_kind;c=f00|#bonus_damage_kind#]]
           ][?bonus_reach|[s=4.0|Reach: #bonus_reach#]
           ][?bonus_range|[s=4.0|Range: #bonus_range#]
@@ -435,6 +436,7 @@ children:
           ][?per|Perception: #per#
           ][?int|Intelligence: #int#
           ][?wis|Wisdom: #wis#
+          ][?bonus_ap|AP: #bonus_ap#
           ][?min_damage|[s=4.0|Damage: #min_damage# to #max_damage# [c=f00|#damage_kind#]]
           ][?min_bonus_damage|[s=4.0|Damage: #min_bonus_damage# to #max_bonus_damage# [?bonus_damage_kind;c=f00|#bonus_damage_kind#]]
           ][?reach|[s=4.0|Reach: #reach#]
@@ -485,6 +487,7 @@ children:
           ][?per|Perception: #per#
           ][?int|Intelligence: #int#
           ][?wis|Wisdom: #wis#
+          ][?bonus_ap|AP: #bonus_ap#
           ][?min_bonus_damage|[s=4.0|Damage: #min_bonus_damage# to #max_bonus_damage# [?bonus_damage_kind;c=f00|#bonus_damage_kind#]]
           ][?bonus_reach|[s=4.0|Reach: #bonus_reach#]
           ][?bonus_range|[s=4.0|Range: #bonus_range#]
@@ -539,6 +542,7 @@ children:
       ][?per|Perception: #per#
       ][?int|Intelligence: #int#
       ][?wis|Wisdom: #wis#
+      ][?bonus_ap|AP: #bonus_ap#
       ][?min_damage|[s=4.0|Damage: #min_damage# to #max_damage# [c=f00|#damage_kind#]]
       ][?min_bonus_damage|[s=4.0|Damage: #min_bonus_damage# to #max_bonus_damage# [?bonus_damage_kind;c=f00|#bonus_damage_kind#]]
       ][?reach|[s=4.0|Reach: #reach#]

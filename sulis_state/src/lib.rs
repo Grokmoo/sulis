@@ -88,6 +88,7 @@ use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 use std::cell::RefCell;
 
+use sulis_rules::HitKind;
 use sulis_core::config::CONFIG;
 use sulis_core::util::{self, Point};
 use sulis_core::io::{GraphicsRenderer, MainLoopUpdater};
@@ -123,52 +124,41 @@ pub struct GameState {
     path_finder: PathFinder,
 }
 
-impl GameState {
-    pub fn execute_ability_on_activate(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>) {
+macro_rules! exec_script {
+    ($func:ident: $($x:ident),*) => {
         let start_time = time::Instant::now();
 
         let result: Result<(), rlua::Error> = SCRIPT.with(|script_state| {
-            script_state.ability_on_activate(parent, ability)
+            script_state.$func($($x, )*)
         });
 
         if let Err(e) = result {
-            warn!("Error executing lua script function on_activate for ability");
+            warn!("Error executing lua script function");
             warn!("{}", e);
         }
 
         info!("Script execution time: {}", util::format_elapsed_secs(start_time.elapsed()));
+    }
+}
+
+impl GameState {
+    pub fn execute_ability_after_attack(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>,
+                                        targets: Vec<Rc<RefCell<EntityState>>>, kind: HitKind) {
+        exec_script!(ability_after_attack: parent, ability, targets, kind);
+    }
+
+    pub fn execute_ability_on_activate(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>) {
+        exec_script!(ability_on_activate: parent, ability);
     }
 
     pub fn execute_ability_on_target_select(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>,
                                             targets: Vec<Rc<RefCell<EntityState>>>) {
-        let start_time = time::Instant::now();
-
-        let result: Result<(), rlua::Error> = SCRIPT.with(|script_state| {
-            script_state.ability_on_target_select(parent, ability, targets)
-        });
-
-        if let Err(e) = result {
-            warn!("Error executing lua script function on_activate for ability");
-            warn!("{}", e);
-        }
-
-        info!("Script execution time: {}", util::format_elapsed_secs(start_time.elapsed()));
+        exec_script!(ability_on_target_select: parent, ability, targets);
     }
 
     pub fn execute_ability_script(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>,
                                   targets: Vec<Rc<RefCell<EntityState>>>, func: &str) {
-        let start_time = time::Instant::now();
-
-        let result: Result<(), rlua::Error> = SCRIPT.with(|script_state| {
-            script_state.ability_script(parent, ability, targets, func)
-        });
-
-        if let Err(e) = result {
-            warn!("Error executing lua script function on_activate for ability");
-            warn!("{}", e);
-        }
-
-        info!("Script execution time: {}", util::format_elapsed_secs(start_time.elapsed()));
+        exec_script!(ability_script: parent, ability, targets, func);
     }
 
     pub fn init(pc_actor: Rc<Actor>) -> Result<(), Error> {

@@ -18,6 +18,7 @@ use std::collections::HashSet;
 
 use rlua::{UserData, UserDataMethods};
 
+use sulis_rules::HitKind;
 use sulis_module::Module;
 use script::{ScriptEntity, ScriptEntitySet};
 use GameState;
@@ -29,7 +30,7 @@ const ON_ANIM_COMPLETE: &str = "on_anim_complete";
 pub trait ScriptCallback {
     fn before_attack(&self) { }
 
-    fn after_attack(&self) { }
+    fn after_attack(&self, _hit_kind: HitKind) { }
 
     fn on_anim_complete(&self) { }
 }
@@ -69,9 +70,13 @@ impl ScriptCallback for CallbackData {
         }
     }
 
-    fn after_attack(&self) {
+    fn after_attack(&self, hit_kind: HitKind) {
         if self.funcs.contains(AFTER_ATTACK) {
-            self.do_callback(AFTER_ATTACK);
+            let area_state = GameState::area_state();
+            let parent = area_state.borrow().get_entity(self.parent);
+            let ability = Module::ability(&self.ability_id).unwrap();
+            let targets = self.targets.iter().map(|t| area_state.borrow().get_entity(*t)).collect();
+            GameState::execute_ability_after_attack(&parent, &ability, targets, hit_kind);
         }
     }
 
@@ -98,5 +103,19 @@ impl UserData for CallbackData {
             cb.funcs.insert(func);
             Ok(())
         });
+    }
+}
+
+#[derive(Clone)]
+pub struct ScriptHitKind {
+    pub kind: HitKind,
+}
+
+impl UserData for ScriptHitKind {
+    fn add_methods(methods: &mut UserDataMethods<Self>) {
+        methods.add_method("is_miss", |_, hit, ()| Ok(hit.kind == HitKind::Miss));
+        methods.add_method("is_graze", |_, hit, ()| Ok(hit.kind == HitKind::Graze));
+        methods.add_method("is_hit", |_, hit, ()| Ok(hit.kind == HitKind::Hit));
+        methods.add_method("is_crit", |_, hit, ()| Ok(hit.kind == HitKind::Crit));
     }
 }

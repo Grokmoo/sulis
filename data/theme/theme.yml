@@ -22,7 +22,8 @@ children:
     position: [0, 0]
   ap_bar:
     y_relative: Max
-    position: [80, 0]
+    x_relative: Center
+    position: [-40, 0]
     preferred_size: [0, 8]
     width_relative: ChildSum
     border: [1, 1, 1, 1]

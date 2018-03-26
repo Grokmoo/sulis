@@ -43,7 +43,7 @@ pub use self::damage::DamageList;
 pub mod stat_list;
 pub use self::stat_list::StatList;
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
 pub enum HitKind {
     Miss,
     Graze,

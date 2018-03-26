@@ -14,7 +14,6 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::cmp;
 use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
@@ -66,10 +65,9 @@ impl WidgetKind for ApBar {
 
         let rules = Module::rules();
         let ap_per_ball = rules.display_ap;
-        let base_ap = rules.base_ap;
         let cur_ap = entity.actor.ap();
         let active_balls = cur_ap / ap_per_ball;
-        let total_balls = cmp::max(base_ap / ap_per_ball, active_balls);
+        let total_balls = rules.max_ap / ap_per_ball;
 
         let mut children = Vec::new();
         for i in 0..total_balls {

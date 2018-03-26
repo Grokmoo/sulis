@@ -4,6 +4,8 @@ abilities:
     position: [0, 0]
   - id: mighty_blow
     position: [0, 2]
+  - id: stunning_blow
+    position: [1, 2]
   - id: resilient_body
     position: [0, 4]
   - id: tough_skin
@@ -16,5 +18,3 @@ abilities:
     position: [0, 6]
   - id: elemental_defense
     position: [1, 6]
-  - id: firebolt
-    position: [2, 0]

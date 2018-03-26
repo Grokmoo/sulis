@@ -17,6 +17,7 @@
 mod script_callback;
 use self::script_callback::CallbackData;
 pub use self::script_callback::ScriptCallback;
+use self::script_callback::ScriptHitKind;
 
 mod script_effect;
 use self::script_effect::ScriptEffect;
@@ -37,6 +38,7 @@ use std::cell::RefCell;
 
 use rlua::{self, Function, Lua, UserData, UserDataMethods};
 
+use sulis_rules::HitKind;
 use sulis_module::{Ability};
 use {EntityState, GameState};
 
@@ -90,6 +92,18 @@ impl ScriptState {
                                             ability: &Rc<Ability>,
                                             targets: Vec<Rc<RefCell<EntityState>>>) -> Result<()> {
         self.ability_script(parent, ability, targets, "on_target_select")
+    }
+
+    pub fn ability_after_attack(&self, parent: &Rc<RefCell<EntityState>>,
+                                ability: &Rc<Ability>, targets: Vec<Rc<RefCell<EntityState>>>,
+                                hit_kind: HitKind) -> Result<()> {
+        let hit_kind = ScriptHitKind { kind: hit_kind };
+
+        let script = get_script(ability)?;
+        self.lua.globals().set("ability", ScriptAbility::from(ability))?;
+        self.lua.globals().set("targets", ScriptEntitySet::new(parent, &targets))?;
+        self.lua.globals().set("hit", hit_kind)?;
+        self.execute_script(parent, "(parent, ability, targets, hit)", script, "after_attack")
     }
 
     pub fn ability_script(&self, parent: &Rc<RefCell<EntityState>>,

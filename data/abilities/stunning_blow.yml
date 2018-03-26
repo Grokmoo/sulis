@@ -1,0 +1,13 @@
+id: stunning_blow
+name: "Stunning Blow"
+icon: abilities/stunning_blow
+description: |
+  You make an attack with your weapon with the intent to confuse and disorient an opponent.  The attack is made against the target's Fortitude Defense.
+  On a hit, the target loses 4 AP on their next action.  On a graze, they lose 2 AP.  On a critical hit, they lose 6 AP.  If the AP lost is more than
+  the target would otherwise have for their round, they will continue to make up the remainder of the lost AP on subsequent round(s).
+active:
+  script: "stunning_blow"
+  ap: 30
+  duration: 0
+prereqs:
+  abilities: [ mighty_blow ]

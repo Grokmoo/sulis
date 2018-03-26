@@ -121,14 +121,15 @@ impl EntityState {
 
     pub fn attack(entity: &Rc<RefCell<EntityState>>, target: &Rc<RefCell<EntityState>>,
                   callback: Option<Box<ScriptCallback>>) {
+        let base_time = CONFIG.display.animation_base_time_millis;
         if entity.borrow().actor.stats.attack_is_melee() {
-            let mut anim = MeleeAttackAnimation::new(entity, target,
-                                                 CONFIG.display.animation_base_time_millis * 5);
+            let mut anim = MeleeAttackAnimation::new(entity, target, base_time * 5, Box::new(|att, def| {
+                att.borrow_mut().actor.weapon_attack(def)
+            }));
             anim.set_callback(callback);
             GameState::add_animation(Box::new(anim));
         } else if entity.borrow().actor.stats.attack_is_ranged() {
-            let mut anim = RangedAttackAnimation::new(entity, target,
-                                                  CONFIG.display.animation_base_time_millis);
+            let mut anim = RangedAttackAnimation::new(entity, target, base_time);
             anim.set_callback(callback);
             GameState::add_animation(Box::new(anim));
         }

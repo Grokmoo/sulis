@@ -141,34 +141,39 @@ impl ActorState {
         self.can_reach(dist)
     }
 
-    pub fn weapon_attack(&mut self, target: &Rc<RefCell<EntityState>>) -> (String, Color) {
-        if target.borrow_mut().actor.hp() <= 0 { return ("Miss".to_string(), color::GRAY); }
+    pub fn weapon_attack(&mut self, target: &Rc<RefCell<EntityState>>) -> (HitKind, String, Color) {
+        if target.borrow_mut().actor.hp() <= 0 { return (HitKind::Miss, "Miss".to_string(), color::GRAY); }
 
         info!("'{}' attacks '{}'", self.actor.name, target.borrow().actor.actor.name);
 
         let mut color = color::GRAY;
         let mut damage_str = String::new();
         let mut not_first = false;
+        let mut hit_kind = HitKind::Miss;
 
         for ref attack in self.stats.attacks.iter() {
             if not_first { damage_str.push_str(", "); }
 
-            let (attack_result, attack_color) = self.attack_internal(target, attack);
+            let (hit, attack_result, attack_color) = self.attack_internal(target, attack);
             if attack_color != color::GRAY {
                 color = attack_color;
             }
 
             damage_str.push_str(&attack_result);
 
+            if hit > hit_kind {
+                hit_kind = hit;
+            }
+
             not_first = true;
         }
 
         self.check_death(target);
-        (damage_str, color)
+        (hit_kind, damage_str, color)
     }
 
-    pub fn attack(&mut self, target: &Rc<RefCell<EntityState>>, attack: &Attack) -> (String, Color) {
-        if target.borrow_mut().actor.hp() <= 0 { return ("Miss".to_string(), color::GRAY); }
+    pub fn attack(&mut self, target: &Rc<RefCell<EntityState>>, attack: &Attack) -> (HitKind, String, Color) {
+        if target.borrow_mut().actor.hp() <= 0 { return (HitKind::Miss, "Miss".to_string(), color::GRAY); }
 
         info!("'{}' attacks '{}'", self.actor.name, target.borrow().actor.actor.name);
 
@@ -178,7 +183,7 @@ impl ActorState {
         result
     }
 
-    fn attack_internal(&self, target: &Rc<RefCell<EntityState>>, attack: &Attack) -> (String, Color) {
+    fn attack_internal(&self, target: &Rc<RefCell<EntityState>>, attack: &Attack) -> (HitKind, String, Color) {
         let rules = Module::rules();
         let accuracy = self.stats.accuracy;
 
@@ -197,7 +202,7 @@ impl ActorState {
         let damage_multiplier = match hit_kind {
             HitKind::Miss => {
                 debug!("Miss");
-                return ("Miss".to_string(), color::GRAY);
+                return (HitKind::Miss, "Miss".to_string(), color::GRAY);
             },
             HitKind::Graze => rules.graze_damage_multiplier,
             HitKind::Hit => rules.hit_damage_multiplier,
@@ -217,9 +222,12 @@ impl ActorState {
             }
 
             target.borrow_mut().remove_hp(total);
-            return (format!("{:?}: {}", hit_kind, total), color::RED);
+            return (hit_kind, format!("{:?}: {}", hit_kind, total), color::RED);
+        } else if attack.damage.max() == 0 {
+            // if attack cannot do any damage
+            return (hit_kind, format!("{:?}", hit_kind), color::RED);
         } else {
-            return (format!("{:?}: {}", hit_kind, 0), color::GRAY);
+            return (hit_kind, format!("{:?}: {}", hit_kind, 0), color::GRAY);
         }
     }
 

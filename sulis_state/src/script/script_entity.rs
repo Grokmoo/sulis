@@ -21,7 +21,9 @@ use std::cell::RefCell;
 
 use rlua::{self, Lua, UserData, UserDataMethods};
 
+use animation::{Animation, MeleeAttackAnimation};
 use sulis_rules::{AttackKind, DamageKind, Attack};
+use sulis_core::config::CONFIG;
 use sulis_module::Faction;
 use {EntityState, GameState};
 use script::{CallbackData, Result, ScriptAbility, ScriptEffect, ScriptParticleGenerator, TargeterData};
@@ -80,6 +82,31 @@ impl UserData for ScriptEntity {
             Ok(())
         });
 
+        methods.add_method("anim_special_attack", |_, entity,
+                           (target, attack_kind, min_damage, max_damage, damage_kind, cb):
+                           (ScriptEntity, String, u32, u32, String, Option<CallbackData>)| {
+            let area_state = GameState::area_state();
+
+            let target = area_state.borrow().get_entity(target.index);
+            let parent = area_state.borrow().get_entity(entity.index);
+
+            let damage_kind = DamageKind::from_str(&damage_kind);
+            let attack_kind = AttackKind::from_str(&attack_kind);
+
+            let time = CONFIG.display.animation_base_time_millis * 5;
+            let mut anim = MeleeAttackAnimation::new(&parent, &target, time, Box::new(move |att, def| {
+                let attack = Attack::special(min_damage, max_damage, damage_kind, attack_kind.clone());
+
+                att.borrow_mut().actor.attack(def, &attack)
+            }));
+
+            if let Some(cb) = cb {
+                anim.set_callback(Some(Box::new(cb)));
+            }
+            GameState::add_animation(Box::new(anim));
+            Ok(())
+        });
+
         methods.add_method("special_attack", |_, entity,
                            (target, attack_kind, min_damage, max_damage, damage_kind):
                            (ScriptEntity, String, u32, u32, String)| {
@@ -93,7 +120,7 @@ impl UserData for ScriptEntity {
 
             let attack = Attack::special(min_damage, max_damage, damage_kind, attack_kind);
 
-            let (text, color) = parent.borrow_mut().actor.attack(&target, &attack);
+            let (_hit_kind, text, color) = parent.borrow_mut().actor.attack(&target, &attack);
 
             let scale = 1.2;
             area_state.borrow_mut().add_feedback_text(text, &target, scale, color);

@@ -18,8 +18,9 @@ use std::rc::Rc;
 use std::cell::RefCell;
 use std::time::Instant;
 
+use sulis_rules::HitKind;
 use sulis_core::util;
-use sulis_core::ui::Widget;
+use sulis_core::ui::{Color, Widget};
 use ScriptCallback;
 use {animation, EntityState, GameState};
 
@@ -32,11 +33,17 @@ pub struct MeleeAttackAnimation {
     marked_for_removal: bool,
     has_attacked: bool,
     callback: Option<Box<ScriptCallback>>,
+
+    attack_func: Box<Fn(&Rc<RefCell<EntityState>>, &Rc<RefCell<EntityState>>) -> (HitKind, String, Color)>,
 }
 
 impl MeleeAttackAnimation {
-    pub fn new(attacker: &Rc<RefCell<EntityState>>, defender: &Rc<RefCell<EntityState>>,
-               total_time_millis: u32) -> MeleeAttackAnimation {
+    pub fn new(attacker: &Rc<RefCell<EntityState>>,
+               defender: &Rc<RefCell<EntityState>>,
+               total_time_millis: u32,
+               attack_func: Box<Fn(&Rc<RefCell<EntityState>>, &Rc<RefCell<EntityState>>) ->
+                  (HitKind, String, Color)>) -> MeleeAttackAnimation {
+
         let x = defender.borrow().location.x + defender.borrow().size.width / 2
             - attacker.borrow().location.x - attacker.borrow().size.width / 2;
         let y = defender.borrow().location.y + defender.borrow().size.height / 2
@@ -51,6 +58,7 @@ impl MeleeAttackAnimation {
             marked_for_removal: false,
             has_attacked: false,
             callback: None,
+            attack_func,
         }
     }
 }
@@ -76,14 +84,14 @@ impl animation::Animation for MeleeAttackAnimation {
 
             let area_state = GameState::area_state();
 
-            let (text, color) = self.attacker.borrow_mut().actor.weapon_attack(&self.defender);
+            let (hit_kind, text, color) = (self.attack_func)(&self.attacker, &self.defender);
 
             let scale = 1.2;
             area_state.borrow_mut().add_feedback_text(text, &self.defender, scale, color);
             self.has_attacked = true;
 
             if let Some(ref cb) = self.callback.as_ref() {
-                cb.after_attack();
+                cb.after_attack(hit_kind);
             }
         }
 

@@ -57,7 +57,6 @@ impl WidgetKind for ApBar {
     }
 
     fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>>  {
-        info!("Checking");
         widget.borrow_mut().state.set_visible(GameState::is_current(&self.entity));
 
         let mut entity = self.entity.borrow_mut();

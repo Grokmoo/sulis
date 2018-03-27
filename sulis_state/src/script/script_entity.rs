@@ -30,55 +30,96 @@ use script::{CallbackData, Result, ScriptAbility, ScriptCallback, ScriptEffect, 
 
 #[derive(Clone)]
 pub struct ScriptEntity {
-    pub index: usize,
+    pub index: Option<usize>,
 }
 
 impl ScriptEntity {
     pub fn new(index: usize) -> ScriptEntity {
-        ScriptEntity { index }
+        ScriptEntity { index: Some(index) }
     }
 
     pub fn from(entity: &Rc<RefCell<EntityState>>) -> ScriptEntity {
-        ScriptEntity { index: entity.borrow().index }
+        ScriptEntity { index: Some(entity.borrow().index) }
+    }
+
+    pub fn try_unwrap_index(&self) -> Result<usize> {
+        match self.index {
+            None => Err(rlua::Error::FromLuaConversionError {
+                from: "ScriptEntity",
+                to: "EntityState",
+                message: Some("ScriptEntity does not have a valid index".to_string())
+            }),
+            Some(index) => Ok(index),
+        }
+    }
+
+    pub fn try_unwrap(&self) -> Result<Rc<RefCell<EntityState>>> {
+        match self.index {
+            None => Err(rlua::Error::FromLuaConversionError {
+                from: "ScriptEntity",
+                to: "EntityState",
+                message: Some("ScriptEntity does not have a valid index".to_string())
+            }),
+            Some(index) => {
+                let area_state = GameState::area_state();
+                let area_state = area_state.borrow();
+                match area_state.check_get_entity(index) {
+                    None => Err(rlua::Error::FromLuaConversionError {
+                        from: "ScriptEntity",
+                        to: "EntityState",
+                        message: Some("ScriptEntity refers to an entity that no longer exists.".to_string())
+                    }),
+                    Some(entity) => Ok(entity),
+                }
+            }
+        }
     }
 }
 
 impl UserData for ScriptEntity {
     fn add_methods(methods: &mut UserDataMethods<Self>) {
-        methods.add_method("targets", &targets);
-
-        methods.add_method("to_string", |_, entity, ()| {
-            Ok(entity.index.to_string())
+        methods.add_method("is_valid", |_, entity, ()| {
+            let area_state = GameState::area_state();
+            match entity.index {
+                None => Ok(false),
+                Some(index) => Ok(area_state.borrow().has_entity(index)),
+            }
         });
+
+        methods.add_method("targets", &targets);
 
         methods.add_method("create_effect", |_, entity, args: (String, u32)| {
             info!("Got here");
             let duration = args.1;
             let ability = args.0;
-            Ok(ScriptEffect::new(entity.index, &ability, duration))
+            let index = entity.try_unwrap_index()?;
+            Ok(ScriptEffect::new(index, &ability, duration))
         });
 
         methods.add_method("create_particle_generator", |_, entity, args: (String, Option<f32>)| {
             let duration_secs = args.1.unwrap_or(f32::INFINITY);
             let sprite = args.0;
-            Ok(ScriptParticleGenerator::new(entity.index, sprite, duration_secs))
+            let index = entity.try_unwrap_index()?;
+            Ok(ScriptParticleGenerator::new(index, sprite, duration_secs))
         });
 
         methods.add_method("create_anim", |_, entity, (image, duration): (String, Option<f32>)| {
             let duration = duration.unwrap_or(f32::INFINITY);
-            Ok(ScriptParticleGenerator::new_anim(entity.index, image, duration))
+            let index = entity.try_unwrap_index()?;
+            Ok(ScriptParticleGenerator::new_anim(index, image, duration))
         });
 
         methods.add_method("create_targeter", |_, entity, ability: ScriptAbility| {
-            Ok(TargeterData::new(entity.index, &ability.id))
+            let index = entity.try_unwrap_index()?;
+            Ok(TargeterData::new(index, &ability.id))
         });
 
         methods.add_method("weapon_attack", |_, entity, target: ScriptEntity| {
-            let area_state = GameState::area_state();
-            let target = area_state.borrow().get_entity(target.index);
-            let parent = area_state.borrow().get_entity(entity.index);
+            let target = target.try_unwrap()?;
+            let parent = entity.try_unwrap()?;
             let (_, text, color) = parent.borrow_mut().actor.weapon_attack(&target);
 
+            let area_state = GameState::area_state();
             area_state.borrow_mut().add_feedback_text(text, &target, color);
 
             Ok(())
@@ -86,9 +127,8 @@ impl UserData for ScriptEntity {
 
         methods.add_method("anim_weapon_attack", |_, entity, (target, callback):
                            (ScriptEntity, Option<CallbackData>)| {
-            let area_state = GameState::area_state();
-            let target = area_state.borrow().get_entity(target.index);
-            let parent = area_state.borrow().get_entity(entity.index);
+            let parent = entity.try_unwrap()?;
+            let target = target.try_unwrap()?;
 
             let cb: Option<Box<ScriptCallback>> = match callback {
                 None => None,
@@ -102,11 +142,8 @@ impl UserData for ScriptEntity {
         methods.add_method("anim_special_attack", |_, entity,
                            (target, attack_kind, min_damage, max_damage, damage_kind, cb):
                            (ScriptEntity, String, u32, u32, String, Option<CallbackData>)| {
-            let area_state = GameState::area_state();
-
-            let target = area_state.borrow().get_entity(target.index);
-            let parent = area_state.borrow().get_entity(entity.index);
-
+            let parent = entity.try_unwrap()?;
+            let target = target.try_unwrap()?;
             let damage_kind = DamageKind::from_str(&damage_kind);
             let attack_kind = AttackKind::from_str(&attack_kind);
 
@@ -127,10 +164,8 @@ impl UserData for ScriptEntity {
         methods.add_method("special_attack", |_, entity,
                            (target, attack_kind, min_damage, max_damage, damage_kind):
                            (ScriptEntity, String, u32, u32, String)| {
-            let area_state = GameState::area_state();
-
-            let target = area_state.borrow().get_entity(target.index);
-            let parent = area_state.borrow().get_entity(entity.index);
+            let target = target.try_unwrap()?;
+            let parent = entity.try_unwrap()?;
 
             let damage_kind = DamageKind::from_str(&damage_kind);
             let attack_kind = AttackKind::from_str(&attack_kind);
@@ -139,21 +174,20 @@ impl UserData for ScriptEntity {
 
             let (_hit_kind, text, color) = parent.borrow_mut().actor.attack(&target, &attack);
 
+            let area_state = GameState::area_state();
             area_state.borrow_mut().add_feedback_text(text, &target, color);
 
             Ok(())
         });
 
         methods.add_method("change_overflow_ap", |_, entity, ap| {
-            let area_state = GameState::area_state();
-            let entity = area_state.borrow().get_entity(entity.index);
+            let entity = entity.try_unwrap()?;
             entity.borrow_mut().actor.change_overflow_ap(ap);
             Ok(())
         });
 
         methods.add_method("remove_ap", |_, entity, ap| {
-            let area_state = GameState::area_state();
-            let entity = area_state.borrow().get_entity(entity.index);
+            let entity = entity.try_unwrap()?;
             entity.borrow_mut().actor.remove_ap(ap);
             Ok(())
         });
@@ -161,23 +195,20 @@ impl UserData for ScriptEntity {
         methods.add_method("stats", &create_stats_table);
 
         methods.add_method("x", |_, entity, ()| {
-            let area_state = GameState::area_state();
-            let entity = area_state.borrow().get_entity(entity.index);
+            let entity = entity.try_unwrap()?;
             let x = entity.borrow().location.x as f32 + entity.borrow().size.width as f32 / 2.0;
             Ok(x)
         });
 
         methods.add_method("y", |_, entity, ()| {
-            let area_state = GameState::area_state();
-            let entity = area_state.borrow().get_entity(entity.index);
+            let entity = entity.try_unwrap()?;
             let y = entity.borrow().location.y as f32 + entity.borrow().size.height as f32 / 2.0;
             Ok(y)
         });
 
         methods.add_method("dist", |_, entity, target: ScriptEntity| {
-            let area_state = GameState::area_state();
-            let entity = area_state.borrow().get_entity(entity.index);
-            let target = area_state.borrow().get_entity(target.index);
+            let entity = entity.try_unwrap()?;
+            let target = target.try_unwrap()?;
             let entity = entity.borrow();
             Ok(entity.dist_to_entity(&target))
         });
@@ -185,8 +216,7 @@ impl UserData for ScriptEntity {
 }
 
 fn create_stats_table<'a>(lua: &'a Lua, parent: &ScriptEntity, _args: ()) -> Result<rlua::Table<'a>> {
-    let area_state = GameState::area_state();
-    let parent = area_state.borrow().get_entity(parent.index);
+    let parent = parent.try_unwrap()?;
     let src = &parent.borrow().actor.stats;
 
     let stats = lua.create_table()?;
@@ -224,13 +254,20 @@ fn create_stats_table<'a>(lua: &'a Lua, parent: &ScriptEntity, _args: ()) -> Res
 #[derive(Clone)]
 pub struct ScriptEntitySet {
     pub parent: usize,
-    pub indices: Vec<usize>,
+    pub indices: Vec<Option<usize>>,
 }
 
 impl ScriptEntitySet {
-    pub fn new(parent: &Rc<RefCell<EntityState>>, entities: &Vec<Rc<RefCell<EntityState>>>) -> ScriptEntitySet {
+    pub fn new(parent: &Rc<RefCell<EntityState>>,
+               entities: &Vec<Option<Rc<RefCell<EntityState>>>>) -> ScriptEntitySet {
         let parent = parent.borrow().index;
-        let indices = entities.iter().map(|e| e.borrow().index).collect();
+
+        let indices = entities.iter().map(|e| {
+            match e {
+                &None => None,
+                &Some(ref e) => Some(e.borrow().index),
+            }
+        }).collect();
         ScriptEntitySet {
             parent,
             indices,
@@ -241,23 +278,23 @@ impl ScriptEntitySet {
 impl UserData for ScriptEntitySet {
     fn add_methods(methods: &mut UserDataMethods<Self>) {
         methods.add_method("collect", |_, set, ()| {
-            let table: Vec<ScriptEntity> = set.indices.iter().map(|i| ScriptEntity::new(*i)).collect();
+            let table: Vec<ScriptEntity> = set.indices.iter().map(|i| ScriptEntity { index: *i }).collect();
 
             Ok(table)
         });
 
         methods.add_method("is_empty", |_, set, ()| Ok(set.indices.is_empty()));
         methods.add_method("first", |_, set, ()| {
-            if set.indices.is_empty() {
-                warn!("Attempted to get first element of empty EntitySet");
-                return Err(rlua::Error::FromLuaConversionError {
-                    from: "ScriptEntitySet",
-                    to: "ScriptEntity",
-                    message: Some("EntitySet is empty".to_string())
-                });
+            for index in set.indices.iter() {
+                if let &Some(index) = index { return Ok(ScriptEntity::new(index)); }
             }
 
-            Ok(ScriptEntity::new(*set.indices.first().unwrap()))
+            warn!("Attempted to get first element of EntitySet that has no valid entities");
+            Err(rlua::Error::FromLuaConversionError {
+                from: "ScriptEntitySet",
+                to: "ScriptEntity",
+                message: Some("EntitySet is empty".to_string())
+            })
         });
 
         methods.add_method("visible_within", &visible_within);
@@ -275,10 +312,11 @@ fn targets(_lua: &Lua, parent: &ScriptEntity, _args: ()) -> Result<ScriptEntityS
 
     let mut indices = Vec::new();
     for entity in area_state.entity_iter() {
-        indices.push(entity.borrow().index);
+        indices.push(Some(entity.borrow().index));
     }
 
-    Ok(ScriptEntitySet { indices, parent: parent.index })
+    let parent_index = parent.try_unwrap_index()?;
+    Ok(ScriptEntitySet { indices, parent: parent_index })
 }
 
 fn visible_within(_lua: &Lua, set: &ScriptEntitySet, dist: f32) -> Result<ScriptEntitySet> {
@@ -322,7 +360,15 @@ fn filter_entities<T: Copy>(set: &ScriptEntitySet, t: T,
 
     let mut indices = Vec::new();
     for index in set.indices.iter() {
-        let entity = area_state.borrow().get_entity(*index);
+        let entity = match index {
+            &None => continue,
+            &Some(index) => area_state.borrow().check_get_entity(index),
+        };
+
+        let entity = match entity {
+            None => continue,
+            Some(entity) => entity,
+        };
 
         if !(filter)(&parent, &entity, t) { continue; }
 

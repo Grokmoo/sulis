@@ -107,7 +107,7 @@ impl Targeter for SingleTargeter {
         };
 
         GameState::execute_ability_on_target_select(&self.parent, &self.ability,
-                                                    vec![Rc::clone(&cur_target)]);
+                                                    vec![Some(Rc::clone(&cur_target))]);
     }
 }
 
@@ -128,7 +128,18 @@ impl<'a> From<&'a TargeterData> for SingleTargeter {
         let area_state = area_state.borrow();
 
         let parent = area_state.get_entity(data.parent);
-        let targets = data.targets.iter().map(|t| area_state.get_entity(*t)).collect();
+        let mut targets = Vec::new();
+        for index in data.targets.iter() {
+            let index = match index {
+                &None => continue,
+                &Some(ref index) => *index,
+            };
+
+            match area_state.check_get_entity(index) {
+                None => (),
+                Some(entity) => targets.push(entity),
+            }
+        }
 
         SingleTargeter {
             ability: Module::ability(&data.ability_id).unwrap(),
@@ -150,7 +161,7 @@ enum TargeterKind {
 pub struct TargeterData {
     pub ability_id: String,
     pub parent: usize,
-    pub targets: Vec<usize>,
+    pub targets: Vec<Option<usize>>,
     kind: TargeterKind,
 }
 
@@ -173,7 +184,8 @@ impl UserData for TargeterData {
             Ok(())
         });
         methods.add_method_mut("add", |_, targeter, target: ScriptEntity| {
-            targeter.targets.push(target.index);
+            let index = target.try_unwrap_index()?;
+            targeter.targets.push(Some(index));
             Ok(())
         });
         methods.add_method_mut("set_circle", |_, targeter, radius: f32| {

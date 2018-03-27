@@ -40,3 +40,12 @@ groups:
       slash3: [40, 0]
       slash4: [60, 0]
       slash5: [80, 0]
+  whirlwind:
+    size: [48, 48]
+    position: [0, 80]
+    areas:
+      whirlwind1: [0, 0]
+      whirlwind2: [48, 0]
+      whirlwind3: [96, 0]
+      whirlwind4: [144, 0]
+      whirlwind5: [192, 0]

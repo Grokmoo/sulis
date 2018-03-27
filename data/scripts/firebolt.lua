@@ -17,7 +17,7 @@ function on_target_select(parent, ability, targets)
   
   cb = ability:create_callback(parent)
   cb:add_target(target)
-  cb:register_fn("on_anim_complete")
+  cb:register_fn("on_anim_update")
   
   gen = parent:create_particle_generator("fire_particle", duration)
   gen:set_position(gen:param(parent:x(), vx), gen:param(parent:y(), vy))
@@ -27,13 +27,13 @@ function on_target_select(parent, ability, targets)
   gen:set_particle_x_dist(gen:dist_param(gen:uniform_dist(-0.2, 0.2), gen:uniform_dist(-vx / 5.0, 0.0)))
   gen:set_particle_y_dist(gen:dist_param(gen:uniform_dist(-0.2, 0.2), gen:uniform_dist(-vy / 5.0, 0.0)))
   gen:set_particle_duration_dist(gen:fixed_dist(0.6))
-  gen:set_callback(cb)
+  gen:add_callback(cb, duration - 0.1)
   gen:activate()
   
   ability:activate(parent)
 end
 
-function on_anim_complete(parent, ability, targets)
+function on_anim_update(parent, ability, targets, index)
   target = targets:first()
   parent:special_attack(target, "Reflex", 20, 30, "Fire")
   

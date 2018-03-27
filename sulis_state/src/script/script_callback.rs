@@ -14,18 +14,21 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::rc::Rc;
+use std::cell::RefCell;
 use std::collections::HashSet;
 
 use rlua::{UserData, UserDataMethods};
 
 use sulis_rules::HitKind;
-use sulis_module::Module;
+use sulis_module::{Ability, Module};
 use script::{ScriptEntity, ScriptEntitySet};
-use GameState;
+use {EntityState, GameState};
 
 const BEFORE_ATTACK: &str = "before_attack";
 const AFTER_ATTACK: &str = "after_attack";
 const ON_ANIM_COMPLETE: &str = "on_anim_complete";
+const ON_ANIM_UPDATE: &str = "on_anim_update";
 
 pub trait ScriptCallback {
     fn before_attack(&self) { }
@@ -33,13 +36,18 @@ pub trait ScriptCallback {
     fn after_attack(&self, _hit_kind: HitKind) { }
 
     fn on_anim_complete(&self) { }
+
+    /// Callback called by an animation at a predefined time.
+    /// The `index` is the index of the callback within the animation's
+    /// list of callbacks.  It is 1 based to match with Lua indexing
+    fn on_anim_update(&self, _index: usize) { }
 }
 
 #[derive(Clone)]
 pub struct CallbackData {
     parent: usize,
     ability_id: String,
-    targets: Vec<usize>,
+    targets: Vec<Option<usize>>,
     funcs: HashSet<String>,
 }
 
@@ -53,44 +61,63 @@ impl CallbackData {
         }
     }
 
-    fn do_callback(&self, func: &str) {
+    fn get_params(&self) -> (Rc<RefCell<EntityState>>, Rc<Ability>, Vec<Option<Rc<RefCell<EntityState>>>>) {
         let area_state = GameState::area_state();
         let parent = area_state.borrow().get_entity(self.parent);
         let ability = Module::ability(&self.ability_id).unwrap();
-        let targets = self.targets.iter().map(|t| area_state.borrow().get_entity(*t)).collect();
+        let mut targets = Vec::new();
+        for index in self.targets.iter() {
+            let index = match index {
+                &None => {
+                    targets.push(None);
+                    continue;
+                }, &Some(index) => index,
+            };
 
-        GameState::execute_ability_script(&parent, &ability, targets, &func);
+            match area_state.borrow().check_get_entity(index) {
+                None => targets.push(None),
+                Some(entity) => targets.push(Some(entity)),
+            }
+        }
+        (parent, ability, targets)
     }
 }
 
 impl ScriptCallback for CallbackData {
     fn before_attack(&self) {
-        if self.funcs.contains(BEFORE_ATTACK) {
-            self.do_callback(BEFORE_ATTACK);
-        }
+        if !self.funcs.contains(BEFORE_ATTACK) { return; }
+
+        let (parent, ability, targets) = self.get_params();
+        GameState::execute_ability_script(&parent, &ability, targets, "before_attack");
     }
 
     fn after_attack(&self, hit_kind: HitKind) {
-        if self.funcs.contains(AFTER_ATTACK) {
-            let area_state = GameState::area_state();
-            let parent = area_state.borrow().get_entity(self.parent);
-            let ability = Module::ability(&self.ability_id).unwrap();
-            let targets = self.targets.iter().map(|t| area_state.borrow().get_entity(*t)).collect();
-            GameState::execute_ability_after_attack(&parent, &ability, targets, hit_kind);
-        }
+        if !self.funcs.contains(AFTER_ATTACK) { return; }
+
+        let (parent, ability, targets) = self.get_params();
+        GameState::execute_ability_after_attack(&parent, &ability, targets, hit_kind);
     }
 
     fn on_anim_complete(&self) {
-        if self.funcs.contains(ON_ANIM_COMPLETE) {
-            self.do_callback(ON_ANIM_COMPLETE);
-        }
+        if !self.funcs.contains(ON_ANIM_COMPLETE) { return; }
+
+        let (parent, ability, targets) = self.get_params();
+        GameState::execute_ability_script(&parent, &ability, targets, "on_anim_complete");
+    }
+
+    fn on_anim_update(&self, index: usize) {
+        if !self.funcs.contains(ON_ANIM_UPDATE) { return; }
+
+        let (parent, ability, targets) = self.get_params();
+        GameState::execute_ability_on_anim_update(&parent, &ability, targets, index);
     }
 }
 
 impl UserData for CallbackData {
     fn add_methods(methods: &mut UserDataMethods<Self>) {
         methods.add_method_mut("add_target", |_, cb, target: ScriptEntity| {
-            cb.targets.push(target.index);
+            let index = target.try_unwrap_index()?;
+            cb.targets.push(Some(index));
             Ok(())
         });
 

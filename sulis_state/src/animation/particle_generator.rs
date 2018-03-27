@@ -17,6 +17,7 @@
 use rlua::{UserData};
 use rand::{self, Rng};
 
+use std::cmp::Ordering;
 use std::cell::RefCell;
 use std::rc::Rc;
 use std::time::Instant;
@@ -135,7 +136,7 @@ pub struct GeneratorModel {
     pub particle_x_dist: Option<DistParam>,
     pub particle_y_dist: Option<DistParam>,
     pub particle_duration_dist: Option<Dist>,
-    pub particle_size_dist: Option<(Dist, Dist)>
+    pub particle_size_dist: Option<(Dist, Dist)>,
 }
 
 impl UserData for GeneratorModel { }
@@ -189,6 +190,8 @@ pub struct ParticleGenerator {
     start_time: Instant,
     previous_secs: f32,
     particles: Vec<Particle>,
+    callbacks: Vec<(f32, Box<ScriptCallback>)>, //sorted by the first field which is time in seconds
+    callback_index: usize,
     callback: Option<Box<ScriptCallback>>,
     gen_overflow: f32,
     marked_for_removal: Rc<RefCell<bool>>,
@@ -206,6 +209,8 @@ impl ParticleGenerator {
             owner,
             image,
             callback: None,
+            callback_index: 1, // use lua 1 based indexing
+            callbacks: Vec::new(),
             start_time: Instant::now(),
             previous_secs: 0.0,
             particles: Vec::new(),
@@ -213,6 +218,18 @@ impl ParticleGenerator {
             model,
             marked_for_removal: Rc::new(RefCell::new(false)),
         }
+    }
+
+    pub fn add_callback(&mut self, callback: Box<ScriptCallback>, time_secs: f32) {
+        self.callbacks.push((time_secs, callback));
+
+        self.callbacks.sort_by(|a, b| {
+            if a.0 < b.0 {
+                Ordering::Less
+            } else {
+                Ordering::Greater
+            }
+        });
     }
 
     pub fn add_removal_listener(&self, effect: &mut Effect) {
@@ -297,6 +314,14 @@ impl animation::Animation for ParticleGenerator {
 
             if remove {
                 self.particles.remove(i);
+            }
+        }
+
+        if !self.callbacks.is_empty() {
+            if secs > self.callbacks[0].0 {
+                self.callbacks[0].1.on_anim_update(self.callback_index);
+                self.callbacks.remove(0);
+                self.callback_index += 1;
             }
         }
 

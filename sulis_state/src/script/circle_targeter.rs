@@ -45,7 +45,18 @@ impl CircleTargeter {
         let area_state = area_state.borrow();
 
         let parent = area_state.get_entity(data.parent);
-        let targets = data.targets.iter().map(|t| area_state.get_entity(*t)).collect();
+        let mut targets = Vec::new();
+        for index in data.targets.iter() {
+            let index = match index {
+                &None => continue,
+                &Some(ref index) => *index,
+            };
+
+            match area_state.check_get_entity(index) {
+                None => (),
+                Some(entity) => targets.push(entity),
+            }
+        }
 
         CircleTargeter {
             ability: Module::ability(&data.ability_id).unwrap(),
@@ -190,7 +201,9 @@ impl Targeter for CircleTargeter {
             Some(_) => (),
         };
 
+        let affected = self.cur_affected.iter().map(|e| Some(Rc::clone(e))).collect();
+
         GameState::execute_ability_on_target_select(&self.parent, &self.ability,
-                                                    self.cur_affected.clone());
+                                                    affected);
     }
 }

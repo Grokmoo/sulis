@@ -442,6 +442,25 @@ impl AreaState {
         EntityIterator { area_state: &self, index: 0 }
     }
 
+    pub fn has_entity(&self, index: usize) -> bool {
+        if index >= self.entities.len() {
+            false
+        } else {
+            self.entities[index].is_some()
+        }
+    }
+
+    pub fn check_get_entity(&self, index: usize) -> Option<Rc<RefCell<EntityState>>> {
+        if index >= self.entities.len() {
+            None
+        } else {
+            match self.entities[index] {
+                None => None,
+                Some(ref entity) => Some(Rc::clone(entity)),
+            }
+        }
+    }
+
     pub fn get_entity(&self, index: usize) -> Rc<RefCell<EntityState>> {
         let entity = &self.entities[index];
 

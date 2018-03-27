@@ -142,8 +142,13 @@ macro_rules! exec_script {
 }
 
 impl GameState {
+    pub fn execute_ability_on_anim_update(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>,
+                                          targets: Vec<Option<Rc<RefCell<EntityState>>>>, index: usize) {
+        exec_script!(ability_on_anim_update: parent, ability, targets, index);
+    }
+
     pub fn execute_ability_after_attack(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>,
-                                        targets: Vec<Rc<RefCell<EntityState>>>, kind: HitKind) {
+                                        targets: Vec<Option<Rc<RefCell<EntityState>>>>, kind: HitKind) {
         exec_script!(ability_after_attack: parent, ability, targets, kind);
     }
 
@@ -152,13 +157,14 @@ impl GameState {
     }
 
     pub fn execute_ability_on_target_select(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>,
-                                            targets: Vec<Rc<RefCell<EntityState>>>) {
+                                            targets: Vec<Option<Rc<RefCell<EntityState>>>>) {
         exec_script!(ability_on_target_select: parent, ability, targets);
     }
 
     pub fn execute_ability_script(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>,
-                                  targets: Vec<Rc<RefCell<EntityState>>>, func: &str) {
-        exec_script!(ability_script: parent, ability, targets, func);
+                                  targets: Vec<Option<Rc<RefCell<EntityState>>>>, func: &str) {
+        let t: Option<(&str, usize)> = None;
+        exec_script!(ability_script: parent, ability, targets, t, func);
     }
 
     pub fn init(pc_actor: Rc<Actor>) -> Result<(), Error> {

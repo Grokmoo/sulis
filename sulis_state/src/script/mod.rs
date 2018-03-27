@@ -89,35 +89,45 @@ impl ScriptState {
 
     pub fn ability_on_activate(&self, parent: &Rc<RefCell<EntityState>>,
                                        ability: &Rc<Ability>) -> Result<()> {
-        self.ability_script(parent, ability, Vec::new(), "on_activate")
+        let t: Option<(&str, usize)> = None;
+        self.ability_script(parent, ability, Vec::new(), t, "on_activate")
     }
 
     pub fn ability_on_target_select(&self, parent: &Rc<RefCell<EntityState>>,
                                             ability: &Rc<Ability>,
-                                            targets: Vec<Rc<RefCell<EntityState>>>) -> Result<()> {
-        self.ability_script(parent, ability, targets, "on_target_select")
+                                            targets: Vec<Option<Rc<RefCell<EntityState>>>>) -> Result<()> {
+        let t: Option<(&str, usize)> = None;
+        self.ability_script(parent, ability, targets, t, "on_target_select")
     }
 
     pub fn ability_after_attack(&self, parent: &Rc<RefCell<EntityState>>,
-                                ability: &Rc<Ability>, targets: Vec<Rc<RefCell<EntityState>>>,
+                                ability: &Rc<Ability>, targets: Vec<Option<Rc<RefCell<EntityState>>>>,
                                 hit_kind: HitKind) -> Result<()> {
         let hit_kind = ScriptHitKind { kind: hit_kind };
-
-        let script = get_script(ability)?;
-        self.lua.globals().set("ability", ScriptAbility::from(ability))?;
-        self.lua.globals().set("targets", ScriptEntitySet::new(parent, &targets))?;
-        self.lua.globals().set("hit", hit_kind)?;
-        self.execute_script(parent, "(parent, ability, targets, hit)", script, "after_attack")
+        self.ability_script(parent, ability, targets, Some(("hit", hit_kind)), "after_attack")
     }
 
-    pub fn ability_script(&self, parent: &Rc<RefCell<EntityState>>,
-                                  ability: &Rc<Ability>,
-                                  targets: Vec<Rc<RefCell<EntityState>>>,
-                                  func: &str) -> Result<()> {
+    pub fn ability_on_anim_update(&self, parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>,
+                                  targets: Vec<Option<Rc<RefCell<EntityState>>>>, index: usize) -> Result<()> {
+        self.ability_script(parent, ability, targets, Some(("index", index)), "on_anim_update")
+    }
+
+    pub fn ability_script<'a, T>(&'a self, parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>,
+                                 targets: Vec<Option<Rc<RefCell<EntityState>>>>, arg: Option<(&str, T)>,
+                                 func: &str) -> Result<()> where T: rlua::prelude::ToLua<'a> + Send {
         let script = get_script(ability)?;
         self.lua.globals().set("ability", ScriptAbility::from(ability))?;
         self.lua.globals().set("targets", ScriptEntitySet::new(parent, &targets))?;
-        self.execute_script(parent, "(parent, ability, targets)", script, func)
+
+        let mut args_string = "(parent, ability, targets".to_string();
+        if let Some((arg_str, arg)) = arg {
+            args_string.push_str(", ");
+            args_string.push_str(arg_str);
+
+            self.lua.globals().set(arg_str, arg)?;
+        }
+        args_string.push(')');
+        self.execute_script(parent, &args_string, script, func)
     }
 }
 
@@ -173,16 +183,17 @@ impl UserData for ScriptAbility {
         methods.add_method("duration", |_, ability, ()| Ok(ability.duration));
 
         methods.add_method("create_callback", |_, ability, parent: ScriptEntity| {
-            let cb_data = CallbackData::new(parent.index, &ability.id);
+            let index = parent.try_unwrap_index()?;
+            let cb_data = CallbackData::new(index, &ability.id);
             Ok(cb_data)
         });
     }
 }
 
 fn activate(_lua: &Lua, ability: &ScriptAbility, target: ScriptEntity) -> Result<()> {
-    let area_state = GameState::area_state();
-    let entity = area_state.borrow().get_entity(target.index);
+    let entity = target.try_unwrap()?;
 
+    let area_state = GameState::area_state();
     if area_state.borrow().turn_timer.is_active() {
         entity.borrow_mut().actor.remove_ap(ability.ap);
     }

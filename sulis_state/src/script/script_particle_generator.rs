@@ -27,7 +27,8 @@ use script::{CallbackData, Result};
 pub struct ScriptParticleGenerator {
     parent: usize,
     image: String,
-    callback: Option<CallbackData>,
+    completion_callback: Option<CallbackData>,
+    callbacks: Vec<(f32, CallbackData)>,
     model: GeneratorModel,
 }
 
@@ -43,7 +44,8 @@ impl ScriptParticleGenerator {
         ScriptParticleGenerator {
             parent,
             image,
-            callback: None,
+            completion_callback: None,
+            callbacks: Vec::new(),
             model,
         }
     }
@@ -89,8 +91,16 @@ impl UserData for ScriptParticleGenerator {
             }
             Ok(())
         });
-        methods.add_method_mut("set_callback", |_, gen, cb: CallbackData| {
-            gen.callback = Some(cb);
+        methods.add_method_mut("set_alpha", |_, gen, a: Param| {
+            gen.model.alpha = a;
+            Ok(())
+        });
+        methods.add_method_mut("set_completion_callback", |_, gen, cb: CallbackData| {
+            gen.completion_callback = Some(cb);
+            Ok(())
+        });
+        methods.add_method_mut("add_callback", |_, gen, (cb, time): (CallbackData, f32)| {
+            gen.callbacks.push((time, cb));
             Ok(())
         });
         methods.add_method_mut("set_particle_x_dist", |_, gen, value: DistParam| {
@@ -164,8 +174,12 @@ pub fn create_pgen(gen: &ScriptParticleGenerator) -> Result<ParticleGenerator> {
 
     let mut pgen = ParticleGenerator::new(parent, image, gen.model.clone());
 
-    if let Some(ref cb) = gen.callback {
+    if let Some(ref cb) = gen.completion_callback {
         pgen.set_callback(Some(Box::new(cb.clone())));
+    }
+
+    for &(time, ref cb) in gen.callbacks.iter() {
+        pgen.add_callback(Box::new(cb.clone()), time);
     }
 
     Ok(pgen)

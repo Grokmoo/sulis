@@ -14,6 +14,9 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+mod circle_targeter;
+use self::circle_targeter::CircleTargeter;
+
 mod script_callback;
 use self::script_callback::CallbackData;
 pub use self::script_callback::ScriptCallback;
@@ -30,6 +33,7 @@ mod script_particle_generator;
 use self::script_particle_generator::ScriptParticleGenerator;
 
 pub mod targeter;
+use self::targeter::Targeter;
 use self::targeter::TargeterData;
 
 use std;

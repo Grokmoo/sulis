@@ -215,6 +215,14 @@ impl EntityState {
                   other.prop.size.width, other.prop.size.height)
     }
 
+    pub fn center_x(&self) -> i32 {
+        self.location.x + self.size.width / 2
+    }
+
+    pub fn center_y(&self) -> i32 {
+        self.location.y + self.size.height / 2
+    }
+
     pub fn size(&self) -> &str {
         &self.size.id
     }

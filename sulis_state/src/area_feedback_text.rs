@@ -27,7 +27,6 @@ pub struct AreaFeedbackText {
     pos_y: f32,
     text: String,
     text_width: f32,
-    scale: f32,
     start_time: Instant,
     duration: u32,
     font_renderer: LineRenderer,
@@ -38,14 +37,13 @@ pub struct AreaFeedbackText {
 }
 
 impl AreaFeedbackText {
-    pub fn new(text: String, pos_x: f32, pos_y: f32, scale: f32, color: Color) -> AreaFeedbackText {
+    pub fn new(text: String, pos_x: f32, pos_y: f32, color: Color) -> AreaFeedbackText {
         let font = ResourceSet::get_default_font();
-        let text_width = font.get_width(&text) as f32 * scale / font.line_height as f32;
+        let text_width = font.get_width(&text) as f32 / font.line_height as f32;
 
         AreaFeedbackText {
             text,
             text_width,
-            scale,
             pos_x,
             pos_y,
             color,
@@ -74,13 +72,13 @@ impl AreaFeedbackText {
         self.alpha > 0.0
     }
 
-    pub fn draw(&self, renderer: &mut GraphicsRenderer, offset_x: f32, offset_y: f32,
+    pub fn draw(&self, renderer: &mut GraphicsRenderer, text_scale: f32, offset_x: f32, offset_y: f32,
                 scale_x: f32, scale_y: f32) {
-        // TODO font, color and text size at a minimum should be configurable via text configuration
-        let pos_x = offset_x + self.pos_x - self.text_width / 2.0;
+        // TODO font, color at a minimum should be configurable via text configuration
+        let pos_x = offset_x + self.pos_x - text_scale * self.text_width / 2.0;
         let pos_y = offset_y + self.pos_y - self.hover_y;
 
-        let mut draw_list = self.font_renderer.get_draw_list(&self.text, pos_x, pos_y, self.scale);
+        let mut draw_list = self.font_renderer.get_draw_list(&self.text, pos_x, pos_y, text_scale);
         draw_list.set_scale(scale_x, scale_y);
         draw_list.set_color(Color::new(self.color.r, self.color.g, self.color.b, self.alpha));
         renderer.draw(draw_list);

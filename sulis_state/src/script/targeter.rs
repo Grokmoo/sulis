@@ -14,20 +14,31 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::slice::Iter;
 use std::rc::Rc;
 use std::cell::RefCell;
 
 use rlua::{Lua, UserData, UserDataMethods};
 
+use sulis_core::image::Image;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{animation_state, color, Cursor};
 use sulis_module::{Ability, Module};
 
-use script::{Result, ScriptEntity, ScriptEntitySet};
+use script::{CircleTargeter, Result, ScriptEntity, ScriptEntitySet};
 use {EntityState, GameState};
 
-pub struct Targeter {
+pub trait Targeter {
+    fn draw(&self, renderer: &mut GraphicsRenderer, tile: &Rc<Image>, x_offset: f32, y_offset: f32,
+            scale_x: f32, scale_y: f32, millis: u32);
+
+    fn on_mouse_move(&mut self, cursor_x: i32, cursor_y: i32) -> Option<&Rc<RefCell<EntityState>>>;
+
+    fn on_mouse_release(&mut self);
+
+    fn cancel(&self) -> bool;
+}
+
+pub struct SingleTargeter {
     ability: Rc<Ability>,
     parent: Rc<RefCell<EntityState>>,
     targets: Vec<Rc<RefCell<EntityState>>>,
@@ -37,21 +48,13 @@ pub struct Targeter {
     cancel: bool,
 }
 
-impl Targeter {
-    pub fn target_iter<'a>(&'a self) -> Iter<'a, Rc<RefCell<EntityState>>> {
-        self.targets.iter()
-    }
-
-    pub fn parent(&self) -> &Rc<RefCell<EntityState>> {
-        &self.parent
-    }
-
-    pub fn cancel(&self) -> bool {
+impl Targeter for SingleTargeter {
+    fn cancel(&self) -> bool {
         self.cancel
     }
 
-    pub fn draw(&self, renderer: &mut GraphicsRenderer, x_offset: f32, y_offset: f32,
-                scale_x: f32, scale_y: f32) {
+    fn draw(&self, renderer: &mut GraphicsRenderer, _tile: &Rc<Image>, x_offset: f32, y_offset: f32,
+                scale_x: f32, scale_y: f32, _millis: u32) {
         let mut draw_list = DrawList::empty_sprite();
 
         for target in self.targets.iter() {
@@ -71,16 +74,7 @@ impl Targeter {
         }
     }
 
-    fn draw_target(&self, target: &Rc<RefCell<EntityState>>, x_offset: f32, y_offset: f32) -> DrawList {
-        let target = target.borrow();
-        DrawList::from_sprite_f32(&target.size.cursor_sprite,
-                                  target.location.x as f32 - x_offset,
-                                  target.location.y as f32 - y_offset,
-                                  target.size.width as f32,
-                                  target.size.height as f32)
-    }
-
-    pub fn on_mouse_move(&mut self, cursor_x: i32, cursor_y: i32) -> Option<&Rc<RefCell<EntityState>>> {
+    fn on_mouse_move(&mut self, cursor_x: i32, cursor_y: i32) -> Option<&Rc<RefCell<EntityState>>> {
         for target in self.targets.iter() {
             {
                 let target = target.borrow();
@@ -104,7 +98,7 @@ impl Targeter {
         self.cur_target.as_ref()
     }
 
-    pub fn on_mouse_release(&mut self) {
+    fn on_mouse_release(&mut self) {
         self.cancel = true;
 
         let cur_target = match self.cur_target {
@@ -112,19 +106,31 @@ impl Targeter {
             Some(ref target) => Rc::clone(target),
         };
 
-        GameState::execute_ability_on_target_select(&self.parent, &self.ability, vec![cur_target]);
+        GameState::execute_ability_on_target_select(&self.parent, &self.ability,
+                                                    vec![Rc::clone(&cur_target)]);
     }
 }
 
-impl<'a> From<&'a TargeterData> for Targeter {
-    fn from(data: &TargeterData) -> Targeter {
+impl SingleTargeter {
+    fn draw_target(&self, target: &Rc<RefCell<EntityState>>, x_offset: f32, y_offset: f32) -> DrawList {
+        let target = target.borrow();
+        DrawList::from_sprite_f32(&target.size.cursor_sprite,
+                                  target.location.x as f32 - x_offset,
+                                  target.location.y as f32 - y_offset,
+                                  target.size.width as f32,
+                                  target.size.height as f32)
+    }
+}
+
+impl<'a> From<&'a TargeterData> for SingleTargeter {
+    fn from(data: &TargeterData) -> SingleTargeter {
         let area_state = GameState::area_state();
         let area_state = area_state.borrow();
 
         let parent = area_state.get_entity(data.parent);
         let targets = data.targets.iter().map(|t| area_state.get_entity(*t)).collect();
 
-        Targeter {
+        SingleTargeter {
             ability: Module::ability(&data.ability_id).unwrap(),
             parent,
             targets,
@@ -134,11 +140,18 @@ impl<'a> From<&'a TargeterData> for Targeter {
     }
 }
 
+#[derive(Clone, Copy)]
+enum TargeterKind {
+    Single,
+    Circle { radius: f32 },
+}
+
 #[derive(Clone)]
 pub struct TargeterData {
-    ability_id: String,
-    parent: usize,
-    targets: Vec<usize>,
+    pub ability_id: String,
+    pub parent: usize,
+    pub targets: Vec<usize>,
+    kind: TargeterKind,
 }
 
 impl TargeterData {
@@ -147,6 +160,7 @@ impl TargeterData {
             parent,
             ability_id: ability_id.to_string(),
             targets: Vec::new(),
+            kind: TargeterKind::Single,
         }
     }
 }
@@ -162,13 +176,20 @@ impl UserData for TargeterData {
             targeter.targets.push(target.index);
             Ok(())
         });
+        methods.add_method_mut("set_circle", |_, targeter, radius: f32| {
+            targeter.kind = TargeterKind::Circle { radius };
+            Ok(())
+        });
     }
 }
 
 fn activate(_lua: &Lua, data: &TargeterData, _args: ()) -> Result<()> {
     info!("Activating targeter");
 
-    let targeter = Targeter::from(data);
+    let targeter: Box<Targeter> = match data.kind {
+        TargeterKind::Single => Box::new(SingleTargeter::from(data)),
+        TargeterKind::Circle { radius } => Box::new(CircleTargeter::from(data, radius)),
+    };
 
     let area_state = GameState::area_state();
     area_state.borrow_mut().set_targeter(targeter);

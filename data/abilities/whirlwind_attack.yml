@@ -1,0 +1,11 @@
+id: whirlwind_attack
+name: "Whirlwind Attack"
+icon: abilities/whirlwind_attack
+description: |
+  You unleash a hail of attacks in all directions with your melee weapon, making one standard attack against each opponent within striking distance.
+active:
+  script: "whirlwind_attack"
+  ap: 30
+  duration: 0
+prereqs:
+  abilities: [ mighty_blow ]

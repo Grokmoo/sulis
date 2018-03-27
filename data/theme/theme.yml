@@ -157,6 +157,9 @@ children:
     preferred_size: [-80, 0]
     width_relative: Max
     height_relative: Max
+    custom:
+      targeter_tile: "60_red_transparent_fill"
+      feedback_text_scale: "1.2"
     children:
       action_menu:
         from: .list_box

@@ -21,13 +21,14 @@ use std::cmp;
 use std::time;
 use std::mem;
 
+use sulis_core::image::Image;
 use sulis_core::ui::{compute_area_scaling, animation_state};
 use sulis_core::ui::{color, Cursor, Scrollable, WidgetKind, Widget};
 use sulis_core::io::*;
 use sulis_core::io::event::ClickKind;
 use sulis_core::util::{self, Point};
 use sulis_core::config::CONFIG;
-use sulis_core::resource::Sprite;
+use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::extern_image::ImageBuffer;
 use sulis_module::area::Layer;
 use sulis_state::{AreaDrawable, AreaState, EntityState, GameState};
@@ -51,6 +52,9 @@ pub struct AreaView {
     cache_invalid: bool,
     layers: Vec<String>,
 
+    targeter_tile: Option<Rc<Image>>,
+    feedback_text_scale: f32,
+
     scroll: Scrollable,
     hover_sprite: Option<HoverSprite>,
 }
@@ -72,6 +76,8 @@ impl AreaView {
             cache_invalid: true,
             layers: Vec::new(),
             scroll: Scrollable::new(),
+            targeter_tile: None,
+            feedback_text_scale: 1.0,
         }))
     }
 
@@ -255,6 +261,20 @@ impl WidgetKind for AreaView {
 
     fn as_any_mut(&mut self) -> &mut Any { self }
 
+    fn layout(&mut self, widget: &mut Widget) {
+        widget.do_base_layout();
+
+        if let Some(ref theme) = widget.theme {
+            if let Some(ref image_id) = theme.custom.get("targeter_tile") {
+                self.targeter_tile = ResourceSet::get_image(image_id);
+            }
+            self.feedback_text_scale = theme.get_custom_or_default("feedback_text_scale", 1.0);
+        }
+
+        if self.targeter_tile.is_none() {
+            warn!("No targeter tile specified for Areaview");
+        }
+    }
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         self.hover_sprite = None;
 
@@ -397,15 +417,22 @@ impl WidgetKind for AreaView {
         }
 
         for feedback_text in state.feedback_text_iter() {
-            feedback_text.draw(renderer, p.x as f32 - self.scroll.x(), p.y as f32- self.scroll.y(),
+            feedback_text.draw(renderer, self.feedback_text_scale,
+                               p.x as f32 - self.scroll.x(), p.y as f32- self.scroll.y(),
                                scale_x, scale_y);
         }
 
         GameState::draw_graphics_mode(renderer, p.x as f32 - self.scroll.x(), p.y as f32- self.scroll.y(),
                                       scale_x, scale_y, millis);
 
+        let targeter_tile = match self.targeter_tile {
+            None => return,
+            Some(ref tile) => tile,
+        };
+
         if let Some(ref targeter) = state.targeter() {
-            targeter.borrow().draw(renderer, self.scroll.x(), self.scroll.y(), scale_x, scale_y);
+            targeter.borrow().draw(renderer, targeter_tile, self.scroll.x(), self.scroll.y(),
+                scale_x, scale_y, millis);
         }
     }
 
@@ -414,11 +441,12 @@ impl WidgetKind for AreaView {
         let (x, y) = self.get_cursor_pos(widget);
         if x < 0 || y < 0 { return true; }
 
-        let area_state = GameState::area_state();
-        let has_targeter = area_state.borrow().targeter().is_some();
+        if kind == ClickKind::Middle { return true; }
 
-        if has_targeter {
-            let targeter = Rc::clone(area_state.borrow().targeter().unwrap());
+        let area_state = GameState::area_state();
+
+        let targeter = area_state.borrow_mut().targeter();
+        if let Some(targeter) = targeter {
             targeter.borrow_mut().on_mouse_release();
             return true;
         }
@@ -464,7 +492,10 @@ impl WidgetKind for AreaView {
         self.hover_sprite = None;
 
         let area_state = GameState::area_state();
-        if let Some(ref targeter) = area_state.borrow_mut().targeter() {
+
+        let targeter = area_state.borrow_mut().targeter();
+
+        if let Some(ref targeter) = targeter {
             let mut targeter = targeter.borrow_mut();
             let mouse_over = targeter.on_mouse_move(area_x, area_y);
 

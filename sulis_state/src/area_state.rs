@@ -46,7 +46,7 @@ pub struct AreaState {
 
     last_time_millis: u32,
 
-    targeter: Option<Rc<RefCell<Targeter>>>,
+    targeter: Option<Rc<RefCell<Box<Targeter>>>>,
 }
 
 impl PartialEq for AreaState {
@@ -56,11 +56,14 @@ impl PartialEq for AreaState {
 }
 
 impl AreaState {
-    pub fn targeter(&self) -> Option<&Rc<RefCell<Targeter>>> {
-        self.targeter.as_ref()
+    pub fn targeter(&mut self) -> Option<Rc<RefCell<Box<Targeter>>>> {
+        match self.targeter {
+            None => None,
+            Some(ref targeter) => Some(Rc::clone(targeter)),
+        }
     }
 
-    pub (crate) fn set_targeter(&mut self, targeter: Targeter) {
+    pub (crate) fn set_targeter(&mut self, targeter: Box<Targeter>) {
         self.targeter = Some(Rc::new(RefCell::new(targeter)));
     }
 
@@ -494,10 +497,13 @@ impl AreaState {
         self.feedback_text.iter_mut().for_each(|f| f.update());
         self.feedback_text.retain(|f| f.retain());
 
-        if self.targeter.is_some() {
-            if self.targeter.as_ref().unwrap().borrow().cancel() {
-                self.targeter = None;
-            }
+        let remove_targeter = match self.targeter {
+            None => false,
+            Some(ref targeter) => targeter.borrow().cancel()
+        };
+
+        if remove_targeter {
+            self.targeter.take();
         }
 
         if notify {
@@ -548,12 +554,12 @@ impl AreaState {
     }
 
     pub fn add_feedback_text(&mut self, text: String, target: &Rc<RefCell<EntityState>>,
-                             scale: f32, color: Color) {
+                             color: Color) {
         let width = target.borrow().size.width as f32;
         let pos_x = target.borrow().location.x as f32 + width / 2.0;
         let pos_y = target.borrow().location.y as f32 - 1.5;
 
-        self.feedback_text.push(AreaFeedbackText::new(text, pos_x, pos_y, scale, color));
+        self.feedback_text.push(AreaFeedbackText::new(text, pos_x, pos_y, color));
     }
 
     pub fn feedback_text_iter(&self) -> Iter<AreaFeedbackText> {

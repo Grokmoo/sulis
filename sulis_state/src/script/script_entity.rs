@@ -26,7 +26,7 @@ use sulis_rules::{AttackKind, DamageKind, Attack};
 use sulis_core::config::CONFIG;
 use sulis_module::Faction;
 use {EntityState, GameState};
-use script::{CallbackData, Result, ScriptAbility, ScriptEffect, ScriptParticleGenerator, TargeterData};
+use script::{CallbackData, Result, ScriptAbility, ScriptCallback, ScriptEffect, ScriptParticleGenerator, TargeterData};
 
 #[derive(Clone)]
 pub struct ScriptEntity {
@@ -73,12 +73,29 @@ impl UserData for ScriptEntity {
             Ok(TargeterData::new(entity.index, &ability.id))
         });
 
-        methods.add_method("weapon_attack", |_, entity, (target, callback): (ScriptEntity, CallbackData)| {
+        methods.add_method("weapon_attack", |_, entity, target: ScriptEntity| {
+            let area_state = GameState::area_state();
+            let target = area_state.borrow().get_entity(target.index);
+            let parent = area_state.borrow().get_entity(entity.index);
+            let (_, text, color) = parent.borrow_mut().actor.weapon_attack(&target);
+
+            area_state.borrow_mut().add_feedback_text(text, &target, color);
+
+            Ok(())
+        });
+
+        methods.add_method("anim_weapon_attack", |_, entity, (target, callback):
+                           (ScriptEntity, Option<CallbackData>)| {
             let area_state = GameState::area_state();
             let target = area_state.borrow().get_entity(target.index);
             let parent = area_state.borrow().get_entity(entity.index);
 
-            EntityState::attack(&parent, &target, Some(Box::new(callback)));
+            let cb: Option<Box<ScriptCallback>> = match callback {
+                None => None,
+                Some(cb) => Some(Box::new(cb)),
+            };
+
+            EntityState::attack(&parent, &target, cb);
             Ok(())
         });
 
@@ -122,8 +139,7 @@ impl UserData for ScriptEntity {
 
             let (_hit_kind, text, color) = parent.borrow_mut().actor.attack(&target, &attack);
 
-            let scale = 1.2;
-            area_state.borrow_mut().add_feedback_text(text, &target, scale, color);
+            area_state.borrow_mut().add_feedback_text(text, &target, color);
 
             Ok(())
         });
@@ -198,7 +214,7 @@ fn create_stats_table<'a>(lua: &'a Lua, parent: &ScriptEntity, _args: ()) -> Res
     stats.set("reflex", src.reflex)?;
     stats.set("will", src.will)?;
 
-    stats.set("attack_distance", src.attack_distance())?;
+    stats.set("attack_distance", src.attack_distance() + parent.borrow().size.diagonal / 2.0)?;
     stats.set("attack_is_melee", src.attack_is_melee())?;
     stats.set("attack_is_ranged", src.attack_is_ranged())?;
 
@@ -230,9 +246,15 @@ impl UserData for ScriptEntitySet {
             Ok(table)
         });
 
+        methods.add_method("is_empty", |_, set, ()| Ok(set.indices.is_empty()));
         methods.add_method("first", |_, set, ()| {
             if set.indices.is_empty() {
-                panic!("EntitySet is empty");
+                warn!("Attempted to get first element of empty EntitySet");
+                return Err(rlua::Error::FromLuaConversionError {
+                    from: "ScriptEntitySet",
+                    to: "ScriptEntity",
+                    message: Some("EntitySet is empty".to_string())
+                });
             }
 
             Ok(ScriptEntity::new(*set.indices.first().unwrap()))

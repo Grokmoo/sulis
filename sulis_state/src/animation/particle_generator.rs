@@ -29,35 +29,110 @@ use sulis_core::util;
 
 use {animation, ChangeListener, Effect, EntityState, ScriptCallback};
 
-#[derive(Clone)]
+#[derive(Clone, Copy)]
+pub enum Coord {
+    X,
+    Y,
+}
+
+#[derive(Clone, Copy)]
 pub enum Dist {
-    FixedDist { value: f32 },
-    UniformDist { min: f32, max: f32 },
+    Fixed { value: f32 },
+    Uniform { min: f32, max: f32 },
+    FixedAngleUniformSpeed {
+        angle: f32,
+        min_speed: f32,
+        max_speed: f32,
+    },
+    UniformAngleFixedSpeed {
+        min_angle: f32,
+        max_angle: f32,
+        speed: f32,
+    },
+    UniformAngleUniformSpeed {
+        min_angle: f32,
+        max_angle: f32,
+        min_speed: f32,
+        max_speed: f32,
+    },
 }
 
 impl UserData for Dist { }
 
+fn swap_if_backwards(min: f32, max: f32) -> (f32, f32) {
+    if min > max {
+        (max, min)
+    } else {
+        (min, max)
+    }
+}
+
 impl Dist {
     pub fn create_fixed(value: f32) -> Dist {
-        Dist::FixedDist { value }
+        Dist::Fixed{ value }
     }
 
     pub fn create_uniform(min: f32, max: f32) -> Dist {
         if min == max {
-            Dist::FixedDist { value: min }
-        } else if max > min {
-            Dist::UniformDist { min, max }
+            Dist::Fixed { value: min }
         } else {
-            Dist::UniformDist { min: max, max: min }
+            let (min, max) = swap_if_backwards(min, max);
+            Dist::Uniform { min, max }
+        }
+    }
+
+    pub fn create_angular(min_angle: f32, max_angle: f32, min_speed: f32, max_speed: f32) -> Dist {
+        let (min_speed, max_speed) = swap_if_backwards(min_speed, max_speed);
+        let (min_angle, max_angle) = swap_if_backwards(min_angle, max_angle);
+
+        if min_angle == max_angle && min_speed == max_speed {
+            warn!("Creating invalid angular distribution with both speed and angle fixed");
+            Dist::Fixed { value: min_speed }
+        } else if min_angle == max_angle {
+            Dist::FixedAngleUniformSpeed { angle: min_angle, min_speed, max_speed, }
+        } else if min_speed == max_speed {
+            Dist::UniformAngleFixedSpeed { min_angle, max_angle, speed: min_speed, }
+        } else {
+            Dist::UniformAngleUniformSpeed { min_angle, max_angle, min_speed, max_speed, }
+        }
+    }
+
+    fn generate_pair(&self) -> (f32, f32) {
+        match self {
+            &Dist::Fixed { value } => (value, value),
+            &Dist::Uniform { min, max } => (rand::thread_rng().gen_range(min, max),
+                rand::thread_rng().gen_range(min, max)),
+            &Dist::FixedAngleUniformSpeed { angle, min_speed, max_speed } => {
+                let speed = rand::thread_rng().gen_range(min_speed, max_speed);
+                radial_to_cart(angle, speed)
+            },
+            &Dist::UniformAngleFixedSpeed { min_angle, max_angle, speed } => {
+                let angle = rand::thread_rng().gen_range(min_angle, max_angle);
+                radial_to_cart(angle, speed)
+            },
+            &Dist::UniformAngleUniformSpeed { min_angle, max_angle, min_speed, max_speed } => {
+                let speed = rand::thread_rng().gen_range(min_speed, max_speed);
+                let angle = rand::thread_rng().gen_range(min_angle, max_angle);
+                radial_to_cart(angle, speed)
+            },
         }
     }
 
     fn generate(&self) -> f32 {
         match self {
-            &Dist::FixedDist { value } => value,
-            &Dist::UniformDist { min, max } => rand::thread_rng().gen_range(min, max),
+            &Dist::Fixed { value } => value,
+            &Dist::Uniform { min, max } => rand::thread_rng().gen_range(min, max),
+            _ => {
+                warn!("2D dists should only be used as the sole dist in a position component");
+                0.0
+            }
         }
     }
+}
+
+fn radial_to_cart(angle: f32, mag: f32) -> (f32, f32) {
+    let (y, x) = angle.sin_cos();
+    (x * mag, y * mag)
 }
 
 #[derive(Clone)]
@@ -77,6 +152,20 @@ impl DistParam {
 impl UserData for DistParam { }
 
 #[derive(Clone)]
+pub struct DistParam2D {
+    x: DistParam,
+    y: Option<DistParam>,
+}
+
+impl DistParam2D {
+    pub fn new(x: DistParam, y: Option<DistParam>) -> DistParam2D {
+        DistParam2D { x, y }
+    }
+}
+
+impl UserData for DistParam2D { }
+
+#[derive(Clone, Debug)]
 pub struct Param {
     initial_value: f32,
     dt: f32,
@@ -133,8 +222,7 @@ pub struct GeneratorModel {
     pub duration_secs: f32,
     pub gen_rate: Param,
     pub initial_overflow: f32,
-    pub particle_x_dist: Option<DistParam>,
-    pub particle_y_dist: Option<DistParam>,
+    pub particle_position_dist: Option<DistParam2D>,
     pub particle_duration_dist: Option<Dist>,
     pub particle_size_dist: Option<(Dist, Dist)>,
 }
@@ -153,8 +241,7 @@ impl GeneratorModel {
             moves_with_parent: false,
             gen_rate: Param::fixed(0.0),
             initial_overflow: 0.0,
-            particle_x_dist: None,
-            particle_y_dist: None,
+            particle_position_dist: None,
             particle_duration_dist: None,
             particle_size_dist: None,
         }
@@ -174,8 +261,8 @@ impl Particle {
         self.current_duration += frame_time;
 
         let v_term = self.current_duration;
-        let a_term = 1.0 / 2.0 * v_term * v_term;
-        let j_term = 1.0 / 3.0 * a_term * v_term;
+        let a_term = v_term * v_term;
+        let j_term = a_term * v_term;
 
         self.position.0.update(v_term, a_term, j_term);
         self.position.1.update(v_term, a_term, j_term);
@@ -191,7 +278,6 @@ pub struct ParticleGenerator {
     previous_secs: f32,
     particles: Vec<Particle>,
     callbacks: Vec<(f32, Box<ScriptCallback>)>, //sorted by the first field which is time in seconds
-    callback_index: usize,
     callback: Option<Box<ScriptCallback>>,
     gen_overflow: f32,
     marked_for_removal: Rc<RefCell<bool>>,
@@ -209,7 +295,6 @@ impl ParticleGenerator {
             owner,
             image,
             callback: None,
-            callback_index: 1, // use lua 1 based indexing
             callbacks: Vec::new(),
             start_time: Instant::now(),
             previous_secs: 0.0,
@@ -244,19 +329,36 @@ impl ParticleGenerator {
         position.0.initial_value = position.0.value;
         position.1.initial_value = position.1.value;
 
-        if let Some(ref dist) = self.model.particle_x_dist {
-            position.0.initial_value += dist.value.generate();
-            position.0.dt += dist.dt.generate();
-            position.0.d2t += dist.d2t.generate();
-            position.0.d3t += dist.d3t.generate();
+        if let Some(ref dist2d) = self.model.particle_position_dist {
+            match dist2d.y {
+                None => {
+                    let value = dist2d.x.value.generate_pair();
+                    let dt = dist2d.x.dt.generate_pair();
+                    let d2t = dist2d.x.d2t.generate_pair();
+                    let d3t = dist2d.x.d3t.generate_pair();
+                    position.0.initial_value += value.0;
+                    position.0.dt += dt.0;
+                    position.0.d2t += d2t.0;
+                    position.0.d3t += d3t.0;
+                    position.1.initial_value += value.1;
+                    position.1.dt += dt.1;
+                    position.1.d2t += d2t.1;
+                    position.1.d3t += d3t.1;
+                }, Some(ref y) => {
+                    let x = &dist2d.x;
+                    position.0.initial_value += x.value.generate();
+                    position.0.dt += x.dt.generate();
+                    position.0.d2t += x.d2t.generate();
+                    position.0.d3t += x.d3t.generate();
+
+                    position.1.initial_value += y.value.generate();
+                    position.1.dt += y.dt.generate();
+                    position.1.d2t += y.d2t.generate();
+                    position.1.d3t += y.d3t.generate();
+                }
+            }
         }
 
-        if let Some(ref dist) = self.model.particle_y_dist {
-            position.1.initial_value += dist.value.generate();
-            position.1.dt += dist.dt.generate();
-            position.1.d2t += dist.d2t.generate();
-            position.1.d3t += dist.d3t.generate();
-        }
 
         let total_duration = match self.model.particle_duration_dist {
             None => self.model.duration_secs,
@@ -293,8 +395,8 @@ impl animation::Animation for ParticleGenerator {
         }
 
         let v_term = secs;
-        let a_term = 1.0 / 2.0 * secs * secs;
-        let j_term = 1.0 / 6.0 * secs * secs * secs;
+        let a_term = secs * secs;
+        let j_term = secs * secs * secs;
 
         self.model.gen_rate.update(v_term, a_term, j_term);
         self.model.position.0.update(v_term, a_term, j_term);
@@ -319,9 +421,8 @@ impl animation::Animation for ParticleGenerator {
 
         if !self.callbacks.is_empty() {
             if secs > self.callbacks[0].0 {
-                self.callbacks[0].1.on_anim_update(self.callback_index);
+                self.callbacks[0].1.on_anim_update();
                 self.callbacks.remove(0);
-                self.callback_index += 1;
             }
         }
 

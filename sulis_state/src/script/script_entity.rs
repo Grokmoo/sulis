@@ -26,7 +26,7 @@ use animation::{Animation, MeleeAttackAnimation};
 use sulis_rules::{AttackKind, DamageKind, Attack};
 use sulis_core::config::CONFIG;
 use sulis_module::Faction;
-use {EntityState, GameState};
+use {ActorState, EntityState, GameState};
 use script::{CallbackData, Result, ScriptAbility, ScriptCallback, ScriptEffect, ScriptParticleGenerator, TargeterData};
 
 #[derive(Clone)]
@@ -45,6 +45,7 @@ impl ScriptEntity {
 
     pub fn check_not_equal(&self, other: &ScriptEntity) -> Result<()> {
         if self.index == other.index {
+            warn!("Parent and target must not refer to the same entity for this method");
             Err(rlua::Error::FromLuaConversionError {
                 from: "ScriptEntity",
                 to: "ScriptEntity",
@@ -128,10 +129,9 @@ impl UserData for ScriptEntity {
         });
 
         methods.add_method("weapon_attack", |_, entity, target: ScriptEntity| {
-            entity.check_not_equal(&target)?;
             let target = target.try_unwrap()?;
             let parent = entity.try_unwrap()?;
-            let (_, text, color) = parent.borrow_mut().actor.weapon_attack(&target);
+            let (_, text, color) = ActorState::weapon_attack(&parent, &target);
 
             let area_state = GameState::area_state();
             area_state.borrow_mut().add_feedback_text(text, &target, color);
@@ -167,7 +167,7 @@ impl UserData for ScriptEntity {
             let mut anim = MeleeAttackAnimation::new(&parent, &target, time, Box::new(move |att, def| {
                 let attack = Attack::special(min_damage, max_damage, damage_kind, attack_kind.clone());
 
-                att.borrow_mut().actor.attack(def, &attack)
+                ActorState::attack(att, def, &attack)
             }));
 
             if let Some(cb) = cb {
@@ -180,7 +180,6 @@ impl UserData for ScriptEntity {
         methods.add_method("special_attack", |_, entity,
                            (target, attack_kind, min_damage, max_damage, damage_kind):
                            (ScriptEntity, String, u32, u32, String)| {
-            entity.check_not_equal(&target)?;
             let target = target.try_unwrap()?;
             let parent = entity.try_unwrap()?;
 
@@ -189,7 +188,7 @@ impl UserData for ScriptEntity {
 
             let attack = Attack::special(min_damage, max_damage, damage_kind, attack_kind);
 
-            let (_hit_kind, text, color) = parent.borrow_mut().actor.attack(&target, &attack);
+            let (_hit_kind, text, color) = ActorState::attack(&parent, &target, &attack);
 
             let area_state = GameState::area_state();
             area_state.borrow_mut().add_feedback_text(text, &target, color);
@@ -231,29 +230,34 @@ impl UserData for ScriptEntity {
         });
 
         methods.add_method("dist_to_point", |_, entity, point: HashMap<String, i32>| {
+            let (x, y) = unwrap_point(point)?;
             let entity = entity.try_unwrap()?;
-            let x = match point.get("x") {
-                None => return Err(rlua::Error::FromLuaConversionError {
-                    from: "ScriptPoint",
-                    to: "Point",
-                    message: Some("Point must have x and y coordinates".to_string())
-                }),
-                Some(x) => *x,
-            };
-
-            let y = match point.get("y") {
-                None => return Err(rlua::Error::FromLuaConversionError {
-                    from: "ScriptPoint",
-                    to: "Point",
-                    message: Some("Point must have x and y coordinates".to_string())
-                }),
-                Some(y) => *y,
-            };
-
             let entity = entity.borrow();
             Ok(entity.dist(x, y, 1, 1))
         });
     }
+}
+
+pub fn unwrap_point(point: HashMap<String, i32>) -> Result<(i32, i32)> {
+    let x = match point.get("x") {
+        None => return Err(rlua::Error::FromLuaConversionError {
+            from: "ScriptPoint",
+            to: "Point",
+            message: Some("Point must have x and y coordinates".to_string())
+        }),
+        Some(x) => *x,
+    };
+
+    let y = match point.get("y") {
+        None => return Err(rlua::Error::FromLuaConversionError {
+            from: "ScriptPoint",
+            to: "Point",
+            message: Some("Point must have x and y coordinates".to_string())
+        }),
+        Some(y) => *y,
+    };
+
+    Ok((x, y))
 }
 
 fn create_stats_table<'a>(lua: &'a Lua, parent: &ScriptEntity, _args: ()) -> Result<rlua::Table<'a>> {
@@ -295,6 +299,7 @@ fn create_stats_table<'a>(lua: &'a Lua, parent: &ScriptEntity, _args: ()) -> Res
 #[derive(Clone)]
 pub struct ScriptEntitySet {
     pub parent: usize,
+    pub point: Option<(i32, i32)>,
     pub indices: Vec<Option<usize>>,
 }
 
@@ -311,6 +316,7 @@ impl ScriptEntitySet {
         }).collect();
         ScriptEntitySet {
             parent,
+            point: None,
             indices,
         }
     }
@@ -318,12 +324,29 @@ impl ScriptEntitySet {
 
 impl UserData for ScriptEntitySet {
     fn add_methods(methods: &mut UserDataMethods<Self>) {
-        methods.add_method("collect", |_, set, ()| {
+        methods.add_method("to_table", |_, set, ()| {
             let table: Vec<ScriptEntity> = set.indices.iter().map(|i| ScriptEntity { index: *i }).collect();
 
             Ok(table)
         });
 
+        methods.add_method("selected_point", |_, set, ()| {
+            match set.point {
+                None => {
+                    warn!("Attempted to get selected point from EntitySet where none is defined");
+                    Err(rlua::Error::FromLuaConversionError {
+                        from: "ScriptEntitySet",
+                        to: "Point",
+                        message: Some("EntitySet has no selected point".to_string())
+                    })
+                }, Some((x, y)) => {
+                    let mut point = HashMap::new();
+                    point.insert("x", x);
+                    point.insert("y", y);
+                    Ok(point)
+                }
+            }
+        });
         methods.add_method("is_empty", |_, set, ()| Ok(set.indices.is_empty()));
         methods.add_method("first", |_, set, ()| {
             for index in set.indices.iter() {
@@ -357,7 +380,7 @@ fn targets(_lua: &Lua, parent: &ScriptEntity, _args: ()) -> Result<ScriptEntityS
     }
 
     let parent_index = parent.try_unwrap_index()?;
-    Ok(ScriptEntitySet { indices, parent: parent_index })
+    Ok(ScriptEntitySet { indices, parent: parent_index, point: None, })
 }
 
 fn visible_within(_lua: &Lua, set: &ScriptEntitySet, dist: f32) -> Result<ScriptEntitySet> {
@@ -416,5 +439,5 @@ fn filter_entities<T: Copy>(set: &ScriptEntitySet, t: T,
         indices.push(*index);
     }
 
-    Ok(ScriptEntitySet { indices, parent: set.parent })
+    Ok(ScriptEntitySet { indices, parent: set.parent, point: set.point, })
 }

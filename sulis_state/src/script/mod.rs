@@ -17,17 +17,17 @@
 mod area_targeter;
 use self::area_targeter::AreaTargeter;
 
-mod script_callback;
+pub mod script_callback;
 use self::script_callback::CallbackData;
 pub use self::script_callback::ScriptCallback;
-use self::script_callback::ScriptHitKind;
+pub use self::script_callback::ScriptHitKind;
 
 mod script_effect;
 use self::script_effect::ScriptEffect;
 
 mod script_entity;
-use self::script_entity::ScriptEntity;
-use self::script_entity::ScriptEntitySet;
+pub use self::script_entity::ScriptEntity;
+pub use self::script_entity::ScriptEntitySet;
 
 mod script_particle_generator;
 use self::script_particle_generator::ScriptParticleGenerator;
@@ -37,14 +37,12 @@ use self::targeter::Targeter;
 use self::targeter::TargeterData;
 
 use std;
-use std::collections::HashMap;
 use std::rc::Rc;
 use std::cell::RefCell;
 
 use rlua::{self, Function, Lua, UserData, UserDataMethods};
 
 use sulis_core::util::Point;
-use sulis_rules::HitKind;
 use sulis_module::{Ability};
 use {EntityState, GameState};
 
@@ -92,37 +90,24 @@ impl ScriptState {
     pub fn ability_on_activate(&self, parent: &Rc<RefCell<EntityState>>,
                                        ability: &Rc<Ability>) -> Result<()> {
         let t: Option<(&str, usize)> = None;
-        self.ability_script(parent, ability, Vec::new(), t, "on_activate")
+        self.ability_script(parent, ability, ScriptEntitySet::new(parent, &Vec::new()), t, "on_activate")
     }
 
     pub fn ability_on_target_select(&self, parent: &Rc<RefCell<EntityState>>,
                                     ability: &Rc<Ability>, targets: Vec<Option<Rc<RefCell<EntityState>>>>,
                                     selected_point: Point) -> Result<()> {
-        let mut point = HashMap::new();
-        point.insert("x", selected_point.x);
-        point.insert("y", selected_point.y);
-        self.ability_script(parent, ability, targets, Some(("selected_point", point)),
-            "on_target_select")
-    }
-
-    pub fn ability_after_attack(&self, parent: &Rc<RefCell<EntityState>>,
-                                ability: &Rc<Ability>, targets: Vec<Option<Rc<RefCell<EntityState>>>>,
-                                hit_kind: HitKind) -> Result<()> {
-        let hit_kind = ScriptHitKind { kind: hit_kind };
-        self.ability_script(parent, ability, targets, Some(("hit", hit_kind)), "after_attack")
-    }
-
-    pub fn ability_on_anim_update(&self, parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>,
-                                  targets: Vec<Option<Rc<RefCell<EntityState>>>>, index: usize) -> Result<()> {
-        self.ability_script(parent, ability, targets, Some(("index", index)), "on_anim_update")
+        let mut targets = ScriptEntitySet::new(parent, &targets);
+        targets.point = Some((selected_point.x, selected_point.y));
+        let t: Option<(&str, usize)> = None;
+        self.ability_script(parent, ability, targets, t,"on_target_select")
     }
 
     pub fn ability_script<'a, T>(&'a self, parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>,
-                                 targets: Vec<Option<Rc<RefCell<EntityState>>>>, arg: Option<(&str, T)>,
+                                 targets: ScriptEntitySet, arg: Option<(&str, T)>,
                                  func: &str) -> Result<()> where T: rlua::prelude::ToLua<'a> + Send {
         let script = get_script(ability)?;
         self.lua.globals().set("ability", ScriptAbility::from(ability))?;
-        self.lua.globals().set("targets", ScriptEntitySet::new(parent, &targets))?;
+        self.lua.globals().set("targets", targets)?;
 
         let mut args_string = "(parent, ability, targets".to_string();
         if let Some((arg_str, arg)) = arg {

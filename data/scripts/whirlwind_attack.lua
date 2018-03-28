@@ -14,21 +14,19 @@ function on_activate(parent, ability)
   targeter:activate()
 end
 
-function on_target_select(parent, ability, targets, selected_point)
-  cb = ability:create_callback(parent)
-  cb:add_targets(targets)
-  cb:register_fn("on_anim_update")
-
+function on_target_select(parent, ability, targets)
   duration = 1.0
-
   gen = parent:create_anim("whirlwind", duration)
   gen:set_position(gen:param(parent:x() - 2.0), gen:param(parent:y() - 2.0))
   gen:set_particle_size_dist(gen:fixed_dist(4.0), gen:fixed_dist(4.0))
   gen:set_alpha(gen:param(1.0, 0.0, 0.0, -6.0))
 
-  targets = targets:collect()
+  targets = targets:to_table()
   duration_per_target = duration / (#targets + 1)
   for i = 1, #targets do
+    cb = ability:create_callback(parent)
+	cb:add_target(targets[i])
+	cb:set_on_anim_update_fn("attack_target")
     gen:add_callback(cb, duration_per_target * i)
   end
   
@@ -36,11 +34,11 @@ function on_target_select(parent, ability, targets, selected_point)
   ability:activate(parent)
 end
 
-function on_anim_update(parent, ability, targets, index)
-  targets = targets:collect()
-  
-  if targets[index]:is_valid() then
-    parent:weapon_attack(targets[index])
+function attack_target(parent, ability, targets)
+  target = targets:first()
+
+  if target:is_valid() then
+    parent:weapon_attack(target)
   end
 end
 

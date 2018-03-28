@@ -22,7 +22,7 @@ use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::image::Image;
 use sulis_core::ui::{animation_state, Widget};
 use sulis_core::util;
-use {EntityState, GameState, ScriptCallback};
+use {ActorState, EntityState, GameState, ScriptCallback};
 use animation::Animation;
 
 pub struct RangedAttackAnimation {
@@ -114,8 +114,7 @@ impl Animation for RangedAttackAnimation {
 
                 let area_state = GameState::area_state();
 
-                let (hit_kind, text, color) = self.attacker.borrow_mut().actor.weapon_attack(&self.defender);
-
+                let (hit_kind, text, color) = ActorState::weapon_attack(&self.attacker, &self.defender);
                 area_state.borrow_mut().add_feedback_text(text, &self.defender, color);
                 self.has_attacked = true;
 

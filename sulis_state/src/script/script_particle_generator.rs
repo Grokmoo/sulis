@@ -20,7 +20,7 @@ use sulis_core::resource::ResourceSet;
 
 use {GameState};
 use animation::{Animation, ParticleGenerator};
-use animation::particle_generator::{Dist, Param, DistParam, GeneratorModel};
+use animation::particle_generator::{Dist, Param, DistParam, DistParam2D, GeneratorModel};
 use script::{CallbackData, Result};
 
 #[derive(Clone)]
@@ -66,6 +66,9 @@ impl UserData for ScriptParticleGenerator {
         methods.add_method("zero_dist", |_, _, _: ()| Ok(Dist::create_fixed(0.0)));
         methods.add_method("fixed_dist", |_, _, value: f32| Ok(Dist::create_fixed(value)));
         methods.add_method("uniform_dist", |_, _, (min, max): (f32, f32)| Ok(Dist::create_uniform(min, max)));
+        methods.add_method("angular_dist", |_, _, (min_a, max_a, min_s, max_s): (f32, f32, f32, f32)| {
+            Ok(Dist::create_angular(min_a, max_a, min_s, max_s))
+        });
         methods.add_method_mut("set_initial_gen", |_, gen, value: f32| {
             gen.model.initial_overflow = value;
             Ok(())
@@ -103,13 +106,9 @@ impl UserData for ScriptParticleGenerator {
             gen.callbacks.push((time, cb));
             Ok(())
         });
-        methods.add_method_mut("set_particle_x_dist", |_, gen, value: DistParam| {
-            gen.model.particle_x_dist = Some(value);
-            Ok(())
-        });
-        methods.add_method_mut("set_particle_y_dist", |_, gen, value: DistParam| {
-            gen.model.particle_y_dist = Some(value);
-            Ok(())
+        methods.add_method_mut("set_particle_position_dist", |_, gen, (x, y): (DistParam, Option<DistParam>)| {
+            gen.model.particle_position_dist = Some(DistParam2D::new(x, y));
+           Ok(())
         });
         methods.add_method_mut("set_particle_duration_dist", |_, gen, value: Dist| {
             gen.model.particle_duration_dist = Some(value);

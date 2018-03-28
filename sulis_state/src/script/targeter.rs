@@ -49,7 +49,7 @@ pub struct TargeterData {
     pub effectable: Vec<Option<usize>>,
     pub shape: Shape,
     pub show_mouseover: bool,
-    pub free_select: bool,
+    pub free_select: Option<f32>,
 }
 
 impl TargeterData {
@@ -61,7 +61,7 @@ impl TargeterData {
             effectable: Vec::new(),
             shape: Shape::Single,
             show_mouseover: true,
-            free_select: false,
+            free_select: None,
         }
     }
 }
@@ -82,8 +82,8 @@ impl UserData for TargeterData {
             targeter.show_mouseover = val;
             Ok(())
         });
-        methods.add_method_mut("set_free_select", |_, targeter, val: bool| {
-            targeter.free_select = val;
+        methods.add_method_mut("set_free_select", |_, targeter, val: f32| {
+            targeter.free_select = Some(val);
             Ok(())
         });
         methods.add_method_mut("add_all_effectable", |_, targeter, targets: ScriptEntitySet| {

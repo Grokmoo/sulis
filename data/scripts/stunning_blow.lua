@@ -12,18 +12,18 @@ function on_activate(parent, ability)
   targeter:activate()
 end
 
-function on_target_select(parent, ability, targets, selected_point)
+function on_target_select(parent, ability, targets)
   target = targets:first()
   
   cb = ability:create_callback(parent)
   cb:add_target(target)
-  cb:register_fn("after_attack")
+  cb:set_after_attack_fn("create_stun_effect")
   
   ability:activate(parent)
   parent:anim_special_attack(target, "Fortitude", 0, 0, "Raw", cb)
 end
 
-function after_attack(parent, ability, targets, hit)
+function create_stun_effect(parent, ability, targets, hit)
   target = targets:first()
   
   if hit:is_graze() then

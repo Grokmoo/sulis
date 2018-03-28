@@ -124,7 +124,7 @@ impl EntityState {
         let base_time = CONFIG.display.animation_base_time_millis;
         if entity.borrow().actor.stats.attack_is_melee() {
             let mut anim = MeleeAttackAnimation::new(entity, target, base_time * 5, Box::new(|att, def| {
-                att.borrow_mut().actor.weapon_attack(def)
+                ActorState::weapon_attack(&att, &def)
             }));
             anim.set_callback(callback);
             GameState::add_animation(Box::new(anim));

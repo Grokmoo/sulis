@@ -2,7 +2,7 @@ Asset Location,Sub Asset Description,Sub Asset Pixel Coordinates,Author,License,
 data/fonts/mono.png,,,,CC0 - Public Domain,http://creativecommons.org/publicdomain/zero/1.0/,,
 data/fonts/normal.png,,,,CC0 - Public Domain,http://creativecommons.org/publicdomain/zero/1.0/,,
 data/spritesheets/abilities.png,Ability Icons,"0,0 to 512, 256",pauliuw,CC0 – Public Domain,http://creativecommons.org/publicdomain/zero/1.0/,"Skill, Item, and Spell Icons",https://opengameart.org/content/skill-item-and-spell-icons
-data/spritesheets/abilities.png,Ability Icons,"0, 256 to 512, 512",J. W. Bjerk,CC-BY 3.0,http://creativecommons.org/licenses/by/3.0/,Painterly Spell Icons,https://opengameart.org/content/painterly-spell-icons-part-1
+data/spritesheets/abilities.png,Ability Icons,"0, 256 to 1024, 512",J. W. Bjerk,CC-BY 3.0,http://creativecommons.org/licenses/by/3.0/,Painterly Spell Icons,https://opengameart.org/content/painterly-spell-icons-part-1
 data/spritesheets/abilities.png,Ability Icons,"0, 512 to 512, 640",HorrorPen,CC-BY 3.0,http://creativecommons.org/licenses/by/3.0/,"Icons, Old Page, Sketch",https://opengameart.org/content/icons-old-page-sketch
 data/spritesheets/abilities.png,Ability Icons,"0, 640 to 512, 768",random223,CC-BY-SA 3.0,https://creativecommons.org/licenses/by-sa/3.0/,Colored Ability Icons,https://opengameart.org/content/colored-ability-icons
 data/spritesheets/gui.png,Armored Figure,"512,0 to 1024, 512",yd,CC0 - Public Domain,http://creativecommons.org/publicdomain/zero/1.0/,GUI Elements,https://opengameart.org/content/gui-elements

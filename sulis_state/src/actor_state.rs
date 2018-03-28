@@ -141,20 +141,22 @@ impl ActorState {
         self.can_reach(dist)
     }
 
-    pub fn weapon_attack(&mut self, target: &Rc<RefCell<EntityState>>) -> (HitKind, String, Color) {
+    pub fn weapon_attack(parent: &Rc<RefCell<EntityState>>,
+                         target: &Rc<RefCell<EntityState>>) -> (HitKind, String, Color) {
         if target.borrow_mut().actor.hp() <= 0 { return (HitKind::Miss, "Miss".to_string(), color::GRAY); }
 
-        info!("'{}' attacks '{}'", self.actor.name, target.borrow().actor.actor.name);
+        info!("'{}' attacks '{}'", parent.borrow().actor.actor.name, target.borrow().actor.actor.name);
 
         let mut color = color::GRAY;
         let mut damage_str = String::new();
         let mut not_first = false;
         let mut hit_kind = HitKind::Miss;
 
-        for ref attack in self.stats.attacks.iter() {
+        let attacks = parent.borrow().actor.stats.attacks.clone();
+        for attack in attacks {
             if not_first { damage_str.push_str(", "); }
 
-            let (hit, attack_result, attack_color) = self.attack_internal(target, attack);
+            let (hit, attack_result, attack_color) = ActorState::attack_internal(parent, target, &attack);
             if attack_color != color::GRAY {
                 color = attack_color;
             }
@@ -168,24 +170,26 @@ impl ActorState {
             not_first = true;
         }
 
-        self.check_death(target);
+        ActorState::check_death(parent, target);
         (hit_kind, damage_str, color)
     }
 
-    pub fn attack(&mut self, target: &Rc<RefCell<EntityState>>, attack: &Attack) -> (HitKind, String, Color) {
+    pub fn attack(parent: &Rc<RefCell<EntityState>>, target: &Rc<RefCell<EntityState>>,
+                  attack: &Attack) -> (HitKind, String, Color) {
         if target.borrow_mut().actor.hp() <= 0 { return (HitKind::Miss, "Miss".to_string(), color::GRAY); }
 
-        info!("'{}' attacks '{}'", self.actor.name, target.borrow().actor.actor.name);
+        info!("'{}' attacks '{}'", parent.borrow().actor.actor.name, target.borrow().actor.actor.name);
 
-        let result = self.attack_internal(target, attack);
+        let result = ActorState::attack_internal(parent, target, attack);
 
-        self.check_death(target);
+        ActorState::check_death(parent, target);
         result
     }
 
-    fn attack_internal(&self, target: &Rc<RefCell<EntityState>>, attack: &Attack) -> (HitKind, String, Color) {
+    fn attack_internal(parent: &Rc<RefCell<EntityState>>, target: &Rc<RefCell<EntityState>>,
+                       attack: &Attack) -> (HitKind, String, Color) {
         let rules = Module::rules();
-        let accuracy = self.stats.accuracy;
+        let accuracy = parent.borrow().actor.stats.accuracy;
 
         let defense = {
             let target_stats = &target.borrow().actor.stats;
@@ -283,17 +287,19 @@ impl ActorState {
         self.hp <= 0
     }
 
-    pub fn check_death(&mut self, target: &Rc<RefCell<EntityState>>) {
+    pub fn check_death(parent: &Rc<RefCell<EntityState>>, target: &Rc<RefCell<EntityState>>) {
         if target.borrow().actor.hp() > 0 { return; }
 
-        let target = target.borrow();
-        let reward = match target.actor.actor.reward {
-            None => return,
-            Some(ref reward) => reward,
+        let reward = {
+            let target = target.borrow();
+            match target.actor.actor.reward {
+                None => return,
+                Some(ref reward) => reward.clone(),
+            }
         };
 
-        debug!("Adding XP {} to '{}'", reward.xp, self.actor.id);
-        self.add_xp(reward.xp);
+        debug!("Adding XP {} to '{}'", reward.xp, parent.borrow().actor.actor.id);
+        parent.borrow_mut().add_xp(reward.xp);
 
         let loot = match reward.loot {
             None => return,
@@ -312,7 +318,7 @@ impl ActorState {
         if items.is_empty() { return; }
 
         trace!("Dropping loot with {} items", items.len());
-        let location = target.location.clone();
+        let location = target.borrow().location.clone();
         let prop_data = PropData {
             prop,
             location: location.to_point(),

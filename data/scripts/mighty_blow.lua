@@ -12,12 +12,12 @@ function on_activate(parent, ability)
   targeter:activate()
 end
 
-function on_target_select(parent, ability, targets, selected_point)
+function on_target_select(parent, ability, targets)
   target = targets:first()
   
   cb = ability:create_callback(parent)
   cb:add_target(target)
-  cb:register_fn("before_attack")
+  cb:set_before_attack_fn("create_parent_effect")
   
   -- Remove an additional point of AP beyond the standard attack
   parent:remove_ap(10)
@@ -25,7 +25,7 @@ function on_target_select(parent, ability, targets, selected_point)
   parent:anim_weapon_attack(target, cb)
 end
 
-function before_attack(parent, ability, targets)
+function create_parent_effect(parent, ability, targets)
   target = targets:first()
   stats = parent:stats()
 

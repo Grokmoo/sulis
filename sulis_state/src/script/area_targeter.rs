@@ -112,7 +112,8 @@ pub struct AreaTargeter {
     effectable: Vec<Rc<RefCell<EntityState>>>,
     shape: Shape,
     show_mouseover: bool,
-    free_select: bool,
+    free_select: Option<f32>,
+    free_select_valid: bool,
 
     cur_target: Option<Rc<RefCell<EntityState>>>,
     cursor_pos: Point,
@@ -151,6 +152,7 @@ impl AreaTargeter {
             effectable: create_entity_state_vec(&area_state, &data.effectable),
             cancel: false,
             free_select: data.free_select,
+            free_select_valid: false,
             show_mouseover: data.show_mouseover,
             cur_target: None,
             cursor_pos: Point::as_zero(),
@@ -173,7 +175,7 @@ impl AreaTargeter {
         self.cur_points.clear();
         self.cur_effected.clear();
 
-        if !self.free_select {
+        if self.free_select.is_none() {
             let target = match self.cur_target {
                 None => return,
                 Some(ref target) => target,
@@ -187,10 +189,31 @@ impl AreaTargeter {
             self.cur_effected = self.shape.get_effected_entities(&self.cur_points,
                                                                  Some(&target), &self.effectable);
         } else {
+            if !self.free_select_valid { return; }
+
             self.cur_points = self.shape.get_points(self.cursor_pos, 0.0);
             self.cur_effected = self.shape.get_effected_entities(&self.cur_points, None,
                                                                  &self.effectable);
         }
+    }
+
+    fn compute_free_select_valid(&mut self) -> bool {
+        let dist = match self.free_select {
+            None => { return false; }
+            Some(dist) => dist,
+        };
+
+        if self.parent.borrow().dist(self.cursor_pos.x, self.cursor_pos.y, 1, 1) > dist {
+            return false;
+        }
+
+        let area_state = GameState::area_state();
+        if !area_state.borrow().is_pc_visible(self.cursor_pos.x, self.cursor_pos.y) {
+            // TODO use the parent's visibility since it doesn't have to be a PC
+            return false;
+        }
+
+        true
     }
 }
 
@@ -255,18 +278,22 @@ impl Targeter for AreaTargeter {
             break;
         }
 
-        self.calculate_points();
-        let kind = if !self.free_select {
+        self.free_select_valid = self.compute_free_select_valid();
+
+        let kind = if self.free_select.is_none() {
             match self.cur_target {
                 None => animation_state::Kind::MouseInvalid,
                 Some(_) => animation_state::Kind::MouseSelect,
             }
         } else {
-            // TODO validate free select position: visible? range?
-            animation_state::Kind::MouseSelect
+            match self.free_select_valid {
+                false => animation_state::Kind::MouseInvalid,
+                true => animation_state::Kind::MouseSelect,
+            }
         };
         Cursor::set_cursor_state(kind);
 
+        self.calculate_points();
         if self.show_mouseover {
             self.cur_target.as_ref()
         } else {
@@ -281,13 +308,13 @@ impl Targeter for AreaTargeter {
     fn on_activate(&mut self) {
         self.cancel = true;
 
-        if !self.free_select {
+        if self.free_select.is_none() {
             match self.cur_target {
                 None => return,
                 Some(_) => (),
             };
         } else {
-            // TODO check validation status of free target mode
+            if !self.free_select_valid { return; }
         }
 
         let affected = self.cur_effected.iter().map(|e| Some(Rc::clone(e))).collect();

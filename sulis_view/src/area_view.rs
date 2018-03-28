@@ -419,9 +419,12 @@ impl WidgetKind for AreaView {
 
         self.draw_layer(renderer, scale_x, scale_y, widget, AERIAL_LAYER_ID);
 
+        GameState::draw_graphics_mode(renderer, p.x as f32 - self.scroll.x(), p.y as f32- self.scroll.y(),
+                                      scale_x, scale_y, millis);
+
         self.draw_layer(renderer, scale_x, scale_y, widget, VISIBILITY_TEX_ID);
 
-        //draw transparent version of each actor for when they are obscured behind objects
+        //TODO draw transparent version of each actor for when they are obscured behind objects
         // self.draw_entities(renderer, scale_x, scale_y, 0.4, widget, &state, millis);
 
         if let Some(ref hover) = self.hover_sprite {
@@ -439,9 +442,6 @@ impl WidgetKind for AreaView {
                                p.x as f32 - self.scroll.x(), p.y as f32- self.scroll.y(),
                                scale_x, scale_y);
         }
-
-        GameState::draw_graphics_mode(renderer, p.x as f32 - self.scroll.x(), p.y as f32- self.scroll.y(),
-                                      scale_x, scale_y, millis);
 
         let targeter_tile = match self.targeter_tile {
             None => return,

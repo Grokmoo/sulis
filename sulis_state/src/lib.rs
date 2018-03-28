@@ -95,6 +95,9 @@ use sulis_core::io::{GraphicsRenderer, MainLoopUpdater};
 use sulis_core::ui::Widget;
 use sulis_module::{Ability, Actor, Module};
 
+use script::ScriptEntitySet;
+use script::script_callback::ScriptHitKind;
+
 thread_local! {
     static STATE: RefCell<Option<GameState>> = RefCell::new(None);
     static AI: RefCell<AI> = RefCell::new(AI::new());
@@ -142,16 +145,6 @@ macro_rules! exec_script {
 }
 
 impl GameState {
-    pub fn execute_ability_on_anim_update(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>,
-                                          targets: Vec<Option<Rc<RefCell<EntityState>>>>, index: usize) {
-        exec_script!(ability_on_anim_update: parent, ability, targets, index);
-    }
-
-    pub fn execute_ability_after_attack(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>,
-                                        targets: Vec<Option<Rc<RefCell<EntityState>>>>, kind: HitKind) {
-        exec_script!(ability_after_attack: parent, ability, targets, kind);
-    }
-
     pub fn execute_ability_on_activate(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>) {
         exec_script!(ability_on_activate: parent, ability);
     }
@@ -162,8 +155,16 @@ impl GameState {
         exec_script!(ability_on_target_select: parent, ability, targets, selected_point);
     }
 
+    pub fn execute_ability_after_attack(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>,
+                                        targets: ScriptEntitySet,
+                                        kind: HitKind, func: &str) {
+        let hit_kind = ScriptHitKind { kind };
+        let t = Some(("hit", hit_kind));
+        exec_script!(ability_script: parent, ability, targets, t, func);
+    }
+
     pub fn execute_ability_script(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>,
-                                  targets: Vec<Option<Rc<RefCell<EntityState>>>>, func: &str) {
+                                  targets: ScriptEntitySet, func: &str) {
         let t: Option<(&str, usize)> = None;
         exec_script!(ability_script: parent, ability, targets, t, func);
     }

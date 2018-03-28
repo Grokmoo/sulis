@@ -42,6 +42,18 @@ impl ScriptEntity {
         ScriptEntity { index: Some(entity.borrow().index) }
     }
 
+    pub fn check_not_equal(&self, other: &ScriptEntity) -> Result<()> {
+        if self.index == other.index {
+            Err(rlua::Error::FromLuaConversionError {
+                from: "ScriptEntity",
+                to: "ScriptEntity",
+                message: Some("Parent and target must not match".to_string())
+            })
+        } else {
+            Ok(())
+        }
+    }
+
     pub fn try_unwrap_index(&self) -> Result<usize> {
         match self.index {
             None => Err(rlua::Error::FromLuaConversionError {
@@ -115,6 +127,7 @@ impl UserData for ScriptEntity {
         });
 
         methods.add_method("weapon_attack", |_, entity, target: ScriptEntity| {
+            entity.check_not_equal(&target)?;
             let target = target.try_unwrap()?;
             let parent = entity.try_unwrap()?;
             let (_, text, color) = parent.borrow_mut().actor.weapon_attack(&target);
@@ -127,6 +140,7 @@ impl UserData for ScriptEntity {
 
         methods.add_method("anim_weapon_attack", |_, entity, (target, callback):
                            (ScriptEntity, Option<CallbackData>)| {
+            entity.check_not_equal(&target)?;
             let parent = entity.try_unwrap()?;
             let target = target.try_unwrap()?;
 
@@ -142,6 +156,7 @@ impl UserData for ScriptEntity {
         methods.add_method("anim_special_attack", |_, entity,
                            (target, attack_kind, min_damage, max_damage, damage_kind, cb):
                            (ScriptEntity, String, u32, u32, String, Option<CallbackData>)| {
+            entity.check_not_equal(&target)?;
             let parent = entity.try_unwrap()?;
             let target = target.try_unwrap()?;
             let damage_kind = DamageKind::from_str(&damage_kind);
@@ -164,6 +179,7 @@ impl UserData for ScriptEntity {
         methods.add_method("special_attack", |_, entity,
                            (target, attack_kind, min_damage, max_damage, damage_kind):
                            (ScriptEntity, String, u32, u32, String)| {
+            entity.check_not_equal(&target)?;
             let target = target.try_unwrap()?;
             let parent = entity.try_unwrap()?;
 

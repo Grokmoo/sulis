@@ -161,6 +161,14 @@ children:
       targeter_tile: "60_red_transparent_fill"
       feedback_text_scale: "1.2"
     children:
+      targeter_label:
+        from: .label
+        x_relative: Center
+        position: [0, 5]
+        text_params:
+          scale: 5.0
+          color: { r: 1.0, g: 0.0, b: 0.0, a: 1.0 }
+        text: "Select target for #ability_id#"
       action_menu:
         from: .list_box
         x_relative: Cursor

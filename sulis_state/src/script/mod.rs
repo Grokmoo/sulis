@@ -14,8 +14,8 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-mod circle_targeter;
-use self::circle_targeter::CircleTargeter;
+mod area_targeter;
+use self::area_targeter::AreaTargeter;
 
 mod script_callback;
 use self::script_callback::CallbackData;

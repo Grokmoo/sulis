@@ -30,6 +30,7 @@ use sulis_core::util::{self, Point};
 use sulis_core::config::CONFIG;
 use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::extern_image::ImageBuffer;
+use sulis_widgets::Label;
 use sulis_module::area::Layer;
 use sulis_state::{AreaDrawable, AreaState, EntityState, GameState};
 
@@ -52,6 +53,7 @@ pub struct AreaView {
     cache_invalid: bool,
     layers: Vec<String>,
 
+    targeter_label: Rc<RefCell<Widget>>,
     targeter_tile: Option<Rc<Image>>,
     feedback_text_scale: f32,
 
@@ -70,6 +72,7 @@ const AERIAL_LAYER_ID: &str = "__aerial_layer__";
 impl AreaView {
     pub fn new() -> Rc<RefCell<AreaView>> {
         Rc::new(RefCell::new(AreaView {
+            targeter_label: Widget::with_theme(Label::empty(), "targeter_label"),
             user_scale: 1.0,
             scale: (1.0, 1.0),
             hover_sprite: None,
@@ -286,7 +289,7 @@ impl WidgetKind for AreaView {
         }
         self.cache_invalid = true;
 
-        Vec::with_capacity(0)
+        vec![Rc::clone(&self.targeter_label)]
     }
 
     fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
@@ -332,6 +335,21 @@ impl WidgetKind for AreaView {
 
         let area_state = GameState::area_state();
         let mut state = area_state.borrow_mut();
+
+        // TODO figure out a better way to do this - we don't have an easy
+        // way for the targeter to cause a layout of the label
+        if let Some(targeter) = state.targeter() {
+            let mut targeter_label = self.targeter_label.borrow_mut();
+            if !targeter_label.state.is_visible() {
+                targeter_label.state.set_visible(true);
+                // temporarily clear text so we don't show old data on this frame
+                targeter_label.state.text = String::new();
+                targeter_label.state.add_text_arg("ability_id", targeter.borrow().name());
+                targeter_label.invalidate_layout();
+            }
+        } else {
+            self.targeter_label.borrow_mut().state.set_visible(false);
+        }
 
         match state.pop_scroll_to_callback() {
             None => (),

@@ -2,7 +2,8 @@ function on_activate(parent, ability)
   targets = parent:targets():hostile():visible()
   
   targeter = parent:create_targeter(ability)
-  targeter:add_all(targets)
+  targeter:add_all_selectable(targets)
+  targeter:add_all_effectable(targets)
   targeter:activate()
 end
 

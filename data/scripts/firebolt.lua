@@ -7,11 +7,11 @@ function on_activate(parent, ability)
   targeter:activate()
 end
 
-function on_target_select(parent, ability, targets)
+function on_target_select(parent, ability, targets, selected_point)
   target = targets:first()
   
   speed = 10.0
-  dist = parent:dist(target)
+  dist = parent:dist_to_entity(target)
   duration = 0.5 + dist / speed
   vx = (target:x() - parent:x()) / duration
   vy = (target:y() - parent:y()) / duration

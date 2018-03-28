@@ -465,7 +465,11 @@ impl WidgetKind for AreaView {
 
         let targeter = area_state.borrow_mut().targeter();
         if let Some(targeter) = targeter {
-            targeter.borrow_mut().on_mouse_release();
+            match kind {
+                ClickKind::Left => targeter.borrow_mut().on_activate(),
+                ClickKind::Right => targeter.borrow_mut().on_cancel(),
+                _ => (),
+            }
             return true;
         }
 

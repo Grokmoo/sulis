@@ -14,7 +14,7 @@ function on_activate(parent, ability)
   targeter:activate()
 end
 
-function on_target_select(parent, ability, targets)
+function on_target_select(parent, ability, targets, selected_point)
   cb = ability:create_callback(parent)
   cb:add_targets(targets)
   cb:register_fn("on_anim_update")

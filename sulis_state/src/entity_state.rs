@@ -178,7 +178,7 @@ impl EntityState {
         has_visibility(area, &self, &other.borrow())
     }
 
-    fn dist(&self, to_x: i32, to_y: i32, to_width: i32, to_height: i32) -> f32 {
+    pub fn dist(&self, to_x: i32, to_y: i32, to_width: i32, to_height: i32) -> f32 {
         let self_half_size = self.size.diagonal as f32 / 2.0;
         let other_half_width = to_width as f32 / 2.0;
         let other_half_height = to_height as f32 / 2.0;

@@ -32,7 +32,9 @@ pub trait Targeter {
 
     fn on_mouse_move(&mut self, cursor_x: i32, cursor_y: i32) -> Option<&Rc<RefCell<EntityState>>>;
 
-    fn on_mouse_release(&mut self);
+    fn on_activate(&mut self);
+
+    fn on_cancel(&mut self);
 
     fn cancel(&self) -> bool;
 
@@ -47,6 +49,7 @@ pub struct TargeterData {
     pub effectable: Vec<Option<usize>>,
     pub shape: Shape,
     pub show_mouseover: bool,
+    pub free_select: bool,
 }
 
 impl TargeterData {
@@ -58,6 +61,7 @@ impl TargeterData {
             effectable: Vec::new(),
             shape: Shape::Single,
             show_mouseover: true,
+            free_select: false,
         }
     }
 }
@@ -76,6 +80,10 @@ impl UserData for TargeterData {
         });
         methods.add_method_mut("set_show_mouseover", |_, targeter, val: bool| {
             targeter.show_mouseover = val;
+            Ok(())
+        });
+        methods.add_method_mut("set_free_select", |_, targeter, val: bool| {
+            targeter.free_select = val;
             Ok(())
         });
         methods.add_method_mut("add_all_effectable", |_, targeter, targets: ScriptEntitySet| {

@@ -41,20 +41,28 @@ fn contains(target: &Rc<RefCell<EntityState>>, list: &Vec<Rc<RefCell<EntityState
 }
 
 impl Shape {
-    pub fn get_points(&self, target: &Rc<RefCell<EntityState>>) -> Vec<Point> {
+    pub fn get_points(&self, pos: Point, shift: f32)-> Vec<Point> {
         match self {
             &Shape::Single => Vec::new(),
-            &Shape::Circle { radius } => self.get_points_circle(radius, target),
+            &Shape::Circle { radius } => self.get_points_circle(radius, pos, shift),
         }
     }
 
-    pub fn get_effected_entities(&self, points: &Vec<Point>, target: &Rc<RefCell<EntityState>>,
+    pub fn get_effected_entities(&self, points: &Vec<Point>, target: Option<&Rc<RefCell<EntityState>>>,
                                  effectable: &Vec<Rc<RefCell<EntityState>>>)
         -> Vec<Rc<RefCell<EntityState>>> {
         match self {
             &Shape::Single => {
-                if contains(target, effectable) { vec![Rc::clone(target)] }
-                else { Vec::new() }
+                match target {
+                    None => Vec::new(),
+                    Some(ref target) => {
+                        if contains(target, effectable) {
+                            vec![Rc::clone(target)]
+                        } else {
+                            Vec::new()
+                        }
+                    }
+                }
             },
             _ => self.get_effected(points, effectable),
         }
@@ -82,19 +90,15 @@ impl Shape {
        effected
    }
 
-    fn get_points_circle(&self, radius: f32, target: &Rc<RefCell<EntityState>>) -> Vec<Point> {
+    fn get_points_circle(&self, radius: f32, pos: Point, shift: f32) -> Vec<Point> {
         let mut points = Vec::new();
 
-        let center_x = target.borrow().center_x();
-        let center_y = target.borrow().center_y();
-
         let r = (radius + 1.0).ceil() as i32;
-        let shift = if target.borrow().size.width % 2 == 0 { 0.5 } else { 0.0 };
 
         for y in -r..r {
             for x in -r..r {
                 if (x as f32 + shift).hypot(y as f32 + shift) > radius { continue; }
-                points.push(Point::new(x + center_x, y + center_y));
+                points.push(Point::new(x + pos.x, y + pos.y));
             }
         }
         points
@@ -108,8 +112,10 @@ pub struct AreaTargeter {
     effectable: Vec<Rc<RefCell<EntityState>>>,
     shape: Shape,
     show_mouseover: bool,
+    free_select: bool,
 
     cur_target: Option<Rc<RefCell<EntityState>>>,
+    cursor_pos: Point,
     cur_points: Vec<Point>,
     cur_effected: Vec<Rc<RefCell<EntityState>>>,
 
@@ -144,8 +150,10 @@ impl AreaTargeter {
             selectable: create_entity_state_vec(&area_state, &data.selectable),
             effectable: create_entity_state_vec(&area_state, &data.effectable),
             cancel: false,
+            free_select: data.free_select,
             show_mouseover: data.show_mouseover,
             cur_target: None,
+            cursor_pos: Point::as_zero(),
             cur_points: Vec::new(),
             cur_effected: Vec::new(),
             shape: data.shape,
@@ -164,13 +172,25 @@ impl AreaTargeter {
     fn calculate_points(&mut self) {
         self.cur_points.clear();
         self.cur_effected.clear();
-        let target = match self.cur_target {
-            None => return,
-            Some(ref target) => target,
-        };
 
-        self.cur_points = self.shape.get_points(&target);
-        self.cur_effected = self.shape.get_effected_entities(&self.cur_points, &target, &self.effectable);
+        if !self.free_select {
+            let target = match self.cur_target {
+                None => return,
+                Some(ref target) => target,
+            };
+
+            let center_x = target.borrow().center_x();
+            let center_y = target.borrow().center_y();
+            let shift = if target.borrow().size.width % 2 == 0 { 0.5 } else { 0.0 };
+
+            self.cur_points = self.shape.get_points(Point::new(center_x, center_y), shift);
+            self.cur_effected = self.shape.get_effected_entities(&self.cur_points,
+                                                                 Some(&target), &self.effectable);
+        } else {
+            self.cur_points = self.shape.get_points(self.cursor_pos, 0.0);
+            self.cur_effected = self.shape.get_effected_entities(&self.cur_points, None,
+                                                                 &self.effectable);
+        }
     }
 }
 
@@ -196,32 +216,26 @@ impl Targeter for AreaTargeter {
             renderer.draw(draw_list);
         }
 
-        if let Some(ref target) = self.cur_target {
-            let mut draw_list = DrawList::empty_sprite();
-            match self.shape {
-                Shape::Single => draw_list.append(&mut self.draw_target(target, x_offset, y_offset)),
-                _ => {
-                    for target in self.cur_effected.iter() {
-                        draw_list.append(&mut self.draw_target(target, x_offset, y_offset));
-                    }
-                }
-            }
-            draw_list.set_scale(scale_x, scale_y);
-            draw_list.set_color(color::RED);
-            renderer.draw(draw_list);
-
-            let mut draw_list = DrawList::empty_sprite();
-            for p in self.cur_points.iter() {
-                let x = p.x as f32 - x_offset;
-                let y = p.y as f32 - y_offset;
-                tile.append_to_draw_list(&mut draw_list, &animation_state::NORMAL, x, y, 1.0, 1.0, millis);
-            }
-            draw_list.set_scale(scale_x, scale_y);
-            renderer.draw(draw_list);
+        let mut draw_list = DrawList::empty_sprite();
+        for target in self.cur_effected.iter() {
+            draw_list.append(&mut self.draw_target(target, x_offset, y_offset));
         }
+        draw_list.set_scale(scale_x, scale_y);
+        draw_list.set_color(color::RED);
+        renderer.draw(draw_list);
+
+        let mut draw_list = DrawList::empty_sprite();
+        for p in self.cur_points.iter() {
+            let x = p.x as f32 - x_offset;
+            let y = p.y as f32 - y_offset;
+            tile.append_to_draw_list(&mut draw_list, &animation_state::NORMAL, x, y, 1.0, 1.0, millis);
+        }
+        draw_list.set_scale(scale_x, scale_y);
+        renderer.draw(draw_list);
     }
 
     fn on_mouse_move(&mut self, cursor_x: i32, cursor_y: i32) -> Option<&Rc<RefCell<EntityState>>> {
+        self.cursor_pos = Point::new(cursor_x, cursor_y);
         self.cur_target = None;
 
         for target in self.selectable.iter() {
@@ -232,7 +246,9 @@ impl Targeter for AreaTargeter {
                 let x2 = x1 + target.size.width - 1;
                 let y2 = y1 + target.size.height - 1;
 
-                if cursor_x < x1 || cursor_x > x2 || cursor_y < y1 || cursor_y > y2 { continue; }
+                if cursor_x < x1 || cursor_x > x2 || cursor_y < y1 || cursor_y > y2 {
+                    continue;
+                }
             }
 
             self.cur_target = Some(Rc::clone(target));
@@ -240,9 +256,14 @@ impl Targeter for AreaTargeter {
         }
 
         self.calculate_points();
-        let kind = match self.cur_target {
-            None => animation_state::Kind::MouseInvalid,
-            Some(_) => animation_state::Kind::MouseSelect,
+        let kind = if !self.free_select {
+            match self.cur_target {
+                None => animation_state::Kind::MouseInvalid,
+                Some(_) => animation_state::Kind::MouseSelect,
+            }
+        } else {
+            // TODO validate free select position: visible? range?
+            animation_state::Kind::MouseSelect
         };
         Cursor::set_cursor_state(kind);
 
@@ -253,17 +274,25 @@ impl Targeter for AreaTargeter {
         }
     }
 
-    fn on_mouse_release(&mut self) {
+    fn on_cancel(&mut self) {
+        self.cancel = true;
+    }
+
+    fn on_activate(&mut self) {
         self.cancel = true;
 
-        match self.cur_target {
-            None => return,
-            Some(_) => (),
-        };
+        if !self.free_select {
+            match self.cur_target {
+                None => return,
+                Some(_) => (),
+            };
+        } else {
+            // TODO check validation status of free target mode
+        }
 
         let affected = self.cur_effected.iter().map(|e| Some(Rc::clone(e))).collect();
 
         GameState::execute_ability_on_target_select(&self.parent, &self.ability,
-                                                    affected);
+                                                    affected, self.cursor_pos);
     }
 }

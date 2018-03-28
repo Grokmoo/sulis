@@ -18,6 +18,7 @@ use std;
 use std::f32;
 use std::rc::Rc;
 use std::cell::RefCell;
+use std::collections::HashMap;
 
 use rlua::{self, Lua, UserData, UserDataMethods};
 
@@ -222,11 +223,35 @@ impl UserData for ScriptEntity {
             Ok(y)
         });
 
-        methods.add_method("dist", |_, entity, target: ScriptEntity| {
+        methods.add_method("dist_to_entity", |_, entity, target: ScriptEntity| {
             let entity = entity.try_unwrap()?;
             let target = target.try_unwrap()?;
             let entity = entity.borrow();
             Ok(entity.dist_to_entity(&target))
+        });
+
+        methods.add_method("dist_to_point", |_, entity, point: HashMap<String, i32>| {
+            let entity = entity.try_unwrap()?;
+            let x = match point.get("x") {
+                None => return Err(rlua::Error::FromLuaConversionError {
+                    from: "ScriptPoint",
+                    to: "Point",
+                    message: Some("Point must have x and y coordinates".to_string())
+                }),
+                Some(x) => *x,
+            };
+
+            let y = match point.get("y") {
+                None => return Err(rlua::Error::FromLuaConversionError {
+                    from: "ScriptPoint",
+                    to: "Point",
+                    message: Some("Point must have x and y coordinates".to_string())
+                }),
+                Some(y) => *y,
+            };
+
+            let entity = entity.borrow();
+            Ok(entity.dist(x, y, 1, 1))
         });
     }
 }

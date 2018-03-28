@@ -12,7 +12,7 @@ function on_activate(parent, ability)
   targeter:activate()
 end
 
-function on_target_select(parent, ability, targets)
+function on_target_select(parent, ability, targets, selected_point)
   target = targets:first()
   
   cb = ability:create_callback(parent)

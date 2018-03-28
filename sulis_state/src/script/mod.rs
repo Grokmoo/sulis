@@ -37,11 +37,13 @@ use self::targeter::Targeter;
 use self::targeter::TargeterData;
 
 use std;
+use std::collections::HashMap;
 use std::rc::Rc;
 use std::cell::RefCell;
 
 use rlua::{self, Function, Lua, UserData, UserDataMethods};
 
+use sulis_core::util::Point;
 use sulis_rules::HitKind;
 use sulis_module::{Ability};
 use {EntityState, GameState};
@@ -94,10 +96,13 @@ impl ScriptState {
     }
 
     pub fn ability_on_target_select(&self, parent: &Rc<RefCell<EntityState>>,
-                                            ability: &Rc<Ability>,
-                                            targets: Vec<Option<Rc<RefCell<EntityState>>>>) -> Result<()> {
-        let t: Option<(&str, usize)> = None;
-        self.ability_script(parent, ability, targets, t, "on_target_select")
+                                    ability: &Rc<Ability>, targets: Vec<Option<Rc<RefCell<EntityState>>>>,
+                                    selected_point: Point) -> Result<()> {
+        let mut point = HashMap::new();
+        point.insert("x", selected_point.x);
+        point.insert("y", selected_point.y);
+        self.ability_script(parent, ability, targets, Some(("selected_point", point)),
+            "on_target_select")
     }
 
     pub fn ability_after_attack(&self, parent: &Rc<RefCell<EntityState>>,

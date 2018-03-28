@@ -157,8 +157,9 @@ impl GameState {
     }
 
     pub fn execute_ability_on_target_select(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>,
-                                            targets: Vec<Option<Rc<RefCell<EntityState>>>>) {
-        exec_script!(ability_on_target_select: parent, ability, targets);
+                                            targets: Vec<Option<Rc<RefCell<EntityState>>>>,
+                                            selected_point: Point) {
+        exec_script!(ability_on_target_select: parent, ability, targets, selected_point);
     }
 
     pub fn execute_ability_script(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>,

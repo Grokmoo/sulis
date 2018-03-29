@@ -19,6 +19,9 @@ use std::cmp;
 use std::rc::Rc;
 use std::cell::RefCell;
 
+mod entity_subpos_animation;
+pub use self::entity_subpos_animation::EntitySubposAnimation;
+
 mod melee_attack_animation;
 pub use self::melee_attack_animation::MeleeAttackAnimation;
 

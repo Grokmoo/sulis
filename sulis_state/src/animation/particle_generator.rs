@@ -172,7 +172,7 @@ pub struct Param {
     d2t: f32,
     d3t: f32,
 
-    value: f32,
+    pub value: f32,
 }
 
 impl UserData for Param { }
@@ -206,7 +206,7 @@ impl Param {
         }
     }
 
-    fn update(&mut self, v_term: f32, a_term: f32, j_term: f32) {
+    pub fn update(&mut self, v_term: f32, a_term: f32, j_term: f32) {
         self.value = self.initial_value + self.dt * v_term + self.d2t * a_term + self.d3t * j_term;
     }
 }

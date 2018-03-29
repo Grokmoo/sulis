@@ -32,6 +32,9 @@ pub use self::script_entity::ScriptEntitySet;
 mod script_particle_generator;
 use self::script_particle_generator::ScriptParticleGenerator;
 
+mod script_subpos_animation;
+use self::script_subpos_animation::ScriptSubposAnimation;
+
 pub mod targeter;
 use self::targeter::Targeter;
 use self::targeter::TargeterData;
@@ -42,6 +45,7 @@ use std::cell::RefCell;
 
 use rlua::{self, Function, Lua, UserData, UserDataMethods};
 
+use sulis_core::config::CONFIG;
 use sulis_core::util::Point;
 use sulis_module::{Ability};
 use {EntityState, GameState};
@@ -139,6 +143,15 @@ impl UserData for ScriptInterface {
         methods.add_method("log", |_, _, val: String| {
             info!("[LUA]: {}", val);
             Ok(())
+        });
+
+        methods.add_method("anim_base_time", |_, _, ()| {
+            let secs = CONFIG.display.animation_base_time_millis as f32 / 1000.0;
+            Ok(secs)
+        });
+
+        methods.add_method("atan2", |_, _, (x, y): (f32, f32)| {
+            Ok(y.atan2(x))
         });
     }
 }

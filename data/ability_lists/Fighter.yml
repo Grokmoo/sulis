@@ -8,6 +8,10 @@ abilities:
     position: [1, 2]
   - id: whirlwind_attack
     position: [2, 2]
+  - id: charge_attack
+    position: [3, 2]
+  - id: leap
+    position: [4, 2]
   - id: resilient_body
     position: [0, 4]
   - id: tough_skin

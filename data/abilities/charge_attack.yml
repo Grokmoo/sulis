@@ -1,0 +1,10 @@
+id: charge_attack
+name: "Charge Attack"
+icon: abilities/charge_attack
+description: |
+  You charge forward with incredible speed, moving in a straight line up to 12 tiles away.  Any hostiles in your path suffer an attack.
+active:
+  script: "charge_attack"
+  ap: 20
+  duration: 0
+

@@ -151,7 +151,8 @@ impl AreaView {
     }
 
     fn draw_visibility_to_texture(&self, renderer: &mut GraphicsRenderer, vis_sprite: &Rc<Sprite>,
-                                  explored_sprite: &Rc<Sprite>, area_state: &RefMut<AreaState>) {
+                                  explored_sprite: &Rc<Sprite>, area_state: &RefMut<AreaState>,
+                                  delta_x: i32, delta_y: i32) {
         let start_time = time::Instant::now();
         let (max_tile_x, max_tile_y) = AreaView::get_texture_cache_max(area_state.area.width,
                                                                        area_state.area.height);
@@ -160,10 +161,10 @@ impl AreaView {
         let pc = GameState::pc();
         let c_x = pc.borrow().location.x + pc.borrow().size.width / 2;
         let c_y = pc.borrow().location.y + pc.borrow().size.height / 2;
-        let min_x = cmp::max(0, c_x - vis_dist - 2);
-        let max_x = cmp::min(max_tile_x, c_x + vis_dist + 3);
-        let min_y = cmp::max(0, c_y - vis_dist - 2);
-        let max_y = cmp::min(max_tile_y, c_y + vis_dist + 3);
+        let min_x = cmp::max(0, c_x - vis_dist + if delta_x < 0 { delta_x } else { 0 });
+        let max_x = cmp::min(max_tile_x, c_x + vis_dist + if delta_x > 0 { delta_x } else { 0 });
+        let min_y = cmp::max(0, c_y - vis_dist + if delta_y < 0 { delta_y } else { 0 });
+        let max_y = cmp::min(max_tile_y, c_y + vis_dist + if delta_y > 0 { delta_y } else { 0 });
 
         let scale = TILE_SIZE as i32;
         renderer.clear_texture_region(VISIBILITY_TEX_ID, min_x * scale, min_y * scale,
@@ -386,14 +387,16 @@ impl WidgetKind for AreaView {
             self.draw_vis_to_texture(renderer, &state.area.visibility_tile, &state.area.explored_tile,
                                      &state, 0, 0, max_x, max_y);
             self.cache_invalid = false;
-            state.pc_vis_cache_invalid = false;
+            state.pc_vis_delta = (0, 0);
         }
 
-        if state.pc_vis_cache_invalid {
-            trace!("Redrawing PC visibility to texture");
+        let (pc_vis_delta_x, pc_vis_delta_y) = state.pc_vis_delta;
+        if pc_vis_delta_x != 0 || pc_vis_delta_y != 0 {
+            state.pc_vis_delta = (0, 0);
+            debug!("Redrawing PC visibility to texture");
             self.draw_visibility_to_texture(renderer, &state.area.visibility_tile,
-                                            &state.area.explored_tile, &state);
-            state.pc_vis_cache_invalid = false;
+                                            &state.area.explored_tile, &state,
+                                            pc_vis_delta_x, pc_vis_delta_y);
         }
 
         let p = widget.state.inner_position;

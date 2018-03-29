@@ -27,7 +27,7 @@ use sulis_rules::{AttackKind, DamageKind, Attack};
 use sulis_core::config::CONFIG;
 use sulis_module::Faction;
 use {ActorState, EntityState, GameState};
-use script::{CallbackData, Result, ScriptAbility, ScriptCallback, ScriptEffect, ScriptParticleGenerator, TargeterData};
+use script::*;
 
 #[derive(Clone)]
 pub struct ScriptEntity {
@@ -110,6 +110,11 @@ impl UserData for ScriptEntity {
             Ok(ScriptEffect::new(index, &ability, duration))
         });
 
+        methods.add_method("create_subpos_anim", |_, entity, duration_secs: f32| {
+            let index = entity.try_unwrap_index()?;
+            Ok(ScriptSubposAnimation::new(index, duration_secs))
+        });
+
         methods.add_method("create_particle_generator", |_, entity, args: (String, Option<f32>)| {
             let duration_secs = args.1.unwrap_or(f32::INFINITY);
             let sprite = args.0;
@@ -126,6 +131,16 @@ impl UserData for ScriptEntity {
         methods.add_method("create_targeter", |_, entity, ability: ScriptAbility| {
             let index = entity.try_unwrap_index()?;
             Ok(TargeterData::new(index, &ability.id))
+        });
+
+        methods.add_method("teleport_to", |_, entity, dest: HashMap<String, i32>| {
+            let (x, y) = unwrap_point(dest)?;
+            let entity = entity.try_unwrap()?;
+
+            let area_state = GameState::area_state();
+            let mut area_state = area_state.borrow_mut();
+            area_state.move_entity(&entity, x, y, 0);
+            Ok(())
         });
 
         methods.add_method("weapon_attack", |_, entity, target: ScriptEntity| {
@@ -210,13 +225,38 @@ impl UserData for ScriptEntity {
 
         methods.add_method("stats", &create_stats_table);
 
+        methods.add_method("size_str", |_, entity, ()| {
+            let entity = entity.try_unwrap()?;
+            let entity = entity.borrow();
+            Ok(entity.size().to_string())
+        });
+        methods.add_method("width", |_, entity, ()| {
+            let entity = entity.try_unwrap()?;
+            let entity = entity.borrow();
+            Ok(entity.size.width)
+        });
+        methods.add_method("height", |_, entity, ()| {
+            let entity = entity.try_unwrap()?;
+            let entity = entity.borrow();
+            Ok(entity.size.height)
+        });
         methods.add_method("x", |_, entity, ()| {
+            let entity = entity.try_unwrap()?;
+            let x = entity.borrow().location.x;
+            Ok(x)
+        });
+        methods.add_method("y", |_, entity, ()| {
+            let entity = entity.try_unwrap()?;
+            let y = entity.borrow().location.y;
+            Ok(y)
+        });
+        methods.add_method("center_x", |_, entity, ()| {
             let entity = entity.try_unwrap()?;
             let x = entity.borrow().location.x as f32 + entity.borrow().size.width as f32 / 2.0;
             Ok(x)
         });
 
-        methods.add_method("y", |_, entity, ()| {
+        methods.add_method("center_y", |_, entity, ()| {
             let entity = entity.try_unwrap()?;
             let y = entity.borrow().location.y as f32 + entity.borrow().size.height as f32 / 2.0;
             Ok(y)
@@ -361,6 +401,7 @@ impl UserData for ScriptEntitySet {
             })
         });
 
+        methods.add_method("without_self", &without_self);
         methods.add_method("visible_within", &visible_within);
         methods.add_method("visible", |lua, set, ()| visible_within(lua, set, std::f32::MAX));
         methods.add_method("hostile", |lua, set, ()| is_faction(lua, set, Faction::Hostile));
@@ -381,6 +422,12 @@ fn targets(_lua: &Lua, parent: &ScriptEntity, _args: ()) -> Result<ScriptEntityS
 
     let parent_index = parent.try_unwrap_index()?;
     Ok(ScriptEntitySet { indices, parent: parent_index, point: None, })
+}
+
+fn without_self(_lua: &Lua, set: &ScriptEntitySet, _: ()) -> Result<ScriptEntitySet> {
+    filter_entities(set, (), &|parent, entity, _| {
+        !Rc::ptr_eq(parent, entity)
+    })
 }
 
 fn visible_within(_lua: &Lua, set: &ScriptEntitySet, dist: f32) -> Result<ScriptEntitySet> {

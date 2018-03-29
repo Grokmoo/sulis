@@ -1,0 +1,10 @@
+id: leap
+name: "Leap"
+icon: abilities/leap
+description: |
+  You make an incredible leap to a nearby location, jumping over obstacles and enemies in your path.
+active:
+  script: "leap"
+  ap: 10
+  duration: 0
+

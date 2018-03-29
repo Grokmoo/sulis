@@ -16,7 +16,7 @@
 
 use rand::{self, Rng};
 use sulis_core::ui::Color;
-use sulis_module::{Actor, Area, Module};
+use sulis_module::{Actor, Area, Module, ObjectSize};
 use sulis_module::area::{EncounterData, PropData, Transition};
 use sulis_core::util::Point;
 
@@ -37,7 +37,7 @@ pub struct AreaState {
     entity_grid: Vec<Option<usize>>,
     transition_grid: Vec<Option<usize>>,
 
-    pub pc_vis_cache_invalid: bool,
+    pub pc_vis_delta: (i32, i32),
     pc_vis: Vec<bool>,
     pc_explored: Vec<bool>,
 
@@ -95,7 +95,7 @@ impl AreaState {
             listeners: ChangeListenerList::default(),
             pc_vis,
             pc_explored,
-            pc_vis_cache_invalid: true,
+            pc_vis_delta: (0, 0),
             feedback_text: Vec::new(),
             scroll_to_callback: None,
             last_time_millis: 0,
@@ -203,13 +203,23 @@ impl AreaState {
         locations
     }
 
+    pub fn is_terrain_passable(&self, size: &str, x: i32, y: i32) -> bool {
+        if !self.area.coords_valid(x, y) { return false; }
+
+        if !self.area.get_path_grid(size).is_passable(x, y) { return false; }
+
+        true
+    }
+
+    pub fn is_passable_size(&self, size: &Rc<ObjectSize>, x: i32, y: i32) -> bool {
+        if !self.is_terrain_passable(&size.id, x, y) { return false; }
+
+        size.points(x, y).all(|p| self.point_size_passable(p.x, p.y))
+    }
+
     pub fn is_passable(&self, requester: &Ref<EntityState>,
                        new_x: i32, new_y: i32) -> bool {
-        if !self.area.coords_valid(new_x, new_y) { return false; }
-
-        if !self.area.get_path_grid(requester.size()).is_passable(new_x, new_y) {
-            return false;
-        }
+        if !self.is_terrain_passable(&requester.size(), new_x, new_y) { return false; }
 
         requester.points(new_x, new_y)
            .all(|p| self.point_entities_passable(&requester, p.x, p.y))
@@ -260,9 +270,8 @@ impl AreaState {
         self.area.transitions.get(index)
     }
 
-    fn compute_pc_visibility(&mut self, entity: &EntityState) {
-        calculate_los(&mut self.pc_vis, &mut self.pc_explored, &self.area, entity);
-        self.pc_vis_cache_invalid = true;
+    fn compute_pc_visibility(&mut self, entity: &EntityState, delta_x: i32, delta_y: i32) {
+        calculate_los(&mut self.pc_vis, &mut self.pc_explored, &self.area, entity, delta_x, delta_y);
     }
 
     /// whether the pc has current visibility to the specified coordinations
@@ -275,6 +284,17 @@ impl AreaState {
     /// No bounds checking is done
     pub fn is_pc_explored(&self, x: i32, y: i32) -> bool {
         self.pc_explored[(x + y * self.area.width) as usize]
+    }
+
+    fn point_size_passable(&self, x: i32, y: i32) -> bool {
+        if !self.area.coords_valid(x, y) { return false; }
+
+        let grid_index = self.entity_grid[(x + y * self.area.width) as usize];
+
+        match grid_index {
+            None => true,
+            Some(_) => false,
+        }
     }
 
     fn point_entities_passable(&self, requester: &Ref<EntityState>,
@@ -370,7 +390,7 @@ impl AreaState {
         }
 
         if entity.borrow().is_pc() {
-            self.compute_pc_visibility(&entity.borrow());
+            self.compute_pc_visibility(&entity.borrow(), 0, 0);
         }
 
         self.turn_timer.add(&entity);
@@ -399,7 +419,11 @@ impl AreaState {
         }
 
         if entity.borrow().is_pc() {
-            self.compute_pc_visibility(&*entity.borrow());
+            let d_x = old_x - entity.borrow().location.x;
+            let d_y = old_y - entity.borrow().location.y;
+            self.pc_vis_delta = (d_x, d_y);
+
+            self.compute_pc_visibility(&*entity.borrow(), d_x, d_y);
 
             self.turn_timer.check_ai_activation(entity, &self.area);
         }

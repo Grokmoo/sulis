@@ -17,10 +17,11 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use rlua::{Lua, UserData, UserDataMethods};
+use rlua::{self, Lua, UserData, UserDataMethods};
 
 use sulis_core::image::Image;
 use sulis_core::io::{GraphicsRenderer};
+use sulis_module::Module;
 
 use script::area_targeter::Shape;
 use script::{AreaTargeter, Result, ScriptEntity, ScriptEntitySet};
@@ -50,6 +51,7 @@ pub struct TargeterData {
     pub shape: Shape,
     pub show_mouseover: bool,
     pub free_select: Option<f32>,
+    pub free_select_must_be_passable: Option<String>,
 }
 
 impl TargeterData {
@@ -62,6 +64,7 @@ impl TargeterData {
             shape: Shape::Single,
             show_mouseover: true,
             free_select: None,
+            free_select_must_be_passable: None,
         }
     }
 }
@@ -86,6 +89,21 @@ impl UserData for TargeterData {
             targeter.free_select = Some(val);
             Ok(())
         });
+        methods.add_method_mut("set_free_select_must_be_passable", |_, targeter, val: String| {
+            match Module::object_size(&val) {
+                None => {
+                    warn!("No object size '{}' found", val);
+                    return Err(rlua::Error::FromLuaConversionError {
+                        from: "String",
+                        to: "ObjectSize",
+                        message: Some("Size must be the ID of a valid object size".to_string())
+                    });
+                },
+                Some(_) => (),
+            }
+            targeter.free_select_must_be_passable = Some(val);
+            Ok(())
+        });
         methods.add_method_mut("add_all_effectable", |_, targeter, targets: ScriptEntitySet| {
             targeter.effectable.append(&mut targets.indices.clone());
             Ok(())
@@ -95,8 +113,45 @@ impl UserData for TargeterData {
             targeter.effectable.push(Some(index));
             Ok(())
         });
-        methods.add_method_mut("set_circle", |_, targeter, radius: f32| {
+        methods.add_method_mut("set_shape_circle", |_, targeter, radius: f32| {
             targeter.shape = Shape::Circle { radius };
+            Ok(())
+        });
+        methods.add_method_mut("set_shape_line", |_, targeter, (size, origin_x, origin_y): (String, i32, i32)| {
+            match Module::object_size(&size) {
+                None => {
+                    warn!("No object size '{}' found", size);
+                    return Err(rlua::Error::FromLuaConversionError {
+                        from: "String",
+                        to: "ObjectSize",
+                        message: Some("Size must be the ID of a valid object size".to_string())
+                    });
+                },
+                Some(_) => (),
+            }
+            targeter.shape = Shape::Line { size, origin_x, origin_y };
+            Ok(())
+        });
+        methods.add_method_mut("set_shape_object_size", |_, targeter, size: String| {
+            match Module::object_size(&size) {
+                None => {
+                    warn!("No object size '{}' found", size);
+                    return Err(rlua::Error::FromLuaConversionError {
+                        from: "String",
+                        to: "ObjectSize",
+                        message: Some("Size must be the ID of a valid object size".to_string())
+                    });
+                },
+                Some(_) => (),
+            }
+            targeter.shape = Shape::ObjectSize { size };
+            Ok(())
+        });
+        methods.add_method_mut("set_shape_cone", |_, targeter,
+                               (origin_x, origin_y, radius, angle): (f32, f32, f32, f32)| {
+            let origin_x = origin_x.floor() as i32;
+            let origin_y = origin_y.floor() as i32;
+            targeter.shape = Shape::Cone { origin_x, origin_y, radius, angle };
             Ok(())
         });
     }

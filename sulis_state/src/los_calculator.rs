@@ -23,17 +23,17 @@ use sulis_module::Area;
 use {EntityState};
 
 pub fn calculate_los(los: &mut Vec<bool>, exp: &mut Vec<bool>,
-                     area: &Rc<Area>, entity: &EntityState) {
+                     area: &Rc<Area>, entity: &EntityState, delta_x: i32, delta_y: i32) {
     let start_time = time::Instant::now();
 
     let max_dist = area.vis_dist;
     let entity_x = entity.location.x + entity.size.width / 2;
     let entity_y = entity.location.y + entity.size.height / 2;
 
-    let min_x = cmp::max(0, entity_x - max_dist - 2);
-    let max_x = cmp::min(area.width, entity_x + max_dist + 3);
-    let min_y = cmp::max(0, entity_y - max_dist - 2);
-    let max_y = cmp::min(area.height, entity_y + max_dist + 3);
+    let min_x = cmp::max(0, entity_x - max_dist + if delta_x < 0 { delta_x } else { 0 });
+    let max_x = cmp::min(area.width, entity_x + max_dist + if delta_x > 0 { delta_x } else { 0 });
+    let min_y = cmp::max(0, entity_y - max_dist + if delta_y < 0 { delta_y } else { 0 });
+    let max_y = cmp::min(area.height, entity_y + max_dist + if delta_y > 0 { delta_y } else { 0 });
 
     let src_elev = area.terrain.elevation(entity_x, entity_y);
 

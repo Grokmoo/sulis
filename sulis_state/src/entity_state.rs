@@ -161,7 +161,7 @@ impl EntityState {
             return false;
         }
 
-        if area_state.turn_timer.is_active() {
+        if area_state.turn_timer.is_active() && squares > 0 {
             let ap_cost = self.actor.get_move_ap_cost(squares);
             if self.actor.ap() < ap_cost {
                 return false;

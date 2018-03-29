@@ -20,14 +20,24 @@ use std::cmp;
 
 use ui::Border;
 
-#[derive(Copy, Clone, Deserialize, Serialize, Eq, Hash, PartialEq)]
+#[derive(Copy, Clone, Deserialize, Serialize, Eq, Hash, PartialEq, Ord)]
 #[serde(deny_unknown_fields)]
 pub struct Point {
     pub x: i32,
     pub y: i32,
 }
 
+impl PartialOrd for Point {
+    fn partial_cmp(&self, other: &Point) -> Option<cmp::Ordering> {
+        Some(self.cmp_hash().cmp(&other.cmp_hash()))
+    }
+}
+
 impl Point {
+    fn cmp_hash(&self) -> i32 {
+        self.x + self.y * 65536
+    }
+
     pub fn as_zero() -> Point {
         Point { x: 0, y: 0 }
     }

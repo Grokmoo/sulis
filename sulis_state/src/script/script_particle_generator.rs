@@ -134,7 +134,7 @@ fn dist_param(_lua: &Lua, _: &ScriptParticleGenerator,
     }
 }
 
-fn param(_lua: &Lua, _: &ScriptParticleGenerator,
+pub fn param<T>(_lua: &Lua, _: &T,
          (value, dt, d2t, d3t): (f32, Option<f32>, Option<f32>, Option<f32>)) -> Result<Param> {
     if dt.is_none() {
         Ok(Param::fixed(value))

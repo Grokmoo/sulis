@@ -4,7 +4,7 @@ Sulis is a game and game engine written in Rust.  It is currently in very early 
 ## Getting Started
 
 ### Prerequisites
-You'll need recent versions of Rust and Cargo installed.  The game currently requires nightly to compile.  [Rustup](https://www.rustup.rs/)
+You'll need recent versions of Rust and Cargo installed.  The game will compile on the latest stable version.  [Rustup](https://www.rustup.rs/)
 
 ### Installation
 

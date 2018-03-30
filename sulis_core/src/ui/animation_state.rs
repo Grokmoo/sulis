@@ -38,6 +38,7 @@ pub enum Kind {
     MouseTravel,
     MouseSelect,
     MouseInvalid,
+    MouseDialog,
 }
 
 impl Kind {
@@ -59,6 +60,7 @@ impl Kind {
             MouseTravel => "mouse_travel",
             MouseSelect => "mouse_select",
             MouseInvalid => "mouse_invalid",
+            MouseDialog => "mouse_dialog",
         }
     }
 
@@ -80,6 +82,7 @@ impl Kind {
             "mouse_travel" => MouseTravel,
             "mouse_select" => MouseSelect,
             "mouse_invalid" => MouseInvalid,
+            "mouse_dialog" => MouseDialog,
             _ => return None,
         })
     }

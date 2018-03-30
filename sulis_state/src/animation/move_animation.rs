@@ -45,13 +45,13 @@ impl MoveAnimation {
         let mut next = path[path.len() - 1];
         let mut next2 = path[path.len() - 1];
 
-        for i in 0..path.len() {
-            let cur: Point = path[i];
-            if i < path.len() - 2 {
-                next = path[i + 1];
-                next2 = path[i + 2];
-            } if i < path.len() - 1 {
-                next = path[i + 1];
+        for i in 0..(path.len() as i32) {
+            let cur: Point = path[i as usize];
+            if i < path.len() as i32 - 2 {
+                next = path[i as usize + 1];
+                next2 = path[i as usize + 2];
+            } if i < path.len() as i32 - 1 {
+                next = path[i as usize + 1];
                 // next2 is already set to the final point
             } else {
                 // next and next2 are already set to the final point
@@ -107,15 +107,6 @@ impl animation::Animation for MoveAnimation {
 
             self.mover.borrow_mut().sub_pos = (dx + offset_x, dy + offset_y);
         }
-
-        // if frame_index != self.path.len() - 1 {
-        //     let frame_delta_x = self.path[frame_index + 1].x - self.path[frame_index].x;
-        //     let frame_delta_y = self.path[frame_index + 1].y - self.path[frame_index].y;
-        //
-        //     let delta_x = frame_delta_x as f32;
-        //     let delta_y = frame_delta_y as f32;
-        //     self.mover.borrow_mut().sub_pos = (delta_x * frame_frac, delta_y * frame_frac);
-        // }
 
         if frame_index as i32 == self.last_frame_index {
             return true;

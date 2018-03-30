@@ -10,7 +10,7 @@ equippable:
         max: 38
         kind: Crushing
       kind: # Melee
-        reach: 1.5
+        reach: 1.0
     accuracy: -5
 image:
   HeldMain:

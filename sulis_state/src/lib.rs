@@ -462,11 +462,12 @@ impl GameState {
                   target: &Rc<RefCell<EntityState>>) -> (f32, f32, f32) {
         let (target_x, target_y) = {
             let target = target.borrow();
-            (target.location.x + target.size.width / 2, target.location.y + target.size.height / 2)
+            (target.location.x as f32 + target.size.width as f32 / 2.0 - 0.5,
+             target.location.y as f32 + target.size.height as f32/ 2.0 - 0.5)
         };
 
-        let dist = entity.borrow().size.width as f32 / 2.0 + target.borrow().size.height as f32 / 2.0;
-        let mut range = dist + entity.borrow().actor.stats.attack_distance();
+        let sizes = (entity.borrow().size.diagonal + target.borrow().size.diagonal) / 2.0;
+        let mut range = sizes + entity.borrow().actor.stats.attack_distance();
 
         let area = GameState::area_state();
         let vis_dist = area.borrow().area.vis_dist as f32;
@@ -475,7 +476,7 @@ impl GameState {
         }
 
         trace!("Getting move target at {}, {} within {}", target_x, target_y, range);
-        (target_x as f32, target_y as f32, range)
+        (target_x, target_y, range)
     }
 
     pub fn can_move_towards(entity: &Rc<RefCell<EntityState>>,

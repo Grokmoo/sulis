@@ -7,3 +7,4 @@ states:
     mouse_travel: mouse_travel
     mouse_select: mouse_select
     mouse_invalid: mouse_invalid
+    mouse_dialog: mouse_dialog

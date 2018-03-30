@@ -362,7 +362,7 @@ impl AreaTargeter {
             Some(dist) => dist,
         };
 
-        if self.parent.borrow().dist(self.cursor_pos.x, self.cursor_pos.y, 1, 1) > dist {
+        if self.parent.borrow().dist_to_point(self.cursor_pos) > dist {
             return false;
         }
 

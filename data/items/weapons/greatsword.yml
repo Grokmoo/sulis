@@ -11,7 +11,7 @@ equippable:
         max: 45
         kind: Slashing
       kind: # Melee
-        reach: 3.0
+        reach: 2.0
 image:
   HeldMain:
     creatures/greatsword

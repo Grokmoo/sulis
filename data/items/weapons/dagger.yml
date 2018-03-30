@@ -11,7 +11,7 @@ equippable:
         max: 25
         kind: Piercing
       kind: # Melee
-        reach: 1.0
+        reach: 0.25
 image:
   HeldMain:
     creatures/dagger

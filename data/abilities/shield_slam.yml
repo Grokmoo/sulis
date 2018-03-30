@@ -1,0 +1,11 @@
+id: shield_slam
+name: "Shield Slam"
+icon: abilities/shield_slam
+description: |
+  You slam a target within melee range with your shield, doing little damage but stunning the target and pushing them back.
+  The attack is made against the target's fortitude defense.  The larger you are relative to the target, the further the target will move.  Targets that are much larger than you will not move at all, but may still be stunned.
+  Targets will only be pushed back if it is possible based on the terrain.  If a creature has its back to a wall, it will not be pushed back at all.
+active:
+  script: "shield_slam"
+  ap: 20
+  duration: 0

@@ -356,6 +356,7 @@ groups:
       mouse_travel: [0, 128]
       mouse_select: [128, 128]
       mouse_invalid: [256, 128]
+      mouse_dialog: [384, 128]
   special:
     areas:
       empty: [0, 512, 5, 5]

@@ -17,7 +17,7 @@ base_stats:
       kind: Crushing
     kind: #Melee
       reach: 0.5
-  bonus_reach: 1.0
+  bonus_reach: 0.25
 default_images:
   Male:
     Foreground: creatures/merling_male_fg

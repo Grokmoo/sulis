@@ -214,8 +214,10 @@ impl ActionMenu {
         if let Some(ref entity) = self.hovered_entity {
             if entity.borrow().is_pc() {
                 Cursor::set_cursor_state(animation_state::Kind::MouseSelect);
-            } else {
+            } else if entity.borrow().is_hostile() {
                 Cursor::set_cursor_state(animation_state::Kind::MouseAttack);
+            } else {
+                Cursor::set_cursor_state(animation_state::Kind::MouseDialog);
             }
             let size = Rc::clone(&entity.borrow().size);
             (size, entity.borrow().location.to_point())

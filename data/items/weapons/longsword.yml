@@ -10,7 +10,7 @@ equippable:
         max: 35
         kind: Slashing
       kind: # Melee
-        reach: 2.0
+        reach: 1.5
 image:
   HeldMain:
     creatures/longsword

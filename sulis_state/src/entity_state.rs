@@ -22,7 +22,8 @@ use sulis_module::Area;
 
 use animation::{Animation, MeleeAttackAnimation, RangedAttackAnimation};
 use sulis_core::io::GraphicsRenderer;
-use sulis_module::{Actor, ObjectSize, ObjectSizeIterator, Module};
+use sulis_core::util::Point;
+use sulis_module::{Actor, Faction, ObjectSize, ObjectSizeIterator, Module};
 use sulis_module::area::Transition;
 use {ActorState, AreaState, ChangeListenerList, GameState, has_visibility, Location, PropState, ScriptCallback};
 
@@ -83,6 +84,10 @@ impl EntityState {
 
     pub fn is_pc(&self) -> bool {
         self.is_pc
+    }
+
+    pub fn is_hostile(&self) -> bool {
+        self.actor.actor.faction == Faction::Hostile
     }
 
     pub (crate) fn is_marked_for_removal(&self) -> bool {
@@ -178,22 +183,42 @@ impl EntityState {
         has_visibility(area, &self, &other.borrow())
     }
 
-    pub fn dist(&self, to_x: i32, to_y: i32, to_width: i32, to_height: i32) -> f32 {
-        let self_half_size = self.size.diagonal as f32 / 2.0;
-        let other_half_width = to_width as f32 / 2.0;
-        let other_half_height = to_height as f32 / 2.0;
-        let from_x = self.location.x as f32 + self_half_size;
-        let from_y = self.location.y as f32 + self_half_size;
-        let to_x = to_x as f32 + other_half_width;
-        let to_y = to_y as f32 + other_half_height;
+    pub fn dist_to_point(&self, pos: Point) -> f32 {
+        let x1 = self.location.x as f32 + self.size.width as f32 / 2.0;
+        let y1 = self.location.y as f32 + self.size.height as f32 / 2.0;
+        let x2 = pos.x as f32;
+        let y2 = pos.y as f32;
 
-        ((from_x - to_x) * (from_x - to_x) + (from_y - to_y) * (from_y - to_y)).sqrt()
-            - self_half_size - (other_half_width + other_half_height) / 2.0
+        let dist = ((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)).sqrt();
+        dist - self.size.diagonal / 2.0 - (2.0 as f32).sqrt() / 2.0
     }
 
+    pub fn dist(&self, pos: Point, size: &Rc<ObjectSize>) -> f32 {
+        let x1 = self.location.x as f32 + self.size.width as f32 / 2.0;
+        let y1 = self.location.y as f32 + self.size.height as f32 / 2.0;
+
+        let x2 = pos.x as f32 + size.width as f32 / 2.0;
+        let y2 = pos.y as f32 + size.height as f32 / 2.0;
+
+        let dist = ((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)).sqrt();
+        dist - self.size.diagonal / 2.0 - size.diagonal / 2.0
+    }
+
+    // pub fn dist(&self, to_x: i32, to_y: i32, to_width: i32, to_height: i32) -> f32 {
+    //     let self_half_size = self.size.diagonal as f32 / 2.0;
+    //     let other_half_width = to_width as f32 / 2.0;
+    //     let other_half_height = to_height as f32 / 2.0;
+    //     let from_x = self.location.x as f32 + self_half_size;
+    //     let from_y = self.location.y as f32 + self_half_size;
+    //     let to_x = to_x as f32 + other_half_width;
+    //     let to_y = to_y as f32 + other_half_height;
+    //
+    //     ((from_x - to_x) * (from_x - to_x) + (from_y - to_y) * (from_y - to_y)).sqrt()
+    //         - self_half_size - (other_half_width + other_half_height) / 2.0
+    // }
+
     pub fn dist_to_entity(&self, other: &Rc<RefCell<EntityState>>) -> f32 {
-        let value = self.dist(other.borrow().location.x, other.borrow().location.y,
-            other.borrow().size.width, other.borrow().size.height);
+        let value = self.dist(other.borrow().location.to_point(), &other.borrow().size);
 
         trace!("Computed distance from '{}' at {:?} to '{}' at {:?} = {}", self.actor.actor.name,
                self.location, other.borrow().actor.actor.name, other.borrow().location, value);
@@ -202,7 +227,7 @@ impl EntityState {
     }
 
     pub fn dist_to_transition(&self, other: &Transition) -> f32 {
-        let value = self.dist(other.from.x, other.from.y, other.size.width, other.size.height);
+        let value = self.dist(other.from, &other.size);
 
         trace!("Computed distance from '{}' at {:?} to transition at {:?} = {}",
                self.actor.actor.name, self.location, other.from, value);
@@ -211,8 +236,7 @@ impl EntityState {
     }
 
     pub fn dist_to_prop(&self, other: &PropState) -> f32 {
-        self.dist(other.location.x, other.location.y,
-                  other.prop.size.width, other.prop.size.height)
+        self.dist(other.location.to_point(), &other.prop.size)
     }
 
     pub fn center_x(&self) -> i32 {

@@ -1,0 +1,17 @@
+id: merch01
+name: Merchant
+faction: Friendly
+race: human
+images:
+  Hair: creatures/hair01
+attributes:
+  str: 9
+  dex: 13
+  end: 8
+  per: 12
+  int: 7
+  wis: 9
+levels:
+  fighter: 1
+items: [ boots_leather, legs_pants, torso_shirt ]
+equipped: [ 0, 1, 2 ]

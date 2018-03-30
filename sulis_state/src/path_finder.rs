@@ -123,7 +123,12 @@ impl PathFinder {
             let current = self.find_lowest_f_score_in_open_set();
             if self.is_goal(current, dest_dist_squared) {
                 // info!("Path find loop time: {}", animation::format_elapsed_secs(loop_start_time.elapsed()));
-                return Some(self.reconstruct_path(current));
+                let path = self.reconstruct_path(current);
+                if path.len() == 1 && path[0].x == requester.location.x && path[0].y == requester.location.y {
+                    return None
+                } else {
+                    return Some(self.reconstruct_path(current));
+                }
             }
 
             self.open.remove(&current);

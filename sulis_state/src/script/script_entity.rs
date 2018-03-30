@@ -217,6 +217,12 @@ impl UserData for ScriptEntity {
             Ok(())
         });
 
+        methods.add_method("set_subpos", |_, entity, (x, y): (f32, f32)| {
+            let entity = entity.try_unwrap()?;
+            entity.borrow_mut().sub_pos = (x, y);
+            Ok(())
+        });
+
         methods.add_method("remove_ap", |_, entity, ap| {
             let entity = entity.try_unwrap()?;
             entity.borrow_mut().actor.remove_ap(ap);
@@ -224,6 +230,10 @@ impl UserData for ScriptEntity {
         });
 
         methods.add_method("stats", &create_stats_table);
+
+        methods.add_method("inventory", |_, entity, ()| {
+            Ok(ScriptInventory::new(entity.clone()))
+        });
 
         methods.add_method("size_str", |_, entity, ()| {
             let entity = entity.try_unwrap()?;
@@ -273,7 +283,7 @@ impl UserData for ScriptEntity {
             let (x, y) = unwrap_point(point)?;
             let entity = entity.try_unwrap()?;
             let entity = entity.borrow();
-            Ok(entity.dist(x, y, 1, 1))
+            Ok(entity.dist_to_point(Point::new(x, y)))
         });
     }
 }

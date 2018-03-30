@@ -15,8 +15,8 @@ base_stats:
       max: 15
       kind: Crushing
     kind: #Melee
-      reach: 0.5
-  bonus_reach: 0.5
+      reach: 0.25
+  bonus_reach: 0.0
 default_images:
   Male:
     Background: creatures/goblin0

@@ -29,6 +29,9 @@ mod script_entity;
 pub use self::script_entity::ScriptEntity;
 pub use self::script_entity::ScriptEntitySet;
 
+mod script_inventory;
+pub use self::script_inventory::ScriptInventory;
+
 mod script_particle_generator;
 use self::script_particle_generator::ScriptParticleGenerator;
 
@@ -152,6 +155,14 @@ impl UserData for ScriptInterface {
 
         methods.add_method("atan2", |_, _, (x, y): (f32, f32)| {
             Ok(y.atan2(x))
+        });
+
+        methods.add_method("is_passable", |_, _, (entity, x, y): (ScriptEntity, i32, i32)| {
+            let area_state = GameState::area_state();
+            let area_state = area_state.borrow();
+            let entity = entity.try_unwrap()?;
+            let entity = entity.borrow();
+            Ok(area_state.is_passable(&entity, x, y))
         });
     }
 }

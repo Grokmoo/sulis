@@ -106,17 +106,21 @@ children:
             text: "Select an Ability"
           ability_pane:
             from: .ability_pane
-            position: [110, 10]
-            preferred_size: [-110, -10]
+            position: [160, 10]
+            preferred_size: [-160, -10]
             width_relative: Max
             height_relative: Max
           abilities_pane:
             border: [1, 1, 1, 1]
-            preferred_size: [100, -10]
+            preferred_size: [150, -10]
             position: [0, 10]
             height_relative: Max
             custom:
-              grid_size: 15
+              grid_size: 14
+              grid_border: 1
+              connect_up: abilities/connect_up
+              connect_down: abilities/connect_down
+              connect_straight: abilities/connect_straight
             children:
               ability_button:
                 from: .button

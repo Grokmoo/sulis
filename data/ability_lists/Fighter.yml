@@ -2,25 +2,36 @@ id: fighter
 abilities:
   - id: impenetrable_defense
     position: [0, 0]
+    
   - id: mighty_blow
     position: [0, 2]
+    connect: [ Up, Down ]
+  - id: powerful_blows
+    position: [1, 1.5]
+    connect: [ Down ]
   - id: stunning_blow
-    position: [1, 2]
+    position: [1, 2.5]
+    connect: [ Up, LongDown ]
   - id: whirlwind_attack
     position: [2, 2]
   - id: charge_attack
-    position: [3, 2]
+    position: [2, 3.5]
   - id: leap
-    position: [4, 2]
+    position: [0, 3.5]
+    connect: [ Straight2x ]
+    
   - id: resilient_body
-    position: [0, 4]
-  - id: tough_skin
-    position: [1, 4]
-  - id: lightning_reflexes
     position: [0, 5]
-  - id: improved_initiative
+    connect: [ Straight]
+  - id: tough_skin
     position: [1, 5]
-  - id: tenacious_soul
+  - id: lightning_reflexes
     position: [0, 6]
-  - id: elemental_defense
+    connect: [ Straight ]
+  - id: improved_initiative
     position: [1, 6]
+  - id: tenacious_soul
+    position: [0, 7]
+    connect: [ Straight ]
+  - id: elemental_defense
+    position: [1, 7]

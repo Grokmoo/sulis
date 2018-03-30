@@ -49,3 +49,12 @@ groups:
       whirlwind3: [96, 0]
       whirlwind4: [144, 0]
       whirlwind5: [192, 0]
+  crossed_swords:
+    size: [20, 20]
+    position: [116, 0]
+    areas:
+      crossed_swords1: [0, 0]
+      crossed_swords2: [20, 0]
+      crossed_swords3: [40, 0]
+      crossed_swords4: [60, 0]
+      crossed_swords5: [80, 0]

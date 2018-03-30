@@ -14,6 +14,7 @@ groups:
       
       lightning_reflexes: [0, 1]
       stunning_blow: [1, 1]
+      powerful_blows: [2, 1]
       
       tough_skin: [0, 2]
       elemental_defense: [1, 2]
@@ -24,6 +25,9 @@ groups:
 
       already_selected: [0, 3]
       prereqs_not_met: [1, 3]
+      connect_straight: [2, 3]
+      connect_up: [3, 3]
+      connect_down: [4, 3]
       
       charge_attack: [0, 4]
       

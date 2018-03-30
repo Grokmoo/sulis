@@ -8,4 +8,4 @@ active:
   ap: 30
   duration: 0
 prereqs:
-  abilities: [ mighty_blow ]
+  abilities: [ powerful_blows, stunning_blow ]

@@ -1,0 +1,11 @@
+id: crossed_swords
+frame_time_millis: 200
+frames:
+  - particles/crossed_swords1
+  - particles/crossed_swords2
+  - particles/crossed_swords3
+  - particles/crossed_swords4
+  - particles/crossed_swords5
+  - particles/crossed_swords4
+  - particles/crossed_swords3
+  - particles/crossed_swords2

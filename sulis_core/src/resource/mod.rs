@@ -118,6 +118,19 @@ impl ResourceSet {
         })
     }
 
+    pub fn get_image_else_empty(id: &str) -> Rc<Image> {
+        RESOURCE_SET.with(|r| {
+            match get_resource(id, &r.borrow().images) {
+                None => {
+                    warn!("No image with id '{}' found", id);
+                    get_resource("empty", &r.borrow().images).unwrap()
+                }, Some(ref image) => {
+                    Rc::clone(image)
+                }
+            }
+        })
+    }
+
     pub fn get_empty_image() -> Rc<Image> {
         RESOURCE_SET.with(|r| get_resource("empty", &r.borrow().images)).unwrap()
     }

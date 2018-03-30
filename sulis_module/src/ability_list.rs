@@ -19,14 +19,27 @@ use std::rc::Rc;
 use std::io::Error;
 
 use sulis_core::resource::{ResourceBuilder};
-use sulis_core::util::{Point, invalid_data_error, unable_to_create_error};
+use sulis_core::util::{invalid_data_error, unable_to_create_error};
 use sulis_core::serde_yaml;
 
 use {Ability, Module};
 
+#[derive(Deserialize, Debug, Clone, Copy)]
+#[serde(deny_unknown_fields)]
+pub enum Connect {
+    Up,
+    LongUp,
+    Down,
+    LongDown,
+    Straight,
+    Straight2x,
+    Straight3x,
+}
+
 pub struct Entry {
     pub ability: Rc<Ability>,
-    pub position: Point,
+    pub position: (f32, f32),
+    pub connect: Vec<Connect>,
 }
 
 pub struct AbilityList {
@@ -45,7 +58,11 @@ impl AbilityList {
                 }, Some(ref ability) => Rc::clone(ability),
             };
 
-            entries.push(Entry { ability, position: entry.position });
+            entries.push(Entry {
+                ability,
+                position: entry.position,
+                connect: entry.connect.unwrap_or(Vec::new()),
+            });
         }
 
         Ok(AbilityList {
@@ -63,7 +80,8 @@ impl AbilityList {
 #[serde(deny_unknown_fields)]
 pub struct EntryBuilder {
     id: String,
-    position: Point,
+    position: (f32, f32),
+    connect: Option<Vec<Connect>>,
 }
 
 #[derive(Deserialize, Debug)]

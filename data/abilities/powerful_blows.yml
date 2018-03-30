@@ -1,0 +1,11 @@
+id: powerful_blows
+name: "Powerful Blows"
+icon: abilities/powerful_blows
+description: |
+  You move into an offensive stance.  Your attacks become more powerful, but your defenses are lessened.
+active:
+  script: "powerful_blows"
+  ap: 10
+  duration: 2
+prereqs:
+  abilities: [ mighty_blow ]

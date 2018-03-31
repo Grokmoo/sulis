@@ -29,8 +29,8 @@ pub use self::abilities_bar::AbilitiesBar;
 mod ability_pane;
 pub use self::ability_pane::AbilityPane;
 
-mod action_menu;
-pub use self::action_menu::ActionMenu;
+mod action_kind;
+pub use self::action_kind::ActionKind;
 
 mod ap_bar;
 pub use self::ap_bar::ApBar;

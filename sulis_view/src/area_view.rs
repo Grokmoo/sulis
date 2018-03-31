@@ -34,7 +34,7 @@ use sulis_widgets::Label;
 use sulis_module::area::Layer;
 use sulis_state::{AreaDrawable, AreaState, EntityState, GameState};
 
-use {ActionMenu, EntityMouseover, PropMouseover};
+use {EntityMouseover, PropMouseover, action_kind};
 
 struct HoverSprite {
     pub sprite: Rc<Sprite>,
@@ -476,22 +476,8 @@ impl WidgetKind for AreaView {
             return true;
         }
 
-        let action_menu = ActionMenu::new(x, y);
-        if kind == ClickKind::Left {
-            action_menu.borrow().fire_default_callback(&widget, self);
-
-            if let Some(entity) = area_state.borrow().get_entity_at(x, y) {
-                let (x, y) = {
-                    let entity = entity.borrow();
-                    self.get_mouseover_pos(entity.location.x, entity.location.y,
-                        entity.size.width, entity.size.height)
-                };
-                Widget::set_mouse_over(widget, EntityMouseover::new(&entity), x, y);
-            }
-
-        } else if kind == ClickKind::Right {
-            Widget::add_child_to(widget, Widget::with_defaults(action_menu));
-        }
+        let action = action_kind::get_action(x, y);
+        action.fire_action(widget);
 
         true
     }
@@ -560,24 +546,23 @@ impl WidgetKind for AreaView {
             }
         }
 
-        let action_menu = ActionMenu::new(area_x, area_y);
-        let left_click_action_valid = action_menu.borrow().is_default_callback_valid();
-        let (size, pos) = action_menu.borrow().get_cursor();
-
-        if !left_click_action_valid {
-            Cursor::set_cursor_state(animation_state::Kind::MouseInvalid);
+        let action = action_kind::get_action(area_x, area_y);
+        Cursor::set_cursor_state(action.cursor_state());
+        match action.get_hover_info() {
+            Some((size, x, y)) => {
+                let hover_sprite = HoverSprite {
+                    sprite: Rc::clone(&size.cursor_sprite),
+                    x,
+                    y,
+                    w: size.width,
+                    h: size.height,
+                    left_click_action_valid: true
+                };
+                self.hover_sprite = Some(hover_sprite);
+            }, None => {
+                self.hover_sprite = None;
+            }
         }
-
-        let hover_sprite = HoverSprite {
-            sprite: Rc::clone(&size.cursor_sprite),
-            x: pos.x,
-            y: pos.y,
-            w: size.width,
-            h: size.height,
-            left_click_action_valid,
-        };
-        self.hover_sprite = Some(hover_sprite);
-
         true
     }
 

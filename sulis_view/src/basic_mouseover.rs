@@ -22,43 +22,30 @@ use sulis_core::ui::{Widget, WidgetKind};
 use sulis_core::io::{GraphicsRenderer};
 use sulis_core::util::Point;
 use sulis_widgets::{TextArea};
-use sulis_state::{ChangeListener, EntityState};
 
-const NAME: &'static str = "entity_mouseover";
+const NAME: &'static str = "prop_mouseover";
 
-pub struct EntityMouseover {
-    entity: Rc<RefCell<EntityState>>,
+pub struct BasicMouseover {
     text_area: Rc<RefCell<TextArea>>,
+    text: String,
 }
 
-impl EntityMouseover {
-    pub fn new(entity: &Rc<RefCell<EntityState>>) -> Rc<RefCell<EntityMouseover>> {
-        Rc::new(RefCell::new(EntityMouseover {
-            entity: Rc::clone(entity),
+impl BasicMouseover {
+    pub fn new(text: &str) -> Rc<RefCell<BasicMouseover>> {
+        Rc::new(RefCell::new(BasicMouseover {
             text_area: TextArea::empty(),
+            text: text.to_string(),
         }))
     }
 }
 
-impl WidgetKind for EntityMouseover {
+impl WidgetKind for BasicMouseover {
     widget_kind!(NAME);
 
-    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
-        self.entity.borrow_mut().actor.listeners.add(
-            ChangeListener::invalidate_layout(NAME, widget));
-
-        Vec::new()
-    }
-
     fn layout(&mut self, widget: &mut Widget) {
-        widget.state.add_text_arg("name", &self.entity.borrow().actor.actor.name);
-        widget.state.add_text_arg("cur_hp", &self.entity.borrow().actor.hp().to_string());
-        widget.state.add_text_arg("max_hp", &self.entity.borrow().actor.stats.max_hp.to_string());
+        widget.state.clear_text_args();
+        widget.state.add_text_arg("name", &self.text);
 
-        // double layout - first to get the position, then to actually do the layout
-        self.text_area.borrow_mut().layout(widget);
-        widget.state.position.y -= widget.state.size.height;
-        widget.state.position.x -= widget.state.size.width / 2;
         self.text_area.borrow_mut().layout(widget);
     }
 

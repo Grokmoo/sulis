@@ -8,9 +8,9 @@ children:
   mouse_over:
     from: .text_area
     border: { top: 1, bottom: 1, left: 2, right: 2 }
-    background: bg_base
+    background: 60_transparent_fill
     text: |
-      [c=f00;s=5.0|#name#]
+      [s=5.0|#name#]
       [?cur_hp|#cur_hp# / #max_hp#
       ][?empty;c=888|Empty
       ]
@@ -23,7 +23,7 @@ children:
   ap_bar:
     y_relative: Max
     x_relative: Center
-    position: [-40, 0]
+    position: [-25, 0]
     preferred_size: [0, 8]
     width_relative: ChildSum
     border: [1, 1, 1, 1]
@@ -33,10 +33,36 @@ children:
       ball:
         background: ball_animated
         preferred_size: [6, 6]
+  initiative_ticker:
+    preferred_size: [0, 12]
+    position: [-25, 0]
+    x_relative: Center
+    width_relative: ChildSum
+    layout: BoxHorizontal
+    layout_spacing: { right: 1, left: 0, top: 0, bottom: 0 }
+    children:
+      entry:
+        from: .label
+        background: bg_rounded
+        text: "#0#"
+        text_params:
+          horizontal_alignment: Center
+        preferred_size: [12, 0]
+        height_relative: Max
+      current_entry:
+        from: .label
+        background: bg_rounded
+        text: "#0#"
+        text_params:
+          horizontal_alignment: Center
+          color: [1.0, 0.0, 0.0, 1.0]
+          scale: 6.0
+        preferred_size: [20, 0]
+        height_relative: Max
   right_pane:
     background: bg_base
-    border: [3, 3, 3, 3]
-    preferred_size: [80, 0]
+    border: [2, 2, 2, 2]
+    preferred_size: [50, 0]
     x_relative: Max
     height_relative: Max
     children:
@@ -46,7 +72,7 @@ children:
         x_relative: Max
         height_relative: Max
         position: [0, 40]
-        preferred_size: [40, -100]
+        preferred_size: [42, -100]
         layout: Grid
         layout_spacing: { top: 0, bottom: 0, left: 0, right: 1 }
         children:
@@ -103,29 +129,6 @@ children:
         y_relative: Max
         x_relative: Max
         foreground: end_turn_icon
-      initiative_ticker:
-        border: [1, 1, 1, 1]
-        width_relative: Max
-        height_relative: ChildSum
-        layout: BoxVertical
-        position: [0, 0]
-        children:
-          entry:
-            from: .label
-            text: "#0#"
-            text_params:
-              horizontal_alignment: Left
-            preferred_size: [0, 4]
-            width_relative: Max
-          current_entry:
-            from: .label
-            text: "#0#"
-            text_params:
-              horizontal_alignment: Left
-              color: [1.0, 0.0, 0.0, 1.0]
-              scale: 6.0
-            preferred_size: [0, 8]
-            width_relative: Max
       window_button:
         from: .button
         background: background_rounded
@@ -154,7 +157,7 @@ children:
         position: [0, -30]
         foreground: menu_icon
   area:
-    preferred_size: [-80, 0]
+    preferred_size: [-50, 0]
     width_relative: Max
     height_relative: Max
     custom:
@@ -164,34 +167,11 @@ children:
       targeter_label:
         from: .label
         x_relative: Center
-        position: [0, 5]
+        position: [0, 15]
         text_params:
           scale: 5.0
           color: { r: 1.0, g: 0.0, b: 0.0, a: 1.0 }
         text: "Select target for #ability_id#"
-      action_menu:
-        from: .list_box
-        x_relative: Cursor
-        y_relative: Cursor
-        position: [-1, -1]
-        preferred_size: [24, 0]
-        height_relative: ChildSum
-        width_relative: Zero
-        children:
-          title:
-            from: .label
-            text: "Actions"
-            text_params:
-              scale: 5.0
-              horizontal_alignment: Center
-            preferred_size: [0, 4]
-            width_relative: Max
-            position: [0, 0]
-          actions:
-            from: .list_box
-            border: [0, 0, 0, 0]
-            width_relative: Max
-            position: [0, 4]
   prop_window:
     from: .window
     position: [4, 4]

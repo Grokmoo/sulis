@@ -93,6 +93,21 @@ impl WidgetKind for Label {
         false
     }
 
+    fn on_mouse_move(&mut self, _widget: &Rc<RefCell<Widget>>,
+                     _delta_x: f32, _delta_y: f32) -> bool {
+        true
+    }
+
+    fn on_mouse_enter(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
+        self.super_on_mouse_exit(widget);
+        false
+    }
+
+    fn on_mouse_exit(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
+        self.super_on_mouse_exit(widget);
+        false
+    }
+
     fn layout(&mut self, widget: &mut Widget) {
         if let Some(ref text) = self.text {
             widget.state.add_text_arg("0", text);

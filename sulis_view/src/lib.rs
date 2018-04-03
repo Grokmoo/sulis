@@ -38,6 +38,9 @@ pub use self::ap_bar::ApBar;
 mod area_view;
 pub use self::area_view::AreaView;
 
+mod basic_mouseover;
+pub use self::basic_mouseover::BasicMouseover;
+
 pub mod character_builder;
 pub use self::character_builder::CharacterBuilder;
 
@@ -227,9 +230,6 @@ impl WidgetKind for RootView {
 
             Widget::add_child_to(&right_pane, end_turn_button);
 
-            let ticker = Widget::with_defaults(InitiativeTicker::new());
-            Widget::add_child_to(&right_pane, ticker);
-
             let inv_button = Widget::with_theme(Button::empty(), "inventory_button");
             inv_button.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
                 let parent = Widget::get_root(&widget);
@@ -274,6 +274,7 @@ impl WidgetKind for RootView {
 
         let ap_bar = Widget::with_defaults(ApBar::new(pc));
 
-        vec![area_widget, right_pane, ap_bar]
+        let ticker = Widget::with_defaults(InitiativeTicker::new());
+        vec![area_widget, right_pane, ap_bar, ticker]
     }
 }

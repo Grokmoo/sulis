@@ -41,11 +41,7 @@ impl PropMouseover {
 }
 
 impl WidgetKind for PropMouseover {
-    fn get_name(&self) -> &str { NAME }
-
-    fn as_any(&self) -> &Any { self }
-
-    fn as_any_mut(&mut self) -> &mut Any { self }
+    widget_kind!(NAME);
 
     fn layout(&mut self, widget: &mut Widget) {
         let area_state = GameState::area_state();
@@ -58,6 +54,10 @@ impl WidgetKind for PropMouseover {
         }
         widget.state.add_text_arg("name", &prop.prop.name);
 
+        // double layout - first to get the position, then to actually do the layout
+        self.text_area.borrow_mut().layout(widget);
+        widget.state.position.y -= widget.state.size.height;
+        widget.state.position.x -= widget.state.size.width / 2;
         self.text_area.borrow_mut().layout(widget);
     }
 

@@ -31,8 +31,8 @@ use sulis_core::config::CONFIG;
 use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::extern_image::ImageBuffer;
 use sulis_widgets::Label;
-use sulis_module::area::Layer;
-use sulis_state::{AreaDrawable, AreaState, EntityState, GameState};
+use sulis_module::{ObjectSize, area::Layer};
+use sulis_state::{AreaDrawable, AreaState, EntityState, GameState, Location};
 
 use {EntityMouseover, PropMouseover, action_kind};
 
@@ -103,10 +103,9 @@ impl AreaView {
         self.scroll.set(x, y);
     }
 
-    pub fn get_mouseover_pos(&self, x: i32, y: i32, _width: i32, height: i32) -> (i32, i32) {
-        // let x = x as f32 + width as f32 / 2.0;
-        let x = x as f32;
-        let y = y as f32 + height as f32;
+    pub fn get_mouseover_pos(&self, loc: &Location, size: &Rc<ObjectSize>) -> (i32, i32) {
+        let x = loc.x as f32 + size.width as f32 / 2.0;
+        let y = loc.y as f32;
         let x = ((x - self.scroll.x()) * self.scale.0).round() as i32;
         let y = ((y - self.scroll.y()) * self.scale.1).round() as i32;
 
@@ -513,8 +512,7 @@ impl WidgetKind for AreaView {
             if let Some(ref entity) = mouse_over {
                 let (x, y) = {
                     let entity = entity.borrow();
-                    self.get_mouseover_pos(entity.location.x, entity.location.y,
-                                           entity.size.width, entity.size.height)
+                    self.get_mouseover_pos(&entity.location, &entity.size)
                 };
                 Widget::set_mouse_over(widget, EntityMouseover::new(entity), x, y);
             }
@@ -525,8 +523,7 @@ impl WidgetKind for AreaView {
         if let Some(entity) = area_state.borrow().get_entity_at(area_x, area_y) {
             let (x, y) = {
                 let entity = entity.borrow();
-                self.get_mouseover_pos(entity.location.x, entity.location.y,
-                    entity.size.width, entity.size.height)
+                self.get_mouseover_pos(&entity.location, &entity.size)
             };
             Widget::set_mouse_over(widget, EntityMouseover::new(&entity), x, y);
         } else if let Some(index) = area_state.borrow().prop_index_at(area_x, area_y) {
@@ -539,8 +536,7 @@ impl WidgetKind for AreaView {
                 let (x, y) = {
                     let area_state = area_state.borrow();
                     let prop_state = area_state.get_prop(index);
-                    self.get_mouseover_pos(prop_state.location.x, prop_state.location.y,
-                                           prop_state.prop.size.width, prop_state.prop.size.height)
+                    self.get_mouseover_pos(&prop_state.location, &prop_state.prop.size)
                 };
                 Widget::set_mouse_over(widget, PropMouseover::new(index), x, y);
             }

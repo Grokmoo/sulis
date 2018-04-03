@@ -18,6 +18,7 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
+use sulis_core::io::event::ClickKind;
 use sulis_core::ui::{Widget, WidgetKind};
 use sulis_state::{ChangeListener, GameState};
 use sulis_widgets::Label;
@@ -33,16 +34,26 @@ impl InitiativeTicker {
 }
 
 impl WidgetKind for InitiativeTicker {
-    fn get_name(&self) -> &str {
-        NAME
+    widget_kind!(NAME);
+
+    fn on_mouse_enter(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
+        self.super_on_mouse_enter(widget);
+        true
     }
 
-    fn as_any(&self) -> &Any {
-        self
+    fn on_mouse_press(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
+        self.super_on_mouse_press(widget, kind);
+        false
     }
 
-    fn as_any_mut(&mut self) -> &mut Any {
-        self
+    fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
+        self.super_on_mouse_release(widget, kind);
+        false
+    }
+
+    fn on_mouse_drag(&mut self, _widget: &Rc<RefCell<Widget>>, _kind: ClickKind,
+                     _delta_x: f32, _delta_y: f32) -> bool {
+        false
     }
 
     fn on_remove(&mut self) {

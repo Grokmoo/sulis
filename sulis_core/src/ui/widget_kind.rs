@@ -48,6 +48,21 @@ impl WidgetKind for EmptyWidget {
                      _delta_x: f32, _delta_y: f32) -> bool {
         false
     }
+
+    fn on_mouse_move(&mut self, _widget: &Rc<RefCell<Widget>>,
+                     _delta_x: f32, _delta_y: f32) -> bool {
+        true
+    }
+
+    fn on_mouse_enter(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
+        self.super_on_mouse_enter(widget);
+        false
+    }
+
+    fn on_mouse_exit(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
+        self.super_on_mouse_exit(widget);
+        false
+    }
 }
 
 /// Trait for implementations of different Widgets.  This is held by a 'WidgetState'

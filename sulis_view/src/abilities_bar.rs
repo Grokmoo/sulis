@@ -21,8 +21,10 @@ use std::cell::RefCell;
 use sulis_module::Ability;
 use sulis_state::{ChangeListener, EntityState, GameState};
 use sulis_core::io::event;
-use sulis_core::ui::{Widget, WidgetKind};
+use sulis_core::ui::{Cursor, Widget, WidgetKind};
 use sulis_widgets::{Label};
+
+use BasicMouseover;
 
 pub const NAME: &str = "abilities_bar";
 
@@ -39,11 +41,7 @@ impl AbilitiesBar {
 }
 
 impl WidgetKind for AbilitiesBar {
-    fn get_name(&self) -> &str { NAME }
-
-    fn as_any(&self) -> &Any { self }
-
-    fn as_any_mut(&mut self) -> &mut Any { self }
+    widget_kind!(NAME);
 
     fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>>  {
         {
@@ -79,11 +77,7 @@ impl AbilityButton {
 }
 
 impl WidgetKind for AbilityButton {
-    fn get_name(&self) -> &str { "ability_button" }
-
-    fn as_any(&self) -> &Any { self }
-
-    fn as_any_mut(&mut self) -> &mut Any { self }
+    widget_kind!("ability_button");
 
     fn layout(&mut self, widget: &mut Widget) {
         widget.do_base_layout();
@@ -117,6 +111,13 @@ impl WidgetKind for AbilityButton {
         icon.borrow_mut().state.add_text_arg("icon", &self.ability.icon.id());
 
         vec![icon, duration_label]
+    }
+
+    fn on_mouse_move(&mut self, widget: &Rc<RefCell<Widget>>, _: f32, _: f32) -> bool {
+        info!("move");
+        Widget::set_mouse_over(widget, BasicMouseover::new(&self.ability.name),
+            Cursor::get_x(), Cursor::get_y());
+        true
     }
 
     fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: event::ClickKind) -> bool {

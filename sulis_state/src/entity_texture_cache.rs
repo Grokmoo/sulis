@@ -28,7 +28,7 @@ struct Slot {
 
 pub struct EntityTextureCache {
     // size: u32,
-    // slot_size: u32,
+    slot_size: u32,
     slots_dim: usize,
     texture_id: &'static str,
 
@@ -44,7 +44,7 @@ impl EntityTextureCache {
 
         EntityTextureCache {
             // size,
-            // slot_size,
+            slot_size,
             slots_dim,
             texture_id,
             slots: vec![false;slots_dim*slots_dim],
@@ -69,6 +69,23 @@ impl EntityTextureCache {
         entity.actor.draw_to_texture(renderer, &self.texture_id, scale_x, scale_y, x, y);
 
         slot_index
+    }
+
+    pub fn redraw_entity(&mut self, entity: &EntityState, renderer: &mut GraphicsRenderer, slot: usize) {
+        let slot = &self.entity_slots[slot];
+
+        let min_x = slot.x as f32 + 1.0;
+        let min_y = slot.y as f32 + 1.0;
+        let max_x = min_x + slot.w as f32;
+        let max_y = min_y + slot.h as f32;
+
+        let scale_x = CONFIG.display.width as f32 / self.slots_dim as f32;
+        let scale_y = CONFIG.display.height as f32 / self.slots_dim as f32;
+
+        let scale = self.slot_size as f32;
+        renderer.clear_texture_region(&self.texture_id, (min_x * scale) as i32, (min_y * scale) as i32,
+                                      (max_x * scale) as i32, (max_y * scale) as i32);
+        entity.actor.draw_to_texture(renderer, &self.texture_id, scale_x, scale_y, min_x, min_y);
     }
 
     pub fn draw_slot(&self, renderer: &mut GraphicsRenderer, slot: usize, x: f32, y: f32,

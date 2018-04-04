@@ -40,6 +40,7 @@ pub struct ActorState {
     effects: Vec<Effect>,
     image: LayeredImage,
     ability_states: HashMap<String, AbilityState>,
+    texture_cache_invalid: bool,
 }
 
 impl ActorState {
@@ -76,6 +77,16 @@ impl ActorState {
             image,
             effects: Vec::new(),
             ability_states,
+            texture_cache_invalid: false,
+        }
+    }
+
+    pub fn check_texture_cache_invalid(&mut self) -> bool {
+        if self.texture_cache_invalid {
+            self.texture_cache_invalid = false;
+            true
+        } else {
+            false
         }
     }
 
@@ -273,6 +284,7 @@ impl ActorState {
     pub fn equip(&mut self, index: usize) -> bool {
         let result = self.inventory.equip(index);
         self.compute_stats();
+        self.texture_cache_invalid = true;
 
         result
     }
@@ -280,6 +292,7 @@ impl ActorState {
     pub fn unequip(&mut self, slot: item::Slot) -> bool {
         let result = self.inventory.unequip(slot);
         self.compute_stats();
+        self.texture_cache_invalid = true;
 
         result
     }

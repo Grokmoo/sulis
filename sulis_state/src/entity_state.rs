@@ -71,6 +71,10 @@ impl EntityState {
         }
     }
 
+    pub fn clear_texture_cache(&mut self) {
+        self.texture_cache_slot = None;
+    }
+
     pub fn ai_group(&self) -> Option<usize> {
         self.ai_group
     }
@@ -277,6 +281,11 @@ impl AreaDrawable for EntityState {
     fn cache(&mut self, renderer: &mut GraphicsRenderer, texture_cache: &mut EntityTextureCache) {
         if self.texture_cache_slot.is_none() {
             self.texture_cache_slot = Some(texture_cache.add_entity(&self, renderer));
+            self.actor.check_texture_cache_invalid();
+        }
+
+        if self.actor.check_texture_cache_invalid() {
+            texture_cache.redraw_entity(&self, renderer, self.texture_cache_slot.unwrap());
         }
     }
 

@@ -141,8 +141,7 @@ impl LayoutKind {
             Custom => child.state.position.y,
         };
 
-        child.state.set_position(
-            x + theme.position.x, y + theme.position.y);
+        child.state.set_position(x + theme.position.x, y + theme.position.y);
     }
 
     fn get_preferred_height_recursive(widget: &RefMut<Widget>, parent_inner_size: &Size) -> i32 {

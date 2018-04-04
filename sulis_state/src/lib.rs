@@ -482,24 +482,25 @@ impl GameState {
     pub fn can_move_towards(entity: &Rc<RefCell<EntityState>>,
                             target: &Rc<RefCell<EntityState>>) -> bool {
         let (x, y, dist) = GameState::get_target(entity, target);
-        GameState::can_move_to_internal(entity, x, y, dist)
+        GameState::can_move_towards_point(entity, x, y, dist)
     }
 
     pub fn move_towards(entity: &Rc<RefCell<EntityState>>,
                         target: &Rc<RefCell<EntityState>>) -> bool {
         let (x, y, dist) = GameState::get_target(entity, target);
-        GameState::move_to_internal(entity, x, y, dist)
+        GameState::move_towards_point(entity, x, y, dist, None)
     }
 
     pub fn can_move_to(entity: &Rc<RefCell<EntityState>>, x: i32, y: i32) -> bool {
-        GameState::can_move_to_internal(entity, x as f32, y as f32, 0.6)
+        GameState::can_move_towards_point(entity, x as f32, y as f32, 0.6)
     }
 
     pub fn move_to(entity: &Rc<RefCell<EntityState>>, x: i32, y: i32) -> bool {
-        GameState::move_to_internal(entity, x as f32, y as f32, 0.6)
+        GameState::move_towards_point(entity, x as f32, y as f32, 0.6, None)
     }
 
-    fn move_to_internal(entity: &Rc<RefCell<EntityState>>, x: f32, y: f32, dist: f32) -> bool {
+    pub fn move_towards_point(entity: &Rc<RefCell<EntityState>>,
+                              x: f32, y: f32, dist: f32, cb: Option<Box<ScriptCallback>>) -> bool {
         let anim = STATE.with(|s| {
             let mut state = s.borrow_mut();
             let state = state.as_mut().unwrap();
@@ -517,7 +518,9 @@ impl GameState {
                   util::format_elapsed_secs(start_time.elapsed()));
 
             let entity = Rc::clone(entity);
-            Some(MoveAnimation::new(entity, path, CONFIG.display.animation_base_time_millis))
+            let mut anim = MoveAnimation::new(entity, path, CONFIG.display.animation_base_time_millis);
+            anim.set_callback(cb);
+            Some(anim)
         });
 
         match anim {
@@ -535,7 +538,11 @@ impl GameState {
         }
     }
 
-    fn can_move_to_internal(entity: &Rc<RefCell<EntityState>>, x: f32, y: f32, dist: f32) -> bool {
+    pub fn can_move_towards_point(entity: &Rc<RefCell<EntityState>>, x: f32, y: f32, dist: f32) -> bool {
+        if entity.borrow().actor.ap() < Module::rules().movement_ap {
+            return false;
+        }
+
         STATE.with(|s| {
             let mut state = s.borrow_mut();
             let state = state.as_mut().unwrap();

@@ -125,6 +125,11 @@ impl animation::Animation for MoveAnimation {
         trace!("Updated move animation at frame {}", frame_index);
         if frame_index == self.path.len() - 1 {
             self.mover.borrow_mut().sub_pos = (0.0, 0.0);
+
+            if let Some(ref mut cb) = self.callback {
+                cb.on_anim_complete();
+            }
+
             return false;
         }
 

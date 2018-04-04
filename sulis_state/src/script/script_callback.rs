@@ -38,7 +38,7 @@ pub trait ScriptCallback {
 
     fn after_attack(&self, _hit_kind: HitKind) { }
 
-    fn on_anim_complete(&self) { }
+    fn on_anim_complete(&mut self) { }
 
     fn on_anim_update(&self) { }
 }
@@ -100,7 +100,7 @@ impl ScriptCallback for CallbackData {
         GameState::execute_ability_after_attack(&parent, &ability, targets, hit_kind, &func);
     }
 
-    fn on_anim_complete(&self) {
+    fn on_anim_complete(&mut self) {
         let func = match self.funcs.get(&FuncKind::OnAnimComplete) {
             None => return,
             Some(ref func) => func.to_string(),

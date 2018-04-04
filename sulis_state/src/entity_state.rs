@@ -204,19 +204,6 @@ impl EntityState {
         dist - self.size.diagonal / 2.0 - size.diagonal / 2.0
     }
 
-    // pub fn dist(&self, to_x: i32, to_y: i32, to_width: i32, to_height: i32) -> f32 {
-    //     let self_half_size = self.size.diagonal as f32 / 2.0;
-    //     let other_half_width = to_width as f32 / 2.0;
-    //     let other_half_height = to_height as f32 / 2.0;
-    //     let from_x = self.location.x as f32 + self_half_size;
-    //     let from_y = self.location.y as f32 + self_half_size;
-    //     let to_x = to_x as f32 + other_half_width;
-    //     let to_y = to_y as f32 + other_half_height;
-    //
-    //     ((from_x - to_x) * (from_x - to_x) + (from_y - to_y) * (from_y - to_y)).sqrt()
-    //         - self_half_size - (other_half_width + other_half_height) / 2.0
-    // }
-
     pub fn dist_to_entity(&self, other: &Rc<RefCell<EntityState>>) -> f32 {
         let value = self.dist(other.borrow().location.to_point(), &other.borrow().size);
 

@@ -89,7 +89,7 @@ impl animation::Animation for EntitySubposAnimation {
             true
         } else {
             self.owner.borrow_mut().sub_pos = (0.0, 0.0);
-            if let Some(ref cb) = self.callback {
+            if let Some(ref mut cb) = self.callback {
                 cb.on_anim_complete();
             }
             false

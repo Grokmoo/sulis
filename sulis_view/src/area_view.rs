@@ -475,7 +475,7 @@ impl WidgetKind for AreaView {
             return true;
         }
 
-        let action = action_kind::get_action(x, y);
+        let mut action = action_kind::get_action(x, y);
         action.fire_action(widget);
 
         true

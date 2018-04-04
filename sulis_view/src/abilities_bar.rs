@@ -21,7 +21,7 @@ use std::cell::RefCell;
 use sulis_module::Ability;
 use sulis_state::{ChangeListener, EntityState, GameState};
 use sulis_core::io::event;
-use sulis_core::ui::{Cursor, Widget, WidgetKind};
+use sulis_core::ui::{Widget, WidgetKind};
 use sulis_widgets::{Label};
 
 use BasicMouseover;
@@ -107,16 +107,19 @@ impl WidgetKind for AbilityButton {
         }
 
         let duration_label = Widget::with_theme(Label::empty(), "duration_label");
+        duration_label.borrow_mut().state.set_enabled(false);
         let icon = Widget::empty("icon");
         icon.borrow_mut().state.add_text_arg("icon", &self.ability.icon.id());
+        icon.borrow_mut().state.set_enabled(false);
 
         vec![icon, duration_label]
     }
 
     fn on_mouse_move(&mut self, widget: &Rc<RefCell<Widget>>, _: f32, _: f32) -> bool {
-        info!("move");
+        let x = widget.borrow().state.inner_left();
+        let y = widget.borrow().state.inner_bottom();
         Widget::set_mouse_over(widget, BasicMouseover::new(&self.ability.name),
-            Cursor::get_x(), Cursor::get_y());
+            x, y);
         true
     }
 

@@ -430,7 +430,7 @@ impl animation::Animation for ParticleGenerator {
         if secs < self.model.duration_secs && !*self.marked_for_removal.borrow() {
             true
         } else {
-            if let Some(ref cb) = self.callback {
+            if let Some(ref mut cb) = self.callback {
                 cb.on_anim_complete();
             }
             false

@@ -462,6 +462,10 @@ impl AreaState {
         prop_ref.unwrap()
     }
 
+    pub fn props_len(&self) -> usize {
+        self.props.len()
+    }
+
     pub fn entity_iter(&self) -> EntityIterator {
         EntityIterator { area_state: &self, index: 0 }
     }

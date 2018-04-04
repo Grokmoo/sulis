@@ -122,9 +122,14 @@ impl ActorState {
         self.init();
     }
 
-    pub fn draw_graphics_mode(&self, renderer: &mut GraphicsRenderer, scale_x: f32, scale_y: f32,
+    pub fn draw(&self, renderer: &mut GraphicsRenderer, scale_x: f32, scale_y: f32,
                               x: f32, y: f32, millis: u32) {
         self.image.draw(renderer, scale_x, scale_y, x, y, millis);
+    }
+
+    pub fn draw_to_texture(&self, renderer: &mut GraphicsRenderer, texture_id: &str, scale_x: f32, scale_y: f32,
+                              x: f32, y: f32) {
+        self.image.draw_to_texture(renderer, texture_id, scale_x, scale_y, x, y);
     }
 
     pub fn can_reach(&self, dist: f32) -> bool {

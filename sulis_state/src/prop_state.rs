@@ -23,7 +23,7 @@ use sulis_module::Prop;
 use sulis_module::area::PropData;
 
 use entity_state::AreaDrawable;
-use {ChangeListenerList, ItemList, ItemState, Location};
+use {ChangeListenerList, EntityTextureCache, ItemList, ItemState, Location};
 
 pub struct PropState {
     pub prop: Rc<Prop>,
@@ -127,8 +127,10 @@ impl PropState {
 }
 
 impl AreaDrawable for PropState {
-    fn draw(&self, renderer: &mut GraphicsRenderer, scale_x: f32, scale_y: f32, x: f32, y: f32,
-                millis: u32) {
+    fn cache(&mut self, _renderer: &mut GraphicsRenderer, _texture_cache: &mut EntityTextureCache) { }
+
+    fn draw(&self, renderer: &mut GraphicsRenderer, _entity_texture_cache: &EntityTextureCache,
+            scale_x: f32, scale_y: f32, x: f32, y: f32, millis: u32) {
         let x = x + self.location.x as f32;
         let y = y + self.location.y as f32;
 

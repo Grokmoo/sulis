@@ -32,7 +32,7 @@ use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::extern_image::ImageBuffer;
 use sulis_widgets::Label;
 use sulis_module::{ObjectSize, area::Layer};
-use sulis_state::{AreaDrawable, AreaState, EntityState, GameState, Location};
+use sulis_state::{AreaDrawable, AreaState, EntityState, EntityTextureCache, GameState, Location};
 
 use {EntityMouseover, PropMouseover, action_kind};
 
@@ -52,6 +52,7 @@ pub struct AreaView {
     scale: (f32, f32),
     cache_invalid: bool,
     layers: Vec<String>,
+    entity_texture_cache: EntityTextureCache,
 
     targeter_label: Rc<RefCell<Widget>>,
     targeter_tile: Option<Rc<Image>>,
@@ -65,6 +66,7 @@ const TILE_CACHE_TEXTURE_SIZE: u32 = 2048;
 const TILE_SIZE: u32 = 16;
 const TEX_COORDS: [f32; 8] = [ 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0 ];
 
+const ENTITY_TEX_ID: &'static str = "__entities__";
 const VISIBILITY_TEX_ID: &'static str = "__visibility__";
 const BASE_LAYER_ID: &str = "__base_layer__";
 const AERIAL_LAYER_ID: &str = "__aerial_layer__";
@@ -77,6 +79,7 @@ impl AreaView {
             scale: (1.0, 1.0),
             hover_sprite: None,
             cache_invalid: true,
+            entity_texture_cache: EntityTextureCache::new(ENTITY_TEX_ID, TILE_CACHE_TEXTURE_SIZE, TILE_SIZE),
             layers: Vec::new(),
             scroll: Scrollable::new(),
             targeter_tile: None,
@@ -223,7 +226,7 @@ impl AreaView {
         renderer.draw(draw_list);
     }
 
-    fn draw_entities_props(&self, renderer: &mut GraphicsRenderer, scale_x: f32, scale_y: f32,
+    fn draw_entities_props(&mut self, renderer: &mut GraphicsRenderer, scale_x: f32, scale_y: f32,
                      _alpha: f32, widget: &Widget, state: &AreaState, millis: u32) {
         // let start_time = time::Instant::now();
         let mut to_draw: Vec<&AreaDrawable> = Vec::new();
@@ -236,6 +239,8 @@ impl AreaView {
             if !entity.borrow().location_points().any(|p| state.is_pc_visible(p.x, p.y)) {
                 continue;
             }
+
+            entity.borrow_mut().cache(renderer, &mut self.entity_texture_cache);
 
             let entity = entity.borrow();
             let entity = unsafe {
@@ -250,7 +255,7 @@ impl AreaView {
         for drawable in to_draw {
             let x = widget.state.inner_position.x as f32 - self.scroll.x();
             let y = widget.state.inner_position.y as f32 - self.scroll.y();
-            drawable.draw(renderer, scale_x, scale_y, x, y, millis);
+            drawable.draw(renderer, &self.entity_texture_cache, scale_x, scale_y, x, y, millis);
         }
 
         // info!("Entity & Prop draw time: {}", util::format_elapsed_secs(start_time.elapsed()));
@@ -359,7 +364,7 @@ impl WidgetKind for AreaView {
         if self.cache_invalid {
             debug!("Caching area '{}' layers to texture", state.area.id);
 
-            let texture_ids = vec![VISIBILITY_TEX_ID, BASE_LAYER_ID, AERIAL_LAYER_ID];
+            let texture_ids = vec![VISIBILITY_TEX_ID, BASE_LAYER_ID, AERIAL_LAYER_ID, ENTITY_TEX_ID];
             for texture_id in texture_ids {
                 if renderer.has_texture(texture_id) {
                     renderer.clear_texture(texture_id);

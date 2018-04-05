@@ -37,7 +37,7 @@ children:
     preferred_size: [0, 12]
     position: [-25, 0]
     x_relative: Center
-    width_relative: ChildSum
+    # width_relative: ChildSum
     layout: BoxHorizontal
     layout_spacing: { right: 1, left: 0, top: 0, bottom: 0 }
     children:
@@ -51,13 +51,13 @@ children:
         height_relative: Max
       current_entry:
         from: .label
-        background: bg_rounded
+        background: bg_rounded_hover
         text: "#0#"
         text_params:
           horizontal_alignment: Center
           color: [1.0, 0.0, 0.0, 1.0]
           scale: 6.0
-        preferred_size: [20, 0]
+        preferred_size: [12, 0]
         height_relative: Max
   right_pane:
     background: bg_base

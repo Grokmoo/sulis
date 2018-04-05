@@ -40,6 +40,7 @@ pub struct ActorState {
     effects: Vec<Effect>,
     image: LayeredImage,
     ability_states: HashMap<String, AbilityState>,
+    texture_cache_invalid: bool,
 }
 
 impl ActorState {
@@ -76,6 +77,16 @@ impl ActorState {
             image,
             effects: Vec::new(),
             ability_states,
+            texture_cache_invalid: false,
+        }
+    }
+
+    pub fn check_texture_cache_invalid(&mut self) -> bool {
+        if self.texture_cache_invalid {
+            self.texture_cache_invalid = false;
+            true
+        } else {
+            false
         }
     }
 
@@ -122,9 +133,14 @@ impl ActorState {
         self.init();
     }
 
-    pub fn draw_graphics_mode(&self, renderer: &mut GraphicsRenderer, scale_x: f32, scale_y: f32,
+    pub fn draw(&self, renderer: &mut GraphicsRenderer, scale_x: f32, scale_y: f32,
                               x: f32, y: f32, millis: u32) {
         self.image.draw(renderer, scale_x, scale_y, x, y, millis);
+    }
+
+    pub fn draw_to_texture(&self, renderer: &mut GraphicsRenderer, texture_id: &str, scale_x: f32, scale_y: f32,
+                              x: f32, y: f32) {
+        self.image.draw_to_texture(renderer, texture_id, scale_x, scale_y, x, y);
     }
 
     pub fn can_reach(&self, dist: f32) -> bool {
@@ -268,6 +284,7 @@ impl ActorState {
     pub fn equip(&mut self, index: usize) -> bool {
         let result = self.inventory.equip(index);
         self.compute_stats();
+        self.texture_cache_invalid = true;
 
         result
     }
@@ -275,6 +292,7 @@ impl ActorState {
     pub fn unequip(&mut self, slot: item::Slot) -> bool {
         let result = self.inventory.unequip(slot);
         self.compute_stats();
+        self.texture_cache_invalid = true;
 
         result
     }

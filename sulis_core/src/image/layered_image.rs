@@ -50,6 +50,26 @@ impl LayeredImage {
         }
     }
 
+    pub fn draw_to_texture(&self, renderer: &mut GraphicsRenderer, texture_id: &str, scale_x: f32,
+                           scale_y: f32, x: f32, y: f32) {
+        let state = &animation_state::NORMAL;
+        for &(offset_x, offset_y, color, ref image) in self.layers.iter() {
+            let mut draw_list = DrawList::empty_sprite();
+            let w = image.get_width_f32();
+            let h = image.get_height_f32();
+            image.append_to_draw_list(&mut draw_list, state, x + offset_x, y + offset_y, w, h, 0);
+            if let Some(color) = color {
+                draw_list.set_color(color);
+            }
+            if let Some(hue) = self.hue {
+                draw_list.set_swap_hue(hue);
+            }
+            draw_list.set_scale(scale_x, scale_y);
+            renderer.draw_to_texture(texture_id, draw_list);
+        }
+    }
+
+    // TODO refactor these two almost identical functions
     pub fn draw(&self, renderer: &mut GraphicsRenderer, scale_x: f32, scale_y: f32,
             x: f32, y: f32, millis: u32) {
         let state = &animation_state::NORMAL;

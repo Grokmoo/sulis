@@ -48,6 +48,10 @@ mod entity_state;
 pub use self::entity_state::EntityState;
 pub use self::entity_state::AreaDrawable;
 
+mod entity_texture_cache;
+pub use self::entity_texture_cache::EntityTextureCache;
+pub use self::entity_texture_cache::EntityTextureSlot;
+
 mod actor_state;
 pub use self::actor_state::ActorState;
 
@@ -233,6 +237,11 @@ impl GameState {
             let location = Location::new(x, y, &state.area_state.borrow().area);
             state.area_state.borrow_mut().add_entity(Rc::clone(&state.pc), location);
             state.area_state.borrow_mut().push_scroll_to_callback(Rc::clone(&state.pc));
+
+            let area_state = state.area_state.borrow();
+            for entity in area_state.entity_iter() {
+                entity.borrow_mut().clear_texture_cache();
+            }
         });
     }
 

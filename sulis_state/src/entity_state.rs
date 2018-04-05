@@ -25,7 +25,8 @@ use sulis_core::io::GraphicsRenderer;
 use sulis_core::util::Point;
 use sulis_module::{Actor, Faction, ObjectSize, ObjectSizeIterator, Module};
 use sulis_module::area::Transition;
-use {ActorState, AreaState, ChangeListenerList, GameState, has_visibility, Location, PropState, ScriptCallback};
+use {ActorState, AreaState, ChangeListenerList, EntityTextureCache, EntityTextureSlot,
+    GameState, has_visibility, Location, PropState, ScriptCallback};
 
 pub struct EntityState {
     pub actor: ActorState,
@@ -39,6 +40,7 @@ pub struct EntityState {
     is_pc: bool,
     ai_active: bool,
     marked_for_removal: bool,
+    texture_cache_slot: Option<EntityTextureSlot>,
 }
 
 impl PartialEq for EntityState {
@@ -65,7 +67,12 @@ impl EntityState {
             ai_active: false,
             marked_for_removal: false,
             ai_group,
+            texture_cache_slot: None,
         }
+    }
+
+    pub fn clear_texture_cache(&mut self) {
+        self.texture_cache_slot = None;
     }
 
     pub fn ai_group(&self) -> Option<usize> {
@@ -259,21 +266,46 @@ impl EntityState {
 
         e1.borrow().index == e2.borrow().index
     }
+
+    pub fn draw_no_pos(&self, renderer: &mut GraphicsRenderer,
+                   scale_x: f32, scale_y: f32, x: f32, y: f32, alpha: f32) {
+        if let Some(ref slot) = self.texture_cache_slot {
+            slot.draw(renderer, x, y, scale_x, scale_y, alpha);
+        }
+    }
 }
 
 pub trait AreaDrawable {
-    fn draw(&self, renderer: &mut GraphicsRenderer, scale_x: f32, scale_y: f32, x: f32, y: f32,
-            millis: u32);
+    fn cache(&mut self, renderer: &mut GraphicsRenderer, texture_cache: &mut EntityTextureCache);
+
+    fn draw(&self, renderer: &mut GraphicsRenderer,
+            scale_x: f32, scale_y: f32, x: f32, y: f32, millis: u32, alpha: f32);
 
     fn location(&self) -> &Location;
 }
 
 impl AreaDrawable for EntityState {
-    fn draw(&self, renderer: &mut GraphicsRenderer, scale_x: f32, scale_y: f32, x: f32, y: f32,
-            millis: u32) {
+    fn cache(&mut self, renderer: &mut GraphicsRenderer, texture_cache: &mut EntityTextureCache) {
+        if self.texture_cache_slot.is_none() {
+            self.texture_cache_slot = Some(texture_cache.add_entity(&self, renderer));
+            self.actor.check_texture_cache_invalid();
+        }
+
+        if self.actor.check_texture_cache_invalid() {
+            let slot = &self.texture_cache_slot.as_ref().unwrap();
+            slot.redraw_entity(&self, renderer);
+        }
+    }
+
+    fn draw(&self, renderer: &mut GraphicsRenderer,
+            scale_x: f32, scale_y: f32, x: f32, y: f32, _millis: u32, alpha: f32) {
         let x = x + self.location.x as f32 + self.sub_pos.0;
         let y = y + self.location.y as f32 + self.sub_pos.1;
-        self.actor.draw_graphics_mode(renderer, scale_x, scale_y, x, y, millis);
+
+        if let Some(ref slot) = self.texture_cache_slot {
+            slot.draw(renderer, x, y, scale_x, scale_y, alpha);
+        }
+        // self.actor.draw_graphics_mode(renderer, scale_x, scale_y, x, y, millis);
     }
 
     fn location(&self) -> &Location {

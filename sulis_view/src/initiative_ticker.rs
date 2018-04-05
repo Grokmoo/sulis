@@ -18,10 +18,11 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
+use sulis_core::io::GraphicsRenderer;
 use sulis_core::io::event::ClickKind;
 use sulis_core::ui::{Widget, WidgetKind};
-use sulis_state::{ChangeListener, GameState};
-use sulis_widgets::Label;
+use sulis_core::util::Point;
+use sulis_state::{ChangeListener, EntityState, GameState};
 
 pub const NAME: &str = "initiative_ticker";
 
@@ -75,12 +76,47 @@ impl WidgetKind for InitiativeTicker {
                 true => "current_entry",
                 false => "entry",
             };
-            let widget = Widget::with_theme(Label::new(&entity.borrow().actor.actor.name),
-                                            theme);
+            let widget = Widget::with_theme(TickerLabel::new(&entity), theme);
             widgets.push(widget);
             first = false;
         }
 
         widgets
+    }
+}
+
+struct TickerLabel {
+    entity: Rc<RefCell<EntityState>>,
+}
+
+impl TickerLabel {
+    fn new(entity: &Rc<RefCell<EntityState>>) -> Rc<RefCell<TickerLabel>> {
+        Rc::new(RefCell::new(TickerLabel {
+            entity: Rc::clone(entity),
+        }))
+    }
+}
+
+impl WidgetKind for TickerLabel {
+    widget_kind!(NAME);
+
+    fn draw_graphics_mode(&mut self, renderer: &mut GraphicsRenderer, _pixel_size: Point,
+                          widget: &Widget, _millis: u32) {
+        let entity = self.entity.borrow();
+
+        let x = widget.state.inner_left() as f32;
+        let y = widget.state.inner_top() as f32;
+
+        let inner_width = widget.state.inner_width() as f32;
+        let inner_height = widget.state.inner_height() as f32;
+
+        let w = inner_width / (entity.size.width as f32 + 2.0);
+        let h = inner_height / (entity.size.height as f32 + 2.0);
+        let s = if w > h { h } else { w };
+
+        let cx = x + (inner_width - s) / 2.0 - 2.0;
+        let cy = y + (inner_height - s) / 2.0 - 2.0;
+
+        self.entity.borrow().draw_no_pos(renderer, s, s, cx / s, cy / s, 1.0);
     }
 }

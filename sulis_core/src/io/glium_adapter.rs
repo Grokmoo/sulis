@@ -209,7 +209,7 @@ impl<'a> GraphicsRenderer for GliumRenderer<'a> {
             height: (max_y - min_y) as u32,
         };
 
-        framebuffer.clear(Some(&rect), Some((1.0, 1.0, 1.0, 0.0)), true, None, None);
+        framebuffer.clear(Some(&rect), Some((0.0, 0.0, 0.0, 0.0)), true, None, None);
     }
 
     fn clear_texture(&mut self, id: &str) {
@@ -217,7 +217,7 @@ impl<'a> GraphicsRenderer for GliumRenderer<'a> {
         let mut framebuffer = glium::framebuffer::SimpleFrameBuffer::new(&self.display.display,
                                                                          &texture.texture).unwrap();
 
-        framebuffer.clear_color(1.0, 1.0, 1.0, 0.0);
+        framebuffer.clear_color(0.0, 0.0, 0.0, 0.0);
     }
 
     fn has_texture(&self, id: &str) -> bool {

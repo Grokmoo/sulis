@@ -194,6 +194,11 @@ impl DrawList {
         self.color_filter = [color.r, color.g, color.b, color.a];
     }
 
+    #[inline]
+    pub fn set_alpha(&mut self, alpha: f32) {
+        self.color_filter = [self.color_filter[0], self.color_filter[1], self.color_filter[2], alpha];
+    }
+
     /// enables color swapping for this draw list and sets the hue that the
     /// swap hue will be swapped to
     #[inline]

@@ -227,7 +227,7 @@ impl AreaView {
     }
 
     fn draw_entities_props(&mut self, renderer: &mut GraphicsRenderer, scale_x: f32, scale_y: f32,
-                     _alpha: f32, widget: &Widget, state: &AreaState, millis: u32) {
+                     alpha: f32, widget: &Widget, state: &AreaState, millis: u32) {
         // let start_time = time::Instant::now();
         let mut to_draw: Vec<&AreaDrawable> = Vec::new();
 
@@ -255,7 +255,7 @@ impl AreaView {
         for drawable in to_draw {
             let x = widget.state.inner_position.x as f32 - self.scroll.x();
             let y = widget.state.inner_position.y as f32 - self.scroll.y();
-            drawable.draw(renderer, &self.entity_texture_cache, scale_x, scale_y, x, y, millis);
+            drawable.draw(renderer, scale_x, scale_y, x, y, millis, alpha);
         }
 
         // info!("Entity & Prop draw time: {}", util::format_elapsed_secs(start_time.elapsed()));
@@ -423,16 +423,13 @@ impl WidgetKind for AreaView {
         }
 
         self.draw_entities_props(renderer, scale_x, scale_y, 1.0, widget, &state, millis);
-
         self.draw_layer(renderer, scale_x, scale_y, widget, AERIAL_LAYER_ID);
 
         GameState::draw_graphics_mode(renderer, p.x as f32 - self.scroll.x(), p.y as f32- self.scroll.y(),
                                       scale_x, scale_y, millis);
 
+        self.draw_entities_props(renderer, scale_x, scale_y, 0.4, widget, &state, millis);
         self.draw_layer(renderer, scale_x, scale_y, widget, VISIBILITY_TEX_ID);
-
-        //TODO draw transparent version of each actor for when they are obscured behind objects
-        // self.draw_entities(renderer, scale_x, scale_y, 0.4, widget, &state, millis);
 
         if let Some(ref hover) = self.hover_sprite {
             let mut draw_list = DrawList::from_sprite_f32(&hover.sprite,

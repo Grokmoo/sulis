@@ -50,6 +50,7 @@ pub use self::entity_state::AreaDrawable;
 
 mod entity_texture_cache;
 pub use self::entity_texture_cache::EntityTextureCache;
+pub use self::entity_texture_cache::EntityTextureSlot;
 
 mod actor_state;
 pub use self::actor_state::ActorState;

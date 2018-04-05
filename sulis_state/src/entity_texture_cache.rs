@@ -18,12 +18,43 @@ use sulis_core::config::CONFIG;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use EntityState;
 
-struct Slot {
+#[derive(Clone)]
+pub struct EntityTextureSlot {
     x: i32,
     y: i32,
     w: i32,
     h: i32,
+    texture_id: &'static str,
     tex_coords: [f32; 8],
+    slots_dim: usize,
+    slot_size: u32,
+}
+
+impl EntityTextureSlot {
+    pub fn redraw_entity(&self, entity: &EntityState, renderer: &mut GraphicsRenderer) {
+        let min_x = self.x as f32 + 1.0;
+        let min_y = self.y as f32 + 1.0;
+        let max_x = min_x + self.w as f32;
+        let max_y = min_y + self.h as f32;
+
+        let scale_x = CONFIG.display.width as f32 / self.slots_dim as f32;
+        let scale_y = CONFIG.display.height as f32 / self.slots_dim as f32;
+
+        let scale = self.slot_size as f32;
+        renderer.clear_texture_region(&self.texture_id, (min_x * scale) as i32, (min_y * scale) as i32,
+                                      (max_x * scale) as i32, (max_y * scale) as i32);
+        entity.actor.draw_to_texture(renderer, &self.texture_id, scale_x, scale_y, min_x, min_y);
+    }
+
+    pub fn draw(&self, renderer: &mut GraphicsRenderer, x: f32, y: f32,
+                     scale_x: f32, scale_y: f32, alpha: f32) {
+        let mut list = DrawList::from_texture_id(&self.texture_id, &self.tex_coords,
+                                             x - 1.0, y - 1.0, self.w as f32, self.h as f32);
+
+        list.set_scale(scale_x, scale_y);
+        list.set_alpha(alpha);
+        renderer.draw(list);
+    }
 }
 
 pub struct EntityTextureCache {
@@ -34,7 +65,7 @@ pub struct EntityTextureCache {
 
     slots: Vec<bool>,
 
-    entity_slots: Vec<Slot>,
+    entity_slots: Vec<EntityTextureSlot>,
 }
 
 impl EntityTextureCache {
@@ -54,7 +85,7 @@ impl EntityTextureCache {
 
     /// Adds the specified entity to the cache, finding a slot for the entity and drawing
     /// the entity in that slot.  the returned index is a handle to the slot used by the entity
-    pub fn add_entity(&mut self, entity: &EntityState, renderer: &mut GraphicsRenderer) -> usize {
+    pub fn add_entity(&mut self, entity: &EntityState, renderer: &mut GraphicsRenderer) -> EntityTextureSlot {
         let width = entity.size.width + 2;
         let height = entity.size.height + 2;
 
@@ -68,35 +99,7 @@ impl EntityTextureCache {
         let scale_y = CONFIG.display.height as f32 / self.slots_dim as f32;
         entity.actor.draw_to_texture(renderer, &self.texture_id, scale_x, scale_y, x, y);
 
-        slot_index
-    }
-
-    pub fn redraw_entity(&mut self, entity: &EntityState, renderer: &mut GraphicsRenderer, slot: usize) {
-        let slot = &self.entity_slots[slot];
-
-        let min_x = slot.x as f32 + 1.0;
-        let min_y = slot.y as f32 + 1.0;
-        let max_x = min_x + slot.w as f32;
-        let max_y = min_y + slot.h as f32;
-
-        let scale_x = CONFIG.display.width as f32 / self.slots_dim as f32;
-        let scale_y = CONFIG.display.height as f32 / self.slots_dim as f32;
-
-        let scale = self.slot_size as f32;
-        renderer.clear_texture_region(&self.texture_id, (min_x * scale) as i32, (min_y * scale) as i32,
-                                      (max_x * scale) as i32, (max_y * scale) as i32);
-        entity.actor.draw_to_texture(renderer, &self.texture_id, scale_x, scale_y, min_x, min_y);
-    }
-
-    pub fn draw_slot(&self, renderer: &mut GraphicsRenderer, slot: usize, x: f32, y: f32,
-                     scale_x: f32, scale_y: f32) {
-        let slot = &self.entity_slots[slot];
-
-        let mut list = DrawList::from_texture_id(&self.texture_id, &slot.tex_coords,
-                                             x - 1.0, y - 1.0, slot.w as f32, slot.h as f32);
-
-        list.set_scale(scale_x, scale_y);
-        renderer.draw(list);
+        slot.clone()
     }
 
     fn find_slot(&mut self, width: i32, height: i32) -> usize {
@@ -113,8 +116,9 @@ impl EntityTextureCache {
                 let y_max = (dim - y as f32) / dim;
                 let tex_coords = [ x_min, y_max, x_min, y_min, x_max, y_max, x_max, y_min ];
                 trace!("Pushing slot with tex coords: {:?}, dims: {},{}", tex_coords, width, height);
-                self.entity_slots.push(Slot {
-                    x, y, w: width, h: height, tex_coords
+                self.entity_slots.push(EntityTextureSlot {
+                    x, y, w: width, h: height, tex_coords, texture_id: self.texture_id,
+                    slots_dim: self.slots_dim, slot_size: self.slot_size,
                 });
                 return self.entity_slots.len() - 1
             }

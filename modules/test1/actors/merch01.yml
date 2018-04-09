@@ -1,6 +1,7 @@
 id: merch01
 name: Merchant
 faction: Friendly
+conversation: merch01
 race: human
 images:
   Hair: creatures/hair01

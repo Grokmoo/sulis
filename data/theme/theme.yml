@@ -172,6 +172,40 @@ children:
           scale: 5.0
           color: { r: 1.0, g: 0.0, b: 0.0, a: 1.0 }
         text: "Select target for #ability_id#"
+  dialog_window:
+    from: .window
+    x_relative: Center
+    y_relative: Center
+    width_relative: Zero
+    height_relative: Zero
+    preferred_size: [100, 100]
+    children:
+      title:
+        text: "#name#"
+      node:
+        width_relative: Max
+        preferred_size: [0, -8]
+        position: [0, 8]
+        text_params:
+          font: "normal"
+          scale: 4.0
+        text: "#0#"
+      responses:
+        y_relative: Max
+        layout: BoxVertical
+        layout_spacing: { top: 0, bottom: 1, left: 0, right: 0 }
+        width_relative: Max
+        height_relative: ChildSum
+        children:
+          response_button:
+            from: .button
+            width_relative: Max
+            preferred_size: [0, 6]
+            children:
+              text_area:
+                from: .text_area
+                text: "#0#"
+                width_relative: Max
   prop_window:
     from: .window
     position: [4, 4]

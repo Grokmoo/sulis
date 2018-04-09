@@ -39,6 +39,9 @@ pub use self::area::Area;
 pub mod class;
 pub use self::class::Class;
 
+pub mod conversation;
+pub use self::conversation::Conversation;
+
 pub mod object_size;
 pub use self::object_size::ObjectSize;
 pub use self::object_size::ObjectSizeIterator;
@@ -95,6 +98,7 @@ use sulis_core::resource::*;
 use self::area::Tile;
 use self::ability::AbilityBuilder;
 use self::ability_list::AbilityListBuilder;
+use self::conversation::ConversationBuilder;
 use self::area::AreaBuilder;
 use self::class::ClassBuilder;
 use self::encounter::EncounterBuilder;
@@ -117,6 +121,7 @@ pub struct Module {
     actors: HashMap<String, Rc<Actor>>,
     areas: HashMap<String, Rc<Area>>,
     classes: HashMap<String, Rc<Class>>,
+    conversations: HashMap<String, Rc<Conversation>>,
     encounters: HashMap<String, Rc<Encounter>>,
     items: HashMap<String, Rc<Item>>,
     item_adjectives: HashMap<String, Rc<ItemAdjective>>,
@@ -153,6 +158,16 @@ impl ModuleInfo {
 impl Display for ModuleInfo {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}", self.name)
+    }
+}
+
+macro_rules! getters {
+    ($($name:ident, $plural:ident, $kind:ty);*) => {
+        $(
+            pub fn $name(id: &str) -> Option<Rc<$kind>> {
+                MODULE.with(|m| get_resource(id, &m.borrow().$plural))
+            }
+         )*
     }
 }
 
@@ -322,6 +337,10 @@ impl Module {
                 insert_if_ok("class", id, Class::new(builder, &module), &mut module.classes);
             }
 
+            for (id, builder) in builder_set.conversation_builders.into_iter() {
+                insert_if_ok("conversation", id, Conversation::new(builder, &module), &mut module.conversations);
+            }
+
             for (id, builder) in builder_set.actor_builders.into_iter() {
                 insert_if_ok("actor", id, Actor::new(builder, &module), &mut module.actors);
             }
@@ -347,84 +366,52 @@ impl Module {
         Ok(())
     }
 
-    pub fn ability(id: &str) -> Option<Rc<Ability>> {
-        MODULE.with(|r| get_resource(id, &r.borrow().abilities))
-    }
-
-    pub fn ability_list(id: &str) -> Option<Rc<AbilityList>> {
-        MODULE.with(|r| get_resource(id, &r.borrow().ability_lists))
-    }
-
-    pub fn actor(id: &str) -> Option<Rc<Actor>> {
-        MODULE.with(|r| get_resource(id, &r.borrow().actors))
-    }
-
-    pub fn all_actors() -> Vec<Rc<Actor>> {
-        MODULE.with(|r| all_resources(&r.borrow().actors))
-    }
-
-    pub fn area(id: &str) -> Option<Rc<Area>> {
-        MODULE.with(|m| get_resource(id, &m.borrow().areas))
-    }
-
-    pub fn object_size(id: &str) -> Option<Rc<ObjectSize>> {
-        MODULE.with(|r| get_resource(id, &r.borrow().sizes))
-    }
-
-    pub fn all_object_sizes() -> Vec<Rc<ObjectSize>> {
-        MODULE.with(|r| r.borrow().sizes.iter().map(|ref s| Rc::clone(s.1)).collect())
-    }
-
-    pub fn class(id: &str) -> Option<Rc<Class>> {
-        MODULE.with(|r| get_resource(id, &r.borrow().classes))
-    }
-
-    pub fn all_classes() -> Vec<Rc<Class>> {
-        MODULE.with(|r| all_resources(&r.borrow().classes))
-    }
-
     pub fn game() -> Rc<Game> {
         MODULE.with(|m| Rc::clone(m.borrow().game.as_ref().unwrap()))
-    }
-
-    pub fn all_encounters() -> Vec<Rc<Encounter>> {
-        MODULE.with(|r| all_resources(&r.borrow().encounters))
-    }
-
-    pub fn encounter(id: &str) -> Option<Rc<Encounter>> {
-        MODULE.with(|r| get_resource(id, &r.borrow().encounters))
-    }
-
-    pub fn item(id: &str) -> Option<Rc<Item>> {
-        MODULE.with(|r| get_resource(id, &r.borrow().items))
-    }
-
-    pub fn loot_list(id: &str) -> Option<Rc<LootList>> {
-        MODULE.with(|r| get_resource(id, &r.borrow().loot_lists))
-    }
-
-    pub fn prop(id: &str) -> Option<Rc<Prop>> {
-        MODULE.with(|r| get_resource(id, &r.borrow().props))
-    }
-
-    pub fn all_props() -> Vec<Rc<Prop>> {
-        MODULE.with(|r| all_resources(&r.borrow().props))
-    }
-
-    pub fn race(id: &str) -> Option<Rc<Race>> {
-        MODULE.with(|r| get_resource(id, &r.borrow().races))
-    }
-
-    pub fn all_races() -> Vec<Rc<Race>> {
-        MODULE.with(|r| all_resources(&r.borrow().races))
     }
 
     pub fn rules() -> Rc<Rules> {
         MODULE.with(|m| Rc::clone(m.borrow().rules.as_ref().unwrap()))
     }
 
-    pub fn tile(id: &str) -> Option<Rc<Tile>> {
-        MODULE.with(|r| get_resource(id, &r.borrow().tiles))
+    getters!(
+        ability, abilities, Ability;
+        ability_list, ability_lists, AbilityList;
+        actor, actors, Actor;
+        area, areas, Area;
+        class, classes, Class;
+        conversation, conversations, Conversation;
+        encounter, encounters, Encounter;
+        item, items, Item;
+        loot_list, loot_lists, LootList;
+        object_size, sizes, ObjectSize;
+        prop, props, Prop;
+        race, races, Race;
+        tile, tiles, Tile
+        );
+
+    pub fn all_actors() -> Vec<Rc<Actor>> {
+        MODULE.with(|r| all_resources(&r.borrow().actors))
+    }
+
+    pub fn all_object_sizes() -> Vec<Rc<ObjectSize>> {
+        MODULE.with(|r| r.borrow().sizes.iter().map(|ref s| Rc::clone(s.1)).collect())
+    }
+
+    pub fn all_classes() -> Vec<Rc<Class>> {
+        MODULE.with(|r| all_resources(&r.borrow().classes))
+    }
+
+    pub fn all_encounters() -> Vec<Rc<Encounter>> {
+        MODULE.with(|r| all_resources(&r.borrow().encounters))
+    }
+
+    pub fn all_props() -> Vec<Rc<Prop>> {
+        MODULE.with(|r| all_resources(&r.borrow().props))
+    }
+
+    pub fn all_races() -> Vec<Rc<Race>> {
+        MODULE.with(|r| all_resources(&r.borrow().races))
     }
 
     pub fn all_tiles() -> Vec<Rc<Tile>> {
@@ -442,6 +429,7 @@ impl Default for Module {
             actors: HashMap::new(),
             areas: HashMap::new(),
             classes: HashMap::new(),
+            conversations: HashMap::new(),
             items: HashMap::new(),
             encounters: HashMap::new(),
             props: HashMap::new(),
@@ -461,6 +449,7 @@ struct ModuleBuilder {
     actor_builders: HashMap<String, ActorBuilder>,
     area_builders: HashMap<String, AreaBuilder>,
     class_builders: HashMap<String, ClassBuilder>,
+    conversation_builders: HashMap<String, ConversationBuilder>,
     encounter_builders: HashMap<String, EncounterBuilder>,
     item_builders: HashMap<String, ItemBuilder>,
     item_adjectives: HashMap<String, ItemAdjective>,
@@ -480,6 +469,7 @@ impl ModuleBuilder {
             actor_builders: read(&root_dirs, "actors"),
             area_builders: read(&root_dirs, "areas"),
             class_builders: read(&root_dirs, "classes"),
+            conversation_builders: read(&root_dirs, "conversations"),
             encounter_builders: read(&root_dirs, "encounters"),
             item_builders: read(&root_dirs, "items"),
             item_adjectives: read(&root_dirs, "item_adjectives"),

@@ -273,6 +273,7 @@ impl BuilderSet for CharacterCreator {
             sex: builder.sex,
             attributes: builder.attributes.unwrap(),
             faction: Some(Faction::Friendly),
+            conversation: None,
             images: builder.images.clone(),
             hue: builder.hue,
             hair_color: builder.hair_color,

@@ -21,13 +21,14 @@ use sulis_core::ui::{animation_state, Widget};
 use sulis_core::util::Point;
 use sulis_module::{Module, ObjectSize};
 use sulis_state::{EntityState, GameState, ScriptCallback};
-use RootView;
+use {DialogWindow, RootView};
 
 pub fn get_action(x: i32, y: i32) -> Box<ActionKind> {
     let area_state = GameState::area_state();
     if !area_state.borrow().is_pc_explored(x, y) { return Box::new(InvalidAction {}); }
 
     if let Some(action) = AttackAction::create_if_valid(x, y) { return action; }
+    if let Some(action) = DialogAction::create_if_valid(x, y) { return action; }
     if let Some(action) = PropAction::create_if_valid(x, y) { return action; }
     if let Some(action) = TransitionAction::create_if_valid(x, y) { return action; }
     if let Some(action) = MoveAction::create_if_valid(x as f32, y as f32, None) { return action; }
@@ -41,6 +42,66 @@ pub trait ActionKind {
     fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32)>;
 
     fn fire_action(&mut self, widget: &Rc<RefCell<Widget>>);
+}
+
+struct DialogAction {
+    target: Rc<RefCell<EntityState>>,
+}
+
+impl DialogAction {
+    fn create_if_valid(x: i32, y: i32) -> Option<Box<ActionKind>> {
+        let area_state = GameState::area_state();
+        let area_state = area_state.borrow();
+        let target = match area_state.get_entity_at(x, y) {
+            None => return None,
+            Some(ref entity) => {
+                if entity.borrow().is_pc() { return None; }
+                if entity.borrow().actor.actor.conversation.is_none() { return None; }
+                Rc::clone(entity)
+            }
+        };
+        let max_dist = Module::rules().max_dialog_distance;
+        let pc = GameState::pc();
+        if pc.borrow().dist_to_entity(&target) <= max_dist {
+            Some(Box::new(DialogAction { target }))
+        } else {
+            let cb_action = Box::new(DialogAction {
+                target: Rc::clone(&target)
+            });
+            return MoveThenAction::create_if_valid(target.borrow().location.to_point(),
+                &target.borrow().size, max_dist, cb_action,
+                animation_state::Kind::MouseDialog);
+        }
+    }
+}
+
+impl ActionKind for DialogAction {
+    fn cursor_state(&self) -> animation_state::Kind {
+        animation_state::Kind::MouseDialog
+    }
+
+    fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32)> {
+        let size = Rc::clone(&self.target.borrow().size);
+        let point = self.target.borrow().location.to_point();
+        Some((size, point.x, point.y))
+    }
+
+    fn fire_action(&mut self, widget: &Rc<RefCell<Widget>>) {
+        trace!("Firing dialog action.");
+
+        let convo = match self.target.borrow().actor.actor.conversation {
+            None => {
+                warn!("Attempted to fire conversation action with entity with no convo");
+                return;
+            }, Some(ref convo) => Rc::clone(convo),
+        };
+
+        let window = Widget::with_defaults(DialogWindow::new(&self.target, convo));
+        window.borrow_mut().state.set_modal(true);
+
+        let root = Widget::get_root(widget);
+        Widget::add_child_to(&root, window);
+    }
 }
 
 struct PropAction {

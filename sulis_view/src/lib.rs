@@ -50,6 +50,9 @@ pub use self::character_window::CharacterWindow;
 mod class_pane;
 pub use self::class_pane::ClassPane;
 
+mod dialog_window;
+pub use self::dialog_window::DialogWindow;
+
 mod entity_mouseover;
 pub use self::entity_mouseover::EntityMouseover;
 

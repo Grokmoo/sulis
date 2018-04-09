@@ -27,7 +27,7 @@ use sulis_core::util::{unable_to_create_error};
 use sulis_core::{serde_yaml};
 use sulis_rules::AttributeList;
 
-use {Ability, Class, ImageLayer, ImageLayerSet, Item, LootList, Module, Race};
+use {Ability, Class, Conversation, ImageLayer, ImageLayerSet, Item, LootList, Module, Race};
 
 #[derive(Deserialize, Serialize, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
@@ -70,6 +70,7 @@ pub struct Actor {
     pub id: String,
     pub name: String,
     pub faction: Faction,
+    pub conversation: Option<Rc<Conversation>>,
     pub portrait: Option<Rc<Image>>,
     pub race: Rc<Race>,
     pub sex: Sex,
@@ -122,6 +123,7 @@ impl Actor {
             id: other.id.to_string(),
             name: other.name.to_string(),
             faction: other.faction,
+            conversation: other.conversation.clone(),
             portrait: other.portrait.clone(),
             race: Rc::clone(&other.race),
             sex: other.sex,
@@ -147,6 +149,18 @@ impl Actor {
                 warn!("No match found for race '{}'", builder.race);
                 return unable_to_create_error("actor", &builder.id);
             }, Some(race) => Rc::clone(race)
+        };
+
+        let conversation = match builder.conversation {
+            None => None,
+            Some(ref convo_id) => {
+                Some(match resources.conversations.get(convo_id) {
+                    None => {
+                        warn!("No match found for conversation '{}'", convo_id);
+                        return unable_to_create_error("actor", &builder.id);
+                    }, Some(convo) => Rc::clone(convo),
+                })
+            }
         };
 
         let mut items: Vec<Rc<Item>> = Vec::new();
@@ -254,6 +268,7 @@ impl Actor {
         Ok(Actor {
             id: builder.id,
             name: builder.name,
+            conversation,
             faction: builder.faction.unwrap_or(Faction::Hostile),
             portrait,
             race,
@@ -331,6 +346,7 @@ pub struct ActorBuilder {
     pub sex: Option<Sex>,
     pub portrait: Option<String>,
     pub attributes: AttributeList,
+    pub conversation: Option<String>,
     pub faction: Option<Faction>,
     pub images: HashMap<ImageLayer, String>,
     pub hue: Option<f32>,

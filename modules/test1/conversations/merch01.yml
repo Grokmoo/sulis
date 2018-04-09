@@ -1,0 +1,22 @@
+id: merch01
+initial_node: start
+nodes:
+  start:
+    text: |
+      [c=888|The man looks you over carefully before speaking.]
+      
+      Greetings, traveler!  Might I interest you in some of my wares?
+    responses:
+      - text: |
+          Not today.  Farewell.
+      - text: |
+          Let's see what you've got.
+      - text: |
+          Could I ask you a few questions instead?
+        to: questions
+  questions:
+    text: |
+      I suppose so, but make it quick.
+    responses:
+      - text: |
+          Nevermind.  Farewell.

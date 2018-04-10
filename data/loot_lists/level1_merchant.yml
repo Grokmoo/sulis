@@ -1,0 +1,72 @@
+id: level1_merchant
+generate: {}
+weighted_entries: {}
+probability_entries:
+  boots_leather:
+    weight: 80
+  boots_mail:
+    weight: 50
+  boots_plate:
+    weight: 10
+  gloves_leather:
+    weight: 80
+  gloves_mail:
+    weight: 50
+  gloves_plate:
+    weight: 10
+  helm_leather:
+    weight: 80
+  helm_mail:
+    weight: 50
+  helm_plate:
+    weight: 10
+  legs_leather:
+    weight: 80
+  legs_mail:
+    weight: 50
+  legs_plate:
+    weight: 10
+  torso_leather:
+    weight: 70
+  torso_mail:
+    weight: 40
+  torso_plate:
+    weight: 5
+  battleaxe:
+    weight: 50
+  club:
+    weight: 80
+  crossbow:
+    weight: 50
+  dagger:
+    weight: 80
+  flail:
+    weight: 10
+  greataxe:
+    weight: 10
+  greathammer:
+    weight: 10
+  greatsword:
+    weight: 10
+  hatchet:
+    weight: 80
+  longbow:
+    weight: 10
+  longspear:
+    weight: 20
+  longsword:
+    weight: 20
+  mace:
+    weight: 50
+  morningstar:
+    weight: 20
+  quarterstaff:
+    weight: 80
+  shortbow:
+    weight: 50
+  shortspear:
+    weight: 50
+  shortsword:
+    weight: 50
+  warhammer:
+    weight: 50

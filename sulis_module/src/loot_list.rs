@@ -43,8 +43,10 @@ pub struct LootList {
     generate: Vec<Generate>,
     total_generate_weight: u32,
 
-    entries: Vec<Entry>,
+    weighted_entries: Vec<Entry>,
     total_entries_weight: u32,
+
+    probability_entries: Vec<Entry>,
 }
 
 impl LootList {
@@ -60,28 +62,42 @@ impl LootList {
         }
 
         let mut total_entries_weight = 0;
-        let mut entries = Vec::new();
-        for (id, entry) in builder.entries {
+        let mut weighted_entries = Vec::new();
+        for (id, entry) in builder.weighted_entries {
+            let entry = LootList::create_entry(&builder.id, module, id, entry)?;
             total_entries_weight += entry.weight;
-            let item = match module.items.get(&id) {
-                None => {
-                    warn!("Unable to find item '{}'", id);
-                    return unable_to_create_error("loot_list", &builder.id);
-                }, Some(item) => Rc::clone(item),
-            };
 
-            entries.push(Entry {
-                item,
-                weight: entry.weight,
-            });
+            weighted_entries.push(entry);
+        }
+
+        let mut probability_entries = Vec::new();
+        for (id, entry) in builder.probability_entries {
+            let entry = LootList::create_entry(&builder.id, module, id, entry)?;
+            probability_entries.push(entry);
         }
 
         Ok(LootList {
             id: builder.id,
             generate,
             total_generate_weight,
-            entries,
+            weighted_entries,
             total_entries_weight,
+            probability_entries,
+        })
+    }
+
+    fn create_entry(builder_id: &str, module: &Module, id: String,
+                    entry_in: EntryBuilder) -> Result<Entry, Error> {
+        let item = match module.items.get(&id) {
+            None => {
+                warn!("Unable to find item '{}'", id);
+                return unable_to_create_error("loot_list", &builder_id);
+            }, Some(item) => Rc::clone(item),
+        };
+
+        Ok(Entry {
+            item,
+            weight: entry_in.weight,
         })
     }
 
@@ -98,9 +114,18 @@ impl LootList {
         let num_items = self.gen_num_items();
 
         let mut items = Vec::new();
-        for _ in 0..num_items {
-            if let Some(item) = self.gen_item() {
-                items.push(item);
+        if num_items > 0 {
+            for _ in 0..num_items {
+                if let Some(item) = self.gen_item() {
+                    items.push(item);
+                }
+            }
+        }
+
+        for entry in self.probability_entries.iter() {
+            let roll = rand::thread_rng().gen_range(0, 100);
+            if roll < entry.weight {
+                items.push(Rc::clone(&entry.item));
             }
         }
 
@@ -111,7 +136,7 @@ impl LootList {
         let roll = rand::thread_rng().gen_range(0, self.total_entries_weight);
 
         let mut cur_weight = 0;
-        for entry in self.entries.iter() {
+        for entry in self.weighted_entries.iter() {
             cur_weight += entry.weight;
             if roll < cur_weight {
                 return Some(Rc::clone(&entry.item));
@@ -122,6 +147,8 @@ impl LootList {
     }
 
     fn gen_num_items(&self) -> u32 {
+        if self.total_generate_weight == 0 { return 0; }
+
         let roll = rand::thread_rng().gen_range(0, self.total_generate_weight);
 
         let mut cur_gen_weight = 0;
@@ -147,7 +174,8 @@ struct EntryBuilder {
 pub struct LootListBuilder {
     pub id: String,
     generate: HashMap<u32, u32>,
-    entries: HashMap<String, EntryBuilder>,
+    weighted_entries: HashMap<String, EntryBuilder>,
+    probability_entries: HashMap<String, EntryBuilder>,
 }
 
 impl ResourceBuilder for LootListBuilder {

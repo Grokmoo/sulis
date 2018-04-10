@@ -1,11 +1,12 @@
 id: level1_armor
+probability_entries: {}
 # format is number of items: weight
 # i.e. 2: 1 means generate 2 items with weight 1
 generate:
   1: 4
   2: 2
   3: 1
-entries:
+weighted_entries:
   boots_leather:
     weight: 10
   boots_mail:
@@ -36,4 +37,3 @@ entries:
     weight: 3
   torso_plate:
     weight: 1
-

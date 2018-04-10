@@ -19,7 +19,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_core::io::event;
-use sulis_module::Conversation;
+use sulis_module::{Conversation, conversation::{OnSelect, Response}};
 use sulis_state::{EntityState, ChangeListener};
 use sulis_core::ui::{Widget, WidgetKind};
 use sulis_widgets::{Label, TextArea};
@@ -27,6 +27,7 @@ use sulis_widgets::{Label, TextArea};
 pub const NAME: &str = "dialog_window";
 
 pub struct DialogWindow {
+    pc: Rc<RefCell<EntityState>>,
     entity: Rc<RefCell<EntityState>>,
     convo: Rc<Conversation>,
     cur_node: String,
@@ -35,10 +36,12 @@ pub struct DialogWindow {
 }
 
 impl DialogWindow {
-    pub fn new(entity: &Rc<RefCell<EntityState>>, convo: Rc<Conversation>) -> Rc<RefCell<DialogWindow>> {
+    pub fn new(pc: &Rc<RefCell<EntityState>>, entity: &Rc<RefCell<EntityState>>,
+               convo: Rc<Conversation>) -> Rc<RefCell<DialogWindow>> {
         let cur_node = convo.initial_node();
 
         Rc::new(RefCell::new(DialogWindow {
+            pc: Rc::clone(pc),
             entity: Rc::clone(entity),
             convo: convo,
             node: TextArea::empty(),
@@ -62,30 +65,42 @@ impl WidgetKind for DialogWindow {
         title.borrow_mut().state.add_text_arg("name", &self.entity.borrow().actor.actor.name);
 
         self.node.borrow_mut().text = Some(self.convo.text(&self.cur_node).to_string());
+        let node_widget = Widget::with_theme(self.node.clone(), "node");
+        for flag in self.entity.borrow().custom_flags() {
+            node_widget.borrow_mut().state.add_text_arg(flag, "true");
+        }
+
+        if let &Some(ref on_select) = self.convo.on_view(&self.cur_node) {
+            activate(on_select, &self.pc, &self.entity);
+        }
 
         let responses = Widget::empty("responses");
         {
             for response in self.convo.responses(&self.cur_node) {
-                let response_button = ResponseButton::new(&response.text, &response.to);
+                if !is_viewable(response, &self.pc, &self.entity) { continue; }
+
+                let response_button = ResponseButton::new(&response);
                 let widget = Widget::with_defaults(response_button);
                 Widget::add_child_to(&responses, widget);
             }
         }
 
-        vec![title, Widget::with_theme(self.node.clone(), "node"), responses]
+        vec![title, node_widget, responses]
     }
 }
 
 struct ResponseButton {
     text: String,
     to: Option<String>,
+    on_select: Option<OnSelect>,
 }
 
 impl ResponseButton {
-    fn new(text: &str, to: &Option<String>) -> Rc<RefCell<ResponseButton>> {
+    fn new(response: &Response) -> Rc<RefCell<ResponseButton>> {
         Rc::new(RefCell::new(ResponseButton {
-            text: text.to_string(),
-            to: to.clone(),
+            text: response.text.to_string(),
+            to: response.to.clone(),
+            on_select: response.on_select.clone(),
         }))
     }
 }
@@ -109,16 +124,54 @@ impl WidgetKind for ResponseButton {
         self.super_on_mouse_release(widget, kind);
 
         let parent = Widget::go_up_tree(widget, 2);
+        let window = Widget::downcast_kind_mut::<DialogWindow>(&parent);
+
+        if let Some(ref on_select) = self.on_select {
+            activate(on_select, &window.pc, &window.entity);
+        }
+
         match self.to {
             None => {
                 parent.borrow_mut().mark_for_removal();
             }, Some(ref to) => {
-                let window = Widget::downcast_kind_mut::<DialogWindow>(&parent);
                 window.cur_node = to.to_string();
                 parent.borrow_mut().invalidate_children();
             }
         }
 
         true
+    }
+}
+
+pub fn is_viewable(response: &Response, pc: &Rc<RefCell<EntityState>>,
+                   target: &Rc<RefCell<EntityState>>) -> bool {
+    if let Some(ref on_select) = response.to_view {
+        if let Some(ref flags) = on_select.target_flags {
+            for flag in flags.iter() {
+                if !target.borrow_mut().has_custom_flag(flag) { return false; }
+            }
+        }
+
+        if let Some(ref flags) = on_select.player_flags {
+            for flag in flags.iter() {
+                if !pc.borrow_mut().has_custom_flag(flag) { return false; }
+            }
+        }
+    }
+
+    true
+}
+
+pub fn activate(on_select: &OnSelect, pc: &Rc<RefCell<EntityState>>, target: &Rc<RefCell<EntityState>>) {
+    if let Some(ref flags) = on_select.target_flags {
+        for flag in flags.iter() {
+            target.borrow_mut().set_custom_flag(flag);
+        }
+    }
+
+    if let Some(ref flags) = on_select.player_flags {
+        for flag in flags.iter() {
+            pc.borrow_mut().set_custom_flag(flag);
+        }
     }
 }

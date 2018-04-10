@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::slice::Iter;
 use std::rc::Rc;
 use std::cell::RefCell;
 
@@ -41,6 +42,8 @@ pub struct EntityState {
     ai_active: bool,
     marked_for_removal: bool,
     texture_cache_slot: Option<EntityTextureSlot>,
+
+    custom_flags: Vec<String>,
 }
 
 impl PartialEq for EntityState {
@@ -68,7 +71,22 @@ impl EntityState {
             marked_for_removal: false,
             ai_group,
             texture_cache_slot: None,
+            custom_flags: Vec::new(),
         }
+    }
+
+    pub fn custom_flags<'a>(&'a self) -> Iter<'a, String> {
+        self.custom_flags.iter()
+    }
+
+    pub fn set_custom_flag(&mut self, flag: &str) {
+        self.custom_flags.push(flag.to_string());
+        self.custom_flags.sort();
+        self.custom_flags.dedup();
+    }
+
+    pub fn has_custom_flag(&self, flag: &str) -> bool {
+        self.custom_flags.iter().any(|x| x == flag)
     }
 
     pub fn clear_texture_cache(&mut self) {

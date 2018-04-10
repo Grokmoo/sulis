@@ -46,6 +46,7 @@ pub trait ActionKind {
 
 struct DialogAction {
     target: Rc<RefCell<EntityState>>,
+    pc: Rc<RefCell<EntityState>>,
 }
 
 impl DialogAction {
@@ -63,10 +64,11 @@ impl DialogAction {
         let max_dist = Module::rules().max_dialog_distance;
         let pc = GameState::pc();
         if pc.borrow().dist_to_entity(&target) <= max_dist {
-            Some(Box::new(DialogAction { target }))
+            Some(Box::new(DialogAction { target, pc }))
         } else {
             let cb_action = Box::new(DialogAction {
-                target: Rc::clone(&target)
+                target: Rc::clone(&target),
+                pc: Rc::clone(&pc),
             });
             return MoveThenAction::create_if_valid(target.borrow().location.to_point(),
                 &target.borrow().size, max_dist, cb_action,
@@ -96,7 +98,7 @@ impl ActionKind for DialogAction {
             }, Some(ref convo) => Rc::clone(convo),
         };
 
-        let window = Widget::with_defaults(DialogWindow::new(&self.target, convo));
+        let window = Widget::with_defaults(DialogWindow::new(&self.pc, &self.target, convo));
         window.borrow_mut().state.set_modal(true);
 
         let root = Widget::get_root(widget);

@@ -178,7 +178,7 @@ children:
     y_relative: Center
     width_relative: Zero
     height_relative: Zero
-    preferred_size: [100, 100]
+    preferred_size: [150, 100]
     children:
       title:
         text: "#name#"

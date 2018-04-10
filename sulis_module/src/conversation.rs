@@ -23,17 +23,27 @@ use sulis_core::serde_yaml;
 
 use {Module};
 
+#[derive(Deserialize, Debug, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct OnSelect {
+    pub target_flags: Option<Vec<String>>,
+    pub player_flags: Option<Vec<String>>,
+}
+
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct Response {
     pub text: String,
     pub to: Option<String>,
+    pub on_select: Option<OnSelect>,
+    pub to_view: Option<OnSelect>,
 }
 
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 struct Node {
     text: String,
+    on_view: Option<OnSelect>,
     responses: Vec<Response>,
 }
 
@@ -84,6 +94,15 @@ impl Conversation {
 
     pub fn initial_responses(&self) -> &Vec<Response> {
         &self.nodes.get(&self.initial_node).unwrap().responses
+    }
+
+    // TODO don't panic when getting a node.
+
+    pub fn on_view(&self, node: &str) -> &Option<OnSelect> {
+        match self.nodes.get(node) {
+            None => panic!("Invalid node"),
+            Some(ref node) => &node.on_view,
+        }
     }
 
     pub fn text(&self, node: &str) -> &str {

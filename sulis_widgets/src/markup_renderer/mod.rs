@@ -78,7 +78,8 @@
 //! * **f** - Writes using another defined font.
 //! * **?** - Checks for the existance of a text argument.  If the argument is not
 //! present, this tag is ignored when producing the output.
-//!
+//! * **!** - Checks for the existance of a text argument.  If the argument is present,
+//! this tag is ignored when producing the output.
 //! # Line Wrapping
 //! The character '\n' is treated as a line break, and causes wrap around to the
 //! next line.  Lines that are too long will also be wrapped, with basic whitespace

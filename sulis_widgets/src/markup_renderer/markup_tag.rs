@@ -31,6 +31,7 @@ enum MarkupKind {
     Image,
     Font,
     If,
+    IfNot,
 }
 
 pub struct Markup {
@@ -83,6 +84,7 @@ impl Markup {
                     'i' => Some(Image),
                     'f' => Some(Font),
                     '?' => Some(If),
+                    '!' => Some(IfNot),
                     _ => None,
                 }, Some(kind) => match c {
                     '=' | ' ' => {
@@ -127,6 +129,7 @@ impl Markup {
                 Some(font) => self.font = font,
             },
             If => self.ignore = !widget_state.has_text_arg(buf),
+            IfNot => self.ignore = widget_state.has_text_arg(buf),
         }
     }
 }

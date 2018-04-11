@@ -16,11 +16,11 @@
 
 use rand::{self, Rng};
 use sulis_core::ui::Color;
-use sulis_module::{Actor, Area, Module, ObjectSize};
+use sulis_module::{Actor, Area, LootList, Module, ObjectSize};
 use sulis_module::area::{EncounterData, PropData, Transition};
 use sulis_core::util::Point;
 
-use {AreaFeedbackText, calculate_los, ChangeListenerList, EntityState, Location, PropState, Targeter, TurnTimer};
+use {AreaFeedbackText, calculate_los, ChangeListenerList, EntityState, Location, Merchant, PropState, Targeter, TurnTimer};
 
 use std::slice::Iter;
 use std::rc::Rc;
@@ -47,6 +47,8 @@ pub struct AreaState {
     last_time_millis: u32,
 
     targeter: Option<Rc<RefCell<Box<Targeter>>>>,
+
+    merchants: Vec<Merchant>,
 }
 
 impl PartialEq for AreaState {
@@ -56,6 +58,57 @@ impl PartialEq for AreaState {
 }
 
 impl AreaState {
+    pub fn get_merchant(&self, id: &str) -> Option<&Merchant> {
+        let mut index = None;
+        for (i, merchant) in self.merchants.iter().enumerate() {
+            if merchant.id == id {
+                index = Some(i);
+                break;
+            }
+        }
+
+        match index {
+            Some(i) => Some(&self.merchants[i]),
+            None => None,
+        }
+    }
+
+    pub fn get_merchant_mut(&mut self, id: &str) -> Option<&mut Merchant> {
+        let mut index = None;
+        for (i, merchant) in self.merchants.iter().enumerate() {
+            if merchant.id == id {
+                index = Some(i);
+                break;
+            }
+        }
+
+        match index {
+            Some(i) => Some(&mut self.merchants[i]),
+            None => None,
+        }
+    }
+
+    pub fn get_or_create_merchant(&mut self, id: &str, loot_list: &Rc<LootList>) -> &mut Merchant {
+        let mut index = None;
+        for (i, merchant) in self.merchants.iter().enumerate() {
+            if merchant.id == id {
+                index = Some(i);
+                break;
+            }
+        }
+
+        match index {
+            Some(i) => &mut self.merchants[i],
+            None => {
+                info!("Creating merchant '{}'", id);
+                let len = self.merchants.len();
+                let merchant = Merchant::new(id, loot_list);
+                self.merchants.push(merchant);
+                &mut self.merchants[len]
+            }
+        }
+    }
+
     pub fn targeter(&mut self) -> Option<Rc<RefCell<Box<Targeter>>>> {
         match self.targeter {
             None => None,
@@ -100,6 +153,7 @@ impl AreaState {
             scroll_to_callback: None,
             last_time_millis: 0,
             targeter: None,
+            merchants: Vec::new(),
         }
     }
 

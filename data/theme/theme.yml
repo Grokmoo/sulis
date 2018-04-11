@@ -206,6 +206,24 @@ children:
                 from: .text_area
                 text: "#0#"
                 width_relative: Max
+  merchant_window:
+    from: .window
+    position: [4, 4]
+    preferred_size: [100, 100]
+    height_relative: Zero
+    children:
+      title:
+        text: "Merchant"
+      items_list:
+        preferred_size: [0, -8]
+        position: [0, 8]
+        width_relative: Max
+        height_relative: Max
+        layout: Grid
+        layout_spacing: [0, 1, 0, 1]
+        children:
+          item_button:
+            from: .item_button
   prop_window:
     from: .window
     position: [4, 4]

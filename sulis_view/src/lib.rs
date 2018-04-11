@@ -68,6 +68,9 @@ pub use self::inventory_window::InventoryWindow;
 mod loading_screen;
 pub use self::loading_screen::LoadingScreen;
 
+mod merchant_window;
+pub use self::merchant_window::MerchantWindow;
+
 mod portrait_view;
 pub use self::portrait_view::PortraitView;
 
@@ -101,6 +104,15 @@ pub struct RootView {
 impl RootView {
     pub fn new() -> Rc<RefCell<RootView>> {
         Rc::new(RefCell::new(RootView { }))
+    }
+
+    pub fn set_merchant_window(&mut self, widget: &Rc<RefCell<Widget>>,
+                               desired_state: bool, merchant_id: &str) {
+        self.set_window(widget, self::merchant_window::NAME, desired_state, &|| {
+            MerchantWindow::new(merchant_id)
+        });
+
+        self.set_inventory_window(widget, desired_state);
     }
 
     pub fn set_prop_window(&mut self, widget: &Rc<RefCell<Widget>>,
@@ -168,11 +180,7 @@ impl RootView {
 }
 
 impl WidgetKind for RootView {
-    fn get_name(&self) -> &str { NAME }
-
-    fn as_any(&self) -> &Any { self }
-
-    fn as_any_mut(&mut self) -> &mut Any { self }
+    widget_kind!(NAME);
 
     fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
         use sulis_core::io::InputAction::*;

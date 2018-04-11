@@ -19,10 +19,12 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_core::io::event;
-use sulis_module::{Conversation, conversation::{OnSelect, Response}};
-use sulis_state::{EntityState, ChangeListener};
+use sulis_module::{Conversation, conversation::{MerchantData, OnSelect, Response}, Module};
+use sulis_state::{EntityState, ChangeListener, GameState};
 use sulis_core::ui::{Widget, WidgetKind};
 use sulis_widgets::{Label, TextArea};
+
+use {RootView};
 
 pub const NAME: &str = "dialog_window";
 
@@ -71,7 +73,7 @@ impl WidgetKind for DialogWindow {
         }
 
         if let &Some(ref on_select) = self.convo.on_view(&self.cur_node) {
-            activate(on_select, &self.pc, &self.entity);
+            activate(widget, on_select, &self.pc, &self.entity);
         }
 
         let responses = Widget::empty("responses");
@@ -127,7 +129,7 @@ impl WidgetKind for ResponseButton {
         let window = Widget::downcast_kind_mut::<DialogWindow>(&parent);
 
         if let Some(ref on_select) = self.on_select {
-            activate(on_select, &window.pc, &window.entity);
+            activate(widget, on_select, &window.pc, &window.entity);
         }
 
         match self.to {
@@ -162,7 +164,8 @@ pub fn is_viewable(response: &Response, pc: &Rc<RefCell<EntityState>>,
     true
 }
 
-pub fn activate(on_select: &OnSelect, pc: &Rc<RefCell<EntityState>>, target: &Rc<RefCell<EntityState>>) {
+pub fn activate(widget: &Rc<RefCell<Widget>>, on_select: &OnSelect,
+                pc: &Rc<RefCell<EntityState>>, target: &Rc<RefCell<EntityState>>) {
     if let Some(ref flags) = on_select.target_flags {
         for flag in flags.iter() {
             target.borrow_mut().set_custom_flag(flag);
@@ -174,4 +177,29 @@ pub fn activate(on_select: &OnSelect, pc: &Rc<RefCell<EntityState>>, target: &Rc
             pc.borrow_mut().set_custom_flag(flag);
         }
     }
+
+    if let Some(ref merch) = on_select.show_merchant {
+        show_merchant(widget, merch);
+    }
+}
+
+fn show_merchant(widget: &Rc<RefCell<Widget>>, merch: &MerchantData) {
+    let id = &merch.id;
+    let loot = match Module::loot_list(&merch.loot_list) {
+        None => {
+            warn!("Unable to find loot list '{}' for merchant '{}'", merch.loot_list, id);
+            return;
+        }, Some(loot) => loot,
+    };
+
+    {
+        let area_state = GameState::area_state();
+        let mut area_state = area_state.borrow_mut();
+
+        area_state.get_or_create_merchant(id, &loot);
+    }
+
+    let root = Widget::get_root(widget);
+    let root_view = Widget::downcast_kind_mut::<RootView>(&root);
+    root_view.set_merchant_window(&root, true, &id);
 }

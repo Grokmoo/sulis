@@ -105,7 +105,7 @@ impl WidgetKind for PropWindow {
         let list_content = Widget::empty("items_list");
         for (index, &(qty, ref item)) in prop.items().iter().enumerate() {
             let item_button = ItemButton::new(Some(item.item.icon.id()), qty,
-                Some(index), Some(self.prop_index));
+                Some(index), Some(self.prop_index), None);
             let button = Widget::with_defaults(item_button);
 
             button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |_, _| {

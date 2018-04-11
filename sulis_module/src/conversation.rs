@@ -25,9 +25,17 @@ use {Module};
 
 #[derive(Deserialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
+pub struct MerchantData {
+    pub id: String,
+    pub loot_list: String,
+}
+
+#[derive(Deserialize, Debug, Clone)]
+#[serde(deny_unknown_fields)]
 pub struct OnSelect {
     pub target_flags: Option<Vec<String>>,
     pub player_flags: Option<Vec<String>>,
+    pub show_merchant: Option<MerchantData>,
 }
 
 #[derive(Deserialize, Debug)]

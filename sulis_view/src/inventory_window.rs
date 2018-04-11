@@ -21,7 +21,7 @@ use std::cell::RefCell;
 
 use sulis_rules::BonusList;
 use sulis_module::item::Slot;
-use sulis_state::{EntityState, ChangeListener, GameState};
+use sulis_state::{AreaState, EntityState, ChangeListener, GameState, ItemState};
 use sulis_core::io::event;
 use sulis_core::ui::{Callback, Widget, WidgetKind, WidgetState};
 use sulis_widgets::{Button, Label, TextArea};
@@ -74,7 +74,7 @@ impl WidgetKind for InventoryWindow {
             if quantity == 0 { continue; }
 
             let button = Widget::with_defaults(
-                ItemButton::new(Some(item.item.icon.id()), quantity, Some(index), None));
+                ItemButton::new(Some(item.item.icon.id()), quantity, Some(index), None, None));
 
             match item.item.equippable {
                 Some(_) => {
@@ -99,7 +99,7 @@ impl WidgetKind for InventoryWindow {
             };
 
             let theme_id = format!("{:?}_button", slot).to_lowercase();
-            let item_button = ItemButton::new(icon, 1, actor.inventory().get_index(*slot), None);
+            let item_button = ItemButton::new(icon, 1, actor.inventory().get_index(*slot), None, None);
             let button = Widget::with_theme(item_button.clone(), &theme_id);
             button.borrow_mut().state.set_enabled(enabled);
 
@@ -123,13 +123,14 @@ pub struct ItemButton {
     item_window: Option<Rc<RefCell<Widget>>>,
     item_index: Option<usize>,
     prop_index: Option<usize>,
+    merchant_id: Option<String>,
 }
 
 const ITEM_BUTTON_NAME: &str = "item_button";
 
 impl ItemButton {
     pub fn new(icon: Option<String>, quantity: u32, index: Option<usize>,
-               prop_index: Option<usize>) -> Rc<RefCell<ItemButton>> {
+               prop_index: Option<usize>, merchant_id: Option<String>) -> Rc<RefCell<ItemButton>> {
         Rc::new(RefCell::new(ItemButton {
             icon,
             quantity,
@@ -137,6 +138,7 @@ impl ItemButton {
             item_window: None,
             item_index: index,
             prop_index,
+            merchant_id,
         }))
     }
 
@@ -146,12 +148,45 @@ impl ItemButton {
             self.item_window = None;
         }
     }
+
+    fn get_item_state<'a>(&self, area_state: &'a AreaState, pc: &'a EntityState) -> Option<&'a ItemState> {
+        let item_index = match self.item_index {
+            None => return None,
+            Some(index) => index,
+        };
+
+        if let Some(ref merchant_id) = self.merchant_id {
+            let merchant = area_state.get_merchant(merchant_id);
+            let merchant = match merchant {
+                None => return None,
+                Some(ref merchant) => merchant,
+            };
+
+            if item_index >= merchant.items().len() { return None; }
+
+            return Some(&merchant.items()[item_index].1);
+        }
+
+        match self.prop_index {
+            None => {
+                if item_index >= pc.actor.inventory().items.len() {
+                    return None;
+                }
+                Some(&pc.actor.inventory().items[item_index].1)
+            }, Some(prop_index) => {
+                if !area_state.prop_index_valid(prop_index) { return None; }
+
+                if item_index >= area_state.get_prop(prop_index).items().len() {
+                    return None;
+                }
+                Some(&area_state.get_prop(prop_index).items()[item_index].1)
+            }
+        }
+    }
 }
 
 impl WidgetKind for ItemButton {
-    fn get_name(&self) -> &str { ITEM_BUTTON_NAME }
-    fn as_any(&self) -> &Any { self }
-    fn as_any_mut(&mut self) -> &mut Any { self }
+    widget_kind!(ITEM_BUTTON_NAME);
 
     fn on_remove(&mut self) {
         self.remove_item_window();
@@ -173,50 +208,39 @@ impl WidgetKind for ItemButton {
     fn on_mouse_enter(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
         self.super_on_mouse_enter(widget);
 
-        if self.item_index.is_some() && self.item_window.is_none() {
-            let item_index = self.item_index.unwrap();
+        if self.item_window.is_some() { return true; }
 
-            let pc = GameState::pc();
-            let pc = pc.borrow();
-            let area_state = GameState::area_state();
-            let area_state = area_state.borrow();
+        let pc = GameState::pc();
+        let pc = pc.borrow();
+        let area_state = GameState::area_state();
+        let area_state = area_state.borrow();
 
-            let item_state = match self.prop_index {
-                None => {
-                    if item_index >= pc.actor.inventory().items.len() {
-                        return true;
-                    }
-                    &pc.actor.inventory().items[item_index].1
-                }, Some(prop_index) => {
-                    if !area_state.prop_index_valid(prop_index) { return true; }
+        let item_state = self.get_item_state(&*area_state, &*pc);
+        let item_state = match item_state {
+            None => return true,
+            Some(ref item_state) => item_state,
+        };
 
-                    if item_index >= area_state.get_prop(prop_index).items().len() {
-                        return true;
-                    }
-                    &area_state.get_prop(prop_index).items()[item_index].1
-                }
-            };
+        let item_window = Widget::with_theme(TextArea::empty(), "item_window");
+        {
+            let mut item_window = item_window.borrow_mut();
+            item_window.state.disable();
+            item_window.state.set_position(widget.borrow().state.inner_right(),
+            widget.borrow().state.inner_top());
 
-            let item_window = Widget::with_theme(TextArea::empty(), "item_window");
-            {
-                let mut item_window = item_window.borrow_mut();
-                item_window.state.disable();
-                item_window.state.set_position(widget.borrow().state.inner_right(),
-                    widget.borrow().state.inner_top());
+            item_window.state.add_text_arg("name", &item_state.item.name);
 
-                item_window.state.add_text_arg("name", &item_state.item.name);
-
-                match item_state.item.equippable {
-                    None => (),
-                    Some(ref equippable) => {
-                        add_bonus_text_args(&equippable.bonuses, &mut item_window.state);
-                    },
-                }
+            match item_state.item.equippable {
+                None => (),
+                Some(ref equippable) => {
+                    add_bonus_text_args(&equippable.bonuses, &mut item_window.state);
+                },
             }
-            let root = Widget::get_root(widget);
-            Widget::add_child_to(&root, Rc::clone(&item_window));
-            self.item_window = Some(item_window);
         }
+        let root = Widget::get_root(widget);
+        Widget::add_child_to(&root, Rc::clone(&item_window));
+        self.item_window = Some(item_window);
+
         true
     }
 

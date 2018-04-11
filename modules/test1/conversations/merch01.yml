@@ -13,6 +13,10 @@ nodes:
           Nothing today.  Farewell.
       - text: |
           Let's see what you've got.
+        on_select:
+          show_merchant:
+            id: merch01
+            loot_list: level1_merchant
       - text: |
           Could I ask you a few questions instead?
         to: questions

@@ -1,3 +1,5 @@
 id: misc_trap
 name: Trap
 icon: inventory/misc_trap
+weight: 100
+value: 100

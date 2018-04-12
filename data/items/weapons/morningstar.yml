@@ -1,6 +1,8 @@
 id: morningstar
 name: Morningstar
 icon: inventory/weapon_morningstar
+weight: 500
+value: 400
 equippable:
   slot: HeldMain
   bonuses:

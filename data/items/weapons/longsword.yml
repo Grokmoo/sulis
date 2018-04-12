@@ -1,6 +1,8 @@
 id: longsword
 name: Longsword
 icon: inventory/weapon_longsword
+weight: 400
+value: 800
 equippable:
   slot: HeldMain
   bonuses:

@@ -1,3 +1,5 @@
 id: craft_gem07
 name: Aquamarine
 icon: inventory/craft_gem07
+weight: 5
+value: 100

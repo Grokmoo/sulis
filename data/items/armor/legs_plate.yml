@@ -1,6 +1,8 @@
 id: legs_plate
 name: Plate Pants
 icon: inventory/legs_plate
+weight: 500
+value: 2000
 equippable:
   slot: Legs
   bonuses:

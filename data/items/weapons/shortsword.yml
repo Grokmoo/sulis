@@ -1,6 +1,8 @@
 id: shortsword
 name: Short Sword
 icon: inventory/weapon_shortsword
+weight: 200
+value: 400
 equippable:
   slot: HeldMain
   alternate_slot: HeldOff

@@ -1,3 +1,5 @@
 id: food_apple
 name: Apple
 icon: inventory/food_apple
+weight: 50
+value: 5

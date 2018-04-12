@@ -59,6 +59,9 @@ pub struct Rules {
     pub experience_for_level: Vec<u32>,
 
     pub loot_drop_prop: String,
+
+    pub item_weight_display_factor: i32,
+    pub item_value_display_factor: i32,
 }
 
 impl Rules {

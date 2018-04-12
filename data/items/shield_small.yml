@@ -8,3 +8,5 @@ equippable:
 image:
   HeldOff:
     creatures/shield_small
+weight: 200
+value: 50

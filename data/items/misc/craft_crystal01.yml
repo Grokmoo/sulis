@@ -1,3 +1,5 @@
 id: craft_crystal01
 name: Blue Crystal
 icon: inventory/craft_crystal01
+weight: 10
+value: 100

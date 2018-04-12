@@ -1,3 +1,5 @@
 id: craft_gem06
 name: Topaz
 icon: inventory/craft_gem06
+weight: 5
+value: 200

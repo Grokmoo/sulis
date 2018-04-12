@@ -1,3 +1,5 @@
 id: craft_gold
 name: Gold Bar
 icon: inventory/craft_gold
+weight: 100
+value: 1000

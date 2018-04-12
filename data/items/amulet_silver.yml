@@ -4,3 +4,5 @@ icon: inventory/amulet_03
 equippable:
   slot: Neck
   bonuses: {}
+weight: 10
+value: 200

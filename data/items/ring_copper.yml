@@ -5,3 +5,5 @@ equippable:
   slot: FingerMain
   alternate_slot: FingerOff
   bonuses: {}
+weight: 5
+value: 50

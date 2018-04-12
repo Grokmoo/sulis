@@ -1,6 +1,8 @@
 id: helm_mail
 name: Mail Helm
 icon: inventory/helm_mail
+weight: 200
+value: 500
 equippable:
   slot: Head
   bonuses:

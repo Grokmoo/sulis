@@ -20,7 +20,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_rules::BonusList;
-use sulis_module::item::Slot;
+use sulis_module::{Module, item::Slot};
 use sulis_state::{AreaState, EntityState, ChangeListener, GameState, ItemState};
 use sulis_core::io::event;
 use sulis_core::ui::{Callback, Widget, WidgetKind, WidgetState};
@@ -221,6 +221,7 @@ impl WidgetKind for ItemButton {
             Some(ref item_state) => item_state,
         };
 
+        let rules = Module::rules();
         let item_window = Widget::with_theme(TextArea::empty(), "item_window");
         {
             let mut item_window = item_window.borrow_mut();
@@ -228,7 +229,11 @@ impl WidgetKind for ItemButton {
             item_window.state.set_position(widget.borrow().state.inner_right(),
             widget.borrow().state.inner_top());
 
+            let value = item_state.item.value / rules.item_value_display_factor;
+            let weight = item_state.item.weight / rules.item_weight_display_factor;
             item_window.state.add_text_arg("name", &item_state.item.name);
+            item_window.state.add_text_arg("value", &value.to_string());
+            item_window.state.add_text_arg("weight", &weight.to_string());
 
             match item_state.item.equippable {
                 None => (),

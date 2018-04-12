@@ -1,6 +1,8 @@
 id: boots_leather
 name: Leather Boots
 icon: inventory/boots_leather
+weight: 100
+value: 100
 equippable:
   slot: Feet
   bonuses:

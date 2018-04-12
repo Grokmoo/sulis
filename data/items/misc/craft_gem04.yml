@@ -1,3 +1,5 @@
 id: craft_gem04
 name: Garnet
 icon: inventory/craft_gem04
+weight: 5
+value: 100

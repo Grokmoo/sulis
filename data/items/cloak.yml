@@ -7,3 +7,5 @@ equippable:
 image:
   Cloak:
     creatures/cloak
+weight: 100
+value: 10

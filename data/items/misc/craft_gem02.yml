@@ -1,3 +1,5 @@
 id: craft_gem02
 name: Pink Opal
 icon: inventory/craft_gem02
+weight: 5
+value: 100

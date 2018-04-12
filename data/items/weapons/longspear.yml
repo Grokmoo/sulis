@@ -1,6 +1,8 @@
 id: longspear
 name: Long Spear
 icon: inventory/weapon_longspear
+weight: 800
+value: 200
 equippable:
   slot: HeldMain
   blocks_slot: HeldOff

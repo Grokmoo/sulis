@@ -1,3 +1,5 @@
 id: food_cheese
 name: Cheese
 icon: inventory/food_cheese
+weight: 50
+value: 20

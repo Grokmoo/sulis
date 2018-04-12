@@ -1,6 +1,8 @@
 id: torso_leather
 name: Leather Armor
 icon: inventory/torso_leather
+weight: 300
+value: 400
 equippable:
   slot: Torso
   bonuses:

@@ -1,6 +1,8 @@
 id: quarterstaff
 name: Quarterstaff
 icon: inventory/weapon_quarterstaff
+weight: 300
+value: 20
 equippable:
   slot: HeldMain
   blocks_slot: HeldOff

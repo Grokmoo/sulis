@@ -1,6 +1,8 @@
 id: crossbow
 name: Crossbow
 icon: inventory/weapon_crossbow
+weight: 400
+value: 400
 equippable:
   slot: HeldMain
   blocks_slot: HeldOff

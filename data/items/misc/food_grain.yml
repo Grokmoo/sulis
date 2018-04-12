@@ -1,3 +1,5 @@
 id: food_grain
 name: Grain
 icon: inventory/food_grain
+weight: 100
+value: 10

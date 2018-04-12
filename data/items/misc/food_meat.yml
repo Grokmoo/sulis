@@ -1,3 +1,5 @@
 id: food_meat
 name: Meat
 icon: inventory/food_meat
+weight: 100
+value: 50

@@ -27,6 +27,9 @@ max_dialog_distance: 2.5
 max_transition_distance: 2.5
 max_prop_distance: 2.5
 
+item_weight_display_factor: 100
+item_value_display_factor: 10
+
 selectable_races: [ human, elf, merling ]
 selectable_classes: [ fighter, rogue ]
 

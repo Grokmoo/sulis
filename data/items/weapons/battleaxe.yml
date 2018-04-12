@@ -1,6 +1,8 @@
 id: battleaxe
 name: Battleaxe
 icon: inventory/weapon_battleaxe
+weight: 500
+value: 200
 equippable:
   slot: HeldMain
   bonuses:

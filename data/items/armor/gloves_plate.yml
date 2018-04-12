@@ -1,6 +1,8 @@
 id: gloves_plate
 name: Plate Gloves
 icon: inventory/gloves_plate
+weight: 200
+value: 800
 equippable:
   slot: Hands
   bonuses:

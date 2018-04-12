@@ -1,6 +1,8 @@
 id: helm_plate
 name: Plate Helm
 icon: inventory/helm_plate
+weight: 300
+value: 1000
 equippable:
   slot: Head
   bonuses:

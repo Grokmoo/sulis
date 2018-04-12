@@ -1,3 +1,5 @@
 id: craft_rope
 name: Rope
 icon: inventory/craft_rope
+weight: 100
+value: 50

@@ -1,6 +1,8 @@
 id: legs_mail
 name: Mail Pants
 icon: inventory/legs_mail
+weight: 500
+value: 1000
 equippable:
   slot: Legs
   bonuses:

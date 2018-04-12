@@ -1,3 +1,5 @@
 id: craft_gem09
 name: Emerald
 icon: inventory/craft_gem09
+weight: 5
+value: 300

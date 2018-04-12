@@ -1,6 +1,8 @@
 id: club
 name: Club
 icon: inventory/weapon_club
+weight: 400
+value: 10
 equippable:
   slot: HeldMain
   alternate_slot: HeldOff

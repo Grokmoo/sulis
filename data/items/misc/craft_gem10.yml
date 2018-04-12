@@ -1,3 +1,5 @@
 id: craft_gem10
 name: Sapphire
 icon: inventory/craft_gem10
+weight: 5
+value: 400

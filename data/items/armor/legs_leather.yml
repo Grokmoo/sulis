@@ -1,6 +1,8 @@
 id: legs_leather
 name: Leather Pants
 icon: inventory/legs_leather
+weight: 200
+value: 200
 equippable:
   slot: Legs
   bonuses:

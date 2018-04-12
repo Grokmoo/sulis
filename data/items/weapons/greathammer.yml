@@ -1,6 +1,8 @@
 id: greathammer
 name: Great Hammer
 icon: inventory/weapon_greathammer
+weight: 1500
+value: 400
 equippable:
   slot: HeldMain
   blocks_slot: HeldOff

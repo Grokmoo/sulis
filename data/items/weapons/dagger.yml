@@ -1,6 +1,8 @@
 id: dagger
 name: Dagger
 icon: inventory/weapon_dagger
+weight: 100
+value: 200
 equippable:
   slot: HeldMain
   alternate_slot: HeldOff

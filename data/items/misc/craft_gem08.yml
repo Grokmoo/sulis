@@ -1,3 +1,5 @@
 id: craft_gem08
 name: Ruby
 icon: inventory/craft_gem08
+weight: 5
+value: 300

@@ -1,6 +1,8 @@
 id: mace
 name: Mace
 icon: inventory/weapon_mace
+weight: 500
+value: 200
 equippable:
   slot: HeldMain
   alternate_slot: HeldOff

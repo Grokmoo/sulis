@@ -63,6 +63,8 @@ pub struct Item {
     pub equippable: Option<Equippable>,
     image: Option<HashMap<ImageLayer, Rc<Image>>>,
     alternate_image: Option<HashMap<ImageLayer, Rc<Image>>>,
+    pub value: i32,
+    pub weight: i32,
 }
 
 impl PartialEq for Item {
@@ -122,6 +124,8 @@ impl Item {
             alternate_image: alt_images,
             name: builder.name,
             equippable: builder.equippable,
+            value: builder.value as i32,
+            weight: builder.weight as i32,
         })
     }
 
@@ -149,6 +153,8 @@ pub struct ItemBuilder {
     pub equippable: Option<Equippable>,
     pub image: Option<HashMap<ImageLayer, String>>,
     pub alternate_image: Option<HashMap<ImageLayer, String>>,
+    value: u32,
+    weight: u32,
 }
 
 impl ResourceBuilder for ItemBuilder {

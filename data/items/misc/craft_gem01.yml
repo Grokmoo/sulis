@@ -1,3 +1,5 @@
 id: craft_gem01
 name: Amethyst
 icon: inventory/craft_gem01
+weight: 5
+value: 100

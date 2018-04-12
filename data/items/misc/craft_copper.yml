@@ -1,3 +1,5 @@
 id: craft_copper
 name: Copper Bar
 icon: inventory/craft_copper
+weight: 100
+value: 50

@@ -4,3 +4,5 @@ icon: inventory/belt_03
 equippable:
   slot: Waist
   bonuses: {}
+weight: 100
+value: 10

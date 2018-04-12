@@ -1,3 +1,5 @@
 id: craft_cloth
 name: Cloth
 icon: inventory/craft_cloth
+weight: 100
+value: 10

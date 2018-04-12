@@ -7,3 +7,5 @@ equippable:
 image:
   Legs:
     creatures/pants
+weight: 100
+value: 10

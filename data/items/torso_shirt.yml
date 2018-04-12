@@ -7,3 +7,5 @@ equippable:
 image:
   Torso:
     creatures/shirt
+weight: 100
+value: 10

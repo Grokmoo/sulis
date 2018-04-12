@@ -1,3 +1,5 @@
 id: craft_steel
 name: Steel Bar
 icon: inventory/craft_steel
+weight: 100
+value: 100

@@ -293,6 +293,38 @@ impl AreaState {
         self.prop_grid[x + y * self.area.width as usize]
     }
 
+    pub fn check_create_prop_container_at(&mut self, x: i32, y: i32) {
+        match self.prop_index_at(x, y) {
+            Some(_) => return,
+            None => (),
+        };
+
+        let prop = match Module::prop(&Module::rules().loot_drop_prop) {
+            None => {
+                warn!("Unable to generate prop for item drop as the loot_drop_prop does not exist.");
+                return;
+            }, Some(prop) => prop,
+        };
+
+        let location = Location::new(x, y, &self.area);
+        let prop_data = PropData {
+            prop,
+            location: location.to_point(),
+            items: Vec::new(),
+        };
+
+        self.add_prop(&prop_data, location, true);
+    }
+
+    pub fn prop_mut_at(&mut self, x: i32, y: i32) -> Option<&mut PropState> {
+        let index = match self.prop_index_at(x, y) {
+            None => return None,
+            Some(index) => index,
+        };
+
+        Some(self.get_prop_mut(index))
+    }
+
     pub fn prop_at(&self, x: i32, y: i32) -> Option<&PropState> {
         let index = match self.prop_index_at(x, y) {
             None => return None,

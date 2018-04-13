@@ -5,6 +5,28 @@ include:
   - editor
   - character_builder
 children:
+  item_action_menu:
+    from: .list_box
+    x_relative: Cursor
+    y_relative: Cursor
+    position: [-1, -1]
+    preferred_size: [24, 0]
+    height_relative: ChildSum
+    width_relative: Zero
+    children:
+      title:
+        from: .label
+        text: "Actions"
+        text_params:
+          scale: 5.0
+          horizontal_alignment: Center
+        preferred_size: [0, 4]
+        width_relative: Max
+      actions:
+        from: .list_box
+        border: [0, 0, 0, 0]
+        width_relative: Max
+        position: [0, 4]
   mouse_over:
     from: .text_area
     border: { top: 1, bottom: 1, left: 2, right: 2 }

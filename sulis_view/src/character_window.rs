@@ -27,7 +27,7 @@ use sulis_state::{ActorState, Effect};
 
 use CharacterBuilder;
 use ability_pane::add_ability_text_args;
-use inventory_window::add_bonus_text_args;
+use item_button::add_bonus_text_args;
 
 pub const NAME: &str = "character_window";
 

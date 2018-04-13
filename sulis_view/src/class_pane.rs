@@ -22,7 +22,7 @@ use sulis_core::ui::{Widget, WidgetKind};
 use sulis_widgets::{TextArea};
 use sulis_module::Class;
 
-use inventory_window::add_bonus_text_args;
+use item_button::add_bonus_text_args;
 
 pub const NAME: &str = "class_pane";
 

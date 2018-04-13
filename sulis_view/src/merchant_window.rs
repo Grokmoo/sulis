@@ -21,7 +21,8 @@ use std::cell::RefCell;
 use sulis_state::{ChangeListener, GameState};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{Button, Label};
-use inventory_window::ItemButton;
+
+use ItemButton;
 
 pub const NAME: &str = "merchant_window";
 

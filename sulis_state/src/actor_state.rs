@@ -23,9 +23,8 @@ use sulis_core::io::GraphicsRenderer;
 use sulis_core::image::{LayeredImage};
 use sulis_core::ui::{color, Color};
 use sulis_module::{item, Actor, Module};
-use sulis_module::area::PropData;
 use sulis_rules::{Attack, AttackKind, HitKind, StatList};
-use {AbilityState, ChangeListenerList, Effect, EntityState, GameState, Inventory};
+use {AbilityState, ChangeListenerList, Effect, EntityState, GameState, Inventory, ItemState};
 
 pub struct ActorState {
     pub actor: Rc<Actor>,
@@ -297,6 +296,19 @@ impl ActorState {
         result
     }
 
+    /// removes one item at the specified index from this actor's inventory.
+    pub fn remove_item(&mut self, index: usize) -> Option<ItemState> {
+        let item = self.inventory.remove(index);
+
+        if item.is_some() {
+            self.compute_stats();
+            // in case item was equipped
+            self.texture_cache_invalid = true;
+        }
+
+        item
+    }
+
     pub fn inventory(&self) -> &Inventory {
         &self.inventory
     }
@@ -324,27 +336,22 @@ impl ActorState {
             Some(ref loot) => loot,
         };
 
-        let prop = match Module::prop(&Module::rules().loot_drop_prop) {
-            None => {
-                warn!("Unable to drop loot as loot drop prop does not exist.");
-                return;
-            }, Some(prop) => prop,
-        };
-
         trace!("Checking for loot drop.");
         let items = loot.generate_with_chance(reward.loot_chance);
         if items.is_empty() { return; }
 
         trace!("Dropping loot with {} items", items.len());
-        let location = target.borrow().location.clone();
-        let prop_data = PropData {
-            prop,
-            location: location.to_point(),
-            items,
-        };
-
+        let p = target.borrow().location.to_point();
         let area_state = GameState::area_state();
-        area_state.borrow_mut().add_prop(&prop_data, location, true);
+        let mut area_state = area_state.borrow_mut();
+
+        area_state.check_create_prop_container_at(p.x, p.y);
+        match area_state.prop_mut_at(p.x, p.y) {
+            None => (),
+            Some(ref mut prop) => {
+                prop.add_items(items);
+            }
+        }
     }
 
     pub fn has_level_up(&self) -> bool {

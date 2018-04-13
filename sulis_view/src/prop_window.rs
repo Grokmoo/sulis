@@ -21,8 +21,7 @@ use std::cell::RefCell;
 use sulis_state::{ChangeListener, GameState};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{Button, Label};
-use RootView;
-use inventory_window::ItemButton;
+use {item_button::take_item_cb, ItemButton, RootView};
 
 pub const NAME: &str = "prop_window";
 
@@ -39,11 +38,7 @@ impl PropWindow {
 }
 
 impl WidgetKind for PropWindow {
-    fn get_name(&self) -> &str { NAME }
-
-    fn as_any(&self) -> &Any { self }
-
-    fn as_any_mut(&mut self) -> &mut Any { self }
+    widget_kind!(NAME);
 
     fn layout(&mut self, widget: &mut Widget) {
         widget.do_base_layout();
@@ -106,13 +101,8 @@ impl WidgetKind for PropWindow {
         for (index, &(qty, ref item)) in prop.items().iter().enumerate() {
             let item_button = ItemButton::new(Some(item.item.icon.id()), qty,
                 Some(index), Some(self.prop_index), None);
+            item_button.borrow_mut().add_action("Take", take_item_cb(&GameState::pc(), prop_index, index));
             let button = Widget::with_defaults(item_button);
-
-            button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |_, _| {
-                let pc = GameState::pc();
-                let mut pc = pc.borrow_mut();
-                pc.actor.take(prop_index, index);
-            })));
             Widget::add_child_to(&list_content, button);
         }
 

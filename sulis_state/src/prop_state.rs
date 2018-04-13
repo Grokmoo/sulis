@@ -19,7 +19,7 @@ use std::rc::Rc;
 
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{animation_state, AnimationState};
-use sulis_module::Prop;
+use sulis_module::{Item, Prop};
 use sulis_module::area::PropData;
 
 use entity_state::AreaDrawable;
@@ -87,6 +87,19 @@ impl PropState {
         }
 
         self.animation_state.toggle(animation_state::Kind::Active);
+    }
+
+    pub fn add_item(&mut self, item: ItemState) {
+        self.items.add(item);
+        self.listeners.notify(&self);
+    }
+
+    pub fn add_items(&mut self, items: Vec<Rc<Item>>) {
+        for item in items {
+            let item_state = ItemState::new(item);
+            self.items.add(item_state);
+        }
+        self.listeners.notify(&self);
     }
 
     pub fn items(&self) -> &ItemList {

@@ -44,6 +44,30 @@ impl Inventory {
         inv
     }
 
+    pub fn remove(&mut self, index: usize) -> Option<ItemState> {
+        let quantity = match self.items.get(index) {
+            None => return None,
+            Some(&(qty, _)) => qty,
+        };
+
+        if quantity == 1 {
+            let mut unequip_slot = None;
+            for (slot, i) in self.equipped.iter_mut() {
+                if *i == index {
+                    unequip_slot = Some(*slot);
+                } else if *i > index {
+                    *i -= 1;
+                }
+            }
+
+            if let Some(slot) = unequip_slot {
+                self.unequip(slot);
+            }
+        }
+
+        self.items.remove(index)
+    }
+
     pub fn get_index(&self, slot: Slot) -> Option<usize> {
         match self.equipped.get(&slot) {
             None => None,

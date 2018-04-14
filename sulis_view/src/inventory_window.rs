@@ -23,7 +23,7 @@ use sulis_state::{EntityState, ChangeListener, GameState};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{Button, Label};
 
-use {item_button::{drop_item_cb, equip_item_cb, unequip_item_cb}, ItemButton};
+use {item_button::*, ItemButton};
 
 pub const NAME: &str = "inventory_window";
 
@@ -67,7 +67,7 @@ impl WidgetKind for InventoryWindow {
             let mut quantity = quantity - actor.inventory().equipped_quantity(index);
             if quantity == 0 { continue; }
 
-            let item_but = ItemButton::new(Some(item.item.icon.id()), quantity, Some(index), None, None);
+            let item_but = ItemButton::inventory(item.item.icon.id(), quantity, index);
 
             match item.item.equippable {
                 Some(_) => {
@@ -82,22 +82,23 @@ impl WidgetKind for InventoryWindow {
 
         let equipped_area = Widget::empty("equipped_area");
         for slot in Slot::iter() {
-            let (enabled, icon) = match actor.inventory().get(*slot) {
-                None => (false, None),
-                Some(ref item_state) => (true, Some(item_state.item.icon.id())),
-            };
-
             let theme_id = format!("{:?}_button", slot).to_lowercase();
-            let index = actor.inventory().get_index(*slot);
-            let item_button = ItemButton::new(icon, 1, index, None, None);
-            if let Some(index) = index {
-                item_button.borrow_mut().add_action("Unequip", unequip_item_cb(&GameState::pc(), *slot));
-                item_button.borrow_mut().add_action("Drop", drop_item_cb(&GameState::pc(), index));
-            }
-            let button = Widget::with_theme(item_button.clone(), &theme_id);
-            button.borrow_mut().state.set_enabled(enabled);
 
-            Widget::add_child_to(&equipped_area, button);
+            match actor.inventory().get_index(*slot) {
+                None => {
+                    let button = Widget::empty(&theme_id);
+                    button.borrow_mut().state.set_enabled(false);
+                    Widget::add_child_to(&equipped_area, button);
+                }, Some(index) => {
+                    let item_state = actor.inventory().get(*slot).unwrap();
+
+                    let button = ItemButton::equipped(item_state.item.icon.id(), index);
+                    button.borrow_mut().add_action("Unequip", unequip_item_cb(&GameState::pc(), *slot));
+                    button.borrow_mut().add_action("Drop", unequip_and_drop_item_cb(&GameState::pc(), *slot));
+
+                    Widget::add_child_to(&equipped_area, Widget::with_theme(button, &theme_id));
+                }
+            }
         }
 
         vec![title, close, equipped_area, list_content]

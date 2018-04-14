@@ -601,8 +601,8 @@ children:
   bonus_text:
     from: .text_area
     text: |
-      [s=5.0;c=f00|#name#] [?total_duration;x=60|#remaining_duration# of #total_duration# Rounds Remaining]
-      [?str|Strength: #str#
+      [s=5.0;c=f00|#name#] [?total_duration;x=60|#remaining_duration# of #total_duration# Rounds Remaining
+      ][?str|Strength: #str#
       ][?dex|Dexterity: #dex#
       ][?end|Endurance: #end#
       ][?per|Perception: #per#
@@ -623,6 +623,7 @@ children:
       ][?fortitude|[s=4.0|Fortitude: #fortitude#]
       ][?reflex|[s=4.0|Reflex: #reflex#]
       ][?will|[s=4.0|Will: #will#]
-      ][?value;s=3.5|[c=f00|#value#] Gold
-      ][?weight;s=3.5|[c=f00|#weight#] lbs]
+      ][?value;s=3.5|
+      Value: [c=f00|#value#] Gold
+      ][?weight;s=3.5|Weight: [c=f00|#weight#] lbs]
 ...

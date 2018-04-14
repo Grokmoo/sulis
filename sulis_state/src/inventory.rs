@@ -44,24 +44,23 @@ impl Inventory {
         inv
     }
 
+    /// Removes one copy of the item at the specified index.  Will not
+    /// remove an equipped item.
     pub fn remove(&mut self, index: usize) -> Option<ItemState> {
         let quantity = match self.items.get(index) {
             None => return None,
             Some(&(qty, _)) => qty,
         };
 
-        if quantity == 1 {
-            let mut unequip_slot = None;
-            for (slot, i) in self.equipped.iter_mut() {
-                if *i == index {
-                    unequip_slot = Some(*slot);
-                } else if *i > index {
-                    *i -= 1;
-                }
-            }
+        if self.equipped_quantity(index) == quantity {
+            return None;
+        }
 
-            if let Some(slot) = unequip_slot {
-                self.unequip(slot);
+        if quantity == 1 {
+            for (_, equipped_index) in self.equipped.iter_mut() {
+                if *equipped_index > index {
+                    *equipped_index -= 1;
+                }
             }
         }
 

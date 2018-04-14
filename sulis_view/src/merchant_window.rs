@@ -22,6 +22,7 @@ use sulis_state::{ChangeListener, GameState};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{Button, Label};
 
+use item_button::buy_item_cb;
 use ItemButton;
 
 pub const NAME: &str = "merchant_window";
@@ -36,6 +37,8 @@ impl MerchantWindow {
             merchant_id: merchant_id.to_string(),
         }))
     }
+
+    pub fn merchant_id(&self) -> &str { &self.merchant_id }
 }
 
 impl WidgetKind for MerchantWindow {
@@ -64,7 +67,7 @@ impl WidgetKind for MerchantWindow {
             Some(ref mut merchant) => merchant,
         };
 
-        merchant.listeners.add(ChangeListener::invalidate_layout(NAME, widget));
+        merchant.listeners.add(ChangeListener::invalidate(NAME, widget));
 
         let title = Widget::with_theme(Label::empty(), "title");
 
@@ -73,16 +76,11 @@ impl WidgetKind for MerchantWindow {
 
         let list_content = Widget::empty("items_list");
         for (index, &(qty, ref item)) in merchant.items().iter().enumerate() {
-            let item_button = ItemButton::new(Some(item.item.icon.id()), qty,
-                Some(index), None, Some(self.merchant_id.to_string()));
-            let button = Widget::with_defaults(item_button);
+            let item_button = ItemButton::merchant(item.item.icon.id(), qty, index, &self.merchant_id);
+            item_button.borrow_mut().add_action("Buy", buy_item_cb(&GameState::pc(),
+                &self.merchant_id, index));
 
-            // button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |_, _| {
-            //     let pc = GameState::pc();
-            //     let mut pc = pc.borrow_mut();
-            //     pc.actor.take(prop_index, index);
-            // })));
-            Widget::add_child_to(&list_content, button);
+            Widget::add_child_to(&list_content, Widget::with_defaults(item_button));
         }
 
         vec![title, close, list_content]

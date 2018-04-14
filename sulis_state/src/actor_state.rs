@@ -280,6 +280,11 @@ impl ActorState {
         self.listeners.notify(&self);
     }
 
+    pub fn add_item(&mut self, item_state: ItemState) {
+        self.inventory.items.add(item_state);
+        self.listeners.notify(&self);
+    }
+
     pub fn equip(&mut self, index: usize) -> bool {
         let result = self.inventory.equip(index);
         self.compute_stats();
@@ -297,6 +302,7 @@ impl ActorState {
     }
 
     /// removes one item at the specified index from this actor's inventory.
+    /// will not remove an equipped item
     pub fn remove_item(&mut self, index: usize) -> Option<ItemState> {
         let item = self.inventory.remove(index);
 

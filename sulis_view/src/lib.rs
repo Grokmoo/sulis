@@ -112,6 +112,22 @@ impl RootView {
         Rc::new(RefCell::new(RootView { }))
     }
 
+    /// Gets the merchant window if it is currently opened
+    pub fn get_merchant_window(&self, widget: &Rc<RefCell<Widget>>) -> Option<Rc<RefCell<Widget>>> {
+        match Widget::get_child_with_name(widget, self::merchant_window::NAME) {
+            None => None,
+            Some(ref window) => Some(Rc::clone(window)),
+        }
+    }
+
+    /// Gets the prop window if it is currently opened
+    pub fn get_prop_window(&self, widget: &Rc<RefCell<Widget>>) -> Option<Rc<RefCell<Widget>>> {
+        match Widget::get_child_with_name(widget, self::prop_window::NAME) {
+            None => None,
+            Some(ref window) => Some(Rc::clone(window)),
+        }
+    }
+
     pub fn set_merchant_window(&mut self, widget: &Rc<RefCell<Widget>>,
                                desired_state: bool, merchant_id: &str) {
         self.set_window(widget, self::merchant_window::NAME, desired_state, &|| {

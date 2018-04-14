@@ -27,6 +27,7 @@ use {ItemList, ItemState};
 pub struct Inventory {
     pub items: ItemList,
     pub equipped: HashMap<Slot, usize>,
+    pub coins: i32,
 }
 
 impl Inventory {
@@ -34,6 +35,7 @@ impl Inventory {
         let mut inv = Inventory {
             items: ItemList::new(),
             equipped: HashMap::new(),
+            coins: 0,
         };
 
         for item in actor.items.iter() {
@@ -42,6 +44,14 @@ impl Inventory {
 
         trace!("Populated initial inventory with {} items", inv.items.len());
         inv
+    }
+
+    pub fn coins(&self) -> i32 {
+        self.coins
+    }
+
+    pub fn add_coins(&mut self, amount: i32) {
+        self.coins += amount;
     }
 
     /// Removes one copy of the item at the specified index.  Will not

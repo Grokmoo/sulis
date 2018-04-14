@@ -295,9 +295,17 @@ pub fn buy_item_cb(entity: &Rc<RefCell<EntityState>>, merchant_id: &str, index: 
             Some(ref mut merchant) => merchant,
         };
 
-        // TODO entity needs to pay merchant
+        let value = match merchant.items().get(index) {
+            None => return,
+            Some(&(_, ref item_state)) => merchant.get_buy_price(item_state),
+        };
+
+        if entity.borrow().actor.inventory().coins() < value {
+            return;
+        }
 
         if let Some(item_state) = merchant.remove(index) {
+            entity.borrow_mut().actor.add_coins(-value);
             entity.borrow_mut().actor.add_item(item_state);
         }
     }))
@@ -326,7 +334,8 @@ pub fn sell_item_cb(entity: &Rc<RefCell<EntityState>>, index: usize) -> Callback
 
         let item_state = entity.borrow_mut().actor.remove_item(index);
         if let Some(item_state) = item_state {
-            // TODO merchant needs to pay entity
+            let value = merchant.get_sell_price(&item_state);
+            entity.borrow_mut().actor.add_coins(value);
             merchant.add(item_state);
         }
     }))

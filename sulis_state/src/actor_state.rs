@@ -315,6 +315,11 @@ impl ActorState {
         item
     }
 
+    pub fn add_coins(&mut self, amount: i32) {
+        self.inventory.add_coins(amount);
+        self.listeners.notify(&self);
+    }
+
     pub fn inventory(&self) -> &Inventory {
         &self.inventory
     }

@@ -18,7 +18,7 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_module::{item::Slot};
+use sulis_module::{item::Slot, Module};
 use sulis_state::{EntityState, ChangeListener, GameState};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{Button, Label};
@@ -101,6 +101,17 @@ impl WidgetKind for InventoryWindow {
             }
         }
 
-        vec![title, close, equipped_area, list_content]
+        let coins_item = match Module::item(&Module::rules().coins_item) {
+            None => {
+                warn!("Unable to find coins item");
+                return Vec::new();
+            }, Some(item) => item,
+        };
+        let amount = actor.inventory().coins() as f32 / Module::rules().item_value_display_factor;
+        let button = ItemButton::inventory(coins_item.icon.id(), amount as u32, 0);
+        let coins_button = Widget::with_theme(button, "coins_button");
+        coins_button.borrow_mut().state.set_enabled(false);
+
+        vec![title, close, equipped_area, list_content, coins_button]
     }
 }

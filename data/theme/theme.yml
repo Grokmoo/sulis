@@ -339,6 +339,9 @@ children:
         children:
           item_button:
             from: .item_button
+      coins_button:
+        from: .item_button
+        position: [74, 64]
   item_window:
     from: .bonus_text
     border: { top: 1, bottom: 1, left: 1, right: 1 }

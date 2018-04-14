@@ -62,6 +62,8 @@ pub struct Rules {
 
     pub item_weight_display_factor: f32,
     pub item_value_display_factor: f32,
+
+    pub coins_item: String,
 }
 
 impl Rules {

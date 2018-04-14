@@ -101,6 +101,7 @@ groups:
       craft_iron: [3, 10]
       craft_steel: [4, 10]
       craft_gold: [5, 10]
+      coins: [6, 10]
       
       potion01_yellow: [7, 10]
       

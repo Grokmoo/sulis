@@ -623,7 +623,9 @@ children:
       ][?fortitude|[s=4.0|Fortitude: #fortitude#]
       ][?reflex|[s=4.0|Reflex: #reflex#]
       ][?will|[s=4.0|Will: #will#]
-      ][?value;s=3.5|
+      ][?price;s=3.5|
+      Price: [c=f00|#price#] Gold
+      ][!price;?value;s=3.5|
       Value: [c=f00|#value#] Gold
       ][?weight;s=3.5|Weight: [c=f00|#weight#] lbs]
 ...

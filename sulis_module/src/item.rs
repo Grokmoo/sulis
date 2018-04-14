@@ -171,3 +171,17 @@ impl ResourceBuilder for ItemBuilder {
         }
     }
 }
+
+pub fn format_item_value(value: i32) -> String {
+    let display_factor = Module::rules().item_value_display_factor;
+
+    let value_f = value as f32 / display_factor;
+    format!("{:.*}", 1, value_f)
+}
+
+pub fn format_item_weight(weight: i32) -> String {
+    let display_factor = Module::rules().item_weight_display_factor;
+
+    let weight_f = weight as f32 / display_factor;
+    format!("{:.*}", 2, weight_f)
+}

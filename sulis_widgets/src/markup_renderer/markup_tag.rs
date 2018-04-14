@@ -128,8 +128,8 @@ impl Markup {
                 None => warn!("Font not found '{}'", buf),
                 Some(font) => self.font = font,
             },
-            If => self.ignore = !widget_state.has_text_arg(buf),
-            IfNot => self.ignore = widget_state.has_text_arg(buf),
+            If => self.ignore = self.ignore || !widget_state.has_text_arg(buf),
+            IfNot => self.ignore = self.ignore || widget_state.has_text_arg(buf),
         }
     }
 }

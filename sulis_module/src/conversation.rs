@@ -28,6 +28,8 @@ use {Module};
 pub struct MerchantData {
     pub id: String,
     pub loot_list: String,
+    pub buy_frac: f32,
+    pub sell_frac: f32,
 }
 
 #[derive(Deserialize, Debug, Clone)]

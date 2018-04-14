@@ -88,7 +88,8 @@ impl AreaState {
         }
     }
 
-    pub fn get_or_create_merchant(&mut self, id: &str, loot_list: &Rc<LootList>) -> &mut Merchant {
+    pub fn get_or_create_merchant(&mut self, id: &str, loot_list: &Rc<LootList>,
+                                  buy_frac: f32, sell_frac: f32) -> &mut Merchant {
         let mut index = None;
         for (i, merchant) in self.merchants.iter().enumerate() {
             if merchant.id == id {
@@ -102,7 +103,7 @@ impl AreaState {
             None => {
                 info!("Creating merchant '{}'", id);
                 let len = self.merchants.len();
-                let merchant = Merchant::new(id, loot_list);
+                let merchant = Merchant::new(id, loot_list, buy_frac, sell_frac);
                 self.merchants.push(merchant);
                 &mut self.merchants[len]
             }

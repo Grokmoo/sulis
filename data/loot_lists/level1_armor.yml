@@ -37,3 +37,7 @@ weighted_entries:
     weight: 3
   torso_plate:
     weight: 1
+  shield_small:
+    weight: 10
+  shield_large:
+    weight: 3

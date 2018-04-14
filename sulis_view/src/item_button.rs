@@ -20,7 +20,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_rules::{bonus_list::AttackKindBuilder, BonusList};
-use sulis_module::{item::Slot, Module};
+use sulis_module::{item::{format_item_value, format_item_weight, Slot}};
 use sulis_state::{AreaState, EntityState, GameState, ItemState};
 use sulis_core::io::event;
 use sulis_core::ui::{Callback, Widget, WidgetKind, WidgetState};
@@ -132,6 +132,31 @@ impl ItemButton {
             None
         }
     }
+
+    fn add_price_text_arg(&self, root: &Rc<RefCell<Widget>>, item_window: &mut Widget,
+                          area_state: &AreaState, item_state: &ItemState) {
+        match self.kind {
+            Kind::Merchant { ref id } => {
+                let merchant = area_state.get_merchant(id);
+                if let Some(ref merchant) = merchant {
+                    let value = merchant.get_buy_price(item_state);
+                    item_window.state.add_text_arg("price", &format_item_value(value));
+                }
+            }, Kind::Inventory | Kind::Equipped => {
+                let root_view = Widget::downcast_kind_mut::<RootView>(&root);
+                let merch_window = match root_view.get_merchant_window(&root) {
+                    None => return,
+                    Some(window) => window,
+                };
+                let window = Widget::downcast_kind_mut::<MerchantWindow>(&merch_window);
+                let merchant = area_state.get_merchant(window.merchant_id());
+                if let Some(ref merchant) = merchant {
+                    let value = merchant.get_sell_price(item_state);
+                    item_window.state.add_text_arg("price", &format_item_value(value));
+                }
+            }, _ => (),
+        }
+    }
 }
 
 impl WidgetKind for ItemButton {
@@ -168,7 +193,7 @@ impl WidgetKind for ItemButton {
             Some(ref item_state) => item_state,
         };
 
-        let rules = Module::rules();
+        let root = Widget::get_root(widget);
         let item_window = Widget::with_theme(TextArea::empty(), "item_window");
         {
             let mut item_window = item_window.borrow_mut();
@@ -176,11 +201,10 @@ impl WidgetKind for ItemButton {
             item_window.state.set_position(widget.borrow().state.inner_right(),
             widget.borrow().state.inner_top());
 
-            let value = item_state.item.value / rules.item_value_display_factor;
-            let weight = item_state.item.weight / rules.item_weight_display_factor;
             item_window.state.add_text_arg("name", &item_state.item.name);
-            item_window.state.add_text_arg("value", &value.to_string());
-            item_window.state.add_text_arg("weight", &weight.to_string());
+            item_window.state.add_text_arg("value", &format_item_value(item_state.item.value));
+            item_window.state.add_text_arg("weight", &format_item_weight(item_state.item.weight));
+            self.add_price_text_arg(&root, &mut item_window, &area_state, item_state);
 
             match item_state.item.equippable {
                 None => (),
@@ -189,7 +213,6 @@ impl WidgetKind for ItemButton {
                 },
             }
         }
-        let root = Widget::get_root(widget);
         Widget::add_child_to(&root, Rc::clone(&item_window));
         self.item_window = Some(item_window);
 

@@ -1,0 +1,5 @@
+id: coin
+name: Coin
+icon: inventory/coins
+weight: 0
+value: 10

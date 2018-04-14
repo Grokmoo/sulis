@@ -60,8 +60,8 @@ pub struct Rules {
 
     pub loot_drop_prop: String,
 
-    pub item_weight_display_factor: i32,
-    pub item_value_display_factor: i32,
+    pub item_weight_display_factor: f32,
+    pub item_value_display_factor: f32,
 }
 
 impl Rules {

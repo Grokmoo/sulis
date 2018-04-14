@@ -22,12 +22,14 @@ use {ChangeListenerList, ItemList, ItemState};
 
 pub struct Merchant {
     pub id: String,
+    pub buy_frac: f32,
+    pub sell_frac: f32,
     pub listeners: ChangeListenerList<Merchant>,
     items: ItemList,
 }
 
 impl Merchant {
-    pub fn new(id: &str, loot_list: &Rc<LootList>) -> Merchant {
+    pub fn new(id: &str, loot_list: &Rc<LootList>, buy_frac: f32, sell_frac: f32) -> Merchant {
         let mut items = ItemList::new();
 
         for item in loot_list.generate() {
@@ -37,9 +39,19 @@ impl Merchant {
 
         Merchant {
             id: id.to_string(),
+            buy_frac,
+            sell_frac,
             items,
             listeners: ChangeListenerList::default(),
         }
+    }
+
+    pub fn get_buy_price(&self, item_state: &ItemState) -> i32 {
+        ((item_state.item.value as f32) * self.buy_frac).ceil() as i32
+    }
+
+    pub fn get_sell_price(&self, item_state: &ItemState) -> i32 {
+        ((item_state.item.value as f32) * self.sell_frac).floor() as i32
     }
 
     pub fn add(&mut self, item_state: ItemState) {

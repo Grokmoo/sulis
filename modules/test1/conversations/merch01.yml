@@ -17,6 +17,8 @@ nodes:
           show_merchant:
             id: merch01
             loot_list: level1_merchant
+            buy_frac: 1.0
+            sell_frac: 0.20
       - text: |
           Could I ask you a few questions instead?
         to: questions

@@ -196,7 +196,7 @@ fn show_merchant(widget: &Rc<RefCell<Widget>>, merch: &MerchantData) {
         let area_state = GameState::area_state();
         let mut area_state = area_state.borrow_mut();
 
-        area_state.get_or_create_merchant(id, &loot);
+        area_state.get_or_create_merchant(id, &loot, merch.buy_frac, merch.sell_frac);
     }
 
     let root = Widget::get_root(widget);

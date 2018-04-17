@@ -32,17 +32,15 @@ pub struct EntityTextureSlot {
 
 impl EntityTextureSlot {
     pub fn redraw_entity(&self, entity: &EntityState, renderer: &mut GraphicsRenderer) {
+        let scale = self.slot_size as i32;
+        renderer.clear_texture_region(&self.texture_id, self.x * scale, self.y * scale,
+                                      (self.x + self.w) * scale, (self.y + self.h) * scale);
+
         let min_x = self.x as f32 + 1.0;
         let min_y = self.y as f32 + 1.0;
-        let max_x = min_x + self.w as f32;
-        let max_y = min_y + self.h as f32;
-
         let scale_x = CONFIG.display.width as f32 / self.slots_dim as f32;
         let scale_y = CONFIG.display.height as f32 / self.slots_dim as f32;
 
-        let scale = self.slot_size as f32;
-        renderer.clear_texture_region(&self.texture_id, (min_x * scale) as i32, (min_y * scale) as i32,
-                                      (max_x * scale) as i32, (max_y * scale) as i32);
         entity.actor.draw_to_texture(renderer, &self.texture_id, scale_x, scale_y, min_x, min_y);
     }
 

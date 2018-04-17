@@ -62,7 +62,7 @@ impl ItemList {
         None
     }
 
-    pub fn add_quantity(&mut self, (qty, item_state) : (u32, ItemState)) {
+    pub fn add_quantity(&mut self, qty: u32, item_state: ItemState) {
         match self.find_index(&item_state) {
             Some(index) => self.items[index].0 += qty,
             None => self.items.push((qty, item_state)),
@@ -70,7 +70,7 @@ impl ItemList {
     }
 
     pub fn add(&mut self, item_state: ItemState) {
-        self.add_quantity((1, item_state));
+        self.add_quantity(1, item_state);
     }
 
     /// Removes the entire quantity of items at the specified index and returns it

@@ -29,6 +29,7 @@ use {Item, Module};
 struct Entry {
     item: Rc<Item>,
     weight: u32,
+    quantity: [u32; 2],
 }
 
 #[derive(Debug)]
@@ -95,13 +96,19 @@ impl LootList {
             }, Some(item) => Rc::clone(item),
         };
 
+        let (min_qty, max_qty) = match entry_in.quantity {
+            None => (1, 1),
+            Some(qty) => (qty[0], qty[1]),
+        };
+
         Ok(Entry {
             item,
             weight: entry_in.weight,
+            quantity: [min_qty, max_qty],
         })
     }
 
-    pub fn generate_with_chance(&self, chance: u32) -> Vec<Rc<Item>> {
+    pub fn generate_with_chance(&self, chance: u32) -> Vec<(u32, Rc<Item>)> {
         let roll = rand::thread_rng().gen_range(1, 101);
         if chance >= roll {
             self.generate()
@@ -110,7 +117,7 @@ impl LootList {
         }
     }
 
-    pub fn generate(&self) -> Vec<Rc<Item>> {
+    pub fn generate(&self) -> Vec<(u32, Rc<Item>)> {
         let num_items = self.gen_num_items();
 
         let mut items = Vec::new();
@@ -125,21 +132,32 @@ impl LootList {
         for entry in self.probability_entries.iter() {
             let roll = rand::thread_rng().gen_range(0, 100);
             if roll < entry.weight {
-                items.push(Rc::clone(&entry.item));
+                let quantity = if entry.quantity[0] == entry.quantity[1] {
+                    entry.quantity[0]
+                } else {
+                    rand::thread_rng().gen_range(entry.quantity[0], entry.quantity[1] + 1)
+                };
+
+                items.push((quantity, Rc::clone(&entry.item)));
             }
         }
 
         items
     }
 
-    fn gen_item(&self) -> Option<Rc<Item>> {
+    fn gen_item(&self) -> Option<(u32, Rc<Item>)> {
         let roll = rand::thread_rng().gen_range(0, self.total_entries_weight);
 
         let mut cur_weight = 0;
         for entry in self.weighted_entries.iter() {
             cur_weight += entry.weight;
             if roll < cur_weight {
-                return Some(Rc::clone(&entry.item));
+                let quantity = if entry.quantity[0] == entry.quantity[1] {
+                    entry.quantity[0]
+                } else {
+                    rand::thread_rng().gen_range(entry.quantity[0], entry.quantity[1] + 1)
+                };
+                return Some((quantity, Rc::clone(&entry.item)));
             }
         }
 
@@ -167,6 +185,7 @@ impl LootList {
 #[serde(deny_unknown_fields)]
 struct EntryBuilder {
     weight: u32,
+    quantity: Option<[u32;2]>,
 }
 
 #[derive(Deserialize, Debug)]

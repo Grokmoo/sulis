@@ -1,5 +1,8 @@
 id: level1_misc
-probability_entries: {}
+probability_entries:
+  coin:
+    weight: 100
+    quantity: [3, 20]
 # format is number of items: weight
 # i.e. 2: 1 means generate 2 items with weight 1
 generate:

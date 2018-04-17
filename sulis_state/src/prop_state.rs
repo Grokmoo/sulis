@@ -78,8 +78,9 @@ impl PropState {
             if let Some(ref loot) = self.prop.loot {
                 info!("Generating loot for prop from '{}'", loot.id);
                 let items = loot.generate();
-                for item in items {
-                    self.items.add(ItemState::new(item));
+                for (qty, item) in items {
+                    let item_state = ItemState::new(item);
+                    self.items.add_quantity(qty, item_state);
                 }
             }
 
@@ -94,10 +95,10 @@ impl PropState {
         self.listeners.notify(&self);
     }
 
-    pub fn add_items(&mut self, items: Vec<Rc<Item>>) {
-        for item in items {
+    pub fn add_items(&mut self, items: Vec<(u32, Rc<Item>)>) {
+        for (qty, item) in items {
             let item_state = ItemState::new(item);
-            self.items.add(item_state);
+            self.items.add_quantity(qty, item_state);
         }
         self.listeners.notify(&self);
     }

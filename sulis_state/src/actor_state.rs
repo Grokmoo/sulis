@@ -250,6 +250,18 @@ impl ActorState {
         }
     }
 
+    fn check_add_coins(&mut self, quantity: u32, item_state: &ItemState) -> bool {
+        let coins_id = &Module::rules().coins_item;
+
+        if &item_state.item.id == coins_id {
+            let qty = quantity as i32 * Module::rules().item_value_display_factor as i32;
+            self.inventory.add_coins(qty);
+            true
+        } else {
+            false
+        }
+    }
+
     pub fn take_all(&mut self, prop_index: usize) {
         let area_state = GameState::area_state();
         let mut area_state = area_state.borrow_mut();
@@ -258,9 +270,11 @@ impl ActorState {
         if prop_state.items().len() > 0 {
             let mut i = prop_state.items().len() - 1;
             loop {
-                let item_state = prop_state.remove_all_at(i);
-
-                self.inventory.items.add_quantity(item_state.unwrap());
+                if let Some((qty, item_state)) = prop_state.remove_all_at(i) {
+                    if !self.check_add_coins(qty, &item_state) {
+                        self.inventory.items.add_quantity(qty, item_state);
+                    }
+                }
 
                 if i == 0 { break; }
 
@@ -275,13 +289,19 @@ impl ActorState {
         let mut area_state = area_state.borrow_mut();
         let prop_state = area_state.get_prop_mut(prop_index);
 
-        let item_state = prop_state.remove_one_at(item_index);
-        self.inventory.items.add(item_state.unwrap());
+        if let Some((qty, item_state)) = prop_state.remove_all_at(item_index) {
+            if !self.check_add_coins(qty, &item_state) {
+                self.inventory.items.add_quantity(qty, item_state);
+            }
+        }
+
         self.listeners.notify(&self);
     }
 
     pub fn add_item(&mut self, item_state: ItemState) {
-        self.inventory.items.add(item_state);
+        if !self.check_add_coins(1, &item_state) {
+            self.inventory.items.add(item_state);
+        }
         self.listeners.notify(&self);
     }
 

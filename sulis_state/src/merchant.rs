@@ -32,9 +32,9 @@ impl Merchant {
     pub fn new(id: &str, loot_list: &Rc<LootList>, buy_frac: f32, sell_frac: f32) -> Merchant {
         let mut items = ItemList::new();
 
-        for item in loot_list.generate() {
+        for (qty, item) in loot_list.generate() {
             let item_state = ItemState::new(item);
-            items.add(item_state);
+            items.add_quantity(qty, item_state);
         }
 
         Merchant {

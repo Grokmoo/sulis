@@ -3,7 +3,7 @@ uniform_sets:
   all_passable:
     layer: base
     size: [4, 4]
-    sprite_prefix: "grassland/"
+    sprite_prefix: "tiles/"
     impass: []
     invis: []
     tiles: [ grass_to_dirt_se, grass_to_dirt_s1, grass_to_dirt_s2, grass_to_dirt_s3, grass_to_dirt_sw,
@@ -17,14 +17,14 @@ uniform_sets:
   passable_props:
     layer: base2
     size: [4, 4]
-    sprite_prefix: "grassland/"
+    sprite_prefix: "tiles/"
     impass: []
     invis: []
     tiles: [ mushrooms1, flowers1, flowers2, flowers3, leaves1 ]
   impass_props:
     layer: base2
     size: [4, 4]
-    sprite_prefix: "grassland/"
+    sprite_prefix: "tiles/"
     impass: [[0, 0], [1, 0], [2, 0], [3, 0], [0, 1], [1, 1], [2, 1], [3, 1],
       [0, 2], [1, 2], [2, 2], [3, 2], [0, 3], [1, 3], [2, 3], [3, 3]]
     invis: []
@@ -32,7 +32,7 @@ uniform_sets:
   all_impass:
     layer: base
     size: [4, 4]
-    sprite_prefix: "grassland/"
+    sprite_prefix: "tiles/"
     impass: [[0, 0], [1, 0], [2, 0], [3, 0], [0, 1], [1, 1], [2, 1], [3, 1],
       [0, 2], [1, 2], [2, 2], [3, 2], [0, 3], [1, 3], [2, 3], [3, 3]]
     invis: []
@@ -40,7 +40,7 @@ uniform_sets:
   fence:
     layer: object
     size: [2, 2]
-    sprite_prefix: "grassland/"
+    sprite_prefix: "tiles/"
     impass: [[0, 0], [0, 1], [1, 0], [1, 1]]
     invis: []
     tiles: [ fence_s_e_w, fence_misc_01, fence_misc_02, fence_e_s, fence_w_s, fence_n_s1, fence_n_s2, fence_e_n,
@@ -71,7 +71,7 @@ non_uniform_sets:
   base_impass:
     layer: base
     size: [4, 4]
-    sprite_prefix: "grassland/"
+    sprite_prefix: "tiles/"
     tiles:
       dirt_to_water_se:
         impass: [[3, 3], [3, 2], [2, 3], [3, 1], [2, 2], [1, 3]]
@@ -140,7 +140,7 @@ non_uniform_sets:
   2by2impass:
     layer: base2
     size: [8, 8]
-    sprite_prefix: "grassland/"
+    sprite_prefix: "tiles/"
     tiles:
       cliffs_to_grass_se:
         impass: [[1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1],
@@ -185,7 +185,7 @@ non_uniform_sets:
   2by1impass:
     layer: base2
     size: [8, 4]
-    sprite_prefix: "grassland/"
+    sprite_prefix: "tiles/"
     tiles:
       cliffs_to_grass_e1:
         impass: [[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1],
@@ -202,7 +202,7 @@ non_uniform_sets:
   1by2impass:
     layer: base2
     size: [4, 8]
-    sprite_prefix: "grassland/"
+    sprite_prefix: "tiles/"
     tiles:
       cliffs_to_grass_n1:
         impass: [[0, 1], [1, 1], [2, 1], [3, 1], [0, 2], [1, 2], [2, 2], [3, 2], [0, 3], [1, 3], [2, 3], [3, 3],
@@ -229,78 +229,78 @@ tiles:
   fence_board:
     layer: base2
     size: [2, 2]
-    sprite: grassland/fence_board
+    sprite: tiles/fence_board
   post_base:
     layer: object
     size: [2, 2]
-    sprite: grassland/post_base
+    sprite: tiles/post_base
   post_mid:
     layer: aerial
     size: [2, 2]
-    sprite: grassland/post_mid
+    sprite: tiles/post_mid
   post_top:
     layer: aerial
     size: [2, 2]
-    sprite: grassland/post_top
+    sprite: tiles/post_top
   signpost:
     layer: object
     size: [2, 4]
-    sprite: grassland/signpost
+    sprite: tiles/signpost
     impass: [[0, 2], [0, 3], [1, 2], [1, 3]]
   bridge_horizontal_w:
     layer: base2
     size: [2, 4]
-    sprite: grassland/bridge_horizontal_w
+    sprite: tiles/bridge_horizontal_w
     override_impass: true
   bridge_horizontal_c:
     layer: base2
     size: [2, 4]
-    sprite: grassland/bridge_horizontal_c
+    sprite: tiles/bridge_horizontal_c
     override_impass: true
   bridge_horizontal_e:
     layer: base2
     size: [2, 4]
-    sprite: grassland/bridge_horizontal_e
+    sprite: tiles/bridge_horizontal_e
     override_impass: true
   bridge_vertical_n:
     layer: base2
     size: [4, 2]
-    sprite: grassland/bridge_vertical_n
+    sprite: tiles/bridge_vertical_n
     override_impass: true
   bridge_vertical_c:
     layer: base2
     size: [4, 2]
-    sprite: grassland/bridge_vertical_c
+    sprite: tiles/bridge_vertical_c
     override_impass: true
   bridge_vertical_s:
     layer: base2
     size: [4, 2]
-    sprite: grassland/bridge_vertical_s
+    sprite: tiles/bridge_vertical_s
     override_impass: true
   tree_canopy_c:
     layer: aerial
     size: [2, 6]
-    sprite: grassland/tree_canopy_c
+    sprite: tiles/tree_canopy_c
   tree_canopy_w:
     layer: aerial
     size: [4, 6]
-    sprite: grassland/tree_canopy_w
+    sprite: tiles/tree_canopy_w
   tree_canopy_e:
     layer: aerial
     size: [4, 6]
-    sprite: grassland/tree_canopy_e
+    sprite: tiles/tree_canopy_e
   tree_canopy_c:
     layer: aerial
     size: [2, 6]
-    sprite: grassland/tree_canopy_c
+    sprite: tiles/tree_canopy_c
   tree_canopy_c2:
     layer: aerial
     size: [4, 6]
-    sprite: grassland/tree_canopy_c2
+    sprite: tiles/tree_canopy_c2
   tree_base01:
     layer: object
     size: [6, 4]
-    sprite: grassland/tree_base01
+    sprite: tiles/tree_base01
     impass: [        [1, 0], [2, 0], [3, 0], [4, 0],
              [0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1],
              [0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2],
@@ -310,7 +310,7 @@ tiles:
   tree_base02:
     layer: object
     size: [6, 4]
-    sprite: grassland/tree_base02
+    sprite: tiles/tree_base02
     impass: [        [1, 0], [2, 0], [3, 0], [4, 0],
              [0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1],
              [0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2],
@@ -320,7 +320,7 @@ tiles:
   tree_stump:
     layer: object
     size: [6, 4]
-    sprite: grassland/tree_stump
+    sprite: tiles/tree_stump
     impass: [        [1, 0], [2, 0], [3, 0], [4, 0],
              [0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1],
              [0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2],
@@ -328,30 +328,30 @@ tiles:
   waterfall:
     layer: base2
     size: [16, 12]
-    sprite: grassland/waterfall
+    sprite: tiles/waterfall
     pass: []
   cave_entrance_n:
     layer: base2
     size: [12, 8]
-    sprite: grassland/cave_entrance_n
+    sprite: tiles/cave_entrance_n
     pass: [[4, 4], [4, 5], [4, 6], [4, 7], [5, 4], [5, 5], [5, 6], [5, 7],
            [6, 4], [6, 5], [6, 6], [6, 7], [7, 4], [7, 5], [7, 6], [7, 7]]
   cave_entrance_s:
     layer: base2
     size: [12, 8]
-    sprite: grassland/cave_entrance_s
+    sprite: tiles/cave_entrance_s
     pass: [[4, 0], [4, 1], [4, 2], [4, 3], [5, 0], [5, 1], [5, 2], [5, 3],
            [6, 0], [6, 1], [6, 2], [6, 3], [7, 0], [7, 1], [7, 2], [7, 3]]
   cave_entrance_e:
     layer: base2
     size: [8, 12]
-    sprite: grassland/cave_entrance_e
+    sprite: tiles/cave_entrance_e
     pass: [[0, 4], [0, 5], [0, 6], [0, 7], [1, 4], [1, 5], [1, 6], [1, 7],
            [2, 4], [2, 5], [2, 6], [2, 7], [3, 4], [3, 5], [3, 6], [3, 7]]
   cave_entrance_w:
     layer: base2
     size: [8, 12]
-    sprite: grassland/cave_entrance_w
+    sprite: tiles/cave_entrance_w
     pass: [[4, 4], [4, 5], [4, 6], [4, 7], [5, 4], [5, 5], [5, 6], [5, 7],
            [6, 4], [6, 5], [6, 6], [6, 7], [7, 4], [7, 5], [7, 6], [7, 7]]
   armor_statue:

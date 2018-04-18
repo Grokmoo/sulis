@@ -1,0 +1,306 @@
+id: mine
+uniform_sets:
+  all_passable:
+    layer: base
+    size: [4, 4]
+    sprite_prefix: "tiles/"
+    impass: []
+    invis: []
+    tiles: [
+      mine_light1,
+      mine_light2,
+      mine_light3,
+      mine_dark1,
+      mine_dark2,
+      mine_dark3,
+      
+      mine_dark_to_light_se,
+      mine_dark_to_light_sw,
+      mine_dark_to_light_ne,
+      mine_dark_to_light_nw,
+      
+      mine_light_to_dark_se,
+      mine_light_to_dark_s,
+      mine_light_to_dark_sw,
+      mine_light_to_dark_e,
+      mine_light_to_dark_c,
+      mine_light_to_dark_w,
+      mine_light_to_dark_ne,
+      mine_light_to_dark_n,
+      mine_light_to_dark_nw
+    ]
+  all_impass:
+    layer: base
+    size: [4, 4]
+    sprite_prefix: "tiles/"
+    impass: [[0, 0], [1, 0], [2, 0], [3, 0], [0, 1], [1, 1], [2, 1], [3, 1],
+      [0, 2], [1, 2], [2, 2], [3, 2], [0, 3], [1, 3], [2, 3], [3, 3]]
+    invis: []
+    tiles: [ pit1 ]
+  passable_base2:
+    layer: base2
+    size: [4, 4]
+    sprite_prefix: "tiles/"
+    impass: []
+    invis: []
+    tiles: [
+      track_se,
+      track_s,
+      track_sw,
+      track_e,
+      track_c,
+      track_w,
+      track_ne,
+      track_n,
+      track_nw,
+      track_3way1,
+      track_3way2,
+      catwalk_w,
+      catwalk_e,
+      catwalk_sw,
+      catwalk_se,
+      catwalk_s,
+      catwalk_n,
+      catwalk_nw,
+      catwalk_ne,
+      mushrooms2,
+    ]
+  impass_base2:
+    layer: base2
+    size: [4, 4]
+    sprite_prefix: "tiles/"
+    impass: [[0, 0], [1, 0], [2, 0], [3, 0], [0, 1], [1, 1], [2, 1], [3, 1],
+      [0, 2], [1, 2], [2, 2], [3, 2], [0, 3], [1, 3], [2, 3], [3, 3]]
+    invis: []
+    tiles: [
+      catwalk_legs_corner_se,
+      catwalk_legs_corner_sw,
+      catwalk_legs_sw,
+      catwalk_legs_s,
+      catwalk_legs_se,
+      catwalk_legs_nw,
+      catwalk_legs_n,
+      catwalk_legs_ne,
+      catwalk_legs_corner_ne,
+      catwalk_legs_corner_nw,
+      catwalk_legs_w,
+      catwalk_legs_e,
+      rock4,
+      rock5,
+      rock6,
+      rock7,
+    ]
+  impass_2by2:
+    layer: base
+    size: [8, 8]
+    sprite_prefix: "tiles/"
+    impass: [[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0],
+             [0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1],
+             [0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2],
+             [0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3],
+             [0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4],
+             [0, 5], [1, 5], [2, 5], [3, 5], [4, 5], [5, 5], [6, 5], [7, 5],
+             [0, 6], [1, 6], [2, 6], [3, 6], [4, 6], [5, 6], [6, 6], [7, 6],
+             [0, 7], [1, 7], [2, 7], [3, 7], [4, 7], [5, 7], [6, 7], [7, 7]]
+    invis: []
+    tiles: [
+      mine_wall_nw,
+      mine_wall_ne,
+      mine_wall_sw,
+      mine_wall_se,
+      mine_wall_corner_nw,
+      mine_wall_corner_ne,
+      mine_wall_corner_sw,
+      mine_wall_corner_se,
+      mine_wall_n6,
+      mine_wall_s6,
+      mine_wall_w6,
+      mine_wall_e6,
+    ]
+  impass_2by1:
+    layer: base
+    size: [8, 4]
+    sprite_prefix: "tiles/"
+    impass: [[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0],
+             [0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1],
+             [0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2],
+             [0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3]]
+    invis: []
+    tiles: [
+      mine_wall_w1,
+      mine_wall_w2,
+      mine_wall_w3,
+      mine_wall_e1,
+      mine_wall_e2,
+      mine_wall_e3,
+      mine_wall_e4,
+      mine_wall_e5,
+      mine_wall_w4,
+      mine_wall_w5,
+    ]
+  impass_1by2:
+    layer: base
+    size: [4, 8]
+    sprite_prefix: "tiles/"
+    impass: [[0, 0], [1, 0], [2, 0], [3, 0],
+             [0, 1], [1, 1], [2, 1], [3, 1],
+             [0, 2], [1, 2], [2, 2], [3, 2],
+             [0, 3], [1, 3], [2, 3], [3, 3],
+             [0, 4], [1, 4], [2, 4], [3, 4],
+             [0, 5], [1, 5], [2, 5], [3, 5],
+             [0, 6], [1, 6], [2, 6], [3, 6],
+             [0, 7], [1, 7], [2, 7], [3, 7]]
+    invis: []
+    tiles: [
+      mine_wall_n1,
+      mine_wall_n2,
+      mine_wall_n3,
+      mine_wall_s1,
+      mine_wall_s2,
+      mine_wall_s3,
+      mine_wall_n4,
+      mine_wall_n5,
+      mine_wall_s4,
+      mine_wall_s5
+    ]
+non_uniform_sets:
+  base_impass:
+    layer: base
+    size: [4, 4]
+    sprite_prefix: "tiles/"
+    tiles:
+      mine_light_to_pit_se:
+        impass: [[1, 1], [2, 1], [3, 1], [1, 2], [2, 2], [3, 2], [1, 3], [2, 3], [3, 3]]
+      mine_light_to_pit_s:
+        impass: [[0, 1], [1, 1], [2, 1], [3, 1], [0, 2], [1, 2], [2, 2], [3, 2], [0, 3], [1, 3], [2, 3], [3, 3]]
+      mine_light_to_pit_sw:
+        impass: [[0, 1], [1, 1], [2, 1], [0, 2], [1, 2], [2, 2], [0, 3], [1, 3], [2, 3]]
+      mine_light_to_pit_e:
+        impass: [[1, 0], [2, 0], [3, 0], [1, 1], [2, 1], [3, 1], [1, 2], [2, 2], [3, 2], [1, 3], [2, 3], [3, 3]]
+      mine_light_to_pit_w:
+        impass: [[0, 0], [1, 0], [2, 0], [0, 1], [1, 1], [2, 1], [0, 2], [1, 2], [2, 2], [0, 3], [1, 3], [2, 3]]
+      mine_light_to_pit_ne:
+        impass: [[1, 0], [2, 0], [3, 0], [1, 1], [2, 1], [3, 1], [1, 2], [2, 2], [3, 2]]
+      mine_light_to_pit_n:
+        impass: [[0, 0], [1, 0], [2, 0], [3, 0], [0, 1], [1, 1], [2, 1], [3, 1], [0, 2], [1, 2], [2, 2], [3, 2]]
+      mine_light_to_pit_nw:
+        impass: [[0, 0], [1, 0], [2, 0], [0, 1], [1, 1], [2, 1], [0, 2], [1, 2], [2, 2]]
+      
+      pit_to_mine_light_se:
+        impass: [[0, 0], [1, 0], [2, 0], [3, 0], [0, 1], [1, 1], [2, 1], [3, 1], [0, 2], [1, 2], [2, 2], [3, 2], [0, 3], [1, 3], [2, 3]]
+      pit_to_mine_light_sw:
+        impass: [[0, 0], [1, 0], [2, 0], [3, 0], [0, 1], [1, 1], [2, 1], [3, 1], [0, 2], [1, 2], [2, 2], [3, 2], [1, 3], [2, 3], [3, 3]]
+      pit_to_mine_light_ne:
+        impass: [[0, 0], [1, 0], [2, 0], [0, 1], [1, 1], [2, 1], [3, 1], [0, 2], [1, 2], [2, 2], [3, 2], [0, 3], [1, 3], [2, 3], [3, 3]]
+      pit_to_mine_light_nw:
+        impass: [[1, 0], [2, 0], [3, 0], [0, 1], [1, 1], [2, 1], [3, 1], [0, 2], [1, 2], [2, 2], [3, 2], [0, 3], [1, 3], [2, 3], [3, 3]]
+tiles:
+  ladder_w:
+    layer: object
+    size: [4, 4]
+    sprite: tiles/ladder_w
+    override_impass: true
+  ladder_e:
+    layer: object
+    size: [4, 4]
+    sprite: tiles/ladder_e
+    override_impass: true
+  ladder_s:
+    layer: object
+    size: [4, 4]
+    sprite: tiles/ladder_s
+    override_impass: true
+  ladder_n:
+    layer: object
+    size: [4, 4]
+    sprite: tiles/ladder_n
+    override_impass: true
+  rockbig1:
+    layer: base2
+    size: [8, 8]
+    sprite: tiles/rockbig1
+    pass: []
+    vis: []
+  mine-pillar:
+    layer: aerial
+    size: [4, 8]
+    sprite: tiles/mine-pillar
+    impass: [[0, 4], [1, 4], [2, 4], [3, 4], [0, 5], [1, 5], [2, 5], [3, 5], [0, 6], [1, 6], [2, 6], [3, 6], [0, 7], [1, 7], [2, 7], [3, 7]]
+    invis: [[0, 4], [1, 4], [2, 4], [3, 4], [0, 5], [1, 5], [2, 5], [3, 5], [0, 6], [1, 6], [2, 6], [3, 6], [0, 7], [1, 7], [2, 7], [3, 7]]
+  mine_door_n:
+    layer: base2
+    size: [12, 8]
+    sprite: tiles/mine_door_n
+    pass: [[4, 4], [4, 5], [4, 6], [4, 7], [5, 4], [5, 5], [5, 6], [5, 7],
+           [6, 4], [6, 5], [6, 6], [6, 7], [7, 4], [7, 5], [7, 6], [7, 7]]
+  mine_door_s:
+    layer: base2
+    size: [12, 8]
+    sprite: tiles/mine_door_s
+    pass: [[4, 0], [4, 1], [4, 2], [4, 3], [5, 0], [5, 1], [5, 2], [5, 3],
+           [6, 0], [6, 1], [6, 2], [6, 3], [7, 0], [7, 1], [7, 2], [7, 3]]
+  mine_door_e:
+    layer: base2
+    size: [8, 12]
+    sprite: tiles/mine_door_e
+    pass: [[0, 4], [0, 5], [0, 6], [0, 7], [1, 4], [1, 5], [1, 6], [1, 7],
+           [2, 4], [2, 5], [2, 6], [2, 7], [3, 4], [3, 5], [3, 6], [3, 7]]
+  mine_door_w:
+    layer: base2
+    size: [8, 12]
+    sprite: tiles/mine_door_w
+    pass: [[4, 4], [4, 5], [4, 6], [4, 7], [5, 4], [5, 5], [5, 6], [5, 7],
+           [6, 4], [6, 5], [6, 6], [6, 7], [7, 4], [7, 5], [7, 6], [7, 7]]
+  mine_ladder_n_c:
+    layer: base2
+    size: [4, 8]
+    sprite: tiles/mine_ladder_n_c
+    override_impass: true
+  mine_ladder_s_c:
+    layer: base2
+    size: [4, 8]
+    sprite: tiles/mine_ladder_s_c
+    override_impass: true
+  mine_ladder_e_c:
+    layer: base2
+    size: [8, 4]
+    sprite: tiles/mine_ladder_e_c
+    override_impass: true
+  mine_ladder_w_c:
+    layer: base2
+    size: [8, 4]
+    sprite: tiles/mine_ladder_w_c
+    override_impass: true
+  mine_ladder_e_n:
+    layer: base2
+    size: [8, 4]
+    sprite: tiles/mine_ladder_e_n
+  mine_ladder_e_s:
+    layer: base2
+    size: [8, 4]
+    sprite: tiles/mine_ladder_e_s
+  mine_ladder_w_n:
+    layer: base2
+    size: [8, 4]
+    sprite: tiles/mine_ladder_w_n
+  mine_ladder_w_s:
+    layer: base2
+    size: [8, 4]
+    sprite: tiles/mine_ladder_w_s
+  mine_ladder_n_e:
+    layer: base2
+    size: [4, 8]
+    sprite: tiles/mine_ladder_n_e
+  mine_ladder_n_w:
+    layer: base2
+    size: [4, 8]
+    sprite: tiles/mine_ladder_n_w
+  mine_ladder_s_e:
+    layer: base2
+    size: [4, 8]
+    sprite: tiles/mine_ladder_s_e
+  mine_ladder_s_w:
+    layer: base2
+    size: [4, 8]
+    sprite: tiles/mine_ladder_s_w
+

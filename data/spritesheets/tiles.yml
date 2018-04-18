@@ -1,10 +1,10 @@
-id: grassland
-src: "grassland.png"
-size: [ 1024, 1024 ]
+id: tiles
+src: "tiles.png"
+size: [ 1024, 2048 ]
 simple_image_gen_scale: 64
 grid_multiplier: 64
 groups:
-  1by1:
+  1by1-grass:
     size: [1, 1]
     areas:
       grass_to_dirt_se: [0, 0]
@@ -120,7 +120,7 @@ groups:
       post_base: [12, 6]
       post_mid: [12, 5]
       post_top: [12, 4]
-  2by2:
+  2by2-grass:
     size: [2, 2]
     areas:
       cliffs_to_grass_se: [0, 5]
@@ -132,7 +132,7 @@ groups:
       grass_to_cliffs_sw: [8, 7]
       grass_to_cliffs_ne: [6, 9]
       grass_to_cliffs_nw: [8, 9]
-  3by2:
+  3by2-grass:
     size: [3, 2]
     areas:
       tree_base01: [1, 14]
@@ -140,7 +140,7 @@ groups:
       tree_stump: [5, 14]
       cave_entrance_s: [8, 14]
       cave_entrance_n: [11, 14]
-  2by3:
+  2by3-grass:
     size: [2, 3]
     areas:
       tree_canopy_w: [0, 11]
@@ -148,7 +148,7 @@ groups:
       tree_canopy_c2: [5, 11]
       cave_entrance_w: [14, 9]
       cave_entrance_e: [14, 12]
-  misc:
+  misc-grass:
     areas:
       cliffs_to_grass_n1: [2, 9, 1, 2]
       cliffs_to_grass_n2: [3, 9, 1, 2]
@@ -173,3 +173,170 @@ groups:
       stairs_up_e: [8, 5, 1, 2]
       
       signpost: [9, 5, 1, 2]
+  1by1-mine:
+    size: [1, 1]
+    position: [0, 16]
+    areas:
+      mine_light1: [0, 0]
+      mine_light2: [1, 0]
+      mine_light3: [2, 0]
+      mine_dark1: [3, 0]
+      mine_dark2: [4, 0]
+      mine_dark3: [5, 0]
+      
+      mine_dark_to_light_se: [11, 0]
+      mine_dark_to_light_sw: [12, 0]
+      mine_dark_to_light_ne: [11, 1]
+      mine_dark_to_light_nw: [12, 1]
+      
+      mine_light_to_dark_se: [13, 0]
+      mine_light_to_dark_s: [14, 0]
+      mine_light_to_dark_sw: [15, 0]
+      mine_light_to_dark_e: [13, 1]
+      mine_light_to_dark_c: [14, 1]
+      mine_light_to_dark_w: [15, 1]
+      mine_light_to_dark_ne: [13, 2]
+      mine_light_to_dark_n: [14, 2]
+      mine_light_to_dark_nw: [15, 2]
+      
+      track_se: [13, 3]
+      track_s: [14, 3]
+      track_sw: [15, 3]
+      track_e: [13, 4]
+      track_c: [14, 4]
+      track_w: [15, 4]
+      track_ne: [13, 5]
+      track_n: [14, 5]
+      track_nw: [15, 5]
+      
+      mine_light_to_pit_se: [13, 6]
+      mine_light_to_pit_s: [14, 6]
+      mine_light_to_pit_sw: [15, 6]
+      mine_light_to_pit_e: [13, 7]
+      pit1: [14, 7]
+      mine_light_to_pit_w: [15, 7]
+      mine_light_to_pit_ne: [13, 8]
+      mine_light_to_pit_n: [14, 8]
+      mine_light_to_pit_nw: [15, 8]
+      
+      pit_to_mine_light_se: [5, 12]
+      pit_to_mine_light_sw: [6, 12]
+      pit_to_mine_light_ne: [5, 13]
+      pit_to_mine_light_nw: [6, 13]
+      
+      track_3way1: [3, 13]
+      track_3way2: [3, 14]
+      
+      ladder_n: [0, 8]
+      ladder_w: [1, 8]
+      catwalk_n: [2, 8]
+      ladder_e: [3, 8]
+      catwalk_nw: [5, 8]
+      catwalk_ne: [6, 8]
+      ladder_s: [0, 9]
+      catwalk_legs_nw: [1, 9]
+      catwalk_legs_n: [2, 9]
+      catwalk_legs_ne: [3, 9]
+      catwalk_legs_corner_ne: [5, 9]
+      catwalk_legs_corner_nw: [6, 9]
+      catwalk_w: [0, 10]
+      catwalk_legs_w: [1, 10]
+      catwalk_legs_e: [3, 10]
+      catwalk_e: [4, 10]
+      catwalk_legs_corner_se: [5, 10]
+      catwalk_legs_corner_sw: [6, 10]
+      catwalk_legs_sw: [1, 11]
+      catwalk_legs_s: [2, 11]
+      catwalk_legs_se: [3, 11]
+      catwalk_sw: [5, 11]
+      catwalk_se: [6, 11]
+      catwalk_s: [2, 12]
+      
+      rock4: [4, 3]
+      mushrooms2: [4, 4]
+      rock5: [2, 5]
+      rock6: [3, 5]
+      rock7: [4, 5]
+  2by2-mine:
+    position: [0, 16]
+    size: [2, 2]
+    areas:
+      mine_wall_nw: [0, 1]
+      mine_wall_ne: [5, 1]
+      mine_wall_sw: [0, 6]
+      mine_wall_se: [5, 6]
+      
+      mine_wall_corner_nw: [7, 0]
+      mine_wall_corner_ne: [9, 0]
+      mine_wall_corner_sw: [7, 2]
+      mine_wall_corner_se: [9, 2]
+      
+      mine_wall_n6: [9, 4]
+      mine_wall_s6: [9, 6]
+      mine_wall_w6: [7, 6]
+      mine_wall_e6: [11, 4]
+  1by2-mine:
+    position: [0, 16]
+    size: [1, 2]
+    areas:
+      mine_wall_n1: [2, 1]
+      mine_wall_n2: [3, 1]
+      mine_wall_n3: [4, 1]
+      mine_wall_s1: [2, 6]
+      mine_wall_s2: [3, 6]
+      mine_wall_s3: [4, 6]
+      
+      mine_wall_n4: [7, 4]
+      mine_wall_n5: [8, 4]
+      
+      mine_wall_s4: [11, 6]
+      mine_wall_s5: [12, 6]
+      
+      mine_ladder_n_w: [13, 9]
+      mine_ladder_n_c: [14, 9]
+      mine_ladder_n_e: [15, 9]
+      
+      mine_ladder_s_w: [13, 11]
+      mine_ladder_s_c: [14, 11]
+      mine_ladder_s_e: [15, 11]
+  2by1-mine:
+    position: [0, 16]
+    size: [2, 1]
+    areas:
+      mine_wall_w1: [0, 3]
+      mine_wall_w2: [0, 4]
+      mine_wall_w3: [0, 5]
+      mine_wall_e1: [5, 3]
+      mine_wall_e2: [5, 4]
+      mine_wall_e3: [5, 5]
+      
+      mine_wall_e4: [11, 2]
+      mine_wall_e5: [11, 3]
+      
+      mine_wall_w4: [7, 8]
+      mine_wall_w5: [7, 9]
+      
+      mine_ladder_w_n: [12, 13]
+      mine_ladder_w_c: [12, 14]
+      mine_ladder_w_s: [12, 15]
+      
+      mine_ladder_e_n: [14, 13]
+      mine_ladder_e_c: [14, 14]
+      mine_ladder_e_s: [14, 15]
+  3by2-mine:
+    position: [0, 16]
+    size: [3, 2]
+    areas:
+      mine_door_n: [9, 9]
+      mine_door_s: [9, 11]
+  2by3-mine:
+    position: [0, 16]
+    size: [2, 3]
+    areas:
+      mine_door_w: [8, 13]
+      mine_door_e: [10, 13]
+  misc-mine:
+    position: [0, 16]
+    areas:
+      rockbig1: [2, 3, 2, 2]
+      mine-pillar: [12, 11, 1, 2]

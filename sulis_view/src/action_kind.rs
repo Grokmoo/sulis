@@ -25,6 +25,7 @@ use {DialogWindow, RootView};
 
 pub fn get_action(x: i32, y: i32) -> Box<ActionKind> {
     let area_state = GameState::area_state();
+    if !area_state.borrow().area.coords_valid(x, y) { return Box::new(InvalidAction {}); }
     if !area_state.borrow().is_pc_explored(x, y) { return Box::new(InvalidAction {}); }
 
     if let Some(action) = AttackAction::create_if_valid(x, y) { return action; }

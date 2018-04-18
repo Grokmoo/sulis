@@ -79,10 +79,11 @@ editor:
     encounter_tile: "gui/editor_encounter"
     visibility_tile: "gui/area_invis"
     explored_tile: "gui/area_unexplored"
-    entity_layer: 3
+    entity_layer: 4
     layers:
       - base
       - base2
+      - base3
       - prop
       - object
       - aerial

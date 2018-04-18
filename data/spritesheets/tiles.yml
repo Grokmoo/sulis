@@ -299,6 +299,11 @@ groups:
       mine_ladder_s_w: [13, 11]
       mine_ladder_s_c: [14, 11]
       mine_ladder_s_e: [15, 11]
+      
+      mine_door_n_w: [9, 9]
+      mine_door_n_e: [11, 9]
+      mine_door_s_w: [9, 11]
+      mine_door_s_e: [11, 11]
   2by1-mine:
     position: [0, 16]
     size: [2, 1]
@@ -323,20 +328,32 @@ groups:
       mine_ladder_e_n: [14, 13]
       mine_ladder_e_c: [14, 14]
       mine_ladder_e_s: [14, 15]
-  3by2-mine:
-    position: [0, 16]
-    size: [3, 2]
-    areas:
-      mine_door_n: [9, 9]
-      mine_door_s: [9, 11]
-  2by3-mine:
-    position: [0, 16]
-    size: [2, 3]
-    areas:
-      mine_door_w: [8, 13]
-      mine_door_e: [10, 13]
+      
+      mine_door_w_n: [8, 13]
+      mine_door_w_s: [8, 15]
+      mine_door_e_n: [10, 13]
+      mine_door_e_s: [10, 15]
   misc-mine:
     position: [0, 16]
     areas:
+      mine_door_w_c: [8, 14, 1, 1]
+      mine_door_e_c: [11, 14, 1, 1]
+      mine_door_n_c: [10, 9, 1, 1]
+      mine_door_s_c: [10, 12, 1, 1]
+      mine_door_w_shadow: [9, 14, 1, 1]
+      mine_door_e_shadow: [10, 14, 1, 1]
+      mine_door_n_shadow: [10, 10, 1, 1]
+      mine_door_s_shadow: [10, 11, 1, 1]
+      mine_door_w_light: [0, 15, 1, 1]
+      mine_door_e_light: [1, 15, 1, 1]
+      mine_door_n_light: [3, 12, 1, 1]
+      mine_door_s_light: [3, 15, 1, 1]
+      tunnel: [7, 13, 1, 1]
       rockbig1: [2, 3, 2, 2]
       mine-pillar: [12, 11, 1, 2]
+      minecart_ns: [0, 13, 1, 2]
+      minecart_ew: [1, 13, 1, 2]
+      minecrate1: [0, 11, 1, 2]
+      minecrate2: [1, 12, 1, 1]
+      minebarrel: [4, 11, 1, 2]
+      minecrate3: [12, 9, 1, 2]

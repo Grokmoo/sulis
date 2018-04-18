@@ -37,9 +37,9 @@ uniform_sets:
       [0, 2], [1, 2], [2, 2], [3, 2], [0, 3], [1, 3], [2, 3], [3, 3]]
     invis: []
     tiles: [ pit1 ]
-  passable_base2:
+  track:
     layer: base2
-    size: [4, 4]
+    size: [3, 3]
     sprite_prefix: "tiles/"
     impass: []
     invis: []
@@ -55,22 +55,12 @@ uniform_sets:
       track_nw,
       track_3way1,
       track_3way2,
-      catwalk_w,
-      catwalk_e,
-      catwalk_sw,
-      catwalk_se,
-      catwalk_s,
-      catwalk_n,
-      catwalk_nw,
-      catwalk_ne,
-      mushrooms2,
     ]
-  impass_base2:
+  catwalk_legs:
     layer: base2
-    size: [4, 4]
+    size: [3, 3]
     sprite_prefix: "tiles/"
-    impass: [[0, 0], [1, 0], [2, 0], [3, 0], [0, 1], [1, 1], [2, 1], [3, 1],
-      [0, 2], [1, 2], [2, 2], [3, 2], [0, 3], [1, 3], [2, 3], [3, 3]]
+    impass: [[0, 0], [1, 0], [2, 0], [0, 1], [1, 1], [2, 1], [0, 2], [1, 2], [2, 2]]
     invis: []
     tiles: [
       catwalk_legs_corner_se,
@@ -85,23 +75,12 @@ uniform_sets:
       catwalk_legs_corner_nw,
       catwalk_legs_w,
       catwalk_legs_e,
-      rock4,
-      rock5,
-      rock6,
-      rock7,
     ]
-  impass_2by2:
-    layer: base
-    size: [8, 8]
+  wall_2by2:
+    layer: base2
+    size: [6, 6]
     sprite_prefix: "tiles/"
-    impass: [[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0],
-             [0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1],
-             [0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2],
-             [0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3],
-             [0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4],
-             [0, 5], [1, 5], [2, 5], [3, 5], [4, 5], [5, 5], [6, 5], [7, 5],
-             [0, 6], [1, 6], [2, 6], [3, 6], [4, 6], [5, 6], [6, 6], [7, 6],
-             [0, 7], [1, 7], [2, 7], [3, 7], [4, 7], [5, 7], [6, 7], [7, 7]]
+    impass: [[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [0, 5], [1, 5], [2, 5], [3, 5], [4, 5], [5, 5]]
     invis: []
     tiles: [
       mine_wall_nw,
@@ -117,14 +96,11 @@ uniform_sets:
       mine_wall_w6,
       mine_wall_e6,
     ]
-  impass_2by1:
-    layer: base
-    size: [8, 4]
+  wall_2by1:
+    layer: base2
+    size: [6, 3]
     sprite_prefix: "tiles/"
-    impass: [[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0],
-             [0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1],
-             [0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2],
-             [0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3]]
+    impass: [[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2]]
     invis: []
     tiles: [
       mine_wall_w1,
@@ -137,19 +113,16 @@ uniform_sets:
       mine_wall_e5,
       mine_wall_w4,
       mine_wall_w5,
+      mine_door_w_n,
+      mine_door_w_s,
+      mine_door_e_n,
+      mine_door_e_s
     ]
-  impass_1by2:
-    layer: base
-    size: [4, 8]
+  wall_1by2:
+    layer: base2
+    size: [3, 6]
     sprite_prefix: "tiles/"
-    impass: [[0, 0], [1, 0], [2, 0], [3, 0],
-             [0, 1], [1, 1], [2, 1], [3, 1],
-             [0, 2], [1, 2], [2, 2], [3, 2],
-             [0, 3], [1, 3], [2, 3], [3, 3],
-             [0, 4], [1, 4], [2, 4], [3, 4],
-             [0, 5], [1, 5], [2, 5], [3, 5],
-             [0, 6], [1, 6], [2, 6], [3, 6],
-             [0, 7], [1, 7], [2, 7], [3, 7]]
+    impass: [[0, 0], [1, 0], [2, 0], [0, 1], [1, 1], [2, 1], [0, 2], [1, 2], [2, 2], [0, 3], [1, 3], [2, 3], [0, 4], [1, 4], [2, 4], [0, 5], [1, 5], [2, 5]]
     invis: []
     tiles: [
       mine_wall_n1,
@@ -161,7 +134,39 @@ uniform_sets:
       mine_wall_n4,
       mine_wall_n5,
       mine_wall_s4,
-      mine_wall_s5
+      mine_wall_s5,
+      mine_door_n_w,
+      mine_door_n_e,
+      mine_door_s_w,
+      mine_door_s_e
+    ]
+  door1by1:
+    layer: aerial
+    size: [3, 3]
+    sprite_prefix: "tiles/"
+    impass: []
+    invis: []
+    tiles: [
+      mine_door_w_shadow,
+      mine_door_e_shadow,
+      mine_door_n_shadow,
+      mine_door_s_shadow,
+      mine_door_w_light,
+      mine_door_e_light,
+      mine_door_n_light,
+      mine_door_s_light,
+    ]
+  door1by1_impass:
+    layer: aerial
+    size: [3, 3]
+    sprite_prefix: "tiles/"
+    impass: [[0, 0], [1, 0], [2, 0], [0, 1], [1, 1], [2, 1], [0, 2], [1, 2], [2, 2]]
+    invis: []
+    tiles: [
+      mine_door_w_c,
+      mine_door_e_c,
+      mine_door_n_c,
+      mine_door_s_c,
     ]
 non_uniform_sets:
   base_impass:
@@ -195,112 +200,187 @@ non_uniform_sets:
       pit_to_mine_light_nw:
         impass: [[1, 0], [2, 0], [3, 0], [0, 1], [1, 1], [2, 1], [3, 1], [0, 2], [1, 2], [2, 2], [3, 2], [0, 3], [1, 3], [2, 3], [3, 3]]
 tiles:
+  tunnel:
+    layer: base
+    size: [3, 3]
+    sprite: tiles/tunnel
+    override_impass: true
+  catwalk_w:
+    layer: base3
+    size: [3, 3]
+    sprite: tiles/catwalk_w
+    override_impass: true
+  catwalk_e:
+    layer: base3
+    size: [3, 3]
+    sprite: tiles/catwalk_e
+    override_impass: true
+  catwalk_sw:
+    layer: base3
+    size: [3, 3]
+    sprite: tiles/catwalk_sw
+    override_impass: true
+  catwalk_se:
+    layer: base3
+    size: [3, 3]
+    sprite: tiles/catwalk_se
+    override_impass: true
+  catwalk_s:
+    layer: base3
+    size: [3, 3]
+    sprite: tiles/catwalk_s
+    override_impass: true
+  catwalk_n:
+    layer: base3
+    size: [3, 3]
+    sprite: tiles/catwalk_n
+    override_impass: true
+  catwalk_nw:
+    layer: base3
+    size: [3, 3]
+    sprite: tiles/catwalk_nw
+    override_impass: true
+  catwalk_ne:
+    layer: base3
+    size: [3, 3]
+    sprite: tiles/catwalk_ne
+    override_impass: true
+  minecart_ns:
+    layer: object
+    size: [3, 6]
+    sprite: tiles/minecart_ns
+    pass: [[0, 0], [1, 0], [2, 0], [0, 1], [1, 1], [2, 1], [0, 2], [1, 2], [2, 2]]
+  minecart_ew:
+    layer: object
+    size: [3, 6]
+    sprite: tiles/minecart_ew
+    pass: [[0, 0], [1, 0], [2, 0], [0, 1], [1, 1], [2, 1], [0, 2], [1, 2], [2, 2]]
+  minecrate1:
+    layer: object
+    size: [2, 4]
+    sprite: tiles/minecrate1
+    pass: [[0, 0], [1, 0], [2, 0], [0, 1], [1, 1], [2, 1], [0, 2], [1, 2], [2, 2], [0, 3], [1, 3], [2, 3], [3, 3]]
+  minecrate2:
+    layer: object
+    size: [2, 2]
+    sprite: tiles/minecrate2
+    pass: []
+  minecrate3:
+    layer: object
+    size: [2, 4]
+    sprite: tiles/minecrate3
+    pass: [[0, 0], [1, 0], [2, 0], [0, 1], [1, 1], [2, 1], [0, 2], [1, 2], [2, 2], [0, 3], [1, 3], [2, 3], [3, 3]]
+  minebarrel:
+    layer: object
+    size: [2, 4]
+    sprite: tiles/minebarrel
+    pass: [[0, 0], [1, 0], [2, 0], [0, 1], [1, 1], [2, 1], [0, 2], [1, 2], [2, 2], [0, 3], [1, 3], [2, 3], [3, 3]]
+  mushrooms2:
+    layer: base2
+    size: [2, 2]
+    sprite: tiles/mushrooms2
+  rock4:
+    layer: base2
+    size: [2, 2]
+    sprite: tiles/rock4
+    pass: []
+  rock5:
+    layer: base2
+    size: [2, 2]
+    sprite: tiles/rock5
+    pass: []
+  rock6:
+    layer: base2
+    size: [2, 2]
+    sprite: tiles/rock6
+    pass: []
+  rock7:
+    layer: base2
+    size: [2, 2]
+    sprite: tiles/rock7
+    pass: []
   ladder_w:
     layer: object
-    size: [4, 4]
+    size: [3, 3]
     sprite: tiles/ladder_w
     override_impass: true
   ladder_e:
     layer: object
-    size: [4, 4]
+    size: [3, 3]
     sprite: tiles/ladder_e
     override_impass: true
   ladder_s:
     layer: object
-    size: [4, 4]
+    size: [3, 3]
     sprite: tiles/ladder_s
     override_impass: true
   ladder_n:
     layer: object
-    size: [4, 4]
+    size: [3, 3]
     sprite: tiles/ladder_n
     override_impass: true
   rockbig1:
     layer: base2
-    size: [8, 8]
+    size: [4, 4]
     sprite: tiles/rockbig1
     pass: []
     vis: []
   mine-pillar:
     layer: aerial
-    size: [4, 8]
+    size: [3, 6]
     sprite: tiles/mine-pillar
-    impass: [[0, 4], [1, 4], [2, 4], [3, 4], [0, 5], [1, 5], [2, 5], [3, 5], [0, 6], [1, 6], [2, 6], [3, 6], [0, 7], [1, 7], [2, 7], [3, 7]]
-    invis: [[0, 4], [1, 4], [2, 4], [3, 4], [0, 5], [1, 5], [2, 5], [3, 5], [0, 6], [1, 6], [2, 6], [3, 6], [0, 7], [1, 7], [2, 7], [3, 7]]
-  mine_door_n:
-    layer: base2
-    size: [12, 8]
-    sprite: tiles/mine_door_n
-    pass: [[4, 4], [4, 5], [4, 6], [4, 7], [5, 4], [5, 5], [5, 6], [5, 7],
-           [6, 4], [6, 5], [6, 6], [6, 7], [7, 4], [7, 5], [7, 6], [7, 7]]
-  mine_door_s:
-    layer: base2
-    size: [12, 8]
-    sprite: tiles/mine_door_s
-    pass: [[4, 0], [4, 1], [4, 2], [4, 3], [5, 0], [5, 1], [5, 2], [5, 3],
-           [6, 0], [6, 1], [6, 2], [6, 3], [7, 0], [7, 1], [7, 2], [7, 3]]
-  mine_door_e:
-    layer: base2
-    size: [8, 12]
-    sprite: tiles/mine_door_e
-    pass: [[0, 4], [0, 5], [0, 6], [0, 7], [1, 4], [1, 5], [1, 6], [1, 7],
-           [2, 4], [2, 5], [2, 6], [2, 7], [3, 4], [3, 5], [3, 6], [3, 7]]
-  mine_door_w:
-    layer: base2
-    size: [8, 12]
-    sprite: tiles/mine_door_w
-    pass: [[4, 4], [4, 5], [4, 6], [4, 7], [5, 4], [5, 5], [5, 6], [5, 7],
-           [6, 4], [6, 5], [6, 6], [6, 7], [7, 4], [7, 5], [7, 6], [7, 7]]
+    impass: [[0, 3], [1, 3], [2, 3], [0, 4], [1, 4], [2, 4], [0, 5], [1, 5], [2, 5]]
+    invis: [[0, 3], [1, 3], [2, 3], [0, 4], [1, 4], [2, 4], [0, 5], [1, 5], [2, 5]]
   mine_ladder_n_c:
-    layer: base2
-    size: [4, 8]
+    layer: object
+    size: [3, 6]
     sprite: tiles/mine_ladder_n_c
     override_impass: true
   mine_ladder_s_c:
-    layer: base2
-    size: [4, 8]
+    layer: object
+    size: [3, 6]
     sprite: tiles/mine_ladder_s_c
     override_impass: true
   mine_ladder_e_c:
-    layer: base2
-    size: [8, 4]
+    layer: object
+    size: [6, 3]
     sprite: tiles/mine_ladder_e_c
     override_impass: true
   mine_ladder_w_c:
-    layer: base2
-    size: [8, 4]
+    layer: object
+    size: [6, 3]
     sprite: tiles/mine_ladder_w_c
     override_impass: true
   mine_ladder_e_n:
-    layer: base2
-    size: [8, 4]
+    layer: object
+    size: [6, 3]
     sprite: tiles/mine_ladder_e_n
   mine_ladder_e_s:
-    layer: base2
-    size: [8, 4]
+    layer: object
+    size: [6, 3]
     sprite: tiles/mine_ladder_e_s
   mine_ladder_w_n:
-    layer: base2
-    size: [8, 4]
+    layer: object
+    size: [6, 3]
     sprite: tiles/mine_ladder_w_n
   mine_ladder_w_s:
-    layer: base2
-    size: [8, 4]
+    layer: object
+    size: [6, 3]
     sprite: tiles/mine_ladder_w_s
   mine_ladder_n_e:
-    layer: base2
-    size: [4, 8]
+    layer: object
+    size: [3, 6]
     sprite: tiles/mine_ladder_n_e
   mine_ladder_n_w:
-    layer: base2
-    size: [4, 8]
+    layer: object
+    size: [3, 6]
     sprite: tiles/mine_ladder_n_w
   mine_ladder_s_e:
-    layer: base2
-    size: [4, 8]
+    layer: object
+    size: [3, 6]
     sprite: tiles/mine_ladder_s_e
   mine_ladder_s_w:
-    layer: base2
-    size: [4, 8]
+    layer: object
+    size: [3, 6]
     sprite: tiles/mine_ladder_s_w
 

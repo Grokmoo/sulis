@@ -19,7 +19,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_core::io::event;
-use sulis_module::{Conversation, conversation::{MerchantData, OnSelect, Response}, Module};
+use sulis_module::{OnTrigger, MerchantData, Conversation, conversation::{Response}, Module};
 use sulis_state::{EntityState, ChangeListener, GameState};
 use sulis_core::ui::{Widget, WidgetKind};
 use sulis_widgets::{Label, TextArea};
@@ -94,7 +94,7 @@ impl WidgetKind for DialogWindow {
 struct ResponseButton {
     text: String,
     to: Option<String>,
-    on_select: Option<OnSelect>,
+    on_select: Option<OnTrigger>,
 }
 
 impl ResponseButton {
@@ -164,7 +164,7 @@ pub fn is_viewable(response: &Response, pc: &Rc<RefCell<EntityState>>,
     true
 }
 
-pub fn activate(widget: &Rc<RefCell<Widget>>, on_select: &OnSelect,
+pub fn activate(widget: &Rc<RefCell<Widget>>, on_select: &OnTrigger,
                 pc: &Rc<RefCell<EntityState>>, target: &Rc<RefCell<EntityState>>) {
     if let Some(ref flags) = on_select.target_flags {
         for flag in flags.iter() {
@@ -180,6 +180,10 @@ pub fn activate(widget: &Rc<RefCell<Widget>>, on_select: &OnSelect,
 
     if let Some(ref merch) = on_select.show_merchant {
         show_merchant(widget, merch);
+    }
+
+    if let Some(ref cutscene) = on_select.show_cutscene {
+        show_cutscene(widget, cutscene);
     }
 }
 
@@ -202,4 +206,17 @@ fn show_merchant(widget: &Rc<RefCell<Widget>>, merch: &MerchantData) {
     let root = Widget::get_root(widget);
     let root_view = Widget::downcast_kind_mut::<RootView>(&root);
     root_view.set_merchant_window(&root, true, &id);
+}
+
+fn show_cutscene(widget: &Rc<RefCell<Widget>>, cutscene_id: &str) {
+    let cutscene = match Module::cutscene(cutscene_id) {
+        None => {
+            warn!("Unable to find cutscene '{}' for on_trigger", cutscene_id);
+            return;
+        }, Some(cutscene) => cutscene,
+    };
+
+    info!("Showing cutscene '{}'", cutscene_id);
+
+    let root = Widget::get_root(widget);
 }

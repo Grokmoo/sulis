@@ -42,9 +42,16 @@ pub use self::class::Class;
 pub mod conversation;
 pub use self::conversation::Conversation;
 
+pub mod cutscene;
+pub use self::cutscene::Cutscene;
+
 pub mod object_size;
 pub use self::object_size::ObjectSize;
 pub use self::object_size::ObjectSizeIterator;
+
+pub mod on_trigger;
+pub use self::on_trigger::OnTrigger;
+pub use self::on_trigger::MerchantData;
 
 pub mod encounter;
 pub use self::encounter::Encounter;
@@ -99,6 +106,7 @@ use self::area::Tile;
 use self::ability::AbilityBuilder;
 use self::ability_list::AbilityListBuilder;
 use self::conversation::ConversationBuilder;
+use self::cutscene::CutsceneBuilder;
 use self::area::AreaBuilder;
 use self::class::ClassBuilder;
 use self::encounter::EncounterBuilder;
@@ -122,6 +130,7 @@ pub struct Module {
     areas: HashMap<String, Rc<Area>>,
     classes: HashMap<String, Rc<Class>>,
     conversations: HashMap<String, Rc<Conversation>>,
+    cutscenes: HashMap<String, Rc<Cutscene>>,
     encounters: HashMap<String, Rc<Encounter>>,
     items: HashMap<String, Rc<Item>>,
     item_adjectives: HashMap<String, Rc<ItemAdjective>>,
@@ -349,6 +358,10 @@ impl Module {
                 insert_if_ok("encounter", id, Encounter::new(builder, &module), &mut module.encounters);
             }
 
+            for (id, builder) in builder_set.cutscene_builders {
+                insert_if_ok("cutscene", id, Cutscene::new(builder, &module), &mut module.cutscenes);
+            }
+
             for (id, builder) in builder_set.area_builders {
                  insert_if_ok("area", id, Area::new(builder, &module), &mut module.areas);
             }
@@ -381,6 +394,7 @@ impl Module {
         area, areas, Area;
         class, classes, Class;
         conversation, conversations, Conversation;
+        cutscene, cutscenes, Cutscene;
         encounter, encounters, Encounter;
         item, items, Item;
         loot_list, loot_lists, LootList;
@@ -389,6 +403,16 @@ impl Module {
         race, races, Race;
         tile, tiles, Tile
         );
+
+    pub fn script(id: &str) -> Option<String> {
+        MODULE.with(|r| {
+            let module = r.borrow();
+            match module.scripts.get(id) {
+                None => None,
+                Some(ref script) => Some(script.to_string())
+            }
+        })
+    }
 
     pub fn all_actors() -> Vec<Rc<Actor>> {
         MODULE.with(|r| all_resources(&r.borrow().actors))
@@ -430,6 +454,7 @@ impl Default for Module {
             areas: HashMap::new(),
             classes: HashMap::new(),
             conversations: HashMap::new(),
+            cutscenes: HashMap::new(),
             items: HashMap::new(),
             encounters: HashMap::new(),
             props: HashMap::new(),
@@ -449,6 +474,7 @@ struct ModuleBuilder {
     actor_builders: HashMap<String, ActorBuilder>,
     area_builders: HashMap<String, AreaBuilder>,
     class_builders: HashMap<String, ClassBuilder>,
+    cutscene_builders: HashMap<String, CutsceneBuilder>,
     conversation_builders: HashMap<String, ConversationBuilder>,
     encounter_builders: HashMap<String, EncounterBuilder>,
     item_builders: HashMap<String, ItemBuilder>,
@@ -470,6 +496,7 @@ impl ModuleBuilder {
             area_builders: read(&root_dirs, "areas"),
             class_builders: read(&root_dirs, "classes"),
             conversation_builders: read(&root_dirs, "conversations"),
+            cutscene_builders: read(&root_dirs, "cutscenes"),
             encounter_builders: read(&root_dirs, "encounters"),
             item_builders: read(&root_dirs, "items"),
             item_adjectives: read(&root_dirs, "item_adjectives"),

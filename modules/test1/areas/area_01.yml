@@ -10898,6 +10898,10 @@ transitions:
       "y": 39
     to_area: cave_01
     image_display: transition
+triggers:
+  - kind: OnCampaignStart
+    on_activate:
+      show_cutscene: on_campaign_start
 visibility_tile: gui/area_invis
 explored_tile: gui/area_unexplored
 max_vis_distance: 20

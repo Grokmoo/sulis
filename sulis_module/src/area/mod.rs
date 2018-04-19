@@ -36,7 +36,18 @@ use sulis_core::resource::{ResourceBuilder, ResourceSet, Sprite};
 use sulis_core::util::{Point, Size, unable_to_create_error};
 use sulis_core::serde_yaml;
 
-use {Encounter, Item, Module, ObjectSize, Prop};
+use {Encounter, Item, Module, ObjectSize, OnTrigger, Prop};
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub enum TriggerKind {
+    OnCampaignStart,
+}
+
+#[derive(Debug, Clone)]
+pub struct Trigger {
+    pub kind: TriggerKind,
+    pub on_activate: OnTrigger,
+}
 
 #[derive(Debug, Clone)]
 pub struct Transition {
@@ -79,6 +90,7 @@ pub struct Area {
     pub props: Vec<PropData>,
     pub transitions: Vec<Transition>,
     pub encounters: Vec<EncounterData>,
+    pub triggers: Vec<Trigger>,
     pub vis_dist: i32,
     pub vis_dist_squared: i32,
     pub vis_dist_up_one_squared: i32,
@@ -172,6 +184,14 @@ impl Area {
             transitions.push(transition);
         }
 
+        let mut triggers: Vec<Trigger> = Vec::new();
+        for tbuilder in builder.triggers {
+            triggers.push(Trigger {
+                kind: tbuilder.kind,
+                on_activate: tbuilder.on_activate,
+            });
+        }
+
         let visibility_tile = ResourceSet::get_sprite(&builder.visibility_tile)?;
         let explored_tile = ResourceSet::get_sprite(&builder.explored_tile)?;
 
@@ -188,6 +208,7 @@ impl Area {
             visibility_tile,
             explored_tile,
             transitions,
+            triggers,
             vis_dist: builder.max_vis_distance,
             vis_dist_squared: builder.max_vis_distance * builder.max_vis_distance,
             vis_dist_up_one_squared: builder.max_vis_up_one_distance * builder.max_vis_up_one_distance,
@@ -213,8 +234,6 @@ pub struct AreaBuilder {
     pub name: String,
     pub width: usize,
     pub height: usize,
-    pub terrain: HashMap<String, Vec<Vec<usize>>>,
-    pub elevation: Option<Vec<u8>>,
     pub generate: bool,
     pub layers: Vec<String>,
     pub entity_layer: usize,
@@ -222,10 +241,13 @@ pub struct AreaBuilder {
     pub props: Vec<PropDataBuilder>,
     pub encounters: Vec<EncounterDataBuilder>,
     pub transitions: Vec<TransitionBuilder>,
+    pub triggers: Vec<TriggerBuilder>,
     pub visibility_tile: String,
     pub explored_tile: String,
     pub max_vis_distance: i32,
     pub max_vis_up_one_distance: i32,
+    pub terrain: HashMap<String, Vec<Vec<usize>>>,
+    pub elevation: Option<Vec<u8>>,
 }
 
 impl ResourceBuilder for AreaBuilder {
@@ -241,6 +263,13 @@ impl ResourceBuilder for AreaBuilder {
             Err(error) => Err(Error::new(ErrorKind::InvalidData, format!("{}", error)))
         }
     }
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct TriggerBuilder {
+    pub kind: TriggerKind,
+    pub on_activate: OnTrigger,
 }
 
 #[derive(Deserialize, Serialize, Debug)]

@@ -35,6 +35,7 @@ pub struct AreaModel {
     props: Vec<PropData>,
     encounters: Vec<EncounterData>,
     transitions: Vec<Transition>,
+    triggers: Vec<TriggerBuilder>,
     elevation: Vec<u8>,
 
     encounter_sprite: Option<Rc<Sprite>>,
@@ -43,6 +44,8 @@ pub struct AreaModel {
     id: String,
     name: String,
     filename: String,
+    max_vis_distance: i32,
+    max_vis_up_one_distance: i32,
 }
 
 impl AreaModel {
@@ -76,11 +79,14 @@ impl AreaModel {
             props: Vec::new(),
             encounters: Vec::new(),
             transitions: Vec::new(),
+            triggers: Vec::new(),
             encounter_sprite,
             font_renderer,
             id: CONFIG.editor.area.id.clone(),
             name: CONFIG.editor.area.name.clone(),
             filename: CONFIG.editor.area.filename.clone(),
+            max_vis_distance: 20,
+            max_vis_up_one_distance: 6,
         }
     }
 
@@ -353,7 +359,7 @@ impl AreaModel {
         let path = format!("{}/{}", filename_prefix, filename);
         debug!("Loading area state from {}", filename);
 
-        let area_builder: AreaBuilder = match read_single_resource(&path) {
+        let mut area_builder: AreaBuilder = match read_single_resource(&path) {
             Err(e) => {
                 warn!("Unable to load area from {}", path);
                 warn!("{}", e);
@@ -364,6 +370,8 @@ impl AreaModel {
         self.id = area_builder.id;
         self.name = area_builder.name;
         self.filename = filename.to_string();
+        self.max_vis_distance = area_builder.max_vis_distance;
+        self.max_vis_up_one_distance = area_builder.max_vis_up_one_distance;
 
         trace!("Loading area terrain.");
         for &mut (_, ref mut vec) in self.tiles.iter_mut() {
@@ -479,6 +487,10 @@ impl AreaModel {
             });
         }
 
+        trace!("Loading area triggers.");
+        self.triggers.clear();
+        self.triggers.append(&mut area_builder.triggers);
+
         trace!("Loading area elevation.");
         if let Some(ref elev) = area_builder.elevation {
             if elev.len() != area_builder.height * area_builder.width {
@@ -591,8 +603,9 @@ impl AreaModel {
             props,
             encounters,
             transitions,
-            max_vis_distance: 20,
-            max_vis_up_one_distance: 6,
+            triggers: self.triggers.clone(),
+            max_vis_distance: self.max_vis_distance,
+            max_vis_up_one_distance: self.max_vis_up_one_distance,
         };
 
         trace!("Writing to file {}", filename);

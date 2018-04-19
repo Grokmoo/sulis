@@ -3,6 +3,7 @@ id: area_02
 name: Area 02
 width: 76
 height: 124
+triggers: []
 terrain:
   dirt_to_water_n2:
     - - 56

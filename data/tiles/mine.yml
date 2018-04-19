@@ -259,7 +259,7 @@ tiles:
     layer: object
     size: [2, 4]
     sprite: tiles/minecrate1
-    pass: [[0, 0], [1, 0], [2, 0], [0, 1], [1, 1], [2, 1], [0, 2], [1, 2], [2, 2], [0, 3], [1, 3], [2, 3], [3, 3]]
+    pass: [[0, 0], [1, 0], [0, 1], [1, 1], [0, 2], [1, 2]]
   minecrate2:
     layer: object
     size: [2, 2]
@@ -269,12 +269,12 @@ tiles:
     layer: object
     size: [2, 4]
     sprite: tiles/minecrate3
-    pass: [[0, 0], [1, 0], [2, 0], [0, 1], [1, 1], [2, 1], [0, 2], [1, 2], [2, 2], [0, 3], [1, 3], [2, 3], [3, 3]]
+    pass: [[0, 0], [1, 0], [0, 1], [1, 1], [0, 2], [1, 2]]
   minebarrel:
     layer: object
     size: [2, 4]
     sprite: tiles/minebarrel
-    pass: [[0, 0], [1, 0], [2, 0], [0, 1], [1, 1], [2, 1], [0, 2], [1, 2], [2, 2], [0, 3], [1, 3], [2, 3], [3, 3]]
+    pass: [[0, 0], [1, 0], [0, 1], [1, 1], [0, 2], [1, 2]]
   mushrooms2:
     layer: base2
     size: [2, 2]

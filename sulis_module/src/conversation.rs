@@ -21,39 +21,22 @@ use sulis_core::resource::ResourceBuilder;
 use sulis_core::util::{invalid_data_error, unable_to_create_error};
 use sulis_core::serde_yaml;
 
-use {Module};
-
-#[derive(Deserialize, Debug, Clone)]
-#[serde(deny_unknown_fields)]
-pub struct MerchantData {
-    pub id: String,
-    pub loot_list: String,
-    pub buy_frac: f32,
-    pub sell_frac: f32,
-}
-
-#[derive(Deserialize, Debug, Clone)]
-#[serde(deny_unknown_fields)]
-pub struct OnSelect {
-    pub target_flags: Option<Vec<String>>,
-    pub player_flags: Option<Vec<String>>,
-    pub show_merchant: Option<MerchantData>,
-}
+use {Module, OnTrigger};
 
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct Response {
     pub text: String,
     pub to: Option<String>,
-    pub on_select: Option<OnSelect>,
-    pub to_view: Option<OnSelect>,
+    pub on_select: Option<OnTrigger>,
+    pub to_view: Option<OnTrigger>,
 }
 
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 struct Node {
     text: String,
-    on_view: Option<OnSelect>,
+    on_view: Option<OnTrigger>,
     responses: Vec<Response>,
 }
 
@@ -108,7 +91,7 @@ impl Conversation {
 
     // TODO don't panic when getting a node.
 
-    pub fn on_view(&self, node: &str) -> &Option<OnSelect> {
+    pub fn on_view(&self, node: &str) -> &Option<OnTrigger> {
         match self.nodes.get(node) {
             None => panic!("Invalid node"),
             Some(ref node) => &node.on_view,

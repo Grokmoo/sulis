@@ -24,7 +24,7 @@ use sulis_state::{EntityState, ChangeListener, GameState};
 use sulis_core::ui::{Widget, WidgetKind};
 use sulis_widgets::{Label, TextArea};
 
-use {RootView};
+use {CutsceneWindow, RootView};
 
 pub const NAME: &str = "dialog_window";
 
@@ -219,4 +219,7 @@ fn show_cutscene(widget: &Rc<RefCell<Widget>>, cutscene_id: &str) {
     info!("Showing cutscene '{}'", cutscene_id);
 
     let root = Widget::get_root(widget);
+    let window = Widget::with_defaults(CutsceneWindow::new(cutscene));
+    window.borrow_mut().state.set_modal(true);
+    Widget::add_child_to(&root, window);
 }

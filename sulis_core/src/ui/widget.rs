@@ -420,7 +420,7 @@ impl Widget {
 
     fn update_kind_recursive(widget: &Rc<RefCell<Widget>>) {
         let kind = Rc::clone(&widget.borrow().kind);
-        kind.borrow().update(&widget);
+        kind.borrow_mut().update(&widget);
 
         let len = widget.borrow().children.len();
         for i in 0..len {

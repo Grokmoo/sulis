@@ -99,8 +99,8 @@ use sulis_rules::HitKind;
 use sulis_core::config::CONFIG;
 use sulis_core::util::{self, Point};
 use sulis_core::io::{GraphicsRenderer, MainLoopUpdater};
-use sulis_core::ui::Widget;
-use sulis_module::{Ability, Actor, Module};
+use sulis_core::ui::{Widget};
+use sulis_module::{Ability, Actor, Module, OnTrigger, area::TriggerKind};
 
 use script::ScriptEntitySet;
 use script::script_callback::ScriptHitKind;
@@ -132,6 +132,7 @@ pub struct GameState {
     pc: Rc<RefCell<EntityState>>,
     should_exit: bool,
     path_finder: PathFinder,
+    ui_callbacks: Vec<OnTrigger>,
 }
 
 macro_rules! exec_script {
@@ -182,6 +183,16 @@ impl GameState {
         STATE.with(|state| {
             *state.borrow_mut() = Some(game_state);
         });
+
+        let area_state = GameState::area_state();
+        let area_state = area_state.borrow();
+        for trigger in area_state.area.triggers.iter() {
+            match trigger.kind {
+                TriggerKind::OnCampaignStart => {
+                    GameState::add_ui_callback(trigger.on_activate.clone());
+                }, _ => (),
+            }
+        }
 
         Ok(())
     }
@@ -311,6 +322,24 @@ impl GameState {
             path_finder: path_finder,
             pc: pc_state,
             should_exit: false,
+            ui_callbacks: Vec::new(),
+        })
+    }
+
+    pub fn add_ui_callback(on_trigger: OnTrigger) {
+        STATE.with(|s| {
+            let mut state = s.borrow_mut();
+            let state = state.as_mut().unwrap();
+            state.ui_callbacks.push(on_trigger);
+        })
+    }
+
+    pub fn check_get_ui_callback() -> Option<OnTrigger> {
+        STATE.with(|s| {
+            let mut state = s.borrow_mut();
+            let state = state.as_mut().unwrap();
+
+            state.ui_callbacks.pop()
         })
     }
 

@@ -21,22 +21,44 @@ use sulis_core::serde_yaml;
 
 use Module;
 
+pub struct Frame {
+    pub text: String,
+}
+
 pub struct Cutscene {
     pub id: String,
+    pub frames: Vec<Frame>,
 }
 
 impl Cutscene {
     pub fn new(builder: CutsceneBuilder, _module: &Module) -> Result<Cutscene, Error> {
+        let mut frames = Vec::new();
+        for frame_builder in builder.frames {
+            let frame = Frame {
+                text: frame_builder.text
+            };
+            frames.push(frame);
+        }
+
         Ok(Cutscene {
             id: builder.id,
+            frames,
         })
     }
+}
+
+
+#[derive(Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct FrameBuilder {
+    pub text: String,
 }
 
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct CutsceneBuilder {
     pub id: String,
+    pub frames: Vec<FrameBuilder>,
 }
 
 impl ResourceBuilder for CutsceneBuilder {

@@ -50,6 +50,9 @@ pub use self::character_window::CharacterWindow;
 mod class_pane;
 pub use self::class_pane::ClassPane;
 
+mod cutscene_window;
+pub use self::cutscene_window::CutsceneWindow;
+
 mod dialog_window;
 pub use self::dialog_window::DialogWindow;
 
@@ -203,6 +206,16 @@ impl RootView {
 
 impl WidgetKind for RootView {
     widget_kind!(NAME);
+
+    fn update(&mut self, widget: &Rc<RefCell<Widget>>) {
+        match GameState::check_get_ui_callback() {
+            None => (),
+            Some(on_trigger) => {
+                let pc = GameState::pc();
+                dialog_window::activate(widget, &on_trigger, &pc, &pc);
+            }
+        }
+    }
 
     fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
         use sulis_core::io::InputAction::*;

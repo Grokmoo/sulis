@@ -109,6 +109,7 @@ use self::conversation::ConversationBuilder;
 use self::cutscene::CutsceneBuilder;
 use self::area::AreaBuilder;
 use self::class::ClassBuilder;
+use self::game::GameBuilder;
 use self::encounter::EncounterBuilder;
 use self::item::ItemBuilder;
 use self::loot_list::LootListBuilder;
@@ -154,7 +155,7 @@ impl ModuleInfo {
         let path_str = path.to_string_lossy().to_string();
         debug!("Checking module at '{}'", path_str);
 
-        let game: Game = read_single_resource(&format!("{}/module", path_str))?;
+        let game: GameBuilder = read_single_resource(&format!("{}/module", path_str))?;
 
         Ok(ModuleInfo {
             dir: path_str,
@@ -367,7 +368,8 @@ impl Module {
             }
         });
 
-        let game = read_single_resource(&format!("{}/module", root_dir))?;
+        let game_builder = read_single_resource(&format!("{}/module", root_dir))?;
+        let game = Game::new(game_builder)?;
         let rules = read_single_resource(&format!("{}/rules", root_dir))?;
 
         MODULE.with(move |m| {

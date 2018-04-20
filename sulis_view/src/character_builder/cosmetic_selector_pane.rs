@@ -123,7 +123,7 @@ impl CosmeticSelectorPane {
     fn set_finish_enabled(&self, widget: &Rc<RefCell<Widget>>) {
         let parent = Widget::get_parent(widget);
         let builder = Widget::downcast_kind_mut::<CharacterBuilder>(&parent);
-        builder.finish.borrow_mut().state.set_enabled(self.name.len() > 1 && self.portrait.is_some());
+        builder.next.borrow_mut().state.set_enabled(self.name.len() > 1 && self.portrait.is_some());
     }
 }
 
@@ -153,17 +153,12 @@ impl BuilderPane for CosmeticSelectorPane {
             self.items = items.clone();
         }
 
-        builder.prev.borrow_mut().state.set_enabled(true);
-        builder.next.borrow_mut().state.set_enabled(false);
-        builder.next.borrow_mut().state.set_visible(false);
-        builder.finish.borrow_mut().state.set_visible(true);
-        builder.finish.borrow_mut().state.set_enabled(self.name.len() > 1 && self.portrait.is_some());
+        builder.next.borrow_mut().state.set_enabled(self.name.len() > 1 && self.portrait.is_some());
         self.build_preview();
         widget.borrow_mut().invalidate_children();
     }
 
-    // since this is the last pane, this is called prior to saving
-    fn next(&mut self, builder: &mut CharacterBuilder, _widget: Rc<RefCell<Widget>>) {
+    fn next(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
         builder.sex = Some(self.sex);
         builder.name = self.name.to_string();
         builder.images = self.build_images();
@@ -174,13 +169,12 @@ impl BuilderPane for CosmeticSelectorPane {
             None => None,
             Some(ref image) => Some(image.id()),
         };
+        builder.next(&widget);
     }
 
     fn prev(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
         self.portrait = None;
         self.hue = Some(0.0);
-        builder.next.borrow_mut().state.set_visible(true);
-        builder.finish.borrow_mut().state.set_visible(false);
         builder.prev(&widget);
     }
 }

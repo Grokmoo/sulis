@@ -263,6 +263,42 @@ children:
             from: .spinner
             position: [0, 100]
             x_relative: Max
+      backstory_selector_pane:
+        from: .builder_pane
+        border: { top: 0, bottom: 5, left: 5, right: 5 }
+        children:
+          start_over:
+            from: .button
+            text: "Start Over"
+            preferred_size: [25, 6]
+            position: [115, 3]
+          title:
+            text: "Customize your Backstory"
+          node:
+            width_relative: Max
+            preferred_size: [0, -8]
+            position: [0, 18]
+            text_params:
+              font: "normal"
+              scale: 4.0
+            text: "#0#"
+          responses:
+            y_relative: Max
+            layout: BoxVertical
+            layout_spacing: { top: 0, bottom: 1, left: 0, right: 0 }
+            width_relative: Max
+            height_relative: ChildSum
+            preferred_size: [0, 10]
+            children:
+              response_button:
+                from: .button
+                width_relative: Max
+                preferred_size: [0, 6]
+                children:
+                  text_area:
+                    from: .text_area
+                    text: "#0#"
+                    width_relative: Max
       cosmetic_selector_pane:
         from: .builder_pane
         children:

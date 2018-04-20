@@ -20,6 +20,9 @@ use self::ability_selector_pane::AbilitySelectorPane;
 mod attribute_selector_pane;
 use self::attribute_selector_pane::AttributeSelectorPane;
 
+mod backstory_selector_pane;
+use self::backstory_selector_pane::BackstorySelectorPane;
+
 mod class_selector_pane;
 use self::class_selector_pane::ClassSelectorPane;
 
@@ -211,13 +214,16 @@ impl BuilderSet for CharacterCreator {
         let race_selector_pane = RaceSelectorPane::new();
         let class_selector_pane = ClassSelectorPane::new(class_choices, true);
         let attribute_selector_pane = AttributeSelectorPane::new();
+        let backstory_selector_pane = BackstorySelectorPane::new();
         let cosmetic_selector_pane = CosmeticSelectorPane::new();
         let race_sel_widget = Widget::with_defaults(race_selector_pane.clone());
         let class_sel_widget = Widget::with_defaults(class_selector_pane.clone());
         let attr_sel_widget = Widget::with_defaults(attribute_selector_pane.clone());
+        let backstory_sel_widget = Widget::with_defaults(backstory_selector_pane.clone());
         let cosmetic_sel_widget = Widget::with_defaults(cosmetic_selector_pane.clone());
         class_sel_widget.borrow_mut().state.set_visible(false);
         attr_sel_widget.borrow_mut().state.set_visible(false);
+        backstory_sel_widget.borrow_mut().state.set_visible(false);
         cosmetic_sel_widget.borrow_mut().state.set_visible(false);
         builder.finish.borrow_mut().state.set_visible(false);
 
@@ -227,10 +233,10 @@ impl BuilderSet for CharacterCreator {
         builder.builder_panes.push(class_selector_pane.clone());
         builder.builder_panes.push(attribute_selector_pane.clone());
         builder.builder_panes.push(cosmetic_selector_pane.clone());
-
+        builder.builder_panes.push(backstory_selector_pane.clone());
         race_selector_pane.borrow_mut().on_selected(builder, Rc::clone(&race_sel_widget));
 
-        vec![race_sel_widget, class_sel_widget, attr_sel_widget, cosmetic_sel_widget]
+        vec![race_sel_widget, class_sel_widget, attr_sel_widget, cosmetic_sel_widget, backstory_sel_widget]
     }
 
     fn finish(&self, builder: &mut CharacterBuilder, widget: &Rc<RefCell<Widget>>) {
@@ -265,6 +271,11 @@ impl BuilderSet for CharacterCreator {
             }
         }
 
+        let mut abilities = Vec::new();
+        for ability in builder.abilities.iter() {
+            abilities.push(ability.id.to_string());
+        }
+
         let actor = ActorBuilder {
             id,
             name: builder.name.to_string(),
@@ -283,7 +294,7 @@ impl BuilderSet for CharacterCreator {
             levels,
             xp: None,
             reward: None,
-            abilities: None,
+            abilities: Some(abilities),
         };
 
         info!("Writing character to {}", filename);

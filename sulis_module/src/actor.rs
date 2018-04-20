@@ -97,19 +97,22 @@ impl PartialEq for Actor {
 }
 
 impl Actor {
-    pub fn from(other: &Actor, class_to_add: Rc<Class>, xp: u32,
+    pub fn from(other: &Actor, class_to_add: Option<Rc<Class>>, xp: u32,
                 mut abilities_to_add: Vec<Rc<Ability>>) -> Actor {
-        let mut added = false;
-        let mut levels = other.levels.clone();
-        for &mut (ref existing_class, ref mut level) in levels.iter_mut() {
-            if *existing_class == class_to_add {
-                *level += 1;
-                added = true;
-            }
-        }
 
-        if !added {
-            levels.push((class_to_add, 1));
+        let mut levels = other.levels.clone();
+        if let Some(class_to_add) = class_to_add {
+            let mut added = false;
+            for &mut (ref existing_class, ref mut level) in levels.iter_mut() {
+                if *existing_class == class_to_add {
+                    *level += 1;
+                    added = true;
+                }
+            }
+
+            if !added {
+                levels.push((class_to_add, 1));
+            }
         }
 
         let image_layers = other.image_layers.clone();

@@ -19,7 +19,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_core::io::event;
-use sulis_module::{OnTrigger, MerchantData, Conversation, conversation::{Response}, Module};
+use sulis_module::{Actor, OnTrigger, MerchantData, Conversation, conversation::{Response}, Module};
 use sulis_state::{EntityState, ChangeListener, GameState};
 use sulis_core::ui::{Widget, WidgetKind};
 use sulis_widgets::{Label, TextArea};
@@ -159,6 +159,18 @@ pub fn is_viewable(response: &Response, pc: &Rc<RefCell<EntityState>>,
                 if !pc.borrow_mut().has_custom_flag(flag) { return false; }
             }
         }
+
+        if let Some(ref ability_to_find) = on_select.player_ability {
+            let mut has_ability = false;
+            for ability in pc.borrow().actor.actor.abilities.iter() {
+                if &ability.id == ability_to_find {
+                    has_ability = true;
+                    break;
+                }
+            }
+
+            if !has_ability { return false; }
+        }
     }
 
     true
@@ -166,6 +178,20 @@ pub fn is_viewable(response: &Response, pc: &Rc<RefCell<EntityState>>,
 
 pub fn activate(widget: &Rc<RefCell<Widget>>, on_select: &OnTrigger,
                 pc: &Rc<RefCell<EntityState>>, target: &Rc<RefCell<EntityState>>) {
+    if let Some(ref ability_id) = on_select.player_ability {
+        let ability = match Module::ability(ability_id) {
+            None => {
+                warn!("No ability found for '{}' when activating on_trigger", ability_id);
+                return;
+            }, Some(ability) => ability,
+        };
+
+        let mut pc = pc.borrow_mut();
+        let state = &mut pc.actor;
+        let new_actor = Actor::from(&state.actor, None, state.actor.xp, vec![ability]);
+        state.replace_actor(new_actor);
+    }
+
     if let Some(ref flags) = on_select.target_flags {
         for flag in flags.iter() {
             target.borrow_mut().set_custom_flag(flag);

@@ -119,7 +119,7 @@ impl ActorState {
         self.effects.iter()
     }
 
-    pub fn level_up(&mut self, new_actor: Actor) {
+    pub fn replace_actor(&mut self, new_actor: Actor) {
         self.actor = Rc::new(new_actor);
 
         for ability in self.actor.abilities.iter() {

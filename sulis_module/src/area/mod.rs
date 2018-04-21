@@ -38,9 +38,10 @@ use sulis_core::serde_yaml;
 
 use {Encounter, Item, Module, ObjectSize, OnTrigger, Prop};
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub enum TriggerKind {
     OnCampaignStart,
+    OnAreaLoad,
 }
 
 #[derive(Debug, Clone)]

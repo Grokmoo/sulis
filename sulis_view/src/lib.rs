@@ -321,6 +321,8 @@ impl WidgetKind for RootView {
         let ap_bar = Widget::with_defaults(ApBar::new(pc));
 
         let ticker = Widget::with_defaults(InitiativeTicker::new());
+
+        // area widget must be the first entry in the children list
         vec![area_widget, right_pane, ap_bar, ticker]
     }
 }

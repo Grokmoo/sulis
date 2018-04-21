@@ -1,0 +1,7 @@
+id: on_cave_enter
+frames:
+  - text: This is a first test frame.
+  - text: |
+      This is a multi line text entry for a frame.
+      This is a second line.
+

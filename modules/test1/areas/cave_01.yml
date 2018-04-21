@@ -7047,7 +7047,10 @@ layers:
   - aerial
 entity_layer: 4
 actors: []
-triggers: []
+triggers:
+  - kind: OnAreaLoad
+    on_activate:
+      show_cutscene: on_cave_enter
 props:
   - id: chest_xl_level1_armor
     location:
@@ -7097,8 +7100,8 @@ transitions:
       "y": 39
     size: 4by3
     to:
-      x: 1
-      "y": 1
+      x: 95
+      "y": 5
     to_area: area_01
     image_display: transition
 visibility_tile: gui/area_invis

@@ -51,7 +51,7 @@ groups:
       whirlwind5: [192, 0]
   crossed_swords:
     size: [20, 20]
-    position: [116, 0]
+    position: [121, 0]
     areas:
       crossed_swords1: [0, 0]
       crossed_swords2: [20, 0]

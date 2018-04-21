@@ -242,7 +242,7 @@ fn show_cutscene(widget: &Rc<RefCell<Widget>>, cutscene_id: &str) {
         }, Some(cutscene) => cutscene,
     };
 
-    info!("Showing cutscene '{}'", cutscene_id);
+    info!("Showing cutscene '{}' with {} frames.", cutscene_id, cutscene.frames.len());
 
     let root = Widget::get_root(widget);
     let window = Widget::with_defaults(CutsceneWindow::new(cutscene));

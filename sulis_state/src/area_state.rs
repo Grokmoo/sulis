@@ -49,6 +49,8 @@ pub struct AreaState {
     targeter: Option<Rc<RefCell<Box<Targeter>>>>,
 
     merchants: Vec<Merchant>,
+
+    pub on_load_fired: bool,
 }
 
 impl PartialEq for AreaState {
@@ -155,6 +157,7 @@ impl AreaState {
             last_time_millis: 0,
             targeter: None,
             merchants: Vec::new(),
+            on_load_fired: false,
         }
     }
 

@@ -54,35 +54,7 @@ props:
       x: 83
       "y": 6
     items: []
-encounters:
-  - id: goblins_level1
-    location:
-      x: 20
-      "y": 51
-    size:
-      width: 16
-      height: 10
-  - id: goblins_level1
-    location:
-      x: 67
-      "y": 57
-    size:
-      width: 10
-      height: 10
-  - id: goblins_level1
-    location:
-      x: 79
-      "y": 8
-    size:
-      width: 15
-      height: 10
-  - id: goblins_level1
-    location:
-      x: 29
-      "y": 30
-    size:
-      width: 10
-      height: 10
+encounters: []
 transitions:
   - from:
       x: 79

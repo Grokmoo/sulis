@@ -100,7 +100,7 @@ use sulis_core::config::CONFIG;
 use sulis_core::util::{self, Point};
 use sulis_core::io::{GraphicsRenderer, MainLoopUpdater};
 use sulis_core::ui::{Widget};
-use sulis_module::{Ability, Actor, Module, OnTrigger, area::TriggerKind};
+use sulis_module::{Ability, Actor, Module, OnTrigger, area::{Trigger, TriggerKind}};
 
 use script::ScriptEntitySet;
 use script::script_callback::ScriptHitKind;
@@ -185,14 +185,10 @@ impl GameState {
         });
 
         let area_state = GameState::area_state();
+        area_state.borrow_mut().on_load_fired = true;
         let area_state = area_state.borrow();
-        for trigger in area_state.area.triggers.iter() {
-            match trigger.kind {
-                TriggerKind::OnCampaignStart => {
-                    GameState::add_ui_callback(trigger.on_activate.clone());
-                }, _ => (),
-            }
-        }
+        GameState::add_ui_callbacks_of_kind(&area_state.area.triggers, TriggerKind::OnCampaignStart);
+        GameState::add_ui_callbacks_of_kind(&area_state.area.triggers, TriggerKind::OnAreaLoad);
 
         Ok(())
     }
@@ -257,6 +253,13 @@ impl GameState {
                 entity.borrow_mut().clear_texture_cache();
             }
         });
+
+        let area_state = GameState::area_state();
+        let mut area_state = area_state.borrow_mut();
+        if !area_state.on_load_fired {
+            area_state.on_load_fired = true;
+            GameState::add_ui_callbacks_of_kind(&area_state.area.triggers, TriggerKind::OnAreaLoad);
+        }
     }
 
     fn check_location(p: &Point, area_state: &Rc<RefCell<AreaState>>) -> bool {
@@ -326,11 +329,16 @@ impl GameState {
         })
     }
 
-    pub fn add_ui_callback(on_trigger: OnTrigger) {
+    pub fn add_ui_callbacks_of_kind(callbacks: &Vec<Trigger>, kind: TriggerKind) {
         STATE.with(|s| {
             let mut state = s.borrow_mut();
             let state = state.as_mut().unwrap();
-            state.ui_callbacks.push(on_trigger);
+
+            for cb in callbacks.iter() {
+                if cb.kind == kind {
+                    state.ui_callbacks.push(cb.on_activate.clone());
+                }
+            }
         })
     }
 

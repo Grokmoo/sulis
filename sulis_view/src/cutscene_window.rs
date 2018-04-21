@@ -19,9 +19,8 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_module::{Cutscene};
-use sulis_core::io::event;
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_widgets::{Button, Label, TextArea};
+use sulis_widgets::{Button, TextArea};
 
 pub const NAME: &str = "cutscene_window";
 
@@ -54,20 +53,18 @@ impl WidgetKind for CutsceneWindow {
         let close = Widget::with_theme(Button::empty(), "close");
         close.borrow_mut().state.add_callback(Callback::remove_parent());
 
-        let click_label = Widget::with_theme(Label::empty(), "click_label");
+        let next_button = Widget::with_theme(Button::empty(), "next_button");
+        next_button.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+            let parent = Widget::get_parent(&widget);
+            let window = Widget::downcast_kind_mut::<CutsceneWindow>(&parent);
+            window.frame_index += 1;
+            parent.borrow_mut().invalidate_children();
+        })));
 
         let text_area = Widget::with_defaults(TextArea::empty());
 
         text_area.borrow_mut().state.add_text_arg("0", &frame.text);
 
-        vec![close, click_label, text_area]
-    }
-
-    fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: event::ClickKind) -> bool {
-        self.super_on_mouse_release(widget, kind);
-
-        widget.borrow_mut().invalidate_children();
-        self.frame_index += 1;
-        true
+        vec![close, text_area, next_button]
     }
 }

@@ -195,6 +195,7 @@ children:
           color: { r: 1.0, g: 0.0, b: 0.0, a: 1.0 }
         text: "Select target for #ability_id#"
   cutscene_window:
+    border: [5, 5, 5, 5]
     width_relative: Max
     height_relative: Max
     background: bg_base
@@ -203,15 +204,13 @@ children:
         from: .button
         preferred_size: [8, 4]
         text: "X"
-        position: [-3, 3]
         x_relative: Max
-      click_label:
-        from: .label
-        text: "Click to continue"
-        width_relative: Max
-        preferred_size: [0, 10]
+      next_button:
+        from: .button
+        text: "Continue"
+        x_relative: Center
+        preferred_size: [30, 10]
         y_relative: Max
-        position: [0, -10]
       text_area:
         border: [2, 2, 2, 2]
         text_params:
@@ -222,7 +221,7 @@ children:
         width_relative: Max
         y_relative: Max
         x_relative: Center
-        position: [0, -50]
+        position: [0, -20]
         preferred_size: [-10, 40]
   dialog_window:
     from: .window

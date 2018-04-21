@@ -20,6 +20,12 @@ children:
     children:
       loading_screen:
         from: .loading_screen
+      exit:
+        from: .button
+        text: "Exit"
+        x_relative: Max
+        position: [-5, 5]
+        preferred_size: [15, 8]
       title:
         from: .label
         text_params:
@@ -73,6 +79,12 @@ children:
     children:
       loading_screen:
         from: .loading_screen
+      exit:
+        from: .button
+        text: "Exit"
+        x_relative: Max
+        position: [-5, 5]
+        preferred_size: [15, 8]
       title:
         from: .label
         text_params:
@@ -80,7 +92,7 @@ children:
         text: "Select a Character"
         x_relative: Center
         preferred_size: [40, 10]
-        position: [0, 10]
+        position: [0, 20]
       characters_title:
         from: .label
         text_params:

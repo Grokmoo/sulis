@@ -1,7 +1,24 @@
 id: on_campaign_start
 frames:
-  - text: This is a first test frame.
   - text: |
-      This is a multi line text entry for a frame.
-      This is a second line.
-
+      Listen closely, for what I'm about to tell you is true.  At least, as best as I can remember it.
+  - text: |
+      Millenia ago, when the world was young, magic flowed freely across the land.  It could raise oceans from the deep or topple mighty mountains.  At that time, in every tiny village there lived a wizard who could rival the best of our age.
+  - text: |
+      And in the great cities there were orders of mages with power beyond reckoning - power enough to reshape the land according to their every whim.
+  - text: |
+      The greatest city of all was Xandala, shining jewel of the west.  Greatest it was, because it had the greatest mages.  And the greatest mage of all was the Wizard Emperor Usuvior.
+  - text: |
+      The armies of Xandala were unbeatable - fueled by the most terrible of magics.  They swept over the world, conquering everything in their path.  But even total dominion over Eao could not satisfy the power lust of Usuvior.
+  - text: |
+      Usuvior wished to become a god - and not just any God, but the most powerful of all gods.  For centuries, he gathered his power, until at last he was ready.
+  - text: |
+      Casting a spell the likes of which this world has never seen - before or since - Usuvior mantled Sulis, the god of magic, in an attempt to steal his power.
+  - text: |
+      Such was Usuvior's raw power and cunning that he almost succeeded.  But, blinded by hubris, he had not fully appreciated that control over all magic meant the management of all magic - a task far too large for any mortal mind, even one so great as Usuvior's.
+  - text: |
+      The ensuing magical backlash reshaped the land, sinking entire continents, and utterly destroying Xandala - and Usuvior.
+  - text: |
+      The only reason that all of Eao was not sent into utter ruin was the sacrifice of Sulis - using all of his remaining strength, the god sealed off nearly all magic from the mortal world.
+  - text: |
+      And so today, even great and learned wizards must struggle for a lifetime to master the simplest of spells - spells that were commonplace in those early days of the world.

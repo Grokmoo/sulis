@@ -49,7 +49,7 @@ impl MainLoopUpdater for LoopUpdater {
 
 pub struct CharacterSelector {
     selected: Option<Rc<Actor>>,
-
+    first_add: bool,
     to_select: Option<String>,
 }
 
@@ -58,6 +58,7 @@ impl CharacterSelector {
         Rc::new(RefCell::new(CharacterSelector {
             selected: None,
             to_select: None,
+            first_add: true,
         }))
     }
 
@@ -115,7 +116,6 @@ impl WidgetKind for CharacterSelector {
             let parent = Widget::get_parent(&widget);
 
             let builder = Widget::with_defaults(CharacterBuilder::new());
-            builder.borrow_mut().state.set_modal(true);
             Widget::add_child_to(&parent, builder);
         })));
 
@@ -148,6 +148,7 @@ impl WidgetKind for CharacterSelector {
         })));
         delete_character_button.borrow_mut().state.set_enabled(self.selected.is_some());
 
+        let mut must_create_character = true;
         let characters_pane = Widget::empty("characters_pane");
         {
             let characters = Module::get_available_characters();
@@ -184,6 +185,7 @@ impl WidgetKind for CharacterSelector {
 
                 actor_button.borrow_mut().state.add_callback(actor_callback(actor));
 
+                must_create_character = false;
                 Widget::add_child_to(&characters_pane, actor_button);
             }
         }
@@ -209,8 +211,25 @@ impl WidgetKind for CharacterSelector {
             Widget::with_theme(TextArea::empty(), "details")
         };
 
-        vec![title, chars_title, characters_pane, new_character_button,
-            delete_character_button, play_button, details]
+        let exit = Widget::with_theme(Button::empty(), "exit");
+        exit.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+            EXIT.with(|exit| *exit.borrow_mut() = true);
+
+            let parent = Widget::get_parent(&widget);
+            let sel = Widget::downcast_kind_mut::<CharacterSelector>(&parent);
+            sel.selected = None;
+        })));
+
+        let mut children = vec![title, chars_title, characters_pane, new_character_button,
+            delete_character_button, play_button, details, exit];
+
+        if self.first_add && must_create_character {
+            let builder = Widget::with_defaults(CharacterBuilder::new());
+            children.push(builder);
+        }
+        self.first_add = false;
+
+        children
     }
 }
 

@@ -147,6 +147,12 @@ impl WidgetKind for MainMenuView {
         })));
         play.borrow_mut().state.disable();
 
-        vec![title, modules_title, play, modules_list, details]
+        let exit = Widget::with_theme(Button::empty(), "exit");
+        exit.borrow_mut().state.add_callback(Callback::new(Rc::new(|_, _| {
+            EXIT.with(|exit| *exit.borrow_mut() = true);
+            SELECTED_MODULE.with(|m| *m.borrow_mut() = None);
+        })));
+
+        vec![title, modules_title, play, modules_list, details, exit]
     }
 }

@@ -1,7 +1,4 @@
 id: on_cave_enter
 frames:
-  - text: This is a first test frame.
-  - text: |
-      This is a multi line text entry for a frame.
-      This is a second line.
+  - text: This cave appears to be an abandoned mine.  You wonder what foul creatures lurk in the darkness.
 

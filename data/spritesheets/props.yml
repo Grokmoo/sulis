@@ -4,6 +4,18 @@ size: [ 1024, 1024 ]
 simple_image_gen_scale: 16
 grid_multiplier: 16
 groups:
+  tents:
+    size: [6, 6]
+    position: [33, 3]
+    areas:
+      tent01: [0, 0]
+      tent02: [6, 0]
+  wagons:
+    size: [4, 3]
+    position: [11, 4]
+    areas:
+      wagon01: [0, 0]
+      wagon02: [4, 0]
   transition:
     size: [4, 3]
     position: [40, 0]

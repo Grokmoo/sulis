@@ -1,7 +1,7 @@
-starting_area: area_01
-starting_location: [2, 2]
-name: "Test Module 1"
+starting_area: wellswood_road
+starting_location: [51, 125]
+name: "The Twin Expanse"
 description: |
-  This is the test module for Sulis.
-  Pick your [c=F00|character] and begin play.
+  Leaving your home at a young age, you have the spent the last year on the road learning the craft of an adventurer.
+  Now, you have joined up with a small band of like souls in The Twin Expanse, on the road to the town of Wellswood.
 backstory_conversation: backstory

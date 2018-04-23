@@ -32,8 +32,132 @@ groups:
     position: [0, 0]
     prefix: dirt_light_
     from_template: borders
+  dirt_med:
+    position: [3, 0]
+    prefix: dirt_med_
+    from_template: borders
+  dirt_dark:
+    position: [6, 0]
+    prefix: dirt_dark_
+    from_template: borders
+  rocks_white:
+    position: [9, 0]
+    prefix: rocks_white_
+    from_template: borders
+  rocks_light:
+    position: [12, 0]
+    prefix: rocks_light_
+    from_template: borders
+  rocks_med:
+    position: [15, 0]
+    prefix: rocks_med_
+    from_template: borders
+  rocks_dark:
+    position: [18, 0]
+    prefix: rocks_dark_
+    from_template: borders
+  pit_brown:
+    position: [21, 0]
+    prefix: pit_brown_
+    from_template: borders
+  pit_black:
+    position: [24, 0]
+    prefix: pit_black_
+    from_template: borders
+  earth:
+    position: [27, 0]
+    prefix: earth_
+    from_template: borders
+  grass_med:
+    position: [0, 7]
+    prefix: grass_med_
+    from_template: borders
+  grass_light:
+    position: [3, 7]
+    prefix: grass_light_
+    from_template: borders
+  grass_dark:
+    position: [6, 7]
+    prefix: grass_dark_
+    from_template: borders
+  grass_dead:
+    position: [9, 7]
+    prefix: grass_dead_
+    from_template: borders
+  pit_dark:
+    position: [12, 7]
+    prefix: pit_dark_
+    from_template: borders
+  sand:
+    position: [15, 7]
+    prefix: sand_
+    from_template: borders
+  ice:
+    position: [18, 7]
+    prefix: ice_
+    from_template: borders
+  snow:
+    position: [21, 7]
+    prefix: snow_
+    from_template: borders
+  gravel:
+    position: [24, 7]
+    prefix: gravel_
+    from_template: borders
+  mud:
+    position: [27, 7]
+    prefix: mud_
+    from_template: borders
+  water_light:
+    position: [0, 14]
+    prefix: water_light_
+    from_template: borders
+  water_med:
+    position: [3, 14]
+    prefix: water_med_
+    from_template: borders
+  water_dark:
+    position: [6, 14]
+    prefix: water_dark_
+    from_template: borders
+  water_poison:
+    position: [9, 14]
+    prefix: water_poison_
+    from_template: borders
+  water_swamp:
+    position: [12, 14]
+    prefix: water_swamp_
+    from_template: borders
+  lava:
+    position: [15, 14]
+    prefix: lava_
+    from_template: borders
+  cobble_sand:
+    position: [18, 14]
+    prefix: cobble_sand_
+    from_template: borders
+  cobble_white:
+    position: [21, 14]
+    prefix: cobble_white_
+    from_template: borders
+  cobble_clay:
+    position: [24, 14]
+    prefix: cobble_clay_
+    from_template: borders
+  cobble_stone:
+    position: [27, 14]
+    prefix: cobble_stone_
+    from_template: borders
+  cobble_dirt:
+    position: [0, 21]
+    prefix: cobble_dirt_
+    from_template: borders
+  cobble_plain:
+    position: [7, 21]
+    prefix: cobble_plain_
+    from_template: borders
   cliffs:
-    position: [0, 45]
+    position: [0, 28]
     size: [1, 1]
     areas:
       cliffs_w: [0, 3]
@@ -45,8 +169,10 @@ groups:
       cliffs_rocks1: [1, 8]
       cliffs_rocks2: [3, 8]
       cliffs_rocks3: [4, 8]
+      cliffs_ne: [5, 3]
+      cliffs_nw: [6, 3]
   cliffs_dark:
-    position: [0, 45]
+    position: [0, 28]
     size: [1, 1]
     prefix: cliffs_dark_
     areas:
@@ -70,7 +196,7 @@ groups:
       edge_overlap_se: [4, 3]
       rocks1: [2, 8]
   cliffs_light:
-    position: [0, 45]
+    position: [0, 28]
     size: [1, 1]
     prefix: cliffs_light_
     areas:
@@ -78,7 +204,6 @@ groups:
       outer_edge_n: [6, 0]
       outer_edge_ne: [7, 0]
       outer_edge_w: [5, 1]
-      base: [6, 1]
       outer_edge_e: [7, 1]
       outer_edge_sw: [5, 2]
       outer_edge_s: [6, 2]
@@ -102,12 +227,14 @@ groups:
       ramp_top_ne: [6, 4]
       ramp_top_sw: [5, 5]
       ramp_top_se: [6, 5]
-      ramp_mid_nw: [7, 5]
-      ramp_mid_sw: [7, 6]
+      ramp_mid_ne: [7, 5]
+      ramp_mid_se: [7, 6]
       ramp_bot_e: [8, 6]
       ramp_bot_se: [8, 7]
+      ramp_bot_nw: [3, 4]
+      ramp_bot_ne: [4, 4]
   misc_cliffs:
-    position: [0, 45]
+    position: [0, 28]
     areas:
       cliffs_cave_small: [0, 5, 1, 2]
       cliffs_cave_large: [1, 5, 2, 3]

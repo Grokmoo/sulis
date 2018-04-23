@@ -1,5 +1,21 @@
 id: tileset
 uniform_sets:
+  base_impass:
+    layer: base
+    size: [2, 2]
+    sprite_prefix: "tileset/"
+    impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+    invis: []
+    tiles: [
+      cliffs_c, cliffs_dark_base,
+      water_light_base, water_light_base_variant1, water_light_base_variant2, water_light_base_variant3,
+      water_med_base, water_med_base_variant1, water_med_base_variant2, water_med_base_variant3,
+      water_dark_base, water_dark_base_variant1, water_dark_base_variant2, water_dark_base_variant3,
+      water_poison_base, water_poison_base_variant1, water_poison_base_variant2, water_poison_base_variant3,
+      water_swamp_base, water_swamp_base_variant1, water_swamp_base_variant2, water_swamp_base_variant3,
+      lava_base, lava_base_variant1, lava_base_variant2, lava_base_variant3,
+      pit_brown_base, pit_black_base, pit_dark_base
+    ]
   base_all_passable:
     layer: base
     size: [2, 2]
@@ -8,6 +24,28 @@ uniform_sets:
     invis: []
     tiles: [
       dirt_light_base, dirt_light_base_variant1, dirt_light_base_variant2, dirt_light_base_variant3,
+      dirt_med_base, dirt_med_base_variant1, dirt_med_base_variant2, dirt_med_base_variant3,
+      dirt_dark_base, dirt_dark_base_variant1, dirt_dark_base_variant2, dirt_dark_base_variant3,
+      grass_light_base, grass_light_base_variant1, grass_light_base_variant2, grass_light_base_variant3,
+      grass_med_base, grass_med_base_variant1, grass_med_base_variant2, grass_med_base_variant3,
+      grass_dark_base, grass_dark_base_variant1, grass_dark_base_variant2, grass_dark_base_variant3,
+      grass_dead_base, grass_dead_base_variant1, grass_dead_base_variant2, grass_dead_base_variant3,
+      rocks_white_base, rocks_white_base_variant1, rocks_white_base_variant2, rocks_white_base_variant3,
+      rocks_light_base, rocks_light_base_variant1, rocks_light_base_variant2, rocks_light_base_variant3,
+      rocks_med_base, rocks_med_base_variant1, rocks_med_base_variant2, rocks_med_base_variant3,
+      rocks_dark_base, rocks_dark_base_variant1, rocks_dark_base_variant2, rocks_dark_base_variant3,
+      sand_base, sand_base_variant1, sand_base_variant2, sand_base_variant3,
+      ice_base, ice_base_variant1, ice_base_variant2, ice_base_variant3,
+      snow_base, snow_base_variant1, snow_base_variant2, snow_base_variant3,
+      gravel_base, gravel_base_variant1, gravel_base_variant2, gravel_base_variant3,
+      earth_base, earth_base_variant1, earth_base_variant2, earth_base_variant3,
+      mud_base, mud_base_variant1, mud_base_variant2, mud_base_variant3,
+      cobble_sand_base, cobble_sand_base_variant1, cobble_sand_base_variant2, cobble_sand_base_variant3,
+      cobble_white_base, cobble_white_base_variant1, cobble_white_base_variant2, cobble_white_base_variant3,
+      cobble_clay_base, cobble_clay_base_variant1, cobble_clay_base_variant2, cobble_clay_base_variant3,
+      cobble_stone_base, cobble_stone_base_variant1, cobble_stone_base_variant2, cobble_stone_base_variant3,
+      cobble_dirt_base, cobble_dirt_base_variant1, cobble_dirt_base_variant2, cobble_dirt_base_variant3,
+      cobble_plain_base, cobble_plain_base_variant1, cobble_plain_base_variant2, cobble_plain_base_variant3,
     ]
   base2_all_passable:
     layer: base2
@@ -19,7 +57,133 @@ uniform_sets:
       dirt_light_top1, dirt_light_top2, dirt_light_sw_to_ne, dirt_light_nw_to_se,
       dirt_light_inner_edge_se, dirt_light_inner_edge_sw, dirt_light_inner_edge_ne, dirt_light_inner_edge_nw,
       dirt_light_outer_edge_nw, dirt_light_outer_edge_n, dirt_light_outer_edge_ne, dirt_light_outer_edge_w,
-      dirt_light_outer_edge_e, dirt_light_outer_edge_sw, dirt_light_outer_edge_s, dirt_light_outer_edge_se
+      dirt_light_outer_edge_e, dirt_light_outer_edge_sw, dirt_light_outer_edge_s, dirt_light_outer_edge_se,
+      
+      dirt_med_top1, dirt_med_top2, dirt_med_sw_to_ne, dirt_med_nw_to_se,
+      dirt_med_inner_edge_se, dirt_med_inner_edge_sw, dirt_med_inner_edge_ne, dirt_med_inner_edge_nw,
+      dirt_med_outer_edge_nw, dirt_med_outer_edge_n, dirt_med_outer_edge_ne, dirt_med_outer_edge_w,
+      dirt_med_outer_edge_e, dirt_med_outer_edge_sw, dirt_med_outer_edge_s, dirt_med_outer_edge_se,
+      
+      dirt_dark_top1, dirt_dark_top2, dirt_dark_sw_to_ne, dirt_dark_nw_to_se,
+      dirt_dark_inner_edge_se, dirt_dark_inner_edge_sw, dirt_dark_inner_edge_ne, dirt_dark_inner_edge_nw,
+      dirt_dark_outer_edge_nw, dirt_dark_outer_edge_n, dirt_dark_outer_edge_ne, dirt_dark_outer_edge_w,
+      dirt_dark_outer_edge_e, dirt_dark_outer_edge_sw, dirt_dark_outer_edge_s, dirt_dark_outer_edge_se,
+      
+      grass_light_top1, grass_light_top2, grass_light_sw_to_ne, grass_light_nw_to_se,
+      grass_light_inner_edge_se, grass_light_inner_edge_sw, grass_light_inner_edge_ne, grass_light_inner_edge_nw,
+      grass_light_outer_edge_nw, grass_light_outer_edge_n, grass_light_outer_edge_ne, grass_light_outer_edge_w,
+      grass_light_outer_edge_e, grass_light_outer_edge_sw, grass_light_outer_edge_s, grass_light_outer_edge_se,
+      
+      grass_med_top1, grass_med_top2, grass_med_sw_to_ne, grass_med_nw_to_se,
+      grass_med_inner_edge_se, grass_med_inner_edge_sw, grass_med_inner_edge_ne, grass_med_inner_edge_nw,
+      grass_med_outer_edge_nw, grass_med_outer_edge_n, grass_med_outer_edge_ne, grass_med_outer_edge_w,
+      grass_med_outer_edge_e, grass_med_outer_edge_sw, grass_med_outer_edge_s, grass_med_outer_edge_se,
+      
+      grass_dark_top1, grass_dark_top2, grass_dark_sw_to_ne, grass_dark_nw_to_se,
+      grass_dark_inner_edge_se, grass_dark_inner_edge_sw, grass_dark_inner_edge_ne, grass_dark_inner_edge_nw,
+      grass_dark_outer_edge_nw, grass_dark_outer_edge_n, grass_dark_outer_edge_ne, grass_dark_outer_edge_w,
+      grass_dark_outer_edge_e, grass_dark_outer_edge_sw, grass_dark_outer_edge_s, grass_dark_outer_edge_se,
+      
+      grass_dead_top1, grass_dead_top2, grass_dead_sw_to_ne, grass_dead_nw_to_se,
+      grass_dead_inner_edge_se, grass_dead_inner_edge_sw, grass_dead_inner_edge_ne, grass_dead_inner_edge_nw,
+      grass_dead_outer_edge_nw, grass_dead_outer_edge_n, grass_dead_outer_edge_ne, grass_dead_outer_edge_w,
+      grass_dead_outer_edge_e, grass_dead_outer_edge_sw, grass_dead_outer_edge_s, grass_dead_outer_edge_se,
+      
+      water_light_top1, water_light_top2, water_light_sw_to_ne, water_light_nw_to_se,
+      
+      water_med_top1, water_med_top2, water_med_sw_to_ne, water_med_nw_to_se,
+      
+      water_dark_top1, water_dark_top2, water_dark_sw_to_ne, water_dark_nw_to_se,
+      
+      water_poison_top1, water_poison_top2, water_poison_sw_to_ne, water_poison_nw_to_se,
+      
+      water_swamp_top1, water_swamp_top2, water_swamp_sw_to_ne, water_swamp_nw_to_se,
+      
+      lava_top1, lava_top2, lava_sw_to_ne, lava_nw_to_se,
+      
+      rocks_white_top1, rocks_white_top2, rocks_white_sw_to_ne, rocks_white_nw_to_se,
+      rocks_white_inner_edge_se, rocks_white_inner_edge_sw, rocks_white_inner_edge_ne, rocks_white_inner_edge_nw,
+      rocks_white_outer_edge_nw, rocks_white_outer_edge_n, rocks_white_outer_edge_ne, rocks_white_outer_edge_w,
+      rocks_white_outer_edge_e, rocks_white_outer_edge_sw, rocks_white_outer_edge_s, rocks_white_outer_edge_se,
+      
+      rocks_light_top1, rocks_light_top2, rocks_light_sw_to_ne, rocks_light_nw_to_se,
+      rocks_light_inner_edge_se, rocks_light_inner_edge_sw, rocks_light_inner_edge_ne, rocks_light_inner_edge_nw,
+      rocks_light_outer_edge_nw, rocks_light_outer_edge_n, rocks_light_outer_edge_ne, rocks_light_outer_edge_w,
+      rocks_light_outer_edge_e, rocks_light_outer_edge_sw, rocks_light_outer_edge_s, rocks_light_outer_edge_se,
+      
+      rocks_med_top1, rocks_med_top2, rocks_med_sw_to_ne, rocks_med_nw_to_se,
+      rocks_med_inner_edge_se, rocks_med_inner_edge_sw, rocks_med_inner_edge_ne, rocks_med_inner_edge_nw,
+      rocks_med_outer_edge_nw, rocks_med_outer_edge_n, rocks_med_outer_edge_ne, rocks_med_outer_edge_w,
+      rocks_med_outer_edge_e, rocks_med_outer_edge_sw, rocks_med_outer_edge_s, rocks_med_outer_edge_se,
+      
+      rocks_dark_top1, rocks_dark_top2, rocks_dark_sw_to_ne, rocks_dark_nw_to_se,
+      rocks_dark_inner_edge_se, rocks_dark_inner_edge_sw, rocks_dark_inner_edge_ne, rocks_dark_inner_edge_nw,
+      rocks_dark_outer_edge_nw, rocks_dark_outer_edge_n, rocks_dark_outer_edge_ne, rocks_dark_outer_edge_w,
+      rocks_dark_outer_edge_e, rocks_dark_outer_edge_sw, rocks_dark_outer_edge_s, rocks_dark_outer_edge_se,
+      
+      pit_brown_top1, pit_brown_top2, pit_brown_sw_to_ne, pit_brown_nw_to_se,
+      
+      pit_black_top1, pit_black_top2, pit_black_sw_to_ne, pit_black_nw_to_se,
+      
+      sand_top1, sand_top2, sand_sw_to_ne, sand_nw_to_se,
+      sand_inner_edge_se, sand_inner_edge_sw, sand_inner_edge_ne, sand_inner_edge_nw,
+      sand_outer_edge_nw, sand_outer_edge_n, sand_outer_edge_ne, sand_outer_edge_w,
+      sand_outer_edge_e, sand_outer_edge_sw, sand_outer_edge_s, sand_outer_edge_se,
+      
+      rocks_dark_top1, rocks_dark_top2, rocks_dark_sw_to_ne, rocks_dark_nw_to_se,
+      rocks_dark_inner_edge_se, rocks_dark_inner_edge_sw, rocks_dark_inner_edge_ne, rocks_dark_inner_edge_nw,
+      rocks_dark_outer_edge_nw, rocks_dark_outer_edge_n, rocks_dark_outer_edge_ne, rocks_dark_outer_edge_w,
+      rocks_dark_outer_edge_e, rocks_dark_outer_edge_sw, rocks_dark_outer_edge_s, rocks_dark_outer_edge_se,
+      
+      snow_top1, snow_top2, snow_sw_to_ne, snow_nw_to_se,
+      snow_inner_edge_se, snow_inner_edge_sw, snow_inner_edge_ne, snow_inner_edge_nw,
+      snow_outer_edge_nw, snow_outer_edge_n, snow_outer_edge_ne, snow_outer_edge_w,
+      snow_outer_edge_e, snow_outer_edge_sw, snow_outer_edge_s, snow_outer_edge_se,
+      
+      gravel_top1, gravel_top2, gravel_sw_to_ne, gravel_nw_to_se,
+      gravel_inner_edge_se, gravel_inner_edge_sw, gravel_inner_edge_ne, gravel_inner_edge_nw,
+      gravel_outer_edge_nw, gravel_outer_edge_n, gravel_outer_edge_ne, gravel_outer_edge_w,
+      gravel_outer_edge_e, gravel_outer_edge_sw, gravel_outer_edge_s, gravel_outer_edge_se,
+      
+      earth_top1, earth_top2, earth_sw_to_ne, earth_nw_to_se,
+      earth_inner_edge_se, earth_inner_edge_sw, earth_inner_edge_ne, earth_inner_edge_nw,
+      earth_outer_edge_nw, earth_outer_edge_n, earth_outer_edge_ne, earth_outer_edge_w,
+      earth_outer_edge_e, earth_outer_edge_sw, earth_outer_edge_s, earth_outer_edge_se,
+      
+      mud_top1, mud_top2, mud_sw_to_ne, mud_nw_to_se,
+      mud_inner_edge_se, mud_inner_edge_sw, mud_inner_edge_ne, mud_inner_edge_nw,
+      mud_outer_edge_nw, mud_outer_edge_n, mud_outer_edge_ne, mud_outer_edge_w,
+      mud_outer_edge_e, mud_outer_edge_sw, mud_outer_edge_s, mud_outer_edge_se,
+      
+      cobble_sand_top1, cobble_sand_top2, cobble_sand_sw_to_ne, cobble_sand_nw_to_se,
+      cobble_sand_inner_edge_se, cobble_sand_inner_edge_sw, cobble_sand_inner_edge_ne, cobble_sand_inner_edge_nw,
+      cobble_sand_outer_edge_nw, cobble_sand_outer_edge_n, cobble_sand_outer_edge_ne, cobble_sand_outer_edge_w,
+      cobble_sand_outer_edge_e, cobble_sand_outer_edge_sw, cobble_sand_outer_edge_s, cobble_sand_outer_edge_se,
+      
+      cobble_white_top1, cobble_white_top2, cobble_white_sw_to_ne, cobble_white_nw_to_se,
+      cobble_white_inner_edge_se, cobble_white_inner_edge_sw, cobble_white_inner_edge_ne, cobble_white_inner_edge_nw,
+      cobble_white_outer_edge_nw, cobble_white_outer_edge_n, cobble_white_outer_edge_ne, cobble_white_outer_edge_w,
+      cobble_white_outer_edge_e, cobble_white_outer_edge_sw, cobble_white_outer_edge_s, cobble_white_outer_edge_se,
+      
+      cobble_clay_top1, cobble_clay_top2, cobble_clay_sw_to_ne, cobble_clay_nw_to_se,
+      cobble_clay_inner_edge_se, cobble_clay_inner_edge_sw, cobble_clay_inner_edge_ne, cobble_clay_inner_edge_nw,
+      cobble_clay_outer_edge_nw, cobble_clay_outer_edge_n, cobble_clay_outer_edge_ne, cobble_clay_outer_edge_w,
+      cobble_clay_outer_edge_e, cobble_clay_outer_edge_sw, cobble_clay_outer_edge_s, cobble_clay_outer_edge_se,
+      
+      cobble_stone_top1, cobble_stone_top2, cobble_stone_sw_to_ne, cobble_stone_nw_to_se,
+      cobble_stone_inner_edge_se, cobble_stone_inner_edge_sw, cobble_stone_inner_edge_ne, cobble_stone_inner_edge_nw,
+      cobble_stone_outer_edge_nw, cobble_stone_outer_edge_n, cobble_stone_outer_edge_ne, cobble_stone_outer_edge_w,
+      cobble_stone_outer_edge_e, cobble_stone_outer_edge_sw, cobble_stone_outer_edge_s, cobble_stone_outer_edge_se,
+      
+      cobble_dirt_top1, cobble_dirt_top2, cobble_dirt_sw_to_ne, cobble_dirt_nw_to_se,
+      cobble_dirt_inner_edge_se, cobble_dirt_inner_edge_sw, cobble_dirt_inner_edge_ne, cobble_dirt_inner_edge_nw,
+      cobble_dirt_outer_edge_nw, cobble_dirt_outer_edge_n, cobble_dirt_outer_edge_ne, cobble_dirt_outer_edge_w,
+      cobble_dirt_outer_edge_e, cobble_dirt_outer_edge_sw, cobble_dirt_outer_edge_s, cobble_dirt_outer_edge_se,
+      
+      cobble_plain_top1, cobble_plain_top2, cobble_plain_sw_to_ne, cobble_plain_nw_to_se,
+      cobble_plain_inner_edge_se, cobble_plain_inner_edge_sw, cobble_plain_inner_edge_ne, cobble_plain_inner_edge_nw,
+      cobble_plain_outer_edge_nw, cobble_plain_outer_edge_n, cobble_plain_outer_edge_ne, cobble_plain_outer_edge_w,
+      cobble_plain_outer_edge_e, cobble_plain_outer_edge_sw, cobble_plain_outer_edge_s, cobble_plain_outer_edge_se,
     ]
   base2_impass:
     layer: base2
@@ -28,6 +192,138 @@ uniform_sets:
     impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
     invis: []
     tiles: [ cliffs_rocks1, cliffs_rocks2, cliffs_rocks3 ]
+  base2_inner_edge_se:
+    layer: base2
+    size: [2, 2]
+    sprite_prefix: "tileset/"
+    impass: [[0, 0], [1, 0], [0, 1]]
+    invis: []
+    tiles: [
+      water_light_inner_edge_se, water_med_inner_edge_se, water_dark_inner_edge_se, water_poison_inner_edge_se,
+      water_swamp_inner_edge_se, lava_inner_edge_se, pit_brown_inner_edge_se, pit_black_inner_edge_se,
+      pit_dark_inner_edge_se
+    ]
+  base2_inner_edge_sw:
+    layer: base2
+    size: [2, 2]
+    sprite_prefix: "tileset/"
+    impass: [[0, 0], [1, 0], [0, 1]]
+    invis: []
+    tiles: [
+      water_light_inner_edge_sw, water_med_inner_edge_sw, water_dark_inner_edge_sw, water_poison_inner_edge_sw,
+      water_swamp_inner_edge_sw, lava_inner_edge_sw, pit_brown_inner_edge_sw, pit_black_inner_edge_sw,
+      pit_dark_inner_edge_sw
+    ]
+  base2_inner_edge_ne:
+    layer: base2
+    size: [2, 2]
+    sprite_prefix: "tileset/"
+    impass: [[0, 0], [0, 1], [1, 1]]
+    invis: []
+    tiles: [
+      water_light_inner_edge_ne, water_med_inner_edge_ne, water_dark_inner_edge_ne, water_poison_inner_edge_ne, 
+      water_swamp_inner_edge_ne, lava_inner_edge_ne, pit_brown_inner_edge_ne, pit_black_inner_edge_ne,
+      pit_dark_inner_edge_ne
+    ]
+  base2_inner_edge_nw:
+    layer: base2
+    size: [2, 2]
+    sprite_prefix: "tileset/"
+    impass: [[1, 0], [0, 1], [1, 1]]
+    invis: []
+    tiles: [
+      water_light_inner_edge_nw, water_med_inner_edge_nw, water_dark_inner_edge_nw, water_poison_inner_edge_nw,
+      water_swamp_inner_edge_nw, lava_inner_edge_nw, pit_brown_inner_edge_nw, pit_black_inner_edge_nw,
+      pit_dark_inner_edge_nw
+    ]
+  base2_outer_edge_nw:
+    layer: base2
+    size: [2, 2]
+    sprite_prefix: "tileset/"
+    impass: [[1, 1]]
+    invis: []
+    tiles: [
+      water_light_outer_edge_nw, water_med_outer_edge_nw, water_dark_outer_edge_nw, water_poison_outer_edge_nw, 
+      water_swamp_outer_edge_nw, lava_outer_edge_nw, pit_brown_outer_edge_nw, pit_black_outer_edge_nw,
+      pit_dark_outer_edge_nw
+    ]
+  base2_outer_edge_n:
+    layer: base2
+    size: [2, 2]
+    sprite_prefix: "tileset/"
+    impass: [[0, 1], [1, 1]]
+    invis: []
+    tiles: [
+      water_light_outer_edge_n, water_med_outer_edge_n, water_dark_outer_edge_n, water_poison_outer_edge_n, 
+      water_swamp_outer_edge_n, lava_outer_edge_n, pit_brown_outer_edge_n, pit_black_outer_edge_n,
+      pit_dark_outer_edge_n
+    ]
+  base2_outer_edge_ne:
+    layer: base2
+    size: [2, 2]
+    sprite_prefix: "tileset/"
+    impass: [[0, 1]]
+    invis: []
+    tiles: [
+      water_light_outer_edge_ne, water_med_outer_edge_ne, water_dark_outer_edge_ne, water_poison_outer_edge_ne, 
+      water_swamp_outer_edge_ne, lava_outer_edge_ne, pit_brown_outer_edge_ne, pit_black_outer_edge_ne,
+      pit_dark_outer_edge_ne
+    ]
+  base2_outer_edge_w:
+    layer: base2
+    size: [2, 2]
+    sprite_prefix: "tileset/"
+    impass: [[1, 0], [1, 1]]
+    invis: []
+    tiles: [
+      water_light_outer_edge_w, water_med_outer_edge_w, water_dark_outer_edge_w, water_poison_outer_edge_w,
+      water_swamp_outer_edge_w, lava_outer_edge_w, pit_brown_outer_edge_w, pit_black_outer_edge_w,
+      pit_dark_outer_edge_w
+    ]
+  base2_outer_edge_e:
+    layer: base2
+    size: [2, 2]
+    sprite_prefix: "tileset/"
+    impass: [[0, 0], [0, 1]]
+    invis: []
+    tiles: [
+      water_light_outer_edge_e, water_med_outer_edge_e, water_dark_outer_edge_e, water_poison_outer_edge_e, 
+      water_swamp_outer_edge_e, lava_outer_edge_e, pit_brown_outer_edge_e, pit_black_outer_edge_e,
+      pit_dark_outer_edge_e
+    ]
+  base2_outer_edge_sw:
+    layer: base2
+    size: [2, 2]
+    sprite_prefix: "tileset/"
+    impass: [[1, 0]]
+    invis: []
+    tiles: [
+      water_light_outer_edge_sw, water_med_outer_edge_sw, water_dark_outer_edge_sw, water_poison_outer_edge_sw, 
+      water_swamp_outer_edge_sw, lava_outer_edge_sw, pit_brown_outer_edge_sw, pit_black_outer_edge_sw,
+      pit_dark_outer_edge_sw
+    ]
+  base2_outer_edge_s:
+    layer: base2
+    size: [2, 2]
+    sprite_prefix: "tileset/"
+    impass: [[0, 0], [1, 0]]
+    invis: []
+    tiles: [
+      water_light_outer_edge_s, water_med_outer_edge_s, water_dark_outer_edge_s, water_poison_outer_edge_s, 
+      water_swamp_outer_edge_s, lava_outer_edge_s, pit_brown_outer_edge_s, pit_black_outer_edge_s,
+      pit_dark_outer_edge_s
+    ]
+  base2_outer_edge_se:
+    layer: base2
+    size: [2, 2]
+    sprite_prefix: "tileset/"
+    impass: [[0, 0]]
+    invis: []
+    tiles: [
+      water_light_outer_edge_se, water_med_outer_edge_se, water_dark_outer_edge_se, water_poison_outer_edge_se,
+      water_swamp_outer_edge_se, lava_outer_edge_se, pit_brown_outer_edge_se, pit_black_outer_edge_se,
+      pit_dark_outer_edge_se
+    ]
 non_uniform_sets:
   cliffs:
     layer: base3
@@ -44,6 +340,10 @@ non_uniform_sets:
         impass: [[0, 0], [1, 0]]
       cliffs_se:
         impass: [[0, 0]]
+      cliffs_ne:
+        impass: [[0, 0], [1, 0], [1, 1]]
+      cliffs_nw:
+        impass: [[0, 0], [1, 0], [0, 1]]
   cliffs_dark:
     layer: base3
     size: [2, 2]
@@ -57,8 +357,6 @@ non_uniform_sets:
         impass: [[0, 1]]
       outer_edge_w:
         impass: [[1, 0], [1, 1]]
-      base:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
       outer_edge_e:
         impass: [[0, 0], [0, 1]]
       outer_edge_sw:
@@ -97,8 +395,6 @@ non_uniform_sets:
         impass: [[0, 1]]
       outer_edge_w:
         impass: [[1, 0], [1, 1]]
-      base:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
       outer_edge_e:
         impass: [[0, 0], [0, 1]]
       outer_edge_sw:
@@ -149,12 +445,11 @@ non_uniform_sets:
         impass: []
       ramp_bot_se:
         impass: []
+      ramp_bot_nw:
+        impass: [[0, 0]]
+      ramp_bot_ne:
+        impass: [[1, 0]]
 tiles:
-  cliffs_c:
-    layer: base
-    size: [2, 2]
-    sprite: tileset/cliffs_c
-    pass: []
   cave_entrance_small:
     layer: base3
     size: [2, 4]

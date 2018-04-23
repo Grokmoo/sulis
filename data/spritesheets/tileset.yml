@@ -1,0 +1,113 @@
+id: tileset
+src: "tileset.png"
+size: [1024, 2048]
+simple_image_gen_scale: 32
+grid_multiplier: 32
+templates:
+  borders:
+    size: [1, 1]
+    areas:
+      top1: [0, 0]
+      top2: [0, 1]
+      inner_edge_se: [1, 0]
+      inner_edge_sw: [2, 0]
+      inner_edge_ne: [1, 1]
+      inner_edge_nw: [2, 1]
+      outer_edge_nw: [0, 2]
+      outer_edge_n: [1, 2]
+      outer_edge_ne: [2, 2]
+      outer_edge_w: [0, 3]
+      base: [1, 3]
+      outer_edge_e: [2, 3]
+      outer_edge_sw: [0, 4]
+      outer_edge_s: [1, 4]
+      outer_edge_se: [2, 4]
+      base_variant1: [0, 5]
+      base_variant2: [1, 5]
+      base_variant3: [2, 5]
+      sw_to_ne: [0, 6]
+      nw_to_se: [1, 6]
+groups:
+  dirt_light:
+    position: [0, 0]
+    prefix: dirt_light_
+    from_template: borders
+  cliffs:
+    position: [0, 45]
+    size: [1, 1]
+    areas:
+      cliffs_w: [0, 3]
+      cliffs_c: [1, 3]
+      cliffs_e: [2, 3]
+      cliffs_sw: [0, 4]
+      cliffs_s: [1, 4]
+      cliffs_se: [2, 4]
+      cliffs_rocks1: [1, 8]
+      cliffs_rocks2: [3, 8]
+      cliffs_rocks3: [4, 8]
+  cliffs_dark:
+    position: [0, 45]
+    size: [1, 1]
+    prefix: cliffs_dark_
+    areas:
+      outer_edge_nw: [0, 0]
+      outer_edge_n: [1, 0]
+      outer_edge_ne: [2, 0]
+      outer_edge_w: [0, 1]
+      base: [1, 1]
+      outer_edge_e: [2, 1]
+      outer_edge_sw: [0, 2]
+      outer_edge_s: [1, 2]
+      outer_edge_se: [2, 2]
+      
+      inner_edge_nw: [3, 0]
+      inner_edge_ne: [4, 0]
+      inner_edge_sw: [3, 1]
+      inner_edge_se: [4, 1]
+      edge_overlap_w: [3, 2]
+      edge_overlap_e: [4, 2]
+      edge_overlap_sw: [3, 3]
+      edge_overlap_se: [4, 3]
+      rocks1: [2, 8]
+  cliffs_light:
+    position: [0, 45]
+    size: [1, 1]
+    prefix: cliffs_light_
+    areas:
+      outer_edge_nw: [5, 0]
+      outer_edge_n: [6, 0]
+      outer_edge_ne: [7, 0]
+      outer_edge_w: [5, 1]
+      base: [6, 1]
+      outer_edge_e: [7, 1]
+      outer_edge_sw: [5, 2]
+      outer_edge_s: [6, 2]
+      outer_edge_se: [7, 2]
+      
+      inner_edge_nw: [8, 0]
+      inner_edge_ne: [9, 0]
+      inner_edge_sw: [8, 1]
+      inner_edge_se: [9, 1]
+      edge_overlap_w: [8, 2]
+      edge_overlap_e: [9, 2]
+      edge_overlap_sw: [8, 3]
+      edge_overlap_se: [9, 3]
+      rocks1: [0, 8]
+      
+      ramp_bot_w: [3, 6]
+      ramp_bot_sw: [3, 7]
+      ramp_mid_sw: [4, 6]
+      ramp_mid_nw: [4, 5]
+      ramp_top_nw: [5, 4]
+      ramp_top_ne: [6, 4]
+      ramp_top_sw: [5, 5]
+      ramp_top_se: [6, 5]
+      ramp_mid_nw: [7, 5]
+      ramp_mid_sw: [7, 6]
+      ramp_bot_e: [8, 6]
+      ramp_bot_se: [8, 7]
+  misc_cliffs:
+    position: [0, 45]
+    areas:
+      cliffs_cave_small: [0, 5, 1, 2]
+      cliffs_cave_large: [1, 5, 2, 3]

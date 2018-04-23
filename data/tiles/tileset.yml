@@ -1,0 +1,167 @@
+id: tileset
+uniform_sets:
+  base_all_passable:
+    layer: base
+    size: [2, 2]
+    sprite_prefix: "tileset/"
+    impass: []
+    invis: []
+    tiles: [
+      dirt_light_base, dirt_light_base_variant1, dirt_light_base_variant2, dirt_light_base_variant3,
+    ]
+  base2_all_passable:
+    layer: base2
+    size: [2, 2]
+    sprite_prefix: "tileset/"
+    impass: []
+    invis: []
+    tiles: [
+      dirt_light_top1, dirt_light_top2, dirt_light_sw_to_ne, dirt_light_nw_to_se,
+      dirt_light_inner_edge_se, dirt_light_inner_edge_sw, dirt_light_inner_edge_ne, dirt_light_inner_edge_nw,
+      dirt_light_outer_edge_nw, dirt_light_outer_edge_n, dirt_light_outer_edge_ne, dirt_light_outer_edge_w,
+      dirt_light_outer_edge_e, dirt_light_outer_edge_sw, dirt_light_outer_edge_s, dirt_light_outer_edge_se
+    ]
+  base2_impass:
+    layer: base2
+    size: [2, 2]
+    sprite_prefix: "tileset/"
+    impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+    invis: []
+    tiles: [ cliffs_rocks1, cliffs_rocks2, cliffs_rocks3 ]
+non_uniform_sets:
+  cliffs:
+    layer: base3
+    size: [2, 2]
+    sprite_prefix: "tileset/"
+    tiles:
+      cliffs_w:
+        impass: [[1, 0], [1, 1]]
+      cliffs_e:
+        impass: [[0, 0], [0, 1]]
+      cliffs_sw:
+        impass: [[1, 0]]
+      cliffs_s:
+        impass: [[0, 0], [1, 0]]
+      cliffs_se:
+        impass: [[0, 0]]
+  cliffs_dark:
+    layer: base3
+    size: [2, 2]
+    sprite_prefix: "tileset/cliffs_dark_"
+    tiles:
+      outer_edge_nw:
+        impass: [[1, 1]]
+      outer_edge_n:
+        impass: [[0, 1], [1, 1]]
+      outer_edge_ne:
+        impass: [[0, 1]]
+      outer_edge_w:
+        impass: [[1, 0], [1, 1]]
+      base:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      outer_edge_e:
+        impass: [[0, 0], [0, 1]]
+      outer_edge_sw:
+        impass: [[1, 0]]
+      outer_edge_s:
+        impass: [[0, 0], [1, 0]]
+      outer_edge_se:
+        impass: [[0, 0]]
+      
+      inner_edge_nw:
+        impass: [[1, 0], [0, 1], [1, 1]]
+      inner_edge_ne:
+        impass: [[0, 0], [0, 1], [1, 1]]
+      inner_edge_sw:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      inner_edge_se:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      edge_overlap_w:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      edge_overlap_e:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      edge_overlap_sw:
+        impass: [[0, 0], [1, 0], [1, 1]]
+      edge_overlap_se:
+        impass: [[0, 0], [1, 0], [0, 1]]
+  cliffs_light:
+    layer: base3
+    size: [2, 2]
+    sprite_prefix: "tileset/cliffs_light_"
+    tiles:
+      outer_edge_nw:
+        impass: [[1, 1]]
+      outer_edge_n:
+        impass: [[0, 1], [1, 1]]
+      outer_edge_ne:
+        impass: [[0, 1]]
+      outer_edge_w:
+        impass: [[1, 0], [1, 1]]
+      base:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      outer_edge_e:
+        impass: [[0, 0], [0, 1]]
+      outer_edge_sw:
+        impass: [[1, 0]]
+      outer_edge_s:
+        impass: [[0, 0], [1, 0]]
+      outer_edge_se:
+        impass: [[0, 0]]
+      
+      inner_edge_nw:
+        impass: [[1, 0], [0, 1], [1, 1]]
+      inner_edge_ne:
+        impass: [[0, 0], [0, 1], [1, 1]]
+      inner_edge_sw:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      inner_edge_se:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      edge_overlap_w:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      edge_overlap_e:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      edge_overlap_sw:
+        impass: [[0, 0], [1, 0], [1, 1]]
+      edge_overlap_se:
+        impass: [[0, 0], [1, 0], [0, 1]]
+      
+      ramp_bot_w:
+        impass: []
+      ramp_bot_sw:
+        impass: []
+      ramp_mid_sw:
+        impass: [[1, 0]]
+      ramp_mid_nw:
+        impass: [[0, 0]]
+      ramp_top_nw:
+        impass: [[0, 1]]
+      ramp_top_ne:
+        impass: [[1, 1]]
+      ramp_top_sw:
+        impass: [[1, 1]]
+      ramp_top_se:
+        impass: [[0, 1]]
+      ramp_mid_nw:
+        impass: [[1, 0]]
+      ramp_mid_sw:
+        impass: [[0, 1]]
+      ramp_bot_e:
+        impass: []
+      ramp_bot_se:
+        impass: []
+tiles:
+  cliffs_c:
+    layer: base
+    size: [2, 2]
+    sprite: tileset/cliffs_c
+    pass: []
+  cave_entrance_small:
+    layer: base3
+    size: [2, 4]
+    sprite: tileset/cliffs_cave_small
+    pass: [[0, 3], [1, 3]]
+  cave_entrance_large:
+    layer: base3
+    size: [4, 6]
+    sprite: tileset/cliffs_cave_large
+    pass: [[0, 5], [1, 5], [2, 5], [3, 5]]

@@ -1,0 +1,62 @@
+"[LPC] Terrains" by bluecarrot16, Lanea Zimmerman (Sharm), Daniel Eddeland (Daneeklu), Richard Kettering (Jetrel), Zachariah Husiar (Zabin), Hyptosis, Casper Nilsson, Buko Studios, Nushio, ZaPaper, billknye, William Thompson, caeles, Redshrike, Bertram, and Rayane Félix (RayaneFLX)
+
+Liberated Pixel Cup (LPC) Base Assets (sprites & map tiles)
+Lanea Zimmerman (Sharm)
+CC-BY 3.0 / CC-BY-SA 3.0 / GPL 3.0
+https://opengameart.org/content/liberated-pixel-cup-lpc-base-assets-sprites-map-tiles
+
+[LPC] Farming tilesets, magic animations and UI elements
+Daniel Eddeland (Daneeklu)
+CC-BY-SA 3.0 / GPL 3.0
+https://opengameart.org/content/lpc-farming-tilesets-magic-animations-and-ui-elements
+
+ZRPG Tiles
+Richard Kettering (Jetrel), Zachariah Husiar (Zabin), Hyptosis, Lanea Zimmerman (Sharm), and Open Pixel Project.
+CC-BY-SA 3.0+
+https://opengameart.org/content/zrpg-tiles
+
+LPC C.Nilsson
+Casper Nilsson
+CC-BY-SA 3.0 / GPL 3.0
+https://opengameart.org/content/lpc-cnilsson
+
+Frozen Lake [LPC]
+Buko Studios (http://www.buko-studios.com/) Commissioned by PlayCraft: (www.playcraftapp.com)
+CC-BY 3.0
+https://opengameart.org/content/frozen-lake-lpc
+
+
+LPC Animated Water and waterfalls
+ZaPaper
+CC-BY-SA 3.0
+https://opengameart.org/content/lpc-animated-water-and-waterfalls
+
+LPC More Water Transitions
+billknye
+CC-BY-SA 3.0 / GPL 3.0
+https://opengameart.org/content/lpc-more-water-transitions
+
+[LPC] Sand+Rock Alt Colors
+William.Thompsonj, Daniel Eddeland
+CC-BY-SA 3.0 / GPL 3.0
+https://opengameart.org/content/lpc-sandrock-alt-colors
+
+[LPC] Colorful Sand + Deep Water!
+Nushio
+CC-BY-SA 3.0 / GPL 3.0
+https://opengameart.org/content/lpc-colorful-sand-deep-water
+
+LPC terrain extension
+caeles
+CC-BY-SA 3.0 / GPL 3.0
+https://opengameart.org/content/lpc-terrain-extension
+
+RPG Tiles: Cobble stone paths & town objects
+Zachariah Husiar (Zabin), Daniel Eddeland (Daneeklu), Richard Kettering (Jetrel), Hyptosis, Redshrike, Bertram
+CC-BY-SA 3.0
+https://opengameart.org/content/rpg-tiles-cobble-stone-paths-town-objects
+
+RPG Terrains
+Rayane Félix (RayaneFLX)
+CC-BY-SA 3.0
+https://opengameart.org/content/rpg-terrains

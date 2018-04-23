@@ -93,10 +93,11 @@ impl TilesList {
                 Some(uniform.invis.clone())
             };
             for tile_id in uniform.tiles.iter() {
+                let id = format!("{}{}", prefix, tile_id);
                 let tile = TileBuilder {
                     size: size,
                     layer: layer.to_string(),
-                    sprite: format!("{}{}", prefix, tile_id),
+                    sprite: id.to_string(),
                     impass: impass.clone(),
                     invis: invis.clone(),
                     pass: None,
@@ -104,7 +105,7 @@ impl TilesList {
                     override_impass: None,
                 };
 
-                self.tiles.insert(tile_id.to_string(), tile);
+                self.tiles.insert(id, tile);
             }
         }
     }
@@ -115,10 +116,11 @@ impl TilesList {
             let layer = &non_uniform.layer;
             let prefix = &non_uniform.sprite_prefix;
             for (tile_id, impass_invis) in non_uniform.tiles.iter() {
+                let id = format!("{}{}", prefix, tile_id);
                 let tile = TileBuilder {
                     size: size,
                     layer: layer.to_string(),
-                    sprite: format!("{}{}", prefix, tile_id),
+                    sprite: id.to_string(),
                     impass: impass_invis.impass.clone(),
                     invis: impass_invis.invis.clone(),
                     pass: None,
@@ -126,7 +128,7 @@ impl TilesList {
                     override_impass: None,
                 };
 
-                self.tiles.insert(tile_id.to_string(), tile);
+                self.tiles.insert(id, tile);
             }
         }
     }

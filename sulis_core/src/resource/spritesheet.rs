@@ -93,9 +93,47 @@ impl Spritesheet {
 
         let mut sprites: HashMap<String, Rc<Sprite>> = HashMap::new();
         for (_id, group) in builder.groups {
-            let base_size = group.get_size();
+            let mut template: Option<SpritesheetGroupTemplate> = match group.from_template {
+                None => None,
+                Some(ref id) => {
+                    let templates = match builder.templates {
+                        None => {
+                            warn!("Template '{}' not found", id);
+                            continue;
+                        }, Some(ref templates) => templates,
+                    };
+
+                    match templates.get(id) {
+                        None => {
+                            warn!("Template '{}' not found", id);
+                            continue;
+                        }, Some(template) => Some(template.clone()),
+                    }
+                }
+            };
+
+            let base_size = match template {
+                None => group.get_size(),
+                Some(ref template) => template.size,
+            };
+
             let base_pos = group.get_position();
-            for (id, area_pos) in group.areas {
+
+            let mut areas: HashMap<String, Vec<i32>> = HashMap::new();
+            if let Some(mut group_areas) = group.areas {
+                group_areas.drain().for_each(|(k, v)| {areas.insert(k, v); });
+            }
+
+            if let Some(mut template) = template.as_mut() {
+                template.areas.drain().for_each(|(k, v)| { areas.insert(k, v); });
+            }
+
+            for (base_id, area_pos) in areas {
+                let id = match group.prefix {
+                    None => base_id,
+                    Some(ref prefix) => format!("{}{}", prefix, base_id),
+                };
+
                 let (mut pos, mut size) = match area_pos.len() {
                     2 => (base_pos.add(area_pos[0], area_pos[1]), base_size),
                     4 => (base_pos.add(area_pos[0], area_pos[1]), base_size.add(area_pos[2], area_pos[3])),
@@ -159,6 +197,14 @@ pub struct SpritesheetBuilder {
     pub simple_image_gen_scale: Option<u32>,
     pub grid_multiplier: Option<u32>,
     groups: HashMap<String, SpritesheetGroup>,
+    templates: Option<HashMap<String, SpritesheetGroupTemplate>>,
+}
+
+#[derive(Deserialize, Debug, Clone)]
+#[serde(deny_unknown_fields)]
+struct SpritesheetGroupTemplate {
+    pub size: Size,
+    pub areas: HashMap<String, Vec<i32>>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -166,7 +212,9 @@ pub struct SpritesheetBuilder {
 struct SpritesheetGroup {
     pub size: Option<Size>,
     pub position: Option<Point>,
-    pub areas: HashMap<String, Vec<i32>>,
+    pub prefix: Option<String>,
+    pub areas: Option<HashMap<String, Vec<i32>>>,
+    pub from_template: Option<String>,
 }
 
 impl SpritesheetGroup {

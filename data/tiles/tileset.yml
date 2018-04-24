@@ -7,7 +7,7 @@ uniform_sets:
     impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
     invis: []
     tiles: [
-      cliffs_c, cliffs_dark_base,
+      cliffs_c, cliffs_dark_base, cave_top_base, cave_wall_c,
       water_light_base, water_light_base_variant1, water_light_base_variant2, water_light_base_variant3,
       water_med_base, water_med_base_variant1, water_med_base_variant2, water_med_base_variant3,
       water_dark_base, water_dark_base_variant1, water_dark_base_variant2, water_dark_base_variant3,
@@ -324,7 +324,110 @@ uniform_sets:
       water_swamp_outer_edge_se, lava_outer_edge_se, pit_brown_outer_edge_se, pit_black_outer_edge_se,
       pit_dark_outer_edge_se
     ]
+  base3_pass:
+    layer: base3
+    size: [2, 2]
+    sprite_prefix: "tileset/"
+    impass: []
+    invis: []
+    tiles: [
+      mine_track_nw, mine_track_ne, mine_track_sw, mine_track_se, mine_track_c, mine_track_ns_n,
+      mine_track_ns_c, mine_track_ns_s, mine_track_ew_w, mine_track_ew_c, mine_track_ew_e
+    ]
+  prop_pass:
+    layer: prop
+    size: [2, 2]
+    sprite_prefix: "tileset/"
+    impass: []
+    invis: []
+    tiles: [
+      plant01, plant02, plant03, plant04, plant05, plant06, plant07, plant08, plant09, plant10,
+      plant11, plant12, plant13, plant14, plant15, plant16, plant17, plant18, plant19, plant20
+    ]
 non_uniform_sets:
+  object:
+    layer: object
+    size: [2, 2]
+    sprite_prefix: "tileset/"
+    tiles:
+      mine_beam_nw:
+        impass: []
+      mine_beam_n:
+        impass: []
+      mine_beam_ne:
+        impass: []
+      mine_beam_double_n:
+        impass: []
+      mine_beam_sw:
+        impass: [[0, 0], [0, 1]]
+      mine_beam_se:
+        impass: [[1, 0], [1, 1]]
+      mine_beam_double_s:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+  cave_wall:
+    layer: base3
+    size: [2, 2]
+    sprite_prefix: "tileset/cave_wall_"
+    tiles:
+      w:
+        impass: [[1, 0], [1, 1]]
+      e:
+        impass: [[0, 0], [0, 1]]
+      sw:
+        impass: []
+      s:
+        impass: []
+      se:
+        impass: []
+      ne:
+        impass: [[1, 0]]
+      nw:
+        impass: [[0, 0]]
+  cave_top:
+    layer: base3
+    size: [2, 2]
+    sprite_prefix: "tileset/cave_top_"
+    tiles:
+      outer_edge_nw:
+        impass: [[1, 1]]
+      outer_edge_n:
+        impass: [[0, 1], [1, 1]]
+      outer_edge_ne:
+        impass: [[0, 1]]
+      outer_edge_w:
+        impass: [[1, 0], [1, 1]]
+      outer_edge_e:
+        impass: [[0, 0], [0, 1]]
+      outer_edge_sw:
+        impass: [[1, 0]]
+      outer_edge_s:
+        impass: [[0, 0], [1, 0]]
+      outer_edge_se:
+        impass: [[0, 0]]
+      inner_edge_nw:
+        impass: [[1, 0], [0, 1], [1, 1]]
+      inner_edge_ne:
+        impass: [[0, 0], [0, 1], [1, 1]]
+      inner_edge_sw:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      inner_edge_se:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      edge_overlap_w:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      edge_overlap_e:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      edge_overlap_sw:
+        impass: [[1, 0], [1, 1]]
+      edge_overlap_se:
+        impass: [[0, 0], [0, 1]]
+      edge_overlap_bot_sw:
+        impass: [[1, 0], [1, 1]]
+      edge_overlap_bot_se:
+        impass: [[0, 0], [0, 1]]
+      edge_overlap_bot_w:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      edge_overlap_bot_e:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
   cliffs:
     layer: base3
     size: [2, 2]
@@ -335,15 +438,15 @@ non_uniform_sets:
       cliffs_e:
         impass: [[0, 0], [0, 1]]
       cliffs_sw:
-        impass: [[1, 0]]
+        impass: 
       cliffs_s:
-        impass: [[0, 0], [1, 0]]
+        impass: []
       cliffs_se:
-        impass: [[0, 0]]
+        impass: []
       cliffs_ne:
-        impass: [[0, 0], [1, 0], [1, 1]]
+        impass: [[1, 0]]
       cliffs_nw:
-        impass: [[0, 0], [1, 0], [0, 1]]
+        impass: [[0, 0]]
   cliffs_dark:
     layer: base3
     size: [2, 2]
@@ -365,7 +468,6 @@ non_uniform_sets:
         impass: [[0, 0], [1, 0]]
       outer_edge_se:
         impass: [[0, 0]]
-      
       inner_edge_nw:
         impass: [[1, 0], [0, 1], [1, 1]]
       inner_edge_ne:
@@ -379,9 +481,9 @@ non_uniform_sets:
       edge_overlap_e:
         impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
       edge_overlap_sw:
-        impass: [[0, 0], [1, 0], [1, 1]]
+        impass: [[1, 0], [1, 1]]
       edge_overlap_se:
-        impass: [[0, 0], [1, 0], [0, 1]]
+        impass: [[0, 0], [0, 1]]
   cliffs_light:
     layer: base3
     size: [2, 2]
@@ -403,7 +505,6 @@ non_uniform_sets:
         impass: [[0, 0], [1, 0]]
       outer_edge_se:
         impass: [[0, 0]]
-      
       inner_edge_nw:
         impass: [[1, 0], [0, 1], [1, 1]]
       inner_edge_ne:
@@ -450,13 +551,166 @@ non_uniform_sets:
       ramp_bot_ne:
         impass: [[1, 0]]
 tiles:
-  cave_entrance_small:
+  cliff_entrance_small:
     layer: base3
     size: [2, 4]
     sprite: tileset/cliffs_cave_small
     pass: [[0, 3], [1, 3]]
-  cave_entrance_large:
+  cliff_entrance_large:
     layer: base3
     size: [4, 6]
     sprite: tileset/cliffs_cave_large
     pass: [[0, 5], [1, 5], [2, 5], [3, 5]]
+  cave_entrance_small:
+    layer: base3
+    size: [2, 4]
+    sprite: tileset/cave_entrance_small
+    pass: [[0, 3], [1, 3]]
+  cave_entrance_large_w:
+    layer: base3
+    size: [2, 6]
+    sprite: tileset/cave_entrance_large_w
+    pass: [[0, 5], [1, 1], [1, 2], [1, 3], [1, 4], [1, 5]]
+  cave_entrance_large_c:
+    layer: base3
+    size: [2, 6]
+    sprite: tileset/cave_entrance_large_c
+    impass: [[0, 0], [1, 0]]
+  cave_entrance_large_e:
+    layer: base3
+    size: [2, 6]
+    sprite: tileset/cave_entrance_large_e
+    pass: [[0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [1, 5]]
+  cave_top_tunnel_nw:
+    layer: aerial
+    size: [1, 1]
+    sprite: tileset/cave_top_tunnel_nw
+    override_impass: true
+    impass: []
+  cave_top_tunnel_n:
+    layer: aerial
+    size: [2, 1]
+    sprite: tileset/cave_top_tunnel_n
+    override_impass: true
+    impass: []
+  cave_top_tunnel_ne:
+    layer: aerial
+    size: [1, 1]
+    sprite: tileset/cave_top_tunnel_ne
+    override_impass: true
+    impass: []
+  cave_top_tunnel_w:
+    layer: aerial
+    size: [1, 2]
+    sprite: tileset/cave_top_tunnel_w
+    override_impass: true
+    impass: []
+  cave_top_tunnel_c:
+    layer: aerial
+    size: [2, 2]
+    sprite: tileset/cave_top_tunnel_c
+    override_impass: true
+    impass: []
+  cave_top_tunnel_e:
+    layer: aerial
+    size: [1, 2]
+    sprite: tileset/cave_top_tunnel_e
+    override_impass: true
+    impass: []
+  cave_top_tunnel_sw:
+    layer: aerial
+    size: [1, 2]
+    sprite: tileset/cave_top_tunnel_sw
+    override_impass: true
+    impass: []
+  cave_top_tunnel_s:
+    layer: aerial
+    size: [2, 2]
+    sprite: tileset/cave_top_tunnel_s
+    override_impass: true
+    impass: []
+  cave_top_tunnel_se:
+    layer: aerial
+    size: [1, 2]
+    sprite: tileset/cave_top_tunnel_se
+    override_impass: true
+    impass: []
+  sign:
+    layer: object
+    size: [2, 4]
+    sprite: tileset/sign
+    impass: [[0, 2], [1, 2], [0, 3], [1, 3]]
+  log:
+    layer: prop
+    size: [4, 4]
+    sprite: tileset/log
+    impass: [[1, 1], [2, 1], [1, 2], [2, 2]]
+# TODO: impass and invis for all trees
+  tree_small_01:
+    layer: object
+    size: [4, 4]
+    sprite: tileset/tree_small_01
+  tree_small_02:
+    layer: object
+    size: [6, 6]
+    sprite: tileset/tree_small_02
+  tree_small_03:
+    layer: object
+    size: [4, 6]
+    sprite: tileset/tree_small_03
+  tree_small_04:
+    layer: object
+    size: [4, 6]
+    sprite: tileset/tree_small_04
+  tree_small_05:
+    layer: object
+    size: [6, 6]
+    sprite: tileset/tree_small_05
+  tree_small_06:
+    layer: object
+    size: [4, 6]
+    sprite: tileset/tree_small_06
+  tree_small_07:
+    layer: object
+    size: [6, 6]
+    sprite: tileset/tree_small_07
+  tree_med_01:
+    layer: aerial
+    size: [8, 8]
+    sprite: tileset/tree_med_01
+  tree_med_02:
+    layer: aerial
+    size: [14, 14]
+    sprite: tileset/tree_med_02
+  tree_med_03:
+    layer: aerial
+    size: [14, 14]
+    sprite: tileset/tree_med_03
+  tree_med_04:
+    layer: aerial
+    size: [14, 14]
+    sprite: tileset/tree_med_04
+  tree_med_05:
+    layer: aerial
+    size: [12, 10]
+    sprite: tileset/tree_med_05
+  tree_med_06:
+    layer: aerial
+    size: [10, 8]
+    sprite: tileset/tree_med_06
+  tree_med_07:
+    layer: aerial
+    size: [14, 12]
+    sprite: tileset/tree_med_07
+  tree_med_08:
+    layer: aerial
+    size: [8, 12]
+    sprite: tileset/tree_med_08
+  tree_med_09:
+    layer: aerial
+    size: [14, 12]
+    sprite: tileset/tree_med_09
+  tree_big_01:
+    layer: aerial
+    size: [24, 20]
+    sprite: tileset/tree_big_01

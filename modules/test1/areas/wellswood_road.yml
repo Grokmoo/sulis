@@ -7,61 +7,759 @@ generate: false
 layers:
   - base
   - base2
+  - base3
   - prop
   - object
   - aerial
-  - base3
 entity_layer: 3
 actors: []
 props: []
 encounters: []
-transitions: []
+transitions:
+  - from:
+      x: 10
+      "y": 35
+    size: 4by3
+    to:
+      x: 7
+      "y": 23
+    to_area: wellswood_cave
+    image_display: transition
 triggers: []
 visibility_tile: gui/area_invis
 explored_tile: gui/area_unexplored
 max_vis_distance: 20
 max_vis_up_one_distance: 6
 terrain:
-  tileset/water_med_outer_edge_w:
-    - - 34
-      - 40
-    - - 34
-      - 38
-    - - 34
-      - 36
-    - - 34
-      - 18
-    - - 34
-      - 20
-    - - 36
-      - 32
-    - - 36
-      - 30
-    - - 36
-      - 28
-    - - 36
+  tileset/cliffs_light_inner_edge_se:
+    - - 14
       - 26
+  tileset/water_med_inner_edge_nw:
     - - 36
-      - 24
-    - - 34
-      - 16
-    - - 34
-      - 42
-    - - 34
-      - 44
-    - - 34
-      - 48
-    - - 34
-      - 46
-    - - 34
-      - 50
-    - - 34
-      - 52
+      - 34
+  tileset/grass_light_outer_edge_e:
+    - - 27
+      - 14
   tileset/grass_dead_base_variant2:
     - - 22
       - 46
     - - 2
       - 48
+  tileset/grass_med_inner_edge_nw:
+    - - 26
+      - 30
+  tileset/cliffs_light_outer_edge_e:
+    - - 30
+      - 22
+    - - 30
+      - 24
+  tileset/cliffs_light_ramp_mid_nw:
+    - - 20
+      - 28
+  tileset/pit_brown_inner_edge_ne:
+    - - 11
+      - 50
+  tree_small_04:
+    - - 15
+      - 13
+  tileset/grass_light_outer_edge_sw:
+    - - 17
+      - 16
+    - - 15
+      - 14
+  tileset/grass_light_base_variant1:
+    - - 19
+      - 14
+  tileset/grass_med_outer_edge_s:
+    - - 26
+      - 32
+    - - 28
+      - 32
+    - - 0
+      - 46
+    - - 4
+      - 42
+    - - 6
+      - 42
+    - - 8
+      - 42
+    - - 10
+      - 42
+    - - 12
+      - 42
+    - - 14
+      - 42
+    - - 16
+      - 42
+    - - 18
+      - 42
+    - - 20
+      - 42
+    - - 22
+      - 42
+  tileset/pit_brown_outer_edge_nw:
+    - - 5
+      - 44
+  tileset/dirt_light_base_variant1:
+    - - 14
+      - 24
+    - - 30
+      - 30
+  tileset/dirt_light_base_variant2:
+    - - 22
+      - 22
+    - - 8
+      - 24
+    - - 34
+      - 26
+    - - 32
+      - 38
+    - - 8
+      - 11
+    - - 15
+      - 10
+    - - 31
+      - 44
+  tileset/grass_med_inner_edge_ne:
+    - - 6
+      - 16
+    - - 18
+      - 30
+  tileset/water_med_base_variant1:
+    - - 38
+      - 36
+  tileset/cliffs_light_ramp_top_nw:
+    - - 22
+      - 26
+  tileset/pit_brown_outer_edge_ne:
+    - - 11
+      - 44
+    - - 13
+      - 50
+  tileset/grass_light_outer_edge_n:
+    - - 17
+      - 12
+    - - 19
+      - 12
+    - - 21
+      - 12
+    - - 23
+      - 12
+    - - 25
+      - 12
+  tileset/grass_light_outer_edge_ne:
+    - - 27
+      - 12
+  tileset/cliffs_light_outer_edge_w:
+    - - 4
+      - 20
+    - - 4
+      - 22
+    - - 4
+      - 24
+    - - 4
+      - 26
+    - - 4
+      - 28
+  tileset/cliffs_light_ramp_bot_nw:
+    - - 18
+      - 30
+  tree_small_07:
+    - - 1
+      - 10
+  tileset/grass_med_outer_edge_e:
+    - - 24
+      - 40
+    - - 24
+      - 38
+    - - 24
+      - 36
+    - - 24
+      - 34
+    - - 30
+      - 30
+    - - 2
+      - 44
+  tileset/pit_brown_outer_edge_s:
+    - - 7
+      - 52
+    - - 9
+      - 52
+    - - 11
+      - 52
+  tileset/grass_med_outer_edge_n:
+    - - 20
+      - 30
+    - - 22
+      - 30
+    - - 24
+      - 30
+    - - 4
+      - 14
+    - - 2
+      - 14
+    - - 0
+      - 14
+  tileset/dirt_light_outer_edge_sw:
+    - - 25
+      - 44
+  tileset/cliffs_light_ramp_top_sw:
+    - - 28
+      - 26
+  tileset/pit_brown_outer_edge_se:
+    - - 13
+      - 52
+  tileset/grass_light_inner_edge_sw:
+    - - 17
+      - 14
+  tileset/water_med_outer_edge_s:
+    - - 28
+      - 10
+    - - 26
+      - 10
+    - - 24
+      - 10
+    - - 22
+      - 10
+    - - 18
+      - 8
+    - - 16
+      - 8
+    - - 14
+      - 8
+    - - 12
+      - 8
+    - - 10
+      - 8
+    - - 8
+      - 8
+    - - 6
+      - 8
+    - - 4
+      - 8
+    - - 2
+      - 8
+    - - 0
+      - 8
+  tileset/cliffs_light_outer_edge_se:
+    - - 14
+      - 32
+    - - 30
+      - 26
+  tileset/grass_dead_base:
+    - - 4
+      - 44
+    - - 6
+      - 44
+    - - 8
+      - 44
+    - - 10
+      - 44
+    - - 12
+      - 44
+    - - 12
+      - 46
+    - - 12
+      - 48
+    - - 12
+      - 50
+    - - 14
+      - 50
+    - - 14
+      - 52
+    - - 12
+      - 52
+    - - 10
+      - 52
+    - - 8
+      - 52
+    - - 6
+      - 52
+    - - 4
+      - 52
+    - - 4
+      - 50
+    - - 4
+      - 48
+    - - 4
+      - 46
+    - - 0
+      - 48
+    - - 0
+      - 50
+    - - 2
+      - 50
+    - - 2
+      - 52
+    - - 0
+      - 52
+    - - 14
+      - 44
+    - - 14
+      - 46
+    - - 14
+      - 48
+    - - 16
+      - 52
+    - - 16
+      - 50
+    - - 16
+      - 46
+    - - 16
+      - 44
+    - - 18
+      - 44
+    - - 18
+      - 46
+    - - 18
+      - 48
+    - - 18
+      - 50
+    - - 18
+      - 52
+    - - 0
+      - 46
+    - - 2
+      - 46
+    - - 2
+      - 44
+    - - 2
+      - 42
+    - - 4
+      - 42
+    - - 6
+      - 42
+    - - 8
+      - 42
+    - - 10
+      - 42
+    - - 12
+      - 42
+    - - 14
+      - 42
+    - - 16
+      - 42
+    - - 18
+      - 42
+    - - 20
+      - 42
+    - - 20
+      - 44
+    - - 20
+      - 46
+    - - 20
+      - 48
+    - - 20
+      - 50
+    - - 20
+      - 52
+    - - 22
+      - 42
+    - - 24
+      - 42
+    - - 24
+      - 44
+    - - 22
+      - 44
+    - - 26
+      - 44
+    - - 24
+      - 46
+    - - 26
+      - 46
+    - - 26
+      - 48
+    - - 26
+      - 50
+    - - 26
+      - 52
+    - - 24
+      - 52
+    - - 22
+      - 52
+    - - 22
+      - 50
+    - - 22
+      - 48
+    - - 24
+      - 48
+    - - 24
+      - 50
+  tree_big_01:
+    - - 15
+      - 23
+  tileset/grass_light_outer_edge_nw:
+    - - 15
+      - 12
+  tileset/cliffs_light_outer_edge_s:
+    - - 16
+      - 26
+    - - 18
+      - 26
+    - - 20
+      - 26
+    - - 8
+      - 32
+  tileset/dirt_light_outer_edge_w:
+    - - 27
+      - 46
+    - - 27
+      - 48
+    - - 27
+      - 50
+    - - 27
+      - 52
+  tree_med_04:
+    - - 17
+      - 4
+  tileset/grass_med_outer_edge_ne:
+    - - 30
+      - 28
+    - - 6
+      - 14
+  tileset/grass_dead_base_variant3:
+    - - 16
+      - 48
+  tileset/pit_brown_outer_edge_e:
+    - - 11
+      - 46
+    - - 11
+      - 48
+  tileset/cliffs_light_ramp_bot_sw:
+    - - 24
+      - 30
+  tileset/grass_light_outer_edge_s:
+    - - 19
+      - 16
+    - - 21
+      - 16
+    - - 23
+      - 16
+    - - 25
+      - 16
+  tileset/pit_brown_outer_edge_sw:
+    - - 5
+      - 52
+  tileset/grass_light_outer_edge_se:
+    - - 27
+      - 16
+  tileset/grass_med_base_variant2:
+    - - 2
+      - 18
+    - - 2
+      - 38
+  tileset/water_med_base:
+    - - 36
+      - 36
+    - - 36
+      - 38
+    - - 36
+      - 40
+    - - 38
+      - 40
+    - - 38
+      - 38
+    - - 38
+      - 34
+    - - 38
+      - 32
+    - - 38
+      - 30
+    - - 38
+      - 28
+    - - 38
+      - 26
+    - - 38
+      - 24
+    - - 38
+      - 22
+    - - 38
+      - 20
+    - - 36
+      - 20
+    - - 36
+      - 18
+    - - 36
+      - 16
+    - - 38
+      - 16
+    - - 38
+      - 14
+    - - 36
+      - 14
+    - - 38
+      - 12
+    - - 38
+      - 10
+    - - 38
+      - 8
+    - - 38
+      - 6
+    - - 38
+      - 4
+    - - 38
+      - 2
+    - - 38
+      - 0
+    - - 36
+      - 12
+    - - 34
+      - 12
+    - - 36
+      - 10
+    - - 34
+      - 10
+    - - 32
+      - 10
+    - - 36
+      - 0
+    - - 36
+      - 2
+    - - 36
+      - 4
+    - - 36
+      - 6
+    - - 36
+      - 8
+    - - 34
+      - 8
+    - - 34
+      - 6
+    - - 34
+      - 4
+    - - 34
+      - 2
+    - - 34
+      - 0
+    - - 32
+      - 0
+    - - 32
+      - 2
+    - - 32
+      - 4
+    - - 32
+      - 6
+    - - 32
+      - 8
+    - - 30
+      - 8
+    - - 30
+      - 6
+    - - 30
+      - 4
+    - - 30
+      - 2
+    - - 30
+      - 0
+    - - 28
+      - 0
+    - - 28
+      - 2
+    - - 28
+      - 4
+    - - 28
+      - 6
+    - - 28
+      - 8
+    - - 26
+      - 8
+    - - 26
+      - 4
+    - - 26
+      - 2
+    - - 26
+      - 0
+    - - 24
+      - 0
+    - - 24
+      - 2
+    - - 24
+      - 4
+    - - 24
+      - 8
+    - - 22
+      - 8
+    - - 22
+      - 6
+    - - 22
+      - 4
+    - - 22
+      - 2
+    - - 22
+      - 0
+    - - 20
+      - 0
+    - - 20
+      - 2
+    - - 20
+      - 4
+    - - 20
+      - 6
+    - - 18
+      - 6
+    - - 18
+      - 4
+    - - 18
+      - 2
+    - - 18
+      - 0
+    - - 16
+      - 0
+    - - 16
+      - 2
+    - - 16
+      - 4
+    - - 16
+      - 6
+    - - 14
+      - 6
+    - - 14
+      - 4
+    - - 14
+      - 2
+    - - 14
+      - 0
+    - - 12
+      - 0
+    - - 12
+      - 2
+    - - 12
+      - 4
+    - - 12
+      - 6
+    - - 10
+      - 4
+    - - 10
+      - 2
+    - - 10
+      - 0
+    - - 8
+      - 0
+    - - 8
+      - 2
+    - - 8
+      - 4
+    - - 8
+      - 6
+    - - 6
+      - 6
+    - - 6
+      - 4
+    - - 6
+      - 2
+    - - 6
+      - 0
+    - - 4
+      - 0
+    - - 4
+      - 2
+    - - 4
+      - 4
+    - - 4
+      - 6
+    - - 2
+      - 6
+    - - 2
+      - 4
+    - - 2
+      - 2
+    - - 2
+      - 0
+    - - 0
+      - 0
+    - - 0
+      - 2
+    - - 0
+      - 4
+    - - 0
+      - 6
+    - - 26
+      - 6
+    - - 36
+      - 42
+    - - 38
+      - 42
+    - - 38
+      - 44
+    - - 38
+      - 46
+    - - 38
+      - 48
+    - - 38
+      - 50
+    - - 38
+      - 52
+    - - 36
+      - 52
+    - - 36
+      - 50
+    - - 36
+      - 48
+    - - 36
+      - 46
+    - - 36
+      - 44
+  tileset/cliffs_ne:
+    - - 6
+      - 34
+  tileset/water_med_base_variant3:
+    - - 24
+      - 6
+    - - 10
+      - 6
+  tileset/cliffs_light_outer_edge_ne:
+    - - 30
+      - 20
+    - - 26
+      - 18
+    - - 14
+      - 16
+  tileset/cliffs_sw:
+    - - 6
+      - 36
+    - - 4
+      - 34
+  tileset/cliffs_w:
+    - - 4
+      - 32
+  tileset/dirt_light_base_variant3:
+    - - 10
+      - 20
+    - - 12
+      - 28
+    - - 14
+      - 20
+    - - 10
+      - 28
+    - - 8
+      - 18
+    - - 32
+      - 26
+    - - 34
+      - 30
+    - - 32
+      - 34
+    - - 34
+      - 24
+    - - 28
+      - 38
+    - - 30
+      - 16
+    - - 13
+      - 12
+    - - 4
+      - 11
+    - - 28
+      - 40
+    - - 31
+      - 50
+  tileset/grass_light_base:
+    - - 21
+      - 14
+    - - 23
+      - 14
+    - - 25
+      - 14
   tileset/dirt_light_base:
     - - 8
       - 30
@@ -449,39 +1147,6 @@ terrain:
       - 52
     - - 29
       - 52
-  tileset/dirt_light_inner_edge_sw:
-    - - 27
-      - 44
-    - - 25
-      - 42
-  tileset/cliffs_light_outer_edge_w:
-    - - 4
-      - 20
-    - - 4
-      - 22
-    - - 4
-      - 24
-    - - 4
-      - 26
-    - - 4
-      - 28
-  tileset/grass_light_outer_edge_e:
-    - - 27
-      - 14
-  tileset/water_med_outer_edge_sw:
-    - - 34
-      - 22
-    - - 32
-      - 14
-    - - 30
-      - 12
-    - - 20
-      - 10
-  tileset/cliffs_light_outer_edge_nw:
-    - - 6
-      - 16
-    - - 4
-      - 18
   tileset/cliffs_s:
     - - 16
       - 30
@@ -491,28 +1156,11 @@ terrain:
       - 30
     - - 8
       - 36
-  tileset/pit_brown_outer_edge_w:
-    - - 5
-      - 48
-    - - 5
-      - 46
-    - - 5
-      - 50
-  tileset/cliffs_light_inner_edge_nw:
-    - - 6
-      - 18
-  tileset/grass_light_outer_edge_s:
-    - - 19
-      - 16
-    - - 21
-      - 16
-    - - 23
-      - 16
-    - - 25
-      - 16
-  tileset/grass_dead_base_variant3:
-    - - 16
-      - 48
+  tileset/cliffs_e:
+    - - 14
+      - 34
+    - - 30
+      - 28
   tileset/cliffs_light_outer_edge_n:
     - - 28
       - 20
@@ -532,38 +1180,78 @@ terrain:
       - 16
     - - 8
       - 16
-  tileset/cliffs_light_inner_edge_sw:
-    - - 6
-      - 30
-  tileset/cliffs_light_ramp_mid_nw:
-    - - 20
-      - 28
-  tileset/grass_med_outer_edge_n:
-    - - 20
-      - 30
-    - - 22
-      - 30
-    - - 24
-      - 30
-    - - 4
-      - 14
-    - - 2
-      - 14
-    - - 0
-      - 14
-  tileset/pit_brown_outer_edge_nw:
-    - - 5
+  tileset/pit_brown_outer_edge_n:
+    - - 7
       - 44
+    - - 9
+      - 44
+  tileset/cliffs_light_outer_edge_nw:
+    - - 6
+      - 16
+    - - 4
+      - 18
+  tileset/cliffs_light_outer_edge_sw:
+    - - 4
+      - 30
+    - - 6
+      - 32
+  tileset/water_med_inner_edge_sw:
+    - - 36
+      - 22
+    - - 34
+      - 14
+    - - 32
+      - 12
+    - - 30
+      - 10
+    - - 20
+      - 8
   tileset/cliffs_light_ramp_mid_sw:
     - - 26
       - 28
-  tileset/grass_light_base:
-    - - 21
-      - 14
-    - - 23
-      - 14
-    - - 25
-      - 14
+  tileset/water_med_outer_edge_w:
+    - - 34
+      - 40
+    - - 34
+      - 38
+    - - 34
+      - 36
+    - - 34
+      - 18
+    - - 34
+      - 20
+    - - 36
+      - 32
+    - - 36
+      - 30
+    - - 36
+      - 28
+    - - 36
+      - 26
+    - - 36
+      - 24
+    - - 34
+      - 16
+    - - 34
+      - 42
+    - - 34
+      - 44
+    - - 34
+      - 48
+    - - 34
+      - 46
+    - - 34
+      - 50
+    - - 34
+      - 52
+  tileset/grass_med_inner_edge_se:
+    - - 24
+      - 32
+    - - 2
+      - 42
+  tree_small_01:
+    - - 5
+      - 20
   tileset/cliffs_c:
     - - 28
       - 28
@@ -575,66 +1263,17 @@ terrain:
       - 28
     - - 18
       - 28
+  tileset/cliffs_light_inner_edge_sw:
+    - - 6
+      - 30
+  tileset/cliffs_light_edge_overlap_se:
+    - - 14
+      - 30
   tileset/grass_med_base_variant3:
     - - 12
       - 38
     - - 2
       - 32
-  tileset/cliffs_light_inner_edge_se:
-    - - 14
-      - 26
-  tileset/water_med_outer_edge_s:
-    - - 28
-      - 10
-    - - 26
-      - 10
-    - - 24
-      - 10
-    - - 22
-      - 10
-    - - 18
-      - 8
-    - - 16
-      - 8
-    - - 14
-      - 8
-    - - 12
-      - 8
-    - - 10
-      - 8
-    - - 8
-      - 8
-    - - 6
-      - 8
-    - - 4
-      - 8
-    - - 2
-      - 8
-    - - 0
-      - 8
-  tileset/dirt_light_base_variant2:
-    - - 22
-      - 22
-    - - 8
-      - 24
-    - - 34
-      - 26
-    - - 32
-      - 38
-    - - 8
-      - 11
-    - - 15
-      - 10
-    - - 31
-      - 44
-  tileset/grass_light_outer_edge_se:
-    - - 27
-      - 16
-  tileset/grass_med_base_variant2:
-    - - 2
-      - 18
-    - - 2
-      - 38
   tileset/pit_brown_base:
     - - 9
       - 46
@@ -648,372 +1287,24 @@ terrain:
       - 50
     - - 7
       - 50
-  tileset/dirt_light_base_variant1:
-    - - 14
-      - 24
-    - - 30
-      - 30
-  tileset/grass_med_inner_edge_ne:
-    - - 6
-      - 16
-    - - 18
-      - 30
-  tileset/cliffs_light_edge_overlap_e:
-    - - 14
-      - 28
-  tileset/grass_med_outer_edge_e:
-    - - 24
-      - 40
-    - - 24
-      - 38
-    - - 24
-      - 36
-    - - 24
-      - 34
-    - - 30
-      - 30
-    - - 2
-      - 44
-  tileset/water_med_base_variant2:
-    - - 38
-      - 18
-  tileset/grass_med_outer_edge_s:
-    - - 26
-      - 32
-    - - 28
-      - 32
-    - - 0
-      - 46
-    - - 4
-      - 42
-    - - 6
-      - 42
-    - - 8
-      - 42
-    - - 10
-      - 42
-    - - 12
-      - 42
-    - - 14
-      - 42
-    - - 16
-      - 42
-    - - 18
-      - 42
-    - - 20
-      - 42
-    - - 22
-      - 42
-  tileset/cliffs_light_ramp_bot_sw:
-    - - 24
-      - 30
-  tileset/cliffs_light_outer_edge_e:
-    - - 30
-      - 22
-    - - 30
-      - 24
-  tileset/cliffs_w:
-    - - 4
-      - 32
-  tileset/pit_brown_outer_edge_ne:
-    - - 11
-      - 44
-    - - 13
-      - 50
-  tileset/cliffs_light_outer_edge_ne:
-    - - 30
-      - 20
-    - - 26
-      - 18
-    - - 14
-      - 16
-  tileset/water_med_base_variant3:
-    - - 24
-      - 6
-    - - 10
-      - 6
-  tileset/grass_med_outer_edge_se:
-    - - 30
-      - 32
-    - - 2
-      - 46
-    - - 24
-      - 42
   tileset/cliffs_light_inner_edge_ne:
     - - 26
       - 20
     - - 14
       - 18
-  tileset/grass_med_inner_edge_se:
-    - - 24
-      - 32
-    - - 2
-      - 42
-  tileset/grass_med_inner_edge_nw:
-    - - 26
-      - 30
-  tileset/pit_brown_outer_edge_n:
-    - - 7
-      - 44
-    - - 9
-      - 44
-  tileset/pit_brown_outer_edge_se:
-    - - 13
-      - 52
-  tileset/water_med_base:
-    - - 36
-      - 36
-    - - 36
-      - 38
-    - - 36
-      - 40
-    - - 38
-      - 40
-    - - 38
-      - 38
-    - - 38
+  tileset/grass_med_base_variant1:
+    - - 20
       - 34
-    - - 38
-      - 32
-    - - 38
-      - 30
-    - - 38
-      - 28
-    - - 38
-      - 26
-    - - 38
+    - - 2
       - 24
-    - - 38
-      - 22
-    - - 38
-      - 20
-    - - 36
-      - 20
-    - - 36
-      - 18
-    - - 36
-      - 16
-    - - 38
-      - 16
-    - - 38
-      - 14
-    - - 36
-      - 14
-    - - 38
-      - 12
-    - - 38
-      - 10
-    - - 38
-      - 8
-    - - 38
-      - 6
-    - - 38
-      - 4
-    - - 38
-      - 2
-    - - 38
-      - 0
-    - - 36
-      - 12
-    - - 34
-      - 12
-    - - 36
-      - 10
-    - - 34
-      - 10
-    - - 32
-      - 10
-    - - 36
-      - 0
-    - - 36
-      - 2
-    - - 36
-      - 4
-    - - 36
-      - 6
-    - - 36
-      - 8
-    - - 34
-      - 8
-    - - 34
-      - 6
-    - - 34
-      - 4
-    - - 34
-      - 2
-    - - 34
-      - 0
-    - - 32
-      - 0
-    - - 32
-      - 2
-    - - 32
-      - 4
-    - - 32
-      - 6
-    - - 32
-      - 8
-    - - 30
-      - 8
-    - - 30
-      - 6
-    - - 30
-      - 4
-    - - 30
-      - 2
-    - - 30
-      - 0
     - - 28
-      - 0
-    - - 28
-      - 2
-    - - 28
-      - 4
-    - - 28
-      - 6
-    - - 28
-      - 8
-    - - 26
-      - 8
-    - - 26
-      - 4
-    - - 26
-      - 2
-    - - 26
-      - 0
-    - - 24
-      - 0
-    - - 24
-      - 2
-    - - 24
-      - 4
-    - - 24
-      - 8
-    - - 22
-      - 8
-    - - 22
-      - 6
-    - - 22
-      - 4
-    - - 22
-      - 2
-    - - 22
-      - 0
-    - - 20
-      - 0
-    - - 20
-      - 2
-    - - 20
-      - 4
-    - - 20
-      - 6
-    - - 18
-      - 6
-    - - 18
-      - 4
-    - - 18
-      - 2
-    - - 18
-      - 0
-    - - 16
-      - 0
-    - - 16
-      - 2
-    - - 16
-      - 4
-    - - 16
-      - 6
-    - - 14
-      - 6
-    - - 14
-      - 4
-    - - 14
-      - 2
-    - - 14
-      - 0
-    - - 12
-      - 0
-    - - 12
-      - 2
-    - - 12
-      - 4
-    - - 12
-      - 6
+      - 30
+  tileset/water_med_outer_edge_nw:
+    - - 34
+      - 34
+  cliff_entrance_large:
     - - 10
-      - 4
-    - - 10
-      - 2
-    - - 10
-      - 0
-    - - 8
-      - 0
-    - - 8
-      - 2
-    - - 8
-      - 4
-    - - 8
-      - 6
-    - - 6
-      - 6
-    - - 6
-      - 4
-    - - 6
-      - 2
-    - - 6
-      - 0
-    - - 4
-      - 0
-    - - 4
-      - 2
-    - - 4
-      - 4
-    - - 4
-      - 6
-    - - 2
-      - 6
-    - - 2
-      - 4
-    - - 2
-      - 2
-    - - 2
-      - 0
-    - - 0
-      - 0
-    - - 0
-      - 2
-    - - 0
-      - 4
-    - - 0
-      - 6
-    - - 26
-      - 6
-    - - 36
-      - 42
-    - - 38
-      - 42
-    - - 38
-      - 44
-    - - 38
-      - 46
-    - - 38
-      - 48
-    - - 38
-      - 50
-    - - 38
-      - 52
-    - - 36
-      - 52
-    - - 36
-      - 50
-    - - 36
-      - 48
-    - - 36
-      - 46
-    - - 36
-      - 44
-  tileset/dirt_light_outer_edge_sw:
-    - - 25
-      - 44
+      - 32
   tileset/grass_med_base:
     - - 22
       - 34
@@ -1169,315 +1460,48 @@ terrain:
       - 42
     - - 0
       - 44
-  tileset/grass_med_base_variant1:
-    - - 20
-      - 34
-    - - 2
-      - 24
-    - - 28
-      - 30
-  tileset/cliffs_light_outer_edge_se:
-    - - 14
-      - 32
+  tileset/water_med_outer_edge_sw:
+    - - 34
+      - 22
+    - - 32
+      - 14
     - - 30
-      - 26
-  tileset/cliffs_e:
-    - - 14
-      - 34
-    - - 30
-      - 28
-  tileset/grass_light_outer_edge_nw:
-    - - 15
       - 12
-  cave_entrance_large:
-    - - 10
-      - 32
-  tileset/water_med_base_variant1:
+    - - 20
+      - 10
+  tileset/water_med_base_variant2:
     - - 38
-      - 36
-  tileset/cliffs_ne:
-    - - 6
-      - 34
-  tileset/grass_light_base_variant1:
-    - - 19
-      - 14
-  tileset/pit_brown_inner_edge_ne:
-    - - 11
-      - 50
-  tileset/cliffs_light_edge_overlap_se:
-    - - 14
-      - 30
-  tileset/pit_brown_outer_edge_s:
-    - - 7
-      - 52
-    - - 9
-      - 52
-    - - 11
-      - 52
-  tileset/grass_light_outer_edge_sw:
-    - - 17
-      - 16
-    - - 15
-      - 14
-  tileset/water_med_outer_edge_nw:
-    - - 34
-      - 34
-  tileset/cliffs_light_ramp_top_sw:
-    - - 28
-      - 26
-  tileset/dirt_light_base_variant3:
-    - - 10
-      - 20
-    - - 12
-      - 28
-    - - 14
-      - 20
-    - - 10
-      - 28
-    - - 8
       - 18
-    - - 32
-      - 26
-    - - 34
-      - 30
-    - - 32
-      - 34
-    - - 34
-      - 24
-    - - 28
-      - 38
-    - - 30
-      - 16
-    - - 13
-      - 12
-    - - 4
-      - 11
-    - - 28
-      - 40
-    - - 31
-      - 50
-  tileset/cliffs_light_ramp_top_nw:
-    - - 22
-      - 26
-  tileset/cliffs_light_outer_edge_sw:
-    - - 4
-      - 30
-    - - 6
-      - 32
-  tileset/pit_brown_outer_edge_sw:
-    - - 5
-      - 52
-  tileset/grass_light_inner_edge_sw:
-    - - 17
-      - 14
-  tileset/grass_dead_base:
-    - - 4
-      - 44
-    - - 6
-      - 44
-    - - 8
-      - 44
-    - - 10
-      - 44
-    - - 12
-      - 44
-    - - 12
-      - 46
-    - - 12
-      - 48
-    - - 12
-      - 50
-    - - 14
-      - 50
-    - - 14
-      - 52
-    - - 12
-      - 52
-    - - 10
-      - 52
-    - - 8
-      - 52
-    - - 6
-      - 52
-    - - 4
-      - 52
-    - - 4
-      - 50
-    - - 4
-      - 48
-    - - 4
-      - 46
-    - - 0
-      - 48
-    - - 0
-      - 50
-    - - 2
-      - 50
-    - - 2
-      - 52
-    - - 0
-      - 52
-    - - 14
-      - 44
-    - - 14
-      - 46
-    - - 14
-      - 48
-    - - 16
-      - 52
-    - - 16
-      - 50
-    - - 16
-      - 46
-    - - 16
-      - 44
-    - - 18
-      - 44
-    - - 18
-      - 46
-    - - 18
-      - 48
-    - - 18
-      - 50
-    - - 18
-      - 52
-    - - 0
-      - 46
-    - - 2
-      - 46
-    - - 2
-      - 44
-    - - 2
-      - 42
-    - - 4
-      - 42
-    - - 6
-      - 42
-    - - 8
-      - 42
-    - - 10
-      - 42
-    - - 12
-      - 42
-    - - 14
-      - 42
-    - - 16
-      - 42
-    - - 18
-      - 42
-    - - 20
-      - 42
-    - - 20
-      - 44
-    - - 20
-      - 46
-    - - 20
-      - 48
-    - - 20
-      - 50
-    - - 20
-      - 52
-    - - 22
-      - 42
-    - - 24
-      - 42
-    - - 24
-      - 44
-    - - 22
-      - 44
-    - - 26
-      - 44
-    - - 24
-      - 46
-    - - 26
-      - 46
-    - - 26
-      - 48
-    - - 26
-      - 50
-    - - 26
-      - 52
-    - - 24
-      - 52
-    - - 22
-      - 52
-    - - 22
-      - 50
-    - - 22
-      - 48
-    - - 24
-      - 48
-    - - 24
-      - 50
-  tileset/cliffs_light_ramp_bot_nw:
-    - - 18
-      - 30
-  tileset/pit_brown_outer_edge_e:
-    - - 11
-      - 46
-    - - 11
-      - 48
-  tileset/grass_light_outer_edge_n:
-    - - 17
-      - 12
-    - - 19
-      - 12
-    - - 21
-      - 12
-    - - 23
-      - 12
-    - - 25
-      - 12
   tileset/cliffs_se:
     - - 14
       - 36
     - - 30
       - 30
-  tileset/water_med_inner_edge_sw:
-    - - 36
-      - 22
-    - - 34
-      - 14
-    - - 32
-      - 12
-    - - 30
-      - 10
-    - - 20
-      - 8
-  tileset/grass_med_outer_edge_ne:
-    - - 30
+  tileset/cliffs_light_edge_overlap_e:
+    - - 14
       - 28
-    - - 6
-      - 14
-  tileset/water_med_inner_edge_nw:
-    - - 36
-      - 34
-  tileset/dirt_light_outer_edge_w:
+  tileset/dirt_light_inner_edge_sw:
     - - 27
-      - 46
-    - - 27
+      - 44
+    - - 25
+      - 42
+  tileset/pit_brown_outer_edge_w:
+    - - 5
       - 48
-    - - 27
+    - - 5
+      - 46
+    - - 5
       - 50
-    - - 27
-      - 52
-  tileset/cliffs_light_outer_edge_s:
-    - - 16
-      - 26
-    - - 18
-      - 26
-    - - 20
-      - 26
-    - - 8
+  tileset/grass_med_outer_edge_se:
+    - - 30
       - 32
-  tileset/cliffs_sw:
+    - - 2
+      - 46
+    - - 24
+      - 42
+  tileset/cliffs_light_inner_edge_nw:
     - - 6
-      - 36
-    - - 4
-      - 34
-  tileset/grass_light_outer_edge_ne:
-    - - 27
-      - 12
+      - 18
 elevation:
   - 0
   - 0

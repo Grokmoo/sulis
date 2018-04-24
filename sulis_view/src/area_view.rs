@@ -31,7 +31,7 @@ use sulis_core::config::CONFIG;
 use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::extern_image::ImageBuffer;
 use sulis_widgets::Label;
-use sulis_module::{ObjectSize, area::Layer};
+use sulis_module::{ObjectSize, area::{Layer, Tile}};
 use sulis_state::{AreaDrawable, AreaState, EntityState, EntityTextureCache, GameState, Location};
 
 use {EntityMouseover, PropMouseover, action_kind};
@@ -134,19 +134,26 @@ impl AreaView {
 
     fn draw_layer_to_texture(&self, renderer: &mut GraphicsRenderer, layer: &Layer, texture_id: &str) {
         let (max_tile_x, max_tile_y) = AreaView::get_texture_cache_max(layer.width, layer.height);
-        let mut draw_list = DrawList::empty_sprite();
 
+        let mut tiles: Vec<(i32, i32, Rc<Tile>)> = Vec::new();
         for tile_y in 0..max_tile_y {
             for tile_x in 0..max_tile_x {
                 let tile = match layer.tile_at(tile_x, tile_y) {
                     &None => continue,
                     &Some(ref tile) => tile,
                 };
-                let sprite = &tile.image_display;
-
-                draw_list.append(&mut DrawList::from_sprite(sprite, tile_x, tile_y,
-                                                            tile.width, tile.height));
+                tiles.push((tile_x, tile_y, Rc::clone(tile)));
             }
+        }
+
+        // sort by the bottom y coordinate - use a stable sort so tiles maintain
+        // their ordering otherwise
+        tiles.sort_by(|a, b| { (a.1 + a.2.height).cmp(&(b.1 + b.2.height)) });
+
+        let mut draw_list = DrawList::empty_sprite();
+        for (x, y, tile) in tiles {
+            draw_list.append(&mut DrawList::from_sprite(&tile.image_display, x, y,
+                                                        tile.width, tile.height));
         }
 
         AreaView::draw_list_to_texture(renderer, draw_list, texture_id);
@@ -289,7 +296,7 @@ impl WidgetKind for AreaView {
         let area_state = GameState::area_state();
         let area = &area_state.borrow().area;
 
-        for layer in area.terrain.layers.iter() {
+        for layer in area.layer_set.layers.iter() {
             self.layers.push(layer.id.to_string());
         }
         self.cache_invalid = true;
@@ -376,8 +383,8 @@ impl WidgetKind for AreaView {
                 }
             }
 
-            for (index, layer) in state.area.terrain.layers.iter().enumerate() {
-                let texture_id = if index <= state.area.terrain.entity_layer_index {
+            for (index, layer) in state.area.layer_set.layers.iter().enumerate() {
+                let texture_id = if index <= state.area.layer_set.entity_layer_index {
                     BASE_LAYER_ID
                 } else {
                     AERIAL_LAYER_ID

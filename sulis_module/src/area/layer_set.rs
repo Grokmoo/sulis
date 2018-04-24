@@ -23,7 +23,7 @@ use sulis_core::util::{invalid_data_error};
 use area::{AreaBuilder, Layer, PropData, Tile};
 use {Module, generator};
 
-pub struct Terrain {
+pub struct LayerSet {
     pub width: i32,
     pub height: i32,
     pub layers: Vec<Layer>,
@@ -33,9 +33,9 @@ pub struct Terrain {
     visible: Vec<bool>,
 }
 
-impl Terrain {
+impl LayerSet {
     pub fn new(builder: &AreaBuilder, module: &Module, props: &Vec<PropData>)
-        -> Result<Terrain, Error> {
+        -> Result<LayerSet, Error> {
         let width = builder.width as i32;
         let height = builder.height as i32;
         let dim = (width * height) as usize;
@@ -46,11 +46,11 @@ impl Terrain {
             let layer = Layer::new(builder, id, tiles)?;
             vec![layer]
         } else {
-            Terrain::validate_tiles(builder, module)?;
+            LayerSet::validate_tiles(builder, module)?;
 
             let mut layer_tiles: HashMap<String, Vec<Option<Rc<Tile>>>> = HashMap::new();
 
-            for (tile_id, locations) in &builder.terrain {
+            for (tile_id, locations) in &builder.layer_set {
                 let tile = module.tiles.get(tile_id).unwrap();
 
                 if !layer_tiles.contains_key(&tile.layer) {
@@ -73,7 +73,7 @@ impl Terrain {
         };
 
         if layers.is_empty() {
-            return invalid_data_error("No tiles in area terrain");
+            return invalid_data_error("No tiles in area layer_set");
         }
 
         let mut entity_layer_index = builder.entity_layer;
@@ -107,7 +107,7 @@ impl Terrain {
         }
 
         let layers = layers_sorted;
-        trace!("Created terrain for '{}' with {} layers.", builder.id, layers.len());
+        trace!("Created layer_set for '{}' with {} layers.", builder.id, layers.len());
         let mut passable = vec![true;dim];
         let mut visible = vec![true;dim];
         for layer in layers.iter() {
@@ -176,7 +176,7 @@ impl Terrain {
             }
         };
 
-        Ok(Terrain {
+        Ok(LayerSet {
             width,
             height,
             layers,
@@ -188,7 +188,7 @@ impl Terrain {
     }
 
     fn validate_tiles(builder: &AreaBuilder, module: &Module) -> Result<(), Error> {
-        for (tile_id, locations) in &builder.terrain {
+        for (tile_id, locations) in &builder.layer_set {
             let tile_ref = module.tiles.get(tile_id);
             match tile_ref {
                 Some(t) => t,

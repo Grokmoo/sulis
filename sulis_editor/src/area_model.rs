@@ -373,11 +373,11 @@ impl AreaModel {
         self.max_vis_distance = area_builder.max_vis_distance;
         self.max_vis_up_one_distance = area_builder.max_vis_up_one_distance;
 
-        trace!("Loading area terrain.");
+        trace!("Loading area layer_set.");
         for &mut (_, ref mut vec) in self.tiles.iter_mut() {
             vec.clear();
         }
-        for (tile_id, positions) in area_builder.terrain {
+        for (tile_id, positions) in area_builder.layer_set {
             let tile = match Module::tile(&tile_id) {
                 None => {
                     warn!("No tile with ID {} found", tile_id);
@@ -518,16 +518,16 @@ impl AreaModel {
         let mut width = 0;
         let mut height = 0;
         let mut layers: Vec<String> = Vec::new();
-        let mut terrain: HashMap<String, Vec<Vec<usize>>> = HashMap::new();
+        let mut layer_set: HashMap<String, Vec<Vec<usize>>> = HashMap::new();
 
-        trace!("Saving terrain.");
+        trace!("Saving layer_set.");
         for &(ref layer_id, ref tiles) in self.tiles.iter() {
             layers.push(layer_id.to_string());
             for &(position, ref tile) in tiles.iter() {
                 width = cmp::max(width, position.x + tile.width);
                 height = cmp::max(height, position.y + tile.height);
 
-                let tiles_vec = terrain.entry(tile.id.to_string()).or_insert(Vec::new());
+                let tiles_vec = layer_set.entry(tile.id.to_string()).or_insert(Vec::new());
                 tiles_vec.push(vec![position.x as usize, position.y as usize]);
             }
         }
@@ -591,7 +591,7 @@ impl AreaModel {
             id: self.id.clone(),
             name: self.name.clone(),
             elevation: Some(elevation),
-            terrain,
+            layer_set,
             layers,
             visibility_tile,
             explored_tile,

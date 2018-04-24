@@ -17,11 +17,11 @@
 mod layer;
 pub use self::layer::Layer;
 
+mod layer_set;
+pub use self::layer_set::LayerSet;
+
 mod path_finder_grid;
 use self::path_finder_grid::PathFinderGrid;
-
-mod terrain;
-pub use self::terrain::Terrain;
 
 pub mod tile;
 pub use self::tile::Tile;
@@ -83,7 +83,7 @@ pub struct Area {
     pub name: String,
     pub width: i32,
     pub height: i32,
-    pub terrain: Terrain,
+    pub layer_set: LayerSet,
     path_grids: HashMap<String, PathFinderGrid>,
     pub visibility_tile: Rc<Sprite>,
     pub explored_tile: Rc<Sprite>,
@@ -112,18 +112,18 @@ impl Area {
         }
 
         info!("Creating area {}", builder.id);
-        let terrain = Terrain::new(&builder, module, &props);
-        let terrain = match terrain {
+        let layer_set = LayerSet::new(&builder, module, &props);
+        let layer_set = match layer_set {
             Ok(l) => l,
             Err(e) => {
-                warn!("Unable to generate terrain for area '{}'", builder.id);
+                warn!("Unable to generate layer_set for area '{}'", builder.id);
                 return Err(e);
             }
         };
 
         let mut path_grids = HashMap::new();
         for (_, size) in module.sizes.iter() {
-            let path_grid = PathFinderGrid::new(Rc::clone(size), &terrain);
+            let path_grid = PathFinderGrid::new(Rc::clone(size), &layer_set);
             debug!("Generated path grid for size {}", size.id);
             path_grids.insert(size.id.to_string(), path_grid);
         }
@@ -201,7 +201,7 @@ impl Area {
             name: builder.name,
             width: builder.width as i32,
             height: builder.height as i32,
-            terrain: terrain,
+            layer_set: layer_set,
             path_grids: path_grids,
             actors: builder.actors,
             encounters,
@@ -247,7 +247,7 @@ pub struct AreaBuilder {
     pub explored_tile: String,
     pub max_vis_distance: i32,
     pub max_vis_up_one_distance: i32,
-    pub terrain: HashMap<String, Vec<Vec<usize>>>,
+    pub layer_set: HashMap<String, Vec<Vec<usize>>>,
     pub elevation: Option<Vec<u8>>,
 }
 

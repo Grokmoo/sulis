@@ -35,7 +35,7 @@ pub fn calculate_los(los: &mut Vec<bool>, exp: &mut Vec<bool>,
     let min_y = cmp::max(0, entity_y - max_dist + if delta_y < 0 { delta_y } else { 0 });
     let max_y = cmp::min(area.height, entity_y + max_dist + if delta_y > 0 { delta_y } else { 0 });
 
-    let src_elev = area.terrain.elevation(entity_x, entity_y);
+    let src_elev = area.layer_set.elevation(entity_x, entity_y);
 
     for y in min_y..max_y {
         for x in min_x..max_x {
@@ -55,7 +55,7 @@ pub fn calculate_los(los: &mut Vec<bool>, exp: &mut Vec<bool>,
 pub fn has_visibility(area: &Rc<Area>, entity: &EntityState, target: &EntityState) -> bool {
     let start_x = entity.location.x + entity.size.width / 2;
     let start_y = entity.location.y + entity.size.height / 2;
-    let src_elev = area.terrain.elevation(start_x, start_y);
+    let src_elev = area.layer_set.elevation(start_x, start_y);
 
     for p in target.location_points() {
         if check_vis(area, start_x, start_y, p.x, p.y, src_elev) { return true; }
@@ -95,7 +95,7 @@ fn cast_ray(area: &Rc<Area>, start_x: i32, start_y: i32, end_x: i32, end_y: i32,
 fn check(area: &Rc<Area>, x: i32, y: i32, src_elev: u8) -> bool {
     let index = (x + y * area.width) as usize;
 
-    area.terrain.is_visible_index(index) && area.terrain.elevation_index(index) <= src_elev
+    area.layer_set.is_visible_index(index) && area.layer_set.elevation_index(index) <= src_elev
 }
 
 fn cast_high(area: &Rc<Area>, start_x: i32, start_y: i32, end_x: i32, end_y: i32, src_elev: u8) -> bool {

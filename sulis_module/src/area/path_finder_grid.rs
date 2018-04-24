@@ -18,7 +18,7 @@ use std::rc::Rc;
 use std::fmt;
 
 use ObjectSize;
-use area::Terrain;
+use area::LayerSet;
 
 pub struct PathFinderGrid {
     pub size: Rc<ObjectSize>,
@@ -45,9 +45,9 @@ impl fmt::Debug for PathFinderGrid {
 }
 
 impl PathFinderGrid {
-    pub fn new(size: Rc<ObjectSize>, terrain: &Terrain) -> PathFinderGrid {
-        let width = terrain.width;
-        let height = terrain.height;
+    pub fn new(size: Rc<ObjectSize>, layer_set: &LayerSet) -> PathFinderGrid {
+        let width = layer_set.width;
+        let height = layer_set.height;
 
         let mut passable = vec![false;(width * height) as usize];
 
@@ -59,7 +59,7 @@ impl PathFinderGrid {
                         is_passable = false;
                         break;
                     }
-                    if !terrain.is_passable(p.x, p.y) {
+                    if !layer_set.is_passable(p.x, p.y) {
                         is_passable = false;
                         break;
                     }

@@ -555,22 +555,22 @@ tiles:
     layer: base3
     size: [2, 4]
     sprite: tileset/cliffs_cave_small
-    pass: [[0, 3], [1, 3]]
+    pass: [[0, 2], [1, 2], [0, 3], [1, 3]]
   cliff_entrance_large:
     layer: base3
     size: [4, 6]
     sprite: tileset/cliffs_cave_large
-    pass: [[0, 5], [1, 5], [2, 5], [3, 5]]
+    pass: [[0, 4], [1, 4], [2, 4], [3, 4], [0, 5], [1, 5], [2, 5], [3, 5]]
   cave_entrance_small:
     layer: base3
     size: [2, 4]
     sprite: tileset/cave_entrance_small
-    pass: [[0, 3], [1, 3]]
+    pass: [[0, 2], [1, 2], [0, 3], [1, 3]]
   cave_entrance_large_w:
     layer: base3
     size: [2, 6]
     sprite: tileset/cave_entrance_large_w
-    pass: [[0, 5], [1, 1], [1, 2], [1, 3], [1, 4], [1, 5]]
+    pass: [[0, 4], [0, 5], [1, 1], [1, 2], [1, 3], [1, 4], [1, 5]]
   cave_entrance_large_c:
     layer: base3
     size: [2, 6]
@@ -580,7 +580,7 @@ tiles:
     layer: base3
     size: [2, 6]
     sprite: tileset/cave_entrance_large_e
-    pass: [[0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [1, 5]]
+    pass: [[0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [1, 4], [1, 5]]
   cave_top_tunnel_nw:
     layer: aerial
     size: [1, 1]

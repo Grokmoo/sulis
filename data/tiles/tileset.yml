@@ -341,7 +341,7 @@ uniform_sets:
     impass: []
     invis: []
     tiles: [
-      plant01, plant02, plant03, plant04, plant05, plant06, plant07, plant08, plant09, plant10,
+      plant01, plant02, plant03, plant04, plant05, plant06, plant07, plant08, plant09,
       plant11, plant12, plant13, plant14, plant15, plant16, plant17, plant18, plant19, plant20
     ]
 non_uniform_sets:
@@ -645,72 +645,110 @@ tiles:
     size: [4, 4]
     sprite: tileset/log
     impass: [[1, 1], [2, 1], [1, 2], [2, 2]]
-# TODO: impass and invis for all trees
+  plant10:
+    layer: prop
+    size: [2, 2]
+    sprite: tileset/plant10
+    pass: []
   tree_small_01:
     layer: object
     size: [4, 4]
     sprite: tileset/tree_small_01
+    impass: [[1, 3], [2, 3]]
+    invis: [[1, 3], [2, 3]]
   tree_small_02:
     layer: object
     size: [6, 6]
     sprite: tileset/tree_small_02
+    impass: [[1, 4], [1, 5], [2, 4], [2, 5]]
+    invis: [[1, 4], [1, 5], [2, 4], [2, 5]]
   tree_small_03:
     layer: object
     size: [4, 6]
     sprite: tileset/tree_small_03
+    impass: [[0, 5], [1, 5]]
+    invis: [[0, 5], [1, 5]]
   tree_small_04:
     layer: object
     size: [4, 6]
     sprite: tileset/tree_small_04
+    impass: [[1, 3], [1, 4], [2, 3], [2, 4]]
+    invis: [[1, 3], [1, 4], [2, 3], [2, 4]]
   tree_small_05:
     layer: object
     size: [6, 6]
     sprite: tileset/tree_small_05
+    impass: [[1, 4], [2, 4], [1, 5], [2, 5]]
+    invis: [[1, 4], [2, 4], [1, 5], [2, 5]]
   tree_small_06:
     layer: object
     size: [4, 6]
     sprite: tileset/tree_small_06
+    impass: [[1, 4], [2, 4], [1, 5], [2, 5]]
+    invis: [[1, 4], [2, 4], [1, 5], [2, 5]]
   tree_small_07:
     layer: object
     size: [6, 6]
     sprite: tileset/tree_small_07
+    impass: [[1, 4], [2, 4], [1, 5], [2, 5]]
+    invis: [[1, 4], [2, 4], [1, 5], [2, 5]]
   tree_med_01:
     layer: aerial
     size: [8, 8]
     sprite: tileset/tree_med_01
+    impass: [[2, 5], [3, 5], [4, 5], [5, 5], [2, 6], [3, 6], [4, 6], [5, 6]]
+    invis: [[2, 5], [3, 5], [4, 5], [5, 5], [2, 6], [3, 6], [4, 6], [5, 6]]
   tree_med_02:
     layer: aerial
     size: [14, 14]
     sprite: tileset/tree_med_02
+    impass: [[4, 11], [5, 11], [6, 11], [7, 11], [4, 12], [5, 12], [6, 12], [7, 12]]
+    invis: [[4, 11], [5, 11], [6, 11], [7, 11], [4, 12], [5, 12], [6, 12], [7, 12]]
   tree_med_03:
     layer: aerial
     size: [14, 14]
     sprite: tileset/tree_med_03
+    impass: [[4, 11], [5, 11], [6, 11], [7, 11], [4, 12], [5, 12], [6, 12], [7, 12]]
+    invis: [[4, 11], [5, 11], [6, 11], [7, 11], [4, 12], [5, 12], [6, 12], [7, 12]]
   tree_med_04:
     layer: aerial
     size: [14, 14]
     sprite: tileset/tree_med_04
+    impass: [[4, 11], [5, 11], [6, 11], [7, 11], [4, 12], [5, 12], [6, 12], [7, 12]]
+    invis: [[4, 11], [5, 11], [6, 11], [7, 11], [4, 12], [5, 12], [6, 12], [7, 12]]
   tree_med_05:
     layer: aerial
     size: [12, 10]
     sprite: tileset/tree_med_05
+    impass: [[2, 8], [3, 8], [4, 8], [5, 8], [2, 9], [3, 9], [4, 9], [5, 9], [6, 9]]
+    invis: [[2, 8], [3, 8], [4, 8], [5, 8], [2, 9], [3, 9], [4, 9], [5, 9], [6, 9]]
   tree_med_06:
     layer: aerial
     size: [10, 8]
     sprite: tileset/tree_med_06
+    impass: [[2, 6], [3, 6], [4, 6], [5, 6], [2, 7], [3, 7], [4, 7], [5, 7]]
+    invis: [[2, 6], [3, 6], [4, 6], [5, 6], [2, 7], [3, 7], [4, 7], [5, 7]]
   tree_med_07:
     layer: aerial
     size: [14, 12]
     sprite: tileset/tree_med_07
+    impass: [[4, 9], [5, 9], [6, 9], [7, 9], [4, 10], [5, 10], [6, 10], [7, 10]]
+    invis: [[4, 9], [5, 9], [6, 9], [7, 9], [4, 10], [5, 10], [6, 10], [7, 10]]
   tree_med_08:
     layer: aerial
     size: [8, 12]
     sprite: tileset/tree_med_08
+    impass: [[1, 9], [2, 9], [1, 10], [2, 10]]
+    invis: [[1, 9], [2, 9], [1, 10], [2, 10]]
   tree_med_09:
     layer: aerial
     size: [14, 12]
     sprite: tileset/tree_med_09
+    impass: [[4, 9], [5, 9], [6, 9], [7, 9], [4, 10], [5, 10], [6, 10], [7, 10]]
+    invis: [[4, 9], [5, 9], [6, 9], [7, 9], [4, 10], [5, 10], [6, 10], [7, 10]]
   tree_big_01:
     layer: aerial
     size: [24, 20]
     sprite: tileset/tree_big_01
+    impass: [[8, 17], [9, 17], [10, 17], [11, 17], [8, 18], [9, 18], [10, 18], [11, 18]]
+    invis: [[8, 17], [9, 17], [10, 17], [11, 17], [8, 18], [9, 18], [10, 18], [11, 18]]

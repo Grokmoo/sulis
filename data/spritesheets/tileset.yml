@@ -354,7 +354,7 @@ groups:
       tree_small_06: [8, 10, 2, 3]
       tree_small_07: [10, 10, 3, 3]
         
-      tree_med_01: [12, 7, 4, 4]
+      tree_med_01: [13, 7, 4, 4]
       tree_med_02: [0, 0, 7, 7]
       tree_med_03: [7, 0, 7, 7]
       tree_med_04: [14, 0, 7, 7]

@@ -2,6 +2,8 @@ id: tileset
 terrain_rules:
   grid_width: 2
   grid_height: 2
+  base_layer: "base"
+  border_layer: "base2"
   prefix: "tileset/"
   base_postfix: "_base"
   variant_postfix: "_base_variant"

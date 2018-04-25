@@ -67,6 +67,8 @@ pub struct TileBuilder {
 pub struct TerrainRules {
     pub grid_width: u32,
     pub grid_height: u32,
+    pub base_layer: String,
+    pub border_layer: String,
     pub prefix: String,
     pub base_postfix: String,
     pub variant_postfix: String,

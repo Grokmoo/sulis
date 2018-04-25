@@ -35,6 +35,11 @@ children:
             preferred_size: [24, 4]
             text: "Shift Tiles"
             position: [54, 0]
+          terrain:
+            from: .button
+            preferred_size: [20, 4]
+            text: "Terrain"
+            position: [168, 0]
           tiles:
             from: .button
             preferred_size: [20, 4]
@@ -65,6 +70,34 @@ children:
         height_relative: Max
         preferred_size: [-128, -4]
         position: [0, 4]
+      terrain_picker:
+        background: bg_base
+        border: [1, 1, 1, 1]
+        preferred_size: [128, -4]
+        x_relative: Max
+        height_relative: Max
+        position: [0, 4]
+        children:
+          brush_size_label:
+            from: .label
+            text: "Brush Size"
+            position: [5, 5]
+            preferred_size: [30, 12]
+          brush_size:
+            from: .spinner
+            position: [35, 5]
+          terrain_content:
+            height_relative: Max
+            width_relative: Max
+            position: [0, 24]
+            preferred_size: [-20, -4]
+            layout: Grid
+            layout_spacing: [0, 0, 0, 0]
+            children:
+              terrain_button:
+                from: .button
+                foreground: "#icon#"
+                preferred_size: [20, 20]
       elevation_picker:
         background: bg_base
         border: [1, 1, 1, 1]

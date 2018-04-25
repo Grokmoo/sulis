@@ -62,16 +62,46 @@ pub struct TileBuilder {
     pub override_impass: Option<bool>,
 }
 
+#[derive(Deserialize, Debug, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct TerrainRules {
+    pub grid_width: u32,
+    pub grid_height: u32,
+    pub prefix: String,
+    pub base_postfix: String,
+    pub variant_postfix: String,
+    pub inner_edge_postfix: String,
+    pub outer_edge_postfix: String,
+    pub n_postfix: String,
+    pub s_postfix: String,
+    pub e_postfix: String,
+    pub w_postfix: String,
+    pub ne_postfix: String,
+    pub se_postfix: String,
+    pub nw_postfix: String,
+    pub sw_postfix: String,
+    pub base_weight: u32,
+}
+
+#[derive(Deserialize, Debug, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct TerrainKind {
+    pub id: String,
+    pub variants: Vec<i32>,
+}
+
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
-pub struct TilesList {
+pub struct Tileset {
     pub id: String,
     pub tiles: HashMap<String, TileBuilder>,
     pub uniform_sets: HashMap<String, UniformSet>,
     pub non_uniform_sets: HashMap<String, NonUniformSet>,
+    pub terrain_rules: TerrainRules,
+    pub terrain_kinds: Vec<TerrainKind>,
 }
 
-impl TilesList {
+impl Tileset {
     fn move_tiles(&mut self) {
         self.move_uniform();
         self.move_non_uniform();
@@ -134,13 +164,13 @@ impl TilesList {
     }
 }
 
-impl ResourceBuilder for TilesList {
+impl ResourceBuilder for Tileset {
     fn owned_id(&self) -> String {
         self.id.to_owned()
     }
 
-    fn from_yaml(data: &str) -> Result<TilesList, Error> {
-        let resource: Result<TilesList, serde_yaml::Error> = serde_yaml::from_str(data);
+    fn from_yaml(data: &str) -> Result<Tileset, Error> {
+        let resource: Result<Tileset, serde_yaml::Error> = serde_yaml::from_str(data);
 
         match resource {
             Ok(mut resource) => {

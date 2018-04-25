@@ -1,4 +1,87 @@
 id: tileset
+terrain_rules:
+  grid_width: 2
+  grid_height: 2
+  prefix: "tileset/"
+  base_postfix: "_base"
+  variant_postfix: "_base_variant"
+  inner_edge_postfix: "_inner_edge_"
+  outer_edge_postfix: "_outer_edge_"
+  n_postfix: "n"
+  s_postfix: "s"
+  e_postfix: "e"
+  w_postfix: "w"
+  ne_postfix: "ne"
+  se_postfix: "se"
+  nw_postfix: "nw"
+  sw_postfix: "sw"
+  base_weight: 10
+terrain_kinds:
+  - id: dirt_light
+    variants: [1, 2, 3]
+  - id: dirt_med
+    variants: [1, 2, 3]
+  - id: dirt_dark
+    variants: [1, 2, 3]
+  - id: grass_light
+    variants: [1, 2, 3]
+  - id: grass_med
+    variants: [1, 2, 3]
+  - id: grass_dark
+    variants: [1, 2, 3]
+  - id: grass_dead
+    variants: [1, 2, 3]
+  - id: rocks_white
+    variants: [1, 2, 3]
+  - id: rocks_light
+    variants: [1, 2, 3]
+  - id: rocks_med
+    variants: [1, 2, 3]
+  - id: rocks_dark
+    variants: [1, 2, 3]
+  - id: sand
+    variants: [1, 2, 3]
+  - id: ice
+    variants: [1, 2, 3]
+  - id: snow
+    variants: [1, 2, 3]
+  - id: gravel
+    variants: [1, 2]
+  - id: earth
+    variants: [1, 2, 3]
+  - id: mud
+    variants: [1, 2, 3]
+  - id: cobble_sand
+    variants: [1, 2, 3]
+  - id: cobble_white
+    variants: [1, 2, 3]
+  - id: cobble_clay
+    variants: [1, 2, 3]
+  - id: cobble_stone
+    variants: [1, 2, 3]
+  - id: cobble_dirt
+    variants: [1, 2, 3]
+  - id: cobble_plain
+    variants: [1, 2, 3]
+  - id: water_light
+    variants: [1, 2, 3]
+  - id: water_med
+    variants: [1, 2, 3]
+  - id: water_dark
+    variants: [1, 2, 3]
+  - id: water_poison
+    variants: [1, 2, 3]
+  - id: water_swamp
+    variants: [1, 2, 3]
+  - id: lava
+    variants: [1, 2, 3]
+  - id: pit_brown
+    variants: []
+  - id: pit_black
+    variants: []
+  - id: pit_dark
+    variants: []
+  
 uniform_sets:
   base_impass:
     layer: base
@@ -14,7 +97,9 @@ uniform_sets:
       water_poison_base, water_poison_base_variant1, water_poison_base_variant2, water_poison_base_variant3,
       water_swamp_base, water_swamp_base_variant1, water_swamp_base_variant2, water_swamp_base_variant3,
       lava_base, lava_base_variant1, lava_base_variant2, lava_base_variant3,
-      pit_brown_base, pit_black_base, pit_dark_base
+      pit_brown_base,
+      pit_black_base,
+      pit_dark_base
     ]
   base_all_passable:
     layer: base

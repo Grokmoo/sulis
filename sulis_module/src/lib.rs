@@ -116,7 +116,7 @@ use self::loot_list::LootListBuilder;
 use self::prop::PropBuilder;
 use self::race::RaceBuilder;
 use self::object_size::ObjectSizeBuilder;
-use self::area::TilesList;
+use self::area::{Tileset, tile::{TerrainRules, TerrainKind}};
 
 thread_local! {
     static MODULE: RefCell<Module> = RefCell::new(Module::default());
@@ -141,6 +141,9 @@ pub struct Module {
     sizes: HashMap<String, Rc<ObjectSize>>,
     tiles: HashMap<String, Rc<Tile>>,
     scripts: HashMap<String, String>,
+
+    terrain_rules: Option<TerrainRules>,
+    terrain_kinds: Vec<TerrainKind>,
 }
 
 #[derive(Clone)]
@@ -314,6 +317,9 @@ impl Module {
             }
 
             for (_, tiles_list) in builder_set.tile_builders {
+                module.terrain_rules = Some(tiles_list.terrain_rules);
+                module.terrain_kinds = tiles_list.terrain_kinds;
+
                 for (id, tile_builder) in tiles_list.tiles {
                     insert_if_ok("tile", id.to_string(), Tile::new(id, tile_builder), &mut module.tiles);
                 }
@@ -387,6 +393,14 @@ impl Module {
 
     pub fn rules() -> Rc<Rules> {
         MODULE.with(|m| Rc::clone(m.borrow().rules.as_ref().unwrap()))
+    }
+
+    pub fn terrain_rules() -> TerrainRules {
+        MODULE.with(|m| m.borrow().terrain_rules.as_ref().unwrap().clone())
+    }
+
+    pub fn terrain_kinds() -> Vec<TerrainKind> {
+        MODULE.with(|m| m.borrow().terrain_kinds.clone())
     }
 
     getters!(
@@ -466,6 +480,8 @@ impl Default for Module {
             sizes: HashMap::new(),
             tiles: HashMap::new(),
             scripts: HashMap::new(),
+            terrain_rules: None,
+            terrain_kinds: Vec::new(),
         }
     }
 }
@@ -485,7 +501,7 @@ struct ModuleBuilder {
     prop_builders: HashMap<String, PropBuilder>,
     race_builders: HashMap<String, RaceBuilder>,
     size_builders: HashMap<String, ObjectSizeBuilder>,
-    tile_builders: HashMap<String, TilesList>,
+    tile_builders: HashMap<String, Tileset>,
 }
 
 impl ModuleBuilder {

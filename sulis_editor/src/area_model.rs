@@ -125,6 +125,14 @@ impl AreaModel {
         self.tiles[index].1.push((Point::new(x, y), tile));
     }
 
+    pub fn remove_all_tiles(&mut self, x: i32, y: i32, width: i32, height: i32) {
+        for &mut (_, ref mut tiles) in self.tiles.iter_mut() {
+            tiles.retain(|&(pos, ref tile)| {
+                !is_removal(pos, tile.width, tile.height, x, y, width, height)
+            });
+        }
+    }
+
     pub fn remove_tiles_within(&mut self, layer_id: &str, x: i32, y: i32, width: i32, height: i32) {
         for &mut (ref cur_layer_id, ref mut tiles) in self.tiles.iter_mut() {
             if layer_id != cur_layer_id { continue; }

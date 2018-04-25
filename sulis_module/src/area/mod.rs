@@ -25,7 +25,7 @@ use self::path_finder_grid::PathFinderGrid;
 
 pub mod tile;
 pub use self::tile::Tile;
-pub use self::tile::TilesList;
+pub use self::tile::Tileset;
 
 use std::collections::HashMap;
 use std::io::{Error, ErrorKind};

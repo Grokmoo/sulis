@@ -4,6 +4,7 @@ name: Cave
 width: 42
 height: 26
 generate: false
+terrain: []
 layers:
   - base
   - base2

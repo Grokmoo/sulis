@@ -19,11 +19,35 @@ terrain_rules:
   sw_postfix: "sw"
   base_weight: 10
 terrain_kinds:
-  - id: dirt_light
+  - id: water_light
     variants: [1, 2, 3]
-  - id: dirt_med
+  - id: water_med
     variants: [1, 2, 3]
-  - id: dirt_dark
+  - id: water_dark
+    variants: [1, 2, 3]
+  - id: water_poison
+    variants: [1, 2, 3]
+  - id: water_swamp
+    variants: [1, 2, 3]
+  - id: lava
+    variants: [1, 2, 3]
+  - id: pit_brown
+    variants: []
+  - id: pit_black
+    variants: []
+  - id: pit_dark
+    variants: []
+  - id: cobble_sand
+    variants: [1, 2, 3]
+  - id: cobble_white
+    variants: [1, 2, 3]
+  - id: cobble_clay
+    variants: [1, 2, 3]
+  - id: cobble_stone
+    variants: [1, 2, 3]
+  - id: cobble_dirt
+    variants: [1, 2, 3]
+  - id: cobble_plain
     variants: [1, 2, 3]
   - id: grass_light
     variants: [1, 2, 3]
@@ -32,6 +56,12 @@ terrain_kinds:
   - id: grass_dark
     variants: [1, 2, 3]
   - id: grass_dead
+    variants: [1, 2, 3]
+  - id: dirt_light
+    variants: [1, 2, 3]
+  - id: dirt_med
+    variants: [1, 2, 3]
+  - id: dirt_dark
     variants: [1, 2, 3]
   - id: rocks_white
     variants: [1, 2, 3]
@@ -53,36 +83,6 @@ terrain_kinds:
     variants: [1, 2, 3]
   - id: mud
     variants: [1, 2, 3]
-  - id: cobble_sand
-    variants: [1, 2, 3]
-  - id: cobble_white
-    variants: [1, 2, 3]
-  - id: cobble_clay
-    variants: [1, 2, 3]
-  - id: cobble_stone
-    variants: [1, 2, 3]
-  - id: cobble_dirt
-    variants: [1, 2, 3]
-  - id: cobble_plain
-    variants: [1, 2, 3]
-  - id: water_light
-    variants: [1, 2, 3]
-  - id: water_med
-    variants: [1, 2, 3]
-  - id: water_dark
-    variants: [1, 2, 3]
-  - id: water_poison
-    variants: [1, 2, 3]
-  - id: water_swamp
-    variants: [1, 2, 3]
-  - id: lava
-    variants: [1, 2, 3]
-  - id: pit_brown
-    variants: []
-  - id: pit_black
-    variants: []
-  - id: pit_dark
-    variants: []
   
 uniform_sets:
   base_impass:
@@ -217,10 +217,10 @@ uniform_sets:
       sand_outer_edge_nw, sand_outer_edge_n, sand_outer_edge_ne, sand_outer_edge_w,
       sand_outer_edge_e, sand_outer_edge_sw, sand_outer_edge_s, sand_outer_edge_se,
       
-      rocks_dark_top1, rocks_dark_top2, rocks_dark_sw_to_ne, rocks_dark_nw_to_se,
-      rocks_dark_inner_edge_se, rocks_dark_inner_edge_sw, rocks_dark_inner_edge_ne, rocks_dark_inner_edge_nw,
-      rocks_dark_outer_edge_nw, rocks_dark_outer_edge_n, rocks_dark_outer_edge_ne, rocks_dark_outer_edge_w,
-      rocks_dark_outer_edge_e, rocks_dark_outer_edge_sw, rocks_dark_outer_edge_s, rocks_dark_outer_edge_se,
+      ice_top1, ice_top2, ice_sw_to_ne, ice_nw_to_se,
+      ice_inner_edge_se, ice_inner_edge_sw, ice_inner_edge_ne, ice_inner_edge_nw,
+      ice_outer_edge_nw, ice_outer_edge_n, ice_outer_edge_ne, ice_outer_edge_w,
+      ice_outer_edge_e, ice_outer_edge_sw, ice_outer_edge_s, ice_outer_edge_se,
       
       snow_top1, snow_top2, snow_sw_to_ne, snow_nw_to_se,
       snow_inner_edge_se, snow_inner_edge_sw, snow_inner_edge_ne, snow_inner_edge_nw,

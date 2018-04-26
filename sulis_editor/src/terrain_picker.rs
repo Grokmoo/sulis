@@ -31,7 +31,9 @@ use sulis_widgets::{Button, Label, Spinner};
 
 use {area_model::MAX_AREA_SIZE, AreaModel, EditorMode};
 
-struct TerrainTiles {
+#[derive(Clone)]
+pub struct TerrainTiles {
+    pub id: String,
     base: Rc<Tile>,
     variants: Vec<Rc<Tile>>,
     inner_nw: Rc<Tile>,
@@ -50,7 +52,7 @@ struct TerrainTiles {
 }
 
 impl TerrainTiles {
-    fn new(rules: &TerrainRules, kind: TerrainKind) -> Result<TerrainTiles, Error> {
+    pub fn new(rules: &TerrainRules, kind: TerrainKind) -> Result<TerrainTiles, Error> {
         let base_tile_id = format!("{}{}{}", rules.prefix, kind.id,
                                    rules.base_postfix);
         let base = match Module::tile(&base_tile_id) {
@@ -88,6 +90,7 @@ impl TerrainTiles {
         let outer_sw = TerrainTiles::get_edge(&rules, &kind.id, &rules.outer_edge_postfix, &rules.sw_postfix)?;
 
         Ok(TerrainTiles {
+            id: kind.id,
             base,
             variants,
             inner_nw, inner_ne, inner_sw, inner_se,
@@ -118,11 +121,7 @@ pub struct TerrainPicker {
     grid_height: i32,
 
     terrain_rules: TerrainRules,
-    terrain_kinds: Vec<TerrainTiles>,
-
     cur_terrain: Option<usize>,
-
-    terrain: Vec<usize>,
 }
 
 impl TerrainPicker {
@@ -133,15 +132,6 @@ impl TerrainPicker {
         };
 
         let terrain_rules = Module::terrain_rules();
-        let terrain_in = Module::terrain_kinds();
-
-        let mut terrain_kinds = Vec::new();
-        for kind in terrain_in {
-            match TerrainTiles::new(&terrain_rules, kind) {
-                Err(_) => continue,
-                Ok(terrain) => terrain_kinds.push(terrain),
-            }
-        }
 
         Rc::new(RefCell::new(TerrainPicker {
             cursor_sprite,
@@ -150,9 +140,7 @@ impl TerrainPicker {
             grid_width: terrain_rules.grid_width as i32,
             grid_height: terrain_rules.grid_height as i32,
             terrain_rules,
-            terrain_kinds,
             cur_terrain: None,
-            terrain: vec![0;(MAX_AREA_SIZE * MAX_AREA_SIZE) as usize],
         }))
     }
 
@@ -171,20 +159,20 @@ impl TerrainPicker {
         return Rc::clone(&tiles.variants[(roll - base_weight) as usize]);
     }
 
-    fn check_add_border(&self, tiles: &TerrainTiles, model: &mut AreaModel, x: i32, y: i32) {
-        let self_index = self.terrain[(x + y * MAX_AREA_SIZE) as usize];
-
+    fn check_add_border(&self, model: &mut AreaModel, x: i32, y: i32) {
+        let self_index = model.terrain_index_at(x, y);
+        let tiles = model.terrain_kind(self_index).clone();
         let gh = self.grid_height;
         let gw = self.grid_width;
 
-        let n = self.is_border(self_index, x, y, 0, -gh);
-        let e = self.is_border(self_index, x, y, gw, 0);
-        let s = self.is_border(self_index, x, y, 0, gh);
-        let w = self.is_border(self_index, x, y, -gw, 0);
-        let nw = self.is_border(self_index, x, y, -gw, -gh);
-        let ne = self.is_border(self_index, x, y, gw, -gh);
-        let se = self.is_border(self_index, x, y, gw, gh);
-        let sw = self.is_border(self_index, x, y, -gw, gh);
+        let n = self.is_border(model, self_index, x, y, 0, -gh);
+        let e = self.is_border(model, self_index, x, y, gw, 0);
+        let s = self.is_border(model, self_index, x, y, 0, gh);
+        let w = self.is_border(model, self_index, x, y, -gw, 0);
+        let nw = self.is_border(model, self_index, x, y, -gw, -gh);
+        let ne = self.is_border(model, self_index, x, y, gw, -gh);
+        let se = self.is_border(model, self_index, x, y, gw, gh);
+        let sw = self.is_border(model, self_index, x, y, -gw, gh);
 
         if n && nw && w { model.add_tile(Rc::clone(&tiles.outer_nw), x - gw, y - gh); }
 
@@ -209,12 +197,13 @@ impl TerrainPicker {
         if s && sw && w { model.add_tile(Rc::clone(&tiles.outer_sw), x - gw, y + gh); }
     }
 
-    fn is_border(&self, self_index: usize, x: i32, y: i32, delta_x: i32, delta_y: i32) -> bool {
+    fn is_border(&self, model: &AreaModel, self_index: usize, x: i32, y: i32,
+                 delta_x: i32, delta_y: i32) -> bool {
         let x = x + delta_x;
         let y = y + delta_y;
-        if x < 0 || x >= MAX_AREA_SIZE || y < 0 || y >= MAX_AREA_SIZE { return false; }
+        if x < 0 || x >= MAX_AREA_SIZE || y < 0 || y >= MAX_AREA_SIZE { return true; }
 
-        self_index > self.terrain[(x + y * MAX_AREA_SIZE) as usize]
+        self_index < model.terrain_index_at(x, y)
     }
 }
 
@@ -252,13 +241,13 @@ impl EditorMode for TerrainPicker {
     fn left_click(&mut self, model: &mut AreaModel, x: i32, y: i32) {
         let (index, cur_terrain) = match self.cur_terrain {
             None => return,
-            Some(i) => (i, &self.terrain_kinds[i]),
+            Some(i) => (i, model.terrain_kind(i).clone()),
         };
 
         let x_min = if x % 2 == 0 { x } else { x + 1 };
         let y_min = if y % 2 == 0 { y } else { y + 1 };
         model.remove_tiles_within(&self.terrain_rules.border_layer,
-                                  x_min - self.grid_width, y_min - self.grid_height,
+                                  x_min - 1 * self.grid_width, y_min - 1 * self.grid_height,
                                   (self.brush_size + 2) * self.grid_width,
                                   (self.brush_size + 2) * self.grid_height);
         model.remove_tiles_within(&self.terrain_rules.base_layer,
@@ -272,18 +261,19 @@ impl EditorMode for TerrainPicker {
                 let y = y_min + yi * self.grid_height;
                 if x < 0 || x >= MAX_AREA_SIZE || y < 0 || y >= MAX_AREA_SIZE { continue; }
 
-                self.terrain[(x + y * MAX_AREA_SIZE) as usize] = index;
-
-                model.add_tile(self.gen_choice(cur_terrain), x, y);
+                model.set_terrain_index(x, y, index);
+                model.add_tile(self.gen_choice(&cur_terrain), x, y);
             }
         }
 
-        for yi in -1..self.brush_size+1 {
-            for xi in -1..self.brush_size+1 {
+        // add tiles in a larger radius than we removed -
+        // we rely on the model to not add already existing tiles twice
+        for yi in -2..self.brush_size+2 {
+            for xi in -2..self.brush_size+2 {
                 let x = x_min + xi * self.grid_width;
                 let y = y_min + yi * self.grid_height;
                 if x < 0 || x >= MAX_AREA_SIZE || y < 0 || y >= MAX_AREA_SIZE { continue; }
-                self.check_add_border(cur_terrain, model, x, y);
+                self.check_add_border(model, x, y);
             }
         }
     }
@@ -293,6 +283,16 @@ impl EditorMode for TerrainPicker {
         let y_min = if y % 2 == 0 { y } else { y + 1 };
         model.remove_all_tiles(x_min, y_min, self.brush_size * self.grid_width,
                                 self.brush_size * self.grid_height);
+
+        for yi in 0..self.brush_size {
+            for xi in 0..self.brush_size {
+                let x = x_min + xi * self.grid_width;
+                let y = y_min + yi * self.grid_height;
+                if x < 0 || x >= MAX_AREA_SIZE || y < 0 || y >= MAX_AREA_SIZE { continue; }
+
+                model.set_terrain_index(x, y, 0);
+            }
+        }
     }
 }
 
@@ -318,9 +318,12 @@ impl WidgetKind for TerrainPicker {
         let brush_size_label = Widget::with_theme(Label::empty(), "brush_size_label");
 
         let terrain_content = Widget::empty("terrain_content");
-        for (i, terrain_kind) in self.terrain_kinds.iter().enumerate() {
+        for (i, terrain_kind) in Module::terrain_kinds().into_iter().enumerate() {
+            let base_tile_id = format!("{}{}{}", self.terrain_rules.prefix, terrain_kind.id,
+                                       self.terrain_rules.base_postfix);
+
             let button = Widget::with_theme(Button::empty(), "terrain_button");
-            button.borrow_mut().state.add_text_arg("icon", &terrain_kind.base.image_display.full_id());
+            button.borrow_mut().state.add_text_arg("icon", &base_tile_id);
 
             let cb: Callback = Callback::new(Rc::new(move |widget, _| {
                 let parent = Widget::get_parent(widget);

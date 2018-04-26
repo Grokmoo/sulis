@@ -4,6 +4,7 @@ name: Wellswood Road
 width: 45
 height: 64
 generate: false
+terrain: []
 layers:
   - base
   - base2

@@ -27,6 +27,8 @@ use sulis_core::util::{Point, Size};
 use sulis_module::{Actor, Encounter, Module, Prop};
 use sulis_module::area::*;
 
+use terrain_picker::TerrainTiles;
+
 pub (crate) const MAX_AREA_SIZE: i32 = 128;
 
 pub struct AreaModel {
@@ -46,6 +48,9 @@ pub struct AreaModel {
     filename: String,
     max_vis_distance: i32,
     max_vis_up_one_distance: i32,
+
+    terrain_kinds: Vec<TerrainTiles>,
+    terrain: Vec<usize>,
 }
 
 impl AreaModel {
@@ -72,9 +77,20 @@ impl AreaModel {
 
         let elevation = vec![0;(MAX_AREA_SIZE * MAX_AREA_SIZE) as usize];
 
+        let terrain_rules = Module::terrain_rules();
+        let mut terrain_kinds = Vec::new();
+        for kind in Module::terrain_kinds() {
+            match TerrainTiles::new(&terrain_rules, kind) {
+                Err(_) => continue,
+                Ok(terrain) => terrain_kinds.push(terrain),
+            }
+        }
+
         AreaModel {
             tiles,
             elevation,
+            terrain_kinds,
+            terrain: vec![0;(MAX_AREA_SIZE * MAX_AREA_SIZE) as usize],
             actors: Vec::new(),
             props: Vec::new(),
             encounters: Vec::new(),
@@ -118,10 +134,31 @@ impl AreaModel {
         self.elevation[(x + y * MAX_AREA_SIZE) as usize] = elev;
     }
 
+    pub fn terrain_index_at(&self, x: i32, y: i32) -> usize {
+        self.terrain[(x + y * MAX_AREA_SIZE) as usize]
+    }
+
+    pub fn terrain_kind(&self, index: usize) -> &TerrainTiles {
+        &self.terrain_kinds[index]
+    }
+
+    pub fn terrain_kinds(&self) -> &Vec<TerrainTiles> {
+        &self.terrain_kinds
+    }
+
+    pub fn set_terrain_index(&mut self, x: i32, y: i32, index: usize) {
+        self.terrain[(x + y * MAX_AREA_SIZE) as usize] = index;
+    }
+
     pub fn add_tile(&mut self, tile: Rc<Tile>, x: i32, y: i32) {
         if x < 0 || y < 0 { return; }
 
         let index = self.create_layer_if_missing(&tile.layer);
+
+        // check if the tile already exists
+        for &(p, ref other_tile) in self.tiles[index].1.iter() {
+            if p.x == x && p.y == y && Rc::ptr_eq(other_tile, &tile) { return; }
+        }
         self.tiles[index].1.push((Point::new(x, y), tile));
     }
 
@@ -381,6 +418,22 @@ impl AreaModel {
         self.max_vis_distance = area_builder.max_vis_distance;
         self.max_vis_up_one_distance = area_builder.max_vis_up_one_distance;
 
+        trace!("Loading terrain");
+        if area_builder.terrain.len() <= self.terrain.len() {
+            for (j, id) in area_builder.terrain.into_iter().enumerate() {
+                let mut index = 0;
+                for (i, kind) in self.terrain_kinds.iter().enumerate() {
+                    if kind.id == id {
+                        index = i;
+                        break;
+                    }
+                }
+                self.terrain[j] = index;
+            }
+        } else {
+            warn!("Unable to load terrain as there are too many entries.");
+        }
+
         trace!("Loading area layer_set.");
         for &mut (_, ref mut vec) in self.tiles.iter_mut() {
             vec.clear();
@@ -595,10 +648,17 @@ impl AreaModel {
             }
         }
 
+        let mut terrain = Vec::new();
+        for i in self.terrain.iter() {
+            let tiles = &self.terrain_kinds[*i];
+            terrain.push(tiles.id.to_string());
+        }
+
         let area_builder = AreaBuilder {
             id: self.id.clone(),
             name: self.name.clone(),
             elevation: Some(elevation),
+            terrain,
             layer_set,
             layers,
             visibility_tile,

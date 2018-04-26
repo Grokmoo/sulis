@@ -236,6 +236,7 @@ pub struct AreaBuilder {
     pub width: usize,
     pub height: usize,
     pub generate: bool,
+    pub terrain: Vec<String>,
     pub layers: Vec<String>,
     pub entity_layer: usize,
     pub actors: Vec<ActorData>,

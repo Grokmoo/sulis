@@ -90,6 +90,8 @@ pub trait EditorMode: WidgetKind {
     fn left_click(&mut self, model: &mut AreaModel, x: i32, y: i32);
 
     fn right_click(&mut self, model: &mut AreaModel, x: i32, y: i32);
+
+    fn mouse_scroll(&mut self, _model: &mut AreaModel, _delta: i32) { }
 }
 
 const NAME: &str = "editor";

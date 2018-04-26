@@ -25,72 +25,64 @@ pub struct Layer {
     pub id: String,
     pub width: i32,
     pub height: i32,
-    display: Vec<Option<Rc<Tile>>>,
+    display: Vec<Vec<Rc<Tile>>>,
     passable: Vec<bool>,
     visible: Vec<bool>,
-    spritesheet_id: String,
+    spritesheet_id: Option<String>,
     pub (in area) impass_override_tiles: Vec<(Point, Rc<Tile>)>,
 }
 
 impl Layer {
     pub fn new(builder: &AreaBuilder, id: String,
-               tiles: Vec<Option<Rc<Tile>>>) -> Result<Layer, Error> {
+               tiles: Vec<Vec<Rc<Tile>>>) -> Result<Layer, Error> {
         let width = builder.width as i32;
         let height = builder.height as i32;
         let dim = (width * height) as usize;
 
         let mut impass_overrides = Vec::new();
-        let mut display: Vec<Option<Rc<Tile>>> = vec![None;dim];
+        let mut display: Vec<Vec<Rc<Tile>>> = vec![Vec::new();dim];
         let mut passable: Vec<bool> = vec![true;dim];
         let mut visible: Vec<bool> = vec![true;dim];
         let mut spritesheet_id: Option<String> = None;
 
         trace!("Creating layer '{}' with size: {} x {}", id, width, height);
-        for (index, tile) in tiles.into_iter().enumerate() {
-            let tile = match tile {
-                None => continue,
-                Some(tile) => tile,
-            };
-
-            match spritesheet_id {
-                None => spritesheet_id = Some(tile.image_display.sheet_id.to_string()),
-                Some(ref id) => {
-                    if id != &tile.image_display.sheet_id {
-                        return invalid_data_error(&format!("All tiles in a layer must be from the same \
+        for (index, tile_vec) in tiles.into_iter().enumerate() {
+            for tile in tile_vec {
+                match spritesheet_id {
+                    None => spritesheet_id = Some(tile.image_display.sheet_id.to_string()),
+                    Some(ref id) => {
+                        if id != &tile.image_display.sheet_id {
+                            return invalid_data_error(&format!("All tiles in a layer must be from the same \
                                                            spritesheet: '{}' vs '{}'", id, tile.id));
+                        }
                     }
                 }
-            }
 
-            display[index] = Some(Rc::clone(&tile));
+                let base_x = (index as i32) % width;
+                let base_y = (index as i32) / width;
 
-            let base_x = (index as i32) % width;
-            let base_y = (index as i32) / width;
+                display[index].push(Rc::clone(&tile));
 
-            for p in tile.impass.iter() {
-                passable[(base_x + p.x + (base_y + p.y) * width) as usize] = false;
-            }
+                for p in tile.impass.iter() {
+                    passable[(base_x + p.x + (base_y + p.y) * width) as usize] = false;
+                }
 
-            for p in tile.invis.iter() {
-                let p_index = (base_x + p.x + (base_y + p.y) * width) as usize;
-                visible[p_index] = false;
-            }
+                for p in tile.invis.iter() {
+                    let p_index = (base_x + p.x + (base_y + p.y) * width) as usize;
+                    visible[p_index] = false;
+                }
 
-            if base_x + tile.width > width || base_y + tile.height > height {
-                return invalid_data_error(
-                    &format!("Tile '{}' at [{}, {}] extends past area boundary.",
-                             tile.id, base_x, base_y));
-            }
+                if base_x + tile.width > width || base_y + tile.height > height {
+                    return invalid_data_error(
+                        &format!("Tile '{}' at [{}, {}] extends past area boundary.",
+                                 tile.id, base_x, base_y));
+                }
 
-            if tile.override_impass {
-                impass_overrides.push((Point::new(base_x, base_y), Rc::clone(&tile)));
+                if tile.override_impass {
+                    impass_overrides.push((Point::new(base_x, base_y), Rc::clone(&tile)));
+                }
             }
         }
-
-        let spritesheet_id = match spritesheet_id {
-            None => return invalid_data_error("Empty layer"),
-            Some(id) => id,
-        };
 
         Ok(Layer {
             id,
@@ -104,8 +96,11 @@ impl Layer {
         })
     }
 
-    pub fn get_spritesheet(&self) -> Rc<Spritesheet> {
-        ResourceSet::get_spritesheet(&self.spritesheet_id).unwrap()
+    pub fn get_spritesheet(&self) -> Option<Rc<Spritesheet>> {
+        match self.spritesheet_id {
+            None => None,
+            Some(ref id) => ResourceSet::get_spritesheet(id),
+        }
     }
 
     pub fn is_visible(&self, x: i32, y: i32) -> bool {
@@ -124,7 +119,7 @@ impl Layer {
         self.passable[index]
     }
 
-    pub fn tile_at(&self, x: i32, y: i32) -> &Option<Rc<Tile>> {
+    pub fn tiles_at(&self, x: i32, y: i32) -> &Vec<Rc<Tile>> {
         &self.display[(x + y * self.width) as usize]
     }
 }

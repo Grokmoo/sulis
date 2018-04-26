@@ -40,7 +40,7 @@ impl LayerSet {
         let height = builder.height as i32;
         let dim = (width * height) as usize;
 
-        let mut layers = if builder.generate {
+        let layers = if builder.generate {
             let (id, tiles) = generator::generate_area(width, height, module)?;
 
             let layer = Layer::new(builder, id, tiles)?;
@@ -48,24 +48,29 @@ impl LayerSet {
         } else {
             LayerSet::validate_tiles(builder, module)?;
 
-            let mut layer_tiles: HashMap<String, Vec<Option<Rc<Tile>>>> = HashMap::new();
+            let mut layer_tiles: HashMap<String, Vec<Vec<Rc<Tile>>>> = HashMap::new();
+            for layer_id in builder.layers.iter() {
+                layer_tiles.insert(layer_id.to_string(), vec![Vec::new();dim]);
+            }
 
             for (tile_id, locations) in &builder.layer_set {
                 let tile = module.tiles.get(tile_id).unwrap();
 
                 if !layer_tiles.contains_key(&tile.layer) {
-                    layer_tiles.insert(tile.layer.to_string(), vec![None;dim]);
+                    return invalid_data_error(&format!("Tile {} has undefined layer {}", tile_id, tile.layer));
                 }
 
                 let mut cur_layer = layer_tiles.get_mut(&tile.layer).unwrap();
                 for point in locations.iter() {
-                    cur_layer[point[0] + point[1] * width as usize] = Some(Rc::clone(&tile));
+                    let index = point[0] + point[1] * width as usize;
+                    cur_layer[index].push(Rc::clone(&tile));
                 }
             }
 
             let mut layers: Vec<Layer> = Vec::new();
-            for (id, tiles) in layer_tiles {
-                let layer = Layer::new(builder, id, tiles)?;
+            for layer_id in builder.layers.iter() {
+                let tiles = layer_tiles.remove(layer_id).unwrap();
+                let layer = Layer::new(builder, layer_id.to_string(), tiles)?;
                 layers.push(layer);
             }
 
@@ -76,37 +81,8 @@ impl LayerSet {
             return invalid_data_error("No tiles in area layer_set");
         }
 
-        let mut entity_layer_index = builder.entity_layer;
-        let mut layers_sorted: Vec<Layer> = Vec::new();
-        for (orig_index, id) in builder.layers.iter().enumerate() {
-            let mut layer_index: Option<usize> = None;
-            for (index, layer) in layers.iter().enumerate() {
-                if &layer.id == id {
-                    layer_index = Some(index);
-                    break;
-                }
-            }
+        let entity_layer_index = builder.entity_layer;
 
-            let index = match layer_index {
-                None => {
-                    if orig_index <= entity_layer_index {
-                        entity_layer_index -= 1;
-                    }
-                    continue;
-                }
-                Some(index) => index,
-            };
-
-            let layer = layers.remove(index);
-            layers_sorted.push(layer);
-        }
-
-        if layers.len() > 0 {
-            return invalid_data_error(&format!("One or more tiles has layer '{}', but it is not\
-                present in the area definition", layers[0].id));
-        }
-
-        let layers = layers_sorted;
         trace!("Created layer_set for '{}' with {} layers.", builder.id, layers.len());
         let mut passable = vec![true;dim];
         let mut visible = vec![true;dim];

@@ -153,9 +153,39 @@ groups:
     prefix: cobble_dirt_
     from_template: borders
   cobble_plain:
-    position: [7, 21]
+    position: [3, 21]
     prefix: cobble_plain_
     from_template: borders
+  water_light_to_grass_med:
+    position: [6, 21]
+    prefix: water_light_to_grass_med_
+    from_template: borders
+  water_light_to_grass_dark:
+    position: [9, 21]
+    prefix: water_light_to_grass_dark_
+    from_template: borders
+  sand_to_water_med:
+    position: [12, 21]
+    prefix: sand_to_water_med_
+    from_template: borders
+  sand_to_water_light:
+    position: [15, 21]
+    prefix: sand_to_water_light_
+    from_template: borders
+  ice_to_water_med:
+    position: [18, 21]
+    prefix: ice_to_water_med_
+    from_template: borders
+  grass_med_variants:
+    position: [21, 21]
+    size: [1, 1]
+    areas:
+      grass_med_base_variant4: [0, 0]
+      grass_med_base_variant5: [1, 0]
+      grass_med_base_variant6: [2, 0]
+      grass_med_base_variant7: [0, 1]
+      grass_med_base_variant8: [1, 1]
+      grass_med_base_variant9: [2, 1]
   cliffs:
     position: [0, 28]
     size: [1, 1]

@@ -21,7 +21,7 @@ use Module;
 use area::Tile;
 
 pub fn generate_area(width: i32, height: i32, module: &Module) ->
-        Result<(String, Vec<Option<Rc<Tile>>>), Error> {
+        Result<(String, Vec<Vec<Rc<Tile>>>), Error> {
     debug!("Generating area with size {},{}", width, height);
     let width = width as usize;
     let height = height as usize;
@@ -45,27 +45,9 @@ pub fn generate_area(width: i32, height: i32, module: &Module) ->
                               "Found no impassable tiles to generate terrain."))
     }
 
-    // set up terrain array as passable
-    let mut terrain: Vec<Option<Rc<Tile>>> =
-        vec![Some(Rc::clone(passable_tiles.first().unwrap()));width * height];
+    let terrain: Vec<Vec<Rc<Tile>>> = vec![Vec::new();width * height];
 
-    // generate impassable borders
-    let impass = impassable_tiles.first().unwrap();
-    for x in 0..width {
-        { let cell = terrain.get_mut(x + 0 * width).unwrap();
-        *cell = Some(Rc::clone(impass)); }
-
-        let cell = terrain.get_mut(x + (height - 1) * width).unwrap();
-        *cell = Some(Rc::clone(impass));
-    }
-
-    for y in 0..height {
-        { let cell = terrain.get_mut(0 + y * width).unwrap();
-        *cell = Some(Rc::clone(impass)); }
-
-        let cell = terrain.get_mut(width - 1 + y * width).unwrap();
-        *cell = Some(Rc::clone(impass));
-    }
+    // TODO implement area generate
 
     let id = passable_tiles[0].layer.to_string();
 

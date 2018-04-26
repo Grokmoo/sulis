@@ -112,7 +112,7 @@ impl EditorMode for TilePicker {
             Some(ref tile) => tile,
         };
 
-        model.add_tile(Rc::clone(tile), x, y);
+        model.add_tile(tile, x, y);
     }
 
     fn right_click(&mut self, model: &mut AreaModel, x: i32, y: i32) {

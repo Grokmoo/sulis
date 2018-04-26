@@ -55,6 +55,15 @@ impl Spinner {
     pub fn set_min(&mut self, min: i32) {
         self.min = min;
     }
+
+    pub fn set_value(&mut self, value: i32) {
+        self.value = value;
+        if value > self.max {
+            self.value = self.max;
+        } else if value < self.min {
+            self.value = self.min;
+        }
+    }
 }
 
 impl WidgetKind for Spinner {

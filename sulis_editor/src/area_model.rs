@@ -79,8 +79,10 @@ impl AreaModel {
 
         let terrain_rules = Module::terrain_rules();
         let mut terrain_kinds = Vec::new();
+
+        let all_kinds = Module::terrain_kinds();
         for kind in Module::terrain_kinds() {
-            match TerrainTiles::new(&terrain_rules, kind) {
+            match TerrainTiles::new(&terrain_rules, kind, &all_kinds) {
                 Err(_) => continue,
                 Ok(terrain) => terrain_kinds.push(terrain),
             }
@@ -150,16 +152,16 @@ impl AreaModel {
         self.terrain[(x + y * MAX_AREA_SIZE) as usize] = index;
     }
 
-    pub fn add_tile(&mut self, tile: Rc<Tile>, x: i32, y: i32) {
+    pub fn add_tile(&mut self, tile: &Rc<Tile>, x: i32, y: i32) {
         if x < 0 || y < 0 { return; }
 
         let index = self.create_layer_if_missing(&tile.layer);
 
         // check if the tile already exists
         for &(p, ref other_tile) in self.tiles[index].1.iter() {
-            if p.x == x && p.y == y && Rc::ptr_eq(other_tile, &tile) { return; }
+            if p.x == x && p.y == y && Rc::ptr_eq(other_tile, tile) { return; }
         }
-        self.tiles[index].1.push((Point::new(x, y), tile));
+        self.tiles[index].1.push((Point::new(x, y), Rc::clone(tile)));
     }
 
     pub fn remove_all_tiles(&mut self, x: i32, y: i32, width: i32, height: i32) {

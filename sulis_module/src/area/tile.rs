@@ -82,6 +82,8 @@ pub struct TerrainRules {
     pub se_postfix: String,
     pub nw_postfix: String,
     pub sw_postfix: String,
+    pub sw_to_ne_postfix: String,
+    pub nw_to_se_postfix: String,
     pub base_weight: u32,
 }
 
@@ -90,6 +92,11 @@ pub struct TerrainRules {
 pub struct TerrainKind {
     pub id: String,
     pub variants: Vec<i32>,
+
+    #[serde(default)]
+    pub borders: HashMap<String, String>,
+
+    pub base_weight: Option<u32>,
 }
 
 #[derive(Deserialize, Debug)]

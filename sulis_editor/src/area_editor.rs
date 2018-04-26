@@ -18,7 +18,7 @@ use std::any::Any;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use sulis_core::io::{GraphicsRenderer};
+use sulis_core::io::{GraphicsRenderer, InputAction};
 use sulis_core::io::event::ClickKind;
 use sulis_core::ui::{compute_area_scaling, Cursor, Scrollable, Widget, WidgetKind};
 use sulis_core::util::{Point};
@@ -86,6 +86,23 @@ impl WidgetKind for AreaEditor {
             editor.draw(renderer, &self.model, p.x as f32 - self.scroll.x(), p.y as f32 - self.scroll.y(),
             scale_x, scale_y, millis);
         }
+    }
+
+    fn on_key_press(&mut self, _widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
+        let delta = match key {
+            InputAction::ScrollUp => 1,
+            InputAction::ScrollDown => -1,
+            _ => return false,
+        };
+
+        let editor = match self.cur_editor {
+            None => return true,
+            Some(ref editor) => editor,
+        };
+
+        editor.borrow_mut().mouse_scroll(&mut self.model, delta);
+
+        true
     }
 
     fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {

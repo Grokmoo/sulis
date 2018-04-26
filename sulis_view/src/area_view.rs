@@ -138,11 +138,9 @@ impl AreaView {
         let mut tiles: Vec<(i32, i32, Rc<Tile>)> = Vec::new();
         for tile_y in 0..max_tile_y {
             for tile_x in 0..max_tile_x {
-                let tile = match layer.tile_at(tile_x, tile_y) {
-                    &None => continue,
-                    &Some(ref tile) => tile,
-                };
-                tiles.push((tile_x, tile_y, Rc::clone(tile)));
+                for tile in layer.tiles_at(tile_x, tile_y) {
+                    tiles.push((tile_x, tile_y, Rc::clone(tile)));
+                }
             }
         }
 
@@ -156,7 +154,9 @@ impl AreaView {
                                                         tile.width, tile.height));
         }
 
-        AreaView::draw_list_to_texture(renderer, draw_list, texture_id);
+        if !draw_list.is_empty() {
+            AreaView::draw_list_to_texture(renderer, draw_list, texture_id);
+        }
     }
 
     fn draw_visibility_to_texture(&self, renderer: &mut GraphicsRenderer, vis_sprite: &Rc<Sprite>,

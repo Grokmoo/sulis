@@ -50,7 +50,7 @@ pub struct AreaModel {
     max_vis_up_one_distance: i32,
 
     terrain_kinds: Vec<TerrainTiles>,
-    terrain: Vec<usize>,
+    terrain: Vec<Option<usize>>,
 }
 
 impl AreaModel {
@@ -90,7 +90,7 @@ impl AreaModel {
             tiles,
             elevation,
             terrain_kinds,
-            terrain: vec![0;(MAX_AREA_SIZE * MAX_AREA_SIZE) as usize],
+            terrain: vec![None;(MAX_AREA_SIZE * MAX_AREA_SIZE) as usize],
             actors: Vec::new(),
             props: Vec::new(),
             encounters: Vec::new(),
@@ -134,7 +134,7 @@ impl AreaModel {
         self.elevation[(x + y * MAX_AREA_SIZE) as usize] = elev;
     }
 
-    pub fn terrain_index_at(&self, x: i32, y: i32) -> usize {
+    pub fn terrain_index_at(&self, x: i32, y: i32) -> Option<usize> {
         self.terrain[(x + y * MAX_AREA_SIZE) as usize]
     }
 
@@ -146,7 +146,7 @@ impl AreaModel {
         &self.terrain_kinds
     }
 
-    pub fn set_terrain_index(&mut self, x: i32, y: i32, index: usize) {
+    pub fn set_terrain_index(&mut self, x: i32, y: i32, index: Option<usize>) {
         self.terrain[(x + y * MAX_AREA_SIZE) as usize] = index;
     }
 
@@ -419,19 +419,28 @@ impl AreaModel {
         self.max_vis_up_one_distance = area_builder.max_vis_up_one_distance;
 
         trace!("Loading terrain");
-        if area_builder.terrain.len() <= self.terrain.len() {
-            for (j, id) in area_builder.terrain.into_iter().enumerate() {
-                let mut index = 0;
-                for (i, kind) in self.terrain_kinds.iter().enumerate() {
-                    if kind.id == id {
-                        index = i;
-                        break;
+        let width = area_builder.width as i32;
+        let (mut x, mut y) = (0, 0);
+        for id in area_builder.terrain {
+            if x + y * MAX_AREA_SIZE >= MAX_AREA_SIZE * MAX_AREA_SIZE { break; }
+
+            match id {
+                None => self.terrain[(x + y * MAX_AREA_SIZE) as usize] = None,
+                Some(id) => {
+                    for (index, kind) in self.terrain_kinds.iter().enumerate() {
+                        if kind.id == id {
+                            self.terrain[(x + y * MAX_AREA_SIZE) as usize] = Some(index);
+                            break;
+                        }
                     }
                 }
-                self.terrain[j] = index;
             }
-        } else {
-            warn!("Unable to load terrain as there are too many entries.");
+
+            x += 1;
+            if x == width {
+                x = 0;
+                y += 1;
+            }
         }
 
         trace!("Loading area layer_set.");
@@ -649,9 +658,18 @@ impl AreaModel {
         }
 
         let mut terrain = Vec::new();
-        for i in self.terrain.iter() {
-            let tiles = &self.terrain_kinds[*i];
-            terrain.push(tiles.id.to_string());
+        for y in 0..height {
+            for x in 0..width {
+                let index = match self.terrain[(x + y * MAX_AREA_SIZE) as usize] {
+                    None => {
+                        terrain.push(None);
+                        continue;
+                    }, Some(index) => index,
+                };
+
+                let tiles = &self.terrain_kinds[index];
+                terrain.push(Some(tiles.id.to_string()));
+            }
         }
 
         let area_builder = AreaBuilder {

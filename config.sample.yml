@@ -81,9 +81,9 @@ editor:
     explored_tile: "gui/area_unexplored"
     entity_layer: 4
     layers:
-      - base
-      - base2
-      - base3
+      - terrain_base
+      - terrain_border
+      - walls
       - prop
       - object
       - aerial

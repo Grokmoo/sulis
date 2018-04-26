@@ -236,7 +236,6 @@ pub struct AreaBuilder {
     pub width: usize,
     pub height: usize,
     pub generate: bool,
-    pub terrain: Vec<String>,
     pub layers: Vec<String>,
     pub entity_layer: usize,
     pub actors: Vec<ActorData>,
@@ -249,6 +248,7 @@ pub struct AreaBuilder {
     pub max_vis_distance: i32,
     pub max_vis_up_one_distance: i32,
     pub layer_set: HashMap<String, Vec<Vec<usize>>>,
+    pub terrain: Vec<Option<String>>,
     pub elevation: Option<Vec<u8>>,
 }
 

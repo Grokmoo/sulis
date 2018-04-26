@@ -160,7 +160,10 @@ impl TerrainPicker {
     }
 
     fn check_add_border(&self, model: &mut AreaModel, x: i32, y: i32) {
-        let self_index = model.terrain_index_at(x, y);
+        let self_index = match model.terrain_index_at(x, y) {
+            Some(index) => index,
+            None => return,
+        };
         let tiles = model.terrain_kind(self_index).clone();
         let gh = self.grid_height;
         let gw = self.grid_width;
@@ -203,7 +206,10 @@ impl TerrainPicker {
         let y = y + delta_y;
         if x < 0 || x >= MAX_AREA_SIZE || y < 0 || y >= MAX_AREA_SIZE { return true; }
 
-        self_index < model.terrain_index_at(x, y)
+        match model.terrain_index_at(x, y) {
+            None => false,
+            Some(index) => self_index < index
+        }
     }
 }
 
@@ -261,7 +267,7 @@ impl EditorMode for TerrainPicker {
                 let y = y_min + yi * self.grid_height;
                 if x < 0 || x >= MAX_AREA_SIZE || y < 0 || y >= MAX_AREA_SIZE { continue; }
 
-                model.set_terrain_index(x, y, index);
+                model.set_terrain_index(x, y, Some(index));
                 model.add_tile(self.gen_choice(&cur_terrain), x, y);
             }
         }
@@ -290,7 +296,7 @@ impl EditorMode for TerrainPicker {
                 let y = y_min + yi * self.grid_height;
                 if x < 0 || x >= MAX_AREA_SIZE || y < 0 || y >= MAX_AREA_SIZE { continue; }
 
-                model.set_terrain_index(x, y, 0);
+                model.set_terrain_index(x, y, None);
             }
         }
     }

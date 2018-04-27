@@ -96,9 +96,9 @@ groups:
     position: [18, 7]
     prefix: ice_
     from_template: borders
-  snow:
+  cobble_stone:
     position: [21, 7]
-    prefix: snow_
+    prefix: cobble_stone_
     from_template: borders
   gravel:
     position: [24, 7]
@@ -144,48 +144,67 @@ groups:
     position: [24, 14]
     prefix: cobble_clay_
     from_template: borders
-  cobble_stone:
-    position: [27, 14]
-    prefix: cobble_stone_
-    from_template: borders
   cobble_dirt:
-    position: [0, 21]
+    position: [27, 14]
     prefix: cobble_dirt_
     from_template: borders
   cobble_plain:
-    position: [3, 21]
+    position: [0, 21]
     prefix: cobble_plain_
     from_template: borders
   water_light_to_grass_med:
-    position: [6, 21]
+    position: [3, 21]
     prefix: water_light_to_grass_med_
     from_template: borders
   water_light_to_grass_dark:
-    position: [9, 21]
+    position: [6, 21]
     prefix: water_light_to_grass_dark_
     from_template: borders
   sand_to_water_med:
-    position: [12, 21]
+    position: [9, 21]
     prefix: sand_to_water_med_
     from_template: borders
   sand_to_water_light:
-    position: [15, 21]
+    position: [12, 21]
     prefix: sand_to_water_light_
     from_template: borders
   ice_to_water_med:
-    position: [18, 21]
+    position: [15, 21]
     prefix: ice_to_water_med_
     from_template: borders
-  grass_med_variants:
+  water_ice:
+    position: [18, 21]
+    prefix: water_ice_
+    from_template: borders
+  water_med_to_water_dark:
     position: [21, 21]
+    prefix: water_med_to_water_dark_
+    from_template: borders
+  water_light_to_water_med:
+    position: [24, 21]
+    prefix: water_light_to_water_med_
+    from_template: borders
+  water_ice_to_water_med:
+    position: [27, 21]
+    prefix: water_ice_to_water_med_
+    from_template: borders
+  
+  grass_med_variants:
+    position: [30, 0]
     size: [1, 1]
     areas:
       grass_med_base_variant4: [0, 0]
       grass_med_base_variant5: [1, 0]
-      grass_med_base_variant6: [2, 0]
-      grass_med_base_variant7: [0, 1]
-      grass_med_base_variant8: [1, 1]
-      grass_med_base_variant9: [2, 1]
+      grass_med_base_variant6: [0, 1]
+      grass_med_base_variant7: [1, 1]
+      grass_med_base_variant8: [0, 2]
+      grass_med_base_variant9: [1, 2]
+  water_cold_variants:
+    position: [30, 3]
+    size: [1, 1]
+    areas:
+      water_ice_base_variant4: [0, 0]
+      water_ice_base_variant5: [1, 0]
   cliffs:
     position: [0, 28]
     size: [1, 1]
@@ -215,7 +234,6 @@ groups:
       outer_edge_sw: [0, 2]
       outer_edge_s: [1, 2]
       outer_edge_se: [2, 2]
-      
       inner_edge_nw: [3, 0]
       inner_edge_ne: [4, 0]
       inner_edge_sw: [3, 1]
@@ -225,6 +243,43 @@ groups:
       edge_overlap_sw: [3, 3]
       edge_overlap_se: [4, 3]
       rocks1: [2, 8]
+  cliffs_grass:
+    position: [21, 28]
+    size: [1, 1]
+    prefix: cliffs_grass_
+    areas:
+      outer_edge_nw: [0, 0]
+      outer_edge_n: [1, 0]
+      outer_edge_ne: [2, 0]
+      outer_edge_w: [0, 1]
+      base: [1, 1]
+      outer_edge_e: [2, 1]
+      outer_edge_sw: [0, 2]
+      outer_edge_s: [1, 2]
+      outer_edge_se: [2, 2]
+      inner_edge_nw: [3, 0]
+      inner_edge_ne: [4, 0]
+      inner_edge_sw: [3, 1]
+      inner_edge_se: [4, 1]
+      edge_overlap_w: [3, 2]
+      edge_overlap_e: [4, 2]
+      edge_overlap_sw: [3, 3]
+      edge_overlap_se: [4, 3]
+      
+      ramp_bot_w: [3, 6]
+      ramp_bot_sw: [3, 7]
+      ramp_mid_sw: [4, 6]
+      ramp_mid_nw: [4, 5]
+      ramp_top_nw: [5, 4]
+      ramp_top_ne: [6, 4]
+      ramp_top_sw: [5, 5]
+      ramp_top_se: [6, 5]
+      ramp_mid_ne: [7, 5]
+      ramp_mid_se: [7, 6]
+      ramp_bot_e: [8, 6]
+      ramp_bot_se: [8, 7]
+      ramp_bot_nw: [3, 4]
+      ramp_bot_ne: [4, 4]
   cliffs_light:
     position: [0, 28]
     size: [1, 1]
@@ -268,6 +323,8 @@ groups:
     areas:
       cliffs_cave_small: [0, 5, 1, 2]
       cliffs_cave_large: [1, 5, 2, 3]
+      cliffs_grass_cave_small: [21, 5, 1, 2]
+      cliffs_grass_cave_large: [22, 5, 2, 3]
   cave_wall:
     position: [10, 28]
     size: [1, 1]
@@ -348,7 +405,7 @@ groups:
       cave_entrance_large_c: [2, 5, 1, 3]
       cave_entrance_large_e: [3, 5, 1, 3]
   small_plants:
-    position: [0, 44]
+    position: [0, 45]
     size: [1, 1]
     areas:
       plant01: [0, 0]
@@ -372,7 +429,7 @@ groups:
       plant19: [3, 3]
       plant20: [4, 3]
   misc_plants:
-    position: [0, 37]
+    position: [0, 38]
     areas:
       sign: [0, 11, 1, 2]
       log: [1, 11, 2, 2]
@@ -395,3 +452,30 @@ groups:
       tree_med_09: [11, 13, 7, 6]
         
       tree_big_01: [18, 7, 12, 10]
+  misc_props:
+    position: [6, 36]
+    areas:
+      rock_big: [0, 0, 1, 1]
+      rocks_small: [1, 0, 1, 1]
+      logs_horizontal: [0, 1, 2, 1]
+      logs_vertical: [2, 0, 1, 2]
+      spider_web: [3, 0, 2, 2]
+      old_log01: [5, 0, 2, 1]
+      old_log02: [5, 1, 2, 1]
+      stump: [7, 0, 1, 1]
+      campfire: [7, 1, 1, 1]
+      campfire_with_pot: [8, 1, 1, 1]
+      
+      lilypad01: [10, 0, 1, 2]
+      lilypad02: [11, 0, 1, 2]
+      lilypad03: [12, 0, 1, 1]
+      lilypad04: [12, 1, 1, 1]
+      
+      bridge_horiz_w: [15, 0, 1, 3]
+      bridge_horiz_c: [16, 0, 1, 3]
+      bridge_horiz_break_w: [17, 0, 1, 3]
+      bridge_horiz_break_e: [18, 0, 1, 3]
+      bridge_horiz_e: [19, 0, 1, 3]
+      bridge_vert_n: [20, 0, 2, 1]
+      bridge_vert_c: [20, 1, 2, 1]
+      bridge_vert_s: [20, 2, 2, 1]

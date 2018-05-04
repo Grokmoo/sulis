@@ -64,6 +64,32 @@ pub struct TileBuilder {
 
 #[derive(Deserialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
+pub struct WallRules {
+    pub grid_width: u32,
+    pub grid_height: u32,
+    pub layer: String,
+    pub prefix: String,
+    pub inner_edge_postfix: String,
+    pub outer_edge_postfix: String,
+    pub n_postfix: String,
+    pub s_postfix: String,
+    pub e_postfix: String,
+    pub w_postfix: String,
+    pub ne_postfix: String,
+    pub se_postfix: String,
+    pub nw_postfix: String,
+    pub sw_postfix: String,
+}
+
+#[derive(Deserialize, Debug, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct WallKind {
+    pub id: String,
+    pub base_tile: String,
+}
+
+#[derive(Deserialize, Debug, Clone)]
+#[serde(deny_unknown_fields)]
 pub struct TerrainRules {
     pub grid_width: u32,
     pub grid_height: u32,
@@ -108,6 +134,8 @@ pub struct Tileset {
     pub non_uniform_sets: HashMap<String, NonUniformSet>,
     pub terrain_rules: TerrainRules,
     pub terrain_kinds: Vec<TerrainKind>,
+    pub wall_rules: WallRules,
+    pub wall_kinds: Vec<WallKind>,
 }
 
 impl Tileset {

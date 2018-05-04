@@ -50,6 +50,9 @@ use tile_picker::TilePicker;
 mod transition_window;
 use transition_window::TransitionWindow;
 
+mod wall_picker;
+use wall_picker::WallPicker;
+
 extern crate rand;
 #[macro_use] extern crate log;
 
@@ -207,6 +210,7 @@ impl WidgetKind for EditorView {
 
         let tile_picker_kind = TilePicker::new();
         let terrain_picker_kind = TerrainPicker::new();
+        let wall_picker_kind = WallPicker::new();
         let actor_picker_kind = ActorPicker::new();
         let prop_picker_kind = PropPicker::new();
         let elev_picker_kind = ElevPicker::new();
@@ -215,6 +219,7 @@ impl WidgetKind for EditorView {
         let mut pickers = Vec::new();
         pickers.push(Widget::with_defaults(tile_picker_kind.clone()));
         pickers.push(Widget::with_defaults(terrain_picker_kind.clone()));
+        pickers.push(Widget::with_defaults(wall_picker_kind.clone()));
         pickers.push(Widget::with_defaults(actor_picker_kind.clone()));
         pickers.push(Widget::with_defaults(prop_picker_kind.clone()));
         pickers.push(Widget::with_defaults(elev_picker_kind.clone()));
@@ -224,11 +229,12 @@ impl WidgetKind for EditorView {
         }
 
         let picker_kinds: Vec<Rc<RefCell<EditorMode>>> =
-            vec![tile_picker_kind, terrain_picker_kind, actor_picker_kind, prop_picker_kind,
-                elev_picker_kind, encounter_picker_kind];
+            vec![tile_picker_kind, terrain_picker_kind, wall_picker_kind, actor_picker_kind,
+                prop_picker_kind, elev_picker_kind, encounter_picker_kind];
 
         let buttons = vec![Widget::with_theme(Button::empty(), "tiles"),
             Widget::with_theme(Button::empty(), "terrain"),
+            Widget::with_theme(Button::empty(), "walls"),
             Widget::with_theme(Button::empty(), "actors"),
             Widget::with_theme(Button::empty(), "props"),
             Widget::with_theme(Button::empty(), "elevation"),

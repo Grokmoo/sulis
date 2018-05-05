@@ -4,25 +4,30 @@ wall_rules:
   grid_height: 2
   layer: "walls"
   prefix: "tileset/"
-  inner_edge_postfix: "_inner_edge_"
-  outer_edge_postfix: "_outer_edge_"
-  n_postfix: "n"
-  s_postfix: "s"
-  e_postfix: "e"
-  w_postfix: "w"
-  ne_postfix: "ne"
-  se_postfix: "se"
-  nw_postfix: "nw"
-  sw_postfix: "sw"
+  edges:
+    inner_edge_postfix: "_inner_edge_"
+    outer_edge_postfix: "_outer_edge_"
+    n_postfix: "n"
+    s_postfix: "s"
+    e_postfix: "e"
+    w_postfix: "w"
+    ne_postfix: "ne"
+    se_postfix: "se"
+    nw_postfix: "nw"
+    sw_postfix: "sw"
 wall_kinds:
   - id: cliffs_dark
     base_tile: _outer_edge_s
-  - id: cliffs_light
-    base_tile: _outer_edge_s
-  - id: cliffs_grass
-    base_tile: _outer_edge_s
-  - id: cave_top
-    base_tile: _outer_edge_s
+    extended_prefix: cliffs
+#  - id: cliffs_light
+#    base_tile: _outer_edge_s
+#    extended_prefix: cliffs
+#  - id: cliffs_grass
+#    base_tile: _outer_edge_s
+#    extended_prefix: cliffs
+#  - id: cave_top
+#    base_tile: _outer_edge_s
+#    extended_prefix: cave_wall
 terrain_rules:
   grid_width: 2
   grid_height: 2
@@ -31,18 +36,17 @@ terrain_rules:
   prefix: "tileset/"
   base_postfix: "_base"
   variant_postfix: "_base_variant"
-  inner_edge_postfix: "_inner_edge_"
-  outer_edge_postfix: "_outer_edge_"
-  n_postfix: "n"
-  s_postfix: "s"
-  e_postfix: "e"
-  w_postfix: "w"
-  ne_postfix: "ne"
-  se_postfix: "se"
-  nw_postfix: "nw"
-  sw_postfix: "sw"
-  sw_to_ne_postfix: "sw_to_ne"
-  nw_to_se_postfix: "nw_to_se"
+  edges:
+    inner_edge_postfix: "_inner_edge_"
+    outer_edge_postfix: "_outer_edge_"
+    n_postfix: "n"
+    s_postfix: "s"
+    e_postfix: "e"
+    w_postfix: "w"
+    ne_postfix: "ne"
+    se_postfix: "se"
+    nw_postfix: "nw"
+    sw_postfix: "sw"
   base_weight: 10
 terrain_kinds:
   - id: water_dark
@@ -651,15 +655,15 @@ non_uniform_sets:
         impass: [[1, 0], [1, 1]]
       cliffs_e:
         impass: [[0, 0], [0, 1]]
-      cliffs_sw:
+      cliffs_outer_edge_sw:
         impass: 
-      cliffs_s:
+      cliffs_outer_edge_s:
         impass: []
-      cliffs_se:
+      cliffs_outer_edge_se:
         impass: []
-      cliffs_ne:
+      cliffs_outer_edge_ne:
         impass: [[1, 0]]
-      cliffs_nw:
+      cliffs_outer_edge_nw:
         impass: [[0, 0]]
   cliffs_dark:
     layer: walls

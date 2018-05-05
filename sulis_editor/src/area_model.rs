@@ -152,7 +152,12 @@ impl AreaModel {
         self.terrain[(x + y * MAX_AREA_SIZE) as usize] = index;
     }
 
-    pub fn add_tile(&mut self, tile: &Rc<Tile>, x: i32, y: i32) {
+    pub fn add_tile(&mut self, tile: &Option<Rc<Tile>>, x: i32, y: i32) {
+        let tile = match tile {
+            &None => return,
+            &Some(ref tile) => tile,
+        };
+
         if x < 0 || y < 0 { return; }
 
         let index = self.create_layer_if_missing(&tile.layer);

@@ -107,12 +107,7 @@ impl EditorMode for TilePicker {
     }
 
     fn left_click(&mut self, model: &mut AreaModel, x: i32, y: i32) {
-        let tile = match self.cur_tile {
-            None => return,
-            Some(ref tile) => tile,
-        };
-
-        model.add_tile(tile, x, y);
+        model.add_tile(&self.cur_tile, x, y);
     }
 
     fn right_click(&mut self, model: &mut AreaModel, x: i32, y: i32) {

@@ -23,11 +23,12 @@ use sulis_core::config::CONFIG;
 use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
-use sulis_core::util::{unable_to_create_error, Point};
-use sulis_module::{Module, area::tile::{Tile, WallKind, WallRules}};
+use sulis_core::util::{Point};
+use sulis_module::{Module, area::tile::{WallKind, WallRules}};
 use sulis_widgets::{Button, Label, Spinner};
 
 use {area_model::MAX_AREA_SIZE, AreaModel, EditorMode};
+use terrain_picker::EdgesList;
 
 const NAME: &str = "wall_picker";
 
@@ -35,55 +36,19 @@ const NAME: &str = "wall_picker";
 struct WallTiles {
     pub id: String,
 
-    inner_nw: Rc<Tile>,
-    inner_ne: Rc<Tile>,
-    inner_sw: Rc<Tile>,
-    inner_se: Rc<Tile>,
-
-    outer_n: Rc<Tile>,
-    outer_s: Rc<Tile>,
-    outer_e: Rc<Tile>,
-    outer_w: Rc<Tile>,
-    outer_se: Rc<Tile>,
-    outer_ne: Rc<Tile>,
-    outer_sw: Rc<Tile>,
-    outer_nw: Rc<Tile>,
+    edges: EdgesList,
+    extended: EdgesList,
 }
 
 impl WallTiles {
     pub fn new(kind: WallKind, rules: &WallRules) -> Result<WallTiles, Error> {
-        let id = &kind.id.to_string();
-
-        let inner_nw = WallTiles::get_edge(&rules, &id, &rules.inner_edge_postfix, &rules.nw_postfix)?;
-        let inner_ne = WallTiles::get_edge(&rules, &id, &rules.inner_edge_postfix, &rules.ne_postfix)?;
-        let inner_sw = WallTiles::get_edge(&rules, &id, &rules.inner_edge_postfix, &rules.sw_postfix)?;
-        let inner_se = WallTiles::get_edge(&rules, &id, &rules.inner_edge_postfix, &rules.se_postfix)?;
-
-        let outer_n = WallTiles::get_edge(&rules, &id, &rules.outer_edge_postfix, &rules.n_postfix)?;
-        let outer_s = WallTiles::get_edge(&rules, &id, &rules.outer_edge_postfix, &rules.s_postfix)?;
-        let outer_e = WallTiles::get_edge(&rules, &id, &rules.outer_edge_postfix, &rules.e_postfix)?;
-        let outer_w = WallTiles::get_edge(&rules, &id, &rules.outer_edge_postfix, &rules.w_postfix)?;
-        let outer_ne = WallTiles::get_edge(&rules, &id, &rules.outer_edge_postfix, &rules.ne_postfix)?;
-        let outer_nw = WallTiles::get_edge(&rules, &id, &rules.outer_edge_postfix, &rules.nw_postfix)?;
-        let outer_se = WallTiles::get_edge(&rules, &id, &rules.outer_edge_postfix, &rules.se_postfix)?;
-        let outer_sw = WallTiles::get_edge(&rules, &id, &rules.outer_edge_postfix, &rules.sw_postfix)?;
+        let edges = EdgesList::new(&kind.id, &rules.prefix, &rules.edges)?;
+        let extended = EdgesList::new(&kind.extended_prefix, &rules.prefix, &rules.edges)?;
         Ok(WallTiles {
             id: kind.id,
-            inner_nw, inner_ne, inner_sw, inner_se, outer_n,
-            outer_s, outer_e, outer_w, outer_se, outer_ne, outer_sw,
-            outer_nw,
+            edges,
+            extended,
         })
-    }
-
-    fn get_edge(rules: &WallRules, id: &str, edge_postfix: &str, dir_postfix: &str) -> Result<Rc<Tile>, Error> {
-        let tile_id = format!("{}{}{}{}", rules.prefix, id, edge_postfix, dir_postfix);
-
-        match Module::tile(&tile_id) {
-            None => {
-                warn!("Wall edge tile with '{}', '{}' not found for '{}'", edge_postfix, dir_postfix, id);
-                return unable_to_create_error("wall_tile", &id);
-            }, Some(tile) => Ok(tile),
-        }
     }
 }
 
@@ -167,25 +132,34 @@ impl WallPicker {
         let se = self.check_index(self_index, se_val);
         let sw = self.check_index(self_index, sw_val);
 
-        if n && nw && w { model.add_tile(&tiles.outer_nw, x - gw, y - gh); }
+        if n && nw && w { model.add_tile(&tiles.edges.outer_nw, x - gw, y - gh); }
 
-        if n && nw && ne { model.add_tile(&tiles.outer_n, x, y - gh); }
+        if n && nw && ne { model.add_tile(&tiles.edges.outer_n, x, y - gh); }
 
-        if n && ne && e { model.add_tile(&tiles.outer_ne, x + gw, y - gh); }
+        if n && ne && e { model.add_tile(&tiles.edges.outer_ne, x + gw, y - gh); }
 
-        if e && ne && se { model.add_tile(&tiles.outer_e, x + gw, y); }
-        else if e && ne { model.add_tile(&tiles.inner_ne, x + gw, y); }
-        else if e && se { model.add_tile(&tiles.inner_se, x + gw, y); }
+        if e && ne && se { model.add_tile(&tiles.edges.outer_e, x + gw, y); }
+        else if e && ne { model.add_tile(&tiles.edges.inner_ne, x + gw, y); }
+        else if e && se { model.add_tile(&tiles.edges.inner_se, x + gw, y); }
 
-        if w && nw && sw { model.add_tile(&tiles.outer_w, x - gw, y); }
-        else if w && nw { model.add_tile(&tiles.inner_nw, x - gw, y); }
-        else if w && sw { model.add_tile(&tiles.inner_sw, x - gw, y); }
+        if w && nw && sw { model.add_tile(&tiles.edges.outer_w, x - gw, y); }
+        else if w && nw { model.add_tile(&tiles.edges.inner_nw, x - gw, y); }
+        else if w && sw { model.add_tile(&tiles.edges.inner_sw, x - gw, y); }
 
-        if s && sw && se { model.add_tile(&tiles.outer_s, x, y + gh); }
+        if s && sw && se {
+            model.add_tile(&tiles.edges.outer_s, x, y + gh);
+            model.add_tile(&tiles.extended.outer_s, x, y + 2 * gh);
+        }
 
-        if s && se && e { model.add_tile(&tiles.outer_se, x + gw, y + gh); }
+        if s && se && e {
+            model.add_tile(&tiles.edges.outer_se, x + gw, y + gh);
+            model.add_tile(&tiles.extended.outer_se, x + gw, y + 2 * gh);
+        }
 
-        if s && sw && w { model.add_tile(&tiles.outer_sw, x - gw, y + gh); }
+        if s && sw && w {
+            model.add_tile(&tiles.edges.outer_sw, x - gw, y + gh);
+            model.add_tile(&tiles.extended.outer_sw, x - gw, y + 2 * gh);
+        }
     }
 
     fn check_index(&self, index: usize, other_index: Option<usize>) -> bool {

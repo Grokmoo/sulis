@@ -69,6 +69,12 @@ pub struct WallRules {
     pub grid_height: u32,
     pub layer: String,
     pub prefix: String,
+    pub edges: EdgeRules,
+}
+
+#[derive(Deserialize, Debug, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct EdgeRules {
     pub inner_edge_postfix: String,
     pub outer_edge_postfix: String,
     pub n_postfix: String,
@@ -86,6 +92,7 @@ pub struct WallRules {
 pub struct WallKind {
     pub id: String,
     pub base_tile: String,
+    pub extended_prefix: String,
 }
 
 #[derive(Deserialize, Debug, Clone)]
@@ -98,19 +105,8 @@ pub struct TerrainRules {
     pub prefix: String,
     pub base_postfix: String,
     pub variant_postfix: String,
-    pub inner_edge_postfix: String,
-    pub outer_edge_postfix: String,
-    pub n_postfix: String,
-    pub s_postfix: String,
-    pub e_postfix: String,
-    pub w_postfix: String,
-    pub ne_postfix: String,
-    pub se_postfix: String,
-    pub nw_postfix: String,
-    pub sw_postfix: String,
-    pub sw_to_ne_postfix: String,
-    pub nw_to_se_postfix: String,
     pub base_weight: u32,
+    pub edges: EdgeRules,
 }
 
 #[derive(Deserialize, Debug, Clone)]

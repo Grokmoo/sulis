@@ -24,7 +24,7 @@ use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
 use sulis_core::util::{Point};
-use sulis_module::{Module, area::tile::{WallKind, WallRules}};
+use sulis_module::{Module, area::tile::{Tile, WallKind, WallRules}};
 use sulis_widgets::{Button, Label, Spinner};
 
 use {area_model::MAX_AREA_SIZE, AreaModel, EditorMode};
@@ -35,19 +35,40 @@ const NAME: &str = "wall_picker";
 #[derive(Clone)]
 struct WallTiles {
     pub id: String,
+    fill_tile: Option<Rc<Tile>>,
 
     edges: EdgesList,
-    extended: EdgesList,
+    extended: Vec<EdgesList>,
 }
 
 impl WallTiles {
     pub fn new(kind: WallKind, rules: &WallRules) -> Result<WallTiles, Error> {
+        let fill_tile = match kind.fill_tile {
+            None => None,
+            Some(ref fill_tile) => {
+                let fill_tile_id = format!("{}{}{}", &rules.prefix, &kind.id, fill_tile);
+                match Module::tile(&fill_tile_id) {
+                    None => {
+                        warn!("No fill tile found for '{}'", kind.id);
+                        None
+                    }, Some(tile) => Some(tile),
+                }
+            }
+        };
+
         let edges = EdgesList::new(&kind.id, &rules.prefix, &rules.edges)?;
-        let extended = EdgesList::new(&kind.extended_prefix, &rules.prefix, &rules.edges)?;
+
+        let mut extended = Vec::new();
+        for prefix in kind.extended {
+            let e = EdgesList::new(&prefix, &rules.prefix, &rules.edges)?;
+            extended.push(e);
+        }
+
         Ok(WallTiles {
             id: kind.id,
             edges,
             extended,
+            fill_tile,
         })
     }
 }
@@ -111,6 +132,9 @@ impl WallPicker {
         };
 
         let tiles = self.wall_kinds[self_index].clone();
+
+        model.add_tile(&tiles.fill_tile, x, y);
+
         let gh = self.grid_height;
         let gw = self.grid_width;
 
@@ -140,25 +164,49 @@ impl WallPicker {
 
         if e && ne && se { model.add_tile(&tiles.edges.outer_e, x + gw, y); }
         else if e && ne { model.add_tile(&tiles.edges.inner_ne, x + gw, y); }
-        else if e && se { model.add_tile(&tiles.edges.inner_se, x + gw, y); }
+        else if e && se {
+            model.add_tile(&tiles.edges.inner_se, x + gw, y);
+
+            for (i, ext) in tiles.extended.iter().enumerate() {
+                let offset = 1 + i as i32;
+                model.add_tile(&ext.outer_s, x + gw, y + offset * gh);
+            }
+        }
 
         if w && nw && sw { model.add_tile(&tiles.edges.outer_w, x - gw, y); }
         else if w && nw { model.add_tile(&tiles.edges.inner_nw, x - gw, y); }
-        else if w && sw { model.add_tile(&tiles.edges.inner_sw, x - gw, y); }
+        else if w && sw {
+            model.add_tile(&tiles.edges.inner_sw, x - gw, y);
+            for (i, ext) in tiles.extended.iter().enumerate() {
+                let offset = 1 + i as i32;
+                model.add_tile(&ext.outer_s, x - gw, y + offset * gh);
+            }
+        }
 
         if s && sw && se {
             model.add_tile(&tiles.edges.outer_s, x, y + gh);
-            model.add_tile(&tiles.extended.outer_s, x, y + 2 * gh);
+            for (i, ext) in tiles.extended.iter().enumerate() {
+                let offset = 2 + i as i32;
+                model.add_tile(&ext.outer_s, x, y + offset * gh);
+            }
         }
 
         if s && se && e {
             model.add_tile(&tiles.edges.outer_se, x + gw, y + gh);
-            model.add_tile(&tiles.extended.outer_se, x + gw, y + 2 * gh);
+
+            for (i, ext) in tiles.extended.iter().enumerate() {
+                let offset = 2 + i as i32;
+                model.add_tile(&ext.outer_se, x + gw, y + offset * gh);
+            }
         }
 
         if s && sw && w {
             model.add_tile(&tiles.edges.outer_sw, x - gw, y + gh);
-            model.add_tile(&tiles.extended.outer_sw, x - gw, y + 2 * gh);
+
+            for (i, ext) in tiles.extended.iter().enumerate() {
+                let offset = 2 + i as i32;
+                model.add_tile(&ext.outer_sw, x - gw, y + offset * gh);
+            }
         }
     }
 
@@ -225,11 +273,14 @@ impl EditorMode for WallPicker {
         let x_min = if x % 2 == 0 { x } else { x + 1 };
         let y_min = if y % 2 == 0 { y } else { y + 1 };
 
-        model.remove_tiles_within(&self.wall_rules.layer,
-                                  x_min - 1 * self.grid_width,
-                                  y_min - 1 * self.grid_height,
-                                  (self.brush_size + 2) * self.grid_width,
-                                  (self.brush_size + 2) * self.grid_height);
+        for layer in self.wall_rules.layers.iter() {
+            model.remove_tiles_within(layer,
+                                      x_min - 3 * self.grid_width,
+                                      y_min - 3 * self.grid_height,
+                                      (self.brush_size + 6) * self.grid_width,
+                                      (self.brush_size + 6) * self.grid_height);
+        }
+
         for yi in 0..self.brush_size {
             for xi in 0..self.brush_size {
                 let x = x_min + xi * self.grid_width;
@@ -240,8 +291,8 @@ impl EditorMode for WallPicker {
             }
         }
 
-        for yi in -2..self.brush_size+2 {
-            for xi in -2..self.brush_size+2 {
+        for yi in -4..self.brush_size+4 {
+            for xi in -4..self.brush_size+4 {
                 let x = x_min + xi * self.grid_width;
                 let y = y_min + yi * self.grid_height;
                 if x < 0 || x >= MAX_AREA_SIZE || y < 0 || y >= MAX_AREA_SIZE { continue; }
@@ -253,16 +304,20 @@ impl EditorMode for WallPicker {
     fn right_click(&mut self, model: &mut AreaModel, x: i32, y: i32) {
         let x_min = if x % 2 == 0 { x } else { x + 1 };
         let y_min = if y % 2 == 0 { y } else { y + 1 };
-        model.remove_tiles_within(&self.wall_rules.layer, x_min, y_min,
-                                  self.brush_size * self.grid_width,
-                                  self.brush_size * self.grid_height);
+
+        for layer in self.wall_rules.layers.iter() {
+            model.remove_tiles_within(layer, x_min, y_min,
+                                      self.brush_size * self.grid_width,
+                                      self.brush_size * self.grid_height);
+        }
+
         for yi in 0..self.brush_size {
             for xi in 0..self.brush_size {
                 let x = x_min + xi * self.grid_width;
                 let y = y_min + yi * self.grid_height;
                 if x < 0 || x >= MAX_AREA_SIZE || y < 0 || y >= MAX_AREA_SIZE { continue; }
 
-                self.walls[(xi + yi * MAX_AREA_SIZE) as usize] = None;
+                self.walls[(x + y * MAX_AREA_SIZE) as usize] = None;
             }
         }
     }

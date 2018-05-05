@@ -86,7 +86,7 @@ impl EdgesList {
 
         match Module::tile(&tile_id) {
             None => {
-                warn!("Edge tile with '{}', '{}' not found for '{}'", edge_postfix, dir_postfix, id);
+                trace!("Edge tile with '{}', '{}' not found for '{}'", edge_postfix, dir_postfix, id);
                 None
             }, Some(tile) => Some(tile),
         }

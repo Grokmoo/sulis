@@ -67,7 +67,7 @@ pub struct TileBuilder {
 pub struct WallRules {
     pub grid_width: u32,
     pub grid_height: u32,
-    pub layer: String,
+    pub layers: Vec<String>,
     pub prefix: String,
     pub edges: EdgeRules,
 }
@@ -92,7 +92,8 @@ pub struct EdgeRules {
 pub struct WallKind {
     pub id: String,
     pub base_tile: String,
-    pub extended_prefix: String,
+    pub fill_tile: Option<String>,
+    pub extended: Vec<String>,
 }
 
 #[derive(Deserialize, Debug, Clone)]

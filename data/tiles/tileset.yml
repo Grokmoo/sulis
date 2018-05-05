@@ -2,7 +2,7 @@ id: tileset
 wall_rules:
   grid_width: 2
   grid_height: 2
-  layer: "walls"
+  layers: [ "walls", "walls_top" ]
   prefix: "tileset/"
   edges:
     inner_edge_postfix: "_inner_edge_"
@@ -18,16 +18,20 @@ wall_rules:
 wall_kinds:
   - id: cliffs_dark
     base_tile: _outer_edge_s
-    extended_prefix: cliffs
-#  - id: cliffs_light
-#    base_tile: _outer_edge_s
-#    extended_prefix: cliffs
-#  - id: cliffs_grass
-#    base_tile: _outer_edge_s
-#    extended_prefix: cliffs
-#  - id: cave_top
-#    base_tile: _outer_edge_s
-#    extended_prefix: cave_wall
+    fill_tile: _base
+    extended: [ cliffs_ext1, cliffs_ext2 ]
+  - id: cliffs_light
+    base_tile: _outer_edge_s
+    fill_tile: base
+    extended: [ cliffs_ext1, cliffs_ext2 ]
+  - id: cliffs_grass
+    base_tile: _outer_edge_s
+    fill_tile: base
+    extended: [ cliffs_ext1, cliffs_ext2 ]
+  - id: cave_top
+    base_tile: _outer_edge_s
+    fill_tile: _base
+    extended: [ cave_wall_ext1, cave_wall_ext2 ]
 terrain_rules:
   grid_width: 2
   grid_height: 2
@@ -576,29 +580,30 @@ non_uniform_sets:
         impass: [[1, 0], [1, 1]]
       mine_beam_double_s:
         impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+  cave_wall_top:
+    layer: walls_top
+    size: [2, 2]
+    sprite_prefix: "tileset/cave_wall_"
+    tiles:
+      ext1_outer_edge_sw:
+        impass: [[1, 0], [1, 1]]
+      ext1_outer_edge_se:
+        impass: [[0, 0], [0, 1]]
   cave_wall:
     layer: walls
     size: [2, 2]
     sprite_prefix: "tileset/cave_wall_"
     tiles:
-      c:
+      ext1_outer_edge_s:
         impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      w:
-        impass: [[1, 0], [1, 1]]
-      e:
-        impass: [[0, 0], [0, 1]]
-      sw:
+      ext2_outer_edge_sw:
+        impass: 
+      ext2_outer_edge_s:
         impass: []
-      s:
+      ext2_outer_edge_se:
         impass: []
-      se:
-        impass: []
-      ne:
-        impass: [[1, 0]]
-      nw:
-        impass: [[0, 0]]
   cave_top:
-    layer: walls
+    layer: walls_top
     size: [2, 2]
     sprite_prefix: "tileset/cave_top_"
     tiles:
@@ -628,45 +633,30 @@ non_uniform_sets:
         impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
       inner_edge_se:
         impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      edge_overlap_w:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      edge_overlap_e:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      edge_overlap_sw:
+  cliffs_walls_top:
+    layer: walls_top
+    size: [2, 2]
+    sprite_prefix: "tileset/"
+    tiles:
+      cliffs_ext1_outer_edge_sw:
         impass: [[1, 0], [1, 1]]
-      edge_overlap_se:
+      cliffs_ext1_outer_edge_se:
         impass: [[0, 0], [0, 1]]
-      edge_overlap_bot_sw:
-        impass: [[1, 0], [1, 1]]
-      edge_overlap_bot_se:
-        impass: [[0, 0], [0, 1]]
-      edge_overlap_bot_w:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      edge_overlap_bot_e:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
   cliffs:
     layer: walls
     size: [2, 2]
     sprite_prefix: "tileset/"
     tiles:
-      cliffs_c:
+      cliffs_ext1_outer_edge_s:
         impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      cliffs_w:
-        impass: [[1, 0], [1, 1]]
-      cliffs_e:
-        impass: [[0, 0], [0, 1]]
-      cliffs_outer_edge_sw:
+      cliffs_ext2_outer_edge_sw:
         impass: 
-      cliffs_outer_edge_s:
+      cliffs_ext2_outer_edge_s:
         impass: []
-      cliffs_outer_edge_se:
+      cliffs_ext2_outer_edge_se:
         impass: []
-      cliffs_outer_edge_ne:
-        impass: [[1, 0]]
-      cliffs_outer_edge_nw:
-        impass: [[0, 0]]
   cliffs_dark:
-    layer: walls
+    layer: walls_top
     size: [2, 2]
     sprite_prefix: "tileset/cliffs_dark_"
     tiles:
@@ -696,16 +686,8 @@ non_uniform_sets:
         impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
       inner_edge_se:
         impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      edge_overlap_w:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      edge_overlap_e:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      edge_overlap_sw:
-        impass: [[1, 0], [1, 1]]
-      edge_overlap_se:
-        impass: [[0, 0], [0, 1]]
   cliffs_grass:
-    layer: walls
+    layer: walls_top
     size: [2, 2]
     sprite_prefix: "tileset/cliffs_grass_"
     tiles:
@@ -733,14 +715,6 @@ non_uniform_sets:
         impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
       inner_edge_se:
         impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      edge_overlap_w:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      edge_overlap_e:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      edge_overlap_sw:
-        impass: [[1, 0], [1, 1]]
-      edge_overlap_se:
-        impass: [[0, 0], [0, 1]]
         
       ramp_bot_w:
         impass: []
@@ -771,7 +745,7 @@ non_uniform_sets:
       ramp_bot_ne:
         impass: [[1, 0]]
   cliffs_light:
-    layer: walls
+    layer: walls_top
     size: [2, 2]
     sprite_prefix: "tileset/cliffs_light_"
     tiles:
@@ -799,14 +773,6 @@ non_uniform_sets:
         impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
       inner_edge_se:
         impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      edge_overlap_w:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      edge_overlap_e:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      edge_overlap_sw:
-        impass: [[0, 0], [1, 0], [1, 1]]
-      edge_overlap_se:
-        impass: [[0, 0], [1, 0], [0, 1]]
       
       ramp_bot_w:
         impass: []
@@ -838,42 +804,42 @@ non_uniform_sets:
         impass: [[1, 0]]
 tiles:
   cliff_entrance_small:
-    layer: walls
+    layer: object
     size: [2, 4]
     sprite: tileset/cliffs_cave_small
     pass: [[0, 2], [1, 2], [0, 3], [1, 3]]
   cliff_entrance_large:
-    layer: walls
+    layer: object
     size: [4, 6]
     sprite: tileset/cliffs_cave_large
     pass: [[0, 4], [1, 4], [2, 4], [3, 4], [0, 5], [1, 5], [2, 5], [3, 5]]
   cliff_grass_entrance_small:
-    layer: walls
+    layer: object
     size: [2, 4]
     sprite: tileset/cliffs_grass_cave_small
     pass: [[0, 2], [1, 2], [0, 3], [1, 3]]
   cliff_grass_entrance_large:
-    layer: walls
+    layer: object
     size: [4, 6]
     sprite: tileset/cliffs_grass_cave_large
     pass: [[0, 4], [1, 4], [2, 4], [3, 4], [0, 5], [1, 5], [2, 5], [3, 5]]
   cave_entrance_small:
-    layer: walls
+    layer: object
     size: [2, 4]
     sprite: tileset/cave_entrance_small
     pass: [[0, 2], [1, 2], [0, 3], [1, 3]]
   cave_entrance_large_w:
-    layer: walls
+    layer: object
     size: [2, 6]
     sprite: tileset/cave_entrance_large_w
     pass: [[0, 4], [0, 5], [1, 1], [1, 2], [1, 3], [1, 4], [1, 5]]
   cave_entrance_large_c:
-    layer: walls
+    layer: object
     size: [2, 6]
     sprite: tileset/cave_entrance_large_c
     impass: [[0, 0], [1, 0]]
   cave_entrance_large_e:
-    layer: walls
+    layer: object
     size: [2, 6]
     sprite: tileset/cave_entrance_large_e
     pass: [[0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [1, 4], [1, 5]]

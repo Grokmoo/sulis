@@ -84,6 +84,7 @@ editor:
       - terrain_base
       - terrain_border
       - walls
+      - walls_top
       - prop
       - object
       - aerial

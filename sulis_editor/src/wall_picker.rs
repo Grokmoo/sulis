@@ -74,11 +74,14 @@ impl WallTiles {
 }
 
 pub struct WallPicker {
+    level_widget: Rc<RefCell<Widget>>,
+
     brush_size_spinner: Rc<RefCell<Spinner>>,
     brush_size_widget: Rc<RefCell<Widget>>,
     cursor_sprite: Rc<Sprite>,
 
     cursor_pos: Option<Point>,
+    level: i32,
     brush_size: i32,
     grid_width: i32,
     grid_height: i32,
@@ -87,7 +90,7 @@ pub struct WallPicker {
     cur_wall: Option<usize>,
 
     wall_kinds: Vec<WallTiles>,
-    walls: Vec<Option<usize>>,
+    walls: Vec<(i8, Option<usize>)>,
 }
 
 impl WallPicker {
@@ -102,6 +105,10 @@ impl WallPicker {
         let brush_size_spinner = Spinner::new(brush_size, 1, 20);
         let brush_size_widget = Widget::with_theme(brush_size_spinner.clone(), "brush_size");
 
+        let level = 1;
+        let level_spinner = Spinner::new(level, 0, 5);
+        let level_widget = Widget::with_theme(level_spinner, "level");
+
         let mut wall_kinds = Vec::new();
         for kind in Module::wall_kinds() {
             match WallTiles::new(kind, &wall_rules) {
@@ -111,6 +118,8 @@ impl WallPicker {
         }
 
         Rc::new(RefCell::new(WallPicker {
+            level,
+            level_widget,
             brush_size_spinner,
             brush_size_widget,
             cursor_sprite,
@@ -120,7 +129,7 @@ impl WallPicker {
             grid_height: wall_rules.grid_height as i32,
             wall_rules,
             cur_wall: None,
-            walls: vec![None;(MAX_AREA_SIZE * MAX_AREA_SIZE) as usize],
+            walls: vec![(0, None);(MAX_AREA_SIZE * MAX_AREA_SIZE) as usize],
             wall_kinds,
         }))
     }
@@ -138,23 +147,14 @@ impl WallPicker {
         let gh = self.grid_height;
         let gw = self.grid_width;
 
-        let n_val = self.is_border(model, x, y, 0, -gh);
-        let e_val = self.is_border(model, x, y, gw, 0);
-        let s_val = self.is_border(model, x, y, 0, gh);
-        let w_val = self.is_border(model, x, y, -gw, 0);
-        let nw_val = self.is_border(model, x, y, -gw, -gh);
-        let ne_val = self.is_border(model, x, y, gw, -gh);
-        let se_val = self.is_border(model, x, y, gw, gh);
-        let sw_val = self.is_border(model, x, y, -gw, gh);
-
-        let n = self.check_index(self_index, n_val);
-        let e = self.check_index(self_index, e_val);
-        let s = self.check_index(self_index, s_val);
-        let w = self.check_index(self_index, w_val);
-        let nw = self.check_index(self_index, nw_val);
-        let ne = self.check_index(self_index, ne_val);
-        let se = self.check_index(self_index, se_val);
-        let sw = self.check_index(self_index, sw_val);
+        let n = self.is_border(model, self_index, x, y, 0, -gh);
+        let e = self.is_border(model, self_index, x, y, gw, 0);
+        let s = self.is_border(model, self_index, x, y, 0, gh);
+        let w = self.is_border(model, self_index, x, y, -gw, 0);
+        let nw = self.is_border(model, self_index, x, y, -gw, -gh);
+        let ne = self.is_border(model, self_index, x, y, gw, -gh);
+        let se = self.is_border(model, self_index, x, y, gw, gh);
+        let sw = self.is_border(model, self_index, x, y, -gw, gh);
 
         if n && nw && w { model.add_tile(&tiles.edges.outer_nw, x - gw, y - gh); }
 
@@ -210,24 +210,34 @@ impl WallPicker {
         }
     }
 
-    fn check_index(&self, index: usize, other_index: Option<usize>) -> bool {
-        match other_index {
+    fn is_border(&self, _model: &AreaModel, self_index: usize, x: i32, y: i32,
+                 delta_x: i32, delta_y: i32) -> bool {
+        let src_level = self.wall_level_at(x, y);
+
+        let x = x + delta_x;
+        let y = y + delta_y;
+        if x < 0 || x >= MAX_AREA_SIZE || y < 0 || y >= MAX_AREA_SIZE { return false; }
+
+        let dest_level = self.wall_level_at(x, y);
+
+        match self.wall_index_at(x, y) {
             None => true,
-            Some(other_index) => index < other_index
+            Some(index) => {
+                if self_index != index {
+                    true
+                } else {
+                    dest_level != src_level
+                }
+            }
         }
     }
 
-    fn is_border(&self, _model: &AreaModel, x: i32, y: i32,
-                 delta_x: i32, delta_y: i32) -> Option<usize> {
-        let x = x + delta_x;
-        let y = y + delta_y;
-        if x < 0 || x >= MAX_AREA_SIZE || y < 0 || y >= MAX_AREA_SIZE { return None; }
-
-        self.wall_index_at(x, y)
+    fn wall_index_at(&self, x: i32, y: i32) -> Option<usize> {
+        self.walls[(x + y * MAX_AREA_SIZE) as usize].1
     }
 
-    fn wall_index_at(&self, x: i32, y: i32) -> Option<usize> {
-        self.walls[(x + y * MAX_AREA_SIZE) as usize]
+    fn wall_level_at(&self, x: i32, y: i32) -> i8 {
+        self.walls[(x + y * MAX_AREA_SIZE) as usize].0
     }
 }
 
@@ -287,7 +297,9 @@ impl EditorMode for WallPicker {
                 let y = y_min + yi * self.grid_height;
                 if x < 0 || x >= MAX_AREA_SIZE || y < 0 || y >= MAX_AREA_SIZE { continue; }
 
-                self.walls[(x + y * MAX_AREA_SIZE) as usize] = self.cur_wall;
+                let index = (x + y * MAX_AREA_SIZE) as usize;
+                self.walls[index].1 = self.cur_wall;
+                self.walls[index].0 = self.level as i8;
             }
         }
 
@@ -317,7 +329,7 @@ impl EditorMode for WallPicker {
                 let y = y_min + yi * self.grid_height;
                 if x < 0 || x >= MAX_AREA_SIZE || y < 0 || y >= MAX_AREA_SIZE { continue; }
 
-                self.walls[(x + y * MAX_AREA_SIZE) as usize] = None;
+                self.walls[(x + y * MAX_AREA_SIZE) as usize].1 = None;
             }
         }
     }
@@ -329,6 +341,19 @@ impl WidgetKind for WallPicker {
     fn as_any_mut(&mut self) -> &mut Any { self }
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+        self.level_widget.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, kind| {
+            let parent = Widget::get_parent(&widget);
+            let picker = Widget::downcast_kind_mut::<WallPicker>(&parent);
+
+            let spinner = match kind.as_any().downcast_ref::<Spinner>() {
+                None => panic!("Unable to downcast spinner"),
+                Some(widget) => widget,
+            };
+
+            picker.level = spinner.value();
+        })));
+        let level_label = Widget::with_theme(Label::empty(), "level_label");
+
         self.brush_size_widget.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, kind| {
             let parent = Widget::get_parent(&widget);
             let picker = Widget::downcast_kind_mut::<WallPicker>(&parent);
@@ -370,6 +395,7 @@ impl WidgetKind for WallPicker {
             Widget::add_child_to(&wall_content, button);
         }
 
-        vec![self.brush_size_widget.clone(), brush_size_label, wall_content]
+        vec![self.level_widget.clone(), level_label, self.brush_size_widget.clone(), brush_size_label,
+          wall_content]
     }
 }

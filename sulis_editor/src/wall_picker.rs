@@ -33,7 +33,7 @@ use terrain_picker::EdgesList;
 const NAME: &str = "wall_picker";
 
 #[derive(Clone)]
-struct WallTiles {
+pub struct WallTiles {
     pub id: String,
     fill_tile: Option<Rc<Tile>>,
 
@@ -88,9 +88,6 @@ pub struct WallPicker {
 
     wall_rules: WallRules,
     cur_wall: Option<usize>,
-
-    wall_kinds: Vec<WallTiles>,
-    walls: Vec<(i8, Option<usize>)>,
 }
 
 impl WallPicker {
@@ -109,14 +106,6 @@ impl WallPicker {
         let level_spinner = Spinner::new(level, 0, 5);
         let level_widget = Widget::with_theme(level_spinner, "level");
 
-        let mut wall_kinds = Vec::new();
-        for kind in Module::wall_kinds() {
-            match WallTiles::new(kind, &wall_rules) {
-                Err(_) => continue,
-                Ok(wall) => wall_kinds.push(wall),
-            }
-        }
-
         Rc::new(RefCell::new(WallPicker {
             level,
             level_widget,
@@ -129,32 +118,30 @@ impl WallPicker {
             grid_height: wall_rules.grid_height as i32,
             wall_rules,
             cur_wall: None,
-            walls: vec![(0, None);(MAX_AREA_SIZE * MAX_AREA_SIZE) as usize],
-            wall_kinds,
         }))
     }
 
     fn check_add_border(&self, model: &mut AreaModel, x: i32, y: i32) {
-        let self_index = match self.wall_index_at(x, y) {
-            Some(index) => index,
-            None => return,
+        let (self_elev, self_index) = match model.wall_at(x, y) {
+            (elev, Some(index)) => (elev, index),
+            (_, None) => return,
         };
 
-        let tiles = self.wall_kinds[self_index].clone();
+        let tiles = model.wall_kind(self_index).clone();
 
         model.add_tile(&tiles.fill_tile, x, y);
 
         let gh = self.grid_height;
         let gw = self.grid_width;
 
-        let n = self.is_border(model, self_index, x, y, 0, -gh);
-        let e = self.is_border(model, self_index, x, y, gw, 0);
-        let s = self.is_border(model, self_index, x, y, 0, gh);
-        let w = self.is_border(model, self_index, x, y, -gw, 0);
-        let nw = self.is_border(model, self_index, x, y, -gw, -gh);
-        let ne = self.is_border(model, self_index, x, y, gw, -gh);
-        let se = self.is_border(model, self_index, x, y, gw, gh);
-        let sw = self.is_border(model, self_index, x, y, -gw, gh);
+        let n = self.is_border(model, self_elev, self_index, x, y, 0, -gh);
+        let e = self.is_border(model, self_elev, self_index, x, y, gw, 0);
+        let s = self.is_border(model, self_elev, self_index, x, y, 0, gh);
+        let w = self.is_border(model, self_elev, self_index, x, y, -gw, 0);
+        let nw = self.is_border(model, self_elev, self_index, x, y, -gw, -gh);
+        let ne = self.is_border(model, self_elev, self_index, x, y, gw, -gh);
+        let se = self.is_border(model, self_elev, self_index, x, y, gw, gh);
+        let sw = self.is_border(model, self_elev, self_index, x, y, -gw, gh);
 
         if n && nw && w { model.add_tile(&tiles.edges.outer_nw, x - gw, y - gh); }
 
@@ -210,34 +197,19 @@ impl WallPicker {
         }
     }
 
-    fn is_border(&self, _model: &AreaModel, self_index: usize, x: i32, y: i32,
+    fn is_border(&self, model: &AreaModel, self_elev: i8, _self_index: usize, x: i32, y: i32,
                  delta_x: i32, delta_y: i32) -> bool {
-        let src_level = self.wall_level_at(x, y);
 
         let x = x + delta_x;
         let y = y + delta_y;
         if x < 0 || x >= MAX_AREA_SIZE || y < 0 || y >= MAX_AREA_SIZE { return false; }
 
-        let dest_level = self.wall_level_at(x, y);
+        let (dest_elev, dest_index) = model.wall_at(x, y);
 
-        match self.wall_index_at(x, y) {
+        match dest_index {
             None => true,
-            Some(index) => {
-                if self_index != index {
-                    true
-                } else {
-                    dest_level != src_level
-                }
-            }
+            Some(_) => dest_elev < self_elev,
         }
-    }
-
-    fn wall_index_at(&self, x: i32, y: i32) -> Option<usize> {
-        self.walls[(x + y * MAX_AREA_SIZE) as usize].1
-    }
-
-    fn wall_level_at(&self, x: i32, y: i32) -> i8 {
-        self.walls[(x + y * MAX_AREA_SIZE) as usize].0
     }
 }
 
@@ -297,9 +269,12 @@ impl EditorMode for WallPicker {
                 let y = y_min + yi * self.grid_height;
                 if x < 0 || x >= MAX_AREA_SIZE || y < 0 || y >= MAX_AREA_SIZE { continue; }
 
-                let index = (x + y * MAX_AREA_SIZE) as usize;
-                self.walls[index].1 = self.cur_wall;
-                self.walls[index].0 = self.level as i8;
+                model.set_wall(x, y, self.level as i8, self.cur_wall);
+                for ye in y-1..y + self.grid_height + 1 {
+                    for xe in x-1..x + self.grid_height + 1 {
+                        model.set_elevation(2 * self.level as u8, xe, ye);
+                    }
+                }
             }
         }
 
@@ -329,7 +304,12 @@ impl EditorMode for WallPicker {
                 let y = y_min + yi * self.grid_height;
                 if x < 0 || x >= MAX_AREA_SIZE || y < 0 || y >= MAX_AREA_SIZE { continue; }
 
-                self.walls[(x + y * MAX_AREA_SIZE) as usize].1 = None;
+                model.set_wall(x, y, 0, None);
+                for ye in y..y + self.grid_height {
+                    for xe in x..x + self.grid_height {
+                        model.set_elevation(0, xe, ye);
+                    }
+                }
             }
         }
     }

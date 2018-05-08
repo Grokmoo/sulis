@@ -27,6 +27,7 @@ use sulis_core::util::{Point, Size};
 use sulis_module::{Actor, Encounter, Module, Prop};
 use sulis_module::area::*;
 
+use wall_picker::WallTiles;
 use terrain_picker::TerrainTiles;
 
 pub (crate) const MAX_AREA_SIZE: i32 = 128;
@@ -51,6 +52,9 @@ pub struct AreaModel {
 
     terrain_kinds: Vec<TerrainTiles>,
     terrain: Vec<Option<usize>>,
+
+    wall_kinds: Vec<WallTiles>,
+    walls: Vec<(i8, Option<usize>)>,
 }
 
 impl AreaModel {
@@ -88,11 +92,22 @@ impl AreaModel {
             }
         }
 
+        let wall_rules = Module::wall_rules();
+        let mut wall_kinds = Vec::new();
+        for kind in Module::wall_kinds() {
+            match WallTiles::new(kind, &wall_rules) {
+                Err(_) => continue,
+                Ok(wall) => wall_kinds.push(wall),
+            }
+        }
+
         AreaModel {
             tiles,
             elevation,
             terrain_kinds,
             terrain: vec![None;(MAX_AREA_SIZE * MAX_AREA_SIZE) as usize],
+            wall_kinds,
+            walls: vec![(0, None);(MAX_AREA_SIZE * MAX_AREA_SIZE) as usize],
             actors: Vec::new(),
             props: Vec::new(),
             encounters: Vec::new(),
@@ -134,6 +149,22 @@ impl AreaModel {
         if x < 0 || y < 0 { return; }
 
         self.elevation[(x + y * MAX_AREA_SIZE) as usize] = elev;
+    }
+
+    pub fn wall_kind(&self, index: usize) -> &WallTiles {
+        &self.wall_kinds[index]
+    }
+
+    pub fn wall_kinds(&self) -> &Vec<WallTiles> {
+        &self.wall_kinds
+    }
+
+    pub fn wall_at(&self, x: i32, y: i32) -> (i8, Option<usize>) {
+        self.walls[(x + y * MAX_AREA_SIZE) as usize]
+    }
+
+    pub fn set_wall(&mut self, x: i32, y: i32, elev: i8, index: Option<usize>) {
+        self.walls[(x + y * MAX_AREA_SIZE) as usize] = (elev, index);
     }
 
     pub fn terrain_index_at(&self, x: i32, y: i32) -> Option<usize> {
@@ -450,6 +481,30 @@ impl AreaModel {
             }
         }
 
+        trace!("Loading walls");
+        let (mut x, mut y) = (0, 0);
+        for (elev, id) in area_builder.walls {
+            if x + y * MAX_AREA_SIZE >= MAX_AREA_SIZE * MAX_AREA_SIZE { break; }
+
+            match id {
+                None => self.walls[(x + y * MAX_AREA_SIZE) as usize] = (elev, None),
+                Some(id) => {
+                    for (index, kind) in self.wall_kinds.iter().enumerate() {
+                        if kind.id == id {
+                            self.walls[(x + y * MAX_AREA_SIZE) as usize] = (elev, Some(index));
+                            break;
+                        }
+                    }
+                }
+            }
+
+            x += 1;
+            if x == width {
+                x = 0;
+                y += 1;
+            }
+        }
+
         trace!("Loading area layer_set.");
         for &mut (_, ref mut vec) in self.tiles.iter_mut() {
             vec.clear();
@@ -664,6 +719,7 @@ impl AreaModel {
             }
         }
 
+        trace!("Saving terrain");
         let mut terrain = Vec::new();
         for y in 0..height {
             for x in 0..width {
@@ -679,11 +735,28 @@ impl AreaModel {
             }
         }
 
+        trace!("Saving walls");
+        let mut walls = Vec::new();
+        for y in 0..height {
+            for x in 0..width {
+                let (elev, index) = match self.walls[(x + y * MAX_AREA_SIZE) as usize] {
+                    (elev, None) => {
+                        walls.push((elev, None));
+                        continue;
+                    }, (elev, Some(index)) => (elev, index),
+                };
+
+                let cur_wall = &self.wall_kinds[index];
+                walls.push((elev, Some(cur_wall.id.to_string())));
+            }
+        }
+
         let area_builder = AreaBuilder {
             id: self.id.clone(),
             name: self.name.clone(),
             elevation: Some(elevation),
             terrain,
+            walls,
             layer_set,
             layers,
             visibility_tile,

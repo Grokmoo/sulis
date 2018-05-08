@@ -2374,6 +2374,7 @@ layer_set:
   tileset/cave_top_outer_edge_se:
     - - 26
       - 36
+walls: []
 terrain:
   - rocks_med
   - ~

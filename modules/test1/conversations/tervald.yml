@@ -1,0 +1,27 @@
+id: tervald
+initial_node: start01
+nodes:
+  start01:
+    text: |
+      [c=888|Tervald, the leader of your group, addresses you.]
+      
+      Alright, we know the wagon went into these woods.  The question is: did it come out again?
+    responses:
+      - text: |
+          [c=888|Continue]
+        to: start02
+  start02:
+    text: |
+      I'm not seeing much in the way of a clear trail.  #pc_name#, see if you can spot anything further up the river.
+      
+      The rest of us will make ready for battle - I don't like the looks of this one bit.
+    responses:
+      - text: |
+          [c=888|Continue]
+        to: start03
+  start03:
+    text: |
+      And #pc_name#, watch yourself.  If you spot and trouble, you come back here as quick as you can.  Don't be a hero.
+    responses:
+      - text: |
+          Will do.  See you soon.

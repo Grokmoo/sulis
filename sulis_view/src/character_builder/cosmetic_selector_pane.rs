@@ -424,6 +424,11 @@ impl WidgetKind for CosmeticSelectorPane {
                 next_beard.borrow_mut().state.set_enabled(false);
                 prev_beard.borrow_mut().state.set_enabled(false);
             }
+
+            if race.hair_selections.is_empty() && race.beard_selections.is_empty() {
+                hair_color_label.borrow_mut().state.set_visible(false);
+                hair_color_panel.borrow_mut().state.set_visible(false);
+            }
         }
 
         vec![title, name_field, name_label, Rc::clone(&self.preview),

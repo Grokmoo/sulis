@@ -1,0 +1,56 @@
+id: ratkin
+name: Ratkin
+description: |
+  Distrusted by most due to their appearance and reputation for thievery, Ratkin nonetheless maintain a vast, loosely connected underground empire stretching across the known world and beyond.
+size: 3by3
+base_stats:
+  hit_points: 40
+  accuracy: 30
+  defense: 30
+  fortitude: 30
+  reflex: 30
+  will: 30
+  attack:
+    damage:
+      min: 10
+      max: 15
+      kind: Crushing
+    kind: #Melee
+      reach: 0.5
+  bonus_reach: 0.25
+default_images:
+  Male:
+    Foreground: creatures/ratkin_fg
+    Background: creatures/ratkin_bg
+    Ears: creatures/ratkin_ears
+  Female:
+    Foreground: creatures/ratkin_fg
+    Background: creatures/ratkin_bg
+    Ears: creatures/ratkin_ears
+image_layer_offset_scale: 16
+image_layer_offsets:
+  HeldMain: [-18, -6]
+  HeldOff: [16, -7]
+  Head: [0, 4]
+  Hair: [0, 4]
+  Beard: [0, 4]
+image_layer_postfix:
+  Female: "_dwarf"
+  Male: "_dwarf"
+portrait_selections:
+  - portraits/ratkin01
+  - portraits/ratkin02
+  - portraits/ratkin03
+  - portraits/ratkin04
+  - portraits/ratkin05
+hair_colors : [
+  "FFFFFF", "C0C0C0", "808080", "545454",
+  "545454", "000000", "EEE685", "FFFF00", 
+  "CC9900", "D98719", "FFA500", "EE7600",
+  "FF0000", "C00000", "800000", "CD853F",
+  "8B5A2B", "8B5A00", "8B4513", "5C3317" ]
+skin_colors : [
+  "ACACAC", "909090", "727272", "535353",
+  "EDAE67", "CE9452", "734A29", "422110",
+  "2F1010", "FFC794", "D48661", "80412B",
+  "501002" ]

@@ -84,7 +84,7 @@ children:
             position: [0, 25]
           races_pane:
             border: [1, 1, 1, 1]
-            preferred_size: [0, 12]
+            preferred_size: [20, 12]
             width_relative: ChildSum
             x_relative: Center
             position: [0, 10]

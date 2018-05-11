@@ -1,0 +1,45 @@
+---
+id: Tervald
+name: Tervald
+race: dwarf
+sex: Male
+portrait: portraits/dwarf17
+attributes:
+  str: 14
+  dex: 14
+  end: 16
+  per: 13
+  int: 12
+  wis: 11
+conversation: tervald
+faction: Friendly
+images:
+  Beard: creatures/beard04
+  Hair: creatures/hair03
+hue: 0.7000001072883606
+hair_color:
+  r: 0.545098066329956
+  g: 0.3529411852359772
+  b: 0.16862745583057404
+  a: 1
+skin_color:
+  r: 0.8313725590705872
+  g: 0.5254902243614197
+  b: 0.3803921639919281
+  a: 1
+items:
+  - battleaxe
+  - shield_small
+  - boots_leather
+  - torso_mail
+  - legs_mail
+  - gloves_mail
+equipped:
+  - 0
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+levels:
+  fighter: 4

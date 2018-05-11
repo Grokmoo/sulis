@@ -129,5 +129,11 @@ groups:
       dwarf18: [5, 9]
       dwarf19: [6, 9]
       
+      ratkin01: [0, 10]
+      ratkin02: [1, 10]
+      ratkin03: [2, 10]
+      ratkin04: [3, 10]
+      ratkin05: [4, 10]
+      
       frame: [11, 11]
 

@@ -7,8 +7,17 @@ groups:
   2by2:
     size: [2, 2]
     areas:
-      goblin0: [0, 28]
-      goblin1: [2, 28]
+      spider0: [0, 27]
+      blob0: [2, 27]
+      eye: [4, 27]
+      monster0: [6, 27]
+      skeleton0: [8, 27]
+      wasp0: [10, 27]
+      goblin0: [12, 27]
+      goblin1: [14, 27]
+      goblin2: [16, 27]
+      goblin3: [18, 27]
+      goblin4: [20, 27]
   3by3:
     size: [3, 3]
     areas:
@@ -72,6 +81,21 @@ groups:
       merling_female_ears: [27, 6]
       merling_female_fg: [30, 6]
       merling_female_bg: [33, 6]
+      
+      gloves_leather_dwarf: [0, 9]
+      gloves_mail_dwarf: [3, 9]
+      gloves_plate_dwarf: [6, 9]
+      boots_leather_dwarf: [9, 9]
+      boots_mail_dwarf: [12, 9]
+      boots_plate_dwarf: [15, 9]
+      pants_dwarf: [36, 9]
+      shirt_dwarf: [39, 9]
+      legs_leather_dwarf: [42, 9]
+      torso_leather_dwarf: [45, 9]
+      torso_mail_dwarf: [48, 9]
+      legs_mail_dwarf: [51, 9]
+      torso_plate_dwarf: [54, 9]
+      legs_plate_dwarf: [57, 9]
       
       dwarf_ears: [18, 9]
       dwarf_fg: [21, 9]

@@ -1,0 +1,41 @@
+---
+id: "npc_grazi"
+name: Grazi
+race: human
+sex: Male
+portrait: portraits/human10
+attributes:
+  str: 10
+  dex: 18
+  end: 12
+  per: 16
+  int: 14
+  wis: 10
+conversation: ~
+faction: Friendly
+images:
+  Beard: creatures/beard05
+  Hair: creatures/hair05
+hue: 0
+hair_color:
+  r: 0.545098066329956
+  g: 0.2705882489681244
+  b: 0.07450980693101883
+  a: 1
+skin_color:
+  r: 0.501960813999176
+  g: 0.2549019753932953
+  b: 0.16862745583057404
+  a: 1
+items:
+  - dagger
+  - boots_leather
+  - torso_leather
+  - legs_leather
+equipped:
+  - 0
+  - 1
+  - 2
+  - 3
+levels:
+  rogue: 4

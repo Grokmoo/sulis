@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::slice::Iter;
 use std::collections::HashMap;
 use std::io::Error;
 
@@ -43,7 +44,7 @@ struct Node {
 pub struct Conversation {
     id: String,
     nodes: HashMap<String, Node>,
-    initial_node: String,
+    initial_nodes: Vec<(String, Option<OnTrigger>)>,
 }
 
 impl PartialEq for Conversation {
@@ -54,9 +55,16 @@ impl PartialEq for Conversation {
 
 impl Conversation {
     pub fn new(builder: ConversationBuilder, _module: &Module) -> Result<Conversation, Error> {
-        if !builder.nodes.contains_key(&builder.initial_node) {
-            warn!("Invalid initial node for conversation.  Must be a node ID");
+        if builder.initial_nodes.is_empty() {
+            warn!("Must specify at least one initial node for conversation");
             return unable_to_create_error("conversation", &builder.id);
+        }
+
+        for (node, _) in builder.initial_nodes.iter() {
+            if !builder.nodes.contains_key(node) {
+                warn!("Invalid initial for node '{}'", node);
+                return unable_to_create_error("conversation", &builder.id);
+            }
         }
 
         for (_, ref node) in builder.nodes.iter() {
@@ -73,20 +81,12 @@ impl Conversation {
         Ok(Conversation {
             id: builder.id,
             nodes: builder.nodes,
-            initial_node: builder.initial_node,
+            initial_nodes: builder.initial_nodes,
         })
     }
 
-    pub fn initial_node(&self) -> String {
-        self.initial_node.clone()
-    }
-
-    pub fn initial_text(&self) -> &str {
-        &self.nodes.get(&self.initial_node).unwrap().text
-    }
-
-    pub fn initial_responses(&self) -> &Vec<Response> {
-        &self.nodes.get(&self.initial_node).unwrap().responses
+    pub fn initial_nodes(&self) -> Iter<(String, Option<OnTrigger>)> {
+        self.initial_nodes.iter()
     }
 
     // TODO don't panic when getting a node.
@@ -118,7 +118,7 @@ impl Conversation {
 pub struct ConversationBuilder {
     pub id: String,
     nodes: HashMap<String, Node>,
-    initial_node: String,
+    initial_nodes: Vec<(String, Option<OnTrigger>)>,
 }
 
 impl ResourceBuilder for ConversationBuilder {

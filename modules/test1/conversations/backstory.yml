@@ -1,5 +1,6 @@
 id: backstory
-initial_node: birth
+initial_nodes:
+  - [birth, ~]
 nodes:
   birth:
     text: |

@@ -17,11 +17,11 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use sulis_core::ui::{animation_state, Widget};
+use sulis_core::ui::{animation_state, color, Widget};
 use sulis_core::util::Point;
 use sulis_module::{Module, ObjectSize};
 use sulis_state::{EntityState, GameState, ScriptCallback};
-use {AreaView, DialogWindow, RootView};
+use {AreaView, dialog_window, DialogWindow, RootView};
 
 pub fn get_action(x: i32, y: i32) -> Box<ActionKind> {
     let area_state = GameState::area_state();
@@ -99,11 +99,18 @@ impl ActionKind for DialogAction {
             }, Some(ref convo) => Rc::clone(convo),
         };
 
-        let window = Widget::with_defaults(DialogWindow::new(&self.pc, &self.target, convo));
-        window.borrow_mut().state.set_modal(true);
+        let initial_node = dialog_window::get_initial_node(&convo, &self.pc, &self.target);
+        if convo.responses(&initial_node).is_empty() {
+            let area_state = GameState::area_state();
+            area_state.borrow_mut().add_feedback_text(convo.text(&initial_node).to_string(),
+                &self.target, color::GRAY);
+        } else {
+            let window = Widget::with_defaults(DialogWindow::new(&self.pc, &self.target, convo));
+            window.borrow_mut().state.set_modal(true);
 
-        let root = Widget::get_root(widget);
-        Widget::add_child_to(&root, window);
+            let root = Widget::get_root(widget);
+            Widget::add_child_to(&root, window);
+        }
     }
 }
 

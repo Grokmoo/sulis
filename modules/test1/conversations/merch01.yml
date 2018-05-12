@@ -1,5 +1,6 @@
 id: merch01
-initial_node: start
+initial_nodes:
+  - [start, ~]
 nodes:
   start:
     text: |

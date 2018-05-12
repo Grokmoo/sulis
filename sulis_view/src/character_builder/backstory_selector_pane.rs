@@ -36,10 +36,20 @@ pub struct BackstorySelectorPane {
     abilities: Vec<Rc<Ability>>,
 }
 
+pub fn get_initial_node(convo: &Rc<Conversation>) -> String {
+    let mut cur_node = "";
+    for (node, _) in convo.initial_nodes() {
+        cur_node = node;
+        break;
+    }
+
+    cur_node.to_string()
+}
+
 impl BackstorySelectorPane {
     pub fn new() -> Rc<RefCell<BackstorySelectorPane>> {
         let convo = Rc::clone(&Module::game().backstory_conversation);
-        let cur_node = convo.initial_node();
+        let cur_node = get_initial_node(&convo);
         Rc::new(RefCell::new(BackstorySelectorPane {
             node: TextArea::empty(),
             cur_node,
@@ -78,7 +88,7 @@ impl BuilderPane for BackstorySelectorPane {
     }
 
     fn prev(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
-        self.cur_node = self.convo.initial_node();
+        self.cur_node = get_initial_node(&self.convo);
         self.abilities.clear();
         builder.next.borrow_mut().state.set_visible(true);
         builder.finish.borrow_mut().state.set_visible(false);
@@ -107,7 +117,7 @@ impl WidgetKind for BackstorySelectorPane {
         start_over.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
             let parent = Widget::get_parent(&widget);
             let pane = Widget::downcast_kind_mut::<BackstorySelectorPane>(&parent);
-            pane.cur_node = pane.convo.initial_node();
+            pane.cur_node = get_initial_node(&pane.convo);
             pane.abilities.clear();
             pane.set_next_enabled(&parent);
 

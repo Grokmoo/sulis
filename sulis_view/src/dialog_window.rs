@@ -40,7 +40,7 @@ pub struct DialogWindow {
 impl DialogWindow {
     pub fn new(pc: &Rc<RefCell<EntityState>>, entity: &Rc<RefCell<EntityState>>,
                convo: Rc<Conversation>) -> Rc<RefCell<DialogWindow>> {
-        let cur_node = convo.initial_node();
+        let cur_node = get_initial_node(&convo, pc, entity);
 
         Rc::new(RefCell::new(DialogWindow {
             pc: Rc::clone(pc),
@@ -145,35 +145,59 @@ impl WidgetKind for ResponseButton {
     }
 }
 
-pub fn is_viewable(response: &Response, pc: &Rc<RefCell<EntityState>>,
-                   target: &Rc<RefCell<EntityState>>) -> bool {
-    if let Some(ref on_select) = response.to_view {
-        if let Some(ref flags) = on_select.target_flags {
-            for flag in flags.iter() {
-                if !target.borrow_mut().has_custom_flag(flag) { return false; }
-            }
-        }
+pub fn get_initial_node(convo: &Rc<Conversation>, pc: &Rc<RefCell<EntityState>>,
+                        entity: &Rc<RefCell<EntityState>>) -> String {
+    let mut cur_node = "";
+    for (node, on_trigger) in convo.initial_nodes() {
+        cur_node = node;
 
-        if let Some(ref flags) = on_select.player_flags {
-            for flag in flags.iter() {
-                if !pc.borrow_mut().has_custom_flag(flag) { return false; }
-            }
-        }
-
-        if let Some(ref ability_to_find) = on_select.player_ability {
-            let mut has_ability = false;
-            for ability in pc.borrow().actor.actor.abilities.iter() {
-                if &ability.id == ability_to_find {
-                    has_ability = true;
-                    break;
-                }
-            }
-
-            if !has_ability { return false; }
+        if match on_trigger {
+            Some(on_trigger) => is_match(on_trigger, pc, entity),
+                None => true,
+        } {
+            break
         }
     }
 
+    cur_node.to_string()
+}
+
+pub fn is_match(on_trigger: &OnTrigger, pc: &Rc<RefCell<EntityState>>,
+                target: &Rc<RefCell<EntityState>>) -> bool {
+    if let Some(ref flags) = on_trigger.target_flags {
+        for flag in flags.iter() {
+            if !target.borrow_mut().has_custom_flag(flag) { return false; }
+        }
+    }
+
+    if let Some(ref flags) = on_trigger.player_flags {
+        for flag in flags.iter() {
+            if !pc.borrow_mut().has_custom_flag(flag) { return false; }
+        }
+    }
+
+    if let Some(ref ability_to_find) = on_trigger.player_ability {
+        let mut has_ability = false;
+        for ability in pc.borrow().actor.actor.abilities.iter() {
+            if &ability.id == ability_to_find {
+                has_ability = true;
+                break;
+            }
+        }
+
+        if !has_ability { return false; }
+    }
+
     true
+}
+
+pub fn is_viewable(response: &Response, pc: &Rc<RefCell<EntityState>>,
+                   target: &Rc<RefCell<EntityState>>) -> bool {
+    if let Some(ref on_select) = response.to_view {
+        is_match(on_select, pc, target)
+    } else {
+        true
+    }
 }
 
 pub fn activate(widget: &Rc<RefCell<Widget>>, on_select: &OnTrigger,

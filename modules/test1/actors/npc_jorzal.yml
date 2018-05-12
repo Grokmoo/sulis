@@ -1,0 +1,45 @@
+---
+id: "npc_jorzal"
+name: Jorzal
+race: human
+sex: Male
+portrait: portraits/human30
+attributes:
+  str: 14
+  dex: 14
+  end: 17
+  per: 13
+  int: 10
+  wis: 12
+conversation: ~
+faction: Friendly
+images:
+  Hair: creatures/hair03
+  Beard: creatures/beard05
+hue: 0.6500000953674316
+hair_color:
+  r: 0.3607843220233917
+  g: 0.20000000298023224
+  b: 0.09019608050584793
+  a: 1
+skin_color:
+  r: 1
+  g: 0.7803921699523926
+  b: 0.5803921818733215
+  a: 1
+items:
+  - mace
+  - shield_large
+  - boots_leather
+  - torso_plate
+  - legs_mail
+  - gloves_leather
+equipped:
+  - 0
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+levels:
+  fighter: 4

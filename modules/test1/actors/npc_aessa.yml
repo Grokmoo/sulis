@@ -1,0 +1,42 @@
+---
+id: "npc_aessa"
+name: Aessa
+race: merling
+sex: Female
+portrait: portraits/merling11
+attributes:
+  str: 10
+  dex: 14
+  end: 15
+  per: 14
+  int: 17
+  wis: 10
+conversation: ~
+faction: Friendly
+images:
+  Hair: creatures/hair01
+hue: 0.20000000298023224
+hair_color:
+  r: 0.5764706134796143
+  g: 0.800000011920929
+  b: 0.47843137383461
+  a: 1
+skin_color:
+  r: 0.1764705926179886
+  g: 0.3450980484485626
+  b: 0.6784313917160034
+  a: 1
+items:
+  - quarterstaff
+  - boots_leather
+  - torso_shirt
+  - legs_pants
+  - cloak
+equipped:
+  - 0
+  - 1
+  - 2
+  - 3
+  - 4
+levels:
+  fighter: 4

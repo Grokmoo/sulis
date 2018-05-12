@@ -1,11 +1,20 @@
 id: tervald
-initial_node: start01
+initial_nodes:
+  - - already_talked
+    - { target_flags: [ already_talked ] }
+  - [start01, ~]
 nodes:
+  already_talked:
+    text: |
+      What are you waiting for?  Get moving!
+    responses: []
   start01:
     text: |
       [c=888|Tervald, the leader of your group, addresses you.]
       
       Alright, we know the wagon went into these woods.  The question is: did it come out again?
+    on_view:
+      target_flags: [ already_talked ]
     responses:
       - text: |
           [c=888|Continue]

@@ -50,7 +50,7 @@ use rlua::{self, Function, Lua, UserData, UserDataMethods};
 
 use sulis_core::config::CONFIG;
 use sulis_core::util::Point;
-use sulis_module::{Ability};
+use sulis_module::{Ability, Module};
 use {EntityState, GameState};
 
 type Result<T> = std::result::Result<T, rlua::Error>;
@@ -78,13 +78,15 @@ impl ScriptState {
     }
 
     fn execute_script(&self, parent: &Rc<RefCell<EntityState>>, function_args: &str,
-                          script: &str, function: &str) -> Result<()> {
+                          mut script: String, function: &str) -> Result<()> {
         let globals = self.lua.globals();
         globals.set("parent", ScriptEntity::from(&parent))?;
 
         debug!("Loading script for '{}'", function);
 
-        let script = format!("{}\n{}{}", script, function, function_args);
+        script.push('\n');
+        script.push_str(function);
+        script.push_str(function_args);
         let func: Function = self.lua.load(&script, Some(function))?;
 
         debug!("Calling script function '{}'", function);
@@ -124,7 +126,26 @@ impl ScriptState {
             self.lua.globals().set(arg_str, arg)?;
         }
         args_string.push(')');
-        self.execute_script(parent, &args_string, script, func)
+        self.execute_script(parent, &args_string, script.to_string(), func)
+    }
+
+    pub fn trigger_script(&self, script_id: &str, func: &str, parent: &Rc<RefCell<EntityState>>,
+                          target: &Rc<RefCell<EntityState>>) -> Result<()> {
+        let script = get_script_from_id(script_id)?;
+        self.lua.globals().set("target", ScriptEntity::from(target))?;
+
+        self.execute_script(parent, "(parent, target)", script, func)
+    }
+}
+
+fn get_script_from_id(id: &str) -> Result<String> {
+    match Module::script(id) {
+        None => Err(rlua::Error::ToLuaConversionError {
+            from: "&str",
+            to: "Script",
+            message: Some(format!("No script found with id '{}'", id).to_string()),
+        }),
+        Some(ref script) => Ok(script.to_string())
     }
 }
 

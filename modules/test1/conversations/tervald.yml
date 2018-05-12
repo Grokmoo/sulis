@@ -15,6 +15,9 @@ nodes:
       Alright, we know the wagon went into these woods.  The question is: did it come out again?
     on_view:
       target_flags: [ already_talked ]
+      fire_script:
+        id: wellswood_road_south
+        func: on_talk_tervald
     responses:
       - text: |
           [c=888|Continue]

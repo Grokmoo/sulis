@@ -25,10 +25,18 @@ pub struct MerchantData {
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
+pub struct ScriptData {
+    pub id: String,
+    pub func: String,
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
+#[serde(deny_unknown_fields)]
 pub struct OnTrigger {
     pub player_ability: Option<String>,
     pub target_flags: Option<Vec<String>>,
     pub player_flags: Option<Vec<String>>,
     pub show_merchant: Option<MerchantData>,
     pub show_cutscene: Option<String>,
+    pub fire_script: Option<ScriptData>,
 }

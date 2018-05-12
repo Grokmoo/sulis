@@ -177,6 +177,11 @@ impl GameState {
         exec_script!(ability_script: parent, ability, targets, t, func);
     }
 
+    pub fn execute_trigger_script(script_id: &str, func: &str, parent: &Rc<RefCell<EntityState>>,
+                                  target: &Rc<RefCell<EntityState>>) {
+        exec_script!(trigger_script: script_id, func, parent, target);
+    }
+
     pub fn init(pc_actor: Rc<Actor>) -> Result<(), Error> {
         let game_state = GameState::new(pc_actor)?;
 
@@ -185,6 +190,7 @@ impl GameState {
         });
 
         let area_state = GameState::area_state();
+        area_state.borrow_mut().push_scroll_to_callback(GameState::pc());
         area_state.borrow_mut().on_load_fired = true;
         let area_state = area_state.borrow();
         GameState::add_ui_callbacks_of_kind(&area_state.area.triggers, TriggerKind::OnCampaignStart);

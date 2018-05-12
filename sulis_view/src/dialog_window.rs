@@ -235,6 +235,15 @@ pub fn activate(widget: &Rc<RefCell<Widget>>, on_select: &OnTrigger,
     if let Some(ref cutscene) = on_select.show_cutscene {
         show_cutscene(widget, cutscene);
     }
+
+    if let Some(ref script) = on_select.fire_script {
+        fire_script(&script.id, &script.func, pc, target)
+    }
+}
+
+fn fire_script(script_id: &str, func: &str, parent: &Rc<RefCell<EntityState>>,
+               target: &Rc<RefCell<EntityState>>) {
+    GameState::execute_trigger_script(script_id, func, parent, target);
 }
 
 fn show_merchant(widget: &Rc<RefCell<Widget>>, merch: &MerchantData) {

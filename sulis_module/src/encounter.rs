@@ -32,6 +32,7 @@ struct Entry {
 
 pub struct Encounter {
     pub id: String,
+    pub auto_spawn: bool,
     min_actors: u32,
     max_actors: u32,
     entries: Vec<Entry>,
@@ -64,6 +65,7 @@ impl Encounter {
 
         Ok(Encounter {
             id: builder.id,
+            auto_spawn: builder.auto_spawn,
             min_actors: builder.min_actors,
             max_actors: builder.max_actors,
             entries,
@@ -107,6 +109,7 @@ impl Encounter {
 #[serde(deny_unknown_fields)]
 pub struct EncounterBuilder {
     pub id: String,
+    pub auto_spawn: bool,
     min_actors: u32,
     max_actors: u32,
     entries: HashMap<String, EntryBuilder>,

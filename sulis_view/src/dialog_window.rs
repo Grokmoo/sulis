@@ -21,7 +21,7 @@ use std::cell::RefCell;
 use sulis_core::io::event;
 use sulis_module::{Actor, OnTrigger, MerchantData, Conversation, conversation::{Response}, Module};
 use sulis_state::{EntityState, ChangeListener, GameState};
-use sulis_core::ui::{Widget, WidgetKind};
+use sulis_core::ui::{Widget, WidgetKind, color};
 use sulis_widgets::{Label, TextArea};
 
 use {CutsceneWindow, RootView};
@@ -145,6 +145,22 @@ impl WidgetKind for ResponseButton {
     }
 }
 
+pub fn show_convo(convo: Rc<Conversation>, pc: &Rc<RefCell<EntityState>>,
+                  target: &Rc<RefCell<EntityState>>, widget: &Rc<RefCell<Widget>>) {
+    let initial_node = get_initial_node(&convo, &pc, &target);
+    if convo.responses(&initial_node).is_empty() {
+        let area_state = GameState::area_state();
+        area_state.borrow_mut().add_feedback_text(convo.text(&initial_node).to_string(),
+            &target, color::GRAY);
+    } else {
+        let window = Widget::with_defaults(DialogWindow::new(&pc, &target, convo));
+        window.borrow_mut().state.set_modal(true);
+
+        let root = Widget::get_root(widget);
+        Widget::add_child_to(&root, window);
+    }
+}
+
 pub fn get_initial_node(convo: &Rc<Conversation>, pc: &Rc<RefCell<EntityState>>,
                         entity: &Rc<RefCell<EntityState>>) -> String {
     let mut cur_node = "";
@@ -232,6 +248,10 @@ pub fn activate(widget: &Rc<RefCell<Widget>>, on_select: &OnTrigger,
         show_merchant(widget, merch);
     }
 
+    if let Some(ref convo) = on_select.start_conversation {
+        start_convo(widget, convo);
+    }
+
     if let Some(ref cutscene) = on_select.show_cutscene {
         show_cutscene(widget, cutscene);
     }
@@ -281,4 +301,18 @@ fn show_cutscene(widget: &Rc<RefCell<Widget>>, cutscene_id: &str) {
     let window = Widget::with_defaults(CutsceneWindow::new(cutscene));
     window.borrow_mut().state.set_modal(true);
     Widget::add_child_to(&root, window);
+}
+
+fn start_convo(widget: &Rc<RefCell<Widget>>, convo_id: &str) {
+    let convo = match Module::conversation(convo_id) {
+        None => {
+            warn!("Unable to find convo '{}' for on_trigger", convo_id);
+            return;
+        }, Some(convo) => convo,
+    };
+
+    info!("Showing conversation {}", convo_id);
+
+    let pc = GameState::pc();
+    show_convo(convo, &pc, &pc, widget);
 }

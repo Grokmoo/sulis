@@ -38,5 +38,6 @@ pub struct OnTrigger {
     pub player_flags: Option<Vec<String>>,
     pub show_merchant: Option<MerchantData>,
     pub show_cutscene: Option<String>,
+    pub start_conversation: Option<String>,
     pub fire_script: Option<ScriptData>,
 }

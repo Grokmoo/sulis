@@ -1,4 +1,5 @@
 id: goblins_level3
+auto_spawn: true
 min_actors: 2
 max_actors: 3
 entries:

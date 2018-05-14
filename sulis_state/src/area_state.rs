@@ -17,25 +17,33 @@
 use rand::{self, Rng};
 use sulis_core::ui::Color;
 use sulis_module::{Actor, Area, LootList, Module, ObjectSize};
-use sulis_module::area::{EncounterData, PropData, Transition};
+use sulis_module::area::{EncounterData, PropData, Transition, TriggerKind};
 use sulis_core::util::Point;
 
-use {AreaFeedbackText, calculate_los, ChangeListenerList, EntityState, Location, Merchant, PropState, Targeter, TurnTimer};
+use {AreaFeedbackText, calculate_los, ChangeListenerList, EntityState, GameState,
+    Location, Merchant, PropState, Targeter, TurnTimer};
 
 use std::slice::Iter;
 use std::rc::Rc;
 use std::cell::{Ref, RefCell};
 
+struct TriggerState {
+    activated: bool,
+}
+
 pub struct AreaState {
     pub area: Rc<Area>,
     pub listeners: ChangeListenerList<AreaState>,
     pub turn_timer: TurnTimer,
+
     entities: Vec<Option<Rc<RefCell<EntityState>>>>,
     props: Vec<Option<PropState>>,
+    triggers: Vec<TriggerState>,
 
     prop_grid: Vec<Option<usize>>,
     entity_grid: Vec<Option<usize>>,
     transition_grid: Vec<Option<usize>>,
+    trigger_grid: Vec<Option<usize>>,
 
     pub pc_vis_delta: (i32, i32),
     pc_vis: Vec<bool>,
@@ -136,6 +144,7 @@ impl AreaState {
         let entity_grid = vec![None;dim];
         let transition_grid = vec![None;dim];
         let prop_grid = vec![None;dim];
+        let trigger_grid = vec![None;dim];
         let pc_vis = vec![false;dim];
         let pc_explored = vec![false;dim];
 
@@ -144,10 +153,12 @@ impl AreaState {
             area,
             entities: Vec::new(),
             props: Vec::new(),
+            triggers: Vec::new(),
             turn_timer: TurnTimer::default(),
             transition_grid,
             entity_grid,
             prop_grid,
+            trigger_grid,
             listeners: ChangeListenerList::default(),
             pc_vis,
             pc_explored,
@@ -185,6 +196,36 @@ impl AreaState {
             self.add_prop(prop_data, location, false);
         }
 
+        for (index, trigger) in area.triggers.iter().enumerate() {
+            let trigger_state = TriggerState {
+                activated: false,
+            };
+
+            self.triggers.push(trigger_state);
+
+            let location = match trigger.location {
+                None => continue,
+                Some(ref loc) => loc,
+            };
+
+            let size = match trigger.size {
+                None => continue,
+                Some(ref size) => size,
+            };
+
+
+            let start_x = location.x as usize;
+            let start_y = location.y as usize;
+            let end_x = start_x + size.width as usize;
+            let end_y = start_y + size.height as usize;
+
+            for y in start_y..end_y {
+                for x in start_x..end_x {
+                    self.trigger_grid[x + y * self.area.width as usize] = Some(index);
+                }
+            }
+        }
+
         let turn_timer = TurnTimer::new(&self);
         self.turn_timer = turn_timer;
         trace!("Set up turn timer for area.");
@@ -201,18 +242,37 @@ impl AreaState {
 
         for (enc_index, enc_data) in area.encounters.iter().enumerate() {
             let encounter = &enc_data.encounter;
+            if !encounter.auto_spawn { continue; }
 
-            let actors = encounter.gen_actors();
-            for actor in actors {
-                let location = match self.gen_location(&actor, &enc_data) {
-                    None => {
-                        warn!("Unable to generate location for encounter '{}'", encounter.id);
-                        continue;
-                    }, Some(location) => location,
-                };
+            self.spawn_encounter(enc_index, enc_data);
+        }
+    }
 
-                self.add_actor(actor, location, false, Some(enc_index));
-            }
+    pub fn spawn_encounter_at(&mut self, x: i32, y: i32) -> bool {
+        let area = Rc::clone(&self.area);
+
+        for (enc_index, enc_data) in area.encounters.iter().enumerate() {
+            if enc_data.location.x != x || enc_data.location.y != y { continue; }
+
+            self.spawn_encounter(enc_index, enc_data);
+            return true
+        }
+
+        false
+    }
+
+    pub fn spawn_encounter(&mut self, enc_index: usize, enc_data: &EncounterData) {
+        let encounter = &enc_data.encounter;
+        let actors = encounter.gen_actors();
+        for actor in actors {
+            let location = match self.gen_location(&actor, &enc_data) {
+                None => {
+                    warn!("Unable to generate location for encounter '{}'", encounter.id);
+                    continue;
+                }, Some(location) => location,
+            };
+
+            self.add_actor(actor, location, false, Some(enc_index));
         }
     }
 
@@ -362,6 +422,20 @@ impl AreaState {
 
     fn compute_pc_visibility(&mut self, entity: &EntityState, delta_x: i32, delta_y: i32) {
         calculate_los(&mut self.pc_vis, &mut self.pc_explored, &self.area, entity, delta_x, delta_y);
+    }
+
+    fn check_trigger_grid(&mut self, entity: &EntityState) {
+        let grid_index = entity.location.x + entity.location.y * self.area.width;
+        let index = match self.trigger_grid[grid_index as usize] {
+            None => return,
+            Some(index) => index,
+        };
+
+        if self.triggers[index].activated { return; }
+
+        self.triggers[index].activated = true;
+        GameState::add_ui_callbacks_of_kind(&vec![self.area.triggers[index].clone()],
+            TriggerKind::OnPlayerEnter);
     }
 
     /// whether the pc has current visibility to the specified coordinations
@@ -514,6 +588,8 @@ impl AreaState {
             self.pc_vis_delta = (d_x, d_y);
 
             self.compute_pc_visibility(&*entity.borrow(), d_x, d_y);
+
+            self.check_trigger_grid(&*entity.borrow());
 
             self.turn_timer.check_ai_activation(entity, &self.area);
         }

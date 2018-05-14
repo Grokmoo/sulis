@@ -1,0 +1,10 @@
+id: wellswood_road_south_on_player_enter_bridge
+initial_nodes:
+  - [start01, ~]
+nodes:
+  start01:
+    text: |
+      [c=888|As you step on to the bridge, you hear a loud shout behind you.  There is no time to see what has happened, because at the same time you see two goblins in front of you.]
+    responses:
+      - text: |
+          [c=888|Fight!]

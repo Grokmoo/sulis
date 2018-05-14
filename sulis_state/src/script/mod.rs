@@ -185,6 +185,16 @@ impl UserData for ScriptInterface {
             let entity = entity.borrow();
             Ok(area_state.is_passable(&entity, x, y))
         });
+
+        methods.add_method("spawn_encounter_at", |_, _, (x, y): (i32, i32)| {
+            let area_state = GameState::area_state();
+            let mut area_state = area_state.borrow_mut();
+
+            if !area_state.spawn_encounter_at(x, y) {
+                warn!("Unable to find encounter for script spawn at {},{}", x, y);
+            }
+            Ok(())
+        });
     }
 }
 

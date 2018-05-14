@@ -1,5 +1,5 @@
-id: goblins_level1
-auto_spawn: true
+id: goblins_level1_ambush
+auto_spawn: false
 min_actors: 2
 max_actors: 2
 entries:

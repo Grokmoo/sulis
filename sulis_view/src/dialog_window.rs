@@ -249,7 +249,7 @@ pub fn activate(widget: &Rc<RefCell<Widget>>, on_select: &OnTrigger,
     }
 
     if let Some(ref convo) = on_select.start_conversation {
-        start_convo(widget, convo);
+        start_convo(widget, convo, pc, target);
     }
 
     if let Some(ref cutscene) = on_select.show_cutscene {
@@ -303,7 +303,8 @@ fn show_cutscene(widget: &Rc<RefCell<Widget>>, cutscene_id: &str) {
     Widget::add_child_to(&root, window);
 }
 
-fn start_convo(widget: &Rc<RefCell<Widget>>, convo_id: &str) {
+fn start_convo(widget: &Rc<RefCell<Widget>>, convo_id: &str, pc: &Rc<RefCell<EntityState>>,
+               target: &Rc<RefCell<EntityState>>) {
     let convo = match Module::conversation(convo_id) {
         None => {
             warn!("Unable to find convo '{}' for on_trigger", convo_id);
@@ -313,6 +314,5 @@ fn start_convo(widget: &Rc<RefCell<Widget>>, convo_id: &str) {
 
     info!("Showing conversation {}", convo_id);
 
-    let pc = GameState::pc();
-    show_convo(convo, &pc, &pc, widget);
+    show_convo(convo, pc, target, widget);
 }

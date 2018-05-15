@@ -126,13 +126,19 @@ impl MainLoopUpdater for GameStateMainLoopUpdater {
     }
 }
 
+pub struct UICallback {
+    pub on_trigger: OnTrigger,
+    pub parent: Rc<RefCell<EntityState>>,
+    pub target: Rc<RefCell<EntityState>>,
+}
+
 pub struct GameState {
     areas: HashMap<String, Rc<RefCell<AreaState>>>,
     area_state: Rc<RefCell<AreaState>>,
     pc: Rc<RefCell<EntityState>>,
     should_exit: bool,
     path_finder: PathFinder,
-    ui_callbacks: Vec<OnTrigger>,
+    ui_callbacks: Vec<UICallback>,
 }
 
 macro_rules! exec_script {
@@ -193,8 +199,9 @@ impl GameState {
         area_state.borrow_mut().push_scroll_to_callback(GameState::pc());
         area_state.borrow_mut().on_load_fired = true;
         let area_state = area_state.borrow();
-        GameState::add_ui_callbacks_of_kind(&area_state.area.triggers, TriggerKind::OnCampaignStart);
-        GameState::add_ui_callbacks_of_kind(&area_state.area.triggers, TriggerKind::OnAreaLoad);
+        let pc = GameState::pc();
+        GameState::add_ui_callbacks_of_kind(&area_state.area.triggers, TriggerKind::OnCampaignStart, &pc, &pc);
+        GameState::add_ui_callbacks_of_kind(&area_state.area.triggers, TriggerKind::OnAreaLoad, &pc, &pc);
 
         Ok(())
     }
@@ -261,10 +268,11 @@ impl GameState {
         });
 
         let area_state = GameState::area_state();
+        let pc = GameState::pc();
         let mut area_state = area_state.borrow_mut();
         if !area_state.on_load_fired {
             area_state.on_load_fired = true;
-            GameState::add_ui_callbacks_of_kind(&area_state.area.triggers, TriggerKind::OnAreaLoad);
+            GameState::add_ui_callbacks_of_kind(&area_state.area.triggers, TriggerKind::OnAreaLoad, &pc, &pc);
         }
     }
 
@@ -335,24 +343,44 @@ impl GameState {
         })
     }
 
-    pub fn add_ui_callbacks_of_kind(callbacks: &Vec<Trigger>, kind: TriggerKind) {
+    pub fn add_ui_callback(cb: OnTrigger, parent: &Rc<RefCell<EntityState>>,
+                           target: &Rc<RefCell<EntityState>>) {
+        STATE.with(|s| {
+            let mut state = s.borrow_mut();
+            let state = state.as_mut().unwrap();
+
+            let ui_cb = UICallback {
+                on_trigger: cb,
+                parent: Rc::clone(parent),
+                target: Rc::clone(target),
+            };
+            state.ui_callbacks.push(ui_cb);
+        })
+    }
+
+    pub fn add_ui_callbacks_of_kind(callbacks: &Vec<Trigger>, kind: TriggerKind,
+                                    parent: &Rc<RefCell<EntityState>>, target: &Rc<RefCell<EntityState>>) {
         STATE.with(|s| {
             let mut state = s.borrow_mut();
             let state = state.as_mut().unwrap();
 
             for cb in callbacks.iter() {
                 if cb.kind == kind {
-                    state.ui_callbacks.push(cb.on_activate.clone());
+                    let ui_cb = UICallback {
+                        on_trigger: cb.on_activate.clone(),
+                        parent: Rc::clone(parent),
+                        target: Rc::clone(target),
+                    };
+                    state.ui_callbacks.push(ui_cb);
                 }
             }
         })
     }
 
-    pub fn check_get_ui_callback() -> Option<OnTrigger> {
+    pub fn check_get_ui_callback() -> Option<UICallback> {
         STATE.with(|s| {
             let mut state = s.borrow_mut();
             let state = state.as_mut().unwrap();
-
             state.ui_callbacks.pop()
         })
     }

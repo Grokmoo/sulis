@@ -424,18 +424,21 @@ impl AreaState {
         calculate_los(&mut self.pc_vis, &mut self.pc_explored, &self.area, entity, delta_x, delta_y);
     }
 
-    fn check_trigger_grid(&mut self, entity: &EntityState) {
-        let grid_index = entity.location.x + entity.location.y * self.area.width;
-        let index = match self.trigger_grid[grid_index as usize] {
-            None => return,
-            Some(index) => index,
+    fn check_trigger_grid(&mut self, entity: &Rc<RefCell<EntityState>>) {
+        let index = {
+            let entity = entity.borrow();
+            let grid_index = entity.location.x + entity.location.y * self.area.width;
+            match self.trigger_grid[grid_index as usize] {
+                None => return,
+                Some(index) => index,
+            }
         };
 
         if self.triggers[index].activated { return; }
 
         self.triggers[index].activated = true;
         GameState::add_ui_callbacks_of_kind(&vec![self.area.triggers[index].clone()],
-            TriggerKind::OnPlayerEnter);
+            TriggerKind::OnPlayerEnter, entity, entity);
     }
 
     /// whether the pc has current visibility to the specified coordinations
@@ -582,14 +585,16 @@ impl AreaState {
             self.update_entity_grid(p.x, p.y, Some(entity.borrow().index));
         }
 
-        if entity.borrow().is_pc() {
+        let is_pc = entity.borrow().is_pc();
+
+        if is_pc {
             let d_x = old_x - entity.borrow().location.x;
             let d_y = old_y - entity.borrow().location.y;
             self.pc_vis_delta = (d_x, d_y);
 
             self.compute_pc_visibility(&*entity.borrow(), d_x, d_y);
 
-            self.check_trigger_grid(&*entity.borrow());
+            self.check_trigger_grid(&entity);
 
             self.turn_timer.check_ai_activation(entity, &self.area);
         }

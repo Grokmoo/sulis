@@ -30,7 +30,7 @@ pub struct ScriptData {
     pub func: String,
 }
 
-#[derive(Deserialize, Serialize, Debug, Clone)]
+#[derive(Deserialize, Serialize, Debug, Clone, Default)]
 #[serde(deny_unknown_fields)]
 pub struct OnTrigger {
     pub player_ability: Option<String>,

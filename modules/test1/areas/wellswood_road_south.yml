@@ -12,7 +12,7 @@ layers:
   - prop
   - object
   - aerial
-entity_layer: 4
+entity_layer: 5
 actors:
   - id: npc_tervald
     location:
@@ -99,6 +99,11 @@ triggers:
     size:
       width: 10
       height: 4
+  - kind: OnAreaLoad
+    on_activate:
+      fire_script:
+        id: wellswood_road_south
+        func: on_area_load
 visibility_tile: gui/area_invis
 explored_tile: gui/area_unexplored
 max_vis_distance: 20

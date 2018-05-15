@@ -210,9 +210,8 @@ impl WidgetKind for RootView {
     fn update(&mut self, widget: &Rc<RefCell<Widget>>) {
         match GameState::check_get_ui_callback() {
             None => (),
-            Some(on_trigger) => {
-                let pc = GameState::pc();
-                dialog_window::activate(widget, &on_trigger, &pc, &pc);
+            Some(ui_cb) => {
+                dialog_window::activate(widget, &ui_cb.on_trigger, &ui_cb.parent, &ui_cb.target);
             }
         }
     }

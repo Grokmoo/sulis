@@ -50,7 +50,7 @@ use rlua::{self, Function, Lua, UserData, UserDataMethods};
 
 use sulis_core::config::CONFIG;
 use sulis_core::util::Point;
-use sulis_module::{Ability, Module};
+use sulis_module::{Ability, Module, OnTrigger};
 use {EntityState, GameState};
 
 type Result<T> = std::result::Result<T, rlua::Error>;
@@ -194,6 +194,41 @@ impl UserData for ScriptInterface {
                 warn!("Unable to find encounter for script spawn at {},{}", x, y);
             }
             Ok(())
+        });
+
+        methods.add_method("start_conversation", |_, _, (id, target): (String, Option<ScriptEntity>)| {
+            let pc = GameState::pc();
+            let target = match target {
+                None => Rc::clone(&pc),
+                Some(ref entity) => {
+                    entity.try_unwrap()?
+                }
+            };
+
+            let cb = OnTrigger {
+                start_conversation: Some(id),
+                ..Default::default()
+            };
+
+            GameState::add_ui_callback(cb, &pc, &target);
+            Ok(())
+        });
+
+        methods.add_method("entity_with_id", |_, _, id: String| {
+            let area_state = GameState::area_state();
+            let area_state = area_state.borrow();
+
+            for entity in area_state.entity_iter() {
+                if entity.borrow().actor.actor.id == id {
+                    return Ok(ScriptEntity::from(&entity))
+                }
+            }
+
+            Err(rlua::Error::ToLuaConversionError {
+                from: "ID",
+                to: "ScriptEntity",
+                message: Some("Target with the specified ID does not exist".to_string())
+            })
         });
     }
 }

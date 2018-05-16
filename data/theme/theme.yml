@@ -81,20 +81,20 @@ children:
           scale: 6.0
         preferred_size: [12, 0]
         height_relative: Max
-  right_pane:
+  bottom_pane:
     background: bg_base
     border: [2, 2, 2, 2]
-    preferred_size: [50, 0]
-    x_relative: Max
-    height_relative: Max
+    preferred_size: [0, 40]
+    y_relative: Max
+    width_relative: Max
     children:
       abilities_bar:
         border: [1, 1, 1, 1]
         background: bg_base
-        x_relative: Max
+        x_relative: Center
         height_relative: Max
-        position: [0, 40]
-        preferred_size: [42, -100]
+        position: [0, 00]
+        preferred_size: [150, 0]
         layout: Grid
         layout_spacing: { top: 0, bottom: 0, left: 0, right: 1 }
         children:
@@ -117,6 +117,47 @@ children:
                 foreground: "#icon#"
                 width_relative: Max
                 height_relative: Max
+      end_turn_button:
+        from: .button
+        background: background_rounded
+        preferred_size: [24, 24]
+        y_relative: Max
+        x_relative: Max
+        foreground: end_turn_icon
+      window_button:
+        from: .button
+        background: background_rounded
+        border: [1, 1, 1, 1]
+        preferred_size: [11, 11]
+        y_relative: Max
+        x_relative: Max
+      map_button:
+        from: .bottom_pane.window_button
+        position: [-26, 0]
+        foreground: map_icon
+      log_button:
+        from: .bottom_pane.window_button
+        position: [-26, -13]
+        foreground: log_icon
+      character_button:
+        from: .bottom_pane.window_button
+        position: [-26, -26]
+        foreground: char_icon
+      inventory_button:
+        from: .bottom_pane.window_button
+        position: [-13, -26]
+        foreground: inv_icon
+      menu_button:
+        from: .bottom_pane.window_button
+        position: [0, -26]
+        foreground: menu_icon
+  right_pane:
+    background: bg_base
+    border: [2, 2, 2, 2]
+    preferred_size: [35, 0]
+    x_relative: Max
+    height_relative: Max
+    children:
       portrait_view:
         background: bg_rounded
         x_relative: Max
@@ -144,42 +185,8 @@ children:
               scale: 6.0
             x_relative: Max
             preferred_size: [7, 7]
-      end_turn_button:
-        from: .button
-        background: background_rounded
-        preferred_size: [28, 28]
-        y_relative: Max
-        x_relative: Max
-        foreground: end_turn_icon
-      window_button:
-        from: .button
-        background: background_rounded
-        border: [1, 1, 1, 1]
-        preferred_size: [13, 13]
-        y_relative: Max
-        x_relative: Max
-      map_button:
-        from: .right_pane.window_button
-        position: [-30, 0]
-        foreground: map_icon
-      log_button:
-        from: .right_pane.window_button
-        position: [-30, -15]
-        foreground: log_icon
-      character_button:
-        from: .right_pane.window_button
-        position: [-30, -30]
-        foreground: char_icon
-      inventory_button:
-        from: .right_pane.window_button
-        position: [-15, -30]
-        foreground: inv_icon
-      menu_button:
-        from: .right_pane.window_button
-        position: [0, -30]
-        foreground: menu_icon
   area:
-    preferred_size: [-50, 0]
+    preferred_size: [-35, -40]
     width_relative: Max
     height_relative: Max
     custom:
@@ -225,11 +232,12 @@ children:
         preferred_size: [-10, 40]
   dialog_window:
     from: .window
+    background: bg_medium
     x_relative: Center
-    y_relative: Center
+    y_relative: Max
     width_relative: Zero
     height_relative: Zero
-    preferred_size: [150, 100]
+    preferred_size: [150, 50]
     children:
       title:
         text: "#name#"

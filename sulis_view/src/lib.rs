@@ -254,6 +254,12 @@ impl WidgetKind for RootView {
 
         let right_pane = Widget::empty("right_pane");
         {
+            let portrait = Widget::with_defaults(PortraitView::new(GameState::pc()));
+            Widget::add_child_to(&right_pane, portrait);
+        }
+
+        let bot_pane = Widget::empty("bottom_pane");
+        {
             let end_turn_button = Widget::with_theme(Button::empty(), "end_turn_button");
             end_turn_button.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
                 let root = Widget::get_root(&widget);
@@ -273,7 +279,7 @@ impl WidgetKind for RootView {
                     end_turn_button_ref.borrow_mut().state.set_enabled(enabled);
                 })));
 
-            Widget::add_child_to(&right_pane, end_turn_button);
+            Widget::add_child_to(&bot_pane, end_turn_button);
 
             let inv_button = Widget::with_theme(Button::empty(), "inventory_button");
             inv_button.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
@@ -302,10 +308,10 @@ impl WidgetKind for RootView {
                 view.show_menu(&parent);
             })));
 
-            let portrait = Widget::with_defaults(PortraitView::new(GameState::pc()));
             let abilities = Widget::with_defaults(AbilitiesBar::new(GameState::pc()));
-            Widget::add_children_to(&right_pane, vec![inv_button, cha_button, map_button,
-                                    log_button, men_button, portrait, abilities]);
+
+            Widget::add_children_to(&bot_pane, vec![inv_button, cha_button, map_button,
+                                    log_button, men_button, abilities]);
         }
 
         let widget_ref = Rc::clone(&widget);
@@ -322,6 +328,6 @@ impl WidgetKind for RootView {
         let ticker = Widget::with_defaults(InitiativeTicker::new());
 
         // area widget must be the first entry in the children list
-        vec![area_widget, right_pane, ap_bar, ticker]
+        vec![area_widget, right_pane, bot_pane, ap_bar, ticker]
     }
 }

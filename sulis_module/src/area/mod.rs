@@ -42,15 +42,14 @@ use {Encounter, Item, Module, ObjectSize, OnTrigger, Prop};
 pub enum TriggerKind {
     OnCampaignStart,
     OnAreaLoad,
-    OnPlayerEnter,
+    OnPlayerEnter { location: Point, size: Size },
+    OnEncounterCleared { encounter_location: Point },
 }
 
 #[derive(Debug, Clone)]
 pub struct Trigger {
     pub kind: TriggerKind,
     pub on_activate: OnTrigger,
-    pub location: Option<Point>,
-    pub size: Option<Size>,
 }
 
 #[derive(Debug, Clone)]
@@ -193,8 +192,6 @@ impl Area {
             triggers.push(Trigger {
                 kind: tbuilder.kind,
                 on_activate: tbuilder.on_activate,
-                location: tbuilder.location,
-                size: tbuilder.size,
             });
         }
 
@@ -278,8 +275,6 @@ impl ResourceBuilder for AreaBuilder {
 pub struct TriggerBuilder {
     pub kind: TriggerKind,
     pub on_activate: OnTrigger,
-    pub location: Option<Point>,
-    pub size: Option<Size>,
 }
 
 #[derive(Deserialize, Serialize, Debug)]

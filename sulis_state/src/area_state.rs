@@ -203,16 +203,10 @@ impl AreaState {
 
             self.triggers.push(trigger_state);
 
-            let location = match trigger.location {
-                None => continue,
-                Some(ref loc) => loc,
+            let (location, size) = match trigger.kind {
+                TriggerKind::OnPlayerEnter { location, size } => (location, size),
+                _ => continue,
             };
-
-            let size = match trigger.size {
-                None => continue,
-                Some(ref size) => size,
-            };
-
 
             let start_x = location.x as usize;
             let start_y = location.y as usize;
@@ -437,8 +431,7 @@ impl AreaState {
         if self.triggers[index].activated { return; }
 
         self.triggers[index].activated = true;
-        GameState::add_ui_callbacks_of_kind(&vec![self.area.triggers[index].clone()],
-            TriggerKind::OnPlayerEnter, entity, entity);
+        GameState::add_ui_callback(self.area.triggers[index].on_activate.clone(), entity, entity);
     }
 
     /// whether the pc has current visibility to the specified coordinations

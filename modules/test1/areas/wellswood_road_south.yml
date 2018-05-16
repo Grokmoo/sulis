@@ -82,23 +82,28 @@ encounters:
       height: 10
 transitions: []
 triggers:
-  - kind: OnPlayerEnter
+  - kind:
+      OnEncounterCleared:
+        encounter_location:
+          x: 46
+          y: 72
     on_activate:
-      player_ability: ~
-      target_flags: ~
-      player_flags: ~
-      show_merchant: ~
-      show_cutscene: ~
+      fire_script:
+        id: wellswood_road_south
+        func: on_ambush_cleared
+  - kind:
+      OnPlayerEnter:
+        location:
+          x: 24
+          y: 49
+        size:
+          width: 10
+          height: 4
+    on_activate:
       start_conversation: wellswood_road_south_on_player_enter_bridge
       fire_script:
         id: wellswood_road_south
         func: on_player_enter_bridge
-    location:
-      x: 24
-      "y": 49
-    size:
-      width: 10
-      height: 4
   - kind: OnAreaLoad
     on_activate:
       fire_script:

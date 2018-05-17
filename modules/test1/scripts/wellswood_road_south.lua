@@ -14,5 +14,6 @@ function on_area_load(parent)
 end
 
 function on_ambush_cleared(parent)
-  game:log("test")
+  target = game:entity_with_id("npc_tervald")
+  target:set_flag("ambush_cleared")
 end

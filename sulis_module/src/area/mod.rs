@@ -78,6 +78,7 @@ pub struct EncounterData {
     pub encounter: Rc<Encounter>,
     pub location: Point,
     pub size: Size,
+    pub triggers: Vec<usize>,
 }
 
 pub struct Area {
@@ -130,22 +131,6 @@ impl Area {
             path_grids.insert(size.id.to_string(), path_grid);
         }
 
-        let mut encounters = Vec::new();
-        for encounter_builder in builder.encounters {
-            let encounter = match module.encounters.get(&encounter_builder.id) {
-                None => {
-                    warn!("No encounter '{}' found", &encounter_builder.id);
-                    return unable_to_create_error("area", &builder.id);
-                }, Some(encounter) => Rc::clone(encounter),
-            };
-
-            encounters.push(EncounterData {
-                encounter,
-                location: encounter_builder.location,
-                size: encounter_builder.size,
-            });
-        }
-
         // TODO validate position of all actors, props, encounters
 
         let mut transitions: Vec<Transition> = Vec::new();
@@ -192,6 +177,35 @@ impl Area {
             triggers.push(Trigger {
                 kind: tbuilder.kind,
                 on_activate: tbuilder.on_activate,
+            });
+        }
+
+        let mut encounters = Vec::new();
+        for encounter_builder in builder.encounters {
+            let encounter = match module.encounters.get(&encounter_builder.id) {
+                None => {
+                    warn!("No encounter '{}' found", &encounter_builder.id);
+                    return unable_to_create_error("area", &builder.id);
+                }, Some(encounter) => Rc::clone(encounter),
+            };
+
+            let mut encounter_triggers = Vec::new();
+            for (index, trigger) in triggers.iter().enumerate() {
+                match trigger.kind {
+                    TriggerKind::OnEncounterCleared { encounter_location } => {
+                        if encounter_location == encounter_builder.location {
+                            encounter_triggers.push(index);
+                        }
+                    },
+                    _ => (),
+                }
+            }
+
+            encounters.push(EncounterData {
+                encounter,
+                location: encounter_builder.location,
+                size: encounter_builder.size,
+                triggers: encounter_triggers,
             });
         }
 

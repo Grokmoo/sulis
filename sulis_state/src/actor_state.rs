@@ -351,6 +351,12 @@ impl ActorState {
     pub fn check_death(parent: &Rc<RefCell<EntityState>>, target: &Rc<RefCell<EntityState>>) {
         if target.borrow().actor.hp() > 0 { return; }
 
+        let area_state = GameState::area_state();
+
+        if let Some(index) = target.borrow().ai_group() {
+            area_state.borrow().check_encounter_cleared(index, parent, target);
+        }
+
         let reward = {
             let target = target.borrow();
             match target.actor.actor.reward {
@@ -373,7 +379,6 @@ impl ActorState {
 
         trace!("Dropping loot with {} items", items.len());
         let p = target.borrow().location.to_point();
-        let area_state = GameState::area_state();
         let mut area_state = area_state.borrow_mut();
 
         area_state.check_create_prop_container_at(p.x, p.y);

@@ -1,9 +1,15 @@
 id: tervald
 initial_nodes:
+  - - ambush_cleared
+    - { target_flags: [ ambush_cleared ] }
   - - already_talked
     - { target_flags: [ already_talked ] }
   - [start01, ~]
 nodes:
+  ambush_cleared:
+    text: |
+      Nice job taking on those goblins, kid.
+    responses: []
   already_talked:
     text: |
       What are you waiting for?  Get moving!

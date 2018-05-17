@@ -92,6 +92,12 @@ impl ScriptEntity {
 
 impl UserData for ScriptEntity {
     fn add_methods(methods: &mut UserDataMethods<Self>) {
+        methods.add_method("set_flag", |_, entity, flag: String| {
+            let entity = entity.try_unwrap()?;
+            entity.borrow_mut().set_custom_flag(&flag);
+            Ok(())
+        });
+
         methods.add_method("is_valid", |_, entity, ()| {
             let area_state = GameState::area_state();
             match entity.index {

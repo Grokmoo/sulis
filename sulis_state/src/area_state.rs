@@ -242,6 +242,27 @@ impl AreaState {
         }
     }
 
+    pub fn check_encounter_cleared(&self, index: usize, parent: &Rc<RefCell<EntityState>>,
+                                   target: &Rc<RefCell<EntityState>>) {
+        for entity in self.entity_iter() {
+            if let Some(entity_index) = entity.borrow().ai_group() {
+                if entity_index == index && entity.borrow().actor.hp() > 0 { return; }
+            }
+        }
+
+        for trigger_index in self.area.encounters[index].triggers.iter() {
+            let trigger = &self.area.triggers[*trigger_index];
+
+            match trigger.kind {
+                TriggerKind::OnEncounterCleared { .. } => {
+                    info!("    Calling OnEncounterCleared");
+                    GameState::add_ui_callback(trigger.on_activate.clone(), parent, target);
+                },
+                _ => (),
+            }
+        }
+    }
+
     pub fn spawn_encounter_at(&mut self, x: i32, y: i32) -> bool {
         let area = Rc::clone(&self.area);
 

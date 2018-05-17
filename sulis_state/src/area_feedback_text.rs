@@ -31,13 +31,14 @@ pub struct AreaFeedbackText {
     duration: u32,
     font_renderer: LineRenderer,
     color: Color,
+    move_rate: f32,
 
     hover_y: f32,
     alpha: f32,
 }
 
 impl AreaFeedbackText {
-    pub fn new(text: String, pos_x: f32, pos_y: f32, color: Color) -> AreaFeedbackText {
+    pub fn new(text: String, pos_x: f32, pos_y: f32, color: Color, move_rate: f32) -> AreaFeedbackText {
         let font = ResourceSet::get_default_font();
         let text_width = font.get_width(&text) as f32 / font.line_height as f32;
 
@@ -47,6 +48,7 @@ impl AreaFeedbackText {
             pos_x,
             pos_y,
             color,
+            move_rate,
             start_time: Instant::now(),
             duration: CONFIG.display.animation_base_time_millis * 40,
             font_renderer: LineRenderer::new(&font),
@@ -59,7 +61,7 @@ impl AreaFeedbackText {
     pub fn update(&mut self) {
         let frac = util::get_elapsed_millis(self.start_time.elapsed()) as f32 / self.duration as f32;
 
-        self.hover_y = frac * 3.0;
+        self.hover_y = frac * self.move_rate;
 
         if frac < 0.5 {
             self.alpha = 1.0;

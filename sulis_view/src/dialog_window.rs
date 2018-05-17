@@ -151,7 +151,7 @@ pub fn show_convo(convo: Rc<Conversation>, pc: &Rc<RefCell<EntityState>>,
     if convo.responses(&initial_node).is_empty() {
         let area_state = GameState::area_state();
         area_state.borrow_mut().add_feedback_text(convo.text(&initial_node).to_string(),
-            &target, color::GRAY);
+            &target, color::GRAY, 0.0);
     } else {
         let window = Widget::with_defaults(DialogWindow::new(&pc, &target, convo));
         window.borrow_mut().state.set_modal(true);

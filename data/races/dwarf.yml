@@ -22,9 +22,11 @@ default_images:
   Male:
     Foreground: creatures/dwarf_fg
     Background: creatures/dwarf_bg
+    Shadow: creatures/dwarf_shadow
   Female:
     Foreground: creatures/dwarf_fg
     Background: creatures/dwarf_bg
+    Shadow: creatures/dwarf_shadow
 image_layer_offset_scale: 16
 image_layer_offsets:
   HeldMain: [-18, -6]

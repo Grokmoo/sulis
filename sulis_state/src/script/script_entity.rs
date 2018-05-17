@@ -155,7 +155,7 @@ impl UserData for ScriptEntity {
             let (_, text, color) = ActorState::weapon_attack(&parent, &target);
 
             let area_state = GameState::area_state();
-            area_state.borrow_mut().add_feedback_text(text, &target, color);
+            area_state.borrow_mut().add_feedback_text(text, &target, color, 3.0);
 
             Ok(())
         });
@@ -212,7 +212,7 @@ impl UserData for ScriptEntity {
             let (_hit_kind, text, color) = ActorState::attack(&parent, &target, &attack);
 
             let area_state = GameState::area_state();
-            area_state.borrow_mut().add_feedback_text(text, &target, color);
+            area_state.borrow_mut().add_feedback_text(text, &target, color, 3.0);
 
             Ok(())
         });

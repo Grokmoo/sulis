@@ -23,10 +23,12 @@ default_images:
     Foreground: creatures/merling_male_fg
     Background: creatures/merling_male_bg
     Ears: creatures/merling_male_ears
+    Shadow: creatures/human_male_shadow
   Female:
     Foreground: creatures/merling_female_fg
     Background: creatures/merling_female_bg
     Ears: creatures/merling_female_ears
+    Shadow: creatures/human_female_shadow
 image_layer_offset_scale: 16
 image_layer_offsets:
   HeldMain: [-16, -8]

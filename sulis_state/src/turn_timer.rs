@@ -81,7 +81,7 @@ impl TurnTimer {
         }
 
         for entity in self.entities.iter() {
-            if !entity.borrow().is_hostile() { continue; }
+            // if !entity.borrow().is_hostile() { continue; }
             if entity.borrow().is_ai_active() { continue; }
 
             let ai_group = match entity.borrow().ai_group() {

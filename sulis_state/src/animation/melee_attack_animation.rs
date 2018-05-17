@@ -86,7 +86,7 @@ impl animation::Animation for MeleeAttackAnimation {
 
             let (hit_kind, text, color) = (self.attack_func)(&self.attacker, &self.defender);
 
-            area_state.borrow_mut().add_feedback_text(text, &self.defender, color);
+            area_state.borrow_mut().add_feedback_text(text, &self.defender, color, 3.0);
             self.has_attacked = true;
 
             if let Some(ref cb) = self.callback.as_ref() {

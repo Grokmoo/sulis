@@ -20,11 +20,14 @@ base_stats:
 default_images:
   Male:
     Background: creatures/goblin0
+    Shadow: creatures/goblin_shadow
   Female:
     Background: creatures/goblin0
+    Shadow: creatures/goblin_shadow
 image_layer_offset_scale: 16
 image_layer_offsets:
   HeldMain: [-24, -13]
   HeldOff: [8, -13]
+  Shadow: [0, 3]
 image_layer_postfix: {}
 

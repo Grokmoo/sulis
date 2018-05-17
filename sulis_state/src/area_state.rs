@@ -786,12 +786,12 @@ impl AreaState {
     }
 
     pub fn add_feedback_text(&mut self, text: String, target: &Rc<RefCell<EntityState>>,
-                             color: Color) {
+                             color: Color, move_rate: f32) {
         let width = target.borrow().size.width as f32;
         let pos_x = target.borrow().location.x as f32 + width / 2.0;
         let pos_y = target.borrow().location.y as f32 - 1.5;
 
-        self.feedback_text.push(AreaFeedbackText::new(text, pos_x, pos_y, color));
+        self.feedback_text.push(AreaFeedbackText::new(text, pos_x, pos_y, color, move_rate));
     }
 
     pub fn feedback_text_iter(&self) -> Iter<AreaFeedbackText> {

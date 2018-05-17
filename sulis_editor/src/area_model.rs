@@ -263,6 +263,7 @@ impl AreaModel {
             encounter,
             location: Point::new(x, y),
             size: Size::new(w, h),
+            triggers: Vec::new(),
         });
     }
 
@@ -557,6 +558,7 @@ impl AreaModel {
                 encounter: enc,
                 location: enc_builder.location,
                 size: enc_builder.size,
+                triggers: Vec::new(),
             };
             self.encounters.push(enc_data);
         }

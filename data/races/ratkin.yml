@@ -23,10 +23,12 @@ default_images:
     Foreground: creatures/ratkin_fg
     Background: creatures/ratkin_bg
     Ears: creatures/ratkin_ears
+    Shadow: creatures/dwarf_shadow
   Female:
     Foreground: creatures/ratkin_fg
     Background: creatures/ratkin_bg
     Ears: creatures/ratkin_ears
+    Shadow: creatures/dwarf_shadow
 image_layer_offset_scale: 16
 image_layer_offsets:
   HeldMain: [-18, -6]

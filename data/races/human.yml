@@ -22,9 +22,11 @@ default_images:
   Male:
     Foreground: creatures/human_male_fg
     Background: creatures/human_male_bg
+    Shadow: creatures/human_male_shadow
   Female:
     Foreground: creatures/human_female_fg
     Background: creatures/human_female_bg
+    Shadow: creatures/human_female_shadow
 image_layer_offset_scale: 16
 image_layer_offsets:
   HeldMain: [-16, -8]

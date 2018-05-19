@@ -72,12 +72,14 @@ const MAX_ACTIONS: u32 = 10;
 struct EntityAI {
     entity: Rc<RefCell<EntityState>>,
     state: State,
+    target: Rc<RefCell<EntityState>>,
     actions_taken_this_turn: u32,
 }
 impl EntityAI {
     fn new(entity: &Rc<RefCell<EntityState>>) -> EntityAI {
         EntityAI {
             entity: Rc::clone(entity),
+            target: GameState::pc(), // just a default target, this is selected by the AI later
             state: State::Init,
             actions_taken_this_turn: 0,
         }
@@ -96,27 +98,32 @@ impl EntityAI {
         info!("AI for '{}' transitioned into '{:?}'", self.entity.borrow().actor.actor.name, self.state);
     }
 
-    fn pick_next_action(&self) -> State {
+    fn pick_next_action(&mut self) -> State {
         if self.actions_taken_this_turn > MAX_ACTIONS {
             // guards against any infinite loop
             return State::End;
         }
 
+        self.pick_target();
         let entity = self.entity.borrow();
-        let pc = GameState::pc();
         let area_state = GameState::area_state();
         let area = Rc::clone(&area_state.borrow().area);
 
         // TODO handle the case where ai is in range but cannot actually attack due to visibility
         // or other restrictions - find a path to the target, check each point along the path until
         // a good one is found
-        if !entity.can_reach(&pc) && GameState::can_move_towards(&self.entity, &pc) {
+        if !entity.can_reach(&self.target) && GameState::can_move_towards(&self.entity, &self.target) {
             State::Move
-        } else if entity.can_attack(&pc, &area) {
+        } else if entity.can_attack(&self.target, &area) {
             State::Attack
         } else {
             State::End
         }
+    }
+
+    fn pick_target(&mut self) {
+        // TODO pick a hostile target
+        self.target = GameState::pc();
     }
 
     fn take_action(&mut self) {
@@ -146,14 +153,12 @@ impl EntityAI {
 
     fn do_move(&self) {
         debug!("AI for '{}' is moving.", self.entity.borrow().actor.actor.name);
-        let pc = GameState::pc();
-        GameState::move_towards(&self.entity, &pc);
+        GameState::move_towards(&self.entity, &self.target);
     }
 
     fn do_attack(&self) {
         debug!("AI for '{}' is attacking.", self.entity.borrow().actor.actor.name);
-        let pc = GameState::pc();
-        EntityState::attack(&self.entity, &pc, None);
+        EntityState::attack(&self.entity, &self.target, None);
     }
 
     fn do_end(&self) {

@@ -24,7 +24,7 @@ use sulis_module::Area;
 use animation::{Animation, MeleeAttackAnimation, RangedAttackAnimation};
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::util::Point;
-use sulis_module::{Actor, Faction, ObjectSize, ObjectSizeIterator, Module};
+use sulis_module::{Actor, ObjectSize, ObjectSizeIterator, Module};
 use sulis_module::area::Transition;
 use {ActorState, AreaState, ChangeListenerList, EntityTextureCache, EntityTextureSlot,
     GameState, has_visibility, Location, PropState, ScriptCallback};
@@ -111,8 +111,8 @@ impl EntityState {
         self.is_pc
     }
 
-    pub fn is_hostile(&self) -> bool {
-        self.actor.actor.faction == Faction::Hostile
+    pub fn is_hostile(&self, other: &Rc<RefCell<EntityState>>) -> bool {
+        self.actor.actor.faction != other.borrow().actor.actor.faction
     }
 
     pub (crate) fn is_marked_for_removal(&self) -> bool {

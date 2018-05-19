@@ -25,7 +25,6 @@ use rlua::{self, Lua, UserData, UserDataMethods};
 use animation::{Animation, MeleeAttackAnimation};
 use sulis_rules::{AttackKind, DamageKind, Attack};
 use sulis_core::config::CONFIG;
-use sulis_module::Faction;
 use {ActorState, EntityState, GameState};
 use script::*;
 
@@ -420,8 +419,8 @@ impl UserData for ScriptEntitySet {
         methods.add_method("without_self", &without_self);
         methods.add_method("visible_within", &visible_within);
         methods.add_method("visible", |lua, set, ()| visible_within(lua, set, std::f32::MAX));
-        methods.add_method("hostile", |lua, set, ()| is_faction(lua, set, Faction::Hostile));
-        methods.add_method("friendly", |lua, set, ()| is_faction(lua, set, Faction::Friendly));
+        methods.add_method("hostile", |lua, set, ()| is_hostile(lua, set));
+        methods.add_method("friendly", |lua, set, ()| is_friendly(lua, set));
         methods.add_method("reachable", &reachable);
         methods.add_method("attackable", &attackable);
     }
@@ -471,9 +470,15 @@ fn reachable(_lua: &Lua, set: &ScriptEntitySet, _args: ()) -> Result<ScriptEntit
     })
 }
 
-fn is_faction(_lua: &Lua, set: &ScriptEntitySet, faction: Faction) -> Result<ScriptEntitySet> {
-    filter_entities(set, faction, &|_, entity, faction| {
-        entity.borrow().actor.actor.faction == faction
+fn is_hostile(_lua: &Lua, set: &ScriptEntitySet) -> Result<ScriptEntitySet> {
+    filter_entities(set, (), &|parent, entity, _| {
+        parent.borrow().is_hostile(entity)
+    })
+}
+
+fn is_friendly(_lua: &Lua, set: &ScriptEntitySet) -> Result<ScriptEntitySet> {
+    filter_entities(set, (), &|parent, entity, _| {
+        !parent.borrow().is_hostile(entity)
     })
 }
 

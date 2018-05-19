@@ -66,7 +66,7 @@ impl TurnTimer {
         let mut groups_to_activate: HashSet<usize> = HashSet::new();
         let mut updated = false;
         for entity in self.entities.iter() {
-            if !entity.borrow().is_hostile() { continue; }
+            if entity.borrow().is_pc() { continue; }
             if entity.borrow().is_ai_active() { continue; }
 
             if !pc.borrow().has_visibility(entity, area) && !entity.borrow().has_visibility(pc, area) {
@@ -81,7 +81,6 @@ impl TurnTimer {
         }
 
         for entity in self.entities.iter() {
-            // if !entity.borrow().is_hostile() { continue; }
             if entity.borrow().is_ai_active() { continue; }
 
             let ai_group = match entity.borrow().ai_group() {

@@ -1,5 +1,5 @@
 function on_talk_tervald(parent, target)
-  
+  game:add_party_member("npc_aessa")
 end
 
 function on_player_enter_bridge(parent, target)

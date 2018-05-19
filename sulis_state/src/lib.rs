@@ -136,6 +136,8 @@ pub struct GameState {
     areas: HashMap<String, Rc<RefCell<AreaState>>>,
     area_state: Rc<RefCell<AreaState>>,
     pc: Rc<RefCell<EntityState>>,
+    party: Vec<Rc<RefCell<EntityState>>>,
+    party_listeners: ChangeListenerList<Rc<RefCell<EntityState>>>,
     should_exit: bool,
     path_finder: PathFinder,
     ui_callbacks: Vec<UICallback>,
@@ -159,6 +161,35 @@ macro_rules! exec_script {
 }
 
 impl GameState {
+    pub fn add_party_member(entity: Rc<RefCell<EntityState>>) {
+        info!("Add party member {}", entity.borrow().actor.actor.id);
+        STATE.with(|state| {
+            let mut state = state.borrow_mut();
+            let state = state.as_mut().unwrap();
+
+            state.party.push(Rc::clone(&entity));
+            state.party_listeners.notify(&entity);
+        })
+    }
+
+    pub fn add_party_listener(listener: ChangeListener<Rc<RefCell<EntityState>>>) {
+        STATE.with(|state| {
+            let mut state = state.borrow_mut();
+            let state = state.as_mut().unwrap();
+
+            state.party_listeners.add(listener);
+        })
+    }
+
+    pub fn party() -> Vec<Rc<RefCell<EntityState>>> {
+        STATE.with(|state| {
+            let mut state = state.borrow_mut();
+            let state = state.as_mut().unwrap();
+
+            state.party.clone()
+        })
+    }
+
     pub fn execute_ability_on_activate(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>) {
         exec_script!(ability_on_activate: parent, ability);
     }
@@ -338,6 +369,8 @@ impl GameState {
             area_state: area_state,
             path_finder: path_finder,
             pc: pc_state,
+            party: Vec::new(),
+            party_listeners: ChangeListenerList::default(),
             should_exit: false,
             ui_callbacks: Vec::new(),
         })
@@ -452,6 +485,7 @@ impl GameState {
         let active_entity = STATE.with(|s| {
             let mut state = s.borrow_mut();
             let state = state.as_mut().unwrap();
+
             let mut area_state = state.area_state.borrow_mut();
 
             let result = match area_state.update(millis) {

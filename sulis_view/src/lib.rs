@@ -252,11 +252,7 @@ impl WidgetKind for RootView {
 
         let area_widget = Widget::with_defaults(AreaView::new());
 
-        let right_pane = Widget::empty("right_pane");
-        {
-            let portrait = Widget::with_defaults(PortraitView::new(GameState::pc()));
-            Widget::add_child_to(&right_pane, portrait);
-        }
+        let right_pane = Widget::with_defaults(RightPane::new());
 
         let bot_pane = Widget::empty("bottom_pane");
         {
@@ -329,5 +325,34 @@ impl WidgetKind for RootView {
 
         // area widget must be the first entry in the children list
         vec![area_widget, right_pane, bot_pane, ap_bar, ticker]
+    }
+}
+
+pub struct RightPane {}
+
+impl RightPane {
+    pub fn new() -> Rc<RefCell<RightPane>> {
+        Rc::new(RefCell::new(RightPane {}))
+    }
+}
+
+impl WidgetKind for RightPane {
+    widget_kind!("right_pane");
+
+    fn on_remove(&mut self) { }
+
+    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+        GameState::add_party_listener(ChangeListener::invalidate("right_pane", &widget));
+
+        let mut children = Vec::new();
+        let portrait = Widget::with_defaults(PortraitView::new(GameState::pc()));
+        children.push(portrait);
+
+        for entity in GameState::party() {
+            let portrait = Widget::with_defaults(PortraitView::new(entity));
+            children.push(portrait);
+        }
+
+        children
     }
 }

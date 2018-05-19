@@ -157,6 +157,7 @@ children:
     preferred_size: [35, 0]
     x_relative: Max
     height_relative: Max
+    layout: BoxVertical
     children:
       portrait_view:
         background: bg_rounded

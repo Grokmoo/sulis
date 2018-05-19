@@ -215,20 +215,29 @@ impl UserData for ScriptInterface {
         });
 
         methods.add_method("entity_with_id", |_, _, id: String| {
-            let area_state = GameState::area_state();
-            let area_state = area_state.borrow();
-
-            for entity in area_state.entity_iter() {
-                if entity.borrow().actor.actor.id == id {
-                    return Ok(ScriptEntity::from(&entity))
-                }
+            match entity_with_id(id) {
+                Some(entity) => Ok(ScriptEntity::from(&entity)),
+                None => Err(rlua::Error::ToLuaConversionError {
+                    from: "ID",
+                    to: "ScriptEntity",
+                    message: Some("Target with the specified ID does not exist".to_string())
+                })
             }
+        });
 
-            Err(rlua::Error::ToLuaConversionError {
-                from: "ID",
-                to: "ScriptEntity",
-                message: Some("Target with the specified ID does not exist".to_string())
-            })
+        methods.add_method("add_party_member", |_, _, id: String| {
+            let entity = match entity_with_id(id) {
+                Some(entity) => entity,
+                None => return Err(rlua::Error::ToLuaConversionError {
+                    from: "ID",
+                    to: "ScriptENtity",
+                    message: Some("Entity with specified id does not exist".to_string())
+                })
+            };
+
+            GameState::add_party_member(entity);
+
+            Ok(())
         });
     }
 }
@@ -268,6 +277,19 @@ impl UserData for ScriptAbility {
             Ok(cb_data)
         });
     }
+}
+
+fn entity_with_id(id: String) -> Option<Rc<RefCell<EntityState>>> {
+    let area_state = GameState::area_state();
+    let area_state = area_state.borrow();
+
+    for entity in area_state.entity_iter() {
+        if entity.borrow().actor.actor.id == id {
+            return Some(entity);
+        }
+    }
+
+    None
 }
 
 fn activate(_lua: &Lua, ability: &ScriptAbility, target: ScriptEntity) -> Result<()> {

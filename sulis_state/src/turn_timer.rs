@@ -62,14 +62,17 @@ impl TurnTimer {
         }
     }
 
-    pub fn check_ai_activation(&mut self, pc: &Rc<RefCell<EntityState>>, area: &Rc<Area>) {
+    pub fn check_ai_activation(&mut self, mover: &Rc<RefCell<EntityState>>, area: &Rc<Area>) {
         let mut groups_to_activate: HashSet<usize> = HashSet::new();
         let mut updated = false;
+
         for entity in self.entities.iter() {
+            if Rc::ptr_eq(mover, entity) { continue; }
             if entity.borrow().is_pc() { continue; }
             if entity.borrow().is_ai_active() { continue; }
+            if !entity.borrow().is_hostile(mover) { continue; }
 
-            if !pc.borrow().has_visibility(entity, area) && !entity.borrow().has_visibility(pc, area) {
+            if !mover.borrow().has_visibility(entity, area) && !entity.borrow().has_visibility(mover, area) {
                 continue;
             }
 

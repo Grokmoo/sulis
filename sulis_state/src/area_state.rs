@@ -609,9 +609,9 @@ impl AreaState {
             self.compute_pc_visibility(&*entity.borrow(), d_x, d_y);
 
             self.check_trigger_grid(&entity);
-
-            self.turn_timer.check_ai_activation(entity, &self.area);
         }
+
+        self.turn_timer.check_ai_activation(entity, &self.area);
     }
 
     fn clear_entity_points(&mut self, entity: &EntityState, x: i32, y: i32) {

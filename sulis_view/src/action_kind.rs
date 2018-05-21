@@ -237,7 +237,6 @@ impl AttackAction {
             None => return None,
             Some(ref entity) => {
                 if entity.borrow().is_pc() { return None; }
-                if !entity.borrow().is_hostile() { return None; }
                 Rc::clone(entity)
             }
         };

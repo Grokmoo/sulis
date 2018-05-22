@@ -77,7 +77,7 @@ impl WidgetKind for MerchantWindow {
         let list_content = Widget::empty("items_list");
         for (index, &(qty, ref item)) in merchant.items().iter().enumerate() {
             let item_button = ItemButton::merchant(item.item.icon.id(), qty, index, &self.merchant_id);
-            item_button.borrow_mut().add_action("Buy", buy_item_cb(&GameState::pc(),
+            item_button.borrow_mut().add_action("Buy", buy_item_cb(&GameState::selected(),
                 &self.merchant_id, index));
 
             Widget::add_child_to(&list_content, Widget::with_defaults(item_button));

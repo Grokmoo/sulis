@@ -166,8 +166,9 @@ impl AreaView {
         let (max_tile_x, max_tile_y) = AreaView::get_texture_cache_max(area_state.area.width,
                                                                        area_state.area.height);
 
+        // TODO draw vis for entire party
         let vis_dist = area_state.area.vis_dist;
-        let pc = GameState::pc();
+        let pc = GameState::selected();
         let c_x = pc.borrow().location.x + pc.borrow().size.width / 2;
         let c_y = pc.borrow().location.y + pc.borrow().size.height / 2;
         let min_x = cmp::max(0, c_x - vis_dist + if delta_x < 0 { delta_x } else { 0 });

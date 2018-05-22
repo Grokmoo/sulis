@@ -197,7 +197,7 @@ impl UserData for ScriptInterface {
         });
 
         methods.add_method("start_conversation", |_, _, (id, target): (String, Option<ScriptEntity>)| {
-            let pc = GameState::pc();
+            let pc = GameState::selected();
             let target = match target {
                 None => Rc::clone(&pc),
                 Some(ref entity) => {

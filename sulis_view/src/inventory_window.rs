@@ -71,11 +71,11 @@ impl WidgetKind for InventoryWindow {
 
             match item.item.equippable {
                 Some(_) => {
-                    item_but.borrow_mut().add_action("Equip", equip_item_cb(&GameState::pc(), index));
+                    item_but.borrow_mut().add_action("Equip", equip_item_cb(&GameState::selected(), index));
                 },
                 None => (),
             };
-            item_but.borrow_mut().add_action("Drop", drop_item_cb(&GameState::pc(), index));
+            item_but.borrow_mut().add_action("Drop", drop_item_cb(&GameState::selected(), index));
 
             Widget::add_child_to(&list_content, Widget::with_defaults(item_but));
         }
@@ -93,8 +93,8 @@ impl WidgetKind for InventoryWindow {
                     let item_state = actor.inventory().get(*slot).unwrap();
 
                     let button = ItemButton::equipped(item_state.item.icon.id(), index);
-                    button.borrow_mut().add_action("Unequip", unequip_item_cb(&GameState::pc(), *slot));
-                    button.borrow_mut().add_action("Drop", unequip_and_drop_item_cb(&GameState::pc(), *slot));
+                    button.borrow_mut().add_action("Unequip", unequip_item_cb(&GameState::selected(), *slot));
+                    button.borrow_mut().add_action("Drop", unequip_and_drop_item_cb(&GameState::selected(), *slot));
 
                     Widget::add_child_to(&equipped_area, Widget::with_theme(button, &theme_id));
                 }

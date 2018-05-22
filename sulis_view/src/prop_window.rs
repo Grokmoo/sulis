@@ -90,7 +90,7 @@ impl WidgetKind for PropWindow {
             let parent = Widget::get_parent(&widget);
             parent.borrow_mut().mark_for_removal();
 
-            let pc = GameState::pc();
+            let pc = GameState::selected();
             let mut pc = pc.borrow_mut();
             pc.actor.take_all(prop_index);
 
@@ -102,7 +102,7 @@ impl WidgetKind for PropWindow {
         let list_content = Widget::empty("items_list");
         for (index, &(qty, ref item)) in prop.items().iter().enumerate() {
             let item_button = ItemButton::prop(item.item.icon.id(), qty, index, self.prop_index);
-            item_button.borrow_mut().add_action("Take", take_item_cb(&GameState::pc(), prop_index, index));
+            item_button.borrow_mut().add_action("Take", take_item_cb(&GameState::selected(), prop_index, index));
             let button = Widget::with_defaults(item_button);
             Widget::add_child_to(&list_content, button);
         }

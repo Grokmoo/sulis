@@ -102,7 +102,7 @@ impl CharacterBuilder {
     }
 
     pub fn level_up() -> Rc<RefCell<CharacterBuilder>> {
-        CharacterBuilder::with(Rc::new(LevelUpBuilder { pc: GameState::pc() }))
+        CharacterBuilder::with(Rc::new(LevelUpBuilder { pc: GameState::selected() }))
     }
 
     fn with(builder_set: Rc<BuilderSet>) -> Rc<RefCell<CharacterBuilder>> {

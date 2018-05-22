@@ -151,13 +151,13 @@ impl RootView {
 
     pub fn set_inventory_window(&mut self, widget: &Rc<RefCell<Widget>>, desired_state: bool) {
         self.set_window(widget, self::inventory_window::NAME, desired_state, &|| {
-            InventoryWindow::new(&GameState::pc())
+            InventoryWindow::new(&GameState::selected())
         });
     }
 
     pub fn set_character_window(&mut self, widget: &Rc<RefCell<Widget>>, desired_state: bool) {
         self.set_window(widget, self::character_window::NAME, desired_state, &|| {
-            CharacterWindow::new(&GameState::pc())
+            CharacterWindow::new(&GameState::selected())
         });
     }
 
@@ -243,7 +243,7 @@ impl WidgetKind for RootView {
         let area_state = GameState::area_state();
         area_state.borrow_mut().listeners.remove(NAME);
 
-        let pc = GameState::pc();
+        let pc = GameState::selected();
         pc.borrow_mut().actor.listeners.remove(NAME);
     }
 
@@ -304,15 +304,16 @@ impl WidgetKind for RootView {
                 view.show_menu(&parent);
             })));
 
-            let abilities = Widget::with_defaults(AbilitiesBar::new(GameState::pc()));
+            let abilities = Widget::with_defaults(AbilitiesBar::new(GameState::selected()));
 
             Widget::add_children_to(&bot_pane, vec![inv_button, cha_button, map_button,
                                     log_button, men_button, abilities]);
         }
 
         let widget_ref = Rc::clone(&widget);
-        let pc = GameState::pc();
+        let pc = GameState::selected();
         pc.borrow_mut().actor.listeners.add(ChangeListener::new(NAME, Box::new(move |pc| {
+            // TODO handle party death
             if pc.is_dead() {
                 let menu = Widget::with_defaults(GameOverMenu::new());
                 Widget::add_child_to(&widget_ref, menu);
@@ -345,8 +346,6 @@ impl WidgetKind for RightPane {
         GameState::add_party_listener(ChangeListener::invalidate("right_pane", &widget));
 
         let mut children = Vec::new();
-        let portrait = Widget::with_defaults(PortraitView::new(GameState::pc()));
-        children.push(portrait);
 
         for entity in GameState::party() {
             let portrait = Widget::with_defaults(PortraitView::new(entity));

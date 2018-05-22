@@ -28,6 +28,7 @@ pub fn get_action(x: i32, y: i32) -> Box<ActionKind> {
     if !area_state.borrow().area.coords_valid(x, y) { return Box::new(InvalidAction {}); }
     if !area_state.borrow().is_pc_explored(x, y) { return Box::new(InvalidAction {}); }
 
+    if let Some(action) = SelectAction::create_if_valid(x, y) { return action; }
     if let Some(action) = AttackAction::create_if_valid(x, y) { return action; }
     if let Some(action) = DialogAction::create_if_valid(x, y) { return action; }
     if let Some(action) = PropAction::create_if_valid(x, y) { return action; }
@@ -43,6 +44,46 @@ pub trait ActionKind {
     fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32)>;
 
     fn fire_action(&mut self, widget: &Rc<RefCell<Widget>>);
+}
+
+struct SelectAction {
+    target: Rc<RefCell<EntityState>>,
+}
+
+impl SelectAction {
+    fn create_if_valid(x: i32, y: i32) -> Option<Box<ActionKind>> {
+        let area_state = GameState::area_state();
+        let area_state = area_state.borrow();
+        let target = match area_state.get_entity_at(x, y) {
+            None => return None,
+            Some(ref entity) => {
+                if Rc::ptr_eq(&GameState::selected(), entity) { return None; }
+                if !GameState::is_party_member(entity) { return None; }
+                Rc::clone(entity)
+            }
+        };
+
+        Some(Box::new(SelectAction {
+            target,
+        }))
+    }
+}
+
+impl ActionKind for SelectAction{
+    fn cursor_state(&self) -> animation_state::Kind {
+        animation_state::Kind::MouseSelect
+    }
+
+    fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32)> {
+        let size = Rc::clone(&self.target.borrow().size);
+        let point = self.target.borrow().location.to_point();
+        Some((size, point.x, point.y))
+    }
+
+    fn fire_action(&mut self, _widget: &Rc<RefCell<Widget>>) {
+        trace!("Firing select action.");
+        GameState::set_selected_party_member(Rc::clone(&self.target));
+    }
 }
 
 struct DialogAction {
@@ -63,7 +104,7 @@ impl DialogAction {
             }
         };
         let max_dist = Module::rules().max_dialog_distance;
-        let pc = GameState::pc();
+        let pc = GameState::selected();
         if pc.borrow().dist_to_entity(&target) <= max_dist {
             Some(Box::new(DialogAction { target, pc }))
         } else {
@@ -121,7 +162,7 @@ impl PropAction {
         if !prop_state.prop.interactive { return None; }
 
         let max_dist = Module::rules().max_prop_distance;
-        let pc = GameState::pc();
+        let pc = GameState::selected();
         if pc.borrow().dist_to_prop(prop_state) > max_dist {
             let cb_action = Box::new(PropAction { index });
             return MoveThenAction::create_if_valid(prop_state.location.to_point(),
@@ -184,7 +225,7 @@ impl TransitionAction {
         });
 
         let max_dist = Module::rules().max_transition_distance;
-        let pc = GameState::pc();
+        let pc = GameState::selected();
         if pc.borrow().dist_to_transition(transition) > max_dist {
             return MoveThenAction::create_if_valid(transition.from,
                 &transition.size, max_dist, cb_action, animation_state::Kind::MouseTravel);
@@ -241,7 +282,7 @@ impl AttackAction {
                 Rc::clone(entity)
             }
         };
-        let pc = GameState::pc();
+        let pc = GameState::selected();
         if pc.borrow().can_attack(&target, &area_state.area) {
             Some(Box::new(AttackAction { pc, target }))
         } else {
@@ -299,7 +340,7 @@ impl MoveThenAction {
         let x = pos.x as f32 + size.width as f32 / 2.0 - 0.5;
         let y = pos.y as f32 + size.height as f32 / 2.0 - 0.5;
 
-        let pc = GameState::pc();
+        let pc = GameState::selected();
         let dist = dist + pc.borrow().size.diagonal / 2.0 + size.diagonal / 2.0;
         let move_action = match MoveAction::new_if_valid(x, y, Some(dist)) {
             None => return None,
@@ -351,7 +392,7 @@ struct MoveAction {
 
 impl MoveAction {
     fn new_if_valid(x: f32, y: f32, dist: Option<f32>) -> Option<MoveAction> {
-        let pc = GameState::pc();
+        let pc = GameState::selected();
 
         let dist = match dist {
             None => 0.6,

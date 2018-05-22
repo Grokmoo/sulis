@@ -127,7 +127,7 @@ impl ItemButton {
         let root = Widget::get_root(widget);
         let root_view = Widget::downcast_kind_mut::<RootView>(&root);
         if let Some(_) = root_view.get_merchant_window(&root) {
-            Some(sell_item_cb(&GameState::pc(), self.item_index))
+            Some(sell_item_cb(&GameState::selected(), self.item_index))
         } else {
             None
         }
@@ -182,7 +182,7 @@ impl WidgetKind for ItemButton {
 
         if self.item_window.is_some() { return true; }
 
-        let pc = GameState::pc();
+        let pc = GameState::selected();
         let pc = pc.borrow();
         let area_state = GameState::area_state();
         let area_state = area_state.borrow();

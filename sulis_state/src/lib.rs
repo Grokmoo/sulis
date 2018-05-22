@@ -135,7 +135,7 @@ pub struct UICallback {
 pub struct GameState {
     areas: HashMap<String, Rc<RefCell<AreaState>>>,
     area_state: Rc<RefCell<AreaState>>,
-    pc: Rc<RefCell<EntityState>>,
+    selected: Rc<RefCell<EntityState>>,
     party: Vec<Rc<RefCell<EntityState>>>,
     party_listeners: ChangeListenerList<Rc<RefCell<EntityState>>>,
     should_exit: bool,
@@ -161,11 +161,30 @@ macro_rules! exec_script {
 }
 
 impl GameState {
+    pub fn set_selected_party_member(entity: Rc<RefCell<EntityState>>) {
+        if !GameState::is_party_member(&entity) {
+            warn!("Attempted to select invalid party member {}", entity.borrow().actor.actor.id);
+            return;
+        }
+
+        STATE.with(|state| {
+            let mut state = state.borrow_mut();
+            let state = state.as_mut().unwrap();
+
+            state.selected = entity;
+            // TODO notify listeners
+        })
+    }
+
     pub fn add_party_member(entity: Rc<RefCell<EntityState>>) {
         info!("Add party member {}", entity.borrow().actor.actor.id);
         STATE.with(|state| {
             let mut state = state.borrow_mut();
             let state = state.as_mut().unwrap();
+
+            if !state.area_state.borrow().turn_timer.is_active() {
+                entity.borrow_mut().actor.init_turn();
+            }
 
             state.party.push(Rc::clone(&entity));
             state.party_listeners.notify(&entity);
@@ -178,6 +197,19 @@ impl GameState {
             let state = state.as_mut().unwrap();
 
             state.party_listeners.add(listener);
+        })
+    }
+
+    pub fn is_party_member(entity: &Rc<RefCell<EntityState>>) -> bool {
+        STATE.with(|state| {
+            let mut state = state.borrow_mut();
+            let state = state.as_mut().unwrap();
+
+            for member in state.party.iter() {
+                if Rc::ptr_eq(member, entity) { return true; }
+            }
+
+            false
         })
     }
 
@@ -227,10 +259,10 @@ impl GameState {
         });
 
         let area_state = GameState::area_state();
-        area_state.borrow_mut().push_scroll_to_callback(GameState::pc());
+        area_state.borrow_mut().push_scroll_to_callback(GameState::selected());
         area_state.borrow_mut().on_load_fired = true;
         let area_state = area_state.borrow();
-        let pc = GameState::pc();
+        let pc = GameState::selected();
         GameState::add_ui_callbacks_of_kind(&area_state.area.triggers, TriggerKind::OnCampaignStart, &pc, &pc);
         GameState::add_ui_callbacks_of_kind(&area_state.area.triggers, TriggerKind::OnAreaLoad, &pc, &pc);
 
@@ -284,13 +316,20 @@ impl GameState {
             let state = state.as_mut().unwrap();
 
             {
-                let area_id = state.pc.borrow().location.area_id.to_string();
-                state.areas.get(&area_id).unwrap().borrow_mut().remove_entity(&state.pc);
+                let area_id = state.selected.borrow().location.area_id.to_string();
+                for entity in state.party.iter() {
+                    state.areas.get(&area_id).unwrap().borrow_mut().remove_entity(&entity);
+                }
             }
 
             let location = Location::new(x, y, &state.area_state.borrow().area);
-            state.area_state.borrow_mut().add_entity(Rc::clone(&state.pc), location);
-            state.area_state.borrow_mut().push_scroll_to_callback(Rc::clone(&state.pc));
+
+            for entity in state.party.iter() {
+                // TODO find locations for all of the party members
+                state.area_state.borrow_mut().add_entity(Rc::clone(entity), location.clone());
+            }
+
+            state.area_state.borrow_mut().push_scroll_to_callback(Rc::clone(&state.selected));
 
             let area_state = state.area_state.borrow();
             for entity in area_state.entity_iter() {
@@ -299,7 +338,7 @@ impl GameState {
         });
 
         let area_state = GameState::area_state();
-        let pc = GameState::pc();
+        let pc = GameState::selected();
         let mut area_state = area_state.borrow_mut();
         if !area_state.on_load_fired {
             area_state.on_load_fired = true;
@@ -364,12 +403,15 @@ impl GameState {
         let mut areas: HashMap<String, Rc<RefCell<AreaState>>> = HashMap::new();
         areas.insert(game.starting_area.to_string(), Rc::clone(&area_state));
 
+        let mut party = Vec::new();
+        party.push(Rc::clone(&pc_state));
+
         Ok(GameState {
             areas,
             area_state: area_state,
             path_finder: path_finder,
-            pc: pc_state,
-            party: Vec::new(),
+            selected: pc_state,
+            party,
             party_listeners: ChangeListenerList::default(),
             should_exit: false,
             ui_callbacks: Vec::new(),
@@ -489,11 +531,12 @@ impl GameState {
             let mut area_state = state.area_state.borrow_mut();
 
             let result = match area_state.update(millis) {
-                None => Rc::clone(&state.pc),
+                None => Rc::clone(&state.selected),
                 Some(entity) => Rc::clone(entity),
             };
 
-            if state.pc.borrow().actor.is_dead() {
+            // TODO check for whole party death
+            if state.selected.borrow().actor.is_dead() {
                 area_state.turn_timer.set_active(false);
             }
             result
@@ -571,8 +614,8 @@ impl GameState {
         false
     }
 
-    pub fn pc() -> Rc<RefCell<EntityState>> {
-        STATE.with(|s| Rc::clone(&s.borrow().as_ref().unwrap().pc))
+    pub fn selected() -> Rc<RefCell<EntityState>> {
+        STATE.with(|s| Rc::clone(&s.borrow().as_ref().unwrap().selected))
     }
 
     fn get_target(entity: &Rc<RefCell<EntityState>>,

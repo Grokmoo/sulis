@@ -85,8 +85,8 @@ triggers:
   - kind:
       OnEncounterCleared:
         encounter_location:
-          x: 47
-          "y": 78
+          x: 49
+          "y": 81
     on_activate:
       player_ability: ~
       target_flags: ~

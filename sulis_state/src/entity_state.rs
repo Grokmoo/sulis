@@ -97,10 +97,10 @@ impl EntityState {
         self.ai_group
     }
 
-    pub fn set_ai_active(&mut self) {
+    pub fn set_ai_active(&mut self, active: bool) {
         if self.is_pc() { return; }
 
-        self.ai_active = true;
+        self.ai_active = active;
     }
 
     pub fn is_ai_active(&self) -> bool {

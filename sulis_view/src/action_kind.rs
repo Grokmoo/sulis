@@ -19,7 +19,7 @@ use std::rc::Rc;
 
 use sulis_core::ui::{animation_state, Widget};
 use sulis_core::util::Point;
-use sulis_module::{Module, ObjectSize};
+use sulis_module::{Faction, Module, ObjectSize};
 use sulis_state::{EntityState, GameState, ScriptCallback};
 use {AreaView, dialog_window, RootView};
 
@@ -237,6 +237,7 @@ impl AttackAction {
             None => return None,
             Some(ref entity) => {
                 if entity.borrow().is_pc() { return None; }
+                if entity.borrow().actor.actor.faction == Faction::Friendly { return None; }
                 Rc::clone(entity)
             }
         };

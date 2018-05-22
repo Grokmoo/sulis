@@ -20,7 +20,7 @@ use std::collections::HashSet;
 use std::collections::VecDeque;
 pub use std::collections::vec_deque::Iter;
 
-use sulis_module::Area;
+use sulis_module::{Area, Faction};
 
 use {AreaState, ChangeListenerList, EntityState, GameState};
 
@@ -79,7 +79,7 @@ impl TurnTimer {
             if let Some(ai_group) = entity.borrow().ai_group() {
                 groups_to_activate.insert(ai_group);
             }
-            entity.borrow_mut().set_ai_active();
+            entity.borrow_mut().set_ai_active(true);
             updated = true;
         }
 
@@ -92,7 +92,7 @@ impl TurnTimer {
             };
 
             if groups_to_activate.contains(&ai_group) {
-                entity.borrow_mut().set_ai_active();
+                entity.borrow_mut().set_ai_active(true);
             }
         }
 
@@ -128,6 +128,8 @@ impl TurnTimer {
 
     pub fn end_combat(&mut self) {
         for entity in self.entities.iter() {
+            entity.borrow_mut().set_ai_active(false);
+
             if !entity.borrow().is_pc() { continue; }
 
             entity.borrow_mut().actor.init_turn();
@@ -169,7 +171,8 @@ impl TurnTimer {
         trace!("Removing entity from turn timer: '{}'", entity.borrow().actor.actor.name);
         self.entities.retain(|other| *entity.borrow() != *other.borrow());
 
-        if self.entities.iter().all(|e| !e.borrow().is_ai_active()) {
+        if self.entities.iter().all(|e| !e.borrow().is_ai_active() ||
+                                    e.borrow().actor.actor.faction == Faction::Friendly) {
             self.set_active(false);
         } else {
             self.listeners.notify(&self);

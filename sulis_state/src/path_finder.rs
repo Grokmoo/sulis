@@ -101,8 +101,8 @@ impl PathFinder {
             // memset g_score and f_score to a large floating point number
             // benchmarking revealed that setting these values using the naive
             // approach is the majority of time spent for most path finds
-            ptr::write_bytes(self.g_score.as_mut_ptr(), 127, self.g_score.len() - 1);
-            ptr::write_bytes(self.f_score.as_mut_ptr(), 127, self.f_score.len() - 1);
+            ptr::write_bytes(self.g_score.as_mut_ptr(), 127, self.g_score.len());
+            ptr::write_bytes(self.f_score.as_mut_ptr(), 127, self.f_score.len());
         }
 
         // for each node, cost of getting from start to that node

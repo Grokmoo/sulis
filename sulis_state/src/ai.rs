@@ -33,7 +33,7 @@ impl AI {
     }
 
     pub fn update(&mut self, entity: Rc<RefCell<EntityState>>) {
-        if entity.borrow().is_pc() {
+        if entity.borrow().is_party_member() {
             self.ai = None;
             return;
         }

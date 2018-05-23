@@ -27,8 +27,8 @@ pub struct Location {
     pub y: i32,
     pub area_id: String,
 
-    area_width: i32,
-    area_height: i32,
+    pub area_width: i32,
+    pub area_height: i32,
 }
 
 impl Ord for Location {

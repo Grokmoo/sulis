@@ -68,7 +68,7 @@ impl TurnTimer {
 
         for entity in self.entities.iter() {
             if Rc::ptr_eq(mover, entity) { continue; }
-            if entity.borrow().is_pc() { continue; }
+            if entity.borrow().is_party_member() { continue; }
             if entity.borrow().is_ai_active() { continue; }
             if !entity.borrow().is_hostile(mover) { continue; }
 
@@ -130,7 +130,7 @@ impl TurnTimer {
         for entity in self.entities.iter() {
             entity.borrow_mut().set_ai_active(false);
 
-            if !entity.borrow().is_pc() { continue; }
+            if !entity.borrow().is_party_member() { continue; }
 
             entity.borrow_mut().actor.init_turn();
 
@@ -200,7 +200,7 @@ impl TurnTimer {
         loop {
             {
                 let front = self.entities.front().unwrap();
-                if front.borrow().is_pc() || front.borrow().is_ai_active() {
+                if front.borrow().is_party_member() || front.borrow().is_ai_active() {
                     break;
                 }
             }
@@ -238,7 +238,7 @@ impl<'a> Iterator for ActiveEntityIterator<'a> {
             match self.entity_iter.next() {
                 None => return None,
                 Some(entity) => {
-                    if entity.borrow().is_pc() || entity.borrow().is_ai_active() {
+                    if entity.borrow().is_party_member() || entity.borrow().is_ai_active() {
                         return Some(entity);
                     }
                 }

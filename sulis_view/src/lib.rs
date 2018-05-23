@@ -270,7 +270,7 @@ impl WidgetKind for RootView {
                 ChangeListener::new(NAME, Box::new(move |timer| {
                     let enabled = match timer.current() {
                         None => false,
-                        Some(entity) => entity.borrow().is_pc(),
+                        Some(entity) => entity.borrow().is_party_member(),
                     };
                     end_turn_button_ref.borrow_mut().state.set_enabled(enabled);
                 })));

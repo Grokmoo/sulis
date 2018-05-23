@@ -29,6 +29,16 @@ use sulis_module::area::Transition;
 use {ActorState, AreaState, ChangeListenerList, EntityTextureCache, EntityTextureSlot,
     GameState, has_visibility, Location, PropState, ScriptCallback};
 
+enum AIState {
+    Player {
+        vis: Vec<bool>
+    },
+    AI {
+        group: Option<usize>,
+        active: bool,
+    },
+}
+
 pub struct EntityState {
     pub actor: ActorState,
     pub location: Location,
@@ -37,9 +47,7 @@ pub struct EntityState {
     pub sub_pos: (f32, f32),
     pub listeners: ChangeListenerList<EntityState>,
 
-    ai_group: Option<usize>,
-    is_pc: bool,
-    ai_active: bool,
+    ai_state: AIState,
     marked_for_removal: bool,
     texture_cache_slot: Option<EntityTextureSlot>,
 
@@ -54,8 +62,20 @@ impl PartialEq for EntityState {
 }
 
 impl EntityState {
-    pub(crate) fn new(actor: Rc<Actor>, location: Location,
+    pub(crate) fn new(actor: Rc<Actor>, location: Location, 
                          index: usize, is_pc: bool, ai_group: Option<usize>) -> EntityState {
+        let ai_state = if is_pc {
+            let dim = (location.area_width * location.area_height) as usize;
+            AIState::Player {
+                vis: vec![false; dim],
+            }
+        } else {
+            AIState::AI {
+                group: ai_group,
+                active: false,
+            }
+        };
+
         debug!("Creating new entity state for {}", actor.id);
         let size = Rc::clone(&actor.race.size);
         let actor_state = ActorState::new(actor);
@@ -66,10 +86,8 @@ impl EntityState {
             size,
             index,
             listeners: ChangeListenerList::default(),
-            is_pc,
-            ai_active: false,
             marked_for_removal: false,
-            ai_group,
+            ai_state,
             texture_cache_slot: None,
             custom_flags: Vec::new(),
         }
@@ -94,21 +112,64 @@ impl EntityState {
     }
 
     pub fn ai_group(&self) -> Option<usize> {
-        self.ai_group
+        match self.ai_state {
+            AIState::Player { .. } => None,
+            AIState::AI { group, .. } => group,
+        }
     }
 
     pub fn set_ai_active(&mut self, active: bool) {
-        if self.is_pc() { return; }
-
-        self.ai_active = active;
+        match self.ai_state {
+            AIState::Player { .. } => (),
+            AIState::AI { group, .. } => {
+                self.ai_state = AIState::AI {
+                    group,
+                    active,
+                };
+            }
+        }
     }
 
     pub fn is_ai_active(&self) -> bool {
-        self.ai_active
+        match self.ai_state {
+            AIState::Player { .. } => false,
+            AIState::AI { active, .. } => active,
+        }
     }
 
-    pub fn is_pc(&self) -> bool {
-        self.is_pc
+    pub fn set_party_member(&mut self, member: bool) {
+        if member {
+            let dim = (self.location.area_width * self.location.area_height) as usize;
+            self.ai_state = AIState::Player {
+                vis: vec![false; dim],
+            };
+        } else {
+            self.ai_state = AIState::AI {
+                group: None,
+                active: false,
+            }
+        }
+    }
+
+    pub fn is_party_member(&self) -> bool {
+        match self.ai_state {
+            AIState::Player { .. } => true,
+            AIState::AI { .. } => false,
+        }
+    }
+
+    pub fn pc_vis_mut<'a>(&'a mut self) -> &'a mut Vec<bool> {
+        match self.ai_state {
+            AIState::Player { ref mut vis } => vis,
+            AIState::AI { .. } => panic!(),
+        }
+    }
+
+    pub fn pc_vis(&self) -> &Vec<bool> {
+        match self.ai_state {
+            AIState::Player { ref vis } => vis,
+            AIState::AI { .. } => panic!(),
+        }
     }
 
     pub fn is_hostile(&self, other: &Rc<RefCell<EntityState>>) -> bool {

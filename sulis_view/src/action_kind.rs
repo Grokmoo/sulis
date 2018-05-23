@@ -58,7 +58,7 @@ impl SelectAction {
             None => return None,
             Some(ref entity) => {
                 if Rc::ptr_eq(&GameState::selected(), entity) { return None; }
-                if !GameState::is_party_member(entity) { return None; }
+                if !entity.borrow().is_party_member() { return None; }
                 Rc::clone(entity)
             }
         };
@@ -98,7 +98,7 @@ impl DialogAction {
         let target = match area_state.get_entity_at(x, y) {
             None => return None,
             Some(ref entity) => {
-                if entity.borrow().is_pc() { return None; }
+                if entity.borrow().is_party_member() { return None; }
                 if entity.borrow().actor.actor.conversation.is_none() { return None; }
                 Rc::clone(entity)
             }
@@ -277,7 +277,7 @@ impl AttackAction {
         let target = match area_state.get_entity_at(x, y) {
             None => return None,
             Some(ref entity) => {
-                if entity.borrow().is_pc() { return None; }
+                if entity.borrow().is_party_member() { return None; }
                 if entity.borrow().actor.actor.faction == Faction::Friendly { return None; }
                 Rc::clone(entity)
             }

@@ -18,11 +18,12 @@ use rand::{self, Rng};
 use sulis_core::ui::Color;
 use sulis_module::{Actor, Area, LootList, Module, ObjectSize};
 use sulis_module::area::{EncounterData, PropData, Transition, TriggerKind};
-use sulis_core::util::Point;
+use sulis_core::util::{self, Point};
 
 use {AreaFeedbackText, calculate_los, ChangeListenerList, EntityState, GameState,
     Location, Merchant, PropState, Targeter, TurnTimer};
 
+use std::{ptr, time};
 use std::slice::Iter;
 use std::rc::Rc;
 use std::cell::{Ref, RefCell};
@@ -435,8 +436,28 @@ impl AreaState {
         self.area.transitions.get(index)
     }
 
-    fn compute_pc_visibility(&mut self, entity: &EntityState, delta_x: i32, delta_y: i32) {
-        calculate_los(&mut self.pc_vis, &mut self.pc_explored, &self.area, entity, delta_x, delta_y);
+    pub fn compute_pc_visibility(&mut self, entity: &Rc<RefCell<EntityState>>, delta_x: i32, delta_y: i32) {
+        calculate_los(&mut self.pc_explored, &self.area, &mut entity.borrow_mut(), delta_x, delta_y);
+    }
+
+    pub fn update_view_visibility(&mut self) {
+        let start_time = time::Instant::now();
+        unsafe {
+            ptr::write_bytes(self.pc_vis.as_mut_ptr(), 0, self.pc_vis.len())
+        }
+
+        for entity in GameState::party().iter() {
+            let entity = entity.borrow();
+            let new_vis = entity.pc_vis();
+            for y in 0..self.area.height {
+                for x in 0..self.area.width {
+                    let index = (x + y * self.area.width) as usize;
+                    self.pc_vis[index] = self.pc_vis[index] || new_vis[index]
+                }
+            }
+        }
+
+        info!("Updated view visibility in {} secs", util::format_elapsed_secs(start_time.elapsed()));
     }
 
     fn check_trigger_grid(&mut self, entity: &Rc<RefCell<EntityState>>) {
@@ -570,8 +591,8 @@ impl AreaState {
             self.update_entity_grid(p.x, p.y, Some(new_index));
         }
 
-        if entity.borrow().is_pc() {
-            self.compute_pc_visibility(&entity.borrow(), 0, 0);
+        if entity.borrow().is_party_member() {
+            self.compute_pc_visibility(&entity, 0, 0);
         }
 
         self.turn_timer.add(&entity);
@@ -599,14 +620,15 @@ impl AreaState {
             self.update_entity_grid(p.x, p.y, Some(entity.borrow().index));
         }
 
-        let is_pc = entity.borrow().is_pc();
+        let is_pc = entity.borrow().is_party_member();
 
         if is_pc {
             let d_x = old_x - entity.borrow().location.x;
             let d_y = old_y - entity.borrow().location.y;
             self.pc_vis_delta = (d_x, d_y);
 
-            self.compute_pc_visibility(&*entity.borrow(), d_x, d_y);
+            self.compute_pc_visibility(&entity, d_x, d_y);
+            self.update_view_visibility();
 
             self.check_trigger_grid(&entity);
         }

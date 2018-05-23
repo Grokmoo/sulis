@@ -162,7 +162,7 @@ macro_rules! exec_script {
 
 impl GameState {
     pub fn set_selected_party_member(entity: Rc<RefCell<EntityState>>) {
-        if !GameState::is_party_member(&entity) {
+        if !entity.borrow().is_party_member() {
             warn!("Attempted to select invalid party member {}", entity.borrow().actor.actor.id);
             return;
         }
@@ -186,6 +186,8 @@ impl GameState {
                 entity.borrow_mut().actor.init_turn();
             }
 
+            entity.borrow_mut().set_party_member(true);
+            state.area_state.borrow_mut().compute_pc_visibility(&entity, 0, 0);
             state.party.push(Rc::clone(&entity));
             state.party_listeners.notify(&entity);
         })
@@ -197,19 +199,6 @@ impl GameState {
             let state = state.as_mut().unwrap();
 
             state.party_listeners.add(listener);
-        })
-    }
-
-    pub fn is_party_member(entity: &Rc<RefCell<EntityState>>) -> bool {
-        STATE.with(|state| {
-            let mut state = state.borrow_mut();
-            let state = state.as_mut().unwrap();
-
-            for member in state.party.iter() {
-                if Rc::ptr_eq(member, entity) { return true; }
-            }
-
-            false
         })
     }
 
@@ -259,6 +248,7 @@ impl GameState {
         });
 
         let area_state = GameState::area_state();
+        area_state.borrow_mut().update_view_visibility();
         area_state.borrow_mut().push_scroll_to_callback(GameState::selected());
         area_state.borrow_mut().on_load_fired = true;
         let area_state = area_state.borrow();
@@ -600,7 +590,7 @@ impl GameState {
         let area_state = GameState::area_state();
         let area_state = area_state.borrow();
         if let Some(entity) = area_state.turn_timer.current() {
-            return entity.borrow().is_pc();
+            return entity.borrow().is_party_member();
         }
         false
     }

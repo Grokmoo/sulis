@@ -18,7 +18,8 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_state::{ChangeListener, EntityState};
+use sulis_state::{ChangeListener, EntityState, GameState};
+use sulis_core::io::event;
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{Button, Label, ProgressBar};
 
@@ -65,5 +66,11 @@ impl WidgetKind for PortraitView {
         level_up.borrow_mut().state.set_visible(entity.actor.has_level_up());
 
         vec![portrait, hp_bar, level_up]
+    }
+
+    fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: event::ClickKind) -> bool {
+        self.super_on_mouse_release(widget, kind);
+        GameState::set_selected_party_member(Rc::clone(&self.entity));
+        true
     }
 }

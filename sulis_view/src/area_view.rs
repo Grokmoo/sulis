@@ -57,6 +57,7 @@ pub struct AreaView {
     targeter_label: Rc<RefCell<Widget>>,
     targeter_tile: Option<Rc<Image>>,
     feedback_text_scale: f32,
+    creature_selected_image: Option<Rc<Image>>,
 
     scroll: Scrollable,
     hover_sprite: Option<HoverSprite>,
@@ -84,6 +85,7 @@ impl AreaView {
             scroll: Scrollable::new(),
             targeter_tile: None,
             feedback_text_scale: 1.0,
+            creature_selected_image: None,
         }))
     }
 
@@ -166,7 +168,6 @@ impl AreaView {
         let (max_tile_x, max_tile_y) = AreaView::get_texture_cache_max(area_state.area.width,
                                                                        area_state.area.height);
 
-        // TODO draw vis for entire party
         let vis_dist = area_state.area.vis_dist;
         let pc = GameState::selected();
         let c_x = pc.borrow().location.x + pc.borrow().size.width / 2;
@@ -268,6 +269,27 @@ impl AreaView {
 
         // info!("Entity & Prop draw time: {}", util::format_elapsed_secs(start_time.elapsed()));
     }
+
+    fn draw_selection(&mut self, renderer: &mut GraphicsRenderer, scale_x: f32, scale_y: f32,
+                      widget: &Widget, millis: u32) {
+        let x_base = widget.state.inner_position.x as f32 - self.scroll.x();
+        let y_base = widget.state.inner_position.y as f32 - self.scroll.y();
+
+        if let Some(ref image) = self.creature_selected_image {
+            let selected = GameState::selected();
+            let selected = selected.borrow();
+            let w = selected.size.width as f32;
+            let h = selected.size.height as f32;
+            let x = x_base + selected.location.x as f32 + selected.sub_pos.0;
+            let y = y_base + selected.location.y as f32 + selected.sub_pos.1;
+
+            let mut draw_list = DrawList::empty_sprite();
+            image.append_to_draw_list(&mut draw_list, &animation_state::NORMAL, x, y, w, h, millis);
+
+            draw_list.set_scale(scale_x, scale_y);
+            renderer.draw(draw_list);
+        }
+    }
 }
 
 impl WidgetKind for AreaView {
@@ -285,6 +307,9 @@ impl WidgetKind for AreaView {
                 self.targeter_tile = ResourceSet::get_image(image_id);
             }
             self.feedback_text_scale = theme.get_custom_or_default("feedback_text_scale", 1.0);
+            if let Some(ref image_id) = theme.custom.get("creature_selected_image") {
+                self.creature_selected_image = ResourceSet::get_image(image_id);
+            }
         }
 
         if self.targeter_tile.is_none() {
@@ -430,6 +455,7 @@ impl WidgetKind for AreaView {
             renderer.draw(draw_list);
         }
 
+        self.draw_selection(renderer, scale_x, scale_y, widget, millis);
         self.draw_entities_props(renderer, scale_x, scale_y, 1.0, widget, &state, millis);
         self.draw_layer(renderer, scale_x, scale_y, widget, AERIAL_LAYER_ID);
 

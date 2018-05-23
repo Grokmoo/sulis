@@ -62,25 +62,38 @@ impl TurnTimer {
         }
     }
 
+    fn activate_entity(&self, entity: &Rc<RefCell<EntityState>>, groups: &mut HashSet<usize>) -> bool {
+        if entity.borrow().is_party_member() { return false; }
+        if entity.borrow().is_ai_active() { return false; }
+
+        trace!("activate ai for {}", entity.borrow().actor.actor.name);
+        entity.borrow_mut().set_ai_active(true);
+
+        if let Some(ai_group) = entity.borrow().ai_group() {
+            groups.insert(ai_group);
+        }
+
+        true
+    }
+
     pub fn check_ai_activation(&mut self, mover: &Rc<RefCell<EntityState>>, area: &Rc<Area>) {
         let mut groups_to_activate: HashSet<usize> = HashSet::new();
         let mut updated = false;
 
         for entity in self.entities.iter() {
             if Rc::ptr_eq(mover, entity) { continue; }
-            if entity.borrow().is_party_member() { continue; }
-            if entity.borrow().is_ai_active() { continue; }
             if !entity.borrow().is_hostile(mover) { continue; }
 
             if !mover.borrow().has_visibility(entity, area) && !entity.borrow().has_visibility(mover, area) {
                 continue;
             }
 
-            if let Some(ai_group) = entity.borrow().ai_group() {
-                groups_to_activate.insert(ai_group);
-            }
-            entity.borrow_mut().set_ai_active(true);
+            self.activate_entity(entity, &mut groups_to_activate);
             updated = true;
+        }
+
+        if updated {
+            self.activate_entity(mover, &mut groups_to_activate);
         }
 
         for entity in self.entities.iter() {
@@ -157,13 +170,14 @@ impl TurnTimer {
         self.listeners.notify(&self);
     }
 
-    pub fn add(&mut self, entity: &Rc<RefCell<EntityState>>) {
-        trace!("Added entity to turn timer: '{}'", entity.borrow().actor.actor.name);
+    pub fn add(&mut self, entity: &Rc<RefCell<EntityState>>, area: &Rc<Area>) {
+        debug!("Added entity to turn timer: '{}'", entity.borrow().actor.actor.name);
         self.entities.push_back(Rc::clone(entity));
         if self.entities.len() == 1 {
             // we just pushed the only entity
             entity.borrow_mut().actor.init_turn();
         }
+        self.check_ai_activation(entity, area);
         self.listeners.notify(&self);
     }
 
@@ -212,6 +226,9 @@ impl TurnTimer {
         if let Some(current) = self.entities.front() {
             current.borrow_mut().actor.init_turn();
             current.borrow_mut().actor.update(ROUND_TIME_MILLIS);
+            if current.borrow().is_party_member() {
+                GameState::set_selected_party_member(Rc::clone(current));
+            }
             debug!("'{}' now has the active turn.", current.borrow().actor.actor.name);
         }
     }

@@ -18,12 +18,12 @@ use rand::{self, Rng};
 use sulis_core::ui::Color;
 use sulis_module::{Actor, Area, LootList, Module, ObjectSize};
 use sulis_module::area::{EncounterData, PropData, Transition, TriggerKind};
-use sulis_core::util::{self, Point};
+use sulis_core::util::{Point};
 
 use {AreaFeedbackText, calculate_los, ChangeListenerList, EntityState, GameState,
     Location, Merchant, PropState, Targeter, TurnTimer};
 
-use std::{ptr, time};
+use std::{ptr};
 use std::slice::Iter;
 use std::rc::Rc;
 use std::cell::{Ref, RefCell};
@@ -441,7 +441,6 @@ impl AreaState {
     }
 
     pub fn update_view_visibility(&mut self) {
-        let start_time = time::Instant::now();
         unsafe {
             ptr::write_bytes(self.pc_vis.as_mut_ptr(), 0, self.pc_vis.len())
         }
@@ -456,8 +455,6 @@ impl AreaState {
                 }
             }
         }
-
-        info!("Updated view visibility in {} secs", util::format_elapsed_secs(start_time.elapsed()));
     }
 
     fn check_trigger_grid(&mut self, entity: &Rc<RefCell<EntityState>>) {
@@ -595,7 +592,7 @@ impl AreaState {
             self.compute_pc_visibility(&entity, 0, 0);
         }
 
-        self.turn_timer.add(&entity);
+        self.turn_timer.add(&entity, &self.area);
         self.entities[new_index] = Some(entity);
 
         self.listeners.notify(&self);

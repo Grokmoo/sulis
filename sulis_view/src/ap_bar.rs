@@ -62,6 +62,13 @@ impl WidgetKind for ApBar {
         let mut entity = self.entity.borrow_mut();
         entity.actor.listeners.add(ChangeListener::invalidate(NAME, widget));
 
+        let widget_ref = Rc::clone(widget);
+        GameState::add_party_listener(ChangeListener::new(NAME, Box::new(move |entity| {
+            let bar = Widget::downcast_kind_mut::<ApBar>(&widget_ref);
+            bar.entity = Rc::clone(entity);
+            widget_ref.borrow_mut().invalidate_children();
+        })));
+
         let rules = Module::rules();
         let ap_per_ball = rules.display_ap;
         let cur_ap = entity.actor.ap();

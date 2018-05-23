@@ -348,7 +348,9 @@ impl WidgetKind for RightPane {
         let mut children = Vec::new();
 
         for entity in GameState::party() {
+            let selected = Rc::ptr_eq(&GameState::selected(), &entity);
             let portrait = Widget::with_defaults(PortraitView::new(entity));
+            portrait.borrow_mut().state.set_active(selected);
             children.push(portrait);
         }
 

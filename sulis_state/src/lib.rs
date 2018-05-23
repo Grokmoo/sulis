@@ -171,8 +171,8 @@ impl GameState {
             let mut state = state.borrow_mut();
             let state = state.as_mut().unwrap();
 
-            state.selected = entity;
-            // TODO notify listeners
+            state.selected = Rc::clone(&entity);
+            state.party_listeners.notify(&entity);
         })
     }
 

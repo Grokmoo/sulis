@@ -23,7 +23,7 @@ use sulis_state::{ChangeListener, EntityState};
 use sulis_core::ui::{Callback, Widget, WidgetKind, WidgetState};
 use sulis_widgets::{Button, Label, TextArea};
 use sulis_module::Module;
-use sulis_state::{ActorState, Effect};
+use sulis_state::{ActorState, Effect, GameState};
 
 use CharacterBuilder;
 use ability_pane::add_ability_text_args;
@@ -71,6 +71,13 @@ impl WidgetKind for CharacterWindow {
     fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         self.character.borrow_mut().actor.listeners.add(
             ChangeListener::invalidate(NAME, widget));
+
+        let widget_ref = Rc::clone(widget);
+        GameState::add_party_listener(ChangeListener::new(NAME, Box::new(move |entity| {
+            let window = Widget::downcast_kind_mut::<CharacterWindow>(&widget_ref);
+            window.character = Rc::clone(entity);
+            widget_ref.borrow_mut().invalidate_children();
+        })));
 
         let title = Widget::with_theme(Label::empty(), "title");
         title.borrow_mut().state.add_text_arg("name", &self.character.borrow().actor.actor.name);

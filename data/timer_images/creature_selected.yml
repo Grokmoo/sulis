@@ -1,0 +1,7 @@
+id: creature_selected
+frame_time_millis: 150
+frames:
+  - creatures/selected0
+  - creatures/selected1
+  - creatures/selected2
+  - creatures/selected3

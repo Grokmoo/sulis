@@ -60,6 +60,10 @@ groups:
       legs_plate: [60, 3]
       
       cloak: [0, 6]
+      selected0: [3, 6]
+      selected1: [6, 6]
+      selected2: [9, 6]
+      selected3: [12, 6]
       pants_female: [39, 6]
       shirt_female: [42, 6]
       legs_leather_female: [45, 6]

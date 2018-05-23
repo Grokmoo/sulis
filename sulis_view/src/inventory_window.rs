@@ -55,6 +55,13 @@ impl WidgetKind for InventoryWindow {
         self.entity.borrow_mut().actor.listeners.add(
             ChangeListener::invalidate(NAME, widget));
 
+        let widget_ref = Rc::clone(widget);
+        GameState::add_party_listener(ChangeListener::new(NAME, Box::new(move |entity| {
+            let window = Widget::downcast_kind_mut::<InventoryWindow>(&widget_ref);
+            window.entity = Rc::clone(entity);
+            widget_ref.borrow_mut().invalidate_children();
+        })));
+
         let title = Widget::with_theme(Label::empty(), "title");
 
         let close = Widget::with_theme(Button::empty(), "close");

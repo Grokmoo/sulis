@@ -160,7 +160,7 @@ children:
     layout: BoxVertical
     children:
       portrait_view:
-        background: bg_rounded
+        background: background_rounded
         x_relative: Max
         preferred_size: [30, 36]
         border: [1, 1, 1, 1]
@@ -193,6 +193,7 @@ children:
     custom:
       targeter_tile: "60_red_transparent_fill"
       feedback_text_scale: "1.2"
+      creature_selected_image: "creature_selected"
     children:
       targeter_label:
         from: .label

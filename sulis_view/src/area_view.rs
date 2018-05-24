@@ -58,9 +58,11 @@ pub struct AreaView {
     targeter_tile: Option<Rc<Image>>,
     feedback_text_scale: f32,
     creature_selected_image: Option<Rc<Image>>,
+    selection_box_image: Option<Rc<Image>>,
 
     scroll: Scrollable,
     hover_sprite: Option<HoverSprite>,
+    selection_box_start: Option<(f32, f32)>,
 }
 
 const TILE_CACHE_TEXTURE_SIZE: u32 = 2048;
@@ -86,6 +88,8 @@ impl AreaView {
             targeter_tile: None,
             feedback_text_scale: 1.0,
             creature_selected_image: None,
+            selection_box_image: None,
+            selection_box_start: None,
         }))
     }
 
@@ -270,13 +274,12 @@ impl AreaView {
         // info!("Entity & Prop draw time: {}", util::format_elapsed_secs(start_time.elapsed()));
     }
 
-    fn draw_selection(&mut self, renderer: &mut GraphicsRenderer, scale_x: f32, scale_y: f32,
-                      widget: &Widget, millis: u32) {
+    fn draw_selection(&mut self, selected: &Rc<RefCell<EntityState>>, renderer: &mut GraphicsRenderer,
+                      scale_x: f32, scale_y: f32, widget: &Widget, millis: u32) {
         let x_base = widget.state.inner_position.x as f32 - self.scroll.x();
         let y_base = widget.state.inner_position.y as f32 - self.scroll.y();
 
         if let Some(ref image) = self.creature_selected_image {
-            let selected = GameState::selected();
             let selected = selected.borrow();
             let w = selected.size.width as f32;
             let h = selected.size.height as f32;
@@ -289,6 +292,64 @@ impl AreaView {
             draw_list.set_scale(scale_x, scale_y);
             renderer.draw(draw_list);
         }
+    }
+
+    fn get_selection_box_coords(&self) -> Option<(f32, f32, f32, f32)> {
+        if let Some((x, y)) = self.selection_box_start {
+            let (x2, y2) = Cursor::get_position_f32();
+            let x_start;
+            let y_start;
+            let x_end;
+            let y_end;
+            if x > x2 {
+                x_start = x2;
+                x_end = x;
+            } else {
+                x_start = x;
+                x_end = x2;
+            }
+            if y > y2 {
+                y_start = y2;
+                y_end = y;
+            } else {
+                y_start = y;
+                y_end = y2;
+            }
+
+            return Some((x_start, y_start, x_end, y_end));
+        }
+
+        None
+    }
+
+    fn select_party_in_box(&self, widget: &Widget) -> Vec<Rc<RefCell<EntityState>>> {
+        let mut party = Vec::new();
+
+        let (x, y, x_end, y_end) = match self.get_selection_box_coords() {
+            None => return party,
+            Some((x, y, x2, y2)) => (x, y, x2, y2),
+        };
+
+        let pos = widget.state.inner_position;
+        let x1 = ((x - pos.x as f32) / self.scale.0 + self.scroll.x()) as i32;
+        let y1 = ((y - pos.y as f32) / self.scale.1 + self.scroll.y()) as i32;
+        let x2 = ((x_end - pos.x as f32) / self.scale.0 + self.scroll.x()) as i32;
+        let y2 = ((y_end - pos.y as f32) / self.scale.1 + self.scroll.y()) as i32;
+
+        for entity in GameState::party().iter() {
+            let loc = &entity.borrow().location;
+            let size = &entity.borrow().size;
+
+            if loc.x >= x2 || x1 >= loc.x + size.width {
+                continue;
+            } else if loc.y >= y2 || y1 >= loc.y + size.height {
+                continue;
+            }
+
+            party.push(Rc::clone(entity));
+        }
+
+        party
     }
 }
 
@@ -309,6 +370,10 @@ impl WidgetKind for AreaView {
             self.feedback_text_scale = theme.get_custom_or_default("feedback_text_scale", 1.0);
             if let Some(ref image_id) = theme.custom.get("creature_selected_image") {
                 self.creature_selected_image = ResourceSet::get_image(image_id);
+            }
+
+            if let Some(ref image_id) = theme.custom.get("selection_box_image") {
+                self.selection_box_image = ResourceSet::get_image(image_id);
             }
         }
 
@@ -455,7 +520,10 @@ impl WidgetKind for AreaView {
             renderer.draw(draw_list);
         }
 
-        self.draw_selection(renderer, scale_x, scale_y, widget, millis);
+        self.draw_selection(&GameState::selected(), renderer, scale_x, scale_y, widget, millis);
+        for entity in self.select_party_in_box(widget).iter() {
+            self.draw_selection(&entity, renderer, scale_x, scale_y, widget, millis);
+        }
         self.draw_entities_props(renderer, scale_x, scale_y, 1.0, widget, &state, millis);
         self.draw_layer(renderer, scale_x, scale_y, widget, AERIAL_LAYER_ID);
 
@@ -490,6 +558,17 @@ impl WidgetKind for AreaView {
             targeter.borrow().draw(renderer, targeter_tile, self.scroll.x(), self.scroll.y(),
                 scale_x, scale_y, millis);
         }
+
+        if let Some(ref image) = self.selection_box_image {
+            if let Some((x, y, x_end, y_end)) = self.get_selection_box_coords() {
+                let w = x_end - x;
+                let h = y_end - y;
+
+                let mut draw_list = DrawList::empty_sprite();
+                image.append_to_draw_list(&mut draw_list, &animation_state::NORMAL, x, y, w, h, millis);
+                renderer.draw(draw_list);
+            }
+        }
     }
 
     fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
@@ -508,11 +587,24 @@ impl WidgetKind for AreaView {
                 ClickKind::Right => targeter.borrow_mut().on_cancel(),
                 _ => (),
             }
-            return true;
+        } else {
+            match kind {
+                ClickKind::Left => {
+                    match self.selection_box_start {
+                        None => {
+                            let mut action = action_kind::get_action(x, y);
+                            action.fire_action(widget);
+                        },
+                        Some(_) => {
+                            for party_member in self.select_party_in_box(&widget.borrow()).iter() {
+                                // TODO actually select party
+                            }
+                            self.selection_box_start = None;
+                        },
+                    }
+                }, _ => (),
+            }
         }
-
-        let mut action = action_kind::get_action(x, y);
-        action.fire_action(widget);
 
         true
     }
@@ -526,6 +618,17 @@ impl WidgetKind for AreaView {
 
         match kind {
             ClickKind::Middle => self.scroll.change(delta_x, delta_y),
+            ClickKind::Left => {
+                if let Some(_) = area_state.borrow_mut().targeter() {
+                    return true;
+                }
+
+                match self.selection_box_start {
+                    None => {
+                        self.selection_box_start = Some(Cursor::get_position_f32());
+                    }, Some(_) => (),
+                }
+            },
             _ => (),
         }
 
@@ -536,6 +639,11 @@ impl WidgetKind for AreaView {
                      _delta_x: f32, _delta_y: f32) -> bool {
         let (area_x, area_y) = self.get_cursor_pos(widget);
         self.hover_sprite = None;
+
+        if let Some(_) = self.selection_box_start {
+            Cursor::set_cursor_state(animation_state::Kind::Normal);
+            return true;
+        }
 
         let area_state = GameState::area_state();
 
@@ -601,6 +709,7 @@ impl WidgetKind for AreaView {
     fn on_mouse_exit(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
         self.super_on_mouse_exit(widget);
         self.hover_sprite = None;
+        self.selection_box_start = None;
         true
     }
 }

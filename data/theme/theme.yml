@@ -194,6 +194,7 @@ children:
       targeter_tile: "60_red_transparent_fill"
       feedback_text_scale: "1.2"
       creature_selected_image: "creature_selected"
+      selection_box_image: "bg_selection_box"
     children:
       targeter_label:
         from: .label

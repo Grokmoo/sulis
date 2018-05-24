@@ -1,0 +1,7 @@
+id: bg_selection_box
+generate_sub_images:
+  size: [1, 1]
+  spritesheet: "gui"
+grid: [ "bg_selection_box_top_left",    "bg_selection_box_top_middle",    "bg_selection_box_top_right",
+        "bg_selection_box_middle_left", "bg_selection_box_middle",        "bg_selection_box_middle_right",
+        "bg_selection_box_bottom_left", "bg_selection_box_bottom_middle", "bg_selection_box_bottom_right" ]

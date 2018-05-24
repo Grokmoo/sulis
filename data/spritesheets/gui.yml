@@ -324,6 +324,19 @@ groups:
       bg_inner_bottom_left_active:   [0, 10]
       bg_inner_bottom_middle_active: [5, 10]
       bg_inner_bottom_right_active:  [10, 10]
+  bg_selection_box:
+    size: [5, 5]
+    position: [0, 321]
+    areas:
+      bg_selection_box_top_left:      [0,  0]
+      bg_selection_box_top_middle:    [5,  0]
+      bg_selection_box_top_right:     [10, 0]
+      bg_selection_box_middle_left:   [0,  5]
+      bg_selection_box_middle:        [5,  5]
+      bg_selection_box_middle_right:  [10, 5]
+      bg_selection_box_bottom_left:   [0, 10]
+      bg_selection_box_bottom_middle: [5, 10]
+      bg_selection_box_bottom_right:  [10, 10]
   elev:
     size: [16, 16]
     position: [74, 512]

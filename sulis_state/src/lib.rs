@@ -135,9 +135,11 @@ pub struct UICallback {
 pub struct GameState {
     areas: HashMap<String, Rc<RefCell<AreaState>>>,
     area_state: Rc<RefCell<AreaState>>,
-    selected: Rc<RefCell<EntityState>>,
+    selected: Vec<Rc<RefCell<EntityState>>>,
     party: Vec<Rc<RefCell<EntityState>>>,
-    party_listeners: ChangeListenerList<Rc<RefCell<EntityState>>>,
+
+    // listener returns the first selected party member
+    party_listeners: ChangeListenerList<Option<Rc<RefCell<EntityState>>>>,
     should_exit: bool,
     path_finder: PathFinder,
     ui_callbacks: Vec<UICallback>,
@@ -162,18 +164,38 @@ macro_rules! exec_script {
 
 impl GameState {
     pub fn set_selected_party_member(entity: Rc<RefCell<EntityState>>) {
-        if !entity.borrow().is_party_member() {
-            warn!("Attempted to select invalid party member {}", entity.borrow().actor.actor.id);
-            return;
-        }
+        GameState::select_party_members(vec![entity]);
+    }
 
+    pub fn clear_selected_party_member() {
+        GameState::select_party_members(Vec::new());
+    }
+
+    pub fn select_party_members(members: Vec<Rc<RefCell<EntityState>>>) {
         STATE.with(|state| {
             let mut state = state.borrow_mut();
             let state = state.as_mut().unwrap();
 
-            state.selected = Rc::clone(&entity);
+            state.selected.clear();
+            for member in members {
+                if !member.borrow().is_party_member() {
+                    warn!("Attempted to select non-party member {}", member.borrow().actor.actor.id);
+                    continue;
+                }
+
+                state.selected.push(member);
+            }
+
+            let entity = match state.selected.first() {
+                None => None,
+                Some(ref entity) => Some(Rc::clone(entity)),
+            };
             state.party_listeners.notify(&entity);
         })
+    }
+
+    pub fn selected() -> Vec<Rc<RefCell<EntityState>>> {
+        STATE.with(|s| s.borrow().as_ref().unwrap().selected.clone())
     }
 
     pub fn add_party_member(entity: Rc<RefCell<EntityState>>) {
@@ -189,16 +211,30 @@ impl GameState {
             entity.borrow_mut().set_party_member(true);
             state.area_state.borrow_mut().compute_pc_visibility(&entity, 0, 0);
             state.party.push(Rc::clone(&entity));
+
+            let entity = match state.selected.first() {
+                None => None,
+                Some(ref entity) => Some(Rc::clone(entity)),
+            };
             state.party_listeners.notify(&entity);
         })
     }
 
-    pub fn add_party_listener(listener: ChangeListener<Rc<RefCell<EntityState>>>) {
+    pub fn add_party_listener(listener: ChangeListener<Option<Rc<RefCell<EntityState>>>>) {
         STATE.with(|state| {
             let mut state = state.borrow_mut();
             let state = state.as_mut().unwrap();
 
             state.party_listeners.add(listener);
+        })
+    }
+
+    pub fn player() -> Rc<RefCell<EntityState>> {
+        STATE.with(|state| {
+            let mut state = state.borrow_mut();
+            let state = state.as_mut().unwrap();
+
+            Rc::clone(&state.party[0])
         })
     }
 
@@ -247,12 +283,12 @@ impl GameState {
             *state.borrow_mut() = Some(game_state);
         });
 
+        let pc = GameState::player();
         let area_state = GameState::area_state();
         area_state.borrow_mut().update_view_visibility();
-        area_state.borrow_mut().push_scroll_to_callback(GameState::selected());
+        area_state.borrow_mut().push_scroll_to_callback(Rc::clone(&pc));
         area_state.borrow_mut().on_load_fired = true;
         let area_state = area_state.borrow();
-        let pc = GameState::selected();
         GameState::add_ui_callbacks_of_kind(&area_state.area.triggers, TriggerKind::OnCampaignStart, &pc, &pc);
         GameState::add_ui_callbacks_of_kind(&area_state.area.triggers, TriggerKind::OnAreaLoad, &pc, &pc);
 
@@ -306,8 +342,8 @@ impl GameState {
             let state = state.as_mut().unwrap();
 
             {
-                let area_id = state.selected.borrow().location.area_id.to_string();
                 for entity in state.party.iter() {
+                    let area_id = entity.borrow().location.area_id.to_string();
                     state.areas.get(&area_id).unwrap().borrow_mut().remove_entity(&entity);
                 }
             }
@@ -319,7 +355,7 @@ impl GameState {
                 state.area_state.borrow_mut().add_entity(Rc::clone(entity), location.clone());
             }
 
-            state.area_state.borrow_mut().push_scroll_to_callback(Rc::clone(&state.selected));
+            state.area_state.borrow_mut().push_scroll_to_callback(Rc::clone(&state.party[0]));
 
             let area_state = state.area_state.borrow();
             for entity in area_state.entity_iter() {
@@ -328,7 +364,7 @@ impl GameState {
         });
 
         let area_state = GameState::area_state();
-        let pc = GameState::selected();
+        let pc = GameState::player();
         let mut area_state = area_state.borrow_mut();
         if !area_state.on_load_fired {
             area_state.on_load_fired = true;
@@ -400,7 +436,7 @@ impl GameState {
             areas,
             area_state: area_state,
             path_finder: path_finder,
-            selected: pc_state,
+            selected: Vec::new(),
             party,
             party_listeners: ChangeListenerList::default(),
             should_exit: false,
@@ -520,30 +556,32 @@ impl GameState {
 
             let mut area_state = state.area_state.borrow_mut();
 
-            let result = match area_state.update(millis) {
-                None => Rc::clone(&state.selected),
-                Some(entity) => Rc::clone(entity),
-            };
-
+            let result = area_state.update(millis);
             // TODO check for whole party death
-            if state.selected.borrow().actor.is_dead() {
-                area_state.turn_timer.set_active(false);
+            // if state.selected.borrow().actor.is_dead() {
+            //     area_state.turn_timer.set_active(false);
+            // }
+
+            match result {
+                None => None,
+                Some(ref entity) => Some(Rc::clone(entity)),
             }
-            result
         });
 
         // clear animations for the active entity when entering combat
         if GameState::check_clear_entering_combat() {
             ANIMATIONS.with(|a| {
                 let mut anims = a.borrow_mut();
-                anims.iter_mut().for_each(|a| a.check(&active_entity));
+                anims.iter_mut().for_each(|a| a.mark_for_removal());
             });
         }
 
-        AI.with(|ai| {
-            let mut ai = ai.borrow_mut();
-            ai.update(active_entity);
-        });
+        if let Some(entity) = active_entity {
+            AI.with(|ai| {
+                let mut ai = ai.borrow_mut();
+                ai.update(entity);
+            });
+        }
     }
 
     pub fn draw_graphics_mode(renderer: &mut GraphicsRenderer, offset_x: f32, offset_y: f32,
@@ -602,10 +640,6 @@ impl GameState {
             return Rc::ptr_eq(current, entity);
         }
         false
-    }
-
-    pub fn selected() -> Rc<RefCell<EntityState>> {
-        STATE.with(|s| Rc::clone(&s.borrow().as_ref().unwrap().selected))
     }
 
     fn get_target(entity: &Rc<RefCell<EntityState>>,
@@ -679,7 +713,9 @@ impl GameState {
                 ANIMATIONS.with(|a| {
                     let mut anims = a.borrow_mut();
                     for anim in anims.iter_mut() {
-                        anim.check(entity);
+                        if Rc::ptr_eq(entity, anim.get_owner()) {
+                            anim.mark_for_removal();
+                        }
                     }
                     anims.push(Box::new(anim));
                 });

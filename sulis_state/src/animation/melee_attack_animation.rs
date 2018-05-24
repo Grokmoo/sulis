@@ -107,10 +107,8 @@ impl animation::Animation for MeleeAttackAnimation {
         true
     }
 
-    fn check(&mut self, entity: &Rc<RefCell<EntityState>>) {
-        if *self.attacker.borrow() == *entity.borrow() {
-            self.marked_for_removal = true;
-        }
+    fn mark_for_removal(&mut self) {
+        self.marked_for_removal = true;
     }
 
     fn get_owner(&self) -> &Rc<RefCell<EntityState>> {

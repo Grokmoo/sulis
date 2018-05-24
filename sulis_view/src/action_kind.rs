@@ -57,7 +57,6 @@ impl SelectAction {
         let target = match area_state.get_entity_at(x, y) {
             None => return None,
             Some(ref entity) => {
-                if Rc::ptr_eq(&GameState::selected(), entity) { return None; }
                 if !entity.borrow().is_party_member() { return None; }
                 Rc::clone(entity)
             }
@@ -104,7 +103,10 @@ impl DialogAction {
             }
         };
         let max_dist = Module::rules().max_dialog_distance;
-        let pc = GameState::selected();
+        let pc = match GameState::selected().first() {
+            None => return None,
+            Some(pc) => Rc::clone(pc),
+        };
         if pc.borrow().dist_to_entity(&target) <= max_dist {
             Some(Box::new(DialogAction { target, pc }))
         } else {
@@ -162,7 +164,10 @@ impl PropAction {
         if !prop_state.prop.interactive { return None; }
 
         let max_dist = Module::rules().max_prop_distance;
-        let pc = GameState::selected();
+        let pc = match GameState::selected().first() {
+            None => return None,
+            Some(pc) => Rc::clone(pc),
+        };
         if pc.borrow().dist_to_prop(prop_state) > max_dist {
             let cb_action = Box::new(PropAction { index });
             return MoveThenAction::create_if_valid(prop_state.location.to_point(),
@@ -225,7 +230,10 @@ impl TransitionAction {
         });
 
         let max_dist = Module::rules().max_transition_distance;
-        let pc = GameState::selected();
+        let pc = match GameState::selected().first() {
+            None => return None,
+            Some(pc) => Rc::clone(pc),
+        };
         if pc.borrow().dist_to_transition(transition) > max_dist {
             return MoveThenAction::create_if_valid(transition.from,
                 &transition.size, max_dist, cb_action, animation_state::Kind::MouseTravel);
@@ -282,7 +290,10 @@ impl AttackAction {
                 Rc::clone(entity)
             }
         };
-        let pc = GameState::selected();
+        let pc = match GameState::selected().first() {
+            None => return None,
+            Some(pc) => Rc::clone(pc),
+        };
         if pc.borrow().can_attack(&target, &area_state.area) {
             Some(Box::new(AttackAction { pc, target }))
         } else {
@@ -340,7 +351,10 @@ impl MoveThenAction {
         let x = pos.x as f32 + size.width as f32 / 2.0 - 0.5;
         let y = pos.y as f32 + size.height as f32 / 2.0 - 0.5;
 
-        let pc = GameState::selected();
+        let pc = match GameState::selected().first() {
+            None => return None,
+            Some(pc) => Rc::clone(pc),
+        };
         let dist = dist + pc.borrow().size.diagonal / 2.0 + size.diagonal / 2.0;
         let move_action = match MoveAction::new_if_valid(x, y, Some(dist)) {
             None => return None,
@@ -392,7 +406,11 @@ struct MoveAction {
 
 impl MoveAction {
     fn new_if_valid(x: f32, y: f32, dist: Option<f32>) -> Option<MoveAction> {
-        let pc = GameState::selected();
+        // TODO party move
+        let pc = match GameState::selected().first() {
+            None => return None,
+            Some(pc) => Rc::clone(pc),
+        };
 
         let dist = match dist {
             None => 0.6,

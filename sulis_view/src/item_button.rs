@@ -21,7 +21,7 @@ use std::cell::RefCell;
 
 use sulis_rules::{bonus_list::AttackKindBuilder, BonusList};
 use sulis_module::{item::{format_item_value, format_item_weight, Slot}};
-use sulis_state::{AreaState, EntityState, GameState, ItemState};
+use sulis_state::{EntityState, GameState, ItemState};
 use sulis_core::io::event;
 use sulis_core::ui::{Callback, Widget, WidgetKind, WidgetState};
 use sulis_widgets::{Label, TextArea};
@@ -30,8 +30,8 @@ use {ItemActionMenu, MerchantWindow, PropWindow, RootView};
 enum Kind {
     Prop { index: usize },
     Merchant { id: String },
-    Inventory,
-    Equipped,
+    Inventory { player: Rc<RefCell<EntityState>> },
+    Equipped { player: Rc<RefCell<EntityState>> },
 }
 
 pub struct ItemButton {
@@ -47,12 +47,16 @@ pub struct ItemButton {
 const ITEM_BUTTON_NAME: &str = "item_button";
 
 impl ItemButton {
-    pub fn inventory(icon: String, quantity: u32, item_index: usize) -> Rc<RefCell<ItemButton>> {
-        ItemButton::new(icon, quantity, item_index, Kind::Inventory)
+    pub fn inventory(player: &Rc<RefCell<EntityState>>, icon: String,
+                     quantity: u32, item_index: usize) -> Rc<RefCell<ItemButton>> {
+        let player = Rc::clone(player);
+        ItemButton::new(icon, quantity, item_index, Kind::Inventory { player })
     }
 
-    pub fn equipped(icon: String, item_index: usize) -> Rc<RefCell<ItemButton>> {
-        ItemButton::new(icon, 1, item_index, Kind::Equipped)
+    pub fn equipped(player: &Rc<RefCell<EntityState>>, icon: String,
+                    item_index: usize) -> Rc<RefCell<ItemButton>> {
+        let player = Rc::clone(player);
+        ItemButton::new(icon, 1, item_index, Kind::Equipped { player })
     }
 
     pub fn prop(icon: String, quantity: u32, item_index: usize,
@@ -87,19 +91,22 @@ impl ItemButton {
         }
     }
 
-    fn get_item_state<'a>(&self, area_state: &'a AreaState, pc: &'a EntityState) -> Option<&'a ItemState> {
+    fn get_item_state(&self) -> Option<ItemState> {
+        let area_state = GameState::area_state();
+        let area_state = area_state.borrow();
         match self.kind {
-            Kind::Inventory | Kind::Equipped => {
+            Kind::Equipped { ref player } | Kind::Inventory { ref player } => {
+                let pc = player.borrow();
                 match pc.actor.inventory().items.get(self.item_index) {
                     None => None,
-                    Some(&(_, ref item_state)) => Some(item_state)
+                    Some(&(_, ref item_state)) => Some(item_state.clone())
                 }
             }, Kind::Prop { index } => {
                 if !area_state.prop_index_valid(index) { return None; }
 
                 match area_state.get_prop(index).items().get(self.item_index) {
                     None => None,
-                    Some(&(_, ref item_state)) => Some(item_state)
+                    Some(&(_, ref item_state)) => Some(item_state.clone())
                 }
             }, Kind::Merchant { ref id } => {
                 let merchant = area_state.get_merchant(id);
@@ -110,7 +117,7 @@ impl ItemButton {
 
                 match merchant.items().get(self.item_index) {
                     None => None,
-                    Some(&(_, ref item_state)) => Some(item_state)
+                    Some(&(_, ref item_state)) => Some(item_state.clone())
                 }
             }
         }
@@ -118,7 +125,7 @@ impl ItemButton {
 
     fn check_sell_action(&self, widget: &Rc<RefCell<Widget>>) -> Option<Callback> {
         match self.kind {
-            Kind::Inventory => (),
+            Kind::Inventory { .. } => (),
             _ => return None
         }
 
@@ -126,15 +133,18 @@ impl ItemButton {
         // window may change after the owing inventory window is opened
         let root = Widget::get_root(widget);
         let root_view = Widget::downcast_kind_mut::<RootView>(&root);
-        if let Some(_) = root_view.get_merchant_window(&root) {
-            Some(sell_item_cb(&GameState::selected(), self.item_index))
+        if let Some(window_widget) = root_view.get_merchant_window(&root) {
+            let merchant_window = Widget::downcast_kind_mut::<MerchantWindow>(&window_widget);
+            Some(sell_item_cb(merchant_window.player(), self.item_index))
         } else {
             None
         }
     }
 
     fn add_price_text_arg(&self, root: &Rc<RefCell<Widget>>, item_window: &mut Widget,
-                          area_state: &AreaState, item_state: &ItemState) {
+                          item_state: &ItemState) {
+        let area_state = GameState::area_state();
+        let area_state = area_state.borrow();
         match self.kind {
             Kind::Merchant { ref id } => {
                 let merchant = area_state.get_merchant(id);
@@ -142,7 +152,7 @@ impl ItemButton {
                     let value = merchant.get_buy_price(item_state);
                     item_window.state.add_text_arg("price", &format_item_value(value));
                 }
-            }, Kind::Inventory | Kind::Equipped => {
+            }, Kind::Inventory { .. } | Kind::Equipped { .. } => {
                 let root_view = Widget::downcast_kind_mut::<RootView>(&root);
                 let merch_window = match root_view.get_merchant_window(&root) {
                     None => return,
@@ -182,15 +192,10 @@ impl WidgetKind for ItemButton {
 
         if self.item_window.is_some() { return true; }
 
-        let pc = GameState::selected();
-        let pc = pc.borrow();
-        let area_state = GameState::area_state();
-        let area_state = area_state.borrow();
-
-        let item_state = self.get_item_state(&*area_state, &*pc);
+        let item_state = self.get_item_state();
         let item_state = match item_state {
             None => return true,
-            Some(ref item_state) => item_state,
+            Some(item_state) => item_state,
         };
 
         let root = Widget::get_root(widget);
@@ -204,7 +209,7 @@ impl WidgetKind for ItemButton {
             item_window.state.add_text_arg("name", &item_state.item.name);
             item_window.state.add_text_arg("value", &format_item_value(item_state.item.value));
             item_window.state.add_text_arg("weight", &format_item_weight(item_state.item.weight));
-            self.add_price_text_arg(&root, &mut item_window, &area_state, item_state);
+            self.add_price_text_arg(&root, &mut item_window, &item_state);
 
             match item_state.item.equippable {
                 None => (),

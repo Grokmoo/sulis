@@ -56,10 +56,11 @@ impl WidgetKind for PortraitView {
         hp_bar.borrow_mut().state.add_text_arg("cur_hp", &entity.actor.hp().to_string());
         hp_bar.borrow_mut().state.add_text_arg("max_hp", &entity.actor.stats.max_hp.to_string());
 
+        let entity_ref = Rc::clone(&self.entity);
         let level_up = Widget::with_theme(Button::empty(), "level_up");
-        level_up.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+        level_up.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
             let root = Widget::get_root(&widget);
-            let window = Widget::with_defaults(CharacterBuilder::level_up());
+            let window = Widget::with_defaults(CharacterBuilder::level_up(Rc::clone(&entity_ref)));
             window.borrow_mut().state.set_modal(true);
             Widget::add_child_to(&root, window);
         })));

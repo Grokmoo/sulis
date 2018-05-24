@@ -137,13 +137,9 @@ impl animation::Animation for MoveAnimation {
         true
     }
 
-    fn check(&mut self, entity: &Rc<RefCell<EntityState>>) {
-        let exiting = self.mover.borrow().index == entity.borrow().index;
-
-        if exiting {
-            self.marked_for_removal = true;
-            self.mover.borrow_mut().sub_pos = (0.0, 0.0);
-        }
+    fn mark_for_removal(&mut self) {
+        self.marked_for_removal = true;
+        self.mover.borrow_mut().sub_pos = (0.0, 0.0);
     }
 
     fn get_owner(&self) -> &Rc<RefCell<EntityState>> {

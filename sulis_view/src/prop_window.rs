@@ -18,7 +18,7 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_state::{ChangeListener, GameState};
+use sulis_state::{ChangeListener, EntityState, GameState};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{Button, Label};
 use {item_button::take_item_cb, ItemButton, RootView};
@@ -27,16 +27,20 @@ pub const NAME: &str = "prop_window";
 
 pub struct PropWindow {
     prop_index: usize,
+    player: Rc<RefCell<EntityState>>,
 }
 
 impl PropWindow {
-    pub fn new(prop_index: usize) -> Rc<RefCell<PropWindow>> {
+    pub fn new(prop_index: usize, player: Rc<RefCell<EntityState>>) -> Rc<RefCell<PropWindow>> {
         Rc::new(RefCell::new(PropWindow {
             prop_index,
+            player,
         }))
     }
 
     pub fn prop_index(&self) -> usize { self.prop_index }
+
+    pub fn player(&self) -> &Rc<RefCell<EntityState>> { &self.player }
 }
 
 impl WidgetKind for PropWindow {
@@ -85,14 +89,13 @@ impl WidgetKind for PropWindow {
 
         let take_all = Widget::with_theme(Button::empty(), "take_all");
 
+        let player_ref = Rc::clone(&self.player);
         let prop_index = self.prop_index;
         take_all.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
             let parent = Widget::get_parent(&widget);
             parent.borrow_mut().mark_for_removal();
 
-            let pc = GameState::selected();
-            let mut pc = pc.borrow_mut();
-            pc.actor.take_all(prop_index);
+            player_ref.borrow_mut().actor.take_all(prop_index);
 
             let root = Widget::get_root(&parent);
             let view = Widget::downcast_kind_mut::<RootView>(&root);
@@ -102,7 +105,7 @@ impl WidgetKind for PropWindow {
         let list_content = Widget::empty("items_list");
         for (index, &(qty, ref item)) in prop.items().iter().enumerate() {
             let item_button = ItemButton::prop(item.item.icon.id(), qty, index, self.prop_index);
-            item_button.borrow_mut().add_action("Take", take_item_cb(&GameState::selected(), prop_index, index));
+            item_button.borrow_mut().add_action("Take", take_item_cb(&self.player, prop_index, index));
             let button = Widget::with_defaults(item_button);
             Widget::add_child_to(&list_content, button);
         }

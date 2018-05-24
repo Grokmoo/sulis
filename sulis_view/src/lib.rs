@@ -134,7 +134,10 @@ impl RootView {
     pub fn set_merchant_window(&mut self, widget: &Rc<RefCell<Widget>>,
                                desired_state: bool, merchant_id: &str) {
         self.set_window(widget, self::merchant_window::NAME, desired_state, &|| {
-            MerchantWindow::new(merchant_id)
+            match GameState::selected().first() {
+                None => None,
+                Some(ref entity) => Some(MerchantWindow::new(merchant_id, Rc::clone(entity))),
+            }
         });
 
         self.set_inventory_window(widget, desired_state);
@@ -143,7 +146,10 @@ impl RootView {
     pub fn set_prop_window(&mut self, widget: &Rc<RefCell<Widget>>,
                               desired_state: bool, prop_index: usize) {
         self.set_window(widget, self::prop_window::NAME, desired_state, &|| {
-            PropWindow::new(prop_index)
+            match GameState::selected().first() {
+                None => None,
+                Some(ref entity) => Some(PropWindow::new(prop_index, Rc::clone(entity))),
+            }
         });
 
         self.set_inventory_window(widget, desired_state);
@@ -151,22 +157,32 @@ impl RootView {
 
     pub fn set_inventory_window(&mut self, widget: &Rc<RefCell<Widget>>, desired_state: bool) {
         self.set_window(widget, self::inventory_window::NAME, desired_state, &|| {
-            InventoryWindow::new(&GameState::selected())
+            match GameState::selected().first() {
+                None => None,
+                Some(ref entity) => Some(InventoryWindow::new(entity)),
+            }
         });
     }
 
     pub fn set_character_window(&mut self, widget: &Rc<RefCell<Widget>>, desired_state: bool) {
         self.set_window(widget, self::character_window::NAME, desired_state, &|| {
-            CharacterWindow::new(&GameState::selected())
+            match GameState::selected().first() {
+                None => None,
+                Some(ref entity) => Some(CharacterWindow::new(entity)),
+            }
         });
     }
 
     fn set_window(&mut self, widget: &Rc<RefCell<Widget>>, name: &str, desired_state: bool,
-                     cb: &Fn() -> Rc<RefCell<WidgetKind>>) {
+                     cb: &Fn() -> Option<Rc<RefCell<WidgetKind>>>) {
         match Widget::get_child_with_name(widget, name) {
             None => {
                 if desired_state {
-                    let window = Widget::with_defaults(cb());
+                    let widget_kind = match cb() {
+                        None => return,
+                        Some(kind) => kind,
+                    };
+                    let window = Widget::with_defaults(widget_kind);
                     Widget::add_child_to(&widget, window);
                 }
             }, Some(ref window) => {
@@ -243,11 +259,12 @@ impl WidgetKind for RootView {
         let area_state = GameState::area_state();
         area_state.borrow_mut().listeners.remove(NAME);
 
-        let pc = GameState::selected();
-        pc.borrow_mut().actor.listeners.remove(NAME);
+        for pc in GameState::party() {
+            pc.borrow_mut().actor.listeners.remove(NAME);
+        }
     }
 
-    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         debug!("Adding to root widget.");
 
         let area_widget = Widget::with_defaults(AreaView::new());
@@ -304,23 +321,23 @@ impl WidgetKind for RootView {
                 view.show_menu(&parent);
             })));
 
-            let abilities = Widget::with_defaults(AbilitiesBar::new(GameState::selected()));
+            let abilities = Widget::with_defaults(AbilitiesBar::new(GameState::player()));
 
             Widget::add_children_to(&bot_pane, vec![inv_button, cha_button, map_button,
                                     log_button, men_button, abilities]);
         }
 
-        let widget_ref = Rc::clone(&widget);
-        let pc = GameState::selected();
-        pc.borrow_mut().actor.listeners.add(ChangeListener::new(NAME, Box::new(move |pc| {
-            // TODO handle party death
-            if pc.is_dead() {
-                let menu = Widget::with_defaults(GameOverMenu::new());
-                Widget::add_child_to(&widget_ref, menu);
-            }
-        })));
+        for pc in GameState::party() {
+            pc.borrow_mut().actor.listeners.add(ChangeListener::new(NAME, Box::new(move |_pc| {
+                // TODO handle party death
+                // if pc.is_dead() {
+                //     let menu = Widget::with_defaults(GameOverMenu::new());
+                //     Widget::add_child_to(&widget_ref, menu);
+                // }
+            })));
+        }
 
-        let ap_bar = Widget::with_defaults(ApBar::new(pc));
+        let ap_bar = Widget::with_defaults(ApBar::new(GameState::player()));
 
         let ticker = Widget::with_defaults(InitiativeTicker::new());
 
@@ -347,10 +364,17 @@ impl WidgetKind for RightPane {
 
         let mut children = Vec::new();
 
+        let selected = GameState::selected();
         for entity in GameState::party() {
-            let selected = Rc::ptr_eq(&GameState::selected(), &entity);
+            let mut is_selected = false;
+            for sel in selected.iter() {
+                if Rc::ptr_eq(sel, &entity) {
+                    is_selected = true;
+                    break;
+                }
+            }
             let portrait = Widget::with_defaults(PortraitView::new(entity));
-            portrait.borrow_mut().state.set_active(selected);
+            portrait.borrow_mut().state.set_active(is_selected);
             children.push(portrait);
         }
 

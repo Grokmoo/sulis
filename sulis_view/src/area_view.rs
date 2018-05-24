@@ -173,21 +173,22 @@ impl AreaView {
                                                                        area_state.area.height);
 
         let vis_dist = area_state.area.vis_dist;
-        let pc = GameState::selected();
-        let c_x = pc.borrow().location.x + pc.borrow().size.width / 2;
-        let c_y = pc.borrow().location.y + pc.borrow().size.height / 2;
-        let min_x = cmp::max(0, c_x - vis_dist + if delta_x < 0 { delta_x } else { 0 });
-        let max_x = cmp::min(max_tile_x, c_x + vis_dist + if delta_x > 0 { delta_x } else { 0 });
-        let min_y = cmp::max(0, c_y - vis_dist + if delta_y < 0 { delta_y } else { 0 });
-        let max_y = cmp::min(max_tile_y, c_y + vis_dist + if delta_y > 0 { delta_y } else { 0 });
+        for pc in GameState::party() {
+            let c_x = pc.borrow().location.x + pc.borrow().size.width / 2;
+            let c_y = pc.borrow().location.y + pc.borrow().size.height / 2;
+            let min_x = cmp::max(0, c_x - vis_dist + if delta_x < 0 { delta_x } else { 0 });
+            let max_x = cmp::min(max_tile_x, c_x + vis_dist + if delta_x > 0 { delta_x } else { 0 });
+            let min_y = cmp::max(0, c_y - vis_dist + if delta_y < 0 { delta_y } else { 0 });
+            let max_y = cmp::min(max_tile_y, c_y + vis_dist + if delta_y > 0 { delta_y } else { 0 });
 
-        let scale = TILE_SIZE as i32;
-        renderer.clear_texture_region(VISIBILITY_TEX_ID, min_x * scale, min_y * scale,
-                                      max_x * scale, max_y * scale);
-        self.draw_vis_to_texture(renderer, vis_sprite, explored_sprite, area_state,
-                                 min_x, min_y, max_x, max_y);
-        trace!("Visibility render to texture time: {}",
-              util::format_elapsed_secs(start_time.elapsed()));
+            let scale = TILE_SIZE as i32;
+            renderer.clear_texture_region(VISIBILITY_TEX_ID, min_x * scale, min_y * scale,
+                                          max_x * scale, max_y * scale);
+            self.draw_vis_to_texture(renderer, vis_sprite, explored_sprite, area_state,
+                                     min_x, min_y, max_x, max_y);
+            trace!("Visibility render to texture time: {}",
+                   util::format_elapsed_secs(start_time.elapsed()));
+        }
     }
 
     fn draw_vis_to_texture(&self, renderer: &mut GraphicsRenderer, vis_sprite: &Rc<Sprite>,
@@ -520,7 +521,9 @@ impl WidgetKind for AreaView {
             renderer.draw(draw_list);
         }
 
-        self.draw_selection(&GameState::selected(), renderer, scale_x, scale_y, widget, millis);
+        for selected in GameState::selected() {
+            self.draw_selection(&selected, renderer, scale_x, scale_y, widget, millis);
+        }
         for entity in self.select_party_in_box(widget).iter() {
             self.draw_selection(&entity, renderer, scale_x, scale_y, widget, millis);
         }
@@ -596,9 +599,7 @@ impl WidgetKind for AreaView {
                             action.fire_action(widget);
                         },
                         Some(_) => {
-                            for party_member in self.select_party_in_box(&widget.borrow()).iter() {
-                                // TODO actually select party
-                            }
+                            GameState::select_party_members(self.select_party_in_box(&widget.borrow()));
                             self.selection_box_start = None;
                         },
                     }

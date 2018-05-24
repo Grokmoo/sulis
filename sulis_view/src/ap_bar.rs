@@ -65,7 +65,11 @@ impl WidgetKind for ApBar {
         let widget_ref = Rc::clone(widget);
         GameState::add_party_listener(ChangeListener::new(NAME, Box::new(move |entity| {
             let bar = Widget::downcast_kind_mut::<ApBar>(&widget_ref);
-            bar.entity = Rc::clone(entity);
+
+            if let Some(entity) = entity {
+                bar.entity = Rc::clone(entity);
+            }
+
             widget_ref.borrow_mut().invalidate_children();
         })));
 

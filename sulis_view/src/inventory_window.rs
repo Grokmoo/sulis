@@ -57,6 +57,10 @@ impl WidgetKind for InventoryWindow {
 
         let widget_ref = Rc::clone(widget);
         GameState::add_party_listener(ChangeListener::new(NAME, Box::new(move |entity| {
+            let entity = match entity {
+                None => return,
+                Some(entity) => entity,
+            };
             let window = Widget::downcast_kind_mut::<InventoryWindow>(&widget_ref);
             window.entity = Rc::clone(entity);
             widget_ref.borrow_mut().invalidate_children();
@@ -74,15 +78,16 @@ impl WidgetKind for InventoryWindow {
             let mut quantity = quantity - actor.inventory().equipped_quantity(index);
             if quantity == 0 { continue; }
 
-            let item_but = ItemButton::inventory(item.item.icon.id(), quantity, index);
+            let item_but = ItemButton::inventory(&self.entity, item.item.icon.id(),
+                quantity, index);
 
             match item.item.equippable {
                 Some(_) => {
-                    item_but.borrow_mut().add_action("Equip", equip_item_cb(&GameState::selected(), index));
+                    item_but.borrow_mut().add_action("Equip", equip_item_cb(&self.entity, index));
                 },
                 None => (),
             };
-            item_but.borrow_mut().add_action("Drop", drop_item_cb(&GameState::selected(), index));
+            item_but.borrow_mut().add_action("Drop", drop_item_cb(&self.entity, index));
 
             Widget::add_child_to(&list_content, Widget::with_defaults(item_but));
         }
@@ -99,9 +104,11 @@ impl WidgetKind for InventoryWindow {
                 }, Some(index) => {
                     let item_state = actor.inventory().get(*slot).unwrap();
 
-                    let button = ItemButton::equipped(item_state.item.icon.id(), index);
-                    button.borrow_mut().add_action("Unequip", unequip_item_cb(&GameState::selected(), *slot));
-                    button.borrow_mut().add_action("Drop", unequip_and_drop_item_cb(&GameState::selected(), *slot));
+                    let button = ItemButton::equipped(&self.entity, item_state.item.icon.id(),
+                        index);
+                    button.borrow_mut().add_action("Unequip", unequip_item_cb(&self.entity, *slot));
+                    button.borrow_mut().add_action("Drop",
+                                                   unequip_and_drop_item_cb(&self.entity, *slot));
 
                     Widget::add_child_to(&equipped_area, Widget::with_theme(button, &theme_id));
                 }
@@ -115,7 +122,7 @@ impl WidgetKind for InventoryWindow {
             }, Some(item) => item,
         };
         let amount = actor.inventory().coins() as f32 / Module::rules().item_value_display_factor;
-        let button = ItemButton::inventory(coins_item.icon.id(), amount as u32, 0);
+        let button = ItemButton::inventory(&self.entity, coins_item.icon.id(), amount as u32, 0);
         let coins_button = Widget::with_theme(button, "coins_button");
         coins_button.borrow_mut().state.set_enabled(false);
 

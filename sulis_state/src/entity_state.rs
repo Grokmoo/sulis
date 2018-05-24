@@ -31,7 +31,7 @@ use {ActorState, AreaState, ChangeListenerList, EntityTextureCache, EntityTextur
 
 enum AIState {
     Player {
-        vis: Vec<bool>
+        vis: Vec<bool>,
     },
     AI {
         group: Option<usize>,
@@ -62,8 +62,8 @@ impl PartialEq for EntityState {
 }
 
 impl EntityState {
-    pub(crate) fn new(actor: Rc<Actor>, location: Location, 
-                         index: usize, is_pc: bool, ai_group: Option<usize>) -> EntityState {
+    pub(crate) fn new(actor: Rc<Actor>, location: Location,
+                      index: usize, is_pc: bool, ai_group: Option<usize>) -> EntityState {
         let ai_state = if is_pc {
             let dim = (location.area_width * location.area_height) as usize;
             AIState::Player {
@@ -160,14 +160,14 @@ impl EntityState {
 
     pub fn pc_vis_mut<'a>(&'a mut self) -> &'a mut Vec<bool> {
         match self.ai_state {
-            AIState::Player { ref mut vis } => vis,
+            AIState::Player { ref mut vis, .. } => vis,
             AIState::AI { .. } => panic!(),
         }
     }
 
     pub fn pc_vis(&self) -> &Vec<bool> {
         match self.ai_state {
-            AIState::Player { ref vis } => vis,
+            AIState::Player { ref vis, .. } => vis,
             AIState::AI { .. } => panic!(),
         }
     }

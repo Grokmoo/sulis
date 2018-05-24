@@ -56,7 +56,7 @@ use sulis_widgets::{Button, Label};
 use sulis_module::actor::Sex;
 use sulis_module::{Ability, ActorBuilder, Class, Faction, ImageLayer, Module, Race};
 use sulis_rules::{AttributeList};
-use sulis_state::GameState;
+use sulis_state::{EntityState};
 
 use character_selector::CharacterSelector;
 
@@ -101,8 +101,8 @@ impl CharacterBuilder {
         CharacterBuilder::with(Rc::new(CharacterCreator {}))
     }
 
-    pub fn level_up() -> Rc<RefCell<CharacterBuilder>> {
-        CharacterBuilder::with(Rc::new(LevelUpBuilder { pc: GameState::selected() }))
+    pub fn level_up(pc: Rc<RefCell<EntityState>>) -> Rc<RefCell<CharacterBuilder>> {
+        CharacterBuilder::with(Rc::new(LevelUpBuilder { pc }))
     }
 
     fn with(builder_set: Rc<BuilderSet>) -> Rc<RefCell<CharacterBuilder>> {

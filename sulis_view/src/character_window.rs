@@ -53,11 +53,7 @@ impl CharacterWindow {
 }
 
 impl WidgetKind for CharacterWindow {
-    fn get_name(&self) -> &str { NAME }
-
-    fn as_any(&self) -> &Any { self }
-
-    fn as_any_mut(&mut self) -> &mut Any { self }
+    widget_kind!(NAME);
 
     fn layout(&mut self, widget: &mut Widget) {
         widget.do_base_layout();
@@ -74,6 +70,10 @@ impl WidgetKind for CharacterWindow {
 
         let widget_ref = Rc::clone(widget);
         GameState::add_party_listener(ChangeListener::new(NAME, Box::new(move |entity| {
+            let entity = match entity {
+                Some(entity) => entity,
+                None => return,
+            };
             let window = Widget::downcast_kind_mut::<CharacterWindow>(&widget_ref);
             window.character = Rc::clone(entity);
             widget_ref.borrow_mut().invalidate_children();
@@ -85,11 +85,12 @@ impl WidgetKind for CharacterWindow {
         let close = Widget::with_theme(Button::empty(), "close");
         close.borrow_mut().state.add_callback(Callback::remove_parent());
 
+        let char_ref = Rc::clone(&self.character);
         let level_up = Widget::with_theme(Button::empty(), "level_up");
         level_up.borrow_mut().state.set_visible(self.character.borrow_mut().actor.has_level_up());
-        level_up.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+        level_up.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
             let root = Widget::get_root(&widget);
-            let window = Widget::with_defaults(CharacterBuilder::level_up());
+            let window = Widget::with_defaults(CharacterBuilder::level_up(Rc::clone(&char_ref)));
             window.borrow_mut().state.set_modal(true);
             Widget::add_child_to(&root, window);
         })));

@@ -228,6 +228,8 @@ impl TurnTimer {
             current.borrow_mut().actor.update(ROUND_TIME_MILLIS);
             if current.borrow().is_party_member() {
                 GameState::set_selected_party_member(Rc::clone(current));
+            } else {
+                GameState::clear_selected_party_member();
             }
             debug!("'{}' now has the active turn.", current.borrow().actor.actor.name);
         }

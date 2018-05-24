@@ -46,10 +46,7 @@ use sulis_core::util;
 pub trait Animation {
     fn update(&mut self, root: &Rc<RefCell<Widget>>) -> bool;
 
-    /// this method is called whenever another animation is added for the
-    /// given entity.  This can be used to cancel this animation if the
-    /// other animation should override it, for example.
-    fn check(&mut self, _entity: &Rc<RefCell<EntityState>>) { }
+    fn mark_for_removal(&mut self) {}
 
     fn get_owner(&self) -> &Rc<RefCell<EntityState>>;
 

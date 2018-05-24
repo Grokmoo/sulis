@@ -18,7 +18,7 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_state::{ChangeListener, GameState};
+use sulis_state::{ChangeListener, EntityState, GameState};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{Button, Label};
 
@@ -29,16 +29,20 @@ pub const NAME: &str = "merchant_window";
 
 pub struct MerchantWindow {
     merchant_id: String,
+    player: Rc<RefCell<EntityState>>,
 }
 
 impl MerchantWindow {
-    pub fn new(merchant_id: &str) -> Rc<RefCell<MerchantWindow>> {
+    pub fn new(merchant_id: &str, player: Rc<RefCell<EntityState>>) -> Rc<RefCell<MerchantWindow>> {
         Rc::new(RefCell::new(MerchantWindow {
             merchant_id: merchant_id.to_string(),
+            player,
         }))
     }
 
     pub fn merchant_id(&self) -> &str { &self.merchant_id }
+
+    pub fn player(&self) -> &Rc<RefCell<EntityState>> { &self.player }
 }
 
 impl WidgetKind for MerchantWindow {
@@ -77,7 +81,7 @@ impl WidgetKind for MerchantWindow {
         let list_content = Widget::empty("items_list");
         for (index, &(qty, ref item)) in merchant.items().iter().enumerate() {
             let item_button = ItemButton::merchant(item.item.icon.id(), qty, index, &self.merchant_id);
-            item_button.borrow_mut().add_action("Buy", buy_item_cb(&GameState::selected(),
+            item_button.borrow_mut().add_action("Buy", buy_item_cb(&self.player,
                 &self.merchant_id, index));
 
             Widget::add_child_to(&list_content, Widget::with_defaults(item_button));

@@ -49,6 +49,17 @@ impl WidgetKind for AbilitiesBar {
             entity.actor.listeners.add(ChangeListener::invalidate(NAME, widget));
         }
 
+        let widget_ref = Rc::clone(widget);
+        GameState::add_party_listener(ChangeListener::new(NAME, Box::new(move |entity| {
+            let entity = match entity {
+                None => return,
+                Some(entity) => entity,
+            };
+            let bar = Widget::downcast_kind_mut::<AbilitiesBar>(&widget_ref);
+            bar.entity = Rc::clone(entity);
+            widget_ref.borrow_mut().invalidate_children();
+        })));
+
         let mut children = Vec::new();
         let abilities = self.entity.borrow().actor.actor.abilities.clone();
         for ability in abilities.iter() {

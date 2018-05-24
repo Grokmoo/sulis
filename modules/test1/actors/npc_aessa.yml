@@ -40,3 +40,5 @@ equipped:
   - 4
 levels:
   fighter: 4
+abilities:
+  - mighty_blow

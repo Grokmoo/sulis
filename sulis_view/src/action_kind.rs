@@ -397,7 +397,7 @@ impl ActionKind for MoveThenAction {
     }
 }
 struct MoveAction {
-    pc: Rc<RefCell<EntityState>>,
+    selected: Vec<Rc<RefCell<EntityState>>>,
     x: f32,
     y: f32,
     dist: f32,
@@ -406,28 +406,58 @@ struct MoveAction {
 
 impl MoveAction {
     fn new_if_valid(x: f32, y: f32, dist: Option<f32>) -> Option<MoveAction> {
-        // TODO party move
-        let pc = match GameState::selected().first() {
-            None => return None,
-            Some(pc) => Rc::clone(pc),
-        };
+        let selected = GameState::selected();
+
+        if selected.is_empty() { return None; }
 
         let dist = match dist {
             None => 0.6,
             Some(dist) => dist,
         };
 
-        if !GameState::can_move_towards_point(&pc, x, y, dist) {
+        if !GameState::can_move_towards_point(&selected[0], Vec::new(), x, y, dist) {
             return None;
         }
 
-        Some(MoveAction { pc, x, y, dist, cb: None })
+        Some(MoveAction { selected, x, y, dist, cb: None })
     }
 
     fn create_if_valid(x: f32, y: f32, dist: Option<f32>) -> Option<Box<ActionKind>> {
         match MoveAction::new_if_valid(x, y, dist) {
             None => None,
             Some(action) => Some(Box::new(action)),
+        }
+    }
+
+    fn move_one(&mut self) {
+        let cb = self.cb.take();
+        GameState::move_towards_point(&self.selected[0], Vec::new(), self.x, self.y, self.dist, cb);
+    }
+
+    fn move_all(&mut self) {
+        let entities_to_ignore: Vec<usize> =
+            self.selected.iter().map(|e| e.borrow().index).collect();
+
+        let pc = self.selected.remove(0);
+
+        let pc_cur_x = pc.borrow().location.x as f32;
+        let pc_cur_y = pc.borrow().location.y as f32;
+
+        GameState::move_towards_point(&pc, entities_to_ignore.clone(),
+            self.x, self.y, self.dist, None);
+
+        let dir_x = pc_cur_x - self.x;
+        let dir_y = pc_cur_y - self.y;
+        let mag = dir_x.hypot(dir_y);
+
+        let norm_x = dir_x * 4.0 / mag;
+        let norm_y = dir_y * 4.0 / mag;
+
+        let mut i = 1.0;
+        for member in self.selected.iter() {
+            GameState::move_towards_point(member, entities_to_ignore.clone(),
+                self.x + norm_x * i, self.y + norm_y * i, self.dist, None);
+            i += 1.0;
         }
     }
 }
@@ -439,17 +469,20 @@ impl ActionKind for MoveAction {
 
     fn fire_action(&mut self, widget: &Rc<RefCell<Widget>>) {
         trace!("Firing move action");
-
-        let cb = self.cb.take();
-        GameState::move_towards_point(&self.pc, self.x, self.y, self.dist, cb);
-
         let root = Widget::get_root(widget);
         let view = Widget::downcast_kind_mut::<RootView>(&root);
         view.set_prop_window(&root, false, 0);
+
+        if self.cb.is_some() {
+            self.move_one();
+        } else {
+            self.move_all();
+        }
+
     }
 
     fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32)> {
-        let size = Rc::clone(&self.pc.borrow().size);
+        let size = Rc::clone(&self.selected[0].borrow().size);
         let x = self.x as i32 - size.width / 2;
         let y = self.y as i32 - size.height / 2;
         Some((size, x, y))

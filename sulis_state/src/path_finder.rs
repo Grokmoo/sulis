@@ -71,12 +71,15 @@ impl PathFinder {
     /// Will return a vec of length zero if the dest is already reached by the
     /// requester.
     pub fn find(&mut self, area_state: &AreaState, requester: Ref<EntityState>,
+                mut entities_to_ignore: Vec<usize>,
                 dest_x: f32, dest_y: f32, dest_dist: f32) -> Option<Vec<Point>> {
         if dest_x < 0.0 || dest_y < 0.0 { return None; }
         if dest_x >= self.width as f32 || dest_y >= self.height as f32 { return None; }
 
         debug!("Finding path from {:?} to within {} of {},{}",
                requester.location, dest_dist, dest_x, dest_y);
+
+        entities_to_ignore.push(requester.index);
 
         // let start_time = time::Instant::now();
         self.goal_x = dest_x;
@@ -144,7 +147,7 @@ impl PathFinder {
                 // we compute the passability of each point as needed here
                 let neighbor_x = neighbor % self.width;
                 let neighbor_y = neighbor / self.width;
-                if !area_state.is_passable(&requester, neighbor_x, neighbor_y) {
+                if !area_state.is_passable(&requester, &entities_to_ignore, neighbor_x, neighbor_y) {
                     self.closed.insert(neighbor);
                     //trace!("Not passable");
                     continue;

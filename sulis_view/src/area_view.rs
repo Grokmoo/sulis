@@ -567,6 +567,8 @@ impl WidgetKind for AreaView {
                 let w = x_end - x;
                 let h = y_end - y;
 
+                if w < 1.0 || h < 1.0 { return; }
+
                 let mut draw_list = DrawList::empty_sprite();
                 image.append_to_draw_list(&mut draw_list, &animation_state::NORMAL, x, y, w, h, millis);
                 renderer.draw(draw_list);
@@ -591,19 +593,27 @@ impl WidgetKind for AreaView {
                 _ => (),
             }
         } else {
+            let mut fire_action = false;
             match kind {
                 ClickKind::Left => {
-                    match self.selection_box_start {
-                        None => {
-                            let mut action = action_kind::get_action(x, y);
-                            action.fire_action(widget);
-                        },
-                        Some(_) => {
+                    if let Some((x, y, x_end, y_end)) = self.get_selection_box_coords() {
+                        let w = x_end - x;
+                        let h = y_end - y;
+                        if w < 1.0 && h < 1.0 { fire_action = true; }
+                        else {
                             GameState::select_party_members(self.select_party_in_box(&widget.borrow()));
-                            self.selection_box_start = None;
-                        },
+                        }
+                        self.selection_box_start = None;
+                    } else {
+                        fire_action = true;
                     }
-                }, _ => (),
+                },
+                _ => (),
+            }
+
+            if fire_action {
+                let mut action = action_kind::get_action(x, y);
+                action.fire_action(widget);
             }
         }
 
@@ -615,7 +625,8 @@ impl WidgetKind for AreaView {
         let area_state = GameState::area_state();
         let area_width = area_state.borrow().area.width;
         let area_height = area_state.borrow().area.height;
-        self.scroll.compute_max(&*widget.borrow(), area_width, area_height, self.scale.0, self.scale.1);
+        self.scroll.compute_max(&*widget.borrow(), area_width, area_height,
+            self.scale.0, self.scale.1);
 
         match kind {
             ClickKind::Middle => self.scroll.change(delta_x, delta_y),

@@ -42,7 +42,7 @@ pub struct AreaState {
     triggers: Vec<TriggerState>,
 
     prop_grid: Vec<Option<usize>>,
-    entity_grid: Vec<Option<usize>>,
+    entity_grid: Vec<Vec<usize>>,
     transition_grid: Vec<Option<usize>>,
     trigger_grid: Vec<Option<usize>>,
 
@@ -142,7 +142,7 @@ impl AreaState {
 
     pub fn new(area: Rc<Area>) -> AreaState {
         let dim = (area.width * area.height) as usize;
-        let entity_grid = vec![None;dim];
+        let entity_grid = vec![Vec::new();dim];
         let transition_grid = vec![None;dim];
         let prop_grid = vec![None;dim];
         let trigger_grid = vec![None;dim];
@@ -321,7 +321,7 @@ impl AreaState {
                 for y in y..(y + actor.race.size.height) {
                     for x in x..(x + actor.race.size.width) {
                         let index = (x + y * self.area.width) as usize;
-                        if self.entity_grid[index].is_some() {
+                        if self.entity_grid[index].len() > 0 {
                             impass = true;
                             break;
                         }
@@ -351,12 +351,12 @@ impl AreaState {
         size.points(x, y).all(|p| self.point_size_passable(p.x, p.y))
     }
 
-    pub fn is_passable(&self, requester: &Ref<EntityState>,
+    pub fn is_passable(&self, requester: &Ref<EntityState>, entities_to_ignore: &Vec<usize>,
                        new_x: i32, new_y: i32) -> bool {
         if !self.is_terrain_passable(&requester.size(), new_x, new_y) { return false; }
 
         requester.points(new_x, new_y)
-           .all(|p| self.point_entities_passable(&requester, p.x, p.y))
+           .all(|p| self.point_entities_passable(entities_to_ignore, p.x, p.y))
     }
 
     pub fn prop_index_valid(&self, index: usize) -> bool {
@@ -417,9 +417,10 @@ impl AreaState {
     pub fn get_entity_at(&self, x: i32, y: i32) -> Option<Rc<RefCell<EntityState>>> {
         if !self.area.coords_valid(x, y) { return None; }
 
-        let index = match self.entity_grid.get((x + y * self.area.width) as usize).unwrap() {
-            &None => return None,
-            &Some(index) => index,
+        let index = {
+            let vec = &self.entity_grid[(x + y * self.area.width) as usize];
+            if vec.is_empty() { return None; }
+            vec[0]
         };
 
         Some(self.get_entity(index))
@@ -488,24 +489,21 @@ impl AreaState {
     fn point_size_passable(&self, x: i32, y: i32) -> bool {
         if !self.area.coords_valid(x, y) { return false; }
 
-        let grid_index = self.entity_grid[(x + y * self.area.width) as usize];
+        let grid_index = &self.entity_grid[(x + y * self.area.width) as usize];
 
-        match grid_index {
-            None => true,
-            Some(_) => false,
-        }
+        grid_index.is_empty()
     }
 
-    fn point_entities_passable(&self, requester: &Ref<EntityState>,
+    fn point_entities_passable(&self, entities_to_ignore: &Vec<usize>,
                                x: i32, y: i32) -> bool {
         if !self.area.coords_valid(x, y) { return false; }
 
-        let grid_index = self.entity_grid[(x + y * self.area.width) as usize];
+        let grid = &self.entity_grid[(x + y * self.area.width) as usize];
 
-        match grid_index {
-            None => true, // grid position is empty
-            Some(index) => (index == requester.index),
+        for index in grid.iter() {
+            if !entities_to_ignore.contains(index) { return false; }
         }
+        true
     }
 
     pub(crate) fn add_prop(&mut self, prop_data: &PropData, location: Location, temporary: bool) -> bool {
@@ -575,7 +573,8 @@ impl AreaState {
 
         if !self.area.coords_valid(x, y) { return false; }
 
-        if !self.is_passable(&entity.borrow(), x, y) { return false; }
+        let entities_to_ignore = vec![entity.borrow().index];
+        if !self.is_passable(&entity.borrow(), &entities_to_ignore, x, y) { return false; }
 
         entity.borrow_mut().actor.compute_stats();
         entity.borrow_mut().actor.init();
@@ -585,7 +584,7 @@ impl AreaState {
         entity.borrow_mut().location = location;
 
         for p in entity.borrow().points(x, y) {
-            self.update_entity_grid(p.x, p.y, Some(new_index));
+            self.add_entity_to_grid(p.x, p.y, new_index);
         }
 
         if entity.borrow().is_party_member() {
@@ -613,8 +612,9 @@ impl AreaState {
                                            old_x: i32, old_y: i32) {
         self.clear_entity_points(&*entity.borrow(), old_x, old_y);
 
+        let entity_index = entity.borrow().index;
         for p in entity.borrow().location_points() {
-            self.update_entity_grid(p.x, p.y, Some(entity.borrow().index));
+            self.add_entity_to_grid(p.x, p.y, entity_index);
         }
 
         let is_pc = entity.borrow().is_party_member();
@@ -635,12 +635,16 @@ impl AreaState {
 
     fn clear_entity_points(&mut self, entity: &EntityState, x: i32, y: i32) {
         for p in entity.points(x, y) {
-            self.update_entity_grid(p.x, p.y, None);
+            self.remove_entity_from_grid(p.x, p.y, entity.index);
         }
     }
 
-    fn update_entity_grid(&mut self, x: i32, y: i32, index: Option<usize>) {
-        *self.entity_grid.get_mut((x + y * self.area.width) as usize).unwrap() = index;
+    fn add_entity_to_grid(&mut self, x: i32, y: i32, index: usize) {
+        self.entity_grid[(x + y * self.area.width) as usize].push(index);
+    }
+
+    fn remove_entity_from_grid(&mut self, x: i32, y: i32, index: usize) {
+        self.entity_grid[(x + y * self.area.width) as usize].retain(|e| *e != index);
     }
 
     pub fn get_last_entity(&self) -> Option<&Rc<RefCell<EntityState>>> {

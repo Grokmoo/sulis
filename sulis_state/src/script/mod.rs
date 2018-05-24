@@ -183,7 +183,8 @@ impl UserData for ScriptInterface {
             let area_state = area_state.borrow();
             let entity = entity.try_unwrap()?;
             let entity = entity.borrow();
-            Ok(area_state.is_passable(&entity, x, y))
+            let entities_to_ignore = vec![entity.index];
+            Ok(area_state.is_passable(&entity, &entities_to_ignore, x, y))
         });
 
         methods.add_method("spawn_encounter_at", |_, _, (x, y): (i32, i32)| {

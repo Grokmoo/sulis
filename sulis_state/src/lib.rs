@@ -28,6 +28,9 @@ pub use self::ai::AI;
 mod ability_state;
 pub use self::ability_state::AbilityState;
 
+mod actor_state;
+pub use self::actor_state::ActorState;
+
 pub mod animation;
 use self::animation::{Animation, MoveAnimation};
 
@@ -51,9 +54,6 @@ pub use self::entity_state::AreaDrawable;
 mod entity_texture_cache;
 pub use self::entity_texture_cache::EntityTextureCache;
 pub use self::entity_texture_cache::EntityTextureSlot;
-
-mod actor_state;
-pub use self::actor_state::ActorState;
 
 mod item_state;
 pub use self::item_state::ItemState;
@@ -172,18 +172,24 @@ impl GameState {
     }
 
     pub fn select_party_members(members: Vec<Rc<RefCell<EntityState>>>) {
+        for member in members.iter() {
+            if !member.borrow().is_party_member() {
+                warn!("Attempted to select non-party member {}", member.borrow().actor.actor.id);
+            }
+        }
+
         STATE.with(|state| {
             let mut state = state.borrow_mut();
             let state = state.as_mut().unwrap();
 
             state.selected.clear();
-            for member in members {
-                if !member.borrow().is_party_member() {
-                    warn!("Attempted to select non-party member {}", member.borrow().actor.actor.id);
-                    continue;
+            // add in party member order
+            for party_member in state.party.iter() {
+                for member in members.iter() {
+                    if Rc::ptr_eq(party_member, member) {
+                        state.selected.push(Rc::clone(member));
+                    }
                 }
-
-                state.selected.push(member);
             }
 
             let entity = match state.selected.first() {
@@ -432,11 +438,14 @@ impl GameState {
         let mut party = Vec::new();
         party.push(Rc::clone(&pc_state));
 
+        let mut selected = Vec::new();
+        selected.push(Rc::clone(&pc_state));
+
         Ok(GameState {
             areas,
             area_state: area_state,
             path_finder: path_finder,
-            selected: Vec::new(),
+            selected,
             party,
             party_listeners: ChangeListenerList::default(),
             should_exit: false,
@@ -666,24 +675,24 @@ impl GameState {
     pub fn can_move_towards(entity: &Rc<RefCell<EntityState>>,
                             target: &Rc<RefCell<EntityState>>) -> bool {
         let (x, y, dist) = GameState::get_target(entity, target);
-        GameState::can_move_towards_point(entity, x, y, dist)
+        GameState::can_move_towards_point(entity, Vec::new(), x, y, dist)
     }
 
     pub fn move_towards(entity: &Rc<RefCell<EntityState>>,
                         target: &Rc<RefCell<EntityState>>) -> bool {
         let (x, y, dist) = GameState::get_target(entity, target);
-        GameState::move_towards_point(entity, x, y, dist, None)
+        GameState::move_towards_point(entity, Vec::new(), x, y, dist, None)
     }
 
     pub fn can_move_to(entity: &Rc<RefCell<EntityState>>, x: i32, y: i32) -> bool {
-        GameState::can_move_towards_point(entity, x as f32, y as f32, 0.6)
+        GameState::can_move_towards_point(entity, Vec::new(), x as f32, y as f32, 0.6)
     }
 
     pub fn move_to(entity: &Rc<RefCell<EntityState>>, x: i32, y: i32) -> bool {
-        GameState::move_towards_point(entity, x as f32, y as f32, 0.6, None)
+        GameState::move_towards_point(entity, Vec::new(), x as f32, y as f32, 0.6, None)
     }
 
-    pub fn move_towards_point(entity: &Rc<RefCell<EntityState>>,
+    pub fn move_towards_point(entity: &Rc<RefCell<EntityState>>, entities_to_ignore: Vec<usize>,
                               x: f32, y: f32, dist: f32, cb: Option<Box<ScriptCallback>>) -> bool {
         let anim = STATE.with(|s| {
             let mut state = s.borrow_mut();
@@ -693,7 +702,8 @@ impl GameState {
             let start_time = time::Instant::now();
             let path = {
                 let area_state = state.area_state.borrow();
-                match state.path_finder.find(&area_state, entity.borrow(), x, y, dist) {
+                match state.path_finder.find(&area_state, entity.borrow(),
+                                             entities_to_ignore, x, y, dist) {
                     None => return None,
                     Some(path) => path,
                 }
@@ -724,7 +734,8 @@ impl GameState {
         }
     }
 
-    pub fn can_move_towards_point(entity: &Rc<RefCell<EntityState>>, x: f32, y: f32, dist: f32) -> bool {
+    pub fn can_move_towards_point(entity: &Rc<RefCell<EntityState>>, entities_to_ignore: Vec<usize>,
+                                  x: f32, y: f32, dist: f32) -> bool {
         if entity.borrow().actor.ap() < Module::rules().movement_ap {
             return false;
         }
@@ -735,7 +746,8 @@ impl GameState {
             let area_state = state.area_state.borrow();
 
             let start_time = time::Instant::now();
-            let val = match state.path_finder.find(&area_state, entity.borrow(), x, y, dist) {
+            let val = match state.path_finder.find(&area_state, entity.borrow(),
+                                                   entities_to_ignore, x, y, dist) {
                 None => false,
                 Some(_) => true,
             };

@@ -93,7 +93,7 @@ use std::time;
 use std::collections::HashMap;
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
-use std::cell::RefCell;
+use std::cell::{Cell, RefCell};
 
 use sulis_rules::HitKind;
 use sulis_core::config::CONFIG;
@@ -105,10 +105,13 @@ use sulis_module::{Ability, Actor, Module, OnTrigger, area::{Trigger, TriggerKin
 use script::ScriptEntitySet;
 use script::script_callback::ScriptHitKind;
 
+pub const MOVE_TO_THRESHOLD: f32 = 0.6;
+
 thread_local! {
     static STATE: RefCell<Option<GameState>> = RefCell::new(None);
     static AI: RefCell<AI> = RefCell::new(AI::new());
-    static ENTERING_COMBAT: RefCell<bool> = RefCell::new(false);
+    static ENTERING_COMBAT: Cell<bool> = Cell::new(false);
+    static MODAL_LOCKED: Cell<bool> = Cell::new(false);
     static SCRIPT: ScriptState = ScriptState::new();
     static ANIMATIONS: RefCell<Vec<Box<Animation>>> = RefCell::new(Vec::new());
     static ANIMS_TO_ADD: RefCell<Vec<Box<Animation>>> = RefCell::new(Vec::new());
@@ -487,6 +490,14 @@ impl GameState {
         })
     }
 
+    pub fn is_modal_locked() -> bool {
+        MODAL_LOCKED.with(|c| { c.get() })
+    }
+
+    pub fn set_modal_locked(locked: bool) {
+        MODAL_LOCKED.with(|c| { c.set(locked) })
+    }
+
     pub fn check_get_ui_callback() -> Option<UICallback> {
         STATE.with(|s| {
             let mut state = s.borrow_mut();
@@ -497,17 +508,12 @@ impl GameState {
 
     fn check_clear_entering_combat() -> bool {
         ENTERING_COMBAT.with(|c| {
-            let retval = {
-                *c.borrow()
-            };
-
-            *c.borrow_mut() = false;
-            retval
+            c.replace(false)
         })
     }
 
     pub fn set_entering_combat() {
-        ENTERING_COMBAT.with(|c| *c.borrow_mut() = true);
+        ENTERING_COMBAT.with(|c| c.set(true));
     }
 
     fn get_area_state(id: &str) -> Option<Rc<RefCell<AreaState>>> {
@@ -685,11 +691,11 @@ impl GameState {
     }
 
     pub fn can_move_to(entity: &Rc<RefCell<EntityState>>, x: i32, y: i32) -> bool {
-        GameState::can_move_towards_point(entity, Vec::new(), x as f32, y as f32, 0.6)
+        GameState::can_move_towards_point(entity, Vec::new(), x as f32, y as f32, MOVE_TO_THRESHOLD)
     }
 
     pub fn move_to(entity: &Rc<RefCell<EntityState>>, x: i32, y: i32) -> bool {
-        GameState::move_towards_point(entity, Vec::new(), x as f32, y as f32, 0.6, None)
+        GameState::move_towards_point(entity, Vec::new(), x as f32, y as f32, MOVE_TO_THRESHOLD, None)
     }
 
     pub fn move_towards_point(entity: &Rc<RefCell<EntityState>>, entities_to_ignore: Vec<usize>,

@@ -366,7 +366,13 @@ impl ActorState {
         };
 
         debug!("Adding XP {} to '{}'", reward.xp, parent.borrow().actor.actor.id);
-        parent.borrow_mut().add_xp(reward.xp);
+        if parent.borrow().is_party_member() {
+            for member in GameState::party().iter() {
+                member.borrow_mut().add_xp(reward.xp);
+            }
+        } else {
+            parent.borrow_mut().add_xp(reward.xp);
+        }
 
         let loot = match reward.loot {
             None => return,

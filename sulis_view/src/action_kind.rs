@@ -20,7 +20,7 @@ use std::rc::Rc;
 use sulis_core::ui::{animation_state, Widget};
 use sulis_core::util::Point;
 use sulis_module::{Faction, Module, ObjectSize};
-use sulis_state::{EntityState, GameState, ScriptCallback};
+use sulis_state::{MOVE_TO_THRESHOLD, EntityState, GameState, ScriptCallback};
 use {AreaView, dialog_window, RootView};
 
 pub fn get_action(x: i32, y: i32) -> Box<ActionKind> {
@@ -348,8 +348,11 @@ struct MoveThenAction {
 impl MoveThenAction {
     fn create_if_valid(pos: Point, size: &Rc<ObjectSize>, dist: f32, cb_action: Box<ActionKind>,
                        cursor_state: animation_state::Kind) -> Option<Box<ActionKind>> {
-        let x = pos.x as f32 + size.width as f32 / 2.0 - 0.5;
-        let y = pos.y as f32 + size.height as f32 / 2.0 - 0.5;
+        let (px, py) = (pos.x as f32, pos.y as f32);
+        let (w, h) = (size.width as f32, size.height as f32);
+
+        let x = px + w / 2.0 - 0.5;
+        let y = py + h / 2.0 - 0.5;
 
         let pc = match GameState::selected().first() {
             None => return None,
@@ -419,7 +422,7 @@ impl MoveAction {
         if selected.is_empty() { return None; }
 
         let dist = match dist {
-            None => 0.6,
+            None => MOVE_TO_THRESHOLD,
             Some(dist) => dist,
         };
 
@@ -460,8 +463,11 @@ impl MoveAction {
         let dir_y = pc_cur_y - self.y;
         let mag = dir_x.hypot(dir_y);
 
-        let norm_x = dir_x * 4.0 / mag;
-        let norm_y = dir_y * 4.0 / mag;
+        let w = (pc.borrow().size.width + 1) as f32;
+        let h = (pc.borrow().size.height + 1) as f32;
+
+        let norm_x = dir_x * w / mag;
+        let norm_y = dir_y * h / mag;
 
         let mut i = 1.0;
         for member in self.selected.iter() {

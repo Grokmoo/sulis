@@ -230,6 +230,9 @@ impl WidgetKind for RootView {
                 dialog_window::activate(widget, &ui_cb.on_trigger, &ui_cb.parent, &ui_cb.target);
             }
         }
+
+        let root = Widget::get_root(widget);
+        GameState::set_modal_locked(root.borrow().has_modal());
     }
 
     fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {

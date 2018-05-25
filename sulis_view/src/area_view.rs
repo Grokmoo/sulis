@@ -112,13 +112,13 @@ impl AreaView {
         self.scroll.set(x, y);
     }
 
-    pub fn get_mouseover_pos(&self, loc: &Location, size: &Rc<ObjectSize>) -> (i32, i32) {
+    pub fn get_mouseover_pos(&self, loc: &Location, size: &Rc<ObjectSize>, offset: Point) -> (i32, i32) {
         let x = loc.x as f32 + size.width as f32 / 2.0;
         let y = loc.y as f32;
         let x = ((x - self.scroll.x()) * self.scale.0).round() as i32;
         let y = ((y - self.scroll.y()) * self.scale.1).round() as i32;
 
-        (x, y)
+        (x + offset.x, y + offset.y)
     }
 
     fn get_cursor_pos(&self, widget: &Rc<RefCell<Widget>>) -> (i32, i32) {
@@ -527,14 +527,6 @@ impl WidgetKind for AreaView {
         for entity in self.select_party_in_box(widget).iter() {
             self.draw_selection(&entity, renderer, scale_x, scale_y, widget, millis);
         }
-        self.draw_entities_props(renderer, scale_x, scale_y, 1.0, widget, &state, millis);
-        self.draw_layer(renderer, scale_x, scale_y, widget, AERIAL_LAYER_ID);
-
-        GameState::draw_graphics_mode(renderer, p.x as f32 - self.scroll.x(), p.y as f32- self.scroll.y(),
-                                      scale_x, scale_y, millis);
-
-        self.draw_entities_props(renderer, scale_x, scale_y, 0.4, widget, &state, millis);
-        self.draw_layer(renderer, scale_x, scale_y, widget, VISIBILITY_TEX_ID);
 
         if let Some(ref hover) = self.hover_sprite {
             let mut draw_list = DrawList::from_sprite_f32(&hover.sprite,
@@ -546,21 +538,23 @@ impl WidgetKind for AreaView {
             renderer.draw(draw_list);
         }
 
-        for feedback_text in state.feedback_text_iter() {
-            feedback_text.draw(renderer, self.feedback_text_scale,
-                               p.x as f32 - self.scroll.x(), p.y as f32- self.scroll.y(),
-                               scale_x, scale_y);
-        }
-
         let targeter_tile = match self.targeter_tile {
             None => return,
-            Some(ref tile) => tile,
+            Some(ref tile) => Rc::clone(tile),
         };
 
         if let Some(ref targeter) = state.targeter() {
-            targeter.borrow().draw(renderer, targeter_tile, self.scroll.x(), self.scroll.y(),
+            targeter.borrow().draw(renderer, &targeter_tile, self.scroll.x(), self.scroll.y(),
                 scale_x, scale_y, millis);
         }
+
+        self.draw_entities_props(renderer, scale_x, scale_y, 1.0, widget, &state, millis);
+        self.draw_layer(renderer, scale_x, scale_y, widget, AERIAL_LAYER_ID);
+
+        GameState::draw_graphics_mode(renderer, p.x as f32 - self.scroll.x(), p.y as f32- self.scroll.y(),
+                                      scale_x, scale_y, millis);
+        self.draw_entities_props(renderer, scale_x, scale_y, 0.4, widget, &state, millis);
+        self.draw_layer(renderer, scale_x, scale_y, widget, VISIBILITY_TEX_ID);
 
         if let Some(ref image) = self.selection_box_image {
             if let Some((x, y, x_end, y_end)) = self.get_selection_box_coords() {
@@ -573,6 +567,12 @@ impl WidgetKind for AreaView {
                 image.append_to_draw_list(&mut draw_list, &animation_state::NORMAL, x, y, w, h, millis);
                 renderer.draw(draw_list);
             }
+        }
+
+        for feedback_text in state.feedback_text_iter() {
+            feedback_text.draw(renderer, self.feedback_text_scale,
+                               p.x as f32 - self.scroll.x(), p.y as f32- self.scroll.y(),
+                               scale_x, scale_y);
         }
     }
 
@@ -668,7 +668,8 @@ impl WidgetKind for AreaView {
             if let Some(ref entity) = mouse_over {
                 let (x, y) = {
                     let entity = entity.borrow();
-                    self.get_mouseover_pos(&entity.location, &entity.size)
+                    let offset = entity.actor.actor.race.mouseover_offset;
+                    self.get_mouseover_pos(&entity.location, &entity.size, offset)
                 };
                 Widget::set_mouse_over(widget, EntityMouseover::new(entity), x, y);
             }
@@ -679,7 +680,8 @@ impl WidgetKind for AreaView {
         if let Some(entity) = area_state.borrow().get_entity_at(area_x, area_y) {
             let (x, y) = {
                 let entity = entity.borrow();
-                self.get_mouseover_pos(&entity.location, &entity.size)
+                let offset = entity.actor.actor.race.mouseover_offset;
+                self.get_mouseover_pos(&entity.location, &entity.size, offset)
             };
             Widget::set_mouse_over(widget, EntityMouseover::new(&entity), x, y);
         } else if let Some(index) = area_state.borrow().prop_index_at(area_x, area_y) {
@@ -692,7 +694,7 @@ impl WidgetKind for AreaView {
                 let (x, y) = {
                     let area_state = area_state.borrow();
                     let prop_state = area_state.get_prop(index);
-                    self.get_mouseover_pos(&prop_state.location, &prop_state.prop.size)
+                    self.get_mouseover_pos(&prop_state.location, &prop_state.prop.size, Point::as_zero())
                 };
                 Widget::set_mouse_over(widget, PropMouseover::new(index), x, y);
             }

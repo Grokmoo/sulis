@@ -2,7 +2,7 @@ id: ratkin
 name: Ratkin
 description: |
   Distrusted by most due to their appearance and reputation for thievery, Ratkin nonetheless maintain a vast, loosely connected underground empire stretching across the known world and beyond.
-size: 3by3
+size: 2by2
 base_stats:
   hit_points: 40
   accuracy: 30
@@ -29,13 +29,24 @@ default_images:
     Background: creatures/ratkin_bg
     Ears: creatures/ratkin_ears
     Shadow: creatures/dwarf_shadow
+mouseover_offset: [0, -2]
+ticker_offset: [0.5, 2]
 image_layer_offset_scale: 16
 image_layer_offsets:
-  HeldMain: [-18, -6]
-  HeldOff: [16, -7]
-  Head: [0, 4]
-  Hair: [0, 4]
-  Beard: [0, 4]
+  HeldMain: [-26, -21]
+  HeldOff: [8, -22]
+  Ears: [-8,-11]
+  Hair: [-8,-11]
+  Beard: [-8,-11]
+  Head: [-8,-11]
+  Hands: [-8,-15]
+  Foreground: [-8,-15]
+  Torso: [-8,-15]
+  Legs: [-8,-15]
+  Feet: [-8,-15]
+  Background: [-8,-15]
+  Cloak: [-8,-15]
+  Shadow: [-8,-15]
 image_layer_postfix:
   Female: "_dwarf"
   Male: "_dwarf"

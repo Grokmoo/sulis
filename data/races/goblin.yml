@@ -24,6 +24,8 @@ default_images:
   Female:
     Background: creatures/goblin0
     Shadow: creatures/goblin_shadow
+mouseover_offset: [0, 0]
+ticker_offset: [0.5, 1]
 image_layer_offset_scale: 16
 image_layer_offsets:
   HeldMain: [-24, -13]

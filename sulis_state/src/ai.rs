@@ -33,6 +33,8 @@ impl AI {
     }
 
     pub fn update(&mut self, entity: Rc<RefCell<EntityState>>) {
+        if GameState::is_modal_locked() { return; }
+
         if entity.borrow().is_party_member() {
             self.ai = None;
             return;
@@ -76,7 +78,7 @@ struct EntityAI {
     actions_taken_this_turn: u32,
 }
 impl EntityAI {
-    fn new(entity: &Rc<RefCell<EntityState>>) -> EntityAI {
+        fn new(entity: &Rc<RefCell<EntityState>>) -> EntityAI {
         EntityAI {
             entity: Rc::clone(entity),
             target: None,

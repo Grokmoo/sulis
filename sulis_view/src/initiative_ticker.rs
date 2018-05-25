@@ -114,8 +114,8 @@ impl WidgetKind for TickerLabel {
         let h = inner_height / (entity.size.height as f32 + 2.0);
         let s = if w > h { h } else { w };
 
-        let cx = x + (inner_width - s) / 2.0 - 2.0;
-        let cy = y + (inner_height - s) / 2.0 - 2.0;
+        let cx = x + (inner_width - s) / 2.0 - 2.0 + entity.actor.actor.race.ticker_offset.0;
+        let cy = y + (inner_height - s) / 2.0 - 2.0 + entity.actor.actor.race.ticker_offset.1;
 
         self.entity.borrow().draw_no_pos(renderer, s, s, cx / s, cy / s, 1.0);
     }

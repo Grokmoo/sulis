@@ -18,6 +18,9 @@ use sulis_core::config::CONFIG;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use EntityState;
 
+const BORDER_SIZE: i32 = 2;
+const BORDER_SIZE_F: f32 = BORDER_SIZE as f32;
+
 #[derive(Clone)]
 pub struct EntityTextureSlot {
     x: i32,
@@ -36,8 +39,8 @@ impl EntityTextureSlot {
         renderer.clear_texture_region(&self.texture_id, self.x * scale, self.y * scale,
                                       (self.x + self.w) * scale, (self.y + self.h) * scale);
 
-        let min_x = self.x as f32 + 1.0;
-        let min_y = self.y as f32 + 1.0;
+        let min_x = self.x as f32 + BORDER_SIZE_F;
+        let min_y = self.y as f32 + BORDER_SIZE_F;
         let scale_x = CONFIG.display.width as f32 / self.slots_dim as f32;
         let scale_y = CONFIG.display.height as f32 / self.slots_dim as f32;
 
@@ -47,7 +50,8 @@ impl EntityTextureSlot {
     pub fn draw(&self, renderer: &mut GraphicsRenderer, x: f32, y: f32,
                      scale_x: f32, scale_y: f32, alpha: f32) {
         let mut list = DrawList::from_texture_id(&self.texture_id, &self.tex_coords,
-                                             x - 1.0, y - 1.0, self.w as f32, self.h as f32);
+                                                 x - BORDER_SIZE_F, y - BORDER_SIZE_F,
+                                                 self.w as f32, self.h as f32);
 
         list.set_scale(scale_x, scale_y);
         list.set_alpha(alpha);
@@ -84,13 +88,13 @@ impl EntityTextureCache {
     /// Adds the specified entity to the cache, finding a slot for the entity and drawing
     /// the entity in that slot.  the returned index is a handle to the slot used by the entity
     pub fn add_entity(&mut self, entity: &EntityState, renderer: &mut GraphicsRenderer) -> EntityTextureSlot {
-        let width = entity.size.width + 2;
-        let height = entity.size.height + 2;
+        let width = entity.size.width + BORDER_SIZE * 2;
+        let height = entity.size.height + BORDER_SIZE * 2;
 
         let slot_index = self.find_slot(width, height);
         let slot = &self.entity_slots[slot_index];
-        let x = slot.x as f32 + 1.0;
-        let y = slot.y as f32 + 1.0;
+        let x = slot.x as f32 + BORDER_SIZE_F;
+        let y = slot.y as f32 + BORDER_SIZE_F;
 
         debug!("Drawing entity to texture {} at {},{}", self.texture_id, x, y);
         let scale_x = CONFIG.display.width as f32 / self.slots_dim as f32;

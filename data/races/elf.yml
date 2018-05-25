@@ -2,7 +2,7 @@ id: elf
 name: Elf
 description: |
   Boasting perhaps the oldest of the known civilizations, the empire of the Elves stretched across most of the known world at its peak.  While those days are long gone, individual elves can still be formidable foes.  They are best used off the front line, as magic users, rogues, or archers.
-size: 3by3
+size: 2by2
 base_stats:
   hit_points: 40
   accuracy: 30
@@ -29,10 +29,24 @@ default_images:
     Background: creatures/human_female_bg
     Ears: creatures/elf_female_ears
     Shadow: creatures/human_female_shadow
+mouseover_offset: [0, -3
+ticker_offset: [0.5, 2]]
 image_layer_offset_scale: 16
 image_layer_offsets:
-  HeldMain: [-16, -8]
-  HeldOff: [17, -6]
+  HeldMain: [-24, -23]
+  HeldOff: [9, -21]
+  Ears: [-8,-15]
+  Hair: [-8,-15]
+  Beard: [-8,-15]
+  Head: [-8,-15]
+  Hands: [-8,-15]
+  Foreground: [-8,-15]
+  Torso: [-8,-15]
+  Legs: [-8,-15]
+  Feet: [-8,-15]
+  Background: [-8,-15]
+  Cloak: [-8,-15]
+  Shadow: [-8,-15]
 image_layer_postfix:
   Female: "_female"
 portrait_selections:

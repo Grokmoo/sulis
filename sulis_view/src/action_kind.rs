@@ -404,6 +404,14 @@ struct MoveAction {
     cb: Option<Box<ScriptCallback>>,
 }
 
+fn entities_to_ignore() -> Vec<usize> {
+    if GameState::is_in_turn_mode() {
+        Vec::new()
+    } else {
+        GameState::party().iter().map(|e| e.borrow().index).collect()
+    }
+}
+
 impl MoveAction {
     fn new_if_valid(x: f32, y: f32, dist: Option<f32>) -> Option<MoveAction> {
         let selected = GameState::selected();
@@ -415,7 +423,7 @@ impl MoveAction {
             Some(dist) => dist,
         };
 
-        if !GameState::can_move_towards_point(&selected[0], Vec::new(), x, y, dist) {
+        if !GameState::can_move_towards_point(&selected[0], entities_to_ignore(), x, y, dist) {
             return None;
         }
 
@@ -431,18 +439,20 @@ impl MoveAction {
 
     fn move_one(&mut self) {
         let cb = self.cb.take();
-        GameState::move_towards_point(&self.selected[0], Vec::new(), self.x, self.y, self.dist, cb);
+        GameState::move_towards_point(&self.selected[0], entities_to_ignore(),
+            self.x, self.y, self.dist, cb);
     }
 
     fn move_all(&mut self) {
-        let entities_to_ignore: Vec<usize> =
-            self.selected.iter().map(|e| e.borrow().index).collect();
+        let entities_to_ignore = entities_to_ignore();
 
         let pc = self.selected.remove(0);
 
         let pc_cur_x = pc.borrow().location.x as f32;
         let pc_cur_y = pc.borrow().location.y as f32;
 
+        // TODO we need to bump party members out of the way if there is any overlap
+        // should be able to use the callback for this
         GameState::move_towards_point(&pc, entities_to_ignore.clone(),
             self.x, self.y, self.dist, None);
 
@@ -473,7 +483,7 @@ impl ActionKind for MoveAction {
         let view = Widget::downcast_kind_mut::<RootView>(&root);
         view.set_prop_window(&root, false, 0);
 
-        if self.cb.is_some() {
+        if self.cb.is_some() || GameState::is_in_turn_mode() {
             self.move_one();
         } else {
             self.move_all();

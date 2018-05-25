@@ -4,7 +4,7 @@ end
 
 function on_player_enter_bridge(parent, target)
   game:log("Enter bridge")
-  game:spawn_encounter_at(49, 81)
+  -- game:spawn_encounter_at(49, 81)
   game:spawn_encounter_at(16, 47)
 end
 

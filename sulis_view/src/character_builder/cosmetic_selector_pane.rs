@@ -186,16 +186,21 @@ impl WidgetKind for CosmeticSelectorPane {
 
     fn draw_graphics_mode(&mut self, renderer: &mut GraphicsRenderer, _pixel_size: Point,
                           _widget: &Widget, millis: u32) {
+        let race = match self.race {
+            None => return,
+            Some(ref race) => race,
+        };
+
         let preview = match self.preview_image {
             None => return,
             Some(ref image) => image,
         };
 
         let child = self.preview.borrow();
-        let scale_x = child.state.inner_size.width as f32 / preview.get_width_f32();
-        let scale_y = child.state.inner_size.height as f32 / preview.get_height_f32();
-        let x = child.state.inner_position.x as f32 / scale_x;
-        let y = child.state.inner_position.y as f32 / scale_y;
+        let scale_x = 0.8 * child.state.inner_size.width as f32 / preview.get_width_f32();
+        let scale_y = 0.8 * child.state.inner_size.height as f32 / preview.get_height_f32();
+        let x = (child.state.inner_position.x as f32) / scale_x + race.ticker_offset.0;
+        let y = (child.state.inner_position.y as f32) / scale_y + race.ticker_offset.1;
         preview.draw(renderer, scale_x, scale_y, x, y, millis);
     }
 

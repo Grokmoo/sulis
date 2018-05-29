@@ -202,6 +202,7 @@ impl WidgetKind for AbilitySelectorPane {
 
         let pane = Rc::new(RefCell::new(AbilitiesPane::new()));
         let abilities_pane = Widget::with_defaults(pane.clone());
+        abilities_pane.borrow_mut().state.background = Some(Rc::clone(&self.choices.background));
         for entry in self.choices.iter() {
             let ability = &entry.ability;
             let position = entry.position;

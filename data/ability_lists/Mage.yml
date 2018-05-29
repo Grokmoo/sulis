@@ -1,0 +1,11 @@
+id: mage
+background: magic_circles
+abilities:
+  - id: firebolt
+    position: [0, 4]
+    connect: [ Straight ]
+  - id: flaming_fingers
+    position: [1, 4]
+    connect: [ Straight ]
+  - id: fireball
+    position: [2, 4]

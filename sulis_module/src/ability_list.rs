@@ -18,7 +18,8 @@ use std::slice::Iter;
 use std::rc::Rc;
 use std::io::Error;
 
-use sulis_core::resource::{ResourceBuilder};
+use sulis_core::image::Image;
+use sulis_core::resource::{ResourceBuilder, ResourceSet};
 use sulis_core::util::{invalid_data_error, unable_to_create_error};
 use sulis_core::serde_yaml;
 
@@ -44,6 +45,7 @@ pub struct Entry {
 
 pub struct AbilityList {
     pub id: String,
+    pub background: Rc<Image>,
     entries: Vec<Entry>,
 }
 
@@ -65,8 +67,16 @@ impl AbilityList {
             });
         }
 
+        let background = match ResourceSet::get_image(&builder.background) {
+            None => {
+                warn!("Image '{}' not found", builder.background);
+                return unable_to_create_error("ability_list", &builder.id);
+            }, Some(image) => image,
+        };
+
         Ok(AbilityList {
             id: builder.id,
+            background,
             entries,
         })
     }
@@ -88,6 +98,7 @@ pub struct EntryBuilder {
 #[serde(deny_unknown_fields)]
 pub struct AbilityListBuilder {
     pub id: String,
+    pub background: String,
     abilities: Vec<EntryBuilder>
 }
 

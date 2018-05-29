@@ -106,17 +106,17 @@ children:
             text: "Select an Ability"
           ability_pane:
             from: .ability_pane
-            position: [160, 10]
-            preferred_size: [-160, -10]
+            position: [140, 10]
+            preferred_size: [-140, -10]
             width_relative: Max
             height_relative: Max
           abilities_pane:
             border: [1, 1, 1, 1]
-            preferred_size: [150, -10]
+            preferred_size: [120, -10]
             position: [0, 10]
             height_relative: Max
             custom:
-              grid_size: 14
+              grid_size: 12
               grid_border: 1
               connect_up: abilities/connect_up
               connect_down: abilities/connect_down
@@ -126,7 +126,7 @@ children:
                 from: .button
                 background: background_inner
                 foreground: ability_overlay
-                preferred_size: [12, 12]
+                preferred_size: [11, 11]
                 x_relative: Custom
                 y_relative: Custom
                 children:
@@ -317,7 +317,7 @@ children:
           preview:
             background: bg_transparent_base
             border: [3, 3, 3, 3]
-            preferred_size: [21, 21]
+            preferred_size: [30, 30]
             position: [124, 55]
           name_label:
             from: .label

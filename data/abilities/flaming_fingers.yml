@@ -7,4 +7,5 @@ active:
   script: "flaming_fingers"
   ap: 20
   duration: 0
-
+prereqs:
+  abilities: [ "firebolt" ]

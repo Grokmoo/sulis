@@ -1,4 +1,5 @@
 id: fighter
+background: empty
 abilities:
   - id: impenetrable_defense
     position: [0, 0]

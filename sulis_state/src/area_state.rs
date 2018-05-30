@@ -814,8 +814,10 @@ impl AreaState {
         loop {
             let mut area_pos_valid = true;
 
+            let area_pos_y = area_pos.y as f32;
             for text in self.feedback_text.iter() {
-                if text.area_pos().y == area_pos.y {
+                let text_pos_y = text.area_pos().y as f32 - text.cur_hover_y();
+                if (area_pos_y - text_pos_y).abs() < 0.7 {
                     area_pos.y -= 1;
                     area_pos_valid = false;
                     break;

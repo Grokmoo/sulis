@@ -64,6 +64,8 @@ impl AreaFeedbackText {
 
     pub fn area_pos(&self) -> Point { self.area_pos }
 
+    pub fn cur_hover_y(&self) -> f32 { self.hover_y }
+
     pub fn update(&mut self) {
         let frac = util::get_elapsed_millis(self.start_time.elapsed()) as f32 / self.duration as f32;
 

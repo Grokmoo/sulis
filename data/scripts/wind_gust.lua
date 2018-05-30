@@ -91,7 +91,10 @@ function push_target(parent, ability, targets)
 	total_dist = dist
   end
   
-  game:log("damage based on potential push of " .. tostring(pushback_dist - total_dist))
+  push_damage_base = pushback_dist - total_dist
+  if push_damage_base > 0 then
+    target:take_damage(push_damage_base * 4 - 2, push_damage_base * 4 + 2, "Crushing")
+  end
   
   -- return if the result is to not move the target
   if dest_x == target_x and dest_y == target_y then

@@ -20,7 +20,7 @@ use sulis_core::config::CONFIG;
 use sulis_core::resource::ResourceSet;
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::ui::{Color, LineRenderer};
-use sulis_core::util;
+use sulis_core::util::{self, Point};
 
 pub struct AreaFeedbackText {
     pos_x: f32,
@@ -35,14 +35,18 @@ pub struct AreaFeedbackText {
 
     hover_y: f32,
     alpha: f32,
+
+    area_pos: Point,
 }
 
 impl AreaFeedbackText {
-    pub fn new(text: String, pos_x: f32, pos_y: f32, color: Color, move_rate: f32) -> AreaFeedbackText {
+    pub fn new(area_pos: Point, text: String,
+               pos_x: f32, pos_y: f32, color: Color, move_rate: f32) -> AreaFeedbackText {
         let font = ResourceSet::get_default_font();
         let text_width = font.get_width(&text) as f32 / font.line_height as f32;
 
         AreaFeedbackText {
+            area_pos,
             text,
             text_width,
             pos_x,
@@ -57,6 +61,8 @@ impl AreaFeedbackText {
             alpha: 1.0,
         }
     }
+
+    pub fn area_pos(&self) -> Point { self.area_pos }
 
     pub fn update(&mut self) {
         let frac = util::get_elapsed_millis(self.start_time.elapsed()) as f32 / self.duration as f32;

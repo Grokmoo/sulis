@@ -50,6 +50,10 @@ pub trait Animation {
 
     fn get_owner(&self) -> &Rc<RefCell<EntityState>>;
 
+    /// Whether this animation should block further actions from the parent until it
+    /// completes
+    fn is_blocking(&self) -> bool;
+
     fn draw_graphics_mode(&self, _renderer: &mut GraphicsRenderer, _offset_x: f32, _offset_y: f32,
                           _scale_x: f32, _scale_y: f32, _millis: u32) { }
 

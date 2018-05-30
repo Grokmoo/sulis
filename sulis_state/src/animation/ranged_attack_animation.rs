@@ -152,6 +152,8 @@ impl Animation for RangedAttackAnimation {
         }
     }
 
+    fn is_blocking(&self) -> bool { true }
+
     fn mark_for_removal(&mut self) {
         self.marked_for_removal = true;
     }

@@ -96,6 +96,8 @@ impl animation::Animation for EntitySubposAnimation {
         }
     }
 
+    fn is_blocking(&self) -> bool { true }
+
     fn set_callback(&mut self, callback: Option<Box<ScriptCallback>>) {
         self.callback = callback;
     }

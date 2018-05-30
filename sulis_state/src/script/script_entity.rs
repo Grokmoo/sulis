@@ -25,6 +25,7 @@ use rlua::{self, Lua, UserData, UserDataMethods};
 use animation::{Animation, MeleeAttackAnimation};
 use sulis_rules::{AttackKind, DamageKind, Attack};
 use sulis_core::config::CONFIG;
+use sulis_core::ui::color;
 use {ActorState, EntityState, GameState};
 use script::*;
 
@@ -150,12 +151,13 @@ impl UserData for ScriptEntity {
         methods.add_method("weapon_attack", |_, entity, target: ScriptEntity| {
             let target = target.try_unwrap()?;
             let parent = entity.try_unwrap()?;
-            let (_, text, color) = ActorState::weapon_attack(&parent, &target);
+            let (hit_kind, text, color) = ActorState::weapon_attack(&parent, &target);
 
             let area_state = GameState::area_state();
             area_state.borrow_mut().add_feedback_text(text, &target, color, 3.0);
 
-            Ok(())
+            let hit_kind = ScriptHitKind { kind: hit_kind };
+            Ok(hit_kind)
         });
 
         methods.add_method("anim_weapon_attack", |_, entity, (target, callback):
@@ -198,20 +200,53 @@ impl UserData for ScriptEntity {
 
         methods.add_method("special_attack", |_, entity,
                            (target, attack_kind, min_damage, max_damage, damage_kind):
-                           (ScriptEntity, String, u32, u32, String)| {
+                           (ScriptEntity, String, Option<u32>, Option<u32>, Option<String>)| {
             let target = target.try_unwrap()?;
             let parent = entity.try_unwrap()?;
 
-            let damage_kind = DamageKind::from_str(&damage_kind);
+            let damage_kind = match damage_kind {
+                None => DamageKind::Raw,
+                Some(ref kind) => DamageKind::from_str(kind),
+            };
             let attack_kind = AttackKind::from_str(&attack_kind);
+
+            let min_damage = min_damage.unwrap_or(0);
+            let max_damage = max_damage.unwrap_or(0);
 
             let attack = Attack::special(min_damage, max_damage, damage_kind, attack_kind);
 
-            let (_hit_kind, text, color) = ActorState::attack(&parent, &target, &attack);
+            let (hit_kind, text, color) = ActorState::attack(&parent, &target, &attack);
 
             let area_state = GameState::area_state();
             area_state.borrow_mut().add_feedback_text(text, &target, color, 3.0);
 
+            let hit_kind = ScriptHitKind { kind: hit_kind };
+            Ok(hit_kind)
+        });
+
+        methods.add_method("take_damage", |_, entity, (min_damage, max_damage, damage_kind):
+                           (u32, u32, String)| {
+            let parent = entity.try_unwrap()?;
+            let damage_kind = DamageKind::from_str(&damage_kind);
+
+            let attack = Attack::special(min_damage, max_damage, damage_kind, AttackKind::Fortitude);
+            let damage = attack.roll_damage(&parent.borrow().actor.stats.armor,
+                Module::rules().hit_damage_multiplier);
+
+            let (text, color) = if !damage.is_empty() {
+                let mut total = 0;
+                for (_, amount) in damage {
+                    total += amount;
+                }
+
+                parent.borrow_mut().remove_hp(total);
+                (format!("{}", total), color::RED)
+            } else {
+                ("0".to_string(), color::GRAY)
+            };
+
+            let area_state = GameState::area_state();
+            area_state.borrow_mut().add_feedback_text(text, &parent, color, 3.0);
             Ok(())
         });
 

@@ -610,14 +610,15 @@ impl GameState {
         })
     }
 
-    pub fn has_active_animations(entity: &Rc<RefCell<EntityState>>) -> bool {
+    pub fn has_blocking_animations(entity: &Rc<RefCell<EntityState>>) -> bool {
         ANIMATIONS.with(|a| {
             let anims = a.borrow();
 
             for anim in anims.iter() {
-                if *anim.get_owner().borrow() == *entity.borrow() {
-                    return true;
-                }
+                if !anim.is_blocking() { continue; }
+                if !Rc::ptr_eq(anim.get_owner(), entity) { continue; }
+
+                return true;
             }
             false
         })

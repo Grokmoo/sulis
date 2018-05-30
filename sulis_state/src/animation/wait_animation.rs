@@ -51,6 +51,8 @@ impl animation::Animation for WaitAnimation {
         util::get_elapsed_millis(self.start_time.elapsed()) < self.duration
     }
 
+    fn is_blocking(&self) -> bool { true }
+
     fn get_owner(&self) -> &Rc<RefCell<EntityState>> {
         &self.owner
     }

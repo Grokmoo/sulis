@@ -49,6 +49,18 @@ groups:
       slash3: [40, 0]
       slash4: [60, 0]
       slash5: [80, 0]
+  wind:
+    size: [8, 8]
+    position: [20, 56]
+    areas:
+      wind1: [0, 0]
+      wind2: [8, 0]
+      wind3: [16, 0]
+      wind4: [24, 0]
+      wind5: [32, 0]
+      wind6: [40, 0]
+      wind7: [48, 0]
+      wind8: [56, 0]
   whirlwind:
     size: [48, 48]
     position: [0, 80]

@@ -51,7 +51,7 @@ impl AI {
         }
 
         if let Some(ref mut ai) = self.ai {
-            if !GameState::has_active_animations(&ai.entity) {
+            if !GameState::has_blocking_animations(&ai.entity) {
                 ai.next();
                 ai.take_action();
             }

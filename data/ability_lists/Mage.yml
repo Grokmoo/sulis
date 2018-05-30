@@ -14,3 +14,6 @@ abilities:
 
   - id: slow
     position: [9, 4]
+
+  - id: wind_gust
+    position: [4, 0]

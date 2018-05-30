@@ -137,6 +137,8 @@ impl animation::Animation for MoveAnimation {
         true
     }
 
+    fn is_blocking(&self) -> bool { true }
+
     fn mark_for_removal(&mut self) {
         self.marked_for_removal = true;
         self.mover.borrow_mut().sub_pos = (0.0, 0.0);

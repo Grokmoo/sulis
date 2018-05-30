@@ -382,6 +382,10 @@ impl ParticleGenerator {
 
 impl animation::Animation for ParticleGenerator {
     fn update(&mut self, _root: &Rc<RefCell<Widget>>) -> bool {
+        if self.model.moves_with_parent && self.owner.borrow().actor.is_dead() {
+            return false;
+        }
+
         let secs = util::get_elapsed_millis(self.start_time.elapsed()) as f32 / 1000.0;
         let frame_time_secs = secs - self.previous_secs;
 
@@ -466,6 +470,8 @@ impl animation::Animation for ParticleGenerator {
             renderer.draw(draw_list);
         }
     }
+
+    fn is_blocking(&self) -> bool { false }
 
     fn set_callback(&mut self, callback: Option<Box<ScriptCallback>>) {
         self.callback = callback;

@@ -22,6 +22,15 @@ groups:
       fire6: [40, 0]
       fire7: [48, 0]
       fire8: [56, 0]
+  slow:
+    size: [20, 20]
+    position: [121, 20]
+    areas:
+      slow1: [0, 0]
+      slow2: [20, 0]
+      slow3: [40, 0]
+      slow4: [60, 0]
+      slow5: [80, 0]
   shield:
     size: [20, 20]
     position: [20, 12]

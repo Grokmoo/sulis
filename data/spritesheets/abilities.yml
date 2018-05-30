@@ -36,3 +36,5 @@ groups:
       whirlwind_attack: [0, 5]
       
       flaming_fingers: [0, 6]
+      fire_shield: [1, 6]
+      slow: [2, 6]

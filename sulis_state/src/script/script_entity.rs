@@ -108,7 +108,6 @@ impl UserData for ScriptEntity {
         methods.add_method("targets", &targets);
 
         methods.add_method("create_effect", |_, entity, args: (String, u32)| {
-            info!("Got here");
             let duration = args.1;
             let ability = args.0;
             let index = entity.try_unwrap_index()?;

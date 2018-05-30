@@ -14,11 +14,13 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::collections::HashMap;
+
 use rlua::{Lua, UserData, UserDataMethods};
 
 use sulis_rules::{BonusList, Damage, DamageKind};
 
-use script::{Result, script_particle_generator, ScriptParticleGenerator};
+use script::{CallbackData, Result, script_particle_generator, ScriptParticleGenerator};
 use {Effect, GameState};
 
 #[derive(Clone)]
@@ -27,6 +29,7 @@ pub struct ScriptEffect {
     name: String,
     duration: u32,
     pub bonuses: BonusList,
+    callback: Option<CallbackData>,
 }
 
 impl ScriptEffect {
@@ -36,6 +39,7 @@ impl ScriptEffect {
             name: name.to_string(),
             duration,
             bonuses: BonusList::default(),
+            callback: None,
         }
     }
 }
@@ -51,6 +55,18 @@ impl UserData for ScriptEffect {
         methods.add_method_mut("add_damage_of_kind", |_, effect, (min, max, kind): (u32, u32, String)| {
             let kind = DamageKind::from_str(&kind);
             effect.bonuses.bonus_damage = Some(Damage { min, max, kind: Some(kind) });
+            Ok(())
+        });
+        methods.add_method_mut("add_armor_of_kind", |_, effect, (value, kind): (u32, String)| {
+            let kind = DamageKind::from_str(&kind);
+            if effect.bonuses.armor_kinds.is_none() {
+                effect.bonuses.armor_kinds = Some(HashMap::new());
+            }
+            effect.bonuses.armor_kinds.as_mut().unwrap().insert(kind, value);
+            Ok(())
+        });
+        methods.add_method_mut("set_callback", |_, effect, cb: CallbackData| {
+            effect.callback = Some(cb);
             Ok(())
         });
     }
@@ -91,6 +107,9 @@ fn apply(_lua: &Lua, effect_data: &ScriptEffect, pgen: Option<ScriptParticleGene
 
     trace!("Apply effect to '{}'", entity.borrow().actor.actor.name);
     let mut effect = Effect::new(&effect_data.name, duration, effect_data.bonuses.clone());
+    if let Some(ref cb) = effect_data.callback {
+        effect.set_callback(Box::new(cb.clone()));
+    }
 
     if let Some(ref pgen) = pgen {
         let pgen = script_particle_generator::create_pgen(&pgen)?;

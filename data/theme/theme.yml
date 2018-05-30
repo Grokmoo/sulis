@@ -45,7 +45,7 @@ children:
   ap_bar:
     y_relative: Max
     x_relative: Center
-    position: [-25, 0]
+    position: [0, -40]
     preferred_size: [0, 8]
     width_relative: ChildSum
     border: [1, 1, 1, 1]
@@ -88,13 +88,45 @@ children:
     y_relative: Max
     width_relative: Max
     children:
+      portrait_pane:
+        preferred_size: [100, 0]
+        height_relative: Max
+        layout: BoxHorizontal
+        children:
+          portrait_view:
+            background: background_rounded
+            x_relative: Max
+            preferred_size: [30, 36]
+            border: [1, 1, 1, 1]
+            children:
+              portrait:
+                width_relative: Max
+                height_relative: Max
+                preferred_size: [0, -6]
+                foreground: "#image#"
+              hp_bar:
+                from: .progress_bar
+                width_relative: Max
+                y_relative: Max
+                preferred_size: [0, 6]
+                text: "#cur_hp# / #max_hp#"
+                text_params:
+                  scale: 5.0
+                  horizontal_alignment: Center
+              level_up:
+                from: .button
+                text: "+"
+                text_params:
+                  scale: 6.0
+                x_relative: Max
+                preferred_size: [7, 7]
       abilities_bar:
         border: [1, 1, 1, 1]
         background: bg_base
-        x_relative: Center
         height_relative: Max
-        position: [0, 00]
-        preferred_size: [150, 0]
+        x_relative: Max
+        position: [-41, 0]
+        preferred_size: [120, 0]
         layout: Grid
         layout_spacing: { top: 0, bottom: 0, left: 0, right: 1 }
         children:
@@ -151,41 +183,6 @@ children:
         from: .bottom_pane.window_button
         position: [0, -26]
         foreground: menu_icon
-  right_pane:
-    background: bg_base
-    border: [2, 2, 2, 2]
-    preferred_size: [35, 0]
-    x_relative: Max
-    height_relative: Max
-    layout: BoxVertical
-    children:
-      portrait_view:
-        background: background_rounded
-        x_relative: Max
-        preferred_size: [30, 36]
-        border: [1, 1, 1, 1]
-        children:
-          portrait:
-            width_relative: Max
-            height_relative: Max
-            preferred_size: [0, -6]
-            foreground: "#image#"
-          hp_bar:
-            from: .progress_bar
-            width_relative: Max
-            y_relative: Max
-            preferred_size: [0, 6]
-            text: "#cur_hp# / #max_hp#"
-            text_params:
-              scale: 5.0
-              horizontal_alignment: Center
-          level_up:
-            from: .button
-            text: "+"
-            text_params:
-              scale: 6.0
-            x_relative: Max
-            preferred_size: [7, 7]
   area:
     preferred_size: [-35, -40]
     width_relative: Max

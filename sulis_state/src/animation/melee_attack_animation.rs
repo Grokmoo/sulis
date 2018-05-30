@@ -21,7 +21,7 @@ use std::time::Instant;
 use sulis_rules::HitKind;
 use sulis_core::util;
 use sulis_core::ui::{Color, Widget};
-use ScriptCallback;
+use {ScriptEntitySet, ScriptCallback};
 use {animation, EntityState, GameState};
 
 pub struct MeleeAttackAnimation {
@@ -77,10 +77,21 @@ impl animation::Animation for MeleeAttackAnimation {
         let millis = util::get_elapsed_millis(self.start_time.elapsed());
         let frac = millis as f32 / self.total_time_millis as f32;
 
+        let cb_targets = ScriptEntitySet::new(&self.defender, &vec![Some(Rc::clone(&self.attacker))]);
         if !self.has_attacked && frac > 0.5 {
             if let Some(ref cb) = self.callback.as_ref() {
-                cb.before_attack();
+                cb.before_attack(&cb_targets);
             }
+            self.attacker.borrow().actor.effects_iter().for_each(|effect| {
+                if let Some(ref cb) = effect.callback {
+                    cb.before_attack(&cb_targets);
+                }
+            });
+            self.defender.borrow().actor.effects_iter().for_each(|effect| {
+                if let Some(ref cb) = effect.callback {
+                    cb.before_defense(&cb_targets);
+                }
+            });
 
             let area_state = GameState::area_state();
 
@@ -90,8 +101,18 @@ impl animation::Animation for MeleeAttackAnimation {
             self.has_attacked = true;
 
             if let Some(ref cb) = self.callback.as_ref() {
-                cb.after_attack(hit_kind);
+                cb.after_attack(&cb_targets, hit_kind);
             }
+            self.attacker.borrow().actor.effects_iter().for_each(|effect| {
+                if let Some(ref cb) = effect.callback {
+                    cb.after_attack(&cb_targets, hit_kind);
+                }
+            });
+            self.defender.borrow().actor.effects_iter().for_each(|effect| {
+                if let Some(ref cb) = effect.callback {
+                    cb.after_defense(&cb_targets);
+                }
+            });
         }
 
         let mut attacker = self.attacker.borrow_mut();

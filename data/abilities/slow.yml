@@ -1,0 +1,9 @@
+id: slow
+name: "Slow"
+icon: abilities/slow
+description: |
+  Your target must succeed at a Mental Resistance check or become slowed for 2 rounds, losing action points.
+active:
+  script: "slow"
+  ap: 30
+  duration: 2

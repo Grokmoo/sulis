@@ -1,0 +1,30 @@
+function on_activate(parent, ability)
+  effect = parent:create_effect(ability:name(), ability:duration())
+  effect:add_armor_of_kind(5, "Fire")
+
+  cb = ability:create_callback(parent)
+  cb:set_after_defense_fn("after_defense")
+  effect:set_callback(cb)
+
+  gen = parent:create_particle_generator("fire_particle", duration)
+  gen:set_moves_with_parent()
+  gen:set_gen_rate(gen:param(70.0))
+  gen:set_position(gen:param(-0.25), gen:param(0.0))
+  gen:set_particle_size_dist(gen:fixed_dist(0.5), gen:fixed_dist(0.5))
+  gen:set_particle_position_dist(gen:dist_param(gen:uniform_dist(-0.5, 0.5), gen:uniform_dist(-1.0, 1.0)),
+    gen:dist_param(gen:uniform_dist(0.0, 0.2), gen:uniform_dist(-1.0, 0.0)))
+  gen:set_particle_duration_dist(gen:fixed_dist(0.6))
+  effect:apply(gen)
+
+  ability:activate(parent)
+end
+
+function after_defense(parent, ability, targets)
+  target = targets:first()
+
+  if parent:dist_to_entity(target) > 4.0 then
+    return
+  end
+
+  parent:special_attack(target, "Reflex", 4, 8, "Fire")
+end

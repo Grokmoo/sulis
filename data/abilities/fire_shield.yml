@@ -1,0 +1,9 @@
+id: fire_shield
+name: "Fire Shield"
+icon: abilities/fire_shield
+description: |
+  You are surrounded by a ring of fire, providing resistance to fire based attacks and damaging anyone who gets too close to you.
+active:
+  script: "fire_shield"
+  ap: 20
+  duration: 3

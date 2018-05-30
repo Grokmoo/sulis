@@ -272,10 +272,11 @@ impl WidgetKind for RootView {
 
         let area_widget = Widget::with_defaults(AreaView::new());
 
-        let right_pane = Widget::with_defaults(RightPane::new());
 
         let bot_pane = Widget::empty("bottom_pane");
         {
+            let portrait_pane = Widget::with_defaults(PortraitPane::new());
+
             let end_turn_button = Widget::with_theme(Button::empty(), "end_turn_button");
             end_turn_button.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
                 let root = Widget::get_root(&widget);
@@ -327,7 +328,7 @@ impl WidgetKind for RootView {
             let abilities = Widget::with_defaults(AbilitiesBar::new(GameState::player()));
 
             Widget::add_children_to(&bot_pane, vec![inv_button, cha_button, map_button,
-                                    log_button, men_button, abilities]);
+                                    log_button, men_button, abilities, portrait_pane]);
         }
 
         for pc in GameState::party() {
@@ -345,25 +346,25 @@ impl WidgetKind for RootView {
         let ticker = Widget::with_defaults(InitiativeTicker::new());
 
         // area widget must be the first entry in the children list
-        vec![area_widget, right_pane, bot_pane, ap_bar, ticker]
+        vec![area_widget, bot_pane, ap_bar, ticker]
     }
 }
 
-pub struct RightPane {}
+pub struct PortraitPane {}
 
-impl RightPane {
-    pub fn new() -> Rc<RefCell<RightPane>> {
-        Rc::new(RefCell::new(RightPane {}))
+impl PortraitPane {
+    pub fn new() -> Rc<RefCell<PortraitPane>> {
+        Rc::new(RefCell::new(PortraitPane {}))
     }
 }
 
-impl WidgetKind for RightPane {
-    widget_kind!("right_pane");
+impl WidgetKind for PortraitPane {
+    widget_kind!("portrait_pane");
 
     fn on_remove(&mut self) { }
 
     fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
-        GameState::add_party_listener(ChangeListener::invalidate("right_pane", &widget));
+        GameState::add_party_listener(ChangeListener::invalidate("portrait_pane", &widget));
 
         let mut children = Vec::new();
 

@@ -22,7 +22,7 @@ use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::image::Image;
 use sulis_core::ui::{animation_state, Widget};
 use sulis_core::util;
-use {ActorState, EntityState, GameState, ScriptCallback};
+use {ActorState, EntityState, GameState, ScriptCallback, ScriptEntitySet};
 use animation::Animation;
 
 pub struct RangedAttackAnimation {
@@ -108,9 +108,21 @@ impl Animation for RangedAttackAnimation {
 
         if frac > 1.0 {
             if !self.has_attacked {
+
+                let cb_targets = ScriptEntitySet::new(&self.defender, &vec![Some(Rc::clone(&self.attacker))]);
                 if let Some(ref cb) = self.callback.as_ref() {
-                    cb.before_attack();
+                    cb.before_attack(&cb_targets);
                 }
+                self.attacker.borrow().actor.effects_iter().for_each(|effect| {
+                    if let Some(ref cb) = effect.callback {
+                        cb.before_attack(&cb_targets);
+                    }
+                });
+                self.defender.borrow().actor.effects_iter().for_each(|effect| {
+                    if let Some(ref cb) = effect.callback {
+                        cb.before_defense(&cb_targets);
+                    }
+                });
 
                 let area_state = GameState::area_state();
 
@@ -119,8 +131,18 @@ impl Animation for RangedAttackAnimation {
                 self.has_attacked = true;
 
                 if let Some(ref cb) = self.callback.as_ref() {
-                    cb.after_attack(hit_kind);
+                    cb.after_attack(&cb_targets, hit_kind);
                 }
+                self.attacker.borrow().actor.effects_iter().for_each(|effect| {
+                    if let Some(ref cb) = effect.callback {
+                        cb.after_attack(&cb_targets, hit_kind);
+                    }
+                });
+                self.defender.borrow().actor.effects_iter().for_each(|effect| {
+                    if let Some(ref cb) = effect.callback {
+                        cb.after_defense(&cb_targets);
+                    }
+                });
             }
             false
         } else {

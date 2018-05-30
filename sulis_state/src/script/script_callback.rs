@@ -29,14 +29,20 @@ use {EntityState, GameState};
 enum FuncKind {
     BeforeAttack,
     AfterAttack,
+    AfterDefense,
+    BeforeDefense,
     OnAnimComplete,
     OnAnimUpdate,
 }
 
 pub trait ScriptCallback {
-    fn before_attack(&self) { }
+    fn after_defense(&self, _targets: &ScriptEntitySet) { }
 
-    fn after_attack(&self, _hit_kind: HitKind) { }
+    fn before_defense(&self, _targets: &ScriptEntitySet) { }
+
+    fn before_attack(&self, _targets: &ScriptEntitySet) { }
+
+    fn after_attack(&self, _targets: &ScriptEntitySet, _hit_kind: HitKind) { }
 
     fn on_anim_complete(&mut self) { }
 
@@ -66,11 +72,11 @@ impl CallbackData {
         }
     }
 
-    fn get_params(&self) -> (Rc<RefCell<EntityState>>, Rc<Ability>, ScriptEntitySet) {
+    fn get_params(&self) -> (Rc<RefCell<EntityState>>, Rc<Ability>) {
         let area_state = GameState::area_state();
         let parent = area_state.borrow().get_entity(self.parent);
         let ability = Module::ability(&self.ability_id).unwrap();
-        (parent, ability, self.targets.clone())
+        (parent, ability)
     }
 
     fn add_func(&mut self, kind: FuncKind, name: String) -> Result<()> {
@@ -80,24 +86,44 @@ impl CallbackData {
 }
 
 impl ScriptCallback for CallbackData {
-    fn before_attack(&self) {
+    fn after_defense(&self, targets: &ScriptEntitySet) {
+        let func = match self.funcs.get(&FuncKind::AfterDefense) {
+            None => return,
+            Some(ref func) => func.to_string(),
+        };
+
+        let (parent, ability) = self.get_params();
+        GameState::execute_ability_script(&parent, &ability, targets.clone(), &func);
+    }
+
+    fn before_defense(&self, targets: &ScriptEntitySet) {
+        let func = match self.funcs.get(&FuncKind::BeforeDefense) {
+            None => return,
+            Some(ref func) => func.to_string(),
+        };
+
+        let (parent, ability) = self.get_params();
+        GameState::execute_ability_script(&parent, &ability, targets.clone(), &func);
+    }
+
+    fn before_attack(&self, targets: &ScriptEntitySet) {
         let func = match self.funcs.get(&FuncKind::BeforeAttack) {
             None => return,
             Some(ref func) => func.to_string(),
         };
 
-        let (parent, ability, targets) = self.get_params();
-        GameState::execute_ability_script(&parent, &ability, targets, &func);
+        let (parent, ability) = self.get_params();
+        GameState::execute_ability_script(&parent, &ability, targets.clone(), &func);
     }
 
-    fn after_attack(&self, hit_kind: HitKind) {
+    fn after_attack(&self, targets: &ScriptEntitySet, hit_kind: HitKind) {
         let func = match self.funcs.get(&FuncKind::AfterAttack) {
             None => return,
             Some(ref func) => func.to_string(),
         };
 
-        let (parent, ability, targets) = self.get_params();
-        GameState::execute_ability_after_attack(&parent, &ability, targets, hit_kind, &func);
+        let (parent, ability) = self.get_params();
+        GameState::execute_ability_after_attack(&parent, &ability, targets.clone(), hit_kind, &func);
     }
 
     fn on_anim_complete(&mut self) {
@@ -106,8 +132,8 @@ impl ScriptCallback for CallbackData {
             Some(ref func) => func.to_string(),
         };
 
-        let (parent, ability, targets) = self.get_params();
-        GameState::execute_ability_script(&parent, &ability, targets, &func);
+        let (parent, ability) = self.get_params();
+        GameState::execute_ability_script(&parent, &ability, self.targets.clone(), &func);
     }
 
     fn on_anim_update(&self) {
@@ -116,8 +142,8 @@ impl ScriptCallback for CallbackData {
             Some(ref func) => func.to_string(),
         };
 
-        let (parent, ability, targets) = self.get_params();
-        GameState::execute_ability_script(&parent, &ability, targets, &func);
+        let (parent, ability) = self.get_params();
+        GameState::execute_ability_script(&parent, &ability, self.targets.clone(), &func);
     }
 }
 
@@ -145,6 +171,10 @@ impl UserData for CallbackData {
                                |_, cb, func: String| cb.add_func(FuncKind::BeforeAttack, func));
         methods.add_method_mut("set_after_attack_fn",
                                |_, cb, func: String| cb.add_func(FuncKind::AfterAttack, func));
+        methods.add_method_mut("set_before_defense_fn",
+                               |_, cb, func: String| cb.add_func(FuncKind::BeforeDefense, func));
+        methods.add_method_mut("set_after_defense_fn",
+                               |_, cb, func: String| cb.add_func(FuncKind::AfterDefense, func));
         methods.add_method_mut("set_on_anim_update_fn",
                                |_, cb, func: String| cb.add_func(FuncKind::OnAnimUpdate, func));
         methods.add_method_mut("set_on_anim_complete_fn",

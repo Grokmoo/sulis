@@ -9,3 +9,8 @@ abilities:
     connect: [ Straight ]
   - id: fireball
     position: [2, 4]
+  - id: fire_shield
+    position: [0, 3]
+
+  - id: slow
+    position: [9, 4]

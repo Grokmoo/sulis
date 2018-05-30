@@ -15,6 +15,7 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use sulis_rules::BonusList;
+use script::ScriptCallback;
 use ChangeListenerList;
 
 use ROUND_TIME_MILLIS;
@@ -25,6 +26,7 @@ pub struct Effect {
     total_duration: u32,
 
     bonuses: BonusList,
+    pub callback: Option<Box<ScriptCallback>>,
 
     pub listeners: ChangeListenerList<Effect>,
     pub removal_listeners: ChangeListenerList<Effect>,
@@ -39,7 +41,12 @@ impl Effect {
             bonuses,
             listeners: ChangeListenerList::default(),
             removal_listeners: ChangeListenerList::default(),
+            callback: None,
         }
+    }
+
+    pub fn set_callback(&mut self, cb: Box<ScriptCallback>) {
+        self.callback = Some(cb);
     }
 
     pub fn update(&mut self, millis_elapsed: u32) {

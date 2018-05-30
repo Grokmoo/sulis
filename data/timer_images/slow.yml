@@ -1,0 +1,8 @@
+id: slow
+frame_time_millis: 100
+frames:
+  - particles/slow1
+  - particles/slow2
+  - particles/slow3
+  - particles/slow4
+  - particles/slow5

@@ -33,6 +33,7 @@ enum FuncKind {
     BeforeDefense,
     OnAnimComplete,
     OnAnimUpdate,
+    OnRoundElapsed,
 }
 
 pub trait ScriptCallback {
@@ -44,9 +45,11 @@ pub trait ScriptCallback {
 
     fn after_attack(&self, _targets: &ScriptEntitySet, _hit_kind: HitKind) { }
 
-    fn on_anim_complete(&mut self) { }
+    fn on_anim_complete(&self) { }
 
     fn on_anim_update(&self) { }
+
+    fn on_round_elapsed(&self) { }
 }
 
 #[derive(Clone)]
@@ -126,7 +129,7 @@ impl ScriptCallback for CallbackData {
         GameState::execute_ability_after_attack(&parent, &ability, targets.clone(), hit_kind, &func);
     }
 
-    fn on_anim_complete(&mut self) {
+    fn on_anim_complete(&self) {
         let func = match self.funcs.get(&FuncKind::OnAnimComplete) {
             None => return,
             Some(ref func) => func.to_string(),
@@ -138,6 +141,16 @@ impl ScriptCallback for CallbackData {
 
     fn on_anim_update(&self) {
         let func = match self.funcs.get(&FuncKind::OnAnimUpdate) {
+            None => return,
+            Some(ref func) => func.to_string(),
+        };
+
+        let (parent, ability) = self.get_params();
+        GameState::execute_ability_script(&parent, &ability, self.targets.clone(), &func);
+    }
+
+    fn on_round_elapsed(&self) {
+        let func = match self.funcs.get(&FuncKind::OnRoundElapsed) {
             None => return,
             Some(ref func) => func.to_string(),
         };
@@ -179,6 +192,8 @@ impl UserData for CallbackData {
                                |_, cb, func: String| cb.add_func(FuncKind::OnAnimUpdate, func));
         methods.add_method_mut("set_on_anim_complete_fn",
                                |_, cb, func: String| cb.add_func(FuncKind::OnAnimComplete, func));
+        methods.add_method_mut("set_on_round_elapsed_fn",
+                               |_, cb, func: String| cb.add_func(FuncKind::OnRoundElapsed, func));
     }
 }
 

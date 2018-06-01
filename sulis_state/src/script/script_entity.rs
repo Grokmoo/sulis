@@ -256,6 +256,15 @@ impl UserData for ScriptEntity {
             Ok(())
         });
 
+        methods.add_method("heal_damage", |_, entity, amount: u32| {
+            let parent = entity.try_unwrap()?;
+            parent.borrow_mut().actor.add_hp(amount);
+            let area_state = GameState::area_state();
+            area_state.borrow_mut().add_feedback_text(format!("{}", amount), &parent, color::GREEN, 3.0);
+
+            Ok(())
+        });
+
         methods.add_method("change_overflow_ap", |_, entity, ap| {
             let entity = entity.try_unwrap()?;
             entity.borrow_mut().actor.change_overflow_ap(ap);

@@ -20,8 +20,8 @@ use sulis_module::{Actor, Area, LootList, Module, ObjectSize};
 use sulis_module::area::{EncounterData, PropData, Transition, TriggerKind};
 use sulis_core::util::{Point};
 
-use {AreaFeedbackText, calculate_los, ChangeListenerList, EntityState, GameState,
-    Location, Merchant, PropState, Targeter, TurnTimer};
+use {ActorState, AreaFeedbackText, calculate_los, ChangeListenerList, EntityState, GameState,
+    Location, Merchant, PropState, ScriptCallback, Targeter, TurnTimer};
 
 use std::{ptr};
 use std::slice::Iter;
@@ -35,7 +35,7 @@ struct TriggerState {
 pub struct AreaState {
     pub area: Rc<Area>,
     pub listeners: ChangeListenerList<AreaState>,
-    pub turn_timer: TurnTimer,
+    turn_timer: Rc<RefCell<TurnTimer>>,
 
     entities: Vec<Option<Rc<RefCell<EntityState>>>>,
     props: Vec<Option<PropState>>,
@@ -69,6 +69,10 @@ impl PartialEq for AreaState {
 }
 
 impl AreaState {
+    pub fn turn_timer(&self) -> Rc<RefCell<TurnTimer>> {
+        Rc::clone(&self.turn_timer)
+    }
+
     pub fn get_merchant(&self, id: &str) -> Option<&Merchant> {
         let mut index = None;
         for (i, merchant) in self.merchants.iter().enumerate() {
@@ -155,7 +159,7 @@ impl AreaState {
             entities: Vec::new(),
             props: Vec::new(),
             triggers: Vec::new(),
-            turn_timer: TurnTimer::default(),
+            turn_timer: Rc::new(RefCell::new(TurnTimer::default())),
             transition_grid,
             entity_grid,
             prop_grid,
@@ -221,7 +225,7 @@ impl AreaState {
             }
         }
 
-        let turn_timer = TurnTimer::new(&self);
+        let turn_timer = Rc::new(RefCell::new(TurnTimer::new(&self)));
         self.turn_timer = turn_timer;
         trace!("Set up turn timer for area.");
 
@@ -591,7 +595,7 @@ impl AreaState {
             self.compute_pc_visibility(&entity, 0, 0);
         }
 
-        self.turn_timer.add(&entity, &self.area);
+        self.turn_timer.borrow_mut().add(&entity, &self.area);
         self.entities[new_index] = Some(entity);
 
         self.listeners.notify(&self);
@@ -630,7 +634,7 @@ impl AreaState {
             self.check_trigger_grid(&entity);
         }
 
-        self.turn_timer.check_ai_activation(entity, &self.area);
+        self.turn_timer.borrow_mut().check_ai_activation(entity, &self.area);
     }
 
     fn clear_entity_points(&mut self, entity: &EntityState, x: i32, y: i32) {
@@ -703,15 +707,16 @@ impl AreaState {
         Rc::clone(&entity.as_ref().unwrap())
     }
 
-    pub (crate) fn update(&mut self, millis: u32) -> Option<&Rc<RefCell<EntityState>>> {
+    pub (crate) fn update(&mut self, millis: u32) -> (Vec<Rc<ScriptCallback>>, Option<Rc<RefCell<EntityState>>>) {
         let elapsed_millis = millis - self.last_time_millis;
         self.last_time_millis = millis;
 
-        let real_time = !self.turn_timer.is_active();
+        let real_time = !self.turn_timer.borrow().is_active();
 
         // removal does not shuffle the vector around, so we can safely just iterate
         let mut notify = false;
         let len = self.entities.len();
+        let mut cbs_to_fire = Vec::new();
         for index in 0..len {
             let entity = {
                 let entity = match &self.entities[index].as_ref() {
@@ -720,7 +725,7 @@ impl AreaState {
                 };
 
                 if real_time {
-                    entity.borrow_mut().actor.update(elapsed_millis);
+                    cbs_to_fire.append(&mut ActorState::update(entity, elapsed_millis));
                 } else {
                     entity.borrow_mut().actor.check_removal();
                 }
@@ -765,7 +770,7 @@ impl AreaState {
             self.listeners.notify(&self);
         }
 
-        self.turn_timer.current()
+        (cbs_to_fire, self.turn_timer.borrow().current())
     }
 
     pub(crate) fn remove_entity(&mut self, entity: &Rc<RefCell<EntityState>>) {
@@ -785,7 +790,7 @@ impl AreaState {
         let y = entity.borrow().location.y;
         self.clear_entity_points(&*entity.borrow(), x, y);
         self.entities[index] = None;
-        self.turn_timer.remove(entity);
+        self.turn_timer.borrow_mut().remove(entity);
     }
 
     fn find_prop_index_to_add(&mut self) -> usize {

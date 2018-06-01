@@ -1,0 +1,11 @@
+id: crush
+frame_time_millis: 100
+frames:
+  - particles/crush1
+  - particles/crush2
+  - particles/crush3
+  - particles/crush4
+  - particles/crush5
+  - particles/crush6
+  - particles/crush7
+  - particles/crush8

@@ -12,6 +12,7 @@ groups:
       tenacious_soul: [2, 0]
       resilient_body: [3, 0]
       backstory: [4, 0]
+      crush: [5, 0]
       
       lightning_reflexes: [0, 1]
       stunning_blow: [1, 1]
@@ -26,12 +27,8 @@ groups:
       leap: [5, 2]
       wind_gust: [6, 2]
       rock_armor: [7, 2]
-
-      already_selected: [0, 3]
-      prereqs_not_met: [1, 3]
-      connect_straight: [2, 3]
-      connect_up: [3, 3]
-      connect_down: [4, 3]
+      
+      heal: [0, 3]
       
       charge_attack: [0, 4]
       
@@ -40,3 +37,9 @@ groups:
       flaming_fingers: [0, 6]
       fire_shield: [1, 6]
       slow: [2, 6]
+
+      already_selected: [0, 7]
+      prereqs_not_met: [1, 7]
+      connect_straight: [2, 7]
+      connect_up: [3, 7]
+      connect_down: [4, 7]

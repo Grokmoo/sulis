@@ -82,16 +82,12 @@ impl animation::Animation for MeleeAttackAnimation {
             if let Some(ref cb) = self.callback.as_ref() {
                 cb.before_attack(&cb_targets);
             }
-            self.attacker.borrow().actor.effects_iter().for_each(|effect| {
-                if let Some(ref cb) = effect.callback {
-                    cb.before_attack(&cb_targets);
-                }
-            });
-            self.defender.borrow().actor.effects_iter().for_each(|effect| {
-                if let Some(ref cb) = effect.callback {
-                    cb.before_defense(&cb_targets);
-                }
-            });
+
+            let defender_cbs = self.defender.borrow().callbacks();
+            let attacker_cbs = self.attacker.borrow().callbacks();
+
+            attacker_cbs.iter().for_each(|cb| cb.before_attack(&cb_targets));
+            defender_cbs.iter().for_each(|cb| cb.before_defense(&cb_targets));
 
             let area_state = GameState::area_state();
 
@@ -103,16 +99,9 @@ impl animation::Animation for MeleeAttackAnimation {
             if let Some(ref cb) = self.callback.as_ref() {
                 cb.after_attack(&cb_targets, hit_kind);
             }
-            self.attacker.borrow().actor.effects_iter().for_each(|effect| {
-                if let Some(ref cb) = effect.callback {
-                    cb.after_attack(&cb_targets, hit_kind);
-                }
-            });
-            self.defender.borrow().actor.effects_iter().for_each(|effect| {
-                if let Some(ref cb) = effect.callback {
-                    cb.after_defense(&cb_targets);
-                }
-            });
+
+            attacker_cbs.iter().for_each(|cb| cb.after_attack(&cb_targets, hit_kind));
+            defender_cbs.iter().for_each(|cb| cb.after_defense(&cb_targets));
         }
 
         let mut attacker = self.attacker.borrow_mut();

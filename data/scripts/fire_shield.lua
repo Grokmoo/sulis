@@ -4,7 +4,7 @@ function on_activate(parent, ability)
 
   cb = ability:create_callback(parent)
   cb:set_after_defense_fn("after_defense")
-  effect:set_callback(cb)
+  effect:add_callback(cb)
 
   gen = parent:create_particle_generator("fire_particle", duration)
   gen:set_moves_with_parent()

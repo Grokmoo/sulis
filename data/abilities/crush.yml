@@ -1,0 +1,9 @@
+id: crush
+name: "Crush"
+icon: abilities/crush
+description: |
+  A large chunk of stone erupts from the ground, damaging a single target.
+active:
+  script: "crush"
+  ap: 20
+  duration: 0

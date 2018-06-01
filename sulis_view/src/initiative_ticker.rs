@@ -59,19 +59,18 @@ impl WidgetKind for InitiativeTicker {
 
     fn on_remove(&mut self) {
         let area_state = GameState::area_state();
-        let mut area_state = area_state.borrow_mut();
-        area_state.turn_timer.listeners.remove(NAME);
+        let turn_timer = area_state.borrow().turn_timer();
+        turn_timer.borrow_mut().listeners.remove(NAME);
     }
 
     fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let area_state = GameState::area_state();
-        let mut area_state = area_state.borrow_mut();
-        let timer = &mut area_state.turn_timer;
-        timer.listeners.add(ChangeListener::invalidate(NAME, widget));
+        let timer = area_state.borrow().turn_timer();
+        timer.borrow_mut().listeners.add(ChangeListener::invalidate(NAME, widget));
 
         let mut widgets: Vec<Rc<RefCell<Widget>>> = Vec::new();
         let mut first = true;
-        for entity in timer.active_iter() {
+        for entity in timer.borrow().active_iter() {
             let theme = match first {
                 true => "current_entry",
                 false => "entry",

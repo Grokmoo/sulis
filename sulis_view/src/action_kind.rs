@@ -329,13 +329,13 @@ impl ActionKind for AttackAction {
 }
 
 struct ActionCallback {
-    action: Box<ActionKind>,
+    action: Rc<RefCell<Box<ActionKind>>>,
     widget: Rc<RefCell<Widget>>,
 }
 
 impl ScriptCallback for ActionCallback {
-    fn on_anim_complete(&mut self) {
-        self.action.fire_action(&self.widget);
+    fn on_anim_complete(&self) {
+        self.action.borrow_mut().fire_action(&self.widget);
     }
 }
 
@@ -380,7 +380,7 @@ impl ActionKind for MoveThenAction {
     fn fire_action(&mut self, widget: &Rc<RefCell<Widget>>) {
         let action = match self.cb_action.take() {
             None => return,
-            Some(action) => action,
+            Some(action) => Rc::new(RefCell::new(action)),
         };
 
         let cb = ActionCallback {

@@ -98,6 +98,10 @@ impl EntityState {
         }
     }
 
+    pub fn callbacks(&self) -> Vec<Rc<ScriptCallback>> {
+        self.actor.effects_iter().flat_map(|effect| effect.callbacks()).collect()
+    }
+
     pub fn custom_flags<'a>(&'a self) -> Iter<'a, String> {
         self.custom_flags.iter()
     }
@@ -257,7 +261,8 @@ impl EntityState {
             return false;
         }
 
-        if area_state.turn_timer.is_active() && squares > 0 {
+        let turn_timer = area_state.turn_timer();
+        if turn_timer.borrow().is_active() && squares > 0 {
             let ap_cost = self.actor.get_move_ap_cost(squares);
             if self.actor.ap() < ap_cost {
                 return false;

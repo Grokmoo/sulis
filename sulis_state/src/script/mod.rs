@@ -300,7 +300,8 @@ fn activate(_lua: &Lua, ability: &ScriptAbility, target: ScriptEntity) -> Result
     let entity = target.try_unwrap()?;
 
     let area_state = GameState::area_state();
-    if area_state.borrow().turn_timer.is_active() {
+    let turn_timer = area_state.borrow().turn_timer();
+    if turn_timer.borrow().is_active() {
         entity.borrow_mut().actor.remove_ap(ability.ap);
     }
 

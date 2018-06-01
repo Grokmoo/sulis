@@ -1,0 +1,11 @@
+id: heal
+frame_time_millis: 100
+frames:
+  - particles/heal1
+  - particles/heal2
+  - particles/heal3
+  - particles/heal4
+  - particles/heal5
+  - particles/heal6
+  - particles/heal7
+  - particles/heal8

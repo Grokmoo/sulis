@@ -215,7 +215,8 @@ impl RootView {
     pub fn end_turn(&self) {
         if GameState::is_pc_current() {
             let area_state = GameState::area_state();
-            area_state.borrow_mut().turn_timer.next();
+            let turn_timer = area_state.borrow().turn_timer();
+            turn_timer.borrow_mut().next();
         }
     }
 }
@@ -287,7 +288,8 @@ impl WidgetKind for RootView {
 
             let end_turn_button_ref = Rc::clone(&end_turn_button);
             let area_state = GameState::area_state();
-            area_state.borrow_mut().turn_timer.listeners.add(
+            let turn_timer = area_state.borrow().turn_timer();
+            turn_timer.borrow_mut().listeners.add(
                 ChangeListener::new(NAME, Box::new(move |timer| {
                     let enabled = match timer.current() {
                         None => false,

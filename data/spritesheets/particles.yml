@@ -31,6 +31,18 @@ groups:
       slow3: [40, 0]
       slow4: [60, 0]
       slow5: [80, 0]
+  heal:
+    size: [12, 12]
+    position: [121, 41]
+    areas:
+      heal1: [0, 0]
+      heal2: [12, 0]
+      heal3: [24, 0]
+      heal4: [36, 0]
+      heal5: [48, 0]
+      heal6: [60, 0]
+      heal7: [72, 0]
+      heal8: [84, 0]
   shield:
     size: [20, 20]
     position: [20, 12]
@@ -70,6 +82,18 @@ groups:
       whirlwind3: [96, 0]
       whirlwind4: [144, 0]
       whirlwind5: [192, 0]
+  crush:
+    size: [32, 32]
+    position: [0, 130]
+    areas:
+      crush1: [0, 0]
+      crush2: [32, 0]
+      crush3: [64, 0]
+      crush4: [96, 0]
+      crush5: [128, 0]
+      crush6: [160, 0]
+      crush7: [192, 0]
+      crush8: [224, 0]
   crossed_swords:
     size: [20, 20]
     position: [121, 0]

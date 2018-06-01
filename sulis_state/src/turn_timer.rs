@@ -22,7 +22,7 @@ pub use std::collections::vec_deque::Iter;
 
 use sulis_module::{Area, Faction};
 
-use {AreaState, ChangeListenerList, EntityState, GameState};
+use {ActorState, AreaState, ChangeListenerList, EntityState, GameState};
 
 pub const ROUND_TIME_MILLIS: u32 = 5000;
 
@@ -52,7 +52,7 @@ impl TurnTimer {
 
         if let Some(entity) = entities.front() {
             debug!("Starting turn for '{}'", entity.borrow().actor.actor.name);
-            entity.borrow_mut().actor.init_turn();
+            ActorState::init_actor_turn(&entity);
         }
 
         debug!("Got {} entities for turn timer", entities.len());
@@ -145,7 +145,7 @@ impl TurnTimer {
 
             if !entity.borrow().is_party_member() { continue; }
 
-            entity.borrow_mut().actor.init_turn();
+            ActorState::init_actor_turn(entity);
 
             // TODO don't just heal at the end of combat
             entity.borrow_mut().actor.init();
@@ -175,7 +175,7 @@ impl TurnTimer {
         self.entities.push_back(Rc::clone(entity));
         if self.entities.len() == 1 {
             // we just pushed the only entity
-            entity.borrow_mut().actor.init_turn();
+            ActorState::init_actor_turn(entity);
         }
         self.check_ai_activation(entity, area);
         self.listeners.notify(&self);
@@ -193,10 +193,13 @@ impl TurnTimer {
         }
     }
 
-    pub fn current(&self) -> Option<&Rc<RefCell<EntityState>>> {
+    pub fn current(&self) -> Option<Rc<RefCell<EntityState>>> {
         if !self.active { return None; }
 
-        self.entities.front()
+        match self.entities.front() {
+            None => None,
+            Some(ref entity) => Some(Rc::clone(entity)),
+        }
     }
 
     pub fn next(&mut self) {
@@ -224,8 +227,10 @@ impl TurnTimer {
         }
 
         if let Some(current) = self.entities.front() {
-            current.borrow_mut().actor.init_turn();
-            current.borrow_mut().actor.update(ROUND_TIME_MILLIS);
+            ActorState::init_actor_turn(&current);
+            let cbs_to_fire = ActorState::update(&current, ROUND_TIME_MILLIS);
+            cbs_to_fire.iter().for_each(|cb| cb.on_round_elapsed());
+
             if current.borrow().is_party_member() {
                 GameState::set_selected_party_member(Rc::clone(current));
             } else {

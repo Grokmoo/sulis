@@ -14,6 +14,8 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::rc::Rc;
+
 use sulis_rules::BonusList;
 use script::ScriptCallback;
 use ChangeListenerList;
@@ -26,7 +28,7 @@ pub struct Effect {
     total_duration: u32,
 
     bonuses: BonusList,
-    pub callback: Option<Box<ScriptCallback>>,
+    callbacks: Vec<Rc<ScriptCallback>>,
 
     pub listeners: ChangeListenerList<Effect>,
     pub removal_listeners: ChangeListenerList<Effect>,
@@ -41,21 +43,29 @@ impl Effect {
             bonuses,
             listeners: ChangeListenerList::default(),
             removal_listeners: ChangeListenerList::default(),
-            callback: None,
+            callbacks: Vec::new(),
         }
     }
 
-    pub fn set_callback(&mut self, cb: Box<ScriptCallback>) {
-        self.callback = Some(cb);
+    pub fn callbacks(&self) -> Vec<Rc<ScriptCallback>> {
+        self.callbacks.clone()
     }
 
-    pub fn update(&mut self, millis_elapsed: u32) {
-        let cur_mod = self.cur_duration % ROUND_TIME_MILLIS;
+    pub fn add_callback(&mut self, cb: Rc<ScriptCallback>) {
+        self.callbacks.push(cb);
+    }
+
+    /// Updates the effect time.  returns true if a round has elapsed
+    pub fn update(&mut self, millis_elapsed: u32) -> bool {
+        let cur_mod = self.cur_duration / ROUND_TIME_MILLIS;
 
         self.cur_duration += millis_elapsed;
 
-        if cur_mod != self.cur_duration % ROUND_TIME_MILLIS {
+        if cur_mod != self.cur_duration / ROUND_TIME_MILLIS {
             self.listeners.notify(&self);
+            true
+        } else {
+            false
         }
     }
 

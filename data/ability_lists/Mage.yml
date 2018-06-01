@@ -13,10 +13,14 @@ abilities:
     position: [0, 3]
 
   - id: slow
-    position: [9, 4]
-
+    position: [8, 4]
+  - id: heal
+    position: [8, 3]
+    
   - id: wind_gust
     position: [4, 0]
     
   - id: rock_armor
     position: [4, 8]
+  - id: crush
+    position: [3, 8]

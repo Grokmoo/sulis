@@ -213,8 +213,9 @@ impl GameState {
             let mut state = state.borrow_mut();
             let state = state.as_mut().unwrap();
 
-            if !state.area_state.borrow().turn_timer.is_active() {
-                entity.borrow_mut().actor.init_turn();
+            let turn_timer = state.area_state.borrow().turn_timer();
+            if !turn_timer.borrow().is_active() {
+                ActorState::init_actor_turn(&entity);
             }
 
             entity.borrow_mut().set_party_member(true);
@@ -431,7 +432,7 @@ impl GameState {
         }
 
         let pc_state = Rc::clone(area_state.borrow().get_last_entity().unwrap());
-        pc_state.borrow_mut().actor.init_turn();
+        ActorState::init_actor_turn(&pc_state);
 
         let path_finder = PathFinder::new(&area_state.borrow().area);
 
@@ -565,23 +566,25 @@ impl GameState {
             }
         });
 
-        let active_entity = STATE.with(|s| {
+        let (cbs, active_entity) = STATE.with(|s| {
             let mut state = s.borrow_mut();
             let state = state.as_mut().unwrap();
 
             let mut area_state = state.area_state.borrow_mut();
 
-            let result = area_state.update(millis);
+            let (cbs, active_entity) = area_state.update(millis);
             // TODO check for whole party death
             // if state.selected.borrow().actor.is_dead() {
             //     area_state.turn_timer.set_active(false);
             // }
 
-            match result {
-                None => None,
-                Some(ref entity) => Some(Rc::clone(entity)),
+            match active_entity {
+                None => (cbs, None),
+                Some(ref entity) => (cbs, Some(Rc::clone(entity))),
             }
         });
+
+        cbs.iter().for_each(|cb| cb.on_round_elapsed());
 
         // clear animations for the active entity when entering combat
         if GameState::check_clear_entering_combat() {
@@ -635,15 +638,16 @@ impl GameState {
     /// Returns true if the game is currently in turn mode, false otherwise
     pub fn is_in_turn_mode() -> bool {
         let area_state = GameState::area_state();
-        let area_state = area_state.borrow();
-        area_state.turn_timer.is_active()
+        let turn_timer = area_state.borrow().turn_timer();
+        let turn_timer = turn_timer.borrow();
+        turn_timer.is_active()
     }
 
     /// Returns true if the PC has the current turn, false otherwise
     pub fn is_pc_current() -> bool {
         let area_state = GameState::area_state();
-        let area_state = area_state.borrow();
-        if let Some(entity) = area_state.turn_timer.current() {
+        let turn_timer = area_state.borrow().turn_timer();
+        if let Some(entity) = turn_timer.borrow().current() {
             return entity.borrow().is_party_member();
         }
         false
@@ -651,8 +655,8 @@ impl GameState {
 
     pub fn is_current(entity: &Rc<RefCell<EntityState>>) -> bool {
         let area_state = GameState::area_state();
-        let area_state = area_state.borrow();
-        if let Some(ref current) = area_state.turn_timer.current() {
+        let turn_timer = area_state.borrow().turn_timer();
+        if let Some(ref current) = turn_timer.borrow().current() {
             return Rc::ptr_eq(current, entity);
         }
         false

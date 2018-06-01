@@ -24,7 +24,7 @@ use sulis_core::image::{LayeredImage};
 use sulis_core::ui::{color, Color};
 use sulis_module::{item, Actor, Module};
 use sulis_rules::{Attack, AttackKind, HitKind, StatList};
-use {AbilityState, ChangeListenerList, Effect, EntityState, GameState, Inventory, ItemState};
+use {AbilityState, ChangeListenerList, Effect, EntityState, GameState, Inventory, ItemState, ScriptCallback};
 
 pub struct ActorState {
     pub actor: Rc<Actor>,
@@ -464,6 +464,17 @@ impl ActorState {
         self.listeners.notify(&self);
     }
 
+    pub(crate) fn add_hp(&mut self, hp: u32) {
+        let hp = hp as i32;
+        if hp + self.hp > self.stats.max_hp {
+            self.hp = self.stats.max_hp;
+        } else {
+            self.hp += hp;
+        }
+
+        self.listeners.notify(&self);
+    }
+
     pub fn check_removal(&mut self) {
         let start_len = self.effects.len();
 
@@ -474,16 +485,26 @@ impl ActorState {
         }
     }
 
-    pub fn update(&mut self, millis_elapsed: u32) {
-        for effect in self.effects.iter_mut() {
-            effect.update(millis_elapsed);
+    pub fn update(entity: &Rc<RefCell<EntityState>>, millis_elapsed: u32) -> Vec<Rc<ScriptCallback>> {
+        let mut cbs_to_fire = Vec::new();
+
+        {
+            let actor = &mut entity.borrow_mut().actor;
+            for effect in actor.effects.iter_mut() {
+                if effect.update(millis_elapsed) {
+                    // round timer changed for effect
+                    cbs_to_fire.append(&mut effect.callbacks());
+                }
+            }
+
+            for (_, ability_state) in actor.ability_states.iter_mut() {
+                ability_state.update(millis_elapsed);
+            }
         }
 
-        for (_, ability_state) in self.ability_states.iter_mut() {
-            ability_state.update(millis_elapsed);
-        }
+        entity.borrow_mut().actor.check_removal();
 
-        self.check_removal();
+        cbs_to_fire
     }
 
     pub fn add_effect(&mut self, effect: Effect) {
@@ -520,7 +541,12 @@ impl ActorState {
         }
 
         self.ap = ap;
+
         self.listeners.notify(&self);
+    }
+
+    pub fn init_actor_turn(entity: &Rc<RefCell<EntityState>>) {
+        entity.borrow_mut().actor.init_turn();
     }
 
     pub fn end_turn(&mut self) {

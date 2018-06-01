@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::rc::Rc;
 use std::collections::HashMap;
 
 use rlua::{Lua, UserData, UserDataMethods};
@@ -30,7 +31,7 @@ pub struct ScriptEffect {
     name: String,
     duration: u32,
     pub bonuses: BonusList,
-    callback: Option<CallbackData>,
+    callbacks: Vec<CallbackData>,
 }
 
 impl ScriptEffect {
@@ -40,7 +41,7 @@ impl ScriptEffect {
             name: name.to_string(),
             duration,
             bonuses: BonusList::default(),
-            callback: None,
+            callbacks: Vec::new(),
         }
     }
 }
@@ -88,8 +89,8 @@ impl UserData for ScriptEffect {
 
             Ok(())
         });
-        methods.add_method_mut("set_callback", |_, effect, cb: CallbackData| {
-            effect.callback = Some(cb);
+        methods.add_method_mut("add_callback", |_, effect, cb: CallbackData| {
+            effect.callbacks.push(cb);
             Ok(())
         });
     }
@@ -131,8 +132,8 @@ fn apply(effect_data: &ScriptEffect, pgen: Option<ScriptParticleGenerator>,
 
     trace!("Apply effect to '{}'", entity.borrow().actor.actor.name);
     let mut effect = Effect::new(&effect_data.name, duration, effect_data.bonuses.clone());
-    if let Some(ref cb) = effect_data.callback {
-        effect.set_callback(Box::new(cb.clone()));
+    for cb in effect_data.callbacks.iter() {
+        effect.add_callback(Rc::new(cb.clone()));
     }
 
     if let Some(ref pgen) = pgen {

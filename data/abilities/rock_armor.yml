@@ -1,0 +1,9 @@
+id: rock_armor
+name: "Rock Armor"
+icon: abilities/rock_armor
+description: |
+  Your body is surrounded by a tough layer of rock, granting you a significant armor bonus but making it more difficult to move.
+active:
+  script: "rock_armor"
+  ap: 20
+  duration: 2

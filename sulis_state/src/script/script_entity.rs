@@ -120,6 +120,12 @@ impl UserData for ScriptEntity {
             Ok(ScriptSubposAnimation::new(index, duration_secs))
         });
 
+        methods.add_method("create_color_anim", |_, entity, duration_secs: Option<f32>| {
+            let index = entity.try_unwrap_index()?;
+            let duration = duration_secs.unwrap_or(f32::INFINITY);
+            Ok(ScriptColorAnimation::new(index, duration))
+        });
+
         methods.add_method("create_particle_generator", |_, entity, args: (String, Option<f32>)| {
             let duration_secs = args.1.unwrap_or(f32::INFINITY);
             let sprite = args.0;

@@ -92,6 +92,7 @@ pub struct DrawList {
     pub texture_min_filter: TextureMinFilter,
     pub kind: DrawListKind,
     pub color_filter: [f32; 4],
+    pub color_sec: [f32; 4],
     pub scale: [f32; 2],
     pub color_swap_enabled: bool,
     pub swap_hue: f32,
@@ -107,6 +108,7 @@ impl Default for DrawList {
             texture_min_filter: TextureMinFilter::Linear,
             kind: DrawListKind::Sprite,
             color_filter: [1.0, 1.0, 1.0, 1.0],
+            color_sec: [0.0, 0.0, 0.0, 0.0],
             scale: [1.0, 1.0],
             color_swap_enabled: false,
             swap_hue: 0.0,
@@ -192,6 +194,11 @@ impl DrawList {
     #[inline]
     pub fn set_color(&mut self, color: Color) {
         self.color_filter = [color.r, color.g, color.b, color.a];
+    }
+
+    #[inline]
+    pub fn set_color_sec(&mut self, color: Color) {
+        self.color_sec = [color.r, color.g, color.b, color.a];
     }
 
     #[inline]

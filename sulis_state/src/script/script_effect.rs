@@ -18,9 +18,10 @@ use std::collections::HashMap;
 
 use rlua::{Lua, UserData, UserDataMethods};
 
-use sulis_rules::{BonusList, Damage, DamageKind};
+use sulis_rules::{Attribute, BonusList, Damage, DamageKind};
 
-use script::{CallbackData, Result, script_particle_generator, ScriptParticleGenerator};
+use script::{CallbackData, Result, script_particle_generator, ScriptParticleGenerator,
+    script_color_animation, ScriptColorAnimation};
 use {Effect, GameState};
 
 #[derive(Clone)]
@@ -46,7 +47,14 @@ impl ScriptEffect {
 
 impl UserData for ScriptEffect {
     fn add_methods(methods: &mut UserDataMethods<Self>) {
-        methods.add_method("apply", &apply);
+        // TODO refactor ScriptParticleGenerator, ScriptColorAnimation, and ScriptSubposAnimation
+        // to all implement a common trait
+        methods.add_method("apply_with_color_anim", |_, effect, anim: Option<ScriptColorAnimation>| {
+            apply(effect, None, anim)
+        });
+        methods.add_method("apply", |_, effect, pgen: Option<ScriptParticleGenerator>| {
+            apply(effect, pgen, None)
+        });
         methods.add_method_mut("add_num_bonus", &add_num_bonus);
         methods.add_method_mut("add_damage", |_, effect, (min, max): (u32, u32)| {
             effect.bonuses.bonus_damage = Some(Damage { min, max, kind: None });
@@ -63,6 +71,21 @@ impl UserData for ScriptEffect {
                 effect.bonuses.armor_kinds = Some(HashMap::new());
             }
             effect.bonuses.armor_kinds.as_mut().unwrap().insert(kind, value);
+            Ok(())
+        });
+        methods.add_method_mut("add_attribute_bonus", |_, effect, (attr, amount): (String, i8)| {
+            let attr = match Attribute::from(&attr) {
+                None => {
+                    warn!("Invalid attribute {} in script", attr);
+                    return Ok(());
+                }, Some(attr) => attr,
+            };
+            if effect.bonuses.attributes.is_none() {
+                effect.bonuses.attributes = Some(Vec::new());
+            }
+
+            effect.bonuses.attributes.as_mut().unwrap().push((attr, amount));
+
             Ok(())
         });
         methods.add_method_mut("set_callback", |_, effect, cb: CallbackData| {
@@ -97,7 +120,8 @@ fn add_num_bonus(_lua: &Lua, effect: &mut ScriptEffect, args: (String, f32)) -> 
 
 const TURNS_TO_MILLIS: u32 = 5000;
 
-fn apply(_lua: &Lua, effect_data: &ScriptEffect, pgen: Option<ScriptParticleGenerator>) -> Result<()> {
+fn apply(effect_data: &ScriptEffect, pgen: Option<ScriptParticleGenerator>,
+         anim: Option<ScriptColorAnimation>) -> Result<()> {
     let area_state = GameState::area_state();
     let area_state = area_state.borrow();
 
@@ -115,6 +139,12 @@ fn apply(_lua: &Lua, effect_data: &ScriptEffect, pgen: Option<ScriptParticleGene
         let pgen = script_particle_generator::create_pgen(&pgen)?;
         pgen.add_removal_listener(&mut effect);
         GameState::add_animation(Box::new(pgen));
+    }
+
+    if let Some(ref anim) = anim {
+        let anim = script_color_animation::create_anim(&anim)?;
+        anim.add_removal_listener(&mut effect);
+        GameState::add_animation(Box::new(anim));
     }
 
     entity.borrow_mut().actor.add_effect(effect);

@@ -23,6 +23,7 @@ use sulis_module::Area;
 
 use animation::{Animation, MeleeAttackAnimation, RangedAttackAnimation};
 use sulis_core::io::GraphicsRenderer;
+use sulis_core::ui::{color, Color};
 use sulis_core::util::Point;
 use sulis_module::{Actor, ObjectSize, ObjectSizeIterator, Module};
 use sulis_module::area::Transition;
@@ -45,6 +46,8 @@ pub struct EntityState {
     pub size: Rc<ObjectSize>,
     pub index: usize, // index in vec of the owning area state
     pub sub_pos: (f32, f32),
+    pub color: Color,
+    pub color_sec: Color,
     pub listeners: ChangeListenerList<EntityState>,
 
     ai_state: AIState,
@@ -83,6 +86,8 @@ impl EntityState {
             actor: actor_state,
             location,
             sub_pos: (0.0, 0.0),
+            color: color::WHITE,
+            color_sec: Color::new(0.0, 0.0, 0.0, 0.0),
             size,
             index,
             listeners: ChangeListenerList::default(),
@@ -348,8 +353,10 @@ impl EntityState {
 
     pub fn draw_no_pos(&self, renderer: &mut GraphicsRenderer,
                    scale_x: f32, scale_y: f32, x: f32, y: f32, alpha: f32) {
+        let a = self.color.a * alpha;
+        let color = Color::new(self.color.r, self.color.g, self.color.b, a);
         if let Some(ref slot) = self.texture_cache_slot {
-            slot.draw(renderer, x, y, scale_x, scale_y, alpha);
+            slot.draw(renderer, x, y, scale_x, scale_y, color, self.color_sec);
         }
     }
 }
@@ -381,10 +388,11 @@ impl AreaDrawable for EntityState {
         let x = x + self.location.x as f32 + self.sub_pos.0;
         let y = y + self.location.y as f32 + self.sub_pos.1;
 
+        let a = self.color.a * alpha;
+        let color = Color::new(self.color.r, self.color.g, self.color.b, a);
         if let Some(ref slot) = self.texture_cache_slot {
-            slot.draw(renderer, x, y, scale_x, scale_y, alpha);
+            slot.draw(renderer, x, y, scale_x, scale_y, color, self.color_sec);
         }
-        // self.actor.draw_graphics_mode(renderer, scale_x, scale_y, x, y, millis);
     }
 
     fn location(&self) -> &Location {

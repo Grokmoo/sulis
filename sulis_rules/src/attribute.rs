@@ -40,6 +40,17 @@ pub struct AttributeList {
     pub wisdom: u8,
 }
 
+fn get_new_val(cur: u8, delta: i8) -> u8 {
+    let val = cur as i16 + delta as i16;
+    if val > 255 {
+        255
+    } else if val < 0 {
+        0
+    } else {
+        val as u8
+    }
+}
+
 impl AttributeList {
     pub fn new(base_value: u8) -> AttributeList {
         AttributeList {
@@ -78,20 +89,20 @@ impl AttributeList {
         }
     }
 
-    pub fn add_all(&mut self, attrs: &Vec<(Attribute, u8)>) {
+    pub fn add_all(&mut self, attrs: &Vec<(Attribute, i8)>) {
         for &(attr, value) in attrs.iter() {
             self.add(attr, value);
         }
     }
 
-    pub fn add(&mut self, attr: Attribute, value: u8) {
+    pub fn add(&mut self, attr: Attribute, value: i8) {
         match attr {
-            Strength => self.strength += value,
-            Dexterity => self.dexterity += value,
-            Endurance => self.endurance += value,
-            Perception => self.perception += value,
-            Intellect => self.intellect += value,
-            Wisdom => self.wisdom += value,
+            Strength => self.strength = get_new_val(self.strength, value),
+            Dexterity => self.dexterity = get_new_val(self.dexterity, value),
+            Endurance => self.endurance = get_new_val(self.endurance, value),
+            Perception => self.perception = get_new_val(self.perception, value),
+            Intellect => self.intellect = get_new_val(self.intellect, value),
+            Wisdom => self.wisdom = get_new_val(self.wisdom, value),
         }
     }
 

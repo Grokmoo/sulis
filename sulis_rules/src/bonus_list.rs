@@ -21,7 +21,7 @@ use {Attribute, Damage, DamageKind};
 #[derive(Deserialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct BonusList {
-    pub attributes: Option<Vec<(Attribute, u8)>>,
+    pub attributes: Option<Vec<(Attribute, i8)>>,
     pub ap: Option<i32>,
     pub attack: Option<AttackBuilder>,
     pub base_armor: Option<u32>,

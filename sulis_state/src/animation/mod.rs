@@ -19,6 +19,9 @@ use std::cmp;
 use std::rc::Rc;
 use std::cell::RefCell;
 
+mod entity_color_animation;
+pub use self::entity_color_animation::EntityColorAnimation;
+
 mod entity_subpos_animation;
 pub use self::entity_subpos_animation::EntitySubposAnimation;
 

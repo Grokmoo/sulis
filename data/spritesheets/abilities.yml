@@ -25,6 +25,7 @@ groups:
       fireball: [4, 2]
       leap: [5, 2]
       wind_gust: [6, 2]
+      rock_armor: [7, 2]
 
       already_selected: [0, 3]
       prereqs_not_met: [1, 3]

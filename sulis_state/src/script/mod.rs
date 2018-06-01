@@ -32,6 +32,9 @@ pub use self::script_entity::ScriptEntitySet;
 mod script_inventory;
 pub use self::script_inventory::ScriptInventory;
 
+mod script_color_animation;
+use self::script_color_animation::ScriptColorAnimation;
+
 mod script_particle_generator;
 use self::script_particle_generator::ScriptParticleGenerator;
 

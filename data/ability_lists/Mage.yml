@@ -17,3 +17,6 @@ abilities:
 
   - id: wind_gust
     position: [4, 0]
+    
+  - id: rock_armor
+    position: [4, 8]

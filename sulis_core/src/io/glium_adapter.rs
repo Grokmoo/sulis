@@ -52,9 +52,10 @@ const FRAGMENT_SHADER_SRC: &'static str = r#"
   out vec4 color;
   uniform sampler2D tex;
   uniform vec4 color_filter;
+  uniform vec4 color_sec;
 
   void main() {
-    color = color_filter * texture(tex, v_tex_coords);
+    color = color_filter * texture(tex, v_tex_coords) + color_sec;
   }
 "#;
 
@@ -158,6 +159,7 @@ fn draw_to_surface<T: glium::Surface>(surface: &mut T, draw_list: DrawList,
         matrix: display.matrix,
         tex: (glium_texture.sampler_fn)(glium_texture.texture.sampled()),
         color_filter: draw_list.color_filter,
+        color_sec: draw_list.color_sec,
         swap_hue: draw_list.swap_hue,
         scale: [
             [draw_list.scale[0], 0.0, 0.0, 0.0],
@@ -176,7 +178,10 @@ fn draw_to_surface<T: glium::Surface>(surface: &mut T, draw_list: DrawList,
         &display.base_program
     };
 
-    surface.draw(&vertex_buffer, &indices, program, &uniforms, params).unwrap();
+    match surface.draw(&vertex_buffer, &indices, program, &uniforms, params) {
+        Ok(()) => (),
+        Err(e) => error!("Error drawing to surface: {:?}", e),
+    }
 }
 
 impl<'a> GraphicsRenderer for GliumRenderer<'a> {

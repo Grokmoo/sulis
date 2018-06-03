@@ -414,4 +414,4 @@ groups:
       60_red_transparent_fill: [1, 212, 5, 5]
       80_red_transparent_fill: [9, 212, 5, 5]
       
-      magic_circles: [ 0, 1024, 512, 512 ]
+      magic_circles: [ 0, 1024, 504, 504 ]

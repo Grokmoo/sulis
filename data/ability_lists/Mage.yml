@@ -3,24 +3,22 @@ background: magic_circles
 abilities:
   - id: firebolt
     position: [0, 4]
-    connect: [ Straight ]
   - id: flaming_fingers
     position: [1, 4]
-    connect: [ Straight ]
   - id: fireball
     position: [2, 4]
   - id: fire_shield
-    position: [0, 3]
+    position: [1.15, 3]
 
   - id: slow
     position: [8, 4]
   - id: heal
-    position: [8, 3]
+    position: [7.85, 3]
     
   - id: wind_gust
     position: [4, 0]
     
   - id: rock_armor
-    position: [4, 8]
+    position: [4, 7]
   - id: crush
-    position: [3, 8]
+    position: [4, 8]

@@ -14,7 +14,7 @@ children:
         text_params:
           scale: 5.5
   character_builder:
-    preferred_size: [240, 150]
+    preferred_size: [240, 170]
     border: { top: 6, bottom: 8, right: 6, left: 6 }
     x_relative: Center
     y_relative: Center
@@ -112,12 +112,11 @@ children:
             height_relative: Max
           abilities_pane:
             border: [1, 1, 1, 1]
-            preferred_size: [120, -10]
+            preferred_size: [135, 135]
             position: [0, 10]
-            height_relative: Max
             custom:
-              grid_size: 12
-              grid_border: 1
+              grid_size: 15
+              grid_border: 2
               connect_up: abilities/connect_up
               connect_down: abilities/connect_down
               connect_straight: abilities/connect_straight

@@ -1,0 +1,9 @@
+id: shock
+name: "Shock"
+icon: abilities/shock
+description: |
+  A powerful jolt of electricity zaps the target creature.
+active:
+  script: "shock"
+  ap: 20
+  duration: 0

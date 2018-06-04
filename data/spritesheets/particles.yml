@@ -1,6 +1,6 @@
 id: particles
 src: "particles.png"
-size: [ 128, 128 ]
+size: [ 512, 256 ]
 simple_image_gen_scale: 4
 groups:
   misc:
@@ -103,3 +103,23 @@ groups:
       crossed_swords3: [40, 0]
       crossed_swords4: [60, 0]
       crossed_swords5: [80, 0]
+  shock:
+    size: [64, 64]
+    position: [0, 192]
+    areas:
+      shock1: [0, 0]
+      shock2: [64, 0]
+      shock3: [128, 0]
+      shock4: [196, 0]
+      shock5: [256, 0]
+      shock6: [320, 0]
+  teleport:
+    size: [32, 48]
+    position: [222, 0]
+    areas:
+      teleport1: [0, 0]
+      teleport2: [32, 0]
+      teleport3: [64, 0]
+      teleport4: [96, 0]
+      teleport5: [128, 0]
+      teleport6: [160, 0]

@@ -105,13 +105,20 @@ impl ScriptState {
         self.ability_script(parent, ability, ScriptEntitySet::new(parent, &Vec::new()), t, "on_activate")
     }
 
-    pub fn ability_on_target_select(&self, parent: &Rc<RefCell<EntityState>>,
-                                    ability: &Rc<Ability>, targets: Vec<Option<Rc<RefCell<EntityState>>>>,
-                                    selected_point: Point) -> Result<()> {
+    pub fn ability_on_target_select(&self,
+                                    parent: &Rc<RefCell<EntityState>>,
+                                    ability: &Rc<Ability>,
+                                    targets: Vec<Option<Rc<RefCell<EntityState>>>>,
+                                    selected_point: Point,
+                                    func: &str,
+                                    custom_target: Option<Rc<RefCell<EntityState>>>) -> Result<()> {
         let mut targets = ScriptEntitySet::new(parent, &targets);
         targets.point = Some((selected_point.x, selected_point.y));
-        let t: Option<(&str, usize)> = None;
-        self.ability_script(parent, ability, targets, t,"on_target_select")
+        let arg = match custom_target {
+            None => None,
+            Some(entity) => Some(("custom_target", ScriptEntity::from(&entity))),
+        };
+        self.ability_script(parent, ability, targets, arg, func)
     }
 
     pub fn ability_script<'a, T>(&'a self, parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>,

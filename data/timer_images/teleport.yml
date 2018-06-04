@@ -1,0 +1,9 @@
+id: teleport
+frame_time_millis: 150
+frames:
+  - particles/teleport1
+  - particles/teleport2
+  - particles/teleport3
+  - particles/teleport4
+  - particles/teleport5
+  - particles/teleport6

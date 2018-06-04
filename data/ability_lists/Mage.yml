@@ -4,11 +4,11 @@ abilities:
   - id: firebolt
     position: [0, 4]
   - id: flaming_fingers
-    position: [1, 4]
+    position: [1.05, 4.5]
   - id: fireball
     position: [2, 4]
   - id: fire_shield
-    position: [1.15, 3]
+    position: [1.05, 3.5]
 
   - id: slow
     position: [8, 4]
@@ -17,6 +17,10 @@ abilities:
     
   - id: wind_gust
     position: [4, 0]
+  - id: shock
+    position: [2.5, 1.4]
+  - id: teleport
+    position: [4, 1]
     
   - id: rock_armor
     position: [4, 7]

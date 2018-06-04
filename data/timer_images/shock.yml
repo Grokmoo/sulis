@@ -1,0 +1,9 @@
+id: shock
+frame_time_millis: 100
+frames:
+  - particles/shock1
+  - particles/shock2
+  - particles/shock3
+  - particles/shock4
+  - particles/shock5
+  - particles/shock6

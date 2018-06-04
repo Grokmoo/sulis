@@ -1,0 +1,10 @@
+id: teleport
+name: "Teleport"
+icon: abilities/teleport
+description: |
+  You instantly move yourself or a nearby target (friend or foe) to a new nearby location.
+active:
+  script: "teleport"
+  ap: 10
+  duration: 0
+

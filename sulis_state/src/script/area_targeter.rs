@@ -246,6 +246,8 @@ impl Shape {
 }
 
 pub struct AreaTargeter {
+    on_target_select_func: String,
+    on_target_select_custom_target: Option<Rc<RefCell<EntityState>>>,
     ability: Rc<Ability>,
     parent: Rc<RefCell<EntityState>>,
     selectable: Vec<Rc<RefCell<EntityState>>>,
@@ -298,6 +300,11 @@ impl AreaTargeter {
         };
 
         AreaTargeter {
+            on_target_select_func: data.on_target_select_func.to_string(),
+            on_target_select_custom_target: match data.on_target_select_custom_target {
+                None => None,
+                Some(index) => Some(area_state.get_entity(index)),
+            },
             ability: Module::ability(&data.ability_id).unwrap(),
             parent: area_state.get_entity(data.parent),
             selectable: create_entity_state_vec(&area_state, &data.selectable),
@@ -492,6 +499,7 @@ impl Targeter for AreaTargeter {
             pos.y -= size.height / 2;
         }
 
-        GameState::execute_ability_on_target_select(&self.parent, &self.ability, affected, pos);
+        GameState::execute_ability_on_target_select(&self.parent, &self.ability,
+            affected, pos, &self.on_target_select_func, self.on_target_select_custom_target.clone());
     }
 }

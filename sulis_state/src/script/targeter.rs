@@ -52,6 +52,8 @@ pub struct TargeterData {
     pub show_mouseover: bool,
     pub free_select: Option<f32>,
     pub free_select_must_be_passable: Option<String>,
+    pub on_target_select_func: String,
+    pub on_target_select_custom_target: Option<usize>,
 }
 
 impl TargeterData {
@@ -65,6 +67,8 @@ impl TargeterData {
             show_mouseover: true,
             free_select: None,
             free_select_must_be_passable: None,
+            on_target_select_func: "on_target_select".to_string(),
+            on_target_select_custom_target: None,
         }
     }
 }
@@ -72,6 +76,15 @@ impl TargeterData {
 impl UserData for TargeterData {
     fn add_methods(methods: &mut UserDataMethods<Self>) {
         methods.add_method("activate", &activate);
+        methods.add_method_mut("set_callback_fn", |_, targeter, func: String| {
+            targeter.on_target_select_func = func;
+            Ok(())
+        });
+        methods.add_method_mut("set_callback_custom_target", |_, targeter, target: ScriptEntity| {
+            let index = target.try_unwrap_index()?;
+            targeter.on_target_select_custom_target = Some(index);
+            Ok(())
+        });
         methods.add_method_mut("add_all_selectable", |_, targeter, selectable: ScriptEntitySet| {
             targeter.selectable.append(&mut selectable.indices.clone());
             Ok(())

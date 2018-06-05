@@ -1,0 +1,9 @@
+id: sparkle
+frame_time_millis: 100
+frames:
+  - particles/sparkle1
+  - particles/sparkle2
+  - particles/sparkle3
+  - particles/sparkle4
+  - particles/sparkle5
+  - particles/sparkle6

@@ -14,6 +14,8 @@ abilities:
     position: [8, 4]
   - id: heal
     position: [7.85, 3]
+  - id: luck
+    position: [7, 4]
     
   - id: wind_gust
     position: [4, 0]

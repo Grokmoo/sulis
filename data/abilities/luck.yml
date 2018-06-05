@@ -1,0 +1,9 @@
+id: luck
+name: "Luck"
+icon: abilities/luck
+description: |
+  Calling upon a wellspring of positive energy, you bless all friendly creatures around you with improved accuracy and defense.
+active:
+  script: "luck"
+  ap: 20
+  duration: 4

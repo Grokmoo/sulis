@@ -73,6 +73,16 @@ groups:
       wind6: [40, 0]
       wind7: [48, 0]
       wind8: [56, 0]
+  sparkle:
+    size: [11, 11]
+    position: [21, 65]
+    areas:
+      sparkle1: [0, 0]
+      sparkle2: [11, 0]
+      sparkle3: [22, 0]
+      sparkle4: [33, 0]
+      sparkle5: [44, 0]
+      sparkle6: [44, 0]
   whirlwind:
     size: [48, 48]
     position: [0, 80]

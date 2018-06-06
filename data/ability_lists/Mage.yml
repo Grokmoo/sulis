@@ -11,11 +11,11 @@ abilities:
     position: [1.05, 3.5]
 
   - id: slow
-    position: [8, 4]
+    position: [7.95, 4]
   - id: heal
     position: [7.85, 3]
   - id: luck
-    position: [7, 4]
+    position: [6.95, 4]
     
   - id: wind_gust
     position: [4, 0]
@@ -23,8 +23,12 @@ abilities:
     position: [2.5, 1.4]
   - id: teleport
     position: [4, 1]
+  - id: air_shield
+    position: [5, 1.2]
     
   - id: rock_armor
     position: [4, 7]
   - id: crush
     position: [4, 8]
+  - id: stun
+    position: [5, 6.7]

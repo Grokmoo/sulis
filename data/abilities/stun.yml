@@ -1,0 +1,9 @@
+id: stun
+name: "Stun"
+icon: abilities/stun
+description: |
+  Your target must succeed at a Mental Resistance check or be stunned, losing 6 AP total - causing the target to lose an entire turn's actions.
+active:
+  script: "stun"
+  ap: 30
+  duration: 0

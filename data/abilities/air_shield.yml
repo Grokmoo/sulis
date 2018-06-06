@@ -1,0 +1,9 @@
+id: air_shield
+name: "Air Shield"
+icon: abilities/air_shield
+description: |
+  You are surrounded by a ring of air, providing resistance to electrical and sonic based attacks and a 50% chance to deflect ranged projectiles.
+active:
+  script: "air_shield"
+  ap: 20
+  duration: 3

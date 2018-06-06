@@ -32,6 +32,8 @@ groups:
       shock: [1, 3]
       teleport: [2, 3]
       luck: [3, 3]
+      air_shield: [4, 3]
+      stun: [5, 3]
       
       charge_attack: [0, 4]
       

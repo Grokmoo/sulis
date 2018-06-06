@@ -13,7 +13,7 @@ function on_target_select(parent, ability, targets)
   target = targets:first()
   
   hit = parent:special_attack(target, "Mental")
-  amount = -20
+  amount = -60
   if hit:is_miss() then
     return
   elseif hit:is_graze() then
@@ -24,12 +24,11 @@ function on_target_select(parent, ability, targets)
     amount = amount * 1.5
   end
   
-  effect = target:create_effect(ability:name(), ability:duration())
-  effect:add_num_bonus("ap", amount)
+  target:change_overflow_ap(amount)
   
-  gen = target:create_anim("slow")
+  gen = target:create_anim("burst", 0.15)
   gen:set_moves_with_parent()
-  gen:set_position(gen:param(-0.5), gen:param(-0.5))
-  gen:set_particle_size_dist(gen:fixed_dist(1.0), gen:fixed_dist(1.0))
-  effect:apply(gen)
+  gen:set_position(gen:param(-0.75), gen:param(-0.75))
+  gen:set_particle_size_dist(gen:fixed_dist(1.5), gen:fixed_dist(1.5))
+  gen:activate()
 end

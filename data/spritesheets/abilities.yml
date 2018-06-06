@@ -18,6 +18,7 @@ groups:
       stunning_blow: [1, 1]
       powerful_blows: [2, 1]
       shield_slam: [3, 1]
+      chameleon: [4, 1]
       
       tough_skin: [0, 2]
       elemental_defense: [1, 2]

@@ -216,6 +216,11 @@ impl ActorState {
             }
         };
 
+        if !rules.concealment_roll(target.borrow().actor.stats.concealment) {
+            debug!("Concealment miss");
+            return (HitKind::Miss, "Concealment".to_string(), color::GRAY);
+        }
+
         let hit_kind = rules.attack_roll(accuracy, defense);
 
         let damage_multiplier = match hit_kind {

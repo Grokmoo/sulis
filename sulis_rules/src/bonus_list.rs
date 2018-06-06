@@ -36,6 +36,7 @@ pub struct BonusList {
     pub fortitude: Option<i32>,
     pub reflex: Option<i32>,
     pub will: Option<i32>,
+    pub concealment: Option<i32>,
 }
 
 impl Default for BonusList {
@@ -56,6 +57,7 @@ impl Default for BonusList {
             fortitude: None,
             reflex: None,
             will: None,
+            concealment: None,
         }
     }
 }

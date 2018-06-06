@@ -92,6 +92,13 @@ impl Rules {
             HitKind::Miss
         }
     }
+
+    pub fn concealment_roll(&self, concealment: i32) -> bool {
+        if concealment == 0 { return true; }
+        let roll = rand::thread_rng().gen_range(1, 101);
+        debug!("Concealment roll: {} against {}", roll, concealment);
+        roll > concealment
+    }
 }
 
 impl ResourceBuilder for Rules {

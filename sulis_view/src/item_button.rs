@@ -469,6 +469,7 @@ pub fn add_bonus_text_args(bonuses: &BonusList, widget_state: &mut WidgetState) 
     add_if_present(widget_state, "fortitude", bonuses.fortitude);
     add_if_present(widget_state, "reflex", bonuses.reflex);
     add_if_present(widget_state, "will", bonuses.will);
+    add_if_present(widget_state, "concealment", bonuses.concealment);
 }
 
 fn add_if_present<T: Display>(widget_state: &mut WidgetState, text: &str, val: Option<T>) {

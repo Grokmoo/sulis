@@ -247,6 +247,7 @@ pub fn create_details_text_box(pc: &ActorState) -> Rc<RefCell<Widget>> {
         state.add_text_arg("fortitude", &stats.fortitude.to_string());
         state.add_text_arg("reflex", &stats.reflex.to_string());
         state.add_text_arg("will", &stats.will.to_string());
+        state.add_text_arg("concealment", &stats.concealment.to_string());
     }
     details
 }

@@ -475,6 +475,7 @@ children:
                   [x=0|Wisdom][x=40|#wis#]]
           [s=6|]
           [x=0|Initiative][x=40|#initiative#]
+          [x=0|Concealment|[x=40|#concealment#]
           [?portrait;x=75;y=-3;i=#portrait#;s=30.0|]
           [?portrait;x=75;y=-3;i=portraits/frame;s=30.0|]]
       level_up:
@@ -663,6 +664,7 @@ children:
       ][?fortitude|[s=4.0|Fortitude: #fortitude#]
       ][?reflex|[s=4.0|Reflex: #reflex#]
       ][?will|[s=4.0|Will: #will#]
+      ][?concealment|[s=4.0|Concealment: #concealment#]
       ][?price;s=3.5|
       Price: [c=f00|#price#] Gold
       ][!price;?value;s=3.5|

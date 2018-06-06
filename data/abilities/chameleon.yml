@@ -1,0 +1,9 @@
+id: chameleon
+name: "Chameleon"
+icon: abilities/chameleon
+description: |
+  You gain 50% concealment, causing half of attacks against you to miss, regardless of your opponent's attack rolls.
+active:
+  script: "chameleon"
+  ap: 20
+  duration: 3

@@ -38,6 +38,7 @@ pub struct StatList {
     pub fortitude: i32,
     pub reflex: i32,
     pub will: i32,
+    pub concealment: i32,
 }
 
 impl StatList {
@@ -58,6 +59,7 @@ impl StatList {
             fortitude: 0,
             reflex: 0,
             will: 0,
+            concealment: 0,
         }
     }
 
@@ -114,6 +116,7 @@ impl StatList {
         if let Some(fortitude) = bonuses.fortitude { self.fortitude += fortitude * times_i32; }
         if let Some(reflex) = bonuses.reflex { self.reflex += reflex * times_i32; }
         if let Some(will) = bonuses.will { self.will += will * times_i32; }
+        if let Some(concealment) = bonuses.concealment { self.concealment += concealment * times_i32 }
 
         if let Some(ref attrs) = bonuses.attributes {
             self.attributes.add_all(attrs);

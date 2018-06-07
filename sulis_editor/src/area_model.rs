@@ -30,8 +30,6 @@ use sulis_module::area::*;
 use wall_picker::WallTiles;
 use terrain_picker::TerrainTiles;
 
-pub (crate) const MAX_AREA_SIZE: i32 = 128;
-
 pub struct AreaModel {
     tiles: Vec<(String, Vec<(Point, Rc<Tile>)>)>,
     actors: Vec<(Point, Rc<Actor>)>,
@@ -403,39 +401,44 @@ impl AreaModel {
             actor.draw(renderer, scale_x, scale_y, pos.x as f32 + x, pos.y as f32 + y, millis);
         }
 
-        for ref transition in self.transitions.iter() {
-            let image = &transition.image_display;
-            let x = transition.from.x as f32 + x;
-            let y = transition.from.y as f32 + y;
-            let w = transition.size.width;
-            let h = transition.size.height;
-            let mut draw_list = DrawList::empty_sprite();
-            image.append_to_draw_list(&mut draw_list, &animation_state::NORMAL,
-                                     x, y, w as f32, h as f32, millis);
-            draw_list.set_scale(scale_x, scale_y);
-            renderer.draw(draw_list);
-        }
+        let encounter_sprite = match self.encounter_sprite {
+            None => return,
+            Some(ref sprite) => sprite,
+        };
 
         let font_renderer = match self.font_renderer {
             None => return,
             Some(ref font) => font,
         };
 
-        if let Some(ref encounter_sprite) = self.encounter_sprite {
-            for ref encounter_data in self.encounters.iter() {
-                let x = encounter_data.location.x as f32 + x;
-                let y = encounter_data.location.y as f32 + y;
-                let w = encounter_data.size.width as f32;
-                let h = encounter_data.size.height as f32;
-                let mut draw_list = DrawList::from_sprite_f32(encounter_sprite, x, y, w, h);
-                draw_list.set_scale(scale_x, scale_y);
-                renderer.draw(draw_list);
+        for ref transition in self.transitions.iter() {
+            let x = transition.from.x as f32 + x;
+            let y = transition.from.y as f32 + y;
+            let w = transition.size.width as f32;
+            let h = transition.size.height as f32;
+            let mut draw_list = DrawList::from_sprite_f32(encounter_sprite, x, y, w, h);
+            draw_list.set_scale(scale_x, scale_y);
+            renderer.draw(draw_list);
 
-                let text = format!("{}", encounter_data.encounter.id);
-                let mut draw_list = font_renderer.get_draw_list(&text, x, y, 1.0);
-                draw_list.set_scale(scale_x, scale_y);
-                renderer.draw(draw_list);
-            }
+            let text = format!("to {}", transition.to_area.as_ref().unwrap_or(&"None".to_string()));
+            let mut draw_list = font_renderer.get_draw_list(&text, x, y, 1.0);
+            draw_list.set_scale(scale_x, scale_y);
+            renderer.draw(draw_list);
+        }
+
+        for ref encounter_data in self.encounters.iter() {
+            let x = encounter_data.location.x as f32 + x;
+            let y = encounter_data.location.y as f32 + y;
+            let w = encounter_data.size.width as f32;
+            let h = encounter_data.size.height as f32;
+            let mut draw_list = DrawList::from_sprite_f32(encounter_sprite, x, y, w, h);
+            draw_list.set_scale(scale_x, scale_y);
+            renderer.draw(draw_list);
+
+            let text = format!("{}", encounter_data.encounter.id);
+            let mut draw_list = font_renderer.get_draw_list(&text, x, y, 1.0);
+            draw_list.set_scale(scale_x, scale_y);
+            renderer.draw(draw_list);
         }
     }
 

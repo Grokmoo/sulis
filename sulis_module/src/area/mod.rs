@@ -38,6 +38,8 @@ use sulis_core::serde_yaml;
 
 use {Encounter, Item, Module, ObjectSize, OnTrigger, Prop};
 
+pub const MAX_AREA_SIZE: i32 = 128;
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub enum TriggerKind {
     OnCampaignStart,

@@ -24,8 +24,9 @@ use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
 use sulis_core::util::Point;
 use sulis_widgets::{Label, Spinner};
+use sulis_module::area::MAX_AREA_SIZE;
 
-use {area_model, AreaModel, EditorMode};
+use {AreaModel, EditorMode};
 
 const NAME: &str = "elevation_picker";
 
@@ -70,8 +71,8 @@ impl EditorMode for ElevPicker {
     fn draw(&mut self, renderer: &mut GraphicsRenderer, model: &AreaModel, x_offset: f32, y_offset: f32,
             scale_x: f32, scale_y: f32, _millis: u32) {
         let mut draw_list = DrawList::empty_sprite();
-        for y in 0..area_model::MAX_AREA_SIZE {
-            for x in 0..area_model::MAX_AREA_SIZE {
+        for y in 0..MAX_AREA_SIZE {
+            for x in 0..MAX_AREA_SIZE {
                 let sprite = &self.elev_tiles[model.elevation(x, y) as usize];
                 let x = x as f32 + x_offset;
                 let y = y as f32 + y_offset;

@@ -100,7 +100,7 @@ use sulis_core::config::CONFIG;
 use sulis_core::util::{self, Point};
 use sulis_core::io::{GraphicsRenderer, MainLoopUpdater};
 use sulis_core::ui::{Widget};
-use sulis_module::{Ability, Actor, Module, OnTrigger, area::{Trigger, TriggerKind}};
+use sulis_module::{Ability, Actor, Module, ObjectSize, OnTrigger, area::{Trigger, TriggerKind}};
 
 use script::ScriptEntitySet;
 use script::script_callback::ScriptHitKind;
@@ -360,11 +360,13 @@ impl GameState {
                 }
             }
 
-            let location = Location::new(x, y, &state.area_state.borrow().area);
-
+            let base_location = Location::new(x, y, &state.area_state.borrow().area);
             for entity in state.party.iter() {
-                // TODO find locations for all of the party members
-                state.area_state.borrow_mut().add_entity(Rc::clone(entity), location.clone());
+                entity.borrow_mut().clear_pc_vis();
+                let mut cur_location = base_location.clone();
+                GameState::find_transition_location(&mut cur_location, &entity.borrow().size,
+                                                    &state.area_state.borrow());
+                state.area_state.borrow_mut().add_entity(Rc::clone(entity), cur_location);
             }
 
             state.area_state.borrow_mut().push_scroll_to_callback(Rc::clone(&state.party[0]));
@@ -378,10 +380,33 @@ impl GameState {
         let area_state = GameState::area_state();
         let pc = GameState::player();
         let mut area_state = area_state.borrow_mut();
+        area_state.update_view_visibility();
         if !area_state.on_load_fired {
             area_state.on_load_fired = true;
             GameState::add_ui_callbacks_of_kind(&area_state.area.triggers, TriggerKind::OnAreaLoad, &pc, &pc);
         }
+    }
+
+    fn find_transition_location(location: &mut Location, size: &Rc<ObjectSize>,
+                                area_state: &AreaState) {
+        let (base_x, base_y) = (location.x, location.y);
+        let mut search_size = 0;
+        while search_size < 10 {
+            // TODO this does a lot of unneccesary checking
+            for y in -search_size..search_size+1 {
+                for x in -search_size..search_size+1 {
+                    if area_state.is_passable_size(size, base_x + x, base_y + y) {
+                        location.x = base_x + x;
+                        location.y = base_y + y;
+                        return;
+                    }
+                }
+            }
+
+            search_size += 1;
+        }
+
+        warn!("Unable to find transition locations for all party members");
     }
 
     fn check_location(p: &Point, area_state: &Rc<RefCell<AreaState>>) -> bool {

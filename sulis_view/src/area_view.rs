@@ -196,14 +196,22 @@ impl AreaView {
                            min_x: i32, min_y: i32, max_x: i32, max_y: i32) {
         let mut draw_list = DrawList::empty_sprite();
 
+        // info!("======");
         for tile_y in min_y..max_y {
+            // let mut cur_line = "".to_string();
             for tile_x in min_x..max_x {
-                if area_state.is_pc_visible(tile_x, tile_y) { continue; }
+                if area_state.is_pc_visible(tile_x, tile_y) {
+                    // cur_line.push('x');
+                    continue;
+                } else {
+                    // cur_line.push(' ');
+                }
                 draw_list.append(&mut DrawList::from_sprite(vis_sprite, tile_x, tile_y, 1, 1));
 
                 if area_state.is_pc_explored(tile_x, tile_y) { continue; }
                 draw_list.append(&mut DrawList::from_sprite(explored_sprite, tile_x, tile_y, 1, 1));
             }
+            // info!("{}|", cur_line);
         }
 
         AreaView::draw_list_to_texture(renderer, draw_list, VISIBILITY_TEX_ID);
@@ -487,6 +495,7 @@ impl WidgetKind for AreaView {
             }
 
             let (max_x, max_y) = AreaView::get_texture_cache_max(state.area.width, state.area.height);
+            trace!("Full area visibility draw from 0,0 to {},{}", max_x, max_y);
             self.draw_vis_to_texture(renderer, &state.area.visibility_tile, &state.area.explored_tile,
                                      &state, 0, 0, max_x, max_y);
             self.cache_invalid = false;

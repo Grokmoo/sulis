@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::ptr;
 use std::slice::Iter;
 use std::rc::Rc;
 use std::cell::RefCell;
@@ -26,7 +27,7 @@ use sulis_core::io::GraphicsRenderer;
 use sulis_core::ui::{color, Color};
 use sulis_core::util::Point;
 use sulis_module::{Actor, ObjectSize, ObjectSizeIterator, Module};
-use sulis_module::area::Transition;
+use sulis_module::area::{MAX_AREA_SIZE, Transition};
 use {ActorState, AreaState, ChangeListenerList, EntityTextureCache, EntityTextureSlot,
     GameState, has_visibility, Location, PropState, ScriptCallback};
 
@@ -68,7 +69,7 @@ impl EntityState {
     pub(crate) fn new(actor: Rc<Actor>, location: Location,
                       index: usize, is_pc: bool, ai_group: Option<usize>) -> EntityState {
         let ai_state = if is_pc {
-            let dim = (location.area_width * location.area_height) as usize;
+            let dim = (MAX_AREA_SIZE * MAX_AREA_SIZE) as usize;
             AIState::Player {
                 vis: vec![false; dim],
             }
@@ -164,6 +165,17 @@ impl EntityState {
         match self.ai_state {
             AIState::Player { .. } => true,
             AIState::AI { .. } => false,
+        }
+    }
+
+    pub fn clear_pc_vis(&mut self) {
+        match self.ai_state {
+            AIState::Player { ref mut vis, .. } => {
+                unsafe {
+                    ptr::write_bytes(vis.as_mut_ptr(), 0, vis.len());
+                }
+            },
+            _ => panic!(),
         }
     }
 

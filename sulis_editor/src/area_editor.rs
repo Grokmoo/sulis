@@ -22,8 +22,9 @@ use sulis_core::io::{GraphicsRenderer, InputAction};
 use sulis_core::io::event::ClickKind;
 use sulis_core::ui::{compute_area_scaling, Cursor, Scrollable, Widget, WidgetKind};
 use sulis_core::util::{Point};
+use sulis_module::area::MAX_AREA_SIZE;
 
-use {area_model, AreaModel, EditorMode};
+use {AreaModel, EditorMode};
 
 const NAME: &str = "area_editor";
 
@@ -125,7 +126,7 @@ impl WidgetKind for AreaEditor {
     fn on_mouse_drag(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind,
                      delta_x: f32, delta_y: f32) -> bool {
         self.scroll.compute_max(&*widget.borrow(),
-            area_model::MAX_AREA_SIZE, area_model::MAX_AREA_SIZE, self.scale.0, self.scale.1);
+            MAX_AREA_SIZE, MAX_AREA_SIZE, self.scale.0, self.scale.1);
 
         match kind {
             ClickKind::Middle => self.scroll.change(delta_x, delta_y),

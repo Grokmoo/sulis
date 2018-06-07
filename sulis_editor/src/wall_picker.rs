@@ -24,10 +24,10 @@ use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
 use sulis_core::util::{Point};
-use sulis_module::{Module, area::tile::{Tile, WallKind, WallRules}};
+use sulis_module::{Module, area::MAX_AREA_SIZE, area::tile::{Tile, WallKind, WallRules}};
 use sulis_widgets::{Button, Label, Spinner};
 
-use {area_model::MAX_AREA_SIZE, AreaModel, EditorMode};
+use {AreaModel, EditorMode};
 use terrain_picker::EdgesList;
 
 const NAME: &str = "wall_picker";

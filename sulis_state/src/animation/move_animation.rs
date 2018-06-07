@@ -24,6 +24,7 @@ use sulis_core::ui::Widget;
 use sulis_core::util::{self, Point};
 
 pub struct MoveAnimation {
+   area_id: String,
    mover: Rc<RefCell<EntityState>>,
    path: Vec<Point>,
    last_frame_index: i32,
@@ -66,7 +67,10 @@ impl MoveAnimation {
             prev = cur;
         }
 
+        let area_id = mover.borrow().location.area_id.to_string();
+
         MoveAnimation {
+            area_id,
             mover,
             path,
             start_time: Instant::now(),
@@ -86,7 +90,8 @@ impl animation::Animation for MoveAnimation {
     }
 
     fn update(&mut self, _root: &Rc<RefCell<Widget>>) -> bool {
-        if self.marked_for_removal || self.path.is_empty() {
+        let cur_area_id = self.mover.borrow().location.area_id.to_string();
+        if (self.area_id != cur_area_id) || self.marked_for_removal || self.path.is_empty() {
             self.mover.borrow_mut().sub_pos = (0.0, 0.0);
             return false;
         }

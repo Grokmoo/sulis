@@ -206,6 +206,11 @@ impl ActorState {
         let rules = Module::rules();
         let accuracy = parent.borrow().actor.stats.accuracy;
 
+        if !rules.concealment_roll(target.borrow().actor.stats.concealment) {
+            debug!("Concealment miss");
+            return (HitKind::Miss, "Concealment".to_string(), color::GRAY);
+        }
+
         let defense = {
             let target_stats = &target.borrow().actor.stats;
             match attack.kind {
@@ -216,12 +221,7 @@ impl ActorState {
             }
         };
 
-        if !rules.concealment_roll(target.borrow().actor.stats.concealment) {
-            debug!("Concealment miss");
-            return (HitKind::Miss, "Concealment".to_string(), color::GRAY);
-        }
-
-        let hit_kind = rules.attack_roll(accuracy, defense);
+        let hit_kind = parent.borrow().actor.stats.attack_roll(defense);
 
         let damage_multiplier = match hit_kind {
             HitKind::Miss => {
@@ -619,7 +619,9 @@ impl ActorState {
         }
 
         self.stats.finalize(attacks_list, multiplier, rules.base_attribute);
-
+        self.stats.crit_threshold += rules.crit_percentile as i32;
+        self.stats.hit_threshold += rules.hit_percentile as i32;
+        self.stats.graze_threshold += rules.graze_percentile as i32;
         self.has_level_up = rules.get_xp_for_next_level(self.actor.total_level) <= self.xp;
 
         self.listeners.notify(&self);

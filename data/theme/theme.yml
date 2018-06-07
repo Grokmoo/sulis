@@ -476,6 +476,9 @@ children:
           [s=6|]
           [x=0|Initiative][x=40|#initiative#]
           [x=0|Concealment|[x=40|#concealment#]
+          [s=6|]
+          [x=0|Graze Threshold][x=30|Hit Threshold][x=60|Crit Threshold]
+          [x=0|#graze_threshold#][x=30|#hit_threshold#][x=60|#crit_threshold#]
           [?portrait;x=75;y=-3;i=#portrait#;s=30.0|]
           [?portrait;x=75;y=-3;i=portraits/frame;s=30.0|]]
       level_up:
@@ -665,6 +668,9 @@ children:
       ][?reflex|[s=4.0|Reflex: #reflex#]
       ][?will|[s=4.0|Will: #will#]
       ][?concealment|[s=4.0|Concealment: #concealment#]
+      ][?crit_threshold|[s=4.0|Crit Threshold: #crit_threshold#]
+      ][?hit_threshold|[s=4.0|Hit Threshold: #hit_threshold#]
+      ][?graze_threshold|[s=4.0|Graze Threshold: #graze_threshold#]
       ][?price;s=3.5|
       Price: [c=f00|#price#] Gold
       ][!price;?value;s=3.5|

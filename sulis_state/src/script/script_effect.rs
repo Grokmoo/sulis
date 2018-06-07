@@ -115,6 +115,9 @@ fn add_num_bonus(_lua: &Lua, effect: &mut ScriptEffect, args: (String, f32)) -> 
         "reflex" => effect.bonuses.reflex = Some(amount_int),
         "will" => effect.bonuses.will = Some(amount_int),
         "concealment" => effect.bonuses.concealment = Some(amount_int),
+        "crit_threshold" => effect.bonuses.crit_threshold = Some(amount_int),
+        "hit_threshold" => effect.bonuses.hit_threshold = Some(amount_int),
+        "graze_threshold" => effect.bonuses.graze_threshold = Some(amount_int),
         _ => warn!("Attempted to add int bonus with invalid type '{}'", name),
     }
     Ok(())

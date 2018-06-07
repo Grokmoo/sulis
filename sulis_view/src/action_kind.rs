@@ -260,9 +260,6 @@ impl ActionKind for TransitionAction {
     fn fire_action(&mut self, widget: &Rc<RefCell<Widget>>) {
         trace!("Firing transition callback.");
         GameState::transition(&self.area_id, self.to_x, self.to_y);
-        // let root = Widget::get_root(widget);
-        // root.borrow_mut().invalidate_children();
-        //
         let root = Widget::get_root(widget);
         {
             let root = root.borrow_mut();

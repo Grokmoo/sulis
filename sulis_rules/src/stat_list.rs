@@ -15,9 +15,10 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::rc::Rc;
+use rand::{self, Rng};
 
 use sulis_core::image::Image;
-use {Armor, AttributeList, Attack, BonusList, Damage};
+use {Armor, AttributeList, Attack, BonusList, Damage, HitKind};
 use bonus_list::AttackBuilder;
 
 #[derive(Clone)]
@@ -39,6 +40,9 @@ pub struct StatList {
     pub reflex: i32,
     pub will: i32,
     pub concealment: i32,
+    pub crit_threshold: i32,
+    pub hit_threshold: i32,
+    pub graze_threshold: i32,
 }
 
 impl StatList {
@@ -60,6 +64,29 @@ impl StatList {
             reflex: 0,
             will: 0,
             concealment: 0,
+            crit_threshold: 0,
+            hit_threshold: 0,
+            graze_threshold: 0,
+        }
+    }
+
+    pub fn attack_roll(&self, defense: i32) -> HitKind {
+        let accuracy = self.accuracy;
+        let roll = rand::thread_rng().gen_range(1, 101);
+        debug!("Attack roll: {} with accuracy {} against {}", roll, accuracy, defense);
+
+        if roll + accuracy < defense { return HitKind::Miss; }
+
+        let result = roll + accuracy - defense;
+
+        if result > self.crit_threshold {
+            HitKind::Crit
+        } else if result > self.hit_threshold {
+            HitKind::Hit
+        } else if result > self.graze_threshold {
+            HitKind::Graze
+        } else {
+            HitKind::Miss
         }
     }
 
@@ -117,6 +144,9 @@ impl StatList {
         if let Some(reflex) = bonuses.reflex { self.reflex += reflex * times_i32; }
         if let Some(will) = bonuses.will { self.will += will * times_i32; }
         if let Some(concealment) = bonuses.concealment { self.concealment += concealment * times_i32 }
+        if let Some(crit_threshold) = bonuses.crit_threshold { self.crit_threshold += crit_threshold * times_i32 }
+        if let Some(hit_threshold) = bonuses.hit_threshold { self.hit_threshold += hit_threshold * times_i32 }
+        if let Some(graze_thresh) = bonuses.graze_threshold { self.graze_threshold += graze_thresh * times_i32 }
 
         if let Some(ref attrs) = bonuses.attributes {
             self.attributes.add_all(attrs);
@@ -154,6 +184,14 @@ impl StatList {
         self.fortitude += attrs.bonus(Endurance, base_attr);
         self.reflex += attrs.bonus(Dexterity, base_attr);
         self.will += attrs.bonus(Wisdom, base_attr);
+
+        if self.crit_threshold < self.hit_threshold {
+            self.hit_threshold = self.crit_threshold;
+        }
+
+        if self.hit_threshold < self.graze_threshold {
+            self.graze_threshold = self.hit_threshold;
+        }
     }
 }
 

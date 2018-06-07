@@ -10,18 +10,19 @@ end
 function on_target_select(parent, ability, targets)
   target = targets:first()
   
-  speed = 10.0
+  speed = 15.0
   dist = parent:dist_to_entity(target)
   duration = 0.5 + dist / speed
+  parent_center_y = parent:center_y() - 1.0
   vx = (target:center_x() - parent:center_x()) / duration
-  vy = (target:center_y() - parent:center_y()) / duration
+  vy = (target:center_y() - parent_center_y) / duration
   
   cb = ability:create_callback(parent)
   cb:add_target(target)
   cb:set_on_anim_update_fn("attack_target")
   
   gen = parent:create_particle_generator("fire_particle", duration)
-  gen:set_position(gen:param(parent:center_x(), vx), gen:param(parent:center_y(), vy))
+  gen:set_position(gen:param(parent:center_x(), vx), gen:param(parent_center_y, vy))
   gen:set_gen_rate(gen:param(70.0))
   gen:set_initial_gen(35.0)
   gen:set_particle_size_dist(gen:fixed_dist(0.5), gen:fixed_dist(0.5))

@@ -440,6 +440,25 @@ impl AreaModel {
             draw_list.set_scale(scale_x, scale_y);
             renderer.draw(draw_list);
         }
+
+        for ref trigger_data in self.triggers.iter() {
+            let (loc, size) = match trigger_data.kind {
+                TriggerKind::OnPlayerEnter { location, size } => (location, size),
+                _ => continue,
+            };
+
+            let x = loc.x as f32 + x;
+            let y = loc.y as f32 + y;
+            let w = size.width as f32;
+            let h = size.height as f32;
+            let mut draw_list = DrawList::from_sprite_f32(encounter_sprite, x, y, w, h);
+            draw_list.set_scale(scale_x, scale_y);
+            renderer.draw(draw_list);
+
+            let mut draw_list = font_renderer.get_draw_list("Trigger", x, y, 1.0);
+            draw_list.set_scale(scale_x, scale_y);
+            renderer.draw(draw_list);
+        }
     }
 
     pub fn load(&mut self, filename_prefix: &str, filename: &str) {

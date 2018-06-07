@@ -42,6 +42,7 @@ function apply_effect(parent, ability, targets)
   effect = target:create_effect(ability:name(), ability:duration())
   effect:add_num_bonus("defense", 10)
   effect:add_num_bonus("accuracy", 10)
+  effect:add_num_bonus("crit_threshold", -10)
 
   anim = target:create_particle_generator("sparkle")
   anim:set_moves_with_parent()

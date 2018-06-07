@@ -20,7 +20,6 @@ use rand::{self, Rng};
 use sulis_core::resource::ResourceBuilder;
 use sulis_core::util::invalid_data_error;
 use sulis_core::serde_yaml;
-use sulis_rules::{HitKind};
 
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
@@ -72,25 +71,6 @@ impl Rules {
         if cur_level - 1 >= self.experience_for_level.len() as u32 { return 0; }
 
         self.experience_for_level[(cur_level - 1) as usize]
-    }
-
-    pub fn attack_roll(&self, accuracy: i32, defense: i32) -> HitKind {
-        let roll = rand::thread_rng().gen_range(1, 101);
-        debug!("Attack roll: {} with accuracy {} against {}", roll, accuracy, defense);
-
-        if roll + accuracy < defense { return HitKind::Miss; }
-
-        let result = (roll + accuracy - defense) as u32;
-
-        if result >= self.crit_percentile {
-            HitKind::Crit
-        } else if result >= self.hit_percentile {
-            HitKind::Hit
-        } else if result >= self.graze_percentile {
-            HitKind::Graze
-        } else {
-            HitKind::Miss
-        }
     }
 
     pub fn concealment_roll(&self, concealment: i32) -> bool {

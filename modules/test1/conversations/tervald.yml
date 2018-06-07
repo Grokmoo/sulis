@@ -1,14 +1,80 @@
 id: tervald
 initial_nodes:
+  - - plan_formed
+    - { target_flags: [ plan_formed ] }
   - - ambush_cleared
     - { target_flags: [ ambush_cleared ] }
   - - already_talked
     - { target_flags: [ already_talked ] }
   - [start01, ~]
 nodes:
+  plan_formed:
+    text: |
+      You best be off; there's no time to lose.
+    responses: []
   ambush_cleared:
     text: |
-      Nice job taking on those goblins, kid.
+      [c=888|Tervald is visibly shaken, something you haven't seen before.]
+      
+      Damn it those goblins were right on top of us!
+    on_view:
+      target_flags: [ plan_formed ]
+    responses:
+      - text: |
+          [c=888|Continue]
+        to: ambush_cleared_02
+  ambush_cleared_02:
+    text: |
+      That was just a scouting party.  There are going to be a whole lot more of them, and they are not far behind us.
+    responses:
+      - text: |
+          What should we do?
+        to: ambush_cleared_03a
+      - text: |
+          We'll have to fight our way out!
+        to: ambush_cleared_03a
+      - text: |
+          Sounds like we should cut our losses and run.
+        to: ambush_cleared_03a
+  ambush_cleared_03a:
+    text: |
+      We can't go back, and I don't like our chances in a stand up fight with that many goblins.
+      
+      Our best chance is to find a clear path out of this valley, but we can't do that with goblins on top of us.
+    responses:
+      - text: |
+          [c=888|Continue]
+        to: ambush_cleared_04
+  ambush_cleared_04:
+    text: |
+      The majority of the group will stay here for now with me.  We'll block the pass and try to set up some traps to slow down the main force of goblins.
+      
+      #pc_name#, you scout to the North and try to find us a way out of this mess.  You will probably get in some fights, so you should take someone with you.
+    responses:
+      - text: |
+          Come on, Jorzal.  [c=888|Jorzal is a strong front line fighter and defender.]
+        on_select:
+          fire_script:
+            id: wellswood_road_south
+            func: on_add_jorzal
+        to: ambush_cleared_05
+      - text: |
+          Grazi, you are with me.  [c=888|Grazi is a quick and resourceful rogue.]
+        on_select:
+          fire_script:
+            id: wellswood_road_south
+            func: on_add_grazi
+        to: ambush_cleared_05
+      - text: |
+          Aessa, let's go.  [c=888|Aessa is a powerful magic user.]
+        on_select:
+          fire_script:
+            id: wellswood_road_south
+            func: on_add_aessa
+        to: ambush_cleared_05
+  ambush_cleared_05:
+    text: |
+      Good luck.  We'll see you soon.
     responses: []
   already_talked:
     text: |
@@ -21,9 +87,6 @@ nodes:
       Alright, we know the wagon went into these woods.  The question is: did it come out again?
     on_view:
       target_flags: [ already_talked ]
-      fire_script:
-        id: wellswood_road_south
-        func: on_talk_tervald
     responses:
       - text: |
           [c=888|Continue]
@@ -39,7 +102,7 @@ nodes:
         to: start03
   start03:
     text: |
-      And #pc_name#, watch yourself.  If you spot and trouble, you come back here as quick as you can.  Don't be a hero.
+      And #pc_name#, watch yourself.  If you spot any trouble, you come back here as quick as you can.  Don't be a hero.
     responses:
       - text: |
           Will do.  See you soon.

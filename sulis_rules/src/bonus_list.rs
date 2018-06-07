@@ -37,6 +37,9 @@ pub struct BonusList {
     pub reflex: Option<i32>,
     pub will: Option<i32>,
     pub concealment: Option<i32>,
+    pub crit_threshold: Option<i32>,
+    pub hit_threshold: Option<i32>,
+    pub graze_threshold: Option<i32>,
 }
 
 impl Default for BonusList {
@@ -58,6 +61,9 @@ impl Default for BonusList {
             reflex: None,
             will: None,
             concealment: None,
+            crit_threshold: None,
+            hit_threshold: None,
+            graze_threshold: None,
         }
     }
 }

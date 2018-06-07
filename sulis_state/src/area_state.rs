@@ -29,7 +29,8 @@ use std::rc::Rc;
 use std::cell::{Ref, RefCell};
 
 struct TriggerState {
-    activated: bool,
+    fired: bool,
+    enabled: bool,
 }
 
 pub struct AreaState {
@@ -203,7 +204,8 @@ impl AreaState {
 
         for (index, trigger) in area.triggers.iter().enumerate() {
             let trigger_state = TriggerState {
-                activated: false,
+                fired: false,
+                enabled: trigger.initially_enabled,
             };
 
             self.triggers.push(trigger_state);
@@ -462,6 +464,21 @@ impl AreaState {
         }
     }
 
+    pub fn enable_trigger_at(&mut self, x: i32, y: i32) -> bool{
+        if !self.area.coords_valid(x, y) {
+            warn!("Invalid coords to enable trigger at {},{}", x, y);
+            return false;
+        }
+
+        let index = match self.trigger_grid[(x + y * self.area.width) as usize] {
+            None => return false,
+            Some(index) => index,
+        };
+
+        self.triggers[index].enabled = true;
+        true
+    }
+
     fn check_trigger_grid(&mut self, entity: &Rc<RefCell<EntityState>>) {
         let index = {
             let entity = entity.borrow();
@@ -472,9 +489,9 @@ impl AreaState {
             }
         };
 
-        if self.triggers[index].activated { return; }
+        if !self.triggers[index].enabled || self.triggers[index].fired { return; }
 
-        self.triggers[index].activated = true;
+        self.triggers[index].fired = true;
         GameState::add_ui_callback(self.area.triggers[index].on_activate.clone(), entity, entity);
     }
 

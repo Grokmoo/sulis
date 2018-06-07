@@ -66,7 +66,18 @@ impl WidgetKind for DialogWindow {
         let title = Widget::with_theme(Label::empty(), "title");
         title.borrow_mut().state.add_text_arg("name", &self.entity.borrow().actor.actor.name);
 
-        self.node.borrow_mut().text = Some(self.convo.text(&self.cur_node).to_string());
+        let cur_text = self.convo.text(&self.cur_node).to_string();
+        let responses = self.convo.responses(&self.cur_node);
+
+        if responses.is_empty() {
+            widget.borrow_mut().mark_for_removal();
+
+            let area_state = GameState::area_state();
+            area_state.borrow_mut().add_feedback_text(cur_text, &self.entity, color::GRAY, 0.0);
+            return Vec::new();
+        }
+
+        self.node.borrow_mut().text = Some(cur_text);
         let node_widget = Widget::with_theme(self.node.clone(), "node");
         for flag in self.entity.borrow().custom_flags() {
             node_widget.borrow_mut().state.add_text_arg(flag, "true");
@@ -76,18 +87,18 @@ impl WidgetKind for DialogWindow {
             activate(widget, on_select, &self.pc, &self.entity);
         }
 
-        let responses = Widget::empty("responses");
+        let responses_widget = Widget::empty("responses");
         {
-            for response in self.convo.responses(&self.cur_node) {
+            for response in responses {
                 if !is_viewable(response, &self.pc, &self.entity) { continue; }
 
                 let response_button = ResponseButton::new(&response);
                 let widget = Widget::with_defaults(response_button);
-                Widget::add_child_to(&responses, widget);
+                Widget::add_child_to(&responses_widget, widget);
             }
         }
 
-        vec![title, node_widget, responses]
+        vec![title, node_widget, responses_widget]
     }
 }
 

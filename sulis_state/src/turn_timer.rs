@@ -136,7 +136,7 @@ impl TurnTimer {
             e.borrow_mut().actor.end_turn();
             e.borrow_mut().actor.set_overflow_ap(0);
         });
-        GameState::set_entering_combat();
+        GameState::set_clear_anims();
     }
 
     pub fn end_combat(&mut self) {

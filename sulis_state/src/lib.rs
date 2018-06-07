@@ -110,7 +110,7 @@ pub const MOVE_TO_THRESHOLD: f32 = 0.6;
 thread_local! {
     static STATE: RefCell<Option<GameState>> = RefCell::new(None);
     static AI: RefCell<AI> = RefCell::new(AI::new());
-    static ENTERING_COMBAT: Cell<bool> = Cell::new(false);
+    static CLEAR_ANIMS: Cell<bool> = Cell::new(false);
     static MODAL_LOCKED: Cell<bool> = Cell::new(false);
     static SCRIPT: ScriptState = ScriptState::new();
     static ANIMATIONS: RefCell<Vec<Box<Animation>>> = RefCell::new(Vec::new());
@@ -349,6 +349,8 @@ impl GameState {
             }
         }
 
+        GameState::set_clear_anims();
+
         STATE.with(|state| {
             let mut state = state.borrow_mut();
             let state = state.as_mut().unwrap();
@@ -366,6 +368,8 @@ impl GameState {
                 let mut cur_location = base_location.clone();
                 GameState::find_transition_location(&mut cur_location, &entity.borrow().size,
                                                     &state.area_state.borrow());
+                info!("Transitioning {} to {},{}", entity.borrow().actor.actor.name,
+                    cur_location.x, cur_location.y);
                 state.area_state.borrow_mut().add_entity(Rc::clone(entity), cur_location);
             }
 
@@ -534,14 +538,14 @@ impl GameState {
         })
     }
 
-    fn check_clear_entering_combat() -> bool {
-        ENTERING_COMBAT.with(|c| {
+    fn check_clear_anims() -> bool {
+        CLEAR_ANIMS.with(|c| {
             c.replace(false)
         })
     }
 
-    pub fn set_entering_combat() {
-        ENTERING_COMBAT.with(|c| c.set(true));
+    pub fn set_clear_anims() {
+        CLEAR_ANIMS.with(|c| c.set(true));
     }
 
     fn get_area_state(id: &str) -> Option<Rc<RefCell<AreaState>>> {
@@ -613,11 +617,13 @@ impl GameState {
 
         cbs.iter().for_each(|cb| cb.on_round_elapsed());
 
-        // clear animations for the active entity when entering combat
-        if GameState::check_clear_entering_combat() {
+        if GameState::check_clear_anims() {
             ANIMATIONS.with(|a| {
                 let mut anims = a.borrow_mut();
-                anims.iter_mut().for_each(|a| a.mark_for_removal());
+                for anim in anims.iter_mut() {
+                    if !anim.is_blocking() { continue; }
+                    anim.mark_for_removal();
+                }
             });
         }
 
@@ -652,6 +658,18 @@ impl GameState {
             }
             false
         })
+    }
+
+    pub fn remove_blocking_animations(entity: &Rc<RefCell<EntityState>>) {
+        ANIMATIONS.with(|a| {
+            let mut anims = a.borrow_mut();
+            for anim in anims.iter_mut() {
+                if !anim.is_blocking() { continue; }
+                if !Rc::ptr_eq(entity, anim.get_owner()) { continue; }
+
+                anim.mark_for_removal();
+            }
+        });
     }
 
     pub fn add_animation(anim: Box<Animation>) {
@@ -758,15 +776,8 @@ impl GameState {
         match anim {
             None => false,
             Some(anim) => {
-                ANIMATIONS.with(|a| {
-                    let mut anims = a.borrow_mut();
-                    for anim in anims.iter_mut() {
-                        if Rc::ptr_eq(entity, anim.get_owner()) {
-                            anim.mark_for_removal();
-                        }
-                    }
-                    anims.push(Box::new(anim));
-                });
+                GameState::remove_blocking_animations(entity);
+                GameState::add_animation(Box::new(anim));
                 true
             }
         }

@@ -2,9 +2,12 @@ id: mouse
 states:
     normal: mouse_default
     mouse_move: mouse_move
-    mouse_activate: mouse_container
+    mouse_loot: mouse_container
     mouse_attack: mouse_attack
     mouse_travel: mouse_travel
     mouse_select: mouse_select
     mouse_invalid: mouse_invalid
     mouse_dialog: mouse_dialog
+    mouse_search: mouse_search
+    mouse_unlock: mouse_unlock
+    mouse_interact: mouse_interact

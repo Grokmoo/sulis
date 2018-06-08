@@ -33,12 +33,15 @@ pub enum Kind {
     Custom5,
 
     MouseMove,
-    MouseActivate,
+    MouseLoot,
     MouseAttack,
     MouseTravel,
     MouseSelect,
     MouseInvalid,
     MouseDialog,
+    MouseSearch,
+    MouseInteract,
+    MouseUnlock,
 }
 
 impl Kind {
@@ -55,12 +58,15 @@ impl Kind {
             Custom4 => "custom4",
             Custom5 => "custom5",
             MouseMove => "mouse_move",
-            MouseActivate => "mouse_activate",
+            MouseLoot => "mouse_loot",
             MouseAttack => "mouse_attack",
             MouseTravel => "mouse_travel",
             MouseSelect => "mouse_select",
             MouseInvalid => "mouse_invalid",
             MouseDialog => "mouse_dialog",
+            MouseSearch => "mouse_search",
+            MouseUnlock => "mouse_unlock",
+            MouseInteract => "mouse_interact",
         }
     }
 
@@ -77,12 +83,15 @@ impl Kind {
             "custom4" => Custom4,
             "custom5" => Custom5,
             "mouse_move" => MouseMove,
-            "mouse_activate" => MouseActivate,
+            "mouse_loot" => MouseLoot,
             "mouse_attack" => MouseAttack,
             "mouse_travel" => MouseTravel,
             "mouse_select" => MouseSelect,
             "mouse_invalid" => MouseInvalid,
             "mouse_dialog" => MouseDialog,
+            "mouse_search" => MouseSearch,
+            "mouse_unlock" => MouseUnlock,
+            "mouse_interact" => MouseInteract,
             _ => return None,
         })
     }

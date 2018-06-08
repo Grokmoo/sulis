@@ -1,0 +1,20 @@
+id: ethel
+initial_nodes:
+  - [start, ~]
+nodes:
+  start:
+    text: |
+      Hey.  Interested in making any trades?
+    on_view:
+      target_flags: [ already_talked ]
+    responses:
+      - text: |
+          Not today.  Farewell.
+      - text: |
+          Let's see what you've got.
+        on_select:
+          show_merchant:
+            id: ethel
+            loot_list: level1_merchant
+            buy_frac: 1.0
+            sell_frac: 0.20

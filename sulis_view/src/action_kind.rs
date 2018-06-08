@@ -31,7 +31,8 @@ pub fn get_action(x: i32, y: i32) -> Box<ActionKind> {
     if let Some(action) = SelectAction::create_if_valid(x, y) { return action; }
     if let Some(action) = AttackAction::create_if_valid(x, y) { return action; }
     if let Some(action) = DialogAction::create_if_valid(x, y) { return action; }
-    if let Some(action) = PropAction::create_if_valid(x, y) { return action; }
+    if let Some(action) = DoorPropAction::create_if_valid(x, y) { return action; }
+    if let Some(action) = LootPropAction::create_if_valid(x, y) { return action; }
     if let Some(action) = TransitionAction::create_if_valid(x, y) { return action; }
     if let Some(action) = MoveAction::create_if_valid(x as f32, y as f32, None) { return action; }
 
@@ -148,11 +149,11 @@ impl ActionKind for DialogAction {
     }
 }
 
-struct PropAction {
+struct DoorPropAction {
     index: usize,
 }
 
-impl PropAction {
+impl DoorPropAction {
     fn create_if_valid(x: i32, y: i32) -> Option<Box<ActionKind>> {
         let area_state = GameState::area_state();
         let area_state = area_state.borrow();
@@ -163,7 +164,7 @@ impl PropAction {
         };
 
         let prop_state = area_state.get_prop(index);
-        if !prop_state.prop.interactive { return None; }
+        if !prop_state.is_door() { return None; }
 
         let max_dist = Module::rules().max_prop_distance;
         let pc = match GameState::selected().first() {
@@ -171,17 +172,68 @@ impl PropAction {
             Some(pc) => Rc::clone(pc),
         };
         if pc.borrow().dist_to_prop(prop_state) > max_dist {
-            let cb_action = Box::new(PropAction { index });
+            let cb_action = Box::new(DoorPropAction { index });
             return MoveThenAction::create_if_valid(prop_state.location.to_point(),
-                &prop_state.prop.size, max_dist, cb_action, animation_state::Kind::MouseActivate);
+                &prop_state.prop.size, max_dist, cb_action, animation_state::Kind::MouseInteract);
         }
 
-        Some(Box::new(PropAction { index }))
+        Some(Box::new(DoorPropAction { index }))
     }
 }
 
-impl ActionKind for PropAction {
-    fn cursor_state(&self) -> animation_state::Kind { animation_state::Kind::MouseActivate }
+impl ActionKind for DoorPropAction {
+    fn cursor_state(&self) -> animation_state::Kind { animation_state::Kind::MouseInteract }
+
+    fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32)> {
+        let area_state = GameState::area_state();
+        let area_state = area_state.borrow();
+        let prop = area_state.get_prop(self.index);
+        let point = prop.location.to_point();
+        Some((Rc::clone(&prop.prop.size), point.x, point.y))
+    }
+
+    fn fire_action(&mut self, _widget: &Rc<RefCell<Widget>>) {
+        let area_state = GameState::area_state();
+        let mut area_state = area_state.borrow_mut();
+        let state = area_state.get_prop_mut(self.index);
+        state.toggle_active();
+    }
+}
+
+struct LootPropAction {
+    index: usize,
+}
+
+impl LootPropAction {
+    fn create_if_valid(x: i32, y: i32) -> Option<Box<ActionKind>> {
+        let area_state = GameState::area_state();
+        let area_state = area_state.borrow();
+
+        let index = match area_state.prop_index_at(x, y) {
+            None => return None,
+            Some(index) => index,
+        };
+
+        let prop_state = area_state.get_prop(index);
+        if !prop_state.is_container() { return None; }
+
+        let max_dist = Module::rules().max_prop_distance;
+        let pc = match GameState::selected().first() {
+            None => return None,
+            Some(pc) => Rc::clone(pc),
+        };
+        if pc.borrow().dist_to_prop(prop_state) > max_dist {
+            let cb_action = Box::new(LootPropAction { index });
+            return MoveThenAction::create_if_valid(prop_state.location.to_point(),
+                &prop_state.prop.size, max_dist, cb_action, animation_state::Kind::MouseLoot);
+        }
+
+        Some(Box::new(LootPropAction { index }))
+    }
+}
+
+impl ActionKind for LootPropAction {
+    fn cursor_state(&self) -> animation_state::Kind { animation_state::Kind::MouseLoot }
 
     fn get_hover_info(&self) -> Option<(Rc<ObjectSize>, i32, i32)> {
         let area_state = GameState::area_state();
@@ -470,7 +522,7 @@ impl MoveAction {
         let mut i = 1.0;
         for member in self.selected.iter() {
             GameState::move_towards_point(member, entities_to_ignore.clone(),
-                self.x + norm_x * i, self.y + norm_y * i, self.dist, None);
+                self.x + norm_x * i, self.y + norm_y * i, 0.8, None);
             i += 1.0;
         }
     }

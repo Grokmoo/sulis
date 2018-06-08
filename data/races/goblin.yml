@@ -28,8 +28,9 @@ mouseover_offset: [0, 0]
 ticker_offset: [0.5, 1]
 image_layer_offset_scale: 16
 image_layer_offsets:
-  HeldMain: [-24, -13]
-  HeldOff: [8, -13]
-  Shadow: [0, 3]
+  HeldMain: [-24, -20]
+  HeldOff: [8, -20]
+  Shadow: [0, -4]
+  Background: [0, -5]
 image_layer_postfix: {}
 

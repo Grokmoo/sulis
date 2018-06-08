@@ -4,5 +4,6 @@ icon: inventory/misc_crate
 image: campfire
 size: 2by4
 visible: true
-interactive: false
+interactive:
+  Not
 impass: [[0, 2], [1, 2], [0, 3], [1, 3]]

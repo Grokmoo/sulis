@@ -5,4 +5,5 @@ image: props/backpack
 size: 2by2
 visible: true
 passable: true
-interactive: true
+interactive:
+  Container: {}

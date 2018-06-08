@@ -370,6 +370,9 @@ groups:
       mouse_select: [128, 128]
       mouse_invalid: [256, 128]
       mouse_dialog: [384, 128]
+      mouse_search: [0, 256]
+      mouse_unlock: [128, 256]
+      mouse_interact: [256, 256]
   special:
     areas:
       empty: [0, 512, 5, 5]
@@ -399,6 +402,7 @@ groups:
       cursor7by7round: [146, 675, 112, 112]
       cursor8by8round: [0, 724, 128, 128]
       cursor9by9round: [129, 788, 144, 144]
+      cursor4by6: [230, 578, 64, 96]
       
       ball: [16, 148, 32, 32]
       ball_active: [16, 181, 32, 32]

@@ -4,5 +4,6 @@ icon: inventory/misc_crate
 image: brazier
 size: 3by4
 visible: true
-interactive: false
+interactive:
+  Not
 impass: [[1, 2], [1, 1]]

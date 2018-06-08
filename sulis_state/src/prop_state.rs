@@ -19,21 +19,31 @@ use std::rc::Rc;
 
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{animation_state, AnimationState};
-use sulis_module::{Item, Prop};
+use sulis_module::{Item, LootList, Prop, prop};
 use sulis_module::area::PropData;
 
 use entity_state::AreaDrawable;
 use {ChangeListenerList, EntityTextureCache, ItemList, ItemState, Location};
 
+pub enum Interactive {
+    Not,
+    Container {
+        items: ItemList,
+        loot_to_generate: Option<Rc<LootList>>,
+        temporary: bool,
+    },
+    Door {
+        open: bool,
+    },
+}
+
 pub struct PropState {
     pub prop: Rc<Prop>,
     pub location: Location,
     pub animation_state: AnimationState,
-    items: ItemList,
     pub listeners: ChangeListenerList<PropState>,
-    can_generate_loot: bool,
+    interactive: Interactive,
 
-    temporary: bool,
     marked_for_removal: bool,
 }
 
@@ -51,16 +61,32 @@ impl PropState {
             items.add(ItemState::new(Rc::clone(item)));
         }
 
-        let can_generate_loot = prop_data.prop.loot.is_some();
+        let interactive = match prop_data.prop.interactive {
+            prop::Interactive::Not => {
+                if !items.is_empty() { warn!("Attempted to add items to a non-container prop"); }
+                Interactive::Not
+            },
+            prop::Interactive::Container { ref loot } => {
+                Interactive::Container {
+                    items,
+                    loot_to_generate: loot.clone(),
+                    temporary,
+                }
+            },
+            prop::Interactive::Door { initially_open, .. } => {
+                Interactive::Door {
+                    open: initially_open
+                }
+                // TODO set pass and vis if in closed state
+            }
+        };
 
         PropState {
             prop: Rc::clone(&prop_data.prop),
             location,
+            interactive,
             animation_state: AnimationState::default(),
-            items,
             listeners: ChangeListenerList::default(),
-            can_generate_loot,
-            temporary,
             marked_for_removal: false,
         }
     }
@@ -70,65 +96,125 @@ impl PropState {
     }
 
     pub fn might_contain_items(&self) -> bool {
-        !self.items.is_empty() || self.can_generate_loot
+        match self.interactive {
+            Interactive::Container { ref items, ref loot_to_generate, .. } => {
+                if !items.is_empty() { return true; }
+                if loot_to_generate.is_some() { return true; }
+
+                false
+            },
+            _ => false,
+        }
+    }
+
+    pub fn is_door(&self) -> bool {
+        match self.interactive {
+            Interactive::Door { .. } => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_container(&self) -> bool {
+        match self.interactive {
+            Interactive::Container { .. } => true,
+            _ => false,
+        }
     }
 
     pub fn toggle_active(&mut self) {
-        if !self.is_active() && self.can_generate_loot {
-            if let Some(ref loot) = self.prop.loot {
-                info!("Generating loot for prop from '{}'", loot.id);
-                let items = loot.generate();
-                for (qty, item) in items {
-                    let item_state = ItemState::new(item);
-                    self.items.add_quantity(qty, item_state);
-                }
-            }
-
-            self.can_generate_loot = false;
-        }
-
         self.animation_state.toggle(animation_state::Kind::Active);
+        if !self.is_active() { return; }
+
+        match self.interactive {
+            Interactive::Not => (),
+            Interactive::Container { ref mut items, ref mut loot_to_generate, .. } => {
+                let loot = match loot_to_generate.take() {
+                    None => return,
+                    Some(loot) => loot,
+                };
+
+                info!("Generating loot for prop from '{}'", loot.id);
+                let generated_items = loot.generate();
+                for (qty, item) in generated_items {
+                    let item_state = ItemState::new(item);
+                    items.add_quantity(qty, item_state);
+                }
+            },
+            Interactive::Door { ref mut open } => {
+                let cur_open = *open;
+                *open = !cur_open;
+
+                // TODO implement set pass and vis
+            },
+        }
     }
 
     pub fn add_item(&mut self, item: ItemState) {
-        self.items.add(item);
-        self.listeners.notify(&self);
-    }
-
-    pub fn add_items(&mut self, items: Vec<(u32, Rc<Item>)>) {
-        for (qty, item) in items {
-            let item_state = ItemState::new(item);
-            self.items.add_quantity(qty, item_state);
+        match self.interactive {
+            Interactive::Container { ref mut items, .. } => {
+                items.add(item);
+            },
+            _ => warn!("Attempted to add item to a non-container prop {}", self.prop.id),
         }
         self.listeners.notify(&self);
     }
 
-    pub fn items(&self) -> &ItemList {
-        &self.items
+    pub fn add_items(&mut self, items_to_add: Vec<(u32, Rc<Item>)>) {
+        match self.interactive {
+            Interactive::Container { ref mut items, .. } => {
+                for (qty, item) in items_to_add {
+                    let item_state = ItemState::new(item);
+                    items.add_quantity(qty, item_state);
+                }
+            },
+            _ => warn!("Attempted to add items to a non-container prop {}", self.prop.id),
+        }
+        self.listeners.notify(&self);
     }
 
-    fn notify_and_check(&mut self) {
-        self.listeners.notify(&self);
-
-        if self.temporary && self.items.is_empty() {
-            self.marked_for_removal = true;
+    pub fn items(&self) -> Option<&ItemList> {
+        match self.interactive {
+            Interactive::Container { ref items, .. } => Some(&items),
+            _ => None,
         }
     }
 
     pub fn remove_all_at(&mut self, index: usize) -> Option<(u32, ItemState)> {
-        let item = self.items.remove_all_at(index);
-
+        let item_state = match self.interactive {
+            Interactive::Container { ref mut items, .. } => {
+                items.remove_all_at(index)
+            },
+            _ => {
+                warn!("Attempted to remove items from a non-container prop {}", self.prop.id);
+                None
+            }
+        };
         self.notify_and_check();
-
-        item
+        item_state
     }
 
     pub fn remove_one_at(&mut self, index: usize) -> Option<ItemState> {
-        let item = self.items.remove(index);
-
+        let item_state = match self.interactive {
+            Interactive::Container { ref mut items, .. } => {
+                items.remove(index)
+            },
+            _ => {
+                warn!("Attempted to remove item from a non-container prop {}", self.prop.id);
+                None
+            }
+        };
         self.notify_and_check();
+        item_state
+    }
 
-        item
+    fn notify_and_check(&mut self) {
+        self.listeners.notify(&self);
+        match self.interactive {
+            Interactive::Container { ref items, temporary, .. } => {
+                if items.is_empty() && temporary { self.marked_for_removal = true; }
+            },
+            _ => (),
+        }
     }
 
     pub fn is_active(&self) -> bool {

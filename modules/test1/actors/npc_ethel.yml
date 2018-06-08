@@ -1,0 +1,40 @@
+---
+id: "npc_ethel"
+name: Ethel
+race: elf
+sex: Male
+portrait: portraits/elf01
+attributes:
+  str: 13
+  dex: 18
+  end: 15
+  per: 14
+  int: 10
+  wis: 10
+conversation: ethel
+faction: Friendly
+images:
+  Hair: creatures/hair07
+hue: 0.3500000238418579
+hair_color:
+  r: 0.9333333373069763
+  g: 0.9019607901573181
+  b: 0.5215686559677124
+  a: 1.0
+skin_color:
+  r: 0.9764705896377564
+  g: 0.95686274766922
+  b: 0.7843137383460999
+  a: 1.0
+items:
+  - shortbow
+  - boots_leather
+  - torso_leather
+  - legs_pants
+equipped:
+  - 0
+  - 1
+  - 2
+  - 3
+levels:
+  fighter: 3

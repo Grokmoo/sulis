@@ -696,7 +696,7 @@ impl WidgetKind for AreaView {
         } else if let Some(index) = area_state.borrow().prop_index_at(area_x, area_y) {
             let interactive = {
                 let area_state = area_state.borrow();
-                area_state.get_prop(index).prop.interactive
+                area_state.get_prop(index).is_container()
             };
 
             if interactive {

@@ -272,8 +272,13 @@ impl ActorState {
         let mut area_state = area_state.borrow_mut();
         let prop_state = area_state.get_prop_mut(prop_index);
 
-        if prop_state.items().len() > 0 {
-            let mut i = prop_state.items().len() - 1;
+        let num_items = match prop_state.items() {
+            None => return,
+            Some(ref items) => items.len(),
+        };
+
+        if num_items > 0 {
+            let mut i = num_items - 1;
             loop {
                 if let Some((qty, item_state)) = prop_state.remove_all_at(i) {
                     if !self.check_add_coins(qty, &item_state) {

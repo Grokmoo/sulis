@@ -103,11 +103,16 @@ impl WidgetKind for PropWindow {
         })));
 
         let list_content = Widget::empty("items_list");
-        for (index, &(qty, ref item)) in prop.items().iter().enumerate() {
-            let item_button = ItemButton::prop(item.item.icon.id(), qty, index, self.prop_index);
-            item_button.borrow_mut().add_action("Take", take_item_cb(&self.player, prop_index, index));
-            let button = Widget::with_defaults(item_button);
-            Widget::add_child_to(&list_content, button);
+        match prop.items() {
+            None => (),
+            Some(ref items) => {
+                for (index, &(qty, ref item)) in items.iter().enumerate() {
+                    let item_button = ItemButton::prop(item.item.icon.id(), qty, index, self.prop_index);
+                    item_button.borrow_mut().add_action("Take", take_item_cb(&self.player, prop_index, index));
+                    let button = Widget::with_defaults(item_button);
+                    Widget::add_child_to(&list_content, button);
+                }
+            }
         }
 
         vec![title, icon, close, list_content, take_all]

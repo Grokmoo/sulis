@@ -5,4 +5,5 @@ image: props/chest02
 size: 3by3
 visible: true
 passable: false
-interactive: true
+interactive:
+  Container: {}

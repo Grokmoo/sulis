@@ -5,5 +5,6 @@ image: props/chest03
 size: 3by3
 visible: true
 passable: false
-interactive: true
-loot: level1_armor
+interactive:
+  Container:
+    loot: level1_armor

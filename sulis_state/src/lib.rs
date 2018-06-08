@@ -105,7 +105,7 @@ use sulis_module::{Ability, Actor, Module, ObjectSize, OnTrigger, area::{Trigger
 use script::ScriptEntitySet;
 use script::script_callback::ScriptHitKind;
 
-pub const MOVE_TO_THRESHOLD: f32 = 0.1;
+pub const MOVE_TO_THRESHOLD: f32 = 0.4;
 
 thread_local! {
     static STATE: RefCell<Option<GameState>> = RefCell::new(None);

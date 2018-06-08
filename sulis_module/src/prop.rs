@@ -28,6 +28,19 @@ use {LootList, Module, ObjectSize};
 use area::tile::verify_point;
 
 #[derive(Debug)]
+pub enum Interactive {
+    Not,
+    Container {
+        loot: Option<Rc<LootList>>,
+    },
+    Door {
+        initially_open: bool,
+        closed_impass: Vec<Point>,
+        closed_invis: Vec<Point>,
+    }
+}
+
+#[derive(Debug)]
 pub struct Prop {
     pub id: String,
     pub name: String,
@@ -36,8 +49,7 @@ pub struct Prop {
     pub size: Rc<ObjectSize>,
     pub impass: Vec<Point>,
     pub invis: Vec<Point>,
-    pub interactive: bool,
-    pub loot: Option<Rc<LootList>>,
+    pub interactive: Interactive,
 }
 
 impl Prop {
@@ -105,15 +117,24 @@ impl Prop {
             }
         }
 
-        let loot = match builder.loot {
-            None => None,
-            Some(builder_loot) => {
-                match module.loot_lists.get(&builder_loot) {
-                    None => {
-                        warn!("Unable to find loot list '{}'", builder_loot);
-                        return unable_to_create_error("prop", &builder.id);
-                    }, Some(loot) => Some(Rc::clone(loot))
-                }
+        let interactive = match builder.interactive {
+            InteractiveBuilder::Not => Interactive::Not,
+            InteractiveBuilder::Container { loot } => {
+                let loot = match loot {
+                    None => None,
+                    Some(loot) => {
+                        match module.loot_lists.get(&loot) {
+                            None => {
+                                warn!("Unable to find loot list '{}'", loot);
+                                return unable_to_create_error("prop", &builder.id);
+                            }, Some(loot) => Some(Rc::clone(loot))
+                        }
+                    }
+                };
+                Interactive::Container { loot }
+            },
+            InteractiveBuilder::Door { initially_open, closed_impass, closed_invis } => {
+                Interactive::Door { initially_open, closed_impass, closed_invis }
             }
         };
 
@@ -125,8 +146,7 @@ impl Prop {
             size,
             impass,
             invis,
-            interactive: builder.interactive,
-            loot,
+            interactive,
         })
     }
 
@@ -141,6 +161,21 @@ impl Prop {
 
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
+pub enum InteractiveBuilder {
+    Not,
+    Container {
+        loot: Option<String>,
+    },
+    Door {
+        initially_open: bool,
+        closed_impass: Vec<Point>,
+        closed_invis: Vec<Point>,
+    }
+
+}
+
+#[derive(Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
 pub struct PropBuilder {
     pub id: String,
     pub name: String,
@@ -151,8 +186,7 @@ pub struct PropBuilder {
     pub impass: Option<Vec<Vec<usize>>>,
     pub invis: Option<Vec<Vec<usize>>>,
     pub visible: Option<bool>,
-    pub interactive: bool,
-    pub loot: Option<String>,
+    pub interactive: InteractiveBuilder,
 }
 
 impl ResourceBuilder for PropBuilder {

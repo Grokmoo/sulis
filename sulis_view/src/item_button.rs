@@ -104,9 +104,14 @@ impl ItemButton {
             }, Kind::Prop { index } => {
                 if !area_state.prop_index_valid(index) { return None; }
 
-                match area_state.get_prop(index).items().get(self.item_index) {
+                match area_state.get_prop(index).items() {
                     None => None,
-                    Some(&(_, ref item_state)) => Some(item_state.clone())
+                    Some(ref items) => {
+                        match items.get(self.item_index) {
+                            None => None,
+                            Some(&(_, ref item_state)) => Some(item_state.clone())
+                        }
+                    }
                 }
             }, Kind::Merchant { ref id } => {
                 let merchant = area_state.get_merchant(id);

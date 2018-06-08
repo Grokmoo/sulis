@@ -5,5 +5,6 @@ image: props/chest_small
 size: 2by2
 visible: true
 passable: false
-interactive: true
-loot: level1_misc
+interactive:
+  Container:
+    loot: level1_misc

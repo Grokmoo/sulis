@@ -292,8 +292,8 @@ impl EntityState {
     }
 
     pub fn dist_to_point(&self, pos: Point) -> f32 {
-        let x1 = self.location.x as f32 + self.size.width as f32 / 2.0;
-        let y1 = self.location.y as f32 + self.size.height as f32 / 2.0;
+        let x1 = self.location.x as f32 + (self.size.width / 2) as f32;
+        let y1 = self.location.y as f32 + (self.size.height / 2) as f32;
         let x2 = pos.x as f32;
         let y2 = pos.y as f32;
 
@@ -302,8 +302,8 @@ impl EntityState {
     }
 
     pub fn dist(&self, pos: Point, size: &Rc<ObjectSize>) -> f32 {
-        let x1 = self.location.x as f32 + self.size.width as f32 / 2.0;
-        let y1 = self.location.y as f32 + self.size.height as f32 / 2.0;
+        let x1 = self.location.x as f32 + (self.size.width / 2) as f32;
+        let y1 = self.location.y as f32 + (self.size.height / 2) as f32;
 
         let x2 = pos.x as f32 + size.width as f32 / 2.0;
         let y2 = pos.y as f32 + size.height as f32 / 2.0;

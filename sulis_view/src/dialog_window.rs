@@ -263,6 +263,11 @@ pub fn activate(widget: &Rc<RefCell<Widget>>, on_select: &OnTrigger,
         start_convo(widget, convo, pc, target);
     }
 
+    if let Some(ref line) = on_select.say_line {
+        let area_state = GameState::area_state();
+        area_state.borrow_mut().add_feedback_text(line.to_string(), &target, color::GRAY, 0.0);
+    }
+
     if let Some(ref cutscene) = on_select.show_cutscene {
         show_cutscene(widget, cutscene);
     }

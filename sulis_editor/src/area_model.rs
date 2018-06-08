@@ -648,20 +648,17 @@ impl AreaModel {
         self.triggers.append(&mut area_builder.triggers);
 
         trace!("Loading area elevation.");
-        if let Some(ref elev) = area_builder.elevation {
-            if elev.len() != area_builder.height * area_builder.width {
-                warn!("Invalid elevation array in {}", path);
-                self.elevation = vec![0;(MAX_AREA_SIZE * MAX_AREA_SIZE) as usize];
-            } else {
-                for y in 0..area_builder.height {
-                    for x in 0..area_builder.width {
-                        let val = elev[x + y * area_builder.width];
-                        self.elevation[x + y * MAX_AREA_SIZE as usize] = val;
-                    }
+        let elev = &area_builder.elevation;
+        if elev.len() != area_builder.height * area_builder.width {
+            warn!("Invalid elevation array in {}", path);
+            self.elevation = vec![0;(MAX_AREA_SIZE * MAX_AREA_SIZE) as usize];
+        } else {
+            for y in 0..area_builder.height {
+                for x in 0..area_builder.width {
+                    let val = elev[x + y * area_builder.width];
+                    self.elevation[x + y * MAX_AREA_SIZE as usize] = val;
                 }
             }
-        } else {
-            self.elevation = vec![0;(MAX_AREA_SIZE * MAX_AREA_SIZE) as usize];
         }
     }
 
@@ -778,7 +775,7 @@ impl AreaModel {
         let area_builder = AreaBuilder {
             id: self.id.clone(),
             name: self.name.clone(),
-            elevation: Some(elevation),
+            elevation: elevation,
             terrain,
             walls,
             layer_set,

@@ -270,8 +270,19 @@ pub struct AreaBuilder {
     pub layer_set: HashMap<String, Vec<Vec<usize>>>,
     pub terrain: Vec<Option<String>>,
     pub walls: Vec<(i8, Option<String>)>,
-    pub elevation: Option<Vec<u8>>,
+    // #[serde(serialize_with="ser_elevation", deserialize_with="from_base64")]
+    pub elevation: Vec<u8>,
 }
+
+// fn from_base64<'de, D>(deserializer: D) -> Result<Vec<u8>, D::Error> where D: Deserializer<'de> {
+//     use sulis_core::serde::de::Error;
+//     let s = String::deserialize(deserializer)?;
+//     base64::decode(&s).map_err(|err| Error::custom(err.to_string()))
+// }
+//
+// fn as_base64<S>(input: &[u8], serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
+//     serializer.serialize_str(&base64::encode(input))
+// }
 
 impl ResourceBuilder for AreaBuilder {
     fn owned_id(&self) -> String {

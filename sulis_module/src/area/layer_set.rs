@@ -142,15 +142,9 @@ impl LayerSet {
                 &format!("Entity layer of {} is invalid.", entity_layer_index));
         }
 
-        let elevation = match builder.elevation {
-            None => vec![0;dim],
-            Some(ref elev) => {
-                if elev.len() != dim {
-                    return invalid_data_error("Elevation array must be dimension length*width");
-                }
-                elev.clone()
-            }
-        };
+        if builder.elevation.len() != dim {
+            return invalid_data_error("Elevation array must be dimension length*width");
+        }
 
         Ok(LayerSet {
             width,
@@ -159,7 +153,7 @@ impl LayerSet {
             entity_layer_index,
             passable,
             visible,
-            elevation,
+            elevation: builder.elevation.clone(),
         })
     }
 

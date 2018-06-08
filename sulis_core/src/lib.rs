@@ -21,7 +21,7 @@ extern crate backtrace;
 #[macro_use] extern crate log;
 extern crate flexi_logger;
 
-extern crate serde;
+pub extern crate serde;
 pub extern crate serde_yaml;
 #[macro_use] extern crate serde_derive;
 

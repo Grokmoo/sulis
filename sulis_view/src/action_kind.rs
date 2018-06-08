@@ -107,7 +107,9 @@ impl DialogAction {
             None => return None,
             Some(pc) => Rc::clone(pc),
         };
-        if pc.borrow().dist_to_entity(&target) <= max_dist {
+
+        let dist = pc.borrow().dist_to_entity(&target);
+        if dist <= max_dist {
             Some(Box::new(DialogAction { target, pc }))
         } else {
             let cb_action = Box::new(DialogAction {
@@ -346,10 +348,9 @@ impl MoveThenAction {
     fn create_if_valid(pos: Point, size: &Rc<ObjectSize>, dist: f32, cb_action: Box<ActionKind>,
                        cursor_state: animation_state::Kind) -> Option<Box<ActionKind>> {
         let (px, py) = (pos.x as f32, pos.y as f32);
-        let (w, h) = (size.width as f32, size.height as f32);
 
-        let x = px + w / 2.0 - 0.5;
-        let y = py + h / 2.0 - 0.5;
+        let x = px + (size.width / 2) as f32;
+        let y = py + (size.height / 2) as f32;
 
         let pc = match GameState::selected().first() {
             None => return None,

@@ -283,6 +283,12 @@ impl UserData for ScriptEntity {
             Ok(())
         });
 
+        methods.add_method("name", |_, entity, ()| {
+            let entity = entity.try_unwrap()?;
+            let entity = entity.borrow();
+            Ok(entity.actor.actor.name.to_string())
+        });
+
         methods.add_method("stats", &create_stats_table);
 
         methods.add_method("inventory", |_, entity, ()| {

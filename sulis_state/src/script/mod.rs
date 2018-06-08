@@ -216,6 +216,24 @@ impl UserData for ScriptInterface {
             Ok(())
         });
 
+        methods.add_method("say_line", |_, _, (line, target): (String, Option<ScriptEntity>)| {
+            let pc = GameState::player();
+            let target = match target {
+                None => Rc::clone(&pc),
+                Some(ref entity) => {
+                    entity.try_unwrap()?
+                }
+            };
+
+            let cb = OnTrigger {
+                say_line: Some(line),
+                ..Default::default()
+            };
+
+            GameState::add_ui_callback(cb, &pc, &target);
+            Ok(())
+        });
+
         methods.add_method("start_conversation", |_, _, (id, target): (String, Option<ScriptEntity>)| {
             let pc = GameState::player();
             let target = match target {
@@ -232,6 +250,10 @@ impl UserData for ScriptInterface {
 
             GameState::add_ui_callback(cb, &pc, &target);
             Ok(())
+        });
+
+        methods.add_method("entities_with_ids", |_, _, ids: Vec<String>| {
+            Ok(entities_with_ids(ids))
         });
 
         methods.add_method("entity_with_id", |_, _, id: String| {
@@ -297,6 +319,21 @@ impl UserData for ScriptAbility {
             Ok(cb_data)
         });
     }
+}
+
+fn entities_with_ids(ids: Vec<String>) -> Vec<ScriptEntity> {
+    let mut result = Vec::new();
+
+    let area_state = GameState::area_state();
+    let area_state = area_state.borrow();
+
+    for entity in area_state.entity_iter() {
+        if ids.contains(&entity.borrow().actor.actor.id) {
+            result.push(ScriptEntity::from(&entity));
+        }
+    }
+
+    result
 }
 
 fn entity_with_id(id: String) -> Option<Rc<RefCell<EntityState>>> {

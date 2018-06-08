@@ -105,7 +105,7 @@ use sulis_module::{Ability, Actor, Module, ObjectSize, OnTrigger, area::{Trigger
 use script::ScriptEntitySet;
 use script::script_callback::ScriptHitKind;
 
-pub const MOVE_TO_THRESHOLD: f32 = 0.6;
+pub const MOVE_TO_THRESHOLD: f32 = 0.1;
 
 thread_local! {
     static STATE: RefCell<Option<GameState>> = RefCell::new(None);
@@ -711,8 +711,8 @@ impl GameState {
                   target: &Rc<RefCell<EntityState>>) -> (f32, f32, f32) {
         let (target_x, target_y) = {
             let target = target.borrow();
-            (target.location.x as f32 + target.size.width as f32 / 2.0 - 0.5,
-             target.location.y as f32 + target.size.height as f32/ 2.0 - 0.5)
+            (target.location.x as f32 + (target.size.width / 2) as f32,
+             target.location.y as f32 + (target.size.height / 2) as f32)
         };
 
         let sizes = (entity.borrow().size.diagonal + target.borrow().size.diagonal) / 2.0;

@@ -44,6 +44,7 @@ impl AreaFeedbackText {
                pos_x: f32, pos_y: f32, color: Color, move_rate: f32) -> AreaFeedbackText {
         let font = ResourceSet::get_default_font();
         let text_width = font.get_width(&text) as f32 / font.line_height as f32;
+        let duration = CONFIG.display.animation_base_time_millis * (50 + text.len() as u32 / 2);
 
         AreaFeedbackText {
             area_pos,
@@ -54,7 +55,7 @@ impl AreaFeedbackText {
             color,
             move_rate,
             start_time: Instant::now(),
-            duration: CONFIG.display.animation_base_time_millis * 40,
+            duration,
             font_renderer: LineRenderer::new(&font),
 
             hover_y: 0.0,
@@ -85,7 +86,8 @@ impl AreaFeedbackText {
     pub fn draw(&self, renderer: &mut GraphicsRenderer, text_scale: f32, offset_x: f32, offset_y: f32,
                 scale_x: f32, scale_y: f32) {
         // TODO font, color at a minimum should be configurable via text configuration
-        let pos_x = offset_x + self.pos_x - text_scale * self.text_width / 2.0;
+        let mut pos_x = offset_x + self.pos_x - text_scale * self.text_width / 2.0;
+        if pos_x < 0.0 { pos_x = 0.0; }
         let pos_y = offset_y + self.pos_y - self.hover_y;
 
         let mut draw_list = self.font_renderer.get_draw_list(&self.text, pos_x, pos_y, text_scale);

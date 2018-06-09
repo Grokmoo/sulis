@@ -1,0 +1,4 @@
+id: props/door_double_02
+states:
+  normal: props/door_double_02_closed
+  active: props/door_double_02_open

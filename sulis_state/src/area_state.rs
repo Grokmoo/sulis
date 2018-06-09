@@ -16,11 +16,11 @@
 
 use rand::{self, Rng};
 use sulis_core::ui::Color;
-use sulis_module::{Actor, Area, LootList, Module, ObjectSize};
+use sulis_module::{Actor, Area, LootList, Module, ObjectSize, prop};
 use sulis_module::area::{EncounterData, PropData, Transition, TriggerKind};
 use sulis_core::util::{Point};
 
-use {ActorState, AreaFeedbackText, calculate_los, ChangeListenerList, EntityState, GameState,
+use {ActorState, AreaFeedbackText, calculate_los, has_visibility, ChangeListenerList, EntityState, GameState,
     Location, Merchant, PropState, ScriptCallback, Targeter, TurnTimer};
 
 use std::{ptr};
@@ -47,7 +47,10 @@ pub struct AreaState {
     transition_grid: Vec<Option<usize>>,
     trigger_grid: Vec<Option<usize>>,
 
-    pub pc_vis_delta: (i32, i32),
+    prop_vis_grid: Vec<bool>,
+    prop_pass_grid: Vec<bool>,
+
+    pub pc_vis_delta: (bool, i32, i32),
     pc_vis: Vec<bool>,
     pc_explored: Vec<bool>,
 
@@ -165,10 +168,12 @@ impl AreaState {
             entity_grid,
             prop_grid,
             trigger_grid,
+            prop_vis_grid: vec![true;dim],
+            prop_pass_grid: vec![true;dim],
             listeners: ChangeListenerList::default(),
             pc_vis,
             pc_explored,
-            pc_vis_delta: (0, 0),
+            pc_vis_delta: (false, 0, 0),
             feedback_text: Vec::new(),
             scroll_to_callback: None,
             last_time_millis: 0,
@@ -420,6 +425,58 @@ impl AreaState {
         Some(self.get_prop(index))
     }
 
+    pub fn toggle_prop_active(&mut self, index: usize) {
+        {
+            let state = self.get_prop_mut(index);
+            state.toggle_active();
+            if !state.is_door() { return; }
+        }
+
+        self.update_prop_vis_pass_grid(index);
+
+        self.pc_vis_delta = (true, 0, 0);
+        for member in GameState::party().iter() {
+            self.compute_pc_visibility(member, 0, 0);
+        }
+        self.update_view_visibility();
+    }
+
+    fn update_prop_vis_pass_grid(&mut self, index: usize) {
+        // borrow checker isn't smart enough to let us use get_prop_mut here
+        let prop_ref = self.props[index].as_mut();
+        let state = prop_ref.unwrap();
+
+        if !state.is_door() { return; }
+
+        let width = self.area.width;
+        let start_x = state.location.x;
+        let start_y = state.location.y;
+        let end_x = start_x + state.prop.size.width;
+        let end_y = start_y + state.prop.size.height;
+
+        if state.is_active() {
+            for y in start_y..end_y {
+                for x in start_x..end_x {
+                    self.prop_vis_grid[(x + y * width) as usize] = true;
+                    self.prop_pass_grid[(x + y * width) as usize] = true;
+                }
+            }
+        } else {
+            match state.prop.interactive {
+                prop::Interactive::Door { ref closed_invis, ref closed_impass, .. } => {
+                    for p in closed_invis.iter() {
+                        self.prop_vis_grid[(p.x + start_x + (p.y + start_y) * width) as usize] = false;
+                    }
+
+                    for p in closed_impass.iter() {
+                        self.prop_pass_grid[(p.x + start_x + (p.y + start_y) * width) as usize] = false;
+                    }
+                },
+                _ => (),
+            }
+        }
+    }
+
     pub fn get_entity_at(&self, x: i32, y: i32) -> Option<Rc<RefCell<EntityState>>> {
         if !self.area.coords_valid(x, y) { return None; }
 
@@ -443,8 +500,13 @@ impl AreaState {
         self.area.transitions.get(index)
     }
 
+    pub fn has_visibility(&self, parent: &EntityState, target: &EntityState) -> bool {
+        has_visibility(&self.area, &self.prop_vis_grid, parent, target)
+    }
+
     pub fn compute_pc_visibility(&mut self, entity: &Rc<RefCell<EntityState>>, delta_x: i32, delta_y: i32) {
-        calculate_los(&mut self.pc_explored, &self.area, &mut entity.borrow_mut(), delta_x, delta_y);
+        calculate_los(&mut self.pc_explored, &self.area, &self.prop_vis_grid,
+                      &mut entity.borrow_mut(), delta_x, delta_y);
     }
 
     pub fn update_view_visibility(&mut self) {
@@ -464,7 +526,7 @@ impl AreaState {
         }
     }
 
-    pub fn enable_trigger_at(&mut self, x: i32, y: i32) -> bool{
+    pub fn set_trigger_enabled_at(&mut self, x: i32, y: i32, enabled: bool) -> bool{
         if !self.area.coords_valid(x, y) {
             warn!("Invalid coords to enable trigger at {},{}", x, y);
             return false;
@@ -475,7 +537,7 @@ impl AreaState {
             Some(index) => index,
         };
 
-        self.triggers[index].enabled = true;
+        self.triggers[index].enabled = enabled;
         true
     }
 
@@ -510,7 +572,10 @@ impl AreaState {
     fn point_size_passable(&self, x: i32, y: i32) -> bool {
         if !self.area.coords_valid(x, y) { return false; }
 
-        let grid_index = &self.entity_grid[(x + y * self.area.width) as usize];
+        let index = (x + y * self.area.width) as usize;
+        if !self.prop_pass_grid[index] { return false; }
+
+        let grid_index = &self.entity_grid[index];
 
         grid_index.is_empty()
     }
@@ -519,7 +584,10 @@ impl AreaState {
                                x: i32, y: i32) -> bool {
         if !self.area.coords_valid(x, y) { return false; }
 
-        let grid = &self.entity_grid[(x + y * self.area.width) as usize];
+        let index = (x + y * self.area.width) as usize;
+        if !self.prop_pass_grid[index] { return false; }
+
+        let grid = &self.entity_grid[index];
 
         for index in grid.iter() {
             if !entities_to_ignore.contains(index) { return false; }
@@ -550,6 +618,7 @@ impl AreaState {
         }
 
         self.props[index] = Some(prop_state);
+        self.update_prop_vis_pass_grid(index);
 
         true
     }
@@ -612,7 +681,7 @@ impl AreaState {
             self.compute_pc_visibility(&entity, 0, 0);
         }
 
-        self.turn_timer.borrow_mut().add(&entity, &self.area);
+        self.turn_timer.borrow_mut().add(&entity, &self);
         self.entities[new_index] = Some(entity);
 
         self.listeners.notify(&self);
@@ -643,7 +712,7 @@ impl AreaState {
         if is_pc {
             let d_x = old_x - entity.borrow().location.x;
             let d_y = old_y - entity.borrow().location.y;
-            self.pc_vis_delta = (d_x, d_y);
+            self.pc_vis_delta = (true, d_x, d_y);
 
             self.compute_pc_visibility(&entity, d_x, d_y);
             self.update_view_visibility();
@@ -651,7 +720,7 @@ impl AreaState {
             self.check_trigger_grid(&entity);
         }
 
-        self.turn_timer.borrow_mut().check_ai_activation(entity, &self.area);
+        self.turn_timer.borrow_mut().check_ai_activation(entity, &self);
     }
 
     fn clear_entity_points(&mut self, entity: &EntityState, x: i32, y: i32) {

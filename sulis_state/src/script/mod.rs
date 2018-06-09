@@ -210,7 +210,16 @@ impl UserData for ScriptInterface {
         methods.add_method("enable_trigger_at", |_, _, (x, y): (i32, i32)| {
             let area_state = GameState::area_state();
             let mut area_state = area_state.borrow_mut();
-            if !area_state.enable_trigger_at(x, y) {
+            if !area_state.set_trigger_enabled_at(x, y, true) {
+                warn!("Unable to find trigger at {},{}", x, y);
+            }
+            Ok(())
+        });
+
+        methods.add_method("disable_trigger_at", |_, _, (x, y): (i32, i32)| {
+            let area_state = GameState::area_state();
+            let mut area_state = area_state.borrow_mut();
+            if !area_state.set_trigger_enabled_at(x, y, false) {
                 warn!("Unable to find trigger at {},{}", x, y);
             }
             Ok(())

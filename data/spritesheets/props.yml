@@ -88,8 +88,16 @@ groups:
       armor_statue: [4, 4, 2, 3]
       boxes06: [6, 7, 3, 2]
       boxes07: [9, 7, 3, 2]
-      door01_closed: [0, 24, 4, 6]
-      door01_open: [4, 24, 4, 6]
+      door_double_01_closed: [0, 24, 4, 5]
+      door_double_01_open: [4, 24, 4, 5]
+      door_double_02_closed: [8, 24, 4, 4]
+      door_double_02_open: [12, 24, 4, 4]
+      door_single_01_closed: [16, 24, 2, 3]
+      door_single_01_open: [18, 24, 2, 3]
+      door_single_02_closed: [20, 24, 2, 3]
+      door_single_02_open: [22, 24, 2, 3]
+      door_single_03_closed: [24, 24, 2, 3]
+      door_single_03_open: [26, 24, 2, 3]
   campfire:
     size: [2, 4]
     areas:

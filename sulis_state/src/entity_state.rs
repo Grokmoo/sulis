@@ -20,7 +20,6 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_core::config::CONFIG;
-use sulis_module::Area;
 
 use animation::{Animation, MeleeAttackAnimation, RangedAttackAnimation};
 use sulis_core::io::GraphicsRenderer;
@@ -29,7 +28,7 @@ use sulis_core::util::Point;
 use sulis_module::{Actor, ObjectSize, ObjectSizeIterator, Module};
 use sulis_module::area::{MAX_AREA_SIZE, Transition};
 use {ActorState, AreaState, ChangeListenerList, EntityTextureCache, EntityTextureSlot,
-    GameState, has_visibility, Location, PropState, ScriptCallback};
+    GameState, Location, PropState, ScriptCallback};
 
 enum AIState {
     Player {
@@ -223,12 +222,12 @@ impl EntityState {
 
     /// Returns true if this entity can attack the specified target with its
     /// current weapon, without moving
-    pub fn can_attack(&self, target: &Rc<RefCell<EntityState>>, area: &Rc<Area>) -> bool {
+    pub fn can_attack(&self, target: &Rc<RefCell<EntityState>>, area_state: &AreaState) -> bool {
         let dist = self.dist_to_entity(target);
 
         if !self.actor.can_weapon_attack(target, dist) { return false; }
 
-        self.has_visibility(target, area)
+        area_state.has_visibility(&self, &target.borrow())
     }
 
     pub fn attack(entity: &Rc<RefCell<EntityState>>, target: &Rc<RefCell<EntityState>>,
@@ -285,10 +284,6 @@ impl EntityState {
         self.location.move_to(x, y);
         self.listeners.notify(&self);
         true
-    }
-
-    pub fn has_visibility(&self, other: &Rc<RefCell<EntityState>>, area: &Rc<Area>) -> bool {
-        has_visibility(area, &self, &other.borrow())
     }
 
     pub fn dist_to_point(&self, pos: Point) -> f32 {

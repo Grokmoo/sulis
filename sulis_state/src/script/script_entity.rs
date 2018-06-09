@@ -505,17 +505,16 @@ fn visible_within(_lua: &Lua, set: &ScriptEntitySet, dist: f32) -> Result<Script
         if parent.borrow().dist_to_entity(entity) > dist { return false; }
 
         let area_state = GameState::area_state();
-        let area = &area_state.borrow().area;
-        parent.borrow().has_visibility(entity, area)
+        let area_state = area_state.borrow();
+        area_state.has_visibility(&parent.borrow(), &entity.borrow())
     })
 }
 
 fn attackable(_lua: &Lua, set: &ScriptEntitySet, _args: ()) -> Result<ScriptEntitySet> {
     filter_entities(set, (), &|parent, entity, _| {
         let area_state = GameState::area_state();
-        let area = &area_state.borrow().area;
-
-        parent.borrow().can_attack(entity, area)
+        let area_state = area_state.borrow();
+        parent.borrow().can_attack(entity, &area_state)
     })
 }
 

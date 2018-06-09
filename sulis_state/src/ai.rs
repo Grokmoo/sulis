@@ -109,7 +109,7 @@ impl EntityAI {
         self.pick_target();
         let entity = self.entity.borrow();
         let area_state = GameState::area_state();
-        let area = Rc::clone(&area_state.borrow().area);
+        let area_state = &area_state.borrow();
 
         let target = match self.target {
             None => return State::End,
@@ -121,7 +121,7 @@ impl EntityAI {
         // a good one is found
         if !entity.can_reach(target) && GameState::can_move_towards(&self.entity, target) {
             State::Move
-        } else if entity.can_attack(target, &area) {
+        } else if entity.can_attack(target, &area_state) {
             State::Attack
         } else {
             State::End

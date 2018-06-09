@@ -20,7 +20,7 @@ use std::collections::HashSet;
 use std::collections::VecDeque;
 pub use std::collections::vec_deque::Iter;
 
-use sulis_module::{Area, Faction};
+use sulis_module::{Faction};
 
 use {ActorState, AreaState, ChangeListenerList, EntityState, GameState};
 
@@ -76,7 +76,7 @@ impl TurnTimer {
         true
     }
 
-    pub fn check_ai_activation(&mut self, mover: &Rc<RefCell<EntityState>>, area: &Rc<Area>) {
+    pub fn check_ai_activation(&mut self, mover: &Rc<RefCell<EntityState>>, area_state: &AreaState) {
         let mut groups_to_activate: HashSet<usize> = HashSet::new();
         let mut updated = false;
 
@@ -84,9 +84,8 @@ impl TurnTimer {
             if Rc::ptr_eq(mover, entity) { continue; }
             if !entity.borrow().is_hostile(mover) { continue; }
 
-            if !mover.borrow().has_visibility(entity, area) && !entity.borrow().has_visibility(mover, area) {
-                continue;
-            }
+            if !area_state.has_visibility(&mover.borrow(), &entity.borrow()) &&
+                !area_state.has_visibility(&entity.borrow(), &mover.borrow()) { continue; }
 
             self.activate_entity(entity, &mut groups_to_activate);
             updated = true;
@@ -170,14 +169,14 @@ impl TurnTimer {
         self.listeners.notify(&self);
     }
 
-    pub fn add(&mut self, entity: &Rc<RefCell<EntityState>>, area: &Rc<Area>) {
+    pub fn add(&mut self, entity: &Rc<RefCell<EntityState>>, area_state: &AreaState) {
         debug!("Added entity to turn timer: '{}'", entity.borrow().actor.actor.name);
         self.entities.push_back(Rc::clone(entity));
         if self.entities.len() == 1 {
             // we just pushed the only entity
             ActorState::init_actor_turn(entity);
         }
-        self.check_ai_activation(entity, area);
+        self.check_ai_activation(entity, area_state);
         self.listeners.notify(&self);
     }
 

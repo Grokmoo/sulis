@@ -1,0 +1,14 @@
+id: door_single_01
+name: Door
+icon: inventory/misc_crate
+image: props/door_single_01
+size: 2by3
+impass: []
+invis: []
+interactive:
+  Door:
+    initially_open: false
+    closed_impass: [[0, 0], [1, 0],
+                    [0, 1], [1, 1],
+                    [0, 2], [1, 2]]
+    closed_invis:  []

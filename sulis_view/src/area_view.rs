@@ -499,12 +499,12 @@ impl WidgetKind for AreaView {
             self.draw_vis_to_texture(renderer, &state.area.visibility_tile, &state.area.explored_tile,
                                      &state, 0, 0, max_x, max_y);
             self.cache_invalid = false;
-            state.pc_vis_delta = (0, 0);
+            state.pc_vis_delta = (false, 0, 0);
         }
 
-        let (pc_vis_delta_x, pc_vis_delta_y) = state.pc_vis_delta;
-        if pc_vis_delta_x != 0 || pc_vis_delta_y != 0 {
-            state.pc_vis_delta = (0, 0);
+        let (redraw, pc_vis_delta_x, pc_vis_delta_y) = state.pc_vis_delta;
+        if redraw {
+            state.pc_vis_delta = (false, 0, 0);
             debug!("Redrawing PC visibility to texture");
             self.draw_visibility_to_texture(renderer, &state.area.visibility_tile,
                                             &state.area.explored_tile, &state,

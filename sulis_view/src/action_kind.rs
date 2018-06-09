@@ -31,9 +31,9 @@ pub fn get_action(x: i32, y: i32) -> Box<ActionKind> {
     if let Some(action) = SelectAction::create_if_valid(x, y) { return action; }
     if let Some(action) = AttackAction::create_if_valid(x, y) { return action; }
     if let Some(action) = DialogAction::create_if_valid(x, y) { return action; }
-    if let Some(action) = DoorPropAction::create_if_valid(x, y) { return action; }
     if let Some(action) = LootPropAction::create_if_valid(x, y) { return action; }
     if let Some(action) = TransitionAction::create_if_valid(x, y) { return action; }
+    if let Some(action) = DoorPropAction::create_if_valid(x, y) { return action; }
     if let Some(action) = MoveAction::create_if_valid(x as f32, y as f32, None) { return action; }
 
     Box::new(InvalidAction {})
@@ -195,8 +195,7 @@ impl ActionKind for DoorPropAction {
     fn fire_action(&mut self, _widget: &Rc<RefCell<Widget>>) {
         let area_state = GameState::area_state();
         let mut area_state = area_state.borrow_mut();
-        let state = area_state.get_prop_mut(self.index);
-        state.toggle_active();
+        area_state.toggle_prop_active(self.index);
     }
 }
 
@@ -345,7 +344,7 @@ impl AttackAction {
             None => return None,
             Some(pc) => Rc::clone(pc),
         };
-        if pc.borrow().can_attack(&target, &area_state.area) {
+        if pc.borrow().can_attack(&target, &area_state) {
             Some(Box::new(AttackAction { pc, target }))
         } else {
             let cb_action = Box::new(AttackAction {
@@ -371,7 +370,7 @@ impl ActionKind for AttackAction {
     fn fire_action(&mut self, _widget: &Rc<RefCell<Widget>>) {
         trace!("Firing attack action.");
         let area_state = GameState::area_state();
-        if !self.pc.borrow().can_attack(&self.target, &area_state.borrow().area) {
+        if !self.pc.borrow().can_attack(&self.target, &area_state.borrow()) {
             return;
         }
 

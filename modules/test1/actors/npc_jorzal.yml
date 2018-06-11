@@ -42,4 +42,7 @@ equipped:
   - 4
   - 5
 levels:
-  fighter: 4
+  fighter: 3
+abilities:
+  - mighty_blow
+  - impenetrable_defense

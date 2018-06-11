@@ -3507,7 +3507,7 @@ layer_set:
       - 12
     - - 0
       - 12
-  props/bonespike:
+  bonespike:
     - - 19
       - 13
     - - 21

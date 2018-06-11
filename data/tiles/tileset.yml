@@ -559,7 +559,7 @@ uniform_sets:
     impass: [[0, 0], [1, 0], [2, 0], [3, 0], [0, 1], [1, 1], [2, 1], [3, 1],
       [0, 2], [1, 2], [2, 2], [3, 2], [0, 3], [1, 3], [2, 3], [3, 3]]
     invis: []
-    tiles: [ well, barrels, nest_empty, nest, bonestack, bonespike ]
+    tiles: [ well, barrels, nest_empty, nest, bonestack ]
 non_uniform_sets:
   object:
     layer: object
@@ -1014,6 +1014,11 @@ tiles:
     sprite: tileset/tree_big_01
     impass: [[8, 17], [9, 17], [10, 17], [11, 17], [8, 18], [9, 18], [10, 18], [11, 18]]
     invis: [[8, 17], [9, 17], [10, 17], [11, 17], [8, 18], [9, 18], [10, 18], [11, 18]]
+  bonespike:
+    layer: prop
+    size: [4, 4]
+    sprite: props/bonespike
+    impass: [[1, 1], [2, 1], [1, 2], [2, 2], [1, 3], [2, 3]]
   armor_statue:
     layer: prop
     size: [2, 3]

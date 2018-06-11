@@ -400,11 +400,22 @@ impl AreaState {
         let location = Location::new(x, y, &self.area);
         let prop_data = PropData {
             prop,
+            enabled: true,
             location: location.to_point(),
             items: Vec::new(),
         };
 
         self.add_prop(&prop_data, location, true);
+    }
+
+    pub fn set_prop_enabled_at(&mut self, x: i32, y: i32, enabled: bool) -> bool {
+        match self.prop_mut_at(x, y) {
+            None => false,
+            Some(ref mut prop) => {
+                prop.set_enabled(enabled);
+                true
+            }
+        }
     }
 
     pub fn prop_mut_at(&mut self, x: i32, y: i32) -> Option<&mut PropState> {

@@ -43,6 +43,7 @@ pub struct PropState {
     pub animation_state: AnimationState,
     pub listeners: ChangeListenerList<PropState>,
     interactive: Interactive,
+    enabled: bool,
 
     marked_for_removal: bool,
 }
@@ -83,12 +84,17 @@ impl PropState {
 
         PropState {
             prop: Rc::clone(&prop_data.prop),
+            enabled: prop_data.enabled,
             location,
             interactive,
             animation_state: AnimationState::default(),
             listeners: ChangeListenerList::default(),
             marked_for_removal: false,
         }
+    }
+
+    pub (crate) fn set_enabled(&mut self, enabled: bool) {
+        self.enabled = enabled;
     }
 
     pub (crate) fn is_marked_for_removal(&self) -> bool {
@@ -108,6 +114,8 @@ impl PropState {
     }
 
     pub fn is_door(&self) -> bool {
+        if !self.enabled { return false; }
+
         match self.interactive {
             Interactive::Door { .. } => true,
             _ => false,
@@ -115,6 +123,8 @@ impl PropState {
     }
 
     pub fn is_container(&self) -> bool {
+        if !self.enabled { return false; }
+
         match self.interactive {
             Interactive::Container { .. } => true,
             _ => false,

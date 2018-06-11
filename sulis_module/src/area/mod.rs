@@ -75,6 +75,7 @@ pub struct PropData {
     pub prop: Rc<Prop>,
     pub location: Point,
     pub items: Vec<Rc<Item>>,
+    pub enabled: bool,
 }
 
 pub struct EncounterData {
@@ -331,6 +332,7 @@ pub struct PropDataBuilder {
     pub id: String,
     pub location: Point,
     pub items: Option<Vec<String>>,
+    pub enabled: Option<bool>,
 }
 
 pub fn create_prop(builder: &PropDataBuilder, module: &Module) -> Result<PropData, Error> {
@@ -354,9 +356,12 @@ pub fn create_prop(builder: &PropDataBuilder, module: &Module) -> Result<PropDat
         }
     }
 
+    let enabled = builder.enabled.unwrap_or(true);
+
     Ok(PropData {
         prop,
         location,
         items,
+        enabled,
     })
 }

@@ -380,6 +380,11 @@ groups:
       cave_entrance_large_w: [1, 5, 1, 3]
       cave_entrance_large_c: [2, 5, 1, 3]
       cave_entrance_large_e: [3, 5, 1, 3]
+ 
+      door_frame_metal_e: [3, 2, 1, 2]
+      door_frame_metal_w: [4, 2, 1, 2]
+      door_frame_wood_e: [5, 2, 1, 2]
+      door_frame_wood_w: [6, 2, 1, 2]
   small_plants:
     position: [0, 45]
     size: [1, 1]

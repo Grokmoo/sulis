@@ -1149,3 +1149,19 @@ tiles:
     sprite: tileset/bridge_vert_s
     override_impass: true
     impass: []
+  door_frame_metal_e:
+    layer: walls
+    size: [2, 3]
+    sprite: tileset/door_frame_metal_e
+  door_frame_metal_w:
+    layer: walls
+    size: [2, 3]
+    sprite: tileset/door_frame_metal_w
+  door_frame_wood_e:
+    layer: walls
+    size: [2, 3]
+    sprite: tileset/door_frame_wood_e
+  door_frame_wood_w:
+    layer: walls
+    size: [2, 3]
+    sprite: tileset/door_frame_wood_w

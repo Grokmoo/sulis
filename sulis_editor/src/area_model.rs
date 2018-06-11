@@ -295,6 +295,7 @@ impl AreaModel {
 
         let prop_data = PropData {
             prop,
+            enabled: true,
             location: Point::new(x, y),
             items: Vec::new(),
         };
@@ -610,6 +611,7 @@ impl AreaModel {
 
             let prop_data = PropData {
                 prop,
+                enabled: prop_builder.enabled.unwrap_or(true),
                 location: prop_builder.location,
                 items,
             };
@@ -702,6 +704,7 @@ impl AreaModel {
 
             let builder = PropDataBuilder {
                 id: prop_data.prop.id.to_string(),
+                enabled: Some(prop_data.enabled),
                 location: prop_data.location,
                 items: Some(items),
             };

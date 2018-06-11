@@ -225,6 +225,24 @@ impl UserData for ScriptInterface {
             Ok(())
         });
 
+        methods.add_method("enable_prop_at", |_, _, (x, y): (i32, i32)| {
+            let area_state = GameState::area_state();
+            let mut area_state = area_state.borrow_mut();
+            if !area_state.set_prop_enabled_at(x, y, true) {
+                warn!("Unable to find prop at {},{}", x, y);
+            }
+            Ok(())
+        });
+
+        methods.add_method("disable_prop_at", |_, _, (x, y): (i32, i32)| {
+            let area_state = GameState::area_state();
+            let mut area_state = area_state.borrow_mut();
+            if !area_state.set_prop_enabled_at(x, y, false) {
+                warn!("Unable to find prop at {},{}", x, y);
+            }
+            Ok(())
+        });
+
         methods.add_method("say_line", |_, _, (line, target): (String, Option<ScriptEntity>)| {
             let pc = GameState::player();
             let target = match target {

@@ -46,6 +46,12 @@ impl AreaEditor {
         }))
     }
 
+    pub fn clear_area(&mut self) {
+        self.model = AreaModel::new();
+        self.scroll = Scrollable::new();
+        self.cur_editor = None;
+    }
+
     pub fn set_editor(&mut self, editor: Rc<RefCell<EditorMode>>) {
         self.cur_editor = Some(editor);
     }

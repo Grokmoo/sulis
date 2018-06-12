@@ -1,0 +1,20 @@
+id: goblin_weak
+name: Goblin
+faction: Hostile
+images: {}
+race: goblin
+attributes:
+  str: 7
+  dex: 11
+  end: 6
+  per: 10
+  int: 7
+  wis: 9
+levels:
+  rogue: 1
+items: [ weak_dagger ]
+equipped: [ 0 ]
+reward:
+  xp: 25
+  loot: level1_misc
+  loot_chance: 35

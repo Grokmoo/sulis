@@ -3,5 +3,5 @@ auto_spawn: false
 min_actors: 2
 max_actors: 2
 entries:
-  goblin:
+  goblin_weak:
     weight: 1

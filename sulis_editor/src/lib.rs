@@ -53,6 +53,9 @@ use tile_picker::TilePicker;
 mod transition_window;
 use transition_window::TransitionWindow;
 
+mod vis_picker;
+use vis_picker::VisPicker;
+
 mod wall_picker;
 use wall_picker::WallPicker;
 
@@ -144,6 +147,15 @@ impl WidgetKind for EditorView {
             let mut entries: Vec<list_box::Entry<String>> = Vec::new();
 
             let area_editor_kind_ref = Rc::clone(&area_editor_kind);
+            let new = list_box::Entry::new("New".to_string(),
+            Some(Callback::with_widget(Rc::new(move |widget| {
+                area_editor_kind_ref.borrow_mut().clear_area();
+                let parent = Widget::get_parent(widget);
+                parent.borrow_mut().mark_for_removal();
+            }))));
+            entries.push(new);
+
+            let area_editor_kind_ref = Rc::clone(&area_editor_kind);
             let save = list_box::Entry::new("Save".to_string(),
             Some(Callback::with_widget(Rc::new(move |widget| {
                 let root = Widget::get_root(widget);
@@ -219,6 +231,7 @@ impl WidgetKind for EditorView {
         let elev_picker_kind = ElevPicker::new();
         let encounter_picker_kind = EncounterPicker::new();
         let pass_picker_kind = PassPicker::new();
+        let vis_picker_kind = VisPicker::new();
 
         let mut pickers = Vec::new();
         pickers.push(Widget::with_defaults(tile_picker_kind.clone()));
@@ -229,16 +242,18 @@ impl WidgetKind for EditorView {
         pickers.push(Widget::with_defaults(elev_picker_kind.clone()));
         pickers.push(Widget::with_defaults(encounter_picker_kind.clone()));
         pickers.push(Widget::with_defaults(pass_picker_kind.clone()));
+        pickers.push(Widget::with_defaults(vis_picker_kind.clone()));
         for picker in pickers.iter() {
             picker.borrow_mut().state.set_visible(false);
         }
 
         let picker_kinds: Vec<Rc<RefCell<EditorMode>>> =
             vec![tile_picker_kind, terrain_picker_kind, wall_picker_kind, actor_picker_kind,
-                prop_picker_kind, elev_picker_kind, encounter_picker_kind, pass_picker_kind];
+                prop_picker_kind, elev_picker_kind, encounter_picker_kind, pass_picker_kind,
+                vis_picker_kind];
 
         let names = vec!["Tiles", "Terrain", "Walls", "Actors", "Props",
-            "Elevation", "Encounters", "Passability"];
+            "Elevation", "Encounters", "Passability", "Visibility"];
 
         // Any new pickers need to be added in all 3 places
         assert!(names.len() == picker_kinds.len());

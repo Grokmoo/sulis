@@ -28,8 +28,8 @@ mouseover_offset: [0, 0]
 ticker_offset: [0.5, 1]
 image_layer_offset_scale: 16
 image_layer_offsets:
-  HeldMain: [-24, -20]
-  HeldOff: [8, -20]
+  HeldMain: [-23, -18]
+  HeldOff: [8, -18]
   Shadow: [0, -4]
   Background: [0, -5]
 image_layer_postfix: {}

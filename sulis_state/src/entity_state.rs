@@ -148,7 +148,7 @@ impl EntityState {
 
     pub fn set_party_member(&mut self, member: bool) {
         if member {
-            let dim = (self.location.area_width * self.location.area_height) as usize;
+            let dim = (MAX_AREA_SIZE * MAX_AREA_SIZE) as usize;
             self.ai_state = AIState::Player {
                 vis: vec![false; dim],
             };

@@ -32,6 +32,9 @@ use encounter_picker::EncounterPicker;
 mod load_window;
 use load_window::LoadWindow;
 
+mod pass_picker;
+use pass_picker::PassPicker;
+
 mod prop_picker;
 use prop_picker::PropPicker;
 
@@ -179,7 +182,7 @@ impl WidgetKind for EditorView {
             }))));
             entries.push(quit);
 
-            let drop_down = DropDown::new(entries);
+            let drop_down = DropDown::new(entries, "menu_list");
             let menu = Widget::with_theme(drop_down, "menu");
 
             let transitions = Widget::with_theme(Button::empty(), "transitions");
@@ -215,6 +218,7 @@ impl WidgetKind for EditorView {
         let prop_picker_kind = PropPicker::new();
         let elev_picker_kind = ElevPicker::new();
         let encounter_picker_kind = EncounterPicker::new();
+        let pass_picker_kind = PassPicker::new();
 
         let mut pickers = Vec::new();
         pickers.push(Widget::with_defaults(tile_picker_kind.clone()));
@@ -224,39 +228,39 @@ impl WidgetKind for EditorView {
         pickers.push(Widget::with_defaults(prop_picker_kind.clone()));
         pickers.push(Widget::with_defaults(elev_picker_kind.clone()));
         pickers.push(Widget::with_defaults(encounter_picker_kind.clone()));
+        pickers.push(Widget::with_defaults(pass_picker_kind.clone()));
         for picker in pickers.iter() {
             picker.borrow_mut().state.set_visible(false);
         }
 
         let picker_kinds: Vec<Rc<RefCell<EditorMode>>> =
             vec![tile_picker_kind, terrain_picker_kind, wall_picker_kind, actor_picker_kind,
-                prop_picker_kind, elev_picker_kind, encounter_picker_kind];
+                prop_picker_kind, elev_picker_kind, encounter_picker_kind, pass_picker_kind];
 
-        let buttons = vec![Widget::with_theme(Button::empty(), "tiles"),
-            Widget::with_theme(Button::empty(), "terrain"),
-            Widget::with_theme(Button::empty(), "walls"),
-            Widget::with_theme(Button::empty(), "actors"),
-            Widget::with_theme(Button::empty(), "props"),
-            Widget::with_theme(Button::empty(), "elevation"),
-            Widget::with_theme(Button::empty(), "encounters")];
+        let names = vec!["Tiles", "Terrain", "Walls", "Actors", "Props",
+            "Elevation", "Encounters", "Passability"];
 
         // Any new pickers need to be added in all 3 places
-        assert!(buttons.len() == picker_kinds.len());
-        assert!(buttons.len() == pickers.len());
+        assert!(names.len() == picker_kinds.len());
+        assert!(names.len() == pickers.len());
 
-        for (index, button) in buttons.into_iter().enumerate() {
+        let mut entries: Vec<list_box::Entry<String>> = Vec::new();
+        for (index, name) in names.into_iter().enumerate() {
             let pickers_ref = pickers.clone();
             let picker_kinds_ref = picker_kinds.clone();
             let area_editor_ref = Rc::clone(&area_editor_kind);
-            button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |_, _| {
-                for picker in pickers_ref.iter() {
-                    picker.borrow_mut().state.set_visible(false);
-                }
+            entries.push(list_box::Entry::new(name.to_string(), Some(Callback::new(Rc::new(move |widget, _| {
+                pickers_ref.iter().for_each(|p| p.borrow_mut().state.set_visible(false));
                 pickers_ref[index].borrow_mut().state.set_visible(true);
                 area_editor_ref.borrow_mut().set_editor(picker_kinds_ref[index].clone());
-            })));
-            Widget::add_child_to(&top_bar, button);
+
+                let parent = Widget::get_parent(widget);
+                parent.borrow_mut().mark_for_removal();
+            })))));
         }
+        let drop_down = DropDown::new(entries, "modes_list");
+        let modes = Widget::with_theme(drop_down, "modes");
+        Widget::add_child_to(&top_bar, modes);
 
         let area_editor = Widget::with_defaults(area_editor_kind);
 

@@ -28,12 +28,14 @@ const NAME: &str = "drop_down";
 
 pub struct DropDown<T: Display + Clone + 'static> {
     entries: Vec<Entry<T>>,
+    list_theme: String,
 }
 
 impl<T: Display + Clone + 'static> DropDown<T> {
-    pub fn new(entries: Vec<Entry<T>>) -> Rc<RefCell<DropDown<T>>> {
+    pub fn new(entries: Vec<Entry<T>>, list_theme: &str) -> Rc<RefCell<DropDown<T>>> {
         Rc::new(RefCell::new(DropDown {
             entries,
+            list_theme: list_theme.to_string(),
         }))
     }
 
@@ -56,8 +58,9 @@ impl<T: Display + Clone + 'static> WidgetKind for DropDown<T> {
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let button = Widget::with_defaults(Button::empty());
         let entries_clone = self.entries.clone();
+        let list_theme = self.list_theme.to_string();
         let cb = Callback::new(Rc::new(move |widget, _kind| {
-            let list_box = Widget::with_theme(ListBox::new(entries_clone.clone()), "list");
+            let list_box = Widget::with_theme(ListBox::new(entries_clone.clone()), &list_theme);
             list_box.borrow_mut().state.set_modal(true);
             list_box.borrow_mut().state.modal_remove_on_click_outside = true;
             let parent = Widget::get_root(widget);

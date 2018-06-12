@@ -181,6 +181,10 @@ impl AreaModel {
         self.terrain[(x + y * MAX_AREA_SIZE) as usize] = index;
     }
 
+    pub fn all_tiles(&self) -> impl Iterator<Item = &(Point, Rc<Tile>)> {
+        self.tiles.iter().map(|ref v| &v.1).flat_map(|ref t| t.iter())
+    }
+
     pub fn add_tile(&mut self, tile: &Option<Rc<Tile>>, x: i32, y: i32) {
         let tile = match tile {
             &None => return,

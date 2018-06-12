@@ -2,11 +2,17 @@
 children:
   editor:
     children:
-      list:
+      menu_list:
         from: .list_box
         border: { top: 1, bottom: 1, left: 1, right: 1 }
         background: bg_base
         position: [0, 4]
+        preferred_size: [24, 0]
+      modes_list:
+        from: .list_box
+        border: { top: 1, bottom: 1, left: 1, right: 1 }
+        background: bg_base
+        position: [28, 4]
         preferred_size: [24, 0]
       top_bar:
         background: bg_base
@@ -25,16 +31,27 @@ children:
                 from: .button
                 text: "Menu"
                 preferred_size: [24, 4]
+          modes:
+            background: bg_base
+            width_relative: ChildMax
+            height_relative: ChildSum
+            layout: BoxVertical
+            position: [28, 0]
+            children:
+              button:
+                from: .button
+                text: "Mode"
+                preferred_size: [24, 4]
           transitions:
             from: .button
             preferred_size: [24, 4]
             text: "Transitions"
-            position: [28, 0]
+            position: [54, 0]
           shift_tiles:
             from: .button
             preferred_size: [24, 4]
             text: "Shift Tiles"
-            position: [54, 0]
+            position: [80, 0]
           walls:
             from: .button
             preferred_size: [20, 4]

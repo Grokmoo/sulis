@@ -41,6 +41,7 @@ struct Node {
     responses: Vec<Response>,
 }
 
+#[derive(Debug)]
 pub struct Conversation {
     id: String,
     nodes: HashMap<String, Node>,

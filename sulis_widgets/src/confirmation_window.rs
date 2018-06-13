@@ -42,11 +42,7 @@ impl ConfirmationWindow {
 }
 
 impl WidgetKind for ConfirmationWindow {
-    fn get_name(&self) -> &str { "confirmation_window" }
-
-    fn as_any(&self) -> &Any { self }
-
-    fn as_any_mut(&mut self) -> &mut Any { self }
+    widget_kind!("confirmation_window");
 
     fn layout(&mut self, widget: &mut Widget) {
         widget.do_base_layout();

@@ -66,6 +66,7 @@ impl fmt::Display for Sex {
     }
 }
 
+#[derive(Debug)]
 pub struct Actor {
     pub id: String,
     pub name: String,

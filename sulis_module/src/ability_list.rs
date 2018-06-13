@@ -37,12 +37,14 @@ pub enum Connect {
     Straight3x,
 }
 
+#[derive(Debug)]
 pub struct Entry {
     pub ability: Rc<Ability>,
     pub position: (f32, f32),
     pub connect: Vec<Connect>,
 }
 
+#[derive(Debug)]
 pub struct AbilityList {
     pub id: String,
     pub background: Rc<Image>,

@@ -613,35 +613,47 @@ children:
           #description#
         width_relative: Max
         height_relative: Max
-  exit_confirmation_window:
+  exit_confirmation:
     from: .confirmation_window
     children:
       title:
         text: "Exit Sulis?"
-  game_over_menu:
-    background: bg_base
-    border: [1, 1, 1, 1]
-    preferred_size: [40, 28]
-    x_relative: Center
-    y_relative: Center
-    position: [0, -20]
+  menu_confirmation:
+    from: .confirmation_window
     children:
       title:
-        from: .label
-        width_relative: Max
-        preferred_size: [0, 4]
-        position: [0, 2]
+        text: "Return to Main Menu?"
+      accept:
+        text: "Accept"
+  in_game_menu:
+    background: bg_base
+    border: [5, 5, 5, 5]
+    preferred_size: [40, 10]
+    x_relative: Center
+    y_relative: Center
+    position: [0, 0]
+    layout: BoxVertical
+    layout_spacing: { top: 0, bottom: 5, left: 0, right: 0 }
+    height_relative: ChildSum
+    children:
+      back:
+        from: .button
+        preferred_size: [20, 10]
+        text: "Back to Game"
         text_params:
           scale: 5.5
-        text: "Game Over"
+      menu:
+        from: .button
+        preferred_size: [20, 10]
+        text: "Main Menu"
+        text_params:
+          scale: 5.5
       exit:
         from: .button
         preferred_size: [20, 10]
         text: "Exit"
         text_params:
           scale: 5.5
-        x_relative: Center
-        position: [0, 12]
   bonus_text:
     from: .text_area
     text: |

@@ -26,12 +26,14 @@ use sulis_core::serde_yaml;
 
 use {Actor, Module, PrereqList, PrereqListBuilder};
 
+#[derive(Debug)]
 pub struct Active {
     pub script: String,
     pub ap: u32,
     pub duration: u32,
 }
 
+#[derive(Debug)]
 pub struct Ability {
     pub id: String,
     pub name: String,

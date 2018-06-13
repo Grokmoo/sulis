@@ -59,8 +59,8 @@ pub use self::dialog_window::DialogWindow;
 mod entity_mouseover;
 pub use self::entity_mouseover::EntityMouseover;
 
-mod game_over_menu;
-pub use self::game_over_menu::GameOverMenu;
+mod in_game_menu;
+pub use self::in_game_menu::InGameMenu;
 
 mod initiative_ticker;
 pub use self::initiative_ticker::InitiativeTicker;
@@ -100,19 +100,46 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_core::io::InputAction;
+use sulis_core::io::{InputAction, MainLoopUpdater};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_state::{ChangeListener, GameState};
-use sulis_widgets::{Button, ConfirmationWindow};
+use sulis_state::{ChangeListener, GameState, NextGameStep};
+use sulis_widgets::{Button};
 
 const NAME: &str = "root";
 
+pub struct GameMainLoopUpdater {
+    view: Rc<RefCell<RootView>>,
+}
+
+impl GameMainLoopUpdater {
+    pub fn new(view: &Rc<RefCell<RootView>>) -> GameMainLoopUpdater {
+        GameMainLoopUpdater {
+            view: Rc::clone(view)
+        }
+    }
+}
+
+impl MainLoopUpdater for GameMainLoopUpdater {
+    fn update(&self, root: &Rc<RefCell<Widget>>, millis: u32) {
+        GameState::update(root, millis);
+    }
+
+    fn is_exit(&self) -> bool {
+        self.view.borrow().next_step.is_some()
+    }
+}
+
 pub struct RootView {
+    next_step: Option<NextGameStep>,
 }
 
 impl RootView {
+    pub fn next_step(&self) -> Option<NextGameStep> {
+        self.next_step.clone()
+    }
+
     pub fn new() -> Rc<RefCell<RootView>> {
-        Rc::new(RefCell::new(RootView { }))
+        Rc::new(RefCell::new(RootView { next_step: None }))
     }
 
     /// Gets the merchant window if it is currently opened
@@ -204,12 +231,21 @@ impl RootView {
     }
 
     pub fn show_menu(&mut self, widget: &Rc<RefCell<Widget>>) {
-        let exit_window = Widget::with_theme(
-            ConfirmationWindow::new(Callback::with(
-                    Box::new(|| { GameState::set_exit(); }))),
-                    "exit_confirmation_window");
-        exit_window.borrow_mut().state.set_modal(true);
-        Widget::add_child_to(&widget, exit_window);
+        let exit_cb = Callback::new(Rc::new(|widget, _| {
+            let root = Widget::get_root(widget);
+            let root_view = Widget::downcast_kind_mut::<RootView>(&root);
+            root_view.next_step = Some(NextGameStep::Exit);
+        }));
+
+        let menu_cb = Callback::new(Rc::new(|widget, _| {
+            let root = Widget::get_root(widget);
+            let root_view = Widget::downcast_kind_mut::<RootView>(&root);
+            root_view.next_step = Some(NextGameStep::SelectCharacter);
+        }));
+
+        let menu = Widget::with_defaults(InGameMenu::new(exit_cb, menu_cb));
+        menu.borrow_mut().state.set_modal(true);
+        Widget::add_child_to(&widget, menu);
     }
 
     pub fn end_turn(&self) {
@@ -272,7 +308,6 @@ impl WidgetKind for RootView {
         debug!("Adding to root widget.");
 
         let area_widget = Widget::with_defaults(AreaView::new());
-
 
         let bot_pane = Widget::empty("bottom_pane");
         {

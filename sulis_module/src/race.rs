@@ -29,6 +29,7 @@ use actor::{Sex};
 
 use {ObjectSize, ImageLayer, ImageLayerSet, Module};
 
+#[derive(Debug)]
 pub struct Race {
     pub id: String,
     pub name: String,

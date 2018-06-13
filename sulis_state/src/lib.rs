@@ -98,7 +98,7 @@ use std::cell::{Cell, RefCell};
 use sulis_rules::HitKind;
 use sulis_core::config::CONFIG;
 use sulis_core::util::{self, Point};
-use sulis_core::io::{GraphicsRenderer, MainLoopUpdater};
+use sulis_core::io::{GraphicsRenderer};
 use sulis_core::ui::{Widget};
 use sulis_module::{Ability, Actor, Module, ObjectSize, OnTrigger, area::{Trigger, TriggerKind}};
 
@@ -106,6 +106,14 @@ use script::ScriptEntitySet;
 use script::script_callback::ScriptHitKind;
 
 pub const MOVE_TO_THRESHOLD: f32 = 0.4;
+
+#[derive(Clone, Debug)]
+pub enum NextGameStep {
+    Exit,
+    PlayCampaign { pc_actor: Rc<Actor> },
+    SelectCharacter,
+    SelectModule,
+}
 
 thread_local! {
     static STATE: RefCell<Option<GameState>> = RefCell::new(None);
@@ -115,18 +123,6 @@ thread_local! {
     static SCRIPT: ScriptState = ScriptState::new();
     static ANIMATIONS: RefCell<Vec<Box<Animation>>> = RefCell::new(Vec::new());
     static ANIMS_TO_ADD: RefCell<Vec<Box<Animation>>> = RefCell::new(Vec::new());
-}
-
-pub struct GameStateMainLoopUpdater { }
-
-impl MainLoopUpdater for GameStateMainLoopUpdater {
-    fn update(&self, root: &Rc<RefCell<Widget>>, millis: u32) {
-        GameState::update(root, millis);
-    }
-
-    fn is_exit(&self) -> bool {
-        GameState::is_exit()
-    }
 }
 
 pub struct UICallback {
@@ -143,7 +139,6 @@ pub struct GameState {
 
     // listener returns the first selected party member
     party_listeners: ChangeListenerList<Option<Rc<RefCell<EntityState>>>>,
-    should_exit: bool,
     path_finder: PathFinder,
     ui_callbacks: Vec<UICallback>,
 }
@@ -483,7 +478,6 @@ impl GameState {
             selected,
             party,
             party_listeners: ChangeListenerList::default(),
-            should_exit: false,
             ui_callbacks: Vec::new(),
         })
     }
@@ -555,16 +549,6 @@ impl GameState {
                 Some(area_state) => Some(Rc::clone(&area_state)),
             }
         })
-    }
-
-    pub fn is_exit() -> bool {
-        STATE.with(|s| s.borrow().as_ref().unwrap().should_exit)
-    }
-
-    pub fn set_exit() -> bool {
-        trace!("Setting state exit flag.");
-        STATE.with(|s| s.borrow_mut().as_mut().unwrap().should_exit = true);
-        true
     }
 
     pub fn area_state() -> Rc<RefCell<AreaState>> {

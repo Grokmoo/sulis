@@ -34,6 +34,7 @@ pub struct Kit {
     pub starting_equipment: Vec<String>,
 }
 
+#[derive(Debug)]
 pub struct Class {
     pub id: String,
     pub name: String,

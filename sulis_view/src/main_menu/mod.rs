@@ -16,7 +16,7 @@
 
 use std::any::Any;
 use std::rc::Rc;
-use std::cell::RefCell;
+use std::cell::{Cell, RefCell};
 
 use sulis_core::io::{InputAction, MainLoopUpdater};
 use sulis_core::ui::*;
@@ -57,22 +57,19 @@ impl MainMenuView {
     }
 
     pub fn is_exit(&self) -> bool {
-        EXIT.with(|exit| *exit.borrow())
+        EXIT.with(|exit| exit.replace(false))
     }
 
     pub fn get_selected_module(&self) -> Option<ModuleInfo> {
         SELECTED_MODULE.with(|m| {
-            match m.borrow().as_ref() {
-                None => None,
-                Some(module) => Some(module.clone()),
-            }
+            m.replace(None)
         })
     }
 }
 
 thread_local! {
-    static EXIT: RefCell<bool> = RefCell::new(false);
-    static SELECTED_MODULE: RefCell<Option<ModuleInfo>> = RefCell::new(None);
+    static EXIT: Cell<bool> = Cell::new(false);
+    static SELECTED_MODULE: Cell<Option<ModuleInfo>> = Cell::new(None);
 }
 
 impl WidgetKind for MainMenuView {
@@ -86,7 +83,7 @@ impl WidgetKind for MainMenuView {
             ShowMenu => {
                 let exit_window = Widget::with_theme(
                     ConfirmationWindow::new(Callback::with(
-                            Box::new(|| { EXIT.with(|exit| *exit.borrow_mut() = true); }))),
+                            Box::new(|| { EXIT.with(|exit| exit.set(true)); }))),
                     "exit_confirmation_window");
                 exit_window.borrow_mut().state.set_modal(true);
                 Widget::add_child_to(&widget, exit_window);
@@ -136,8 +133,8 @@ impl WidgetKind for MainMenuView {
                 }, Some(entry) => entry,
             };
 
-            EXIT.with(|exit| *exit.borrow_mut() = true);
-            SELECTED_MODULE.with(|m| *m.borrow_mut() = Some(entry.item().clone()));
+            EXIT.with(|exit| exit.set(true));
+            SELECTED_MODULE.with(|m| m.set(Some(entry.item().clone())));
             info!("Selected module {}", entry.item().name);
 
             let root = Widget::get_root(&widget);
@@ -149,8 +146,8 @@ impl WidgetKind for MainMenuView {
 
         let exit = Widget::with_theme(Button::empty(), "exit");
         exit.borrow_mut().state.add_callback(Callback::new(Rc::new(|_, _| {
-            EXIT.with(|exit| *exit.borrow_mut() = true);
-            SELECTED_MODULE.with(|m| *m.borrow_mut() = None);
+            EXIT.with(|exit| exit.set(true));
+            SELECTED_MODULE.with(|m| m.set(None));
         })));
 
         vec![title, modules_title, play, modules_list, details, exit]

@@ -85,6 +85,12 @@ children:
         x_relative: Max
         position: [-5, 5]
         preferred_size: [15, 8]
+      back:
+        from: .button
+        text: "Back"
+        x_relative: Max
+        position: [-25, 5]
+        preferred_size: [15, 8]
       title:
         from: .label
         text_params:

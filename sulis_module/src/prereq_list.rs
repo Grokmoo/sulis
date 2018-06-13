@@ -23,6 +23,7 @@ use sulis_core::util::unable_to_create_error;
 
 use {Actor, Class, Module, Race};
 
+#[derive(Debug)]
 pub struct PrereqList {
     pub attributes: Option<Vec<(Attribute, u8)>>,
     pub levels: Vec<(Rc<Class>, u32)>,

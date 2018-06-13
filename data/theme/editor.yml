@@ -275,7 +275,7 @@ children:
             custom:
               scroll_delta: "20"
       exit_confirmation_window:
-        from: .exit_confirmation_window
+        from: .exit_confirmation
         children:
           title:
             text: "Exit the Editor?"

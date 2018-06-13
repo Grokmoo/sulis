@@ -89,6 +89,9 @@ pub use self::prop_mouseover::PropMouseover;
 mod prop_window;
 pub use self::prop_window::PropWindow;
 
+mod save_window;
+pub use self::save_window::SaveWindow;
+
 pub mod main_menu;
 
 pub mod character_selector;

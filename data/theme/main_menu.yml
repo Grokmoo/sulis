@@ -74,7 +74,7 @@ children:
         position: [45, 30]
         text: "#description#"
       exit_confirmation_window:
-        from: .exit_confirmation_window
+        from: .exit_confirmation
   character_selector:
     children:
       loading_screen:
@@ -158,7 +158,7 @@ children:
       character_builder:
         from: .character_builder
       exit_confirmation_window:
-        from: .exit_confirmation_window
+        from: .exit_confirmation
       portrait_selector:
         from: .portrait_selector
       delete_character_confirmation_window:

@@ -628,7 +628,7 @@ children:
   in_game_menu:
     background: bg_base
     border: [5, 5, 5, 5]
-    preferred_size: [40, 10]
+    preferred_size: [45, 15]
     x_relative: Center
     y_relative: Center
     position: [0, 0]
@@ -636,24 +636,68 @@ children:
     layout_spacing: { top: 0, bottom: 5, left: 0, right: 0 }
     height_relative: ChildSum
     children:
+      button:
+        from: .button
+        preferred_size: [25, 10]
+        text_params:
+          scale: 5.5
       back:
-        from: .button
-        preferred_size: [20, 10]
+        from: .in_game_menu.button
         text: "Back to Game"
-        text_params:
-          scale: 5.5
+      save:
+        from: .in_game_menu.button
+        text: "Save"
       menu:
-        from: .button
-        preferred_size: [20, 10]
+        from: .in_game_menu.button
         text: "Main Menu"
-        text_params:
-          scale: 5.5
       exit:
-        from: .button
-        preferred_size: [20, 10]
+        from: .in_game_menu.button
         text: "Exit"
+  save_window:
+    background: bg_base
+    border: [5, 5, 5, 5]
+    preferred_size: [120, 120]
+    x_relative: Center
+    y_relative: Center
+    children:
+      title:
+        from: .label
+        width_relative: Max
+        preferred_size: [0, 10]
         text_params:
           scale: 5.5
+        text: "Save"
+      entries:
+        background: bg_base
+        border: [2, 2, 2, 2]
+        width_relative: Max
+        height_relative: Max
+        preferred_size: [0, -30]
+        position: [0, 15]
+        layout: BoxVertical
+        layout_spacing: { top: 0, bottom: 2, left: 0, right: 0 }
+        children:
+          entry:
+            from: .button
+            width_relative: Max
+            preferred_size: [0, 10]
+      cancel:
+        from: .button
+        preferred_size: [25, 10]
+        text_params:
+          scale: 5.5
+        text: "Cancel"
+        x_relative: Max
+        y_relative: Max
+      accept:
+        from: .button
+        preferred_size: [25, 10]
+        text_params:
+          scale: 5.5
+        text: "Save"
+        x_relative: Max
+        y_relative: Max
+        position: [-30, 0]
   bonus_text:
     from: .text_area
     text: |

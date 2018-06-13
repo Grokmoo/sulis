@@ -24,6 +24,7 @@ use sulis_core::serde_yaml;
 use {Conversation, Module};
 
 pub struct Game {
+    pub id: String,
     pub starting_area: String,
     pub starting_location: Point,
     pub name: String,
@@ -47,6 +48,7 @@ impl Game {
             name: builder.name,
             description: builder.description,
             backstory_conversation,
+            id: builder.id,
         })
     }
 }
@@ -54,6 +56,7 @@ impl Game {
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct GameBuilder {
+    pub id: String,
     pub starting_area: String,
     pub starting_location: Point,
     pub name: String,

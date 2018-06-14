@@ -684,6 +684,14 @@ children:
             from: .button
             width_relative: Max
             preferred_size: [0, 10]
+            children:
+              text_area:
+                from: .text_area
+                width_relative: Max
+                height_relative: Max
+                text: |
+                  [s=5|#player_name#][x=40|#datetime#]
+                  #current_area_name#
       cancel:
         from: .button
         preferred_size: [25, 10]

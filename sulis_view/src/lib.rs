@@ -22,6 +22,7 @@ extern crate sulis_widgets;
 
 extern crate chrono;
 #[macro_use] extern crate log;
+#[macro_use] extern crate serde_derive;
 
 mod abilities_bar;
 pub use self::abilities_bar::AbilitiesBar;

@@ -23,9 +23,9 @@ use std::io::Error;
 
 use sulis_core::{config, serde_yaml};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_core::resource::{ResourceBuilder, write_to_file};
+use sulis_core::resource::{ResourceBuilder, read_single_resource_path};
 use sulis_core::util::{invalid_data_error};
-use sulis_widgets::{Button, ConfirmationWindow, Label, TextArea};
+use sulis_widgets::{Button, Label, TextArea};
 use sulis_module::Module;
 
 const NAME: &str = "load_window";
@@ -39,7 +39,8 @@ fn get_save_dir() -> PathBuf {
 
 pub struct LoadWindow {
     accept: Rc<RefCell<Widget>>,
-    entries: Vec<PathBuf>,
+    entries: Vec<(PathBuf, SaveFileMetaData)>,
+    selected_entry: Option<usize>,
 }
 
 impl LoadWindow {
@@ -54,11 +55,11 @@ impl LoadWindow {
             }
         };
 
-        Rc::new(RefCell::new(LoadWindow { accept, entries }))
+        Rc::new(RefCell::new(LoadWindow { accept, entries, selected_entry: None }))
     }
 
-    fn get_available_files() -> Result<Vec<PathBuf>, Error> {
-        let mut results: Vec<PathBuf> = Vec::new();
+    fn get_available_files() -> Result<Vec<(PathBuf, SaveFileMetaData)>, Error> {
+        let mut results: Vec<(PathBuf, SaveFileMetaData)> = Vec::new();
 
         let dir = get_save_dir();
         debug!("Reading save games from {}", dir.to_string_lossy());
@@ -83,14 +84,18 @@ impl LoadWindow {
 
             if extension != "yml" { continue; }
 
-            results.push(path.to_path_buf());
+            let path_buf = path.to_path_buf();
+
+            let save_file: SaveFile = read_single_resource_path(&path_buf)?;
+
+            results.push((path_buf, save_file.meta));
         }
 
         Ok(results)
     }
 
     pub fn load(&self) {
-
+        // TODO implement load
     }
 }
 
@@ -115,13 +120,30 @@ impl WidgetKind for LoadWindow {
 
             parent.borrow_mut().mark_for_removal();
         })));
-        self.accept.borrow_mut().state.set_enabled(false);
+        self.accept.borrow_mut().state.set_enabled(self.selected_entry.is_some());
 
         let entries = Widget::empty("entries");
 
-        for path_buf in self.entries.iter() {
+        for (index, (ref _path_buf, ref meta)) in self.entries.iter().enumerate() {
             let text_area = Widget::with_defaults(TextArea::empty());
+            text_area.borrow_mut().state.add_text_arg("player_name", &meta.player_name);
+            text_area.borrow_mut().state.add_text_arg("datetime", &meta.datetime);
+            text_area.borrow_mut().state.add_text_arg("current_area_name", &meta.current_area_name);
             let widget = Widget::with_theme(Button::empty(), "entry");
+            widget.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
+                let parent = Widget::go_up_tree(widget, 2);
+                parent.borrow_mut().invalidate_children();
+
+                let load_window = Widget::downcast_kind_mut::<LoadWindow>(&parent);
+                load_window.selected_entry = Some(index);
+            })));
+
+            if let Some(selected_index) = self.selected_entry {
+                if selected_index == index {
+                    widget.borrow_mut().state.set_active(true);
+                }
+            }
+
             Widget::add_child_to(&widget, text_area);
 
             Widget::add_child_to(&entries, widget);
@@ -132,19 +154,26 @@ impl WidgetKind for LoadWindow {
 }
 
 #[derive(Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct SaveFile {
+    meta: SaveFileMetaData,
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 struct SaveFileMetaData {
     player_name: String,
     datetime: String,
     current_area_name: String,
 }
 
-impl ResourceBuilder for SaveFileMetaData {
+impl ResourceBuilder for SaveFile {
     fn owned_id(&self) -> String {
-        &self.player_name
+        self.meta.player_name.to_string()
     }
 
     fn from_yaml(data: &str) -> Result<Self, Error> {
-        let resource: Result<SaveFileMetaData, serde_yaml::Error> = serde_yaml::from_str(data);
+        let resource: Result<SaveFile, serde_yaml::Error> = serde_yaml::from_str(data);
 
         match resource {
             Ok(resource) => Ok(resource),

@@ -53,7 +53,7 @@ impl WidgetKind for InGameMenu {
             let parent = Widget::get_parent(widget);
             parent.borrow_mut().mark_for_removal();
 
-            // TODO save
+            // TODO implement save
         })));
 
         let load = Widget::with_theme(Button::empty(), "load");

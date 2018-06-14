@@ -30,7 +30,7 @@ use std::collections::HashMap;
 use std::fs::{self, File};
 use std::io::{Read, Error};
 use std::ffi::OsStr;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 #[derive(Debug)]
 pub struct ResourceBuilderSet {
@@ -81,13 +81,22 @@ impl ResourceBuilderSet {
     }
 }
 
-pub fn write_to_file<T: serde::ser::Serialize>(filename: &str, data: &T) -> Result<(), Error> {
+pub fn write_to_file<T: serde::ser::Serialize, P: AsRef<Path>>(filename: P, data: &T) -> Result<(), Error> {
     let file = File::create(filename)?;
 
     match serde_yaml::to_writer(file, data) {
         Err(e) => invalid_data_error(&format!("{}", e)),
         Ok(()) => Ok(()),
     }
+}
+
+pub fn read_single_resource_path<T: ResourceBuilder>(path: &Path) -> Result<T, Error> {
+    let mut file = File::open(path)?;
+
+    let mut file_data = String::new();
+    file.read_to_string(&mut file_data)?;
+
+    T::from_yaml(&file_data)
 }
 
 pub fn read_single_resource<T: ResourceBuilder>(filename: &str) -> Result<T, Error> {

@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+extern crate chrono;
 extern crate rlua;
 extern crate rand;
 
@@ -21,6 +22,7 @@ extern crate sulis_core;
 extern crate sulis_module;
 extern crate sulis_rules;
 #[macro_use] extern crate log;
+#[macro_use] extern crate serde_derive;
 
 mod ai;
 pub use self::ai::AI;
@@ -79,6 +81,10 @@ use self::path_finder::PathFinder;
 
 mod prop_state;
 pub use self::prop_state::PropState;
+
+pub mod save_file;
+pub use self::save_file::SaveFile;
+pub use self::save_file::SaveFileMetaData;
 
 mod script;
 pub use self::script::ScriptState;

@@ -625,10 +625,17 @@ children:
         text: "Return to Main Menu?"
       accept:
         text: "Accept"
+  delete_save_confirmation:
+    from: .confirmation_window
+    children:
+      title:
+        text: "Delete Saved Game?"
+      accept:
+        text: "Delete"
   in_game_menu:
     background: bg_base
     border: [5, 5, 5, 5]
-    preferred_size: [45, 15]
+    preferred_size: [45, 20]
     x_relative: Center
     y_relative: Center
     position: [0, 0]
@@ -647,15 +654,18 @@ children:
       save:
         from: .in_game_menu.button
         text: "Save"
+      load:
+        from: .in_game_menu.button
+        text: "Load"
       menu:
         from: .in_game_menu.button
         text: "Main Menu"
       exit:
         from: .in_game_menu.button
         text: "Exit"
-  save_window:
-    background: bg_base
-    border: [5, 5, 5, 5]
+  load_window:
+    background: bg_large
+    border: { top: 6, bottom: 8, left: 6, right: 6 }
     preferred_size: [120, 120]
     x_relative: Center
     y_relative: Center
@@ -666,7 +676,7 @@ children:
         preferred_size: [0, 10]
         text_params:
           scale: 5.5
-        text: "Save"
+        text: "Select a File to Load"
       entries:
         background: bg_base
         border: [2, 2, 2, 2]
@@ -681,6 +691,21 @@ children:
             from: .button
             width_relative: Max
             preferred_size: [0, 10]
+            children:
+              text_area:
+                from: .text_area
+                width_relative: Max
+                height_relative: Max
+                text: |
+                  [s=5|#player_name#][x=40|#datetime#]
+                  #current_area_name#
+      delete:
+        from: .button
+        preferred_size: [25, 10]
+        text_params:
+          scale: 5.5
+        text: "Delete"
+        y_relative: Max
       cancel:
         from: .button
         preferred_size: [25, 10]
@@ -694,7 +719,7 @@ children:
         preferred_size: [25, 10]
         text_params:
           scale: 5.5
-        text: "Save"
+        text: "Load"
         x_relative: Max
         y_relative: Max
         position: [-30, 0]

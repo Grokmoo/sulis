@@ -45,6 +45,11 @@ impl WidgetKind for ConfirmationWindow {
     widget_kind!("confirmation_window");
 
     fn layout(&mut self, widget: &mut Widget) {
+        if widget.state.has_text_arg("custom") {
+            let value = widget.state.get_text_arg("custom").unwrap();
+            self.title.borrow_mut().state.add_text_arg("custom", value);
+        }
+
         widget.do_base_layout();
     }
 

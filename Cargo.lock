@@ -777,9 +777,12 @@ dependencies = [
 name = "sulis_state"
 version = "0.1.0"
 dependencies = [
+ "chrono 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "rand 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "rlua 0.14.0-alpha.0 (git+https://github.com/chucklefish/rlua)",
+ "serde 1.0.66 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde_derive 1.0.66 (registry+https://github.com/rust-lang/crates.io-index)",
  "sulis_core 0.1.0",
  "sulis_module 0.1.0",
  "sulis_rules 0.1.0",
@@ -791,8 +794,6 @@ version = "0.1.0"
 dependencies = [
  "chrono 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde 1.0.66 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde_derive 1.0.66 (registry+https://github.com/rust-lang/crates.io-index)",
  "sulis_core 0.1.0",
  "sulis_module 0.1.0",
  "sulis_rules 0.1.0",

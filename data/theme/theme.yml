@@ -625,6 +625,13 @@ children:
         text: "Return to Main Menu?"
       accept:
         text: "Accept"
+  delete_save_confirmation:
+    from: .confirmation_window
+    children:
+      title:
+        text: "Delete Saved Game?"
+      accept:
+        text: "Delete"
   in_game_menu:
     background: bg_base
     border: [5, 5, 5, 5]
@@ -657,8 +664,8 @@ children:
         from: .in_game_menu.button
         text: "Exit"
   load_window:
-    background: bg_base
-    border: [5, 5, 5, 5]
+    background: bg_large
+    border: { top: 6, bottom: 8, left: 6, right: 6 }
     preferred_size: [120, 120]
     x_relative: Center
     y_relative: Center
@@ -669,7 +676,7 @@ children:
         preferred_size: [0, 10]
         text_params:
           scale: 5.5
-        text: "Load"
+        text: "Select a File to Load"
       entries:
         background: bg_base
         border: [2, 2, 2, 2]
@@ -692,6 +699,13 @@ children:
                 text: |
                   [s=5|#player_name#][x=40|#datetime#]
                   #current_area_name#
+      delete:
+        from: .button
+        preferred_size: [25, 10]
+        text_params:
+          scale: 5.5
+        text: "Delete"
+        y_relative: Max
       cancel:
         from: .button
         preferred_size: [25, 10]

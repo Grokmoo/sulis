@@ -17,36 +17,23 @@
 use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
-use std::path::{PathBuf};
-use std::fs;
-use std::io::Error;
 
-use sulis_core::{config, serde_yaml};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_core::resource::{ResourceBuilder, read_single_resource_path};
-use sulis_core::util::{invalid_data_error};
-use sulis_widgets::{Button, Label, TextArea};
-use sulis_module::Module;
+use sulis_widgets::{Button, Label, TextArea, ConfirmationWindow};
+use sulis_state::{SaveFileMetaData, save_file::{delete_save, load_state, get_available_save_files}};
 
 const NAME: &str = "load_window";
 
-fn get_save_dir() -> PathBuf {
-    let mut path = config::USER_DIR.clone();
-    path.push("save");
-    path.push(&Module::game().id);
-    path
-}
-
 pub struct LoadWindow {
     accept: Rc<RefCell<Widget>>,
-    entries: Vec<(PathBuf, SaveFileMetaData)>,
+    entries: Vec<SaveFileMetaData>,
     selected_entry: Option<usize>,
 }
 
 impl LoadWindow {
     pub fn new() -> Rc<RefCell<LoadWindow>> {
         let accept = Widget::with_theme(Button::empty(), "accept");
-        let entries = match LoadWindow::get_available_files() {
+        let entries = match get_available_save_files() {
             Ok(files) => files,
             Err(e) => {
                 warn!("Unable to read saved files");
@@ -58,44 +45,34 @@ impl LoadWindow {
         Rc::new(RefCell::new(LoadWindow { accept, entries, selected_entry: None }))
     }
 
-    fn get_available_files() -> Result<Vec<(PathBuf, SaveFileMetaData)>, Error> {
-        let mut results: Vec<(PathBuf, SaveFileMetaData)> = Vec::new();
+    pub fn load(&self) {
+        let index = match self.selected_entry {
+            None => return,
+            Some(index) => index,
+        };
 
-        let dir = get_save_dir();
-        debug!("Reading save games from {}", dir.to_string_lossy());
-
-        if !dir.is_dir() {
-            fs::create_dir_all(dir.clone())?;
+        match load_state(&self.entries[index]) {
+            Err(e) => {
+                error!("Error loading game state");
+                error!("{}", e);
+            }, Ok(()) => (),
         }
-
-        let dir_entries = fs::read_dir(dir)?;
-
-        for entry in dir_entries {
-            trace!("Checking entry {:?}", entry);
-            let entry = entry?;
-
-            let path = entry.path();
-            if !path.is_file() { continue; }
-
-            let extension = match path.extension() {
-                None => continue,
-                Some(ext) => ext.to_string_lossy(),
-            };
-
-            if extension != "yml" { continue; }
-
-            let path_buf = path.to_path_buf();
-
-            let save_file: SaveFile = read_single_resource_path(&path_buf)?;
-
-            results.push((path_buf, save_file.meta));
-        }
-
-        Ok(results)
     }
 
-    pub fn load(&self) {
-        // TODO implement load
+    pub fn delete_save(&mut self) {
+        let index = match self.selected_entry {
+            None => return,
+            Some(index) => index,
+        };
+
+        match delete_save(&self.entries[index]) {
+            Err(e) => {
+                error!("Error deleting save");
+                error!("{}", e);
+            }, Ok(()) => (),
+        }
+
+        self.entries.remove(index);
     }
 }
 
@@ -113,6 +90,27 @@ impl WidgetKind for LoadWindow {
             parent.borrow_mut().mark_for_removal();
         })));
 
+        let load_window_widget_ref = Rc::clone(widget);
+        let delete_cb = Callback::new(Rc::new(move |widget, _| {
+            load_window_widget_ref.borrow_mut().invalidate_children();
+
+            let load_window = Widget::downcast_kind_mut::<LoadWindow>(&load_window_widget_ref);
+            load_window.delete_save();
+            load_window.selected_entry = None;
+
+            let parent = Widget::get_parent(widget);
+            parent.borrow_mut().mark_for_removal();
+        }));
+
+        let delete = Widget::with_theme(Button::empty(), "delete");
+        delete.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
+            let root = Widget::get_root(widget);
+            let conf_window = Widget::with_theme(ConfirmationWindow::new(delete_cb.clone()), "delete_save_confirmation");
+            conf_window.borrow_mut().state.set_modal(true);
+            Widget::add_child_to(&root, conf_window);
+        })));
+        delete.borrow_mut().state.set_enabled(self.selected_entry.is_some());
+
         self.accept.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
             let parent = Widget::get_parent(widget);
             let load_window = Widget::downcast_kind_mut::<LoadWindow>(&parent);
@@ -124,7 +122,7 @@ impl WidgetKind for LoadWindow {
 
         let entries = Widget::empty("entries");
 
-        for (index, (ref _path_buf, ref meta)) in self.entries.iter().enumerate() {
+        for (index, ref meta) in self.entries.iter().enumerate() {
             let text_area = Widget::with_defaults(TextArea::empty());
             text_area.borrow_mut().state.add_text_arg("player_name", &meta.player_name);
             text_area.borrow_mut().state.add_text_arg("datetime", &meta.datetime);
@@ -149,35 +147,6 @@ impl WidgetKind for LoadWindow {
             Widget::add_child_to(&entries, widget);
         }
 
-        vec![cancel, self.accept.clone(), title, entries]
-    }
-}
-
-#[derive(Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-struct SaveFile {
-    meta: SaveFileMetaData,
-}
-
-#[derive(Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-struct SaveFileMetaData {
-    player_name: String,
-    datetime: String,
-    current_area_name: String,
-}
-
-impl ResourceBuilder for SaveFile {
-    fn owned_id(&self) -> String {
-        self.meta.player_name.to_string()
-    }
-
-    fn from_yaml(data: &str) -> Result<Self, Error> {
-        let resource: Result<SaveFile, serde_yaml::Error> = serde_yaml::from_str(data);
-
-        match resource {
-            Ok(resource) => Ok(resource),
-            Err(error) => invalid_data_error(&format!("{}", error))
-        }
+        vec![cancel, delete, self.accept.clone(), title, entries]
     }
 }

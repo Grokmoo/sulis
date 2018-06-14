@@ -81,7 +81,7 @@ impl ResourceBuilderSet {
     }
 }
 
-pub fn write_to_file<T: serde::ser::Serialize>(filename: &str, data: &T) -> Result<(), Error> {
+pub fn write_to_file<T: serde::ser::Serialize, P: AsRef<Path>>(filename: P, data: &T) -> Result<(), Error> {
     let file = File::create(filename)?;
 
     match serde_yaml::to_writer(file, data) {

@@ -20,6 +20,7 @@ use std::cell::RefCell;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{Button, ConfirmationWindow};
+use sulis_state::save_file::create_save;
 
 use LoadWindow;
 
@@ -53,7 +54,12 @@ impl WidgetKind for InGameMenu {
             let parent = Widget::get_parent(widget);
             parent.borrow_mut().mark_for_removal();
 
-            // TODO implement save
+            match create_save() {
+                Err(e) => {
+                    error!("Error saving game");
+                    error!("{}", e);
+                }, Ok(()) => (),
+            }
         })));
 
         let load = Widget::with_theme(Button::empty(), "load");

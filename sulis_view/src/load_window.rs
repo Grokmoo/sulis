@@ -21,13 +21,14 @@ use std::path::{PathBuf};
 use std::fs;
 use std::io::Error;
 
-use sulis_core::config;
+use sulis_core::{config, serde_yaml};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_core::resource::write_to_file;
-use sulis_widgets::{Button, ConfirmationWindow, Label};
+use sulis_core::resource::{ResourceBuilder, write_to_file};
+use sulis_core::util::{invalid_data_error};
+use sulis_widgets::{Button, ConfirmationWindow, Label, TextArea};
 use sulis_module::Module;
 
-const NAME: &str = "save_window";
+const NAME: &str = "load_window";
 
 fn get_save_dir() -> PathBuf {
     let mut path = config::USER_DIR.clone();
@@ -36,15 +37,15 @@ fn get_save_dir() -> PathBuf {
     path
 }
 
-pub struct SaveWindow {
+pub struct LoadWindow {
     accept: Rc<RefCell<Widget>>,
     entries: Vec<PathBuf>,
 }
 
-impl SaveWindow {
-    pub fn new() -> Rc<RefCell<SaveWindow>> {
+impl LoadWindow {
+    pub fn new() -> Rc<RefCell<LoadWindow>> {
         let accept = Widget::with_theme(Button::empty(), "accept");
-        let entries = match SaveWindow::get_available_files() {
+        let entries = match LoadWindow::get_available_files() {
             Ok(files) => files,
             Err(e) => {
                 warn!("Unable to read saved files");
@@ -53,7 +54,7 @@ impl SaveWindow {
             }
         };
 
-        Rc::new(RefCell::new(SaveWindow { accept, entries }))
+        Rc::new(RefCell::new(LoadWindow { accept, entries }))
     }
 
     fn get_available_files() -> Result<Vec<PathBuf>, Error> {
@@ -88,12 +89,12 @@ impl SaveWindow {
         Ok(results)
     }
 
-    pub fn save(&self) {
+    pub fn load(&self) {
 
     }
 }
 
-impl WidgetKind for SaveWindow {
+impl WidgetKind for LoadWindow {
     widget_kind!(NAME);
 
     fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
@@ -109,8 +110,8 @@ impl WidgetKind for SaveWindow {
 
         self.accept.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
             let parent = Widget::get_parent(widget);
-            let save_window = Widget::downcast_kind_mut::<SaveWindow>(&parent);
-            save_window.save();
+            let load_window = Widget::downcast_kind_mut::<LoadWindow>(&parent);
+            load_window.load();
 
             parent.borrow_mut().mark_for_removal();
         })));
@@ -119,11 +120,35 @@ impl WidgetKind for SaveWindow {
         let entries = Widget::empty("entries");
 
         for path_buf in self.entries.iter() {
-            let label = path_buf.to_string_lossy().to_string();
-            let widget = Widget::with_theme(Button::with_text(&label), "entry");
+            let text_area = Widget::with_defaults(TextArea::empty());
+            let widget = Widget::with_theme(Button::empty(), "entry");
+            Widget::add_child_to(&widget, text_area);
+
             Widget::add_child_to(&entries, widget);
         }
 
         vec![cancel, self.accept.clone(), title, entries]
+    }
+}
+
+#[derive(Serialize, Deserialize)]
+struct SaveFileMetaData {
+    player_name: String,
+    datetime: String,
+    current_area_name: String,
+}
+
+impl ResourceBuilder for SaveFileMetaData {
+    fn owned_id(&self) -> String {
+        &self.player_name
+    }
+
+    fn from_yaml(data: &str) -> Result<Self, Error> {
+        let resource: Result<SaveFileMetaData, serde_yaml::Error> = serde_yaml::from_str(data);
+
+        match resource {
+            Ok(resource) => Ok(resource),
+            Err(error) => invalid_data_error(&format!("{}", error))
+        }
     }
 }

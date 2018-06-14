@@ -21,7 +21,7 @@ use std::cell::RefCell;
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{Button, ConfirmationWindow};
 
-use SaveWindow;
+use LoadWindow;
 
 const NAME: &str = "in_game_menu";
 
@@ -53,8 +53,16 @@ impl WidgetKind for InGameMenu {
             let parent = Widget::get_parent(widget);
             parent.borrow_mut().mark_for_removal();
 
+            // TODO save
+        })));
+
+        let load = Widget::with_theme(Button::empty(), "load");
+        load.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+            let parent = Widget::get_parent(widget);
+            parent.borrow_mut().mark_for_removal();
+
             let root = Widget::get_root(widget);
-            let window = Widget::with_defaults(SaveWindow::new());
+            let window = Widget::with_defaults(LoadWindow::new());
             window.borrow_mut().state.set_modal(true);
             Widget::add_child_to(&root, window);
         })));
@@ -79,6 +87,6 @@ impl WidgetKind for InGameMenu {
             Widget::add_child_to(&root, window);
         })));
 
-        vec![back, save, menu, exit]
+        vec![back, save, load, menu, exit]
     }
 }

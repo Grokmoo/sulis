@@ -628,7 +628,7 @@ children:
   in_game_menu:
     background: bg_base
     border: [5, 5, 5, 5]
-    preferred_size: [45, 15]
+    preferred_size: [45, 20]
     x_relative: Center
     y_relative: Center
     position: [0, 0]
@@ -647,13 +647,16 @@ children:
       save:
         from: .in_game_menu.button
         text: "Save"
+      load:
+        from: .in_game_menu.button
+        text: "Load"
       menu:
         from: .in_game_menu.button
         text: "Main Menu"
       exit:
         from: .in_game_menu.button
         text: "Exit"
-  save_window:
+  load_window:
     background: bg_base
     border: [5, 5, 5, 5]
     preferred_size: [120, 120]
@@ -666,7 +669,7 @@ children:
         preferred_size: [0, 10]
         text_params:
           scale: 5.5
-        text: "Save"
+        text: "Load"
       entries:
         background: bg_base
         border: [2, 2, 2, 2]
@@ -694,7 +697,7 @@ children:
         preferred_size: [25, 10]
         text_params:
           scale: 5.5
-        text: "Save"
+        text: "Load"
         x_relative: Max
         y_relative: Max
         position: [-30, 0]

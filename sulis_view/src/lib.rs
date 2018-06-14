@@ -77,6 +77,9 @@ pub use self::item_button::ItemButton;
 mod loading_screen;
 pub use self::loading_screen::LoadingScreen;
 
+mod load_window;
+pub use self::load_window::LoadWindow;
+
 mod merchant_window;
 pub use self::merchant_window::MerchantWindow;
 
@@ -88,9 +91,6 @@ pub use self::prop_mouseover::PropMouseover;
 
 mod prop_window;
 pub use self::prop_window::PropWindow;
-
-mod save_window;
-pub use self::save_window::SaveWindow;
 
 pub mod main_menu;
 

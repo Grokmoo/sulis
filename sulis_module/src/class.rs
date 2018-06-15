@@ -23,7 +23,7 @@ use sulis_core::util::{invalid_data_error, unable_to_create_error};
 use sulis_core::serde_yaml;
 use sulis_rules::{AttributeList, BonusList};
 
-use {AbilityList, Module};
+use {Ability, AbilityList, Module};
 
 #[derive(Deserialize, Serialize, Debug)]
 #[serde(deny_unknown_fields)]
@@ -41,6 +41,7 @@ pub struct Class {
     pub description: String,
     pub bonuses_per_level: BonusList,
     ability_choices: HashMap<u32, Vec<Rc<AbilityList>>>,
+    starting_abilities: Vec<Rc<Ability>>,
     pub kits: Vec<Kit>,
 }
 
@@ -75,6 +76,23 @@ impl Class {
             ability_choices.insert(level, vec);
         }
 
+        if builder.kits.is_empty() {
+            warn!("Each class must specify at least one kit.");
+            return unable_to_create_error("class", &builder.id);
+        }
+
+        let mut abilities = Vec::new();
+        for ability_id in builder.starting_abilities {
+            let ability = match module.abilities.get(&ability_id) {
+                None => {
+                    warn!("Unable to find ability '{}'", ability_id);
+                    return unable_to_create_error("class", &builder.id);
+                }, Some(ref ability) => Rc::clone(ability),
+            };
+
+            abilities.push(ability);
+        }
+
         Ok(Class {
             id: builder.id,
             name: builder.name,
@@ -82,7 +100,12 @@ impl Class {
             bonuses_per_level: builder.bonuses_per_level,
             kits: builder.kits,
             ability_choices,
+            starting_abilities: abilities,
         })
+    }
+
+    pub fn starting_abilities(&self) -> Vec<Rc<Ability>> {
+        self.starting_abilities.clone()
     }
 
     pub fn ability_choices(&self, level: u32) -> Vec<Rc<AbilityList>> {
@@ -101,6 +124,7 @@ pub struct ClassBuilder {
     pub description: String,
     pub bonuses_per_level: BonusList,
     pub ability_choices: HashMap<u32, Vec<String>>,
+    pub starting_abilities: Vec<String>,
     pub kits: Vec<Kit>,
 }
 

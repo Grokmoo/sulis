@@ -11,6 +11,7 @@ bonuses_per_level:
   reflex: 2
   will: 2
   initiative: 1
+starting_abilities: []
 ability_choices:
   2: [ fighter ]
   3: [ fighter ]

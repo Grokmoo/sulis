@@ -10,6 +10,7 @@ bonuses_per_level:
   reflex: 3
   will: 2
   initiative: 1
+starting_abilities: []
 ability_choices: {}
 kits:
   - name: Mechanic

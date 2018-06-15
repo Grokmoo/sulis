@@ -73,6 +73,12 @@ impl AttributeSelectorPane {
 impl BuilderPane for AttributeSelectorPane {
     fn on_selected(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
         self.selected_class = builder.class.clone();
+
+        if let Some(ref class) = self.selected_class {
+        self.selected_kit = Some(0);
+        self.attrs = class.kits[0].default_attributes.clone();
+        }
+
         builder.attributes = None;
         builder.prev.borrow_mut().state.set_enabled(true);
         self.calculate_available();

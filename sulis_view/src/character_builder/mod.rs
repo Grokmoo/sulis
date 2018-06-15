@@ -276,6 +276,10 @@ impl BuilderSet for CharacterCreator {
             abilities.push(ability.id.to_string());
         }
 
+        for ability in builder.class.as_ref().unwrap().starting_abilities() {
+            abilities.push(ability.id.to_string());
+        }
+
         let actor = ActorBuilder {
             id,
             name: builder.name.to_string(),

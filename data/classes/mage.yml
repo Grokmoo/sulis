@@ -1,7 +1,7 @@
 id: mage
 name: Mage
 description: |
-  A mage is a person who has spent years studying the craft of spells.  Even the humblest mage can bend the elements to their will, while more advanced mages gain incredible power in their chosen specialities.
+  Mages are students of the highly complex system known as the circles of magic.  Although highly sophisticated and powerful, it is extremely rigid with formalized rules, gestures, and phrases developed over thousands of years.
 bonuses_per_level:
   hit_points: 8
   accuracy: 2
@@ -10,6 +10,8 @@ bonuses_per_level:
   reflex: 2
   will: 4
   initiative: 1
+starting_abilities:
+  - firebolt
 ability_choices:
   2: [ mage ]
   3: [ mage ]
@@ -21,7 +23,7 @@ ability_choices:
   9: [ mage ]
   10: [ mage ]
 kits:
-  - name: Enhancer
+  - name: Mage
     default_attributes:
       str: 10
       dex: 13
@@ -31,16 +33,5 @@ kits:
       wis: 12
     starting_equipment: [ quarterstaff, boots_leather, torso_shirt, legs_pants ]
     description: |
-      A mage with a penchant for protecting and enhancing the combat abilities of their comrades.
-  - name: Blaster
-    default_attributes:
-      str: 10
-      dex: 12
-      end: 14
-      per: 14
-      int: 18
-      wis: 12
-    starting_equipment: [ crossbow, boots_leather, torso_shirt, legs_pants ]
-    description: |
-      A mage with a specialty in doing massive damage to enemies from afar.
-  
+      A mage with the capability to cast a variety of spells from the circles of magic.
+

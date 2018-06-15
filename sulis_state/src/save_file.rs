@@ -25,12 +25,13 @@ use sulis_core::{config, serde_yaml};
 use sulis_core::resource::{ResourceBuilder, read_single_resource_path, write_to_file};
 use sulis_core::util::{invalid_data_error};
 use sulis_module::Module;
-use GameState;
+use {GameState, SaveState};
 
 #[derive(Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct SaveFile {
     meta: SaveFileMetaData,
+    state: SaveState,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -60,7 +61,7 @@ pub fn load_state(save_file: &SaveFileMetaData) -> Result<(), Error> {
     let path = save_file.path.as_path();
     let save_file: SaveFile = read_single_resource_path(path)?;
 
-    // TODO implement
+    save_file.state.load();
     Ok(())
 }
 
@@ -73,10 +74,11 @@ pub fn create_save() -> Result<(), Error> {
 
     let meta = create_meta_data(utc.format("%c").to_string());
 
-    // TODO implement
+    let state = SaveState::create();
 
     let save = SaveFile {
-        meta
+        meta,
+        state,
     };
 
     write_to_file(path.as_path(), &save)
@@ -124,7 +126,15 @@ pub fn get_available_save_files() -> Result<Vec<SaveFileMetaData>, Error> {
 
         let path_buf = path.to_path_buf();
 
-        let save_file: SaveFile = read_single_resource_path(&path_buf)?;
+        let save_file: SaveFile = match read_single_resource_path(&path_buf) {
+            Ok(save_file) => save_file,
+            Err(e) => {
+                warn!("Unable to read save file: {}", path_buf.to_string_lossy());
+                warn!("{}", e);
+                continue;
+            }
+        };
+
         let mut meta = save_file.meta;
         meta.path = path_buf;
 

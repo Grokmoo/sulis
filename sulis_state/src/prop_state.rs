@@ -42,7 +42,7 @@ pub struct PropState {
     pub location: Location,
     pub animation_state: AnimationState,
     pub listeners: ChangeListenerList<PropState>,
-    interactive: Interactive,
+    pub (crate) interactive: Interactive,
     enabled: bool,
 
     marked_for_removal: bool,
@@ -91,6 +91,10 @@ impl PropState {
             listeners: ChangeListenerList::default(),
             marked_for_removal: false,
         }
+    }
+
+    pub (crate) fn is_enabled(&self) -> bool {
+        self.enabled
     }
 
     pub (crate) fn set_enabled(&mut self, enabled: bool) {

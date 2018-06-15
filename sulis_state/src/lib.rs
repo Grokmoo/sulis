@@ -86,6 +86,9 @@ pub mod save_file;
 pub use self::save_file::SaveFile;
 pub use self::save_file::SaveFileMetaData;
 
+mod save_state;
+pub use self::save_state::SaveState;
+
 mod script;
 pub use self::script::ScriptState;
 pub use self::script::targeter::Targeter;
@@ -548,7 +551,13 @@ impl GameState {
         CLEAR_ANIMS.with(|c| c.set(true));
     }
 
-    fn get_area_state(id: &str) -> Option<Rc<RefCell<AreaState>>> {
+    pub fn area_state_ids() -> Vec<String> {
+        STATE.with(|s| {
+            s.borrow().as_ref().unwrap().areas.keys().map(|k| k.to_string()).collect()
+        })
+    }
+
+    pub fn get_area_state(id: &str) -> Option<Rc<RefCell<AreaState>>> {
         STATE.with(|s| {
             match s.borrow().as_ref().unwrap().areas.get(id) {
                 None => None,

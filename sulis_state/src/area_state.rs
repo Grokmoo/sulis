@@ -28,19 +28,24 @@ use std::slice::Iter;
 use std::rc::Rc;
 use std::cell::{Ref, RefCell};
 
-struct TriggerState {
-    fired: bool,
-    enabled: bool,
+pub struct TriggerState {
+    pub(crate) fired: bool,
+    pub(crate) enabled: bool,
 }
 
 pub struct AreaState {
     pub area: Rc<Area>,
+
+    // Members that need to be saved
+    pub(crate) pc_explored: Vec<bool>,
+    pub on_load_fired: bool,
+    props: Vec<Option<PropState>>,
+    pub(crate) triggers: Vec<TriggerState>,
+    pub(crate) merchants: Vec<Merchant>,
+    entities: Vec<Option<Rc<RefCell<EntityState>>>>,
+
     pub listeners: ChangeListenerList<AreaState>,
     turn_timer: Rc<RefCell<TurnTimer>>,
-
-    entities: Vec<Option<Rc<RefCell<EntityState>>>>,
-    props: Vec<Option<PropState>>,
-    triggers: Vec<TriggerState>,
 
     prop_grid: Vec<Option<usize>>,
     entity_grid: Vec<Vec<usize>>,
@@ -52,7 +57,6 @@ pub struct AreaState {
 
     pub pc_vis_delta: (bool, i32, i32),
     pc_vis: Vec<bool>,
-    pc_explored: Vec<bool>,
 
     feedback_text: Vec<AreaFeedbackText>,
     scroll_to_callback: Option<Rc<RefCell<EntityState>>>,
@@ -60,10 +64,6 @@ pub struct AreaState {
     last_time_millis: u32,
 
     targeter: Option<Rc<RefCell<Box<Targeter>>>>,
-
-    merchants: Vec<Merchant>,
-
-    pub on_load_fired: bool,
 }
 
 impl PartialEq for AreaState {

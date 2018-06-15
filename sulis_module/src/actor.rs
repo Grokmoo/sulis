@@ -87,6 +87,9 @@ pub struct Actor {
     image_layers: ImageLayerSet,
     image: LayeredImage,
 
+    // stored directly from the builder, solely for convenience
+    pub builder_images: HashMap<ImageLayer, String>,
+
     pub reward: Option<Reward>,
     pub abilities: Vec<Rc<Ability>>,
 }
@@ -142,6 +145,7 @@ impl Actor {
             skin_color: other.skin_color,
             image_layers,
             image,
+            builder_images: other.builder_images.clone(),
             reward: other.reward.clone(),
             abilities,
         }
@@ -228,7 +232,7 @@ impl Actor {
             }
         };
 
-        let image_layers = ImageLayerSet::merge(race.default_images(), sex, builder.images)?;
+        let image_layers = ImageLayerSet::merge(race.default_images(), sex, builder.images.clone())?;
         let images_list = image_layers.get_list(sex, builder.hair_color, builder.skin_color);
         let image = LayeredImage::new(images_list, builder.hue);
 
@@ -286,6 +290,7 @@ impl Actor {
             to_equip,
             image_layers,
             image,
+            builder_images: builder.images,
             hue: builder.hue,
             skin_color: builder.skin_color,
             hair_color: builder.hair_color,
@@ -336,9 +341,9 @@ impl Actor {
 #[derive(Deserialize, Debug, Serialize, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct RewardBuilder {
-    xp: u32,
-    loot: Option<String>,
-    loot_chance: Option<u32>,
+    pub xp: u32,
+    pub loot: Option<String>,
+    pub loot_chance: Option<u32>,
 }
 
 #[derive(Deserialize, Debug, Serialize)]

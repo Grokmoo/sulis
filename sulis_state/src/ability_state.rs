@@ -64,6 +64,10 @@ impl AbilityState {
         self.remaining_duration = self.ability.active.as_ref().unwrap().duration * ROUND_TIME_MILLIS;
     }
 
+    pub fn remaining_duration(&self) -> u32 {
+        self.remaining_duration
+    }
+
     pub fn remaining_duration_rounds(&self) -> u32 {
         (self.remaining_duration as f32 / ROUND_TIME_MILLIS as f32).ceil() as u32
     }

@@ -14,17 +14,22 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::rc::Rc;
+use std::cell::RefCell;
 use std::u64;
 use std::collections::HashMap;
 
-use sulis_core::util::Point;
+use sulis_core::util::{Point, Size};
+use sulis_module::{item::Slot, actor::{ActorBuilder, RewardBuilder}};
 
-use {GameState, ItemState, PropState, prop_state::Interactive, Merchant};
+use {ActorState, EntityState, GameState, ItemState, PropState, prop_state::Interactive, Merchant};
 use area_state::{TriggerState};
 
 #[derive(Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct SaveState {
+    party: Vec<usize>,
+    selected: Vec<usize>,
     areas: HashMap<String, AreaSaveState>,
     current_area: String,
 }
@@ -40,9 +45,21 @@ impl SaveState {
         let area_state = GameState::area_state();
         let current_area = area_state.borrow().area.id.to_string();
 
+        let mut party = Vec::new();
+        for entity in GameState::party().iter() {
+            party.push(entity.borrow().index);
+        }
+
+        let mut selected = Vec::new();
+        for entity in GameState::selected().iter() {
+            selected.push(entity.borrow().index);
+        }
+
         SaveState {
             areas,
             current_area,
+            party,
+            selected,
         }
     }
 
@@ -55,6 +72,7 @@ impl SaveState {
 #[serde(deny_unknown_fields)]
 pub struct AreaSaveState {
     on_load_fired: bool,
+    entities: Vec<EntitySaveState>,
     props: Vec<PropSaveState>,
     triggers: Vec<TriggerSaveState>,
     merchants: Vec<MerchantSaveState>,
@@ -103,12 +121,18 @@ impl AreaSaveState {
             merchants.push(MerchantSaveState::new(merchant));
         }
 
+        let mut entities = Vec::new();
+        for entity in area_state.entity_iter() {
+            entities.push(EntitySaveState::new(entity));
+        }
+
         AreaSaveState {
             pc_explored,
             on_load_fired,
             props,
             triggers,
             merchants,
+            entities,
         }
     }
 }
@@ -231,4 +255,127 @@ impl MerchantSaveState {
             items,
         }
     }
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct EntitySaveState {
+    index: usize,
+    actor_base: Option<ActorBuilder>,
+    actor: ActorSaveState,
+    location: Point,
+    size: Size,
+    custom_flags: Vec<String>,
+    ai_group: Option<usize>,
+    ai_active: bool,
+}
+
+impl EntitySaveState {
+    pub fn new(entity: Rc<RefCell<EntityState>>) -> EntitySaveState {
+        let entity = entity.borrow();
+
+        let actor_base = if entity.is_party_member() {
+            let actor = &entity.actor.actor;
+
+            let mut levels = HashMap::new();
+            for (ref class, level) in actor.levels.iter() {
+                levels.insert(class.id.to_string(), *level);
+            }
+
+            let reward = match actor.reward {
+                None => None,
+                Some(ref reward) => {
+                    Some(RewardBuilder {
+                        xp: reward.xp,
+                        loot: reward.loot.as_ref().map(|l| l.id.to_string()),
+                        loot_chance: Some(reward.loot_chance),
+                    })
+                }
+            };
+
+            Some(ActorBuilder {
+                id: actor.id.to_string(),
+                name: actor.name.to_string(),
+                race: actor.race.id.to_string(),
+                sex: Some(actor.sex),
+                portrait: actor.portrait.as_ref().map(|p| p.id().to_string()),
+                attributes: actor.attributes,
+                conversation: actor.conversation.as_ref().map(|c| c.id.to_string()),
+                faction: Some(actor.faction),
+                images: actor.builder_images.clone(),
+                hue: actor.hue,
+                hair_color: actor.hair_color,
+                skin_color: actor.skin_color,
+                items: Some(actor.items.iter().map(|i| i.id.to_string()).collect()),
+                equipped: Some(actor.to_equip.iter().map(|e| *e as u32).collect()),
+                levels,
+                xp: Some(actor.xp),
+                reward,
+                abilities: Some(actor.abilities.iter().map(|a| a.id.to_string()).collect()),
+            })
+        } else {
+            None
+        };
+
+        EntitySaveState {
+            index: entity.index,
+            actor: ActorSaveState::new(&entity.actor),
+            location: entity.location.to_point(),
+            size: Size::new(entity.size.width, entity.size.height),
+            custom_flags: entity.custom_flags().map(|s| s.to_string()).collect(),
+            ai_group: entity.ai_group(),
+            ai_active: entity.is_ai_active(),
+            actor_base,
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ActorSaveState {
+    id: String,
+    hp: i32,
+    ap: u32,
+    overflow_ap: i32,
+    xp: u32,
+    items: Vec<ItemListEntrySaveState>,
+    equipped: Vec<Option<usize>>,
+    coins: i32,
+    ability_states: HashMap<String, AbilitySaveState>,
+}
+
+impl ActorSaveState {
+    pub fn new(actor_state: &ActorState) -> ActorSaveState {
+        // TODO serialize effects
+        let mut equipped = Vec::new();
+        for slot in Slot::iter() {
+            equipped.push(actor_state.inventory().equipped(slot));
+        }
+
+        let mut ability_states = HashMap::new();
+        for (id, ref ability_state) in actor_state.ability_states.iter() {
+            ability_states.insert(id.to_string(), AbilitySaveState {
+                remaining_duration: ability_state.remaining_duration(),
+            });
+        }
+
+        ActorSaveState {
+            id: actor_state.actor.id.to_string(),
+            hp: actor_state.hp(),
+            ap: actor_state.ap(),
+            overflow_ap: actor_state.overflow_ap(),
+            xp: actor_state.xp(),
+            items: actor_state.inventory().items.iter()
+                .map(|(q, ref i)| ItemListEntrySaveState::new(*q, i)).collect(),
+            equipped,
+            coins: actor_state.inventory().coins(),
+            ability_states,
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct AbilitySaveState {
+    remaining_duration: u32,
 }

@@ -38,7 +38,7 @@ pub struct ActorState {
     inventory: Inventory,
     effects: Vec<Effect>,
     image: LayeredImage,
-    ability_states: HashMap<String, AbilityState>,
+    pub(crate) ability_states: HashMap<String, AbilityState>,
     texture_cache_invalid: bool,
 }
 
@@ -421,6 +421,10 @@ impl ActorState {
 
     pub fn hp(&self) -> i32 {
         self.hp
+    }
+
+    pub fn overflow_ap(&self) -> i32 {
+        self.overflow_ap
     }
 
     pub fn ap(&self) -> u32 {

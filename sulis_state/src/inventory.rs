@@ -46,6 +46,10 @@ impl Inventory {
         inv
     }
 
+    pub fn equipped(&self, slot: &Slot) -> Option<usize> {
+        self.equipped.get(slot).map(|i| *i)
+    }
+
     pub fn coins(&self) -> i32 {
         self.coins
     }

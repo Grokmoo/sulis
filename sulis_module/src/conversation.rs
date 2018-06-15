@@ -43,7 +43,7 @@ struct Node {
 
 #[derive(Debug)]
 pub struct Conversation {
-    id: String,
+    pub id: String,
     nodes: HashMap<String, Node>,
     initial_nodes: Vec<(String, Option<OnTrigger>)>,
 }

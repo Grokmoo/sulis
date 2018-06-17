@@ -29,13 +29,15 @@ use {CharacterBuilder, LoadingScreen, main_menu::MainMenu};
 pub struct CharacterSelector {
     selected: Option<Rc<Actor>>,
     first_add: bool,
+    main_menu: Rc<RefCell<Widget>>,
 }
 
 impl CharacterSelector {
-    pub fn new() -> Rc<RefCell<CharacterSelector>> {
+    pub fn new(main_menu: Rc<RefCell<Widget>>) -> Rc<RefCell<CharacterSelector>> {
         Rc::new(RefCell::new(CharacterSelector {
             selected: None,
             first_add: true,
+            main_menu,
         }))
     }
 }
@@ -67,11 +69,12 @@ impl WidgetKind for CharacterSelector {
             let root = Widget::get_root(&widget);
 
             let actor_id = actor_id.clone();
+            let parent = Widget::get_parent(&widget);
             let window = ConfirmationWindow::new(Callback::new(Rc::new(move |widget, _| {
                 Module::delete_character(&actor_id);
-                widget.borrow_mut().mark_for_removal();
+                let widget_parent = Widget::get_parent(&widget);
+                widget_parent.borrow_mut().mark_for_removal();
 
-                let parent= Widget::get_root(&widget);
                 let selector = Widget::downcast_kind_mut::<CharacterSelector>(&parent);
                 selector.selected = None;
                 parent.borrow_mut().invalidate_children();
@@ -142,15 +145,15 @@ impl WidgetKind for CharacterSelector {
             Widget::with_theme(TextArea::empty(), "details")
         };
 
-        let mut children = vec![title, chars_title, characters_pane, new_character_button,
-            delete_char_button, play_button, details];
-
         if self.first_add && must_create_character {
-            children.push(Widget::with_defaults(CharacterBuilder::new()));
+            let menu = Widget::downcast_kind_mut::<MainMenu>(&self.main_menu);
+            debug!("Showing character builder");
+            menu.char_builder_to_add = Some(CharacterBuilder::new());
         }
         self.first_add = false;
 
-        children
+        vec![title, chars_title, characters_pane, new_character_button,
+            delete_char_button, play_button, details]
     }
 }
 

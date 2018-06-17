@@ -31,7 +31,7 @@ use sulis_state::{NextGameStep};
 use sulis_module::{Module};
 use sulis_widgets::{Button, ConfirmationWindow, Label};
 
-use {LoadWindow};
+use {CharacterBuilder, LoadWindow};
 
 pub struct LoopUpdater {
     view: Rc<RefCell<MainMenu>>,
@@ -64,6 +64,7 @@ pub struct MainMenu {
     pub(crate) next_step: Option<NextGameStep>,
     mode: Mode,
     content: Rc<RefCell<Widget>>,
+    pub(crate) char_builder_to_add: Option<Rc<RefCell<CharacterBuilder>>>,
 }
 
 impl MainMenu {
@@ -72,6 +73,7 @@ impl MainMenu {
             next_step: None,
             mode: Mode::NoChoice,
             content: Widget::empty("content"),
+            char_builder_to_add: None,
         }))
     }
 
@@ -127,10 +129,9 @@ impl WidgetKind for MainMenu {
             let parent = Widget::get_parent(&widget);
             let starter = Widget::downcast_kind_mut::<MainMenu>(&parent);
 
-            starter.mode = Mode::New;
-            starter.content = Widget::with_defaults(CharacterSelector::new());
-
             parent.borrow_mut().invalidate_children();
+            starter.mode = Mode::New;
+            starter.content = Widget::with_defaults(CharacterSelector::new(parent.clone()));
         })));
 
         let load = Widget::with_theme(Button::empty(), "load");
@@ -185,6 +186,12 @@ impl WidgetKind for MainMenu {
             module_title.borrow_mut().state.set_visible(false);
         }
 
-        vec![title, module_title, new, load, module, exit, self.content.clone()]
+        let mut children = vec![title, module_title, new, load, module, exit, self.content.clone()];
+
+        if let Some(builder) = self.char_builder_to_add.take() {
+            children.push(Widget::with_defaults(builder));
+        }
+
+        children
     }
 }

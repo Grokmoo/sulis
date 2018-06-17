@@ -60,6 +60,8 @@ children:
         width_relative: Max
         height_relative: Max
         preferred_size: [0, -40]
+      character_builder:
+        from: .character_builder
       loading_screen:
         from: .loading_screen
       portrait_selector:
@@ -75,8 +77,6 @@ children:
             text: "Delete"
   character_selector:
     children:
-      character_builder:
-        from: .character_builder
       title:
         from: .label
         text_params:

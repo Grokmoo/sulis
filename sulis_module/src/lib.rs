@@ -391,6 +391,13 @@ impl Module {
         Ok(())
     }
 
+    pub fn load_actor(builder: ActorBuilder) -> Result<Actor, Error> {
+        MODULE.with(|module| {
+            let module = module.borrow();
+            Actor::new(builder, &module)
+        })
+    }
+
     pub fn game() -> Rc<Game> {
         MODULE.with(|m| Rc::clone(m.borrow().game.as_ref().unwrap()))
     }

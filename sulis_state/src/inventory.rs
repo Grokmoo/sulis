@@ -14,14 +14,16 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::io::Error;
 use std::slice::Iter;
 use std::rc::Rc;
 use std::collections::HashMap;
 
 use sulis_core::image::Image;
-use sulis_module::{Actor, ImageLayer};
-use sulis_module::item::Slot;
+use sulis_core::util::invalid_data_error;
+use sulis_module::{Actor, ImageLayer, Module, item::Slot};
 use {ItemList, ItemState};
+use save_state::ItemListEntrySaveState;
 
 #[derive(Clone)]
 pub struct Inventory {
@@ -44,6 +46,56 @@ impl Inventory {
 
         trace!("Populated initial inventory with {} items", inv.items.len());
         inv
+    }
+
+    pub fn load(&mut self, items: Vec<ItemListEntrySaveState>,
+                equipped: Vec<Option<usize>>) -> Result<(), Error> {
+        for item_save in items {
+           let item = match Module::item(&item_save.item.id) {
+               None => invalid_data_error(&format!("No item with ID '{}'",
+                                                   item_save.item.id)),
+                Some(item) => Ok(item),
+           }?;
+
+           self.items.add_quantity(item_save.quantity, ItemState::new(item));
+        }
+
+        for (slot_index, slot) in Slot::iter().enumerate() {
+            let slot = *slot;
+
+            if slot_index > equipped.len() { break; }
+            let index = match equipped[slot_index] {
+                None => continue,
+                Some(index) => index,
+            };
+
+            let item_state = match self.items.get(index) {
+                None => invalid_data_error(&format!("Invalid equipped index {}", index)),
+                Some((_, ref item_state)) => Ok(item_state),
+            }?;
+
+            let equippable = match item_state.item.equippable {
+                None => invalid_data_error(&format!("Item at index '{}' is not equippable",
+                                                    index)),
+                Some(ref equip) => Ok(equip),
+            }?;
+
+            if equippable.slot != slot {
+                let ok = match equippable.alternate_slot {
+                    None => false,
+                    Some(alt_slot) => alt_slot == slot,
+                };
+
+                if !ok {
+                    return invalid_data_error(&format!("item at index '{}' invalid equip type",
+                                                       index));
+                }
+            }
+
+            self.equipped.insert(slot, index);
+        }
+
+        Ok(())
     }
 
     pub fn equipped(&self, slot: &Slot) -> Option<usize> {

@@ -106,7 +106,7 @@ use std::cell::{Cell, RefCell};
 
 use sulis_rules::HitKind;
 use sulis_core::config::CONFIG;
-use sulis_core::util::{self, Point};
+use sulis_core::util::{self, Point, invalid_data_error};
 use sulis_core::io::{GraphicsRenderer};
 use sulis_core::ui::{Widget};
 use sulis_module::{Ability, Actor, Module, ObjectSize, OnTrigger, area::{Trigger, TriggerKind}};
@@ -170,6 +170,130 @@ macro_rules! exec_script {
 }
 
 impl GameState {
+    pub fn load(save_state: SaveState) -> Result<(), Error> {
+        let result: Result<(), Error> = STATE.with(|state| {
+            let mut state = state.borrow_mut();
+            let state = state.as_mut().unwrap();
+
+            let mut new_indices = HashMap::new();
+            state.areas.clear();
+            for (id, area_save) in save_state.areas {
+                let add_indices = id == save_state.current_area;
+                let area_state = AreaState::load(&id, &mut new_indices, add_indices, area_save)?;
+
+                state.areas.insert(id, Rc::new(RefCell::new(area_state)));
+            }
+
+            state.area_state = match state.areas.get(&save_state.current_area) {
+                Some(ref area) => Ok(Rc::clone(area)),
+                None => invalid_data_error(&format!("Unable to load current area '{}'",
+                                                    save_state.current_area)),
+            }?;
+
+            let path_finder = PathFinder::new(&state.area_state.borrow().area);
+            state.path_finder = path_finder;
+
+            for index in save_state.party {
+                let new_index = match new_indices.get(&index) {
+                    None => invalid_data_error(&format!("Invalid party entity index '{}'",
+                                                        index)),
+                    Some(index) => Ok(index),
+                }?;
+
+                let entity = Rc::clone(&state.area_state.borrow()
+                                       .entities[*new_index].as_ref().unwrap());
+                state.party.push(entity);
+            }
+
+            for index in save_state.selected {
+                let new_index = match new_indices.get(&index) {
+                    None => invalid_data_error(&format!("Invalid selected entity index '{}'",
+                                                        index)),
+                    Some(index) => Ok(index),
+                }?;
+
+                let entity = Rc::clone(&state.area_state.borrow()
+                                       .entities[*new_index].as_ref().unwrap());
+                state.selected.push(entity);
+            }
+
+            Ok(())
+        });
+
+        result?;
+
+        let area_state = GameState::area_state();
+        let mut area_state = area_state.borrow_mut();
+        area_state.update_view_visibility();
+
+        Ok(())
+    }
+
+    pub fn init(pc_actor: Rc<Actor>) -> Result<(), Error> {
+        let game_state = GameState::new(pc_actor)?;
+
+        STATE.with(|state| {
+            *state.borrow_mut() = Some(game_state);
+        });
+
+        let pc = GameState::player();
+        let area_state = GameState::area_state();
+        area_state.borrow_mut().update_view_visibility();
+        area_state.borrow_mut().push_scroll_to_callback(Rc::clone(&pc));
+        area_state.borrow_mut().on_load_fired = true;
+        let area_state = area_state.borrow();
+        GameState::add_ui_callbacks_of_kind(&area_state.area.triggers, TriggerKind::OnCampaignStart, &pc, &pc);
+        GameState::add_ui_callbacks_of_kind(&area_state.area.triggers, TriggerKind::OnAreaLoad, &pc, &pc);
+
+        Ok(())
+    }
+
+    fn new(pc: Rc<Actor>) -> Result<GameState, Error> {
+        let game = Module::game();
+
+        let area_state = GameState::setup_area_state(&game.starting_area)?;
+
+        debug!("Setting up PC {}, with {:?}", &pc.name, &game.starting_location);
+        let location = Location::from_point(&game.starting_location, &area_state.borrow().area);
+
+        if !location.coords_valid(location.x, location.y) {
+            error!("Starting location coordinates must be valid for the starting area.");
+            return Err(Error::new(ErrorKind::InvalidData,
+                                  "Unable to create starting location."));
+        }
+
+        if !area_state.borrow_mut().add_actor(pc, location, true, None) {
+            error!("Player character starting location must be within \
+                   area bounds and passable.");
+            return Err(Error::new(ErrorKind::InvalidData,
+                "Unable to add player character to starting area at starting location"));
+        }
+
+        let pc_state = Rc::clone(area_state.borrow().get_last_entity().unwrap());
+        ActorState::init_actor_turn(&pc_state);
+
+        let path_finder = PathFinder::new(&area_state.borrow().area);
+
+        let mut areas: HashMap<String, Rc<RefCell<AreaState>>> = HashMap::new();
+        areas.insert(game.starting_area.to_string(), Rc::clone(&area_state));
+
+        let mut party = Vec::new();
+        party.push(Rc::clone(&pc_state));
+
+        let mut selected = Vec::new();
+        selected.push(Rc::clone(&pc_state));
+
+        Ok(GameState {
+            areas,
+            area_state: area_state,
+            path_finder: path_finder,
+            selected,
+            party,
+            party_listeners: ChangeListenerList::default(),
+            ui_callbacks: Vec::new(),
+        })
+    }
+
     pub fn set_selected_party_member(entity: Rc<RefCell<EntityState>>) {
         GameState::select_party_members(vec![entity]);
     }
@@ -292,25 +416,6 @@ impl GameState {
         exec_script!(trigger_script: script_id, func, parent, target);
     }
 
-    pub fn init(pc_actor: Rc<Actor>) -> Result<(), Error> {
-        let game_state = GameState::new(pc_actor)?;
-
-        STATE.with(|state| {
-            *state.borrow_mut() = Some(game_state);
-        });
-
-        let pc = GameState::player();
-        let area_state = GameState::area_state();
-        area_state.borrow_mut().update_view_visibility();
-        area_state.borrow_mut().push_scroll_to_callback(Rc::clone(&pc));
-        area_state.borrow_mut().on_load_fired = true;
-        let area_state = area_state.borrow();
-        GameState::add_ui_callbacks_of_kind(&area_state.area.triggers, TriggerKind::OnCampaignStart, &pc, &pc);
-        GameState::add_ui_callbacks_of_kind(&area_state.area.triggers, TriggerKind::OnAreaLoad, &pc, &pc);
-
-        Ok(())
-    }
-
     pub fn transition(area_id: &Option<String>, x: i32, y: i32) {
         let p = Point::new(x, y);
         info!("Area transition to {:?} at {},{}", area_id, x, y);
@@ -374,7 +479,14 @@ impl GameState {
                                                     &state.area_state.borrow());
                 info!("Transitioning {} to {},{}", entity.borrow().actor.actor.name,
                     cur_location.x, cur_location.y);
-                state.area_state.borrow_mut().add_entity(Rc::clone(entity), cur_location);
+
+                match state.area_state.borrow_mut().add_entity(Rc::clone(entity), cur_location) {
+                    Ok(_) => (),
+                    Err(e) => {
+                        warn!("Unable to add party member");
+                        warn!("{}", e);
+                    }
+                }
             }
 
             state.area_state.borrow_mut().push_scroll_to_callback(Rc::clone(&state.party[0]));
@@ -443,52 +555,6 @@ impl GameState {
         area_state.borrow_mut().populate();
 
         Ok(area_state)
-    }
-
-    fn new(pc: Rc<Actor>) -> Result<GameState, Error> {
-        let game = Module::game();
-
-        let area_state = GameState::setup_area_state(&game.starting_area)?;
-
-        debug!("Setting up PC {}, with {:?}", &pc.name, &game.starting_location);
-        let location = Location::from_point(&game.starting_location, &area_state.borrow().area);
-
-        if !location.coords_valid(location.x, location.y) {
-            error!("Starting location coordinates must be valid for the starting area.");
-            return Err(Error::new(ErrorKind::InvalidData,
-                                  "Unable to create starting location."));
-        }
-
-        if !area_state.borrow_mut().add_actor(pc, location, true, None) {
-            error!("Player character starting location must be within \
-                   area bounds and passable.");
-            return Err(Error::new(ErrorKind::InvalidData,
-                "Unable to add player character to starting area at starting location"));
-        }
-
-        let pc_state = Rc::clone(area_state.borrow().get_last_entity().unwrap());
-        ActorState::init_actor_turn(&pc_state);
-
-        let path_finder = PathFinder::new(&area_state.borrow().area);
-
-        let mut areas: HashMap<String, Rc<RefCell<AreaState>>> = HashMap::new();
-        areas.insert(game.starting_area.to_string(), Rc::clone(&area_state));
-
-        let mut party = Vec::new();
-        party.push(Rc::clone(&pc_state));
-
-        let mut selected = Vec::new();
-        selected.push(Rc::clone(&pc_state));
-
-        Ok(GameState {
-            areas,
-            area_state: area_state,
-            path_finder: path_finder,
-            selected,
-            party,
-            party_listeners: ChangeListenerList::default(),
-            ui_callbacks: Vec::new(),
-        })
     }
 
     pub fn add_ui_callback(cb: OnTrigger, parent: &Rc<RefCell<EntityState>>,

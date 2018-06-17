@@ -61,8 +61,7 @@ pub fn load_state(save_file: &SaveFileMetaData) -> Result<(), Error> {
     let path = save_file.path.as_path();
     let save_file: SaveFile = read_single_resource_path(path)?;
 
-    save_file.state.load();
-    Ok(())
+    save_file.state.load()
 }
 
 pub fn create_save() -> Result<(), Error> {

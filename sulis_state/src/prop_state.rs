@@ -16,14 +16,17 @@
 
 use std::fmt;
 use std::rc::Rc;
+use std::io::Error;
 
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{animation_state, AnimationState};
-use sulis_module::{Item, LootList, Prop, prop};
+use sulis_core::util::invalid_data_error;
+use sulis_module::{Item, LootList, Module, Prop, prop};
 use sulis_module::area::PropData;
 
 use entity_state::AreaDrawable;
 use {ChangeListenerList, EntityTextureCache, ItemList, ItemState, Location};
+use save_state::PropInteractiveSaveState;
 
 pub enum Interactive {
     Not,
@@ -91,6 +94,47 @@ impl PropState {
             listeners: ChangeListenerList::default(),
             marked_for_removal: false,
         }
+    }
+
+    pub(crate) fn load_interactive(&mut self, interactive: PropInteractiveSaveState)
+        -> Result<(), Error>{
+        match interactive {
+            PropInteractiveSaveState::Not => { self.interactive = Interactive::Not; },
+            PropInteractiveSaveState::Container { loot_to_generate, temporary, items } => {
+                let mut item_list = ItemList::new();
+                for item_save_state in items {
+                    let item = match Module::item(&item_save_state.item.id) {
+                        None => invalid_data_error(&format!("No item with ID '{}'",
+                                                            item_save_state.item.id)),
+                        Some(item) => Ok(item),
+                    }?;
+
+                    item_list.add_quantity(item_save_state.quantity, ItemState::new(item));
+                }
+
+                let loot = match loot_to_generate {
+                    None => Ok(None),
+                    Some(ref id) => match Module::loot_list(id) {
+                        None => invalid_data_error(&format!("No loot list with ID '{}'",
+                                                            id)),
+                        Some(loot_list) => Ok(Some(loot_list)),
+                    }
+                }?;
+
+                self.interactive = Interactive::Container {
+                    items: item_list,
+                    loot_to_generate: loot,
+                    temporary,
+                };
+            },
+            PropInteractiveSaveState::Door { open } => {
+                self.interactive = Interactive::Door {
+                    open
+                };
+            }
+        }
+
+        Ok(())
     }
 
     pub (crate) fn is_enabled(&self) -> bool {

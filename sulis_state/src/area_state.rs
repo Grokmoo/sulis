@@ -14,14 +14,17 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::io::Error;
+
 use rand::{self, Rng};
+
 use sulis_core::ui::Color;
 use sulis_module::{Actor, Area, LootList, Module, ObjectSize, prop};
 use sulis_module::area::{EncounterData, PropData, Transition, TriggerKind};
-use sulis_core::util::{Point};
+use sulis_core::util::{invalid_data_error, Point};
 
-use {ActorState, AreaFeedbackText, calculate_los, has_visibility, ChangeListenerList, EntityState, GameState,
-    Location, Merchant, PropState, ScriptCallback, Targeter, TurnTimer};
+use *;
+use save_state::{AreaSaveState};
 
 use std::{ptr};
 use std::slice::Iter;
@@ -42,7 +45,7 @@ pub struct AreaState {
     props: Vec<Option<PropState>>,
     pub(crate) triggers: Vec<TriggerState>,
     pub(crate) merchants: Vec<Merchant>,
-    entities: Vec<Option<Rc<RefCell<EntityState>>>>,
+    pub(crate) entities: Vec<Option<Rc<RefCell<EntityState>>>>,
 
     pub listeners: ChangeListenerList<AreaState>,
     turn_timer: Rc<RefCell<TurnTimer>>,
@@ -73,6 +76,117 @@ impl PartialEq for AreaState {
 }
 
 impl AreaState {
+    pub fn new(area: Rc<Area>) -> AreaState {
+        let dim = (area.width * area.height) as usize;
+        let entity_grid = vec![Vec::new();dim];
+        let transition_grid = vec![None;dim];
+        let prop_grid = vec![None;dim];
+        let trigger_grid = vec![None;dim];
+        let pc_vis = vec![false;dim];
+        let pc_explored = vec![false;dim];
+
+        info!("Initializing area state for '{}'", area.name);
+        AreaState {
+            area,
+            entities: Vec::new(),
+            props: Vec::new(),
+            triggers: Vec::new(),
+            turn_timer: Rc::new(RefCell::new(TurnTimer::default())),
+            transition_grid,
+            entity_grid,
+            prop_grid,
+            trigger_grid,
+            prop_vis_grid: vec![true;dim],
+            prop_pass_grid: vec![true;dim],
+            listeners: ChangeListenerList::default(),
+            pc_vis,
+            pc_explored,
+            pc_vis_delta: (false, 0, 0),
+            feedback_text: Vec::new(),
+            scroll_to_callback: None,
+            last_time_millis: 0,
+            targeter: None,
+            merchants: Vec::new(),
+            on_load_fired: false,
+        }
+    }
+
+    pub fn load(id: &str, new_indices: &mut HashMap<usize, usize>, add_new_indices: bool,
+                save: AreaSaveState) -> Result<AreaState, Error> {
+        let area = match Module::area(id) {
+            None => invalid_data_error(&format!("Unable to find area '{}'", id)),
+            Some(area) => Ok(area),
+        }?;
+
+        let mut area_state = AreaState::new(area);
+
+        area_state.on_load_fired = save.on_load_fired;
+
+        for (index, mut buf) in save.pc_explored.into_iter().enumerate() {
+            for i in 0..64 {
+                if buf % 2 == 1 {
+                    let pc_exp_index = i + index * 64;
+                    if pc_exp_index > area_state.pc_explored.len() { break; }
+                    area_state.pc_explored[pc_exp_index] = true;
+                }
+                buf = buf / 2;
+            }
+        }
+
+        for prop_save_state in save.props {
+            let prop = match Module::prop(&prop_save_state.id) {
+                None => invalid_data_error(&format!("No prop with ID '{}'", prop_save_state.id)),
+                Some(prop) => Ok(prop),
+            }?;
+
+            let location = Location::from_point(&prop_save_state.location, &area_state.area);
+
+            let prop_data = PropData {
+                prop,
+                location: prop_save_state.location,
+                items: Vec::new(),
+                enabled: prop_save_state.enabled,
+            };
+
+            let index = area_state.add_prop(&prop_data, location, false)?;
+            area_state.props[index].as_mut().unwrap()
+                .load_interactive(prop_save_state.interactive)?;
+        }
+
+        for (index, trigger_save) in save.triggers.into_iter().enumerate() {
+            if index >= area_state.area.triggers.len() {
+                return invalid_data_error(&format!("Too many triggers defined in save"));
+            }
+
+            let trigger_state = TriggerState {
+                enabled: trigger_save.enabled,
+                fired: trigger_save.fired,
+            };
+            area_state.add_trigger(index, trigger_state);
+        }
+
+        for merchant_save in save.merchants {
+            area_state.merchants.push(Merchant::load(merchant_save)?);
+        }
+
+        for entity_save in save.entities {
+            let index = entity_save.index;
+            let location = Location::from_point(&entity_save.location, &area_state.area);
+
+            let entity = Rc::new(RefCell::new(EntityState::load(entity_save, &location)?));
+            let new_index = area_state.add_entity(entity, location)?;
+
+            if add_new_indices {
+                new_indices.insert(index, new_index);
+            }
+        }
+
+        // TODO need to save / load the turn timer ordering
+        area_state.turn_timer = Rc::new(RefCell::new(TurnTimer::new(&area_state)));
+
+        Ok(area_state)
+    }
+
     pub fn turn_timer(&self) -> Rc<RefCell<TurnTimer>> {
         Rc::clone(&self.turn_timer)
     }
@@ -104,6 +218,58 @@ impl AreaState {
         match index {
             Some(i) => Some(&mut self.merchants[i]),
             None => None,
+        }
+    }
+
+    /// Adds entities defined in the area definition to this area state
+    pub fn populate(&mut self) {
+        let area = Rc::clone(&self.area);
+        for actor_data in area.actors.iter() {
+            let actor = match Module::actor(&actor_data.id) {
+                None => {
+                    warn!("No actor with id '{}' found when initializing area '{}'",
+                              actor_data.id, self.area.id);
+                    continue;
+                },
+                Some(actor_data) => actor_data,
+            };
+
+            let location = Location::from_point(&actor_data.location, &self.area);
+            debug!("Adding actor '{}' at '{:?}'", actor.id, location);
+            self.add_actor(actor, location, false, None);
+        }
+
+        for prop_data in area.props.iter() {
+            let location = Location::from_point(&prop_data.location, &area);
+            debug!("Adding prop '{}' at '{:?}'", prop_data.prop.id, location);
+            match self.add_prop(prop_data, location, false) {
+                Err(e) => {
+                    warn!("Unable to add prop at {:?}", &prop_data.location);
+                    warn!("{}", e);
+                }, Ok(_) => (),
+            }
+        }
+
+        for (index, trigger) in area.triggers.iter().enumerate() {
+            let trigger_state = TriggerState {
+                fired: false,
+                enabled: trigger.initially_enabled,
+            };
+
+            self.add_trigger(index, trigger_state);
+        }
+
+        let turn_timer = Rc::new(RefCell::new(TurnTimer::new(&self)));
+        self.turn_timer = turn_timer;
+        trace!("Set up turn timer for area.");
+
+        self.add_transitions_from_area();
+
+        for (enc_index, enc_data) in area.encounters.iter().enumerate() {
+            let encounter = &enc_data.encounter;
+            if !encounter.auto_spawn { continue; }
+
+            self.spawn_encounter(enc_index, enc_data);
         }
     }
 
@@ -148,94 +314,7 @@ impl AreaState {
         self.scroll_to_callback.take()
     }
 
-    pub fn new(area: Rc<Area>) -> AreaState {
-        let dim = (area.width * area.height) as usize;
-        let entity_grid = vec![Vec::new();dim];
-        let transition_grid = vec![None;dim];
-        let prop_grid = vec![None;dim];
-        let trigger_grid = vec![None;dim];
-        let pc_vis = vec![false;dim];
-        let pc_explored = vec![false;dim];
-
-        info!("Initializing area state for '{}'", area.name);
-        AreaState {
-            area,
-            entities: Vec::new(),
-            props: Vec::new(),
-            triggers: Vec::new(),
-            turn_timer: Rc::new(RefCell::new(TurnTimer::default())),
-            transition_grid,
-            entity_grid,
-            prop_grid,
-            trigger_grid,
-            prop_vis_grid: vec![true;dim],
-            prop_pass_grid: vec![true;dim],
-            listeners: ChangeListenerList::default(),
-            pc_vis,
-            pc_explored,
-            pc_vis_delta: (false, 0, 0),
-            feedback_text: Vec::new(),
-            scroll_to_callback: None,
-            last_time_millis: 0,
-            targeter: None,
-            merchants: Vec::new(),
-            on_load_fired: false,
-        }
-    }
-
-    /// Adds entities defined in the area definition to this area state
-    pub fn populate(&mut self) {
-        let area = Rc::clone(&self.area);
-        for actor_data in area.actors.iter() {
-            let actor = match Module::actor(&actor_data.id) {
-                None => {
-                    warn!("No actor with id '{}' found when initializing area '{}'",
-                              actor_data.id, self.area.id);
-                    continue;
-                },
-                Some(actor_data) => actor_data,
-            };
-
-            let location = Location::from_point(&actor_data.location, &self.area);
-            debug!("Adding actor '{}' at '{:?}'", actor.id, location);
-            self.add_actor(actor, location, false, None);
-        }
-
-        for prop_data in area.props.iter() {
-            let location = Location::from_point(&prop_data.location, &area);
-            debug!("Adding prop '{}' at '{:?}'", prop_data.prop.id, location);
-            self.add_prop(prop_data, location, false);
-        }
-
-        for (index, trigger) in area.triggers.iter().enumerate() {
-            let trigger_state = TriggerState {
-                fired: false,
-                enabled: trigger.initially_enabled,
-            };
-
-            self.triggers.push(trigger_state);
-
-            let (location, size) = match trigger.kind {
-                TriggerKind::OnPlayerEnter { location, size } => (location, size),
-                _ => continue,
-            };
-
-            let start_x = location.x as usize;
-            let start_y = location.y as usize;
-            let end_x = start_x + size.width as usize;
-            let end_y = start_y + size.height as usize;
-
-            for y in start_y..end_y {
-                for x in start_x..end_x {
-                    self.trigger_grid[x + y * self.area.width as usize] = Some(index);
-                }
-            }
-        }
-
-        let turn_timer = Rc::new(RefCell::new(TurnTimer::new(&self)));
-        self.turn_timer = turn_timer;
-        trace!("Set up turn timer for area.");
-
+    fn add_transitions_from_area(&mut self) {
         for (index, transition) in self.area.transitions.iter().enumerate() {
             debug!("Adding transition '{}' at '{:?}'", index, transition.from);
             for y in 0..transition.size.height {
@@ -245,12 +324,26 @@ impl AreaState {
                 }
             }
         }
+    }
 
-        for (enc_index, enc_data) in area.encounters.iter().enumerate() {
-            let encounter = &enc_data.encounter;
-            if !encounter.auto_spawn { continue; }
+    fn add_trigger(&mut self, index: usize, trigger_state: TriggerState) {
+        let trigger = &self.area.triggers[index];
+        self.triggers.push(trigger_state);
 
-            self.spawn_encounter(enc_index, enc_data);
+        let (location, size) = match trigger.kind {
+            TriggerKind::OnPlayerEnter { location, size } => (location, size),
+            _ => return,
+        };
+
+        let start_x = location.x as usize;
+        let start_y = location.y as usize;
+        let end_x = start_x + size.width as usize;
+        let end_y = start_y + size.height as usize;
+
+        for y in start_y..end_y {
+            for x in start_x..end_x {
+                self.trigger_grid[x + y * self.area.width as usize] = Some(index);
+            }
         }
     }
 
@@ -405,7 +498,12 @@ impl AreaState {
             items: Vec::new(),
         };
 
-        self.add_prop(&prop_data, location, true);
+        match self.add_prop(&prop_data, location, true) {
+            Err(e) => {
+                warn!("Unable to add temp container at {},{}", x, y);
+                warn!("{}", e);
+            }, Ok(_) => (),
+        }
     }
 
     pub fn set_prop_enabled_at(&mut self, x: i32, y: i32, enabled: bool) -> bool {
@@ -606,12 +704,14 @@ impl AreaState {
         true
     }
 
-    pub(crate) fn add_prop(&mut self, prop_data: &PropData, location: Location, temporary: bool) -> bool {
+    pub(crate) fn add_prop(&mut self, prop_data: &PropData, location: Location, temporary: bool) -> Result<usize, Error> {
         let prop = &prop_data.prop;
 
-        if !self.area.coords_valid(location.x, location.y) { return false; }
+        if !self.area.coords_valid(location.x, location.y) {
+            return invalid_data_error(&format!("Prop location outside area bounds"));
+        }
         if !self.area.coords_valid(location.x + prop.size.width, location.y + prop.size.height) {
-            return false;
+            return invalid_data_error(&format!("Prop location outside area bounds"));
         }
 
         let prop_state = PropState::new(prop_data, location, temporary);
@@ -631,7 +731,7 @@ impl AreaState {
         self.props[index] = Some(prop_state);
         self.update_prop_vis_pass_grid(index);
 
-        true
+        Ok(index)
     }
 
     pub(crate) fn remove_prop(&mut self, index: usize) {
@@ -664,18 +764,29 @@ impl AreaState {
                                                            0,
                                                            is_pc,
                                                            ai_group)));
-        self.add_entity(entity, location)
+        match self.add_entity(entity, location) {
+            Ok(_) => true,
+            Err(e) => {
+                warn!("Unable to add entity to area");
+                warn!("{}", e);
+                false
+            }
+        }
     }
 
     pub(crate) fn add_entity(&mut self, entity: Rc<RefCell<EntityState>>,
-                                location: Location) -> bool {
+                                location: Location) -> Result<usize, Error> {
         let x = location.x;
         let y = location.y;
 
-        if !self.area.coords_valid(x, y) { return false; }
+        if !self.area.coords_valid(x, y) {
+            return invalid_data_error(&format!("entity location is out of bounds: {},{}", x, y));
+        }
 
         let entities_to_ignore = vec![entity.borrow().index];
-        if !self.is_passable(&entity.borrow(), &entities_to_ignore, x, y) { return false; }
+        if !self.is_passable(&entity.borrow(), &entities_to_ignore, x, y) {
+            return invalid_data_error(&format!("entity location is not passable: {},{}", x, y));
+        }
 
         entity.borrow_mut().actor.compute_stats();
         entity.borrow_mut().actor.init();
@@ -696,7 +807,7 @@ impl AreaState {
         self.entities[new_index] = Some(entity);
 
         self.listeners.notify(&self);
-        true
+        Ok(new_index)
     }
 
     pub fn move_entity(&mut self, entity: &Rc<RefCell<EntityState>>, x: i32, y: i32, squares: u32) -> bool {

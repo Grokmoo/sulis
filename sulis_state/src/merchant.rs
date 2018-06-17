@@ -14,11 +14,13 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::io::Error;
 use std::rc::Rc;
 
-use sulis_module::{LootList};
+use sulis_core::util::invalid_data_error;
+use sulis_module::{LootList, Module};
 
-use {ChangeListenerList, ItemList, ItemState};
+use {ChangeListenerList, ItemList, ItemState, save_state::MerchantSaveState};
 
 pub struct Merchant {
     pub id: String,
@@ -29,6 +31,26 @@ pub struct Merchant {
 }
 
 impl Merchant {
+    pub fn load(save: MerchantSaveState) -> Result<Merchant, Error> {
+        let mut items = ItemList::new();
+        for item_save in save.items {
+            let item = match Module::item(&item_save.item.id) {
+                None => invalid_data_error(&format!("No item with ID '{}'", item_save.item.id)),
+                Some(item) => Ok(item),
+            }?;
+
+            items.add_quantity(item_save.quantity, ItemState::new(item));
+        }
+
+        Ok(Merchant {
+            id: save.id,
+            buy_frac: save.buy_frac,
+            sell_frac: save.sell_frac,
+            listeners: ChangeListenerList::default(),
+            items,
+        })
+    }
+
     pub fn new(id: &str, loot_list: &Rc<LootList>, buy_frac: f32, sell_frac: f32) -> Merchant {
         let mut items = ItemList::new();
 

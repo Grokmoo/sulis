@@ -23,7 +23,7 @@ use ROUND_TIME_MILLIS;
 
 pub struct AbilityState {
     ability: Rc<Ability>,
-    remaining_duration: u32,
+    pub(crate) remaining_duration: u32,
     pub listeners: ChangeListenerList<AbilityState>,
 }
 

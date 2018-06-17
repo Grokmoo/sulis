@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::io::Error;
 use std::ptr;
 use std::slice::Iter;
 use std::rc::Rc;
@@ -24,11 +25,12 @@ use sulis_core::config::CONFIG;
 use animation::{Animation, MeleeAttackAnimation, RangedAttackAnimation};
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::ui::{color, Color};
-use sulis_core::util::Point;
+use sulis_core::util::{Point, invalid_data_error};
 use sulis_module::{Actor, ObjectSize, ObjectSizeIterator, Module};
 use sulis_module::area::{MAX_AREA_SIZE, Transition};
 use {ActorState, AreaState, ChangeListenerList, EntityTextureCache, EntityTextureSlot,
     GameState, Location, PropState, ScriptCallback};
+use save_state::EntitySaveState;
 
 enum AIState {
     Player {
@@ -65,6 +67,44 @@ impl PartialEq for EntityState {
 }
 
 impl EntityState {
+    pub(crate) fn load(save: EntitySaveState, location: &Location) -> Result<EntityState, Error> {
+        let ai_state = match save.actor_base.as_ref() {
+            None => {
+                AIState::AI {
+                    group: save.ai_group,
+                    active: save.ai_active,
+                }
+            }, Some(_) => {
+                let dim = (MAX_AREA_SIZE * MAX_AREA_SIZE) as usize;
+                AIState::Player {
+                    vis: vec![false; dim],
+                }
+            },
+        };
+
+        let size = match Module::object_size(&save.size) {
+            None => invalid_data_error(&format!("Invalid size '{}' for actor", save.size)),
+            Some(size) => Ok(size),
+        }?;
+
+        let actor = ActorState::load(save.actor, save.actor_base)?;
+
+        Ok(EntityState {
+            actor,
+            location: location.clone(),
+            size,
+            index: save.index,
+            sub_pos: (0.0, 0.0),
+            color: color::WHITE,
+            color_sec: Color::new(0.0, 0.0, 0.0, 0.0),
+            listeners: ChangeListenerList::default(),
+            ai_state,
+            marked_for_removal: false,
+            texture_cache_slot: None,
+            custom_flags: save.custom_flags,
+        })
+    }
+
     pub(crate) fn new(actor: Rc<Actor>, location: Location,
                       index: usize, is_pc: bool, ai_group: Option<usize>) -> EntityState {
         let ai_state = if is_pc {

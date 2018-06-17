@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::io::Error;
 use std::slice::{Iter, IterMut};
 use std::rc::Rc;
 use std::cell::{RefCell};
@@ -22,9 +23,11 @@ use std::collections::HashMap;
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::image::{LayeredImage};
 use sulis_core::ui::{color, Color};
-use sulis_module::{item, Actor, Module};
+use sulis_core::util::invalid_data_error;
+use sulis_module::{item, Actor, Module, ActorBuilder};
 use sulis_rules::{Attack, AttackKind, HitKind, StatList};
 use {AbilityState, ChangeListenerList, Effect, EntityState, GameState, Inventory, ItemState, ScriptCallback};
+use save_state::ActorSaveState;
 
 pub struct ActorState {
     pub actor: Rc<Actor>,
@@ -43,6 +46,61 @@ pub struct ActorState {
 }
 
 impl ActorState {
+    pub fn load(save: ActorSaveState, base: Option<ActorBuilder>) -> Result<ActorState, Error> {
+        let actor = match base {
+            None => {
+                match Module::actor(&save.id) {
+                    None => invalid_data_error(&format!("No actor with id '{}'", save.id)),
+                    Some(actor) => Ok(actor),
+                }?
+            }
+            Some(builder) => {
+                Rc::new(Module::load_actor(builder)?)
+            }
+        };
+
+        let attrs = actor.attributes;
+
+        let image = LayeredImage::new(actor.image_layers()
+            .get_list(actor.sex, actor.hair_color, actor.skin_color), actor.hue);
+
+        let mut ability_states = HashMap::new();
+        for ability in actor.abilities.iter() {
+            if ability.active.is_none() { continue; }
+
+            let mut ability_state = AbilityState::new(ability);
+
+            match save.ability_states.get(&ability.id) {
+                None => (),
+                Some(ref ability_save) => {
+                    ability_state.remaining_duration = ability_save.remaining_duration;
+                }
+            }
+
+            ability_states.insert(ability.id.to_string(), ability_state);
+        }
+
+        let mut inventory = Inventory::new(&actor);
+        inventory.load(save.items, save.equipped)?;
+        inventory.add_coins(save.coins);
+
+        Ok(ActorState {
+            actor,
+            inventory,
+            stats: StatList::new(attrs),
+            listeners: ChangeListenerList::default(),
+            hp: save.hp,
+            ap: save.ap,
+            overflow_ap: save.overflow_ap,
+            xp: save.xp,
+            has_level_up: false,
+            image,
+            effects: Vec::new(),
+            ability_states,
+            texture_cache_invalid: false,
+        })
+    }
+
     pub fn new(actor: Rc<Actor>) -> ActorState {
         trace!("Creating new actor state for {}", actor.id);
         let mut inventory = Inventory::new(&actor);

@@ -94,8 +94,6 @@ pub use self::prop_window::PropWindow;
 
 pub mod main_menu;
 
-pub mod character_selector;
-
 mod race_pane;
 pub use self::race_pane::RacePane;
 
@@ -243,7 +241,7 @@ impl RootView {
         let menu_cb = Callback::new(Rc::new(|widget, _| {
             let root = Widget::get_root(widget);
             let root_view = Widget::downcast_kind_mut::<RootView>(&root);
-            root_view.next_step = Some(NextGameStep::SelectCharacter);
+            root_view.next_step = Some(NextGameStep::MainMenu);
         }));
 
         let menu = Widget::with_defaults(InGameMenu::new(exit_cb, menu_cb));

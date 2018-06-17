@@ -664,65 +664,12 @@ children:
         from: .in_game_menu.button
         text: "Exit"
   load_window:
+    from: .load_window_base
     background: bg_large
     border: { top: 6, bottom: 8, left: 6, right: 6 }
     preferred_size: [120, 120]
     x_relative: Center
     y_relative: Center
-    children:
-      title:
-        from: .label
-        width_relative: Max
-        preferred_size: [0, 10]
-        text_params:
-          scale: 5.5
-        text: "Select a File to Load"
-      entries:
-        background: bg_base
-        border: [2, 2, 2, 2]
-        width_relative: Max
-        height_relative: Max
-        preferred_size: [0, -30]
-        position: [0, 15]
-        layout: BoxVertical
-        layout_spacing: { top: 0, bottom: 2, left: 0, right: 0 }
-        children:
-          entry:
-            from: .button
-            width_relative: Max
-            preferred_size: [0, 10]
-            children:
-              text_area:
-                from: .text_area
-                width_relative: Max
-                height_relative: Max
-                text: |
-                  [s=5|#player_name#][x=40|#datetime#]
-                  #current_area_name#
-      delete:
-        from: .button
-        preferred_size: [25, 10]
-        text_params:
-          scale: 5.5
-        text: "Delete"
-        y_relative: Max
-      cancel:
-        from: .button
-        preferred_size: [25, 10]
-        text_params:
-          scale: 5.5
-        text: "Cancel"
-        x_relative: Max
-        y_relative: Max
-      accept:
-        from: .button
-        preferred_size: [25, 10]
-        text_params:
-          scale: 5.5
-        text: "Load"
-        x_relative: Max
-        y_relative: Max
-        position: [-30, 0]
   bonus_text:
     from: .text_area
     text: |

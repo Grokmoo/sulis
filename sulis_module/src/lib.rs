@@ -146,6 +146,7 @@ pub struct Module {
     terrain_kinds: Vec<TerrainKind>,
     wall_rules: Option<WallRules>,
     wall_kinds: Vec<WallKind>,
+    init: bool,
 }
 
 #[derive(Clone)]
@@ -386,9 +387,14 @@ impl Module {
             let mut m = m.borrow_mut();
             m.game = Some(Rc::new(game));
             m.rules = Some(Rc::new(rules));
+            m.init = true;
         });
 
         Ok(())
+    }
+
+    pub fn is_initialized() -> bool {
+        MODULE.with(|m| { m.borrow_mut().init })
     }
 
     pub fn load_actor(builder: ActorBuilder) -> Result<Actor, Error> {
@@ -503,6 +509,7 @@ impl Default for Module {
             terrain_kinds: Vec::new(),
             wall_rules: None,
             wall_kinds: Vec::new(),
+            init: false,
         }
     }
 }

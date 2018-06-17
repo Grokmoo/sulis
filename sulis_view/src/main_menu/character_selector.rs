@@ -18,88 +18,30 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::{RefCell};
 
-use sulis_core::io::{InputAction, MainLoopUpdater};
 use sulis_core::ui::*;
 use sulis_state::{ActorState, NextGameStep};
 use sulis_module::{Actor, Module};
 use sulis_widgets::{Button, ConfirmationWindow, Label, TextArea};
 
 use character_window::create_details_text_box;
-use {CharacterBuilder, LoadingScreen};
-
-pub struct LoopUpdater {
-    view: Rc<RefCell<CharacterSelector>>,
-}
-
-impl LoopUpdater {
-    pub fn new(view: &Rc<RefCell<CharacterSelector>>) -> LoopUpdater {
-        LoopUpdater {
-            view: Rc::clone(view),
-        }
-    }
-}
-
-impl MainLoopUpdater for LoopUpdater {
-    fn update(&self, _root: &Rc<RefCell<Widget>>, _millis: u32) { }
-
-    fn is_exit(&self) -> bool {
-        self.view.borrow().is_exit()
-    }
-}
+use {CharacterBuilder, LoadingScreen, main_menu::MainMenu};
 
 pub struct CharacterSelector {
     selected: Option<Rc<Actor>>,
     first_add: bool,
-    to_select: Option<String>,
-    next_step: Option<NextGameStep>,
 }
 
 impl CharacterSelector {
     pub fn new() -> Rc<RefCell<CharacterSelector>> {
         Rc::new(RefCell::new(CharacterSelector {
             selected: None,
-            to_select: None,
             first_add: true,
-            next_step: None,
         }))
-    }
-
-    pub fn is_exit(&self) -> bool {
-        self.next_step.is_some()
-    }
-
-    pub fn next_step(&self) -> Option<NextGameStep> {
-        self.next_step.clone()
-    }
-
-    pub fn set_to_select(&mut self, id: &str) {
-        self.to_select = Some(id.to_string());
     }
 }
 
 impl WidgetKind for CharacterSelector {
-    widget_kind!("root");
-
-    fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
-        use sulis_core::io::InputAction::*;
-        match key {
-            ShowMenu => {
-                let exit_window = Widget::with_theme(
-                    ConfirmationWindow::new(Callback::new(Rc::new(|widget, _| {
-                        let parent = Widget::get_root(&widget);
-                        let selector = Widget::downcast_kind_mut::<CharacterSelector>(&parent);
-                        selector.selected = None;
-                        selector.next_step = Some(NextGameStep::Exit);
-                    }))),
-                    "exit_confirmation_window");
-                exit_window.borrow_mut().state.set_modal(true);
-                Widget::add_child_to(&widget, exit_window);
-            },
-            _ => return false,
-        }
-
-        true
-    }
+    widget_kind!("character_selector");
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         debug!("Adding to main menu widget");
@@ -109,19 +51,19 @@ impl WidgetKind for CharacterSelector {
 
         let new_character_button = Widget::with_theme(Button::empty(), "new_character_button");
         new_character_button.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::get_parent(&widget);
+            let root = Widget::get_root(&widget);
 
             let builder = Widget::with_defaults(CharacterBuilder::new());
-            Widget::add_child_to(&parent, builder);
+            Widget::add_child_to(&root, builder);
         })));
 
-        let delete_character_button = Widget::with_theme(Button::empty(), "delete_character_button");
+        let delete_char_button = Widget::with_theme(Button::empty(), "delete_character_button");
 
         let (actor_name, actor_id) = match self.selected {
             None => (String::new(), String::new()),
             Some(ref actor) => (actor.name.to_string(), actor.id.to_string()),
         };
-        delete_character_button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
+        delete_char_button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
             let root = Widget::get_root(&widget);
 
             let actor_id = actor_id.clone();
@@ -129,10 +71,10 @@ impl WidgetKind for CharacterSelector {
                 Module::delete_character(&actor_id);
                 widget.borrow_mut().mark_for_removal();
 
-                let root = Widget::get_root(&widget);
-                let selector = Widget::downcast_kind_mut::<CharacterSelector>(&root);
+                let parent= Widget::get_root(&widget);
+                let selector = Widget::downcast_kind_mut::<CharacterSelector>(&parent);
                 selector.selected = None;
-                root.borrow_mut().invalidate_children();
+                parent.borrow_mut().invalidate_children();
             })));
             {
                 let window = window.borrow();
@@ -142,7 +84,7 @@ impl WidgetKind for CharacterSelector {
             window_widget.borrow_mut().state.set_modal(true);
             Widget::add_child_to(&root, window_widget);
         })));
-        delete_character_button.borrow_mut().state.set_enabled(self.selected.is_some());
+        delete_char_button.borrow_mut().state.set_enabled(self.selected.is_some());
 
         let mut must_create_character = true;
         let characters_pane = Widget::empty("characters_pane");
@@ -151,21 +93,6 @@ impl WidgetKind for CharacterSelector {
             for actor in characters {
                 let actor = Rc::new(actor);
                 trace!("Adding button for {}", actor.id);
-
-                let select = if let Some(ref to_select_id) = self.to_select {
-                    if &actor.id == to_select_id {
-                        true
-                    } else {
-                        false
-                    }
-                } else {
-                    false
-                };
-
-                if select {
-                    self.selected = Some(Rc::clone(&actor));
-                    self.to_select = None;
-                }
 
                 let actor_button = Widget::with_theme(Button::empty(), "character_button");
                 actor_button.borrow_mut().state.add_text_arg("name", &actor.name);
@@ -189,13 +116,16 @@ impl WidgetKind for CharacterSelector {
         let play_button = Widget::with_theme(Button::empty(), "play_button");
         play_button.borrow_mut().state.set_enabled(self.selected.is_some());
         play_button.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let root = Widget::get_root(&widget);
-            let selector = Widget::downcast_kind_mut::<CharacterSelector>(&root);
+            let parent = Widget::get_parent(&widget);
+            let selector = Widget::downcast_kind_mut::<CharacterSelector>(&parent);
             let selected = match selector.selected {
                 None => return,
                 Some(ref selected) => Rc::clone(selected),
             };
-            selector.next_step = Some(NextGameStep::PlayCampaign { pc_actor: selected });
+
+            let root = Widget::get_root(&widget);
+            let window = Widget::downcast_kind_mut::<MainMenu>(&root);
+            window.next_step = Some(NextGameStep::PlayCampaign { pc_actor: selected });
 
             let loading_screen = Widget::with_defaults(LoadingScreen::new());
             loading_screen.borrow_mut().state.set_modal(true);
@@ -212,28 +142,11 @@ impl WidgetKind for CharacterSelector {
             Widget::with_theme(TextArea::empty(), "details")
         };
 
-        let exit = Widget::with_theme(Button::empty(), "exit");
-        exit.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::get_parent(&widget);
-            let sel = Widget::downcast_kind_mut::<CharacterSelector>(&parent);
-            sel.next_step = Some(NextGameStep::Exit);
-            sel.selected = None;
-        })));
-
-        let back = Widget::with_theme(Button::empty(), "back");
-        back.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::get_parent(&widget);
-            let sel = Widget::downcast_kind_mut::<CharacterSelector>(&parent);
-            sel.next_step = Some(NextGameStep::SelectModule);
-            sel.selected = None;
-        })));
-
         let mut children = vec![title, chars_title, characters_pane, new_character_button,
-            delete_character_button, play_button, details, exit, back];
+            delete_char_button, play_button, details];
 
         if self.first_add && must_create_character {
-            let builder = Widget::with_defaults(CharacterBuilder::new());
-            children.push(builder);
+            children.push(Widget::with_defaults(CharacterBuilder::new()));
         }
         self.first_add = false;
 

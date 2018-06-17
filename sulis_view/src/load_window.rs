@@ -26,6 +26,7 @@ const NAME: &str = "load_window";
 
 pub struct LoadWindow {
     accept: Rc<RefCell<Widget>>,
+    pub(crate) cancel: Rc<RefCell<Widget>>,
     entries: Vec<SaveFileMetaData>,
     selected_entry: Option<usize>,
 }
@@ -33,6 +34,7 @@ pub struct LoadWindow {
 impl LoadWindow {
     pub fn new() -> Rc<RefCell<LoadWindow>> {
         let accept = Widget::with_theme(Button::empty(), "accept");
+        let cancel = Widget::with_theme(Button::empty(), "cancel");
         let entries = match get_available_save_files() {
             Ok(files) => files,
             Err(e) => {
@@ -42,10 +44,15 @@ impl LoadWindow {
             }
         };
 
-        Rc::new(RefCell::new(LoadWindow { accept, entries, selected_entry: None }))
+        Rc::new(RefCell::new(LoadWindow {
+            accept,
+            cancel,
+            entries,
+            selected_entry: None
+        }))
     }
 
-    pub fn load(&self) {
+    pub fn load(&self, root: &Rc<RefCell<Widget>>) {
         let index = match self.selected_entry {
             None => return,
             Some(index) => index,
@@ -55,7 +62,9 @@ impl LoadWindow {
             Err(e) => {
                 error!("Error loading game state");
                 error!("{}", e);
-            }, Ok(()) => (),
+            }, Ok(()) => {
+                root.borrow_mut().invalidate_children();
+            }
         }
     }
 
@@ -80,12 +89,9 @@ impl WidgetKind for LoadWindow {
     widget_kind!(NAME);
 
     fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
-        widget.borrow_mut().state.set_modal(true);
-
         let title = Widget::with_theme(Label::empty(), "title");
 
-        let cancel = Widget::with_theme(Button::empty(), "cancel");
-        cancel.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+        self.cancel.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
             let parent = Widget::get_parent(widget);
             parent.borrow_mut().mark_for_removal();
         })));
@@ -112,9 +118,10 @@ impl WidgetKind for LoadWindow {
         delete.borrow_mut().state.set_enabled(self.selected_entry.is_some());
 
         self.accept.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+            let root = Widget::get_root(widget);
             let parent = Widget::get_parent(widget);
             let load_window = Widget::downcast_kind_mut::<LoadWindow>(&parent);
-            load_window.load();
+            load_window.load(&root);
 
             parent.borrow_mut().mark_for_removal();
         })));
@@ -147,6 +154,6 @@ impl WidgetKind for LoadWindow {
             Widget::add_child_to(&entries, widget);
         }
 
-        vec![cancel, delete, self.accept.clone(), title, entries]
+        vec![self.cancel.clone(), delete, self.accept.clone(), title, entries]
     }
 }

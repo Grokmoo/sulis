@@ -58,8 +58,6 @@ use sulis_module::{Ability, ActorBuilder, Class, Faction, ImageLayer, Module, Ra
 use sulis_rules::{AttributeList};
 use sulis_state::{EntityState};
 
-use character_selector::CharacterSelector;
-
 pub const NAME: &str = "character_builder";
 
 trait BuilderPane {
@@ -312,8 +310,6 @@ impl BuilderSet for CharacterCreator {
 
         let root = Widget::get_root(&widget);
         root.borrow_mut().invalidate_children();
-        let selector = Widget::downcast_kind_mut::<CharacterSelector>(&root);
-        selector.set_to_select(&actor.id);
     }
 }
 

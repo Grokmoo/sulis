@@ -28,11 +28,10 @@ use sulis_core::config::CONFIG;
 use sulis_core::resource::ResourceSet;
 use sulis_core::io::IO;
 use sulis_core::util;
-use sulis_module::{Actor, Module};
+use sulis_module::{Actor};
 use sulis_state::{GameState, NextGameStep};
 use sulis_view::{RootView};
-use sulis_view::character_selector::{self, CharacterSelector};
-use sulis_view::main_menu::{MainMenuView, MainMenuLoopUpdater};
+use sulis_view::main_menu;
 
 fn init() -> Box<IO> {
     // CONFIG will be lazily initialized here; if it fails it
@@ -57,61 +56,22 @@ fn init() -> Box<IO> {
     }
 }
 
-fn select_module(io: &mut Box<IO>) -> NextGameStep {
-    let modules_list = Module::get_available_modules("modules");
-    if modules_list.len() == 0 {
-        util::error_and_exit("No valid modules found.");
-    }
-
-    let main_menu_view = MainMenuView::new(modules_list);
-    let loop_updater = MainMenuLoopUpdater::new(&main_menu_view);
-    let main_menu_root = ui::create_ui_tree(main_menu_view.clone());
-    match ResourceSet::get_theme().children.get("main_menu") {
-        None => warn!("No theme found for 'main_menu"),
-        Some(ref theme) => {
-            main_menu_root.borrow_mut().theme = Some(Rc::clone(theme));
-            main_menu_root.borrow_mut().theme_id = ".main_menu".to_string();
-            main_menu_root.borrow_mut().theme_subname = "main_menu".to_string();
-        }
-    }
-
-    if let Err(e) = util::main_loop(io, main_menu_root, Box::new(loop_updater)) {
-        error!("{}", e);
-        util::error_and_exit("Error in main menu.");
-    }
-
-    let mmv_ref = main_menu_view.borrow();
-    match mmv_ref.get_selected_module() {
-        None => {
-            NextGameStep::Exit
-        },
-        Some(module) => {
-            info!("Reading module from {}", module.dir);
-            if let Err(e) =  Module::init(&CONFIG.resources.directory, &module.dir) {
-                error!("{}", e);
-                util::error_and_exit("There was a fatal error setting up the module.");
-            };
-            NextGameStep::SelectCharacter
-        }
-    }
-}
-
-fn select_character(io: &mut Box<IO>) -> NextGameStep {
-    let view = CharacterSelector::new();
-    let loop_updater = character_selector::LoopUpdater::new(&view);
+fn start_module(io: &mut Box<IO>) -> NextGameStep {
+    let view = main_menu::MainMenu::new();
+    let loop_updater = main_menu::LoopUpdater::new(&view);
     let root = ui::create_ui_tree(view.clone());
-    match ResourceSet::get_theme().children.get("character_selector") {
-        None => warn!("No theme found for 'character_selector'"),
+    match ResourceSet::get_theme().children.get("main_menu") {
+        None => warn!("No theme found for 'main_menu'"),
         Some(ref theme) => {
             root.borrow_mut().theme = Some(Rc::clone(theme));
-            root.borrow_mut().theme_id = ".character_selector".to_string();
-            root.borrow_mut().theme_subname = "character_selector".to_string();
+            root.borrow_mut().theme_id = ".main_menu".to_string();
+            root.borrow_mut().theme_subname = "main_menu".to_string();
         }
     }
 
     if let Err(e) = util::main_loop(io, root, Box::new(loop_updater)) {
         error!("{}", e);
-        util::error_and_exit("Error in character selector.");
+        util::error_and_exit("Error in module starter.");
     }
 
     let view = view.borrow();
@@ -147,13 +107,12 @@ fn run_campaign(io: &mut Box<IO>, pc_actor: Rc<Actor>) -> NextGameStep {
 fn main() {
     let mut io = init();
 
-    let mut next_step = NextGameStep::SelectModule;
+    let mut next_step = NextGameStep::MainMenu;
     loop {
         next_step = match next_step {
             NextGameStep::Exit => break,
             NextGameStep::PlayCampaign { pc_actor } => run_campaign(&mut io, pc_actor),
-            NextGameStep::SelectCharacter => select_character(&mut io),
-            NextGameStep::SelectModule => select_module(&mut io),
+            NextGameStep::MainMenu => start_module(&mut io),
         };
     }
 

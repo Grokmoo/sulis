@@ -120,8 +120,7 @@ pub const MOVE_TO_THRESHOLD: f32 = 0.4;
 pub enum NextGameStep {
     Exit,
     PlayCampaign { pc_actor: Rc<Actor> },
-    SelectCharacter,
-    SelectModule,
+    MainMenu,
 }
 
 thread_local! {
@@ -193,6 +192,7 @@ impl GameState {
             let path_finder = PathFinder::new(&state.area_state.borrow().area);
             state.path_finder = path_finder;
 
+            state.party.clear();
             for index in save_state.party {
                 let new_index = match new_indices.get(&index) {
                     None => invalid_data_error(&format!("Invalid party entity index '{}'",
@@ -205,6 +205,7 @@ impl GameState {
                 state.party.push(entity);
             }
 
+            state.selected.clear();
             for index in save_state.selected {
                 let new_index = match new_indices.get(&index) {
                     None => invalid_data_error(&format!("Invalid selected entity index '{}'",
@@ -216,6 +217,8 @@ impl GameState {
                                        .entities[*new_index].as_ref().unwrap());
                 state.selected.push(entity);
             }
+
+            state.area_state.borrow_mut().push_scroll_to_callback(Rc::clone(&state.party[0]));
 
             Ok(())
         });

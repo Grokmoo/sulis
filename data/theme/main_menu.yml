@@ -1,36 +1,153 @@
 ---
 children:
-  loading_screen:
-    background: bg_base
-    width_relative: Max
-    height_relative: Max
-    children:
-      loading_label:
-        from: .label
-        text_params:
-          scale: 8.0
-          horizontal_alignment: Center
-        text: "Loading..."
-        x_relative: Center
-        y_relative: Max
-        width_relative: Max
-        preferred_size: [0, 10]
-        position: [0, -20]
   main_menu:
     children:
+      title:
+        from: .label
+        text_params:
+          scale: 8
+        text: "Sulis"
+        preferred_size: [40, 10]
+        x_relative: Center
+        position: [0, 0]
+      module_title:
+        from: .label
+        text_params:
+          scale: 7
+        text: "#module#"
+        preferred_size: [100, 10]
+        x_relative: Center
+        position: [0, 10]
+      button:
+        from: .button
+        preferred_size: [42, 12]
+        text_params:
+          scale: 5
+        x_relative: Center
+      module:
+        from: .main_menu.button
+        text: "Select Module"
+        position: [-70, 25]
+      new:
+        from: .main_menu.button
+        position: [-23, 25]
+        text: "Start New Game"
+      load:
+        from: .main_menu.button
+        position: [24, 25]
+        text: "Load Existing Save"
+      exit:
+        from: .main_menu.button
+        text: "Exit Game"
+        position: [71, 25]
+      content: {}
+      load_window:
+        from: .load_window_base
+        border: [5, 5, 5, 5]
+        position: [0, 35]
+        height_relative: Max
+        x_relative: Center
+        preferred_size: [150, -40]
+      module_selector:
+        from: .module_selector
+        position: [0, 40]
+        width_relative: Max
+        height_relative: Max
+        preferred_size: [0, -40]
+      character_selector:
+        from: .character_selector
+        position: [0, 40]
+        width_relative: Max
+        height_relative: Max
+        preferred_size: [0, -40]
       loading_screen:
         from: .loading_screen
-      exit:
+      portrait_selector:
+        from: .portrait_selector
+      exit_confirmation_window:
+        from: .exit_confirmation
+      delete_character_confirmation_window:
+        from: .confirmation_window
+        children:
+          title:
+            text: "Delete #name#?"
+          accept:
+            text: "Delete"
+  character_selector:
+    children:
+      character_builder:
+        from: .character_builder
+      title:
+        from: .label
+        text_params:
+          scale: 8
+        text: "Select a Character"
+        x_relative: Center
+        preferred_size: [40, 10]
+        position: [0, 0]
+      characters_title:
+        from: .label
+        text_params:
+          scale: 6
+          horizontal_alignment: Left
+        text: "Available Characters"
+        x_relative: Center
+        position: [-40, 10]
+        preferred_size: [80, 10]
+      new_character_button:
         from: .button
-        text: "Exit"
-        x_relative: Max
-        position: [-5, 5]
-        preferred_size: [15, 8]
+        text: "New Character"
+        x_relative: Center
+        y_relative: Max
+        position: [-95, -15]
+        preferred_size: [30, 10]
+      delete_character_button:
+        from: .button
+        text: "Delete"
+        x_relative: Center
+        y_relative: Max
+        position: [-67, -15]
+        preferred_size: [20, 10]
+      characters_pane:
+        border: [1, 1, 1, 1]
+        background: bg_base
+        x_relative: Center
+        height_relative: Max
+        preferred_size: [100, -45]
+        position: [-60, 18]
+        layout: Grid
+        layout_spacing: { top: 0, bottom: 1, right: 1, left: 0 }
+        children:
+          character_button:
+            from: .button
+            background: background_inner
+            foreground: "#portrait#"
+            preferred_size: [28, 28]
+      play_button:
+        from: .button
+        text: "Play"
+        text_params:
+          scale: 6
+        x_relative: Center
+        y_relative: Max
+        position: [-30, -15]
+        preferred_size: [40, 10]
+      details:
+        from: .character_window.details
+        border: [4, 4, 4, 4]
+        background: bg_base
+        x_relative: Center
+        width_relative: Zero
+        height_relative: Max
+        preferred_size: [115, -25]
+        position: [50, 10]
+  module_selector:
+    children:
       title:
         from: .label
         text_params:
           scale: 8.0
-        text: "Sulis"
+        text: "Select a Module"
         x_relative: Center
         preferred_size: [40, 10]
         position: [0, 10]
@@ -73,99 +190,20 @@ children:
         preferred_size: [100, -50]
         position: [45, 30]
         text: "#description#"
-      exit_confirmation_window:
-        from: .exit_confirmation
-  character_selector:
+  loading_screen:
+    background: bg_base
+    width_relative: Max
+    height_relative: Max
     children:
-      loading_screen:
-        from: .loading_screen
-      exit:
-        from: .button
-        text: "Exit"
-        x_relative: Max
-        position: [-5, 5]
-        preferred_size: [15, 8]
-      back:
-        from: .button
-        text: "Back"
-        x_relative: Max
-        position: [-25, 5]
-        preferred_size: [15, 8]
-      title:
+      loading_label:
         from: .label
         text_params:
-          scale: 8
-        text: "Select a Character"
-        x_relative: Center
-        preferred_size: [40, 10]
-        position: [0, 20]
-      characters_title:
-        from: .label
-        text_params:
-          scale: 6
-          horizontal_alignment: Left
-        text: "Available Characters"
-        x_relative: Center
-        position: [-40, 30]
-        preferred_size: [80, 10]
-      new_character_button:
-        from: .button
-        text: "New Character"
+          scale: 8.0
+          horizontal_alignment: Center
+        text: "Loading..."
         x_relative: Center
         y_relative: Max
-        position: [-95, -15]
-        preferred_size: [30, 10]
-      delete_character_button:
-        from: .button
-        text: "Delete"
-        x_relative: Center
-        y_relative: Max
-        position: [-67, -15]
-        preferred_size: [20, 10]
-      characters_pane:
-        border: [1, 1, 1, 1]
-        background: bg_base
-        x_relative: Center
-        height_relative: Max
-        preferred_size: [100, -65]
-        position: [-60, 38]
-        layout: Grid
-        layout_spacing: { top: 0, bottom: 1, right: 1, left: 0 }
-        children:
-          character_button:
-            from: .button
-            background: background_inner
-            foreground: "#portrait#"
-            preferred_size: [28, 28]
-      play_button:
-        from: .button
-        text: "Play"
-        text_params:
-          scale: 6
-        x_relative: Center
-        y_relative: Max
-        position: [-30, -15]
-        preferred_size: [40, 10]
-      details:
-        from: .character_window.details
-        border: [4, 4, 4, 4]
-        background: bg_base
-        x_relative: Center
-        width_relative: Zero
-        height_relative: Max
-        preferred_size: [115, -45]
-        position: [50, 30]
-      character_builder:
-        from: .character_builder
-      exit_confirmation_window:
-        from: .exit_confirmation
-      portrait_selector:
-        from: .portrait_selector
-      delete_character_confirmation_window:
-        from: .confirmation_window
-        children:
-          title:
-            text: "Delete #name#?"
-          accept:
-            text: "Delete"
+        width_relative: Max
+        preferred_size: [0, 10]
+        position: [0, -20]
 ...

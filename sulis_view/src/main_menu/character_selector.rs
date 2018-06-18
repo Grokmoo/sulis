@@ -128,7 +128,7 @@ impl WidgetKind for CharacterSelector {
 
             let root = Widget::get_root(&widget);
             let window = Widget::downcast_kind_mut::<MainMenu>(&root);
-            window.next_step = Some(NextGameStep::PlayCampaign { pc_actor: selected });
+            window.next_step = Some(NextGameStep::NewCampaign { pc_actor: selected });
 
             let loading_screen = Widget::with_defaults(LoadingScreen::new());
             loading_screen.borrow_mut().state.set_modal(true);

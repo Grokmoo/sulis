@@ -135,8 +135,8 @@ pub struct RootView {
 }
 
 impl RootView {
-    pub fn next_step(&self) -> Option<NextGameStep> {
-        self.next_step.clone()
+    pub fn next_step(&mut self) -> Option<NextGameStep> {
+        self.next_step.take()
     }
 
     pub fn new() -> Rc<RefCell<RootView>> {

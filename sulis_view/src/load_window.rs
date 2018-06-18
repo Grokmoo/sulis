@@ -20,7 +20,10 @@ use std::cell::RefCell;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{Button, Label, TextArea, ConfirmationWindow};
-use sulis_state::{SaveFileMetaData, save_file::{delete_save, load_state, get_available_save_files}};
+use sulis_state::{SaveState, SaveFileMetaData, NextGameStep};
+use sulis_state::save_file::{delete_save, load_state, get_available_save_files};
+
+use {LoadingScreen, main_menu::MainMenu, RootView};
 
 const NAME: &str = "load_window";
 
@@ -29,10 +32,11 @@ pub struct LoadWindow {
     pub(crate) cancel: Rc<RefCell<Widget>>,
     entries: Vec<SaveFileMetaData>,
     selected_entry: Option<usize>,
+    main_menu_mode: bool,
 }
 
 impl LoadWindow {
-    pub fn new() -> Rc<RefCell<LoadWindow>> {
+    pub fn new(main_menu_mode: bool) -> Rc<RefCell<LoadWindow>> {
         let accept = Widget::with_theme(Button::empty(), "accept");
         let cancel = Widget::with_theme(Button::empty(), "cancel");
         let entries = match get_available_save_files() {
@@ -48,7 +52,8 @@ impl LoadWindow {
             accept,
             cancel,
             entries,
-            selected_entry: None
+            selected_entry: None,
+            main_menu_mode,
         }))
     }
 
@@ -60,12 +65,27 @@ impl LoadWindow {
 
         match load_state(&self.entries[index]) {
             Err(e) => {
-                error!("Error loading game state");
+                error!("Error reading game state");
                 error!("{}", e);
-            }, Ok(()) => {
-                root.borrow_mut().invalidate_children();
+            }, Ok(state) => {
+                self.set_load_step(state, root);
             }
         }
+    }
+
+    pub fn set_load_step(&self, save_state: SaveState, root: &Rc<RefCell<Widget>>) {
+        // TODO remove the bool flag passed in the constructor
+        if self.main_menu_mode {
+            let main_menu = Widget::downcast_kind_mut::<MainMenu>(root);
+            main_menu.next_step = Some(NextGameStep::LoadCampaign { save_state });
+        } else {
+            let root_view = Widget::downcast_kind_mut::<RootView>(root);
+            root_view.next_step = Some(NextGameStep::LoadCampaign { save_state });
+        }
+
+        let loading_screen = Widget::with_defaults(LoadingScreen::new());
+        loading_screen.borrow_mut().state.set_modal(true);
+        Widget::add_child_to(&root, loading_screen);
     }
 
     pub fn delete_save(&mut self) {

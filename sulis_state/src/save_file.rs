@@ -57,11 +57,11 @@ pub fn delete_save(save_file: &SaveFileMetaData) -> Result<(), Error> {
     fs::remove_file(path)
 }
 
-pub fn load_state(save_file: &SaveFileMetaData) -> Result<(), Error> {
+pub fn load_state(save_file: &SaveFileMetaData) -> Result<SaveState, Error> {
     let path = save_file.path.as_path();
     let save_file: SaveFile = read_single_resource_path(path)?;
 
-    save_file.state.load()
+    Ok(save_file.state)
 }
 
 pub fn create_save() -> Result<(), Error> {

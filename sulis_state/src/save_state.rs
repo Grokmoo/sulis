@@ -26,7 +26,7 @@ use sulis_module::{item::Slot, actor::{ActorBuilder, RewardBuilder}};
 use {ActorState, EntityState, GameState, ItemState, PropState, prop_state::Interactive, Merchant};
 use area_state::{TriggerState};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct SaveState {
     pub(crate) party: Vec<usize>,
@@ -69,7 +69,7 @@ impl SaveState {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct AreaSaveState {
     pub(crate) on_load_fired: bool,
@@ -138,7 +138,7 @@ impl AreaSaveState {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct PropSaveState {
     pub(crate) id: String,
@@ -184,7 +184,7 @@ impl PropSaveState {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub enum PropInteractiveSaveState {
     Not,
@@ -198,7 +198,7 @@ pub enum PropInteractiveSaveState {
     },
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct ItemListEntrySaveState {
     pub(crate) quantity: u32,
@@ -214,13 +214,13 @@ impl ItemListEntrySaveState {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct ItemSaveState {
     pub(crate) id: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct TriggerSaveState {
     pub(crate) fired: bool,
@@ -236,7 +236,7 @@ impl TriggerSaveState {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct MerchantSaveState {
     pub(crate) id: String,
@@ -258,7 +258,7 @@ impl MerchantSaveState {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct EntitySaveState {
     pub(crate) index: usize,
@@ -331,7 +331,7 @@ impl EntitySaveState {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct ActorSaveState {
     pub(crate) id: String,
@@ -375,7 +375,7 @@ impl ActorSaveState {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct AbilitySaveState {
     pub(crate) remaining_duration: u32,

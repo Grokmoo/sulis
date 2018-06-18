@@ -116,10 +116,11 @@ use script::script_callback::ScriptHitKind;
 
 pub const MOVE_TO_THRESHOLD: f32 = 0.4;
 
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub enum NextGameStep {
     Exit,
-    PlayCampaign { pc_actor: Rc<Actor> },
+    NewCampaign { pc_actor: Rc<Actor> },
+    LoadCampaign { save_state: SaveState },
     MainMenu,
 }
 
@@ -170,29 +171,25 @@ macro_rules! exec_script {
 
 impl GameState {
     pub fn load(save_state: SaveState) -> Result<(), Error> {
-        let result: Result<(), Error> = STATE.with(|state| {
-            let mut state = state.borrow_mut();
-            let state = state.as_mut().unwrap();
-
+        let game_state: Result<GameState, Error> = {
             let mut new_indices = HashMap::new();
-            state.areas.clear();
+            let mut areas = HashMap::new();
             for (id, area_save) in save_state.areas {
                 let add_indices = id == save_state.current_area;
                 let area_state = AreaState::load(&id, &mut new_indices, add_indices, area_save)?;
 
-                state.areas.insert(id, Rc::new(RefCell::new(area_state)));
+                areas.insert(id, Rc::new(RefCell::new(area_state)));
             }
 
-            state.area_state = match state.areas.get(&save_state.current_area) {
+            let area_state = match areas.get(&save_state.current_area) {
                 Some(ref area) => Ok(Rc::clone(area)),
                 None => invalid_data_error(&format!("Unable to load current area '{}'",
                                                     save_state.current_area)),
             }?;
 
-            let path_finder = PathFinder::new(&state.area_state.borrow().area);
-            state.path_finder = path_finder;
+            let path_finder = PathFinder::new(&area_state.borrow().area);
 
-            state.party.clear();
+            let mut party = Vec::new();
             for index in save_state.party {
                 let new_index = match new_indices.get(&index) {
                     None => invalid_data_error(&format!("Invalid party entity index '{}'",
@@ -200,12 +197,12 @@ impl GameState {
                     Some(index) => Ok(index),
                 }?;
 
-                let entity = Rc::clone(&state.area_state.borrow()
+                let entity = Rc::clone(&area_state.borrow()
                                        .entities[*new_index].as_ref().unwrap());
-                state.party.push(entity);
+                party.push(entity);
             }
 
-            state.selected.clear();
+            let mut selected = Vec::new();
             for index in save_state.selected {
                 let new_index = match new_indices.get(&index) {
                     None => invalid_data_error(&format!("Invalid selected entity index '{}'",
@@ -213,21 +210,32 @@ impl GameState {
                     Some(index) => Ok(index),
                 }?;
 
-                let entity = Rc::clone(&state.area_state.borrow()
+                let entity = Rc::clone(&area_state.borrow()
                                        .entities[*new_index].as_ref().unwrap());
-                state.selected.push(entity);
+                selected.push(entity);
             }
 
-            state.area_state.borrow_mut().push_scroll_to_callback(Rc::clone(&state.party[0]));
+            Ok(GameState {
+                areas,
+                area_state,
+                path_finder,
+                party,
+                selected,
+                party_listeners: ChangeListenerList::default(),
+                ui_callbacks: Vec::new(),
+            })
+        };
 
-            Ok(())
+        let game_state = game_state?;
+        STATE.with(|state| {
+            *state.borrow_mut() = Some(game_state);
         });
 
-        result?;
-
+        let pc = GameState::player();
         let area_state = GameState::area_state();
         let mut area_state = area_state.borrow_mut();
         area_state.update_view_visibility();
+        area_state.push_scroll_to_callback(pc);
 
         Ok(())
     }

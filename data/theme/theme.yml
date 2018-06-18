@@ -1,9 +1,9 @@
 ---
 include:
   - widgets
+  - character_builder
   - main_menu
   - editor
-  - character_builder
 children:
   item_action_menu:
     from: .list_box

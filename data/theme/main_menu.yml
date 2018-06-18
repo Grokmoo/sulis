@@ -75,6 +75,13 @@ children:
             text: "Delete #name#?"
           accept:
             text: "Delete"
+      delete_save_confirmation:
+        from: .confirmation_window
+        children:
+          title:
+            text: "Delete Saved Game?"
+          accept:
+            text: "Delete"
   character_selector:
     children:
       title:

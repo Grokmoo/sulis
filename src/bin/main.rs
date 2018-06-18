@@ -29,9 +29,8 @@ use sulis_core::resource::ResourceSet;
 use sulis_core::io::IO;
 use sulis_core::util;
 use sulis_module::{Actor};
-use sulis_state::{GameState, NextGameStep};
-use sulis_view::{RootView};
-use sulis_view::main_menu;
+use sulis_state::{GameState, NextGameStep, SaveState};
+use sulis_view::{RootView, main_menu};
 
 fn init() -> Box<IO> {
     // CONFIG will be lazily initialized here; if it fails it
@@ -74,20 +73,34 @@ fn start_module(io: &mut Box<IO>) -> NextGameStep {
         util::error_and_exit("Error in module starter.");
     }
 
-    let view = view.borrow();
+    let mut view = view.borrow_mut();
     match view.next_step() {
         None => NextGameStep::Exit,
         Some(step) => step,
     }
 }
 
-fn run_campaign(io: &mut Box<IO>, pc_actor: Rc<Actor>) -> NextGameStep {
+fn new_campaign(io: &mut Box<IO>, pc_actor: Rc<Actor>) -> NextGameStep {
     info!("Initializing game state.");
     if let Err(e) = GameState::init(pc_actor) {
         error!("{}",  e);
         util::error_and_exit("There was a fatal error creating the game state.");
     };
 
+    run_campaign(io)
+}
+
+fn load_campaign(io: &mut Box<IO>, save_state: SaveState) -> NextGameStep {
+    info!("Loading game state.");
+    if let Err(e) = GameState::load(save_state) {
+        error!("{}", e);
+        util::error_and_exit("There was a fatal error loading the game state.");
+    };
+
+    run_campaign(io)
+}
+
+fn run_campaign(io: &mut Box<IO>) -> NextGameStep {
     let view = RootView::new();
     let loop_updater = sulis_view::GameMainLoopUpdater::new(&view);
     let root = ui::create_ui_tree(view.clone());
@@ -97,7 +110,7 @@ fn run_campaign(io: &mut Box<IO>, pc_actor: Rc<Actor>) -> NextGameStep {
         error!("Error in main loop.  Exiting...");
     }
 
-    let view = view.borrow();
+    let mut view = view.borrow_mut();
     match view.next_step() {
         None => NextGameStep::Exit,
         Some(step) => step,
@@ -111,7 +124,8 @@ fn main() {
     loop {
         next_step = match next_step {
             NextGameStep::Exit => break,
-            NextGameStep::PlayCampaign { pc_actor } => run_campaign(&mut io, pc_actor),
+            NextGameStep::NewCampaign { pc_actor } => new_campaign(&mut io, pc_actor),
+            NextGameStep::LoadCampaign { save_state } => load_campaign(&mut io, save_state),
             NextGameStep::MainMenu => start_module(&mut io),
         };
     }

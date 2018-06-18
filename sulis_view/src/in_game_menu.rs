@@ -68,7 +68,7 @@ impl WidgetKind for InGameMenu {
             parent.borrow_mut().mark_for_removal();
 
             let root = Widget::get_root(widget);
-            let window = Widget::with_defaults(LoadWindow::new());
+            let window = Widget::with_defaults(LoadWindow::new(false));
             window.borrow_mut().state.set_modal(true);
             Widget::add_child_to(&root, window);
         })));

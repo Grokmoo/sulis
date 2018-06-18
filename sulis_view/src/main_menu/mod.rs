@@ -86,8 +86,8 @@ impl MainMenu {
         self.next_step.is_some()
     }
 
-    pub fn next_step(&self) -> Option<NextGameStep> {
-        self.next_step.clone()
+    pub fn next_step(&mut self) -> Option<NextGameStep> {
+        self.next_step.take()
     }
 }
 
@@ -140,7 +140,7 @@ impl WidgetKind for MainMenu {
             let starter = Widget::downcast_kind_mut::<MainMenu>(&parent);
 
             starter.mode = Mode::Load;
-            let load_window = LoadWindow::new();
+            let load_window = LoadWindow::new(true);
             {
                 let window = load_window.borrow();
                 window.cancel.borrow_mut().state.set_visible(false);

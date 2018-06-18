@@ -80,7 +80,7 @@ impl ActorState {
             ability_states.insert(ability.id.to_string(), ability_state);
         }
 
-        let mut inventory = Inventory::new(&actor);
+        let mut inventory = Inventory::empty();
         inventory.load(save.items, save.equipped)?;
         inventory.add_coins(save.coins);
 

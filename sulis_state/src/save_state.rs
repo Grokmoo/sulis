@@ -31,8 +31,8 @@ use area_state::{TriggerState};
 pub struct SaveState {
     pub(crate) party: Vec<usize>,
     pub(crate) selected: Vec<usize>,
-    pub(crate) areas: HashMap<String, AreaSaveState>,
     pub(crate) current_area: String,
+    pub(crate) areas: HashMap<String, AreaSaveState>,
 }
 
 impl SaveState {

@@ -74,8 +74,8 @@ pub struct EntityTextureCache {
 
 impl EntityTextureCache {
     pub fn new(texture_id: &'static str, size: u32, slot_size: u32) -> EntityTextureCache {
-        debug!("Creating entity texture cache");
         let slots_dim = (size / slot_size) as usize;
+        info!("Creating entity texture cache with {} slots dimension", slots_dim);
 
         EntityTextureCache {
             // size,

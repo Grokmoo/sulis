@@ -34,18 +34,21 @@ pub struct Inventory {
 
 impl Inventory {
     pub fn new(actor: &Rc<Actor>) -> Inventory {
-        let mut inv = Inventory {
-            items: ItemList::new(),
-            equipped: HashMap::new(),
-            coins: 0,
-        };
-
+        let mut inv = Inventory::empty();
         for item in actor.items.iter() {
             inv.items.add(ItemState::new(Rc::clone(item)));
         }
 
         trace!("Populated initial inventory with {} items", inv.items.len());
         inv
+    }
+
+    pub fn empty() -> Inventory {
+        Inventory {
+            items: ItemList::new(),
+            equipped: HashMap::new(),
+            coins: 0,
+        }
     }
 
     pub fn load(&mut self, items: Vec<ItemListEntrySaveState>,

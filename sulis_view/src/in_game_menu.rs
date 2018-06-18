@@ -22,7 +22,7 @@ use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{Button, ConfirmationWindow};
 use sulis_state::save_file::create_save;
 
-use LoadWindow;
+use {LoadWindow, RootView};
 
 const NAME: &str = "in_game_menu";
 
@@ -54,11 +54,17 @@ impl WidgetKind for InGameMenu {
             let parent = Widget::get_parent(widget);
             parent.borrow_mut().mark_for_removal();
 
+            let root = Widget::get_root(widget);
+            let view = Widget::downcast_kind_mut::<RootView>(&root);
+
             match create_save() {
                 Err(e) => {
                     error!("Error saving game");
                     error!("{}", e);
-                }, Ok(()) => (),
+                    view.add_status_text("Error saving game!");
+                }, Ok(()) => {
+                    view.add_status_text("Save complete.");
+                }
             }
         })));
 

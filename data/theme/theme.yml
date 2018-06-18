@@ -5,6 +5,9 @@ include:
   - main_menu
   - editor
 children:
+  status_text:
+    from: .label
+    position: [0, 2]
   item_action_menu:
     from: .list_box
     x_relative: Cursor

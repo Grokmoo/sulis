@@ -4,10 +4,10 @@
 display:
     # Glium is the only choice for now
     adapter: Glium
-    
+
     # Display Mode - Fullscreen, BorderlessWindow, Window
     mode: Window
-    
+
     # Which monitor to display on, starting from 0
     monitor: 0
 
@@ -18,11 +18,11 @@ display:
     # UI scaling - Standard
     width: 320
     height: 180
-    
+
     # UI scaling - Large
     # width: 256
     # height: 144
-    
+
     # UI scaling - Small
     # width: 368
     # height: 207
@@ -35,7 +35,7 @@ display:
 
     # The name of the default font used to render text when no font is specified
     default_font: "normal"
-    
+
     # The default mouse pointer
     default_cursor: "mouse"
 
@@ -52,6 +52,7 @@ input:
         KeySpace: EndTurn
         KeyMinus: ScrollDown
         KeyEquals: ScrollUp
+        KeyF5: QuickSave
 
 logging:
     # Log level may be error, warn, info, debug, or trace

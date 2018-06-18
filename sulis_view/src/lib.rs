@@ -97,14 +97,16 @@ pub mod main_menu;
 mod race_pane;
 pub use self::race_pane::RacePane;
 
+use std::time::Instant;
 use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_core::io::{InputAction, MainLoopUpdater};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_state::{ChangeListener, GameState, NextGameStep};
-use sulis_widgets::{Button};
+use sulis_core::util;
+use sulis_state::{ChangeListener, GameState, NextGameStep, save_file::create_save};
+use sulis_widgets::{Button, Label};
 
 const NAME: &str = "root";
 
@@ -132,6 +134,8 @@ impl MainLoopUpdater for GameMainLoopUpdater {
 
 pub struct RootView {
     next_step: Option<NextGameStep>,
+    status: Rc<RefCell<Widget>>,
+    status_added: Option<Instant>,
 }
 
 impl RootView {
@@ -139,8 +143,17 @@ impl RootView {
         self.next_step.take()
     }
 
+    pub fn add_status_text(&mut self, text: &str) {
+        self.status.borrow_mut().state.text = text.to_string();
+        self.status_added = Some(Instant::now());
+    }
+
     pub fn new() -> Rc<RefCell<RootView>> {
-        Rc::new(RefCell::new(RootView { next_step: None }))
+        Rc::new(RefCell::new(RootView {
+            next_step: None,
+            status: Widget::with_theme(Label::empty(), "status_text"),
+            status_added: None,
+        }))
     }
 
     /// Gets the merchant window if it is currently opened
@@ -269,6 +282,14 @@ impl WidgetKind for RootView {
             }
         }
 
+        if let Some(instant) = self.status_added {
+            let elapsed = util::get_elapsed_millis(instant.elapsed());
+            if elapsed > 5000 {
+                self.status_added = None;
+                self.status.borrow_mut().state.text = String::new();
+            }
+        }
+
         let root = Widget::get_root(widget);
         GameState::set_modal_locked(root.borrow().has_modal());
     }
@@ -290,6 +311,16 @@ impl WidgetKind for RootView {
             EndTurn => {
                 self.end_turn();
             },
+            QuickSave => {
+                if let Err(e) = create_save() {
+                    error!("Error quick saving game");
+                    error!("{}", e);
+                    self.add_status_text("Error performing Quicksave!");
+                } else {
+                    self.add_status_text("Quicksave Complete.");
+                }
+
+            }
             _ => return false,
         }
 
@@ -384,7 +415,7 @@ impl WidgetKind for RootView {
         let ticker = Widget::with_defaults(InitiativeTicker::new());
 
         // area widget must be the first entry in the children list
-        vec![area_widget, bot_pane, ap_bar, ticker]
+        vec![area_widget, bot_pane, ap_bar, ticker, self.status.clone()]
     }
 }
 

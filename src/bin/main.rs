@@ -55,7 +55,7 @@ fn init() -> Box<IO> {
     }
 }
 
-fn start_module(io: &mut Box<IO>) -> NextGameStep {
+fn main_menu(io: &mut Box<IO>) -> NextGameStep {
     let view = main_menu::MainMenu::new();
     let loop_updater = main_menu::LoopUpdater::new(&view);
     let root = ui::create_ui_tree(view.clone());
@@ -126,7 +126,7 @@ fn main() {
             NextGameStep::Exit => break,
             NextGameStep::NewCampaign { pc_actor } => new_campaign(&mut io, pc_actor),
             NextGameStep::LoadCampaign { save_state } => load_campaign(&mut io, save_state),
-            NextGameStep::MainMenu => start_module(&mut io),
+            NextGameStep::MainMenu => main_menu(&mut io),
         };
     }
 

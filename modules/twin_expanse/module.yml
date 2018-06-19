@@ -1,0 +1,8 @@
+id: twin_expanse
+starting_area: wellswood_road_south
+starting_location: [48, 72]
+name: "The Twin Expanse"
+description: |
+  Leaving your home at a young age, you have the spent the last year on the road learning the craft of an adventurer.
+  Now, you have joined up with a small band of like souls in The Twin Expanse, on the road to the town of Wellswood.
+backstory_conversation: backstory

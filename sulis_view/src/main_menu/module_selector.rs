@@ -87,7 +87,7 @@ impl WidgetKind for ModuleSelector {
 
             let root = Widget::get_root(&widget);
             let menu = Widget::downcast_kind_mut::<MainMenu>(&root);
-            menu.reset();
+            menu.load_module(&module.dir);
             root.borrow_mut().invalidate_children();
         })));
         play.borrow_mut().state.disable();

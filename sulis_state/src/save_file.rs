@@ -97,6 +97,37 @@ fn create_meta_data(datetime: String) -> SaveFileMetaData {
     }
 }
 
+pub fn has_available_save_files() -> bool {
+    let dir = get_save_dir();
+    if !dir.is_dir() { return false; }
+
+    let dir_entries = match fs::read_dir(dir) {
+        Err(_) => return false,
+        Ok(entries) => entries,
+    };
+
+    for entry in dir_entries {
+        let entry = match entry {
+            Err(_) => continue,
+            Ok(entry) => entry,
+        };
+
+        let path = entry.path();
+        if !path.is_file() { continue; }
+
+        let extension = match path.extension() {
+            None => continue,
+            Some(ext) => ext.to_string_lossy(),
+        };
+
+        if extension != "yml" { continue; }
+
+        return true;
+    }
+
+    false
+}
+
 pub fn get_available_save_files() -> Result<Vec<SaveFileMetaData>, Error> {
     let mut results = Vec::new();
 

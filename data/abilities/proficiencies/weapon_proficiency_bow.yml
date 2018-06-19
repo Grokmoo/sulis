@@ -1,0 +1,8 @@
+id: weapon_proficiency_bow
+name: "Bow Proficiency"
+icon: abilities/weapon_proficiency
+description: |
+  You have proficiency in the use of bows.
+bonuses:
+  weapon_proficiencies:
+    - Bow

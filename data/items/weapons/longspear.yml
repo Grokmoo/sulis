@@ -1,5 +1,8 @@
 id: longspear
 name: Long Spear
+kind:
+  Weapon:
+    kind: Spear
 icon: inventory/weapon_longspear
 weight: 800
 value: 200

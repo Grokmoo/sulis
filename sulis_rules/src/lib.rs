@@ -50,3 +50,23 @@ pub enum HitKind {
     Hit,
     Crit,
 }
+
+#[derive(Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord, Deserialize)]
+pub enum WeaponKind {
+    Axe,
+    Crossbow,
+    Bow,
+    SmallSword,
+    LargeSword,
+    Hammer,
+    Spear,
+    Mace,
+    Simple,
+}
+
+#[derive(Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord, Deserialize)]
+pub enum ArmorKind {
+    Light,
+    Medium,
+    Heavy,
+}

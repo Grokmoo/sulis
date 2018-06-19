@@ -1,5 +1,8 @@
 id: shortspear
 name: Short Spear
+kind:
+  Weapon:
+    kind: Spear
 icon: inventory/weapon_shortspear
 weight: 500
 value: 100

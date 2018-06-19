@@ -1,5 +1,8 @@
 id: dagger
 name: Dagger
+kind:
+  Weapon:
+    kind: SmallSword
 icon: inventory/weapon_dagger
 weight: 100
 value: 200

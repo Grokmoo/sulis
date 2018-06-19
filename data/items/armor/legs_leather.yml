@@ -1,5 +1,8 @@
 id: legs_leather
 name: Leather Pants
+kind:
+  Armor:
+    kind: Light
 icon: inventory/legs_leather
 weight: 200
 value: 200

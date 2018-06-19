@@ -168,11 +168,14 @@ children:
           kit_area:
             from: .text_area
             background: bg_base
-            border: [1, 1, 1, 1]
+            border: [2, 2, 2, 2]
             preferred_size: [-70, 100]
             width_relative: Max
             position: [0, 25]
-            text: "#description#"
+            text: |
+              [s=6|#name#]
+              
+              #description#
           kits_pane:
             border: [1, 1, 1, 1]
             preferred_size: [0, 12]

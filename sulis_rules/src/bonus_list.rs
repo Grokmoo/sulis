@@ -16,7 +16,7 @@
 
 use std::collections::HashMap;
 
-use {Attribute, Damage, DamageKind};
+use {Attribute, Damage, DamageKind, ArmorKind, WeaponKind};
 
 #[derive(Deserialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
@@ -27,6 +27,8 @@ pub struct BonusList {
     pub base_armor: Option<u32>,
     pub armor_kinds: Option<HashMap<DamageKind, u32>>,
     pub bonus_damage: Option<Damage>,
+    pub armor_proficiencies: Option<Vec<ArmorKind>>,
+    pub weapon_proficiencies: Option<Vec<WeaponKind>>,
     pub bonus_reach: Option<f32>,
     pub bonus_range: Option<f32>,
     pub initiative: Option<i32>,
@@ -50,6 +52,8 @@ impl Default for BonusList {
             attack: None,
             base_armor: None,
             armor_kinds: None,
+            armor_proficiencies: None,
+            weapon_proficiencies: None,
             bonus_damage: None,
             bonus_range: None,
             bonus_reach: None,

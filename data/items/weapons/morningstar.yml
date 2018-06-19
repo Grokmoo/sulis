@@ -1,5 +1,8 @@
 id: morningstar
 name: Morningstar
+kind:
+  Weapon:
+    kind: Mace
 icon: inventory/weapon_morningstar
 weight: 500
 value: 400

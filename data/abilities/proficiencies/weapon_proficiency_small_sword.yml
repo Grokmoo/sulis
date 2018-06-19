@@ -1,0 +1,8 @@
+id: weapon_proficiency_small_sword
+name: "Small Sword Proficiency"
+icon: abilities/weapon_proficiency
+description: |
+  You have proficiency in the use of small swords.
+bonuses:
+  weapon_proficiencies:
+    - SmallSword

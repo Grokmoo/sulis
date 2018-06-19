@@ -1,5 +1,8 @@
 id: helm_plate
 name: Plate Helm
+kind:
+  Armor:
+    kind: Heavy
 icon: inventory/helm_plate
 weight: 300
 value: 1000

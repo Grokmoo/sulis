@@ -1,5 +1,8 @@
 id: warhammer
 name: Warhammer
+kind:
+  Weapon:
+    kind: Hammer
 icon: inventory/weapon_warhammer
 weight: 800
 value: 300

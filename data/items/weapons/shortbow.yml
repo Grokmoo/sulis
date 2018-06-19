@@ -1,5 +1,8 @@
 id: shortbow
 name: Shortbow
+kind:
+  Weapon:
+    kind: Bow
 icon: inventory/weapon_shortbow
 weight: 300
 value: 300

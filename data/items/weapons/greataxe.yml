@@ -1,5 +1,8 @@
 id: greataxe
 name: Great Axe
+kind:
+  Weapon:
+    kind: Axe
 icon: inventory/weapon_greataxe
 weight: 1000
 value: 500

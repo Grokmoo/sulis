@@ -1,5 +1,8 @@
 id: longsword
 name: Longsword
+kind:
+  Weapon:
+    kind: LargeSword
 icon: inventory/weapon_longsword
 weight: 400
 value: 800

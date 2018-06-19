@@ -2,16 +2,28 @@ id: fighter
 name: Fighter
 description: |
   Fighters are experts in all forms of martial combat, and, as they gain experience, frequently masters in more than one.  They have solid training in a large variety of weapons and equipment.
-  On the battlefield, they will often protect more fragile comrades as well as leap into the fray themselves.
+  On the battlefield, they can both protect more fragile comrades as well as leap into the fray themselves.
 bonuses_per_level:
-  hit_points: 15
+  hit_points: 10
   accuracy: 5
   defense: 3
   fortitude: 3
   reflex: 2
   will: 2
   initiative: 1
-starting_abilities: []
+starting_abilities:
+  - armor_proficiency_light
+  - armor_proficiency_medium
+  - armor_proficiency_heavy
+  - weapon_proficiency_axe
+  - weapon_proficiency_crossbow
+  - weapon_proficiency_bow
+  - weapon_proficiency_small_sword
+  - weapon_proficiency_large_sword
+  - weapon_proficiency_hammer
+  - weapon_proficiency_spear
+  - weapon_proficiency_mace
+  - weapon_proficiency_simple
 ability_choices:
   2: [ fighter ]
   3: [ fighter ]
@@ -37,14 +49,14 @@ kits:
   - name: Archer
     default_attributes:
       str: 13
-      dex: 18
-      end: 15
-      per: 14
+      dex: 19
+      end: 14
+      per: 15
       int: 10
       wis: 10
     starting_equipment: [ shortbow, boots_leather, torso_leather, legs_pants ]
     description: |
-      An expert with range weapons, who prefers to keep their distance from enemies where possible, using their skills to take down the most dangerous targets from afar.
+      An expert with ranged weapons, who prefers to keep their distance from enemies where possible, using their skills to take down the most dangerous targets from afar.
   - name: Defender
     default_attributes:
       str: 16
@@ -56,4 +68,3 @@ kits:
     starting_equipment: [ shortsword, shield_small, boots_leather, torso_mail, legs_leather, gloves_leather ]
     description: |
       A fighter who will typically use heavy armor and a large shield.  While certainly capable of dishing out punishment, their primary role on the battlefield is often to protect their compatriots.
-  

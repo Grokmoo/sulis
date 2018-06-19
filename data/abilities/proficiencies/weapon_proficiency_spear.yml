@@ -1,0 +1,8 @@
+id: weapon_proficiency_spear
+name: "Spear Proficiency"
+icon: abilities/weapon_proficiency
+description: |
+  You have proficiency in the use of spears.
+bonuses:
+  weapon_proficiencies:
+    - Spear

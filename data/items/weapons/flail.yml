@@ -1,5 +1,8 @@
 id: flail
 name: Flail
+kind:
+  Weapon:
+    kind: Mace
 icon: inventory/weapon_flail
 weight: 500
 value: 500

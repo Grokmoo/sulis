@@ -1,5 +1,8 @@
 id: torso_leather
 name: Leather Armor
+kind:
+  Armor:
+    kind: Light
 icon: inventory/torso_leather
 weight: 300
 value: 400

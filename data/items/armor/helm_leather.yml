@@ -1,5 +1,8 @@
 id: helm_leather
 name: Leather Helm
+kind:
+  Armor:
+    kind: Light
 icon: inventory/helm_leather
 weight: 100
 value: 100

@@ -584,6 +584,7 @@ children:
     children:
       details:
         from: .text_area
+        border: [2, 2, 2, 2]
         text: |
           [s=6|#name#]
           [s=6|]
@@ -599,13 +600,13 @@ children:
           ][?bonus_reach|[s=4.0|Reach: #bonus_reach#]
           ][?bonus_range|[s=4.0|Range: #bonus_range#]
           ][?armor|[s=4.0|Armor: #armor#][?armor_slashing;s=3.0| (Slashing: #armor_slashing#)][?armor_piercing;s=3.0| (Piercing: #armor_piercing#)][?armor_crushing;s=3.0| (Crushing: #armor_crushing#)][?armor_acid;s=3.0| (Acid: #armor_acid#)][?armor_cold;s=3.0| (Cold: #armor_cold#)][?armor_electrical;s=3.0| (Electrical: #armor_electrical#)][?armor_fire;s=3.0| (Fire: #armor_fire#)][?armor_sonic;s=3.0| (Sonic: #armor_sonic#)]
-          ][?initiative|[s=4.0|Initiative: #initiative#]
           ][?hit_points|[s=4.0|Hit Points: #hit_points#]
           ][?accuracy|[s=4.0|Accuracy: #accuracy#]
           ][?defense|[s=4.0|Defense: #defense#]
           ][?fortitude|[s=4.0|Fortitude: #fortitude#]
           ][?reflex|[s=4.0|Reflex: #reflex#]
           ][?will|[s=4.0|Will: #will#]
+          ][?initiative|[s=4.0|Initiative: #initiative#]
           ]
           #description#
         width_relative: Max

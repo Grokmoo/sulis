@@ -1,5 +1,8 @@
 id: greatsword
 name: Greatsword
+kind:
+  Weapon:
+    kind: LargeSword
 icon: inventory/weapon_greatsword
 weight: 600
 value: 1000

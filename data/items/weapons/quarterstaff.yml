@@ -1,5 +1,8 @@
 id: quarterstaff
 name: Quarterstaff
+kind:
+  Weapon:
+    kind: Simple
 icon: inventory/weapon_quarterstaff
 weight: 300
 value: 20

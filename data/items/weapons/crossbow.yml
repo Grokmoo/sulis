@@ -1,5 +1,8 @@
 id: crossbow
 name: Crossbow
+kind:
+  Weapon:
+    kind: Crossbow
 icon: inventory/weapon_crossbow
 weight: 400
 value: 400

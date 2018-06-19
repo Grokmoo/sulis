@@ -1,0 +1,8 @@
+id: weapon_proficiency_mace
+name: "Mace Proficiency"
+icon: abilities/weapon_proficiency
+description: |
+  You have proficiency in the use of maces.
+bonuses:
+  weapon_proficiencies:
+    - Mace

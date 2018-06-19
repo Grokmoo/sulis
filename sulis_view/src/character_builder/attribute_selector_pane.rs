@@ -163,6 +163,7 @@ impl WidgetKind for AttributeSelectorPane {
 
         let kit_area = Widget::with_theme(TextArea::empty(), "kit_area");
         kit_area.borrow_mut().state.add_text_arg("description", &selected_kit.description);
+        kit_area.borrow_mut().state.add_text_arg("name", &selected_kit.name);
         children.push(kit_area);
 
         for attr in Attribute::iter() {

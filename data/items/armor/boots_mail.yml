@@ -1,5 +1,8 @@
 id: boots_mail
 name: Mail Boots
+kind:
+  Armor:
+    kind: Medium
 icon: inventory/boots_mail
 weight: 200
 value: 500

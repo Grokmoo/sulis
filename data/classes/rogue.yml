@@ -3,27 +3,21 @@ name: Rogue
 description: |
   Rogues have a variety of skills both in and out of combat, making them a valuable addition to any party.  They are usually poorly suited to standing on the front lines of combat, but instead must attack from the flanks and shadows, waiting for the perfect moment before unleashing a devastating strike with surgical precision.
 bonuses_per_level:
-  hit_points: 10
+  hit_points: 7
   accuracy: 3
   defense: 3
   fortitude: 2
   reflex: 3
   will: 2
   initiative: 1
-starting_abilities: []
+starting_abilities:
+  - armor_proficiency_light
+  - weapon_proficiency_crossbow
+  - weapon_proficiency_bow
+  - weapon_proficiency_small_sword
+  - weapon_proficiency_simple
 ability_choices: {}
 kits:
-  - name: Mechanic
-    default_attributes:
-      str: 10
-      dex: 18
-      end: 12
-      per: 16
-      int: 14
-      wis: 10
-    starting_equipment: [ crossbow, boots_leather, torso_shirt, legs_pants ]
-    description: |
-      An expert in locks, traps, and all things mechanical thanks to keen senses and intellect.  Prefers to keep out of harms way in combat, using precise ranged strikes.
   - name: Swashbuckler
     default_attributes:
       str: 14
@@ -35,6 +29,17 @@ kits:
     starting_equipment: [ shortsword, boots_leather, gloves_leather, torso_leather, legs_leather ]
     description: |
       Not afraid to get their hands dirty on the front lines, the Swashbuckler will use every trick in the book to keep themselves out of harm's way and their enemies in it.  They can be very effective, but are also vulnerable to being overwhelmed.
+  - name: Mechanic
+    default_attributes:
+      str: 10
+      dex: 18
+      end: 12
+      per: 16
+      int: 14
+      wis: 10
+    starting_equipment: [ crossbow, boots_leather, torso_shirt, legs_pants ]
+    description: |
+      An expert in locks, traps, and all things mechanical thanks to keen senses and intellect.  Prefers to keep out of harms way in combat, using precise ranged strikes.
   - name: Assassin
     default_attributes:
       str: 13

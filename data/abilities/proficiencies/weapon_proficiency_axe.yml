@@ -1,0 +1,8 @@
+id: weapon_proficiency_axe
+name: "Axe Proficiency"
+icon: abilities/weapon_proficiency
+description: |
+  You have proficiency in the use of axes.
+bonuses:
+  weapon_proficiencies:
+    - Axe

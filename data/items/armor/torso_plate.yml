@@ -1,5 +1,8 @@
 id: torso_plate
 name: Plate Armor
+kind:
+  Armor:
+    kind: Heavy
 icon: inventory/torso_plate
 weight: 1000
 value: 5000

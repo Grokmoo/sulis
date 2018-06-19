@@ -1,5 +1,8 @@
 id: torso_mail
 name: Mail Armor
+kind:
+  Armor:
+    kind: Medium
 icon: inventory/torso_mail
 weight: 800
 value: 2000

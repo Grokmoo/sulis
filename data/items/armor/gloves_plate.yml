@@ -1,5 +1,8 @@
 id: gloves_plate
 name: Plate Gloves
+kind:
+  Armor:
+    kind: Heavy
 icon: inventory/gloves_plate
 weight: 200
 value: 800

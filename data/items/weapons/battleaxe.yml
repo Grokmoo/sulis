@@ -1,5 +1,8 @@
 id: battleaxe
 name: Battleaxe
+kind:
+  Weapon:
+    kind: Axe
 icon: inventory/weapon_battleaxe
 weight: 500
 value: 200

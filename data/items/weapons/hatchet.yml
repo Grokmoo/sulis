@@ -1,5 +1,8 @@
 id: hatchet
 name: Hatchet
+kind:
+  Weapon:
+    kind: Axe
 icon: inventory/weapon_hatchet
 weight: 200
 value: 100

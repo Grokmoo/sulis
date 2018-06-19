@@ -23,6 +23,7 @@ use sulis_core::image::Image;
 use sulis_core::resource::{ResourceBuilder, ResourceSet};
 use sulis_core::serde_yaml;
 use sulis_core::util::unable_to_create_error;
+use sulis_rules::{ArmorKind, WeaponKind};
 
 use {Equippable, ImageLayer, Module};
 
@@ -55,10 +56,18 @@ use self::Slot::*;
 const SLOTS_LIST: [Slot; 12] = [Cloak, Feet, Legs, Torso, Hands, Head, HeldMain, HeldOff, Waist,
                                 Neck, FingerMain, FingerOff];
 
+#[derive(Debug, Deserialize)]
+pub enum ItemKind {
+    Armor { kind: ArmorKind },
+    Weapon { kind: WeaponKind },
+    Other,
+}
+
 #[derive(Debug)]
 pub struct Item {
     pub id: String,
     pub name: String,
+    kind: ItemKind,
     pub icon: Rc<Image>,
     pub equippable: Option<Equippable>,
     image: Option<HashMap<ImageLayer, Rc<Image>>>,
@@ -121,6 +130,7 @@ impl Item {
             id: builder.id,
             icon: icon,
             image: images,
+            kind: builder.kind.unwrap_or(ItemKind::Other),
             alternate_image: alt_images,
             name: builder.name,
             equippable: builder.equippable,
@@ -149,6 +159,7 @@ impl Item {
 pub struct ItemBuilder {
     pub id: String,
     pub name: String,
+    kind: Option<ItemKind>,
     pub icon: String,
     pub equippable: Option<Equippable>,
     pub image: Option<HashMap<ImageLayer, String>>,

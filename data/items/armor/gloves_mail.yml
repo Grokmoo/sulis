@@ -1,5 +1,8 @@
 id: gloves_mail
 name: Mail Gloves
+kind:
+  Armor:
+    kind: Medium
 icon: inventory/gloves_mail
 weight: 150
 value: 400

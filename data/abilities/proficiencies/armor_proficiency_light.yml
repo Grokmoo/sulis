@@ -1,0 +1,8 @@
+id: armor_proficiency_light
+name: "Light Armor Proficiency"
+icon: abilities/armor_proficiency
+description: |
+  You have proficiency in the use of light armor.
+bonuses:
+  armor_proficiencies:
+    - Light

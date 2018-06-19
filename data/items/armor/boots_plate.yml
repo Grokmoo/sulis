@@ -1,5 +1,8 @@
 id: boots_plate
 name: Plate Boots
+kind:
+  Armor:
+    kind: Heavy
 icon: inventory/boots_plate
 weight: 300
 value: 1000

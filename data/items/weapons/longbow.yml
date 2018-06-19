@@ -1,5 +1,8 @@
 id: longbow
 name: Longbow
+kind:
+  Weapon:
+    kind: Bow
 icon: inventory/weapon_longbow
 weight: 400
 value: 800

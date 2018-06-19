@@ -1,5 +1,8 @@
 id: helm_mail
 name: Mail Helm
+kind:
+  Armor:
+    kind: Medium
 icon: inventory/helm_mail
 weight: 200
 value: 500

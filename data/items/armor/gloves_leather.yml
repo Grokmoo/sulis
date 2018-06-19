@@ -1,5 +1,8 @@
 id: gloves_leather
 name: Leather Gloves
+kind:
+  Armor:
+    kind: Light
 icon: inventory/gloves_leather
 weight: 100
 value: 100

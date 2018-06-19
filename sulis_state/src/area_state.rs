@@ -165,6 +165,8 @@ impl AreaState {
             area_state.add_trigger(index, trigger_state);
         }
 
+        area_state.add_transitions_from_area();
+
         for merchant_save in save.merchants {
             area_state.merchants.push(Merchant::load(merchant_save)?);
         }

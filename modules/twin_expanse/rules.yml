@@ -31,7 +31,7 @@ item_weight_display_factor: 100
 item_value_display_factor: 10
 coins_item: coin
 
-selectable_races: [ human, dwarf, elf, merling, ratkin ]
+selectable_races: [ human, dwarf, elf, kimer, rodian ]
 selectable_classes: [ fighter, rogue, mage ]
 
 experience_for_level: [100, 300, 600, 1000, 1500, 2100, 2800, 3600, 4500,

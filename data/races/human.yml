@@ -4,6 +4,10 @@ description: |
   Tough and adaptable, humans have colonized much of the world, often at the expense of other races.  Human adventurers of all types can frequently be found throughout the Five Corners and beyond. 
 size: 2by2
 base_stats:
+  attributes:
+    Strength: 1
+    Endurance: 1
+    Perception: -1
   hit_points: 40
   accuracy: 30
   defense: 30

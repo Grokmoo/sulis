@@ -4,10 +4,15 @@ description: |
   Boasting perhaps the oldest of the known civilizations, the empire of the Elves stretched across most of the known world at its peak.  While those days are long gone, individual elves can still be formidable foes.  They are best used off the front line, as magic users, rogues, or archers.
 size: 2by2
 base_stats:
+  attributes:
+    Strength: -1
+    Dexterity: 1
+    Endurance: -2
+    Perception: 2
   hit_points: 40
   accuracy: 30
   defense: 30
-  fortitude: 25
+  fortitude: 30
   reflex: 30
   will: 35
   attack:
@@ -17,7 +22,7 @@ base_stats:
       kind: Crushing
     kind: #Melee
       reach: 0.5
-  bonus_reach: 1.0
+  bonus_reach: 0.25
 default_images:
   Male:
     Foreground: creatures/human_male_fg

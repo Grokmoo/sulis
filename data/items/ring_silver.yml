@@ -6,6 +6,6 @@ equippable:
   alternate_slot: FingerOff
   bonuses:
     attributes:
-      - [Perception, 2]
+      Perception: 2
 weight: 5
 value: 100

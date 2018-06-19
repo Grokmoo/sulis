@@ -1,13 +1,18 @@
-id: merling
-name: Merling
+id: kimer
+name: Kimer
 description: |
-  An ancient and proud people, their massive cities are cloistered away far from prying eyes in the ocean depths.  Occasionally, however, some wanderlusted Merlings make their way into the realms of the other races.  They are well suited to be magic users or warriors.
+  An ancient and proud people, their massive cities are cloistered away far from prying eyes in the ocean depths.  Occasionally, however, some wander-lusted Kimer make their way into the realms of the other races.  They are well suited to be magic users or warriors.
 size: 2by2
 base_stats:
-  hit_points: 35
+  attributes:
+    Endurance: -1
+    Perception: -1
+    Intellect: 1
+    Wisdom: 1
+  hit_points: 40
   accuracy: 30
   defense: 32
-  fortitude: 30
+  fortitude: 35
   reflex: 30
   will: 30
   attack:

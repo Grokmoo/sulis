@@ -2,7 +2,7 @@
 # The main game configuration file.  User preferences are set here.
 
 display:
-    # Glium is the only choice for now
+    # Display Adapter - Glium is the only choice for now
     adapter: Glium
 
     # Display Mode - Fullscreen, BorderlessWindow, Window
@@ -31,13 +31,14 @@ display:
     frame_rate: 30
 
     # This scales the overall speed of all game animations, in milliseconds
+    # Larger values make animations take longer
     animation_base_time_millis: 50
 
     # The name of the default font used to render text when no font is specified
-    default_font: "normal"
+    default_font: normal
 
     # The default mouse pointer
-    default_cursor: "mouse"
+    default_cursor: mouse
 
 resources:
     # all resources are subdirectories under this
@@ -68,7 +69,7 @@ logging:
 # Defaults used by the editor when creating areas
 editor:
   # The ID of the module that the editor will load
-  module: "test1"
+  module: twin_expanse
 
   transition_image: transition
   transition_size: 4by3

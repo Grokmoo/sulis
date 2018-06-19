@@ -82,10 +82,10 @@ impl UserData for ScriptEffect {
                 }, Some(attr) => attr,
             };
             if effect.bonuses.attributes.is_none() {
-                effect.bonuses.attributes = Some(Vec::new());
+                effect.bonuses.attributes = Some(HashMap::new());
             }
 
-            effect.bonuses.attributes.as_mut().unwrap().push((attr, amount));
+            effect.bonuses.attributes.as_mut().unwrap().insert(attr, amount);
 
             Ok(())
         });

@@ -3,6 +3,11 @@ name: Goblin
 description: "Monster"
 size: 2by2
 base_stats:
+  attributes:
+    Strength: -3
+    Dexterity: 2
+    Endurance: -1
+    Intellect: -2
   hit_points: 20
   accuracy: 30
   defense: 30

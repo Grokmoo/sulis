@@ -459,7 +459,7 @@ pub fn add_bonus_text_args(bonuses: &BonusList, widget_state: &mut WidgetState) 
     }
 
     if let Some(ref attributes) = bonuses.attributes {
-        for &(attr, value) in attributes.iter() {
+        for (attr, value) in attributes.iter() {
             widget_state.add_text_arg(&attr.short_name(), &value.to_string());
         }
     }

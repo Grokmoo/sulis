@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::collections::HashMap;
 use std::slice::Iter;
 
 use self::Attribute::*;
@@ -89,9 +90,9 @@ impl AttributeList {
         }
     }
 
-    pub fn add_all(&mut self, attrs: &Vec<(Attribute, i8)>) {
-        for &(attr, value) in attrs.iter() {
-            self.add(attr, value);
+    pub fn add_all(&mut self, attrs: &HashMap<Attribute, i8>) {
+        for (attr, value) in attrs.iter() {
+            self.add(*attr, *value);
         }
     }
 

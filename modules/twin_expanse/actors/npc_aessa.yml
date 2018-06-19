@@ -1,7 +1,7 @@
 ---
 id: "npc_aessa"
 name: Aessa
-race: merling
+race: kimer
 sex: Female
 portrait: portraits/merling11
 attributes:

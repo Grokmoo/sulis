@@ -96,7 +96,7 @@ children:
                 text_params:
                   scale: 5.0
                 text: "#name#"
-                preferred_size: [30, 10]
+                preferred_size: [25, 10]
       ability_selector_pane:
         from: .builder_pane
         width_relative: Max
@@ -169,7 +169,7 @@ children:
             from: .text_area
             background: bg_base
             border: [1, 1, 1, 1]
-            preferred_size: [-50, 100]
+            preferred_size: [-70, 100]
             width_relative: Max
             position: [0, 25]
             text: "#description#"
@@ -203,65 +203,117 @@ children:
               horizontal_alignment: Right
             text: "Points Left"
             x_relative: Max
-            position: [-20, 115]
+            position: [-40, 115]
           amount_label:
             from: .label
             background: bg_base
             text: "#points#     "
-            position: [0, 115]
+            position: [-20, 115]
             preferred_size: [19, 12]
             x_relative: Max
             text_params:
               scale: 5.0
               horizontal_alignment: Right
+          bonus_label:
+            from: .label
+            text: "+ #value# = "
+            preferred_size: [10, 12]
+            x_relative: Max
+            text_params:
+              scale: 5.0
+              horizontal_alignment: Right
+          total_label:
+            from: .label
+            text: "#value#"
+            preferred_size: [10, 12]
+            text_params:
+              scale: 6.0
+              horizontal_alignment: Right
+            x_relative: Max
           str_label:
             from: .character_builder.attribute_selector_pane.attr_label
-            position: [-20, 25]
+            position: [-40, 25]
             text: "Strength"
           str_spinner:
             from: .spinner
-            position: [0, 25]
+            position: [-20, 25]
             x_relative: Max
+          str_bonus:
+            from: .character_builder.attribute_selector_pane.bonus_label
+            position: [-8, 25]
+          str_total:
+            from: .character_builder.attribute_selector_pane.total_label
+            position: [0, 25]
           dex_label:
             from: .character_builder.attribute_selector_pane.attr_label
-            position: [-20, 40]
+            position: [-40, 40]
             text: "Dexterity"
           dex_spinner:
             from: .spinner
-            position: [0, 40]
+            position: [-20, 40]
             x_relative: Max
+          dex_bonus:
+            from: .character_builder.attribute_selector_pane.bonus_label
+            position: [-8, 40]
+          dex_total:
+            from: .character_builder.attribute_selector_pane.total_label
+            position: [0, 40]
           end_label:
             from: .character_builder.attribute_selector_pane.attr_label
-            position: [-20, 55]
+            position: [-40, 55]
             text: "Endurance"
           end_spinner:
             from: .spinner
-            position: [0, 55]
+            position: [-20, 55]
             x_relative: Max
+          end_bonus:
+            from: .character_builder.attribute_selector_pane.bonus_label
+            position: [-8, 55]
+          end_total:
+            from: .character_builder.attribute_selector_pane.total_label
+            position: [0, 55]
           per_label:
             from: .character_builder.attribute_selector_pane.attr_label
-            position: [-20, 70]
+            position: [-40, 70]
             text: "Perception"
           per_spinner:
             from: .spinner
-            position: [0, 70]
+            position: [-20, 70]
             x_relative: Max
+          per_bonus:
+            from: .character_builder.attribute_selector_pane.bonus_label
+            position: [-8, 70]
+          per_total:
+            from: .character_builder.attribute_selector_pane.total_label
+            position: [0, 70]
           int_label:
             from: .character_builder.attribute_selector_pane.attr_label
-            position: [-20, 85]
+            position: [-40, 85]
             text: "Intelligence"
           int_spinner:
             from: .spinner
-            position: [0, 85]
+            position: [-20, 85]
             x_relative: Max
+          int_bonus:
+            from: .character_builder.attribute_selector_pane.bonus_label
+            position: [-8, 85]
+          int_total:
+            from: .character_builder.attribute_selector_pane.total_label
+            position: [0, 85]
           wis_label:
             from: .character_builder.attribute_selector_pane.attr_label
-            position: [-20, 100]
+            position: [-40, 100]
             text: "Wisdom"
           wis_spinner:
             from: .spinner
-            position: [0, 100]
+            position: [-20, 100]
             x_relative: Max
+          wis_bonus:
+            from: .character_builder.attribute_selector_pane.bonus_label
+            position: [-8, 100]
+          wis_total:
+            from: .character_builder.attribute_selector_pane.total_label
+            position: [0, 100]
       backstory_selector_pane:
         from: .builder_pane
         border: { top: 0, bottom: 5, left: 5, right: 5 }

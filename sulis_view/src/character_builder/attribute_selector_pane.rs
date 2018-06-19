@@ -20,7 +20,7 @@ use std::cell::RefCell;
 
 use sulis_rules::{Attribute, AttributeList};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_module::{Class, Module};
+use sulis_module::{Class, Module, Race};
 use sulis_widgets::{Button, Label, Spinner, TextArea};
 
 use CharacterBuilder;
@@ -31,6 +31,7 @@ pub const NAME: &str = "attribute_selector_pane";
 pub struct AttributeSelectorPane {
     available: i32,
     attrs: AttributeList,
+    selected_race: Option<Rc<Race>>,
     selected_class: Option<Rc<Class>>,
     selected_kit: Option<usize>,
 }
@@ -46,6 +47,7 @@ impl AttributeSelectorPane {
         Rc::new(RefCell::new(AttributeSelectorPane {
             attrs,
             available,
+            selected_race: None,
             selected_class: None,
             selected_kit: None,
         }))
@@ -73,6 +75,7 @@ impl AttributeSelectorPane {
 impl BuilderPane for AttributeSelectorPane {
     fn on_selected(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
         self.selected_class = builder.class.clone();
+        self.selected_race = builder.race.clone();
 
         if let Some(ref class) = self.selected_class {
         self.selected_kit = Some(0);
@@ -125,6 +128,11 @@ impl WidgetKind for AttributeSelectorPane {
         let ref class = match self.selected_class {
             None => return children,
             Some(ref class) => class,
+        };
+
+        let ref race = match self.selected_race {
+            None => return children,
+            Some(ref race) => race,
         };
 
         let kits_pane = Widget::empty("kits_pane");
@@ -181,6 +189,19 @@ impl WidgetKind for AttributeSelectorPane {
 
             let label = Widget::with_theme(Label::empty(), &format!("{}_label", attr.short_name()));
             children.push(label);
+
+            let bonus = Widget::with_theme(Label::empty(), &format!("{}_bonus", attr.short_name()));
+            let bonus_value = match race.base_stats.attributes {
+                None => 0,
+                Some(ref attrs) => *attrs.get(attr).unwrap_or(&0),
+            };
+            bonus.borrow_mut().state.add_text_arg("value", &bonus_value.to_string());
+            children.push(bonus);
+
+            let total_value = bonus_value as i32 + value;
+            let total = Widget::with_theme(Label::empty(), &format!("{}_total", attr.short_name()));
+            total.borrow_mut().state.add_text_arg("value", &total_value.to_string());
+            children.push(total);
         }
 
         let points_label = Widget::with_theme(Label::empty(), "points_label");

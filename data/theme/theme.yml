@@ -671,7 +671,7 @@ children:
   bonus_text:
     from: .text_area
     text: |
-      [s=5.0;c=f00|#name#] [?total_duration;x=60|#remaining_duration# of #total_duration# Rounds Remaining
+      [s=5.0;c=0ff|#name#] [?total_duration;x=60|#remaining_duration# of #total_duration# Rounds Remaining ][?prof_not_met;s=4.0;c=f00|Proficiency Not Met
       ][?str|Strength: #str#
       ][?dex|Dexterity: #dex#
       ][?end|Endurance: #end#

@@ -1,5 +1,8 @@
 id: shield_small
 name: Small Shield
+kind:
+  Armor:
+    kind: Light
 icon: inventory/shield_small
 equippable:
   slot: HeldOff

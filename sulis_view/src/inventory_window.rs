@@ -18,10 +18,10 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_module::{item::Slot, Module};
-use sulis_state::{EntityState, ChangeListener, GameState};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{Button, Label};
+use sulis_module::{item::Slot, Module};
+use sulis_state::{EntityState, ChangeListener, GameState, inventory::has_proficiency};
 
 use {item_button::*, ItemButton};
 
@@ -81,12 +81,11 @@ impl WidgetKind for InventoryWindow {
             let item_but = ItemButton::inventory(&self.entity, item.item.icon.id(),
                 quantity, index);
 
-            match item.item.equippable {
-                Some(_) => {
+            if let Some(_) = item.item.equippable {
+                if has_proficiency(&item, &actor.stats) {
                     item_but.borrow_mut().add_action("Equip", equip_item_cb(&self.entity, index));
-                },
-                None => (),
-            };
+                }
+            }
             item_but.borrow_mut().add_action("Drop", drop_item_cb(&self.entity, index));
 
             Widget::add_child_to(&list_content, Widget::with_defaults(item_but));

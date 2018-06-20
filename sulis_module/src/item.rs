@@ -67,7 +67,7 @@ pub enum ItemKind {
 pub struct Item {
     pub id: String,
     pub name: String,
-    kind: ItemKind,
+    pub kind: ItemKind,
     pub icon: Rc<Image>,
     pub equippable: Option<Equippable>,
     image: Option<HashMap<ImageLayer, Rc<Image>>>,

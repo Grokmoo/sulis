@@ -21,7 +21,7 @@ use std::cell::RefCell;
 
 use sulis_rules::{bonus_list::AttackKindBuilder, BonusList};
 use sulis_module::{item::{format_item_value, format_item_weight, Slot}};
-use sulis_state::{EntityState, GameState, ItemState};
+use sulis_state::{EntityState, GameState, ItemState, inventory::has_proficiency};
 use sulis_core::io::event;
 use sulis_core::ui::{Callback, Widget, WidgetKind, WidgetState};
 use sulis_widgets::{Label, TextArea};
@@ -210,6 +210,22 @@ impl WidgetKind for ItemButton {
             item_window.state.disable();
             item_window.state.set_position(widget.borrow().state.inner_right(),
             widget.borrow().state.inner_top());
+
+            match self.kind {
+                Kind::Inventory { ref player } => {
+                    if !has_proficiency(&item_state, &player.borrow().actor.stats) {
+                        item_window.state.add_text_arg("prof_not_met", "true");
+                    }
+                }, Kind::Merchant { .. } => {
+                    let player = GameState::selected();
+                    if player.len() > 0 {
+                        if !has_proficiency(&item_state, &player[0].borrow().actor.stats) {
+                            item_window.state.add_text_arg("prof_not_met", "true");
+                        }
+                    }
+                },
+                _ => (),
+            }
 
             item_window.state.add_text_arg("name", &item_state.item.name);
             item_window.state.add_text_arg("value", &format_item_value(item_state.item.value));

@@ -103,10 +103,7 @@ impl ActorState {
 
     pub fn new(actor: Rc<Actor>) -> ActorState {
         trace!("Creating new actor state for {}", actor.id);
-        let mut inventory = Inventory::new(&actor);
-        for index in actor.to_equip.iter() {
-            inventory.equip(*index);
-        }
+        let inventory = Inventory::new(&actor);
 
         let image = LayeredImage::new(actor.image_layers().get_list(actor.sex,
                                                                     actor.hair_color,
@@ -120,8 +117,10 @@ impl ActorState {
             ability_states.insert(ability.id.to_string(), AbilityState::new(ability));
         }
 
+        let to_equip = actor.to_equip.clone();
+
         let xp = actor.xp;
-        ActorState {
+        let mut actor_state = ActorState {
             actor,
             inventory,
             stats: StatList::new(attrs),
@@ -135,7 +134,14 @@ impl ActorState {
             effects: Vec::new(),
             ability_states,
             texture_cache_invalid: false,
+        };
+
+        actor_state.compute_stats();
+        for index in to_equip.iter() {
+            actor_state.inventory.equip(*index, &actor_state.stats);
         }
+
+        actor_state
     }
 
     pub fn check_texture_cache_invalid(&mut self) -> bool {
@@ -374,7 +380,7 @@ impl ActorState {
     }
 
     pub fn equip(&mut self, index: usize) -> bool {
-        let result = self.inventory.equip(index);
+        let result = self.inventory.equip(index, &self.stats);
         self.compute_stats();
         self.texture_cache_invalid = true;
 

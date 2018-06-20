@@ -39,3 +39,9 @@ equipped:
   - 3
 levels:
   rogue: 3
+abilities:
+  - armor_proficiency_light
+  - weapon_proficiency_crossbow
+  - weapon_proficiency_bow
+  - weapon_proficiency_small_sword
+  - weapon_proficiency_simple

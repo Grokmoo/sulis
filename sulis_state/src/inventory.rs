@@ -21,7 +21,8 @@ use std::collections::HashMap;
 
 use sulis_core::image::Image;
 use sulis_core::util::invalid_data_error;
-use sulis_module::{Actor, ImageLayer, Module, item::Slot};
+use sulis_rules::StatList;
+use sulis_module::{Actor, ImageLayer, Module, item::{Slot, ItemKind}};
 use {ItemList, ItemState};
 use save_state::ItemListEntrySaveState;
 
@@ -191,17 +192,21 @@ impl Inventory {
 
     /// equips the item at the given index.  returns true if the item
     /// was equipped.  false if the item does not exist
-    pub fn equip(&mut self, index: usize) -> bool {
+    pub fn equip(&mut self, index: usize, stats: &StatList) -> bool {
         trace!("Attempting equip of item at '{}", index);
 
         let (slot, alt_slot, blocked_slot) = match self.items.get(index) {
             None => return false,
-            Some(&(_, ref item)) => match &item.item.equippable {
-                &None => return false,
-                &Some(ref equippable) => {
-                    trace!("Found matching slot '{:?}'", equippable.slot);
+            Some(&(_, ref item)) => {
+                if !has_proficiency(item, stats) { return false; }
 
-                    (equippable.slot, equippable.alternate_slot, equippable.blocks_slot)
+                match &item.item.equippable {
+                    &None => return false,
+                    &Some(ref equippable) => {
+                        trace!("Found matching slot '{:?}'", equippable.slot);
+
+                        (equippable.slot, equippable.alternate_slot, equippable.blocks_slot)
+                    }
                 }
             }
         };
@@ -324,5 +329,13 @@ impl<'a> Iterator for EquippedIterator<'a> {
 
             return Some(&self.inventory.items[index].1);
         }
+    }
+}
+
+pub fn has_proficiency(item: &ItemState, stats: &StatList) -> bool {
+    match item.item.kind {
+        ItemKind::Other => true,
+        ItemKind::Armor { kind } => stats.has_armor_proficiency(kind),
+        ItemKind::Weapon { kind } => stats.has_weapon_proficiency(kind),
     }
 }

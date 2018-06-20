@@ -18,7 +18,7 @@ use std::rc::Rc;
 use rand::{self, Rng};
 
 use sulis_core::image::Image;
-use {Armor, AttributeList, Attack, BonusList, Damage, HitKind};
+use {Armor, AttributeList, Attack, BonusList, Damage, HitKind, WeaponKind, ArmorKind};
 use bonus_list::AttackBuilder;
 
 #[derive(Clone)]
@@ -26,6 +26,8 @@ pub struct StatList {
     attack_range: f32,
 
     pub attributes: AttributeList,
+    armor_proficiencies: Vec<ArmorKind>,
+    weapon_proficiencies: Vec<WeaponKind>,
     pub bonus_ap: i32,
     pub bonus_damage: Vec<Damage>,
     pub bonus_reach: f32,
@@ -49,6 +51,8 @@ impl StatList {
     pub fn new(attrs: AttributeList) -> StatList {
         StatList {
             attributes: attrs,
+            armor_proficiencies: Vec::new(),
+            weapon_proficiencies: Vec::new(),
             bonus_ap: 0,
             bonus_damage: Vec::new(),
             bonus_reach: 0.0,
@@ -68,6 +72,14 @@ impl StatList {
             hit_threshold: 0,
             graze_threshold: 0,
         }
+    }
+
+    pub fn has_armor_proficiency(&self, prof: ArmorKind) -> bool {
+        self.armor_proficiencies.contains(&prof)
+    }
+
+    pub fn has_weapon_proficiency(&self, prof: WeaponKind) -> bool {
+        self.weapon_proficiencies.contains(&prof)
     }
 
     pub fn attack_roll(&self, defense: i32) -> HitKind {
@@ -129,6 +141,22 @@ impl StatList {
 
         if let Some(bonus_damage) = bonuses.bonus_damage {
             self.bonus_damage.push(bonus_damage.mult(times));
+        }
+
+        if let Some(ref armor_profs) = bonuses.armor_proficiencies {
+            for armor_prof in armor_profs.iter() {
+                if self.armor_proficiencies.contains(armor_prof) { continue; }
+
+                self.armor_proficiencies.push(*armor_prof);
+            }
+        }
+
+        if let Some(ref weapon_profs) = bonuses.weapon_proficiencies {
+            for weapon_prof in weapon_profs.iter() {
+                if self.weapon_proficiencies.contains(weapon_prof) { continue; }
+
+                self.weapon_proficiencies.push(*weapon_prof);
+            }
         }
 
         let times_f32 = times as f32;

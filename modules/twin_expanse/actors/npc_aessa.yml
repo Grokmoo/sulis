@@ -43,3 +43,5 @@ levels:
 abilities:
   - firebolt
   - heal
+  - weapon_proficiency_crossbow
+  - weapon_proficiency_simple

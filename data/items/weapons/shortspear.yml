@@ -8,14 +8,14 @@ weight: 500
 value: 100
 equippable:
   slot: HeldMain
-  bonuses:
-    attack:
-      damage:
-        min: 20
-        max: 30
-        kind: Piercing
-      kind: # Melee
-        reach: 2.0
+  bonuses: {}
+  attack:
+    damage:
+      min: 20
+      max: 30
+      kind: Piercing
+    kind: # Melee
+      reach: 2.0
 image:
   HeldMain:
     creatures/shortspear

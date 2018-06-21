@@ -115,7 +115,7 @@ impl Item {
 
 
         if let &Some(ref equippable) = &builder.equippable {
-            if let Some(ref attack) = equippable.bonuses.attack {
+            if let Some(ref attack) = equippable.attack {
                 if attack.damage.kind.is_none() {
                     warn!("Kind must be specified for attack damage.");
                     return unable_to_create_error("item", &builder.id);

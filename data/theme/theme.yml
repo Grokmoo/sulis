@@ -482,6 +482,9 @@ children:
           [s=6|]
           [x=0|Graze Threshold][x=30|Hit Threshold][x=60|Crit Threshold]
           [x=0|#graze_threshold#][x=30|#hit_threshold#][x=60|#crit_threshold#]
+          
+          [x=0|Graze Multiplier][x=30|Hit Multiplier][x=60|Crit Multiplier]
+          [x=0|#graze_multiplier#][x=30|1.0][x=60|#crit_multiplier#]
           [?portrait;x=75;y=-3;i=#portrait#;s=30.0|]
           [?portrait;x=75;y=-3;i=portraits/frame;s=30.0|]]
       level_up:

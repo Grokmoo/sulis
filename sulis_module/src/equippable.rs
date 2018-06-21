@@ -14,7 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use sulis_rules::BonusList;
+use sulis_rules::{bonus_list::AttackBuilder, BonusList};
 use item::Slot;
 
 #[derive(Deserialize, Debug, Clone)]
@@ -24,5 +24,6 @@ pub struct Equippable {
     pub alternate_slot: Option<Slot>,
     pub blocks_slot: Option<Slot>,
     pub bonuses: BonusList,
+    pub attack: Option<AttackBuilder>,
 }
 

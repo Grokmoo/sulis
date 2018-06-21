@@ -22,7 +22,7 @@ use sulis_core::ui::{Widget, WidgetKind};
 use sulis_widgets::{TextArea};
 use sulis_module::Race;
 
-use item_button::add_bonus_text_args;
+use item_button::{add_bonus_text_args, add_attack_text_args};
 
 pub const NAME: &str = "race_pane";
 
@@ -70,6 +70,7 @@ impl WidgetKind for RacePane {
             state.add_text_arg("description", &race.description);
 
             add_bonus_text_args(&race.base_stats, state);
+            add_attack_text_args(&race.base_attack, state);
         }
         vec![details]
     }

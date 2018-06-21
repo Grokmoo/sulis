@@ -23,7 +23,6 @@ use {Attribute, Damage, DamageKind, ArmorKind, WeaponKind};
 pub struct BonusList {
     pub attributes: Option<HashMap<Attribute, i8>>,
     pub ap: Option<i32>,
-    pub attack: Option<AttackBuilder>,
     pub base_armor: Option<u32>,
     pub armor_kinds: Option<HashMap<DamageKind, u32>>,
     pub bonus_damage: Option<Damage>,
@@ -42,6 +41,8 @@ pub struct BonusList {
     pub crit_threshold: Option<i32>,
     pub hit_threshold: Option<i32>,
     pub graze_threshold: Option<i32>,
+    pub graze_multiplier: Option<f32>,
+    pub crit_multiplier: Option<f32>,
 }
 
 impl Default for BonusList {
@@ -49,7 +50,6 @@ impl Default for BonusList {
         BonusList {
             attributes: None,
             ap: None,
-            attack: None,
             base_armor: None,
             armor_kinds: None,
             armor_proficiencies: None,
@@ -68,6 +68,8 @@ impl Default for BonusList {
             crit_threshold: None,
             hit_threshold: None,
             graze_threshold: None,
+            graze_multiplier: None,
+            crit_multiplier: None,
         }
     }
 }

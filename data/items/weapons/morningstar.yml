@@ -8,14 +8,14 @@ weight: 500
 value: 400
 equippable:
   slot: HeldMain
-  bonuses:
-    attack:
-      damage:
-        min: 25
-        max: 35
-        kind: Crushing
-      kind: # Melee
-        reach: 1.0
+  bonuses: {}
+  attack:
+    damage:
+      min: 25
+      max: 35
+      kind: Crushing
+    kind: # Melee
+      reach: 1.0
 image:
   HeldMain:
     creatures/morningstar

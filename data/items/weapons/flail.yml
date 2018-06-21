@@ -9,14 +9,14 @@ value: 500
 equippable:
   slot: HeldMain
   bonuses:
-    attack:
-      damage:
-        min: 28
-        max: 38
-        kind: Crushing
-      kind: # Melee
-        reach: 1.0
     accuracy: -5
+  attack:
+    damage:
+      min: 28
+      max: 38
+      kind: Crushing
+    kind: # Melee
+      reach: 1.0
 image:
   HeldMain:
     creatures/flail

@@ -53,11 +53,6 @@ impl PartialEq for Class {
 
 impl Class {
     pub fn new(builder: ClassBuilder, module: &Module) -> Result<Class, Error> {
-        if builder.bonuses_per_level.attack.is_some() {
-            warn!("Must not specify an attack for a class.");
-            return unable_to_create_error("class", &builder.id);
-        }
-
         let mut ability_choices = HashMap::new();
         for (level, list) in builder.ability_choices {
             let mut vec = Vec::new();

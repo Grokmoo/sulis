@@ -38,7 +38,6 @@ pub struct Rules {
     pub crit_percentile: u32,
 
     pub graze_damage_multiplier: f32,
-    pub hit_damage_multiplier: f32,
     pub crit_damage_multiplier: f32,
 
     pub dual_wield_damage_multiplier: f32,

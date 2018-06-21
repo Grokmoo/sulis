@@ -27,7 +27,7 @@ use sulis_state::{ActorState, Effect, GameState};
 
 use CharacterBuilder;
 use ability_pane::add_ability_text_args;
-use item_button::add_bonus_text_args;
+use item_button::{add_bonus_text_args};
 
 pub const NAME: &str = "character_window";
 
@@ -251,6 +251,8 @@ pub fn create_details_text_box(pc: &ActorState) -> Rc<RefCell<Widget>> {
         state.add_text_arg("crit_threshold", &stats.crit_threshold.to_string());
         state.add_text_arg("hit_threshold", &stats.hit_threshold.to_string());
         state.add_text_arg("graze_threshold", &stats.graze_threshold.to_string());
+        state.add_text_arg("crit_multiplier", &stats.crit_multiplier.to_string());
+        state.add_text_arg("graze_multiplier", &stats.graze_multiplier.to_string());
     }
     details
 }

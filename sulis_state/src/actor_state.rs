@@ -285,16 +285,19 @@ impl ActorState {
             }
         };
 
-        let hit_kind = parent.borrow().actor.stats.attack_roll(defense);
-
-        let damage_multiplier = match hit_kind {
-            HitKind::Miss => {
-                debug!("Miss");
-                return (HitKind::Miss, "Miss".to_string(), color::GRAY);
-            },
-            HitKind::Graze => rules.graze_damage_multiplier,
-            HitKind::Hit => rules.hit_damage_multiplier,
-            HitKind::Crit => rules.crit_damage_multiplier,
+        let (hit_kind, damage_multiplier) = {
+            let parent_stats = &parent.borrow().actor.stats;
+            let hit_kind = parent_stats.attack_roll(defense);
+            let damage_multiplier = match hit_kind {
+                HitKind::Miss => {
+                    debug!("Miss");
+                    return (HitKind::Miss, "Miss".to_string(), color::GRAY);
+                },
+                HitKind::Graze => parent_stats.graze_multiplier,
+                HitKind::Hit => 1.0,
+                HitKind::Crit => parent_stats.crit_multiplier,
+            };
+            (hit_kind, damage_multiplier)
         };
 
         debug!("Accuracy {} vs defense {}: {:?}", accuracy, defense, hit_kind);
@@ -664,7 +667,7 @@ impl ActorState {
             let equippable = match item_state.item.equippable {
                 None => continue,
                 Some(ref equippable) => {
-                    if let Some(ref attack) = equippable.bonuses.attack {
+                    if let Some(ref attack) = equippable.attack {
                         attacks_list.push(attack);
                     }
 
@@ -676,10 +679,7 @@ impl ActorState {
         }
 
         let multiplier = if attacks_list.is_empty() {
-            if let Some(ref attack) = self.actor.race.base_stats.attack {
-                attacks_list.push(attack);
-            }
-
+            attacks_list.push(&self.actor.race.base_attack);
             1.0
         } else if attacks_list.len() > 1 {
             rules.dual_wield_damage_multiplier
@@ -695,6 +695,8 @@ impl ActorState {
         self.stats.crit_threshold += rules.crit_percentile as i32;
         self.stats.hit_threshold += rules.hit_percentile as i32;
         self.stats.graze_threshold += rules.graze_percentile as i32;
+        self.stats.graze_multiplier += rules.graze_damage_multiplier;
+        self.stats.crit_multiplier += rules.crit_damage_multiplier;
         self.has_level_up = rules.get_xp_for_next_level(self.actor.total_level) <= self.xp;
 
         self.listeners.notify(&self);

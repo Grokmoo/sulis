@@ -57,7 +57,7 @@ impl UserData for ScriptInventory {
                 Some(ref item_state) => {
                     match item_state.item.equippable {
                         None => false,
-                        Some(ref equippable) => equippable.bonuses.attack.is_none(),
+                        Some(ref equippable) => equippable.attack.is_none(),
                     }
                 }
             })

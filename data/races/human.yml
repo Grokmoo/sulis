@@ -14,14 +14,14 @@ base_stats:
   fortitude: 30
   reflex: 30
   will: 30
-  attack:
-    damage:
-      min: 10
-      max: 15
-      kind: Crushing
-    kind: #Melee
-      reach: 0.5
   bonus_reach: 0.25
+base_attack:
+  damage:
+    min: 10
+    max: 15
+    kind: Crushing
+  kind: #Melee
+    reach: 0.5
 default_images:
   Male:
     Foreground: creatures/human_male_fg

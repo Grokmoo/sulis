@@ -9,14 +9,14 @@ value: 200
 equippable:
   slot: HeldMain
   alternate_slot: HeldOff
-  bonuses:
-    attack:
-      damage:
-        min: 15
-        max: 25
-        kind: Piercing
-      kind: # Melee
-        reach: 0.25
+  bonuses: {}
+  attack:
+    damage:
+      min: 15
+      max: 25
+      kind: Piercing
+    kind: # Melee
+      reach: 0.25
 image:
   HeldMain:
     creatures/dagger

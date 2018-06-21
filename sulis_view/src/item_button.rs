@@ -19,7 +19,7 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_rules::{bonus_list::AttackKindBuilder, BonusList};
+use sulis_rules::{bonus_list::{AttackBuilder, AttackKindBuilder}, BonusList};
 use sulis_module::{item::{format_item_value, format_item_weight, Slot}};
 use sulis_state::{EntityState, GameState, ItemState, inventory::has_proficiency};
 use sulis_core::io::event;
@@ -235,6 +235,9 @@ impl WidgetKind for ItemButton {
             match item_state.item.equippable {
                 None => (),
                 Some(ref equippable) => {
+                    if let Some(ref attack) = equippable.attack {
+                        add_attack_text_args(attack, &mut item_window.state);
+                    }
                     add_bonus_text_args(&equippable.bonuses, &mut item_window.state);
                 },
             }
@@ -435,20 +438,20 @@ pub fn unequip_item_cb(entity: &Rc<RefCell<EntityState>>, slot: Slot) -> Callbac
     }))
 }
 
-pub fn add_bonus_text_args(bonuses: &BonusList, widget_state: &mut WidgetState) {
-    if let Some(ref attack) = bonuses.attack {
-        widget_state.add_text_arg("min_damage", &attack.damage.min.to_string());
-        widget_state.add_text_arg("max_damage", &attack.damage.max.to_string());
-        add_if_present(widget_state, "damage_kind", attack.damage.kind);
+pub fn add_attack_text_args(attack: &AttackBuilder, widget_state: &mut WidgetState) {
+    widget_state.add_text_arg("min_damage", &attack.damage.min.to_string());
+    widget_state.add_text_arg("max_damage", &attack.damage.max.to_string());
+    add_if_present(widget_state, "damage_kind", attack.damage.kind);
 
-        match attack.kind {
-            AttackKindBuilder::Melee { reach } =>
-                widget_state.add_text_arg("reach", &reach.to_string()),
+    match attack.kind {
+        AttackKindBuilder::Melee { reach } =>
+            widget_state.add_text_arg("reach", &reach.to_string()),
             AttackKindBuilder::Ranged { range, .. } =>
                 widget_state.add_text_arg("range", &range.to_string()),
-        }
     }
+}
 
+pub fn add_bonus_text_args(bonuses: &BonusList, widget_state: &mut WidgetState) {
     if let Some(ref damage) = bonuses.bonus_damage {
         widget_state.add_text_arg("min_bonus_damage", &damage.min.to_string());
         widget_state.add_text_arg("max_bonus_damage", &damage.max.to_string());
@@ -494,6 +497,8 @@ pub fn add_bonus_text_args(bonuses: &BonusList, widget_state: &mut WidgetState) 
     add_if_present(widget_state, "crit_threshold", bonuses.crit_threshold);
     add_if_present(widget_state, "hit_threshold", bonuses.hit_threshold);
     add_if_present(widget_state, "graze_threshold", bonuses.graze_threshold);
+    add_if_present(widget_state, "graze_multiplier", bonuses.graze_multiplier);
+    add_if_present(widget_state, "crit_multiplier", bonuses.crit_multiplier);
 }
 
 fn add_if_present<T: Display>(widget_state: &mut WidgetState, text: &str, val: Option<T>) {

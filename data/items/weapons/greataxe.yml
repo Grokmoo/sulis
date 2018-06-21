@@ -9,14 +9,14 @@ value: 500
 equippable:
   slot: HeldMain
   blocks_slot: HeldOff
-  bonuses:
-    attack:
-      damage:
-        min: 35
-        max: 45
-        kind: Slashing
-      kind: # Melee
-        reach: 1.5
+  bonuses: {}
+  attack:
+    damage:
+      min: 35
+      max: 45
+      kind: Slashing
+    kind: # Melee
+      reach: 1.5
 image:
   HeldMain:
     creatures/greataxe

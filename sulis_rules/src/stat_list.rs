@@ -45,6 +45,8 @@ pub struct StatList {
     pub crit_threshold: i32,
     pub hit_threshold: i32,
     pub graze_threshold: i32,
+    pub graze_multiplier: f32,
+    pub crit_multiplier: f32,
 }
 
 impl StatList {
@@ -71,6 +73,8 @@ impl StatList {
             crit_threshold: 0,
             hit_threshold: 0,
             graze_threshold: 0,
+            graze_multiplier: 0.0,
+            crit_multiplier: 0.0,
         }
     }
 
@@ -175,6 +179,8 @@ impl StatList {
         if let Some(crit_threshold) = bonuses.crit_threshold { self.crit_threshold += crit_threshold * times_i32 }
         if let Some(hit_threshold) = bonuses.hit_threshold { self.hit_threshold += hit_threshold * times_i32 }
         if let Some(graze_thresh) = bonuses.graze_threshold { self.graze_threshold += graze_thresh * times_i32 }
+        if let Some(graze_mult) = bonuses.graze_multiplier { self.graze_multiplier += graze_mult * times_f32 }
+        if let Some(crit_mult) = bonuses.crit_multiplier { self.crit_multiplier += crit_mult * times_f32 }
 
         if let Some(ref attrs) = bonuses.attributes {
             self.attributes.add_all(attrs);

@@ -9,15 +9,15 @@ value: 300
 equippable:
   slot: HeldMain
   blocks_slot: HeldOff
-  bonuses:
-    attack:
-      damage:
-        min: 25
-        max: 35
-        kind: Piercing
-      kind: # Ranged
-        range: 30.0
-        projectile: creatures/projectile_bow
+  bonuses: {}
+  attack:
+    damage:
+      min: 25
+      max: 35
+      kind: Piercing
+    kind: # Ranged
+      range: 30.0
+      projectile: creatures/projectile_bow
 image:
   HeldOff:
     creatures/shortbow

@@ -9,14 +9,14 @@ value: 200
 equippable:
   slot: HeldMain
   blocks_slot: HeldOff
-  bonuses:
-    attack:
-      damage:
-        min: 25
-        max: 35
-        kind: Piercing
-      kind: # Melee
-        reach: 3.0
+  bonuses: {}
+  attack:
+    damage:
+      min: 25
+      max: 35
+      kind: Piercing
+    kind: # Melee
+      reach: 3.0
 image:
   HeldMain:
     creatures/longspear

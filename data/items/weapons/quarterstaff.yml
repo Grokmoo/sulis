@@ -9,14 +9,14 @@ value: 20
 equippable:
   slot: HeldMain
   blocks_slot: HeldOff
-  bonuses:
-    attack:
-      damage:
-        min: 20
-        max: 30
-        kind: Crushing
-      kind: # Melee
-        reach: 2.0
+  bonuses: {}
+  attack:
+    damage:
+      min: 20
+      max: 30
+      kind: Crushing
+    kind: # Melee
+      reach: 2.0
 image:
   HeldMain:
     creatures/quarterstaff

@@ -9,14 +9,14 @@ value: 10
 equippable:
   slot: HeldMain
   alternate_slot: HeldOff
-  bonuses:
-    attack:
-      damage:
-        min: 15
-        max: 25
-        kind: Crushing
-      kind: # Melee
-        reach: 0.5
+  bonuses: {}
+  attack:
+    damage:
+      min: 15
+      max: 25
+      kind: Crushing
+    kind: # Melee
+      reach: 0.5
 image:
   HeldMain:
     creatures/club

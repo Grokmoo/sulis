@@ -23,7 +23,7 @@ use sulis_core::image::Image;
 use sulis_core::resource::{ResourceBuilder, ResourceSet};
 use sulis_core::util::{invalid_data_error, unable_to_create_error, Point};
 use sulis_core::serde_yaml;
-use sulis_rules::BonusList;
+use sulis_rules::{BonusList, bonus_list::AttackBuilder};
 
 use actor::{Sex};
 
@@ -36,6 +36,7 @@ pub struct Race {
     pub description: String,
     pub size: Rc<ObjectSize>,
     pub base_stats: BonusList,
+    pub base_attack: AttackBuilder,
     pub hair_selections: Vec<String>,
     pub beard_selections: Vec<String>,
     pub portrait_selections: Vec<String>,
@@ -71,16 +72,9 @@ impl Race {
 
         let default_images = ImageLayerSet::new(builder.default_images)?;
 
-        match builder.base_stats.attack {
-            None => {
-                warn!("You must specify a base_damage for each race.");
-                return unable_to_create_error("race", &builder.id);
-            }, Some(ref attack) => {
-                if attack.damage.kind.is_none() {
-                    warn!("Attack must always have a damage kind specified.");
-                    return unable_to_create_error("race", &builder.id);
-                }
-            }
+        if builder.base_attack.damage.kind.is_none() {
+            warn!("Attack must always have a damage kind specified.");
+            return unable_to_create_error("race", &builder.id);
         }
 
         let mut hair_colors = Vec::new();
@@ -99,6 +93,7 @@ impl Race {
             description: builder.description,
             size,
             base_stats: builder.base_stats,
+            base_attack: builder.base_attack,
             default_images,
             image_layer_offsets: offsets,
             image_layer_postfix: builder.image_layer_postfix,
@@ -141,6 +136,7 @@ pub struct RaceBuilder {
     pub name: String,
     pub description: String,
     pub size: String,
+    pub base_attack: AttackBuilder,
     pub base_stats: BonusList,
     pub default_images: HashMap<Sex, HashMap<ImageLayer, String>>,
     pub hair_selections: Option<Vec<String>>,

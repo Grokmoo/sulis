@@ -236,8 +236,7 @@ impl UserData for ScriptEntity {
             let damage_kind = DamageKind::from_str(&damage_kind);
 
             let attack = Attack::special(min_damage, max_damage, damage_kind, AttackKind::Fortitude);
-            let damage = attack.roll_damage(&parent.borrow().actor.stats.armor,
-                Module::rules().hit_damage_multiplier);
+            let damage = attack.roll_damage(&parent.borrow().actor.stats.armor, 1.0);
 
             let (text, color) = if !damage.is_empty() {
                 let mut total = 0;
@@ -402,6 +401,13 @@ fn create_stats_table<'a>(lua: &'a Lua, parent: &ScriptEntity, _args: ()) -> Res
     stats.set("attack_distance", src.attack_distance() + parent.borrow().size.diagonal / 2.0)?;
     stats.set("attack_is_melee", src.attack_is_melee())?;
     stats.set("attack_is_ranged", src.attack_is_ranged())?;
+
+    stats.set("concealment", src.concealment)?;
+    stats.set("crit_threshold", src.crit_threshold)?;
+    stats.set("graze_threshold", src.graze_threshold)?;
+    stats.set("hit_threshold", src.hit_threshold)?;
+    stats.set("graze_multiplier", src.graze_multiplier)?;
+    stats.set("crit_multiplier", src.crit_multiplier)?;
 
     Ok(stats)
 }

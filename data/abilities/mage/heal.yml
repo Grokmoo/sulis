@@ -6,4 +6,5 @@ description: |
 active:
   script: "heal"
   ap: 20
-  duration: 2
+  duration:
+    Rounds: 2

@@ -32,10 +32,13 @@ pub struct Effect {
 
     pub listeners: ChangeListenerList<Effect>,
     pub removal_listeners: ChangeListenerList<Effect>,
+
+    deactivate_with_ability: Option<String>,
 }
 
 impl Effect {
-    pub fn new(name: &str, duration: u32, bonuses: BonusList) -> Effect {
+    pub fn new(name: &str, duration: u32, bonuses: BonusList,
+               deactivate_with_ability: Option<String>) -> Effect {
         Effect {
             name: name.to_string(),
             cur_duration: 0,
@@ -44,6 +47,18 @@ impl Effect {
             listeners: ChangeListenerList::default(),
             removal_listeners: ChangeListenerList::default(),
             callbacks: Vec::new(),
+            deactivate_with_ability,
+        }
+    }
+
+    pub fn mark_for_removal(&mut self) {
+        self.total_duration = 0;
+    }
+
+    pub fn deactivates_with(&self, id: &str) -> bool {
+        match self.deactivate_with_ability {
+            None => false,
+            Some(ref ability_id) => id == ability_id,
         }
     }
 

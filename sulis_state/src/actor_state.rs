@@ -157,6 +157,19 @@ impl ActorState {
         self.ability_states.get_mut(id)
     }
 
+    /// Returns true if the ability state for the given ability can be
+    /// activated (any active ability) or deactivated (only relevant for modes)
+    pub fn can_toggle(&self, id: &str) -> bool {
+        match self.ability_states.get(id) {
+            None => false,
+            Some(ref state) => {
+                if self.ap < state.activate_ap() { return false; }
+
+                state.is_available() || state.is_active_mode()
+            }
+        }
+    }
+
     pub fn can_activate(&self, id: &str) -> bool {
         match self.ability_states.get(id) {
             None => false,
@@ -164,6 +177,20 @@ impl ActorState {
                 if self.ap < state.activate_ap() { return false; }
 
                 state.is_available()
+            }
+        }
+    }
+
+    pub fn deactivate_ability_state(&mut self, id: &str) {
+        match self.ability_states.get_mut(id) {
+            None => (),
+            Some(ref mut state) => {
+                state.deactivate();
+                for effect in self.effects.iter_mut() {
+                    if effect.deactivates_with(id) {
+                        effect.mark_for_removal();
+                    }
+                }
             }
         }
     }
@@ -188,6 +215,7 @@ impl ActorState {
 
         for ability in self.actor.abilities.iter() {
             if ability.active.is_none() { continue; }
+            if self.ability_states.contains_key(&ability.id) { continue; }
 
             self.ability_states.insert(ability.id.to_string(), AbilityState::new(ability));
         }

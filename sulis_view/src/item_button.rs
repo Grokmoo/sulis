@@ -474,6 +474,9 @@ pub fn add_bonus_text_args(bonuses: &BonusList, widget_state: &mut WidgetState) 
     if let Some(ref damage) = bonuses.bonus_damage {
         widget_state.add_text_arg("min_bonus_damage", &damage.min.to_string());
         widget_state.add_text_arg("max_bonus_damage", &damage.max.to_string());
+        if damage.ap > 0 {
+            widget_state.add_text_arg("armor_piercing", &damage.ap.to_string());
+        }
         if let Some(kind) = damage.kind {
             widget_state.add_text_arg("bonus_damage_kind", &kind.to_string());
         }

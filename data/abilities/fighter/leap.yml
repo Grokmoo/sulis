@@ -6,5 +6,6 @@ description: |
 active:
   script: "leap"
   ap: 10
-  duration: 0
+  duration:
+    Instant
 

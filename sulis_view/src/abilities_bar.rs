@@ -93,15 +93,17 @@ impl WidgetKind for AbilityButton {
     fn layout(&mut self, widget: &mut Widget) {
         widget.do_base_layout();
 
-        widget.state.set_enabled(self.entity.borrow().actor.can_activate(&self.ability.id));
+        widget.state.set_enabled(self.entity.borrow().actor.can_toggle(&self.ability.id));
 
         if let Some(ref mut state) = self.entity.borrow_mut().actor.ability_state(&self.ability.id) {
             let rounds = state.remaining_duration_rounds();
 
+            widget.children[1].borrow_mut().state.clear_text_args();
             if rounds == 0 {
-                widget.children[1].borrow_mut().state.clear_text_args();
-            } else {
+            } else if rounds < 100_000 {
                 widget.children[1].borrow_mut().state.add_text_arg("duration", &rounds.to_string());
+            } else {
+                widget.children[1].borrow_mut().state.add_text_arg("duration", "Active");
             }
         }
     }
@@ -137,9 +139,13 @@ impl WidgetKind for AbilityButton {
     fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: event::ClickKind) -> bool {
         self.super_on_mouse_release(widget, kind);
 
-        if !self.entity.borrow().actor.can_activate(&self.ability.id) { return true; }
+        if self.entity.borrow().actor.can_activate(&self.ability.id) {
+            info!("Activate {}", self.ability.id);
+            GameState::execute_ability_on_activate(&self.entity, &self.ability);
+        } else if self.entity.borrow().actor.can_toggle(&self.ability.id) {
+            self.entity.borrow_mut().actor.deactivate_ability_state(&self.ability.id);
+        }
 
-        GameState::execute_ability_on_activate(&self.entity, &self.ability);
         true
     }
 }

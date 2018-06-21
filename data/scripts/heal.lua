@@ -8,8 +8,6 @@ function on_activate(parent, ability)
 end
 
 function on_target_select(parent, ability, targets)
-  ability:activate(parent)
-
   target = targets:first()
   
   target:heal_damage(10)

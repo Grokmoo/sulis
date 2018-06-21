@@ -50,7 +50,12 @@ impl Attack {
     }
 
     pub fn new(builder: &AttackBuilder, stats: &StatList) -> Attack {
-        let damage = DamageList::new(builder.damage, &stats.bonus_damage);
+        let mut bonus_damage = stats.bonus_damage.clone();
+        if let Some(ref damage) = builder.bonuses.bonus_damage {
+            bonus_damage.push(damage.clone());
+        }
+
+        let damage = DamageList::new(builder.damage, &bonus_damage);
 
         let kind = match builder.kind {
             AttackKindBuilder::Melee { reach } =>

@@ -6,4 +6,5 @@ description: |
 active:
   script: "crush"
   ap: 20
-  duration: 0
+  duration:
+    Instant

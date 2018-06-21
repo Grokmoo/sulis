@@ -5,6 +5,10 @@ abilities:
     position: [0, 0]
   - id: shield_slam
     position: [0, 1]
+  - id: guardian
+    position: [1, 0.5]
+  - id: defensive_fighting
+    position: [2, 0]
     
   - id: mighty_blow
     position: [0, 3]

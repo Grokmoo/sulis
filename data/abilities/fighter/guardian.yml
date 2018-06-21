@@ -1,0 +1,10 @@
+id: guardian
+name: "Guardian"
+icon: abilities/guardian
+description: |
+  You focus on protecting one nearby ally, granting them defense and armor bonuses for a single turn.  You must have an equipped shield to use this ability.
+active:
+  script: "guardian"
+  ap: 10
+  duration:
+    Rounds: 1

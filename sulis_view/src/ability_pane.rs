@@ -20,7 +20,7 @@ use std::cell::RefCell;
 
 use sulis_core::ui::{Widget, WidgetKind, WidgetState};
 use sulis_widgets::{TextArea};
-use sulis_module::{Ability, Module};
+use sulis_module::{ability, Ability, Module};
 
 use item_button::add_bonus_text_args;
 
@@ -80,6 +80,12 @@ pub fn add_ability_text_args(state: &mut WidgetState, ability: &Rc<Ability>) {
         state.add_text_arg("active", "true");
         let ap = active.ap / Module::rules().display_ap;
         state.add_text_arg("activate_ap", &ap.to_string());
+
+        match active.duration {
+            ability::Duration::Rounds(rounds) => state.add_text_arg("duration", &rounds.to_string()),
+            ability::Duration::Mode => state.add_text_arg("mode", "true"),
+            ability::Duration::Instant => state.add_text_arg("instant", "true"),
+        }
     } else {
         state.add_text_arg("passive", "true");
     }

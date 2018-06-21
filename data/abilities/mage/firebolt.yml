@@ -6,5 +6,6 @@ description: |
 active:
   script: "firebolt"
   ap: 20
-  duration: 0
+  duration:
+    Instant
 

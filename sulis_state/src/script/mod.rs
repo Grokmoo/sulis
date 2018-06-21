@@ -53,7 +53,7 @@ use rlua::{self, Function, Lua, UserData, UserDataMethods};
 
 use sulis_core::config::CONFIG;
 use sulis_core::util::Point;
-use sulis_module::{Ability, Module, OnTrigger};
+use sulis_module::{ability, Ability, Module, OnTrigger};
 use {EntityState, GameState};
 
 type Result<T> = std::result::Result<T, rlua::Error>;
@@ -323,10 +323,16 @@ impl ScriptAbility {
     fn from(ability: &Rc<Ability>) -> ScriptAbility {
         assert!(ability.active.is_some());
 
+        let duration = match ability.active.as_ref().unwrap().duration {
+            ability::Duration::Rounds(rounds) => rounds,
+            ability::Duration::Mode => 0,
+            ability::Duration::Instant => 0,
+        };
+
         ScriptAbility {
             id: ability.id.to_string(),
             name: ability.name.to_string(),
-            duration: ability.active.as_ref().unwrap().duration,
+            duration,
             ap: ability.active.as_ref().unwrap().ap,
         }
     }

@@ -6,4 +6,5 @@ description: |
 active:
   script: "luck"
   ap: 20
-  duration: 4
+  duration:
+    Rounds: 4

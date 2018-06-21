@@ -14,8 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std;
-use std::f32;
+use std::{self, f32, u32};
 use std::rc::Rc;
 use std::cell::RefCell;
 use std::collections::HashMap;
@@ -108,8 +107,8 @@ impl UserData for ScriptEntity {
 
         methods.add_method("targets", &targets);
 
-        methods.add_method("create_effect", |_, entity, args: (String, u32)| {
-            let duration = args.1;
+        methods.add_method("create_effect", |_, entity, args: (String, Option<u32>)| {
+            let duration = args.1.unwrap_or(u32::MAX);
             let ability = args.0;
             let index = entity.try_unwrap_index()?;
             Ok(ScriptEffect::new(index, &ability, duration))
@@ -289,6 +288,15 @@ impl UserData for ScriptEntity {
             let entity = entity.try_unwrap()?;
             let entity = entity.borrow();
             Ok(entity.actor.actor.name.to_string())
+        });
+
+        methods.add_method("has_active_mode", |_, entity, ()| {
+            let entity = entity.try_unwrap()?;
+            let entity = entity.borrow();
+            for (_, ref state) in entity.actor.ability_states.iter() {
+                if state.is_active_mode() { return Ok(true); }
+            }
+            Ok(false)
         });
 
         methods.add_method("stats", &create_stats_table);

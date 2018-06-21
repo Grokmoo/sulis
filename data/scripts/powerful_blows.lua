@@ -1,6 +1,11 @@
 function on_activate(parent, ability)
-  effect = parent:create_effect(ability:name(), ability:duration())
-  effect:add_damage(2, 5)
+  if parent:has_active_mode() then
+    return
+  end
+
+  effect = parent:create_effect(ability:name())
+  effect:deactivate_with(ability)
+  effect:add_damage(2, 5, 5)
   effect:add_num_bonus("accuracy", 10)
   effect:add_num_bonus("defense", -10)
 

@@ -14,9 +14,10 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::u32;
 use std::rc::Rc;
 
-use sulis_module::Ability;
+use sulis_module::{ability::Duration, Ability};
 use ChangeListenerList;
 
 use ROUND_TIME_MILLIS;
@@ -60,8 +61,26 @@ impl AbilityState {
         self.remaining_duration == 0
     }
 
+    pub fn is_active_mode(&self) -> bool {
+        self.remaining_duration > 100_000 * ROUND_TIME_MILLIS
+    }
+
     pub fn activate(&mut self) {
-        self.remaining_duration = self.ability.active.as_ref().unwrap().duration * ROUND_TIME_MILLIS;
+        self.remaining_duration = match self.ability.active.as_ref().unwrap().duration {
+            Duration::Rounds(rounds) => rounds * ROUND_TIME_MILLIS,
+            Duration::Mode => u32::MAX,
+            Duration::Instant => 0,
+        };
+    }
+
+    pub fn deactivate(&mut self) {
+        if !self.is_active_mode() {
+            warn!("Attempted to deactivate non-mode ability {}", self.ability.id);
+            return;
+        }
+
+        self.remaining_duration = 0;
+        self.listeners.notify(&self);
     }
 
     pub fn remaining_duration(&self) -> u32 {

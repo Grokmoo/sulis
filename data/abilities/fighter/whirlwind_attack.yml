@@ -6,6 +6,7 @@ description: |
 active:
   script: "whirlwind_attack"
   ap: 30
-  duration: 0
+  duration:
+    Instant
 prereqs:
   abilities: [ powerful_blows, stunning_blow ]

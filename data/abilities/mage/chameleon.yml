@@ -6,4 +6,5 @@ description: |
 active:
   script: "chameleon"
   ap: 20
-  duration: 3
+  duration:
+    Rounds: 3

@@ -1,0 +1,10 @@
+id: defensive_fighting
+name: "Defensive Fighting"
+icon: abilities/defensive_fighting
+description: |
+  You enter a defensive stance, gaining bonuses to Defense but penalties to Accuracy, especially Crits.  This ability is a mode which will last until deactivated.  You must have a shield equipped to use this ability.    You may only have one combat mode active at a time.
+active:
+  script: "defensive_fighting"
+  ap: 10
+  duration:
+    Mode

@@ -21,6 +21,7 @@ groups:
       powerful_blows: [2, 1]
       shield_slam: [3, 1]
       chameleon: [4, 1]
+      defensive_fighting: [5, 1]
       
       tough_skin: [0, 2]
       elemental_defense: [1, 2]
@@ -37,6 +38,7 @@ groups:
       luck: [3, 3]
       air_shield: [4, 3]
       stun: [5, 3]
+      guardian: [6, 3]
       
       charge_attack: [0, 4]
       

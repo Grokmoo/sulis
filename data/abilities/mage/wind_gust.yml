@@ -6,5 +6,6 @@ description: |
 active:
   script: "wind_gust"
   ap: 30
-  duration: 0
+  duration:
+    Instant
 

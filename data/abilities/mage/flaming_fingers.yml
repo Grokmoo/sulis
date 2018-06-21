@@ -6,6 +6,7 @@ description: |
 active:
   script: "flaming_fingers"
   ap: 20
-  duration: 0
+  duration:
+    Instant
 prereqs:
   abilities: [ "firebolt" ]

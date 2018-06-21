@@ -8,4 +8,5 @@ description: |
 active:
   script: "shield_slam"
   ap: 20
-  duration: 0
+  duration:
+    Instant

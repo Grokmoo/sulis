@@ -30,7 +30,7 @@ use {Actor, Module, PrereqList, PrereqListBuilder};
 pub struct Active {
     pub script: String,
     pub ap: u32,
-    pub duration: u32,
+    pub duration: Duration,
 }
 
 #[derive(Debug)]
@@ -112,10 +112,18 @@ impl Ability {
 
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
+pub enum Duration {
+    Rounds(u32),
+    Mode,
+    Instant,
+}
+
+#[derive(Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
 pub struct ActiveBuilder {
     script: String,
     ap: u32,
-    duration: u32,
+    duration: Duration,
 }
 
 #[derive(Deserialize, Debug)]

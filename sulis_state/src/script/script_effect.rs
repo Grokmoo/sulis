@@ -22,7 +22,7 @@ use rlua::{Lua, UserData, UserDataMethods};
 use sulis_rules::{Attribute, BonusList, Damage, DamageKind};
 
 use script::{CallbackData, Result, script_particle_generator, ScriptParticleGenerator,
-    script_color_animation, ScriptColorAnimation};
+    script_color_animation, ScriptColorAnimation, ScriptAbility};
 use {Effect, GameState};
 
 #[derive(Clone)]
@@ -30,6 +30,7 @@ pub struct ScriptEffect {
     parent: usize,
     name: String,
     duration: u32,
+    deactivate_with_ability: Option<String>,
     pub bonuses: BonusList,
     callbacks: Vec<CallbackData>,
 }
@@ -39,6 +40,7 @@ impl ScriptEffect {
         ScriptEffect {
             parent,
             name: name.to_string(),
+            deactivate_with_ability: None,
             duration,
             bonuses: BonusList::default(),
             callbacks: Vec::new(),
@@ -93,6 +95,10 @@ impl UserData for ScriptEffect {
             effect.callbacks.push(cb);
             Ok(())
         });
+        methods.add_method_mut("deactivate_with", |_, effect, ability: ScriptAbility| {
+            effect.deactivate_with_ability = Some(ability.id);
+            Ok(())
+        });
     }
 }
 
@@ -137,7 +143,8 @@ fn apply(effect_data: &ScriptEffect, pgen: Option<ScriptParticleGenerator>,
     let duration = effect_data.duration * TURNS_TO_MILLIS;
 
     trace!("Apply effect to '{}'", entity.borrow().actor.actor.name);
-    let mut effect = Effect::new(&effect_data.name, duration, effect_data.bonuses.clone());
+    let mut effect = Effect::new(&effect_data.name, duration, effect_data.bonuses.clone(),
+        effect_data.deactivate_with_ability.clone());
     for cb in effect_data.callbacks.iter() {
         effect.add_callback(Rc::new(cb.clone()));
     }

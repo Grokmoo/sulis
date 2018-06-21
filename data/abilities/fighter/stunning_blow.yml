@@ -8,6 +8,7 @@ description: |
 active:
   script: "stunning_blow"
   ap: 30
-  duration: 0
+  duration:
+    Instant
 prereqs:
   abilities: [ mighty_blow ]

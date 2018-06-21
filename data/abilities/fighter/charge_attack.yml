@@ -6,6 +6,7 @@ description: |
 active:
   script: "charge_attack"
   ap: 20
-  duration: 0
+  duration:
+    Instant
 prereqs:
   abilities: [ leap ]

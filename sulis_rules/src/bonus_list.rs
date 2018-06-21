@@ -20,6 +20,32 @@ use {Attribute, Damage, DamageKind, ArmorKind, WeaponKind};
 
 #[derive(Deserialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
+pub struct AttackBonusList {
+    pub bonus_damage: Option<Damage>,
+    pub accuracy: Option<i32>,
+    pub crit_threshold: Option<i32>,
+    pub hit_threshold: Option<i32>,
+    pub graze_threshold: Option<i32>,
+    pub graze_multiplier: Option<f32>,
+    pub crit_multiplier: Option<f32>,
+}
+
+impl Default for AttackBonusList {
+    fn default() -> AttackBonusList {
+        AttackBonusList {
+            bonus_damage: None,
+            accuracy: None,
+            crit_threshold: None,
+            hit_threshold: None,
+            graze_threshold: None,
+            graze_multiplier: None,
+            crit_multiplier: None,
+        }
+    }
+}
+
+#[derive(Deserialize, Debug, Clone)]
+#[serde(deny_unknown_fields)]
 pub struct BonusList {
     pub attributes: Option<HashMap<Attribute, i8>>,
     pub ap: Option<i32>,
@@ -79,6 +105,7 @@ impl Default for BonusList {
 pub struct AttackBuilder {
     pub damage: Damage,
     pub kind: AttackKindBuilder,
+    pub bonuses: AttackBonusList,
 }
 
 impl AttackBuilder {
@@ -93,6 +120,7 @@ impl AttackBuilder {
         AttackBuilder {
             damage: self.damage.mult_f32(multiplier),
             kind: self.kind.clone(),
+            bonuses: self.bonuses.clone(),
         }
     }
 }

@@ -12,12 +12,14 @@ equippable:
   bonuses: {}
   attack:
     damage:
-      min: 35
-      max: 45
+      min: 15
+      max: 25
       kind: Piercing
     kind: # Ranged
       range: 30.0
       projectile: creatures/projectile_crossbow
+    bonuses:
+      accuracy: 5
 image:
   HeldMain:
     creatures/crossbow

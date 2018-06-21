@@ -17,11 +17,12 @@ base_stats:
   bonus_reach: 0.0
 base_attack:
   damage:
-    min: 10
-    max: 15
+    min: 8
+    max: 12
     kind: Crushing
   kind: #Melee
     reach: 0.25
+  bonuses: {}
 default_images:
   Male:
     Background: creatures/goblin0

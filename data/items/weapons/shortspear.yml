@@ -11,11 +11,12 @@ equippable:
   bonuses: {}
   attack:
     damage:
-      min: 20
-      max: 30
+      min: 12
+      max: 18
       kind: Piercing
     kind: # Melee
       reach: 2.0
+    bonuses: {}
 image:
   HeldMain:
     creatures/shortspear

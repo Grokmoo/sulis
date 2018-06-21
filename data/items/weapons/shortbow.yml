@@ -12,12 +12,14 @@ equippable:
   bonuses: {}
   attack:
     damage:
-      min: 25
-      max: 35
+      min: 12
+      max: 18
       kind: Piercing
     kind: # Ranged
       range: 30.0
       projectile: creatures/projectile_bow
+    bonuses:
+      crit_multiplier: 0.25
 image:
   HeldOff:
     creatures/shortbow

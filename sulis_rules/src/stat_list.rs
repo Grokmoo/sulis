@@ -19,7 +19,7 @@ use rand::{self, Rng};
 
 use sulis_core::image::Image;
 use {Armor, AttributeList, Attack, BonusList, Damage, HitKind, WeaponKind, ArmorKind};
-use bonus_list::AttackBuilder;
+use bonus_list::{AttackBonusList, AttackBuilder};
 
 #[derive(Clone)]
 pub struct StatList {
@@ -86,8 +86,8 @@ impl StatList {
         self.weapon_proficiencies.contains(&prof)
     }
 
-    pub fn attack_roll(&self, defense: i32) -> HitKind {
-        let accuracy = self.accuracy;
+    pub fn attack_roll(&self, defense: i32, bonuses: &AttackBonusList) -> HitKind {
+        let accuracy = self.accuracy + bonuses.accuracy.unwrap_or(0);
         let roll = rand::thread_rng().gen_range(1, 101);
         debug!("Attack roll: {} with accuracy {} against {}", roll, accuracy, defense);
 
@@ -95,11 +95,11 @@ impl StatList {
 
         let result = roll + accuracy - defense;
 
-        if result > self.crit_threshold {
+        if result > self.crit_threshold + bonuses.crit_threshold.unwrap_or(0) {
             HitKind::Crit
-        } else if result > self.hit_threshold {
+        } else if result > self.hit_threshold + bonuses.hit_threshold.unwrap_or(0) {
             HitKind::Hit
-        } else if result > self.graze_threshold {
+        } else if result > self.graze_threshold + bonuses.graze_threshold.unwrap_or(0) {
             HitKind::Graze
         } else {
             HitKind::Miss

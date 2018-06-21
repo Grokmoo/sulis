@@ -12,11 +12,13 @@ equippable:
   bonuses: {}
   attack:
     damage:
-      min: 20
-      max: 30
+      min: 12
+      max: 18
       kind: Slashing
     kind: # Melee
-      reach: 10.5
+      reach: 0.5
+    bonuses:
+      crit_multiplier: 0.5
 image:
   HeldMain:
     creatures/hatchet

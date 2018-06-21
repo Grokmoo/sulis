@@ -8,15 +8,17 @@ weight: 500
 value: 500
 equippable:
   slot: HeldMain
-  bonuses:
-    accuracy: -5
+  bonuses: {}
   attack:
     damage:
-      min: 28
-      max: 38
+      min: 18
+      max: 25
       kind: Crushing
     kind: # Melee
       reach: 1.0
+    bonuses:
+      crit_multiplier: 0.5
+      accuracy: -5
 image:
   HeldMain:
     creatures/flail

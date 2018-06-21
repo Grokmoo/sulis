@@ -449,6 +449,22 @@ pub fn add_attack_text_args(attack: &AttackBuilder, widget_state: &mut WidgetSta
             AttackKindBuilder::Ranged { range, .. } =>
                 widget_state.add_text_arg("range", &range.to_string()),
     }
+
+    let bonuses = &attack.bonuses;
+    add_if_present(widget_state, "attack_crit_threshold", bonuses.crit_threshold);
+    add_if_present(widget_state, "attack_hit_threshold", bonuses.hit_threshold);
+    add_if_present(widget_state, "attack_graze_threshold", bonuses.graze_threshold);
+    add_if_present(widget_state, "attack_graze_multiplier", bonuses.graze_multiplier);
+    add_if_present(widget_state, "attack_crit_multiplier", bonuses.crit_multiplier);
+    add_if_present(widget_state, "attack_accuracy", bonuses.accuracy);
+
+    if let Some(ref damage) = bonuses.bonus_damage {
+        widget_state.add_text_arg("attack_min_bonus_damage", &damage.min.to_string());
+        widget_state.add_text_arg("attack_max_bonus_damage", &damage.max.to_string());
+        if let Some(kind) = damage.kind {
+            widget_state.add_text_arg("attack_bonus_damage_kind", &kind.to_string());
+        }
+    }
 }
 
 pub fn add_bonus_text_args(bonuses: &BonusList, widget_state: &mut WidgetState) {

@@ -9,11 +9,12 @@ equippable:
   bonuses: {}
   attack:
     damage:
-      min: 10
-      max: 15
+      min: 8
+      max: 12
       kind: Piercing
     kind: # Melee
       reach: 0.25
+    bonuses: {}
 image:
   HeldMain:
     creatures/dagger

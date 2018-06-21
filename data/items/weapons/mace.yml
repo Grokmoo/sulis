@@ -12,11 +12,13 @@ equippable:
   bonuses: {}
   attack:
     damage:
-      min: 20
-      max: 30
+      min: 15
+      max: 20
       kind: Crushing
     kind: # Melee
       reach: 0.5
+    bonuses:
+      crit_multiplier: -0.25
 image:
   HeldMain:
     creatures/mace

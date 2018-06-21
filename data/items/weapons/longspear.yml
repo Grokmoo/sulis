@@ -12,11 +12,12 @@ equippable:
   bonuses: {}
   attack:
     damage:
-      min: 25
-      max: 35
+      min: 18
+      max: 25
       kind: Piercing
     kind: # Melee
       reach: 3.0
+    bonuses: {}
 image:
   HeldMain:
     creatures/longspear

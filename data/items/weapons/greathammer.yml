@@ -12,11 +12,13 @@ equippable:
   bonuses: {}
   attack:
     damage:
-      min: 35
-      max: 45
+      min: 25
+      max: 35
       kind: Crushing
     kind: # Melee
       reach: 1.0
+    bonuses:
+      crit_multiplier: -0.25
 image:
   HeldMain:
     creatures/greathammer

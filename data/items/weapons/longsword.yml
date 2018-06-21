@@ -8,14 +8,16 @@ weight: 400
 value: 800
 equippable:
   slot: HeldMain
-  bonuses: {}
+  bonuses:
+    defense: 5
   attack:
     damage:
-      min: 25
-      max: 35
+      min: 15
+      max: 22
       kind: Slashing
     kind: # Melee
       reach: 1.5
+    bonuses: {}
 image:
   HeldMain:
     creatures/longsword

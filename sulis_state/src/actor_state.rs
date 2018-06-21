@@ -287,15 +287,18 @@ impl ActorState {
 
         let (hit_kind, damage_multiplier) = {
             let parent_stats = &parent.borrow().actor.stats;
-            let hit_kind = parent_stats.attack_roll(defense);
+            let hit_kind = parent_stats.attack_roll(defense, &attack.bonuses);
             let damage_multiplier = match hit_kind {
                 HitKind::Miss => {
                     debug!("Miss");
                     return (HitKind::Miss, "Miss".to_string(), color::GRAY);
                 },
-                HitKind::Graze => parent_stats.graze_multiplier,
-                HitKind::Hit => 1.0,
-                HitKind::Crit => parent_stats.crit_multiplier,
+                HitKind::Graze =>
+                    parent_stats.graze_multiplier + attack.bonuses.graze_multiplier.unwrap_or(0.0),
+                HitKind::Hit =>
+                    1.0,
+                HitKind::Crit =>
+                    parent_stats.crit_multiplier + attack.bonuses.crit_multiplier.unwrap_or(0.0),
             };
             (hit_kind, damage_multiplier)
         };

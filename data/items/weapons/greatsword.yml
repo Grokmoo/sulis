@@ -9,14 +9,16 @@ value: 1000
 equippable:
   slot: HeldMain
   blocks_slot: HeldOff
-  bonuses: {}
+  bonuses:
+    defense: 5
   attack:
     damage:
-      min: 35
-      max: 45
+      min: 22
+      max: 30
       kind: Slashing
     kind: # Melee
       reach: 2.0
+    bonuses: {}
 image:
   HeldMain:
     creatures/greatsword

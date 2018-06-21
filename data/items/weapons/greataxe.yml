@@ -12,11 +12,13 @@ equippable:
   bonuses: {}
   attack:
     damage:
-      min: 35
-      max: 45
+      min: 22
+      max: 30
       kind: Slashing
     kind: # Melee
       reach: 1.5
+    bonuses:
+      crit_multiplier: 0.5
 image:
   HeldMain:
     creatures/greataxe

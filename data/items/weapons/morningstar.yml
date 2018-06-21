@@ -11,11 +11,13 @@ equippable:
   bonuses: {}
   attack:
     damage:
-      min: 25
-      max: 35
+      min: 18
+      max: 25
       kind: Crushing
     kind: # Melee
       reach: 1.0
+    bonuses:
+      crit_multiplier: -0.25
 image:
   HeldMain:
     creatures/morningstar

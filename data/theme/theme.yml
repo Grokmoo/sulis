@@ -683,6 +683,13 @@ children:
       ][?wis|Wisdom: #wis#
       ][?bonus_ap|AP: #bonus_ap#
       ][?min_damage|[s=4.0|Damage: #min_damage# to #max_damage# [c=f00|#damage_kind#]]
+      ][?attack_min_bonus_damage|[s=4.0|Damage: #attack_min_bonus_damage# to #attack_max_bonus_damage# [?attack_bonus_damage_kind;c=f00|#attack_bonus_damage_kind#]]
+      ][?attack_accuracy|[s=4.0|Accuracy: #attack_accuracy#]
+      ][?attack_crit_threshold|[s=4.0|Crit Threshold: #attack_crit_threshold#]
+      ][?attack_hit_threshold|[s=4.0|Hit Threshold: #attack_hit_threshold#]
+      ][?attack_graze_threshold|[s=4.0|Graze Threshold: #attack_graze_threshold#]
+      ][?attack_crit_multiplier|[s=4.0|Crit Multiplier: #attack_crit_multiplier#]
+      ][?attack_graze_multiplier|[s=4.0|Graze Multiplier: #attack_graze_multiplier#]
       ][?min_bonus_damage|[s=4.0|Damage: #min_bonus_damage# to #max_bonus_damage# [?bonus_damage_kind;c=f00|#bonus_damage_kind#]]
       ][?reach|[s=4.0|Reach: #reach#]
       ][?range|[s=4.0|Range: #range#]
@@ -700,6 +707,8 @@ children:
       ][?crit_threshold|[s=4.0|Crit Threshold: #crit_threshold#]
       ][?hit_threshold|[s=4.0|Hit Threshold: #hit_threshold#]
       ][?graze_threshold|[s=4.0|Graze Threshold: #graze_threshold#]
+      ][?crit_multiplier|[s=4.0|Crit Multiplier: #crit_multiplier#]
+      ][?graze_multiplier|[s=4.0|Graze Multiplier: #graze_multiplier#]
       ][?price;s=3.5|
       Price: [c=f00|#price#] Gold
       ][!price;?value;s=3.5|

@@ -11,11 +11,13 @@ equippable:
   bonuses: {}
   attack:
     damage:
-      min: 25
-      max: 35
+      min: 15
+      max: 22
       kind: Slashing
     kind: # Melee
       reach: 1.0
+    bonuses:
+      crit_multiplier: 0.5
 image:
   HeldMain:
     creatures/battleaxe

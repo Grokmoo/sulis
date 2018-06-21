@@ -12,11 +12,12 @@ equippable:
   bonuses: {}
   attack:
     damage:
-      min: 15
-      max: 25
+      min: 10
+      max: 15
       kind: Crushing
     kind: # Melee
       reach: 0.5
+    bonuses: {}
 image:
   HeldMain:
     creatures/club

@@ -18,7 +18,7 @@ use std::rc::Rc;
 
 use sulis_core::image::Image;
 use sulis_core::resource::ResourceSet;
-use bonus_list::{AttackBuilder, AttackKindBuilder};
+use bonus_list::{AttackBuilder, AttackKindBuilder, AttackBonusList};
 use {Armor, Damage, DamageKind, DamageList, StatList};
 
 use AttackKind::*;
@@ -27,6 +27,7 @@ use AttackKind::*;
 pub struct Attack {
     pub damage: DamageList,
     pub kind: AttackKind,
+    pub bonuses: AttackBonusList,
 }
 
 impl Attack {
@@ -43,6 +44,7 @@ impl Attack {
         Attack {
             damage: damage_list,
             kind: attack_kind,
+            bonuses: AttackBonusList::default(),
         }
     }
 
@@ -66,6 +68,7 @@ impl Attack {
         Attack {
             damage,
             kind,
+            bonuses: builder.bonuses.clone(),
         }
     }
 
@@ -96,6 +99,7 @@ impl Attack {
         Attack {
             damage: self.damage.mult(multiplier),
             kind: self.kind.clone(),
+            bonuses: self.bonuses.clone(),
         }
     }
 

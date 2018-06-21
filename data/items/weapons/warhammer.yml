@@ -11,13 +11,13 @@ equippable:
   bonuses: {}
   attack:
     damage:
-      min: 18
-      max: 25
+      min: 15
+      max: 22
+      ap: 3
       kind: Crushing
     kind: # Melee
       reach: 1.0
-    bonuses:
-      crit_multiplier: -0.25
+    bonuses: {}
 image:
   HeldMain:
     creatures/warhammer

@@ -25,6 +25,7 @@ pub struct DamageList {
     damage: Vec<Damage>,
     min: u32,
     max: u32,
+    ap: u32,
 }
 
 impl DamageList {
@@ -33,6 +34,7 @@ impl DamageList {
             damage: Vec::new(),
             min: 0,
             max: 0,
+            ap: 0,
         }
     }
 
@@ -44,11 +46,13 @@ impl DamageList {
 
         let min = damage.min;
         let max = damage.max;
+        let ap = damage.ap;
 
         DamageList {
             damage: vec![damage],
             min,
             max,
+            ap,
         }
     }
 
@@ -61,6 +65,7 @@ impl DamageList {
         let mut damage_list = Vec::new();
         let mut min = base_damage.min;
         let mut max = base_damage.max;
+        let mut ap = base_damage.ap;
         damage_list.push(base_damage);
 
         let mut bonus_damage = bonus_damage.clone();
@@ -70,6 +75,7 @@ impl DamageList {
         for damage in bonus_damage {
             min += damage.min;
             max += damage.max;
+            ap += damage.ap;
 
             if damage.kind.is_none() || damage.kind == damage_list[0].kind {
                 damage_list[0].add(damage);
@@ -106,6 +112,7 @@ impl DamageList {
             damage: damage_list,
             min,
             max,
+            ap,
         }
     }
 
@@ -115,7 +122,7 @@ impl DamageList {
     /// the base damage kind of this damage is then subtracted from the damage.  The
     /// resulting vector may be an empty vector to indicate no damage, or a vector of
     /// one or more kinds each associated with a positive damage amount.  The damage
-    /// amount will never be zero.
+    /// amount for each entry will never be zero.
     pub fn roll(&self, armor: &Armor, multiplier: f32) -> Vec<(DamageKind, u32)> {
         if self.damage.is_empty() { return Vec::new(); }
 
@@ -123,6 +130,13 @@ impl DamageList {
 
         debug!("Computing damage amount from {} to {} vs {} armor", self.min,
                self.max, armor_amount);
+
+        let armor_amount = if self.ap > armor_amount {
+            0
+        } else {
+            armor_amount - self.ap
+        };
+        trace!("Armor adjusted by AP: {}", armor_amount);
 
         let mut output = Vec::new();
         let mut armor_left = armor_amount;
@@ -142,6 +156,8 @@ impl DamageList {
         output
     }
 
+    pub fn ap(&self) -> u32 { self.ap }
+
     pub fn min(&self) -> u32 { self.min }
 
     pub fn max(&self) -> u32 { self.max }
@@ -150,10 +166,12 @@ impl DamageList {
         let mut damage_vec = Vec::new();
         let mut min = 0;
         let mut max = 0;
+        let mut ap = 0;
         for damage in self.damage.iter() {
             let new_damage = damage.clone().mult_f32(multiplier);
             min += new_damage.min;
             max += new_damage.max;
+            ap += new_damage.ap;
             damage_vec.push(new_damage);
         }
 
@@ -161,6 +179,7 @@ impl DamageList {
             damage: damage_vec,
             min,
             max,
+            ap,
         }
     }
 }
@@ -250,6 +269,9 @@ impl Display for DamageKind {
 pub struct Damage {
     pub min: u32,
     pub max: u32,
+
+    #[serde(default)]
+    pub ap: u32,
     pub kind: Option<DamageKind>,
 }
 
@@ -257,12 +279,14 @@ impl Damage {
     pub fn add(&mut self, other: Damage) {
         self.min += other.min;
         self.max += other.max;
+        self.ap += other.ap;
     }
 
     pub fn mult_f32(&mut self, val: f32) -> Damage {
         Damage {
             min: (self.min as f32 * val) as u32,
             max: (self.max as f32 * val) as u32,
+            ap: (self.ap as f32 * val) as u32,
             kind: self.kind,
         }
     }
@@ -271,6 +295,7 @@ impl Damage {
         Damage {
             min: self.min * times,
             max: self.max * times,
+            ap: self.ap * times,
             kind: self.kind,
         }
     }
@@ -289,6 +314,7 @@ impl Default for Damage {
         Damage {
             min: 0,
             max: 0,
+            ap: 0,
             kind: None,
         }
     }

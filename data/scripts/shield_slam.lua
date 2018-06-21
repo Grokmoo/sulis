@@ -19,7 +19,7 @@ function on_target_select(parent, ability, targets)
   cb:set_after_attack_fn("create_stun_effect")
   
   ability:activate(parent)
-  parent:anim_special_attack(target, "Fortitude", 0, 0, "Raw", cb)
+  parent:anim_special_attack(target, "Fortitude", 0, 0, 0, "Raw", cb)
 end
 
 function create_stun_effect(parent, ability, targets, hit)

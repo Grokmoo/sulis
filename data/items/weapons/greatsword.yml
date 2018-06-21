@@ -10,11 +10,12 @@ equippable:
   slot: HeldMain
   blocks_slot: HeldOff
   bonuses:
-    defense: 5
+    defense: 7
   attack:
     damage:
       min: 22
       max: 30
+      ap: 3
       kind: Slashing
     kind: # Melee
       reach: 2.0

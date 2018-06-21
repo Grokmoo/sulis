@@ -19,7 +19,7 @@ equippable:
       range: 30.0
       projectile: creatures/projectile_bow
     bonuses:
-      crit_multiplier: 0.25
+      crit_multiplier: 0.5
 image:
   HeldOff:
     creatures/longbow

@@ -441,6 +441,9 @@ pub fn unequip_item_cb(entity: &Rc<RefCell<EntityState>>, slot: Slot) -> Callbac
 pub fn add_attack_text_args(attack: &AttackBuilder, widget_state: &mut WidgetState) {
     widget_state.add_text_arg("min_damage", &attack.damage.min.to_string());
     widget_state.add_text_arg("max_damage", &attack.damage.max.to_string());
+    if attack.damage.ap > 0 {
+        widget_state.add_text_arg("armor_piercing", &attack.damage.ap.to_string());
+    }
     add_if_present(widget_state, "damage_kind", attack.damage.kind);
 
     match attack.kind {

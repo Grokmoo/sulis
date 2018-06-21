@@ -11,13 +11,14 @@ equippable:
   bonuses: {}
   attack:
     damage:
-      min: 18
-      max: 25
+      min: 15
+      max: 22
+      ap: 5
       kind: Crushing
     kind: # Melee
       reach: 1.0
     bonuses:
-      crit_multiplier: 0.5
+      crit_multiplier: 0.25
       accuracy: -5
 image:
   HeldMain:

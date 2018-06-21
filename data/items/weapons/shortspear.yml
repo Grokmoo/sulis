@@ -13,6 +13,7 @@ equippable:
     damage:
       min: 12
       max: 18
+      ap: 2
       kind: Piercing
     kind: # Melee
       reach: 2.0

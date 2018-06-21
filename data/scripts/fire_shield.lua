@@ -26,5 +26,5 @@ function after_defense(parent, ability, targets)
     return
   end
 
-  parent:special_attack(target, "Reflex", 4, 8, "Fire")
+  parent:special_attack(target, "Reflex", 4, 8, 0, "Fire")
 end

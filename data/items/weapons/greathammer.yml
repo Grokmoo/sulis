@@ -12,8 +12,9 @@ equippable:
   bonuses: {}
   attack:
     damage:
-      min: 25
-      max: 35
+      min: 22
+      max: 30
+      ap: 7
       kind: Crushing
     kind: # Melee
       reach: 1.0

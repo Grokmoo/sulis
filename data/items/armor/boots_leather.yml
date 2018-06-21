@@ -1,8 +1,5 @@
 id: boots_leather
 name: Leather Boots
-kind:
-  Armor:
-    kind: Light
 icon: inventory/boots_leather
 weight: 100
 value: 100

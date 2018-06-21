@@ -182,8 +182,8 @@ impl UserData for ScriptEntity {
         });
 
         methods.add_method("anim_special_attack", |_, entity,
-                           (target, attack_kind, min_damage, max_damage, damage_kind, cb):
-                           (ScriptEntity, String, u32, u32, String, Option<CallbackData>)| {
+                           (target, attack_kind, min_damage, max_damage, ap, damage_kind, cb):
+                           (ScriptEntity, String, u32, u32, u32, String, Option<CallbackData>)| {
             entity.check_not_equal(&target)?;
             let parent = entity.try_unwrap()?;
             let target = target.try_unwrap()?;
@@ -192,7 +192,8 @@ impl UserData for ScriptEntity {
 
             let time = CONFIG.display.animation_base_time_millis * 5;
             let mut anim = MeleeAttackAnimation::new(&parent, &target, time, Box::new(move |att, def| {
-                let attack = Attack::special(min_damage, max_damage, damage_kind, attack_kind.clone());
+                let attack = Attack::special(min_damage, max_damage, ap,
+                                             damage_kind, attack_kind.clone());
 
                 ActorState::attack(att, def, &attack)
             }));
@@ -205,8 +206,8 @@ impl UserData for ScriptEntity {
         });
 
         methods.add_method("special_attack", |_, entity,
-                           (target, attack_kind, min_damage, max_damage, damage_kind):
-                           (ScriptEntity, String, Option<u32>, Option<u32>, Option<String>)| {
+                           (target, attack_kind, min_damage, max_damage, ap, damage_kind):
+                           (ScriptEntity, String, Option<u32>, Option<u32>, Option<u32>, Option<String>)| {
             let target = target.try_unwrap()?;
             let parent = entity.try_unwrap()?;
 
@@ -218,8 +219,9 @@ impl UserData for ScriptEntity {
 
             let min_damage = min_damage.unwrap_or(0);
             let max_damage = max_damage.unwrap_or(0);
+            let ap = ap.unwrap_or(0);
 
-            let attack = Attack::special(min_damage, max_damage, damage_kind, attack_kind);
+            let attack = Attack::special(min_damage, max_damage, ap, damage_kind, attack_kind);
 
             let (hit_kind, text, color) = ActorState::attack(&parent, &target, &attack);
 
@@ -230,12 +232,13 @@ impl UserData for ScriptEntity {
             Ok(hit_kind)
         });
 
-        methods.add_method("take_damage", |_, entity, (min_damage, max_damage, damage_kind):
-                           (u32, u32, String)| {
+        methods.add_method("take_damage", |_, entity, (min_damage, max_damage, damage_kind, ap):
+                           (u32, u32, String, Option<u32>)| {
             let parent = entity.try_unwrap()?;
             let damage_kind = DamageKind::from_str(&damage_kind);
 
-            let attack = Attack::special(min_damage, max_damage, damage_kind, AttackKind::Fortitude);
+            let attack = Attack::special(min_damage, max_damage,
+                                         ap.unwrap_or(0), damage_kind, AttackKind::Fortitude);
             let damage = attack.roll_damage(&parent.borrow().actor.stats.armor, 1.0);
 
             let (text, color) = if !damage.is_empty() {

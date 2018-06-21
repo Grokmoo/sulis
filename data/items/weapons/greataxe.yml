@@ -14,6 +14,7 @@ equippable:
     damage:
       min: 22
       max: 30
+      ap: 5
       kind: Slashing
     kind: # Melee
       reach: 1.5

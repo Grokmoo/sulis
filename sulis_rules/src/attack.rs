@@ -31,11 +31,12 @@ pub struct Attack {
 }
 
 impl Attack {
-    pub fn special(min_damage: u32, max_damage: u32,
+    pub fn special(min_damage: u32, max_damage: u32, ap: u32,
                    damage_kind: DamageKind, attack_kind: AttackKind) -> Attack {
         let damage = Damage {
             min: min_damage,
             max: max_damage,
+            ap: ap,
             kind: Some(damage_kind),
         };
 

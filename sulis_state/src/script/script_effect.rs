@@ -57,13 +57,13 @@ impl UserData for ScriptEffect {
             apply(effect, pgen, None)
         });
         methods.add_method_mut("add_num_bonus", &add_num_bonus);
-        methods.add_method_mut("add_damage", |_, effect, (min, max): (u32, u32)| {
-            effect.bonuses.bonus_damage = Some(Damage { min, max, kind: None });
+        methods.add_method_mut("add_damage", |_, effect, (min, max, ap): (u32, u32, Option<u32>)| {
+            effect.bonuses.bonus_damage = Some(Damage { min, max, ap: ap.unwrap_or(0), kind: None });
             Ok(())
         });
-        methods.add_method_mut("add_damage_of_kind", |_, effect, (min, max, kind): (u32, u32, String)| {
+        methods.add_method_mut("add_damage_of_kind", |_, effect, (min, max, kind, ap): (u32, u32, String, Option<u32>)| {
             let kind = DamageKind::from_str(&kind);
-            effect.bonuses.bonus_damage = Some(Damage { min, max, kind: Some(kind) });
+            effect.bonuses.bonus_damage = Some(Damage { min, max, ap: ap.unwrap_or(0), kind: Some(kind) });
             Ok(())
         });
         methods.add_method_mut("add_armor_of_kind", |_, effect, (value, kind): (u32, String)| {

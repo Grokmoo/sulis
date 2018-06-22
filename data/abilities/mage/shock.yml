@@ -5,6 +5,6 @@ description: |
   A powerful jolt of electricity zaps the target creature.
 active:
   script: "shock"
-  ap: 20
+  ap: 2000
   duration:
     Instant

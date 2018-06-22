@@ -5,7 +5,7 @@ description: |
   Streams of fire extend from your fingertips, damaging all targets in a cone up to 10 tiles away.
 active:
   script: "flaming_fingers"
-  ap: 20
+  ap: 2000
   duration:
     Instant
 prereqs:

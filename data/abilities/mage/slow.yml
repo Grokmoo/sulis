@@ -5,6 +5,6 @@ description: |
   Your target must succeed at a Mental Resistance check or become slowed for 3 rounds, losing action points each turn.
 active:
   script: "slow"
-  ap: 20
+  ap: 2000
   duration:
     Rounds: 3

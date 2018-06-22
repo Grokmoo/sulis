@@ -5,6 +5,6 @@ description: |
   A large chunk of stone erupts from the ground, damaging a single target.
 active:
   script: "crush"
-  ap: 20
+  ap: 2000
   duration:
     Instant

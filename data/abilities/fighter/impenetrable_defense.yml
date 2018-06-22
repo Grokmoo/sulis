@@ -6,7 +6,7 @@ description: |
   You gain a bonus of +25 to your Defense, and +10 to Reflex, Fortitude, and Will for 2 turns.
 active:
   script: "impenetrable_defense"
-  ap: 40
+  ap: 4000
   duration:
     Rounds: 2
 prereqs:

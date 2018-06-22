@@ -23,6 +23,7 @@ groups:
       chameleon: [4, 1]
       defensive_fighting: [5, 1]
       improved_shield_slam: [6, 1]
+      devastating_blows: [7, 1]
       
       tough_skin: [0, 2]
       elemental_defense: [1, 2]

@@ -5,6 +5,6 @@ description: |
   You are surrounded by a ring of air, providing resistance to electrical and sonic based attacks and a 50% chance to deflect ranged projectiles.
 active:
   script: "air_shield"
-  ap: 20
+  ap: 2000
   duration:
     Rounds: 3

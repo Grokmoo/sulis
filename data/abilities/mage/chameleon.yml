@@ -5,6 +5,6 @@ description: |
   You gain 50% concealment, causing half of attacks against you to miss, regardless of your opponent's attack rolls.
 active:
   script: "chameleon"
-  ap: 20
+  ap: 2000
   duration:
     Rounds: 3

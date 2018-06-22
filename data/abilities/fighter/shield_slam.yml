@@ -7,6 +7,6 @@ description: |
   Targets will only be pushed back if it is possible based on the terrain.  If a creature has its back to a wall, it will not be pushed back at all.
 active:
   script: "shield_slam"
-  ap: 20
+  ap: 2000
   duration:
     Instant

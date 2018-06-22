@@ -5,7 +5,7 @@ description: |
   You unleash a hail of attacks in all directions with your melee weapon, making one standard attack against each opponent within striking distance.
 active:
   script: "whirlwind_attack"
-  ap: 30
+  ap: 3000
   duration:
     Instant
 prereqs:

@@ -5,7 +5,7 @@ description: |
   You launch an explosive bolt of elemental fire at a visible location of your choice.  Upon reaching its destination, it explodes dealing damage to all targets within a 5 tile radius.
 active:
   script: "fireball"
-  ap: 30
+  ap: 3000
   duration:
     Instant
 prereqs:

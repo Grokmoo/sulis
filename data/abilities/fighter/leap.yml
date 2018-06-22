@@ -5,7 +5,7 @@ description: |
   You make an incredible leap to a nearby location, jumping over obstacles and enemies in your path.
 active:
   script: "leap"
-  ap: 10
+  ap: 1000
   duration:
     Instant
 

@@ -5,6 +5,6 @@ description: |
   You are surrounded by a ring of fire, providing resistance to fire based attacks and damaging anyone who gets too close to you.
 active:
   script: "fire_shield"
-  ap: 20
+  ap: 2000
   duration:
     Rounds: 3

@@ -1,0 +1,7 @@
+id: devastating_blows
+name: "Devastating Blows"
+icon: abilities/devastating_blows
+description: |
+  Your powerful blows ability is significantly improved, granting you even more damaging attacks, armor piercing, as well as improved critical hits.
+prereqs:
+  abilities: [ powerful_blows ]

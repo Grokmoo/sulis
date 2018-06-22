@@ -5,6 +5,6 @@ description: |
   You channel a burst of healing energy to one nearby ally, restoring their lost hit points.
 active:
   script: "heal"
-  ap: 20
+  ap: 2000
   duration:
     Rounds: 2

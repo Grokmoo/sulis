@@ -22,7 +22,9 @@ abilities:
     connect: [ Up, Down ]
   - id: powerful_blows
     position: [1, 3.5]
-    connect: [ Down ]
+    connect: [ Straight2x, Down ]
+  - id: devastating_blows
+    position: [3, 3.5]
   - id: stunning_blow
     position: [1, 4.5]
     connect: [ Up ]

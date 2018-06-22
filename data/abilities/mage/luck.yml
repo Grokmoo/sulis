@@ -5,6 +5,6 @@ description: |
   Calling upon a wellspring of positive energy, you bless all friendly creatures around you with improved accuracy and defense.
 active:
   script: "luck"
-  ap: 20
+  ap: 2000
   duration:
     Rounds: 4

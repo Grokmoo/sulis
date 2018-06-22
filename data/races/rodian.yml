@@ -3,6 +3,7 @@ name: Rodian
 description: |
   Distrusted by most due to their appearance and reputation for thievery, Rodians nonetheless maintain a vast, loosely connected underground empire stretching across the known world and beyond.  Rodians are a common sight in the large cities of other races.  They make excellent Rogues.
 size: 2by2
+movement_rate: 1.0
 base_stats:
   attributes:
     Strength: -2

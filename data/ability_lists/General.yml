@@ -16,3 +16,31 @@ abilities:
     connect: [ Straight ]
   - id: elemental_defense
     position: [1, 2]
+
+  - id: armor_proficiency_light
+    position: [0, 3]
+    connect: [ Straight ]
+  - id: armor_proficiency_medium
+    position: [1, 3]
+    connect: [ Straight ]
+  - id: armor_proficiency_heavy
+    position: [2, 3]
+
+  - id: weapon_proficiency_simple
+    position: [0, 5]
+    connect: [ LongUp, LongDown, Straight ]
+  - id: weapon_proficiency_mace
+    position: [1, 4]
+  - id: weapon_proficiency_axe
+    position: [1, 5]
+  - id: weapon_proficiency_small_sword
+    position: [1, 6]
+    connect: [ Straight ]
+  - id: weapon_proficiency_large_sword
+    position: [2, 6]
+  - id: weapon_proficiency_spear
+    position: [0, 7]
+  - id: weapon_proficiency_bow
+    position: [1, 7]
+  - id: weapon_proficiency_crossbow
+    position: [2, 7]

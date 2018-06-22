@@ -10,9 +10,7 @@ equippable:
   slot: Head
   bonuses:
     base_armor: 1
-    armor_kinds:
-      Acid: 2
-      Electrical: 2
+    movement_rate: -0.02
 image:
   Head:
     creatures/helm_leather

@@ -12,6 +12,8 @@ equippable:
     base_armor: 3
     armor_kinds:
       Slashing: 4
+      Electrical: 2
+    movement_rate: -0.02
 image:
   Hands:
     creatures/gloves_plate

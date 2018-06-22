@@ -6,3 +6,5 @@ description: |
 bonuses:
   armor_proficiencies:
     - Heavy
+prereqs:
+  abilities: [ armor_proficiency_medium ]

@@ -10,6 +10,10 @@ equippable:
   slot: Torso
   bonuses:
     base_armor: 5
+    armor_kinds:
+      Slashing: 6
+      Crushing: 4
+    movement_rate: -0.09
 image:
   Torso:
     creatures/torso_mail

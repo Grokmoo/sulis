@@ -9,6 +9,7 @@ equippable:
   bonuses:
     defense: 15
     accuracy: -5
+    movement_rate: -0.10
 image:
   HeldOff:
     creatures/shield_large

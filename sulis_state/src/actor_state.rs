@@ -531,7 +531,7 @@ impl ActorState {
 
     pub fn get_move_ap_cost(&self, squares: u32) -> u32 {
         let rules = Module::rules();
-        rules.movement_ap * squares
+        ((rules.movement_ap as f32) / self.stats.movement_rate) as u32 * squares
     }
 
     pub fn set_overflow_ap(&mut self, ap: i32) {
@@ -728,6 +728,7 @@ impl ActorState {
         self.stats.graze_threshold += rules.graze_percentile as i32;
         self.stats.graze_multiplier += rules.graze_damage_multiplier;
         self.stats.crit_multiplier += rules.crit_damage_multiplier;
+        self.stats.movement_rate += self.actor.race.movement_rate;
         self.has_level_up = rules.get_xp_for_next_level(self.actor.total_level) <= self.xp;
 
         self.listeners.notify(&self);

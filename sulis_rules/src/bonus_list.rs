@@ -69,6 +69,7 @@ pub struct BonusList {
     pub graze_threshold: Option<i32>,
     pub graze_multiplier: Option<f32>,
     pub crit_multiplier: Option<f32>,
+    pub movement_rate: Option<f32>,
 }
 
 impl Default for BonusList {
@@ -96,6 +97,7 @@ impl Default for BonusList {
             graze_threshold: None,
             graze_multiplier: None,
             crit_multiplier: None,
+            movement_rate: None,
         }
     }
 }

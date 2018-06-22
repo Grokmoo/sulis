@@ -6,3 +6,5 @@ description: |
 bonuses:
   armor_proficiencies:
     - Medium
+prereqs:
+  abilities: [ armor_proficiency_light ]

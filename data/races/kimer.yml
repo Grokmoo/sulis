@@ -3,6 +3,7 @@ name: Kimer
 description: |
   An ancient and proud people, their massive cities are cloistered away far from prying eyes in the ocean depths.  Occasionally, however, some wander-lusted Kimer make their way into the realms of the other races.  They are well suited to be magic users or warriors.
 size: 2by2
+movement_rate: 1.0
 base_stats:
   attributes:
     Endurance: -1

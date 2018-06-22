@@ -11,8 +11,9 @@ equippable:
   bonuses:
     base_armor: 2
     armor_kinds:
-      Acid: 3
-      Electrical: 3
+      Slashing: 3
+      Acid: 2
+    movement_rate: -0.03
 image:
   Legs:
     creatures/legs_leather

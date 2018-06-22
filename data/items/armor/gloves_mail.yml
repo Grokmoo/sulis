@@ -10,6 +10,7 @@ equippable:
   slot: Hands
   bonuses:
     base_armor: 2
+    movement_rate: -0.01
 image:
   Hands:
     creatures/gloves_mail

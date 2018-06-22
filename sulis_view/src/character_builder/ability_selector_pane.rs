@@ -141,7 +141,7 @@ impl WidgetKind for AbilitiesPane {
                     }, &Connect::Straight => {
                         &self.connect_straight_image
                     }, &Connect::LongUp => {
-                        y += grid / 2.0;
+                        y -= grid / 2.0;
                         x += grid / 2.0 - self.grid_border as f32 * 3.0;
                         &self.connect_up_image
                     }, &Connect::LongDown => {

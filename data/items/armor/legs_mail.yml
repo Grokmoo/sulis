@@ -10,6 +10,10 @@ equippable:
   slot: Legs
   bonuses:
     base_armor: 4
+    armor_kinds:
+      Slashing: 5
+      Crushing: 3
+    movement_rate: -0.06
 image:
   Legs:
     creatures/legs_mail

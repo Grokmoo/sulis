@@ -8,6 +8,7 @@ equippable:
   slot: HeldOff
   bonuses:
     defense: 10
+    movement_rate: -0.05
 image:
   HeldOff:
     creatures/shield_small

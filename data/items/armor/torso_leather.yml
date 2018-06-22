@@ -11,8 +11,9 @@ equippable:
   bonuses:
     base_armor: 3
     armor_kinds:
-      Acid: 5
-      Electrical: 5
+      Slashing: 4
+      Acid: 2
+    movement_rate: -0.05
 image:
   Torso:
     creatures/torso_leather

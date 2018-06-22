@@ -1,11 +1,11 @@
 ---
-display_ap: 10
-base_ap: 40
-max_ap: 80
-max_overflow_ap: 20
-min_overflow_ap: -40
-movement_ap: 1
-attack_ap: 20
+display_ap: 1000
+base_ap: 4000
+max_ap: 8000
+max_overflow_ap: 2000
+min_overflow_ap: -4000
+movement_ap: 100
+attack_ap: 2000
 base_initiative: 10
 
 graze_percentile: 20

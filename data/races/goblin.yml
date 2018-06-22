@@ -2,6 +2,7 @@ id: goblin
 name: Goblin
 description: "Monster"
 size: 2by2
+movement_rate: 0.85
 base_stats:
   attributes:
     Strength: -3

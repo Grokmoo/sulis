@@ -179,14 +179,16 @@ impl MarkupRenderer {
                         cur_markup = Markup::from_string(&markup_buf, &markup_stack.last().unwrap(),
                             widget_state);
                         markup_buf.clear();
-                        if let Some(markup_x) = cur_markup.pos_x {
-                            x = pos_x + markup_x;
-                        }
-                        if let Some(markup_y) = cur_markup.pos_y {
-                            y = pos_y + markup_y;
-                        }
-                        if let Some(ref image) = cur_markup.image {
-                            self.draw_sprite(&image, &cur_markup, x, y);
+                        if !cur_markup.ignore {
+                            if let Some(markup_x) = cur_markup.pos_x {
+                                x = pos_x + markup_x;
+                            }
+                            if let Some(markup_y) = cur_markup.pos_y {
+                                y = pos_y + markup_y;
+                            }
+                            if let Some(ref image) = cur_markup.image {
+                                self.draw_sprite(&image, &cur_markup, x, y);
+                            }
                         }
                     }, ']' => {
                         let (x1, y1) = self.draw_current(&mut word_buf, &cur_markup,

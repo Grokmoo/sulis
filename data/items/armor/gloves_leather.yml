@@ -10,9 +10,6 @@ equippable:
   slot: Hands
   bonuses:
     base_armor: 1
-    armor_kinds:
-      Acid: 2
-      Electrical: 2
 image:
   Hands:
     creatures/gloves_leather

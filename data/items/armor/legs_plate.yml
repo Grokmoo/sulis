@@ -11,7 +11,10 @@ equippable:
   bonuses:
     base_armor: 5
     armor_kinds:
-      Slashing: 6
+      Slashing: 7
+      Piercing: 6
+      Electrical: 3
+    movement_rate: -0.08
 image:
   Legs:
     creatures/legs_plate

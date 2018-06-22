@@ -12,6 +12,9 @@ equippable:
     base_armor: 7
     armor_kinds:
       Slashing: 9
+      Piercing: 8
+      Electrical: 4
+    movement_rate: -0.14
 image:
   Torso:
     creatures/torso_plate

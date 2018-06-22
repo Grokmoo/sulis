@@ -16,13 +16,13 @@ starting_abilities:
   - weapon_proficiency_crossbow
 ability_choices:
   2: [ mage ]
-  3: [ mage ]
+  3: [ mage, general ]
   4: [ mage ]
   5: [ mage ]
-  6: [ mage ]
+  6: [ mage, general ]
   7: [ mage ]
   8: [ mage ]
-  9: [ mage ]
+  9: [ mage, general ]
   10: [ mage ]
 kits:
   - name: Mage

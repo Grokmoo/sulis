@@ -18,6 +18,12 @@ function on_target_select(parent, ability, targets)
   cb:add_target(target)
   cb:set_after_attack_fn("create_stun_effect")
   
+  if parent:has_ability("improved_shield_slam") then
+    effect = parent:create_effect(ability:name(), 0)
+    effect:add_num_bonus("accuracy", 25)
+    effect:apply()
+  end
+  
   ability:activate(parent)
   parent:anim_special_attack(target, "Fortitude", 0, 0, 0, "Raw", cb)
 end
@@ -27,6 +33,10 @@ function create_stun_effect(parent, ability, targets, hit)
   
   -- compute the max target pushback distance
   pushback_dist = 2 + parent:width() - target:width()
+  
+  if parent:has_ability("improved_shield_slam") then
+    pushback_dist = pushback_dist + 3
+  end
   
   if hit:is_miss() then
     return

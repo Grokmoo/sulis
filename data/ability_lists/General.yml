@@ -1,0 +1,18 @@
+id: general
+background: empty
+abilities:
+  - id: resilient_body
+    position: [0, 0]
+    connect: [ Straight]
+  - id: tough_skin
+    position: [1, 0]
+  - id: lightning_reflexes
+    position: [0, 1]
+    connect: [ Straight ]
+  - id: improved_initiative
+    position: [1, 1]
+  - id: tenacious_soul
+    position: [0, 2]
+    connect: [ Straight ]
+  - id: elemental_defense
+    position: [1, 2]

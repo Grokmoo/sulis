@@ -8,3 +8,5 @@ active:
   ap: 10
   duration:
     Rounds: 1
+prereqs:
+  abilities: [ defensive_fighting ]

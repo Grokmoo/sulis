@@ -28,7 +28,7 @@ use sulis_core::ui::color;
 use {ActorState, EntityState, GameState};
 use script::*;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct ScriptEntity {
     pub index: Option<usize>,
 }
@@ -290,6 +290,12 @@ impl UserData for ScriptEntity {
             Ok(entity.actor.actor.name.to_string())
         });
 
+        methods.add_method("has_ability", |_, entity, id: String| {
+            let entity = entity.try_unwrap()?;
+            let entity = entity.borrow();
+            Ok(entity.actor.actor.has_ability_with_id(&id))
+        });
+
         methods.add_method("has_active_mode", |_, entity, ()| {
             let entity = entity.try_unwrap()?;
             let entity = entity.borrow();
@@ -423,7 +429,7 @@ fn create_stats_table<'a>(lua: &'a Lua, parent: &ScriptEntity, _args: ()) -> Res
     Ok(stats)
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct ScriptEntitySet {
     pub parent: usize,
     pub point: Option<(i32, i32)>,
@@ -477,7 +483,9 @@ impl UserData for ScriptEntitySet {
         methods.add_method("is_empty", |_, set, ()| Ok(set.indices.is_empty()));
         methods.add_method("first", |_, set, ()| {
             for index in set.indices.iter() {
-                if let &Some(index) = index { return Ok(ScriptEntity::new(index)); }
+                if let &Some(index) = index {
+                    return Ok(ScriptEntity::new(index));
+                }
             }
 
             warn!("Attempted to get first element of EntitySet that has no valid entities");

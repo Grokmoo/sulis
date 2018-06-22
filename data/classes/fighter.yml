@@ -26,13 +26,13 @@ starting_abilities:
   - weapon_proficiency_simple
 ability_choices:
   2: [ fighter ]
-  3: [ fighter ]
+  3: [ fighter, general ]
   4: [ fighter ]
-  5: [ fighter ]
+  5: [ fighter, general ]
   6: [ fighter ]
-  7: [ fighter ]
+  7: [ fighter, general ]
   8: [ fighter ]
-  9: [ fighter ]
+  9: [ fighter, general ]
   10: [ fighter ]
 kits:
   - name: Brawler

@@ -9,3 +9,5 @@ active:
   ap: 40
   duration:
     Rounds: 2
+prereqs:
+  abilities: [ defensive_fighting ]

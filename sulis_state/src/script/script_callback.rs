@@ -56,21 +56,16 @@ pub trait ScriptCallback {
 pub struct CallbackData {
     parent: usize,
     ability_id: String,
-    targets: ScriptEntitySet,
+    targets: Option<ScriptEntitySet>,
     funcs: HashMap<FuncKind, String>,
 }
 
 impl CallbackData {
     pub fn new(parent: usize, ability_id: &str) -> CallbackData {
-        let targets = ScriptEntitySet {
-            parent,
-            point: None,
-            indices: Vec::new(),
-        };
         CallbackData {
             parent,
             ability_id: ability_id.to_string(),
-            targets,
+            targets: None,
             funcs: HashMap::new(),
         }
     }
@@ -86,6 +81,36 @@ impl CallbackData {
         self.funcs.insert(kind, name);
         Ok(())
     }
+
+    fn create_targets_if_missing(&mut self) {
+        if self.targets.is_some() { return; }
+
+        self.targets = Some(ScriptEntitySet {
+            parent: self.parent,
+            point: None,
+            indices: Vec::new(),
+        });
+    }
+
+    fn get_or_create_targets(&self) -> ScriptEntitySet {
+        if let Some(ref targets) = self.targets {
+            targets.clone()
+        } else {
+            ScriptEntitySet {
+                parent: self.parent,
+                point: None,
+                indices: Vec::new(),
+            }
+        }
+    }
+
+    fn get_targets(&self, targets: &ScriptEntitySet) -> ScriptEntitySet {
+        if let Some(ref targets) = self.targets {
+            targets.clone()
+        } else {
+            targets.clone()
+        }
+    }
 }
 
 impl ScriptCallback for CallbackData {
@@ -96,7 +121,8 @@ impl ScriptCallback for CallbackData {
         };
 
         let (parent, ability) = self.get_params();
-        GameState::execute_ability_script(&parent, &ability, targets.clone(), &func);
+        let targets = self.get_targets(targets);
+        GameState::execute_ability_script(&parent, &ability, targets, &func);
     }
 
     fn before_defense(&self, targets: &ScriptEntitySet) {
@@ -106,7 +132,8 @@ impl ScriptCallback for CallbackData {
         };
 
         let (parent, ability) = self.get_params();
-        GameState::execute_ability_script(&parent, &ability, targets.clone(), &func);
+        let targets = self.get_targets(targets);
+        GameState::execute_ability_script(&parent, &ability, targets, &func);
     }
 
     fn before_attack(&self, targets: &ScriptEntitySet) {
@@ -116,7 +143,8 @@ impl ScriptCallback for CallbackData {
         };
 
         let (parent, ability) = self.get_params();
-        GameState::execute_ability_script(&parent, &ability, targets.clone(), &func);
+        let targets = self.get_targets(targets);
+        GameState::execute_ability_script(&parent, &ability, targets, &func);
     }
 
     fn after_attack(&self, targets: &ScriptEntitySet, hit_kind: HitKind) {
@@ -126,7 +154,8 @@ impl ScriptCallback for CallbackData {
         };
 
         let (parent, ability) = self.get_params();
-        GameState::execute_ability_after_attack(&parent, &ability, targets.clone(), hit_kind, &func);
+        let targets = self.get_targets(targets);
+        GameState::execute_ability_after_attack(&parent, &ability, targets, hit_kind, &func);
     }
 
     fn on_anim_complete(&self) {
@@ -136,7 +165,8 @@ impl ScriptCallback for CallbackData {
         };
 
         let (parent, ability) = self.get_params();
-        GameState::execute_ability_script(&parent, &ability, self.targets.clone(), &func);
+        let targets = self.get_or_create_targets();
+        GameState::execute_ability_script(&parent, &ability, targets, &func);
     }
 
     fn on_anim_update(&self) {
@@ -146,7 +176,8 @@ impl ScriptCallback for CallbackData {
         };
 
         let (parent, ability) = self.get_params();
-        GameState::execute_ability_script(&parent, &ability, self.targets.clone(), &func);
+        let targets = self.get_or_create_targets();
+        GameState::execute_ability_script(&parent, &ability, targets, &func);
     }
 
     fn on_round_elapsed(&self) {
@@ -156,27 +187,37 @@ impl ScriptCallback for CallbackData {
         };
 
         let (parent, ability) = self.get_params();
-        GameState::execute_ability_script(&parent, &ability, self.targets.clone(), &func);
+        let targets = self.get_or_create_targets();
+        GameState::execute_ability_script(&parent, &ability, targets, &func);
     }
 }
 
 impl UserData for CallbackData {
     fn add_methods(methods: &mut UserDataMethods<Self>) {
         methods.add_method_mut("add_target", |_, cb, target: ScriptEntity| {
+            cb.create_targets_if_missing();
             let index = target.try_unwrap_index()?;
-            cb.targets.indices.push(Some(index));
+            if let Some(ref mut cb_targets) = cb.targets {
+                cb_targets.indices.push(Some(index));
+            }
             Ok(())
         });
 
         methods.add_method_mut("add_targets", |_, cb, targets: ScriptEntitySet| {
-            cb.targets.indices.append(&mut targets.indices.clone());
-            cb.targets.point = targets.point.clone();
+            cb.create_targets_if_missing();
+            if let Some(ref mut cb_targets) = cb.targets {
+                cb_targets.indices.append(&mut targets.indices.clone());
+                cb_targets.point = targets.point.clone();
+            }
             Ok(())
         });
 
         methods.add_method_mut("add_selected_point", |_, cb, p: HashMap<String, i32>| {
+            cb.create_targets_if_missing();
             let (x, y) = script_entity::unwrap_point(p)?;
-            cb.targets.point = Some((x, y));
+            if let Some(ref mut cb_targets) = cb.targets {
+                cb_targets.point = Some((x, y));
+            }
             Ok(())
         });
 

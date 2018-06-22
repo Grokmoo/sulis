@@ -1,0 +1,7 @@
+id: improved_shield_slam
+name: "Improved Shield Slam"
+icon: abilities/improved_shield_slam
+description: |
+  Your shield slam is upgraded - becoming more accurate and pushing targets back further.
+prereqs:
+  abilities: [ shield_slam ]

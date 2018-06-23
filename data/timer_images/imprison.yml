@@ -1,0 +1,8 @@
+id: imprison
+frame_time_millis: 100
+frames:
+  - particles/imprison1
+  - particles/imprison2
+  - particles/imprison3
+  - particles/imprison4
+  - particles/imprison5

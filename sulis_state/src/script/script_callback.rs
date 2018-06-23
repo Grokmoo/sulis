@@ -37,13 +37,13 @@ enum FuncKind {
 }
 
 pub trait ScriptCallback {
-    fn after_defense(&self, _targets: &ScriptEntitySet) { }
+    fn after_defense(&self, _targets: &ScriptEntitySet, _hit_kind: HitKind, _damage: u32) { }
 
     fn before_defense(&self, _targets: &ScriptEntitySet) { }
 
     fn before_attack(&self, _targets: &ScriptEntitySet) { }
 
-    fn after_attack(&self, _targets: &ScriptEntitySet, _hit_kind: HitKind) { }
+    fn after_attack(&self, _targets: &ScriptEntitySet, _hit_kind: HitKind, _damage: u32) { }
 
     fn on_anim_complete(&self) { }
 
@@ -114,7 +114,7 @@ impl CallbackData {
 }
 
 impl ScriptCallback for CallbackData {
-    fn after_defense(&self, targets: &ScriptEntitySet) {
+    fn after_defense(&self, targets: &ScriptEntitySet, hit_kind: HitKind, damage: u32) {
         let func = match self.funcs.get(&FuncKind::AfterDefense) {
             None => return,
             Some(ref func) => func.to_string(),
@@ -122,7 +122,8 @@ impl ScriptCallback for CallbackData {
 
         let (parent, ability) = self.get_params();
         let targets = self.get_targets(targets);
-        GameState::execute_ability_script(&parent, &ability, targets, &func);
+        GameState::execute_ability_with_attack_data(&parent, &ability, targets,
+                                                    hit_kind, damage, &func);
     }
 
     fn before_defense(&self, targets: &ScriptEntitySet) {
@@ -147,7 +148,7 @@ impl ScriptCallback for CallbackData {
         GameState::execute_ability_script(&parent, &ability, targets, &func);
     }
 
-    fn after_attack(&self, targets: &ScriptEntitySet, hit_kind: HitKind) {
+    fn after_attack(&self, targets: &ScriptEntitySet, hit_kind: HitKind, damage: u32) {
         let func = match self.funcs.get(&FuncKind::AfterAttack) {
             None => return,
             Some(ref func) => func.to_string(),
@@ -155,7 +156,8 @@ impl ScriptCallback for CallbackData {
 
         let (parent, ability) = self.get_params();
         let targets = self.get_targets(targets);
-        GameState::execute_ability_after_attack(&parent, &ability, targets, hit_kind, &func);
+        GameState::execute_ability_with_attack_data(&parent, &ability, targets,
+                                                    hit_kind, damage, &func);
     }
 
     fn on_anim_complete(&self) {
@@ -241,6 +243,7 @@ impl UserData for CallbackData {
 #[derive(Clone)]
 pub struct ScriptHitKind {
     pub kind: HitKind,
+    pub damage: u32,
 }
 
 impl UserData for ScriptHitKind {
@@ -249,5 +252,6 @@ impl UserData for ScriptHitKind {
         methods.add_method("is_graze", |_, hit, ()| Ok(hit.kind == HitKind::Graze));
         methods.add_method("is_hit", |_, hit, ()| Ok(hit.kind == HitKind::Hit));
         methods.add_method("is_crit", |_, hit, ()| Ok(hit.kind == HitKind::Crit));
+        methods.add_method("total_damage", |_, hit, ()| Ok(hit.damage));
     }
 }

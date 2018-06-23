@@ -70,6 +70,10 @@ pub struct BonusList {
     pub graze_multiplier: Option<f32>,
     pub crit_multiplier: Option<f32>,
     pub movement_rate: Option<f32>,
+    #[serde(default)]
+    pub move_disabled: bool,
+    #[serde(default)]
+    pub attack_disabled: bool,
 }
 
 impl Default for BonusList {
@@ -98,6 +102,8 @@ impl Default for BonusList {
             graze_multiplier: None,
             crit_multiplier: None,
             movement_rate: None,
+            move_disabled: false,
+            attack_disabled: false,
         }
     }
 }

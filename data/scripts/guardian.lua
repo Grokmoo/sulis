@@ -30,7 +30,6 @@ function on_target_select(parent, ability, targets)
     gen:set_moves_with_parent()
     gen:set_position(gen:param(-0.75), gen:param(-01.5))
     gen:set_particle_size_dist(gen:fixed_dist(1.5), gen:fixed_dist(1.5))
-    gen:set_color(gen:param(0.1), gen:param(0.6), gen:param(0.6))
     effect:apply(gen)
   end
 

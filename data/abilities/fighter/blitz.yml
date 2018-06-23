@@ -1,0 +1,13 @@
+id: blitz
+name: "Blitz"
+icon: abilities/blitz
+description: |
+  You attack a single target four times in rapid succession with your melee weapon.  Each attack after the first suffers a successively higher accuracy penalty.
+active:
+  script: "blitz"
+  ap: 4000
+  duration:
+    Instant
+prereqs:
+  abilities:
+    - stunning_blow

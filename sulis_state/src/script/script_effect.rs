@@ -63,6 +63,14 @@ impl UserData for ScriptEffect {
             effect.bonuses.bonus_damage = Some(Damage { min, max, ap: ap.unwrap_or(0), kind: None });
             Ok(())
         });
+        methods.add_method_mut("add_move_disabled", |_, effect, ()| {
+            effect.bonuses.move_disabled = true;
+            Ok(())
+        });
+        methods.add_method_mut("add_attack_disabled", |_, effect, ()| {
+            effect.bonuses.attack_disabled = true;
+            Ok(())
+        });
         methods.add_method_mut("add_damage_of_kind", |_, effect, (min, max, kind, ap): (u32, u32, String, Option<u32>)| {
             let kind = DamageKind::from_str(&kind);
             effect.bonuses.bonus_damage = Some(Damage { min, max, ap: ap.unwrap_or(0), kind: Some(kind) });

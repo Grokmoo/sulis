@@ -243,6 +243,8 @@ impl EntityState {
     /// Returns true if this entity has enough AP to move at least 1 square,
     /// false otherwise
     pub fn can_move(&self) -> bool {
+        if self.actor.stats.move_disabled { return false; }
+
         self.actor.ap() >= self.actor.get_move_ap_cost(1)
     }
 
@@ -263,6 +265,8 @@ impl EntityState {
     /// Returns true if this entity can attack the specified target with its
     /// current weapon, without moving
     pub fn can_attack(&self, target: &Rc<RefCell<EntityState>>, area_state: &AreaState) -> bool {
+        if self.actor.stats.attack_disabled { return false; }
+
         let dist = self.dist_to_entity(target);
 
         if !self.actor.can_weapon_attack(target, dist) { return false; }

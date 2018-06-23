@@ -121,16 +121,17 @@ impl Animation for RangedAttackAnimation {
 
                 let area_state = GameState::area_state();
 
-                let (hit_kind, text, color) = ActorState::weapon_attack(&self.attacker, &self.defender);
+                let (hit_kind, damage, text, color) =
+                    ActorState::weapon_attack(&self.attacker, &self.defender);
                 area_state.borrow_mut().add_feedback_text(text, &self.defender, color, 3.0);
                 self.has_attacked = true;
 
                 if let Some(ref cb) = self.callback.as_ref() {
-                    cb.after_attack(&cb_targets, hit_kind);
+                    cb.after_attack(&cb_targets, hit_kind, damage);
                 }
 
-                attacker_cbs.iter().for_each(|cb| cb.after_attack(&cb_targets, hit_kind));
-                defender_cbs.iter().for_each(|cb| cb.after_defense(&cb_targets));
+                attacker_cbs.iter().for_each(|cb| cb.after_attack(&cb_targets, hit_kind, damage));
+                defender_cbs.iter().for_each(|cb| cb.after_defense(&cb_targets, hit_kind, damage));
             }
             false
         } else {

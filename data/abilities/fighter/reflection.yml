@@ -1,0 +1,8 @@
+id: reflection
+name: "Reflection"
+icon: abilities/reflection
+description: |
+  Your defensive fighting stance is improved.  Attacks made against you from melee range reflect a portion of their damage back on the attacker.
+prereqs:
+  abilities:
+    - impenetrable_defense

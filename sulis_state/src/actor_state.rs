@@ -249,8 +249,8 @@ impl ActorState {
     }
 
     pub fn weapon_attack(parent: &Rc<RefCell<EntityState>>,
-                         target: &Rc<RefCell<EntityState>>) -> (HitKind, String, Color) {
-        if target.borrow_mut().actor.hp() <= 0 { return (HitKind::Miss, "Miss".to_string(), color::GRAY); }
+                         target: &Rc<RefCell<EntityState>>) -> (HitKind, u32, String, Color) {
+        if target.borrow_mut().actor.hp() <= 0 { return (HitKind::Miss, 0, "Miss".to_string(), color::GRAY); }
 
         info!("'{}' attacks '{}'", parent.borrow().actor.actor.name, target.borrow().actor.actor.name);
 
@@ -258,12 +258,13 @@ impl ActorState {
         let mut damage_str = String::new();
         let mut not_first = false;
         let mut hit_kind = HitKind::Miss;
+        let mut total_damage = 0;
 
         let attacks = parent.borrow().actor.stats.attacks.clone();
         for attack in attacks {
             if not_first { damage_str.push_str(", "); }
 
-            let (hit, attack_result, attack_color) = ActorState::attack_internal(parent, target, &attack);
+            let (hit, dmg, attack_result, attack_color) = ActorState::attack_internal(parent, target, &attack);
             if attack_color != color::GRAY {
                 color = attack_color;
             }
@@ -274,16 +275,18 @@ impl ActorState {
                 hit_kind = hit;
             }
 
+            total_damage += dmg;
+
             not_first = true;
         }
 
         ActorState::check_death(parent, target);
-        (hit_kind, damage_str, color)
+        (hit_kind, total_damage, damage_str, color)
     }
 
     pub fn attack(parent: &Rc<RefCell<EntityState>>, target: &Rc<RefCell<EntityState>>,
-                  attack: &Attack) -> (HitKind, String, Color) {
-        if target.borrow_mut().actor.hp() <= 0 { return (HitKind::Miss, "Miss".to_string(), color::GRAY); }
+                  attack: &Attack) -> (HitKind, u32, String, Color) {
+        if target.borrow_mut().actor.hp() <= 0 { return (HitKind::Miss, 0, "Miss".to_string(), color::GRAY); }
 
         info!("'{}' attacks '{}'", parent.borrow().actor.actor.name, target.borrow().actor.actor.name);
 
@@ -294,13 +297,13 @@ impl ActorState {
     }
 
     fn attack_internal(parent: &Rc<RefCell<EntityState>>, target: &Rc<RefCell<EntityState>>,
-                       attack: &Attack) -> (HitKind, String, Color) {
+                       attack: &Attack) -> (HitKind, u32, String, Color) {
         let rules = Module::rules();
         let accuracy = parent.borrow().actor.stats.accuracy;
 
         if !rules.concealment_roll(target.borrow().actor.stats.concealment) {
             debug!("Concealment miss");
-            return (HitKind::Miss, "Concealment".to_string(), color::GRAY);
+            return (HitKind::Miss, 0, "Concealment".to_string(), color::GRAY);
         }
 
         let defense = {
@@ -319,7 +322,7 @@ impl ActorState {
             let damage_multiplier = match hit_kind {
                 HitKind::Miss => {
                     debug!("Miss");
-                    return (HitKind::Miss, "Miss".to_string(), color::GRAY);
+                    return (HitKind::Miss, 0, "Miss".to_string(), color::GRAY);
                 },
                 HitKind::Graze =>
                     parent_stats.graze_multiplier + attack.bonuses.graze_multiplier.unwrap_or(0.0),
@@ -344,12 +347,12 @@ impl ActorState {
             }
 
             target.borrow_mut().remove_hp(total);
-            return (hit_kind, format!("{:?}: {}", hit_kind, total), color::RED);
+            return (hit_kind, total, format!("{:?}: {}", hit_kind, total), color::RED);
         } else if attack.damage.max() == 0 {
             // if attack cannot do any damage
-            return (hit_kind, format!("{:?}", hit_kind), color::RED);
+            return (hit_kind, 0, format!("{:?}", hit_kind), color::RED);
         } else {
-            return (hit_kind, format!("{:?}: {}", hit_kind, 0), color::GRAY);
+            return (hit_kind, 0, format!("{:?}: {}", hit_kind, 0), color::GRAY);
         }
     }
 

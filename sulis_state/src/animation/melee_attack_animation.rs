@@ -34,7 +34,8 @@ pub struct MeleeAttackAnimation {
     has_attacked: bool,
     callback: Option<Box<ScriptCallback>>,
 
-    attack_func: Box<Fn(&Rc<RefCell<EntityState>>, &Rc<RefCell<EntityState>>) -> (HitKind, String, Color)>,
+    attack_func: Box<Fn(&Rc<RefCell<EntityState>>, &Rc<RefCell<EntityState>>) ->
+        (HitKind, u32, String, Color)>,
 }
 
 impl MeleeAttackAnimation {
@@ -42,7 +43,7 @@ impl MeleeAttackAnimation {
                defender: &Rc<RefCell<EntityState>>,
                total_time_millis: u32,
                attack_func: Box<Fn(&Rc<RefCell<EntityState>>, &Rc<RefCell<EntityState>>) ->
-                  (HitKind, String, Color)>) -> MeleeAttackAnimation {
+                  (HitKind, u32, String, Color)>) -> MeleeAttackAnimation {
 
         let x = defender.borrow().location.x + defender.borrow().size.width / 2
             - attacker.borrow().location.x - attacker.borrow().size.width / 2;
@@ -91,17 +92,17 @@ impl animation::Animation for MeleeAttackAnimation {
 
             let area_state = GameState::area_state();
 
-            let (hit_kind, text, color) = (self.attack_func)(&self.attacker, &self.defender);
+            let (hit_kind, damage, text, color) = (self.attack_func)(&self.attacker, &self.defender);
 
             area_state.borrow_mut().add_feedback_text(text, &self.defender, color, 3.0);
             self.has_attacked = true;
 
             if let Some(ref cb) = self.callback.as_ref() {
-                cb.after_attack(&cb_targets, hit_kind);
+                cb.after_attack(&cb_targets, hit_kind, damage);
             }
 
-            attacker_cbs.iter().for_each(|cb| cb.after_attack(&cb_targets, hit_kind));
-            defender_cbs.iter().for_each(|cb| cb.after_defense(&cb_targets));
+            attacker_cbs.iter().for_each(|cb| cb.after_attack(&cb_targets, hit_kind, damage));
+            defender_cbs.iter().for_each(|cb| cb.after_defense(&cb_targets, hit_kind, damage));
         }
 
         let mut attacker = self.attacker.borrow_mut();

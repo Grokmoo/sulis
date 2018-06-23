@@ -156,12 +156,12 @@ impl UserData for ScriptEntity {
         methods.add_method("weapon_attack", |_, entity, target: ScriptEntity| {
             let target = target.try_unwrap()?;
             let parent = entity.try_unwrap()?;
-            let (hit_kind, text, color) = ActorState::weapon_attack(&parent, &target);
+            let (hit_kind, damage, text, color) = ActorState::weapon_attack(&parent, &target);
 
             let area_state = GameState::area_state();
             area_state.borrow_mut().add_feedback_text(text, &target, color, 3.0);
 
-            let hit_kind = ScriptHitKind { kind: hit_kind };
+            let hit_kind = ScriptHitKind { kind: hit_kind, damage };
             Ok(hit_kind)
         });
 
@@ -222,12 +222,12 @@ impl UserData for ScriptEntity {
 
             let attack = Attack::special(min_damage, max_damage, ap, damage_kind, attack_kind);
 
-            let (hit_kind, text, color) = ActorState::attack(&parent, &target, &attack);
+            let (hit_kind, damage, text, color) = ActorState::attack(&parent, &target, &attack);
 
             let area_state = GameState::area_state();
             area_state.borrow_mut().add_feedback_text(text, &target, color, 3.0);
 
-            let hit_kind = ScriptHitKind { kind: hit_kind };
+            let hit_kind = ScriptHitKind { kind: hit_kind, damage };
             Ok(hit_kind)
         });
 

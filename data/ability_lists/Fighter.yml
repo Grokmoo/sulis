@@ -6,6 +6,7 @@ abilities:
     connect: [Up, Down]
   - id: impenetrable_defense
     position: [1, 0]
+    connect: [Straight2x]
   - id: guardian
     position: [1, 1]
     connect: [Straight]
@@ -16,6 +17,8 @@ abilities:
     connect: [ Straight2x ]
   - id: improved_shield_slam
     position: [2, 2]
+  - id: reflection
+    position: [3, 0]
     
   - id: mighty_blow
     position: [0, 4]
@@ -27,11 +30,19 @@ abilities:
     position: [3, 3.5]
   - id: stunning_blow
     position: [1, 4.5]
-    connect: [ Up ]
+    connect: [ Up, Straight2x ]
   - id: whirlwind_attack
     position: [2, 4]
-  - id: charge_attack
-    position: [2, 5.5]
+  - id: blitz
+    position: [3, 4.5]
+
   - id: leap
-    position: [0, 5.5]
+    position: [5, 0]
     connect: [ Straight2x ]
+  - id: charge_attack
+    position: [7, 0]
+  - id: grapple
+    position: [6, 1]
+    connect: [ Straight ]
+  - id: improved_grapple
+    position: [7, 1]

@@ -133,3 +133,12 @@ groups:
       teleport4: [96, 0]
       teleport5: [128, 0]
       teleport6: [160, 0]
+  imprison:
+    size: [32, 31]
+    position: [222, 52]
+    areas:
+      imprison1: [0, 0]
+      imprison2: [32, 0]
+      imprison3: [64, 0]
+      imprison4: [96, 0]
+      imprison5: [128, 0]

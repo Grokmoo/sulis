@@ -48,6 +48,8 @@ pub struct StatList {
     pub graze_multiplier: f32,
     pub crit_multiplier: f32,
     pub movement_rate: f32,
+    pub move_disabled: bool,
+    pub attack_disabled: bool,
 }
 
 impl StatList {
@@ -77,6 +79,8 @@ impl StatList {
             graze_multiplier: 0.0,
             crit_multiplier: 0.0,
             movement_rate: 0.0,
+            move_disabled: false,
+            attack_disabled: false,
         }
     }
 
@@ -184,6 +188,9 @@ impl StatList {
         if let Some(graze_mult) = bonuses.graze_multiplier { self.graze_multiplier += graze_mult * times_f32 }
         if let Some(crit_mult) = bonuses.crit_multiplier { self.crit_multiplier += crit_mult * times_f32 }
         if let Some(rate) = bonuses.movement_rate { self.movement_rate += rate * times_f32; }
+
+        if bonuses.move_disabled { self.move_disabled = true; }
+        if bonuses.attack_disabled { self.attack_disabled = true; }
 
         if let Some(ref attrs) = bonuses.attributes {
             self.attributes.add_all(attrs);

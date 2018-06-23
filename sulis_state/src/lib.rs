@@ -408,10 +408,10 @@ impl GameState {
                      func, custom_target);
     }
 
-    pub fn execute_ability_after_attack(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>,
-                                        targets: ScriptEntitySet,
-                                        kind: HitKind, func: &str) {
-        let hit_kind = ScriptHitKind { kind };
+    pub fn execute_ability_with_attack_data(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>,
+                                        targets: ScriptEntitySet, kind: HitKind,
+                                        damage: u32, func: &str) {
+        let hit_kind = ScriptHitKind { kind, damage };
         let t = Some(("hit", hit_kind));
         exec_script!(ability_script: parent, ability, targets, t, func);
     }
@@ -861,6 +861,8 @@ impl GameState {
 
     pub fn can_move_towards_point(entity: &Rc<RefCell<EntityState>>, entities_to_ignore: Vec<usize>,
                                   x: f32, y: f32, dist: f32) -> bool {
+        if entity.borrow().actor.stats.move_disabled { return false; }
+
         // if entity cannot move even 1 square
         if entity.borrow().actor.ap() < entity.borrow().actor.get_move_ap_cost(1) {
             return false;

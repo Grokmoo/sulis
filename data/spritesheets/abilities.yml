@@ -1,6 +1,6 @@
 id: abilities
 src: "abilities.png"
-size: [ 512, 512 ]
+size: [ 1024, 2048 ]
 simple_image_gen_scale: 128
 grid_multiplier: 128
 groups:
@@ -21,7 +21,6 @@ groups:
       powerful_blows: [2, 1]
       shield_slam: [3, 1]
       chameleon: [4, 1]
-      defensive_fighting: [5, 1]
       improved_shield_slam: [6, 1]
       devastating_blows: [7, 1]
       
@@ -46,6 +45,7 @@ groups:
       charge_attack: [0, 4]
       
       whirlwind_attack: [0, 5]
+      blitz: [1, 5]
       
       flaming_fingers: [0, 6]
       fire_shield: [1, 6]
@@ -56,3 +56,8 @@ groups:
       connect_straight: [2, 7]
       connect_up: [3, 7]
       connect_down: [4, 7]
+      
+      grapple: [0, 8]
+      improved_grapple: [1, 8]
+      defensive_fighting: [2, 8]
+      reflection: [3, 8]

@@ -16,7 +16,7 @@
 
 use rlua::{Lua, UserData, UserDataMethods};
 
-use {GameState};
+use {AreaState, GameState};
 use animation::{Animation, EntityColorAnimation};
 use animation::particle_generator::{Param};
 use script::{CallbackData, Result, script_particle_generator};
@@ -68,16 +68,17 @@ impl UserData for ScriptColorAnimation {
 }
 
 fn activate(_lua: &Lua, data: &ScriptColorAnimation, _args: ()) -> Result<()> {
-    let anim = create_anim(data)?;
+    let area_state = GameState::area_state();
+    let anim = create_anim(data, &area_state.borrow())?;
 
     GameState::add_animation(Box::new(anim));
 
     Ok(())
 }
 
-pub fn create_anim(data: &ScriptColorAnimation) -> Result<EntityColorAnimation> {
-    let area_state = GameState::area_state();
-    let parent = area_state.borrow().get_entity(data.parent);
+pub fn create_anim(data: &ScriptColorAnimation,
+                   area_state: &AreaState) -> Result<EntityColorAnimation> {
+    let parent = area_state.get_entity(data.parent);
 
     let mut anim = EntityColorAnimation::new(parent, data.color.clone(), data.color_sec.clone(),
         data.duration_secs);

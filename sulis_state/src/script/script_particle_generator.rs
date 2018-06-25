@@ -18,7 +18,7 @@ use rlua::{self, Lua, UserData, UserDataMethods};
 
 use sulis_core::resource::ResourceSet;
 
-use {GameState};
+use {AreaState, GameState};
 use animation::{Animation, ParticleGenerator};
 use animation::particle_generator::{Dist, Param, DistParam, DistParam2D, GeneratorModel};
 use script::{CallbackData, Result};
@@ -148,16 +148,17 @@ pub fn param<T>(_lua: &Lua, _: &T,
 }
 
 fn activate(_lua: &Lua, gen: &ScriptParticleGenerator, _args: ()) -> Result<()> {
-    let pgen = create_pgen(gen)?;
+    let area_state = GameState::area_state();
+    let pgen = create_pgen(gen, &area_state.borrow())?;
 
     GameState::add_animation(Box::new(pgen));
 
     Ok(())
 }
 
-pub fn create_pgen(gen: &ScriptParticleGenerator) -> Result<ParticleGenerator> {
-    let area_state = GameState::area_state();
-    let parent = area_state.borrow().get_entity(gen.parent);
+pub fn create_pgen(gen: &ScriptParticleGenerator,
+                   area_state: &AreaState) -> Result<ParticleGenerator> {
+    let parent = area_state.get_entity(gen.parent);
 
     let image = match ResourceSet::get_image(&gen.image) {
         Some(image) => image,

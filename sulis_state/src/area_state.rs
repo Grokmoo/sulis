@@ -46,6 +46,7 @@ pub struct AreaState {
     pub(crate) triggers: Vec<TriggerState>,
     pub(crate) merchants: Vec<Merchant>,
     pub(crate) entities: Vec<Option<Rc<RefCell<EntityState>>>>,
+    pub(crate) effects: Vec<Option<Effect>>,
 
     pub listeners: ChangeListenerList<AreaState>,
     turn_timer: Rc<RefCell<TurnTimer>>,
@@ -91,6 +92,7 @@ impl AreaState {
             entities: Vec::new(),
             props: Vec::new(),
             triggers: Vec::new(),
+            effects: Vec::new(),
             turn_timer: Rc::new(RefCell::new(TurnTimer::default())),
             transition_grid,
             entity_grid,
@@ -183,10 +185,28 @@ impl AreaState {
             }
         }
 
+        // TODO save / load effects
+
         // TODO need to save / load the turn timer ordering
         area_state.turn_timer = Rc::new(RefCell::new(TurnTimer::new(&area_state)));
 
         Ok(area_state)
+    }
+
+    pub fn effect_mut<'a>(&'a mut self, index: usize) -> &'a mut Effect {
+        self.effects[index].as_mut().unwrap()
+    }
+
+    pub fn effect(&self, index: usize) -> &Effect {
+        self.effects[index].as_ref().unwrap()
+    }
+
+    pub fn add_effect(&mut self, entity: &Rc<RefCell<EntityState>>, effect: Effect) {
+        let bonuses = effect.bonuses().clone();
+        self.effects.push(Some(effect));
+        let index = self.effects.len() - 1;
+        entity.borrow_mut().actor.add_effect(index, bonuses);
+        self.turn_timer.borrow_mut().add_effect(index);
     }
 
     pub fn turn_timer(&self) -> Rc<RefCell<TurnTimer>> {
@@ -805,7 +825,8 @@ impl AreaState {
             self.compute_pc_visibility(&entity, 0, 0);
         }
 
-        self.turn_timer.borrow_mut().add(&entity, &self);
+        let turn_timer = Rc::clone(&self.turn_timer);
+        turn_timer.borrow_mut().add(&entity, self);
         self.entities[new_index] = Some(entity);
 
         self.listeners.notify(&self);
@@ -844,7 +865,8 @@ impl AreaState {
             self.check_trigger_grid(&entity);
         }
 
-        self.turn_timer.borrow_mut().check_ai_activation(entity, &self);
+        let turn_timer = Rc::clone(&self.turn_timer);
+        turn_timer.borrow_mut().check_ai_activation(entity, self);
     }
 
     fn clear_entity_points(&mut self, entity: &EntityState, x: i32, y: i32) {
@@ -927,6 +949,20 @@ impl AreaState {
         let mut notify = false;
         let len = self.entities.len();
         let mut cbs_to_fire = Vec::new();
+
+        if real_time {
+            for effect in self.effects.iter_mut() {
+                let effect = match effect {
+                    None => continue,
+                    Some(ref mut effect) => effect,
+                };
+
+                if effect.update(elapsed_millis) {
+                    cbs_to_fire.append(&mut effect.callbacks());
+                }
+            }
+        }
+
         for index in 0..len {
             let entity = {
                 let entity = match &self.entities[index].as_ref() {
@@ -935,9 +971,11 @@ impl AreaState {
                 };
 
                 if real_time {
-                    cbs_to_fire.append(&mut ActorState::update(entity, elapsed_millis));
+                    ActorState::update(entity, &mut self.effects,
+                                       &mut self.turn_timer.borrow_mut(), elapsed_millis);
                 } else {
-                    entity.borrow_mut().actor.check_removal();
+                    entity.borrow_mut().actor.check_removal(&mut self.effects,
+                                                            &mut self.turn_timer.borrow_mut());
                 }
 
                 if !entity.borrow().is_marked_for_removal() { continue; }
@@ -945,6 +983,7 @@ impl AreaState {
                 Rc::clone(entity)
             };
 
+            // TODO remove all effects associated with entity
             self.remove_entity_at_index(&entity, index);
             notify = true;
         }
@@ -1000,7 +1039,7 @@ impl AreaState {
         let y = entity.borrow().location.y;
         self.clear_entity_points(&*entity.borrow(), x, y);
         self.entities[index] = None;
-        self.turn_timer.borrow_mut().remove(entity);
+        self.turn_timer.borrow_mut().remove_entity(entity);
     }
 
     fn find_prop_index_to_add(&mut self) -> usize {

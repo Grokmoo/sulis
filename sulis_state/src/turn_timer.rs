@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::fmt;
 use std::rc::Rc;
 use std::cell::RefCell;
 use std::collections::HashSet;
@@ -26,12 +27,27 @@ use {ActorState, AreaState, ChangeListenerList, EntityState, GameState};
 
 pub const ROUND_TIME_MILLIS: u32 = 5000;
 
+#[derive(Clone)]
+enum Entry {
+    Entity(Rc<RefCell<EntityState>>),
+    Effect(usize),
+}
+
+impl fmt::Debug for Entry {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Entry::Entity(e) => write!(f, "Entry::Entity::{}", e.borrow().index),
+            Entry::Effect(i) => write!(f, "Entry::Effect::{}", i),
+        }
+    }
+}
+
 /// `TurnTimer` maintains a list of all entities in a given `AreaState`.  The
 /// list proceed in initiative order, with the front of the list always containing
 /// the currently active entity.  Once an entity's turn is up, it is moved to the
 /// back of the list.  Internally, this is accomplished using a `VecDeque`
 pub struct TurnTimer {
-    entities: VecDeque<Rc<RefCell<EntityState>>>,
+    entries: VecDeque<Entry>,
     pub listeners: ChangeListenerList<TurnTimer>,
     active: bool,
 }
@@ -39,7 +55,7 @@ pub struct TurnTimer {
 impl Default for TurnTimer {
     fn default() -> TurnTimer {
         TurnTimer {
-            entities: VecDeque::new(),
+            entries: VecDeque::new(),
             listeners: ChangeListenerList::default(),
             active: false,
         }
@@ -48,16 +64,18 @@ impl Default for TurnTimer {
 
 impl TurnTimer {
     pub fn new(area_state: &AreaState) -> TurnTimer {
-        let entities: VecDeque<Rc<RefCell<EntityState>>> = area_state.entity_iter().collect();
+        let entries: VecDeque<Entry> = area_state.entity_iter().map(|e| Entry::Entity(e)).collect();
 
-        if let Some(entity) = entities.front() {
-            debug!("Starting turn for '{}'", entity.borrow().actor.actor.name);
-            ActorState::init_actor_turn(&entity);
+        if let Some(entry) = entries.front() {
+            if let Entry::Entity(ref entity) = entry {
+                debug!("Starting turn for '{}'", entity.borrow().actor.actor.name);
+                ActorState::init_actor_turn(entity);
+            }
         }
 
-        debug!("Got {} entities for turn timer", entities.len());
+        debug!("Got {} entities for turn timer", entries.len());
         TurnTimer {
-            entities,
+            entries,
             ..Default::default()
         }
     }
@@ -76,11 +94,16 @@ impl TurnTimer {
         true
     }
 
-    pub fn check_ai_activation(&mut self, mover: &Rc<RefCell<EntityState>>, area_state: &AreaState) {
+    pub fn check_ai_activation(&mut self, mover: &Rc<RefCell<EntityState>>, area_state: &mut AreaState) {
         let mut groups_to_activate: HashSet<usize> = HashSet::new();
         let mut updated = false;
 
-        for entity in self.entities.iter() {
+        for entry in self.entries.iter() {
+            let entity = match entry {
+                Entry::Entity(ref e) => e,
+                Entry::Effect(_) => continue,
+            };
+
             if Rc::ptr_eq(mover, entity) { continue; }
             if !entity.borrow().is_hostile(mover) { continue; }
 
@@ -95,7 +118,12 @@ impl TurnTimer {
             self.activate_entity(mover, &mut groups_to_activate);
         }
 
-        for entity in self.entities.iter() {
+        for entry in self.entries.iter() {
+            let entity = match entry {
+                Entry::Entity(ref e) => e,
+                Entry::Effect(_) => continue,
+            };
+
             if entity.borrow().is_ai_active() { continue; }
 
             let ai_group = match entity.borrow().ai_group() {
@@ -110,8 +138,14 @@ impl TurnTimer {
 
         if updated {
             if !self.active {
+                info!("Set combat mode active");
                 self.set_active(true);
-                self.activate_current();
+                loop {
+                    if self.current_is_active_entity() { break; }
+                    let front = self.entries.pop_front().unwrap();
+                    self.entries.push_back(front);
+                }
+                self.activate_current(area_state);
             } else {
                 self.listeners.notify(&self);
             }
@@ -119,27 +153,45 @@ impl TurnTimer {
     }
 
     pub fn roll_initiative(&mut self) {
-        let mut entities: Vec<(i32, Rc<RefCell<EntityState>>)> = Vec::new();
-        for ref entity in self.entities.iter() {
-            let initiative = entity.borrow().actor.stats.initiative;
-            entities.push((initiative, Rc::clone(entity)));
-        }
-        entities.sort_by_key(|e| e.0);
+        let mut entries: Vec<_> = self.entries.iter().map(|e| e.clone()).collect();
 
-        self.entities.clear();
-        for (_initiative, entity) in entities {
-            self.entities.push_front(entity);
-        }
-
-        self.entities.iter().for_each(|e| {
-            e.borrow_mut().actor.end_turn();
-            e.borrow_mut().actor.set_overflow_ap(0);
+        entries.sort_by_key(|entry| {
+            match entry {
+                Entry::Entity(ref e) => {
+                    e.borrow().actor.stats.initiative
+                }, Entry::Effect(_) => {
+                    // TODO effects may need to be associated with the
+                    // nearest entity here for consistency when entering combat
+                    0
+                }
+            }
         });
+
+        self.entries.clear();
+        for entry in entries {
+            self.entries.push_front(entry);
+        }
+
+        for entry in self.entries.iter() {
+            let entity = match entry {
+                Entry::Entity(ref e) => e,
+                Entry::Effect(_) => continue,
+            };
+
+            entity.borrow_mut().actor.end_turn();
+            entity.borrow_mut().actor.set_overflow_ap(0);
+        }
+
         GameState::set_clear_anims();
     }
 
     pub fn end_combat(&mut self) {
-        for entity in self.entities.iter() {
+        for entry in self.entries.iter() {
+            let entity = match entry {
+                Entry::Entity(ref e) => e,
+                Entry::Effect(_) => continue,
+            };
+
             entity.borrow_mut().set_ai_active(false);
 
             if !entity.borrow().is_party_member() { continue; }
@@ -169,10 +221,25 @@ impl TurnTimer {
         self.listeners.notify(&self);
     }
 
-    pub fn add(&mut self, entity: &Rc<RefCell<EntityState>>, area_state: &AreaState) {
+    pub fn remove_effect(&mut self, index: usize) {
+        debug!("Remove effect with index {} from turn timer", index);
+        self.entries.retain(|entry| {
+            match entry {
+                Entry::Effect(i) => *i != index,
+                Entry::Entity(_) => true,
+            }
+        });
+    }
+
+    pub fn add_effect(&mut self, index: usize) {
+        self.entries.push_back(Entry::Effect(index));
+        debug!("Added effect with index {} to turn timer", index);
+    }
+
+    pub fn add(&mut self, entity: &Rc<RefCell<EntityState>>, area_state: &mut AreaState) {
         debug!("Added entity to turn timer: '{}'", entity.borrow().actor.actor.name);
-        self.entities.push_back(Rc::clone(entity));
-        if self.entities.len() == 1 {
+        self.entries.push_back(Entry::Entity(Rc::clone(entity)));
+        if self.entries.len() == 1 {
             // we just pushed the only entity
             ActorState::init_actor_turn(entity);
         }
@@ -180,12 +247,25 @@ impl TurnTimer {
         self.listeners.notify(&self);
     }
 
-    pub fn remove(&mut self, entity: &Rc<RefCell<EntityState>>) {
-        trace!("Removing entity from turn timer: '{}'", entity.borrow().actor.actor.name);
-        self.entities.retain(|other| *entity.borrow() != *other.borrow());
+    pub fn remove_entity(&mut self, entity: &Rc<RefCell<EntityState>>) {
+        // TODO if entity being removed is current entity and next entity is player
+        // this leads to a turn timer lock
 
-        if self.entities.iter().all(|e| !e.borrow().is_ai_active() ||
-                                    e.borrow().actor.actor.faction == Faction::Friendly) {
+        trace!("Removing entity from turn timer: '{}'", entity.borrow().actor.actor.name);
+        self.entries.retain(|entry| {
+            match entry {
+                Entry::Entity(ref e) => !Rc::ptr_eq(e, entity),
+                Entry::Effect(_) => true,
+            }
+        });
+
+        if self.entries.iter().all(|entry| {
+            match entry {
+                Entry::Entity(ref e) => {
+                    !e.borrow().is_ai_active() || e.borrow().actor.actor.faction == Faction::Friendly
+                }, Entry::Effect(_) => true,
+            }
+        }) {
             self.set_active(false);
         } else {
             self.listeners.notify(&self);
@@ -195,60 +275,102 @@ impl TurnTimer {
     pub fn current(&self) -> Option<Rc<RefCell<EntityState>>> {
         if !self.active { return None; }
 
-        match self.entities.front() {
+        match self.entries.front() {
             None => None,
-            Some(ref entity) => Some(Rc::clone(entity)),
+            Some(ref entry) => {
+                match entry {
+                    Entry::Entity(ref e) => Some(Rc::clone(e)),
+                    Entry::Effect(_) => None,
+                }
+            }
         }
+    }
+
+    fn current_is_active_entity(&self) -> bool {
+        match self.entries.front() {
+            Some(Entry::Entity(e)) => {
+                if e.borrow().is_party_member() || e.borrow().is_ai_active() {
+                    return true;
+                }
+            }, _ => (),
+        }
+
+        false
     }
 
     pub fn next(&mut self) {
-        if !self.active || self.entities.front().is_none() { return; }
+        if !self.active { return; }
 
-        let front = self.entities.pop_front().unwrap();
-        front.borrow_mut().actor.end_turn();
-        self.entities.push_back(front);
+        let mut cbs_to_fire = Vec::new();
 
-        self.activate_current();
+        {
+            let area_state = GameState::area_state();
+            let mut area_state = area_state.borrow_mut();
+            let mut current_ended = false;
+            loop {
+
+                if current_ended && self.current_is_active_entity() { break; }
+
+                let front = match self.entries.pop_front() {
+                    None => return,
+                    Some(entry) => entry,
+                };
+
+                match front {
+                    Entry::Effect(index) => {
+                        let effect = area_state.effect_mut(index);
+                        if effect.update(ROUND_TIME_MILLIS) {
+                            cbs_to_fire.append(&mut effect.callbacks());
+                        }
+                        self.entries.push_back(Entry::Effect(index));
+                    },
+                    Entry::Entity(entity) => {
+                        entity.borrow_mut().actor.end_turn();
+                        self.entries.push_back(Entry::Entity(entity));
+                        current_ended = true;
+                    }
+                }
+            }
+        }
+
+        cbs_to_fire.iter().for_each(|cb| cb.on_round_elapsed());
+
+        let area_state = GameState::area_state();
+        self.activate_current(&mut area_state.borrow_mut());
         self.listeners.notify(&self);
     }
 
-    fn activate_current(&mut self) {
-        loop {
-            {
-                let front = self.entities.front().unwrap();
-                if front.borrow().is_party_member() || front.borrow().is_ai_active() {
-                    break;
-                }
+    fn activate_current(&mut self, area_state: &mut AreaState) {
+        let current = match self.entries.front() {
+            None => return,
+            Some(ref entry) => match entry {
+                Entry::Effect(_) => return,
+                Entry::Entity(ref entity) => Rc::clone(entity),
             }
+        };
 
-            let front = self.entities.pop_front().unwrap();
-            self.entities.push_back(front);
+        ActorState::init_actor_turn(&current);
+        ActorState::update(&current, &mut area_state.effects,
+                           self, ROUND_TIME_MILLIS);
+
+        if current.borrow().is_party_member() {
+            GameState::set_selected_party_member(Rc::clone(&current));
+        } else {
+            GameState::clear_selected_party_member();
         }
-
-        if let Some(current) = self.entities.front() {
-            ActorState::init_actor_turn(&current);
-            let cbs_to_fire = ActorState::update(&current, ROUND_TIME_MILLIS);
-            cbs_to_fire.iter().for_each(|cb| cb.on_round_elapsed());
-
-            if current.borrow().is_party_member() {
-                GameState::set_selected_party_member(Rc::clone(current));
-            } else {
-                GameState::clear_selected_party_member();
-            }
-            debug!("'{}' now has the active turn.", current.borrow().actor.actor.name);
-        }
+        debug!("'{}' now has the active turn.", current.borrow().actor.actor.name);
     }
 
     pub fn active_iter(&self) -> ActiveEntityIterator {
         ActiveEntityIterator {
-            entity_iter: self.entities.iter(),
+            entry_iter: self.entries.iter(),
             turn_timer: self,
         }
     }
 }
 
 pub struct ActiveEntityIterator<'a> {
-    entity_iter: Iter<'a, Rc<RefCell<EntityState>>>,
+    entry_iter: Iter<'a, Entry>,
     turn_timer: &'a TurnTimer,
 }
 
@@ -258,11 +380,14 @@ impl<'a> Iterator for ActiveEntityIterator<'a> {
         if !self.turn_timer.active { return None; }
 
         loop {
-            match self.entity_iter.next() {
+            match self.entry_iter.next() {
                 None => return None,
-                Some(entity) => {
-                    if entity.borrow().is_party_member() || entity.borrow().is_ai_active() {
-                        return Some(entity);
+                Some(ref entry) => match entry {
+                    Entry::Effect(_) => (),
+                    Entry::Entity(ref e) => {
+                        if e.borrow().is_party_member() || e.borrow().is_ai_active() {
+                            return Some(e);
+                        }
                     }
                 }
             }

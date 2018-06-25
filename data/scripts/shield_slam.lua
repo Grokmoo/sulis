@@ -41,12 +41,12 @@ function create_stun_effect(parent, ability, targets, hit)
   if hit:is_miss() then
     return
   elseif hit:is_graze() then
-    target:change_overflow_ap(-10)
+    target:change_overflow_ap(-1000)
 	pushback_dist = pushback_dist - 2
   elseif hit:is_hit() then
-    target:change_overflow_ap(-20)
+    target:change_overflow_ap(-2000)
   elseif hit:is_crit() then
-    target:change_overflow_ap(-30)
+    target:change_overflow_ap(-3000)
 	pushback_dist = pushback_dist + 2
   end
   

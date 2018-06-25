@@ -237,6 +237,10 @@ impl GameState {
         area_state.update_view_visibility();
         area_state.push_scroll_to_callback(pc);
 
+        ANIMATIONS.with(|anims| {
+            (*anims.borrow_mut()).clear();
+        });
+
         Ok(())
     }
 

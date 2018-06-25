@@ -138,8 +138,10 @@ impl EntityState {
         }
     }
 
-    pub fn callbacks(&self) -> Vec<Rc<ScriptCallback>> {
-        self.actor.effects_iter().flat_map(|effect| effect.callbacks()).collect()
+    pub fn callbacks(&self, area_state: &AreaState) -> Vec<Rc<ScriptCallback>> {
+        self.actor.effects_iter().flat_map(|index| {
+            area_state.effect(*index).callbacks()
+        }).collect()
     }
 
     pub fn custom_flags<'a>(&'a self) -> Iter<'a, String> {

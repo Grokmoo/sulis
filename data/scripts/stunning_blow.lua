@@ -27,11 +27,11 @@ function create_stun_effect(parent, ability, targets, hit)
   target = targets:first()
   
   if hit:is_graze() then
-    target:change_overflow_ap(-20)
+    target:change_overflow_ap(-2000)
   elseif hit:is_hit() then
-    target:change_overflow_ap(-40)
+    target:change_overflow_ap(-4000)
   elseif hit:is_crit() then
-    target:change_overflow_ap(-60)
+    target:change_overflow_ap(-6000)
   end
   
   gen = target:create_anim("burst", 0.15)

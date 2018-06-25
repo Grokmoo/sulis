@@ -198,7 +198,7 @@ impl EntityAI {
     fn do_end(&self) {
         debug!("AI for '{}' is ending.", self.entity.borrow().actor.actor.name);
         let area_state = GameState::area_state();
-        let turn_timer = area_state.borrow().turn_timer();
+        let turn_timer = Rc::clone(&area_state.borrow().turn_timer());
         turn_timer.borrow_mut().next();
     }
 }

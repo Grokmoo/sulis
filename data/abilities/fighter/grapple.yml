@@ -7,4 +7,4 @@ active:
   script: "grapple"
   ap: 3000
   duration:
-    Rounds: 2
+    Rounds: 1

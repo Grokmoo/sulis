@@ -145,13 +145,11 @@ const TURNS_TO_MILLIS: u32 = 5000;
 fn apply(effect_data: &ScriptEffect, pgen: Option<ScriptParticleGenerator>,
          anim: Option<ScriptColorAnimation>) -> Result<()> {
     let area_state = GameState::area_state();
-    let area_state = area_state.borrow();
-
+    let mut area_state = area_state.borrow_mut();
     let entity = area_state.get_entity(effect_data.parent);
-
     let duration = effect_data.duration * TURNS_TO_MILLIS;
 
-    trace!("Apply effect to '{}'", entity.borrow().actor.actor.name);
+    info!("Apply effect to '{}' with duration {}", entity.borrow().actor.actor.name, duration);
     let mut effect = Effect::new(&effect_data.name, duration, effect_data.bonuses.clone(),
         effect_data.deactivate_with_ability.clone());
     for cb in effect_data.callbacks.iter() {
@@ -159,18 +157,16 @@ fn apply(effect_data: &ScriptEffect, pgen: Option<ScriptParticleGenerator>,
     }
 
     if let Some(ref pgen) = pgen {
-        let pgen = script_particle_generator::create_pgen(&pgen)?;
+        let pgen = script_particle_generator::create_pgen(&pgen, &area_state)?;
         pgen.add_removal_listener(&mut effect);
         GameState::add_animation(Box::new(pgen));
     }
-
     if let Some(ref anim) = anim {
-        let anim = script_color_animation::create_anim(&anim)?;
+        let anim = script_color_animation::create_anim(&anim, &area_state)?;
         anim.add_removal_listener(&mut effect);
         GameState::add_animation(Box::new(anim));
     }
 
-    entity.borrow_mut().actor.add_effect(effect);
-
+    area_state.add_effect(&entity, effect);
     Ok(())
 }

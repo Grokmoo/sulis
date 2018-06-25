@@ -460,7 +460,7 @@ children:
           [s=4|]
           [s=5|Level #level_0# #class_0#]
           [?0_damage_min;s=5;x=0;y=22|Main Hand]
-          [?0_damage_min;s=4;x=0|Damage: #0_damagezaq   _min# to #0_damage_max#
+          [?0_damage_min;s=4;x=0|Damage: #0_damage_min# to #0_damage_max#
           ][?0_armor_piercing;s=4;x=0|Armor Piercing: #0_armor_piercing#
           ][?0_accuracy;s=4;x=0|Accuracy: #0_accuracy#
           ][?0_crit_threshold;s=4;x=0|Crit Threshold: #0_crit_threshold#

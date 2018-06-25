@@ -13,7 +13,7 @@ function on_target_select(parent, ability, targets)
   target = targets:first()
   
   hit = parent:special_attack(target, "Mental")
-  amount = -60
+  amount = -6000
   if hit:is_miss() then
     return
   elseif hit:is_graze() then

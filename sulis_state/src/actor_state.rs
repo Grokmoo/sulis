@@ -15,7 +15,6 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::io::Error;
-use std::slice::{Iter, IterMut};
 use std::rc::Rc;
 use std::cell::{RefCell};
 use std::collections::HashMap;
@@ -25,8 +24,8 @@ use sulis_core::image::{LayeredImage};
 use sulis_core::ui::{color, Color};
 use sulis_core::util::invalid_data_error;
 use sulis_module::{item, Actor, Module, ActorBuilder};
-use sulis_rules::{Attack, AttackKind, HitKind, StatList};
-use {AbilityState, ChangeListenerList, Effect, EntityState, GameState, Inventory, ItemState, ScriptCallback};
+use sulis_rules::{Attack, AttackKind, BonusList, HitKind, StatList};
+use {AbilityState, ChangeListenerList, Effect, EntityState, GameState, Inventory, ItemState, TurnTimer};
 use save_state::ActorSaveState;
 
 pub struct ActorState {
@@ -39,7 +38,7 @@ pub struct ActorState {
     xp: u32,
     has_level_up: bool,
     inventory: Inventory,
-    effects: Vec<Effect>,
+    effects: Vec<(usize, BonusList)>,
     image: LayeredImage,
     pub(crate) ability_states: HashMap<String, AbilityState>,
     texture_cache_invalid: bool,
@@ -186,7 +185,12 @@ impl ActorState {
             None => (),
             Some(ref mut state) => {
                 state.deactivate();
-                for effect in self.effects.iter_mut() {
+
+                let area_state = GameState::area_state();
+                let mut area_state = area_state.borrow_mut();
+
+                for (index, _) in self.effects.iter() {
+                    let effect = area_state.effect_mut(*index);
                     if effect.deactivates_with(id) {
                         effect.mark_for_removal();
                     }
@@ -202,12 +206,8 @@ impl ActorState {
         }
     }
 
-    pub fn effects_iter_mut<'a>(&'a mut self) -> IterMut<'a, Effect> {
-        self.effects.iter_mut()
-    }
-
-    pub fn effects_iter<'a>(&'a self) -> Iter<'a, Effect> {
-        self.effects.iter()
+    pub fn effects_iter<'a>(&'a self) -> impl Iterator<Item=&'a usize> {
+        self.effects.iter().map(|(index, _)| index)
     }
 
     pub fn replace_actor(&mut self, new_actor: Actor) {
@@ -590,43 +590,41 @@ impl ActorState {
         self.listeners.notify(&self);
     }
 
-    pub fn check_removal(&mut self) {
+    pub fn check_removal(&mut self, effects: &mut Vec<Option<Effect>>, turn_timer: &mut TurnTimer) {
         let start_len = self.effects.len();
 
-        self.effects.retain(|e| !e.is_removal());
+        self.effects.retain(|(index, _)| {
+            if effects[*index].as_ref().unwrap().is_removal() {
+                effects[*index] = None;
+                turn_timer.remove_effect(*index);
+                info!("Removing effect at {}", index);
+                false
+            } else {
+                true
+            }
+        });
 
         if start_len != self.effects.len() {
             self.compute_stats();
         }
     }
 
-    pub fn update(entity: &Rc<RefCell<EntityState>>, millis_elapsed: u32) -> Vec<Rc<ScriptCallback>> {
-        let mut cbs_to_fire = Vec::new();
-
+    pub fn update(entity: &Rc<RefCell<EntityState>>, effects: &mut Vec<Option<Effect>>,
+                  turn_timer: &mut TurnTimer, millis_elapsed: u32) {
         {
             let actor = &mut entity.borrow_mut().actor;
-            for effect in actor.effects.iter_mut() {
-                if effect.update(millis_elapsed) {
-                    // round timer changed for effect
-                    cbs_to_fire.append(&mut effect.callbacks());
-                }
-            }
 
             for (_, ability_state) in actor.ability_states.iter_mut() {
                 ability_state.update(millis_elapsed);
             }
         }
 
-        entity.borrow_mut().actor.check_removal();
-
-        cbs_to_fire
+        entity.borrow_mut().actor.check_removal(effects, turn_timer);
     }
 
-    pub fn add_effect(&mut self, effect: Effect) {
-        debug!("Adding effect with duration {} to '{}'", effect.duration_millis(),
-            self.actor.name);
-
-        self.effects.push(effect);
+    pub fn add_effect(&mut self, index: usize, bonuses: BonusList) {
+        info!("Adding effect with index {} to '{}'", index, self.actor.name);
+        self.effects.push((index, bonuses));
         self.compute_stats();
     }
 
@@ -636,6 +634,8 @@ impl ActorState {
 
     pub fn init_turn(&mut self) {
         let rules = Module::rules();
+
+        trace!("Init turn for '{}' with overflow ap of {}", self.actor.name, self.overflow_ap);
 
         let mut ap = rules.base_ap as i32 + self.overflow_ap;
 
@@ -721,8 +721,8 @@ impl ActorState {
             1.0
         };
 
-        for effect in self.effects.iter() {
-            self.stats.add(effect.bonuses());
+        for (_, ref bonuses) in self.effects.iter() {
+            self.stats.add(bonuses);
         }
 
         self.stats.finalize(attacks_list, multiplier, rules.base_attribute);

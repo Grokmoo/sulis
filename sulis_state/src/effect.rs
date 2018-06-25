@@ -23,7 +23,7 @@ use ChangeListenerList;
 use ROUND_TIME_MILLIS;
 
 pub struct Effect {
-    name: String,
+    pub name: String,
     cur_duration: u32,
     total_duration: u32,
 

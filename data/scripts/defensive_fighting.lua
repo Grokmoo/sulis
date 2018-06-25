@@ -15,13 +15,13 @@ function on_activate(parent, ability)
   effect:add_num_bonus("crit_threshold", 20)
   effect:add_num_bonus("crit_multiplier", -0.25)
   effect:add_num_bonus("accuracy", -10)
-  
+
   if parent:has_ability("reflection") then
     cb = ability:create_callback(parent)
     cb:set_after_defense_fn("after_defense")
     effect:add_callback(cb)
   end
-  
+
   gen = parent:create_anim("shield")
   gen:set_moves_with_parent()
   gen:set_position(gen:param(-0.5), gen:param(-2.5))

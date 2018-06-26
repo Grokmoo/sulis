@@ -1,0 +1,12 @@
+id: penetrating_shot
+name: "Penetrating Shot"
+icon: abilities/penetrating_shot
+description: |
+  You fire a single shot, traveling in a straight line up to your maximum range.  A reflex attack is made against each target in line.  Damage from this attack ignores armor.
+active:
+  script: "penetrating_shot"
+  ap: 2000
+  duration:
+    Instant
+prereqs:
+  abilities: [ powerful_shot ]

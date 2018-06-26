@@ -288,8 +288,8 @@ pub struct ParticleGenerator {
 impl ParticleGenerator {
     pub fn new(owner: Rc<RefCell<EntityState>>, image: Rc<Image>,
                model: GeneratorModel) -> ParticleGenerator {
-        trace!("Created new particle generator with particle '{}', duration {}",
-               image.id(), model.duration_secs);
+        trace!("Created new particle generator with particle '{}', duration {}, pos: {:?}",
+               image.id(), model.duration_secs, model.position);
         let gen_overflow = model.initial_overflow;
         ParticleGenerator {
             owner,

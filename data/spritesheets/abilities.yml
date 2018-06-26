@@ -63,3 +63,4 @@ groups:
       reflection: [3, 8]
       powerful_shot: [4, 8]
       precise_shot: [5, 8]
+      penetrating_shot: [6, 8]

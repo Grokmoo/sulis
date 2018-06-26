@@ -425,6 +425,18 @@ fn create_stats_table<'a>(lua: &'a Lua, parent: &ScriptEntity, _args: ()) -> Res
     stats.set("hit_threshold", src.hit_threshold)?;
     stats.set("graze_multiplier", src.graze_multiplier)?;
     stats.set("crit_multiplier", src.crit_multiplier)?;
+    stats.set("movement_rate", src.movement_rate)?;
+    stats.set("attack_cost", src.attack_cost)?;
+
+    if let Some(image) = src.get_ranged_projectile() {
+        stats.set("ranged_projectile", image.id())?;
+    }
+
+    for (index, attack) in src.attacks.iter().enumerate() {
+        stats.set(format!("damage_min_{}", index), attack.damage.min())?;
+        stats.set(format!("damage_max_{}", index), attack.damage.max())?;
+        stats.set(format!("armor_piercing_{}", index), attack.damage.ap())?;
+    }
 
     Ok(stats)
 }

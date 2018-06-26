@@ -31,7 +31,8 @@ use {AreaState, EntityState, GameState};
 pub enum Shape {
     Single,
     Circle { radius: f32 },
-    Line { size: String, origin_x: i32, origin_y: i32 },
+    Line { size: String, origin_x: i32, origin_y: i32, length: i32 },
+    LineSegment { size: String, origin_x: i32, origin_y: i32 },
     ObjectSize { size: String },
     Cone { origin_x: i32, origin_y: i32, radius: f32, angle: f32 },
 }
@@ -44,7 +45,7 @@ fn contains(target: &Rc<RefCell<EntityState>>, list: &Vec<Rc<RefCell<EntityState
     false
 }
 
-fn cast_high(area: &AreaState, size: &Rc<ObjectSize>, start: Point, end: Point) -> Vec<Point> {
+fn cast_high(size: &Rc<ObjectSize>, start: Point, end: Point) -> Vec<Point> {
     let mut points = Vec::new();
 
     let mut delta_x = end.x - start.x;
@@ -54,7 +55,6 @@ fn cast_high(area: &AreaState, size: &Rc<ObjectSize>, start: Point, end: Point) 
     let mut d = 2 * delta_x - delta_y;
     let mut x = start.x;
     for y in start.y..end.y {
-        if !area.is_terrain_passable(&size.id, x, y) { return Vec::new(); }
         points.append(&mut size.points(x, y).collect());
 
         if d > 0 {
@@ -64,12 +64,11 @@ fn cast_high(area: &AreaState, size: &Rc<ObjectSize>, start: Point, end: Point) 
         d += 2 * delta_x;
     }
 
-    if !area.is_terrain_passable(&size.id, end.x, end.y) { return Vec::new(); }
     points.append(&mut size.points(end.x, end.y).collect());
     points
 }
 
-fn cast_low(area: &AreaState, size: &Rc<ObjectSize>, start: Point, end: Point) -> Vec<Point> {
+fn cast_low(size: &Rc<ObjectSize>, start: Point, end: Point) -> Vec<Point> {
     let mut points = Vec::new();
 
     let mut delta_y = end.y - start.y;
@@ -79,7 +78,6 @@ fn cast_low(area: &AreaState, size: &Rc<ObjectSize>, start: Point, end: Point) -
     let mut d = 2 * delta_y - delta_x;
     let mut y = start.y;
     for x in start.x..end.x {
-        if !area.is_terrain_passable(&size.id, x, y) { return Vec::new(); }
         points.append(&mut size.points(x, y).collect());
 
         if d > 0 {
@@ -89,7 +87,6 @@ fn cast_low(area: &AreaState, size: &Rc<ObjectSize>, start: Point, end: Point) -
         d += 2 * delta_y;
     }
 
-    if !area.is_terrain_passable(&size.id, end.x, end.y) { return Vec::new(); }
     points.append(&mut size.points(end.x, end.y).collect());
     points
 }
@@ -109,6 +106,7 @@ impl Shape {
     pub fn get_cursor_offset(&self) -> Point {
         match self {
             &Shape::Single | &Shape::Circle { .. } | &Shape::Cone { .. } => Point::as_zero(),
+            &Shape::LineSegment { ref size, .. } => get_cursor_offset_from_size(size),
             &Shape::Line { ref size, .. } => get_cursor_offset_from_size(size),
             &Shape::ObjectSize { ref size } => get_cursor_offset_from_size(size),
         }
@@ -118,8 +116,10 @@ impl Shape {
         match self {
             &Shape::Single => Vec::new(),
             &Shape::Circle { radius } => self.get_points_circle(radius, pos, shift),
-            &Shape::Line { ref size, origin_x, origin_y } =>
-                self.get_points_line(Point::new(origin_x, origin_y), pos, size),
+            &Shape::Line { ref size, origin_x, origin_y, length } =>
+                self.get_points_line(Point::new(origin_x, origin_y), pos, length, size),
+            &Shape::LineSegment { ref size, origin_x, origin_y } =>
+                self.get_points_line_segment(Point::new(origin_x, origin_y), pos, size),
             &Shape::ObjectSize { ref size } => self.get_points_object_size(pos, size),
             &Shape::Cone { origin_x, origin_y, radius, angle } =>
                 self.get_points_cone(Point::new(origin_x, origin_y), pos, radius, angle),
@@ -166,35 +166,107 @@ impl Shape {
         }
 
        effected
-   }
+    }
 
-    fn get_points_line(&self, start: Point, end: Point, size: &str) -> Vec<Point> {
+    fn get_points_line_segment(&self, start: Point, end: Point, size: &str) -> Vec<Point> {
+        let (points, concat) = self.get_points_line_internal(start, end, size);
+
+        if concat { return Vec::new(); }
+
+        points
+    }
+
+    fn get_points_line(&self, start: Point, pos: Point, len: i32, size: &str) -> Vec<Point> {
+        let dir_x = pos.x - start.x;
+        let dir_y = pos.y - start.y;
+
+        let dir_len = (dir_x * dir_x) + (dir_y * dir_y);
+        let dir_len_sqrt = (dir_len as f32).sqrt();
+
+        let dir_x = dir_x as f32 / dir_len_sqrt;
+        let dir_y = dir_y as f32 / dir_len_sqrt;
+
+        let end_x = (start.x as f32 + dir_x * len as f32).round();
+        let end_y = (start.y as f32 + dir_y * len as f32).round();
+
+        let (points, _) =
+            self.get_points_line_internal(start, Point::new(end_x as i32, end_y as i32), size);
+
+        points
+    }
+
+    fn get_points_line_internal(&self, start: Point, end: Point,
+                                size: &str) -> (Vec<Point>, bool) {
         let area_state = GameState::area_state();
         let area_state = area_state.borrow();
         let size = match Module::object_size(size) {
             None => {
                 warn!("Invalid object size in Targeter: '{}'", size);
-                return Vec::new();
+                return (Vec::new(), true);
             }, Some(size) => size,
         };
 
-        let mut points = if (end.y - start.y).abs() < (end.x - start.x).abs() {
+        let (mut points, concat) = if (end.y - start.y).abs() < (end.x - start.x).abs() {
             if start.x > end.x {
-                cast_low(&area_state, &size, end, start)
+                let mut p = cast_low(&size, end, start);
+                let concated = self.concat_from_end(&area_state, &size, &mut p);
+                (p, concated)
             } else {
-                cast_low(&area_state, &size, start, end)
+                let mut p = cast_low(&size, start, end);
+                let concated = self.concat_from_start(&area_state, &size, &mut p);
+                (p, concated)
             }
         } else {
             if start.y > end.y {
-                cast_high(&area_state, &size, end, start)
+                let mut p = cast_high(&size, end, start);
+                let concated = self.concat_from_end(&area_state, &size, &mut p);
+                (p, concated)
             } else {
-                cast_high(&area_state, &size, start, end)
+                let mut p = cast_high(&size, start, end);
+                let concated = self.concat_from_start(&area_state, &size, &mut p);
+                (p, concated)
             }
         };
 
         points.sort();
         points.dedup();
-        points
+        (points, concat)
+    }
+
+    fn concat_from_start(&self, area: &AreaState, size: &ObjectSize,
+                         points: &mut Vec<Point>) -> bool {
+        let mut index = 0;
+        loop {
+            if index == points.len() { return false; }
+
+            if !area.is_terrain_passable(&size.id, points[index].x, points[index].y) {
+                break;
+            }
+            index += 1;
+        }
+
+        if index == 0 { points.clear(); }
+        else { points.truncate(index); }
+
+        true
+    }
+
+    fn concat_from_end(&self, area: &AreaState, size: &ObjectSize,
+                       points: &mut Vec<Point>) -> bool {
+        let mut index = points.len() - 1;
+        loop {
+            if !area.is_terrain_passable(&size.id, points[index].x, points[index].y) {
+                break;
+            }
+
+            if index == 0 { return false; }
+            index -= 1;
+        }
+
+        if index == 0 { points.remove(0); }
+        else { points.drain(0..index + 1); }
+
+        true
     }
 
     fn get_points_cone(&self, origin: Point, to: Point, radius: f32,

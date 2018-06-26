@@ -48,6 +48,8 @@ abilities:
     position: [7, 1]
     
   - id: precise_shot
-    position: [5, 4]
+    position: [5, 3]
   - id: powerful_shot
-    position: [5, 6]
+    position: [5, 4]
+  - id: penetrating_shot
+    position: [6, 3]

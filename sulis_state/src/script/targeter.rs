@@ -130,7 +130,23 @@ impl UserData for TargeterData {
             targeter.shape = Shape::Circle { radius };
             Ok(())
         });
-        methods.add_method_mut("set_shape_line", |_, targeter, (size, origin_x, origin_y): (String, i32, i32)| {
+        methods.add_method_mut("set_shape_line", |_, targeter, (size, origin_x, origin_y, length):
+                               (String, i32, i32, i32)| {
+            match Module::object_size(&size) {
+                None => {
+                    warn!("No object size '{}' found", size);
+                    return Err(rlua::Error::FromLuaConversionError {
+                        from: "String",
+                        to: "ObjectSize",
+                        message: Some("Size must be the ID of a valid object size".to_string())
+                    });
+                }, Some(_) => (),
+            }
+            targeter.shape = Shape::Line { size, origin_x, origin_y, length };
+            Ok(())
+        });
+        methods.add_method_mut("set_shape_line_segment",
+                               |_, targeter, (size, origin_x, origin_y): (String, i32, i32)| {
             match Module::object_size(&size) {
                 None => {
                     warn!("No object size '{}' found", size);
@@ -142,7 +158,7 @@ impl UserData for TargeterData {
                 },
                 Some(_) => (),
             }
-            targeter.shape = Shape::Line { size, origin_x, origin_y };
+            targeter.shape = Shape::LineSegment { size, origin_x, origin_y };
             Ok(())
         });
         methods.add_method_mut("set_shape_object_size", |_, targeter, size: String| {

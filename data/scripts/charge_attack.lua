@@ -9,7 +9,7 @@ function on_activate(parent, ability)
   targeter = parent:create_targeter(ability)
   targeter:set_free_select(12.0)
   targeter:set_free_select_must_be_passable(parent:size_str())
-  targeter:set_shape_line(parent:size_str(), parent:x(), parent:y())
+  targeter:set_shape_line_segment(parent:size_str(), parent:x(), parent:y())
   targeter:add_all_effectable(targets)
   targeter:activate()
 end

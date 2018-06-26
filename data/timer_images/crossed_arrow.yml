@@ -1,0 +1,11 @@
+id: crossed_arrow
+frame_time_millis: 200
+frames:
+  - particles/crossed_arrow1
+  - particles/crossed_arrow2
+  - particles/crossed_arrow3
+  - particles/crossed_arrow4
+  - particles/crossed_arrow5
+  - particles/crossed_arrow4
+  - particles/crossed_arrow3
+  - particles/crossed_arrow2

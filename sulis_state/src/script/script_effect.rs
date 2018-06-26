@@ -135,6 +135,7 @@ fn add_num_bonus(_lua: &Lua, effect: &mut ScriptEffect, args: (String, f32)) -> 
         "graze_multiplier" => effect.bonuses.graze_multiplier = Some(amount),
         "crit_multiplier" => effect.bonuses.crit_multiplier = Some(amount),
         "movement_rate" => effect.bonuses.movement_rate = Some(amount),
+        "attack_cost" => effect.bonuses.attack_cost = Some(amount_int),
         _ => warn!("Attempted to add num bonus with invalid type '{}'", name),
     }
     Ok(())

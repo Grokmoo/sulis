@@ -242,8 +242,7 @@ impl ActorState {
         trace!("Checking can attack for '{}'.  Distance to target is {}",
                self.actor.name, dist);
 
-        let attack_ap = Module::rules().attack_ap;
-        if self.ap < attack_ap { return false; }
+        if self.ap < self.stats.attack_cost as u32 { return false; }
 
         self.can_reach(dist)
     }
@@ -732,6 +731,7 @@ impl ActorState {
         self.stats.graze_multiplier += rules.graze_damage_multiplier;
         self.stats.crit_multiplier += rules.crit_damage_multiplier;
         self.stats.movement_rate += self.actor.race.movement_rate;
+        self.stats.attack_cost += rules.attack_ap as i32;
         self.has_level_up = rules.get_xp_for_next_level(self.actor.total_level) <= self.xp;
 
         self.listeners.notify(&self);

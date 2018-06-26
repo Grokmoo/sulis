@@ -291,7 +291,8 @@ impl EntityState {
             GameState::add_animation(Box::new(anim));
         }
 
-        entity.borrow_mut().actor.remove_ap(Module::rules().attack_ap);
+        let attack_ap = entity.borrow().actor.stats.attack_cost;
+        entity.borrow_mut().actor.remove_ap(attack_ap as u32);
     }
 
     pub fn add_xp(&mut self, xp: u32) {

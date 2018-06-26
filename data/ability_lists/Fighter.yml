@@ -46,3 +46,8 @@ abilities:
     connect: [ Straight ]
   - id: improved_grapple
     position: [7, 1]
+    
+  - id: precise_shot
+    position: [5, 4]
+  - id: powerful_shot
+    position: [5, 6]

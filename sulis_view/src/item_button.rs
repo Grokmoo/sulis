@@ -20,7 +20,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_rules::{bonus_list::{AttackBuilder, AttackKindBuilder}, BonusList};
-use sulis_module::{item::{format_item_value, format_item_weight, Slot}};
+use sulis_module::{item::{format_item_value, format_item_weight, Slot}, Module};
 use sulis_state::{EntityState, GameState, ItemState, inventory::has_proficiency};
 use sulis_core::io::event;
 use sulis_core::ui::{Callback, Widget, WidgetKind, WidgetState};
@@ -472,8 +472,10 @@ pub fn add_attack_text_args(attack: &AttackBuilder, widget_state: &mut WidgetSta
 
 pub fn add_bonus_text_args(bonuses: &BonusList, widget_state: &mut WidgetState) {
     if let Some(ref damage) = bonuses.bonus_damage {
-        widget_state.add_text_arg("min_bonus_damage", &damage.min.to_string());
-        widget_state.add_text_arg("max_bonus_damage", &damage.max.to_string());
+        if damage.max > 0 {
+            widget_state.add_text_arg("min_bonus_damage", &damage.min.to_string());
+            widget_state.add_text_arg("max_bonus_damage", &damage.max.to_string());
+        }
         if damage.ap > 0 {
             widget_state.add_text_arg("armor_piercing", &damage.ap.to_string());
         }
@@ -503,6 +505,11 @@ pub fn add_bonus_text_args(bonuses: &BonusList, widget_state: &mut WidgetState) 
         for (attr, value) in attributes.iter() {
             widget_state.add_text_arg(&attr.short_name(), &value.to_string());
         }
+    }
+
+    if let Some(attack_cost) = bonuses.attack_cost {
+        let cost = attack_cost / Module::rules().display_ap as i32;
+        widget_state.add_text_arg("attack_cost", &cost.to_string());
     }
 
     add_if_present(widget_state, "bonus_ap", bonuses.ap);

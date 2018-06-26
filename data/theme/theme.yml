@@ -730,6 +730,7 @@ children:
       ][?crit_multiplier|[s=4.0|Crit Multiplier: #crit_multiplier#]
       ][?graze_multiplier|[s=4.0|Graze Multiplier: #graze_multiplier#]
       ][?movement_rate|[s=4.0|Movement Rate: #movement_rate#]
+      ][?attack_cost|[s=4.0|Attack Cost: #attack_cost#]
       ][?price;s=3.5|
       Price: [c=f00|#price#] Gold
       ][!price;?value;s=3.5|

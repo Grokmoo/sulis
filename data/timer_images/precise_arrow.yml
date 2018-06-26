@@ -1,0 +1,11 @@
+id: precise_arrow
+frame_time_millis: 200
+frames:
+  - particles/precise_arrow1
+  - particles/precise_arrow2
+  - particles/precise_arrow3
+  - particles/precise_arrow4
+  - particles/precise_arrow5
+  - particles/precise_arrow4
+  - particles/precise_arrow3
+  - particles/precise_arrow2

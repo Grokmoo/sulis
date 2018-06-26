@@ -61,3 +61,5 @@ groups:
       improved_grapple: [1, 8]
       defensive_fighting: [2, 8]
       reflection: [3, 8]
+      powerful_shot: [4, 8]
+      precise_shot: [5, 8]

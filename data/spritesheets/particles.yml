@@ -113,6 +113,24 @@ groups:
       crossed_swords3: [40, 0]
       crossed_swords4: [60, 0]
       crossed_swords5: [80, 0]
+  precise_arrow:
+    size: [20, 20]
+    position: [120, 60]
+    areas:
+      precise_arrow1: [0, 0]
+      precise_arrow2: [20, 0]
+      precise_arrow3: [40, 0]
+      precise_arrow4: [60, 0]
+      precise_arrow5: [80, 0]
+  crossed_arrow:
+    size: [20, 20]
+    position: [240, 85]
+    areas:
+      crossed_arrow1: [0, 0]
+      crossed_arrow2: [20, 0]
+      crossed_arrow3: [40, 0]
+      crossed_arrow4: [60, 0]
+      crossed_arrow5: [80, 0]
   shock:
     size: [64, 64]
     position: [0, 192]

@@ -214,6 +214,7 @@ impl Param {
 #[derive(Clone)]
 pub struct GeneratorModel {
     pub position: (Param, Param),
+    pub rotation: Option<Param>,
     pub red: Param,
     pub green: Param,
     pub blue: Param,
@@ -234,6 +235,7 @@ impl GeneratorModel {
         GeneratorModel {
             duration_secs,
             position: (Param::fixed(x), Param::fixed(y)),
+            rotation: None,
             red: Param::fixed(1.0),
             green: Param::fixed(1.0),
             blue: Param::fixed(1.0),
@@ -410,6 +412,10 @@ impl animation::Animation for ParticleGenerator {
         self.model.blue.update(v_term, a_term, j_term);
         self.model.alpha.update(v_term, a_term, j_term);
 
+        if let Some(ref mut rotation) = self.model.rotation {
+            rotation.update(v_term, a_term, j_term);
+        }
+
         let mut i = self.particles.len();
         loop {
             if i == 0 { break; }
@@ -467,6 +473,9 @@ impl animation::Animation for ParticleGenerator {
             draw_list.set_scale(scale_x, scale_y);
             draw_list.set_color(Color::new(self.model.red.value, self.model.green.value,
                                            self.model.blue.value, self.model.alpha.value));
+            if let Some(ref rotation) = self.model.rotation {
+                draw_list.rotate(rotation.value);
+            }
             renderer.draw(draw_list);
         }
     }

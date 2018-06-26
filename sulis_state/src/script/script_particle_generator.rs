@@ -85,6 +85,10 @@ impl UserData for ScriptParticleGenerator {
             gen.model.position = (x, y);
             Ok(())
         });
+        methods.add_method_mut("set_rotation", |_, gen, rotation: Param| {
+            gen.model.rotation = Some(rotation);
+            Ok(())
+        });
         methods.add_method_mut("set_color", |_, gen, (r, g, b, a): (Param, Param, Param, Option<Param>)| {
             gen.model.red = r;
             gen.model.green = g;

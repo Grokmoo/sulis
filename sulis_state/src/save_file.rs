@@ -69,6 +69,11 @@ pub fn create_save() -> Result<(), Error> {
     let filename = format!("save_{}.yml", utc.format("%Y%m%d-%H%M%S%.3f"));
 
     let mut path = get_save_dir();
+    if !path.is_dir() {
+        trace!("Save dir '{:?}' not found, attempting to create it.", path);
+        fs::create_dir_all(path.clone())?;
+    }
+
     path.push(filename);
 
     let meta = create_meta_data(utc.format("%c").to_string());

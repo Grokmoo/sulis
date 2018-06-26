@@ -25,6 +25,7 @@ function on_target_select(parent, ability, targets)
 
   delta_x = pos.x - parent:x()
   delta_y = pos.y - parent:y()
+  angle = game:atan2(delta_x, delta_y)
   
   norm = math.sqrt((delta_x * delta_x) + (delta_y * delta_y))
   
@@ -33,6 +34,8 @@ function on_target_select(parent, ability, targets)
   
   anim:set_position(anim:param(parent:x(), delta_x / duration), anim:param(parent:y(), delta_y / duration))
   anim:set_particle_size_dist(anim:fixed_dist(3.0), anim:fixed_dist(3.0))
+  anim:set_rotation(anim:param(angle))
+  anim:set_color(anim:param(1.0), anim:param(0.0), anim:param(0.0))
   
   targets = targets:to_table()
   for i = 1, #targets do 

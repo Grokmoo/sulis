@@ -326,7 +326,7 @@ impl ActorState {
                 HitKind::Graze =>
                     parent_stats.graze_multiplier + attack.bonuses.graze_multiplier.unwrap_or(0.0),
                 HitKind::Hit =>
-                    1.0,
+                    parent_stats.hit_multiplier + attack.bonuses.hit_multiplier.unwrap_or(0.0),
                 HitKind::Crit =>
                     parent_stats.crit_multiplier + attack.bonuses.crit_multiplier.unwrap_or(0.0),
             };
@@ -729,6 +729,7 @@ impl ActorState {
         self.stats.hit_threshold += rules.hit_percentile as i32;
         self.stats.graze_threshold += rules.graze_percentile as i32;
         self.stats.graze_multiplier += rules.graze_damage_multiplier;
+        self.stats.hit_multiplier += 1.0;
         self.stats.crit_multiplier += rules.crit_damage_multiplier;
         self.stats.movement_rate += self.actor.race.movement_rate;
         self.stats.attack_cost += rules.attack_ap as i32;

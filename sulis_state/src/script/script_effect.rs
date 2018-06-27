@@ -133,6 +133,7 @@ fn add_num_bonus(_lua: &Lua, effect: &mut ScriptEffect, args: (String, f32)) -> 
         "hit_threshold" => effect.bonuses.hit_threshold = Some(amount_int),
         "graze_threshold" => effect.bonuses.graze_threshold = Some(amount_int),
         "graze_multiplier" => effect.bonuses.graze_multiplier = Some(amount),
+        "hit_multiplier" => effect.bonuses.hit_multiplier = Some(amount),
         "crit_multiplier" => effect.bonuses.crit_multiplier = Some(amount),
         "movement_rate" => effect.bonuses.movement_rate = Some(amount),
         "attack_cost" => effect.bonuses.attack_cost = Some(amount_int),

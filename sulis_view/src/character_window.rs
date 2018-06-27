@@ -248,6 +248,7 @@ pub fn create_details_text_box(pc: &ActorState) -> Rc<RefCell<Widget>> {
             add_fmt_text_arg(state, index, "hit_threshold", attack.bonuses.hit_threshold);
             add_fmt_text_arg(state, index, "graze_threshold", attack.bonuses.graze_threshold);
             add_fmt_text_arg(state, index, "crit_multiplier", attack.bonuses.crit_multiplier);
+            add_fmt_text_arg(state, index, "hit_multiplier", attack.bonuses.hit_multiplier);
             add_fmt_text_arg(state, index, "graze_multiplier", attack.bonuses.graze_multiplier);
         }
 
@@ -279,6 +280,7 @@ pub fn create_details_text_box(pc: &ActorState) -> Rc<RefCell<Widget>> {
         state.add_text_arg("hit_threshold", &stats.hit_threshold.to_string());
         state.add_text_arg("graze_threshold", &stats.graze_threshold.to_string());
         state.add_text_arg("crit_multiplier", &stats.crit_multiplier.to_string());
+        state.add_text_arg("hit_multiplier", &stats.hit_multiplier.to_string());
         state.add_text_arg("graze_multiplier", &stats.graze_multiplier.to_string());
         state.add_text_arg("movement_rate", &format!("{:.2}", stats.movement_rate));
     }

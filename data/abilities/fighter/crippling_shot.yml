@@ -1,0 +1,12 @@
+id: crippling_shot
+name: "Crippling Shot"
+icon: abilities/crippling_shot
+description: |
+  You fire a shot aiming to slow instead of damage.  The attack itself does reduced damage, but adds a large penalty to movement rate on the target.
+active:
+  script: "crippling_shot"
+  ap: 2000
+  duration:
+    Rounds: 3
+prereqs:
+  abilities: [ precise_shot ]

@@ -458,6 +458,7 @@ pub fn add_attack_text_args(attack: &AttackBuilder, widget_state: &mut WidgetSta
     add_if_present(widget_state, "attack_hit_threshold", bonuses.hit_threshold);
     add_if_present(widget_state, "attack_graze_threshold", bonuses.graze_threshold);
     add_if_present(widget_state, "attack_graze_multiplier", bonuses.graze_multiplier);
+    add_if_present(widget_state, "attack_hit_multiplier", bonuses.hit_multiplier);
     add_if_present(widget_state, "attack_crit_multiplier", bonuses.crit_multiplier);
     add_if_present(widget_state, "attack_accuracy", bonuses.accuracy);
 
@@ -527,6 +528,7 @@ pub fn add_bonus_text_args(bonuses: &BonusList, widget_state: &mut WidgetState) 
     add_if_present(widget_state, "hit_threshold", bonuses.hit_threshold);
     add_if_present(widget_state, "graze_threshold", bonuses.graze_threshold);
     add_if_present(widget_state, "graze_multiplier", bonuses.graze_multiplier);
+    add_if_present(widget_state, "hit_multiplier", bonuses.hit_multiplier);
     add_if_present(widget_state, "crit_multiplier", bonuses.crit_multiplier);
     add_if_present(widget_state, "movement_rate", bonuses.movement_rate);
 }

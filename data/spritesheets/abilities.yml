@@ -64,3 +64,4 @@ groups:
       powerful_shot: [4, 8]
       precise_shot: [5, 8]
       penetrating_shot: [6, 8]
+      crippling_shot: [7, 8]

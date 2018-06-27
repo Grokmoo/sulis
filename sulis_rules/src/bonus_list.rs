@@ -27,6 +27,7 @@ pub struct AttackBonusList {
     pub hit_threshold: Option<i32>,
     pub graze_threshold: Option<i32>,
     pub graze_multiplier: Option<f32>,
+    pub hit_multiplier: Option<f32>,
     pub crit_multiplier: Option<f32>,
 }
 
@@ -39,6 +40,7 @@ impl Default for AttackBonusList {
             hit_threshold: None,
             graze_threshold: None,
             graze_multiplier: None,
+            hit_multiplier: None,
             crit_multiplier: None,
         }
     }
@@ -68,6 +70,7 @@ pub struct BonusList {
     pub hit_threshold: Option<i32>,
     pub graze_threshold: Option<i32>,
     pub graze_multiplier: Option<f32>,
+    pub hit_multiplier: Option<f32>,
     pub crit_multiplier: Option<f32>,
     pub movement_rate: Option<f32>,
     pub attack_cost: Option<i32>,
@@ -101,6 +104,7 @@ impl Default for BonusList {
             hit_threshold: None,
             graze_threshold: None,
             graze_multiplier: None,
+            hit_multiplier: None,
             crit_multiplier: None,
             movement_rate: None,
             attack_cost: None,

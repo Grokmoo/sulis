@@ -46,6 +46,7 @@ pub struct StatList {
     pub hit_threshold: i32,
     pub graze_threshold: i32,
     pub graze_multiplier: f32,
+    pub hit_multiplier: f32,
     pub crit_multiplier: f32,
     pub movement_rate: f32,
     pub attack_cost: i32,
@@ -78,6 +79,7 @@ impl StatList {
             hit_threshold: 0,
             graze_threshold: 0,
             graze_multiplier: 0.0,
+            hit_multiplier: 0.0,
             crit_multiplier: 0.0,
             movement_rate: 0.0,
             attack_cost: 0,
@@ -188,6 +190,7 @@ impl StatList {
         if let Some(hit_threshold) = bonuses.hit_threshold { self.hit_threshold += hit_threshold * times_i32 }
         if let Some(graze_thresh) = bonuses.graze_threshold { self.graze_threshold += graze_thresh * times_i32 }
         if let Some(graze_mult) = bonuses.graze_multiplier { self.graze_multiplier += graze_mult * times_f32 }
+        if let Some(hit_mult) = bonuses.hit_multiplier { self.hit_multiplier += hit_mult * times_f32 }
         if let Some(crit_mult) = bonuses.crit_multiplier { self.crit_multiplier += crit_mult * times_f32 }
         if let Some(rate) = bonuses.movement_rate { self.movement_rate += rate * times_f32; }
         if let Some(rate) = bonuses.attack_cost { self.attack_cost += rate * times_i32; }

@@ -424,6 +424,7 @@ fn create_stats_table<'a>(lua: &'a Lua, parent: &ScriptEntity, _args: ()) -> Res
     stats.set("graze_threshold", src.graze_threshold)?;
     stats.set("hit_threshold", src.hit_threshold)?;
     stats.set("graze_multiplier", src.graze_multiplier)?;
+    stats.set("hit_multiplier", src.hit_multiplier)?;
     stats.set("crit_multiplier", src.crit_multiplier)?;
     stats.set("movement_rate", src.movement_rate)?;
     stats.set("attack_cost", src.attack_cost)?;

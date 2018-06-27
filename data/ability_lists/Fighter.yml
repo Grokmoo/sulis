@@ -49,6 +49,8 @@ abilities:
     
   - id: precise_shot
     position: [5, 3]
+  - id: crippling_shot
+    position: [6, 3]
   - id: powerful_shot
     position: [5, 4]
   - id: penetrating_shot

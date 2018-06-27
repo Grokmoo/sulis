@@ -467,6 +467,7 @@ children:
           ][?0_hit_threshold;s=4;x=0|Hit Threshold: #0_hit_threshold#
           ][?0_graze_threshold;s=4;x=0|Graze Threshold: #0_graze_threshold#
           ][?0_crit_multiplier;s=4;x=0|Crit Multiplier: #0_crit_multiplier#
+          ][?0_hit_multiplier;s=4;x=0|Hit Multiplier: #0_hit_multiplier#
           ][?0_graze_multiplier;s=4;x=0|Graze Multiplier: #0_graze_multiplier#]
           
           [?1_damage_min;s=5;x=40;y=22|Off Hand]
@@ -477,6 +478,7 @@ children:
           ][?1_hit_threshold;s=4;x=40|Hit Threshold: #1_hit_threshold#
           ][?1_graze_threshold;s=4;x=40|Graze Threshold: #1_graze_threshold#
           ][?1_crit_multiplier;s=4;x=40|Crit Multiplier: #1_crit_multiplier#
+          ][?1_hit_multiplier;s=4;x=0|Hit Multiplier: #1_hit_multiplier#
           ][?1_graze_multiplier;s=4;x=40|Graze Multiplier: #1_graze_multiplier#]
           [s=4;x=0;y=40|Range: #reach#]
           [s=4;x=0|Accuracy: #accuracy#]
@@ -499,7 +501,7 @@ children:
           [x=0|#graze_threshold#][x=30|#hit_threshold#][x=60|#crit_threshold#]
           
           [x=0|Graze Multiplier][x=30|Hit Multiplier][x=60|Crit Multiplier]
-          [x=0|#graze_multiplier#][x=30|1.0][x=60|#crit_multiplier#]
+          [x=0|#graze_multiplier#][x=30|#hit_multiplier#][x=60|#crit_multiplier#]
           [?portrait;x=75;y=-3;i=#portrait#;s=30.0|]
           [?portrait;x=75;y=-3;i=portraits/frame;s=30.0|]]
       level_up:
@@ -709,6 +711,7 @@ children:
       ][?attack_hit_threshold|[s=4.0|Hit Threshold: #attack_hit_threshold#]
       ][?attack_graze_threshold|[s=4.0|Graze Threshold: #attack_graze_threshold#]
       ][?attack_crit_multiplier|[s=4.0|Crit Multiplier: #attack_crit_multiplier#]
+      ][?attack_hit_multiplier|[s=4.0|Hit Multiplier: #attack_hit_multiplier#]
       ][?attack_graze_multiplier|[s=4.0|Graze Multiplier: #attack_graze_multiplier#]
       ][?min_bonus_damage|[s=4.0|Damage: #min_bonus_damage# to #max_bonus_damage# [?bonus_damage_kind;c=f00|#bonus_damage_kind#]]
       ][?reach|[s=4.0|Reach: #reach#]
@@ -728,6 +731,7 @@ children:
       ][?hit_threshold|[s=4.0|Hit Threshold: #hit_threshold#]
       ][?graze_threshold|[s=4.0|Graze Threshold: #graze_threshold#]
       ][?crit_multiplier|[s=4.0|Crit Multiplier: #crit_multiplier#]
+      ][?hit_multiplier|[s=4.0|Hit Multiplier: #hit_multiplier#]
       ][?graze_multiplier|[s=4.0|Graze Multiplier: #graze_multiplier#]
       ][?movement_rate|[s=4.0|Movement Rate: #movement_rate#]
       ][?attack_cost|[s=4.0|Attack Cost: #attack_cost#]

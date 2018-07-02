@@ -1,0 +1,12 @@
+id: arrow_storm
+name: "Arrow Storm"
+icon: abilities/arrow_storm
+description: |
+  You fire a hail of arrows at all enemies in a narrow cone.  Each enemy suffers a standard attack.
+active:
+  script: "arrow_storm"
+  ap: 4000
+  duration:
+    Instant
+prereqs:
+  abilities: [ penetrating_shot ]

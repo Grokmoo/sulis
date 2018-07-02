@@ -1,7 +1,0 @@
-id: improved_grapple
-name: "Improved Grapple"
-icon: abilities/improved_grapple
-description: |
-  Your grapple ability is improved, allowing you to grapple larger targets more easily.
-prereqs:
-  abilities: [ grapple ]

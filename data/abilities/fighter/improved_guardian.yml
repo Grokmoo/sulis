@@ -1,7 +1,0 @@
-id: improved_guardian
-name: "Improved Guardian"
-icon: abilities/improved_guardian
-description: |
-  Your guardian ability is upgraded - now allowing you to protect all allies in melee range at once.
-prereqs:
-  abilities: [ guardian ]

@@ -21,8 +21,6 @@ groups:
       powerful_blows: [2, 1]
       shield_slam: [3, 1]
       chameleon: [4, 1]
-      improved_shield_slam: [6, 1]
-      devastating_blows: [7, 1]
       
       tough_skin: [0, 2]
       elemental_defense: [1, 2]
@@ -40,7 +38,6 @@ groups:
       air_shield: [4, 3]
       stun: [5, 3]
       guardian: [6, 3]
-      improved_guardian: [7, 3]
       
       charge_attack: [0, 4]
       
@@ -51,21 +48,16 @@ groups:
       fire_shield: [1, 6]
       slow: [2, 6]
 
-      already_selected: [0, 7]
       prereqs_not_met: [1, 7]
       connect_straight: [2, 7]
       connect_up: [3, 7]
       connect_down: [4, 7]
       
       grapple: [0, 8]
-      improved_grapple: [1, 8]
       defensive_fighting: [2, 8]
-      reflection: [3, 8]
       powerful_shot: [4, 8]
       precise_shot: [5, 8]
       penetrating_shot: [6, 8]
       crippling_shot: [7, 8]
       
       arrow_storm: [0, 9]
-      consistent_shot: [1, 9]
-      critical_shot: [2, 9]

@@ -43,6 +43,12 @@ pub struct Reward {
     pub loot_chance: u32,
 }
 
+#[derive(Debug, Clone)]
+pub struct OwnedAbility {
+    pub ability: Rc<Ability>,
+    pub level: u32,
+}
+
 impl Default for Reward {
     fn default() -> Reward {
         Reward {
@@ -91,7 +97,7 @@ pub struct Actor {
     pub builder_images: HashMap<ImageLayer, String>,
 
     pub reward: Option<Reward>,
-    pub abilities: Vec<Rc<Ability>>,
+    pub abilities: Vec<OwnedAbility>,
 }
 
 impl PartialEq for Actor {
@@ -102,7 +108,7 @@ impl PartialEq for Actor {
 
 impl Actor {
     pub fn from(other: &Actor, class_to_add: Option<Rc<Class>>, xp: u32,
-                mut abilities_to_add: Vec<Rc<Ability>>) -> Actor {
+                abilities_to_add: Vec<Rc<Ability>>) -> Actor {
 
         let mut levels = other.levels.clone();
         if let Some(class_to_add) = class_to_add {
@@ -124,7 +130,20 @@ impl Actor {
         let image = LayeredImage::new(images_list, other.hue);
 
         let mut abilities = other.abilities.clone();
-        abilities.append(&mut abilities_to_add);
+        for ability in abilities_to_add {
+            let mut upgraded = false;
+            for owned_ability in abilities.iter_mut() {
+                if Rc::ptr_eq(&owned_ability.ability, &ability) {
+                    owned_ability.level += 1;
+                    upgraded = true;
+                    break;
+                }
+            }
+
+            if !upgraded {
+                abilities.push(OwnedAbility { ability, level: 0 });
+            }
+        }
 
         Actor {
             id: other.id.to_string(),
@@ -260,16 +279,26 @@ impl Actor {
             }
         };
 
-        let mut abilities = Vec::new();
-        if let Some(ref builder_abilities) = builder.abilities {
-            for ability_id in builder_abilities {
-                let ability = match resources.abilities.get(ability_id) {
-                    None => {
-                        warn!("No ability found for '{}'", ability_id);
-                        return unable_to_create_error("actor", &builder.id);
-                    }, Some(ref ability) => Rc::clone(ability),
-                };
-                abilities.push(ability);
+        let mut abilities: Vec<OwnedAbility> = Vec::new();
+        for ability_id in builder.abilities {
+            let ability = match resources.abilities.get(&ability_id) {
+                None => {
+                    warn!("No ability found for '{}'", ability_id);
+                    return unable_to_create_error("actor", &builder.id);
+                }, Some(ref ability) => Rc::clone(ability),
+            };
+
+            let mut upgrade = false;
+            for owned_ability in abilities.iter_mut() {
+                if Rc::ptr_eq(&owned_ability.ability, &ability) {
+                    owned_ability.level += 1;
+                    upgrade = true;
+                    break;
+                }
+            }
+
+            if !upgrade {
+                abilities.push(OwnedAbility { ability, level: 0 });
             }
         }
 
@@ -306,9 +335,19 @@ impl Actor {
         0
     }
 
+    pub fn ability_level(&self, id: &str) -> Option<u32> {
+        for ability in self.abilities.iter() {
+            if ability.ability.id == id {
+                return Some(ability.level);
+            }
+        }
+
+        None
+    }
+
     pub fn has_ability_with_id(&self, id: &str) -> bool {
         for ability in self.abilities.iter() {
-            if ability.id == id {
+            if ability.ability.id == id {
                 return true;
             }
         }
@@ -318,7 +357,7 @@ impl Actor {
 
     pub fn has_ability(&self, other: &Rc<Ability>) -> bool {
         for ability in self.abilities.iter() {
-            if ability == other { return true; }
+            if Rc::ptr_eq(&ability.ability, other) { return true; }
         }
 
         false
@@ -366,7 +405,7 @@ pub struct ActorBuilder {
     pub levels: HashMap<String, u32>,
     pub xp: Option<u32>,
     pub reward: Option<RewardBuilder>,
-    pub abilities: Option<Vec<String>>,
+    pub abilities: Vec<String>,
 }
 
 impl ResourceBuilder for ActorBuilder {

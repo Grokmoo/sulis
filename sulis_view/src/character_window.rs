@@ -144,6 +144,8 @@ pub fn create_abilities_pane(pc: &ActorState) -> Rc<RefCell<Widget>> {
 
     let list = Widget::empty("list");
     for ability in pc.actor.abilities.iter() {
+        let level = ability.level;
+        let ability = &ability.ability;
         let button = Widget::with_theme(Button::empty(), "ability_button");
         button.borrow_mut().state.add_text_arg("icon", &ability.icon.id());
 
@@ -151,6 +153,7 @@ pub fn create_abilities_pane(pc: &ActorState) -> Rc<RefCell<Widget>> {
         let details_ref = Rc::clone(&details);
         button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |_, _| {
             add_ability_text_args(&mut details_ref.borrow_mut().state, &ability_ref);
+            details_ref.borrow_mut().state.add_text_arg("owned_level", &(level + 1).to_string());
             details_ref.borrow_mut().invalidate_layout();
         })));
 

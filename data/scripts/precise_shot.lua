@@ -12,7 +12,7 @@ function on_activate(parent, ability)
   effect:add_num_bonus("attack_cost", 1000)
   effect:add_damage(0, 0, 5)
 
-  if parent:has_ability("critical_shot") then
+  if parent:ability_level(ability) > 1 then
 	effect:add_num_bonus("accuracy", 25)
 	effect:add_num_bonus("crit_multiplier", 1.0)
   else

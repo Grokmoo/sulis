@@ -12,7 +12,7 @@ function on_activate(parent, ability)
   
   effect:add_num_bonus("accuracy", -10)
 
-  if parent:has_ability("consistent_shot") then
+  if parent:ability_level(ability) > 1 then
     effect:add_num_bonus("graze_multiplier", 0.25)
 	effect:add_damage(5, 12, 0)
   else

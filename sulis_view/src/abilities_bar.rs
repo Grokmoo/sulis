@@ -63,9 +63,10 @@ impl WidgetKind for AbilitiesBar {
         let mut children = Vec::new();
         let abilities = self.entity.borrow().actor.actor.abilities.clone();
         for ability in abilities.iter() {
+            let ability = &ability.ability;
             if self.entity.borrow_mut().actor.ability_state(&ability.id).is_none() { continue; }
 
-            let button = Widget::with_defaults(AbilityButton::new(&ability, &self.entity));
+            let button = Widget::with_defaults(AbilityButton::new(ability, &self.entity));
             children.push(button);
         }
 

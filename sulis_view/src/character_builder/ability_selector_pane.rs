@@ -25,7 +25,7 @@ use sulis_core::resource::ResourceSet;
 use sulis_core::ui::{animation_state, Callback, Widget, WidgetKind};
 use sulis_core::util::Point;
 use sulis_widgets::{Button, Label};
-use sulis_module::{Ability, AbilityList, ability_list::Connect};
+use sulis_module::{Ability, AbilityList, ability_list::Connect, actor::OwnedAbility};
 
 use {AbilityPane, CharacterBuilder};
 use character_builder::BuilderPane;
@@ -33,7 +33,7 @@ use character_builder::BuilderPane;
 pub const NAME: &str = "ability_selector_pane";
 
 pub struct AbilitySelectorPane {
-    already_selected: HashSet<Rc<Ability>>,
+    already_selected: Vec<OwnedAbility>,
     prereqs_not_met: HashSet<Rc<Ability>>,
     choices: Rc<AbilityList>,
     selected_ability: Option<Rc<Ability>>,
@@ -42,14 +42,51 @@ pub struct AbilitySelectorPane {
 
 impl AbilitySelectorPane {
     pub fn new(choices: Rc<AbilityList>, index: usize,
-               already_selected: Vec<Rc<Ability>>) -> Rc<RefCell<AbilitySelectorPane>> {
+               already_selected: Vec<OwnedAbility>) -> Rc<RefCell<AbilitySelectorPane>> {
         Rc::new(RefCell::new(AbilitySelectorPane {
             selected_ability: None,
             index,
             choices,
-            already_selected: already_selected.into_iter().collect(),
+            already_selected,
             prereqs_not_met: HashSet::new(),
         }))
+    }
+
+    pub fn add_already_selected(&mut self, ability: &Rc<Ability>) {
+        for owned in self.already_selected.iter_mut() {
+            if Rc::ptr_eq(&owned.ability, ability) {
+                owned.level += 1;
+                return;
+            }
+        }
+
+        self.already_selected.push(OwnedAbility { ability: Rc::clone(ability), level: 0 });
+    }
+
+    pub fn remove_already_selected(&mut self, ability: &Rc<Ability>) {
+        let mut index_to_remove = 0;
+        for (index, owned) in self.already_selected.iter_mut().enumerate() {
+            if Rc::ptr_eq(&owned.ability, ability) {
+                if owned.level == 0 {
+                    index_to_remove = index;
+                    break;
+                }
+
+                owned.level -= 1;
+                return;
+            }
+        }
+
+        self.already_selected.remove(index_to_remove);
+    }
+
+    pub fn already_selected_current_level(&self, ability: &Rc<Ability>) -> Option<u32> {
+        for owned in self.already_selected.iter() {
+            if Rc::ptr_eq(&ability, &owned.ability) {
+                return Some(owned.level);
+            }
+        }
+        None
     }
 }
 
@@ -60,7 +97,7 @@ impl BuilderPane for AbilitySelectorPane {
         builder.prev.borrow_mut().state.set_enabled(true);
 
         for ability in builder.abilities.iter() {
-            self.already_selected.insert(Rc::clone(ability));
+            self.add_already_selected(ability);
         }
 
         self.prereqs_not_met.clear();
@@ -88,7 +125,7 @@ impl BuilderPane for AbilitySelectorPane {
     fn prev(&mut self, builder: &mut CharacterBuilder, widget: Rc<RefCell<Widget>>) {
         self.selected_ability = None;
         for ability in builder.abilities.iter() {
-            self.already_selected.remove(ability);
+            self.remove_already_selected(ability);
         }
         builder.prev(&widget);
     }
@@ -211,9 +248,7 @@ impl WidgetKind for AbilitySelectorPane {
 
             let ability_button = Widget::with_theme(Button::empty(), "ability_button");
 
-            if self.already_selected.contains(ability) {
-                ability_button.borrow_mut().state.animation_state.add(animation_state::Kind::Custom1);
-            }
+            let level = self.already_selected_current_level(ability);
 
             if self.prereqs_not_met.contains(ability) {
                 ability_button.borrow_mut().state.animation_state.add(animation_state::Kind::Custom2);
@@ -223,11 +258,32 @@ impl WidgetKind for AbilitySelectorPane {
             icon.borrow_mut().state.add_text_arg("icon", &ability.icon.id());
             Widget::add_child_to(&ability_button, icon);
 
+            let upgrade = Widget::with_theme(Label::empty(), "upgrade0");
+            if let Some(_) = level {
+                upgrade.borrow_mut().state.set_active(true);
+            }
+            Widget::add_child_to(&ability_button, upgrade);
+
+            for (index, _) in ability.upgrades.iter().enumerate() {
+                let upgrade = Widget::with_theme(Label::empty(), &format!("upgrade{}", index+1));
+                if let Some(level) = level {
+                    if level as usize > index {
+                        upgrade.borrow_mut().state.set_active(true);
+                    }
+                }
+                Widget::add_child_to(&ability_button, upgrade);
+            }
+
             if let Some(ref selected_ability) = self.selected_ability {
                 ability_button.borrow_mut().state.set_active(*ability == *selected_ability);
             }
 
-            let enable_next = self.already_selected.contains(ability) || self.prereqs_not_met.contains(ability);
+            let mut enable_next = true;
+            if let Some(level) = level {
+                if level as usize == ability.upgrades.len() { enable_next = false; }
+            }
+            if self.prereqs_not_met.contains(ability) { enable_next = false; }
+
             let ability_ref = Rc::clone(&ability);
             ability_button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
                 let parent = Widget::go_up_tree(&widget, 2);
@@ -237,7 +293,7 @@ impl WidgetKind for AbilitySelectorPane {
 
                 let builder_widget = Widget::get_parent(&parent);
                 let builder = Widget::downcast_kind_mut::<CharacterBuilder>(&builder_widget);
-                builder.next.borrow_mut().state.set_enabled(!enable_next);
+                builder.next.borrow_mut().state.set_enabled(enable_next);
             })));
 
             Widget::add_child_to(&abilities_pane, ability_button);
@@ -257,8 +313,8 @@ impl WidgetKind for AbilitySelectorPane {
             details.borrow_mut().state.add_text_arg("prereqs_not_met", "true");
         }
 
-        if self.already_selected.contains(ability) {
-            details.borrow_mut().state.add_text_arg("already_owned", "true");
+        if let Some(level) = self.already_selected_current_level(ability) {
+            details.borrow_mut().state.add_text_arg("owned_level", &(level + 1).to_string());
         }
 
         vec![title, ability_pane_widget, abilities_pane]

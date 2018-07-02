@@ -7,8 +7,8 @@ function on_activate(parent, ability)
   effect:deactivate_with(ability)
   effect:add_num_bonus("accuracy", 10)
   effect:add_num_bonus("defense", -10)
-  
-  if parent:has_ability("devastating_blows") then
+ 
+  if parent:ability_level(ability) > 1 then
     effect:add_damage(3, 8, 5)
 	effect:add_num_bonus("crit_multiplier", 0.5)
   else

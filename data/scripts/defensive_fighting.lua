@@ -16,7 +16,7 @@ function on_activate(parent, ability)
   effect:add_num_bonus("crit_multiplier", -0.25)
   effect:add_num_bonus("accuracy", -10)
 
-  if parent:has_ability("reflection") then
+  if parent:ability_level(ability) > 1 then
     cb = ability:create_callback(parent)
     cb:set_after_defense_fn("after_defense")
     effect:add_callback(cb)

@@ -1,0 +1,6 @@
+id: ball_small_animated
+states:
+    normal: ball_small
+    active: ball_small_active
+    hover: ball_small
+    active + hover: ball_small_active

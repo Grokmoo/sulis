@@ -1,5 +1,4 @@
 id: ability_overlay
 states:
     normal: empty
-    custom1: abilities/already_selected
     custom2: abilities/prereqs_not_met

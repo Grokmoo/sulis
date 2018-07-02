@@ -290,10 +290,14 @@ impl UserData for ScriptEntity {
             Ok(entity.actor.actor.name.to_string())
         });
 
-        methods.add_method("has_ability", |_, entity, id: String| {
+        methods.add_method("ability_level", |_, entity, ability: ScriptAbility| {
             let entity = entity.try_unwrap()?;
             let entity = entity.borrow();
-            Ok(entity.actor.actor.has_ability_with_id(&id))
+
+            match entity.actor.actor.ability_level(&ability.id) {
+                None => Ok(0),
+                Some(level) => Ok(level + 1),
+            }
         });
 
         methods.add_method("has_active_mode", |_, entity, ()| {

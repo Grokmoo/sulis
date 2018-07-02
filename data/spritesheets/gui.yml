@@ -408,6 +408,8 @@ groups:
       
       ball: [16, 148, 32, 32]
       ball_active: [16, 181, 32, 32]
+      ball_small: [16, 214, 16, 16]
+      ball_small_active: [16, 231, 16, 16]
       
       red_fill: [5, 73, 5, 5]
       20_transparent_fill: [1, 187, 5, 5]

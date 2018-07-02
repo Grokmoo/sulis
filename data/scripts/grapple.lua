@@ -22,7 +22,7 @@ function on_target_select(parent, ability, targets)
   ability:activate(parent)
   
   accuracy = 10 - 5 * target:width()
-  if parent:has_ability("improved_grapple") then
+  if parent:ability_level(ability) > 1 then
     accuracy = accuracy + 20
   end
   

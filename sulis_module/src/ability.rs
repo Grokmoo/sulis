@@ -42,6 +42,7 @@ pub struct Ability {
     pub active: Option<Active>,
     pub bonuses: BonusList,
     pub prereqs: Option<PrereqList>,
+    pub upgrades: Vec<String>,
 }
 
 impl Eq for Ability { }
@@ -99,6 +100,7 @@ impl Ability {
             active,
             bonuses: builder.bonuses.unwrap_or_default(),
             prereqs,
+            upgrades: builder.upgrades.unwrap_or_default(),
         })
     }
 
@@ -136,6 +138,7 @@ pub struct AbilityBuilder {
     pub active: Option<ActiveBuilder>,
     pub bonuses: Option<BonusList>,
     pub prereqs: Option<PrereqListBuilder>,
+    pub upgrades: Option<Vec<String>>,
 }
 
 impl ResourceBuilder for AbilityBuilder {

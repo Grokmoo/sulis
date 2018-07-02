@@ -552,12 +552,16 @@ children:
         width_relative: Max
         height_relative: Max
         text: |
-          [s=6|#name#][?prereqs_not_met;c=f00|  Prereqs not Met][?already_owned;c=0f0|  Owned]
+          [s=6|#name#][?prereqs_not_met;c=f00|  Prereqs not Met][?owned_level;c=0f0|  Owned - Level #owned_level#]
           [s=6|]
           [?active;s=5;c=f00|Active - AP: #activate_ap#
           [s=4;c=fff|[?duration|Duration: #duration# Rounds][?mode|Mode][?instant|Duration: Instantaneous]]
           ][?passive;s=5;c=0ff|Passive]
           [s=4|#description#]
+          [?upgrade1|[s=5|Level 2]
+          [s=4|#upgrade1#]]
+          [?upgrade2|[s=5|Level 3]
+          [s=4|#upgrade2#]]
           [?str|Strength: #str#
           ][?dex|Dexterity: #dex#
           ][?end|Endurance: #end#
@@ -597,7 +601,8 @@ children:
           ][?prereq_ability_2|Ability: #prereq_ability_2#
           ][?prereq_ability_3|Ability: #prereq_ability_3#
           ][?prereq_ability_4|Ability: #prereq_ability_4#
-          ]
+          ]]
+          
   class_pane:
     preferred_size: [40, 40]
     background: bg_base

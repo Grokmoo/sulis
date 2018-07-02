@@ -8,3 +8,6 @@ active:
   ap: 1000
   duration:
     Mode
+upgrades:
+  - |
+    Your powerful shot ability is upgraded, causing even more damage - especially on grazes.

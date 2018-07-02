@@ -6,28 +6,17 @@ abilities:
     connect: [Up, Down]
   - id: impenetrable_defense
     position: [1, 0]
-    connect: [Straight2x]
   - id: guardian
     position: [1, 1]
-    connect: [Straight]
-  - id: improved_guardian
-    position: [2, 1]
   - id: shield_slam
     position: [0, 2]
-    connect: [ Straight2x ]
-  - id: improved_shield_slam
-    position: [2, 2]
-  - id: reflection
-    position: [3, 0]
     
   - id: mighty_blow
     position: [0, 4]
     connect: [ Up, Down ]
   - id: powerful_blows
     position: [1, 3.5]
-    connect: [ Straight2x, Down ]
-  - id: devastating_blows
-    position: [3, 3.5]
+    connect: [ Down ]
   - id: stunning_blow
     position: [1, 4.5]
     connect: [ Up, Straight2x ]
@@ -43,23 +32,16 @@ abilities:
     position: [7, 0]
   - id: grapple
     position: [6, 1]
-    connect: [ Straight ]
-  - id: improved_grapple
-    position: [7, 1]
     
   - id: precise_shot
     position: [5, 3]
-    connect: [ Up, Down ]
+    connect: [ Up ]
   - id: crippling_shot
-    position: [6, 2.5]
-  - id: critical_shot
-    position: [6, 3.5]
+    position: [6, 3]
   - id: powerful_shot
-    position: [5, 5]
-    connect: [ Up, Down, Straight2x ]
+    position: [5, 4.5]
+    connect: [ Up, Straight2x ]
   - id: penetrating_shot
-    position: [6, 4.5]
-  - id: consistent_shot
-    position: [6, 5.5]
+    position: [6, 4.0]
   - id: arrow_storm
-    position: [7, 5]
+    position: [7, 4.5]

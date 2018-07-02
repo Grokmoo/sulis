@@ -296,7 +296,7 @@ impl BuilderSet for CharacterCreator {
             levels,
             xp: None,
             reward: None,
-            abilities: Some(abilities),
+            abilities: abilities,
         };
 
         info!("Writing character to {}", filename);

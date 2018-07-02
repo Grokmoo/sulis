@@ -206,7 +206,7 @@ pub fn is_match(on_trigger: &OnTrigger, pc: &Rc<RefCell<EntityState>>,
     if let Some(ref ability_to_find) = on_trigger.player_ability {
         let mut has_ability = false;
         for ability in pc.borrow().actor.actor.abilities.iter() {
-            if &ability.id == ability_to_find {
+            if &ability.ability.id == ability_to_find {
                 has_ability = true;
                 break;
             }

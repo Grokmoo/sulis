@@ -133,6 +133,20 @@ children:
                     foreground: "#icon#"
                     width_relative: Max
                     height_relative: Max
+                  upgrade0:
+                    foreground: ball_small_animated
+                    preferred_size: [3, 3]
+                    y_relative: Max
+                  upgrade1:
+                    foreground: ball_small_animated
+                    preferred_size: [3, 3]
+                    y_relative: Max
+                    position: [3, 0]
+                  upgrade2:
+                    foreground: ball_small_animated
+                    preferred_size: [3, 3]
+                    y_relative: Max
+                    position: [6, 0]
       class_selector_pane:
         from: .builder_pane
         children:

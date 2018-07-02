@@ -4,8 +4,8 @@ function on_activate(parent, ability)
   end
 
   targets = parent:targets():friendly():reachable():without_self()
-  
-  if parent:has_ability("improved_guardian") then
+ 
+  if parent:ability_level(ability) > 1 then
     targeter = parent:create_targeter(ability)
     targeter:add_selectable(parent)
     targeter:set_shape_circle(5.0)

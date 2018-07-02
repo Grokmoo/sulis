@@ -294,6 +294,13 @@ impl EntitySaveState {
                 }
             };
 
+            let mut abilities: Vec<String> = Vec::new();
+            for owned_ability in actor.abilities.iter() {
+                for _ in 0..(owned_ability.level + 1) {
+                    abilities.push(owned_ability.ability.id.to_string());
+                }
+            }
+
             Some(ActorBuilder {
                 id: actor.id.to_string(),
                 name: actor.name.to_string(),
@@ -312,7 +319,7 @@ impl EntitySaveState {
                 levels,
                 xp: Some(actor.xp),
                 reward,
-                abilities: Some(actor.abilities.iter().map(|a| a.id.to_string()).collect()),
+                abilities,
             })
         } else {
             None

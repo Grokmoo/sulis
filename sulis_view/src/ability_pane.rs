@@ -76,6 +76,10 @@ pub fn add_ability_text_args(state: &mut WidgetState, ability: &Rc<Ability>) {
     state.add_text_arg("name", &ability.name);
     state.add_text_arg("description", &ability.description);
 
+    for (index, text) in ability.upgrades.iter().enumerate() {
+        state.add_text_arg(&format!("upgrade{}", index + 1), text);
+    }
+
     if let Some(ref active) = ability.active {
         state.add_text_arg("active", "true");
         let ap = active.ap / Module::rules().display_ap;

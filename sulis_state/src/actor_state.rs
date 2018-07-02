@@ -65,18 +65,18 @@ impl ActorState {
 
         let mut ability_states = HashMap::new();
         for ability in actor.abilities.iter() {
-            if ability.active.is_none() { continue; }
+            if ability.ability.active.is_none() { continue; }
 
-            let mut ability_state = AbilityState::new(ability);
+            let mut ability_state = AbilityState::new(&ability.ability);
 
-            match save.ability_states.get(&ability.id) {
+            match save.ability_states.get(&ability.ability.id) {
                 None => (),
                 Some(ref ability_save) => {
                     ability_state.remaining_duration = ability_save.remaining_duration;
                 }
             }
 
-            ability_states.insert(ability.id.to_string(), ability_state);
+            ability_states.insert(ability.ability.id.to_string(), ability_state);
         }
 
         let mut inventory = Inventory::empty();
@@ -111,6 +111,7 @@ impl ActorState {
 
         let mut ability_states = HashMap::new();
         for ability in actor.abilities.iter() {
+            let ability = &ability.ability;
             if ability.active.is_none() { continue; }
 
             ability_states.insert(ability.id.to_string(), AbilityState::new(ability));
@@ -214,6 +215,7 @@ impl ActorState {
         self.actor = Rc::new(new_actor);
 
         for ability in self.actor.abilities.iter() {
+            let ability = &ability.ability;
             if ability.active.is_none() { continue; }
             if self.ability_states.contains_key(&ability.id) { continue; }
 
@@ -692,7 +694,7 @@ impl ActorState {
         }
 
         for ability in self.actor.abilities.iter() {
-            self.stats.add(&ability.bonuses);
+            self.stats.add(&ability.ability.bonuses);
         }
 
         let mut attacks_list = Vec::new();

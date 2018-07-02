@@ -9,4 +9,4 @@ active:
   duration:
     Instant
 prereqs:
-  abilities: [ penetrating_shot ]
+  abilities: [ powerful_shot ]

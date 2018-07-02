@@ -1,0 +1,7 @@
+id: consistent_shot
+name: "Consistent Shot"
+icon: abilities/consistent_shot
+description: |
+  Your powerful shot ability is upgraded, causing even more damage - especially on grazes.
+prereqs:
+  abilities: [ powerful_shot ]

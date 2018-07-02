@@ -49,11 +49,17 @@ abilities:
     
   - id: precise_shot
     position: [5, 3]
+    connect: [ Up, Down ]
   - id: crippling_shot
-    position: [6, 3]
+    position: [6, 2.5]
+  - id: critical_shot
+    position: [6, 3.5]
   - id: powerful_shot
-    position: [5, 4]
+    position: [5, 5]
+    connect: [ Up, Down, Straight2x ]
   - id: penetrating_shot
-    position: [6, 4]
+    position: [6, 4.5]
+  - id: consistent_shot
+    position: [6, 5.5]
   - id: arrow_storm
-    position: [7, 3.5]
+    position: [7, 5]

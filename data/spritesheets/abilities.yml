@@ -67,3 +67,5 @@ groups:
       crippling_shot: [7, 8]
       
       arrow_storm: [0, 9]
+      consistent_shot: [1, 9]
+      critical_shot: [2, 9]

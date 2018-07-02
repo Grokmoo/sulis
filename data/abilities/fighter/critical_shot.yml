@@ -1,0 +1,7 @@
+id: critical_shot
+name: "Critical Shot"
+icon: abilities/critical_shot
+description: |
+  Your orecise shot ability is upgraded, gaining greater accuracy and more powerful critical hits.
+prereqs:
+  abilities: [ precise_shot ]

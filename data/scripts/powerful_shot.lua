@@ -9,10 +9,16 @@ function on_activate(parent, ability)
 
   effect = parent:create_effect(ability:name())
   effect:deactivate_with(ability)
-  effect:add_damage(5, 12, 0)
+  
   effect:add_num_bonus("accuracy", -10)
-  effect:add_num_bonus("graze_multiplier", 0.25)
 
+  if parent:has_ability("consistent_shot") then
+    effect:add_num_bonus("graze_multiplier", 0.25)
+	effect:add_damage(5, 12, 0)
+  else
+    effect:add_damage(2, 8, 0)
+  end
+  
   gen = parent:create_anim("crossed_arrow")
   gen:set_moves_with_parent()
   gen:set_position(gen:param(-0.5), gen:param(-2.5))

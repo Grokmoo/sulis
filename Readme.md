@@ -14,7 +14,7 @@ You'll need recent versions of Rust and Cargo installed.  The game will compile 
 1. On first run, `config.yml` is created in your home directory.  This file may be edited with your preferences.
   * Linux - `$XDG_CONFIG_HOME/.sulis/` (typically `$HOME/.config/.sulis`) 
   * Windows -`$HOME\My Documents\My Games\Sulis`
-1. Running with release mode is recommended.  The compilation process takes several minutes, but load time and performance in game are massively improved over a standard debug build.
+Note that Running with release mode is recommended.  The compilation process takes several minutes, but load time and performance in game are massively improved over a standard debug build.
 
 ### Running the editor
 

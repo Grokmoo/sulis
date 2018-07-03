@@ -119,16 +119,15 @@ lazy_static! {
 fn get_user_dir() -> PathBuf {
     let mut path = match env::var("XDG_CONFIG_HOME") {
         Ok(path_str) => {
-            let path = Path::new(path_str);
-            if path.is_dir() {
-                path
-            } else {
-                get_home_dir()
-            }
+            PathBuf::from(path_str)
         },
-        Err(_) => get_home_dir(),
+        Err(_) => {
+            let mut path = get_home_dir();
+            path.push(".config/");
+            path
+        }
     };
-    path.push(".sulis/");
+    path.push("sulis/");
     path
 }
 

@@ -8,6 +8,7 @@ active:
   ap: 3000
   duration:
     Rounds: 1
+  cooldown: 2
 upgrades:
   - |
     Your grapple ability is improved, allowing you to grapple larger targets more easily.

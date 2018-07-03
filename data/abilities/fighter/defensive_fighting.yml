@@ -8,6 +8,7 @@ active:
   ap: 1000
   duration:
     Mode
+  cooldown: 2
 upgrades:
   - |
     When in defensive fighting mode, attacks made on you from within melee range reflect a portion of their damage back on their attacker.

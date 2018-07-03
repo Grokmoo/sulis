@@ -8,5 +8,6 @@ active:
   ap: 2000
   duration:
     Rounds: 3
+  cooldown: 1
 prereqs:
   abilities: [ precise_shot ]

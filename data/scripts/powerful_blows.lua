@@ -1,5 +1,6 @@
 function on_activate(parent, ability)
   if parent:has_active_mode() then
+    game:say_line("Only one mode may be active at a time.", parent)
     return
   end
 

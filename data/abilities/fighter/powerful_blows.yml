@@ -8,6 +8,7 @@ active:
   ap: 1000
   duration:
     Mode
+  cooldown: 2
 prereqs:
   abilities: [ mighty_blow ]
 upgrades:

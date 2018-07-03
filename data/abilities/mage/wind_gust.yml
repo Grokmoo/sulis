@@ -8,4 +8,4 @@ active:
   ap: 3000
   duration:
     Instant
-
+  cooldown: 1

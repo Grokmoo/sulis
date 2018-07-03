@@ -10,5 +10,6 @@ active:
   ap: 3000
   duration:
     Instant
+  cooldown: 1
 prereqs:
   abilities: [ mighty_blow ]

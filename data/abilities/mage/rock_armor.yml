@@ -8,3 +8,4 @@ active:
   ap: 2000
   duration:
     Rounds: 2
+  cooldown: 3

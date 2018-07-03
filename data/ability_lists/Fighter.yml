@@ -35,7 +35,7 @@ abilities:
     
   - id: precise_shot
     position: [5, 3]
-    connect: [ Up ]
+    connect: [ Straight ]
   - id: crippling_shot
     position: [6, 3]
   - id: powerful_shot

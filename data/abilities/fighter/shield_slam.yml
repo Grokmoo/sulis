@@ -10,6 +10,7 @@ active:
   ap: 2000
   duration:
     Instant
+  cooldown: 1
 upgrades:
   - |
     Your shield slam is upgraded - becoming more accurate and pushing targets back further.

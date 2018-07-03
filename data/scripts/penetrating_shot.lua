@@ -3,6 +3,7 @@ line_len = 30.0
 function on_activate(parent, ability)
   stats = parent:stats()
   if not stats.attack_is_ranged then
+    game:say_line("You must have a ranged weapon equipped.", parent)
     return
   end
 

@@ -90,6 +90,10 @@ pub fn add_ability_text_args(state: &mut WidgetState, ability: &Rc<Ability>) {
             ability::Duration::Mode => state.add_text_arg("mode", "true"),
             ability::Duration::Instant => state.add_text_arg("instant", "true"),
         }
+
+        if active.cooldown != 0 {
+            state.add_text_arg("cooldown", &active.cooldown.to_string());
+        }
     } else {
         state.add_text_arg("passive", "true");
     }

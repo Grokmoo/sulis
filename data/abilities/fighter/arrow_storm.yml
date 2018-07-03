@@ -8,5 +8,6 @@ active:
   ap: 4000
   duration:
     Instant
+  cooldown: 2
 prereqs:
   abilities: [ powerful_shot ]

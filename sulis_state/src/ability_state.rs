@@ -66,10 +66,12 @@ impl AbilityState {
     }
 
     pub fn activate(&mut self) {
-        self.remaining_duration = match self.ability.active.as_ref().unwrap().duration {
-            Duration::Rounds(rounds) => rounds * ROUND_TIME_MILLIS,
-            Duration::Mode => u32::MAX,
-            Duration::Instant => 0,
+        self.remaining_duration = match self.ability.active {
+            None => panic!(),
+            Some(ref active) => match active.duration {
+                Duration::Mode => u32::MAX,
+                Duration::Instant | Duration::Rounds(_) => active.cooldown * ROUND_TIME_MILLIS,
+            }
         };
     }
 
@@ -79,7 +81,10 @@ impl AbilityState {
             return;
         }
 
-        self.remaining_duration = 0;
+        self.remaining_duration = match self.ability.active {
+            None => panic!(),
+            Some(ref active) => active.cooldown * ROUND_TIME_MILLIS,
+        };
         self.listeners.notify(&self);
     }
 

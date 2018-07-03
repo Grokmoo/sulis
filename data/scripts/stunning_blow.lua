@@ -1,6 +1,7 @@
 function on_activate(parent, ability)
   stats = parent:stats()
   if not stats.attack_is_melee then
+    game:say_line("You must have a melee weapon equipped.", parent)
     return
   end
 

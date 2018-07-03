@@ -1,9 +1,11 @@
 function on_activate(parent, ability)
   if not parent:inventory():has_equipped_shield() then
+    game:say_line("You must have a shield equipped.", parent)
     return
   end
   
   if parent:has_active_mode() then
+    game:say_line("Only one mode may be active at a time.", parent)
     return
   end
 

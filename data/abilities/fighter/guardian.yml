@@ -8,6 +8,7 @@ active:
   ap: 1000
   duration:
     Rounds: 1
+  cooldown: 2
 prereqs:
   abilities: [ defensive_fighting ]
 upgrades:

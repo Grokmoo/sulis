@@ -8,6 +8,7 @@ active:
   ap: 1000
   duration:
     Mode
+  cooldown: 2
 upgrades:
   - |
     Your precise shot ability is upgraded, gaining greater accuracy and more powerful critical hits.

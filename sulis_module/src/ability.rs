@@ -31,6 +31,7 @@ pub struct Active {
     pub script: String,
     pub ap: u32,
     pub duration: Duration,
+    pub cooldown: u32,
 }
 
 #[derive(Debug)]
@@ -79,10 +80,20 @@ impl Ability {
                     }, Some(ref script) => script.to_string(),
                 };
 
+                let cooldown = match active.cooldown {
+                    None => {
+                        match active.duration {
+                            Duration::Rounds(c) => c,
+                            Duration::Mode | Duration::Instant => 0,
+                        }
+                    }, Some(c) => c,
+                };
+
                 Some(Active {
                     script,
                     ap: active.ap,
                     duration: active.duration,
+                    cooldown,
                 })
             },
         };
@@ -126,6 +137,7 @@ pub struct ActiveBuilder {
     script: String,
     ap: u32,
     duration: Duration,
+    cooldown: Option<u32>,
 }
 
 #[derive(Deserialize, Debug)]

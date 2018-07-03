@@ -555,7 +555,8 @@ children:
           [s=6|#name#][?prereqs_not_met;c=f00|  Prereqs not Met][?owned_level;c=0f0|  Owned - Level #owned_level#]
           [s=6|]
           [?active;s=5;c=f00|Active - AP: #activate_ap#
-          [s=4;c=fff|[?duration|Duration: #duration# Rounds][?mode|Mode][?instant|Duration: Instantaneous]]
+          [s=4;c=fff|[?duration|Duration: #duration# Rounds][?mode|Mode][?instant|Duration: Instantaneous]
+          ][?cooldown;s=4;c=fff|Cooldown: #cooldown# Rounds]
           ][?passive;s=5;c=0ff|Passive]
           [s=4|#description#]
           [?upgrade1|[s=5|Level 2]

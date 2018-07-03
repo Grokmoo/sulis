@@ -8,6 +8,7 @@ active:
   ap: 4000
   duration:
     Instant
+  cooldown: 2
 prereqs:
   abilities:
     - stunning_blow

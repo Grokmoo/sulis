@@ -1,5 +1,5 @@
 # Sulis
-Sulis is a game and game engine written in Rust.  It is currently in very early development.
+Sulis is a game and game engine written in Rust.  It is currently in early development.
 
 ## Getting Started
 
@@ -9,14 +9,15 @@ You'll need recent versions of Rust and Cargo installed.  The game will compile 
 ### Installation
 
 1. Clone the git repository.
-1. `cargo build`
-1. Run the game with `cargo run`
-1. On first run, `config.yml` is placed in `$HOME/.sulis/` (Linux) or `$HOME\My Documents\My Games\Sulis` (Windows).  This file may be edited with your preferences.
+1. `cargo build --release`
+1. Run the game with `cargo run --release`
+1. On first run, `config.yml` is placed in `$XDG_CONFIG_HOME/.sulis/` (typically `$HOME/.config/.sulis`) (Linux) or `$HOME\My Documents\My Games\Sulis` (Windows).  This file may be edited with your preferences.
+1. Running with release mode is recommended.  The compilation process takes several minutes, but load time and performance in game are massively improved over a standard debug build.
 
 ### Running the editor
 
 1. `cd sulis_editor/`
-1. `cargo run`
+1. `cargo run --release`
 
 ## Built With
 * [Serde](https://serde.rs/)

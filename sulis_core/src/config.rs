@@ -117,8 +117,17 @@ lazy_static! {
 
 #[cfg(not(target_os = "windows"))]
 fn get_user_dir() -> PathBuf {
-    let mut path = get_home_dir();
-    path.push(".sulis/");
+    let mut path = match env::var("XDG_CONFIG_HOME") {
+        Ok(path_str) => {
+            PathBuf::from(path_str)
+        },
+        Err(_) => {
+            let mut path = get_home_dir();
+            path.push(".config/");
+            path
+        }
+    };
+    path.push("sulis/");
     path
 }
 

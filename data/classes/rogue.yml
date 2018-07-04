@@ -16,7 +16,7 @@ starting_abilities:
   - weapon_proficiency_bow
   - weapon_proficiency_small_sword
   - weapon_proficiency_simple
-ability_choices: {}
+upgrades: {}
 kits:
   - name: Swashbuckler
     default_attributes:

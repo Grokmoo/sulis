@@ -5,7 +5,10 @@ description: |
   You are surrounded by a ring of air, providing resistance to electrical and sonic based attacks and a 50% chance to deflect ranged projectiles.
 active:
   script: "air_shield"
+  group: "2nd Circle"
   ap: 2000
   duration:
     Rounds: 3
   cooldown: 4
+prereqs:
+  total_level: 4

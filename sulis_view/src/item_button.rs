@@ -513,6 +513,11 @@ pub fn add_bonus_text_args(bonuses: &BonusList, widget_state: &mut WidgetState) 
         widget_state.add_text_arg("attack_cost", &cost.to_string());
     }
 
+    for (index, (ref group_id, amount)) in bonuses.group_uses_per_encounter.iter().enumerate() {
+        widget_state.add_text_arg(&format!("ability_group_{}", index), group_id);
+        widget_state.add_text_arg(&format!("ability_group_{}_uses_per_encounter", index), &amount.to_string());
+    }
+
     add_if_present(widget_state, "bonus_ap", bonuses.ap);
     add_if_present(widget_state, "bonus_reach", bonuses.bonus_reach);
     add_if_present(widget_state, "bonus_range", bonuses.bonus_range);

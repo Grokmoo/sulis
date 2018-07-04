@@ -35,12 +35,18 @@ pub struct Kit {
 }
 
 #[derive(Debug)]
+pub struct Upgrades {
+    pub ability_choices: Vec<Rc<AbilityList>>,
+    pub group_uses_per_encounter: Vec<(String, u32)>,
+}
+
+#[derive(Debug)]
 pub struct Class {
     pub id: String,
     pub name: String,
     pub description: String,
     pub bonuses_per_level: BonusList,
-    ability_choices: HashMap<u32, Vec<Rc<AbilityList>>>,
+    upgrades: HashMap<u32, Upgrades>,
     starting_abilities: Vec<Rc<Ability>>,
     pub kits: Vec<Kit>,
 }
@@ -53,11 +59,10 @@ impl PartialEq for Class {
 
 impl Class {
     pub fn new(builder: ClassBuilder, module: &Module) -> Result<Class, Error> {
-        let mut ability_choices = HashMap::new();
-        for (level, list) in builder.ability_choices {
-            let mut vec = Vec::new();
-
-            for ability_list_id in list {
+        let mut upgrades = HashMap::new();
+        for (level, upgrades_builder) in builder.upgrades {
+            let mut ability_choices = Vec::new();
+            for ability_list_id in upgrades_builder.ability_choices {
                 let ability_list = match module.ability_lists.get(&ability_list_id) {
                     None => {
                         warn!("Unable to find ability list '{}'", ability_list_id);
@@ -65,10 +70,17 @@ impl Class {
                     }, Some(ref ability_list) => Rc::clone(ability_list),
                 };
 
-                vec.push(ability_list);
+                ability_choices.push(ability_list);
             }
 
-            ability_choices.insert(level, vec);
+            let group_uses_per_encounter = upgrades_builder.group_uses_per_encounter;
+
+            let upgrades_for_level = Upgrades {
+                ability_choices,
+                group_uses_per_encounter,
+            };
+
+            upgrades.insert(level, upgrades_for_level);
         }
 
         if builder.kits.is_empty() {
@@ -94,7 +106,7 @@ impl Class {
             description: builder.description,
             bonuses_per_level: builder.bonuses_per_level,
             kits: builder.kits,
-            ability_choices,
+            upgrades,
             starting_abilities: abilities,
         })
     }
@@ -104,11 +116,28 @@ impl Class {
     }
 
     pub fn ability_choices(&self, level: u32) -> Vec<Rc<AbilityList>> {
-        match self.ability_choices.get(&level) {
+        match self.upgrades.get(&level) {
             None => Vec::new(),
-            Some(choices) => choices.clone(),
+            Some(upgrades) => upgrades.ability_choices.clone(),
         }
     }
+
+    // TODO would love to just return a ref here but we can't return a ref to an empty vec
+    pub fn group_uses_per_encounter(&self, level: u32) -> Vec<(String, u32)> {
+        match self.upgrades.get(&level) {
+            None => Vec::new(),
+            Some(upgrades) => upgrades.group_uses_per_encounter.clone(),
+        }
+    }
+}
+
+#[derive(Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct UpgradesBuilder {
+    ability_choices: Vec<String>,
+
+    #[serde(default)]
+    group_uses_per_encounter: Vec<(String, u32)>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -118,7 +147,7 @@ pub struct ClassBuilder {
     pub name: String,
     pub description: String,
     pub bonuses_per_level: BonusList,
-    pub ability_choices: HashMap<u32, Vec<String>>,
+    pub upgrades: HashMap<u32, UpgradesBuilder>,
     pub starting_abilities: Vec<String>,
     pub kits: Vec<Kit>,
 }

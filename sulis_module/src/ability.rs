@@ -31,6 +31,7 @@ pub struct Active {
     pub script: String,
     pub ap: u32,
     pub duration: Duration,
+    pub group: String,
     pub cooldown: u32,
 }
 
@@ -94,6 +95,7 @@ impl Ability {
                     ap: active.ap,
                     duration: active.duration,
                     cooldown,
+                    group: active.group,
                 })
             },
         };
@@ -137,6 +139,7 @@ pub struct ActiveBuilder {
     script: String,
     ap: u32,
     duration: Duration,
+    group: String,
     cooldown: Option<u32>,
 }
 

@@ -5,7 +5,10 @@ description: |
   Your body is surrounded by a tough layer of rock, granting you a significant armor bonus but making it more difficult to move.
 active:
   script: "rock_armor"
+  group: "2nd Circle"
   ap: 2000
   duration:
     Rounds: 2
   cooldown: 3
+prereqs:
+  total_level: 4

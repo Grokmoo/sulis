@@ -169,6 +169,7 @@ impl LayoutKind {
                 }
                 height += theme.border.vertical()
             },
+            Custom => height += widget.state.size.height,
             _ => {},
         };
 
@@ -200,6 +201,7 @@ impl LayoutKind {
                 }
                 width += theme.border.horizontal()
             },
+            Custom => width += widget.state.size.width,
             _ => {},
         };
 

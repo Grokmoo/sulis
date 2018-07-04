@@ -5,6 +5,7 @@ description: |
   You attempt to grapple a nearby opponent.  If successful, they are unable to move or attack for one turn.  On a graze, the opponent cannot move but can still attack.  It is more difficult to grapple larger targets.
 active:
   script: "grapple"
+  group: Fighter
   ap: 3000
   duration:
     Rounds: 1

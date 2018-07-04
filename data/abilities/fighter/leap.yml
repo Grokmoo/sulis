@@ -5,6 +5,7 @@ description: |
   You make an incredible leap to a nearby location, jumping over obstacles and enemies in your path.
 active:
   script: "leap"
+  group: Fighter
   ap: 1000
   duration:
     Instant

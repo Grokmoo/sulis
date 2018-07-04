@@ -78,6 +78,8 @@ pub struct BonusList {
     pub move_disabled: bool,
     #[serde(default)]
     pub attack_disabled: bool,
+    #[serde(default)]
+    pub group_uses_per_encounter: Vec<(String, u32)>,
 }
 
 impl Default for BonusList {
@@ -110,6 +112,7 @@ impl Default for BonusList {
             attack_cost: None,
             move_disabled: false,
             attack_disabled: false,
+            group_uses_per_encounter: Vec::new(),
         }
     }
 }

@@ -5,7 +5,10 @@ description: |
   You gain 50% concealment, causing half of attacks against you to miss, regardless of your opponent's attack rolls.
 active:
   script: "chameleon"
+  group: "3rd Circle"
   ap: 2000
   duration:
     Rounds: 3
   cooldown: 4
+prereqs:
+  total_level: 7

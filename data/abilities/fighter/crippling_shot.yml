@@ -5,6 +5,7 @@ description: |
   You fire a shot aiming to slow instead of damage.  The attack itself does reduced damage, but adds a large penalty to movement rate on the target.
 active:
   script: "crippling_shot"
+  group: Fighter
   ap: 2000
   duration:
     Rounds: 3

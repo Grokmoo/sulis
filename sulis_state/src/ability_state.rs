@@ -23,17 +23,22 @@ use ChangeListenerList;
 use ROUND_TIME_MILLIS;
 
 pub struct AbilityState {
-    ability: Rc<Ability>,
+    pub ability: Rc<Ability>,
+    pub group: String,
     pub(crate) remaining_duration: u32,
     pub listeners: ChangeListenerList<AbilityState>,
 }
 
 impl AbilityState {
     pub fn new(ability: &Rc<Ability>) -> AbilityState {
-        assert!(ability.active.is_some());
+        let group = match ability.active {
+            None => panic!(),
+            Some(ref active) => active.group.to_string(),
+        };
 
         AbilityState {
             ability: Rc::clone(ability),
+            group,
             remaining_duration: 0,
             listeners: ChangeListenerList::default(),
         }

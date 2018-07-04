@@ -155,10 +155,6 @@ impl CharacterBuilder {
         }))
     }
 
-    pub fn prereqs_met(&self, ability: &Rc<Ability>) -> bool {
-        self.builder_set.prereqs_met(ability)
-    }
-
     pub fn next(&mut self, widget: &Rc<RefCell<Widget>>) {
         self.change_index(widget, 1);
     }
@@ -201,10 +197,6 @@ impl WidgetKind for CharacterBuilder {
 struct CharacterCreator {}
 
 impl BuilderSet for CharacterCreator {
-    fn prereqs_met(&self, _ability: &Rc<Ability>) -> bool {
-        false
-    }
-
     fn on_add(&self, builder: &mut CharacterBuilder,
               _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let class_choices = Module::rules().selectable_classes.clone();
@@ -318,6 +310,4 @@ pub trait BuilderSet {
               widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>>;
 
     fn finish(&self, builder: &mut CharacterBuilder, widget: &Rc<RefCell<Widget>>);
-
-    fn prereqs_met(&self, ability: &Rc<Ability>) -> bool;
 }

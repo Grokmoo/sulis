@@ -5,6 +5,7 @@ description: |
   You attack a single target four times in rapid succession with your melee weapon.  Each attack after the first suffers a successively higher accuracy penalty.
 active:
   script: "blitz"
+  group: Fighter
   ap: 4000
   duration:
     Instant

@@ -14,16 +14,59 @@ starting_abilities:
   - firebolt
   - weapon_proficiency_simple
   - weapon_proficiency_crossbow
-ability_choices:
-  2: [ mage ]
-  3: [ mage, general ]
-  4: [ mage ]
-  5: [ mage ]
-  6: [ mage, general ]
-  7: [ mage ]
-  8: [ mage ]
-  9: [ mage, general ]
-  10: [ mage ]
+upgrades:
+  1:
+    ability_choices: []
+    group_uses_per_encounter:
+      - [ "1st Circle", 2 ]
+  2:
+    ability_choices: [ mage ]
+    group_uses_per_encounter:
+      - [ "1st Circle", 3 ]
+  3:
+    ability_choices: [ mage, general ]
+    group_uses_per_encounter:
+      - [ "1st Circle", 3 ]
+  4:
+    ability_choices: [ mage ]
+    group_uses_per_encounter:
+      - [ "1st Circle", 3 ]
+      - [ "2nd Circle", 1 ]
+  5:
+    ability_choices: [ mage ]
+    group_uses_per_encounter:
+      - [ "1st Circle", 4 ]
+      - [ "2nd Circle", 2 ]
+  6:
+    ability_choices: [ mage, general ]
+    group_uses_per_encounter:
+      - [ "1st Circle", 4 ]
+      - [ "2nd Circle", 3 ]
+  7:
+    ability_choices: [ mage ]
+    group_uses_per_encounter:
+      - [ "1st Circle", 4 ]
+      - [ "2nd Circle", 3 ]
+      - [ "3rd Circle", 1 ]
+  8:
+    ability_choices: [ mage ]
+    group_uses_per_encounter:
+      - [ "1st Circle", 4 ]
+      - [ "2nd Circle", 4 ]
+      - [ "3rd Circle", 2 ]
+  9:
+    ability_choices: [ mage, general ]
+    group_uses_per_encounter:
+      - [ "1st Circle", 4 ]
+      - [ "2nd Circle", 4 ]
+      - [ "3rd Circle", 3 ]
+  10:
+    ability_choices: [ mage ]
+    group_uses_per_encounter:
+      - [ "1st Circle", 4 ]
+      - [ "2nd Circle", 4 ]
+      - [ "3rd Circle", 3 ]
+      - [ "4th Circle", 1 ]
 kits:
   - name: Mage
     default_attributes:

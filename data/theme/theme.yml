@@ -130,28 +130,62 @@ children:
         x_relative: Max
         position: [-41, 0]
         preferred_size: [120, 0]
-        layout: Grid
+        layout: BoxHorizontal
         layout_spacing: { top: 0, bottom: 0, left: 0, right: 1 }
         children:
-          ability_button:
-            from: .button
-            background: background_inner
-            foreground: "greyed_out"
-            preferred_size: [12, 12]
+          group_pane:
+            background: bg_base
+            preferred_size: [0, 0]
+            height_relative: Max
+            width_relative: Custom
+            border: [1, 1, 1, 1]
+            custom:
+              vertical_count: 2
+              grid_width: 13
+              min_horizontal_count: 1
             children:
-              duration_label:
+              title_label:
                 from: .label
-                text: "#duration#"
+                text: "#group#"
+                text_params:
+                  scale: 3.5
+                preferred_size: [0, 4]
+                width_relative: Max
+              uses_label:
+                from: .label
+                text: "#current_uses# / #total_uses#"
                 text_params:
                   horizontal_alignment: Right
-                  vertical_alignment: Top
-                  color: { r: 1.0, g: 0.0, b: 0.0, a: 1.0 }
+                preferred_size: [0, 4]
+                position: [0, 4]
+                width_relative: Max
+              abilities_pane:
                 width_relative: Max
                 height_relative: Max
-              icon:
-                foreground: "#icon#"
-                width_relative: Max
-                height_relative: Max
+                preferred_size: [0, -8]
+                y_relative: Max
+                layout: Grid
+                layout_spacing: { top: 0, bottom: 0, left: 0, right: 0 }
+                children:
+                  ability_button:
+                    from: .button
+                    background: background_inner
+                    foreground: "greyed_out"
+                    preferred_size: [12, 12]
+                    children:
+                      duration_label:
+                        from: .label
+                        text: "#duration#"
+                        text_params:
+                          horizontal_alignment: Right
+                          vertical_alignment: Top
+                          color: { r: 1.0, g: 0.0, b: 0.0, a: 1.0 }
+                        width_relative: Max
+                        height_relative: Max
+                      icon:
+                        foreground: "#icon#"
+                        width_relative: Max
+                        height_relative: Max
       end_turn_button:
         from: .button
         background: background_rounded
@@ -616,7 +650,10 @@ children:
           [s=6|#name#]
           [s=6|]
           [s=5|Bonuses per Level]
-          [?str|Strength: #str#
+          [?ability_group_0|#ability_group_0# ability uses per encounter: #ability_group_0_uses_per_encounter#
+          ][?ability_group_1|#ability_group_1# ability uses per encounter: #ability_group_1_uses_per_encounter#
+          ][?ability_group_2|#ability_group_2# ability uses per encounter: #ability_group_2_uses_per_encounter#
+          ][?str|Strength: #str#
           ][?dex|Dexterity: #dex#
           ][?end|Endurance: #end#
           ][?per|Perception: #per#
@@ -702,6 +739,9 @@ children:
       [?active_mode;c=f00|Active Mode
       ][?total_duration;c=f00|#remaining_duration# of #total_duration# Rounds Remaining
       ][?prof_not_met;s=4.0;c=f00|Proficiency Not Met
+      ][?ability_group_0|#ability_group_0# ability uses per encounter: #ability_group_0_uses_per_encounter#
+      ][?ability_group_1|#ability_group_1# ability uses per encounter: #ability_group_1_uses_per_encounter#
+      ][?ability_group_2|#ability_group_2# ability uses per encounter: #ability_group_2_uses_per_encounter#
       ][?str|Strength: #str#
       ][?dex|Dexterity: #dex#
       ][?end|Endurance: #end#

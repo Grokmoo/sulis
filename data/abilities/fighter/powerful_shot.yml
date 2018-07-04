@@ -5,6 +5,7 @@ description: |
   You put as much energy as possible into each shot.  Your ranged attacks do more damage but suffer in accuracy.  You may only have one combat mode active at a time.
 active:
   script: "powerful_shot"
+  group: Fighter
   ap: 1000
   duration:
     Mode

@@ -5,6 +5,7 @@ description: |
   A large chunk of stone erupts from the ground, damaging a single target.
 active:
   script: "crush"
+  group: "1st Circle"
   ap: 2000
   duration:
     Instant

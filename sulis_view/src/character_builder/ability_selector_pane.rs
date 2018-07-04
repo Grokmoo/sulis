@@ -25,7 +25,8 @@ use sulis_core::resource::ResourceSet;
 use sulis_core::ui::{animation_state, Callback, Widget, WidgetKind};
 use sulis_core::util::Point;
 use sulis_widgets::{Button, Label};
-use sulis_module::{Ability, AbilityList, ability_list::Connect, actor::OwnedAbility};
+use sulis_module::{Ability, AbilityList, ability_list::Connect, Actor, actor::OwnedAbility};
+use sulis_state::EntityState;
 
 use {AbilityPane, CharacterBuilder};
 use character_builder::BuilderPane;
@@ -38,10 +39,11 @@ pub struct AbilitySelectorPane {
     choices: Rc<AbilityList>,
     selected_ability: Option<Rc<Ability>>,
     index: usize,
+    pc: Rc<RefCell<EntityState>>,
 }
 
 impl AbilitySelectorPane {
-    pub fn new(choices: Rc<AbilityList>, index: usize,
+    pub fn new(choices: Rc<AbilityList>, index: usize, pc: Rc<RefCell<EntityState>>,
                already_selected: Vec<OwnedAbility>) -> Rc<RefCell<AbilitySelectorPane>> {
         Rc::new(RefCell::new(AbilitySelectorPane {
             selected_ability: None,
@@ -49,6 +51,7 @@ impl AbilitySelectorPane {
             choices,
             already_selected,
             prereqs_not_met: HashSet::new(),
+            pc,
         }))
     }
 
@@ -100,10 +103,13 @@ impl BuilderPane for AbilitySelectorPane {
             self.add_already_selected(ability);
         }
 
+        let prereq_actor = Rc::new(Actor::from(&self.pc.borrow().actor.actor,
+            builder.class.clone(), 0, builder.abilities.clone()));
+
         self.prereqs_not_met.clear();
         for entry in self.choices.iter() {
             let ability = &entry.ability;
-            if !builder.prereqs_met(ability) {
+            if !ability.meets_prereqs(&prereq_actor) {
                 self.prereqs_not_met.insert(Rc::clone(ability));
             }
         }

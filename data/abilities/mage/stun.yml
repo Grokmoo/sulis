@@ -5,7 +5,10 @@ description: |
   Your target must succeed at a Mental Resistance check or be stunned, losing 6 AP total - causing the target to lose an entire turn's actions.
 active:
   script: "stun"
+  group: "2nd Circle"
   ap: 3000
   duration:
     Instant
   cooldown: 1
+prereqs:
+  total_level: 4

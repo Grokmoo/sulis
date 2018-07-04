@@ -28,10 +28,6 @@ pub struct LevelUpBuilder {
 }
 
 impl BuilderSet for LevelUpBuilder {
-    fn prereqs_met(&self, ability: &Rc<Ability>) -> bool {
-        ability.meets_prereqs(&self.pc.borrow().actor.actor)
-    }
-
     fn on_add(&self, builder: &mut CharacterBuilder,
               _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let mut children = Vec::new();
@@ -57,7 +53,8 @@ impl BuilderSet for LevelUpBuilder {
         let actor = &self.pc.borrow().actor.actor;
         let level = actor.total_level + 1;
         for (index, mut ability_list) in actor.base_class().ability_choices(level).into_iter().enumerate() {
-            let pane = AbilitySelectorPane::new(ability_list, index, actor.abilities.clone());
+            let pane = AbilitySelectorPane::new(ability_list, index, Rc::clone(&self.pc),
+                actor.abilities.clone());
             let widget = Widget::with_defaults(pane.clone());
             widget.borrow_mut().state.set_visible(false);
 

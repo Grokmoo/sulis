@@ -5,6 +5,7 @@ description: |
   You call forth a powerful gust of wind, knocking back all targets in a large cone in front of you.  Targets that are knocked into solid objects such as trees, large rocks, or cliffs take damage based on how far they would have moved if the object had not been present.
 active:
   script: "wind_gust"
+  group: "1st Circle"
   ap: 3000
   duration:
     Instant

@@ -41,6 +41,7 @@ pub struct ActorState {
     effects: Vec<(usize, BonusList)>,
     image: LayeredImage,
     pub(crate) ability_states: HashMap<String, AbilityState>,
+    current_group_uses_per_encounter: HashMap<String, u32>,
     texture_cache_invalid: bool,
 }
 
@@ -83,6 +84,9 @@ impl ActorState {
         inventory.load(save.items, save.equipped)?;
         inventory.add_coins(save.coins);
 
+        let current_group_uses_per_encounter = HashMap::new();
+        // TODO save / load group uses per encounter
+
         Ok(ActorState {
             actor,
             inventory,
@@ -97,6 +101,7 @@ impl ActorState {
             effects: Vec::new(),
             ability_states,
             texture_cache_invalid: false,
+            current_group_uses_per_encounter,
         })
     }
 
@@ -119,6 +124,8 @@ impl ActorState {
 
         let to_equip = actor.to_equip.clone();
 
+        let current_group_uses_per_encounter = HashMap::new();
+
         let xp = actor.xp;
         let mut actor_state = ActorState {
             actor,
@@ -134,6 +141,7 @@ impl ActorState {
             effects: Vec::new(),
             ability_states,
             texture_cache_invalid: false,
+            current_group_uses_per_encounter,
         };
 
         actor_state.compute_stats();
@@ -153,6 +161,10 @@ impl ActorState {
         }
     }
 
+    pub fn current_uses_per_encounter(&self, ability_group: &str) -> u32 {
+        *self.current_group_uses_per_encounter.get(ability_group).unwrap_or(&0)
+    }
+
     pub fn ability_state(&mut self, id: &str) -> Option<&mut AbilityState> {
         self.ability_states.get_mut(id)
     }
@@ -165,7 +177,11 @@ impl ActorState {
             Some(ref state) => {
                 if self.ap < state.activate_ap() { return false; }
 
-                state.is_available() || state.is_active_mode()
+                if state.is_active_mode() { return true; }
+
+                if self.current_uses_per_encounter(&state.group) == 0 { return false; }
+
+                state.is_available()
             }
         }
     }
@@ -175,6 +191,8 @@ impl ActorState {
             None => false,
             Some(ref state) => {
                 if self.ap < state.activate_ap() { return false; }
+
+                if self.current_uses_per_encounter(&state.group) == 0 { return false; }
 
                 state.is_available()
             }
@@ -203,7 +221,10 @@ impl ActorState {
     pub fn activate_ability_state(&mut self, id: &str) {
         match self.ability_states.get_mut(id) {
             None => (),
-            Some(ref mut state) => state.activate(),
+            Some(ref mut state) => {
+                state.activate();
+                *self.current_group_uses_per_encounter.entry(state.group.to_string()).or_insert(1) -= 1;
+            }
         }
     }
 
@@ -631,6 +652,9 @@ impl ActorState {
 
     pub fn init(&mut self) {
         self.hp = self.stats.max_hp;
+        for (ref group, amount) in self.stats.uses_per_encounter_iter() {
+            self.current_group_uses_per_encounter.insert(group.to_string(), *amount);
+        }
     }
 
     pub fn init_turn(&mut self) {
@@ -691,6 +715,7 @@ impl ActorState {
 
         for &(ref class, level) in self.actor.levels.iter() {
             self.stats.add_multiple(&class.bonuses_per_level, level);
+            self.stats.add_group_uses_per_encounter(&class.group_uses_per_encounter(level), 1);
         }
 
         for ability in self.actor.abilities.iter() {

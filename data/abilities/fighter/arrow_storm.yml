@@ -5,6 +5,7 @@ description: |
   You fire a hail of arrows at all enemies in a narrow cone.  Each enemy suffers a standard attack.
 active:
   script: "arrow_storm"
+  group: Fighter
   ap: 4000
   duration:
     Instant

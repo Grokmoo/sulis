@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::collections::HashMap;
 use std::rc::Rc;
 use rand::{self, Rng};
 
@@ -52,6 +53,7 @@ pub struct StatList {
     pub attack_cost: i32,
     pub move_disabled: bool,
     pub attack_disabled: bool,
+    group_uses_per_encounter: HashMap<String, u32>,
 }
 
 impl StatList {
@@ -85,7 +87,20 @@ impl StatList {
             attack_cost: 0,
             move_disabled: false,
             attack_disabled: false,
+            group_uses_per_encounter: HashMap::new(),
         }
+    }
+
+    pub fn uses_per_encounter_iter(&self) -> impl Iterator<Item = (&String, &u32)> {
+        self.group_uses_per_encounter.iter()
+    }
+
+    pub fn ability_groups(&self) -> Vec<String> {
+        self.group_uses_per_encounter.keys().map(|k| k.to_string()).collect()
+    }
+
+    pub fn uses_per_encounter(&self, ability_group: &str) -> u32 {
+        *self.group_uses_per_encounter.get(ability_group).unwrap_or(&0)
     }
 
     pub fn has_armor_proficiency(&self, prof: ArmorKind) -> bool {
@@ -138,6 +153,12 @@ impl StatList {
     /// attacks can reach
     pub fn attack_distance(&self) -> f32 {
         self.attack_range
+    }
+
+    pub fn add_group_uses_per_encounter(&mut self, uses: &Vec<(String, u32)>, times: u32) {
+        for (ref group_id, amount) in uses.iter() {
+            *self.group_uses_per_encounter.entry(group_id.to_string()).or_insert(0) += amount * times;
+        }
     }
 
     /// Adds the bonuses from the specified BonusList to this stat list.
@@ -197,6 +218,8 @@ impl StatList {
 
         if bonuses.move_disabled { self.move_disabled = true; }
         if bonuses.attack_disabled { self.attack_disabled = true; }
+
+        self.add_group_uses_per_encounter(&bonuses.group_uses_per_encounter, times as u32);
 
         if let Some(ref attrs) = bonuses.attributes {
             self.attributes.add_all(attrs);

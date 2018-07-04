@@ -2,7 +2,7 @@ id: heal
 name: "Heal"
 icon: abilities/heal
 description: |
-  You channel a burst of healing energy to one nearby ally, restoring their lost hit points.
+  You channel a burst of healing energy to one nearby ally, restoring their lost hit points over several rounds.
 active:
   script: "heal"
   group: "1st Circle"

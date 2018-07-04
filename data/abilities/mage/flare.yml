@@ -1,0 +1,12 @@
+id: flare
+name: "Flare"
+icon: abilities/flare
+description: |
+  Fire erupts on a nearby target, doing minor damage.
+active:
+  script: "flare"
+  group: "Cantrips"
+  ap: 2000
+  duration:
+    Instant
+  cooldown: 2

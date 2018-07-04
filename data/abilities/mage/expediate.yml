@@ -1,0 +1,12 @@
+id: expediate
+name: "Expediate"
+icon: abilities/expediate
+description: |
+  You or a nearby ally are boosted by the wind, moving more quickly and gaining a small bonus to defense and reflex resistance.
+active:
+  script: "expediate"
+  group: "Cantrips"
+  ap: 2000
+  duration:
+    Rounds: 2
+  cooldown: 4

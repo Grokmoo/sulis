@@ -21,8 +21,6 @@ function on_target_select(parent, ability, targets)
   cb:set_after_attack_fn("create_cripple_effect")
   cb:set_before_attack_fn("create_parent_penalty")
   
-  
-  
   ability:activate(parent)
   parent:anim_weapon_attack(target, cb)
 end

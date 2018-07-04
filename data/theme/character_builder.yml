@@ -112,11 +112,11 @@ children:
             height_relative: Max
           abilities_pane:
             border: [1, 1, 1, 1]
-            preferred_size: [135, 135]
+            preferred_size: [132, 132]
             position: [0, 10]
             custom:
-              grid_size: 15
-              grid_border: 2
+              grid_size: 12
+              grid_border: 1
               connect_up: abilities/connect_up
               connect_down: abilities/connect_down
               connect_straight: abilities/connect_straight
@@ -125,7 +125,7 @@ children:
                 from: .button
                 background: background_inner
                 foreground: ability_overlay
-                preferred_size: [11, 11]
+                preferred_size: [10, 10]
                 x_relative: Custom
                 y_relative: Custom
                 children:

@@ -11,11 +11,11 @@ bonuses_per_level:
   will: 2
   initiative: 1
 starting_abilities:
-  - armor_proficiency_light
-  - weapon_proficiency_crossbow
-  - weapon_proficiency_bow
-  - weapon_proficiency_small_sword
-  - weapon_proficiency_simple
+  - armor_light
+  - weapon_crossbow
+  - weapon_bow
+  - weapon_small_sword
+  - weapon_simple
 upgrades: {}
 kits:
   - name: Swashbuckler

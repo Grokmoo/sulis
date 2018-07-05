@@ -18,7 +18,7 @@ use std::hash::{Hash, Hasher};
 use std::rc::Rc;
 use std::io::Error;
 
-use sulis_rules::BonusList;
+use sulis_rules::{BonusList, StatList};
 use sulis_core::image::Image;
 use sulis_core::resource::{ResourceBuilder, ResourceSet};
 use sulis_core::util::{invalid_data_error, unable_to_create_error};
@@ -45,7 +45,7 @@ pub struct Ability {
     pub active: Option<Active>,
     pub bonuses: BonusList,
     pub prereqs: Option<PrereqList>,
-    pub upgrades: Vec<String>,
+    pub upgrades: Vec<Upgrade>,
 }
 
 impl Eq for Ability { }
@@ -119,6 +119,20 @@ impl Ability {
         })
     }
 
+    pub fn add_bonuses_to(&self, level: u32, stats: &mut StatList) {
+        stats.add(&self.bonuses);
+        let mut index = 1;
+        for upgrade in self.upgrades.iter() {
+            if index > level { break; }
+
+            if let Some(ref bonuses) = upgrade.bonuses {
+                stats.add(bonuses);
+            }
+
+            index += 1;
+        }
+    }
+
     pub fn meets_prereqs(&self, actor: &Rc<Actor>) -> bool {
         match self.prereqs {
             None => true,
@@ -133,6 +147,13 @@ pub enum Duration {
     Rounds(u32),
     Mode,
     Instant,
+}
+
+#[derive(Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct Upgrade {
+    pub description: String,
+    pub bonuses: Option<BonusList>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -156,7 +177,7 @@ pub struct AbilityBuilder {
     pub active: Option<ActiveBuilder>,
     pub bonuses: Option<BonusList>,
     pub prereqs: Option<PrereqListBuilder>,
-    pub upgrades: Option<Vec<String>>,
+    pub upgrades: Option<Vec<Upgrade>>,
 }
 
 impl ResourceBuilder for AbilityBuilder {

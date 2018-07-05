@@ -21,28 +21,51 @@ use {Attribute, Damage, DamageKind, ArmorKind, WeaponKind};
 #[derive(Deserialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct AttackBonusList {
-    pub bonus_damage: Option<Damage>,
-    pub accuracy: Option<i32>,
-    pub crit_threshold: Option<i32>,
-    pub hit_threshold: Option<i32>,
-    pub graze_threshold: Option<i32>,
-    pub graze_multiplier: Option<f32>,
-    pub hit_multiplier: Option<f32>,
-    pub crit_multiplier: Option<f32>,
+    #[serde(default)]
+    pub bonus_damage: Vec<Damage>,
+    #[serde(default)]
+    pub accuracy: i32,
+    #[serde(default)]
+    pub crit_threshold: i32,
+    #[serde(default)]
+    pub hit_threshold: i32,
+    #[serde(default)]
+    pub graze_threshold: i32,
+    #[serde(default)]
+    pub graze_multiplier: f32,
+    #[serde(default)]
+    pub hit_multiplier: f32,
+    #[serde(default)]
+    pub crit_multiplier: f32,
 }
 
 impl Default for AttackBonusList {
     fn default() -> AttackBonusList {
         AttackBonusList {
-            bonus_damage: None,
-            accuracy: None,
-            crit_threshold: None,
-            hit_threshold: None,
-            graze_threshold: None,
-            graze_multiplier: None,
-            hit_multiplier: None,
-            crit_multiplier: None,
+            bonus_damage: Vec::new(),
+            accuracy: 0,
+            crit_threshold: 0,
+            hit_threshold: 0,
+            graze_threshold: 0,
+            graze_multiplier: 0.0,
+            hit_multiplier: 0.0,
+            crit_multiplier: 0.0,
         }
+    }
+}
+
+impl AttackBonusList {
+    pub fn add(&mut self, other: &AttackBonusList) {
+        for damage in other.bonus_damage.iter() {
+            self.bonus_damage.push(*damage);
+        }
+        self.accuracy += other.accuracy;
+        self.crit_threshold += other.crit_threshold;
+        self.hit_threshold += other.hit_threshold;
+        self.graze_threshold += other.graze_threshold;
+        self.graze_multiplier += other.graze_multiplier;
+        self.hit_multiplier += other.hit_multiplier;
+        self.crit_multiplier += other.crit_multiplier;
     }
 }
 
@@ -56,6 +79,8 @@ pub struct BonusList {
     pub bonus_damage: Option<Damage>,
     pub armor_proficiencies: Option<Vec<ArmorKind>>,
     pub weapon_proficiencies: Option<Vec<WeaponKind>>,
+    #[serde(default)]
+    pub weapon_bonuses: Vec<(WeaponKind, AttackBonusList)>,
     pub bonus_reach: Option<f32>,
     pub bonus_range: Option<f32>,
     pub initiative: Option<i32>,
@@ -91,6 +116,7 @@ impl Default for BonusList {
             armor_kinds: None,
             armor_proficiencies: None,
             weapon_proficiencies: None,
+            weapon_bonuses: Vec::new(),
             bonus_damage: None,
             bonus_range: None,
             bonus_reach: None,

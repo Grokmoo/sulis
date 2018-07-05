@@ -13,5 +13,5 @@ active:
   short_description: |
     Hold an opponent, preventing them from moving or attacking.
 upgrades:
-  - |
-    Your grapple ability is improved, allowing you to grapple larger targets more easily.
+  - description: |
+      Your grapple ability is improved, allowing you to grapple larger targets more easily.

@@ -1,0 +1,23 @@
+id: weapon_axe
+name: "Axe"
+icon: abilities/weapon_axe
+description: |
+  You have proficiency in the use of axes.
+bonuses:
+  weapon_proficiencies:
+    - Axe
+prereqs:
+  abilities: [ weapon_simple ]
+upgrades:
+  - description: |
+      You gain a bonus to damage while using axes.
+    bonuses:
+      weapon_bonuses:
+        - - Axe
+          - bonus_damage: [ { min: 3, max: 5 } ]
+  - description: |
+      Critical hits you make with axes become even more devastating.
+    bonuses:
+      weapon_bonuses:
+        - - Axe
+          - crit_multiplier: 0.5

@@ -19,7 +19,7 @@ use std::rc::Rc;
 use sulis_core::image::Image;
 use sulis_core::resource::ResourceSet;
 use bonus_list::{AttackBuilder, AttackKindBuilder, AttackBonusList};
-use {Armor, Damage, DamageKind, DamageList, StatList};
+use {Armor, Damage, DamageKind, DamageList, StatList, WeaponKind};
 
 use AttackKind::*;
 
@@ -49,12 +49,19 @@ impl Attack {
         }
     }
 
-    pub fn new(builder: &AttackBuilder, stats: &StatList) -> Attack {
-        let mut bonus_damage = stats.bonus_damage.clone();
-        if let Some(ref damage) = builder.bonuses.bonus_damage {
-            bonus_damage.push(damage.clone());
+    pub fn new(builder: &AttackBuilder, stats: &StatList, weapon_kind: WeaponKind) -> Attack {
+        let mut bonuses = builder.bonuses.clone();
+
+        for (owned_kind, owned_bonuses) in stats.weapon_bonuses.iter() {
+            if *owned_kind == weapon_kind {
+                bonuses.add(owned_bonuses);
+            }
         }
 
+        let mut bonus_damage = stats.bonus_damage.clone();
+        for damage in bonuses.bonus_damage.iter() {
+            bonus_damage.push(damage.clone());
+        }
         let damage = DamageList::new(builder.damage, &bonus_damage);
 
         let kind = match builder.kind {
@@ -74,7 +81,7 @@ impl Attack {
         Attack {
             damage,
             kind,
-            bonuses: builder.bonuses.clone(),
+            bonuses,
         }
     }
 

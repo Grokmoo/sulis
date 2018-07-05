@@ -17,7 +17,6 @@
 use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
-use std::fmt::Display;
 
 use sulis_rules::{Attribute, DamageKind};
 use sulis_state::{ChangeListener, EntityState};
@@ -201,11 +200,8 @@ fn add_effect_text_args(effect: &Effect, widget_state: &mut WidgetState) {
     add_bonus_text_args(&effect.bonuses(), widget_state);
 }
 
-fn add_fmt_text_arg<T: Display>(state: &mut WidgetState, index: usize, name: &str, value: Option<T>) {
-    let value = match value {
-        None => return,
-        Some(val) => val,
-    };
+fn add_if_nonzero(state: &mut WidgetState, index: usize, name: &str, value: f32) {
+    if value == 0.0 { return; }
 
     state.add_text_arg(&format!("{}_{}", index, name), &value.to_string());
 }
@@ -246,13 +242,13 @@ pub fn create_details_text_box(pc: &ActorState) -> Rc<RefCell<Widget>> {
                 state.add_text_arg(&format!("{}_armor_piercing", index)
                                    , &attack.damage.ap().to_string());
             }
-            add_fmt_text_arg(state, index, "accuracy", attack.bonuses.accuracy);
-            add_fmt_text_arg(state, index, "crit_threshold", attack.bonuses.crit_threshold);
-            add_fmt_text_arg(state, index, "hit_threshold", attack.bonuses.hit_threshold);
-            add_fmt_text_arg(state, index, "graze_threshold", attack.bonuses.graze_threshold);
-            add_fmt_text_arg(state, index, "crit_multiplier", attack.bonuses.crit_multiplier);
-            add_fmt_text_arg(state, index, "hit_multiplier", attack.bonuses.hit_multiplier);
-            add_fmt_text_arg(state, index, "graze_multiplier", attack.bonuses.graze_multiplier);
+            add_if_nonzero(state, index, "accuracy", attack.bonuses.accuracy as f32);
+            add_if_nonzero(state, index, "crit_threshold", attack.bonuses.crit_threshold as f32);
+            add_if_nonzero(state, index, "hit_threshold", attack.bonuses.hit_threshold as f32);
+            add_if_nonzero(state, index, "graze_threshold", attack.bonuses.graze_threshold as f32);
+            add_if_nonzero(state, index, "crit_multiplier", attack.bonuses.crit_multiplier);
+            add_if_nonzero(state, index, "hit_multiplier", attack.bonuses.hit_multiplier);
+            add_if_nonzero(state, index, "graze_multiplier", attack.bonuses.graze_multiplier);
         }
 
         state.add_text_arg("reach", &stats.attack_distance().to_string());

@@ -1,8 +1,0 @@
-id: weapon_proficiency_large_sword
-name: "Large Sword Proficiency"
-icon: abilities/weapon_proficiency
-description: |
-  You have proficiency in the use of large swords.
-bonuses:
-  weapon_proficiencies:
-    - LargeSword

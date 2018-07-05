@@ -1,6 +1,6 @@
-id: armor_proficiency_light
-name: "Light Armor Proficiency"
-icon: abilities/armor_proficiency
+id: armor_light
+name: "Light Armor"
+icon: abilities/armor_light
 description: |
   You have proficiency in the use of light armor.
 bonuses:

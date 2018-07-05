@@ -13,5 +13,5 @@ active:
   short_description: |
     Enter a mode with improved defenses at the cost of accuracy.
 upgrades:
-  - |
-    When in defensive fighting mode, attacks made on you from within melee range reflect a portion of their damage back on their attacker.
+  - description: |
+      When in defensive fighting mode, attacks made on you from within melee range reflect a portion of their damage back on their attacker.

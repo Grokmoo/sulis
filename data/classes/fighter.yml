@@ -12,17 +12,17 @@ bonuses_per_level:
   will: 2
   initiative: 1
 starting_abilities:
-  - armor_proficiency_light
-  - armor_proficiency_medium
-  - armor_proficiency_heavy
-  - weapon_proficiency_axe
-  - weapon_proficiency_crossbow
-  - weapon_proficiency_bow
-  - weapon_proficiency_small_sword
-  - weapon_proficiency_large_sword
-  - weapon_proficiency_spear
-  - weapon_proficiency_mace
-  - weapon_proficiency_simple
+  - armor_light
+  - armor_medium
+  - armor_heavy
+  - weapon_axe
+  - weapon_crossbow
+  - weapon_bow
+  - weapon_small_sword
+  - weapon_large_sword
+  - weapon_spear
+  - weapon_mace
+  - weapon_simple
 upgrades:
   2:
     ability_choices: [ fighter ]

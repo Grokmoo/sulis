@@ -1,0 +1,23 @@
+id: weapon_small_sword
+name: "Small Sword"
+icon: abilities/weapon_small_sword
+description: |
+  You have proficiency in the use of small swords.
+bonuses:
+  weapon_proficiencies:
+    - SmallSword
+prereqs:
+  abilities: [ weapon_simple ]
+upgrades:
+  - description: |
+      You gain a bonus to accuracy while using small swords.
+    bonuses:
+      weapon_bonuses:
+        - - SmallSword
+          - accuracy: 10
+  - description: |
+      You get more critical hits when using small swords.
+    bonuses:
+      weapon_bonuses:
+        - - SmallSword
+          - crit_threshold: -10

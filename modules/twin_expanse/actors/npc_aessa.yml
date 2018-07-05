@@ -38,10 +38,15 @@ equipped:
   - 2
   - 3
   - 4
+xp: 300
 levels:
   mage: 3
 abilities:
-  - firebolt
-  - heal
-  - weapon_proficiency_crossbow
-  - weapon_proficiency_simple
+  - minor_heal
+  - flare
+  - expediate
+  - acid_bomb
+  - weapon_simple
+  - weapon_crossbow
+  - wind_gust
+  - crush

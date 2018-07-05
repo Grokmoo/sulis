@@ -1,8 +1,0 @@
-id: weapon_proficiency_crossbow
-name: "Crossbow Proficiency"
-icon: abilities/weapon_proficiency
-description: |
-  You have proficiency in the use of crossbows.
-bonuses:
-  weapon_proficiencies:
-    - Crossbow

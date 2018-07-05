@@ -135,16 +135,21 @@ children:
                     height_relative: Max
                   upgrade0:
                     foreground: ball_small_animated
-                    preferred_size: [3, 3]
+                    preferred_size: [2, 2]
                     y_relative: Max
                   upgrade1:
                     foreground: ball_small_animated
-                    preferred_size: [3, 3]
+                    preferred_size: [2, 2]
                     y_relative: Max
-                    position: [3, 0]
+                    position: [2, 0]
                   upgrade2:
                     foreground: ball_small_animated
-                    preferred_size: [3, 3]
+                    preferred_size: [2, 2]
+                    y_relative: Max
+                    position: [4, 0]
+                  upgrade3:
+                    foreground: ball_small_animated
+                    preferred_size: [2, 2]
                     y_relative: Max
                     position: [6, 0]
       class_selector_pane:

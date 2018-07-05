@@ -24,7 +24,7 @@ use sulis_core::image::{LayeredImage};
 use sulis_core::ui::{color, Color};
 use sulis_core::util::invalid_data_error;
 use sulis_module::{item, Actor, Module, ActorBuilder};
-use sulis_rules::{Attack, AttackKind, BonusList, HitKind, StatList};
+use sulis_rules::{Attack, AttackKind, BonusList, HitKind, StatList, WeaponKind};
 use {AbilityState, ChangeListenerList, Effect, EntityState, GameState, Inventory, ItemState, TurnTimer};
 use save_state::ActorSaveState;
 
@@ -347,11 +347,11 @@ impl ActorState {
                     return (HitKind::Miss, 0, "Miss".to_string(), color::GRAY);
                 },
                 HitKind::Graze =>
-                    parent_stats.graze_multiplier + attack.bonuses.graze_multiplier.unwrap_or(0.0),
+                    parent_stats.graze_multiplier + attack.bonuses.graze_multiplier,
                 HitKind::Hit =>
-                    parent_stats.hit_multiplier + attack.bonuses.hit_multiplier.unwrap_or(0.0),
+                    parent_stats.hit_multiplier + attack.bonuses.hit_multiplier,
                 HitKind::Crit =>
-                    parent_stats.crit_multiplier + attack.bonuses.crit_multiplier.unwrap_or(0.0),
+                    parent_stats.crit_multiplier + attack.bonuses.crit_multiplier,
             };
             (hit_kind, damage_multiplier)
         };
@@ -719,7 +719,8 @@ impl ActorState {
         }
 
         for ability in self.actor.abilities.iter() {
-            self.stats.add(&ability.ability.bonuses);
+            let level = ability.level;
+            ability.ability.add_bonuses_to(level, &mut self.stats);
         }
 
         let mut attacks_list = Vec::new();
@@ -728,7 +729,16 @@ impl ActorState {
                 None => continue,
                 Some(ref equippable) => {
                     if let Some(ref attack) = equippable.attack {
-                        attacks_list.push(attack);
+                        let weapon_kind = match item_state.item.kind {
+                            item::ItemKind::Weapon { kind } => kind,
+                            _ => {
+                                warn!("Weapon attack belonging to item '{}' with no associated WeaponKind",
+                                      item_state.item.id);
+                                continue;
+                            }
+                        };
+
+                        attacks_list.push((attack, weapon_kind));
                     }
 
                     equippable
@@ -739,7 +749,7 @@ impl ActorState {
         }
 
         let multiplier = if attacks_list.is_empty() {
-            attacks_list.push(&self.actor.race.base_attack);
+            attacks_list.push((&self.actor.race.base_attack, WeaponKind::Simple));
             1.0
         } else if attacks_list.len() > 1 {
             rules.dual_wield_damage_multiplier

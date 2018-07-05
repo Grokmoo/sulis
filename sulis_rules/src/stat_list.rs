@@ -29,6 +29,7 @@ pub struct StatList {
     pub attributes: AttributeList,
     armor_proficiencies: Vec<ArmorKind>,
     weapon_proficiencies: Vec<WeaponKind>,
+    pub weapon_bonuses: Vec<(WeaponKind, AttackBonusList)>,
     pub bonus_ap: i32,
     pub bonus_damage: Vec<Damage>,
     pub bonus_reach: f32,
@@ -62,6 +63,7 @@ impl StatList {
             attributes: attrs,
             armor_proficiencies: Vec::new(),
             weapon_proficiencies: Vec::new(),
+            weapon_bonuses: Vec::new(),
             bonus_ap: 0,
             bonus_damage: Vec::new(),
             bonus_reach: 0.0,
@@ -112,7 +114,7 @@ impl StatList {
     }
 
     pub fn attack_roll(&self, defense: i32, bonuses: &AttackBonusList) -> HitKind {
-        let accuracy = self.accuracy + bonuses.accuracy.unwrap_or(0);
+        let accuracy = self.accuracy + bonuses.accuracy;
         let roll = rand::thread_rng().gen_range(1, 101);
         debug!("Attack roll: {} with accuracy {} against {}", roll, accuracy, defense);
 
@@ -120,11 +122,11 @@ impl StatList {
 
         let result = roll + accuracy - defense;
 
-        if result > self.crit_threshold + bonuses.crit_threshold.unwrap_or(0) {
+        if result > self.crit_threshold + bonuses.crit_threshold {
             HitKind::Crit
-        } else if result > self.hit_threshold + bonuses.hit_threshold.unwrap_or(0) {
+        } else if result > self.hit_threshold + bonuses.hit_threshold {
             HitKind::Hit
-        } else if result > self.graze_threshold + bonuses.graze_threshold.unwrap_or(0) {
+        } else if result > self.graze_threshold + bonuses.graze_threshold {
             HitKind::Graze
         } else {
             HitKind::Miss
@@ -194,6 +196,22 @@ impl StatList {
             }
         }
 
+        for (weapon_kind, ref attack_bonuses) in bonuses.weapon_bonuses.iter() {
+            let mut found = false;
+            for (owned_weapon_kind, ref mut owned_bonuses) in self.weapon_bonuses.iter_mut() {
+                if weapon_kind == owned_weapon_kind {
+                    owned_bonuses.add(attack_bonuses);
+                    found = true;
+                    break;
+                }
+            }
+
+            if !found {
+                let owned_bonuses = attack_bonuses.clone();
+                self.weapon_bonuses.push((*weapon_kind, owned_bonuses));
+            }
+        }
+
         let times_f32 = times as f32;
         let times_i32 = times as i32;
         if let Some(ap) = bonuses.ap { self.bonus_ap += ap * times_i32; }
@@ -226,14 +244,14 @@ impl StatList {
         }
     }
 
-    pub fn finalize(&mut self, attacks: Vec<&AttackBuilder>, multiplier: f32, base_attr: i32) {
+    pub fn finalize(&mut self, attacks: Vec<(&AttackBuilder, WeaponKind)>, multiplier: f32, base_attr: i32) {
         if attacks.is_empty() {
             warn!("Finalized stats with no attacks");
         }
 
         let mut attack_range = None;
-        for builder in attacks {
-            let attack = Attack::new(builder, &self).mult(multiplier);
+        for (builder, weapon_kind) in attacks {
+            let mut attack = Attack::new(builder, &self, weapon_kind).mult(multiplier);
 
             if attack_range.is_none() {
                 attack_range = Some(attack.distance());

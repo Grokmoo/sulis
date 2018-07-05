@@ -454,15 +454,16 @@ pub fn add_attack_text_args(attack: &AttackBuilder, widget_state: &mut WidgetSta
     }
 
     let bonuses = &attack.bonuses;
-    add_if_present(widget_state, "attack_crit_threshold", bonuses.crit_threshold);
-    add_if_present(widget_state, "attack_hit_threshold", bonuses.hit_threshold);
-    add_if_present(widget_state, "attack_graze_threshold", bonuses.graze_threshold);
-    add_if_present(widget_state, "attack_graze_multiplier", bonuses.graze_multiplier);
-    add_if_present(widget_state, "attack_hit_multiplier", bonuses.hit_multiplier);
-    add_if_present(widget_state, "attack_crit_multiplier", bonuses.crit_multiplier);
-    add_if_present(widget_state, "attack_accuracy", bonuses.accuracy);
+    add_if_nonzero(widget_state, "attack_crit_threshold", bonuses.crit_threshold as f32);
+    add_if_nonzero(widget_state, "attack_hit_threshold", bonuses.hit_threshold as f32);
+    add_if_nonzero(widget_state, "attack_graze_threshold", bonuses.graze_threshold as f32);
+    add_if_nonzero(widget_state, "attack_graze_multiplier", bonuses.graze_multiplier);
+    add_if_nonzero(widget_state, "attack_hit_multiplier", bonuses.hit_multiplier);
+    add_if_nonzero(widget_state, "attack_crit_multiplier", bonuses.crit_multiplier);
+    add_if_nonzero(widget_state, "attack_accuracy", bonuses.accuracy as f32);
 
-    if let Some(ref damage) = bonuses.bonus_damage {
+    for damage in bonuses.bonus_damage.iter() {
+        // TODO support multiple bonus damages
         widget_state.add_text_arg("attack_min_bonus_damage", &damage.min.to_string());
         widget_state.add_text_arg("attack_max_bonus_damage", &damage.max.to_string());
         if let Some(kind) = damage.kind {
@@ -536,6 +537,12 @@ pub fn add_bonus_text_args(bonuses: &BonusList, widget_state: &mut WidgetState) 
     add_if_present(widget_state, "hit_multiplier", bonuses.hit_multiplier);
     add_if_present(widget_state, "crit_multiplier", bonuses.crit_multiplier);
     add_if_present(widget_state, "movement_rate", bonuses.movement_rate);
+}
+
+fn add_if_nonzero(widget_state: &mut WidgetState, text: &str, val: f32) {
+    if val != 0.0 {
+        widget_state.add_text_arg(text, &val.to_string());
+    }
 }
 
 fn add_if_present<T: Display>(widget_state: &mut WidgetState, text: &str, val: Option<T>) {

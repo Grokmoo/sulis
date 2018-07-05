@@ -13,5 +13,5 @@ active:
   short_description: |
     Enter a mode with improved ranged damage.
 upgrades:
-  - |
-    Your powerful shot ability is upgraded, causing even more damage - especially on grazes.
+  - description: |
+      Your powerful shot ability is upgraded, causing even more damage - especially on grazes.

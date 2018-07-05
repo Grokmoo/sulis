@@ -1,0 +1,10 @@
+id: armor_heavy
+name: "Heavy Armor"
+icon: abilities/armor_heavy
+description: |
+  You have proficiency in the use of heavy armor.
+bonuses:
+  armor_proficiencies:
+    - Heavy
+prereqs:
+  abilities: [ armor_medium ]

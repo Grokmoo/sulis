@@ -37,11 +37,14 @@ equipped:
   - 1
   - 2
   - 3
+xp: 300
 levels:
   rogue: 3
 abilities:
-  - armor_proficiency_light
-  - weapon_proficiency_crossbow
-  - weapon_proficiency_bow
-  - weapon_proficiency_small_sword
-  - weapon_proficiency_simple
+  - armor_light
+  - weapon_crossbow
+  - weapon_bow
+  - weapon_small_sword
+  - weapon_simple
+  - precise_shot
+  - crippling_shot

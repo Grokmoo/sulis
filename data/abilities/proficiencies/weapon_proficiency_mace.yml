@@ -1,9 +1,0 @@
-id: weapon_proficiency_mace
-name: "Mace & Hammer Proficiency"
-icon: abilities/weapon_proficiency
-description: |
-  You have proficiency in the use of maces and hammers.
-bonuses:
-  weapon_proficiencies:
-    - Mace
-    - Hammer

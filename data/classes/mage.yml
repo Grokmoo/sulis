@@ -15,8 +15,8 @@ starting_abilities:
   - flare
   - expediate
   - acid_bomb
-  - weapon_proficiency_simple
-  - weapon_proficiency_crossbow
+  - weapon_simple
+  - weapon_crossbow
 upgrades:
   1:
     ability_choices: []

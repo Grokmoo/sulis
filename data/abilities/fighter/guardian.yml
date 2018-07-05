@@ -15,5 +15,5 @@ active:
 prereqs:
   abilities: [ defensive_fighting ]
 upgrades:
-  - |
-    Your guardian ability is upgraded - now allowing you to protect all allies in melee range at once.
+  - description: |
+      Your guardian ability is upgraded - now allowing you to protect all allies in melee range at once.

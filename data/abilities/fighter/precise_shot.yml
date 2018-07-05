@@ -13,5 +13,5 @@ active:
   short_description: |
     Enter a mode with improved ranged accuracy.
 upgrades:
-  - |
-    Your precise shot ability is upgraded, gaining greater accuracy and more powerful critical hits.
+  - description: |
+      Your precise shot ability is upgraded, gaining greater accuracy and more powerful critical hits.

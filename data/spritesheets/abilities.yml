@@ -13,8 +13,6 @@ groups:
       resilient_body: [3, 0]
       backstory: [4, 0]
       crush: [5, 0]
-      armor_proficiency: [6, 0]
-      weapon_proficiency: [7, 0]
       
       lightning_reflexes: [0, 1]
       stunning_blow: [1, 1]
@@ -59,6 +57,19 @@ groups:
       precise_shot: [5, 7]
       penetrating_shot: [6, 7]
       crippling_shot: [7, 7]
+      
+      armor_light: [0, 8]
+      armor_medium: [1, 8]
+      armor_heavy: [2, 8]
+      weapon_axe: [3, 8]
+      weapon_bow: [4, 8]
+      weapon_crossbow: [5, 8]
+      weapon_large_sword: [6, 8]
+      weapon_mace: [7, 8]
+      
+      weapon_simple: [0, 9]
+      weapon_small_sword: [1, 9]
+      weapon_spear: [2, 9]
       
       prereqs_not_met: [7, 4]
       connect_straight: [5, 5]

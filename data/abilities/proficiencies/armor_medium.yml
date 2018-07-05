@@ -1,0 +1,10 @@
+id: armor_medium
+name: "Medium Armor"
+icon: abilities/armor_medium
+description: |
+  You have proficiency in the use of medium armor.
+bonuses:
+  armor_proficiencies:
+    - Medium
+prereqs:
+  abilities: [ armor_light ]

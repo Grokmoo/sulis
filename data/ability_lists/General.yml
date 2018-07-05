@@ -17,30 +17,30 @@ abilities:
   - id: elemental_defense
     position: [1, 2]
 
-  - id: armor_proficiency_light
+  - id: armor_light
     position: [0, 3]
     connect: [ Straight ]
-  - id: armor_proficiency_medium
+  - id: armor_medium
     position: [1, 3]
     connect: [ Straight ]
-  - id: armor_proficiency_heavy
+  - id: armor_heavy
     position: [2, 3]
 
-  - id: weapon_proficiency_simple
+  - id: weapon_simple
     position: [0, 5]
     connect: [ LongUp, LongDown, Straight ]
-  - id: weapon_proficiency_mace
+  - id: weapon_mace
     position: [1, 4]
-  - id: weapon_proficiency_axe
+  - id: weapon_axe
     position: [1, 5]
-  - id: weapon_proficiency_small_sword
+  - id: weapon_small_sword
     position: [1, 6]
     connect: [ Straight ]
-  - id: weapon_proficiency_large_sword
+  - id: weapon_large_sword
     position: [2, 6]
-  - id: weapon_proficiency_spear
+  - id: weapon_spear
     position: [0, 7]
-  - id: weapon_proficiency_bow
+  - id: weapon_bow
     position: [1, 7]
-  - id: weapon_proficiency_crossbow
+  - id: weapon_crossbow
     position: [2, 7]

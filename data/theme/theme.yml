@@ -609,6 +609,8 @@ children:
           [s=4|#upgrade1#]]
           [?upgrade2|[s=5|Level 3]
           [s=4|#upgrade2#]]
+          [?upgrade3|[s=5|Level 4]
+          [s=4|#upgrade3#]]
           [?str|Strength: #str#
           ][?dex|Dexterity: #dex#
           ][?end|Endurance: #end#

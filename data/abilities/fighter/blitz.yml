@@ -10,6 +10,8 @@ active:
   duration:
     Instant
   cooldown: 2
+  short_description: |
+    Rapidly attack a single opponent many times.
 prereqs:
   abilities:
     - stunning_blow

@@ -10,5 +10,7 @@ active:
   duration:
     Instant
   cooldown: 1
+  short_description: |
+    Damage one opponent with electricity.
 prereqs:
   total_level: 4

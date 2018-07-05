@@ -10,6 +10,8 @@ active:
   duration:
     Instant
   cooldown: 1
+  short_description: |
+    Deal large fire damage to a group of opponents.
 prereqs:
   abilities: [ "flaming_fingers" ]
   total_level: 7

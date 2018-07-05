@@ -10,6 +10,8 @@ active:
   duration:
     Mode
   cooldown: 2
+  short_description: |
+    Enter a mode with more powerful melee attacks at the cost of defense.
 prereqs:
   abilities: [ mighty_blow ]
 upgrades:

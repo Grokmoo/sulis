@@ -10,3 +10,5 @@ active:
   duration:
     Instant
   cooldown: 1
+  short_description: |
+    Knock back all enemies in an arc.

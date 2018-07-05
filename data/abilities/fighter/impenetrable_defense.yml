@@ -11,5 +11,7 @@ active:
   duration:
     Rounds: 2
   cooldown: 3
+  short_description: |
+    Gain bonuses to all defenses.
 prereqs:
   abilities: [ defensive_fighting ]

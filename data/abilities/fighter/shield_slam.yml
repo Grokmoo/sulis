@@ -12,6 +12,8 @@ active:
   duration:
     Instant
   cooldown: 1
+  short_description: |
+    Push back, stun, and damage a single opponent.
 upgrades:
   - |
     Your shield slam is upgraded - becoming more accurate and pushing targets back further.

@@ -10,5 +10,7 @@ active:
   duration:
     Rounds: 2
   cooldown: 3
+  short_description: |
+    Gain greatly improved armor at the cost of movement.
 prereqs:
   total_level: 4

@@ -19,14 +19,12 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_module::{actor::OwnedAbility, Ability};
+use sulis_module::{actor::OwnedAbility, Ability, Module, ability::Duration};
 use sulis_state::{ChangeListener, EntityState, GameState};
 use sulis_core::io::event;
 use sulis_core::ui::{Widget, WidgetKind};
 use sulis_core::util::Size;
-use sulis_widgets::{Label};
-
-use BasicMouseover;
+use sulis_widgets::{Label, TextArea};
 
 pub const NAME: &str = "abilities_bar";
 
@@ -197,6 +195,7 @@ impl WidgetKind for GroupPane {
 struct AbilityButton {
     entity: Rc<RefCell<EntityState>>,
     ability: Rc<Ability>,
+    hover: Option<Rc<RefCell<Widget>>>,
 }
 
 impl AbilityButton {
@@ -204,7 +203,15 @@ impl AbilityButton {
         Rc::new(RefCell::new(AbilityButton {
             ability: Rc::clone(ability),
             entity: Rc::clone(entity),
+            hover: None,
         }))
+    }
+
+    fn remove_hover(&mut self) {
+        if let Some(ref hover) = self.hover {
+            hover.borrow_mut().mark_for_removal();
+        }
+        self.hover = None;
     }
 }
 
@@ -239,19 +246,59 @@ impl WidgetKind for AbilityButton {
         vec![icon, duration_label]
     }
 
-    fn on_mouse_move(&mut self, widget: &Rc<RefCell<Widget>>, _: f32, _: f32) -> bool {
-        let x = widget.borrow().state.inner_left();
-        let y = widget.borrow().state.inner_bottom();
-        Widget::set_mouse_over(widget, BasicMouseover::new(&self.ability.name),
-            x, y);
+    fn on_mouse_enter(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
+        self.super_on_mouse_enter(widget);
+
+        if self.hover.is_some() { return true; }
+
+        let root = Widget::get_root(widget);
+        let hover = Widget::with_theme(TextArea::empty(), "ability_hover");
+        {
+            let mut hover = hover.borrow_mut();
+            hover.state.disable();
+            hover.state.set_position(widget.borrow().state.inner_right(),
+                widget.borrow().state.inner_top());
+
+            hover.state.add_text_arg("name", &self.ability.name);
+            hover.state.add_text_arg("description", &self.ability.description);
+            if let Some(ref active) = self.ability.active {
+                let ap = active.ap / Module::rules().display_ap;
+                hover.state.add_text_arg("activate_ap", &ap.to_string());
+
+                match active.duration {
+                    Duration::Rounds(rounds) => hover.state.add_text_arg("duration", &rounds.to_string()),
+                    Duration::Mode => hover.state.add_text_arg("mode", "true"),
+                    Duration::Instant => hover.state.add_text_arg("instant", "true"),
+                }
+
+                if active.cooldown != 0 {
+                    hover.state.add_text_arg("cooldown", &active.cooldown.to_string());
+                }
+
+                hover.state.add_text_arg("short_description", &active.short_description);
+            }
+        }
+
+        Widget::add_child_to(&root, Rc::clone(&hover));
+        self.hover = Some(hover);
+
+        true
+    }
+
+    fn on_mouse_exit(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
+        self.super_on_mouse_exit(widget);
+
+        self.remove_hover();
         true
     }
 
     fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: event::ClickKind) -> bool {
         self.super_on_mouse_release(widget, kind);
 
+        self.remove_hover();
+
         if self.entity.borrow().actor.can_activate(&self.ability.id) {
-            info!("Activate {}", self.ability.id);
+            info!("ate {}", self.ability.id);
             GameState::execute_ability_on_activate(&self.entity, &self.ability);
         } else if self.entity.borrow().actor.can_toggle(&self.ability.id) {
             self.entity.borrow_mut().actor.deactivate_ability_state(&self.ability.id);

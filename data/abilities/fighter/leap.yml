@@ -10,4 +10,5 @@ active:
   duration:
     Instant
   cooldown: 1
-
+  short_description: |
+    Leap over obstacles to a nearby location.

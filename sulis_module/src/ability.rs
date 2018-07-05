@@ -33,6 +33,7 @@ pub struct Active {
     pub duration: Duration,
     pub group: String,
     pub cooldown: u32,
+    pub short_description: String,
 }
 
 #[derive(Debug)]
@@ -96,6 +97,7 @@ impl Ability {
                     duration: active.duration,
                     cooldown,
                     group: active.group,
+                    short_description: active.short_description,
                 })
             },
         };
@@ -141,6 +143,7 @@ pub struct ActiveBuilder {
     duration: Duration,
     group: String,
     cooldown: Option<u32>,
+    short_description: String,
 }
 
 #[derive(Deserialize, Debug)]

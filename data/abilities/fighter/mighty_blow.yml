@@ -11,4 +11,5 @@ active:
   duration:
     Instant
   cooldown: 1
-
+  short_description: |
+    A super powered melee attack against one opponent.

@@ -10,5 +10,7 @@ active:
   duration:
     Instant
   cooldown: 1
+  short_description: |
+    Stun a single opponent with a Mental Resistance check.
 prereqs:
   total_level: 4

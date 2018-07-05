@@ -10,3 +10,5 @@ active:
   duration:
     Instant
   cooldown: 3
+  short_description: |
+    Heal one ally a small amount.

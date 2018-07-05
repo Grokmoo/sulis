@@ -10,3 +10,5 @@ active:
   duration:
     Instant
   cooldown: 2
+  short_description: |
+    Do minor fire damage to one opponent.

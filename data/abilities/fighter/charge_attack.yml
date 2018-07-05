@@ -10,5 +10,7 @@ active:
   duration:
     Instant
   cooldown: 1
+  short_description: |
+    Charge through multiple opponents, attack each in turn.
 prereqs:
   abilities: [ leap ]

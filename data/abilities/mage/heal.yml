@@ -10,3 +10,5 @@ active:
   duration:
     Rounds: 2
   cooldown: 3
+  short_description: |
+    Heal a significant amount of damage to one ally over several turns.

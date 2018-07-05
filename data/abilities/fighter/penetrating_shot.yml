@@ -10,5 +10,7 @@ active:
   duration:
     Instant
   cooldown: 1
+  short_description: |
+    Attacks all enemies in an arc.
 prereqs:
   abilities: [ powerful_shot ]

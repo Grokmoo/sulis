@@ -30,6 +30,18 @@ children:
         border: [0, 0, 0, 0]
         width_relative: Max
         position: [0, 4]
+  ability_hover:
+    from: .text_area
+    border: { top: 1, bottom: 1, left: 2, right: 2 }
+    background: 60_transparent_fill
+    text: |
+      [s=5.0|#name#]   [s=4.0;c=f00|AP: #activate_ap#]
+      #short_description#
+    preferred_size: [60, 12]
+    width_relative: Custom
+    height_relative: Custom
+    x_relative: Custom
+    y_relative: Custom
   mouse_over:
     from: .text_area
     border: { top: 1, bottom: 1, left: 2, right: 2 }

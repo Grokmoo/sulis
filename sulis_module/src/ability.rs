@@ -26,12 +26,32 @@ use sulis_core::serde_yaml;
 
 use {Actor, Module, PrereqList, PrereqListBuilder};
 
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub struct AbilityGroup {
+    pub index: usize,
+}
+
+impl AbilityGroup {
+    pub fn new(module: &Module, group_id: &str) -> Option<AbilityGroup> {
+        for (index, other_group_id) in module.rules.as_ref().unwrap().ability_groups.iter().enumerate() {
+            if other_group_id == group_id {
+                return Some(AbilityGroup { index });
+            }
+        }
+        None
+    }
+
+    pub fn name(&self) -> String {
+        Module::rules().ability_groups[self.index].clone()
+    }
+}
+
 #[derive(Debug)]
 pub struct Active {
     pub script: String,
     pub ap: u32,
     pub duration: Duration,
-    pub group: String,
+    pub group: AbilityGroup,
     pub cooldown: u32,
     pub short_description: String,
 }
@@ -91,12 +111,19 @@ impl Ability {
                     }, Some(c) => c,
                 };
 
+                let group = match AbilityGroup::new(module, &active.group) {
+                    None => {
+                        warn!("Unable to find ability group '{}'", active.group);
+                        return unable_to_create_error("ability", &builder.id);
+                    }, Some(group) => group,
+                };
+
                 Some(Active {
                     script,
                     ap: active.ap,
                     duration: active.duration,
                     cooldown,
-                    group: active.group,
+                    group,
                     short_description: active.short_description,
                 })
             },

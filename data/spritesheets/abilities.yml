@@ -72,6 +72,3 @@ groups:
       weapon_spear: [2, 9]
       
       prereqs_not_met: [7, 4]
-      connect_straight: [5, 5]
-      connect_up: [6, 5]
-      connect_down: [7, 5]

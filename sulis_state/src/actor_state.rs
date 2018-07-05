@@ -715,7 +715,13 @@ impl ActorState {
 
         for &(ref class, level) in self.actor.levels.iter() {
             self.stats.add_multiple(&class.bonuses_per_level, level);
-            self.stats.add_group_uses_per_encounter(&class.group_uses_per_encounter(level), 1);
+            for (ref group_id, amount) in class.group_uses_per_encounter(level).iter() {
+                if let Some(amount) = amount {
+                    self.stats.add_single_group_uses_per_encounter(group_id, *amount);
+                } else {
+                    self.stats.add_single_group_uses_per_encounter(group_id, 100_000);
+                }
+            }
         }
 
         for ability in self.actor.abilities.iter() {

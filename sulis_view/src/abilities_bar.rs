@@ -19,7 +19,7 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_module::{actor::OwnedAbility, Ability, Module, ability::Duration};
+use sulis_module::{actor::OwnedAbility, Ability, Module, ability::{AbilityGroup, Duration}};
 use sulis_state::{ChangeListener, EntityState, GameState};
 use sulis_core::io::event;
 use sulis_core::ui::{Widget, WidgetKind};
@@ -77,11 +77,18 @@ impl WidgetKind for AbilitiesBar {
         self.group_panes.clear();
         let mut children = Vec::new();
         let abilities = self.entity.borrow().actor.actor.abilities.clone();
-        let mut groups = self.entity.borrow().actor.stats.ability_groups();
-        groups.sort(); // TODO this sort order needs to be user defined
 
-        for group_id in groups {
-            let group_pane = GroupPane::new(&group_id, &self.entity, &abilities);
+        let mut groups = Vec::new();
+        for (index, group_id) in Module::rules().ability_groups.iter().enumerate() {
+            if self.entity.borrow().actor.stats.uses_per_encounter(group_id) > 0 {
+                groups.push(AbilityGroup { index });
+            }
+        }
+
+        for group in groups {
+            let group_pane = GroupPane::new(group, &self.entity, &abilities);
+
+            if group_pane.borrow().abilities.is_empty() { continue; }
 
             let group_widget = Widget::with_defaults(group_pane);
             self.group_panes.push(Rc::clone(&group_widget));
@@ -96,14 +103,15 @@ struct GroupPane {
     entity: Rc<RefCell<EntityState>>,
     abilities: Vec<OwnedAbility>,
     group: String,
-    uses_label: Rc<RefCell<Widget>>,
+    description: Rc<RefCell<Widget>>,
     vertical_count: u32,
     min_horizontal_count: u32,
     grid_width: u32,
+    grid_border: u32,
 }
 
 impl GroupPane {
-    fn new(group: &str, entity: &Rc<RefCell<EntityState>>,
+    fn new(group: AbilityGroup, entity: &Rc<RefCell<EntityState>>,
            abilities: &Vec<OwnedAbility>) -> Rc<RefCell<GroupPane>> {
         let mut abilities_to_add = Vec::new();
         for ability in abilities.iter() {
@@ -112,16 +120,17 @@ impl GroupPane {
                 Some(ref active) => active,
             };
 
-            if &active.group == group {
+            if active.group == group {
                 abilities_to_add.push(ability.clone());
             }
         }
         Rc::new(RefCell::new(GroupPane {
-            group: group.to_string(),
+            group: group.name(),
             entity: Rc::clone(entity),
             abilities: abilities_to_add,
-            uses_label: Widget::with_theme(Label::empty(), "uses_label"),
+            description: Widget::with_theme(TextArea::empty(), "description"),
             grid_width: 1,
+            grid_border: 1,
             vertical_count: 1,
             min_horizontal_count: 1,
         }))
@@ -140,12 +149,17 @@ impl GroupPane {
             if let Some(ref count) = theme.custom.get("min_horizontal_count") {
                 self.min_horizontal_count = count.parse::<u32>().unwrap_or(1);
             }
+
+            if let Some(ref width) = theme.custom.get("grid_border") {
+                self.grid_border = width.parse::<u32>().unwrap_or(1);
+            }
         }
 
         let height = widget.state.size.height;
         let cols = (self.abilities.len() as f32 / self.vertical_count as f32).ceil() as u32;
         let cols = cmp::max(cols, self.min_horizontal_count) as i32;
-        widget.state.set_size(Size::new(cols * self.grid_width as i32 + 1, height));
+        let width = cols * self.grid_width as i32 + self.grid_border as i32;
+        widget.state.set_size(Size::new(width, height));
     }
 }
 
@@ -153,7 +167,7 @@ impl WidgetKind for GroupPane {
     widget_kind!("group_pane");
 
     fn layout(&mut self, widget: &mut Widget) {
-        self.uses_label.borrow_mut().state.add_text_arg("current_uses",
+        self.description.borrow_mut().state.add_text_arg("current_uses",
             &self.entity.borrow().actor.current_uses_per_encounter(&self.group).to_string());
 
         widget.do_base_layout();
@@ -174,11 +188,14 @@ impl WidgetKind for GroupPane {
             }
         }
 
-        self.uses_label.borrow_mut().state.add_text_arg("total_uses",
-            &self.entity.borrow().actor.stats.uses_per_encounter(&self.group).to_string());
+        self.description.borrow_mut().state.clear_text_args();
 
-        let title_label = Widget::with_theme(Label::empty(), "title_label");
-        title_label.borrow_mut().state.add_text_arg("group", &self.group);
+        let total_uses = self.entity.borrow().actor.stats.uses_per_encounter(&self.group);
+        if total_uses < 100_000 {
+            self.description.borrow_mut().state.add_text_arg("total_uses", &total_uses.to_string());
+        }
+
+        self.description.borrow_mut().state.add_text_arg("group", &self.group);
 
         let abilities_pane = Widget::empty("abilities_pane");
         for ability in self.abilities.iter() {
@@ -188,7 +205,7 @@ impl WidgetKind for GroupPane {
             Widget::add_child_to(&abilities_pane, button);
         }
 
-        vec![self.uses_label.clone(), title_label, abilities_pane]
+        vec![self.description.clone(), abilities_pane]
     }
 }
 

@@ -1,46 +1,38 @@
 id: general
-background: empty
 abilities:
-  - id: resilient_body
-    position: [0, 0]
-    connect: [ Straight]
-  - id: tough_skin
-    position: [1, 0]
-  - id: lightning_reflexes
-    position: [0, 1]
-    connect: [ Straight ]
-  - id: improved_initiative
-    position: [1, 1]
-  - id: tenacious_soul
-    position: [0, 2]
-    connect: [ Straight ]
-  - id: elemental_defense
-    position: [1, 2]
-
   - id: armor_light
-    position: [0, 3]
-    connect: [ Straight ]
+    position: [0, 0]
   - id: armor_medium
-    position: [1, 3]
-    connect: [ Straight ]
+    position: [1, 0]
   - id: armor_heavy
-    position: [2, 3]
+    position: [2, 0]
 
   - id: weapon_simple
-    position: [0, 5]
-    connect: [ LongUp, LongDown, Straight ]
+    position: [0, 2]
   - id: weapon_mace
-    position: [1, 4]
+    position: [1, 1]
   - id: weapon_axe
-    position: [1, 5]
+    position: [1, 3]
   - id: weapon_small_sword
-    position: [1, 6]
-    connect: [ Straight ]
+    position: [1, 2]
   - id: weapon_large_sword
-    position: [2, 6]
+    position: [2, 2]
   - id: weapon_spear
-    position: [0, 7]
+    position: [0, 4]
   - id: weapon_bow
-    position: [1, 7]
+    position: [1, 4]
   - id: weapon_crossbow
-    position: [2, 7]
+    position: [2, 4]
+    
+  - id: resilient_body
+    position: [4, 0]
+  - id: tough_skin
+    position: [5, 0]
+  - id: lightning_reflexes
+    position: [4, 1]
+  - id: improved_initiative
+    position: [5, 1]
+  - id: tenacious_soul
+    position: [4, 2]
+  - id: elemental_defense
+    position: [5, 2]

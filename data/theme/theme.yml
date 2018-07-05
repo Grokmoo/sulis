@@ -8,6 +8,16 @@ children:
   status_text:
     from: .label
     position: [0, 2]
+  item_window:
+    from: .bonus_text
+    border: { top: 1, bottom: 1, left: 1, right: 1 }
+    background: 80_transparent_fill
+    width_relative: Custom
+    height_relative: Custom
+    preferred_size: [60, 14]
+    position: [0, 0]
+    x_relative: Custom
+    y_relative: Custom
   item_action_menu:
     from: .list_box
     x_relative: Cursor
@@ -33,7 +43,7 @@ children:
   ability_hover:
     from: .text_area
     border: { top: 1, bottom: 1, left: 2, right: 2 }
-    background: 60_transparent_fill
+    background: 80_transparent_fill
     text: |
       [s=5.0|#name#]   [s=4.0;c=f00|AP: #activate_ap#]
       #short_description#
@@ -45,7 +55,7 @@ children:
   mouse_over:
     from: .text_area
     border: { top: 1, bottom: 1, left: 2, right: 2 }
-    background: 60_transparent_fill
+    background: 80_transparent_fill
     text: |
       [s=5.0|#name#]
       [?cur_hp|#cur_hp# / #max_hp#
@@ -136,8 +146,6 @@ children:
                 x_relative: Max
                 preferred_size: [7, 7]
       abilities_bar:
-        border: [1, 1, 1, 1]
-        background: bg_base
         height_relative: Max
         x_relative: Max
         position: [-41, 0]
@@ -150,27 +158,20 @@ children:
             preferred_size: [0, 0]
             height_relative: Max
             width_relative: Custom
-            border: [1, 1, 1, 1]
+            border: { top: 1, bottom: 1, left: 1, right: 0 }
             custom:
               vertical_count: 2
               grid_width: 13
+              grid_border: 2
               min_horizontal_count: 1
             children:
-              title_label:
-                from: .label
-                text: "#group#"
-                text_params:
-                  scale: 3.5
-                preferred_size: [0, 4]
+              description:
+                from: .text_area
                 width_relative: Max
-              uses_label:
-                from: .label
-                text: "#current_uses# / #total_uses#"
-                text_params:
-                  horizontal_alignment: Right
-                preferred_size: [0, 4]
-                position: [0, 4]
-                width_relative: Max
+                preferred_size: [0, 8]
+                text: |
+                  [s=3.9;c=f00|#group#]
+                  [?total_uses;s=3.9|#current_uses# / #total_uses#]
               abilities_pane:
                 width_relative: Max
                 height_relative: Max
@@ -183,7 +184,7 @@ children:
                     from: .button
                     background: background_inner
                     foreground: "greyed_out"
-                    preferred_size: [12, 12]
+                    preferred_size: [13, 13]
                     children:
                       duration_label:
                         from: .label
@@ -428,16 +429,6 @@ children:
       coins_button:
         from: .item_button
         position: [74, 64]
-  item_window:
-    from: .bonus_text
-    border: { top: 1, bottom: 1, left: 1, right: 1 }
-    background: bg_base
-    width_relative: Custom
-    height_relative: Custom
-    preferred_size: [60, 14]
-    position: [0, 0]
-    x_relative: Custom
-    y_relative: Custom
   character_window:
     from: .window
     children:
@@ -606,12 +597,12 @@ children:
           ][?passive;s=5;c=0ff|Passive]
           [s=4|#description#]
           [?upgrade1|[s=5|Level 2]
-          [s=4|#upgrade1#]]
-          [?upgrade2|[s=5|Level 3]
-          [s=4|#upgrade2#]]
-          [?upgrade3|[s=5|Level 4]
-          [s=4|#upgrade3#]]
-          [?str|Strength: #str#
+          [s=4|#upgrade1#]
+          ][?upgrade2|[s=5|Level 3]
+          [s=4|#upgrade2#]
+          ][?upgrade3|[s=5|Level 4]
+          [s=4|#upgrade3#]
+          ][?str|Strength: #str#
           ][?dex|Dexterity: #dex#
           ][?end|Endurance: #end#
           ][?per|Perception: #per#
@@ -632,7 +623,7 @@ children:
           ][?fortitude|[s=4.0|Fortitude: #fortitude#]
           ][?reflex|[s=4.0|Reflex: #reflex#]
           ][?will|[s=4.0|Will: #will#]
-          [?prereqs|[s=5|]
+          ][?prereqs|[s=5|]
           [s=5;c=f00|Prereqs]
           [?prereq_total_level|Level: #prereq_total_level#
           ][?prereq_race|Race: #prereq_race#

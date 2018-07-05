@@ -62,7 +62,7 @@ impl LayoutKind {
             max_height = cmp::max(max_height, height);
             child.borrow_mut().state.set_size(Size::new(width, height));
 
-            if current_x + width + theme.layout_spacing.right > widget.state.inner_right() {
+            if current_x + width + theme.layout_spacing.right > widget.state.inner_right() + 1 {
                 current_x = widget.state.inner_left() + theme.layout_spacing.left;
                 current_y += max_height;
                 current_y += theme.layout_spacing.top + theme.layout_spacing.bottom;

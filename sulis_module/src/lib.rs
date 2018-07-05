@@ -304,9 +304,12 @@ impl Module {
 
         debug!("Creating module from parsed data.");
 
+        let rules = read_single_resource(&format!("{}/rules", root_dir))?;
+
         MODULE.with(|module| {
             let mut module = module.borrow_mut();
 
+            module.rules = Some(Rc::new(rules));
             module.scripts = read_to_string(&vec![data_dir, root_dir], "scripts");
 
             for (id, adj) in builder_set.item_adjectives {
@@ -381,12 +384,10 @@ impl Module {
 
         let game_builder = read_single_resource(&format!("{}/module", root_dir))?;
         let game = Game::new(game_builder)?;
-        let rules = read_single_resource(&format!("{}/rules", root_dir))?;
 
         MODULE.with(move |m| {
             let mut m = m.borrow_mut();
             m.game = Some(Rc::new(game));
-            m.rules = Some(Rc::new(rules));
             m.init = true;
         });
 

@@ -1,9 +1,7 @@
 id: fighter
-background: empty
 abilities:
   - id: defensive_fighting
     position: [0, 0.5]
-    connect: [Up, Down]
   - id: impenetrable_defense
     position: [1, 0]
   - id: guardian
@@ -12,22 +10,18 @@ abilities:
     position: [0, 2]
     
   - id: mighty_blow
-    position: [0, 4]
-    connect: [ Up, Down ]
+    position: [0, 4.5]
   - id: powerful_blows
-    position: [1, 3.5]
-    connect: [ Down ]
+    position: [1, 4]
   - id: stunning_blow
-    position: [1, 4.5]
-    connect: [ Up, Straight2x ]
+    position: [1, 5]
   - id: whirlwind_attack
-    position: [2, 4]
+    position: [2, 4.5]
   - id: blitz
-    position: [3, 4.5]
+    position: [3, 5]
 
   - id: leap
     position: [5, 0]
-    connect: [ Straight2x ]
   - id: charge_attack
     position: [7, 0]
   - id: grapple
@@ -35,12 +29,10 @@ abilities:
     
   - id: precise_shot
     position: [5, 3]
-    connect: [ Straight ]
   - id: crippling_shot
     position: [6, 3]
   - id: powerful_shot
     position: [5, 4.5]
-    connect: [ Up, Straight2x ]
   - id: penetrating_shot
     position: [6, 4.0]
   - id: arrow_storm

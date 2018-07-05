@@ -1,45 +1,44 @@
 id: mage
-background: magic_circles
 abilities:
   - id: minor_heal
-    position: [5.9, 4.95]
+    position: [6, 5]
   - id: flare
-    position: [4, 4.95]
+    position: [4, 5]
   - id: expediate
-    position: [4.95, 4]
+    position: [5, 4]
   - id: acid_bomb
-    position: [4.95, 5.9]
+    position: [5, 6]
 
   - id: firebolt
-    position: [3, 4.95]
+    position: [3, 5]
   - id: flaming_fingers
-    position: [2, 5.45]
+    position: [2.1, 5.5]
   - id: fire_shield
-    position: [2, 4.45]
+    position: [2.1, 4.5]
   - id: fireball
-    position: [1, 4.95]
+    position: [1, 5]
     
   - id: wind_gust
-    position: [4.95, 3]
+    position: [5, 3]
   - id: shock
-    position: [2.6, 3.2]
+    position: [2.7, 3.3]
   - id: teleport
-    position: [5.95, 2.2]
+    position: [6, 2.25]
   - id: air_shield
-    position: [4.95, 2]
+    position: [5, 2]
   - id: chameleon
-    position: [5.45, 1]
+    position: [5.5, 1.1]
 
   - id: slow
-    position: [6.9, 4.95]
+    position: [7, 5]
   - id: heal
     position: [6.6, 3.95]
   - id: luck
-    position: [7.9, 4.95]
+    position: [8, 5]
   
   - id: crush
-    position: [4.95, 6.9]
+    position: [5, 7]
   - id: rock_armor
-    position: [4.95, 7.9]
+    position: [5, 8.05]
   - id: stun
-    position: [5.95, 7.7]
+    position: [6, 7.75]

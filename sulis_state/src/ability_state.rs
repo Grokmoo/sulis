@@ -33,7 +33,7 @@ impl AbilityState {
     pub fn new(ability: &Rc<Ability>) -> AbilityState {
         let group = match ability.active {
             None => panic!(),
-            Some(ref active) => active.group.to_string(),
+            Some(ref active) => active.group.name(),
         };
 
         AbilityState {

@@ -5,7 +5,7 @@ description: |
   You move into an offensive stance.  Your attacks become more powerful, but your defenses are lessened.  You may only have one combat mode active at a time.
 active:
   script: "powerful_blows"
-  group: Fighter
+  group: Modes
   ap: 1000
   duration:
     Mode

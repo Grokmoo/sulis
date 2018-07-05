@@ -14,7 +14,7 @@ function on_target_select(parent, ability, targets)
   effect:add_num_bonus("defense", 5)
   effect:add_num_bonus("reflex", 5)
 
-  gen = parent:create_particle_generator("wind_particle", duration)
+  gen = target:create_particle_generator("wind_particle", duration)
   gen:set_moves_with_parent()
   gen:set_gen_rate(gen:param(30.0))
   gen:set_position(gen:param(-0.25), gen:param(0.0))

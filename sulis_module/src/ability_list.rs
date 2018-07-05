@@ -18,36 +18,21 @@ use std::slice::Iter;
 use std::rc::Rc;
 use std::io::Error;
 
-use sulis_core::image::Image;
-use sulis_core::resource::{ResourceBuilder, ResourceSet};
+use sulis_core::resource::{ResourceBuilder};
 use sulis_core::util::{invalid_data_error, unable_to_create_error};
 use sulis_core::serde_yaml;
 
 use {Ability, Module};
 
-#[derive(Deserialize, Debug, Clone, Copy)]
-#[serde(deny_unknown_fields)]
-pub enum Connect {
-    Up,
-    LongUp,
-    Down,
-    LongDown,
-    Straight,
-    Straight2x,
-    Straight3x,
-}
-
 #[derive(Debug)]
 pub struct Entry {
     pub ability: Rc<Ability>,
     pub position: (f32, f32),
-    pub connect: Vec<Connect>,
 }
 
 #[derive(Debug)]
 pub struct AbilityList {
     pub id: String,
-    pub background: Rc<Image>,
     entries: Vec<Entry>,
 }
 
@@ -65,20 +50,11 @@ impl AbilityList {
             entries.push(Entry {
                 ability,
                 position: entry.position,
-                connect: entry.connect.unwrap_or(Vec::new()),
             });
         }
 
-        let background = match ResourceSet::get_image(&builder.background) {
-            None => {
-                warn!("Image '{}' not found", builder.background);
-                return unable_to_create_error("ability_list", &builder.id);
-            }, Some(image) => image,
-        };
-
         Ok(AbilityList {
             id: builder.id,
-            background,
             entries,
         })
     }
@@ -93,14 +69,12 @@ impl AbilityList {
 pub struct EntryBuilder {
     id: String,
     position: (f32, f32),
-    connect: Option<Vec<Connect>>,
 }
 
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct AbilityListBuilder {
     pub id: String,
-    pub background: String,
     abilities: Vec<EntryBuilder>
 }
 

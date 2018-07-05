@@ -110,22 +110,48 @@ children:
             preferred_size: [-140, -10]
             width_relative: Max
             height_relative: Max
-          abilities_pane:
-            border: [1, 1, 1, 1]
+          abilities_pane_fighter:
+            from: .character_builder.ability_selector_pane.abilities_pane
+            background: fighter_abilities
+            preferred_size: [128, 128]
+            custom:
+              grid_size: 16
+              grid_border: 2
+            children:
+              ability_button:
+                preferred_size: [12, 12]
+          abilities_pane_mage:
+            from: .character_builder.ability_selector_pane.abilities_pane
+            background: magic_circles
             preferred_size: [132, 132]
-            position: [0, 10]
             custom:
               grid_size: 12
               grid_border: 1
-              connect_up: abilities/connect_up
-              connect_down: abilities/connect_down
-              connect_straight: abilities/connect_straight
+            children:
+              ability_button:
+                preferred_size: [10, 10]
+          abilities_pane_general:
+            from: .character_builder.ability_selector_pane.abilities_pane
+            background: general_abilities
+            preferred_size: [128, 128]
+            custom:
+              grid_size: 16
+              grid_border: 2
+            children:
+              ability_button:
+                preferred_size: [12, 12]
+          abilities_pane:
+            preferred_size: [128, 128]
+            position: [0, 10]
+            custom:
+              grid_size: 16
+              grid_border: 2
             children:
               ability_button:
                 from: .button
                 background: background_inner
                 foreground: ability_overlay
-                preferred_size: [10, 10]
+                preferred_size: [12, 12]
                 x_relative: Custom
                 y_relative: Custom
                 children:
@@ -135,23 +161,23 @@ children:
                     height_relative: Max
                   upgrade0:
                     foreground: ball_small_animated
-                    preferred_size: [2, 2]
+                    preferred_size: [3, 3]
                     y_relative: Max
                   upgrade1:
                     foreground: ball_small_animated
-                    preferred_size: [2, 2]
+                    preferred_size: [3, 3]
                     y_relative: Max
-                    position: [2, 0]
+                    position: [3, 0]
                   upgrade2:
                     foreground: ball_small_animated
-                    preferred_size: [2, 2]
-                    y_relative: Max
-                    position: [4, 0]
-                  upgrade3:
-                    foreground: ball_small_animated
-                    preferred_size: [2, 2]
+                    preferred_size: [3, 3]
                     y_relative: Max
                     position: [6, 0]
+                  upgrade3:
+                    foreground: ball_small_animated
+                    preferred_size: [3, 3]
+                    y_relative: Max
+                    position: [9, 0]
       class_selector_pane:
         from: .builder_pane
         children:

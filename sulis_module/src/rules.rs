@@ -53,6 +53,7 @@ pub struct Rules {
 
     pub selectable_races: Vec<String>,
     pub selectable_classes: Vec<String>,
+    pub ability_groups: Vec<String>,
 
     pub experience_for_level: Vec<u32>,
 

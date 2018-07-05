@@ -157,6 +157,10 @@ impl StatList {
         self.attack_range
     }
 
+    pub fn add_single_group_uses_per_encounter(&mut self, group_id: &str, uses: u32) {
+        *self.group_uses_per_encounter.entry(group_id.to_string()).or_insert(0) += uses;
+    }
+
     pub fn add_group_uses_per_encounter(&mut self, uses: &Vec<(String, u32)>, times: u32) {
         for (ref group_id, amount) in uses.iter() {
             *self.group_uses_per_encounter.entry(group_id.to_string()).or_insert(0) += amount * times;

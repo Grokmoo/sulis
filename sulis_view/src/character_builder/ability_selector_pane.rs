@@ -19,13 +19,9 @@ use std::rc::Rc;
 use std::cell::RefCell;
 use std::collections::HashSet;
 
-use sulis_core::io::{DrawList, GraphicsRenderer};
-use sulis_core::image::Image;
-use sulis_core::resource::ResourceSet;
 use sulis_core::ui::{animation_state, Callback, Widget, WidgetKind};
-use sulis_core::util::Point;
 use sulis_widgets::{Button, Label};
-use sulis_module::{Ability, AbilityList, ability_list::Connect, Actor, actor::OwnedAbility};
+use sulis_module::{Ability, AbilityList, Actor, actor::OwnedAbility};
 use sulis_state::EntityState;
 
 use {AbilityPane, CharacterBuilder};
@@ -139,88 +135,31 @@ impl BuilderPane for AbilitySelectorPane {
 
 struct AbilitiesPane {
     positions: Vec<(f32, f32)>,
-    connects: Vec<Vec<Connect>>,
     grid_size: i32,
     grid_border: i32,
-    connect_up_image: Rc<Image>,
-    connect_down_image: Rc<Image>,
-    connect_straight_image: Rc<Image>,
+    id: String,
 }
 
 impl AbilitiesPane {
-    fn new() -> AbilitiesPane {
+    fn new(id: &str) -> AbilitiesPane {
         AbilitiesPane {
             positions: Vec::new(),
-            connects: Vec::new(),
             grid_size: 10,
             grid_border: 1,
-            connect_up_image: ResourceSet::get_empty_image(),
-            connect_down_image: ResourceSet::get_empty_image(),
-            connect_straight_image: ResourceSet::get_empty_image(),
+            id: format!("abilities_pane_{}", id),
         }
     }
 }
 
 impl WidgetKind for AbilitiesPane {
-    widget_kind!["abilities_pane"];
-
-    fn draw_graphics_mode(&mut self, renderer: &mut GraphicsRenderer, _pixel_size: Point,
-                          widget: &Widget, millis: u32) {
-        let grid = self.grid_size as f32;
-
-        let mut draw_list = DrawList::empty_sprite();
-        for (index, ref vec) in self.connects.iter().enumerate() {
-            for connect in vec.iter() {
-                let mut x = widget.state.inner_left() as f32 + self.positions[index].0 * grid;
-                let mut y = widget.state.inner_top() as f32 + self.positions[index].1 * grid;
-
-                let mut width = grid;
-                x += self.grid_border as f32 * 3.0;
-                let image = match connect {
-                    &Connect::Up => {
-                        &self.connect_up_image
-                    }, &Connect::Down => {
-                        &self.connect_down_image
-                    }, &Connect::Straight => {
-                        &self.connect_straight_image
-                    }, &Connect::LongUp => {
-                        y -= grid / 2.0;
-                        x += grid / 2.0 - self.grid_border as f32 * 3.0;
-                        &self.connect_up_image
-                    }, &Connect::LongDown => {
-                        y += grid / 2.0;
-                        x += grid / 2.0 - self.grid_border as f32 * 3.0;
-                        &self.connect_down_image
-                    }, &Connect::Straight2x => {
-                        width += grid;
-                        &self.connect_straight_image
-                    }, &Connect::Straight3x => {
-                        width += 2.0 * grid;
-                        &self.connect_straight_image
-                    }
-                };
-
-                image.append_to_draw_list(&mut draw_list, &widget.state.animation_state, x, y,
-                                          width, grid, millis);
-            }
-        }
-
-        renderer.draw(draw_list);
-    }
+    fn get_name(&self) -> &str { &self.id }
+    fn as_any(&self) -> &Any { self }
+    fn as_any_mut(&mut self) -> &mut Any { self }
 
     fn layout(&mut self, widget: &mut Widget) {
         if let Some(ref theme) = widget.theme {
             self.grid_size = theme.get_custom_or_default("grid_size", 10);
             self.grid_border = theme.get_custom_or_default("grid_border", 1);
-            if let Some(ref image_id) = theme.custom.get("connect_up") {
-                self.connect_up_image = ResourceSet::get_image_else_empty(image_id);
-            }
-            if let Some(ref image_id) = theme.custom.get("connect_down") {
-                self.connect_down_image = ResourceSet::get_image_else_empty(image_id);
-            }
-            if let Some(ref image_id) = theme.custom.get("connect_straight") {
-                self.connect_straight_image = ResourceSet::get_image_else_empty(image_id);
-            }
         }
 
         let grid = self.grid_size as f32;
@@ -243,14 +182,12 @@ impl WidgetKind for AbilitySelectorPane {
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let title = Widget::with_theme(Label::empty(), "title");
 
-        let pane = Rc::new(RefCell::new(AbilitiesPane::new()));
+        let pane = Rc::new(RefCell::new(AbilitiesPane::new(&self.choices.id)));
         let abilities_pane = Widget::with_defaults(pane.clone());
-        abilities_pane.borrow_mut().state.background = Some(Rc::clone(&self.choices.background));
         for entry in self.choices.iter() {
             let ability = &entry.ability;
             let position = entry.position;
             pane.borrow_mut().positions.push(position);
-            pane.borrow_mut().connects.push(entry.connect.clone());
 
             let ability_button = Widget::with_theme(Button::empty(), "ability_button");
 

@@ -5,9 +5,9 @@ authors = ["Jared Stephen <grok_moo@yahoo.com>"]
 
 [dependencies]
 backtrace = "0.3"
-flexi_logger = "0.6"
-image = "0.18"
-glium = "0.21"
+flexi_logger = "0.9"
+image = "0.19"
+glium = { git = "https://github.com/mitchmindtree/glium", branch = "update_glutin" }
 lazy_static = "1.0"
 log = "0.4"
 serde = "1.0"

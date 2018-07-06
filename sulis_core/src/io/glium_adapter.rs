@@ -25,11 +25,11 @@ use io::keyboard_event::Key;
 use io::event::ClickKind;
 use resource::ResourceSet;
 use ui::{Cursor, Widget};
-use util::Point;
+use util::{self, Point};
 
 use glium::{self, CapabilitiesSource, Surface, glutin, Rect};
 use glium::backend::Facade;
-use glium::glutin::{ContextBuilder, CursorState, Robustness, VirtualKeyCode};
+use glium::glutin::{ContextBuilder, VirtualKeyCode};
 use glium::texture::{RawImage2d, SrgbTexture2d};
 use glium::uniforms::{MinifySamplerFilter, MagnifySamplerFilter, Sampler};
 
@@ -271,14 +271,16 @@ impl GliumDisplay {
             DisplayMode::Fullscreen => (monitor.clone(), false),
         };
 
+        let dims = glutin::dpi::LogicalSize::new(CONFIG.display.width_pixels as f64,
+                                                 CONFIG.display.height_pixels as f64);
+
         let window = glium::glutin::WindowBuilder::new()
-            .with_dimensions(CONFIG.display.width_pixels, CONFIG.display.height_pixels)
+            .with_dimensions(dims)
             .with_title("Sulis")
             .with_decorations(decorations)
             .with_fullscreen(fullscreen);
 
         let context = ContextBuilder::new()
-            .with_gl_robustness(Robustness::NoError)
             .with_gl_debug_flag(false)
             .with_multisampling(0)
             .with_pixel_format(24, 8);
@@ -289,8 +291,9 @@ impl GliumDisplay {
         };
 
         if let Some(ref monitor) = monitor {
-            let (x, y) = monitor.get_position();
-            display.gl_window().set_position(x, y);
+            let physical_position = monitor.get_position();
+            let logical_position = physical_position.to_logical(monitor.get_hidpi_factor());
+            display.gl_window().set_position(logical_position);
         }
 
         info!("Initialized glium adapter:");
@@ -314,10 +317,7 @@ impl GliumDisplay {
             Err(e) => return glium_error(e),
         };
 
-        match display.gl_window().set_cursor_state(CursorState::Hide) {
-            Ok(()) => (),
-            Err(e) => return glium_error(e),
-        };
+        display.gl_window().hide_cursor(true);
 
         Ok(GliumDisplay {
             display,
@@ -338,13 +338,19 @@ impl GliumDisplay {
 impl IO for GliumDisplay {
     fn process_input(&mut self, root: Rc<RefCell<Widget>>) {
         let mut mouse_move: Option<(f32, f32)> = None;
-        let (width, height) = self.display.gl_window().get_inner_size().unwrap();
+        let display_size = match self.display.gl_window().get_inner_size() {
+            None => {
+                util::error_and_exit("Unable to get logical display size");
+                unreachable!();
+            }
+            Some(size) => size,
+        };
         self.events_loop.poll_events(|event| {
             if let glutin::Event::WindowEvent { event, .. } = event {
                 match event {
                     glium::glutin::WindowEvent::CursorMoved { position, .. } => {
-                        let mouse_x = (CONFIG.display.width as f64 * position.0 / width as f64) as f32;
-                        let mouse_y = (CONFIG.display.height as f64 * position.1 / height as f64) as f32;
+                        let mouse_x = (CONFIG.display.width as f64 * position.x / display_size.width) as f32;
+                        let mouse_y = (CONFIG.display.height as f64 * position.y / display_size.height) as f32;
                         mouse_move = Some((mouse_x, mouse_y));
                     },
                     _ => InputAction::handle_action(process_window_event(event), Rc::clone(&root)),
@@ -363,7 +369,8 @@ impl IO for GliumDisplay {
         target.clear_color(0.0, 0.0, 0.0, 1.0);
         {
             let mut renderer = GliumRenderer::new(&mut target, self);
-            let pixel_size = Point::from_tuple(renderer.target.get_dimensions());
+            let (width, height) = renderer.target.get_dimensions();
+            let pixel_size = Point::new(width as i32, height as i32);
             root.draw_graphics_mode(&mut renderer, pixel_size, millis);
 
             Cursor::draw(&mut renderer, millis);
@@ -393,7 +400,7 @@ fn get_min_filter(filter: TextureMinFilter) -> MinifySamplerFilter {
 fn process_window_event(event: glutin::WindowEvent) -> Option<InputAction> {
     use glium::glutin::WindowEvent::*;
     match event {
-        Closed => Some(InputAction::ShowMenu),
+        CloseRequested => Some(InputAction::ShowMenu),
         ReceivedCharacter(c) => Some(InputAction::CharReceived(c)),
         KeyboardInput { input, .. } => CONFIG.get_input_action(process_keyboard_input(input)),
         MouseInput { state, button, .. } => {
@@ -412,7 +419,7 @@ fn process_window_event(event: glutin::WindowEvent) -> Option<InputAction> {
         MouseWheel { delta, .. } => {
             let amount = match delta {
                 glium::glutin::MouseScrollDelta::LineDelta(_, y) => y,
-                glium::glutin::MouseScrollDelta::PixelDelta(_, y) => y,
+                glium::glutin::MouseScrollDelta::PixelDelta(pos) => pos.y as f32,
             };
 
             // scrolling the mouse wheeel seems to be buggy at the moment, only take some events

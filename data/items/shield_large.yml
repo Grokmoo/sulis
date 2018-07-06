@@ -7,10 +7,12 @@ icon: inventory/shield_large
 equippable:
   slot: HeldOff
   bonuses:
-    entries:
-      - defense: 15
-      - accuracy: -5
-      - movement_rate: -0.10
+    - kind:
+        defense: 15
+    - kind:
+        accuracy: -5
+    - kind:
+        movement_rate: -0.10
 image:
   HeldOff:
     creatures/shield_large

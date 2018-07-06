@@ -3,14 +3,20 @@ name: Rogue
 description: |
   Rogues have a variety of skills both in and out of combat, making them a valuable addition to any party.  They are usually poorly suited to standing on the front lines of combat, but instead must attack from the flanks and shadows, waiting for the perfect moment before unleashing a devastating strike with surgical precision.
 bonuses_per_level:
-  entries:
-    - hit_points: 7
-    - accuracy: 3
-    - defense: 3
-    - fortitude: 2
-    - reflex: 3
-    - will: 2
-    - initiative: 1
+  - kind:
+      hit_points: 7
+  - kind:
+      accuracy: 3
+  - kind:
+      defense: 3
+  - kind:
+      fortitude: 2
+  - kind:
+      reflex: 3
+  - kind:
+      will: 2
+  - kind:
+      initiative: 1
 starting_abilities:
   - armor_light
   - weapon_crossbow

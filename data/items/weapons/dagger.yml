@@ -9,7 +9,7 @@ value: 200
 equippable:
   slot: HeldMain
   alternate_slot: HeldOff
-  bonuses: {}
+  bonuses: []
   attack:
     damage:
       min: 10

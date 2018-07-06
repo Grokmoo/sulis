@@ -9,10 +9,9 @@ value: 200
 equippable:
   slot: Legs
   bonuses:
-    entries:
-      - armor: 2
-      - armor_kind: [ Slashing, 1]
-      - movement_rate: -0.03
+    - kind: { armor: 2 }
+    - kind: { armor_kind: [ Slashing, 1] }
+    - kind: { movement_rate: -0.03 }
 image:
   Legs:
     creatures/legs_leather

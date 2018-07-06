@@ -3,7 +3,7 @@ name: Pants
 icon: inventory/legs_pants
 equippable:
   slot: Legs
-  bonuses: {}
+  bonuses: []
 image:
   Legs:
     creatures/pants

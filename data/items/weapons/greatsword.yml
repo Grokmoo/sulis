@@ -10,8 +10,8 @@ equippable:
   slot: HeldMain
   blocks_slot: HeldOff
   bonuses:
-    entries:
-      - defense: 7
+    - kind:
+        defense: 7
   attack:
     damage:
       min: 22

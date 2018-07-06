@@ -14,7 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use sulis_rules::{bonus_list::AttackBuilder, BonusList};
+use sulis_rules::{bonus::AttackBuilder, BonusList};
 use item::Slot;
 
 #[derive(Deserialize, Debug, Clone)]

@@ -4,5 +4,5 @@ icon: abilities/lightning_reflexes
 description: |
   Your quickness and agility in the face of danger is improved.  You gain +10 to Reflex Defense.
 bonuses:
-  entries:
-    - reflex: 10
+  - kind:
+      reflex: 10

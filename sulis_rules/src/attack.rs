@@ -18,8 +18,8 @@ use std::rc::Rc;
 
 use sulis_core::image::Image;
 use sulis_core::resource::ResourceSet;
-use bonus_list::{AttackBuilder, AttackKindBuilder};
-use {Armor, AttackBonuses, Bonus, Damage, DamageKind, DamageList, StatList, WeaponKind};
+use bonus::{AttackBuilder, AttackKindBuilder, BonusKind};
+use {Armor, AttackBonuses, Damage, DamageKind, DamageList, StatList, WeaponKind};
 
 use AttackKind::*;
 
@@ -58,14 +58,14 @@ impl Attack {
         for (owned_kind, owned_bonus) in stats.attack_bonuses.iter() {
             if *owned_kind == weapon_kind {
                 match owned_bonus {
-                    Bonus::Damage(damage) => bonus_damage.push(damage.clone()),
-                    Bonus::Accuracy(amount) => bonuses.accuracy += amount,
-                    Bonus::CritThreshold(amount) => bonuses.crit_threshold += amount,
-                    Bonus::HitThreshold(amount) => bonuses.hit_threshold += amount,
-                    Bonus::GrazeThreshold(amount) => bonuses.graze_threshold += amount,
-                    Bonus::CritMultiplier(amount) => bonuses.crit_multiplier += amount,
-                    Bonus::HitMultiplier(amount) => bonuses.hit_multiplier += amount,
-                    Bonus::GrazeMultiplier(amount) => bonuses.graze_multiplier += amount,
+                    BonusKind::Damage(damage) => bonus_damage.push(damage.clone()),
+                    BonusKind::Accuracy(amount) => bonuses.accuracy += amount,
+                    BonusKind::CritThreshold(amount) => bonuses.crit_threshold += amount,
+                    BonusKind::HitThreshold(amount) => bonuses.hit_threshold += amount,
+                    BonusKind::GrazeThreshold(amount) => bonuses.graze_threshold += amount,
+                    BonusKind::CritMultiplier(amount) => bonuses.crit_multiplier += amount,
+                    BonusKind::HitMultiplier(amount) => bonuses.hit_multiplier += amount,
+                    BonusKind::GrazeMultiplier(amount) => bonuses.graze_multiplier += amount,
                     _ => {
                         warn!("Attack bonus of type '{:?}' for weapon {:?} will never be applied",
                               owned_bonus, owned_kind);

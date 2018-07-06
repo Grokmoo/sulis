@@ -19,7 +19,7 @@ use {Attribute, Damage, DamageKind, ArmorKind, WeaponKind};
 #[derive(Deserialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
 #[serde(rename_all = "snake_case")]
-pub enum Bonus {
+pub enum BonusKind {
     Attribute { attribute: Attribute, amount: i8 },
     ActionPoints(i32),
     Armor(i32),
@@ -50,45 +50,57 @@ pub enum Bonus {
     GroupUsesPerEncounter { group: String, amount: u32 },
 }
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Deserialize, Debug, Clone, Copy)]
 #[serde(deny_unknown_fields)]
-#[serde(default)]
-pub struct BonusList {
-    entries: Vec<Bonus>,
-    // these bonuses are applied to the owning entity if a weapon of this kind is equipped
-    // TODO dual wielding does allow multiple bonuses of different weapon kinds at the same time
-    weapon: Vec<(WeaponKind, Bonus)>,
+pub enum Contingent {
+    /// Bonuses that should always be applied
+    Always,
 
-    // these bonuses are applied only to a specific attack using the specified weapon_kind
-    // should only include Damage, Accuracy, Crit/Hit/Graze Threshold & Multiplier
-    attack: Vec<(WeaponKind, Bonus)>,
+    /// Bonuses that should only be applied to the parent if they have the given
+    /// WeaponKind equipped
+    WeaponEquipped(WeaponKind),
+
+    /// Bonuses that should only be applied to an attack using the given WeaponKind
+    AttackWithWeapon(WeaponKind),
 }
 
+impl Default for Contingent {
+    fn default() -> Contingent {
+        Contingent::Always
+    }
+}
+
+#[derive(Deserialize, Debug, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct Bonus {
+    #[serde(default)]
+    pub when: Contingent,
+    pub kind: BonusKind,
+}
+
+#[derive(Deserialize, Debug, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct BonusList(Vec<Bonus>);
+
 impl BonusList {
+    /// An iterator through all standard bonuses held in this list.  These bonuses
+    /// should always be applied to the parent entity
     pub fn iter(&self) -> impl Iterator<Item=&Bonus> {
-        self.entries.iter()
+        self.0.iter()
     }
 
-    pub fn weapon_iter(&self) -> impl Iterator<Item=&(WeaponKind, Bonus)> {
-        self.weapon.iter()
+    pub fn add(&mut self, bonus: Bonus) {
+        self.0.push(bonus);
     }
 
-    pub fn attack_iter(&self) -> impl Iterator<Item=&(WeaponKind, Bonus)> {
-        self.attack.iter()
-    }
-
-    pub fn add_entry(&mut self, bonus: Bonus) {
-        self.entries.push(bonus);
+    pub fn add_kind(&mut self, kind: BonusKind) {
+        self.0.push(Bonus { when: Contingent::Always, kind });
     }
 }
 
 impl Default for BonusList {
     fn default() -> BonusList {
-        BonusList {
-            entries: Vec::new(),
-            weapon: Vec::new(),
-            attack: Vec::new(),
-        }
+        BonusList(Vec::new())
     }
 }
 

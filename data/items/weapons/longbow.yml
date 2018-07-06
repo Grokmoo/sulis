@@ -9,7 +9,7 @@ value: 800
 equippable:
   slot: HeldMain
   blocks_slot: HeldOff
-  bonuses: {}
+  bonuses: []
   attack:
     damage:
       min: 15

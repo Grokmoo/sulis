@@ -4,6 +4,6 @@ icon: inventory/ring_03
 equippable:
   slot: FingerMain
   alternate_slot: FingerOff
-  bonuses: {}
+  bonuses: []
 weight: 5
 value: 500

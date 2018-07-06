@@ -9,11 +9,10 @@ value: 1000
 equippable:
   slot: Feet
   bonuses:
-    entries:
-      - armor: 3
-      - armor_kind: [ Slashing, 1]
-      - armor_kind: [Electrical, -1]
-      - movement_rate: -0.03
+    - kind: { armor: 3 }
+    - kind: { armor_kind: [ Slashing, 1] }
+    - kind: { armor_kind: [Electrical, -1] }
+    - kind: { movement_rate: -0.03 }
 image:
   Feet:
     creatures/boots_plate

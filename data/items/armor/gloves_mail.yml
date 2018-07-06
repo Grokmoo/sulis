@@ -9,9 +9,8 @@ value: 400
 equippable:
   slot: Hands
   bonuses:
-    entries:
-      - armor: 2
-      - movement_rate: -0.01
+    - kind: { armor: 2 }
+    - kind: { movement_rate: -0.01 }
 image:
   Hands:
     creatures/gloves_mail

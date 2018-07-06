@@ -9,11 +9,10 @@ value: 1000
 equippable:
   slot: Legs
   bonuses:
-    entries:
-      - armor: 4
-      - armor_kind: [ Slashing, 1]
-      - armor_kind: [ Crushing, -1]
-      - movement_rate: -0.06
+    - kind: { armor: 4 }
+    - kind: { armor_kind: [ Slashing, 1] }
+    - kind: { armor_kind: [ Crushing, -1] }
+    - kind: { movement_rate: -0.06 }
 image:
   Legs:
     creatures/legs_mail

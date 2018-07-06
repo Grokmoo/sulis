@@ -3,7 +3,7 @@ name: Cloak
 icon: inventory/cloak_01
 equippable:
   slot: Cloak
-  bonuses: {}
+  bonuses: []
 image:
   Cloak:
     creatures/cloak

@@ -5,18 +5,17 @@ description: |
 size: 2by2
 movement_rate: 1.0
 base_stats:
-  entries:
-    - attribute: [ Endurance, -1 ]
-    - attribute: [ Perception, -1 ]
-    - attribute: [ Intellect, 1 ]
-    - attribute: [ Wisdom, 1 ]
-    - hit_points: 40
-    - accuracy: 30
-    - defense: 32
-    - fortitude: 35
-    - reflex: 30
-    - will: 30
-    - reach: 0.25
+  - kind: { attribute: [ Endurance, -1 ] }
+  - kind: { attribute: [ Perception, -1 ] }
+  - kind: { attribute: [ Intellect, 1 ] }
+  - kind: { attribute: [ Wisdom, 1 ] }
+  - kind: { hit_points: 40 }
+  - kind: { accuracy: 30 }
+  - kind: { defense: 32 }
+  - kind: { fortitude: 35 }
+  - kind: { reflex: 30 }
+  - kind: { will: 30 }
+  - kind: { reach: 0.25 }
 base_attack:
   damage:
     min: 8

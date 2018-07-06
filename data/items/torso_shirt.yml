@@ -3,7 +3,7 @@ name: Shirt
 icon: inventory/torso_shirt
 equippable:
   slot: Torso
-  bonuses: {}
+  bonuses: []
 image:
   Torso:
     creatures/shirt

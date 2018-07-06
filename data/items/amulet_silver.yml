@@ -3,6 +3,6 @@ name: Silver Amulet
 icon: inventory/amulet_03
 equippable:
   slot: Neck
-  bonuses: {}
+  bonuses: []
 weight: 10
 value: 200

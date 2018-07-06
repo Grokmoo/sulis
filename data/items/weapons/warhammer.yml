@@ -8,7 +8,7 @@ weight: 800
 value: 300
 equippable:
   slot: HeldMain
-  bonuses: {}
+  bonuses: []
   attack:
     damage:
       min: 15

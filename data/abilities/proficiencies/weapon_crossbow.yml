@@ -4,16 +4,20 @@ icon: abilities/weapon_crossbow
 description: |
   You have proficiency in the use of crossbows.
 bonuses:
-  entries:
-    - weapon_proficiency: Crossbow
+  - kind:
+      weapon_proficiency: Crossbow
 upgrades:
   - description: |
       You gain a bonus to accuracy while using crossbows.
     bonuses:
-      attack:
-        - [ Crossbow, accuracy: 10 ]
+      - kind:
+          accuracy: 10
+        when:
+          AttackWithWeapon: Crossbow
   - description: |
       Critical hits you make with crossbows become even more devastating.
     bonuses:
-      attack:
-        - [ Crossbow, crit_multiplier: 0.5 ]
+      - kind:
+          crit_multiplier: 0.5
+        when:
+          AttackWithWeapon: Crossbow

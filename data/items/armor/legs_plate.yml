@@ -9,12 +9,12 @@ value: 2000
 equippable:
   slot: Legs
   bonuses:
-    base_armor: 5
-    armor_kinds:
-      Slashing: 7
-      Piercing: 6
-      Electrical: 3
-    movement_rate: -0.08
+    entries:
+      - armor: 5
+      - armor_kind: [ Slashing, 2]
+      - armor_kind: [ Piercing, 1]
+      - armor_kind: [ Electrical, -2]
+      - movement_rate: -0.08
 image:
   Legs:
     creatures/legs_plate

@@ -18,8 +18,8 @@ use std::rc::Rc;
 
 use sulis_core::image::Image;
 use sulis_core::resource::ResourceSet;
-use bonus_list::{AttackBuilder, AttackKindBuilder, AttackBonusList};
-use {Armor, Damage, DamageKind, DamageList, StatList, WeaponKind};
+use bonus_list::{AttackBuilder, AttackKindBuilder};
+use {Armor, AttackBonuses, Bonus, Damage, DamageKind, DamageList, StatList, WeaponKind};
 
 use AttackKind::*;
 
@@ -27,7 +27,7 @@ use AttackKind::*;
 pub struct Attack {
     pub damage: DamageList,
     pub kind: AttackKind,
-    pub bonuses: AttackBonusList,
+    pub bonuses: AttackBonuses,
 }
 
 impl Attack {
@@ -45,23 +45,35 @@ impl Attack {
         Attack {
             damage: damage_list,
             kind: attack_kind,
-            bonuses: AttackBonusList::default(),
+            bonuses: AttackBonuses::default(),
         }
     }
 
     pub fn new(builder: &AttackBuilder, stats: &StatList, weapon_kind: WeaponKind) -> Attack {
         let mut bonuses = builder.bonuses.clone();
-
-        for (owned_kind, owned_bonuses) in stats.weapon_bonuses.iter() {
+        let mut bonus_damage = stats.bonus_damage.clone();
+        if let Some(damage) = bonuses.damage {
+            bonus_damage.push(damage);
+        }
+        for (owned_kind, owned_bonus) in stats.attack_bonuses.iter() {
             if *owned_kind == weapon_kind {
-                bonuses.add(owned_bonuses);
+                match owned_bonus {
+                    Bonus::Damage(damage) => bonus_damage.push(damage.clone()),
+                    Bonus::Accuracy(amount) => bonuses.accuracy += amount,
+                    Bonus::CritThreshold(amount) => bonuses.crit_threshold += amount,
+                    Bonus::HitThreshold(amount) => bonuses.hit_threshold += amount,
+                    Bonus::GrazeThreshold(amount) => bonuses.graze_threshold += amount,
+                    Bonus::CritMultiplier(amount) => bonuses.crit_multiplier += amount,
+                    Bonus::HitMultiplier(amount) => bonuses.hit_multiplier += amount,
+                    Bonus::GrazeMultiplier(amount) => bonuses.graze_multiplier += amount,
+                    _ => {
+                        warn!("Attack bonus of type '{:?}' for weapon {:?} will never be applied",
+                              owned_bonus, owned_kind);
+                    }
+                }
             }
         }
 
-        let mut bonus_damage = stats.bonus_damage.clone();
-        for damage in bonuses.bonus_damage.iter() {
-            bonus_damage.push(damage.clone());
-        }
         let damage = DamageList::new(builder.damage, &bonus_damage);
 
         let kind = match builder.kind {

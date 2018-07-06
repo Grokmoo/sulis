@@ -9,8 +9,9 @@ value: 500
 equippable:
   slot: Feet
   bonuses:
-    base_armor: 2
-    movement_rate: -0.02
+    entries:
+      - armor: 2
+      - movement_rate: -0.02
 image:
   Feet:
     creatures/boots_mail

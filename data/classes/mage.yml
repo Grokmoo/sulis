@@ -3,13 +3,14 @@ name: Mage
 description: |
   Mages are students of the highly complex system known as the circles of magic.  Although highly sophisticated and powerful, it is extremely rigid with formalized rules, gestures, and phrases developed over thousands of years.
 bonuses_per_level:
-  hit_points: 5
-  accuracy: 2
-  defense: 2
-  fortitude: 2
-  reflex: 2
-  will: 4
-  initiative: 1
+  entries:
+    - hit_points: 5
+    - accuracy: 2
+    - defense: 2
+    - fortitude: 2
+    - reflex: 2
+    - will: 4
+    - initiative: 1
 starting_abilities:
   - minor_heal
   - flare

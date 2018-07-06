@@ -14,131 +14,109 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::collections::HashMap;
-
 use {Attribute, Damage, DamageKind, ArmorKind, WeaponKind};
 
 #[derive(Deserialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
-pub struct AttackBonusList {
-    #[serde(default)]
-    pub bonus_damage: Vec<Damage>,
-    #[serde(default)]
-    pub accuracy: i32,
-    #[serde(default)]
-    pub crit_threshold: i32,
-    #[serde(default)]
-    pub hit_threshold: i32,
-    #[serde(default)]
-    pub graze_threshold: i32,
-    #[serde(default)]
-    pub graze_multiplier: f32,
-    #[serde(default)]
-    pub hit_multiplier: f32,
-    #[serde(default)]
-    pub crit_multiplier: f32,
-}
-
-impl Default for AttackBonusList {
-    fn default() -> AttackBonusList {
-        AttackBonusList {
-            bonus_damage: Vec::new(),
-            accuracy: 0,
-            crit_threshold: 0,
-            hit_threshold: 0,
-            graze_threshold: 0,
-            graze_multiplier: 0.0,
-            hit_multiplier: 0.0,
-            crit_multiplier: 0.0,
-        }
-    }
-}
-
-impl AttackBonusList {
-    pub fn add(&mut self, other: &AttackBonusList) {
-        for damage in other.bonus_damage.iter() {
-            self.bonus_damage.push(*damage);
-        }
-        self.accuracy += other.accuracy;
-        self.crit_threshold += other.crit_threshold;
-        self.hit_threshold += other.hit_threshold;
-        self.graze_threshold += other.graze_threshold;
-        self.graze_multiplier += other.graze_multiplier;
-        self.hit_multiplier += other.hit_multiplier;
-        self.crit_multiplier += other.crit_multiplier;
-    }
+#[serde(rename_all = "snake_case")]
+pub enum Bonus {
+    Attribute { attribute: Attribute, amount: i8 },
+    ActionPoints(i32),
+    Armor(i32),
+    ArmorKind { kind: DamageKind, amount: i32 },
+    Damage(Damage),
+    ArmorProficiency(ArmorKind),
+    WeaponProficiency(WeaponKind),
+    Reach(f32),
+    Range(f32),
+    Initiative(i32),
+    HitPoints(i32),
+    Accuracy(i32),
+    Defense(i32),
+    Fortitude(i32),
+    Reflex(i32),
+    Will(i32),
+    Concealment(i32),
+    CritThreshold(i32),
+    HitThreshold(i32),
+    GrazeThreshold(i32),
+    CritMultiplier(f32),
+    HitMultiplier(f32),
+    GrazeMultiplier(f32),
+    MovementRate(f32),
+    AttackCost(i32),
+    MoveDisabled,
+    AttackDisabled,
+    GroupUsesPerEncounter { group: String, amount: u32 },
 }
 
 #[derive(Deserialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
+#[serde(default)]
 pub struct BonusList {
-    pub attributes: Option<HashMap<Attribute, i8>>,
-    pub ap: Option<i32>,
-    pub base_armor: Option<u32>,
-    pub armor_kinds: Option<HashMap<DamageKind, u32>>,
-    pub bonus_damage: Option<Damage>,
-    pub armor_proficiencies: Option<Vec<ArmorKind>>,
-    pub weapon_proficiencies: Option<Vec<WeaponKind>>,
-    #[serde(default)]
-    pub weapon_bonuses: Vec<(WeaponKind, AttackBonusList)>,
-    pub bonus_reach: Option<f32>,
-    pub bonus_range: Option<f32>,
-    pub initiative: Option<i32>,
-    pub hit_points: Option<i32>,
-    pub accuracy: Option<i32>,
-    pub defense: Option<i32>,
-    pub fortitude: Option<i32>,
-    pub reflex: Option<i32>,
-    pub will: Option<i32>,
-    pub concealment: Option<i32>,
-    pub crit_threshold: Option<i32>,
-    pub hit_threshold: Option<i32>,
-    pub graze_threshold: Option<i32>,
-    pub graze_multiplier: Option<f32>,
-    pub hit_multiplier: Option<f32>,
-    pub crit_multiplier: Option<f32>,
-    pub movement_rate: Option<f32>,
-    pub attack_cost: Option<i32>,
-    #[serde(default)]
-    pub move_disabled: bool,
-    #[serde(default)]
-    pub attack_disabled: bool,
-    #[serde(default)]
-    pub group_uses_per_encounter: Vec<(String, u32)>,
+    entries: Vec<Bonus>,
+    // these bonuses are applied to the owning entity if a weapon of this kind is equipped
+    // TODO dual wielding does allow multiple bonuses of different weapon kinds at the same time
+    weapon: Vec<(WeaponKind, Bonus)>,
+
+    // these bonuses are applied only to a specific attack using the specified weapon_kind
+    // should only include Damage, Accuracy, Crit/Hit/Graze Threshold & Multiplier
+    attack: Vec<(WeaponKind, Bonus)>,
+}
+
+impl BonusList {
+    pub fn iter(&self) -> impl Iterator<Item=&Bonus> {
+        self.entries.iter()
+    }
+
+    pub fn weapon_iter(&self) -> impl Iterator<Item=&(WeaponKind, Bonus)> {
+        self.weapon.iter()
+    }
+
+    pub fn attack_iter(&self) -> impl Iterator<Item=&(WeaponKind, Bonus)> {
+        self.attack.iter()
+    }
+
+    pub fn add_entry(&mut self, bonus: Bonus) {
+        self.entries.push(bonus);
+    }
 }
 
 impl Default for BonusList {
     fn default() -> BonusList {
         BonusList {
-            attributes: None,
-            ap: None,
-            base_armor: None,
-            armor_kinds: None,
-            armor_proficiencies: None,
-            weapon_proficiencies: None,
-            weapon_bonuses: Vec::new(),
-            bonus_damage: None,
-            bonus_range: None,
-            bonus_reach: None,
-            initiative: None,
-            hit_points: None,
-            accuracy: None,
-            defense: None,
-            fortitude: None,
-            reflex: None,
-            will: None,
-            concealment: None,
-            crit_threshold: None,
-            hit_threshold: None,
-            graze_threshold: None,
-            graze_multiplier: None,
-            hit_multiplier: None,
-            crit_multiplier: None,
-            movement_rate: None,
-            attack_cost: None,
-            move_disabled: false,
-            attack_disabled: false,
-            group_uses_per_encounter: Vec::new(),
+            entries: Vec::new(),
+            weapon: Vec::new(),
+            attack: Vec::new(),
+        }
+    }
+}
+
+#[derive(Deserialize, Debug, Clone)]
+#[serde(deny_unknown_fields)]
+#[serde(default)]
+pub struct AttackBonuses {
+    pub damage: Option<Damage>,
+    pub accuracy: i32,
+    pub crit_threshold: i32,
+    pub hit_threshold: i32,
+    pub graze_threshold: i32,
+    pub crit_multiplier: f32,
+    pub hit_multiplier: f32,
+    pub graze_multiplier: f32,
+}
+
+impl Default for AttackBonuses {
+    fn default() -> AttackBonuses {
+        AttackBonuses {
+            damage: None,
+            accuracy: 0,
+            crit_threshold: 0,
+            hit_threshold: 0,
+            graze_threshold: 0,
+            crit_multiplier: 0.0,
+            hit_multiplier: 0.0,
+            graze_multiplier: 0.0,
         }
     }
 }
@@ -148,7 +126,7 @@ impl Default for BonusList {
 pub struct AttackBuilder {
     pub damage: Damage,
     pub kind: AttackKindBuilder,
-    pub bonuses: AttackBonusList,
+    pub bonuses: AttackBonuses,
 }
 
 impl AttackBuilder {

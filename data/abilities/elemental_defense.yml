@@ -4,10 +4,10 @@ icon: abilities/elemental_defense
 description: |
   Through superior training and strength of will, you are able to shrug off elemental damage.  You gain 3 points of Armor against Acid, Cold, Electrical, and Fire damage.
 bonuses:
-  armor_kinds:
-    Acid: 3
-    Cold: 3
-    Electrical: 3
-    Fire: 3
+  entries:
+    - armor_kind: [ Acid, 3]
+    - armor_kind: [ Cold, 3]
+    - armor_kind: [Electrical, 3]
+    - armor_kind: [Fire, 3]
 prereqs:
   abilities: [ tenacious_soul ]

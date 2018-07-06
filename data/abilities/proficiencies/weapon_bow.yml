@@ -4,18 +4,16 @@ icon: abilities/weapon_bow
 description: |
   You have proficiency in the use of bows.
 bonuses:
-  weapon_proficiencies:
-    - Bow
+  entries:
+    - weapon_proficiency: Bow
 upgrades:
   - description: |
       You gain a bonus to accuracy while using bows.
     bonuses:
-      weapon_bonuses:
-        - - Bow
-          - accuracy: 10
+      attack:
+        - [ Bow, accuracy: 10 ]
   - description: |
       Critical hits you make with bows become even more devastating.
     bonuses:
-      weapon_bonuses:
-        - - Bow
-          - crit_multiplier: 0.5
+      attack:
+        - [ Bow, crit_multiplier: 0.5 ]

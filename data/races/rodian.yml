@@ -5,18 +5,18 @@ description: |
 size: 2by2
 movement_rate: 1.0
 base_stats:
-  attributes:
-    Strength: -2
-    Dexterity: 4
-    Endurance: -1
-    Wisdom: -1
-  hit_points: 40
-  accuracy: 25
-  defense: 30
-  fortitude: 30
-  reflex: 30
-  will: 25
-  bonus_reach: 0.25
+  entries:
+    - attribute: [ Strength, -2 ]
+    - attribute: [ Dexterity, 4 ]
+    - attribute: [ Endurance, -1 ]
+    - attribute: [ Wisdom, -1 ]
+    - hit_points: 40
+    - accuracy: 25
+    - defense: 30
+    - fortitude: 30
+    - reflex: 30
+    - will: 25
+    - reach: 0.25
 base_attack:
   damage:
     min: 8

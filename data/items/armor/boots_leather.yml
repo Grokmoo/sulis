@@ -6,7 +6,8 @@ value: 100
 equippable:
   slot: Feet
   bonuses:
-    base_armor: 1
+    entries:
+      - armor: 1
 image:
   Feet:
     creatures/boots_leather

@@ -4,18 +4,16 @@ icon: abilities/weapon_simple
 description: |
   You have proficiency in the use of simple weapons.
 bonuses:
-  weapon_proficiencies:
-    - Simple
+  entries:
+    - weapon_proficiency: Simple
 upgrades:
   - description: |
       You gain a bonus to accuracy while using simple weapons.
     bonuses:
-      weapon_bonuses:
-        - - Simple
-          - accuracy: 10
+      attack:
+        - [ Simple, accuracy: 10 ]
   - description: |
       You gain a bonus to damage while using simple weapons.
     bonuses:
-      weapon_bonuses:
-        - - Simple
-          - bonus_damage: [ { min: 2, max: 4 } ]
+      attack:
+        - [ Simple, damage: { min: 2, max: 4 } ]

@@ -14,8 +14,6 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::collections::HashMap;
-
 use DamageKind;
 
 #[derive(Deserialize, Debug, Clone)]
@@ -35,28 +33,31 @@ impl Default for Armor {
 }
 
 impl Armor {
-    pub fn add(&mut self, base_armor: Option<u32>, kinds: &Option<HashMap<DamageKind, u32>>) {
-        let other_base = match base_armor {
-            None => 0,
-            Some(base) => base,
-        };
-
-        let kinds = match kinds {
-            &None => {
-                self.kinds.iter_mut().for_each(|amount| *amount += other_base);
-                self.base += other_base;
-                return;
-            },
-            &Some(ref kinds) => kinds,
-        };
-
-        for kind in DamageKind::iter() {
-            if *kind == DamageKind::Raw { continue; }
-            let amount = kinds.get(kind).unwrap_or(&other_base);
-            self.kinds[kind.index()] += amount;
+    pub fn add_base(&mut self, amount: i32) {
+        if self.base as i32 + amount < 0 {
+            self.base = 0;
+        } else {
+            self.base = (self.base as i32 + amount) as u32;
         }
 
-        self.base += other_base;
+        for index in 0..self.kinds.len() {
+            if self.kinds[index] as i32 + amount < 0 {
+                self.kinds[index] = 0;
+            } else {
+                self.kinds[index] = (self.kinds[index] as i32 + amount) as u32;
+            }
+        }
+    }
+
+    pub fn add_kind(&mut self, kind: DamageKind, amount: i32) {
+        if kind == DamageKind::Raw { return; }
+
+        let index = kind.index();
+        if self.kinds[index] as i32 + amount < 0 {
+            self.kinds[index] = 0;
+        } else {
+            self.kinds[index] = (self.kinds[index] as i32 + amount) as u32;
+        }
     }
 
     /// Returns the amount of damage resistance that this armor value

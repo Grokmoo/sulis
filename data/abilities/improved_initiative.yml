@@ -4,6 +4,7 @@ icon: abilities/improved_initiative
 description: |
   Your reactions are just a bit faster than everyone else.  You gain +3 to Initiative.
 bonuses:
-  initiative: 3
+  entries:
+    - initiative: 3
 prereqs:
   abilities: [ lightning_reflexes ]

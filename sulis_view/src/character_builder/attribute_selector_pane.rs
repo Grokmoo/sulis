@@ -14,11 +14,13 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::collections::HashMap;
+
 use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_rules::{Attribute, AttributeList};
+use sulis_rules::{Attribute, AttributeList, Bonus};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_module::{Class, Module, Race};
 use sulis_widgets::{Button, Label, Spinner, TextArea};
@@ -166,6 +168,15 @@ impl WidgetKind for AttributeSelectorPane {
         kit_area.borrow_mut().state.add_text_arg("name", &selected_kit.name);
         children.push(kit_area);
 
+        let mut attr_bonuses: HashMap<Attribute, i32> = HashMap::new();
+        for bonus in race.base_stats.iter() {
+            match bonus {
+                Bonus::Attribute { attribute, amount } => {
+                    attr_bonuses.insert(*attribute, *amount as i32);
+                }, _ => (),
+            }
+        }
+
         for attr in Attribute::iter() {
             let value = self.attrs.get(*attr) as i32;
             let max = if self.available > 0 {
@@ -192,10 +203,7 @@ impl WidgetKind for AttributeSelectorPane {
             children.push(label);
 
             let bonus = Widget::with_theme(Label::empty(), &format!("{}_bonus", attr.short_name()));
-            let bonus_value = match race.base_stats.attributes {
-                None => 0,
-                Some(ref attrs) => *attrs.get(attr).unwrap_or(&0),
-            };
+            let bonus_value = *attr_bonuses.get(attr).unwrap_or(&0);
             bonus.borrow_mut().state.add_text_arg("value", &bonus_value.to_string());
             children.push(bonus);
 

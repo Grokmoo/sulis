@@ -9,7 +9,8 @@ value: 800
 equippable:
   slot: HeldMain
   bonuses:
-    defense: 7
+    entries:
+      - defense: 7
   attack:
     damage:
       min: 15

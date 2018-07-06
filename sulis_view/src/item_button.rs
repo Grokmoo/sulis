@@ -19,7 +19,7 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_rules::{bonus_list::{AttackBuilder, AttackKindBuilder}, BonusList};
+use sulis_rules::{bonus_list::{AttackBuilder, AttackKindBuilder}, BonusList, Bonus, Armor, DamageKind};
 use sulis_module::{item::{format_item_value, format_item_weight, Slot}, Module};
 use sulis_state::{EntityState, GameState, ItemState, inventory::has_proficiency};
 use sulis_core::io::event;
@@ -462,8 +462,7 @@ pub fn add_attack_text_args(attack: &AttackBuilder, widget_state: &mut WidgetSta
     add_if_nonzero(widget_state, "attack_crit_multiplier", bonuses.crit_multiplier);
     add_if_nonzero(widget_state, "attack_accuracy", bonuses.accuracy as f32);
 
-    for damage in bonuses.bonus_damage.iter() {
-        // TODO support multiple bonus damages
+    if let Some(damage) = bonuses.damage {
         widget_state.add_text_arg("attack_min_bonus_damage", &damage.min.to_string());
         widget_state.add_text_arg("attack_max_bonus_damage", &damage.max.to_string());
         if let Some(kind) = damage.kind {
@@ -472,71 +471,79 @@ pub fn add_attack_text_args(attack: &AttackBuilder, widget_state: &mut WidgetSta
     }
 }
 
+fn add<T: Display>(widget_state: &mut WidgetState, name: &str, value: T) {
+    widget_state.add_text_arg(name, &value.to_string());
+}
+
+fn add_bonus(bonus: &Bonus, state: &mut WidgetState,
+             group_uses_index: &mut usize, damage_index: &mut usize, armor: &mut Armor) {
+    use sulis_rules::Bonus::*;
+    match bonus {
+        Attribute { attribute, amount } => add(state, &attribute.short_name(), amount),
+        ActionPoints(amount) => add(state, "bonus_ap", amount),
+        Armor(amount) => armor.add_base(*amount),
+        ArmorKind { kind, amount } => armor.add_kind(*kind, *amount),
+        Damage(damage) => {
+            let index = *damage_index;
+            if damage.max > 0 {
+                add(state, &format!("min_bonus_damage_{}", index), damage.min);
+                add(state, &format!("max_bonus_damage_{}", index), damage.max);
+            }
+            if damage.ap > 0 {
+                add(state, &format!("armor_piercing_{}", index), damage.ap);
+            }
+            if let Some(kind) = damage.kind {
+                add(state, &format!("bonus_damage_kind_{}", index), kind);
+            }
+            *damage_index += 1;
+        },
+        Reach(amount) => add(state, "bonus_reach", amount),
+        Range(amount) => add(state, "bonus_range", amount),
+        Initiative(amount) => add(state, "initiative", amount),
+        HitPoints(amount) => add(state, "hit_points", amount),
+        Accuracy(amount) => add(state, "accuracy", amount),
+        Defense(amount) => add(state, "defense", amount),
+        Fortitude(amount) => add(state, "fortitude", amount),
+        Reflex(amount) => add(state, "reflex", amount),
+        Will(amount) => add(state, "will", amount),
+        Concealment(amount) => add(state, "concealment", amount),
+        CritThreshold(amount) => add(state, "crit_threshold", amount),
+        HitThreshold(amount) => add(state, "hit_threshold", amount),
+        GrazeThreshold(amount) => add(state, "graze_threshold", amount),
+        CritMultiplier(amount) => add(state, "crit_multiplier", amount),
+        HitMultiplier(amount) => add(state, "hit_multiplier", amount),
+        GrazeMultiplier(amount) => add(state, "graze_multiplier", amount),
+        MovementRate(amount) => add(state, "movement_rate", amount),
+        AttackCost(amount) => {
+            let cost = amount / Module::rules().display_ap as i32;
+            add(state, "attack_cost", cost);
+        },
+        GroupUsesPerEncounter { group, amount } => {
+            let index = *group_uses_index;
+            add(state, &format!("ability_group_{}", index), group);
+            add(state, &format!("ability_group_{}_uses_per_encounter", index), amount);
+            *group_uses_index += 1;
+        }
+        _ => (),
+    }
+}
+
 pub fn add_bonus_text_args(bonuses: &BonusList, widget_state: &mut WidgetState) {
-    if let Some(ref damage) = bonuses.bonus_damage {
-        if damage.max > 0 {
-            widget_state.add_text_arg("min_bonus_damage", &damage.min.to_string());
-            widget_state.add_text_arg("max_bonus_damage", &damage.max.to_string());
-        }
-        if damage.ap > 0 {
-            widget_state.add_text_arg("armor_piercing", &damage.ap.to_string());
-        }
-        if let Some(kind) = damage.kind {
-            widget_state.add_text_arg("bonus_damage_kind", &kind.to_string());
-        }
+    let mut group_uses_index = 0;
+    let mut damage_index = 0;
+    let mut armor = Armor::default();
+    for bonus in bonuses.iter() {
+        add_bonus(bonus, widget_state, &mut group_uses_index, &mut damage_index, &mut armor);
     }
 
-    let mut armor_arg_added = false;
-    if let Some(ref base_armor) = bonuses.base_armor {
-        widget_state.add_text_arg("armor", &base_armor.to_string());
-        armor_arg_added = true;
+    if armor.base() > 0 {
+        add(widget_state, "armor", armor.base());
     }
 
-    if let Some(ref armor_kinds) = bonuses.armor_kinds {
-        if !armor_arg_added {
-            widget_state.add_text_arg("armor", "0");
-        }
-
-        for (kind, amount) in armor_kinds.iter() {
-            widget_state.add_text_arg(&format!("armor_{}", kind).to_lowercase(),
-                                               &amount.to_string());
-        }
+    for kind in DamageKind::iter() {
+        if !armor.differs_from_base(*kind) { continue; }
+        add(widget_state, &format!("armor_{}", kind).to_lowercase(), armor.amount(*kind));
     }
-
-    if let Some(ref attributes) = bonuses.attributes {
-        for (attr, value) in attributes.iter() {
-            widget_state.add_text_arg(&attr.short_name(), &value.to_string());
-        }
-    }
-
-    if let Some(attack_cost) = bonuses.attack_cost {
-        let cost = attack_cost / Module::rules().display_ap as i32;
-        widget_state.add_text_arg("attack_cost", &cost.to_string());
-    }
-
-    for (index, (ref group_id, amount)) in bonuses.group_uses_per_encounter.iter().enumerate() {
-        widget_state.add_text_arg(&format!("ability_group_{}", index), group_id);
-        widget_state.add_text_arg(&format!("ability_group_{}_uses_per_encounter", index), &amount.to_string());
-    }
-
-    add_if_present(widget_state, "bonus_ap", bonuses.ap);
-    add_if_present(widget_state, "bonus_reach", bonuses.bonus_reach);
-    add_if_present(widget_state, "bonus_range", bonuses.bonus_range);
-    add_if_present(widget_state, "initiative", bonuses.initiative);
-    add_if_present(widget_state, "hit_points", bonuses.hit_points);
-    add_if_present(widget_state, "accuracy", bonuses.accuracy);
-    add_if_present(widget_state, "defense", bonuses.defense);
-    add_if_present(widget_state, "fortitude", bonuses.fortitude);
-    add_if_present(widget_state, "reflex", bonuses.reflex);
-    add_if_present(widget_state, "will", bonuses.will);
-    add_if_present(widget_state, "concealment", bonuses.concealment);
-    add_if_present(widget_state, "crit_threshold", bonuses.crit_threshold);
-    add_if_present(widget_state, "hit_threshold", bonuses.hit_threshold);
-    add_if_present(widget_state, "graze_threshold", bonuses.graze_threshold);
-    add_if_present(widget_state, "graze_multiplier", bonuses.graze_multiplier);
-    add_if_present(widget_state, "hit_multiplier", bonuses.hit_multiplier);
-    add_if_present(widget_state, "crit_multiplier", bonuses.crit_multiplier);
-    add_if_present(widget_state, "movement_rate", bonuses.movement_rate);
 }
 
 fn add_if_nonzero(widget_state: &mut WidgetState, text: &str, val: f32) {

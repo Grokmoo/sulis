@@ -4,8 +4,6 @@ icon: inventory/ring_02
 equippable:
   slot: FingerMain
   alternate_slot: FingerOff
-  bonuses:
-    attributes:
-      Perception: 2
+  bonuses: {}
 weight: 5
 value: 100

@@ -4,25 +4,21 @@ icon: abilities/weapon_mace
 description: |
   You have proficiency in the use of maces and hammers.
 bonuses:
-  weapon_proficiencies:
-    - Mace
-    - Hammer
+  entries:
+    - weapon_proficiency: Mace
+    - weapon_proficiency: Hammer
 prereqs:
   abilities: [ weapon_simple ]
 upgrades:
   - description: |
       You gain a bonus to damage while using maces & hammers.
     bonuses:
-      weapon_bonuses:
-        - - Mace
-          - bonus_damage: [ { min: 3, max: 5 } ]
-        - - Hammer
-          - bonus_damage: [ { min: 3, max: 5 } ]
+      attack:
+        - [ Mace, damage: { min: 3, max: 5} ]
+        - [ Hammer, damage: { min: 3, max: 5 } ]
   - description: |
       You get more hits and fewer grazes when using maces.
     bonuses:
-      weapon_bonuses:
-        - - Mace
-          - hit_threshold: -10
-        - - Hammer
-          - hit_threshold: -10
+      attack:
+        - [ Mace, hit_threshold: -10 ]
+        - [ Hammer, hit_threshold: -10 ]

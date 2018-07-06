@@ -9,11 +9,11 @@ value: 2000
 equippable:
   slot: Torso
   bonuses:
-    base_armor: 5
-    armor_kinds:
-      Slashing: 6
-      Crushing: 4
-    movement_rate: -0.09
+    entries:
+      - armor: 5
+      - armor_kind: [ Slashing, 1]
+      - armor_kind: [ Crushing, -1]
+      - movement_rate: -0.09
 image:
   Torso:
     creatures/torso_mail

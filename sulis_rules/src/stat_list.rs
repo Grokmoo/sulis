@@ -19,8 +19,8 @@ use std::rc::Rc;
 use rand::{self, Rng};
 
 use sulis_core::image::Image;
-use {Armor, AttributeList, Attack, BonusList, Damage, HitKind, WeaponKind, ArmorKind};
-use bonus_list::{AttackBonusList, AttackBuilder};
+use {Armor, AttributeList, Attack, Bonus, BonusList, Damage, HitKind, WeaponKind, ArmorKind};
+use bonus_list::{AttackBonuses, AttackBuilder};
 
 #[derive(Clone)]
 pub struct StatList {
@@ -29,7 +29,10 @@ pub struct StatList {
     pub attributes: AttributeList,
     armor_proficiencies: Vec<ArmorKind>,
     weapon_proficiencies: Vec<WeaponKind>,
-    pub weapon_bonuses: Vec<(WeaponKind, AttackBonusList)>,
+    // these bonuses are applied to the stat list if a weapon of this kind is equipped
+    pub weapon_bonuses: Vec<(WeaponKind, Bonus)>,
+    // these bonuses are applied only to the attack itself of the given weaponkind
+    pub attack_bonuses: Vec<(WeaponKind, Bonus)>,
     pub bonus_ap: i32,
     pub bonus_damage: Vec<Damage>,
     pub bonus_reach: f32,
@@ -64,6 +67,7 @@ impl StatList {
             armor_proficiencies: Vec::new(),
             weapon_proficiencies: Vec::new(),
             weapon_bonuses: Vec::new(),
+            attack_bonuses: Vec::new(),
             bonus_ap: 0,
             bonus_damage: Vec::new(),
             bonus_reach: 0.0,
@@ -113,7 +117,7 @@ impl StatList {
         self.weapon_proficiencies.contains(&prof)
     }
 
-    pub fn attack_roll(&self, defense: i32, bonuses: &AttackBonusList) -> HitKind {
+    pub fn attack_roll(&self, defense: i32, bonuses: &AttackBonuses) -> HitKind {
         let accuracy = self.accuracy + bonuses.accuracy;
         let roll = rand::thread_rng().gen_range(1, 101);
         debug!("Attack roll: {} with accuracy {} against {}", roll, accuracy, defense);
@@ -178,79 +182,79 @@ impl StatList {
     pub fn add_multiple(&mut self, bonuses: &BonusList, times: u32) {
         if times == 0 { return; }
 
-        self.armor.add(bonuses.base_armor, &bonuses.armor_kinds);
-
-        if let Some(bonus_damage) = bonuses.bonus_damage {
-            self.bonus_damage.push(bonus_damage.mult(times));
+        // TODO handle add multiple for weapon and attack bonuses
+        for (weapon_kind, bonus) in bonuses.weapon_iter() {
+            self.weapon_bonuses.push((*weapon_kind, bonus.clone()));
         }
 
-        if let Some(ref armor_profs) = bonuses.armor_proficiencies {
-            for armor_prof in armor_profs.iter() {
-                if self.armor_proficiencies.contains(armor_prof) { continue; }
-
-                self.armor_proficiencies.push(*armor_prof);
-            }
+        for (weapon_kind, bonus) in bonuses.attack_iter() {
+            self.attack_bonuses.push((*weapon_kind, bonus.clone()));
         }
 
-        if let Some(ref weapon_profs) = bonuses.weapon_proficiencies {
-            for weapon_prof in weapon_profs.iter() {
-                if self.weapon_proficiencies.contains(weapon_prof) { continue; }
-
-                self.weapon_proficiencies.push(*weapon_prof);
-            }
+        for bonus in bonuses.iter() {
+            self.add_bonus(bonus, times);
         }
+    }
 
-        for (weapon_kind, ref attack_bonuses) in bonuses.weapon_bonuses.iter() {
-            let mut found = false;
-            for (owned_weapon_kind, ref mut owned_bonuses) in self.weapon_bonuses.iter_mut() {
-                if weapon_kind == owned_weapon_kind {
-                    owned_bonuses.add(attack_bonuses);
-                    found = true;
-                    break;
-                }
-            }
-
-            if !found {
-                let owned_bonuses = attack_bonuses.clone();
-                self.weapon_bonuses.push((*weapon_kind, owned_bonuses));
-            }
-        }
-
-        let times_f32 = times as f32;
+    fn add_bonus(&mut self, bonus: &Bonus, times: u32) {
         let times_i32 = times as i32;
-        if let Some(ap) = bonuses.ap { self.bonus_ap += ap * times_i32; }
-        if let Some(reach) = bonuses.bonus_reach { self.bonus_reach += reach * times_f32; }
-        if let Some(range) = bonuses.bonus_range { self.bonus_range += range * times_f32; }
-        if let Some(hit_points) = bonuses.hit_points { self.max_hp += hit_points * times_i32; }
-        if let Some(initiative) = bonuses.initiative { self.initiative += initiative * times_i32; }
-        if let Some(accuracy) = bonuses.accuracy { self.accuracy += accuracy * times_i32; }
-        if let Some(defense) = bonuses.defense { self.defense += defense * times_i32; }
-        if let Some(fortitude) = bonuses.fortitude { self.fortitude += fortitude * times_i32; }
-        if let Some(reflex) = bonuses.reflex { self.reflex += reflex * times_i32; }
-        if let Some(will) = bonuses.will { self.will += will * times_i32; }
-        if let Some(concealment) = bonuses.concealment { self.concealment += concealment * times_i32 }
-        if let Some(crit_threshold) = bonuses.crit_threshold { self.crit_threshold += crit_threshold * times_i32 }
-        if let Some(hit_threshold) = bonuses.hit_threshold { self.hit_threshold += hit_threshold * times_i32 }
-        if let Some(graze_thresh) = bonuses.graze_threshold { self.graze_threshold += graze_thresh * times_i32 }
-        if let Some(graze_mult) = bonuses.graze_multiplier { self.graze_multiplier += graze_mult * times_f32 }
-        if let Some(hit_mult) = bonuses.hit_multiplier { self.hit_multiplier += hit_mult * times_f32 }
-        if let Some(crit_mult) = bonuses.crit_multiplier { self.crit_multiplier += crit_mult * times_f32 }
-        if let Some(rate) = bonuses.movement_rate { self.movement_rate += rate * times_f32; }
-        if let Some(rate) = bonuses.attack_cost { self.attack_cost += rate * times_i32; }
+        let times_f32 = times as f32;
 
-        if bonuses.move_disabled { self.move_disabled = true; }
-        if bonuses.attack_disabled { self.attack_disabled = true; }
-
-        self.add_group_uses_per_encounter(&bonuses.group_uses_per_encounter, times as u32);
-
-        if let Some(ref attrs) = bonuses.attributes {
-            self.attributes.add_all(attrs);
+        use Bonus::*;
+        match bonus {
+            Attribute { attribute, amount } => self.attributes.add(*attribute, *amount),
+            ActionPoints(amount) => self.bonus_ap += amount * times_i32,
+            Armor(amount) => self.armor.add_base(amount * times_i32),
+            ArmorKind { kind, amount } => self.armor.add_kind(*kind, amount * times_i32),
+            Damage(damage) => self.bonus_damage.push(damage.mult(times)),
+            ArmorProficiency(kind) => {
+                if !self.armor_proficiencies.contains(kind) {
+                    self.armor_proficiencies.push(*kind);
+                }
+            },
+            WeaponProficiency(kind) => {
+                if !self.weapon_proficiencies.contains(kind) {
+                    self.weapon_proficiencies.push(*kind);
+                }
+            },
+            Reach(amount) => self.bonus_reach += amount * times_f32,
+            Range(amount) => self.bonus_range += amount * times_f32,
+            Initiative(amount) => self.initiative += amount * times_i32,
+            HitPoints(amount) => self.max_hp += amount * times_i32,
+            Accuracy(amount) => self.accuracy += amount * times_i32,
+            Defense(amount) => self.defense += amount * times_i32,
+            Fortitude(amount) => self.fortitude += amount * times_i32,
+            Reflex(amount) => self.reflex += amount * times_i32,
+            Will(amount) => self.will += amount * times_i32,
+            Concealment(amount) => self.concealment += amount * times_i32,
+            CritThreshold(amount) => self.crit_threshold += amount * times_i32,
+            HitThreshold(amount) => self.hit_threshold += amount * times_i32,
+            GrazeThreshold(amount) => self.graze_threshold += amount * times_i32,
+            CritMultiplier(amount) => self.crit_multiplier += amount * times_f32,
+            HitMultiplier(amount) => self.hit_multiplier += amount * times_f32,
+            GrazeMultiplier(amount) => self.graze_multiplier += amount * times_f32,
+            MovementRate(amount) => self.movement_rate += amount * times_f32,
+            AttackCost(amount) => self.attack_cost += amount * times_i32,
+            MoveDisabled => self.move_disabled = true,
+            AttackDisabled => self.attack_disabled = true,
+            GroupUsesPerEncounter { group, amount } => self.add_single_group_uses_per_encounter(group, *amount),
         }
     }
 
     pub fn finalize(&mut self, attacks: Vec<(&AttackBuilder, WeaponKind)>, multiplier: f32, base_attr: i32) {
         if attacks.is_empty() {
             warn!("Finalized stats with no attacks");
+        }
+
+        // clone here to avoid problem with add_bonus needing mutable borrow,
+        // even though it would be safe
+        let weapon_bonuses = self.weapon_bonuses.clone();
+        for (_, weapon_kind) in attacks.iter() {
+            for (other_weapon_kind, bonus) in weapon_bonuses.iter() {
+                if other_weapon_kind != weapon_kind { continue; }
+
+                self.add_bonus(bonus, 1);
+            }
         }
 
         let mut attack_range = None;

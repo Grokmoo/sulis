@@ -4,20 +4,18 @@ icon: abilities/weapon_large_sword
 description: |
   You have proficiency in the use of large swords.
 bonuses:
-  weapon_proficiencies:
-    - LargeSword
+  entries:
+    - weapon_proficiency: LargeSword
 prereqs:
   abilities: [ weapon_small_sword ]
 upgrades:
   - description: |
       You gain a bonus to accuracy while using large swords.
     bonuses:
-      weapon_bonuses:
-        - - LargeSword
-          - accuracy: 10
+      attack:
+        - [ LargeSword, accuracy: 10 ]
   - description: |
       Grazes you make with large swords are more damaging.
     bonuses:
-      weapon_bonuses:
-        - - LargeSword
-          - graze_multiplier: 0.25
+      attack:
+        - [ LargeSword, graze_multiplier: 0.25 ]

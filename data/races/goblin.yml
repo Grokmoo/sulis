@@ -4,18 +4,18 @@ description: "Monster"
 size: 2by2
 movement_rate: 0.85
 base_stats:
-  attributes:
-    Strength: -3
-    Dexterity: 2
-    Endurance: -1
-    Intellect: -2
-  hit_points: 20
-  accuracy: 30
-  defense: 30
-  fortitude: 30
-  reflex: 30
-  will: 30
-  bonus_reach: 0.0
+  entries:
+    - attribute: [Strength, -3 ]
+    - attribute: [Dexterity, 2 ]
+    - attribute: [Endurance, -1 ]
+    - attribute: [Intellect, -2 ]
+    - hit_points: 20
+    - accuracy: 30
+    - defense: 30
+    - fortitude: 30
+    - reflex: 30
+    - will: 30
+    - reach: 0.0
 base_attack:
   damage:
     min: 8

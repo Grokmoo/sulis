@@ -9,7 +9,8 @@ value: 100
 equippable:
   slot: Hands
   bonuses:
-    base_armor: 1
+    entries:
+      - armor: 1
 image:
   Hands:
     creatures/gloves_leather

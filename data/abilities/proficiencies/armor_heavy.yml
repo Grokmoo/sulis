@@ -4,7 +4,7 @@ icon: abilities/armor_heavy
 description: |
   You have proficiency in the use of heavy armor.
 bonuses:
-  armor_proficiencies:
-    - Heavy
+  entries:
+    - armor_proficiency: Heavy
 prereqs:
   abilities: [ armor_medium ]

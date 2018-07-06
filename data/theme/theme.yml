@@ -610,7 +610,6 @@ children:
           ][?wis|Wisdom: #wis#
           ][?bonus_ap|AP: #bonus_ap#
           ][?min_damage|[s=4.0|Damage: #min_damage# to #max_damage# [c=f00|#damage_kind#]]
-          ][?min_bonus_damage|[s=4.0|Damage: #min_bonus_damage# to #max_bonus_damage# [?bonus_damage_kind;c=f00|#bonus_damage_kind#]]
           ][?reach|[s=4.0|Reach: #reach#]
           ][?range|[s=4.0|Range: #range#]
           ][?bonus_reach|[s=4.0|Reach: #bonus_reach#]
@@ -665,7 +664,7 @@ children:
           ][?int|Intelligence: #int#
           ][?wis|Wisdom: #wis#
           ][?bonus_ap|AP: #bonus_ap#
-          ][?min_bonus_damage|[s=4.0|Damage: #min_bonus_damage# to #max_bonus_damage# [?bonus_damage_kind;c=f00|#bonus_damage_kind#]]
+          ][?min_bonus_damage_0|[s=4.0|Damage: #min_bonus_damage_0# to #max_bonus_damage_0# [?bonus_damage_kind_0;c=f00|#bonus_damage_kind_0#]]
           ][?bonus_reach|[s=4.0|Reach: #bonus_reach#]
           ][?bonus_range|[s=4.0|Range: #bonus_range#]
           ][?armor|[s=4.0|Armor: #armor#][?armor_slashing;s=3.0| (Slashing: #armor_slashing#)][?armor_piercing;s=3.0| (Piercing: #armor_piercing#)][?armor_crushing;s=3.0| (Crushing: #armor_crushing#)][?armor_acid;s=3.0| (Acid: #armor_acid#)][?armor_cold;s=3.0| (Cold: #armor_cold#)][?armor_electrical;s=3.0| (Electrical: #armor_electrical#)][?armor_fire;s=3.0| (Fire: #armor_fire#)][?armor_sonic;s=3.0| (Sonic: #armor_sonic#)]
@@ -764,7 +763,9 @@ children:
       ][?attack_crit_multiplier|[s=4.0|Crit Multiplier: #attack_crit_multiplier#]
       ][?attack_hit_multiplier|[s=4.0|Hit Multiplier: #attack_hit_multiplier#]
       ][?attack_graze_multiplier|[s=4.0|Graze Multiplier: #attack_graze_multiplier#]
-      ][?min_bonus_damage|[s=4.0|Damage: #min_bonus_damage# to #max_bonus_damage# [?bonus_damage_kind;c=f00|#bonus_damage_kind#]]
+      ][?min_bonus_damage_0|[s=4.0|Damage: #min_bonus_damage_0# to #max_bonus_damage_0# [?bonus_damage_kind_0;c=f00|#bonus_damage_kind_0#]]
+      ][?min_bonus_damage_1|[s=4.0|Damage: #min_bonus_damage_1# to #max_bonus_damage_1# [?bonus_damage_kind_0;c=f00|#bonus_damage_kind_1#]]
+      ][?min_bonus_damage_2|[s=4.0|Damage: #min_bonus_damage_2# to #max_bonus_damage_2# [?bonus_damage_kind_0;c=f00|#bonus_damage_kind_2#]]
       ][?reach|[s=4.0|Reach: #reach#]
       ][?range|[s=4.0|Range: #range#]
       ][?bonus_reach|[s=4.0|Reach: #bonus_reach#]

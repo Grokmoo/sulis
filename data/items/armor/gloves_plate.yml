@@ -9,11 +9,11 @@ value: 800
 equippable:
   slot: Hands
   bonuses:
-    base_armor: 3
-    armor_kinds:
-      Slashing: 4
-      Electrical: 2
-    movement_rate: -0.02
+    entries:
+      - armor: 3
+      - armor_kind: [ Slashing, 1]
+      - armor_kind: [ Electrical, -1]
+      - movement_rate: -0.02
 image:
   Hands:
     creatures/gloves_plate

@@ -4,19 +4,17 @@ icon: abilities/weapon_spear
 description: |
   You have proficiency in the use of spears.
 bonuses:
-  weapon_proficiencies:
-    - Spear
+  entries:
+    - weapon_proficiency: Spear
 upgrades:
   - description: |
       You gain a bonus to accuracy while using spears.
     bonuses:
-      weapon_bonuses:
-        - - Spear
-          - accuracy: 10
+      attack:
+        - [Spear, accuracy: 10]
   - description: |
       Critical hits you make with spears become more frequent and more damaging.
     bonuses:
-      weapon_bonuses:
-        - - Spear
-          - crit_multiplier: 0.25
-            crit_threshold: -5
+      attack:
+        - [Spear, crit_threshold: -10]
+        - [Spear, crit_multiplier: 0.25]

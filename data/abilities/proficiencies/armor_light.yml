@@ -4,5 +4,5 @@ icon: abilities/armor_light
 description: |
   You have proficiency in the use of light armor.
 bonuses:
-  armor_proficiencies:
-    - Light
+  entries:
+    - armor_proficiency: Light

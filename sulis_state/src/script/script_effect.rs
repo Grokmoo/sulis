@@ -122,6 +122,7 @@ fn add_num_bonus(_lua: &Lua, effect: &mut ScriptEffect, args: (String, f32)) -> 
         "reflex" => effect.bonuses.add_kind(Reflex(amount_int)),
         "will" => effect.bonuses.add_kind(Will(amount_int)),
         "concealment" => effect.bonuses.add_kind(Concealment(amount_int)),
+        "concealment_ignore" => effect.bonuses.add_kind(ConcealmentIgnore(amount_int)),
         "crit_threshold" => effect.bonuses.add_kind(CritThreshold(amount_int)),
         "hit_threshold" => effect.bonuses.add_kind(HitThreshold(amount_int)),
         "graze_threshold" => effect.bonuses.add_kind(GrazeThreshold(amount_int)),

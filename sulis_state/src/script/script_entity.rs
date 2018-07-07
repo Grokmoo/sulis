@@ -424,6 +424,7 @@ fn create_stats_table<'a>(lua: &'a Lua, parent: &ScriptEntity, _args: ()) -> Res
     stats.set("attack_is_ranged", src.attack_is_ranged())?;
 
     stats.set("concealment", src.concealment)?;
+    stats.set("concealment_ignore", src.concealment_ignore)?;
     stats.set("crit_threshold", src.crit_threshold)?;
     stats.set("graze_threshold", src.graze_threshold)?;
     stats.set("hit_threshold", src.hit_threshold)?;

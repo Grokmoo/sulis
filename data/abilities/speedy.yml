@@ -6,3 +6,9 @@ description: |
 bonuses:
   - kind:
       movement_rate: 0.1
+upgrades:
+  - description: |
+      You gain an additional boost to movement speed.
+    bonuses:
+      - kind:
+          movement_rate: 0.1

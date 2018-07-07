@@ -1,0 +1,8 @@
+id: defender
+name: "Defender"
+icon: abilities/defender
+description: |
+  You gain a +5 bonus to defense at all times.
+bonuses:
+  - kind:
+      defense: 5

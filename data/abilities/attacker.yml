@@ -1,0 +1,8 @@
+id: attacker
+name: "Attacker"
+icon: abilities/attacker
+description: |
+  You gain a +5 bonus to accuracy for all attacks.
+bonuses:
+  - kind:
+      accuracy: 5

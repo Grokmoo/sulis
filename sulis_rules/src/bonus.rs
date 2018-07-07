@@ -37,6 +37,7 @@ pub enum BonusKind {
     Reflex(i32),
     Will(i32),
     Concealment(i32),
+    ConcealmentIgnore(i32),
     CritThreshold(i32),
     HitThreshold(i32),
     GrazeThreshold(i32),

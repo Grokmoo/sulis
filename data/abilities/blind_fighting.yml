@@ -1,0 +1,10 @@
+id: blind_fighting
+name: "Blind Fighting"
+icon: abilities/blind_fighting
+description: |
+  You ignore up to 35 points of concealment on any target you attack.
+bonuses:
+  - kind:
+      concealment_ignore: 35
+prereqs:
+  abilities: [ attacker, defender ]

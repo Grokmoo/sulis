@@ -1,0 +1,10 @@
+id: acrobatic_fighting
+name: "Acrobatic Fighting"
+icon: abilities/acrobatic_fighting
+description: |
+  You are able to move in and around targets more easily in combat, striking opponents that are further away.
+bonuses:
+  - kind:
+      reach: 1.0
+prereqs:
+  abilities: [ attacker, defender ]

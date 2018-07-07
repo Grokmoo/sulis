@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::cmp;
 use std::io::Error;
 use std::rc::Rc;
 use std::cell::{RefCell};
@@ -323,7 +324,10 @@ impl ActorState {
         let rules = Module::rules();
         let accuracy = parent.borrow().actor.stats.accuracy;
 
-        if !rules.concealment_roll(target.borrow().actor.stats.concealment) {
+        let concealment = cmp::max(0, target.borrow().actor.stats.concealment -
+                                   parent.borrow().actor.stats.concealment_ignore);
+
+        if !rules.concealment_roll(concealment) {
             debug!("Concealment miss");
             return (HitKind::Miss, 0, "Concealment".to_string(), color::GRAY);
         }

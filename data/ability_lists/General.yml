@@ -36,9 +36,16 @@ abilities:
     position: [4, 2]
   - id: elemental_defense
     position: [5, 2]
-
-  - id: speedy
+  - id: attacker
+    position: [4, 3]
+  - id: blind_fighting
+    position: [5, 3]
+  - id: defender
     position: [4, 4]
+  - id: acrobatic_fighting
+    position: [5, 4]
+  - id: speedy
+    position: [4, 5]
   
   - id: strength_training
     position: [0, 6]

@@ -275,6 +275,7 @@ pub fn create_details_text_box(pc: &ActorState) -> Rc<RefCell<Widget>> {
         state.add_text_arg("reflex", &stats.reflex.to_string());
         state.add_text_arg("will", &stats.will.to_string());
         state.add_text_arg("concealment", &stats.concealment.to_string());
+        state.add_text_arg("concealment_ignore", &stats.concealment_ignore.to_string());
         state.add_text_arg("crit_threshold", &stats.crit_threshold.to_string());
         state.add_text_arg("hit_threshold", &stats.hit_threshold.to_string());
         state.add_text_arg("graze_threshold", &stats.graze_threshold.to_string());

@@ -21,8 +21,8 @@ use std::collections::HashMap;
 
 use sulis_core::image::Image;
 use sulis_core::util::invalid_data_error;
-use sulis_rules::StatList;
-use sulis_module::{Actor, ImageLayer, Module, item::{Slot, ItemKind}};
+use sulis_rules::{StatList, Slot, ItemKind};
+use sulis_module::{Actor, ImageLayer, Module};
 use {ItemList, ItemState};
 use save_state::ItemListEntrySaveState;
 

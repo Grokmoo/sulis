@@ -46,6 +46,42 @@ pub use self::damage::DamageList;
 pub mod stat_list;
 pub use self::stat_list::StatList;
 
+#[derive(Deserialize, Debug, Copy, Clone, PartialEq, Eq, Hash)]
+#[serde(deny_unknown_fields)]
+pub enum Slot {
+    Cloak,
+    Head,
+    Torso,
+    Hands,
+    HeldMain,
+    HeldOff,
+    Legs,
+    Feet,
+    Waist,
+    Neck,
+    FingerMain,
+    FingerOff,
+}
+
+impl Slot {
+    pub fn iter() -> ::std::slice::Iter<'static, Slot> {
+        SLOTS_LIST.iter()
+    }
+}
+
+use self::Slot::*;
+
+// The sort order of this list is important
+const SLOTS_LIST: [Slot; 12] = [Cloak, Feet, Legs, Torso, Hands, Head, HeldMain, HeldOff, Waist,
+                                Neck, FingerMain, FingerOff];
+
+#[derive(Debug, Deserialize)]
+pub enum ItemKind {
+    Armor { kind: ArmorKind },
+    Weapon { kind: WeaponKind },
+    Other,
+}
+
 #[derive(Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
 pub enum HitKind {
     Miss,

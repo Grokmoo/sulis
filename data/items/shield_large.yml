@@ -2,7 +2,7 @@ id: shield_large
 name: Large Shield
 kind:
   Armor:
-    kind: Heavy
+    kind: Medium
 icon: inventory/shield_large
 equippable:
   slot: HeldOff

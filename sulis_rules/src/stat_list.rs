@@ -19,7 +19,7 @@ use std::rc::Rc;
 use rand::{self, Rng};
 
 use sulis_core::image::Image;
-use {Armor, AttributeList, Attack, Damage, HitKind, WeaponKind, ArmorKind};
+use {Armor, AttributeList, Attack, Damage, HitKind, WeaponKind, ArmorKind, Slot};
 use bonus::{AttackBonuses, AttackBuilder, BonusKind, BonusList};
 
 #[derive(Clone)]
@@ -192,7 +192,7 @@ impl StatList {
             match bonus.when {
                 Always => self.add_bonus(&bonus.kind, times),
                 AttackWithWeapon(weapon_kind) => self.attack_bonuses.push((weapon_kind, bonus.kind.clone())),
-                _ => self.contingent_bonuses.add(bonus.clone()),
+                WeaponEquipped(_) | ArmorEquipped {..} => self.contingent_bonuses.add(bonus.clone()),
             }
         }
     }
@@ -243,7 +243,11 @@ impl StatList {
         }
     }
 
-    pub fn finalize(&mut self, attacks: Vec<(&AttackBuilder, WeaponKind)>, multiplier: f32, base_attr: i32) {
+    pub fn finalize(&mut self,
+                    attacks: Vec<(&AttackBuilder, WeaponKind)>,
+                    equipped_armor: HashMap<Slot, ArmorKind>,
+                    multiplier: f32,
+                    base_attr: i32) {
         if attacks.is_empty() {
             warn!("Finalized stats with no attacks");
         }
@@ -258,6 +262,13 @@ impl StatList {
                 WeaponEquipped(weapon_kind) => {
                     for (_, attack_weapon_kind) in attacks.iter() {
                         if weapon_kind == *attack_weapon_kind { self.add_bonus(&bonus.kind, 1); }
+                    }
+                }
+                ArmorEquipped { kind, slot } => {
+                    if let Some(armor_kind) = equipped_armor.get(&slot) {
+                        if *armor_kind == kind {
+                            self.add_bonus(&bonus.kind, 1);
+                        }
                     }
                 }
             }

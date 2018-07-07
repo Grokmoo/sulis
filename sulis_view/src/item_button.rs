@@ -19,8 +19,8 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_rules::{bonus::{AttackBuilder, AttackKindBuilder}, Bonus, BonusList, Armor, DamageKind};
-use sulis_module::{item::{format_item_value, format_item_weight, Slot}, Module};
+use sulis_rules::{bonus::{AttackBuilder, AttackKindBuilder}, Bonus, BonusList, Armor, DamageKind, Slot};
+use sulis_module::{item::{format_item_value, format_item_weight}, Module};
 use sulis_state::{EntityState, GameState, ItemState, inventory::has_proficiency};
 use sulis_core::io::event;
 use sulis_core::ui::{Callback, Widget, WidgetKind, WidgetState};

@@ -81,5 +81,9 @@ groups:
       defender: [3, 10]
       blind_fighting: [4, 10]
       acrobatic_fighting: [5, 10]
+      shield_combat: [6, 10]
+      armored_combat: [7, 10]
+      
+      healthy: [0, 11]
       
       prereqs_not_met: [7, 4]

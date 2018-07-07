@@ -23,45 +23,9 @@ use sulis_core::image::Image;
 use sulis_core::resource::{ResourceBuilder, ResourceSet};
 use sulis_core::serde_yaml;
 use sulis_core::util::unable_to_create_error;
-use sulis_rules::{ArmorKind, WeaponKind};
+use sulis_rules::{ItemKind};
 
 use {Equippable, ImageLayer, Module};
-
-#[derive(Deserialize, Debug, Copy, Clone, PartialEq, Eq, Hash)]
-#[serde(deny_unknown_fields)]
-pub enum Slot {
-    Cloak,
-    Head,
-    Torso,
-    Hands,
-    HeldMain,
-    HeldOff,
-    Legs,
-    Feet,
-    Waist,
-    Neck,
-    FingerMain,
-    FingerOff,
-}
-
-impl Slot {
-    pub fn iter() -> ::std::slice::Iter<'static, Slot> {
-        SLOTS_LIST.iter()
-    }
-}
-
-use self::Slot::*;
-
-// The sort order of this list is important
-const SLOTS_LIST: [Slot; 12] = [Cloak, Feet, Legs, Torso, Hands, Head, HeldMain, HeldOff, Waist,
-                                Neck, FingerMain, FingerOff];
-
-#[derive(Debug, Deserialize)]
-pub enum ItemKind {
-    Armor { kind: ArmorKind },
-    Weapon { kind: WeaponKind },
-    Other,
-}
 
 #[derive(Debug)]
 pub struct Item {

@@ -16,7 +16,7 @@
 
 use rlua::{UserData, UserDataMethods};
 
-use sulis_module::item::Slot;
+use sulis_rules::Slot;
 use script::*;
 
 #[derive(Clone)]

@@ -7,4 +7,4 @@ bonuses:
   - kind:
       concealment_ignore: 35
 prereqs:
-  abilities: [ attacker, defender ]
+  abilities: [ attacker, speedy ]

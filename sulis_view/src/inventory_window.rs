@@ -20,7 +20,8 @@ use std::cell::RefCell;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{Button, Label};
-use sulis_module::{item::Slot, Module};
+use sulis_rules::Slot;
+use sulis_module::{Module};
 use sulis_state::{EntityState, ChangeListener, GameState, inventory::has_proficiency};
 
 use {item_button::*, ItemButton};

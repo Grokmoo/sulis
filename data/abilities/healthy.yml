@@ -1,0 +1,26 @@
+id: healthy
+name: "Healthy"
+icon: abilities/healthy
+description: |
+  Your gain +10 additional hit points, allowing you to take more damage in combat.
+bonuses:
+  - kind:
+      hit_points: 10
+prereqs:
+  abilities: [ resilient_body ]
+upgrades:
+  - description: |
+      You gain an additional +10 hit points, for a total of +20.
+    bonuses:
+      - kind:
+          hit_points: 10
+  - description: |
+      You gain an additional +10 hit points, for a total of +30.
+    bonuses:
+      - kind:
+          hit_points: 10
+  - description: |
+      You gain an additional +10 hit points, for a total of +40.
+    bonuses:
+      - kind:
+          hit_points: 10

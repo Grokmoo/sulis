@@ -1,0 +1,42 @@
+id: shield_combat
+name: "Shield Combat"
+icon: abilities/shield_combat
+description: |
+  You gain additional defense when using shields.
+bonuses:
+  - kind:
+      defense: 3
+    when:
+      ArmorEquipped:
+        slot: HeldOff
+        kind: Light
+  - kind:
+      defense: 5
+    when:
+      ArmorEquipped:
+        slot: HeldOff
+        kind: Medium
+  - kind:
+      defense: 8
+    when:
+      ArmorEquipped:
+        slot: HeldOff
+        kind: Heavy
+prereqs:
+  abilities: [ defender ]
+upgrades:
+  - description: |
+      You are able to overcome the accuracy penalty associated with larger shields.
+    bonuses:
+      - kind:
+          accuracy: 5
+        when:
+          ArmorEquipped:
+            slot: HeldOff
+            kind: Medium
+      - kind:
+          accuracy: 10
+        when:
+          ArmorEquipped:
+            slot: HeldOff
+            kind: Heavy

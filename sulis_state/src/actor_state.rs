@@ -24,8 +24,8 @@ use sulis_core::io::GraphicsRenderer;
 use sulis_core::image::{LayeredImage};
 use sulis_core::ui::{color, Color};
 use sulis_core::util::invalid_data_error;
-use sulis_module::{item, Actor, Module, ActorBuilder};
-use sulis_rules::{Attack, AttackKind, BonusList, HitKind, StatList, WeaponKind};
+use sulis_rules::{Attack, AttackKind, BonusList, HitKind, StatList, WeaponKind, Slot, ItemKind};
+use sulis_module::{Actor, Module, ActorBuilder};
 use {AbilityState, ChangeListenerList, Effect, EntityState, GameState, Inventory, ItemState, TurnTimer};
 use save_state::ActorSaveState;
 
@@ -450,7 +450,7 @@ impl ActorState {
         result
     }
 
-    pub fn unequip(&mut self, slot: item::Slot) -> bool {
+    pub fn unequip(&mut self, slot: Slot) -> bool {
         let result = self.inventory.unequip(slot);
         self.compute_stats();
         self.texture_cache_invalid = true;
@@ -740,7 +740,7 @@ impl ActorState {
                 Some(ref equippable) => {
                     if let Some(ref attack) = equippable.attack {
                         let weapon_kind = match item_state.item.kind {
-                            item::ItemKind::Weapon { kind } => kind,
+                            ItemKind::Weapon { kind } => kind,
                             _ => {
                                 warn!("Weapon attack belonging to item '{}' with no associated WeaponKind",
                                       item_state.item.id);
@@ -771,7 +771,17 @@ impl ActorState {
             self.stats.add(bonuses);
         }
 
-        self.stats.finalize(attacks_list, multiplier, rules.base_attribute);
+        let mut equipped_armor = HashMap::new();
+        for slot in Slot::iter() {
+            if let Some(ref item_state) = self.inventory.get(*slot) {
+                match item_state.item.kind {
+                    ItemKind::Armor { kind } => { equipped_armor.insert(*slot, kind); }
+                    _ => (),
+                }
+            }
+        }
+
+        self.stats.finalize(attacks_list, equipped_armor, multiplier, rules.base_attribute);
         self.stats.crit_threshold += rules.crit_percentile as i32;
         self.stats.hit_threshold += rules.hit_percentile as i32;
         self.stats.graze_threshold += rules.graze_percentile as i32;

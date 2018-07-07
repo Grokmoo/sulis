@@ -7,4 +7,4 @@ bonuses:
   - kind:
       reach: 1.0
 prereqs:
-  abilities: [ attacker, defender ]
+  abilities: [ attacker, speedy ]

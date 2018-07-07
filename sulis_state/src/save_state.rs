@@ -21,7 +21,8 @@ use std::u64;
 use std::collections::HashMap;
 
 use sulis_core::util::{Point};
-use sulis_module::{item::Slot, actor::{ActorBuilder, RewardBuilder}};
+use sulis_rules::Slot;
+use sulis_module::{actor::{ActorBuilder, RewardBuilder}};
 
 use {ActorState, EntityState, GameState, ItemState, PropState, prop_state::Interactive, Merchant};
 use area_state::{TriggerState};

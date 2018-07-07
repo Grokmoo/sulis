@@ -1,0 +1,24 @@
+id: endurance_training
+name: "Endurance Training"
+icon: abilities/endurance_training
+description: |
+  You have trained to improve your Endurance, gaining a +1 permanent bonus.
+bonuses:
+  - kind:
+      attribute: { attribute: Endurance, amount: 1 }
+upgrades:
+  - description: |
+      You gain an additional bonus to Endurance, for a total of +2.
+    bonuses:
+      - kind:
+          attribute: { attribute: Endurance, amount: 1 }
+  - description: |
+      You gain an additional bonus to Endurance, for a total of +3.
+    bonuses:
+      - kind:
+          attribute: { attribute: Endurance, amount: 1 }
+  - description: |
+      You gain an additional bonus to Endurance, for a total of +4.
+    bonuses:
+      - kind:
+          attribute: { attribute: Endurance, amount: 1 }

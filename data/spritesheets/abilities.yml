@@ -70,5 +70,12 @@ groups:
       weapon_simple: [0, 9]
       weapon_small_sword: [1, 9]
       weapon_spear: [2, 9]
+      speedy: [3, 9]
+      strength_training: [4, 9]
+      dexterity_training: [5, 9]
+      endurance_training: [6, 9]
+      perception_training: [7, 9]
+      intellect_training: [0, 10]
+      wisdom_training: [1, 10]
       
       prereqs_not_met: [7, 4]

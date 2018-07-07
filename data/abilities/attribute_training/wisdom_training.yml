@@ -1,0 +1,24 @@
+id: wisdom_training
+name: "Wisdom Training"
+icon: abilities/wisdom_training
+description: |
+  You have trained to improve your Wisdom, gaining a +1 permanent bonus.
+bonuses:
+  - kind:
+      attribute: { attribute: Wisdom, amount: 1 }
+upgrades:
+  - description: |
+      You gain an additional bonus to Wisdom, for a total of +2.
+    bonuses:
+      - kind:
+          attribute: { attribute: Wisdom, amount: 1 }
+  - description: |
+      You gain an additional bonus to Wisdom, for a total of +3.
+    bonuses:
+      - kind:
+          attribute: { attribute: Wisdom, amount: 1 }
+  - description: |
+      You gain an additional bonus to Wisdom, for a total of +4.
+    bonuses:
+      - kind:
+          attribute: { attribute: Wisdom, amount: 1 }

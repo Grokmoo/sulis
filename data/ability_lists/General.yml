@@ -36,3 +36,19 @@ abilities:
     position: [4, 2]
   - id: elemental_defense
     position: [5, 2]
+
+  - id: speedy
+    position: [4, 4]
+  
+  - id: strength_training
+    position: [0, 6]
+  - id: dexterity_training
+    position: [1, 6]
+  - id: endurance_training
+    position: [2, 6]
+  - id: perception_training
+    position: [0, 7]
+  - id: intellect_training
+    position: [1, 7]
+  - id: wisdom_training
+    position: [2, 7]

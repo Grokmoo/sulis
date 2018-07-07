@@ -1,0 +1,24 @@
+id: strength_training
+name: "Strength Training"
+icon: abilities/strength_training
+description: |
+  You have trained to improve your Strength, gaining a +1 permanent bonus.
+bonuses:
+  - kind:
+      attribute: { attribute: Strength, amount: 1 }
+upgrades:
+  - description: |
+      You gain an additional bonus to Strength, for a total of +2.
+    bonuses:
+      - kind:
+          attribute: { attribute: Strength, amount: 1 }
+  - description: |
+      You gain an additional bonus to Strength, for a total of +3.
+    bonuses:
+      - kind:
+          attribute: { attribute: Strength, amount: 1 }
+  - description: |
+      You gain an additional bonus to Strength, for a total of +4.
+    bonuses:
+      - kind:
+          attribute: { attribute: Strength, amount: 1 }

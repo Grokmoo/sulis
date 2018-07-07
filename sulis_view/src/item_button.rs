@@ -19,7 +19,7 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_rules::{bonus_list::{AttackBuilder, AttackKindBuilder}, BonusList, Bonus, Armor, DamageKind};
+use sulis_rules::{bonus::{AttackBuilder, AttackKindBuilder}, Bonus, BonusList, Armor, DamageKind};
 use sulis_module::{item::{format_item_value, format_item_weight, Slot}, Module};
 use sulis_state::{EntityState, GameState, ItemState, inventory::has_proficiency};
 use sulis_core::io::event;
@@ -477,8 +477,8 @@ fn add<T: Display>(widget_state: &mut WidgetState, name: &str, value: T) {
 
 fn add_bonus(bonus: &Bonus, state: &mut WidgetState,
              group_uses_index: &mut usize, damage_index: &mut usize, armor: &mut Armor) {
-    use sulis_rules::Bonus::*;
-    match bonus {
+    use sulis_rules::BonusKind::*;
+    match &bonus.kind {
         Attribute { attribute, amount } => add(state, &attribute.short_name(), amount),
         ActionPoints(amount) => add(state, "bonus_ap", amount),
         Armor(amount) => armor.add_base(*amount),

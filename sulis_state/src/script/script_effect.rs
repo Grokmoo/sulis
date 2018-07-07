@@ -18,7 +18,7 @@ use std::rc::Rc;
 
 use rlua::{Lua, UserData, UserDataMethods};
 
-use sulis_rules::{Attribute, Bonus, BonusList, Damage, DamageKind};
+use sulis_rules::{Attribute, BonusKind, BonusList, Damage, DamageKind};
 
 use script::{CallbackData, Result, script_particle_generator, ScriptParticleGenerator,
     script_color_animation, ScriptColorAnimation, ScriptAbility};
@@ -59,26 +59,26 @@ impl UserData for ScriptEffect {
         });
         methods.add_method_mut("add_num_bonus", &add_num_bonus);
         methods.add_method_mut("add_damage", |_, effect, (min, max, ap): (u32, u32, Option<u32>)| {
-            effect.bonuses.add_entry(Bonus::Damage(Damage { min, max, ap: ap.unwrap_or(0), kind: None }));
+            effect.bonuses.add_kind(BonusKind::Damage(Damage { min, max, ap: ap.unwrap_or(0), kind: None }));
             Ok(())
         });
         methods.add_method_mut("add_move_disabled", |_, effect, ()| {
-            effect.bonuses.add_entry(Bonus::MoveDisabled);
+            effect.bonuses.add_kind(BonusKind::MoveDisabled);
             Ok(())
         });
         methods.add_method_mut("add_attack_disabled", |_, effect, ()| {
-            effect.bonuses.add_entry(Bonus::AttackDisabled);
+            effect.bonuses.add_kind(BonusKind::AttackDisabled);
             Ok(())
         });
         methods.add_method_mut("add_damage_of_kind", |_, effect, (min, max, kind, ap):
                                (u32, u32, String, Option<u32>)| {
             let kind = DamageKind::from_str(&kind);
-            effect.bonuses.add_entry(Bonus::Damage(Damage { min, max, ap: ap.unwrap_or(0), kind: Some(kind) }));
+            effect.bonuses.add_kind(BonusKind::Damage(Damage { min, max, ap: ap.unwrap_or(0), kind: Some(kind) }));
             Ok(())
         });
         methods.add_method_mut("add_armor_of_kind", |_, effect, (value, kind): (i32, String)| {
             let kind = DamageKind::from_str(&kind);
-            effect.bonuses.add_entry(Bonus::ArmorKind { kind, amount: value });
+            effect.bonuses.add_kind(BonusKind::ArmorKind { kind, amount: value });
             Ok(())
         });
         methods.add_method_mut("add_attribute_bonus", |_, effect, (attr, amount): (String, i8)| {
@@ -88,7 +88,7 @@ impl UserData for ScriptEffect {
                     return Ok(());
                 }, Some(attr) => attr,
             };
-            effect.bonuses.add_entry(Bonus::Attribute { attribute, amount });
+            effect.bonuses.add_kind(BonusKind::Attribute { attribute, amount });
             Ok(())
         });
         methods.add_method_mut("add_callback", |_, effect, cb: CallbackData| {
@@ -108,28 +108,28 @@ fn add_num_bonus(_lua: &Lua, effect: &mut ScriptEffect, args: (String, f32)) -> 
     let amount_int = amount as i32;
 
     trace!("Adding numeric bonus {} to '{}'", amount, name);
-    use sulis_rules::Bonus::*;
+    use sulis_rules::bonus::BonusKind::*;
     match name.as_ref() {
-        "armor" => effect.bonuses.add_entry(Armor(amount_int)),
-        "ap" => effect.bonuses.add_entry(ActionPoints(amount_int)),
-        "reach" => effect.bonuses.add_entry(Reach(amount)),
-        "range" => effect.bonuses.add_entry(Range(amount)),
-        "initiative" => effect.bonuses.add_entry(Initiative(amount_int)),
-        "hit_points" => effect.bonuses.add_entry(HitPoints(amount_int)),
-        "accuracy" => effect.bonuses.add_entry(Accuracy(amount_int)),
-        "defense" => effect.bonuses.add_entry(Defense(amount_int)),
-        "fortitude" => effect.bonuses.add_entry(Fortitude(amount_int)),
-        "reflex" => effect.bonuses.add_entry(Reflex(amount_int)),
-        "will" => effect.bonuses.add_entry(Will(amount_int)),
-        "concealment" => effect.bonuses.add_entry(Concealment(amount_int)),
-        "crit_threshold" => effect.bonuses.add_entry(CritThreshold(amount_int)),
-        "hit_threshold" => effect.bonuses.add_entry(HitThreshold(amount_int)),
-        "graze_threshold" => effect.bonuses.add_entry(GrazeThreshold(amount_int)),
-        "graze_multiplier" => effect.bonuses.add_entry(GrazeMultiplier(amount)),
-        "hit_multiplier" => effect.bonuses.add_entry(HitMultiplier(amount)),
-        "crit_multiplier" => effect.bonuses.add_entry(CritMultiplier(amount)),
-        "movement_rate" => effect.bonuses.add_entry(MovementRate(amount)),
-        "attack_cost" => effect.bonuses.add_entry(AttackCost(amount_int)),
+        "armor" => effect.bonuses.add_kind(Armor(amount_int)),
+        "ap" => effect.bonuses.add_kind(ActionPoints(amount_int)),
+        "reach" => effect.bonuses.add_kind(Reach(amount)),
+        "range" => effect.bonuses.add_kind(Range(amount)),
+        "initiative" => effect.bonuses.add_kind(Initiative(amount_int)),
+        "hit_points" => effect.bonuses.add_kind(HitPoints(amount_int)),
+        "accuracy" => effect.bonuses.add_kind(Accuracy(amount_int)),
+        "defense" => effect.bonuses.add_kind(Defense(amount_int)),
+        "fortitude" => effect.bonuses.add_kind(Fortitude(amount_int)),
+        "reflex" => effect.bonuses.add_kind(Reflex(amount_int)),
+        "will" => effect.bonuses.add_kind(Will(amount_int)),
+        "concealment" => effect.bonuses.add_kind(Concealment(amount_int)),
+        "crit_threshold" => effect.bonuses.add_kind(CritThreshold(amount_int)),
+        "hit_threshold" => effect.bonuses.add_kind(HitThreshold(amount_int)),
+        "graze_threshold" => effect.bonuses.add_kind(GrazeThreshold(amount_int)),
+        "graze_multiplier" => effect.bonuses.add_kind(GrazeMultiplier(amount)),
+        "hit_multiplier" => effect.bonuses.add_kind(HitMultiplier(amount)),
+        "crit_multiplier" => effect.bonuses.add_kind(CritMultiplier(amount)),
+        "movement_rate" => effect.bonuses.add_kind(MovementRate(amount)),
+        "attack_cost" => effect.bonuses.add_kind(AttackCost(amount_int)),
         _ => warn!("Attempted to add num bonus with invalid type '{}'", name),
     }
     Ok(())

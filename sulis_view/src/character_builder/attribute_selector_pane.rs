@@ -20,7 +20,7 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_rules::{Attribute, AttributeList, Bonus};
+use sulis_rules::{Attribute, AttributeList, BonusKind};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_module::{Class, Module, Race};
 use sulis_widgets::{Button, Label, Spinner, TextArea};
@@ -170,9 +170,9 @@ impl WidgetKind for AttributeSelectorPane {
 
         let mut attr_bonuses: HashMap<Attribute, i32> = HashMap::new();
         for bonus in race.base_stats.iter() {
-            match bonus {
-                Bonus::Attribute { attribute, amount } => {
-                    attr_bonuses.insert(*attribute, *amount as i32);
+            match bonus.kind {
+                BonusKind::Attribute { attribute, amount } => {
+                    attr_bonuses.insert(attribute, amount as i32);
                 }, _ => (),
             }
         }

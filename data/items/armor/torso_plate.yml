@@ -9,12 +9,11 @@ value: 5000
 equippable:
   slot: Torso
   bonuses:
-    entries:
-      - armor: 7
-      - armor_kind: [ Slashing, 2 ]
-      - armor_kind: [ Piercing, 1 ]
-      - armor_kind: [ Electrical, -3 ]
-      - movement_rate: -0.14
+    - kind: { armor: 7 }
+    - kind: { armor_kind: [ Slashing, 2 ] }
+    - kind: { armor_kind: [ Piercing, 1 ] }
+    - kind: { armor_kind: [ Electrical, -3 ] }
+    - kind: { movement_rate: -0.14 }
 image:
   Torso:
     creatures/torso_plate

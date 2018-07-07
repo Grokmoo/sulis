@@ -10,8 +10,8 @@ equippable:
   slot: HeldMain
   alternate_slot: HeldOff
   bonuses:
-    entries:
-      - defense: 5
+    - kind:
+        defense: 5
   attack:
     damage:
       min: 12

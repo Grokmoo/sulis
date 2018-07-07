@@ -1,0 +1,8 @@
+id: speedy
+name: "Speedy"
+icon: abilities/speedy
+description: |
+  Your are faster than usual, gaining a boost to movement speed.
+bonuses:
+  - kind:
+      movement_rate: 0.1

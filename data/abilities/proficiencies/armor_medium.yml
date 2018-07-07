@@ -4,7 +4,7 @@ icon: abilities/armor_medium
 description: |
   You have proficiency in the use of medium armor.
 bonuses:
-  entries:
-    - armor_proficiency: Medium
+  - kind:
+      armor_proficiency: Medium
 prereqs:
   abilities: [ armor_light ]

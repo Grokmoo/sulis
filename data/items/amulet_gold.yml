@@ -3,6 +3,6 @@ name: Gold Amulet
 icon: inventory/amulet_05
 equippable:
   slot: Neck
-  bonuses: {}
+  bonuses: []
 weight: 10
 value: 1000

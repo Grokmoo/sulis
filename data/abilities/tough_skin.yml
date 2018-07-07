@@ -4,9 +4,11 @@ icon: abilities/tough_skin
 description: |
   Your body has gained enhanced toughness, granting you 3 additional armor against physical attacks (Slashing, Piercing, and Crushing).
 bonuses:
-  entries:
-    - armor_kind: [ Slashing, 3]
-    - armor_kind: [ Piercing, 3]
-    - armor_kind: [ Crushing, 3]
+  - kind:
+      armor_kind: [ Slashing, 3]
+  - kind:
+      armor_kind: [ Piercing, 3]
+  - kind:
+      armor_kind: [ Crushing, 3]
 prereqs:
   abilities: [ resilient_body ]

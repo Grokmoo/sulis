@@ -32,10 +32,11 @@ pub mod attribute;
 pub use self::attribute::Attribute;
 pub use self::attribute::AttributeList;
 
-pub mod bonus_list;
-pub use self::bonus_list::Bonus;
-pub use self::bonus_list::BonusList;
-pub use self::bonus_list::AttackBonuses;
+pub mod bonus;
+pub use self::bonus::Bonus;
+pub use self::bonus::BonusKind;
+pub use self::bonus::BonusList;
+pub use self::bonus::AttackBonuses;
 
 pub mod damage;
 pub use self::damage::Damage;

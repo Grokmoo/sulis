@@ -23,7 +23,7 @@ use sulis_core::image::Image;
 use sulis_core::resource::{ResourceBuilder, ResourceSet};
 use sulis_core::util::{invalid_data_error, unable_to_create_error, Point};
 use sulis_core::serde_yaml;
-use sulis_rules::{BonusList, bonus_list::AttackBuilder};
+use sulis_rules::{BonusList, bonus::AttackBuilder};
 
 use actor::{Sex};
 

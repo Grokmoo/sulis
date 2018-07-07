@@ -9,11 +9,10 @@ value: 400
 equippable:
   slot: Torso
   bonuses:
-    entries:
-      - armor: 3
-      - armor_kind: [ Slashing, 1]
-      - armor_kind: [ Acid, -1 ]
-      - movement_rate: -0.05
+    - kind: { armor: 3 }
+    - kind: { armor_kind: [ Slashing, 1] }
+    - kind: { armor_kind: [ Acid, -1 ] }
+    - kind: { movement_rate: -0.05 }
 image:
   Torso:
     creatures/torso_leather

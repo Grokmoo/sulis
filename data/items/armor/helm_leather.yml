@@ -9,9 +9,8 @@ value: 100
 equippable:
   slot: Head
   bonuses:
-    entries:
-      - armor: 1
-      - movement_rate: -0.02
+    - kind: { armor: 1 }
+    - kind: { movement_rate: -0.02 }
 image:
   Head:
     creatures/helm_leather

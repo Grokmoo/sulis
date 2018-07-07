@@ -1,0 +1,24 @@
+id: perception_training
+name: "Perception Training"
+icon: abilities/perception_training
+description: |
+  You have trained to improve your Perception, gaining a +1 permanent bonus.
+bonuses:
+  - kind:
+      attribute: { attribute: Perception, amount: 1 }
+upgrades:
+  - description: |
+      You gain an additional bonus to Perception, for a total of +2.
+    bonuses:
+      - kind:
+          attribute: { attribute: Perception, amount: 1 }
+  - description: |
+      You gain an additional bonus to Perception, for a total of +3.
+    bonuses:
+      - kind:
+          attribute: { attribute: Perception, amount: 1 }
+  - description: |
+      You gain an additional bonus to Perception, for a total of +4.
+    bonuses:
+      - kind:
+          attribute: { attribute: Perception, amount: 1 }

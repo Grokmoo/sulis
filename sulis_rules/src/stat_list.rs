@@ -19,8 +19,8 @@ use std::rc::Rc;
 use rand::{self, Rng};
 
 use sulis_core::image::Image;
-use {Armor, AttributeList, Attack, Bonus, BonusList, Damage, HitKind, WeaponKind, ArmorKind};
-use bonus_list::{AttackBonuses, AttackBuilder};
+use {Armor, AttributeList, Attack, Damage, HitKind, WeaponKind, ArmorKind};
+use bonus::{AttackBonuses, AttackBuilder, BonusKind, BonusList};
 
 #[derive(Clone)]
 pub struct StatList {
@@ -29,10 +29,12 @@ pub struct StatList {
     pub attributes: AttributeList,
     armor_proficiencies: Vec<ArmorKind>,
     weapon_proficiencies: Vec<WeaponKind>,
-    // these bonuses are applied to the stat list if a weapon of this kind is equipped
-    pub weapon_bonuses: Vec<(WeaponKind, Bonus)>,
+
+    // contingent bonuses are accumulated here and then applied if applicable when finalizing
+    pub contingent_bonuses: BonusList,
+
     // these bonuses are applied only to the attack itself of the given weaponkind
-    pub attack_bonuses: Vec<(WeaponKind, Bonus)>,
+    pub attack_bonuses: Vec<(WeaponKind, BonusKind)>,
     pub bonus_ap: i32,
     pub bonus_damage: Vec<Damage>,
     pub bonus_reach: f32,
@@ -66,7 +68,7 @@ impl StatList {
             attributes: attrs,
             armor_proficiencies: Vec::new(),
             weapon_proficiencies: Vec::new(),
-            weapon_bonuses: Vec::new(),
+            contingent_bonuses: BonusList::default(),
             attack_bonuses: Vec::new(),
             bonus_ap: 0,
             bonus_damage: Vec::new(),
@@ -183,24 +185,21 @@ impl StatList {
         if times == 0 { return; }
 
         // TODO handle add multiple for weapon and attack bonuses
-        for (weapon_kind, bonus) in bonuses.weapon_iter() {
-            self.weapon_bonuses.push((*weapon_kind, bonus.clone()));
-        }
-
-        for (weapon_kind, bonus) in bonuses.attack_iter() {
-            self.attack_bonuses.push((*weapon_kind, bonus.clone()));
-        }
-
         for bonus in bonuses.iter() {
-            self.add_bonus(bonus, times);
+            use bonus::Contingent::*;
+            match bonus.when {
+                Always => self.add_bonus(&bonus.kind, times),
+                AttackWithWeapon(weapon_kind) => self.attack_bonuses.push((weapon_kind, bonus.kind.clone())),
+                _ => self.contingent_bonuses.add(bonus.clone()),
+            }
         }
     }
 
-    fn add_bonus(&mut self, bonus: &Bonus, times: u32) {
+    fn add_bonus(&mut self, bonus: &BonusKind, times: u32) {
         let times_i32 = times as i32;
         let times_f32 = times as f32;
 
-        use Bonus::*;
+        use bonus::BonusKind::*;
         match bonus {
             Attribute { attribute, amount } => self.attributes.add(*attribute, *amount),
             ActionPoints(amount) => self.bonus_ap += amount * times_i32,
@@ -248,12 +247,16 @@ impl StatList {
 
         // clone here to avoid problem with add_bonus needing mutable borrow,
         // even though it would be safe
-        let weapon_bonuses = self.weapon_bonuses.clone();
-        for (_, weapon_kind) in attacks.iter() {
-            for (other_weapon_kind, bonus) in weapon_bonuses.iter() {
-                if other_weapon_kind != weapon_kind { continue; }
-
-                self.add_bonus(bonus, 1);
+        let contingent = self.contingent_bonuses.clone();
+        for bonus in contingent.iter() {
+            use bonus::Contingent::*;
+            match bonus.when {
+                Always | AttackWithWeapon(_) => unreachable!(),
+                WeaponEquipped(weapon_kind) => {
+                    for (_, attack_weapon_kind) in attacks.iter() {
+                        if weapon_kind == *attack_weapon_kind { self.add_bonus(&bonus.kind, 1); }
+                    }
+                }
             }
         }
 

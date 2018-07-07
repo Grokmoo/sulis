@@ -4,18 +4,22 @@ icon: abilities/weapon_small_sword
 description: |
   You have proficiency in the use of small swords.
 bonuses:
-  entries:
-    - weapon_proficiency: SmallSword
+  - kind:
+      weapon_proficiency: SmallSword
 prereqs:
   abilities: [ weapon_simple ]
 upgrades:
   - description: |
       You gain a bonus to accuracy while using small swords.
     bonuses:
-      attack:
-        - [ SmallSword, accuracy: 10 ]
+      - kind:
+          accuracy: 10
+        when:
+          AttackWithWeapon: SmallSword
   - description: |
       You gain an additional bonus to defense when using small swords.
     bonuses:
-      weapon:
-        - [ SmallSword, defense: 5 ]
+      - kind:
+          defense: 5
+        when:
+          WeaponEquipped: SmallSword

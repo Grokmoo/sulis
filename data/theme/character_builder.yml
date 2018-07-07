@@ -163,21 +163,22 @@ children:
                     foreground: ball_small_animated
                     preferred_size: [3, 3]
                     y_relative: Max
+                    position: [-1, 1]
                   upgrade1:
                     foreground: ball_small_animated
                     preferred_size: [3, 3]
                     y_relative: Max
-                    position: [3, 0]
+                    position: [2, 1]
                   upgrade2:
                     foreground: ball_small_animated
                     preferred_size: [3, 3]
                     y_relative: Max
-                    position: [6, 0]
+                    position: [5, 1]
                   upgrade3:
                     foreground: ball_small_animated
                     preferred_size: [3, 3]
                     y_relative: Max
-                    position: [9, 0]
+                    position: [8, 1]
       class_selector_pane:
         from: .builder_pane
         children:

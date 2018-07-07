@@ -7,9 +7,10 @@ icon: inventory/shield_small
 equippable:
   slot: HeldOff
   bonuses:
-    entries:
-      - defense: 10
-      - movement_rate: -0.05
+    - kind:
+        defense: 10
+    - kind:
+        movement_rate: -0.05
 image:
   HeldOff:
     creatures/shield_small

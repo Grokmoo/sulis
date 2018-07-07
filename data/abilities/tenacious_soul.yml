@@ -4,5 +4,5 @@ icon: abilities/tenacious_soul
 description: |
   Your strength of mind is improved.  You gain +10 to Will Defense.
 bonuses:
-  entries:
-    - will: 10
+  - kind:
+      will: 10

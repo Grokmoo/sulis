@@ -85,5 +85,11 @@ groups:
       armored_combat: [7, 10]
       
       healthy: [0, 11]
+      helping_hand: [1, 11]
+      inspire: [2, 11]
+      ranged_mastery: [3, 11]
+      melee_mastery: [5, 11]
+      shielded_mastery: [6, 11]
+      dual_wielding_mastery: [7, 11]
       
       prereqs_not_met: [7, 4]

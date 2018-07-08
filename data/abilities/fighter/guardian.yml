@@ -14,6 +14,7 @@ active:
     Protect a nearby ally or allies.
 prereqs:
   abilities: [ defensive_fighting ]
+  total_level: 3
 upgrades:
   - description: |
       Your guardian ability is upgraded - now allowing you to protect all allies in melee range at once.

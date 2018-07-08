@@ -91,6 +91,15 @@ pub enum HitKind {
 }
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord, Deserialize)]
+pub enum WeaponStyle {
+    Ranged,
+    TwoHanded,
+    Single,
+    Shielded,
+    DualWielding,
+}
+
+#[derive(Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord, Deserialize)]
 pub enum WeaponKind {
     Axe,
     Crossbow,

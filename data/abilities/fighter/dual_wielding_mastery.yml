@@ -1,0 +1,29 @@
+id: dual_wielding_mastery
+name: "Dual Wielding Mastery"
+icon: abilities/dual_wielding_mastery
+description: |
+  You are a master of combat with two weapons.  Your attack speed and initiative are significantly increased when using two weapons.
+bonuses:
+  - kind:
+      attack_cost: -500
+    when:
+      WeaponStyle: DualWielding
+  - kind:
+      initiative: 4
+    when:
+      WeaponStyle: DualWielding
+prereqs:
+  abilities: [ blitz, whirlwind_attack ]
+  total_level: 9
+upgrades:
+  - description: |
+      Your dual weapons create a lethal wall to your enemies, granting you a significant bonus to accuracy and defense.
+    bonuses:
+      - kind:
+          accuracy: 10
+        when:
+          WeaponStyle: DualWielding
+      - kind:
+          defense: 10
+        when:
+          WeaponStyle: DualWielding

@@ -1,0 +1,17 @@
+id: inspire
+name: "Inspire"
+icon: abilities/inspire
+description: |
+  Inspire all nearby allies, granting them bonuses to their primary attributes.
+active:
+  script: "inspire"
+  group: Fighter
+  ap: 3000
+  duration:
+    Rounds: 3
+  cooldown: 5
+  short_description: |
+    Grant attribute bonuses to all nearby allies.
+prereqs:
+  abilities: [ helping_hand ]
+  total_level: 5

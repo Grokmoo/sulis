@@ -2,7 +2,7 @@ id: armored_combat
 name: "Armored Combat"
 icon: abilities/armored_combat
 description: |
-  You gain are able to ignore some of the penalties from using medium and heavy armor.
+  You are able to ignore some of the penalties from using medium and heavy armor.
 bonuses:
   - kind:
       movement_rate: 0.05

@@ -1,0 +1,33 @@
+id: shielded_mastery
+name: "Shielded Mastery"
+icon: abilities/shielded_mastery
+description: |
+  You are a master of combat involving a one handed weapon and shield.  You gain a bonus to all defenses while in this style.
+bonuses:
+  - kind:
+      defense: 5
+    when:
+      WeaponStyle: Shielded
+  - kind:
+      fortitude: 5
+    when:
+      WeaponStyle: Shielded
+  - kind:
+      reflex: 5
+    when:
+      WeaponStyle: Shielded
+  - kind:
+      will: 5
+    when:
+      WeaponStyle: Shielded
+prereqs:
+  abilities: [ impenetrable_defense, guardian ]
+  total_level: 9
+upgrades:
+  - description: |
+      You gain bonus armor when fighting in a shielded style.
+    bonuses:
+      - kind:
+          armor: 3
+        when:
+          WeaponStyle: Shielded

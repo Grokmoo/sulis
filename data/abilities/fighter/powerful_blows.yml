@@ -14,6 +14,7 @@ active:
     Enter a mode with more powerful melee attacks at the cost of defense.
 prereqs:
   abilities: [ mighty_blow ]
+  total_level: 3
 upgrades:
   - description: |
       Your powerful blows ability is significantly improved, granting you even more damaging attacks, armor piercing, as well as improved critical hits.

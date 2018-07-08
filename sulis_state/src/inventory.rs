@@ -21,7 +21,7 @@ use std::collections::HashMap;
 
 use sulis_core::image::Image;
 use sulis_core::util::invalid_data_error;
-use sulis_rules::{StatList, Slot, ItemKind};
+use sulis_rules::{StatList, Slot, ItemKind, WeaponStyle, bonus::AttackKindBuilder};
 use sulis_module::{Actor, ImageLayer, Module};
 use {ItemList, ItemState};
 use save_state::ItemListEntrySaveState;
@@ -100,6 +100,50 @@ impl Inventory {
         }
 
         Ok(())
+    }
+
+    pub fn weapon_style(&self) -> WeaponStyle {
+        match self.get(Slot::HeldOff) {
+            None => (),
+            Some(ref item_state) => {
+                match item_state.item.kind {
+                    ItemKind::Armor { .. } => return WeaponStyle::Shielded,
+                    ItemKind::Weapon { .. } => {
+                        match self.get(Slot::HeldMain) {
+                            None => return WeaponStyle::Single,
+                            Some(_) => return WeaponStyle::DualWielding,
+                        }
+                    }
+                    ItemKind::Other => (),
+                }
+            }
+        }
+
+        match self.get(Slot::HeldMain) {
+            None => return WeaponStyle::Single,
+            Some(ref item_state) => {
+                match &item_state.item.equippable {
+                    Some(ref equippable) => {
+                        match equippable.attack {
+                            Some(ref attack_builder) => {
+                                if let AttackKindBuilder::Ranged { .. } = attack_builder.kind {
+                                    return WeaponStyle::Ranged;
+                                }
+                            },
+                            _ => (),
+                        }
+
+                        match equippable.blocks_slot {
+                            Some(Slot::HeldOff) => return WeaponStyle::TwoHanded,
+                            _ => (),
+                        }
+
+                        WeaponStyle::Single
+                    },
+                    None => unreachable!(),
+                }
+            }
+        }
     }
 
     pub fn equipped(&self, slot: &Slot) -> Option<usize> {

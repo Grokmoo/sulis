@@ -107,6 +107,23 @@ impl UserData for ScriptEntity {
 
         methods.add_method("targets", &targets);
 
+        methods.add_method("remove_effects_with_tag", |_, entity, tag: String| {
+            let entity = entity.try_unwrap()?;
+            let entity = entity.borrow();
+
+            let area_state = GameState::area_state();
+            let mut area_state = area_state.borrow_mut();
+
+            for effect_index in entity.actor.effects_iter() {
+                let effect = area_state.effect_mut(*effect_index);
+                if effect.tag == tag {
+                    effect.mark_for_removal();
+                }
+            }
+
+            Ok(())
+        });
+
         methods.add_method("create_effect", |_, entity, args: (String, Option<u32>)| {
             let duration = args.1.unwrap_or(u32::MAX);
             let ability = args.0;
@@ -264,6 +281,12 @@ impl UserData for ScriptEntity {
             area_state.borrow_mut().add_feedback_text(format!("{}", amount), &parent, color::GREEN, 3.0);
 
             Ok(())
+        });
+
+        methods.add_method("get_overflow_ap", |_, entity, ()| {
+            let entity = entity.try_unwrap()?;
+            let ap = entity.borrow().actor.overflow_ap();
+            Ok(ap)
         });
 
         methods.add_method("change_overflow_ap", |_, entity, ap| {

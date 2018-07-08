@@ -24,6 +24,7 @@ use ROUND_TIME_MILLIS;
 
 pub struct Effect {
     pub name: String,
+    pub tag: String,
     cur_duration: u32,
     total_duration: u32,
 
@@ -37,10 +38,11 @@ pub struct Effect {
 }
 
 impl Effect {
-    pub fn new(name: &str, duration: u32, bonuses: BonusList,
+    pub fn new(name: &str, tag: &str, duration: u32, bonuses: BonusList,
                deactivate_with_ability: Option<String>) -> Effect {
         Effect {
             name: name.to_string(),
+            tag: tag.to_string(),
             cur_duration: 0,
             total_duration: duration,
             bonuses,

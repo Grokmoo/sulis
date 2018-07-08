@@ -664,7 +664,7 @@ impl ActorState {
     pub fn init_turn(&mut self) {
         let rules = Module::rules();
 
-        trace!("Init turn for '{}' with overflow ap of {}", self.actor.name, self.overflow_ap);
+        info!("Init turn for '{}' with overflow ap of {}", self.actor.name, self.overflow_ap);
 
         let mut ap = rules.base_ap as i32 + self.overflow_ap;
 
@@ -781,7 +781,9 @@ impl ActorState {
             }
         }
 
-        self.stats.finalize(attacks_list, equipped_armor, multiplier, rules.base_attribute);
+        let weapon_style = self.inventory.weapon_style();
+
+        self.stats.finalize(attacks_list, equipped_armor, weapon_style, multiplier, rules.base_attribute);
         self.stats.crit_threshold += rules.crit_percentile as i32;
         self.stats.hit_threshold += rules.hit_percentile as i32;
         self.stats.graze_threshold += rules.graze_percentile as i32;

@@ -25,6 +25,7 @@ function on_target_select(parent, ability, targets)
   end
   
   effect = target:create_effect(ability:name(), ability:duration())
+  effect:set_tag("slow")
   effect:add_num_bonus("ap", amount)
   
   gen = target:create_anim("slow")

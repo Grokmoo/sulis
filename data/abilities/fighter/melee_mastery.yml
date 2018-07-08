@@ -1,0 +1,29 @@
+id: melee_mastery
+name: "Melee Mastery"
+icon: abilities/melee_mastery
+description: |
+  You are a master of combat with a single weapon.  You gain significant bonuses to damage in this style.
+bonuses:
+  - kind:
+      damage: { min: 4, max: 8, ap: 4 }
+    when:
+      WeaponStyle: Single
+  - kind:
+      damage: { min: 5, max: 10, ap: 5 }
+    when:
+      WeaponStyle: TwoHanded
+prereqs:
+  abilities: [ powerful_blows, whirlwind_attack ]
+  total_level: 9
+upgrades:
+  - description: |
+      Your melee attacks are nearly always hit for major damage.  Grazes do significantly more damage.
+    bonuses:
+      - kind:
+          graze_multiplier: 0.25
+        when:
+          WeaponStyle: Single
+      - kind:
+          graze_multiplier: 0.25
+        when:
+          WeaponStyle: TwoHanded

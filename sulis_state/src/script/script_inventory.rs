@@ -16,7 +16,7 @@
 
 use rlua::{UserData, UserDataMethods};
 
-use sulis_rules::Slot;
+use sulis_rules::{Slot, WeaponStyle};
 use script::*;
 
 #[derive(Clone)]
@@ -61,6 +61,32 @@ impl UserData for ScriptInventory {
                     }
                 }
             })
+        });
+
+        methods.add_method("weapon_style", |_, data, ()| {
+            try_unwrap!(data => inv);
+
+            Ok(ScriptWeaponStyle { style: inv.weapon_style() })
+        });
+    }
+}
+
+#[derive(Clone)]
+pub struct ScriptWeaponStyle {
+    pub style: WeaponStyle,
+}
+
+impl UserData for ScriptWeaponStyle {
+    fn add_methods(methods: &mut UserDataMethods<Self>) {
+        methods.add_method("to_string", |_, style, ()| {
+            use sulis_rules::WeaponStyle::*;
+            Ok(match style.style {
+                Ranged => "Ranged",
+                TwoHanded => "TwoHanded",
+                Single => "Single",
+                Shielded => "Shielded",
+                DualWielding => "DualWielding",
+            }.to_string())
         });
     }
 }

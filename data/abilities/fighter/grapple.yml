@@ -12,6 +12,9 @@ active:
   cooldown: 2
   short_description: |
     Hold an opponent, preventing them from moving or attacking.
+prereqs:
+  abilities: [ leap ]
+  total_level: 3
 upgrades:
   - description: |
       Your grapple ability is improved, allowing you to grapple larger targets more easily.

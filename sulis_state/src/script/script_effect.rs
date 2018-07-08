@@ -28,6 +28,7 @@ use {Effect, GameState};
 pub struct ScriptEffect {
     parent: usize,
     name: String,
+    tag: String,
     duration: u32,
     deactivate_with_ability: Option<String>,
     pub bonuses: BonusList,
@@ -39,6 +40,7 @@ impl ScriptEffect {
         ScriptEffect {
             parent,
             name: name.to_string(),
+            tag: "default".to_string(),
             deactivate_with_ability: None,
             duration,
             bonuses: BonusList::default(),
@@ -99,6 +101,10 @@ impl UserData for ScriptEffect {
             effect.deactivate_with_ability = Some(ability.id);
             Ok(())
         });
+        methods.add_method_mut("set_tag", |_, effect, tag: String| {
+            effect.tag = tag;
+            Ok(())
+        });
     }
 }
 
@@ -146,7 +152,7 @@ fn apply(effect_data: &ScriptEffect, pgen: Option<ScriptParticleGenerator>,
     let duration = effect_data.duration * TURNS_TO_MILLIS;
 
     info!("Apply effect to '{}' with duration {}", entity.borrow().actor.actor.name, duration);
-    let mut effect = Effect::new(&effect_data.name, duration, effect_data.bonuses.clone(),
+    let mut effect = Effect::new(&effect_data.name, &effect_data.tag, duration, effect_data.bonuses.clone(),
         effect_data.deactivate_with_ability.clone());
     for cb in effect_data.callbacks.iter() {
         effect.add_callback(Rc::new(cb.clone()));

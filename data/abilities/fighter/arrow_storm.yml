@@ -14,3 +14,4 @@ active:
     Attack all opponents in an arc.
 prereqs:
   abilities: [ powerful_shot ]
+  total_level: 7

@@ -14,7 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use {Attribute, Damage, DamageKind, ArmorKind, Slot, WeaponKind};
+use {Attribute, Damage, DamageKind, ArmorKind, Slot, WeaponKind, WeaponStyle};
 
 #[derive(Deserialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
@@ -67,6 +67,10 @@ pub enum Contingent {
     /// Bonuses that should only be applied to the parent if they have a shield of
     /// the specified type equipped
     ArmorEquipped { kind: ArmorKind, slot: Slot },
+
+    /// Bonus that should only be applied if the parent's attack is of the given
+    /// weapons style
+    WeaponStyle(WeaponStyle),
 }
 
 impl Default for Contingent {

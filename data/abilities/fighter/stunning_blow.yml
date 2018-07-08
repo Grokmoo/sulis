@@ -16,3 +16,4 @@ active:
     Stun a single opponent for one round.
 prereqs:
   abilities: [ mighty_blow ]
+  total_level: 3

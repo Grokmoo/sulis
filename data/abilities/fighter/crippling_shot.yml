@@ -14,3 +14,4 @@ active:
     Damage and cripple a single target.
 prereqs:
   abilities: [ precise_shot ]
+  total_level: 3

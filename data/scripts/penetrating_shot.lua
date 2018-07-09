@@ -59,7 +59,7 @@ function attack_target(parent, ability, target)
   stats = parent:stats()
   
   if target:is_valid() then
-    parent:special_attack(target, "Reflex", stats.damage_min_0, stats.damage_max_0, stats.armor_piercing_0, "Raw")
+    parent:special_attack(target, "Reflex", stats.damage_min_0, stats.damage_max_0, stats.armor_penetration_0, "Raw")
   end
 end
 

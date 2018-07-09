@@ -464,7 +464,7 @@ fn create_stats_table<'a>(lua: &'a Lua, parent: &ScriptEntity, _args: ()) -> Res
     for (index, attack) in src.attacks.iter().enumerate() {
         stats.set(format!("damage_min_{}", index), attack.damage.min())?;
         stats.set(format!("damage_max_{}", index), attack.damage.max())?;
-        stats.set(format!("armor_piercing_{}", index), attack.damage.ap())?;
+        stats.set(format!("armor_penetration_{}", index), attack.damage.ap())?;
     }
 
     Ok(stats)

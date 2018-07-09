@@ -239,7 +239,7 @@ pub fn create_details_text_box(pc: &ActorState) -> Rc<RefCell<Widget>> {
             state.add_text_arg(&format!("{}_damage_max", index)
                                , &attack.damage.max().to_string());
             if attack.damage.ap() > 0 {
-                state.add_text_arg(&format!("{}_armor_piercing", index)
+                state.add_text_arg(&format!("{}_armor_penetration", index)
                                    , &attack.damage.ap().to_string());
             }
             add_if_nonzero(state, index, "accuracy", attack.bonuses.accuracy as f32);

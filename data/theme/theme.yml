@@ -498,7 +498,7 @@ children:
           [s=5|Level #level_0# #class_0#]
           [?0_damage_min;s=5;x=0;y=22|Main Hand]
           [?0_damage_min;s=4;x=0|Damage: #0_damage_min# to #0_damage_max#
-          ][?0_armor_piercing;s=4;x=0|Armor Piercing: #0_armor_piercing#
+          ][?0_armor_penetration;s=4;x=0|Armor Penetration: #0_armor_penetration#
           ][?0_accuracy;s=4;x=0|Accuracy: #0_accuracy#
           ][?0_crit_threshold;s=4;x=0|Crit Threshold: #0_crit_threshold#
           ][?0_hit_threshold;s=4;x=0|Hit Threshold: #0_hit_threshold#
@@ -506,10 +506,10 @@ children:
           ][?0_crit_multiplier;s=4;x=0|Crit Multiplier: #0_crit_multiplier#
           ][?0_hit_multiplier;s=4;x=0|Hit Multiplier: #0_hit_multiplier#
           ][?0_graze_multiplier;s=4;x=0|Graze Multiplier: #0_graze_multiplier#]
-          
+
           [?1_damage_min;s=5;x=40;y=22|Off Hand]
           [?1_damage_min;s=4;x=40|Damage: #1_damage_min# to #1_damage_max#
-          ][?1_armor_piercing;s=4;x=40|Armor Piercing: #1_armor_piercing#
+          ][?1_armor_penetration;s=4;x=40|Armor Penetration: #1_armor_penetration#
           ][?1_accuracy;s=4;x=40|Accuracy: #1_accuracy#
           ][?1_crit_threshold;s=4;x=40|Crit Threshold: #1_crit_threshold#
           ][?1_hit_threshold;s=4;x=40|Hit Threshold: #1_hit_threshold#
@@ -614,7 +614,7 @@ children:
           ][?wis|Wisdom: #wis#
           ][?bonus_ap|AP: #bonus_ap#
           ][?min_damage|[s=4.0|Damage: #min_damage# to #max_damage# [c=f00|#damage_kind#]]
-          ][?armor_piercing|[s=4.0|Armor Piercing: #armor_piercing#]
+          ][?armor_penetration|[s=4.0|Armor Penetration: #armor_penetration#]
           ][?attack_min_bonus_damage|[s=4.0|Damage: #attack_min_bonus_damage# to #attack_max_bonus_damage# [?attack_bonus_damage_kind;c=f00|#attack_bonus_damage_kind#]]
           ][?attack_accuracy|[s=4.0|Accuracy: #attack_accuracy#]
           ][?attack_crit_threshold|[s=4.0|Crit Threshold: #attack_crit_threshold#]
@@ -780,7 +780,7 @@ children:
       ][?wis|Wisdom: #wis#
       ][?bonus_ap|AP: #bonus_ap#
       ][?min_damage|[s=4.0|Damage: #min_damage# to #max_damage# [c=f00|#damage_kind#]]
-      ][?armor_piercing|[s=4.0|Armor Piercing: #armor_piercing#]
+      ][?armor_penetration|[s=4.0|Armor Penetration: #armor_penetration#]
       ][?attack_min_bonus_damage|[s=4.0|Damage: #attack_min_bonus_damage# to #attack_max_bonus_damage# [?attack_bonus_damage_kind;c=f00|#attack_bonus_damage_kind#]]
       ][?attack_accuracy|[s=4.0|Accuracy: #attack_accuracy#]
       ][?attack_crit_threshold|[s=4.0|Crit Threshold: #attack_crit_threshold#]

@@ -17,7 +17,7 @@ prereqs:
   total_level: 9
 upgrades:
   - description: |
-      Your ranged attacks are nearly impossible to resist.  You gain armor piercing and ignore up to 25 points of concealment on all ranged attacks.
+      Your ranged attacks are nearly impossible to resist.  You gain armor penetration and ignore up to 25 points of concealment on all ranged attacks.
     bonuses:
       - kind:
           damage: { min:0, max: 0, ap: 10 }

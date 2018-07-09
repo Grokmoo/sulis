@@ -442,7 +442,7 @@ pub fn add_attack_text_args(attack: &AttackBuilder, widget_state: &mut WidgetSta
     widget_state.add_text_arg("min_damage", &attack.damage.min.to_string());
     widget_state.add_text_arg("max_damage", &attack.damage.max.to_string());
     if attack.damage.ap > 0 {
-        widget_state.add_text_arg("armor_piercing", &attack.damage.ap.to_string());
+        widget_state.add_text_arg("armor_penetration", &attack.damage.ap.to_string());
     }
     add_if_present(widget_state, "damage_kind", attack.damage.kind);
 
@@ -490,7 +490,7 @@ fn add_bonus(bonus: &Bonus, state: &mut WidgetState,
                 add(state, &format!("max_bonus_damage_{}", index), damage.max);
             }
             if damage.ap > 0 {
-                add(state, &format!("armor_piercing_{}", index), damage.ap);
+                add(state, &format!("armor_penetration_{}", index), damage.ap);
             }
             if let Some(kind) = damage.kind {
                 add(state, &format!("bonus_damage_kind_{}", index), kind);

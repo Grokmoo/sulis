@@ -1,0 +1,6 @@
+id: rogue
+abilities:
+  - id: hide
+    position: [0, 0.5]
+  - id: hide_in_plain_sight
+    position: [1, 0.0]

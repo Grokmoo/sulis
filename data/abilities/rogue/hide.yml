@@ -1,0 +1,19 @@
+id: hide
+name: "Hide"
+icon: abilities/hide
+description: |
+  You move about unseen and unnoticed.  Enemies will not target you while you remain hidden.  Upon activating this ability and each round thereafter your opponents get a chance to spot you, based on their Perception and how far away you are from them.  Actions such as attacking or using most abilities will immediately end your hidden state.
+active:
+  script: "hide"
+  group: Modes
+  ap: 2000
+  duration:
+    Mode
+  cooldown: 2
+  short_description: |
+    Hide so that enemies will not attack you.
+upgrades:
+  - description: |
+      You are more difficult to spot while hidden.
+  - description: |
+      You are extremely difficult to spot while hidden, even for the most perceptive onlookers.

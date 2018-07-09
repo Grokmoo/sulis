@@ -64,6 +64,10 @@ impl UserData for ScriptEffect {
             effect.bonuses.add_kind(BonusKind::Damage(Damage { min, max, ap: ap.unwrap_or(0), kind: None }));
             Ok(())
         });
+        methods.add_method_mut("add_hidden", |_, effect, ()| {
+            effect.bonuses.add_kind(BonusKind::Hidden);
+            Ok(())
+        });
         methods.add_method_mut("add_move_disabled", |_, effect, ()| {
             effect.bonuses.add_kind(BonusKind::MoveDisabled);
             Ok(())

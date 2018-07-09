@@ -321,19 +321,41 @@ pub struct ScriptAbility {
 
 impl ScriptAbility {
     fn from(ability: &Rc<Ability>) -> ScriptAbility {
-        assert!(ability.active.is_some());
+        let duration = match ability.active {
+            None => 0,
+            Some(ref active) => match active.duration {
+                ability::Duration::Rounds(rounds) => rounds,
+                ability::Duration::Mode => 0,
+                ability::Duration::Instant => 0,
+            }
+        };
 
-        let duration = match ability.active.as_ref().unwrap().duration {
-            ability::Duration::Rounds(rounds) => rounds,
-            ability::Duration::Mode => 0,
-            ability::Duration::Instant => 0,
+        let ap = match ability.active {
+            None => 0,
+            Some(ref active) => active.ap,
         };
 
         ScriptAbility {
             id: ability.id.to_string(),
             name: ability.name.to_string(),
             duration,
-            ap: ability.active.as_ref().unwrap().ap,
+            ap,
+        }
+    }
+
+    fn error_if_not_active(&self) -> Result<()> {
+        let ability = match Module::ability(&self.id) {
+            None => unreachable!(),
+            Some(ability) => ability,
+        };
+
+        match ability.active {
+            None => Err(rlua::Error::FromLuaConversionError {
+                from: "ScriptAbility",
+                to: "ActiveAbility",
+                message: Some(format!("The ability '{}' is not active", self.id)),
+            }),
+            Some(_) => Ok(())
         }
     }
 }
@@ -341,12 +363,19 @@ impl ScriptAbility {
 impl UserData for ScriptAbility {
     fn add_methods(methods: &mut UserDataMethods<Self>) {
         methods.add_method("activate", &activate);
+        methods.add_method("deactivate", |_, ability, target: ScriptEntity| {
+            ability.error_if_not_active()?;
+            let target = target.try_unwrap()?;
+            target.borrow_mut().actor.deactivate_ability_state(&ability.id);
+            Ok(())
+        });
         methods.add_method("name", |_, ability, ()| {
             Ok(ability.name.to_string())
         });
         methods.add_method("duration", |_, ability, ()| Ok(ability.duration));
 
         methods.add_method("create_callback", |_, ability, parent: ScriptEntity| {
+            ability.error_if_not_active()?;
             let index = parent.try_unwrap_index()?;
             let cb_data = CallbackData::new(index, &ability.id);
             Ok(cb_data)
@@ -383,6 +412,7 @@ fn entity_with_id(id: String) -> Option<Rc<RefCell<EntityState>>> {
 }
 
 fn activate(_lua: &Lua, ability: &ScriptAbility, target: ScriptEntity) -> Result<()> {
+    ability.error_if_not_active()?;
     let entity = target.try_unwrap()?;
 
     let area_state = GameState::area_state();

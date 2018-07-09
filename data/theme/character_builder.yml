@@ -110,16 +110,14 @@ children:
             preferred_size: [-140, -10]
             width_relative: Max
             height_relative: Max
+          abilities_pane_rogue:
+            from: .character_builder.ability_selector_pane.abilities_pane
+            background: rogue_abilities
+            preferred_size: [128, 128]
           abilities_pane_fighter:
             from: .character_builder.ability_selector_pane.abilities_pane
             background: fighter_abilities
             preferred_size: [128, 128]
-            custom:
-              grid_size: 16
-              grid_border: 2
-            children:
-              ability_button:
-                preferred_size: [12, 12]
           abilities_pane_mage:
             from: .character_builder.ability_selector_pane.abilities_pane
             background: magic_circles
@@ -134,12 +132,6 @@ children:
             from: .character_builder.ability_selector_pane.abilities_pane
             background: general_abilities
             preferred_size: [128, 128]
-            custom:
-              grid_size: 16
-              grid_border: 2
-            children:
-              ability_button:
-                preferred_size: [12, 12]
           abilities_pane:
             preferred_size: [128, 128]
             position: [0, 10]

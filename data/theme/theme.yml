@@ -814,6 +814,9 @@ children:
       ][?graze_multiplier|[s=4.0|Graze Multiplier: #graze_multiplier#]
       ][?movement_rate|[s=4.0|Movement Rate: #movement_rate#]
       ][?attack_cost|[s=4.0|Attack Cost: #attack_cost#]
+      ][?move_disabled|[s=4.0|Movement Disabled]
+      ][?attack_disabled|[s=4.0|Attack Disabled]
+      ][?hidden|[s=4.0|Hidden]
       ][?price;s=3.5|
       Price: [c=f00|#price#] Gold
       ][!price;?value;s=3.5|

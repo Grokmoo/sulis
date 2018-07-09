@@ -26,7 +26,7 @@ use animation::{Animation, MeleeAttackAnimation, RangedAttackAnimation};
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::ui::{color, Color};
 use sulis_core::util::{Point, invalid_data_error};
-use sulis_module::{Actor, ObjectSize, ObjectSizeIterator, Module};
+use sulis_module::{actor::Faction, Actor, ObjectSize, ObjectSizeIterator, Module};
 use sulis_module::area::{MAX_AREA_SIZE, Transition};
 use {ActorState, AreaState, ChangeListenerList, EntityTextureCache, EntityTextureSlot,
     GameState, Location, PropState, ScriptCallback};
@@ -444,6 +444,14 @@ impl AreaDrawable for EntityState {
 
     fn draw(&self, renderer: &mut GraphicsRenderer,
             scale_x: f32, scale_y: f32, x: f32, y: f32, _millis: u32, alpha: f32) {
+        // don't draw invisible hostiles
+        if self.actor.stats.hidden {
+            match self.actor.actor.faction {
+                Faction::Hostile => return,
+                Faction::Friendly => (),
+            }
+        }
+
         let x = x + self.location.x as f32 + self.sub_pos.0;
         let y = y + self.location.y as f32 + self.sub_pos.1;
 

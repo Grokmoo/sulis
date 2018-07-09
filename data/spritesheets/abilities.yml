@@ -96,5 +96,7 @@ groups:
       
       improved_initiative: [0, 12]
       tough_skin: [1, 12]
+      hide: [2, 12]
+      hide_in_plain_sight: [3, 12]
       
       prereqs_not_met: [7, 4]

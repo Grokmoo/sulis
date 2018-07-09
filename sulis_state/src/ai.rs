@@ -135,6 +135,7 @@ impl EntityAI {
         let mut dists = Vec::new();
         for target in area_state.entity_iter() {
             if !self.entity.borrow().is_hostile(&target) { continue; }
+            if target.borrow().actor.stats.hidden { continue; }
 
             let dist = self.entity.borrow().dist_to_entity(&target);
             dists.push((target, (dist * 100.0) as i32));

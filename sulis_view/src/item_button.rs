@@ -525,7 +525,15 @@ fn add_bonus(bonus: &Bonus, state: &mut WidgetState,
             add(state, &format!("ability_group_{}_uses_per_encounter", index), amount);
             *group_uses_index += 1;
         }
-        _ => (),
+        ArmorProficiency(armor_kind) => {
+            add(state, &format!("armor_proficiency_{:?}", armor_kind), "true");
+        },
+        WeaponProficiency(weapon_kind) => {
+            add(state, &format!("weapon_proficiency_{:?}", weapon_kind), "true");
+        },
+        MoveDisabled => add(state, "move_disabled", true),
+        AttackDisabled => add(state, "attack_disabled", true),
+        Hidden => add(state, "hidden", true),
     }
 }
 

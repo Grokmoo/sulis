@@ -23,7 +23,52 @@ starting_abilities:
   - weapon_bow
   - weapon_small_sword
   - weapon_simple
-upgrades: {}
+upgrades:
+  2:
+    ability_choices: [ rogue ]
+    group_uses_per_encounter:
+      - [ Rogue, 2 ]
+      - [ Modes, ~ ]
+  3:
+    ability_choices: [ rogue, general ]
+    group_uses_per_encounter:
+      - [ Rogue, 2 ]
+      - [ Modes, ~ ]
+  4:
+    ability_choices: [ rogue ]
+    group_uses_per_encounter:
+      - [ Rogue, 3 ]
+      - [ Modes, ~ ]
+  5:
+    ability_choices: [ rogue, general ]
+    group_uses_per_encounter:
+      - [ Rogue, 3 ]
+      - [ Modes, ~ ]
+  6:
+    ability_choices: [ rogue ]
+    group_uses_per_encounter:
+      - [ Rogue, 3 ]
+      - [ Modes, ~ ]
+  7:
+    ability_choices: [ rogue, general ]
+    group_uses_per_encounter:
+      - [ Rogue, 4 ]
+      - [ Modes, ~ ]
+  8:
+    ability_choices: [ rogue ]
+    group_uses_per_encounter:
+      - [ Rogue, 4 ]
+      - [ Modes, ~ ]
+  9:
+    ability_choices: [ rogue, general ]
+    group_uses_per_encounter:
+      - [ Rogue, 4 ]
+      - [ Modes, ~ ]
+  10:
+    ability_choices: [ rogue ]
+    group_uses_per_encounter:
+      - [ Rogue, 5 ]
+      - [ Modes, ~ ]
 kits:
   - name: Swashbuckler
     default_attributes:

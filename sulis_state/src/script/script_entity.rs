@@ -125,7 +125,7 @@ impl UserData for ScriptEntity {
         });
 
         methods.add_method("create_effect", |_, entity, args: (String, Option<u32>)| {
-            let duration = args.1.unwrap_or(u32::MAX);
+            let duration = args.1.unwrap_or(100_000);
             let ability = args.0;
             let index = entity.try_unwrap_index()?;
             Ok(ScriptEffect::new(index, &ability, duration))
@@ -311,6 +311,23 @@ impl UserData for ScriptEntity {
             let entity = entity.try_unwrap()?;
             let entity = entity.borrow();
             Ok(entity.actor.actor.name.to_string())
+        });
+
+        methods.add_method("get_ability", |_, entity, id: String| {
+            let ability = match Module::ability(&id) {
+                None => return Err(rlua::Error::FromLuaConversionError {
+                    from: "String",
+                    to: "ScriptAbility",
+                    message: Some(format!("Ability '{}' does not exist", id))
+                }),
+                Some(ability) => ability,
+            };
+            let entity = entity.try_unwrap()?;
+            if !entity.borrow().actor.actor.has_ability(&ability) {
+                return Ok(None);
+            }
+
+            Ok(Some(ScriptAbility::from(&ability)))
         });
 
         methods.add_method("ability_level", |_, entity, ability: ScriptAbility| {

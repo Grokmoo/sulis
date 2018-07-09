@@ -48,6 +48,7 @@ pub enum BonusKind {
     AttackCost(i32),
     MoveDisabled,
     AttackDisabled,
+    Hidden,
     GroupUsesPerEncounter { group: String, amount: u32 },
 }
 

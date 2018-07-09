@@ -3,6 +3,9 @@ name: Weak Dagger
 icon: inventory/weapon_dagger
 weight: 100
 value: 200
+kind:
+  Weapon:
+    kind: SmallSword
 equippable:
   slot: HeldMain
   alternate_slot: HeldOff

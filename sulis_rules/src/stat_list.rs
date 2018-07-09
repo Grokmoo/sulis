@@ -60,6 +60,7 @@ pub struct StatList {
     pub attack_cost: i32,
     pub move_disabled: bool,
     pub attack_disabled: bool,
+    pub hidden: bool,
     group_uses_per_encounter: HashMap<String, u32>,
 }
 
@@ -97,6 +98,7 @@ impl StatList {
             attack_cost: 0,
             move_disabled: false,
             attack_disabled: false,
+            hidden: false,
             group_uses_per_encounter: HashMap::new(),
         }
     }
@@ -240,6 +242,7 @@ impl StatList {
             AttackCost(amount) => self.attack_cost += amount * times_i32,
             MoveDisabled => self.move_disabled = true,
             AttackDisabled => self.attack_disabled = true,
+            Hidden => self.hidden = true,
             GroupUsesPerEncounter { group, amount } => self.add_single_group_uses_per_encounter(group, *amount),
         }
     }

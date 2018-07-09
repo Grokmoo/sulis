@@ -5,12 +5,10 @@ description: |
   A powerful jolt of electricity zaps the target creature.
 active:
   script: "shock"
-  group: "2nd Circle"
+  group: "1st Circle"
   ap: 2000
   duration:
     Instant
   cooldown: 1
   short_description: |
     Damage one opponent with electricity.
-prereqs:
-  total_level: 4

@@ -315,7 +315,6 @@ impl WidgetKind for AbilityButton {
         self.remove_hover();
 
         if self.entity.borrow().actor.can_activate(&self.ability.id) {
-            info!("ate {}", self.ability.id);
             GameState::execute_ability_on_activate(&self.entity, &self.ability);
         } else if self.entity.borrow().actor.can_toggle(&self.ability.id) {
             self.entity.borrow_mut().actor.deactivate_ability_state(&self.ability.id);

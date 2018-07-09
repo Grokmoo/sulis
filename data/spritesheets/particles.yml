@@ -31,6 +31,15 @@ groups:
       slow3: [40, 0]
       slow4: [60, 0]
       slow5: [80, 0]
+  haste:
+    size: [20, 20]
+    position: [240, 105]
+    areas:
+      haste1: [0, 0]
+      haste2: [20, 0]
+      haste3: [40, 0]
+      haste4: [60, 0]
+      haste5: [80, 0]
   heal:
     size: [12, 12]
     position: [121, 41]

@@ -20,9 +20,9 @@ groups:
       shield_slam: [3, 1]
       chameleon: [4, 1]
       
-      tough_skin: [0, 2]
-      elemental_defense: [1, 2]
-      improved_initiative: [2, 2]
+      acid_spores: [0, 2]
+      acid_weapon: [1, 2]
+      haste: [2, 2]
       firebolt: [3, 2]
       fireball: [4, 2]
       leap: [5, 2]
@@ -42,6 +42,7 @@ groups:
       
       whirlwind_attack: [0, 5]
       blitz: [1, 5]
+      petrify: [2, 5]
       
       flaming_fingers: [0, 6]
       fire_shield: [1, 6]
@@ -88,8 +89,12 @@ groups:
       helping_hand: [1, 11]
       inspire: [2, 11]
       ranged_mastery: [3, 11]
+      elemental_defense: [4, 11]
       melee_mastery: [5, 11]
       shielded_mastery: [6, 11]
       dual_wielding_mastery: [7, 11]
+      
+      improved_initiative: [0, 12]
+      tough_skin: [1, 12]
       
       prereqs_not_met: [7, 4]

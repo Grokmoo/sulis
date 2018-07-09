@@ -480,7 +480,7 @@ fn add_bonus(bonus: &Bonus, state: &mut WidgetState,
     use sulis_rules::BonusKind::*;
     match &bonus.kind {
         Attribute { attribute, amount } => add(state, &attribute.short_name(), amount),
-        ActionPoints(amount) => add(state, "bonus_ap", amount),
+        ActionPoints(amount) => add(state, "bonus_ap", *amount / Module::rules().display_ap as i32),
         Armor(amount) => armor.add_base(*amount),
         ArmorKind { kind, amount } => armor.add_kind(*kind, *amount),
         Damage(damage) => {

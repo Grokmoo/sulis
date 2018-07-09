@@ -2,7 +2,7 @@ id: stun
 name: "Stun"
 icon: abilities/stun
 description: |
-  Your target must succeed at a Mental Resistance check or be stunned, losing 6 AP total - causing the target to lose an entire turn's actions.
+  Your target must succeed at a Will check or be stunned, losing 6 AP total - causing the target to lose an entire turn's actions.
 active:
   script: "stun"
   group: "2nd Circle"
@@ -11,6 +11,6 @@ active:
     Instant
   cooldown: 1
   short_description: |
-    Stun a single opponent with a Mental Resistance check.
+    Stun a single opponent with a Will check.
 prereqs:
   total_level: 4

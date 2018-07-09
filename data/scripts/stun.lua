@@ -12,7 +12,7 @@ function on_target_select(parent, ability, targets)
 
   target = targets:first()
   
-  hit = parent:special_attack(target, "Mental")
+  hit = parent:special_attack(target, "Will")
   amount = -6000
   if hit:is_miss() then
     return

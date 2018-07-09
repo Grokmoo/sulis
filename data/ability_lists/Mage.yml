@@ -17,11 +17,13 @@ abilities:
     position: [2.1, 4.5]
   - id: fireball
     position: [1, 5]
+  - id: haste
+    position: [2.7, 3.3]
     
   - id: wind_gust
     position: [5, 3]
   - id: shock
-    position: [2.7, 3.3]
+    position: [3.5, 3.8]
   - id: teleport
     position: [6, 2.25]
   - id: air_shield
@@ -38,7 +40,13 @@ abilities:
   
   - id: crush
     position: [5, 7]
+  - id: acid_weapon
+    position: [6, 6.7]
   - id: rock_armor
     position: [5, 8.05]
   - id: stun
     position: [6, 7.75]
+  - id: petrify
+    position: [5, 9.05]
+  - id: acid_spores
+    position: [7, 8.45]

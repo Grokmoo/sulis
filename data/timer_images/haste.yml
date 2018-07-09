@@ -1,0 +1,8 @@
+id: haste
+frame_time_millis: 100
+frames:
+  - particles/haste1
+  - particles/haste2
+  - particles/haste3
+  - particles/haste4
+  - particles/haste5

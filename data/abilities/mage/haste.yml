@@ -1,0 +1,16 @@
+id: haste
+name: "Haste"
+icon: abilities/haste
+description: |
+  A nearby ally acts faster than usual, gaining bonus action points.
+active:
+  script: "haste"
+  group: "2nd Circle"
+  ap: 2000
+  duration:
+    Rounds: 2
+  cooldown: 4
+  short_description: |
+    Give bonus action points to one ally.
+prereqs:
+  total_level: 4

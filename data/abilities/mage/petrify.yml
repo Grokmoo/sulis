@@ -1,0 +1,16 @@
+id: petrify
+name: "Petrify"
+icon: abilities/petrify
+description: |
+  Your target must succeed at a Fortitude check or become petrified.  While petrified, targets are unable to take any actions at all, and suffer massive penalties to defense, and vulnerability to crushing attacks.
+active:
+  script: "petrify"
+  group: "3rd Circle"
+  ap: 3000
+  duration:
+    Rounds: 3
+  cooldown: 5
+  short_description: |
+    Hold and make vulnerable a single opponent.
+prereqs:
+  total_level: 7

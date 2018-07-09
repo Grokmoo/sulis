@@ -2,7 +2,7 @@ id: slow
 name: "Slow"
 icon: abilities/slow
 description: |
-  Your target must succeed at a Mental Resistance check or become slowed for 3 rounds, losing action points each turn.
+  Your target must succeed at a Will check or become slowed for 3 rounds, losing action points each turn.
 active:
   script: "slow"
   group: "1st Circle"
@@ -11,4 +11,4 @@ active:
     Rounds: 3
   cooldown: 1
   short_description: |
-    Reduce action points for one opponent with a Mental Resistance check.
+    Reduce action points for one opponent with a Will check.

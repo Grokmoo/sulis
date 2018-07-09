@@ -1,0 +1,14 @@
+id: acid_weapon
+name: "Acid Weapon"
+icon: abilities/acid_weapon
+description: |
+  Imbues the weapon or weapons of the specified target with acid damage.
+active:
+  script: "acid_weapon"
+  group: "1st Circle"
+  ap: 1000
+  duration:
+    Rounds: 3
+  cooldown: 4
+  short_description: |
+    Imbues the target's weapon with acid damage.

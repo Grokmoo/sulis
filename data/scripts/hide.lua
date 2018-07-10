@@ -1,4 +1,20 @@
 function on_activate(parent, ability)
+  activate_no_check(parent, ability)
+  
+  ability:activate(parent)
+  
+  if check_spotted(parent, ability) then
+    game:say_line("Failed to hide", parent)
+	ability:deactivate(parent)
+  end
+end
+
+function activate_no_ap(parent, ability)
+  activate_no_check(parent, ability)
+  ability:activate(parent, false)
+end
+
+function activate_no_check(parent, ability)
   effect = parent:create_effect(ability:name())
   effect:deactivate_with(ability)
   effect:add_hidden()
@@ -14,13 +30,6 @@ function on_activate(parent, ability)
                  anim:param(1.0),
                  anim:param(0.4))
   effect:apply_with_color_anim(anim)
-
-  ability:activate(parent)
-  
-  if check_spotted(parent, ability) then
-    game:say_line("Failed to hide", parent)
-	ability:deactivate(parent)
-  end
 end
 
 function on_round_elapsed(parent, ability)

@@ -1,0 +1,14 @@
+id: backflip
+name: "Backflip"
+icon: abilities/backflip
+description: |
+  Flip over the head of a nearby enemy, performing an attack while doing so.  
+active:
+  script: "backflip"
+  group: Rogue
+  ap: 2000
+  duration:
+    Instant
+  cooldown: 3
+  short_description: |
+    Move behind an enemy and make an attack.

@@ -1,0 +1,18 @@
+id: rapid_strikes
+name: "Rapid Strikes"
+icon: abilities/rapid_strikes
+description: |
+  Rapidly leap and attack up to 3 enemies in a cone in front of you in turn.
+active:
+  script: "rapid_strikes"
+  group: Rogue
+  ap: 4000
+  duration:
+    Instant
+  cooldown: 4
+  short_description: |
+    Attack up to 3 enemies in a cone in front of you.
+prereqs:
+  abilities:
+    - backflip
+  total_level: 7

@@ -324,6 +324,7 @@ pub struct AreaTargeter {
     parent: Rc<RefCell<EntityState>>,
     selectable: Vec<Rc<RefCell<EntityState>>>,
     effectable: Vec<Rc<RefCell<EntityState>>>,
+    max_effectable: Option<usize>,
     shape: Shape,
     show_mouseover: bool,
     free_select: Option<f32>,
@@ -381,6 +382,7 @@ impl AreaTargeter {
             parent: area_state.get_entity(data.parent),
             selectable: create_entity_state_vec(&area_state, &data.selectable),
             effectable: create_entity_state_vec(&area_state, &data.effectable),
+            max_effectable: data.max_effectable,
             cancel: false,
             free_select: data.free_select,
             free_select_must_be_passable,
@@ -432,6 +434,10 @@ impl AreaTargeter {
             if self.cur_points.is_empty() {
                 self.free_select_valid = false;
             }
+        }
+
+        if let Some(max) = self.max_effectable {
+            self.cur_effected.truncate(max);
         }
     }
 

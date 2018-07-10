@@ -425,4 +425,4 @@ groups:
       magic_circles: [ 0, 1024, 506, 506 ]
       general_abilities: [ 512, 1024, 512, 512]
       fighter_abilities: [0, 1536, 512, 512]
-      rogue_abilities: [0, 1536, 512, 512]
+      rogue_abilities: [512, 1536, 512, 512]

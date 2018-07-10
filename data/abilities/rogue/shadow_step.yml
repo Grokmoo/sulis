@@ -1,0 +1,16 @@
+id: shadow_step
+name: "Shadow Step"
+icon: abilities/shadow_step
+description: |
+  You enter hidden mode if you are not already hidden, and instantly move to the targeted location.  You do not need to pass the normal hide check in order to become hidden.
+active:
+  script: "shadow_step"
+  group: Rogue
+  ap: 2000
+  duration:
+    Instant
+  cooldown: 3
+  short_description: |
+    Hide and move a short distance.
+prereqs:
+  abilities: [ hide ]

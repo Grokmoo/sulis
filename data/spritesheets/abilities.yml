@@ -98,5 +98,8 @@ groups:
       tough_skin: [1, 12]
       hide: [2, 12]
       hide_in_plain_sight: [3, 12]
+      shadow_step: [4, 12]
+      backflip: [5, 12]
+      rapid_strikes: [6, 12]
       
       prereqs_not_met: [7, 4]

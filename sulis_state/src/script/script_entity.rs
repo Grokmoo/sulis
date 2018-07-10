@@ -25,6 +25,7 @@ use animation::{Animation, MeleeAttackAnimation};
 use sulis_rules::{AttackKind, DamageKind, Attack};
 use sulis_core::config::CONFIG;
 use sulis_core::ui::color;
+use sulis_core::resource::ResourceSet;
 use {ActorState, EntityState, GameState};
 use script::*;
 
@@ -147,6 +148,12 @@ impl UserData for ScriptEntity {
             let sprite = args.0;
             let index = entity.try_unwrap_index()?;
             Ok(ScriptParticleGenerator::new(index, sprite, duration_secs))
+        });
+
+        methods.add_method("wait_anim", |_, entity, duration: f32| {
+            let index = entity.try_unwrap_index()?;
+            let image = ResourceSet::get_empty_image();
+            Ok(ScriptParticleGenerator::new_anim(index, image.id(), duration))
         });
 
         methods.add_method("create_anim", |_, entity, (image, duration): (String, Option<f32>)| {

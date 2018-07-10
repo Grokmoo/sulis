@@ -48,6 +48,7 @@ pub struct TargeterData {
     pub parent: usize,
     pub selectable: Vec<Option<usize>>,
     pub effectable: Vec<Option<usize>>,
+    pub max_effectable: Option<usize>,
     pub shape: Shape,
     pub show_mouseover: bool,
     pub free_select: Option<f32>,
@@ -63,6 +64,7 @@ impl TargeterData {
             ability_id: ability_id.to_string(),
             selectable: Vec::new(),
             effectable: Vec::new(),
+            max_effectable: None,
             shape: Shape::Single,
             show_mouseover: true,
             free_select: None,
@@ -124,6 +126,10 @@ impl UserData for TargeterData {
         methods.add_method_mut("add_effectable", |_, targeter, target: ScriptEntity| {
             let index = target.try_unwrap_index()?;
             targeter.effectable.push(Some(index));
+            Ok(())
+        });
+        methods.add_method_mut("set_max_effectable", |_, targeter, max: usize| {
+            targeter.max_effectable = Some(max);
             Ok(())
         });
         methods.add_method_mut("set_shape_circle", |_, targeter, radius: f32| {

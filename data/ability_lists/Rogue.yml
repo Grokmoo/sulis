@@ -4,3 +4,9 @@ abilities:
     position: [0, 0.5]
   - id: hide_in_plain_sight
     position: [1, 0.0]
+  - id: shadow_step
+    position: [1, 1]
+  - id: backflip
+    position: [0, 2]
+  - id: rapid_strikes
+    position: [2, 3]

@@ -362,6 +362,15 @@ impl ScriptAbility {
 
 impl UserData for ScriptAbility {
     fn add_methods(methods: &mut UserDataMethods<Self>) {
+        methods.add_method("is_active_mode", |_, ability, target: ScriptEntity| {
+            ability.error_if_not_active()?;
+            let target = target.try_unwrap()?;
+            let mut target = target.borrow_mut();
+            match target.actor.ability_state(&ability.id) {
+                None => Ok(false),
+                Some(ref ability_state) => Ok(ability_state.is_active_mode()),
+            }
+        });
         methods.add_method("activate", &activate);
         methods.add_method("deactivate", |_, ability, target: ScriptEntity| {
             ability.error_if_not_active()?;
@@ -411,13 +420,14 @@ fn entity_with_id(id: String) -> Option<Rc<RefCell<EntityState>>> {
     None
 }
 
-fn activate(_lua: &Lua, ability: &ScriptAbility, target: ScriptEntity) -> Result<()> {
+fn activate(_lua: &Lua, ability: &ScriptAbility, (target, take_ap): (ScriptEntity, Option<bool>)) -> Result<()> {
     ability.error_if_not_active()?;
     let entity = target.try_unwrap()?;
+    let take_ap = take_ap.unwrap_or(true);
 
     let area_state = GameState::area_state();
     let turn_timer = area_state.borrow().turn_timer();
-    if turn_timer.borrow().is_active() {
+    if take_ap && turn_timer.borrow().is_active() {
         entity.borrow_mut().actor.remove_ap(ability.ap);
     }
 

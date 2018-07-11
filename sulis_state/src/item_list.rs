@@ -19,7 +19,7 @@ use std::slice::Iter;
 
 use ItemState;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct ItemList {
     items: Vec<(u32, ItemState)>,
 }

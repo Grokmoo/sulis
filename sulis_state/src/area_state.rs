@@ -153,6 +153,8 @@ impl AreaState {
             let index = area_state.add_prop(&prop_data, location, false)?;
             area_state.props[index].as_mut().unwrap()
                 .load_interactive(prop_save_state.interactive)?;
+
+            area_state.update_prop_vis_pass_grid(index);
         }
 
         for (index, trigger_save) in save.triggers.into_iter().enumerate() {

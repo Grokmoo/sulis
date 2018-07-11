@@ -28,6 +28,7 @@ use entity_state::AreaDrawable;
 use {ChangeListenerList, EntityTextureCache, ItemList, ItemState, Location};
 use save_state::PropInteractiveSaveState;
 
+#[derive(Debug)]
 pub enum Interactive {
     Not,
     Container {
@@ -81,7 +82,6 @@ impl PropState {
                 Interactive::Door {
                     open: initially_open
                 }
-                // TODO set pass and vis if in closed state
             }
         };
 
@@ -131,6 +131,10 @@ impl PropState {
                 self.interactive = Interactive::Door {
                     open
                 };
+
+                if open {
+                    self.animation_state.toggle(animation_state::Kind::Active);
+                }
             }
         }
 
@@ -181,11 +185,13 @@ impl PropState {
 
     pub fn toggle_active(&mut self) {
         self.animation_state.toggle(animation_state::Kind::Active);
-        if !self.is_active() { return; }
+        let is_active = self.is_active();
 
         match self.interactive {
             Interactive::Not => (),
             Interactive::Container { ref mut items, ref mut loot_to_generate, .. } => {
+                if !is_active { return; }
+
                 let loot = match loot_to_generate.take() {
                     None => return,
                     Some(loot) => loot,
@@ -201,8 +207,6 @@ impl PropState {
             Interactive::Door { ref mut open } => {
                 let cur_open = *open;
                 *open = !cur_open;
-
-                // TODO implement set pass and vis
             },
         }
     }

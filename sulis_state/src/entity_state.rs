@@ -376,6 +376,14 @@ impl EntityState {
         self.dist(other.location.to_point(), &other.prop.size)
     }
 
+    pub fn center_x_f32(&self) -> f32 {
+        self.location.x as f32 + self.size.width as f32 / 2.0
+    }
+
+    pub fn center_y_f32(&self) -> f32 {
+        self.location.y as f32 + self.size.height as f32 / 2.0
+    }
+
     pub fn center_x(&self) -> i32 {
         self.location.x + self.size.width / 2
     }

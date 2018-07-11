@@ -18,10 +18,26 @@ use std::rc::Rc;
 
 use sulis_core::image::Image;
 use sulis_core::resource::ResourceSet;
-use bonus::{AttackBuilder, AttackKindBuilder, BonusKind};
+use bonus::{AttackBuilder, AttackKindBuilder, BonusKind, BonusList};
 use {Armor, AttackBonuses, Damage, DamageKind, DamageList, StatList, WeaponKind};
 
 use AttackKind::*;
+
+fn add_bonus(bonuses: &mut AttackBonuses, bonus_damage: &mut Vec<Damage>, bonus_kind: &BonusKind) {
+    match bonus_kind{
+        BonusKind::Damage(damage) => bonus_damage.push(damage.clone()),
+        BonusKind::Accuracy(amount) => bonuses.accuracy += amount,
+        BonusKind::CritThreshold(amount) => bonuses.crit_threshold += amount,
+        BonusKind::HitThreshold(amount) => bonuses.hit_threshold += amount,
+        BonusKind::GrazeThreshold(amount) => bonuses.graze_threshold += amount,
+        BonusKind::CritMultiplier(amount) => bonuses.crit_multiplier += amount,
+        BonusKind::HitMultiplier(amount) => bonuses.hit_multiplier += amount,
+        BonusKind::GrazeMultiplier(amount) => bonuses.graze_multiplier += amount,
+        _ => {
+            warn!("Attack bonus of type '{:?}' will never be applied", bonus_kind);
+        }
+    }
+}
 
 #[derive(Clone)]
 pub struct Attack {
@@ -49,28 +65,47 @@ impl Attack {
         }
     }
 
+    pub fn from(other: &Attack, bonuses_to_add: &BonusList) -> Attack {
+        let kind = other.kind.clone();
+        let mut bonuses = other.bonuses.clone();
+        let mut bonus_damage = other.damage.clone().to_vec();
+        assert!(bonus_damage.len() > 0);
+
+        let base_damage = bonus_damage.remove(0);
+
+        for bonus in bonuses_to_add.iter() {
+            add_bonus(&mut bonuses, &mut bonus_damage, &bonus.kind);
+        }
+
+        let damage = DamageList::new(base_damage, &bonus_damage);
+
+        Attack {
+            kind,
+            bonuses,
+            damage,
+        }
+    }
+
     pub fn new(builder: &AttackBuilder, stats: &StatList, weapon_kind: WeaponKind) -> Attack {
         let mut bonuses = builder.bonuses.clone();
         let mut bonus_damage = stats.bonus_damage.clone();
         if let Some(damage) = bonuses.damage {
             bonus_damage.push(damage);
         }
-        for (owned_kind, owned_bonus) in stats.attack_bonuses.iter() {
-            if *owned_kind == weapon_kind {
-                match owned_bonus {
-                    BonusKind::Damage(damage) => bonus_damage.push(damage.clone()),
-                    BonusKind::Accuracy(amount) => bonuses.accuracy += amount,
-                    BonusKind::CritThreshold(amount) => bonuses.crit_threshold += amount,
-                    BonusKind::HitThreshold(amount) => bonuses.hit_threshold += amount,
-                    BonusKind::GrazeThreshold(amount) => bonuses.graze_threshold += amount,
-                    BonusKind::CritMultiplier(amount) => bonuses.crit_multiplier += amount,
-                    BonusKind::HitMultiplier(amount) => bonuses.hit_multiplier += amount,
-                    BonusKind::GrazeMultiplier(amount) => bonuses.graze_multiplier += amount,
-                    _ => {
-                        warn!("Attack bonus of type '{:?}' for weapon {:?} will never be applied",
-                              owned_bonus, owned_kind);
+        for bonus in stats.attack_bonuses.iter() {
+            use bonus::Contingent::*;
+            match bonus.when {
+                AttackWithWeapon(bonus_weapon_kind) => {
+                    if bonus_weapon_kind == weapon_kind {
+                        add_bonus(&mut bonuses, &mut bonus_damage, &bonus.kind);
                     }
-                }
+                },
+                AttackWhenHidden => {
+                    if stats.hidden {
+                        add_bonus(&mut bonuses, &mut bonus_damage, &bonus.kind);
+                    }
+                },
+                _ => unreachable!(),
             }
         }
 

@@ -534,6 +534,7 @@ children:
           [x=0|Concealment|[x=40|#concealment#]
           [x=0|Concealment Ignore|[x=40|#concealment_ignore#]
           [x=0|Movement Rate|[x=40|#movement_rate#]]
+          [x=0|Flanking Angle|[x=40|#flanking_angle#]]
           [s=6|]
           [x=0|Graze Threshold][x=30|Hit Threshold][x=60|Crit Threshold]
           [x=0|#graze_threshold#][x=30|#hit_threshold#][x=60|#crit_threshold#]
@@ -648,6 +649,7 @@ children:
           ][?graze_multiplier|[s=4.0|Graze Multiplier: #graze_multiplier#]
           ][?movement_rate|[s=4.0|Movement Rate: #movement_rate#]
           ][?attack_cost|[s=4.0|Attack Cost: #attack_cost#]
+          ][?flanking_angle|[s=4.0|Flanking Angle: #flanking_angle#]
           ][?prereqs|[s=5|]
           [s=5;c=f00|Prereqs]
           [?prereq_total_level|Level: #prereq_total_level#
@@ -814,6 +816,7 @@ children:
       ][?graze_multiplier|[s=4.0|Graze Multiplier: #graze_multiplier#]
       ][?movement_rate|[s=4.0|Movement Rate: #movement_rate#]
       ][?attack_cost|[s=4.0|Attack Cost: #attack_cost#]
+      ][?flanking_angle|[s=4.0|Flanking Angle: #flanking_angle#]
       ][?move_disabled|[s=4.0|Movement Disabled]
       ][?attack_disabled|[s=4.0|Attack Disabled]
       ][?hidden|[s=4.0|Hidden]

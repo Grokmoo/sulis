@@ -1,0 +1,18 @@
+id: backstab
+name: "Backstab"
+icon: abilities/backstab
+description: |
+  You gain significant bonus damage and accuracy when attacking while hidden or flanking an opponent.
+bonuses:
+  - kind:
+      damage: { min: 10, max: 18, ap: 8 }
+    when:  AttackWhenHidden
+  - kind:
+      accuracy: 25
+    when: AttackWhenHidden
+  - kind:
+      damage: { min: 7, max: 13, ap: 5 }
+    when: AttackWhenFlanking
+  - kind:
+      accuracy: 10
+    when: AttackWhenFlanking

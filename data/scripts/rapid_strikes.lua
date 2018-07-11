@@ -41,6 +41,13 @@ function attack_target1(parent, ability, targets)
     parent:weapon_attack(target1)
   end
 
+  hide = parent:get_ability("hide")
+  cb = hide:create_callback(parent)
+  cb:set_on_anim_complete_fn("deactivate")
+  hide_anim = parent:wait_anim(0.1)
+  hide_anim:set_completion_callback(cb)
+  hide_anim:activate()
+  
   targets_table = targets:to_table()
   if #targets_table < 2 then
     anim_return(parent, ability, target1)

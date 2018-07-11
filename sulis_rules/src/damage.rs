@@ -29,6 +29,10 @@ pub struct DamageList {
 }
 
 impl DamageList {
+    pub fn to_vec(self) -> Vec<Damage> {
+        self.damage
+    }
+
     pub fn empty() -> DamageList {
         DamageList {
             damage: Vec::new(),
@@ -99,7 +103,7 @@ impl DamageList {
 
         if let Some(cur_damage) = cur_damage {
             assert!(cur_damage.kind.is_some());
-            damage_list.push(cur_damage);
+    damage_list.push(cur_damage);
         }
 
         debug!("Created damage list {} to {}, base kind {}", min,

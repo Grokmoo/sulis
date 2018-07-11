@@ -20,7 +20,7 @@ use rand::{self, Rng};
 
 use sulis_core::image::Image;
 use {Armor, AttributeList, Attack, Damage, HitKind, WeaponKind, ArmorKind, Slot, WeaponStyle};
-use bonus::{AttackBonuses, AttackBuilder, BonusKind, BonusList};
+use bonus::{AttackBonuses, AttackBuilder, Bonus, BonusKind, BonusList};
 
 #[derive(Clone)]
 pub struct StatList {
@@ -32,9 +32,11 @@ pub struct StatList {
 
     // contingent bonuses are accumulated here and then applied if applicable when finalizing
     pub contingent_bonuses: BonusList,
+    // bonuses contingent on flanking that are only applied to some attacks
+    pub flanking_bonuses: BonusList,
 
     // these bonuses are applied only to the attack itself of the given weaponkind
-    pub attack_bonuses: Vec<(WeaponKind, BonusKind)>,
+    pub attack_bonuses: Vec<Bonus>,
     pub bonus_ap: i32,
     pub bonus_damage: Vec<Damage>,
     pub bonus_reach: f32,
@@ -43,6 +45,7 @@ pub struct StatList {
     pub armor: Armor,
     pub max_hp: i32,
     pub initiative: i32,
+    pub flanking_angle: i32,
     pub accuracy: i32,
     pub defense: i32,
     pub fortitude: i32,
@@ -71,6 +74,7 @@ impl StatList {
             armor_proficiencies: Vec::new(),
             weapon_proficiencies: Vec::new(),
             contingent_bonuses: BonusList::default(),
+            flanking_bonuses: BonusList::default(),
             attack_bonuses: Vec::new(),
             bonus_ap: 0,
             bonus_damage: Vec::new(),
@@ -81,6 +85,7 @@ impl StatList {
             armor: Armor::default(),
             max_hp: 0,
             initiative: 0,
+            flanking_angle: 0,
             accuracy: 0,
             defense: 0,
             fortitude: 0,
@@ -193,7 +198,9 @@ impl StatList {
             use bonus::Contingent::*;
             match bonus.when {
                 Always => self.add_bonus(&bonus.kind, times),
-                AttackWithWeapon(weapon_kind) => self.attack_bonuses.push((weapon_kind, bonus.kind.clone())),
+                AttackWithWeapon(_) | AttackWhenHidden =>
+                    self.attack_bonuses.push(bonus.clone()),
+                AttackWhenFlanking => self.flanking_bonuses.add(bonus.clone()),
                 WeaponEquipped(_) | ArmorEquipped {..} | WeaponStyle(_) =>
                     self.contingent_bonuses.add(bonus.clone()),
             }
@@ -240,6 +247,7 @@ impl StatList {
             GrazeMultiplier(amount) => self.graze_multiplier += amount * times_f32,
             MovementRate(amount) => self.movement_rate += amount * times_f32,
             AttackCost(amount) => self.attack_cost += amount * times_i32,
+            FlankingAngle(amount) => self.flanking_angle += amount * times_i32,
             MoveDisabled => self.move_disabled = true,
             AttackDisabled => self.attack_disabled = true,
             Hidden => self.hidden = true,
@@ -263,7 +271,7 @@ impl StatList {
         for bonus in contingent.iter() {
             use bonus::Contingent::*;
             match bonus.when {
-                Always | AttackWithWeapon(_) => unreachable!(),
+                Always | AttackWithWeapon(_) | AttackWhenHidden | AttackWhenFlanking => unreachable!(),
                 WeaponEquipped(weapon_kind) => {
                     for (_, attack_weapon_kind) in attacks.iter() {
                         if weapon_kind == *attack_weapon_kind { self.add_bonus(&bonus.kind, 1); }

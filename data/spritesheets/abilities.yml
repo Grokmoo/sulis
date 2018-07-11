@@ -101,5 +101,8 @@ groups:
       shadow_step: [4, 12]
       backflip: [5, 12]
       rapid_strikes: [6, 12]
+      flanker: [7, 12]
+      
+      backstab: [0, 13]
       
       prereqs_not_met: [7, 4]

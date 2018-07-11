@@ -10,3 +10,7 @@ abilities:
     position: [0, 2]
   - id: rapid_strikes
     position: [2, 3]
+  - id: backstab
+    position: [0, 4]
+  - id: flanker
+    position: [1, 5]

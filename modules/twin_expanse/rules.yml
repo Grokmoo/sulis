@@ -7,6 +7,7 @@ min_overflow_ap: -4000
 movement_ap: 100
 attack_ap: 2000
 base_initiative: 10
+base_flanking_angle: 150
 
 graze_percentile: 20
 hit_percentile: 55

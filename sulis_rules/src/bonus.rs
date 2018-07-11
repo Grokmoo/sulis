@@ -46,6 +46,7 @@ pub enum BonusKind {
     GrazeMultiplier(f32),
     MovementRate(f32),
     AttackCost(i32),
+    FlankingAngle(i32),
     MoveDisabled,
     AttackDisabled,
     Hidden,
@@ -62,16 +63,25 @@ pub enum Contingent {
     /// WeaponKind equipped
     WeaponEquipped(WeaponKind),
 
-    /// Bonuses that should only be applied to an attack using the given WeaponKind
-    AttackWithWeapon(WeaponKind),
-
     /// Bonuses that should only be applied to the parent if they have a shield of
     /// the specified type equipped
     ArmorEquipped { kind: ArmorKind, slot: Slot },
 
     /// Bonus that should only be applied if the parent's attack is of the given
-    /// weapons style
+    /// weapon style
     WeaponStyle(WeaponStyle),
+
+    /// For bonuses applied to attacks, only Damage, Accuracy, CritThreshold, HitThreshold,
+    /// GrazeThreshold, CritMultiplier, HitMultiplier, and GrazeMultiplier are valid
+
+    /// Bonuses that should only be applied to an attack using the given WeaponKind
+    AttackWithWeapon(WeaponKind),
+
+    /// Bonuses that are only applied to attacks when the attacker is hidden
+    AttackWhenHidden,
+
+    /// Bonuses that are only applied to attacks when the attacker is flanking
+    AttackWhenFlanking,
 }
 
 impl Default for Contingent {

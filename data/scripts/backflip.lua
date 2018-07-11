@@ -59,6 +59,13 @@ function attack_target(parent, ability, target)
   if target:is_valid() then
     parent:weapon_attack(target)
   end
+  
+  hide = parent:get_ability("hide")
+  cb = hide:create_callback(parent)
+  cb:set_on_anim_complete_fn("deactivate")
+  hide_anim = parent:wait_anim(0.1)
+  hide_anim:set_completion_callback(cb)
+  hide_anim:activate()
 end
 
 function move_parent(parent, ability, targets)

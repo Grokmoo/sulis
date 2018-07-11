@@ -9,6 +9,13 @@ function on_activate(parent, ability)
   end
 end
 
+function deactivate(parent, ability)
+  if ability:is_active_mode(parent) then
+    game:say_line("Spotted!", parent)
+    ability:deactivate(parent)
+  end
+end
+
 function activate_no_ap(parent, ability)
   activate_no_check(parent, ability)
   ability:activate(parent, false)

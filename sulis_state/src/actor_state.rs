@@ -284,8 +284,45 @@ impl ActorState {
         let mut total_damage = 0;
 
         let attacks = parent.borrow().actor.stats.attacks.clone();
+
+        let mut is_flanking = false;
+        let area_state = GameState::area_state();
+        for entity in area_state.borrow().entity_iter() {
+            if Rc::ptr_eq(&entity, parent) { continue; }
+            if Rc::ptr_eq(&entity, target) { continue; }
+
+            let entity = entity.borrow();
+            if !entity.is_hostile(&target) { continue; }
+
+            // TODO allow ranged weapons to flank?  and at any distance?
+            if !entity.can_reach(&target) { continue; }
+
+            let p_target = (target.borrow().center_x_f32(), target.borrow().center_y_f32());
+            let p_parent = (parent.borrow().center_x_f32(), parent.borrow().center_y_f32());
+            let p_other = (entity.center_x_f32(), entity.center_y_f32());
+
+            let p1 = (p_target.0 - p_parent.0, p_target.1 - p_parent.1);
+            let p2 = (p_target.0 - p_other.0, p_target.1 - p_other.1);
+
+            let angle = ((p1.0 * p2.0 + p1.1 * p2.1) / (p1.0.hypot(p1.1) * p2.0.hypot(p2.1))).acos();
+            let angle = angle.to_degrees();
+
+            // info!("Got angle {} between {} and {} attacking {}", angle, parent.borrow().actor.actor.name,
+            //     entity.actor.actor.name, target.borrow().actor.actor.name);
+            if angle > parent.borrow().actor.stats.flanking_angle as f32 {
+                is_flanking = true;
+                break;
+            }
+        }
+
         for attack in attacks {
             if not_first { damage_str.push_str(", "); }
+
+            let attack = if is_flanking {
+                Attack::from(&attack, &parent.borrow().actor.stats.flanking_bonuses)
+            } else {
+                attack
+            };
 
             let (hit, dmg, attack_result, attack_color) = ActorState::attack_internal(parent, target, &attack);
             if attack_color != color::GRAY {
@@ -784,6 +821,7 @@ impl ActorState {
         let weapon_style = self.inventory.weapon_style();
 
         self.stats.finalize(attacks_list, equipped_armor, weapon_style, multiplier, rules.base_attribute);
+        self.stats.flanking_angle += rules.base_flanking_angle;
         self.stats.crit_threshold += rules.crit_percentile as i32;
         self.stats.hit_threshold += rules.hit_percentile as i32;
         self.stats.graze_threshold += rules.graze_percentile as i32;

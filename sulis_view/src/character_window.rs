@@ -260,6 +260,7 @@ pub fn create_details_text_box(pc: &ActorState) -> Rc<RefCell<Widget>> {
         state.add_text_arg("next_xp", &rules.get_xp_for_next_level(pc.actor.total_level).to_string());
 
         state.add_text_arg("initiative", &stats.initiative.to_string());
+        state.add_text_arg("flanking_angle", &stats.flanking_angle.to_string());
 
         state.add_text_arg("armor", &stats.armor.base().to_string());
         for kind in DamageKind::iter() {

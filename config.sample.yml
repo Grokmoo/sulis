@@ -51,9 +51,10 @@ input:
         KeyI: ToggleInventory
         KeyC: ToggleCharacter
         KeySpace: EndTurn
-        KeyMinus: ScrollDown
-        KeyEquals: ScrollUp
+        KeyDown: ScrollDown
+        KeyUp: ScrollUp
         KeyF5: QuickSave
+        KeyGrave: ToggleConsole
 
 logging:
     # Log level may be error, warn, info, debug, or trace

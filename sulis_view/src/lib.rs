@@ -50,6 +50,9 @@ pub use self::character_window::CharacterWindow;
 mod class_pane;
 pub use self::class_pane::ClassPane;
 
+mod console_window;
+pub use self::console_window::ConsoleWindow;
+
 mod cutscene_window;
 pub use self::cutscene_window::CutsceneWindow;
 
@@ -214,6 +217,12 @@ impl RootView {
         });
     }
 
+    pub fn set_console_window(&mut self, widget: &Rc<RefCell<Widget>>, desired_state: bool) {
+        self.set_window(widget, self::console_window::NAME, desired_state, &|| {
+            Some(ConsoleWindow::new())
+        });
+    }
+
     fn set_window(&mut self, widget: &Rc<RefCell<Widget>>, name: &str, desired_state: bool,
                      cb: &Fn() -> Option<Rc<RefCell<WidgetKind>>>) {
         match Widget::get_child_with_name(widget, name) {
@@ -232,6 +241,11 @@ impl RootView {
                 }
             }
         }
+    }
+
+    pub fn toggle_console_window(&mut self, widget: &Rc<RefCell<Widget>>) {
+        let desired_state = !Widget::has_child_with_name(widget, self::console_window::NAME);
+        self.set_console_window(widget, desired_state);
     }
 
     pub fn toggle_inventory_window(&mut self, widget: &Rc<RefCell<Widget>>) {
@@ -297,20 +311,11 @@ impl WidgetKind for RootView {
     fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
         use sulis_core::io::InputAction::*;
         match key {
-            ShowMenu => {
-                self.show_menu(widget);
-            },
-            ToggleInventory => {
-                let desired_state = !Widget::has_child_with_name(widget, self::inventory_window::NAME);
-                self.set_inventory_window(widget, desired_state);
-            },
-            ToggleCharacter => {
-                let desired_state = !Widget::has_child_with_name(widget, self::character_window::NAME);
-                self.set_character_window(widget, desired_state);
-            },
-            EndTurn => {
-                self.end_turn();
-            },
+            ShowMenu => self.show_menu(widget),
+            ToggleConsole => self.toggle_console_window(widget),
+            ToggleInventory => self.toggle_inventory_window(widget),
+            ToggleCharacter => self.toggle_character_window(widget),
+            EndTurn => self.end_turn(),
             QuickSave => {
                 if let Err(e) = create_save() {
                     error!("Error quick saving game");
@@ -320,7 +325,7 @@ impl WidgetKind for RootView {
                     self.add_status_text("Quicksave Complete.");
                 }
 
-            }
+            },
             _ => return false,
         }
 

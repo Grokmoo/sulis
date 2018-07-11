@@ -350,12 +350,16 @@ impl Widget {
         None
     }
 
-    pub fn grab_keyboard_focus(widget: &Rc<RefCell<Widget>>) {
+    /// Attempts to grab keyboard focus.  this will fail if
+    /// the widget has not been added to the tree yet
+    pub fn grab_keyboard_focus(widget: &Rc<RefCell<Widget>>) -> bool {
         let root = Widget::get_root(widget);
+        if Rc::ptr_eq(&root, widget) { return false; }
         Widget::remove_old_keyboard_focus(&root);
         root.borrow_mut().keyboard_focus_child = Some(Rc::clone(widget));
         widget.borrow_mut().state.has_keyboard_focus = true;
         trace!("Keyboard focus to {}", widget.borrow().theme_id);
+        true
     }
 
     pub fn clear_keyboard_focus(widget: &Rc<RefCell<Widget>>) {
@@ -554,7 +558,10 @@ impl Widget {
                 event::Kind::CharTyped(c) => {
                     return child_kind.borrow_mut().on_char_typed(&child, c);
                 },
-                event::Kind::KeyPress(_) => return false, // eat all other keyboard actions
+                event::Kind::KeyPress(key) => {
+                    // send key press events only to the keyboard focus child when one exists
+                    return child_kind.borrow_mut().on_key_press(&child, key);
+                },
                 _ => (),
             }
         } else {

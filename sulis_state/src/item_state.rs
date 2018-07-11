@@ -14,7 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use sulis_module::Item;
+use sulis_module::{Module, Item};
 
 use std::rc::Rc;
 
@@ -33,6 +33,13 @@ impl ItemState {
     pub fn new(item: Rc<Item>) -> ItemState {
         ItemState {
             item
+        }
+    }
+
+    pub fn from(id: &str) -> Option<ItemState> {
+        match Module::item(id) {
+            None => None,
+            Some(item) => Some(ItemState::new(item)),
         }
     }
 }

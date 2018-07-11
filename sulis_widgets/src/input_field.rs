@@ -20,8 +20,8 @@ use std::cell::RefCell;
 
 use sulis_core::resource::ResourceSet;
 use sulis_core::image::Image;
-use sulis_core::ui::{LineRenderer, Widget, WidgetKind};
-use sulis_core::io::{GraphicsRenderer};
+use sulis_core::ui::{Callback, LineRenderer, Widget, WidgetKind};
+use sulis_core::io::{GraphicsRenderer, InputAction};
 use sulis_core::util::Point;
 use Label;
 
@@ -34,6 +34,9 @@ pub struct InputField {
     carat_width: f32,
     carat_height: f32,
     carat_offset: f32,
+    enter_callback: Option<Callback>,
+    key_press_callback: Option<Rc<Fn(&Rc<RefCell<Widget>>, &mut InputField, InputAction)>>,
+    initializing: bool,
 }
 
 impl InputField {
@@ -45,7 +48,34 @@ impl InputField {
             carat_width: 1.0,
             carat_height: 1.0,
             carat_offset: 0.0,
+            enter_callback: None,
+            key_press_callback: None,
+            initializing: true,
         }))
+    }
+
+    pub fn set_key_press_callback(&mut self, cb: Rc<Fn(&Rc<RefCell<Widget>>, &mut InputField, InputAction)>) {
+        self.key_press_callback = Some(cb);
+    }
+
+    pub fn set_enter_callback(&mut self, cb: Callback) {
+        self.enter_callback = Some(cb);
+    }
+
+    pub fn text(&self) -> String {
+        self.text.clone()
+    }
+
+    pub fn set_text(&mut self, text: &str, widget: &Rc<RefCell<Widget>>) {
+        self.text = text.to_string();
+        self.label.borrow_mut().text = Some(self.text.clone());
+        widget.borrow_mut().invalidate_layout();
+    }
+
+    pub fn clear(&mut self, widget: &Rc<RefCell<Widget>>) {
+        self.text.clear();
+        self.label.borrow_mut().text = Some(self.text.clone());
+        widget.borrow_mut().invalidate_layout();
     }
 }
 
@@ -55,6 +85,14 @@ impl WidgetKind for InputField {
     fn as_any_mut(&mut self) -> &mut Any { self }
 
     fn wants_keyboard_focus(&self) -> bool { true }
+
+    fn update(&mut self, widget: &Rc<RefCell<Widget>>) {
+        if self.initializing {
+            if Widget::grab_keyboard_focus(&widget) {
+                self.initializing = false;
+            }
+        }
+    }
 
     fn layout(&mut self, widget: &mut Widget) {
         if let Some(ref text) = self.label.borrow().text {
@@ -91,9 +129,27 @@ impl WidgetKind for InputField {
             }
         }
 
+        let mut buf = [0u8; 4];
+        c.encode_utf8(&mut buf);
+        if buf[0] == 13 && c.len_utf8() == 1 {
+            let cb = self.enter_callback.clone();
+            if let Some(cb) = cb {
+                (cb).call(widget, self);
+            }
+        }
+
         self.label.borrow_mut().text = Some(self.text.clone());
         widget.borrow_mut().invalidate_layout();
         Widget::fire_callback(widget, self);
+        true
+    }
+
+    fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
+        let cb = self.key_press_callback.clone();
+        if let Some(ref cb) = cb {
+            (cb)(widget, self, key);
+        }
+
         true
     }
 

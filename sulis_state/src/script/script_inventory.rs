@@ -17,6 +17,7 @@
 use rlua::{UserData, UserDataMethods};
 
 use sulis_rules::{Slot, WeaponStyle};
+use ItemState;
 use script::*;
 
 #[derive(Clone)]
@@ -67,6 +68,26 @@ impl UserData for ScriptInventory {
             try_unwrap!(data => inv);
 
             Ok(ScriptWeaponStyle { style: inv.weapon_style() })
+        });
+
+        methods.add_method("add_coins", |_, data, amount: i32| {
+            let parent = data.parent.try_unwrap()?;
+            parent.borrow_mut().actor.add_coins(amount);
+            Ok(())
+        });
+
+        methods.add_method("add_item", |_, data, item: String| {
+            let parent = data.parent.try_unwrap()?;
+            let item = match ItemState::from(&item) {
+                None => return Err(rlua::Error::FromLuaConversionError {
+                    from: "String",
+                    to: "Item",
+                    message: Some(format!("Item '{}' does not exist", item)),
+                }),
+                Some(item) => item,
+            };
+            parent.borrow_mut().actor.add_item(item);
+            Ok(())
         });
     }
 }

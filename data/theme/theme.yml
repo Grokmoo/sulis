@@ -362,6 +362,39 @@ children:
         children:
           item_button:
             from: .item_button
+  console_window:
+    position: [0, 0]
+    border: [1, 1, 1, 1]
+    width_relative: Max
+    preferred_size: [0, 12]
+    background: 80_transparent_fill
+    children:
+      prompt:
+        from: .label
+        text: ">"
+        text_params:
+          color: [1.0, 0.0, 0.0, 1.0]
+          font: mono
+          horizontal_alignment: Right
+        position: [0, 0]
+        preferred_size: [4, 4]
+      input:
+        from: .input_field
+        background: empty
+        text_params:
+          font: mono
+        position: [4, 0]
+        preferred_size: [-4, 4]
+        width_relative: Max
+      output:
+        from: .label
+        text_params:
+          color: [0.8, 0.8, 0.8, 1.0]
+          horizontal_alignment: Left
+          font: mono
+        position: [0, 4]
+        preferred_size: [0, 4]
+        width_relative: Max
   inventory_window:
     from: .window
     position: [120, 4]

@@ -90,7 +90,7 @@ pub trait WidgetKind {
     /// clicked.
     fn wants_keyboard_focus(&self) -> bool { false }
 
-    /// This method is called after this WidgetKind is added to its parent widget.
+    /// This method is called before this WidgetKind is added to its parent widget.
     /// It returns a vector of 'Widget's that will be added as children to the
     /// parent widget.  If you implement this but do not need to add any children,
     /// returning 'Vec::with_capacity(0)' is best.

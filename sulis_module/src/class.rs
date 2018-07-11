@@ -32,6 +32,7 @@ pub struct Kit {
     pub description: String,
     pub default_attributes: AttributeList,
     pub starting_equipment: Vec<String>,
+    pub starting_coins: i32,
 }
 
 #[derive(Debug)]

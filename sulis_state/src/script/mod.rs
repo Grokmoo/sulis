@@ -99,6 +99,20 @@ impl ScriptState {
         Ok(())
     }
 
+    pub fn console(&self, script: String, party: &Vec<Rc<RefCell<EntityState>>>) -> Result<String> {
+        assert!(party.len() > 0);
+        self.lua.globals().set("player", ScriptEntity::from(&party[0]))?;
+
+        let party_table = self.lua.create_table()?;
+        for (index, member) in party.iter().enumerate() {
+            party_table.set(index + 1, ScriptEntity::from(member))?;
+        }
+
+        self.lua.globals().set("party", party_table)?;
+
+        self.lua.eval::<String>(&script, None)
+    }
+
     pub fn ability_on_activate(&self, parent: &Rc<RefCell<EntityState>>,
                                        ability: &Rc<Ability>) -> Result<()> {
         let t: Option<(&str, usize)> = None;

@@ -24,6 +24,7 @@ use io::Event;
 #[derive(Debug, Deserialize, Copy, Clone)]
 #[serde(deny_unknown_fields)]
 pub enum InputAction {
+    ToggleConsole,
     ToggleInventory,
     ToggleCharacter,
     ShowMenu,

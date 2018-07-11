@@ -96,6 +96,7 @@ kits:
       int: 17
       wis: 12
     starting_equipment: [ quarterstaff, boots_leather, torso_shirt, legs_pants ]
+    starting_coins: 200
     description: |
       A mage with the capability to cast a variety of spells from the circles of magic.
 

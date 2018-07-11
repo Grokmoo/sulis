@@ -400,6 +400,19 @@ impl GameState {
         })
     }
 
+    pub fn execute_console_script(script: String) -> String {
+        let party = GameState::party();
+        let result: Result<String, rlua::Error> = SCRIPT.with(|script_state| {
+            script_state.console(script, &party)
+        });
+
+        match result {
+            Ok(result) => result,
+            Err(rlua::Error::FromLuaConversionError { .. }) => "Success".to_string(),
+            Err(e) => format!("{}", e),
+        }
+    }
+
     pub fn execute_ability_on_activate(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>) {
         exec_script!(ability_on_activate: parent, ability);
     }

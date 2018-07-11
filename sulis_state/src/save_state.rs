@@ -317,6 +317,7 @@ impl EntitySaveState {
                 skin_color: actor.skin_color,
                 items: Some(actor.items.iter().map(|i| i.id.to_string()).collect()),
                 equipped: Some(actor.to_equip.iter().map(|e| *e as u32).collect()),
+                coins: Some(actor.coins),
                 levels,
                 xp: Some(actor.xp),
                 reward,

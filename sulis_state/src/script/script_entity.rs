@@ -92,6 +92,12 @@ impl ScriptEntity {
 
 impl UserData for ScriptEntity {
     fn add_methods(methods: &mut UserDataMethods<Self>) {
+        methods.add_method("add_xp", |_, entity, amount: u32| {
+            let entity = entity.try_unwrap()?;
+            entity.borrow_mut().actor.add_xp(amount);
+            Ok(())
+        });
+
         methods.add_method("set_flag", |_, entity, flag: String| {
             let entity = entity.try_unwrap()?;
             entity.borrow_mut().set_custom_flag(&flag);

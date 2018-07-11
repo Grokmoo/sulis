@@ -104,6 +104,7 @@ impl BuilderPane for AttributeSelectorPane {
 
         builder.attributes = Some(self.attrs);
         builder.items = Some(kit.starting_equipment.clone());
+        builder.coins = kit.starting_coins;
         builder.next(&widget);
     }
 

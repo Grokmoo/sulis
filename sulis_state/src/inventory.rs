@@ -40,6 +40,7 @@ impl Inventory {
             inv.items.add(ItemState::new(Rc::clone(item)));
         }
 
+        inv.coins = actor.coins;
         trace!("Populated initial inventory with {} items", inv.items.len());
         inv
     }

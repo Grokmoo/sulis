@@ -292,6 +292,9 @@ impl GliumDisplay {
 
         if let Some(ref monitor) = monitor {
             let physical_position = monitor.get_position();
+            // TODO this doesn't work if you have monitors with different hidpi factors
+            // would be very hard to solve in the general case, maybe just allow a configured
+            // logical position
             let logical_position = physical_position.to_logical(monitor.get_hidpi_factor());
             display.gl_window().set_position(logical_position);
         }

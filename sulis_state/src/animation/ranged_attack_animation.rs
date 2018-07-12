@@ -22,7 +22,7 @@ use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::image::Image;
 use sulis_core::ui::{animation_state, Widget};
 use sulis_core::util;
-use {ActorState, EntityState, GameState, ScriptCallback, ScriptEntitySet};
+use {ActorState, EntityState, GameState, ScriptCallback, script::ScriptEntitySet};
 use animation::Animation;
 
 pub struct RangedAttackAnimation {

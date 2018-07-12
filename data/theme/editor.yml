@@ -208,7 +208,7 @@ children:
             from: .button
             text: "#name#"
             text_params:
-              scale: 4.0
+              scale: 6.0
             preferred_size: [40, 6]
       encounter_picker:
         background: bg_base

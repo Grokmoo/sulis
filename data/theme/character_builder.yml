@@ -12,7 +12,7 @@ children:
         position: [0, 3]
         width_relative: Max
         text_params:
-          scale: 5.5
+          scale: 8.0
   character_builder:
     preferred_size: [240, 170]
     border: { top: 6, bottom: 8, right: 6, left: 6 }
@@ -63,8 +63,8 @@ children:
             width_relative: Max
             position: [0, 15]
             text: |
-              [s=5|Class: #class#]
-              [s=4|]
+              [s=7|Class: #class#]
+              [s=6|]
               [?ability_name_0|Ability: #ability_name_0#]
               [?ability_name_1|Ability: #ability_name_1#]
               [?ability_name_2|Ability: #ability_name_2#]
@@ -94,7 +94,7 @@ children:
               race_button:
                 from: .button
                 text_params:
-                  scale: 5.0
+                  scale: 7.0
                 text: "#name#"
                 preferred_size: [25, 10]
       ability_selector_pane:
@@ -195,7 +195,7 @@ children:
               class_button:
                 from: .button
                 text_params:
-                  scale: 5.0
+                  scale: 7.0
                 text: "#name#"
                 preferred_size: [30, 10]
       attribute_selector_pane:
@@ -211,7 +211,7 @@ children:
             width_relative: Max
             position: [0, 25]
             text: |
-              [s=6|#name#]
+              [s=9|#name#]
               
               #description#
           kits_pane:
@@ -226,21 +226,21 @@ children:
               kit_button:
                 from: .button
                 text_params:
-                  scale: 5.0
+                  scale: 7.0
                 text: "#name#"
                 preferred_size: [30, 10]
           attr_label:
             from: .label
             preferred_size: [24, 12]
             text_params:
-              scale: 5.0
+              scale: 7.0
               horizontal_alignment: Right
             x_relative: Max
           points_label:
             from: .label
             preferred_size: [24, 12]
             text_params:
-              scale: 5.0
+              scale: 7.0
               horizontal_alignment: Right
             text: "Points Left"
             x_relative: Max
@@ -253,7 +253,7 @@ children:
             preferred_size: [19, 12]
             x_relative: Max
             text_params:
-              scale: 5.0
+              scale: 7.0
               horizontal_alignment: Right
           bonus_label:
             from: .label
@@ -261,14 +261,14 @@ children:
             preferred_size: [10, 12]
             x_relative: Max
             text_params:
-              scale: 5.0
+              scale: 7.0
               horizontal_alignment: Right
           total_label:
             from: .label
             text: "#value#"
             preferred_size: [10, 12]
             text_params:
-              scale: 6.0
+              scale: 9.0
               horizontal_alignment: Right
             x_relative: Max
           str_label:
@@ -372,8 +372,8 @@ children:
             position: [0, 18]
             text_params:
               font: "normal"
-              scale: 4.0
-            text: "#0#"
+              scale: 6.0
+            text: "[s=6.0|#0#]"
           responses:
             y_relative: Max
             layout: BoxVertical
@@ -389,7 +389,7 @@ children:
                 children:
                   text_area:
                     from: .text_area
-                    text: "#0#"
+                    text: "[s=6.0|#0#]"
                     width_relative: Max
       cosmetic_selector_pane:
         from: .builder_pane

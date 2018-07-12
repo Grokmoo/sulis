@@ -31,7 +31,7 @@ children:
         from: .label
         text: "Actions"
         text_params:
-          scale: 5.0
+          scale: 7.0
           horizontal_alignment: Center
         preferred_size: [0, 4]
         width_relative: Max
@@ -45,8 +45,8 @@ children:
     border: { top: 1, bottom: 1, left: 2, right: 2 }
     background: 80_transparent_fill
     text: |
-      [s=5.0|#name#]   [s=4.0;c=f00|AP: #activate_ap#]
-      #short_description#
+      [s=6.0|#name#]   [s=5.0;c=f00|AP: #activate_ap#]
+      [s=5.0|#short_description#]
     preferred_size: [60, 12]
     width_relative: Custom
     height_relative: Custom
@@ -54,12 +54,12 @@ children:
     y_relative: Custom
   mouse_over:
     from: .text_area
-    border: { top: 1, bottom: 1, left: 2, right: 2 }
+    border: { top: 1, bottom: 0, left: 2, right: 2 }
     background: 80_transparent_fill
     text: |
-      [s=5.0|#name#]
-      [?cur_hp|#cur_hp# / #max_hp#
-      ][?empty;c=888|Empty
+      [s=6.0|#name#]
+      [?cur_hp;s=5.0|#cur_hp# / #max_hp#
+      ][?empty;c=888;s=5.0|Empty
       ]
     preferred_size: [100, 12]
     width_relative: Custom
@@ -84,7 +84,6 @@ children:
     preferred_size: [0, 12]
     position: [-25, 0]
     x_relative: Center
-    # width_relative: ChildSum
     layout: BoxHorizontal
     layout_spacing: { right: 1, left: 0, top: 0, bottom: 0 }
     children:
@@ -103,7 +102,7 @@ children:
         text_params:
           horizontal_alignment: Center
           color: [1.0, 0.0, 0.0, 1.0]
-          scale: 6.0
+          scale: 9.0
         preferred_size: [12, 0]
         height_relative: Max
   bottom_pane:
@@ -136,13 +135,13 @@ children:
                 preferred_size: [0, 6]
                 text: "#cur_hp# / #max_hp#"
                 text_params:
-                  scale: 5.0
+                  scale: 7.0
                   horizontal_alignment: Center
               level_up:
                 from: .button
                 text: "+"
                 text_params:
-                  scale: 6.0
+                  scale: 9.0
                 x_relative: Max
                 preferred_size: [7, 7]
       abilities_bar:
@@ -170,8 +169,8 @@ children:
                 width_relative: Max
                 preferred_size: [0, 8]
                 text: |
-                  [s=3.9;c=f00|#group#]
-                  [?total_uses;s=3.9|#current_uses# / #total_uses#]
+                  [s=5.0;c=f00|#group#]
+                  [?total_uses;s=5.0|#current_uses# / #total_uses#]
               abilities_pane:
                 width_relative: Max
                 height_relative: Max
@@ -239,7 +238,7 @@ children:
     height_relative: Max
     custom:
       targeter_tile: "60_red_transparent_fill"
-      feedback_text_scale: "1.2"
+      feedback_text_scale: "1.5"
       creature_selected_image: "creature_selected"
       selection_box_image: "bg_selection_box"
     children:
@@ -248,7 +247,7 @@ children:
         x_relative: Center
         position: [0, 15]
         text_params:
-          scale: 5.0
+          scale: 7.0
           color: { r: 1.0, g: 0.0, b: 0.0, a: 1.0 }
         text: "Select target for #ability_id#"
   cutscene_window:
@@ -272,7 +271,7 @@ children:
         border: [2, 2, 2, 2]
         text_params:
           font: normal
-          scale: 6.0
+          scale: 9.0
         background: bg_base
         text: "#0#"
         width_relative: Max
@@ -297,7 +296,7 @@ children:
         position: [0, 8]
         text_params:
           font: "normal"
-          scale: 4.0
+          scale: 5.0
         text: "#0#"
       responses:
         y_relative: Max
@@ -313,7 +312,7 @@ children:
             children:
               text_area:
                 from: .text_area
-                text: "#0#"
+                text: "[s=5.0|#0#]"
                 width_relative: Max
   merchant_window:
     from: .window
@@ -349,7 +348,7 @@ children:
         from: .button
         text: "Take All"
         text_params:
-          scale: 5.0
+          scale: 7.0
         preferred_size: [25, 10]
         position: [25, 10]
       items_list:
@@ -375,6 +374,7 @@ children:
         text_params:
           color: [1.0, 0.0, 0.0, 1.0]
           font: mono
+          scale: 4.0
           horizontal_alignment: Right
         position: [0, 0]
         preferred_size: [4, 4]
@@ -383,6 +383,7 @@ children:
         background: empty
         text_params:
           font: mono
+          scale: 4.0
         position: [4, 0]
         preferred_size: [-4, 4]
         width_relative: Max
@@ -392,6 +393,7 @@ children:
           color: [0.8, 0.8, 0.8, 1.0]
           horizontal_alignment: Left
           font: mono
+          scale: 4.0
         position: [0, 4]
         preferred_size: [0, 4]
         width_relative: Max
@@ -521,69 +523,67 @@ children:
         position: [0, 8]
         text_params:
           font: "normal"
-          scale: 4.0
+          scale: 6.0
         text: |
-          [?name|[s=6|#name# - #race# #sex#]
+          [?name|[s=8|#name# - #race# #sex#]
+          [s=6|Level #level_0# #class_0#]
           [s=4|]
-          [s=5|[x=0|Hit Points][x=30|Experience]]
+          [s=6|[x=0|Hit Points][x=30|Experience]]
           [x=0|#cur_hp# / #max_hp#][x=30|#cur_xp# / #next_xp#]
-          [s=4|]
-          [s=5|Level #level_0# #class_0#]
-          [?0_damage_min;s=5;x=0;y=22|Main Hand]
-          [?0_damage_min;s=4;x=0|Damage: #0_damage_min# to #0_damage_max#
-          ][?0_armor_penetration;s=4;x=0|Armor Penetration: #0_armor_penetration#
-          ][?0_accuracy;s=4;x=0|Accuracy: #0_accuracy#
-          ][?0_crit_threshold;s=4;x=0|Crit Threshold: #0_crit_threshold#
-          ][?0_hit_threshold;s=4;x=0|Hit Threshold: #0_hit_threshold#
-          ][?0_graze_threshold;s=4;x=0|Graze Threshold: #0_graze_threshold#
-          ][?0_crit_multiplier;s=4;x=0|Crit Multiplier: #0_crit_multiplier#
-          ][?0_hit_multiplier;s=4;x=0|Hit Multiplier: #0_hit_multiplier#
-          ][?0_graze_multiplier;s=4;x=0|Graze Multiplier: #0_graze_multiplier#]
-
-          [?1_damage_min;s=5;x=40;y=22|Off Hand]
-          [?1_damage_min;s=4;x=40|Damage: #1_damage_min# to #1_damage_max#
-          ][?1_armor_penetration;s=4;x=40|Armor Penetration: #1_armor_penetration#
-          ][?1_accuracy;s=4;x=40|Accuracy: #1_accuracy#
-          ][?1_crit_threshold;s=4;x=40|Crit Threshold: #1_crit_threshold#
-          ][?1_hit_threshold;s=4;x=40|Hit Threshold: #1_hit_threshold#
-          ][?1_graze_threshold;s=4;x=40|Graze Threshold: #1_graze_threshold#
-          ][?1_crit_multiplier;s=4;x=40|Crit Multiplier: #1_crit_multiplier#
-          ][?1_hit_multiplier;s=4;x=0|Hit Multiplier: #1_hit_multiplier#
-          ][?1_graze_multiplier;s=4;x=40|Graze Multiplier: #1_graze_multiplier#]
-          [s=4;x=0;y=40|Range: #reach#]
-          [s=4;x=0|Accuracy: #accuracy#]
-          [s=6|]
-          [s=5.0;x=0|Armor: #armor#][?armor_slashing;s=4.0| (Slashing: #armor_slashing#)][?armor_piercing;s=4.0| (Piercing: #armor_piercing#)][?armor_crushing;s=4.0| (Crushing: #armor_crushing#)][?armor_acid;s=4.0| (Acid: #armor_acid#)][?armor_cold;s=4.0| (Cold: #armor_cold#)][?armor_electrical;s=4.0| (Electrical: #armor_electrical#)][?armor_fire;s=4.0| (Fire: #armor_fire#)][?armor_sonic;s=4.0| (Sonic: #armor_sonic#)]
-          [s=4|[x=0|Defense: #defense#][x=30|Fortitude: #fortitude#][x=60|Reflex: #reflex#][x=90|Will: #will#]]
-          [s=6|]
-          [s=5|[x=0|Strength][x=40|#str#]
-                  [x=0|Dexterity][x=40|#dex#]
-                  [x=0|Endurance][x=40|#end#]
-                  [x=0|Perception][x=40|#per#]
-                  [x=0|Intellect][x=40|#int#]
-                  [x=0|Wisdom][x=40|#wis#]]
-          [s=6|]
-          [x=0|Initiative][x=40|#initiative#]
-          [x=0|Concealment|[x=40|#concealment#]
-          [x=0|Concealment Ignore|[x=40|#concealment_ignore#]
-          [x=0|Movement Rate|[x=40|#movement_rate#]]
-          [x=0|Flanking Angle|[x=40|#flanking_angle#]]
-          [s=6|]
-          [x=0|Graze Threshold][x=30|Hit Threshold][x=60|Crit Threshold]
-          [x=0|#graze_threshold#][x=30|#hit_threshold#][x=60|#crit_threshold#]
           
-          [x=0|Graze Multiplier][x=30|Hit Multiplier][x=60|Crit Multiplier]
-          [x=0|#graze_multiplier#][x=30|#hit_multiplier#][x=60|#crit_multiplier#]
-          [?portrait;x=75;y=-3;i=#portrait#;s=30.0|]
-          [?portrait;x=75;y=-3;i=portraits/frame;s=30.0|]]
+          [?0_damage_min;s=6;x=0;y=25|Main Hand]
+          [?0_damage_min;s=5;x=0|Damage: #0_damage_min# to #0_damage_max#
+          ][?0_armor_penetration;s=5;x=0|AP: #0_armor_penetration#
+          ][?0_accuracy;s=5;x=0|Accuracy: #0_accuracy#
+          ][?0_crit_threshold;s=5;x=0|Crit Threshold: #0_crit_threshold#
+          ][?0_hit_threshold;s=5;x=0|Hit Threshold: #0_hit_threshold#
+          ][?0_graze_threshold;s=5;x=0|Graze Threshold: #0_graze_threshold#
+          ][?0_crit_multiplier;s=5;x=0|Crit Multiplier: #0_crit_multiplier#
+          ][?0_hit_multiplier;s=5;x=0|Hit Multiplier: #0_hit_multiplier#
+          ][?0_graze_multiplier;s=5;x=0|Graze Multiplier: #0_graze_multiplier#]
+
+          [?1_damage_min;s=6;x=35;y=25|Off Hand]
+          [?1_damage_min;s=5;x=35|Damage: #1_damage_min# to #1_damage_max#
+          ][?1_armor_penetration;s=5;x=35|AP: #1_armor_penetration#
+          ][?1_accuracy;s=5;x=35|Accuracy: #1_accuracy#
+          ][?1_crit_threshold;s=5;x=35|Crit Threshold: #1_crit_threshold#
+          ][?1_hit_threshold;s=5;x=35|Hit Threshold: #1_hit_threshold#
+          ][?1_graze_threshold;s=5;x=35|Graze Threshold: #1_graze_threshold#
+          ][?1_crit_multiplier;s=5;x=35|Crit Multiplier: #1_crit_multiplier#
+          ][?1_hit_multiplier;s=5;x=35|Hit Multiplier: #1_hit_multiplier#
+          ][?1_graze_multiplier;s=5;x=35|Graze Multiplier: #1_graze_multiplier#]
+          [s=6;x=0;y=48|Accuracy: #accuracy#]
+          [s=4|]
+          [s=6.0;x=0|Armor: #armor#][?armor_slashing;s=6.0| (Slashing: #armor_slashing#)][?armor_piercing;s=6.0| (Piercing: #armor_piercing#)][?armor_crushing;s=6.0| (Crushing: #armor_crushing#)][?armor_acid;s=6.0| (Acid: #armor_acid#)][?armor_cold;s=6.0| (Cold: #armor_cold#)][?armor_electrical;s=6.0| (Electrical: #armor_electrical#)][?armor_fire;s=6.0| (Fire: #armor_fire#)][?armor_sonic;s=6.0| (Sonic: #armor_sonic#)]
+          [s=5|[x=0|Defense: #defense#][x=28|Fortitude: #fortitude#][x=56|Reflex: #reflex#][x=84|Will: #will#]]
+
+          [s=6;y=70|[x=0|Strength][x=30|#str#]
+               [x=0|Dexterity][x=30|#dex#]
+               [x=0|Endurance][x=30|#end#]
+               [x=0|Perception][x=30|#per#]
+               [x=0|Intellect][x=30|#int#]
+               [x=0|Wisdom][x=30|#wis#]]
+          
+          [y=70;x=60;s=5|Range[x=90|#reach#]]
+          [x=60;s=5|Initiative[x=90|#initiative#]]
+          [x=60;s=5|Movement Rate[x=90|#movement_rate#]]
+          [x=60;s=5|Flanking Angle[x=90|#flanking_angle#]]
+          [x=60;s=5|Concealment[x=90|#concealment#]]
+          [x=60;s=5|Concealment Ignore[x=90|#concealment_ignore#]]
+          
+          [y=100;x=0|Graze][x=20|Hit][x=40|Crit]
+          [x=0|#graze_threshold# / x#graze_multiplier#][x=20|#hit_threshold# / x#hit_multiplier#][x=40|#crit_threshold# /  x#crit_multiplier#]
+
+          [?portrait;x=64;y=-3;i=#portrait#;s=40.0|]
+          [?portrait;x=64;y=-3;i=portraits/frame;s=40.0|]]
       level_up:
         from: .button
         text: "Level Up"
         text_params:
-          scale: 6.0
+          scale: 7.0
         x_relative: Max
-        preferred_size: [25, 8]
-        position: [-4, 1]
+        preferred_size: [25, 6]
+        position: [-4, 2]
   race_pane:
     preferred_size: [40, 40]
     background: bg_base
@@ -593,23 +593,23 @@ children:
         from: .text_area
         border: [2, 2, 2, 2]
         text: |
-          [s=6|#name#]
-          [s=6|]
-          [s=5|Attribute Bonuses]
+          [s=9|#name#]
+          [s=9|]
+          [s=7|Attribute Bonuses]
           [?str|Strength: #str#
           ][?dex|Dexterity: #dex#
           ][?end|Endurance: #end#
           ][?per|Perception: #per#
           ][?int|Intelligence: #int#
-          ][?wis|Wisdom: #wis#]
-          
-          [s=5|Base Stats]
-          [?initiative|[s=4.0|Initiative: #initiative#]
-          ][?accuracy|[s=4.0|Accuracy: #accuracy#]
-          ][?defense|[s=4.0|Defense: #defense#]
-          ][?fortitude|[s=4.0|Fortitude: #fortitude#]
-          ][?reflex|[s=4.0|Reflex: #reflex#]
-          ][?will|[s=4.0|Will: #will#]
+          ][?wis|Wisdom: #wis#
+          ]
+          [s=7|Base Stats]
+          [?initiative|[s=6.0|Initiative: #initiative#]
+          ][?accuracy|[s=6.0|Accuracy: #accuracy#]
+          ][?defense|[s=6.0|Defense: #defense#]
+          ][?fortitude|[s=6.0|Fortitude: #fortitude#]
+          ][?reflex|[s=6.0|Reflex: #reflex#]
+          ][?will|[s=6.0|Will: #will#]
           ]
           #description#
         width_relative: Max
@@ -624,19 +624,19 @@ children:
         width_relative: Max
         height_relative: Max
         text: |
-          [s=6|#name#][?prereqs_not_met;c=f00|  Prereqs not Met][?owned_level;c=0f0|  Owned - Level #owned_level#]
-          [s=6|]
-          [?active;s=5;c=f00|Active - AP: #activate_ap#
-          [s=4;c=fff|[?duration|Duration: #duration# Rounds][?mode|Mode][?instant|Duration: Instantaneous]
-          ][?cooldown;s=4;c=fff|Cooldown: #cooldown# Rounds]
-          ][?passive;s=5;c=0ff|Passive]
-          [s=4|#description#]
-          [?upgrade1|[s=5|Level 2]
-          [s=4|#upgrade1#]
-          ][?upgrade2|[s=5|Level 3]
-          [s=4|#upgrade2#]
-          ][?upgrade3|[s=5|Level 4]
-          [s=4|#upgrade3#]
+          [s=8|#name#][?prereqs_not_met;c=f00|  Prereqs not Met][?owned_level;c=0f0|  Owned - Level #owned_level#]
+          [s=9|]
+          [?active;s=7;c=f00|Active - AP: #activate_ap#
+          [s=6;c=fff|[?duration|Duration: #duration# Rounds][?mode|Mode][?instant|Duration: Instantaneous]
+          ][?cooldown;s=6;c=fff|Cooldown: #cooldown# Rounds]
+          ][?passive;s=7;c=0ff|Passive]
+          #description#
+          [?upgrade1|[s=6|Level 2]
+          [s=5|#upgrade1#]
+          ][?upgrade2|[s=6|Level 3]
+          [s=5|#upgrade2#]
+          ][?upgrade3|[s=6|Level 4]
+          [s=5|#upgrade3#]
           ][?ability_group_0|#ability_group_0# ability uses per encounter: #ability_group_0_uses_per_encounter#
           ][?ability_group_1|#ability_group_1# ability uses per encounter: #ability_group_1_uses_per_encounter#
           ][?ability_group_2|#ability_group_2# ability uses per encounter: #ability_group_2_uses_per_encounter#
@@ -647,44 +647,44 @@ children:
           ][?int|Intelligence: #int#
           ][?wis|Wisdom: #wis#
           ][?bonus_ap|AP: #bonus_ap#
-          ][?min_damage|[s=4.0|Damage: #min_damage# to #max_damage# [c=f00|#damage_kind#]]
-          ][?armor_penetration|[s=4.0|Armor Penetration: #armor_penetration#]
-          ][?attack_min_bonus_damage|[s=4.0|Damage: #attack_min_bonus_damage# to #attack_max_bonus_damage# [?attack_bonus_damage_kind;c=f00|#attack_bonus_damage_kind#]]
-          ][?attack_accuracy|[s=4.0|Accuracy: #attack_accuracy#]
-          ][?attack_crit_threshold|[s=4.0|Crit Threshold: #attack_crit_threshold#]
-          ][?attack_hit_threshold|[s=4.0|Hit Threshold: #attack_hit_threshold#]
-          ][?attack_graze_threshold|[s=4.0|Graze Threshold: #attack_graze_threshold#]
-          ][?attack_crit_multiplier|[s=4.0|Crit Multiplier: #attack_crit_multiplier#]
-          ][?attack_hit_multiplier|[s=4.0|Hit Multiplier: #attack_hit_multiplier#]
-          ][?attack_graze_multiplier|[s=4.0|Graze Multiplier: #attack_graze_multiplier#]
-          ][?min_bonus_damage_0|[s=4.0|Damage: #min_bonus_damage_0# to #max_bonus_damage_0# [?bonus_damage_kind_0;c=f00|#bonus_damage_kind_0#]]
-          ][?min_bonus_damage_1|[s=4.0|Damage: #min_bonus_damage_1# to #max_bonus_damage_1# [?bonus_damage_kind_0;c=f00|#bonus_damage_kind_1#]]
-          ][?min_bonus_damage_2|[s=4.0|Damage: #min_bonus_damage_2# to #max_bonus_damage_2# [?bonus_damage_kind_0;c=f00|#bonus_damage_kind_2#]]
-          ][?reach|[s=4.0|Reach: #reach#]
-          ][?range|[s=4.0|Range: #range#]
-          ][?bonus_reach|[s=4.0|Reach: #bonus_reach#]
-          ][?bonus_range|[s=4.0|Range: #bonus_range#]
-          ][?armor|[s=4.0|Armor: #armor#][?armor_slashing;s=3.0| (Slashing: #armor_slashing#)][?armor_piercing;s=3.0| (Piercing: #armor_piercing#)][?armor_crushing;s=3.0| (Crushing: #armor_crushing#)][?armor_acid;s=3.0| (Acid: #armor_acid#)][?armor_cold;s=3.0| (Cold: #armor_cold#)][?armor_electrical;s=3.0| (Electrical: #armor_electrical#)][?armor_fire;s=3.0| (Fire: #armor_fire#)][?armor_sonic;s=3.0| (Sonic: #armor_sonic#)]
-          ][?initiative|[s=4.0|Initiative: #initiative#]
-          ][?hit_points|[s=4.0|Hit Points: #hit_points#]
-          ][?accuracy|[s=4.0|Accuracy: #accuracy#]
-          ][?defense|[s=4.0|Defense: #defense#]
-          ][?fortitude|[s=4.0|Fortitude: #fortitude#]
-          ][?reflex|[s=4.0|Reflex: #reflex#]
-          ][?will|[s=4.0|Will: #will#]
-          ][?concealment|[s=4.0|Concealment: #concealment#]
-          ][?concealment_ignore|[s=4.0|Ignore Concealment: #concealment_ignore#]
-          ][?crit_threshold|[s=4.0|Crit Threshold: #crit_threshold#]
-          ][?hit_threshold|[s=4.0|Hit Threshold: #hit_threshold#]
-          ][?graze_threshold|[s=4.0|Graze Threshold: #graze_threshold#]
-          ][?crit_multiplier|[s=4.0|Crit Multiplier: #crit_multiplier#]
-          ][?hit_multiplier|[s=4.0|Hit Multiplier: #hit_multiplier#]
-          ][?graze_multiplier|[s=4.0|Graze Multiplier: #graze_multiplier#]
-          ][?movement_rate|[s=4.0|Movement Rate: #movement_rate#]
-          ][?attack_cost|[s=4.0|Attack Cost: #attack_cost#]
-          ][?flanking_angle|[s=4.0|Flanking Angle: #flanking_angle#]
-          ][?prereqs|[s=5|]
-          [s=5;c=f00|Prereqs]
+          ][?min_damage|[s=6.0|Damage: #min_damage# to #max_damage# [c=f00|#damage_kind#]]
+          ][?armor_penetration|[s=6.0|Armor Penetration: #armor_penetration#]
+          ][?attack_min_bonus_damage|[s=6.0|Damage: #attack_min_bonus_damage# to #attack_max_bonus_damage# [?attack_bonus_damage_kind;c=f00|#attack_bonus_damage_kind#]]
+          ][?attack_accuracy|[s=6.0|Accuracy: #attack_accuracy#]
+          ][?attack_crit_threshold|[s=6.0|Crit Threshold: #attack_crit_threshold#]
+          ][?attack_hit_threshold|[s=6.0|Hit Threshold: #attack_hit_threshold#]
+          ][?attack_graze_threshold|[s=6.0|Graze Threshold: #attack_graze_threshold#]
+          ][?attack_crit_multiplier|[s=6.0|Crit Multiplier: #attack_crit_multiplier#]
+          ][?attack_hit_multiplier|[s=6.0|Hit Multiplier: #attack_hit_multiplier#]
+          ][?attack_graze_multiplier|[s=6.0|Graze Multiplier: #attack_graze_multiplier#]
+          ][?min_bonus_damage_0|[s=6.0|Damage: #min_bonus_damage_0# to #max_bonus_damage_0# [?bonus_damage_kind_0;c=f00|#bonus_damage_kind_0#]]
+          ][?min_bonus_damage_1|[s=6.0|Damage: #min_bonus_damage_1# to #max_bonus_damage_1# [?bonus_damage_kind_0;c=f00|#bonus_damage_kind_1#]]
+          ][?min_bonus_damage_2|[s=6.0|Damage: #min_bonus_damage_2# to #max_bonus_damage_2# [?bonus_damage_kind_0;c=f00|#bonus_damage_kind_2#]]
+          ][?reach|[s=6.0|Reach: #reach#]
+          ][?range|[s=6.0|Range: #range#]
+          ][?bonus_reach|[s=6.0|Reach: #bonus_reach#]
+          ][?bonus_range|[s=6.0|Range: #bonus_range#]
+          ][?armor|[s=6.0|Armor: #armor#][?armor_slashing;s=5.0| (Slashing: #armor_slashing#)][?armor_piercing;s=5.0| (Piercing: #armor_piercing#)][?armor_crushing;s=5.0| (Crushing: #armor_crushing#)][?armor_acid;s=5.0| (Acid: #armor_acid#)][?armor_cold;s=5.0| (Cold: #armor_cold#)][?armor_electrical;s=5.0| (Electrical: #armor_electrical#)][?armor_fire;s=5.0| (Fire: #armor_fire#)][?armor_sonic;s=5.0| (Sonic: #armor_sonic#)]
+          ][?initiative|[s=6.0|Initiative: #initiative#]
+          ][?hit_points|[s=6.0|Hit Points: #hit_points#]
+          ][?accuracy|[s=6.0|Accuracy: #accuracy#]
+          ][?defense|[s=6.0|Defense: #defense#]
+          ][?fortitude|[s=6.0|Fortitude: #fortitude#]
+          ][?reflex|[s=6.0|Reflex: #reflex#]
+          ][?will|[s=6.0|Will: #will#]
+          ][?concealment|[s=6.0|Concealment: #concealment#]
+          ][?concealment_ignore|[s=6.0|Ignore Concealment: #concealment_ignore#]
+          ][?crit_threshold|[s=6.0|Crit Threshold: #crit_threshold#]
+          ][?hit_threshold|[s=6.0|Hit Threshold: #hit_threshold#]
+          ][?graze_threshold|[s=6.0|Graze Threshold: #graze_threshold#]
+          ][?crit_multiplier|[s=6.0|Crit Multiplier: #crit_multiplier#]
+          ][?hit_multiplier|[s=6.0|Hit Multiplier: #hit_multiplier#]
+          ][?graze_multiplier|[s=6.0|Graze Multiplier: #graze_multiplier#]
+          ][?movement_rate|[s=6.0|Movement Rate: #movement_rate#]
+          ][?attack_cost|[s=6.0|Attack Cost: #attack_cost#]
+          ][?flanking_angle|[s=6.0|Flanking Angle: #flanking_angle#]
+          ][?prereqs|[s=7|]
+          [s=7;c=f00|Prereqs]
           [?prereq_total_level|Level: #prereq_total_level#
           ][?prereq_race|Race: #prereq_race#
           ][?prereq_class_0|#prereq_class_0#: #prereq_level_0#
@@ -702,7 +702,6 @@ children:
           ][?prereq_ability_3|Ability: #prereq_ability_3#
           ][?prereq_ability_4|Ability: #prereq_ability_4#
           ]]
-          
   class_pane:
     preferred_size: [40, 40]
     background: bg_base
@@ -712,9 +711,9 @@ children:
         from: .text_area
         border: [2, 2, 2, 2]
         text: |
-          [s=6|#name#]
-          [s=6|]
-          [s=5|Bonuses per Level]
+          [s=9|#name#]
+          [s=9|]
+          [s=7|Bonuses per Level]
           [?ability_group_0|#ability_group_0# ability uses per encounter: #ability_group_0_uses_per_encounter#
           ][?ability_group_1|#ability_group_1# ability uses per encounter: #ability_group_1_uses_per_encounter#
           ][?ability_group_2|#ability_group_2# ability uses per encounter: #ability_group_2_uses_per_encounter#
@@ -725,17 +724,17 @@ children:
           ][?int|Intelligence: #int#
           ][?wis|Wisdom: #wis#
           ][?bonus_ap|AP: #bonus_ap#
-          ][?min_bonus_damage_0|[s=4.0|Damage: #min_bonus_damage_0# to #max_bonus_damage_0# [?bonus_damage_kind_0;c=f00|#bonus_damage_kind_0#]]
-          ][?bonus_reach|[s=4.0|Reach: #bonus_reach#]
-          ][?bonus_range|[s=4.0|Range: #bonus_range#]
-          ][?armor|[s=4.0|Armor: #armor#][?armor_slashing;s=3.0| (Slashing: #armor_slashing#)][?armor_piercing;s=3.0| (Piercing: #armor_piercing#)][?armor_crushing;s=3.0| (Crushing: #armor_crushing#)][?armor_acid;s=3.0| (Acid: #armor_acid#)][?armor_cold;s=3.0| (Cold: #armor_cold#)][?armor_electrical;s=3.0| (Electrical: #armor_electrical#)][?armor_fire;s=3.0| (Fire: #armor_fire#)][?armor_sonic;s=3.0| (Sonic: #armor_sonic#)]
-          ][?hit_points|[s=4.0|Hit Points: #hit_points#]
-          ][?accuracy|[s=4.0|Accuracy: #accuracy#]
-          ][?defense|[s=4.0|Defense: #defense#]
-          ][?fortitude|[s=4.0|Fortitude: #fortitude#]
-          ][?reflex|[s=4.0|Reflex: #reflex#]
-          ][?will|[s=4.0|Will: #will#]
-          ][?initiative|[s=4.0|Initiative: #initiative#]
+          ][?min_bonus_damage_0|[s=6.0|Damage: #min_bonus_damage_0# to #max_bonus_damage_0# [?bonus_damage_kind_0;c=f00|#bonus_damage_kind_0#]]
+          ][?bonus_reach|[s=6.0|Reach: #bonus_reach#]
+          ][?bonus_range|[s=6.0|Range: #bonus_range#]
+          ][?armor|[s=6.0|Armor: #armor#][?armor_slashing;s=5.0| (Slashing: #armor_slashing#)][?armor_piercing;s=5.0| (Piercing: #armor_piercing#)][?armor_crushing;s=5.0| (Crushing: #armor_crushing#)][?armor_acid;s=5.0| (Acid: #armor_acid#)][?armor_cold;s=5.0| (Cold: #armor_cold#)][?armor_electrical;s=5.0| (Electrical: #armor_electrical#)][?armor_fire;s=5.0| (Fire: #armor_fire#)][?armor_sonic;s=5.0| (Sonic: #armor_sonic#)]
+          ][?hit_points|[s=6.0|Hit Points: #hit_points#]
+          ][?accuracy|[s=6.0|Accuracy: #accuracy#]
+          ][?defense|[s=6.0|Defense: #defense#]
+          ][?fortitude|[s=6.0|Fortitude: #fortitude#]
+          ][?reflex|[s=6.0|Reflex: #reflex#]
+          ][?will|[s=6.0|Will: #will#]
+          ][?initiative|[s=6.0|Initiative: #initiative#]
           ]
           #description#
         width_relative: Max
@@ -774,7 +773,7 @@ children:
         from: .button
         preferred_size: [25, 10]
         text_params:
-          scale: 5.5
+          scale: 7.0
       back:
         from: .in_game_menu.button
         text: "Back to Game"
@@ -800,10 +799,10 @@ children:
   bonus_text:
     from: .text_area
     text: |
-      [s=5.0;c=0ff|#name#]
+      [s=7.0;c=0ff|#name#]
       [?active_mode;c=f00|Active Mode
       ][?total_duration;c=f00|#remaining_duration# of #total_duration# Rounds Remaining
-      ][?prof_not_met;s=4.0;c=f00|Proficiency Not Met
+      ][?prof_not_met;s=6.0;c=f00|Proficiency Not Met
       ][?ability_group_0|#ability_group_0# ability uses per encounter: #ability_group_0_uses_per_encounter#
       ][?ability_group_1|#ability_group_1# ability uses per encounter: #ability_group_1_uses_per_encounter#
       ][?ability_group_2|#ability_group_2# ability uses per encounter: #ability_group_2_uses_per_encounter#
@@ -814,48 +813,48 @@ children:
       ][?int|Intelligence: #int#
       ][?wis|Wisdom: #wis#
       ][?bonus_ap|AP: #bonus_ap#
-      ][?min_damage|[s=4.0|Damage: #min_damage# to #max_damage# [c=f00|#damage_kind#]]
-      ][?armor_penetration|[s=4.0|Armor Penetration: #armor_penetration#]
-      ][?attack_min_bonus_damage|[s=4.0|Damage: #attack_min_bonus_damage# to #attack_max_bonus_damage# [?attack_bonus_damage_kind;c=f00|#attack_bonus_damage_kind#]]
-      ][?attack_accuracy|[s=4.0|Accuracy: #attack_accuracy#]
-      ][?attack_crit_threshold|[s=4.0|Crit Threshold: #attack_crit_threshold#]
-      ][?attack_hit_threshold|[s=4.0|Hit Threshold: #attack_hit_threshold#]
-      ][?attack_graze_threshold|[s=4.0|Graze Threshold: #attack_graze_threshold#]
-      ][?attack_crit_multiplier|[s=4.0|Crit Multiplier: #attack_crit_multiplier#]
-      ][?attack_hit_multiplier|[s=4.0|Hit Multiplier: #attack_hit_multiplier#]
-      ][?attack_graze_multiplier|[s=4.0|Graze Multiplier: #attack_graze_multiplier#]
-      ][?min_bonus_damage_0|[s=4.0|Damage: #min_bonus_damage_0# to #max_bonus_damage_0# [?bonus_damage_kind_0;c=f00|#bonus_damage_kind_0#]]
-      ][?min_bonus_damage_1|[s=4.0|Damage: #min_bonus_damage_1# to #max_bonus_damage_1# [?bonus_damage_kind_0;c=f00|#bonus_damage_kind_1#]]
-      ][?min_bonus_damage_2|[s=4.0|Damage: #min_bonus_damage_2# to #max_bonus_damage_2# [?bonus_damage_kind_0;c=f00|#bonus_damage_kind_2#]]
-      ][?reach|[s=4.0|Reach: #reach#]
-      ][?range|[s=4.0|Range: #range#]
-      ][?bonus_reach|[s=4.0|Reach: #bonus_reach#]
-      ][?bonus_range|[s=4.0|Range: #bonus_range#]
-      ][?armor|[s=4.0|Armor: #armor#][?armor_slashing;s=3.0| (Slashing: #armor_slashing#)][?armor_piercing;s=3.0| (Piercing: #armor_piercing#)][?armor_crushing;s=3.0| (Crushing: #armor_crushing#)][?armor_acid;s=3.0| (Acid: #armor_acid#)][?armor_cold;s=3.0| (Cold: #armor_cold#)][?armor_electrical;s=3.0| (Electrical: #armor_electrical#)][?armor_fire;s=3.0| (Fire: #armor_fire#)][?armor_sonic;s=3.0| (Sonic: #armor_sonic#)]
-      ][?initiative|[s=4.0|Initiative: #initiative#]
-      ][?hit_points|[s=4.0|Hit Points: #hit_points#]
-      ][?accuracy|[s=4.0|Accuracy: #accuracy#]
-      ][?defense|[s=4.0|Defense: #defense#]
-      ][?fortitude|[s=4.0|Fortitude: #fortitude#]
-      ][?reflex|[s=4.0|Reflex: #reflex#]
-      ][?will|[s=4.0|Will: #will#]
-      ][?concealment|[s=4.0|Concealment: #concealment#]
-      ][?concealment_ignore|[s=4.0|Ignore Concealment: #concealment_ignore#]
-      ][?crit_threshold|[s=4.0|Crit Threshold: #crit_threshold#]
-      ][?hit_threshold|[s=4.0|Hit Threshold: #hit_threshold#]
-      ][?graze_threshold|[s=4.0|Graze Threshold: #graze_threshold#]
-      ][?crit_multiplier|[s=4.0|Crit Multiplier: #crit_multiplier#]
-      ][?hit_multiplier|[s=4.0|Hit Multiplier: #hit_multiplier#]
-      ][?graze_multiplier|[s=4.0|Graze Multiplier: #graze_multiplier#]
-      ][?movement_rate|[s=4.0|Movement Rate: #movement_rate#]
-      ][?attack_cost|[s=4.0|Attack Cost: #attack_cost#]
-      ][?flanking_angle|[s=4.0|Flanking Angle: #flanking_angle#]
-      ][?move_disabled|[s=4.0|Movement Disabled]
-      ][?attack_disabled|[s=4.0|Attack Disabled]
-      ][?hidden|[s=4.0|Hidden]
-      ][?price;s=3.5|
+      ][?min_damage|[s=6.0|Damage: #min_damage# to #max_damage# [c=f00|#damage_kind#]]
+      ][?armor_penetration|[s=6.0|Armor Penetration: #armor_penetration#]
+      ][?attack_min_bonus_damage|[s=6.0|Damage: #attack_min_bonus_damage# to #attack_max_bonus_damage# [?attack_bonus_damage_kind;c=f00|#attack_bonus_damage_kind#]]
+      ][?attack_accuracy|[s=6.0|Accuracy: #attack_accuracy#]
+      ][?attack_crit_threshold|[s=6.0|Crit Threshold: #attack_crit_threshold#]
+      ][?attack_hit_threshold|[s=6.0|Hit Threshold: #attack_hit_threshold#]
+      ][?attack_graze_threshold|[s=6.0|Graze Threshold: #attack_graze_threshold#]
+      ][?attack_crit_multiplier|[s=6.0|Crit Multiplier: #attack_crit_multiplier#]
+      ][?attack_hit_multiplier|[s=6.0|Hit Multiplier: #attack_hit_multiplier#]
+      ][?attack_graze_multiplier|[s=6.0|Graze Multiplier: #attack_graze_multiplier#]
+      ][?min_bonus_damage_0|[s=6.0|Damage: #min_bonus_damage_0# to #max_bonus_damage_0# [?bonus_damage_kind_0;c=f00|#bonus_damage_kind_0#]]
+      ][?min_bonus_damage_1|[s=6.0|Damage: #min_bonus_damage_1# to #max_bonus_damage_1# [?bonus_damage_kind_0;c=f00|#bonus_damage_kind_1#]]
+      ][?min_bonus_damage_2|[s=6.0|Damage: #min_bonus_damage_2# to #max_bonus_damage_2# [?bonus_damage_kind_0;c=f00|#bonus_damage_kind_2#]]
+      ][?reach|[s=6.0|Reach: #reach#]
+      ][?range|[s=6.0|Range: #range#]
+      ][?bonus_reach|[s=6.0|Reach: #bonus_reach#]
+      ][?bonus_range|[s=6.0|Range: #bonus_range#]
+      ][?armor|[s=6.0|Armor: #armor#][?armor_slashing;s=5.0| (Slashing: #armor_slashing#)][?armor_piercing;s=5.0| (Piercing: #armor_piercing#)][?armor_crushing;s=5.0| (Crushing: #armor_crushing#)][?armor_acid;s=5.0| (Acid: #armor_acid#)][?armor_cold;s=5.0| (Cold: #armor_cold#)][?armor_electrical;s=5.0| (Electrical: #armor_electrical#)][?armor_fire;s=5.0| (Fire: #armor_fire#)][?armor_sonic;s=5.0| (Sonic: #armor_sonic#)]
+      ][?initiative|[s=6.0|Initiative: #initiative#]
+      ][?hit_points|[s=6.0|Hit Points: #hit_points#]
+      ][?accuracy|[s=6.0|Accuracy: #accuracy#]
+      ][?defense|[s=6.0|Defense: #defense#]
+      ][?fortitude|[s=6.0|Fortitude: #fortitude#]
+      ][?reflex|[s=6.0|Reflex: #reflex#]
+      ][?will|[s=6.0|Will: #will#]
+      ][?concealment|[s=6.0|Concealment: #concealment#]
+      ][?concealment_ignore|[s=6.0|Ignore Concealment: #concealment_ignore#]
+      ][?crit_threshold|[s=6.0|Crit Threshold: #crit_threshold#]
+      ][?hit_threshold|[s=6.0|Hit Threshold: #hit_threshold#]
+      ][?graze_threshold|[s=6.0|Graze Threshold: #graze_threshold#]
+      ][?crit_multiplier|[s=6.0|Crit Multiplier: #crit_multiplier#]
+      ][?hit_multiplier|[s=6.0|Hit Multiplier: #hit_multiplier#]
+      ][?graze_multiplier|[s=6.0|Graze Multiplier: #graze_multiplier#]
+      ][?movement_rate|[s=6.0|Movement Rate: #movement_rate#]
+      ][?attack_cost|[s=6.0|Attack Cost: #attack_cost#]
+      ][?flanking_angle|[s=6.0|Flanking Angle: #flanking_angle#]
+      ][?move_disabled|[s=6.0|Movement Disabled]
+      ][?attack_disabled|[s=6.0|Attack Disabled]
+      ][?hidden|[s=6.0|Hidden]
+      ][?price;s=5.5|
       Price: [c=f00|#price#] Gold
-      ][!price;?value;s=3.5|
+      ][!price;?value;s=5.5|
       Value: [c=f00|#value#] Gold
-      ][?weight;s=3.5|Weight: [c=f00|#weight#] lbs]
+      ][?weight;s=5.5|Weight: [c=f00|#weight#] lbs]
 ...

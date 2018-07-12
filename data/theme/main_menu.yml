@@ -5,7 +5,7 @@ children:
       title:
         from: .label
         text_params:
-          scale: 8
+          scale: 12
         text: "Sulis"
         preferred_size: [40, 10]
         x_relative: Center
@@ -13,7 +13,7 @@ children:
       module_title:
         from: .label
         text_params:
-          scale: 7
+          scale: 10
         text: "#module#"
         preferred_size: [100, 10]
         x_relative: Center
@@ -22,7 +22,7 @@ children:
         from: .button
         preferred_size: [42, 12]
         text_params:
-          scale: 5
+          scale: 7
         x_relative: Center
       module:
         from: .main_menu.button
@@ -87,7 +87,7 @@ children:
       title:
         from: .label
         text_params:
-          scale: 8
+          scale: 10
         text: "Select a Character"
         x_relative: Center
         preferred_size: [40, 10]
@@ -95,7 +95,7 @@ children:
       characters_title:
         from: .label
         text_params:
-          scale: 6
+          scale: 9
           horizontal_alignment: Left
         text: "Available Characters"
         x_relative: Center
@@ -134,7 +134,7 @@ children:
         from: .button
         text: "Play"
         text_params:
-          scale: 6
+          scale: 9
         x_relative: Center
         y_relative: Max
         position: [-30, -5]
@@ -153,16 +153,16 @@ children:
       title:
         from: .label
         text_params:
-          scale: 8.0
+          scale: 10.0
         text: "Select a Module"
         x_relative: Center
         preferred_size: [40, 10]
-        position: [0, 10]
+        position: [0, 0]
       play_button:
         from: .button
         text: "Select"
         text_params:
-          scale: 6.0
+          scale: 9.0
           vertical_alignment: Center
         preferred_size: [40, 10]
         x_relative: Center
@@ -172,21 +172,21 @@ children:
         from: .label
         text: "Available Modules"
         text_params:
-          scale: 6.0
+          scale: 9.0
         x_relative: Center
         preferred_size: [80, 10]
-        position: [-50, 30]
+        position: [-50, 10]
       modules_list:
         from: .list_box
-        preferred_size: [80, -58]
-        position: [-50, 38]
+        preferred_size: [100, -35]
+        position: [-60, 18]
         x_relative: Center
         height_relative: Max
         width_relative: Zero
         children:
           entry:
             text_params:
-              scale: 6.0
+              scale: 9.0
             preferred_size: [0, 6]
       details:
         from: .text_area
@@ -194,8 +194,8 @@ children:
         background: bg_base
         x_relative: Center
         height_relative: Max
-        preferred_size: [100, -35]
-        position: [45, 30]
+        preferred_size: [115, -15]
+        position: [50, 10]
         text: "#description#"
   loading_screen:
     background: bg_base
@@ -205,7 +205,7 @@ children:
       loading_label:
         from: .label
         text_params:
-          scale: 8.0
+          scale: 12.0
           horizontal_alignment: Center
         text: "Loading..."
         x_relative: Center

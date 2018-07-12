@@ -1,6 +1,6 @@
 Asset Location,Sub Asset Description,Sub Asset Pixel Coordinates,Author,License,License Link,Original Title,Source
 data/fonts/mono.png,,,,CC0 - Public Domain,http://creativecommons.org/publicdomain/zero/1.0/,,
-data/fonts/normal.png,,,,CC0 - Public Domain,http://creativecommons.org/publicdomain/zero/1.0/,,
+data/fonts/normal.png,,,Multiple Designers,SIL Open Font License 1.1,http://scripts.sil.org/OFL,Titillium Web,https://fonts.google.com/specimen/Titillium+Web
 data/spritesheets/abilities.png,Ability Icons,"0,0 to 1024, 256",pauliuw,CC0 - Public Domain,http://creativecommons.org/publicdomain/zero/1.0/,"Skill, Item, and Spell Icons",https://opengameart.org/content/skill-item-and-spell-icons
 data/spritesheets/abilities.png,Ability Icons,"0, 256 to 1024, 512",J. W. Bjerk,CC-BY 3.0,http://creativecommons.org/licenses/by/3.0/,Painterly Spell Icons,https://opengameart.org/content/painterly-spell-icons-part-1
 data/spritesheets/abilities.png,Ability Icons,"0, 512 to 640, 640",HorrorPen,CC-BY 3.0,http://creativecommons.org/licenses/by/3.0/,"Icons, Old Page, Sketch",https://opengameart.org/content/icons-old-page-sketch

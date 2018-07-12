@@ -212,7 +212,6 @@ impl WidgetKind for GroupPane {
 struct AbilityButton {
     entity: Rc<RefCell<EntityState>>,
     ability: Rc<Ability>,
-    hover: Option<Rc<RefCell<Widget>>>,
 }
 
 impl AbilityButton {
@@ -220,15 +219,7 @@ impl AbilityButton {
         Rc::new(RefCell::new(AbilityButton {
             ability: Rc::clone(ability),
             entity: Rc::clone(entity),
-            hover: None,
         }))
-    }
-
-    fn remove_hover(&mut self) {
-        if let Some(ref hover) = self.hover {
-            hover.borrow_mut().mark_for_removal();
-        }
-        self.hover = None;
     }
 }
 
@@ -263,18 +254,11 @@ impl WidgetKind for AbilityButton {
         vec![icon, duration_label]
     }
 
-    fn on_mouse_enter(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
-        self.super_on_mouse_enter(widget);
-
-        if self.hover.is_some() { return true; }
-
-        let root = Widget::get_root(widget);
+    fn on_mouse_move(&mut self, widget: &Rc<RefCell<Widget>>, _dx: f32, _dy: f32) -> bool {
         let hover = Widget::with_theme(TextArea::empty(), "ability_hover");
         {
             let mut hover = hover.borrow_mut();
             hover.state.disable();
-            hover.state.set_position(widget.borrow().state.inner_right(),
-                widget.borrow().state.inner_top());
 
             hover.state.add_text_arg("name", &self.ability.name);
             hover.state.add_text_arg("description", &self.ability.description);
@@ -296,23 +280,14 @@ impl WidgetKind for AbilityButton {
             }
         }
 
-        Widget::add_child_to(&root, Rc::clone(&hover));
-        self.hover = Some(hover);
+        Widget::set_mouse_over_widget(&widget, hover, widget.borrow().state.inner_right(),
+            widget.borrow().state.inner_top());
 
-        true
-    }
-
-    fn on_mouse_exit(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
-        self.super_on_mouse_exit(widget);
-
-        self.remove_hover();
         true
     }
 
     fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: event::ClickKind) -> bool {
         self.super_on_mouse_release(widget, kind);
-
-        self.remove_hover();
 
         if self.entity.borrow().actor.can_activate(&self.ability.id) {
             GameState::execute_ability_on_activate(&self.entity, &self.ability);

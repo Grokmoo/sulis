@@ -398,16 +398,21 @@ impl Widget {
         }
     }
 
-    pub fn set_mouse_over(widget: &Rc<RefCell<Widget>>, mouse_over: Rc<RefCell<WidgetKind>>,
-                          x: i32, y: i32) {
+    pub fn set_mouse_over_widget(widget: &Rc<RefCell<Widget>>, mouse_over: Rc<RefCell<Widget>>,
+                                 x: i32, y: i32) {
         let root = Widget::get_root(widget);
         Widget::remove_mouse_over(&root);
 
         trace!("Add mouse over from '{}'", widget.borrow().theme_id);
-        let child = Widget::with_theme(mouse_over, "mouse_over");
-        child.borrow_mut().state.is_mouse_over = true;
-        child.borrow_mut().state.position = Point::new(x, y);
-        Widget::add_child_to(&root, child);
+        mouse_over.borrow_mut().state.is_mouse_over = true;
+        mouse_over.borrow_mut().state.position = Point::new(x, y);
+        Widget::add_child_to(&root, mouse_over);
+    }
+
+    pub fn set_mouse_over(widget: &Rc<RefCell<Widget>>, mouse_over: Rc<RefCell<WidgetKind>>,
+                          x: i32, y: i32) {
+        let mouse_over = Widget::with_theme(mouse_over, "mouse_over");
+        Widget::set_mouse_over_widget(widget, mouse_over, x, y);
     }
 
     pub fn update(root: &Rc<RefCell<Widget>>) -> Result<(), Error> {

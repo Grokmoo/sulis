@@ -125,6 +125,10 @@ pub fn setup_logger() {
         .duplicate_error()
         .format(opt_format);
 
+    if CONFIG.logging.append {
+        logger = logger.append();
+    }
+
     if !CONFIG.logging.use_timestamps {
         logger = logger.suppress_timestamp();
     }

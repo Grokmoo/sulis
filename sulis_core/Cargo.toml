@@ -5,8 +5,8 @@ authors = ["Jared Stephen <grok_moo@yahoo.com>"]
 
 [dependencies]
 backtrace = "0.3"
-flexi_logger = "0.6"
-image = "0.18"
+flexi_logger = "0.9"
+image = "0.19"
 glium = "0.21"
 lazy_static = "1.0"
 log = "0.4"

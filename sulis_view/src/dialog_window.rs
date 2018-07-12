@@ -21,7 +21,7 @@ use std::cell::RefCell;
 use sulis_core::io::event;
 use sulis_module::{Actor, OnTrigger, MerchantData, Conversation, conversation::{Response}, Module};
 use sulis_state::{EntityState, ChangeListener, GameState};
-use sulis_core::ui::{Widget, WidgetKind, color};
+use sulis_core::ui::{Widget, WidgetKind, color, theme};
 use sulis_widgets::{Label, TextArea};
 
 use {CutsceneWindow, RootView};
@@ -66,8 +66,15 @@ impl WidgetKind for DialogWindow {
         let title = Widget::with_theme(Label::empty(), "title");
         title.borrow_mut().state.add_text_arg("name", &self.entity.borrow().actor.actor.name);
 
-        let cur_text = self.convo.text(&self.cur_node).to_string();
+        let cur_text = self.convo.text(&self.cur_node);
         let responses = self.convo.responses(&self.cur_node);
+
+        let node_widget = Widget::with_theme(self.node.clone(), "node");
+        for flag in self.entity.borrow().custom_flags() {
+            node_widget.borrow_mut().state.add_text_arg(flag, "true");
+        }
+        node_widget.borrow_mut().state.add_text_arg("player_name", &self.pc.borrow().actor.actor.name);
+        let cur_text = theme::expand_text_args(cur_text, &node_widget.borrow().state);
 
         if responses.is_empty() {
             widget.borrow_mut().mark_for_removal();
@@ -78,10 +85,6 @@ impl WidgetKind for DialogWindow {
         }
 
         self.node.borrow_mut().text = Some(cur_text);
-        let node_widget = Widget::with_theme(self.node.clone(), "node");
-        for flag in self.entity.borrow().custom_flags() {
-            node_widget.borrow_mut().state.add_text_arg(flag, "true");
-        }
 
         if let &Some(ref on_select) = self.convo.on_view(&self.cur_node) {
             activate(widget, on_select, &self.pc, &self.entity);

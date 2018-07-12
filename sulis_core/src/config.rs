@@ -65,6 +65,7 @@ pub struct EditorAreaConfig {
 pub struct LoggingConfig {
     pub log_level: String,
     pub use_timestamps: bool,
+    pub append: bool,
 }
 
 #[derive(Debug, Deserialize, Clone)]

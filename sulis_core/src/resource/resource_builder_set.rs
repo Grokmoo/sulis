@@ -181,8 +181,11 @@ fn read_file<T>(path: PathBuf, resources: &mut HashMap<String, T>,
                                  func: &Fn(&str, String, &mut HashMap<String, T>)) {
     let path_str = path.to_string_lossy().to_string();
 
-    // don't attempt to parse image fileV
-    if path_str.ends_with("png") { return; }
+    // don't attempt to parse image files
+    if !path_str.ends_with("json") && !path_str.ends_with("yml") && !path_str.ends_with("lua") {
+        trace!("Skipping file '{}' because of unrecognized extension", path_str);
+        return
+    }
 
     debug!("Reading file at {}", path_str);
     let mut file = match File::open(path) {

@@ -47,44 +47,39 @@ children:
             preferred_size: [24, 4]
             text: "Transitions"
             position: [54, 0]
-          shift_tiles:
+          mode_button:
             from: .button
             preferred_size: [24, 4]
+          shift_tiles:
+            from: .editor.top_bar.mode_button
             text: "Shift Tiles"
             position: [80, 0]
           walls:
-            from: .button
-            preferred_size: [20, 4]
+            from: .editor.top_bar.mode_button
             text: "Walls"
             position: [144, 0]
           terrain:
-            from: .button
-            preferred_size: [20, 4]
+            from: .editor.top_bar.mode_button
             text: "Terrain"
             position: [168, 0]
           tiles:
-            from: .button
-            preferred_size: [20, 4]
+            from: .editor.top_bar.mode_button
             text: "Tiles"
             position: [192, 0]
           actors:
-            from: .button
-            preferred_size: [20, 4]
+            from: .editor.top_bar.mode_button
             text: "Actors"
             position: [216, 0]
           props:
-            from: .button
-            preferred_size: [20, 4]
+            from: .editor.top_bar.mode_button
             text: "Props"
             position: [240, 0]
           elevation:
-            from: .button
-            preferred_size: [20, 4]
+            from: .editor.top_bar.mode_button
             text: "Elevation"
             position: [264, 0]
           encounters:
-            from: .button
-            preferred_size: [20, 4]
+            from: .editor.top_bar.mode_button
             text: "Encounters"
             position: [288, 0]
       area_editor:
@@ -257,6 +252,8 @@ children:
               layer_button:
                 from: .button
                 text: "#0#"
+                text_params:
+                  scale: 4.0
                 preferred_size: [16, 4]
           tiles_content:
             height_relative: Max

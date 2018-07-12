@@ -62,6 +62,9 @@ pub use self::dialog_window::DialogWindow;
 mod entity_mouseover;
 pub use self::entity_mouseover::EntityMouseover;
 
+mod game_over_window;
+pub use self::game_over_window::GameOverWindow;
+
 mod in_game_menu;
 pub use self::in_game_menu::InGameMenu;
 
@@ -341,7 +344,7 @@ impl WidgetKind for RootView {
         }
     }
 
-    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         debug!("Adding to root widget.");
 
         let area_widget = Widget::with_defaults(AreaView::new());
@@ -405,15 +408,18 @@ impl WidgetKind for RootView {
                                     log_button, men_button, abilities, portrait_pane]);
         }
 
-        for pc in GameState::party() {
-            pc.borrow_mut().actor.listeners.add(ChangeListener::new(NAME, Box::new(move |_pc| {
-                // TODO handle party death
-                // if pc.is_dead() {
-                //     let menu = Widget::with_defaults(GameOverMenu::new());
-                //     Widget::add_child_to(&widget_ref, menu);
-                // }
-            })));
-        }
+        let widget_ref = Rc::clone(widget);
+        let pc = GameState::player();
+        pc.borrow_mut().actor.listeners.add(ChangeListener::new(NAME, Box::new(move |pc| {
+            if !pc.is_dead() { return; }
+            let menu_cb = Callback::new(Rc::new(|widget, _| {
+                let root = Widget::get_root(widget);
+                let root_view = Widget::downcast_kind_mut::<RootView>(&root);
+                root_view.next_step = Some(NextGameStep::MainMenu);
+            }));
+            let menu = Widget::with_defaults(GameOverWindow::new(menu_cb));
+            Widget::add_child_to(&widget_ref, menu);
+        })));
 
         let ap_bar = Widget::with_defaults(ApBar::new(GameState::player()));
 

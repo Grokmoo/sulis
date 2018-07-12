@@ -165,7 +165,10 @@ impl Theme {
     /// stored in the WidgetState.  See `WidgetState#add_text_arg` and
     /// `expand_text_args`
     pub fn apply_text(&self, state: &mut WidgetState) {
-        let out = expand_text_args(&self.text, state);
+        let out = match self.text {
+            None => String::new(),
+            Some(ref text) => expand_text_args(text, state),
+        };
 
         state.set_text_content(out);
     }
@@ -175,7 +178,11 @@ impl Theme {
     /// and `expand_text_args`
     pub fn apply_foreground(&self, state: &mut WidgetState) {
         if self.foreground.is_some() {
-            let out = expand_text_args(&self.foreground, state);
+
+            let out = match self.foreground {
+                None => return,
+                Some(ref text) => expand_text_args(text, state),
+            };
             if out.is_empty() { return; }
 
             match ResourceSet::get_image(&out) {
@@ -205,12 +212,7 @@ impl Theme {
 /// surrounded by `#` before and after.  A `##` produces just one `#` in the output.
 /// For example, if the text arg `name` is set to `John Doe`, then the String
 /// `Hello, #name# ##1` will be expanded to `Hello, John Doe #1`
-pub fn expand_text_args(text: &Option<String>, state: &WidgetState) -> String {
-    let text = match text {
-        &None => return String::new(),
-        &Some(ref text) => text,
-    };
-
+pub fn expand_text_args(text: &str, state: &WidgetState) -> String {
     let mut out = String::new();
     let mut cur_arg = String::new();
     let mut arg_accum = false;

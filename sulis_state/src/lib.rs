@@ -350,6 +350,45 @@ impl GameState {
         STATE.with(|s| s.borrow().as_ref().unwrap().selected.clone())
     }
 
+    pub fn remove_party_member(entity: Rc<RefCell<EntityState>>) {
+        info!("Remove party member {}", entity.borrow().actor.actor.id);
+        STATE.with(|state| {
+            let mut state = state.borrow_mut();
+            let state = state.as_mut().unwrap();
+
+            entity.borrow_mut().set_party_member(false);
+            state.party.retain(|e| !Rc::ptr_eq(e, &entity));
+
+            state.selected.retain(|e| !Rc::ptr_eq(e, &entity));
+
+            let entity = match state.selected.first() {
+                None => None,
+                Some(ref entity) => Some(Rc::clone(entity)),
+            };
+            state.party_listeners.notify(&entity);
+        })
+    }
+
+    pub fn remove_dead_party_members() {
+        STATE.with(|state| {
+            let mut state = state.borrow_mut();
+            let state = state.as_mut().unwrap();
+
+            let cur_lens = (state.party.len(), state.selected.len());
+            state.party.retain(|e| !e.borrow().actor.is_dead());
+            state.selected.retain(|e| !e.borrow().actor.is_dead());
+
+            if state.party.len() != cur_lens.0 || state.selected.len() != cur_lens.1 {
+                info!("Removed a dead party member; notifying listeners");
+                let entity = match state.selected.first() {
+                    None => None,
+                    Some(ref entity) => Some(Rc::clone(entity)),
+                };
+                state.party_listeners.notify(&entity);
+            }
+        });
+    }
+
     pub fn add_party_member(entity: Rc<RefCell<EntityState>>) {
         info!("Add party member {}", entity.borrow().actor.actor.id);
         STATE.with(|state| {
@@ -697,16 +736,14 @@ impl GameState {
             let mut area_state = state.area_state.borrow_mut();
 
             let (cbs, active_entity) = area_state.update(millis);
-            // TODO check for whole party death
-            // if state.selected.borrow().actor.is_dead() {
-            //     area_state.turn_timer.set_active(false);
-            // }
 
             match active_entity {
                 None => (cbs, None),
                 Some(ref entity) => (cbs, Some(Rc::clone(entity))),
             }
         });
+
+        GameState::remove_dead_party_members();
 
         cbs.iter().for_each(|cb| cb.on_round_elapsed());
 

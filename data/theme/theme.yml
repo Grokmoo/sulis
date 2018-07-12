@@ -286,7 +286,7 @@ children:
     y_relative: Max
     width_relative: Zero
     height_relative: Zero
-    preferred_size: [150, 50]
+    preferred_size: [150, 60]
     children:
       title:
         text: "#name#"
@@ -739,6 +739,30 @@ children:
           #description#
         width_relative: Max
         height_relative: Max
+  game_over_window:
+    background: bg_base
+    border: [1, 1, 1, 1]
+    preferred_size: [60, 28]
+    x_relative: Center
+    y_relative: Center
+    position: [0, -20]
+    children:
+      title:
+        from: .label
+        width_relative: Max
+        preferred_size: [0, 4]
+        position: [0, 3]
+        text_params:
+          scale: 7
+        text: "You have died!"
+      exit:
+        from: .button
+        preferred_size: [36, 12]
+        text: "Main Menu"
+        text_params:
+          scale: 7
+        position: [0, 11]
+        x_relative: Center
   exit_confirmation:
     from: .confirmation_window
     children:

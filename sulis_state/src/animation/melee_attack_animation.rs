@@ -21,7 +21,7 @@ use std::time::Instant;
 use sulis_rules::HitKind;
 use sulis_core::util;
 use sulis_core::ui::{Color, Widget};
-use {ScriptEntitySet, ScriptCallback};
+use {script::ScriptEntitySet, ScriptCallback};
 use {animation, EntityState, GameState};
 
 pub struct MeleeAttackAnimation {

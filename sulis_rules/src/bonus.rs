@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use sulis_core::util::ExtInt;
 use {Attribute, Damage, DamageKind, ArmorKind, Slot, WeaponKind, WeaponStyle};
 
 #[derive(Deserialize, Debug, Clone)]
@@ -50,7 +51,7 @@ pub enum BonusKind {
     MoveDisabled,
     AttackDisabled,
     Hidden,
-    GroupUsesPerEncounter { group: String, amount: u32 },
+    GroupUsesPerEncounter { group: String, amount: ExtInt },
 }
 
 #[derive(Deserialize, Debug, Clone, Copy)]

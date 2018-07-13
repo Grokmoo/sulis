@@ -20,6 +20,8 @@ pub use self::point::Point;
 pub mod size;
 pub use self::size::Size;
 
+use std::ops::*;
+use std::fmt;
 use std::rc::Rc;
 use std::cell::RefCell;
 use std::io::{Error, ErrorKind};
@@ -33,6 +35,85 @@ use flexi_logger::{Logger, opt_format};
 use config::{self, CONFIG};
 use ui::Widget;
 use io::{IO, MainLoopUpdater};
+
+#[derive(Deserialize, Serialize, Debug, Clone, Copy)]
+#[serde(deny_unknown_fields)]
+#[serde(untagged)]
+pub enum ExtInt {
+    Int(u32),
+    Infinity,
+}
+
+impl ExtInt {
+    pub fn is_zero(&self) -> bool {
+        match self {
+            ExtInt::Int(amount) => *amount == 0,
+            ExtInt::Infinity => false,
+        }
+    }
+
+    pub fn is_infinite(&self) -> bool {
+        match self {
+            ExtInt::Int(_) => false,
+            ExtInt::Infinity => true,
+        }
+    }
+}
+
+impl fmt::Display for ExtInt {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            ExtInt::Int(amount) => write!(f, "{}", amount),
+            ExtInt::Infinity => write!(f, "infinity"),
+        }
+    }
+}
+
+impl Mul<u32> for ExtInt {
+    type Output = ExtInt;
+    fn mul(self, other: u32) -> ExtInt {
+        match self {
+            ExtInt::Int(amount) => ExtInt::Int(amount * other),
+            ExtInt::Infinity => ExtInt::Infinity,
+        }
+    }
+}
+
+impl Add<ExtInt> for ExtInt {
+    type Output = ExtInt;
+    fn add(self, other: ExtInt) -> ExtInt {
+        match self {
+            ExtInt::Int(amount) => match other {
+                ExtInt::Int(other_amount) => ExtInt::Int(amount + other_amount),
+                ExtInt::Infinity => ExtInt::Infinity,
+            },
+            ExtInt::Infinity => ExtInt::Infinity,
+        }
+    }
+}
+
+impl Add<u32> for ExtInt {
+    type Output = ExtInt;
+    fn add(self, other: u32) -> ExtInt {
+        match self {
+            ExtInt::Int(amount) => ExtInt::Int(amount + other),
+            ExtInt::Infinity => ExtInt::Infinity,
+        }
+    }
+}
+
+impl Sub<u32> for ExtInt {
+    type Output = ExtInt;
+    fn sub(self, other: u32) -> ExtInt {
+        match self {
+            ExtInt::Int(amount) => {
+                if other > amount { ExtInt::Int(0) }
+                else { ExtInt::Int(amount - other) }
+            },
+            ExtInt::Infinity => ExtInt::Infinity,
+        }
+    }
+}
 
 pub fn invalid_data_error<T>(str: &str) -> Result<T, Error> {
     Err(Error::new(ErrorKind::InvalidData, str))

@@ -19,6 +19,7 @@ use std::rc::Rc;
 use rand::{self, Rng};
 
 use sulis_core::image::Image;
+use sulis_core::util::ExtInt;
 use {Armor, AttributeList, Attack, Damage, HitKind, WeaponKind, ArmorKind, Slot, WeaponStyle};
 use bonus::{AttackBonuses, AttackBuilder, Bonus, BonusKind, BonusList};
 
@@ -64,7 +65,7 @@ pub struct StatList {
     pub move_disabled: bool,
     pub attack_disabled: bool,
     pub hidden: bool,
-    group_uses_per_encounter: HashMap<String, u32>,
+    group_uses_per_encounter: HashMap<String, ExtInt>,
 }
 
 impl StatList {
@@ -108,7 +109,7 @@ impl StatList {
         }
     }
 
-    pub fn uses_per_encounter_iter(&self) -> impl Iterator<Item = (&String, &u32)> {
+    pub fn uses_per_encounter_iter(&self) -> impl Iterator<Item = (&String, &ExtInt)> {
         self.group_uses_per_encounter.iter()
     }
 
@@ -116,8 +117,8 @@ impl StatList {
         self.group_uses_per_encounter.keys().map(|k| k.to_string()).collect()
     }
 
-    pub fn uses_per_encounter(&self, ability_group: &str) -> u32 {
-        *self.group_uses_per_encounter.get(ability_group).unwrap_or(&0)
+    pub fn uses_per_encounter(&self, ability_group: &str) -> ExtInt {
+        *self.group_uses_per_encounter.get(ability_group).unwrap_or(&ExtInt::Int(0))
     }
 
     pub fn has_armor_proficiency(&self, prof: ArmorKind) -> bool {
@@ -172,13 +173,15 @@ impl StatList {
         self.attack_range
     }
 
-    pub fn add_single_group_uses_per_encounter(&mut self, group_id: &str, uses: u32) {
-        *self.group_uses_per_encounter.entry(group_id.to_string()).or_insert(0) += uses;
+    pub fn add_single_group_uses_per_encounter(&mut self, group_id: &str, uses: ExtInt) {
+        let cur_uses = *self.group_uses_per_encounter.get(group_id).unwrap_or(&ExtInt::Int(0));
+        let new_uses = cur_uses + uses;
+        self.group_uses_per_encounter.insert(group_id.to_string(), new_uses);
     }
 
-    pub fn add_group_uses_per_encounter(&mut self, uses: &Vec<(String, u32)>, times: u32) {
+    pub fn add_group_uses_per_encounter(&mut self, uses: &Vec<(String, ExtInt)>, times: u32) {
         for (ref group_id, amount) in uses.iter() {
-            *self.group_uses_per_encounter.entry(group_id.to_string()).or_insert(0) += amount * times;
+            self.add_single_group_uses_per_encounter(group_id, *amount * times);
         }
     }
 

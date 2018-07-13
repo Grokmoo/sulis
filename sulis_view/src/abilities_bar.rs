@@ -19,11 +19,11 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_module::{actor::OwnedAbility, Ability, Module, ability::{AbilityGroup, Duration}};
-use sulis_state::{ChangeListener, EntityState, GameState};
 use sulis_core::io::event;
 use sulis_core::ui::{Widget, WidgetKind};
-use sulis_core::util::Size;
+use sulis_core::util::{Size, ExtInt};
+use sulis_module::{actor::OwnedAbility, Ability, Module, ability::{AbilityGroup, Duration}};
+use sulis_state::{ChangeListener, EntityState, GameState};
 use sulis_widgets::{Label, TextArea};
 
 pub const NAME: &str = "abilities_bar";
@@ -80,7 +80,7 @@ impl WidgetKind for AbilitiesBar {
 
         let mut groups = Vec::new();
         for (index, group_id) in Module::rules().ability_groups.iter().enumerate() {
-            if self.entity.borrow().actor.stats.uses_per_encounter(group_id) > 0 {
+            if !self.entity.borrow().actor.stats.uses_per_encounter(group_id).is_zero() {
                 groups.push(AbilityGroup { index });
             }
         }
@@ -191,7 +191,7 @@ impl WidgetKind for GroupPane {
         self.description.borrow_mut().state.clear_text_args();
 
         let total_uses = self.entity.borrow().actor.stats.uses_per_encounter(&self.group);
-        if total_uses < 100_000 {
+        if !total_uses.is_infinite() {
             self.description.borrow_mut().state.add_text_arg("total_uses", &total_uses.to_string());
         }
 
@@ -232,14 +232,13 @@ impl WidgetKind for AbilityButton {
         widget.state.set_enabled(self.entity.borrow().actor.can_toggle(&self.ability.id));
 
         if let Some(ref mut state) = self.entity.borrow_mut().actor.ability_state(&self.ability.id) {
-            let rounds = state.remaining_duration_rounds();
-
             widget.children[1].borrow_mut().state.clear_text_args();
-            if rounds == 0 {
-            } else if rounds < 100_000 {
-                widget.children[1].borrow_mut().state.add_text_arg("duration", &rounds.to_string());
-            } else {
-                widget.children[1].borrow_mut().state.add_text_arg("duration", "Active");
+            let mut child = &mut widget.children[1].borrow_mut().state;
+            match state.remaining_duration_rounds() {
+                ExtInt::Infinity => child.add_text_arg("duration", "Active"),
+                ExtInt::Int(rounds) => {
+                    if rounds != 0 { child.add_text_arg("duration", &rounds.to_string()); }
+                }
             }
         }
     }

@@ -19,7 +19,7 @@ use std::collections::HashMap;
 use std::io::Error;
 
 use sulis_core::resource::ResourceBuilder;
-use sulis_core::util::{invalid_data_error, unable_to_create_error};
+use sulis_core::util::{invalid_data_error, unable_to_create_error, ExtInt};
 use sulis_core::serde_yaml;
 use sulis_rules::{AttributeList, BonusList};
 
@@ -38,7 +38,7 @@ pub struct Kit {
 #[derive(Debug)]
 pub struct Upgrades {
     pub ability_choices: Vec<Rc<AbilityList>>,
-    pub group_uses_per_encounter: Vec<(String, Option<u32>)>,
+    pub group_uses_per_encounter: Vec<(String, ExtInt)>,
 }
 
 #[derive(Debug)]
@@ -124,7 +124,7 @@ impl Class {
     }
 
     // TODO would love to just return a ref here but we can't return a ref to an empty vec
-    pub fn group_uses_per_encounter(&self, level: u32) -> Vec<(String, Option<u32>)> {
+    pub fn group_uses_per_encounter(&self, level: u32) -> Vec<(String, ExtInt)> {
         match self.upgrades.get(&level) {
             None => Vec::new(),
             Some(upgrades) => upgrades.group_uses_per_encounter.clone(),
@@ -138,7 +138,7 @@ pub struct UpgradesBuilder {
     ability_choices: Vec<String>,
 
     #[serde(default)]
-    group_uses_per_encounter: Vec<(String, Option<u32>)>,
+    group_uses_per_encounter: Vec<(String, ExtInt)>,
 }
 
 #[derive(Deserialize, Debug)]

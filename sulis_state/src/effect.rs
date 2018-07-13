@@ -16,6 +16,7 @@
 
 use std::rc::Rc;
 
+use sulis_core::util::ExtInt;
 use sulis_rules::BonusList;
 use script::ScriptCallback;
 use ChangeListenerList;
@@ -26,7 +27,7 @@ pub struct Effect {
     pub name: String,
     pub tag: String,
     cur_duration: u32,
-    total_duration: u32,
+    total_duration: ExtInt,
 
     bonuses: BonusList,
     callbacks: Vec<Rc<ScriptCallback>>,
@@ -38,7 +39,7 @@ pub struct Effect {
 }
 
 impl Effect {
-    pub fn new(name: &str, tag: &str, duration: u32, bonuses: BonusList,
+    pub fn new(name: &str, tag: &str, duration: ExtInt, bonuses: BonusList,
                deactivate_with_ability: Option<String>) -> Effect {
         Effect {
             name: name.to_string(),
@@ -54,7 +55,7 @@ impl Effect {
     }
 
     pub fn mark_for_removal(&mut self) {
-        self.total_duration = 0;
+        self.total_duration = ExtInt::Int(0);
     }
 
     pub fn deactivates_with(&self, id: &str) -> bool {
@@ -87,12 +88,17 @@ impl Effect {
     }
 
     pub fn is_removal(&self) -> bool {
-        if self.cur_duration < self.total_duration {
-            false
-        } else {
-            self.removal_listeners.notify(&self);
-            debug!("Removing effect");
-            true
+        match self.total_duration {
+            ExtInt::Infinity => false,
+            ExtInt::Int(total_duration) => {
+                if self.cur_duration >= total_duration {
+                    self.removal_listeners.notify(&self);
+                    debug!("Removing effect");
+                    true
+                } else {
+                    false
+                }
+            }
         }
     }
 
@@ -104,17 +110,26 @@ impl Effect {
         &self.bonuses
     }
 
-    pub fn duration_millis(&self) -> u32 {
+    pub fn duration_millis(&self) -> ExtInt {
         self.total_duration
     }
 
-    pub fn total_duration_rounds(&self) -> u32 {
-        (self.total_duration as f32 / ROUND_TIME_MILLIS as f32).ceil() as u32
+    pub fn total_duration_rounds(&self) -> ExtInt {
+        match self.total_duration {
+            ExtInt::Infinity => ExtInt::Infinity,
+            ExtInt::Int(dur) => {
+                ExtInt::Int((dur as f32 / ROUND_TIME_MILLIS as f32).ceil() as u32)
+            }
+        }
     }
 
-    pub fn remaining_duration_rounds(&self) -> u32 {
-        if self.cur_duration > self.total_duration { return 0; }
-
-        ((self.total_duration - self.cur_duration) as f32 / ROUND_TIME_MILLIS as f32).ceil() as u32
+    pub fn remaining_duration_rounds(&self) -> ExtInt {
+        let remaining_duration = self.total_duration - self.cur_duration;
+        match remaining_duration {
+            ExtInt::Infinity => ExtInt::Infinity,
+            ExtInt::Int(dur) => {
+                ExtInt::Int((dur as f32 / ROUND_TIME_MILLIS as f32).ceil() as u32)
+            }
+        }
     }
 }

@@ -17,6 +17,7 @@
 use std::u32;
 use std::rc::Rc;
 
+use sulis_core::util::ExtInt;
 use sulis_module::{ability::Duration, Ability};
 use ChangeListenerList;
 
@@ -25,7 +26,8 @@ use ROUND_TIME_MILLIS;
 pub struct AbilityState {
     pub ability: Rc<Ability>,
     pub group: String,
-    pub(crate) remaining_duration: u32,
+    pub(crate) remaining_duration: ExtInt,
+    last_elapsed: u32,
     pub listeners: ChangeListenerList<AbilityState>,
 }
 
@@ -39,21 +41,19 @@ impl AbilityState {
         AbilityState {
             ability: Rc::clone(ability),
             group,
-            remaining_duration: 0,
+            remaining_duration: ExtInt::Int(0),
+            last_elapsed: 0,
             listeners: ChangeListenerList::default(),
         }
     }
 
     pub fn update(&mut self, millis_elapsed: u32) {
-        let cur_rounds = self.remaining_duration % ROUND_TIME_MILLIS;
+        self.last_elapsed += millis_elapsed;
 
-        if millis_elapsed > self.remaining_duration {
-            self.remaining_duration = 0;
-        } else {
-            self.remaining_duration -= millis_elapsed;
-        }
+        self.remaining_duration = self.remaining_duration - millis_elapsed;
 
-        if cur_rounds != self.remaining_duration % ROUND_TIME_MILLIS {
+        if self.last_elapsed > ROUND_TIME_MILLIS {
+            self.last_elapsed -= ROUND_TIME_MILLIS;
             self.listeners.notify(&self);
         }
     }
@@ -63,19 +63,19 @@ impl AbilityState {
     }
 
     pub fn is_available(&self) -> bool {
-        self.remaining_duration == 0
+        self.remaining_duration.is_zero()
     }
 
     pub fn is_active_mode(&self) -> bool {
-        self.remaining_duration > 100_000 * ROUND_TIME_MILLIS
+        self.remaining_duration.is_infinite()
     }
 
     pub fn activate(&mut self) {
         self.remaining_duration = match self.ability.active {
             None => panic!(),
             Some(ref active) => match active.duration {
-                Duration::Mode => u32::MAX,
-                Duration::Instant | Duration::Rounds(_) => active.cooldown * ROUND_TIME_MILLIS,
+                Duration::Mode => ExtInt::Infinity,
+                Duration::Instant | Duration::Rounds(_) => ExtInt::Int(active.cooldown * ROUND_TIME_MILLIS),
             }
         };
     }
@@ -88,16 +88,21 @@ impl AbilityState {
 
         self.remaining_duration = match self.ability.active {
             None => panic!(),
-            Some(ref active) => active.cooldown * ROUND_TIME_MILLIS,
+            Some(ref active) => ExtInt::Int(active.cooldown * ROUND_TIME_MILLIS),
         };
         self.listeners.notify(&self);
     }
 
-    pub fn remaining_duration(&self) -> u32 {
+    pub fn remaining_duration(&self) -> ExtInt {
         self.remaining_duration
     }
 
-    pub fn remaining_duration_rounds(&self) -> u32 {
-        (self.remaining_duration as f32 / ROUND_TIME_MILLIS as f32).ceil() as u32
+    pub fn remaining_duration_rounds(&self) -> ExtInt {
+        match self.remaining_duration {
+            ExtInt::Infinity => ExtInt::Infinity,
+            ExtInt::Int(dur) => {
+                ExtInt::Int((dur as f32 / ROUND_TIME_MILLIS as f32).ceil() as u32)
+            }
+        }
     }
 }

@@ -402,7 +402,14 @@ impl WidgetKind for RootView {
                 view.show_menu(&parent);
             })));
 
-            let abilities = Widget::with_defaults(AbilitiesBar::new(GameState::player()));
+            let mut selected = GameState::selected();
+            let entity = if selected.is_empty() {
+                GameState::player()
+            } else {
+                selected.remove(0)
+            };
+
+            let abilities = Widget::with_defaults(AbilitiesBar::new(entity));
 
             Widget::add_children_to(&bot_pane, vec![inv_button, cha_button, map_button,
                                     log_button, men_button, abilities, portrait_pane]);

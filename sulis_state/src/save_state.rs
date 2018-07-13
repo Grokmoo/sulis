@@ -20,7 +20,7 @@ use std::cell::RefCell;
 use std::u64;
 use std::collections::HashMap;
 
-use sulis_core::util::{Point};
+use sulis_core::util::{Point, ExtInt};
 use sulis_rules::Slot;
 use sulis_module::{actor::{ActorBuilder, RewardBuilder}};
 
@@ -387,5 +387,5 @@ impl ActorSaveState {
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct AbilitySaveState {
-    pub(crate) remaining_duration: u32,
+    pub(crate) remaining_duration: ExtInt,
 }

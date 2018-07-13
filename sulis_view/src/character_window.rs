@@ -18,12 +18,12 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_rules::{Attribute, DamageKind};
-use sulis_state::{ChangeListener, EntityState};
+use sulis_core::util::ExtInt;
 use sulis_core::ui::{Callback, Widget, WidgetKind, WidgetState};
+use sulis_rules::{Attribute, DamageKind};
 use sulis_widgets::{Button, Label, TextArea};
 use sulis_module::Module;
-use sulis_state::{ActorState, Effect, GameState};
+use sulis_state::{ActorState, Effect, GameState, ChangeListener, EntityState};
 
 use CharacterBuilder;
 use ability_pane::add_ability_text_args;
@@ -189,13 +189,14 @@ pub fn create_effects_pane(pc: &mut ActorState) -> Rc<RefCell<Widget>> {
 
 fn add_effect_text_args(effect: &Effect, widget_state: &mut WidgetState) {
     widget_state.add_text_arg("name", effect.name());
-    if effect.remaining_duration_rounds() < 100_000 {
-        widget_state.add_text_arg("total_duration",
-                                  &effect.total_duration_rounds().to_string());
-        widget_state.add_text_arg("remaining_duration",
-                                  &effect.remaining_duration_rounds().to_string());
-    } else {
-        widget_state.add_text_arg("active_mode", "true");
+    match effect.remaining_duration_rounds() {
+        ExtInt::Infinity => widget_state.add_text_arg("active_mode", "true"),
+        ExtInt::Int(_) => {
+            widget_state.add_text_arg("total_duration",
+                                      &effect.total_duration_rounds().to_string());
+            widget_state.add_text_arg("remaining_duration",
+                                      &effect.remaining_duration_rounds().to_string());
+        }
     }
     add_bonus_text_args(&effect.bonuses(), widget_state);
 }

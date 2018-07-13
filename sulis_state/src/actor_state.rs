@@ -23,7 +23,7 @@ use std::collections::HashMap;
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::image::{LayeredImage};
 use sulis_core::ui::{color, Color};
-use sulis_core::util::invalid_data_error;
+use sulis_core::util::{invalid_data_error, ExtInt};
 use sulis_rules::{Attack, AttackKind, BonusList, HitKind, StatList, WeaponKind, Slot, ItemKind};
 use sulis_module::{Actor, Module, ActorBuilder};
 use {AbilityState, ChangeListenerList, Effect, EntityState, GameState, Inventory, ItemState, TurnTimer};
@@ -42,7 +42,7 @@ pub struct ActorState {
     effects: Vec<(usize, BonusList)>,
     image: LayeredImage,
     pub(crate) ability_states: HashMap<String, AbilityState>,
-    current_group_uses_per_encounter: HashMap<String, u32>,
+    current_group_uses_per_encounter: HashMap<String, ExtInt>,
     texture_cache_invalid: bool,
 }
 
@@ -162,8 +162,8 @@ impl ActorState {
         }
     }
 
-    pub fn current_uses_per_encounter(&self, ability_group: &str) -> u32 {
-        *self.current_group_uses_per_encounter.get(ability_group).unwrap_or(&0)
+    pub fn current_uses_per_encounter(&self, ability_group: &str) -> ExtInt {
+        *self.current_group_uses_per_encounter.get(ability_group).unwrap_or(&ExtInt::Int(0))
     }
 
     pub fn ability_state(&mut self, id: &str) -> Option<&mut AbilityState> {
@@ -180,7 +180,7 @@ impl ActorState {
 
                 if state.is_active_mode() { return true; }
 
-                if self.current_uses_per_encounter(&state.group) == 0 { return false; }
+                if self.current_uses_per_encounter(&state.group).is_zero() { return false; }
 
                 state.is_available()
             }
@@ -193,7 +193,7 @@ impl ActorState {
             Some(ref state) => {
                 if self.ap < state.activate_ap() { return false; }
 
-                if self.current_uses_per_encounter(&state.group) == 0 { return false; }
+                if self.current_uses_per_encounter(&state.group).is_zero() { return false; }
 
                 state.is_available()
             }
@@ -224,7 +224,8 @@ impl ActorState {
             None => (),
             Some(ref mut state) => {
                 state.activate();
-                *self.current_group_uses_per_encounter.entry(state.group.to_string()).or_insert(1) -= 1;
+                let cur = *self.current_group_uses_per_encounter.get(&state.group).unwrap_or(&ExtInt::Int(1));
+                self.current_group_uses_per_encounter.insert(state.group.to_string(), cur - 1);
             }
         }
     }
@@ -757,11 +758,7 @@ impl ActorState {
         for &(ref class, level) in self.actor.levels.iter() {
             self.stats.add_multiple(&class.bonuses_per_level, level);
             for (ref group_id, amount) in class.group_uses_per_encounter(level).iter() {
-                if let Some(amount) = amount {
-                    self.stats.add_single_group_uses_per_encounter(group_id, *amount);
-                } else {
-                    self.stats.add_single_group_uses_per_encounter(group_id, 100_000);
-                }
+                self.stats.add_single_group_uses_per_encounter(group_id, *amount);
             }
         }
 

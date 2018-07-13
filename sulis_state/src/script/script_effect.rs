@@ -18,6 +18,7 @@ use std::rc::Rc;
 
 use rlua::{Lua, UserData, UserDataMethods};
 
+use sulis_core::util::ExtInt;
 use sulis_rules::{Attribute, BonusKind, BonusList, Damage, DamageKind};
 
 use script::{CallbackData, Result, script_particle_generator, ScriptParticleGenerator,
@@ -29,14 +30,14 @@ pub struct ScriptEffect {
     parent: usize,
     name: String,
     tag: String,
-    duration: u32,
+    duration: ExtInt,
     deactivate_with_ability: Option<String>,
     pub bonuses: BonusList,
     callbacks: Vec<CallbackData>,
 }
 
 impl ScriptEffect {
-    pub fn new(parent: usize, name: &str, duration: u32) -> ScriptEffect {
+    pub fn new(parent: usize, name: &str, duration: ExtInt) -> ScriptEffect {
         ScriptEffect {
             parent,
             name: name.to_string(),

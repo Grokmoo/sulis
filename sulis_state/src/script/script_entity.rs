@@ -21,12 +21,13 @@ use std::collections::HashMap;
 
 use rlua::{self, Lua, UserData, UserDataMethods};
 
-use animation::{Animation, MeleeAttackAnimation};
-use sulis_rules::{AttackKind, DamageKind, Attack};
+use sulis_core::util::ExtInt;
 use sulis_core::config::CONFIG;
 use sulis_core::ui::color;
 use sulis_core::resource::ResourceSet;
+use sulis_rules::{AttackKind, DamageKind, Attack};
 use {ActorState, EntityState, GameState};
+use animation::{Animation, MeleeAttackAnimation};
 use script::*;
 
 #[derive(Clone, Debug)]
@@ -132,7 +133,10 @@ impl UserData for ScriptEntity {
         });
 
         methods.add_method("create_effect", |_, entity, args: (String, Option<u32>)| {
-            let duration = args.1.unwrap_or(100_000);
+            let duration = match args.1 {
+                None => ExtInt::Infinity,
+                Some(dur) => ExtInt::Int(dur),
+            };
             let ability = args.0;
             let index = entity.try_unwrap_index()?;
             Ok(ScriptEffect::new(index, &ability, duration))

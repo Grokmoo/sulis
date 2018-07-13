@@ -1,8 +1,3 @@
 target/*
-characters/*
-config.yml
 *.swp
 *.swo
-log/*
-*/log/*
-sulis_editor/config.yml

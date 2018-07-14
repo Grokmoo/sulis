@@ -96,9 +96,9 @@ pub use self::script::ScriptState;
 pub use self::script::targeter::Targeter;
 pub use self::script::ScriptCallback;
 
-mod turn_timer;
-pub use self::turn_timer::TurnTimer;
-pub use self::turn_timer::ROUND_TIME_MILLIS;
+mod turn_manager;
+pub(crate) use self::turn_manager::TurnManager;
+pub use self::turn_manager::ROUND_TIME_MILLIS;
 
 use std::rc::Rc;
 use std::cell::RefCell;

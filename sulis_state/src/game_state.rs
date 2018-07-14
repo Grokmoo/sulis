@@ -29,12 +29,13 @@ use sulis_core::io::{GraphicsRenderer};
 use sulis_core::ui::{Widget};
 use sulis_module::{Ability, Actor, Module, ObjectSize, OnTrigger, area::{Trigger, TriggerKind}};
 
-use {ActorState, AI, AreaState, ChangeListener, ChangeListenerList, EntityState, Location,
-    PathFinder, SaveState, ScriptState, UICallback, MOVE_TO_THRESHOLD};
+use {AI, AreaState, ChangeListener, ChangeListenerList, EntityState, Location,
+    PathFinder, SaveState, ScriptState, UICallback, MOVE_TO_THRESHOLD, TurnManager};
 use script::{script_callback::ScriptHitKind, ScriptEntitySet, ScriptCallback};
 use animation::{Animation, MoveAnimation};
 
 thread_local! {
+    static TURN_MANAGER: RefCell<TurnManager> = RefCell::new(TurnManager::default());
     static STATE: RefCell<Option<GameState>> = RefCell::new(None);
     static AI: RefCell<AI> = RefCell::new(AI::new());
     static CLEAR_ANIMS: Cell<bool> = Cell::new(false);
@@ -191,7 +192,7 @@ impl GameState {
         }
 
         let pc_state = Rc::clone(area_state.borrow().get_last_entity().unwrap());
-        ActorState::init_actor_turn(&pc_state);
+        pc_state.borrow_mut().actor.init_turn();
 
         let path_finder = PathFinder::new(&area_state.borrow().area);
 
@@ -303,7 +304,7 @@ impl GameState {
 
             let turn_timer = state.area_state.borrow().turn_timer();
             if !turn_timer.borrow().is_active() {
-                ActorState::init_actor_turn(&entity);
+                entity.borrow_mut().actor.init_turn();
             }
 
             entity.borrow_mut().set_party_member(true);

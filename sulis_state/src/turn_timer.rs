@@ -301,7 +301,7 @@ impl TurnTimer {
     pub fn next(&mut self) {
         if !self.active { return; }
 
-        let mut cbs_to_fire = Vec::new();
+        // let mut cbs_to_fire = Vec::new();
 
         {
             let area_state = GameState::area_state();
@@ -319,9 +319,9 @@ impl TurnTimer {
                 match front {
                     Entry::Effect(index) => {
                         let effect = area_state.effect_mut(index);
-                        if effect.update(ROUND_TIME_MILLIS) {
-                            cbs_to_fire.append(&mut effect.callbacks());
-                        }
+                        // if effect.update(ROUND_TIME_MILLIS) {
+                        //     cbs_to_fire.append(&mut effect.callbacks());
+                        // }
                         self.entries.push_back(Entry::Effect(index));
                     },
                     Entry::Entity(entity) => {
@@ -333,7 +333,7 @@ impl TurnTimer {
             }
         }
 
-        cbs_to_fire.iter().for_each(|cb| cb.on_round_elapsed());
+        // cbs_to_fire.iter().for_each(|cb| cb.on_round_elapsed());
 
         let area_state = GameState::area_state();
         self.activate_current(&mut area_state.borrow_mut());
@@ -350,8 +350,8 @@ impl TurnTimer {
         };
 
         ActorState::init_actor_turn(&current);
-        ActorState::update(&current, &mut area_state.effects,
-                           self, ROUND_TIME_MILLIS);
+        // ActorState::update(&current, &mut area_state.effects,
+        //                    self, ROUND_TIME_MILLIS);
 
         if current.borrow().is_party_member() {
             GameState::set_selected_party_member(Rc::clone(&current));

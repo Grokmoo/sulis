@@ -960,9 +960,9 @@ impl AreaState {
                     Some(ref mut effect) => effect,
                 };
 
-                if effect.update(elapsed_millis) {
-                    cbs_to_fire.append(&mut effect.callbacks());
-                }
+                // if effect.update(elapsed_millis) {
+                //     cbs_to_fire.append(&mut effect.callbacks());
+                // }
             }
         }
 
@@ -974,11 +974,11 @@ impl AreaState {
                 };
 
                 if real_time {
-                    ActorState::update(entity, &mut self.effects,
-                                       &mut self.turn_timer.borrow_mut(), elapsed_millis);
+                    // ActorState::update(entity, &mut self.effects,
+                    //                    &mut self.turn_timer.borrow_mut(), elapsed_millis);
                 } else {
-                    entity.borrow_mut().actor.check_removal(&mut self.effects,
-                                                            &mut self.turn_timer.borrow_mut());
+                    // entity.borrow_mut().actor.check_removal(&mut self.effects,
+                    //                                         &mut self.turn_timer.borrow_mut());
                 }
 
                 if !entity.borrow().is_marked_for_removal() { continue; }

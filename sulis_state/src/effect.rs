@@ -74,16 +74,14 @@ impl Effect {
     }
 
     /// Updates the effect time.  returns true if a round has elapsed
-    pub fn update(&mut self, millis_elapsed: u32) -> bool {
+    pub fn update(&mut self, millis_elapsed: u32) {
         let cur_mod = self.cur_duration / ROUND_TIME_MILLIS;
 
         self.cur_duration += millis_elapsed;
 
         if cur_mod != self.cur_duration / ROUND_TIME_MILLIS {
+            self.callbacks.iter().for_each(|cb| cb.on_round_elapsed());
             self.listeners.notify(&self);
-            true
-        } else {
-            false
         }
     }
 

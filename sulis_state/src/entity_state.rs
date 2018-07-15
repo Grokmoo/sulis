@@ -19,6 +19,7 @@ use std::ptr;
 use std::slice::Iter;
 use std::rc::Rc;
 use std::cell::RefCell;
+use std::collections::HashMap;
 
 use sulis_core::config::CONFIG;
 
@@ -67,7 +68,8 @@ impl PartialEq for EntityState {
 }
 
 impl EntityState {
-    pub(crate) fn load(save: EntitySaveState, location: &Location) -> Result<EntityState, Error> {
+    pub(crate) fn load(save: EntitySaveState,
+                       areas: &HashMap<String, Rc<RefCell<AreaState>>>) -> Result<EntityState, Error> {
         let ai_state = match save.actor_base.as_ref() {
             None => {
                 AIState::AI {
@@ -82,6 +84,13 @@ impl EntityState {
             },
         };
 
+        let area = match areas.get(&save.location.area) {
+            None => invalid_data_error(&format!("Invalid area '{}' for entity", save.location.area)),
+            Some(area) => Ok(area),
+        }?;
+
+        let location = Location::new(save.location.x, save.location.y, &area.borrow().area);
+
         let size = match Module::object_size(&save.size) {
             None => invalid_data_error(&format!("Invalid size '{}' for actor", save.size)),
             Some(size) => Ok(size),
@@ -91,7 +100,7 @@ impl EntityState {
 
         Ok(EntityState {
             actor,
-            location: location.clone(),
+            location,
             size,
             index: save.index,
             sub_pos: (0.0, 0.0),
@@ -138,9 +147,11 @@ impl EntityState {
         }
     }
 
-    pub fn callbacks(&self, area_state: &AreaState) -> Vec<Rc<ScriptCallback>> {
+    pub fn callbacks(&self) -> Vec<Rc<ScriptCallback>> {
+        let mgr = GameState::turn_manager();
+        let mgr = mgr.borrow();
         self.actor.effects_iter().flat_map(|index| {
-            area_state.effect(*index).callbacks()
+            mgr.effect(*index).callbacks()
         }).collect()
     }
 
@@ -308,7 +319,7 @@ impl EntityState {
         }
     }
 
-    pub fn move_to(&mut self, area_state: &mut AreaState, x: i32, y: i32, squares: u32) -> bool {
+    pub fn move_to(&mut self, x: i32, y: i32, squares: u32) -> bool {
         trace!("Move to {},{}", x, y);
         if !self.location.coords_valid(x, y) { return false; }
         if !self.location.coords_valid(x + self.size.width - 1, y + self.size.height - 1) {
@@ -319,8 +330,8 @@ impl EntityState {
             return false;
         }
 
-        let turn_timer = area_state.turn_timer();
-        if turn_timer.borrow().is_active() && squares > 0 {
+        let mgr = GameState::turn_manager();
+        if mgr.borrow().is_combat_active() && squares > 0 {
             let ap_cost = self.actor.get_move_ap_cost(squares);
             if self.actor.ap() < ap_cost {
                 return false;

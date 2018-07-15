@@ -16,10 +16,10 @@
 
 use std::rc::Rc;
 use std::cell::RefCell;
-use std::collections::{HashSet, VecDeque};
+use std::collections::{HashSet, VecDeque, vec_deque::Iter};
 
 use sulis_module::Faction;
-use {ChangeListenerList, Effect, EntityState, GameState};
+use {AreaState, ChangeListenerList, Effect, EntityState, GameState};
 
 pub const ROUND_TIME_MILLIS: u32 = 5000;
 
@@ -35,7 +35,7 @@ pub struct TurnManager {
     combat_active: bool,
     last_millis: u32,
 
-    listeners: ChangeListenerList<TurnManager>,
+    pub listeners: ChangeListenerList<TurnManager>,
     order: VecDeque<Entry>,
 }
 
@@ -53,7 +53,46 @@ impl Default for TurnManager {
 }
 
 impl TurnManager {
-    fn update(&mut self, current_millis: u32) {
+    pub(crate) fn clear(&mut self) {
+        self.entities.clear();
+        self.effects.clear();
+        self.combat_active = false;
+        self.listeners = ChangeListenerList::default();
+        self.order.clear();
+    }
+
+    pub fn effect_mut(&mut self, index: usize) -> &mut Effect {
+        self.effects[index].as_mut().unwrap()
+    }
+
+    pub fn effect(&self, index: usize) -> &Effect {
+        self.effects[index].as_ref().unwrap()
+    }
+
+    pub fn active_iter(&self) -> ActiveEntityIterator {
+        ActiveEntityIterator { mgr: &self, entry_iter: self.order.iter() }
+    }
+
+    pub fn entity_iter(&self) -> EntityIterator {
+        EntityIterator { mgr: &self, index: 0 }
+    }
+
+    pub fn has_entity(&self, index: usize) -> bool {
+        if index >= self.entities.len() { return false; }
+
+        self.entities[index].is_some()
+    }
+
+    pub fn entity_checked(&self, index: usize) -> Option<Rc<RefCell<EntityState>>> {
+        if index >= self.entities.len() { return None; }
+        self.entities[index].clone()
+    }
+
+    pub fn entity(&self, index: usize) -> Rc<RefCell<EntityState>> {
+        Rc::clone(self.entities[index].as_ref().unwrap())
+    }
+
+    pub fn update(&mut self, current_millis: u32) {
         self.last_millis = current_millis;
         let elapsed_millis = if self.combat_active { current_millis - self.last_millis } else { 0 };
 
@@ -69,7 +108,6 @@ impl TurnManager {
         for index in 0..self.entities.len() {
             if self.update_entity(index, elapsed_millis) {
                 self.remove_entity(index);
-                // TODO area needs to learn of this
             }
         }
     }
@@ -95,7 +133,7 @@ impl TurnManager {
         entity.is_marked_for_removal()
     }
 
-    fn next(&mut self) {
+    pub fn next(&mut self) {
         self.iterate_to_next_entity();
         self.init_turn_for_current_entity();
 
@@ -123,14 +161,14 @@ impl TurnManager {
             _ => unreachable!(),
         };
 
-        let current = current.borrow_mut();
+        let mut current = current.borrow_mut();
         current.actor.init_turn();
         current.actor.elapse_time(ROUND_TIME_MILLIS, &self.effects);
 
         debug!("'{}' now has the active turn", current.actor.actor.name);
     }
 
-    fn current(&self) -> Option<Rc<RefCell<EntityState>>> {
+    pub fn current(&self) -> Option<Rc<RefCell<EntityState>>> {
         if !self.combat_active { return None; }
 
         match self.order.front() {
@@ -186,10 +224,7 @@ impl TurnManager {
         false
     }
 
-    fn check_ai_activation(&mut self, mover: &Rc<RefCell<EntityState>>) {
-        let area_state = GameState::area_state();
-        let mut area_state = area_state.borrow_mut();
-
+    pub fn check_ai_activation(&mut self, mover: &Rc<RefCell<EntityState>>, area_state: &AreaState) {
         let mut groups_to_activate: HashSet<usize> = HashSet::new();
         let mut state_changed = false;
 
@@ -238,13 +273,13 @@ impl TurnManager {
         }
 
         if !self.combat_active {
-            info!("Set combat mode active");
             self.set_combat_active(true);
             loop {
                 if self.current_is_active_entity() { break; }
                 let front = self.order.pop_front().unwrap();
                 self.order.push_back(front);
             }
+            self.init_turn_for_current_entity();
         } else {
             self.listeners.notify(&self);
         }
@@ -263,7 +298,7 @@ impl TurnManager {
         }
     }
 
-    fn is_combat_active(&self) -> bool {
+    pub fn is_combat_active(&self) -> bool {
         self.combat_active
     }
 
@@ -288,7 +323,7 @@ impl TurnManager {
                 None => continue,
                 Some(ref entity) => entity,
             };
-            let entity = entity.borrow_mut();
+            let mut entity = entity.borrow_mut();
 
             entity.set_ai_active(false);
 
@@ -328,22 +363,30 @@ impl TurnManager {
         GameState::set_clear_anims();
     }
 
-    fn add_entity(&mut self, entity: &Rc<RefCell<EntityState>>) {
+    pub fn add_entity(&mut self, entity: &Rc<RefCell<EntityState>>) -> usize {
         let entity_to_add = Rc::clone(entity);
         self.entities.push(Some(entity_to_add));
         let index = self.entities.len() - 1;
         self.order.push_back(Entry::Entity(index));
         debug!("Added entity at {} to turn timer", index);
 
-        self.check_ai_activation(&entity);
+        entity.borrow_mut().index = index;
         self.listeners.notify(&self);
+
+        index
     }
 
-    fn add_effect(&mut self, effect: Effect) {
+    pub fn add_effect(&mut self, effect: Effect, entity: &Rc<RefCell<EntityState>>) -> usize {
+        let bonuses = effect.bonuses().clone();
+
         self.effects.push(Some(effect));
         let index = self.effects.len() - 1;
         self.order.push_back(Entry::Effect(index));
         debug!("Added effect at {} to turn timer", index);
+
+        entity.borrow_mut().actor.add_effect(index, bonuses);
+
+        index
     }
 
     fn remove_effect(&mut self, index: usize) {
@@ -357,6 +400,10 @@ impl TurnManager {
     }
 
     fn remove_entity(&mut self, index: usize) {
+        let entity = Rc::clone(self.entities[index].as_ref().unwrap());
+        let area_state = GameState::get_area_state(&entity.borrow().location.area_id).unwrap();
+        area_state.borrow_mut().remove_entity(&entity);
+
         self.entities[index] = None;
 
         self.order.retain(|e| {
@@ -378,6 +425,56 @@ impl TurnManager {
             self.set_combat_active(false);
         } else {
             self.listeners.notify(&self);
+        }
+    }
+}
+
+pub struct ActiveEntityIterator<'a> {
+    entry_iter: Iter<'a, Entry>,
+    mgr: &'a TurnManager,
+}
+
+impl<'a> Iterator for ActiveEntityIterator<'a> {
+    type Item = &'a Rc<RefCell<EntityState>>;
+    fn next(&mut self) -> Option<&'a Rc<RefCell<EntityState>>> {
+        if !self.mgr.is_combat_active() { return None; }
+
+        loop {
+            match self.entry_iter.next() {
+                None => return None,
+                Some(ref entry) => match entry {
+                    Entry::Effect(_) => (),
+                    Entry::Entity(index) => {
+                        let entity = self.mgr.entities[*index].as_ref().unwrap();
+                        if entity.borrow().is_party_member() || entity.borrow().is_ai_active() {
+                            return Some(entity);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+pub struct EntityIterator<'a> {
+    mgr: &'a TurnManager,
+    index: usize,
+}
+
+impl<'a> Iterator for EntityIterator<'a> {
+    type Item = Rc<RefCell<EntityState>>;
+    fn next(&mut self) -> Option<Rc<RefCell<EntityState>>> {
+        loop {
+            let next = self.mgr.entities.get(self.index);
+
+            self.index += 1;
+
+            match next {
+                None => return None,
+                Some(e) => match e {
+                    &None => continue,
+                    &Some(ref entity) => return Some(Rc::clone(entity))
+                }
+            }
         }
     }
 }

@@ -206,11 +206,11 @@ impl ActorState {
             Some(ref mut state) => {
                 state.deactivate();
 
-                let area_state = GameState::area_state();
-                let mut area_state = area_state.borrow_mut();
+                let mgr = GameState::turn_manager();
+                let mut mgr = mgr.borrow_mut();
 
                 for (index, _) in self.effects.iter() {
-                    let effect = area_state.effect_mut(*index);
+                    let effect = mgr.effect_mut(*index);
                     if effect.deactivates_with(id) {
                         effect.mark_for_removal();
                     }
@@ -287,8 +287,8 @@ impl ActorState {
         let attacks = parent.borrow().actor.stats.attacks.clone();
 
         let mut is_flanking = false;
-        let area_state = GameState::area_state();
-        for entity in area_state.borrow().entity_iter() {
+        let mgr = GameState::turn_manager();
+        for entity in mgr.borrow().entity_iter() {
             if Rc::ptr_eq(&entity, parent) { continue; }
             if Rc::ptr_eq(&entity, target) { continue; }
 

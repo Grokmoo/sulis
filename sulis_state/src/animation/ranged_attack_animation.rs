@@ -115,8 +115,8 @@ impl Animation for RangedAttackAnimation {
 
                 let area_state = GameState::area_state();
 
-                let defender_cbs = self.defender.borrow().callbacks(&area_state.borrow());
-                let attacker_cbs = self.attacker.borrow().callbacks(&area_state.borrow());
+                let defender_cbs = self.defender.borrow().callbacks();
+                let attacker_cbs = self.attacker.borrow().callbacks();
 
                 attacker_cbs.iter().for_each(|cb| cb.before_attack(&cb_targets));
                 defender_cbs.iter().for_each(|cb| cb.before_defense(&cb_targets));

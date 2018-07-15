@@ -410,12 +410,17 @@ fn entities_with_ids(ids: Vec<String>) -> Vec<ScriptEntity> {
     let mut result = Vec::new();
 
     let area_state = GameState::area_state();
-    let area_state = area_state.borrow();
+    let area_id = area_state.borrow().area.id.to_string();
 
-    for entity in area_state.entity_iter() {
-        if ids.contains(&entity.borrow().actor.actor.id) {
-            result.push(ScriptEntity::from(&entity));
+    let mgr = GameState::turn_manager();
+    for entity in mgr.borrow().entity_iter() {
+        {
+            let entity = entity.borrow();
+            if !entity.location.is_in_area_id(&area_id) { continue; }
+            if !ids.contains(&entity.actor.actor.id) { continue; }
         }
+
+        result.push(ScriptEntity::from(&entity));
     }
 
     result
@@ -423,12 +428,17 @@ fn entities_with_ids(ids: Vec<String>) -> Vec<ScriptEntity> {
 
 fn entity_with_id(id: String) -> Option<Rc<RefCell<EntityState>>> {
     let area_state = GameState::area_state();
-    let area_state = area_state.borrow();
+    let area_id = area_state.borrow().area.id.to_string();
 
-    for entity in area_state.entity_iter() {
-        if entity.borrow().actor.actor.id == id {
-            return Some(entity);
+    let mgr = GameState::turn_manager();
+    for entity in mgr.borrow().entity_iter() {
+        {
+            let entity = entity.borrow();
+            if !entity.location.is_in_area_id(&area_id) { continue; }
+            if entity.actor.actor.id != id { continue; }
         }
+
+        return Some(entity)
     }
 
     None
@@ -439,9 +449,8 @@ fn activate(_lua: &Lua, ability: &ScriptAbility, (target, take_ap): (ScriptEntit
     let entity = target.try_unwrap()?;
     let take_ap = take_ap.unwrap_or(true);
 
-    let area_state = GameState::area_state();
-    let turn_timer = area_state.borrow().turn_timer();
-    if take_ap && turn_timer.borrow().is_active() {
+    let mgr = GameState::turn_manager();
+    if take_ap && mgr.borrow().is_combat_active() {
         entity.borrow_mut().actor.remove_ap(ability.ap);
     }
 

@@ -109,4 +109,8 @@ impl Location {
     pub fn is_in(&self, area_state: &AreaState) -> bool {
         self.area_id == area_state.area.id
     }
+
+    pub fn is_in_area_id(&self, id: &str) -> bool {
+        &self.area_id == id
+    }
 }

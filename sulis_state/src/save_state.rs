@@ -24,7 +24,7 @@ use sulis_core::util::{Point, ExtInt};
 use sulis_rules::Slot;
 use sulis_module::{actor::{ActorBuilder, RewardBuilder}};
 
-use {ActorState, EntityState, GameState, ItemState, PropState, prop_state::Interactive, Merchant};
+use {ActorState, EntityState, GameState, ItemState, Location, PropState, prop_state::Interactive, Merchant};
 use area_state::{TriggerState};
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -34,6 +34,7 @@ pub struct SaveState {
     pub(crate) selected: Vec<usize>,
     pub(crate) current_area: String,
     pub(crate) areas: HashMap<String, AreaSaveState>,
+    pub(crate) manager: ManagerSaveState,
 }
 
 impl SaveState {
@@ -62,6 +63,7 @@ impl SaveState {
             current_area,
             party,
             selected,
+            manager: ManagerSaveState::new(),
         }
     }
 
@@ -72,9 +74,29 @@ impl SaveState {
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
+pub struct ManagerSaveState {
+    pub(crate) entities: Vec<EntitySaveState>,
+}
+
+impl ManagerSaveState {
+    pub fn new() -> ManagerSaveState {
+        let mgr = GameState::turn_manager();
+        let mgr = mgr.borrow();
+        let mut entities = Vec::new();
+        for entity in mgr.entity_iter() {
+            entities.push(EntitySaveState::new(entity));
+        }
+
+        ManagerSaveState {
+            entities,
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
 pub struct AreaSaveState {
     pub(crate) on_load_fired: bool,
-    pub(crate) entities: Vec<EntitySaveState>,
     pub(crate) props: Vec<PropSaveState>,
     pub(crate) triggers: Vec<TriggerSaveState>,
     pub(crate) merchants: Vec<MerchantSaveState>,
@@ -123,18 +145,12 @@ impl AreaSaveState {
             merchants.push(MerchantSaveState::new(merchant));
         }
 
-        let mut entities = Vec::new();
-        for entity in area_state.entity_iter() {
-            entities.push(EntitySaveState::new(entity));
-        }
-
         AreaSaveState {
             pc_explored,
             on_load_fired,
             props,
             triggers,
             merchants,
-            entities,
         }
     }
 }
@@ -265,7 +281,7 @@ pub struct EntitySaveState {
     pub(crate) index: usize,
     pub(crate) actor_base: Option<ActorBuilder>,
     pub(crate) actor: ActorSaveState,
-    pub(crate) location: Point,
+    pub(crate) location: LocationSaveState,
     pub(crate) size: String,
     pub(crate) custom_flags: Vec<String>,
     pub(crate) ai_group: Option<usize>,
@@ -330,12 +346,30 @@ impl EntitySaveState {
         EntitySaveState {
             index: entity.index,
             actor: ActorSaveState::new(&entity.actor),
-            location: entity.location.to_point(),
+            location: LocationSaveState::new(&entity.location),
             size: entity.size.id.clone(),
             custom_flags: entity.custom_flags().map(|s| s.to_string()).collect(),
             ai_group: entity.ai_group(),
             ai_active: entity.is_ai_active(),
             actor_base,
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct LocationSaveState {
+    pub(crate) x: i32,
+    pub(crate) y: i32,
+    pub(crate) area: String,
+}
+
+impl LocationSaveState {
+    pub fn new(location: &Location) -> LocationSaveState {
+        LocationSaveState {
+            x: location.x,
+            y: location.y,
+            area: location.area_id.to_string(),
         }
     }
 }

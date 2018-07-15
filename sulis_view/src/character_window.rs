@@ -167,10 +167,10 @@ pub fn create_abilities_pane(pc: &ActorState) -> Rc<RefCell<Widget>> {
 pub fn create_effects_pane(pc: &mut ActorState) -> Rc<RefCell<Widget>> {
     let effects = Widget::empty("effects");
 
-    let area_state = GameState::area_state();
-    let mut area_state = area_state.borrow_mut();
+    let mgr = GameState::turn_manager();
+    let mut mgr = mgr.borrow_mut();
     for index in pc.effects_iter() {
-        let effect = area_state.effect_mut(*index);
+        let effect = mgr.effect_mut(*index);
         let widget = Widget::with_theme(TextArea::empty(), "effect");
 
         add_effect_text_args(effect, &mut widget.borrow_mut().state);

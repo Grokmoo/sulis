@@ -14,8 +14,11 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::collections::HashMap;
 use std::io::Error;
+use std::{ptr};
+use std::slice::Iter;
+use std::rc::Rc;
+use std::cell::{Ref, RefCell};
 
 use rand::{self, Rng};
 
@@ -24,13 +27,8 @@ use sulis_module::{Actor, Area, LootList, Module, ObjectSize, prop};
 use sulis_module::area::{EncounterData, PropData, Transition, TriggerKind};
 use sulis_core::util::{invalid_data_error, Point};
 
-use *;
 use save_state::{AreaSaveState};
-
-use std::{ptr};
-use std::slice::Iter;
-use std::rc::Rc;
-use std::cell::{Ref, RefCell};
+use *;
 
 pub struct TriggerState {
     pub(crate) fired: bool,
@@ -44,13 +42,11 @@ pub struct AreaState {
     pub(crate) pc_explored: Vec<bool>,
     pub on_load_fired: bool,
     props: Vec<Option<PropState>>,
+    entities: Vec<usize>,
     pub(crate) triggers: Vec<TriggerState>,
     pub(crate) merchants: Vec<Merchant>,
-    pub(crate) entities: Vec<Option<Rc<RefCell<EntityState>>>>,
-    pub(crate) effects: Vec<Option<Effect>>,
 
     pub listeners: ChangeListenerList<AreaState>,
-    turn_timer: Rc<RefCell<TurnTimer>>,
 
     prop_grid: Vec<Option<usize>>,
     entity_grid: Vec<Vec<usize>>,
@@ -65,8 +61,6 @@ pub struct AreaState {
 
     feedback_text: Vec<AreaFeedbackText>,
     scroll_to_callback: Option<Rc<RefCell<EntityState>>>,
-
-    last_time_millis: u32,
 
     targeter: Option<Rc<RefCell<Box<Targeter>>>>,
 }
@@ -90,11 +84,9 @@ impl AreaState {
         info!("Initializing area state for '{}'", area.name);
         AreaState {
             area,
-            entities: Vec::new(),
             props: Vec::new(),
+            entities: Vec::new(),
             triggers: Vec::new(),
-            effects: Vec::new(),
-            turn_timer: Rc::new(RefCell::new(TurnTimer::default())),
             transition_grid,
             entity_grid,
             prop_grid,
@@ -107,15 +99,13 @@ impl AreaState {
             pc_vis_delta: (false, 0, 0),
             feedback_text: Vec::new(),
             scroll_to_callback: None,
-            last_time_millis: 0,
             targeter: None,
             merchants: Vec::new(),
             on_load_fired: false,
         }
     }
 
-    pub fn load(id: &str, new_indices: &mut HashMap<usize, usize>, add_new_indices: bool,
-                save: AreaSaveState) -> Result<AreaState, Error> {
+    pub fn load(id: &str, save: AreaSaveState) -> Result<AreaState, Error> {
         let area = match Module::area(id) {
             None => invalid_data_error(&format!("Unable to find area '{}'", id)),
             Some(area) => Ok(area),
@@ -176,44 +166,7 @@ impl AreaState {
             area_state.merchants.push(Merchant::load(merchant_save)?);
         }
 
-        for entity_save in save.entities {
-            let index = entity_save.index;
-            let location = Location::from_point(&entity_save.location, &area_state.area);
-
-            let entity = Rc::new(RefCell::new(EntityState::load(entity_save, &location)?));
-            let new_index = area_state.add_entity(entity, location)?;
-
-            if add_new_indices {
-                new_indices.insert(index, new_index);
-            }
-        }
-
-        // TODO save / load effects
-
-        // TODO need to save / load the turn timer ordering
-        area_state.turn_timer = Rc::new(RefCell::new(TurnTimer::new(&area_state)));
-
         Ok(area_state)
-    }
-
-    pub fn effect_mut<'a>(&'a mut self, index: usize) -> &'a mut Effect {
-        self.effects[index].as_mut().unwrap()
-    }
-
-    pub fn effect(&self, index: usize) -> &Effect {
-        self.effects[index].as_ref().unwrap()
-    }
-
-    pub fn add_effect(&mut self, entity: &Rc<RefCell<EntityState>>, effect: Effect) {
-        let bonuses = effect.bonuses().clone();
-        self.effects.push(Some(effect));
-        let index = self.effects.len() - 1;
-        entity.borrow_mut().actor.add_effect(index, bonuses);
-        self.turn_timer.borrow_mut().add_effect(index);
-    }
-
-    pub fn turn_timer(&self) -> Rc<RefCell<TurnTimer>> {
-        Rc::clone(&self.turn_timer)
     }
 
     pub fn get_merchant(&self, id: &str) -> Option<&Merchant> {
@@ -261,7 +214,12 @@ impl AreaState {
 
             let location = Location::from_point(&actor_data.location, &self.area);
             debug!("Adding actor '{}' at '{:?}'", actor.id, location);
-            self.add_actor(actor, location, false, None);
+            match self.add_actor(actor, location, false, None) {
+                Ok(_) => (),
+                Err(e) => {
+                    warn!("Error adding actor to area: {}", e);
+                }
+            }
         }
 
         for prop_data in area.props.iter() {
@@ -283,10 +241,6 @@ impl AreaState {
 
             self.add_trigger(index, trigger_state);
         }
-
-        let turn_timer = Rc::new(RefCell::new(TurnTimer::new(&self)));
-        self.turn_timer = turn_timer;
-        trace!("Set up turn timer for area.");
 
         self.add_transitions_from_area();
 
@@ -374,7 +328,8 @@ impl AreaState {
 
     pub fn check_encounter_cleared(&self, index: usize, parent: &Rc<RefCell<EntityState>>,
                                    target: &Rc<RefCell<EntityState>>) {
-        for entity in self.entity_iter() {
+        let mgr = GameState::turn_manager();
+        for entity in mgr.borrow().entity_iter() {
             if let Some(entity_index) = entity.borrow().ai_group() {
                 if entity_index == index && entity.borrow().actor.hp() > 0 { return; }
             }
@@ -417,7 +372,12 @@ impl AreaState {
                 }, Some(location) => location,
             };
 
-            self.add_actor(actor, location, false, Some(enc_index));
+            match self.add_actor(actor, location, false, Some(enc_index)) {
+                Ok(_) => (),
+                Err(e) => {
+                    warn!("Error adding actor for spawned encounter: {}", e);
+                }
+            }
         }
     }
 
@@ -620,7 +580,9 @@ impl AreaState {
             vec[0]
         };
 
-        Some(self.get_entity(index))
+        let mgr = GameState::turn_manager();
+        let mgr = mgr.borrow();
+        Some(mgr.entity(index))
     }
 
     pub fn get_transition_at(&self, x: i32, y: i32) -> Option<&Transition> {
@@ -783,23 +745,31 @@ impl AreaState {
     }
 
     pub(crate) fn add_actor(&mut self, actor: Rc<Actor>, location: Location,
-                            is_pc: bool, ai_group: Option<usize>) -> bool {
+                            is_pc: bool, ai_group: Option<usize>) -> Result<usize, Error> {
         let entity = Rc::new(RefCell::new(EntityState::new(actor,
                                                            location.clone(),
                                                            0,
                                                            is_pc,
                                                            ai_group)));
         match self.add_entity(entity, location) {
-            Ok(_) => true,
+            Ok(index) => Ok(index),
             Err(e) => {
                 warn!("Unable to add entity to area");
                 warn!("{}", e);
-                false
+                Err(e)
             }
         }
     }
 
     pub(crate) fn add_entity(&mut self, entity: Rc<RefCell<EntityState>>,
+                                location: Location) -> Result<usize, Error> {
+
+        let mgr = GameState::turn_manager();
+        let index = mgr.borrow_mut().add_entity(&entity);
+        self.transition_entity_to(entity, index, location)
+    }
+
+    pub(crate) fn transition_entity_to(&mut self, entity: Rc<RefCell<EntityState>>, index: usize,
                                 location: Location) -> Result<usize, Error> {
         let x = location.x;
         let y = location.y;
@@ -816,30 +786,25 @@ impl AreaState {
         entity.borrow_mut().actor.compute_stats();
         entity.borrow_mut().actor.init();
 
-        let new_index = self.find_entity_index_to_add();
-        entity.borrow_mut().index = new_index;
         entity.borrow_mut().location = location;
+        self.entities.push(index);
 
         for p in entity.borrow().points(x, y) {
-            self.add_entity_to_grid(p.x, p.y, new_index);
+            self.add_entity_to_grid(p.x, p.y, index);
         }
 
         if entity.borrow().is_party_member() {
             self.compute_pc_visibility(&entity, 0, 0);
         }
 
-        let turn_timer = Rc::clone(&self.turn_timer);
-        turn_timer.borrow_mut().add(&entity, self);
-        self.entities[new_index] = Some(entity);
-
         self.listeners.notify(&self);
-        Ok(new_index)
+        Ok(index)
     }
 
     pub fn move_entity(&mut self, entity: &Rc<RefCell<EntityState>>, x: i32, y: i32, squares: u32) -> bool {
         let old_x = entity.borrow().location.x;
         let old_y = entity.borrow().location.y;
-        if !entity.borrow_mut().move_to(self, x, y, squares) { return false; }
+        if !entity.borrow_mut().move_to(x, y, squares) { return false; }
 
         self.update_entity_position(entity, old_x, old_y);
 
@@ -868,8 +833,8 @@ impl AreaState {
             self.check_trigger_grid(&entity);
         }
 
-        let turn_timer = Rc::clone(&self.turn_timer);
-        turn_timer.borrow_mut().check_ai_activation(entity, self);
+        let mgr = GameState::turn_manager();
+        mgr.borrow_mut().check_ai_activation(entity, self);
     }
 
     fn clear_entity_points(&mut self, entity: &EntityState, x: i32, y: i32) {
@@ -884,16 +849,6 @@ impl AreaState {
 
     fn remove_entity_from_grid(&mut self, x: i32, y: i32, index: usize) {
         self.entity_grid[(x + y * self.area.width) as usize].retain(|e| *e != index);
-    }
-
-    pub fn get_last_entity(&self) -> Option<&Rc<RefCell<EntityState>>> {
-        for item in self.entities.iter().rev() {
-            if let &Some(ref entity) = item {
-                return Some(entity);
-            }
-        }
-
-        None
     }
 
     pub fn prop_iter<'a>(&'a self) -> PropIterator {
@@ -913,84 +868,8 @@ impl AreaState {
         self.props.len()
     }
 
-    pub fn entity_iter(&self) -> EntityIterator {
-        EntityIterator { area_state: &self, index: 0 }
-    }
-
-    pub fn has_entity(&self, index: usize) -> bool {
-        if index >= self.entities.len() {
-            false
-        } else {
-            self.entities[index].is_some()
-        }
-    }
-
-    pub fn check_get_entity(&self, index: usize) -> Option<Rc<RefCell<EntityState>>> {
-        if index >= self.entities.len() {
-            None
-        } else {
-            match self.entities[index] {
-                None => None,
-                Some(ref entity) => Some(Rc::clone(entity)),
-            }
-        }
-    }
-
-    pub fn get_entity(&self, index: usize) -> Rc<RefCell<EntityState>> {
-        let entity = &self.entities[index];
-
-        Rc::clone(&entity.as_ref().unwrap())
-    }
-
-    pub (crate) fn update(&mut self, millis: u32) -> (Vec<Rc<ScriptCallback>>, Option<Rc<RefCell<EntityState>>>) {
-        let elapsed_millis = millis - self.last_time_millis;
-        self.last_time_millis = millis;
-
-        let real_time = !self.turn_timer.borrow().is_active();
-
-        // removal does not shuffle the vector around, so we can safely just iterate
+    pub (crate) fn update(&mut self, _millis: u32) {
         let mut notify = false;
-        let len = self.entities.len();
-        let mut cbs_to_fire = Vec::new();
-
-        if real_time {
-            for effect in self.effects.iter_mut() {
-                let effect = match effect {
-                    None => continue,
-                    Some(ref mut effect) => effect,
-                };
-
-                if effect.update(elapsed_millis) {
-                    cbs_to_fire.append(&mut effect.callbacks());
-                }
-            }
-        }
-
-        for index in 0..len {
-            let entity = {
-                let entity = match &self.entities[index].as_ref() {
-                    &None => continue,
-                    &Some(entity) => entity,
-                };
-
-                if real_time {
-                    ActorState::update(entity, &mut self.effects,
-                                       &mut self.turn_timer.borrow_mut(), elapsed_millis);
-                } else {
-                    entity.borrow_mut().actor.check_removal(&mut self.effects,
-                                                            &mut self.turn_timer.borrow_mut());
-                }
-
-                if !entity.borrow().is_marked_for_removal() { continue; }
-
-                Rc::clone(entity)
-            };
-
-            // TODO remove all effects associated with entity
-            self.remove_entity_at_index(&entity, index);
-            notify = true;
-        }
-
         let len = self.props.len();
         for index in 0..len {
             {
@@ -1021,28 +900,17 @@ impl AreaState {
         if notify {
             self.listeners.notify(&self);
         }
-
-        (cbs_to_fire, self.turn_timer.borrow().current())
     }
 
-    pub(crate) fn remove_entity(&mut self, entity: &Rc<RefCell<EntityState>>) {
-        if !entity.borrow().location.is_in(&self) {
-            warn!("Unable to remove entity '{}' from area '{}' as it is not in the area.",
-                  entity.borrow().actor.actor.id, self.area.id);
-        }
+    pub fn remove_entity(&mut self, entity: &Rc<RefCell<EntityState>>) {
+        let entity = entity.borrow();
+        let index = entity.index;
+        trace!("Removing entity '{}' with index '{}'", entity.actor.actor.name, index);
+        let x = entity.location.x;
+        let y = entity.location.y;
+        self.clear_entity_points(&entity, x, y);
 
-        let index = entity.borrow().index;
-        self.remove_entity_at_index(entity, index);
-        self.listeners.notify(&self);
-    }
-
-    fn remove_entity_at_index(&mut self, entity: &Rc<RefCell<EntityState>>, index: usize) {
-        trace!("Removing entity '{}' with index '{}'", entity.borrow().actor.actor.name, index);
-        let x = entity.borrow().location.x;
-        let y = entity.borrow().location.y;
-        self.clear_entity_points(&*entity.borrow(), x, y);
-        self.entities[index] = None;
-        self.turn_timer.borrow_mut().remove_entity(entity);
+        self.entities.retain(|i| *i != index);
     }
 
     fn find_prop_index_to_add(&mut self) -> usize {
@@ -1052,17 +920,6 @@ impl AreaState {
 
         self.props.push(None);
         self.props.len() - 1
-    }
-
-    fn find_entity_index_to_add(&mut self) -> usize {
-        for (index, item) in self.entities.iter().enumerate() {
-            if item.is_none() {
-                return index;
-            }
-        }
-
-        self.entities.push(None);
-        self.entities.len() - 1
     }
 
     pub fn add_feedback_text(&mut self, text: String, target: &Rc<RefCell<EntityState>>,
@@ -1094,6 +951,10 @@ impl AreaState {
     pub fn feedback_text_iter(&self) -> Iter<AreaFeedbackText> {
         self.feedback_text.iter()
     }
+
+    pub fn entity_iter(&self) -> impl Iterator<Item = &usize> {
+        self.entities.iter()
+    }
 }
 
 pub struct PropIterator<'a> {
@@ -1113,30 +974,6 @@ impl<'a> Iterator for PropIterator<'a> {
                 Some(prop) => match prop {
                     &None => continue,
                     &Some(ref prop) => return Some(prop),
-                }
-            }
-        }
-    }
-}
-
-pub struct EntityIterator<'a> {
-    area_state: &'a AreaState,
-    index: usize,
-}
-
-impl<'a> Iterator for EntityIterator<'a> {
-    type Item = Rc<RefCell<EntityState>>;
-    fn next(&mut self) -> Option<Rc<RefCell<EntityState>>> {
-        loop {
-            let next = self.area_state.entities.get(self.index);
-
-            self.index += 1;
-
-            match next {
-                None => return None,
-                Some(e) => match e {
-                    &None => continue,
-                    &Some(ref entity) => return Some(Rc::clone(entity))
                 }
             }
         }

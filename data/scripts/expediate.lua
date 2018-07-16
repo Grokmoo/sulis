@@ -9,7 +9,7 @@ end
 
 function on_target_select(parent, ability, targets)
   target = targets:first()
-  effect = parent:create_effect(ability:name(), ability:duration())
+  effect = target:create_effect(ability:name(), ability:duration())
   effect:add_num_bonus("movement_rate", 0.5)
   effect:add_num_bonus("defense", 5)
   effect:add_num_bonus("reflex", 5)

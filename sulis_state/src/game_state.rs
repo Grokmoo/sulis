@@ -29,12 +29,13 @@ use sulis_core::io::{GraphicsRenderer};
 use sulis_core::ui::{Widget};
 use sulis_module::{Ability, Actor, Module, ObjectSize, OnTrigger, area::{Trigger, TriggerKind}};
 
-use {ActorState, AI, AreaState, ChangeListener, ChangeListenerList, EntityState, Location,
-    PathFinder, SaveState, ScriptState, UICallback, MOVE_TO_THRESHOLD};
+use {AI, AreaState, ChangeListener, ChangeListenerList, EntityState, Location,
+    PathFinder, SaveState, ScriptState, UICallback, MOVE_TO_THRESHOLD, TurnManager};
 use script::{script_callback::ScriptHitKind, ScriptEntitySet, ScriptCallback};
 use animation::{Animation, MoveAnimation};
 
 thread_local! {
+    static TURN_MANAGER: Rc<RefCell<TurnManager>> = Rc::new(RefCell::new(TurnManager::default()));
     static STATE: RefCell<Option<GameState>> = RefCell::new(None);
     static AI: RefCell<AI> = RefCell::new(AI::new());
     static CLEAR_ANIMS: Cell<bool> = Cell::new(false);
@@ -75,12 +76,14 @@ macro_rules! exec_script {
 
 impl GameState {
     pub fn load(save_state: SaveState) -> Result<(), Error> {
+        TURN_MANAGER.with(|mgr| {
+            mgr.borrow_mut().clear();
+        });
+
         let game_state: Result<GameState, Error> = {
-            let mut new_indices = HashMap::new();
             let mut areas = HashMap::new();
             for (id, area_save) in save_state.areas {
-                let add_indices = id == save_state.current_area;
-                let area_state = AreaState::load(&id, &mut new_indices, add_indices, area_save)?;
+                let area_state = AreaState::load(&id, area_save)?;
 
                 areas.insert(id, Rc::new(RefCell::new(area_state)));
             }
@@ -93,33 +96,55 @@ impl GameState {
 
             let path_finder = PathFinder::new(&area_state.borrow().area);
 
-            let mut party = Vec::new();
-            for index in save_state.party {
-                let new_index = match new_indices.get(&index) {
-                    None => invalid_data_error(&format!("Invalid party entity index '{}'",
-                                                        index)),
-                    Some(index) => Ok(index),
-                }?;
-
-                let entity = Rc::clone(&area_state.borrow()
-                                       .entities[*new_index].as_ref().unwrap());
-                party.push(entity);
-            }
-
+            let mut entities = Vec::new();
             let mut selected = Vec::new();
-            for index in save_state.selected {
-                let new_index = match new_indices.get(&index) {
-                    None => invalid_data_error(&format!("Invalid selected entity index '{}'",
-                                                        index)),
-                    Some(index) => Ok(index),
-                }?;
+            let mut party = Vec::new();
 
-                let entity = Rc::clone(&area_state.borrow()
-                                       .entities[*new_index].as_ref().unwrap());
-                selected.push(entity);
+            for entity_save in save_state.manager.entities {
+                let entity = Rc::new(RefCell::new(EntityState::load(entity_save, &areas)?));
+                entities.push(entity);
             }
 
-            // TODO save load turn timer
+            // TODO looping through in this fashion is very inefficient
+            for index in save_state.party {
+                let mut found = false;
+                for entity in entities.iter() {
+                    if entity.borrow().index == index {
+                        party.push(Rc::clone(entity));
+                        found = true;
+                        break;
+                    }
+                }
+
+                if !found {
+                    return invalid_data_error(&format!("Invalid party index '{}'", index));
+                }
+            }
+
+            for index in save_state.selected {
+                let mut found = false;
+                for entity in party.iter() {
+                    if entity.borrow().index == index {
+                        selected.push(Rc::clone(entity));
+                        found = true;
+                        break;
+                    }
+                }
+
+                if !found {
+                    return invalid_data_error(&format!("Invalid selected index '{}'", index));
+                }
+            }
+
+            for entity in entities {
+                let area_state = match areas.get(&entity.borrow().location.area_id) {
+                    Some(state) => state,
+                    None => unreachable!(),
+                };
+
+                let location = entity.borrow().location.clone();
+                area_state.borrow_mut().add_entity(entity, location)?;
+            }
 
             Ok(GameState {
                 areas,
@@ -151,8 +176,11 @@ impl GameState {
     }
 
     pub fn init(pc_actor: Rc<Actor>) -> Result<(), Error> {
-        let game_state = GameState::new(pc_actor)?;
+        TURN_MANAGER.with(|mgr| {
+            mgr.borrow_mut().clear();
+        });
 
+        let game_state = GameState::new(pc_actor)?;
         STATE.with(|state| {
             *state.borrow_mut() = Some(game_state);
         });
@@ -183,15 +211,18 @@ impl GameState {
                                   "Unable to create starting location."));
         }
 
-        if !area_state.borrow_mut().add_actor(pc, location, true, None) {
-            error!("Player character starting location must be within \
-                   area bounds and passable.");
-            return Err(Error::new(ErrorKind::InvalidData,
-                "Unable to add player character to starting area at starting location"));
-        }
+        let index = match area_state.borrow_mut().add_actor(pc, location, true, None) {
+            Err(_) => {
+                error!("Player character starting location must be within bounds and passable.");
+                return invalid_data_error("Unable to add player character at starting location");
+            },
+            Ok(index) => index,
+        };
 
-        let pc_state = Rc::clone(area_state.borrow().get_last_entity().unwrap());
-        ActorState::init_actor_turn(&pc_state);
+        let mgr = GameState::turn_manager();
+        let pc_state = mgr.borrow().entity(index);
+
+        pc_state.borrow_mut().actor.init_turn();
 
         let path_finder = PathFinder::new(&area_state.borrow().area);
 
@@ -213,6 +244,10 @@ impl GameState {
             party_listeners: ChangeListenerList::default(),
             ui_callbacks: Vec::new(),
         })
+    }
+
+    pub fn turn_manager() -> Rc<RefCell<TurnManager>> {
+        TURN_MANAGER.with(|m| Rc::clone(&m))
     }
 
     pub fn set_selected_party_member(entity: Rc<RefCell<EntityState>>) {
@@ -301,9 +336,9 @@ impl GameState {
             let mut state = state.borrow_mut();
             let state = state.as_mut().unwrap();
 
-            let turn_timer = state.area_state.borrow().turn_timer();
-            if !turn_timer.borrow().is_active() {
-                ActorState::init_actor_turn(&entity);
+            let mgr = GameState::turn_manager();
+            if !mgr.borrow().is_combat_active() {
+                entity.borrow_mut().actor.init_turn();
             }
 
             entity.borrow_mut().set_party_member(true);
@@ -440,7 +475,8 @@ impl GameState {
             {
                 for entity in state.party.iter() {
                     let area_id = entity.borrow().location.area_id.to_string();
-                    state.areas.get(&area_id).unwrap().borrow_mut().remove_entity(&entity);
+                    let area = &state.areas.get(&area_id).unwrap();
+                    area.borrow_mut().remove_entity(&entity);
                 }
             }
 
@@ -452,8 +488,9 @@ impl GameState {
                                                     &state.area_state.borrow());
                 info!("Transitioning {} to {},{}", entity.borrow().actor.actor.name,
                     cur_location.x, cur_location.y);
+                let index = entity.borrow().index;
 
-                match state.area_state.borrow_mut().add_entity(Rc::clone(entity), cur_location) {
+                match state.area_state.borrow_mut().transition_entity_to(Rc::clone(entity), index, cur_location) {
                     Ok(_) => (),
                     Err(e) => {
                         warn!("Unable to add party member");
@@ -464,8 +501,8 @@ impl GameState {
 
             state.area_state.borrow_mut().push_scroll_to_callback(Rc::clone(&state.party[0]));
 
-            let area_state = state.area_state.borrow();
-            for entity in area_state.entity_iter() {
+            let mgr = GameState::turn_manager();
+            for entity in mgr.borrow().entity_iter() {
                 entity.borrow_mut().clear_texture_cache();
             }
         });
@@ -635,23 +672,21 @@ impl GameState {
             }
         });
 
-        let (cbs, active_entity) = STATE.with(|s| {
+        let mgr = GameState::turn_manager();
+        let cbs = mgr.borrow_mut().update(millis);
+
+        cbs.iter().for_each(|cb| cb.on_round_elapsed());
+
+        STATE.with(|s| {
             let mut state = s.borrow_mut();
             let state = state.as_mut().unwrap();
 
             let mut area_state = state.area_state.borrow_mut();
 
-            let (cbs, active_entity) = area_state.update(millis);
-
-            match active_entity {
-                None => (cbs, None),
-                Some(ref entity) => (cbs, Some(Rc::clone(entity))),
-            }
+            area_state.update(millis);
         });
 
         GameState::remove_dead_party_members();
-
-        cbs.iter().for_each(|cb| cb.on_round_elapsed());
 
         if GameState::check_clear_anims() {
             ANIMATIONS.with(|a| {
@@ -663,7 +698,8 @@ impl GameState {
             });
         }
 
-        if let Some(entity) = active_entity {
+        let current = mgr.borrow().current();
+        if let Some(entity) = current {
             AI.with(|ai| {
                 let mut ai = ai.borrow_mut();
                 ai.update(entity);
@@ -718,27 +754,25 @@ impl GameState {
 
     /// Returns true if the game is currently in turn mode, false otherwise
     pub fn is_in_turn_mode() -> bool {
-        let area_state = GameState::area_state();
-        let turn_timer = area_state.borrow().turn_timer();
-        let turn_timer = turn_timer.borrow();
-        turn_timer.is_active()
+        let mgr = GameState::turn_manager();
+        let mgr = mgr.borrow();
+        mgr.is_combat_active()
     }
 
     /// Returns true if the PC has the current turn, false otherwise
     pub fn is_pc_current() -> bool {
-        let area_state = GameState::area_state();
-        let turn_timer = area_state.borrow().turn_timer();
-        if let Some(entity) = turn_timer.borrow().current() {
+        let mgr = GameState::turn_manager();
+        if let Some(entity) = mgr.borrow().current() {
             return entity.borrow().is_party_member();
         }
+
         false
     }
 
     pub fn is_current(entity: &Rc<RefCell<EntityState>>) -> bool {
-        let area_state = GameState::area_state();
-        let turn_timer = area_state.borrow().turn_timer();
-        if let Some(ref current) = turn_timer.borrow().current() {
-            return Rc::ptr_eq(current, entity);
+        let mgr = GameState::turn_manager();
+        if let Some(current) = mgr.borrow().current() {
+            return Rc::ptr_eq(&current, entity);
         }
         false
     }

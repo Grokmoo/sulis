@@ -71,8 +71,8 @@ impl CallbackData {
     }
 
     fn get_params(&self) -> (Rc<RefCell<EntityState>>, Rc<Ability>) {
-        let area_state = GameState::area_state();
-        let parent = area_state.borrow().get_entity(self.parent);
+        let mgr = GameState::turn_manager();
+        let parent = mgr.borrow().entity(self.parent);
         let ability = Module::ability(&self.ability_id).unwrap();
         (parent, ability)
     }

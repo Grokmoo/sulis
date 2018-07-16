@@ -9,6 +9,6 @@ active:
   ap: 2000
   duration:
     Rounds: 2
-  cooldown: 4
+  cooldown: 2
   short_description: |
     Deal damage over time and a small accuracy penalty to a single opponent.

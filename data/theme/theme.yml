@@ -854,7 +854,7 @@ children:
       ][?range|Range: #range#
       ][?bonus_reach|Reach: #bonus_reach#
       ][?bonus_range|Range: #bonus_range#
-      ][?armor|Armor: #armor#][?armor_slashing;s=5.0| (Slashing: #armor_slashing#)][?armor_piercing;s=5.0| (Piercing: #armor_piercing#)][?armor_crushing;s=5.0| (Crushing: #armor_crushing#)][?armor_acid;s=5.0| (Acid: #armor_acid#)][?armor_cold;s=5.0| (Cold: #armor_cold#)][?armor_electrical;s=5.0| (Electrical: #armor_electrical#)][?armor_fire;s=5.0| (Fire: #armor_fire#)][?armor_sonic;s=5.0| (Sonic: #armor_sonic#)
+      ][?armor|[s=6.0|Armor: #armor#][?armor_slashing;s=5.0| (Slashing: #armor_slashing#)][?armor_piercing;s=5.0| (Piercing: #armor_piercing#)][?armor_crushing;s=5.0| (Crushing: #armor_crushing#)][?armor_acid;s=5.0| (Acid: #armor_acid#)][?armor_cold;s=5.0| (Cold: #armor_cold#)][?armor_electrical;s=5.0| (Electrical: #armor_electrical#)][?armor_fire;s=5.0| (Fire: #armor_fire#)][?armor_sonic;s=5.0| (Sonic: #armor_sonic#)]
       ][?initiative|Initiative: #initiative#
       ][?hit_points|Hit Points: #hit_points#
       ][?accuracy|Accuracy: #accuracy#

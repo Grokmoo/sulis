@@ -26,7 +26,7 @@ use sulis_core::ui::{color, Color};
 use sulis_core::util::{invalid_data_error, ExtInt};
 use sulis_rules::{Attack, AttackKind, BonusList, HitKind, StatList, WeaponKind, Slot, ItemKind};
 use sulis_module::{Actor, Module, ActorBuilder};
-use {AbilityState, ChangeListenerList, Effect, EntityState, GameState, Inventory, ItemState, TurnTimer};
+use {AbilityState, ChangeListenerList, Effect, EntityState, GameState, Inventory, ItemState};
 use save_state::ActorSaveState;
 
 pub struct ActorState {
@@ -206,11 +206,11 @@ impl ActorState {
             Some(ref mut state) => {
                 state.deactivate();
 
-                let area_state = GameState::area_state();
-                let mut area_state = area_state.borrow_mut();
+                let mgr = GameState::turn_manager();
+                let mut mgr = mgr.borrow_mut();
 
                 for (index, _) in self.effects.iter() {
-                    let effect = area_state.effect_mut(*index);
+                    let effect = mgr.effect_mut(*index);
                     if effect.deactivates_with(id) {
                         effect.mark_for_removal();
                     }
@@ -287,8 +287,8 @@ impl ActorState {
         let attacks = parent.borrow().actor.stats.attacks.clone();
 
         let mut is_flanking = false;
-        let area_state = GameState::area_state();
-        for entity in area_state.borrow().entity_iter() {
+        let mgr = GameState::turn_manager();
+        for entity in mgr.borrow().entity_iter() {
             if Rc::ptr_eq(&entity, parent) { continue; }
             if Rc::ptr_eq(&entity, target) { continue; }
 
@@ -654,36 +654,19 @@ impl ActorState {
         self.listeners.notify(&self);
     }
 
-    pub fn check_removal(&mut self, effects: &mut Vec<Option<Effect>>, turn_timer: &mut TurnTimer) {
-        let start_len = self.effects.len();
+    pub fn elapse_time(&mut self, millis_elapsed: u32, all_effects: &Vec<Option<Effect>>) {
+        for (_, ability_state) in self.ability_states.iter_mut() {
+            ability_state.update(millis_elapsed);
+        }
 
+        let start_len = self.effects.len();
         self.effects.retain(|(index, _)| {
-            if effects[*index].as_ref().unwrap().is_removal() {
-                effects[*index] = None;
-                turn_timer.remove_effect(*index);
-                info!("Removing effect at {}", index);
-                false
-            } else {
-                true
-            }
+            all_effects[*index].is_some()
         });
 
         if start_len != self.effects.len() {
             self.compute_stats();
         }
-    }
-
-    pub fn update(entity: &Rc<RefCell<EntityState>>, effects: &mut Vec<Option<Effect>>,
-                  turn_timer: &mut TurnTimer, millis_elapsed: u32) {
-        {
-            let actor = &mut entity.borrow_mut().actor;
-
-            for (_, ability_state) in actor.ability_states.iter_mut() {
-                ability_state.update(millis_elapsed);
-            }
-        }
-
-        entity.borrow_mut().actor.check_removal(effects, turn_timer);
     }
 
     pub fn add_effect(&mut self, index: usize, bonuses: BonusList) {
@@ -725,10 +708,6 @@ impl ActorState {
         self.ap = ap;
 
         self.listeners.notify(&self);
-    }
-
-    pub fn init_actor_turn(entity: &Rc<RefCell<EntityState>>) {
-        entity.borrow_mut().actor.init_turn();
     }
 
     pub fn end_turn(&mut self) {

@@ -74,17 +74,19 @@ impl Effect {
     }
 
     /// Updates the effect time.  returns true if a round has elapsed
-    pub fn update(&mut self, millis_elapsed: u32) -> bool {
+    #[must_use]
+    pub fn update(&mut self, millis_elapsed: u32) -> Vec<Rc<ScriptCallback>> {
         let cur_mod = self.cur_duration / ROUND_TIME_MILLIS;
 
         self.cur_duration += millis_elapsed;
 
         if cur_mod != self.cur_duration / ROUND_TIME_MILLIS {
             self.listeners.notify(&self);
-            true
-        } else {
-            false
+
+            return self.callbacks.clone()
         }
+
+        Vec::new()
     }
 
     pub fn is_removal(&self) -> bool {

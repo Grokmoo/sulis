@@ -70,8 +70,8 @@ fn activate(_lua: &Lua, data: &ScriptSubposAnimation, _args: ()) -> Result<()> {
 }
 
 pub fn create_anim(data: &ScriptSubposAnimation) -> Result<EntitySubposAnimation> {
-    let area_state = GameState::area_state();
-    let parent = area_state.borrow().get_entity(data.parent);
+    let mgr = GameState::turn_manager();
+    let parent = mgr.borrow().entity(data.parent);
 
     let mut anim = EntitySubposAnimation::new(parent, data.position.clone(), data.duration_secs);
 

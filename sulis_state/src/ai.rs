@@ -129,11 +129,11 @@ impl EntityAI {
     }
 
     fn pick_target(&mut self) {
-        let area_state = GameState::area_state();
-        let area_state = area_state.borrow();
+        let mgr = GameState::turn_manager();
+        let mgr = mgr.borrow();
 
         let mut dists = Vec::new();
-        for target in area_state.entity_iter() {
+        for target in mgr.entity_iter() {
             if !self.entity.borrow().is_hostile(&target) { continue; }
             if target.borrow().actor.stats.hidden { continue; }
 
@@ -198,8 +198,9 @@ impl EntityAI {
 
     fn do_end(&self) {
         debug!("AI for '{}' is ending.", self.entity.borrow().actor.actor.name);
-        let area_state = GameState::area_state();
-        let turn_timer = Rc::clone(&area_state.borrow().turn_timer());
-        turn_timer.borrow_mut().next();
+        let turn_mgr = GameState::turn_manager();
+        let cbs = turn_mgr.borrow_mut().next();
+
+        cbs.iter().for_each(|cb| cb.on_round_elapsed());
     }
 }

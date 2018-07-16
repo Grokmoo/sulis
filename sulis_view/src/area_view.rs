@@ -257,14 +257,17 @@ impl AreaView {
             to_draw.push(&*prop_state);
         }
 
-        for entity in state.entity_iter() {
-            if !entity.borrow().location_points().any(|p| state.is_pc_visible(p.x, p.y)) {
+        let mgr = GameState::turn_manager();
+        let mgr = mgr.borrow();
+        for index in state.entity_iter() {
+            let entity = mgr.entity(*index);
+            let mut entity = entity.borrow_mut();
+            if !entity.location_points().any(|p| state.is_pc_visible(p.x, p.y)) {
                 continue;
             }
 
-            entity.borrow_mut().cache(renderer, &mut self.entity_texture_cache);
+            entity.cache(renderer, &mut self.entity_texture_cache);
 
-            let entity = entity.borrow();
             let entity = unsafe {
                 mem::transmute::<&EntityState, &'static EntityState>(&*entity)
             };

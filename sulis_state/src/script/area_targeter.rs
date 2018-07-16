@@ -25,7 +25,7 @@ use sulis_core::util::{Point};
 use sulis_module::{Ability, Module, ObjectSize};
 
 use script::{Targeter, TargeterData};
-use {AreaState, EntityState, GameState};
+use {AreaState, EntityState, GameState, TurnManager};
 
 #[derive(Clone)]
 pub enum Shape {
@@ -340,8 +340,7 @@ pub struct AreaTargeter {
     cancel: bool,
 }
 
-fn create_entity_state_vec(area_state: &AreaState,
-                           input: &Vec<Option<usize>>) -> Vec<Rc<RefCell<EntityState>>> {
+fn create_entity_state_vec(mgr: &TurnManager, input: &Vec<Option<usize>>) -> Vec<Rc<RefCell<EntityState>>> {
     let mut out = Vec::new();
     for index in input.iter() {
         let index = match index {
@@ -349,7 +348,7 @@ fn create_entity_state_vec(area_state: &AreaState,
             &Some(ref index) => *index,
         };
 
-        match area_state.check_get_entity(index) {
+        match mgr.entity_checked(index) {
             None => (),
             Some(entity) => out.push(entity),
         }
@@ -359,8 +358,8 @@ fn create_entity_state_vec(area_state: &AreaState,
 
 impl AreaTargeter {
     pub fn from(data: &TargeterData) -> AreaTargeter {
-        let area_state = GameState::area_state();
-        let area_state = area_state.borrow();
+        let mgr = GameState::turn_manager();
+        let mgr = mgr.borrow();
 
         let free_select_must_be_passable = match data.free_select_must_be_passable {
             None => None,
@@ -376,12 +375,12 @@ impl AreaTargeter {
             on_target_select_func: data.on_target_select_func.to_string(),
             on_target_select_custom_target: match data.on_target_select_custom_target {
                 None => None,
-                Some(index) => Some(area_state.get_entity(index)),
+                Some(index) => mgr.entity_checked(index),
             },
             ability: Module::ability(&data.ability_id).unwrap(),
-            parent: area_state.get_entity(data.parent),
-            selectable: create_entity_state_vec(&area_state, &data.selectable),
-            effectable: create_entity_state_vec(&area_state, &data.effectable),
+            parent: mgr.entity(data.parent),
+            selectable: create_entity_state_vec(&mgr, &data.selectable),
+            effectable: create_entity_state_vec(&mgr, &data.effectable),
             max_effectable: data.max_effectable,
             cancel: false,
             free_select: data.free_select,

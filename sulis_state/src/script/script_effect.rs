@@ -151,9 +151,8 @@ const TURNS_TO_MILLIS: u32 = 5000;
 
 fn apply(effect_data: &ScriptEffect, pgen: Option<ScriptParticleGenerator>,
          anim: Option<ScriptColorAnimation>) -> Result<()> {
-    let area_state = GameState::area_state();
-    let mut area_state = area_state.borrow_mut();
-    let entity = area_state.get_entity(effect_data.parent);
+    let mgr = GameState::turn_manager();
+    let entity = mgr.borrow().entity(effect_data.parent);
     let duration = effect_data.duration * TURNS_TO_MILLIS;
 
     info!("Apply effect to '{}' with duration {}", entity.borrow().actor.actor.name, duration);
@@ -164,16 +163,16 @@ fn apply(effect_data: &ScriptEffect, pgen: Option<ScriptParticleGenerator>,
     }
 
     if let Some(ref pgen) = pgen {
-        let pgen = script_particle_generator::create_pgen(&pgen, &area_state)?;
+        let pgen = script_particle_generator::create_pgen(&pgen)?;
         pgen.add_removal_listener(&mut effect);
         GameState::add_animation(Box::new(pgen));
     }
     if let Some(ref anim) = anim {
-        let anim = script_color_animation::create_anim(&anim, &area_state)?;
+        let anim = script_color_animation::create_anim(&anim)?;
         anim.add_removal_listener(&mut effect);
         GameState::add_animation(Box::new(anim));
     }
 
-    area_state.add_effect(&entity, effect);
+    mgr.borrow_mut().add_effect(effect, &entity);
     Ok(())
 }

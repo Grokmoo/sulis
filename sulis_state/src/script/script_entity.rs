@@ -76,9 +76,9 @@ impl ScriptEntity {
                 message: Some("ScriptEntity does not have a valid index".to_string())
             }),
             Some(index) => {
-                let area_state = GameState::area_state();
-                let area_state = area_state.borrow();
-                match area_state.check_get_entity(index) {
+                let mgr = GameState::turn_manager();
+                let mgr = mgr.borrow();
+                match mgr.entity_checked(index) {
                     None => Err(rlua::Error::FromLuaConversionError {
                         from: "ScriptEntity",
                         to: "EntityState",
@@ -106,10 +106,10 @@ impl UserData for ScriptEntity {
         });
 
         methods.add_method("is_valid", |_, entity, ()| {
-            let area_state = GameState::area_state();
+            let mgr = GameState::turn_manager();
             match entity.index {
                 None => Ok(false),
-                Some(index) => Ok(area_state.borrow().has_entity(index)),
+                Some(index) => Ok(mgr.borrow().has_entity(index)),
             }
         });
 
@@ -119,11 +119,11 @@ impl UserData for ScriptEntity {
             let entity = entity.try_unwrap()?;
             let entity = entity.borrow();
 
-            let area_state = GameState::area_state();
-            let mut area_state = area_state.borrow_mut();
+            let mgr = GameState::turn_manager();
+            let mut mgr = mgr.borrow_mut();
 
             for effect_index in entity.actor.effects_iter() {
-                let effect = area_state.effect_mut(*effect_index);
+                let effect = mgr.effect_mut(*effect_index);
                 if effect.tag == tag {
                     effect.mark_for_removal();
                 }
@@ -582,15 +582,19 @@ impl UserData for ScriptEntitySet {
 }
 
 fn targets(_lua: &Lua, parent: &ScriptEntity, _args: ()) -> Result<ScriptEntitySet> {
-    let area_state = GameState::area_state();
-    let area_state = area_state.borrow();
+    let parent = parent.try_unwrap()?;
+    let area_id = parent.borrow().location.area_id.to_string();
 
+    let mgr = GameState::turn_manager();
     let mut indices = Vec::new();
-    for entity in area_state.entity_iter() {
-        indices.push(Some(entity.borrow().index));
+    for entity in mgr.borrow().entity_iter() {
+        let entity = entity.borrow();
+        if !entity.location.is_in_area_id(&area_id) { continue; }
+
+        indices.push(Some(entity.index));
     }
 
-    let parent_index = parent.try_unwrap_index()?;
+    let parent_index = parent.borrow().index;
     Ok(ScriptEntitySet { indices, parent: parent_index, point: None, })
 }
 
@@ -640,15 +644,17 @@ fn filter_entities<T: Copy>(set: &ScriptEntitySet, t: T,
                   filter: &Fn(&Rc<RefCell<EntityState>>, &Rc<RefCell<EntityState>>, T) -> bool)
     -> Result<ScriptEntitySet> {
 
-    let area_state = GameState::area_state();
+    let parent = ScriptEntity::new(set.parent);
+    let parent = parent.try_unwrap()?;
 
-    let parent = area_state.borrow().get_entity(set.parent);
+    let mgr = GameState::turn_manager();
+    let mgr = mgr.borrow();
 
     let mut indices = Vec::new();
     for index in set.indices.iter() {
         let entity = match index {
             &None => continue,
-            &Some(index) => area_state.borrow().check_get_entity(index),
+            &Some(index) => mgr.entity_checked(index),
         };
 
         let entity = match entity {

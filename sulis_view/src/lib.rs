@@ -282,7 +282,8 @@ impl RootView {
     pub fn end_turn(&self) {
         if GameState::is_pc_current() {
             let mgr = GameState::turn_manager();
-            mgr.borrow_mut().next();
+            let cbs = mgr.borrow_mut().next();
+            cbs.iter().for_each(|cb| cb.on_round_elapsed());
         }
     }
 }

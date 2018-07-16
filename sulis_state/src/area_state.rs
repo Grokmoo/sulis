@@ -870,8 +870,6 @@ impl AreaState {
 
     pub (crate) fn update(&mut self, _millis: u32) {
         let mut notify = false;
-        // TODO notify on entity or prop removal - turn timer needs to notify area of entity
-        // removal
         let len = self.props.len();
         for index in 0..len {
             {

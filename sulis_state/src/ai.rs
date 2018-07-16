@@ -199,6 +199,8 @@ impl EntityAI {
     fn do_end(&self) {
         debug!("AI for '{}' is ending.", self.entity.borrow().actor.actor.name);
         let turn_mgr = GameState::turn_manager();
-        turn_mgr.borrow_mut().next();
+        let cbs = turn_mgr.borrow_mut().next();
+
+        cbs.iter().for_each(|cb| cb.on_round_elapsed());
     }
 }

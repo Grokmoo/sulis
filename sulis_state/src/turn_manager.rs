@@ -19,7 +19,7 @@ use std::cell::RefCell;
 use std::collections::{HashSet, VecDeque, vec_deque::Iter};
 
 use sulis_module::Faction;
-use {AreaState, ChangeListenerList, Effect, EntityState, GameState};
+use {AreaState, ChangeListenerList, Effect, EntityState, GameState, ScriptCallback};
 
 pub const ROUND_TIME_MILLIS: u32 = 5000;
 
@@ -92,14 +92,19 @@ impl TurnManager {
         Rc::clone(self.entities[index].as_ref().unwrap())
     }
 
-    pub fn update(&mut self, current_millis: u32) {
+    #[must_use]
+    pub fn update(&mut self, current_millis: u32) -> Vec<Rc<ScriptCallback>> {
+        let mut cbs = Vec::new();
+
+        let elapsed_millis = if !self.combat_active { current_millis - self.last_millis } else { 0 };
         self.last_millis = current_millis;
-        let elapsed_millis = if self.combat_active { current_millis - self.last_millis } else { 0 };
 
         if !self.combat_active {
             // removal just replaces some with none, so we can safely iterate
             for index in 0..self.effects.len() {
-                if self.update_effect(index, elapsed_millis) {
+                let (is_removal, mut effect_cbs) = self.update_effect(index, elapsed_millis);
+                cbs.append(&mut effect_cbs);
+                if is_removal {
                     self.remove_effect(index);
                 }
             }
@@ -110,16 +115,19 @@ impl TurnManager {
                 self.remove_entity(index);
             }
         }
+
+        cbs
     }
 
-    fn update_effect(&mut self, index: usize, elapsed_millis: u32) -> bool {
+    #[must_use]
+    fn update_effect(&mut self, index: usize, elapsed_millis: u32) -> (bool, Vec<Rc<ScriptCallback>>) {
         let effect = match self.effects[index] {
-            None => return false,
+            None => return (false, Vec::new()),
             Some(ref mut effect) => effect,
         };
 
-        effect.update(elapsed_millis);
-        effect.is_removal()
+        let cbs = effect.update(elapsed_millis);
+        (effect.is_removal(), cbs)
     }
 
     fn update_entity(&mut self, index: usize, elapsed_millis: u32) -> bool {
@@ -133,8 +141,9 @@ impl TurnManager {
         entity.is_marked_for_removal()
     }
 
-    pub fn next(&mut self) {
-        self.iterate_to_next_entity();
+    #[must_use]
+    pub fn next(&mut self) -> Vec<Rc<ScriptCallback>> {
+        let cbs = self.iterate_to_next_entity();
         self.init_turn_for_current_entity();
 
         match self.current() {
@@ -148,6 +157,7 @@ impl TurnManager {
         }
 
         self.listeners.notify(&self);
+        cbs
     }
 
     fn init_turn_for_current_entity(&mut self) {
@@ -160,6 +170,10 @@ impl TurnManager {
             },
             _ => unreachable!(),
         };
+
+        if current.borrow().is_party_member() {
+            GameState::set_selected_party_member(Rc::clone(current));
+        }
 
         let mut current = current.borrow_mut();
         current.actor.init_turn();
@@ -182,24 +196,25 @@ impl TurnManager {
         }
     }
 
-    fn iterate_to_next_entity(&mut self) {
+    #[must_use]
+    fn iterate_to_next_entity(&mut self) -> Vec<Rc<ScriptCallback>> {
+        let mut cbs = Vec::new();
         let mut current_ended = false;
 
         loop {
             if current_ended && self.current_is_active_entity() { break; }
 
             let front = match self.order.pop_front() {
-                None => return,
+                None => unreachable!(),
                 Some(entry) => entry,
             };
 
             match front {
                 Entry::Effect(index) => {
-                    if self.update_effect(index, ROUND_TIME_MILLIS) {
-                        self.remove_effect(index);
-                    } else {
-                        self.order.push_back(Entry::Effect(index));
-                    }
+                    let (removal, mut effect_cbs) = self.update_effect(index, ROUND_TIME_MILLIS);
+                    cbs.append(&mut effect_cbs);
+                    if removal { self.remove_effect(index); }
+                    else { self.order.push_back(Entry::Effect(index)); }
                 },
                 Entry::Entity(index) => {
                     if let Some(entity) = &self.entities[index] {
@@ -211,6 +226,8 @@ impl TurnManager {
                 }
             }
         }
+
+        cbs
     }
 
     fn current_is_active_entity(&self) -> bool {
@@ -222,6 +239,12 @@ impl TurnManager {
         }
 
         false
+    }
+
+    pub fn check_ai_activation_for_party(&mut self, area_state: &AreaState) {
+        for entity in GameState::party() {
+            self.check_ai_activation(&entity, area_state);
+        }
     }
 
     pub fn check_ai_activation(&mut self, mover: &Rc<RefCell<EntityState>>, area_state: &AreaState) {
@@ -406,10 +429,20 @@ impl TurnManager {
 
         self.entities[index] = None;
 
+        // can't do this with a collect because of lifetime issues
+        let mut effects_to_remove = Vec::new();
+        {
+            let entity = entity.borrow();
+            for index in entity.actor.effects_iter() {
+                effects_to_remove.push(*index);
+                self.effects[*index] = None;
+            }
+        }
+
         self.order.retain(|e| {
             match e {
                 Entry::Entity(i) => *i != index,
-                Entry::Effect(_) => true,
+                Entry::Effect(i) => !effects_to_remove.contains(i),
             }
         });
 

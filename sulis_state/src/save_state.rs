@@ -87,6 +87,8 @@ impl ManagerSaveState {
             entities.push(EntitySaveState::new(entity));
         }
 
+        // TODO save / load effects
+
         ManagerSaveState {
             entities,
         }

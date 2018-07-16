@@ -218,6 +218,10 @@ impl UserData for ScriptInterface {
             if !area_state.spawn_encounter_at(x, y) {
                 warn!("Unable to find encounter for script spawn at {},{}", x, y);
             }
+
+            let mgr = GameState::turn_manager();
+            mgr.borrow_mut().check_ai_activation_for_party(&area_state);
+
             Ok(())
         });
 

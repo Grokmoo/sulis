@@ -673,7 +673,9 @@ impl GameState {
         });
 
         let mgr = GameState::turn_manager();
-        mgr.borrow_mut().update(millis);
+        let cbs = mgr.borrow_mut().update(millis);
+
+        cbs.iter().for_each(|cb| cb.on_round_elapsed());
 
         STATE.with(|s| {
             let mut state = s.borrow_mut();

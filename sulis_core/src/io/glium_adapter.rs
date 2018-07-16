@@ -403,7 +403,7 @@ fn get_min_filter(filter: TextureMinFilter) -> MinifySamplerFilter {
 fn process_window_event(event: glutin::WindowEvent) -> Option<InputAction> {
     use glium::glutin::WindowEvent::*;
     match event {
-        CloseRequested => Some(InputAction::ShowMenu),
+        CloseRequested => Some(InputAction::Exit),
         ReceivedCharacter(c) => Some(InputAction::CharReceived(c)),
         KeyboardInput { input, .. } => CONFIG.get_input_action(process_keyboard_input(input)),
         MouseInput { state, button, .. } => {

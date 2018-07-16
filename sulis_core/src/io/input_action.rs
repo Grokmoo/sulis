@@ -32,6 +32,8 @@ pub enum InputAction {
     ScrollUp,
     ScrollDown,
     QuickSave,
+    SelectAll,
+    Exit,
     MouseMove(f32, f32),
     MouseDown(ClickKind),
     MouseUp(ClickKind),

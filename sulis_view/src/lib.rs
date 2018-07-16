@@ -112,7 +112,7 @@ use sulis_core::io::{InputAction, MainLoopUpdater};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::util;
 use sulis_state::{ChangeListener, GameState, NextGameStep, save_file::create_save};
-use sulis_widgets::{Button, Label};
+use sulis_widgets::{Button, ConfirmationWindow, Label};
 
 const NAME: &str = "root";
 
@@ -279,6 +279,18 @@ impl RootView {
         Widget::add_child_to(&widget, menu);
     }
 
+    pub fn show_exit(&mut self, widget: &Rc<RefCell<Widget>>) {
+        let exit_cb = Callback::new(Rc::new(|widget, _| {
+            let root = Widget::get_root(widget);
+            let view = Widget::downcast_kind_mut::<RootView>(&root);
+            view.next_step = Some(NextGameStep::Exit);
+        }));
+
+        let window = Widget::with_theme(ConfirmationWindow::new(exit_cb), "exit_confirmation");
+        window.borrow_mut().state.set_modal(true);
+        Widget::add_child_to(widget, window);
+    }
+
     pub fn end_turn(&self) {
         if GameState::is_pc_current() {
             let mgr = GameState::turn_manager();
@@ -319,6 +331,8 @@ impl WidgetKind for RootView {
             ToggleInventory => self.toggle_inventory_window(widget),
             ToggleCharacter => self.toggle_character_window(widget),
             EndTurn => self.end_turn(),
+            Exit => self.show_exit(widget),
+            SelectAll => GameState::select_party_members(GameState::party()),
             QuickSave => {
                 if let Err(e) = create_save() {
                     error!("Error quick saving game");
@@ -352,6 +366,11 @@ impl WidgetKind for RootView {
         let bot_pane = Widget::empty("bottom_pane");
         {
             let portrait_pane = Widget::with_defaults(PortraitPane::new());
+
+            let select_all = Widget::with_theme(Button::empty(), "select_all_button");
+            select_all.borrow_mut().state.add_callback(Callback::new(Rc::new(|_, _| {
+                GameState::select_party_members(GameState::party());
+            })));
 
             let end_turn_button = Widget::with_theme(Button::empty(), "end_turn_button");
             end_turn_button.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
@@ -411,7 +430,7 @@ impl WidgetKind for RootView {
             let abilities = Widget::with_defaults(AbilitiesBar::new(entity));
 
             Widget::add_children_to(&bot_pane, vec![inv_button, cha_button, map_button,
-                                    log_button, men_button, abilities, portrait_pane]);
+                                    log_button, men_button, abilities, portrait_pane, select_all]);
         }
 
         let widget_ref = Rc::clone(widget);

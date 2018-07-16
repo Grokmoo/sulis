@@ -112,8 +112,14 @@ children:
     y_relative: Max
     width_relative: Max
     children:
+      select_all_button:
+        from: .button
+        foreground: select_all
+        border: [0, 0, 0, 0]
+        preferred_size: [6, 6]
       portrait_pane:
         preferred_size: [100, 0]
+        position: [7, 0]
         height_relative: Max
         layout: BoxHorizontal
         children:

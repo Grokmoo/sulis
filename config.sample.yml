@@ -55,6 +55,7 @@ input:
         KeyUp: ScrollUp
         KeyF5: QuickSave
         KeyGrave: ToggleConsole
+        KeyP: SelectAll
 
 logging:
     # Log level may be error, warn, info, debug, or trace

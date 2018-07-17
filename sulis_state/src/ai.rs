@@ -17,9 +17,8 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use animation::WaitAnimation;
 use sulis_core::config::CONFIG;
-use {EntityState, GameState};
+use {animation::Anim, EntityState, GameState};
 
 pub struct AI {
     ai: Option<EntityAI>,
@@ -172,8 +171,8 @@ impl EntityAI {
     fn do_wait(&self, time: u32) {
         debug!("AI for '{}' is waiting.", self.entity.borrow().actor.actor.name);
         let wait_time = CONFIG.display.animation_base_time_millis * time;
-        let anim = WaitAnimation::new(&self.entity, wait_time);
-        GameState::add_animation(Box::new(anim));
+        let anim = Anim::new_wait(&self.entity, wait_time);
+        GameState::add_animation(anim);
     }
 
     fn do_move(&self) {

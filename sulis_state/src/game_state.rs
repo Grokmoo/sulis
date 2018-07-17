@@ -32,7 +32,7 @@ use sulis_module::{Ability, Actor, Module, ObjectSize, OnTrigger, area::{Trigger
 use {AI, AreaState, ChangeListener, ChangeListenerList, EntityState, Location,
     PathFinder, SaveState, ScriptState, UICallback, MOVE_TO_THRESHOLD, TurnManager};
 use script::{script_callback::ScriptHitKind, ScriptEntitySet, ScriptCallback};
-use animation::{Animation, MoveAnimation};
+use animation::{self, Anim, AnimState};
 
 thread_local! {
     static TURN_MANAGER: Rc<RefCell<TurnManager>> = Rc::new(RefCell::new(TurnManager::default()));
@@ -41,8 +41,8 @@ thread_local! {
     static CLEAR_ANIMS: Cell<bool> = Cell::new(false);
     static MODAL_LOCKED: Cell<bool> = Cell::new(false);
     static SCRIPT: ScriptState = ScriptState::new();
-    static ANIMATIONS: RefCell<Vec<Box<Animation>>> = RefCell::new(Vec::new());
-    static ANIMS_TO_ADD: RefCell<Vec<Box<Animation>>> = RefCell::new(Vec::new());
+    static ANIMATIONS: RefCell<AnimState> = RefCell::new(AnimState::new());
+    static ANIMS_TO_ADD: RefCell<Vec<Anim>> = RefCell::new(Vec::new());
 }
 
 pub struct GameState {
@@ -76,9 +76,8 @@ macro_rules! exec_script {
 
 impl GameState {
     pub fn load(save_state: SaveState) -> Result<(), Error> {
-        TURN_MANAGER.with(|mgr| {
-            mgr.borrow_mut().clear();
-        });
+        TURN_MANAGER.with(|mgr| mgr.borrow_mut().clear());
+        ANIMATIONS.with(|anims| anims.borrow_mut().clear());
 
         let game_state: Result<GameState, Error> = {
             let mut areas = HashMap::new();
@@ -167,10 +166,6 @@ impl GameState {
         let mut area_state = area_state.borrow_mut();
         area_state.update_view_visibility();
         area_state.push_scroll_to_callback(pc);
-
-        ANIMATIONS.with(|anims| {
-            (*anims.borrow_mut()).clear();
-        });
 
         Ok(())
     }
@@ -647,7 +642,7 @@ impl GameState {
     }
 
     pub fn update(root: &Rc<RefCell<Widget>>, millis: u32) {
-        let mut anims_to_add: Vec<Box<Animation>> = ANIMS_TO_ADD.with(|a| {
+        let to_add: Vec<Anim> = ANIMS_TO_ADD.with(|a| {
             let mut anims = a.borrow_mut();
 
             let to_add = anims.drain(0..).collect();
@@ -655,22 +650,7 @@ impl GameState {
             to_add
         });
 
-        ANIMATIONS.with(|a| {
-            let mut anims = a.borrow_mut();
-
-            anims.append(&mut anims_to_add);
-
-            let mut i = 0;
-            while i < anims.len() {
-                let retain = anims[i].update(root);
-
-                if retain {
-                    i += 1;
-                } else {
-                    anims.remove(i);
-                }
-            }
-        });
+        ANIMATIONS.with(|a| a.borrow_mut().update(to_add, root));
 
         let mgr = GameState::turn_manager();
         let cbs = mgr.borrow_mut().update(millis);
@@ -689,13 +669,7 @@ impl GameState {
         GameState::remove_dead_party_members();
 
         if GameState::check_clear_anims() {
-            ANIMATIONS.with(|a| {
-                let mut anims = a.borrow_mut();
-                for anim in anims.iter_mut() {
-                    if !anim.is_blocking() { continue; }
-                    anim.mark_for_removal();
-                }
-            });
+            ANIMATIONS.with(|a| a.borrow_mut().clear_all_blocking_anims());
         }
 
         let current = mgr.borrow().current();
@@ -707,44 +681,25 @@ impl GameState {
         }
     }
 
-    pub fn draw_graphics_mode(renderer: &mut GraphicsRenderer, offset_x: f32, offset_y: f32,
+    pub fn draw_above_entities(renderer: &mut GraphicsRenderer, offset_x: f32, offset_y: f32,
                               scale_x: f32, scale_y: f32, millis: u32) {
-        ANIMATIONS.with(|a| {
-            let anims = a.borrow();
+        ANIMATIONS.with(|a| a.borrow().draw_above_entities(renderer, offset_x, offset_y, scale_x, scale_y, millis));
+    }
 
-            for anim in anims.iter() {
-                anim.draw_graphics_mode(renderer, offset_x, offset_y, scale_x, scale_y, millis);
-            }
-        })
+    pub fn draw_below_entities(renderer: &mut GraphicsRenderer, offset_x: f32, offset_y: f32,
+                              scale_x: f32, scale_y: f32, millis: u32) {
+        ANIMATIONS.with(|a| a.borrow().draw_below_entities(renderer, offset_x, offset_y, scale_x, scale_y, millis));
     }
 
     pub fn has_blocking_animations(entity: &Rc<RefCell<EntityState>>) -> bool {
-        ANIMATIONS.with(|a| {
-            let anims = a.borrow();
-
-            for anim in anims.iter() {
-                if !anim.is_blocking() { continue; }
-                if !Rc::ptr_eq(anim.get_owner(), entity) { continue; }
-
-                return true;
-            }
-            false
-        })
+        ANIMATIONS.with(|a| a.borrow().has_blocking_anims(entity))
     }
 
     pub fn remove_blocking_animations(entity: &Rc<RefCell<EntityState>>) {
-        ANIMATIONS.with(|a| {
-            let mut anims = a.borrow_mut();
-            for anim in anims.iter_mut() {
-                if !anim.is_blocking() { continue; }
-                if !Rc::ptr_eq(entity, anim.get_owner()) { continue; }
-
-                anim.mark_for_removal();
-            }
-        });
+        ANIMATIONS.with(|a| a.borrow_mut().clear_blocking_anims(entity) );
     }
 
-    pub fn add_animation(anim: Box<Animation>) {
+    pub fn add_animation(anim: Anim) {
         ANIMS_TO_ADD.with(|a| {
             let mut anims = a.borrow_mut();
 
@@ -837,9 +792,10 @@ impl GameState {
             debug!("Path finding complete in {} secs",
                   util::format_elapsed_secs(start_time.elapsed()));
 
-            let entity = Rc::clone(entity);
-            let mut anim = MoveAnimation::new(entity, path, CONFIG.display.animation_base_time_millis);
-            anim.set_callback(cb);
+            let mut anim = animation::move_animation::new(entity, path, CONFIG.display.animation_base_time_millis);
+            if let Some(cb) = cb {
+                anim.add_completion_callback(cb);
+            }
             Some(anim)
         });
 
@@ -847,7 +803,7 @@ impl GameState {
             None => false,
             Some(anim) => {
                 GameState::remove_blocking_animations(entity);
-                GameState::add_animation(Box::new(anim));
+                GameState::add_animation(anim);
                 true
             }
         }

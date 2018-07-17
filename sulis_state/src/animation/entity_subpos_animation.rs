@@ -14,95 +14,24 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::cmp::Ordering;
 use std::cell::RefCell;
 use std::rc::Rc;
-use std::time::Instant;
 
-use sulis_core::ui::{Widget};
-use sulis_core::util;
-
-use {animation, EntityState, ScriptCallback};
+use {EntityState};
 use animation::particle_generator::Param;
 
-pub struct EntitySubposAnimation {
-    owner: Rc<RefCell<EntityState>>,
-    position: (Param, Param),
-    duration_secs: f32,
+pub (in animation) fn update(x: &mut Param, y: &mut Param, owner: &Rc<RefCell<EntityState>>, millis: u32) {
+    let secs = millis as f32 / 1000.0;
+    let v_term = secs;
+    let a_term = secs * secs;
+    let j_term = secs * secs * secs;
 
-    start_time: Instant,
-    previous_secs: f32,
-    callbacks: Vec<(f32, Box<ScriptCallback>)>, //sorted by the first field which is time in seconds
-    callback: Option<Box<ScriptCallback>>,
+    x.update(v_term, a_term, j_term);
+    y.update(v_term, a_term, j_term);
+
+    owner.borrow_mut().sub_pos = (x.value, y.value);
 }
 
-impl EntitySubposAnimation {
-    pub fn new(owner: Rc<RefCell<EntityState>>, position: (Param, Param),
-        duration_secs: f32) -> EntitySubposAnimation {
-        trace!("Created new entity subpos animation with duration {}", duration_secs);
-        EntitySubposAnimation {
-            owner,
-            callback: None,
-            callbacks: Vec::new(),
-            start_time: Instant::now(),
-            previous_secs: 0.0,
-            position,
-            duration_secs,
-        }
-    }
-
-    pub fn add_callback(&mut self, callback: Box<ScriptCallback>, time_secs: f32) {
-        self.callbacks.push((time_secs, callback));
-
-        self.callbacks.sort_by(|a, b| {
-            if a.0 < b.0 {
-                Ordering::Less
-            } else {
-                Ordering::Greater
-            }
-        });
-    }
-}
-
-impl animation::Animation for EntitySubposAnimation {
-    fn update(&mut self, _root: &Rc<RefCell<Widget>>) -> bool {
-        let secs = util::get_elapsed_millis(self.start_time.elapsed()) as f32 / 1000.0;
-
-        let v_term = secs;
-        let a_term = secs * secs;
-        let j_term = secs * secs * secs;
-
-        self.position.0.update(v_term, a_term, j_term);
-        self.position.1.update(v_term, a_term, j_term);
-
-        self.owner.borrow_mut().sub_pos = (self.position.0.value, self.position.1.value);
-
-        if !self.callbacks.is_empty() {
-            if secs > self.callbacks[0].0 {
-                self.callbacks[0].1.on_anim_update();
-                self.callbacks.remove(0);
-            }
-        }
-
-        self.previous_secs = secs;
-        if secs < self.duration_secs {
-            true
-        } else {
-            self.owner.borrow_mut().sub_pos = (0.0, 0.0);
-            if let Some(ref mut cb) = self.callback {
-                cb.on_anim_complete();
-            }
-            false
-        }
-    }
-
-    fn is_blocking(&self) -> bool { true }
-
-    fn set_callback(&mut self, callback: Option<Box<ScriptCallback>>) {
-        self.callback = callback;
-    }
-
-    fn get_owner(&self) -> &Rc<RefCell<EntityState>> {
-        &self.owner
-    }
+pub (in animation) fn cleanup(owner: &Rc<RefCell<EntityState>>) {
+    owner.borrow_mut().sub_pos = (0.0, 0.0);
 }

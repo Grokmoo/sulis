@@ -16,115 +16,82 @@
 
 use std::rc::Rc;
 use std::cell::RefCell;
-use std::time::Instant;
 
 use sulis_rules::HitKind;
-use sulis_core::util;
-use sulis_core::ui::{Color, Widget};
+use sulis_core::ui::{Color};
 use {script::ScriptEntitySet, ScriptCallback};
-use {animation, EntityState, GameState};
+use {animation::Anim, EntityState, GameState};
 
-pub struct MeleeAttackAnimation {
-    attacker: Rc<RefCell<EntityState>>,
+pub (in animation) fn update(attacker: &Rc<RefCell<EntityState>>, model: &mut MeleeAttackAnimModel, frac: f32) {
+    if !model.has_attacked && frac > 0.5 {
+        let cb_targets = ScriptEntitySet::new(&model.defender, &vec![Some(Rc::clone(attacker))]);
+
+        for cb in model.callbacks.iter() {
+            cb.before_attack(&cb_targets);
+        }
+
+        let area_state = GameState::area_state();
+
+        let defender_cbs = model.defender.borrow().callbacks();
+        let attacker_cbs = attacker.borrow().callbacks();
+
+        attacker_cbs.iter().for_each(|cb| cb.before_attack(&cb_targets));
+        defender_cbs.iter().for_each(|cb| cb.before_defense(&cb_targets));
+
+        let (hit_kind, damage, text, color) = (model.attack_func)(attacker, &model.defender);
+
+        area_state.borrow_mut().add_feedback_text(text, &model.defender, color, 3.0);
+        model.has_attacked = true;
+
+        for cb in model.callbacks.iter() {
+            cb.after_attack(&cb_targets, hit_kind, damage);
+        }
+
+        attacker_cbs.iter().for_each(|cb| cb.after_attack(&cb_targets, hit_kind, damage));
+        defender_cbs.iter().for_each(|cb| cb.after_defense(&cb_targets, hit_kind, damage));
+    }
+
+    let mut attacker = attacker.borrow_mut();
+    if frac > 0.5 {
+        attacker.sub_pos = ((1.0 - frac) * model.vector.0, (1.0 - frac) * model.vector.1);
+    } else {
+        attacker.sub_pos = (frac * model.vector.0, frac * model.vector.1);
+    }
+}
+
+pub (in animation) fn cleanup(owner: &Rc<RefCell<EntityState>>) {
+    owner.borrow_mut().sub_pos = (0.0, 0.0);
+}
+
+pub (in animation) struct MeleeAttackAnimModel {
     defender: Rc<RefCell<EntityState>>,
+    callbacks: Vec<Box<ScriptCallback>>,
     vector: (f32, f32),
-    start_time: Instant,
-    total_time_millis: u32,
-    marked_for_removal: bool,
-    has_attacked: bool,
-    callback: Option<Box<ScriptCallback>>,
-
+    pub (in animation) has_attacked: bool,
     attack_func: Box<Fn(&Rc<RefCell<EntityState>>, &Rc<RefCell<EntityState>>) ->
         (HitKind, u32, String, Color)>,
 }
 
-impl MeleeAttackAnimation {
-    pub fn new(attacker: &Rc<RefCell<EntityState>>,
-               defender: &Rc<RefCell<EntityState>>,
-               total_time_millis: u32,
-               attack_func: Box<Fn(&Rc<RefCell<EntityState>>, &Rc<RefCell<EntityState>>) ->
-                  (HitKind, u32, String, Color)>) -> MeleeAttackAnimation {
+pub fn new(attacker: &Rc<RefCell<EntityState>>,
+           defender: &Rc<RefCell<EntityState>>,
+           duration_millis: u32,
+           callbacks: Vec<Box<ScriptCallback>>,
+           attack_func: Box<Fn(&Rc<RefCell<EntityState>>, &Rc<RefCell<EntityState>>) ->
+                (HitKind, u32, String, Color)>) -> Anim {
 
-        let x = defender.borrow().location.x + defender.borrow().size.width / 2
-            - attacker.borrow().location.x - attacker.borrow().size.width / 2;
-        let y = defender.borrow().location.y + defender.borrow().size.height / 2
-            - attacker.borrow().location.y - attacker.borrow().size.height / 2;
+    let x = defender.borrow().location.x + defender.borrow().size.width / 2
+        - attacker.borrow().location.x - attacker.borrow().size.width / 2;
+    let y = defender.borrow().location.y + defender.borrow().size.height / 2
+        - attacker.borrow().location.y - attacker.borrow().size.height / 2;
+    let vector = (x as f32, y as f32);
 
-        MeleeAttackAnimation {
-            attacker: Rc::clone(attacker),
-            defender: Rc::clone(defender),
-            vector: (x as f32, y as f32),
-            start_time: Instant::now(),
-            total_time_millis,
-            marked_for_removal: false,
-            has_attacked: false,
-            callback: None,
-            attack_func,
-        }
-    }
-}
+    let model = MeleeAttackAnimModel {
+        defender: Rc::clone(defender),
+        callbacks,
+        has_attacked: false,
+        attack_func,
+        vector,
+    };
 
-impl animation::Animation for MeleeAttackAnimation {
-    fn set_callback(&mut self, callback: Option<Box<ScriptCallback>>) {
-        self.callback = callback;
-    }
-
-    fn update(&mut self, _root: &Rc<RefCell<Widget>>) -> bool {
-        if self.marked_for_removal {
-            self.attacker.borrow_mut().sub_pos = (0.0, 0.0);
-            return false;
-        }
-
-        let millis = util::get_elapsed_millis(self.start_time.elapsed());
-        let frac = millis as f32 / self.total_time_millis as f32;
-
-        let cb_targets = ScriptEntitySet::new(&self.defender, &vec![Some(Rc::clone(&self.attacker))]);
-        if !self.has_attacked && frac > 0.5 {
-            if let Some(ref cb) = self.callback.as_ref() {
-                cb.before_attack(&cb_targets);
-            }
-
-            let area_state = GameState::area_state();
-
-            let defender_cbs = self.defender.borrow().callbacks();
-            let attacker_cbs = self.attacker.borrow().callbacks();
-
-            attacker_cbs.iter().for_each(|cb| cb.before_attack(&cb_targets));
-            defender_cbs.iter().for_each(|cb| cb.before_defense(&cb_targets));
-
-            let (hit_kind, damage, text, color) = (self.attack_func)(&self.attacker, &self.defender);
-
-            area_state.borrow_mut().add_feedback_text(text, &self.defender, color, 3.0);
-            self.has_attacked = true;
-
-            if let Some(ref cb) = self.callback.as_ref() {
-                cb.after_attack(&cb_targets, hit_kind, damage);
-            }
-
-            attacker_cbs.iter().for_each(|cb| cb.after_attack(&cb_targets, hit_kind, damage));
-            defender_cbs.iter().for_each(|cb| cb.after_defense(&cb_targets, hit_kind, damage));
-        }
-
-        let mut attacker = self.attacker.borrow_mut();
-        if frac > 1.0 {
-            attacker.sub_pos = (0.0, 0.0);
-            return false;
-        } else if frac > 0.5 {
-            attacker.sub_pos = ((1.0 - frac) * self.vector.0, (1.0 - frac) * self.vector.1);
-        } else {
-            attacker.sub_pos = (frac * self.vector.0, frac * self.vector.1);
-        }
-
-        true
-    }
-
-    fn is_blocking(&self) -> bool { true }
-
-    fn mark_for_removal(&mut self) {
-        self.marked_for_removal = true;
-    }
-
-    fn get_owner(&self) -> &Rc<RefCell<EntityState>> {
-        &self.attacker
-    }
+    Anim::new_melee_attack(attacker, duration_millis, model)
 }

@@ -20,6 +20,7 @@ pub use self::point::Point;
 pub mod size;
 pub use self::size::Size;
 
+use std::f32;
 use std::ops::*;
 use std::fmt;
 use std::rc::Rc;
@@ -36,7 +37,7 @@ use config::{self, CONFIG};
 use ui::Widget;
 use io::{IO, MainLoopUpdater};
 
-#[derive(Deserialize, Serialize, Debug, Clone, Copy)]
+#[derive(Deserialize, Serialize, Debug, Clone, Copy, PartialEq)]
 #[serde(deny_unknown_fields)]
 #[serde(untagged)]
 pub enum ExtInt {
@@ -56,6 +57,20 @@ impl ExtInt {
         match self {
             ExtInt::Int(_) => false,
             ExtInt::Infinity => true,
+        }
+    }
+
+    pub fn to_f32(&self) -> f32 {
+        match self {
+            ExtInt::Int(amount) => *amount as f32,
+            ExtInt::Infinity => f32::INFINITY,
+        }
+    }
+
+    pub fn less_than(&self, other: u32) -> bool {
+        match self {
+            ExtInt::Int(amount) => *amount < other,
+            ExtInt::Infinity => false,
         }
     }
 }

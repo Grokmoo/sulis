@@ -27,7 +27,7 @@ pub struct AbilityState {
     pub ability: Rc<Ability>,
     pub group: String,
     pub(crate) remaining_duration: ExtInt,
-    last_elapsed: u32,
+    cur_duration: u32,
     pub listeners: ChangeListenerList<AbilityState>,
 }
 
@@ -42,18 +42,18 @@ impl AbilityState {
             ability: Rc::clone(ability),
             group,
             remaining_duration: ExtInt::Int(0),
-            last_elapsed: 0,
+            cur_duration: 0,
             listeners: ChangeListenerList::default(),
         }
     }
 
     pub fn update(&mut self, millis_elapsed: u32) {
-        self.last_elapsed += millis_elapsed;
+        let cur_mod = self.cur_duration / ROUND_TIME_MILLIS;
+        self.cur_duration += millis_elapsed;
 
         self.remaining_duration = self.remaining_duration - millis_elapsed;
 
-        if self.last_elapsed > ROUND_TIME_MILLIS {
-            self.last_elapsed -= ROUND_TIME_MILLIS;
+        if cur_mod != self.cur_duration / ROUND_TIME_MILLIS {
             self.listeners.notify(&self);
         }
     }
@@ -78,6 +78,8 @@ impl AbilityState {
                 Duration::Instant | Duration::Rounds(_) => ExtInt::Int(active.cooldown * ROUND_TIME_MILLIS),
             }
         };
+        self.cur_duration = 0;
+        self.listeners.notify(&self);
     }
 
     pub fn deactivate(&mut self) {

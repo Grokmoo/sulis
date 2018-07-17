@@ -99,14 +99,12 @@ impl TurnManager {
         let elapsed_millis = if !self.combat_active { current_millis - self.last_millis } else { 0 };
         self.last_millis = current_millis;
 
-        if !self.combat_active {
-            // removal just replaces some with none, so we can safely iterate
-            for index in 0..self.effects.len() {
-                let (is_removal, mut effect_cbs) = self.update_effect(index, elapsed_millis);
-                cbs.append(&mut effect_cbs);
-                if is_removal {
-                    self.remove_effect(index);
-                }
+        // removal just replaces some with none, so we can safely iterate
+        for index in 0..self.effects.len() {
+            let (is_removal, mut effect_cbs) = self.update_effect(index, elapsed_millis);
+            cbs.append(&mut effect_cbs);
+            if is_removal {
+                self.remove_effect(index);
             }
         }
 

@@ -165,12 +165,12 @@ fn apply(effect_data: &ScriptEffect, pgen: Option<ScriptParticleGenerator>,
     if let Some(ref pgen) = pgen {
         let pgen = script_particle_generator::create_pgen(&pgen)?;
         pgen.add_removal_listener(&mut effect);
-        GameState::add_animation(Box::new(pgen));
+        GameState::add_animation(pgen);
     }
     if let Some(ref anim) = anim {
         let anim = script_color_animation::create_anim(&anim)?;
         anim.add_removal_listener(&mut effect);
-        GameState::add_animation(Box::new(anim));
+        GameState::add_animation(anim);
     }
 
     mgr.borrow_mut().add_effect(effect, &entity);

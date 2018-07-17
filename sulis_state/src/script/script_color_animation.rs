@@ -16,8 +16,9 @@
 
 use rlua::{Lua, UserData, UserDataMethods};
 
+use sulis_core::util::ExtInt;
 use {GameState};
-use animation::{Animation, EntityColorAnimation};
+use animation::{Anim};
 use animation::particle_generator::{Param};
 use script::{CallbackData, Result, script_particle_generator};
 
@@ -26,18 +27,18 @@ pub struct ScriptColorAnimation {
     parent: usize,
     completion_callback: Option<CallbackData>,
     callbacks: Vec<(f32, CallbackData)>,
-    duration_secs: f32,
+    duration_millis: ExtInt,
     color: [Param; 4],
     color_sec: [Param; 4],
 }
 
 impl ScriptColorAnimation {
-    pub fn new(parent: usize, duration_secs: f32) -> ScriptColorAnimation {
+    pub fn new(parent: usize, duration_millis: ExtInt) -> ScriptColorAnimation {
         ScriptColorAnimation {
             parent,
             completion_callback: None,
             callbacks: Vec::new(),
-            duration_secs,
+            duration_millis,
             color: [Param::fixed(1.0), Param::fixed(1.0), Param::fixed(1.0), Param::fixed(1.0)],
             color_sec: [Param::fixed(0.0), Param::fixed(0.0), Param::fixed(0.0), Param::fixed(0.0)],
         }
@@ -70,24 +71,24 @@ impl UserData for ScriptColorAnimation {
 fn activate(_lua: &Lua, data: &ScriptColorAnimation, _args: ()) -> Result<()> {
     let anim = create_anim(data)?;
 
-    GameState::add_animation(Box::new(anim));
+    GameState::add_animation(anim);
 
     Ok(())
 }
 
-pub fn create_anim(data: &ScriptColorAnimation) -> Result<EntityColorAnimation> {
+pub fn create_anim(data: &ScriptColorAnimation) -> Result<Anim> {
     let mgr = GameState::turn_manager();
     let parent = mgr.borrow().entity(data.parent);
 
-    let mut anim = EntityColorAnimation::new(parent, data.color.clone(), data.color_sec.clone(),
-        data.duration_secs);
+    let mut anim = Anim::new_entity_color(&parent, data.duration_millis,
+                                          data.color.clone(), data.color_sec.clone());
 
     if let Some(ref cb) = data.completion_callback {
-        anim.set_callback(Some(Box::new(cb.clone())));
+        anim.add_completion_callback(Box::new(cb.clone()));
     }
 
     for &(time, ref cb) in data.callbacks.iter() {
-        anim.add_callback(Box::new(cb.clone()), time);
+        anim.add_update_callback(Box::new(cb.clone()), (time * 1000.0) as u32);
     }
 
     Ok(anim)

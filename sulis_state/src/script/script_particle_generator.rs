@@ -17,9 +17,10 @@
 use rlua::{self, Lua, UserData, UserDataMethods};
 
 use sulis_core::resource::ResourceSet;
+use sulis_core::util::ExtInt;
 
 use {GameState};
-use animation::{Animation, ParticleGenerator};
+use animation::{Anim, self};
 use animation::particle_generator::{Dist, Param, DistParam, DistParam2D, GeneratorModel};
 use script::{CallbackData, Result};
 
@@ -33,13 +34,13 @@ pub struct ScriptParticleGenerator {
 }
 
 impl ScriptParticleGenerator {
-    pub fn new(parent: usize, image: String, duration_secs: f32) -> ScriptParticleGenerator {
+    pub fn new(parent: usize, image: String, duration_millis: ExtInt) -> ScriptParticleGenerator {
         let mgr = GameState::turn_manager();
         let owner = mgr.borrow().entity(parent);
         let x = owner.borrow().location.x as f32 + owner.borrow().size.width as f32 / 2.0;
         let y = owner.borrow().location.y as f32 + owner.borrow().size.height as f32 / 2.0;
 
-        let model = GeneratorModel::new(duration_secs, x, y);
+        let model = GeneratorModel::new(duration_millis, x, y);
 
         ScriptParticleGenerator {
             parent,
@@ -50,8 +51,8 @@ impl ScriptParticleGenerator {
         }
     }
 
-    pub fn new_anim(parent: usize, image: String, duration_secs: f32) -> ScriptParticleGenerator {
-        let mut pgen = ScriptParticleGenerator::new(parent, image, duration_secs);
+    pub fn new_anim(parent: usize, image: String, duration_millis: ExtInt) -> ScriptParticleGenerator {
+        let mut pgen = ScriptParticleGenerator::new(parent, image, duration_millis);
         pgen.model.initial_overflow = 1.0;
         pgen.model.gen_rate = Param::fixed(0.0);
         pgen
@@ -154,12 +155,12 @@ pub fn param<T>(_lua: &Lua, _: &T,
 fn activate(_lua: &Lua, gen: &ScriptParticleGenerator, _args: ()) -> Result<()> {
     let pgen = create_pgen(gen)?;
 
-    GameState::add_animation(Box::new(pgen));
+    GameState::add_animation(pgen);
 
     Ok(())
 }
 
-pub fn create_pgen(gen: &ScriptParticleGenerator) -> Result<ParticleGenerator> {
+pub fn create_pgen(gen: &ScriptParticleGenerator) -> Result<Anim> {
     let mgr = GameState::turn_manager();
     let parent = mgr.borrow().entity(gen.parent);
 
@@ -175,14 +176,14 @@ pub fn create_pgen(gen: &ScriptParticleGenerator) -> Result<ParticleGenerator> {
         }
     };
 
-    let mut pgen = ParticleGenerator::new(parent, image, gen.model.clone());
+    let mut pgen = animation::particle_generator::new(&parent, image, gen.model.clone());
 
     if let Some(ref cb) = gen.completion_callback {
-        pgen.set_callback(Some(Box::new(cb.clone())));
+        pgen.add_completion_callback(Box::new(cb.clone()));
     }
 
     for &(time, ref cb) in gen.callbacks.iter() {
-        pgen.add_callback(Box::new(cb.clone()), time);
+        pgen.add_update_callback(Box::new(cb.clone()), (time * 1000.0) as u32);
     }
 
     Ok(pgen)

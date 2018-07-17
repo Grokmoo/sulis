@@ -27,7 +27,7 @@ use sulis_core::ui::color;
 use sulis_core::resource::ResourceSet;
 use sulis_rules::{AttackKind, DamageKind, Attack};
 use {ActorState, EntityState, GameState};
-use animation::{Animation, MeleeAttackAnimation};
+use animation::{self};
 use script::*;
 
 #[derive(Clone, Debug)]
@@ -144,30 +144,41 @@ impl UserData for ScriptEntity {
 
         methods.add_method("create_subpos_anim", |_, entity, duration_secs: f32| {
             let index = entity.try_unwrap_index()?;
-            Ok(ScriptSubposAnimation::new(index, duration_secs))
+            let duration = ExtInt::Int((duration_secs * 1000.0) as u32);
+            Ok(ScriptSubposAnimation::new(index, duration))
         });
 
         methods.add_method("create_color_anim", |_, entity, duration_secs: Option<f32>| {
             let index = entity.try_unwrap_index()?;
-            let duration = duration_secs.unwrap_or(f32::INFINITY);
+            let duration = match duration_secs {
+                None => ExtInt::Infinity,
+                Some(amount) => ExtInt::Int((amount * 1000.0) as u32),
+            };
             Ok(ScriptColorAnimation::new(index, duration))
         });
 
         methods.add_method("create_particle_generator", |_, entity, args: (String, Option<f32>)| {
-            let duration_secs = args.1.unwrap_or(f32::INFINITY);
             let sprite = args.0;
             let index = entity.try_unwrap_index()?;
-            Ok(ScriptParticleGenerator::new(index, sprite, duration_secs))
+            let duration = match args.1 {
+                None => ExtInt::Infinity,
+                Some(amount) => ExtInt::Int((amount * 1000.0) as u32),
+            };
+            Ok(ScriptParticleGenerator::new(index, sprite, duration))
         });
 
         methods.add_method("wait_anim", |_, entity, duration: f32| {
             let index = entity.try_unwrap_index()?;
             let image = ResourceSet::get_empty_image();
+            let duration = ExtInt::Int((duration * 1000.0) as u32);
             Ok(ScriptParticleGenerator::new_anim(index, image.id(), duration))
         });
 
         methods.add_method("create_anim", |_, entity, (image, duration): (String, Option<f32>)| {
-            let duration = duration.unwrap_or(f32::INFINITY);
+            let duration = match duration {
+                None => ExtInt::Infinity,
+                Some(amount) => ExtInt::Int((amount * 1000.0) as u32),
+            };
             let index = entity.try_unwrap_index()?;
             Ok(ScriptParticleGenerator::new_anim(index, image, duration))
         });
@@ -222,19 +233,20 @@ impl UserData for ScriptEntity {
             let target = target.try_unwrap()?;
             let damage_kind = DamageKind::from_str(&damage_kind);
             let attack_kind = AttackKind::from_str(&attack_kind);
-
+            let mut cbs: Vec<Box<ScriptCallback>> = Vec::new();
+            if let Some(cb) = cb {
+                cbs.push(Box::new(cb));
+            }
             let time = CONFIG.display.animation_base_time_millis * 5;
-            let mut anim = MeleeAttackAnimation::new(&parent, &target, time, Box::new(move |att, def| {
+            let anim = animation::melee_attack_animation::new(&parent, &target,
+                                                              time, cbs, Box::new(move |att, def| {
                 let attack = Attack::special(min_damage, max_damage, ap,
                                              damage_kind, attack_kind.clone());
 
                 ActorState::attack(att, def, &attack)
             }));
 
-            if let Some(cb) = cb {
-                anim.set_callback(Some(Box::new(cb)));
-            }
-            GameState::add_animation(Box::new(anim));
+            GameState::add_animation(anim);
             Ok(())
         });
 

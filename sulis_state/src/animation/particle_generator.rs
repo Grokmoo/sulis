@@ -17,17 +17,14 @@
 use rlua::{UserData};
 use rand::{self, Rng};
 
-use std::cmp::Ordering;
-use std::cell::RefCell;
+use std::cell::{Cell, RefCell};
 use std::rc::Rc;
-use std::time::Instant;
 
 use sulis_core::image::Image;
 use sulis_core::io::{DrawList, GraphicsRenderer};
-use sulis_core::ui::{animation_state, Color, Widget};
-use sulis_core::util;
-
-use {animation, ChangeListener, Effect, EntityState, ScriptCallback};
+use sulis_core::ui::{animation_state, Color};
+use sulis_core::util::ExtInt;
+use {animation::Anim, EntityState};
 
 #[derive(Clone, Copy)]
 pub enum Coord {
@@ -211,6 +208,108 @@ impl Param {
     }
 }
 
+pub (in animation) fn update(owner: &Rc<RefCell<EntityState>>, model: &mut GeneratorModel,
+                             state: &mut GeneratorState, marked_for_removal: &Rc<Cell<bool>>, millis: u32) {
+    if model.moves_with_parent && owner.borrow().actor.is_dead() {
+        marked_for_removal.set(true);
+        return;
+    }
+
+    let secs = millis as f32 / 1000.0;
+    let frame_time_secs = secs - state.previous_secs;
+
+    let num_to_gen = model.gen_rate.value * frame_time_secs + state.gen_overflow;
+
+    state.gen_overflow = num_to_gen.fract();
+
+    for _ in 0..(num_to_gen.trunc() as i32) {
+        let particle = model.generate_particle();
+        state.particles.push(particle);
+    }
+
+    let v_term = secs;
+    let a_term = secs * secs;
+    let j_term = secs * secs * secs;
+
+    model.gen_rate.update(v_term, a_term, j_term);
+    model.position.0.update(v_term, a_term, j_term);
+    model.position.1.update(v_term, a_term, j_term);
+    model.red.update(v_term, a_term, j_term);
+    model.green.update(v_term, a_term, j_term);
+    model.blue.update(v_term, a_term, j_term);
+    model.alpha.update(v_term, a_term, j_term);
+
+    if let Some(ref mut rotation) = model.rotation {
+        rotation.update(v_term, a_term, j_term);
+    }
+
+    let mut i = state.particles.len();
+    loop {
+        if i == 0 { break; }
+
+        i -= 1;
+
+        let remove = state.particles[i].update(frame_time_secs);
+
+        if remove {
+            state.particles.remove(i);
+        }
+    }
+
+    state.previous_secs = secs;
+}
+
+pub (in animation) fn draw(state: &GeneratorState, model: &GeneratorModel, owner: &Rc<RefCell<EntityState>>,
+        renderer: &mut GraphicsRenderer, offset_x: f32, offset_y: f32,
+        scale_x: f32, scale_y: f32, _millis: u32) {
+    let (offset_x, offset_y) = if model.moves_with_parent {
+        let parent = owner.borrow();
+        let x = parent.location.x as f32 + parent.size.width as f32 / 2.0 + parent.sub_pos.0;
+        let y = parent.location.y as f32 + parent.size.height as f32 / 2.0 + parent.sub_pos.1;
+        (x + offset_x, y + offset_y)
+    } else {
+        (offset_x, offset_y)
+    };
+
+    let mut draw_list = DrawList::empty_sprite();
+    for particle in state.particles.iter() {
+        let x = particle.position.0.value + offset_x;
+        let y = particle.position.1.value + offset_y;
+        let w = particle.width;
+        let h = particle.height;
+        let millis = (particle.current_duration * 1000.0) as u32;
+        state.image.append_to_draw_list(&mut draw_list, &animation_state::NORMAL,
+                                       x, y, w, h, millis);
+    }
+
+    if !draw_list.is_empty() {
+        draw_list.set_scale(scale_x, scale_y);
+        draw_list.set_color(Color::new(model.red.value, model.green.value,
+                                       model.blue.value, model.alpha.value));
+        if let Some(ref rotation) = model.rotation {
+            draw_list.rotate(rotation.value);
+        }
+        renderer.draw(draw_list);
+    }
+}
+
+pub fn new(owner: &Rc<RefCell<EntityState>>, image: Rc<Image>, model: GeneratorModel) -> Anim {
+    let state = GeneratorState {
+        image,
+        particles: Vec::new(),
+        gen_overflow: model.initial_overflow,
+        previous_secs: 0.0
+    };
+
+    Anim::new_pgen(owner, model.duration_millis, model, state)
+}
+pub (in animation) struct GeneratorState {
+    image: Rc<Image>,
+    particles: Vec<Particle>,
+    gen_overflow: f32,
+    previous_secs: f32,
+}
+
 #[derive(Clone)]
 pub struct GeneratorModel {
     pub position: (Param, Param),
@@ -220,7 +319,7 @@ pub struct GeneratorModel {
     pub blue: Param,
     pub alpha: Param,
     pub moves_with_parent: bool,
-    pub duration_secs: f32,
+    pub duration_millis: ExtInt,
     pub gen_rate: Param,
     pub initial_overflow: f32,
     pub particle_position_dist: Option<DistParam2D>,
@@ -231,9 +330,9 @@ pub struct GeneratorModel {
 impl UserData for GeneratorModel { }
 
 impl GeneratorModel {
-    pub fn new(duration_secs: f32, x: f32, y: f32) -> GeneratorModel {
+    pub fn new(duration_millis: ExtInt, x: f32, y: f32) -> GeneratorModel {
         GeneratorModel {
-            duration_secs,
+            duration_millis,
             position: (Param::fixed(x), Param::fixed(y)),
             rotation: None,
             red: Param::fixed(1.0),
@@ -248,90 +347,13 @@ impl GeneratorModel {
             particle_size_dist: None,
         }
     }
-}
-
-struct Particle {
-    position: (Param, Param),
-    total_duration: f32,
-    current_duration: f32,
-    width: f32,
-    height: f32,
-}
-
-impl Particle {
-    fn update(&mut self, frame_time: f32) -> bool {
-        self.current_duration += frame_time;
-
-        let v_term = self.current_duration;
-        let a_term = v_term * v_term;
-        let j_term = a_term * v_term;
-
-        self.position.0.update(v_term, a_term, j_term);
-        self.position.1.update(v_term, a_term, j_term);
-
-        self.current_duration > self.total_duration
-    }
-}
-
-pub struct ParticleGenerator {
-    image: Rc<Image>,
-    owner: Rc<RefCell<EntityState>>,
-    start_time: Instant,
-    previous_secs: f32,
-    particles: Vec<Particle>,
-    callbacks: Vec<(f32, Box<ScriptCallback>)>, //sorted by the first field which is time in seconds
-    callback: Option<Box<ScriptCallback>>,
-    gen_overflow: f32,
-    marked_for_removal: Rc<RefCell<bool>>,
-
-    model: GeneratorModel,
-}
-
-impl ParticleGenerator {
-    pub fn new(owner: Rc<RefCell<EntityState>>, image: Rc<Image>,
-               model: GeneratorModel) -> ParticleGenerator {
-        trace!("Created new particle generator with particle '{}', duration {}, pos: {:?}",
-               image.id(), model.duration_secs, model.position);
-        let gen_overflow = model.initial_overflow;
-        ParticleGenerator {
-            owner,
-            image,
-            callback: None,
-            callbacks: Vec::new(),
-            start_time: Instant::now(),
-            previous_secs: 0.0,
-            particles: Vec::new(),
-            gen_overflow,
-            model,
-            marked_for_removal: Rc::new(RefCell::new(false)),
-        }
-    }
-
-    pub fn add_callback(&mut self, callback: Box<ScriptCallback>, time_secs: f32) {
-        self.callbacks.push((time_secs, callback));
-
-        self.callbacks.sort_by(|a, b| {
-            if a.0 < b.0 {
-                Ordering::Less
-            } else {
-                Ordering::Greater
-            }
-        });
-    }
-
-    pub fn add_removal_listener(&self, effect: &mut Effect) {
-        let marked_for_removal = Rc::clone(&self.marked_for_removal);
-        effect.removal_listeners.add(ChangeListener::new("particle_gen", Box::new(move |_| {
-            *marked_for_removal.borrow_mut() = true;
-        })));
-    }
 
     fn generate_particle(&self) -> Particle {
-        let mut position = self.model.position.clone(); // inherit position from generator
+        let mut position = self.position.clone(); // inherit position from generator
         position.0.initial_value = position.0.value;
         position.1.initial_value = position.1.value;
 
-        if let Some(ref dist2d) = self.model.particle_position_dist {
+        if let Some(ref dist2d) = self.particle_position_dist {
             match dist2d.y {
                 None => {
                     let value = dist2d.x.value.generate_pair();
@@ -362,12 +384,14 @@ impl ParticleGenerator {
         }
 
 
-        let total_duration = match self.model.particle_duration_dist {
-            None => self.model.duration_secs,
+        let total_duration = match self.particle_duration_dist {
+            None => {
+                self.duration_millis.to_f32() * 1000.0
+            },
             Some(ref dist) => dist.generate(),
         };
 
-        let (width, height) = match self.model.particle_size_dist.as_ref() {
+        let (width, height) = match self.particle_size_dist.as_ref() {
             None => (1.0, 1.0),
             Some(&(ref width, ref height)) => (width.generate(), height.generate()),
         };
@@ -382,111 +406,25 @@ impl ParticleGenerator {
     }
 }
 
-impl animation::Animation for ParticleGenerator {
-    fn update(&mut self, _root: &Rc<RefCell<Widget>>) -> bool {
-        if self.model.moves_with_parent && self.owner.borrow().actor.is_dead() {
-            return false;
-        }
+struct Particle {
+    position: (Param, Param),
+    total_duration: f32,
+    current_duration: f32,
+    width: f32,
+    height: f32,
+}
 
-        let secs = util::get_elapsed_millis(self.start_time.elapsed()) as f32 / 1000.0;
-        let frame_time_secs = secs - self.previous_secs;
+impl Particle {
+    fn update(&mut self, frame_time: f32) -> bool {
+        self.current_duration += frame_time;
 
-        let num_to_gen = self.model.gen_rate.value * frame_time_secs + self.gen_overflow;
+        let v_term = self.current_duration;
+        let a_term = v_term * v_term;
+        let j_term = a_term * v_term;
 
-        self.gen_overflow = num_to_gen.fract();
+        self.position.0.update(v_term, a_term, j_term);
+        self.position.1.update(v_term, a_term, j_term);
 
-        for _ in 0..(num_to_gen.trunc() as i32) {
-            let particle = self.generate_particle();
-            self.particles.push(particle);
-        }
-
-        let v_term = secs;
-        let a_term = secs * secs;
-        let j_term = secs * secs * secs;
-
-        self.model.gen_rate.update(v_term, a_term, j_term);
-        self.model.position.0.update(v_term, a_term, j_term);
-        self.model.position.1.update(v_term, a_term, j_term);
-        self.model.red.update(v_term, a_term, j_term);
-        self.model.green.update(v_term, a_term, j_term);
-        self.model.blue.update(v_term, a_term, j_term);
-        self.model.alpha.update(v_term, a_term, j_term);
-
-        if let Some(ref mut rotation) = self.model.rotation {
-            rotation.update(v_term, a_term, j_term);
-        }
-
-        let mut i = self.particles.len();
-        loop {
-            if i == 0 { break; }
-
-            i -= 1;
-
-            let remove = self.particles[i].update(frame_time_secs);
-
-            if remove {
-                self.particles.remove(i);
-            }
-        }
-
-        if !self.callbacks.is_empty() {
-            if secs > self.callbacks[0].0 {
-                self.callbacks[0].1.on_anim_update();
-                self.callbacks.remove(0);
-            }
-        }
-
-        self.previous_secs = secs;
-        if secs < self.model.duration_secs && !*self.marked_for_removal.borrow() {
-            true
-        } else {
-            if let Some(ref mut cb) = self.callback {
-                cb.on_anim_complete();
-            }
-            false
-        }
-    }
-
-    fn draw_graphics_mode(&self, renderer: &mut GraphicsRenderer, offset_x: f32, offset_y: f32,
-                          scale_x: f32, scale_y: f32, _millis: u32) {
-        let (offset_x, offset_y) = if self.model.moves_with_parent {
-            let parent = self.owner.borrow();
-            let x = parent.location.x as f32 + parent.size.width as f32 / 2.0 + parent.sub_pos.0;
-            let y = parent.location.y as f32 + parent.size.height as f32 / 2.0 + parent.sub_pos.1;
-            (x + offset_x, y + offset_y)
-        } else {
-            (offset_x, offset_y)
-        };
-
-        let mut draw_list = DrawList::empty_sprite();
-        for particle in self.particles.iter() {
-            let x = particle.position.0.value + offset_x;
-            let y = particle.position.1.value + offset_y;
-            let w = particle.width;
-            let h = particle.height;
-            let millis = (particle.current_duration * 1000.0) as u32;
-            self.image.append_to_draw_list(&mut draw_list, &animation_state::NORMAL,
-                                           x, y, w, h, millis);
-        }
-
-        if !draw_list.is_empty() {
-            draw_list.set_scale(scale_x, scale_y);
-            draw_list.set_color(Color::new(self.model.red.value, self.model.green.value,
-                                           self.model.blue.value, self.model.alpha.value));
-            if let Some(ref rotation) = self.model.rotation {
-                draw_list.rotate(rotation.value);
-            }
-            renderer.draw(draw_list);
-        }
-    }
-
-    fn is_blocking(&self) -> bool { false }
-
-    fn set_callback(&mut self, callback: Option<Box<ScriptCallback>>) {
-        self.callback = callback;
-    }
-
-    fn get_owner(&self) -> &Rc<RefCell<EntityState>> {
-        &self.owner
+        self.current_duration > self.total_duration
     }
 }

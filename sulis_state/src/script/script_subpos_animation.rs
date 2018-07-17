@@ -16,8 +16,9 @@
 
 use rlua::{Lua, UserData, UserDataMethods};
 
+use sulis_core::util::ExtInt;
 use {GameState};
-use animation::{Animation, EntitySubposAnimation};
+use animation::{Anim};
 use animation::particle_generator::{Param};
 use script::{CallbackData, Result, script_particle_generator};
 
@@ -26,17 +27,17 @@ pub struct ScriptSubposAnimation {
     parent: usize,
     completion_callback: Option<CallbackData>,
     callbacks: Vec<(f32, CallbackData)>,
-    duration_secs: f32,
+    duration_millis: ExtInt,
     position: (Param, Param),
 }
 
 impl ScriptSubposAnimation {
-    pub fn new(parent: usize, duration_secs: f32) -> ScriptSubposAnimation {
+    pub fn new(parent: usize, duration_millis: ExtInt) -> ScriptSubposAnimation {
         ScriptSubposAnimation {
             parent,
             completion_callback: None,
             callbacks: Vec::new(),
-            duration_secs,
+            duration_millis,
             position: (Param::fixed(0.0), Param::fixed(0.0)),
         }
     }
@@ -64,23 +65,26 @@ impl UserData for ScriptSubposAnimation {
 fn activate(_lua: &Lua, data: &ScriptSubposAnimation, _args: ()) -> Result<()> {
     let anim = create_anim(data)?;
 
-    GameState::add_animation(Box::new(anim));
+    GameState::add_animation(anim);
 
     Ok(())
 }
 
-pub fn create_anim(data: &ScriptSubposAnimation) -> Result<EntitySubposAnimation> {
+pub fn create_anim(data: &ScriptSubposAnimation) -> Result<Anim> {
     let mgr = GameState::turn_manager();
     let parent = mgr.borrow().entity(data.parent);
 
-    let mut anim = EntitySubposAnimation::new(parent, data.position.clone(), data.duration_secs);
+    let x = data.position.0.clone();
+    let y = data.position.1.clone();
+
+    let mut anim = Anim::new_entity_subpos(&parent, data.duration_millis, x, y);
 
     if let Some(ref cb) = data.completion_callback {
-        anim.set_callback(Some(Box::new(cb.clone())));
+        anim.add_completion_callback(Box::new(cb.clone()));
     }
 
     for &(time, ref cb) in data.callbacks.iter() {
-        anim.add_callback(Box::new(cb.clone()), time);
+        anim.add_update_callback(Box::new(cb.clone()), (time * 1000.0) as u32);
     }
 
     Ok(anim)

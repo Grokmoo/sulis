@@ -23,7 +23,7 @@ use std::collections::HashMap;
 
 use sulis_core::config::CONFIG;
 
-use animation::{Animation, MeleeAttackAnimation, RangedAttackAnimation};
+use animation::{self};
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::ui::{color, Color};
 use sulis_core::util::{Point, invalid_data_error};
@@ -289,17 +289,16 @@ impl EntityState {
 
     pub fn attack(entity: &Rc<RefCell<EntityState>>, target: &Rc<RefCell<EntityState>>,
                   callback: Option<Box<ScriptCallback>>) {
-        let base_time = CONFIG.display.animation_base_time_millis;
+        let time = CONFIG.display.animation_base_time_millis;
+        let cbs: Vec<Box<ScriptCallback>> = callback.into_iter().collect();
         if entity.borrow().actor.stats.attack_is_melee() {
-            let mut anim = MeleeAttackAnimation::new(entity, target, base_time * 5, Box::new(|att, def| {
-                ActorState::weapon_attack(&att, &def)
+            let anim = animation::melee_attack_animation::new(entity, target, time * 5, cbs, Box::new(|a, d| {
+                ActorState::weapon_attack(&a, &d)
             }));
-            anim.set_callback(callback);
-            GameState::add_animation(Box::new(anim));
+            GameState::add_animation(anim);
         } else if entity.borrow().actor.stats.attack_is_ranged() {
-            let mut anim = RangedAttackAnimation::new(entity, target, base_time);
-            anim.set_callback(callback);
-            GameState::add_animation(Box::new(anim));
+            let anim = animation::ranged_attack_animation::new(entity, target, cbs, time);
+            GameState::add_animation(anim);
         }
 
         let attack_ap = entity.borrow().actor.stats.attack_cost;

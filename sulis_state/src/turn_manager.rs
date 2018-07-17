@@ -355,6 +355,10 @@ impl TurnManager {
             // TODO this is healing the party at the end of each combat
             entity.actor.init();
         }
+
+        if GameState::selected().is_empty() {
+            GameState::set_selected_party_member(GameState::player());
+        }
     }
 
     fn initiate_combat(&mut self) {

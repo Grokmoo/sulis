@@ -146,6 +146,7 @@ impl AnimState {
             if retain { i += 1; }
             else {
                 vec[i].cleanup_kind();
+                vec[i].run_completion_callbacks();
                 vec.remove(i);
             }
         }
@@ -247,20 +248,22 @@ impl Anim {
         }
 
         if (self.duration_millis.less_than(millis) && self.ok_to_remove()) || self.marked_for_removal.get() {
-            for cb in self.update_callbacks.iter() {
-                cb.1.on_anim_update();
-            }
-            self.update_callbacks.clear();
-
-            for cb in self.completion_callbacks.iter() {
-                cb.on_anim_complete();
-            }
-            self.completion_callbacks.clear();
-
             false
         } else {
             true
         }
+    }
+
+    fn run_completion_callbacks(&mut self) {
+        for cb in self.update_callbacks.iter() {
+            cb.1.on_anim_update();
+        }
+        self.update_callbacks.clear();
+
+        for cb in self.completion_callbacks.iter() {
+            cb.on_anim_complete();
+        }
+        self.completion_callbacks.clear();
     }
 
     fn ok_to_remove(&self) -> bool {

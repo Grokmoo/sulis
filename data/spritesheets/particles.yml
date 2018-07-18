@@ -10,6 +10,15 @@ groups:
       circle8: [0, 28, 8, 8]
       circle12: [0, 40, 12, 12]
       circle20: [0, 56, 20, 20]
+  fire_surface:
+    size: [18, 18]
+    areas:
+      fire_surface1: [342, 87]
+      fire_surface2: [362, 87]
+      fire_surface3: [382, 87]
+      fire_surface4: [402, 87]
+      fire_surface5: [422, 87]
+      fire_surface6: [442, 87]
   firebolt:
     size: [8, 8]
     position: [20, 0]

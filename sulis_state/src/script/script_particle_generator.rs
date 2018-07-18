@@ -57,6 +57,10 @@ impl ScriptParticleGenerator {
         pgen.model.gen_rate = Param::fixed(0.0);
         pgen
     }
+
+    pub fn owned_model(&self) -> GeneratorModel {
+        self.model.clone()
+    }
 }
 
 impl UserData for ScriptParticleGenerator {
@@ -69,6 +73,14 @@ impl UserData for ScriptParticleGenerator {
         methods.add_method("uniform_dist", |_, _, (min, max): (f32, f32)| Ok(Dist::create_uniform(min, max)));
         methods.add_method("angular_dist", |_, _, (min_a, max_a, min_s, max_s): (f32, f32, f32, f32)| {
             Ok(Dist::create_angular(min_a, max_a, min_s, max_s))
+        });
+        methods.add_method_mut("set_draw_below_entities", |_, gen, _: ()| {
+            gen.model.draw_above_entities = false;
+            Ok(())
+        });
+        methods.add_method_mut("set_draw_above_entities", |_, gen, _: ()| {
+            gen.model.draw_above_entities = true;
+            Ok(())
         });
         methods.add_method_mut("set_initial_gen", |_, gen, value: f32| {
             gen.model.initial_overflow = value;
@@ -153,14 +165,23 @@ pub fn param<T>(_lua: &Lua, _: &T,
 }
 
 fn activate(_lua: &Lua, gen: &ScriptParticleGenerator, _args: ()) -> Result<()> {
-    let pgen = create_pgen(gen)?;
+    let pgen = create_pgen(gen, gen.model.clone())?;
 
     GameState::add_animation(pgen);
 
     Ok(())
 }
 
-pub fn create_pgen(gen: &ScriptParticleGenerator) -> Result<Anim> {
+pub fn create_surface_pgen(gen: &ScriptParticleGenerator, x: i32, y: i32) -> Result<Anim> {
+    let mut model = gen.model.clone();
+    let x_param = model.position.0.offset(x as f32);
+    let y_param = model.position.1.offset(y as f32);
+    model.position = (x_param, y_param);
+
+    create_pgen(gen, model)
+}
+
+pub fn create_pgen(gen: &ScriptParticleGenerator, model: GeneratorModel) -> Result<Anim> {
     let mgr = GameState::turn_manager();
     let parent = mgr.borrow().entity(gen.parent);
 
@@ -176,7 +197,7 @@ pub fn create_pgen(gen: &ScriptParticleGenerator) -> Result<Anim> {
         }
     };
 
-    let mut pgen = animation::particle_generator::new(&parent, image, gen.model.clone());
+    let mut pgen = animation::particle_generator::new(&parent, image, model);
 
     if let Some(ref cb) = gen.completion_callback {
         pgen.add_completion_callback(Box::new(cb.clone()));
@@ -188,4 +209,3 @@ pub fn create_pgen(gen: &ScriptParticleGenerator) -> Result<Anim> {
 
     Ok(pgen)
 }
-

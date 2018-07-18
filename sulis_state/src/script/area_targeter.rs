@@ -576,7 +576,8 @@ impl Targeter for AreaTargeter {
             pos.y -= size.height / 2;
         }
 
-        GameState::execute_ability_on_target_select(&self.parent, &self.ability,
-            affected, pos, &self.on_target_select_func, self.on_target_select_custom_target.clone());
+        GameState::execute_ability_on_target_select(&self.parent, &self.ability, affected,
+            pos, self.cur_points.clone(), &self.on_target_select_func,
+            self.on_target_select_custom_target.clone());
     }
 }

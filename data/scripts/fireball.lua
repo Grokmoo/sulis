@@ -52,6 +52,19 @@ function create_explosion(parent, ability, targets)
   gen:set_particle_position_dist(gen:dist_param(gen:uniform_dist(-0.1, 0.1), gen:angular_dist(0.0, 2 * math.pi, 0, speed)))
   gen:set_particle_duration_dist(gen:fixed_dist(0.6))
   
+  points = targets:affected_points()
+  surface = parent:create_surface(ability:name(), points, 2)
+  
+  s_anim = parent:create_anim("fire_surface")
+  s_anim:set_position(s_anim:param(0.0), s_anim:param(0.0))
+  s_anim:set_particle_size_dist(s_anim:fixed_dist(1.0), s_anim:fixed_dist(1.0))
+  s_anim:set_draw_below_entities()
+  surface:apply(s_anim)
+  --for i = 1, #points do
+  --  point = points[i]
+  --   game:log("point " .. point.x .. ", " .. point.y)
+  --end
+  
   targets = targets:to_table()
   for i = 1, #targets do
     cb = ability:create_callback(parent)

@@ -18,6 +18,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 use std::collections::{HashSet, VecDeque, vec_deque::Iter};
 
+use sulis_core::util::Point;
 use sulis_module::Faction;
 use {AreaState, ChangeListenerList, Effect, EntityState, GameState, ScriptCallback};
 
@@ -401,6 +402,20 @@ impl TurnManager {
         index
     }
 
+    pub fn add_surface(&mut self, effect: Effect, area_state: &Rc<RefCell<AreaState>>,
+                       points: Vec<Point>) -> usize {
+        let bonuses = effect.bonuses().clone();
+
+        self.effects.push(Some(effect));
+        let index = self.effects.len() - 1;
+        self.order.push_back(Entry::Effect(index));
+        debug!("Added surface at {} to turn manager", index);
+
+        area_state.borrow_mut().add_surface(index, bonuses, points);
+
+        index
+    }
+
     pub fn add_effect(&mut self, effect: Effect, entity: &Rc<RefCell<EntityState>>) -> usize {
         let bonuses = effect.bonuses().clone();
 
@@ -415,6 +430,13 @@ impl TurnManager {
     }
 
     fn remove_effect(&mut self, index: usize) {
+        if let Some(effect) = &self.effects[index] {
+            if let Some((ref area_id, ref points)) = effect.surface() {
+                let area = GameState::get_area_state(area_id).unwrap();
+                area.borrow_mut().remove_surface(index, points);
+            }
+        }
+
         self.effects[index] = None;
         self.order.retain(|e| {
             match e {

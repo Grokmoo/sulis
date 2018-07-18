@@ -18,16 +18,22 @@ use std::rc::Rc;
 
 use rlua::{Lua, UserData, UserDataMethods};
 
-use sulis_core::util::ExtInt;
+use sulis_core::util::{ExtInt, Point};
 use sulis_rules::{Attribute, BonusKind, BonusList, Damage, DamageKind};
 
 use script::{CallbackData, Result, script_particle_generator, ScriptParticleGenerator,
     script_color_animation, ScriptColorAnimation, ScriptAbility};
-use {Effect, GameState};
+use {ChangeListener, Effect, GameState};
+
+#[derive(Clone)]
+enum Kind {
+    Entity(usize),
+    Surface(Vec<(i32, i32)>),
+}
 
 #[derive(Clone)]
 pub struct ScriptEffect {
-    parent: usize,
+    kind: Kind,
     name: String,
     tag: String,
     duration: ExtInt,
@@ -37,9 +43,21 @@ pub struct ScriptEffect {
 }
 
 impl ScriptEffect {
-    pub fn new(parent: usize, name: &str, duration: ExtInt) -> ScriptEffect {
+    pub fn new_surface(points: Vec<(i32, i32)>, name: &str, duration: ExtInt) -> ScriptEffect {
         ScriptEffect {
-            parent,
+            kind: Kind::Surface(points),
+            name: name.to_string(),
+            tag: "default".to_string(),
+            deactivate_with_ability: None,
+            duration,
+            bonuses: BonusList::default(),
+            callbacks: Vec::new(),
+        }
+    }
+
+    pub fn new_entity(parent: usize, name: &str, duration: ExtInt) -> ScriptEffect {
+        ScriptEffect {
+            kind: Kind::Entity(parent),
             name: name.to_string(),
             tag: "default".to_string(),
             deactivate_with_ability: None,
@@ -152,27 +170,53 @@ const TURNS_TO_MILLIS: u32 = 5000;
 fn apply(effect_data: &ScriptEffect, pgen: Option<ScriptParticleGenerator>,
          anim: Option<ScriptColorAnimation>) -> Result<()> {
     let mgr = GameState::turn_manager();
-    let entity = mgr.borrow().entity(effect_data.parent);
     let duration = effect_data.duration * TURNS_TO_MILLIS;
 
-    info!("Apply effect to '{}' with duration {}", entity.borrow().actor.actor.name, duration);
     let mut effect = Effect::new(&effect_data.name, &effect_data.tag, duration, effect_data.bonuses.clone(),
         effect_data.deactivate_with_ability.clone());
     for cb in effect_data.callbacks.iter() {
         effect.add_callback(Rc::new(cb.clone()));
     }
 
-    if let Some(ref pgen) = pgen {
-        let pgen = script_particle_generator::create_pgen(&pgen)?;
-        pgen.add_removal_listener(&mut effect);
-        GameState::add_animation(pgen);
-    }
     if let Some(ref anim) = anim {
         let anim = script_color_animation::create_anim(&anim)?;
         anim.add_removal_listener(&mut effect);
         GameState::add_animation(anim);
     }
 
-    mgr.borrow_mut().add_effect(effect, &entity);
+    match &effect_data.kind {
+        Kind::Entity(parent) => {
+            if let Some(ref pgen) = pgen {
+                let pgen = script_particle_generator::create_pgen(&pgen, pgen.owned_model())?;
+                pgen.add_removal_listener(&mut effect);
+                GameState::add_animation(pgen);
+            }
+
+            let entity = mgr.borrow().entity(*parent);
+            info!("Apply effect to '{}' with duration {}", entity.borrow().actor.actor.name, duration);
+            mgr.borrow_mut().add_effect(effect, &entity);
+        },
+        Kind::Surface(points) => {
+            let points: Vec<_> = points.iter().map(|(x, y)| Point::new(*x, *y)).collect();
+            if let Some(ref pgen) = pgen {
+                let mut marked = Vec::new();
+                for p in points.iter() {
+                    let pgen = script_particle_generator::create_surface_pgen(&pgen, p.x, p.y)?;
+                    marked.push(pgen.get_marked_for_removal());
+                    GameState::add_animation(pgen);
+                }
+                effect.removal_listeners.add(ChangeListener::new("anim", Box::new(move |_| {
+                    for m in marked.iter() {
+                        m.set(true);
+                    }
+                })));
+            }
+            let area = GameState::area_state();
+            effect.set_surface_for_area(&area.borrow().area.id, &points);
+            info!("Add surface to '{}' with duration {}", area.borrow().area.name, duration);
+            mgr.borrow_mut().add_surface(effect, &area, points);
+        },
+    }
+
     Ok(())
 }

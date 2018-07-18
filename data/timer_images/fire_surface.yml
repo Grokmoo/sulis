@@ -1,0 +1,13 @@
+id: fire_surface
+frame_time_millis: 100
+frames:
+  - particles/fire_surface1
+  - particles/fire_surface2
+  - particles/fire_surface3
+  - particles/fire_surface4
+  - particles/fire_surface5
+  - particles/fire_surface6
+  - particles/fire_surface5
+  - particles/fire_surface4
+  - particles/fire_surface3
+  - particles/fire_surface2

@@ -132,6 +132,20 @@ impl UserData for ScriptEntity {
             Ok(())
         });
 
+        methods.add_method("create_surface", |_, _, (name, points, duration):
+            (String, Vec<HashMap<String, i32>>, Option<u32>)| {
+            let duration = match duration {
+                None => ExtInt::Infinity,
+                Some(dur) => ExtInt::Int(dur),
+            };
+            let points: Vec<(i32, i32)> = points.into_iter().map(|p| {
+                let x = p.get("x").unwrap();
+                let y = p.get("y").unwrap();
+                (*x, *y)
+            }).collect();
+            Ok(ScriptEffect::new_surface(points, &name, duration))
+        });
+
         methods.add_method("create_effect", |_, entity, args: (String, Option<u32>)| {
             let duration = match args.1 {
                 None => ExtInt::Infinity,
@@ -139,7 +153,7 @@ impl UserData for ScriptEntity {
             };
             let ability = args.0;
             let index = entity.try_unwrap_index()?;
-            Ok(ScriptEffect::new(index, &ability, duration))
+            Ok(ScriptEffect::new_entity(index, &ability, duration))
         });
 
         methods.add_method("create_subpos_anim", |_, entity, duration_secs: f32| {
@@ -519,11 +533,27 @@ fn create_stats_table<'a>(lua: &'a Lua, parent: &ScriptEntity, _args: ()) -> Res
 #[derive(Clone, Debug)]
 pub struct ScriptEntitySet {
     pub parent: usize,
-    pub point: Option<(i32, i32)>,
+    pub selected_point: Option<(i32, i32)>,
+    pub affected_points: Vec<(i32, i32)>,
     pub indices: Vec<Option<usize>>,
 }
 
 impl ScriptEntitySet {
+    pub fn append(&mut self, other: &ScriptEntitySet) {
+        self.indices.append(&mut other.indices.clone());
+        self.selected_point = other.selected_point.clone();
+        self.affected_points.append(&mut other.affected_points.clone());
+    }
+
+    pub fn with_parent(parent: usize) -> ScriptEntitySet {
+        ScriptEntitySet {
+            parent,
+            indices: Vec::new(),
+            selected_point: None,
+            affected_points: Vec::new(),
+        }
+    }
+
     pub fn new(parent: &Rc<RefCell<EntityState>>,
                entities: &Vec<Option<Rc<RefCell<EntityState>>>>) -> ScriptEntitySet {
         let parent = parent.borrow().index;
@@ -536,7 +566,8 @@ impl ScriptEntitySet {
         }).collect();
         ScriptEntitySet {
             parent,
-            point: None,
+            selected_point: None,
+            affected_points: Vec::new(),
             indices,
         }
     }
@@ -550,8 +581,18 @@ impl UserData for ScriptEntitySet {
             Ok(table)
         });
 
+        methods.add_method("affected_points", |_, set, ()| {
+            let table: Vec<HashMap<&str, i32>> = set.affected_points.iter().map(|p| {
+                let mut map = HashMap::new();
+                map.insert("x", p.0);
+                map.insert("y", p.1);
+                map
+            }).collect();
+            Ok(table)
+        });
+
         methods.add_method("selected_point", |_, set, ()| {
-            match set.point {
+            match set.selected_point {
                 None => {
                     warn!("Attempted to get selected point from EntitySet where none is defined");
                     Err(rlua::Error::FromLuaConversionError {
@@ -607,7 +648,12 @@ fn targets(_lua: &Lua, parent: &ScriptEntity, _args: ()) -> Result<ScriptEntityS
     }
 
     let parent_index = parent.borrow().index;
-    Ok(ScriptEntitySet { indices, parent: parent_index, point: None, })
+    Ok(ScriptEntitySet {
+        parent: parent_index,
+        indices,
+        selected_point: None,
+        affected_points: Vec::new(),
+    })
 }
 
 fn without_self(_lua: &Lua, set: &ScriptEntitySet, _: ()) -> Result<ScriptEntitySet> {
@@ -679,5 +725,10 @@ fn filter_entities<T: Copy>(set: &ScriptEntitySet, t: T,
         indices.push(*index);
     }
 
-    Ok(ScriptEntitySet { indices, parent: set.parent, point: set.point, })
+    Ok(ScriptEntitySet {
+        parent: set.parent,
+        indices,
+        selected_point: set.selected_point,
+        affected_points: set.affected_points.clone(),
+    })
 }

@@ -16,12 +16,17 @@
 
 use std::rc::Rc;
 
-use sulis_core::util::ExtInt;
+use sulis_core::util::{ExtInt, Point};
 use sulis_rules::BonusList;
 use script::ScriptCallback;
 use ChangeListenerList;
 
 use ROUND_TIME_MILLIS;
+
+struct Surface {
+    area_id: String,
+    points: Vec<Point>,
+}
 
 pub struct Effect {
     pub name: String,
@@ -36,6 +41,7 @@ pub struct Effect {
     pub removal_listeners: ChangeListenerList<Effect>,
 
     deactivate_with_ability: Option<String>,
+    surface: Option<Surface>,
 }
 
 impl Effect {
@@ -51,11 +57,27 @@ impl Effect {
             removal_listeners: ChangeListenerList::default(),
             callbacks: Vec::new(),
             deactivate_with_ability,
+            surface: None
         }
     }
 
     pub fn mark_for_removal(&mut self) {
         self.total_duration = ExtInt::Int(0);
+    }
+
+    pub fn set_surface_for_area(&mut self, area: &str, points: &Vec<Point>) {
+        let area_id = area.to_string();
+        self.surface = Some(Surface {
+            area_id,
+            points: points.clone(),
+        })
+    }
+
+    pub fn surface(&self) -> Option<(&str, &Vec<Point>)> {
+        match self.surface {
+            None => None,
+            Some(ref surface) => Some((&surface.area_id, &surface.points)),
+        }
     }
 
     pub fn deactivates_with(&self, id: &str) -> bool {

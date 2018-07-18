@@ -124,14 +124,16 @@ impl ScriptState {
                                     ability: &Rc<Ability>,
                                     targets: Vec<Option<Rc<RefCell<EntityState>>>>,
                                     selected_point: Point,
+                                    affected_points: Vec<Point>,
                                     func: &str,
                                     custom_target: Option<Rc<RefCell<EntityState>>>) -> Result<()> {
         let mut targets = ScriptEntitySet::new(parent, &targets);
-        targets.point = Some((selected_point.x, selected_point.y));
+        targets.selected_point = Some((selected_point.x, selected_point.y));
         let arg = match custom_target {
             None => None,
             Some(entity) => Some(("custom_target", ScriptEntity::from(&entity))),
         };
+        targets.affected_points = affected_points.into_iter().map(|p| (p.x, p.y)).collect();
         self.ability_script(parent, ability, targets, arg, func)
     }
 

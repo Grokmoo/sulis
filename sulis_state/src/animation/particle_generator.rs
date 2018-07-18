@@ -175,6 +175,13 @@ pub struct Param {
 impl UserData for Param { }
 
 impl Param {
+    pub fn offset(&self, offset: f32) -> Param {
+        let value = self.value + offset;
+        Param {
+            initial_value: value, value, dt: self.dt, d2t: self.d2t, d3t: self.d3t
+        }
+    }
+
     pub fn fixed(value: f32) -> Param {
         let initial_value = value;
         Param {
@@ -325,6 +332,7 @@ pub struct GeneratorModel {
     pub particle_position_dist: Option<DistParam2D>,
     pub particle_duration_dist: Option<Dist>,
     pub particle_size_dist: Option<(Dist, Dist)>,
+    pub draw_above_entities: bool,
 }
 
 impl UserData for GeneratorModel { }
@@ -345,6 +353,7 @@ impl GeneratorModel {
             particle_position_dist: None,
             particle_duration_dist: None,
             particle_size_dist: None,
+            draw_above_entities: true,
         }
     }
 

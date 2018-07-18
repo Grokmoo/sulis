@@ -517,6 +517,8 @@ impl WidgetKind for AreaView {
         let p = widget.state.inner_position;
 
         self.draw_layer(renderer, scale_x, scale_y, widget, BASE_LAYER_ID);
+        GameState::draw_below_entities(renderer, p.x as f32 - self.scroll.x(), p.y as f32- self.scroll.y(),
+            scale_x, scale_y, millis);
 
         let mut draw_list = DrawList::empty_sprite();
         for transition in state.area.transitions.iter() {
@@ -560,8 +562,6 @@ impl WidgetKind for AreaView {
                 scale_x, scale_y, millis);
         }
 
-        GameState::draw_below_entities(renderer, p.x as f32 - self.scroll.x(), p.y as f32- self.scroll.y(),
-            scale_x, scale_y, millis);
         self.draw_entities_props(renderer, scale_x, scale_y, 1.0, widget, &state, millis);
         self.draw_layer(renderer, scale_x, scale_y, widget, AERIAL_LAYER_ID);
 

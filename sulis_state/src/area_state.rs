@@ -23,6 +23,7 @@ use std::cell::{Ref, RefCell};
 use rand::{self, Rng};
 
 use sulis_core::ui::Color;
+use sulis_rules::BonusList;
 use sulis_module::{Actor, Area, LootList, Module, ObjectSize, prop};
 use sulis_module::area::{EncounterData, PropData, Transition, TriggerKind};
 use sulis_core::util::{invalid_data_error, Point};
@@ -43,6 +44,7 @@ pub struct AreaState {
     pub on_load_fired: bool,
     props: Vec<Option<PropState>>,
     entities: Vec<usize>,
+    surfaces: Vec<(usize, BonusList)>,
     pub(crate) triggers: Vec<TriggerState>,
     pub(crate) merchants: Vec<Merchant>,
 
@@ -50,6 +52,7 @@ pub struct AreaState {
 
     prop_grid: Vec<Option<usize>>,
     entity_grid: Vec<Vec<usize>>,
+    surface_grid: Vec<Vec<usize>>,
     transition_grid: Vec<Option<usize>>,
     trigger_grid: Vec<Option<usize>>,
 
@@ -75,6 +78,7 @@ impl AreaState {
     pub fn new(area: Rc<Area>) -> AreaState {
         let dim = (area.width * area.height) as usize;
         let entity_grid = vec![Vec::new();dim];
+        let surface_grid = vec![Vec::new();dim];
         let transition_grid = vec![None;dim];
         let prop_grid = vec![None;dim];
         let trigger_grid = vec![None;dim];
@@ -86,9 +90,11 @@ impl AreaState {
             area,
             props: Vec::new(),
             entities: Vec::new(),
+            surfaces: Vec::new(),
             triggers: Vec::new(),
             transition_grid,
             entity_grid,
+            surface_grid,
             prop_grid,
             trigger_grid,
             prop_vis_grid: vec![true;dim],
@@ -758,6 +764,28 @@ impl AreaState {
                 warn!("{}", e);
                 Err(e)
             }
+        }
+    }
+
+    pub(crate) fn remove_surface(&mut self, index: usize, points: &Vec<Point>) {
+        info!("Removing surface {} from area", index);
+        self.surfaces.retain(|(i, _)| *i != index);
+
+        for p in points {
+            self.surface_grid[(p.x + p.y * self.area.width) as usize].retain(|i| *i != index);
+        }
+    }
+
+    pub(crate) fn add_surface(&mut self, index: usize, bonuses: BonusList, points: Vec<Point>) {
+        self.surfaces.push((index, bonuses));
+
+        for p in points {
+            if !self.area.coords_valid(p.x, p.y) {
+                warn!("Attempted to add surface with invalid coordinate {},{}", p.x, p.y);
+                continue;
+            }
+
+            self.surface_grid[(p.x + p.y * self.area.width) as usize].push(index);
         }
     }
 

@@ -85,22 +85,14 @@ impl CallbackData {
     fn create_targets_if_missing(&mut self) {
         if self.targets.is_some() { return; }
 
-        self.targets = Some(ScriptEntitySet {
-            parent: self.parent,
-            point: None,
-            indices: Vec::new(),
-        });
+        self.targets = Some(ScriptEntitySet::with_parent(self.parent));
     }
 
     fn get_or_create_targets(&self) -> ScriptEntitySet {
         if let Some(ref targets) = self.targets {
             targets.clone()
         } else {
-            ScriptEntitySet {
-                parent: self.parent,
-                point: None,
-                indices: Vec::new(),
-            }
+            ScriptEntitySet::with_parent(self.parent)
         }
     }
 
@@ -208,8 +200,7 @@ impl UserData for CallbackData {
         methods.add_method_mut("add_targets", |_, cb, targets: ScriptEntitySet| {
             cb.create_targets_if_missing();
             if let Some(ref mut cb_targets) = cb.targets {
-                cb_targets.indices.append(&mut targets.indices.clone());
-                cb_targets.point = targets.point.clone();
+                cb_targets.append(&targets);
             }
             Ok(())
         });
@@ -218,7 +209,7 @@ impl UserData for CallbackData {
             cb.create_targets_if_missing();
             let (x, y) = script_entity::unwrap_point(p)?;
             if let Some(ref mut cb_targets) = cb.targets {
-                cb_targets.point = Some((x, y));
+                cb_targets.selected_point = Some((x, y));
             }
             Ok(())
         });

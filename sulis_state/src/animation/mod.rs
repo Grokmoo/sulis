@@ -64,11 +64,21 @@ impl AnimState {
     pub fn update(&mut self, to_add: Vec<Anim>, root: &Rc<RefCell<Widget>>) {
         for anim in to_add {
             use self::AnimKind::*;
+            let draw_above = match anim.kind {
+                ParticleGenerator { ref model, .. } => model.draw_above_entities,
+                _ => false,
+            };
+
             match anim.kind {
                 RangedAttack { .. } =>
                     self.above_anims.push(anim),
-                ParticleGenerator { .. } => // TODO support below anims
-                    self.above_anims.push(anim),
+                ParticleGenerator { .. } => {
+                    if draw_above {
+                        self.above_anims.push(anim);
+                    } else {
+                        self.below_anims.push(anim);
+                    }
+                },
                 _ =>
                     self.no_draw_anims.push(anim),
             }
@@ -341,6 +351,10 @@ impl Anim {
         effect.removal_listeners.add(ChangeListener::new("anim", Box::new(move |_| {
             marked_for_removal.set(true);
         })));
+    }
+
+    pub fn get_marked_for_removal(&self) -> Rc<Cell<bool>> {
+        Rc::clone(&self.marked_for_removal)
     }
 
     pub fn mark_for_removal(&mut self) {

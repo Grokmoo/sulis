@@ -19,6 +19,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 use std::collections::HashMap;
 
+use rand::{self, Rng};
 use rlua::{self, Lua, UserData, UserDataMethods};
 
 use sulis_core::util::ExtInt;
@@ -578,6 +579,21 @@ impl UserData for ScriptEntitySet {
         methods.add_method("to_table", |_, set, ()| {
             let table: Vec<ScriptEntity> = set.indices.iter().map(|i| ScriptEntity { index: *i }).collect();
 
+            Ok(table)
+        });
+
+        methods.add_method("random_affected_points", |_, set, frac: f32| {
+            let table: Vec<HashMap<&str, i32>> = set.affected_points.iter().filter_map(|p| {
+                let roll = rand::thread_rng().gen_range(0.0, 1.0);
+                if roll > frac {
+                    None
+                } else {
+                    let mut map = HashMap::new();
+                    map.insert("x", p.0);
+                    map.insert("y", p.1);
+                    Some(map)
+                }
+            }).collect();
             Ok(table)
         });
 

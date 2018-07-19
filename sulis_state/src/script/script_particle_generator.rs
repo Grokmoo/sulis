@@ -135,6 +135,10 @@ impl UserData for ScriptParticleGenerator {
             gen.model.particle_size_dist = Some((width, height));
             Ok(())
         });
+        methods.add_method_mut("set_particle_frame_time_offset_dist", |_, gen, value: Dist| {
+            gen.model.particle_frame_time_offset_dist = Some(value);
+            Ok(())
+        });
     }
 }
 

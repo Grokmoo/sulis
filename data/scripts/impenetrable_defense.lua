@@ -9,7 +9,8 @@ function on_activate(parent, ability)
   gen:set_moves_with_parent()
   gen:set_position(gen:param(-0.75), gen:param(-01.5))
   gen:set_particle_size_dist(gen:fixed_dist(1.5), gen:fixed_dist(1.5))
-  effect:apply(gen)
+  effect:add_anim(gen)
+  effect:apply()
 
   ability:activate(parent)
 end

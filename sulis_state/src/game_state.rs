@@ -31,7 +31,7 @@ use sulis_module::{Ability, Actor, Module, ObjectSize, OnTrigger, area::{Trigger
 
 use {AI, AreaState, ChangeListener, ChangeListenerList, EntityState, Location,
     PathFinder, SaveState, ScriptState, UICallback, MOVE_TO_THRESHOLD, TurnManager};
-use script::{script_callback::ScriptHitKind, ScriptEntitySet, ScriptCallback};
+use script::{script_callback::{self, ScriptHitKind}, ScriptEntitySet, ScriptCallback};
 use animation::{self, Anim, AnimState};
 
 thread_local! {
@@ -470,11 +470,17 @@ impl GameState {
             let mut state = state.borrow_mut();
             let state = state.as_mut().unwrap();
 
+            let mgr = GameState::turn_manager();
             {
                 for entity in state.party.iter() {
+                    let entity_index = entity.borrow().index;
                     let area_id = entity.borrow().location.area_id.to_string();
                     let area = &state.areas.get(&area_id).unwrap();
-                    area.borrow_mut().remove_entity(&entity);
+                    let surfaces = area.borrow_mut().remove_entity(&entity);
+
+                    for surface in surfaces {
+                        mgr.borrow_mut().remove_from_surface(entity_index, surface);
+                    }
                 }
             }
 
@@ -499,7 +505,6 @@ impl GameState {
 
             state.area_state.borrow_mut().push_scroll_to_callback(Rc::clone(&state.party[0]));
 
-            let mgr = GameState::turn_manager();
             for entity in mgr.borrow().entity_iter() {
                 entity.borrow_mut().clear_texture_cache();
             }
@@ -658,7 +663,7 @@ impl GameState {
         let mgr = GameState::turn_manager();
         let cbs = mgr.borrow_mut().update(millis);
 
-        cbs.iter().for_each(|cb| cb.on_round_elapsed());
+        script_callback::fire_round_elapsed(cbs);
 
         STATE.with(|s| {
             let mut state = s.borrow_mut();

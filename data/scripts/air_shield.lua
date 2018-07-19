@@ -15,7 +15,8 @@ function on_activate(parent, ability)
   gen:set_particle_position_dist(gen:dist_param(gen:uniform_dist(-0.5, 0.5), gen:uniform_dist(-1.0, 1.0)),
     gen:dist_param(gen:uniform_dist(0.0, 0.2), gen:uniform_dist(-1.0, 0.0)))
   gen:set_particle_duration_dist(gen:fixed_dist(0.6))
-  effect:apply(gen)
+  effect:add_anim(gen)
+  effect:apply()
 
   ability:activate(parent)
 end

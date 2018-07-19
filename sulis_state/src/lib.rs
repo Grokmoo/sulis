@@ -91,7 +91,7 @@ pub use self::save_file::SaveFileMetaData;
 mod save_state;
 pub use self::save_state::SaveState;
 
-mod script;
+pub mod script;
 pub use self::script::ScriptState;
 pub use self::script::targeter::Targeter;
 pub use self::script::ScriptCallback;

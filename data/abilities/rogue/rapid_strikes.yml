@@ -14,5 +14,5 @@ active:
     Attack up to 3 enemies in a cone in front of you.
 prereqs:
   abilities:
-    - backflip
+    - backstab
   total_level: 7

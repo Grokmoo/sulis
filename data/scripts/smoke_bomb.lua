@@ -1,0 +1,60 @@
+smoke_radius = 5.0
+
+function on_activate(parent, ability)
+  targets = parent:targets()
+  
+  targeter = parent:create_targeter(ability)
+  targeter:set_free_select(10.0)
+  targeter:set_free_select_must_be_passable("1by1")
+  targeter:set_shape_circle(smoke_radius)
+  targeter:add_all_effectable(targets)
+  targeter:activate()
+end
+
+function on_target_select(parent, ability, targets)
+  selected_point = targets:selected_point()
+  speed = 15.0
+  dist = parent:dist_to_point(selected_point)
+  duration = dist / speed
+  vx = (selected_point.x - parent:center_x()) / duration
+  vy = (selected_point.y - parent:center_y()) / duration
+  
+  cb = ability:create_callback(parent)
+  cb:add_targets(targets)
+  cb:set_on_anim_complete_fn("create_smoke")
+  
+  gen = parent:create_anim("particles/circle12", duration)
+  gen:set_color(gen:param(0.5), gen:param(0.5), gen:param(0.5))
+  gen:set_position(gen:param(parent:center_x(), vx), gen:param(parent:center_y(), vy))
+  gen:set_particle_size_dist(gen:fixed_dist(0.7), gen:fixed_dist(0.7))
+  gen:set_particle_position_dist(gen:dist_param(gen:fixed_dist(0.0), gen:fixed_dist(-vx / 5.0)),
+    gen:dist_param(gen:fixed_dist(0.0), gen:fixed_dist(-vy / 5.0)))
+  gen:set_particle_duration_dist(gen:fixed_dist(0.6))
+  gen:set_completion_callback(cb)
+  gen:activate()
+  
+  ability:activate(parent)
+end
+
+function create_smoke(parent, ability, targets)
+  points = targets:affected_points()
+  surface = parent:create_surface(ability:name(), points, ability:duration())
+  surface:add_num_bonus("concealment", 30)
+  
+  s_anim = parent:create_particle_generator("particles/circle12")
+  s_anim:set_position(s_anim:param(0.0), s_anim:param(0.0))
+  s_anim:set_color(s_anim:param(0.5), s_anim:param(0.5), s_anim:param(0.5), s_anim:param(0.15))
+  s_anim:set_gen_rate(s_anim:param(20.0))
+  s_anim:set_particle_size_dist(s_anim:fixed_dist(1.0), s_anim:fixed_dist(1.0))
+  s_anim:set_particle_duration_dist(s_anim:fixed_dist(1.0))
+  s_anim:set_particle_position_dist(s_anim:dist_param(s_anim:uniform_dist(-1.0, 1.0), s_anim:uniform_dist(-0.2, 0.2)),
+                                    s_anim:dist_param(s_anim:uniform_dist(-1.0, 1.0), s_anim:uniform_dist(-0.2, 0.2)))
+  s_anim:set_draw_above_entities()
+  surface:add_anim(s_anim)
+  surface:apply()
+  
+  --for i = 1, #points do
+  --  point = points[i]
+  --   game:log("point " .. point.x .. ", " .. point.y)
+  --end
+end

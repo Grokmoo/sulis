@@ -18,6 +18,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_core::config::CONFIG;
+use script::script_callback;
 use {animation::Anim, EntityState, GameState};
 
 pub struct AI {
@@ -199,7 +200,6 @@ impl EntityAI {
         debug!("AI for '{}' is ending.", self.entity.borrow().actor.actor.name);
         let turn_mgr = GameState::turn_manager();
         let cbs = turn_mgr.borrow_mut().next();
-
-        cbs.iter().for_each(|cb| cb.on_round_elapsed());
+        script_callback::fire_round_elapsed(cbs);
     }
 }

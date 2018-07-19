@@ -1,0 +1,16 @@
+id: healing_circle
+name: "Healing Circle"
+icon: abilities/healing_circle
+description: |
+  You create a wellspring of magical healing energy at the designated location.  All allies within the area of effect are healed significantly each round.
+active:
+  script: "healing_circle"
+  group: "3rd Circle"
+  ap: 3000
+  duration:
+    Rounds: 3
+  cooldown: 4
+  short_description: |
+    Continually heal all allies in an area.
+prereqs:
+  total_level: 7

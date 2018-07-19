@@ -43,5 +43,6 @@ function on_target_select(parent, ability, targets)
                      anim:param(0.2),
                      anim:param(0.2),
                      anim:param(0.0))
-  effect:apply_with_color_anim(anim)
+  effect:add_color_anim(anim)
+  effect:apply()
 end

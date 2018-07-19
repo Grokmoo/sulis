@@ -23,7 +23,8 @@ function on_target_select(parent, ability, targets)
   anim:set_particle_position_dist(anim:dist_param(anim:uniform_dist(-0.2, 0.2), anim:uniform_dist(-1.0, 1.0)),
     anim:dist_param(anim:uniform_dist(-0.2, 0.2), anim:uniform_dist(-1.0, 1.0), anim:fixed_dist(5.0)))
   anim:set_particle_duration_dist(anim:fixed_dist(0.3))
-  effect:apply(anim)
+  effect:add_anim(anim)
+  effect:apply()
   
   ability:activate(parent)
 end

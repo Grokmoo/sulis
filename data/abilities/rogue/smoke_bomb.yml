@@ -1,0 +1,16 @@
+id: smoke_bomb
+name: "Smoke Bomb"
+icon: abilities/smoke_bomb
+description: |
+  Throw a bomb to a nearby location, creating an area of concealing smoke.  The concealment applies to any creature inside the area, making them harder to hit and providing bonuses to Hide.
+active:
+  script: "smoke_bomb"
+  group: Rogue
+  ap: 2000
+  duration:
+    Rounds: 3
+  cooldown: 3
+  short_description: |
+    Create concealing smoke in an area.
+prereqs:
+  abilities: [ hide ]

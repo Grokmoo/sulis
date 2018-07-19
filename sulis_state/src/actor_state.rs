@@ -675,6 +675,11 @@ impl ActorState {
         self.compute_stats();
     }
 
+    pub (crate) fn remove_effect(&mut self, index: usize) {
+        self.effects.retain(|(i, _)| *i != index);
+        self.compute_stats();
+    }
+
     pub fn init(&mut self) {
         self.hp = self.stats.max_hp;
         for (ref group, amount) in self.stats.uses_per_encounter_iter() {

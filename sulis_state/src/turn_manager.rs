@@ -15,12 +15,13 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::rc::Rc;
-use std::cell::RefCell;
+use std::cell::{RefCell, Cell};
 use std::collections::{HashSet, VecDeque, vec_deque::Iter};
 
 use sulis_core::util::Point;
 use sulis_module::Faction;
-use {AreaState, ChangeListenerList, Effect, EntityState, GameState, ScriptCallback};
+use script::CallbackData;
+use {AreaState, ChangeListener, ChangeListenerList, Effect, EntityState, GameState, ScriptCallback};
 
 pub const ROUND_TIME_MILLIS: u32 = 5000;
 
@@ -33,6 +34,7 @@ enum Entry {
 pub struct TurnManager {
     entities: Vec<Option<Rc<RefCell<EntityState>>>>,
     effects: Vec<Option<Effect>>,
+    effects_remove_next_update: Vec<usize>,
     combat_active: bool,
     last_millis: u32,
 
@@ -45,6 +47,7 @@ impl Default for TurnManager {
         TurnManager {
             entities: Vec::new(),
             effects: Vec::new(),
+            effects_remove_next_update: Vec::new(),
             listeners: ChangeListenerList::default(),
             order: VecDeque::new(),
             combat_active: false,
@@ -57,6 +60,7 @@ impl TurnManager {
     pub(crate) fn clear(&mut self) {
         self.entities.clear();
         self.effects.clear();
+        self.effects_remove_next_update.clear();
         self.combat_active = false;
         self.listeners = ChangeListenerList::default();
         self.order.clear();
@@ -68,6 +72,12 @@ impl TurnManager {
 
     pub fn effect(&self, index: usize) -> &Effect {
         self.effects[index].as_ref().unwrap()
+    }
+
+    pub fn effect_checked(&self, index: usize) -> Option<&Effect> {
+        if index >= self.effects.len() { return None; }
+
+        self.effects[index].as_ref().clone()
     }
 
     pub fn active_iter(&self) -> ActiveEntityIterator {
@@ -95,6 +105,12 @@ impl TurnManager {
 
     #[must_use]
     pub fn update(&mut self, current_millis: u32) -> Vec<Rc<ScriptCallback>> {
+        // need to do an additional copy to satisfy the borrow checker here
+        let to_remove: Vec<usize> = self.effects_remove_next_update.drain(..).collect();
+        for index in to_remove {
+            self.remove_effect(index);
+        }
+
         let mut cbs = Vec::new();
 
         let elapsed_millis = if !self.combat_active { current_millis - self.last_millis } else { 0 };
@@ -105,7 +121,7 @@ impl TurnManager {
             let (is_removal, mut effect_cbs) = self.update_effect(index, elapsed_millis);
             cbs.append(&mut effect_cbs);
             if is_removal {
-                self.remove_effect(index);
+                self.queue_remove_effect(index);
             }
         }
 
@@ -212,7 +228,7 @@ impl TurnManager {
                 Entry::Effect(index) => {
                     let (removal, mut effect_cbs) = self.update_effect(index, ROUND_TIME_MILLIS);
                     cbs.append(&mut effect_cbs);
-                    if removal { self.remove_effect(index); }
+                    if removal { self.queue_remove_effect(index); }
                     else { self.order.push_back(Entry::Effect(index)); }
                 },
                 Entry::Entity(index) => {
@@ -389,6 +405,21 @@ impl TurnManager {
         GameState::set_clear_anims();
     }
 
+    pub (crate) fn add_to_surface(&mut self, entity_index: usize, surface_index: usize) {
+        let entity = self.entity(entity_index);
+        let surface = self.effect(surface_index);
+        info!("Add '{}' from surface {}", entity.borrow().actor.actor.name, surface_index);
+        entity.borrow_mut().actor.add_effect(surface_index, surface.bonuses().clone());
+
+    }
+
+    pub (crate) fn remove_from_surface(&mut self, entity_index: usize, surface_index: usize) {
+        let entity = self.entity(entity_index);
+        assert!(self.effects[surface_index].is_some());
+        info!("Remove '{}' from surface {}", entity.borrow().actor.actor.name, surface_index);
+        entity.borrow_mut().actor.remove_effect(surface_index);
+    }
+
     pub fn add_entity(&mut self, entity: &Rc<RefCell<EntityState>>) -> usize {
         let entity_to_add = Rc::clone(entity);
         self.entities.push(Some(entity_to_add));
@@ -402,41 +433,68 @@ impl TurnManager {
         index
     }
 
-    pub fn add_surface(&mut self, effect: Effect, area_state: &Rc<RefCell<AreaState>>,
-                       points: Vec<Point>) -> usize {
-        let bonuses = effect.bonuses().clone();
+    fn add_effect_internal(&mut self, mut effect: Effect, cbs: Vec<CallbackData>,
+                           removal_markers: Vec<Rc<Cell<bool>>>) -> usize {
+        effect.removal_listeners.add(ChangeListener::new("anim", Box::new(move |_| {
+            removal_markers.iter().for_each(|m| m.set(true));
+        })));
+
+        let index = self.effects.len();
+        for mut cb in cbs {
+            cb.set_effect(index);
+            effect.add_callback(Rc::new(cb));
+        }
 
         self.effects.push(Some(effect));
-        let index = self.effects.len() - 1;
         self.order.push_back(Entry::Effect(index));
-        debug!("Added surface at {} to turn manager", index);
-
-        area_state.borrow_mut().add_surface(index, bonuses, points);
+        debug!("Added effect at {} to turn manager", index);
 
         index
     }
 
-    pub fn add_effect(&mut self, effect: Effect, entity: &Rc<RefCell<EntityState>>) -> usize {
-        let bonuses = effect.bonuses().clone();
+    pub fn add_surface(&mut self, effect: Effect, area_state: &Rc<RefCell<AreaState>>,
+                       points: Vec<Point>, cbs: Vec<CallbackData>,
+                       removal_markers: Vec<Rc<Cell<bool>>>) -> usize {
+        let index = self.add_effect_internal(effect, cbs, removal_markers);
 
-        self.effects.push(Some(effect));
-        let index = self.effects.len() - 1;
-        self.order.push_back(Entry::Effect(index));
-        debug!("Added effect at {} to turn timer", index);
+        let entities = area_state.borrow_mut().add_surface(index, points);
 
+        for entity in entities {
+            self.add_to_surface(entity, index);
+        }
+
+        index
+    }
+
+    pub fn add_effect(&mut self, effect: Effect, entity: &Rc<RefCell<EntityState>>,
+                      cbs: Vec<CallbackData>, removal_markers: Vec<Rc<Cell<bool>>>) -> usize {
+        let index = self.add_effect_internal(effect, cbs, removal_markers);
+
+        let bonuses = self.effect(index).bonuses().clone();
         entity.borrow_mut().actor.add_effect(index, bonuses);
 
         index
     }
 
+    // queue up the effect removal for later because we want to
+    // call the callbacks before removal, and we must call them
+    // outside the turn manager to avoid double borrow errors
+    fn queue_remove_effect(&mut self, index: usize) {
+        self.effects_remove_next_update.push(index);
+    }
+
     fn remove_effect(&mut self, index: usize) {
+        let mut entities = HashSet::new();
         if let Some(effect) = &self.effects[index] {
             if let Some((ref area_id, ref points)) = effect.surface() {
                 let area = GameState::get_area_state(area_id).unwrap();
-                area.borrow_mut().remove_surface(index, points);
+                entities = area.borrow_mut().remove_surface(index, points);
             }
         }
 
+        for entity in entities {
+            self.remove_from_surface(entity, index);
+        }
         self.effects[index] = None;
         self.order.retain(|e| {
             match e {
@@ -449,7 +507,11 @@ impl TurnManager {
     fn remove_entity(&mut self, index: usize) {
         let entity = Rc::clone(self.entities[index].as_ref().unwrap());
         let area_state = GameState::get_area_state(&entity.borrow().location.area_id).unwrap();
-        area_state.borrow_mut().remove_entity(&entity);
+        let surfaces = area_state.borrow_mut().remove_entity(&entity);
+
+        for surface in surfaces.iter() {
+            self.remove_from_surface(index, *surface);
+        }
 
         self.entities[index] = None;
 

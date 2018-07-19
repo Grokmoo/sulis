@@ -12,7 +12,8 @@ function on_activate(parent, ability)
                      anim:param(0.2),
                      anim:param(0.0),
                      anim:param(0.0))
-  effect:apply_with_color_anim(anim)
+  effect:add_color_anim(anim)
+  effect:apply()
 
   ability:activate(parent)
 end

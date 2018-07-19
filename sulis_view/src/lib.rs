@@ -111,7 +111,7 @@ use std::cell::RefCell;
 use sulis_core::io::{InputAction, MainLoopUpdater};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::util;
-use sulis_state::{ChangeListener, GameState, NextGameStep, save_file::create_save};
+use sulis_state::{ChangeListener, GameState, NextGameStep, save_file::create_save, script::script_callback};
 use sulis_widgets::{Button, ConfirmationWindow, Label};
 
 const NAME: &str = "root";
@@ -295,7 +295,7 @@ impl RootView {
         if GameState::is_pc_current() {
             let mgr = GameState::turn_manager();
             let cbs = mgr.borrow_mut().next();
-            cbs.iter().for_each(|cb| cb.on_round_elapsed());
+            script_callback::fire_round_elapsed(cbs);
         }
     }
 }

@@ -10,6 +10,7 @@ groups:
       circle8: [0, 28, 8, 8]
       circle12: [0, 40, 12, 12]
       circle20: [0, 56, 20, 20]
+      square: [342, 107, 18, 18]
   fire_surface:
     size: [18, 18]
     areas:

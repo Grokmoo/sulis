@@ -37,6 +37,8 @@ abilities:
     position: [6.6, 3.95]
   - id: luck
     position: [8, 5]
+  - id: healing_circle
+    position: [8.80, 4]
   
   - id: crush
     position: [5, 7]

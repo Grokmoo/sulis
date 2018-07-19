@@ -18,7 +18,7 @@ mod area_targeter;
 use self::area_targeter::AreaTargeter;
 
 pub mod script_callback;
-use self::script_callback::CallbackData;
+pub use self::script_callback::CallbackData;
 pub use self::script_callback::ScriptCallback;
 pub use self::script_callback::ScriptHitKind;
 

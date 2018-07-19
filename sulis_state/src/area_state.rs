@@ -19,11 +19,11 @@ use std::{ptr};
 use std::slice::Iter;
 use std::rc::Rc;
 use std::cell::{Ref, RefCell};
+use std::collections::HashSet;
 
 use rand::{self, Rng};
 
 use sulis_core::ui::Color;
-use sulis_rules::BonusList;
 use sulis_module::{Actor, Area, LootList, Module, ObjectSize, prop};
 use sulis_module::area::{EncounterData, PropData, Transition, TriggerKind};
 use sulis_core::util::{invalid_data_error, Point};
@@ -44,7 +44,7 @@ pub struct AreaState {
     pub on_load_fired: bool,
     props: Vec<Option<PropState>>,
     entities: Vec<usize>,
-    surfaces: Vec<(usize, BonusList)>,
+    surfaces: Vec<usize>,
     pub(crate) triggers: Vec<TriggerState>,
     pub(crate) merchants: Vec<Merchant>,
 
@@ -767,18 +767,39 @@ impl AreaState {
         }
     }
 
-    pub(crate) fn remove_surface(&mut self, index: usize, points: &Vec<Point>) {
-        info!("Removing surface {} from area", index);
-        self.surfaces.retain(|(i, _)| *i != index);
-
+    pub(crate) fn entities_with_points(&self, points: &Vec<Point>) -> Vec<usize> {
+        let mut result = HashSet::new();
         for p in points {
-            self.surface_grid[(p.x + p.y * self.area.width) as usize].retain(|i| *i != index);
+            for entity in self.entity_grid[(p.x + p.y * self.area.width) as usize].iter() {
+                result.insert(*entity);
+            }
         }
+
+        result.into_iter().collect()
     }
 
-    pub(crate) fn add_surface(&mut self, index: usize, bonuses: BonusList, points: Vec<Point>) {
-        self.surfaces.push((index, bonuses));
+    #[must_use]
+    pub(crate) fn remove_surface(&mut self, index: usize, points: &Vec<Point>) -> HashSet<usize> {
+        info!("Removing surface {} from area", index);
 
+        let mut entities = HashSet::new();
+        for p in points {
+            self.surface_grid[(p.x + p.y * self.area.width) as usize].retain(|i| *i != index);
+            for entity in self.entity_grid[(p.x + p.y * self.area.width) as usize].iter() {
+                entities.insert(*entity);
+            }
+        }
+
+        self.surfaces.retain(|i| *i != index);
+
+        entities
+    }
+
+    #[must_use]
+    pub(crate) fn add_surface(&mut self, index: usize, points: Vec<Point>) -> HashSet<usize> {
+        self.surfaces.push(index);
+
+        let mut entities = HashSet::new();
         for p in points {
             if !self.area.coords_valid(p.x, p.y) {
                 warn!("Attempted to add surface with invalid coordinate {},{}", p.x, p.y);
@@ -786,7 +807,13 @@ impl AreaState {
             }
 
             self.surface_grid[(p.x + p.y * self.area.width) as usize].push(index);
+
+            for entity in self.entity_grid[(p.x + p.y * self.area.width) as usize].iter() {
+                entities.insert(*entity);
+            }
         }
+
+        entities
     }
 
     pub(crate) fn add_entity(&mut self, entity: Rc<RefCell<EntityState>>,
@@ -817,8 +844,10 @@ impl AreaState {
         entity.borrow_mut().location = location;
         self.entities.push(index);
 
-        for p in entity.borrow().points(x, y) {
-            self.add_entity_to_grid(p.x, p.y, index);
+        let mgr = GameState::turn_manager();
+        let surfaces = self.add_entity_points(&entity.borrow());
+        for surface in surfaces {
+            mgr.borrow_mut().add_to_surface(entity.borrow().index, surface);
         }
 
         if entity.borrow().is_party_member() {
@@ -841,11 +870,19 @@ impl AreaState {
 
     fn update_entity_position(&mut self, entity: &Rc<RefCell<EntityState>>,
                                            old_x: i32, old_y: i32) {
-        self.clear_entity_points(&*entity.borrow(), old_x, old_y);
-
         let entity_index = entity.borrow().index;
-        for p in entity.borrow().location_points() {
-            self.add_entity_to_grid(p.x, p.y, entity_index);
+        let old_surfaces = self.clear_entity_points(&entity.borrow(), old_x, old_y);
+        let new_surfaces = self.add_entity_points(&entity.borrow());
+
+        let mgr = GameState::turn_manager();
+        // remove from surfaces in old but not in new
+        for surface in old_surfaces.difference(&new_surfaces) {
+            mgr.borrow_mut().remove_from_surface(entity_index, *surface);
+        }
+
+        // add to surfaces in new but not in old
+        for surface in new_surfaces.difference(&old_surfaces) {
+            mgr.borrow_mut().add_to_surface(entity_index, *surface);
         }
 
         let is_pc = entity.borrow().is_party_member();
@@ -865,10 +902,30 @@ impl AreaState {
         mgr.borrow_mut().check_ai_activation(entity, self);
     }
 
-    fn clear_entity_points(&mut self, entity: &EntityState, x: i32, y: i32) {
+    #[must_use]
+    fn add_entity_points(&mut self, entity: &EntityState) -> HashSet<usize> {
+        let mut surfaces = HashSet::new();
+        for p in entity.location_points() {
+            self.add_entity_to_grid(p.x, p.y, entity.index);
+            for surface in self.surface_grid[(p.x + p.y * self.area.width) as usize].iter() {
+                surfaces.insert(*surface);
+            }
+        }
+
+        surfaces
+    }
+
+    #[must_use]
+    fn clear_entity_points(&mut self, entity: &EntityState, x: i32, y: i32) -> HashSet<usize> {
+        let mut surfaces = HashSet::new();
         for p in entity.points(x, y) {
             self.remove_entity_from_grid(p.x, p.y, entity.index);
+            for surface in self.surface_grid[(p.x + p.y * self.area.width) as usize].iter() {
+                surfaces.insert(*surface);
+            }
         }
+
+        surfaces
     }
 
     fn add_entity_to_grid(&mut self, x: i32, y: i32, index: usize) {
@@ -930,15 +987,18 @@ impl AreaState {
         }
     }
 
-    pub fn remove_entity(&mut self, entity: &Rc<RefCell<EntityState>>) {
+    #[must_use]
+    pub fn remove_entity(&mut self, entity: &Rc<RefCell<EntityState>>) -> HashSet<usize> {
         let entity = entity.borrow();
         let index = entity.index;
         trace!("Removing entity '{}' with index '{}'", entity.actor.actor.name, index);
         let x = entity.location.x;
         let y = entity.location.y;
-        self.clear_entity_points(&entity, x, y);
+        let surfaces = self.clear_entity_points(&entity, x, y);
 
         self.entities.retain(|i| *i != index);
+
+        surfaces
     }
 
     fn find_prop_index_to_add(&mut self) -> usize {

@@ -25,6 +25,13 @@ use sulis_module::{Ability, Module};
 use script::{Result, script_entity, ScriptEntity, ScriptEntitySet};
 use {EntityState, GameState};
 
+pub fn fire_round_elapsed(cbs: Vec<Rc<ScriptCallback>>) {
+    for cb in cbs {
+        cb.on_round_elapsed();
+        cb.on_surface_round_elapsed();
+    }
+}
+
 #[derive(Clone, Copy, PartialOrd, Ord, Hash, PartialEq, Eq)]
 enum FuncKind {
     BeforeAttack,
@@ -34,6 +41,7 @@ enum FuncKind {
     OnAnimComplete,
     OnAnimUpdate,
     OnRoundElapsed,
+    OnSurfaceRoundElapsed,
 }
 
 pub trait ScriptCallback {
@@ -50,11 +58,14 @@ pub trait ScriptCallback {
     fn on_anim_update(&self) { }
 
     fn on_round_elapsed(&self) { }
+
+    fn on_surface_round_elapsed(&self) { }
 }
 
 #[derive(Clone)]
 pub struct CallbackData {
     parent: usize,
+    effect: Option<usize>,
     ability_id: String,
     targets: Option<ScriptEntitySet>,
     funcs: HashMap<FuncKind, String>,
@@ -64,10 +75,15 @@ impl CallbackData {
     pub fn new(parent: usize, ability_id: &str) -> CallbackData {
         CallbackData {
             parent,
+            effect: None,
             ability_id: ability_id.to_string(),
             targets: None,
             funcs: HashMap::new(),
         }
+    }
+
+    pub(crate) fn set_effect(&mut self, index: usize) {
+        self.effect = Some(index);
     }
 
     fn get_params(&self) -> (Rc<RefCell<EntityState>>, Rc<Ability>) {
@@ -184,6 +200,53 @@ impl ScriptCallback for CallbackData {
         let targets = self.get_or_create_targets();
         GameState::execute_ability_script(&parent, &ability, targets, &func);
     }
+
+    /// when called, this computes the current target set and sends it to
+    /// the lua function based on the surface state
+    fn on_surface_round_elapsed(&self) {
+        let func = match self.funcs.get(&FuncKind::OnSurfaceRoundElapsed) {
+            None => return,
+            Some(ref func) => func.to_string(),
+        };
+
+        let (parent, ability) = self.get_params();
+        match compute_surface_targets(self.effect, self.parent) {
+            Some(targets) => GameState::execute_ability_script(&parent, &ability, targets, &func),
+            None => warn!("Unable to fire on_surface_round_elapsed"),
+        };
+    }
+}
+
+fn compute_surface_targets(effect: Option<usize>, parent: usize) -> Option<ScriptEntitySet> {
+    let effect = match effect {
+        None => return None,
+        Some(index) => index,
+    };
+
+    let mut targets = ScriptEntitySet::with_parent(parent);
+
+    let mgr = GameState::turn_manager();
+    let mgr = mgr.borrow();
+
+    let effect = match mgr.effect_checked(effect) {
+        None => return None,
+        Some(effect) => effect,
+    };
+
+    match effect.surface() {
+        None => {
+            warn!("Attempted to exec on_surface_round_elapsed on non-surface");
+            return None;
+        }, Some((area_id, points)) => {
+            targets.affected_points = points.iter().map(|p| (p.x, p.y)).collect();
+
+            let area = GameState::get_area_state(area_id).unwrap();
+            let inside = area.borrow().entities_with_points(points);
+            targets.indices = inside.into_iter().map(|i| Some(i)).collect();
+        }
+    }
+
+    Some(targets)
 }
 
 impl UserData for CallbackData {
@@ -228,6 +291,8 @@ impl UserData for CallbackData {
                                |_, cb, func: String| cb.add_func(FuncKind::OnAnimComplete, func));
         methods.add_method_mut("set_on_round_elapsed_fn",
                                |_, cb, func: String| cb.add_func(FuncKind::OnRoundElapsed, func));
+        methods.add_method_mut("set_on_surface_round_elapsed_fn",
+                               |_, cb, func: String| cb.add_func(FuncKind::OnSurfaceRoundElapsed, func));
     }
 }
 

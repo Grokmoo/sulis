@@ -19,6 +19,7 @@ groups:
       powerful_blows: [2, 1]
       shield_slam: [3, 1]
       chameleon: [4, 1]
+      luck: [5, 1]
       
       acid_spores: [0, 2]
       acid_weapon: [1, 2]
@@ -32,7 +33,7 @@ groups:
       heal: [0, 3]
       shock: [1, 3]
       teleport: [2, 3]
-      luck: [3, 3]
+      healing_circle: [3, 3]
       air_shield: [4, 3]
       stun: [5, 3]
       guardian: [6, 3]
@@ -104,5 +105,6 @@ groups:
       flanker: [7, 12]
       
       backstab: [0, 13]
+      smoke_bomb: [1, 13]
       
       prereqs_not_met: [7, 4]

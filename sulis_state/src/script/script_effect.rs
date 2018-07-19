@@ -14,8 +14,6 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::rc::Rc;
-
 use rlua::{Lua, UserData, UserDataMethods};
 
 use sulis_core::util::{ExtInt, Point};
@@ -23,7 +21,7 @@ use sulis_rules::{Attribute, BonusKind, BonusList, Damage, DamageKind};
 
 use script::{CallbackData, Result, script_particle_generator, ScriptParticleGenerator,
     script_color_animation, ScriptColorAnimation, ScriptAbility};
-use {ChangeListener, Effect, GameState};
+use {Effect, GameState};
 
 #[derive(Clone)]
 enum Kind {
@@ -40,6 +38,8 @@ pub struct ScriptEffect {
     deactivate_with_ability: Option<String>,
     pub bonuses: BonusList,
     callbacks: Vec<CallbackData>,
+    pgens: Vec<ScriptParticleGenerator>,
+    color_anims: Vec<ScriptColorAnimation>,
 }
 
 impl ScriptEffect {
@@ -52,6 +52,8 @@ impl ScriptEffect {
             duration,
             bonuses: BonusList::default(),
             callbacks: Vec::new(),
+            pgens: Vec::new(),
+            color_anims: Vec::new(),
         }
     }
 
@@ -64,19 +66,24 @@ impl ScriptEffect {
             duration,
             bonuses: BonusList::default(),
             callbacks: Vec::new(),
+            pgens: Vec::new(),
+            color_anims: Vec::new(),
         }
     }
 }
 
 impl UserData for ScriptEffect {
     fn add_methods(methods: &mut UserDataMethods<Self>) {
-        // TODO refactor ScriptParticleGenerator, ScriptColorAnimation, and ScriptSubposAnimation
-        // to all implement a common trait
-        methods.add_method("apply_with_color_anim", |_, effect, anim: Option<ScriptColorAnimation>| {
-            apply(effect, None, anim)
+        methods.add_method("apply", |_, effect, _args: ()| {
+            apply(effect)
         });
-        methods.add_method("apply", |_, effect, pgen: Option<ScriptParticleGenerator>| {
-            apply(effect, pgen, None)
+        methods.add_method_mut("add_color_anim", |_, effect, anim: ScriptColorAnimation| {
+            effect.color_anims.push(anim);
+            Ok(())
+        });
+        methods.add_method_mut("add_anim", |_, effect, pgen: ScriptParticleGenerator| {
+            effect.pgens.push(pgen);
+            Ok(())
         });
         methods.add_method_mut("add_num_bonus", &add_num_bonus);
         methods.add_method_mut("add_damage", |_, effect, (min, max, ap): (u32, u32, Option<u32>)| {
@@ -167,54 +174,46 @@ fn add_num_bonus(_lua: &Lua, effect: &mut ScriptEffect, args: (String, f32)) -> 
 
 const TURNS_TO_MILLIS: u32 = 5000;
 
-fn apply(effect_data: &ScriptEffect, pgen: Option<ScriptParticleGenerator>,
-         anim: Option<ScriptColorAnimation>) -> Result<()> {
+fn apply(effect_data: &ScriptEffect) -> Result<()> {
     let mgr = GameState::turn_manager();
     let duration = effect_data.duration * TURNS_TO_MILLIS;
 
     let mut effect = Effect::new(&effect_data.name, &effect_data.tag, duration, effect_data.bonuses.clone(),
         effect_data.deactivate_with_ability.clone());
-    for cb in effect_data.callbacks.iter() {
-        effect.add_callback(Rc::new(cb.clone()));
-    }
+    let cbs = effect_data.callbacks.clone();
 
-    if let Some(ref anim) = anim {
+    let mut marked = Vec::new();
+    for anim in effect_data.color_anims.iter() {
         let anim = script_color_animation::create_anim(&anim)?;
-        anim.add_removal_listener(&mut effect);
+        marked.push(anim.get_marked_for_removal());
         GameState::add_animation(anim);
     }
 
     match &effect_data.kind {
         Kind::Entity(parent) => {
-            if let Some(ref pgen) = pgen {
+            for pgen in effect_data.pgens.iter() {
                 let pgen = script_particle_generator::create_pgen(&pgen, pgen.owned_model())?;
-                pgen.add_removal_listener(&mut effect);
+                marked.push(pgen.get_marked_for_removal());
                 GameState::add_animation(pgen);
             }
 
             let entity = mgr.borrow().entity(*parent);
             info!("Apply effect to '{}' with duration {}", entity.borrow().actor.actor.name, duration);
-            mgr.borrow_mut().add_effect(effect, &entity);
+            mgr.borrow_mut().add_effect(effect, &entity, cbs, marked);
         },
         Kind::Surface(points) => {
             let points: Vec<_> = points.iter().map(|(x, y)| Point::new(*x, *y)).collect();
-            if let Some(ref pgen) = pgen {
-                let mut marked = Vec::new();
+            for pgen in effect_data.pgens.iter() {
                 for p in points.iter() {
                     let pgen = script_particle_generator::create_surface_pgen(&pgen, p.x, p.y)?;
                     marked.push(pgen.get_marked_for_removal());
                     GameState::add_animation(pgen);
                 }
-                effect.removal_listeners.add(ChangeListener::new("anim", Box::new(move |_| {
-                    for m in marked.iter() {
-                        m.set(true);
-                    }
-                })));
             }
             let area = GameState::area_state();
             effect.set_surface_for_area(&area.borrow().area.id, &points);
             info!("Add surface to '{}' with duration {}", area.borrow().area.name, duration);
-            mgr.borrow_mut().add_surface(effect, &area, points);
+            mgr.borrow_mut().add_surface(effect, &area, points, cbs, marked);
         },
     }
 

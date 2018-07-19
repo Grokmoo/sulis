@@ -14,3 +14,5 @@ abilities:
     position: [0, 4]
   - id: flanker
     position: [1, 5]
+  - id: smoke_bomb
+    position: [2, 0.5]

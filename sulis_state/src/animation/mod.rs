@@ -91,6 +91,7 @@ impl AnimState {
 
     pub fn draw_below_entities(&self, renderer: &mut GraphicsRenderer, offset_x: f32, offset_y: f32,
                 scale_x: f32, scale_y: f32, millis: u32) {
+        // TODO need to only draw animations that are in the current area
         for anim in self.below_anims.iter() {
             anim.draw(renderer, offset_x, offset_y, scale_x, scale_y, millis);
         }
@@ -98,6 +99,7 @@ impl AnimState {
 
     pub fn draw_above_entities(&self, renderer: &mut GraphicsRenderer, offset_x: f32, offset_y: f32,
                                scale_x: f32, scale_y: f32, millis: u32) {
+        // TODO only draw anims in the current area
         for anim in self.above_anims.iter() {
             anim.draw(renderer, offset_x, offset_y, scale_x, scale_y, millis);
         }

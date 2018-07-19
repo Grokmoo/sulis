@@ -36,7 +36,8 @@ function activate_no_check(parent, ability)
                  anim:param(1.0),
                  anim:param(1.0),
                  anim:param(0.4))
-  effect:apply_with_color_anim(anim)
+  effect:add_color_anim(anim)
+  effect:apply()
 end
 
 function on_round_elapsed(parent, ability)

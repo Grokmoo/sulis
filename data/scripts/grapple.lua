@@ -55,5 +55,6 @@ function create_grapple_effect(parent, ability, targets, hit)
   gen:set_position(gen:param(-0.74), gen:param(-1.0))
   gen:set_particle_size_dist(gen:fixed_dist(1.5), gen:fixed_dist(1.5))
   gen:set_color(gen:param(1.0), gen:param(0.2), gen:param(0.0))
-  effect:apply(gen)
+  effect:add_anim(gen)
+  effect:apply()
 end

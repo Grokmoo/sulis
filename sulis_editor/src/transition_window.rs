@@ -14,38 +14,18 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::str::FromStr;
 use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::util::Point;
-use sulis_widgets::{Button, InputField, Label, list_box, ListBox};
+use sulis_module::area::MAX_AREA_SIZE;
+use sulis_widgets::{Button, InputField, Label, list_box, ListBox, Spinner};
 
 use AreaEditor;
 
 pub const NAME: &str = "transition_window";
-
-fn parse_coords(input: &str) -> Option<(i32, i32)> {
-    let mut vals: Vec<i32> = Vec::new();
-
-    for s in input.split(",") {
-        let i = match i32::from_str(s) {
-            Err(_) => {
-                warn!("Unable to parse coordinates from {}", input);
-                return None;
-            },
-            Ok(i) => i
-        };
-
-        vals.push(i);
-    }
-
-    if vals.len() != 2 { return None; }
-
-    Some((vals[0], vals[1]))
-}
 
 pub struct TransitionWindow {
     area_editor: Rc<RefCell<AreaEditor>>,
@@ -82,15 +62,18 @@ impl WidgetKind for TransitionWindow {
             let area_editor = self.area_editor.borrow();
             let transition = area_editor.model.transition(index);
 
-            let from_str = format!("{},{}", transition.from.x, transition.from.y);
-            let to_str = format!("{},{}", transition.to.x, transition.to.y);
             let to_area_str = match transition.to_area {
                 None => "",
                 Some(ref area) => area,
             };
 
-            let from = Widget::with_theme(InputField::new(&from_str), "from");
-            let to = Widget::with_theme(InputField::new(&to_str), "to");
+            let max = MAX_AREA_SIZE - 1;
+            let from_x = Spinner::new(transition.from.x, 0, max);
+            let from_y = Spinner::new(transition.from.y, 0, max);
+
+            let to_x = Spinner::new(transition.to.x, 0, max);
+            let to_y = Spinner::new(transition.to.y, 0, max);
+
             let to_area = Widget::with_theme(InputField::new(to_area_str), "to_area");
             let from_label = Widget::with_theme(Label::empty(), "from_label");
             let to_label = Widget::with_theme(Label::empty(), "to_label");
@@ -98,10 +81,13 @@ impl WidgetKind for TransitionWindow {
 
             let apply = Widget::with_theme(Button::empty(), "apply_button");
 
-            let from_ref = Rc::clone(&from);
-            let to_ref = Rc::clone(&to);
             let to_area_ref = Rc::clone(&to_area);
             let area_editor_ref = Rc::clone(&self.area_editor);
+
+            let from_x_ref = Rc::clone(&from_x);
+            let from_y_ref = Rc::clone(&from_y);
+            let to_x_ref = Rc::clone(&to_x);
+            let to_y_ref = Rc::clone(&to_y);
             apply.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
                 let to_area_str = to_area_ref.borrow().state.text.to_string();
                 let to_area = if to_area_str.is_empty() {
@@ -110,15 +96,8 @@ impl WidgetKind for TransitionWindow {
                     Some(to_area_str)
                 };
 
-                let from = Point::from_tuple_i32(match parse_coords(&from_ref.borrow().state.text) {
-                    None => return,
-                    Some((x, y)) => (x, y),
-                });
-
-                let to = Point::from_tuple_i32(match parse_coords(&to_ref.borrow().state.text) {
-                    None => return,
-                    Some((x, y)) => (x, y),
-                });
+                let from = Point::new(from_x_ref.borrow().value(), from_y_ref.borrow().value());
+                let to = Point::new(to_x_ref.borrow().value(), to_y_ref.borrow().value());
 
                 let window = Widget::get_parent(widget);
                 window.borrow_mut().invalidate_children();
@@ -153,8 +132,10 @@ impl WidgetKind for TransitionWindow {
                 transition_window.selected_transition = None;
             })));
 
-            widgets.append(&mut vec![from, to, to_area, from_label, to_label,
+            widgets.append(&mut vec![to_area, from_label, to_label,
                            to_area_label, apply, delete]);
+            widgets.append(&mut vec![Widget::with_theme(to_x, "to_x"), Widget::with_theme(to_y, "to_y"),
+                Widget::with_theme(from_x, "from_x"), Widget::with_theme(from_y, "from_y")]);
         }
 
         let mut entries: Vec<list_box::Entry<String>> = Vec::new();

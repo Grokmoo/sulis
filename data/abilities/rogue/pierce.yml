@@ -1,0 +1,17 @@
+id: pierce
+name: "Pierce"
+icon: abilities/pierce
+description: |
+  Make an attack against a single opponent, gaining extremely high armor penetration for the attack.  This is particularly devastating on a backstab attack.
+active:
+  script: "pierce"
+  group: Rogue
+  ap: 2000
+  duration:
+    Instant
+  cooldown: 3
+  short_description: |
+    Make an armor penetrating attack.
+prereqs:
+  abilities: [ backstab ]
+  total_level: 3

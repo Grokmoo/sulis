@@ -14,35 +14,71 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::time::{Instant};
 use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_core::ui::{LineRenderer, Widget, WidgetKind};
 use sulis_core::io::{event, GraphicsRenderer};
-use sulis_core::util::Point;
+use sulis_core::util::{self, Point};
 use Label;
 
 pub struct Button {
     label: Rc<RefCell<Label>>,
+    mouse_pressed_time: Option<Instant>,
+    last_repeat_time: Option<Instant>,
+    repeat_init_time: u32,
+    repeat_time: u32,
 }
 
 impl Button {
     pub fn empty() -> Rc<RefCell<Button>> {
         Rc::new(RefCell::new(Button {
             label: Label::empty(),
+            mouse_pressed_time: None,
+            last_repeat_time: None,
+            repeat_init_time: 0,
+            repeat_time: 0,
         }))
     }
 
     pub fn with_text(text: &str) -> Rc<RefCell<Button>> {
         Rc::new(RefCell::new(Button {
             label: Label::new(text),
+            mouse_pressed_time: None,
+            last_repeat_time: None,
+            repeat_init_time: 0,
+            repeat_time: 0,
         }))
     }
 }
 
 impl WidgetKind for Button {
     widget_kind!["button"];
+
+    fn update(&mut self, widget: &Rc<RefCell<Widget>>) {
+        if self.repeat_time == 0 { return; }
+
+        let start_time = match self.mouse_pressed_time {
+            None => return,
+            Some(time) => time,
+        };
+
+        if util::get_elapsed_millis(start_time.elapsed()) < self.repeat_init_time { return; }
+
+        let millis = match self.last_repeat_time {
+            None => self.repeat_time,
+            Some(time) => util::get_elapsed_millis(time.elapsed()),
+        };
+
+        // this is going to be very frame rate dependant for small values of
+        // repeat_time, but it is fine for our purposes
+        if millis >= self.repeat_time {
+            self.last_repeat_time = Some(Instant::now());
+            Widget::fire_callback(widget, self);
+        }
+    }
 
     fn layout(&mut self, widget: &mut Widget) {
         if let Some(ref text) = self.label.borrow().text {
@@ -53,16 +89,30 @@ impl WidgetKind for Button {
         if let Some(ref font) = widget.state.font {
             widget.state.text_renderer = Some(Box::new(LineRenderer::new(font)));
         }
+
+        if let Some(ref theme) = widget.theme {
+            self.repeat_time = theme.get_custom_or_default("repeat_time", 0);
+            self.repeat_init_time = theme.get_custom_or_default("repeat_init_time", 0);
+        }
     }
 
-    fn draw_graphics_mode(&mut self, renderer: &mut GraphicsRenderer, pixel_size: Point,
-                          widget: &Widget, millis: u32) {
-        self.label.borrow_mut().draw_graphics_mode(renderer, pixel_size, widget, millis);
+    fn draw(&mut self, renderer: &mut GraphicsRenderer, pixel_size: Point,
+            widget: &Widget, millis: u32) {
+        self.label.borrow_mut().draw(renderer, pixel_size, widget, millis);
+    }
+
+    fn on_mouse_press(&mut self, widget: &Rc<RefCell<Widget>>, kind: event::ClickKind) -> bool {
+        self.super_on_mouse_press(widget, kind);
+
+        self.mouse_pressed_time = Some(Instant::now());
+        true
     }
 
     fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: event::ClickKind) -> bool {
         self.super_on_mouse_release(widget, kind);
         Widget::fire_callback(widget, self);
+        self.mouse_pressed_time = None;
+        self.last_repeat_time = None;
         true
     }
 }

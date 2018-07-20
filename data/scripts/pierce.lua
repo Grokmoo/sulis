@@ -20,7 +20,7 @@ function on_target_select(parent, ability, targets)
   cb:add_target(target)
   cb:set_before_attack_fn("create_parent_effect")
   
-  ability:activate(parent)
+  -- ability:activate(parent)
   parent:anim_weapon_attack(target, cb)
 end
 
@@ -30,12 +30,13 @@ function create_parent_effect(parent, ability, targets)
 
   effect = parent:create_effect(ability:name(), 0)
   effect:add_num_bonus("accuracy", 25)
-  effect:add_damage(10, 15)
+  effect:add_damage(2, 4, 20)
   effect:apply()
   
   gen = target:create_anim("burst", 0.15)
   gen:set_moves_with_parent()
   gen:set_position(gen:param(-0.75), gen:param(-0.75))
   gen:set_particle_size_dist(gen:fixed_dist(1.5), gen:fixed_dist(1.5))
+  gen:set_color(gen:param(1.0), gen:param(0.2), gen:param(0.2))
   gen:activate()
 end

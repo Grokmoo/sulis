@@ -2,6 +2,7 @@ id: hide_in_plain_sight
 name: "Hide in Plain Sight"
 icon: abilities/hide_in_plain_sight
 description: |
-  You are able to hide and remain hidden even when nearly on top of opponents.
+  You are a master of the shadows, able to hide and remain hidden even when nearly on top of opponents.
 prereqs:
   abilities: [ hide ]
+  total_level: 9

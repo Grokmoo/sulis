@@ -49,8 +49,8 @@ impl WidgetKind for BasicMouseover {
         self.text_area.borrow_mut().layout(widget);
     }
 
-    fn draw_graphics_mode(&mut self, renderer: &mut GraphicsRenderer, pixel_size: Point,
-                          widget: &Widget, millis: u32) {
-        self.text_area.borrow_mut().draw_graphics_mode(renderer, pixel_size, widget, millis);
+    fn draw(&mut self, renderer: &mut GraphicsRenderer, pixel_size: Point,
+            widget: &Widget, millis: u32) {
+        self.text_area.borrow_mut().draw(renderer, pixel_size, widget, millis);
     }
 }

@@ -89,8 +89,8 @@ impl MainLoopUpdater for EditorMainLoopUpdater {
 }
 
 pub trait EditorMode: WidgetKind {
-    fn draw(&mut self, renderer: &mut GraphicsRenderer, model: &AreaModel, x: f32, y: f32,
-            scale_x: f32, scale_y: f32, millis: u32);
+    fn draw_mode(&mut self, renderer: &mut GraphicsRenderer, model: &AreaModel, x: f32, y: f32,
+                 scale_x: f32, scale_y: f32, millis: u32);
 
     fn cursor_size(&self) -> (i32, i32);
 

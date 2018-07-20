@@ -1016,6 +1016,8 @@ impl AreaState {
 
     pub fn add_feedback_text(&mut self, text: String, target: &Rc<RefCell<EntityState>>,
                              color: Color, move_rate: f32) {
+        if text.trim().is_empty() { return; }
+
         let mut area_pos = target.borrow().location.to_point();
         loop {
             let mut area_pos_valid = true;

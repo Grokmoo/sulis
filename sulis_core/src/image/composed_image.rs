@@ -190,8 +190,8 @@ impl Image for ComposedImage {
         image.append_to_draw_list(draw_list, state, draw_x, draw_y, draw_w, draw_h, millis);
     }
 
-    fn draw_graphics_mode(&self, renderer: &mut GraphicsRenderer, state: &AnimationState,
-                          x: f32, y: f32, w: f32, h: f32, millis: u32) {
+    fn draw(&self, renderer: &mut GraphicsRenderer, state: &AnimationState,
+            x: f32, y: f32, w: f32, h: f32, millis: u32) {
         let mut draw_list = DrawList::empty_sprite();
         self.append_to_draw_list(&mut draw_list, state, x, y, w, h, millis);
         renderer.draw(draw_list);

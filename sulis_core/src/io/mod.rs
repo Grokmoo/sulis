@@ -34,6 +34,7 @@ use extern_image::{ImageBuffer, Rgba};
 use config::{CONFIG, IOAdapter};
 use ui::{Widget, Color};
 use resource::Sprite;
+use util::{Point, Size};
 
 pub trait MainLoopUpdater {
     fn update(&self, root: &Rc<RefCell<Widget>>, millis: u32);
@@ -60,6 +61,10 @@ pub trait GraphicsRenderer {
     fn clear_texture_region(&mut self, id: &str, min_x: i32, min_y: i32, max_x: i32, max_y: i32);
 
     fn has_texture(&self, id: &str) -> bool;
+
+    fn set_scissor(&mut self, pos: Point, size: Size);
+
+    fn clear_scissor(&mut self);
 }
 
 #[derive(Debug, Copy, Clone)]

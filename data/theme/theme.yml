@@ -147,7 +147,7 @@ children:
                 from: .button
                 text: "+"
                 text_params:
-                  scale: 9.0
+                  scale: 7.0
                 x_relative: Max
                 preferred_size: [7, 7]
       abilities_bar:
@@ -643,52 +643,6 @@ children:
           [s=5|#upgrade2#]
           ][?upgrade3|[s=6|Level 4]
           [s=5|#upgrade3#]
-          ][?ability_group_0|#ability_group_0# ability uses per encounter: #ability_group_0_uses_per_encounter#
-          ][?ability_group_1|#ability_group_1# ability uses per encounter: #ability_group_1_uses_per_encounter#
-          ][?ability_group_2|#ability_group_2# ability uses per encounter: #ability_group_2_uses_per_encounter#
-          ][?str|Strength: #str#
-          ][?dex|Dexterity: #dex#
-          ][?end|Endurance: #end#
-          ][?per|Perception: #per#
-          ][?int|Intelligence: #int#
-          ][?wis|Wisdom: #wis#
-          ][?bonus_ap|AP: #bonus_ap#
-          ][?min_damage|[s=6.0|Damage: #min_damage# to #max_damage# [c=f00|#damage_kind#]]
-          ][?armor_penetration|[s=6.0|Armor Penetration: #armor_penetration#]
-          ][?attack_min_bonus_damage|[s=6.0|Damage: #attack_min_bonus_damage# to #attack_max_bonus_damage# [?attack_bonus_damage_kind;c=f00|#attack_bonus_damage_kind#]]
-          ][?attack_accuracy|[s=6.0|Accuracy: #attack_accuracy#]
-          ][?attack_crit_threshold|[s=6.0|Crit Threshold: #attack_crit_threshold#]
-          ][?attack_hit_threshold|[s=6.0|Hit Threshold: #attack_hit_threshold#]
-          ][?attack_graze_threshold|[s=6.0|Graze Threshold: #attack_graze_threshold#]
-          ][?attack_crit_multiplier|[s=6.0|Crit Multiplier: #attack_crit_multiplier#]
-          ][?attack_hit_multiplier|[s=6.0|Hit Multiplier: #attack_hit_multiplier#]
-          ][?attack_graze_multiplier|[s=6.0|Graze Multiplier: #attack_graze_multiplier#]
-          ][?min_bonus_damage_0|[s=6.0|Damage: #min_bonus_damage_0# to #max_bonus_damage_0# [?bonus_damage_kind_0;c=f00|#bonus_damage_kind_0#]]
-          ][?min_bonus_damage_1|[s=6.0|Damage: #min_bonus_damage_1# to #max_bonus_damage_1# [?bonus_damage_kind_0;c=f00|#bonus_damage_kind_1#]]
-          ][?min_bonus_damage_2|[s=6.0|Damage: #min_bonus_damage_2# to #max_bonus_damage_2# [?bonus_damage_kind_0;c=f00|#bonus_damage_kind_2#]]
-          ][?reach|[s=6.0|Reach: #reach#]
-          ][?range|[s=6.0|Range: #range#]
-          ][?bonus_reach|[s=6.0|Reach: #bonus_reach#]
-          ][?bonus_range|[s=6.0|Range: #bonus_range#]
-          ][?armor|[s=6.0|Armor: #armor#][?armor_slashing;s=5.0| (Slashing: #armor_slashing#)][?armor_piercing;s=5.0| (Piercing: #armor_piercing#)][?armor_crushing;s=5.0| (Crushing: #armor_crushing#)][?armor_acid;s=5.0| (Acid: #armor_acid#)][?armor_cold;s=5.0| (Cold: #armor_cold#)][?armor_electrical;s=5.0| (Electrical: #armor_electrical#)][?armor_fire;s=5.0| (Fire: #armor_fire#)][?armor_sonic;s=5.0| (Sonic: #armor_sonic#)]
-          ][?initiative|[s=6.0|Initiative: #initiative#]
-          ][?hit_points|[s=6.0|Hit Points: #hit_points#]
-          ][?accuracy|[s=6.0|Accuracy: #accuracy#]
-          ][?defense|[s=6.0|Defense: #defense#]
-          ][?fortitude|[s=6.0|Fortitude: #fortitude#]
-          ][?reflex|[s=6.0|Reflex: #reflex#]
-          ][?will|[s=6.0|Will: #will#]
-          ][?concealment|[s=6.0|Concealment: #concealment#]
-          ][?concealment_ignore|[s=6.0|Ignore Concealment: #concealment_ignore#]
-          ][?crit_threshold|[s=6.0|Crit Threshold: #crit_threshold#]
-          ][?hit_threshold|[s=6.0|Hit Threshold: #hit_threshold#]
-          ][?graze_threshold|[s=6.0|Graze Threshold: #graze_threshold#]
-          ][?crit_multiplier|[s=6.0|Crit Multiplier: #crit_multiplier#]
-          ][?hit_multiplier|[s=6.0|Hit Multiplier: #hit_multiplier#]
-          ][?graze_multiplier|[s=6.0|Graze Multiplier: #graze_multiplier#]
-          ][?movement_rate|[s=6.0|Movement Rate: #movement_rate#]
-          ][?attack_cost|[s=6.0|Attack Cost: #attack_cost#]
-          ][?flanking_angle|[s=6.0|Flanking Angle: #flanking_angle#]
           ][?prereqs|[s=7|]
           [s=7;c=f00|Prereqs]
           [?prereq_total_level|Level: #prereq_total_level#
@@ -823,7 +777,7 @@ children:
     from: .load_window_base
     background: bg_large
     border: { top: 6, bottom: 8, left: 6, right: 6 }
-    preferred_size: [120, 120]
+    preferred_size: [120, 118]
     x_relative: Center
     y_relative: Center
   bonus_text:

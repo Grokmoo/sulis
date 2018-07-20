@@ -37,8 +37,8 @@ use ui::AnimationState;
 use util::{size, Size};
 
 pub trait Image: Debug {
-    fn draw_graphics_mode(&self, renderer: &mut GraphicsRenderer, state: &AnimationState,
-                          x: f32, y: f32, w: f32, h: f32, millis: u32);
+    fn draw(&self, renderer: &mut GraphicsRenderer, state: &AnimationState,
+            x: f32, y: f32, w: f32, h: f32, millis: u32);
 
     fn append_to_draw_list(&self, draw_list: &mut DrawList, state: &AnimationState,
                            x: f32, y: f32, w: f32, h: f32, millis: u32);
@@ -56,15 +56,11 @@ pub trait Image: Debug {
 pub struct EmptyImage {}
 
 impl Image for EmptyImage {
-    fn draw_graphics_mode(&self, _renderer: &mut GraphicsRenderer, _state: &AnimationState,
-                          _x: f32, _y: f32, _w: f32, _h: f32, _millis: u32) {
-
-    }
+    fn draw(&self, _renderer: &mut GraphicsRenderer, _state: &AnimationState,
+            _x: f32, _y: f32, _w: f32, _h: f32, _millis: u32) { }
 
     fn append_to_draw_list(&self, _draw_list: &mut DrawList, _state: &AnimationState,
-                           _x: f32, _y: f32, _w: f32, _h: f32, _millis: u32) {
-
-    }
+                           _x: f32, _y: f32, _w: f32, _h: f32, _millis: u32) { }
 
     fn get_width_f32(&self) -> f32 { 0.0 }
     fn get_height_f32(&self) -> f32 { 0.0 }

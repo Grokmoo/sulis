@@ -1,0 +1,8 @@
+id: arrow_down
+frame_time_millis: 150
+frames:
+  - particles/arrow_down1
+  - particles/arrow_down2
+  - particles/arrow_down3
+  - particles/arrow_down4
+  - particles/arrow_down5

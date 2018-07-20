@@ -153,9 +153,9 @@ impl WidgetKind for InputField {
         true
     }
 
-    fn draw_graphics_mode(&mut self, renderer: &mut GraphicsRenderer, pixel_size: Point,
-                          widget: &Widget, millis: u32) {
-        self.label.borrow_mut().draw_graphics_mode(renderer, pixel_size, widget, millis);
+    fn draw(&mut self, renderer: &mut GraphicsRenderer, pixel_size: Point,
+            widget: &Widget, millis: u32) {
+        self.label.borrow_mut().draw(renderer, pixel_size, widget, millis);
 
         if !widget.state.has_keyboard_focus() { return; }
 
@@ -165,7 +165,7 @@ impl WidgetKind for InputField {
                 (widget.state.inner_size.height as f32 - self.carat_height) / 2.0;
             let w = self.carat_width;
             let h = self.carat_height;
-            carat.draw_graphics_mode(renderer, &widget.state.animation_state, x, y, w, h, millis);
+            carat.draw(renderer, &widget.state.animation_state, x, y, w, h, millis);
         }
     }
 }

@@ -19,7 +19,8 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_rules::{bonus::{AttackBuilder, AttackKindBuilder}, Bonus, BonusList, Armor, DamageKind, Slot};
+use sulis_rules::bonus::{AttackBuilder, AttackKindBuilder, Contingent};
+use sulis_rules::{Bonus, BonusList, Armor, DamageKind, Slot};
 use sulis_module::{item::{format_item_value, format_item_weight}, Module};
 use sulis_state::{EntityState, GameState, ItemState, inventory::has_proficiency};
 use sulis_core::io::event;
@@ -543,6 +544,10 @@ pub fn add_bonus_text_args(bonuses: &BonusList, widget_state: &mut WidgetState) 
     let mut damage_index = 0;
     let mut armor = Armor::default();
     for bonus in bonuses.iter() {
+        match bonus.when {
+            Contingent::Always => (),
+            _ => continue,
+        }
         add_bonus(bonus, widget_state, &mut group_uses_index, &mut damage_index, &mut armor);
     }
 

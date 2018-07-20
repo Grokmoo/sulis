@@ -48,6 +48,9 @@ pub use progress_bar::ProgressBar;
 pub mod scrollbar;
 pub use self::scrollbar::Scrollbar;
 
+pub mod scroll_pane;
+pub use self::scroll_pane::ScrollPane;
+
 pub mod spinner;
 pub use self::spinner::Spinner;
 

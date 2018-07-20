@@ -84,10 +84,10 @@ impl Image for AnimatedImage {
         self.id.clone()
     }
 
-    fn draw_graphics_mode(&self, renderer: &mut GraphicsRenderer, state: &AnimationState,
-                          x: f32, y: f32, w: f32, h: f32, millis: u32) {
+    fn draw(&self, renderer: &mut GraphicsRenderer, state: &AnimationState,
+            x: f32, y: f32, w: f32, h: f32, millis: u32) {
         AnimationState::find_match_in_vec(state, &self.images)
-            .draw_graphics_mode(renderer, state, x, y, w, h, millis);
+            .draw(renderer, state, x, y, w, h, millis);
     }
 
     fn append_to_draw_list(&self, draw_list: &mut DrawList, state: &AnimationState,

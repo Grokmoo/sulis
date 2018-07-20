@@ -45,8 +45,8 @@ impl VisPicker {
 }
 
 impl EditorMode for VisPicker {
-    fn draw(&mut self, renderer: &mut GraphicsRenderer, model: &AreaModel, x_offset: f32, y_offset: f32,
-            scale_x: f32, scale_y: f32, _millis: u32) {
+    fn draw_mode(&mut self, renderer: &mut GraphicsRenderer, model: &AreaModel, x_offset: f32, y_offset: f32,
+                 scale_x: f32, scale_y: f32, _millis: u32) {
         let mut draw_list = DrawList::empty_sprite();
         for (p, tile) in model.all_tiles() {
             let x_base = x_offset + p.x as f32;

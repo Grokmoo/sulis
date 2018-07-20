@@ -55,7 +55,7 @@ impl WidgetKind for ColorButton {
         }
     }
 
-    fn draw_graphics_mode(&mut self, renderer: &mut GraphicsRenderer, _pixel_size: Point,
+    fn draw(&mut self, renderer: &mut GraphicsRenderer, _pixel_size: Point,
                           widget: &Widget, millis: u32) {
         let icon = match self.icon {
             None => return,

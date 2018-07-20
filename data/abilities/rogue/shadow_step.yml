@@ -13,4 +13,6 @@ active:
   short_description: |
     Hide and move a short distance.
 prereqs:
-  abilities: [ hide ]
+  abilities: [ hide, backflip ]
+  total_level: 5
+  

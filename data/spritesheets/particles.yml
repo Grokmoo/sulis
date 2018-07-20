@@ -179,3 +179,12 @@ groups:
       imprison3: [64, 0]
       imprison4: [96, 0]
       imprison5: [128, 0]
+  arrow_down:
+    size: [20, 20]
+    position: [260, 140]
+    areas:
+      arrow_down1: [0, 0]
+      arrow_down2: [20, 0]
+      arrow_down3: [40, 0]
+      arrow_down4: [60, 0]
+      arrow_down5: [80, 0]

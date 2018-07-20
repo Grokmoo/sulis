@@ -70,7 +70,7 @@ impl Cursor {
 
             let w = image.get_width_f32();
             let h = image.get_height_f32();
-            image.draw_graphics_mode(renderer, &cursor.state, cursor.xf - w / 2.0,
+            image.draw(renderer, &cursor.state, cursor.xf - w / 2.0,
                                      cursor.yf - h / 2.0, w, h, millis);
         });
     }

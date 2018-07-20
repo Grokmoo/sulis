@@ -104,6 +104,7 @@ pub struct GliumDisplay {
     swap_program: glium::Program,
     matrix: [[f32; 4]; 4],
     textures: HashMap<String, GliumTexture>,
+    hidpi_factor: f64,
 }
 
 struct GliumTexture {
@@ -115,19 +116,24 @@ pub struct GliumRenderer<'a> {
     target: &'a mut glium::Frame,
     display: &'a mut GliumDisplay,
     params: glium::DrawParameters<'a>,
+    hidpi_factor: f64,
 }
 
 impl<'a> GliumRenderer<'a> {
     fn new(target: &'a mut glium::Frame, display: &'a mut GliumDisplay) -> GliumRenderer<'a> {
         let params = glium::DrawParameters {
             blend: glium::draw_parameters::Blend::alpha_blending(),
+            smooth: Some(glium::draw_parameters::Smooth::Nicest),
+
             .. Default::default()
         };
 
+        let hidpi_factor = display.hidpi_factor;
         GliumRenderer {
             target,
             display,
             params,
+            hidpi_factor,
         }
     }
 
@@ -185,6 +191,30 @@ fn draw_to_surface<T: glium::Surface>(surface: &mut T, draw_list: DrawList,
 }
 
 impl<'a> GraphicsRenderer for GliumRenderer<'a> {
+    fn set_scissor(&mut self, pos: Point, size: Size) {
+        let window_size = match self.display.display.gl_window().get_inner_size() {
+            None => {
+                error!("Unable to query display size");
+                return;
+            }
+            Some(size) => size,
+        };
+        let scale_x = self.hidpi_factor * window_size.width / CONFIG.display.width as f64;
+        let scale_y = self.hidpi_factor * window_size.height / CONFIG.display.height as f64;
+
+        let rect = glium::Rect {
+            left: (pos.x as f64 * scale_x) as u32,
+            bottom: ((CONFIG.display.height - (pos.y + size.height)) as f64 * scale_y) as u32,
+            width: (size.width as f64 * scale_x) as u32,
+            height: (size.height as f64 * scale_y) as u32,
+        };
+        self.params.scissor = Some(rect);
+    }
+
+    fn clear_scissor(&mut self) {
+        self.params.scissor = None;
+    }
+
     fn register_texture(&mut self, id: &str, image: ImageBuffer<Rgba<u8>, Vec<u8>>,
                         min_filter: TextureMinFilter, mag_filter: TextureMagFilter) {
         let dims = image.dimensions();
@@ -290,6 +320,8 @@ impl GliumDisplay {
             Err(e) => return glium_error(e),
         };
 
+        let mut hidpi_factor = 1.0;
+
         if let Some(ref monitor) = monitor {
             let physical_position = monitor.get_position();
             // TODO this doesn't work if you have monitors with different hidpi factors
@@ -297,6 +329,7 @@ impl GliumDisplay {
             // logical position
             let logical_position = physical_position.to_logical(monitor.get_hidpi_factor());
             display.gl_window().set_position(logical_position);
+            hidpi_factor = monitor.get_hidpi_factor();
         }
 
         info!("Initialized glium adapter:");
@@ -307,6 +340,8 @@ impl GliumDisplay {
         info!("Video memory available: {:?}", display.get_free_video_memory());
         trace!("Extensions: {:#?}", display.get_context().get_extensions());
         trace!("Capabilities: {:?}", display.get_context().get_capabilities());
+
+        info!("Using hi dpi factor: {}", hidpi_factor);
 
         let base_program = match glium::Program::from_source(&display, VERTEX_SHADER_SRC,
                                                   FRAGMENT_SHADER_SRC, None) {
@@ -334,6 +369,7 @@ impl GliumDisplay {
                 [-1.0 , -1.0, 0.0, 1.0f32],
             ],
             textures: HashMap::new(),
+            hidpi_factor,
         })
     }
 }
@@ -371,10 +407,13 @@ impl IO for GliumDisplay {
         let mut target = self.display.draw();
         target.clear_color(0.0, 0.0, 0.0, 1.0);
         {
+            let hidpi_factor = self.hidpi_factor;
             let mut renderer = GliumRenderer::new(&mut target, self);
             let (width, height) = renderer.target.get_dimensions();
-            let pixel_size = Point::new(width as i32, height as i32);
-            root.draw_graphics_mode(&mut renderer, pixel_size, millis);
+            let width = (width as f64 / hidpi_factor).round() as i32;
+            let height = (height as f64 / hidpi_factor).round() as i32;
+            let pixel_size = Point::new(width, height);
+            root.draw(&mut renderer, pixel_size, millis);
 
             Cursor::draw(&mut renderer, millis);
         }

@@ -83,9 +83,9 @@ impl TimerImage {
 impl Image for TimerImage {
     fn id(&self) -> String { self.id.clone() }
 
-    fn draw_graphics_mode(&self, renderer: &mut GraphicsRenderer, state: &AnimationState,
-                          x: f32, y: f32, w: f32, h: f32, millis: u32) {
-        self.get_cur_frame(millis).draw_graphics_mode(renderer, state, x, y, w, h, millis);
+    fn draw(&self, renderer: &mut GraphicsRenderer, state: &AnimationState,
+            x: f32, y: f32, w: f32, h: f32, millis: u32) {
+        self.get_cur_frame(millis).draw(renderer, state, x, y, w, h, millis);
     }
 
     fn append_to_draw_list(&self, draw_list: &mut DrawList, state: &AnimationState,

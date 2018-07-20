@@ -76,18 +76,18 @@ impl WidgetKind for ProgressBar {
         }
     }
 
-    fn draw_graphics_mode(&mut self, renderer: &mut GraphicsRenderer, pixel_size: Point,
-                          widget: &Widget, millis: u32) {
+    fn draw(&mut self, renderer: &mut GraphicsRenderer, pixel_size: Point,
+            widget: &Widget, millis: u32) {
         if self.fraction > 0.0 {
             if let Some(ref bar) = self.bar {
                 let x = widget.state.inner_left() as f32;
                 let y = widget.state.inner_top() as f32;
                 let w = widget.state.inner_width() as f32 * self.fraction;
                 let h = widget.state.inner_height() as f32;
-                bar.draw_graphics_mode(renderer, &widget.state.animation_state, x, y, w, h, millis);
+                bar.draw(renderer, &widget.state.animation_state, x, y, w, h, millis);
             }
         }
 
-        self.label.borrow_mut().draw_graphics_mode(renderer, pixel_size, widget, millis);
+        self.label.borrow_mut().draw(renderer, pixel_size, widget, millis);
     }
 }

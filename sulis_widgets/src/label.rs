@@ -120,8 +120,8 @@ impl WidgetKind for Label {
         }
     }
 
-    fn draw_graphics_mode(&mut self, renderer: &mut GraphicsRenderer, _pixel_size: Point,
-                          widget: &Widget, _millis: u32) {
+    fn draw(&mut self, renderer: &mut GraphicsRenderer, _pixel_size: Point,
+            widget: &Widget, _millis: u32) {
         let font_rend = match &widget.state.text_renderer {
             &None => return,
             &Some(ref renderer) => renderer,

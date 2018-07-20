@@ -45,7 +45,7 @@ impl PropPicker {
 }
 
 impl EditorMode for PropPicker {
-    fn draw(&mut self, renderer: &mut GraphicsRenderer, _model: &AreaModel, x: f32, y: f32,
+    fn draw_mode(&mut self, renderer: &mut GraphicsRenderer, _model: &AreaModel, x: f32, y: f32,
             scale_x: f32, scale_y: f32, millis: u32) {
 
         for &(pos, ref prop) in self.removal_props.iter() {

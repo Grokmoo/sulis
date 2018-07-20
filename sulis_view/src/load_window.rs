@@ -19,7 +19,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_widgets::{Button, Label, TextArea, ConfirmationWindow};
+use sulis_widgets::{Button, Label, ScrollPane, TextArea, ConfirmationWindow};
 use sulis_state::{SaveState, SaveFileMetaData, NextGameStep};
 use sulis_state::save_file::{delete_save, load_state, get_available_save_files};
 
@@ -147,7 +147,8 @@ impl WidgetKind for LoadWindow {
         })));
         self.accept.borrow_mut().state.set_enabled(self.selected_entry.is_some());
 
-        let entries = Widget::empty("entries");
+        let scrollpane = ScrollPane::new();
+        let entries = Widget::with_theme(scrollpane.clone(), "entries");
 
         for (index, ref meta) in self.entries.iter().enumerate() {
             let text_area = Widget::with_defaults(TextArea::empty());
@@ -156,7 +157,7 @@ impl WidgetKind for LoadWindow {
             text_area.borrow_mut().state.add_text_arg("current_area_name", &meta.current_area_name);
             let widget = Widget::with_theme(Button::empty(), "entry");
             widget.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let parent = Widget::go_up_tree(widget, 2);
+                let parent = Widget::go_up_tree(widget, 3);
                 parent.borrow_mut().invalidate_children();
 
                 let load_window = Widget::downcast_kind_mut::<LoadWindow>(&parent);
@@ -170,8 +171,7 @@ impl WidgetKind for LoadWindow {
             }
 
             Widget::add_child_to(&widget, text_area);
-
-            Widget::add_child_to(&entries, widget);
+            scrollpane.borrow().add_to_content(widget);
         }
 
         vec![self.cancel.clone(), delete, self.accept.clone(), title, entries]

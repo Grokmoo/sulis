@@ -377,6 +377,9 @@ impl ActorState {
                 AttackKind::Reflex => target_stats.reflex,
                 AttackKind::Will => target_stats.will,
                 AttackKind::Melee { .. } | AttackKind::Ranged { .. } => target_stats.defense,
+                AttackKind::Dummy => {
+                    return (HitKind::Hit, 0, "".to_string(), color::GRAY);
+                }
             }
         };
 

@@ -48,8 +48,8 @@ impl TilePicker {
 }
 
 impl EditorMode for TilePicker {
-    fn draw(&mut self, renderer: &mut GraphicsRenderer, _model: &AreaModel, x: f32, y: f32,
-            scale_x: f32, scale_y: f32, _millis: u32) {
+    fn draw_mode(&mut self, renderer: &mut GraphicsRenderer, _model: &AreaModel, x: f32, y: f32,
+                 scale_x: f32, scale_y: f32, _millis: u32) {
 
         if !self.removal_tiles.is_empty() {
             let mut draw_list = DrawList::empty_sprite();

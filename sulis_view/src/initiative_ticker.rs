@@ -97,8 +97,8 @@ impl TickerLabel {
 impl WidgetKind for TickerLabel {
     widget_kind!(NAME);
 
-    fn draw_graphics_mode(&mut self, renderer: &mut GraphicsRenderer, _pixel_size: Point,
-                          widget: &Widget, _millis: u32) {
+    fn draw(&mut self, renderer: &mut GraphicsRenderer, _pixel_size: Point,
+            widget: &Widget, _millis: u32) {
         let entity = self.entity.borrow();
 
         let x = widget.state.inner_left() as f32;

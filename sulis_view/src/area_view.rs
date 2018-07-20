@@ -418,8 +418,8 @@ impl WidgetKind for AreaView {
         let old_user_scale = self.user_scale;
 
         self.user_scale += delta;
-        if self.user_scale < 0.7 { self.user_scale = 0.7; }
-        else if self.user_scale > 1.8 { self.user_scale = 1.8; }
+        if self.user_scale < 0.5 { self.user_scale = 0.5; }
+        else if self.user_scale > 2.0 { self.user_scale = 2.0; }
 
         // recenter the view based on the scroll change
         let (old_scale_x, old_scale_y) = self.scale;
@@ -439,8 +439,8 @@ impl WidgetKind for AreaView {
         true
     }
 
-    fn draw_graphics_mode(&mut self, renderer: &mut GraphicsRenderer, pixel_size: Point,
-                          widget: &Widget, millis: u32) {
+    fn draw(&mut self, renderer: &mut GraphicsRenderer, pixel_size: Point,
+            widget: &Widget, millis: u32) {
         {
             let (sx, sy) = compute_area_scaling(pixel_size);
             self.scale = (sx * self.user_scale, sy * self.user_scale);

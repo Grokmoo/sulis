@@ -76,7 +76,7 @@ impl WidgetKind for AreaEditor {
 
     fn as_any_mut(&mut self) -> &mut Any { self }
 
-    fn draw_graphics_mode(&mut self, renderer: &mut GraphicsRenderer, pixel_size: Point,
+    fn draw(&mut self, renderer: &mut GraphicsRenderer, pixel_size: Point,
                           widget: &Widget, millis: u32) {
         self.scale = compute_area_scaling(pixel_size);
         let (scale_x, scale_y) = self.scale;
@@ -90,7 +90,7 @@ impl WidgetKind for AreaEditor {
 
         if let Some(ref editor) = self.cur_editor {
             let mut editor = editor.borrow_mut();
-            editor.draw(renderer, &self.model, p.x as f32 - self.scroll.x(), p.y as f32 - self.scroll.y(),
+            editor.draw_mode(renderer, &self.model, p.x as f32 - self.scroll.x(), p.y as f32 - self.scroll.y(),
             scale_x, scale_y, millis);
         }
     }

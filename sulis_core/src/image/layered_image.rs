@@ -93,8 +93,8 @@ impl Image for LayeredImage {
         panic!("LayeredImage must be drawn directly");
     }
 
-    fn draw_graphics_mode(&self, _renderer: &mut GraphicsRenderer, _state: &AnimationState,
-                          _x: f32, _y: f32, _w: f32, _h: f32, _millis: u32) {
+    fn draw(&self, _renderer: &mut GraphicsRenderer, _state: &AnimationState,
+            _x: f32, _y: f32, _w: f32, _h: f32, _millis: u32) {
         panic!("LayeredImage must be drawn directly");
     }
 

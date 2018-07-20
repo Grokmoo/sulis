@@ -146,11 +146,17 @@ children:
         preferred_size: [7, 5]
         text: "-"
         position: [0, 5]
+        custom:
+          repeat_init_time: 500
+          repeat_time: 30
       up:
         from: .button
         preferred_size: [7, 5]
         text: "+"
         position: [0, 0]
+        custom:
+          repeat_init_time: 500
+          repeat_time: 30
   confirmation_window:
     background: bg_base
     border: [1, 1, 1, 1]
@@ -196,21 +202,30 @@ children:
         height_relative: Max
         preferred_size: [0, -30]
         position: [0, 15]
-        layout: BoxVertical
-        layout_spacing: { top: 0, bottom: 2, left: 0, right: 0 }
         children:
-          entry:
-            from: .button
+          scrollbar:
+            from: .scrollbar
+            custom:
+              scroll_delta: 12
+          content:
             width_relative: Max
-            preferred_size: [0, 10]
+            height_relative: Max
+            preferred_size: [-7, 0]
+            layout: BoxVertical
+            layout_spacing: { top: 0, bottom: 2, left: 0, right: 0 }
             children:
-              text_area:
-                from: .text_area
+              entry:
+                from: .button
                 width_relative: Max
-                height_relative: Max
-                text: |
-                  [s=7|#player_name#][x=40|#datetime#]
-                  #current_area_name#
+                preferred_size: [0, 10]
+                children:
+                  text_area:
+                    from: .text_area
+                    width_relative: Max
+                    height_relative: Max
+                    text: |
+                      [s=7|#player_name#][x=40|#datetime#]
+                      #current_area_name#
       delete:
         from: .button
         preferred_size: [25, 10]

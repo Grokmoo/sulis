@@ -309,8 +309,9 @@ children:
             x_relative: Center
       transition_window:
         from: .window
+        background: bg_medium
         height_relative: Zero
-        preferred_size: [125, 61]
+        preferred_size: [160, 80]
         x_relative: Center
         y_relative: Center
         children:
@@ -318,58 +319,65 @@ children:
             text: "Transition Editor"
           apply_button:
             from: .button
-            preferred_size: [16, 4]
+            preferred_size: [16, 6]
             text: "Apply"
-            position: [96, 44]
+            y_relative: Max
+            x_relative: Max
           new_button:
             from: .button
-            preferred_size: [16, 4]
+            preferred_size: [16, 6]
             text: "New"
-            position: [48, 44]
+            y_relative: Max
+            position: [65, 0]
           delete_button:
             from: .button
-            preferred_size: [16, 4]
+            preferred_size: [16, 6]
             text: "Delete"
-            position: [68, 44]
+            y_relative: Max
+            position: [85, 0]
           transitions_list:
             from: .list_box
-            preferred_size: [40, 40]
-            position: [0, 8]
-            height_relative: Zero
+            preferred_size: [60, -5]
+            position: [0, 5]
+            height_relative: Max
             width_relative: Zero
           from_label:
             from: .label
             text: "From Point"
             text_params:
               horizontal_alignment: Right
-            preferred_size: [8, 4]
-            position: [48, 8]
+            preferred_size: [8, 12]
+            position: [68, 5]
           to_label:
             from: .label
             text: "To Point"
             text_params:
               horizontal_alignment: Right
-            preferred_size: [16, 4]
-            position: [48, 16]
+            preferred_size: [16, 12]
+            position: [68, 20]
           to_area_label:
             from: .label
             text: "To Area ID"
             text_params:
               horizontal_alignment: Right
-            preferred_size: [16, 4]
-            position: [48, 24]
-          from:
-            from: .input_field
-            preferred_size: [32, 4]
-            position: [68, 8]
-          to:
-            from: .input_field
-            preferred_size: [32, 4]
-            position: [68, 16]
+            preferred_size: [16, 6]
+            position: [68, 35]
+          from_x:
+            from: .spinner
+            position: [88, 5]
+          from_y:
+            from: .spinner
+            position: [108, 5]
+          to_x:
+            from: .spinner
+            position: [88, 20]
+          to_y:
+            from: .spinner
+            position: [108, 20]
           to_area:
             from: .input_field
-            preferred_size: [40, 4]
-            position: [68, 24]
+            preferred_size: [60, 6]
+            position: [88, 35]
       load_window:
         from: .window
         height_relative: Zero

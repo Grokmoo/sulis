@@ -184,6 +184,7 @@ impl AttackKind {
             "Fortitude" => AttackKind::Fortitude,
             "Reflex" => AttackKind::Reflex,
             "Will" => AttackKind::Will,
+            "Dummy" => AttackKind::Dummy,
             _ => {
                 warn!("Unable to parse string '{}' into attack kind", s);
                 AttackKind::Will
@@ -199,4 +200,5 @@ pub enum AttackKind {
     Fortitude,
     Reflex,
     Will,
+    Dummy,
 }

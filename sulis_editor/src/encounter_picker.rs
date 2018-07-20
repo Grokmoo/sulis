@@ -60,7 +60,7 @@ impl EncounterPicker {
 }
 
 impl EditorMode for EncounterPicker {
-    fn draw(&mut self, renderer: &mut GraphicsRenderer, _model: &AreaModel, x: f32, y: f32,
+    fn draw_mode(&mut self, renderer: &mut GraphicsRenderer, _model: &AreaModel, x: f32, y: f32,
             scale_x: f32, scale_y: f32, _millis: u32) {
 
         match self.cur_encounter {

@@ -184,7 +184,7 @@ impl WidgetKind for CosmeticSelectorPane {
     fn as_any(&self) -> &Any { self }
     fn as_any_mut(&mut self) -> &mut Any { self }
 
-    fn draw_graphics_mode(&mut self, renderer: &mut GraphicsRenderer, _pixel_size: Point,
+    fn draw(&mut self, renderer: &mut GraphicsRenderer, _pixel_size: Point,
                           _widget: &Widget, millis: u32) {
         let race = match self.race {
             None => return,

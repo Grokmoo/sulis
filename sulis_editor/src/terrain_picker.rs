@@ -292,7 +292,7 @@ impl TerrainPicker {
 }
 
 impl EditorMode for TerrainPicker {
-    fn draw(&mut self, renderer: &mut GraphicsRenderer, _model: &AreaModel, x_offset: f32, y_offset: f32,
+    fn draw_mode(&mut self, renderer: &mut GraphicsRenderer, _model: &AreaModel, x_offset: f32, y_offset: f32,
             scale_x: f32, scale_y: f32, _millis: u32) {
         let gw = self.grid_width as f32;
         let gh = self.grid_height as f32;

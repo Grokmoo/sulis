@@ -476,9 +476,13 @@ pub fn unwrap_point(point: HashMap<String, i32>) -> Result<(i32, i32)> {
 
 fn create_stats_table<'a>(lua: &'a Lua, parent: &ScriptEntity, _args: ()) -> Result<rlua::Table<'a>> {
     let parent = parent.try_unwrap()?;
-    let src = &parent.borrow().actor.stats;
+    let parent = parent.borrow();
+    let src = &parent.actor.stats;
 
     let stats = lua.create_table()?;
+    stats.set("current_hp", parent.actor.hp())?;
+    stats.set("current_ap", parent.actor.ap())?;
+
     stats.set("strength", src.attributes.strength)?;
     stats.set("dexterity", src.attributes.dexterity)?;
     stats.set("endurance", src.attributes.endurance)?;
@@ -503,7 +507,7 @@ fn create_stats_table<'a>(lua: &'a Lua, parent: &ScriptEntity, _args: ()) -> Res
     stats.set("reflex", src.reflex)?;
     stats.set("will", src.will)?;
 
-    stats.set("attack_distance", src.attack_distance() + parent.borrow().size.diagonal / 2.0)?;
+    stats.set("attack_distance", src.attack_distance() + parent.size.diagonal / 2.0)?;
     stats.set("attack_is_melee", src.attack_is_melee())?;
     stats.set("attack_is_ranged", src.attack_is_ranged())?;
 

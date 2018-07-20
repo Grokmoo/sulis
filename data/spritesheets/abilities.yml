@@ -106,5 +106,9 @@ groups:
       
       backstab: [0, 13]
       smoke_bomb: [1, 13]
+      pierce: [2, 13]
+      killing_blow: [3, 13]
+      feint: [4, 13]
+      backstab_mastery: [5, 13]
       
       prereqs_not_met: [7, 4]

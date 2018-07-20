@@ -43,7 +43,6 @@ pub struct WidgetState {
     pub is_modal: bool,
     pub modal_remove_on_click_outside: bool,
     pub is_mouse_over: bool,
-
     text_args: HashMap<String, String>,
     pub (in ui) callback: Option<Callback>,
     pub (in ui) has_keyboard_focus: bool,

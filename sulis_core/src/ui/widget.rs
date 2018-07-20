@@ -46,8 +46,7 @@ impl Widget {
         self.modal_child.is_some()
     }
 
-    pub fn draw_graphics_mode(&self, renderer: &mut GraphicsRenderer,
-                              pixel_size: Point, millis: u32) {
+    pub fn draw(&self, renderer: &mut GraphicsRenderer, pixel_size: Point, millis: u32) {
         if !self.state.visible { return; }
 
         if let Some(ref image) = self.state.background {
@@ -55,24 +54,26 @@ impl Widget {
             let y = self.state.position.y as f32;
             let w = self.state.size.width as f32;
             let h = self.state.size.height as f32;
-            image.draw_graphics_mode(renderer, &self.state.animation_state, x, y, w, h, millis);
+            image.draw(renderer, &self.state.animation_state, x, y, w, h, millis);
         }
 
-        self.kind.borrow_mut().draw_graphics_mode(renderer, pixel_size, &self, millis);
+        self.kind.borrow_mut().draw(renderer, pixel_size, &self, millis);
 
         for child in self.children.iter() {
             let child = child.borrow();
 
-            child.draw_graphics_mode(renderer, pixel_size, millis);
+            child.draw(renderer, pixel_size, millis);
 
             if let Some(ref image) = child.state.foreground {
                 let x = child.state.inner_position.x as f32;
                 let y = child.state.inner_position.y as f32;
                 let w = child.state.inner_size.width as f32;
                 let h = child.state.inner_size.height as f32;
-                image.draw_graphics_mode(renderer, &child.state.animation_state, x, y, w, h, millis);
+                image.draw(renderer, &child.state.animation_state, x, y, w, h, millis);
             }
         }
+
+        self.kind.borrow_mut().end_draw(renderer);
     }
 
     pub fn set_theme_name(&mut self, name: &str) {

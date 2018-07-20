@@ -71,8 +71,10 @@ pub trait WidgetKind {
     /// called every frame
     fn update(&mut self, _widget: &Rc<RefCell<Widget>>) { }
 
-    fn draw_graphics_mode(&mut self, _renderer: &mut GraphicsRenderer, _pixel_size: Point,
-                          _widget: &Widget, _millis: u32) { }
+    fn draw(&mut self, _renderer: &mut GraphicsRenderer, _pixel_size: Point,
+            _widget: &Widget, _millis: u32) { }
+
+    fn end_draw(&mut self, _renderer: &mut GraphicsRenderer) { }
 
     fn layout(&mut self, widget: &mut Widget) {
         widget.do_base_layout();

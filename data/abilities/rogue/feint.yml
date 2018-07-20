@@ -1,0 +1,17 @@
+id: feint
+name: "Feint"
+icon: abilities/feint
+description: |
+  Make an attack against an enemy intended to mislead.  If the target fails a Will resistance check, they suffer a penalty to defense for one round.
+active:
+  script: "feint"
+  group: Rogue
+  ap: 2000
+  duration:
+    Rounds: 1
+  cooldown: 3
+  short_description: |
+    Lower the defenses of a single target.
+prereqs:
+  abilities: [ flanker ]
+  total_level: 5

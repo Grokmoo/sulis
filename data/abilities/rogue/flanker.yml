@@ -4,7 +4,8 @@ icon: abilities/flanker
 description: |
   You no longer need to have an ally directly on the other side of an enemy to flank them, and are able to flank from the sides.
 prereqs:
-  abilities: [ hide ]
+  abilities: [ backstab ]
+  total_level: 3
 bonuses:
   - kind:
       flanking_angle: -30

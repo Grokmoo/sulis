@@ -45,9 +45,8 @@ children:
         from: .load_window_base
         border: [5, 5, 5, 5]
         position: [0, 35]
-        height_relative: Max
         x_relative: Center
-        preferred_size: [150, -35]
+        preferred_size: [150, 138]
       module_selector:
         from: .module_selector
         position: [0, 40]

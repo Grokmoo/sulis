@@ -123,7 +123,7 @@ impl<'a> GliumRenderer<'a> {
     fn new(target: &'a mut glium::Frame, display: &'a mut GliumDisplay) -> GliumRenderer<'a> {
         let params = glium::DrawParameters {
             blend: glium::draw_parameters::Blend::alpha_blending(),
-            smooth: Some(glium::draw_parameters::Smooth::Nicest),
+            smooth: Some(glium::draw_parameters::Smooth::Fastest),
 
             .. Default::default()
         };

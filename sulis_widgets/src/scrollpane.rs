@@ -19,12 +19,78 @@ use std::rc::Rc;
 use std::cell::RefCell;
 use std::cmp;
 
+use sulis_core::io::GraphicsRenderer;
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use {Button};
+use sulis_core::util::{Point, Size};
 
-const NAME: &str = "scrollbar";
+use Button;
 
-pub struct Scrollbar {
+/// Simple ScrollPane that clips its child content to its inner area
+/// nested scroll panes are not supported
+/// only does vertical scrolling
+pub struct ScrollPane {
+    content: Rc<RefCell<Widget>>,
+    scrollbar: Rc<RefCell<Scrollbar>>,
+    scrollbar_widget: Rc<RefCell<Widget>>,
+}
+
+impl ScrollPane {
+    pub fn new() -> Rc<RefCell<ScrollPane>> {
+        let content = Widget::empty("content");
+        let scrollbar = Scrollbar::new(&content);
+        let scrollbar_widget = Widget::with_defaults(scrollbar.clone());
+        Rc::new(RefCell::new(ScrollPane {
+            content,
+            scrollbar,
+            scrollbar_widget,
+        }))
+    }
+
+    pub fn add_to_content(&self, child: Rc<RefCell<Widget>>) {
+        Widget::add_child_to(&self.content, child);
+    }
+}
+
+impl WidgetKind for ScrollPane {
+    widget_kind!["scrollpane"];
+
+    fn draw(&mut self, renderer: &mut GraphicsRenderer, _pixel_size: Point,
+            widget: &Widget, _millis: u32) {
+        let x = widget.state.inner_position.x;
+        let y = widget.state.inner_position.y;
+        let width = widget.state.inner_size.width;
+        let height = widget.state.inner_size.height;
+        renderer.set_scissor(Point::new(x, y), Size::new(width, height));
+    }
+
+    fn layout(&mut self, widget: &mut Widget) {
+        let scroll = self.scrollbar.borrow().cur_y();
+
+        widget.do_self_layout();
+        let x = widget.state.position.x;
+        let y = widget.state.position.y;
+        widget.state.set_position(x, y - scroll);
+
+        widget.do_children_layout();
+
+        widget.state.set_position(x, y);
+
+        let sx = self.scrollbar_widget.borrow().state.position.x;
+        let sy = self.scrollbar_widget.borrow().state.position.y;
+        self.scrollbar_widget.borrow_mut().state.set_position(sx, sy + scroll);
+    }
+
+    fn end_draw(&mut self, renderer: &mut GraphicsRenderer) {
+        renderer.clear_scissor();
+    }
+
+    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+
+        vec![Rc::clone(&self.content), Rc::clone(&self.scrollbar_widget)]
+    }
+}
+
+struct Scrollbar {
     widget: Rc<RefCell<Widget>>,
     delta: u32,
 
@@ -37,7 +103,7 @@ pub struct Scrollbar {
 }
 
 impl Scrollbar {
-    pub fn new(widget_to_scroll: &Rc<RefCell<Widget>>) -> Rc<RefCell<Scrollbar>> {
+    fn new(widget_to_scroll: &Rc<RefCell<Widget>>) -> Rc<RefCell<Scrollbar>> {
         let up = Widget::with_theme(Button::empty(), "up");
         let down = Widget::with_theme(Button::empty(), "down");
 
@@ -52,7 +118,7 @@ impl Scrollbar {
         }))
     }
 
-    pub fn cur_y(&self) -> i32 {
+    fn cur_y(&self) -> i32 {
         self.cur_y
     }
 
@@ -85,11 +151,7 @@ impl Scrollbar {
 }
 
 impl WidgetKind for Scrollbar {
-    fn get_name(&self) -> &str { NAME }
-
-    fn as_any(&self) -> &Any { self }
-
-    fn as_any_mut(&mut self) -> &mut Any { self }
+    widget_kind!("scrollbar");
 
     fn layout(&mut self, widget: &mut Widget) {
         widget.do_base_layout();

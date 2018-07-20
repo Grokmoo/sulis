@@ -255,18 +255,24 @@ children:
                 text_params:
                   scale: 4.0
                 preferred_size: [16, 4]
-          tiles_content:
+          tiles:
             height_relative: Max
             width_relative: Max
             position: [0, 4]
-            preferred_size: [-5, -4]
-            layout: Grid
-            layout_spacing: [0, 0, 0, 0]
+            preferred_size: [0, -4]
             children:
-              tile_button:
-                from: .button
-                foreground: "#icon#"
-                preferred_size: [20, 20]
+              scrollbar:
+                from: .scrollbar
+              content:
+                width_relative: Max
+                height_relative: Max
+                layout: Grid
+                layout_spacing: [0, 0, 0, 0]
+                children:
+                  tile_button:
+                    from: .button
+                    foreground: "#icon#"
+                    preferred_size: [20, 20]
           scrollbar:
             from: .scrollbar
             custom:

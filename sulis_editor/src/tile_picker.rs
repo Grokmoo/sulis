@@ -23,7 +23,7 @@ use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
 use sulis_core::util::Point;
 use sulis_module::Module;
 use sulis_module::area::Tile;
-use sulis_widgets::{Button, Scrollbar};
+use sulis_widgets::{Button, ScrollPane};
 
 use {AreaModel, EditorMode};
 
@@ -166,7 +166,7 @@ impl WidgetKind for TilePicker {
             Some(ref layer) => layer,
         };
 
-        let tiles_content = Widget::empty("tiles_content");
+        let scrollpane = ScrollPane::new();
         for tile in all_tiles {
             if &tile.layer != cur_layer { continue; }
 
@@ -183,18 +183,16 @@ impl WidgetKind for TilePicker {
                     }
                     widget.borrow_mut().state.set_active(true);
 
-                    let parent = Widget::get_parent(&parent);
+                    let parent = Widget::go_up_tree(&parent, 2);
                     let tile_picker = Widget::downcast_kind_mut::<TilePicker>(&parent);
                     tile_picker.cur_tile = Some(Rc::clone(&tile));
                 }
             }));
 
             button.borrow_mut().state.add_callback(cb);
-            Widget::add_child_to(&tiles_content, button);
+            scrollpane.borrow().add_to_content(button);
         }
 
-        let scrollbar = Widget::with_defaults(Scrollbar::new(&tiles_content));
-
-        vec![tiles_content, layers_content, scrollbar]
+        vec![Widget::with_theme(scrollpane, "tiles"), layers_content]
     }
 }

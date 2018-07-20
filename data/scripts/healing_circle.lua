@@ -29,10 +29,10 @@ function on_target_select(parent, ability, targets)
   anim:set_draw_above_entities()
   surface:add_anim(anim)
   
-  below = parent:create_anim("particles/square")
+  below = parent:create_anim("particles/circle16")
   below:set_draw_below_entities()
-  below:set_position(below:param(0.0), below:param(0.0))
-  below:set_particle_size_dist(below:fixed_dist(1.0), below:fixed_dist(1.0))
+  below:set_position(below:param(-0.5), below:param(-0.5))
+  below:set_particle_size_dist(below:fixed_dist(2.0), below:fixed_dist(2.0))
   below:set_color(below:param(0.0), below:param(1.0), below:param(1.0), below:param(0.1))
   surface:add_anim(below)
   
@@ -44,7 +44,6 @@ function on_target_select(parent, ability, targets)
 	targets[i]:heal_damage(20)
   end
 end
-
 
 function apply_heal(parent, ability, targets)
   targets = targets:friendly()

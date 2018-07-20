@@ -588,7 +588,7 @@ impl AreaState {
 
         let mgr = GameState::turn_manager();
         let mgr = mgr.borrow();
-        Some(mgr.entity(index))
+        mgr.entity_checked(index)
     }
 
     pub fn get_transition_at(&self, x: i32, y: i32) -> Option<&Transition> {
@@ -883,6 +883,10 @@ impl AreaState {
         // add to surfaces in new but not in old
         for surface in new_surfaces.difference(&old_surfaces) {
             mgr.borrow_mut().add_to_surface(entity_index, *surface);
+        }
+
+        for surface in new_surfaces.intersection(&old_surfaces) {
+            mgr.borrow_mut().increment_surface_squares_moved(entity_index, *surface);
         }
 
         let is_pc = entity.borrow().is_party_member();

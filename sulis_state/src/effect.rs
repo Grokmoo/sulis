@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::collections::HashMap;
 use std::rc::Rc;
 
 use sulis_core::util::{ExtInt, Point};
@@ -26,6 +27,7 @@ use ROUND_TIME_MILLIS;
 struct Surface {
     area_id: String,
     points: Vec<Point>,
+    squares_to_fire_on_moved: u32,
 }
 
 pub struct Effect {
@@ -42,6 +44,8 @@ pub struct Effect {
 
     deactivate_with_ability: Option<String>,
     surface: Option<Surface>,
+
+    squares_moved: HashMap<usize, u32>,
 }
 
 impl Effect {
@@ -57,19 +61,25 @@ impl Effect {
             removal_listeners: ChangeListenerList::default(),
             callbacks: Vec::new(),
             deactivate_with_ability,
-            surface: None
+            surface: None,
+            squares_moved: HashMap::new(),
         }
+    }
+
+    pub(crate) fn increment_squares_moved(&mut self, entity: usize) {
+        *self.squares_moved.entry(entity).or_insert(0) += 1;
     }
 
     pub fn mark_for_removal(&mut self) {
         self.total_duration = ExtInt::Int(0);
     }
 
-    pub fn set_surface_for_area(&mut self, area: &str, points: &Vec<Point>) {
+    pub fn set_surface_for_area(&mut self, area: &str, points: &Vec<Point>, squares_to_fire_on_moved: u32) {
         let area_id = area.to_string();
         self.surface = Some(Surface {
             area_id,
             points: points.clone(),
+            squares_to_fire_on_moved,
         })
     }
 
@@ -93,6 +103,27 @@ impl Effect {
 
     pub fn add_callback(&mut self, cb: Rc<ScriptCallback>) {
         self.callbacks.push(cb);
+    }
+
+    #[must_use]
+    pub fn update_on_moved_in_surface(&mut self) -> Vec<(Rc<ScriptCallback>, usize)> {
+        let to_fire = match self.surface {
+            None => return Vec::new(),
+            Some(ref surface) => surface.squares_to_fire_on_moved,
+        };
+
+        let mut result = Vec::new();
+        for (index, amount) in self.squares_moved.iter_mut() {
+            if *amount >= to_fire {
+                for cb in self.callbacks.iter() {
+                    result.push((cb.clone(), *index));
+                }
+
+                *amount -= to_fire;
+            }
+        }
+
+        result
     }
 
     /// Updates the effect time.  returns true if a round has elapsed

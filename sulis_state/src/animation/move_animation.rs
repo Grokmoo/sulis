@@ -24,7 +24,7 @@ use sulis_core::util::{Point};
 pub (in animation) fn update(mover: &Rc<RefCell<EntityState>>, marked_for_removal: &Rc<Cell<bool>>,
                              model: &mut MoveAnimModel, millis: u32) {
     let cur_area_id = mover.borrow().location.area_id.to_string();
-    if (model.area_id != cur_area_id) || model.path.is_empty() {
+    if (model.area_id != cur_area_id) || model.path.is_empty()  || mover.borrow().actor.is_dead() {
         marked_for_removal.set(true);
         return;
     }

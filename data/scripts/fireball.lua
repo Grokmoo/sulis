@@ -14,9 +14,9 @@ end
 
 function on_target_select(parent, ability, targets)
   selected_point = targets:selected_point()
-  speed = 12.0
+  speed = 10.0
   dist = parent:dist_to_point(selected_point)
-  duration = 0.5 + dist / speed
+  duration = dist / speed
   vx = (selected_point.x - parent:center_x()) / duration
   vy = (selected_point.y - parent:center_y()) / duration
   
@@ -39,6 +39,13 @@ function on_target_select(parent, ability, targets)
 end
 
 function create_explosion(parent, ability, targets)
+  anim = parent:wait_anim(0.3)
+  cb = ability:create_callback(parent)
+  cb:add_targets(targets)
+  cb:set_on_anim_complete_fn("create_fire_surface")
+  anim:set_completion_callback(cb)
+  anim:activate()
+  
   duration = 1.2
   
   position = targets:selected_point()
@@ -69,5 +76,48 @@ function attack_target(parent, ability, targets)
   if target:is_valid() then
     target = targets:first()
     parent:special_attack(target, "Reflex", 20, 30, 0, "Fire")
+  end
+end
+
+function create_fire_surface(parent, ability, targets)
+  points = targets:random_affected_points(0.7)
+  surf = parent:create_surface(ability:name(), points, 2)
+  surf:set_squares_to_fire_on_moved(3)
+  
+  cb = ability:create_callback(parent)
+  cb:set_on_surface_round_elapsed_fn("on_round_elapsed")
+  cb:set_on_moved_in_surface_fn("on_moved")
+  surf:add_callback(cb)
+  
+  gen = parent:create_particle_generator("fire_particle")
+  gen:set_alpha(gen:param(0.75))
+  gen:set_gen_rate(gen:param(30.0))
+  gen:set_position(gen:param(0.0), gen:param(0.0))
+  gen:set_particle_size_dist(gen:fixed_dist(0.5), gen:fixed_dist(0.5))
+  gen:set_particle_duration_dist(gen:fixed_dist(0.6))
+  gen:set_particle_position_dist(gen:dist_param(gen:uniform_dist(-0.5, 0.5), gen:uniform_dist(-0.1, 0.1)),
+								 gen:dist_param(gen:uniform_dist(0.0, 0.5), gen:uniform_dist(-2.0, -3.0)))
+  gen:set_draw_above_entities()
+  surf:add_anim(gen)
+  
+  below = parent:create_anim("particles/circle16")
+  below:set_draw_below_entities()
+  below:set_position(below:param(-0.25), below:param(-0.25))
+  below:set_particle_size_dist(below:fixed_dist(1.5), below:fixed_dist(1.5))
+  below:set_color(below:param(0.8), below:param(0.5), below:param(0.0), below:param(0.2))
+  surf:add_anim(below)
+  
+  surf:apply()
+end
+
+function on_moved(parent, ability, targets)
+  target = targets:first()
+  target:take_damage(2, 4, "Fire")
+end
+
+function on_round_elapsed(parent, ability, targets)
+  targets = targets:to_table()
+  for i = 1, #targets do
+	targets[i]:take_damage(2, 4, "Fire")
   end
 end

@@ -26,7 +26,11 @@ use {Effect, GameState};
 #[derive(Clone)]
 enum Kind {
     Entity(usize),
-    Surface(Vec<(i32, i32)>),
+
+    Surface {
+        points: Vec<(i32, i32)>,
+        squares_to_fire_on_moved: u32
+    }
 }
 
 #[derive(Clone)]
@@ -45,7 +49,7 @@ pub struct ScriptEffect {
 impl ScriptEffect {
     pub fn new_surface(points: Vec<(i32, i32)>, name: &str, duration: ExtInt) -> ScriptEffect {
         ScriptEffect {
-            kind: Kind::Surface(points),
+            kind: Kind::Surface { points, squares_to_fire_on_moved: 1 },
             name: name.to_string(),
             tag: "default".to_string(),
             deactivate_with_ability: None,
@@ -76,6 +80,17 @@ impl UserData for ScriptEffect {
     fn add_methods(methods: &mut UserDataMethods<Self>) {
         methods.add_method("apply", |_, effect, _args: ()| {
             apply(effect)
+        });
+        methods.add_method_mut("set_squares_to_fire_on_moved", |_, effect, squares: u32| {
+            match effect.kind {
+                Kind::Entity(_) => {
+                    warn!("Attempted to set movement squares until on_moved fired for non surface effect");
+                },
+                Kind::Surface { ref mut squares_to_fire_on_moved, .. } => {
+                    *squares_to_fire_on_moved = squares;
+                }
+            }
+            Ok(())
         });
         methods.add_method_mut("add_color_anim", |_, effect, anim: ScriptColorAnimation| {
             effect.color_anims.push(anim);
@@ -201,7 +216,7 @@ fn apply(effect_data: &ScriptEffect) -> Result<()> {
             info!("Apply effect to '{}' with duration {}", entity.borrow().actor.actor.name, duration);
             mgr.borrow_mut().add_effect(effect, &entity, cbs, marked);
         },
-        Kind::Surface(points) => {
+        Kind::Surface { points, squares_to_fire_on_moved } => {
             let points: Vec<_> = points.iter().map(|(x, y)| Point::new(*x, *y)).collect();
             for pgen in effect_data.pgens.iter() {
                 for p in points.iter() {
@@ -211,7 +226,7 @@ fn apply(effect_data: &ScriptEffect) -> Result<()> {
                 }
             }
             let area = GameState::area_state();
-            effect.set_surface_for_area(&area.borrow().area.id, &points);
+            effect.set_surface_for_area(&area.borrow().area.id, &points, *squares_to_fire_on_moved);
             info!("Add surface to '{}' with duration {}", area.borrow().area.name, duration);
             mgr.borrow_mut().add_surface(effect, &area, points, cbs, marked);
         },

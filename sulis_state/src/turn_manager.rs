@@ -34,6 +34,7 @@ enum Entry {
 pub struct TurnManager {
     entities: Vec<Option<Rc<RefCell<EntityState>>>>,
     effects: Vec<Option<Effect>>,
+    surfaces: Vec<usize>,
     effects_remove_next_update: Vec<usize>,
     combat_active: bool,
     last_millis: u32,
@@ -47,6 +48,7 @@ impl Default for TurnManager {
         TurnManager {
             entities: Vec::new(),
             effects: Vec::new(),
+            surfaces: Vec::new(),
             effects_remove_next_update: Vec::new(),
             listeners: ChangeListenerList::default(),
             order: VecDeque::new(),
@@ -60,6 +62,7 @@ impl TurnManager {
     pub(crate) fn clear(&mut self) {
         self.entities.clear();
         self.effects.clear();
+        self.surfaces.clear();
         self.effects_remove_next_update.clear();
         self.combat_active = false;
         self.listeners = ChangeListenerList::default();
@@ -101,6 +104,20 @@ impl TurnManager {
 
     pub fn entity(&self, index: usize) -> Rc<RefCell<EntityState>> {
         Rc::clone(self.entities[index].as_ref().unwrap())
+    }
+
+    #[must_use]
+    pub fn update_on_moved_in_surface(&mut self) -> Vec<(Rc<ScriptCallback>, usize)> {
+        let mut result = Vec::new();
+
+        for index in self.surfaces.iter() {
+            // can't use the method because of borrow checker
+            let effect = self.effects[*index].as_mut().unwrap();
+
+            result.append(&mut effect.update_on_moved_in_surface());
+        }
+
+        result
     }
 
     #[must_use]
@@ -405,16 +422,24 @@ impl TurnManager {
         GameState::set_clear_anims();
     }
 
+    pub(crate) fn increment_surface_squares_moved(&mut self, entity_index: usize, surface_index: usize) {
+        let surface = self.effect_mut(surface_index);
+        surface.increment_squares_moved(entity_index);
+    }
+
     pub (crate) fn add_to_surface(&mut self, entity_index: usize, surface_index: usize) {
         let entity = self.entity(entity_index);
-        let surface = self.effect(surface_index);
+        let surface = self.effect_mut(surface_index);
         info!("Add '{}' from surface {}", entity.borrow().actor.actor.name, surface_index);
         entity.borrow_mut().actor.add_effect(surface_index, surface.bonuses().clone());
-
+        surface.increment_squares_moved(entity_index);
     }
 
     pub (crate) fn remove_from_surface(&mut self, entity_index: usize, surface_index: usize) {
-        let entity = self.entity(entity_index);
+        let entity = match self.entity_checked(entity_index) {
+            None => return,
+            Some(entity) => entity,
+        };
         assert!(self.effects[surface_index].is_some());
         info!("Remove '{}' from surface {}", entity.borrow().actor.actor.name, surface_index);
         entity.borrow_mut().actor.remove_effect(surface_index);
@@ -456,7 +481,7 @@ impl TurnManager {
                        points: Vec<Point>, cbs: Vec<CallbackData>,
                        removal_markers: Vec<Rc<Cell<bool>>>) -> usize {
         let index = self.add_effect_internal(effect, cbs, removal_markers);
-
+        self.surfaces.push(index);
         let entities = area_state.borrow_mut().add_surface(index, points);
 
         for entity in entities {
@@ -502,6 +527,8 @@ impl TurnManager {
                 Entry::Entity(_) => true,
             }
         });
+
+        self.surfaces.retain(|e| *e != index);
     }
 
     fn remove_entity(&mut self, index: usize) {

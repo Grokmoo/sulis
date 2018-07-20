@@ -32,6 +32,12 @@ pub fn fire_round_elapsed(cbs: Vec<Rc<ScriptCallback>>) {
     }
 }
 
+pub fn fire_on_moved_in_surface(cbs: Vec<(Rc<ScriptCallback>, usize)>) {
+    for (cb, target) in cbs {
+        cb.on_moved_in_surface(target);
+    }
+}
+
 #[derive(Clone, Copy, PartialOrd, Ord, Hash, PartialEq, Eq)]
 enum FuncKind {
     BeforeAttack,
@@ -42,6 +48,7 @@ enum FuncKind {
     OnAnimUpdate,
     OnRoundElapsed,
     OnSurfaceRoundElapsed,
+    OnMovedInSurface,
 }
 
 pub trait ScriptCallback {
@@ -60,6 +67,8 @@ pub trait ScriptCallback {
     fn on_round_elapsed(&self) { }
 
     fn on_surface_round_elapsed(&self) { }
+
+    fn on_moved_in_surface(&self, _target: usize) { }
 }
 
 #[derive(Clone)]
@@ -122,6 +131,18 @@ impl CallbackData {
 }
 
 impl ScriptCallback for CallbackData {
+    fn on_moved_in_surface(&self, target: usize) {
+        let func = match self.funcs.get(&FuncKind::OnMovedInSurface) {
+            None => return,
+            Some(ref func) => func.to_string(),
+        };
+
+        let (parent, ability) = self.get_params();
+        let mut targets = ScriptEntitySet::with_parent(self.parent);
+        targets.indices.push(Some(target));
+        GameState::execute_ability_script(&parent, &ability, targets, &func);
+    }
+
     fn after_defense(&self, targets: &ScriptEntitySet, hit_kind: HitKind, damage: u32) {
         let func = match self.funcs.get(&FuncKind::AfterDefense) {
             None => return,
@@ -293,6 +314,8 @@ impl UserData for CallbackData {
                                |_, cb, func: String| cb.add_func(FuncKind::OnRoundElapsed, func));
         methods.add_method_mut("set_on_surface_round_elapsed_fn",
                                |_, cb, func: String| cb.add_func(FuncKind::OnSurfaceRoundElapsed, func));
+        methods.add_method_mut("set_on_moved_in_surface_fn",
+                               |_, cb, func: String| cb.add_func(FuncKind::OnMovedInSurface, func));
     }
 }
 

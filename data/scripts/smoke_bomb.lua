@@ -43,7 +43,7 @@ function create_smoke(parent, ability, targets)
   
   s_anim = parent:create_particle_generator("particles/circle12")
   s_anim:set_position(s_anim:param(0.0), s_anim:param(0.0))
-  s_anim:set_color(s_anim:param(0.5), s_anim:param(0.5), s_anim:param(0.5), s_anim:param(0.15))
+  s_anim:set_color(s_anim:param(0.5), s_anim:param(0.5), s_anim:param(0.5), s_anim:param(0.3))
   s_anim:set_gen_rate(s_anim:param(20.0))
   s_anim:set_particle_size_dist(s_anim:fixed_dist(1.0), s_anim:fixed_dist(1.0))
   s_anim:set_particle_duration_dist(s_anim:fixed_dist(1.0))

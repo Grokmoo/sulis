@@ -28,7 +28,7 @@ skin_color:
   b: 0.16862745583057404
   a: 1
 items:
-  - dagger
+  - shortsword
   - boots_leather
   - torso_leather
   - legs_leather
@@ -48,3 +48,5 @@ abilities:
   - weapon_simple
   - precise_shot
   - crippling_shot
+  - hide
+  - backstab

@@ -469,7 +469,7 @@ children:
             from: .item_button
       coins_button:
         from: .item_button
-        position: [74, 64]
+        position: [74, 16]
   character_window:
     from: .window
     children:

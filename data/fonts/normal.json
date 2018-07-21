@@ -1,7 +1,7 @@
 {
   "id" : "normal",
   "src" : "normal.png",
-  "line_height" : 55,
+  "line_height" : 57,
   "base" : 41,
   "characters" : [
     { "id" : 32, "xywh" : [ 152, 0, 0, 0 ], "offset" : [ 0, 41 ], "x_advance" : 8}, 

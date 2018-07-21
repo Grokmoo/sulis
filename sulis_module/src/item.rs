@@ -28,6 +28,13 @@ use sulis_rules::{ItemKind};
 use {Equippable, ImageLayer, Module};
 
 #[derive(Debug)]
+pub struct Usable {
+    pub script: String,
+    pub ap: u32,
+    pub short_description: String,
+}
+
+#[derive(Debug)]
 pub struct Item {
     pub id: String,
     pub name: String,
@@ -38,6 +45,7 @@ pub struct Item {
     alternate_image: Option<HashMap<ImageLayer, Rc<Image>>>,
     pub value: i32,
     pub weight: i32,
+    pub usable: Option<Usable>,
 }
 
 impl PartialEq for Item {
@@ -68,7 +76,7 @@ fn build_hash_map(id: &str, input: Option<HashMap<ImageLayer, String>>)
 }
 
 impl Item {
-    pub fn new(builder: ItemBuilder, _module: &Module) -> Result<Item, Error> {
+    pub fn new(builder: ItemBuilder, module: &Module) -> Result<Item, Error> {
         let icon = match ResourceSet::get_image(&builder.icon) {
             None => {
                 warn!("No image found for icon '{}'", builder.icon);
@@ -90,6 +98,24 @@ impl Item {
         let images = build_hash_map(&builder.id, builder.image)?;
         let alt_images = build_hash_map(&builder.id, builder.alternate_image)?;
 
+        let usable = match builder.usable {
+            None => None,
+            Some(usable) => {
+                let script = match module.scripts.get(&usable.script) {
+                    None => {
+                        warn!("No script found with id '{}'", usable.script);
+                        return unable_to_create_error("item", &builder.id);
+                    }, Some(ref script) => script.to_string(),
+                };
+
+                Some(Usable {
+                    script,
+                    ap: usable.ap,
+                    short_description: usable.short_description,
+                })
+            }
+        };
+
         Ok(Item {
             id: builder.id,
             icon: icon,
@@ -100,6 +126,7 @@ impl Item {
             equippable: builder.equippable,
             value: builder.value as i32,
             weight: builder.weight as i32,
+            usable,
         })
     }
 
@@ -120,6 +147,14 @@ impl Item {
 
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
+pub struct UsableBuilder {
+    pub script: String,
+    pub ap: u32,
+    pub short_description: String,
+}
+
+#[derive(Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
 pub struct ItemBuilder {
     pub id: String,
     pub name: String,
@@ -130,6 +165,7 @@ pub struct ItemBuilder {
     pub alternate_image: Option<HashMap<ImageLayer, String>>,
     value: u32,
     weight: u32,
+    usable: Option<UsableBuilder>,
 }
 
 impl ResourceBuilder for ItemBuilder {

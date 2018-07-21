@@ -298,6 +298,22 @@ impl WidgetKind for ItemButton {
     }
 }
 
+pub fn use_item_cb(entity: &Rc<RefCell<EntityState>>, index: usize) -> Callback {
+    let entity = Rc::clone(entity);
+    Callback::with(Box::new(move || {
+        let item = match entity.borrow().actor.inventory().items.get(index) {
+            None => {
+                warn!("Attempted to activate an invalid item index {}", index);
+                return;
+            }, Some((_, item_state)) => {
+                Rc::clone(&item_state.item)
+            }
+        };
+        GameState::execute_item_on_activate(&entity, &item);
+        entity.borrow_mut().actor.remove_item(index);
+    }))
+}
+
 pub fn take_item_cb(entity: &Rc<RefCell<EntityState>>, prop_index: usize, index: usize) -> Callback {
     let entity = Rc::clone(entity);
     Callback::with(Box::new(move || {

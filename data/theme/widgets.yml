@@ -119,9 +119,11 @@ children:
         from: .label
         text: "#quantity#"
         text_params:
+          font: outlined
           horizontal_alignment: Right
           vertical_alignment: Top
           color: { r: 1.0, g: 0.0, b: 0.0, a: 1.0 }
+          scale: 5.0
         width_relative: Max
         height_relative: Max
         preferred_size: [-1, 0]

@@ -258,8 +258,17 @@ impl BuilderSet for CharacterCreator {
 
         let mut equipped = Vec::new();
         if let Some(ref items) = builder.items {
-            for (index, _) in items.iter().enumerate() {
-                equipped.push(index as u32);
+            for (index, item_id) in items.iter().enumerate() {
+                match Module::item(item_id) {
+                    None => {
+                        warn!("Unable to find item to add {}", item_id);
+                    },
+                    Some(item) => {
+                        if item.equippable.is_some() {
+                            equipped.push(index as u32);
+                        }
+                    }
+                }
             }
         }
 

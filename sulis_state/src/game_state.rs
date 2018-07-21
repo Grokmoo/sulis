@@ -27,7 +27,7 @@ use sulis_core::config::CONFIG;
 use sulis_core::util::{self, Point, invalid_data_error};
 use sulis_core::io::{GraphicsRenderer};
 use sulis_core::ui::{Widget};
-use sulis_module::{Ability, Actor, Module, ObjectSize, OnTrigger, area::{Trigger, TriggerKind}};
+use sulis_module::{Ability, Actor, Item, Module, ObjectSize, OnTrigger, area::{Trigger, TriggerKind}};
 
 use {AI, AreaState, ChangeListener, ChangeListenerList, EntityState, Location,
     PathFinder, SaveState, ScriptState, UICallback, MOVE_TO_THRESHOLD, TurnManager};
@@ -386,6 +386,10 @@ impl GameState {
             Err(rlua::Error::FromLuaConversionError { .. }) => "Success".to_string(),
             Err(e) => format!("{}", e),
         }
+    }
+
+    pub fn execute_item_on_activate(parent: &Rc<RefCell<EntityState>>, item: &Rc<Item>) {
+        exec_script!(item_on_activate: parent, item);
     }
 
     pub fn execute_ability_on_activate(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>) {

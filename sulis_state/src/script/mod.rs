@@ -53,7 +53,7 @@ use rlua::{self, Function, Lua, UserData, UserDataMethods};
 
 use sulis_core::config::CONFIG;
 use sulis_core::util::Point;
-use sulis_module::{ability, Ability, Module, OnTrigger};
+use sulis_module::{ability, Ability, Item, Module, OnTrigger};
 use {EntityState, GameState};
 
 type Result<T> = std::result::Result<T, rlua::Error>;
@@ -111,6 +111,23 @@ impl ScriptState {
         self.lua.globals().set("party", party_table)?;
 
         self.lua.eval::<String>(&script, None)
+    }
+
+    pub fn item_on_activate(&self, parent: &Rc<RefCell<EntityState>>,
+                            item: &Rc<Item>) -> Result<()> {
+        let script = match &item.usable {
+            None => Err(rlua::Error::ToLuaConversionError {
+                from: "ScriptItem",
+                to: "Item",
+                message: Some(format!("The item is not usable {}", item.id).to_string()),
+            }),
+            Some(usable) => Ok(usable.script.to_string())
+        }?;
+
+        self.lua.globals().set("item", ScriptItem::from(item))?;
+
+        let args_string = "(parent, item)".to_string();
+        self.execute_script(parent, &args_string, script.to_string(), "on_activate")
     }
 
     pub fn ability_on_activate(&self, parent: &Rc<RefCell<EntityState>>,
@@ -332,6 +349,45 @@ impl UserData for ScriptInterface {
 }
 
 #[derive(Clone)]
+pub struct ScriptItem {
+    id: String,
+    name: String,
+    ap: u32,
+}
+
+impl ScriptItem {
+    fn from(item: &Rc<Item>) -> ScriptItem {
+        let ap = match &item.usable {
+            None => 0,
+            Some(usable) => usable.ap,
+        };
+
+        ScriptItem {
+            id: item.id.to_string(),
+            name: item.name.to_string(),
+            ap,
+        }
+    }
+}
+
+impl UserData for ScriptItem {
+    fn add_methods(methods: &mut UserDataMethods<Self>) {
+        methods.add_method("activate", &activate_item);
+        methods.add_method("name", |_, item, ()| {
+            Ok(item.name.to_string())
+        });
+
+        methods.add_method("create_callback", |_, item, parent: ScriptEntity| {
+            let index = parent.try_unwrap_index()?;
+            // TODO implement
+            // let cb_data = CallbackData::new(index, &ability.id);
+            // Ok(cb_data)
+            Ok(())
+        });
+    }
+}
+
+#[derive(Clone)]
 pub struct ScriptAbility {
     id: String,
     name: String,
@@ -448,6 +504,17 @@ fn entity_with_id(id: String) -> Option<Rc<RefCell<EntityState>>> {
     }
 
     None
+}
+
+fn activate_item(_lua: &Lua, item: &ScriptItem, target: ScriptEntity) -> Result<()> {
+    let target = target.try_unwrap()?;
+
+    let mgr = GameState::turn_manager();
+    if mgr.borrow().is_combat_active() {
+        target.borrow_mut().actor.remove_ap(item.ap);
+    }
+
+    Ok(())
 }
 
 fn activate(_lua: &Lua, ability: &ScriptAbility, (target, take_ap): (ScriptEntity, Option<bool>)) -> Result<()> {

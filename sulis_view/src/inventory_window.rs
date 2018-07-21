@@ -82,6 +82,10 @@ impl WidgetKind for InventoryWindow {
             let item_but = ItemButton::inventory(&self.entity, item.item.icon.id(),
                 quantity, index);
 
+            if let Some(_) = item.item.usable {
+                item_but.borrow_mut().add_action("Use", use_item_cb(&self.entity, index));
+            }
+
             if let Some(_) = item.item.equippable {
                 if has_proficiency(&item, &actor.stats) {
                     item_but.borrow_mut().add_action("Equip", equip_item_cb(&self.entity, index));

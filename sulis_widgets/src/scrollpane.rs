@@ -100,12 +100,14 @@ struct Scrollbar {
 
     up: Rc<RefCell<Widget>>,
     down: Rc<RefCell<Widget>>,
+    thumb: Rc<RefCell<Widget>>,
 }
 
 impl Scrollbar {
     fn new(widget_to_scroll: &Rc<RefCell<Widget>>) -> Rc<RefCell<Scrollbar>> {
         let up = Widget::with_theme(Button::empty(), "up");
         let down = Widget::with_theme(Button::empty(), "down");
+        let thumb = Widget::with_theme(Button::empty(), "thumb");
 
         Rc::new(RefCell::new(Scrollbar {
             widget: Rc::clone(widget_to_scroll),
@@ -115,6 +117,7 @@ impl Scrollbar {
             max_y: 0,
             up,
             down,
+            thumb,
         }))
     }
 
@@ -165,6 +168,29 @@ impl WidgetKind for Scrollbar {
 
         self.up.borrow_mut().state.set_enabled(self.cur_y != self.min_y);
         self.down.borrow_mut().state.set_enabled(self.cur_y != self.max_y);
+
+
+        let widget_height = widget_ref.borrow().state.size.height as f32;
+        let thumb_frac = widget_height / ((self.max_y as f32 - self.min_y as f32) + widget_height);
+
+        // self.thumb.borrow_mut().state.set_enabled(thumb_frac < 1.0);
+        self.thumb.borrow_mut().state.set_enabled(false);
+
+        let inner_height = widget.state.inner_height() - self.up.borrow().state.size.height -
+            self.down.borrow().state.size.height;
+        let thumb_height = (thumb_frac * inner_height as f32).round() as i32;
+        let thumb_width = self.thumb.borrow().state.size.width;
+        self.thumb.borrow_mut().state.set_size(Size::new(thumb_width, thumb_height));
+
+        let thumb_x = self.thumb.borrow().state.position.x;
+        let thumb_base_y = self.up.borrow().state.position.y + self.up.borrow().state.size.height;
+
+        let thumb_pos_frac = (self.cur_y as f32 - self.min_y as f32) / (self.max_y as f32 - self.min_y as f32);
+        let thumb_max_y = self.down.borrow().state.position.y - thumb_height - thumb_base_y;
+
+        let thumb_y = thumb_base_y + (thumb_pos_frac * thumb_max_y as f32).round() as i32;
+
+        self.thumb.borrow_mut().state.set_position(thumb_x, thumb_y);
     }
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
@@ -182,6 +208,6 @@ impl WidgetKind for Scrollbar {
             kind.update_children_position(&widget_ref, 1);
         })));
 
-        vec![Rc::clone(&self.up), Rc::clone(&self.down)]
+        vec![Rc::clone(&self.up), Rc::clone(&self.down), Rc::clone(&self.thumb)]
     }
 }

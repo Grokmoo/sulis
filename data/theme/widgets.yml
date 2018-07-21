@@ -12,6 +12,11 @@ children:
     custom:
       scroll_delta: "10"
     children:
+      thumb:
+        from: .button
+        width_relative: Max
+        height_relative: Custom
+        y_relative: Custom
       up:
         from: .button
         width_relative: Max

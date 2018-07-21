@@ -310,7 +310,6 @@ pub fn use_item_cb(entity: &Rc<RefCell<EntityState>>, index: usize) -> Callback 
             }
         };
         GameState::execute_item_on_activate(&entity, &item);
-        entity.borrow_mut().actor.remove_item(index);
     }))
 }
 

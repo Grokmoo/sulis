@@ -115,25 +115,51 @@ impl ScriptState {
 
     pub fn item_on_activate(&self, parent: &Rc<RefCell<EntityState>>,
                             item: &Rc<Item>) -> Result<()> {
-        let script = match &item.usable {
-            None => Err(rlua::Error::ToLuaConversionError {
-                from: "ScriptItem",
-                to: "Item",
-                message: Some(format!("The item is not usable {}", item.id).to_string()),
-            }),
-            Some(usable) => Ok(usable.script.to_string())
-        }?;
+        let t: Option<(&str, usize)> = None;
+        self.item_script(parent, item, ScriptEntitySet::new(parent, &Vec::new()), t, "on_activate")
+    }
 
+    pub fn item_on_target_select(&self,
+                                 parent: &Rc<RefCell<EntityState>>,
+                                 item: &Rc<Item>,
+                                 targets: Vec<Option<Rc<RefCell<EntityState>>>>,
+                                 selected_point: Point,
+                                 affected_points: Vec<Point>,
+                                 func: &str,
+                                 custom_target: Option<Rc<RefCell<EntityState>>>) -> Result<()> {
+        let mut targets = ScriptEntitySet::new(parent, &targets);
+        targets.selected_point = Some((selected_point.x, selected_point.y));
+        let arg = match custom_target {
+            None => None,
+            Some(entity) => Some(("custom_target", ScriptEntity::from(&entity))),
+        };
+        targets.affected_points = affected_points.into_iter().map(|p| (p.x, p.y)).collect();
+        self.item_script(parent, item, targets, arg, func)
+    }
+
+    pub fn item_script<'a, T>(&'a self, parent: &Rc<RefCell<EntityState>>, item: &Rc<Item>,
+                              targets: ScriptEntitySet, arg: Option<(&str, T)>,
+                              func: &str) -> Result<()> where T: rlua::prelude::ToLua<'a> + Send {
+        let script = get_item_script(item)?;
         self.lua.globals().set("item", ScriptItem::from(item))?;
+        self.lua.globals().set("targets", targets)?;
 
-        let args_string = "(parent, item)".to_string();
-        self.execute_script(parent, &args_string, script.to_string(), "on_activate")
+        let mut args_string = "(parent, item, targets".to_string();
+        if let Some((arg_str, arg)) = arg {
+            args_string.push_str(", ");
+            args_string.push_str(arg_str);
+
+            self.lua.globals().set(arg_str, arg)?;
+        }
+        args_string.push(')');
+        self.execute_script(parent, &args_string, script.to_string(), func)
     }
 
     pub fn ability_on_activate(&self, parent: &Rc<RefCell<EntityState>>,
                                        ability: &Rc<Ability>) -> Result<()> {
         let t: Option<(&str, usize)> = None;
-        self.ability_script(parent, ability, ScriptEntitySet::new(parent, &Vec::new()), t, "on_activate")
+        self.ability_script(parent, ability,
+                            ScriptEntitySet::new(parent, &Vec::new()), t, "on_activate")
     }
 
     pub fn ability_on_target_select(&self,
@@ -157,7 +183,7 @@ impl ScriptState {
     pub fn ability_script<'a, T>(&'a self, parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>,
                                  targets: ScriptEntitySet, arg: Option<(&str, T)>,
                                  func: &str) -> Result<()> where T: rlua::prelude::ToLua<'a> + Send {
-        let script = get_script(ability)?;
+        let script = get_ability_script(ability)?;
         self.lua.globals().set("ability", ScriptAbility::from(ability))?;
         self.lua.globals().set("targets", targets)?;
 
@@ -192,7 +218,18 @@ fn get_script_from_id(id: &str) -> Result<String> {
     }
 }
 
-fn get_script(ability: &Rc<Ability>) -> Result<&str> {
+fn get_item_script(item: &Rc<Item>) -> Result<&str> {
+    match &item.usable {
+        None => Err(rlua::Error::ToLuaConversionError {
+            from: "ScriptItem",
+            to: "Item",
+            message: Some(format!("The item is not usable {}", item.id).to_string()),
+        }),
+        Some(usable) => Ok(&usable.script)
+    }
+}
+
+fn get_ability_script(ability: &Rc<Ability>) -> Result<&str> {
     match ability.active {
         None => Err(rlua::Error::ToLuaConversionError {
             from: "Rc<Ability>",
@@ -350,6 +387,8 @@ impl UserData for ScriptInterface {
 
 #[derive(Clone)]
 pub struct ScriptItem {
+    parent: usize,
+    index: usize,
     id: String,
     name: String,
     ap: u32,
@@ -368,6 +407,22 @@ impl ScriptItem {
             ap,
         }
     }
+
+    fn error_if_not_valid(&self) -> Result<()> {
+        let item = match Module::item(&self.id) {
+            None => unreachable!(),
+            Some(item) => item,
+        };
+
+        match item.usable {
+            None => Err(rlua::Error::FromLuaConversionError {
+                from: "ScriptItem",
+                to: "UsableItem",
+                message: Some(format!("The item '{}' is not usable", self.id)),
+            }),
+            Some(_) => Ok(())
+        }
+    }
 }
 
 impl UserData for ScriptItem {
@@ -378,11 +433,10 @@ impl UserData for ScriptItem {
         });
 
         methods.add_method("create_callback", |_, item, parent: ScriptEntity| {
+            item.error_if_not_valid()?;
             let index = parent.try_unwrap_index()?;
-            // TODO implement
-            // let cb_data = CallbackData::new(index, &ability.id);
-            // Ok(cb_data)
-            Ok(())
+            let cb_data = CallbackData::new_item(index, &item.id);
+            Ok(cb_data)
         });
     }
 }
@@ -462,7 +516,7 @@ impl UserData for ScriptAbility {
         methods.add_method("create_callback", |_, ability, parent: ScriptEntity| {
             ability.error_if_not_active()?;
             let index = parent.try_unwrap_index()?;
-            let cb_data = CallbackData::new(index, &ability.id);
+            let cb_data = CallbackData::new_ability(index, &ability.id);
             Ok(cb_data)
         });
     }
@@ -514,6 +568,7 @@ fn activate_item(_lua: &Lua, item: &ScriptItem, target: ScriptEntity) -> Result<
         target.borrow_mut().actor.remove_ap(item.ap);
     }
 
+    entity.borrow_mut().actor.remove_item(index);
     Ok(())
 }
 

@@ -15,15 +15,14 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::rc::Rc;
-use std::cell::RefCell;
 use std::collections::{HashMap};
 
 use rlua::{UserData, UserDataMethods};
 
 use sulis_rules::HitKind;
-use sulis_module::{Ability, Module};
+use sulis_module::{Module};
 use script::{Result, script_entity, ScriptEntity, ScriptEntitySet};
-use {EntityState, GameState};
+use {GameState};
 
 pub fn fire_round_elapsed(cbs: Vec<Rc<ScriptCallback>>) {
     for cb in cbs {
@@ -72,34 +71,45 @@ pub trait ScriptCallback {
 }
 
 #[derive(Clone)]
+enum Kind {
+    Ability(String),
+    Item(String),
+}
+
+#[derive(Clone)]
 pub struct CallbackData {
     parent: usize,
     effect: Option<usize>,
-    ability_id: String,
+    kind: Kind,
     targets: Option<ScriptEntitySet>,
     funcs: HashMap<FuncKind, String>,
 }
 
 impl CallbackData {
-    pub fn new(parent: usize, ability_id: &str) -> CallbackData {
+    pub fn new_ability(parent: usize, ability_id: &str) -> CallbackData {
         CallbackData {
             parent,
             effect: None,
-            ability_id: ability_id.to_string(),
+            kind: Kind::Ability(ability_id.to_string()),
             targets: None,
             funcs: HashMap::new(),
         }
     }
 
-    pub(crate) fn set_effect(&mut self, index: usize) {
-        self.effect = Some(index);
+    pub fn new_item(parent: usize, item_id: &str) -> CallbackData {
+        CallbackData {
+            parent,
+            effect: None,
+            kind: Kind::Item(item_id.to_string()),
+            targets: None,
+            funcs: HashMap::new(),
+        }
     }
 
-    fn get_params(&self) -> (Rc<RefCell<EntityState>>, Rc<Ability>) {
-        let mgr = GameState::turn_manager();
-        let parent = mgr.borrow().entity(self.parent);
-        let ability = Module::ability(&self.ability_id).unwrap();
-        (parent, ability)
+    // functions used in setting up the data
+
+    pub(crate) fn set_effect(&mut self, index: usize) {
+        self.effect = Some(index);
     }
 
     fn add_func(&mut self, kind: FuncKind, name: String) -> Result<()> {
@@ -112,6 +122,8 @@ impl CallbackData {
 
         self.targets = Some(ScriptEntitySet::with_parent(self.parent));
     }
+
+    // functions used in firing the script callback
 
     fn get_or_create_targets(&self) -> ScriptEntitySet {
         if let Some(ref targets) = self.targets {
@@ -128,113 +140,101 @@ impl CallbackData {
             targets.clone()
         }
     }
+
+    fn exec_standard_script(&self, targets: ScriptEntitySet, func_kind: FuncKind) {
+        let func = match self.funcs.get(&func_kind) {
+            None => return,
+            Some(ref func) => func.to_string(),
+        };
+
+        let mgr = GameState::turn_manager();
+        let parent = mgr.borrow().entity(self.parent);
+
+        match &self.kind {
+            Kind::Ability(ref id) => {
+                let ability = Module::ability(id).unwrap();
+                GameState::execute_ability_script(&parent, &ability, targets, &func);
+            },
+            Kind::Item(ref id) => {
+                let item = Module::item(id).unwrap();
+                GameState::execute_item_script(&parent, &item, targets, &func);
+            }
+        }
+    }
+
+    fn exec_script_with_attack_data(&self, targets: ScriptEntitySet, hit_kind: HitKind,
+                                    damage: u32, func_kind: FuncKind) {
+        let func = match self.funcs.get(&func_kind) {
+            None => return,
+            Some(ref func) => func.to_string(),
+        };
+
+        let mgr = GameState::turn_manager();
+        let parent = mgr.borrow().entity(self.parent);
+
+        match &self.kind {
+            Kind::Ability(ref id) => {
+                let ability = Module::ability(id).unwrap();
+                GameState::execute_ability_with_attack_data(&parent, &ability, targets,
+                                                            hit_kind, damage, &func);
+            },
+            Kind::Item(ref id) => {
+                let item = Module::item(id).unwrap();
+                GameState::execute_item_with_attack_data(&parent, &item, targets,
+                                                         hit_kind, damage, &func);
+            }
+        }
+    }
 }
 
 impl ScriptCallback for CallbackData {
-    fn on_moved_in_surface(&self, target: usize) {
-        let func = match self.funcs.get(&FuncKind::OnMovedInSurface) {
-            None => return,
-            Some(ref func) => func.to_string(),
-        };
-
-        let (parent, ability) = self.get_params();
-        let mut targets = ScriptEntitySet::with_parent(self.parent);
-        targets.indices.push(Some(target));
-        GameState::execute_ability_script(&parent, &ability, targets, &func);
-    }
-
-    fn after_defense(&self, targets: &ScriptEntitySet, hit_kind: HitKind, damage: u32) {
-        let func = match self.funcs.get(&FuncKind::AfterDefense) {
-            None => return,
-            Some(ref func) => func.to_string(),
-        };
-
-        let (parent, ability) = self.get_params();
-        let targets = self.get_targets(targets);
-        GameState::execute_ability_with_attack_data(&parent, &ability, targets,
-                                                    hit_kind, damage, &func);
-    }
-
     fn before_defense(&self, targets: &ScriptEntitySet) {
-        let func = match self.funcs.get(&FuncKind::BeforeDefense) {
-            None => return,
-            Some(ref func) => func.to_string(),
-        };
-
-        let (parent, ability) = self.get_params();
-        let targets = self.get_targets(targets);
-        GameState::execute_ability_script(&parent, &ability, targets, &func);
+        self.exec_standard_script(self.get_targets(targets), FuncKind::BeforeDefense);
     }
 
     fn before_attack(&self, targets: &ScriptEntitySet) {
-        let func = match self.funcs.get(&FuncKind::BeforeAttack) {
-            None => return,
-            Some(ref func) => func.to_string(),
-        };
-
-        let (parent, ability) = self.get_params();
-        let targets = self.get_targets(targets);
-        GameState::execute_ability_script(&parent, &ability, targets, &func);
-    }
-
-    fn after_attack(&self, targets: &ScriptEntitySet, hit_kind: HitKind, damage: u32) {
-        let func = match self.funcs.get(&FuncKind::AfterAttack) {
-            None => return,
-            Some(ref func) => func.to_string(),
-        };
-
-        let (parent, ability) = self.get_params();
-        let targets = self.get_targets(targets);
-        GameState::execute_ability_with_attack_data(&parent, &ability, targets,
-                                                    hit_kind, damage, &func);
+        self.exec_standard_script(self.get_targets(targets), FuncKind::BeforeAttack);
     }
 
     fn on_anim_complete(&self) {
-        let func = match self.funcs.get(&FuncKind::OnAnimComplete) {
-            None => return,
-            Some(ref func) => func.to_string(),
-        };
-
-        let (parent, ability) = self.get_params();
-        let targets = self.get_or_create_targets();
-        GameState::execute_ability_script(&parent, &ability, targets, &func);
+        self.exec_standard_script(self.get_or_create_targets(), FuncKind::OnAnimComplete);
     }
 
     fn on_anim_update(&self) {
-        let func = match self.funcs.get(&FuncKind::OnAnimUpdate) {
-            None => return,
-            Some(ref func) => func.to_string(),
-        };
-
-        let (parent, ability) = self.get_params();
-        let targets = self.get_or_create_targets();
-        GameState::execute_ability_script(&parent, &ability, targets, &func);
+        self.exec_standard_script(self.get_or_create_targets(), FuncKind::OnAnimUpdate);
     }
 
     fn on_round_elapsed(&self) {
-        let func = match self.funcs.get(&FuncKind::OnRoundElapsed) {
-            None => return,
-            Some(ref func) => func.to_string(),
-        };
-
-        let (parent, ability) = self.get_params();
-        let targets = self.get_or_create_targets();
-        GameState::execute_ability_script(&parent, &ability, targets, &func);
+        self.exec_standard_script(self.get_or_create_targets(), FuncKind::OnRoundElapsed);
     }
 
     /// when called, this computes the current target set and sends it to
     /// the lua function based on the surface state
     fn on_surface_round_elapsed(&self) {
-        let func = match self.funcs.get(&FuncKind::OnSurfaceRoundElapsed) {
-            None => return,
-            Some(ref func) => func.to_string(),
+        let targets = match compute_surface_targets(self.effect, self.parent) {
+            Some(targets) => targets,
+            None => {
+                warn!("Unable to fire on surface_round_elapsed");
+                return;
+            }
         };
+        self.exec_standard_script(targets, FuncKind::OnSurfaceRoundElapsed);
+    }
 
-        let (parent, ability) = self.get_params();
-        match compute_surface_targets(self.effect, self.parent) {
-            Some(targets) => GameState::execute_ability_script(&parent, &ability, targets, &func),
-            None => warn!("Unable to fire on_surface_round_elapsed"),
-        };
+    fn on_moved_in_surface(&self, target: usize) {
+        let mut targets = ScriptEntitySet::with_parent(self.parent);
+        targets.indices.push(Some(target));
+        self.exec_standard_script(targets, FuncKind::OnMovedInSurface);
+    }
+
+    fn after_defense(&self, targets: &ScriptEntitySet, hit_kind: HitKind, damage: u32) {
+        self.exec_script_with_attack_data(self.get_targets(targets), hit_kind, damage,
+            FuncKind::AfterDefense);
+    }
+
+    fn after_attack(&self, targets: &ScriptEntitySet, hit_kind: HitKind, damage: u32) {
+        self.exec_script_with_attack_data(self.get_targets(targets), hit_kind, damage,
+            FuncKind::AfterAttack);
     }
 }
 

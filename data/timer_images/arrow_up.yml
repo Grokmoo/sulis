@@ -1,0 +1,8 @@
+id: arrow_up
+frame_time_millis: 150
+frames:
+  - particles/arrow_up1
+  - particles/arrow_up2
+  - particles/arrow_up3
+  - particles/arrow_up4
+  - particles/arrow_up5

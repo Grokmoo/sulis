@@ -463,7 +463,16 @@ impl UserData for ScriptItem {
         methods.add_method("name", |_, item, ()| {
             Ok(item.name.to_string())
         });
-
+        methods.add_method("duration", |_, item, ()| {
+            let item = item.try_item()?;
+            match &item.usable {
+                None => Ok(0),
+                Some(usable) => match usable.duration {
+                    ability::Duration::Rounds(amount) => Ok(amount),
+                    _ => Ok(0),
+                },
+            }
+        });
         methods.add_method("create_callback", |_, item, parent: ScriptEntity| {
             item.error_if_not_valid()?;
             let index = parent.try_unwrap_index()?;

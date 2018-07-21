@@ -784,7 +784,10 @@ children:
     from: .text_area
     text: |
       [s=6.0;c=0ff|#name#]
-      [?active_mode;c=f00|Active Mode
+      [?usable_description|AP: #usable_ap# [?consumable;c=f00|    Consumable]
+      [?usable_duration|Duration: #usable_duration# Rounds][?usable_instant|Duration: Instantaneous]
+      [s=4.0|#usable_description#]
+      ][?active_mode;c=f00|Active Mode
       ][s=5|[?total_duration;c=f00|#remaining_duration# of #total_duration# Rounds Remaining
       ][?prof_not_met;s=5.0;c=f00|Proficiency Not Met
       ][?ability_group_0|#ability_group_0# ability uses per encounter: #ability_group_0_uses_per_encounter#

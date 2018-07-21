@@ -7,4 +7,6 @@ usable:
   consumable: true
   script: potion_healing
   ap: 2000
-  short_description: "Heals a small amount of damage"
+  duration:
+    Instant
+  short_description: "Heals a moderate amount of damage."

@@ -188,3 +188,12 @@ groups:
       arrow_down3: [40, 0]
       arrow_down4: [60, 0]
       arrow_down5: [80, 0]
+  arrow_up:
+    size: [20, 20]
+    position: [260, 160]
+    areas:
+      arrow_up1: [0, 0]
+      arrow_up2: [20, 0]
+      arrow_up3: [40, 0]
+      arrow_up4: [60, 0]
+      arrow_up5: [80, 0]

@@ -10,6 +10,12 @@ generate:
   2: 4
   3: 1
 weighted_entries:
+  potion_healing:
+    weight: 20
+  potion_mind:
+    weight: 10
+  potion_power:
+    weight: 10
   amulet_gold:
     weight: 1
   amulet_silver:

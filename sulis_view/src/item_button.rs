@@ -21,7 +21,7 @@ use std::cell::RefCell;
 
 use sulis_rules::bonus::{AttackBuilder, AttackKindBuilder, Contingent};
 use sulis_rules::{Bonus, BonusList, Armor, DamageKind, Slot};
-use sulis_module::{item::{format_item_value, format_item_weight}, Module};
+use sulis_module::{ability, item::{format_item_value, format_item_weight}, Module};
 use sulis_state::{EntityState, GameState, ItemState, inventory::has_proficiency};
 use sulis_core::io::event;
 use sulis_core::ui::{Callback, Widget, WidgetKind, WidgetState};
@@ -232,6 +232,26 @@ impl WidgetKind for ItemButton {
             item_window.state.add_text_arg("value", &format_item_value(item_state.item.value));
             item_window.state.add_text_arg("weight", &format_item_weight(item_state.item.weight));
             self.add_price_text_arg(&root, &mut item_window, &item_state);
+
+            match &item_state.item.usable {
+                None => (),
+                Some(usable) => {
+                    let state = &mut item_window.state;
+
+                    let ap = usable.ap / Module::rules().display_ap;
+                    state.add_text_arg("usable_ap", &ap.to_string());
+                    if usable.consumable {
+                        state.add_text_arg("consumable", "true");
+                    }
+                    match usable.duration {
+                        ability::Duration::Rounds(rounds) =>
+                            state.add_text_arg("usable_duration", &rounds.to_string()),
+                        ability::Duration::Mode => state.add_text_arg("usable_mode", "true"),
+                        ability::Duration::Instant => state.add_text_arg("usable_instant", "true"),
+                    }
+                    state.add_text_arg("usable_description", &usable.short_description);
+                }
+            }
 
             match item_state.item.equippable {
                 None => (),

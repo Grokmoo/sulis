@@ -25,12 +25,13 @@ use sulis_core::serde_yaml;
 use sulis_core::util::unable_to_create_error;
 use sulis_rules::{ItemKind};
 
-use {Equippable, ImageLayer, Module};
+use {Equippable, ImageLayer, Module, ability::Duration};
 
 #[derive(Debug)]
 pub struct Usable {
     pub script: String,
     pub ap: u32,
+    pub duration: Duration,
     pub consumable: bool,
     pub short_description: String,
 }
@@ -112,6 +113,7 @@ impl Item {
                 Some(Usable {
                     script,
                     consumable: usable.consumable,
+                    duration: usable.duration,
                     ap: usable.ap,
                     short_description: usable.short_description,
                 })
@@ -152,6 +154,7 @@ impl Item {
 pub struct UsableBuilder {
     pub script: String,
     pub ap: u32,
+    pub duration: Duration,
     pub consumable: bool,
     pub short_description: String,
 }

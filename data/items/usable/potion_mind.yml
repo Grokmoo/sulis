@@ -1,0 +1,12 @@
+id: potion_mind
+name: Potion of Mind
+icon: inventory/potion01_green
+weight: 50
+value: 300
+usable:
+  consumable: true
+  script: potion_mind
+  ap: 2000
+  duration:
+    Rounds: 3
+  short_description: "Temporarily increases your mental attributes."

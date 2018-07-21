@@ -85,7 +85,7 @@ kits:
       per: 12
       int: 10
       wis: 10
-    starting_equipment: [ battleaxe, boots_leather, torso_leather, legs_pants, potion_healing ]
+    starting_equipment: [ battleaxe, boots_leather, torso_leather, legs_pants, potion_healing, potion_power, potion_power ]
     starting_coins: 200
     description: |
       A battle hardened warrior who prefers large weapons and close quarters combat.  They can deal out tremendous damage to any foes who dare to enter the melee.
@@ -97,7 +97,7 @@ kits:
       per: 15
       int: 10
       wis: 10
-    starting_equipment: [ shortbow, boots_leather, torso_leather, legs_pants, potion_healing ]
+    starting_equipment: [ shortbow, boots_leather, torso_leather, legs_pants, potion_healing, potion_power, potion_power ]
     starting_coins: 200
     description: |
       An expert with ranged weapons, who prefers to keep their distance from enemies where possible, using their skills to take down the most dangerous targets from afar.
@@ -109,7 +109,7 @@ kits:
       per: 13
       int: 10
       wis: 10
-    starting_equipment: [ shortsword, shield_small, boots_leather, torso_mail, legs_leather, gloves_leather, potion_healing ]
+    starting_equipment: [ shortsword, shield_small, boots_leather, torso_mail, legs_leather, gloves_leather, potion_healing, potion_power, potion_power ]
     starting_coins: 200
     description: |
       A fighter who will typically use heavy armor and a large shield.  While certainly capable of dishing out punishment, their primary role on the battlefield is often to protect their compatriots.

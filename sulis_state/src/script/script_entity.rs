@@ -205,7 +205,7 @@ impl UserData for ScriptEntity {
 
         methods.add_method("create_targeter_for_item", |_, entity, item: ScriptItem| {
             let index = entity.try_unwrap_index()?;
-            Ok(TargeterData::new_item(index, &item.id))
+            Ok(TargeterData::new_item(index, item.index))
         });
 
         methods.add_method("teleport_to", |_, entity, dest: HashMap<String, i32>| {

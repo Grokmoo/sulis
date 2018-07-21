@@ -45,7 +45,7 @@ pub trait Targeter {
 #[derive(Clone)]
 pub enum Kind {
     Ability(String),
-    Item(String),
+    Item(usize),
 }
 
 #[derive(Clone)]
@@ -80,8 +80,8 @@ impl TargeterData {
         }
     }
 
-    pub fn new_item(parent: usize, item_id: &str) -> TargeterData {
-        TargeterData::new(parent, Kind::Item(item_id.to_string()))
+    pub fn new_item(parent: usize, item_index: usize) -> TargeterData {
+        TargeterData::new(parent, Kind::Item(item_index))
     }
 
     pub fn new_ability(parent: usize, ability_id: &str) -> TargeterData {

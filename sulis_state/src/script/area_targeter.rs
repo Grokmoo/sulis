@@ -22,7 +22,7 @@ use sulis_core::image::Image;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{animation_state, color, Cursor};
 use sulis_core::util::{Point};
-use sulis_module::{Ability, Item, Module, ObjectSize};
+use sulis_module::{Ability, Module, ObjectSize};
 
 use script::{targeter, Targeter, TargeterData};
 use {AreaState, EntityState, GameState, TurnManager};
@@ -319,7 +319,7 @@ impl Shape {
 
 enum ScriptSource {
     Ability(Rc<Ability>),
-    Item(Rc<Item>),
+    Item { index: usize, name: String },
 }
 
 pub struct AreaTargeter {
@@ -376,11 +376,20 @@ impl AreaTargeter {
             },
         };
 
+        let parent = mgr.entity(data.parent);
+
         let script_source = match &data.kind {
             targeter::Kind::Ability(ref id) =>
                 ScriptSource::Ability(Module::ability(id).unwrap()),
-            targeter::Kind::Item(ref id) =>
-                ScriptSource::Item(Module::item(id).unwrap()),
+            targeter::Kind::Item(index) => {
+                let name = match parent.borrow().actor.inventory().items.get(*index) {
+                    None => {
+                        warn!("Invalid item index in targeter");
+                        "".to_string()
+                    }, Some((_, item)) => item.item.name.to_string(),
+                };
+                ScriptSource::Item { index: *index, name }
+            }
         };
 
         AreaTargeter {
@@ -390,7 +399,7 @@ impl AreaTargeter {
                 Some(index) => mgr.entity_checked(index),
             },
             script_source,
-            parent: mgr.entity(data.parent),
+            parent,
             selectable: create_entity_state_vec(&mgr, &data.selectable),
             effectable: create_entity_state_vec(&mgr, &data.effectable),
             max_effectable: data.max_effectable,
@@ -483,7 +492,7 @@ impl Targeter for AreaTargeter {
     fn name(&self) -> &str {
         match &self.script_source {
             ScriptSource::Ability(ability) => &ability.name,
-            ScriptSource::Item(item) => &item.name,
+            ScriptSource::Item { name, .. } => name,
         }
     }
 
@@ -598,8 +607,8 @@ impl Targeter for AreaTargeter {
             ScriptSource::Ability(ref ability) =>
                 GameState::execute_ability_on_target_select(&self.parent, ability, affected,
                                                             pos, points, func, custom_target),
-            ScriptSource::Item(ref item) =>
-                GameState::execute_item_on_target_select(&self.parent, item, affected, pos,
+            ScriptSource::Item { index, .. } =>
+                GameState::execute_item_on_target_select(&self.parent, *index, affected, pos,
                                                          points, func, custom_target),
         }
     }

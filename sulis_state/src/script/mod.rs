@@ -114,14 +114,15 @@ impl ScriptState {
     }
 
     pub fn item_on_activate(&self, parent: &Rc<RefCell<EntityState>>,
-                            item: &Rc<Item>) -> Result<()> {
+                            item_index: usize) -> Result<()> {
         let t: Option<(&str, usize)> = None;
-        self.item_script(parent, item, ScriptEntitySet::new(parent, &Vec::new()), t, "on_activate")
+        self.item_script(parent, item_index,
+                         ScriptEntitySet::new(parent, &Vec::new()), t, "on_activate")
     }
 
     pub fn item_on_target_select(&self,
                                  parent: &Rc<RefCell<EntityState>>,
-                                 item: &Rc<Item>,
+                                 item_index: usize,
                                  targets: Vec<Option<Rc<RefCell<EntityState>>>>,
                                  selected_point: Point,
                                  affected_points: Vec<Point>,
@@ -134,14 +135,16 @@ impl ScriptState {
             Some(entity) => Some(("custom_target", ScriptEntity::from(&entity))),
         };
         targets.affected_points = affected_points.into_iter().map(|p| (p.x, p.y)).collect();
-        self.item_script(parent, item, targets, arg, func)
+        self.item_script(parent, item_index, targets, arg, func)
     }
 
-    pub fn item_script<'a, T>(&'a self, parent: &Rc<RefCell<EntityState>>, item: &Rc<Item>,
+    pub fn item_script<'a, T>(&'a self, parent: &Rc<RefCell<EntityState>>, item_index: usize,
                               targets: ScriptEntitySet, arg: Option<(&str, T)>,
                               func: &str) -> Result<()> where T: rlua::prelude::ToLua<'a> + Send {
-        let script = get_item_script(item)?;
-        self.lua.globals().set("item", ScriptItem::from(item))?;
+        let script_item = ScriptItem::from(parent, item_index)?;
+        let item = script_item.try_item()?;
+        let script = get_item_script(&item)?;
+        self.lua.globals().set("item", script_item)?;
         self.lua.globals().set("targets", targets)?;
 
         let mut args_string = "(parent, item, targets".to_string();
@@ -395,24 +398,53 @@ pub struct ScriptItem {
 }
 
 impl ScriptItem {
-    fn from(item: &Rc<Item>) -> ScriptItem {
+    fn from(parent: &Rc<RefCell<EntityState>>, index: usize) -> Result<ScriptItem> {
+        let item = match parent.borrow().actor.inventory().items.get(index) {
+            None => return Err(rlua::Error::FromLuaConversionError {
+                from: "ScriptItem",
+                to: "Item",
+                message: Some(format!("Item at index {} no longer exists", index)),
+            }),
+            Some((_, item_state)) => Rc::clone(&item_state.item),
+        };
+
         let ap = match &item.usable {
             None => 0,
             Some(usable) => usable.ap,
         };
 
-        ScriptItem {
+        Ok(ScriptItem {
+            parent: parent.borrow().index,
+            index,
             id: item.id.to_string(),
             name: item.name.to_string(),
             ap,
+        })
+    }
+
+    fn try_item(&self) -> Result<Rc<Item>> {
+        let parent = ScriptEntity::new(self.parent).try_unwrap()?;
+        let parent = parent.borrow();
+        match parent.actor.inventory().items.get(self.index) {
+            None => Err(rlua::Error::FromLuaConversionError {
+                from: "ScriptItem",
+                to: "Item",
+                message: Some(format!("The item '{}' no longer exists in the parent", self.id)),
+            }),
+            Some((_, item_state)) => Ok(Rc::clone(&item_state.item)),
         }
     }
 
     fn error_if_not_valid(&self) -> Result<()> {
-        let item = match Module::item(&self.id) {
-            None => unreachable!(),
-            Some(item) => item,
-        };
+        let item = self.try_item()?;
+
+        if item.id != self.id {
+            return Err(rlua::Error::FromLuaConversionError {
+                from: "ScriptItem",
+                to: "Item",
+                message: Some(format!("The item '{}' is no longer present", self.id)),
+            });
+        }
 
         match item.usable {
             None => Err(rlua::Error::FromLuaConversionError {
@@ -435,7 +467,7 @@ impl UserData for ScriptItem {
         methods.add_method("create_callback", |_, item, parent: ScriptEntity| {
             item.error_if_not_valid()?;
             let index = parent.try_unwrap_index()?;
-            let cb_data = CallbackData::new_item(index, &item.id);
+            let cb_data = CallbackData::new_item(index, item.index);
             Ok(cb_data)
         });
     }
@@ -560,15 +592,25 @@ fn entity_with_id(id: String) -> Option<Rc<RefCell<EntityState>>> {
     None
 }
 
-fn activate_item(_lua: &Lua, item: &ScriptItem, target: ScriptEntity) -> Result<()> {
+fn activate_item(_lua: &Lua, script_item: &ScriptItem, target: ScriptEntity) -> Result<()> {
+    let item = script_item.try_item()?;
     let target = target.try_unwrap()?;
 
     let mgr = GameState::turn_manager();
     if mgr.borrow().is_combat_active() {
-        target.borrow_mut().actor.remove_ap(item.ap);
+        target.borrow_mut().actor.remove_ap(script_item.ap);
     }
 
-    entity.borrow_mut().actor.remove_item(index);
+    match item.usable {
+        None => unreachable!(),
+        Some(ref usable) => {
+            if usable.consumable {
+                let parent = ScriptEntity::new(script_item.parent).try_unwrap()?;
+                parent.borrow_mut().actor.remove_item(script_item.index);
+            }
+        }
+    }
+
     Ok(())
 }
 

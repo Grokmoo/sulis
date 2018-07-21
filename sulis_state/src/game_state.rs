@@ -27,7 +27,7 @@ use sulis_core::config::CONFIG;
 use sulis_core::util::{self, Point, invalid_data_error};
 use sulis_core::io::{GraphicsRenderer};
 use sulis_core::ui::{Widget};
-use sulis_module::{Ability, Actor, Item, Module, ObjectSize, OnTrigger, area::{Trigger, TriggerKind}};
+use sulis_module::{Ability, Actor, Module, ObjectSize, OnTrigger, area::{Trigger, TriggerKind}};
 
 use {AI, AreaState, ChangeListener, ChangeListenerList, EntityState, Location,
     PathFinder, SaveState, ScriptState, UICallback, MOVE_TO_THRESHOLD, TurnManager};
@@ -388,32 +388,32 @@ impl GameState {
         }
     }
 
-    pub fn execute_item_on_activate(parent: &Rc<RefCell<EntityState>>, item: &Rc<Item>) {
-        exec_script!(item_on_activate: parent, item);
+    pub fn execute_item_on_activate(parent: &Rc<RefCell<EntityState>>, index: usize) {
+        exec_script!(item_on_activate: parent, index);
     }
 
-    pub fn execute_item_script(parent: &Rc<RefCell<EntityState>>, item: &Rc<Item>,
+    pub fn execute_item_script(parent: &Rc<RefCell<EntityState>>, index: usize,
                                targets: ScriptEntitySet, func: &str) {
         let t: Option<(&str, usize)> = None;
-        exec_script!(item_script: parent, item, targets, t, func);
+        exec_script!(item_script: parent, index, targets, t, func);
     }
 
-    pub fn execute_item_with_attack_data(parent: &Rc<RefCell<EntityState>>, item: &Rc<Item>,
+    pub fn execute_item_with_attack_data(parent: &Rc<RefCell<EntityState>>, index: usize,
                                          targets: ScriptEntitySet, kind: HitKind,
                                          damage: u32, func: &str) {
         let hit_kind = ScriptHitKind { kind, damage };
         let t = Some(("hit", hit_kind));
-        exec_script!(item_script: parent, item, targets, t, func);
+        exec_script!(item_script: parent, index, targets, t, func);
     }
 
     pub fn execute_item_on_target_select(parent: &Rc<RefCell<EntityState>>,
-                                         item: &Rc<Item>,
+                                         index: usize,
                                          targets: Vec<Option<Rc<RefCell<EntityState>>>>,
                                          selected_point: Point,
                                          affected_points: Vec<Point>,
                                          func: &str,
                                          custom_target: Option<Rc<RefCell<EntityState>>>) {
-        exec_script!(item_on_target_select: parent, item, targets, selected_point,
+        exec_script!(item_on_target_select: parent, index, targets, selected_point,
                      affected_points, func, custom_target);
     }
 

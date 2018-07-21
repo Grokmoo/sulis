@@ -73,7 +73,7 @@ pub trait ScriptCallback {
 #[derive(Clone)]
 enum Kind {
     Ability(String),
-    Item(String),
+    Item(usize),
 }
 
 #[derive(Clone)]
@@ -96,11 +96,11 @@ impl CallbackData {
         }
     }
 
-    pub fn new_item(parent: usize, item_id: &str) -> CallbackData {
+    pub fn new_item(parent: usize, item_index: usize) -> CallbackData {
         CallbackData {
             parent,
             effect: None,
-            kind: Kind::Item(item_id.to_string()),
+            kind: Kind::Item(item_index),
             targets: None,
             funcs: HashMap::new(),
         }
@@ -155,9 +155,8 @@ impl CallbackData {
                 let ability = Module::ability(id).unwrap();
                 GameState::execute_ability_script(&parent, &ability, targets, &func);
             },
-            Kind::Item(ref id) => {
-                let item = Module::item(id).unwrap();
-                GameState::execute_item_script(&parent, &item, targets, &func);
+            Kind::Item(index) => {
+                GameState::execute_item_script(&parent, *index, targets, &func);
             }
         }
     }
@@ -178,9 +177,8 @@ impl CallbackData {
                 GameState::execute_ability_with_attack_data(&parent, &ability, targets,
                                                             hit_kind, damage, &func);
             },
-            Kind::Item(ref id) => {
-                let item = Module::item(id).unwrap();
-                GameState::execute_item_with_attack_data(&parent, &item, targets,
+            Kind::Item(index) => {
+                GameState::execute_item_with_attack_data(&parent, *index, targets,
                                                          hit_kind, damage, &func);
             }
         }

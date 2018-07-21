@@ -4,6 +4,7 @@ icon: inventory/potion01_red
 weight: 50
 value: 300
 usable:
+  consumable: true
   script: potion_healing
   ap: 2000
   short_description: "Heals a small amount of damage"

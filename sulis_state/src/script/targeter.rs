@@ -43,8 +43,14 @@ pub trait Targeter {
 }
 
 #[derive(Clone)]
+pub enum Kind {
+    Ability(String),
+    Item(usize),
+}
+
+#[derive(Clone)]
 pub struct TargeterData {
-    pub ability_id: String,
+    pub kind: Kind,
     pub parent: usize,
     pub selectable: Vec<Option<usize>>,
     pub effectable: Vec<Option<usize>>,
@@ -58,10 +64,10 @@ pub struct TargeterData {
 }
 
 impl TargeterData {
-    pub fn new(parent: usize, ability_id: &str) -> TargeterData {
+    fn new(parent: usize, kind: Kind) -> TargeterData {
         TargeterData {
             parent,
-            ability_id: ability_id.to_string(),
+            kind,
             selectable: Vec::new(),
             effectable: Vec::new(),
             max_effectable: None,
@@ -72,6 +78,14 @@ impl TargeterData {
             on_target_select_func: "on_target_select".to_string(),
             on_target_select_custom_target: None,
         }
+    }
+
+    pub fn new_item(parent: usize, item_index: usize) -> TargeterData {
+        TargeterData::new(parent, Kind::Item(item_index))
+    }
+
+    pub fn new_ability(parent: usize, ability_id: &str) -> TargeterData {
+        TargeterData::new(parent, Kind::Ability(ability_id.to_string()))
     }
 }
 

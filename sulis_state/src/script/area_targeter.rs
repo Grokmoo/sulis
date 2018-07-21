@@ -24,7 +24,7 @@ use sulis_core::ui::{animation_state, color, Cursor};
 use sulis_core::util::{Point};
 use sulis_module::{Ability, Module, ObjectSize};
 
-use script::{Targeter, TargeterData};
+use script::{targeter, Targeter, TargeterData};
 use {AreaState, EntityState, GameState, TurnManager};
 
 #[derive(Clone)]
@@ -317,10 +317,15 @@ impl Shape {
     }
 }
 
+enum ScriptSource {
+    Ability(Rc<Ability>),
+    Item { index: usize, name: String },
+}
+
 pub struct AreaTargeter {
     on_target_select_func: String,
     on_target_select_custom_target: Option<Rc<RefCell<EntityState>>>,
-    ability: Rc<Ability>,
+    script_source: ScriptSource,
     parent: Rc<RefCell<EntityState>>,
     selectable: Vec<Rc<RefCell<EntityState>>>,
     effectable: Vec<Rc<RefCell<EntityState>>>,
@@ -371,14 +376,30 @@ impl AreaTargeter {
             },
         };
 
+        let parent = mgr.entity(data.parent);
+
+        let script_source = match &data.kind {
+            targeter::Kind::Ability(ref id) =>
+                ScriptSource::Ability(Module::ability(id).unwrap()),
+            targeter::Kind::Item(index) => {
+                let name = match parent.borrow().actor.inventory().items.get(*index) {
+                    None => {
+                        warn!("Invalid item index in targeter");
+                        "".to_string()
+                    }, Some((_, item)) => item.item.name.to_string(),
+                };
+                ScriptSource::Item { index: *index, name }
+            }
+        };
+
         AreaTargeter {
             on_target_select_func: data.on_target_select_func.to_string(),
             on_target_select_custom_target: match data.on_target_select_custom_target {
                 None => None,
                 Some(index) => mgr.entity_checked(index),
             },
-            ability: Module::ability(&data.ability_id).unwrap(),
-            parent: mgr.entity(data.parent),
+            script_source,
+            parent,
             selectable: create_entity_state_vec(&mgr, &data.selectable),
             effectable: create_entity_state_vec(&mgr, &data.effectable),
             max_effectable: data.max_effectable,
@@ -469,7 +490,10 @@ impl AreaTargeter {
 
 impl Targeter for AreaTargeter {
     fn name(&self) -> &str {
-        &self.ability.name
+        match &self.script_source {
+            ScriptSource::Ability(ability) => &ability.name,
+            ScriptSource::Item { name, .. } => name,
+        }
     }
 
     fn cancel(&self) -> bool {
@@ -576,8 +600,16 @@ impl Targeter for AreaTargeter {
             pos.y -= size.height / 2;
         }
 
-        GameState::execute_ability_on_target_select(&self.parent, &self.ability, affected,
-            pos, self.cur_points.clone(), &self.on_target_select_func,
-            self.on_target_select_custom_target.clone());
+        let points = self.cur_points.clone();
+        let func = &self.on_target_select_func;
+        let custom_target = self.on_target_select_custom_target.clone();
+        match &self.script_source {
+            ScriptSource::Ability(ref ability) =>
+                GameState::execute_ability_on_target_select(&self.parent, ability, affected,
+                                                            pos, points, func, custom_target),
+            ScriptSource::Item { index, .. } =>
+                GameState::execute_item_on_target_select(&self.parent, *index, affected, pos,
+                                                         points, func, custom_target),
+        }
     }
 }

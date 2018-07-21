@@ -31,6 +31,7 @@ use {Equippable, ImageLayer, Module};
 pub struct Usable {
     pub script: String,
     pub ap: u32,
+    pub consumable: bool,
     pub short_description: String,
 }
 
@@ -110,6 +111,7 @@ impl Item {
 
                 Some(Usable {
                     script,
+                    consumable: usable.consumable,
                     ap: usable.ap,
                     short_description: usable.short_description,
                 })
@@ -150,6 +152,7 @@ impl Item {
 pub struct UsableBuilder {
     pub script: String,
     pub ap: u32,
+    pub consumable: bool,
     pub short_description: String,
 }
 

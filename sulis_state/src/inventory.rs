@@ -21,7 +21,7 @@ use std::collections::HashMap;
 
 use sulis_core::image::Image;
 use sulis_core::util::invalid_data_error;
-use sulis_rules::{StatList, Slot, ItemKind, WeaponStyle, bonus::AttackKindBuilder};
+use sulis_rules::{StatList, Slot, ItemKind, WeaponStyle, bonus::AttackKindBuilder, QuickSlot};
 use sulis_module::{Actor, ImageLayer, Module};
 use {ItemList, ItemState};
 use save_state::ItemListEntrySaveState;
@@ -30,6 +30,7 @@ use save_state::ItemListEntrySaveState;
 pub struct Inventory {
     pub items: ItemList,
     pub equipped: HashMap<Slot, usize>,
+    pub quick: HashMap<QuickSlot, usize>,
     pub coins: i32,
 }
 
@@ -49,12 +50,13 @@ impl Inventory {
         Inventory {
             items: ItemList::new(),
             equipped: HashMap::new(),
+            quick: HashMap::new(),
             coins: 0,
         }
     }
 
     pub fn load(&mut self, items: Vec<ItemListEntrySaveState>,
-                equipped: Vec<Option<usize>>) -> Result<(), Error> {
+                equipped: Vec<Option<usize>>, quick: Vec<Option<usize>>) -> Result<(), Error> {
         for item_save in items {
            let item = match Module::item(&item_save.item.id) {
                None => invalid_data_error(&format!("No item with ID '{}'",
@@ -98,6 +100,18 @@ impl Inventory {
             }
 
             self.equipped.insert(slot, index);
+        }
+
+        for (quick_index, quick_slot) in QuickSlot::iter().enumerate() {
+            let quick_slot = *quick_slot;
+
+            if quick_index > quick.len() { break; }
+            let index = match quick[quick_index] {
+                None => continue,
+                Some(index) => index,
+            };
+
+            self.quick.insert(quick_slot, index);
         }
 
         Ok(())
@@ -147,6 +161,10 @@ impl Inventory {
         }
     }
 
+    pub fn quick(&self, slot: &QuickSlot) -> Option<usize> {
+        self.quick.get(slot).map(|i| *i)
+    }
+
     pub fn equipped(&self, slot: &Slot) -> Option<usize> {
         self.equipped.get(slot).map(|i| *i)
     }
@@ -171,6 +189,15 @@ impl Inventory {
             return None;
         }
 
+        let mut quick_refs = Vec::new();
+        for(slot, quick_index) in self.quick.iter_mut() {
+            if quantity == 1 && *quick_index > index {
+                *quick_index -= 1;
+            } else if *quick_index == index {
+                quick_refs.push(*slot);
+            }
+        }
+
         if quantity == 1 {
             for (_, equipped_index) in self.equipped.iter_mut() {
                 if *equipped_index > index {
@@ -179,7 +206,31 @@ impl Inventory {
             }
         }
 
+        let quantity = quantity - 1;
+        if quick_refs.len() as u32 > quantity {
+            let to_remove = quick_refs.len() - quantity as usize;
+            for i in 0..to_remove {
+                self.quick.remove(&quick_refs[i]);
+            }
+        }
+
         self.items.remove(index)
+    }
+
+    pub fn get_quick_index(&self, quick_slot: QuickSlot) -> Option<usize> {
+        match self.quick.get(&quick_slot) {
+            None => None,
+            Some(index) => Some(*index),
+        }
+    }
+
+    pub fn get_quick(&self, quick_slot: QuickSlot) -> Option<&ItemState> {
+        let index = match self.quick.get(&quick_slot) {
+            None => return None,
+            Some(index) => *index,
+        };
+
+        Some(&self.items[index].1)
     }
 
     pub fn get_index(&self, slot: Slot) -> Option<usize> {
@@ -233,6 +284,34 @@ impl Inventory {
     /// returns true if it is, false otherwise
     pub fn is_equipped(&self, index: usize) -> bool {
         self.equipped_quantity(index) > 0
+    }
+
+    pub fn swap_weapon_set(&mut self) {
+        let cur_main = self.get_index(Slot::HeldMain);
+        let cur_off = self.get_index(Slot::HeldOff);
+
+        let cur_alt_main = self.get_quick_index(QuickSlot::AltHeldMain);
+        let cur_alt_off = self.get_quick_index(QuickSlot::AltHeldOff);
+
+        match cur_main {
+            None => self.quick.remove(&QuickSlot::AltHeldMain),
+            Some(index) => self.quick.insert(QuickSlot::AltHeldMain, index),
+        };
+
+        match cur_off {
+            None => self.quick.remove(&QuickSlot::AltHeldOff),
+            Some(index) => self.quick.insert(QuickSlot::AltHeldOff, index),
+        };
+
+        match cur_alt_main {
+            None => self.equipped.remove(&Slot::HeldMain),
+            Some(index) => self.equipped.insert(Slot::HeldMain, index),
+        };
+
+        match cur_alt_off {
+            None => self.equipped.remove(&Slot::HeldOff),
+            Some(index) => self.equipped.insert(Slot::HeldOff, index),
+        };
     }
 
     /// equips the item at the given index.  returns true if the item
@@ -307,6 +386,11 @@ impl Inventory {
         debug!("Equipping item at '{}' into '{:?}'", index, slot_to_use);
         self.equipped.insert(slot_to_use, index);
 
+        true
+    }
+
+    pub fn clear_quickslot(&mut self, quick_slot: QuickSlot) -> bool {
+        self.quick.remove(&quick_slot);
         true
     }
 

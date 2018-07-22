@@ -298,18 +298,24 @@ impl WidgetKind for ItemButton {
             event::ClickKind::Right => {
                 let menu = ItemActionMenu::new();
 
+                let mut at_least_one_action = false;
                 if let Some(action) = self.check_sell_action(widget) {
                     menu.borrow_mut().add_action("Sell", action);
+                    at_least_one_action = true;
                 }
 
                 for &(ref name, ref cb) in self.actions.iter() {
                     menu.borrow_mut().add_action(name, cb.clone());
+                    at_least_one_action = true;
                 }
-                let menu = Widget::with_defaults(menu);
-                menu.borrow_mut().state.set_modal(true);
-                menu.borrow_mut().state.modal_remove_on_click_outside = true;
-                let root = Widget::get_root(widget);
-                Widget::add_child_to(&root, menu);
+
+                if at_least_one_action {
+                    let menu = Widget::with_defaults(menu);
+                    menu.borrow_mut().state.set_modal(true);
+                    menu.borrow_mut().state.modal_remove_on_click_outside = true;
+                    let root = Widget::get_root(widget);
+                    Widget::add_child_to(&root, menu);
+                }
             },
             _ => return false,
         }

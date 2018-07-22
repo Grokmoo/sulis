@@ -98,6 +98,9 @@ pub use self::prop_mouseover::PropMouseover;
 mod prop_window;
 pub use self::prop_window::PropWindow;
 
+mod quick_item_bar;
+use self::quick_item_bar::QuickItemBar;
+
 pub mod main_menu;
 
 mod race_pane;
@@ -427,10 +430,12 @@ impl WidgetKind for RootView {
                 selected.remove(0)
             };
 
+            let quick_items = Widget::with_defaults(QuickItemBar::new(&entity));
             let abilities = Widget::with_defaults(AbilitiesBar::new(entity));
 
             Widget::add_children_to(&bot_pane, vec![inv_button, cha_button, map_button,
-                                    log_button, men_button, abilities, portrait_pane, select_all]);
+                                    log_button, men_button, abilities, quick_items,
+                                    portrait_pane, select_all]);
         }
 
         let widget_ref = Rc::clone(widget);

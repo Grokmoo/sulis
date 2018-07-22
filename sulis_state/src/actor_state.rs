@@ -82,7 +82,7 @@ impl ActorState {
         }
 
         let mut inventory = Inventory::empty();
-        inventory.load(save.items, save.equipped)?;
+        inventory.load(save.items, save.equipped, save.quick)?;
         inventory.add_coins(save.coins);
 
         let current_group_uses_per_encounter = HashMap::new();
@@ -481,6 +481,12 @@ impl ActorState {
             self.inventory.items.add(item_state);
         }
         self.listeners.notify(&self);
+    }
+
+    pub fn swap_weapon_set(&mut self) {
+        self.inventory.swap_weapon_set();
+        self.compute_stats();
+        self.texture_cache_invalid = true;
     }
 
     pub fn equip(&mut self, index: usize) -> bool {

@@ -150,6 +150,42 @@ children:
                   scale: 7.0
                 x_relative: Max
                 preferred_size: [7, 7]
+      quick_item_bar:
+        height_relative: Max
+        x_relative: Max
+        position: [-162, 0]
+        preferred_size: [28, 0]
+        background: bg_base
+        border: [1, 1, 1, 1]
+        children:
+          title:
+            from: .label
+            text: "Quick Items"
+            position: [0, 0]
+            preferred_size: [0, 8]
+            width_relative: Max
+            text_params:
+              vertical_alignment: Top
+              horizontal_alignment: Left
+              color: { r: 1.0, g: 0.0, b: 0.0, a: 1.0 }
+          swap_weapons:
+            from: .button
+            foreground: swap_weapons
+            preferred_size: [7, 7]
+            position: [0, 0]
+            x_relative: Max
+          usable1:
+            from: .item_button
+            position: [0, 8]
+          usable2:
+            from: .item_button
+            position: [14, 8]
+          usable3:
+            from: .item_button
+            position: [0, 21]
+          usable4:
+            from: .item_button
+            position: [14, 21]
       abilities_bar:
         height_relative: Max
         x_relative: Max
@@ -411,55 +447,78 @@ children:
         text: "Inventory"
       equipped_area:
         background: inventory_paper_doll
-        preferred_size: [84, 84]
-        position: [12, 8]
+        preferred_size: [96, 96]
+        position: [6, 6]
         children:
           cloak_button:
             from: .item_button
-            position: [16, 12]
-            preferred_size: [16, 16]
+            position: [66, 12]
+            preferred_size: [14, 14]
           head_button:
             from: .item_button
-            position: [36, 3]
+            position: [50, 4]
           torso_button:
             from: .item_button
-            position: [35, 17]
-            preferred_size: [14, 14]
+            position: [48, 20]
+            preferred_size: [16, 16]
           hands_button:
             from: .item_button
-            position: [47, 32]
+            position: [66, 36]
           legs_button:
             from: .item_button
-            position: [36, 47]
+            preferred_size: [16, 16]
+            position: [48, 52]
           feet_button:
             from: .item_button
-            position: [36, 64]
-          heldmain_button:
-            from: .item_button
-            position: [10, 32]
-            preferred_size: [16, 16]
-          heldoff_button:
-            from: .item_button
-            position: [60, 32]
-            preferred_size: [16, 16]
+            preferred_size: [14, 14]
+            position: [49, 76]
           waist_button:
             from: .item_button
-            position: [35, 32]
+            position: [52, 38]
           neck_button:
             from: .item_button
-            position: [50, 12]
+            position: [40, 10]
             preferred_size: [8, 8]
           fingermain_button:
             from: .item_button
-            position: [28, 45]
+            position: [44, 38]
             preferred_size: [6, 6]
           fingeroff_button:
             from: .item_button
-            position: [50, 45]
+            position: [66, 50]
             preferred_size: [6, 6]
+          heldmain_button:
+            from: .item_button
+            position: [5, 20]
+            preferred_size: [14, 14]
+          heldoff_button:
+            from: .item_button
+            position: [20, 20]
+            preferred_size: [14, 14]
+            
+          altheldmain_button:
+            from: .item_button
+            position: [5, 37]
+            preferred_size: [14, 14]
+          altheldoff_button:
+            from: .item_button
+            position: [20, 37]
+            preferred_size: [14, 14]
+          usable1_button:
+            from: .item_button
+            position: [8, 58]
+          usable2_button:
+            from: .item_button
+            position: [22, 58]
+          usable3_button:
+            from: .item_button
+            position: [8, 72]
+          usable4_button:
+            from: .item_button
+            position: [22, 72]
       items_list:
-        preferred_size: [0, -93]
-        position: [0, 93]
+        preferred_size: [0, -106]
+        position: [0, 106]
         width_relative: Max
         height_relative: Max
         layout: Grid
@@ -469,7 +528,7 @@ children:
             from: .item_button
       coins_button:
         from: .item_button
-        position: [74, 16]
+        position: [80, 80]
   character_window:
     from: .window
     children:

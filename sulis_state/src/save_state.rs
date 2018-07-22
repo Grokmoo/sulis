@@ -21,7 +21,7 @@ use std::u64;
 use std::collections::HashMap;
 
 use sulis_core::util::{Point, ExtInt};
-use sulis_rules::Slot;
+use sulis_rules::{QuickSlot, Slot};
 use sulis_module::{actor::{ActorBuilder, RewardBuilder}};
 
 use {ActorState, EntityState, GameState, ItemState, Location, PropState, prop_state::Interactive, Merchant};
@@ -386,6 +386,7 @@ pub struct ActorSaveState {
     pub(crate) xp: u32,
     pub(crate) items: Vec<ItemListEntrySaveState>,
     pub(crate) equipped: Vec<Option<usize>>,
+    pub(crate) quick: Vec<Option<usize>>,
     pub(crate) coins: i32,
     pub(crate) ability_states: HashMap<String, AbilitySaveState>,
 }
@@ -396,6 +397,11 @@ impl ActorSaveState {
         let mut equipped = Vec::new();
         for slot in Slot::iter() {
             equipped.push(actor_state.inventory().equipped(slot));
+        }
+
+        let mut quick = Vec::new();
+        for quick_slot in QuickSlot::iter() {
+            quick.push(actor_state.inventory().quick(quick_slot));
         }
 
         let mut ability_states = HashMap::new();
@@ -414,6 +420,7 @@ impl ActorSaveState {
             items: actor_state.inventory().items.iter()
                 .map(|(q, ref i)| ItemListEntrySaveState::new(*q, i)).collect(),
             equipped,
+            quick,
             coins: actor_state.inventory().coins(),
             ability_states,
         }

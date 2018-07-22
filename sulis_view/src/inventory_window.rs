@@ -20,7 +20,7 @@ use std::cell::RefCell;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{Button, Label};
-use sulis_rules::Slot;
+use sulis_rules::{Slot, QuickSlot};
 use sulis_module::{Module};
 use sulis_state::{EntityState, ChangeListener, GameState, inventory::has_proficiency};
 
@@ -114,6 +114,24 @@ impl WidgetKind for InventoryWindow {
                     button.borrow_mut().add_action("Drop",
                                                    unequip_and_drop_item_cb(&self.entity, *slot));
 
+                    Widget::add_child_to(&equipped_area, Widget::with_theme(button, &theme_id));
+                }
+            }
+        }
+
+        for quick_slot in QuickSlot::iter() {
+            let theme_id = format!("{:?}_button", quick_slot).to_lowercase();
+
+            match actor.inventory().get_quick_index(*quick_slot) {
+                None => {
+                    let button = Widget::empty(&theme_id);
+                    button.borrow_mut().state.set_enabled(false);
+                    Widget::add_child_to(&equipped_area, button);
+                }, Some(index) => {
+                    let (_, item_state) = actor.inventory().items.get(index).unwrap();
+
+                    let button = ItemButton::equipped(&self.entity, item_state.item.icon.id(),
+                                                      index);
                     Widget::add_child_to(&equipped_area, Widget::with_theme(button, &theme_id));
                 }
             }

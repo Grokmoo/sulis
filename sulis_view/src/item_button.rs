@@ -20,7 +20,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_rules::bonus::{AttackBuilder, AttackKindBuilder, Contingent};
-use sulis_rules::{Bonus, BonusList, Armor, DamageKind, Slot};
+use sulis_rules::{Bonus, BonusList, Armor, DamageKind, QuickSlot, Slot};
 use sulis_module::{ability, item::{format_item_value, format_item_weight}, Module};
 use sulis_state::{EntityState, GameState, ItemState, inventory::has_proficiency};
 use sulis_core::io::event;
@@ -324,6 +324,14 @@ impl WidgetKind for ItemButton {
     }
 }
 
+pub fn set_quickslot_cb(entity: &Rc<RefCell<EntityState>>,
+                        index: usize, slot: QuickSlot) -> Callback {
+    let entity = Rc::clone(entity);
+    Callback::new(Rc::new(move |_, _| {
+        entity.borrow_mut().actor.set_quick(index, slot);
+    }))
+}
+
 pub fn use_item_cb(entity: &Rc<RefCell<EntityState>>, index: usize) -> Callback {
     let entity = Rc::clone(entity);
     Callback::new(Rc::new(move |widget, _| {
@@ -334,7 +342,8 @@ pub fn use_item_cb(entity: &Rc<RefCell<EntityState>>, index: usize) -> Callback 
     }))
 }
 
-pub fn take_item_cb(entity: &Rc<RefCell<EntityState>>, prop_index: usize, index: usize) -> Callback {
+pub fn take_item_cb(entity: &Rc<RefCell<EntityState>>,
+                    prop_index: usize, index: usize) -> Callback {
     let entity = Rc::clone(entity);
     Callback::with(Box::new(move || {
         entity.borrow_mut().actor.take(prop_index, index);
@@ -348,7 +357,8 @@ pub fn equip_item_cb(entity: &Rc<RefCell<EntityState>>, index: usize) -> Callbac
     }))
 }
 
-pub fn buy_item_cb(entity: &Rc<RefCell<EntityState>>, merchant_id: &str, index: usize) -> Callback {
+pub fn buy_item_cb(entity: &Rc<RefCell<EntityState>>,
+                   merchant_id: &str, index: usize) -> Callback {
     let entity = Rc::clone(entity);
     let merchant_id = merchant_id.to_string();
     Callback::with(Box::new(move || {

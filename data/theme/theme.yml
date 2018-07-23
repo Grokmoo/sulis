@@ -14,7 +14,7 @@ children:
     background: 80_transparent_fill
     width_relative: Custom
     height_relative: Custom
-    preferred_size: [60, 14]
+    preferred_size: [50, 14]
     position: [0, 0]
     x_relative: Custom
     y_relative: Custom
@@ -23,7 +23,7 @@ children:
     x_relative: Cursor
     y_relative: Cursor
     position: [-1, -1]
-    preferred_size: [24, 0]
+    preferred_size: [30, 0]
     height_relative: ChildSum
     width_relative: Zero
     children:
@@ -441,6 +441,8 @@ children:
         width_relative: Max
   inventory_window:
     from: .window
+    preferred_size: [180, 112]
+    height_relative: Zero
     position: [120, 4]
     children:
       title:
@@ -448,7 +450,7 @@ children:
       equipped_area:
         background: inventory_paper_doll
         preferred_size: [96, 96]
-        position: [6, 6]
+        position: [2, 2]
         children:
           cloak_button:
             from: .item_button
@@ -516,21 +518,43 @@ children:
           usable4_button:
             from: .item_button
             position: [22, 72]
+      stash_title:
+        from: .label
+        text: "Stash"
+        text_params:
+          scale: 6.0
+          horizontal_alignment: Center
+        position: [100, 4]
+        width_relative: Max
+        preferred_size: [-100, 4]
       items_list:
-        preferred_size: [0, -106]
-        position: [0, 106]
+        background: bg_base
+        border: [2, 2, 2, 2]
+        preferred_size: [-100, -12]
+        position: [100, 8]
         width_relative: Max
         height_relative: Max
-        layout: Grid
-        layout_spacing: [0, 1, 0, 1]
         children:
-          item_button:
-            from: .item_button
+          scrollbar:
+            from: .scrollbar
+            custom:
+              scroll_delta: 12
+          content:
+            preferred_size: [-7, 0]
+            layout: Grid
+            layout_spacing: [0, 1, 0, 1]
+            width_relative: Max
+            height_relative: Max
+            children:
+              item_button:
+                from: .item_button
       coins_button:
         from: .item_button
         position: [80, 80]
   character_window:
     from: .window
+    height_relative: 0
+    preferred_size: [120, 134]
     children:
       title:
         text: "Character Sheet"
@@ -557,12 +581,12 @@ children:
             background: bg_base
             width_relative: Max
             height_relative: Zero
-            preferred_size: [0, 80]
+            preferred_size: [0, 66]
             y_relative: Max
           list:
             width_relative: Max
             height_relative: Max
-            preferred_size: [0, -82]
+            preferred_size: [0, -68]
             layout: Grid
             layout_spacing: { top :0, bottom: 1, left: 0, right: 1 }
             children:

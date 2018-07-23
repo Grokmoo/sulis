@@ -314,6 +314,22 @@ impl Inventory {
         };
     }
 
+    /// attempts to set the item at the given index as a quick item.  returns
+    /// true if successful, false if not
+    pub fn set_quick(&mut self, index: usize, quick_slot: QuickSlot) -> bool {
+        {
+            let item_state = match self.items.get(index) {
+                None => return false,
+                Some(&(_, ref item)) => item,
+            };
+
+            if item_state.item.usable.is_none() { return false; }
+        }
+
+        self.quick.insert(quick_slot, index);
+        true
+    }
+
     /// equips the item at the given index.  returns true if the item
     /// was equipped.  false if the item does not exist
     pub fn equip(&mut self, index: usize, stats: &StatList) -> bool {

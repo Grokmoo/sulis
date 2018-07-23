@@ -19,7 +19,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_widgets::{Button, Label};
+use sulis_widgets::{Button, Label, ScrollPane};
 use sulis_rules::{Slot, QuickSlot};
 use sulis_module::{Module};
 use sulis_state::{EntityState, ChangeListener, GameState, inventory::has_proficiency};
@@ -74,7 +74,8 @@ impl WidgetKind for InventoryWindow {
 
         let ref actor = self.entity.borrow().actor;
 
-        let list_content = Widget::empty("items_list");
+        let scrollpane = ScrollPane::new();
+        let list_content = Widget::with_theme(scrollpane.clone(), "items_list");
         for (index, &(quantity, ref item)) in actor.inventory().items.iter().enumerate() {
             let mut quantity = quantity - actor.inventory().equipped_quantity(index);
             if quantity == 0 { continue; }
@@ -83,7 +84,15 @@ impl WidgetKind for InventoryWindow {
                 quantity, index);
 
             if let Some(_) = item.item.usable {
-                item_but.borrow_mut().add_action("Use", use_item_cb(&self.entity, index));
+                let mut but = item_but.borrow_mut();
+                but.add_action("Set Quickslot 1",
+                               set_quickslot_cb(&self.entity, index, QuickSlot::Usable1));
+                but.add_action("Set Quickslot 2",
+                               set_quickslot_cb(&self.entity, index, QuickSlot::Usable2));
+                but.add_action("Set Quickslot 3",
+                               set_quickslot_cb(&self.entity, index, QuickSlot::Usable3));
+                but.add_action("Set Quickslot 4",
+                               set_quickslot_cb(&self.entity, index, QuickSlot::Usable4));
             }
 
             if let Some(_) = item.item.equippable {
@@ -93,7 +102,7 @@ impl WidgetKind for InventoryWindow {
             }
             item_but.borrow_mut().add_action("Drop", drop_item_cb(&self.entity, index));
 
-            Widget::add_child_to(&list_content, Widget::with_defaults(item_but));
+            scrollpane.borrow().add_to_content(Widget::with_defaults(item_but));
         }
 
         let equipped_area = Widget::empty("equipped_area");
@@ -128,10 +137,10 @@ impl WidgetKind for InventoryWindow {
                     button.borrow_mut().state.set_enabled(false);
                     Widget::add_child_to(&equipped_area, button);
                 }, Some(index) => {
-                    let (_, item_state) = actor.inventory().items.get(index).unwrap();
+                    let (qty, item_state) = actor.inventory().items.get(index).unwrap();
 
-                    let button = ItemButton::equipped(&self.entity, item_state.item.icon.id(),
-                                                      index);
+                    let button = ItemButton::inventory(&self.entity, item_state.item.icon.id(),
+                                                      *qty, index);
                     Widget::add_child_to(&equipped_area, Widget::with_theme(button, &theme_id));
                 }
             }
@@ -148,6 +157,7 @@ impl WidgetKind for InventoryWindow {
         let coins_button = Widget::with_theme(button, "coins_button");
         coins_button.borrow_mut().state.set_enabled(false);
 
-        vec![title, close, equipped_area, list_content, coins_button]
+        let stash_title = Widget::with_theme(Label::empty(), "stash_title");
+        vec![title, close, equipped_area, list_content, coins_button, stash_title]
     }
 }

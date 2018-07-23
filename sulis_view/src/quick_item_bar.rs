@@ -19,8 +19,10 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
+use sulis_rules::QuickSlot;
 use sulis_state::{ChangeListener, EntityState, GameState};
 use sulis_widgets::{Label, Button};
+use {item_button::use_item_cb, ItemButton};
 
 pub const NAME: &str = "quick_item_bar";
 
@@ -65,11 +67,29 @@ impl WidgetKind for QuickItemBar {
             bar.entity.borrow_mut().actor.swap_weapon_set();
         })));
 
-        let usable1 = Widget::with_theme(Button::empty(), "usable1");
-        let usable2 = Widget::with_theme(Button::empty(), "usable2");
-        let usable3 = Widget::with_theme(Button::empty(), "usable3");
-        let usable4 = Widget::with_theme(Button::empty(), "usable4");
+        let usable1 = create_button(&self.entity, QuickSlot::Usable1, "usable1");
+        let usable2 = create_button(&self.entity, QuickSlot::Usable2, "usable2");
+        let usable3 = create_button(&self.entity, QuickSlot::Usable3, "usable3");
+        let usable4 = create_button(&self.entity, QuickSlot::Usable4, "usable4");
 
         vec![title, swap_weapons, usable1, usable2, usable3, usable4]
+    }
+}
+
+fn create_button(entity: &Rc<RefCell<EntityState>>, slot: QuickSlot,
+                 theme_id: &str) -> Rc<RefCell<Widget>> {
+    let actor = &entity.borrow().actor;
+    match actor.inventory().get_quick_index(slot) {
+        None => {
+            let button = Widget::empty(theme_id);
+            button.borrow_mut().state.set_enabled(false);
+            button
+        }, Some(index) => {
+            let (qty, item_state) = actor.inventory().items.get(index).unwrap();
+            let button = ItemButton::inventory(entity, item_state.item.icon.id(),
+                *qty, index);
+            button.borrow_mut().add_action("Use", use_item_cb(entity, index));
+            Widget::with_theme(button, theme_id)
+        }
     }
 }

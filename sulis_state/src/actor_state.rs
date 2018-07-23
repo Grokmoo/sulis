@@ -24,7 +24,8 @@ use sulis_core::io::GraphicsRenderer;
 use sulis_core::image::{LayeredImage};
 use sulis_core::ui::{color, Color};
 use sulis_core::util::{invalid_data_error, ExtInt};
-use sulis_rules::{Attack, AttackKind, BonusList, HitKind, StatList, WeaponKind, Slot, ItemKind};
+use sulis_rules::{Attack, AttackKind, BonusList, HitKind, StatList, WeaponKind,
+    QuickSlot, Slot, ItemKind};
 use sulis_module::{Actor, Module, ActorBuilder};
 use {AbilityState, ChangeListenerList, Effect, EntityState, GameState, Inventory, ItemState};
 use save_state::ActorSaveState;
@@ -480,6 +481,11 @@ impl ActorState {
         if !self.check_add_coins(1, &item_state) {
             self.inventory.items.add(item_state);
         }
+        self.listeners.notify(&self);
+    }
+
+    pub fn set_quick(&mut self, index: usize, slot: QuickSlot) {
+        self.inventory.set_quick(index, slot);
         self.listeners.notify(&self);
     }
 

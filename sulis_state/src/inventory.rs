@@ -22,7 +22,7 @@ use std::collections::HashMap;
 use sulis_core::image::Image;
 use sulis_core::util::invalid_data_error;
 use sulis_rules::{StatList, Slot, ItemKind, WeaponStyle, bonus::AttackKindBuilder, QuickSlot};
-use sulis_module::{Actor, ImageLayer, Module};
+use sulis_module::{ImageLayer, Module};
 use {ItemList, ItemState};
 use save_state::ItemListEntrySaveState;
 
@@ -35,17 +35,6 @@ pub struct Inventory {
 }
 
 impl Inventory {
-    pub fn new(actor: &Rc<Actor>) -> Inventory {
-        let mut inv = Inventory::empty();
-        for item in actor.items.iter() {
-            inv.items.add(ItemState::new(Rc::clone(item)));
-        }
-
-        inv.coins = actor.coins;
-        trace!("Populated initial inventory with {} items", inv.items.len());
-        inv
-    }
-
     pub fn empty() -> Inventory {
         Inventory {
             items: ItemList::new(),

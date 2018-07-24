@@ -1,0 +1,12 @@
+id: healing_kit
+name: Healing Kit
+icon: inventory/misc_healing_kit
+weight: 100
+value: 400
+usable:
+  consumable: true
+  script: healing_kit
+  ap: 2000
+  duration:
+    Rounds: 10
+  short_description: "Heals damage on an ally slowly over time."

@@ -128,7 +128,7 @@ groups:
       potion02_yellow: [2, 13]
       potion02_green: [3, 13]
       potion02_cyan: [4, 13]
-      
+      misc_healing_kit: [5, 13]
       craft_crystal01: [6, 13]
       craft_crystal02: [7, 13]
       

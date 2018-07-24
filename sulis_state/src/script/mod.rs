@@ -116,7 +116,7 @@ impl ScriptState {
     pub fn item_on_activate(&self, parent: &Rc<RefCell<EntityState>>,
                             item_index: usize) -> Result<()> {
         let t: Option<(&str, usize)> = None;
-        self.item_script(parent, item_index,
+        self.item_script(parent, None, item_index,
                          ScriptEntitySet::new(parent, &Vec::new()), t, "on_activate")
     }
 
@@ -135,14 +135,33 @@ impl ScriptState {
             Some(entity) => Some(("custom_target", ScriptEntity::from(&entity))),
         };
         targets.affected_points = affected_points.into_iter().map(|p| (p.x, p.y)).collect();
-        self.item_script(parent, item_index, targets, arg, func)
+        self.item_script(parent, None, item_index, targets, arg, func)
     }
 
-    pub fn item_script<'a, T>(&'a self, parent: &Rc<RefCell<EntityState>>, item_index: usize,
-                              targets: ScriptEntitySet, arg: Option<(&str, T)>,
+    /// Runs a script on the given item, using the specified parent.  If `item_id` is None, then it
+    /// is assumed that the item exists on the parent at the specified `item_index`.  If it Some,
+    /// this is not assumed, but the specified index is still set on the item that is passed into
+    /// the script state.
+    pub fn item_script<'a, T>(&'a self, parent: &Rc<RefCell<EntityState>>, item_id: Option<String>,
+                              item_index: usize, targets: ScriptEntitySet,
+                              arg: Option<(&str, T)>,
                               func: &str) -> Result<()> where T: rlua::prelude::ToLua<'a> + Send {
-        let script_item = ScriptItem::from(parent, item_index)?;
-        let item = script_item.try_item()?;
+        let (item, script_item) = match item_id {
+            None => {
+                let script_item = ScriptItem::from(parent, item_index)?;
+                let item = script_item.try_item()?;
+                (item, script_item)
+            },
+            Some(ref id) => {
+                let item = match Module::item(&id) {
+                    None => unreachable!(),
+                    Some(item) => item,
+                };
+                let mut script_item = ScriptItem::new(parent, &item)?;
+                script_item.index = item_index;
+                (item, script_item)
+            }
+        };
         let script = get_item_script(&item)?;
         self.lua.globals().set("item", script_item)?;
         self.lua.globals().set("targets", targets)?;
@@ -398,6 +417,21 @@ pub struct ScriptItem {
 }
 
 impl ScriptItem {
+    fn new(parent: &Rc<RefCell<EntityState>>, item: &Rc<Item>) -> Result<ScriptItem> {
+        let ap = match &item.usable {
+            None => 0,
+            Some(usable) => usable.ap,
+        };
+
+        Ok(ScriptItem {
+            parent: parent.borrow().index,
+            index: 0,
+            id: item.id.to_string(),
+            name: item.name.to_string(),
+            ap,
+        })
+    }
+
     fn from(parent: &Rc<RefCell<EntityState>>, index: usize) -> Result<ScriptItem> {
         let item = match parent.borrow().actor.inventory().items.get(index) {
             None => return Err(rlua::Error::FromLuaConversionError {
@@ -434,27 +468,6 @@ impl ScriptItem {
             Some((_, item_state)) => Ok(Rc::clone(&item_state.item)),
         }
     }
-
-    fn error_if_not_valid(&self) -> Result<()> {
-        let item = self.try_item()?;
-
-        if item.id != self.id {
-            return Err(rlua::Error::FromLuaConversionError {
-                from: "ScriptItem",
-                to: "Item",
-                message: Some(format!("The item '{}' is no longer present", self.id)),
-            });
-        }
-
-        match item.usable {
-            None => Err(rlua::Error::FromLuaConversionError {
-                from: "ScriptItem",
-                to: "UsableItem",
-                message: Some(format!("The item '{}' is not usable", self.id)),
-            }),
-            Some(_) => Ok(())
-        }
-    }
 }
 
 impl UserData for ScriptItem {
@@ -474,9 +487,8 @@ impl UserData for ScriptItem {
             }
         });
         methods.add_method("create_callback", |_, item, parent: ScriptEntity| {
-            item.error_if_not_valid()?;
             let index = parent.try_unwrap_index()?;
-            let cb_data = CallbackData::new_item(index, item.index);
+            let cb_data = CallbackData::new_item(index, item.id.to_string());
             Ok(cb_data)
         });
     }

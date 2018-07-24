@@ -392,18 +392,22 @@ impl GameState {
         exec_script!(item_on_activate: parent, index);
     }
 
-    pub fn execute_item_script(parent: &Rc<RefCell<EntityState>>, index: usize,
+    pub fn execute_item_script(parent: &Rc<RefCell<EntityState>>, item_id: String,
                                targets: ScriptEntitySet, func: &str) {
         let t: Option<(&str, usize)> = None;
-        exec_script!(item_script: parent, index, targets, t, func);
+        let item_id = Some(item_id);
+        let index = 0;
+        exec_script!(item_script: parent, item_id, index, targets, t, func);
     }
 
-    pub fn execute_item_with_attack_data(parent: &Rc<RefCell<EntityState>>, index: usize,
+    pub fn execute_item_with_attack_data(parent: &Rc<RefCell<EntityState>>, item_id: String,
                                          targets: ScriptEntitySet, kind: HitKind,
                                          damage: u32, func: &str) {
         let hit_kind = ScriptHitKind { kind, damage };
         let t = Some(("hit", hit_kind));
-        exec_script!(item_script: parent, index, targets, t, func);
+        let item_id = Some(item_id);
+        let index = 0;
+        exec_script!(item_script: parent, item_id, index, targets, t, func);
     }
 
     pub fn execute_item_on_target_select(parent: &Rc<RefCell<EntityState>>,

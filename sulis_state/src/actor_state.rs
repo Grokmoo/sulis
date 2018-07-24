@@ -109,7 +109,7 @@ impl ActorState {
 
     pub fn new(actor: Rc<Actor>) -> ActorState {
         trace!("Creating new actor state for {}", actor.id);
-        let inventory = Inventory::new(&actor);
+        let inventory = Inventory::empty();
 
         let image = LayeredImage::new(actor.image_layers().get_list(actor.sex,
                                                                     actor.hair_color,
@@ -130,7 +130,7 @@ impl ActorState {
 
         let xp = actor.xp;
         let mut actor_state = ActorState {
-            actor,
+            actor: Rc::clone(&actor),
             inventory,
             stats: StatList::new(attrs),
             listeners: ChangeListenerList::default(),
@@ -145,6 +145,12 @@ impl ActorState {
             texture_cache_invalid: false,
             current_group_uses_per_encounter,
         };
+
+        for item in actor.items.iter() {
+            let index = actor_state.inventory.items.add(ItemState::new(Rc::clone(item)));
+            actor_state.check_add_to_quickslot(index, 1);
+        }
+        actor_state.inventory.coins = actor.coins;
 
         actor_state.compute_stats();
         for index in to_equip.iter() {

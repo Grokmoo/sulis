@@ -93,6 +93,8 @@ struct DialogAction {
 
 impl DialogAction {
     fn create_if_valid(x: i32, y: i32) -> Option<Box<ActionKind>> {
+        if GameState::is_combat_active() { return None; }
+
         let area_state = GameState::area_state();
         let area_state = area_state.borrow();
         let target = match area_state.get_entity_at(x, y) {

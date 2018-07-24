@@ -1,0 +1,12 @@
+id: poison_vial
+name: Poison Vial
+icon: inventory/potion01_yellow
+weight: 50
+value: 200
+usable:
+  consumable: true
+  script: poison_vial
+  ap: 2000
+  duration:
+    Rounds: 3
+  short_description: "Poisons your weapons, dealing damage over time."

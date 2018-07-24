@@ -614,6 +614,9 @@ pub fn add_bonus_text_args(bonuses: &BonusList, widget_state: &mut WidgetState) 
         add_bonus(bonus, widget_state, &mut group_uses_index, &mut damage_index, &mut armor);
     }
 
+    if !armor.is_empty() {
+        add(widget_state, "any_armor", "true");
+    }
     if armor.base() > 0 {
         add(widget_state, "armor", armor.base());
     }

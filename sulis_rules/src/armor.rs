@@ -72,6 +72,16 @@ impl Armor {
         self.base
     }
 
+    pub fn is_empty(&self) -> bool {
+        if self.base > 0 { return false; }
+
+        for val in self.kinds.iter() {
+            if *val > 0 { return false; }
+        }
+
+        true
+    }
+
     pub fn differs_from_base(&self, kind: DamageKind) -> bool {
         if kind == DamageKind::Raw { return true; }
 

@@ -26,9 +26,12 @@ use animation::{Anim};
 pub (in animation) fn update(attacker: &Rc<RefCell<EntityState>>, model: &mut RangedAttackAnimModel, frac: f32) {
     if frac > 1.0 {
         if !model.has_attacked {
-            let cb_targets = ScriptEntitySet::new(&model.defender, &vec![Some(Rc::clone(&attacker))]);
+            let cb_def_targets = ScriptEntitySet::new(&model.defender,
+                                                      &vec![Some(Rc::clone(attacker))]);
+            let cb_att_targets = ScriptEntitySet::new(attacker,
+                                                      &vec![Some(Rc::clone(&model.defender))]);
             for cb in model.callbacks.iter() {
-                cb.before_attack(&cb_targets);
+                cb.before_attack(&cb_def_targets);
             }
 
             let area_state = GameState::area_state();
@@ -36,8 +39,8 @@ pub (in animation) fn update(attacker: &Rc<RefCell<EntityState>>, model: &mut Ra
             let defender_cbs = model.defender.borrow().callbacks();
             let attacker_cbs = attacker.borrow().callbacks();
 
-            attacker_cbs.iter().for_each(|cb| cb.before_attack(&cb_targets));
-            defender_cbs.iter().for_each(|cb| cb.before_defense(&cb_targets));
+            attacker_cbs.iter().for_each(|cb| cb.before_attack(&cb_att_targets));
+            defender_cbs.iter().for_each(|cb| cb.before_defense(&cb_def_targets));
 
             let (hit_kind, damage, text, color) =
                 ActorState::weapon_attack(attacker, &model.defender);
@@ -45,11 +48,11 @@ pub (in animation) fn update(attacker: &Rc<RefCell<EntityState>>, model: &mut Ra
             model.has_attacked = true;
 
             for cb in model.callbacks.iter() {
-                cb.after_attack(&cb_targets, hit_kind, damage);
+                cb.after_attack(&cb_def_targets, hit_kind, damage);
             }
 
-            attacker_cbs.iter().for_each(|cb| cb.after_attack(&cb_targets, hit_kind, damage));
-            defender_cbs.iter().for_each(|cb| cb.after_defense(&cb_targets, hit_kind, damage));
+            attacker_cbs.iter().for_each(|cb| cb.after_attack(&cb_att_targets, hit_kind, damage));
+            defender_cbs.iter().for_each(|cb| cb.after_defense(&cb_def_targets, hit_kind, damage));
         }
     } else {
         model.cur_pos = (frac * model.vec.0 + model.start_pos.0,

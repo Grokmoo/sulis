@@ -2,6 +2,24 @@ id: level1_merchant
 generate: {}
 weighted_entries: {}
 probability_entries:
+  healing_kit:
+    weight: 90
+    quantity: [1, 5]
+  potion_healing:
+    weight: 90
+    quantity: [1, 5]
+  potion_power:
+    weight: 75
+    quantity: [1, 2]
+  potion_mind:
+    weight: 75
+    quantity: [1, 2]
+  potion_elements:
+    weight: 75
+    quantity: [1, 2]
+  poison_vial:
+    weight: 75
+    quantity: [1, 4]
   boots_leather:
     weight: 80
   boots_mail:

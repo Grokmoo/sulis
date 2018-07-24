@@ -1,0 +1,12 @@
+id: potion_elements
+name: Potion of Elements
+icon: inventory/potion02_purple
+weight: 50
+value: 500
+usable:
+  consumable: true
+  script: potion_elements
+  ap: 2000
+  duration:
+    Rounds: 5
+  short_description: "Provides protection against elemental damage."

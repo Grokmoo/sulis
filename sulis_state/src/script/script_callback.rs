@@ -73,7 +73,9 @@ pub trait ScriptCallback {
 #[derive(Clone)]
 enum Kind {
     Ability(String),
-    Item(usize),
+    Item(String), // callback is based on an item ID, not a particular
+                  // slot - this allows creating callbacks after the
+                  // consumable items has been used
 }
 
 #[derive(Clone)]
@@ -96,11 +98,11 @@ impl CallbackData {
         }
     }
 
-    pub fn new_item(parent: usize, item_index: usize) -> CallbackData {
+    pub fn new_item(parent: usize, item_id: String) -> CallbackData {
         CallbackData {
             parent,
             effect: None,
-            kind: Kind::Item(item_index),
+            kind: Kind::Item(item_id),
             targets: None,
             funcs: HashMap::new(),
         }
@@ -155,8 +157,8 @@ impl CallbackData {
                 let ability = Module::ability(id).unwrap();
                 GameState::execute_ability_script(&parent, &ability, targets, &func);
             },
-            Kind::Item(index) => {
-                GameState::execute_item_script(&parent, *index, targets, &func);
+            Kind::Item(id) => {
+                GameState::execute_item_script(&parent, id.to_string(), targets, &func);
             }
         }
     }
@@ -177,8 +179,8 @@ impl CallbackData {
                 GameState::execute_ability_with_attack_data(&parent, &ability, targets,
                                                             hit_kind, damage, &func);
             },
-            Kind::Item(index) => {
-                GameState::execute_item_with_attack_data(&parent, *index, targets,
+            Kind::Item(id) => {
+                GameState::execute_item_with_attack_data(&parent, id.to_string(), targets,
                                                          hit_kind, damage, &func);
             }
         }
@@ -209,6 +211,8 @@ impl ScriptCallback for CallbackData {
     /// when called, this computes the current target set and sends it to
     /// the lua function based on the surface state
     fn on_surface_round_elapsed(&self) {
+        if self.funcs.get(&FuncKind::OnSurfaceRoundElapsed).is_none() { return; }
+
         let targets = match compute_surface_targets(self.effect, self.parent) {
             Some(targets) => targets,
             None => {

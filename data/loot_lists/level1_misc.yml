@@ -10,6 +10,12 @@ generate:
   2: 4
   3: 1
 weighted_entries:
+  poison_vial:
+    weight: 10
+  potion_elements:
+    weight: 10
+  healing_kit:
+    weight: 10
   potion_healing:
     weight: 20
   potion_mind:

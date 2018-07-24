@@ -277,6 +277,7 @@ impl WidgetKind for ItemButton {
     }
 
     fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: event::ClickKind) -> bool {
+        self.super_on_mouse_release(widget, kind);
         self.remove_item_window();
 
         match kind {
@@ -324,11 +325,27 @@ impl WidgetKind for ItemButton {
     }
 }
 
-pub fn set_quickslot_cb(entity: &Rc<RefCell<EntityState>>,
-                        index: usize, slot: QuickSlot) -> Callback {
+pub fn clear_quickslot_cb(entity: &Rc<RefCell<EntityState>>, slot: QuickSlot) -> Callback {
     let entity = Rc::clone(entity);
     Callback::new(Rc::new(move |_, _| {
-        entity.borrow_mut().actor.set_quick(index, slot);
+        let actor = &mut entity.borrow_mut().actor;
+        actor.clear_quick(slot);
+    }))
+}
+
+pub fn set_quickslot_cb(entity: &Rc<RefCell<EntityState>>,
+                        index: usize) -> Callback {
+    let entity = Rc::clone(entity);
+    Callback::new(Rc::new(move |_, _| {
+        let actor = &mut entity.borrow_mut().actor;
+        for slot in QuickSlot::usable_iter() {
+            if actor.inventory().get_quick(*slot).is_none() {
+                actor.set_quick(index, *slot);
+                return;
+            }
+        }
+
+        actor.set_quick(index, QuickSlot::Usable1);
     }))
 }
 

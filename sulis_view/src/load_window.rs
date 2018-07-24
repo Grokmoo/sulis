@@ -29,6 +29,7 @@ const NAME: &str = "load_window";
 
 pub struct LoadWindow {
     accept: Rc<RefCell<Widget>>,
+    delete: Rc<RefCell<Widget>>,
     pub(crate) cancel: Rc<RefCell<Widget>>,
     entries: Vec<SaveFileMetaData>,
     selected_entry: Option<usize>,
@@ -39,6 +40,7 @@ impl LoadWindow {
     pub fn new(main_menu_mode: bool) -> Rc<RefCell<LoadWindow>> {
         let accept = Widget::with_theme(Button::empty(), "accept");
         let cancel = Widget::with_theme(Button::empty(), "cancel");
+        let delete = Widget::with_theme(Button::empty(), "delete");
         let entries = match get_available_save_files() {
             Ok(files) => files,
             Err(e) => {
@@ -50,6 +52,7 @@ impl LoadWindow {
 
         Rc::new(RefCell::new(LoadWindow {
             accept,
+            delete,
             cancel,
             entries,
             selected_entry: None,
@@ -103,6 +106,11 @@ impl LoadWindow {
 
         self.entries.remove(index);
     }
+
+    fn set_button_state(&self) {
+        self.delete.borrow_mut().state.set_enabled(self.selected_entry.is_some());
+        self.accept.borrow_mut().state.set_enabled(self.selected_entry.is_some());
+    }
 }
 
 impl WidgetKind for LoadWindow {
@@ -123,19 +131,18 @@ impl WidgetKind for LoadWindow {
             let load_window = Widget::downcast_kind_mut::<LoadWindow>(&load_window_widget_ref);
             load_window.delete_save();
             load_window.selected_entry = None;
+            load_window.set_button_state();
 
             let parent = Widget::get_parent(widget);
             parent.borrow_mut().mark_for_removal();
         }));
 
-        let delete = Widget::with_theme(Button::empty(), "delete");
-        delete.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
+        self.delete.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
             let root = Widget::get_root(widget);
             let conf_window = Widget::with_theme(ConfirmationWindow::new(delete_cb.clone()), "delete_save_confirmation");
             conf_window.borrow_mut().state.set_modal(true);
             Widget::add_child_to(&root, conf_window);
         })));
-        delete.borrow_mut().state.set_enabled(self.selected_entry.is_some());
 
         self.accept.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
             let root = Widget::get_root(widget);
@@ -145,7 +152,6 @@ impl WidgetKind for LoadWindow {
 
             parent.borrow_mut().mark_for_removal();
         })));
-        self.accept.borrow_mut().state.set_enabled(self.selected_entry.is_some());
 
         let scrollpane = ScrollPane::new();
         let entries = Widget::with_theme(scrollpane.clone(), "entries");
@@ -158,10 +164,17 @@ impl WidgetKind for LoadWindow {
             let widget = Widget::with_theme(Button::empty(), "entry");
             widget.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
                 let parent = Widget::go_up_tree(widget, 3);
-                parent.borrow_mut().invalidate_children();
+                parent.borrow_mut().invalidate_layout();
 
                 let load_window = Widget::downcast_kind_mut::<LoadWindow>(&parent);
                 load_window.selected_entry = Some(index);
+                load_window.set_button_state();
+
+                let content = Widget::get_parent(widget);
+                for child in content.borrow().children.iter() {
+                    child.borrow_mut().state.set_active(false);
+                }
+                widget.borrow_mut().state.set_active(true);
             })));
 
             if let Some(selected_index) = self.selected_entry {
@@ -174,6 +187,8 @@ impl WidgetKind for LoadWindow {
             scrollpane.borrow().add_to_content(widget);
         }
 
-        vec![self.cancel.clone(), delete, self.accept.clone(), title, entries]
+        self.set_button_state();
+
+        vec![self.cancel.clone(), self.delete.clone(), self.accept.clone(), title, entries]
     }
 }

@@ -80,6 +80,9 @@ pub use self::item_action_menu::ItemActionMenu;
 mod item_button;
 pub use self::item_button::ItemButton;
 
+mod item_list_pane;
+pub use self::item_list_pane::ItemListPane;
+
 mod loading_screen;
 pub use self::loading_screen::LoadingScreen;
 

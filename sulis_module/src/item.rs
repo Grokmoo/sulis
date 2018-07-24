@@ -147,6 +147,20 @@ impl Item {
             Some(ref image) => Some(image.iter()),
         }
     }
+
+    pub fn is_armor(&self) -> bool {
+        match self.kind {
+            ItemKind::Armor { .. } => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_weapon(&self) -> bool {
+        match self.kind {
+            ItemKind::Weapon { .. } => true,
+            _ => false,
+        }
+    }
 }
 
 #[derive(Deserialize, Debug)]

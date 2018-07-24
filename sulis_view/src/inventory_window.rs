@@ -16,26 +16,28 @@
 
 use std::any::Any;
 use std::rc::Rc;
-use std::cell::RefCell;
+use std::cell::{Cell, RefCell};
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_widgets::{Button, Label, ScrollPane};
+use sulis_widgets::{Button, Label};
 use sulis_rules::{Slot, QuickSlot};
 use sulis_module::{Module};
-use sulis_state::{EntityState, ChangeListener, GameState, inventory::has_proficiency};
+use sulis_state::{EntityState, ChangeListener, GameState};
 
-use {item_button::*, ItemButton};
+use {item_button::*, ItemListPane, ItemButton, item_list_pane::Filter};
 
 pub const NAME: &str = "inventory_window";
 
 pub struct InventoryWindow {
     entity: Rc<RefCell<EntityState>>,
+    filter: Rc<Cell<Filter>>,
 }
 
 impl InventoryWindow {
     pub fn new(entity: &Rc<RefCell<EntityState>>) -> Rc<RefCell<InventoryWindow>> {
         Rc::new(RefCell::new(InventoryWindow {
-            entity: Rc::clone(entity)
+            entity: Rc::clone(entity),
+            filter: Rc::new(Cell::new(Filter::All)),
         }))
     }
 }
@@ -56,6 +58,8 @@ impl WidgetKind for InventoryWindow {
         self.entity.borrow_mut().actor.listeners.add(
             ChangeListener::invalidate(NAME, widget));
 
+        let combat_active = GameState::is_combat_active();
+
         let widget_ref = Rc::clone(widget);
         GameState::add_party_listener(ChangeListener::new(NAME, Box::new(move |entity| {
             let entity = match entity {
@@ -74,36 +78,7 @@ impl WidgetKind for InventoryWindow {
 
         let ref actor = self.entity.borrow().actor;
 
-        let scrollpane = ScrollPane::new();
-        let list_content = Widget::with_theme(scrollpane.clone(), "items_list");
-        for (index, &(quantity, ref item)) in actor.inventory().items.iter().enumerate() {
-            let mut quantity = quantity - actor.inventory().equipped_quantity(index);
-            if quantity == 0 { continue; }
-
-            let item_but = ItemButton::inventory(&self.entity, item.item.icon.id(),
-                quantity, index);
-
-            if let Some(_) = item.item.usable {
-                let mut but = item_but.borrow_mut();
-                but.add_action("Set Quickslot 1",
-                               set_quickslot_cb(&self.entity, index, QuickSlot::Usable1));
-                but.add_action("Set Quickslot 2",
-                               set_quickslot_cb(&self.entity, index, QuickSlot::Usable2));
-                but.add_action("Set Quickslot 3",
-                               set_quickslot_cb(&self.entity, index, QuickSlot::Usable3));
-                but.add_action("Set Quickslot 4",
-                               set_quickslot_cb(&self.entity, index, QuickSlot::Usable4));
-            }
-
-            if let Some(_) = item.item.equippable {
-                if has_proficiency(&item, &actor.stats) {
-                    item_but.borrow_mut().add_action("Equip", equip_item_cb(&self.entity, index));
-                }
-            }
-            item_but.borrow_mut().add_action("Drop", drop_item_cb(&self.entity, index));
-
-            scrollpane.borrow().add_to_content(Widget::with_defaults(item_but));
-        }
+        let item_list_pane = Widget::with_defaults(ItemListPane::new_entity(&self.entity, &self.filter));
 
         let equipped_area = Widget::empty("equipped_area");
         for slot in Slot::iter() {
@@ -119,9 +94,11 @@ impl WidgetKind for InventoryWindow {
 
                     let button = ItemButton::equipped(&self.entity, item_state.item.icon.id(),
                         index);
-                    button.borrow_mut().add_action("Unequip", unequip_item_cb(&self.entity, *slot));
-                    button.borrow_mut().add_action("Drop",
-                                                   unequip_and_drop_item_cb(&self.entity, *slot));
+                    if !combat_active {
+                        let mut but = button.borrow_mut();
+                        but.add_action("Unequip", unequip_item_cb(&self.entity, *slot));
+                        but.add_action("Drop", unequip_and_drop_item_cb(&self.entity, *slot));
+                    }
 
                     Widget::add_child_to(&equipped_area, Widget::with_theme(button, &theme_id));
                 }
@@ -139,9 +116,17 @@ impl WidgetKind for InventoryWindow {
                 }, Some(index) => {
                     let (qty, item_state) = actor.inventory().items.get(index).unwrap();
 
-                    let button = ItemButton::inventory(&self.entity, item_state.item.icon.id(),
+                    let but = ItemButton::inventory(&self.entity, item_state.item.icon.id(),
                                                       *qty, index);
-                    Widget::add_child_to(&equipped_area, Widget::with_theme(button, &theme_id));
+
+                    if actor.can_use(index) {
+                        but.borrow_mut().add_action("Use", use_item_cb(&self.entity, index));
+                    }
+
+                    but.borrow_mut().add_action("Clear Use Slot",
+                                                clear_quickslot_cb(&self.entity, *quick_slot));
+
+                    Widget::add_child_to(&equipped_area, Widget::with_theme(but, &theme_id));
                 }
             }
         }
@@ -158,6 +143,6 @@ impl WidgetKind for InventoryWindow {
         coins_button.borrow_mut().state.set_enabled(false);
 
         let stash_title = Widget::with_theme(Label::empty(), "stash_title");
-        vec![title, close, equipped_area, list_content, coins_button, stash_title]
+        vec![title, close, equipped_area, item_list_pane, coins_button, stash_title]
     }
 }

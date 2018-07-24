@@ -457,7 +457,7 @@ struct MoveAction {
 }
 
 fn entities_to_ignore() -> Vec<usize> {
-    if GameState::is_in_turn_mode() {
+    if GameState::is_combat_active() {
         Vec::new()
     } else {
         GameState::party().iter().map(|e| e.borrow().index).collect()
@@ -538,7 +538,7 @@ impl ActionKind for MoveAction {
         let view = Widget::downcast_kind_mut::<RootView>(&root);
         view.set_prop_window(&root, false, 0);
 
-        if self.cb.is_some() || GameState::is_in_turn_mode() {
+        if self.cb.is_some() || GameState::is_combat_active() {
             self.move_one();
         } else {
             self.move_all();

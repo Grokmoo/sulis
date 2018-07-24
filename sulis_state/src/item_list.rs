@@ -62,15 +62,24 @@ impl ItemList {
         None
     }
 
-    pub fn add_quantity(&mut self, qty: u32, item_state: ItemState) {
+    /// Adds the specified count of this item, and returns the index
+    /// the item was placed at
+    pub fn add_quantity(&mut self, qty: u32, item_state: ItemState) -> usize {
         match self.find_index(&item_state) {
-            Some(index) => self.items[index].0 += qty,
-            None => self.items.push((qty, item_state)),
+            Some(index) => {
+                self.items[index].0 += qty;
+                index
+            }, None => {
+                self.items.push((qty, item_state));
+                self.items.len() - 1
+            }
         }
     }
 
-    pub fn add(&mut self, item_state: ItemState) {
-        self.add_quantity(1, item_state);
+    /// Adds one count of the specified item, and returns the index that
+    /// the item was placed at
+    pub fn add(&mut self, item_state: ItemState) -> usize {
+        self.add_quantity(1, item_state)
     }
 
     /// Removes the entire quantity of items at the specified index and returns it

@@ -31,6 +31,7 @@ pub struct Rules {
     pub movement_ap: u32,
     pub attack_ap: u32,
     pub display_ap: u32,
+    pub swap_weapons_ap: u32,
     pub base_initiative: i32,
     pub base_flanking_angle: i32,
     pub graze_percentile: u32,

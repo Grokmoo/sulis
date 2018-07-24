@@ -16,18 +16,19 @@
 
 use std::any::Any;
 use std::rc::Rc;
-use std::cell::RefCell;
+use std::cell::{Cell, RefCell};
 
 use sulis_state::{ChangeListener, EntityState, GameState};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{Button, Label};
-use {item_button::take_item_cb, ItemButton, RootView};
+use {ItemListPane, RootView, item_list_pane::Filter};
 
 pub const NAME: &str = "prop_window";
 
 pub struct PropWindow {
     prop_index: usize,
     player: Rc<RefCell<EntityState>>,
+    filter: Rc<Cell<Filter>>,
 }
 
 impl PropWindow {
@@ -35,6 +36,7 @@ impl PropWindow {
         Rc::new(RefCell::new(PropWindow {
             prop_index,
             player,
+            filter: Rc::new(Cell::new(Filter::All)),
         }))
     }
 
@@ -65,56 +67,47 @@ impl WidgetKind for PropWindow {
     }
 
     fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
-        let area_state = GameState::area_state();
-        let mut area_state = area_state.borrow_mut();
-
-        if !area_state.prop_index_valid(self.prop_index) {
-            // prop is invalid or has been removed.  close the window
-            widget.borrow_mut().mark_for_removal();
-            return Vec::new();
-        }
-
-        let prop = area_state.get_prop_mut(self.prop_index);
-
-        prop.listeners.add(ChangeListener::invalidate(NAME, widget));
-
         let title = Widget::with_theme(Label::empty(), "title");
-        title.borrow_mut().state.add_text_arg("name", &prop.prop.name);
-
         let icon = Widget::with_theme(Label::empty(), "icon");
-        icon.borrow_mut().state.foreground = Some(Rc::clone(&prop.prop.icon));
-
         let close = Widget::with_theme(Button::empty(), "close");
-        close.borrow_mut().state.add_callback(Callback::remove_parent());
-
         let take_all = Widget::with_theme(Button::empty(), "take_all");
 
-        let player_ref = Rc::clone(&self.player);
-        let prop_index = self.prop_index;
-        take_all.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-            let parent = Widget::get_parent(&widget);
-            parent.borrow_mut().mark_for_removal();
+        {
+            let area_state = GameState::area_state();
+            let mut area_state = area_state.borrow_mut();
 
-            player_ref.borrow_mut().actor.take_all(prop_index);
-
-            let root = Widget::get_root(&parent);
-            let view = Widget::downcast_kind_mut::<RootView>(&root);
-            view.set_inventory_window(&root, false);
-        })));
-
-        let list_content = Widget::empty("items_list");
-        match prop.items() {
-            None => (),
-            Some(ref items) => {
-                for (index, &(qty, ref item)) in items.iter().enumerate() {
-                    let item_button = ItemButton::prop(item.item.icon.id(), qty, index, self.prop_index);
-                    item_button.borrow_mut().add_action("Take", take_item_cb(&self.player, prop_index, index));
-                    let button = Widget::with_defaults(item_button);
-                    Widget::add_child_to(&list_content, button);
-                }
+            if !area_state.prop_index_valid(self.prop_index) {
+                // prop is invalid or has been removed.  close the window
+                widget.borrow_mut().mark_for_removal();
+                return Vec::new();
             }
+
+            let prop = area_state.get_prop_mut(self.prop_index);
+
+            prop.listeners.add(ChangeListener::invalidate(NAME, widget));
+
+            title.borrow_mut().state.add_text_arg("name", &prop.prop.name);
+            icon.borrow_mut().state.foreground = Some(Rc::clone(&prop.prop.icon));
+            close.borrow_mut().state.add_callback(Callback::remove_parent());
+
+            let player_ref = Rc::clone(&self.player);
+            let prop_index = self.prop_index;
+            take_all.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
+                let parent = Widget::get_parent(&widget);
+                parent.borrow_mut().mark_for_removal();
+
+                player_ref.borrow_mut().actor.take_all(prop_index);
+
+                let root = Widget::get_root(&parent);
+                let view = Widget::downcast_kind_mut::<RootView>(&root);
+                view.set_inventory_window(&root, false);
+            })));
+            take_all.borrow_mut().state.set_enabled(!GameState::is_combat_active());
         }
 
-        vec![title, icon, close, list_content, take_all]
+        let item_list_pane = Widget::with_defaults(
+            ItemListPane::new_prop(&self.player, self.prop_index, &self.filter));
+
+        vec![title, icon, close, item_list_pane, take_all]
     }
 }

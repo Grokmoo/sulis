@@ -111,7 +111,7 @@ children:
   item_button:
     from: .button
     background: empty
-    foreground: background_transparent
+    foreground: background_transparent_no_disabled
     border: [0, 0, 0, 0]
     preferred_size: [12, 12]
     children:

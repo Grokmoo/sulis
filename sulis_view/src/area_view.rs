@@ -567,7 +567,7 @@ impl WidgetKind for AreaView {
             scale_x, scale_y, millis);
         self.draw_layer(renderer, scale_x, scale_y, widget, AERIAL_LAYER_ID);
 
-        self.draw_entities_props(renderer, scale_x, scale_y, 0.4, widget, &state, millis);
+        self.draw_entities_props(renderer, scale_x, scale_y, 0.6, widget, &state, millis);
         self.draw_layer(renderer, scale_x, scale_y, widget, VISIBILITY_TEX_ID);
 
         if let Some(ref image) = self.selection_box_image {

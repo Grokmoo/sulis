@@ -18,6 +18,7 @@ use std::rc::Rc;
 use std::cell::RefMut;
 use std::cmp;
 
+use config::CONFIG;
 use ui::{Size, Widget};
 use ui::theme::Theme;
 
@@ -129,7 +130,7 @@ impl LayoutKind {
             Center => (widget.state.inner_left() + widget.state.inner_right() -
                        size.width) / 2,
             Max => widget.state.inner_right() - size.width,
-            Cursor => ::ui::Cursor::get_x(),
+            Cursor => cmp::min(::ui::Cursor::get_x(), CONFIG.display.width - size.width),
             Custom => child.state.position.x,
         };
         let y = match theme.y_relative {
@@ -137,7 +138,7 @@ impl LayoutKind {
             Center => (widget.state.inner_top() + widget.state.inner_bottom() -
                        size.height) / 2,
             Max => widget.state.inner_bottom() - size.height,
-            Cursor => ::ui::Cursor::get_y(),
+            Cursor => cmp::min(::ui::Cursor::get_y(), CONFIG.display.height - size.height),
             Custom => child.state.position.y,
         };
 

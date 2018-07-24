@@ -90,12 +90,18 @@ impl QuickSlot {
     pub fn iter() -> ::std::slice::Iter<'static, QuickSlot> {
         QUICKSLOTS_LIST.iter()
     }
+
+    pub fn usable_iter() -> ::std::slice::Iter<'static, QuickSlot> {
+        USABLE_QUICKSLOTS_LIST.iter()
+    }
 }
 
 use self::QuickSlot::*;
 
 const QUICKSLOTS_LIST: [QuickSlot; 6] = [ AltHeldMain, AltHeldOff, Usable1, Usable2, Usable3,
                                           Usable4];
+
+const USABLE_QUICKSLOTS_LIST: [QuickSlot; 4] = [ Usable1, Usable2, Usable3, Usable4 ];
 
 #[derive(Debug, Deserialize)]
 pub enum ItemKind {

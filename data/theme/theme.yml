@@ -176,15 +176,19 @@ children:
             x_relative: Max
           usable1:
             from: .item_button
+            background: background_transparent
             position: [0, 8]
           usable2:
             from: .item_button
+            background: background_transparent
             position: [14, 8]
           usable3:
             from: .item_button
+            background: background_transparent
             position: [0, 21]
           usable4:
             from: .item_button
+            background: background_transparent
             position: [14, 21]
       abilities_bar:
         height_relative: Max
@@ -275,7 +279,7 @@ children:
         position: [0, -26]
         foreground: menu_icon
   area:
-    preferred_size: [-35, -40]
+    preferred_size: [0, -40]
     width_relative: Max
     height_relative: Max
     custom:
@@ -356,53 +360,6 @@ children:
                 from: .text_area
                 text: "[s=5.0|#0#]"
                 width_relative: Max
-  merchant_window:
-    from: .window
-    position: [4, 4]
-    preferred_size: [100, 100]
-    height_relative: Zero
-    children:
-      title:
-        text: "Merchant"
-      items_list:
-        preferred_size: [0, -8]
-        position: [0, 8]
-        width_relative: Max
-        height_relative: Max
-        layout: Grid
-        layout_spacing: [0, 1, 0, 1]
-        children:
-          item_button:
-            from: .item_button
-  prop_window:
-    from: .window
-    position: [4, 4]
-    preferred_size: [100, 100]
-    height_relative: Zero
-    children:
-      title:
-        text: "#name#"
-      icon:
-        preferred_size: [20, 20]
-        background: bg_base
-        position: [0, 5]
-      take_all:
-        from: .button
-        text: "Take All"
-        text_params:
-          scale: 7.0
-        preferred_size: [25, 10]
-        position: [25, 10]
-      items_list:
-        preferred_size: [0, -28]
-        position: [0, 28]
-        width_relative: Max
-        height_relative: Max
-        layout: Grid
-        layout_spacing: [0, 1, 0, 1]
-        children:
-          item_button:
-            from: .item_button
   console_window:
     position: [0, 0]
     border: [1, 1, 1, 1]
@@ -439,11 +396,93 @@ children:
         position: [0, 4]
         preferred_size: [0, 4]
         width_relative: Max
+  item_list_pane:
+    children:
+      filter_all:
+        from: .tab_button
+        text: "All"
+        preferred_size: [9, 6]
+        position: [3, 0]
+      filter_weapon:
+        from: .tab_button
+        text: "Weapons"
+        preferred_size: [18, 6]
+        position: [12, 0]
+      filter_armor:
+        from: .tab_button
+        text: "Armor"
+        preferred_size: [15, 6]
+        position: [30, 0]
+      filter_usable:
+        from: .tab_button
+        text: "Usable"
+        preferred_size: [15, 6]
+        position: [45, 0]
+      items_list:
+        background: bg_rounded
+        border: [2, 2, 2, 2]
+        preferred_size: [0, -6]
+        position: [0, 6]
+        width_relative: Max
+        height_relative: Max
+        children:
+          scrollbar:
+            from: .scrollbar
+            custom:
+              scroll_delta: 13
+          content:
+            preferred_size: [-7, 0]
+            layout: Grid
+            layout_spacing: [0, 1, 0, 1]
+            width_relative: Max
+            height_relative: Max
+            children:
+              item_button:
+                from: .item_button
+  merchant_window:
+    from: .window
+    position: [4, 4]
+    preferred_size: [113, 112]
+    height_relative: Zero
+    children:
+      title:
+        text: "Merchant"
+      item_list_pane:
+        from: .item_list_pane
+        width_relative: Max
+        height_relative: Max
+        position: [0, 4]
+        preferred_size: [0, -4]
+  prop_window:
+    from: .window
+    position: [4, 4]
+    preferred_size: [113, 112]
+    height_relative: Zero
+    children:
+      title:
+        text: "#name#"
+      icon:
+        preferred_size: [20, 20]
+        background: bg_base
+        position: [0, 5]
+      take_all:
+        from: .button
+        text: "Take All"
+        text_params:
+          scale: 7.0
+        preferred_size: [25, 10]
+        position: [25, 10]
+      item_list_pane:
+        from: .item_list_pane
+        position: [0, 27]
+        preferred_size: [0, -27]
+        width_relative: Max
+        height_relative: Max
   inventory_window:
     from: .window
-    preferred_size: [180, 112]
+    preferred_size: [187, 112]
     height_relative: Zero
-    position: [120, 4]
+    position: [128, 4]
     children:
       title:
         text: "Inventory"
@@ -522,54 +561,40 @@ children:
         from: .label
         text: "Stash"
         text_params:
-          scale: 6.0
+          scale: 8.0
           horizontal_alignment: Center
         position: [100, 4]
         width_relative: Max
-        preferred_size: [-100, 4]
-      items_list:
-        background: bg_base
-        border: [2, 2, 2, 2]
-        preferred_size: [-100, -12]
-        position: [100, 8]
+        preferred_size: [-100, 6]
+      item_list_pane:
+        from: .item_list_pane
+        position: [100, 10]
+        preferred_size: [-100, -10]
         width_relative: Max
         height_relative: Max
-        children:
-          scrollbar:
-            from: .scrollbar
-            custom:
-              scroll_delta: 12
-          content:
-            preferred_size: [-7, 0]
-            layout: Grid
-            layout_spacing: [0, 1, 0, 1]
-            width_relative: Max
-            height_relative: Max
-            children:
-              item_button:
-                from: .item_button
       coins_button:
         from: .item_button
-        position: [80, 80]
+        position: [162, 3]
   character_window:
     from: .window
     height_relative: 0
     preferred_size: [120, 134]
+    position: [4, 4]
     children:
       title:
         text: "Character Sheet"
       char_pane_button:
         from: .tab_button
         text: "Character"
-        position: [5, 2]
+        position: [3, 2]
       abilities_pane_button:
         from: .tab_button
         text: "Abilities"
-        position: [26, 2]
+        position: [23, 2]
       effects_pane_button:
         from: .tab_button
         text: "Effects"
-        position: [47, 2]
+        position: [43, 2]
       abilities:
         from: .tab_pane
         position: [0, 8]

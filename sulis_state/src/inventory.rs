@@ -314,6 +314,10 @@ impl Inventory {
         };
     }
 
+    pub fn clear_quick(&mut self, quick_slot: QuickSlot) {
+        self.quick.remove(&quick_slot);
+    }
+
     /// attempts to set the item at the given index as a quick item.  returns
     /// true if successful, false if not
     pub fn set_quick(&mut self, index: usize, quick_slot: QuickSlot) -> bool {

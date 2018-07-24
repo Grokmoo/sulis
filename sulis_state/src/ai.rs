@@ -132,10 +132,13 @@ impl EntityAI {
         let mgr = GameState::turn_manager();
         let mgr = mgr.borrow();
 
+        let area_id = self.entity.borrow().location.area_id.to_string();
+
         let mut dists = Vec::new();
         for target in mgr.entity_iter() {
             if !self.entity.borrow().is_hostile(&target) { continue; }
             if target.borrow().actor.stats.hidden { continue; }
+            if !target.borrow().location.is_in_area_id(&area_id) { continue; }
 
             let dist = self.entity.borrow().dist_to_entity(&target);
             dists.push((target, (dist * 100.0) as i32));

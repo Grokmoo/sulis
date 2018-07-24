@@ -748,7 +748,7 @@ impl GameState {
     }
 
     /// Returns true if the game is currently in turn mode, false otherwise
-    pub fn is_in_turn_mode() -> bool {
+    pub fn is_combat_active() -> bool {
         let mgr = GameState::turn_manager();
         let mgr = mgr.borrow();
         mgr.is_combat_active()

@@ -5,3 +5,6 @@ states:
     active: bg_transparent_active
     active + hover: bg_transparent_active
     pressed + hover: bg_transparent_active
+    disabled: bg_transparent_disabled
+    disabled + hover: bg_transparent_disabled
+    disabled + pressed + hover: bg_transparent_disabled

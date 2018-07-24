@@ -171,6 +171,27 @@ impl ActorState {
         self.ability_states.get_mut(id)
     }
 
+    /// Returns true if the parent can swap weapons, false otherwise
+    pub fn can_swap_weapons(&self) -> bool {
+        self.ap >= Module::rules().swap_weapons_ap
+    }
+
+    /// Returns true if the item at the given index can be activated,
+    /// false otherwise
+    pub fn can_use(&self, item_index: usize) -> bool {
+        match &self.inventory.items.get(item_index) {
+            None => false,
+            Some(&(_, ref item_state)) => {
+                match &item_state.item.usable {
+                    None => false,
+                    Some(usable) => {
+                        self.ap >= usable.ap
+                    }
+                }
+            }
+        }
+    }
+
     /// Returns true if the ability state for the given ability can be
     /// activated (any active ability) or deactivated (only relevant for modes)
     pub fn can_toggle(&self, id: &str) -> bool {
@@ -436,6 +457,29 @@ impl ActorState {
         }
     }
 
+    // called after adding an item to the inventory.  if the quantity in
+    // the inventory is equal to quantity, it means the item was newly
+    // added and should be added to a quickslot if possible
+    fn check_add_to_quickslot(&mut self, index: usize, quantity: u32) {
+        {
+            let (qty, item_state) = match self.inventory.items.get(index) {
+                None => return,
+                Some(i) => i,
+            };
+
+            if *qty != quantity { return; }
+
+            if item_state.item.usable.is_none() { return; }
+        }
+
+        for slot in QuickSlot::usable_iter() {
+            if self.inventory.get_quick(*slot).is_some() { continue; }
+
+            self.set_quick(index, *slot);
+            return;
+        }
+    }
+
     pub fn take_all(&mut self, prop_index: usize) {
         let area_state = GameState::area_state();
         let mut area_state = area_state.borrow_mut();
@@ -451,7 +495,8 @@ impl ActorState {
             loop {
                 if let Some((qty, item_state)) = prop_state.remove_all_at(i) {
                     if !self.check_add_coins(qty, &item_state) {
-                        self.inventory.items.add_quantity(qty, item_state);
+                        let index = self.inventory.items.add_quantity(qty, item_state);
+                        self.check_add_to_quickslot(index, qty);
                     }
                 }
 
@@ -470,7 +515,8 @@ impl ActorState {
 
         if let Some((qty, item_state)) = prop_state.remove_all_at(item_index) {
             if !self.check_add_coins(qty, &item_state) {
-                self.inventory.items.add_quantity(qty, item_state);
+                let index = self.inventory.items.add_quantity(qty, item_state);
+                self.check_add_to_quickslot(index, qty);
             }
         }
 
@@ -479,7 +525,8 @@ impl ActorState {
 
     pub fn add_item(&mut self, item_state: ItemState) {
         if !self.check_add_coins(1, &item_state) {
-            self.inventory.items.add(item_state);
+            let index = self.inventory.items.add(item_state);
+            self.check_add_to_quickslot(index, 1);
         }
         self.listeners.notify(&self);
     }
@@ -489,10 +536,20 @@ impl ActorState {
         self.listeners.notify(&self);
     }
 
+    pub fn clear_quick(&mut self, slot: QuickSlot) {
+        self.inventory.clear_quick(slot);
+        self.listeners.notify(&self);
+    }
+
     pub fn swap_weapon_set(&mut self) {
+        let swap_ap = Module::rules().swap_weapons_ap;
+        if self.ap < swap_ap { return; }
         self.inventory.swap_weapon_set();
         self.compute_stats();
         self.texture_cache_invalid = true;
+        if GameState::is_combat_active() {
+            self.remove_ap(swap_ap);
+        }
     }
 
     pub fn equip(&mut self, index: usize) -> bool {

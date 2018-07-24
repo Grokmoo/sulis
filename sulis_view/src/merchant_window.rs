@@ -16,20 +16,20 @@
 
 use std::any::Any;
 use std::rc::Rc;
-use std::cell::RefCell;
+use std::cell::{Cell, RefCell};
 
 use sulis_state::{ChangeListener, EntityState, GameState};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{Button, Label};
 
-use item_button::buy_item_cb;
-use ItemButton;
+use {ItemListPane, item_list_pane::Filter};
 
 pub const NAME: &str = "merchant_window";
 
 pub struct MerchantWindow {
     merchant_id: String,
     player: Rc<RefCell<EntityState>>,
+    filter: Rc<Cell<Filter>>,
 }
 
 impl MerchantWindow {
@@ -37,6 +37,7 @@ impl MerchantWindow {
         Rc::new(RefCell::new(MerchantWindow {
             merchant_id: merchant_id.to_string(),
             player,
+            filter: Rc::new(Cell::new(Filter::All)),
         }))
     }
 
@@ -62,31 +63,27 @@ impl WidgetKind for MerchantWindow {
     }
 
     fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
-        let area_state = GameState::area_state();
-        let mut area_state = area_state.borrow_mut();
+        {
+            let area_state = GameState::area_state();
+            let mut area_state = area_state.borrow_mut();
 
-        let mut merchant = area_state.get_merchant_mut(&self.merchant_id);
-        let merchant = match merchant {
-            None => return Vec::new(),
-            Some(ref mut merchant) => merchant,
-        };
+            let mut merchant = area_state.get_merchant_mut(&self.merchant_id);
+            let merchant = match merchant {
+                None => return Vec::new(),
+                Some(ref mut merchant) => merchant,
+            };
 
-        merchant.listeners.add(ChangeListener::invalidate(NAME, widget));
+            merchant.listeners.add(ChangeListener::invalidate(NAME, widget));
+        }
 
         let title = Widget::with_theme(Label::empty(), "title");
 
         let close = Widget::with_theme(Button::empty(), "close");
         close.borrow_mut().state.add_callback(Callback::remove_parent());
 
-        let list_content = Widget::empty("items_list");
-        for (index, &(qty, ref item)) in merchant.items().iter().enumerate() {
-            let item_button = ItemButton::merchant(item.item.icon.id(), qty, index, &self.merchant_id);
-            item_button.borrow_mut().add_action("Buy", buy_item_cb(&self.player,
-                &self.merchant_id, index));
+        let item_list_pane = Widget::with_defaults(
+            ItemListPane::new_merchant(&self.player, self.merchant_id.to_string(), &self.filter));
 
-            Widget::add_child_to(&list_content, Widget::with_defaults(item_button));
-        }
-
-        vec![title, close, list_content]
+        vec![title, close, item_list_pane]
     }
 }

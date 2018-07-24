@@ -65,6 +65,7 @@ impl WidgetKind for PortraitView {
             Widget::add_child_to(&root, window);
         })));
         level_up.borrow_mut().state.set_visible(entity.actor.has_level_up());
+        level_up.borrow_mut().state.set_enabled(!GameState::is_combat_active());
 
         vec![portrait, hp_bar, level_up]
     }

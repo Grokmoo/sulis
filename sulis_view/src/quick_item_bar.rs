@@ -22,7 +22,7 @@ use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_rules::QuickSlot;
 use sulis_state::{ChangeListener, EntityState, GameState};
 use sulis_widgets::{Label, Button};
-use {item_button::use_item_cb, ItemButton};
+use {item_button::{clear_quickslot_cb, use_item_cb}, ItemButton};
 
 pub const NAME: &str = "quick_item_bar";
 
@@ -66,6 +66,7 @@ impl WidgetKind for QuickItemBar {
             let bar = Widget::downcast_kind_mut::<QuickItemBar>(&parent);
             bar.entity.borrow_mut().actor.swap_weapon_set();
         })));
+        swap_weapons.borrow_mut().state.set_enabled(self.entity.borrow().actor.can_swap_weapons());
 
         let usable1 = create_button(&self.entity, QuickSlot::Usable1, "usable1");
         let usable2 = create_button(&self.entity, QuickSlot::Usable2, "usable2");
@@ -89,7 +90,10 @@ fn create_button(entity: &Rc<RefCell<EntityState>>, slot: QuickSlot,
             let button = ItemButton::inventory(entity, item_state.item.icon.id(),
                 *qty, index);
             button.borrow_mut().add_action("Use", use_item_cb(entity, index));
-            Widget::with_theme(button, theme_id)
+            button.borrow_mut().add_action("Clear Use Slot", clear_quickslot_cb(entity, slot));
+            let widget = Widget::with_theme(button, theme_id);
+            widget.borrow_mut().state.set_enabled(actor.can_use(index));
+            widget
         }
     }
 }

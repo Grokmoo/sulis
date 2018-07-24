@@ -94,6 +94,7 @@ impl WidgetKind for CharacterWindow {
             window.borrow_mut().state.set_modal(true);
             Widget::add_child_to(&root, window);
         })));
+        level_up.borrow_mut().state.set_enabled(!GameState::is_combat_active());
 
         let char_pane = Widget::with_theme(Button::empty(), "char_pane_button");
         char_pane.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {

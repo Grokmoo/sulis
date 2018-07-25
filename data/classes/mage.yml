@@ -10,7 +10,7 @@ bonuses_per_level:
   - kind:
       ranged_accuracy: 2
   - kind:
-      spell_accuracy: 5
+      spell_accuracy: 4
   - kind:
       defense: 2
   - kind:
@@ -90,6 +90,46 @@ upgrades:
       - [ "2nd Circle", 4 ]
       - [ "3rd Circle", 2 ]
       - [ "4th Circle", 1 ]
+  11:
+    ability_choices: [ mage ]
+    group_uses_per_encounter:
+      - [ "Cantrips", 4 ]
+      - [ "1st Circle", 4 ]
+      - [ "2nd Circle", 4 ]
+      - [ "3rd Circle", 3 ]
+      - [ "4th Circle", 2 ]
+  12:
+    ability_choices: [ mage, general ]
+    group_uses_per_encounter:
+      - [ "Cantrips", 4 ]
+      - [ "1st Circle", 4 ]
+      - [ "2nd Circle", 4 ]
+      - [ "3rd Circle", 4 ]
+      - [ "4th Circle", 2 ]
+  13:
+    ability_choices: [ mage ]
+    group_uses_per_encounter:
+      - [ "Cantrips", 4 ]
+      - [ "1st Circle", 4 ]
+      - [ "2nd Circle", 4 ]
+      - [ "3rd Circle", 4 ]
+      - [ "4th Circle", 3 ]
+  14:
+    ability_choices: [ mage ]
+    group_uses_per_encounter:
+      - [ "Cantrips", 4 ]
+      - [ "1st Circle", 4 ]
+      - [ "2nd Circle", 4 ]
+      - [ "3rd Circle", 4 ]
+      - [ "4th Circle", 4 ]
+  15:
+    ability_choices: [ mage, general ]
+    group_uses_per_encounter:
+      - [ "Cantrips", 4 ]
+      - [ "1st Circle", 4 ]
+      - [ "2nd Circle", 4 ]
+      - [ "3rd Circle", 4 ]
+      - [ "4th Circle", 4 ]
 kits:
   - name: Mage
     default_attributes:
@@ -100,7 +140,7 @@ kits:
       int: 17
       wis: 12
     starting_equipment: [ quarterstaff, boots_leather, torso_shirt, legs_pants, potion_healing, potion_mind ]
-    starting_coins: 200
+    starting_coins: 500
     description: |
       A mage with the capability to cast a variety of spells from the circles of magic.
 

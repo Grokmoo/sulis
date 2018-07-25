@@ -7,9 +7,9 @@ bonuses_per_level:
   - kind:
       hit_points: 10
   - kind:
-      melee_accuracy: 5
+      melee_accuracy: 4
   - kind:
-      ranged_accuracy: 5
+      ranged_accuracy: 4
   - kind:
       defense: 3
   - kind:
@@ -78,6 +78,31 @@ upgrades:
     group_uses_per_encounter:
       - [ Fighter, 5 ]
       - [ Modes, ~ ]
+  11:
+    ability_choices: [ fighter, general ]
+    group_uses_per_encounter:
+      - [ Fighter, 5 ]
+      - [ Modes, ~ ]
+  12:
+    ability_choices: [ fighter ]
+    group_uses_per_encounter:
+      - [ Fighter, 5 ]
+      - [ Modes, ~ ]
+  13:
+    ability_choices: [ fighter, general ]
+    group_uses_per_encounter:
+      - [ Fighter, 6 ]
+      - [ Modes, ~ ]
+  14:
+    ability_choices: [ fighter ]
+    group_uses_per_encounter:
+      - [ Fighter, 6 ]
+      - [ Modes, ~ ]
+  15:
+    ability_choices: [ fighter, general ]
+    group_uses_per_encounter:
+      - [ Fighter, 6 ]
+      - [ Modes, ~ ]
 kits:
   - name: Brawler
     default_attributes:
@@ -112,6 +137,6 @@ kits:
       int: 10
       wis: 10
     starting_equipment: [ shortsword, shield_small, boots_leather, torso_mail, legs_leather, gloves_leather, potion_healing, potion_power, potion_power ]
-    starting_coins: 200
+    starting_coins: 100
     description: |
       A fighter who will typically use heavy armor and a large shield.  While certainly capable of dishing out punishment, their primary role on the battlefield is often to protect their compatriots.

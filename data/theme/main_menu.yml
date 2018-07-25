@@ -198,7 +198,7 @@ children:
         height_relative: Max
         preferred_size: [115, -15]
         position: [50, 10]
-        text: "#description#"
+        text: "[s=7.0|#description#]"
   loading_screen:
     background: bg_base
     width_relative: Max

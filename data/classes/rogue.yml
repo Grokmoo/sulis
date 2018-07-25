@@ -71,6 +71,31 @@ upgrades:
     group_uses_per_encounter:
       - [ Rogue, 5 ]
       - [ Modes, ~ ]
+  11:
+    ability_choices: [ rogue, general ]
+    group_uses_per_encounter:
+      - [ Rogue, 5 ]
+      - [ Modes, ~ ]
+  12:
+    ability_choices: [ rogue ]
+    group_uses_per_encounter:
+      - [ Rogue, 5 ]
+      - [ Modes, ~ ]
+  13:
+    ability_choices: [ rogue, general ]
+    group_uses_per_encounter:
+      - [ Rogue, 6 ]
+      - [ Modes, ~ ]
+  14:
+    ability_choices: [ rogue ]
+    group_uses_per_encounter:
+      - [ Rogue, 6 ]
+      - [ Modes, ~ ]
+  15:
+    ability_choices: [ rogue, general ]
+    group_uses_per_encounter:
+      - [ Rogue, 6 ]
+      - [ Modes, ~ ]
 kits:
   - name: Swashbuckler
     default_attributes:
@@ -81,7 +106,7 @@ kits:
       int: 13
       wis: 10
     starting_equipment: [ shortsword, boots_leather, gloves_leather, torso_leather, legs_leather, potion_healing, potion_power, potion_mind ]
-    starting_coins: 200
+    starting_coins: 300
     description: |
       Not afraid to get their hands dirty on the front lines, the Swashbuckler will use every trick in the book to keep themselves out of harm's way and their enemies in it.  They can be very effective, but are also vulnerable to being overwhelmed.
   - name: Mechanic
@@ -93,7 +118,7 @@ kits:
       int: 14
       wis: 10
     starting_equipment: [ crossbow, boots_leather, torso_shirt, legs_pants, potion_healing, potion_power, potion_mind ]
-    starting_coins: 200
+    starting_coins: 300
     description: |
       An expert in locks, traps, and all things mechanical thanks to keen senses and intellect.  Prefers to keep out of harms way in combat, using precise ranged strikes.
   - name: Assassin
@@ -105,6 +130,6 @@ kits:
       int: 12
       wis: 12
     starting_equipment: [ dagger, boots_leather, gloves_leather, torso_leather, legs_pants, potion_healing, potion_power, potion_mind ]
-    starting_coins: 200
+    starting_coins: 300
     description: |
       Striking from the shadows when least expected, Assassins can bring down the most dangerous targets in seconds, ideally giving their prey no time to react.  They can be quickly brought down themselves, though, if caught out in the open.

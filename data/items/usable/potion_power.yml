@@ -9,4 +9,4 @@ usable:
   ap: 2000
   duration:
     Rounds: 3
-  short_description: "Temporarily increases your physical attributes"
+  short_description: "Temporarily increases your physical attributes."

@@ -48,7 +48,7 @@ end
 function push_target(parent, ability, targets)
   target = targets:first()
 
-  hit = parent:special_attack(target, "Reflex")
+  hit = parent:special_attack(target, "Reflex", "Spell")
   
   pushback_dist = 8 - target:width()
   if hit:is_miss() then

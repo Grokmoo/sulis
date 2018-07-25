@@ -172,7 +172,6 @@ impl Scrollbar {
 
         self.max_y = max_y - self.content_height + widget.borrow().state.border.vertical()
             - widget.borrow().state.position.y;
-        // self.max_y = max_y - widget.borrow().state.inner_size.height - widget.borrow().state.position.y;
 
         if self.max_y < self.min_y { self.max_y = self.min_y }
     }
@@ -200,11 +199,10 @@ impl WidgetKind for Scrollbar {
 
 
         let widget_height = self.content_height as f32;
-        // let widget_height = widget_ref.borrow().state.size.height as f32;
         let thumb_frac = widget_height / ((self.max_y as f32 - self.min_y as f32) + widget_height);
 
-        // self.thumb.borrow_mut().state.set_enabled(thumb_frac < 1.0);
         self.thumb.borrow_mut().state.set_enabled(false);
+        widget.state.set_visible(thumb_frac < 1.0);
 
         let inner_height = widget.state.inner_height() - self.up.borrow().state.size.height -
             self.down.borrow().state.size.height;

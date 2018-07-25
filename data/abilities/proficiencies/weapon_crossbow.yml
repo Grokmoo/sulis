@@ -11,7 +11,7 @@ upgrades:
       You gain a bonus to accuracy while using crossbows.
     bonuses:
       - kind:
-          accuracy: 10
+          ranged_accuracy: 10
         when:
           AttackWithWeapon: Crossbow
   - description: |

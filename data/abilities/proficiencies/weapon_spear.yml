@@ -11,7 +11,7 @@ upgrades:
       You gain a bonus to accuracy while using spears.
     bonuses:
       - kind:
-          accuracy: 10
+          melee_accuracy: 10
         when:
           AttackWithWeapon: Spear
   - description: |

@@ -21,7 +21,7 @@ use std::cell::RefCell;
 use sulis_core::util::ExtInt;
 use sulis_core::ui::{Callback, Widget, WidgetKind, WidgetState};
 use sulis_rules::{Attribute, DamageKind};
-use sulis_widgets::{Button, Label, TextArea};
+use sulis_widgets::{Button, Label, TextArea, ScrollPane};
 use sulis_module::Module;
 use sulis_state::{ActorState, Effect, GameState, ChangeListener, EntityState};
 
@@ -142,7 +142,8 @@ pub fn create_abilities_pane(pc: &ActorState) -> Rc<RefCell<Widget>> {
 
     let details = Widget::with_theme(TextArea::empty(), "details");
 
-    let list = Widget::empty("list");
+    let scrollpane = ScrollPane::new();
+    let list = Widget::with_theme(scrollpane.clone(), "list");
     for ability in pc.actor.abilities.iter() {
         let level = ability.level;
         let ability = &ability.ability;
@@ -157,7 +158,7 @@ pub fn create_abilities_pane(pc: &ActorState) -> Rc<RefCell<Widget>> {
             details_ref.borrow_mut().invalidate_layout();
         })));
 
-        Widget::add_child_to(&list, button);
+        scrollpane.borrow().add_to_content(button);
     }
 
     Widget::add_child_to(&abilities, list);
@@ -166,7 +167,8 @@ pub fn create_abilities_pane(pc: &ActorState) -> Rc<RefCell<Widget>> {
 }
 
 pub fn create_effects_pane(pc: &mut ActorState) -> Rc<RefCell<Widget>> {
-    let effects = Widget::empty("effects");
+    let scrollpane = ScrollPane::new();
+    let effects = Widget::with_theme(scrollpane.clone(), "effects");
 
     let mgr = GameState::turn_manager();
     let mut mgr = mgr.borrow_mut();
@@ -182,7 +184,7 @@ pub fn create_effects_pane(pc: &mut ActorState) -> Rc<RefCell<Widget>> {
             widget_ref.borrow_mut().invalidate_layout();
         })));
 
-        Widget::add_child_to(&effects, widget);
+        scrollpane.borrow().add_to_content(widget);
     }
 
     effects
@@ -244,7 +246,10 @@ pub fn create_details_text_box(pc: &ActorState) -> Rc<RefCell<Widget>> {
                 state.add_text_arg(&format!("{}_armor_penetration", index)
                                    , &attack.damage.ap().to_string());
             }
-            add_if_nonzero(state, index, "accuracy", attack.bonuses.accuracy as f32);
+
+            add_if_nonzero(state, index, "spell_accuracy", attack.bonuses.spell_accuracy as f32);
+            add_if_nonzero(state, index, "ranged_accuracy", attack.bonuses.ranged_accuracy as f32);
+            add_if_nonzero(state, index, "melee_accuracy", attack.bonuses.melee_accuracy as f32);
             add_if_nonzero(state, index, "crit_threshold", attack.bonuses.crit_threshold as f32);
             add_if_nonzero(state, index, "hit_threshold", attack.bonuses.hit_threshold as f32);
             add_if_nonzero(state, index, "graze_threshold", attack.bonuses.graze_threshold as f32);
@@ -272,7 +277,9 @@ pub fn create_details_text_box(pc: &ActorState) -> Rc<RefCell<Widget>> {
             &stats.armor.amount(*kind).to_string());
         }
 
-        state.add_text_arg("accuracy", &stats.accuracy.to_string());
+        state.add_text_arg("melee_accuracy", &stats.melee_accuracy.to_string());
+        state.add_text_arg("ranged_accuracy", &stats.ranged_accuracy.to_string());
+        state.add_text_arg("spell_accuracy", &stats.spell_accuracy.to_string());
         state.add_text_arg("defense", &stats.defense.to_string());
         state.add_text_arg("fortitude", &stats.fortitude.to_string());
         state.add_text_arg("reflex", &stats.reflex.to_string());

@@ -21,7 +21,7 @@ function on_target_select(parent, ability, targets)
   cb:set_after_attack_fn("create_feint_effect")
   
   ability:activate(parent)
-  parent:anim_special_attack(target, "Will", 0, 0, 0, "Raw", cb)
+  parent:anim_special_attack(target, "Will", "Melee", 0, 0, 0, "Raw", cb)
 end
 
 function create_feint_effect(parent, ability, targets, hit)

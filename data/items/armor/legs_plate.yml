@@ -14,6 +14,8 @@ equippable:
     - kind: { armor_kind: [ Piercing, 1] }
     - kind: { armor_kind: [ Electrical, -2] }
     - kind: { movement_rate: -0.08 }
+    - kind: { attribute: [Dexterity, -1] }
+    - kind: { spell_accuracy: -5 }
 image:
   Legs:
     creatures/legs_plate

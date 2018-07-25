@@ -151,7 +151,11 @@ impl EntityState {
         let mgr = GameState::turn_manager();
         let mgr = mgr.borrow();
         self.actor.effects_iter().flat_map(|index| {
-            mgr.effect(*index).callbacks()
+            if let Some(effect) = mgr.effect_checked(*index) {
+                effect.callbacks()
+            } else {
+                Vec::new()
+            }
         }).collect()
     }
 

@@ -2,6 +2,8 @@
 children:
   main_menu:
     children:
+      tooltip:
+        from: .tooltip
       title:
         from: .label
         text_params:
@@ -177,6 +179,7 @@ children:
         position: [-50, 10]
       modules_list:
         from: .list_box
+        border: [2, 2, 2, 2]
         preferred_size: [100, -35]
         position: [-60, 18]
         x_relative: Center

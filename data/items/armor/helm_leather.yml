@@ -11,6 +11,7 @@ equippable:
   bonuses:
     - kind: { armor: 1 }
     - kind: { movement_rate: -0.02 }
+    - kind: { spell_accuracy: -2 }
 image:
   Head:
     creatures/helm_leather

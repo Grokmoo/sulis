@@ -21,7 +21,7 @@ function on_target_select(parent, ability, targets)
   cb:set_after_attack_fn("do_attack")
   
   ability:activate(parent)
-  parent:anim_special_attack(target, "Dummy", 0, 0, 0, "Raw", cb)
+  parent:anim_special_attack(target, "Dummy", "Melee", 0, 0, 0, "Raw", cb)
   
   anim = target:create_color_anim(1.0)
   anim:set_color(anim:param(1.0, 0.0),

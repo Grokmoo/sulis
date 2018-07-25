@@ -41,7 +41,7 @@ function attack_target(parent, ability, targets)
 
   if not target:is_valid() then return end
   
-  hit = parent:special_attack(target, "Reflex", 10, 15, 0, "Acid")
+  hit = parent:special_attack(target, "Reflex", "Spell", 10, 15, 0, "Acid")
   duration = 3
   if hit:is_miss() then
     return

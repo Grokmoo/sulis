@@ -11,6 +11,7 @@ equippable:
   bonuses:
     - kind: { armor: 2 }
     - kind: { movement_rate: -0.01 }
+    - kind: { spell_accuracy: -8 }
 image:
   Hands:
     creatures/gloves_mail

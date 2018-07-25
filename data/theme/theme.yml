@@ -14,7 +14,7 @@ children:
     background: 80_transparent_fill
     width_relative: Custom
     height_relative: Custom
-    preferred_size: [50, 14]
+    preferred_size: [60, 14]
     position: [0, 0]
     x_relative: Custom
     y_relative: Custom
@@ -52,6 +52,8 @@ children:
     height_relative: Custom
     x_relative: Custom
     y_relative: Custom
+  tooltip:
+    from: .tooltip
   mouse_over:
     from: .text_area
     border: { top: 1, bottom: 0, left: 2, right: 2 }
@@ -117,6 +119,8 @@ children:
         foreground: select_all
         border: [0, 0, 0, 0]
         preferred_size: [6, 6]
+        custom:
+          tooltip: "Select All Party Members"
       portrait_pane:
         preferred_size: [100, 0]
         position: [7, 0]
@@ -148,6 +152,8 @@ children:
                 text: "+"
                 text_params:
                   scale: 7.0
+                custom:
+                  tooltip: "Level Up"
                 x_relative: Max
                 preferred_size: [7, 7]
       quick_item_bar:
@@ -160,7 +166,7 @@ children:
         children:
           title:
             from: .label
-            text: "Quick Items"
+            text: "Usable Items"
             position: [0, 0]
             preferred_size: [0, 8]
             width_relative: Max
@@ -174,6 +180,8 @@ children:
             preferred_size: [7, 7]
             position: [0, 0]
             x_relative: Max
+            custom:
+              tooltip: "Swap Weapon Set"
           usable1:
             from: .item_button
             background: background_transparent
@@ -246,6 +254,8 @@ children:
                         height_relative: Max
       end_turn_button:
         from: .button
+        custom:
+          tooltip: "End Turn"
         background: background_rounded
         preferred_size: [24, 24]
         y_relative: Max
@@ -260,22 +270,32 @@ children:
         x_relative: Max
       map_button:
         from: .bottom_pane.window_button
+        custom:
+          tooltip: "Map"
         position: [-26, 0]
         foreground: map_icon
       log_button:
         from: .bottom_pane.window_button
+        custom:
+          tooltip: "Log"
         position: [-26, -13]
         foreground: log_icon
       character_button:
         from: .bottom_pane.window_button
+        custom:
+          tooltip: "Character Sheet"
         position: [-26, -26]
         foreground: char_icon
       inventory_button:
         from: .bottom_pane.window_button
+        custom:
+          tooltip: "Inventory"
         position: [-13, -26]
         foreground: inv_icon
       menu_button:
         from: .bottom_pane.window_button
+        custom:
+          tooltip: "Menu"
         position: [0, -26]
         foreground: menu_icon
   area:
@@ -596,7 +616,10 @@ children:
         text: "Effects"
         position: [43, 2]
       abilities:
-        from: .tab_pane
+        background: bg_rounded
+        border: [2, 2, 2, 2]
+        width_relative: Max
+        height_relative: Max
         position: [0, 8]
         preferred_size: [0, -8]
         children:
@@ -609,30 +632,56 @@ children:
             preferred_size: [0, 66]
             y_relative: Max
           list:
+            preferred_size: [0, -68]
             width_relative: Max
             height_relative: Max
-            preferred_size: [0, -68]
-            layout: Grid
-            layout_spacing: { top :0, bottom: 1, left: 0, right: 1 }
             children:
-              ability_button:
-                from: .button
-                preferred_size: [12, 12]
-                foreground: "#icon#"
+              scrollbar:
+                from: .scrollbar
+                custom:
+                  scroll_delta: 15
+              content:
+                preferred_size: [-7, 0]
+                layout: Grid
+                layout_spacing: { top :0, bottom: 2, left: 0, right: 2 }
+                width_relative: Max
+                height_relative: Max
+                children:
+                  ability_button:
+                    from: .button
+                    preferred_size: [12, 12]
+                    foreground: "#icon#"
       effects:
-        from: .tab_pane
+        background: bg_rounded
+        border: [2, 2, 2, 2]
+        width_relative: Max
+        height_relative: Max
         preferred_size: [0, -8]
         position: [0, 8]
         layout: Grid
         layout_spacing: { top: 0, bottom: 1, left: 1, right: 0 }
         children:
-          effect:
-            from: .bonus_text
-            background: bg_rounded
-            border: [1, 1, 1, 1]
-            preferred_size: [50, 35]
+          scrollbar:
+            from: .scrollbar
+            custom:
+              scroll_delta: 10
+          content:
+            preferred_size: [-7, 0]
+            layout: Grid
+            layout_spacing: { top :0, bottom: 1, left: 0, right: 1 }
+            width_relative: Max
+            height_relative: Max
+            children:
+              effect:
+                from: .bonus_text
+                background: bg_rounded
+                border: [1, 1, 1, 1]
+                preferred_size: [48, 35]
       details:
-        from: .tab_pane
+        background: bg_rounded
+        border: [2, 2, 2, 2]
+        width_relative: Max
+        height_relative: Max
         preferred_size: [0, -8]
         position: [0, 8]
         text_params:
@@ -648,7 +697,9 @@ children:
           [?0_damage_min;s=6;x=0;y=25|Main Hand]
           [?0_damage_min;s=5;x=0|Damage: #0_damage_min# to #0_damage_max#
           ][?0_armor_penetration;s=5;x=0|AP: #0_armor_penetration#
-          ][?0_accuracy;s=5;x=0|Accuracy: #0_accuracy#
+          ][?0_melee_accuracy;s=5;x=0|Accuracy: #0_melee_accuracy#
+          ][?0_ranged_accuracy;s=5;x=0|Accuracy: #0_ranged_accuracy#
+          ][?0_spell_accuracy;s=5;x=0|Accuracy: #0_spell_accuracy#
           ][?0_crit_threshold;s=5;x=0|Crit Threshold: #0_crit_threshold#
           ][?0_hit_threshold;s=5;x=0|Hit Threshold: #0_hit_threshold#
           ][?0_graze_threshold;s=5;x=0|Graze Threshold: #0_graze_threshold#
@@ -659,14 +710,17 @@ children:
           [?1_damage_min;s=6;x=35;y=25|Off Hand]
           [?1_damage_min;s=5;x=35|Damage: #1_damage_min# to #1_damage_max#
           ][?1_armor_penetration;s=5;x=35|AP: #1_armor_penetration#
-          ][?1_accuracy;s=5;x=35|Accuracy: #1_accuracy#
+          ][?1_melee_accuracy;s=5;x=0|Accuracy: #1_melee_accuracy#
+          ][?1_ranged_accuracy;s=5;x=0|Accuracy: #1_ranged_accuracy#
+          ][?1_spell_accuracy;s=5;x=0|Accuracy: #1_spell_accuracy#
           ][?1_crit_threshold;s=5;x=35|Crit Threshold: #1_crit_threshold#
           ][?1_hit_threshold;s=5;x=35|Hit Threshold: #1_hit_threshold#
           ][?1_graze_threshold;s=5;x=35|Graze Threshold: #1_graze_threshold#
           ][?1_crit_multiplier;s=5;x=35|Crit Multiplier: #1_crit_multiplier#
           ][?1_hit_multiplier;s=5;x=35|Hit Multiplier: #1_hit_multiplier#
           ][?1_graze_multiplier;s=5;x=35|Graze Multiplier: #1_graze_multiplier#]
-          [s=6;x=0;y=48|Accuracy: #accuracy#]
+          [s=6;x=0;y=44|Accuracy]
+          [s=5|[x=0|Melee: #melee_accuracy#][x=28|Ranged: #ranged_accuracy#][x=56|Spell: #spell_accuracy#]]
           [s=4|]
           [s=6.0;x=0|Armor: #armor#][?armor_slashing;s=6.0| (Slashing: #armor_slashing#)][?armor_piercing;s=6.0| (Piercing: #armor_piercing#)][?armor_crushing;s=6.0| (Crushing: #armor_crushing#)][?armor_acid;s=6.0| (Acid: #armor_acid#)][?armor_cold;s=6.0| (Cold: #armor_cold#)][?armor_electrical;s=6.0| (Electrical: #armor_electrical#)][?armor_fire;s=6.0| (Fire: #armor_fire#)][?armor_sonic;s=6.0| (Sonic: #armor_sonic#)]
           [s=5|[x=0|Defense: #defense#][x=28|Fortitude: #fortitude#][x=56|Reflex: #reflex#][x=84|Will: #will#]]
@@ -707,7 +761,7 @@ children:
         from: .text_area
         border: [2, 2, 2, 2]
         text: |
-          [s=9|#name#]
+          #description#
           [s=9|]
           [s=7|Attribute Bonuses]
           [?str|Strength: #str#
@@ -719,13 +773,14 @@ children:
           ]
           [s=7|Base Stats]
           [?initiative|[s=6.0|Initiative: #initiative#]
-          ][?accuracy|[s=6.0|Accuracy: #accuracy#]
+          ][?melee_accuracy|[s=6.0|Melee Accuracy: #melee_accuracy#]
+          ][?ranged_accuracy|[s=6.0|Ranged Accuracy: #ranged_accuracy#]
+          ][?spell_accuracy|[s=6.0|Spell Accuracy: #spell_accuracy#]
           ][?defense|[s=6.0|Defense: #defense#]
           ][?fortitude|[s=6.0|Fortitude: #fortitude#]
           ][?reflex|[s=6.0|Reflex: #reflex#]
           ][?will|[s=6.0|Will: #will#]
           ]
-          #description#
         width_relative: Max
         height_relative: Max
   ability_pane:
@@ -755,9 +810,9 @@ children:
           [s=7;c=f00|Prereqs]
           [?prereq_total_level|Level: #prereq_total_level#
           ][?prereq_race|Race: #prereq_race#
-          ][?prereq_class_0|#prereq_class_0#: #prereq_level_0#
-          ][?prereq_class_0|#prereq_class_1#: #prereq_level_1#
-          ][?prereq_class_0|#prereq_class_2#: #prereq_level_2#
+          ][?prereq_class_0|Level #prereq_level_0# #prereq_class_0#
+          ][?prereq_class_1|Level #prereq_level_1# #prereq_class_1#
+          ][?prereq_class_2|Level #prereq_level_2# #prereq_class_2#
           ][?prereq_str|Strength: #prereq_str#
           ][?prereq_dex|Dexterity: #prereq_dex#
           ][?prereq_end|Endurance: #prereq_end#
@@ -779,32 +834,33 @@ children:
         from: .text_area
         border: [2, 2, 2, 2]
         text: |
-          [s=9|#name#]
+          #description#
           [s=9|]
           [s=7|Bonuses per Level]
           [?ability_group_0|#ability_group_0# ability uses per encounter: #ability_group_0_uses_per_encounter#
           ][?ability_group_1|#ability_group_1# ability uses per encounter: #ability_group_1_uses_per_encounter#
           ][?ability_group_2|#ability_group_2# ability uses per encounter: #ability_group_2_uses_per_encounter#
-          ][?str|Strength: #str#
-          ][?dex|Dexterity: #dex#
-          ][?end|Endurance: #end#
-          ][?per|Perception: #per#
-          ][?int|Intelligence: #int#
-          ][?wis|Wisdom: #wis#
-          ][?bonus_ap|AP: #bonus_ap#
+          ][?str|Strength: +#str#
+          ][?dex|Dexterity: +#dex#
+          ][?end|Endurance: +#end#
+          ][?per|Perception: +#per#
+          ][?int|Intelligence: +#int#
+          ][?wis|Wisdom: +#wis#
+          ][?bonus_ap|AP: +#bonus_ap#
           ][?min_bonus_damage_0|[s=6.0|Damage: #min_bonus_damage_0# to #max_bonus_damage_0# [?bonus_damage_kind_0;c=f00|#bonus_damage_kind_0#]]
           ][?bonus_reach|[s=6.0|Reach: #bonus_reach#]
           ][?bonus_range|[s=6.0|Range: #bonus_range#]
           ][?armor|[s=6.0|Armor: #armor#][?armor_slashing;s=5.0| (Slashing: #armor_slashing#)][?armor_piercing;s=5.0| (Piercing: #armor_piercing#)][?armor_crushing;s=5.0| (Crushing: #armor_crushing#)][?armor_acid;s=5.0| (Acid: #armor_acid#)][?armor_cold;s=5.0| (Cold: #armor_cold#)][?armor_electrical;s=5.0| (Electrical: #armor_electrical#)][?armor_fire;s=5.0| (Fire: #armor_fire#)][?armor_sonic;s=5.0| (Sonic: #armor_sonic#)]
-          ][?hit_points|[s=6.0|Hit Points: #hit_points#]
-          ][?accuracy|[s=6.0|Accuracy: #accuracy#]
-          ][?defense|[s=6.0|Defense: #defense#]
-          ][?fortitude|[s=6.0|Fortitude: #fortitude#]
-          ][?reflex|[s=6.0|Reflex: #reflex#]
-          ][?will|[s=6.0|Will: #will#]
-          ][?initiative|[s=6.0|Initiative: #initiative#]
+          ][?hit_points|[s=6.0|Hit Points: +#hit_points#]
+          ][?melee_accuracy|[s=6.0|Melee Accuracy: +#melee_accuracy#]
+          ][?ranged_accuracy|[s=6.0|Ranged Accuracy: +#ranged_accuracy#]
+          ][?spell_accuracy|[s=6.0|Spell Accuracy: +#spell_accuracy#]
+          ][?defense|[s=6.0|Defense: +#defense#]
+          ][?fortitude|[s=6.0|Fortitude: +#fortitude#]
+          ][?reflex|[s=6.0|Reflex: +#reflex#]
+          ][?will|[s=6.0|Will: +#will#]
+          ][?initiative|[s=6.0|Initiative: +#initiative#]
           ]
-          #description#
         width_relative: Max
         height_relative: Max
   game_over_window:
@@ -898,6 +954,7 @@ children:
       ][?active_mode;c=f00|Active Mode
       ][s=5|[?total_duration;c=f00|#remaining_duration# of #total_duration# Rounds Remaining
       ][?prof_not_met;s=5.0;c=f00|Proficiency Not Met
+      ][?any_armor|[s=6.0|Armor: ][?armor;s=6.0|#armor#][?armor_slashing;s=5.0| (Slashing: #armor_slashing#)][?armor_piercing;s=5.0| (Piercing: #armor_piercing#)][?armor_crushing;s=5.0| (Crushing: #armor_crushing#)][?armor_acid;s=5.0| (Acid: #armor_acid#)][?armor_cold;s=5.0| (Cold: #armor_cold#)][?armor_electrical;s=5.0| (Electrical: #armor_electrical#)][?armor_fire;s=5.0| (Fire: #armor_fire#)][?armor_sonic;s=5.0| (Sonic: #armor_sonic#)]
       ][?ability_group_0|#ability_group_0# ability uses per encounter: #ability_group_0_uses_per_encounter#
       ][?ability_group_1|#ability_group_1# ability uses per encounter: #ability_group_1_uses_per_encounter#
       ][?ability_group_2|#ability_group_2# ability uses per encounter: #ability_group_2_uses_per_encounter#
@@ -911,7 +968,9 @@ children:
       ][?min_damage|Damage: #min_damage# to #max_damage# [c=f00|#damage_kind#]
       ][?armor_penetration|Armor Penetration: #armor_penetration#
       ][?attack_min_bonus_damage|Damage: #attack_min_bonus_damage# to #attack_max_bonus_damage# [?attack_bonus_damage_kind;c=f00|#attack_bonus_damage_kind#]
-      ][?attack_accuracy|Accuracy: #attack_accuracy#
+      ][?attack_melee_accuracy|Melee Accuracy: #attack_melee_accuracy#
+      ][?attack_ranged_accuracy|Ranged Accuracy: #attack_ranged_accuracy#
+      ][?attack_spell_accuracy|Spell Accuracy: #attack_spell_accuracy#
       ][?attack_crit_threshold|Crit Threshold: #attack_crit_threshold#
       ][?attack_hit_threshold|Hit Threshold: #attack_hit_threshold#
       ][?attack_graze_threshold|Graze Threshold: #attack_graze_threshold#
@@ -925,10 +984,11 @@ children:
       ][?range|Range: #range#
       ][?bonus_reach|Reach: #bonus_reach#
       ][?bonus_range|Range: #bonus_range#
-      ][?any_armor|[?armor;s=6.0|Armor: #armor#][?armor_slashing;s=5.0| (Slashing: #armor_slashing#)][?armor_piercing;s=5.0| (Piercing: #armor_piercing#)][?armor_crushing;s=5.0| (Crushing: #armor_crushing#)][?armor_acid;s=5.0| (Acid: #armor_acid#)][?armor_cold;s=5.0| (Cold: #armor_cold#)][?armor_electrical;s=5.0| (Electrical: #armor_electrical#)][?armor_fire;s=5.0| (Fire: #armor_fire#)][?armor_sonic;s=5.0| (Sonic: #armor_sonic#)]
       ][?initiative|Initiative: #initiative#
       ][?hit_points|Hit Points: #hit_points#
-      ][?accuracy|Accuracy: #accuracy#
+      ][?melee_accuracy|Melee Accuracy: #melee_accuracy#
+      ][?ranged_accuracy|Ranged Accuracy: #ranged_accuracy#
+      ][?spell_accuracy|Spell Accuracy: #spell_accuracy#
       ][?defense|Defense: #defense#
       ][?fortitude|Fortitude: #fortitude#
       ][?reflex|Reflex: #reflex#

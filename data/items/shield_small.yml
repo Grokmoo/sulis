@@ -11,6 +11,8 @@ equippable:
         defense: 10
     - kind:
         movement_rate: -0.05
+    - kind:
+        spell_accuracy: -10
 image:
   HeldOff:
     creatures/shield_small

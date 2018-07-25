@@ -12,7 +12,7 @@ function on_target_select(parent, ability, targets)
 
   target = targets:first()
   
-  hit = parent:special_attack(target, "Reflex")
+  hit = parent:special_attack(target, "Reflex", "Spell")
   duration = ability:duration()
   if hit:is_miss() then
     return
@@ -27,7 +27,9 @@ function on_target_select(parent, ability, targets)
   target:take_damage(4, 8, "Acid")
   
   effect = target:create_effect(ability:name(), duration)
-  effect:add_num_bonus("accuracy", -10)
+  effect:add_num_bonus("melee_accuracy", -10)
+  effect:add_num_bonus("ranged_accuracy", -10)
+  effect:add_num_bonus("spell_accuracy", -10)
   
   cb = ability:create_callback(parent)
   cb:add_target(target)

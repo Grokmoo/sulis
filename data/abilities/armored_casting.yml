@@ -1,0 +1,34 @@
+id: armored_casting
+name: "Armored Casting"
+icon: abilities/armored_casting
+description: |
+  You are proficient in casting while wearing light armor, able to ignore most of the penalties to spell accuracy while doing so.
+bonuses:
+  - kind:
+      spell_accuracy: 2
+    when:
+      ArmorEquipped:
+        slot: Torso
+        kind: Light
+  - kind:
+      spell_accuracy: 1
+    when:
+      ArmorEquipped:
+        slot: Legs
+        kind: Light
+  - kind:
+      spell_accuracy: 3
+    when:
+      ArmorEquipped:
+        slot: Hands
+        kind: Light
+  - kind:
+      spell_accuracy: 1
+    when:
+      ArmorEquipped:
+        slot: Head
+        kind: Light
+prereqs:
+  abilities: [ armor_light ]
+  levels:
+    mage: 3

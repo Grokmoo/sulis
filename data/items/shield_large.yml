@@ -10,7 +10,11 @@ equippable:
     - kind:
         defense: 15
     - kind:
-        accuracy: -5
+        melee_accuracy: -5
+    - kind:
+        ranged_accuracy: -5
+    - kind:
+        spell_accuracy: -20
     - kind:
         movement_rate: -0.10
 image:

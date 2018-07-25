@@ -246,22 +246,23 @@ impl UserData for ScriptEntity {
         });
 
         methods.add_method("anim_special_attack", |_, entity,
-                           (target, attack_kind, min_damage, max_damage, ap, damage_kind, cb):
-                           (ScriptEntity, String, u32, u32, u32, String, Option<CallbackData>)| {
+            (target, attack_kind, accuracy_kind, min_damage, max_damage, ap, damage_kind, cb):
+            (ScriptEntity, String, String, u32, u32, u32, String, Option<CallbackData>)| {
+
             entity.check_not_equal(&target)?;
             let parent = entity.try_unwrap()?;
             let target = target.try_unwrap()?;
             let damage_kind = DamageKind::from_str(&damage_kind);
-            let attack_kind = AttackKind::from_str(&attack_kind);
+            let attack_kind = AttackKind::from_str(&attack_kind, &accuracy_kind);
             let mut cbs: Vec<Box<ScriptCallback>> = Vec::new();
             if let Some(cb) = cb {
                 cbs.push(Box::new(cb));
             }
             let time = CONFIG.display.animation_base_time_millis * 5;
-            let anim = animation::melee_attack_animation::new(&parent, &target,
+            let anim = animation::melee_attack_animation::new(&Rc::clone(&parent), &target,
                                                               time, cbs, Box::new(move |att, def| {
-                let attack = Attack::special(min_damage, max_damage, ap,
-                                             damage_kind, attack_kind.clone());
+                let attack = Attack::special(&parent.borrow().actor.stats, min_damage, max_damage,
+                    ap, damage_kind, attack_kind.clone());
 
                 ActorState::attack(att, def, &attack)
             }));
@@ -271,8 +272,8 @@ impl UserData for ScriptEntity {
         });
 
         methods.add_method("special_attack", |_, entity,
-                           (target, attack_kind, min_damage, max_damage, ap, damage_kind):
-                           (ScriptEntity, String, Option<u32>, Option<u32>, Option<u32>, Option<String>)| {
+            (target, attack_kind, accuracy_kind, min_damage, max_damage, ap, damage_kind):
+            (ScriptEntity, String, String, Option<u32>, Option<u32>, Option<u32>, Option<String>)| {
             let target = target.try_unwrap()?;
             let parent = entity.try_unwrap()?;
 
@@ -280,13 +281,14 @@ impl UserData for ScriptEntity {
                 None => DamageKind::Raw,
                 Some(ref kind) => DamageKind::from_str(kind),
             };
-            let attack_kind = AttackKind::from_str(&attack_kind);
+            let attack_kind = AttackKind::from_str(&attack_kind, &accuracy_kind);
 
             let min_damage = min_damage.unwrap_or(0);
             let max_damage = max_damage.unwrap_or(0);
             let ap = ap.unwrap_or(0);
 
-            let attack = Attack::special(min_damage, max_damage, ap, damage_kind, attack_kind);
+            let attack = Attack::special(&parent.borrow().actor.stats,
+                min_damage, max_damage, ap, damage_kind, attack_kind);
 
             let (hit_kind, damage, text, color) = ActorState::attack(&parent, &target, &attack);
 
@@ -302,8 +304,8 @@ impl UserData for ScriptEntity {
             let parent = entity.try_unwrap()?;
             let damage_kind = DamageKind::from_str(&damage_kind);
 
-            let attack = Attack::special(min_damage, max_damage,
-                                         ap.unwrap_or(0), damage_kind, AttackKind::Fortitude);
+            let attack = Attack::special(&parent.borrow().actor.stats, min_damage, max_damage,
+                ap.unwrap_or(0), damage_kind, AttackKind::Dummy);
             let damage = attack.roll_damage(&parent.borrow().actor.stats.armor, 1.0);
 
             let (text, color) = if !damage.is_empty() {
@@ -506,7 +508,9 @@ fn create_stats_table<'a>(lua: &'a Lua, parent: &ScriptEntity, _args: ()) -> Res
     stats.set("bonus_range", src.bonus_range)?;
     stats.set("max_hp", src.max_hp)?;
     stats.set("initiative", src.initiative)?;
-    stats.set("accuracy", src.accuracy)?;
+    stats.set("melee_accuracy", src.melee_accuracy)?;
+    stats.set("ranged_accuracy", src.ranged_accuracy)?;
+    stats.set("spell_accuracy", src.spell_accuracy)?;
     stats.set("defense", src.defense)?;
     stats.set("fortitude", src.fortitude)?;
     stats.set("reflex", src.reflex)?;

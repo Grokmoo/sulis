@@ -20,7 +20,7 @@ upgrades:
       Your dual weapons create a lethal wall to your enemies, granting you a significant bonus to accuracy and defense.
     bonuses:
       - kind:
-          accuracy: 10
+          melee_accuracy: 10
         when:
           WeaponStyle: DualWielding
       - kind:

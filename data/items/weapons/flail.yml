@@ -19,7 +19,7 @@ equippable:
       reach: 1.0
     bonuses:
       crit_multiplier: 0.25
-      accuracy: -5
+      melee_accuracy: -5
 image:
   HeldMain:
     creatures/flail

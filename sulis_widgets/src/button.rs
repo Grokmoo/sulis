@@ -22,7 +22,7 @@ use std::cell::RefCell;
 use sulis_core::ui::{LineRenderer, Widget, WidgetKind};
 use sulis_core::io::{event, GraphicsRenderer};
 use sulis_core::util::{self, Point};
-use Label;
+use {Label, TextArea};
 
 pub struct Button {
     label: Rc<RefCell<Label>>,
@@ -30,6 +30,7 @@ pub struct Button {
     last_repeat_time: Option<Instant>,
     repeat_init_time: u32,
     repeat_time: u32,
+    tooltip: String,
 }
 
 impl Button {
@@ -40,6 +41,7 @@ impl Button {
             last_repeat_time: None,
             repeat_init_time: 0,
             repeat_time: 0,
+            tooltip: String::new(),
         }))
     }
 
@@ -50,6 +52,7 @@ impl Button {
             last_repeat_time: None,
             repeat_init_time: 0,
             repeat_time: 0,
+            tooltip: String::new(),
         }))
     }
 }
@@ -93,12 +96,33 @@ impl WidgetKind for Button {
         if let Some(ref theme) = widget.theme {
             self.repeat_time = theme.get_custom_or_default("repeat_time", 0);
             self.repeat_init_time = theme.get_custom_or_default("repeat_init_time", 0);
+            if let Some(tooltip) = theme.custom.get("tooltip") {
+                self.tooltip = tooltip.to_string();
+            }
         }
     }
 
     fn draw(&mut self, renderer: &mut GraphicsRenderer, pixel_size: Point,
             widget: &Widget, millis: u32) {
         self.label.borrow_mut().draw(renderer, pixel_size, widget, millis);
+    }
+
+    // TODO refactor tooltip code into a common case somewhere - can probably
+    // also include item button, ability button
+    fn on_mouse_move(&mut self, widget: &Rc<RefCell<Widget>>, _dx: f32, _dy: f32) -> bool {
+        if self.tooltip.is_empty() { return false; }
+
+        let tooltip = Widget::with_theme(TextArea::empty(), "tooltip");
+        tooltip.borrow_mut().state.add_text_arg("0", &self.tooltip);
+
+        let (x, y) = {
+            let state = &widget.borrow().state;
+            (state.position.x + state.size.width, state.position.y)
+        };
+
+        Widget::set_mouse_over_widget(widget, tooltip, x, y);
+
+        true
     }
 
     fn on_mouse_press(&mut self, widget: &Rc<RefCell<Widget>>, kind: event::ClickKind) -> bool {

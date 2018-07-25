@@ -110,5 +110,13 @@ groups:
       killing_blow: [3, 13]
       feint: [4, 13]
       backstab_mastery: [5, 13]
+      zealous_caster: [6, 13]
+      armored_casting: [7, 13]
+      
+      deadly_caster: [0, 14]
+      ice_master: [1, 14]
+      fire_master: [2, 14]
+      lightning_master: [3, 14]
+      acid_master: [4, 14]
       
       prereqs_not_met: [7, 4]

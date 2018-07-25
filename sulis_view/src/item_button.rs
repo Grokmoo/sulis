@@ -524,7 +524,9 @@ pub fn add_attack_text_args(attack: &AttackBuilder, widget_state: &mut WidgetSta
     add_if_nonzero(widget_state, "attack_graze_multiplier", bonuses.graze_multiplier);
     add_if_nonzero(widget_state, "attack_hit_multiplier", bonuses.hit_multiplier);
     add_if_nonzero(widget_state, "attack_crit_multiplier", bonuses.crit_multiplier);
-    add_if_nonzero(widget_state, "attack_accuracy", bonuses.accuracy as f32);
+    add_if_nonzero(widget_state, "attack_melee_accuracy", bonuses.melee_accuracy as f32);
+    add_if_nonzero(widget_state, "attack_ranged_accuracy", bonuses.ranged_accuracy as f32);
+    add_if_nonzero(widget_state, "attack_spell_accuracy", bonuses.spell_accuracy as f32);
 
     if let Some(damage) = bonuses.damage {
         widget_state.add_text_arg("attack_min_bonus_damage", &damage.min.to_string());
@@ -565,7 +567,9 @@ fn add_bonus(bonus: &Bonus, state: &mut WidgetState,
         Range(amount) => add(state, "bonus_range", amount),
         Initiative(amount) => add(state, "initiative", amount),
         HitPoints(amount) => add(state, "hit_points", amount),
-        Accuracy(amount) => add(state, "accuracy", amount),
+        MeleeAccuracy(amount) => add(state, "melee_accuracy", amount),
+        RangedAccuracy(amount) => add(state, "ranged_accuracy", amount),
+        SpellAccuracy(amount) => add(state, "spell_accuracy", amount),
         Defense(amount) => add(state, "defense", amount),
         Fortitude(amount) => add(state, "fortitude", amount),
         Reflex(amount) => add(state, "reflex", amount),

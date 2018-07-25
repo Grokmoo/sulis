@@ -24,7 +24,7 @@ use sulis_core::io::GraphicsRenderer;
 use sulis_core::image::{LayeredImage};
 use sulis_core::ui::{color, Color};
 use sulis_core::util::{invalid_data_error, ExtInt};
-use sulis_rules::{Attack, AttackKind, BonusList, HitKind, StatList, WeaponKind,
+use sulis_rules::{AccuracyKind, Attack, AttackKind, BonusList, HitKind, StatList, WeaponKind,
     QuickSlot, Slot, ItemKind};
 use sulis_module::{Actor, Module, ActorBuilder};
 use {AbilityState, ChangeListenerList, Effect, EntityState, GameState, Inventory, ItemState};
@@ -388,7 +388,6 @@ impl ActorState {
     fn attack_internal(parent: &Rc<RefCell<EntityState>>, target: &Rc<RefCell<EntityState>>,
                        attack: &Attack) -> (HitKind, u32, String, Color) {
         let rules = Module::rules();
-        let accuracy = parent.borrow().actor.stats.accuracy;
 
         let concealment = cmp::max(0, target.borrow().actor.stats.concealment -
                                    parent.borrow().actor.stats.concealment_ignore);
@@ -398,13 +397,14 @@ impl ActorState {
             return (HitKind::Miss, 0, "Concealment".to_string(), color::GRAY);
         }
 
-        let defense = {
+        let (accuracy_kind, defense) = {
             let target_stats = &target.borrow().actor.stats;
             match attack.kind {
-                AttackKind::Fortitude => target_stats.fortitude,
-                AttackKind::Reflex => target_stats.reflex,
-                AttackKind::Will => target_stats.will,
-                AttackKind::Melee { .. } | AttackKind::Ranged { .. } => target_stats.defense,
+                AttackKind::Fortitude { accuracy } => (accuracy, target_stats.fortitude),
+                AttackKind::Reflex { accuracy } => (accuracy, target_stats.reflex),
+                AttackKind::Will { accuracy } => (accuracy, target_stats.will),
+                AttackKind::Melee { .. } => (AccuracyKind::Melee, target_stats.defense),
+                AttackKind::Ranged { .. } => (AccuracyKind::Ranged, target_stats.defense),
                 AttackKind::Dummy => {
                     return (HitKind::Hit, 0, "".to_string(), color::GRAY);
                 }
@@ -413,7 +413,7 @@ impl ActorState {
 
         let (hit_kind, damage_multiplier) = {
             let parent_stats = &parent.borrow().actor.stats;
-            let hit_kind = parent_stats.attack_roll(defense, &attack.bonuses);
+            let hit_kind = parent_stats.attack_roll(accuracy_kind, defense, &attack.bonuses);
             let damage_multiplier = match hit_kind {
                 HitKind::Miss => {
                     debug!("Miss");
@@ -428,8 +428,6 @@ impl ActorState {
             };
             (hit_kind, damage_multiplier)
         };
-
-        debug!("Accuracy {} vs defense {}: {:?}", accuracy, defense, hit_kind);
 
         let damage = attack.roll_damage(&target.borrow().actor.stats.armor, damage_multiplier);
 

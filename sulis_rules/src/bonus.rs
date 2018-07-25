@@ -32,7 +32,9 @@ pub enum BonusKind {
     Range(f32),
     Initiative(i32),
     HitPoints(i32),
-    Accuracy(i32),
+    MeleeAccuracy(i32),
+    RangedAccuracy(i32),
+    SpellAccuracy(i32),
     Defense(i32),
     Fortitude(i32),
     Reflex(i32),
@@ -72,7 +74,8 @@ pub enum Contingent {
     /// weapon style
     WeaponStyle(WeaponStyle),
 
-    /// For bonuses applied to attacks, only Damage, Accuracy, CritThreshold, HitThreshold,
+    /// For bonuses applied to attacks, only Damage, MeleeAccuracy, RangedAccuracy,
+    /// SpellAccuracy, CritThreshold, HitThreshold,
     /// GrazeThreshold, CritMultiplier, HitMultiplier, and GrazeMultiplier are valid
 
     /// Bonuses that should only be applied to an attack using the given WeaponKind
@@ -83,6 +86,9 @@ pub enum Contingent {
 
     /// Bonuses that are only applied to attacks when the attacker is flanking
     AttackWhenFlanking,
+
+    /// Bonuses that are only applied to attacks with the specified base damage kind
+    AttackWithDamageKind(DamageKind),
 }
 
 impl Default for Contingent {
@@ -130,7 +136,9 @@ impl Default for BonusList {
 #[serde(default)]
 pub struct AttackBonuses {
     pub damage: Option<Damage>,
-    pub accuracy: i32,
+    pub melee_accuracy: i32,
+    pub ranged_accuracy: i32,
+    pub spell_accuracy: i32,
     pub crit_threshold: i32,
     pub hit_threshold: i32,
     pub graze_threshold: i32,
@@ -143,7 +151,9 @@ impl Default for AttackBonuses {
     fn default() -> AttackBonuses {
         AttackBonuses {
             damage: None,
-            accuracy: 0,
+            melee_accuracy: 0,
+            ranged_accuracy: 0,
+            spell_accuracy: 0,
             crit_threshold: 0,
             hit_threshold: 0,
             graze_threshold: 0,
@@ -175,6 +185,13 @@ impl AttackBuilder {
             damage: self.damage.mult_f32(multiplier),
             kind: self.kind.clone(),
             bonuses: self.bonuses.clone(),
+        }
+    }
+
+    pub fn is_melee(&self) -> bool {
+        match self.kind {
+            AttackKindBuilder::Melee { .. } => true,
+            _ => false,
         }
     }
 }

@@ -5,7 +5,7 @@ description: |
   You are a master of combat involving ranged weapons.  You gain significant bonuses to accuracy and crit damage when using this style.
 bonuses:
   - kind:
-      accuracy: 10
+      ranged_accuracy: 10
     when:
       WeaponStyle: Ranged
   - kind:

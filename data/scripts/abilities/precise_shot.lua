@@ -15,10 +15,10 @@ function on_activate(parent, ability)
   effect:add_damage(0, 0, 5)
 
   if parent:ability_level(ability) > 1 then
-	effect:add_num_bonus("accuracy", 25)
+	effect:add_num_bonus("ranged_accuracy", 25)
 	effect:add_num_bonus("crit_multiplier", 1.0)
   else
-    effect:add_num_bonus("accuracy", 15)
+    effect:add_num_bonus("ranged_accuracy", 15)
 	effect:add_num_bonus("crit_multiplier", 0.50)
   end
   

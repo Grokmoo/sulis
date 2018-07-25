@@ -1,0 +1,22 @@
+id: lightning_master
+name: "Lightning Master"
+icon: abilities/lightning_master
+description: |
+  Your spells dealing Electrical damage gain a significant damage boost.
+bonuses:
+  - kind:
+      graze_multiplier: 0.075
+    when:
+      AttackWithDamageKind: Electrical
+  - kind:
+      hit_multiplier: 0.15
+    when:
+      AttackWithDamageKind: Electrical
+  - kind:
+      crit_multiplier: 0.225
+    when:
+      AttackWithDamageKind: Electrical
+prereqs:
+  abilities: [ deadly_caster ]
+  levels:
+    mage: 9

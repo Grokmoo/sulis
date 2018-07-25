@@ -25,43 +25,58 @@ abilities:
     position: [2, 4]
     
   - id: resilient_body
-    position: [4, 0.5]
+    position: [3.5, 0.5]
   - id: tough_skin
-    position: [5, 0]
+    position: [4.5, 0]
   - id: healthy
-    position: [5, 1]
+    position: [4.5, 1]
   - id: lightning_reflexes
-    position: [4, 2]
+    position: [3.5, 2]
   - id: improved_initiative
-    position: [5, 2]
+    position: [4.5, 2]
   - id: tenacious_soul
-    position: [4, 3]
+    position: [3.5, 3]
   - id: elemental_defense
-    position: [5, 3]
+    position: [4.5, 3]
   - id: attacker
-    position: [4, 4]
+    position: [3.5, 4]
   - id: blind_fighting
-    position: [5, 4]
+    position: [4.5, 4]
   - id: speedy
-    position: [4, 5]
+    position: [3.5, 5]
   - id: acrobatic_fighting
-    position: [5, 5]
+    position: [4.5, 5]
   - id: defender
-    position: [4, 6.5]
+    position: [3.5, 6.5]
   - id: shield_combat
-    position: [5, 6]
+    position: [4.5, 6]
   - id: armored_combat
-    position: [5, 7]
+    position: [4.5, 7]
   
   - id: strength_training
-    position: [0, 6]
+    position: [0, 5.5]
   - id: dexterity_training
-    position: [1, 6]
+    position: [1, 5.5]
   - id: endurance_training
-    position: [2, 6]
+    position: [2, 5.5]
   - id: perception_training
-    position: [0, 7]
+    position: [0, 6.5]
   - id: intellect_training
-    position: [1, 7]
+    position: [1, 6.5]
   - id: wisdom_training
-    position: [2, 7]
+    position: [2, 6.5]
+  
+  - id: armored_casting
+    position: [6, 0]
+  - id: zealous_caster
+    position: [7, 0]
+  - id: deadly_caster
+    position: [6, 2.5]
+  - id: ice_master
+    position: [7, 1]
+  - id: fire_master
+    position: [7, 2]
+  - id: lightning_master
+    position: [7, 3]
+  - id: acid_master
+    position: [7, 4]

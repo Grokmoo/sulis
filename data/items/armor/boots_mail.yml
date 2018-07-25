@@ -11,6 +11,7 @@ equippable:
   bonuses:
     - kind: { armor: 2 }
     - kind: { movement_rate: -0.02 }
+    - kind: { spell_accuracy: -3 }
 image:
   Feet:
     creatures/boots_mail

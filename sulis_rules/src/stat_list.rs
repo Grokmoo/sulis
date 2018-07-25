@@ -20,7 +20,8 @@ use rand::{self, Rng};
 
 use sulis_core::image::Image;
 use sulis_core::util::ExtInt;
-use {Armor, AttributeList, Attack, Damage, HitKind, WeaponKind, ArmorKind, Slot, WeaponStyle};
+use {AccuracyKind, Armor, AttributeList, Attack, Damage,
+    HitKind, WeaponKind, ArmorKind, Slot, WeaponStyle};
 use bonus::{AttackBonuses, AttackBuilder, Bonus, BonusKind, BonusList};
 
 #[derive(Clone)]
@@ -47,7 +48,9 @@ pub struct StatList {
     pub max_hp: i32,
     pub initiative: i32,
     pub flanking_angle: i32,
-    pub accuracy: i32,
+    pub melee_accuracy: i32,
+    pub ranged_accuracy: i32,
+    pub spell_accuracy: i32,
     pub defense: i32,
     pub fortitude: i32,
     pub reflex: i32,
@@ -87,7 +90,9 @@ impl StatList {
             max_hp: 0,
             initiative: 0,
             flanking_angle: 0,
-            accuracy: 0,
+            melee_accuracy: 0,
+            ranged_accuracy: 0,
+            spell_accuracy: 0,
             defense: 0,
             fortitude: 0,
             reflex: 0,
@@ -129,8 +134,13 @@ impl StatList {
         self.weapon_proficiencies.contains(&prof)
     }
 
-    pub fn attack_roll(&self, defense: i32, bonuses: &AttackBonuses) -> HitKind {
-        let accuracy = self.accuracy + bonuses.accuracy;
+    pub fn attack_roll(&self, accuracy_kind: AccuracyKind,
+                       defense: i32, bonuses: &AttackBonuses) -> HitKind {
+        let accuracy = match accuracy_kind {
+            AccuracyKind::Melee => self.melee_accuracy + bonuses.melee_accuracy,
+            AccuracyKind::Ranged => self.ranged_accuracy + bonuses.ranged_accuracy,
+            AccuracyKind::Spell => self.spell_accuracy + bonuses.spell_accuracy,
+        };
         let roll = rand::thread_rng().gen_range(1, 101);
         debug!("Attack roll: {} with accuracy {} against {}", roll, accuracy, defense);
 
@@ -201,7 +211,7 @@ impl StatList {
             use bonus::Contingent::*;
             match bonus.when {
                 Always => self.add_bonus(&bonus.kind, times),
-                AttackWithWeapon(_) | AttackWhenHidden =>
+                AttackWithWeapon(_) | AttackWhenHidden | AttackWithDamageKind(_) =>
                     self.attack_bonuses.push(bonus.clone()),
                 AttackWhenFlanking => self.flanking_bonuses.add(bonus.clone()),
                 WeaponEquipped(_) | ArmorEquipped {..} | WeaponStyle(_) =>
@@ -235,7 +245,9 @@ impl StatList {
             Range(amount) => self.bonus_range += amount * times_f32,
             Initiative(amount) => self.initiative += amount * times_i32,
             HitPoints(amount) => self.max_hp += amount * times_i32,
-            Accuracy(amount) => self.accuracy += amount * times_i32,
+            MeleeAccuracy(amount) => self.melee_accuracy += amount * times_i32,
+            RangedAccuracy(amount) => self.ranged_accuracy += amount * times_i32,
+            SpellAccuracy(amount) => self.spell_accuracy += amount * times_i32,
             Defense(amount) => self.defense += amount * times_i32,
             Fortitude(amount) => self.fortitude += amount * times_i32,
             Reflex(amount) => self.reflex += amount * times_i32,
@@ -264,9 +276,12 @@ impl StatList {
                     weapon_style: WeaponStyle,
                     multiplier: f32,
                     base_attr: i32) {
-        if attacks.is_empty() {
+        let is_melee = if attacks.is_empty() {
             warn!("Finalized stats with no attacks");
-        }
+            false
+        } else {
+            attacks[0].0.is_melee()
+        };
 
         // clone here to avoid problem with add_bonus needing mutable borrow,
         // even though it would be safe
@@ -274,7 +289,8 @@ impl StatList {
         for bonus in contingent.iter() {
             use bonus::Contingent::*;
             match bonus.when {
-                Always | AttackWithWeapon(_) | AttackWhenHidden | AttackWhenFlanking => unreachable!(),
+                Always | AttackWithWeapon(_) | AttackWhenHidden |
+                    AttackWhenFlanking | AttackWithDamageKind(_) => unreachable!(),
                 WeaponEquipped(weapon_kind) => {
                     for (_, attack_weapon_kind) in attacks.iter() {
                         if weapon_kind == *attack_weapon_kind { self.add_bonus(&bonus.kind, 1); }
@@ -315,12 +331,26 @@ impl StatList {
 
         use Attribute::*;
         let attrs = &self.attributes;
-        self.initiative += attrs.bonus(Perception, base_attr) / 2;
-        self.accuracy += attrs.bonus(Perception, base_attr);
-        self.defense += attrs.bonus(Dexterity, base_attr);
-        self.fortitude += attrs.bonus(Endurance, base_attr);
-        self.reflex += attrs.bonus(Dexterity, base_attr);
-        self.will += attrs.bonus(Wisdom, base_attr);
+        let str_bonus = attrs.bonus(Strength, base_attr);
+        let dex_bonus = attrs.bonus(Dexterity, base_attr);
+        let end_bonus = attrs.bonus(Endurance, base_attr);
+        let per_bonus = attrs.bonus(Perception, base_attr);
+        let int_bonus = attrs.bonus(Intellect, base_attr);
+        let wis_bonus = attrs.bonus(Wisdom, base_attr);
+        self.initiative += dex_bonus / 2 + per_bonus / 2;
+        self.melee_accuracy += per_bonus + str_bonus * 2;
+        self.ranged_accuracy += per_bonus + dex_bonus * 2;
+        self.spell_accuracy += per_bonus + int_bonus * 2;
+        self.defense += dex_bonus * 2;
+        self.fortitude += end_bonus * 2;
+        self.reflex += dex_bonus * 2;
+        self.will += wis_bonus * 2;
+
+        if is_melee {
+            self.graze_multiplier += 0.02 * str_bonus as f32;
+            self.hit_multiplier += 0.04 * str_bonus as f32;
+            self.crit_multiplier += 0.06 * str_bonus as f32;
+        }
 
         if self.crit_threshold < self.hit_threshold {
             self.hit_threshold = self.crit_threshold;

@@ -1,0 +1,27 @@
+id: zealous_caster
+name: "Zealous Caster"
+icon: abilities/zealous_caster
+description: |
+  You gain an additional use per encounter of your 1st Circle Spells.
+bonuses:
+  - kind:
+      group_uses_per_encounter: { group: "1st Circle", amount: 1 }
+prereqs:
+  levels:
+    mage: 6
+upgrades:
+  - description: |
+      You gain an additional use per encounter of your 2nd Circle Spells.
+    bonuses:
+      - kind:
+          group_uses_per_encounter: { group: "2nd Circle", amount: 1 }
+  - description: |
+      You gain an additional use per encounter of your 3rd Circle Spells.
+    bonuses:
+      - kind:
+          group_uses_per_encounter: { group: "3rd Circle", amount: 1 }
+  - description: |
+      You gain an additional use per encounter of your 4th Circle Spells.
+    bonuses:
+      - kind:
+          group_uses_per_encounter: { group: "4th Circle", amount: 1 }

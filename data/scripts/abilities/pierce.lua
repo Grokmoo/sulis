@@ -29,7 +29,7 @@ function create_parent_effect(parent, ability, targets)
   stats = parent:stats()
 
   effect = parent:create_effect(ability:name(), 0)
-  effect:add_num_bonus("accuracy", 25)
+  effect:add_num_bonus("melee_accuracy", 25)
   effect:add_damage(2, 4, 20)
   effect:apply()
   

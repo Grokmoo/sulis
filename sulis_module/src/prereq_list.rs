@@ -21,12 +21,18 @@ use std::io::Error;
 use sulis_rules::{Attribute};
 use sulis_core::util::unable_to_create_error;
 
-use {Actor, Class, Module, Race};
+use {Actor, Module, Race};
 
 #[derive(Debug)]
 pub struct PrereqList {
     pub attributes: Option<Vec<(Attribute, u8)>>,
-    pub levels: Vec<(Rc<Class>, u32)>,
+
+    /// A class and associated level in that class that is required
+    /// Unlike other prereqs, this is an OR condition, meaning
+    /// if the vec is non-empty, at least one of the entries must
+    /// be met
+    pub levels: Vec<(String, u32)>,
+
     pub total_level: Option<u32>,
     pub race: Option<Rc<Race>>,
     pub abilities: Vec<String>, // we can't store the actual ability here because it might
@@ -38,14 +44,7 @@ impl PrereqList {
         let mut levels = Vec::new();
         if let Some(builder_levels) = builder.levels {
             for (class_id, level) in builder_levels {
-                let class = match module.classes.get(&class_id) {
-                    None => {
-                        warn!("No match for class '{}'", class_id);
-                        return unable_to_create_error("prereq_list", "prereqs class");
-                    }, Some(class) => Rc::clone(class)
-                };
-
-                levels.push((class, level));
+                levels.push((class_id, level));
             }
         }
 
@@ -76,9 +75,21 @@ impl PrereqList {
             }
         }
 
-        for &(ref class, level) in self.levels.iter() {
-            if actor.levels(class) < level { return false; }
+        let mut class_level_met = self.levels.is_empty();
+        for &(ref class_id, level) in self.levels.iter() {
+            let class = match Module::class(class_id) {
+                None => {
+                    warn!("Invalid class '{}' found when matching prereqs", class_id);
+                    continue;
+                }, Some(class) => class,
+            };
+            if actor.levels(&class) >= level {
+                class_level_met = true;
+                break;
+            }
         }
+
+        if !class_level_met { return false; }
 
         if let Some(total_level) = self.total_level {
             if actor.total_level < total_level { return false; }

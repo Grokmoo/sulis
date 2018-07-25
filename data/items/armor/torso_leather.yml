@@ -13,6 +13,7 @@ equippable:
     - kind: { armor_kind: [ Slashing, 1] }
     - kind: { armor_kind: [ Acid, -1 ] }
     - kind: { movement_rate: -0.05 }
+    - kind: { spell_accuracy: -3 }
 image:
   Torso:
     creatures/torso_leather

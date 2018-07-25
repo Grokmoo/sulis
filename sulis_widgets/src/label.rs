@@ -24,10 +24,13 @@ use sulis_core::io::event::ClickKind;
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::util::Point;
 
+use TextArea;
+
 pub struct Label {
     pub text: Option<String>,
     pub text_draw_end_x: f32,
     pub text_draw_end_y: f32,
+    tooltip: String,
 }
 
 impl Label {
@@ -36,6 +39,7 @@ impl Label {
             text: None,
             text_draw_end_x: 0.0,
             text_draw_end_y: 0.0,
+            tooltip: String::new(),
         }))
     }
 
@@ -44,6 +48,7 @@ impl Label {
             text: Some(text.to_string()),
             text_draw_end_x: 0.0,
             text_draw_end_y: 0.0,
+            tooltip: String::new(),
         }))
     }
 
@@ -93,11 +98,6 @@ impl WidgetKind for Label {
         false
     }
 
-    fn on_mouse_move(&mut self, _widget: &Rc<RefCell<Widget>>,
-                     _delta_x: f32, _delta_y: f32) -> bool {
-        true
-    }
-
     fn on_mouse_enter(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
         self.super_on_mouse_exit(widget);
         false
@@ -106,6 +106,23 @@ impl WidgetKind for Label {
     fn on_mouse_exit(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
         self.super_on_mouse_exit(widget);
         false
+    }
+
+    // TODO refactor tooltip code into a common case somewhere
+    fn on_mouse_move(&mut self, widget: &Rc<RefCell<Widget>>, _dx: f32, _dy: f32) -> bool {
+        if self.tooltip.is_empty() { return false; }
+
+        let tooltip = Widget::with_theme(TextArea::empty(), "tooltip");
+        tooltip.borrow_mut().state.add_text_arg("0", &self.tooltip);
+
+        let (x, y) = {
+            let state = &widget.borrow().state;
+            (state.position.x + state.size.width, state.position.y)
+        };
+
+        Widget::set_mouse_over_widget(widget, tooltip, x, y);
+
+        true
     }
 
     fn layout(&mut self, widget: &mut Widget) {
@@ -117,6 +134,12 @@ impl WidgetKind for Label {
 
         if let Some(ref font) = widget.state.font {
             widget.state.text_renderer = Some(Box::new(LineRenderer::new(font)));
+        }
+
+        if let Some(ref theme) = widget.theme {
+            if let Some(tooltip) = theme.custom.get("tooltip") {
+                self.tooltip = tooltip.to_string();
+            }
         }
     }
 

@@ -26,7 +26,9 @@ use AttackKind::*;
 fn add_bonus(bonuses: &mut AttackBonuses, bonus_damage: &mut Vec<Damage>, bonus_kind: &BonusKind) {
     match bonus_kind{
         BonusKind::Damage(damage) => bonus_damage.push(damage.clone()),
-        BonusKind::Accuracy(amount) => bonuses.accuracy += amount,
+        BonusKind::MeleeAccuracy(amount) => bonuses.melee_accuracy += amount,
+        BonusKind::RangedAccuracy(amount) => bonuses.ranged_accuracy += amount,
+        BonusKind::SpellAccuracy(amount) => bonuses.spell_accuracy += amount,
         BonusKind::CritThreshold(amount) => bonuses.crit_threshold += amount,
         BonusKind::HitThreshold(amount) => bonuses.hit_threshold += amount,
         BonusKind::GrazeThreshold(amount) => bonuses.graze_threshold += amount,
@@ -47,7 +49,7 @@ pub struct Attack {
 }
 
 impl Attack {
-    pub fn special(min_damage: u32, max_damage: u32, ap: u32,
+    pub fn special(stats: &StatList, min_damage: u32, max_damage: u32, ap: u32,
                    damage_kind: DamageKind, attack_kind: AttackKind) -> Attack {
         let damage = Damage {
             min: min_damage,
@@ -56,12 +58,33 @@ impl Attack {
             kind: Some(damage_kind),
         };
 
-        let damage_list = DamageList::from(damage);
+        let mut bonuses = AttackBonuses::default();
+        let mut bonus_damage = Vec::new();
+
+        for bonus in stats.attack_bonuses.iter() {
+            use bonus::Contingent::*;
+            match bonus.when {
+                AttackWithWeapon(_) => (), // doesn't apply to this non weapon attack
+                AttackWhenHidden => {
+                    if stats.hidden {
+                        add_bonus(&mut bonuses, &mut bonus_damage, &bonus.kind);
+                    }
+                },
+                AttackWithDamageKind(kind_to_match) => {
+                    if damage_kind == kind_to_match {
+                        add_bonus(&mut bonuses, &mut bonus_damage, &bonus.kind);
+                    }
+                }
+                _ => unreachable!(),
+            }
+        }
+
+        let damage_list = DamageList::new(damage, &bonus_damage);
 
         Attack {
             damage: damage_list,
             kind: attack_kind,
-            bonuses: AttackBonuses::default(),
+            bonuses,
         }
     }
 
@@ -102,6 +125,12 @@ impl Attack {
                 },
                 AttackWhenHidden => {
                     if stats.hidden {
+                        add_bonus(&mut bonuses, &mut bonus_damage, &bonus.kind);
+                    }
+                },
+                AttackWithDamageKind(damage_kind) => {
+                    assert!(builder.damage.kind.is_some());
+                    if builder.damage.kind.unwrap() == damage_kind {
                         add_bonus(&mut bonuses, &mut bonus_damage, &bonus.kind);
                     }
                 },
@@ -179,15 +208,25 @@ impl Attack {
 }
 
 impl AttackKind {
-    pub fn from_str(s: &str) -> AttackKind {
-        match s {
-            "Fortitude" => AttackKind::Fortitude,
-            "Reflex" => AttackKind::Reflex,
-            "Will" => AttackKind::Will,
+    pub fn from_str(attack: &str, kind: &str) -> AttackKind {
+        let kind = match kind {
+            "Melee" => AccuracyKind::Melee,
+            "Ranged" => AccuracyKind::Ranged,
+            "Spell" => AccuracyKind::Spell,
+            _ => {
+                warn!("Unable to parse string '{}' into accuracy kind", kind);
+                AccuracyKind::Melee
+            }
+        };
+
+        match attack {
+            "Fortitude" => AttackKind::Fortitude { accuracy: kind },
+            "Reflex" => AttackKind::Reflex { accuracy: kind },
+            "Will" => AttackKind::Will { accuracy: kind },
             "Dummy" => AttackKind::Dummy,
             _ => {
-                warn!("Unable to parse string '{}' into attack kind", s);
-                AttackKind::Will
+                warn!("Unable to parse string '{}' into attack kind", attack);
+                AttackKind::Dummy
             }
         }
     }
@@ -197,8 +236,15 @@ impl AttackKind {
 pub enum AttackKind {
     Melee { reach: f32 },
     Ranged { range: f32, projectile: String },
-    Fortitude,
-    Reflex,
-    Will,
+    Fortitude { accuracy: AccuracyKind },
+    Reflex { accuracy: AccuracyKind },
+    Will { accuracy: AccuracyKind },
     Dummy,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum AccuracyKind {
+    Melee,
+    Ranged,
+    Spell,
 }

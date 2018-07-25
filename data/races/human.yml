@@ -9,7 +9,9 @@ base_stats:
   - kind: { attribute: [Endurance, 1 ] }
   - kind: { attribute: [Perception, -1 ] }
   - kind: { hit_points: 40 }
-  - kind: { accuracy: 30 }
+  - kind: { melee_accuracy: 30 }
+  - kind: { ranged_accuracy: 30 }
+  - kind: { spell_accuracy: 30 }
   - kind: { defense: 30 }
   - kind: { fortitude: 30 }
   - kind: { reflex: 30 }

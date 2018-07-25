@@ -5,4 +5,9 @@ description: |
   You gain a +5 bonus to accuracy for all attacks.
 bonuses:
   - kind:
-      accuracy: 5
+      melee_accuracy: 5
+  - kind:
+      ranged_accuracy: 5
+  - kind:
+      spell_accuracy: 5
+

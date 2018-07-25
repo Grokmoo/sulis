@@ -10,7 +10,9 @@ base_stats:
   - kind: { attribute: [ Intellect, 1 ] }
   - kind: { attribute: [ Wisdom, 1 ] }
   - kind: { hit_points: 40 }
-  - kind: { accuracy: 30 }
+  - kind: { melee_accuracy: 25 }
+  - kind: { ranged_accuracy: 30 }
+  - kind: { spell_accuracy: 35 }
   - kind: { defense: 32 }
   - kind: { fortitude: 35 }
   - kind: { reflex: 30 }

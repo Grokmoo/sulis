@@ -1,5 +1,15 @@
 ---
 children:
+  tooltip:
+    from: .text_area
+    border: { top: 1, bottom: 1, left: 2, right: 2 }
+    background: 80_transparent_fill
+    text: "[s=5.0|#0#]"
+    preferred_size: [50, 4]
+    width_relative: Custom
+    height_relative: Custom
+    x_relative: Custom
+    y_relative: Custom
   label:
     text_params:
       font: "normal"
@@ -40,11 +50,6 @@ children:
     from: .button
     background: background_tab
     preferred_size: [20, 6]
-  tab_pane:
-    background: bg_rounded
-    border: [2, 2, 2, 2]
-    width_relative: Max
-    height_relative: Max
   color_button:
     background: background
     border: [1, 1, 1, 1]

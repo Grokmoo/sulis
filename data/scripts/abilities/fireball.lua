@@ -75,7 +75,7 @@ function attack_target(parent, ability, targets)
 
   if target:is_valid() then
     target = targets:first()
-    parent:special_attack(target, "Reflex", 20, 30, 0, "Fire")
+    parent:special_attack(target, "Reflex", "Spell", 20, 30, 0, "Fire")
   end
 end
 

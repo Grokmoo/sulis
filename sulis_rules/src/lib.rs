@@ -27,6 +27,7 @@ pub use self::armor::Armor;
 pub mod attack;
 pub use self::attack::Attack;
 pub use self::attack::AttackKind;
+pub use self::attack::AccuracyKind;
 
 pub mod attribute;
 pub use self::attribute::Attribute;

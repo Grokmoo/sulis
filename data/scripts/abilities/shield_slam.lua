@@ -21,12 +21,12 @@ function on_target_select(parent, ability, targets)
  
   if parent:ability_level(ability) > 1 then
     effect = parent:create_effect(ability:name(), 0)
-    effect:add_num_bonus("accuracy", 25)
+    effect:add_num_bonus("melee_accuracy", 25)
     effect:apply()
   end
   
   ability:activate(parent)
-  parent:anim_special_attack(target, "Fortitude", 0, 0, 0, "Raw", cb)
+  parent:anim_special_attack(target, "Fortitude", "Melee", 0, 0, 0, "Raw", cb)
 end
 
 function create_stun_effect(parent, ability, targets, hit)

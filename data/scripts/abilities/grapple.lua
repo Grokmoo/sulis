@@ -28,10 +28,10 @@ function on_target_select(parent, ability, targets)
   end
   
   effect = parent:create_effect(ability:name(), 0)
-  effect:add_num_bonus("accuracy", accuracy)
+  effect:add_num_bonus("melee_accuracy", accuracy)
   effect:apply()
   
-  parent:anim_special_attack(target, "Fortitude", 0, 0, 0, "Raw", cb)
+  parent:anim_special_attack(target, "Fortitude", "Melee", 0, 0, 0, "Raw", cb)
 end
 
 function create_grapple_effect(parent, ability, targets, hit)

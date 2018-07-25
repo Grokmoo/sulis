@@ -13,7 +13,7 @@ upgrades:
       You gain a bonus to accuracy while using small swords.
     bonuses:
       - kind:
-          accuracy: 10
+          melee_accuracy: 10
         when:
           AttackWithWeapon: SmallSword
   - description: |

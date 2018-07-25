@@ -12,7 +12,7 @@ function on_activate(parent, ability)
   effect = parent:create_effect(ability:name())
   effect:deactivate_with(ability)
   
-  effect:add_num_bonus("accuracy", -10)
+  effect:add_num_bonus("ranged_accuracy", -10)
 
   if parent:ability_level(ability) > 1 then
     effect:add_num_bonus("graze_multiplier", 0.25)

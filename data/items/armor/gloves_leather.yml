@@ -10,6 +10,7 @@ equippable:
   slot: Hands
   bonuses:
     - kind: { armor: 1 }
+    - kind: { spell_accuracy: -4 }
 image:
   Hands:
     creatures/gloves_leather

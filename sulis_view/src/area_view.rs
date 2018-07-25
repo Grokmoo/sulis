@@ -419,7 +419,7 @@ impl WidgetKind for AreaView {
 
         self.user_scale += delta;
         if self.user_scale < 0.5 { self.user_scale = 0.5; }
-        else if self.user_scale > 1.8 { self.user_scale = 1.8; }
+        else if self.user_scale > 1.5 { self.user_scale = 1.5; }
 
         // recenter the view based on the scroll change
         let (old_scale_x, old_scale_y) = self.scale;

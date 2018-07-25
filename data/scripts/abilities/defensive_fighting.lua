@@ -16,7 +16,7 @@ function on_activate(parent, ability)
   effect:add_num_bonus("fortitude", 5)
   effect:add_num_bonus("crit_threshold", 20)
   effect:add_num_bonus("crit_multiplier", -0.25)
-  effect:add_num_bonus("accuracy", -10)
+  effect:add_num_bonus("melee_accuracy", -10)
 
   if parent:ability_level(ability) > 1 then
     cb = ability:create_callback(parent)

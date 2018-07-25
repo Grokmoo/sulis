@@ -12,6 +12,7 @@ equippable:
     - kind: { armor: 2 }
     - kind: { armor_kind: [ Slashing, 1] }
     - kind: { movement_rate: -0.03 }
+    - kind: { spell_accuracy: -2 }
 image:
   Legs:
     creatures/legs_leather

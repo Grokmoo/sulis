@@ -37,7 +37,7 @@ end
 
 function attack_target(parent, ability, targets)
   target = targets:first()
-  parent:special_attack(target, "Reflex", 20, 30, 0, "Fire")
+  parent:special_attack(target, "Reflex", "Spell", 20, 30, 0, "Fire")
   
   gen = target:create_particle_generator("fire_particle", 0.6)
   gen:set_initial_gen(50.0)

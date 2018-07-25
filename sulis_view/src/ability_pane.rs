@@ -110,8 +110,14 @@ pub fn add_ability_text_args(state: &mut WidgetState, ability: &Rc<Ability>) {
             }
         }
 
-        for (index, &(ref class, level)) in prereqs.levels.iter().enumerate() {
-            state.add_text_arg(&format!("prereq_class_{}", index), &class.id);
+        for (index, &(ref class_id, level)) in prereqs.levels.iter().enumerate() {
+            let class = match Module::class(class_id) {
+                None => {
+                    warn!("Invalid class '{}' in prereq list", class_id);
+                    continue;
+                }, Some(class) => class,
+            };
+            state.add_text_arg(&format!("prereq_class_{}", index), &class.name);
             state.add_text_arg(&format!("prereq_level_{}", index), &level.to_string());
         }
 

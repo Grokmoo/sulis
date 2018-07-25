@@ -29,13 +29,13 @@ upgrades:
       You are able to overcome the accuracy penalty associated with larger shields.
     bonuses:
       - kind:
-          accuracy: 5
+          melee_accuracy: 5
         when:
           ArmorEquipped:
             slot: HeldOff
             kind: Medium
       - kind:
-          accuracy: 10
+          melee_accuracy: 10
         when:
           ArmorEquipped:
             slot: HeldOff

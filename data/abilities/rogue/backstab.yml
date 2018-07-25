@@ -15,8 +15,14 @@ upgrades:
       You gain an accuracy boost when attacking while hidden or flanking.
     bonuses:
       - kind:
-          accuracy: 10
+          melee_accuracy: 10
         when: AttackWhenFlanking
       - kind:
-          accuracy: 25
+          ranged_accuracy: 10
+        when: AttackWhenFlanking
+      - kind:
+          melee_accuracy: 25
+        when: AttackWhenHidden
+      - kind:
+          ranged_accuracy: 25
         when: AttackWhenHidden

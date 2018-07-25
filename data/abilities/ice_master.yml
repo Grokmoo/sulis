@@ -1,0 +1,22 @@
+id: ice_master
+name: "Ice Master"
+icon: abilities/ice_master
+description: |
+  Your spells dealing Cold damage gain a significant damage boost.
+bonuses:
+  - kind:
+      graze_multiplier: 0.075
+    when:
+      AttackWithDamageKind: Cold
+  - kind:
+      hit_multiplier: 0.15
+    when:
+      AttackWithDamageKind: Cold
+  - kind:
+      crit_multiplier: 0.225
+    when:
+      AttackWithDamageKind: Cold
+prereqs:
+  abilities: [ deadly_caster ]
+  levels:
+    mage: 9

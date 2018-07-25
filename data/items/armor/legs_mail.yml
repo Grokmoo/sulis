@@ -13,6 +13,8 @@ equippable:
     - kind: { armor_kind: [ Slashing, 1] }
     - kind: { armor_kind: [ Crushing, -1] }
     - kind: { movement_rate: -0.06 }
+    - kind: { attribute: [Dexterity, -1] }
+    - kind: { spell_accuracy: -3 }
 image:
   Legs:
     creatures/legs_mail

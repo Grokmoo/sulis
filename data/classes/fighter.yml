@@ -7,7 +7,9 @@ bonuses_per_level:
   - kind:
       hit_points: 10
   - kind:
-      accuracy: 5
+      melee_accuracy: 5
+  - kind:
+      ranged_accuracy: 5
   - kind:
       defense: 3
   - kind:

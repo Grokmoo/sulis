@@ -12,7 +12,7 @@ function on_target_select(parent, ability, targets)
 
   target = targets:first()
   
-  hit = parent:special_attack(target, "Fortitude")
+  hit = parent:special_attack(target, "Fortitude", "Spell")
   duration = ability:duration()
   if hit:is_miss() then
     return

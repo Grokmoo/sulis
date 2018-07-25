@@ -6,7 +6,7 @@ function on_activate(parent, ability)
 
   effect = parent:create_effect(ability:name())
   effect:deactivate_with(ability)
-  effect:add_num_bonus("accuracy", 10)
+  effect:add_num_bonus("melee_accuracy", 10)
   effect:add_num_bonus("defense", -10)
  
   if parent:ability_level(ability) > 1 then

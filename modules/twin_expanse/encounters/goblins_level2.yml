@@ -1,0 +1,9 @@
+id: goblins_level2
+auto_spawn: true
+min_gen_actors: 3
+max_gen_actors: 3
+entries:
+  - id: goblin
+    weight: 2
+  - id: goblin_spearman
+    weight: 1

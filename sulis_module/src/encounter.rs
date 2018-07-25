@@ -16,7 +16,6 @@
 
 use rand::{self, Rng};
 use std::io::{Error, ErrorKind};
-use std::collections::HashMap;
 use std::rc::Rc;
 
 use sulis_core::resource::{ResourceBuilder};
@@ -28,13 +27,14 @@ use {Actor, Module};
 struct Entry {
     actor: Rc<Actor>,
     weight: u32,
+    always: bool,
 }
 
 pub struct Encounter {
     pub id: String,
     pub auto_spawn: bool,
-    min_actors: u32,
-    max_actors: u32,
+    min_gen_actors: u32,
+    max_gen_actors: u32,
     entries: Vec<Entry>,
     total_weight: u32,
 }
@@ -48,10 +48,10 @@ impl Encounter {
 
         let mut entries = Vec::new();
         let mut total_weight = 0;
-        for (actor_id, entry) in builder.entries {
-            let actor = match module.actors.get(&actor_id) {
+        for entry in builder.entries {
+            let actor = match module.actors.get(&entry.id) {
                 None => {
-                    warn!("no actor '{}' found", actor_id);
+                    warn!("no actor '{}' found", entry.id);
                     return unable_to_create_error("encounter", &builder.id);
                 }, Some(actor) => Rc::clone(actor),
             };
@@ -60,14 +60,15 @@ impl Encounter {
             entries.push(Entry {
                 actor,
                 weight: entry.weight,
+                always: entry.always,
             });
         }
 
         Ok(Encounter {
             id: builder.id,
             auto_spawn: builder.auto_spawn,
-            min_actors: builder.min_actors,
-            max_actors: builder.max_actors,
+            min_gen_actors: builder.min_gen_actors,
+            max_gen_actors: builder.max_gen_actors,
             entries,
             total_weight,
         })
@@ -89,7 +90,7 @@ impl Encounter {
     pub fn gen_actors(&self) -> Vec<Rc<Actor>> {
         let mut actors = Vec::new();
 
-        let num = rand::thread_rng().gen_range(self.min_actors, self.max_actors + 1);
+        let num = rand::thread_rng().gen_range(self.min_gen_actors, self.max_gen_actors + 1);
         for _ in 0..num {
             match self.gen_actor() {
                 None => {
@@ -101,6 +102,10 @@ impl Encounter {
             }
         }
 
+        for entry in self.entries.iter() {
+            if entry.always { actors.push(Rc::clone(&entry.actor)); }
+        }
+
         actors
     }
 }
@@ -110,15 +115,21 @@ impl Encounter {
 pub struct EncounterBuilder {
     pub id: String,
     pub auto_spawn: bool,
-    min_actors: u32,
-    max_actors: u32,
-    entries: HashMap<String, EntryBuilder>,
+    min_gen_actors: u32,
+    max_gen_actors: u32,
+    entries: Vec<EntryBuilder>,
 }
 
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct EntryBuilder {
+    id: String,
+
+    #[serde(default)]
     weight: u32,
+
+    #[serde(default)]
+    always: bool,
 }
 
 impl ResourceBuilder for EncounterBuilder {

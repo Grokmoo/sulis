@@ -1,0 +1,44 @@
+id: ogre
+name: Ogre
+description: "Monster"
+size: 3by3
+movement_rate: 1.2
+base_stats:
+  - kind: { attribute: [Strength, 3 ] }
+  - kind: { attribute: [Dexterity, -2 ] }
+  - kind: { attribute: [Endurance, 3 ] }
+  - kind: { attribute: [Intellect, -3 ] }
+  - kind: { hit_points: 40 }
+  - kind: { melee_accuracy: 30 }
+  - kind: { ranged_accuracy: 30 }
+  - kind: { spell_accuracy: 20 }
+  - kind: { defense: 30 }
+  - kind: { fortitude: 30 }
+  - kind: { reflex: 30 }
+  - kind: { will: 30 }
+  - kind: { reach: 1.0 }
+base_attack:
+  damage:
+    min: 15
+    max: 22
+    kind: Crushing
+  kind: #Melee
+    reach: 1.0
+  bonuses: {}
+default_images:
+  Male:
+    Background: creatures/ogre01
+    Shadow: creatures/ogre_shadow
+  Female:
+    Background: creatures/ogre01
+    Shadow: creatures/ogre_shadow
+mouseover_offset: [0, -6]
+ticker_offset: [0.0, 1.5]
+image_layer_offset_scale: 16
+image_layer_offsets:
+  HeldMain: [-34, -16]
+  HeldOff: [33, -15]
+  Shadow: [-8, -24]
+  Background: [-8, -24]
+image_layer_postfix: {}
+

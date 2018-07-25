@@ -23,6 +23,11 @@ groups:
       selected1: [2, 29]
       selected2: [4, 29]
       selected3: [6, 29]
+  4by4:
+    size: [4, 4]
+    areas:
+      ogre01: [29, 21]
+      ogre_shadow: [33, 21]
   3by3:
     size: [3, 3]
     areas:

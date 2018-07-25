@@ -1,0 +1,35 @@
+id: ogre
+name: Ogre
+faction: Hostile
+images: {}
+race: ogre
+attributes:
+  str: 20
+  dex: 8
+  end: 15
+  per: 9
+  int: 6
+  wis: 9
+levels:
+  fighter: 6
+items: [ greataxe ]
+equipped: [ 0 ]
+reward:
+  xp: 200
+  loot: level5_misc
+  loot_chance: 100
+abilities:
+  - armor_light
+  - armor_medium
+  - armor_heavy
+  - weapon_axe
+  - weapon_crossbow
+  - weapon_bow
+  - weapon_small_sword
+  - weapon_large_sword
+  - weapon_spear
+  - weapon_mace
+  - weapon_simple
+  - mighty_blow
+  - powerful_blows
+  - stunning_blow

@@ -1,0 +1,17 @@
+id: goblins_level5
+auto_spawn: true
+min_gen_actors: 4
+max_gen_actors: 5
+entries:
+  - id: goblin_archer
+    weight: 4
+  - id: goblin_brute_01
+    weight: 1
+  - id: goblin_brute_02
+    weight: 1
+  - id: goblin_brute_03
+    weight: 1
+  - id: goblin_defender_01
+    weight: 1
+  - id: goblin_defender_02
+    weight: 1

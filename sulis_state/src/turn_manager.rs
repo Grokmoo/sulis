@@ -316,6 +316,7 @@ impl TurnManager {
 
             let mut entity = entity.borrow_mut();
             if entity.is_ai_active() { continue; }
+            if !entity.location.is_in(&area_state) { continue; }
 
             match entity.ai_group() {
                 None => continue,

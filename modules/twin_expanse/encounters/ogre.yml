@@ -1,0 +1,11 @@
+id: ogre
+auto_spawn: false
+min_gen_actors: 0
+max_gen_actors: 0
+entries:
+  - id: ogre
+    always: true
+  - id: goblin_archer
+    always: true
+  - id: goblin_archer
+    always: true

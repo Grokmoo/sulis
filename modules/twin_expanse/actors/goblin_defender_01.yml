@@ -1,0 +1,34 @@
+id: goblin_defender_01
+name: Goblin Defender
+faction: Hostile
+images: {}
+race: goblin
+attributes:
+  str: 10
+  dex: 13
+  end: 12
+  per: 12
+  int: 7
+  wis: 9
+levels:
+  fighter: 3
+items: [ mace, torso_leather, shield_small ]
+equipped: [ 0, 1, 2 ]
+reward:
+  xp: 50
+  loot: level1_misc
+  loot_chance: 45
+abilities:
+  - armor_light
+  - armor_medium
+  - armor_heavy
+  - weapon_axe
+  - weapon_crossbow
+  - weapon_bow
+  - weapon_small_sword
+  - weapon_large_sword
+  - weapon_spear
+  - weapon_mace
+  - weapon_simple
+  - shield_slam
+  - defensive_fighting

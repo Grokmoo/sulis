@@ -1,7 +1,7 @@
 id: goblins_level1
 auto_spawn: true
-min_actors: 2
-max_actors: 2
+min_gen_actors: 2
+max_gen_actors: 2
 entries:
-  goblin:
+  - id: goblin
     weight: 1

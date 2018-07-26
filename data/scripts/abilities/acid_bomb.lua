@@ -24,7 +24,7 @@ function on_target_select(parent, ability, targets)
     duration = duration * 3 / 2
   end
   
-  target:take_damage(4, 8, "Acid")
+  target:take_damage(4, 8, "Acid", 5)
   
   effect = target:create_effect(ability:name(), duration)
   effect:add_num_bonus("melee_accuracy", -10)
@@ -53,5 +53,5 @@ end
 function apply_damage(parent, ability, targets)
   target = targets:first()
   
-  target:take_damage(4, 8, "Acid")
+  target:take_damage(4, 8, "Acid", 5)
 end

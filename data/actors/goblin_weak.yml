@@ -12,8 +12,9 @@ attributes:
   wis: 9
 levels:
   rogue: 1
-items: [ weak_dagger ]
-equipped: [ 0 ]
+inventory:
+  equipped:
+    HeldMain: weak_dagger
 reward:
   xp: 25
   loot: level1_misc

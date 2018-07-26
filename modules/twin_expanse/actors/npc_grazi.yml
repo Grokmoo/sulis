@@ -27,16 +27,15 @@ skin_color:
   g: 0.2549019753932953
   b: 0.16862745583057404
   a: 1
-items:
-  - shortsword
-  - boots_leather
-  - torso_leather
-  - legs_leather
-equipped:
-  - 0
-  - 1
-  - 2
-  - 3
+inventory:
+  equipped:
+    HeldMain: shortsword
+    Feet: boots_leather
+    Torso: torso_leather
+    Legs: legs_leather
+  quick:
+    Usable1: potion_healing
+    AltHeldMain: shortbow
 xp: 300
 levels:
   rogue: 3

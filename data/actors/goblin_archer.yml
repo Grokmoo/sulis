@@ -12,8 +12,11 @@ attributes:
   wis: 10
 levels:
   rogue: 3
-items: [ shortbow ]
-equipped: [ 0 ]
+inventory:
+  equipped:
+    HeldMain: shortbow
+  quick:
+    AltHeldMain: dagger
 reward:
   xp: 40
   loot: level1_misc

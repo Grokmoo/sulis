@@ -26,16 +26,15 @@ skin_color:
   g: 0.95686274766922
   b: 0.7843137383460999
   a: 1.0
-items:
-  - shortbow
-  - boots_leather
-  - torso_leather
-  - legs_pants
-equipped:
-  - 0
-  - 1
-  - 2
-  - 3
+inventory:
+  equipped:
+    HeldMain: shortbow
+    Feet: boots_leather
+    Torso: torso_leather
+    Legs: legs_leather
+  quick:
+    Usable1: potion_healing
+    AltHeldMain: shortbow
 xp: 300
 levels:
   fighter: 3

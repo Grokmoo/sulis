@@ -22,7 +22,7 @@ use std::collections::HashMap;
 use sulis_core::image::Image;
 use sulis_core::util::invalid_data_error;
 use sulis_rules::{StatList, Slot, ItemKind, WeaponStyle, bonus::AttackKindBuilder, QuickSlot};
-use sulis_module::{ImageLayer, Module};
+use sulis_module::{Actor, ImageLayer, Module};
 use {ItemList, ItemState};
 use save_state::ItemListEntrySaveState;
 
@@ -309,14 +309,23 @@ impl Inventory {
 
     /// attempts to set the item at the given index as a quick item.  returns
     /// true if successful, false if not
-    pub fn set_quick(&mut self, index: usize, quick_slot: QuickSlot) -> bool {
-        {
-            let item_state = match self.items.get(index) {
-                None => return false,
-                Some(&(_, ref item)) => item,
-            };
+    pub fn set_quick(&mut self, index: usize,
+                     quick_slot: QuickSlot, actor: &Rc<Actor>) -> bool {
+        use sulis_rules::QuickSlot::*;
+        match quick_slot {
+            Usable1 | Usable2 | Usable3 | Usable4 => {
+                let item_state = match self.items.get(index) {
+                    None => return false,
+                    Some(&(_, ref item)) => item,
+                };
 
-            if item_state.item.usable.is_none() { return false; }
+                if !item_state.item.meets_prereqs(actor) { return false; }
+                if item_state.item.usable.is_none() { return false; }
+            },
+            AltHeldMain | AltHeldOff => {
+                // TODO validate - this code path is only being used
+                // when loading actors from a file
+            },
         }
 
         self.quick.insert(quick_slot, index);
@@ -325,12 +334,14 @@ impl Inventory {
 
     /// equips the item at the given index.  returns true if the item
     /// was equipped.  false if the item does not exist
-    pub fn equip(&mut self, index: usize, stats: &StatList) -> bool {
+    pub fn equip(&mut self, index: usize, stats: &StatList, actor: &Rc<Actor>,
+                 preferred_slot: Option<Slot>) -> bool {
         trace!("Attempting equip of item at '{}", index);
 
         let (slot, alt_slot, blocked_slot) = match self.items.get(index) {
             None => return false,
             Some(&(_, ref item)) => {
+                if !item.item.meets_prereqs(actor) { return false; }
                 if !has_proficiency(item, stats) { return false; }
 
                 match &item.item.equippable {
@@ -364,23 +375,8 @@ impl Inventory {
 
         // now determine whether to go with primary or alt based on how many
         // items need to be removed from each.  prefer primary in a tie
-        let slot_to_use = if alt_slot.is_none() {
-            slot
-        } else {
-            let alt_slot = alt_slot.unwrap();
-            let mut alt_count = 0;
-            let mut primary_count = 0;
-            if to_remove_primary.is_some() { primary_count += 1; }
-            if self.equipped.get(&slot).is_some() { primary_count += 1; }
-            if to_remove_alt.is_some() { alt_count += 1; }
-            if self.equipped.get(&alt_slot).is_some() { alt_count += 1; }
-
-            if alt_count < primary_count {
-                alt_slot
-            } else {
-                slot
-            }
-        };
+        let slot_to_use = self.determine_slot_to_equip(slot, alt_slot, preferred_slot,
+                                                       to_remove_primary, to_remove_alt);
 
         if let Some(slot) = to_remove_primary {
             if !self.unequip(slot) { return false; }
@@ -396,6 +392,34 @@ impl Inventory {
         self.equipped.insert(slot_to_use, index);
 
         true
+    }
+
+    fn determine_slot_to_equip(&self, slot: Slot, alt_slot: Option<Slot>,
+                               preferred_slot: Option<Slot>,
+                               to_remove_primary: Option<Slot>,
+                               to_remove_alt: Option<Slot>) -> Slot {
+        let alt_slot = match alt_slot {
+            None => return slot,
+            Some(slot) => slot,
+        };
+
+        if let Some(preferred_slot) = preferred_slot {
+            if preferred_slot == slot { return slot; }
+            else if preferred_slot == alt_slot { return alt_slot; }
+        }
+
+        let mut alt_count = 0;
+        let mut primary_count = 0;
+        if to_remove_primary.is_some() { primary_count += 1; }
+        if self.equipped.get(&slot).is_some() { primary_count += 1; }
+        if to_remove_alt.is_some() { alt_count += 1; }
+        if self.equipped.get(&alt_slot).is_some() { alt_count += 1; }
+
+        if alt_count < primary_count {
+            alt_slot
+        } else {
+            slot
+        }
     }
 
     pub fn clear_quickslot(&mut self, quick_slot: QuickSlot) -> bool {

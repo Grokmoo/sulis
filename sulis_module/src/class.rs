@@ -23,7 +23,7 @@ use sulis_core::util::{invalid_data_error, unable_to_create_error, ExtInt};
 use sulis_core::serde_yaml;
 use sulis_rules::{AttributeList, BonusList};
 
-use {Ability, AbilityList, Module};
+use {Ability, AbilityList, InventoryBuilder, Module};
 
 #[derive(Deserialize, Serialize, Debug)]
 #[serde(deny_unknown_fields)]
@@ -31,8 +31,7 @@ pub struct Kit {
     pub name: String,
     pub description: String,
     pub default_attributes: AttributeList,
-    pub starting_equipment: Vec<String>,
-    pub starting_coins: i32,
+    pub starting_inventory: InventoryBuilder,
 }
 
 #[derive(Debug)]

@@ -27,20 +27,16 @@ skin_color:
   g: 0.7803921699523926
   b: 0.5803921818733215
   a: 1
-items:
-  - mace
-  - shield_large
-  - boots_leather
-  - torso_plate
-  - legs_mail
-  - gloves_leather
-equipped:
-  - 0
-  - 1
-  - 2
-  - 3
-  - 4
-  - 5
+inventory:
+  equipped:
+    HeldMain: mace
+    HeldOff: shield_large
+    Feet: boots_leather
+    Torso: torso_plate
+    Legs: legs_mail
+    Hands: gloves_leather
+  quick:
+    Usable1: potion_healing
 xp: 300
 levels:
   fighter: 3

@@ -12,8 +12,6 @@ attributes:
   wis: 10
 levels:
   mage: 3
-items: [  ]
-equipped: [  ]
 reward:
   xp: 50
   loot: level1_misc

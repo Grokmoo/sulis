@@ -1,0 +1,42 @@
+id: scorpion_large
+name: Scorpion
+description: "Monster"
+size: 3by3
+movement_rate: 1.0
+base_stats:
+  - kind: { attribute: [Strength, 3 ] }
+  - kind: { attribute: [Dexterity, 4 ] }
+  - kind: { attribute: [Endurance, 3 ] }
+  - kind: { attribute: [Intellect, -5 ] }
+  - kind: { hit_points: 40 }
+  - kind: { melee_accuracy: 30 }
+  - kind: { ranged_accuracy: 30 }
+  - kind: { spell_accuracy: 20 }
+  - kind: { defense: 30 }
+  - kind: { fortitude: 30 }
+  - kind: { reflex: 30 }
+  - kind: { will: 30 }
+  - kind: { reach: 1.0 }
+base_attack:
+  damage:
+    min: 15
+    max: 22
+    kind: Piercing
+  kind: #Melee
+    reach: 1.0
+  bonuses: {}
+default_images:
+  Male:
+    Background: creatures/scorpion_large
+    Shadow: creatures/scorpion_large_shadow
+  Female:
+    Background: creatures/scorpion_large
+    Shadow: creatures/scorpion_large_shadow
+mouseover_offset: [0, 0]
+ticker_offset: [-0.5, 0.0]
+image_layer_offset_scale: 16
+image_layer_offsets:
+  Shadow: [-7, -10]
+  Background: [-7, -10]
+image_layer_postfix: {}
+

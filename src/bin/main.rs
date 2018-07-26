@@ -36,6 +36,7 @@ fn init() -> Box<IO> {
     // CONFIG will be lazily initialized here; if it fails it
     // prints an error and exits
     util::setup_logger();
+    info!("=========Initializing=========");
     info!("Setup Logger and read configuration from 'config.yml'");
 
     info!("Reading resources from {}", CONFIG.resources.directory);

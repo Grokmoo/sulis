@@ -11,8 +11,10 @@ attributes:
   wis: 10
 levels:
   fighter: 4
-items: [ hatchet, torso_leather ]
-equipped: [ 0, 1 ]
+inventory:
+  equipped:
+    HeldMain: hatchet
+    Torso: torso_leather
 reward:
   xp: 50
   loot: level1_misc

@@ -22,6 +22,8 @@ weighted_entries:
     weight: 10
   potion_power:
     weight: 10
+  potion_spellpower:
+    weight: 10
   amulet_gold:
     weight: 10
   amulet_silver:

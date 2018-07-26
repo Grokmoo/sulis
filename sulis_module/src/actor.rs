@@ -27,7 +27,8 @@ use sulis_core::util::{unable_to_create_error};
 use sulis_core::{serde_yaml};
 use sulis_rules::AttributeList;
 
-use {Ability, Class, Conversation, ImageLayer, ImageLayerSet, Item, LootList, Module, Race};
+use {Ability, Class, Conversation, ImageLayer, ImageLayerSet, InventoryBuilder,
+    LootList, Module, Race};
 
 #[derive(Deserialize, Serialize, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
@@ -82,9 +83,7 @@ pub struct Actor {
     pub race: Rc<Race>,
     pub sex: Sex,
     pub attributes: AttributeList,
-    pub items: Vec<Rc<Item>>,
-    pub coins: i32,
-    pub to_equip: Vec<usize>,
+    pub inventory: InventoryBuilder,
     pub xp: u32,
     pub total_level: u32,
     pub levels: Vec<(Rc<Class>, u32)>,
@@ -155,9 +154,7 @@ impl Actor {
             race: Rc::clone(&other.race),
             sex: other.sex,
             attributes: other.attributes,
-            items: other.items.clone(),
-            coins: other.coins,
-            to_equip: other.to_equip.clone(),
+            inventory: other.inventory.clone(),
             xp,
             total_level: other.total_level + 1,
             levels,
@@ -192,20 +189,6 @@ impl Actor {
             }
         };
 
-        let mut items: Vec<Rc<Item>> = Vec::new();
-        if let Some(builder_items) = builder.items {
-            for item_id in builder_items {
-                let item = match resources.items.get(&item_id) {
-                    None => {
-                        warn!("No match found for item ID '{}'", item_id);
-                        return unable_to_create_error("actor", &builder.id);
-                    },
-                    Some(item) => Rc::clone(item)
-                };
-                items.push(item);
-            }
-        }
-
         let sex = match builder.sex {
             None => Sex::Male,
             Some(sex) => sex,
@@ -223,24 +206,6 @@ impl Actor {
 
             total_level += level;
             levels.push((class, level));
-        }
-
-        let mut to_equip: Vec<usize> = Vec::new();
-        if let Some(builder_equipped) = builder.equipped {
-            for index in builder_equipped {
-                let index = index as usize;
-                if index >= items.len() {
-                    warn!("No item exists to equip at index {}", index);
-                    return unable_to_create_error("actor", &builder.id);
-                }
-
-                if items[index].equippable.is_none() {
-                    warn!("Item at index {}: {} is not equippable.", index, items[index].name);
-                    return unable_to_create_error("actor", &builder.id);
-                }
-
-                to_equip.push(index);
-            }
         }
 
         let portrait = match builder.portrait {
@@ -316,10 +281,8 @@ impl Actor {
             levels,
             total_level,
             xp: builder.xp.unwrap_or(0),
+            inventory: builder.inventory,
             reward,
-            items,
-            coins: builder.coins.unwrap_or(0),
-            to_equip,
             image_layers,
             image,
             builder_images: builder.images,
@@ -403,9 +366,8 @@ pub struct ActorBuilder {
     pub hue: Option<f32>,
     pub hair_color: Option<Color>,
     pub skin_color: Option<Color>,
-    pub items: Option<Vec<String>>,
-    pub equipped: Option<Vec<u32>>,
-    pub coins: Option<i32>,
+    #[serde(default)]
+    pub inventory: InventoryBuilder,
     pub levels: HashMap<String, u32>,
     pub xp: Option<u32>,
     pub reward: Option<RewardBuilder>,

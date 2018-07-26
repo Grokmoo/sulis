@@ -26,18 +26,16 @@ skin_color:
   g: 0.3450980484485626
   b: 0.6784313917160034
   a: 1
-items:
-  - quarterstaff
-  - boots_leather
-  - torso_shirt
-  - legs_pants
-  - cloak
-equipped:
-  - 0
-  - 1
-  - 2
-  - 3
-  - 4
+inventory:
+  equipped:
+    HeldMain: quarterstaff
+    Feet: boots_leather
+    Torso: torso_shirt
+    Legs: legs_pants
+    Cloak: cloak
+  quick:
+    Usable1: potion_healing
+    AltHeldMain: crossbow
 xp: 300
 levels:
   mage: 3

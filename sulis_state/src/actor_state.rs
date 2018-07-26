@@ -124,8 +124,6 @@ impl ActorState {
             ability_states.insert(ability.id.to_string(), AbilityState::new(ability));
         }
 
-        let to_equip = actor.to_equip.clone();
-
         let current_group_uses_per_encounter = HashMap::new();
 
         let xp = actor.xp;
@@ -146,16 +144,23 @@ impl ActorState {
             current_group_uses_per_encounter,
         };
 
-        for item in actor.items.iter() {
-            let index = actor_state.inventory.items.add(ItemState::new(Rc::clone(item)));
-            actor_state.check_add_to_quickslot(index, 1);
-        }
-        actor_state.inventory.coins = actor.coins;
-
         actor_state.compute_stats();
-        for index in to_equip.iter() {
-            actor_state.inventory.equip(*index, &actor_state.stats);
+
+        for (slot, item) in actor.inventory.equipped_iter() {
+            let index = actor_state.inventory.items.add(ItemState::new(item));
+            actor_state.inventory.equip(index, &actor_state.stats, &actor, Some(slot));
         }
+
+        for (slot, item) in actor.inventory.quick_iter() {
+            let index = actor_state.inventory.items.add(ItemState::new(item));
+            actor_state.inventory.set_quick(index, slot, &actor);
+        }
+
+        for item in actor.inventory.item_iter() {
+            actor_state.inventory.items.add(ItemState::new(item));
+        }
+
+        actor_state.inventory.coins = actor.inventory.coins() as i32;
 
         actor_state
     }
@@ -188,6 +193,8 @@ impl ActorState {
         match &self.inventory.items.get(item_index) {
             None => false,
             Some(&(_, ref item_state)) => {
+                if !item_state.item.meets_prereqs(&self.actor) { return false; }
+
                 match &item_state.item.usable {
                     None => false,
                     Some(usable) => {
@@ -540,7 +547,7 @@ impl ActorState {
     }
 
     pub fn set_quick(&mut self, index: usize, slot: QuickSlot) {
-        self.inventory.set_quick(index, slot);
+        self.inventory.set_quick(index, slot, &self.actor);
         self.listeners.notify(&self);
     }
 
@@ -560,8 +567,8 @@ impl ActorState {
         }
     }
 
-    pub fn equip(&mut self, index: usize) -> bool {
-        let result = self.inventory.equip(index, &self.stats);
+    pub fn equip(&mut self, index: usize, preferred_slot: Option<Slot>) -> bool {
+        let result = self.inventory.equip(index, &self.stats, &self.actor, preferred_slot);
         self.compute_stats();
         self.texture_cache_invalid = true;
 

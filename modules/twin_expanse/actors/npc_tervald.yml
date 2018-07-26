@@ -27,20 +27,16 @@ skin_color:
   g: 0.5254902243614197
   b: 0.3803921639919281
   a: 1
-items:
-  - battleaxe
-  - shield_small
-  - boots_leather
-  - torso_mail
-  - legs_mail
-  - gloves_mail
-equipped:
-  - 0
-  - 1
-  - 2
-  - 3
-  - 4
-  - 5
+inventory:
+  equipped:
+    HeldMain: battleaxe
+    HeldOff: shield_small
+    Feet: boots_leather
+    Torso: torso_mail
+    Legs: legs_mail
+    Hands: gloves_mail
+  quick:
+    Usable1: potion_healing
 xp: 600
 levels:
   fighter: 4

@@ -1,8 +1,8 @@
-id: shroom_med
-name: Mushroom
+id: scorpion_medium
+name: Scorpion
 faction: Hostile
 images: {}
-race: shroom
+race: scorpion_medium
 attributes:
   str: 10
   dex: 10
@@ -11,7 +11,7 @@ attributes:
   int: 10
   wis: 10
 levels:
-  fighter: 1
+  fighter: 3
 reward:
   xp: 25
   loot: level1_misc

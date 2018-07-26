@@ -20,6 +20,9 @@ probability_entries:
   poison_vial:
     weight: 75
     quantity: [1, 4]
+  potion_spellpower:
+    weight: 75
+    quantity: [1, 4]
   boots_leather:
     weight: 80
   boots_mail:

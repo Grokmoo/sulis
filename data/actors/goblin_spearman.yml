@@ -12,8 +12,9 @@ attributes:
   wis: 10
 levels:
   rogue: 3
-items: [ shortspear ]
-equipped: [ 0 ]
+inventory:
+  equipped:
+    HeldMain: shortspear
 reward:
   xp: 25
   loot: level1_misc

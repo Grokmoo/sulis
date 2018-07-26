@@ -14,10 +14,13 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::str::FromStr;
+
 use rlua::{Lua, UserData, UserDataMethods};
 
 use sulis_core::util::{ExtInt, Point};
-use sulis_rules::{Attribute, BonusKind, BonusList, Damage, DamageKind};
+use sulis_rules::{Attribute, Bonus, BonusKind, BonusList, Damage, DamageKind, bonus::Contingent,
+    WeaponKind, ArmorKind, Slot, WeaponStyle};
 
 use script::{CallbackData, Result, script_particle_generator, ScriptParticleGenerator,
     script_color_animation, ScriptColorAnimation, ScriptAbility};
@@ -100,44 +103,6 @@ impl UserData for ScriptEffect {
             effect.pgens.push(pgen);
             Ok(())
         });
-        methods.add_method_mut("add_num_bonus", &add_num_bonus);
-        methods.add_method_mut("add_damage", |_, effect, (min, max, ap): (u32, u32, Option<u32>)| {
-            effect.bonuses.add_kind(BonusKind::Damage(Damage { min, max, ap: ap.unwrap_or(0), kind: None }));
-            Ok(())
-        });
-        methods.add_method_mut("add_hidden", |_, effect, ()| {
-            effect.bonuses.add_kind(BonusKind::Hidden);
-            Ok(())
-        });
-        methods.add_method_mut("add_move_disabled", |_, effect, ()| {
-            effect.bonuses.add_kind(BonusKind::MoveDisabled);
-            Ok(())
-        });
-        methods.add_method_mut("add_attack_disabled", |_, effect, ()| {
-            effect.bonuses.add_kind(BonusKind::AttackDisabled);
-            Ok(())
-        });
-        methods.add_method_mut("add_damage_of_kind", |_, effect, (min, max, kind, ap):
-                               (u32, u32, String, Option<u32>)| {
-            let kind = DamageKind::from_str(&kind);
-            effect.bonuses.add_kind(BonusKind::Damage(Damage { min, max, ap: ap.unwrap_or(0), kind: Some(kind) }));
-            Ok(())
-        });
-        methods.add_method_mut("add_armor_of_kind", |_, effect, (value, kind): (i32, String)| {
-            let kind = DamageKind::from_str(&kind);
-            effect.bonuses.add_kind(BonusKind::ArmorKind { kind, amount: value });
-            Ok(())
-        });
-        methods.add_method_mut("add_attribute_bonus", |_, effect, (attr, amount): (String, i8)| {
-            let attribute = match Attribute::from(&attr) {
-                None => {
-                    warn!("Invalid attribute {} in script", attr);
-                    return Ok(());
-                }, Some(attr) => attr,
-            };
-            effect.bonuses.add_kind(BonusKind::Attribute { attribute, amount });
-            Ok(())
-        });
         methods.add_method_mut("add_callback", |_, effect, cb: CallbackData| {
             effect.callbacks.push(cb);
             Ok(())
@@ -150,42 +115,193 @@ impl UserData for ScriptEffect {
             effect.tag = tag;
             Ok(())
         });
+        methods.add_method_mut("add_num_bonus", &add_num_bonus);
+        methods.add_method_mut("add_damage", |_, effect, (min, max, ap, when):
+                               (u32, u32, Option<u32>, Option<String>)| {
+            let kind = BonusKind::Damage(Damage { min, max, ap: ap.unwrap_or(0), kind: None });
+            add_bonus_to_effect(effect, kind, when);
+            Ok(())
+        });
+        methods.add_method_mut("add_hidden", |_, effect, when: Option<String>| {
+            let kind = BonusKind::Hidden;
+            add_bonus_to_effect(effect, kind, when);
+            Ok(())
+        });
+        methods.add_method_mut("add_move_disabled", |_, effect, when: Option<String>| {
+            let kind = BonusKind::MoveDisabled;
+            add_bonus_to_effect(effect, kind, when);
+            Ok(())
+        });
+        methods.add_method_mut("add_attack_disabled", |_, effect, when: Option<String>| {
+            let kind = BonusKind::AttackDisabled;
+            add_bonus_to_effect(effect, kind, when);
+            Ok(())
+        });
+        methods.add_method_mut("add_damage_of_kind", |_, effect, (min, max, kind, ap, when):
+                               (u32, u32, String, Option<u32>, Option<String>)| {
+            let dmg_kind = DamageKind::from_str(&kind);
+            let kind = BonusKind::Damage(
+                Damage { min, max, ap: ap.unwrap_or(0), kind: Some(dmg_kind) }
+            );
+            add_bonus_to_effect(effect, kind, when);
+            Ok(())
+        });
+        methods.add_method_mut("add_armor_of_kind", |_, effect, (value, kind, when):
+                               (i32, String, Option<String>)| {
+            let armor_kind = DamageKind::from_str(&kind);
+            let kind = BonusKind::ArmorKind { kind: armor_kind, amount: value };
+            add_bonus_to_effect(effect, kind, when);
+            Ok(())
+        });
+        methods.add_method_mut("add_attribute_bonus", |_, effect, (attr, amount, when):
+                               (String, i8, Option<String>)| {
+            let attribute = match Attribute::from(&attr) {
+                None => {
+                    warn!("Invalid attribute {} in script", attr);
+                    return Ok(());
+                }, Some(attr) => attr,
+            };
+            let kind = BonusKind::Attribute { attribute, amount };
+            add_bonus_to_effect(effect, kind, when);
+            Ok(())
+        });
     }
 }
 
-fn add_num_bonus(_lua: &Lua, effect: &mut ScriptEffect, args: (String, f32)) -> Result<()> {
-    let (name, amount) = args;
+fn add_bonus_to_effect(effect: &mut ScriptEffect, bonus_kind: BonusKind, when: Option<String>) {
+    if let Some(when) = when {
+        let split: Vec<_> = when.split(" ").collect();
+        if split.is_empty() {
+            warn!("Unable to parse bonus when of '{}'", when);
+            return;
+        }
+
+        let contingent = if split.len() == 1 {
+            match split[0] {
+                "always" => Contingent::Always,
+                "attack_when_hidden" => Contingent::AttackWhenHidden,
+                "attack_when_flanking" => Contingent::AttackWhenFlanking,
+                _ => {
+                    warn!("Unable to parse contingent '{}'.  May need an additional arg.", when);
+                    return;
+                }
+            }
+        } else {
+            match split[0] {
+                "weapon_equipped" => {
+                    if split.len() != 2 {
+                        warn!("Need 2 args for weapon_equipped from '{}'", when);
+                        return;
+                    }
+
+                    if let Ok(weapon_kind) = WeaponKind::from_str(split[1]) {
+                        Contingent::WeaponEquipped(weapon_kind)
+                    } else {
+                        return;
+                    }
+                },
+                "armor_equipped" => {
+                    if split.len() != 3 {
+                        warn!("Need 3 args for armor_equipped from '{}'", when);
+                        return;
+                    }
+
+                    let armor_kind = match ArmorKind::from_str(split[1]) {
+                        Err(_) => return,
+                        Ok(kind) => kind,
+                    };
+
+                    let slot = match Slot::from_str(split[2]) {
+                        Err(_) => return,
+                        Ok(slot) => slot,
+                    };
+
+                    Contingent::ArmorEquipped { kind: armor_kind, slot }
+                },
+                "weapon_style" => {
+                    if split.len() != 2 {
+                        warn!("Need 2 args for weapon_style from '{}'", when);
+                        return;
+                    }
+
+                    if let Ok(weapon_style) = WeaponStyle::from_str(split[1]) {
+                        Contingent::WeaponStyle(weapon_style)
+                    } else {
+                        return;
+                    }
+                },
+                "attack_with_weapon" => {
+                    if split.len() != 2 {
+                        warn!("Need 2 args for attack_with_weapon from '{}'", when);
+                        return;
+                    }
+
+                    if let Ok(weapon_kind) = WeaponKind::from_str(split[1]) {
+                        Contingent::AttackWithWeapon(weapon_kind)
+                    } else {
+                        return;
+                    }
+                },
+                "attack_with_damage_kind" => {
+                    if split.len() != 2 {
+                        warn!("Need 2 args for attack_with_damage_kind from '{}'", when);
+                        return;
+                    }
+
+                    Contingent::AttackWithDamageKind(DamageKind::from_str(split[1]))
+                },
+                _ => {
+                    warn!("Unable to parse contingent '{}'.  Unknown kind / too many args.", when);
+                    return
+                }
+            }
+        };
+
+        let bonus = Bonus { when: contingent, kind: bonus_kind };
+        effect.bonuses.add(bonus);
+    } else {
+        effect.bonuses.add_kind(bonus_kind);
+    }
+}
+
+fn add_num_bonus(_lua: &Lua, effect: &mut ScriptEffect, (name, amount, when):
+                 (String, f32, Option<String>)) -> Result<()> {
     let name = name.to_lowercase();
     let amount_int = amount as i32;
 
     trace!("Adding numeric bonus {} to '{}'", amount, name);
     use sulis_rules::bonus::BonusKind::*;
-    match name.as_ref() {
-        "armor" => effect.bonuses.add_kind(Armor(amount_int)),
-        "ap" => effect.bonuses.add_kind(ActionPoints(amount_int)),
-        "reach" => effect.bonuses.add_kind(Reach(amount)),
-        "range" => effect.bonuses.add_kind(Range(amount)),
-        "initiative" => effect.bonuses.add_kind(Initiative(amount_int)),
-        "hit_points" => effect.bonuses.add_kind(HitPoints(amount_int)),
-        "melee_accuracy" => effect.bonuses.add_kind(MeleeAccuracy(amount_int)),
-        "ranged_accuracy" => effect.bonuses.add_kind(RangedAccuracy(amount_int)),
-        "spell_accuracy" => effect.bonuses.add_kind(SpellAccuracy(amount_int)),
-        "defense" => effect.bonuses.add_kind(Defense(amount_int)),
-        "fortitude" => effect.bonuses.add_kind(Fortitude(amount_int)),
-        "reflex" => effect.bonuses.add_kind(Reflex(amount_int)),
-        "will" => effect.bonuses.add_kind(Will(amount_int)),
-        "concealment" => effect.bonuses.add_kind(Concealment(amount_int)),
-        "concealment_ignore" => effect.bonuses.add_kind(ConcealmentIgnore(amount_int)),
-        "crit_threshold" => effect.bonuses.add_kind(CritThreshold(amount_int)),
-        "hit_threshold" => effect.bonuses.add_kind(HitThreshold(amount_int)),
-        "graze_threshold" => effect.bonuses.add_kind(GrazeThreshold(amount_int)),
-        "graze_multiplier" => effect.bonuses.add_kind(GrazeMultiplier(amount)),
-        "hit_multiplier" => effect.bonuses.add_kind(HitMultiplier(amount)),
-        "crit_multiplier" => effect.bonuses.add_kind(CritMultiplier(amount)),
-        "movement_rate" => effect.bonuses.add_kind(MovementRate(amount)),
-        "attack_cost" => effect.bonuses.add_kind(AttackCost(amount_int)),
-        _ => warn!("Attempted to add num bonus with invalid type '{}'", name),
-    }
+    let kind = match name.as_ref() {
+        "armor" => Armor(amount_int),
+        "ap" => ActionPoints(amount_int),
+        "reach" => Reach(amount),
+        "range" => Range(amount),
+        "initiative" => Initiative(amount_int),
+        "hit_points" => HitPoints(amount_int),
+        "melee_accuracy" => MeleeAccuracy(amount_int),
+        "ranged_accuracy" => RangedAccuracy(amount_int),
+        "spell_accuracy" => SpellAccuracy(amount_int),
+        "defense" => Defense(amount_int),
+        "fortitude" => Fortitude(amount_int),
+        "reflex" => Reflex(amount_int),
+        "will" => Will(amount_int),
+        "concealment" => Concealment(amount_int),
+        "concealment_ignore" => ConcealmentIgnore(amount_int),
+        "crit_threshold" => CritThreshold(amount_int),
+        "hit_threshold" => HitThreshold(amount_int),
+        "graze_threshold" => GrazeThreshold(amount_int),
+        "graze_multiplier" => GrazeMultiplier(amount),
+        "hit_multiplier" => HitMultiplier(amount),
+        "crit_multiplier" => CritMultiplier(amount),
+        "movement_rate" => MovementRate(amount),
+        "attack_cost" => AttackCost(amount_int),
+        _ => {
+            warn!("Attempted to add num bonus with invalid type '{}'", name);
+            return Ok(());
+        }
+    };
+
+    add_bonus_to_effect(effect, kind, when);
     Ok(())
 }
 

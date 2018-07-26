@@ -24,8 +24,9 @@ use sulis_core::image::{Image, LayeredImage};
 use sulis_core::resource::ResourceSet;
 use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
 use sulis_core::util::Point;
+use sulis_rules::Slot;
 use sulis_module::actor::Sex;
-use sulis_module::{ImageLayer, ImageLayerSet, Module, Race};
+use sulis_module::{ImageLayer, ImageLayerSet, Item, Race};
 use sulis_widgets::{Button, InputField, Label};
 
 use CharacterBuilder;
@@ -37,7 +38,7 @@ pub struct CosmeticSelectorPane {
     preview: Rc<RefCell<Widget>>,
 
     race: Option<Rc<Race>>,
-    items: Vec<String>,
+    items: Vec<(Slot, Rc<Item>)>,
     sex: Sex,
     name: String,
     hair_index: Option<usize>,
@@ -82,20 +83,27 @@ impl CosmeticSelectorPane {
         };
 
         let mut insert: HashMap<ImageLayer, Rc<Image>> = HashMap::new();
-        for ref item_id in self.items.iter() {
-            let item = match Module::item(item_id) {
-                None => {
-                    warn!("No item found for builder base item '{}'", item_id);
-                    continue;
-                }, Some(item) => item,
+        for (slot, item) in self.items.iter() {
+            let iter = match &item.equippable {
+                Some(equip) => {
+                    if equip.slot == *slot {
+                        item.image_iter()
+                    } else if equip.alternate_slot.unwrap() == *slot {
+                        item.alt_image_iter()
+                    } else {
+                        unreachable!()
+                    }
+                },
+                None => unreachable!(),
             };
 
-            if let Some(iter) = item.image_iter() {
+            if let Some(iter) = iter {
                 iter.for_each(|(layer, image)| { insert.insert(*layer, Rc::clone(image)); });
             }
         }
 
-        let images_list = image_layers.get_list_with(self.sex, &race, self.hair_color, self.skin_color, insert);
+        let images_list = image_layers.get_list_with(self.sex, &race, self.hair_color,
+                                                     self.skin_color, insert);
         self.preview_image = Some(Rc::new(LayeredImage::new(images_list, self.hue)));
     }
 
@@ -149,8 +157,10 @@ impl BuilderPane for CosmeticSelectorPane {
             }
         }
 
-        if let Some(ref items) = builder.items {
-            self.items = items.clone();
+        if let Some(ref inventory) = builder.inventory {
+            for (slot, item) in inventory.equipped_iter() {
+                self.items.push((slot, item));
+            }
         }
 
         builder.next.borrow_mut().state.set_enabled(self.name.len() > 1 && self.portrait.is_some());

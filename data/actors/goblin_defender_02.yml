@@ -11,8 +11,11 @@ attributes:
   wis: 10
 levels:
   fighter: 4
-items: [ shortsword, torso_mail, shield_small ]
-equipped: [ 0, 1, 2 ]
+inventory:
+  equipped:
+    HeldMain: shortsword
+    HeldOff: shield_small
+    Torso: torso_mail
 reward:
   xp: 50
   loot: level1_misc

@@ -33,6 +33,7 @@ use sulis_core::extern_image::ImageBuffer;
 use sulis_widgets::Label;
 use sulis_module::{ObjectSize, area::{Layer, Tile}};
 use sulis_state::{AreaDrawable, AreaState, EntityState, EntityTextureCache, GameState, Location};
+use sulis_state::area_feedback_text;
 
 use {EntityMouseover, PropMouseover, action_kind};
 
@@ -56,13 +57,13 @@ pub struct AreaView {
 
     targeter_label: Rc<RefCell<Widget>>,
     targeter_tile: Option<Rc<Image>>,
-    feedback_text_scale: f32,
     creature_selected_image: Option<Rc<Image>>,
     selection_box_image: Option<Rc<Image>>,
 
     scroll: Scrollable,
     hover_sprite: Option<HoverSprite>,
     selection_box_start: Option<(f32, f32)>,
+    feedback_text_params: area_feedback_text::Params,
 }
 
 const TILE_CACHE_TEXTURE_SIZE: u32 = 2048;
@@ -86,10 +87,10 @@ impl AreaView {
             layers: Vec::new(),
             scroll: Scrollable::new(),
             targeter_tile: None,
-            feedback_text_scale: 1.0,
             creature_selected_image: None,
             selection_box_image: None,
             selection_box_start: None,
+            feedback_text_params: area_feedback_text::Params::default(),
         }))
     }
 
@@ -379,7 +380,7 @@ impl WidgetKind for AreaView {
             if let Some(ref image_id) = theme.custom.get("targeter_tile") {
                 self.targeter_tile = ResourceSet::get_image(image_id);
             }
-            self.feedback_text_scale = theme.get_custom_or_default("feedback_text_scale", 1.0);
+
             if let Some(ref image_id) = theme.custom.get("creature_selected_image") {
                 self.creature_selected_image = ResourceSet::get_image(image_id);
             }
@@ -387,6 +388,27 @@ impl WidgetKind for AreaView {
             if let Some(ref image_id) = theme.custom.get("selection_box_image") {
                 self.selection_box_image = ResourceSet::get_image(image_id);
             }
+
+            self.feedback_text_params.scale =
+                theme.get_custom_or_default("feedback_text_scale", 1.0);
+
+            if let Some(ref font_id) = theme.custom.get("feedback_text_font") {
+                self.feedback_text_params.font = match ResourceSet::get_font(font_id) {
+                    None => {
+                        warn!("Invalid font specified for area feedback text '{}'", font_id);
+                        ResourceSet::get_default_font()
+                    }, Some(font) => font,
+                };
+            }
+
+            self.feedback_text_params.info_color =
+                theme.get_custom_or_default("feedback_text_info_color", color::LIGHT_GRAY);
+            self.feedback_text_params.miss_color =
+                theme.get_custom_or_default("feedback_text_miss_color", color::LIGHT_GRAY);
+            self.feedback_text_params.hit_color =
+                theme.get_custom_or_default("feedback_text_hit_color", color::RED);
+            self.feedback_text_params.heal_color =
+                theme.get_custom_or_default("feedback_text_heal_color", color::BLUE);
         }
 
         if self.targeter_tile.is_none() {
@@ -584,7 +606,7 @@ impl WidgetKind for AreaView {
         }
 
         for feedback_text in state.feedback_text_iter() {
-            feedback_text.draw(renderer, self.feedback_text_scale,
+            feedback_text.draw(renderer, &self.feedback_text_params,
                                p.x as f32 - self.scroll.x(), p.y as f32- self.scroll.y(),
                                scale_x, scale_y);
         }
@@ -701,7 +723,8 @@ impl WidgetKind for AreaView {
         } else if let Some(index) = area_state.borrow().prop_index_at(area_x, area_y) {
             let interactive = {
                 let area_state = area_state.borrow();
-                area_state.get_prop(index).is_container()
+                let prop = area_state.get_prop(index);
+                prop.is_container() && prop.is_enabled()
             };
 
             if interactive {

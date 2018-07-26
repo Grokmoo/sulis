@@ -122,8 +122,8 @@ impl Race {
         }
     }
 
-    pub fn get_image_layer_offset(&self, layer: ImageLayer) -> (f32, f32) {
-        *self.image_layer_offsets.get(&layer).unwrap_or(&(0.0, 0.0))
+    pub fn get_image_layer_offset(&self, layer: ImageLayer) -> Option<&(f32, f32)> {
+        self.image_layer_offsets.get(&layer)
     }
 
     pub fn default_images(&self) -> &ImageLayerSet {

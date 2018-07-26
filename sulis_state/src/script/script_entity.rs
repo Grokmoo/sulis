@@ -24,10 +24,9 @@ use rlua::{self, Lua, UserData, UserDataMethods};
 
 use sulis_core::util::ExtInt;
 use sulis_core::config::CONFIG;
-use sulis_core::ui::color;
 use sulis_core::resource::ResourceSet;
 use sulis_rules::{AttackKind, DamageKind, Attack};
-use {ActorState, EntityState, GameState};
+use {ActorState, EntityState, GameState, Location, area_feedback_text::ColorKind};
 use animation::{self};
 use script::*;
 
@@ -37,6 +36,10 @@ pub struct ScriptEntity {
 }
 
 impl ScriptEntity {
+    pub fn invalid() -> ScriptEntity {
+        ScriptEntity { index: None }
+    }
+
     pub fn new(index: usize) -> ScriptEntity {
         ScriptEntity { index: Some(index) }
     }
@@ -112,6 +115,12 @@ impl UserData for ScriptEntity {
                 None => Ok(false),
                 Some(index) => Ok(mgr.borrow().has_entity(index)),
             }
+        });
+
+        methods.add_method("is_party_member", |_, entity, ()| {
+            let entity = entity.try_unwrap()?;
+            let is_member = entity.borrow().is_party_member();
+            Ok(is_member)
         });
 
         methods.add_method("targets", &targets);
@@ -211,10 +220,31 @@ impl UserData for ScriptEntity {
         methods.add_method("teleport_to", |_, entity, dest: HashMap<String, i32>| {
             let (x, y) = unwrap_point(dest)?;
             let entity = entity.try_unwrap()?;
+            let entity_index = entity.borrow().index;
+            let mgr = GameState::turn_manager();
 
             let area_state = GameState::area_state();
-            let mut area_state = area_state.borrow_mut();
-            area_state.move_entity(&entity, x, y, 0);
+            if !entity.borrow().location.is_in(&area_state.borrow()) {
+                let old_area_state = GameState::get_area_state(
+                    &entity.borrow().location.area_id).unwrap();
+
+                let surfaces = old_area_state.borrow_mut().remove_entity(&entity);
+                for surface in surfaces {
+                    mgr.borrow_mut().remove_from_surface(entity_index, surface);
+                }
+
+                let new_loc = Location::new(x, y, &area_state.borrow().area);
+                match area_state.borrow_mut().transition_entity_to(entity, entity_index, new_loc) {
+                    Err(e) => {
+                        warn!("Unable to move entity using script function");
+                        warn!("{}", e);
+                    }, Ok(_) => (),
+                }
+            } else {
+                let mut area_state = area_state.borrow_mut();
+                area_state.move_entity(&entity, x, y, 0);
+            }
+
             Ok(())
         });
 
@@ -241,7 +271,7 @@ impl UserData for ScriptEntity {
                 Some(cb) => Some(Box::new(cb)),
             };
 
-            EntityState::attack(&parent, &target, cb);
+            EntityState::attack(&parent, &target, cb, false);
             Ok(())
         });
 
@@ -315,9 +345,9 @@ impl UserData for ScriptEntity {
                 }
 
                 parent.borrow_mut().remove_hp(total);
-                (format!("{}", total), color::RED)
+                (format!("{}", total), ColorKind::Hit)
             } else {
-                ("0".to_string(), color::GRAY)
+                ("0".to_string(), ColorKind::Miss)
             };
 
             let area_state = GameState::area_state();
@@ -329,7 +359,8 @@ impl UserData for ScriptEntity {
             let parent = entity.try_unwrap()?;
             parent.borrow_mut().actor.add_hp(amount);
             let area_state = GameState::area_state();
-            area_state.borrow_mut().add_feedback_text(format!("{}", amount), &parent, color::GREEN, 3.0);
+            area_state.borrow_mut().add_feedback_text(format!("{}", amount), &parent,
+                ColorKind::Heal, 3.0);
 
             Ok(())
         });

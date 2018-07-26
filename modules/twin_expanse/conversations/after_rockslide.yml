@@ -1,0 +1,50 @@
+id: after_rockslide
+initial_nodes:
+  - [start01, ~]
+nodes:
+  start01:
+    text: |
+      [c=888|As the dust clears, you see several members of your party around you, but no sign of Torvald.  It seems also that the goblins have left, at least for now.]
+    responses:
+      - text: |
+          What happened?
+        to: start02
+      - text: |
+          Where is Torvald?
+        to: start02
+  start02:
+    text: |
+      The goblins set some sort of trap for us.  I think we have to assume Torvald is dead.
+    responses:
+      - text: |
+          So what now?
+        to: start03
+      - text: |
+          We have to get out here.
+        to: start03b
+  start03b:
+    text: |
+      Agreed.
+    responses:
+      - text: |
+          [c=888|Continue]
+        to: start03
+  start03:
+    text: |
+      It doesn't look like we can go back, at least not in any rush.  And I doubt we have much time before those goblins are back here.
+    responses:
+      - text: |
+          [c=888|Continue]
+        to: start04
+  start04:
+    text: |
+      #player_name#, I think you are the best choice to lead us out of this.  You've certainly shown more initiative then anyone else here.
+      
+      [c=888|The others nod in agreement.  It looks like the matter has been quickly settled.]
+    responses:
+      - text: |
+          Alright then.  Lets go.
+        on_select:
+          fire_script:
+            id: wellswood_road_north
+            func: after_rockslide_dialog

@@ -19,7 +19,7 @@ use std::io::{Error, ErrorKind};
 use sulis_core::resource::ResourceBuilder;
 use sulis_core::serde_yaml;
 
-use Module;
+use {Module, OnTrigger};
 
 pub struct Frame {
     pub text: String,
@@ -28,6 +28,7 @@ pub struct Frame {
 pub struct Cutscene {
     pub id: String,
     pub frames: Vec<Frame>,
+    pub on_end: Option<OnTrigger>,
 }
 
 impl Cutscene {
@@ -43,6 +44,7 @@ impl Cutscene {
         Ok(Cutscene {
             id: builder.id,
             frames,
+            on_end: builder.on_end,
         })
     }
 }
@@ -59,6 +61,7 @@ pub struct FrameBuilder {
 pub struct CutsceneBuilder {
     pub id: String,
     pub frames: Vec<FrameBuilder>,
+    pub on_end: Option<OnTrigger>,
 }
 
 impl ResourceBuilder for CutsceneBuilder {

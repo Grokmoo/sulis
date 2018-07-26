@@ -1,0 +1,7 @@
+id: spiders_level3
+auto_spawn: true
+min_gen_actors: 6
+max_gen_actors: 8
+entries:
+  - id: spider
+    weight: 1

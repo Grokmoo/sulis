@@ -4,7 +4,7 @@ min_gen_actors: 4
 max_gen_actors: 5
 entries:
   - id: goblin_archer
-    weight: 4
+    weight: 3
   - id: goblin_brute_01
     weight: 1
   - id: goblin_brute_02
@@ -14,4 +14,8 @@ entries:
   - id: goblin_defender_01
     weight: 1
   - id: goblin_defender_02
+    weight: 1
+  - id: goblin_shaman_01
+    weight: 1
+  - id: goblin_shaman_02
     weight: 1

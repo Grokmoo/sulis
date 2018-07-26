@@ -1,0 +1,42 @@
+id: sea_serpent
+name: Sea Serpent
+description: "Monster"
+size: 4by4
+movement_rate: 1.0
+base_stats:
+  - kind: { attribute: [Strength, 5 ] }
+  - kind: { attribute: [Dexterity, 2 ] }
+  - kind: { attribute: [Endurance, 3 ] }
+  - kind: { attribute: [Intellect, -5 ] }
+  - kind: { hit_points: 40 }
+  - kind: { melee_accuracy: 30 }
+  - kind: { ranged_accuracy: 30 }
+  - kind: { spell_accuracy: 20 }
+  - kind: { defense: 30 }
+  - kind: { fortitude: 30 }
+  - kind: { reflex: 30 }
+  - kind: { will: 30 }
+  - kind: { reach: 1.0 }
+base_attack:
+  damage:
+    min: 20
+    max: 30
+    kind: Crushing
+  kind: #Melee
+    reach: 2.0
+  bonuses: {}
+default_images:
+  Male:
+    Background: creatures/seaserpent01
+    Shadow: creatures/seaserpent01_shadow
+  Female:
+    Background: creatures/seaserpent01
+    Shadow: creatures/seaserpent01_shadow
+mouseover_offset: [0, -2]
+ticker_offset: [0.0, 0.0]
+image_layer_offset_scale: 16
+image_layer_offsets:
+  Shadow: [0, -5]
+  Background: [0, -10]
+image_layer_postfix: {}
+

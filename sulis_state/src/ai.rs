@@ -196,7 +196,7 @@ impl EntityAI {
         };
 
         debug!("AI for '{}' is attacking.", self.entity.borrow().actor.actor.name);
-        EntityState::attack(&self.entity, target, None);
+        EntityState::attack(&self.entity, target, None, true);
     }
 
     fn do_end(&self) {

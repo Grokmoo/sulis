@@ -129,7 +129,10 @@ impl ImageLayerSet {
                         continue;
                     }
 
-                    let (x, y) = race.get_image_layer_offset(*layer);
+                    let (x, y) = match race.get_image_layer_offset(*layer) {
+                        None => continue,
+                        Some((x, y)) => (*x, *y),
+                    };
                     match sex_map.get(&layer) {
                         Some(ref image) => {
                             list.push((x, y, get_color(*layer, hair, skin), Rc::clone(image)));
@@ -174,7 +177,10 @@ fn get_color(layer: ImageLayer, hair: Option<Color>, skin: Option<Color>) -> Opt
 fn insert_for_race_sex(list: &mut Vec<(f32, f32, Option<Color>, Rc<Image>)>,
                        insert: &HashMap<ImageLayer, Rc<Image>>,
                        sex: Sex, race: &Rc<Race>, layer: ImageLayer) -> bool {
-    let (x, y) = race.get_image_layer_offset(layer);
+    let (x, y) = match race.get_image_layer_offset(layer) {
+        None => return true,
+        Some((x, y)) => (*x, *y),
+    };
     match insert.get(&layer) {
         Some(ref image) => {
             list.push((x, y, None, race.image_for_sex(sex, image)));

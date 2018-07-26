@@ -123,6 +123,8 @@ impl<'a> GliumRenderer<'a> {
     fn new(target: &'a mut glium::Frame, display: &'a mut GliumDisplay) -> GliumRenderer<'a> {
         let params = glium::DrawParameters {
             blend: glium::draw_parameters::Blend::alpha_blending(),
+            backface_culling: glium::draw_parameters::BackfaceCullingMode::CullingDisabled,
+            clip_planes_bitmask: 0,
 
             .. Default::default()
         };

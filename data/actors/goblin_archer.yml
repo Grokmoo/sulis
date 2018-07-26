@@ -1,21 +1,21 @@
-id: goblin_spearman
-name: Goblin Spearman
+id: goblin_archer
+name: Goblin Archer
 faction: Hostile
 images: {}
 race: goblin
 attributes:
   str: 9
-  dex: 13
-  end: 8
+  dex: 12
+  end: 10
   per: 12
-  int: 7
-  wis: 9
+  int: 10
+  wis: 10
 levels:
-  rogue: 1
-items: [ shortspear ]
+  rogue: 3
+items: [ shortbow ]
 equipped: [ 0 ]
 reward:
-  xp: 25
+  xp: 40
   loot: level1_misc
   loot_chance: 35
 abilities:

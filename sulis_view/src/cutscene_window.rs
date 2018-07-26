@@ -21,6 +21,7 @@ use std::cell::RefCell;
 use sulis_module::{Cutscene};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{Button, TextArea};
+use sulis_state::GameState;
 
 pub const NAME: &str = "cutscene_window";
 
@@ -46,12 +47,26 @@ impl WidgetKind for CutsceneWindow {
         let frame = match frame {
             None => {
                 widget.borrow_mut().mark_for_removal();
+                if let Some(cb) = &self.cutscene.on_end {
+                    let pc = GameState::player();
+                    GameState::add_ui_callback(cb.clone(), &pc, &pc);
+                }
                 return Vec::new();
             }, Some(ref frame) => frame,
         };
 
         let close = Widget::with_theme(Button::empty(), "close");
-        close.borrow_mut().state.add_callback(Callback::remove_parent());
+
+        let cutscene = Rc::clone(&self.cutscene);
+        close.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
+            let parent = Widget::get_parent(widget);
+            parent.borrow_mut().mark_for_removal();
+
+            if let Some(cb) = &cutscene.on_end {
+                let pc = GameState::player();
+                GameState::add_ui_callback(cb.clone(), &pc, &pc);
+            }
+        })));
 
         let next_button = Widget::with_theme(Button::empty(), "next_button");
         next_button.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {

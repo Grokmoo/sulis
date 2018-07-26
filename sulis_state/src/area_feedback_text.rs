@@ -14,13 +14,44 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::rc::Rc;
 use std::time::Instant;
 
 use sulis_core::config::CONFIG;
-use sulis_core::resource::ResourceSet;
+use sulis_core::resource::{ResourceSet, Font};
 use sulis_core::io::GraphicsRenderer;
-use sulis_core::ui::{Color, LineRenderer};
+use sulis_core::ui::{color, Color, LineRenderer};
 use sulis_core::util::{self, Point};
+
+pub struct Params {
+    pub font: Rc<Font>,
+    pub scale: f32,
+    pub info_color: Color,
+    pub miss_color: Color,
+    pub hit_color: Color,
+    pub heal_color: Color,
+}
+
+impl Default for Params {
+    fn default() -> Params {
+        Params {
+            font: ResourceSet::get_default_font(),
+            scale: 1.0,
+            info_color: color::LIGHT_GRAY,
+            miss_color: color::LIGHT_GRAY,
+            hit_color: color::RED,
+            heal_color: color::BLUE,
+        }
+    }
+}
+
+#[derive(Copy, Clone, PartialEq, Eq)]
+pub enum ColorKind {
+    Info,
+    Miss,
+    Hit,
+    Heal,
+}
 
 pub struct AreaFeedbackText {
     pos_x: f32,
@@ -29,8 +60,7 @@ pub struct AreaFeedbackText {
     text_width: f32,
     start_time: Instant,
     duration: u32,
-    font_renderer: LineRenderer,
-    color: Color,
+    color_kind: ColorKind,
     move_rate: f32,
 
     hover_y: f32,
@@ -41,23 +71,19 @@ pub struct AreaFeedbackText {
 
 impl AreaFeedbackText {
     pub fn new(area_pos: Point, text: String,
-               pos_x: f32, pos_y: f32, color: Color, move_rate: f32) -> AreaFeedbackText {
-        let font = ResourceSet::get_default_font();
-        let text_width = font.get_width(&text) as f32 / font.line_height as f32;
+               pos_x: f32, pos_y: f32, color_kind: ColorKind, move_rate: f32) -> AreaFeedbackText {
         let duration = CONFIG.display.animation_base_time_millis * (50 + text.len() as u32 / 2);
 
         AreaFeedbackText {
             area_pos,
             text,
-            text_width,
+            text_width: 0.0,
             pos_x,
             pos_y,
-            color,
+            color_kind,
             move_rate,
             start_time: Instant::now(),
             duration,
-            font_renderer: LineRenderer::new(&font),
-
             hover_y: 0.0,
             alpha: 1.0,
         }
@@ -83,16 +109,31 @@ impl AreaFeedbackText {
         self.alpha > 0.0
     }
 
-    pub fn draw(&self, renderer: &mut GraphicsRenderer, text_scale: f32, offset_x: f32, offset_y: f32,
+    // it is assumed that the params being passed in here do not change
+    pub fn draw(&mut self, renderer: &mut GraphicsRenderer, params: &Params,
+                offset_x: f32, offset_y: f32,
                 scale_x: f32, scale_y: f32) {
-        // TODO font, color at a minimum should be configurable via text configuration
-        let mut pos_x = offset_x + self.pos_x - text_scale * self.text_width / 2.0;
+        // creating the line renderer here is not ideal but is a low cost operation
+        let font_renderer = LineRenderer::new(&params.font);
+        if self.text_width == 0.0 {
+            self.text_width = params.font.get_width(&self.text) as f32
+                / params.font.line_height as f32;
+        }
+
+        let color = match self.color_kind {
+            ColorKind::Info => params.info_color,
+            ColorKind::Miss => params.miss_color,
+            ColorKind::Hit => params.hit_color,
+            ColorKind::Heal => params.heal_color,
+        };
+
+        let mut pos_x = offset_x + self.pos_x - params.scale * self.text_width / 2.0;
         if pos_x < 0.0 { pos_x = 0.0; }
         let pos_y = offset_y + self.pos_y - self.hover_y;
 
-        let mut draw_list = self.font_renderer.get_draw_list(&self.text, pos_x, pos_y, text_scale);
+        let mut draw_list = font_renderer.get_draw_list(&self.text, pos_x, pos_y, params.scale);
         draw_list.set_scale(scale_x, scale_y);
-        draw_list.set_color(Color::new(self.color.r, self.color.g, self.color.b, self.alpha));
+        draw_list.set_color(color);
         renderer.draw(draw_list);
     }
 }

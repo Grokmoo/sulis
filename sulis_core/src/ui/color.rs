@@ -14,6 +14,9 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::io::{Error, ErrorKind};
+use std::str::FromStr;
+
 #[derive(Deserialize, Serialize, Debug, Clone, Copy, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub struct Color {
@@ -42,6 +45,20 @@ impl Color {
     }
 
     pub fn from_string(text: &str) -> Color {
+        match Color::from_str(text) {
+            Ok(color) => color,
+            Err(e) => {
+                warn!("{}", e);
+                WHITE
+            }
+        }
+    }
+}
+
+impl FromStr for Color {
+    type Err = Error;
+
+    fn from_str(text: &str) -> Result<Self, Self::Err> {
         if text.len() == 3 || text.len() == 4 {
             let r = get_component(&text[0..1], 16.0);
             let g = get_component(&text[1..2], 16.0);
@@ -52,7 +69,7 @@ impl Color {
                 1.0
             };
 
-            Color { r, g, b, a }
+            Ok(Color { r, g, b, a })
         } else if text.len() == 6 || text.len() == 8 {
             let r = get_component(&text[0..2], 255.0);
             let g = get_component(&text[2..4], 255.0);
@@ -63,15 +80,16 @@ impl Color {
                 1.0
             };
 
-            Color { r, g, b, a }
+            Ok(Color { r, g, b, a })
         } else {
-            warn!("Unable to parse color from string '{}'", text);
-            WHITE
+            Err(Error::new(ErrorKind::InvalidInput,
+                           format!("Unable to parse color from string '{}'", text)))
         }
     }
 }
 
 pub const WHITE: Color = Color { r: 1.0, g: 1.0, b: 1.0, a: 1.0 };
+pub const LIGHT_GRAY: Color = Color { r: 0.75, g: 0.75, b: 0.75, a: 1.0 };
 pub const GRAY: Color = Color { r: 0.5, g: 0.5, b: 0.5, a: 1.0 };
 pub const BLACK: Color = Color { r: 0.0, g: 0.0, b: 0.0, a: 1.0 };
 pub const RED: Color = Color { r: 1.0, g: 0.0, b: 0.0, a: 1.0 };

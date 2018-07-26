@@ -1,23 +1,24 @@
-id: goblin_defender_02
-name: Goblin Defender
+id: goblin_shaman_02
+name: Goblin Shaman
 faction: Hostile
-images: {}
 race: goblin
 attributes:
   str: 10
-  dex: 13
-  end: 12
-  per: 12
-  int: 7
-  wis: 9
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
 levels:
-  fighter: 3
-items: [ shortsword, torso_leather, shield_small ]
-equipped: [ 0, 1, 2 ]
+  mage: 4
+items: [  ]
+equipped: [  ]
 reward:
   xp: 50
   loot: level1_misc
   loot_chance: 45
+images:
+  Background: creatures/goblin3
 abilities:
   - armor_light
   - armor_medium
@@ -25,10 +26,9 @@ abilities:
   - weapon_axe
   - weapon_crossbow
   - weapon_bow
-  - weapon_small_sword
-  - weapon_large_sword
   - weapon_spear
   - weapon_mace
   - weapon_simple
-  - shield_slam
-  - defensive_fighting
+  - slow
+  - firebolt
+  - wind_gust

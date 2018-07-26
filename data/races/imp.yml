@@ -1,0 +1,43 @@
+id: imp
+name: Imp
+description: "Monster"
+size: 2by2
+movement_rate: 0.8
+base_stats:
+  - kind: { attribute: [Strength, -2 ] }
+  - kind: { attribute: [Dexterity, 2 ] }
+  - kind: { attribute: [Endurance, -2 ] }
+  - kind: { attribute: [Intellect, 2 ] }
+  - kind: { attribute: [Wisdom, -4] }
+  - kind: { hit_points: 20 }
+  - kind: { melee_accuracy: 25 }
+  - kind: { ranged_accuracy: 30 }
+  - kind: { spell_accuracy: 25 }
+  - kind: { defense: 30 }
+  - kind: { fortitude: 30 }
+  - kind: { reflex: 30 }
+  - kind: { will: 30 }
+  - kind: { reach: 0.0 }
+base_attack:
+  damage:
+    min: 12
+    max: 15
+    kind: Crushing
+  kind: #Melee
+    reach: 0.5
+  bonuses: {}
+default_images:
+  Male:
+    Background: creatures/imp01
+    Shadow: creatures/imp01_shadow
+  Female:
+    Background: creatures/imp01
+    Shadow: creatures/imp01_shadow
+mouseover_offset: [0, -2]
+ticker_offset: [0.5, 2]
+image_layer_offset_scale: 16
+image_layer_offsets:
+  Shadow: [-8, -19]
+  Background: [-8, -19]
+image_layer_postfix: {}
+

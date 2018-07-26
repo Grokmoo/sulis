@@ -292,7 +292,7 @@ impl EntityState {
     }
 
     pub fn attack(entity: &Rc<RefCell<EntityState>>, target: &Rc<RefCell<EntityState>>,
-                  callback: Option<Box<ScriptCallback>>) {
+                  callback: Option<Box<ScriptCallback>>, remove_ap: bool) {
         let time = CONFIG.display.animation_base_time_millis;
         let cbs: Vec<Box<ScriptCallback>> = callback.into_iter().collect();
         if entity.borrow().actor.stats.attack_is_melee() {
@@ -305,8 +305,10 @@ impl EntityState {
             GameState::add_animation(anim);
         }
 
-        let attack_ap = entity.borrow().actor.stats.attack_cost;
-        entity.borrow_mut().actor.remove_ap(attack_ap as u32);
+        if remove_ap {
+            let attack_ap = entity.borrow().actor.stats.attack_cost;
+            entity.borrow_mut().actor.remove_ap(attack_ap as u32);
+        }
     }
 
     pub fn add_xp(&mut self, xp: u32) {

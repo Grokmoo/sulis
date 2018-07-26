@@ -35,7 +35,7 @@ pub use self::actor_state::ActorState;
 
 pub mod animation;
 
-mod area_feedback_text;
+pub mod area_feedback_text;
 use self::area_feedback_text::AreaFeedbackText;
 
 mod area_state;

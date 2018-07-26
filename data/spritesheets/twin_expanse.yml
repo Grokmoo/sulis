@@ -1,0 +1,10 @@
+id: twin_expanse
+src: "twin_expanse.png"
+size: [ 256, 256 ]
+simple_image_gen_scale: 16
+grid_multiplier: 16
+groups:
+  misc:
+    areas:
+      rockslide_closed: [0, 0, 6, 12]
+      rockslide_open: [6, 0, 6, 12]

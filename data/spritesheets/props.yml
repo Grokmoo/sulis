@@ -18,7 +18,7 @@ groups:
       wagon02: [4, 0]
   transition:
     size: [3, 3]
-    position: [40, 0]
+    position: [40, 14]
     areas:
       transition0: [0, 0]
       transition1: [3, 0]

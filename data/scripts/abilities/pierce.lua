@@ -20,7 +20,7 @@ function on_target_select(parent, ability, targets)
   cb:add_target(target)
   cb:set_before_attack_fn("create_parent_effect")
   
-  -- ability:activate(parent)
+  ability:activate(parent)
   parent:anim_weapon_attack(target, cb)
 end
 

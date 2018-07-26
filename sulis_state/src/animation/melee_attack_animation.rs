@@ -18,9 +18,8 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_rules::HitKind;
-use sulis_core::ui::{Color};
 use {script::ScriptEntitySet, ScriptCallback};
-use {animation::Anim, EntityState, GameState};
+use {animation::Anim, EntityState, GameState, area_feedback_text::ColorKind};
 
 pub (in animation) fn update(attacker: &Rc<RefCell<EntityState>>, model: &mut MeleeAttackAnimModel, frac: f32) {
     if !model.has_attacked && frac > 0.5 {
@@ -70,7 +69,7 @@ pub (in animation) struct MeleeAttackAnimModel {
     vector: (f32, f32),
     pub (in animation) has_attacked: bool,
     attack_func: Box<Fn(&Rc<RefCell<EntityState>>, &Rc<RefCell<EntityState>>) ->
-        (HitKind, u32, String, Color)>,
+        (HitKind, u32, String, ColorKind)>,
 }
 
 pub fn new(attacker: &Rc<RefCell<EntityState>>,
@@ -78,7 +77,7 @@ pub fn new(attacker: &Rc<RefCell<EntityState>>,
            duration_millis: u32,
            callbacks: Vec<Box<ScriptCallback>>,
            attack_func: Box<Fn(&Rc<RefCell<EntityState>>, &Rc<RefCell<EntityState>>) ->
-                (HitKind, u32, String, Color)>) -> Anim {
+                (HitKind, u32, String, ColorKind)>) -> Anim {
 
     let x = defender.borrow().location.x + defender.borrow().size.width / 2
         - attacker.borrow().location.x - attacker.borrow().size.width / 2;

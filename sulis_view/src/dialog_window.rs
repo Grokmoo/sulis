@@ -18,11 +18,11 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
+use sulis_core::ui::{Widget, WidgetKind, theme};
 use sulis_core::io::event;
-use sulis_module::{Actor, OnTrigger, MerchantData, Conversation, conversation::{Response}, Module};
-use sulis_state::{EntityState, ChangeListener, GameState};
-use sulis_core::ui::{Widget, WidgetKind, color, theme};
 use sulis_widgets::{Label, TextArea};
+use sulis_module::{Actor, OnTrigger, MerchantData, Conversation, conversation::{Response}, Module};
+use sulis_state::{EntityState, ChangeListener, GameState, area_feedback_text::ColorKind};
 
 use {CutsceneWindow, RootView};
 
@@ -80,7 +80,8 @@ impl WidgetKind for DialogWindow {
             widget.borrow_mut().mark_for_removal();
 
             let area_state = GameState::area_state();
-            area_state.borrow_mut().add_feedback_text(cur_text, &self.entity, color::GRAY, 0.0);
+            area_state.borrow_mut().add_feedback_text(cur_text, &self.entity,
+                                                      ColorKind::Info, 0.0);
             return Vec::new();
         }
 
@@ -165,7 +166,7 @@ pub fn show_convo(convo: Rc<Conversation>, pc: &Rc<RefCell<EntityState>>,
     if convo.responses(&initial_node).is_empty() {
         let area_state = GameState::area_state();
         area_state.borrow_mut().add_feedback_text(convo.text(&initial_node).to_string(),
-            &target, color::GRAY, 0.0);
+            &target, ColorKind::Info, 0.0);
     } else {
         let window = Widget::with_defaults(DialogWindow::new(&pc, &target, convo));
         window.borrow_mut().state.set_modal(true);
@@ -268,7 +269,8 @@ pub fn activate(widget: &Rc<RefCell<Widget>>, on_select: &OnTrigger,
 
     if let Some(ref line) = on_select.say_line {
         let area_state = GameState::area_state();
-        area_state.borrow_mut().add_feedback_text(line.to_string(), &target, color::GRAY, 0.0);
+        area_state.borrow_mut().add_feedback_text(line.to_string(), &target,
+            ColorKind::Info, 0.0);
     }
 
     if let Some(ref cutscene) = on_select.show_cutscene {

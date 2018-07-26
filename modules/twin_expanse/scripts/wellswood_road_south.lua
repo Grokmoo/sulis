@@ -18,12 +18,14 @@ function on_add_grazi(parent, target)
 end
 
 function on_player_enter_bridge(parent, target)
+  game:cancel_blocking_anims()
   game:spawn_encounter_at(17, 36)
   game:enable_trigger_at(35, 66)
 end
 
 function on_player_go_too_far(parent, target)
   game:say_line("I should check back with the others before going any further.", parent)
+  game:cancel_blocking_anims()
 end
 
 function on_player_return(parent, target)

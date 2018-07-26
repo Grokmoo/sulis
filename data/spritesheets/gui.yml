@@ -405,7 +405,7 @@ groups:
       cursor7by7round: [146, 675, 112, 112]
       cursor8by8round: [0, 724, 128, 128]
       cursor9by9round: [129, 788, 144, 144]
-      cursor4by6: [230, 578, 64, 96]
+      cursor4by6: [259, 578, 64, 96]
       cursor4by5: [259, 675, 64, 80]
       cursor4by4: [258, 756, 64, 64]
       

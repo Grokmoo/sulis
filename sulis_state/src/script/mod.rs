@@ -266,6 +266,11 @@ struct ScriptInterface { }
 
 impl UserData for ScriptInterface {
     fn add_methods(methods: &mut UserDataMethods<Self>) {
+        methods.add_method("cancel_blocking_anims", |_, _, ()| {
+            GameState::remove_all_blocking_animations();
+            Ok(())
+        });
+
         methods.add_method("log", |_, _, val: String| {
             info!("[LUA]: {}", val);
             Ok(())
@@ -339,6 +344,20 @@ impl UserData for ScriptInterface {
             Ok(())
         });
 
+        methods.add_method("toggle_prop_at", |_, _, (x, y): (i32, i32)| {
+            let area_state = GameState::area_state();
+            let mut area_state = area_state.borrow_mut();
+            let index = match area_state.prop_index_at(x, y) {
+                None => {
+                    warn!("Unable to find prop at {},{}", x, y);
+                    return Ok(());
+                }, Some(prop) => prop,
+            };
+            area_state.toggle_prop_active(index);
+
+            Ok(())
+        });
+
         methods.add_method("say_line", |_, _, (line, target): (String, Option<ScriptEntity>)| {
             let pc = GameState::player();
             let target = match target {
@@ -375,6 +394,18 @@ impl UserData for ScriptInterface {
             Ok(())
         });
 
+        methods.add_method("show_cutscene", |_, _, id: String| {
+            let pc = GameState::player();
+
+            let cb = OnTrigger {
+                show_cutscene: Some(id),
+                ..Default::default()
+            };
+
+            GameState::add_ui_callback(cb, &pc, &pc);
+            Ok(())
+        });
+
         methods.add_method("entities_with_ids", |_, _, ids: Vec<String>| {
             Ok(entities_with_ids(ids))
         });
@@ -382,11 +413,7 @@ impl UserData for ScriptInterface {
         methods.add_method("entity_with_id", |_, _, id: String| {
             match entity_with_id(id) {
                 Some(entity) => Ok(ScriptEntity::from(&entity)),
-                None => Err(rlua::Error::ToLuaConversionError {
-                    from: "ID",
-                    to: "ScriptEntity",
-                    message: Some("Target with the specified ID does not exist".to_string())
-                })
+                None => Ok(ScriptEntity::invalid()),
             }
         });
 
@@ -596,14 +623,10 @@ fn entities_with_ids(ids: Vec<String>) -> Vec<ScriptEntity> {
 }
 
 fn entity_with_id(id: String) -> Option<Rc<RefCell<EntityState>>> {
-    let area_state = GameState::area_state();
-    let area_id = area_state.borrow().area.id.to_string();
-
     let mgr = GameState::turn_manager();
     for entity in mgr.borrow().entity_iter() {
         {
             let entity = entity.borrow();
-            if !entity.location.is_in_area_id(&area_id) { continue; }
             if entity.actor.actor.id != id { continue; }
         }
 

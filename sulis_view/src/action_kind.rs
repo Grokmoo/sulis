@@ -166,7 +166,7 @@ impl DoorPropAction {
         };
 
         let prop_state = area_state.get_prop(index);
-        if !prop_state.is_door() { return None; }
+        if !prop_state.is_door() || !prop_state.is_enabled() { return None; }
 
         let max_dist = Module::rules().max_prop_distance;
         let pc = match GameState::selected().first() {
@@ -216,7 +216,7 @@ impl LootPropAction {
         };
 
         let prop_state = area_state.get_prop(index);
-        if !prop_state.is_container() { return None; }
+        if !prop_state.is_container() || !prop_state.is_enabled() { return None; }
 
         let max_dist = Module::rules().max_prop_distance;
         let pc = match GameState::selected().first() {
@@ -376,7 +376,7 @@ impl ActionKind for AttackAction {
             return;
         }
 
-        EntityState::attack(&self.pc, &self.target, None);
+        EntityState::attack(&self.pc, &self.target, None, true);
     }
 }
 

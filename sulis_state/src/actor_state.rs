@@ -22,11 +22,11 @@ use std::collections::HashMap;
 
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::image::{LayeredImage};
-use sulis_core::ui::{color, Color};
 use sulis_core::util::{invalid_data_error, ExtInt};
 use sulis_rules::{AccuracyKind, Attack, AttackKind, BonusList, HitKind, StatList, WeaponKind,
     QuickSlot, Slot, ItemKind};
 use sulis_module::{Actor, Module, ActorBuilder};
+use area_feedback_text::ColorKind;
 use {AbilityState, ChangeListenerList, Effect, EntityState, GameState, Inventory, ItemState};
 use save_state::ActorSaveState;
 
@@ -301,12 +301,14 @@ impl ActorState {
     }
 
     pub fn weapon_attack(parent: &Rc<RefCell<EntityState>>,
-                         target: &Rc<RefCell<EntityState>>) -> (HitKind, u32, String, Color) {
-        if target.borrow_mut().actor.hp() <= 0 { return (HitKind::Miss, 0, "Miss".to_string(), color::GRAY); }
+                         target: &Rc<RefCell<EntityState>>) -> (HitKind, u32, String, ColorKind) {
+        if target.borrow_mut().actor.hp() <= 0 {
+            return (HitKind::Miss, 0, "Miss".to_string(), ColorKind::Miss);
+        }
 
         info!("'{}' attacks '{}'", parent.borrow().actor.actor.name, target.borrow().actor.actor.name);
 
-        let mut color = color::GRAY;
+        let mut color = ColorKind::Miss;
         let mut damage_str = String::new();
         let mut not_first = false;
         let mut hit_kind = HitKind::Miss;
@@ -354,7 +356,7 @@ impl ActorState {
             };
 
             let (hit, dmg, attack_result, attack_color) = ActorState::attack_internal(parent, target, &attack);
-            if attack_color != color::GRAY {
+            if attack_color != ColorKind::Miss {
                 color = attack_color;
             }
 
@@ -374,8 +376,10 @@ impl ActorState {
     }
 
     pub fn attack(parent: &Rc<RefCell<EntityState>>, target: &Rc<RefCell<EntityState>>,
-                  attack: &Attack) -> (HitKind, u32, String, Color) {
-        if target.borrow_mut().actor.hp() <= 0 { return (HitKind::Miss, 0, "Miss".to_string(), color::GRAY); }
+                  attack: &Attack) -> (HitKind, u32, String, ColorKind) {
+        if target.borrow_mut().actor.hp() <= 0 {
+            return (HitKind::Miss, 0, "Miss".to_string(), ColorKind::Miss);
+        }
 
         info!("'{}' attacks '{}'", parent.borrow().actor.actor.name, target.borrow().actor.actor.name);
 
@@ -386,7 +390,7 @@ impl ActorState {
     }
 
     fn attack_internal(parent: &Rc<RefCell<EntityState>>, target: &Rc<RefCell<EntityState>>,
-                       attack: &Attack) -> (HitKind, u32, String, Color) {
+                       attack: &Attack) -> (HitKind, u32, String, ColorKind) {
         let rules = Module::rules();
 
         let concealment = cmp::max(0, target.borrow().actor.stats.concealment -
@@ -394,7 +398,7 @@ impl ActorState {
 
         if !rules.concealment_roll(concealment) {
             debug!("Concealment miss");
-            return (HitKind::Miss, 0, "Concealment".to_string(), color::GRAY);
+            return (HitKind::Miss, 0, "Concealment".to_string(), ColorKind::Miss);
         }
 
         let (accuracy_kind, defense) = {
@@ -406,7 +410,7 @@ impl ActorState {
                 AttackKind::Melee { .. } => (AccuracyKind::Melee, target_stats.defense),
                 AttackKind::Ranged { .. } => (AccuracyKind::Ranged, target_stats.defense),
                 AttackKind::Dummy => {
-                    return (HitKind::Hit, 0, "".to_string(), color::GRAY);
+                    return (HitKind::Hit, 0, "".to_string(), ColorKind::Miss);
                 }
             }
         };
@@ -417,7 +421,7 @@ impl ActorState {
             let damage_multiplier = match hit_kind {
                 HitKind::Miss => {
                     debug!("Miss");
-                    return (HitKind::Miss, 0, "Miss".to_string(), color::GRAY);
+                    return (HitKind::Miss, 0, "Miss".to_string(), ColorKind::Miss);
                 },
                 HitKind::Graze =>
                     parent_stats.graze_multiplier + attack.bonuses.graze_multiplier,
@@ -440,12 +444,12 @@ impl ActorState {
             }
 
             target.borrow_mut().remove_hp(total);
-            return (hit_kind, total, format!("{:?}: {}", hit_kind, total), color::RED);
+            return (hit_kind, total, format!("{:?}: {}", hit_kind, total), ColorKind::Hit);
         } else if attack.damage.max() == 0 {
             // if attack cannot do any damage
-            return (hit_kind, 0, format!("{:?}", hit_kind), color::RED);
+            return (hit_kind, 0, format!("{:?}", hit_kind), ColorKind::Hit);
         } else {
-            return (hit_kind, 0, format!("{:?}: {}", hit_kind, 0), color::GRAY);
+            return (hit_kind, 0, format!("{:?}: {}", hit_kind, 0), ColorKind::Miss);
         }
     }
 

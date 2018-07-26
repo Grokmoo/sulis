@@ -66,6 +66,8 @@ impl PropState {
             items.add(ItemState::new(Rc::clone(item)));
         }
 
+        let mut anim_state = AnimationState::default();
+
         let interactive = match prop_data.prop.interactive {
             prop::Interactive::Not => {
                 if !items.is_empty() { warn!("Attempted to add items to a non-container prop"); }
@@ -79,6 +81,10 @@ impl PropState {
                 }
             },
             prop::Interactive::Door { initially_open, .. } => {
+                if initially_open {
+                    anim_state.toggle(animation_state::Kind::Active);
+                }
+
                 Interactive::Door {
                     open: initially_open
                 }
@@ -90,7 +96,7 @@ impl PropState {
             enabled: prop_data.enabled,
             location,
             interactive,
-            animation_state: AnimationState::default(),
+            animation_state: anim_state,
             listeners: ChangeListenerList::default(),
             marked_for_removal: false,
         }
@@ -133,7 +139,9 @@ impl PropState {
                 };
 
                 if open {
-                    self.animation_state.toggle(animation_state::Kind::Active);
+                    self.animation_state.add(animation_state::Kind::Active);
+                } else {
+                    self.animation_state.remove(animation_state::Kind::Active);
                 }
             }
         }
@@ -141,7 +149,7 @@ impl PropState {
         Ok(())
     }
 
-    pub (crate) fn is_enabled(&self) -> bool {
+    pub fn is_enabled(&self) -> bool {
         self.enabled
     }
 
@@ -166,8 +174,6 @@ impl PropState {
     }
 
     pub fn is_door(&self) -> bool {
-        if !self.enabled { return false; }
-
         match self.interactive {
             Interactive::Door { .. } => true,
             _ => false,
@@ -175,8 +181,6 @@ impl PropState {
     }
 
     pub fn is_container(&self) -> bool {
-        if !self.enabled { return false; }
-
         match self.interactive {
             Interactive::Container { .. } => true,
             _ => false,

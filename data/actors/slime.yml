@@ -1,19 +1,19 @@
-id: goblin
-name: Goblin
+id: slime
+name: Slime
 faction: Hostile
 images: {}
-race: goblin
+race: slime
 attributes:
-  str: 9
-  dex: 13
-  end: 8
-  per: 12
-  int: 7
-  wis: 9
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
 levels:
-  rogue: 1
-items: [ club ]
-equipped: [ 0 ]
+  fighter: 1
+items: [ ]
+equipped: [ ]
 reward:
   xp: 25
   loot: level1_misc

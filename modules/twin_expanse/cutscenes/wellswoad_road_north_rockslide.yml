@@ -1,0 +1,13 @@
+id: wellswood_road_north_rockslide
+on_end:
+  fire_script:
+    id: wellswood_road_north
+    func: after_rockslide_cutscene
+frames:
+  - text: As you make your way forward, you hear gutteral shouting on the cliffs behind you.  A goblin ambush!
+  - text: |
+      You turn to look and see Tervald and the group running towards you.
+      
+      "They are coming!  Forward!"  he shouts.
+  - text: |
+      You have no time to react, as at that very moment you hear the deafining crash of rocks falling - an avalanche!

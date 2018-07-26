@@ -1,0 +1,4 @@
+id: twin_expanse/rockslide
+states:
+  normal: twin_expanse/rockslide_closed
+  active: twin_expanse/rockslide_open

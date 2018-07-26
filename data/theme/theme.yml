@@ -122,7 +122,7 @@ children:
         custom:
           tooltip: "Select All Party Members"
       portrait_pane:
-        preferred_size: [100, 0]
+        preferred_size: [120, 0]
         position: [7, 0]
         height_relative: Max
         layout: BoxHorizontal
@@ -158,8 +158,7 @@ children:
                 preferred_size: [7, 7]
       quick_item_bar:
         height_relative: Max
-        x_relative: Max
-        position: [-162, 0]
+        position: [130, 0]
         preferred_size: [28, 0]
         background: bg_base
         border: [1, 1, 1, 1]
@@ -200,8 +199,7 @@ children:
             position: [14, 21]
       abilities_bar:
         height_relative: Max
-        x_relative: Max
-        position: [-41, 0]
+        position: [159, 0]
         preferred_size: [120, 0]
         layout: BoxHorizontal
         layout_spacing: { top: 0, bottom: 0, left: 0, right: 1 }
@@ -304,7 +302,12 @@ children:
     height_relative: Max
     custom:
       targeter_tile: "60_red_transparent_fill"
-      feedback_text_scale: "1.5"
+      feedback_text_scale: 1.5
+      feedback_text_font: outlined
+      feedback_text_info_color: FFF
+      feedback_text_miss_color: AAA
+      feedback_text_hit_color: FF2400
+      feedback_text_heal_color: 0FF
       creature_selected_image: "creature_selected"
       selection_box_image: "bg_selection_box"
     children:
@@ -719,13 +722,13 @@ children:
           ][?1_crit_multiplier;s=5;x=35|Crit Multiplier: #1_crit_multiplier#
           ][?1_hit_multiplier;s=5;x=35|Hit Multiplier: #1_hit_multiplier#
           ][?1_graze_multiplier;s=5;x=35|Graze Multiplier: #1_graze_multiplier#]
-          [s=6;x=0;y=44|Accuracy]
+          [s=6;x=0;y=46|Accuracy]
           [s=5|[x=0|Melee: #melee_accuracy#][x=28|Ranged: #ranged_accuracy#][x=56|Spell: #spell_accuracy#]]
-          [s=4|]
-          [s=6.0;x=0|Armor: #armor#][?armor_slashing;s=6.0| (Slashing: #armor_slashing#)][?armor_piercing;s=6.0| (Piercing: #armor_piercing#)][?armor_crushing;s=6.0| (Crushing: #armor_crushing#)][?armor_acid;s=6.0| (Acid: #armor_acid#)][?armor_cold;s=6.0| (Cold: #armor_cold#)][?armor_electrical;s=6.0| (Electrical: #armor_electrical#)][?armor_fire;s=6.0| (Fire: #armor_fire#)][?armor_sonic;s=6.0| (Sonic: #armor_sonic#)]
+          [s=4|
+          ][s=6.0;x=0|Armor: #armor#][?armor_slashing;s=6.0| (Slashing: #armor_slashing#)][?armor_piercing;s=6.0| (Piercing: #armor_piercing#)][?armor_crushing;s=6.0| (Crushing: #armor_crushing#)][?armor_acid;s=6.0| (Acid: #armor_acid#)][?armor_cold;s=6.0| (Cold: #armor_cold#)][?armor_electrical;s=6.0| (Electrical: #armor_electrical#)][?armor_fire;s=6.0| (Fire: #armor_fire#)][?armor_sonic;s=6.0| (Sonic: #armor_sonic#)]
           [s=5|[x=0|Defense: #defense#][x=28|Fortitude: #fortitude#][x=56|Reflex: #reflex#][x=84|Will: #will#]]
-
-          [s=6;y=70|[x=0|Strength][x=30|#str#]
+          [s=4|
+          ][s=6;y=70|[x=0|Strength][x=30|#str#]
                [x=0|Dexterity][x=30|#dex#]
                [x=0|Endurance][x=30|#end#]
                [x=0|Perception][x=30|#per#]

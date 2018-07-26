@@ -16,6 +16,20 @@ function on_complete_wellswood_road_cave(parent, target)
   game:say_line("What the hell is that thing doing here?", party_member)
 end
 
+function on_enter_wellswood_road_north(parent, target)
+  party_member = get_party_member()
+  if party_member == nil then return end
+  
+  game:say_line("This forest just keeps going.  There must be a path through.", party_member)
+end
+
+function on_enter_wellswood_road_spiders(parent, target)
+  party_member = get_party_member()
+  if party_member == nil then return end
+  
+  game:say_line("I don't think the goblins come to this part of the forest.", party_member)
+end
+
 function get_party_member()
   targets = game:entities_with_ids(names)
   

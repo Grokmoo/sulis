@@ -16,14 +16,12 @@
 
 use std::io::Error;
 use std::{ptr};
-use std::slice::Iter;
 use std::rc::Rc;
 use std::cell::{Ref, RefCell};
 use std::collections::HashSet;
 
 use rand::{self, Rng};
 
-use sulis_core::ui::Color;
 use sulis_module::{Actor, Area, LootList, Module, ObjectSize, prop};
 use sulis_module::area::{EncounterData, PropData, Transition, TriggerKind};
 use sulis_core::util::{invalid_data_error, Point};
@@ -1015,7 +1013,7 @@ impl AreaState {
     }
 
     pub fn add_feedback_text(&mut self, text: String, target: &Rc<RefCell<EntityState>>,
-                             color: Color, move_rate: f32) {
+                             color_kind: area_feedback_text::ColorKind, move_rate: f32) {
         if text.trim().is_empty() { return; }
 
         let mut area_pos = target.borrow().location.to_point();
@@ -1039,11 +1037,12 @@ impl AreaState {
         let pos_x = area_pos.x as f32 + width / 2.0;
         let pos_y = area_pos.y as f32 - 1.5;
 
-        self.feedback_text.push(AreaFeedbackText::new(area_pos, text, pos_x, pos_y, color, move_rate));
+        self.feedback_text.push(AreaFeedbackText::new(area_pos, text, pos_x, pos_y,
+                                                      color_kind, move_rate));
     }
 
-    pub fn feedback_text_iter(&self) -> Iter<AreaFeedbackText> {
-        self.feedback_text.iter()
+    pub fn feedback_text_iter(&mut self) -> impl Iterator<Item = &mut AreaFeedbackText> {
+        self.feedback_text.iter_mut()
     }
 
     pub fn entity_iter(&self) -> impl Iterator<Item = &usize> {

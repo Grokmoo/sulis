@@ -743,6 +743,10 @@ impl GameState {
         ANIMATIONS.with(|a| a.borrow_mut().clear_blocking_anims(entity) );
     }
 
+    pub fn remove_all_blocking_animations() {
+        ANIMATIONS.with(|a| a.borrow_mut().clear_all_blocking_anims() );
+    }
+
     pub fn add_animation(anim: Anim) {
         ANIMS_TO_ADD.with(|a| {
             let mut anims = a.borrow_mut();

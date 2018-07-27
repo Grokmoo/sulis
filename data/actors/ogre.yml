@@ -12,8 +12,9 @@ attributes:
   wis: 9
 levels:
   fighter: 6
-items: [ greataxe ]
-equipped: [ 0 ]
+inventory:
+  equipped:
+    HeldMain: greataxe
 reward:
   xp: 200
   loot: level5_misc

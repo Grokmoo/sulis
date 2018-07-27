@@ -77,5 +77,5 @@ end
 function apply_damage(parent, ability, targets)
   target = targets:first()
   
-  target:take_damage(10, 15, "Acid")
+  target:take_damage(10, 15, "Acid", 10)
 end

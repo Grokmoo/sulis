@@ -1,25 +1,21 @@
-id: goblin_brute_03
-name: Goblin Brute
+id: spider_large
+name: Large Spider
 faction: Hostile
-race: goblin
+images: {}
+race: spider_large
 attributes:
-  str: 15
+  str: 10
   dex: 10
-  end: 11
+  end: 10
   per: 10
   int: 10
   wis: 10
 levels:
-  fighter: 4
-inventory:
-  equipped:
-    HeldMain: battleaxe
+  fighter: 6
 reward:
-  xp: 50
-  loot: level1_misc
-  loot_chance: 45
-images:
-  Background: creatures/goblin2
+  xp: 200
+  loot: level5_misc
+  loot_chance: 100
 abilities:
   - armor_light
   - armor_medium
@@ -34,3 +30,4 @@ abilities:
   - weapon_simple
   - mighty_blow
   - powerful_blows
+  - stunning_blow

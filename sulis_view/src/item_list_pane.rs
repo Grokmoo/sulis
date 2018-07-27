@@ -161,14 +161,15 @@ impl ItemListPane {
                 quantity, index);
 
             if let Some(_) = item.item.usable {
-                if !combat_active {
+                if !combat_active && item.item.meets_prereqs(&actor.actor) {
                     let mut but = item_but.borrow_mut();
                     but.add_action("Add to Use Slot", set_quickslot_cb(&self.entity, index));
                 }
             }
 
             if let Some(_) = item.item.equippable {
-                if !combat_active && has_proficiency(&item, &actor.stats) {
+                if !combat_active && has_proficiency(&item, &actor.stats) &&
+                    item.item.meets_prereqs(&actor.actor) {
                     item_but.borrow_mut().add_action("Equip", equip_item_cb(&self.entity, index));
                 }
             }

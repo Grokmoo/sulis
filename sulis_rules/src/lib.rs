@@ -14,6 +14,9 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::str::FromStr;
+use std::io::{Error, ErrorKind};
+
 extern crate sulis_core;
 
 extern crate rand;
@@ -47,7 +50,7 @@ pub use self::damage::DamageList;
 pub mod stat_list;
 pub use self::stat_list::StatList;
 
-#[derive(Deserialize, Debug, Copy, Clone, PartialEq, Eq, Hash)]
+#[derive(Deserialize, Serialize, Debug, Copy, Clone, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub enum Slot {
     Cloak,
@@ -70,13 +73,40 @@ impl Slot {
     }
 }
 
+impl FromStr for Slot {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let val = match s {
+            "cloak" => Slot::Cloak,
+            "head" => Slot::Head,
+            "torso" => Slot::Torso,
+            "hands" => Slot::Hands,
+            "held_main" => Slot::HeldMain,
+            "held_off" => Slot::HeldOff,
+            "legs" => Slot::Legs,
+            "feet" => Slot::Feet,
+            "waist" => Slot::Waist,
+            "neck" => Slot::Neck,
+            "finger_main" => Slot::FingerMain,
+            "finger_off" => Slot::FingerOff,
+            _ => {
+                return Err(Error::new(ErrorKind::InvalidInput,
+                                      format!("Unable to parse Slot from '{}'", s)));
+            },
+        };
+
+        Ok(val)
+    }
+}
+
 use self::Slot::*;
 
 // The sort order of this list is important
 const SLOTS_LIST: [Slot; 12] = [Cloak, Feet, Legs, Torso, Hands, Head, HeldMain, HeldOff, Waist,
                                 Neck, FingerMain, FingerOff];
 
-#[derive(Deserialize, Debug, Copy, Clone, PartialEq, Eq, Hash)]
+#[derive(Deserialize, Serialize, Debug, Copy, Clone, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub enum QuickSlot {
     AltHeldMain,
@@ -119,6 +149,25 @@ pub enum HitKind {
     Crit,
 }
 
+impl FromStr for HitKind {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let val = match s {
+            "miss" => HitKind::Miss,
+            "graze" => HitKind::Graze,
+            "hit" => HitKind::Hit,
+            "crit" => HitKind::Crit,
+            _ => {
+                return Err(Error::new(ErrorKind::InvalidInput,
+                                      format!("Unable to parse HitKind from '{}'", s)));
+            },
+        };
+
+        Ok(val)
+    }
+}
+
 #[derive(Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord, Deserialize)]
 pub enum WeaponStyle {
     Ranged,
@@ -126,6 +175,26 @@ pub enum WeaponStyle {
     Single,
     Shielded,
     DualWielding,
+}
+
+impl FromStr for WeaponStyle {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let val = match s {
+            "ranged" => WeaponStyle::Ranged,
+            "two_handed" => WeaponStyle::TwoHanded,
+            "single" => WeaponStyle::Single,
+            "shielded" => WeaponStyle::Shielded,
+            "dual_wielding" => WeaponStyle::DualWielding,
+            _ => {
+                return Err(Error::new(ErrorKind::InvalidInput,
+                                      format!("Unable to parse WeaponStyle from '{}'", s)));
+            },
+        };
+
+        Ok(val)
+    }
 }
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord, Deserialize)]
@@ -141,9 +210,51 @@ pub enum WeaponKind {
     Simple,
 }
 
+impl FromStr for WeaponKind {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let val = match s {
+            "axe" => WeaponKind::Axe,
+            "crossbow" => WeaponKind::Crossbow,
+            "bow" => WeaponKind::Bow,
+            "small_sword" => WeaponKind::SmallSword,
+            "large_sword" => WeaponKind::LargeSword,
+            "hammer" => WeaponKind::Hammer,
+            "spear" => WeaponKind::Spear,
+            "mace" => WeaponKind::Mace,
+            "simple" => WeaponKind::Simple,
+            _ => {
+                return Err(Error::new(ErrorKind::InvalidInput,
+                                      format!("Unable to parse WeaponKind from '{}'", s)));
+            },
+        };
+
+        Ok(val)
+    }
+}
+
 #[derive(Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord, Deserialize)]
 pub enum ArmorKind {
     Light,
     Medium,
     Heavy,
+}
+
+impl FromStr for ArmorKind {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let val = match s {
+            "light" => ArmorKind::Light,
+            "medium" => ArmorKind::Medium,
+            "heavy" => ArmorKind::Heavy,
+            _ => {
+                return Err(Error::new(ErrorKind::InvalidInput,
+                                      format!("Unable to parse ArmorKind from '{}'", s)));
+            },
+        };
+
+        Ok(val)
+    }
 }

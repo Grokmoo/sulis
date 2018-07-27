@@ -12,8 +12,6 @@ attributes:
   wis: 10
 levels:
   fighter: 6
-items: [  ]
-equipped: [ ]
 reward:
   xp: 200
   loot: level5_misc

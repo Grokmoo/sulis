@@ -1,0 +1,15 @@
+id: potion_spellpower
+name: Potion of Spellpower
+icon: inventory/potion01_cyan
+weight: 50
+value: 600
+usable:
+  consumable: true
+  script: potion_spellpower
+  ap: 2000
+  duration:
+    Rounds: 3
+  short_description: "Temporarily increases the damage done by most of your spells."
+prereqs:
+  levels:
+    mage: 1

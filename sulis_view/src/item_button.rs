@@ -21,7 +21,7 @@ use std::cell::RefCell;
 
 use sulis_rules::bonus::{AttackBuilder, AttackKindBuilder, Contingent};
 use sulis_rules::{Bonus, BonusList, Armor, DamageKind, QuickSlot, Slot};
-use sulis_module::{ability, item::{format_item_value, format_item_weight}, Module};
+use sulis_module::{ability, item::{format_item_value, format_item_weight}, Module, PrereqList};
 use sulis_state::{EntityState, GameState, ItemState, inventory::has_proficiency};
 use sulis_core::io::event;
 use sulis_core::ui::{Callback, Widget, WidgetKind, WidgetState};
@@ -217,11 +217,19 @@ impl WidgetKind for ItemButton {
                     if !has_proficiency(&item_state, &player.borrow().actor.stats) {
                         item_window.state.add_text_arg("prof_not_met", "true");
                     }
+
+                    if !item_state.item.meets_prereqs(&player.borrow().actor.actor) {
+                        item_window.state.add_text_arg("prereqs_not_met", "true");
+                    }
                 }, Kind::Merchant { .. } => {
                     let player = GameState::selected();
                     if player.len() > 0 {
                         if !has_proficiency(&item_state, &player[0].borrow().actor.stats) {
                             item_window.state.add_text_arg("prof_not_met", "true");
+                        }
+
+                        if !item_state.item.meets_prereqs(&player[0].borrow().actor.actor) {
+                            item_window.state.add_text_arg("prereqs_not_met", "true");
                         }
                     }
                 },
@@ -232,6 +240,10 @@ impl WidgetKind for ItemButton {
             item_window.state.add_text_arg("value", &format_item_value(item_state.item.value));
             item_window.state.add_text_arg("weight", &format_item_weight(item_state.item.weight));
             self.add_price_text_arg(&root, &mut item_window, &item_state);
+
+            if let Some(ref prereqs) = &item_state.item.prereqs {
+                add_prereq_text_args(prereqs, &mut item_window.state);
+            }
 
             match &item_state.item.usable {
                 None => (),
@@ -370,7 +382,8 @@ pub fn take_item_cb(entity: &Rc<RefCell<EntityState>>,
 pub fn equip_item_cb(entity: &Rc<RefCell<EntityState>>, index: usize) -> Callback {
     let entity = Rc::clone(entity);
     Callback::with(Box::new(move || {
-        entity.borrow_mut().actor.equip(index);
+        // equip with no preferred slot
+        entity.borrow_mut().actor.equip(index, None);
     }))
 }
 
@@ -541,7 +554,7 @@ fn add<T: Display>(widget_state: &mut WidgetState, name: &str, value: T) {
     widget_state.add_text_arg(name, &value.to_string());
 }
 
-fn add_bonus(bonus: &Bonus, state: &mut WidgetState,
+fn add_bonus(bonus: &Bonus, state: &mut WidgetState, has_accuracy: &mut bool,
              group_uses_index: &mut usize, damage_index: &mut usize, armor: &mut Armor) {
     use sulis_rules::BonusKind::*;
     match &bonus.kind {
@@ -567,9 +580,9 @@ fn add_bonus(bonus: &Bonus, state: &mut WidgetState,
         Range(amount) => add(state, "bonus_range", amount),
         Initiative(amount) => add(state, "initiative", amount),
         HitPoints(amount) => add(state, "hit_points", amount),
-        MeleeAccuracy(amount) => add(state, "melee_accuracy", amount),
-        RangedAccuracy(amount) => add(state, "ranged_accuracy", amount),
-        SpellAccuracy(amount) => add(state, "spell_accuracy", amount),
+        MeleeAccuracy(amount) => { add(state, "melee_accuracy", amount); *has_accuracy = true; },
+        RangedAccuracy(amount) => { add(state, "ranged_accuracy", amount); *has_accuracy = true; },
+        SpellAccuracy(amount) => { add(state, "spell_accuracy", amount); *has_accuracy = true; },
         Defense(amount) => add(state, "defense", amount),
         Fortitude(amount) => add(state, "fortitude", amount),
         Reflex(amount) => add(state, "reflex", amount),
@@ -606,16 +619,62 @@ fn add_bonus(bonus: &Bonus, state: &mut WidgetState,
     }
 }
 
+pub fn add_prereq_text_args(prereqs: &PrereqList, state: &mut WidgetState) {
+    state.add_text_arg("prereqs", "true");
+
+    if let Some(ref attrs) = prereqs.attributes {
+        for &(attr, amount) in attrs.iter() {
+            state.add_text_arg(&format!("prereq_{}", attr.short_name()), &amount.to_string());
+        }
+    }
+
+    for (index, &(ref class_id, level)) in prereqs.levels.iter().enumerate() {
+        let class = match Module::class(class_id) {
+            None => {
+                warn!("Invalid class '{}' in prereq list", class_id);
+                continue;
+            }, Some(class) => class,
+        };
+        state.add_text_arg(&format!("prereq_class_{}", index), &class.name);
+        state.add_text_arg(&format!("prereq_level_{}", index), &level.to_string());
+    }
+
+    if let Some(total_level) = prereqs.total_level {
+        state.add_text_arg("prereq_total_level", &total_level.to_string());
+    }
+
+    if let Some(ref race) = prereqs.race {
+        state.add_text_arg("prereq_race", &race.id);
+    }
+
+    for (index, ref ability_id) in prereqs.abilities.iter().enumerate() {
+        let ability = match Module::ability(ability_id) {
+            None => {
+                warn!("No ability '{}' found for prereq list", ability_id);
+                continue;
+            }, Some(ability) => ability,
+        };
+
+        state.add_text_arg(&format!("prereq_ability_{}", index), &ability.name);
+    }
+}
+
 pub fn add_bonus_text_args(bonuses: &BonusList, widget_state: &mut WidgetState) {
     let mut group_uses_index = 0;
     let mut damage_index = 0;
     let mut armor = Armor::default();
+    let mut has_accuracy = false;
     for bonus in bonuses.iter() {
         match bonus.when {
             Contingent::Always => (),
             _ => continue,
         }
-        add_bonus(bonus, widget_state, &mut group_uses_index, &mut damage_index, &mut armor);
+        add_bonus(bonus, widget_state, &mut has_accuracy, &mut group_uses_index,
+                  &mut damage_index, &mut armor);
+    }
+
+    if has_accuracy {
+        add(widget_state, "any_accuracy", "true");
     }
 
     if !armor.is_empty() {

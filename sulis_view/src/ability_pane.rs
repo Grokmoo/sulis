@@ -22,7 +22,7 @@ use sulis_core::ui::{Widget, WidgetKind, WidgetState};
 use sulis_widgets::{TextArea};
 use sulis_module::{ability, Ability, Module};
 
-use item_button::add_bonus_text_args;
+use item_button::{add_bonus_text_args, add_prereq_text_args};
 
 pub const NAME: &str = "ability_pane";
 
@@ -102,42 +102,6 @@ pub fn add_ability_text_args(state: &mut WidgetState, ability: &Rc<Ability>) {
     add_bonus_text_args(&ability.bonuses, state);
 
     if let Some(ref prereqs) = ability.prereqs {
-        state.add_text_arg("prereqs", "true");
-
-        if let Some(ref attrs) = prereqs.attributes {
-            for &(attr, amount) in attrs.iter() {
-                state.add_text_arg(&format!("prereq_{}", attr.short_name()), &amount.to_string());
-            }
-        }
-
-        for (index, &(ref class_id, level)) in prereqs.levels.iter().enumerate() {
-            let class = match Module::class(class_id) {
-                None => {
-                    warn!("Invalid class '{}' in prereq list", class_id);
-                    continue;
-                }, Some(class) => class,
-            };
-            state.add_text_arg(&format!("prereq_class_{}", index), &class.name);
-            state.add_text_arg(&format!("prereq_level_{}", index), &level.to_string());
-        }
-
-        if let Some(total_level) = prereqs.total_level {
-            state.add_text_arg("prereq_total_level", &total_level.to_string());
-        }
-
-        if let Some(ref race) = prereqs.race {
-            state.add_text_arg("prereq_race", &race.id);
-        }
-
-        for (index, ref ability_id) in prereqs.abilities.iter().enumerate() {
-            let ability = match Module::ability(ability_id) {
-                None => {
-                    warn!("No ability '{}' found for prereq list", ability_id);
-                    continue;
-                }, Some(ability) => ability,
-            };
-
-            state.add_text_arg(&format!("prereq_ability_{}", index), &ability.name);
-        }
+        add_prereq_text_args(prereqs, state);
     }
 }

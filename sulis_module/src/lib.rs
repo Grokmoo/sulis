@@ -56,9 +56,6 @@ pub use self::on_trigger::MerchantData;
 pub mod encounter;
 pub use self::encounter::Encounter;
 
-pub mod equippable;
-pub use self::equippable::Equippable;
-
 pub mod game;
 pub use self::game::Game;
 
@@ -68,8 +65,13 @@ pub mod image_layer;
 pub use self::image_layer::ImageLayer;
 pub use self::image_layer::ImageLayerSet;
 
+pub mod inventory_builder;
+pub use self::inventory_builder::InventoryBuilder;
+
 pub mod item;
 pub use self::item::Item;
+pub use self::item::Equippable;
+pub use self::item::Usable;
 
 pub mod item_adjective;
 pub use self::item_adjective::ItemAdjective;

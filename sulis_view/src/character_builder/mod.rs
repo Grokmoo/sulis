@@ -54,7 +54,7 @@ use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
 use sulis_core::resource::write_to_file;
 use sulis_widgets::{Button, Label};
 use sulis_module::actor::Sex;
-use sulis_module::{Ability, ActorBuilder, Class, Faction, ImageLayer, Module, Race};
+use sulis_module::{Ability, ActorBuilder, Class, Faction, ImageLayer, InventoryBuilder, Module, Race};
 use sulis_rules::{AttributeList};
 use sulis_state::{EntityState};
 
@@ -82,8 +82,7 @@ pub struct CharacterBuilder {
     pub race: Option<Rc<Race>>,
     pub class: Option<Rc<Class>>,
     pub attributes: Option<AttributeList>,
-    pub items: Option<Vec<String>>,
-    pub coins: i32,
+    pub inventory: Option<InventoryBuilder>,
     pub sex: Option<Sex>,
     pub name: String,
     pub images: HashMap<ImageLayer, String>,
@@ -149,8 +148,7 @@ impl CharacterBuilder {
             skin_color: None,
             hair_color: None,
             attributes: None,
-            items: None,
-            coins: 0,
+            inventory: None,
             portrait: None,
             images: HashMap::new(),
             abilities: Vec::new(),
@@ -256,22 +254,6 @@ impl BuilderSet for CharacterCreator {
         let mut levels = HashMap::new();
         levels.insert(builder.class.as_ref().unwrap().id.to_string(), 1);
 
-        let mut equipped = Vec::new();
-        if let Some(ref items) = builder.items {
-            for (index, item_id) in items.iter().enumerate() {
-                match Module::item(item_id) {
-                    None => {
-                        warn!("Unable to find item to add {}", item_id);
-                    },
-                    Some(item) => {
-                        if item.equippable.is_some() {
-                            equipped.push(index as u32);
-                        }
-                    }
-                }
-            }
-        }
-
         let mut abilities = Vec::new();
         for ability in builder.abilities.iter() {
             abilities.push(ability.id.to_string());
@@ -280,6 +262,11 @@ impl BuilderSet for CharacterCreator {
         for ability in builder.class.as_ref().unwrap().starting_abilities() {
             abilities.push(ability.id.to_string());
         }
+
+        let inventory = match builder.inventory {
+            None => InventoryBuilder::default(),
+            Some(ref inv) => inv.clone(),
+        };
 
         let actor = ActorBuilder {
             id,
@@ -294,9 +281,7 @@ impl BuilderSet for CharacterCreator {
             hue: builder.hue,
             hair_color: builder.hair_color,
             skin_color: builder.skin_color,
-            items: builder.items.clone(),
-            coins: Some(builder.coins),
-            equipped: Some(equipped),
+            inventory,
             levels,
             xp: None,
             reward: None,

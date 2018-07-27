@@ -12,8 +12,9 @@ attributes:
   wis: 10
 levels:
   rogue: 1
-items: [ club ]
-equipped: [ 0 ]
+inventory:
+  equipped:
+    HeldMain: club
 reward:
   xp: 25
   loot: level1_misc

@@ -103,8 +103,7 @@ impl BuilderPane for AttributeSelectorPane {
         };
 
         builder.attributes = Some(self.attrs);
-        builder.items = Some(kit.starting_equipment.clone());
-        builder.coins = kit.starting_coins;
+        builder.inventory = Some(kit.starting_inventory.clone());
         builder.next(&widget);
     }
 

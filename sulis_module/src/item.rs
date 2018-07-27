@@ -23,9 +23,19 @@ use sulis_core::image::Image;
 use sulis_core::resource::{ResourceBuilder, ResourceSet};
 use sulis_core::serde_yaml;
 use sulis_core::util::unable_to_create_error;
-use sulis_rules::{ItemKind};
+use sulis_rules::{ItemKind, bonus::AttackBuilder, BonusList, Slot};
 
-use {Equippable, ImageLayer, Module, ability::Duration};
+use {Actor, ImageLayer, Module, ability::Duration, PrereqList, PrereqListBuilder};
+
+#[derive(Deserialize, Debug, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct Equippable {
+    pub slot: Slot,
+    pub alternate_slot: Option<Slot>,
+    pub blocks_slot: Option<Slot>,
+    pub bonuses: BonusList,
+    pub attack: Option<AttackBuilder>,
+}
 
 #[derive(Debug)]
 pub struct Usable {
@@ -43,6 +53,7 @@ pub struct Item {
     pub kind: ItemKind,
     pub icon: Rc<Image>,
     pub equippable: Option<Equippable>,
+    pub prereqs: Option<PrereqList>,
     image: Option<HashMap<ImageLayer, Rc<Image>>>,
     alternate_image: Option<HashMap<ImageLayer, Rc<Image>>>,
     pub value: i32,
@@ -120,6 +131,11 @@ impl Item {
             }
         };
 
+        let prereqs = match builder.prereqs {
+            None => None,
+            Some(list) => Some(PrereqList::new(list, module)?),
+        };
+
         Ok(Item {
             id: builder.id,
             icon: icon,
@@ -131,7 +147,15 @@ impl Item {
             value: builder.value as i32,
             weight: builder.weight as i32,
             usable,
+            prereqs,
         })
+    }
+
+    pub fn meets_prereqs(&self, actor: &Rc<Actor>) -> bool {
+        match self.prereqs {
+            None => true,
+            Some(ref prereqs) => prereqs.meets(actor),
+        }
     }
 
     pub fn alt_image_iter(&self) -> Option<Iter<ImageLayer, Rc<Image>>> {
@@ -183,6 +207,7 @@ pub struct ItemBuilder {
     pub equippable: Option<Equippable>,
     pub image: Option<HashMap<ImageLayer, String>>,
     pub alternate_image: Option<HashMap<ImageLayer, String>>,
+    prereqs: Option<PrereqListBuilder>,
     value: u32,
     weight: u32,
     usable: Option<UsableBuilder>,

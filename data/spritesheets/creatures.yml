@@ -30,9 +30,16 @@ groups:
       ogre_shadow: [33, 21]
       seaserpent01: [29, 25]
       seaserpent01_shadow: [33, 25]
+      spider_large: [0, 21]
+      spider_large_shadow: [4, 21]
+      scorpion_large: [8, 21]
+      scorpion_large_shadow: [12, 21]
   3by3:
     size: [3, 3]
     areas:
+      scorpion_medium: [16, 21]
+      scorpion_medium_shadow: [19, 21]
+    
       hair01: [0, 0]
       hair02: [3, 0]
       hair03: [6, 0]
@@ -163,11 +170,10 @@ groups:
       shortspear_off: [39, 18]
       longspear_off: [42, 18]
       quarterstaff_off: [45, 18]
-      projectile_crossbow: [51, 18]
       projectile_bow: [48, 18]
-      
-      shield_small: [0, 21]
-      shield_large: [3, 21]
+      projectile_crossbow: [51, 18]
+      shield_small: [54, 18]
+      shield_large: [57, 18]
       
       wolf01: [39, 21]
       wolf_shadow: [39, 24]

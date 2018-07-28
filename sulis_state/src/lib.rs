@@ -93,7 +93,6 @@ pub use self::save_state::SaveState;
 
 pub mod script;
 pub use self::script::ScriptState;
-pub use self::script::targeter::Targeter;
 pub use self::script::ScriptCallback;
 
 mod turn_manager;

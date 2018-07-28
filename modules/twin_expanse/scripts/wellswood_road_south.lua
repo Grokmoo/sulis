@@ -1,5 +1,5 @@
 function disable_go_too_far()
-  game:disable_trigger_at(3, 25)
+  game:disable_trigger_at(3, 27)
 end
 
 function on_add_aessa(parent, target)

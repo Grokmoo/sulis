@@ -117,6 +117,7 @@ impl EntityAI {
 
         self.actions_taken_this_turn += 1;
 
+        info!("ai action script");
         GameState::execute_ai_script(&self.entity, "ai_action")
     }
 

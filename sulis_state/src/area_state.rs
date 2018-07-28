@@ -25,7 +25,7 @@ use rand::{self, Rng};
 use sulis_module::{Actor, Area, LootList, Module, ObjectSize, prop};
 use sulis_module::area::{EncounterData, PropData, Transition, TriggerKind};
 use sulis_core::util::{invalid_data_error, Point};
-
+use script::AreaTargeter;
 use save_state::{AreaSaveState};
 use *;
 
@@ -63,7 +63,7 @@ pub struct AreaState {
     feedback_text: Vec<AreaFeedbackText>,
     scroll_to_callback: Option<Rc<RefCell<EntityState>>>,
 
-    targeter: Option<Rc<RefCell<Box<Targeter>>>>,
+    targeter: Option<Rc<RefCell<AreaTargeter>>>,
 }
 
 impl PartialEq for AreaState {
@@ -278,14 +278,14 @@ impl AreaState {
         }
     }
 
-    pub fn targeter(&mut self) -> Option<Rc<RefCell<Box<Targeter>>>> {
+    pub fn targeter(&mut self) -> Option<Rc<RefCell<AreaTargeter>>> {
         match self.targeter {
             None => None,
             Some(ref targeter) => Some(Rc::clone(targeter)),
         }
     }
 
-    pub (crate) fn set_targeter(&mut self, targeter: Box<Targeter>) {
+    pub (crate) fn set_targeter(&mut self, targeter: AreaTargeter) {
         self.targeter = Some(Rc::new(RefCell::new(targeter)));
     }
 

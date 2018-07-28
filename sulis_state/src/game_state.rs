@@ -729,7 +729,6 @@ impl GameState {
             let state = state.as_mut().unwrap();
 
             let mut area_state = state.area_state.borrow_mut();
-
             area_state.update(millis);
         });
 

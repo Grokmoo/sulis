@@ -130,6 +130,18 @@ impl UserData for ScriptEntity {
             Ok(is_member)
         });
 
+        methods.add_method("use_ability", |_, entity, ability: ScriptAbility| {
+            let parent = entity.try_unwrap()?;
+            info!("ability on activate script");
+            GameState::execute_ability_on_activate(&parent, &ability.to_ability());
+            Ok(())
+        });
+
+        methods.add_method("abilities", |_, entity, ()| {
+            let entity = entity.try_unwrap()?;
+            Ok(ScriptAbilitySet::from(&entity))
+        });
+
         methods.add_method("targets", &targets);
 
         methods.add_method("remove_effects_with_tag", |_, entity, tag: String| {

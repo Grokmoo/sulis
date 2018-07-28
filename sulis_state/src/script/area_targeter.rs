@@ -24,7 +24,7 @@ use sulis_core::ui::{animation_state, color, Cursor};
 use sulis_core::util::{Point};
 use sulis_module::{Ability, Module, ObjectSize};
 
-use script::{targeter, Targeter, TargeterData};
+use script::{targeter, TargeterData};
 use {AreaState, EntityState, GameState, TurnManager};
 
 #[derive(Clone)]
@@ -486,21 +486,23 @@ impl AreaTargeter {
 
         true
     }
-}
 
-impl Targeter for AreaTargeter {
-    fn name(&self) -> &str {
+    pub fn parent(&self) -> &Rc<RefCell<EntityState>> {
+        &self.parent
+    }
+
+    pub fn name(&self) -> &str {
         match &self.script_source {
             ScriptSource::Ability(ability) => &ability.name,
             ScriptSource::Item { name, .. } => name,
         }
     }
 
-    fn cancel(&self) -> bool {
+    pub fn cancel(&self) -> bool {
         self.cancel
     }
 
-    fn draw(&self, renderer: &mut GraphicsRenderer, tile: &Rc<Image>, x_offset: f32, y_offset: f32,
+    pub fn draw(&self, renderer: &mut GraphicsRenderer, tile: &Rc<Image>, x_offset: f32, y_offset: f32,
                 scale_x: f32, scale_y: f32, millis: u32) {
         let mut draw_list = DrawList::empty_sprite();
 
@@ -531,7 +533,7 @@ impl Targeter for AreaTargeter {
         renderer.draw(draw_list);
     }
 
-    fn on_mouse_move(&mut self, cursor_x: i32, cursor_y: i32) -> Option<&Rc<RefCell<EntityState>>> {
+    pub fn on_mouse_move(&mut self, cursor_x: i32, cursor_y: i32) -> Option<&Rc<RefCell<EntityState>>> {
         self.cursor_pos = Point::new(cursor_x, cursor_y);
         self.cursor_offset = self.shape.get_cursor_offset();
         self.cur_target = None;
@@ -576,21 +578,29 @@ impl Targeter for AreaTargeter {
         }
     }
 
-    fn on_cancel(&mut self) {
+    pub fn on_cancel(&mut self) {
         self.cancel = true;
     }
 
-    fn on_activate(&mut self) {
-        self.cancel = true;
+    pub fn cur_affected(&self) -> &Vec<Rc<RefCell<EntityState>>> {
+        &self.cur_effected
+    }
 
+    pub fn is_valid_to_activate(&self) -> bool {
         if self.free_select.is_none() {
             match self.cur_target {
-                None => return,
-                Some(_) => (),
-            };
+                None => false,
+                Some(_) => true,
+            }
         } else {
-            if !self.free_select_valid { return; }
+            self.free_select_valid
         }
+    }
+
+    pub fn on_activate(&mut self) {
+        self.cancel = true;
+
+        if !self.is_valid_to_activate() { return; }
 
         let affected = self.cur_effected.iter().map(|e| Some(Rc::clone(e))).collect();
 
@@ -603,6 +613,7 @@ impl Targeter for AreaTargeter {
         let points = self.cur_points.clone();
         let func = &self.on_target_select_func;
         let custom_target = self.on_target_select_custom_target.clone();
+        info!("on target select script");
         match &self.script_source {
             ScriptSource::Ability(ref ability) =>
                 GameState::execute_ability_on_target_select(&self.parent, ability, affected,

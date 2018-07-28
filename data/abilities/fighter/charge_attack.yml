@@ -10,6 +10,11 @@ active:
   duration:
     Instant
   cooldown: 1
+  ai:
+    priority: 10
+    kind: Damage
+    group: Multiple
+    range: Short
   short_description: |
     Charge through multiple opponents, attack each in turn.
 prereqs:

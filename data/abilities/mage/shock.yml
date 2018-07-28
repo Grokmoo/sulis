@@ -10,5 +10,10 @@ active:
   duration:
     Instant
   cooldown: 1
+  ai:
+    priority: 20
+    kind: Damage
+    group: Single
+    range: Visible
   short_description: |
     Damage one opponent with electricity.

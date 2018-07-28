@@ -64,6 +64,7 @@ function attack_or_ability(parent, target)
   
   for i = 1, #abilities do
     parent:use_ability(abilities[i])
+	handle_targeter(parent)
     return
   end
 
@@ -83,4 +84,6 @@ function handle_targeter(parent)
 	  return
 	end
   end
+  
+  game:cancel_targeter()
 end

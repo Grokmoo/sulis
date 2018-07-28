@@ -11,6 +11,11 @@ active:
   duration:
     Instant
   cooldown: 1
+  ai:
+    priority: 20
+    kind: Damage
+    group: Multiple
+    range: Short
   short_description: |
     Deal fire damage to all opponents in an arc.
 prereqs:

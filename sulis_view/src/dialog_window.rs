@@ -70,8 +70,11 @@ impl WidgetKind for DialogWindow {
         let responses = self.convo.responses(&self.cur_node);
 
         let node_widget = Widget::with_theme(self.node.clone(), "node");
-        for flag in self.entity.borrow().custom_flags() {
-            node_widget.borrow_mut().state.add_text_arg(flag, "true");
+        {
+            let entity = self.entity.borrow();
+            for (ref flag, ref val) in entity.custom_flags() {
+                node_widget.borrow_mut().state.add_text_arg(flag, val);
+            }
         }
         node_widget.borrow_mut().state.add_text_arg("player_name", &self.pc.borrow().actor.actor.name);
         let cur_text = theme::expand_text_args(cur_text, &node_widget.borrow().state);
@@ -249,13 +252,13 @@ pub fn activate(widget: &Rc<RefCell<Widget>>, on_select: &OnTrigger,
 
     if let Some(ref flags) = on_select.target_flags {
         for flag in flags.iter() {
-            target.borrow_mut().set_custom_flag(flag);
+            target.borrow_mut().set_custom_flag(flag, "true");
         }
     }
 
     if let Some(ref flags) = on_select.player_flags {
         for flag in flags.iter() {
-            pc.borrow_mut().set_custom_flag(flag);
+            pc.borrow_mut().set_custom_flag(flag, "true");
         }
     }
 

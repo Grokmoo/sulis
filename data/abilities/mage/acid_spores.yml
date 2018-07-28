@@ -10,6 +10,11 @@ active:
   duration:
     Instant
   cooldown: 4
+  ai:
+    priority: 10
+    kind: Damage
+    group: Multiple
+    range: Visible
   short_description: |
     Launch multiple acid blasts at nearby targets.
 prereqs:

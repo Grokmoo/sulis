@@ -10,6 +10,11 @@ active:
   duration:
     Rounds: 3
   cooldown: 4
+  ai:
+    priority: 10
+    kind: Heal
+    group: Multiple
+    range: Short
   short_description: |
     Continually heal all allies in an area.
 prereqs:

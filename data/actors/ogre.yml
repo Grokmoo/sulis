@@ -12,10 +12,10 @@ attributes:
   int: 10
   wis: 10
 levels:
-  fighter: 6
+  fighter: 5
 inventory:
   equipped:
-    HeldMain: greataxe
+    HeldMain: battleaxe
 reward:
   xp: 200
   loot: level5_misc
@@ -32,4 +32,4 @@ abilities:
   - weapon_spear
   - weapon_mace
   - weapon_simple
-  - mighty_blow
+  - stunning_blow

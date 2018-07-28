@@ -10,5 +10,10 @@ active:
   duration:
     Rounds: 2
   cooldown: 4
+  ai:
+    priority: 40
+    kind: Buff
+    group: Single
+    range: Short
   short_description: |
     You or an ally gain a boost to movement.

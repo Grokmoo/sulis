@@ -10,6 +10,11 @@ active:
   duration:
     Mode
   cooldown: 2
+  ai:
+    priority: 5
+    kind: Buff
+    group: Single
+    range: Personal
   short_description: |
     Enter a mode with improved defenses at the cost of accuracy.
 upgrades:

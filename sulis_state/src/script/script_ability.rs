@@ -20,8 +20,8 @@ use std::cell::RefCell;
 
 use rlua::{self, Lua, UserData, UserDataMethods};
 
-use sulis_module::{ability, Ability, Module};
-use {EntityState, GameState};
+use sulis_module::{ability::{self, AIData}, Ability, Module};
+use {EntityState, GameState, area_feedback_text::ColorKind};
 use script::{ScriptEntity, CallbackData};
 
 type Result<T> = std::result::Result<T, rlua::Error>;
@@ -29,7 +29,7 @@ type Result<T> = std::result::Result<T, rlua::Error>;
 #[derive(Clone)]
 pub struct ScriptAbilitySet {
     pub parent: usize,
-    pub abilities: Vec<String>,
+    pub abilities: Vec<ScriptAbility>,
 }
 
 impl ScriptAbilitySet {
@@ -37,7 +37,8 @@ impl ScriptAbilitySet {
         let parent = entity.borrow().index;
         let mut abilities = Vec::new();
         for (id, _) in entity.borrow().actor.ability_states.iter() {
-            abilities.push(id.to_string());
+            let ability = Module::ability(id).unwrap();
+            abilities.push(ScriptAbility::from(&ability));
         }
 
         ScriptAbilitySet {
@@ -50,24 +51,62 @@ impl ScriptAbilitySet {
 impl UserData for ScriptAbilitySet {
     fn add_methods(methods: &mut UserDataMethods<Self>) {
         methods.add_method("to_table", |_, set, ()| {
-            let table: Vec<_> = set.abilities.iter().map(|id| {
-                let ability = Module::ability(id).unwrap();
-                ScriptAbility::from(&ability)
-            }).collect();
-            Ok(table)
+            Ok(set.abilities.clone())
         });
 
         methods.add_method("can_activate", |_, set, ()| {
             let parent = ScriptEntity::new(set.parent).try_unwrap()?;
             let parent = parent.borrow();
-            let abilities = set.abilities.iter().filter_map(|id| {
-                if parent.actor.can_activate(id) {
-                    Some(id.to_string())
+            let abilities = set.abilities.iter().filter_map(|ability| {
+                if parent.actor.can_activate(&ability.id) {
+                    Some(ability.clone())
                 } else {
                     None
                 }
             }).collect();
             Ok(ScriptAbilitySet { parent: set.parent, abilities })
+        });
+
+        methods.add_method("filter_kind", |_, set, kind: String| {
+            let kind = ability::AIKind::from_str(&kind);
+
+            let abilities = set.abilities.iter().filter_map(|ability| {
+                if ability.ai_data.kind == kind {
+                    Some(ability.clone())
+                } else {
+                    None
+                }
+            }).collect();
+            Ok(ScriptAbilitySet { parent: set.parent, abilities })
+        });
+
+        methods.add_method("filter_group", |_, set, group: String| {
+            let group = ability::AIGroup::from_str(&group);
+            let abilities = set.abilities.iter().filter_map(|ability| {
+                if ability.ai_data.group == group {
+                    Some(ability.clone())
+                } else {
+                    None
+                }
+            }).collect();
+            Ok(ScriptAbilitySet { parent: set.parent, abilities })
+        });
+
+        methods.add_method("filter_range", |_, set, range: String| {
+            let range = ability::AIRange::from_str(&range);
+            let abilities = set.abilities.iter().filter_map(|ability| {
+                if ability.ai_data.range == range {
+                    Some(ability.clone())
+                } else {
+                    None
+                }
+            }).collect();
+            Ok(ScriptAbilitySet { parent: set.parent, abilities })
+        });
+
+        methods.add_method_mut("sort_by_priority", |_, set, ()| {
+            set.abilities.sort_by_key(|a| a.ai_data.priority());
+            Ok(())
         });
     }
 }
@@ -78,16 +117,21 @@ pub struct ScriptAbility {
     name: String,
     duration: u32,
     ap: u32,
+    ai_data: AIData,
 }
 
 impl ScriptAbility {
     pub fn from(ability: &Rc<Ability>) -> ScriptAbility {
-        let duration = match ability.active {
-            None => 0,
-            Some(ref active) => match active.duration {
-                ability::Duration::Rounds(rounds) => rounds,
-                ability::Duration::Mode => 0,
-                ability::Duration::Instant => 0,
+        let (duration, ai_data) = match ability.active {
+            None => unreachable!(),
+            Some(ref active) => {
+                let duration = match active.duration {
+                    ability::Duration::Rounds(rounds) => rounds,
+                    ability::Duration::Mode => 0,
+                    ability::Duration::Instant => 0,
+                };
+
+                (duration, active.ai)
             }
         };
 
@@ -101,6 +145,7 @@ impl ScriptAbility {
             name: ability.name.to_string(),
             duration,
             ap,
+            ai_data,
         }
     }
 
@@ -154,6 +199,16 @@ impl UserData for ScriptAbility {
             let cb_data = CallbackData::new_ability(index, &ability.id);
             Ok(cb_data)
         });
+
+        methods.add_method("ai_data", |lua, ability, ()| {
+            let ai_data = lua.create_table()?;
+            ai_data.set("priority", ability.ai_data.priority())?;
+            ai_data.set("kind", ability.ai_data.kind())?;
+            ai_data.set("group", ability.ai_data.group())?;
+            ai_data.set("range", ability.ai_data.range())?;
+
+            Ok(ai_data)
+        });
     }
 }
 
@@ -168,6 +223,10 @@ fn activate(_lua: &Lua, ability: &ScriptAbility, (target, take_ap): (ScriptEntit
     }
 
     entity.borrow_mut().actor.activate_ability_state(&ability.id);
+
+    let area_state = GameState::area_state();
+    area_state.borrow_mut().add_feedback_text(ability.name.to_string(),
+        &entity, ColorKind::Info, 3.0);
 
     Ok(())
 }

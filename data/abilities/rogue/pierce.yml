@@ -10,6 +10,11 @@ active:
   duration:
     Instant
   cooldown: 3
+  ai:
+    priority: 20
+    kind: Damage
+    group: Single
+    range: Reach
   short_description: |
     Make an armor penetrating attack.
 prereqs:

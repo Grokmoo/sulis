@@ -16,7 +16,6 @@
 
 use std::io::Error;
 use std::ptr;
-use std::slice::Iter;
 use std::rc::Rc;
 use std::cell::RefCell;
 use std::collections::HashMap;
@@ -57,7 +56,7 @@ pub struct EntityState {
     marked_for_removal: bool,
     texture_cache_slot: Option<EntityTextureSlot>,
 
-    custom_flags: Vec<String>,
+    custom_flags: HashMap<String, String>,
 }
 
 impl PartialEq for EntityState {
@@ -143,7 +142,7 @@ impl EntityState {
             marked_for_removal: false,
             ai_state,
             texture_cache_slot: None,
-            custom_flags: Vec::new(),
+            custom_flags: HashMap::new(),
         }
     }
 
@@ -159,18 +158,23 @@ impl EntityState {
         }).collect()
     }
 
-    pub fn custom_flags<'a>(&'a self) -> Iter<'a, String> {
+    pub fn custom_flags<'a>(&'a self) -> impl Iterator<Item=(&String, &String)> {
         self.custom_flags.iter()
     }
 
-    pub fn set_custom_flag(&mut self, flag: &str) {
-        self.custom_flags.push(flag.to_string());
-        self.custom_flags.sort();
-        self.custom_flags.dedup();
+    pub fn set_custom_flag(&mut self, flag: &str, value: &str) {
+        self.custom_flags.insert(flag.to_string(), value.to_string());
+    }
+
+    pub fn get_custom_flag(&self, flag: &str) -> Option<String> {
+        match self.custom_flags.get(flag) {
+            None => None,
+            Some(val) => Some(val.to_string()),
+        }
     }
 
     pub fn has_custom_flag(&self, flag: &str) -> bool {
-        self.custom_flags.iter().any(|x| x == flag)
+        self.custom_flags.contains_key(flag)
     }
 
     pub fn clear_texture_cache(&mut self) {

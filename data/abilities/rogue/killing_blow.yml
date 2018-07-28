@@ -10,6 +10,11 @@ active:
   duration:
     Instant
   cooldown: 3
+  ai:
+    priority: 30
+    kind: Damage
+    group: Single
+    range: Reach
   short_description: |
     Instantly kill heavily damaged targets.
 prereqs:

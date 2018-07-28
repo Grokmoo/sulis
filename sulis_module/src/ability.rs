@@ -54,6 +54,7 @@ pub struct Active {
     pub group: AbilityGroup,
     pub cooldown: u32,
     pub short_description: String,
+    pub ai: AIData,
 }
 
 #[derive(Debug)]
@@ -125,6 +126,7 @@ impl Ability {
                     cooldown,
                     group,
                     short_description: active.short_description,
+                    ai: active.ai,
                 })
             },
         };
@@ -192,6 +194,96 @@ pub struct ActiveBuilder {
     group: String,
     cooldown: Option<u32>,
     short_description: String,
+    ai: AIData,
+}
+
+#[derive(Deserialize, Debug, Clone, Copy)]
+#[serde(deny_unknown_fields)]
+pub struct AIData {
+    pub priority: u32,
+    pub kind: AIKind,
+    pub group: AIGroup,
+    pub range: AIRange,
+}
+
+impl AIData {
+    pub fn priority(&self) -> u32 { self.priority }
+
+    pub fn kind(&self) -> String { format!("{:?}", self.kind) }
+
+    pub fn group(&self) -> String { format!("{:?}", self.group) }
+
+    pub fn range(&self) -> String { format!("{:?}", self.range) }
+}
+
+#[derive(Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub enum AIKind {
+    Damage,
+    Heal,
+    Buff,
+    Debuff,
+    Special
+}
+
+impl AIKind {
+    pub fn from_str(s: &str) -> AIKind {
+        match s {
+            "Damage" => AIKind::Damage,
+            "Heal" => AIKind::Heal,
+            "Buff" => AIKind::Buff,
+            "Debuff" => AIKind::Debuff,
+            "Special" => AIKind::Special,
+            _ => {
+                warn!("Invalid AI kind string '{}'", s);
+                AIKind::Damage
+            }
+        }
+    }
+}
+
+#[derive(Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub enum AIGroup {
+    Single,
+    Multiple,
+}
+
+impl AIGroup {
+    pub fn from_str(s: &str) -> AIGroup {
+        match s {
+            "Single" => AIGroup::Single,
+            "Multiple" => AIGroup::Multiple,
+            _ => {
+                warn!("Invalid AI group string '{}'", s);
+                AIGroup::Single
+            }
+        }
+    }
+}
+
+#[derive(Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub enum AIRange {
+    Personal,
+    Reach,
+    Short,
+    Visible
+}
+
+impl AIRange {
+    pub fn from_str(s: &str) -> AIRange {
+        match s {
+            "Personal" => AIRange::Personal,
+            "Reach" => AIRange::Reach,
+            "Short" => AIRange::Short,
+            "Visible" => AIRange::Visible,
+            _ => {
+                warn!("Invalid AI range string '{}'", s);
+                AIRange::Personal
+            }
+        }
+    }
 }
 
 #[derive(Deserialize, Debug)]

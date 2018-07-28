@@ -285,7 +285,7 @@ pub struct EntitySaveState {
     pub(crate) actor: ActorSaveState,
     pub(crate) location: LocationSaveState,
     pub(crate) size: String,
-    pub(crate) custom_flags: Vec<String>,
+    pub(crate) custom_flags: HashMap<String, String>,
     pub(crate) ai_group: Option<usize>,
     pub(crate) ai_active: bool,
 }
@@ -344,12 +344,16 @@ impl EntitySaveState {
             None
         };
 
+        let flags = entity.custom_flags().map(|(k, v)| {
+            (k.to_string(), v.to_string())
+        }).collect();
+
         EntitySaveState {
             index: entity.index,
             actor: ActorSaveState::new(&entity.actor),
             location: LocationSaveState::new(&entity.location),
             size: entity.size.id.clone(),
-            custom_flags: entity.custom_flags().map(|s| s.to_string()).collect(),
+            custom_flags: flags,
             ai_group: entity.ai_group(),
             ai_active: entity.is_ai_active(),
             actor_base,

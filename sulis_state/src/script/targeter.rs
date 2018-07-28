@@ -188,14 +188,16 @@ impl UserData for TargeterData {
 
 fn activate(_lua: &Lua, data: &TargeterData, _args: ()) -> Result<()> {
     info!("Activating targeter");
-    let parent = ScriptEntity::new(data.parent).try_unwrap()?;
+    // let parent = ScriptEntity::new(data.parent).try_unwrap()?;
 
     let targeter = AreaTargeter::from(data);
 
     let area_state = GameState::area_state();
     area_state.borrow_mut().set_targeter(targeter);
 
-    GameState::execute_ai_script(&parent, "handle_targeter");
+    // if !parent.borrow().is_party_member() {
+    //     GameState::execute_ai_script(&parent, "handle_targeter");
+    // }
 
     Ok(())
 }

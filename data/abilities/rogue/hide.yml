@@ -10,6 +10,11 @@ active:
   duration:
     Mode
   cooldown: 2
+  ai:
+    priority: 10
+    kind: Buff
+    group: Single
+    range: Personal
   short_description: |
     Hide so that enemies will not attack you.
 upgrades:

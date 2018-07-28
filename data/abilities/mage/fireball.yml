@@ -11,6 +11,11 @@ active:
   duration:
     Instant
   cooldown: 1
+  ai:
+    priority: 10
+    kind: Damage
+    group: Multiple
+    range: Visible
   short_description: |
     Deal large fire damage to a group of opponents.
 prereqs:

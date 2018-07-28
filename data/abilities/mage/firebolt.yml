@@ -10,5 +10,10 @@ active:
   duration:
     Instant
   cooldown: 1
+  ai:
+    priority: 30
+    kind: Damage
+    group: Single
+    range: Visible
   short_description: |
     Deal fire damage to one opponent.

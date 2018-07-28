@@ -10,5 +10,10 @@ active:
   duration:
     Rounds: 2
   cooldown: 2
+  ai:
+    priority: 40
+    kind: Damage
+    group: Single
+    range: Short
   short_description: |
     Deal damage over time and a small accuracy penalty to a single opponent.

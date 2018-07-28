@@ -294,6 +294,7 @@ impl TurnManager {
             let mut entity = entity.borrow_mut();
             if !entity.is_hostile(mover) { continue; }
             if !entity.location.is_in(&area_state) { continue; }
+            if entity.actor.actor.ai.is_none() { continue; }
 
             let mover = mover.borrow();
             if !area_state.has_visibility(&mover, &entity) && !area_state.has_visibility(&entity, &mover) {

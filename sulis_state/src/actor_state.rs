@@ -302,9 +302,13 @@ impl ActorState {
         trace!("Checking can attack for '{}'.  Distance to target is {}",
                self.actor.name, dist);
 
-        if self.ap < self.stats.attack_cost as u32 { return false; }
+        if !self.has_ap_to_attack() { return false; }
 
         self.can_reach(dist)
+    }
+
+    pub(crate) fn has_ap_to_attack(&self) -> bool {
+        self.ap >= self.stats.attack_cost as u32
     }
 
     pub fn weapon_attack(parent: &Rc<RefCell<EntityState>>,

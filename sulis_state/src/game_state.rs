@@ -29,7 +29,7 @@ use sulis_core::io::{GraphicsRenderer};
 use sulis_core::ui::{Widget};
 use sulis_module::{Ability, Actor, Module, ObjectSize, OnTrigger, area::{Trigger, TriggerKind}};
 
-use {AI, AreaState, ChangeListener, ChangeListenerList, EntityState, Location,
+use {ai, AI, AreaState, ChangeListener, ChangeListenerList, EntityState, Location,
     PathFinder, SaveState, ScriptState, UICallback, MOVE_TO_THRESHOLD, TurnManager};
 use script::{script_callback::{self, ScriptHitKind}, ScriptEntitySet, ScriptCallback};
 use animation::{self, Anim, AnimState};
@@ -386,6 +386,29 @@ impl GameState {
             Err(rlua::Error::FromLuaConversionError { .. }) => "Success".to_string(),
             Err(e) => format!("{}", e),
         }
+    }
+
+    pub fn execute_ai_script(parent: &Rc<RefCell<EntityState>>, func: &str) -> ai::State {
+        let start_time = time::Instant::now();
+
+        let result = SCRIPT.with(|state| {
+            state.ai_script(parent, func)
+        });
+
+        let result = match result {
+            Err(e) => {
+                warn!("Error in lua AI script");
+                warn!("{}", e);
+                return ai::State::End;
+            },
+            Ok(val) => {
+                val
+            }
+        };
+
+        info!("AI Script execution time: {}", util::format_elapsed_secs(start_time.elapsed()));
+
+        result
     }
 
     pub fn execute_item_on_activate(parent: &Rc<RefCell<EntityState>>, index: usize) {

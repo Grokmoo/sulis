@@ -1,4 +1,5 @@
 id: wolf
+ai: ai_basic
 name: Wolf
 faction: Hostile
 images: {}

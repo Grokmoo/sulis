@@ -54,7 +54,7 @@ use rlua::{self, Function, Lua, UserData, UserDataMethods};
 use sulis_core::config::CONFIG;
 use sulis_core::util::Point;
 use sulis_module::{ability, Ability, Item, Module, OnTrigger};
-use {EntityState, GameState};
+use {EntityState, GameState, ai};
 
 type Result<T> = std::result::Result<T, rlua::Error>;
 
@@ -80,8 +80,11 @@ impl ScriptState {
         ScriptState { lua }
     }
 
-    fn execute_script(&self, parent: &Rc<RefCell<EntityState>>, function_args: &str,
-                          mut script: String, function: &str) -> Result<()> {
+    fn execute_script<'lua, T: rlua::FromLuaMulti<'lua>>(&'lua self,
+                                                         parent: &Rc<RefCell<EntityState>>,
+                                                         function_args: &str,
+                                                         mut script: String,
+                                                         function: &str) -> Result<T> {
         let globals = self.lua.globals();
         globals.set("parent", ScriptEntity::from(&parent))?;
 
@@ -94,9 +97,7 @@ impl ScriptState {
 
         debug!("Calling script function '{}'", function);
 
-        func.call::<_, ()>("")?;
-
-        Ok(())
+        func.call::<_, T>("")
     }
 
     pub fn console(&self, script: String, party: &Vec<Rc<RefCell<EntityState>>>) -> Result<String> {
@@ -111,6 +112,18 @@ impl ScriptState {
         self.lua.globals().set("party", party_table)?;
 
         self.lua.eval::<String>(&script, None)
+}
+
+    pub fn ai_script(&self, parent: &Rc<RefCell<EntityState>>, func: &str) -> Result<ai::State> {
+        let script = match &parent.borrow().actor.actor.ai {
+            None => unreachable!(),
+            Some(script) => script.clone(),
+        };
+
+        self.lua.globals().set("state", ai::State::End)?;
+        self.execute_script(parent, "(parent, state)", script, func)?;
+
+        self.lua.globals().get("state")
     }
 
     pub fn item_on_activate(&self, parent: &Rc<RefCell<EntityState>>,

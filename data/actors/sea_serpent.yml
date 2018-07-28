@@ -1,4 +1,5 @@
 id: sea_serpent
+ai: ai_basic
 name: Sea Serpent
 faction: Hostile
 images: {}

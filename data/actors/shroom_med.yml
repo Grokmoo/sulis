@@ -1,4 +1,5 @@
 id: shroom_med
+ai: ai_basic
 name: Mushroom
 faction: Hostile
 images: {}

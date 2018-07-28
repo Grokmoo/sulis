@@ -338,6 +338,7 @@ impl EntitySaveState {
                 xp: Some(actor.xp),
                 reward,
                 abilities,
+                ai: None,
             })
         } else {
             None

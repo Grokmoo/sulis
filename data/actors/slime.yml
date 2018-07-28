@@ -1,4 +1,5 @@
 id: slime
+ai: ai_basic
 name: Slime
 faction: Hostile
 images: {}

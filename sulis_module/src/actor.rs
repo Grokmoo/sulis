@@ -98,6 +98,8 @@ pub struct Actor {
 
     pub reward: Option<Reward>,
     pub abilities: Vec<OwnedAbility>,
+
+    pub ai: Option<String>,
 }
 
 impl PartialEq for Actor {
@@ -145,6 +147,7 @@ impl Actor {
             }
         }
 
+
         Actor {
             id: other.id.to_string(),
             name: other.name.to_string(),
@@ -166,6 +169,7 @@ impl Actor {
             builder_images: other.builder_images.clone(),
             reward: other.reward.clone(),
             abilities,
+            ai: other.ai.clone(),
         }
     }
 
@@ -269,6 +273,18 @@ impl Actor {
             }
         }
 
+        let ai = match builder.ai {
+            None => None,
+            Some(id) => {
+                match resources.scripts.get(&id) {
+                    None => {
+                        warn!("No script found with id '{}'", id);
+                        return unable_to_create_error("actor", &builder.id);
+                    }, Some(ref script) => Some(script.to_string()),
+                }
+            }
+        };
+
         Ok(Actor {
             id: builder.id,
             name: builder.name,
@@ -290,6 +306,7 @@ impl Actor {
             skin_color: builder.skin_color,
             hair_color: builder.hair_color,
             abilities,
+            ai,
         })
     }
 
@@ -372,6 +389,7 @@ pub struct ActorBuilder {
     pub xp: Option<u32>,
     pub reward: Option<RewardBuilder>,
     pub abilities: Vec<String>,
+    pub ai: Option<String>,
 }
 
 impl ResourceBuilder for ActorBuilder {

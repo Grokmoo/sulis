@@ -1,4 +1,5 @@
 id: imp
+ai: ai_basic
 name: Imp
 faction: Hostile
 images: {}

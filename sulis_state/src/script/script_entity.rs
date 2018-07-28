@@ -27,8 +27,7 @@ use sulis_core::config::CONFIG;
 use sulis_core::resource::ResourceSet;
 use sulis_rules::{AttackKind, DamageKind, Attack};
 use {ActorState, EntityState, GameState, Location, area_feedback_text::ColorKind};
-use animation::{self};
-use script::*;
+use {ai, animation::{self}, script::*};
 
 #[derive(Clone, Debug)]
 pub struct ScriptEntity {
@@ -97,6 +96,14 @@ impl ScriptEntity {
 
 impl UserData for ScriptEntity {
     fn add_methods(methods: &mut UserDataMethods<Self>) {
+        methods.add_method("state_end", |_, _, ()| {
+            Ok(ai::State::End)
+        });
+
+        methods.add_method("state_wait", |_, _, time: u32| {
+            Ok(ai::State::Wait(time))
+        });
+
         methods.add_method("add_xp", |_, entity, amount: u32| {
             let entity = entity.try_unwrap()?;
             entity.borrow_mut().actor.add_xp(amount);
@@ -217,6 +224,34 @@ impl UserData for ScriptEntity {
             Ok(TargeterData::new_item(index, item.index))
         });
 
+        methods.add_method("move_towards_entity", |_, entity, dest: ScriptEntity| {
+            let parent = entity.try_unwrap()?;
+            let target = dest.try_unwrap()?;
+
+            GameState::move_towards(&parent, &target);
+
+            Ok(())
+        });
+
+        methods.add_method("has_ap_to_attack", |_, entity, ()| {
+            let parent = entity.try_unwrap()?;
+            let result = parent.borrow().actor.has_ap_to_attack();
+            Ok(result)
+        });
+
+        methods.add_method("can_reach", |_, entity, target: ScriptEntity| {
+            let parent = entity.try_unwrap()?;
+            let target = target.try_unwrap()?;
+            let result = parent.borrow().can_reach(&target);
+            Ok(result)
+        });
+
+        methods.add_method("can_move", |_, entity, ()| {
+            let parent = entity.try_unwrap()?;
+            let result = parent.borrow().can_move();
+            Ok(result)
+        });
+
         methods.add_method("teleport_to", |_, entity, dest: HashMap<String, i32>| {
             let (x, y) = unwrap_point(dest)?;
             let entity = entity.try_unwrap()?;
@@ -260,8 +295,8 @@ impl UserData for ScriptEntity {
             Ok(hit_kind)
         });
 
-        methods.add_method("anim_weapon_attack", |_, entity, (target, callback):
-                           (ScriptEntity, Option<CallbackData>)| {
+        methods.add_method("anim_weapon_attack", |_, entity, (target, callback, use_ap):
+                           (ScriptEntity, Option<CallbackData>, Option<bool>)| {
             entity.check_not_equal(&target)?;
             let parent = entity.try_unwrap()?;
             let target = target.try_unwrap()?;
@@ -271,7 +306,9 @@ impl UserData for ScriptEntity {
                 Some(cb) => Some(Box::new(cb)),
             };
 
-            EntityState::attack(&parent, &target, cb, false);
+            let use_ap = use_ap.unwrap_or(false);
+
+            EntityState::attack(&parent, &target, cb, use_ap);
             Ok(())
         });
 
@@ -701,6 +738,10 @@ fn targets(_lua: &Lua, parent: &ScriptEntity, _args: ()) -> Result<ScriptEntityS
     let mgr = GameState::turn_manager();
     let mut indices = Vec::new();
     for entity in mgr.borrow().entity_iter() {
+        if parent.borrow().is_hostile(&entity) && entity.borrow().actor.stats.hidden {
+            continue;
+        }
+
         let entity = entity.borrow();
         if !entity.location.is_in_area_id(&area_id) { continue; }
 

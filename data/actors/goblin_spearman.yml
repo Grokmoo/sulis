@@ -1,4 +1,5 @@
 id: goblin_spearman
+ai: ai_basic
 name: Goblin Spearman
 faction: Hostile
 images: {}

@@ -50,6 +50,14 @@ impl ScriptAbilitySet {
 
 impl UserData for ScriptAbilitySet {
     fn add_methods(methods: &mut UserDataMethods<Self>) {
+        methods.add_method("len", |_, set, ()| {
+            Ok(set.abilities.len())
+        });
+
+        methods.add_method("is_empty", |_, set, ()| {
+            Ok(set.abilities.is_empty())
+        });
+
         methods.add_method("to_table", |_, set, ()| {
             Ok(set.abilities.clone())
         });
@@ -67,7 +75,20 @@ impl UserData for ScriptAbilitySet {
             Ok(ScriptAbilitySet { parent: set.parent, abilities })
         });
 
-        methods.add_method("filter_kind", |_, set, kind: String| {
+        methods.add_method("remove_kind", |_ , set, kind: String| {
+            let kind = ability::AIKind::from_str(&kind);
+
+            let abilities = set.abilities.iter().filter_map(|ability| {
+                if ability.ai_data.kind != kind {
+                    Some(ability.clone())
+                } else {
+                    None
+                }
+            }).collect();
+            Ok(ScriptAbilitySet { parent: set.parent, abilities })
+        });
+
+        methods.add_method("only_kind", |_, set, kind: String| {
             let kind = ability::AIKind::from_str(&kind);
 
             let abilities = set.abilities.iter().filter_map(|ability| {
@@ -80,7 +101,7 @@ impl UserData for ScriptAbilitySet {
             Ok(ScriptAbilitySet { parent: set.parent, abilities })
         });
 
-        methods.add_method("filter_group", |_, set, group: String| {
+        methods.add_method("only_group", |_, set, group: String| {
             let group = ability::AIGroup::from_str(&group);
             let abilities = set.abilities.iter().filter_map(|ability| {
                 if ability.ai_data.group == group {
@@ -92,7 +113,7 @@ impl UserData for ScriptAbilitySet {
             Ok(ScriptAbilitySet { parent: set.parent, abilities })
         });
 
-        methods.add_method("filter_range", |_, set, range: String| {
+        methods.add_method("only_range", |_, set, range: String| {
             let range = ability::AIRange::from_str(&range);
             let abilities = set.abilities.iter().filter_map(|ability| {
                 if ability.ai_data.range == range {

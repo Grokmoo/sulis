@@ -32,4 +32,5 @@ abilities:
   - weapon_spear
   - weapon_mace
   - weapon_simple
-  - stunning_blow
+  - mighty_blow
+  - charge_attack

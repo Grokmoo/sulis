@@ -1,0 +1,13 @@
+id: ai_test
+auto_spawn: true
+min_gen_actors: 0
+max_gen_actors: 0
+entries:
+  - id: goblin_defender_01
+    always: true
+  - id: goblin_shaman_01
+    always: true
+  - id: goblin_shaman_02
+    always: true
+  - id: goblin_brute_01
+    always: true

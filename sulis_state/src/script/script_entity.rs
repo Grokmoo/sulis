@@ -104,6 +104,14 @@ impl UserData for ScriptEntity {
             Ok(ai::State::Wait(time))
         });
 
+        methods.add_method("vis_dist", |_, entity, ()| {
+            let parent = entity.try_unwrap()?;
+            let area_id = &parent.borrow().location.area_id;
+            let area = GameState::get_area_state(area_id).unwrap();
+            let dist = area.borrow().area.vis_dist as f32;
+            Ok(dist)
+        });
+
         methods.add_method("add_xp", |_, entity, amount: u32| {
             let entity = entity.try_unwrap()?;
             entity.borrow_mut().actor.add_xp(amount);
@@ -118,6 +126,12 @@ impl UserData for ScriptEntity {
             };
 
             entity.borrow_mut().set_custom_flag(&flag, val);
+            Ok(())
+        });
+
+        methods.add_method("clear_flag", |_, entity, flag: String| {
+            let entity = entity.try_unwrap()?;
+            entity.borrow_mut().clear_custom_flag(&flag);
             Ok(())
         });
 
@@ -253,11 +267,21 @@ impl UserData for ScriptEntity {
             Ok(TargeterData::new_item(index, item.index))
         });
 
-        methods.add_method("move_towards_entity", |_, entity, dest: ScriptEntity| {
+        methods.add_method("move_towards_entity", |_, entity, (dest, dist):
+                           (ScriptEntity, Option<f32>)| {
             let parent = entity.try_unwrap()?;
             let target = dest.try_unwrap()?;
 
-            GameState::move_towards(&parent, &target);
+            if let Some(dist) = dist {
+                let (x, y) = {
+                    let target = target.borrow();
+                    (target.location.x as f32 + (target.size.width / 2) as f32,
+                     target.location.y as f32 + (target.size.height / 2) as f32)
+                };
+                GameState::move_towards_point(&parent, Vec::new(), x, y, dist, None);
+            } else {
+                GameState::move_towards(&parent, &target);
+            }
 
             Ok(())
         });

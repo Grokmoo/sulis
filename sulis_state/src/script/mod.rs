@@ -298,6 +298,12 @@ struct ScriptInterface { }
 
 impl UserData for ScriptInterface {
     fn add_methods(methods: &mut UserDataMethods<Self>) {
+        methods.add_method("has_targeter", |_, _, ()| {
+            let area_state = GameState::area_state();
+            let mut area_state = area_state.borrow_mut();
+            Ok(area_state.targeter().is_some())
+        });
+
         methods.add_method("check_targeter_position", |_, _, (x, y): (i32, i32)| {
             let targeter = get_targeter()?;
             let mut targeter = targeter.borrow_mut();

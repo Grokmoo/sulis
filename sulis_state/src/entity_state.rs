@@ -162,6 +162,10 @@ impl EntityState {
         self.custom_flags.iter()
     }
 
+    pub fn clear_custom_flag(&mut self, flag: &str) {
+        self.custom_flags.remove(flag);
+    }
+
     pub fn set_custom_flag(&mut self, flag: &str, value: &str) {
         self.custom_flags.insert(flag.to_string(), value.to_string());
     }

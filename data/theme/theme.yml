@@ -871,12 +871,11 @@ children:
         width_relative: Max
         height_relative: Max
   game_over_window:
-    background: bg_base
+    background: 60_transparent_fill
     border: [1, 1, 1, 1]
     preferred_size: [60, 28]
     x_relative: Center
-    y_relative: Center
-    position: [0, -20]
+    position: [0, 0]
     children:
       title:
         from: .label

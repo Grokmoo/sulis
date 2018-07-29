@@ -4,7 +4,7 @@ description: "Monster"
 size: 3by3
 movement_rate: 1.2
 base_stats:
-  - kind: { attribute: [Strength, 3 ] }
+  - kind: { attribute: [Strength, 5 ] }
   - kind: { attribute: [Dexterity, -2 ] }
   - kind: { attribute: [Endurance, 3 ] }
   - kind: { attribute: [Intellect, -3 ] }

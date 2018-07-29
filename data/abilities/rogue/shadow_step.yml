@@ -10,6 +10,11 @@ active:
   duration:
     Instant
   cooldown: 3
+  ai:
+    priority: 100
+    kind: Special
+    group: Single
+    range: Short
   short_description: |
     Hide and move a short distance.
 prereqs:

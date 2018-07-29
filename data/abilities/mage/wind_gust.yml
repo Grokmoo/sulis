@@ -7,6 +7,11 @@ active:
   script: "wind_gust"
   group: "1st Circle"
   ap: 3000
+  ai:
+    priority: 30
+    kind: Debuff
+    group: Multiple
+    range: Short
   duration:
     Instant
   cooldown: 1

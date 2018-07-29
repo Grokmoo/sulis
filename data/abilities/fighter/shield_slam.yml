@@ -12,6 +12,11 @@ active:
   duration:
     Instant
   cooldown: 1
+  ai:
+    priority: 20
+    kind: Debuff
+    group: Single
+    range: Reach
   short_description: |
     Push back, stun, and damage a single opponent.
 upgrades:

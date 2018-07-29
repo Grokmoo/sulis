@@ -10,6 +10,11 @@ active:
   duration:
     Instant
   cooldown: 2
+  ai:
+    priority: 10
+    kind: Damage
+    group: Multiple
+    range: Visible
   short_description: |
     Attack all opponents in an arc.
 prereqs:

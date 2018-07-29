@@ -10,5 +10,10 @@ active:
   duration:
     Instant
   cooldown: 2
+  ai:
+    priority: 20
+    kind: Buff
+    group: Single
+    range: Reach
   short_description: |
     Clear minor status effects on an ally.

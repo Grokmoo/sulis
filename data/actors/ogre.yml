@@ -5,17 +5,17 @@ faction: Hostile
 images: {}
 race: ogre
 attributes:
-  str: 20
-  dex: 8
-  end: 15
-  per: 9
-  int: 6
-  wis: 9
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
 levels:
-  fighter: 6
+  fighter: 5
 inventory:
   equipped:
-    HeldMain: greataxe
+    HeldMain: battleaxe
 reward:
   xp: 200
   loot: level5_misc
@@ -33,5 +33,4 @@ abilities:
   - weapon_mace
   - weapon_simple
   - mighty_blow
-  - powerful_blows
-  - stunning_blow
+  - charge_attack

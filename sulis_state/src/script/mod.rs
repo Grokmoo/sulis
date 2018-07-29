@@ -15,7 +15,11 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 mod area_targeter;
-use self::area_targeter::AreaTargeter;
+pub use self::area_targeter::AreaTargeter;
+
+mod script_ability;
+pub use self::script_ability::ScriptAbility;
+pub use self::script_ability::ScriptAbilitySet;
 
 pub mod script_callback;
 pub use self::script_callback::CallbackData;
@@ -42,7 +46,6 @@ mod script_subpos_animation;
 use self::script_subpos_animation::ScriptSubposAnimation;
 
 pub mod targeter;
-use self::targeter::Targeter;
 use self::targeter::TargeterData;
 
 use std;
@@ -275,10 +278,59 @@ fn get_ability_script(ability: &Rc<Ability>) -> Result<&str> {
     }
 }
 
+fn get_targeter() -> Result<Rc<RefCell<AreaTargeter>>> {
+    let area_state = GameState::area_state();
+    let mut area_state = area_state.borrow_mut();
+    match area_state.targeter() {
+        None => {
+            warn!("Error getting targeter");
+            Err(rlua::Error::ToLuaConversionError {
+                from: "Lua",
+                to: "Targeter",
+                message: Some("No targeter is present".to_string()),
+            })
+        },
+        Some(tg) => Ok(tg),
+    }
+}
+
 struct ScriptInterface { }
 
 impl UserData for ScriptInterface {
     fn add_methods(methods: &mut UserDataMethods<Self>) {
+        methods.add_method("has_targeter", |_, _, ()| {
+            let area_state = GameState::area_state();
+            let mut area_state = area_state.borrow_mut();
+            Ok(area_state.targeter().is_some())
+        });
+
+        methods.add_method("check_targeter_position", |_, _, (x, y): (i32, i32)| {
+            let targeter = get_targeter()?;
+            let mut targeter = targeter.borrow_mut();
+            targeter.on_mouse_move(x, y);
+            Ok(targeter.is_valid_to_activate())
+        });
+
+        methods.add_method("get_targeter_affected", |_, _, ()| {
+            let targeter = get_targeter()?;
+            let targeter = targeter.borrow_mut();
+            let parent = targeter.parent();
+            let affected = targeter.cur_affected().iter().map(|e| Some(Rc::clone(e))).collect();
+            Ok(ScriptEntitySet::new(&parent, &affected))
+        });
+
+        methods.add_method("cancel_targeter", |_, _, ()| {
+            let targeter = get_targeter()?;
+            targeter.borrow_mut().on_cancel();
+            Ok(())
+        });
+
+        methods.add_method("activate_targeter", |_, _, ()| {
+            let targeter = get_targeter()?;
+            targeter.borrow_mut().on_activate();
+            Ok(())
+        });
+
         methods.add_method("cancel_blocking_anims", |_, _, ()| {
             GameState::remove_all_blocking_animations();
             Ok(())
@@ -534,87 +586,6 @@ impl UserData for ScriptItem {
     }
 }
 
-#[derive(Clone)]
-pub struct ScriptAbility {
-    id: String,
-    name: String,
-    duration: u32,
-    ap: u32,
-}
-
-impl ScriptAbility {
-    fn from(ability: &Rc<Ability>) -> ScriptAbility {
-        let duration = match ability.active {
-            None => 0,
-            Some(ref active) => match active.duration {
-                ability::Duration::Rounds(rounds) => rounds,
-                ability::Duration::Mode => 0,
-                ability::Duration::Instant => 0,
-            }
-        };
-
-        let ap = match ability.active {
-            None => 0,
-            Some(ref active) => active.ap,
-        };
-
-        ScriptAbility {
-            id: ability.id.to_string(),
-            name: ability.name.to_string(),
-            duration,
-            ap,
-        }
-    }
-
-    fn error_if_not_active(&self) -> Result<()> {
-        let ability = match Module::ability(&self.id) {
-            None => unreachable!(),
-            Some(ability) => ability,
-        };
-
-        match ability.active {
-            None => Err(rlua::Error::FromLuaConversionError {
-                from: "ScriptAbility",
-                to: "ActiveAbility",
-                message: Some(format!("The ability '{}' is not active", self.id)),
-            }),
-            Some(_) => Ok(())
-        }
-    }
-}
-
-impl UserData for ScriptAbility {
-    fn add_methods(methods: &mut UserDataMethods<Self>) {
-        methods.add_method("is_active_mode", |_, ability, target: ScriptEntity| {
-            ability.error_if_not_active()?;
-            let target = target.try_unwrap()?;
-            let mut target = target.borrow_mut();
-            match target.actor.ability_state(&ability.id) {
-                None => Ok(false),
-                Some(ref ability_state) => Ok(ability_state.is_active_mode()),
-            }
-        });
-        methods.add_method("activate", &activate);
-        methods.add_method("deactivate", |_, ability, target: ScriptEntity| {
-            ability.error_if_not_active()?;
-            let target = target.try_unwrap()?;
-            target.borrow_mut().actor.deactivate_ability_state(&ability.id);
-            Ok(())
-        });
-        methods.add_method("name", |_, ability, ()| {
-            Ok(ability.name.to_string())
-        });
-        methods.add_method("duration", |_, ability, ()| Ok(ability.duration));
-
-        methods.add_method("create_callback", |_, ability, parent: ScriptEntity| {
-            ability.error_if_not_active()?;
-            let index = parent.try_unwrap_index()?;
-            let cb_data = CallbackData::new_ability(index, &ability.id);
-            Ok(cb_data)
-        });
-    }
-}
-
 fn entities_with_ids(ids: Vec<String>) -> Vec<ScriptEntity> {
     let mut result = Vec::new();
 
@@ -671,17 +642,3 @@ fn activate_item(_lua: &Lua, script_item: &ScriptItem, target: ScriptEntity) -> 
     Ok(())
 }
 
-fn activate(_lua: &Lua, ability: &ScriptAbility, (target, take_ap): (ScriptEntity, Option<bool>)) -> Result<()> {
-    ability.error_if_not_active()?;
-    let entity = target.try_unwrap()?;
-    let take_ap = take_ap.unwrap_or(true);
-
-    let mgr = GameState::turn_manager();
-    if take_ap && mgr.borrow().is_combat_active() {
-        entity.borrow_mut().actor.remove_ap(ability.ap);
-    }
-
-    entity.borrow_mut().actor.activate_ability_state(&ability.id);
-
-    Ok(())
-}

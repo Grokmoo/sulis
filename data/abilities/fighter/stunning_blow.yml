@@ -12,6 +12,11 @@ active:
   duration:
     Instant
   cooldown: 2
+  ai:
+    priority: 30
+    kind: Damage
+    group: Single
+    range: Reach
   short_description: |
     Stun a single opponent for one round.
 prereqs:

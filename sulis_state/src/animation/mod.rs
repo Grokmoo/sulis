@@ -369,14 +369,16 @@ impl Anim {
 
     pub fn is_blocking(&self) -> bool {
         use self::AnimKind::*;
-        match self.kind {
+        match &self.kind {
             EntityColor { .. } => false,
             EntitySubpos { .. } => true,
             MeleeAttack { .. } => true,
             RangedAttack { .. } => true,
             Move { .. } => true,
             Wait => true,
-            ParticleGenerator { .. } => false,
+            ParticleGenerator { model, ..} => {
+                !model.duration_millis.is_infinite()
+            },
         }
     }
 }

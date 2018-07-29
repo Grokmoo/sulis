@@ -10,5 +10,10 @@ active:
   duration:
     Instant
   cooldown: 2
+  ai:
+    priority: 40
+    kind: Damage
+    group: Single
+    range: Short
   short_description: |
     Do minor fire damage to one opponent.

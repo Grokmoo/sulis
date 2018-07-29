@@ -104,16 +104,47 @@ impl UserData for ScriptEntity {
             Ok(ai::State::Wait(time))
         });
 
+        methods.add_method("vis_dist", |_, entity, ()| {
+            let parent = entity.try_unwrap()?;
+            let area_id = &parent.borrow().location.area_id;
+            let area = GameState::get_area_state(area_id).unwrap();
+            let dist = area.borrow().area.vis_dist as f32;
+            Ok(dist)
+        });
+
         methods.add_method("add_xp", |_, entity, amount: u32| {
             let entity = entity.try_unwrap()?;
             entity.borrow_mut().actor.add_xp(amount);
             Ok(())
         });
 
-        methods.add_method("set_flag", |_, entity, flag: String| {
+        methods.add_method("set_flag", |_, entity, (flag, val): (String, Option<String>)| {
             let entity = entity.try_unwrap()?;
-            entity.borrow_mut().set_custom_flag(&flag);
+            let val = match &val {
+                None => "true",
+                Some(val) => val,
+            };
+
+            entity.borrow_mut().set_custom_flag(&flag, val);
             Ok(())
+        });
+
+        methods.add_method("clear_flag", |_, entity, flag: String| {
+            let entity = entity.try_unwrap()?;
+            entity.borrow_mut().clear_custom_flag(&flag);
+            Ok(())
+        });
+
+        methods.add_method("has_flag", |_, entity, flag: String| {
+            let entity = entity.try_unwrap()?;
+            let result = entity.borrow().has_custom_flag(&flag);
+            Ok(result)
+        });
+
+        methods.add_method("get_flag", |_, entity, flag: String| {
+            let entity = entity.try_unwrap()?;
+            let result = entity.borrow().get_custom_flag(&flag);
+            Ok(result)
         });
 
         methods.add_method("is_valid", |_, entity, ()| {
@@ -128,6 +159,18 @@ impl UserData for ScriptEntity {
             let entity = entity.try_unwrap()?;
             let is_member = entity.borrow().is_party_member();
             Ok(is_member)
+        });
+
+        methods.add_method("use_ability", |_, entity, ability: ScriptAbility| {
+            let parent = entity.try_unwrap()?;
+            info!("ability on activate script");
+            GameState::execute_ability_on_activate(&parent, &ability.to_ability());
+            Ok(())
+        });
+
+        methods.add_method("abilities", |_, entity, ()| {
+            let entity = entity.try_unwrap()?;
+            Ok(ScriptAbilitySet::from(&entity))
         });
 
         methods.add_method("targets", &targets);
@@ -224,11 +267,21 @@ impl UserData for ScriptEntity {
             Ok(TargeterData::new_item(index, item.index))
         });
 
-        methods.add_method("move_towards_entity", |_, entity, dest: ScriptEntity| {
+        methods.add_method("move_towards_entity", |_, entity, (dest, dist):
+                           (ScriptEntity, Option<f32>)| {
             let parent = entity.try_unwrap()?;
             let target = dest.try_unwrap()?;
 
-            GameState::move_towards(&parent, &target);
+            if let Some(dist) = dist {
+                let (x, y) = {
+                    let target = target.borrow();
+                    (target.location.x as f32 + (target.size.width / 2) as f32,
+                     target.location.y as f32 + (target.size.height / 2) as f32)
+                };
+                GameState::move_towards_point(&parent, Vec::new(), x, y, dist, None);
+            } else {
+                GameState::move_towards(&parent, &target);
+            }
 
             Ok(())
         });

@@ -10,6 +10,11 @@ active:
   duration:
     Instant
   cooldown: 1
+  ai:
+    priority: 10
+    kind: Debuff
+    group: Single
+    range: Short
   short_description: |
     Stun a single opponent with a Will check.
 prereqs:

@@ -10,6 +10,11 @@ active:
   duration:
     Instant
   cooldown: 2
+  ai:
+    priority: 10
+    kind: Damage
+    group: Single
+    range: Reach
   short_description: |
     Rapidly attack a single opponent many times.
 prereqs:

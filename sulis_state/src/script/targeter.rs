@@ -14,33 +14,13 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::rc::Rc;
-use std::cell::RefCell;
-
 use rlua::{self, Lua, UserData, UserDataMethods};
 
-use sulis_core::image::Image;
-use sulis_core::io::{GraphicsRenderer};
 use sulis_module::Module;
 
 use script::area_targeter::Shape;
 use script::{AreaTargeter, Result, ScriptEntity, ScriptEntitySet};
-use {EntityState, GameState};
-
-pub trait Targeter {
-    fn draw(&self, renderer: &mut GraphicsRenderer, tile: &Rc<Image>, x_offset: f32, y_offset: f32,
-            scale_x: f32, scale_y: f32, millis: u32);
-
-    fn on_mouse_move(&mut self, cursor_x: i32, cursor_y: i32) -> Option<&Rc<RefCell<EntityState>>>;
-
-    fn on_activate(&mut self);
-
-    fn on_cancel(&mut self);
-
-    fn cancel(&self) -> bool;
-
-    fn name(&self) -> &str;
-}
+use {GameState};
 
 #[derive(Clone)]
 pub enum Kind {
@@ -208,10 +188,16 @@ impl UserData for TargeterData {
 
 fn activate(_lua: &Lua, data: &TargeterData, _args: ()) -> Result<()> {
     info!("Activating targeter");
+    // let parent = ScriptEntity::new(data.parent).try_unwrap()?;
 
-    let targeter: Box<Targeter> = Box::new(AreaTargeter::from(data));
+    let targeter = AreaTargeter::from(data);
 
     let area_state = GameState::area_state();
     area_state.borrow_mut().set_targeter(targeter);
+
+    // if !parent.borrow().is_party_member() {
+    //     GameState::execute_ai_script(&parent, "handle_targeter");
+    // }
+
     Ok(())
 }

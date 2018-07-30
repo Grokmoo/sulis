@@ -25,7 +25,7 @@ use sulis_core::serde_yaml;
 use sulis_core::util::unable_to_create_error;
 use sulis_rules::{ItemKind, bonus::AttackBuilder, BonusList, Slot};
 
-use {Actor, ImageLayer, Module, ability::Duration, PrereqList, PrereqListBuilder};
+use {Actor, ImageLayer, Module, ability::{AIData, Duration}, PrereqList, PrereqListBuilder};
 
 #[derive(Deserialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
@@ -44,6 +44,7 @@ pub struct Usable {
     pub duration: Duration,
     pub consumable: bool,
     pub short_description: String,
+    pub ai: AIData,
 }
 
 #[derive(Debug)]
@@ -127,6 +128,7 @@ impl Item {
                     duration: usable.duration,
                     ap: usable.ap,
                     short_description: usable.short_description,
+                    ai: usable.ai,
                 })
             }
         };
@@ -195,6 +197,7 @@ pub struct UsableBuilder {
     pub duration: Duration,
     pub consumable: bool,
     pub short_description: String,
+    pub ai: AIData,
 }
 
 #[derive(Deserialize, Debug)]

@@ -21,7 +21,7 @@ use std::cell::RefCell;
 use rlua::{self, Lua, UserData, UserDataMethods};
 
 use sulis_module::{ability::{self, AIData}, Ability, Module};
-use {EntityState, GameState, area_feedback_text::ColorKind};
+use {EntityState, GameState};
 use script::{ScriptEntity, CallbackData};
 
 type Result<T> = std::result::Result<T, rlua::Error>;
@@ -244,10 +244,5 @@ fn activate(_lua: &Lua, ability: &ScriptAbility, (target, take_ap): (ScriptEntit
     }
 
     entity.borrow_mut().actor.activate_ability_state(&ability.id);
-
-    let area_state = GameState::area_state();
-    area_state.borrow_mut().add_feedback_text(ability.name.to_string(),
-        &entity, ColorKind::Info, 3.0);
-
     Ok(())
 }

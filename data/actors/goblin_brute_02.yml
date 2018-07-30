@@ -16,6 +16,8 @@ inventory:
   equipped:
     HeldMain: hatchet
     Torso: torso_leather
+  quick:
+    Usable1: potion_power
 reward:
   xp: 50
   loot: level1_misc

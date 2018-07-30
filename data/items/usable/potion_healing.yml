@@ -9,4 +9,9 @@ usable:
   ap: 2000
   duration:
     Instant
+  ai:
+    priority: 10
+    kind: Heal
+    group: Single
+    range: Personal
   short_description: "Heals a moderate amount of damage."

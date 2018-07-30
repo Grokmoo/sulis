@@ -35,6 +35,7 @@ pub use self::script_entity::ScriptEntitySet;
 
 mod script_inventory;
 pub use self::script_inventory::ScriptInventory;
+pub use self::script_inventory::ScriptUsableItem;
 
 mod script_color_animation;
 use self::script_color_animation::ScriptColorAnimation;

@@ -9,4 +9,9 @@ usable:
   ap: 2000
   duration:
     Rounds: 10
+  ai:
+    priority: 10
+    kind: Heal
+    group: Single
+    range: Reach
   short_description: "Heals damage on an ally slowly over time."

@@ -163,8 +163,20 @@ impl UserData for ScriptEntity {
 
         methods.add_method("use_ability", |_, entity, ability: ScriptAbility| {
             let parent = entity.try_unwrap()?;
-            info!("ability on activate script");
             GameState::execute_ability_on_activate(&parent, &ability.to_ability());
+            Ok(())
+        });
+
+        methods.add_method("use_item", |_, entity, item: ScriptUsableItem| {
+            let parent = entity.try_unwrap()?;
+            let index = match parent.borrow().actor.inventory().get_quick_index(item.slot) {
+                None => {
+                    warn!("Attempted to use missing item in slot {:?}", item.slot);
+                    return Ok(())
+                }, Some(index) => index,
+            };
+
+            GameState::execute_item_on_activate(&parent, index);
             Ok(())
         });
 

@@ -9,4 +9,9 @@ usable:
   ap: 2000
   duration:
     Rounds: 5
+  ai:
+    priority: 10
+    kind: Buff
+    group: Single
+    range: Personal
   short_description: "Provides protection against elemental damage."

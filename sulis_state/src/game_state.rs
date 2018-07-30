@@ -29,7 +29,8 @@ use sulis_core::io::{GraphicsRenderer};
 use sulis_core::ui::{Widget};
 use sulis_module::{Ability, Actor, Module, ObjectSize, OnTrigger, area::{Trigger, TriggerKind}};
 
-use {ai, AI, AreaState, ChangeListener, ChangeListenerList, EntityState, Location,
+use {area_feedback_text::ColorKind, ai, AI, AreaState, ChangeListener, ChangeListenerList,
+    EntityState, Location,
     PathFinder, SaveState, ScriptState, UICallback, MOVE_TO_THRESHOLD, TurnManager};
 use script::{script_callback::{self, ScriptHitKind}, ScriptEntitySet, ScriptCallback};
 use animation::{self, Anim, AnimState};
@@ -412,6 +413,12 @@ impl GameState {
     }
 
     pub fn execute_item_on_activate(parent: &Rc<RefCell<EntityState>>, index: usize) {
+        let area = GameState::area_state();
+        let name = match &parent.borrow().actor.inventory().items.get(index) {
+            None => unreachable!(),
+            Some(&(_, ref item)) => item.item.name.to_string(),
+        };
+        area.borrow_mut().add_feedback_text(name, parent, ColorKind::Info, 3.0);
         exec_script!(item_on_activate: parent, index);
     }
 
@@ -445,6 +452,8 @@ impl GameState {
     }
 
     pub fn execute_ability_on_activate(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>) {
+        let area = GameState::area_state();
+        area.borrow_mut().add_feedback_text(ability.name.to_string(), parent, ColorKind::Info, 3.0);
         exec_script!(ability_on_activate: parent, ability);
     }
 

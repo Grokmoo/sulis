@@ -9,4 +9,9 @@ usable:
   ap: 2000
   duration:
     Rounds: 3
+  ai:
+    priority: 10
+    kind: Buff
+    group: Single
+    range: Personal
   short_description: "Temporarily increases your physical attributes."

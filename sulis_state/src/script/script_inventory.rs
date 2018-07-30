@@ -16,7 +16,8 @@
 
 use rlua::{UserData, UserDataMethods};
 
-use sulis_rules::{Slot, WeaponStyle};
+use sulis_rules::{Slot, WeaponStyle, QuickSlot};
+use sulis_module::ability::AIData;
 use ItemState;
 use script::*;
 
@@ -88,6 +89,52 @@ impl UserData for ScriptInventory {
             };
             parent.borrow_mut().actor.add_item(item);
             Ok(())
+        });
+
+        methods.add_method("usable_items", |_, data, ()| {
+            let parent = data.parent.try_unwrap()?;
+            let parent = parent.borrow();
+            let mut items = Vec::new();
+            for slot in QuickSlot::usable_iter() {
+                let item = match parent.actor.inventory().get_quick(*slot) {
+                    None => continue,
+                    Some(item) => item,
+                };
+
+                let usable = match &item.item.usable {
+                    None => unreachable!(),
+                    Some(usable) => usable,
+                };
+
+                items.push(ScriptUsableItem {
+                    parent: data.parent.clone(),
+                    slot: *slot,
+                    ai: usable.ai,
+                });
+            }
+
+            Ok(items)
+        });
+    }
+}
+
+#[derive(Clone)]
+pub struct ScriptUsableItem {
+    parent: ScriptEntity,
+    pub slot: QuickSlot,
+    ai: AIData,
+}
+
+impl UserData for ScriptUsableItem {
+    fn add_methods(methods: &mut UserDataMethods<Self>) {
+        methods.add_method("ai_data", |lua, item, ()| {
+            let ai_data = lua.create_table()?;
+            ai_data.set("priority", item.ai.priority())?;
+            ai_data.set("kind", item.ai.kind())?;
+            ai_data.set("group", item.ai.group())?;
+            ai_data.set("range", item.ai.range())?;
+
+            Ok(ai_data)
         });
     }
 }

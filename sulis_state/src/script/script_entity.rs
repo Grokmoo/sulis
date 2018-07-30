@@ -163,8 +163,9 @@ impl UserData for ScriptEntity {
 
         methods.add_method("use_ability", |_, entity, ability: ScriptAbility| {
             let parent = entity.try_unwrap()?;
+            if !parent.borrow().actor.can_toggle(&ability.id) { return Ok(false); }
             GameState::execute_ability_on_activate(&parent, &ability.to_ability());
-            Ok(())
+            Ok(true)
         });
 
         methods.add_method("use_item", |_, entity, item: ScriptUsableItem| {
@@ -172,12 +173,20 @@ impl UserData for ScriptEntity {
             let index = match parent.borrow().actor.inventory().get_quick_index(item.slot) {
                 None => {
                     warn!("Attempted to use missing item in slot {:?}", item.slot);
-                    return Ok(())
+                    return Ok(false)
                 }, Some(index) => index,
             };
-
+            if !parent.borrow().actor.can_use(index) { return Ok(false); }
             GameState::execute_item_on_activate(&parent, index);
-            Ok(())
+            Ok(true)
+        });
+
+        methods.add_method("swap_weapons", |_, entity, ()| {
+            let parent = entity.try_unwrap()?;
+            if !parent.borrow().actor.can_swap_weapons() { return Ok(false); }
+
+            parent.borrow_mut().actor.swap_weapon_set();
+            Ok(true)
         });
 
         methods.add_method("abilities", |_, entity, ()| {
@@ -793,6 +802,7 @@ impl UserData for ScriptEntitySet {
         methods.add_method("friendly", |lua, set, ()| is_friendly(lua, set));
         methods.add_method("reachable", &reachable);
         methods.add_method("attackable", &attackable);
+        methods.add_method("threatening", &threatening);
     }
 }
 
@@ -843,6 +853,14 @@ fn attackable(_lua: &Lua, set: &ScriptEntitySet, _args: ()) -> Result<ScriptEnti
         let area_state = GameState::area_state();
         let area_state = area_state.borrow();
         parent.borrow().can_attack(entity, &area_state)
+    })
+}
+
+fn threatening(_lua: &Lua, set: &ScriptEntitySet, _args: ()) -> Result<ScriptEntitySet> {
+    filter_entities(set, (), &|parent, entity, _| {
+        if !entity.borrow().actor.stats.attack_is_melee() { return false; }
+
+        entity.borrow().can_reach(parent)
     })
 }
 

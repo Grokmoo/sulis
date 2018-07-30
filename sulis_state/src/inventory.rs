@@ -106,14 +106,15 @@ impl Inventory {
         Ok(())
     }
 
-    pub fn weapon_style(&self) -> WeaponStyle {
-        match self.get(Slot::HeldOff) {
+    fn weapon_style_internal(&self, main: Option<&ItemState>,
+                             off: Option<&ItemState>) -> WeaponStyle {
+        match off {
             None => (),
             Some(ref item_state) => {
                 match item_state.item.kind {
                     ItemKind::Armor { .. } => return WeaponStyle::Shielded,
                     ItemKind::Weapon { .. } => {
-                        match self.get(Slot::HeldMain) {
+                        match main {
                             None => return WeaponStyle::Single,
                             Some(_) => return WeaponStyle::DualWielding,
                         }
@@ -123,7 +124,7 @@ impl Inventory {
             }
         }
 
-        match self.get(Slot::HeldMain) {
+        match main {
             None => return WeaponStyle::Single,
             Some(ref item_state) => {
                 match &item_state.item.equippable {
@@ -148,6 +149,15 @@ impl Inventory {
                 }
             }
         }
+    }
+
+    pub fn alt_weapon_style(&self) -> WeaponStyle {
+        self.weapon_style_internal(self.get_quick(QuickSlot::AltHeldMain),
+                                   self.get_quick(QuickSlot::AltHeldOff))
+    }
+
+    pub fn weapon_style(&self) -> WeaponStyle {
+        self.weapon_style_internal(self.get(Slot::HeldMain), self.get(Slot::HeldOff))
     }
 
     pub fn quick(&self, slot: &QuickSlot) -> Option<usize> {

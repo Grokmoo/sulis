@@ -2,10 +2,17 @@ function ai_action(parent, state)
     abilities = parent:abilities():can_activate():remove_kind("Special")
     abilities:sort_by_priority()
 	
-    hostiles = parent:targets():hostile():to_table()
+    hostiles = parent:targets():hostile()
     friendlies = parent:targets():friendly():to_table()
 
+	if check_swap_weapons(parent, hostiles).done then
+		_G.state = parent:state_wait(10)
+		return
+	end
+	
 	items = parent:inventory():usable_items()
+	
+	hostiles = hostiles:to_table()
 	
 	failed_use_count = 0
 	
@@ -51,6 +58,30 @@ function ai_action(parent, state)
     end
 
     _G.state = parent:state_wait(10)
+end
+
+function check_swap_weapons(parent, hostiles)
+	if parent:inventory():weapon_style() ~= "Ranged" then
+		return { done=false }
+	end
+	
+	if hostiles:threatening():is_empty() then
+		return { done=false }
+	end
+	
+	if not parent:inventory():has_alt_weapons() then
+		return { done=false }
+	end
+	
+	if parent:inventory():alt_weapon_style() ~= "Ranged" then
+		game:log("alt weapon match")
+		if parent:swap_weapons() then
+			game:log("swap success")
+			return { done=true }
+		end
+	end
+	
+	return { done=false }
 end
 
 function find_and_use_item(parent, items, hostiles, friendlies, failed_use_count)

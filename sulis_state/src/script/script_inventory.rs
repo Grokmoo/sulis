@@ -16,7 +16,7 @@
 
 use rlua::{UserData, UserDataMethods};
 
-use sulis_rules::{Slot, WeaponStyle, QuickSlot};
+use sulis_rules::{Slot, QuickSlot};
 use sulis_module::ability::AIData;
 use ItemState;
 use script::*;
@@ -65,10 +65,22 @@ impl UserData for ScriptInventory {
             })
         });
 
-        methods.add_method("weapon_style", |_, data, ()| {
+        methods.add_method("has_alt_weapons", |_, data, ()| {
             try_unwrap!(data => inv);
 
-            Ok(ScriptWeaponStyle { style: inv.weapon_style() })
+            let result = inv.get_quick_index(QuickSlot::AltHeldMain).is_some() ||
+                inv.get_quick_index(QuickSlot::AltHeldOff).is_some();
+            Ok(result)
+        });
+
+        methods.add_method("alt_weapon_style", |_, data, ()| {
+            try_unwrap!(data => inv);
+            Ok(format!("{:?}", inv.alt_weapon_style()))
+        });
+
+        methods.add_method("weapon_style", |_, data, ()| {
+            try_unwrap!(data => inv);
+            Ok(format!("{:?}", inv.weapon_style()))
         });
 
         methods.add_method("add_coins", |_, data, amount: i32| {
@@ -135,26 +147,6 @@ impl UserData for ScriptUsableItem {
             ai_data.set("range", item.ai.range())?;
 
             Ok(ai_data)
-        });
-    }
-}
-
-#[derive(Clone)]
-pub struct ScriptWeaponStyle {
-    pub style: WeaponStyle,
-}
-
-impl UserData for ScriptWeaponStyle {
-    fn add_methods(methods: &mut UserDataMethods<Self>) {
-        methods.add_method("to_string", |_, style, ()| {
-            use sulis_rules::WeaponStyle::*;
-            Ok(match style.style {
-                Ranged => "Ranged",
-                TwoHanded => "TwoHanded",
-                Single => "Single",
-                Shielded => "Shielded",
-                DualWielding => "DualWielding",
-            }.to_string())
         });
     }
 }

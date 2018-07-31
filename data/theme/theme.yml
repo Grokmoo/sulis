@@ -312,7 +312,6 @@ children:
       feedback_text_miss_color: AAA
       feedback_text_hit_color: FF2400
       feedback_text_heal_color: 0FF
-      creature_selected_image: "creature_selected"
       selection_box_image: "bg_selection_box"
     children:
       targeter_label:

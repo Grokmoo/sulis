@@ -2,5 +2,6 @@ id: 2by2
 width: 2
 height: 2
 cursor_image: "gui/cursor2by2"
+selection_image: "creature_selected"
 relative_points: [[0, 0], [1, 0],
                   [0, 1], [1, 1]]

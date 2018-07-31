@@ -17,8 +17,9 @@
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 
+use sulis_core::image::Image;
 use sulis_core::resource::{ResourceBuilder, ResourceSet, Sprite};
-use sulis_core::util::{invalid_data_error, Point};
+use sulis_core::util::{invalid_data_error, unable_to_create_error, Point};
 use sulis_core::serde_yaml;
 
 #[derive(Debug)]
@@ -28,6 +29,7 @@ pub struct ObjectSize {
     pub height: i32,
     pub diagonal: f32,
     pub cursor_sprite: Rc<Sprite>,
+    pub selection_image: Rc<Image>,
     relative_points: Vec<Point>,
 }
 
@@ -54,6 +56,13 @@ impl ObjectSize {
 
         let sprite = ResourceSet::get_sprite(&builder.cursor_image)?;
 
+        let selection_image = match ResourceSet::get_image(&builder.selection_image) {
+            None => {
+                warn!("Unable to locate image '{}'", builder.selection_image);
+                return unable_to_create_error("object_size", &builder.id);
+            }, Some(img) => img,
+        };
+
         let diagonal = (((width * width) + (height * height)) as f32).sqrt();
 
         Ok(ObjectSize {
@@ -62,6 +71,7 @@ impl ObjectSize {
             height,
             diagonal,
             cursor_sprite: sprite,
+            selection_image,
             relative_points: points,
         })
     }
@@ -109,6 +119,7 @@ pub struct ObjectSizeBuilder {
     pub width: u32,
     pub height: u32,
     pub cursor_image: String,
+    pub selection_image: String,
     pub relative_points: Vec<Vec<usize>>,
 }
 

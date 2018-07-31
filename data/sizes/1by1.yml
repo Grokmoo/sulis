@@ -2,4 +2,5 @@ id: 1by1
 width: 1
 height: 1
 cursor_image: "gui/cursor1by1"
+selection_image: "empty"
 relative_points: [[0, 0]]

@@ -57,7 +57,6 @@ pub struct AreaView {
 
     targeter_label: Rc<RefCell<Widget>>,
     targeter_tile: Option<Rc<Image>>,
-    creature_selected_image: Option<Rc<Image>>,
     selection_box_image: Option<Rc<Image>>,
 
     scroll: Scrollable,
@@ -87,7 +86,6 @@ impl AreaView {
             layers: Vec::new(),
             scroll: Scrollable::new(),
             targeter_tile: None,
-            creature_selected_image: None,
             selection_box_image: None,
             selection_box_start: None,
             feedback_text_params: area_feedback_text::Params::default(),
@@ -292,19 +290,18 @@ impl AreaView {
         let x_base = widget.state.inner_position.x as f32 - self.scroll.x();
         let y_base = widget.state.inner_position.y as f32 - self.scroll.y();
 
-        if let Some(ref image) = self.creature_selected_image {
-            let selected = selected.borrow();
-            let w = selected.size.width as f32;
-            let h = selected.size.height as f32;
-            let x = x_base + selected.location.x as f32 + selected.sub_pos.0;
-            let y = y_base + selected.location.y as f32 + selected.sub_pos.1;
+        let selected = selected.borrow();
+        let w = selected.size.width as f32;
+        let h = selected.size.height as f32;
+        let x = x_base + selected.location.x as f32 + selected.sub_pos.0;
+        let y = y_base + selected.location.y as f32 + selected.sub_pos.1;
 
-            let mut draw_list = DrawList::empty_sprite();
-            image.append_to_draw_list(&mut draw_list, &animation_state::NORMAL, x, y, w, h, millis);
+        let mut draw_list = DrawList::empty_sprite();
+        selected.size.selection_image.append_to_draw_list(&mut draw_list, &animation_state::NORMAL,
+                                                          x, y, w, h, millis);
 
-            draw_list.set_scale(scale_x, scale_y);
-            renderer.draw(draw_list);
-        }
+        draw_list.set_scale(scale_x, scale_y);
+        renderer.draw(draw_list);
     }
 
     fn get_selection_box_coords(&self) -> Option<(f32, f32, f32, f32)> {
@@ -379,10 +376,6 @@ impl WidgetKind for AreaView {
         if let Some(ref theme) = widget.theme {
             if let Some(ref image_id) = theme.custom.get("targeter_tile") {
                 self.targeter_tile = ResourceSet::get_image(image_id);
-            }
-
-            if let Some(ref image_id) = theme.custom.get("creature_selected_image") {
-                self.creature_selected_image = ResourceSet::get_image(image_id);
             }
 
             if let Some(ref image_id) = theme.custom.get("selection_box_image") {

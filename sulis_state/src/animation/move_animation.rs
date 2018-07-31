@@ -18,8 +18,11 @@ use std::cmp;
 use std::cell::{Cell, RefCell};
 use std::rc::Rc;
 
-use {animation::Anim, EntityState, GameState};
 use sulis_core::util::{Point};
+use sulis_core::io::{DrawList, GraphicsRenderer};
+use sulis_core::ui::animation_state;
+use sulis_module::ObjectSize;
+use {animation::Anim, EntityState, GameState};
 
 pub (in animation) fn update(mover: &Rc<RefCell<EntityState>>, marked_for_removal: &Rc<Cell<bool>>,
                              model: &mut MoveAnimModel, millis: u32) {
@@ -63,6 +66,25 @@ pub (in animation) fn update(mover: &Rc<RefCell<EntityState>>, marked_for_remova
     }
 }
 
+pub (in animation) fn draw(model: &MoveAnimModel, renderer: &mut GraphicsRenderer,
+                           offset_x: f32, offset_y: f32,
+                           scale_x: f32, scale_y: f32, millis: u32) {
+    if model.path.len() == 0 { return; }
+
+    let w = model.owner_size.width as f32;
+    let h = model.owner_size.height as f32;
+
+    let last = &model.path[model.path.len() - 1];
+    let x = offset_x + last.x as f32;
+    let y = offset_y + last.y as f32;
+
+    let mut draw_list = DrawList::empty_sprite();
+    model.owner_size.selection_image.append_to_draw_list(&mut draw_list, &animation_state::NORMAL,
+                                                         x, y, w, h, millis);
+    draw_list.set_scale(scale_x, scale_y);
+    renderer.draw(draw_list);
+}
+
 pub (in animation) fn cleanup(owner: &Rc<RefCell<EntityState>>) {
     owner.borrow_mut().sub_pos = (0.0, 0.0);
 }
@@ -102,7 +124,8 @@ pub fn new(mover: &Rc<RefCell<EntityState>>, path: Vec<Point>, frame_time_millis
         path,
         last_frame_index: 0,
         frame_time_millis,
-        smoothed_path
+        smoothed_path,
+        owner_size: Rc::clone(&mover.borrow().size),
     };
 
     Anim::new_move(mover, duration_millis, model)
@@ -114,4 +137,5 @@ pub struct MoveAnimModel {
     pub (in animation) last_frame_index: i32,
     frame_time_millis: u32,
     smoothed_path: Vec<(f32, f32)>,
+    owner_size: Rc<ObjectSize>,
 }

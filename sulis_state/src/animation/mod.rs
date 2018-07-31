@@ -79,6 +79,13 @@ impl AnimState {
                         self.below_anims.push(anim);
                     }
                 },
+                Move { .. } =>{
+                    if anim.owner.borrow().is_party_member() {
+                        self.below_anims.push(anim);
+                    } else {
+                        self.no_draw_anims.push(anim);
+                    }
+                },
                 _ =>
                     self.no_draw_anims.push(anim),
             }
@@ -324,10 +331,14 @@ impl Anim {
         use self::AnimKind::*;
         match self.kind {
             RangedAttack { ref model } =>
-                ranged_attack_animation::draw(&model, renderer, offset_x, offset_y, scale_x, scale_y, millis),
+                ranged_attack_animation::draw(model, renderer, offset_x, offset_y,
+                                              scale_x, scale_y, millis),
             ParticleGenerator { ref state, ref model } =>
                 particle_generator::draw(state, model, &self.owner, renderer,
                                          offset_x, offset_y, scale_x, scale_y, millis),
+            Move { ref model } =>
+                move_animation::draw(model, renderer, offset_x, offset_y,
+                                     scale_x, scale_y, millis),
             _ => (),
         }
     }

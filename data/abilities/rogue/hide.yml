@@ -12,7 +12,7 @@ active:
   cooldown: 2
   ai:
     priority: 10
-    kind: Buff
+    kind: Special
     group: Single
     range: Personal
   short_description: |

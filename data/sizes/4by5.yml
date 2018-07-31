@@ -2,6 +2,7 @@ id: 4by5
 width: 4
 height: 5
 cursor_image: "gui/cursor4by5"
+selection_image: "empty"
 relative_points: [[0, 0], [1, 0], [2, 0], [3, 0],
                   [0, 1], [1, 1], [2, 1], [3, 1],
                   [0, 2], [1, 2], [2, 2], [3, 2],

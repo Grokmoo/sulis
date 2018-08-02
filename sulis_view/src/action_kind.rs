@@ -498,34 +498,9 @@ impl MoveAction {
     }
 
     fn move_all(&mut self) {
-        let entities_to_ignore = entities_to_ignore();
-
-        let pc = self.selected.remove(0);
-
-        let pc_cur_x = pc.borrow().location.x as f32;
-        let pc_cur_y = pc.borrow().location.y as f32;
-
-        // TODO we need to bump party members out of the way if there is any overlap
-        // should be able to use the callback for this
-        GameState::move_towards_point(&pc, entities_to_ignore.clone(),
-            self.x, self.y, self.dist, None);
-
-        let dir_x = pc_cur_x - self.x;
-        let dir_y = pc_cur_y - self.y;
-        let mag = dir_x.hypot(dir_y);
-
-        let w = (pc.borrow().size.width + 1) as f32;
-        let h = (pc.borrow().size.height + 1) as f32;
-
-        let norm_x = dir_x * w / mag;
-        let norm_y = dir_y * h / mag;
-
-        let mut i = 1.0;
-        for member in self.selected.iter() {
-            GameState::move_towards_point(member, entities_to_ignore.clone(),
-                self.x + norm_x * i, self.y + norm_y * i, 0.8, None);
-            i += 1.0;
-        }
+        let formation = GameState::party_formation();
+        formation.borrow().move_group(&self.selected, entities_to_ignore(),
+                                      self.x, self.y);
     }
 }
 

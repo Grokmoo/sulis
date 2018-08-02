@@ -30,7 +30,7 @@ use sulis_core::ui::{Widget};
 use sulis_module::{Ability, Actor, Module, ObjectSize, OnTrigger, area::{Trigger, TriggerKind}};
 
 use {area_feedback_text::ColorKind, ai, AI, AreaState, ChangeListener, ChangeListenerList,
-    EntityState, Location,
+    EntityState, Location, Formation,
     PathFinder, SaveState, ScriptState, UICallback, MOVE_TO_THRESHOLD, TurnManager};
 use script::{script_callback::{self, ScriptHitKind}, ScriptEntitySet, ScriptCallback};
 use animation::{self, Anim, AnimState};
@@ -51,6 +51,7 @@ pub struct GameState {
     area_state: Rc<RefCell<AreaState>>,
     selected: Vec<Rc<RefCell<EntityState>>>,
     party: Vec<Rc<RefCell<EntityState>>>,
+    party_formation: Rc<RefCell<Formation>>,
 
     // listener returns the first selected party member
     party_listeners: ChangeListenerList<Option<Rc<RefCell<EntityState>>>>,
@@ -146,12 +147,15 @@ impl GameState {
                 area_state.borrow_mut().add_entity(entity, location)?;
             }
 
+            let formation = save_state.formation;
+
             Ok(GameState {
                 areas,
                 area_state,
                 path_finder,
                 party,
                 selected,
+                party_formation: Rc::new(RefCell::new(formation)),
                 party_listeners: ChangeListenerList::default(),
                 ui_callbacks: Vec::new(),
             })
@@ -237,6 +241,7 @@ impl GameState {
             path_finder: path_finder,
             selected,
             party,
+            party_formation: Rc::new(RefCell::new(Formation::default())),
             party_listeners: ChangeListenerList::default(),
             ui_callbacks: Vec::new(),
         })
@@ -912,6 +917,15 @@ impl GameState {
                   util::format_elapsed_secs(start_time.elapsed()));
 
             val
+        })
+    }
+
+    pub fn party_formation() -> Rc<RefCell<Formation>> {
+        STATE.with(|s| {
+            let state = s.borrow();
+            let state = state.as_ref().unwrap();
+
+            Rc::clone(&state.party_formation)
         })
     }
 }

@@ -56,6 +56,9 @@ mod entity_texture_cache;
 pub use self::entity_texture_cache::EntityTextureCache;
 pub use self::entity_texture_cache::EntityTextureSlot;
 
+mod formation;
+pub use self::formation::Formation;
+
 mod game_state;
 pub use self::game_state::GameState;
 

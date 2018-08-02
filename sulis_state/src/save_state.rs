@@ -24,13 +24,15 @@ use sulis_core::util::{Point, ExtInt};
 use sulis_rules::{QuickSlot, Slot};
 use sulis_module::{actor::{ActorBuilder, RewardBuilder}};
 
-use {ActorState, EntityState, GameState, ItemState, Location, PropState, prop_state::Interactive, Merchant};
+use {ActorState, EntityState, Formation, GameState, ItemState, Location,
+    PropState, prop_state::Interactive, Merchant};
 use area_state::{TriggerState};
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct SaveState {
     pub(crate) party: Vec<usize>,
+    pub(crate) formation: Formation,
     pub(crate) selected: Vec<usize>,
     pub(crate) current_area: String,
     pub(crate) areas: HashMap<String, AreaSaveState>,
@@ -58,11 +60,15 @@ impl SaveState {
             selected.push(entity.borrow().index);
         }
 
+        let formation = GameState::party_formation();
+        let formation = formation.borrow().clone();
+
         SaveState {
             areas,
             current_area,
             party,
             selected,
+            formation,
             manager: ManagerSaveState::new(),
         }
     }

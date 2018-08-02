@@ -21,7 +21,7 @@ use rlua::{UserData, UserDataMethods};
 
 use sulis_rules::HitKind;
 use sulis_module::{Module};
-use script::{Result, script_entity, ScriptEntity, ScriptEntitySet};
+use script::{Result, script_entity, ScriptEntity, ScriptEntitySet, ScriptActiveSurface};
 use {GameState};
 
 pub fn fire_round_elapsed(cbs: Vec<Rc<ScriptCallback>>) {
@@ -213,7 +213,7 @@ impl ScriptCallback for CallbackData {
     fn on_surface_round_elapsed(&self) {
         if self.funcs.get(&FuncKind::OnSurfaceRoundElapsed).is_none() { return; }
 
-        let targets = match compute_surface_targets(self.effect, self.parent) {
+        let targets = match compute_surface_targets(self.effect, self.parent, None) {
             Some(targets) => targets,
             None => {
                 warn!("Unable to fire on surface_round_elapsed");
@@ -224,8 +224,16 @@ impl ScriptCallback for CallbackData {
     }
 
     fn on_moved_in_surface(&self, target: usize) {
-        let mut targets = ScriptEntitySet::with_parent(self.parent);
-        targets.indices.push(Some(target));
+        if self.funcs.get(&FuncKind::OnMovedInSurface).is_none() { return; }
+
+        let targets = match compute_surface_targets(self.effect, self.parent, Some(target)) {
+            Some(targets) => targets,
+            None => {
+                warn!("Unable to fire on_moved_in_surface");
+                return;
+            }
+        };
+
         self.exec_standard_script(targets, FuncKind::OnMovedInSurface);
     }
 
@@ -240,14 +248,14 @@ impl ScriptCallback for CallbackData {
     }
 }
 
-fn compute_surface_targets(effect: Option<usize>, parent: usize) -> Option<ScriptEntitySet> {
+fn compute_surface_targets(effect: Option<usize>, parent: usize, target: Option<usize>) -> Option<ScriptEntitySet> {
     let effect = match effect {
         None => return None,
         Some(index) => index,
     };
 
     let mut targets = ScriptEntitySet::with_parent(parent);
-
+    targets.surface = Some(ScriptActiveSurface { index: effect });
     let mgr = GameState::turn_manager();
     let mgr = mgr.borrow();
 
@@ -264,8 +272,12 @@ fn compute_surface_targets(effect: Option<usize>, parent: usize) -> Option<Scrip
             targets.affected_points = points.iter().map(|p| (p.x, p.y)).collect();
 
             let area = GameState::get_area_state(area_id).unwrap();
-            let inside = area.borrow().entities_with_points(points);
-            targets.indices = inside.into_iter().map(|i| Some(i)).collect();
+            if let Some(target) = target {
+                targets.indices.push(Some(target));
+            } else {
+                let inside = area.borrow().entities_with_points(points);
+                targets.indices = inside.into_iter().map(|i| Some(i)).collect();
+            }
         }
     }
 

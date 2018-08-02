@@ -26,6 +26,30 @@ use script::{CallbackData, Result, script_particle_generator, ScriptParticleGene
     script_color_animation, ScriptColorAnimation, ScriptAbility};
 use {Effect, GameState};
 
+// represents a surface already present to be passed into a script,
+// not an effect that is to be created
+#[derive(Clone, Debug)]
+pub struct ScriptActiveSurface {
+    pub index: usize,
+}
+
+impl UserData for ScriptActiveSurface {
+    fn add_methods(methods: &mut UserDataMethods<Self>) {
+        methods.add_method("mark_for_removal", |_, surface, _args: ()| {
+            let mgr = GameState::turn_manager();
+            let mut mgr = mgr.borrow_mut();
+            let effect = match mgr.effect_mut_checked(surface.index) {
+                None => {
+                    warn!("Effect index associated with ScriptSurface is invalid");
+                    return Ok(());
+                }, Some(effect) => effect,
+            };
+            effect.mark_for_removal();
+            Ok(())
+        });
+    }
+}
+
 #[derive(Clone)]
 enum Kind {
     Entity(usize),

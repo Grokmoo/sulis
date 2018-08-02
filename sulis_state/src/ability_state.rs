@@ -75,7 +75,8 @@ impl AbilityState {
             None => panic!(),
             Some(ref active) => match active.duration {
                 Duration::Mode => ExtInt::Infinity,
-                Duration::Instant | Duration::Rounds(_) => ExtInt::Int(active.cooldown * ROUND_TIME_MILLIS),
+                Duration::Permanent | Duration::Instant | Duration::Rounds(_) =>
+                    ExtInt::Int(active.cooldown * ROUND_TIME_MILLIS),
             }
         };
         self.cur_duration = 0;

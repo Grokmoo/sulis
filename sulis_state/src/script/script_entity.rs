@@ -299,12 +299,10 @@ impl UserData for ScriptEntity {
                     (target.location.x as f32 + (target.size.width / 2) as f32,
                      target.location.y as f32 + (target.size.height / 2) as f32)
                 };
-                GameState::move_towards_point(&parent, Vec::new(), x, y, dist, None);
+                Ok(GameState::move_towards_point(&parent, Vec::new(), x, y, dist, None))
             } else {
-                GameState::move_towards(&parent, &target);
+                Ok(GameState::move_towards(&parent, &target))
             }
-
-            Ok(())
         });
 
         methods.add_method("has_ap_to_attack", |_, entity, ()| {
@@ -692,6 +690,7 @@ pub struct ScriptEntitySet {
     pub selected_point: Option<(i32, i32)>,
     pub affected_points: Vec<(i32, i32)>,
     pub indices: Vec<Option<usize>>,
+    pub surface: Option<ScriptActiveSurface>,
 }
 
 impl ScriptEntitySet {
@@ -699,6 +698,7 @@ impl ScriptEntitySet {
         self.indices.append(&mut other.indices.clone());
         self.selected_point = other.selected_point.clone();
         self.affected_points.append(&mut other.affected_points.clone());
+        self.surface = other.surface.clone();
     }
 
     pub fn with_parent(parent: usize) -> ScriptEntitySet {
@@ -707,6 +707,7 @@ impl ScriptEntitySet {
             indices: Vec::new(),
             selected_point: None,
             affected_points: Vec::new(),
+            surface: None,
         }
     }
 
@@ -725,6 +726,7 @@ impl ScriptEntitySet {
             selected_point: None,
             affected_points: Vec::new(),
             indices,
+            surface: None,
         }
     }
 }
@@ -750,6 +752,21 @@ impl UserData for ScriptEntitySet {
                 }
             }).collect();
             Ok(table)
+        });
+
+        methods.add_method("surface", |_, set, ()| {
+            match &set.surface {
+                None => {
+                    warn!("Attempted to get surface from target set with no surface defined");
+                    Err(rlua::Error::FromLuaConversionError {
+                        from: "ScriptEntitySet",
+                        to: "Surface",
+                        message: Some("EntitySet has no surface".to_string())
+                    })
+                }, Some(surf) => {
+                    Ok(surf.clone())
+                }
+            }
         });
 
         methods.add_method("affected_points", |_, set, ()| {
@@ -829,6 +846,7 @@ fn targets(_lua: &Lua, parent: &ScriptEntity, _args: ()) -> Result<ScriptEntityS
         indices,
         selected_point: None,
         affected_points: Vec::new(),
+        surface: None,
     })
 }
 
@@ -914,5 +932,6 @@ fn filter_entities<T: Copy>(set: &ScriptEntitySet, t: T,
         indices,
         selected_point: set.selected_point,
         affected_points: set.affected_points.clone(),
+        surface: set.surface.clone(),
     })
 }

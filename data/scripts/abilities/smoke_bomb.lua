@@ -29,7 +29,6 @@ function on_target_select(parent, ability, targets)
   gen:set_particle_size_dist(gen:fixed_dist(0.7), gen:fixed_dist(0.7))
   gen:set_particle_position_dist(gen:dist_param(gen:fixed_dist(0.0), gen:fixed_dist(-vx / 5.0)),
     gen:dist_param(gen:fixed_dist(0.0), gen:fixed_dist(-vy / 5.0)))
-  gen:set_particle_duration_dist(gen:fixed_dist(0.6))
   gen:set_completion_callback(cb)
   gen:activate()
   

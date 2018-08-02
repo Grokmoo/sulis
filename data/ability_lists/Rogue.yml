@@ -24,3 +24,14 @@ abilities:
     position: [3, 3]
   - id: backstab_mastery
     position: [4, 3.5]
+
+  - id: spike_trap
+    position: [0, 5.5]
+  - id: sticky_trap
+    position: [1, 5]
+  - id: fire_trap
+    position: [2, 5.5]
+  - id: shrapnel_grenade
+    position: [3, 6]
+  - id: stun_grenade
+    position: [1, 6.5]

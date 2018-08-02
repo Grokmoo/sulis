@@ -3,6 +3,16 @@ src: "particles.png"
 size: [ 512, 256 ]
 simple_image_gen_scale: 4
 groups:
+  sticky_trap:
+    areas:
+      sticky_trap: [416, 48, 16, 16]
+  spike_trap:
+    areas:
+      spike_trap_set: [416, 0, 16, 32]
+      spike_trap_fired: [432, 0, 16, 32]
+  fire_trap:
+    areas:
+      fire_trap: [432, 48, 16, 16]
   misc:
     areas:
       circle16: [0, 0, 16, 16]

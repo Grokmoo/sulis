@@ -1,0 +1,21 @@
+id: stun_grenade
+name: "Stun Grenade"
+icon: abilities/stun_grenade
+description: |
+  Throw a grenade that emits a bright flash and loud bang on impact, stunning and disorienting targets for a short time.
+active:
+  script: "stun_grenade"
+  group: "Rogue"
+  ap: 3000
+  duration:
+    Instant
+  cooldown: 4
+  ai:
+    priority: 20
+    kind: Damage
+    group: Multiple
+    range: Visible
+  short_description: |
+    Stun enemies in an area
+prereqs:
+  total_level: 3

@@ -260,6 +260,7 @@ impl WidgetKind for ItemButton {
                             state.add_text_arg("usable_duration", &rounds.to_string()),
                         ability::Duration::Mode => state.add_text_arg("usable_mode", "true"),
                         ability::Duration::Instant => state.add_text_arg("usable_instant", "true"),
+                        ability::Duration::Permanent => state.add_text_arg("usable_permanent", "true"),
                     }
                     state.add_text_arg("usable_description", &usable.short_description);
                 }

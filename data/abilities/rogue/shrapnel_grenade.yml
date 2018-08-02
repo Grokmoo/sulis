@@ -1,0 +1,22 @@
+id: shrapnel_grenade
+name: "Shrapnel Grenade"
+icon: abilities/shrapnel_grenade
+description: |
+  Throw a grenade that explodes on impact, dealing significant piercing damage to anyone nearby.  This damage is very effective at penetrating armor.
+active:
+  script: "shrapnel_grenade"
+  group: "Rogue"
+  ap: 3000
+  duration:
+    Instant
+  cooldown: 5
+  ai:
+    priority: 10
+    kind: Damage
+    group: Multiple
+    range: Visible
+  short_description: |
+    Deal piercing damage to a group of enemies.
+prereqs:
+  total_level: 7
+  abilities: [ spike_trap ]

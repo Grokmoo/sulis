@@ -1,0 +1,22 @@
+id: sticky_trap
+name: "Sticky Trap"
+icon: abilities/sticky_trap
+description: |
+  Set a trap that explodes in a sticky substance when stepped on, preventing the target from moving for 2 rounds.
+active:
+  script: sticky_trap
+  group: Mechanics
+  ap: 4000
+  duration:
+    Permanent
+  cooldown: 3
+  ai:
+    priority: 10
+    kind: Special
+    group: Single
+    range: Reach
+  short_description: |
+    Set a trap that will hold enemies in place
+prereqs:
+  total_level: 3
+  abilities: [ spike_trap ]

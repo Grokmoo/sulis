@@ -72,6 +72,7 @@ impl Effect {
 
     pub fn mark_for_removal(&mut self) {
         self.total_duration = ExtInt::Int(0);
+        self.callbacks.clear(); // prevent any more scripts from firing
     }
 
     pub fn set_surface_for_area(&mut self, area: &str, points: &Vec<Point>, squares_to_fire_on_moved: u32) {

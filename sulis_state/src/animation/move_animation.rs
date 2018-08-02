@@ -27,9 +27,17 @@ use {animation::Anim, EntityState, GameState};
 pub (in animation) fn update(mover: &Rc<RefCell<EntityState>>, marked_for_removal: &Rc<Cell<bool>>,
                              model: &mut MoveAnimModel, millis: u32) {
     let cur_area_id = mover.borrow().location.area_id.to_string();
-    if (model.area_id != cur_area_id) || model.path.is_empty()  || mover.borrow().actor.is_dead() {
+    if (model.area_id != cur_area_id) || model.path.is_empty() {
         marked_for_removal.set(true);
         return;
+    }
+
+    {
+        let actor = &mover.borrow().actor;
+        if actor.is_dead() || actor.stats.move_disabled {
+            marked_for_removal.set(true);
+            return;
+        }
     }
 
     let frame_index = cmp::min((millis / model.frame_time_millis) as usize, model.path.len() - 1);

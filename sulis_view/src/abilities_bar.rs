@@ -269,6 +269,7 @@ impl WidgetKind for AbilityButton {
                     Duration::Rounds(rounds) => hover.state.add_text_arg("duration", &rounds.to_string()),
                     Duration::Mode => hover.state.add_text_arg("mode", "true"),
                     Duration::Instant => hover.state.add_text_arg("instant", "true"),
+                    Duration::Permanent => hover.state.add_text_arg("permanent", "true"),
                 }
 
                 if active.cooldown != 0 {

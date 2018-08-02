@@ -107,7 +107,7 @@ impl Ability {
                     None => {
                         match active.duration {
                             Duration::Rounds(c) => c,
-                            Duration::Mode | Duration::Instant => 0,
+                            Duration::Mode | Duration::Instant | Duration::Permanent => 0,
                         }
                     }, Some(c) => c,
                 };
@@ -176,6 +176,7 @@ pub enum Duration {
     Rounds(u32),
     Mode,
     Instant,
+    Permanent,
 }
 
 #[derive(Deserialize, Debug)]

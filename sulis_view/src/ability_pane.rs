@@ -90,6 +90,7 @@ pub fn add_ability_text_args(state: &mut WidgetState, ability: &Rc<Ability>) {
             ability::Duration::Rounds(rounds) => state.add_text_arg("duration", &rounds.to_string()),
             ability::Duration::Mode => state.add_text_arg("mode", "true"),
             ability::Duration::Instant => state.add_text_arg("instant", "true"),
+            ability::Duration::Permanent => state.add_text_arg("permanent", "true"),
         }
 
         if active.cooldown != 0 {

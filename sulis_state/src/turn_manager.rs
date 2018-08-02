@@ -69,6 +69,12 @@ impl TurnManager {
         self.order.clear();
     }
 
+    pub fn effect_mut_checked(&mut self, index: usize) -> Option<&mut Effect> {
+        if index >= self.effects.len() { return None; }
+
+        self.effects[index].as_mut()
+    }
+
     pub fn effect_mut(&mut self, index: usize) -> &mut Effect {
         self.effects[index].as_mut().unwrap()
     }
@@ -80,7 +86,11 @@ impl TurnManager {
     pub fn effect_checked(&self, index: usize) -> Option<&Effect> {
         if index >= self.effects.len() { return None; }
 
-        self.effects[index].as_ref().clone()
+        self.effects[index].as_ref()
+    }
+
+    pub fn effect_iter(&self) -> EffectIterator {
+        EffectIterator { mgr: &self, index: 0 }
     }
 
     pub fn active_iter(&self) -> ActiveEntityIterator {
@@ -623,6 +633,30 @@ impl<'a> Iterator for EntityIterator<'a> {
                     &Some(ref entity) => return Some(Rc::clone(entity))
                 }
             }
+        }
+    }
+}
+
+pub struct EffectIterator<'a> {
+    mgr: &'a TurnManager,
+    index: usize,
+}
+
+impl<'a> Iterator for EffectIterator<'a> {
+    type Item = &'a Effect;
+    fn next(&mut self) -> Option<&'a Effect> {
+        loop {
+            let next = self.mgr.effects.get(self.index);
+
+            self.index += 1;
+
+            match &next {
+                None => return None,
+                Some(e) => match e {
+                    None => continue,
+                    Some(e) => return Some(e)
+                }
+            };
         }
     }
 }

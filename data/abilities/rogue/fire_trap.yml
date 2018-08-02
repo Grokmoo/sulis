@@ -1,0 +1,22 @@
+id: fire_trap
+name: "Fire Trap"
+icon: abilities/fire_trap
+description: |
+  Set a trap that, when activated, shoots out an explosive spout of fire, burning the target.
+active:
+  script: fire_trap
+  group: Mechanics
+  ap: 4000
+  duration:
+    Permanent
+  cooldown: 3
+  ai:
+    priority: 10
+    kind: Special
+    group: Single
+    range: Reach
+  short_description: |
+    Set a damaging fire trap for enemies
+prereqs:
+  total_level: 5
+  abilities: [ spike_trap ]

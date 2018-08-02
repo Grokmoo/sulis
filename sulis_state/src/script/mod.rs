@@ -28,6 +28,7 @@ pub use self::script_callback::ScriptHitKind;
 
 mod script_effect;
 use self::script_effect::ScriptEffect;
+use self::script_effect::ScriptActiveSurface;
 
 mod script_entity;
 pub use self::script_entity::ScriptEntity;
@@ -470,6 +471,19 @@ impl UserData for ScriptInterface {
 
             GameState::add_ui_callback(cb, &pc, &pc);
             Ok(())
+        });
+
+        methods.add_method("num_effects_with_tag", |_, _, tag: String| {
+            let mgr = GameState::turn_manager();
+            let mgr = mgr.borrow();
+
+            let mut count = 0;
+            for effect in mgr.effect_iter() {
+                if effect.tag == tag {
+                    count += 1;
+                }
+            }
+            Ok(count)
         });
 
         methods.add_method("entities_with_ids", |_, _, ids: Vec<String>| {

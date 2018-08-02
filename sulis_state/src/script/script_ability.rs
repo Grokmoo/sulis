@@ -149,6 +149,7 @@ impl ScriptAbility {
                 let duration = match active.duration {
                     ability::Duration::Rounds(rounds) => rounds,
                     ability::Duration::Mode => 0,
+                    ability::Duration::Permanent => 0,
                     ability::Duration::Instant => 0,
                 };
 

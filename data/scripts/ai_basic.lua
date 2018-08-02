@@ -54,7 +54,11 @@ function ai_action(parent, state)
     if parent:can_reach(target) then
         parent:anim_weapon_attack(target, nil, true)
     else
-        parent:move_towards_entity(target)
+	    -- attempt to move, if we can't move at all then just end
+        if not parent:move_towards_entity(target) then
+		  _G.state = parent:state_end()
+		  return
+		end
     end
 
     _G.state = parent:state_wait(10)

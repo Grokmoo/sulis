@@ -34,7 +34,7 @@ coins_item: coin
 
 selectable_races: [ human, dwarf, elf, kimer, rodian ]
 selectable_classes: [ fighter, rogue, mage ]
-ability_groups: [ "Fighter", "Rogue", "Modes", "4th Circle", "3rd Circle", "2nd Circle", "1st Circle", "Cantrips"]
+ability_groups: [ "Fighter", "Rogue", "Modes", "Mechanics", "4th Circle", "3rd Circle", "2nd Circle", "1st Circle", "Cantrips"]
 
 experience_for_level: [100, 300, 600, 1000, 1500, 2100, 2800, 3600, 4500,
                        5500, 6600, 7800, 9100, 10500, 12000, 13600, 15300, 17100, 19000,

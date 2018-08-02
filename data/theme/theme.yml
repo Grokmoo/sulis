@@ -802,7 +802,7 @@ children:
           [s=8|#name#][?prereqs_not_met;c=f00|  Prereqs not Met][?owned_level;c=0f0|  Owned - Level #owned_level#]
           [s=9|]
           [?active;s=7;c=f00|Active - AP: #activate_ap#
-          [s=6;c=fff|[?duration|Duration: #duration# Rounds][?mode|Mode][?instant|Duration: Instantaneous]
+          [s=6;c=fff|[?duration|Duration: #duration# Rounds][?mode|Mode][?instant|Duration: Instantaneous][?permanent|Permanent]
           ][?cooldown;s=6;c=fff|Cooldown: #cooldown# Rounds]
           ][?passive;s=7;c=0ff|Passive]
           #description#

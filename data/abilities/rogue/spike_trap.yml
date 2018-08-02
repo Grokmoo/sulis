@@ -1,0 +1,19 @@
+id: spike_trap
+name: "Spike Trap"
+icon: abilities/spike_trap
+description: |
+  Set a trap of jagged spikes on a nearby tile.  When an enemy passes over the trap, it is triggered, dealing damage.
+active:
+  script: spike_trap
+  group: Mechanics
+  ap: 4000
+  duration:
+    Permanent
+  cooldown: 3
+  ai:
+    priority: 10
+    kind: Special
+    group: Single
+    range: Reach
+  short_description: |
+    Set a damaging trap for enemies

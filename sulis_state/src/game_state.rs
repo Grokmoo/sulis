@@ -859,6 +859,13 @@ impl GameState {
 
     pub fn move_towards_point(entity: &Rc<RefCell<EntityState>>, entities_to_ignore: Vec<usize>,
                               x: f32, y: f32, dist: f32, cb: Option<Box<ScriptCallback>>) -> bool {
+        if entity.borrow().actor.stats.move_disabled { return false; }
+
+        // if entity cannot move even 1 square
+        if entity.borrow().actor.ap() < entity.borrow().actor.get_move_ap_cost(1) {
+            return false;
+        }
+
         let anim = STATE.with(|s| {
             let mut state = s.borrow_mut();
             let state = state.as_mut().unwrap();

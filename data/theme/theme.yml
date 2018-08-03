@@ -118,12 +118,20 @@ children:
         from: .button
         foreground: select_all
         border: [0, 0, 0, 0]
-        preferred_size: [6, 6]
+        preferred_size: [10, 10]
         custom:
           tooltip: "Select All Party Members"
+      formations_button:
+        from: .button
+        foreground: formations
+        border: [0, 0, 0, 0]
+        position: [0, 11]
+        preferred_size: [10, 10]
+        custom:
+          tooltip: "Set party formation"
       portrait_pane:
         preferred_size: [120, 0]
-        position: [7, 0]
+        position: [11, 0]
         height_relative: Max
         layout: BoxHorizontal
         children:
@@ -158,7 +166,7 @@ children:
                 preferred_size: [7, 7]
       quick_item_bar:
         height_relative: Max
-        position: [130, 0]
+        position: [133, 0]
         preferred_size: [28, 0]
         background: bg_base
         border: [1, 1, 1, 1]
@@ -203,7 +211,7 @@ children:
             position: [14, 21]
       abilities_bar:
         height_relative: Max
-        position: [159, 0]
+        position: [162, 0]
         preferred_size: [120, 0]
         layout: BoxHorizontal
         layout_spacing: { top: 0, bottom: 0, left: 0, right: 1 }
@@ -465,6 +473,36 @@ children:
             children:
               item_button:
                 from: .item_button
+  formation_window:
+    from: .window
+    border: { top: 8, bottom: 8, left: 6, right: 6 }
+    position: [0, 4]
+    x_relative: Center
+    preferred_size: [148, 108]
+    height_relative: Zero
+    custom:
+      grid_half_width: 8
+      grid_height: 12
+      button_size: 2
+    children:
+      title:
+        text: "Party Formation"
+        position: [0, -7]
+      close:
+        position: [3, -5]
+      position:
+        from: .button
+        preferred_size: [0, 0]
+        x_relative: Custom
+        y_relative: Custom
+        width_relative: Custom
+        height_relative: Custom
+        children:
+          portrait:
+            foreground: "#portrait#"
+            preferred_size: [12, 12]
+            x_relative: Center
+            y_relative: Center
   merchant_window:
     from: .window
     position: [4, 4]

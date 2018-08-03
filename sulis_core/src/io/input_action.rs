@@ -27,6 +27,7 @@ pub enum InputAction {
     ToggleConsole,
     ToggleInventory,
     ToggleCharacter,
+    ToggleFormation,
     ShowMenu,
     EndTurn,
     ScrollUp,

@@ -19,10 +19,6 @@ display:
     width: 320
     height: 180
 
-    # UI scaling - Large
-    # width: 256
-    # height: 144
-
     # UI scaling - Small
     # width: 368
     # height: 207
@@ -50,6 +46,7 @@ input:
         KeyEscape: ShowMenu
         KeyI: ToggleInventory
         KeyC: ToggleCharacter
+        KeyF: ToggleFormation
         KeySpace: EndTurn
         KeyDown: ScrollDown
         KeyUp: ScrollUp

@@ -1,0 +1,22 @@
+id: sundering_trap
+name: "Sundering Trap"
+icon: abilities/sundering_trap
+description: |
+  Set a trap that does light damage, but sunders the target's armor, temporarily decreasing its value.
+active:
+  script: sundering_trap
+  group: Mechanics
+  ap: 4000
+  duration:
+    Permanent
+  cooldown: 3
+  ai:
+    priority: 10
+    kind: Special
+    group: Single
+    range: Reach
+  short_description: |
+    Set a trap that decreases enemy armor.
+prereqs:
+  total_level: 7
+  abilities: [ spike_trap ]

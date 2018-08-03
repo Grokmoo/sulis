@@ -1,0 +1,22 @@
+id: become_wind
+name: "Become Wind"
+icon: abilities/become_wind
+description: |
+  You become as the air around you, gaining a large bonus to movement speed and bonuses to dexterity and reflexes.
+active:
+  script: "become_wind"
+  group: "Rogue"
+  ap: 1000
+  duration:
+    Rounds: 2
+  cooldown: 4
+  ai:
+    priority: 30
+    kind: Buff
+    group: Single
+    range: Personal
+  short_description: |
+    Gain bonuses to movement speed, defense, and reflexes.
+prereqs:
+  total_level: 3
+  abilities: [ hide ]

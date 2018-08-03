@@ -2,12 +2,12 @@ id: rogue
 abilities:
   - id: hide
     position: [0, 0.5]
+  - id: become_wind
+    position: [1, 0]
   - id: hide_in_plain_sight
     position: [4, 0.5]
   - id: shadow_step
     position: [2, 1.0]
-  - id: smoke_bomb
-    position: [1, 0.0]
   - id: backflip
     position: [1, 1.5]
   - id: backstab
@@ -28,10 +28,14 @@ abilities:
   - id: spike_trap
     position: [0, 5.5]
   - id: sticky_trap
-    position: [1, 5]
+    position: [1, 6]
   - id: fire_trap
     position: [2, 5.5]
+  - id: smoke_bomb
+    position: [0, 6.5]
   - id: shrapnel_grenade
     position: [3, 6]
   - id: stun_grenade
-    position: [1, 6.5]
+    position: [1, 7]
+  - id: sundering_trap
+    position: [3, 5]

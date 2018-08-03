@@ -46,8 +46,8 @@ function on_entered(parent, ability, targets)
   point = points[1]
   
   gen = target:create_particle_generator("fire_particle", 1.0)
-  gen:set_initial_gen(500.0)
-  gen:set_gen_rate(gen:param(100.0, 0, -500, -500))
+  gen:set_initial_gen(200.0)
+  gen:set_gen_rate(gen:param(50.0, 0, -200, -200))
   gen:set_position(gen:param(point.x), gen:param(point.y))
   gen:set_particle_size_dist(gen:fixed_dist(0.7), gen:fixed_dist(0.7))
   gen:set_particle_position_dist(gen:dist_param(gen:uniform_dist(-0.3, 0.3), gen:uniform_dist(-0.5, 0.5)),
@@ -56,4 +56,21 @@ function on_entered(parent, ability, targets)
   gen:activate()
   
   parent:special_attack(target, "Reflex", "Ranged", 30, 40, 0, "Fire")
+  
+  if parent:ability_level(ability) > 1 then
+    nearby = target:targets():visible_within(3):to_table()
+	for i = 1, #nearby do
+      parent:special_attack(nearby[i], "Reflex", "Ranged", 10, 20, 0, "Fire")
+    end
+	
+	gen = target:create_particle_generator("fire_particle", 1.0)
+    gen:set_initial_gen(50.0)
+    gen:set_gen_rate(gen:param(10.0, 0, -100, -100))
+    gen:set_position(gen:param(point.x), gen:param(point.y))
+    gen:set_particle_size_dist(gen:fixed_dist(0.7), gen:fixed_dist(0.7))
+    gen:set_particle_position_dist(gen:dist_param(gen:uniform_dist(-0.3, 0.3), gen:uniform_dist(-5.0, 5.0)),
+    gen:dist_param(gen:uniform_dist(-0.3, 0.3), gen:uniform_dist(-2.0, -10.0)))
+    gen:set_particle_duration_dist(gen:fixed_dist(0.6))
+    gen:activate()
+  end
 end

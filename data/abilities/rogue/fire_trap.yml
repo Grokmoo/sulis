@@ -20,3 +20,6 @@ active:
 prereqs:
   total_level: 5
   abilities: [ spike_trap ]
+upgrades:
+  - description: |
+      Your fire trap deals damage to nearby targets as well.

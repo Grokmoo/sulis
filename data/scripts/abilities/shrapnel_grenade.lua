@@ -4,7 +4,7 @@ function on_activate(parent, ability)
   targets = parent:targets()
   
   targeter = parent:create_targeter(ability)
-  targeter:set_free_select(12.0)
+  targeter:set_free_select(8.0)
   targeter:set_free_select_must_be_passable("1by1")
   targeter:set_shape_object_size("7by7round")
   targeter:add_all_effectable(targets)

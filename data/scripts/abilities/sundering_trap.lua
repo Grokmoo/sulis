@@ -26,6 +26,7 @@ function on_target_select(parent, ability, targets)
   surf:add_callback(cb)
   
   anim = parent:create_anim("particles/spike_trap_set")
+  anim:set_color(anim:param(1.0), anim:param(0.0), anim:param(0.0))
   anim:set_position(anim:param(0.0), anim:param(-1.0))
   anim:set_particle_size_dist(anim:fixed_dist(1.0), anim:fixed_dist(2.0))
   anim:set_draw_below_entities()
@@ -46,37 +47,37 @@ function on_entered(parent, ability, targets)
   point = points[1]
   
   anim = target:create_anim("particles/spike_trap_fired", 0.5)
+  anim:set_color(anim:param(1.0), anim:param(0.0), anim:param(0.0))
   anim:set_position(anim:param(point.x), anim:param(point.y - 1.0))
   anim:set_particle_size_dist(anim:fixed_dist(1.0), anim:fixed_dist(2.0))
   anim:set_draw_above_entities()
   anim:activate()
   
-  hit = parent:special_attack(target, "Reflex", "Ranged", 20, 30, 0, "Piercing")
+  hit = parent:special_attack(target, "Reflex", "Ranged", 10, 15, 15, "Piercing")
   
-  if not target:is_dead() and parent:ability_level(ability) > 1 then
-    effect = target:create_effect(ability:name(), 2)
-    
-	if hit:is_miss() then return end
-	
-    if hit:is_graze() then
-      effect:add_num_bonus("movement_rate", -0.25)
-    elseif hit:is_hit() then
-      effect:add_num_bonus("movement_rate", -0.5)
-    elseif hit:is_crit() then
-      effect:add_num_bonus("movement_rate", -0.75)
-    end
-    
-    anim = target:create_particle_generator("particles/circle4")
-    anim:set_initial_gen(10.0)
-    anim:set_color(anim:param(1.0), anim:param(0.0), anim:param(0.0))
-    anim:set_gen_rate(anim:param(10.0))
-    anim:set_moves_with_parent()
-    anim:set_position(anim:param(0.0), anim:param(0.0))
-    anim:set_particle_size_dist(anim:fixed_dist(0.3), anim:fixed_dist(0.3))
-    anim:set_particle_position_dist(anim:dist_param(anim:uniform_dist(-0.5, 0.5), anim:uniform_dist(-1.0, 1.0)),
-      anim:dist_param(anim:uniform_dist(-0.2, 0.2), anim:uniform_dist(-1.0, 1.0), anim:fixed_dist(5.0)))
-    anim:set_particle_duration_dist(anim:fixed_dist(0.3))
-    effect:add_anim(anim)
-    effect:apply()
+  effect = target:create_effect(ability:name(), 2)
+  
+  if hit:is_miss() then return end
+
+  if hit:is_graze() then
+    effect:add_num_bonus("armor", -5)
+  elseif hit:is_hit() then
+    effect:add_num_bonus("armor", -10)
+  elseif hit:is_crit() then
+    effect:add_num_bonus("armor", -15)
   end
+  
+  gen = target:create_particle_generator("shield")
+  gen:set_initial_gen(3.0)
+  gen:set_gen_rate(gen:param(3.0))
+  gen:set_moves_with_parent()
+  gen:set_color(gen:param(1.0), gen:param(0.0), gen:param(0.0))
+  gen:set_position(gen:param(-0.5), gen:param(-1.0))
+  gen:set_particle_size_dist(gen:fixed_dist(1.0), gen:fixed_dist(1.0))
+  gen:set_particle_position_dist(gen:dist_param(gen:uniform_dist(-0.5, 0.5)),
+    gen:dist_param(gen:uniform_dist(-0.2, 0.2), gen:fixed_dist(1.0)))
+  gen:set_particle_duration_dist(gen:fixed_dist(0.95))
+  effect:add_anim(gen)
+  
+  effect:apply()
 end

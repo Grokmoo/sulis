@@ -17,6 +17,3 @@ active:
     range: Short
   short_description: |
     Create concealing smoke in an area.
-prereqs:
-  abilities: [ hide ]
-  total_level: 3

@@ -19,4 +19,4 @@ active:
     Deal piercing damage to a group of enemies.
 prereqs:
   total_level: 7
-  abilities: [ spike_trap ]
+  abilities: [ smoke_bomb, fire_trap ]

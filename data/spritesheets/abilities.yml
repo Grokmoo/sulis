@@ -124,5 +124,7 @@ groups:
       
       shrapnel_grenade: [0, 15]
       stun_grenade: [1, 15]
+      sundering_trap: [2, 15]
+      become_wind: [3, 15]
       
       prereqs_not_met: [7, 4]

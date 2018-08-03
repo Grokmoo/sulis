@@ -147,6 +147,12 @@ impl UserData for ScriptEntity {
             Ok(result)
         });
 
+        methods.add_method("is_dead", |_, entity, ()| {
+            let entity = entity.try_unwrap()?;
+            let result = entity.borrow().actor.is_dead();
+            Ok(result)
+        });
+
         methods.add_method("is_valid", |_, entity, ()| {
             let mgr = GameState::turn_manager();
             match entity.index {

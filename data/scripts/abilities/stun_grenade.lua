@@ -1,12 +1,15 @@
-frag_radius = 4.0
-
 function on_activate(parent, ability)
   targets = parent:targets()
   
   targeter = parent:create_targeter(ability)
-  targeter:set_free_select(12.0)
+  targeter:set_free_select(8.0)
   targeter:set_free_select_must_be_passable("1by1")
-  targeter:set_shape_object_size("7by7round")
+  if parent:ability_level(ability) > 1 then
+    targeter:set_shape_circle(5.5)
+  else
+    targeter:set_shape_object_size("7by7round")
+  end
+  
   targeter:add_all_effectable(targets)
   targeter:activate()
 end

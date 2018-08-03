@@ -12,10 +12,14 @@ active:
   cooldown: 4
   ai:
     priority: 20
-    kind: Damage
+    kind: Debuff
     group: Multiple
     range: Visible
   short_description: |
     Stun enemies in an area
 prereqs:
   total_level: 3
+  abilities: [ smoke_bomb ]
+upgrades:
+  - description: |
+      Your stun grenade affects targets in a larger area.

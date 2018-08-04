@@ -62,6 +62,9 @@ pub use self::dialog_window::DialogWindow;
 mod entity_mouseover;
 pub use self::entity_mouseover::EntityMouseover;
 
+mod formation_window;
+pub use self::formation_window::FormationWindow;
+
 mod game_over_window;
 pub use self::game_over_window::GameOverWindow;
 
@@ -232,6 +235,12 @@ impl RootView {
         });
     }
 
+    pub fn set_formation_window(&mut self, widget: &Rc<RefCell<Widget>>, desired_state: bool) {
+        self.set_window(widget, self::formation_window::NAME, desired_state, &|| {
+            Some(FormationWindow::new())
+        });
+    }
+
     fn set_window(&mut self, widget: &Rc<RefCell<Widget>>, name: &str, desired_state: bool,
                      cb: &Fn() -> Option<Rc<RefCell<WidgetKind>>>) {
         match Widget::get_child_with_name(widget, name) {
@@ -250,6 +259,11 @@ impl RootView {
                 }
             }
         }
+    }
+
+    pub fn toggle_formation_window(&mut self, widget: &Rc<RefCell<Widget>>) {
+        let desired_state = !Widget::has_child_with_name(widget, self::formation_window::NAME);
+        self.set_formation_window(widget, desired_state);
     }
 
     pub fn toggle_console_window(&mut self, widget: &Rc<RefCell<Widget>>) {
@@ -336,6 +350,7 @@ impl WidgetKind for RootView {
             ToggleConsole => self.toggle_console_window(widget),
             ToggleInventory => self.toggle_inventory_window(widget),
             ToggleCharacter => self.toggle_character_window(widget),
+            ToggleFormation => self.toggle_formation_window(widget),
             EndTurn => self.end_turn(),
             Exit => self.show_exit(widget),
             SelectAll => GameState::select_party_members(GameState::party()),
@@ -372,6 +387,13 @@ impl WidgetKind for RootView {
         let bot_pane = Widget::empty("bottom_pane");
         {
             let portrait_pane = Widget::with_defaults(PortraitPane::new());
+
+            let formations = Widget::with_theme(Button::empty(), "formations_button");
+            formations.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+                let parent = Widget::get_root(&widget);
+                let view = Widget::downcast_kind_mut::<RootView>(&parent);
+                view.toggle_formation_window(&parent);
+            })));
 
             let select_all = Widget::with_theme(Button::empty(), "select_all_button");
             select_all.borrow_mut().state.add_callback(Callback::new(Rc::new(|_, _| {
@@ -438,7 +460,7 @@ impl WidgetKind for RootView {
 
             Widget::add_children_to(&bot_pane, vec![inv_button, cha_button, map_button,
                                     log_button, men_button, abilities, quick_items,
-                                    portrait_pane, select_all]);
+                                    portrait_pane, select_all, formations]);
         }
 
         let widget_ref = Rc::clone(widget);

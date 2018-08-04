@@ -54,6 +54,16 @@ fn center_of_group(entities: &Vec<Rc<RefCell<EntityState>>>) -> (f32, f32) {
 }
 
 impl Formation {
+    pub fn positions_iter(&self) -> impl Iterator<Item=&(f32, f32)> {
+        self.positions.iter()
+    }
+
+    pub fn set_position(&mut self, index: usize, pos: (f32, f32)) {
+        if index >= self.positions.len() { return; }
+
+        self.positions[index] = pos;
+    }
+
     pub fn move_group(&self, entities_to_move: &Vec<Rc<RefCell<EntityState>>>,
                   entities_to_ignore: Vec<usize>, x_base: f32, y_base: f32) {
         if entities_to_move.len() == 1 {

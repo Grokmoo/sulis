@@ -61,8 +61,14 @@ impl FormationWindow {
         }
 
         self.active_entry = index;
-        for (entry_index, entry) in self.entries.iter().enumerate() {
-            entry.child.borrow_mut().state.set_active(index.unwrap_or(1000) == entry_index);
+        if let Some(index) = self.active_entry {
+            for (entry_index, entry) in self.entries.iter().enumerate() {
+                entry.child.borrow_mut().state.set_enabled(index  == entry_index);
+            }
+        } else {
+            for entry in self.entries.iter() {
+                entry.child.borrow_mut().state.set_enabled(true);
+            }
         }
     }
 }
@@ -100,6 +106,13 @@ impl WidgetKind for FormationWindow {
     }
 
     fn on_mouse_move(&mut self, widget: &Rc<RefCell<Widget>>, _dx: f32, _dy: f32) -> bool {
+        let index = match self.active_entry {
+            None => return true,
+            Some(index) => index,
+        };
+        let cur_grid_pos = self.entries[index].position;
+
+        // compute the new grid position
         let x = Cursor::get_x_f32() - widget.borrow().state.inner_position.x as f32;
         let y = Cursor::get_y_f32() - widget.borrow().state.inner_position.y as f32;
 
@@ -120,7 +133,25 @@ impl WidgetKind for FormationWindow {
             grid_pos.1 = self.grid_height - self.button_size + 1.0;
         }
 
-        if let Some(index) = self.active_entry {
+        if cur_grid_pos != grid_pos {
+            //verify the new grid position is not blocked
+            let r1 = (grid_pos.0, grid_pos.1, self.button_size, self.button_size);
+
+            for (i, entry) in self.entries.iter().enumerate() {
+                if i == index { continue; }
+
+                let r2 = (entry.position.0, entry.position.1, self.button_size, self.button_size);
+
+                // if one rectangle is on the left side of the other
+                if r1.0 >= r2.0 + r2.2 || r2.0 >= r1.0 + r1.2 { continue; }
+
+                // if one rectangle is above the other
+                if r1.1 >= r2.1 + r2.3 || r2.1 >= r1.1 + r1.3 { continue; }
+
+                // the rectangles overlap
+                return true;
+            }
+
             self.entries[index].position = (grid_pos.0, grid_pos.1);
             widget.borrow_mut().invalidate_layout();
         }
@@ -149,7 +180,7 @@ impl WidgetKind for FormationWindow {
             button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
                 let parent = Widget::get_parent(widget);
                 let window = Widget::downcast_kind_mut::<FormationWindow>(&parent);
-                if !widget.borrow().state.is_active() {
+                if !window.active_entry.is_some() {
                     window.set_active_entry(Some(index));
                 } else {
                     window.set_active_entry(None);

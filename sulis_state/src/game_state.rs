@@ -32,7 +32,7 @@ use sulis_module::{Ability, Actor, Module, ObjectSize, OnTrigger, area::{Trigger
 use {area_feedback_text::ColorKind, ai, AI, AreaState, ChangeListener, ChangeListenerList,
     EntityState, Location, Formation,
     PathFinder, SaveState, ScriptState, UICallback, MOVE_TO_THRESHOLD, TurnManager};
-use script::{script_callback::{self, ScriptHitKind}, ScriptEntitySet, ScriptCallback};
+use script::{script_callback::{self, ScriptHitKind}, ScriptEntitySet, ScriptCallback, ScriptItemKind};
 use animation::{self, Anim, AnimState};
 
 thread_local! {
@@ -417,42 +417,36 @@ impl GameState {
         result
     }
 
-    pub fn execute_item_on_activate(parent: &Rc<RefCell<EntityState>>, index: usize) {
+    pub fn execute_item_on_activate(parent: &Rc<RefCell<EntityState>>, kind: ScriptItemKind) {
         let area = GameState::area_state();
-        let name = match &parent.borrow().actor.inventory().items.get(index) {
-            None => unreachable!(),
-            Some(&(_, ref item)) => item.item.name.to_string(),
-        };
+        let item = kind.item(parent);
+        let name = item.item.name.to_string();
         area.borrow_mut().add_feedback_text(name, parent, ColorKind::Info, 3.0);
-        exec_script!(item_on_activate: parent, index);
+        exec_script!(item_on_activate: parent, kind);
     }
 
-    pub fn execute_item_script(parent: &Rc<RefCell<EntityState>>, item_id: String,
+    pub fn execute_item_script(parent: &Rc<RefCell<EntityState>>, kind: ScriptItemKind,
                                targets: ScriptEntitySet, func: &str) {
         let t: Option<(&str, usize)> = None;
-        let item_id = Some(item_id);
-        let index = 0;
-        exec_script!(item_script: parent, item_id, index, targets, t, func);
+        exec_script!(item_script: parent, kind, targets, t, func);
     }
 
-    pub fn execute_item_with_attack_data(parent: &Rc<RefCell<EntityState>>, item_id: String,
+    pub fn execute_item_with_attack_data(parent: &Rc<RefCell<EntityState>>, i_kind: ScriptItemKind,
                                          targets: ScriptEntitySet, kind: HitKind,
                                          damage: u32, func: &str) {
         let hit_kind = ScriptHitKind { kind, damage };
         let t = Some(("hit", hit_kind));
-        let item_id = Some(item_id);
-        let index = 0;
-        exec_script!(item_script: parent, item_id, index, targets, t, func);
+        exec_script!(item_script: parent, i_kind, targets, t, func);
     }
 
     pub fn execute_item_on_target_select(parent: &Rc<RefCell<EntityState>>,
-                                         index: usize,
+                                         kind: ScriptItemKind,
                                          targets: Vec<Option<Rc<RefCell<EntityState>>>>,
                                          selected_point: Point,
                                          affected_points: Vec<Point>,
                                          func: &str,
                                          custom_target: Option<Rc<RefCell<EntityState>>>) {
-        exec_script!(item_on_target_select: parent, index, targets, selected_point,
+        exec_script!(item_on_target_select: parent, kind, targets, selected_point,
                      affected_points, func, custom_target);
     }
 

@@ -245,6 +245,14 @@ pub struct ItemSaveState {
     pub(crate) id: String,
 }
 
+impl ItemSaveState {
+    fn new(item: &ItemState) -> ItemSaveState {
+        ItemSaveState {
+            id: item.item.id.clone(),
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct TriggerSaveState {
@@ -394,8 +402,8 @@ pub struct ActorSaveState {
     pub(crate) overflow_ap: i32,
     pub(crate) xp: u32,
     pub(crate) items: Vec<ItemListEntrySaveState>,
-    pub(crate) equipped: Vec<Option<usize>>,
-    pub(crate) quick: Vec<Option<usize>>,
+    pub(crate) equipped: Vec<Option<ItemSaveState>>,
+    pub(crate) quick: Vec<Option<ItemSaveState>>,
     pub(crate) coins: i32,
     pub(crate) ability_states: HashMap<String, AbilitySaveState>,
 }
@@ -405,12 +413,20 @@ impl ActorSaveState {
         // TODO serialize effects
         let mut equipped = Vec::new();
         for slot in Slot::iter() {
-            equipped.push(actor_state.inventory().equipped(slot));
+            if let Some(item) = actor_state.inventory().equipped(*slot) {
+                equipped.push(Some(ItemSaveState::new(item)));
+            } else {
+                equipped.push(None);
+            }
         }
 
         let mut quick = Vec::new();
         for quick_slot in QuickSlot::iter() {
-            quick.push(actor_state.inventory().quick(quick_slot));
+            if let Some(item) = actor_state.inventory().quick(*quick_slot) {
+                quick.push(Some(ItemSaveState::new(item)));
+            } else {
+                quick.push(None);
+            }
         }
 
         let mut ability_states = HashMap::new();

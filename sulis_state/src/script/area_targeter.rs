@@ -24,7 +24,7 @@ use sulis_core::ui::{animation_state, color, Cursor};
 use sulis_core::util::{Point};
 use sulis_module::{Ability, Module, ObjectSize};
 
-use script::{targeter, TargeterData};
+use script::{targeter, TargeterData, ScriptItemKind};
 use {AreaState, EntityState, GameState, TurnManager};
 
 #[derive(Clone)]
@@ -319,7 +319,7 @@ impl Shape {
 
 enum ScriptSource {
     Ability(Rc<Ability>),
-    Item { index: usize, name: String },
+    Item { kind: ScriptItemKind, name: String },
 }
 
 pub struct AreaTargeter {
@@ -381,14 +381,14 @@ impl AreaTargeter {
         let script_source = match &data.kind {
             targeter::Kind::Ability(ref id) =>
                 ScriptSource::Ability(Module::ability(id).unwrap()),
-            targeter::Kind::Item(index) => {
-                let name = match parent.borrow().actor.inventory().items.get(*index) {
+            targeter::Kind::Item(kind) => {
+                let name = match kind.item_checked(&parent) {
                     None => {
-                        warn!("Invalid item index in targeter");
+                        warn!("Invalid item kind for targeter");
                         "".to_string()
-                    }, Some((_, item)) => item.item.name.to_string(),
+                    }, Some(item) => item.item.name.clone(),
                 };
-                ScriptSource::Item { index: *index, name }
+                ScriptSource::Item { kind: kind.clone(), name }
             }
         };
 
@@ -618,8 +618,8 @@ impl AreaTargeter {
             ScriptSource::Ability(ref ability) =>
                 GameState::execute_ability_on_target_select(&self.parent, ability, affected,
                                                             pos, points, func, custom_target),
-            ScriptSource::Item { index, .. } =>
-                GameState::execute_item_on_target_select(&self.parent, *index, affected, pos,
+            ScriptSource::Item { kind, .. } =>
+                GameState::execute_item_on_target_select(&self.parent, kind.clone(), affected, pos,
                                                          points, func, custom_target),
         }
     }

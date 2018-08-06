@@ -21,7 +21,7 @@ use rlua::{UserData, UserDataMethods};
 
 use sulis_rules::HitKind;
 use sulis_module::{Module};
-use script::{Result, script_entity, ScriptEntity, ScriptEntitySet, ScriptActiveSurface};
+use script::{Result, script_entity, ScriptEntity, ScriptEntitySet, ScriptActiveSurface, ScriptItemKind};
 use {GameState};
 
 pub fn fire_round_elapsed(cbs: Vec<Rc<ScriptCallback>>) {
@@ -158,7 +158,8 @@ impl CallbackData {
                 GameState::execute_ability_script(&parent, &ability, targets, &func);
             },
             Kind::Item(id) => {
-                GameState::execute_item_script(&parent, id.to_string(), targets, &func);
+                GameState::execute_item_script(&parent, ScriptItemKind::WithID(id.to_string()),
+                    targets, &func);
             }
         }
     }
@@ -180,8 +181,8 @@ impl CallbackData {
                                                             hit_kind, damage, &func);
             },
             Kind::Item(id) => {
-                GameState::execute_item_with_attack_data(&parent, id.to_string(), targets,
-                                                         hit_kind, damage, &func);
+                GameState::execute_item_with_attack_data(&parent,
+                    ScriptItemKind::WithID(id.to_string()), targets, hit_kind, damage, &func);
             }
         }
     }

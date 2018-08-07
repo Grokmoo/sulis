@@ -58,8 +58,9 @@ use rlua::{self, Function, Lua, UserData, UserDataMethods};
 
 use sulis_core::config::CONFIG;
 use sulis_core::util::Point;
+use sulis_rules::QuickSlot;
 use sulis_module::{ability, Ability, Item, Module, OnTrigger};
-use {EntityState, GameState, ai};
+use {EntityState, ItemState, GameState, ai};
 
 type Result<T> = std::result::Result<T, rlua::Error>;
 
@@ -132,15 +133,15 @@ impl ScriptState {
     }
 
     pub fn item_on_activate(&self, parent: &Rc<RefCell<EntityState>>,
-                            item_index: usize) -> Result<()> {
+                            kind: ScriptItemKind) -> Result<()> {
         let t: Option<(&str, usize)> = None;
-        self.item_script(parent, None, item_index,
+        self.item_script(parent, kind,
                          ScriptEntitySet::new(parent, &Vec::new()), t, "on_activate")
     }
 
     pub fn item_on_target_select(&self,
                                  parent: &Rc<RefCell<EntityState>>,
-                                 item_index: usize,
+                                 kind: ScriptItemKind,
                                  targets: Vec<Option<Rc<RefCell<EntityState>>>>,
                                  selected_point: Point,
                                  affected_points: Vec<Point>,
@@ -153,33 +154,21 @@ impl ScriptState {
             Some(entity) => Some(("custom_target", ScriptEntity::from(&entity))),
         };
         targets.affected_points = affected_points.into_iter().map(|p| (p.x, p.y)).collect();
-        self.item_script(parent, None, item_index, targets, arg, func)
+        self.item_script(parent, kind, targets, arg, func)
     }
 
     /// Runs a script on the given item, using the specified parent.  If `item_id` is None, then it
     /// is assumed that the item exists on the parent at the specified `item_index`.  If it Some,
     /// this is not assumed, but the specified index is still set on the item that is passed into
     /// the script state.
-    pub fn item_script<'a, T>(&'a self, parent: &Rc<RefCell<EntityState>>, item_id: Option<String>,
-                              item_index: usize, targets: ScriptEntitySet,
+    pub fn item_script<'a, T>(&'a self, parent: &Rc<RefCell<EntityState>>,
+                              kind: ScriptItemKind,
+                              targets: ScriptEntitySet,
                               arg: Option<(&str, T)>,
                               func: &str) -> Result<()> where T: rlua::prelude::ToLua<'a> + Send {
-        let (item, script_item) = match item_id {
-            None => {
-                let script_item = ScriptItem::from(parent, item_index)?;
-                let item = script_item.try_item()?;
-                (item, script_item)
-            },
-            Some(ref id) => {
-                let item = match Module::item(&id) {
-                    None => unreachable!(),
-                    Some(item) => item,
-                };
-                let mut script_item = ScriptItem::new(parent, &item)?;
-                script_item.index = item_index;
-                (item, script_item)
-            }
-        };
+        let script_item = ScriptItem::new(parent, kind)?;
+
+        let item = script_item.try_item()?;
         let script = get_item_script(&item)?;
         self.lua.globals().set("item", script_item)?;
         self.lua.globals().set("targets", targets)?;
@@ -511,68 +500,136 @@ impl UserData for ScriptInterface {
 
             Ok(())
         });
+
+        methods.add_method("add_party_coins", |_, _, amount: i32| {
+            GameState::add_party_coins(amount);
+            let stash = GameState::party_stash();
+            let stash = &stash.borrow();
+            stash.listeners.notify(stash);
+            Ok(())
+        });
+
+        methods.add_method("add_party_item", |_, _, item: String| {
+            let stash = GameState::party_stash();
+            let item = match ItemState::from(&item) {
+                None => return Err(rlua::Error::FromLuaConversionError {
+                    from: "String",
+                    to: "Item",
+                    message: Some(format!("Item '{}' does not exist", item)),
+                }),
+                Some(item) => item,
+            };
+
+            stash.borrow_mut().add_item(1, item);
+            Ok(())
+        });
+    }
+}
+
+#[derive(Clone, Debug)]
+pub enum ScriptItemKind {
+    Stash(usize),
+    Quick(QuickSlot),
+    WithID(String),
+}
+
+impl ScriptItemKind {
+    pub fn item_checked(&self, parent: &Rc<RefCell<EntityState>>) -> Option<ItemState> {
+        match self {
+            ScriptItemKind::Stash(index) => {
+                let stash = GameState::party_stash();
+                let stash = stash.borrow();
+                match stash.items().get(*index) {
+                    None => None,
+                    Some(&(_, ref item)) => Some(item.clone()),
+                }
+            },
+            ScriptItemKind::Quick(slot) => {
+                match parent.borrow().actor.inventory().quick(*slot) {
+                    None => None,
+                    Some(item) => Some(item.clone()),
+                }
+            },
+            ScriptItemKind::WithID(id) => {
+                match Module::item(id) {
+                    None => None,
+                    Some(item) => Some(ItemState::new(item)),
+                }
+            }
+        }
+    }
+
+    pub fn item(&self, parent: &Rc<RefCell<EntityState>>) -> ItemState {
+        match self {
+            ScriptItemKind::Stash(index) => {
+                let stash = GameState::party_stash();
+                let stash = stash.borrow();
+                match stash.items().get(*index) {
+                    None => unreachable!(),
+                    Some(&(_, ref item)) => item.clone(),
+                }
+            },
+            ScriptItemKind::Quick(slot) => {
+                match parent.borrow().actor.inventory().quick(*slot) {
+                    None => unreachable!(),
+                    Some(item) => item.clone(),
+                }
+            },
+            ScriptItemKind::WithID(id) => {
+                match Module::item(id) {
+                    None => unreachable!(),
+                    Some(item) => ItemState::new(item),
+                }
+            }
+        }
     }
 }
 
 #[derive(Clone)]
 pub struct ScriptItem {
     parent: usize,
-    index: usize,
+    kind: ScriptItemKind,
     id: String,
     name: String,
     ap: u32,
 }
 
 impl ScriptItem {
-    fn new(parent: &Rc<RefCell<EntityState>>, item: &Rc<Item>) -> Result<ScriptItem> {
-        let ap = match &item.usable {
-            None => 0,
-            Some(usable) => usable.ap,
-        };
-
-        Ok(ScriptItem {
-            parent: parent.borrow().index,
-            index: 0,
-            id: item.id.to_string(),
-            name: item.name.to_string(),
-            ap,
-        })
-    }
-
-    fn from(parent: &Rc<RefCell<EntityState>>, index: usize) -> Result<ScriptItem> {
-        let item = match parent.borrow().actor.inventory().items.get(index) {
+    pub fn new(parent: &Rc<RefCell<EntityState>>, kind: ScriptItemKind) -> Result<ScriptItem> {
+        let item = match kind.item_checked(parent) {
             None => return Err(rlua::Error::FromLuaConversionError {
                 from: "ScriptItem",
                 to: "Item",
-                message: Some(format!("Item at index {} no longer exists", index)),
+                message: Some(format!("Item with kind {:?} does not exist", kind)),
             }),
-            Some((_, item_state)) => Rc::clone(&item_state.item),
+            Some(item) => item,
         };
 
-        let ap = match &item.usable {
+        let ap = match &item.item.usable {
             None => 0,
             Some(usable) => usable.ap,
         };
 
         Ok(ScriptItem {
             parent: parent.borrow().index,
-            index,
-            id: item.id.to_string(),
-            name: item.name.to_string(),
+            kind,
+            id: item.item.id.to_string(),
+            name: item.item.name.to_string(),
             ap,
         })
     }
 
     fn try_item(&self) -> Result<Rc<Item>> {
         let parent = ScriptEntity::new(self.parent).try_unwrap()?;
-        let parent = parent.borrow();
-        match parent.actor.inventory().items.get(self.index) {
+        let item = self.kind.item_checked(&parent);
+
+        match item {
             None => Err(rlua::Error::FromLuaConversionError {
                 from: "ScriptItem",
                 to: "Item",
                 message: Some(format!("The item '{}' no longer exists in the parent", self.id)),
             }),
-            Some((_, item_state)) => Ok(Rc::clone(&item_state.item)),
+            Some(item_state) => Ok(Rc::clone(&item_state.item)),
         }
     }
 }
@@ -649,7 +706,16 @@ fn activate_item(_lua: &Lua, script_item: &ScriptItem, target: ScriptEntity) -> 
         Some(ref usable) => {
             if usable.consumable {
                 let parent = ScriptEntity::new(script_item.parent).try_unwrap()?;
-                parent.borrow_mut().actor.remove_item(script_item.index);
+                match &script_item.kind {
+                    ScriptItemKind::Quick(slot) => {
+                        let item = parent.borrow_mut().actor.clear_quick(*slot);
+                        add_another_to_quickbar(&parent, item, *slot);
+                    }, ScriptItemKind::Stash(index) => {
+                        // throw away item
+                        let stash = GameState::party_stash();
+                        let _ = stash.borrow_mut().remove_item(*index);
+                    }, ScriptItemKind::WithID(_) => (),
+                };
             }
         }
     }
@@ -657,3 +723,22 @@ fn activate_item(_lua: &Lua, script_item: &ScriptItem, target: ScriptEntity) -> 
     Ok(())
 }
 
+fn add_another_to_quickbar(parent: &Rc<RefCell<EntityState>>,
+                           item: Option<ItemState>, slot: QuickSlot) {
+    let item = match item {
+        None => return,
+        Some(item) => item,
+    };
+
+    let stash = GameState::party_stash();
+    let index = match stash.borrow().items().find_index(&item) {
+        None => return,
+        Some(index) => index,
+    };
+
+    let mut stash = stash.borrow_mut();
+    if let Some(item) = stash.remove_item(index) {
+        // we know the quick slot is empty because it was just cleared
+        let _ = parent.borrow_mut().actor.set_quick(item, slot);
+    }
+}

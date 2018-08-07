@@ -148,7 +148,7 @@ kits:
       quick:
         Usable1: potion_healing
         Usable2: potion_mind
-      coins: 600
+      pc_starting_coins: 600
     description: |
       A mage with the capability to cast a variety of spells from the circles of magic.
 

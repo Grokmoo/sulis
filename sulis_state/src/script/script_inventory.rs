@@ -18,7 +18,6 @@ use rlua::{UserData, UserDataMethods};
 
 use sulis_rules::{Slot, QuickSlot};
 use sulis_module::ability::AIData;
-use ItemState;
 use script::*;
 
 #[derive(Clone)]
@@ -45,7 +44,7 @@ impl UserData for ScriptInventory {
         methods.add_method("has_equipped_weapon", |_, data, ()| {
             try_unwrap!(data => inv);
 
-            Ok(match inv.get(Slot::HeldMain) {
+            Ok(match inv.equipped(Slot::HeldMain) {
                 None => false,
                 Some(_) => true,
             })
@@ -54,7 +53,7 @@ impl UserData for ScriptInventory {
         methods.add_method("has_equipped_shield", |_, data, ()| {
             try_unwrap!(data => inv);
 
-            Ok(match inv.get(Slot::HeldOff) {
+            Ok(match inv.equipped(Slot::HeldOff) {
                 None => false,
                 Some(ref item_state) => {
                     match item_state.item.equippable {
@@ -68,8 +67,8 @@ impl UserData for ScriptInventory {
         methods.add_method("has_alt_weapons", |_, data, ()| {
             try_unwrap!(data => inv);
 
-            let result = inv.get_quick_index(QuickSlot::AltHeldMain).is_some() ||
-                inv.get_quick_index(QuickSlot::AltHeldOff).is_some();
+            let result = inv.quick(QuickSlot::AltHeldMain).is_some() ||
+                inv.quick(QuickSlot::AltHeldOff).is_some();
             Ok(result)
         });
 
@@ -83,32 +82,12 @@ impl UserData for ScriptInventory {
             Ok(format!("{:?}", inv.weapon_style()))
         });
 
-        methods.add_method("add_coins", |_, data, amount: i32| {
-            let parent = data.parent.try_unwrap()?;
-            parent.borrow_mut().actor.add_coins(amount);
-            Ok(())
-        });
-
-        methods.add_method("add_item", |_, data, item: String| {
-            let parent = data.parent.try_unwrap()?;
-            let item = match ItemState::from(&item) {
-                None => return Err(rlua::Error::FromLuaConversionError {
-                    from: "String",
-                    to: "Item",
-                    message: Some(format!("Item '{}' does not exist", item)),
-                }),
-                Some(item) => item,
-            };
-            parent.borrow_mut().actor.add_item(item);
-            Ok(())
-        });
-
         methods.add_method("usable_items", |_, data, ()| {
             let parent = data.parent.try_unwrap()?;
             let parent = parent.borrow();
             let mut items = Vec::new();
             for slot in QuickSlot::usable_iter() {
-                let item = match parent.actor.inventory().get_quick(*slot) {
+                let item = match parent.actor.inventory().quick(*slot) {
                     None => continue,
                     Some(item) => item,
                 };

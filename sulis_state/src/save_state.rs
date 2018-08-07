@@ -33,6 +33,8 @@ use area_state::{TriggerState};
 pub struct SaveState {
     pub(crate) party: Vec<usize>,
     pub(crate) formation: Formation,
+    pub(crate) coins: i32,
+    pub(crate) stash: Vec<ItemListEntrySaveState>,
     pub(crate) selected: Vec<usize>,
     pub(crate) current_area: String,
     pub(crate) areas: HashMap<String, AreaSaveState>,
@@ -63,12 +65,17 @@ impl SaveState {
         let formation = GameState::party_formation();
         let formation = formation.borrow().clone();
 
+        let stash = GameState::party_stash();
+        let stash = stash.borrow().save();
+
         SaveState {
             areas,
             current_area,
             party,
             selected,
             formation,
+            coins: GameState::party_coins(),
+            stash,
             manager: ManagerSaveState::new(),
         }
     }
@@ -231,7 +238,7 @@ pub struct ItemListEntrySaveState {
 }
 
 impl ItemListEntrySaveState {
-    fn new(quantity: u32, item_state: &ItemState) -> ItemListEntrySaveState {
+    pub(crate) fn new(quantity: u32, item_state: &ItemState) -> ItemListEntrySaveState {
         ItemListEntrySaveState {
             quantity,
             item: ItemSaveState { id: item_state.item.id.to_string() },
@@ -243,6 +250,14 @@ impl ItemListEntrySaveState {
 #[serde(deny_unknown_fields)]
 pub struct ItemSaveState {
     pub(crate) id: String,
+}
+
+impl ItemSaveState {
+    fn new(item: &ItemState) -> ItemSaveState {
+        ItemSaveState {
+            id: item.item.id.clone(),
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -393,10 +408,8 @@ pub struct ActorSaveState {
     pub(crate) ap: u32,
     pub(crate) overflow_ap: i32,
     pub(crate) xp: u32,
-    pub(crate) items: Vec<ItemListEntrySaveState>,
-    pub(crate) equipped: Vec<Option<usize>>,
-    pub(crate) quick: Vec<Option<usize>>,
-    pub(crate) coins: i32,
+    pub(crate) equipped: Vec<Option<ItemSaveState>>,
+    pub(crate) quick: Vec<Option<ItemSaveState>>,
     pub(crate) ability_states: HashMap<String, AbilitySaveState>,
 }
 
@@ -405,12 +418,20 @@ impl ActorSaveState {
         // TODO serialize effects
         let mut equipped = Vec::new();
         for slot in Slot::iter() {
-            equipped.push(actor_state.inventory().equipped(slot));
+            if let Some(item) = actor_state.inventory().equipped(*slot) {
+                equipped.push(Some(ItemSaveState::new(item)));
+            } else {
+                equipped.push(None);
+            }
         }
 
         let mut quick = Vec::new();
         for quick_slot in QuickSlot::iter() {
-            quick.push(actor_state.inventory().quick(quick_slot));
+            if let Some(item) = actor_state.inventory().quick(*quick_slot) {
+                quick.push(Some(ItemSaveState::new(item)));
+            } else {
+                quick.push(None);
+            }
         }
 
         let mut ability_states = HashMap::new();
@@ -426,11 +447,8 @@ impl ActorSaveState {
             ap: actor_state.ap(),
             overflow_ap: actor_state.overflow_ap(),
             xp: actor_state.xp(),
-            items: actor_state.inventory().items.iter()
-                .map(|(q, ref i)| ItemListEntrySaveState::new(*q, i)).collect(),
             equipped,
             quick,
-            coins: actor_state.inventory().coins(),
             ability_states,
         }
     }

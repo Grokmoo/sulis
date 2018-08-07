@@ -146,6 +146,9 @@ impl AnimState {
             if !Rc::ptr_eq(entity, anim.owner()) { continue; }
 
             anim.mark_for_removal();
+            // don't fire any more callbacks for removed anims
+            anim.completion_callbacks.clear();
+            anim.update_callbacks.clear();
         }
     }
 
@@ -153,6 +156,9 @@ impl AnimState {
         for anim in vec.iter_mut() {
             if anim.is_blocking() {
                 anim.mark_for_removal();
+                // don't fire any more callbacks for removed anims
+                anim.completion_callbacks.clear();
+                anim.update_callbacks.clear();
             }
         }
     }

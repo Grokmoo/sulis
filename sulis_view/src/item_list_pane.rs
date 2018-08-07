@@ -20,7 +20,7 @@ use std::cell::{Cell, RefCell};
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{Button, ScrollPane};
-use sulis_module::Item;
+use sulis_module::{Item, Module};
 use sulis_state::{EntityState, GameState, inventory::has_proficiency};
 
 use {item_button::*, ItemButton};
@@ -107,8 +107,7 @@ impl ItemListPane {
             if !self.cur_filter.get().is_allowed(&item.item) { continue; }
 
             let item_button = ItemButton::merchant(item.item.icon.id(), qty, index, merchant_id);
-            item_button.borrow_mut().add_action("Buy", buy_item_cb(&self.entity,
-                merchant_id, index));
+            item_button.borrow_mut().add_action("Buy", buy_item_cb(merchant_id, index));
 
             scrollpane.borrow().add_to_content(Widget::with_defaults(item_button));
         }
@@ -134,7 +133,7 @@ impl ItemListPane {
                     let item_button = ItemButton::prop(item.item.icon.id(), qty, index, prop_index);
                     if !combat_active {
                         item_button.borrow_mut()
-                            .add_action("Take", take_item_cb(&self.entity, prop_index, index));
+                            .add_action("Take", take_item_cb(prop_index, index));
                     }
                     scrollpane.borrow().add_to_content(Widget::with_defaults(item_button));
                 }
@@ -151,14 +150,13 @@ impl ItemListPane {
 
         let scrollpane = ScrollPane::new();
         let list_content = Widget::with_theme(scrollpane.clone(), "items_list");
-        for (index, &(quantity, ref item)) in actor.inventory().items.iter().enumerate() {
+
+        let stash = GameState::party_stash();
+        let stash = stash.borrow();
+        for (index, &(quantity, ref item)) in stash.items().iter().enumerate() {
             if !self.cur_filter.get().is_allowed(&item.item) { continue; }
 
-            let mut quantity = quantity - actor.inventory().equipped_quantity(index);
-            if quantity == 0 { continue; }
-
-            let item_but = ItemButton::inventory(&self.entity, item.item.icon.id(),
-                quantity, index);
+            let item_but = ItemButton::inventory(item.item.icon.id(), quantity, index);
 
             if let Some(_) = item.item.usable {
                 if !combat_active && item.item.meets_prereqs(&actor.actor) {
@@ -197,6 +195,24 @@ impl WidgetKind for ItemListPane {
             Kind::Merchant(id) => self.create_content_merchant(id),
         };
         children.push(content);
+
+        match &self.kind {
+            Kind::Entity => {
+                let coins_item = match Module::item(&Module::rules().coins_item) {
+                    None => {
+                        warn!("Unable to find coins item");
+                        return Vec::new();
+                    }, Some(item) => item,
+                };
+                let amount = GameState::party_coins() as f32 /
+                    Module::rules().item_value_display_factor;
+                let button = ItemButton::inventory(coins_item.icon.id(), amount as u32, 0);
+                let coins_button = Widget::with_theme(button, "coins_button");
+                coins_button.borrow_mut().state.set_enabled(false);
+                children.push(coins_button);
+            },
+            _ => (),
+        }
 
         for filter in FILTERS_LIST.iter() {
             let filter = *filter;

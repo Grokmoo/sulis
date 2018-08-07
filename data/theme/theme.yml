@@ -432,6 +432,9 @@ children:
         width_relative: Max
   item_list_pane:
     children:
+      coins_button:
+        from: .item_button
+        position: [62, -7]
       filter_all:
         from: .tab_button
         text: "All"
@@ -636,9 +639,6 @@ children:
         preferred_size: [-100, -10]
         width_relative: Max
         height_relative: Max
-      coins_button:
-        from: .item_button
-        position: [162, 3]
   character_window:
     from: .window
     height_relative: 0

@@ -30,9 +30,9 @@ use sulis_core::ui::{Widget};
 use sulis_module::{Ability, Actor, Module, ObjectSize, OnTrigger, area::{Trigger, TriggerKind}};
 
 use {area_feedback_text::ColorKind, ai, AI, AreaState, ChangeListener, ChangeListenerList,
-    EntityState, Location, Formation,
+    EntityState, Location, Formation, ItemList, ItemState, PartyStash,
     PathFinder, SaveState, ScriptState, UICallback, MOVE_TO_THRESHOLD, TurnManager};
-use script::{script_callback::{self, ScriptHitKind}, ScriptEntitySet, ScriptCallback};
+use script::{script_callback::{self, ScriptHitKind}, ScriptEntitySet, ScriptCallback, ScriptItemKind};
 use animation::{self, Anim, AnimState};
 
 thread_local! {
@@ -52,6 +52,8 @@ pub struct GameState {
     selected: Vec<Rc<RefCell<EntityState>>>,
     party: Vec<Rc<RefCell<EntityState>>>,
     party_formation: Rc<RefCell<Formation>>,
+    party_coins: i32,
+    party_stash: Rc<RefCell<PartyStash>>,
 
     // listener returns the first selected party member
     party_listeners: ChangeListenerList<Option<Rc<RefCell<EntityState>>>>,
@@ -149,6 +151,18 @@ impl GameState {
 
             let formation = save_state.formation;
 
+            let party_coins = save_state.coins;
+
+            let mut stash = ItemList::new();
+            for item_save in save_state.stash {
+                let item = match Module::item(&item_save.item.id) {
+                    None => invalid_data_error(&format!("No item with ID '{}'", item_save.item.id)),
+                    Some(item) => Ok(item),
+                }?;
+
+                stash.add_quantity(item_save.quantity, ItemState::new(item));
+            }
+
             Ok(GameState {
                 areas,
                 area_state,
@@ -156,6 +170,8 @@ impl GameState {
                 party,
                 selected,
                 party_formation: Rc::new(RefCell::new(formation)),
+                party_coins,
+                party_stash: Rc::new(RefCell::new(PartyStash::new(stash))),
                 party_listeners: ChangeListenerList::default(),
                 ui_callbacks: Vec::new(),
             })
@@ -198,6 +214,13 @@ impl GameState {
     }
 
     fn new(pc: Rc<Actor>) -> Result<GameState, Error> {
+        let party_coins = pc.inventory.pc_starting_coins();
+        let mut party_stash = ItemList::new();
+        for item in pc.inventory.pc_starting_item_iter() {
+            let item_state = ItemState::new(item);
+            party_stash.add(item_state);
+        }
+
         let game = Module::game();
 
         let area_state = GameState::setup_area_state(&game.starting_area)?;
@@ -242,6 +265,8 @@ impl GameState {
             selected,
             party,
             party_formation: Rc::new(RefCell::new(Formation::default())),
+            party_coins,
+            party_stash: Rc::new(RefCell::new(PartyStash::new(party_stash))),
             party_listeners: ChangeListenerList::default(),
             ui_callbacks: Vec::new(),
         })
@@ -417,42 +442,36 @@ impl GameState {
         result
     }
 
-    pub fn execute_item_on_activate(parent: &Rc<RefCell<EntityState>>, index: usize) {
+    pub fn execute_item_on_activate(parent: &Rc<RefCell<EntityState>>, kind: ScriptItemKind) {
         let area = GameState::area_state();
-        let name = match &parent.borrow().actor.inventory().items.get(index) {
-            None => unreachable!(),
-            Some(&(_, ref item)) => item.item.name.to_string(),
-        };
+        let item = kind.item(parent);
+        let name = item.item.name.to_string();
         area.borrow_mut().add_feedback_text(name, parent, ColorKind::Info, 3.0);
-        exec_script!(item_on_activate: parent, index);
+        exec_script!(item_on_activate: parent, kind);
     }
 
-    pub fn execute_item_script(parent: &Rc<RefCell<EntityState>>, item_id: String,
+    pub fn execute_item_script(parent: &Rc<RefCell<EntityState>>, kind: ScriptItemKind,
                                targets: ScriptEntitySet, func: &str) {
         let t: Option<(&str, usize)> = None;
-        let item_id = Some(item_id);
-        let index = 0;
-        exec_script!(item_script: parent, item_id, index, targets, t, func);
+        exec_script!(item_script: parent, kind, targets, t, func);
     }
 
-    pub fn execute_item_with_attack_data(parent: &Rc<RefCell<EntityState>>, item_id: String,
+    pub fn execute_item_with_attack_data(parent: &Rc<RefCell<EntityState>>, i_kind: ScriptItemKind,
                                          targets: ScriptEntitySet, kind: HitKind,
                                          damage: u32, func: &str) {
         let hit_kind = ScriptHitKind { kind, damage };
         let t = Some(("hit", hit_kind));
-        let item_id = Some(item_id);
-        let index = 0;
-        exec_script!(item_script: parent, item_id, index, targets, t, func);
+        exec_script!(item_script: parent, i_kind, targets, t, func);
     }
 
     pub fn execute_item_on_target_select(parent: &Rc<RefCell<EntityState>>,
-                                         index: usize,
+                                         kind: ScriptItemKind,
                                          targets: Vec<Option<Rc<RefCell<EntityState>>>>,
                                          selected_point: Point,
                                          affected_points: Vec<Point>,
                                          func: &str,
                                          custom_target: Option<Rc<RefCell<EntityState>>>) {
-        exec_script!(item_on_target_select: parent, index, targets, selected_point,
+        exec_script!(item_on_target_select: parent, kind, targets, selected_point,
                      affected_points, func, custom_target);
     }
 
@@ -925,6 +944,18 @@ impl GameState {
 
             val
         })
+    }
+
+    pub fn party_stash() -> Rc<RefCell<PartyStash>> {
+        STATE.with(|s| Rc::clone(&s.borrow().as_ref().unwrap().party_stash))
+    }
+
+    pub fn party_coins() -> i32 {
+        STATE.with(|s| s.borrow().as_ref().unwrap().party_coins)
+    }
+
+    pub fn add_party_coins(amount: i32) {
+        STATE.with(|s| s.borrow_mut().as_mut().unwrap().party_coins += amount);
     }
 
     pub fn party_formation() -> Rc<RefCell<Formation>> {

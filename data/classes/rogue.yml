@@ -130,7 +130,7 @@ kits:
         Usable1: potion_healing
         Usable2: potion_power
         Usable3: potion_mind
-      coins: 300
+      pc_starting_coins: 300
     description: |
       Not afraid to get their hands dirty on the front lines, the Swashbuckler will use every trick in the book to keep themselves out of harm's way and their enemies in it.  They can be very effective, but are also vulnerable to being overwhelmed.
   - name: Mechanic
@@ -153,7 +153,7 @@ kits:
         Usable2: potion_power
         Usable3: potion_mind
         AltHeldMain: dagger
-      coins: 300
+      pc_starting_coins: 300
     description: |
       An expert in locks, traps, and all things mechanical thanks to keen senses and intellect.  Prefers to keep out of harms way in combat, using precise ranged strikes.
   - name: Assassin
@@ -177,6 +177,6 @@ kits:
         Usable2: potion_power
         Usable3: potion_mind
         AltHeldMain: dagger
-      coins: 400
+      pc_starting_coins: 400
     description: |
       Striking from the shadows when least expected, Assassins can bring down the most dangerous targets in seconds, ideally giving their prey no time to react.  They can be quickly brought down themselves, though, if caught out in the open.

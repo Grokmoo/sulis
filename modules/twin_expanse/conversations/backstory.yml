@@ -22,10 +22,15 @@ nodes:
         on_select:
           player_ability: backstory_birth_desert
       - text: |
-          The Ufrar Mountains
+          The Mountains of Naath
         to: parents
         on_select:
           player_ability: backstory_birth_mountains
+      - text: |
+          The frozen tundra of Obeka
+        to: parents
+        on_select:
+          player_ability: backstory_birth_tundra
   parents:
     text: |
       Your parents were...
@@ -90,18 +95,30 @@ nodes:
         on_select:
           player_ability: backstory_leave_exiled
       - text: |
+          You were betrayed, framed for a crime you did not commit.  You left instead of facing false justice.
+        to: adventure
+        on_select:
+          player_ability: backstory_leave_betrayed
+      - text: |
+          Your family went bankrupt.  With no food or money, you decided to make your own way.
+        to: adventure
+        on_select:
+          player_ability: backstory_leave_bankrupt
+      - text: |
           Your entire family was killed and you were forced to flee.
         to: adventure
         on_select:
           player_ability: backstory_leave_parents_killed
       - text: |
-          You grew restless and decided to leave to make your own way.
+          You grew restless and decided to leave and forge your own destiny.
         to: adventure
         on_select:
           player_ability: backstory_leave_restless
   adventure:
     text: |
       On the road for many months and many miles, you began to learn the life of an adventurer.
+      
       Eventually, you ended up meeting a small group of adventurers in an inn in a region called the Twin Expanse.
+      
       In need of money and looking to prove yourself, you decided to join up with them - taking a contract to look into the whereabouts of a missing merchant and his wagon.
     responses: []

@@ -175,15 +175,10 @@ impl UserData for ScriptEntity {
         });
 
         methods.add_method("use_item", |_, entity, item: ScriptUsableItem| {
+            let slot = item.slot;
             let parent = entity.try_unwrap()?;
-            let index = match parent.borrow().actor.inventory().get_quick_index(item.slot) {
-                None => {
-                    warn!("Attempted to use missing item in slot {:?}", item.slot);
-                    return Ok(false)
-                }, Some(index) => index,
-            };
-            if !parent.borrow().actor.can_use(index) { return Ok(false); }
-            GameState::execute_item_on_activate(&parent, index);
+            if !parent.borrow().actor.can_use_quick(slot) { return Ok(false); }
+            GameState::execute_item_on_activate(&parent, ScriptItemKind::Quick(slot));
             Ok(true)
         });
 
@@ -291,7 +286,7 @@ impl UserData for ScriptEntity {
 
         methods.add_method("create_targeter_for_item", |_, entity, item: ScriptItem| {
             let index = entity.try_unwrap_index()?;
-            Ok(TargeterData::new_item(index, item.index))
+            Ok(TargeterData::new_item(index, item.kind))
         });
 
         methods.add_method("move_towards_entity", |_, entity, (dest, dist):

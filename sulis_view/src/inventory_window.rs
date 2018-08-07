@@ -14,15 +14,16 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::time;
 use std::any::Any;
 use std::rc::Rc;
 use std::cell::{Cell, RefCell};
 
+use sulis_core::util;
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{Button, Label};
 use sulis_rules::{Slot, QuickSlot};
-use sulis_module::{Module};
-use sulis_state::{EntityState, ChangeListener, GameState};
+use sulis_state::{EntityState, ChangeListener, GameState, script::ScriptItemKind};
 
 use {item_button::*, ItemListPane, ItemButton, item_list_pane::Filter};
 
@@ -55,6 +56,10 @@ impl WidgetKind for InventoryWindow {
     }
 
     fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+        let start_time = time::Instant::now();
+
+        let stash = GameState::party_stash();
+        stash.borrow_mut().listeners.add(ChangeListener::invalidate(NAME, widget));
         self.entity.borrow_mut().actor.listeners.add(
             ChangeListener::invalidate(NAME, widget));
 
@@ -84,16 +89,14 @@ impl WidgetKind for InventoryWindow {
         for slot in Slot::iter() {
             let theme_id = format!("{:?}_button", slot).to_lowercase();
 
-            match actor.inventory().get_index(*slot) {
+            match actor.inventory().equipped(*slot) {
                 None => {
                     let button = Widget::empty(&theme_id);
                     button.borrow_mut().state.set_enabled(false);
                     Widget::add_child_to(&equipped_area, button);
-                }, Some(index) => {
-                    let item_state = actor.inventory().get(*slot).unwrap();
-
+                }, Some(item_state) => {
                     let button = ItemButton::equipped(&self.entity, item_state.item.icon.id(),
-                        index);
+                        *slot);
                     if !combat_active {
                         let mut but = button.borrow_mut();
                         but.add_action("Unequip", unequip_item_cb(&self.entity, *slot));
@@ -108,22 +111,22 @@ impl WidgetKind for InventoryWindow {
         for quick_slot in QuickSlot::iter() {
             let theme_id = format!("{:?}_button", quick_slot).to_lowercase();
 
-            match actor.inventory().get_quick_index(*quick_slot) {
+            match actor.inventory().quick(*quick_slot) {
                 None => {
                     let button = Widget::empty(&theme_id);
                     button.borrow_mut().state.set_enabled(false);
                     Widget::add_child_to(&equipped_area, button);
-                }, Some(index) => {
-                    let (qty, item_state) = actor.inventory().items.get(index).unwrap();
+                }, Some(item_state) => {
+                    let quantity = 1 + stash.borrow().items().get_quantity(&item_state);
+                    let but = ItemButton::quick(&self.entity, quantity, item_state.item.icon.id(),
+                        *quick_slot);
 
-                    let but = ItemButton::inventory(&self.entity, item_state.item.icon.id(),
-                                                      *qty, index);
-
-                    if actor.can_use(index) {
-                        but.borrow_mut().add_action("Use", use_item_cb(&self.entity, index));
+                    if actor.can_use_quick(*quick_slot) {
+                        let kind = ScriptItemKind::Quick(*quick_slot);
+                        but.borrow_mut().add_action("Use", use_item_cb(&self.entity, kind));
                     }
 
-                    but.borrow_mut().add_action("Clear Use Slot",
+                    but.borrow_mut().add_action("Clear Slot",
                                                 clear_quickslot_cb(&self.entity, *quick_slot));
 
                     Widget::add_child_to(&equipped_area, Widget::with_theme(but, &theme_id));
@@ -131,18 +134,12 @@ impl WidgetKind for InventoryWindow {
             }
         }
 
-        let coins_item = match Module::item(&Module::rules().coins_item) {
-            None => {
-                warn!("Unable to find coins item");
-                return Vec::new();
-            }, Some(item) => item,
-        };
-        let amount = actor.inventory().coins() as f32 / Module::rules().item_value_display_factor;
-        let button = ItemButton::inventory(&self.entity, coins_item.icon.id(), amount as u32, 0);
-        let coins_button = Widget::with_theme(button, "coins_button");
-        coins_button.borrow_mut().state.set_enabled(false);
 
         let stash_title = Widget::with_theme(Label::empty(), "stash_title");
-        vec![title, close, equipped_area, item_list_pane, coins_button, stash_title]
+
+        trace!("Inventory window creation time: {}",
+               util::format_elapsed_secs(start_time.elapsed()));
+
+        vec![title, close, equipped_area, item_list_pane, stash_title]
     }
 }

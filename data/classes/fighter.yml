@@ -121,9 +121,9 @@ kits:
       quick:
         Usable1: potion_healing
         Usable2: potion_power
-      items:
+      pc_starting_items:
         - potion_power
-      coins: 200
+      pc_starting_coins: 200
     description: |
       A battle hardened warrior who prefers large weapons and close quarters combat.  They can deal out tremendous damage to any foes who dare to enter the melee.
   - name: Archer
@@ -144,9 +144,9 @@ kits:
         Usable1: potion_healing
         Usable2: potion_power
         AltHeldMain: dagger
-      items:
+      pc_starting_items:
         - potion_power
-      coins: 200
+      pc_starting_coins: 200
     description: |
       An expert with ranged weapons, who prefers to keep their distance from enemies where possible, using their skills to take down the most dangerous targets from afar.
   - name: Defender
@@ -168,8 +168,8 @@ kits:
       quick:
         Usable1: potion_healing
         Usable2: potion_power
-      items:
+      pc_starting_items:
         - potion_power
-      coins: 100
+      pc_starting_coins: 100
     description: |
       A fighter who will typically use heavy armor and a large shield.  While certainly capable of dishing out punishment, their primary role on the battlefield is often to protect their compatriots.

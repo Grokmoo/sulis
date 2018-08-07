@@ -54,7 +54,15 @@ impl ItemList {
         self.items.get(index)
     }
 
-    fn find_index(&self, state: &ItemState) -> Option<usize> {
+    pub fn get_quantity(&self, item: &ItemState) -> u32 {
+        for &(qty, ref item_in_list) in self.items.iter() {
+            if item == item_in_list { return qty; }
+        }
+
+        0
+    }
+
+    pub fn find_index(&self, state: &ItemState) -> Option<usize> {
         for (i, &(_, ref item)) in self.items.iter().enumerate() {
             if item == state { return Some(i); }
         }

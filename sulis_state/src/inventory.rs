@@ -31,7 +31,6 @@ pub struct Inventory {
     pub items: ItemList,
     pub equipped: HashMap<Slot, ItemState>,
     pub quick: HashMap<QuickSlot, ItemState>,
-    pub coins: i32,
 }
 
 impl Inventory {
@@ -40,7 +39,6 @@ impl Inventory {
             items: ItemList::new(),
             equipped: HashMap::new(),
             quick: HashMap::new(),
-            coins: 0,
         }
     }
 
@@ -175,14 +173,6 @@ impl Inventory {
 
     pub fn equipped(&self, slot: Slot) -> Option<&ItemState> {
         self.equipped.get(&slot)
-    }
-
-    pub fn coins(&self) -> i32 {
-        self.coins
-    }
-
-    pub fn add_coins(&mut self, amount: i32) {
-        self.coins += amount;
     }
 
     /// Returns an iterator traversing all equipped items

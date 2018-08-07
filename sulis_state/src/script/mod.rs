@@ -500,6 +500,15 @@ impl UserData for ScriptInterface {
 
             Ok(())
         });
+
+        methods.add_method("add_party_coins", |_, _, amount: i32| {
+            GameState::add_party_coins(amount);
+            if let Some(selected) = GameState::selected().first() {
+                let actor = &selected.borrow().actor;
+                actor.listeners.notify(actor);
+            }
+            Ok(())
+        });
     }
 }
 

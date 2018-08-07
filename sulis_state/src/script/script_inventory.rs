@@ -83,12 +83,6 @@ impl UserData for ScriptInventory {
             Ok(format!("{:?}", inv.weapon_style()))
         });
 
-        methods.add_method("add_coins", |_, data, amount: i32| {
-            let parent = data.parent.try_unwrap()?;
-            parent.borrow_mut().actor.add_coins(amount);
-            Ok(())
-        });
-
         methods.add_method("add_item", |_, data, item: String| {
             let parent = data.parent.try_unwrap()?;
             let item = match ItemState::from(&item) {
@@ -99,7 +93,8 @@ impl UserData for ScriptInventory {
                 }),
                 Some(item) => item,
             };
-            parent.borrow_mut().actor.add_item(item);
+            let is_party_member = parent.borrow().is_party_member();
+            parent.borrow_mut().actor.add_item(item, is_party_member);
             Ok(())
         });
 

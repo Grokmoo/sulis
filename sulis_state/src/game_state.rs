@@ -52,6 +52,7 @@ pub struct GameState {
     selected: Vec<Rc<RefCell<EntityState>>>,
     party: Vec<Rc<RefCell<EntityState>>>,
     party_formation: Rc<RefCell<Formation>>,
+    party_coins: i32,
 
     // listener returns the first selected party member
     party_listeners: ChangeListenerList<Option<Rc<RefCell<EntityState>>>>,
@@ -149,6 +150,8 @@ impl GameState {
 
             let formation = save_state.formation;
 
+            let party_coins = save_state.coins;
+
             Ok(GameState {
                 areas,
                 area_state,
@@ -156,6 +159,7 @@ impl GameState {
                 party,
                 selected,
                 party_formation: Rc::new(RefCell::new(formation)),
+                party_coins,
                 party_listeners: ChangeListenerList::default(),
                 ui_callbacks: Vec::new(),
             })
@@ -180,10 +184,14 @@ impl GameState {
             mgr.borrow_mut().clear();
         });
 
+        let coins = pc_actor.inventory.pc_starting_coins();
+
         let game_state = GameState::new(pc_actor)?;
         STATE.with(|state| {
             *state.borrow_mut() = Some(game_state);
         });
+
+        GameState::add_party_coins(coins);
 
         let pc = GameState::player();
         let area_state = GameState::area_state();
@@ -242,6 +250,7 @@ impl GameState {
             selected,
             party,
             party_formation: Rc::new(RefCell::new(Formation::default())),
+            party_coins: 0,
             party_listeners: ChangeListenerList::default(),
             ui_callbacks: Vec::new(),
         })
@@ -919,6 +928,14 @@ impl GameState {
 
             val
         })
+    }
+
+    pub fn party_coins() -> i32 {
+        STATE.with(|s| s.borrow().as_ref().unwrap().party_coins)
+    }
+
+    pub fn add_party_coins(amount: i32) {
+        STATE.with(|s| s.borrow_mut().as_mut().unwrap().party_coins += amount);
     }
 
     pub fn party_formation() -> Rc<RefCell<Formation>> {

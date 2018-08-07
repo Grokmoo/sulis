@@ -96,7 +96,7 @@ impl WidgetKind for PropWindow {
                 let parent = Widget::get_parent(&widget);
                 parent.borrow_mut().mark_for_removal();
 
-                player_ref.borrow_mut().actor.take_all(prop_index);
+                player_ref.borrow_mut().actor.take_all(prop_index, true);
 
                 let root = Widget::get_root(&parent);
                 let view = Widget::downcast_kind_mut::<RootView>(&root);

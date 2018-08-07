@@ -26,7 +26,9 @@ pub struct InventoryBuilder {
     equipped: HashMap<Slot, String>,
     quick: HashMap<QuickSlot, String>,
     items: Vec<String>,
-    coins: u32,
+
+    #[serde(default)]
+    pc_starting_coins: i32,
 }
 
 fn equippable_to(item: &Rc<Item>, item_id: &str, slot: Slot) -> bool {
@@ -50,9 +52,10 @@ fn equippable_to(item: &Rc<Item>, item_id: &str, slot: Slot) -> bool {
 }
 
 impl InventoryBuilder {
-    /// Returns the number of coins specified for this inventory
-    pub fn coins(&self) -> u32 {
-        self.coins
+    /// Returns the starting currency for players owning this inventory.
+    /// This is only relevant for new player characters.
+    pub fn pc_starting_coins(&self) -> i32 {
+        self.pc_starting_coins
     }
 
     /// Iterates over the items in this inventory, validating that they exist
@@ -123,7 +126,7 @@ impl Default for InventoryBuilder {
             equipped: HashMap::new(),
             quick: HashMap::new(),
             items: Vec::new(),
-            coins: 0,
+            pc_starting_coins: 0,
         }
     }
 }

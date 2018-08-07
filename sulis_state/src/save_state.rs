@@ -33,6 +33,7 @@ use area_state::{TriggerState};
 pub struct SaveState {
     pub(crate) party: Vec<usize>,
     pub(crate) formation: Formation,
+    pub(crate) coins: i32,
     pub(crate) selected: Vec<usize>,
     pub(crate) current_area: String,
     pub(crate) areas: HashMap<String, AreaSaveState>,
@@ -69,6 +70,7 @@ impl SaveState {
             party,
             selected,
             formation,
+            coins: GameState::party_coins(),
             manager: ManagerSaveState::new(),
         }
     }
@@ -404,7 +406,6 @@ pub struct ActorSaveState {
     pub(crate) items: Vec<ItemListEntrySaveState>,
     pub(crate) equipped: Vec<Option<ItemSaveState>>,
     pub(crate) quick: Vec<Option<ItemSaveState>>,
-    pub(crate) coins: i32,
     pub(crate) ability_states: HashMap<String, AbilitySaveState>,
 }
 
@@ -446,7 +447,6 @@ impl ActorSaveState {
                 .map(|(q, ref i)| ItemListEntrySaveState::new(*q, i)).collect(),
             equipped,
             quick,
-            coins: actor_state.inventory().coins(),
             ability_states,
         }
     }

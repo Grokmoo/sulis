@@ -134,7 +134,7 @@ impl WidgetKind for InventoryWindow {
                 return Vec::new();
             }, Some(item) => item,
         };
-        let amount = actor.inventory().coins() as f32 / Module::rules().item_value_display_factor;
+        let amount = GameState::party_coins() as f32 / Module::rules().item_value_display_factor;
         let button = ItemButton::inventory(&self.entity, coins_item.icon.id(), amount as u32, 0);
         let coins_button = Widget::with_theme(button, "coins_button");
         coins_button.borrow_mut().state.set_enabled(false);

@@ -399,7 +399,7 @@ pub fn take_item_cb(entity: &Rc<RefCell<EntityState>>,
                     prop_index: usize, index: usize) -> Callback {
     let entity = Rc::clone(entity);
     Callback::with(Box::new(move || {
-        entity.borrow_mut().actor.take(prop_index, index);
+        entity.borrow_mut().actor.take(prop_index, index, true);
     }))
 }
 
@@ -430,13 +430,13 @@ pub fn buy_item_cb(entity: &Rc<RefCell<EntityState>>,
             Some(&(_, ref item_state)) => merchant.get_buy_price(item_state),
         };
 
-        if entity.borrow().actor.inventory().coins() < value {
+        if GameState::party_coins() < value {
             return;
         }
 
         if let Some(item_state) = merchant.remove(index) {
-            entity.borrow_mut().actor.add_coins(-value);
-            entity.borrow_mut().actor.add_item(item_state);
+            GameState::add_party_coins(-value);
+            entity.borrow_mut().actor.add_item(item_state, true);
         }
     }))
 }
@@ -465,9 +465,12 @@ pub fn sell_item_cb(entity: &Rc<RefCell<EntityState>>, index: usize) -> Callback
         let item_state = entity.borrow_mut().actor.remove_item(index);
         if let Some(item_state) = item_state {
             let value = merchant.get_sell_price(&item_state);
-            entity.borrow_mut().actor.add_coins(value);
+            GameState::add_party_coins(value);
             merchant.add(item_state);
         }
+
+        let actor = &entity.borrow().actor;
+        actor.listeners.notify(actor);
     }))
 }
 
@@ -530,7 +533,7 @@ pub fn unequip_item_cb(entity: &Rc<RefCell<EntityState>>, slot: Slot) -> Callbac
     Callback::with(Box::new(move || {
         let item = entity.borrow_mut().actor.unequip(slot);
         if let Some(item) = item {
-            entity.borrow_mut().actor.add_item(item);
+            entity.borrow_mut().actor.add_item(item, true);
         }
     }))
 }

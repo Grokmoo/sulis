@@ -84,7 +84,6 @@ impl ActorState {
 
         let mut inventory = Inventory::empty();
         inventory.load(save.items, save.equipped, save.quick)?;
-        inventory.add_coins(save.coins);
 
         let current_group_uses_per_encounter = HashMap::new();
         // TODO save / load group uses per encounter
@@ -168,8 +167,6 @@ impl ActorState {
         for item in actor.inventory.item_iter() {
             actor_state.inventory.items.add(ItemState::new(item));
         }
-
-        actor_state.inventory.coins = actor.inventory.coins() as i32;
 
         actor_state
     }
@@ -473,12 +470,15 @@ impl ActorState {
         }
     }
 
-    fn check_add_coins(&mut self, quantity: u32, item_state: &ItemState) -> bool {
+    fn check_add_coins(&mut self, quantity: u32, item_state: &ItemState,
+                       is_party_member: bool) -> bool {
+        if !is_party_member { return false; }
+
         let coins_id = &Module::rules().coins_item;
 
         if &item_state.item.id == coins_id {
             let qty = quantity as i32 * Module::rules().item_value_display_factor as i32;
-            self.inventory.add_coins(qty);
+            GameState::add_party_coins(qty);
             true
         } else {
             false
@@ -515,7 +515,7 @@ impl ActorState {
         }
     }
 
-    pub fn take_all(&mut self, prop_index: usize) {
+    pub fn take_all(&mut self, prop_index: usize, is_party_member: bool) {
         let area_state = GameState::area_state();
         let mut area_state = area_state.borrow_mut();
         let prop_state = area_state.get_prop_mut(prop_index);
@@ -529,7 +529,7 @@ impl ActorState {
             let mut i = num_items - 1;
             loop {
                 if let Some((qty, item_state)) = prop_state.remove_all_at(i) {
-                    if !self.check_add_coins(qty, &item_state) {
+                    if !self.check_add_coins(qty, &item_state, is_party_member) {
                         let index = self.inventory.items.add_quantity(qty, item_state);
                         self.check_add_to_quickslot(index);
                     }
@@ -543,13 +543,13 @@ impl ActorState {
         }
     }
 
-    pub fn take(&mut self, prop_index: usize, item_index: usize) {
+    pub fn take(&mut self, prop_index: usize, item_index: usize, is_party_member: bool) {
         let area_state = GameState::area_state();
         let mut area_state = area_state.borrow_mut();
         let prop_state = area_state.get_prop_mut(prop_index);
 
         if let Some((qty, item_state)) = prop_state.remove_all_at(item_index) {
-            if !self.check_add_coins(qty, &item_state) {
+            if !self.check_add_coins(qty, &item_state, is_party_member) {
                 let index = self.inventory.items.add_quantity(qty, item_state);
                 self.check_add_to_quickslot(index);
             }
@@ -558,8 +558,8 @@ impl ActorState {
         self.listeners.notify(&self);
     }
 
-    pub fn add_item(&mut self, item_state: ItemState) {
-        if !self.check_add_coins(1, &item_state) {
+    pub fn add_item(&mut self, item_state: ItemState, is_party_member: bool) {
+        if !self.check_add_coins(1, &item_state, is_party_member) {
             let index = self.inventory.items.add(item_state);
             self.check_add_to_quickslot(index);
         }
@@ -628,11 +628,6 @@ impl ActorState {
     pub fn remove_item(&mut self, index: usize) -> Option<ItemState> {
         let item = self.inventory.items.remove(index);
         item
-    }
-
-    pub fn add_coins(&mut self, amount: i32) {
-        self.inventory.add_coins(amount);
-        self.listeners.notify(&self);
     }
 
     pub fn inventory(&self) -> &Inventory {

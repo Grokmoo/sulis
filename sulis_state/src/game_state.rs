@@ -30,7 +30,7 @@ use sulis_core::ui::{Widget};
 use sulis_module::{Ability, Actor, Module, ObjectSize, OnTrigger, area::{Trigger, TriggerKind}};
 
 use {area_feedback_text::ColorKind, ai, AI, AreaState, ChangeListener, ChangeListenerList,
-    EntityState, Location, Formation,
+    EntityState, Location, Formation, ItemList, ItemState, PartyStash,
     PathFinder, SaveState, ScriptState, UICallback, MOVE_TO_THRESHOLD, TurnManager};
 use script::{script_callback::{self, ScriptHitKind}, ScriptEntitySet, ScriptCallback, ScriptItemKind};
 use animation::{self, Anim, AnimState};
@@ -53,6 +53,7 @@ pub struct GameState {
     party: Vec<Rc<RefCell<EntityState>>>,
     party_formation: Rc<RefCell<Formation>>,
     party_coins: i32,
+    party_stash: Rc<RefCell<PartyStash>>,
 
     // listener returns the first selected party member
     party_listeners: ChangeListenerList<Option<Rc<RefCell<EntityState>>>>,
@@ -152,6 +153,16 @@ impl GameState {
 
             let party_coins = save_state.coins;
 
+            let mut stash = ItemList::new();
+            for item_save in save_state.stash {
+                let item = match Module::item(&item_save.item.id) {
+                    None => invalid_data_error(&format!("No item with ID '{}'", item_save.item.id)),
+                    Some(item) => Ok(item),
+                }?;
+
+                stash.add_quantity(item_save.quantity, ItemState::new(item));
+            }
+
             Ok(GameState {
                 areas,
                 area_state,
@@ -160,6 +171,7 @@ impl GameState {
                 selected,
                 party_formation: Rc::new(RefCell::new(formation)),
                 party_coins,
+                party_stash: Rc::new(RefCell::new(PartyStash::new(stash))),
                 party_listeners: ChangeListenerList::default(),
                 ui_callbacks: Vec::new(),
             })
@@ -184,14 +196,10 @@ impl GameState {
             mgr.borrow_mut().clear();
         });
 
-        let coins = pc_actor.inventory.pc_starting_coins();
-
         let game_state = GameState::new(pc_actor)?;
         STATE.with(|state| {
             *state.borrow_mut() = Some(game_state);
         });
-
-        GameState::add_party_coins(coins);
 
         let pc = GameState::player();
         let area_state = GameState::area_state();
@@ -206,6 +214,13 @@ impl GameState {
     }
 
     fn new(pc: Rc<Actor>) -> Result<GameState, Error> {
+        let party_coins = pc.inventory.pc_starting_coins();
+        let mut party_stash = ItemList::new();
+        for item in pc.inventory.pc_starting_item_iter() {
+            let item_state = ItemState::new(item);
+            party_stash.add(item_state);
+        }
+
         let game = Module::game();
 
         let area_state = GameState::setup_area_state(&game.starting_area)?;
@@ -250,7 +265,8 @@ impl GameState {
             selected,
             party,
             party_formation: Rc::new(RefCell::new(Formation::default())),
-            party_coins: 0,
+            party_coins,
+            party_stash: Rc::new(RefCell::new(PartyStash::new(party_stash))),
             party_listeners: ChangeListenerList::default(),
             ui_callbacks: Vec::new(),
         })
@@ -928,6 +944,10 @@ impl GameState {
 
             val
         })
+    }
+
+    pub fn party_stash() -> Rc<RefCell<PartyStash>> {
+        STATE.with(|s| Rc::clone(&s.borrow().as_ref().unwrap().party_stash))
     }
 
     pub fn party_coins() -> i32 {

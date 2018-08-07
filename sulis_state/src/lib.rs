@@ -84,6 +84,9 @@ pub use self::merchant::Merchant;
 mod path_finder;
 use self::path_finder::PathFinder;
 
+mod party_stash;
+pub use self::party_stash::PartyStash;
+
 mod prop_state;
 pub use self::prop_state::PropState;
 

@@ -90,13 +90,13 @@ impl WidgetKind for PropWindow {
             icon.borrow_mut().state.foreground = Some(Rc::clone(&prop.prop.icon));
             close.borrow_mut().state.add_callback(Callback::remove_parent());
 
-            let player_ref = Rc::clone(&self.player);
             let prop_index = self.prop_index;
             take_all.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
                 let parent = Widget::get_parent(&widget);
                 parent.borrow_mut().mark_for_removal();
 
-                player_ref.borrow_mut().actor.take_all(prop_index, true);
+                let stash = GameState::party_stash();
+                stash.borrow_mut().take_all(prop_index);
 
                 let root = Widget::get_root(&parent);
                 let view = Widget::downcast_kind_mut::<RootView>(&root);

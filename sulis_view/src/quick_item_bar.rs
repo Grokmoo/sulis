@@ -79,6 +79,7 @@ impl WidgetKind for QuickItemBar {
 
 fn create_button(entity: &Rc<RefCell<EntityState>>, slot: QuickSlot,
                  theme_id: &str) -> Rc<RefCell<Widget>> {
+    let stash = GameState::party_stash();
     let actor = &entity.borrow().actor;
     match actor.inventory().quick(slot) {
         None => {
@@ -86,12 +87,13 @@ fn create_button(entity: &Rc<RefCell<EntityState>>, slot: QuickSlot,
             button.borrow_mut().state.set_enabled(false);
             button
         }, Some(item_state) => {
+            let quantity = 1 + stash.borrow().items().get_quantity(&item_state);
             let kind = ScriptItemKind::Quick(slot);
-            let button = ItemButton::quick(entity, item_state.item.icon.id(), slot);
+            let button = ItemButton::quick(entity, quantity, item_state.item.icon.id(), slot);
             button.borrow_mut().add_action("Use", use_item_cb(entity, kind));
-            button.borrow_mut().add_action("Clear Use Slot", clear_quickslot_cb(entity, slot));
+            button.borrow_mut().add_action("Clear Slot", clear_quickslot_cb(entity, slot));
             let widget = Widget::with_theme(button, theme_id);
-            widget.borrow_mut().state.set_enabled(actor.can_use(slot));
+            widget.borrow_mut().state.set_enabled(actor.can_use_quick(slot));
             widget
         }
     }

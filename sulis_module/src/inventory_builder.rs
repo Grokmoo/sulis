@@ -25,10 +25,11 @@ use {Item, Module};
 pub struct InventoryBuilder {
     equipped: HashMap<Slot, String>,
     quick: HashMap<QuickSlot, String>,
-    items: Vec<String>,
 
     #[serde(default)]
     pc_starting_coins: i32,
+    #[serde(default)]
+    pc_starting_items: Vec<String>,
 }
 
 fn equippable_to(item: &Rc<Item>, item_id: &str, slot: Slot) -> bool {
@@ -59,8 +60,8 @@ impl InventoryBuilder {
     }
 
     /// Iterates over the items in this inventory, validating that they exist
-    pub fn item_iter<'a>(&'a self) -> impl Iterator<Item=Rc<Item>> + 'a {
-        self.items.iter().filter_map(|item_id| {
+    pub fn pc_starting_item_iter<'a>(&'a self) -> impl Iterator<Item=Rc<Item>> + 'a {
+        self.pc_starting_items.iter().filter_map(|item_id| {
             match Module::item(item_id) {
                 None => {
                     warn!("Item with id '{}' not found for inventory item", item_id);
@@ -125,7 +126,7 @@ impl Default for InventoryBuilder {
         InventoryBuilder {
             equipped: HashMap::new(),
             quick: HashMap::new(),
-            items: Vec::new(),
+            pc_starting_items: Vec::new(),
             pc_starting_coins: 0,
         }
     }

@@ -177,7 +177,7 @@ impl UserData for ScriptEntity {
         methods.add_method("use_item", |_, entity, item: ScriptUsableItem| {
             let slot = item.slot;
             let parent = entity.try_unwrap()?;
-            if !parent.borrow().actor.can_use(slot) { return Ok(false); }
+            if !parent.borrow().actor.can_use_quick(slot) { return Ok(false); }
             GameState::execute_item_on_activate(&parent, ScriptItemKind::Quick(slot));
             Ok(true)
         });

@@ -32,7 +32,7 @@ use {ItemActionMenu, MerchantWindow, PropWindow, RootView};
 enum Kind {
     Prop { prop_index: usize, item_index: usize },
     Merchant { id: String, item_index: usize },
-    Inventory { player: Rc<RefCell<EntityState>>, item_index: usize },
+    Inventory { item_index: usize },
     Equipped { player: Rc<RefCell<EntityState>>, slot: Slot },
     Quick { player: Rc<RefCell<EntityState>>, quick: QuickSlot },
 }
@@ -49,11 +49,8 @@ pub struct ItemButton {
 const ITEM_BUTTON_NAME: &str = "item_button";
 
 impl ItemButton {
-    pub fn inventory(player: &Rc<RefCell<EntityState>>, icon: String,
-                     quantity: u32, item_index: usize) -> Rc<RefCell<ItemButton>> {
-        let player = Rc::clone(player);
-        ItemButton::new(icon, quantity,
-                        Kind::Inventory { player, item_index })
+    pub fn inventory(icon: String, quantity: u32, item_index: usize) -> Rc<RefCell<ItemButton>> {
+        ItemButton::new(icon, quantity, Kind::Inventory { item_index })
     }
 
     pub fn equipped(player: &Rc<RefCell<EntityState>>, icon: String,
@@ -62,10 +59,10 @@ impl ItemButton {
         ItemButton::new(icon, 1, Kind::Equipped { player, slot })
     }
 
-    pub fn quick(player: &Rc<RefCell<EntityState>>, icon: String,
+    pub fn quick(player: &Rc<RefCell<EntityState>>, quantity: u32, icon: String,
                  quick: QuickSlot) -> Rc<RefCell<ItemButton>> {
         let player = Rc::clone(player);
-        ItemButton::new(icon, 1, Kind::Quick { player, quick })
+        ItemButton::new(icon, quantity, Kind::Quick { player, quick })
     }
 
     pub fn prop(icon: String, quantity: u32, item_index: usize,
@@ -105,9 +102,10 @@ impl ItemButton {
         let area_state = GameState::area_state();
         let area_state = area_state.borrow();
         match self.kind {
-            Kind::Inventory { ref player, item_index } => {
-                let pc = player.borrow();
-                match pc.actor.inventory().items.get(item_index) {
+            Kind::Inventory { item_index } => {
+                let stash = GameState::party_stash();
+                let stash = stash.borrow();
+                match stash.items().get(item_index) {
                     None => None,
                     Some(&(_, ref item_state)) => Some(item_state.clone())
                 }
@@ -236,15 +234,7 @@ impl WidgetKind for ItemButton {
             widget.borrow().state.inner_top());
 
             match self.kind {
-                Kind::Inventory { ref player, .. } => {
-                    if !has_proficiency(&item_state, &player.borrow().actor.stats) {
-                        item_window.state.add_text_arg("prof_not_met", "true");
-                    }
-
-                    if !item_state.item.meets_prereqs(&player.borrow().actor.actor) {
-                        item_window.state.add_text_arg("prereqs_not_met", "true");
-                    }
-                }, Kind::Merchant { .. } => {
+                Kind::Inventory { .. } | Kind::Merchant { .. } => {
                     let player = GameState::selected();
                     if player.len() > 0 {
                         if !has_proficiency(&item_state, &player[0].borrow().actor.stats) {
@@ -364,8 +354,14 @@ impl WidgetKind for ItemButton {
 pub fn clear_quickslot_cb(entity: &Rc<RefCell<EntityState>>, slot: QuickSlot) -> Callback {
     let entity = Rc::clone(entity);
     Callback::new(Rc::new(move |_, _| {
-        let actor = &mut entity.borrow_mut().actor;
-        actor.clear_quick(slot);
+        let item = {
+            let actor = &mut entity.borrow_mut().actor;
+            actor.clear_quick(slot)
+        };
+        if let Some(item) = item {
+            let stash = GameState::party_stash();
+            stash.borrow_mut().add_item(1, item);
+        }
     }))
 }
 
@@ -373,15 +369,27 @@ pub fn set_quickslot_cb(entity: &Rc<RefCell<EntityState>>,
                         index: usize) -> Callback {
     let entity = Rc::clone(entity);
     Callback::new(Rc::new(move |_, _| {
-        let actor = &mut entity.borrow_mut().actor;
-        for slot in QuickSlot::usable_iter() {
-            if actor.inventory().quick(*slot).is_none() {
-                actor.set_quick(index, *slot);
-                return;
-            }
-        }
+        let stash = GameState::party_stash();
+        let item = match stash.borrow_mut().remove_item(index) {
+            None => return,
+            Some(item) => item,
+        };
 
-        actor.set_quick(index, QuickSlot::Usable1);
+        let to_add = {
+            let actor = &mut entity.borrow_mut().actor;
+            for slot in QuickSlot::usable_iter() {
+                if actor.inventory().quick(*slot).is_none() {
+                    let _ = actor.set_quick(item, *slot); // we know there is no item here
+                    return;
+                }
+            }
+
+            actor.set_quick(item, QuickSlot::Usable1)
+        };
+
+        if let Some(item) = to_add {
+            stash.borrow_mut().add_item(1, item);
+        }
     }))
 }
 
@@ -395,25 +403,32 @@ pub fn use_item_cb(entity: &Rc<RefCell<EntityState>>, kind: ScriptItemKind) -> C
     }))
 }
 
-pub fn take_item_cb(entity: &Rc<RefCell<EntityState>>,
-                    prop_index: usize, index: usize) -> Callback {
-    let entity = Rc::clone(entity);
+pub fn take_item_cb(prop_index: usize, index: usize) -> Callback {
     Callback::with(Box::new(move || {
-        entity.borrow_mut().actor.take(prop_index, index, true);
+        let stash = GameState::party_stash();
+        stash.borrow_mut().take(prop_index, index);
     }))
 }
 
 pub fn equip_item_cb(entity: &Rc<RefCell<EntityState>>, index: usize) -> Callback {
     let entity = Rc::clone(entity);
     Callback::with(Box::new(move || {
+        let stash = GameState::party_stash();
+        let item = match stash.borrow_mut().remove_item(index) {
+            None => return,
+            Some(item) => item,
+        };
+
         // equip with no preferred slot
-        entity.borrow_mut().actor.equip(index, None);
+        let to_add = entity.borrow_mut().actor.equip(item, None);
+
+        for item in to_add {
+            stash.borrow_mut().add_item(1, item);
+        }
     }))
 }
 
-pub fn buy_item_cb(entity: &Rc<RefCell<EntityState>>,
-                   merchant_id: &str, index: usize) -> Callback {
-    let entity = Rc::clone(entity);
+pub fn buy_item_cb(merchant_id: &str, index: usize) -> Callback {
     let merchant_id = merchant_id.to_string();
     Callback::with(Box::new(move || {
         let area_state = GameState::area_state();
@@ -436,7 +451,8 @@ pub fn buy_item_cb(entity: &Rc<RefCell<EntityState>>,
 
         if let Some(item_state) = merchant.remove(index) {
             GameState::add_party_coins(-value);
-            entity.borrow_mut().actor.add_item(item_state, true);
+            let stash = GameState::party_stash();
+            stash.borrow_mut().add_item(1, item_state);
         }
     }))
 }
@@ -462,7 +478,8 @@ pub fn sell_item_cb(entity: &Rc<RefCell<EntityState>>, index: usize) -> Callback
             Some(ref mut merchant) => merchant,
         };
 
-        let item_state = entity.borrow_mut().actor.remove_item(index);
+        let stash = GameState::party_stash();
+        let item_state = stash.borrow_mut().remove_item(index);
         if let Some(item_state) = item_state {
             let value = merchant.get_sell_price(&item_state);
             GameState::add_party_coins(value);
@@ -477,7 +494,8 @@ pub fn sell_item_cb(entity: &Rc<RefCell<EntityState>>, index: usize) -> Callback
 pub fn drop_item_cb(entity: &Rc<RefCell<EntityState>>, index: usize) -> Callback {
     let entity = Rc::clone(entity);
     Callback::new(Rc::new(move |widget, _| {
-        let item = entity.borrow_mut().actor.remove_item(index);
+        let stash = GameState::party_stash();
+        let item = stash.borrow_mut().remove_item(index);
         if let Some(item) = item {
             drop_item(widget, &entity, item);
         }
@@ -533,7 +551,8 @@ pub fn unequip_item_cb(entity: &Rc<RefCell<EntityState>>, slot: Slot) -> Callbac
     Callback::with(Box::new(move || {
         let item = entity.borrow_mut().actor.unequip(slot);
         if let Some(item) = item {
-            entity.borrow_mut().actor.add_item(item, true);
+            let stash = GameState::party_stash();
+            stash.borrow_mut().add_item(1, item);
         }
     }))
 }

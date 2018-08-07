@@ -121,7 +121,7 @@ kits:
       quick:
         Usable1: potion_healing
         Usable2: potion_power
-      items:
+      pc_starting_items:
         - potion_power
       pc_starting_coins: 200
     description: |
@@ -144,7 +144,7 @@ kits:
         Usable1: potion_healing
         Usable2: potion_power
         AltHeldMain: dagger
-      items:
+      pc_starting_items:
         - potion_power
       pc_starting_coins: 200
     description: |
@@ -168,7 +168,7 @@ kits:
       quick:
         Usable1: potion_healing
         Usable2: potion_power
-      items:
+      pc_starting_items:
         - potion_power
       pc_starting_coins: 100
     description: |

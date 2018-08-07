@@ -503,10 +503,24 @@ impl UserData for ScriptInterface {
 
         methods.add_method("add_party_coins", |_, _, amount: i32| {
             GameState::add_party_coins(amount);
-            if let Some(selected) = GameState::selected().first() {
-                let actor = &selected.borrow().actor;
-                actor.listeners.notify(actor);
-            }
+            let stash = GameState::party_stash();
+            let stash = &stash.borrow();
+            stash.listeners.notify(stash);
+            Ok(())
+        });
+
+        methods.add_method("add_party_item", |_, _, item: String| {
+            let stash = GameState::party_stash();
+            let item = match ItemState::from(&item) {
+                None => return Err(rlua::Error::FromLuaConversionError {
+                    from: "String",
+                    to: "Item",
+                    message: Some(format!("Item '{}' does not exist", item)),
+                }),
+                Some(item) => item,
+            };
+
+            stash.borrow_mut().add_item(1, item);
             Ok(())
         });
     }
@@ -514,7 +528,7 @@ impl UserData for ScriptInterface {
 
 #[derive(Clone, Debug)]
 pub enum ScriptItemKind {
-    ItemList(usize),
+    Stash(usize),
     Quick(QuickSlot),
     WithID(String),
 }
@@ -522,8 +536,10 @@ pub enum ScriptItemKind {
 impl ScriptItemKind {
     pub fn item_checked(&self, parent: &Rc<RefCell<EntityState>>) -> Option<ItemState> {
         match self {
-            ScriptItemKind::ItemList(index) => {
-                match parent.borrow().actor.inventory().items.get(*index) {
+            ScriptItemKind::Stash(index) => {
+                let stash = GameState::party_stash();
+                let stash = stash.borrow();
+                match stash.items().get(*index) {
                     None => None,
                     Some(&(_, ref item)) => Some(item.clone()),
                 }
@@ -545,8 +561,10 @@ impl ScriptItemKind {
 
     pub fn item(&self, parent: &Rc<RefCell<EntityState>>) -> ItemState {
         match self {
-            ScriptItemKind::ItemList(index) => {
-                match parent.borrow().actor.inventory().items.get(*index) {
+            ScriptItemKind::Stash(index) => {
+                let stash = GameState::party_stash();
+                let stash = stash.borrow();
+                match stash.items().get(*index) {
                     None => unreachable!(),
                     Some(&(_, ref item)) => item.clone(),
                 }
@@ -690,11 +708,12 @@ fn activate_item(_lua: &Lua, script_item: &ScriptItem, target: ScriptEntity) -> 
                 let parent = ScriptEntity::new(script_item.parent).try_unwrap()?;
                 match &script_item.kind {
                     ScriptItemKind::Quick(slot) => {
+                        let item = parent.borrow_mut().actor.clear_quick(*slot);
+                        add_another_to_quickbar(&parent, item, *slot);
+                    }, ScriptItemKind::Stash(index) => {
                         // throw away item
-                        let _ = parent.borrow_mut().actor.clear_quick(*slot);
-                    }, ScriptItemKind::ItemList(index) => {
-                        // throw away item
-                        let _ = parent.borrow_mut().actor.remove_item(*index);
+                        let stash = GameState::party_stash();
+                        let _ = stash.borrow_mut().remove_item(*index);
                     }, ScriptItemKind::WithID(_) => (),
                 };
             }
@@ -704,3 +723,22 @@ fn activate_item(_lua: &Lua, script_item: &ScriptItem, target: ScriptEntity) -> 
     Ok(())
 }
 
+fn add_another_to_quickbar(parent: &Rc<RefCell<EntityState>>,
+                           item: Option<ItemState>, slot: QuickSlot) {
+    let item = match item {
+        None => return,
+        Some(item) => item,
+    };
+
+    let stash = GameState::party_stash();
+    let index = match stash.borrow().items().find_index(&item) {
+        None => return,
+        Some(index) => index,
+    };
+
+    let mut stash = stash.borrow_mut();
+    if let Some(item) = stash.remove_item(index) {
+        // we know the quick slot is empty because it was just cleared
+        let _ = parent.borrow_mut().actor.set_quick(item, slot);
+    }
+}

@@ -23,12 +23,11 @@ use sulis_core::image::Image;
 use sulis_core::util::invalid_data_error;
 use sulis_rules::{StatList, Slot, ItemKind, WeaponStyle, bonus::AttackKindBuilder, QuickSlot};
 use sulis_module::{Actor, ImageLayer, Module};
-use {ItemList, ItemState};
-use save_state::{ItemSaveState, ItemListEntrySaveState};
+use {ItemState};
+use save_state::{ItemSaveState};
 
 #[derive(Clone)]
 pub struct Inventory {
-    pub items: ItemList,
     pub equipped: HashMap<Slot, ItemState>,
     pub quick: HashMap<QuickSlot, ItemState>,
 }
@@ -36,25 +35,13 @@ pub struct Inventory {
 impl Inventory {
     pub fn empty() -> Inventory {
         Inventory {
-            items: ItemList::new(),
             equipped: HashMap::new(),
             quick: HashMap::new(),
         }
     }
 
-    pub fn load(&mut self, items: Vec<ItemListEntrySaveState>,
-                equipped: Vec<Option<ItemSaveState>>,
+    pub fn load(&mut self, equipped: Vec<Option<ItemSaveState>>,
                 quick: Vec<Option<ItemSaveState>>) -> Result<(), Error> {
-        for item_save in items {
-           let item = match Module::item(&item_save.item.id) {
-               None => invalid_data_error(&format!("No item with ID '{}'",
-                                                   item_save.item.id)),
-                Some(item) => Ok(item),
-           }?;
-
-           self.items.add_quantity(item_save.quantity, ItemState::new(item));
-        }
-
         for (slot_index, slot) in Slot::iter().enumerate() {
             let slot = *slot;
 
@@ -235,8 +222,9 @@ impl Inventory {
 
     /// Sets the given item to the quick slot.  The caller must validate that the
     /// item can be set with `can_set_quick` prior to doing this
-    pub fn set_quick(&mut self, item_state: ItemState, slot: QuickSlot) {
-        self.quick.insert(slot, item_state);
+    #[must_use]
+    pub fn set_quick(&mut self, item_state: ItemState, slot: QuickSlot) -> Option<ItemState> {
+        self.quick.insert(slot, item_state)
     }
 
     /// Returns true if the given item can be equipped

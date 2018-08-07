@@ -12,7 +12,7 @@ active:
   cooldown: 3
   ai:
     priority: 10
-    kind: Damage
+    kind: Special
     group: Multiple
     range: Short
   short_description: |

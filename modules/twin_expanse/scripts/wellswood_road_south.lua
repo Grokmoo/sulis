@@ -20,7 +20,7 @@ end
 function on_player_enter_bridge(parent, target)
   game:cancel_blocking_anims()
   game:spawn_encounter_at(17, 36)
-  game:enable_trigger_at(35, 66)
+  game:enable_trigger_at(35, 65)
 end
 
 function on_player_go_too_far(parent, target)

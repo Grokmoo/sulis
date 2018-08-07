@@ -6,14 +6,14 @@ display:
     adapter: Glium
 
     # Display Mode - Fullscreen, BorderlessWindow, Window
-    mode: BorderlessWindow
+    mode: Window
 
     # Which monitor to display on, starting from 0
     monitor: 0
 
     # size of the graphical display in pixels
-    width_pixels: 1920
-    height_pixels: 1080
+    width_pixels: 1600
+    height_pixels: 900
 
     # UI scaling - Standard
     width: 320
@@ -64,7 +64,7 @@ logging:
     # Meaning each run of the game will generate a unique log filename.
     # If false, each run will simply use the same main.log file.
     use_timestamps: false
-    
+
     # If set to false, the log file is truncated at application startup;
     # all previous entries are removed.  If set to true, the previous log
     # entries are kept.  This option will have no effect if use_timestamps

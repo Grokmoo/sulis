@@ -139,7 +139,7 @@ triggers:
       OnPlayerEnter:
         location:
           x: 35
-          "y": 66
+          "y": 65
         size:
           width: 25
           height: 10

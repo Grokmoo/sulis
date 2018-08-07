@@ -234,7 +234,7 @@ impl WidgetKind for ItemButton {
             widget.borrow().state.inner_top());
 
             match self.kind {
-                Kind::Inventory { .. } | Kind::Merchant { .. } => {
+                Kind::Prop { .. } | Kind::Inventory { .. } | Kind::Merchant { .. } => {
                     let player = GameState::selected();
                     if player.len() > 0 {
                         if !has_proficiency(&item_state, &player[0].borrow().actor.stats) {

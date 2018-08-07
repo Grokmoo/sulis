@@ -154,9 +154,6 @@ impl ItemListPane {
         for (index, &(quantity, ref item)) in actor.inventory().items.iter().enumerate() {
             if !self.cur_filter.get().is_allowed(&item.item) { continue; }
 
-            let mut quantity = quantity - actor.inventory().equipped_quantity(index);
-            if quantity == 0 { continue; }
-
             let item_but = ItemButton::inventory(&self.entity, item.item.icon.id(),
                 quantity, index);
 

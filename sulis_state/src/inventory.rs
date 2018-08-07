@@ -61,7 +61,7 @@ impl Inventory {
             let slot = *slot;
 
             if slot_index > equipped.len() { break; }
-            let item = match equipped[slot_index] {
+            let item = match &equipped[slot_index] {
                 None => continue,
                 Some(item) => item,
             };
@@ -71,21 +71,24 @@ impl Inventory {
                 Some(item) => Ok(ItemState::new(item)),
             }?;
 
-            let equippable = match item_state.item.equippable {
-                None => invalid_data_error(&format!("Item in slot '{:?}' is not equippable",
-                                                    slot)),
-                Some(ref equip) => Ok(equip),
-            }?;
+            {
+                let equippable = match item_state.item.equippable {
+                    None =>
+                        invalid_data_error(&format!("Item in slot '{:?}' is not equippable",
+                            slot)),
+                    Some(ref equip) => Ok(equip),
+                }?;
 
-            if equippable.slot != slot {
-                let ok = match equippable.alternate_slot {
-                    None => false,
-                    Some(alt_slot) => alt_slot == slot,
-                };
+                if equippable.slot != slot {
+                    let ok = match equippable.alternate_slot {
+                        None => false,
+                        Some(alt_slot) => alt_slot == slot,
+                    };
 
-                if !ok {
-                    return invalid_data_error(&format!("item in slot '{:?}' invalid equip type",
-                                                       slot));
+                    if !ok {
+                        return invalid_data_error(
+                            &format!("item in slot '{:?}' invalid equip type", slot));
+                    }
                 }
             }
 
@@ -96,7 +99,7 @@ impl Inventory {
             let quick_slot = *quick_slot;
 
             if quick_index > quick.len() { break; }
-            let item = match quick[quick_index] {
+            let item = match &quick[quick_index] {
                 None => continue,
                 Some(item) => item,
             };
@@ -216,6 +219,7 @@ impl Inventory {
         }
     }
 
+    #[must_use]
     pub fn clear_quick(&mut self, quick_slot: QuickSlot) -> Option<ItemState> {
         self.quick.remove(&quick_slot)
     }
@@ -241,22 +245,16 @@ impl Inventory {
 
     /// Sets the given item to the quick slot.  The caller must validate that the
     /// item can be set with `can_set_quick` prior to doing this
-    pub fn set_quick(&mut self, item_state: ItemState, slot: QuickSlot, actor: &Rc<Actor>) {
+    pub fn set_quick(&mut self, item_state: ItemState, slot: QuickSlot) {
         self.quick.insert(slot, item_state);
     }
 
     /// Returns true if the given item can be equipped
-    pub fn can_equip(&mut self, item_state: &ItemState, stats: &StatList, actor: &Rc<Actor>,
-                     preferred_slot: Option<Slot>) -> bool {
+    pub fn can_equip(&self, item_state: &ItemState, stats: &StatList, actor: &Rc<Actor>) -> bool {
         if !item_state.item.meets_prereqs(actor) { return false; }
         if !has_proficiency(item_state, stats) { return false; }
 
-        let (slot, alt_slot, blocked_slot) = match &item_state.item.equippable {
-            None => return false,
-            Some(ref equippable) => {
-                (equippable.slot, equippable.alternate_slot, equippable.blocks_slot)
-            }
-        };
+        if item_state.item.equippable.is_none() { return false; }
 
         true
     }
@@ -264,7 +262,8 @@ impl Inventory {
     /// Equips the specified item.  you must verify that the item can be equipped
     /// with `can_equip` first.  Returns a vec of any items that were unequipped as
     /// a result of equipping this item
-    pub fn equip(&mut self, item_state: ItemState, stats: &StatList, actor: &Rc<Actor>,
+    #[must_use]
+    pub fn equip(&mut self, item_state: ItemState,
                  preferred_slot: Option<Slot>) -> Vec<ItemState> {
         let mut unequipped = Vec::new();
 

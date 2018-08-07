@@ -575,7 +575,7 @@ impl ScriptItem {
                 to: "Item",
                 message: Some(format!("Item with kind {:?} does not exist", kind)),
             }),
-            Some(ref item) => item,
+            Some(item) => item,
         };
 
         let ap = match &item.item.usable {
@@ -681,9 +681,11 @@ fn activate_item(_lua: &Lua, script_item: &ScriptItem, target: ScriptEntity) -> 
                 let parent = ScriptEntity::new(script_item.parent).try_unwrap()?;
                 match &script_item.kind {
                     ScriptItemKind::Quick(slot) => {
-                        parent.borrow_mut().actor.clear_quick(*slot);
+                        // throw away item
+                        let _ = parent.borrow_mut().actor.clear_quick(*slot);
                     }, ScriptItemKind::ItemList(index) => {
-                        parent.borrow_mut().actor.remove_item(*index);
+                        // throw away item
+                        let _ = parent.borrow_mut().actor.remove_item(*index);
                     }, ScriptItemKind::WithID(_) => (),
                 };
             }

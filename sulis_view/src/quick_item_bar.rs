@@ -20,7 +20,7 @@ use std::cell::RefCell;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_rules::QuickSlot;
-use sulis_state::{ChangeListener, EntityState, GameState};
+use sulis_state::{ChangeListener, EntityState, GameState, script::ScriptItemKind};
 use sulis_widgets::{Label, Button};
 use {item_button::{clear_quickslot_cb, use_item_cb}, ItemButton};
 
@@ -80,19 +80,18 @@ impl WidgetKind for QuickItemBar {
 fn create_button(entity: &Rc<RefCell<EntityState>>, slot: QuickSlot,
                  theme_id: &str) -> Rc<RefCell<Widget>> {
     let actor = &entity.borrow().actor;
-    match actor.inventory().get_quick_index(slot) {
+    match actor.inventory().quick(slot) {
         None => {
             let button = Widget::empty(theme_id);
             button.borrow_mut().state.set_enabled(false);
             button
-        }, Some(index) => {
-            let (qty, item_state) = actor.inventory().items.get(index).unwrap();
-            let button = ItemButton::inventory(entity, item_state.item.icon.id(),
-                *qty, index);
-            button.borrow_mut().add_action("Use", use_item_cb(entity, index));
+        }, Some(item_state) => {
+            let kind = ScriptItemKind::Quick(slot);
+            let button = ItemButton::quick(entity, item_state.item.icon.id(), slot);
+            button.borrow_mut().add_action("Use", use_item_cb(entity, kind));
             button.borrow_mut().add_action("Clear Use Slot", clear_quickslot_cb(entity, slot));
             let widget = Widget::with_theme(button, theme_id);
-            widget.borrow_mut().state.set_enabled(actor.can_use(index));
+            widget.borrow_mut().state.set_enabled(actor.can_use(slot));
             widget
         }
     }

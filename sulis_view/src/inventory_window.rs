@@ -22,7 +22,7 @@ use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{Button, Label};
 use sulis_rules::{Slot, QuickSlot};
 use sulis_module::{Module};
-use sulis_state::{EntityState, ChangeListener, GameState};
+use sulis_state::{EntityState, ChangeListener, GameState, script::ScriptItemKind};
 
 use {item_button::*, ItemListPane, ItemButton, item_list_pane::Filter};
 
@@ -84,16 +84,14 @@ impl WidgetKind for InventoryWindow {
         for slot in Slot::iter() {
             let theme_id = format!("{:?}_button", slot).to_lowercase();
 
-            match actor.inventory().get_index(*slot) {
+            match actor.inventory().equipped(*slot) {
                 None => {
                     let button = Widget::empty(&theme_id);
                     button.borrow_mut().state.set_enabled(false);
                     Widget::add_child_to(&equipped_area, button);
-                }, Some(index) => {
-                    let item_state = actor.inventory().get(*slot).unwrap();
-
+                }, Some(item_state) => {
                     let button = ItemButton::equipped(&self.entity, item_state.item.icon.id(),
-                        index);
+                        *slot);
                     if !combat_active {
                         let mut but = button.borrow_mut();
                         but.add_action("Unequip", unequip_item_cb(&self.entity, *slot));
@@ -108,19 +106,18 @@ impl WidgetKind for InventoryWindow {
         for quick_slot in QuickSlot::iter() {
             let theme_id = format!("{:?}_button", quick_slot).to_lowercase();
 
-            match actor.inventory().get_quick_index(*quick_slot) {
+            match actor.inventory().quick(*quick_slot) {
                 None => {
                     let button = Widget::empty(&theme_id);
                     button.borrow_mut().state.set_enabled(false);
                     Widget::add_child_to(&equipped_area, button);
-                }, Some(index) => {
-                    let (qty, item_state) = actor.inventory().items.get(index).unwrap();
+                }, Some(item_state) => {
+                    let but = ItemButton::quick(&self.entity, item_state.item.icon.id(),
+                        *quick_slot);
 
-                    let but = ItemButton::inventory(&self.entity, item_state.item.icon.id(),
-                                                      *qty, index);
-
-                    if actor.can_use(index) {
-                        but.borrow_mut().add_action("Use", use_item_cb(&self.entity, index));
+                    if actor.can_use(*quick_slot) {
+                        let kind = ScriptItemKind::Quick(*quick_slot);
+                        but.borrow_mut().add_action("Use", use_item_cb(&self.entity, kind));
                     }
 
                     but.borrow_mut().add_action("Clear Use Slot",

@@ -148,10 +148,11 @@ impl ActorState {
 
         for (slot, item) in actor.inventory.equipped_iter() {
             let item = ItemState::new(item);
-            if !actor_state.inventory.can_equip(&item, &actor_state.stats, &actor, Some(slot)) {
+            if !actor_state.inventory.can_equip(&item, &actor_state.stats, &actor) {
                 warn!("Unable to equip item '{}' for actor '{}'", item.item.id, actor.id);
             } else {
-                actor_state.inventory.equip(item, &actor_state.stats, &actor, Some(slot));
+                let _ = actor_state.inventory.equip(item, Some(slot));
+                // don't deal with any items which have been unequiped as a result
             }
         }
 
@@ -160,7 +161,7 @@ impl ActorState {
             if !actor_state.inventory.can_set_quick(&item, slot, &actor) {
                 warn!("Unable to set quick item '{}' for actor '{}'", item.item.id, actor.id);
             } else {
-                actor_state.inventory.set_quick(item, slot, &actor);
+                actor_state.inventory.set_quick(item, slot);
             }
         }
 
@@ -484,26 +485,33 @@ impl ActorState {
         }
     }
 
-    // called after adding an item to the inventory.  if the quantity in
-    // the inventory is equal to quantity, it means the item was newly
-    // added and should be added to a quickslot if possible
-    fn check_add_to_quickslot(&mut self, index: usize, quantity: u32) {
-        {
-            let (qty, item_state) = match self.inventory.items.get(index) {
-                None => return,
-                Some(i) => i,
-            };
+    /// Adds the item at the specified index to the quickbar if it isn't already
+    /// present and there is a slot available
+    fn check_add_to_quickslot(&mut self, index: usize) {
+        let mut first_free = None;
 
-            if *qty != quantity { return; }
+        {
+            let (_, item_state) = self.inventory.items.get(index).unwrap();
 
             if item_state.item.usable.is_none() { return; }
+
+            for slot in QuickSlot::usable_iter() {
+                let other = self.inventory.quick(*slot);
+
+                if first_free.is_none() && other.is_none() {
+                    first_free = Some(*slot);
+                }
+
+                if let Some(other) = other {
+                    if other == item_state { return; }
+                }
+            }
         }
 
-        for slot in QuickSlot::usable_iter() {
-            if self.inventory.quick(*slot).is_some() { continue; }
-
-            self.set_quick(index, *slot);
-            return;
+        if let Some(slot) = first_free {
+            let item_state = self.inventory.items.remove(index).unwrap();
+            self.inventory.set_quick(item_state, slot);
+            self.listeners.notify(&self);
         }
     }
 
@@ -523,7 +531,7 @@ impl ActorState {
                 if let Some((qty, item_state)) = prop_state.remove_all_at(i) {
                     if !self.check_add_coins(qty, &item_state) {
                         let index = self.inventory.items.add_quantity(qty, item_state);
-                        self.check_add_to_quickslot(index, qty);
+                        self.check_add_to_quickslot(index);
                     }
                 }
 
@@ -543,7 +551,7 @@ impl ActorState {
         if let Some((qty, item_state)) = prop_state.remove_all_at(item_index) {
             if !self.check_add_coins(qty, &item_state) {
                 let index = self.inventory.items.add_quantity(qty, item_state);
-                self.check_add_to_quickslot(index, qty);
+                self.check_add_to_quickslot(index);
             }
         }
 
@@ -553,22 +561,24 @@ impl ActorState {
     pub fn add_item(&mut self, item_state: ItemState) {
         if !self.check_add_coins(1, &item_state) {
             let index = self.inventory.items.add(item_state);
-            self.check_add_to_quickslot(index, 1);
+            self.check_add_to_quickslot(index);
         }
         self.listeners.notify(&self);
     }
 
     pub fn set_quick(&mut self, index: usize, slot: QuickSlot) {
         if let Some(item) = self.inventory.items.remove(index) {
-            self.inventory.set_quick(item, slot, &self.actor);
+            self.inventory.set_quick(item, slot);
             self.listeners.notify(&self);
         }
     }
 
-    pub fn clear_quick(&mut self, slot: QuickSlot) -> Option<ItemState> {
+    pub fn clear_quick(&mut self, slot: QuickSlot) {
         let item = self.inventory.clear_quick(slot);
+        if let Some(item) = item {
+            self.inventory.items.add(item);
+        }
         self.listeners.notify(&self);
-        item
     }
 
     pub fn swap_weapon_set(&mut self) {
@@ -589,13 +599,13 @@ impl ActorState {
                 Some(&(_, ref item)) => item,
             };
 
-            if !self.inventory.can_equip(&item, &self.stats, &self.actor, preferred_slot) {
+            if !self.inventory.can_equip(&item, &self.stats, &self.actor) {
                 return false;
             }
         }
 
         let item = self.inventory.items.remove(index).unwrap();
-        let unequipped = self.inventory.equip(item, &self.stats, &self.actor, preferred_slot);
+        let unequipped = self.inventory.equip(item, preferred_slot);
         for item in unequipped {
             self.inventory.items.add(item);
         }
@@ -605,13 +615,16 @@ impl ActorState {
         true
     }
 
-    pub fn unequip(&mut self, slot: Slot)  {
-        if let Some(item) = self.inventory.unequip(slot) { self.inventory.items.add(item); }
+    #[must_use]
+    pub fn unequip(&mut self, slot: Slot) -> Option<ItemState> {
+        let item = self.inventory.unequip(slot);
         self.compute_stats();
         self.texture_cache_invalid = true;
+        item
     }
 
     /// removes one item at the specified index from this actor's inventory.
+    #[must_use]
     pub fn remove_item(&mut self, index: usize) -> Option<ItemState> {
         let item = self.inventory.items.remove(index);
         item

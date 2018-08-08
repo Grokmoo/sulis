@@ -11,6 +11,7 @@ deploy:
     skip_cleanup: true
     on:
       tags: true
+      all_branches: true
 before_deploy:
   - cargo build --release
   - cp target/release/main ./sulis

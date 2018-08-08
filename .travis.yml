@@ -6,7 +6,9 @@ cache: cargo
 before_deploy:
 - cargo build --release
 - cp target/release/main ./sulis
-- tar --exclude='./target' --exclude='./.git' -zcvf target/sulis-$TRAVIS_TAG.tar.gz .
+- ln -s . sulis/
+- >-
+  tar --transform 's|^|sulis/|' --exclude='./target' --exclude='./.git' -zcvf target/sulis-$TRAVIS_TAG.tar.gz sulis/*
 deploy:
   provider: releases
   skip_cleanup: true

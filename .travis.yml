@@ -1,0 +1,20 @@
+language: rust
+rust:
+  - stable
+cache: cargo
+jobs:
+  include:
+    - script:
+      - cargo build
+    - stage: GitHub Release
+      script:
+        - cargo build --release
+        - cp target/release/main.exe ./sulis.exe
+        - tar --exclude='./target' cvfz sulis-$TRAVIS_TAG.tar.gz .
+      deploy:
+        provider: releases
+        api_key: "$GITHUB_OAUTH_TOKEN"
+        file: sulis-$TRAVIS_TAG.tar.gz
+        skip_cleanup: true
+        on:
+          tags: true

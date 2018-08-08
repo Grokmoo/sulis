@@ -60,7 +60,7 @@ use sulis_core::config::CONFIG;
 use sulis_core::util::Point;
 use sulis_rules::QuickSlot;
 use sulis_module::{ability, Ability, Item, Module, OnTrigger};
-use {EntityState, ItemState, GameState, ai};
+use {EntityState, ItemState, GameState, ai, area_feedback_text::ColorKind};
 
 type Result<T> = std::result::Result<T, rlua::Error>;
 
@@ -700,6 +700,10 @@ fn activate_item(_lua: &Lua, script_item: &ScriptItem, target: ScriptEntity) -> 
     if mgr.borrow().is_combat_active() {
         target.borrow_mut().actor.remove_ap(script_item.ap);
     }
+
+    let area = GameState::area_state();
+    let name = item.name.to_string();
+    area.borrow_mut().add_feedback_text(name, &target, ColorKind::Info, 3.0);
 
     match item.usable {
         None => unreachable!(),

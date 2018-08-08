@@ -29,7 +29,7 @@ use sulis_core::io::{GraphicsRenderer};
 use sulis_core::ui::{Widget};
 use sulis_module::{Ability, Actor, Module, ObjectSize, OnTrigger, area::{Trigger, TriggerKind}};
 
-use {area_feedback_text::ColorKind, ai, AI, AreaState, ChangeListener, ChangeListenerList,
+use {ai, AI, AreaState, ChangeListener, ChangeListenerList,
     EntityState, Location, Formation, ItemList, ItemState, PartyStash,
     PathFinder, SaveState, ScriptState, UICallback, MOVE_TO_THRESHOLD, TurnManager};
 use script::{script_callback::{self, ScriptHitKind}, ScriptEntitySet, ScriptCallback, ScriptItemKind};
@@ -443,10 +443,6 @@ impl GameState {
     }
 
     pub fn execute_item_on_activate(parent: &Rc<RefCell<EntityState>>, kind: ScriptItemKind) {
-        let area = GameState::area_state();
-        let item = kind.item(parent);
-        let name = item.item.name.to_string();
-        area.borrow_mut().add_feedback_text(name, parent, ColorKind::Info, 3.0);
         exec_script!(item_on_activate: parent, kind);
     }
 
@@ -476,8 +472,6 @@ impl GameState {
     }
 
     pub fn execute_ability_on_activate(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>) {
-        let area = GameState::area_state();
-        area.borrow_mut().add_feedback_text(ability.name.to_string(), parent, ColorKind::Info, 3.0);
         exec_script!(ability_on_activate: parent, ability);
     }
 
@@ -488,6 +482,7 @@ impl GameState {
                                             affected_points: Vec<Point>,
                                             func: &str,
                                             custom_target: Option<Rc<RefCell<EntityState>>>) {
+
         exec_script!(ability_on_target_select: parent, ability, targets, selected_point,
                      affected_points, func, custom_target);
     }

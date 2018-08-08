@@ -1,0 +1,9 @@
+id: spiders_level5
+auto_spawn: true
+min_gen_actors: 6
+max_gen_actors: 8
+entries:
+  - id: spider_large
+    always: true
+  - id: spider
+    weight: 1

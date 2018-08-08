@@ -1,3 +1,4 @@
+if: tag IS present
 language: rust
 rust:
 - stable
@@ -6,11 +7,11 @@ deploy:
   provider: releases
   api_key:
     secure: WqVU2+FiAaGaaZp24VB7+CaCG9Xy5jVZZ5ytNAv2UTnd7R1pByBVTisQogrT+8CgxrCJbcE56vh7PaA5sNxV2BgVJt3WnSSz7EJ3eGsatKSVDZIECs6A++1ZNAlSCxYDXYa85Uh5USQzNiHspeWK04YE+b/ZHSJFl4kyCCVLgviV57QZq/nYivbLzbPM99aEt2Xf3Krfd/duBHLIucbxzRAJ3BeqG/dTDq/SIHtpS/PR92+EVTY9WxFDN1xJE08JKDlDy356wPN/xPgSSFWpFRBq3EBQH07KNj87WVkcaDiqnRas+6Z6iPmijUiBoIgbw/OD3Oly4A1rkC/gROuXFjHlOIioS1/WFjyOqWHt3MnVuC/QRb6GF5pCqQAeIlYC1OhuYX9j0kq5g472c/KnxToIIqPvE4PxAEmYFEEkhsvnHGphRR7iHhouK/cpSlozTejSfRnKZU5LAAZPtmKJBQ58kzhIdWnu4xVR9hOs0rLBpZEkO5Ad6KF25Q+vYwNgVnjh41kxjR778tl1u45LcgfvdEDWQy/6Gff5rhdkaifw7UK4o7HsktD9LxrQbzqVIkoUPCETd+I7Pmp7XB8CV45w2TJkdu8ix4jyN32BTc5985t3KA6Y8FmTxpZUYM9dDruWstRy50ves94RtGfxm4imwAGCXUicoZR31rULxwA=
-    file: sulis-$TRAVIS_TAG.tar.gz
+    file: target/sulis-$TRAVIS_TAG.tar.gz
     skip_cleanup: true
     on:
       tags: true
 before_deploy:
   - cargo build --release
   - cp target/release/main ./sulis
-  - tar --exclude='./target' --exclude='./.git' -cvfz sulis-$TRAVIS_TAG.tar.gz .
+  - tar --exclude='./target' --exclude='./.git' -zcvf target/sulis-$TRAVIS_TAG.tar.gz .

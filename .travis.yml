@@ -3,7 +3,10 @@ rust:
 - stable
 cache: cargo
 jobs:
-  - stage: Build and Release
+  - stage: Build
+    script:
+    - cargo build
+  - stage: Release
     script:
     - cargo build --release
     - cp target/release/main.exe ./sulis.exe

@@ -3,9 +3,7 @@ rust:
 - stable
 cache: cargo
 jobs:
-  - stage: Build
-    script:
-    - cargo build
+  include:
   - stage: Release
     script:
     - cargo build --release

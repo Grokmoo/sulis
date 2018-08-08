@@ -13,8 +13,10 @@ script:
   - cargo install cross
   - cross build --release --target $TARGET
 before_deploy:
-- cp target/$TARGET/release/main$TARGET_EXTENSION ./sulis$TARGET_EXTENSION
+- mkdir sulis/
+- cp target/$TARGET/release/main$TARGET_EXTENSION sulis/sulis$TARGET_EXTENSION
 - git archive HEAD --prefix=sulis/ --format=zip -o sulis-$TRAVIS_TAG-$TARGET_NAME.zip
+- zip -u sulis-$TRAVIS_TAG-$TARGET_NAME.zip sulis/sulis$TARGET_EXTENSION
 deploy:
   provider: releases
   skip_cleanup: true

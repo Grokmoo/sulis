@@ -1,4 +1,7 @@
 if: tag IS present
+sudo: required
+services:
+  - docker
 language: rust
 rust:
 - stable
@@ -7,12 +10,13 @@ matrix:
     - env: TARGET=x86_64-unknown-linux-musl TARGET_NAME=linux64
     - env: TARGET=x86_64-pc-windows-gnu TARGET_NAME=win64
 cache: cargo
+script:
+  - cargo install cross
+  - cross build --release --target $TARGET
 before_cache:
   # Travis can't cache files that are not readable by "others"
 - chmod -R a+r $HOME/.cargo
 before_deploy:
-- cargo install cross
-- cross build --release --target $TARGET
 - cp target/$TARGET/release/main ./sulis
 - >-
   tar --transform 's|^|sulis/|' --exclude='./target' --exclude='./.git' -zcvf target/sulis-$TRAVIS_TAG-$TARGET_NAME.tar.gz .

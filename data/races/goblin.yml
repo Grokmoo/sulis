@@ -37,7 +37,7 @@ ticker_offset: [0.5, 1]
 image_layer_offset_scale: 16
 image_layer_offsets:
   HeldMain: [-23, -20]
-  HeldOff: [8, -20]
+  HeldOff: [6, -20]
   Shadow: [0, -4]
   Background: [0, -7]
 image_layer_postfix: {}

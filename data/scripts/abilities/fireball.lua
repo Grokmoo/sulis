@@ -5,7 +5,8 @@ function on_activate(parent, ability)
   
   targeter = parent:create_targeter(ability)
   targeter:set_free_select(15.0)
-  targeter:set_free_select_must_be_passable("1by1")
+  -- TODO build support for free_select_must_be_terrain_passable
+  -- targeter:set_free_select_must_be_passable("1by1")
   -- targeter:set_shape_circle(fireball_radius)
   targeter:set_shape_object_size("9by9round")
   targeter:add_all_effectable(targets)

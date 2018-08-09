@@ -252,7 +252,7 @@ impl AreaState {
             let encounter = &enc_data.encounter;
             if !encounter.auto_spawn { continue; }
 
-            self.spawn_encounter(enc_index, enc_data);
+            self.spawn_encounter(enc_index, enc_data, true);
         }
     }
 
@@ -358,14 +358,17 @@ impl AreaState {
         for (enc_index, enc_data) in area.encounters.iter().enumerate() {
             if enc_data.location.x != x || enc_data.location.y != y { continue; }
 
-            self.spawn_encounter(enc_index, enc_data);
+            // this method is called by script, still spawn in debug mode
+            self.spawn_encounter(enc_index, enc_data, false);
             return true
         }
 
         false
     }
 
-    pub fn spawn_encounter(&mut self, enc_index: usize, enc_data: &EncounterData) {
+    pub fn spawn_encounter(&mut self, enc_index: usize, enc_data: &EncounterData,
+                           respect_debug: bool) {
+        if respect_debug && GameState::is_debug() { return; }
         let encounter = &enc_data.encounter;
         let actors = encounter.gen_actors();
         for actor in actors {

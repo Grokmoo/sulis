@@ -1,0 +1,34 @@
+id: goblin_mage
+ai: ai_basic
+name: Goblin Mage
+faction: Hostile
+race: goblin
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
+levels:
+  mage: 10
+reward:
+  xp: 200
+  loot: level5_misc
+  loot_chance: 45
+images:
+  Background: creatures/goblin3
+abilities:
+  - armor_light
+  - armor_medium
+  - armor_heavy
+  - weapon_axe
+  - weapon_crossbow
+  - weapon_bow
+  - weapon_spear
+  - weapon_mace
+  - weapon_simple
+  - petrify
+  - fireball
+  - healing_circle
+  - acid_spores

@@ -1,0 +1,40 @@
+id: goblin_champion
+ai: ai_basic
+name: Goblin Champion
+faction: Hostile
+race: goblin
+attributes:
+  str: 10
+  dex: 11
+  end: 14
+  per: 10
+  int: 10
+  wis: 10
+levels:
+  fighter: 10
+inventory:
+  equipped:
+    HeldMain: shortsword
+    HeldOff: shield_large
+    Torso: torso_plate
+reward:
+  xp: 200
+  loot: level5_misc
+  loot_chance: 45
+images:
+  Background: creatures/goblin4
+abilities:
+  - armor_light
+  - armor_medium
+  - armor_heavy
+  - weapon_axe
+  - weapon_crossbow
+  - weapon_bow
+  - weapon_small_sword
+  - weapon_large_sword
+  - weapon_spear
+  - weapon_mace
+  - weapon_simple
+  - shield_slam
+  - defensive_fighting
+  - guardian

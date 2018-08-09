@@ -1,0 +1,40 @@
+id: goblin_killer
+ai: ai_basic
+name: Goblin Killer
+faction: Hostile
+race: goblin
+attributes:
+  str: 13
+  dex: 10
+  end: 12
+  per: 10
+  int: 10
+  wis: 10
+levels:
+  fighter: 10
+inventory:
+  equipped:
+    HeldMain: greataxe
+  quick:
+    Usable1: potion_healing
+reward:
+  xp: 200
+  loot: level5_misc
+  loot_chance: 45
+images:
+  Background: creatures/goblin2
+abilities:
+  - armor_light
+  - armor_medium
+  - armor_heavy
+  - weapon_axe
+  - weapon_crossbow
+  - weapon_bow
+  - weapon_small_sword
+  - weapon_large_sword
+  - weapon_spear
+  - weapon_mace
+  - weapon_simple
+  - mighty_blow
+  - powerful_blows
+  - whirlwind_attack

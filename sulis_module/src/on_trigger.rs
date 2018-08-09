@@ -33,12 +33,30 @@ pub struct ScriptData {
 #[derive(Deserialize, Serialize, Debug, Clone, Default)]
 #[serde(deny_unknown_fields)]
 pub struct OnTrigger {
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub player_ability: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub target_flags: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub player_flags: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub show_merchant: Option<MerchantData>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub show_cutscene: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub start_conversation: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub fire_script: Option<ScriptData>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub say_line: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub game_over_window: Option<String>,
 }

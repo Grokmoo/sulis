@@ -450,6 +450,17 @@ impl UserData for ScriptInterface {
             Ok(())
         });
 
+        methods.add_method("show_game_over_window", |_, _, text: String| {
+            let pc = GameState::player();
+            let cb = OnTrigger {
+                game_over_window: Some(text),
+                ..Default::default()
+            };
+
+            GameState::add_ui_callback(cb, &pc, &pc);
+            Ok(())
+        });
+
         methods.add_method("show_cutscene", |_, _, id: String| {
             let pc = GameState::player();
 

@@ -25,7 +25,7 @@ use rlua::{self, Lua, UserData, UserDataMethods};
 use sulis_core::util::ExtInt;
 use sulis_core::config::CONFIG;
 use sulis_core::resource::ResourceSet;
-use sulis_rules::{AttackKind, DamageKind, Attack};
+use sulis_rules::{Attribute, AttackKind, DamageKind, Attack};
 use {ActorState, EntityState, GameState, Location, area_feedback_text::ColorKind};
 use {ai, animation::{self}, script::*};
 
@@ -623,6 +623,8 @@ pub fn unwrap_point(point: HashMap<String, i32>) -> Result<(i32, i32)> {
 }
 
 fn create_stats_table<'a>(lua: &'a Lua, parent: &ScriptEntity, _args: ()) -> Result<rlua::Table<'a>> {
+    let rules = Module::rules();
+
     let parent = parent.try_unwrap()?;
     let parent = parent.borrow();
     let src = &parent.actor.stats;
@@ -637,6 +639,16 @@ fn create_stats_table<'a>(lua: &'a Lua, parent: &ScriptEntity, _args: ()) -> Res
     stats.set("perception", src.attributes.perception)?;
     stats.set("intellect", src.attributes.intellect)?;
     stats.set("wisdom", src.attributes.wisdom)?;
+
+    {
+        use self::Attribute::*;
+        stats.set("strength_bonus", src.attributes.bonus(Strength, rules.base_attribute))?;
+        stats.set("dexterity_bonus", src.attributes.bonus(Dexterity, rules.base_attribute))?;
+        stats.set("endurance_bonus", src.attributes.bonus(Endurance, rules.base_attribute))?;
+        stats.set("perception_bonus", src.attributes.bonus(Perception, rules.base_attribute))?;
+        stats.set("intellect_bonus", src.attributes.bonus(Intellect, rules.base_attribute))?;
+        stats.set("wisdom_bonus", src.attributes.bonus(Wisdom, rules.base_attribute))?;
+    }
 
     stats.set("base_armor", src.armor.base())?;
     let armor = lua.create_table()?;

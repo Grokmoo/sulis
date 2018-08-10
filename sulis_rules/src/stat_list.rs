@@ -340,7 +340,7 @@ impl StatList {
         self.initiative += dex_bonus / 2 + per_bonus / 2;
         self.melee_accuracy += per_bonus + str_bonus * 2;
         self.ranged_accuracy += per_bonus + dex_bonus * 2;
-        self.spell_accuracy += per_bonus + int_bonus * 2;
+        self.spell_accuracy += wis_bonus + int_bonus * 2;
         self.defense += dex_bonus * 2;
         self.fortitude += end_bonus * 2;
         self.reflex += dex_bonus * 2;

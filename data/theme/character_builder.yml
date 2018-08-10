@@ -324,7 +324,7 @@ children:
             position: [-40, 70]
             text: "Perception"
             custom:
-              tooltip: "Affects all of your accuracy stats and the order you go in combat."
+              tooltip: "Affects melee and ranged accuracy stats and the order you go in combat."
           per_spinner:
             from: .spinner
             position: [-20, 70]
@@ -340,7 +340,7 @@ children:
             position: [-40, 85]
             text: "Intelligence"
             custom:
-              tooltip: "Affects accuracy with spells."
+              tooltip: "Affects spell accuracy and power of spells and many special abilities."
           int_spinner:
             from: .spinner
             position: [-20, 85]
@@ -356,7 +356,7 @@ children:
             position: [-40, 100]
             text: "Wisdom"
             custom:
-              tooltip: "Affects your ability to resist many magical effects."
+              tooltip: "Affects spell accuracy and your ability to resist many magical effects."
           wis_spinner:
             from: .spinner
             position: [-20, 100]

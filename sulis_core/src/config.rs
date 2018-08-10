@@ -36,7 +36,21 @@ pub struct Config {
   pub editor: EditorConfig,
 
   #[serde(default)]
-  pub debug: bool,
+  pub debug: DebugConfig,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct DebugConfig {
+    pub encounter_spawning: bool,
+}
+
+impl Default for DebugConfig {
+    fn default() -> Self {
+        DebugConfig {
+            encounter_spawning: true
+        }
+    }
 }
 
 #[derive(Debug, Deserialize, Clone)]

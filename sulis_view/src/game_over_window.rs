@@ -19,17 +19,18 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_widgets::{Button, Label};
+use sulis_widgets::{Button, Label, TextArea};
 
 const NAME: &str = "game_over_window";
 
 pub struct GameOverWindow {
     menu_callback: Callback,
+    content_text: String,
 }
 
 impl GameOverWindow {
-    pub fn new(menu_callback: Callback ) -> Rc<RefCell<GameOverWindow>> {
-        Rc::new(RefCell::new(GameOverWindow { menu_callback }))
+    pub fn new(menu_callback: Callback, content_text: String) -> Rc<RefCell<GameOverWindow>> {
+        Rc::new(RefCell::new(GameOverWindow { menu_callback, content_text }))
     }
 }
 
@@ -40,9 +41,10 @@ impl WidgetKind for GameOverWindow {
         widget.borrow_mut().state.set_modal(true);
 
         let label = Widget::with_theme(Label::empty(), "title");
+        let content = Widget::with_theme(TextArea::new(&self.content_text), "content");
         let exit = Widget::with_theme(Button::empty(), "exit");
         exit.borrow_mut().state.add_callback(self.menu_callback.clone());
 
-        vec![label, exit]
+        vec![label, exit, content]
     }
 }

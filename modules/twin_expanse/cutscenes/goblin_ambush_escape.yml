@@ -1,0 +1,18 @@
+id: goblin_ambush_escape
+on_end:
+  game_over_window: |
+    Thanks for playing the introductory campaign for Sulis.  Check back in the coming months for more content!
+  fire_script:
+    id: goblin_cliffs
+    func: after_escape_cutscene
+frames:
+  - text: |
+      You and your companions attempt to push through the pass, but it rapidly narrows around you.
+      
+      The goblins pursue you, forcing you ever further nonetheless.
+  - text: |
+      Finally, you are almost through - the pass widens again, and you can see a valley ahead of you.
+  - text: |
+      All at once you hear a loud crack and goblin screaming.  The pass is collapsing in!
+  - text: |
+      The only thing you can do is try to push forward as darkness overtakes you...

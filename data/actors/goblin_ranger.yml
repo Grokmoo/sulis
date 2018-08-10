@@ -1,0 +1,35 @@
+id: goblin_ranger
+ai: ai_basic
+name: Goblin Ranger
+faction: Hostile
+images: {}
+race: goblin
+attributes:
+  str: 9
+  dex: 12
+  end: 10
+  per: 12
+  int: 10
+  wis: 10
+levels:
+  rogue: 10
+inventory:
+  equipped:
+    HeldMain: longbow
+  quick:
+    AltHeldMain: dagger
+reward:
+  xp: 200
+  loot: level5_misc
+  loot_chance: 35
+abilities:
+  - armor_light
+  - armor_medium
+  - weapon_bow
+  - weapon_small_sword
+  - weapon_spear
+  - weapon_simple
+  - backstab
+  - backstab
+  - flanker
+  - flanker

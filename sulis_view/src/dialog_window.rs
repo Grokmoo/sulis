@@ -18,13 +18,13 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_core::ui::{Widget, WidgetKind, theme};
+use sulis_core::ui::{Widget, WidgetKind, theme, Callback};
 use sulis_core::io::event;
 use sulis_widgets::{Label, TextArea};
 use sulis_module::{Actor, OnTrigger, MerchantData, Conversation, conversation::{Response}, Module};
-use sulis_state::{EntityState, ChangeListener, GameState, area_feedback_text::ColorKind};
+use sulis_state::{EntityState, ChangeListener, GameState, area_feedback_text::ColorKind, NextGameStep};
 
-use {CutsceneWindow, RootView};
+use {CutsceneWindow, RootView, GameOverWindow};
 
 pub const NAME: &str = "dialog_window";
 
@@ -283,6 +283,23 @@ pub fn activate(widget: &Rc<RefCell<Widget>>, on_select: &OnTrigger,
     if let Some(ref script) = on_select.fire_script {
         fire_script(&script.id, &script.func, pc, target)
     }
+
+    if let Some(ref text) = on_select.game_over_window {
+        game_over_window(widget, text.clone())
+    }
+}
+
+fn game_over_window(widget: &Rc<RefCell<Widget>>, text: String) {
+    let menu_cb = Callback::new(Rc::new(|widget, _| {
+        let root = Widget::get_root(widget);
+        let root_view = Widget::downcast_kind_mut::<RootView>(&root);
+        root_view.next_step = Some(NextGameStep::MainMenu);
+    }));
+    let window = Widget::with_theme(GameOverWindow::new(menu_cb, text),
+        "script_game_over_window");
+    window.borrow_mut().state.set_modal(true);
+    let root = Widget::get_root(widget);
+    Widget::add_child_to(&root, window);
 }
 
 fn fire_script(script_id: &str, func: &str, parent: &Rc<RefCell<EntityState>>,

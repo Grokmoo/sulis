@@ -78,9 +78,7 @@ function check_swap_weapons(parent, hostiles)
 	end
 	
 	if parent:inventory():alt_weapon_style() ~= "Ranged" then
-		game:log("alt weapon match")
 		if parent:swap_weapons() then
-			game:log("swap success")
 			return { done=true }
 		end
 	end
@@ -165,7 +163,6 @@ function check_action(parent, ai_data, hostiles, friendlies, failed_use_count)
         target_dist = 8 - failed_use_count * 2
     elseif ai_data.range == "Visible" then
         target_dist = parent:vis_dist() - 1 - failed_use_count * 3
-		game:log("moving to within " .. target_dist .. " for long range")
     end
 	
 	dist = parent:dist_to_entity(target)

@@ -34,6 +34,9 @@ pub struct Config {
   pub input: InputConfig,
   pub logging: LoggingConfig,
   pub editor: EditorConfig,
+
+  #[serde(default)]
+  pub debug: bool,
 }
 
 #[derive(Debug, Deserialize, Clone)]

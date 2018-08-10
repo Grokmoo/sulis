@@ -472,7 +472,7 @@ impl WidgetKind for RootView {
                 let root_view = Widget::downcast_kind_mut::<RootView>(&root);
                 root_view.next_step = Some(NextGameStep::MainMenu);
             }));
-            let menu = Widget::with_defaults(GameOverWindow::new(menu_cb));
+            let menu = Widget::with_defaults(GameOverWindow::new(menu_cb, String::new()));
             Widget::add_child_to(&widget_ref, menu);
         })));
 

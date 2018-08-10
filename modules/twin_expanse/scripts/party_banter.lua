@@ -1,5 +1,12 @@
 names = { "npc_aessa", "npc_grazi", "npc_jorzal" }
 
+function on_enter_wellswood_road_north_cliffs(parent, target)
+  party_member = get_party_member()
+  if party_member == nil then return end
+  
+  game:say_line("I don't cherish the idea of heading into these hills - they are going to be swarming with goblins.", party_member)
+end
+
 function on_enter_wellswood_road_cave(parent, target)
   party_member = get_party_member()
   if party_member == nil then return end

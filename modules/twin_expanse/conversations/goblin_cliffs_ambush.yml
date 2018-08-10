@@ -1,0 +1,32 @@
+id: goblin_cliffs_ambush
+initial_nodes:
+  - [start01, ~]
+nodes:
+  start01:
+    text: |
+      [c=888|A horde of goblins emerges from the cliffs behind you.  You are hopelessly outmatched.]
+    responses:
+      - text: |
+          [c=888|Continue]
+        to: start02
+  start02:
+    text: |
+      [c=888|In front of you, the pass narrows further.  But, you think you can squeeze through.]
+    responses:
+      - text: |
+          Lets kill every one of these bastards!
+        to: start03a
+      - text: |
+          [c=888|Try and escape through the pass.]
+        on_select:
+          show_cutscene: goblin_ambush_escape
+  start03a:
+    text: |
+      [c=888|Your companions do not share your enthusiasm.  Staying here means certain death.]
+    responses:
+      - text: |
+          [c=f00|Stand and fight.]
+      - text: |
+          [c=888|Try and escape through the pass.]
+        on_select:
+          show_cutscene: goblin_ambush_escape

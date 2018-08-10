@@ -907,6 +907,37 @@ children:
           ]
         width_relative: Max
         height_relative: Max
+  script_game_over_window:
+    background: bg_base
+    border: [3, 3, 3, 3]
+    preferred_size: [100, 50]
+    x_relative: Center
+    y_relative: Center
+    position: [0, 0]
+    children:
+      title:
+        from: .label
+        width_relative: Max
+        preferred_size: [0, 4]
+        position: [0, 3]
+        text_params:
+          scale: 7
+        text: "The End for now"
+      content:
+        from: .text_area
+        text: "#0#"
+        position: [0, 13]
+        width_relative: Max
+        preferred_size: [0, 20]
+      exit:
+        from: .button
+        preferred_size: [36, 12]
+        text: "Main Menu"
+        text_params:
+          scale: 7
+        position: [0, 0]
+        x_relative: Center
+        y_relative: Max
   game_over_window:
     background: 60_transparent_fill
     border: [1, 1, 1, 1]
@@ -922,6 +953,8 @@ children:
         text_params:
           scale: 7
         text: "You have died!"
+      content:
+        from: .text_area
       exit:
         from: .button
         preferred_size: [36, 12]

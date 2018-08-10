@@ -1,0 +1,22 @@
+id: enter_goblin_camp
+initial_nodes:
+  - [start01, ~]
+nodes:
+  start01:
+    text: |
+      [c=888|Straight ahead, you see clear markings from a large group of goblins.  There is a camp ahead.]
+      
+      [c=888| You also see a pass leading off to the East.  It may take longer, but you will likely meet less resistance that way.]
+    responses:
+      - text: |
+          It looks like there is a pass to the East.  Lets try to go around.
+        to: start02
+      - text: |
+          The fastest way out of here is going to be straight through those goblins ahead.
+        to: start02
+  start02:
+    text: |
+      [c=888|The others nod agreement.  They will follow your decision, whatever it may be.]
+    responses:
+      - text: |
+          Lets go.

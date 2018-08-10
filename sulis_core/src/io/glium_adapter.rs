@@ -34,7 +34,7 @@ use glium::texture::{RawImage2d, SrgbTexture2d};
 use glium::uniforms::{MinifySamplerFilter, MagnifySamplerFilter, Sampler};
 
 const VERTEX_SHADER_SRC: &'static str = r#"
-  #version 140
+  #version 130
   in vec2 position;
   in vec2 tex_coords;
   out vec2 v_tex_coords;
@@ -47,7 +47,7 @@ const VERTEX_SHADER_SRC: &'static str = r#"
 "#;
 
 const FRAGMENT_SHADER_SRC: &'static str = r#"
-  #version 140
+  #version 130
   in vec2 v_tex_coords;
   out vec4 color;
   uniform sampler2D tex;
@@ -60,7 +60,7 @@ const FRAGMENT_SHADER_SRC: &'static str = r#"
 "#;
 
 const SWAP_FRAGMENT_SHADER_SRC: &'static str = r#"
-  #version 140
+  #version 130
   in vec2 v_tex_coords;
   out vec4 color;
   uniform sampler2D tex;

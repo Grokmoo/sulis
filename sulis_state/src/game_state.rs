@@ -41,7 +41,6 @@ thread_local! {
     static AI: RefCell<AI> = RefCell::new(AI::new());
     static CLEAR_ANIMS: Cell<bool> = Cell::new(false);
     static MODAL_LOCKED: Cell<bool> = Cell::new(false);
-    static DEBUG_MODE: Cell<bool> = Cell::new(false);
     static SCRIPT: ScriptState = ScriptState::new();
     static ANIMATIONS: RefCell<AnimState> = RefCell::new(AnimState::new());
     static ANIMS_TO_ADD: RefCell<Vec<Anim>> = RefCell::new(Vec::new());
@@ -81,7 +80,6 @@ macro_rules! exec_script {
 
 impl GameState {
     pub fn load(save_state: SaveState) -> Result<(), Error> {
-        DEBUG_MODE.with(|debug| debug.set(CONFIG.debug));
         TURN_MANAGER.with(|mgr| mgr.borrow_mut().clear());
         ANIMATIONS.with(|anims| anims.borrow_mut().clear());
 
@@ -194,7 +192,6 @@ impl GameState {
     }
 
     pub fn init(pc_actor: Rc<Actor>) -> Result<(), Error> {
-        DEBUG_MODE.with(|debug| debug.set(CONFIG.debug));
         TURN_MANAGER.with(|mgr| {
             mgr.borrow_mut().clear();
         });
@@ -689,10 +686,6 @@ impl GameState {
                 }
             }
         })
-    }
-
-    pub fn is_debug() -> bool {
-        DEBUG_MODE.with(|d| d.get())
     }
 
     pub fn is_modal_locked() -> bool {

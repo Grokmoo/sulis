@@ -290,33 +290,55 @@ fn get_monitor(events_loop: &glium::glutin::EventsLoop) -> Option<glium::glutin:
     None
 }
 
+fn try_get_display(events_loop: &glium::glutin::EventsLoop,
+                   monitor: Option<glium::glutin::MonitorId>)
+    -> Result<glium::Display, glium::backend::glutin::DisplayCreationError> {
+
+    let (fullscreen, decorations) = match CONFIG.display.mode {
+        DisplayMode::Window => (None, true),
+        DisplayMode::BorderlessWindow => (None, false),
+        DisplayMode::Fullscreen => (monitor, false),
+    };
+
+    let dims = glutin::dpi::LogicalSize::new(CONFIG.display.width_pixels as f64,
+                                             CONFIG.display.height_pixels as f64);
+
+
+    let window = glium::glutin::WindowBuilder::new()
+        .with_dimensions(dims)
+        .with_title("Sulis")
+        .with_decorations(decorations)
+        .with_fullscreen(fullscreen.clone());
+    let context = ContextBuilder::new()
+        .with_pixel_format(24, 8);
+
+    match glium::Display::new(window, context, &events_loop) {
+        Ok(display) => return Ok(display),
+        Err(e) => {
+            warn!("Unable to create hardware accelerated display, falling back...");
+            warn!("{}", e);
+        }
+    };
+
+    let window = glium::glutin::WindowBuilder::new()
+        .with_dimensions(dims)
+        .with_title("Sulis")
+        .with_decorations(decorations)
+        .with_fullscreen(fullscreen);
+    let context = ContextBuilder::new()
+        .with_hardware_acceleration(None)
+        .with_pixel_format(24, 8);
+
+    return glium::Display::new(window, context, &events_loop)
+}
+
 impl GliumDisplay {
     pub fn new() -> Result<GliumDisplay, Error> {
         debug!("Initialize Glium Display adapter.");
         let events_loop = glium::glutin::EventsLoop::new();
         let monitor = get_monitor(&events_loop);
 
-        let (fullscreen, decorations) = match CONFIG.display.mode {
-            DisplayMode::Window => (None, true),
-            DisplayMode::BorderlessWindow => (None, false),
-            DisplayMode::Fullscreen => (monitor.clone(), false),
-        };
-
-        let dims = glutin::dpi::LogicalSize::new(CONFIG.display.width_pixels as f64,
-                                                 CONFIG.display.height_pixels as f64);
-
-        let window = glium::glutin::WindowBuilder::new()
-            .with_dimensions(dims)
-            .with_title("Sulis")
-            .with_decorations(decorations)
-            .with_fullscreen(fullscreen);
-
-        let context = ContextBuilder::new()
-            .with_gl_debug_flag(false)
-            .with_multisampling(0)
-            .with_pixel_format(24, 8);
-
-        let display = match glium::Display::new(window, context, &events_loop) {
+        let display = match try_get_display(&events_loop, monitor.clone()) {
             Ok(display) => display,
             Err(e) => return glium_error(e),
         };

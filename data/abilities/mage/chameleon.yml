@@ -2,7 +2,7 @@ id: chameleon
 name: "Chameleon"
 icon: abilities/chameleon
 description: |
-  You gain 50% concealment, causing half of attacks against you to miss, regardless of your opponent's attack rolls.
+  You gain a large amount of concealment, causing many attacks against you to miss, regardless of your opponent's attack rolls.
 active:
   script: "chameleon"
   group: "3rd Circle"

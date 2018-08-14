@@ -65,7 +65,7 @@ function attack_target(parent, ability, targets)
   target = targets:first()
   
   hit = parent:special_attack(target, "Reflex", "Ranged")
-  amount = -2000
+  amount = -(2 + stats.intellect_bonus / 20) * game:ap_display_factor()
   if hit:is_miss() then
     return
   elseif hit:is_graze() then

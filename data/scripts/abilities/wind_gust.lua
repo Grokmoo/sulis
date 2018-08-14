@@ -1,4 +1,4 @@
-max_dist = 18
+max_dist = 14
 
 function on_activate(parent, ability)
   targets = parent:targets():without_self()
@@ -47,10 +47,11 @@ end
 
 function push_target(parent, ability, targets)
   target = targets:first()
+  stats = parent:stats()
 
   hit = parent:special_attack(target, "Reflex", "Spell")
   
-  pushback_dist = 8 - target:width()
+  pushback_dist = math.floor(8 + stats.caster_level / 3 + stats.intellect_bonus / 6 - target:width())
   if hit:is_miss() then
     pushback_dist = pushback_dist - 4
   elseif hit:is_graze() then
@@ -93,7 +94,7 @@ function push_target(parent, ability, targets)
   
   push_damage_base = pushback_dist - total_dist
   if push_damage_base > 0 then
-    target:take_damage(push_damage_base * 4 - 2, push_damage_base * 4 + 2, "Crushing")
+    target:take_damage(push_damage_base * 3 - 2, push_damage_base * 3 + 2, "Crushing")
   end
   
   -- return if the result is to not move the target

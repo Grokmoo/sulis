@@ -2,7 +2,7 @@ id: acid_spores
 name: "Acid Spores"
 icon: abilities/acid_spores
 description: |
-  You launch a series of blasts of a powerful corrosive acid at nearby targets.  Opponents caught in the blast suffer substantial damage over time.  The effect does not stack.
+  You launch a series of blasts of a powerful corrosive acid at nearby targets.  Opponents caught in the blast suffer substantial damage over time.  The spell leaves behind a damaging acid surface that lasts for 4 turns.
 active:
   script: "acid_spores"
   group: "3rd Circle"

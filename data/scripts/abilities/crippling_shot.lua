@@ -39,13 +39,14 @@ function create_cripple_effect(parent, ability, targets, hit)
   if hit:is_miss() then return end
   
   effect = target:create_effect(ability:name(), ability:duration())
+  stats = parent:stats()
   
   if hit:is_graze() then
-    effect:add_num_bonus("movement_rate", -0.5)
+    effect:add_num_bonus("movement_rate", -0.5 - stats.level / 60)
   elseif hit:is_hit() then
-    effect:add_num_bonus("movement_rate", -0.75)
+    effect:add_num_bonus("movement_rate", -0.75 - stats.level / 40)
   elseif hit:is_crit() then
-    effect:add_num_bonus("movement_rate", -1.0)
+    effect:add_num_bonus("movement_rate", -1.0 - stats.level / 40)
   end
   
   anim = target:create_particle_generator("particles/circle4")

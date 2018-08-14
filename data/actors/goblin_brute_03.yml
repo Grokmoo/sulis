@@ -16,7 +16,7 @@ inventory:
   equipped:
     HeldMain: battleaxe
 reward:
-  xp: 50
+  xp: 15
   loot: level1_misc
   loot_chance: 45
 images:

@@ -51,7 +51,11 @@ function on_entered(parent, ability, targets)
   anim:set_draw_above_entities()
   anim:activate()
   
-  hit = parent:special_attack(target, "Reflex", "Ranged", 20, 30, 0, "Piercing")
+  stats = parent:stats()
+  min_dmg = 18 + stats.level / 2 + stats.intellect_bonus / 4
+  max_dmg = 28 + stats.level + stats.intellect_bonus / 2
+  
+  hit = parent:special_attack(target, "Reflex", "Ranged", min_dmg, max_dmg, 0, "Piercing")
   
   if not target:is_dead() and parent:ability_level(ability) > 1 then
     effect = target:create_effect(ability:name(), 2)

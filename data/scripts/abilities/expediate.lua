@@ -8,11 +8,12 @@ function on_activate(parent, ability)
 end
 
 function on_target_select(parent, ability, targets)
+  stats = parent:stats()
   target = targets:first()
   effect = target:create_effect(ability:name(), ability:duration())
-  effect:add_num_bonus("movement_rate", 0.5)
-  effect:add_num_bonus("defense", 5)
-  effect:add_num_bonus("reflex", 5)
+  effect:add_num_bonus("movement_rate", 0.5 + stats.intellect_bonus * 0.01 + stats.caster_level * 0.02)
+  effect:add_num_bonus("defense", 5 + stats.intellect_bonus / 4 + stats.caster_level / 2)
+  effect:add_num_bonus("reflex", 5 + stats.intellect_bonus / 4 + stats.caster_level / 2)
 
   gen = target:create_particle_generator("wind_particle")
   gen:set_moves_with_parent()

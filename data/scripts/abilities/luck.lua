@@ -37,14 +37,17 @@ function on_target_select(parent, ability, targets)
 end
 
 function apply_effect(parent, ability, targets)
+  stats = parent:stats()
+  amount = 10 + stats.caster_level / 2 + stats.intellect_bonus / 4
+
   target = targets:first()
   
   effect = target:create_effect(ability:name(), ability:duration())
-  effect:add_num_bonus("defense", 10)
-  effect:add_num_bonus("melee_accuracy", 10)
-  effect:add_num_bonus("ranged_accuracy", 10)
-  effect:add_num_bonus("spell_accuracy", 10)
-  effect:add_num_bonus("crit_threshold", -10)
+  effect:add_num_bonus("defense", amount)
+  effect:add_num_bonus("melee_accuracy", amount)
+  effect:add_num_bonus("ranged_accuracy", amount)
+  effect:add_num_bonus("spell_accuracy", amount)
+  effect:add_num_bonus("crit_threshold", -amount)
 
   anim = target:create_particle_generator("sparkle")
   anim:set_moves_with_parent()

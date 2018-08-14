@@ -332,6 +332,11 @@ impl UserData for ScriptInterface {
             Ok(())
         });
 
+        methods.add_method("ap_display_factor", |_, _, ()| {
+            let rules = Module::rules();
+            Ok(rules.display_ap)
+        });
+
         methods.add_method("anim_base_time", |_, _, ()| {
             let secs = CONFIG.display.animation_base_time_millis as f32 / 1000.0;
             Ok(secs)

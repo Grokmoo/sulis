@@ -21,7 +21,7 @@ function on_target_select(parent, ability, targets)
  
   if parent:ability_level(ability) > 1 then
     effect = parent:create_effect(ability:name(), 0)
-    effect:add_num_bonus("melee_accuracy", 25)
+    effect:add_num_bonus("melee_accuracy", 25 + parent:stats().level)
     effect:apply()
   end
   

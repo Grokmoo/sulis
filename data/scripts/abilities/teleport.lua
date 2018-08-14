@@ -1,5 +1,8 @@
 function on_activate(parent, ability)
-  targets = parent:targets():visible_within(10)
+  stats = parent:stats()
+  range = 7 + stats.caster_level / 2
+
+  targets = parent:targets():visible_within(range)
   
   targeter = parent:create_targeter(ability)
   targeter:add_all_selectable(targets)
@@ -10,9 +13,12 @@ end
 
 function on_target(parent, ability, targets)
   target = targets:first()
+  
+  stats = parent:stats()
+  range = 7 + stats.caster_level / 2
 
   targeter = parent:create_targeter(ability)
-  targeter:set_free_select(12.0)
+  targeter:set_free_select(range + 2)
   targeter:set_free_select_must_be_passable(parent:size_str())
   targeter:set_shape_object_size(parent:size_str())
   targeter:set_callback_fn("on_position")

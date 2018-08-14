@@ -24,8 +24,11 @@ function on_target_select(parent, ability, targets)
   targets = targets:to_table()
   for i = 1, #targets do
     effect = targets[i]:create_effect(ability:name(), ability:duration())
-    effect:add_num_bonus("defense", 20)
-    effect:add_num_bonus("armor", 10)
+	
+	stats = parent:stats()
+	
+    effect:add_num_bonus("defense", 20 + stats.level)
+    effect:add_num_bonus("armor", 10 + stats.level / 2)
 
     gen = targets[i]:create_anim("shield")
     gen:set_moves_with_parent()

@@ -38,7 +38,7 @@ end
 function create_smoke(parent, ability, targets)
   points = targets:affected_points()
   surface = parent:create_surface(ability:name(), points, ability:duration())
-  surface:add_num_bonus("concealment", 30)
+  surface:add_num_bonus("concealment", 30 + parent:stats().level)
   
   s_anim = parent:create_particle_generator("particles/circle12")
   s_anim:set_position(s_anim:param(0.0), s_anim:param(0.0))

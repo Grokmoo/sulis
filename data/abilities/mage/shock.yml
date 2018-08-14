@@ -2,7 +2,7 @@ id: shock
 name: "Shock"
 icon: abilities/shock
 description: |
-  A powerful jolt of electricity zaps the target creature.
+  A powerful jolt of electricity zaps the target creature.  This is very effective against heavily armored targets.
 active:
   script: "shock"
   group: "1st Circle"

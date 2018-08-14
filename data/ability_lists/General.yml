@@ -80,3 +80,5 @@ abilities:
     position: [7, 3]
   - id: acid_master
     position: [7, 4]
+  - id: practiced_caster
+    position: [6, 5]

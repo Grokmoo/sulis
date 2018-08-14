@@ -387,7 +387,11 @@ impl UserData for ScriptEntity {
 
         methods.add_method("anim_special_attack", |_, entity,
             (target, attack_kind, accuracy_kind, min_damage, max_damage, ap, damage_kind, cb):
-            (ScriptEntity, String, String, u32, u32, u32, String, Option<CallbackData>)| {
+            (ScriptEntity, String, String, f32, f32, f32, String, Option<CallbackData>)| {
+
+            let min_damage = min_damage as u32;
+            let max_damage = max_damage as u32;
+            let ap = ap as u32;
 
             entity.check_not_equal(&target)?;
             let parent = entity.try_unwrap()?;
@@ -413,7 +417,7 @@ impl UserData for ScriptEntity {
 
         methods.add_method("special_attack", |_, entity,
             (target, attack_kind, accuracy_kind, min_damage, max_damage, ap, damage_kind):
-            (ScriptEntity, String, String, Option<u32>, Option<u32>, Option<u32>, Option<String>)| {
+            (ScriptEntity, String, String, Option<f32>, Option<f32>, Option<f32>, Option<String>)| {
             let target = target.try_unwrap()?;
             let parent = entity.try_unwrap()?;
 
@@ -423,9 +427,9 @@ impl UserData for ScriptEntity {
             };
             let attack_kind = AttackKind::from_str(&attack_kind, &accuracy_kind);
 
-            let min_damage = min_damage.unwrap_or(0);
-            let max_damage = max_damage.unwrap_or(0);
-            let ap = ap.unwrap_or(0);
+            let min_damage = min_damage.unwrap_or(0.0) as u32;
+            let max_damage = max_damage.unwrap_or(0.0) as u32;
+            let ap = ap.unwrap_or(0.0) as u32;
 
             let attack = Attack::special(&parent.borrow().actor.stats,
                 min_damage, max_damage, ap, damage_kind, attack_kind);
@@ -440,10 +444,12 @@ impl UserData for ScriptEntity {
         });
 
         methods.add_method("take_damage", |_, entity, (min_damage, max_damage, damage_kind, ap):
-                           (u32, u32, String, Option<u32>)| {
+                           (f32, f32, String, Option<u32>)| {
             let parent = entity.try_unwrap()?;
             let damage_kind = DamageKind::from_str(&damage_kind);
 
+            let min_damage = min_damage as u32;
+            let max_damage = max_damage as u32;
             let attack = Attack::special(&parent.borrow().actor.stats, min_damage, max_damage,
                 ap.unwrap_or(0), damage_kind, AttackKind::Dummy);
             let damage = attack.roll_damage(&parent.borrow().actor.stats.armor, 1.0);
@@ -465,7 +471,8 @@ impl UserData for ScriptEntity {
             Ok(())
         });
 
-        methods.add_method("heal_damage", |_, entity, amount: u32| {
+        methods.add_method("heal_damage", |_, entity, amount: f32| {
+            let amount = amount as u32;
             let parent = entity.try_unwrap()?;
             parent.borrow_mut().actor.add_hp(amount);
             let area_state = GameState::area_state();
@@ -657,6 +664,8 @@ fn create_stats_table<'a>(lua: &'a Lua, parent: &ScriptEntity, _args: ()) -> Res
     }
     stats.set("armor", armor)?;
 
+    stats.set("level", parent.actor.actor.total_level)?;
+    stats.set("caster_level", src.caster_level)?;
     stats.set("bonus_reach", src.bonus_reach)?;
     stats.set("bonus_range", src.bonus_range)?;
     stats.set("max_hp", src.max_hp)?;

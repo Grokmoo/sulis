@@ -55,12 +55,15 @@ function on_entered(parent, ability, targets)
   gen:set_particle_duration_dist(gen:fixed_dist(0.6))
   gen:activate()
   
-  parent:special_attack(target, "Reflex", "Ranged", 30, 40, 0, "Fire")
+  stats = parent:stats()
+  min_dmg = 25 + stats.level / 2 + stats.intellect_bonus / 4
+  max_dmg = 35 + stats.level + stats.intellect_bonus / 2
+  parent:special_attack(target, "Reflex", "Ranged", min_dmg, max_dmg, 0, "Fire")
   
   if parent:ability_level(ability) > 1 then
     nearby = target:targets():visible_within(3):to_table()
 	for i = 1, #nearby do
-      parent:special_attack(nearby[i], "Reflex", "Ranged", 10, 20, 0, "Fire")
+      parent:special_attack(nearby[i], "Reflex", "Ranged", 10, 20 + stats.level / 2, 0, "Fire")
     end
 	
 	gen = target:create_particle_generator("fire_particle", 1.0)

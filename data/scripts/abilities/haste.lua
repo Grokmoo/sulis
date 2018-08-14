@@ -14,7 +14,10 @@ function on_target_select(parent, ability, targets)
   
   effect = target:create_effect(ability:name(), ability:duration())
   effect:set_tag("haste")
-  effect:add_num_bonus("ap", 2000)
+  
+  stats = parent:stats()
+  amount = (2 + stats.intellect_bonus / 20) * game:ap_display_factor()
+  effect:add_num_bonus("ap", amount)
   
   gen = target:create_anim("haste")
   gen:set_moves_with_parent()

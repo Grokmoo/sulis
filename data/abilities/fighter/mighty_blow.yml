@@ -3,7 +3,7 @@ name: "Mighty Blow"
 icon: abilities/mighty_blow
 description: |
   You unleash a powerful blow upon a single enemy with your current melee weapon.
-  The attack is made with a +25 bonus to Accuracy, and 10 to 15 bonus Damage.
+  The attack is made with a bonus to Accuracy and Damage.
 active:
   script: "mighty_blow"
   group: Fighter

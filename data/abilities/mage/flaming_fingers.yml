@@ -2,7 +2,7 @@ id: flaming_fingers
 name: "Flaming Fingers"
 icon: abilities/flaming_fingers
 description: |
-  Streams of fire extend from your fingertips, damaging all targets in a cone up to 10 tiles away.
+  Streams of fire extend from your fingertips, damaging all targets in a short cone.
   This leaves behind some random fire surfaces that burn any who enter them for 1 turn.
 active:
   script: "flaming_fingers"

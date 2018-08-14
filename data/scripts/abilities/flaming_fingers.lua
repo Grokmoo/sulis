@@ -1,4 +1,4 @@
-max_dist = 10
+max_dist = 8
 
 function on_activate(parent, ability)
   targets = parent:targets():without_self()
@@ -56,7 +56,11 @@ function attack_target(parent, ability, targets)
   target = targets:first()
 
   if target:is_valid() then
-    parent:special_attack(target, "Reflex", "Spell", 20, 30, 0, "Fire")
+    stats = parent:stats()
+	min_dmg = 8 + stats.caster_level / 2 + stats.intellect_bonus / 4
+	max_dmg = 16 + stats.caster_level + stats.intellect_bonus / 2
+  
+    parent:special_attack(target, "Reflex", "Spell", min_dmg, max_dmg, 0, "Fire")
   end
 end
 

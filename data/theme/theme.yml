@@ -777,6 +777,7 @@ children:
                [x=0|Wisdom][x=30|#wis#]]
           
           [y=70;x=60;s=5|Range[x=90|#reach#]]
+          [x=60;s=5|Caster level[x=90|#caster_level#]]
           [x=60;s=5|Initiative[x=90|#initiative#]]
           [x=60;s=5|Movement Rate[x=90|#movement_rate#]]
           [x=60;s=5|Flanking Angle[x=90|#flanking_angle#]]
@@ -890,6 +891,7 @@ children:
           ][?per|Perception: +#per#
           ][?int|Intelligence: +#int#
           ][?wis|Wisdom: +#wis#
+          ][?caster_level|Caster level: #caster_level#
           ][?bonus_ap|AP: +#bonus_ap#
           ][?min_bonus_damage_0|[s=6.0|Damage: #min_bonus_damage_0# to #max_bonus_damage_0# [?bonus_damage_kind_0;c=f00|#bonus_damage_kind_0#]]
           ][?bonus_reach|[s=6.0|Reach: #bonus_reach#]
@@ -1042,6 +1044,7 @@ children:
       ][?per|Perception: #per#
       ][?int|Intelligence: #int#
       ][?wis|Wisdom: #wis#
+      ][?caster_level|Caster level: #caster_level#
       ][?bonus_ap|AP: #bonus_ap#
       ][?min_damage|Damage: #min_damage# to #max_damage# [c=f00|#damage_kind#]
       ][?armor_penetration|Armor Penetration: #armor_penetration#

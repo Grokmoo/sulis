@@ -1,6 +1,9 @@
 function on_activate(parent, ability)
   effect = parent:create_effect(ability:name(), ability:duration())
-  effect:add_armor_of_kind(5, "Fire")
+  
+  stats = parent:stats()
+  amount = 7 + stats.caster_level / 2
+  effect:add_armor_of_kind(amount, "Fire")
 
   cb = ability:create_callback(parent)
   cb:set_after_defense_fn("after_defense")
@@ -27,5 +30,8 @@ function after_defense(parent, ability, targets)
     return
   end
 
+  stats = parent:stats()
+  min_dmg = 4 + stats.caster_level / 4 + stats.intellect_bonus / 6
+  max_dmg = 8 + stats.caster_level / 2 + stats.intellect_bonus / 3
   parent:special_attack(target, "Reflex", "Spell", 4, 8, 0, "Fire")
 end

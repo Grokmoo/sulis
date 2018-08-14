@@ -68,6 +68,7 @@ pub struct StatList {
     pub move_disabled: bool,
     pub attack_disabled: bool,
     pub hidden: bool,
+    pub caster_level: i32,
     group_uses_per_encounter: HashMap<String, ExtInt>,
 }
 
@@ -110,6 +111,7 @@ impl StatList {
             move_disabled: false,
             attack_disabled: false,
             hidden: false,
+            caster_level: 0,
             group_uses_per_encounter: HashMap::new(),
         }
     }
@@ -263,6 +265,7 @@ impl StatList {
             MovementRate(amount) => self.movement_rate += amount * times_f32,
             AttackCost(amount) => self.attack_cost += amount * times_i32,
             FlankingAngle(amount) => self.flanking_angle += amount * times_i32,
+            CasterLevel(amount) => self.caster_level += amount * times_i32,
             MoveDisabled => self.move_disabled = true,
             AttackDisabled => self.attack_disabled = true,
             Hidden => self.hidden = true,

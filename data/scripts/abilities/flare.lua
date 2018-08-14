@@ -8,8 +8,11 @@ function on_activate(parent, ability)
 end
 
 function on_target_select(parent, ability, targets)
+  stats = parent:stats()
   target = targets:first()
-  parent:special_attack(target, "Reflex", "Spell", 10, 18, 0, "Fire")
+  min_dmg = 12 + stats.caster_level
+  max_dmg = 20 + stats.intellect_bonus / 2 + stats.caster_level
+  parent:special_attack(target, "Reflex", "Spell", min_dmg, max_dmg, 0, "Fire")
   
   gen = target:create_particle_generator("fire_particle", 0.6)
   gen:set_initial_gen(50.0)

@@ -1,0 +1,17 @@
+id: practiced_caster
+name: "Practiced Caster"
+icon: abilities/practiced_caster
+description: |
+  You cast your spells as if you were two levels higher in your spell casting class.
+bonuses:
+  - kind:
+      caster_level: 2
+prereqs:
+  levels:
+    mage: 3
+upgrades:
+  - description: |
+      You gain an additional bonus of two to Caster Level.
+    bonuses:
+      - kind:
+          caster_level: 2

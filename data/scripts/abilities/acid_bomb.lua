@@ -10,6 +10,7 @@ end
 function on_target_select(parent, ability, targets)
   ability:activate(parent)
 
+  stats = parent:stats()
   target = targets:first()
   
   hit = parent:special_attack(target, "Reflex", "Spell")
@@ -24,12 +25,13 @@ function on_target_select(parent, ability, targets)
     duration = duration * 3 / 2
   end
   
-  target:take_damage(4, 8, "Acid", 5)
+  max_dmg = 8 + stats.caster_level / 2
+  target:take_damage(4, max_dmg, "Acid", 5)
   
   effect = target:create_effect(ability:name(), duration)
-  effect:add_num_bonus("melee_accuracy", -10)
-  effect:add_num_bonus("ranged_accuracy", -10)
-  effect:add_num_bonus("spell_accuracy", -10)
+  effect:add_num_bonus("melee_accuracy", -10 - stats.caster_level / 2)
+  effect:add_num_bonus("ranged_accuracy", -10 - stats.caster_level / 2)
+  effect:add_num_bonus("spell_accuracy", -10 - stats.caster_level / 2)
   
   cb = ability:create_callback(parent)
   cb:add_target(target)
@@ -51,7 +53,9 @@ function on_target_select(parent, ability, targets)
 end
 
 function apply_damage(parent, ability, targets)
+  stats = parent:stats()
   target = targets:first()
   
-  target:take_damage(4, 8, "Acid", 5)
+  max_dmg = 8 + stats.caster_level / 2
+  target:take_damage(4, max_dmg, "Acid", 5)
 end

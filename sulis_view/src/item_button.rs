@@ -638,6 +638,7 @@ fn add_bonus(bonus: &Bonus, state: &mut WidgetState, has_accuracy: &mut bool,
         HitMultiplier(amount) => add(state, "hit_multiplier", amount),
         GrazeMultiplier(amount) => add(state, "graze_multiplier", amount),
         MovementRate(amount) => add(state, "movement_rate", amount),
+        CasterLevel(amount) => add(state, "caster_level", amount),
         AttackCost(amount) => {
             let cost = amount / Module::rules().display_ap as i32;
             add(state, "attack_cost", cost);

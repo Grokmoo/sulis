@@ -2,7 +2,7 @@ id: killing_blow
 name: "Killing Blow"
 icon: abilities/killing_blow
 description: |
-  An attack that does raw damage against a single opponent, that cannot be resisted.  If the target is below 30% hit points, they die instantly.
+  An attack that does raw damage against a single opponent that cannot be resisted.  If the target is below 30% hit points, they die instantly.
 active:
   script: "killing_blow"
   group: Rogue

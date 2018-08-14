@@ -2,7 +2,7 @@ id: stun
 name: "Stun"
 icon: abilities/stun
 description: |
-  Your target must succeed at a Will check or be stunned, losing 6 AP total - causing the target to lose an entire turn's actions.
+  Your target must succeed at a Will check or be stunned, losing an entire turn's actions or more.
 active:
   script: "stun"
   group: "2nd Circle"

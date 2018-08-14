@@ -29,8 +29,10 @@ function create_parent_effect(parent, ability, targets)
   stats = parent:stats()
 
   effect = parent:create_effect(ability:name(), 0)
-  effect:add_num_bonus("melee_accuracy", 25)
-  effect:add_damage(2, 4, 20)
+  stats = parent:stats()
+  
+  effect:add_num_bonus("melee_accuracy", 10 + stats.level)
+  effect:add_damage(2, 4, 20 + stats.level / 2)
   effect:apply()
   
   gen = target:create_anim("burst", 0.15)

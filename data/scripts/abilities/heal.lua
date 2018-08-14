@@ -8,9 +8,10 @@ function on_activate(parent, ability)
 end
 
 function on_target_select(parent, ability, targets)
+  stats = parent:stats()
   target = targets:first()
   
-  target:heal_damage(10)
+  target:heal_damage(12 + stats.caster_level / 3)
   
   effect = target:create_effect(ability:name(), ability:duration())
   
@@ -35,7 +36,8 @@ function on_target_select(parent, ability, targets)
 end
 
 function apply_heal(parent, ability, targets)
+  stats = parent:stats()
   target = targets:first()
   
-  target:heal_damage(10)
+  target:heal_damage(12 + stats.caster_level / 3)
 end

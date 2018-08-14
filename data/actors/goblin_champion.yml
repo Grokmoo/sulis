@@ -18,7 +18,7 @@ inventory:
     HeldOff: shield_large
     Torso: torso_plate
 reward:
-  xp: 200
+  xp: 50
   loot: level5_misc
   loot_chance: 45
 images:

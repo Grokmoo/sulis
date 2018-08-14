@@ -141,8 +141,11 @@ impl UserData for ScriptEffect {
         });
         methods.add_method_mut("add_num_bonus", &add_num_bonus);
         methods.add_method_mut("add_damage", |_, effect, (min, max, ap, when):
-                               (u32, u32, Option<u32>, Option<String>)| {
-            let kind = BonusKind::Damage(Damage { min, max, ap: ap.unwrap_or(0), kind: None });
+                               (f32, f32, Option<f32>, Option<String>)| {
+            let min = min as u32;
+            let max = max as u32;
+            let ap = ap.unwrap_or(0.0) as u32;
+            let kind = BonusKind::Damage(Damage { min, max, ap, kind: None });
             add_bonus_to_effect(effect, kind, when);
             Ok(())
         });
@@ -162,23 +165,28 @@ impl UserData for ScriptEffect {
             Ok(())
         });
         methods.add_method_mut("add_damage_of_kind", |_, effect, (min, max, kind, ap, when):
-                               (u32, u32, String, Option<u32>, Option<String>)| {
+                               (f32, f32, String, Option<f32>, Option<String>)| {
+            let min = min as u32;
+            let max = max as u32;
+            let ap = ap.unwrap_or(0.0) as u32;
             let dmg_kind = DamageKind::from_str(&kind);
             let kind = BonusKind::Damage(
-                Damage { min, max, ap: ap.unwrap_or(0), kind: Some(dmg_kind) }
+                Damage { min, max, ap: ap, kind: Some(dmg_kind) }
             );
             add_bonus_to_effect(effect, kind, when);
             Ok(())
         });
         methods.add_method_mut("add_armor_of_kind", |_, effect, (value, kind, when):
-                               (i32, String, Option<String>)| {
+                               (f32, String, Option<String>)| {
+            let value = value as i32;
             let armor_kind = DamageKind::from_str(&kind);
             let kind = BonusKind::ArmorKind { kind: armor_kind, amount: value };
             add_bonus_to_effect(effect, kind, when);
             Ok(())
         });
         methods.add_method_mut("add_attribute_bonus", |_, effect, (attr, amount, when):
-                               (String, i8, Option<String>)| {
+                               (String, f32, Option<String>)| {
+            let amount = amount as i8;
             let attribute = match Attribute::from(&attr) {
                 None => {
                     warn!("Invalid attribute {} in script", attr);

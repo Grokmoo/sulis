@@ -17,7 +17,7 @@ inventory:
   equipped:
     HeldMain: battleaxe
 reward:
-  xp: 200
+  xp: 50
   loot: level5_misc
   loot_chance: 100
 abilities:

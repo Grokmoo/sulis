@@ -50,6 +50,7 @@ pub enum BonusKind {
     MovementRate(f32),
     AttackCost(i32),
     FlankingAngle(i32),
+    CasterLevel(i32),
     MoveDisabled,
     AttackDisabled,
     Hidden,

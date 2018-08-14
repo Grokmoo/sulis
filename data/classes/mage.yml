@@ -16,11 +16,13 @@ bonuses_per_level:
   - kind:
       fortitude: 2
   - kind:
-      reflex: 4
+      reflex: 2
   - kind:
-      will: 4
+      will: 3
   - kind:
       initiative: 1
+  - kind:
+      caster_level: 1
 starting_abilities:
   - minor_heal
   - flare

@@ -14,7 +14,7 @@ attributes:
 levels:
   mage: 3
 reward:
-  xp: 50
+  xp: 15
   loot: level1_misc
   loot_chance: 35
 abilities:

@@ -73,10 +73,12 @@ end
 
 function attack_target(parent, ability, targets)
   target = targets:first()
-
+  
   if target:is_valid() then
-    target = targets:first()
-    parent:special_attack(target, "Reflex", "Spell", 20, 30, 0, "Fire")
+    stats = parent:stats()
+	min_dmg = 15 + stats.caster_level / 3 + stats.intellect_bonus / 6
+    max_dmg = 25 + stats.intellect_bonus / 3 + stats.caster_level * 0.667
+    parent:special_attack(target, "Reflex", "Spell", min_dmg, max_dmg, 0, "Fire")
   end
 end
 
@@ -113,12 +115,12 @@ end
 
 function on_moved(parent, ability, targets)
   target = targets:first()
-  target:take_damage(2, 4, "Fire", 5)
+  target:take_damage(3, 6, "Fire", 8)
 end
 
 function on_round_elapsed(parent, ability, targets)
   targets = targets:to_table()
   for i = 1, #targets do
-	targets[i]:take_damage(2, 4, "Fire", 5)
+	targets[i]:take_damage(3, 6, "Fire", 8)
   end
 end

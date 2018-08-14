@@ -8,10 +8,14 @@ function on_activate(parent, ability)
 end
 
 function on_target_select(parent, ability, targets)
+  stats = parent:stats()
   target = targets:first()
   
   effect = target:create_effect(ability:name(), ability:duration())
-  effect:add_damage_of_kind(4, 7, "Acid")
+  
+  min_dmg = 3 + stats.caster_level / 4 + stats.intellect_bonus / 8
+  max_dmg = 6 + stats.caster_level / 2 + stats.intellect_bonus / 4
+  effect:add_damage_of_kind(min_dmg, max_dmg, "Acid")
   
   anim = target:create_particle_generator("particles/circle4")
   anim:set_moves_with_parent()

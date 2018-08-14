@@ -19,7 +19,7 @@ inventory:
   quick:
     AltHeldMain: dagger
 reward:
-  xp: 40
+  xp: 10
   loot: level1_misc
   loot_chance: 35
 abilities:

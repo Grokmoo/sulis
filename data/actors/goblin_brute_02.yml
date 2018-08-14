@@ -19,7 +19,7 @@ inventory:
   quick:
     Usable1: potion_power
 reward:
-  xp: 50
+  xp: 15
   loot: level1_misc
   loot_chance: 45
 images:

@@ -8,12 +8,13 @@ function on_activate(parent, ability)
 end
 
 function on_target_select(parent, ability, targets)
+  stats = parent:stats()
   ability:activate(parent)
 
   target = targets:first()
   
   hit = parent:special_attack(target, "Will", "Spell")
-  amount = -20
+  amount = -(2 + stats.intellect_bonus / 20) * game:ap_display_factor()
   if hit:is_miss() then
     return
   elseif hit:is_graze() then

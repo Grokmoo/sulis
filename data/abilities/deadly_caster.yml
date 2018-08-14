@@ -22,4 +22,4 @@ bonuses:
       AttackWithDamageKind: Fire
 prereqs:
   levels:
-    mage: 6
+    mage: 3

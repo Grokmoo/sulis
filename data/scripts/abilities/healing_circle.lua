@@ -39,9 +39,12 @@ function on_target_select(parent, ability, targets)
   surface:apply()
   ability:activate(parent)
   
+  stats = parent:stats()
+  amount = 20 + stats.caster_level + stats.intellect_bonus / 2
+  
   targets = targets:friendly():to_table()
   for i = 1, #targets do
-	targets[i]:heal_damage(20)
+	targets[i]:heal_damage(amount)
   end
 end
 
@@ -52,9 +55,12 @@ function apply_heal(parent, ability, targets)
   --  point = points[i]
   --   game:log("point " .. point.x .. ", " .. point.y)
   --end
+  
+  stats = parent:stats()
+  amount = 20 + stats.caster_level + stats.intellect_bonus / 2
 
   targets = targets:to_table()
   for i = 1, #targets do
-	targets[i]:heal_damage(20)
+	targets[i]:heal_damage(amount)
   end
 end

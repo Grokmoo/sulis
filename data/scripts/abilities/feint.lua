@@ -30,13 +30,14 @@ function create_feint_effect(parent, ability, targets, hit)
   if hit:is_miss() then return end
 
   effect = target:create_effect(ability:name(), ability:duration())
+  stats = parent:stats()
   
   if hit:is_graze() then
-    effect:add_num_bonus("defense", -10)
+    effect:add_num_bonus("defense", -10 - stats.level)
   elseif hit:is_hit() then
-    effect:add_num_bonus("defense", -20)
+    effect:add_num_bonus("defense", -20 - stats.level * 1.5)
   elseif hit:is_crit() then
-    effect:add_num_bonus("defense", -30)
+    effect:add_num_bonus("defense", -30 - stats.level * 2)
   end
 
   anim = target:create_particle_generator("arrow_down")

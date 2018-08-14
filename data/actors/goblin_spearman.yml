@@ -17,7 +17,7 @@ inventory:
   equipped:
     HeldMain: shortspear
 reward:
-  xp: 25
+  xp: 10
   loot: level1_misc
   loot_chance: 35
 abilities:

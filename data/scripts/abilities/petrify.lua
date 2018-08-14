@@ -24,14 +24,16 @@ function on_target_select(parent, ability, targets)
     duration = duration + 1
   end
   
+  stats = parent:stats()
+  
   effect = target:create_effect(ability:name(), duration)
   effect:set_tag("petrify")
   effect:add_move_disabled()
   effect:add_attack_disabled()
-  effect:add_num_bonus("defense", -30)
-  effect:add_num_bonus("fortitude", -20)
-  effect:add_num_bonus("reflex", -40)
-  effect:add_num_bonus("will", -20)
+  effect:add_num_bonus("defense", -30 - stats.caster_level)
+  effect:add_num_bonus("fortitude", -20 - stats.caster_level)
+  effect:add_num_bonus("reflex", -40 - stats.caster_level)
+  effect:add_num_bonus("will", -20 - stats.caster_level)
   effect:add_armor_of_kind(-8, "Crushing")
   
   anim = target:create_color_anim()

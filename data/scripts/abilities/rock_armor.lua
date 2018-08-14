@@ -1,6 +1,8 @@
 function on_activate(parent, ability)
   effect = parent:create_effect(ability:name(), ability:duration())
-  effect:add_num_bonus("armor", 15)
+  
+  stats = parent:stats()
+  effect:add_num_bonus("armor", 12 + stats.caster_level)
   effect:add_attribute_bonus("Dexterity", -4)
 
   anim = parent:create_color_anim()

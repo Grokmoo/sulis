@@ -15,6 +15,8 @@ function on_target_select(parent, ability, targets)
   ability:activate(parent)
   duration = 1.2
   
+  create_acid_surface(parent, ability, targets)
+  
   targets = targets:to_table()
   for i = 1, #targets do
     gen = parent:create_particle_generator("particles/circle4", duration)
@@ -41,7 +43,11 @@ function attack_target(parent, ability, targets)
 
   if not target:is_valid() then return end
   
-  hit = parent:special_attack(target, "Reflex", "Spell", 10, 15, 0, "Acid")
+  stats = parent:stats()
+  min_dmg = 5 + stats.intellect_bonus / 8 + stats.caster_level / 4
+  max_dmg = 10 + stats.intellect_bonus / 4 + stats.caster_level / 2
+  
+  hit = parent:special_attack(target, "Reflex", "Spell", min_dmg, max_dmg, 8, "Acid")
   duration = 3
   if hit:is_miss() then
     return
@@ -77,5 +83,45 @@ end
 function apply_damage(parent, ability, targets)
   target = targets:first()
   
-  target:take_damage(10, 15, "Acid", 10)
+  stats = parent:stats()
+  min_dmg = 5 + stats.caster_level / 4 + stats.intellect_bonus / 8
+  max_dmg = 10 + stats.intellect_bonus / 4 + stats.caster_level / 2
+  target:take_damage(min_dmg, max_dmg, "Acid", 8)
+end
+
+function create_acid_surface(parent, ability, targets)
+  points = targets:random_affected_points(0.6)
+  surf = parent:create_surface(ability:name(), points, 4)
+  surf:set_squares_to_fire_on_moved(3)
+  
+  cb = ability:create_callback(parent)
+  cb:set_on_surface_round_elapsed_fn("on_round_elapsed")
+  cb:set_on_moved_in_surface_fn("on_moved")
+  surf:add_callback(cb)
+  
+  gen = parent:create_particle_generator("particles/circle8")
+  gen:set_alpha(gen:param(0.75))
+  gen:set_gen_rate(gen:param(30.0))
+  gen:set_position(gen:param(0.0), gen:param(0.0))
+  gen:set_color(gen:param(0.0), gen:param(1.0), gen:param(0.3))
+  gen:set_particle_size_dist(gen:fixed_dist(0.5), gen:fixed_dist(0.5))
+  gen:set_particle_duration_dist(gen:fixed_dist(0.6))
+  gen:set_particle_position_dist(gen:dist_param(gen:uniform_dist(-0.5, 0.5), gen:uniform_dist(-0.5, 0.5)),
+								 gen:dist_param(gen:uniform_dist(-0.5, 0.5), gen:uniform_dist(-0.5, 0.5)))
+  gen:set_draw_below_entities()
+  surf:add_anim(gen)
+  
+  surf:apply()
+end
+
+function on_moved(parent, ability, targets)
+  target = targets:first()
+  target:take_damage(2, 4, "Acid", 12)
+end
+
+function on_round_elapsed(parent, ability, targets)
+  targets = targets:to_table()
+  for i = 1, #targets do
+	targets[i]:take_damage(2, 4, "Acid", 12)
+  end
 end

@@ -9,11 +9,14 @@ function on_activate(parent, ability)
     return
   end
 
+  stats = parent:stats()
+  amount = 10 + stats.level / 2
+  
   effect = parent:create_effect(ability:name())
   effect:deactivate_with(ability)
-  effect:add_num_bonus("defense", 10)
-  effect:add_num_bonus("reflex", 5)
-  effect:add_num_bonus("fortitude", 5)
+  effect:add_num_bonus("defense", amount)
+  effect:add_num_bonus("reflex", amount / 2)
+  effect:add_num_bonus("fortitude", amount / 2)
   effect:add_num_bonus("crit_threshold", 20)
   effect:add_num_bonus("crit_multiplier", -0.25)
   effect:add_num_bonus("melee_accuracy", -10)
@@ -43,7 +46,7 @@ function after_defense(parent, ability, targets, hit)
     return
   end
 
-  max_damage = math.floor(hit:total_damage() * 0.5)
+  max_damage = math.floor(hit:total_damage() * 0.3)
   
   target:take_damage(max_damage, max_damage, "Raw")
 end

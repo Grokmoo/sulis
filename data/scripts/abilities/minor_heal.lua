@@ -9,8 +9,10 @@ end
 
 function on_target_select(parent, ability, targets)
   target = targets:first()
+  stats = parent:stats()
   
-  target:heal_damage(10)
+  amount = 12 + stats.caster_level + stats.intellect_bonus / 4
+  target:heal_damage(amount)
 
   anim = target:create_particle_generator("heal", 1.0)
   anim:set_moves_with_parent()

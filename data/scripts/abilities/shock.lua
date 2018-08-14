@@ -28,6 +28,9 @@ end
 function attack_target(parent, ability, targets)
   target = targets:first()
 
-  parent:special_attack(target, "Reflex", "Spell", 20, 30, 0, "Electrical")
+  stats = parent:stats()
+  min_dmg = 15 + stats.caster_level / 2 + stats.intellect_bonus / 4
+  max_dmg = 25 + stats.intellect_bonus / 2 + stats.caster_level
+  parent:special_attack(target, "Reflex", "Spell", min_dmg, max_dmg, 4, "Electrical")
 end
 

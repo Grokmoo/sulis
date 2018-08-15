@@ -29,7 +29,7 @@ use sulis_core::ui::{Widget};
 use sulis_rules::HitKind;
 use sulis_module::{Ability, Actor, Module, ObjectSize, OnTrigger, area::{Trigger, TriggerKind}};
 
-use {ai, AI, AreaState, ChangeListener, ChangeListenerList,
+use {ai, AI, AreaState, ChangeListener, ChangeListenerList, Effect,
     EntityState, Location, Formation, ItemList, ItemState, PartyStash,
     PathFinder, SaveState, ScriptState, UICallback, MOVE_TO_THRESHOLD, TurnManager};
 use script::{script_callback::{self, ScriptHitKind}, ScriptEntitySet, ScriptCallback, ScriptItemKind};
@@ -99,54 +99,69 @@ impl GameState {
 
             let path_finder = PathFinder::new(&area_state.borrow().area);
 
-            let mut entities = Vec::new();
+            let mut entities = HashMap::new();
             let mut selected = Vec::new();
             let mut party = Vec::new();
 
             for entity_save in save_state.manager.entities {
+                let index = entity_save.index;
                 let entity = Rc::new(RefCell::new(EntityState::load(entity_save, &areas)?));
-                entities.push(entity);
+                entities.insert(index, entity);
             }
 
-            // TODO looping through in this fashion is very inefficient
             for index in save_state.party {
-                let mut found = false;
-                for entity in entities.iter() {
-                    if entity.borrow().index == index {
-                        party.push(Rc::clone(entity));
-                        found = true;
-                        break;
-                    }
-                }
-
-                if !found {
-                    return invalid_data_error(&format!("Invalid party index '{}'", index));
+                match entities.get(&index) {
+                    None => return invalid_data_error(&format!("Invalid party index {}", index)),
+                    Some(ref entity) => party.push(Rc::clone(entity)),
                 }
             }
 
             for index in save_state.selected {
-                let mut found = false;
-                for entity in party.iter() {
-                    if entity.borrow().index == index {
-                        selected.push(Rc::clone(entity));
-                        found = true;
-                        break;
-                    }
-                }
-
-                if !found {
-                    return invalid_data_error(&format!("Invalid selected index '{}'", index));
+                match entities.get(&index) {
+                    None => return invalid_data_error(&format!("Invalid selected index {}", index)),
+                    Some(ref entity) => selected.push(Rc::clone(entity)),
                 }
             }
 
-            for entity in entities {
+            for entity in entities.values() {
                 let area_state = match areas.get(&entity.borrow().location.area_id) {
                     Some(state) => state,
                     None => unreachable!(),
                 };
 
                 let location = entity.borrow().location.clone();
-                area_state.borrow_mut().add_entity(entity, location)?;
+                area_state.borrow_mut().add_entity(Rc::clone(entity), location)?;
+            }
+
+            let mgr = GameState::turn_manager();
+            for effect_save in save_state.manager.effects {
+                let mut effect = Effect::load(effect_save);
+                if let Some(index) = effect.entity {
+                    let entity = match entities.get(&index) {
+                        None =>
+                            return invalid_data_error(&format!("Invalid effect entity {}", index)),
+                        Some(ref entity) => Rc::clone(entity),
+                    };
+
+                    // the index has changed with the load
+                    effect.entity = Some(entity.borrow().index);
+
+                    // TODO load callbacks and animations
+                    mgr.borrow_mut().add_effect(effect, &entity, Vec::new(), Vec::new());
+                    continue;
+                }
+
+                if let Some(surface) = effect.surface.clone() {
+                    let area = match areas.get(&surface.area_id) {
+                        None => return invalid_data_error(
+                            &format!("Invalid area ID '{}'", surface.area_id)),
+                        Some(area) => area,
+                    };
+
+                    // TODO load callbacks and animations
+                    mgr.borrow_mut().add_surface(effect, area, surface.points,
+                                                 Vec::new(), Vec::new());
+                }
             }
 
             let formation = save_state.formation;
@@ -783,6 +798,10 @@ impl GameState {
     pub fn draw_below_entities(renderer: &mut GraphicsRenderer, offset_x: f32, offset_y: f32,
                               scale_x: f32, scale_y: f32, millis: u32) {
         ANIMATIONS.with(|a| a.borrow().draw_below_entities(renderer, offset_x, offset_y, scale_x, scale_y, millis));
+    }
+
+    pub fn has_any_blocking_animations() -> bool {
+        ANIMATIONS.with(|a| a.borrow().has_any_blocking_anims())
     }
 
     pub fn has_blocking_animations(entity: &Rc<RefCell<EntityState>>) -> bool {

@@ -112,6 +112,12 @@ impl AnimState {
         }
     }
 
+    pub fn has_any_blocking_anims(&self) -> bool {
+        AnimState::has_any_blocking_vec(&self.no_draw_anims) ||
+            AnimState::has_any_blocking_vec(&self.below_anims) ||
+            AnimState::has_any_blocking_vec(&self.above_anims)
+    }
+
     pub fn has_blocking_anims(&self, entity: &Rc<RefCell<EntityState>>) -> bool {
         AnimState::has_blocking_vec(&self.no_draw_anims, entity) ||
             AnimState::has_blocking_vec(&self.below_anims, entity) ||
@@ -128,6 +134,15 @@ impl AnimState {
         AnimState::clear_all_blocking_vec(&mut self.no_draw_anims);
         AnimState::clear_all_blocking_vec(&mut self.below_anims);
         AnimState::clear_all_blocking_vec(&mut self.above_anims);
+    }
+
+    fn has_any_blocking_vec(vec: &Vec<Anim>) -> bool {
+        for anim in vec.iter() {
+            if !anim.is_blocking() { continue; }
+
+            return true
+        }
+        false
     }
 
     fn has_blocking_vec(vec: &Vec<Anim>, entity: &Rc<RefCell<EntityState>>) -> bool {

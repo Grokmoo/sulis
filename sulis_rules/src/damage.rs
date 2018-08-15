@@ -188,7 +188,7 @@ impl DamageList {
     }
 }
 
-#[derive(Deserialize, Debug, Clone, Copy, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Deserialize, Serialize, Debug, Clone, Copy, Hash, PartialEq, Eq, PartialOrd, Ord)]
 #[serde(deny_unknown_fields)]
 pub enum DamageKind {
     Slashing,
@@ -268,7 +268,7 @@ impl Display for DamageKind {
     }
 }
 
-#[derive(Deserialize, Debug, Copy, Clone)]
+#[derive(Deserialize, Serialize, Debug, Copy, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct Damage {
     pub min: u32,

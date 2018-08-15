@@ -20,35 +20,55 @@ use std::rc::Rc;
 use sulis_core::util::{ExtInt, Point};
 use sulis_rules::BonusList;
 use script::ScriptCallback;
-use ChangeListenerList;
+use {ChangeListenerList, save_state::EffectSaveState};
 
 use ROUND_TIME_MILLIS;
 
-struct Surface {
-    area_id: String,
-    points: Vec<Point>,
-    squares_to_fire_on_moved: u32,
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct Surface {
+    pub(crate) area_id: String,
+    pub(crate) points: Vec<Point>,
+    pub(crate) squares_to_fire_on_moved: u32,
 }
 
 pub struct Effect {
     pub name: String,
     pub tag: String,
-    cur_duration: u32,
-    total_duration: ExtInt,
 
-    bonuses: BonusList,
+    pub(crate) cur_duration: u32,
+    pub(crate) total_duration: ExtInt,
+    pub(crate) bonuses: BonusList,
+    pub(crate) deactivate_with_ability: Option<String>,
+    pub(crate) surface: Option<Surface>,
+    pub(crate) entity: Option<usize>,
+
+    squares_moved: HashMap<usize, u32>,
     callbacks: Vec<Rc<ScriptCallback>>,
 
     pub listeners: ChangeListenerList<Effect>,
     pub removal_listeners: ChangeListenerList<Effect>,
-
-    deactivate_with_ability: Option<String>,
-    surface: Option<Surface>,
-
-    squares_moved: HashMap<usize, u32>,
 }
 
 impl Effect {
+    pub fn load(data: EffectSaveState) -> Effect {
+        Effect {
+            name: data.name,
+            tag: data.tag,
+            cur_duration: data.cur_duration,
+            total_duration: data.total_duration,
+            bonuses: data.bonuses,
+            deactivate_with_ability: data.deactivate_with_ability,
+            surface: data.surface,
+            entity: data.entity,
+
+            squares_moved: HashMap::new(),
+            callbacks: Vec::new(),
+            listeners: ChangeListenerList::default(),
+            removal_listeners: ChangeListenerList::default(),
+        }
+    }
+
     pub fn new(name: &str, tag: &str, duration: ExtInt, bonuses: BonusList,
                deactivate_with_ability: Option<String>) -> Effect {
         Effect {
@@ -62,6 +82,7 @@ impl Effect {
             callbacks: Vec::new(),
             deactivate_with_ability,
             surface: None,
+            entity: None,
             squares_moved: HashMap::new(),
         }
     }
@@ -82,6 +103,10 @@ impl Effect {
             points: points.clone(),
             squares_to_fire_on_moved,
         })
+    }
+
+    pub fn set_owning_entity(&mut self, entity: usize) {
+        self.entity = Some(entity);
     }
 
     pub fn surface(&self) -> Option<(&str, &Vec<Point>)> {

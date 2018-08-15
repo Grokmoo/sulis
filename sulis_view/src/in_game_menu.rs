@@ -20,7 +20,7 @@ use std::cell::RefCell;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{Button, ConfirmationWindow};
-use sulis_state::save_file::create_save;
+use sulis_state::{GameState};
 
 use {LoadWindow, RootView};
 
@@ -57,16 +57,9 @@ impl WidgetKind for InGameMenu {
             let root = Widget::get_root(widget);
             let view = Widget::downcast_kind_mut::<RootView>(&root);
 
-            match create_save() {
-                Err(e) => {
-                    error!("Error saving game");
-                    error!("{}", e);
-                    view.add_status_text("Error saving game!");
-                }, Ok(()) => {
-                    view.add_status_text("Save complete.");
-                }
-            }
+            view.save();
         })));
+        save.borrow_mut().state.set_enabled(!GameState::is_combat_active());
 
         let load = Widget::with_theme(Button::empty(), "load");
         load.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {

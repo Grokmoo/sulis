@@ -21,10 +21,10 @@ use std::u64;
 use std::collections::HashMap;
 
 use sulis_core::util::{Point, ExtInt};
-use sulis_rules::{QuickSlot, Slot};
+use sulis_rules::{QuickSlot, Slot, BonusList};
 use sulis_module::{actor::{ActorBuilder, RewardBuilder}};
 
-use {ActorState, EntityState, Formation, GameState, ItemState, Location,
+use {ActorState, effect, Effect, EntityState, Formation, GameState, ItemState, Location,
     PropState, prop_state::Interactive, Merchant};
 use area_state::{TriggerState};
 
@@ -89,6 +89,7 @@ impl SaveState {
 #[serde(deny_unknown_fields)]
 pub struct ManagerSaveState {
     pub(crate) entities: Vec<EntitySaveState>,
+    pub(crate) effects: Vec<EffectSaveState>,
 }
 
 impl ManagerSaveState {
@@ -100,10 +101,42 @@ impl ManagerSaveState {
             entities.push(EntitySaveState::new(entity));
         }
 
-        // TODO save / load effects
+        let mut effects = Vec::new();
+        for effect in mgr.effect_iter() {
+            effects.push(EffectSaveState::new(effect));
+        }
 
         ManagerSaveState {
             entities,
+            effects,
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct EffectSaveState {
+    pub(crate) name: String,
+    pub(crate) tag: String,
+    pub(crate) cur_duration: u32,
+    pub(crate) total_duration: ExtInt,
+    pub(crate) deactivate_with_ability: Option<String>,
+    pub(crate) surface: Option<effect::Surface>,
+    pub(crate) entity: Option<usize>,
+    pub(crate) bonuses: BonusList,
+}
+
+impl EffectSaveState {
+    pub fn new(effect: &Effect) -> EffectSaveState {
+        EffectSaveState {
+            name: effect.name.to_string(),
+            tag: effect.tag.to_string(),
+            cur_duration: effect.cur_duration,
+            total_duration: effect.total_duration,
+            deactivate_with_ability: effect.deactivate_with_ability.clone(),
+            surface: effect.surface.clone(),
+            entity: effect.entity.clone(),
+            bonuses: effect.bonuses.clone(),
         }
     }
 }

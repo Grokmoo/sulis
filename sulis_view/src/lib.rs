@@ -318,6 +318,21 @@ impl RootView {
             script_callback::fire_round_elapsed(cbs);
         }
     }
+
+    pub fn save(&mut self) {
+        if GameState::is_combat_active() {
+            self.add_status_text("Cannot save during combat.");
+            return;
+        }
+
+        if let Err(e) = create_save() {
+            error!("Error quick saving game");
+            error!("{}", e);
+            self.add_status_text("Error performing Save!");
+        } else {
+            self.add_status_text("Save Complete.");
+        }
+    }
 }
 
 impl WidgetKind for RootView {
@@ -354,16 +369,7 @@ impl WidgetKind for RootView {
             EndTurn => self.end_turn(),
             Exit => self.show_exit(widget),
             SelectAll => GameState::select_party_members(GameState::party()),
-            QuickSave => {
-                if let Err(e) = create_save() {
-                    error!("Error quick saving game");
-                    error!("{}", e);
-                    self.add_status_text("Error performing Quicksave!");
-                } else {
-                    self.add_status_text("Quicksave Complete.");
-                }
-
-            },
+            QuickSave => self.save(),
             _ => return false,
         }
 

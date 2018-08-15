@@ -17,7 +17,7 @@
 use sulis_core::util::ExtInt;
 use {Attribute, Damage, DamageKind, ArmorKind, Slot, WeaponKind, WeaponStyle};
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
 #[serde(rename_all = "snake_case")]
 pub enum BonusKind {
@@ -57,7 +57,7 @@ pub enum BonusKind {
     GroupUsesPerEncounter { group: String, amount: ExtInt },
 }
 
-#[derive(Deserialize, Debug, Clone, Copy)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy)]
 #[serde(deny_unknown_fields)]
 pub enum Contingent {
     /// Bonuses that should always be applied
@@ -98,7 +98,7 @@ impl Default for Contingent {
     }
 }
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct Bonus {
     #[serde(default)]
@@ -106,7 +106,7 @@ pub struct Bonus {
     pub kind: BonusKind,
 }
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct BonusList(Vec<Bonus>);
 

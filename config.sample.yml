@@ -3,7 +3,7 @@
 
 display:
     # Display Adapter - Glium is the only choice for now
-    adapter: Glium
+    adapter: Auto
 
     # Display Mode - Fullscreen, BorderlessWindow, Window
     mode: Window

@@ -168,7 +168,7 @@ impl FromStr for HitKind {
     }
 }
 
-#[derive(Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord, Deserialize)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
 pub enum WeaponStyle {
     Ranged,
     TwoHanded,
@@ -197,7 +197,7 @@ impl FromStr for WeaponStyle {
     }
 }
 
-#[derive(Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord, Deserialize)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
 pub enum WeaponKind {
     Axe,
     Crossbow,
@@ -234,7 +234,7 @@ impl FromStr for WeaponKind {
     }
 }
 
-#[derive(Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord, Deserialize)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
 pub enum ArmorKind {
     Light,
     Medium,

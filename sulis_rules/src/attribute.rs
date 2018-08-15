@@ -119,7 +119,7 @@ impl AttributeList {
     }
 }
 
-#[derive(Deserialize, Debug, Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[derive(Deserialize, Serialize, Debug, Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 #[serde(deny_unknown_fields)]
 pub enum Attribute {
     Strength,

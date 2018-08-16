@@ -23,6 +23,7 @@ extern crate flexi_logger;
 
 pub extern crate serde;
 pub extern crate serde_yaml;
+pub extern crate serde_json;
 #[macro_use] extern crate serde_derive;
 
 #[macro_use] extern crate glium;

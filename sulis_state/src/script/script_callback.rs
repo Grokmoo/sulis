@@ -15,29 +15,34 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::rc::Rc;
+use std::cell::RefCell;
 use std::collections::{HashMap};
+use std::io::Error;
+use std::result::{self};
 
 use rlua::{UserData, UserDataMethods};
 
+use sulis_core::util::invalid_data_error;
 use sulis_rules::HitKind;
 use sulis_module::{Module};
 use script::{Result, script_entity, ScriptEntity, ScriptEntitySet, ScriptActiveSurface, ScriptItemKind};
-use {GameState};
+use {EntityState, GameState};
 
-pub fn fire_round_elapsed(cbs: Vec<Rc<ScriptCallback>>) {
+pub fn fire_round_elapsed(cbs: Vec<Rc<CallbackData>>) {
     for cb in cbs {
         cb.on_round_elapsed();
         cb.on_surface_round_elapsed();
     }
 }
 
-pub fn fire_on_moved_in_surface(cbs: Vec<(Rc<ScriptCallback>, usize)>) {
+pub fn fire_on_moved_in_surface(cbs: Vec<(Rc<CallbackData>, usize)>) {
     for (cb, target) in cbs {
         cb.on_moved_in_surface(target);
     }
 }
 
-#[derive(Clone, Copy, PartialOrd, Ord, Hash, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Copy, PartialOrd, Ord, Hash, PartialEq, Eq, Debug)]
+#[serde(deny_unknown_fields)]
 enum FuncKind {
     BeforeAttack,
     AfterAttack,
@@ -70,7 +75,8 @@ pub trait ScriptCallback {
     fn on_moved_in_surface(&self, _target: usize) { }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize, Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
 enum Kind {
     Ability(String),
     Item(String), // callback is based on an item ID, not a particular
@@ -78,7 +84,8 @@ enum Kind {
                   // consumable items has been used
 }
 
-#[derive(Clone)]
+#[derive(Deserialize, Serialize, Clone, Debug)]
+#[serde(deny_unknown_fields)]
 pub struct CallbackData {
     parent: usize,
     effect: Option<usize>,
@@ -88,6 +95,25 @@ pub struct CallbackData {
 }
 
 impl CallbackData {
+    pub fn update_entity_refs_on_load(&mut self, entities: &HashMap<usize,
+                                      Rc<RefCell<EntityState>>>) -> result::Result<(), Error> {
+
+        match entities.get(&self.parent) {
+            None => {
+                return invalid_data_error(&format!("Invalid parent {} for callback", self.parent));
+            }, Some(ref entity) => self.parent = entity.borrow().index,
+        }
+
+        if let Some(ref mut targets) = &mut self.targets {
+            targets.update_entity_refs_on_load(entities)?;
+        }
+        Ok(())
+    }
+
+    pub fn update_effect_index_on_load(&mut self, index: usize) {
+        self.effect = Some(index);
+    }
+
     pub fn new_ability(parent: usize, ability_id: &str) -> CallbackData {
         CallbackData {
             parent,
@@ -251,7 +277,10 @@ impl ScriptCallback for CallbackData {
 
 fn compute_surface_targets(effect: Option<usize>, parent: usize, target: Option<usize>) -> Option<ScriptEntitySet> {
     let effect = match effect {
-        None => return None,
+        None => {
+            warn!("Surface effect is not set");
+            return None;
+        },
         Some(index) => index,
     };
 
@@ -261,7 +290,10 @@ fn compute_surface_targets(effect: Option<usize>, parent: usize, target: Option<
     let mgr = mgr.borrow();
 
     let effect = match mgr.effect_checked(effect) {
-        None => return None,
+        None => {
+            warn!("Invalid effect for surface");
+            return None;
+        },
         Some(effect) => effect,
     };
 

@@ -14,15 +14,15 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::fs;
-use std::path::PathBuf;
-use std::io::Error;
+use std::path::{Path, PathBuf};
+use std::fs::{self, File};
+use std::io::{Read, Error};
 use std::time;
 
 use chrono::prelude::*;
 
-use sulis_core::{config, serde_yaml};
-use sulis_core::resource::{ResourceBuilder, read_single_resource_path, write_to_file};
+use sulis_core::{config, serde_yaml, util::self, serde_json};
+use sulis_core::resource::{ResourceBuilder, read_single_resource_path, write_json_to_file};
 use sulis_core::util::{invalid_data_error};
 use sulis_module::Module;
 use {GameState, SaveState};
@@ -32,6 +32,17 @@ use {GameState, SaveState};
 pub struct SaveFile {
     meta: SaveFileMetaData,
     state: SaveState,
+}
+
+impl SaveFile {
+    fn from_json(data: &str) -> Result<Self, Error> {
+        let resource: Result<SaveFile, serde_json::Error> = serde_json::from_str(data);
+
+        match resource {
+            Ok(resource) => Ok(resource),
+            Err(error) => invalid_data_error(&format!("{}", error))
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize)]
@@ -65,8 +76,11 @@ pub fn load_state(save_file: &SaveFileMetaData) -> Result<SaveState, Error> {
 }
 
 pub fn create_save() -> Result<(), Error> {
+    let start_time = time::Instant::now();
+    info!("Start save");
+
     let utc = Utc::now();
-    let filename = format!("save_{}.yml", utc.format("%Y%m%d-%H%M%S%.3f"));
+    let filename = format!("save_{}.json", utc.format("%Y%m%d-%H%M%S%.3f"));
 
     let mut path = get_save_dir();
     if !path.is_dir() {
@@ -78,6 +92,9 @@ pub fn create_save() -> Result<(), Error> {
 
     let meta = create_meta_data(utc.format("%c").to_string());
 
+    info!("  Filename and meta data creation complete in {} secs",
+          util::format_elapsed_secs(start_time.elapsed()));
+
     let state = SaveState::create();
 
     let save = SaveFile {
@@ -85,7 +102,13 @@ pub fn create_save() -> Result<(), Error> {
         state,
     };
 
-    write_to_file(path.as_path(), &save)
+    info!("  Save data created in {} secs", util::format_elapsed_secs(start_time.elapsed()));
+
+    let result = write_json_to_file(path.as_path(), &save);
+
+    info!("  Save to disk complete in {} secs", util::format_elapsed_secs(start_time.elapsed()));
+
+    result
 }
 
 fn create_meta_data(datetime: String) -> SaveFileMetaData {
@@ -125,12 +148,21 @@ pub fn has_available_save_files() -> bool {
             Some(ext) => ext.to_string_lossy(),
         };
 
-        if extension != "yml" { continue; }
+        if extension != "json" { continue; }
 
         return true;
     }
 
     false
+}
+
+fn read_save_file(path: &Path) -> Result<SaveFile, Error> {
+    let mut file = File::open(path)?;
+
+    let mut file_data = String::new();
+    file.read_to_string(&mut file_data)?;
+
+    SaveFile::from_json(&file_data)
 }
 
 pub fn get_available_save_files() -> Result<Vec<SaveFileMetaData>, Error> {
@@ -157,11 +189,11 @@ pub fn get_available_save_files() -> Result<Vec<SaveFileMetaData>, Error> {
             Some(ext) => ext.to_string_lossy(),
         };
 
-        if extension != "yml" { continue; }
+        if extension != "json" { continue; }
 
         let path_buf = path.to_path_buf();
 
-        let save_file: SaveFile = match read_single_resource_path(&path_buf) {
+        let save_file: SaveFile = match read_save_file(&path_buf) {
             Ok(save_file) => save_file,
             Err(e) => {
                 warn!("Unable to read save file: {}", path_buf.to_string_lossy());

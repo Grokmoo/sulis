@@ -15,12 +15,14 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::collections::HashMap;
+use std::cell::RefCell;
 use std::rc::Rc;
+use std::io::Error;
 
 use sulis_core::util::{ExtInt, Point};
 use sulis_rules::BonusList;
-use script::ScriptCallback;
-use {ChangeListenerList, save_state::EffectSaveState};
+use script::{CallbackData};
+use {ChangeListenerList, save_state::EffectSaveState, EntityState};
 
 use ROUND_TIME_MILLIS;
 
@@ -42,17 +44,29 @@ pub struct Effect {
     pub(crate) deactivate_with_ability: Option<String>,
     pub(crate) surface: Option<Surface>,
     pub(crate) entity: Option<usize>,
+    pub(crate) callbacks: Vec<Rc<CallbackData>>,
 
     squares_moved: HashMap<usize, u32>,
-    callbacks: Vec<Rc<ScriptCallback>>,
 
     pub listeners: ChangeListenerList<Effect>,
+
+    // listeners that are called when this effect is removed
+    // child animations are referenced here to cause them to
+    // be removed when this effect is removed
     pub removal_listeners: ChangeListenerList<Effect>,
 }
 
 impl Effect {
-    pub fn load(data: EffectSaveState) -> Effect {
-        Effect {
+    pub fn load(data: EffectSaveState, new_index: usize,
+                entities: &HashMap<usize, Rc<RefCell<EntityState>>>) -> Result<Effect, Error> {
+        let mut callbacks = Vec::new();
+        for mut cb in data.callbacks {
+            cb.update_entity_refs_on_load(entities)?;
+            cb.update_effect_index_on_load(new_index);
+            callbacks.push(Rc::new(cb));
+        }
+
+        Ok(Effect {
             name: data.name,
             tag: data.tag,
             cur_duration: data.cur_duration,
@@ -63,10 +77,10 @@ impl Effect {
             entity: data.entity,
 
             squares_moved: HashMap::new(),
-            callbacks: Vec::new(),
+            callbacks,
             listeners: ChangeListenerList::default(),
             removal_listeners: ChangeListenerList::default(),
-        }
+        })
     }
 
     pub fn new(name: &str, tag: &str, duration: ExtInt, bonuses: BonusList,
@@ -123,16 +137,16 @@ impl Effect {
         }
     }
 
-    pub fn callbacks(&self) -> Vec<Rc<ScriptCallback>> {
+    pub fn callbacks(&self) -> Vec<Rc<CallbackData>> {
         self.callbacks.clone()
     }
 
-    pub fn add_callback(&mut self, cb: Rc<ScriptCallback>) {
+    pub fn add_callback(&mut self, cb: Rc<CallbackData>) {
         self.callbacks.push(cb);
     }
 
     #[must_use]
-    pub fn update_on_moved_in_surface(&mut self) -> Vec<(Rc<ScriptCallback>, usize)> {
+    pub fn update_on_moved_in_surface(&mut self) -> Vec<(Rc<CallbackData>, usize)> {
         let to_fire = match self.surface {
             None => return Vec::new(),
             Some(ref surface) => surface.squares_to_fire_on_moved,
@@ -154,7 +168,7 @@ impl Effect {
 
     /// Updates the effect time.  returns true if a round has elapsed
     #[must_use]
-    pub fn update(&mut self, millis_elapsed: u32) -> Vec<Rc<ScriptCallback>> {
+    pub fn update(&mut self, millis_elapsed: u32) -> Vec<Rc<CallbackData>> {
         let cur_mod = self.cur_duration / ROUND_TIME_MILLIS;
 
         self.cur_duration += millis_elapsed;

@@ -38,8 +38,7 @@ use ui::Widget;
 use io::{IO, MainLoopUpdater};
 
 #[derive(Deserialize, Serialize, Debug, Clone, Copy, PartialEq)]
-#[serde(deny_unknown_fields)]
-#[serde(untagged)]
+#[serde(deny_unknown_fields, untagged)]
 pub enum ExtInt {
     Int(u32),
     Infinity,
@@ -63,7 +62,7 @@ impl ExtInt {
     pub fn to_f32(&self) -> f32 {
         match self {
             ExtInt::Int(amount) => *amount as f32,
-            ExtInt::Infinity => f32::INFINITY,
+            ExtInt::Infinity => 1e12, // use a value that serde json can serialize properly
         }
     }
 
@@ -175,12 +174,15 @@ pub fn main_loop(io: &mut Box<IO>, root: Rc<RefCell<Widget>>,
 
     let mut frames = 0;
     let mut render_time = time::Duration::from_secs(0);
+    let mut last_start_time = time::Instant::now();
+
     loop {
-        let start_time = time::Instant::now();
+        let last_elapsed = get_elapsed_millis(last_start_time.elapsed());
+        last_start_time = time::Instant::now();
         let total_elapsed = get_elapsed_millis(main_loop_start_time.elapsed());
 
         io.process_input(Rc::clone(&root));
-        updater.update(&root, total_elapsed);
+        updater.update(&root, last_elapsed);
 
         if let Err(e) = Widget::update(&root) {
             error!("There was a fatal error updating the UI tree state.");
@@ -194,7 +196,7 @@ pub fn main_loop(io: &mut Box<IO>, root: Rc<RefCell<Widget>>,
             break;
         }
 
-        let frame_elapsed = start_time.elapsed();
+        let frame_elapsed = last_start_time.elapsed();
         if frame_time > frame_elapsed {
             thread::sleep(frame_time - frame_elapsed);
         }

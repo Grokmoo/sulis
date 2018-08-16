@@ -16,6 +16,7 @@
 
 use serde;
 use serde_yaml;
+use serde_json;
 
 use resource::*;
 use resource::spritesheet::SpritesheetBuilder;
@@ -78,6 +79,17 @@ impl ResourceBuilderSet {
             font_builders: read(&root_dirs, "fonts"),
             fonts_dir: format!("{}/fonts/", root),
         })
+    }
+}
+
+pub fn write_json_to_file<T: serde::ser::Serialize,
+    P: AsRef<Path>>(filename: P, data: &T) -> Result<(), Error> {
+
+    let file = File::create(filename)?;
+
+    match serde_json::to_writer(file, data) {
+        Err(e) => invalid_data_error(&format!("{}", e)),
+        Ok(()) => Ok(()),
     }
 }
 

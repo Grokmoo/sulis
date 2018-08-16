@@ -26,13 +26,19 @@ use sulis_core::ui::{animation_state, Color};
 use sulis_core::util::ExtInt;
 use {animation::Anim, EntityState};
 
-#[derive(Clone, Copy)]
+fn is_zero(val: &f32) -> bool {
+    *val == 0.0
+}
+
+#[derive(Clone, Copy, Serialize, Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
 pub enum Coord {
     X,
     Y,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Serialize, Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
 pub enum Dist {
     Fixed { value: f32 },
     Uniform { min: f32, max: f32 },
@@ -132,7 +138,8 @@ fn radial_to_cart(angle: f32, mag: f32) -> (f32, f32) {
     (x * mag, y * mag)
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize, Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
 pub struct DistParam {
     value: Dist,
     dt: Dist,
@@ -148,7 +155,8 @@ impl DistParam {
 
 impl UserData for DistParam { }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize, Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
 pub struct DistParam2D {
     x: DistParam,
     y: Option<DistParam>,
@@ -162,19 +170,35 @@ impl DistParam2D {
 
 impl UserData for DistParam2D { }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Param {
+    #[serde(default, skip_serializing_if = "is_zero")]
     initial_value: f32,
+
+    #[serde(default, skip_serializing_if = "is_zero")]
     dt: f32,
+
+    #[serde(default, skip_serializing_if = "is_zero")]
     d2t: f32,
+
+    #[serde(default, skip_serializing_if = "is_zero")]
     d3t: f32,
 
+    #[serde(default, skip_serializing_if = "is_zero")]
     pub value: f32,
 }
 
 impl UserData for Param { }
 
 impl Param {
+    pub fn is_non_zero(&self) -> bool {
+        return self.initial_value != 0.0 ||
+            self.dt != 0.0 ||
+            self.d2t != 0.0 ||
+            self.d3t != 0.0;
+    }
+
     pub fn offset(&self, offset: f32) -> Param {
         let value = self.value + offset;
         Param {
@@ -311,16 +335,20 @@ pub fn new(owner: &Rc<RefCell<EntityState>>, image: Rc<Image>, model: GeneratorM
     Anim::new_pgen(owner, model.duration_millis, model, state)
 }
 pub (in animation) struct GeneratorState {
-    image: Rc<Image>,
-    particles: Vec<Particle>,
-    gen_overflow: f32,
-    previous_secs: f32,
+    pub(in animation) image: Rc<Image>,
+    pub(in animation) particles: Vec<Particle>,
+    pub(in animation) gen_overflow: f32,
+    pub(in animation) previous_secs: f32,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize, Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
 pub struct GeneratorModel {
     pub position: (Param, Param),
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub rotation: Option<Param>,
+
     pub red: Param,
     pub green: Param,
     pub blue: Param,
@@ -329,10 +357,19 @@ pub struct GeneratorModel {
     pub duration_millis: ExtInt,
     pub gen_rate: Param,
     pub initial_overflow: f32,
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub particle_position_dist: Option<DistParam2D>,
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub particle_duration_dist: Option<Dist>,
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub particle_frame_time_offset_dist: Option<Dist>,
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub particle_size_dist: Option<(Dist, Dist)>,
+
     pub draw_above_entities: bool,
 }
 
@@ -422,7 +459,9 @@ impl GeneratorModel {
     }
 }
 
-struct Particle {
+#[derive(Clone, Serialize, Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
+pub(in animation) struct Particle {
     position: (Param, Param),
     total_duration: f32,
     current_duration: f32,

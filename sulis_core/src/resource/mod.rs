@@ -15,7 +15,8 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 mod resource_builder_set;
-pub use self::resource_builder_set::{read, read_single_resource, read_single_resource_path, read_to_string, write_to_file};
+pub use self::resource_builder_set::{read, read_single_resource, read_single_resource_path,
+    read_to_string, write_to_file, write_json_to_file};
 
 mod spritesheet;
 pub use self::spritesheet::Spritesheet;

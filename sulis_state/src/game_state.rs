@@ -25,7 +25,6 @@ use rlua;
 use sulis_core::config::CONFIG;
 use sulis_core::util::{self, Point, invalid_data_error};
 use sulis_core::io::{GraphicsRenderer};
-use sulis_core::ui::{Widget};
 use sulis_rules::HitKind;
 use sulis_module::{Ability, Actor, Module, ObjectSize, OnTrigger, area::{Trigger, TriggerKind}};
 
@@ -33,7 +32,7 @@ use {ai, AI, AreaState, ChangeListener, ChangeListenerList, Effect,
     EntityState, Location, Formation, ItemList, ItemState, PartyStash,
     PathFinder, SaveState, ScriptState, UICallback, MOVE_TO_THRESHOLD, TurnManager};
 use script::{script_callback::{self, ScriptHitKind}, ScriptEntitySet, ScriptCallback, ScriptItemKind};
-use animation::{self, Anim, AnimState};
+use animation::{self, Anim, AnimState, AnimSaveState};
 
 thread_local! {
     static TURN_MANAGER: Rc<RefCell<TurnManager>> = Rc::new(RefCell::new(TurnManager::default()));
@@ -82,6 +81,11 @@ impl GameState {
     pub fn load(save_state: SaveState) -> Result<(), Error> {
         TURN_MANAGER.with(|mgr| mgr.borrow_mut().clear());
         ANIMATIONS.with(|anims| anims.borrow_mut().clear());
+        STATE.with(|state| *state.borrow_mut() = None);
+        CLEAR_ANIMS.with(|c| c.set(false));
+        MODAL_LOCKED.with(|c| c.set(false));
+        ANIMS_TO_ADD.with(|anims| anims.borrow_mut().clear());
+        AI.with(|ai| *ai.borrow_mut() = AI::new());
 
         let game_state: Result<GameState, Error> = {
             let mut areas = HashMap::new();
@@ -133,9 +137,14 @@ impl GameState {
                 area_state.borrow_mut().add_entity(Rc::clone(entity), location)?;
             }
 
+            let mut effects = HashMap::new();
+
             let mgr = GameState::turn_manager();
             for effect_save in save_state.manager.effects {
-                let mut effect = Effect::load(effect_save);
+                let old_index = effect_save.index;
+                let new_index = mgr.borrow().get_next_effect_index();
+
+                let mut effect = Effect::load(effect_save, new_index, &entities)?;
                 if let Some(index) = effect.entity {
                     let entity = match entities.get(&index) {
                         None =>
@@ -146,8 +155,10 @@ impl GameState {
                     // the index has changed with the load
                     effect.entity = Some(entity.borrow().index);
 
-                    // TODO load callbacks and animations
-                    mgr.borrow_mut().add_effect(effect, &entity, Vec::new(), Vec::new());
+                    let new_idx = mgr.borrow_mut().add_effect(effect, &entity,
+                                                                Vec::new(), Vec::new());
+                    assert!(new_index == new_idx);
+                    effects.insert(old_index, new_index);
                     continue;
                 }
 
@@ -158,10 +169,24 @@ impl GameState {
                         Some(area) => area,
                     };
 
-                    // TODO load callbacks and animations
-                    mgr.borrow_mut().add_surface(effect, area, surface.points,
-                                                 Vec::new(), Vec::new());
+                    let new_idx = mgr.borrow_mut().add_surface(effect, area, surface.points,
+                                                                 Vec::new(), Vec::new());
+                    assert!(new_index == new_idx);
+                    effects.insert(old_index, new_index);
                 }
+            }
+
+            let mut marked = HashMap::new();
+            for anim in save_state.anims {
+                match anim.load(&entities, &effects, &mut marked) {
+                    None => (),
+                    Some(anim) => GameState::add_animation(anim),
+                }
+            }
+
+            let mgr = GameState::turn_manager();
+            for (index, vec) in marked {
+                mgr.borrow_mut().add_removal_listener_for_effect(index, vec);
             }
 
             let formation = save_state.formation;
@@ -748,7 +773,7 @@ impl GameState {
         STATE.with(|s| Rc::clone(&s.borrow().as_ref().unwrap().area_state))
     }
 
-    pub fn update(root: &Rc<RefCell<Widget>>, millis: u32) {
+    pub fn update(millis: u32) {
         let to_add: Vec<Anim> = ANIMS_TO_ADD.with(|a| {
             let mut anims = a.borrow_mut();
 
@@ -757,7 +782,7 @@ impl GameState {
             to_add
         });
 
-        ANIMATIONS.with(|a| a.borrow_mut().update(to_add, root));
+        ANIMATIONS.with(|a| a.borrow_mut().update(to_add, millis));
 
         let mgr = GameState::turn_manager();
         let cbs = mgr.borrow_mut().update(millis);
@@ -772,7 +797,7 @@ impl GameState {
             let state = state.as_mut().unwrap();
 
             let mut area_state = state.area_state.borrow_mut();
-            area_state.update(millis);
+            area_state.update();
         });
 
         GameState::remove_dead_party_members();
@@ -822,6 +847,10 @@ impl GameState {
 
             anims.push(anim);
         });
+    }
+
+    pub fn save_anims() -> Vec<AnimSaveState> {
+        ANIMATIONS.with(|a| a.borrow().save_anims())
     }
 
     /// Returns true if the game is currently in turn mode, false otherwise

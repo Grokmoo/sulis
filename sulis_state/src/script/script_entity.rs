@@ -18,11 +18,12 @@ use std::{self, f32, u32};
 use std::rc::Rc;
 use std::cell::RefCell;
 use std::collections::HashMap;
+use std::io::Error;
 
 use rand::{self, Rng};
 use rlua::{self, Lua, UserData, UserDataMethods};
 
-use sulis_core::util::ExtInt;
+use sulis_core::util::{invalid_data_error, ExtInt};
 use sulis_core::config::CONFIG;
 use sulis_core::resource::ResourceSet;
 use sulis_rules::{Attribute, AttackKind, DamageKind, Attack};
@@ -706,16 +707,51 @@ fn create_stats_table<'a>(lua: &'a Lua, parent: &ScriptEntity, _args: ()) -> Res
     Ok(stats)
 }
 
-#[derive(Clone, Debug)]
+#[derive(Deserialize, Serialize, Clone, Debug)]
+#[serde(deny_unknown_fields)]
 pub struct ScriptEntitySet {
     pub parent: usize,
     pub selected_point: Option<(i32, i32)>,
     pub affected_points: Vec<(i32, i32)>,
     pub indices: Vec<Option<usize>>,
+
+    // surface is set when passing into script as argument, but should
+    // never be saved as part of a callback
+    #[serde(skip)]
     pub surface: Option<ScriptActiveSurface>,
 }
 
 impl ScriptEntitySet {
+    pub fn update_entity_refs_on_load(&mut self,
+                                      entities: &HashMap<usize, Rc<RefCell<EntityState>>>) ->
+        ::std::result::Result<(), Error> {
+
+        match entities.get(&self.parent) {
+            None => {
+                return invalid_data_error(
+                    &format!("Invalid parent {} for ScriptEntitySet", self.parent));
+            }, Some(ref entity) => self.parent = entity.borrow().index,
+        }
+
+        let mut indices = Vec::new();
+        for index in self.indices.drain(..) {
+            match index {
+                None => indices.push(None),
+                Some(index) => {
+                    match entities.get(&index) {
+                        None => {
+                            return invalid_data_error(
+                                &format!("Invalid target {} for ScriptEntitySet", index));
+                        }, Some(ref entity) => indices.push(Some(entity.borrow().index)),
+                    }
+                }
+            }
+        }
+        self.indices = indices;
+
+        Ok(())
+    }
+
     pub fn append(&mut self, other: &ScriptEntitySet) {
         self.indices.append(&mut other.indices.clone());
         self.selected_point = other.selected_point.clone();

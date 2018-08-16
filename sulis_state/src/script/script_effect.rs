@@ -347,9 +347,12 @@ fn apply(effect_data: &ScriptEffect) -> Result<()> {
         effect_data.deactivate_with_ability.clone());
     let cbs = effect_data.callbacks.clone();
 
+    let effect_index = mgr.borrow().get_next_effect_index();
+
     let mut marked = Vec::new();
     for anim in effect_data.color_anims.iter() {
-        let anim = script_color_animation::create_anim(&anim)?;
+        let mut anim = script_color_animation::create_anim(&anim)?;
+        anim.set_removal_effect(effect_index);
         marked.push(anim.get_marked_for_removal());
         GameState::add_animation(anim);
     }
@@ -357,7 +360,8 @@ fn apply(effect_data: &ScriptEffect) -> Result<()> {
     match &effect_data.kind {
         Kind::Entity(parent) => {
             for pgen in effect_data.pgens.iter() {
-                let pgen = script_particle_generator::create_pgen(&pgen, pgen.owned_model())?;
+                let mut pgen = script_particle_generator::create_pgen(&pgen, pgen.owned_model())?;
+                pgen.set_removal_effect(effect_index);
                 marked.push(pgen.get_marked_for_removal());
                 GameState::add_animation(pgen);
             }
@@ -371,7 +375,8 @@ fn apply(effect_data: &ScriptEffect) -> Result<()> {
             let points: Vec<_> = points.iter().map(|(x, y)| Point::new(*x, *y)).collect();
             for pgen in effect_data.pgens.iter() {
                 for p in points.iter() {
-                    let pgen = script_particle_generator::create_surface_pgen(&pgen, p.x, p.y)?;
+                    let mut pgen = script_particle_generator::create_surface_pgen(&pgen, p.x, p.y)?;
+                    pgen.set_removal_effect(effect_index);
                     marked.push(pgen.get_marked_for_removal());
                     GameState::add_animation(pgen);
                 }

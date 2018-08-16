@@ -22,7 +22,6 @@ use std::collections::HashMap;
 
 use sulis_core::config::CONFIG;
 
-use animation::{self};
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::ui::{color, Color};
 use sulis_core::util::{Point, invalid_data_error};
@@ -30,6 +29,8 @@ use sulis_module::{actor::Faction, Actor, ObjectSize, ObjectSizeIterator, Module
 use sulis_module::area::{MAX_AREA_SIZE, Transition};
 use {ActorState, AreaState, ChangeListenerList, EntityTextureCache, EntityTextureSlot,
     GameState, Location, PropState, ScriptCallback};
+use script::CallbackData;
+use animation::{self};
 use save_state::EntitySaveState;
 
 enum AIState {
@@ -146,7 +147,7 @@ impl EntityState {
         }
     }
 
-    pub fn callbacks(&self) -> Vec<Rc<ScriptCallback>> {
+    pub fn callbacks(&self) -> Vec<Rc<CallbackData>> {
         let mgr = GameState::turn_manager();
         let mgr = mgr.borrow();
         self.actor.effects_iter().flat_map(|index| {

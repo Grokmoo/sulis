@@ -14,10 +14,13 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::time::{Instant, Duration};
+use std::time::{Duration};
 use std::cmp;
 use std::rc::Rc;
 use std::cell::{Cell, RefCell};
+
+mod anim_save_state;
+pub use self::anim_save_state::AnimSaveState;
 
 mod entity_color_animation;
 
@@ -31,7 +34,7 @@ pub mod particle_generator;
 
 pub mod ranged_attack_animation;
 
-use sulis_core::{io::GraphicsRenderer, ui::Widget, util::{self, ExtInt}};
+use sulis_core::{io::GraphicsRenderer, util::{self, ExtInt}};
 
 use {ChangeListener, Effect, EntityState, ScriptCallback};
 use self::particle_generator::Param;
@@ -61,7 +64,7 @@ impl AnimState {
         self.above_anims.clear();
     }
 
-    pub fn update(&mut self, to_add: Vec<Anim>, root: &Rc<RefCell<Widget>>) {
+    pub fn update(&mut self, to_add: Vec<Anim>, elapsed: u32) {
         for anim in to_add {
             use self::AnimKind::*;
             let draw_above = match anim.kind {
@@ -86,14 +89,22 @@ impl AnimState {
                         self.no_draw_anims.push(anim);
                     }
                 },
-                _ =>
-                    self.no_draw_anims.push(anim),
+                _ => self.no_draw_anims.push(anim),
             }
         }
 
-        AnimState::update_vec(&mut self.no_draw_anims, root);
-        AnimState::update_vec(&mut self.below_anims, root);
-        AnimState::update_vec(&mut self.above_anims, root);
+        AnimState::update_vec(&mut self.no_draw_anims, elapsed);
+        AnimState::update_vec(&mut self.below_anims, elapsed);
+        AnimState::update_vec(&mut self.above_anims, elapsed);
+    }
+
+    pub fn save_anims(&self) -> Vec<AnimSaveState> {
+        let mut anims = Vec::new();
+        self.below_anims.iter().for_each(|anim| anims.push(AnimSaveState::new(anim)));
+        self.above_anims.iter().for_each(|anim| anims.push(AnimSaveState::new(anim)));
+        self.no_draw_anims.iter().for_each(|anim| anims.push(AnimSaveState::new(anim)));
+
+        anims
     }
 
     pub fn draw_below_entities(&self, renderer: &mut GraphicsRenderer, offset_x: f32, offset_y: f32,
@@ -178,10 +189,10 @@ impl AnimState {
         }
     }
 
-    fn update_vec(vec: &mut Vec<Anim>, root: &Rc<RefCell<Widget>>) {
+    fn update_vec(vec: &mut Vec<Anim>, elapsed: u32) {
         let mut i = 0;
         while i < vec.len() {
-            let retain = vec[i].update(root);
+            let retain = vec[i].update(elapsed);
 
             if retain { i += 1; }
             else {
@@ -194,13 +205,14 @@ impl AnimState {
 }
 
 pub struct Anim {
-    kind: AnimKind,
-    start_time: Instant,
-    duration_millis: ExtInt,
+    pub(in animation) kind: AnimKind,
+    pub(in animation) elapsed: u32,
+    pub(in animation) duration_millis: ExtInt,
     marked_for_removal: Rc<Cell<bool>>,
     completion_callbacks: Vec<Box<ScriptCallback>>,
     update_callbacks: Vec<(u32, Box<ScriptCallback>)>, // sorted by the first field, time in secs
-    owner: Rc<RefCell<EntityState>>,
+    pub(in animation) owner: Rc<RefCell<EntityState>>,
+    pub(in animation) removal_effect: Option<usize>, // used only for save/load purposes
 }
 
 pub (in animation) enum AnimKind {
@@ -266,28 +278,34 @@ impl Anim {
                               kind: AnimKind) -> Anim {
         Anim {
             kind,
-            start_time: Instant::now(),
+            elapsed: 0,
             duration_millis,
             marked_for_removal: Rc::new(Cell::new(false)),
             completion_callbacks: Vec::new(),
             update_callbacks: Vec::new(),
             owner: Rc::clone(owner),
+            removal_effect: None,
         }
     }
 
-    pub fn update(&mut self, _root: &Rc<RefCell<Widget>>) -> bool {
-        let millis = util::get_elapsed_millis(self.start_time.elapsed());
+    pub fn set_removal_effect(&mut self, index: usize) {
+        self.removal_effect = Some(index);
+    }
 
-        self.update_kind(millis);
+    pub fn update(&mut self, millis: u32) -> bool {
+        let elapsed = self.elapsed + millis;
+        self.elapsed = elapsed;
+
+        self.update_kind(elapsed);
 
         if !self.update_callbacks.is_empty() {
-            if millis > self.update_callbacks[0].0 {
+            if elapsed > self.update_callbacks[0].0 {
                 self.update_callbacks[0].1.on_anim_update();
                 self.update_callbacks.remove(0);
             }
         }
 
-        if (self.duration_millis.less_than(millis) && self.ok_to_remove()) || self.marked_for_removal.get() {
+        if (self.duration_millis.less_than(elapsed) && self.ok_to_remove()) || self.marked_for_removal.get() {
             false
         } else {
             true

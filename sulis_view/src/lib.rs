@@ -138,8 +138,8 @@ impl GameMainLoopUpdater {
 }
 
 impl MainLoopUpdater for GameMainLoopUpdater {
-    fn update(&self, root: &Rc<RefCell<Widget>>, millis: u32) {
-        GameState::update(root, millis);
+    fn update(&self, _root: &Rc<RefCell<Widget>>, millis: u32) {
+        GameState::update(millis);
     }
 
     fn is_exit(&self) -> bool {

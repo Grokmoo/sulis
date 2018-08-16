@@ -21,7 +21,7 @@ use std::collections::{HashSet, VecDeque, vec_deque::Iter};
 use sulis_core::util::Point;
 use sulis_module::Faction;
 use script::CallbackData;
-use {AreaState, ChangeListener, ChangeListenerList, Effect, EntityState, GameState, ScriptCallback};
+use {AreaState, ChangeListener, ChangeListenerList, Effect, EntityState, GameState};
 
 pub const ROUND_TIME_MILLIS: u32 = 5000;
 
@@ -33,11 +33,10 @@ enum Entry {
 
 pub struct TurnManager {
     entities: Vec<Option<Rc<RefCell<EntityState>>>>,
-    effects: Vec<Option<Effect>>,
+    pub(crate) effects: Vec<Option<Effect>>,
     surfaces: Vec<usize>,
     effects_remove_next_update: Vec<usize>,
     combat_active: bool,
-    last_millis: u32,
 
     pub listeners: ChangeListenerList<TurnManager>,
     order: VecDeque<Entry>,
@@ -53,7 +52,6 @@ impl Default for TurnManager {
             listeners: ChangeListenerList::default(),
             order: VecDeque::new(),
             combat_active: false,
-            last_millis: 0,
         }
     }
 }
@@ -117,7 +115,7 @@ impl TurnManager {
     }
 
     #[must_use]
-    pub fn update_on_moved_in_surface(&mut self) -> Vec<(Rc<ScriptCallback>, usize)> {
+    pub fn update_on_moved_in_surface(&mut self) -> Vec<(Rc<CallbackData>, usize)> {
         let mut result = Vec::new();
 
         for index in self.surfaces.iter() {
@@ -131,7 +129,7 @@ impl TurnManager {
     }
 
     #[must_use]
-    pub fn update(&mut self, current_millis: u32) -> Vec<Rc<ScriptCallback>> {
+    pub fn update(&mut self, elapsed_millis: u32) -> Vec<Rc<CallbackData>> {
         // need to do an additional copy to satisfy the borrow checker here
         let to_remove: Vec<usize> = self.effects_remove_next_update.drain(..).collect();
         for index in to_remove {
@@ -140,8 +138,7 @@ impl TurnManager {
 
         let mut cbs = Vec::new();
 
-        let elapsed_millis = if !self.combat_active { current_millis - self.last_millis } else { 0 };
-        self.last_millis = current_millis;
+        let elapsed_millis = if !self.combat_active { elapsed_millis } else { 0 };
 
         // removal just replaces some with none, so we can safely iterate
         for index in 0..self.effects.len() {
@@ -162,7 +159,7 @@ impl TurnManager {
     }
 
     #[must_use]
-    fn update_effect(&mut self, index: usize, elapsed_millis: u32) -> (bool, Vec<Rc<ScriptCallback>>) {
+    fn update_effect(&mut self, index: usize, elapsed_millis: u32) -> (bool, Vec<Rc<CallbackData>>) {
         let effect = match self.effects[index] {
             None => return (false, Vec::new()),
             Some(ref mut effect) => effect,
@@ -184,7 +181,7 @@ impl TurnManager {
     }
 
     #[must_use]
-    pub fn next(&mut self) -> Vec<Rc<ScriptCallback>> {
+    pub fn next(&mut self) -> Vec<Rc<CallbackData>> {
         let cbs = self.iterate_to_next_entity();
         self.init_turn_for_current_entity();
 
@@ -239,7 +236,7 @@ impl TurnManager {
     }
 
     #[must_use]
-    fn iterate_to_next_entity(&mut self) -> Vec<Rc<ScriptCallback>> {
+    fn iterate_to_next_entity(&mut self) -> Vec<Rc<CallbackData>> {
         let mut cbs = Vec::new();
         let mut current_ended = false;
 
@@ -489,6 +486,12 @@ impl TurnManager {
         index
     }
 
+    /// Returns the index that will be set for the next effect that is added
+    /// to this turn manager
+    pub fn get_next_effect_index(&self) -> usize {
+        self.effects.len()
+    }
+
     pub fn add_surface(&mut self, effect: Effect, area_state: &Rc<RefCell<AreaState>>,
                        points: Vec<Point>, cbs: Vec<CallbackData>,
                        removal_markers: Vec<Rc<Cell<bool>>>) -> usize {
@@ -511,6 +514,22 @@ impl TurnManager {
         entity.borrow_mut().actor.add_effect(index, bonuses);
 
         index
+    }
+
+    /// Adds the specified cells to be set to true when the given effect is removed.  this
+    /// is used when loading, in order to associate animations with effects
+    pub fn add_removal_listener_for_effect(&mut self, index: usize, marked: Vec<Rc<Cell<bool>>>) {
+        match self.effects.get_mut(index) {
+            None => unreachable!(),
+            Some(ref mut effect) => match effect {
+                None => unreachable!(),
+                Some(ref mut effect) => {
+                    effect.removal_listeners.add(ChangeListener::new("anim", Box::new(move |_| {
+                        marked.iter().for_each(|m| m.set(true));
+                    })));
+                }
+            }
+        }
     }
 
     // queue up the effect removal for later because we want to

@@ -959,7 +959,7 @@ impl AreaState {
         self.props.len()
     }
 
-    pub (crate) fn update(&mut self, _millis: u32) {
+    pub (crate) fn update(&mut self) {
         let mut notify = false;
         let len = self.props.len();
         for index in 0..len {

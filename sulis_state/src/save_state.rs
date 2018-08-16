@@ -27,6 +27,8 @@ use sulis_module::{actor::{ActorBuilder, RewardBuilder}};
 use {ActorState, effect, Effect, EntityState, Formation, GameState, ItemState, Location,
     PropState, prop_state::Interactive, Merchant};
 use area_state::{TriggerState};
+use script::CallbackData;
+use animation::AnimSaveState;
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
@@ -39,6 +41,7 @@ pub struct SaveState {
     pub(crate) current_area: String,
     pub(crate) areas: HashMap<String, AreaSaveState>,
     pub(crate) manager: ManagerSaveState,
+    pub(crate) anims: Vec<AnimSaveState>,
 }
 
 impl SaveState {
@@ -77,6 +80,7 @@ impl SaveState {
             coins: GameState::party_coins(),
             stash,
             manager: ManagerSaveState::new(),
+            anims: GameState::save_anims(),
         }
     }
 
@@ -102,8 +106,13 @@ impl ManagerSaveState {
         }
 
         let mut effects = Vec::new();
-        for effect in mgr.effect_iter() {
-            effects.push(EffectSaveState::new(effect));
+        for (index, effect) in mgr.effects.iter().enumerate() {
+            match effect {
+                None => continue,
+                Some(ref effect) => {
+                    effects.push(EffectSaveState::new(effect, index));
+                }
+            }
         }
 
         ManagerSaveState {
@@ -116,6 +125,7 @@ impl ManagerSaveState {
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct EffectSaveState {
+    pub(crate) index: usize,
     pub(crate) name: String,
     pub(crate) tag: String,
     pub(crate) cur_duration: u32,
@@ -124,11 +134,19 @@ pub struct EffectSaveState {
     pub(crate) surface: Option<effect::Surface>,
     pub(crate) entity: Option<usize>,
     pub(crate) bonuses: BonusList,
+    pub(crate) callbacks: Vec<CallbackData>,
 }
 
 impl EffectSaveState {
-    pub fn new(effect: &Effect) -> EffectSaveState {
+    pub fn new(effect: &Effect, index: usize) -> EffectSaveState {
+        let mut callbacks: Vec<CallbackData> = Vec::new();
+        for cb in effect.callbacks.iter() {
+            let inner: CallbackData = CallbackData::clone(&*cb);
+            callbacks.push(inner);
+        }
+
         EffectSaveState {
+            index,
             name: effect.name.to_string(),
             tag: effect.tag.to_string(),
             cur_duration: effect.cur_duration,
@@ -137,6 +155,7 @@ impl EffectSaveState {
             surface: effect.surface.clone(),
             entity: effect.entity.clone(),
             bonuses: effect.bonuses.clone(),
+            callbacks,
         }
     }
 }
@@ -444,6 +463,7 @@ pub struct ActorSaveState {
     pub(crate) equipped: Vec<Option<ItemSaveState>>,
     pub(crate) quick: Vec<Option<ItemSaveState>>,
     pub(crate) ability_states: HashMap<String, AbilitySaveState>,
+    pub(crate) current_group_uses_per_encounter: HashMap<String, ExtInt>,
 }
 
 impl ActorSaveState {
@@ -483,6 +503,7 @@ impl ActorSaveState {
             equipped,
             quick,
             ability_states,
+            current_group_uses_per_encounter: actor_state.current_group_uses_per_encounter.clone(),
         }
     }
 }

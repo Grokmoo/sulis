@@ -43,7 +43,7 @@ pub struct ActorState {
     effects: Vec<(usize, BonusList)>,
     image: LayeredImage,
     pub(crate) ability_states: HashMap<String, AbilityState>,
-    current_group_uses_per_encounter: HashMap<String, ExtInt>,
+    pub(crate) current_group_uses_per_encounter: HashMap<String, ExtInt>,
     texture_cache_invalid: bool,
 }
 
@@ -85,8 +85,7 @@ impl ActorState {
         let mut inventory = Inventory::empty();
         inventory.load(save.equipped, save.quick)?;
 
-        let current_group_uses_per_encounter = HashMap::new();
-        // TODO save / load group uses per encounter
+        let current_group_uses_per_encounter = save.current_group_uses_per_encounter;
 
         Ok(ActorState {
             actor,

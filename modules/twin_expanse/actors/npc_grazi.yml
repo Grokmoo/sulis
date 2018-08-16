@@ -37,14 +37,13 @@ inventory:
   quick:
     Usable1: potion_healing
     AltHeldMain: shortbow
-xp: 300
+xp: 120
 levels:
-  rogue: 3
+  rogue: 2
 abilities:
   - armor_light
   - weapon_crossbow
   - weapon_bow
   - weapon_small_sword
   - weapon_simple
-  - hide
   - backstab

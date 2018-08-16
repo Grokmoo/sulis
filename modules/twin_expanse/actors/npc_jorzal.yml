@@ -38,9 +38,9 @@ inventory:
     Hands: gloves_leather
   quick:
     Usable1: potion_healing
-xp: 300
+xp: 120
 levels:
-  fighter: 3
+  fighter: 2
 abilities:
   - armor_light
   - armor_medium
@@ -54,4 +54,3 @@ abilities:
   - weapon_mace
   - weapon_simple
   - mighty_blow
-  - defensive_fighting

@@ -37,9 +37,9 @@ inventory:
   quick:
     Usable1: potion_healing
     AltHeldMain: crossbow
-xp: 300
+xp: 120
 levels:
-  mage: 3
+  mage: 2
 abilities:
   - minor_heal
   - flare
@@ -48,4 +48,3 @@ abilities:
   - weapon_simple
   - weapon_crossbow
   - wind_gust
-  - crush

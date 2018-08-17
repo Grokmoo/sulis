@@ -337,6 +337,7 @@ impl AttackAction {
         let target = match area_state.get_entity_at(x, y) {
             None => return None,
             Some(ref entity) => {
+                if entity.borrow().actor.hp() <= 0 { return None; }
                 if entity.borrow().is_party_member() { return None; }
                 if entity.borrow().actor.actor.faction == Faction::Friendly { return None; }
                 Rc::clone(entity)

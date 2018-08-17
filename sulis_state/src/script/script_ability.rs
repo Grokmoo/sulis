@@ -245,7 +245,7 @@ fn activate(_lua: &Lua, ability: &ScriptAbility, (target, take_ap): (ScriptEntit
     }
 
     let area = GameState::area_state();
-    area.borrow_mut().add_feedback_text(ability.name.to_string(), &entity, ColorKind::Info, 3.0);
+    area.borrow_mut().add_feedback_text(ability.name.to_string(), &entity, ColorKind::Info);
     entity.borrow_mut().actor.activate_ability_state(&ability.id);
     Ok(())
 }

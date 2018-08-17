@@ -170,7 +170,7 @@ impl DistParam2D {
 
 impl UserData for DistParam2D { }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Copy, Clone, Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Param {
     #[serde(default, skip_serializing_if = "is_zero")]

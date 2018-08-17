@@ -363,7 +363,7 @@ impl UserData for ScriptEntity {
             let (hit_kind, damage, text, color) = ActorState::weapon_attack(&parent, &target);
 
             let area_state = GameState::area_state();
-            area_state.borrow_mut().add_feedback_text(text, &target, color, 3.0);
+            area_state.borrow_mut().add_feedback_text(text, &target, color);
 
             let hit_kind = ScriptHitKind { kind: hit_kind, damage };
             Ok(hit_kind)
@@ -438,7 +438,7 @@ impl UserData for ScriptEntity {
             let (hit_kind, damage, text, color) = ActorState::attack(&parent, &target, &attack);
 
             let area_state = GameState::area_state();
-            area_state.borrow_mut().add_feedback_text(text, &target, color, 3.0);
+            area_state.borrow_mut().add_feedback_text(text, &target, color);
 
             let hit_kind = ScriptHitKind { kind: hit_kind, damage };
             Ok(hit_kind)
@@ -461,14 +461,14 @@ impl UserData for ScriptEntity {
                     total += amount;
                 }
 
-                parent.borrow_mut().remove_hp(total);
+                EntityState::remove_hp(&parent, total);
                 (format!("{}", total), ColorKind::Hit)
             } else {
                 ("0".to_string(), ColorKind::Miss)
             };
 
             let area_state = GameState::area_state();
-            area_state.borrow_mut().add_feedback_text(text, &parent, color, 3.0);
+            area_state.borrow_mut().add_feedback_text(text, &parent, color);
             Ok(())
         });
 
@@ -478,7 +478,7 @@ impl UserData for ScriptEntity {
             parent.borrow_mut().actor.add_hp(amount);
             let area_state = GameState::area_state();
             area_state.borrow_mut().add_feedback_text(format!("{}", amount), &parent,
-                ColorKind::Heal, 3.0);
+                ColorKind::Heal);
 
             Ok(())
         });

@@ -191,23 +191,23 @@ children:
               tooltip: "Swap Weapon Set"
           usable1:
             from: .item_button
-            background: background_transparent
-            foreground: greyed_out
+            background: quick_item_button
+            foreground: ability_button_fg
             position: [0, 8]
           usable2:
             from: .item_button
-            background: background_transparent
-            foreground: greyed_out
+            background: quick_item_button
+            foreground: ability_button_fg
             position: [14, 8]
           usable3:
             from: .item_button
-            background: background_transparent
-            foreground: greyed_out
+            background: quick_item_button
+            foreground: ability_button_fg
             position: [0, 21]
           usable4:
             from: .item_button
-            background: background_transparent
-            foreground: greyed_out
+            background: quick_item_button
+            foreground: ability_button_fg
             position: [14, 21]
       abilities_bar:
         height_relative: Max
@@ -245,8 +245,8 @@ children:
                 children:
                   ability_button:
                     from: .button
-                    background: background_inner
-                    foreground: "greyed_out"
+                    background: ability_button
+                    foreground: ability_button_fg
                     preferred_size: [13, 13]
                     children:
                       duration_label:
@@ -766,7 +766,7 @@ children:
           [s=6;x=0;y=46|Accuracy]
           [s=5|[x=0|Melee: #melee_accuracy#][x=28|Ranged: #ranged_accuracy#][x=56|Spell: #spell_accuracy#]]
           [s=4|
-          ][s=6.0;x=0|Armor: #armor#][?armor_slashing;s=6.0| (Slashing: #armor_slashing#)][?armor_piercing;s=6.0| (Piercing: #armor_piercing#)][?armor_crushing;s=6.0| (Crushing: #armor_crushing#)][?armor_acid;s=6.0| (Acid: #armor_acid#)][?armor_cold;s=6.0| (Cold: #armor_cold#)][?armor_electrical;s=6.0| (Electrical: #armor_electrical#)][?armor_fire;s=6.0| (Fire: #armor_fire#)][?armor_sonic;s=6.0| (Sonic: #armor_sonic#)]
+          ][s=6.0;x=0|Armor: #armor#][?armor_slashing;s=5.0| (Slashing: #armor_slashing#)][?armor_piercing;s=5.0| (Piercing: #armor_piercing#)][?armor_crushing;s=5.0| (Crushing: #armor_crushing#)][?armor_acid;s=5.0| (Acid: #armor_acid#)][?armor_cold;s=5.0| (Cold: #armor_cold#)][?armor_electrical;s=5.0| (Electrical: #armor_electrical#)][?armor_fire;s=5.0| (Fire: #armor_fire#)][?armor_sonic;s=5.0| (Sonic: #armor_sonic#)]
           [s=5|[x=0|Defense: #defense#][x=28|Fortitude: #fortitude#][x=56|Reflex: #reflex#][x=84|Will: #will#]]
           [s=4|
           ][s=6;y=70|[x=0|Strength][x=30|#str#]

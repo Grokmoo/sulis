@@ -396,6 +396,11 @@ pub fn set_quickslot_cb(entity: &Rc<RefCell<EntityState>>,
 pub fn use_item_cb(entity: &Rc<RefCell<EntityState>>, kind: ScriptItemKind) -> Callback {
     let entity = Rc::clone(entity);
     Callback::new(Rc::new(move |widget, _| {
+        match kind {
+            ScriptItemKind::Quick(slot) => {
+                if !entity.borrow().actor.can_use_quick(slot) { return; }
+            }, _ => (),
+        }
         let root = Widget::get_root(widget);
         let view = Widget::downcast_kind_mut::<RootView>(&root);
         view.set_inventory_window(&root, false);

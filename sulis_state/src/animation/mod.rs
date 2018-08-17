@@ -237,6 +237,9 @@ pub (in animation) enum AnimKind {
     /// A particle effect from a script - can also be used for simple
     /// single image animations
     ParticleGenerator { model: GeneratorModel, state: GeneratorState },
+
+    /// Animation triggered when an entity is killed
+    EntityDeath { color: [Param; 4], color_sec: [Param; 4] },
 }
 
 impl Anim {
@@ -272,6 +275,17 @@ impl Anim {
     pub (in animation) fn new_pgen(owner: &Rc<RefCell<EntityState>>, duration_millis: ExtInt,
                                    model: GeneratorModel, state: GeneratorState) -> Anim {
         Anim::new(owner, duration_millis, AnimKind::ParticleGenerator { model, state })
+    }
+
+    pub fn new_entity_death(owner: &Rc<RefCell<EntityState>>) -> Anim {
+        let time = 800;
+        let time_f32 = time as f32 / 1000.0;
+        let duration_millis = ExtInt::Int(time);
+        let alpha = Param::with_jerk(1.0, 0.0, 0.0, -1.0 / time_f32);
+        let color = [Param::fixed(1.0), Param::fixed(0.0), Param::fixed(0.0), alpha];
+        let red = Param::with_accel(0.0, 1.0 / time_f32, -1.0 / time_f32);
+        let color_sec = [red, Param::fixed(0.0), Param::fixed(0.0), Param::fixed(0.0)];
+        Anim::new(owner, duration_millis, AnimKind::EntityDeath { color, color_sec })
     }
 
     fn new(owner: &Rc<RefCell<EntityState>>, duration_millis: ExtInt,
@@ -340,6 +354,8 @@ impl Anim {
         match self.kind {
             EntityColor { ref mut color, ref mut color_sec } =>
                 entity_color_animation::update(color, color_sec, &self.owner, millis),
+            EntityDeath { ref mut color, ref mut color_sec } =>
+                entity_color_animation::update(color, color_sec, &self.owner, millis),
             EntitySubpos { ref mut x, ref mut y } =>
                 entity_subpos_animation::update(x, y, &self.owner, millis),
             MeleeAttack { ref mut model } =>
@@ -361,6 +377,9 @@ impl Anim {
             EntitySubpos { .. } => entity_subpos_animation::cleanup(&self.owner),
             MeleeAttack { .. } => melee_attack_animation::cleanup(&self.owner),
             Move { .. } => move_animation::cleanup(&self.owner),
+            EntityDeath { .. } => {
+                self.owner.borrow_mut().marked_for_removal = true;
+            },
             _ => (),
         }
     }
@@ -429,6 +448,7 @@ impl Anim {
             ParticleGenerator { model, ..} => {
                 !model.duration_millis.is_infinite()
             },
+            EntityDeath { .. } => true,
         }
     }
 }

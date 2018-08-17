@@ -18,7 +18,7 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_core::ui::{Callback, Widget, WidgetKind};
+use sulis_core::ui::{animation_state, Callback, Widget, WidgetKind};
 use sulis_rules::QuickSlot;
 use sulis_state::{ChangeListener, EntityState, GameState, script::ScriptItemKind};
 use sulis_widgets::{Label, Button};
@@ -92,8 +92,13 @@ fn create_button(entity: &Rc<RefCell<EntityState>>, slot: QuickSlot,
             let button = ItemButton::quick(entity, quantity, item_state.item.icon.id(), slot);
             button.borrow_mut().add_action("Use", use_item_cb(entity, kind));
             button.borrow_mut().add_action("Clear Slot", clear_quickslot_cb(entity, slot));
-            let widget = Widget::with_theme(button, theme_id);
-            widget.borrow_mut().state.set_enabled(actor.can_use_quick(slot));
+            let widget = Widget::with_theme(button.clone(), theme_id);
+            if actor.can_use_quick(slot) {
+                widget.borrow_mut().state.animation_state.remove(animation_state::Kind::Custom1);
+            } else {
+                widget.borrow_mut().state.animation_state.add(animation_state::Kind::Custom1);
+
+            }
             widget
         }
     }

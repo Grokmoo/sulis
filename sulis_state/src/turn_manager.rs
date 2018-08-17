@@ -280,13 +280,13 @@ impl TurnManager {
         false
     }
 
-    pub fn check_ai_activation_for_party(&mut self, area_state: &AreaState) {
+    pub fn check_ai_activation_for_party(&mut self, area_state: &mut AreaState) {
         for entity in GameState::party() {
             self.check_ai_activation(&entity, area_state);
         }
     }
 
-    pub fn check_ai_activation(&mut self, mover: &Rc<RefCell<EntityState>>, area_state: &AreaState) {
+    pub fn check_ai_activation(&mut self, mover: &Rc<RefCell<EntityState>>, area_state: &mut AreaState) {
         let mut groups_to_activate: HashSet<usize> = HashSet::new();
         let mut state_changed = false;
 
@@ -343,6 +343,7 @@ impl TurnManager {
                 let front = self.order.pop_front().unwrap();
                 self.order.push_back(front);
             }
+            area_state.bump_party_overlap(self);
             self.init_turn_for_current_entity();
         } else {
             self.listeners.notify(&self);

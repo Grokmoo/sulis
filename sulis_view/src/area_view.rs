@@ -117,7 +117,9 @@ impl AreaView {
         let x = ((x - self.scroll.x()) * self.scale.0).round() as i32;
         let y = ((y - self.scroll.y()) * self.scale.1).round() as i32;
 
-        (x + offset.x, y + offset.y)
+        let offset_x = (offset.x as f32 * self.user_scale).round() as i32;
+        let offset_y = (offset.y as f32 * self.user_scale).round() as i32;
+        (x + offset_x, y + offset_y)
     }
 
     fn get_cursor_pos(&self, widget: &Rc<RefCell<Widget>>) -> (i32, i32) {

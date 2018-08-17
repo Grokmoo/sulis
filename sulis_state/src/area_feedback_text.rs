@@ -120,12 +120,13 @@ impl AreaFeedbackText {
                 / params.font.line_height as f32;
         }
 
-        let color = match self.color_kind {
+        let mut color = match self.color_kind {
             ColorKind::Info => params.info_color,
             ColorKind::Miss => params.miss_color,
             ColorKind::Hit => params.hit_color,
             ColorKind::Heal => params.heal_color,
         };
+        color.a = self.alpha;
 
         let mut pos_x = offset_x + self.pos_x - params.scale * self.text_width / 2.0;
         if pos_x < 0.0 { pos_x = 0.0; }

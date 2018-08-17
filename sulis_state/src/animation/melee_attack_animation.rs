@@ -40,7 +40,7 @@ pub (in animation) fn update(attacker: &Rc<RefCell<EntityState>>, model: &mut Me
 
         let (hit_kind, damage, text, color) = (model.attack_func)(attacker, &model.defender);
 
-        area_state.borrow_mut().add_feedback_text(text, &model.defender, color, 3.0);
+        area_state.borrow_mut().add_feedback_text(text, &model.defender, color);
         model.has_attacked = true;
 
         for cb in model.callbacks.iter() {

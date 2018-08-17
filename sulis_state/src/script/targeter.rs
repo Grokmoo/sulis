@@ -16,7 +16,7 @@
 
 use rlua::{self, Lua, UserData, UserDataMethods};
 
-use sulis_module::Module;
+use sulis_module::{Module, OnTrigger};
 
 use script::area_targeter::Shape;
 use script::{AreaTargeter, Result, ScriptEntity, ScriptEntitySet, ScriptItemKind};
@@ -188,6 +188,17 @@ impl UserData for TargeterData {
 
 fn activate(_lua: &Lua, data: &TargeterData, _args: ()) -> Result<()> {
     info!("Activating targeter");
+
+    let parent = ScriptEntity::new(data.parent).try_unwrap()?;
+    if parent.borrow().is_party_member() && data.free_select.is_none() && data.selectable.is_empty() {
+        let cb = OnTrigger {
+            say_line: Some("No valid targets.".to_string()),
+            ..Default::default()
+        };
+
+        GameState::add_ui_callback(cb, &parent, &parent);
+        return Ok(());
+    }
 
     let targeter = AreaTargeter::from(data);
 

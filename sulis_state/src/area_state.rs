@@ -865,30 +865,31 @@ impl AreaState {
         let old_y = entity.borrow().location.y;
         if !entity.borrow_mut().move_to(x, y, squares) { return false; }
 
-        self.update_entity_position(entity, old_x, old_y);
+        let mgr = GameState::turn_manager();
+
+        self.update_entity_position(entity, old_x, old_y, &mut mgr.borrow_mut());
 
         true
     }
 
     fn update_entity_position(&mut self, entity: &Rc<RefCell<EntityState>>,
-                                           old_x: i32, old_y: i32) {
+                                           old_x: i32, old_y: i32, mgr: &mut TurnManager) {
         let entity_index = entity.borrow().index;
         let old_surfaces = self.clear_entity_points(&entity.borrow(), old_x, old_y);
         let new_surfaces = self.add_entity_points(&entity.borrow());
 
-        let mgr = GameState::turn_manager();
         // remove from surfaces in old but not in new
         for surface in old_surfaces.difference(&new_surfaces) {
-            mgr.borrow_mut().remove_from_surface(entity_index, *surface);
+            mgr.remove_from_surface(entity_index, *surface);
         }
 
         // add to surfaces in new but not in old
         for surface in new_surfaces.difference(&old_surfaces) {
-            mgr.borrow_mut().add_to_surface(entity_index, *surface);
+            mgr.add_to_surface(entity_index, *surface);
         }
 
         for surface in new_surfaces.intersection(&old_surfaces) {
-            mgr.borrow_mut().increment_surface_squares_moved(entity_index, *surface);
+            mgr.increment_surface_squares_moved(entity_index, *surface);
         }
 
         let is_pc = entity.borrow().is_party_member();
@@ -904,8 +905,7 @@ impl AreaState {
             self.check_trigger_grid(&entity);
         }
 
-        let mgr = GameState::turn_manager();
-        mgr.borrow_mut().check_ai_activation(entity, self);
+        mgr.check_ai_activation(entity, self);
     }
 
     #[must_use]
@@ -993,6 +993,74 @@ impl AreaState {
         }
     }
 
+    pub fn bump_party_overlap(&mut self, mgr: &mut TurnManager) {
+        debug!("Combat initiated.  Checking for party overlap");
+        let party = GameState::party();
+        if party.len() < 2 { return; }
+
+        let mut bb = Vec::new();
+        for member in party.iter() {
+            let member = member.borrow();
+            let x = member.location.x;
+            let y = member.location.y;
+            let w = member.size.width;
+            let h = member.size.height;
+            bb.push((x, y, w, h));
+        }
+
+        let mut to_bump = HashSet::new();
+        for i in 0..(bb.len() - 1) {
+            for j in (i + 1)..(bb.len()) {
+                // if one box is on left side of the other
+                if bb[i].0 >= bb[j].0 + bb[j].2 || bb[j].0 >= bb[i].0 + bb[i].2 {
+                    continue;
+                }
+
+                // if one box in above the other
+                if bb[i].1 >= bb[j].1 + bb[j].3 || bb[j].1 >= bb[i].1 + bb[i].3 {
+                    continue;
+                }
+
+                trace!("Found party overlap between {} and {}", i, j);
+                to_bump.insert(i);
+            }
+        }
+
+        for index in to_bump {
+            let member = &party[index];
+
+            let (old_x, old_y) = (member.borrow().location.x, member.borrow().location.y);
+            let (x, y) = match self.find_bump_position(member, old_x, old_y) {
+                None => {
+                    warn!("Unable to bump '{}' to avoid party overlap", member.borrow().actor.actor.name);
+                    continue;
+                }, Some((x, y)) => (x, y),
+            };
+
+            info!("Bumping '{}' from {},{} to {},{}", member.borrow().actor.actor.name, old_x, old_y,
+                x, y);
+            member.borrow_mut().location.move_to(x, y);
+            self.update_entity_position(member, old_x, old_y, mgr);
+            // TODO add subpos animation so move is smooth
+        }
+    }
+
+    fn find_bump_position(&self, entity: &Rc<RefCell<EntityState>>,
+                          cur_x: i32, cur_y: i32) -> Option<(i32, i32)> {
+        // TODO search for bump positions
+        let to_check = vec![(cur_x - 1, cur_y - 1), (cur_x, cur_y - 1), (cur_x + 1, cur_y - 1),
+                        (cur_x - 1, cur_y), (cur_x + 1, cur_y),
+                        (cur_x - 1, cur_y + 1), (cur_x, cur_y + 1), (cur_x + 1, cur_y + 1)];
+
+        let to_ignore = vec![entity.borrow().index];
+        for (x, y) in to_check {
+            if self.point_entities_passable(&to_ignore, x, y) {
+                return Some((x, y));
+            }
+        }
+        None
+    }
+
     #[must_use]
     pub fn remove_entity(&mut self, entity: &Rc<RefCell<EntityState>>) -> HashSet<usize> {
         let entity = entity.borrow();
@@ -1017,7 +1085,9 @@ impl AreaState {
     }
 
     pub fn add_feedback_text(&mut self, text: String, target: &Rc<RefCell<EntityState>>,
-                             color_kind: area_feedback_text::ColorKind, move_rate: f32) {
+                             color_kind: area_feedback_text::ColorKind) {
+        let move_rate = 3.0;
+
         if text.trim().is_empty() { return; }
 
         let mut area_pos = target.borrow().location.to_point();

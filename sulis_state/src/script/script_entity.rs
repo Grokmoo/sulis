@@ -893,6 +893,7 @@ fn targets(_lua: &Lua, parent: &ScriptEntity, _args: ()) -> Result<ScriptEntityS
         }
 
         let entity = entity.borrow();
+        if entity.actor.is_dead() { continue; }
         if !entity.location.is_in_area_id(&area_id) { continue; }
 
         indices.push(Some(entity.index));

@@ -1032,13 +1032,14 @@ impl AreaState {
             let (old_x, old_y) = (member.borrow().location.x, member.borrow().location.y);
             let (x, y) = match self.find_bump_position(member, old_x, old_y) {
                 None => {
-                    warn!("Unable to bump '{}' to avoid party overlap", member.borrow().actor.actor.name);
+                    warn!("Unable to bump '{}' to avoid party overlap",
+                          member.borrow().actor.actor.name);
                     continue;
                 }, Some((x, y)) => (x, y),
             };
 
-            info!("Bumping '{}' from {},{} to {},{}", member.borrow().actor.actor.name, old_x, old_y,
-                x, y);
+            info!("Bumping '{}' from {},{} to {},{}", member.borrow().actor.actor.name,
+                old_x, old_y, x, y);
             member.borrow_mut().location.move_to(x, y);
             self.update_entity_position(member, old_x, old_y, mgr);
             // TODO add subpos animation so move is smooth
@@ -1047,15 +1048,14 @@ impl AreaState {
 
     fn find_bump_position(&self, entity: &Rc<RefCell<EntityState>>,
                           cur_x: i32, cur_y: i32) -> Option<(i32, i32)> {
-        // TODO search for bump positions
-        let to_check = vec![(cur_x - 1, cur_y - 1), (cur_x, cur_y - 1), (cur_x + 1, cur_y - 1),
-                        (cur_x - 1, cur_y), (cur_x + 1, cur_y),
-                        (cur_x - 1, cur_y + 1), (cur_x, cur_y + 1), (cur_x + 1, cur_y + 1)];
-
         let to_ignore = vec![entity.borrow().index];
-        for (x, y) in to_check {
-            if self.point_entities_passable(&to_ignore, x, y) {
-                return Some((x, y));
+        for radius in 1..=3 {
+            for y in -radius..=radius {
+                for x in -radius..=radius {
+                    if self.point_entities_passable(&to_ignore, cur_x + x, cur_y + y) {
+                        return Some((cur_x + x, cur_y + y));
+                    }
+                }
             }
         }
         None

@@ -61,7 +61,11 @@ impl PartyStash {
     /// Removes one item from the specified index.  returns it if there
     /// was an item to remove
     pub fn remove_item(&mut self, index: usize) -> Option<ItemState> {
-        self.items.remove(index)
+        let result = self.items.remove(index);
+
+        self.listeners.notify(&self);
+
+        result
     }
 
     /// Takes all items out of the specified prop and into this stash

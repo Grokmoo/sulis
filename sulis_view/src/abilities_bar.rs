@@ -20,7 +20,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_core::io::event;
-use sulis_core::ui::{Widget, WidgetKind};
+use sulis_core::ui::{animation_state, Widget, WidgetKind};
 use sulis_core::util::{Size, ExtInt};
 use sulis_module::{actor::OwnedAbility, Ability, Module, ability::{AbilityGroup, Duration}};
 use sulis_state::{ChangeListener, EntityState, GameState};
@@ -229,7 +229,11 @@ impl WidgetKind for AbilityButton {
     fn layout(&mut self, widget: &mut Widget) {
         widget.do_base_layout();
 
-        widget.state.set_enabled(self.entity.borrow().actor.can_toggle(&self.ability.id));
+        if self.entity.borrow().actor.can_toggle(&self.ability.id) {
+            widget.state.animation_state.remove(animation_state::Kind::Custom1);
+        } else {
+            widget.state.animation_state.add(animation_state::Kind::Custom1);
+        }
 
         if let Some(ref mut state) = self.entity.borrow_mut().actor.ability_state(&self.ability.id) {
             widget.children[1].borrow_mut().state.clear_text_args();

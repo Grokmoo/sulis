@@ -24,20 +24,23 @@ use sulis_core::ui::animation_state;
 use sulis_module::ObjectSize;
 use {animation::Anim, EntityState, GameState};
 
+fn check_immediate_cancel(mover: &Rc<RefCell<EntityState>>, model: &mut MoveAnimModel) -> bool {
+    let cur_area_id = mover.borrow().location.area_id.to_string();
+    if (model.area_id != cur_area_id) || model.path.is_empty() { return true; }
+
+    if GameState::is_combat_active() != model.combat_mode { return true; }
+
+    let actor = &mover.borrow().actor;
+    if actor.is_dead() || actor.stats.move_disabled { return true; }
+
+    false
+}
+
 pub (in animation) fn update(mover: &Rc<RefCell<EntityState>>, marked_for_removal: &Rc<Cell<bool>>,
                              model: &mut MoveAnimModel, millis: u32) {
-    let cur_area_id = mover.borrow().location.area_id.to_string();
-    if (model.area_id != cur_area_id) || model.path.is_empty() {
+    if check_immediate_cancel(mover, model) {
         marked_for_removal.set(true);
         return;
-    }
-
-    {
-        let actor = &mover.borrow().actor;
-        if actor.is_dead() || actor.stats.move_disabled {
-            marked_for_removal.set(true);
-            return;
-        }
     }
 
     let frame_index = cmp::min((millis / model.frame_time_millis) as usize, model.path.len() - 1);
@@ -128,6 +131,7 @@ pub fn new(mover: &Rc<RefCell<EntityState>>, path: Vec<Point>, frame_time_millis
     let duration_millis = frame_time_millis * path.len() as u32;
     let area_id = mover.borrow().location.area_id.to_string();
     let model = MoveAnimModel {
+        combat_mode: GameState::is_combat_active(),
         area_id,
         path,
         last_frame_index: 0,
@@ -141,6 +145,8 @@ pub fn new(mover: &Rc<RefCell<EntityState>>, path: Vec<Point>, frame_time_millis
 
 pub struct MoveAnimModel {
     area_id: String,
+    combat_mode: bool, // whether this move was created in or out of combat.  a change in
+                       // this status will cancel the move
     pub (in animation) path: Vec<Point>,
     pub (in animation) last_frame_index: i32,
     frame_time_millis: u32,

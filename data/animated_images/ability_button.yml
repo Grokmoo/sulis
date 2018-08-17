@@ -1,0 +1,10 @@
+id: ability_button
+states:
+    normal: bg_inner_base
+    hover: bg_inner_hover
+    active: bg_inner_active
+    active + hover: bg_inner_active
+    pressed + hover: bg_inner_pressed
+    custom1: bg_inner_disabled
+    custom1 + hover: bg_inner_disabled
+    custom1 + pressed + hover: bg_inner_disabled

@@ -98,8 +98,6 @@ impl Formation {
                 if !GameState::can_move_towards_point(&to_move[index], entities_to_ignore.clone(),
                     x, y, dist) { continue; }
 
-                // TODO bump any entity overlap at the end of the move - will also need to
-                // handle combat start
                 GameState::move_towards_point(&to_move[index], entities_to_ignore.clone(),
                     x, y, dist, None);
                 break;

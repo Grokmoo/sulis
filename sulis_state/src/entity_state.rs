@@ -30,7 +30,7 @@ use sulis_module::area::{MAX_AREA_SIZE, Transition};
 use {ActorState, AreaState, ChangeListenerList, EntityTextureCache, EntityTextureSlot,
     GameState, Location, PropState, ScriptCallback};
 use script::CallbackData;
-use animation::{self};
+use animation::{self, Anim};
 use save_state::EntitySaveState;
 
 enum AIState {
@@ -54,7 +54,7 @@ pub struct EntityState {
     pub listeners: ChangeListenerList<EntityState>,
 
     ai_state: AIState,
-    marked_for_removal: bool,
+    pub(crate) marked_for_removal: bool,
     texture_cache_slot: Option<EntityTextureSlot>,
 
     custom_flags: HashMap<String, String>,
@@ -324,12 +324,17 @@ impl EntityState {
         self.actor.add_xp(xp);
     }
 
-    pub fn remove_hp(&mut self, hp: u32) {
-        self.actor.remove_hp(hp);
+    pub fn remove_hp(entity: &Rc<RefCell<EntityState>>, hp: u32) {
+        entity.borrow_mut().actor.remove_hp(hp);
 
-        if self.actor.hp() <= 0 {
-            debug!("Entity '{}' has zero hit points.  Marked to remove.", self.actor.actor.name);
-            self.marked_for_removal = true;
+        let hp = entity.borrow().actor.hp();
+        if hp <= 0 {
+            debug!("Entity '{}' has zero hit points.  Playing death animation",
+                   entity.borrow().actor.actor.name);
+            let anim = Anim::new_entity_death(entity);
+            GameState::add_animation(anim);
+        } else {
+            GameState::create_damage_animation(&entity);
         }
     }
 

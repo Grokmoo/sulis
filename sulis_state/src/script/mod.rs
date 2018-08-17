@@ -364,7 +364,7 @@ impl UserData for ScriptInterface {
             }
 
             let mgr = GameState::turn_manager();
-            mgr.borrow_mut().check_ai_activation_for_party(&area_state);
+            mgr.borrow_mut().check_ai_activation_for_party(&mut area_state);
 
             Ok(())
         });
@@ -719,7 +719,7 @@ fn activate_item(_lua: &Lua, script_item: &ScriptItem, target: ScriptEntity) -> 
 
     let area = GameState::area_state();
     let name = item.name.to_string();
-    area.borrow_mut().add_feedback_text(name, &target, ColorKind::Info, 3.0);
+    area.borrow_mut().add_feedback_text(name, &target, ColorKind::Info);
 
     match item.usable {
         None => unreachable!(),

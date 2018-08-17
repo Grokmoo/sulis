@@ -23,7 +23,7 @@ use std::cell::{Cell, RefCell};
 use rlua;
 
 use sulis_core::config::CONFIG;
-use sulis_core::util::{self, Point, invalid_data_error};
+use sulis_core::util::{self, Point, invalid_data_error, ExtInt};
 use sulis_core::io::{GraphicsRenderer};
 use sulis_rules::HitKind;
 use sulis_module::{Ability, Actor, Module, ObjectSize, OnTrigger, area::{Trigger, TriggerKind}};
@@ -32,7 +32,7 @@ use {ai, AI, AreaState, ChangeListener, ChangeListenerList, Effect,
     EntityState, Location, Formation, ItemList, ItemState, PartyStash,
     PathFinder, SaveState, ScriptState, UICallback, MOVE_TO_THRESHOLD, TurnManager};
 use script::{script_callback::{self, ScriptHitKind}, ScriptEntitySet, ScriptCallback, ScriptItemKind};
-use animation::{self, Anim, AnimState, AnimSaveState};
+use animation::{self, Anim, AnimState, AnimSaveState, particle_generator::Param};
 
 thread_local! {
     static TURN_MANAGER: Rc<RefCell<TurnManager>> = Rc::new(RefCell::new(TurnManager::default()));
@@ -341,6 +341,7 @@ impl GameState {
                 for member in members.iter() {
                     if Rc::ptr_eq(party_member, member) {
                         state.selected.push(Rc::clone(member));
+                        // GameState::create_selection_animation(&member);
                     }
                 }
             }
@@ -351,6 +352,18 @@ impl GameState {
             };
             state.party_listeners.notify(&entity);
         })
+    }
+
+    pub fn create_damage_animation(entity: &Rc<RefCell<EntityState>>) {
+        let time = 200;
+        let time_f32 = time as f32 / 1000.0;
+        let duration = ExtInt::Int(time);
+        let color = [Param::with_jerk(0.0, 1.0 / time_f32, 0.0, -1.0 / time_f32),
+            Param::fixed(1.0), Param::fixed(1.0), Param::fixed(1.0)];
+        let color_sec = [Param::with_jerk(0.0, 0.7 / time_f32, 0.0, -0.7 / time_f32),
+            Param::fixed(0.0), Param::fixed(0.0), Param::fixed(0.0)];
+        let anim = Anim::new_entity_color(entity, duration, color, color_sec);
+        GameState::add_animation(anim);
     }
 
     pub fn selected() -> Vec<Rc<RefCell<EntityState>>> {

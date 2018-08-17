@@ -470,7 +470,7 @@ impl ActorState {
                 total += amount;
             }
 
-            target.borrow_mut().remove_hp(total);
+            EntityState::remove_hp(target, total);
             return (hit_kind, total, format!("{:?}: {}", hit_kind, total), ColorKind::Hit);
         } else if attack.damage.max() == 0 {
             // if attack cannot do any damage

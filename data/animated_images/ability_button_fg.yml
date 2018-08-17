@@ -1,0 +1,10 @@
+id: ability_button_fg
+states:
+    normal: empty
+    hover: 40_transparent_fill
+    pressed + hover: 40_red_transparent_fill
+    active + hover: 60_red_transparent_fill
+    pressed + active: 40_red_transparent_fill
+    custom1: 80_transparent_fill
+    custom1 + hover: 80_transparent_fill
+    custom1 + pressed + hover: 80_transparent_fill

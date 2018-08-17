@@ -1,0 +1,10 @@
+id: quick_item_button
+states:
+    normal: bg_transparent_base
+    hover: bg_transparent_hover
+    active: bg_transparent_active
+    active + hover: bg_transparent_active
+    pressed + hover: bg_transparent_active
+    custom1: bg_transparent_disabled
+    custom1 + hover: bg_transparent_disabled
+    custom1 + pressed + hover: bg_transparent_disabled

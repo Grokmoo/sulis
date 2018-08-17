@@ -9,7 +9,7 @@ Please visit https://www.sulisgame.com or check the [Releases page](https://gith
 ## Building from Source
 
 ### Prerequisites
-You'll need recent versions of Rust and Cargo installed.  The game will compile on the latest stable version.  [Rustup](https://www.rustup.rs/)
+You'll need recent versions of Rust and Cargo installed.  The game will compile on the latest stable version.  [Get Rust](https://www.rust-lang.org/)
 
 ### Installation
 

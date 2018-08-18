@@ -950,7 +950,7 @@ impl GameState {
             let path = {
                 let area_state = state.area_state.borrow();
                 match state.path_finder.find(&area_state, entity.borrow(),
-                                             entities_to_ignore, x, y, dist) {
+                                             entities_to_ignore, true, x, y, dist) {
                     None => return None,
                     Some(path) => path,
                 }
@@ -991,7 +991,7 @@ impl GameState {
 
             let start_time = time::Instant::now();
             let val = match state.path_finder.find(&area_state, entity.borrow(),
-                                                   entities_to_ignore, x, y, dist) {
+                                                   entities_to_ignore, false, x, y, dist) {
                 None => false,
                 Some(_) => true,
             };

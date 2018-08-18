@@ -14,11 +14,12 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::time;
 use std::cell::Ref;
-use std::collections::{HashMap, HashSet};
+use std::collections::{HashMap, HashSet, BTreeMap};
 use std::{f32, ptr};
 
-use sulis_core::util::Point;
+use sulis_core::util::{self, Point};
 use sulis_module::Area;
 use {EntityState, AreaState};
 
@@ -28,16 +29,14 @@ pub struct PathFinder {
     pub width: i32,
     pub height: i32,
 
-    f_score: Vec<f32>,
-    g_score: Vec<f32>,
-    open: HashSet<i32>,
+    f_score: Vec<i32>,
+    g_score: Vec<i32>,
+    open: BTreeMap<i32, i32>,
     closed: HashSet<i32>,
     came_from: HashMap<i32, i32>,
 
     goal_x: f32,
     goal_y: f32,
-    requester_center_x: f32,
-    requester_center_y: f32,
 }
 
 impl PathFinder {
@@ -49,15 +48,13 @@ impl PathFinder {
         PathFinder {
             width,
             height,
-            f_score: vec![0.0;(width*height) as usize],
-            g_score: vec![0.0;(width*height) as usize],
-            open: HashSet::new(),
+            f_score: vec![0;(width*height) as usize],
+            g_score: vec![0;(width*height) as usize],
+            open: BTreeMap::new(),
             closed: HashSet::new(),
             came_from: HashMap::new(),
             goal_x: 0.0,
             goal_y: 0.0,
-            requester_center_x: 0.0,
-            requester_center_y: 0.0,
         }
     }
 
@@ -70,11 +67,17 @@ impl PathFinder {
     /// efficient manner.  Returns `None` if no path exists to reach the destination.
     /// Will return a vec of length zero if the dest is already reached by the
     /// requester.
+    /// If reconstruct is set to false, does not produce a path.  Instead, only
+    /// checks if a path exists, returning Some if it does, None if not
     pub fn find(&mut self, area_state: &AreaState, requester: Ref<EntityState>,
-                mut entities_to_ignore: Vec<usize>,
+                mut entities_to_ignore: Vec<usize>, reconstruct: bool,
                 dest_x: f32, dest_y: f32, dest_dist: f32) -> Option<Vec<Point>> {
         if dest_x < 0.0 || dest_y < 0.0 { return None; }
         if dest_x >= self.width as f32 || dest_y >= self.height as f32 { return None; }
+
+        let grid = area_state.area.get_path_grid(&requester.size());
+        let prop_grid = &area_state.prop_pass_grid;
+        let entity_grid = &area_state.entity_grid;
 
         debug!("Finding path from {:?} to within {} of {},{}",
                requester.location, dest_dist, dest_x, dest_y);
@@ -82,16 +85,14 @@ impl PathFinder {
         entities_to_ignore.push(requester.index);
 
         // let start_time = time::Instant::now();
-        self.goal_x = dest_x;
-        self.goal_y = dest_y;
-        self.requester_center_x = (requester.size.width / 2) as f32;
-        self.requester_center_y = (requester.size.height  / 2) as f32;
-        let dest_dist_squared = dest_dist * dest_dist;
+        self.goal_x = dest_x - (requester.size.width / 2) as f32;
+        self.goal_y = dest_y - (requester.size.height / 2) as f32;;
+        let dest_dist_squared = (dest_dist * dest_dist) as i32;
         let start = requester.location.x + requester.location.y * self.width;
 
         // the set of discovered nodes that are not evaluated yet
         self.open.clear();
-        self.open.insert(start);
+        // self.open.insert(start);
 
         // the set of nodes that have already been evaluated
         self.closed.clear();
@@ -101,43 +102,45 @@ impl PathFinder {
 
         // let f_g_init_time = time::Instant::now();
         unsafe {
-            // memset g_score and f_score to a large floating point number
+            // memset g_score and f_score to a large integer value
             // benchmarking revealed that setting these values using the naive
             // approach is the majority of time spent for most path finds
             ptr::write_bytes(self.g_score.as_mut_ptr(), 127, self.g_score.len());
             ptr::write_bytes(self.f_score.as_mut_ptr(), 127, self.f_score.len());
         }
 
-        // for each node, cost of getting from start to that node
-        // self.g_score.iter_mut().for_each(|v| *v = f32::INFINITY);
-        // for each node, total cost of getting from start to goal passing by this node
-        // self.f_score.iter_mut().for_each(|v| *v = f32::INFINITY);
-
-        self.g_score[start as usize] = 0.0;
+        self.g_score[start as usize] = 0;
         self.f_score[start as usize] = self.dist_squared(start);
-        // info!("F and G score init: {}", animation::format_elapsed_secs(f_g_init_time.elapsed()));
+        // info!("F and G score init: {}", util::format_elapsed_secs(f_g_init_time.elapsed()));
 
-        // info!("Spent {} secs in path find init", animation::format_elapsed_secs(start_time.elapsed()));
+        self.open.insert(self.f_score[start as usize] as i32, start);
+        // info!("Spent {} secs in path find init", util::format_elapsed_secs(start_time.elapsed()));
 
-        // let loop_start_time = time::Instant::now();
+        let loop_start_time = time::Instant::now();
 
         let mut iterations = 0;
         while iterations < MAX_ITERATIONS && !self.open.is_empty() {
-            let current = self.find_lowest_f_score_in_open_set();
+            let (current_f_score, current) = self.find_lowest_f_score_in_open_set();
             if self.is_goal(current, dest_dist_squared) {
-                // info!("Path find loop time: {}", animation::format_elapsed_secs(loop_start_time.elapsed()));
+                trace!("Path loop time: {}", util::format_elapsed_secs(loop_start_time.elapsed()));
                 let path = self.reconstruct_path(current);
-                if path.len() == 1 && path[0].x == requester.location.x && path[0].y == requester.location.y {
+                if path.len() == 1 && path[0].x == requester.location.x &&
+                    path[0].y == requester.location.y {
                     return None
-                } else {
+                } else if reconstruct {
                     return Some(self.reconstruct_path(current));
+                } else {
+                    return Some(Vec::new())
                 }
             }
 
-            self.open.remove(&current);
+            self.open.remove(&current_f_score);
             self.closed.insert(current);
 
-            for neighbor in self.get_neighbors(current) {
+            let neighbors = self.get_neighbors(current);
+            for i in 0..4 {
+                let neighbor = neighbors[i];
+                if neighbor == -1 { continue; }
                 //trace!("Checking neighbor {}", neighbor);
                 if self.closed.contains(&neighbor) {
                     //trace!("Already evaluated.");
@@ -147,26 +150,39 @@ impl PathFinder {
                 // we compute the passability of each point as needed here
                 let neighbor_x = neighbor % self.width;
                 let neighbor_y = neighbor / self.width;
-                if !area_state.is_passable(&requester, &entities_to_ignore, neighbor_x, neighbor_y) {
+
+                // this should be equivalent to checking is_passable on the area_state
+                // but significantly faster here, removing unneccesary checks
+                if !grid.is_passable(neighbor_x, neighbor_y) ||
+                    !requester.points(neighbor_x, neighbor_y).all(|p| {
+                        let index = (p.x + p.y * self.width) as usize;
+                        if !prop_grid[index] { return false; }
+                        for i in entity_grid[index].iter() {
+                            if !entities_to_ignore.contains(i) { return false; }
+                        }
+                        true
+                    }) {
+
                     self.closed.insert(neighbor);
                     //trace!("Not passable");
                     continue;
                 }
 
-                if !self.open.contains(&neighbor) {
-                    self.open.insert(neighbor);
-                }
-
                 let tentative_g_score = self.g_score[current as usize] +
                     self.get_cost(current, neighbor);
                 if tentative_g_score >= self.g_score[neighbor as usize] {
+                    self.open.insert(self.f_score[neighbor as usize], neighbor);
                     //trace!("G score indicates this neighbor is not preferable.");
                     continue; // this is not a better path
                 }
 
-                self.came_from.insert(neighbor, current);
+                if reconstruct {
+                    self.came_from.insert(neighbor, current);
+                }
+
                 self.g_score[neighbor as usize] = tentative_g_score;
                 self.f_score[neighbor as usize] = tentative_g_score + self.dist_squared(neighbor);
+                self.open.insert(self.f_score[neighbor as usize], neighbor);
             }
 
             iterations += 1;
@@ -175,14 +191,16 @@ impl PathFinder {
         None
     }
 
-    fn is_goal(&self, current: i32, dest_dist_squared: f32) -> bool {
+    #[inline]
+    fn is_goal(&self, current: i32, dest_dist_squared: i32) -> bool {
         self.dist_squared(current) <= dest_dist_squared
     }
 
+    #[inline]
     fn reconstruct_path(&self, current: i32) -> Vec<Point> {
         trace!("Reconstructing path");
 
-        // let path_reconstruct_time = time::Instant::now();
+        // let reconstruct_time = time::Instant::now();
         let mut path: Vec<Point> = Vec::new();
 
         path.push(self.get_point(current));
@@ -197,20 +215,24 @@ impl PathFinder {
         }
 
         path.reverse();
-        debug!("Found path: {:?}", path);
-        // info!("Reconstruct path time: {}", animation::format_elapsed_secs(path_reconstruct_time.elapsed()));
+        trace!("Found path: {:?}", path);
+        // info!("Reconstruct path time: {}", util::format_elapsed_secs(reconstruct_time.elapsed()));
         path
     }
 
+    #[inline]
     fn get_point(&self, index: i32) -> Point {
         Point::new(index % self.width, index / self.width)
     }
 
-    fn get_cost(&self, _from: i32, _to: i32) -> f32 {
-        1.0
+    #[inline]
+    fn get_cost(&self, _from: i32, _to: i32) -> i32 {
+        1
     }
 
-    fn get_neighbors(&self, point: i32) -> Vec<i32> {
+    #[inline]
+    // using an array here instead of a vec is much faster
+    fn get_neighbors(&self, point: i32) -> [i32; 4] {
         let width = self.width;
         let height = self.height;
 
@@ -219,39 +241,30 @@ impl PathFinder {
         let left = point - 1;
         let bottom = point + width;
 
-        let mut neighbors: Vec<i32> = Vec::new();
-        if top > 0 { neighbors.push(top); }
-        if bottom < width * height { neighbors.push(bottom); }
-        if right % width != point % width { neighbors.push(right); }
-        if left % width != point % width { neighbors.push(left); }
+        let mut neighbors = [-1; 4];
+        if top > 0 { neighbors[0] = top; }
+        if bottom < width * height { neighbors[1] = bottom; }
+        if right % width != point % width { neighbors[2] = right; }
+        if left % width != point % width { neighbors[3] = left; }
 
         //trace!("Got neighbors for {}: {:?}", point, neighbors);
         neighbors
     }
 
-    fn find_lowest_f_score_in_open_set(&self) -> i32 {
-        let mut lowest = f32::INFINITY;
-        let mut lowest_index = 0;
-
-        for val in self.open.iter() {
-            let f_score = &self.f_score[*val as usize];
-            if f_score < &lowest {
-                lowest = *f_score;
-                lowest_index = *val;
-            }
-        }
-
-        //trace!("Found lowest f score of {} at {}", lowest, lowest_index);
-        lowest_index
+    #[inline]
+    fn find_lowest_f_score_in_open_set(&self) -> (i32, i32) {
+        let (f_score, index) = self.open.iter().next().unwrap();
+        (*f_score, *index)
     }
 
-    fn dist_squared(&self, start: i32) -> f32 {
+    #[inline]
+    fn dist_squared(&self, start: i32) -> i32 {
         let s_x = start % self.width;
         let s_y = start / self.width;
 
-        let x_part = s_x as f32 + self.requester_center_x - self.goal_x;
-        let y_part = s_y as f32 + self.requester_center_y - self.goal_y;
+        let x_part = s_x as f32 - self.goal_x;
+        let y_part = s_y as f32 - self.goal_y;
 
-        x_part * x_part + y_part * y_part
+        (x_part * x_part + y_part * y_part) as i32
     }
 }

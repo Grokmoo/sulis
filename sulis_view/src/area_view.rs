@@ -367,11 +367,7 @@ impl AreaView {
 }
 
 impl WidgetKind for AreaView {
-    fn get_name(&self) -> &str { NAME }
-
-    fn as_any(&self) -> &Any { self }
-
-    fn as_any_mut(&mut self) -> &mut Any { self }
+    widget_kind!(NAME);
 
     fn layout(&mut self, widget: &mut Widget) {
         widget.do_base_layout();
@@ -756,6 +752,7 @@ impl WidgetKind for AreaView {
                 self.hover_sprite = None;
             }
         }
+
         true
     }
 

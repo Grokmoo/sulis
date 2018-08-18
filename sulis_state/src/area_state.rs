@@ -50,13 +50,13 @@ pub struct AreaState {
     pub listeners: ChangeListenerList<AreaState>,
 
     prop_grid: Vec<Option<usize>>,
-    entity_grid: Vec<Vec<usize>>,
+    pub(crate) entity_grid: Vec<Vec<usize>>,
     surface_grid: Vec<Vec<usize>>,
     transition_grid: Vec<Option<usize>>,
     trigger_grid: Vec<Option<usize>>,
 
     prop_vis_grid: Vec<bool>,
-    prop_pass_grid: Vec<bool>,
+    pub(crate) prop_pass_grid: Vec<bool>,
 
     pub pc_vis_delta: (bool, i32, i32),
     pc_vis: Vec<bool>,

@@ -995,7 +995,7 @@ impl GameState {
                 None => false,
                 Some(_) => true,
             };
-            debug!("Path finding complete in {} secs",
+            info!("Path finding complete in {} secs",
                   util::format_elapsed_secs(start_time.elapsed()));
 
             val

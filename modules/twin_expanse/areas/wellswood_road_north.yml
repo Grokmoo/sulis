@@ -167,6 +167,7 @@ transitions:
       x: 68
       "y": 18
     to_area: wellswood_road_south
+    hover_text: "Road South"
     image_display: transition
   - from:
       x: 102
@@ -176,6 +177,7 @@ transitions:
       x: 31
       "y": 76
     to_area: goblin_cliffs
+    hover_text: "To Cliffs"
     image_display: transition
 triggers:
   - kind:

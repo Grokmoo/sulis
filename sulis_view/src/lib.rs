@@ -100,6 +100,7 @@ pub use self::portrait_view::PortraitView;
 
 mod prop_mouseover;
 pub use self::prop_mouseover::PropMouseover;
+pub use self::prop_mouseover::TransitionMouseover;
 
 mod prop_window;
 pub use self::prop_window::PropWindow;

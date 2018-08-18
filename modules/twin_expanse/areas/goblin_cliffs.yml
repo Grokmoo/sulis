@@ -109,6 +109,7 @@ transitions:
       x: 103
       "y": 2
     to_area: wellswood_road_north
+    hover_text: "To Wellswood Road"
     image_display: transition
 triggers:
   - kind:

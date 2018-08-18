@@ -104,6 +104,7 @@ transitions:
       x: 4
       "y": 9
     to_area: wellswood_road_cave
+    hover_text: "Enter Cave"
     image_display: transition
   - from:
       x: 71
@@ -113,6 +114,7 @@ transitions:
       x: 2
       "y": 116
     to_area: wellswood_road_north
+    hover_text: "Road North"
     image_display: transition
 triggers:
   - kind:

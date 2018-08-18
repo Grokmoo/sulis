@@ -354,6 +354,7 @@ impl AreaModel {
             from: Point::new(1, 1),
             to: Point::new(1, 1),
             to_area: None,
+            hover_text: "<<PLACEHOLDER>>".to_string(),
             size,
             image_display: sprite,
         });
@@ -644,6 +645,7 @@ impl AreaModel {
                 from: transition_builder.from,
                 to: transition_builder.to,
                 size,
+                hover_text: transition_builder.hover_text,
                 to_area: transition_builder.to_area,
                 image_display: image,
             });
@@ -733,6 +735,7 @@ impl AreaModel {
                 from: transition.from,
                 size: transition.size.id.to_string(),
                 to: transition.to,
+                hover_text: transition.hover_text.to_string(),
                 to_area: transition.to_area.clone(),
                 image_display: CONFIG.editor.transition_image.clone(),
             });

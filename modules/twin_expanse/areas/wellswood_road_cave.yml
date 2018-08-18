@@ -101,6 +101,7 @@ transitions:
       x: 12
       "y": 10
     to_area: wellswood_road_south
+    hover_text: "Exit Cave"
     image_display: transition
 triggers:
   - kind:

@@ -61,6 +61,7 @@ pub struct Transition {
     pub size: Rc<ObjectSize>,
     pub to: Point,
     pub to_area: Option<String>,
+    pub hover_text: String,
     pub image_display: Rc<Image>,
 }
 
@@ -169,6 +170,7 @@ impl Area {
             let transition = Transition {
                 from: t_builder.from,
                 to: t_builder.to,
+                hover_text: t_builder.hover_text,
                 size,
                 to_area: t_builder.to_area,
                 image_display: image,
@@ -314,6 +316,7 @@ pub struct TransitionBuilder {
     pub from: Point,
     pub size: String,
     pub to: Point,
+    pub hover_text: String,
     pub to_area: Option<String>,
     pub image_display: String,
 }

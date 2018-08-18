@@ -66,3 +66,39 @@ impl WidgetKind for PropMouseover {
         self.text_area.borrow_mut().draw(renderer, pixel_size, widget, millis);
     }
 }
+
+pub struct TransitionMouseover {
+    text_area: Rc<RefCell<TextArea>>,
+    name: String,
+}
+
+impl TransitionMouseover {
+    pub fn new(name: String) -> Rc<RefCell<TransitionMouseover>> {
+        Rc::new(RefCell::new(TransitionMouseover {
+            name,
+            text_area: TextArea::empty(),
+        }))
+    }
+}
+
+impl WidgetKind for TransitionMouseover {
+    widget_kind!("transition_mouseover");
+
+    fn layout(&mut self, widget: &mut Widget) {
+        widget.state.clear_text_args();
+        widget.state.add_text_arg("name", &self.name);
+
+        // double layout as above
+        self.text_area.borrow_mut().layout(widget);
+        widget.state.position.y -= widget.state.size.height;
+        if widget.state.position.y < 0 { widget.state.position.y = 0; }
+        widget.state.position.x -= widget.state.size.width / 2;
+        if widget.state.position.x < 0 { widget.state.position.x = 0; }
+        self.text_area.borrow_mut().layout(widget);
+    }
+
+    fn draw(&mut self, renderer: &mut GraphicsRenderer, pixel_size: Point,
+            widget: &Widget, millis: u32) {
+        self.text_area.borrow_mut().draw(renderer, pixel_size, widget, millis);
+    }
+}

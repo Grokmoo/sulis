@@ -34,6 +34,20 @@ end
 
 function on_area_load(parent)
   target = game:entity_with_id("npc_tervald")
+  
+  base_class = game:player():base_class()
+  if base_class ~= "fighter" then
+    target:set_flag("jorzal_valid_pick")
+  end
+  
+  if base_class ~= "rogue" then
+    target:set_flag("grazi_valid_pick")
+  end
+  
+  if base_class ~= "mage" then
+    target:set_flag("aessa_valid_pick")
+  end
+  
   game:start_conversation("tervald", target)
 end
 

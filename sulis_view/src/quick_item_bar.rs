@@ -47,6 +47,9 @@ impl WidgetKind for QuickItemBar {
             entity.actor.listeners.add(ChangeListener::invalidate(NAME, widget));
         }
 
+        let stash = GameState::party_stash();
+        stash.borrow_mut().listeners.add(ChangeListener::invalidate(NAME, widget));
+
         let widget_ref = Rc::clone(widget);
         GameState::add_party_listener(ChangeListener::new(NAME, Box::new(move |entity| {
             let entity = match entity {

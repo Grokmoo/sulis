@@ -53,6 +53,8 @@ nodes:
     responses:
       - text: |
           Come on, Jorzal.  [c=888|Jorzal is a strong front line fighter and defender.]
+        to_view:
+          target_flags: [ jorzal_valid_pick ]
         on_select:
           fire_script:
             id: wellswood_road_south
@@ -60,6 +62,8 @@ nodes:
         to: ambush_cleared_05
       - text: |
           Grazi, you are with me.  [c=888|Grazi is a quick and resourceful rogue.]
+        to_view:
+          target_flags: [ grazi_valid_pick ]
         on_select:
           fire_script:
             id: wellswood_road_south
@@ -67,6 +71,8 @@ nodes:
         to: ambush_cleared_05
       - text: |
           Aessa, let's go.  [c=888|Aessa is a powerful magic user.]
+        to_view:
+          target_flags: [ aessa_valid_pick ]
         on_select:
           fire_script:
             id: wellswood_road_south

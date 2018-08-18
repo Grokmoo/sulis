@@ -466,6 +466,10 @@ impl UserData for ScriptInterface {
             Ok(())
         });
 
+        methods.add_method("player", |_, _, ()| {
+            Ok(ScriptEntity::from(&GameState::player()))
+        });
+
         methods.add_method("show_cutscene", |_, _, id: String| {
             let pc = GameState::player();
 

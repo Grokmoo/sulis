@@ -32,7 +32,7 @@ pub struct Rules {
     pub attack_ap: u32,
     pub display_ap: u32,
     pub swap_weapons_ap: u32,
-    pub base_initiative: i32,
+    pub initiative_roll_max: i32,
     pub base_flanking_angle: i32,
     pub graze_percentile: u32,
     pub hit_percentile: u32,

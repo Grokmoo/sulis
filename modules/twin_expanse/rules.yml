@@ -7,7 +7,7 @@ min_overflow_ap: -4000
 movement_ap: 100
 attack_ap: 2000
 swap_weapons_ap: 2000
-base_initiative: 10
+initiative_roll_max: 20
 base_flanking_angle: 150
 
 graze_percentile: 20

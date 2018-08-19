@@ -18,8 +18,10 @@ use std::rc::Rc;
 use std::cell::{RefCell, Cell};
 use std::collections::{HashSet, VecDeque, vec_deque::Iter};
 
+use rand::{self, Rng};
+
 use sulis_core::util::Point;
-use sulis_module::Faction;
+use sulis_module::{Faction, Module};
 use script::CallbackData;
 use {AreaState, ChangeListener, ChangeListenerList, Effect, EntityState, GameState};
 
@@ -403,19 +405,31 @@ impl TurnManager {
     }
 
     fn initiate_combat(&mut self) {
-        let mut entries: Vec<_> = self.order.drain(..).collect();
-        entries.sort_by_key(|entry| {
+        // first, compute initiative for each entry in the list
+        let initiative_roll_max = Module::rules().initiative_roll_max;
+        let mut initiative = vec![0; self.order.len()];
+        let mut index = initiative.len() - 1;
+        let mut last_initiative = 0;
+        for entry in self.order.iter().rev() {
             match entry {
-                Entry::Entity(index) => {
-                    self.entities[*index].as_ref().unwrap().borrow().actor.stats.initiative
-                }, Entry::Effect(_) => {
-                    // TODO effects should be preferrably moved along with the
-                    // entity who is next in the queue to preserve this ordering
-                    0
+                Entry::Entity(entity_index) => {
+                    let base = self.entities[*entity_index].as_ref()
+                        .unwrap().borrow().actor.stats.initiative;
+                    last_initiative = base + rand::thread_rng().gen_range(0, initiative_roll_max);
+                    initiative[index] = 2* last_initiative;
+                },
+                Entry::Effect(_) => {
+                    // this effect should come just before the associated entity
+                    initiative[index] = 2 * last_initiative - 1;
                 }
             }
-        });
-        entries.drain(..).for_each(|entry| self.order.push_front(entry));
+            index -= 1;
+        }
+
+
+        let mut entries: Vec<_> = self.order.drain(..).zip(initiative).collect();
+        entries.sort_by_key(|&(_, initiative)| { initiative });
+        entries.into_iter().for_each(|(entry, _)| self.order.push_front(entry));
 
         for entity in self.entities.iter() {
             let entity = match entity {

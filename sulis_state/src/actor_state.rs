@@ -755,7 +755,6 @@ impl ActorState {
         self.image = LayeredImage::new(layers, self.actor.hue);
 
         let rules = Module::rules();
-        self.stats.initiative = rules.base_initiative;
         self.stats.add(&self.actor.race.base_stats);
 
         for &(ref class, level) in self.actor.levels.iter() {

@@ -26,7 +26,8 @@ use sulis_state::{ChangeListener, EntityState, GameState};
 
 pub const NAME: &str = "initiative_ticker";
 
-pub struct InitiativeTicker { }
+pub struct InitiativeTicker {
+}
 
 impl InitiativeTicker {
     pub fn new() -> Rc<RefCell<InitiativeTicker>> {
@@ -57,16 +58,11 @@ impl WidgetKind for InitiativeTicker {
         false
     }
 
-    fn on_remove(&mut self) {
-        let mgr = GameState::turn_manager();
-        mgr.borrow_mut().listeners.remove(NAME);
-    }
-
     fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let mgr = GameState::turn_manager();
         mgr.borrow_mut().listeners.add(ChangeListener::invalidate(NAME, widget));
 
-        let mut widgets: Vec<Rc<RefCell<Widget>>> = Vec::new();
+        let pane = Widget::empty("pane");
         let mut first = true;
         for entity in mgr.borrow().active_iter() {
             let theme = match first {
@@ -74,11 +70,11 @@ impl WidgetKind for InitiativeTicker {
                 false => "entry",
             };
             let widget = Widget::with_theme(TickerLabel::new(&entity), theme);
-            widgets.push(widget);
+            Widget::add_child_to(&pane, widget);
             first = false;
         }
 
-        widgets
+        vec![pane]
     }
 }
 

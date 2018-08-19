@@ -345,10 +345,9 @@ impl TurnManager {
             }
             area_state.bump_party_overlap(self);
             self.init_turn_for_current_entity();
-        } else {
-            self.listeners.notify(&self);
         }
 
+        self.listeners.notify(&self);
     }
 
     fn activate_entity_ai(&self, entity: &mut EntityState, groups: &mut HashSet<usize>) {
@@ -378,8 +377,6 @@ impl TurnManager {
         } else {
             self.initiate_combat();
         }
-
-        self.listeners.notify(&self);
     }
 
     fn end_combat(&mut self) {
@@ -601,9 +598,8 @@ impl TurnManager {
             }
         }) {
             self.set_combat_active(false);
-        } else {
-            self.listeners.notify(&self);
         }
+        self.listeners.notify(&self);
     }
 }
 

@@ -24,6 +24,7 @@ use sulis_core::ui::theme::TextParams;
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 enum MarkupKind {
+    Center,
     Color,
     Scale,
     PosX,
@@ -40,6 +41,7 @@ pub struct Markup {
     pub pos_x: Option<f32>,
     pub pos_y: Option<f32>,
     pub image: Option<String>,
+    pub center: Option<f32>,
     pub font: Rc<Font>,
     pub ignore: bool,
 }
@@ -52,6 +54,7 @@ impl Markup {
             pos_x: None,
             pos_y: None,
             image: None,
+            center: None,
             font: Rc::clone(font),
             ignore: false,
         }
@@ -64,6 +67,7 @@ impl Markup {
             pos_x: None,
             pos_y: None,
             image: None,
+            center: None,
             font: Rc::clone(&other.font),
             ignore: other.ignore,
         }
@@ -77,6 +81,7 @@ impl Markup {
             use self::MarkupKind::*;
             match markup_kind {
                 None => markup_kind = match c {
+                    'a' => Some(Center),
                     'c' => Some(Color),
                     's' => Some(Scale),
                     'x' => Some(PosX),
@@ -123,6 +128,7 @@ impl Markup {
             Scale => self.scale = get_float(buf),
             PosX => self.pos_x = Some(get_float(buf)),
             PosY => self.pos_y = Some(get_float(buf)),
+            Center => self.center = Some(get_float(buf)),
             Image => self.image = Some(buf.to_string()),
             Font => match ResourceSet::get_font(buf) {
                 None => warn!("Font not found '{}'", buf),

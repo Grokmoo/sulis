@@ -61,6 +61,10 @@
 //! to.  Close the tag with ].
 //!
 //! # List of params
+//! * **a** - Center aligns the text in this tag based on the specified width.
+//! Uses a very simple peek ahead method that does not support nesting of this
+//! attribute recursively or most other tags.  Does support nested color tag.
+//! Only works over a single line
 //! * **c** - Specify a color, in one of several formats, all hex based:
 //! `RRGGBBAA`, `RRGGBB`, `RGBA`, `RGB`.  When using 2 characters for a component,
 //! you are specifying with full byte precision.  When using 1 character, you are
@@ -137,6 +141,39 @@ impl MarkupRenderer {
         self.right_x.ceil() as i32
     }
 
+    fn peek_width_until_tag_close(&self, cur_markup: &Markup, text: &str) -> f32 {
+        let mut in_markup_tag = false;
+        let mut escaped = false;
+        let mut width = 0;
+        let mut tag_count = 1;
+        for c in text.chars() {
+            if escaped {
+                width += cur_markup.font.get_char_width(c);
+                escaped = false;
+                continue;
+            }
+
+            match c {
+                '\\' => escaped = true,
+                '[' => {
+                    tag_count += 1;
+                    in_markup_tag = true;
+                },
+                '|' => in_markup_tag = false,
+                ']' => tag_count -= 1,
+                _ => {
+                    if !in_markup_tag {
+                        width += cur_markup.font.get_char_width(c);
+                    }
+                }
+            }
+
+            if tag_count == 0 { break; }
+        }
+
+        width as f32 * cur_markup.scale / cur_markup.font.line_height as f32
+    }
+
     /// This sets up the drawing cache for this renderer.  it should be
     /// called when laying out the widget, once its position, size, and
     /// text are set.
@@ -157,7 +194,13 @@ impl MarkupRenderer {
         let mut x = pos_x;
         let mut y = pos_y;
 
-        for c in text.chars() {
+        let mut chars = text.chars();
+        loop {
+            let c = match chars.next() {
+                None => break,
+                Some(c) => c,
+            };
+
             if escaped {
                 word_buf.push(c);
                 word_width += cur_markup.font.get_char_width(c);
@@ -185,6 +228,11 @@ impl MarkupRenderer {
                             }
                             if let Some(markup_y) = cur_markup.pos_y {
                                 y = pos_y + markup_y;
+                            }
+                            if let Some(center_width) = cur_markup.center {
+                                let text_width_until_tag_close =
+                                    self.peek_width_until_tag_close(&cur_markup, chars.as_str());
+                                x += (center_width - text_width_until_tag_close) / 2.0;
                             }
                             if let Some(ref image) = cur_markup.image {
                                 self.draw_sprite(&image, &cur_markup, x, y);

@@ -412,7 +412,7 @@ impl Widget {
 
     pub fn set_mouse_over(widget: &Rc<RefCell<Widget>>, mouse_over: Rc<RefCell<WidgetKind>>,
                           x: i32, y: i32) {
-        let mouse_over = Widget::with_theme(mouse_over, "mouse_over");
+        let mouse_over = Widget::with_defaults(mouse_over);
         Widget::set_mouse_over_widget(widget, mouse_over, x, y);
     }
 

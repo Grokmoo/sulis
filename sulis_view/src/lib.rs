@@ -35,6 +35,9 @@ pub use self::action_kind::ActionKind;
 mod ap_bar;
 pub use self::ap_bar::ApBar;
 
+mod area_mouseover;
+pub use self::area_mouseover::AreaMouseover;
+
 mod area_view;
 pub use self::area_view::AreaView;
 
@@ -58,9 +61,6 @@ pub use self::cutscene_window::CutsceneWindow;
 
 mod dialog_window;
 pub use self::dialog_window::DialogWindow;
-
-mod entity_mouseover;
-pub use self::entity_mouseover::EntityMouseover;
 
 mod formation_window;
 pub use self::formation_window::FormationWindow;
@@ -97,10 +97,6 @@ pub use self::merchant_window::MerchantWindow;
 
 mod portrait_view;
 pub use self::portrait_view::PortraitView;
-
-mod prop_mouseover;
-pub use self::prop_mouseover::PropMouseover;
-pub use self::prop_mouseover::TransitionMouseover;
 
 mod prop_window;
 pub use self::prop_window::PropWindow;

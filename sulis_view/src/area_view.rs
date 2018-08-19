@@ -35,7 +35,7 @@ use sulis_module::{ObjectSize, area::{Layer, Tile}};
 use sulis_state::{AreaDrawable, AreaState, EntityState, EntityTextureCache, GameState};
 use sulis_state::area_feedback_text;
 
-use {EntityMouseover, PropMouseover, action_kind, TransitionMouseover};
+use {AreaMouseover, action_kind};
 
 struct HoverSprite {
     pub sprite: Rc<Sprite>,
@@ -364,6 +364,78 @@ impl AreaView {
 
         party
     }
+
+    fn set_mouseover(&self, widget: &Rc<RefCell<Widget>>, x: i32, y: i32) -> bool {
+        let area_state = GameState::area_state();
+        let targeter = area_state.borrow_mut().targeter();
+
+        if let Some(ref targeter) = targeter {
+            let mut targeter = targeter.borrow_mut();
+            let mouse_over = targeter.on_mouse_move(x, y);
+
+            if let Some(ref entity) = mouse_over {
+                let (x, y) = {
+                    let entity = entity.borrow();
+                    let offset = entity.actor.actor.race.mouseover_offset;
+                    self.get_mouseover_pos(entity.location.to_point(), &entity.size, offset)
+                };
+                Widget::set_mouse_over(widget, AreaMouseover::new_entity(entity), x, y);
+            }
+
+            return false;
+        }
+
+        let area_state = area_state.borrow();
+        if let Some(entity) = area_state.get_entity_at(x, y) {
+            let (x, y) = {
+                let entity = entity.borrow();
+                let offset = entity.actor.actor.race.mouseover_offset;
+                self.get_mouseover_pos(entity.location.to_point(), &entity.size, offset)
+            };
+            Widget::set_mouse_over(widget, AreaMouseover::new_entity(&entity), x, y);
+        } else if let Some(index) = area_state.prop_index_at(x, y) {
+            let interactive = {
+                let prop = area_state.get_prop(index);
+                prop.is_container() && prop.is_enabled()
+            };
+
+            if interactive {
+                let (x, y) = {
+                    let prop_state = area_state.get_prop(index);
+                    self.get_mouseover_pos(prop_state.location.to_point(),
+                        &prop_state.prop.size, Point::as_zero())
+                };
+                Widget::set_mouse_over(widget, AreaMouseover::new_prop(index), x, y);
+            }
+        } else if let Some(transition) = area_state.get_transition_at(x, y) {
+            let (x, y) = self.get_mouseover_pos(transition.from, &transition.size, Point::as_zero());
+
+            Widget::set_mouse_over(widget,
+                AreaMouseover::new_transition(&transition.hover_text), x, y);
+        }
+
+        true
+    }
+
+    fn set_cursor(&mut self, x: i32, y: i32) {
+        let action = action_kind::get_action(x, y);
+        Cursor::set_cursor_state(action.cursor_state());
+        match action.get_hover_info() {
+            Some((size, x, y)) => {
+                let hover_sprite = HoverSprite {
+                    sprite: Rc::clone(&size.cursor_sprite),
+                    x,
+                    y,
+                    w: size.width,
+                    h: size.height,
+                    left_click_action_valid: true
+                };
+                self.hover_sprite = Some(hover_sprite);
+            }, None => {
+                self.hover_sprite = None;
+            }
+        }
+    }
 }
 
 impl WidgetKind for AreaView {
@@ -644,7 +716,6 @@ impl WidgetKind for AreaView {
                 action.fire_action(widget);
             }
         }
-
         true
     }
 
@@ -685,72 +756,8 @@ impl WidgetKind for AreaView {
             return true;
         }
 
-        let area_state = GameState::area_state();
-
-        let targeter = area_state.borrow_mut().targeter();
-
-        if let Some(ref targeter) = targeter {
-            let mut targeter = targeter.borrow_mut();
-            let mouse_over = targeter.on_mouse_move(area_x, area_y);
-
-            if let Some(ref entity) = mouse_over {
-                let (x, y) = {
-                    let entity = entity.borrow();
-                    let offset = entity.actor.actor.race.mouseover_offset;
-                    self.get_mouseover_pos(entity.location.to_point(), &entity.size, offset)
-                };
-                Widget::set_mouse_over(widget, EntityMouseover::new(entity), x, y);
-            }
-
-            return true;
-        }
-
-        if let Some(entity) = area_state.borrow().get_entity_at(area_x, area_y) {
-            let (x, y) = {
-                let entity = entity.borrow();
-                let offset = entity.actor.actor.race.mouseover_offset;
-                self.get_mouseover_pos(entity.location.to_point(), &entity.size, offset)
-            };
-            Widget::set_mouse_over(widget, EntityMouseover::new(&entity), x, y);
-        } else if let Some(index) = area_state.borrow().prop_index_at(area_x, area_y) {
-            let interactive = {
-                let area_state = area_state.borrow();
-                let prop = area_state.get_prop(index);
-                prop.is_container() && prop.is_enabled()
-            };
-
-            if interactive {
-                let (x, y) = {
-                    let area_state = area_state.borrow();
-                    let prop_state = area_state.get_prop(index);
-                    self.get_mouseover_pos(prop_state.location.to_point(),
-                        &prop_state.prop.size, Point::as_zero())
-                };
-                Widget::set_mouse_over(widget, PropMouseover::new(index), x, y);
-            }
-        } else if let Some(transition) = area_state.borrow().get_transition_at(area_x, area_y) {
-            let (x, y) = self.get_mouseover_pos(transition.from, &transition.size, Point::as_zero());
-
-            Widget::set_mouse_over(widget,
-                TransitionMouseover::new(transition.hover_text.to_string()), x, y);
-        }
-
-        let action = action_kind::get_action(area_x, area_y);
-        Cursor::set_cursor_state(action.cursor_state());
-        match action.get_hover_info() {
-            Some((size, x, y)) => {
-                let hover_sprite = HoverSprite {
-                    sprite: Rc::clone(&size.cursor_sprite),
-                    x,
-                    y,
-                    w: size.width,
-                    h: size.height,
-                    left_click_action_valid: true
-                };
-                self.hover_sprite = Some(hover_sprite);
-            }, None => {
-                self.hover_sprite = None;
-            }
+        if self.set_mouseover(widget, area_x, area_y) {
+            self.set_cursor(area_x, area_y);
         }
 
         true

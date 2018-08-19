@@ -159,16 +159,26 @@ impl LayoutKind {
             ChildMax => {
                 for child in widget.children.iter() {
                     height = cmp::max(height,
-                        LayoutKind::get_preferred_height_recursive(&child.borrow_mut(), parent_inner_size));
+                        LayoutKind::get_preferred_height_recursive(&child.borrow_mut(),
+                            parent_inner_size));
                 }
                 height += theme.border.vertical()
             },
             ChildSum => {
                 for child in widget.children.iter() {
                     height +=
-                        LayoutKind::get_preferred_height_recursive(&child.borrow_mut(), parent_inner_size);
+                        LayoutKind::get_preferred_height_recursive(&child.borrow_mut(),
+                            parent_inner_size);
                 }
-                height += theme.border.vertical()
+                height += theme.border.vertical();
+
+                match theme.layout {
+                    LayoutKind::BoxVertical => {
+                        height += theme.layout_spacing.vertical() *
+                            (widget.children.len() as i32 - 1);
+                    },
+                    _ => (),
+                }
             },
             Custom => height += widget.state.size.height,
             _ => {},
@@ -191,20 +201,31 @@ impl LayoutKind {
             ChildMax => {
                 for child in widget.children.iter() {
                     width = cmp::max(width,
-                        LayoutKind::get_preferred_width_recursive(&child.borrow_mut(), parent_inner_size));
+                        LayoutKind::get_preferred_width_recursive(&child.borrow_mut(),
+                            parent_inner_size));
                 }
                 width += theme.border.horizontal()
             },
             ChildSum => {
                 for child in widget.children.iter() {
                     width +=
-                        LayoutKind::get_preferred_width_recursive(&child.borrow_mut(), parent_inner_size);
+                        LayoutKind::get_preferred_width_recursive(&child.borrow_mut(),
+                            parent_inner_size);
                 }
-                width += theme.border.horizontal()
+                width += theme.border.horizontal();
+
+                match theme.layout {
+                    LayoutKind::BoxHorizontal => {
+                        width += theme.layout_spacing.horizontal() *
+                            (widget.children.len() as i32 - 1);
+                    },
+                    _ => (),
+                }
             },
             Custom => width += widget.state.size.width,
             _ => {},
         };
+
 
         width
     }

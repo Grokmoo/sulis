@@ -54,21 +54,18 @@ children:
     y_relative: Custom
   tooltip:
     from: .tooltip
-  mouse_over:
+  area_mouseover:
     from: .text_area
-    border: { top: 1, bottom: 0, left: 2, right: 2 }
-    background: 80_transparent_fill
+    border: { top: 2, bottom: 0, left: 2, right: 2 }
+    background: bg_inner_transparent_80
     text: |
-      [s=6.0|#name#]
-      [?cur_hp;s=5.0|#cur_hp# / #max_hp#
-      ][?empty;c=888;s=5.0|Empty
+      [s=8.0|[a=56|#name#]]
+      [?cur_hp;s=5.0|[a=56|#cur_hp# / #max_hp#]
+      ][?empty;c=888;s=5.0|[a=56|Empty]
       ]
-    preferred_size: [100, 12]
-    width_relative: Custom
-    height_relative: Custom
-    x_relative: Custom
-    y_relative: Custom
-    position: [0, 0]
+    preferred_size: [60, 12]
+    x_relative: Center
+    position: [0, 13]
   ap_bar:
     y_relative: Max
     x_relative: Center
@@ -84,29 +81,34 @@ children:
         preferred_size: [6, 6]
   initiative_ticker:
     preferred_size: [0, 12]
-    position: [-25, 0]
-    x_relative: Center
-    layout: BoxHorizontal
-    layout_spacing: { right: 1, left: 0, top: 0, bottom: 0 }
+    position: [0, 0]
+    width_relative: Max
     children:
-      entry:
-        from: .label
-        background: bg_rounded
-        text: "#0#"
-        text_params:
-          horizontal_alignment: Center
-        preferred_size: [12, 0]
+      pane:
+        x_relative: Center
+        width_relative: ChildSum
         height_relative: Max
-      current_entry:
-        from: .label
-        background: bg_rounded_hover
-        text: "#0#"
-        text_params:
-          horizontal_alignment: Center
-          color: [1.0, 0.0, 0.0, 1.0]
-          scale: 9.0
-        preferred_size: [12, 0]
-        height_relative: Max
+        layout: BoxHorizontal
+        layout_spacing: { right: 1, left: 0, top: 0, bottom: 0 }
+        children:
+          entry:
+            from: .label
+            background: bg_rounded
+            text: "#0#"
+            text_params:
+              horizontal_alignment: Center
+            preferred_size: [12, 0]
+            height_relative: Max
+          current_entry:
+            from: .label
+            background: bg_rounded_hover
+            text: "#0#"
+            text_params:
+              horizontal_alignment: Center
+              color: [1.0, 0.0, 0.0, 1.0]
+              scale: 9.0
+            preferred_size: [12, 0]
+            height_relative: Max
   bottom_pane:
     background: bg_base
     border: [2, 2, 2, 2]
@@ -325,7 +327,7 @@ children:
       targeter_label:
         from: .label
         x_relative: Center
-        position: [0, 15]
+        position: [-20, 15]
         text_params:
           scale: 7.0
           color: { r: 1.0, g: 0.0, b: 0.0, a: 1.0 }
@@ -987,7 +989,7 @@ children:
   in_game_menu:
     background: bg_base
     border: [5, 5, 5, 5]
-    preferred_size: [45, 20]
+    preferred_size: [45, 0]
     x_relative: Center
     y_relative: Center
     position: [0, 0]

@@ -947,7 +947,8 @@ children:
     border: [1, 1, 1, 1]
     preferred_size: [60, 28]
     x_relative: Center
-    position: [0, 0]
+    y_relative: Max
+    position: [0, -40]
     children:
       title:
         from: .label

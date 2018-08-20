@@ -307,6 +307,8 @@ impl Anim {
     }
 
     pub fn update(&mut self, millis: u32) -> bool {
+        if self.marked_for_removal.get() { return false; }
+
         let elapsed = self.elapsed + millis;
         self.elapsed = elapsed;
 

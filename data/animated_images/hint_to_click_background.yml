@@ -1,0 +1,10 @@
+id: hint_to_click_background
+states:
+    normal: hint_to_click_bg_base
+    hover: bg_hover
+    active: bg_active
+    active + hover: bg_active
+    pressed + hover: bg_pressed
+    disabled: bg_disabled
+    disabled + hover: bg_disabled
+    disabled + pressed + hover: bg_disabled

@@ -33,8 +33,8 @@ inventory:
     HeldMain: mace
     HeldOff: shield_large
     Feet: boots_leather
-    Torso: torso_plate
-    Legs: legs_mail
+    Torso: torso_mail
+    Legs: legs_leather
     Hands: gloves_leather
   quick:
     Usable1: potion_healing

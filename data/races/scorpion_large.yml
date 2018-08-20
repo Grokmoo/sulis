@@ -32,7 +32,6 @@ default_images:
   Female:
     Background: creatures/scorpion_large
     Shadow: creatures/scorpion_large_shadow
-mouseover_offset: [0, 0]
 ticker_offset: [-0.5, 0.0]
 image_layer_offset_scale: 16
 image_layer_offsets:

@@ -31,7 +31,7 @@ use sulis_core::config::CONFIG;
 use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::extern_image::ImageBuffer;
 use sulis_widgets::Label;
-use sulis_module::{ObjectSize, area::{Layer, Tile}};
+use sulis_module::{area::{Layer, Tile}};
 use sulis_state::{AreaDrawable, AreaState, EntityState, EntityTextureCache, GameState};
 use sulis_state::area_feedback_text;
 
@@ -63,6 +63,9 @@ pub struct AreaView {
     hover_sprite: Option<HoverSprite>,
     selection_box_start: Option<(f32, f32)>,
     feedback_text_params: area_feedback_text::Params,
+
+    area_mouseover: Option<Rc<RefCell<AreaMouseover>>>,
+    area_mouseover_widget: Option<Rc<RefCell<Widget>>>,
 }
 
 const TILE_CACHE_TEXTURE_SIZE: u32 = 2048;
@@ -89,6 +92,8 @@ impl AreaView {
             selection_box_image: None,
             selection_box_start: None,
             feedback_text_params: area_feedback_text::Params::default(),
+            area_mouseover: None,
+            area_mouseover_widget: None,
         }))
     }
 
@@ -109,18 +114,6 @@ impl AreaView {
         let y = y - widget.state.inner_height() as f32 / scale_y / 2.0;
 
         self.scroll.set(x, y);
-    }
-
-    pub fn get_mouseover_pos(&self, loc: Point, size: &Rc<ObjectSize>,
-                             offset: Point) -> (i32, i32) {
-        let x = loc.x as f32 + size.width as f32 / 2.0;
-        let y = loc.y as f32;
-        let x = ((x - self.scroll.x()) * self.scale.0).round() as i32;
-        let y = ((y - self.scroll.y()) * self.scale.1).round() as i32;
-
-        let offset_x = (offset.x as f32 * self.user_scale).round() as i32;
-        let offset_y = (offset.y as f32 * self.user_scale).round() as i32;
-        (x + offset_x, y + offset_y)
     }
 
     fn get_cursor_pos(&self, widget: &Rc<RefCell<Widget>>) -> (i32, i32) {
@@ -365,7 +358,7 @@ impl AreaView {
         party
     }
 
-    fn set_mouseover(&self, widget: &Rc<RefCell<Widget>>, x: i32, y: i32) -> bool {
+    fn check_mouseover(&self, x: i32, y: i32) -> Option<Rc<RefCell<AreaMouseover>>> {
         let area_state = GameState::area_state();
         let targeter = area_state.borrow_mut().targeter();
 
@@ -374,25 +367,15 @@ impl AreaView {
             let mouse_over = targeter.on_mouse_move(x, y);
 
             if let Some(ref entity) = mouse_over {
-                let (x, y) = {
-                    let entity = entity.borrow();
-                    let offset = entity.actor.actor.race.mouseover_offset;
-                    self.get_mouseover_pos(entity.location.to_point(), &entity.size, offset)
-                };
-                Widget::set_mouse_over(widget, AreaMouseover::new_entity(entity), x, y);
+                return Some(AreaMouseover::new_entity(entity));
+            } else {
+                return None;
             }
-
-            return false;
         }
 
         let area_state = area_state.borrow();
         if let Some(entity) = area_state.get_entity_at(x, y) {
-            let (x, y) = {
-                let entity = entity.borrow();
-                let offset = entity.actor.actor.race.mouseover_offset;
-                self.get_mouseover_pos(entity.location.to_point(), &entity.size, offset)
-            };
-            Widget::set_mouse_over(widget, AreaMouseover::new_entity(&entity), x, y);
+            Some(AreaMouseover::new_entity(&entity))
         } else if let Some(index) = area_state.prop_index_at(x, y) {
             let interactive = {
                 let prop = area_state.get_prop(index);
@@ -400,21 +383,15 @@ impl AreaView {
             };
 
             if interactive {
-                let (x, y) = {
-                    let prop_state = area_state.get_prop(index);
-                    self.get_mouseover_pos(prop_state.location.to_point(),
-                        &prop_state.prop.size, Point::as_zero())
-                };
-                Widget::set_mouse_over(widget, AreaMouseover::new_prop(index), x, y);
+                Some(AreaMouseover::new_prop(index))
+            } else {
+                None
             }
         } else if let Some(transition) = area_state.get_transition_at(x, y) {
-            let (x, y) = self.get_mouseover_pos(transition.from, &transition.size, Point::as_zero());
-
-            Widget::set_mouse_over(widget,
-                AreaMouseover::new_transition(&transition.hover_text), x, y);
+            Some(AreaMouseover::new_transition(&transition.hover_text))
+        } else {
+            None
         }
-
-        true
     }
 
     fn set_cursor(&mut self, x: i32, y: i32) {
@@ -438,7 +415,8 @@ impl AreaView {
     }
 
     pub fn update_cursor_and_hover(&mut self, widget: &Rc<RefCell<Widget>>) {
-        let (area_x, area_y) = self.get_cursor_pos(widget);
+        let area_state = GameState::area_state();
+
         self.hover_sprite = None;
 
         if let Some(_) = self.selection_box_start {
@@ -446,9 +424,48 @@ impl AreaView {
             return;
         }
 
-        if self.set_mouseover(widget, area_x, area_y) {
+        let (area_x, area_y) = self.get_cursor_pos(widget);
+        match self.check_mouseover(area_x, area_y) {
+            None => {
+                self.clear_area_mouseover();
+            },
+            Some(mouseover) => {
+                let (clear, set_new) = if let Some(ref cur_mouseover) = self.area_mouseover {
+                    if *cur_mouseover.borrow() == *mouseover.borrow() { (false, false) }
+                    else { (true, true) }
+                } else { (false, true) };
+
+                if clear { self.clear_area_mouseover(); }
+                if set_new { self.set_new_mouseover(widget, mouseover); }
+            }
+        };
+
+        if area_state.borrow_mut().targeter().is_none() {
             self.set_cursor(area_x, area_y);
         }
+    }
+
+    fn set_new_mouseover(&mut self, parent: &Rc<RefCell<Widget>>,
+                         mouseover: Rc<RefCell<AreaMouseover>>) {
+        self.area_mouseover = Some(Rc::clone(&mouseover));
+        let widget = Widget::with_defaults(mouseover);
+        self.area_mouseover_widget = Some(Rc::clone(&widget));
+
+        let root = Widget::get_root(parent);
+        Widget::add_child_to(&root, widget);
+    }
+
+    pub fn clear_area_mouseover(&mut self) {
+        if let Some(ref widget) = self.area_mouseover_widget {
+            widget.borrow_mut().mark_for_removal();
+
+            // prevent from double drawing if we end up creating
+            // a new mouseover on this frame
+            widget.borrow_mut().state.set_visible(false);
+        }
+
+        self.area_mouseover = None;
+        self.area_mouseover_widget = None;
     }
 }
 
@@ -757,12 +774,6 @@ impl WidgetKind for AreaView {
             _ => (),
         }
 
-        true
-    }
-
-    fn on_mouse_move(&mut self, widget: &Rc<RefCell<Widget>>,
-                     _delta_x: f32, _delta_y: f32) -> bool {
-        self.update_cursor_and_hover(widget);
         true
     }
 

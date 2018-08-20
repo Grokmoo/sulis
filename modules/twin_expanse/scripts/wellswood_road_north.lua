@@ -39,8 +39,8 @@ function after_rockslide_dialog(parent)
   base_class = game:player():base_class()
 
   check_add_party_member("npc_jorzal", base_class)
-  check_add_party_member("npc_grazi")
-  check_add_party_member("npc_aessa")
+  check_add_party_member("npc_grazi", base_class)
+  check_add_party_member("npc_aessa", base_class)
 end
 
 function check_add_party_member(id, base_class)

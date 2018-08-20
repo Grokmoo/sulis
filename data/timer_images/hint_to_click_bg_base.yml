@@ -1,0 +1,11 @@
+id: hint_to_click_bg_base
+frame_time_millis: 150
+frames:
+  - bg_hint_to_click1
+  - bg_hint_to_click2
+  - bg_hint_to_click3
+  - bg_hint_to_click4
+  - bg_hint_to_click5
+  - bg_hint_to_click4
+  - bg_hint_to_click3
+  - bg_hint_to_click2

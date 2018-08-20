@@ -32,6 +32,31 @@ enum Kind {
     Transition(String),
 }
 
+impl PartialEq for AreaMouseover {
+    fn eq(&self, other: &AreaMouseover) -> bool {
+        match &self.kind {
+            Kind::Entity(ref entity) => {
+                match &other.kind {
+                    Kind::Entity(ref other_entity) => Rc::ptr_eq(entity, other_entity),
+                    _ => false,
+                }
+            },
+            Kind::Prop(index) => {
+                match &other.kind {
+                    Kind::Prop(other_index) => other_index == index,
+                    _ => false,
+                }
+            },
+            Kind::Transition(ref name) => {
+                match &other.kind {
+                    Kind::Transition(ref other_name) => other_name == name,
+                    _ => false,
+                }
+            }
+        }
+    }
+}
+
 pub struct AreaMouseover {
     kind: Kind,
     text_area: Rc<RefCell<TextArea>>,
@@ -57,7 +82,7 @@ impl AreaMouseover {
         }))
     }
 
-    fn set_text_args(&self, state: &mut WidgetState) {
+    fn set_text_args(&self, state: &mut WidgetState) -> bool {
         state.clear_text_args();
 
         match self.kind {
@@ -70,6 +95,11 @@ impl AreaMouseover {
             Kind::Prop(index) => {
                 let area_state = GameState::area_state();
                 let area_state = area_state.borrow();
+                if !area_state.prop_index_valid(index) {
+                    state.set_visible(false);
+                    return false;
+                }
+
                 let prop = area_state.get_prop(index);
 
                 if !prop.might_contain_items() {
@@ -81,6 +111,8 @@ impl AreaMouseover {
                 state.add_text_arg("name", &name);
             },
         }
+
+        true
     }
 }
 
@@ -100,13 +132,11 @@ impl WidgetKind for AreaMouseover {
     }
 
     fn layout(&mut self, widget: &mut Widget) {
-        self.set_text_args(&mut widget.state);
+        if !self.set_text_args(&mut widget.state) {
+            widget.mark_for_removal();
+        }
 
-        // double layout - first to get the position, then to actually do the layout
         self.text_area.borrow_mut().layout(widget);
-        // widget.state.position.y -= widget.state.size.height;
-        // widget.state.position.x -= widget.state.size.width / 2;
-        // self.text_area.borrow_mut().layout(widget);
     }
 
     fn draw(&mut self, renderer: &mut GraphicsRenderer, pixel_size: Point,

@@ -408,9 +408,10 @@ impl TurnManager {
         // first, compute initiative for each entry in the list
         let initiative_roll_max = Module::rules().initiative_roll_max;
         let mut initiative = vec![0; self.order.len()];
-        let mut index = initiative.len() - 1;
+        let mut index = initiative.len();
         let mut last_initiative = 0;
         for entry in self.order.iter().rev() {
+            index -= 1;
             match entry {
                 Entry::Entity(entity_index) => {
                     let base = self.entities[*entity_index].as_ref()
@@ -423,7 +424,6 @@ impl TurnManager {
                     initiative[index] = 2 * last_initiative - 1;
                 }
             }
-            index -= 1;
         }
 
 

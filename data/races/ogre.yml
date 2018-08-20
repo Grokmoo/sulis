@@ -32,7 +32,6 @@ default_images:
   Female:
     Background: creatures/ogre01
     Shadow: creatures/ogre_shadow
-mouseover_offset: [0, -6]
 ticker_offset: [0.0, 1.5]
 image_layer_offset_scale: 16
 image_layer_offsets:

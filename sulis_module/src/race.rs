@@ -43,7 +43,6 @@ pub struct Race {
     pub portrait_selections: Vec<String>,
     pub hair_colors: Vec<Color>,
     pub skin_colors: Vec<Color>,
-    pub mouseover_offset: Point,
     pub ticker_offset: (f32, f32),
     default_images: ImageLayerSet,
     image_layer_offsets: HashMap<ImageLayer, (f32, f32)>,
@@ -104,7 +103,6 @@ impl Race {
             portrait_selections: builder.portrait_selections.unwrap_or(Vec::new()),
             hair_colors,
             skin_colors,
-            mouseover_offset: builder.mouseover_offset,
             ticker_offset: builder.ticker_offset,
         })
     }
@@ -147,7 +145,6 @@ pub struct RaceBuilder {
     pub portrait_selections: Option<Vec<String>>,
     pub hair_colors: Option<Vec<String>>,
     pub skin_colors: Option<Vec<String>>,
-    pub mouseover_offset: Point,
     pub ticker_offset: (f32, f32),
     image_layer_offsets: HashMap<ImageLayer, Point>,
     image_layer_offset_scale: i32,

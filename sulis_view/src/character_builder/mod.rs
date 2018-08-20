@@ -58,6 +58,8 @@ use sulis_module::{Ability, ActorBuilder, Class, Faction, ImageLayer, InventoryB
 use sulis_rules::{AttributeList};
 use sulis_state::{EntityState};
 
+use main_menu::CharacterSelector;
+
 pub const NAME: &str = "character_builder";
 
 trait BuilderPane {
@@ -95,8 +97,10 @@ pub struct CharacterBuilder {
 }
 
 impl CharacterBuilder {
-    pub fn new() -> Rc<RefCell<CharacterBuilder>> {
-        CharacterBuilder::with(Rc::new(CharacterCreator {}))
+    pub fn new(char_selector_widget: &Rc<RefCell<Widget>>) -> Rc<RefCell<CharacterBuilder>> {
+        CharacterBuilder::with(Rc::new(CharacterCreator {
+            character_selector_widget: Rc::clone(char_selector_widget),
+        }))
     }
 
     pub fn level_up(pc: Rc<RefCell<EntityState>>) -> Rc<RefCell<CharacterBuilder>> {
@@ -194,7 +198,9 @@ impl WidgetKind for CharacterBuilder {
     }
 }
 
-struct CharacterCreator {}
+struct CharacterCreator {
+    character_selector_widget: Rc<RefCell<Widget>>,
+}
 
 impl BuilderSet for CharacterCreator {
     fn on_add(&self, builder: &mut CharacterBuilder,
@@ -229,7 +235,7 @@ impl BuilderSet for CharacterCreator {
         vec![race_sel_widget, class_sel_widget, attr_sel_widget, cosmetic_sel_widget, backstory_sel_widget]
     }
 
-    fn finish(&self, builder: &mut CharacterBuilder, widget: &Rc<RefCell<Widget>>) {
+    fn finish(&self, builder: &mut CharacterBuilder, _widget: &Rc<RefCell<Widget>>) {
         let utc: DateTime<Utc> = Utc::now();
 
         let mut path = config::USER_DIR.clone();
@@ -269,7 +275,7 @@ impl BuilderSet for CharacterCreator {
         };
 
         let actor = ActorBuilder {
-            id,
+            id: id.to_string(),
             name: builder.name.to_string(),
             portrait: builder.portrait.clone(),
             race: builder.race.as_ref().unwrap().id.to_string(),
@@ -298,8 +304,9 @@ impl BuilderSet for CharacterCreator {
             Ok(()) => (),
         }
 
-        let root = Widget::get_root(&widget);
-        root.borrow_mut().invalidate_children();
+        self.character_selector_widget.borrow_mut().invalidate_children();
+        let char_sel = Widget::downcast_kind_mut::<CharacterSelector>(&self.character_selector_widget);
+        char_sel.set_to_select(id);
     }
 }
 

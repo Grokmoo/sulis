@@ -33,7 +33,6 @@ default_images:
   Female:
     Background: creatures/imp01
     Shadow: creatures/imp01_shadow
-mouseover_offset: [0, -2]
 ticker_offset: [0.5, 2]
 image_layer_offset_scale: 16
 image_layer_offsets:

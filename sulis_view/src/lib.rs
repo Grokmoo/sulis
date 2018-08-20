@@ -361,6 +361,7 @@ impl WidgetKind for RootView {
         let has_modal = root.borrow().has_modal();
         GameState::set_modal_locked(has_modal);
 
+        let mut area_view_updated = false;
         if !has_modal {
             let (cx, cy) = (Cursor::get_x(), Cursor::get_y());
             let len = root.borrow().children.len();
@@ -375,10 +376,13 @@ impl WidgetKind for RootView {
 
                 if Rc::ptr_eq(&child, &self.area_view_widget) {
                     self.area_view.borrow_mut().update_cursor_and_hover(&self.area_view_widget);
+                    area_view_updated = true;
                 }
                 break;
             }
         }
+
+        if !area_view_updated { self.area_view.borrow_mut().clear_area_mouseover(); }
     }
 
     fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {

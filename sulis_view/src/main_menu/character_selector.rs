@@ -30,6 +30,7 @@ pub struct CharacterSelector {
     selected: Option<Rc<Actor>>,
     first_add: bool,
     main_menu: Rc<RefCell<Widget>>,
+    to_select: Option<String>,
 }
 
 impl CharacterSelector {
@@ -38,24 +39,30 @@ impl CharacterSelector {
             selected: None,
             first_add: true,
             main_menu,
+            to_select: None,
         }))
+    }
+
+    pub fn set_to_select(&mut self, actor_id: String) {
+        self.to_select = Some(actor_id);
     }
 }
 
 impl WidgetKind for CharacterSelector {
     widget_kind!("character_selector");
 
-    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+    fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         debug!("Adding to main menu widget");
 
         let title = Widget::with_theme(Label::empty(), "title");
         let chars_title = Widget::with_theme(Label::empty(), "characters_title");
 
         let new_character_button = Widget::with_theme(Button::empty(), "new_character_button");
-        new_character_button.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+        let char_selector_widget = Rc::clone(widget);
+        new_character_button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
             let root = Widget::get_root(&widget);
 
-            let builder = Widget::with_defaults(CharacterBuilder::new());
+            let builder = Widget::with_defaults(CharacterBuilder::new(&char_selector_widget));
             Widget::add_child_to(&root, builder);
         })));
 
@@ -87,7 +94,11 @@ impl WidgetKind for CharacterSelector {
             window_widget.borrow_mut().state.set_modal(true);
             Widget::add_child_to(&root, window_widget);
         })));
-        delete_char_button.borrow_mut().state.set_enabled(self.selected.is_some());
+
+        let to_select = match self.to_select.take() {
+            None => "".to_string(),
+            Some(to_select) => to_select,
+        };
 
         let mut must_create_character = true;
         let characters_pane = Widget::empty("characters_pane");
@@ -96,6 +107,10 @@ impl WidgetKind for CharacterSelector {
             for actor in characters {
                 let actor = Rc::new(actor);
                 trace!("Adding button for {}", actor.id);
+
+                if actor.id == to_select {
+                    self.selected = Some(Rc::clone(&actor));
+                }
 
                 let actor_button = Widget::with_theme(Button::empty(), "character_button");
                 actor_button.borrow_mut().state.add_text_arg("name", &actor.name);
@@ -117,7 +132,6 @@ impl WidgetKind for CharacterSelector {
         }
 
         let play_button = Widget::with_theme(Button::empty(), "play_button");
-        play_button.borrow_mut().state.set_enabled(self.selected.is_some());
         play_button.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
             let parent = Widget::get_parent(&widget);
             let selector = Widget::downcast_kind_mut::<CharacterSelector>(&parent);
@@ -145,10 +159,13 @@ impl WidgetKind for CharacterSelector {
             Widget::with_theme(TextArea::empty(), "details")
         };
 
+        delete_char_button.borrow_mut().state.set_enabled(self.selected.is_some());
+        play_button.borrow_mut().state.set_enabled(self.selected.is_some());
+
         if self.first_add && must_create_character {
             let menu = Widget::downcast_kind_mut::<MainMenu>(&self.main_menu);
             debug!("Showing character builder");
-            menu.char_builder_to_add = Some(CharacterBuilder::new());
+            menu.char_builder_to_add = Some(CharacterBuilder::new(widget));
         }
         self.first_add = false;
 

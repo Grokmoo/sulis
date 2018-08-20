@@ -51,17 +51,51 @@ function ai_action(parent, state)
     end
 
     target = find_target(parent, hostiles)
-    if parent:can_reach(target) then
-        parent:anim_weapon_attack(target, nil, true)
-    else
-	    -- attempt to move, if we can't move at all then just end
-        if not parent:move_towards_entity(target) then
-		  _G.state = parent:state_end()
-		  return
-		end
-    end
+	result = check_move_for_attack(parent, target)
+	if result.attack then
+		parent:anim_weapon_attack(target, nil, true)
+	end
+	
+	if result.done then
+		_G.state = parent:state_end()
+	else
+		_G.state = parent:state_wait(10)
+	end
+end
 
-    _G.state = parent:state_wait(10)
+function check_move_for_attack(parent, target)
+    if not parent:stats().attack_is_ranged then
+	    if parent:can_reach(target) then
+		    return { attack=true }
+		end
+		
+		if not parent:move_towards_entity(target) then
+			return { attack=false, done=true }
+		end
+	else
+		dist = parent:dist_to_entity(target)
+		target_dist = parent:vis_dist() - 2
+		
+		if dist > target_dist then
+			if not parent:move_towards_entity(target, target_dist) then
+				return { attack=false, done=true }
+			end
+			
+			return { attack=false, done=false }
+		end
+		
+		if not parent:has_visibility(target) then
+			if not parent:move_towards_entity(target, dist - 2) then
+				return { attack=false, done=true }
+			end
+			
+			return { attack=false, done=false }
+		end
+		
+		return { attack=true }
+	end
+	
+	return { attack=false, done=false }
 end
 
 function check_swap_weapons(parent, hostiles)

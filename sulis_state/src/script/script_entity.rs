@@ -320,6 +320,15 @@ impl UserData for ScriptEntity {
             Ok(result)
         });
 
+        methods.add_method("has_visibility", |_, entity, target: ScriptEntity| {
+            let parent = entity.try_unwrap()?;
+            let target = target.try_unwrap()?;
+            let area_state = GameState::area_state();
+            let area_state = area_state.borrow();
+            let result = area_state.has_visibility(&parent.borrow(), &target.borrow());
+            Ok(result)
+        });
+
         methods.add_method("can_move", |_, entity, ()| {
             let parent = entity.try_unwrap()?;
             let result = parent.borrow().can_move();

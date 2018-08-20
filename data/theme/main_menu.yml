@@ -133,6 +133,7 @@ children:
             preferred_size: [28, 28]
       play_button:
         from: .button
+        background: hint_to_click_background
         text: "Play"
         text_params:
           scale: 9
@@ -161,6 +162,7 @@ children:
         position: [0, 0]
       play_button:
         from: .button
+        background: hint_to_click_background
         text: "Select"
         text_params:
           scale: 9.0

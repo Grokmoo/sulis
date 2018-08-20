@@ -37,7 +37,6 @@ default_images:
     Background: creatures/ratkin_bg
     Ears: creatures/ratkin_ears
     Shadow: creatures/dwarf_shadow
-mouseover_offset: [0, -2]
 ticker_offset: [0.5, 2]
 image_layer_offset_scale: 16
 image_layer_offsets:

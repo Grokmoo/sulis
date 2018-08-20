@@ -78,8 +78,11 @@ pub (in animation) fn draw(model: &RangedAttackAnimModel, renderer: &mut Graphic
 
 pub fn new(attacker: &Rc<RefCell<EntityState>>, defender: &Rc<RefCell<EntityState>>,
            callbacks: Vec<Box<ScriptCallback>>, duration_millis: u32) -> Anim {
-    let mut start_pos = ((attacker.borrow().location.x + attacker.borrow().size.width / 2) as f32,
-    (attacker.borrow().location.y + attacker.borrow().size.height / 2) as f32);
+    let mut start_pos = (
+        (attacker.borrow().location.x + attacker.borrow().size.width / 2) as f32,
+        (attacker.borrow().location.y + attacker.borrow().size.height / 2) as f32
+    );
+
     let x = (defender.borrow().location.x + defender.borrow().size.width / 2) as f32 - start_pos.0;
     let y = (defender.borrow().location.y + defender.borrow().size.height / 2) as f32 - start_pos.1;
     let dist = (x * x + y * y).sqrt();

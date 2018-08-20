@@ -37,7 +37,6 @@ default_images:
     Background: creatures/human_female_bg
     Ears: creatures/elf_female_ears
     Shadow: creatures/human_female_shadow
-mouseover_offset: [0, -3]
 ticker_offset: [0.5, 2]
 image_layer_offset_scale: 16
 image_layer_offsets:

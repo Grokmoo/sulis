@@ -179,9 +179,9 @@ impl AreaView {
             let c_x = pc.borrow().location.x + pc.borrow().size.width / 2;
             let c_y = pc.borrow().location.y + pc.borrow().size.height / 2;
             let min_x = cmp::max(0, c_x - vis_dist + if delta_x < 0 { delta_x } else { 0 });
-            let max_x = cmp::min(max_tile_x, c_x + vis_dist + if delta_x > 0 { delta_x } else { 0 });
+            let max_x = cmp::min(max_tile_x, 1 + c_x + vis_dist + if delta_x > 0 { delta_x } else { 0 });
             let min_y = cmp::max(0, c_y - vis_dist + if delta_y < 0 { delta_y } else { 0 });
-            let max_y = cmp::min(max_tile_y, c_y + vis_dist + if delta_y > 0 { delta_y } else { 0 });
+            let max_y = cmp::min(max_tile_y, 1 + c_y + vis_dist + if delta_y > 0 { delta_y } else { 0 });
 
             let scale = TILE_SIZE as i32;
             renderer.clear_texture_region(VISIBILITY_TEX_ID, min_x * scale, min_y * scale,

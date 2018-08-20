@@ -47,8 +47,6 @@ pub struct AreaState {
     pub(crate) triggers: Vec<TriggerState>,
     pub(crate) merchants: Vec<Merchant>,
 
-    pub listeners: ChangeListenerList<AreaState>,
-
     prop_grid: Vec<Option<usize>>,
     pub(crate) entity_grid: Vec<Vec<usize>>,
     surface_grid: Vec<Vec<usize>>,
@@ -98,7 +96,6 @@ impl AreaState {
             trigger_grid,
             prop_vis_grid: vec![true;dim],
             prop_pass_grid: vec![true;dim],
-            listeners: ChangeListenerList::default(),
             pc_vis,
             pc_explored,
             pc_vis_delta: (false, 0, 0),
@@ -856,7 +853,6 @@ impl AreaState {
             self.compute_pc_visibility(&entity, 0, 0);
         }
 
-        self.listeners.notify(&self);
         Ok(index)
     }
 
@@ -960,7 +956,6 @@ impl AreaState {
     }
 
     pub (crate) fn update(&mut self) {
-        let mut notify = false;
         let len = self.props.len();
         for index in 0..len {
             {
@@ -973,7 +968,6 @@ impl AreaState {
             }
 
             self.remove_prop(index);
-            notify = true;
         }
 
         self.feedback_text.iter_mut().for_each(|f| f.update());
@@ -986,10 +980,6 @@ impl AreaState {
 
         if remove_targeter {
             self.targeter.take();
-        }
-
-        if notify {
-            self.listeners.notify(&self);
         }
     }
 

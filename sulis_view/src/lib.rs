@@ -115,7 +115,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_core::io::{InputAction, MainLoopUpdater};
-use sulis_core::ui::{Callback, Widget, WidgetKind};
+use sulis_core::ui::{Callback, Widget, WidgetKind, Cursor};
 use sulis_core::util;
 use sulis_state::{ChangeListener, GameState, NextGameStep, save_file::create_save, script::script_callback};
 use sulis_widgets::{Button, ConfirmationWindow, Label};
@@ -148,6 +148,8 @@ pub struct RootView {
     next_step: Option<NextGameStep>,
     status: Rc<RefCell<Widget>>,
     status_added: Option<Instant>,
+    area_view: Rc<RefCell<AreaView>>,
+    area_view_widget: Rc<RefCell<Widget>>,
 }
 
 impl RootView {
@@ -161,10 +163,14 @@ impl RootView {
     }
 
     pub fn new() -> Rc<RefCell<RootView>> {
+        let area_view = AreaView::new();
+        let area_view_widget = Widget::with_defaults(area_view.clone());
         Rc::new(RefCell::new(RootView {
             next_step: None,
             status: Widget::with_theme(Label::empty(), "status_text"),
             status_added: None,
+            area_view,
+            area_view_widget,
         }))
     }
 
@@ -352,7 +358,27 @@ impl WidgetKind for RootView {
         }
 
         let root = Widget::get_root(widget);
-        GameState::set_modal_locked(root.borrow().has_modal());
+        let has_modal = root.borrow().has_modal();
+        GameState::set_modal_locked(has_modal);
+
+        if !has_modal {
+            let (cx, cy) = (Cursor::get_x(), Cursor::get_y());
+            let len = root.borrow().children.len();
+            for i in (0..len).rev() {
+                let child = Rc::clone(&root.borrow().children[i]);
+                {
+                    let child = child.borrow();
+                    if !child.state.is_enabled() || !child.state.visible { continue; }
+
+                    if !child.state.in_bounds(cx, cy) { continue; }
+                }
+
+                if Rc::ptr_eq(&child, &self.area_view_widget) {
+                    self.area_view.borrow_mut().update_cursor_and_hover(&self.area_view_widget);
+                }
+                break;
+            }
+        }
     }
 
     fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
@@ -373,19 +399,11 @@ impl WidgetKind for RootView {
         true
     }
 
-    fn on_remove(&mut self) {
-        let area_state = GameState::area_state();
-        area_state.borrow_mut().listeners.remove(NAME);
-
-        for pc in GameState::party() {
-            pc.borrow_mut().actor.listeners.remove(NAME);
-        }
-    }
-
     fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
-        debug!("Adding to root widget.");
+        info!("Adding to root widget.");
 
-        let area_widget = Widget::with_defaults(AreaView::new());
+        self.area_view = AreaView::new();
+        self.area_view_widget = Widget::with_defaults(self.area_view.clone());
 
         let bot_pane = Widget::empty("bottom_pane");
         {
@@ -484,7 +502,7 @@ impl WidgetKind for RootView {
         let ticker = Widget::with_defaults(InitiativeTicker::new());
 
         // area widget must be the first entry in the children list
-        vec![area_widget, bot_pane, ap_bar, ticker, self.status.clone()]
+        vec![Rc::clone(&self.area_view_widget), bot_pane, ap_bar, ticker, self.status.clone()]
     }
 }
 

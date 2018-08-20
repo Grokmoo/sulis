@@ -436,6 +436,20 @@ impl AreaView {
             }
         }
     }
+
+    pub fn update_cursor_and_hover(&mut self, widget: &Rc<RefCell<Widget>>) {
+        let (area_x, area_y) = self.get_cursor_pos(widget);
+        self.hover_sprite = None;
+
+        if let Some(_) = self.selection_box_start {
+            Cursor::set_cursor_state(animation_state::Kind::Normal);
+            return;
+        }
+
+        if self.set_mouseover(widget, area_x, area_y) {
+            self.set_cursor(area_x, area_y);
+        }
+    }
 }
 
 impl WidgetKind for AreaView {
@@ -748,18 +762,7 @@ impl WidgetKind for AreaView {
 
     fn on_mouse_move(&mut self, widget: &Rc<RefCell<Widget>>,
                      _delta_x: f32, _delta_y: f32) -> bool {
-        let (area_x, area_y) = self.get_cursor_pos(widget);
-        self.hover_sprite = None;
-
-        if let Some(_) = self.selection_box_start {
-            Cursor::set_cursor_state(animation_state::Kind::Normal);
-            return true;
-        }
-
-        if self.set_mouseover(widget, area_x, area_y) {
-            self.set_cursor(area_x, area_y);
-        }
-
+        self.update_cursor_and_hover(widget);
         true
     }
 

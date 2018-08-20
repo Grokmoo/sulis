@@ -21,7 +21,7 @@ use sulis_core::ui::{animation_state, Widget};
 use sulis_core::util::Point;
 use sulis_module::{Faction, Module, ObjectSize};
 use sulis_state::{MOVE_TO_THRESHOLD, EntityState, GameState, ScriptCallback};
-use {AreaView, dialog_window, RootView};
+use {dialog_window, RootView};
 
 pub fn get_action(x: i32, y: i32) -> Box<ActionKind> {
     let area_state = GameState::area_state();
@@ -316,12 +316,7 @@ impl ActionKind for TransitionAction {
         trace!("Firing transition callback.");
         GameState::transition(&self.area_id, self.to_x, self.to_y);
         let root = Widget::get_root(widget);
-        {
-            let root = root.borrow_mut();
-            root.children[0].borrow_mut().mark_for_removal();
-        }
-        let area_widget = Widget::with_defaults(AreaView::new());
-        Widget::add_child_to_front(&root, area_widget);
+        root.borrow_mut().invalidate_children();
     }
 }
 

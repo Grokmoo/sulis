@@ -49,6 +49,7 @@ pub struct GameState {
     areas: HashMap<String, Rc<RefCell<AreaState>>>,
     area_state: Rc<RefCell<AreaState>>,
     selected: Vec<Rc<RefCell<EntityState>>>,
+    user_zoom: f32,
     party: Vec<Rc<RefCell<EntityState>>>,
     party_formation: Rc<RefCell<Formation>>,
     party_coins: i32,
@@ -59,6 +60,9 @@ pub struct GameState {
     path_finder: PathFinder,
     ui_callbacks: Vec<UICallback>,
 }
+
+const MIN_ZOOM: f32 = 0.7;
+const MAX_ZOOM: f32 = 2.0;
 
 macro_rules! exec_script {
     ($func:ident: $($x:ident),*) => {
@@ -209,6 +213,7 @@ impl GameState {
                 path_finder,
                 party,
                 selected,
+                user_zoom: save_state.zoom,
                 party_formation: Rc::new(RefCell::new(formation)),
                 party_coins,
                 party_stash: Rc::new(RefCell::new(PartyStash::new(stash))),
@@ -299,6 +304,7 @@ impl GameState {
         selected.push(Rc::clone(&pc_state));
 
         Ok(GameState {
+            user_zoom: 1.0,
             areas,
             area_state: area_state,
             path_finder: path_finder,
@@ -310,6 +316,22 @@ impl GameState {
             party_listeners: ChangeListenerList::default(),
             ui_callbacks: Vec::new(),
         })
+    }
+
+    pub fn set_user_zoom(mut zoom: f32) {
+        STATE.with(|state| {
+            let mut state = state.borrow_mut();
+            let state = state.as_mut().unwrap();
+
+            if zoom > MAX_ZOOM { zoom = MAX_ZOOM; }
+            else if zoom < MIN_ZOOM { zoom = MIN_ZOOM; }
+
+            state.user_zoom = zoom;
+        });
+    }
+
+    pub fn user_zoom() -> f32 {
+        STATE.with(|state| state.borrow().as_ref().unwrap().user_zoom)
     }
 
     pub fn turn_manager() -> Rc<RefCell<TurnManager>> {

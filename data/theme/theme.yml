@@ -771,12 +771,12 @@ children:
           ][s=6.0;x=0|Armor: #armor#][?armor_slashing;s=5.0| (Slashing: #armor_slashing#)][?armor_piercing;s=5.0| (Piercing: #armor_piercing#)][?armor_crushing;s=5.0| (Crushing: #armor_crushing#)][?armor_acid;s=5.0| (Acid: #armor_acid#)][?armor_cold;s=5.0| (Cold: #armor_cold#)][?armor_electrical;s=5.0| (Electrical: #armor_electrical#)][?armor_fire;s=5.0| (Fire: #armor_fire#)][?armor_sonic;s=5.0| (Sonic: #armor_sonic#)]
           [s=5|[x=0|Defense: #defense#][x=28|Fortitude: #fortitude#][x=56|Reflex: #reflex#][x=84|Will: #will#]]
           [s=4|
-          ][s=6;y=70|[x=0|Strength][x=30|#str#]
-               [x=0|Dexterity][x=30|#dex#]
-               [x=0|Endurance][x=30|#end#]
-               [x=0|Perception][x=30|#per#]
-               [x=0|Intellect][x=30|#int#]
-               [x=0|Wisdom][x=30|#wis#]]
+          ][s=6;y=70|[x=0|Strength][r=30|#str#]
+               [x=0|Dexterity][r=30|#dex#]
+               [x=0|Endurance][r=30|#end#]
+               [x=0|Perception][r=30|#per#]
+               [x=0|Intellect][r=30|#int#]
+               [x=0|Wisdom][r=30|#wis#]]
           
           [y=70;x=60;s=5|Range[x=90|#reach#]]
           [x=60;s=5|Caster level[x=90|#caster_level#]]
@@ -811,22 +811,22 @@ children:
           #description#
           [s=9|]
           [s=7|Attribute Bonuses]
-          [?str|Strength: #str#
-          ][?dex|Dexterity: #dex#
-          ][?end|Endurance: #end#
-          ][?per|Perception: #per#
-          ][?int|Intelligence: #int#
-          ][?wis|Wisdom: #wis#
+          [?str|Strength [r=32|#str#]
+          ][?dex|Dexterity [r=32|#dex#]
+          ][?end|Endurance [r=32|#end#]
+          ][?per|Perception [r=32|#per#]
+          ][?int|Intelligence [r=32|#int#]
+          ][?wis|Wisdom: [r=32|#wis#]
           ]
           [s=7|Base Stats]
-          [?initiative|[s=6.0|Initiative: #initiative#]
-          ][?melee_accuracy|[s=6.0|Melee Accuracy: #melee_accuracy#]
-          ][?ranged_accuracy|[s=6.0|Ranged Accuracy: #ranged_accuracy#]
-          ][?spell_accuracy|[s=6.0|Spell Accuracy: #spell_accuracy#]
-          ][?defense|[s=6.0|Defense: #defense#]
-          ][?fortitude|[s=6.0|Fortitude: #fortitude#]
-          ][?reflex|[s=6.0|Reflex: #reflex#]
-          ][?will|[s=6.0|Will: #will#]
+          [?initiative|[s=6.0|Initiative [r=40|#initiative#]]
+          ][?melee_accuracy|[s=6.0|Melee Accuracy [r=40|#melee_accuracy#]]
+          ][?ranged_accuracy|[s=6.0|Ranged Accuracy [r=40|#ranged_accuracy#]]
+          ][?spell_accuracy|[s=6.0|Spell Accuracy [r=40|#spell_accuracy#]]
+          ][?defense|[s=6.0|Defense [r=40|#defense#]]
+          ][?fortitude|[s=6.0|Fortitude [r=40|#fortitude#]]
+          ][?reflex|[s=6.0|Reflex [r=40|#reflex#]]
+          ][?will|[s=6.0|Will [r=40|#will#]]
           ]
         width_relative: Max
         height_relative: Max
@@ -884,30 +884,23 @@ children:
           #description#
           [s=9|]
           [s=7|Bonuses per Level]
-          [?ability_group_0|#ability_group_0# ability uses per encounter: #ability_group_0_uses_per_encounter#
-          ][?ability_group_1|#ability_group_1# ability uses per encounter: #ability_group_1_uses_per_encounter#
-          ][?ability_group_2|#ability_group_2# ability uses per encounter: #ability_group_2_uses_per_encounter#
-          ][?str|Strength: +#str#
-          ][?dex|Dexterity: +#dex#
-          ][?end|Endurance: +#end#
-          ][?per|Perception: +#per#
-          ][?int|Intelligence: +#int#
-          ][?wis|Wisdom: +#wis#
-          ][?caster_level|Caster level: #caster_level#
-          ][?bonus_ap|AP: +#bonus_ap#
-          ][?min_bonus_damage_0|[s=6.0|Damage: #min_bonus_damage_0# to #max_bonus_damage_0# [?bonus_damage_kind_0;c=f00|#bonus_damage_kind_0#]]
-          ][?bonus_reach|[s=6.0|Reach: #bonus_reach#]
-          ][?bonus_range|[s=6.0|Range: #bonus_range#]
-          ][?armor|[s=6.0|Armor: #armor#][?armor_slashing;s=5.0| (Slashing: #armor_slashing#)][?armor_piercing;s=5.0| (Piercing: #armor_piercing#)][?armor_crushing;s=5.0| (Crushing: #armor_crushing#)][?armor_acid;s=5.0| (Acid: #armor_acid#)][?armor_cold;s=5.0| (Cold: #armor_cold#)][?armor_electrical;s=5.0| (Electrical: #armor_electrical#)][?armor_fire;s=5.0| (Fire: #armor_fire#)][?armor_sonic;s=5.0| (Sonic: #armor_sonic#)]
-          ][?hit_points|[s=6.0|Hit Points: +#hit_points#]
-          ][?melee_accuracy|[s=6.0|Melee Accuracy: +#melee_accuracy#]
-          ][?ranged_accuracy|[s=6.0|Ranged Accuracy: +#ranged_accuracy#]
-          ][?spell_accuracy|[s=6.0|Spell Accuracy: +#spell_accuracy#]
-          ][?defense|[s=6.0|Defense: +#defense#]
-          ][?fortitude|[s=6.0|Fortitude: +#fortitude#]
-          ][?reflex|[s=6.0|Reflex: +#reflex#]
-          ][?will|[s=6.0|Will: +#will#]
-          ][?initiative|[s=6.0|Initiative: +#initiative#]
+          [?str|Strength: [r=40|+#str#]
+          ][?dex|Dexterity: [r=40|+#dex#]
+          ][?end|Endurance: [r=40|+#end#]
+          ][?per|Perception: [r=40|+#per#]
+          ][?int|Intelligence: [r=40|+#int#]
+          ][?wis|Wisdom: [r=40|+#wis#]
+          ][?caster_level|Caster level: [r=40|+#caster_level#]
+          ][?bonus_ap|AP: [r=40|+#bonus_ap#]
+          ][?hit_points|[s=6.0|Hit Points: [r=40|+#hit_points#]]
+          ][?melee_accuracy|[s=6.0|Melee Accuracy: [r=40|+#melee_accuracy#]]
+          ][?ranged_accuracy|[s=6.0|Ranged Accuracy: [r=40|+#ranged_accuracy#]]
+          ][?spell_accuracy|[s=6.0|Spell Accuracy: [r=40|+#spell_accuracy#]]
+          ][?defense|[s=6.0|Defense: [r=40|+#defense#]]
+          ][?fortitude|[s=6.0|Fortitude: [r=40|+#fortitude#]]
+          ][?reflex|[s=6.0|Reflex: [r=40|+#reflex#]]
+          ][?will|[s=6.0|Will: [r=40|+#will#]]
+          ][?initiative|[s=6.0|Initiative: [r=40|+#initiative#]]
           ]
         width_relative: Max
         height_relative: Max

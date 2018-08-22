@@ -49,7 +49,6 @@ struct HoverSprite {
 const NAME: &'static str = "area";
 
 pub struct AreaView {
-    user_scale: f32,
     scale: (f32, f32),
     cache_invalid: bool,
     layers: Vec<String>,
@@ -81,7 +80,6 @@ impl AreaView {
     pub fn new() -> Rc<RefCell<AreaView>> {
         Rc::new(RefCell::new(AreaView {
             targeter_label: Widget::with_theme(Label::empty(), "targeter_label"),
-            user_scale: 1.0,
             scale: (1.0, 1.0),
             hover_sprite: None,
             cache_invalid: true,
@@ -531,16 +529,14 @@ impl WidgetKind for AreaView {
             _ => return false,
         };
 
-        let old_user_scale = self.user_scale;
-
-        self.user_scale += delta;
-        if self.user_scale < 0.5 { self.user_scale = 0.5; }
-        else if self.user_scale > 1.5 { self.user_scale = 1.5; }
+        let old_user_scale = GameState::user_zoom();
+        GameState::set_user_zoom(old_user_scale + delta);
+        let user_scale = GameState::user_zoom();
 
         // recenter the view based on the scroll change
         let (old_scale_x, old_scale_y) = self.scale;
-        self.scale = (old_scale_x / old_user_scale * self.user_scale,
-                      old_scale_y / old_user_scale * self.user_scale);
+        self.scale = (old_scale_x / old_user_scale * user_scale,
+                      old_scale_y / old_user_scale * user_scale);
 
         let width = widget.borrow().state.inner_width() as f32;
         let height = widget.borrow().state.inner_height() as f32;
@@ -557,9 +553,10 @@ impl WidgetKind for AreaView {
 
     fn draw(&mut self, renderer: &mut GraphicsRenderer, pixel_size: Point,
             widget: &Widget, millis: u32) {
+        let zoom = GameState::user_zoom();
         {
             let (sx, sy) = compute_area_scaling(pixel_size);
-            self.scale = (sx * self.user_scale, sy * self.user_scale);
+            self.scale = (sx * zoom, sy * zoom);
         }
 
         let (scale_x, scale_y) = self.scale;

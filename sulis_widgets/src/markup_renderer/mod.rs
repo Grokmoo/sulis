@@ -65,6 +65,8 @@
 //! Uses a very simple peek ahead method that does not support nesting of this
 //! attribute recursively or most other tags.  Does support nested color tag.
 //! Only works over a single line
+//! * **r** - Right aligns text to the specified x coordinate.  Does not
+//! support nesting except for color tag, just like center.
 //! * **c** - Specify a color, in one of several formats, all hex based:
 //! `RRGGBBAA`, `RRGGBB`, `RGBA`, `RGB`.  When using 2 characters for a component,
 //! you are specifying with full byte precision.  When using 1 character, you are
@@ -233,6 +235,11 @@ impl MarkupRenderer {
                                 let text_width_until_tag_close =
                                     self.peek_width_until_tag_close(&cur_markup, chars.as_str());
                                 x += (center_width - text_width_until_tag_close) / 2.0;
+                            }
+                            if let Some(right_x) = cur_markup.right {
+                                let text_width_until_tag_close =
+                                    self.peek_width_until_tag_close(&cur_markup, chars.as_str());
+                                x = pos_x + right_x - text_width_until_tag_close;
                             }
                             if let Some(ref image) = cur_markup.image {
                                 self.draw_sprite(&image, &cur_markup, x, y);

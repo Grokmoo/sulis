@@ -20,12 +20,17 @@ bonuses_per_level:
   - kind:
       initiative: 1
 starting_abilities:
+  - hide
   - armor_light
   - weapon_crossbow
   - weapon_bow
   - weapon_small_sword
   - weapon_simple
 upgrades:
+  1:
+    ability_choices: []
+    group_uses_per_encounter:
+      - [ Modes, ~ ]
   2:
     ability_choices: [ rogue ]
     group_uses_per_encounter:

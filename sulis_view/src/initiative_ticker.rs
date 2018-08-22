@@ -40,7 +40,7 @@ impl WidgetKind for InitiativeTicker {
 
     fn on_mouse_enter(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
         self.super_on_mouse_enter(widget);
-        true
+        false 
     }
 
     fn on_mouse_press(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
@@ -59,6 +59,8 @@ impl WidgetKind for InitiativeTicker {
     }
 
     fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+        widget.borrow_mut().state.set_enabled(false);
+
         let mgr = GameState::turn_manager();
         mgr.borrow_mut().listeners.add(ChangeListener::invalidate(NAME, widget));
 

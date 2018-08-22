@@ -157,6 +157,7 @@ impl BuilderPane for CosmeticSelectorPane {
             }
         }
 
+        self.items.clear();
         if let Some(ref inventory) = builder.inventory {
             for (slot, item) in inventory.equipped_iter() {
                 self.items.push((slot, item));

@@ -20,7 +20,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 use std::collections::HashMap;
 
-use sulis_core::config::CONFIG;
+use sulis_core::config::Config;
 
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::ui::{color, Color};
@@ -302,7 +302,7 @@ impl EntityState {
 
     pub fn attack(entity: &Rc<RefCell<EntityState>>, target: &Rc<RefCell<EntityState>>,
                   callback: Option<Box<ScriptCallback>>, remove_ap: bool) {
-        let time = CONFIG.display.animation_base_time_millis;
+        let time = Config::animation_base_time_millis();
         let cbs: Vec<Box<ScriptCallback>> = callback.into_iter().collect();
         if entity.borrow().actor.stats.attack_is_melee() {
             let anim = animation::melee_attack_animation::new(entity, target, time * 5, cbs, Box::new(|a, d| {

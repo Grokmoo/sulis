@@ -14,7 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use io::InputAction;
+use io::{keyboard_event::Key, InputAction};
 
 #[derive(Copy, Clone, Debug)]
 pub struct Event {
@@ -52,9 +52,10 @@ pub enum Kind {
     MouseExit,
     CharTyped(char),
     KeyPress(InputAction),
+    RawKey(Key),
 }
 
-#[derive(Deserialize, Copy, Clone, Debug, PartialEq)]
+#[derive(Deserialize, Serialize, Copy, Clone, Debug, PartialEq, PartialOrd)]
 #[serde(deny_unknown_fields)]
 pub enum ClickKind {
     Left,

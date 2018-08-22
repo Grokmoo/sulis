@@ -25,8 +25,8 @@ extern crate sulis_view;
 
 use std::rc::Rc;
 
-use sulis_core::ui;
-use sulis_core::config::CONFIG;
+use sulis_core::ui::{self, Cursor};
+use sulis_core::config::Config;
 use sulis_core::resource::ResourceSet;
 use sulis_core::io::IO;
 use sulis_core::util;
@@ -41,11 +41,18 @@ fn init() -> Box<IO> {
     info!("=========Initializing=========");
     info!("Setup Logger and read configuration from 'config.yml'");
 
-    info!("Reading resources from {}", CONFIG.resources.directory);
-    if let Err(e) = ResourceSet::init(&CONFIG.resources.directory) {
+    let resources_dir = Config::resources_config().directory;
+    info!("Reading resources from {}", resources_dir);
+    if let Err(e) = ResourceSet::init(&resources_dir) {
         error!("{}", e);
         util::error_and_exit("There was a fatal error reading resources..");
     };
+
+    create_io()
+}
+
+fn create_io() -> Box<IO> {
+    Cursor::update_max();
 
     info!("Setting up display adapter.");
     match sulis_core::io::create() {
@@ -59,7 +66,7 @@ fn init() -> Box<IO> {
 }
 
 fn main_menu(io: &mut Box<IO>) -> NextGameStep {
-    let view = main_menu::MainMenu::new();
+    let view = main_menu::MainMenu::new(io.get_display_configurations());
     let loop_updater = main_menu::LoopUpdater::new(&view);
     let root = ui::create_ui_tree(view.clone());
     match ResourceSet::get_theme().children.get("main_menu") {
@@ -130,6 +137,10 @@ fn main() {
             NextGameStep::NewCampaign { pc_actor } => new_campaign(&mut io, pc_actor),
             NextGameStep::LoadCampaign { save_state } => load_campaign(&mut io, save_state),
             NextGameStep::MainMenu => main_menu(&mut io),
+            NextGameStep::RecreateIO => {
+                io = create_io();
+                main_menu(&mut io)
+            }
         };
     }
 

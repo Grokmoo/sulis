@@ -18,7 +18,7 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_core::config::CONFIG;
+use sulis_core::config::Config;
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{Button, InputField, Label};
 
@@ -95,7 +95,7 @@ impl WidgetKind for SaveWindow {
         let area_editor_kind_ref = Rc::clone(&self.area_editor);
         save_button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _kind| {
             let parent = Widget::get_parent(widget);
-            let filename_prefix = format!("../modules/{}/areas/", CONFIG.editor.module);
+            let filename_prefix = format!("../modules/{}/areas/", Config::editor_config().module);
             area_editor_kind_ref.borrow().model.save(&filename_prefix);
             parent.borrow_mut().mark_for_removal();
         })));

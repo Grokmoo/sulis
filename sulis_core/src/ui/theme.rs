@@ -22,7 +22,7 @@ use std::io::{Read, Error, ErrorKind};
 use std::rc::Rc;
 use std::collections::HashMap;
 
-use config::CONFIG;
+use config::Config;
 use resource::{ResourceSet};
 use util::Point;
 use ui::{Border, color, Color, LayoutKind, Size, WidgetState};
@@ -93,7 +93,7 @@ impl TextParams {
             vertical_alignment: src.vertical_alignment.unwrap_or(VerticalTextAlignment::Center),
             color: src.color.unwrap_or(color::WHITE),
             scale: src.scale.unwrap_or(1.0),
-            font: src.font.unwrap_or(CONFIG.display.default_font.to_string()),
+            font: src.font.unwrap_or(Config::default_font()),
         }
     }
 }

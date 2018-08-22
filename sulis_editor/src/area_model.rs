@@ -19,7 +19,7 @@ use std::cmp;
 use std::slice::Iter;
 use std::collections::HashMap;
 
-use sulis_core::config::CONFIG;
+use sulis_core::config::{Config, EditorConfig};
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::resource::{Sprite, ResourceSet, read_single_resource, write_to_file};
 use sulis_core::ui::{animation_state, LineRenderer};
@@ -31,6 +31,8 @@ use wall_picker::WallTiles;
 use terrain_picker::TerrainTiles;
 
 pub struct AreaModel {
+    pub config: EditorConfig,
+
     tiles: Vec<(String, Vec<(Point, Rc<Tile>)>)>,
     actors: Vec<(Point, Rc<Actor>)>,
     props: Vec<PropData>,
@@ -57,23 +59,25 @@ pub struct AreaModel {
 
 impl AreaModel {
     pub fn new() -> AreaModel {
-        let encounter_sprite = match ResourceSet::get_sprite(&CONFIG.editor.area.encounter_tile) {
+        let config = Config::editor_config();
+
+        let encounter_sprite = match ResourceSet::get_sprite(&config.area.encounter_tile) {
             Ok(sprite) => Some(sprite),
             Err(_) => {
-                warn!("Encounter tile '{}' not found", CONFIG.editor.area.encounter_tile);
+                warn!("Encounter tile '{}' not found", config.area.encounter_tile);
                 None
             },
         };
 
-        let font_renderer = match ResourceSet::get_font(&CONFIG.display.default_font) {
+        let font_renderer = match ResourceSet::get_font(&Config::default_font()) {
             None => {
-                warn!("Font '{}' not found", CONFIG.display.default_font);
+                warn!("Font '{}' not found", Config::default_font());
                 None
             }, Some(font) => Some(LineRenderer::new(&font)),
         };
 
         let mut tiles = Vec::new();
-        for ref layer_id in CONFIG.editor.area.layers.iter() {
+        for ref layer_id in config.area.layers.iter() {
             tiles.push((layer_id.to_string(), Vec::new()));
         }
 
@@ -99,7 +103,12 @@ impl AreaModel {
             }
         }
 
+        let id = config.area.id.clone();
+        let name = config.area.name.clone();
+        let filename = config.area.filename.clone();
+
         AreaModel {
+            config,
             tiles,
             elevation,
             terrain_kinds,
@@ -113,9 +122,9 @@ impl AreaModel {
             triggers: Vec::new(),
             encounter_sprite,
             font_renderer,
-            id: CONFIG.editor.area.id.clone(),
-            name: CONFIG.editor.area.name.clone(),
-            filename: CONFIG.editor.area.filename.clone(),
+            id,
+            name,
+            filename,
             max_vis_distance: 20,
             max_vis_up_one_distance: 6,
         }
@@ -336,16 +345,16 @@ impl AreaModel {
     }
 
     pub fn new_transition(&mut self) -> Option<usize> {
-        let sprite = match ResourceSet::get_image(&CONFIG.editor.transition_image) {
+        let sprite = match ResourceSet::get_image(&self.config.transition_image) {
             None => {
-                warn!("No image with ID {} found.", CONFIG.editor.transition_image);
+                warn!("No image with ID {} found.", self.config.transition_image);
                 return None;
             }, Some(image) => image,
         };
 
-        let size = match Module::object_size(&CONFIG.editor.transition_size) {
+        let size = match Module::object_size(&self.config.transition_size) {
             None => {
-                warn!("No size with ID '{}' found.", CONFIG.editor.transition_size);
+                warn!("No size with ID '{}' found.", self.config.transition_size);
                 return None;
             }, Some(ref size) => Rc::clone(size),
         };
@@ -673,8 +682,8 @@ impl AreaModel {
     pub fn save(&self, filename_prefix: &str) {
         let filename = format!("{}/{}.yml", filename_prefix, self.filename);
         debug!("Saving current area state to {}", filename);
-        let visibility_tile = CONFIG.editor.area.visibility_tile.clone();
-        let explored_tile = CONFIG.editor.area.explored_tile.clone();
+        let visibility_tile = self.config.area.visibility_tile.clone();
+        let explored_tile = self.config.area.explored_tile.clone();
 
         let mut width = 0;
         let mut height = 0;
@@ -692,7 +701,7 @@ impl AreaModel {
                 tiles_vec.push(vec![position.x as usize, position.y as usize]);
             }
         }
-        let entity_layer = CONFIG.editor.area.entity_layer;
+        let entity_layer = self.config.area.entity_layer;
 
         trace!("Saving actors.");
         let mut actors: Vec<ActorData> = Vec::new();
@@ -737,7 +746,7 @@ impl AreaModel {
                 to: transition.to,
                 hover_text: transition.hover_text.to_string(),
                 to_area: transition.to_area.clone(),
-                image_display: CONFIG.editor.transition_image.clone(),
+                image_display: self.config.transition_image.clone(),
             });
         }
 

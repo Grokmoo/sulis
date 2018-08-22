@@ -20,7 +20,7 @@ use std::cell::{RefCell};
 
 use sulis_core::ui::*;
 use sulis_core::util;
-use sulis_core::config::CONFIG;
+use sulis_core::config::Config;
 use sulis_widgets::{Button, Label, list_box, MutuallyExclusiveListBox, TextArea};
 use sulis_module::{Module, ModuleInfo};
 
@@ -80,7 +80,8 @@ impl WidgetKind for ModuleSelector {
 
             let module = entry.item().clone();
             info!("Reading module from {}", module.dir);
-            if let Err(e) =  Module::init(&CONFIG.resources.directory, &module.dir) {
+            let resource_dir = Config::resources_config().directory;
+            if let Err(e) =  Module::init(&resource_dir, &module.dir) {
                 error!("{}", e);
                 util::error_and_exit("There was a fatal error setting up the module.");
             };

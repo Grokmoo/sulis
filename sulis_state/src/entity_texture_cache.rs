@@ -14,7 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use sulis_core::config::CONFIG;
+use sulis_core::config::Config;
 use sulis_core::ui::Color;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use EntityState;
@@ -42,8 +42,9 @@ impl EntityTextureSlot {
 
         let min_x = self.x as f32 + BORDER_SIZE_F;
         let min_y = self.y as f32 + BORDER_SIZE_F;
-        let scale_x = CONFIG.display.width as f32 / self.slots_dim as f32;
-        let scale_y = CONFIG.display.height as f32 / self.slots_dim as f32;
+        let (ui_x, ui_y) = Config::ui_size();
+        let scale_x = ui_x as f32 / self.slots_dim as f32;
+        let scale_y = ui_y as f32 / self.slots_dim as f32;
 
         entity.actor.draw_to_texture(renderer, &self.texture_id, scale_x, scale_y, min_x, min_y);
     }
@@ -99,8 +100,9 @@ impl EntityTextureCache {
         let y = slot.y as f32 + BORDER_SIZE_F;
 
         debug!("Drawing entity to texture {} at {},{}", self.texture_id, x, y);
-        let scale_x = CONFIG.display.width as f32 / self.slots_dim as f32;
-        let scale_y = CONFIG.display.height as f32 / self.slots_dim as f32;
+        let (ui_x, ui_y) = Config::ui_size();
+        let scale_x = ui_x as f32 / self.slots_dim as f32;
+        let scale_y = ui_y as f32 / self.slots_dim as f32;
         entity.actor.draw_to_texture(renderer, &self.texture_id, scale_x, scale_y, x, y);
 
         slot.clone()

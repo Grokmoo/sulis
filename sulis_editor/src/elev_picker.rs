@@ -18,7 +18,7 @@ use std::any::Any;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use sulis_core::config::CONFIG;
+use sulis_core::config::Config;
 use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
@@ -41,13 +41,13 @@ pub struct ElevPicker {
 
 impl ElevPicker {
     pub fn new() -> Rc<RefCell<ElevPicker>> {
-        let cursor_sprite = match ResourceSet::get_sprite(&CONFIG.editor.cursor) {
-            Err(_) => panic!("Unable to find cursor sprite '{}'", CONFIG.editor.cursor),
+        let cursor_sprite = match ResourceSet::get_sprite(&Config::editor_config().cursor) {
+            Err(_) => panic!("Unable to find cursor sprite '{}'", Config::editor_config().cursor),
             Ok(sprite) => sprite,
         };
 
         let mut elev_tiles = Vec::new();
-        for ref sprite_id in CONFIG.editor.area.elev_tiles.iter() {
+        for ref sprite_id in Config::editor_config().area.elev_tiles.iter() {
             let sprite = match ResourceSet::get_sprite(sprite_id) {
                 Err(_) => {
                     warn!("Editor elevation tile '{}' not found", sprite_id);
@@ -147,7 +147,8 @@ impl WidgetKind for ElevPicker {
         let brush_size_label = Widget::with_theme(Label::empty(), "brush_size_label");
 
         let elev = Widget::with_theme(
-            Spinner::new(self.set_elev_to as i32, 0, CONFIG.editor.area.elev_tiles.len() as i32 - 1), "elev");
+            Spinner::new(self.set_elev_to as i32, 0,
+                         Config::editor_config().area.elev_tiles.len() as i32 - 1), "elev");
         elev.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, kind| {
             let parent = Widget::get_parent(&widget);
             let picker = Widget::downcast_kind_mut::<ElevPicker>(&parent);

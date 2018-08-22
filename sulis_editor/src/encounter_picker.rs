@@ -18,7 +18,7 @@ use std::any::Any;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use sulis_core::config::CONFIG;
+use sulis_core::config::Config;
 use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
@@ -41,10 +41,12 @@ pub struct EncounterPicker {
 
 impl EncounterPicker {
     pub fn new() -> Rc<RefCell<EncounterPicker>> {
-        let sprite = match ResourceSet::get_sprite(&CONFIG.editor.area.encounter_tile) {
+        let enc_tile = Config::editor_config().area.encounter_tile;
+
+        let sprite = match ResourceSet::get_sprite(&enc_tile) {
             Ok(sprite) => Some(sprite),
             Err(_) => {
-                warn!("Encounter tile '{}' not found", CONFIG.editor.area.encounter_tile);
+                warn!("Encounter tile '{}' not found", enc_tile);
                 None
             },
         };

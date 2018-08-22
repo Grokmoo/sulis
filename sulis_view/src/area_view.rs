@@ -27,7 +27,7 @@ use sulis_core::ui::{color, Cursor, Scrollable, WidgetKind, Widget};
 use sulis_core::io::*;
 use sulis_core::io::event::ClickKind;
 use sulis_core::util::{self, Point};
-use sulis_core::config::CONFIG;
+use sulis_core::config::Config;
 use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::extern_image::ImageBuffer;
 use sulis_widgets::Label;
@@ -213,13 +213,12 @@ impl AreaView {
     }
 
     fn draw_list_to_texture(renderer: &mut GraphicsRenderer, draw_list: DrawList, texture_id: &str) {
+        let (ui_x, ui_y) = Config::ui_size();
         let mut draw_list = draw_list;
         draw_list.texture_mag_filter = TextureMagFilter::Linear;
         draw_list.texture_min_filter = TextureMinFilter::Linear;
-        draw_list.set_scale(TILE_SIZE as f32 / TILE_CACHE_TEXTURE_SIZE as f32 *
-                            CONFIG.display.width as f32,
-                            TILE_SIZE as f32 / TILE_CACHE_TEXTURE_SIZE as f32 *
-                            CONFIG.display.height as f32);
+        draw_list.set_scale(TILE_SIZE as f32 / TILE_CACHE_TEXTURE_SIZE as f32 * ui_x as f32,
+                            TILE_SIZE as f32 / TILE_CACHE_TEXTURE_SIZE as f32 * ui_y as f32);
         renderer.draw_to_texture(texture_id, draw_list);
     }
 

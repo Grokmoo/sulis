@@ -20,6 +20,9 @@ pub use self::character_selector::CharacterSelector;
 pub mod module_selector;
 pub use self::module_selector::ModuleSelector;
 
+pub mod options;
+pub use self::options::Options;
+
 use std::fs::File;
 use std::io::{prelude::*, Error};
 use std::path::PathBuf;
@@ -27,8 +30,8 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::{RefCell};
 
-use sulis_core::config::{self, CONFIG};
-use sulis_core::io::{InputAction, MainLoopUpdater};
+use sulis_core::config::{self, Config};
+use sulis_core::io::{InputAction, MainLoopUpdater, DisplayConfiguration};
 use sulis_core::ui::*;
 use sulis_core::util;
 use sulis_widgets::{Button, ConfirmationWindow, Label};
@@ -61,6 +64,7 @@ enum Mode {
     New,
     Load,
     Module,
+    Options,
     NoChoice,
 }
 
@@ -88,7 +92,7 @@ fn check_selected_module_file() -> Result<String, Error> {
 
 fn load_module_internal(module_dir: &str) {
     info!("Reading module from {}", module_dir);
-    if let Err(e) =  Module::init(&CONFIG.resources.directory, module_dir) {
+    if let Err(e) =  Module::init(&Config::resources_config().directory, module_dir) {
         error!("{}", e);
         util::error_and_exit("There was a fatal error setting up the module.");
     };
@@ -99,10 +103,11 @@ pub struct MainMenu {
     mode: Mode,
     content: Rc<RefCell<Widget>>,
     pub(crate) char_builder_to_add: Option<Rc<RefCell<CharacterBuilder>>>,
+    pub(crate) display_configurations: Vec<DisplayConfiguration>,
 }
 
 impl MainMenu {
-    pub fn new() -> Rc<RefCell<MainMenu>> {
+    pub fn new(display_configurations: Vec<DisplayConfiguration>) -> Rc<RefCell<MainMenu>> {
         match check_selected_module_file() {
             Ok(dir) => load_module_internal(&dir),
             Err(e) => {
@@ -116,6 +121,7 @@ impl MainMenu {
             mode: Mode::NoChoice,
             content: Widget::empty("content"),
             char_builder_to_add: None,
+            display_configurations,
         }))
     }
 
@@ -130,6 +136,10 @@ impl MainMenu {
 
     pub fn next_step(&mut self) -> Option<NextGameStep> {
         self.next_step.take()
+    }
+
+    pub fn recreate_io(&mut self) {
+        self.next_step = Some(NextGameStep::RecreateIO);
     }
 
     pub fn load_module(&mut self, module_dir: &str) {
@@ -223,6 +233,18 @@ impl WidgetKind for MainMenu {
             parent.borrow_mut().invalidate_children();
         })));
 
+        let options = Widget::with_theme(Button::empty(), "options");
+        options.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+            let parent = Widget::get_parent(&widget);
+            let window = Widget::downcast_kind_mut::<MainMenu>(&parent);
+            window.mode = Mode::Options;
+            let configs = window.display_configurations.clone();
+
+            window.content = Widget::with_defaults(Options::new(configs));
+
+            parent.borrow_mut().invalidate_children();
+        })));
+
         let exit = Widget::with_theme(Button::empty(), "exit");
         exit.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
             let parent = Widget::get_parent(&widget);
@@ -234,6 +256,7 @@ impl WidgetKind for MainMenu {
             Mode::New => new.borrow_mut().state.set_active(true),
             Mode::Load => load.borrow_mut().state.set_active(true),
             Mode::Module => module.borrow_mut().state.set_active(true),
+            Mode::Options => options.borrow_mut().state.set_active(true),
             Mode::NoChoice => (),
         }
 
@@ -245,7 +268,8 @@ impl WidgetKind for MainMenu {
             load.borrow_mut().state.set_enabled(false);
         }
 
-        let mut children = vec![title, module_title, new, load, module, exit, self.content.clone()];
+        let mut children = vec![title, module_title, new, load, module,
+            exit, options, self.content.clone()];
 
         if let Some(builder) = self.char_builder_to_add.take() {
             children.push(Widget::with_defaults(builder));

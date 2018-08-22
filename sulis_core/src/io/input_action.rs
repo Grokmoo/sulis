@@ -19,9 +19,9 @@ use std::cell::RefCell;
 
 use ui::{Cursor, Widget};
 use io::event::{ClickKind, Kind};
-use io::Event;
+use io::{keyboard_event::Key, Event};
 
-#[derive(Debug, Deserialize, Copy, Clone)]
+#[derive(Debug, Deserialize, Serialize, Copy, Clone, PartialOrd, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub enum InputAction {
     ToggleConsole,
@@ -40,15 +40,11 @@ pub enum InputAction {
     MouseUp(ClickKind),
     MouseScroll(i32),
     CharReceived(char),
+    RawKey(Key),
 }
 
 impl InputAction {
-    pub fn handle_action(action: Option<InputAction>, root: Rc<RefCell<Widget>>) {
-        let action = match action {
-            None => return,
-            Some(action) => action
-        };
-
+    pub fn handle_action(action: InputAction, root: &Rc<RefCell<Widget>>) {
         // don't spam tons of mouse move actions in the event logs
         match action {
             MouseMove(_, _) => (),
@@ -58,9 +54,9 @@ impl InputAction {
         Widget::remove_mouse_over(&root);
         use io::InputAction::*;
         match action {
-            MouseMove(x, y) => Cursor::move_to(&root, x, y),
-            MouseDown(kind) => Cursor::press(&root, kind),
-            MouseUp(kind) => Cursor::release(&root, kind),
+            MouseMove(x, y) => Cursor::move_to(root, x, y),
+            MouseDown(kind) => Cursor::press(root, kind),
+            MouseUp(kind) => Cursor::release(root, kind),
             MouseScroll(scroll) => {
                 if scroll > 0 {
                     InputAction::fire_action(ScrollUp, root);
@@ -69,13 +65,16 @@ impl InputAction {
                 }
             },
             CharReceived(c) => {
-                Widget::dispatch_event(&root, Event::new(Kind::CharTyped(c)));
+                Widget::dispatch_event(root, Event::new(Kind::CharTyped(c)));
+            },
+            RawKey(key) => {
+                Widget::dispatch_event(root, Event::new(Kind::RawKey(key)));
             },
             _ => InputAction::fire_action(action, root),
         }
     }
 
-    fn fire_action(action: InputAction, root: Rc<RefCell<Widget>>) {
+    fn fire_action(action: InputAction, root: &Rc<RefCell<Widget>>) {
         debug!("Firing action {:?}", action);
 
         let event = Event::new(Kind::KeyPress(action));

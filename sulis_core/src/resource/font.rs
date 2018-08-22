@@ -22,7 +22,7 @@ use std::collections::HashMap;
 use io::Vertex;
 use resource::ResourceBuilder;
 use util::{invalid_data_error, Point, Size};
-use config::CONFIG;
+use config::Config;
 
 use serde_yaml;
 
@@ -78,13 +78,15 @@ impl Font {
         };
         let scale_factor = line_height / self.line_height as f32;
 
+        let ui_height = Config::ui_height();
+
         let tc = &font_char.tex_coords;
         let x_char = pos_x + scale_factor * font_char.offset.x as f32;
         let y_char = pos_y + scale_factor * font_char.offset.y as f32;
         let x_min = x_char;
-        let y_min = CONFIG.display.height as f32 - y_char;
+        let y_min = ui_height as f32 - y_char;
         let x_max = x_char + scale_factor * font_char.size.width as f32;
-        let y_max = CONFIG.display.height as f32
+        let y_max = ui_height as f32
             - (y_char + scale_factor * font_char.size.height as f32);
         quads.append(&mut vec![
             Vertex { position: [ x_min, y_max ], tex_coords: [tc[0], tc[1]] },

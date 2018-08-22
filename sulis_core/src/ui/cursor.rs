@@ -20,7 +20,7 @@ use std::rc::Rc;
 use image::Image;
 use io::event::ClickKind;
 use io::{event, Event, GraphicsRenderer};
-use config::CONFIG;
+use config::Config;
 use resource::ResourceSet;
 use ui::{animation_state, AnimationState, Widget};
 
@@ -42,8 +42,8 @@ thread_local! {
     static CURSOR: RefCell<Cursor> = RefCell::new(Cursor {
         x: 0,
         y: 0,
-        max_x: CONFIG.display.width,
-        max_y: CONFIG.display.height,
+        max_x: Config::ui_width(),
+        max_y: Config::ui_height(),
         xf: 0.0,
         yf: 0.0,
         button_down: None,
@@ -58,7 +58,7 @@ impl Cursor {
             let mut cursor = cursor.borrow_mut();
 
             if cursor.image.is_none() {
-                cursor.image = ResourceSet::get_image(&CONFIG.display.default_cursor);
+                cursor.image = ResourceSet::get_image(&Config::default_cursor());
             }
 
             let image = match cursor.image {
@@ -72,6 +72,14 @@ impl Cursor {
             let h = image.get_height_f32();
             image.draw(renderer, &cursor.state, cursor.xf - w / 2.0,
                                      cursor.yf - h / 2.0, w, h, millis);
+        });
+    }
+
+    pub fn update_max() {
+        CURSOR.with(|cursor| {
+            let mut cursor = cursor.borrow_mut();
+            cursor.max_x = Config::ui_width();
+            cursor.max_y = Config::ui_height();
         });
     }
 

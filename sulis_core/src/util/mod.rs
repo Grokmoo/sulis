@@ -33,7 +33,7 @@ use std::panic;
 use backtrace::Backtrace;
 use flexi_logger::{Logger, opt_format};
 
-use config::{self, CONFIG};
+use config::{self, Config};
 use ui::Widget;
 use io::{IO, MainLoopUpdater};
 
@@ -165,7 +165,7 @@ pub fn error_and_exit(error: &str) {
 
 pub fn main_loop(io: &mut Box<IO>, root: Rc<RefCell<Widget>>,
              updater: Box<MainLoopUpdater>) -> Result<(), Error> {
-    let fpms = (1000.0 / (CONFIG.display.frame_rate as f32)) as u64;
+    let fpms = (1000.0 / (Config::frame_rate() as f32)) as u64;
     let frame_time = time::Duration::from_millis(fpms);
     trace!("Computed {} frames per milli.", fpms);
 
@@ -217,17 +217,19 @@ pub fn setup_logger() {
     path.push("log");
     let log_dir = path.to_string_lossy();
 
-    let mut logger = Logger::with_str(&CONFIG.logging.log_level)
+    let log_config = Config::logging_config();
+
+    let mut logger = Logger::with_str(&log_config.log_level)
         .log_to_file()
         .directory(log_dir)
         .duplicate_error()
         .format(opt_format);
 
-    if CONFIG.logging.append {
+    if log_config.append {
         logger = logger.append();
     }
 
-    if !CONFIG.logging.use_timestamps {
+    if !log_config.use_timestamps {
         logger = logger.suppress_timestamp();
     }
 

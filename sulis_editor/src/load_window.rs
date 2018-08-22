@@ -21,7 +21,7 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_core::config::CONFIG;
+use sulis_core::config::Config;
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{Button, Label, list_box, ListBox};
 
@@ -57,7 +57,7 @@ impl WidgetKind for LoadWindow {
         let load = Widget::with_theme(Button::empty(), "load_button");
         load.borrow_mut().state.set_enabled(false);
 
-        let dir_str = format!("../modules/{}/areas/", CONFIG.editor.module);
+        let dir_str = format!("../modules/{}/areas/", Config::editor_config().module);
         let areas = get_area_entries(&dir_str);
 
         let load_ref = Rc::clone(&load);

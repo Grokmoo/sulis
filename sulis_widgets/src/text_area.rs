@@ -18,7 +18,7 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_core::config::CONFIG;
+use sulis_core::config::Config;
 use sulis_core::ui::theme::SizeRelative;
 use sulis_core::ui::{Widget, WidgetKind};
 use sulis_core::io::{GraphicsRenderer, event::ClickKind};
@@ -116,18 +116,20 @@ impl WidgetKind for TextArea {
             widget.state.set_size(Size::new(width, height));
         }
 
+        let (ui_x, ui_y) = Config::ui_size();
+
         // limit position of text area to inside the screen
         // we need to double render in this case - first render finds
         // the text area size, second render to actually display the text
-        if widget.state.position.y + widget.state.size.height > CONFIG.display.height {
+        if widget.state.position.y + widget.state.size.height > ui_y {
             let x = widget.state.position.x;
-            let y = CONFIG.display.height - widget.state.size.height;
+            let y = ui_y - widget.state.size.height;
             widget.state.set_position(x, y);
             self.render_to_cache(widget);
         }
 
-        if widget.state.position.x + widget.state.size.width > CONFIG.display.width {
-            let x = CONFIG.display.width - widget.state.size.width;
+        if widget.state.position.x + widget.state.size.width > ui_x {
+            let x = ui_x - widget.state.size.width;
             let y = widget.state.position.y;
             widget.state.set_position(x, y);
             self.render_to_cache(widget);

@@ -118,6 +118,7 @@ pub enum NextGameStep {
     NewCampaign { pc_actor: Rc<Actor> },
     LoadCampaign { save_state: SaveState },
     MainMenu,
+    RecreateIO,
 }
 
 pub struct UICallback {

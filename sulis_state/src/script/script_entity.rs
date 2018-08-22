@@ -24,7 +24,7 @@ use rand::{self, Rng};
 use rlua::{self, Lua, UserData, UserDataMethods};
 
 use sulis_core::util::{invalid_data_error, ExtInt};
-use sulis_core::config::CONFIG;
+use sulis_core::config::Config;
 use sulis_core::resource::ResourceSet;
 use sulis_rules::{Attribute, AttackKind, DamageKind, Attack};
 use {ActorState, EntityState, GameState, Location, area_feedback_text::ColorKind};
@@ -412,7 +412,7 @@ impl UserData for ScriptEntity {
             if let Some(cb) = cb {
                 cbs.push(Box::new(cb));
             }
-            let time = CONFIG.display.animation_base_time_millis * 5;
+            let time = Config::animation_base_time_millis() * 5;
             let anim = animation::melee_attack_animation::new(&Rc::clone(&parent), &target,
                                                               time, cbs, Box::new(move |att, def| {
                 let attack = Attack::special(&parent.borrow().actor.stats, min_damage, max_damage,

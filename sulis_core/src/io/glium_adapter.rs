@@ -19,7 +19,7 @@ use std::collections::HashMap;
 use std::cell::{Ref, RefCell};
 use std::rc::Rc;
 
-use config::{CONFIG, DisplayMode};
+use config::{Config, DisplayMode};
 use io::*;
 use io::keyboard_event::Key;
 use io::event::ClickKind;
@@ -200,12 +200,13 @@ impl<'a> GraphicsRenderer for GliumRenderer<'a> {
             }
             Some(size) => size,
         };
-        let scale_x = self.hidpi_factor * window_size.width / CONFIG.display.width as f64;
-        let scale_y = self.hidpi_factor * window_size.height / CONFIG.display.height as f64;
+        let (res_x, res_y) = Config::ui_size();
+        let scale_x = self.hidpi_factor * window_size.width / res_x as f64;
+        let scale_y = self.hidpi_factor * window_size.height / res_y as f64;
 
         let rect = glium::Rect {
             left: (pos.x as f64 * scale_x) as u32,
-            bottom: ((CONFIG.display.height - (pos.y + size.height)) as f64 * scale_y) as u32,
+            bottom: ((res_y - (pos.y + size.height)) as f64 * scale_y) as u32,
             width: (size.width as f64 * scale_x) as u32,
             height: (size.height as f64 * scale_y) as u32,
         };
@@ -282,7 +283,7 @@ fn glium_error<E: ::std::fmt::Display>(e: E) -> Result<GliumDisplay, Error> {
 }
 
 fn get_monitor(events_loop: &glium::glutin::EventsLoop) -> Option<glium::glutin::MonitorId> {
-    let target_monitor = CONFIG.display.monitor;
+    let target_monitor = Config::monitor();
     for (index, monitor) in events_loop.get_available_monitors().enumerate() {
         if index == target_monitor { return Some(monitor); }
     }
@@ -294,15 +295,14 @@ fn try_get_display(events_loop: &glium::glutin::EventsLoop,
                    monitor: Option<glium::glutin::MonitorId>)
     -> Result<glium::Display, glium::backend::glutin::DisplayCreationError> {
 
-    let (fullscreen, decorations) = match CONFIG.display.mode {
+    let (fullscreen, decorations) = match Config::display_mode() {
         DisplayMode::Window => (None, true),
         DisplayMode::BorderlessWindow => (None, false),
         DisplayMode::Fullscreen => (monitor, false),
     };
 
-    let dims = glutin::dpi::LogicalSize::new(CONFIG.display.width_pixels as f64,
-                                             CONFIG.display.height_pixels as f64);
-
+    let (res_x, res_y) = Config::display_resolution();
+    let dims = glutin::dpi::LogicalSize::new(res_x as f64, res_y as f64);
 
     let window = glium::glutin::WindowBuilder::new()
         .with_dimensions(dims)
@@ -380,14 +380,16 @@ impl GliumDisplay {
 
         display.gl_window().hide_cursor(true);
 
+        let (ui_x, ui_y) = Config::ui_size();
+
         Ok(GliumDisplay {
             display,
             events_loop,
             base_program,
             swap_program,
             matrix: [
-                [2.0 / CONFIG.display.width as f32, 0.0, 0.0, 0.0],
-                [0.0, 2.0 / CONFIG.display.height as f32, 0.0, 0.0],
+                [2.0 / ui_x as f32, 0.0, 0.0, 0.0],
+                [0.0, 2.0 / ui_y as f32, 0.0, 0.0],
                 [0.0, 0.0, 1.0, 0.0],
                 [-1.0 , -1.0, 0.0, 1.0f32],
             ],
@@ -397,8 +399,50 @@ impl GliumDisplay {
     }
 }
 
+const RESOLUTIONS: [(u32, u32); 8] = [
+    (3840, 2160),
+    (2560, 1440),
+    (1920, 1080),
+    (1768, 992),
+    (1600, 900),
+    (1536, 864),
+    (1366, 768),
+    (1280, 720),
+];
+
+
 impl IO for GliumDisplay {
+    fn get_display_configurations(&self) -> Vec<DisplayConfiguration> {
+        let mut configs = Vec::new();
+
+        for (index, monitor_id) in self.events_loop.get_available_monitors().enumerate() {
+            // glium get_name() does not seem to return anything useful in most cases
+            let name = format!("Monitor {}", index + 1);
+
+            let dims: (u32, u32) = monitor_id.get_dimensions()
+                .to_logical(monitor_id.get_hidpi_factor()).into();
+
+            let mut resolutions = vec![dims];
+            for (w, h) in RESOLUTIONS.iter() {
+                let (w, h) = (*w, *h);
+                if w > dims.0 || h > dims.1 { continue; }
+                if w == dims.0 && h == dims.1 { continue; }
+
+                resolutions.push((w, h));
+            }
+
+            configs.push(DisplayConfiguration {
+                name,
+                index,
+                resolutions
+            });
+        }
+
+        configs
+    }
+
     fn process_input(&mut self, root: Rc<RefCell<Widget>>) {
+        let (ui_x, ui_y) = Config::ui_size();
         let mut mouse_move: Option<(f32, f32)> = None;
         let display_size = match self.display.gl_window().get_inner_size() {
             None => {
@@ -411,18 +455,22 @@ impl IO for GliumDisplay {
             if let glutin::Event::WindowEvent { event, .. } = event {
                 match event {
                     glium::glutin::WindowEvent::CursorMoved { position, .. } => {
-                        let mouse_x = (CONFIG.display.width as f64 * position.x / display_size.width) as f32;
-                        let mouse_y = (CONFIG.display.height as f64 * position.y / display_size.height) as f32;
+                        let mouse_x = (ui_x as f64 * position.x / display_size.width) as f32;
+                        let mouse_y = (ui_y as f64 * position.y / display_size.height) as f32;
                         mouse_move = Some((mouse_x, mouse_y));
                     },
-                    _ => InputAction::handle_action(process_window_event(event), Rc::clone(&root)),
+                    _ => {
+                        for action in process_window_event(event) {
+                            InputAction::handle_action(action, &root);
+                        }
+                    }
                 }
             }
         });
 
         // merge all mouse move events into at most one per frame
         if let Some((mouse_x, mouse_y)) = mouse_move {
-            InputAction::handle_action(Some(InputAction::MouseMove(mouse_x, mouse_y)), Rc::clone(&root));
+            InputAction::handle_action(InputAction::MouseMove(mouse_x, mouse_y), &root);
         }
     }
 
@@ -462,23 +510,35 @@ fn get_min_filter(filter: TextureMinFilter) -> MinifySamplerFilter {
     }
 }
 
-fn process_window_event(event: glutin::WindowEvent) -> Option<InputAction> {
+fn process_window_event(event: glutin::WindowEvent) -> Vec<InputAction> {
     use glium::glutin::WindowEvent::*;
     match event {
-        CloseRequested => Some(InputAction::Exit),
-        ReceivedCharacter(c) => Some(InputAction::CharReceived(c)),
-        KeyboardInput { input, .. } => CONFIG.get_input_action(process_keyboard_input(input)),
+        CloseRequested => vec![InputAction::Exit],
+        ReceivedCharacter(c) => vec![InputAction::CharReceived(c)],
+        KeyboardInput { input, .. } => {
+            let mut result = Vec::new();
+            let kb_event = match process_keyboard_input(input) {
+                None => return Vec::new(),
+                Some(evt) => evt,
+            };
+            result.push(InputAction::RawKey(kb_event.key));
+            match Config::get_input_action(kb_event) {
+                None => (),
+                Some(action) => result.push(action),
+            };
+            result
+        },
         MouseInput { state, button, .. } => {
             let kind = match button {
                 glium::glutin::MouseButton::Left => ClickKind::Left,
                 glium::glutin::MouseButton::Right => ClickKind::Right,
                 glium::glutin::MouseButton::Middle => ClickKind::Middle,
-                _ => return None,
+                _ => return Vec::new(),
             };
 
             match state {
-                glium::glutin::ElementState::Pressed => Some(InputAction::MouseDown(kind)),
-                glium::glutin::ElementState::Released => Some(InputAction::MouseUp(kind)),
+                glium::glutin::ElementState::Pressed => vec![InputAction::MouseDown(kind)],
+                glium::glutin::ElementState::Released => vec![InputAction::MouseUp(kind)],
             }
         },
         MouseWheel { delta, .. } => {
@@ -493,12 +553,12 @@ fn process_window_event(event: glutin::WindowEvent) -> Option<InputAction> {
             } else if amount == -1.0 {
                 -1
             } else {
-                return None;
+                return Vec::new();
             };
 
-            Some(InputAction::MouseScroll(amount))
+            vec![InputAction::MouseScroll(amount)]
         }
-        _ => None,
+        _ => Vec::new(),
     }
 }
 

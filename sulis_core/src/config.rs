@@ -15,6 +15,7 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::env;
+use std::cell::RefCell;
 use std::io::{Read, Error, ErrorKind};
 use std::path::Path;
 use std::fs::{self, File};
@@ -26,7 +27,15 @@ use io::{KeyboardEvent, InputAction};
 
 use serde_yaml;
 
-#[derive(Debug, Deserialize, Clone)]
+thread_local! {
+    static CONFIG: RefCell<Config> = RefCell::new(Config::init());
+}
+
+lazy_static! {
+    pub static ref USER_DIR: PathBuf = get_user_dir();
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct Config {
   pub display: DisplayConfig,
@@ -39,7 +48,95 @@ pub struct Config {
   pub debug: DebugConfig,
 }
 
-#[derive(Debug, Deserialize, Clone)]
+impl Config {
+    pub fn set(config: Config) {
+        CONFIG.with(|c| *c.borrow_mut() = config);
+    }
+
+    pub fn get_clone() -> Config {
+        CONFIG.with(|c| c.borrow().clone())
+    }
+
+    pub fn display_resolution() -> (u32, u32) {
+        CONFIG.with(|c| {
+            let c = c.borrow();
+            (c.display.width_pixels, c.display.height_pixels)
+        })
+    }
+
+    pub fn monitor() -> usize {
+        CONFIG.with(|c| c.borrow().display.monitor)
+    }
+
+    pub fn default_font() -> String {
+        CONFIG.with(|c| c.borrow().display.default_font.to_string())
+    }
+
+    pub fn default_cursor() -> String {
+        CONFIG.with(|c| c.borrow().display.default_cursor.to_string())
+    }
+
+    pub fn display_adapter() -> IOAdapter {
+        CONFIG.with(|c| c.borrow().display.adapter)
+    }
+
+    pub fn display_mode() -> DisplayMode {
+        CONFIG.with(|c| c.borrow().display.mode)
+    }
+
+    pub fn ui_height() -> i32 {
+        CONFIG.with(|c| c.borrow().display.height)
+    }
+
+    pub fn ui_width() -> i32 {
+        CONFIG.with(|c| c.borrow().display.width)
+    }
+
+    pub fn ui_size() -> (i32, i32) {
+        CONFIG.with(|c| {
+            let c = c.borrow();
+            (c.display.width, c.display.height)
+        })
+    }
+
+    pub fn frame_rate() -> u32 {
+        CONFIG.with(|c| c.borrow().display.frame_rate)
+    }
+
+    pub fn animation_base_time_millis() -> u32 {
+        CONFIG.with(|c| c.borrow().display.animation_base_time_millis)
+    }
+
+    pub fn logging_config() -> LoggingConfig {
+        CONFIG.with(|c| c.borrow().logging.clone())
+    }
+
+    pub fn debug() -> DebugConfig {
+        CONFIG.with(|c| c.borrow().debug.clone())
+    }
+
+    pub fn editor_config() -> EditorConfig {
+        CONFIG.with(|c| c.borrow().editor.clone())
+    }
+
+    pub fn resources_config() -> ResourcesConfig {
+        CONFIG.with(|c| c.borrow().resources.clone())
+    }
+
+    pub fn get_input_action(k: KeyboardEvent) -> Option<InputAction> {
+        debug!("Got keyboard input '{:?}'", k);
+        CONFIG.with(|c| {
+            match c.borrow().input.keybindings.get(&k.key) {
+                None => None,
+                Some(action) => Some(*action),
+            }
+        })
+    }
+
+
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct DebugConfig {
     pub encounter_spawning: bool,
@@ -53,7 +150,7 @@ impl Default for DebugConfig {
     }
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct EditorConfig {
     pub module: String,
@@ -63,7 +160,7 @@ pub struct EditorConfig {
     pub area: EditorAreaConfig,
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct EditorAreaConfig {
     pub filename: String,
@@ -77,7 +174,7 @@ pub struct EditorAreaConfig {
     pub entity_layer: usize,
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct LoggingConfig {
     pub log_level: String,
@@ -85,7 +182,7 @@ pub struct LoggingConfig {
     pub append: bool,
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct DisplayConfig {
     pub adapter: IOAdapter,
@@ -101,7 +198,7 @@ pub struct DisplayConfig {
     pub default_cursor: String,
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone, Copy)]
 #[serde(deny_unknown_fields)]
 pub enum DisplayMode {
     Window,
@@ -109,28 +206,23 @@ pub enum DisplayMode {
     Fullscreen,
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct ResourcesConfig {
     pub directory: String,
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct InputConfig {
     pub keybindings: HashMap<Key, InputAction>
 }
 
-#[derive(Debug, Deserialize, Copy, Clone)]
+#[derive(Debug, Deserialize, Serialize, Copy, Clone)]
 #[serde(deny_unknown_fields)]
 pub enum IOAdapter {
     Auto,
     Glium,
-}
-
-lazy_static! {
-    pub static ref CONFIG: Config = Config::init();
-    pub static ref USER_DIR: PathBuf = get_user_dir();
 }
 
 #[cfg(not(target_os = "windows"))]
@@ -166,7 +258,7 @@ fn get_home_dir() -> PathBuf {
 }
 
 const CONFIG_FILENAME: &str = "config.yml";
-const CONFIG_BASE: &str = "config.sample.yml";
+pub const CONFIG_BASE: &str = "config.sample.yml";
 
 impl Config {
     fn init() -> Config {
@@ -216,7 +308,7 @@ impl Config {
         }
     }
 
-    fn new(filepath: &Path) -> Result<Config, Error> {
+    pub fn new(filepath: &Path) -> Result<Config, Error> {
         let mut f = File::open(filepath)?;
         let mut file_data = String::new();
         f.read_to_string(&mut file_data)?;
@@ -241,18 +333,5 @@ impl Config {
         }
 
         Ok(config)
-    }
-
-    pub fn get_input_action(&self, k: Option<KeyboardEvent>) -> Option<InputAction> {
-        match k {
-            None => None,
-            Some(k) => {
-                debug!("Got keyboard input '{:?}'", k);
-                match self.input.keybindings.get(&k.key) {
-                    None => None,
-                    Some(action) => Some(*action),
-                }
-            }
-        }
     }
 }

@@ -24,7 +24,7 @@ extern crate sulis_editor;
 use std::rc::Rc;
 
 use sulis_core::ui;
-use sulis_core::config::CONFIG;
+use sulis_core::config::Config;
 use sulis_core::resource::ResourceSet;
 use sulis_core::util;
 use sulis_module::Module;
@@ -37,15 +37,17 @@ fn main() {
     util::setup_logger();
     info!("Setup Logger and read configuration from 'config.yml'");
 
-    info!("Reading resources from {}", CONFIG.resources.directory);
-    let data_dir = format!("../{}", CONFIG.resources.directory);
+    let dir = Config::resources_config().directory;
+    info!("Reading resources from {}", dir);
+    let data_dir = format!("../{}", dir);
     if let Err(e) = ResourceSet::init(&data_dir) {
         error!("{}", e);
         util::error_and_exit("There was a fatal error reading resources.");
     };
 
-    info!("Reading module from {}", CONFIG.editor.module);
-    if let Err(e) =  Module::init(&data_dir, &format!("../modules/{}", CONFIG.editor.module)) {
+    let module = Config::editor_config().module;
+    info!("Reading module from {}", module);
+    if let Err(e) =  Module::init(&data_dir, &format!("../modules/{}", module)) {
         error!("{}", e);
         util::error_and_exit("There was a fatal error setting up the module.");
     };

@@ -22,7 +22,7 @@ use std::rc::Rc;
 
 use rand::{self, Rng};
 
-use sulis_core::config::CONFIG;
+use sulis_core::config::Config;
 use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
@@ -188,8 +188,8 @@ pub struct TerrainPicker {
 
 impl TerrainPicker {
     pub fn new() -> Rc<RefCell<TerrainPicker>> {
-        let cursor_sprite = match ResourceSet::get_sprite(&CONFIG.editor.cursor) {
-            Err(_) => panic!("Unable to find cursor sprite '{}'", CONFIG.editor.cursor),
+        let cursor_sprite = match ResourceSet::get_sprite(&Config::editor_config().cursor) {
+            Err(_) => panic!("Unable to find cursor sprite '{}'", Config::editor_config().cursor),
             Ok(sprite) => sprite,
         };
 

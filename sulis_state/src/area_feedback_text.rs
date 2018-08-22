@@ -17,7 +17,7 @@
 use std::rc::Rc;
 use std::time::Instant;
 
-use sulis_core::config::CONFIG;
+use sulis_core::config::Config;
 use sulis_core::resource::{ResourceSet, Font};
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::ui::{color, Color, LineRenderer};
@@ -72,7 +72,7 @@ pub struct AreaFeedbackText {
 impl AreaFeedbackText {
     pub fn new(area_pos: Point, text: String,
                pos_x: f32, pos_y: f32, color_kind: ColorKind, move_rate: f32) -> AreaFeedbackText {
-        let duration = CONFIG.display.animation_base_time_millis * (50 + text.len() as u32 / 2);
+        let duration = Config::animation_base_time_millis() * (50 + text.len() as u32 / 2);
 
         AreaFeedbackText {
             area_pos,

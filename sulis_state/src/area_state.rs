@@ -23,7 +23,7 @@ use std::collections::HashSet;
 use rand::{self, Rng};
 
 use sulis_core::util::{invalid_data_error, Point};
-use sulis_core::config::CONFIG;
+use sulis_core::config::Config;
 use sulis_module::{Actor, Area, LootList, Module, ObjectSize, prop};
 use sulis_module::area::{EncounterData, PropData, Transition, TriggerKind};
 use script::AreaTargeter;
@@ -366,7 +366,7 @@ impl AreaState {
 
     pub fn spawn_encounter(&mut self, enc_index: usize, enc_data: &EncounterData,
                            respect_debug: bool) {
-        if respect_debug && !CONFIG.debug.encounter_spawning { return; }
+        if respect_debug && !Config::debug().encounter_spawning { return; }
         let encounter = &enc_data.encounter;
         let actors = encounter.gen_actors();
         for actor in actors {

@@ -19,7 +19,7 @@ use std::cell::RefCell;
 
 use rlua;
 
-use sulis_core::config::CONFIG;
+use sulis_core::config::Config;
 use script::script_callback;
 use {animation::Anim, EntityState, GameState};
 
@@ -103,7 +103,7 @@ impl EntityAI {
 
     fn wait(&self, time: u32) {
         debug!("AI for '{}' is waiting.", self.entity.borrow().actor.actor.name);
-        let wait_time = CONFIG.display.animation_base_time_millis * time;
+        let wait_time = Config::animation_base_time_millis() * time;
         let anim = Anim::new_wait(&self.entity, wait_time);
         GameState::add_animation(anim);
     }

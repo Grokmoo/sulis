@@ -31,10 +31,17 @@ use std::cell::{RefCell, Ref};
 
 use extern_image::{ImageBuffer, Rgba};
 
-use config::{CONFIG, IOAdapter};
+use config::{Config, IOAdapter};
 use ui::{Widget, Color};
 use resource::Sprite;
 use util::{Point, Size};
+
+#[derive(Debug, Clone)]
+pub struct DisplayConfiguration {
+    pub name: String,
+    pub index: usize,
+    pub resolutions: Vec<(u32, u32)>,
+}
 
 pub trait MainLoopUpdater {
     fn update(&self, root: &Rc<RefCell<Widget>>, millis: u32);
@@ -46,6 +53,11 @@ pub trait IO {
     fn process_input(&mut self, root: Rc<RefCell<Widget>>);
 
     fn render_output(&mut self, root: Ref<Widget>, millis: u32);
+
+    /// Returns a list of available display configurations.  Each monitor
+    /// name is in the overall vec, with each entry in the vec for that key
+    /// a valid (x, y) display resolution
+    fn get_display_configurations(&self) -> Vec<DisplayConfiguration>;
 }
 
 pub trait GraphicsRenderer {
@@ -160,7 +172,7 @@ impl DrawList {
     pub fn from_texture_id(id: &str, tex_coords: &[f32; 8], x: f32,
                            y: f32, w: f32, h: f32) -> DrawList {
         let x_min = x;
-        let y_max = CONFIG.display.height as f32 - y;
+        let y_max = Config::ui_height() as f32 - y;
         let x_max = x_min + w;
         let y_min = y_max - h;
         let tc = tex_coords;
@@ -270,7 +282,7 @@ pub struct Vertex {
 implement_vertex!(Vertex, position, tex_coords);
 
 pub fn create() -> Result<Box<IO>, Error> {
-    match CONFIG.display.adapter {
+    match Config::display_adapter() {
         IOAdapter::Auto => get_auto_adapter(),
         IOAdapter::Glium => get_glium_adapter(),
     }

@@ -32,7 +32,7 @@ use std::io::Error;
 use std::fmt::Display;
 use std::hash::Hash;
 
-use config::CONFIG;
+use config::Config;
 use resource::resource_builder_set::ResourceBuilderSet;
 use image::{Image, EmptyImage, SimpleImage, AnimatedImage, ComposedImage, TimerImage};
 use util::invalid_data_error;
@@ -87,9 +87,9 @@ impl ResourceSet {
                 &mut resource_set.fonts);
             }
 
-            if !resource_set.fonts.contains_key(&CONFIG.display.default_font) {
+            if !resource_set.fonts.contains_key(&Config::default_font()) {
                 return invalid_data_error(&format!("Default font '{}' is not defined.",
-                                                   CONFIG.display.default_font));
+                                                   Config::default_font()));
             }
 
             let empty = Rc::new(EmptyImage { });
@@ -137,7 +137,7 @@ impl ResourceSet {
     }
 
     pub fn get_default_font() -> Rc<Font> {
-        RESOURCE_SET.with(|r| get_resource(&CONFIG.display.default_font, &r.borrow().fonts)).unwrap()
+        RESOURCE_SET.with(|r| get_resource(&Config::default_font(), &r.borrow().fonts)).unwrap()
     }
 
     pub fn get_theme() -> Rc<Theme> {

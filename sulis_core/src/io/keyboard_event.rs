@@ -19,7 +19,7 @@ pub struct KeyboardEvent {
     pub key: Key,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, Deserialize)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, Deserialize, Serialize, PartialOrd)]
 #[serde(deny_unknown_fields)]
 pub enum Key {
     KeyUnknown,

@@ -18,7 +18,7 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use io::{GraphicsRenderer, InputAction};
+use io::{GraphicsRenderer, InputAction, keyboard_event::Key};
 use io::event::ClickKind;
 use ui::{animation_state, Cursor, Widget};
 use util::Point;
@@ -158,6 +158,10 @@ pub trait WidgetKind {
     fn on_mouse_exit(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
         self.super_on_mouse_exit(widget);
         true
+    }
+
+    fn on_raw_key(&mut self, _widget: &Rc<RefCell<Widget>>, _key: Key) -> bool {
+        false
     }
 
     fn on_key_press(&mut self, _widget: &Rc<RefCell<Widget>>, _key: InputAction) -> bool {

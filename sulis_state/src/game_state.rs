@@ -22,7 +22,7 @@ use std::cell::{Cell, RefCell};
 
 use rlua;
 
-use sulis_core::config::CONFIG;
+use sulis_core::config::Config;
 use sulis_core::util::{self, Point, invalid_data_error, ExtInt};
 use sulis_core::io::{GraphicsRenderer};
 use sulis_rules::HitKind;
@@ -958,7 +958,7 @@ impl GameState {
             debug!("Path finding complete in {} secs",
                   util::format_elapsed_secs(start_time.elapsed()));
 
-            let mut anim = animation::move_animation::new(entity, path, CONFIG.display.animation_base_time_millis);
+            let mut anim = animation::move_animation::new(entity, path, Config::animation_base_time_millis());
             if let Some(cb) = cb {
                 anim.add_completion_callback(cb);
             }

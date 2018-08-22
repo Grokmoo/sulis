@@ -56,7 +56,7 @@ use std::cell::RefCell;
 
 use rlua::{self, Function, Lua, UserData, UserDataMethods};
 
-use sulis_core::config::CONFIG;
+use sulis_core::config::Config;
 use sulis_core::util::Point;
 use sulis_rules::QuickSlot;
 use sulis_module::{ability, Ability, Item, Module, OnTrigger};
@@ -338,7 +338,7 @@ impl UserData for ScriptInterface {
         });
 
         methods.add_method("anim_base_time", |_, _, ()| {
-            let secs = CONFIG.display.animation_base_time_millis as f32 / 1000.0;
+            let secs = Config::animation_base_time_millis() as f32 / 1000.0;
             Ok(secs)
         });
 

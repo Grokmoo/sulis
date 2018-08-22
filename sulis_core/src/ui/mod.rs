@@ -64,7 +64,7 @@ pub use self::widget_state::WidgetState;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use config::CONFIG;
+use config::Config;
 use resource::ResourceSet;
 use util::{Point, Size};
 
@@ -72,8 +72,8 @@ pub fn create_ui_tree(kind: Rc<RefCell<WidgetKind>>) -> Rc<RefCell<Widget>> {
 
     debug!("Creating UI tree.");
     let root = Widget::with_defaults(kind);
-    root.borrow_mut().state.set_size(Size::new(CONFIG.display.width,
-                                               CONFIG.display.height));
+    let (ui_x, ui_y) = Config::ui_size();
+    root.borrow_mut().state.set_size(Size::new(ui_x, ui_y));
     root.borrow_mut().theme = Some(ResourceSet::get_theme());
 
     root

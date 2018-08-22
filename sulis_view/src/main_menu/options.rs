@@ -202,7 +202,7 @@ impl WidgetKind for Options {
                 options.cur_display_conf += 1;
             }
 
-            parent.borrow_mut().invalidate_layout();
+            parent.borrow_mut().invalidate_children();
         })));
         if self.display_confs.len() == 1 {
             next_monitor.borrow_mut().state.set_enabled(false);

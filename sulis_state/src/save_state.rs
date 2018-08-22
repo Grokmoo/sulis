@@ -38,12 +38,16 @@ pub struct SaveState {
     pub(crate) coins: i32,
     pub(crate) stash: Vec<ItemListEntrySaveState>,
     pub(crate) selected: Vec<usize>,
+
+    #[serde(default = "default_zoom")]
     pub(crate) zoom: f32,
     pub(crate) current_area: String,
     pub(crate) areas: HashMap<String, AreaSaveState>,
     pub(crate) manager: ManagerSaveState,
     pub(crate) anims: Vec<AnimSaveState>,
 }
+
+fn default_zoom() -> f32 { 1.0 }
 
 impl SaveState {
     pub fn create() -> SaveState {

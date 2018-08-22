@@ -16,7 +16,7 @@ You'll need recent versions of Rust and Cargo installed.  The game will compile 
 1. Clone the git repository.
 1. `cargo build --release`
 1. Run the game with `cargo run --release`
-1. On first run, `config.yml` is created in your home directory.  This file may be edited with your preferences.
+1. On first run, `config.yml` is created in your home directory.  This file may be edited with your preferences.  It is also written to when using the in game options menu, however changes you have made manually should generally be preserved.
   * Linux - `$XDG_CONFIG_HOME/.sulis/` (typically `$HOME/.config/.sulis`) 
   * Windows -`$HOME\My Documents\My Games\Sulis`
 

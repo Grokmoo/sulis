@@ -1,6 +1,6 @@
 [package]
 name = "sulis_module"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Jared Stephen <grok_moo@yahoo.com>"]
 
 [dependencies]

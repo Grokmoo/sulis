@@ -64,11 +64,14 @@ impl Layer {
                 display[index].push(Rc::clone(&tile));
 
                 for p in tile.impass.iter() {
-                    passable[(base_x + p.x + (base_y + p.y) * width) as usize] = false;
+                    let index = (base_x + p.x + (base_y + p.y) * width) as usize;
+                    if index >= dim { continue; }
+                    passable[index] = false;
                 }
 
                 for p in tile.invis.iter() {
                     let p_index = (base_x + p.x + (base_y + p.y) * width) as usize;
+                    if p_index >= dim { continue; }
                     visible[p_index] = false;
                 }
 

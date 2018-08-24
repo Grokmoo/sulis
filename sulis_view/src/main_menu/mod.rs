@@ -17,6 +17,9 @@
 pub mod character_selector;
 pub use self::character_selector::CharacterSelector;
 
+mod links_pane;
+use self::links_pane::LinksPane;
+
 pub mod module_selector;
 pub use self::module_selector::ModuleSelector;
 
@@ -65,6 +68,7 @@ enum Mode {
     Load,
     Module,
     Options,
+    Links,
     NoChoice,
 }
 
@@ -191,9 +195,11 @@ impl WidgetKind for MainMenu {
             module_title.borrow_mut().state.add_text_arg("module", &Module::game().name);
         }
 
+        let menu_pane = Widget::empty("menu_pane");
+
         let new = Widget::with_theme(Button::empty(), "new");
         new.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::get_parent(&widget);
+            let parent = Widget::go_up_tree(&widget, 2);
             let starter = Widget::downcast_kind_mut::<MainMenu>(&parent);
 
             parent.borrow_mut().invalidate_children();
@@ -203,7 +209,7 @@ impl WidgetKind for MainMenu {
 
         let load = Widget::with_theme(Button::empty(), "load");
         load.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::get_parent(&widget);
+            let parent = Widget::go_up_tree(&widget, 2);
             let starter = Widget::downcast_kind_mut::<MainMenu>(&parent);
 
             starter.mode = Mode::Load;
@@ -219,7 +225,7 @@ impl WidgetKind for MainMenu {
 
         let module = Widget::with_theme(Button::empty(), "module");
         module.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::get_parent(&widget);
+            let parent = Widget::go_up_tree(&widget, 2);
             let window = Widget::downcast_kind_mut::<MainMenu>(&parent);
 
             window.mode = Mode::Module;
@@ -235,7 +241,7 @@ impl WidgetKind for MainMenu {
 
         let options = Widget::with_theme(Button::empty(), "options");
         options.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::get_parent(&widget);
+            let parent = Widget::go_up_tree(&widget, 2);
             let window = Widget::downcast_kind_mut::<MainMenu>(&parent);
             window.mode = Mode::Options;
             let configs = window.display_configurations.clone();
@@ -245,9 +251,20 @@ impl WidgetKind for MainMenu {
             parent.borrow_mut().invalidate_children();
         })));
 
+        let links = Widget::with_theme(Button::empty(), "links");
+        links.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+            let parent = Widget::go_up_tree(&widget, 2);
+            let window = Widget::downcast_kind_mut::<MainMenu>(&parent);
+            window.mode = Mode::Links;
+
+            window.content = Widget::with_defaults(LinksPane::new());
+
+            parent.borrow_mut().invalidate_children();
+        })));
+
         let exit = Widget::with_theme(Button::empty(), "exit");
         exit.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::get_parent(&widget);
+            let parent = Widget::go_up_tree(&widget, 2);
             let window = Widget::downcast_kind_mut::<MainMenu>(&parent);
             window.next_step = Some(NextGameStep::Exit);
         })));
@@ -257,6 +274,7 @@ impl WidgetKind for MainMenu {
             Mode::Load => load.borrow_mut().state.set_active(true),
             Mode::Module => module.borrow_mut().state.set_active(true),
             Mode::Options => options.borrow_mut().state.set_active(true),
+            Mode::Links => links.borrow_mut().state.set_active(true),
             Mode::NoChoice => (),
         }
 
@@ -268,8 +286,9 @@ impl WidgetKind for MainMenu {
             load.borrow_mut().state.set_enabled(false);
         }
 
-        let mut children = vec![title, module_title, new, load, module,
-            exit, options, self.content.clone()];
+        Widget::add_children_to(&menu_pane, vec![module, new, load, options, links, exit]);
+
+        let mut children = vec![title, module_title, menu_pane, self.content.clone()];
 
         if let Some(builder) = self.char_builder_to_add.take() {
             children.push(Widget::with_defaults(builder));

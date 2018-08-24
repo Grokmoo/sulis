@@ -543,6 +543,12 @@ impl UserData for ScriptInterface {
             stash.borrow_mut().add_item(1, item);
             Ok(())
         });
+
+        methods.add_method("transition_party_to", |_, _, (area, x, y): (String, i32, i32)| {
+            let location = Some(area);
+            GameState::transition(&location, x, y);
+            Ok(())
+        });
     }
 }
 

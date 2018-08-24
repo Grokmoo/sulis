@@ -63,6 +63,10 @@ impl LayerSet {
                 let mut cur_layer = layer_tiles.get_mut(&tile.layer).unwrap();
                 for point in locations.iter() {
                     let index = point[0] + point[1] * width as usize;
+                    if index >= dim {
+                        warn!("Invalid tile location {},{}", point[0], point[1]);
+                        continue;
+                    }
                     cur_layer[index].push(Rc::clone(&tile));
                 }
             }

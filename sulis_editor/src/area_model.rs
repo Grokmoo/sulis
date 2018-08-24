@@ -697,10 +697,13 @@ impl AreaModel {
                 width = cmp::max(width, position.x + tile.width);
                 height = cmp::max(height, position.y + tile.height);
 
+                if position.x >= MAX_AREA_SIZE || position.y >= MAX_AREA_SIZE { continue; }
                 let tiles_vec = layer_set.entry(tile.id.to_string()).or_insert(Vec::new());
                 tiles_vec.push(vec![position.x as usize, position.y as usize]);
             }
         }
+        width = cmp::min(width, MAX_AREA_SIZE);
+        height = cmp::min(height, MAX_AREA_SIZE);
         let entity_layer = self.config.area.entity_layer;
 
         trace!("Saving actors.");

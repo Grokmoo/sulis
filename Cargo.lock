@@ -531,6 +531,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "open"
+version = "1.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "winapi 0.3.5 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
 name = "osmesa-sys"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -791,20 +799,20 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "sulis"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "log 0.4.3 (registry+https://github.com/rust-lang/crates.io-index)",
- "sulis_core 0.1.0",
- "sulis_module 0.1.0",
- "sulis_rules 0.1.0",
- "sulis_state 0.1.0",
- "sulis_view 0.1.0",
- "sulis_widgets 0.1.0",
+ "sulis_core 0.1.1",
+ "sulis_module 0.1.1",
+ "sulis_rules 0.1.1",
+ "sulis_state 0.1.1",
+ "sulis_view 0.1.1",
+ "sulis_widgets 0.1.1",
 ]
 
 [[package]]
 name = "sulis_core"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "backtrace 0.3.9 (registry+https://github.com/rust-lang/crates.io-index)",
  "flexi_logger 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -820,43 +828,43 @@ dependencies = [
 
 [[package]]
 name = "sulis_editor"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "log 0.4.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "rand 0.5.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.71 (registry+https://github.com/rust-lang/crates.io-index)",
- "sulis_core 0.1.0",
- "sulis_module 0.1.0",
- "sulis_state 0.1.0",
- "sulis_widgets 0.1.0",
+ "sulis_core 0.1.1",
+ "sulis_module 0.1.1",
+ "sulis_state 0.1.1",
+ "sulis_widgets 0.1.1",
 ]
 
 [[package]]
 name = "sulis_module"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "log 0.4.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "rand 0.5.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.71 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_derive 1.0.71 (registry+https://github.com/rust-lang/crates.io-index)",
- "sulis_core 0.1.0",
- "sulis_rules 0.1.0",
+ "sulis_core 0.1.1",
+ "sulis_rules 0.1.1",
 ]
 
 [[package]]
 name = "sulis_rules"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "log 0.4.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "rand 0.5.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.71 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_derive 1.0.71 (registry+https://github.com/rust-lang/crates.io-index)",
- "sulis_core 0.1.0",
+ "sulis_core 0.1.1",
 ]
 
 [[package]]
 name = "sulis_state"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "chrono 0.4.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.4.3 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -864,30 +872,31 @@ dependencies = [
  "rlua 0.14.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.71 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_derive 1.0.71 (registry+https://github.com/rust-lang/crates.io-index)",
- "sulis_core 0.1.0",
- "sulis_module 0.1.0",
- "sulis_rules 0.1.0",
+ "sulis_core 0.1.1",
+ "sulis_module 0.1.1",
+ "sulis_rules 0.1.1",
 ]
 
 [[package]]
 name = "sulis_view"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "chrono 0.4.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.4.3 (registry+https://github.com/rust-lang/crates.io-index)",
- "sulis_core 0.1.0",
- "sulis_module 0.1.0",
- "sulis_rules 0.1.0",
- "sulis_state 0.1.0",
- "sulis_widgets 0.1.0",
+ "open 1.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sulis_core 0.1.1",
+ "sulis_module 0.1.1",
+ "sulis_rules 0.1.1",
+ "sulis_state 0.1.1",
+ "sulis_widgets 0.1.1",
 ]
 
 [[package]]
 name = "sulis_widgets"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "log 0.4.3 (registry+https://github.com/rust-lang/crates.io-index)",
- "sulis_core 0.1.0",
+ "sulis_core 0.1.1",
 ]
 
 [[package]]
@@ -1158,6 +1167,7 @@ dependencies = [
 "checksum num-traits 0.2.5 (registry+https://github.com/rust-lang/crates.io-index)" = "630de1ef5cc79d0cdd78b7e33b81f083cbfe90de0f4b2b2f07f905867c70e9fe"
 "checksum num_cpus 1.8.0 (registry+https://github.com/rust-lang/crates.io-index)" = "c51a3322e4bca9d212ad9a158a02abc6934d005490c054a2778df73a70aa0a30"
 "checksum objc 0.2.5 (registry+https://github.com/rust-lang/crates.io-index)" = "9833ab0efe5361b1e2122a0544a5d3359576911a42cb098c2e59be8650807367"
+"checksum open 1.2.2 (registry+https://github.com/rust-lang/crates.io-index)" = "eedfa0ca7b54d84d948bfd058b8f82e767d11f362dd78c36866fd1f69c175867"
 "checksum osmesa-sys 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)" = "88cfece6e95d2e717e0872a7f53a8684712ad13822a7979bc760b9c77ec0013b"
 "checksum owning_ref 0.3.3 (registry+https://github.com/rust-lang/crates.io-index)" = "cdf84f41639e037b484f93433aa3897863b561ed65c6e59c7073d7c561710f37"
 "checksum parking_lot 0.6.3 (registry+https://github.com/rust-lang/crates.io-index)" = "69376b761943787ebd5cc85a5bc95958651a22609c5c1c2b65de21786baec72b"

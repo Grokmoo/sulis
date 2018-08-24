@@ -22,30 +22,36 @@ children:
         position: [0, 10]
       button:
         from: .button
-        preferred_size: [42, 12]
+        preferred_size: [35, 12]
         text_params:
           scale: 7
         x_relative: Center
-      module:
-        from: .main_menu.button
-        text: "Select Module"
-        position: [-92, 25]
-      new:
-        from: .main_menu.button
-        position: [-45, 25]
-        text: "Start New Game"
-      load:
-        from: .main_menu.button
-        position: [2, 25]
-        text: "Load Existing Save"
-      options:
-        from: .main_menu.button
-        position: [49, 25]
-        text: "Options"
-      exit:
-        from: .main_menu.button
-        text: "Exit Game"
-        position: [96, 25]
+      menu_pane:
+        position: [0, 25]
+        preferred_size: [0, 12]
+        width_relative: ChildSum
+        layout: BoxHorizontal
+        layout_spacing: { right: 5 }
+        x_relative: Center
+        children:
+          module:
+            from: .main_menu.button
+            text: "Select Module"
+          new:
+            from: .main_menu.button
+            text: "New Game"
+          load:
+            from: .main_menu.button
+            text: "Load Game"
+          options:
+            from: .main_menu.button
+            text: "Options"
+          links:
+            from: .main_menu.button
+            text: "Credits & Docs"
+          exit:
+            from: .main_menu.button
+            text: "Exit Sulis"
       content: {}
       load_window:
         from: .load_window_base
@@ -61,6 +67,12 @@ children:
         preferred_size: [0, -40]
       keybinding_popup:
         from: .keybinding_popup
+      links_pane:
+        from: .links_pane
+        position: [0, 40]
+        width_relative: Max
+        height_relative: Max
+        preferred_size: [0, -40]
       options_window:
         from: .options_window
         position: [0, 40]
@@ -95,6 +107,39 @@ children:
             text: "Delete Saved Game?"
           accept:
             text: "Delete"
+  links_pane:
+    children:
+      title:
+        from: .label
+        text_params:
+          scale: 8
+        text: "Links will open in your Web Browser:"
+        x_relative: Center
+        preferred_size: [80, 10]
+      website:
+        from: .button
+        text: "Sulis Website (www.sulisgame.com)"
+        preferred_size: [80, 10]
+        x_relative: Center
+        position: [0, 15]
+      github:
+        from: .button
+        text: "GitHub (github.com/Grokmoo/sulis)"
+        preferred_size: [80, 10]
+        x_relative: Center
+        position: [0, 30]
+      credits:
+        from: .button
+        text: "Credits & Attribution (on GitHub)"
+        preferred_size: [80, 10]
+        x_relative: Center
+        position: [0, 45]
+      changes:
+        from: .button
+        text: "Changelog (on GitHub)"
+        preferred_size: [80, 10]
+        x_relative: Center
+        position: [0, 60]
   character_selector:
     children:
       title:

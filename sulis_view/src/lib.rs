@@ -20,6 +20,7 @@ extern crate sulis_module;
 extern crate sulis_state;
 extern crate sulis_widgets;
 
+extern crate open;
 extern crate chrono;
 #[macro_use] extern crate log;
 
@@ -129,7 +130,7 @@ pub struct GameMainLoopUpdater {
 impl GameMainLoopUpdater {
     pub fn new(view: &Rc<RefCell<RootView>>) -> GameMainLoopUpdater {
         GameMainLoopUpdater {
-            view: Rc::clone(view)
+            view: Rc::clone(view),
         }
     }
 }
@@ -150,6 +151,7 @@ pub struct RootView {
     status_added: Option<Instant>,
     area_view: Rc<RefCell<AreaView>>,
     area_view_widget: Rc<RefCell<Widget>>,
+    area: String,
 }
 
 impl RootView {
@@ -171,6 +173,7 @@ impl RootView {
             status_added: None,
             area_view,
             area_view_widget,
+            area: "".to_string(),
         }))
     }
 
@@ -342,6 +345,14 @@ impl WidgetKind for RootView {
     widget_kind!(NAME);
 
     fn update(&mut self, widget: &Rc<RefCell<Widget>>) {
+        let area_state = GameState::area_state();
+        let root = Widget::get_root(widget);
+        let area = area_state.borrow().area.id.clone();
+        if area != self.area {
+            self.area = area;
+            root.borrow_mut().invalidate_children();
+        }
+
         match GameState::check_get_ui_callback() {
             None => (),
             Some(ui_cb) => {

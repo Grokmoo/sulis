@@ -46,10 +46,16 @@ impl Options {
             config.input.keybindings.iter().map(|(k, v)| (*k, *v)).collect();
         cur_keybindings.sort_by(|(_, v1), (_, v2)| v1.partial_cmp(v2).unwrap());
 
+        let cur_display_conf = if config.display.monitor >= display_confs.len() {
+            0
+        } else {
+            config.display.monitor
+        };
+
         Rc::new(RefCell::new(Options {
             display_confs,
             cur_display_mode: config.display.mode,
-            cur_display_conf: config.display.monitor,
+            cur_display_conf,
             cur_resolution: (config.display.width_pixels, config.display.height_pixels),
             cur_anim_speed: config.display.animation_base_time_millis,
             cur_ui_scale: (config.display.width, config.display.height),

@@ -25,11 +25,12 @@ use sulis_core::config::Config;
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::ui::{color, Color};
 use sulis_core::util::{Point, invalid_data_error};
+use sulis_rules::HitKind;
 use sulis_module::{actor::Faction, Actor, ObjectSize, ObjectSizeIterator, Module};
 use sulis_module::area::{MAX_AREA_SIZE, Transition};
 use {ActorState, AreaState, ChangeListenerList, EntityTextureCache, EntityTextureSlot,
     GameState, Location, PropState, ScriptCallback};
-use script::CallbackData;
+use script::{CallbackData, ScriptEntitySet};
 use animation::{self, Anim};
 use save_state::EntitySaveState;
 
@@ -324,8 +325,9 @@ impl EntityState {
         self.actor.add_xp(xp);
     }
 
-    pub fn remove_hp(entity: &Rc<RefCell<EntityState>>, hp: u32) {
-        entity.borrow_mut().actor.remove_hp(hp);
+    pub fn remove_hp(entity: &Rc<RefCell<EntityState>>, attacker: &Rc<RefCell<EntityState>>,
+                     hit_kind: HitKind, hp_amount: u32) {
+        entity.borrow_mut().actor.remove_hp(hp_amount);
 
         let hp = entity.borrow().actor.hp();
         if hp <= 0 {
@@ -336,6 +338,9 @@ impl EntityState {
         } else {
             GameState::create_damage_animation(&entity);
         }
+
+        let targets = ScriptEntitySet::from_pair(entity, attacker);
+        entity.borrow().callbacks().iter().for_each(|cb| cb.on_damaged(&targets, hit_kind, hp_amount));
     }
 
     pub fn move_to(&mut self, x: i32, y: i32, squares: u32) -> bool {

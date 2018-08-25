@@ -26,7 +26,7 @@ use rlua::{self, Lua, UserData, UserDataMethods};
 use sulis_core::util::{invalid_data_error, ExtInt};
 use sulis_core::config::Config;
 use sulis_core::resource::ResourceSet;
-use sulis_rules::{Attribute, AttackKind, DamageKind, Attack};
+use sulis_rules::{Attribute, AttackKind, DamageKind, Attack, HitKind};
 use {ActorState, EntityState, GameState, Location, area_feedback_text::ColorKind};
 use {ai, animation::{self}, script::*};
 
@@ -453,9 +453,10 @@ impl UserData for ScriptEntity {
             Ok(hit_kind)
         });
 
-        methods.add_method("take_damage", |_, entity, (min_damage, max_damage, damage_kind, ap):
-                           (f32, f32, String, Option<u32>)| {
+        methods.add_method("take_damage", |_, entity, (attacker, min_damage, max_damage, damage_kind, ap):
+                           (ScriptEntity, f32, f32, String, Option<u32>)| {
             let parent = entity.try_unwrap()?;
+            let attacker = attacker.try_unwrap()?;
             let damage_kind = DamageKind::from_str(&damage_kind);
 
             let min_damage = min_damage as u32;
@@ -470,7 +471,7 @@ impl UserData for ScriptEntity {
                     total += amount;
                 }
 
-                EntityState::remove_hp(&parent, total);
+                EntityState::remove_hp(&parent, &attacker, HitKind::Hit, total);
                 (format!("{}", total), ColorKind::Hit)
             } else {
                 ("0".to_string(), ColorKind::Miss)
@@ -780,6 +781,20 @@ impl ScriptEntitySet {
             indices: Vec::new(),
             selected_point: None,
             affected_points: Vec::new(),
+            surface: None,
+        }
+    }
+
+    pub fn from_pair(parent: &Rc<RefCell<EntityState>>,
+                     target: &Rc<RefCell<EntityState>>) -> ScriptEntitySet {
+        let parent = parent.borrow().index;
+        let indices = vec![Some(target.borrow().index)];
+
+        ScriptEntitySet {
+            parent,
+            selected_point: None,
+            affected_points: Vec::new(),
+            indices,
             surface: None,
         }
     }

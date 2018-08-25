@@ -86,7 +86,7 @@ function apply_damage(parent, ability, targets)
   stats = parent:stats()
   min_dmg = 5 + stats.caster_level / 4 + stats.intellect_bonus / 8
   max_dmg = 10 + stats.intellect_bonus / 4 + stats.caster_level / 2
-  target:take_damage(min_dmg, max_dmg, "Acid", 8)
+  target:take_damage(parent, min_dmg, max_dmg, "Acid", 8)
 end
 
 function create_acid_surface(parent, ability, targets)
@@ -116,12 +116,12 @@ end
 
 function on_moved(parent, ability, targets)
   target = targets:first()
-  target:take_damage(2, 4, "Acid", 12)
+  target:take_damage(parent, 2, 4, "Acid", 12)
 end
 
 function on_round_elapsed(parent, ability, targets)
   targets = targets:to_table()
   for i = 1, #targets do
-	targets[i]:take_damage(2, 4, "Acid", 12)
+	targets[i]:take_damage(parent, 2, 4, "Acid", 12)
   end
 end

@@ -44,6 +44,7 @@ pub fn fire_on_moved_in_surface(cbs: Vec<(Rc<CallbackData>, usize)>) {
 #[derive(Serialize, Deserialize, Clone, Copy, PartialOrd, Ord, Hash, PartialEq, Eq, Debug)]
 #[serde(deny_unknown_fields)]
 enum FuncKind {
+    OnDamaged,
     BeforeAttack,
     AfterAttack,
     AfterDefense,
@@ -56,6 +57,8 @@ enum FuncKind {
 }
 
 pub trait ScriptCallback {
+    fn on_damaged(&self, _targets: &ScriptEntitySet, _hit_kind: HitKind, _damage: u32) { }
+
     fn after_defense(&self, _targets: &ScriptEntitySet, _hit_kind: HitKind, _damage: u32) { }
 
     fn before_defense(&self, _targets: &ScriptEntitySet) { }
@@ -273,6 +276,11 @@ impl ScriptCallback for CallbackData {
         self.exec_script_with_attack_data(self.get_targets(targets), hit_kind, damage,
             FuncKind::AfterAttack);
     }
+
+    fn on_damaged(&self, targets: &ScriptEntitySet, hit_kind: HitKind, damage: u32) {
+        self.exec_script_with_attack_data(self.get_targets(targets), hit_kind, damage,
+            FuncKind::OnDamaged);
+    }
 }
 
 fn compute_surface_targets(effect: Option<usize>, parent: usize, target: Option<usize>) -> Option<ScriptEntitySet> {
@@ -345,6 +353,8 @@ impl UserData for CallbackData {
             Ok(())
         });
 
+        methods.add_method_mut("set_on_damaged_fn",
+                               |_, cb, func: String| cb.add_func(FuncKind::OnDamaged, func));
         methods.add_method_mut("set_before_attack_fn",
                                |_, cb, func: String| cb.add_func(FuncKind::BeforeAttack, func));
         methods.add_method_mut("set_after_attack_fn",

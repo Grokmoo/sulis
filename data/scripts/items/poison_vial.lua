@@ -61,5 +61,5 @@ end
 function poison_round_elapsed(parent, item, targets)
   target = targets:first()
 
-  target:take_damage(2, 4, "Raw")
+  target:take_damage(parent, 2, 4, "Raw")
 end

@@ -47,9 +47,9 @@ function do_attack(parent, ability, targets)
   max_hp = target_stats.max_hp
   
   if cur_hp / max_hp < 0.3 then
-    target:take_damage(cur_hp, cur_hp, "Raw")
+    target:take_damage(parent, cur_hp, cur_hp, "Raw")
   else
-    target:take_damage(min_dmg, max_dmg, "Raw")
+    target:take_damage(parent, min_dmg, max_dmg, "Raw")
   end
 
   gen = target:create_anim("burst", 0.15)

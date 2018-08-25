@@ -42,11 +42,9 @@ function after_defense(parent, ability, targets, hit)
   
   target = targets:first()
 
-  if parent:dist_to_entity(target) > 4.0 then
-    return
-  end
+  if not target:can_reach(parent) then return end
 
   max_damage = math.floor(hit:total_damage() * 0.3)
   
-  target:take_damage(max_damage, max_damage, "Raw")
+  target:take_damage(parent, max_damage, max_damage, "Raw")
 end

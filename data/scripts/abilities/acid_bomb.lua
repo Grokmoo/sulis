@@ -26,7 +26,7 @@ function on_target_select(parent, ability, targets)
   end
   
   max_dmg = 8 + stats.caster_level / 2
-  target:take_damage(4, max_dmg, "Acid", 5)
+  target:take_damage(parent, 4, max_dmg, "Acid", 5)
   
   effect = target:create_effect(ability:name(), duration)
   effect:add_num_bonus("melee_accuracy", -10 - stats.caster_level / 2)
@@ -57,5 +57,5 @@ function apply_damage(parent, ability, targets)
   target = targets:first()
   
   max_dmg = 8 + stats.caster_level / 2
-  target:take_damage(4, max_dmg, "Acid", 5)
+  target:take_damage(parent, 4, max_dmg, "Acid", 5)
 end

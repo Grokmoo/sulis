@@ -74,7 +74,7 @@ impl AnimSaveState {
             kind,
             elapsed: anim.elapsed,
             duration_millis: anim.duration_millis,
-            owner: anim.owner.borrow().index,
+            owner: anim.owner.borrow().index(),
             removal_effect: anim.removal_effect,
         }
     }

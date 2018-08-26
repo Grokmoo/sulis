@@ -458,7 +458,7 @@ fn entities_to_ignore() -> Vec<usize> {
     if GameState::is_combat_active() {
         Vec::new()
     } else {
-        GameState::party().iter().map(|e| e.borrow().index).collect()
+        GameState::party().iter().map(|e| e.borrow().index()).collect()
     }
 }
 

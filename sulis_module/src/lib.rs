@@ -33,6 +33,9 @@ pub use self::actor::Sex;
 pub use self::actor::ActorBuilder;
 pub use self::actor::Faction;
 
+pub mod ai;
+pub use self::ai::AITemplate;
+
 pub mod area;
 pub use self::area::Area;
 
@@ -107,6 +110,7 @@ use sulis_core::resource::*;
 use self::area::Tile;
 use self::ability::AbilityBuilder;
 use self::ability_list::AbilityListBuilder;
+use self::ai::AITemplateBuilder;
 use self::conversation::ConversationBuilder;
 use self::cutscene::CutsceneBuilder;
 use self::area::AreaBuilder;
@@ -130,6 +134,7 @@ pub struct Module {
     abilities: HashMap<String, Rc<Ability>>,
     ability_lists: HashMap<String, Rc<AbilityList>>,
     actors: HashMap<String, Rc<Actor>>,
+    ai_templates: HashMap<String, Rc<AITemplate>>,
     areas: HashMap<String, Rc<Area>>,
     classes: HashMap<String, Rc<Class>>,
     conversations: HashMap<String, Rc<Conversation>>,
@@ -335,6 +340,11 @@ impl Module {
                 }
             }
 
+            for (id, builder) in builder_set.ai_builders {
+                insert_if_ok("ai_template", id, AITemplate::new(builder, &module),
+                    &mut module.ai_templates);
+            }
+
             for (id, builder) in builder_set.ability_builders {
                 insert_if_ok("ability", id, Ability::new(builder, &module), &mut module.abilities);
             }
@@ -435,6 +445,7 @@ impl Module {
         ability, abilities, Ability;
         ability_list, ability_lists, AbilityList;
         actor, actors, Actor;
+        ai_template, ai_templates, AITemplate;
         area, areas, Area;
         class, classes, Class;
         conversation, conversations, Conversation;
@@ -495,6 +506,7 @@ impl Default for Module {
             abilities: HashMap::new(),
             ability_lists: HashMap::new(),
             actors: HashMap::new(),
+            ai_templates: HashMap::new(),
             areas: HashMap::new(),
             classes: HashMap::new(),
             conversations: HashMap::new(),
@@ -521,6 +533,7 @@ struct ModuleBuilder {
     ability_builders: HashMap<String, AbilityBuilder>,
     ability_list_builders: HashMap<String, AbilityListBuilder>,
     actor_builders: HashMap<String, ActorBuilder>,
+    ai_builders: HashMap<String, AITemplateBuilder>,
     area_builders: HashMap<String, AreaBuilder>,
     class_builders: HashMap<String, ClassBuilder>,
     cutscene_builders: HashMap<String, CutsceneBuilder>,
@@ -542,6 +555,7 @@ impl ModuleBuilder {
             ability_builders: read(&root_dirs, "abilities"),
             ability_list_builders: read(&root_dirs, "ability_lists"),
             actor_builders: read(&root_dirs, "actors"),
+            ai_builders: read(&root_dirs, "ai"),
             area_builders: read(&root_dirs, "areas"),
             class_builders: read(&root_dirs, "classes"),
             conversation_builders: read(&root_dirs, "conversations"),

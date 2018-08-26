@@ -269,3 +269,11 @@ function find_target(parent, targets)
 
     return closest_target
 end
+
+-- OnDamaged script hook
+function on_damaged(parent, targets, hit)
+    target = targets:first()
+	
+	-- game:log(parent:name() .. " damaged by " .. target:name() .. ": "
+	--     .. hit:kind() .. " for " .. hit:total_damage() .. " damage.")
+end

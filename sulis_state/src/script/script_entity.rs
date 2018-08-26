@@ -45,7 +45,7 @@ impl ScriptEntity {
     }
 
     pub fn from(entity: &Rc<RefCell<EntityState>>) -> ScriptEntity {
-        ScriptEntity { index: Some(entity.borrow().index) }
+        ScriptEntity { index: Some(entity.borrow().index()) }
     }
 
     pub fn check_not_equal(&self, other: &ScriptEntity) -> Result<()> {
@@ -338,7 +338,7 @@ impl UserData for ScriptEntity {
         methods.add_method("teleport_to", |_, entity, dest: HashMap<String, i32>| {
             let (x, y) = unwrap_point(dest)?;
             let entity = entity.try_unwrap()?;
-            let entity_index = entity.borrow().index;
+            let entity_index = entity.borrow().index();
             let mgr = GameState::turn_manager();
 
             let area_state = GameState::area_state();
@@ -746,7 +746,7 @@ impl ScriptEntitySet {
             None => {
                 return invalid_data_error(
                     &format!("Invalid parent {} for ScriptEntitySet", self.parent));
-            }, Some(ref entity) => self.parent = entity.borrow().index,
+            }, Some(ref entity) => self.parent = entity.borrow().index(),
         }
 
         let mut indices = Vec::new();
@@ -758,7 +758,7 @@ impl ScriptEntitySet {
                         None => {
                             return invalid_data_error(
                                 &format!("Invalid target {} for ScriptEntitySet", index));
-                        }, Some(ref entity) => indices.push(Some(entity.borrow().index)),
+                        }, Some(ref entity) => indices.push(Some(entity.borrow().index())),
                     }
                 }
             }
@@ -787,8 +787,8 @@ impl ScriptEntitySet {
 
     pub fn from_pair(parent: &Rc<RefCell<EntityState>>,
                      target: &Rc<RefCell<EntityState>>) -> ScriptEntitySet {
-        let parent = parent.borrow().index;
-        let indices = vec![Some(target.borrow().index)];
+        let parent = parent.borrow().index();
+        let indices = vec![Some(target.borrow().index())];
 
         ScriptEntitySet {
             parent,
@@ -801,12 +801,12 @@ impl ScriptEntitySet {
 
     pub fn new(parent: &Rc<RefCell<EntityState>>,
                entities: &Vec<Option<Rc<RefCell<EntityState>>>>) -> ScriptEntitySet {
-        let parent = parent.borrow().index;
+        let parent = parent.borrow().index();
 
         let indices = entities.iter().map(|e| {
             match e {
                 &None => None,
-                &Some(ref e) => Some(e.borrow().index),
+                &Some(ref e) => Some(e.borrow().index()),
             }
         }).collect();
         ScriptEntitySet {
@@ -926,10 +926,10 @@ fn targets(_lua: &Lua, parent: &ScriptEntity, _args: ()) -> Result<ScriptEntityS
         if entity.actor.is_dead() { continue; }
         if !entity.location.is_in_area_id(&area_id) { continue; }
 
-        indices.push(Some(entity.index));
+        indices.push(Some(entity.index()));
     }
 
-    let parent_index = parent.borrow().index;
+    let parent_index = parent.borrow().index();
     Ok(ScriptEntitySet {
         parent: parent_index,
         indices,

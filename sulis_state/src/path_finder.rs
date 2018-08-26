@@ -82,7 +82,7 @@ impl PathFinder {
         debug!("Finding path from {:?} to within {} of {},{}",
                requester.location, dest_dist, dest_x, dest_y);
 
-        entities_to_ignore.push(requester.index);
+        entities_to_ignore.push(requester.index());
 
         // let start_time = time::Instant::now();
         self.goal_x = dest_x - (requester.size.width / 2) as f32;

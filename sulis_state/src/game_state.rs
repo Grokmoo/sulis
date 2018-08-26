@@ -157,7 +157,7 @@ impl GameState {
                     };
 
                     // the index has changed with the load
-                    effect.entity = Some(entity.borrow().index);
+                    effect.entity = Some(entity.borrow().index());
 
                     let new_idx = mgr.borrow_mut().add_effect(effect, &entity,
                                                                 Vec::new(), Vec::new());
@@ -521,6 +521,20 @@ impl GameState {
         exec_script!(item_on_activate: parent, kind);
     }
 
+    pub fn execute_entity_script(parent: &Rc<RefCell<EntityState>>,
+                                 targets: ScriptEntitySet, func: &str) {
+        let t: Option<(&str, usize)> = None;
+        exec_script!(entity_script: parent, targets, t, func);
+    }
+
+    pub fn execute_entity_with_attack_data(parent: &Rc<RefCell<EntityState>>,
+                                           targets: ScriptEntitySet, kind: HitKind,
+                                           damage: u32, func: &str) {
+        let hit_kind = ScriptHitKind { kind, damage };
+        let t = Some(("hit", hit_kind));
+        exec_script!(entity_script: parent, targets, t, func);
+    }
+
     pub fn execute_item_script(parent: &Rc<RefCell<EntityState>>, kind: ScriptItemKind,
                                targets: ScriptEntitySet, func: &str) {
         let t: Option<(&str, usize)> = None;
@@ -632,7 +646,7 @@ impl GameState {
             let mgr = GameState::turn_manager();
             {
                 for entity in state.party.iter() {
-                    let entity_index = entity.borrow().index;
+                    let entity_index = entity.borrow().index();
                     let area_id = entity.borrow().location.area_id.to_string();
                     let area = &state.areas.get(&area_id).unwrap();
                     let surfaces = area.borrow_mut().remove_entity(&entity);
@@ -651,7 +665,7 @@ impl GameState {
                                                     &state.area_state.borrow());
                 info!("Transitioning {} to {},{}", entity.borrow().actor.actor.name,
                     cur_location.x, cur_location.y);
-                let index = entity.borrow().index;
+                let index = entity.borrow().index();
 
                 match state.area_state.borrow_mut().transition_entity_to(Rc::clone(entity), index, cur_location) {
                     Ok(_) => (),

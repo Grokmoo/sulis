@@ -473,7 +473,7 @@ impl TurnManager {
         self.order.push_back(Entry::Entity(index));
         debug!("Added entity at {} to turn timer", index);
 
-        entity.borrow_mut().index = index;
+        entity.borrow_mut().set_index(index);
         self.listeners.notify(&self);
 
         index

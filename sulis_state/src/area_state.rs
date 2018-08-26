@@ -832,7 +832,7 @@ impl AreaState {
             return invalid_data_error(&format!("entity location is out of bounds: {},{}", x, y));
         }
 
-        let entities_to_ignore = vec![entity.borrow().index];
+        let entities_to_ignore = vec![entity.borrow().index()];
         if !self.is_passable(&entity.borrow(), &entities_to_ignore, x, y) {
             warn!("Entity location is not passable: {},{}", x, y);
         }
@@ -846,7 +846,7 @@ impl AreaState {
         let mgr = GameState::turn_manager();
         let surfaces = self.add_entity_points(&entity.borrow());
         for surface in surfaces {
-            mgr.borrow_mut().add_to_surface(entity.borrow().index, surface);
+            mgr.borrow_mut().add_to_surface(entity.borrow().index(), surface);
         }
 
         if entity.borrow().is_party_member() {
@@ -870,7 +870,7 @@ impl AreaState {
 
     fn update_entity_position(&mut self, entity: &Rc<RefCell<EntityState>>,
                                            old_x: i32, old_y: i32, mgr: &mut TurnManager) {
-        let entity_index = entity.borrow().index;
+        let entity_index = entity.borrow().index();
         let old_surfaces = self.clear_entity_points(&entity.borrow(), old_x, old_y);
         let new_surfaces = self.add_entity_points(&entity.borrow());
 
@@ -908,7 +908,7 @@ impl AreaState {
     fn add_entity_points(&mut self, entity: &EntityState) -> HashSet<usize> {
         let mut surfaces = HashSet::new();
         for p in entity.location_points() {
-            self.add_entity_to_grid(p.x, p.y, entity.index);
+            self.add_entity_to_grid(p.x, p.y, entity.index());
             for surface in self.surface_grid[(p.x + p.y * self.area.width) as usize].iter() {
                 surfaces.insert(*surface);
             }
@@ -921,7 +921,7 @@ impl AreaState {
     fn clear_entity_points(&mut self, entity: &EntityState, x: i32, y: i32) -> HashSet<usize> {
         let mut surfaces = HashSet::new();
         for p in entity.points(x, y) {
-            self.remove_entity_from_grid(p.x, p.y, entity.index);
+            self.remove_entity_from_grid(p.x, p.y, entity.index());
             for surface in self.surface_grid[(p.x + p.y * self.area.width) as usize].iter() {
                 surfaces.insert(*surface);
             }
@@ -1038,7 +1038,7 @@ impl AreaState {
 
     fn find_bump_position(&self, entity: &Rc<RefCell<EntityState>>,
                           cur_x: i32, cur_y: i32) -> Option<(i32, i32)> {
-        let to_ignore = vec![entity.borrow().index];
+        let to_ignore = vec![entity.borrow().index()];
         for radius in 1..=3 {
             for y in -radius..=radius {
                 for x in -radius..=radius {
@@ -1054,7 +1054,7 @@ impl AreaState {
     #[must_use]
     pub fn remove_entity(&mut self, entity: &Rc<RefCell<EntityState>>) -> HashSet<usize> {
         let entity = entity.borrow();
-        let index = entity.index;
+        let index = entity.index();
         trace!("Removing entity '{}' with index '{}'", entity.actor.actor.name, index);
         let x = entity.location.x;
         let y = entity.location.y;

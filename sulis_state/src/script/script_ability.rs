@@ -34,7 +34,7 @@ pub struct ScriptAbilitySet {
 
 impl ScriptAbilitySet {
     pub fn from(entity: &Rc<RefCell<EntityState>>) -> ScriptAbilitySet {
-        let parent = entity.borrow().index;
+        let parent = entity.borrow().index();
         let mut abilities = Vec::new();
         for (id, _) in entity.borrow().actor.ability_states.iter() {
             let ability = Module::ability(id).unwrap();

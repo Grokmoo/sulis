@@ -367,7 +367,7 @@ fn apply(effect_data: &ScriptEffect) -> Result<()> {
             }
 
             let entity = mgr.borrow().entity(*parent);
-            effect.set_owning_entity(entity.borrow().index);
+            effect.set_owning_entity(entity.borrow().index());
             info!("Apply effect to '{}' with duration {}", entity.borrow().actor.actor.name, duration);
             mgr.borrow_mut().add_effect(effect, &entity, cbs, marked);
         },

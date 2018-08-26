@@ -26,11 +26,11 @@ use sulis_core::io::GraphicsRenderer;
 use sulis_core::ui::{color, Color};
 use sulis_core::util::{Point, invalid_data_error};
 use sulis_rules::HitKind;
-use sulis_module::{actor::Faction, Actor, ObjectSize, ObjectSizeIterator, Module};
+use sulis_module::{actor::Faction, Actor, ObjectSize, ObjectSizeIterator, Module, ai};
 use sulis_module::area::{MAX_AREA_SIZE, Transition};
 use {ActorState, AreaState, ChangeListenerList, EntityTextureCache, EntityTextureSlot,
     GameState, Location, PropState, ScriptCallback};
-use script::{CallbackData, ScriptEntitySet};
+use script::{self, CallbackData, ScriptEntitySet};
 use animation::{self, Anim};
 use save_state::EntitySaveState;
 
@@ -48,13 +48,14 @@ pub struct EntityState {
     pub actor: ActorState,
     pub location: Location,
     pub size: Rc<ObjectSize>,
-    pub index: usize, // index in vec of the owning area state
+    index: usize, // index in vec of the owning manager
     pub sub_pos: (f32, f32),
     pub color: Color,
     pub color_sec: Color,
     pub listeners: ChangeListenerList<EntityState>,
 
     ai_state: AIState,
+    ai_callbacks: Option<Rc<CallbackData>>,
     pub(crate) marked_for_removal: bool,
     texture_cache_slot: Option<EntityTextureSlot>,
 
@@ -101,6 +102,7 @@ impl EntityState {
 
         Ok(EntityState {
             actor,
+            ai_callbacks: None,
             location,
             size,
             index: save.index,
@@ -134,6 +136,7 @@ impl EntityState {
         let actor_state = ActorState::new(actor);
         EntityState {
             actor: actor_state,
+            ai_callbacks: None,
             location,
             sub_pos: (0.0, 0.0),
             color: color::WHITE,
@@ -148,16 +151,44 @@ impl EntityState {
         }
     }
 
+    pub fn index(&self) -> usize {
+        self.index
+    }
+
+    pub fn set_index(&mut self, index: usize) {
+        self.index = index;
+        if let Some(ref ai) = self.actor.actor.ai {
+            let mut cbs = CallbackData::new_entity(self.index);
+            for (kind, func) in ai.hooks.iter() {
+                let func = func.to_string();
+                let result = match kind {
+                    ai::FuncKind::OnDamaged => cbs.add_func(script::FuncKind::OnDamaged, func),
+                    ai::FuncKind::BeforeAttack => cbs.add_func(script::FuncKind::BeforeAttack, func),
+                    ai::FuncKind::AfterAttack => cbs.add_func(script::FuncKind::AfterAttack, func),
+                    ai::FuncKind::BeforeDefense => cbs.add_func(script::FuncKind::BeforeDefense, func),
+                };
+                result.unwrap();
+            }
+            self.ai_callbacks = Some(Rc::new(cbs));
+        }
+    }
+
     pub fn callbacks(&self) -> Vec<Rc<CallbackData>> {
         let mgr = GameState::turn_manager();
         let mgr = mgr.borrow();
-        self.actor.effects_iter().flat_map(|index| {
+        let mut result: Vec<_> = self.actor.effects_iter().flat_map(|index| {
             if let Some(effect) = mgr.effect_checked(*index) {
                 effect.callbacks()
             } else {
                 Vec::new()
             }
-        }).collect()
+        }).collect();
+
+        if let Some(ref cb) = self.ai_callbacks {
+            result.push(Rc::clone(cb));
+        }
+
+        result
     }
 
     pub fn custom_flags<'a>(&'a self) -> impl Iterator<Item=(&String, &String)> {

@@ -27,7 +27,7 @@ use sulis_core::util::{unable_to_create_error};
 use sulis_core::{serde_yaml};
 use sulis_rules::AttributeList;
 
-use {Ability, Class, Conversation, ImageLayer, ImageLayerSet, InventoryBuilder,
+use {Ability, AITemplate, Class, Conversation, ImageLayer, ImageLayerSet, InventoryBuilder,
     LootList, Module, Race};
 
 #[derive(Deserialize, Serialize, Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -99,7 +99,7 @@ pub struct Actor {
     pub reward: Option<Reward>,
     pub abilities: Vec<OwnedAbility>,
 
-    pub ai: Option<String>,
+    pub ai: Option<Rc<AITemplate>>,
 }
 
 impl PartialEq for Actor {
@@ -276,11 +276,11 @@ impl Actor {
         let ai = match builder.ai {
             None => None,
             Some(id) => {
-                match resources.scripts.get(&id) {
+                match resources.ai_templates.get(&id) {
                     None => {
-                        warn!("No script found with id '{}'", id);
+                        warn!("No AI template found with id '{}'", id);
                         return unable_to_create_error("actor", &builder.id);
-                    }, Some(ref script) => Some(script.to_string()),
+                    }, Some(ref ai) => Some(Rc::clone(ai)),
                 }
             }
         };

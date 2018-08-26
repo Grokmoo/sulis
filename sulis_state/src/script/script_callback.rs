@@ -43,7 +43,7 @@ pub fn fire_on_moved_in_surface(cbs: Vec<(Rc<CallbackData>, usize)>) {
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialOrd, Ord, Hash, PartialEq, Eq, Debug)]
 #[serde(deny_unknown_fields)]
-enum FuncKind {
+pub enum FuncKind {
     OnDamaged,
     BeforeAttack,
     AfterAttack,
@@ -85,6 +85,7 @@ enum Kind {
     Item(String), // callback is based on an item ID, not a particular
                   // slot - this allows creating callbacks after the
                   // consumable items has been used
+    Entity,
 }
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
@@ -104,7 +105,7 @@ impl CallbackData {
         match entities.get(&self.parent) {
             None => {
                 return invalid_data_error(&format!("Invalid parent {} for callback", self.parent));
-            }, Some(ref entity) => self.parent = entity.borrow().index,
+            }, Some(ref entity) => self.parent = entity.borrow().index(),
         }
 
         if let Some(ref mut targets) = &mut self.targets {
@@ -137,13 +138,23 @@ impl CallbackData {
         }
     }
 
+    pub fn new_entity(parent: usize) -> CallbackData {
+        CallbackData {
+            parent,
+            effect: None,
+            kind: Kind::Entity,
+            targets: None,
+            funcs: HashMap::new(),
+        }
+    }
+
     // functions used in setting up the data
 
     pub(crate) fn set_effect(&mut self, index: usize) {
         self.effect = Some(index);
     }
 
-    fn add_func(&mut self, kind: FuncKind, name: String) -> Result<()> {
+    pub fn add_func(&mut self, kind: FuncKind, name: String) -> Result<()> {
         self.funcs.insert(kind, name);
         Ok(())
     }
@@ -189,7 +200,10 @@ impl CallbackData {
             Kind::Item(id) => {
                 GameState::execute_item_script(&parent, ScriptItemKind::WithID(id.to_string()),
                     targets, &func);
-            }
+            },
+            Kind::Entity => {
+                GameState::execute_entity_script(&parent, targets, &func);
+            },
         }
     }
 
@@ -212,6 +226,10 @@ impl CallbackData {
             Kind::Item(id) => {
                 GameState::execute_item_with_attack_data(&parent,
                     ScriptItemKind::WithID(id.to_string()), targets, hit_kind, damage, &func);
+            },
+            Kind::Entity => {
+                GameState::execute_entity_with_attack_data(&parent, targets, hit_kind, damage,
+                                                           &func);
             }
         }
     }
@@ -389,5 +407,8 @@ impl UserData for ScriptHitKind {
         methods.add_method("is_hit", |_, hit, ()| Ok(hit.kind == HitKind::Hit));
         methods.add_method("is_crit", |_, hit, ()| Ok(hit.kind == HitKind::Crit));
         methods.add_method("total_damage", |_, hit, ()| Ok(hit.damage));
+        methods.add_method("kind", |_, hit, ()| {
+            Ok(format!("{:?}", hit.kind))
+        });
     }
 }

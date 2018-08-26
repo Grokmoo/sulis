@@ -62,12 +62,12 @@ impl SaveState {
 
         let mut party = Vec::new();
         for entity in GameState::party().iter() {
-            party.push(entity.borrow().index);
+            party.push(entity.borrow().index());
         }
 
         let mut selected = Vec::new();
         for entity in GameState::selected().iter() {
-            selected.push(entity.borrow().index);
+            selected.push(entity.borrow().index());
         }
 
         let formation = GameState::party_formation();
@@ -428,7 +428,7 @@ impl EntitySaveState {
         }).collect();
 
         EntitySaveState {
-            index: entity.index,
+            index: entity.index(),
             actor: ActorSaveState::new(&entity.actor),
             location: LocationSaveState::new(&entity.location),
             size: entity.size.id.clone(),

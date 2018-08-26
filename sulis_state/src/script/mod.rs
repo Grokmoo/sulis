@@ -25,6 +25,7 @@ pub mod script_callback;
 pub use self::script_callback::CallbackData;
 pub use self::script_callback::ScriptCallback;
 pub use self::script_callback::ScriptHitKind;
+pub use self::script_callback::FuncKind;
 
 mod script_effect;
 use self::script_effect::ScriptEffect;
@@ -123,7 +124,7 @@ impl ScriptState {
     pub fn ai_script(&self, parent: &Rc<RefCell<EntityState>>, func: &str) -> Result<ai::State> {
         let script = match &parent.borrow().actor.actor.ai {
             None => unreachable!(),
-            Some(script) => script.clone(),
+            Some(ai_template) => ai_template.script(),
         };
 
         self.lua.globals().set("state", ai::State::End)?;
@@ -155,6 +156,34 @@ impl ScriptState {
         };
         targets.affected_points = affected_points.into_iter().map(|p| (p.x, p.y)).collect();
         self.item_script(parent, kind, targets, arg, func)
+    }
+
+    pub fn entity_script<'a, T>(&'a self, parent: &Rc<RefCell<EntityState>>,
+                                targets: ScriptEntitySet,
+                                arg: Option<(&str, T)>,
+                                func: &str) -> Result<()> where T: rlua::prelude::ToLua<'a> + Send {
+        self.lua.globals().set("targets", targets)?;
+
+        let script = match &parent.borrow().actor.actor.ai {
+            None => {
+                warn!("Script called for entity {} with no AI", parent.borrow().actor.actor.name);
+                return Err(rlua::Error::ToLuaConversionError {
+                    from: "Entity",
+                    to: "Script",
+                    message: Some(format!("No script found for entity")),
+                });
+            },
+            Some(ai_template) => ai_template.script(),
+        };
+
+        let mut args_string = "(parent, targets".to_string();
+        if let Some((arg_str, arg)) = arg {
+            args_string.push_str(", ");
+            args_string.push_str(arg_str);
+            self.lua.globals().set(arg_str, arg)?;
+        }
+        args_string.push(')');
+        self.execute_script(parent, &args_string, script.to_string(), func)
     }
 
     /// Runs a script on the given item, using the specified parent.  If `item_id` is None, then it
@@ -351,7 +380,7 @@ impl UserData for ScriptInterface {
             let area_state = area_state.borrow();
             let entity = entity.try_unwrap()?;
             let entity = entity.borrow();
-            let entities_to_ignore = vec![entity.index];
+            let entities_to_ignore = vec![entity.index()];
             Ok(area_state.is_passable(&entity, &entities_to_ignore, x, y))
         });
 
@@ -637,7 +666,7 @@ impl ScriptItem {
         };
 
         Ok(ScriptItem {
-            parent: parent.borrow().index,
+            parent: parent.borrow().index(),
             kind,
             id: item.item.id.to_string(),
             name: item.item.name.to_string(),

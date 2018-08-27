@@ -16,6 +16,14 @@ wall_rules:
     nw_postfix: "nw"
     sw_postfix: "sw"
 wall_kinds:
+  - id: roof_stone
+    base_tile: _outer_edge_s
+    fill_tile: _base
+    extended: [ building_stone ]
+  - id: roof_wood
+    base_tile: _outer_edge_s
+    fill_tile: _base
+    extended: [ building_wood ]
   - id: cliffs_dark
     base_tile: _outer_edge_s
     fill_tile: _base
@@ -538,6 +546,26 @@ uniform_sets:
     tiles: [
       rock_big, campfire_with_pot, stump
     ]
+  walls1by2impass:
+    layer: walls
+    size: [2, 4]
+    sprite_prefix: "tileset/"
+    impass: [[0, 0], [1, 0], [0, 1], [1, 1], [0, 2], [1, 2], [0, 3], [1, 3]]
+    invis: []
+    tiles: [
+      building_stone_outer_edge_sw, building_stone_outer_edge_s, building_stone_outer_edge_se,
+      building_wood_outer_edge_sw, building_wood_outer_edge_s, building_wood_outer_edge_se,
+      building_wood_variant1, building_wood_variant2, building_wood_variant3
+    ]
+  object1by2:
+    layer: object
+    size: [2, 4]
+    sprite_prefix: "tileset/"
+    impass: []
+    invis: []
+    tiles: [
+      window01, window02,
+    ]
   2by2prop:
     layer: prop
     size: [2, 2]
@@ -561,6 +589,62 @@ uniform_sets:
     invis: []
     tiles: [ well, barrels, nest_empty, nest, bonestack ]
 non_uniform_sets:
+  roof_wood:
+    layer: aerial
+    size: [2, 2]
+    sprite_prefix: "tileset/roof_wood_"
+    tiles:
+      base:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+        invis: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      outer_edge_nw:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      outer_edge_n:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      outer_edge_ne:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      outer_edge_w:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      outer_edge_e:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      outer_edge_sw:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      outer_edge_s:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      outer_edge_se:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      inner_edge_sw:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      inner_edge_se:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+  roof_stone:
+    layer: aerial
+    size: [2, 2]
+    sprite_prefix: "tileset/roof_stone_"
+    tiles:
+      base:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+        invis: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      outer_edge_nw:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      outer_edge_n:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      outer_edge_ne:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      outer_edge_w:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      outer_edge_e:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      outer_edge_sw:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      outer_edge_s:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      outer_edge_se:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      inner_edge_sw:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      inner_edge_se:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
   object:
     layer: object
     size: [2, 2]

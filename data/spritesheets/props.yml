@@ -98,6 +98,8 @@ groups:
       door_single_02_open: [22, 24, 2, 3]
       door_single_03_closed: [24, 24, 2, 3]
       door_single_03_open: [26, 24, 2, 3]
+      door_single_04_closed: [28, 24, 2, 3]
+      door_single_04_open: [30, 24, 2, 3]
   campfire:
     size: [2, 4]
     areas:

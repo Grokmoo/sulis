@@ -1,0 +1,12 @@
+id: building_door_01
+name: Door
+icon: inventory/misc_crate
+image: props/door_single_02
+size: 2by3
+impass: []
+invis: []
+interactive:
+  Door:
+    initially_open: false
+    closed_impass: []
+    closed_invis:  []

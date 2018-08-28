@@ -371,7 +371,8 @@ impl EntityState {
         }
 
         let targets = ScriptEntitySet::from_pair(entity, attacker);
-        entity.borrow().callbacks().iter().for_each(|cb| cb.on_damaged(&targets, hit_kind, hp_amount));
+        let cbs = entity.borrow().callbacks();
+        cbs.iter().for_each(|cb| cb.on_damaged(&targets, hit_kind, hp_amount));
     }
 
     pub fn move_to(&mut self, x: i32, y: i32, squares: u32) -> bool {

@@ -94,6 +94,7 @@ editor:
       - walls_top
       - prop
       - object
+      - walls_aerial
       - aerial
     elev_tiles:
       - gui/elev_lowest

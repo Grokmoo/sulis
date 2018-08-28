@@ -98,26 +98,28 @@ function check_move_for_attack(parent, target)
   return { attack=false, done=false }
 end
 
+--- Swaps weapon to mele is enemy is close and vice versa.
+-- This will force to use ranged weapon always when possible
+-- if entity has it.
 function check_swap_weapons(parent, hostiles)
-  if parent:inventory():weapon_style() ~= "Ranged" then
-    return { done=false }
-  end
+  has_secondary = parent:inventory():has_alt_weapons()
+  if has_secondary then
+    primary = parent:inventory():weapon_style()
+    secondary = parent:inventory():alt_weapon_style()
 
-  if hostiles:threatening():is_empty() then
-    return { done=false }
-  end
-
-  if not parent:inventory():has_alt_weapons() then
-    return { done=false }
-  end
-
-  if parent:inventory():alt_weapon_style() ~= "Ranged" then
-    if parent:swap_weapons() then
-      return { done=true }
+    if primary == "Ranged" and secondary ~= "Ranged" and not hostiles:threatening():is_empty() then
+      if parent:swap_weapons() then
+        return { done=true }
+      end
+    elseif primary ~= "Ranged" and secondary == "Ranged" and hostiles:threatening():is_empty() then
+      if parent:swap_weapons() then
+        return { done=true }
+      end
     end
   end
 
   return { done=false }
+
 end
 
 function find_and_use_item(parent, items, hostiles, friendlies, failed_use_count)

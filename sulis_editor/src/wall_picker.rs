@@ -147,7 +147,9 @@ impl WallPicker {
 
         if n && nw && ne { model.add_tile(&tiles.edges.outer_n, x, y - gh); }
 
-        if n && ne && e { model.add_tile(&tiles.edges.outer_ne, x + gw, y - gh); }
+        if n && ne && e {
+            model.add_tile(&tiles.edges.outer_ne, x + gw, y - gh);
+        }
 
         if e && ne && se { model.add_tile(&tiles.edges.outer_e, x + gw, y); }
         else if e && ne { model.add_tile(&tiles.edges.inner_ne, x + gw, y); }

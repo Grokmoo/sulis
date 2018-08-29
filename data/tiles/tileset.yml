@@ -2,7 +2,7 @@ id: tileset
 wall_rules:
   grid_width: 2
   grid_height: 2
-  layers: [ "walls", "walls_top" ]
+  layers: [ "walls", "walls_top", "walls_aerial" ]
   prefix: "tileset/"
   edges:
     inner_edge_postfix: "_inner_edge_"
@@ -590,7 +590,7 @@ uniform_sets:
     tiles: [ well, barrels, nest_empty, nest, bonestack ]
 non_uniform_sets:
   roof_wood:
-    layer: aerial
+    layer: walls_aerial
     size: [2, 2]
     sprite_prefix: "tileset/roof_wood_"
     tiles:
@@ -618,7 +618,7 @@ non_uniform_sets:
       inner_edge_se:
         impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
   roof_stone:
-    layer: aerial
+    layer: walls_aerial
     size: [2, 2]
     sprite_prefix: "tileset/roof_stone_"
     tiles:

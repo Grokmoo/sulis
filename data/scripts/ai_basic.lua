@@ -255,8 +255,8 @@ function find_heal_target(parent, targets)
   end
 end
 
--- Just finds the closest target for now
-function find_target(parent, targets)
+--- Finds the closest target.
+function find_closest_target(parent, targets)
   closest_dist = 1000
   closest_target = nil
 
@@ -272,10 +272,131 @@ function find_target(parent, targets)
   return closest_target
 end
 
--- OnDamaged script hook
-function on_damaged(parent, targets, hit)
-  target = targets:first()
+-- Find most wounded (less then 30% hp)
+function find_wounded_target(parent, targets)
+  hp_frac = 1.0
+  most_wounded = nil
 
-  -- game:log(parent:name() .. " damaged by " .. target:name() .. ": "
+  for i = 1, #targets do
+    stats = targets[i]:stats()
+    frac = stats.current_hp / stats.max_hp
+    if frac < hp_frac then
+      hp_frac = frac
+      most_wounded = targets[i]
+    end
+  end
+
+  if hp_frac < 0.3 then
+    game:log("WOUNDED: attacker: " .. parent:name() .. " enemy: " .. most_wounded:name() .. "(" .. hp_frac .. ")")
+    return most_wounded
+  else
+    return nil
+  end
+end
+
+--- Find weakest (least ammount of current_hp) 
+function find_weakest_target(parent, targets)
+  smallest_hp = 10000
+  weakest_target = nil
+
+  for i = 1, #targets do
+    health = targets[i]:stats().current_hp
+    if health < smallest_hp then
+      smallest_hp = health
+      weakest_target = targets[i]
+    end
+  end
+
+  return weakest_target
+end
+
+--- If entity have flag "target" find enemy name set in flag and attack it if possible.
+-- We can throw "else" statements out after this will setle down (no logging).
+function find_and_manage_target_flag(parent, targets)
+  if parent:has_flag("target") then
+    for i= 1, #targets do
+      if targets[i]:name() == parent:get_flag("target") then
+        rounds_left = tonumber(parent:get_flag("target_rounds"))
+        if rounds_left >= 1 then
+          is_visible = parent:dist_to_entity(targets[i]) < parent:vis_dist()
+          if targets[i]:is_valid() and is_visible then
+            parent:set_flag("target_rounds", tostring(rounds_left - 1))
+            game:log("TARGET FLAG: " .. parent:name() .. " remembers " .. targets[i]:name() .. " for " .. rounds_left)
+            return targets[i]
+          else
+            game:log("TARGET FLAG: lost target: " .. targets[i]:name() .. " vis: " ..
+              tostring(is_visible) .. " valid: " .. tostring(targets[i]:is_valid()))
+          end
+        else
+          game:log("TARGET FLAG: lost interest in " .. targets[i]:name())
+        end
+        parent:clear_flag("target")
+        parent:clear_flag("target_rounds")
+        return nil
+      end
+    end
+  end
+  return nil
+end
+
+--- Find target dispatcher.
+-- It decides which method use when determining target.
+-- TODO: use parent perception instead of random decision.
+function find_target(parent, targets)
+  flagged = find_and_manage_target_flag(parent, targets)
+  if flagged ~= nil then
+    return flagged
+  end
+
+  wounded = find_wounded_target(parent, targets)
+  if wounded ~= nil then
+    game:log("found wounded!")
+    return wounded
+  end
+
+  math.randomseed(os.time())
+  r = math.random()
+
+  if r <= 0.33 then 
+    closest = find_closest_target(parent, targets)
+    game:log("CLOSEST: attacker ".. parent:name() .. " enemy: " .. closest:name())
+    return closest
+  elseif (r > 0.33) and (r <= 0.44) then
+    -- get random target! :-)
+    math.randomseed(os.time()) 
+    i = math.random(1,#targets)
+    game:log("RANDOM: attacker " .. parent:name() .. " enemy: " .. targets[i]:name())
+    return targets[i]
+  else
+    weakest = find_weakest_target(parent, targets)
+    dist = parent:dist_to_entity(weakest)
+    visibility_dist = parent:vis_dist() / 2
+    if dist > visibility_dist then
+      closest = find_closest_target(parent, targets)
+      game:log("WEAKEST TOO FAR, SO CLOSEST: attacker: " .. parent:name() .. " enemy: " .. closest:name())
+      return closest
+    else
+      game:log("WEAKEST: attacker: " .. parent:name() .. " enemy: " .. weakest:name())
+      return weakest
+    end
+  end
+end
+
+
+
+--- OnDamaged script hook
+-- TODO: determine which attack is above normal, maybe critical + some higher number?
+-- Or remembering average hit in flag?
+function on_damaged(parent, targets, hit)
+  remember_for = 5 -- for how many attacks
+  attacker = targets:first() -- there is always only actual attacker in targets
+
+  -- game:log(parent:name() .. " damaged by " .. attacker:name() .. " : "
   --     .. hit:kind() .. " for " .. hit:total_damage() .. " damage.")
+  
+  if hit:total_damage() > 10 then
+    game:log("TARGET FLAG: set for " .. parent:name() .. ", attacker: " .. attacker:name() .. "(" .. remember_for .. ")")
+    parent:set_flag("target", attacker:name())
+    parent:set_flag("target_rounds", tostring(remember_for))
+  end
 end

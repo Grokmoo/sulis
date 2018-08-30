@@ -467,11 +467,23 @@ impl TurnManager {
     }
 
     pub fn add_entity(&mut self, entity: &Rc<RefCell<EntityState>>) -> usize {
+        {
+            let entity = entity.borrow();
+            let uid = entity.unique_id();
+            for other_entity in self.entity_iter() {
+                if uid == other_entity.borrow().unique_id() {
+                    warn!("Adding entity with duplicate unique ID '{}', this could cause script issues",
+                          uid);
+                    break;
+                }
+            }
+        }
+
         let entity_to_add = Rc::clone(entity);
         self.entities.push(Some(entity_to_add));
         let index = self.entities.len() - 1;
         self.order.push_back(Entry::Entity(index));
-        debug!("Added entity at {} to turn timer", index);
+        debug!("Added entity with unique id '{}' at {} to turn timer", entity.borrow().unique_id(), index);
 
         entity.borrow_mut().set_index(index);
         self.listeners.notify(&self);

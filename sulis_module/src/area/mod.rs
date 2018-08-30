@@ -70,6 +70,7 @@ pub struct Transition {
 pub struct ActorData {
     pub id: String,
     pub location: Point,
+    pub unique_id: Option<String>,
 }
 
 pub struct PropData {

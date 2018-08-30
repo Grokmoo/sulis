@@ -314,7 +314,33 @@ fn get_targeter() -> Result<Rc<RefCell<AreaTargeter>>> {
     }
 }
 
-struct ScriptInterface { }
+/// The ScriptInterface, accessible in all Lua scripts as the global `game`.
+/// The following methods are available on this object (documentation WIP):
+///
+/// # `entity_with_id(id) -> Table<ScriptEntity>`
+/// Returns a `ScriptEntity` object for the entity with the given unique
+/// id, if such an entity can be found.  Otherwise, returns the invalid `ScriptEntity`.  The ID is
+/// the unique id associated with the individual entity, which is typically the same as the actor
+/// ID for actors that are only used once, and is generated for encounter created actors.
+/// ## Examples
+/// ```lua
+///   entity = game:entity_with_id("id1")
+///   if not entity:is_valid() return end
+///   game:log("Found entity with name " .. entity:name())
+///```
+///
+/// # `entities_with_ids(ids) -> ScriptEntity`
+/// Returns a list of `ScriptEntity` objects for each of the specified
+/// ids that are found.  The list may be empty.  Also see `entity_with_id(id)`.
+/// ## Examples
+/// ```lua
+///  entities = game:entities_with_ids({"id1", "id2"})
+///  for i = 1, #entities do
+///    game:log("Found entity with name " .. entities[i]:name())
+///  end
+///
+/// ```
+pub struct ScriptInterface { }
 
 impl UserData for ScriptInterface {
     fn add_methods(methods: &mut UserDataMethods<Self>) {
@@ -724,7 +750,7 @@ fn entities_with_ids(ids: Vec<String>) -> Vec<ScriptEntity> {
         {
             let entity = entity.borrow();
             if !entity.location.is_in_area_id(&area_id) { continue; }
-            if !ids.contains(&entity.actor.actor.id) { continue; }
+            if !ids.iter().any(|uid| uid == entity.unique_id()) { continue; }
         }
 
         result.push(ScriptEntity::from(&entity));
@@ -738,7 +764,7 @@ fn entity_with_id(id: String) -> Option<Rc<RefCell<EntityState>>> {
     for entity in mgr.borrow().entity_iter() {
         {
             let entity = entity.borrow();
-            if entity.actor.actor.id != id { continue; }
+            if entity.unique_id() != &id { continue; }
         }
 
         return Some(entity)

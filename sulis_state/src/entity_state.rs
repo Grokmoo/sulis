@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::usize;
 use std::io::Error;
 use std::ptr;
 use std::rc::Rc;
@@ -48,7 +49,6 @@ pub struct EntityState {
     pub actor: ActorState,
     pub location: Location,
     pub size: Rc<ObjectSize>,
-    index: usize, // index in vec of the owning manager
     pub sub_pos: (f32, f32),
     pub color: Color,
     pub color_sec: Color,
@@ -60,6 +60,9 @@ pub struct EntityState {
     texture_cache_slot: Option<EntityTextureSlot>,
 
     custom_flags: HashMap<String, String>,
+
+    index: usize, // index in vec of the owning manager
+    unique_id: String, // assigned when setting the index and persisted on save
 }
 
 impl PartialEq for EntityState {
@@ -106,6 +109,7 @@ impl EntityState {
             location,
             size,
             index: save.index,
+            unique_id: save.unique_id,
             sub_pos: (0.0, 0.0),
             color: color::WHITE,
             color_sec: Color::new(0.0, 0.0, 0.0, 0.0),
@@ -117,8 +121,8 @@ impl EntityState {
         })
     }
 
-    pub(crate) fn new(actor: Rc<Actor>, location: Location,
-                      index: usize, is_pc: bool, ai_group: Option<usize>) -> EntityState {
+    pub(crate) fn new(actor: Rc<Actor>, unique_id: Option<String>, location: Location, is_pc: bool,
+                      ai_group: Option<usize>) -> EntityState {
         let ai_state = if is_pc {
             let dim = (MAX_AREA_SIZE * MAX_AREA_SIZE) as usize;
             AIState::Player {
@@ -129,6 +133,11 @@ impl EntityState {
                 group: ai_group,
                 active: false,
             }
+        };
+
+        let unique_id = match unique_id {
+            None => "".to_string(),
+            Some(val) => val,
         };
 
         debug!("Creating new entity state for {}", actor.id);
@@ -142,13 +151,18 @@ impl EntityState {
             color: color::WHITE,
             color_sec: Color::new(0.0, 0.0, 0.0, 0.0),
             size,
-            index,
+            index: usize::MAX,
+            unique_id: unique_id,
             listeners: ChangeListenerList::default(),
             marked_for_removal: false,
             ai_state,
             texture_cache_slot: None,
             custom_flags: HashMap::new(),
         }
+    }
+
+    pub fn unique_id(&self) -> &str {
+        &self.unique_id
     }
 
     pub fn index(&self) -> usize {
@@ -170,6 +184,10 @@ impl EntityState {
                 result.unwrap();
             }
             self.ai_callbacks = Some(Rc::new(cbs));
+        }
+
+        if self.unique_id.len() == 0 {
+            self.unique_id = format!("__uid__{}{}", self.actor.actor.id, index);
         }
     }
 

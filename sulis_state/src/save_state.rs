@@ -360,6 +360,7 @@ impl MerchantSaveState {
 #[serde(deny_unknown_fields)]
 pub struct EntitySaveState {
     pub(crate) index: usize,
+    pub(crate) unique_id: String,
     pub(crate) actor_base: Option<ActorBuilder>,
     pub(crate) actor: ActorSaveState,
     pub(crate) location: LocationSaveState,
@@ -428,6 +429,7 @@ impl EntitySaveState {
         }).collect();
 
         EntitySaveState {
+            unique_id: entity.unique_id().to_string(),
             index: entity.index(),
             actor: ActorSaveState::new(&entity.actor),
             location: LocationSaveState::new(&entity.location),

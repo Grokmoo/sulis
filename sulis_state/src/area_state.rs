@@ -214,9 +214,14 @@ impl AreaState {
                 Some(actor_data) => actor_data,
             };
 
+            let unique_id = match actor_data.unique_id {
+                None => actor_data.id.to_string(),
+                Some(ref uid) => uid.to_string(),
+            };
+
             let location = Location::from_point(&actor_data.location, &self.area);
             debug!("Adding actor '{}' at '{:?}'", actor.id, location);
-            match self.add_actor(actor, location, false, None) {
+            match self.add_actor(actor, location, Some(unique_id), false, None) {
                 Ok(_) => (),
                 Err(e) => {
                     warn!("Error adding actor to area: {}", e);
@@ -377,7 +382,7 @@ impl AreaState {
                 }, Some(location) => location,
             };
 
-            match self.add_actor(actor, location, false, Some(enc_index)) {
+            match self.add_actor(actor, location, None, false, Some(enc_index)) {
                 Ok(_) => (),
                 Err(e) => {
                     warn!("Error adding actor for spawned encounter: {}", e);
@@ -749,11 +754,11 @@ impl AreaState {
         self.props[index] = None;
     }
 
-    pub(crate) fn add_actor(&mut self, actor: Rc<Actor>, location: Location,
+    pub(crate) fn add_actor(&mut self, actor: Rc<Actor>, location: Location, unique_id: Option<String>,
                             is_pc: bool, ai_group: Option<usize>) -> Result<usize, Error> {
         let entity = Rc::new(RefCell::new(EntityState::new(actor,
+                                                           unique_id,
                                                            location.clone(),
-                                                           0,
                                                            is_pc,
                                                            ai_group)));
         match self.add_entity(entity, location) {

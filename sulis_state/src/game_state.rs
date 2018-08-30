@@ -279,7 +279,7 @@ impl GameState {
                                   "Unable to create starting location."));
         }
 
-        let index = match area_state.borrow_mut().add_actor(pc, location, true, None) {
+        let index = match area_state.borrow_mut().add_actor(pc, location, None, true, None) {
             Err(_) => {
                 error!("Player character starting location must be within bounds and passable.");
                 return invalid_data_error("Unable to add player character at starting location");

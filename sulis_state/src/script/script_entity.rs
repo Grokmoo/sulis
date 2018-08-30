@@ -523,6 +523,12 @@ impl UserData for ScriptEntity {
             Ok(entity.actor.actor.base_class().id.clone())
         });
 
+        methods.add_method("id", |_, entity, ()| {
+            let entity = entity.try_unwrap()?;
+            let entity = entity.borrow();
+            Ok(entity.unique_id().to_string())
+        });
+
         methods.add_method("name", |_, entity, ()| {
             let entity = entity.try_unwrap()?;
             let entity = entity.borrow();

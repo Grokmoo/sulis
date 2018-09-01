@@ -97,8 +97,8 @@ impl WidgetKind for AreaEditor {
 
     fn on_key_press(&mut self, _widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
         let delta = match key {
-            InputAction::ScrollUp => 1,
-            InputAction::ScrollDown => -1,
+            InputAction::ZoomIn => 1,
+            InputAction::ZoomOut => -1,
             _ => return false,
         };
 

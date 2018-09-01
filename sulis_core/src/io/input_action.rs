@@ -32,6 +32,10 @@ pub enum InputAction {
     EndTurn,
     ScrollUp,
     ScrollDown,
+    ScrollLeft,
+    ScrollRight,
+    ZoomIn,
+    ZoomOut,
     QuickSave,
     SelectAll,
     Exit,
@@ -59,9 +63,9 @@ impl InputAction {
             MouseUp(kind) => Cursor::release(root, kind),
             MouseScroll(scroll) => {
                 if scroll > 0 {
-                    InputAction::fire_action(ScrollUp, root);
+                    InputAction::fire_action(ZoomIn, root);
                 } else {
-                    InputAction::fire_action(ScrollDown, root);
+                    InputAction::fire_action(ZoomOut, root);
                 }
             },
             CharReceived(c) => {

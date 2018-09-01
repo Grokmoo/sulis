@@ -28,14 +28,23 @@ use sulis_widgets::{Button, Label, ScrollPane};
 
 use main_menu::MainMenu;
 
+enum Tab {
+    Display,
+    Input,
+}
+
 pub struct Options {
     display_confs: Vec<DisplayConfiguration>,
+
+    cur_tab: Tab,
 
     cur_display_mode: DisplayMode,
     cur_display_conf: usize,
     cur_ui_scale: (i32, i32),
     cur_resolution: (u32, u32),
     cur_anim_speed: u32,
+    cur_scroll_speed: f32,
+    cur_edge_scrolling: bool,
     cur_keybindings: Vec<(Key, InputAction)>,
 }
 
@@ -54,10 +63,15 @@ impl Options {
 
         Rc::new(RefCell::new(Options {
             display_confs,
+
+            cur_tab: Tab::Display,
+
             cur_display_mode: config.display.mode,
             cur_display_conf,
             cur_resolution: (config.display.width_pixels, config.display.height_pixels),
             cur_anim_speed: config.display.animation_base_time_millis,
+            cur_scroll_speed: config.input.scroll_speed,
+            cur_edge_scrolling: config.input.edge_scrolling,
             cur_ui_scale: (config.display.width, config.display.height),
             cur_keybindings,
         }))
@@ -96,6 +110,8 @@ impl Options {
         config.display.width = self.cur_ui_scale.0;
         config.display.height = self.cur_ui_scale.1;
 
+        config.input.scroll_speed = self.cur_scroll_speed;
+        config.input.edge_scrolling = self.cur_edge_scrolling;
         config.input.keybindings.clear();
         for (k, v) in self.cur_keybindings.iter() {
             config.input.keybindings.insert(*k, *v);
@@ -113,11 +129,252 @@ impl Options {
 
         Config::set(config);
     }
+
+    fn add_display_widgets(&mut self) -> Vec<Rc<RefCell<Widget>>> {
+        let mode_title = Widget::with_theme(Label::empty(), "mode_title");
+
+        let mode_content = Widget::empty("mode_content");
+
+        let mode_window = Widget::with_theme(Button::empty(), "mode_window");
+        mode_window.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+            let parent = Widget::go_up_tree(widget, 3);
+            let options = Widget::downcast_kind_mut::<Options>(&parent);
+            options.cur_display_mode = DisplayMode::Window;
+            parent.borrow_mut().invalidate_children();
+        })));
+        let mode_borderless = Widget::with_theme(Button::empty(), "mode_borderless");
+        mode_borderless.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+            let parent = Widget::go_up_tree(widget, 3);
+            let options = Widget::downcast_kind_mut::<Options>(&parent);
+            options.cur_display_mode = DisplayMode::BorderlessWindow;
+            parent.borrow_mut().invalidate_children();
+        })));
+
+        match self.cur_display_mode {
+            DisplayMode::Window => mode_window.borrow_mut().state.set_active(true),
+            DisplayMode::BorderlessWindow => mode_borderless.borrow_mut().state.set_active(true),
+            DisplayMode::Fullscreen =>
+                info!("Display mode is fullscreen, which is a non-standard option."),
+        }
+
+        Widget::add_child_to(&mode_content, mode_window);
+        Widget::add_child_to(&mode_content, mode_borderless);
+
+        let monitor_title = Widget::with_theme(Label::empty(), "monitor_title");
+
+        let monitor_content = Widget::empty("monitor_content");
+
+        let monitor_label = Widget::with_theme(Label::empty(), "monitor_label");
+        let name = self.display_confs[self.cur_display_conf].name.to_string();
+        monitor_label.borrow_mut().state.add_text_arg("monitor", &name);
+        let next_monitor = Widget::with_theme(Button::empty(), "next_monitor");
+        next_monitor.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+            let parent = Widget::go_up_tree(widget, 3);
+            let options = Widget::downcast_kind_mut::<Options>(&parent);
+
+            if options.cur_display_conf == options.display_confs.len() - 1 {
+                options.cur_display_conf = 0;
+            } else {
+                options.cur_display_conf += 1;
+            }
+
+            parent.borrow_mut().invalidate_children();
+        })));
+        if self.display_confs.len() == 1 {
+            next_monitor.borrow_mut().state.set_enabled(false);
+        }
+
+        Widget::add_child_to(&monitor_content, monitor_label);
+        Widget::add_child_to(&monitor_content, next_monitor);
+
+        let resolution_title = Widget::with_theme(Label::empty(), "resolution_title");
+
+        let scrollpane = ScrollPane::new();
+        let resolution_pane = Widget::with_theme(scrollpane.clone(), "resolution_pane");
+        let mut resolution_found = false;
+        for (w, h) in self.display_confs[self.cur_display_conf].resolutions.iter() {
+            let (w, h) = (*w, *h);
+            let button = Widget::with_theme(Button::empty(), "resolution_button");
+            button.borrow_mut().state.add_text_arg("width", &w.to_string());
+            button.borrow_mut().state.add_text_arg("height", &h.to_string());
+
+            button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
+                let parent = Widget::go_up_tree(widget, 4);
+                let options = Widget::downcast_kind_mut::<Options>(&parent);
+                options.cur_resolution = (w, h);
+                parent.borrow_mut().invalidate_children();
+            })));
+
+
+            if w == self.cur_resolution.0 && h == self.cur_resolution.1 {
+                button.borrow_mut().state.set_active(true);
+                resolution_found = true;
+            }
+
+            scrollpane.borrow().add_to_content(button);
+        }
+
+        if !resolution_found {
+            info!("Screen resolution is set to {},{} which is non-standard",
+                  self.cur_resolution.0, self.cur_resolution.1);
+        }
+
+        let ui_scale_title = Widget::with_theme(Label::empty(), "ui_scale_title");
+
+        let ui_scale_content = Widget::empty("ui_scale_content");
+
+        let (ui_width, ui_height) = (self.cur_ui_scale.0, self.cur_ui_scale.1);
+        let normal = Widget::with_theme(Button::empty(), "normal");
+        normal.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+            let parent = Widget::go_up_tree(widget, 3);
+            let options = Widget::downcast_kind_mut::<Options>(&parent);
+            options.cur_ui_scale = UI_SCALE_NORMAL;
+            parent.borrow_mut().invalidate_children();
+        })));
+
+        let small = Widget::with_theme(Button::empty(), "small");
+        small.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+            let parent = Widget::go_up_tree(widget, 3);
+            let options = Widget::downcast_kind_mut::<Options>(&parent);
+            options.cur_ui_scale = UI_SCALE_SMALL;
+            parent.borrow_mut().invalidate_children();
+        })));
+
+        if ui_width == UI_SCALE_NORMAL.0 && ui_height == UI_SCALE_NORMAL.1 {
+            normal.borrow_mut().state.set_active(true);
+        } else if ui_width == UI_SCALE_SMALL.0 && ui_height == UI_SCALE_SMALL.1 {
+            small.borrow_mut().state.set_active(true);
+        } else {
+            info!("UI Scale is set to {},{} which is a nonstandard value", ui_width, ui_height);
+        }
+
+        Widget::add_child_to(&ui_scale_content, normal);
+        Widget::add_child_to(&ui_scale_content, small);
+
+        let anim_speed_title = Widget::with_theme(Label::empty(), "anim_speed_title");
+
+        let anim_speed_content = Widget::empty("anim_speed_content");
+        let mut speed_found = false;
+        for speed in ANIM_SPEEDS.iter() {
+            let speed = *speed;
+            let button = Widget::with_theme(Button::empty(), "speed_button");
+            button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
+                let parent = Widget::go_up_tree(widget, 3);
+                let options = Widget::downcast_kind_mut::<Options>(&parent);
+                options.cur_anim_speed = speed;
+                parent.borrow_mut().invalidate_children();
+            })));
+            if speed == self.cur_anim_speed {
+                button.borrow_mut().state.set_active(true);
+                speed_found = true;
+            }
+
+            Widget::add_child_to(&anim_speed_content, button);
+        }
+
+        if !speed_found {
+            info!("Animation speed is set to {} which is a nonstandard value",
+                  self.cur_anim_speed);
+        }
+
+        let slow_label = Widget::with_theme(Label::empty(), "anim_speed_slow");
+        let fast_label = Widget::with_theme(Label::empty(), "anim_speed_fast");
+
+        vec![mode_title, mode_content, monitor_title, monitor_content,
+            resolution_title, resolution_pane, ui_scale_title, ui_scale_content,
+            slow_label, fast_label, anim_speed_title, anim_speed_content]
+    }
+
+    fn add_input_widgets(&mut self) -> Vec<Rc<RefCell<Widget>>> {
+        let scroll_speed_title = Widget::with_theme(Label::empty(), "scroll_speed_title");
+
+        let scroll_speed_content = Widget::empty("scroll_speed_content");
+        let mut speed_found = false;
+        for speed in SCROLL_SPEEDS.iter() {
+            let speed = *speed;
+            let button = Widget::with_theme(Button::empty(), "speed_button");
+            button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
+                let parent = Widget::go_up_tree(widget, 3);
+                let options = Widget::downcast_kind_mut::<Options>(&parent);
+                options.cur_scroll_speed = speed;
+                parent.borrow_mut().invalidate_children();
+            })));
+            if speed == self.cur_scroll_speed {
+                button.borrow_mut().state.set_active(true);
+                speed_found = true;
+            }
+
+            Widget::add_child_to(&scroll_speed_content, button);
+        }
+
+        if !speed_found {
+            info!("Scroll speed is set to {} which is a nonstandard value",
+                  self.cur_scroll_speed);
+        }
+
+        let slow_label = Widget::with_theme(Label::empty(), "scroll_speed_slow");
+        let fast_label = Widget::with_theme(Label::empty(), "scroll_speed_fast");
+
+        let edge_scroll_content = Widget::empty("edge_scroll_content");
+        let edge_scroll_label = Widget::with_theme(Label::empty(), "label");
+        Widget::add_child_to(&edge_scroll_content, edge_scroll_label);
+
+        let edge_scroll_on = Widget::with_theme(Button::empty(), "on");
+        edge_scroll_on.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+            let parent = Widget::go_up_tree(widget, 3);
+            let options = Widget::downcast_kind_mut::<Options>(&parent);
+            options.cur_edge_scrolling = true;
+            parent.borrow_mut().invalidate_children();
+        })));
+        let edge_scroll_off = Widget::with_theme(Button::empty(), "off");
+        edge_scroll_off.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+            let parent = Widget::go_up_tree(widget, 3);
+            let options = Widget::downcast_kind_mut::<Options>(&parent);
+            options.cur_edge_scrolling = false;
+            parent.borrow_mut().invalidate_children();
+        })));
+        if self.cur_edge_scrolling {
+            edge_scroll_on.borrow_mut().state.set_active(true);
+        } else {
+            edge_scroll_off.borrow_mut().state.set_active(true);
+        }
+
+        Widget::add_child_to(&edge_scroll_content, edge_scroll_on);
+        Widget::add_child_to(&edge_scroll_content, edge_scroll_off);
+
+        let keybindings_title = Widget::with_theme(Label::empty(), "keybindings_title");
+
+        let scrollpane = ScrollPane::new();
+        let keybindings_pane = Widget::with_theme(scrollpane.clone(), "keybindings_pane");
+        for (key, action) in self.cur_keybindings.iter() {
+            let key_button = Widget::with_theme(Button::empty(), "key_button");
+            key_button.borrow_mut().state.add_text_arg("key", &format!("{:?}", key));
+
+            let action_ref = action.clone();
+            key_button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
+                let parent = Widget::go_up_tree(widget, 4);
+
+                let root = Widget::get_root(widget);
+                let popup = KeybindingPopup::new(action_ref.clone(), parent);
+                Widget::add_child_to(&root, Widget::with_defaults(popup));
+            })));
+
+            let action_label= Widget::with_theme(Label::empty(), "action_label");
+            action_label.borrow_mut().state.add_text_arg("action", &format!("{:?}", action));
+
+            scrollpane.borrow().add_to_content(key_button);
+            scrollpane.borrow().add_to_content(action_label);
+        }
+
+        vec![scroll_speed_title, scroll_speed_content, fast_label,
+            slow_label, keybindings_title, keybindings_pane, edge_scroll_content]
+    }
 }
 
 const UI_SCALE_NORMAL: (i32, i32) = (320, 180);
 const UI_SCALE_SMALL: (i32, i32) = (368, 207);
 const ANIM_SPEEDS: [u32; 5] = [75, 50, 35, 25, 15];
+const SCROLL_SPEEDS: [f32; 7] = [0.75, 1.0, 1.5, 2.25, 3.5, 5.0, 7.0];
 
 impl WidgetKind for Options {
     widget_kind!("options_window");
@@ -155,201 +412,38 @@ impl WidgetKind for Options {
             root.borrow_mut().invalidate_children();
         })));
 
+        let display = Widget::with_theme(Button::empty(), "display");
+        display.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+            let parent = Widget::get_parent(widget);
+            let options = Widget::downcast_kind_mut::<Options>(&parent);
+            options.cur_tab = Tab::Display;
+            parent.borrow_mut().invalidate_children();
+        })));
+
+        let input = Widget::with_theme(Button::empty(), "input");
+        input.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+            let parent = Widget::get_parent(widget);
+            let options = Widget::downcast_kind_mut::<Options>(&parent);
+            options.cur_tab = Tab::Input;
+            parent.borrow_mut().invalidate_children();
+        })));
+
         let content = Widget::empty("content");
 
-        let mode_title = Widget::with_theme(Label::empty(), "mode_title");
-        Widget::add_child_to(&content, mode_title);
-
-        let mode_content = Widget::empty("mode_content");
-
-        let mode_window = Widget::with_theme(Button::empty(), "mode_window");
-        mode_window.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::go_up_tree(widget, 3);
-            let options = Widget::downcast_kind_mut::<Options>(&parent);
-            options.cur_display_mode = DisplayMode::Window;
-            parent.borrow_mut().invalidate_children();
-        })));
-        let mode_borderless = Widget::with_theme(Button::empty(), "mode_borderless");
-        mode_borderless.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::go_up_tree(widget, 3);
-            let options = Widget::downcast_kind_mut::<Options>(&parent);
-            options.cur_display_mode = DisplayMode::BorderlessWindow;
-            parent.borrow_mut().invalidate_children();
-        })));
-
-        match self.cur_display_mode {
-            DisplayMode::Window => mode_window.borrow_mut().state.set_active(true),
-            DisplayMode::BorderlessWindow => mode_borderless.borrow_mut().state.set_active(true),
-            DisplayMode::Fullscreen =>
-                info!("Display mode is fullscreen, which is a non-standard option."),
-        }
-
-        Widget::add_child_to(&mode_content, mode_window);
-        Widget::add_child_to(&mode_content, mode_borderless);
-
-        Widget::add_child_to(&content, mode_content);
-
-        let monitor_title = Widget::with_theme(Label::empty(), "monitor_title");
-        Widget::add_child_to(&content, monitor_title);
-
-        let monitor_content = Widget::empty("monitor_content");
-
-        let monitor_label = Widget::with_theme(Label::empty(), "monitor_label");
-        let name = self.display_confs[self.cur_display_conf].name.to_string();
-        monitor_label.borrow_mut().state.add_text_arg("monitor", &name);
-        let next_monitor = Widget::with_theme(Button::empty(), "next_monitor");
-        next_monitor.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::go_up_tree(widget, 3);
-            let options = Widget::downcast_kind_mut::<Options>(&parent);
-
-            if options.cur_display_conf == options.display_confs.len() - 1 {
-                options.cur_display_conf = 0;
-            } else {
-                options.cur_display_conf += 1;
+        let widgets = match self.cur_tab {
+            Tab::Display => {
+                display.borrow_mut().state.set_active(true);
+                self.add_display_widgets()
+            },
+            Tab::Input => {
+                input.borrow_mut().state.set_active(true);
+                self.add_input_widgets()
             }
+        };
 
-            parent.borrow_mut().invalidate_children();
-        })));
-        if self.display_confs.len() == 1 {
-            next_monitor.borrow_mut().state.set_enabled(false);
-        }
+        Widget::add_children_to(&content, widgets);
 
-        Widget::add_child_to(&monitor_content, monitor_label);
-        Widget::add_child_to(&monitor_content, next_monitor);
-
-        Widget::add_child_to(&content, monitor_content);
-
-        let resolution_title = Widget::with_theme(Label::empty(), "resolution_title");
-        Widget::add_child_to(&content, resolution_title);
-
-        let scrollpane = ScrollPane::new();
-        let resolution_pane = Widget::with_theme(scrollpane.clone(), "resolution_pane");
-        let mut resolution_found = false;
-        for (w, h) in self.display_confs[self.cur_display_conf].resolutions.iter() {
-            let (w, h) = (*w, *h);
-            let button = Widget::with_theme(Button::empty(), "resolution_button");
-            button.borrow_mut().state.add_text_arg("width", &w.to_string());
-            button.borrow_mut().state.add_text_arg("height", &h.to_string());
-
-            button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let parent = Widget::go_up_tree(widget, 4);
-                let options = Widget::downcast_kind_mut::<Options>(&parent);
-                options.cur_resolution = (w, h);
-                parent.borrow_mut().invalidate_children();
-            })));
-
-
-            if w == self.cur_resolution.0 && h == self.cur_resolution.1 {
-                button.borrow_mut().state.set_active(true);
-                resolution_found = true;
-            }
-
-            scrollpane.borrow().add_to_content(button);
-        }
-
-        if !resolution_found {
-            info!("Screen resolution is set to {},{} which is non-standard",
-                  self.cur_resolution.0, self.cur_resolution.1);
-        }
-
-        Widget::add_child_to(&content, resolution_pane);
-
-        let ui_scale_title = Widget::with_theme(Label::empty(), "ui_scale_title");
-        Widget::add_child_to(&content, ui_scale_title);
-
-        let ui_scale_content = Widget::empty("ui_scale_content");
-
-        let (ui_width, ui_height) = (self.cur_ui_scale.0, self.cur_ui_scale.1);
-        let normal = Widget::with_theme(Button::empty(), "normal");
-        normal.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::go_up_tree(widget, 3);
-            let options = Widget::downcast_kind_mut::<Options>(&parent);
-            options.cur_ui_scale = UI_SCALE_NORMAL;
-            parent.borrow_mut().invalidate_children();
-        })));
-
-        let small = Widget::with_theme(Button::empty(), "small");
-        small.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::go_up_tree(widget, 3);
-            let options = Widget::downcast_kind_mut::<Options>(&parent);
-            options.cur_ui_scale = UI_SCALE_SMALL;
-            parent.borrow_mut().invalidate_children();
-        })));
-
-        if ui_width == UI_SCALE_NORMAL.0 && ui_height == UI_SCALE_NORMAL.1 {
-            normal.borrow_mut().state.set_active(true);
-        } else if ui_width == UI_SCALE_SMALL.0 && ui_height == UI_SCALE_SMALL.1 {
-            small.borrow_mut().state.set_active(true);
-        } else {
-            info!("UI Scale is set to {},{} which is a nonstandard value", ui_width, ui_height);
-        }
-
-        Widget::add_child_to(&ui_scale_content, normal);
-        Widget::add_child_to(&ui_scale_content, small);
-
-        Widget::add_child_to(&content, ui_scale_content);
-
-        let anim_speed_title = Widget::with_theme(Label::empty(), "anim_speed_title");
-        Widget::add_child_to(&content, anim_speed_title);
-
-        let anim_speed_content = Widget::empty("anim_speed_content");
-        let mut speed_found = false;
-        for speed in ANIM_SPEEDS.iter() {
-            let speed = *speed;
-            let button = Widget::with_theme(Button::empty(), "speed_button");
-            button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let parent = Widget::go_up_tree(widget, 3);
-                let options = Widget::downcast_kind_mut::<Options>(&parent);
-                options.cur_anim_speed = speed;
-                parent.borrow_mut().invalidate_children();
-            })));
-            if speed == self.cur_anim_speed {
-                button.borrow_mut().state.set_active(true);
-                speed_found = true;
-            }
-
-            Widget::add_child_to(&anim_speed_content, button);
-        }
-
-        if !speed_found {
-            info!("Animation speed is set to {} which is a nonstandard value",
-                  self.cur_anim_speed);
-        }
-
-        let slow_label = Widget::with_theme(Label::empty(), "anim_speed_slow");
-        let fast_label = Widget::with_theme(Label::empty(), "anim_speed_fast");
-        Widget::add_child_to(&content, slow_label);
-        Widget::add_child_to(&content, fast_label);
-
-        Widget::add_child_to(&content, anim_speed_content);
-
-        let keybindings_title = Widget::with_theme(Label::empty(), "keybindings_title");
-        Widget::add_child_to(&content, keybindings_title);
-
-        let keybindings_content = Widget::empty("keybindings_content");
-        for (key, action) in self.cur_keybindings.iter() {
-            let key_button = Widget::with_theme(Button::empty(), "key_button");
-            key_button.borrow_mut().state.add_text_arg("key", &format!("{:?}", key));
-
-            let action_ref = action.clone();
-            key_button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let parent = Widget::go_up_tree(widget, 3);
-
-                let root = Widget::get_root(widget);
-                let popup = KeybindingPopup::new(action_ref.clone(), parent);
-                Widget::add_child_to(&root, Widget::with_defaults(popup));
-            })));
-
-            let action_label= Widget::with_theme(Label::empty(), "action_label");
-            action_label.borrow_mut().state.add_text_arg("action", &format!("{:?}", action));
-
-            Widget::add_child_to(&keybindings_content, key_button);
-            Widget::add_child_to(&keybindings_content, action_label);
-        }
-
-        Widget::add_child_to(&content, keybindings_content);
-
-        vec![title, apply, cancel, reset, content]
+        vec![title, apply, cancel, reset, content, display, input]
     }
 }
 
@@ -399,3 +493,4 @@ impl WidgetKind for KeybindingPopup {
         vec![title]
     }
 }
+

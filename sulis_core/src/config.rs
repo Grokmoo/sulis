@@ -133,7 +133,13 @@ impl Config {
         })
     }
 
+    pub fn scroll_speed() -> f32 {
+        CONFIG.with(|c| c.borrow().input.scroll_speed)
+    }
 
+    pub fn edge_scrolling() -> bool {
+        CONFIG.with(|c| c.borrow().input.edge_scrolling)
+    }
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
@@ -215,6 +221,8 @@ pub struct ResourcesConfig {
 #[derive(Debug, Deserialize, Serialize, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct InputConfig {
+    pub edge_scrolling: bool,
+    pub scroll_speed: f32,
     pub keybindings: HashMap<Key, InputAction>
 }
 

@@ -464,6 +464,13 @@ impl AreaView {
         self.area_mouseover = None;
         self.area_mouseover_widget = None;
     }
+
+    pub fn scroll(&mut self, delta_x: f32, delta_y: f32) {
+        let speed = Config::scroll_speed();
+        let delta_x = speed * delta_x / self.scale.0;
+        let delta_y = speed * delta_y / self.scale.1;
+        self.scroll.change(delta_x, delta_y)
+    }
 }
 
 impl WidgetKind for AreaView {
@@ -524,8 +531,8 @@ impl WidgetKind for AreaView {
     fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
         use sulis_core::io::InputAction::*;
         let delta = match key {
-            ScrollUp => 0.1,
-            ScrollDown => -0.1,
+            ZoomIn => 0.1,
+            ZoomOut => -0.1,
             _ => return false,
         };
 
@@ -755,7 +762,9 @@ impl WidgetKind for AreaView {
             self.scale.0, self.scale.1);
 
         match kind {
-            ClickKind::Middle => self.scroll.change(delta_x, delta_y),
+            ClickKind::Middle => {
+                self.scroll(delta_x, delta_y);
+            },
             ClickKind::Left => {
                 if let Some(_) = area_state.borrow_mut().targeter() {
                     return true;

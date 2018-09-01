@@ -41,6 +41,12 @@ resources:
     directory: data
 
 input:
+    # whether moving the mouse to the screen edge will scroll the view
+    edge_scrolling: false
+    
+    # scrolling rate for all scrolling methods
+    scroll_speed: 1.5
+
     # a mapping of keyboard characters to game actions
     keybindings:
         KeyEscape: ShowMenu
@@ -50,6 +56,10 @@ input:
         KeySpace: EndTurn
         KeyDown: ScrollDown
         KeyUp: ScrollUp
+        KeyLeft: ScrollLeft
+        KeyRight: ScrollRight
+        KeyPageUp: ZoomIn
+        KeyPageDown: ZoomOut
         KeyF5: QuickSave
         KeyGrave: ToggleConsole
         KeyP: SelectAll

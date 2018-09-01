@@ -231,6 +231,18 @@ children:
         x_relative: Center
         preferred_size: [40, 10]
         position: [0, 0]
+      display:
+        from: .tab_button
+        text: "Display"
+        position: [-60, 3]
+        preferred_size: [19, 7]
+        x_relative: Center
+      input:
+        from: .tab_button
+        text: "Input"
+        position: [-40, 3]
+        preferred_size: [19, 7]
+        x_relative: Center
       reset:
         from: .button
         preferred_size: [30, 10]
@@ -283,10 +295,10 @@ children:
             from: .options_window.content_title
             text: "Display Mode"
             position: [0, 0]
-            x_relative: Zero
+            x_relative: Center
           mode_content:
             from: .options_window.content_sub_content
-            x_relative: Zero
+            x_relative: Center
             preferred_size: [0, 8]
             position: [0, 5]
             width_relative: ChildSum
@@ -311,10 +323,10 @@ children:
             from: .options_window.content_title
             text: "Monitor"
             position: [0, 15]
-            x_relative: Zero
+            x_relative: Center
           monitor_content:
             from: .options_window.content_sub_content
-            x_relative: Zero
+            x_relative: Center
             preferred_size: [50, 8]
             position: [0, 20]
             children:
@@ -334,45 +346,17 @@ children:
                 preferred_size: [10, 0]
                 custom:
                   tooltip: "Specify which monitor to display on."
-          keybindings_title:
-            from: .options_window.content_title
-            text: "Keybindings"
-            position: [-10, 30]
-            x_relative: Max
-          keybindings_content:
-            from: .options_window.content_sub_content
-            x_relative: Max
-            preferred_size: [70, 71]
-            position: [0, 35]
-            layout: Grid
-            layout_spacing: { right: 1, bottom: 1 }
-            children:
-              key_button:
-                from: .button
-                text: "#key#"
-                text_params:
-                  horizontal_alignment: Right
-                preferred_size: [25, 6]
-                custom:
-                  tooltip: "Press to rebind this action."
-              action_label:
-                from: .button
-                background: bg_base
-                text: "#action#"
-                text_params:
-                  horizontal_alignment: Left
-                preferred_size: [41, 6]
           resolution_title:
             from: .options_window.content_title
             text: "Resolution"
-            position: [-3, 30]
-            x_relative: Zero
+            position: [0, 30]
+            x_relative: Center
           resolution_pane:
             from: .options_window.content_sub_content
             background: empty
-            x_relative: Zero
-            preferred_size: [50, 57]
-            position: [0, 35]
+            x_relative: Center
+            preferred_size: [50, 43]
+            position: [3, 35]
             children:
               scrollbar:
                 from: .scrollbar
@@ -395,13 +379,13 @@ children:
           ui_scale_title:
             from: .options_window.content_title
             text: "UI Scale"
-            position: [-20, 0]
-            x_relative: Max
+            position: [0, 80]
+            x_relative: Center
           ui_scale_content:
             from: .options_window.content_sub_content
-            x_relative: Max
+            x_relative: Center
             preferred_size: [50, 8]
-            position: [-20, 5]
+            position: [0, 85]
             children:
               small:
                 from: .button
@@ -421,28 +405,28 @@ children:
           anim_speed_title:
             from: .options_window.content_title
             text: "Animation Speed"
-            position: [-20, 15]
-            x_relative: Max
+            position: [0, 95]
+            x_relative: Center
           anim_speed_slow:
             from: .label
             text: Slow
-            position: [-60, 16]
+            position: [-20, 96]
             preferred_size: [10, 5]
-            x_relative: Max
+            x_relative: Center
           anim_speed_fast:
             from: .label
             text: Fast
-            position: [-20, 16]
+            position: [20, 96]
             preferred_size: [10, 5]
-            x_relative: Max
+            x_relative: Center
           anim_speed_content:
             from: .options_window.content_sub_content
-            x_relative: Max
+            x_relative: Center
             preferred_size: [0, 8]
             width_relative: ChildSum
             layout: BoxHorizontal
             layout_spacing: { top: 0, bottom: 0, left: 0, right: 2 }
-            position: [-20, 20]
+            position: [0, 100]
             children:
               speed_button:
                 from: .button
@@ -450,6 +434,100 @@ children:
                 preferred_size: [8, 0]
                 custom:
                   tooltip: "Set the speed of all in game animations.  Affects the speed of combat and character movement."
+          scroll_speed_title:
+            from: .options_window.content_title
+            text: "Scroll Speed"
+            position: [0, 0]
+            x_relative: Center
+          scroll_speed_slow:
+            from: .label
+            text: Slow
+            position: [-30, 1]
+            preferred_size: [10, 5]
+            x_relative: Center
+          scroll_speed_fast:
+            from: .label
+            text: Fast
+            position: [30, 1]
+            preferred_size: [10, 5]
+            x_relative: Center
+          scroll_speed_content:
+            from: .options_window.content_sub_content
+            x_relative: Center
+            preferred_size: [70, 8]
+            position: [0, 5]
+            layout: BoxHorizontal
+            layout_spacing: { right: 2 }
+            children:
+              speed_button:
+                from: .button
+                height_relative: Max
+                preferred_size: [8, 0]
+                custom:
+                  tooltip: "Set the speed of view scrolling."
+          edge_scroll_content:
+            from: .options_window.content_sub_content
+            x_relative: Center
+            preferred_size: [50, 8]
+            position: [0, 17]
+            children:
+              label:
+                from: .label
+                text: "Edge Scrolling"
+                text_params:
+                  scale: 6
+                x_relative: Zero
+                preferred_size: [32, 6]
+              on:
+                from: .button
+                text: "On"
+                x_relative: Max
+                preferred_size: [8, 6]
+              off:
+                from: .button
+                text: "Off"
+                x_relative: Max
+                preferred_size: [8, 6]
+                position: [-9, 0]
+          keybindings_title:
+            from: .options_window.content_title
+            text: "Keybindings"
+            position: [0, 30]
+            x_relative: Center
+          keybindings_pane:
+            from: .options_window.content_sub_content
+            background: bg_base
+            x_relative: Center
+            preferred_size: [70, 73]
+            position: [0, 35]
+            children:
+              scrollbar:
+                from: .scrollbar
+                custom:
+                  scroll_delta: 7
+              content:
+                from: .options_window.content_sub_content
+                background: empty
+                width_relative: Max
+                height_relative: Max
+                layout: Grid
+                layout_spacing: { right: 1, bottom: 1 }
+                children:
+                  key_button:
+                    from: .button
+                    text: "#key#"
+                    text_params:
+                      horizontal_alignment: Right
+                    preferred_size: [25, 6]
+                    custom:
+                      tooltip: "Press to rebind this action."
+                  action_label:
+                    from: .button
+                    background: bg_base
+                    text: "#action#"
+                    text_params:
+                      horizontal_alignment: Left
+                    preferred_size: [35, 6]
   module_selector:
     children:
       title:

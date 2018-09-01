@@ -115,6 +115,7 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
+use sulis_core::config::Config;
 use sulis_core::io::{InputAction, MainLoopUpdater};
 use sulis_core::ui::{Callback, Widget, WidgetKind, Cursor};
 use sulis_core::util;
@@ -372,9 +373,9 @@ impl WidgetKind for RootView {
         let has_modal = root.borrow().has_modal();
         GameState::set_modal_locked(has_modal);
 
+        let (cx, cy) = (Cursor::get_x(), Cursor::get_y());
         let mut area_view_updated = false;
         if !has_modal {
-            let (cx, cy) = (Cursor::get_x(), Cursor::get_y());
             let len = root.borrow().children.len();
             for i in (0..len).rev() {
                 let child = Rc::clone(&root.borrow().children[i]);
@@ -394,6 +395,20 @@ impl WidgetKind for RootView {
         }
 
         if !area_view_updated { self.area_view.borrow_mut().clear_area_mouseover(); }
+
+        if Config::edge_scrolling() {
+            if cx == Config::ui_width() - 1 {
+                self.area_view.borrow_mut().scroll(-2.0, 0.0);
+            } else if cx == 0 {
+                self.area_view.borrow_mut().scroll(2.0, 0.0);
+            }
+
+            if cy == Config::ui_height() - 1 {
+                self.area_view.borrow_mut().scroll(0.0, -2.0);
+            } else if cy == 0 {
+                self.area_view.borrow_mut().scroll(0.0, 2.0);
+            }
+        }
     }
 
     fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
@@ -408,6 +423,10 @@ impl WidgetKind for RootView {
             Exit => self.show_exit(widget),
             SelectAll => GameState::select_party_members(GameState::party()),
             QuickSave => self.save(),
+            ScrollUp => self.area_view.borrow_mut().scroll(0.0, 2.0),
+            ScrollDown => self.area_view.borrow_mut().scroll(0.0, -2.0),
+            ScrollRight => self.area_view.borrow_mut().scroll(-2.0, 0.0),
+            ScrollLeft => self.area_view.borrow_mut().scroll(2.0, 0.0),
             _ => return false,
         }
 

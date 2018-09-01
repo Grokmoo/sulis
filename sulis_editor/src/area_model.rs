@@ -709,7 +709,8 @@ impl AreaModel {
         trace!("Saving actors.");
         let mut actors: Vec<ActorData> = Vec::new();
         for &(pos, ref actor) in self.actors.iter() {
-            actors.push(ActorData { id: actor.id.to_string(), location: pos });
+            let unique_id = None;
+            actors.push(ActorData { id: actor.id.to_string(), unique_id, location: pos });
         }
 
         trace!("Saving props.");

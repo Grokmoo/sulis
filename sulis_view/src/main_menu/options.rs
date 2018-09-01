@@ -149,16 +149,23 @@ impl Options {
             options.cur_display_mode = DisplayMode::BorderlessWindow;
             parent.borrow_mut().invalidate_children();
         })));
+        let mode_fullscreen = Widget::with_theme(Button::empty(), "mode_fullscreen");
+        mode_fullscreen.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+            let parent = Widget::go_up_tree(widget, 3);
+            let options = Widget::downcast_kind_mut::<Options>(&parent);
+            options.cur_display_mode = DisplayMode::Fullscreen;
+            parent.borrow_mut().invalidate_children();
+        })));
 
         match self.cur_display_mode {
             DisplayMode::Window => mode_window.borrow_mut().state.set_active(true),
             DisplayMode::BorderlessWindow => mode_borderless.borrow_mut().state.set_active(true),
-            DisplayMode::Fullscreen =>
-                info!("Display mode is fullscreen, which is a non-standard option."),
+            DisplayMode::Fullscreen => mode_fullscreen.borrow_mut().state.set_active(true),
         }
 
         Widget::add_child_to(&mode_content, mode_window);
         Widget::add_child_to(&mode_content, mode_borderless);
+        Widget::add_child_to(&mode_content, mode_fullscreen);
 
         let monitor_title = Widget::with_theme(Label::empty(), "monitor_title");
 

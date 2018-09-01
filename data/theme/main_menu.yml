@@ -319,6 +319,13 @@ children:
                 height_relative: Max
                 custom:
                   tooltip: "Borderless Window - Select this along with maximum resolution for fullscreen."
+              mode_fullscreen:
+                from: .button
+                text: "Fullscreen"
+                preferred_size: [23, 0]
+                height_relative: Max
+                custom:
+                  tooltip: "Traditional fullscreen mode.  Borderless is almost always the better choice."
           monitor_title:
             from: .options_window.content_title
             text: "Monitor"
@@ -374,8 +381,6 @@ children:
                     text: "#width# by #height#"
                     width_relative: Max
                     preferred_size: [0, 6]
-                    custom:
-                      tooltip: "Press to use this resolution."
           ui_scale_title:
             from: .options_window.content_title
             text: "UI Scale"
@@ -483,12 +488,16 @@ children:
                 text: "On"
                 x_relative: Max
                 preferred_size: [8, 6]
+                custom:
+                  tooltip: "Scroll the view when the mouse is at the edge of the screen."
               off:
                 from: .button
                 text: "Off"
                 x_relative: Max
                 preferred_size: [8, 6]
                 position: [-9, 0]
+                custom:
+                  tooltip: "Do not scroll the view when the mouse is at the edge of the screen."
           keybindings_title:
             from: .options_window.content_title
             text: "Keybindings"

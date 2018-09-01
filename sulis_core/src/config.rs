@@ -274,45 +274,56 @@ impl Config {
         config_path.push(CONFIG_FILENAME);
         let config_path = config_path.as_path();
 
-        let config_base_path = Path::new(CONFIG_BASE);
-
         if !config_path.is_file() {
-            println!("{} not found, attempting to create it from {}", CONFIG_FILENAME, CONFIG_BASE);
-            if let Some(path) = config_path.parent() {
-                match fs::create_dir_all(path) {
-                    Err(_) => (),
-                    Ok(_) => (),
-                };
-            }
-
-            match fs::copy(config_base_path, config_path) {
-                Err(_) => {
-                    let config_base_str = format!("../{}", CONFIG_BASE);
-                    let config_base_path = Path::new(&config_base_str);
-                    match fs::copy(config_base_path, config_path) {
-                        Err(e) => {
-                            eprintln!("{}", e);
-                            eprintln!("Unable to create configuration file '{}'", CONFIG_FILENAME);
-                            eprintln!("Exiting...");
-                            ::std::process::exit(1);
-                        },
-                        _ => {}
-                    }
-                },
-                _ => {}
-            }
-
+            Config::create_config_from_sample(config_path);
         }
 
-        let config = Config::new(config_path);
-        match config {
-            Ok(c) => c,
+        match Config::new(config_path) {
+            Ok(config) => config,
             Err(e) => {
                 eprintln!("{}", e);
-                eprintln!("Fatal error loading the configuration from '{}'", CONFIG_FILENAME);
-                eprintln!("Exiting...");
-                ::std::process::exit(1);
+                eprintln!("Error parsing config file at '{}', attempting delete.", CONFIG_FILENAME);
+
+                Config::create_config_from_sample(config_path);
+
+                match Config::new(config_path) {
+                    Ok(config) => config,
+                    Err(e) => {
+                        eprintln!("{}", e);
+                        eprintln!("Fatal error in sample config.  Exiting...");
+                        ::std::process::exit(1);
+                    }
+                }
             }
+        }
+    }
+
+    fn create_config_from_sample(config_path: &Path) {
+        let config_base_path = Path::new(CONFIG_BASE);
+
+        println!("{} not found, attempting to create it from {}", CONFIG_FILENAME, CONFIG_BASE);
+        if let Some(path) = config_path.parent() {
+            match fs::create_dir_all(path) {
+                Err(_) => (),
+                Ok(_) => (),
+            };
+        }
+
+        match fs::copy(config_base_path, config_path) {
+            Err(_) => {
+                let config_base_str = format!("../{}", CONFIG_BASE);
+                let config_base_path = Path::new(&config_base_str);
+                match fs::copy(config_base_path, config_path) {
+                    Err(e) => {
+                        eprintln!("{}", e);
+                        eprintln!("Unable to create configuration file '{}'", CONFIG_FILENAME);
+                        eprintln!("Exiting...");
+                        ::std::process::exit(1);
+                    },
+                    _ => {}
+                }
+            },
+            _ => {}
         }
     }
 

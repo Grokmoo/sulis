@@ -30,11 +30,9 @@ wall_kinds:
     extended: [ cliffs_ext1, cliffs_ext2 ]
   - id: cliffs_light
     base_tile: _outer_edge_s
-    fill_tile: _base
     extended: [ cliffs_ext1, cliffs_ext2 ]
   - id: cliffs_grass
     base_tile: _outer_edge_s
-    fill_tile: _base
     extended: [ cliffs_ext1, cliffs_ext2 ]
   - id: cave_top
     base_tile: _outer_edge_s

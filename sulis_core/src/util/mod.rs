@@ -31,7 +31,7 @@ use std::time::Duration;
 use std::panic;
 
 use backtrace::Backtrace;
-use flexi_logger::{Logger, opt_format};
+use flexi_logger::{Duplicate, Logger, opt_format};
 
 use config::{self, Config};
 use ui::Widget;
@@ -221,8 +221,9 @@ pub fn setup_logger() {
 
     let mut logger = Logger::with_str(&log_config.log_level)
         .log_to_file()
+        .print_message()
         .directory(log_dir)
-        .duplicate_error()
+        .duplicate_to_stderr(Duplicate::Warn)
         .format(opt_format);
 
     if log_config.append {

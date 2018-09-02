@@ -643,7 +643,7 @@ children:
         height_relative: Max
   character_window:
     from: .window
-    height_relative: 0
+    height_relative: Zero
     preferred_size: [120, 134]
     position: [4, 4]
     children:

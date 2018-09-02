@@ -40,7 +40,6 @@ thread_local! {
     static AI: RefCell<AI> = RefCell::new(AI::new());
     static CLEAR_ANIMS: Cell<bool> = Cell::new(false);
     static MODAL_LOCKED: Cell<bool> = Cell::new(false);
-    static SCRIPT: ScriptState = ScriptState::new();
     static ANIMATIONS: RefCell<AnimState> = RefCell::new(AnimState::new());
     static ANIMS_TO_ADD: RefCell<Vec<Anim>> = RefCell::new(Vec::new());
 }
@@ -68,11 +67,7 @@ macro_rules! exec_script {
     ($func:ident: $($x:ident),*) => {
         let start_time = time::Instant::now();
 
-        let result: Result<(), rlua::Error> = SCRIPT.with(|script_state| {
-            script_state.$func($($x, )*)
-        });
-
-        if let Err(e) = result {
+        if let Err(e) = ScriptState::new().$func($($x, )*) {
             warn!("Error executing lua script function");
             warn!("{}", e);
         }
@@ -483,11 +478,8 @@ impl GameState {
 
     pub fn execute_console_script(script: String) -> String {
         let party = GameState::party();
-        let result: Result<String, rlua::Error> = SCRIPT.with(|script_state| {
-            script_state.console(script, &party)
-        });
 
-        match result {
+        match ScriptState::new().console(script, &party) {
             Ok(result) => result,
             Err(rlua::Error::FromLuaConversionError { .. }) => "Success".to_string(),
             Err(e) => format!("{}", e),
@@ -497,11 +489,7 @@ impl GameState {
     pub fn execute_ai_script(parent: &Rc<RefCell<EntityState>>, func: &str) -> ai::State {
         let start_time = time::Instant::now();
 
-        let result = SCRIPT.with(|state| {
-            state.ai_script(parent, func)
-        });
-
-        let result = match result {
+        let result = match ScriptState::new().ai_script(parent, func) {
             Err(e) => {
                 warn!("Error in lua AI script");
                 warn!("{}", e);

@@ -54,6 +54,9 @@ pub struct SaveFileMetaData {
 
     #[serde(skip)]
     path: PathBuf,
+
+    #[serde(skip)]
+    pub error: Option<String>,
 }
 
 fn get_save_dir() -> PathBuf {
@@ -122,6 +125,7 @@ fn create_meta_data(datetime: String) -> SaveFileMetaData {
         datetime,
         current_area_name: cur_area.area.name.to_string(),
         path: Default::default(),
+        error: None,
     }
 }
 
@@ -165,6 +169,36 @@ fn read_save_file(path: &Path) -> Result<SaveFile, Error> {
     SaveFile::from_json(&file_data)
 }
 
+fn create_error_meta(path: PathBuf, error: Error) -> SaveFileMetaData {
+    let time = match fs::metadata(&path) {
+        Err(e) => {
+            warn!("Unable to get metadata for invalid save file at {:?}", path);
+            warn!("{}", e);
+            Utc::now()
+        },
+        Ok(meta) => {
+            match meta.created() {
+                Err(e) => {
+                    warn!("Unable to get creation time for invalid save file at {:?}", path);
+                    warn!("{}", e);
+                    Utc::now()
+                },
+                Ok(time) => DateTime::from(time)
+            }
+        }
+    };
+
+    let datetime = time.format("%c").to_string();
+
+    SaveFileMetaData {
+        player_name: "Unknown Player".to_string(),
+        datetime,
+        current_area_name: "Unknown Area".to_string(),
+        path,
+        error: Some(error.to_string()),
+    }
+}
+
 pub fn get_available_save_files() -> Result<Vec<SaveFileMetaData>, Error> {
     let mut results = Vec::new();
 
@@ -198,6 +232,7 @@ pub fn get_available_save_files() -> Result<Vec<SaveFileMetaData>, Error> {
             Err(e) => {
                 warn!("Unable to read save file: {}", path_buf.to_string_lossy());
                 warn!("{}", e);
+                results.push(create_error_meta(path_buf, e));
                 continue;
             }
         };

@@ -109,7 +109,15 @@ impl LoadWindow {
 
     fn set_button_state(&self) {
         self.delete.borrow_mut().state.set_enabled(self.selected_entry.is_some());
-        self.accept.borrow_mut().state.set_enabled(self.selected_entry.is_some());
+
+        let accept_enabled = match self.selected_entry {
+            None => false,
+            Some(index) => {
+                self.entries[index].error.is_none()
+            }
+        };
+
+        self.accept.borrow_mut().state.set_enabled(accept_enabled);
     }
 }
 
@@ -161,6 +169,10 @@ impl WidgetKind for LoadWindow {
             text_area.borrow_mut().state.add_text_arg("player_name", &meta.player_name);
             text_area.borrow_mut().state.add_text_arg("datetime", &meta.datetime);
             text_area.borrow_mut().state.add_text_arg("current_area_name", &meta.current_area_name);
+            if meta.error.is_some() {
+                text_area.borrow_mut().state.add_text_arg("error", &meta.error.as_ref().unwrap());
+            }
+
             let widget = Widget::with_theme(Button::empty(), "entry");
             widget.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
                 let parent = Widget::go_up_tree(widget, 3);

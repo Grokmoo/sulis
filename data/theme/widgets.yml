@@ -236,8 +236,8 @@ children:
                     width_relative: Max
                     height_relative: Max
                     text: |
-                      [s=7|#player_name#][x=40|#datetime#]
-                      #current_area_name#
+                      [?error;c=f00|Invalid or Corrupt][!error;s=7|#player_name#][x=40|#datetime#]
+                      [!error|#current_area_name#]
       delete:
         from: .button
         preferred_size: [25, 10]

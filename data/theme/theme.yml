@@ -797,8 +797,17 @@ children:
         text_params:
           scale: 7.0
         x_relative: Max
-        preferred_size: [25, 6]
+        preferred_size: [20, 6]
         position: [-4, 2]
+      export:
+        from: .button
+        text: "Export"
+        text_params:
+          scale: 7.0
+        x_relative: Max
+        y_relative: Max
+        preferred_size: [20, 6]
+        position: [-2, -2]
   race_pane:
     preferred_size: [40, 40]
     background: bg_base

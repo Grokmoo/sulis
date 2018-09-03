@@ -41,17 +41,12 @@ use self::level_up_finish_pane::LevelUpFinishPane;
 mod race_selector_pane;
 use self::race_selector_pane::RaceSelectorPane;
 
-use chrono::prelude::*;
-
 use std::collections::HashMap;
-use std::fs;
 use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_core::config;
 use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
-use sulis_core::resource::write_to_file;
 use sulis_widgets::{Button, Label};
 use sulis_module::actor::Sex;
 use sulis_module::{Ability, ActorBuilder, Class, Faction, ImageLayer, InventoryBuilder, Module, Race};
@@ -59,6 +54,7 @@ use sulis_rules::{AttributeList};
 use sulis_state::{EntityState};
 
 use main_menu::CharacterSelector;
+use character_window::{get_character_export_filename, write_character_to_file};
 
 pub const NAME: &str = "character_builder";
 
@@ -236,21 +232,13 @@ impl BuilderSet for CharacterCreator {
     }
 
     fn finish(&self, builder: &mut CharacterBuilder, _widget: &Rc<RefCell<Widget>>) {
-        let utc: DateTime<Utc> = Utc::now();
-
-        let mut path = config::USER_DIR.clone();
-        path.push("characters");
-        let dir = path.as_path();
-        let id = format!("pc_{}_{}", builder.name, utc.format("%Y%m%d-%H%M%S"));
-        let filename = format!("{}/{}.yml", dir.to_string_lossy(), id);
-
-        info!("Saving character {}", id);
-
-        if let Err(e) = fs::create_dir_all(dir) {
-            error!("Unable to create characters directory '{}'", dir.to_string_lossy());
-            error!("{}", e);
-            return;
-        }
+        let (filename, id) = match get_character_export_filename(&builder.name) {
+            Err(e) => {
+                warn!("{}", e);
+                warn!("Unable to save character '{}'", builder.name);
+                return;
+            }, Ok(filename) => filename,
+        };
 
         if builder.race.is_none() || builder.class.is_none() || builder.attributes.is_none() {
             warn!("Unable to save character with undefined stats");
@@ -295,8 +283,7 @@ impl BuilderSet for CharacterCreator {
             ai: None,
         };
 
-        info!("Writing character to {}", filename);
-        match write_to_file(&filename, &actor) {
+        match write_character_to_file(&filename, &actor) {
             Err(e) => {
                 error!("Unable to write actor to file {}", filename);
                 error!("{}", e);

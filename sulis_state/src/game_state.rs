@@ -256,9 +256,9 @@ impl GameState {
     fn new(pc: Rc<Actor>) -> Result<GameState, Error> {
         let party_coins = pc.inventory.pc_starting_coins();
         let mut party_stash = ItemList::new();
-        for item in pc.inventory.pc_starting_item_iter() {
+        for (qty, item) in pc.inventory.pc_starting_item_iter() {
             let item_state = ItemState::new(item);
-            party_stash.add(item_state);
+            party_stash.add_quantity(qty, item_state);
         }
 
         let game = Module::game();

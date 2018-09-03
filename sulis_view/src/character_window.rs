@@ -14,15 +14,21 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::io::Error;
 use std::any::Any;
 use std::rc::Rc;
+use std::fs;
 use std::cell::RefCell;
 
+use chrono::prelude::*;
+
+use sulis_core::config;
+use sulis_core::resource::write_to_file;
 use sulis_core::util::ExtInt;
 use sulis_core::ui::{Callback, Widget, WidgetKind, WidgetState};
-use sulis_rules::{Attribute, DamageKind};
+use sulis_rules::{Attribute, DamageKind, Slot, QuickSlot};
 use sulis_widgets::{Button, Label, TextArea, ScrollPane};
-use sulis_module::Module;
+use sulis_module::{ActorBuilder, Module, InventoryBuilder};
 use sulis_state::{ActorState, Effect, GameState, ChangeListener, EntityState};
 
 use CharacterBuilder;
@@ -96,6 +102,14 @@ impl WidgetKind for CharacterWindow {
         })));
         level_up.borrow_mut().state.set_enabled(!GameState::is_combat_active());
 
+        let export = Widget::with_theme(Button::empty(), "export");
+        let pc = GameState::player();
+        export.borrow_mut().state.set_visible(Rc::ptr_eq(&pc, &self.character));
+        export.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
+            widget.borrow_mut().state.set_enabled(false);
+            export_character(&pc.borrow().actor);
+        })));
+
         let char_pane = Widget::with_theme(Button::empty(), "char_pane_button");
         char_pane.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
             let parent = Widget::get_parent(&widget);
@@ -133,8 +147,95 @@ impl WidgetKind for CharacterWindow {
             }
         };
 
-        vec![title, close, cur_pane, level_up, char_pane, abilities_pane, effects_pane]
+        vec![title, close, cur_pane, level_up, export, char_pane, abilities_pane, effects_pane]
     }
+}
+
+fn export_character(pc: &ActorState) {
+    let (filename, id) = match get_character_export_filename(&pc.actor.name) {
+        Err(e) => {
+            warn!("{}", e);
+            warn!("Unable to export character '{}'", pc.actor.name);
+            return;
+        }, Ok(filename) => filename,
+    };
+
+    let portrait = match pc.actor.portrait {
+        None => None,
+        Some(ref img) => Some(img.id().to_string()),
+    };
+
+    let abilities = pc.actor.abilities.iter().map(|a| a.ability.id.to_string()).collect();
+    let levels = pc.actor.levels.iter().map(|(class, level)| (class.id.to_string(), *level))
+        .collect();
+
+    let coins = GameState::party_coins();
+
+    let stash = GameState::party_stash();
+    let items = stash.borrow().items().iter().map(|(qty, item)| (*qty, item.item.id.to_string()))
+        .collect();
+
+    let equipped = Slot::iter().map(|slot| (*slot, pc.inventory().equipped(*slot)))
+        .filter(|(_, item)| item.is_some())
+        .map(|(slot, item)| (slot, item.unwrap().item.id.to_string()))
+        .collect();
+
+    let quick = QuickSlot::iter().map(|slot| (*slot, pc.inventory().quick(*slot)))
+        .filter(|(_, item)| item.is_some())
+        .map(|(slot, item)| (slot, item.unwrap().item.id.to_string()))
+        .collect();
+
+    let inventory = InventoryBuilder::new(equipped, quick, coins, items);
+
+    let actor = ActorBuilder {
+        id,
+        name: pc.actor.name.to_string(),
+        portrait,
+        race: pc.actor.race.id.to_string(),
+        sex: Some(pc.actor.sex),
+        attributes: pc.actor.attributes,
+        faction: Some(pc.actor.faction),
+        conversation: None,
+        images: pc.actor.builder_images.clone(),
+        hue: pc.actor.hue.clone(),
+        hair_color: pc.actor.hair_color.clone(),
+        skin_color: pc.actor.skin_color.clone(),
+        abilities,
+        levels,
+        inventory,
+        xp: Some(pc.xp()),
+        reward: None,
+        ai: None,
+    };
+
+    match write_character_to_file(&filename, &actor) {
+        Err(e) => {
+            warn!("{}", e);
+            warn!("Unable to write character '{}' to file", pc.actor.name);
+        }, Ok(()) => (),
+    }
+}
+
+pub fn write_character_to_file(filename: &str, actor: &ActorBuilder) -> Result<(), Error> {
+    info!("Writing character '{}' to '{}'", actor.id, filename);
+    write_to_file(filename, actor)
+}
+
+pub fn get_character_export_filename(name: &str) -> Result<(String, String), Error> {
+    let utc = Utc::now();
+
+    let mut path = config::USER_DIR.clone();
+    path.push("characters");
+    let dir = path.as_path();
+    let id = format!("pc_{}_{}", name, utc.format("%Y%m%d-%H%M%S"));
+    let filename = format!("{}/{}.yml", dir.to_string_lossy(), id);
+
+    if let Err(e) = fs::create_dir_all(dir) {
+        error!("Unable to create characters directory '{}'", dir.to_string_lossy());
+        return Err(e);
+    }
+
+    Ok((filename, id))
 }
 
 pub fn create_abilities_pane(pc: &ActorState) -> Rc<RefCell<Widget>> {

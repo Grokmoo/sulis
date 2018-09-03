@@ -29,7 +29,7 @@ pub struct InventoryBuilder {
     #[serde(default)]
     pc_starting_coins: i32,
     #[serde(default)]
-    pc_starting_items: Vec<String>,
+    pc_starting_items: Vec<(u32, String)>,
 }
 
 fn equippable_to(item: &Rc<Item>, item_id: &str, slot: Slot) -> bool {
@@ -53,6 +53,16 @@ fn equippable_to(item: &Rc<Item>, item_id: &str, slot: Slot) -> bool {
 }
 
 impl InventoryBuilder {
+    pub fn new(equipped: HashMap<Slot, String>, quick: HashMap<QuickSlot, String>,
+               pc_starting_coins: i32, pc_starting_items: Vec<(u32, String)>) -> InventoryBuilder {
+        InventoryBuilder {
+            equipped,
+            quick,
+            pc_starting_coins,
+            pc_starting_items,
+        }
+    }
+
     /// Returns the starting currency for players owning this inventory.
     /// This is only relevant for new player characters.
     pub fn pc_starting_coins(&self) -> i32 {
@@ -60,13 +70,13 @@ impl InventoryBuilder {
     }
 
     /// Iterates over the items in this inventory, validating that they exist
-    pub fn pc_starting_item_iter<'a>(&'a self) -> impl Iterator<Item=Rc<Item>> + 'a {
-        self.pc_starting_items.iter().filter_map(|item_id| {
+    pub fn pc_starting_item_iter<'a>(&'a self) -> impl Iterator<Item=(u32, Rc<Item>)> + 'a {
+        self.pc_starting_items.iter().filter_map(|(qty, item_id)| {
             match Module::item(item_id) {
                 None => {
                     warn!("Item with id '{}' not found for inventory item", item_id);
                     None
-                }, Some(item) => Some(item),
+                }, Some(item) => Some((*qty, item)),
             }
         })
     }

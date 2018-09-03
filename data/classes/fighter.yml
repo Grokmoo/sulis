@@ -122,7 +122,7 @@ kits:
         Usable1: potion_healing
         Usable2: potion_power
       pc_starting_items:
-        - potion_power
+        - [ 1, potion_power]
       pc_starting_coins: 200
     description: |
       A battle hardened warrior who prefers large weapons and close quarters combat.  They can deal out tremendous damage to any foes who dare to enter the melee.
@@ -145,7 +145,7 @@ kits:
         Usable2: potion_power
         AltHeldMain: dagger
       pc_starting_items:
-        - potion_power
+        - [ 1, potion_power]
       pc_starting_coins: 200
     description: |
       An expert with ranged weapons, who prefers to keep their distance from enemies where possible, using their skills to take down the most dangerous targets from afar.
@@ -169,7 +169,7 @@ kits:
         Usable1: potion_healing
         Usable2: potion_power
       pc_starting_items:
-        - potion_power
+        - [ 1, potion_power]
       pc_starting_coins: 100
     description: |
       A fighter who will typically use heavy armor and a large shield.  While certainly capable of dishing out punishment, their primary role on the battlefield is often to protect their compatriots.

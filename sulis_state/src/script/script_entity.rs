@@ -662,6 +662,7 @@ fn create_stats_table<'a>(lua: &'a Lua, parent: &ScriptEntity, _args: ()) -> Res
     let stats = lua.create_table()?;
     stats.set("current_hp", parent.actor.hp())?;
     stats.set("current_ap", parent.actor.ap())?;
+    stats.set("current_xp", parent.actor.xp())?;
 
     stats.set("strength", src.attributes.strength)?;
     stats.set("dexterity", src.attributes.dexterity)?;

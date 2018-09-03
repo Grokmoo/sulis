@@ -142,6 +142,15 @@ children:
         position: [0, 60]
   character_selector:
     children:
+      invalid_level_box:
+        from: .text_area
+        text: "[c=f00|This character is level #level#, which is greater than the module maximum, level #max_level#.]"
+        background: bg_base
+        border: [2, 2, 2, 2]
+        x_relative: Center
+        y_relative: Max
+        position: [-60, -20]
+        preferred_size: [96, 13]
       title:
         from: .label
         text_params:

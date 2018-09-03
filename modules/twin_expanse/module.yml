@@ -9,3 +9,4 @@ description: |
   
   This is an adventure for a new character of any background starting at level 1.
 backstory_conversation: backstory
+max_starting_level: 1

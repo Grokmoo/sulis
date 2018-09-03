@@ -576,6 +576,11 @@ impl UserData for ScriptInterface {
             Ok(())
         });
 
+        methods.add_method("party_coins", |_, _, ()| {
+            let coins = GameState::party_coins();
+            Ok(coins)
+        });
+
         methods.add_method("add_party_coins", |_, _, amount: i32| {
             GameState::add_party_coins(amount);
             let stash = GameState::party_stash();

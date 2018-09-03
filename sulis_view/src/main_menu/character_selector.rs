@@ -46,6 +46,30 @@ impl CharacterSelector {
     pub fn set_to_select(&mut self, actor_id: String) {
         self.to_select = Some(actor_id);
     }
+
+    #[must_use]
+    fn set_play_enabled(&self, play: &mut WidgetState) -> Rc<RefCell<Widget>> {
+        let max_level = Module::game().max_starting_level;
+
+        let invalid_level = Widget::with_theme(TextArea::empty(), "invalid_level_box");
+        let (enabled, invalid_vis) = match self.selected {
+            None => (false, false),
+            Some(ref actor) => {
+                invalid_level.borrow_mut().state
+                    .add_text_arg("level", &actor.total_level.to_string());
+                invalid_level.borrow_mut().state
+                    .add_text_arg("max_level", &max_level.to_string());
+
+                let enabled = actor.total_level <= max_level;
+                (enabled, !enabled)
+            }
+        };
+
+        invalid_level.borrow_mut().state.set_visible(invalid_vis);
+        play.set_enabled(enabled);
+
+        invalid_level
+    }
 }
 
 impl WidgetKind for CharacterSelector {
@@ -160,7 +184,7 @@ impl WidgetKind for CharacterSelector {
         };
 
         delete_char_button.borrow_mut().state.set_enabled(self.selected.is_some());
-        play_button.borrow_mut().state.set_enabled(self.selected.is_some());
+        let invalid_level = self.set_play_enabled(&mut play_button.borrow_mut().state);
 
         if self.first_add && must_create_character {
             let menu = Widget::downcast_kind_mut::<MainMenu>(&self.main_menu);
@@ -170,7 +194,7 @@ impl WidgetKind for CharacterSelector {
         self.first_add = false;
 
         vec![title, chars_title, characters_pane, new_character_button,
-            delete_char_button, play_button, details]
+            delete_char_button, play_button, details, invalid_level]
     }
 }
 

@@ -30,6 +30,7 @@ pub struct Game {
     pub name: String,
     pub description: String,
     pub backstory_conversation: Rc<Conversation>,
+    pub max_starting_level: u32,
 }
 
 impl Game {
@@ -49,6 +50,7 @@ impl Game {
             description: builder.description,
             backstory_conversation,
             id: builder.id,
+            max_starting_level: builder.max_starting_level,
         })
     }
 }
@@ -62,6 +64,7 @@ pub struct GameBuilder {
     pub name: String,
     pub description: String,
     pub backstory_conversation: String,
+    pub max_starting_level: u32,
 }
 
 impl ResourceBuilder for GameBuilder {

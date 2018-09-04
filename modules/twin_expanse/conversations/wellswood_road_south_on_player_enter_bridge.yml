@@ -1,6 +1,6 @@
 id: wellswood_road_south_on_player_enter_bridge
 initial_nodes:
-  - [start01, ~]
+  - id: start01
 nodes:
   start01:
     text: |

@@ -1,8 +1,8 @@
 id: wellswood_road_north_rockslide
 on_end:
-  fire_script:
-    id: wellswood_road_north
-    func: after_rockslide_cutscene
+  - fire_script:
+      id: wellswood_road_north
+      func: after_rockslide_cutscene
 frames:
   - text: As you make your way forward, you hear gutteral shouting on the cliffs behind you.  A goblin ambush!
   - text: |

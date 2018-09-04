@@ -126,17 +126,10 @@ triggers:
           width: 20
           height: 8
     on_activate:
-      player_ability: ~
-      target_flags: ~
-      player_flags: ~
-      show_merchant: ~
-      show_cutscene: ~
-      start_conversation: ~
-      fire_script:
-        id: wellswood_road_south
-        func: on_player_go_too_far
-      say_line: ~
-    initially_enabled: ~
+      - fire_script:
+          id: wellswood_road_south
+          func: on_player_go_too_far
+    initially_enabled: true
   - kind:
       OnPlayerEnter:
         location:
@@ -146,16 +139,9 @@ triggers:
           width: 25
           height: 10
     on_activate:
-      player_ability: ~
-      target_flags: ~
-      player_flags: ~
-      show_merchant: ~
-      show_cutscene: ~
-      start_conversation: ~
-      fire_script:
-        id: wellswood_road_south
-        func: on_player_return
-      say_line: ~
+      - fire_script:
+          id: wellswood_road_south
+          func: on_player_return
     initially_enabled: false
   - kind:
       OnEncounterCleared:
@@ -163,17 +149,10 @@ triggers:
           x: 49
           "y": 81
     on_activate:
-      player_ability: ~
-      target_flags: ~
-      player_flags: ~
-      show_merchant: ~
-      show_cutscene: ~
-      start_conversation: ~
-      fire_script:
-        id: wellswood_road_south
-        func: on_ambush_cleared
-      say_line: ~
-    initially_enabled: ~
+      - fire_script:
+          id: wellswood_road_south
+          func: on_ambush_cleared
+    initially_enabled: true
   - kind:
       OnPlayerEnter:
         location:
@@ -183,30 +162,17 @@ triggers:
           width: 10
           height: 4
     on_activate:
-      player_ability: ~
-      target_flags: ~
-      player_flags: ~
-      show_merchant: ~
-      show_cutscene: ~
-      start_conversation: wellswood_road_south_on_player_enter_bridge
-      fire_script:
-        id: wellswood_road_south
-        func: on_player_enter_bridge
-      say_line: ~
-    initially_enabled: ~
+      - start_conversation: wellswood_road_south_on_player_enter_bridge
+      - fire_script:
+          id: wellswood_road_south
+          func: on_player_enter_bridge
+    initially_enabled: true
   - kind: OnAreaLoad
     on_activate:
-      player_ability: ~
-      target_flags: ~
-      player_flags: ~
-      show_merchant: ~
-      show_cutscene: ~
-      start_conversation: ~
-      fire_script:
-        id: wellswood_road_south
-        func: on_area_load
-      say_line: ~
-    initially_enabled: ~
+      - fire_script:
+          id: wellswood_road_south
+          func: on_area_load
+    initially_enabled: true
 visibility_tile: gui/area_invis
 explored_tile: gui/area_unexplored
 max_vis_distance: 20

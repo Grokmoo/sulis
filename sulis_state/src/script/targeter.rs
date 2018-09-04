@@ -191,12 +191,9 @@ fn activate(_lua: &Lua, data: &TargeterData, _args: ()) -> Result<()> {
 
     let parent = ScriptEntity::new(data.parent).try_unwrap()?;
     if parent.borrow().is_party_member() && data.free_select.is_none() && data.selectable.is_empty() {
-        let cb = OnTrigger {
-            say_line: Some("No valid targets.".to_string()),
-            ..Default::default()
-        };
+        let cb = OnTrigger::SayLine("No valid targets".to_string());
 
-        GameState::add_ui_callback(cb, &parent, &parent);
+        GameState::add_ui_callback(vec![cb], &parent, &parent);
         return Ok(());
     }
 

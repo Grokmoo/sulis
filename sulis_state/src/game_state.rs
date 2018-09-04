@@ -731,7 +731,7 @@ impl GameState {
         Ok(area_state)
     }
 
-    pub fn add_ui_callback(cb: OnTrigger, parent: &Rc<RefCell<EntityState>>,
+    pub fn add_ui_callback(cb: Vec<OnTrigger>, parent: &Rc<RefCell<EntityState>>,
                            target: &Rc<RefCell<EntityState>>) {
         STATE.with(|s| {
             let mut state = s.borrow_mut();
@@ -1019,7 +1019,7 @@ impl GameState {
                 None => false,
                 Some(_) => true,
             };
-            debug!("Path finding complete in {} secs",
+            trace!("Path finding complete in {} secs",
                   util::format_elapsed_secs(start_time.elapsed()));
 
             val

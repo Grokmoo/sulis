@@ -1,6 +1,6 @@
 id: goblin_cliffs_ambush
 initial_nodes:
-  - [start01, ~]
+  - id: start01
 nodes:
   start01:
     text: |
@@ -19,7 +19,7 @@ nodes:
       - text: |
           [c=888|Try and escape through the pass.]
         on_select:
-          show_cutscene: goblin_ambush_escape
+          - show_cutscene: goblin_ambush_escape
   start03a:
     text: |
       [c=888|Your companions do not share your enthusiasm.  Staying here means certain death.]
@@ -29,4 +29,4 @@ nodes:
       - text: |
           [c=888|Try and escape through the pass.]
         on_select:
-          show_cutscene: goblin_ambush_escape
+          - show_cutscene: goblin_ambush_escape

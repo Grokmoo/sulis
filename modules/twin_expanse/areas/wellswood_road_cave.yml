@@ -113,17 +113,10 @@ triggers:
           width: 10
           height: 5
     on_activate:
-      player_ability: ~
-      target_flags: ~
-      player_flags: ~
-      show_merchant: ~
-      show_cutscene: ~
-      start_conversation: ~
-      fire_script:
-        id: party_banter
-        func: on_enter_wellswood_road_cave
-      say_line: ~
-    initially_enabled: ~
+      - fire_script:
+          id: party_banter
+          func: on_enter_wellswood_road_cave
+    initially_enabled: true
   - kind:
       OnPlayerEnter:
         location:
@@ -133,17 +126,10 @@ triggers:
           width: 17
           height: 12
     on_activate:
-      player_ability: ~
-      target_flags: ~
-      player_flags: ~
-      show_merchant: ~
-      show_cutscene: ~
-      start_conversation: ~
-      fire_script:
-        id: party_banter
-        func: on_complete_wellswood_road_cave
-      say_line: ~
-    initially_enabled: ~
+       - fire_script:
+            id: party_banter
+            func: on_complete_wellswood_road_cave
+    initially_enabled: true
 visibility_tile: gui/area_invis
 explored_tile: gui/area_unexplored
 max_vis_distance: 12

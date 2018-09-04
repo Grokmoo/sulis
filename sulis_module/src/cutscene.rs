@@ -28,7 +28,7 @@ pub struct Frame {
 pub struct Cutscene {
     pub id: String,
     pub frames: Vec<Frame>,
-    pub on_end: Option<OnTrigger>,
+    pub on_end: Vec<OnTrigger>,
 }
 
 impl Cutscene {
@@ -61,7 +61,9 @@ pub struct FrameBuilder {
 pub struct CutsceneBuilder {
     pub id: String,
     pub frames: Vec<FrameBuilder>,
-    pub on_end: Option<OnTrigger>,
+
+    #[serde(default)]
+    pub on_end: Vec<OnTrigger>,
 }
 
 impl ResourceBuilder for CutsceneBuilder {

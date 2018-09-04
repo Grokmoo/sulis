@@ -136,7 +136,7 @@ pub fn read<T: ResourceBuilder>(root_dirs: &Vec<&str>, dir: &str) -> HashMap<Str
     }
 
     if resources.is_empty() {
-        warn!("Unable to read any resources from directories: '{:?}'", root_dirs);
+        info!("Unable to read any resources from subdir '{}' in directories: '{:?}'", dir, root_dirs);
     }
 
     resources
@@ -150,7 +150,7 @@ pub fn read_to_string(root_dirs: &Vec<&str>, dir: &str) -> HashMap<String, Strin
     }
 
     if resources.is_empty() {
-        warn!("Unable to read any resources from directories: '{:?}'", root_dirs);
+        info!("Unable to read any resources from subdir '{}' in directories: '{:?}'", dir, root_dirs);
     }
 
     resources

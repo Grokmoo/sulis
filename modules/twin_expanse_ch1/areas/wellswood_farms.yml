@@ -57,10 +57,10 @@ transitions: []
 triggers:
   - kind: OnAreaLoad
     on_activate:
-      fire_script:
-        id: wellswood_farms
-        func: on_area_load
-    initially_enabled: ~
+      - fire_script:
+          id: wellswood_farms
+          func: on_area_load
+    initially_enabled: true
 visibility_tile: gui/area_invis
 explored_tile: gui/area_unexplored
 max_vis_distance: 20

@@ -17,6 +17,7 @@
 extern crate chrono;
 extern crate rlua;
 extern crate rand;
+extern crate int_hash;
 
 extern crate sulis_core;
 extern crate sulis_module;
@@ -122,7 +123,7 @@ pub enum NextGameStep {
 }
 
 pub struct UICallback {
-    pub on_trigger: OnTrigger,
+    pub on_trigger: Vec<OnTrigger>,
     pub parent: Rc<RefCell<EntityState>>,
     pub target: Rc<RefCell<EntityState>>,
 }

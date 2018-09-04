@@ -189,10 +189,10 @@ triggers:
           width: 9
           height: 7
     on_activate:
-      fire_script:
-        id: party_banter
-        func: on_enter_wellswood_road_north_cliffs
-    initially_enabled: ~
+      - fire_script:
+          id: party_banter
+          func: on_enter_wellswood_road_north_cliffs
+    initially_enabled: true
   - kind:
       OnPlayerEnter:
         location:
@@ -202,10 +202,10 @@ triggers:
           width: 12
           height: 10
     on_activate:
-      fire_script:
-        id: wellswood_road_north
-        func: on_enter_rockslide
-    initially_enabled: ~
+      - fire_script:
+          id: wellswood_road_north
+          func: on_enter_rockslide
+    initially_enabled: true
   - kind:
       OnPlayerEnter:
         location:
@@ -215,10 +215,10 @@ triggers:
           width: 7
           height: 6
     on_activate:
-      fire_script:
-        id: party_banter
-        func: on_enter_wellswood_road_north
-    initially_enabled: ~
+      - fire_script:
+          id: party_banter
+          func: on_enter_wellswood_road_north
+    initially_enabled: true
   - kind:
       OnPlayerEnter:
         location:
@@ -228,10 +228,10 @@ triggers:
           width: 7
           height: 6
     on_activate:
-      fire_script:
-        id: party_banter
-        func: on_enter_wellswood_road_spiders
-    initially_enabled: ~
+      - fire_script:
+          id: party_banter
+          func: on_enter_wellswood_road_spiders
+    initially_enabled: true
 visibility_tile: gui/area_invis
 explored_tile: gui/area_unexplored
 max_vis_distance: 18

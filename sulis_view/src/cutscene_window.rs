@@ -39,6 +39,13 @@ impl CutsceneWindow {
     }
 }
 
+pub fn add_on_end_cbs(cutscene: &Rc<Cutscene>) {
+    if cutscene.on_end.len() > 0 {
+        let pc = GameState::player();
+        GameState::add_ui_callback(cutscene.on_end.clone(), &pc, &pc);
+    }
+}
+
 impl WidgetKind for CutsceneWindow {
     widget_kind!(NAME);
 
@@ -47,10 +54,7 @@ impl WidgetKind for CutsceneWindow {
         let frame = match frame {
             None => {
                 widget.borrow_mut().mark_for_removal();
-                if let Some(cb) = &self.cutscene.on_end {
-                    let pc = GameState::player();
-                    GameState::add_ui_callback(cb.clone(), &pc, &pc);
-                }
+                add_on_end_cbs(&self.cutscene);
                 return Vec::new();
             }, Some(ref frame) => frame,
         };
@@ -62,10 +66,7 @@ impl WidgetKind for CutsceneWindow {
             let parent = Widget::get_parent(widget);
             parent.borrow_mut().mark_for_removal();
 
-            if let Some(cb) = &cutscene.on_end {
-                let pc = GameState::player();
-                GameState::add_ui_callback(cb.clone(), &pc, &pc);
-            }
+            add_on_end_cbs(&cutscene);
         })));
 
         let next_button = Widget::with_theme(Button::empty(), "next_button");

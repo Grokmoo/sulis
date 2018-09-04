@@ -131,7 +131,7 @@ impl WidgetKind for BackstorySelectorPane {
 struct ResponseButton {
     text: String,
     to: Option<String>,
-    on_select: Option<OnTrigger>,
+    on_select: Vec<OnTrigger>,
 }
 
 impl ResponseButton {
@@ -157,12 +157,17 @@ impl WidgetKind for ResponseButton {
         let parent = Widget::go_up_tree(widget, 2);
         let pane = Widget::downcast_kind_mut::<BackstorySelectorPane>(&parent);
 
-        if let Some(ref on_select) = self.on_select {
-            if let Some(ref ability_id) = on_select.player_ability {
-                match Module::ability(ability_id) {
-                    None => {
-                        warn!("No ability found for '{}' in backstory", ability_id);
-                    }, Some(ability) => pane.abilities.push(ability),
+        for trigger in self.on_select.iter() {
+            match trigger {
+                OnTrigger::PlayerAbility(ability_id) => {
+                    match Module::ability(ability_id) {
+                        None => {
+                            warn!("No ability found for '{}' in backstory", ability_id);
+                        }, Some(ability) => pane.abilities.push(ability),
+                    }
+                },
+                _ => {
+                    warn!("Unsupported OnTrigger variant '{:?}' in backstory", trigger);
                 }
             }
         }

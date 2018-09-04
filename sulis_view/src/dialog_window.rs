@@ -106,9 +106,7 @@ impl WidgetKind for DialogWindow {
 
         self.node.borrow_mut().text = Some(cur_text);
 
-        if let &Some(ref on_select) = self.convo.on_view(&self.cur_node) {
-            activate(widget, on_select, &self.pc, &self.entity);
-        }
+        activate(widget, self.convo.on_view(&self.cur_node), &self.pc, &self.entity);
 
         let responses_widget = Widget::empty("responses");
         {
@@ -128,7 +126,7 @@ impl WidgetKind for DialogWindow {
 struct ResponseButton {
     text: String,
     to: Option<String>,
-    on_select: Option<OnTrigger>,
+    on_select: Vec<OnTrigger>,
 }
 
 impl ResponseButton {
@@ -162,9 +160,7 @@ impl WidgetKind for ResponseButton {
         let parent = Widget::go_up_tree(widget, 2);
         let window = Widget::downcast_kind_mut::<DialogWindow>(&parent);
 
-        if let Some(ref on_select) = self.on_select {
-            activate(widget, on_select, &window.pc, &window.entity);
-        }
+        activate(widget, &self.on_select, &window.pc, &window.entity);
 
         match self.to {
             None => {
@@ -201,41 +197,42 @@ pub fn get_initial_node(convo: &Rc<Conversation>, pc: &Rc<RefCell<EntityState>>,
     for (node, on_trigger) in convo.initial_nodes() {
         cur_node = node;
 
-        if match on_trigger {
-            Some(on_trigger) => is_match(on_trigger, pc, entity),
-                None => true,
-        } {
-            break
-        }
+        if is_match(on_trigger, pc, entity) { break; }
     }
 
     cur_node.to_string()
 }
 
-pub fn is_match(on_trigger: &OnTrigger, pc: &Rc<RefCell<EntityState>>,
+pub fn is_match(on_trigger: &Vec<OnTrigger>, pc: &Rc<RefCell<EntityState>>,
                 target: &Rc<RefCell<EntityState>>) -> bool {
-    if let Some(ref flags) = on_trigger.target_flags {
-        for flag in flags.iter() {
-            if !target.borrow_mut().has_custom_flag(flag) { return false; }
-        }
-    }
+    for trigger in on_trigger.iter() {
+        use sulis_module::OnTrigger::*;
+        match trigger {
+            TargetFlags(ref flags) => {
+                for flag in flags.iter() {
+                    if !target.borrow_mut().has_custom_flag(flag) { return false; }
+                }
+            },
+            PlayerFlags(ref flags) => {
+                for flag in flags.iter() {
+                    if !pc.borrow_mut().has_custom_flag(flag) { return false; }
+                }
+            },
+            PlayerAbility(ref ability_to_find) => {
+                let mut has_ability = false;
+                for ability in pc.borrow().actor.actor.abilities.iter() {
+                    if &ability.ability.id == ability_to_find {
+                        has_ability = true;
+                        break;
+                    }
+                }
 
-    if let Some(ref flags) = on_trigger.player_flags {
-        for flag in flags.iter() {
-            if !pc.borrow_mut().has_custom_flag(flag) { return false; }
-        }
-    }
-
-    if let Some(ref ability_to_find) = on_trigger.player_ability {
-        let mut has_ability = false;
-        for ability in pc.borrow().actor.actor.abilities.iter() {
-            if &ability.ability.id == ability_to_find {
-                has_ability = true;
-                break;
+                if !has_ability { return false; }
+            },
+            _ => {
+                warn!("Unsupported OnTrigger kind '{:?}' in validator", trigger);
             }
         }
-
-        if !has_ability { return false; }
     }
 
     true
@@ -243,65 +240,49 @@ pub fn is_match(on_trigger: &OnTrigger, pc: &Rc<RefCell<EntityState>>,
 
 pub fn is_viewable(response: &Response, pc: &Rc<RefCell<EntityState>>,
                    target: &Rc<RefCell<EntityState>>) -> bool {
-    if let Some(ref on_select) = response.to_view {
-        is_match(on_select, pc, target)
-    } else {
-        true
-    }
+    is_match(&response.to_view, pc, target)
 }
 
-pub fn activate(widget: &Rc<RefCell<Widget>>, on_select: &OnTrigger,
+pub fn activate(widget: &Rc<RefCell<Widget>>, on_select: &Vec<OnTrigger>,
                 pc: &Rc<RefCell<EntityState>>, target: &Rc<RefCell<EntityState>>) {
-    if let Some(ref ability_id) = on_select.player_ability {
-        let ability = match Module::ability(ability_id) {
-            None => {
-                warn!("No ability found for '{}' when activating on_trigger", ability_id);
-                return;
-            }, Some(ability) => ability,
-        };
 
-        let mut pc = pc.borrow_mut();
-        let state = &mut pc.actor;
-        let new_actor = Actor::from(&state.actor, None, state.actor.xp, vec![ability]);
-        state.replace_actor(new_actor);
-    }
+    use sulis_module::OnTrigger::*;
+    for trigger in on_select.iter() {
+        match trigger {
+            PlayerAbility(ref ability_id) => {
+                let ability = match Module::ability(ability_id) {
+                    None => {
+                        warn!("No ability found for '{}' when activating on_trigger", ability_id);
+                        return;
+                    }, Some(ability) => ability,
+                };
 
-    if let Some(ref flags) = on_select.target_flags {
-        for flag in flags.iter() {
-            target.borrow_mut().set_custom_flag(flag, "true");
+                let mut pc = pc.borrow_mut();
+                let state = &mut pc.actor;
+                let new_actor = Actor::from(&state.actor, None, state.actor.xp, vec![ability]);
+                state.replace_actor(new_actor);
+            },
+            TargetFlags(ref flags) => {
+                for flag in flags.iter() {
+                    target.borrow_mut().set_custom_flag(flag, "true");
+                }
+            },
+            PlayerFlags(ref flags) => {
+                for flag in flags.iter() {
+                    pc.borrow_mut().set_custom_flag(flag, "true");
+                }
+            },
+            ShowMerchant(ref merch) => show_merchant(widget, merch),
+            StartConversation(ref convo) => start_convo(widget, convo, pc, target),
+            SayLine(ref line) => {
+                let area_state = GameState::area_state();
+                area_state.borrow_mut().add_feedback_text(line.to_string(), &target,
+                ColorKind::Info);
+            },
+            ShowCutscene(ref cutscene) => show_cutscene(widget, cutscene),
+            FireScript(ref script) => fire_script(&script.id, &script.func, pc, target),
+            GameOverWindow(ref text) => game_over_window(widget, text.to_string()),
         }
-    }
-
-    if let Some(ref flags) = on_select.player_flags {
-        for flag in flags.iter() {
-            pc.borrow_mut().set_custom_flag(flag, "true");
-        }
-    }
-
-    if let Some(ref merch) = on_select.show_merchant {
-        show_merchant(widget, merch);
-    }
-
-    if let Some(ref convo) = on_select.start_conversation {
-        start_convo(widget, convo, pc, target);
-    }
-
-    if let Some(ref line) = on_select.say_line {
-        let area_state = GameState::area_state();
-        area_state.borrow_mut().add_feedback_text(line.to_string(), &target,
-            ColorKind::Info);
-    }
-
-    if let Some(ref cutscene) = on_select.show_cutscene {
-        show_cutscene(widget, cutscene);
-    }
-
-    if let Some(ref script) = on_select.fire_script {
-        fire_script(&script.id, &script.func, pc, target)
-    }
-
-    if let Some(ref text) = on_select.game_over_window {
-        game_over_window(widget, text.clone())
     }
 }
 

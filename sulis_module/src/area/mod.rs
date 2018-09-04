@@ -51,7 +51,7 @@ pub enum TriggerKind {
 #[derive(Debug, Clone)]
 pub struct Trigger {
     pub kind: TriggerKind,
-    pub on_activate: OnTrigger,
+    pub on_activate: Vec<OnTrigger>,
     pub initially_enabled: bool,
 }
 
@@ -184,7 +184,7 @@ impl Area {
             triggers.push(Trigger {
                 kind: tbuilder.kind,
                 on_activate: tbuilder.on_activate,
-                initially_enabled: tbuilder.initially_enabled.unwrap_or(true),
+                initially_enabled: tbuilder.initially_enabled,
             });
         }
 
@@ -307,8 +307,8 @@ impl ResourceBuilder for AreaBuilder {
 #[serde(deny_unknown_fields)]
 pub struct TriggerBuilder {
     pub kind: TriggerKind,
-    pub on_activate: OnTrigger,
-    pub initially_enabled: Option<bool>,
+    pub on_activate: Vec<OnTrigger>,
+    pub initially_enabled: bool,
 }
 
 #[derive(Deserialize, Serialize, Debug)]

@@ -1,6 +1,6 @@
 id: after_rockslide
 initial_nodes:
-  - [start01, ~]
+  - id: start01
 nodes:
   start01:
     text: |
@@ -45,6 +45,6 @@ nodes:
       - text: |
           Alright then.  Lets go.
         on_select:
-          fire_script:
-            id: wellswood_road_north
-            func: after_rockslide_dialog
+          - fire_script:
+              id: wellswood_road_north
+              func: after_rockslide_dialog

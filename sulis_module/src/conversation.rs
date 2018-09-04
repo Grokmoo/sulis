@@ -29,15 +29,21 @@ use {Module, OnTrigger};
 pub struct Response {
     pub text: String,
     pub to: Option<String>,
-    pub on_select: Option<OnTrigger>,
-    pub to_view: Option<OnTrigger>,
+
+    #[serde(default)]
+    pub on_select: Vec<OnTrigger>,
+
+    #[serde(default)]
+    pub to_view: Vec<OnTrigger>,
 }
 
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 struct Node {
     text: String,
-    on_view: Option<OnTrigger>,
+
+    #[serde(default)]
+    on_view: Vec<OnTrigger>,
     responses: Vec<Response>,
 }
 
@@ -45,7 +51,7 @@ struct Node {
 pub struct Conversation {
     pub id: String,
     nodes: HashMap<String, Node>,
-    initial_nodes: Vec<(String, Option<OnTrigger>)>,
+    initial_nodes: Vec<(String, Vec<OnTrigger>)>,
 }
 
 impl PartialEq for Conversation {
@@ -61,11 +67,14 @@ impl Conversation {
             return unable_to_create_error("conversation", &builder.id);
         }
 
-        for (node, _) in builder.initial_nodes.iter() {
-            if !builder.nodes.contains_key(node) {
-                warn!("Invalid initial for node '{}'", node);
+        let mut initial_nodes = Vec::new();
+        for node in builder.initial_nodes {
+            if !builder.nodes.contains_key(&node.id) {
+                warn!("Invalid initial node '{}'", node.id);
                 return unable_to_create_error("conversation", &builder.id);
             }
+
+            initial_nodes.push((node.id, node.to_view));
         }
 
         for (_, ref node) in builder.nodes.iter() {
@@ -82,17 +91,17 @@ impl Conversation {
         Ok(Conversation {
             id: builder.id,
             nodes: builder.nodes,
-            initial_nodes: builder.initial_nodes,
+            initial_nodes,
         })
     }
 
-    pub fn initial_nodes(&self) -> Iter<(String, Option<OnTrigger>)> {
+    pub fn initial_nodes(&self) -> Iter<(String, Vec<OnTrigger>)> {
         self.initial_nodes.iter()
     }
 
     // TODO don't panic when getting a node.
 
-    pub fn on_view(&self, node: &str) -> &Option<OnTrigger> {
+    pub fn on_view(&self, node: &str) -> &Vec<OnTrigger> {
         match self.nodes.get(node) {
             None => panic!("Invalid node"),
             Some(ref node) => &node.on_view,
@@ -116,10 +125,19 @@ impl Conversation {
 
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
+pub struct InitialNode {
+    id: String,
+
+    #[serde(default)]
+    to_view: Vec<OnTrigger>,
+}
+
+#[derive(Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
 pub struct ConversationBuilder {
     pub id: String,
     nodes: HashMap<String, Node>,
-    initial_nodes: Vec<(String, Option<OnTrigger>)>,
+    initial_nodes: Vec<InitialNode>,
 }
 
 impl ResourceBuilder for ConversationBuilder {

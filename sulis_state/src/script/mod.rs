@@ -483,12 +483,8 @@ impl UserData for ScriptInterface {
                 }
             };
 
-            let cb = OnTrigger {
-                say_line: Some(line),
-                ..Default::default()
-            };
-
-            GameState::add_ui_callback(cb, &pc, &target);
+            let cb = OnTrigger::SayLine(line);
+            GameState::add_ui_callback(vec![cb], &pc, &target);
             Ok(())
         });
 
@@ -501,23 +497,15 @@ impl UserData for ScriptInterface {
                 }
             };
 
-            let cb = OnTrigger {
-                start_conversation: Some(id),
-                ..Default::default()
-            };
-
-            GameState::add_ui_callback(cb, &pc, &target);
+            let cb = OnTrigger::StartConversation(id);
+            GameState::add_ui_callback(vec![cb], &pc, &target);
             Ok(())
         });
 
         methods.add_method("show_game_over_window", |_, _, text: String| {
             let pc = GameState::player();
-            let cb = OnTrigger {
-                game_over_window: Some(text),
-                ..Default::default()
-            };
-
-            GameState::add_ui_callback(cb, &pc, &pc);
+            let cb = OnTrigger::GameOverWindow(text);
+            GameState::add_ui_callback(vec![cb], &pc, &pc);
             Ok(())
         });
 
@@ -527,13 +515,8 @@ impl UserData for ScriptInterface {
 
         methods.add_method("show_cutscene", |_, _, id: String| {
             let pc = GameState::player();
-
-            let cb = OnTrigger {
-                show_cutscene: Some(id),
-                ..Default::default()
-            };
-
-            GameState::add_ui_callback(cb, &pc, &pc);
+            let cb = OnTrigger::ShowCutscene(id);
+            GameState::add_ui_callback(vec![cb], &pc, &pc);
             Ok(())
         });
 

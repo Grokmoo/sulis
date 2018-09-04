@@ -1,6 +1,6 @@
 id: enter_goblin_camp
 initial_nodes:
-  - [start01, ~]
+  - id: start01
 nodes:
   start01:
     text: |

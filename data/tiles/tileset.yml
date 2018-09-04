@@ -16,14 +16,26 @@ wall_rules:
     nw_postfix: "nw"
     sw_postfix: "sw"
 wall_kinds:
+  - id: roof_thatched
+    base_tile: _outer_edge_s
+    fill_tile: _base
+    extended: [ building_wood ]
   - id: roof_stone
     base_tile: _outer_edge_s
     fill_tile: _base
     extended: [ building_stone ]
+  - id: roof_wood_02
+    base_tile: _outer_edge_s
+    fill_tile: _base
+    extended: [ building_wood ]
   - id: roof_wood
     base_tile: _outer_edge_s
     fill_tile: _base
     extended: [ building_wood ]
+  - id: roof_brick
+    base_tile: _outer_edge_s
+    fill_tile: _base
+    extended: [ building_brick ]
   - id: cliffs_dark
     base_tile: _outer_edge_s
     fill_tile: _base
@@ -59,6 +71,8 @@ terrain_rules:
     sw_postfix: "sw"
   base_weight: 10
 terrain_kinds:
+  - id: stone_bordered
+    variants: []
   - id: water_dark
     variants: [1, 2, 3]
     borders:
@@ -127,7 +141,7 @@ terrain_kinds:
     variants: [1, 2, 3]
   - id: mud
     variants: [1, 2, 3]
-  - id: rocks_white
+  - id: dirt_fields
     variants: [1, 2, 3]
   - id: rocks_light
     variants: [1, 2, 3]
@@ -171,7 +185,7 @@ uniform_sets:
       grass_med_base_variant8, grass_med_base_variant9,
       grass_dark_base, grass_dark_base_variant1, grass_dark_base_variant2, grass_dark_base_variant3,
       grass_dead_base, grass_dead_base_variant1, grass_dead_base_variant2, grass_dead_base_variant3,
-      rocks_white_base, rocks_white_base_variant1, rocks_white_base_variant2, rocks_white_base_variant3,
+      dirt_fields_base, dirt_fields_base_variant1, dirt_fields_base_variant2, dirt_fields_base_variant3,
       rocks_light_base, rocks_light_base_variant1, rocks_light_base_variant2, rocks_light_base_variant3,
       rocks_med_base, rocks_med_base_variant1, rocks_med_base_variant2, rocks_med_base_variant3,
       rocks_dark_base, rocks_dark_base_variant1, rocks_dark_base_variant2, rocks_dark_base_variant3,
@@ -186,6 +200,7 @@ uniform_sets:
       cobble_stone_base, cobble_stone_base_variant1, cobble_stone_base_variant2, cobble_stone_base_variant3,
       cobble_dirt_base, cobble_dirt_base_variant1, cobble_dirt_base_variant2, cobble_dirt_base_variant3,
       cobble_plain_base, cobble_plain_base_variant1, cobble_plain_base_variant2, cobble_plain_base_variant3,
+      stone_bordered_base,
     ]
   base2_all_passable:
     layer: terrain_border
@@ -253,10 +268,10 @@ uniform_sets:
       
       lava_top1, lava_top2, lava_sw_to_ne, lava_nw_to_se,
       
-      rocks_white_top1, rocks_white_top2, rocks_white_sw_to_ne, rocks_white_nw_to_se,
-      rocks_white_inner_edge_se, rocks_white_inner_edge_sw, rocks_white_inner_edge_ne, rocks_white_inner_edge_nw,
-      rocks_white_outer_edge_nw, rocks_white_outer_edge_n, rocks_white_outer_edge_ne, rocks_white_outer_edge_w,
-      rocks_white_outer_edge_e, rocks_white_outer_edge_sw, rocks_white_outer_edge_s, rocks_white_outer_edge_se,
+      dirt_fields_top1, dirt_fields_top2, dirt_fields_sw_to_ne, dirt_fields_nw_to_se,
+      dirt_fields_inner_edge_se, dirt_fields_inner_edge_sw, dirt_fields_inner_edge_ne, dirt_fields_inner_edge_nw,
+      dirt_fields_outer_edge_nw, dirt_fields_outer_edge_n, dirt_fields_outer_edge_ne, dirt_fields_outer_edge_w,
+      dirt_fields_outer_edge_e, dirt_fields_outer_edge_sw, dirt_fields_outer_edge_s, dirt_fields_outer_edge_se,
       
       rocks_light_top1, rocks_light_top2, rocks_light_sw_to_ne, rocks_light_nw_to_se,
       rocks_light_inner_edge_se, rocks_light_inner_edge_sw, rocks_light_inner_edge_ne, rocks_light_inner_edge_nw,
@@ -333,6 +348,10 @@ uniform_sets:
       cobble_plain_inner_edge_se, cobble_plain_inner_edge_sw, cobble_plain_inner_edge_ne, cobble_plain_inner_edge_nw,
       cobble_plain_outer_edge_nw, cobble_plain_outer_edge_n, cobble_plain_outer_edge_ne, cobble_plain_outer_edge_w,
       cobble_plain_outer_edge_e, cobble_plain_outer_edge_sw, cobble_plain_outer_edge_s, cobble_plain_outer_edge_se,
+      
+      stone_bordered_inner_edge_se, stone_bordered_inner_edge_sw, stone_bordered_inner_edge_ne, stone_bordered_inner_edge_nw,
+      stone_bordered_outer_edge_nw, stone_bordered_outer_edge_n, stone_bordered_outer_edge_ne, stone_bordered_outer_edge_w,
+      stone_bordered_outer_edge_e, stone_bordered_outer_edge_sw, stone_bordered_outer_edge_s, stone_bordered_outer_edge_se,
     ]
   base2_impass:
     layer: terrain_border
@@ -534,6 +553,26 @@ uniform_sets:
       plant01, plant02, plant03, plant04, plant05, plant06, plant07, plant08, plant09,
       plant11, plant12, plant13, plant14, plant15, plant16, plant17, plant18, plant19, plant20,
       rocks_small, campfire, lilypad03, lilypad04,
+      meat01, meat02, fish01, fish02, fish03,
+      veg01, veg02, veg03, veg04, veg05, veg06
+    ]
+  object_bin_impass:
+    layer: object
+    size: [2, 4]
+    sprite_prefix: "tileset/"
+    impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+    invis: []
+    tiles: [
+      veg01_bin, veg02_bin, veg03_bin, veg04_bin, veg05_bin, veg06_bin, bin01
+    ]
+  object_farm_2by2_impass:
+    layer: object
+    size: [4, 4]
+    sprite_prefix: "tileset/"
+    impass: [[1, 0], [2, 0], [3, 0], [0, 1], [1, 1], [2, 1], [3, 1], [0, 2], [1, 2], [2, 2], [3, 2], [1, 3], [2, 3], [3, 3]]
+    invis: []
+    tiles: [
+      veg_sack01_2by2, veg_sack02_2by2, flour_sack_2by2, wood_pile_2by2
     ]
   object_impass:
     layer: object
@@ -542,7 +581,19 @@ uniform_sets:
     impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
     invis: []
     tiles: [
-      rock_big, campfire_with_pot, stump
+      rock_big, campfire_with_pot, stump,
+      wood_pile, anvil01, flour_sack, anvil02, veg_sack01, veg_sack02,
+      fence_e, fence_e_w, fence_w, fence_n, fence_n_s, fence_s, fence_e_s, fence_e_w_s, fence_w_s, fence_e_n_s,
+      fence_e_w_n_s, fence_w_n_s, fence_e_n, fence_e_w_n, fence_w_n, fence_gate_w, fence_gate_c, fence_gate_e,
+    ]
+  object_boats:
+    layer: object
+    size: [8, 4]
+    sprite_prefix: "tileset/"
+    impass: []
+    invis: []
+    tiles: [
+      boat01, boat01_water, boat02, boat02_water
     ]
   walls1by2impass:
     layer: walls
@@ -553,7 +604,9 @@ uniform_sets:
     tiles: [
       building_stone_outer_edge_sw, building_stone_outer_edge_s, building_stone_outer_edge_se,
       building_wood_outer_edge_sw, building_wood_outer_edge_s, building_wood_outer_edge_se,
-      building_wood_variant1, building_wood_variant2, building_wood_variant3
+      building_wood_variant1, building_wood_variant2, building_wood_variant3,
+      building_brick_outer_edge_sw, building_brick_outer_edge_s, building_brick_outer_edge_se,
+      building_brick_variant1, building_brick_variant2, building_brick_variant3
     ]
   object1by2:
     layer: object
@@ -563,6 +616,10 @@ uniform_sets:
     invis: []
     tiles: [
       window01, window02,
+      farm_plant_01a, farm_plant_02a, farm_plant_03a, farm_plant_04a, farm_plant_05a, farm_plant_06a, farm_plant_07a,
+      farm_plant_01b, farm_plant_02b, farm_plant_03b, farm_plant_04b, farm_plant_05b, farm_plant_06b, farm_plant_07b,
+      farm_plant_01c, farm_plant_02c, farm_plant_03c, farm_plant_04c, farm_plant_05c, farm_plant_06c, farm_plant_07c,
+      farm_plant_01d, farm_plant_02d, farm_plant_03d, farm_plant_04d, farm_plant_05d, farm_plant_06d, farm_plant_07d,
     ]
   2by2prop:
     layer: prop
@@ -587,6 +644,62 @@ uniform_sets:
     invis: []
     tiles: [ well, barrels, nest_empty, nest, bonestack ]
 non_uniform_sets:
+  roof_brick:
+    layer: walls_aerial
+    size: [2, 2]
+    sprite_prefix: "tileset/roof_brick_"
+    tiles:
+      base:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+        invis: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      outer_edge_nw:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      outer_edge_n:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      outer_edge_ne:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      outer_edge_w:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      outer_edge_e:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      outer_edge_sw:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      outer_edge_s:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      outer_edge_se:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      inner_edge_sw:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      inner_edge_se:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+  roof_wood_02:
+    layer: walls_aerial
+    size: [2, 2]
+    sprite_prefix: "tileset/roof_wood_02_"
+    tiles:
+      base:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+        invis: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      outer_edge_nw:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      outer_edge_n:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      outer_edge_ne:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      outer_edge_w:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      outer_edge_e:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      outer_edge_sw:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      outer_edge_s:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      outer_edge_se:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      inner_edge_sw:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      inner_edge_se:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
   roof_wood:
     layer: walls_aerial
     size: [2, 2]
@@ -619,6 +732,34 @@ non_uniform_sets:
     layer: walls_aerial
     size: [2, 2]
     sprite_prefix: "tileset/roof_stone_"
+    tiles:
+      base:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+        invis: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      outer_edge_nw:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      outer_edge_n:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      outer_edge_ne:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      outer_edge_w:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      outer_edge_e:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      outer_edge_sw:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      outer_edge_s:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      outer_edge_se:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      inner_edge_sw:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+      inner_edge_se:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+  roof_thatched:
+    layer: walls_aerial
+    size: [2, 2]
+    sprite_prefix: "tileset/roof_thatched_"
     tiles:
       base:
         impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
@@ -1252,3 +1393,41 @@ tiles:
     layer: walls
     size: [2, 3]
     sprite: tileset/door_frame_wood_w
+  tent_bot:
+    layer: object
+    size: [8, 6]
+    sprite: tileset/tent_bot
+    pass: []
+    invis: [[3, 0], [4, 0], [3, 1], [4, 1], [3, 2], [4, 2], [3, 3], [4, 3]]
+  tent_top:
+    layer: aerial
+    size: [8, 4]
+    sprite: tileset/tent_top
+    invis: [[3, 1], [4, 1], [3, 2], [4, 2], [3, 3], [4, 3]]
+  bazaar01_top:
+    layer: aerial
+    size: [4, 2]
+    sprite: tileset/bazaar01_top
+  bazaar02_top:
+    layer: aerial
+    size: [4, 2]
+    sprite: tileset/bazaar02_top
+  bazaar03_top:
+    layer: aerial
+    size: [4, 2]
+    sprite: tileset/bazaar03_top
+  bazaar01_bot:
+    layer: object
+    size: [4, 4]
+    pass: []
+    sprite: tileset/bazaar01_bot
+  bazaar02_bot:
+    layer: object
+    size: [4, 4]
+    pass: []
+    sprite: tileset/bazaar02_bot
+  bazaar03_bot:
+    layer: object
+    size: [4, 2]
+    pass: []
+    sprite: tileset/bazaar03_bot

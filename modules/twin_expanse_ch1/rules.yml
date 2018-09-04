@@ -1,0 +1,45 @@
+---
+display_ap: 1000
+base_ap: 4000
+max_ap: 8000
+max_overflow_ap: 2000
+min_overflow_ap: -4000
+movement_ap: 100
+attack_ap: 2000
+swap_weapons_ap: 2000
+initiative_roll_max: 20
+base_flanking_angle: 150
+
+graze_percentile: 20
+hit_percentile: 55
+crit_percentile: 100
+
+graze_damage_multiplier: 0.5
+crit_damage_multiplier: 1.5
+
+dual_wield_damage_multiplier: 0.75
+
+base_attribute: 10
+builder_max_attribute: 20
+builder_min_attribute: 8
+builder_attribute_points: 80
+
+max_dialog_distance: 2.5
+max_transition_distance: 2.5
+max_prop_distance: 2.5
+
+item_weight_display_factor: 100
+item_value_display_factor: 10
+coins_item: coin
+
+selectable_races: [ human, dwarf, elf, kimer, rodian ]
+selectable_classes: [ fighter, rogue, mage ]
+ability_groups: [ "Fighter", "Rogue", "Modes", "Mechanics", "4th Circle", "3rd Circle", "2nd Circle", "1st Circle", "Cantrips"]
+
+experience_for_level: [100, 300, 600, 1000, 1500, 2100, 2800, 3600, 4500,
+                       5500, 6600, 7800, 9100, 10500, 12000, 13600, 15300, 17100, 19000,
+                       21000, 23100, 25300, 27600, 30000, 32500, 35100, 37800, 40600, 43500,
+                       46500, 49600, 52800, 56100, 59500, 63000, 66600, 70300, 74100, 78000,
+                       82000, 86100, 90300, 94600, 99000, 103500, 108100, 112800, 117600, 122500]
+
+loot_drop_prop: backpack

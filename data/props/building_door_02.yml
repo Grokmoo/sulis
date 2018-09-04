@@ -8,7 +8,5 @@ invis: []
 interactive:
   Door:
     initially_open: false
-    closed_impass: [[0, 0], [1, 0],
-                    [0, 1], [1, 1],
-                    [0, 2], [1, 2]]
-    closed_invis:  [[0, 0], [1, 0]]
+    closed_impass: []
+    closed_invis:  []

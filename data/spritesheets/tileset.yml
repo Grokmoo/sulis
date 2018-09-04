@@ -4,6 +4,20 @@ size: [1024, 2048]
 simple_image_gen_scale: 32
 grid_multiplier: 32
 templates:
+  roof:
+    size: [1, 1]
+    areas:
+      base: [1, 3]
+      outer_edge_nw: [0, 0]
+      outer_edge_n: [1, 0]
+      outer_edge_ne: [2, 0]
+      outer_edge_w: [0, 1]
+      outer_edge_e: [2, 1]
+      outer_edge_sw: [0, 2]
+      outer_edge_s: [1, 2]
+      outer_edge_se: [2, 2]
+      inner_edge_sw: [0, 3]
+      inner_edge_se: [2, 3]
   borders:
     size: [1, 1]
     areas:
@@ -40,9 +54,9 @@ groups:
     position: [6, 0]
     prefix: dirt_dark_
     from_template: borders
-  rocks_white:
+  dirt_fields:
     position: [9, 0]
-    prefix: rocks_white_
+    prefix: dirt_fields_
     from_template: borders
   rocks_light:
     position: [12, 0]
@@ -189,21 +203,44 @@ groups:
     prefix: water_ice_to_water_med_
     from_template: borders
 
+  roof_thatched:
+    position: [7, 59]
+    prefix: roof_thatched_
+    from_template: roof
   roof_stone:
-    position: [3, 57]
+    position: [0, 57]
+    prefix: roof_stone_
+    from_template: roof
+  roof_wood:
+    position: [0, 57]
+    prefix: roof_wood_
+    from_template: roof
+  roof_wood_02:
+    position: [10, 59]
+    prefix: roof_wood_02_
+    from_template: roof
+  roof_brick:
+    position: [10, 59]
+    prefix: roof_brick_
+    from_template: roof
+  stone_bordered:
+    position: [29, 29]
     size: [1, 1]
+    prefix: stone_bordered_
     areas:
-      roof_stone_base: [1, 3]
-      roof_stone_outer_edge_nw: [0, 0]
-      roof_stone_outer_edge_n: [1, 3]
-      roof_stone_outer_edge_ne: [2, 0]
-      roof_stone_outer_edge_w: [0, 1]
-      roof_stone_outer_edge_e: [2, 1]
-      roof_stone_outer_edge_sw: [0, 2]
-      roof_stone_outer_edge_s: [1, 2]
-      roof_stone_outer_edge_se: [2, 2]
-      roof_stone_inner_edge_sw: [0, 3]
-      roof_stone_inner_edge_se: [2, 3]
+      inner_edge_se: [1, 0]
+      inner_edge_sw: [2, 0]
+      inner_edge_ne: [1, 1]
+      inner_edge_nw: [2, 1]
+      outer_edge_nw: [0, 2]
+      outer_edge_n: [1, 2]
+      outer_edge_ne: [2, 2]
+      outer_edge_w: [0, 3]
+      base: [1, 3]
+      outer_edge_e: [2, 3]
+      outer_edge_sw: [0, 4]
+      outer_edge_s: [1, 4]
+      outer_edge_se: [2, 4]
   building_stone:
     position: [0, 62]
     size: [1, 2]
@@ -211,23 +248,8 @@ groups:
       building_stone_outer_edge_sw: [0, 0]
       building_stone_outer_edge_s: [1, 0]
       building_stone_outer_edge_se: [2, 0]
-  roof_wood:
-    position: [3, 57]
-    size: [1, 1]
-    areas:
-      roof_wood_base: [1, 3]
-      roof_wood_outer_edge_nw: [0, 0]
-      roof_wood_outer_edge_n: [1, 3]
-      roof_wood_outer_edge_ne: [2, 0]
-      roof_wood_outer_edge_w: [0, 1]
-      roof_wood_outer_edge_e: [2, 1]
-      roof_wood_outer_edge_sw: [0, 2]
-      roof_wood_outer_edge_s: [1, 2]
-      roof_wood_outer_edge_se: [2, 2]
-      roof_wood_inner_edge_sw: [0, 3]
-      roof_wood_inner_edge_se: [2, 3]
   building_wood:
-    position: [11, 57]
+    position: [7, 57]
     size: [1, 2]
     areas:
       building_wood_outer_edge_sw: [0, 0]
@@ -236,6 +258,16 @@ groups:
       building_wood_variant1: [1, 0]
       building_wood_variant2: [2, 0]
       building_wood_variant3: [3, 0]
+  building_brick:
+    position: [13, 59]
+    size: [1, 2]
+    areas:
+      building_brick_outer_edge_sw: [0, 0]
+      building_brick_outer_edge_s: [1, 0]
+      building_brick_outer_edge_se: [2, 0]
+      building_brick_variant1: [0, 2]
+      building_brick_variant2: [1, 2]
+      building_brick_variant3: [2, 2]
   grass_med_variants:
     position: [30, 0]
     size: [1, 1]
@@ -507,8 +539,116 @@ groups:
       bridge_vert_n: [20, 0, 2, 1]
       bridge_vert_c: [20, 1, 2, 1]
       bridge_vert_s: [20, 2, 2, 1]
+      
+      bazaar01_top: [24, 8, 2, 1]
+      bazaar01_bot: [24, 9, 2, 2]
+      bazaar02_top: [24, 11, 2, 1]
+      bazaar02_bot: [24, 12, 2, 2]
+      bazaar03_top: [24, 14, 2, 1]
+      bazaar03_bot: [24, 15, 2, 1]
   misc_building:
     position: [0, 57]
     areas:
-      window01: [17, 0, 1, 2]
-      window02: [18, 0, 1, 2]
+      window01: [13, 0, 1, 2]
+      window02: [14, 0, 1, 2]
+      tent_top: [3, 0, 4, 2]
+      tent_bot: [3, 2, 4, 3]
+  misc_farm:
+    position: [30, 0]
+    areas:
+      wood_pile: [0, 4, 1, 1]
+      anvil01: [1, 4, 1, 1]
+      wood_pile_2by2: [0, 5, 2, 2]
+      flour_sack: [0, 7, 1, 1]
+      anvil02: [1, 7, 1, 1]
+      flour_sack_2by2: [0, 8, 2, 2]
+      veg_sack01: [0, 10, 1, 1]
+      veg_sack02: [1, 10, 1, 1]
+      veg_sack01_2by2: [0, 11, 2, 2]
+      veg_sack02_2by2: [0, 13, 2, 2]
+      meat01: [0, 15, 1, 1]
+      meat02: [1, 15, 1, 1]
+      
+      bin01: [0, 16, 1, 2]
+      
+      fish01: [0, 18, 1, 1]
+      fish02: [0, 19, 1, 1]
+      fish03: [0, 20, 1, 1]
+      veg01: [1, 19, 1, 1]
+      veg02: [1, 20, 1, 1]
+      veg03: [0, 21, 1, 1]
+      veg04: [1, 21, 1, 1]
+      veg05: [0, 22, 1, 1]
+      veg06: [1, 22, 1, 1]
+      
+      veg01_bin: [0, 23, 1, 2]
+      veg02_bin: [1, 23, 1, 2]
+      veg03_bin: [0, 25, 1, 2]
+      veg04_bin: [1, 25, 1, 2]
+      veg05_bin: [0, 27, 1, 2]
+      veg06_bin: [1, 27, 1, 2]
+  misc_boats:
+    position: [19, 55]
+    size: [4, 2]
+    areas:
+      boat01: [0, 0]
+      boat01_water: [0, 2]
+      boat02: [0, 4]
+      boat02_water: [0, 6]
+  farm_plants:
+    position: [23, 55]
+    size: [1, 2]
+    areas:
+      farm_plant_01a: [0, 0]
+      farm_plant_02a: [1, 0]
+      farm_plant_03a: [2, 0]
+      farm_plant_04a: [3, 0]
+      farm_plant_05a: [4, 0]
+      farm_plant_06a: [5, 0]
+      farm_plant_07a: [6, 0]
+      
+      farm_plant_01b: [0, 2]
+      farm_plant_02b: [1, 2]
+      farm_plant_03b: [2, 2]
+      farm_plant_04b: [3, 2]
+      farm_plant_05b: [4, 2]
+      farm_plant_06b: [5, 2]
+      farm_plant_07b: [6, 2]
+      
+      farm_plant_01c: [0, 4]
+      farm_plant_02c: [1, 4]
+      farm_plant_03c: [2, 4]
+      farm_plant_04c: [3, 4]
+      farm_plant_05c: [4, 4]
+      farm_plant_06c: [5, 4]
+      farm_plant_07c: [6, 4]
+      
+      farm_plant_01d: [0, 6]
+      farm_plant_02d: [1, 6]
+      farm_plant_03d: [2, 6]
+      farm_plant_04d: [3, 6]
+      farm_plant_05d: [4, 6]
+      farm_plant_06d: [5, 6]
+      farm_plant_07d: [6, 6]
+  fence:
+    position: [16, 57]
+    size: [1, 1]
+    areas:
+      fence_e: [0, 0]
+      fence_e_w: [1, 0]
+      fence_w: [2, 0]
+      fence_n: [0, 1]
+      fence_n_s: [1, 1]
+      fence_s: [2, 1]
+      fence_e_s: [0, 2]
+      fence_e_w_s: [1, 2]
+      fence_w_s: [2, 2]
+      fence_e_n_s: [0, 3]
+      fence_e_w_n_s: [1, 3]
+      fence_w_n_s: [2, 3]
+      fence_e_n: [0, 4]
+      fence_e_w_n: [1, 4]
+      fence_w_n: [2, 4]
+      fence_gate_w: [0, 5]
+      fence_gate_c: [1, 5]
+      fence_gate_e: [2, 5]

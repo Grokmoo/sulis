@@ -16,8 +16,10 @@
 
 use std::time;
 use std::cell::Ref;
-use std::collections::{HashMap, HashSet, BTreeMap};
+use std::collections::{BTreeMap};
 use std::{f32, ptr};
+
+use int_hash::{IntHashMap, IntHashSet};
 
 use sulis_core::util::{self, Point};
 use sulis_module::Area;
@@ -32,8 +34,8 @@ pub struct PathFinder {
     f_score: Vec<i32>,
     g_score: Vec<i32>,
     open: BTreeMap<i32, i32>,
-    closed: HashSet<i32>,
-    came_from: HashMap<i32, i32>,
+    closed: IntHashSet<i32>,
+    came_from: IntHashMap<i32, i32>,
 
     goal_x: f32,
     goal_y: f32,
@@ -51,8 +53,8 @@ impl PathFinder {
             f_score: vec![0;(width*height) as usize],
             g_score: vec![0;(width*height) as usize],
             open: BTreeMap::new(),
-            closed: HashSet::new(),
-            came_from: HashMap::new(),
+            closed: IntHashSet::default(),
+            came_from: IntHashMap::default(),
             goal_x: 0.0,
             goal_y: 0.0,
         }
@@ -79,7 +81,7 @@ impl PathFinder {
         let prop_grid = &area_state.prop_pass_grid;
         let entity_grid = &area_state.entity_grid;
 
-        debug!("Finding path from {:?} to within {} of {},{}",
+        trace!("Finding path from {:?} to within {} of {},{}",
                requester.location, dest_dist, dest_x, dest_y);
 
         entities_to_ignore.push(requester.index());

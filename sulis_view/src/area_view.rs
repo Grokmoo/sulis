@@ -65,6 +65,8 @@ pub struct AreaView {
 
     area_mouseover: Option<Rc<RefCell<AreaMouseover>>>,
     area_mouseover_widget: Option<Rc<RefCell<Widget>>>,
+
+    scroll_target: Option<(f32, f32)>,
 }
 
 const TILE_CACHE_TEXTURE_SIZE: u32 = 2048;
@@ -92,6 +94,7 @@ impl AreaView {
             feedback_text_params: area_feedback_text::Params::default(),
             area_mouseover: None,
             area_mouseover_widget: None,
+            scroll_target: None,
         }))
     }
 
@@ -100,18 +103,26 @@ impl AreaView {
         let x = entity.borrow().location.x as f32 + entity.borrow().size.width as f32 / 2.0;
         let y = entity.borrow().location.y as f32 + entity.borrow().size.height as f32 / 2.0;
 
-        self.center_scroll_on_point(x, y, area_width, area_height, widget);
+        let (x, y) = self.center_scroll_on_point(x, y, area_width, area_height, widget);
+        self.scroll.set(x, y);
     }
 
     fn center_scroll_on_point(&mut self, x: f32, y: f32, area_width: i32,
-                              area_height: i32, widget: &Widget) {
+                              area_height: i32, widget: &Widget) -> (f32, f32) {
         let (scale_x, scale_y) = self.scale;
         self.scroll.compute_max(widget, area_width, area_height, scale_x, scale_y);
 
         let x = x - widget.state.inner_width() as f32 / scale_x / 2.0;
         let y = y - widget.state.inner_height() as f32 / scale_y / 2.0;
 
-        self.scroll.set(x, y);
+        (x, y)
+    }
+
+    pub fn delayed_scroll_to_point(&mut self, x: f32, y: f32, area_width: i32,
+                                   area_height: i32, widget: &Widget) {
+        let (x, y) = self.center_scroll_on_point(x, y, area_width, area_height, widget);
+        let (x, y) = self.scroll.bound(x, y);
+        self.scroll_target = Some((x, y));
     }
 
     fn get_cursor_pos(&self, widget: &Rc<RefCell<Widget>>) -> (i32, i32) {
@@ -465,8 +476,8 @@ impl AreaView {
         self.area_mouseover_widget = None;
     }
 
-    pub fn scroll(&mut self, delta_x: f32, delta_y: f32) {
-        let speed = Config::scroll_speed();
+    pub fn scroll(&mut self, delta_x: f32, delta_y: f32, millis: u32) {
+        let speed = Config::scroll_speed() * millis as f32 / 33.0;
         let delta_x = speed * delta_x / self.scale.0;
         let delta_y = speed * delta_y / self.scale.1;
         self.scroll.change(delta_x, delta_y)
@@ -475,6 +486,32 @@ impl AreaView {
 
 impl WidgetKind for AreaView {
     widget_kind!(NAME);
+
+    fn update(&mut self, _widget: &Rc<RefCell<Widget>>, millis: u32) {
+        let (dest_x, dest_y) = match self.scroll_target {
+            None => return,
+            Some((x, y)) => (x, y),
+        };
+
+        let (sign_x, sign_y) = ((self.scroll.x() - dest_x).signum(), (self.scroll.y() - dest_y).signum());
+
+        let speed = Config::scroll_speed() * 4.0 * millis as f32 / 33.3;
+        let (speed_x, speed_y) = (speed / self.scale.0, speed / self.scale.1);
+
+        let (cur_x, cur_y) = (self.scroll.x(), self.scroll.y());
+
+        let (dir_x, dir_y) = (cur_x - dest_x, cur_y - dest_y);
+
+        let mag = dir_y.hypot(dir_x);
+        let (delta_x, delta_y) = (dir_x * speed_x / mag, dir_y * speed_y / mag);
+
+        self.scroll.change(delta_x, delta_y);
+
+        if (self.scroll.x() - dest_x).signum() != sign_x || (self.scroll.y() - dest_y).signum() != sign_y {
+            self.scroll.set(dest_x, dest_y);
+            self.scroll_target = None;
+        }
+    }
 
     fn layout(&mut self, widget: &mut Widget) {
         widget.do_base_layout();
@@ -763,7 +800,7 @@ impl WidgetKind for AreaView {
 
         match kind {
             ClickKind::Middle => {
-                self.scroll(delta_x, delta_y);
+                self.scroll(delta_x, delta_y, 33);
             },
             ClickKind::Left => {
                 if let Some(_) = area_state.borrow_mut().targeter() {

@@ -86,7 +86,7 @@ impl WidgetKind for InputField {
 
     fn wants_keyboard_focus(&self) -> bool { true }
 
-    fn update(&mut self, widget: &Rc<RefCell<Widget>>) {
+    fn update(&mut self, widget: &Rc<RefCell<Widget>>, _millis: u32) {
         if self.initializing {
             if Widget::grab_keyboard_focus(&widget) {
                 self.initializing = false;

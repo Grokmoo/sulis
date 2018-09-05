@@ -137,8 +137,12 @@ impl GameMainLoopUpdater {
 }
 
 impl MainLoopUpdater for GameMainLoopUpdater {
-    fn update(&self, _root: &Rc<RefCell<Widget>>, millis: u32) {
-        GameState::update(millis);
+    fn update(&self, root: &Rc<RefCell<Widget>>, millis: u32) {
+        let ui_cb = GameState::update(millis);
+
+        if let Some(cb) = ui_cb {
+            dialog_window::activate(root, &cb.on_trigger, &cb.parent, &cb.target);
+        }
     }
 
     fn is_exit(&self) -> bool {
@@ -156,6 +160,10 @@ pub struct RootView {
 }
 
 impl RootView {
+    pub fn area_view(&self) -> (Rc<RefCell<AreaView>>, Rc<RefCell<Widget>>) {
+        (Rc::clone(&self.area_view), Rc::clone(&self.area_view_widget))
+    }
+
     pub fn next_step(&mut self) -> Option<NextGameStep> {
         self.next_step.take()
     }
@@ -345,20 +353,13 @@ impl RootView {
 impl WidgetKind for RootView {
     widget_kind!(NAME);
 
-    fn update(&mut self, widget: &Rc<RefCell<Widget>>) {
+    fn update(&mut self, widget: &Rc<RefCell<Widget>>, millis: u32) {
         let area_state = GameState::area_state();
         let root = Widget::get_root(widget);
         let area = area_state.borrow().area.id.clone();
         if area != self.area {
             self.area = area;
             root.borrow_mut().invalidate_children();
-        }
-
-        match GameState::check_get_ui_callback() {
-            None => (),
-            Some(ui_cb) => {
-                dialog_window::activate(widget, &ui_cb.on_trigger, &ui_cb.parent, &ui_cb.target);
-            }
         }
 
         if let Some(instant) = self.status_added {
@@ -398,15 +399,15 @@ impl WidgetKind for RootView {
 
         if Config::edge_scrolling() {
             if cx == Config::ui_width() - 1 {
-                self.area_view.borrow_mut().scroll(-2.0, 0.0);
+                self.area_view.borrow_mut().scroll(-2.0, 0.0, millis);
             } else if cx == 0 {
-                self.area_view.borrow_mut().scroll(2.0, 0.0);
+                self.area_view.borrow_mut().scroll(2.0, 0.0, millis);
             }
 
             if cy == Config::ui_height() - 1 {
-                self.area_view.borrow_mut().scroll(0.0, -2.0);
+                self.area_view.borrow_mut().scroll(0.0, -2.0, millis);
             } else if cy == 0 {
-                self.area_view.borrow_mut().scroll(0.0, 2.0);
+                self.area_view.borrow_mut().scroll(0.0, 2.0, millis);
             }
         }
     }
@@ -423,10 +424,10 @@ impl WidgetKind for RootView {
             Exit => self.show_exit(widget),
             SelectAll => GameState::select_party_members(GameState::party()),
             QuickSave => self.save(),
-            ScrollUp => self.area_view.borrow_mut().scroll(0.0, 2.0),
-            ScrollDown => self.area_view.borrow_mut().scroll(0.0, -2.0),
-            ScrollRight => self.area_view.borrow_mut().scroll(-2.0, 0.0),
-            ScrollLeft => self.area_view.borrow_mut().scroll(2.0, 0.0),
+            ScrollUp => self.area_view.borrow_mut().scroll(0.0, 2.0, 33),
+            ScrollDown => self.area_view.borrow_mut().scroll(0.0, -2.0, 33),
+            ScrollRight => self.area_view.borrow_mut().scroll(-2.0, 0.0, 33),
+            ScrollLeft => self.area_view.borrow_mut().scroll(2.0, 0.0, 33),
             _ => return false,
         }
 

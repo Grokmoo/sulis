@@ -282,8 +282,27 @@ pub fn activate(widget: &Rc<RefCell<Widget>>, on_select: &Vec<OnTrigger>,
             ShowCutscene(ref cutscene) => show_cutscene(widget, cutscene),
             FireScript(ref script) => fire_script(&script.id, &script.func, pc, target),
             GameOverWindow(ref text) => game_over_window(widget, text.to_string()),
+            ScrollView(x, y) => scroll_view(widget, *x, *y),
         }
     }
+}
+
+fn scroll_view(widget: &Rc<RefCell<Widget>>, x: i32, y: i32) {
+    let root = Widget::get_root(widget);
+
+    let (area_view, area_view_widget) = {
+        let view = Widget::downcast_kind_mut::<RootView>(&root);
+        view.area_view()
+    };
+
+    let (width, height) = {
+        let area = GameState::area_state();
+        let area = area.borrow();
+        (area.area.width, area.area.height)
+    };
+
+    area_view.borrow_mut().delayed_scroll_to_point(x as f32, y as f32, width, height,
+                                                   &area_view_widget.borrow());
 }
 
 fn game_over_window(widget: &Rc<RefCell<Widget>>, text: String) {

@@ -94,6 +94,7 @@ pub struct WallKind {
     pub base_tile: String,
     pub fill_tile: Option<String>,
     pub extended: Vec<String>,
+    pub interior_border: bool,
 }
 
 #[derive(Deserialize, Debug, Clone)]

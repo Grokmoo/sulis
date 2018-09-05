@@ -60,7 +60,7 @@ impl Button {
 impl WidgetKind for Button {
     widget_kind!["button"];
 
-    fn update(&mut self, widget: &Rc<RefCell<Widget>>) {
+    fn update(&mut self, widget: &Rc<RefCell<Widget>>, _millis: u32) {
         if self.repeat_time == 0 { return; }
 
         let start_time = match self.mouse_pressed_time {

@@ -69,7 +69,7 @@ impl WidgetKind for EmptyWidget {
 /// object which contains the common functionality across all Widgets.
 pub trait WidgetKind {
     /// called every frame
-    fn update(&mut self, _widget: &Rc<RefCell<Widget>>) { }
+    fn update(&mut self, _widget: &Rc<RefCell<Widget>>, _millis: u32) { }
 
     fn draw(&mut self, _renderer: &mut GraphicsRenderer, _pixel_size: Point,
             _widget: &Widget, _millis: u32) { }

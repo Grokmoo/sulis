@@ -184,7 +184,7 @@ pub fn main_loop(io: &mut Box<IO>, root: Rc<RefCell<Widget>>,
         io.process_input(Rc::clone(&root));
         updater.update(&root, last_elapsed);
 
-        if let Err(e) = Widget::update(&root) {
+        if let Err(e) = Widget::update(&root, last_elapsed) {
             error!("There was a fatal error updating the UI tree state.");
             return Err(e);
         }

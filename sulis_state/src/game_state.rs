@@ -773,14 +773,6 @@ impl GameState {
         MODAL_LOCKED.with(|c| { c.set(locked) })
     }
 
-    pub fn check_get_ui_callback() -> Option<UICallback> {
-        STATE.with(|s| {
-            let mut state = s.borrow_mut();
-            let state = state.as_mut().unwrap();
-            state.ui_callbacks.pop()
-        })
-    }
-
     fn check_clear_anims() -> bool {
         CLEAR_ANIMS.with(|c| {
             c.replace(false)
@@ -810,7 +802,14 @@ impl GameState {
         STATE.with(|s| Rc::clone(&s.borrow().as_ref().unwrap().area_state))
     }
 
-    pub fn update(millis: u32) {
+    #[must_use]
+    pub fn update(millis: u32) -> Option<UICallback> {
+        let ui_cb = STATE.with(|s| {
+            let mut state = s.borrow_mut();
+            let state = state.as_mut().unwrap();
+            state.ui_callbacks.pop()
+        });
+
         let to_add: Vec<Anim> = ANIMS_TO_ADD.with(|a| {
             let mut anims = a.borrow_mut();
 
@@ -850,6 +849,8 @@ impl GameState {
                 ai.update(entity);
             });
         }
+
+        ui_cb
     }
 
     pub fn draw_above_entities(renderer: &mut GraphicsRenderer, offset_x: f32, offset_y: f32,

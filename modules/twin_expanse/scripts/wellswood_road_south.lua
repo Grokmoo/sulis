@@ -19,6 +19,7 @@ end
 
 function on_player_enter_bridge(parent, target)
   game:cancel_blocking_anims()
+  game:scroll_view(19, 36)
   game:spawn_encounter_at(17, 36)
   game:enable_trigger_at(35, 65)
 end

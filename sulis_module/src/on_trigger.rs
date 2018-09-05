@@ -42,4 +42,5 @@ pub enum OnTrigger {
     FireScript(ScriptData),
     SayLine(String),
     GameOverWindow(String),
+    ScrollView(i32, i32),
 }

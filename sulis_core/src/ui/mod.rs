@@ -120,15 +120,21 @@ impl Scrollable {
         self.set(x, y);
     }
 
-    pub fn set(&mut self, mut scroll_x: f32, mut scroll_y: f32) {
-        if scroll_x < 0.0 { scroll_x = 0.0; }
-        else if scroll_x > self.max_x { scroll_x = self.max_x; }
+    pub fn set(&mut self, scroll_x: f32, scroll_y: f32) {
+        let (x, y) = self.bound(scroll_x, scroll_y);
 
-        if scroll_y < 0.0 { scroll_y = 0.0; }
-        else if scroll_y > self.max_y { scroll_y = self.max_y; }
+        self.x = x;
+        self.y = y;
+    }
 
-        self.x = scroll_x;
-        self.y = scroll_y;
+    pub fn bound(&self, mut x: f32, mut y: f32) -> (f32, f32) {
+        if x < 0.0 { x = 0.0; }
+        else if x > self.max_x { x = self.max_x; }
+
+        if y < 0.0 { y = 0.0; }
+        else if y > self.max_y { y = self.max_y; }
+
+        (x, y)
     }
 
     pub fn x(&self) -> f32 { self.x }

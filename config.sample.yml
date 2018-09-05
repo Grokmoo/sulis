@@ -24,7 +24,7 @@ display:
     # height: 207
 
     # in frames per second
-    frame_rate: 30
+    frame_rate: 60
 
     # This scales the overall speed of all game animations, in milliseconds
     # Larger values make animations take longer

@@ -416,9 +416,9 @@ impl Widget {
         Widget::set_mouse_over_widget(widget, mouse_over, x, y);
     }
 
-    pub fn update(root: &Rc<RefCell<Widget>>) -> Result<(), Error> {
+    pub fn update(root: &Rc<RefCell<Widget>>, millis: u32) -> Result<(), Error> {
         Widget::check_children_removal(&root);
-        Widget::update_kind_recursive(&root);
+        Widget::update_kind_recursive(&root, millis);
 
         Widget::check_readd(&root);
         Widget::check_children(&root)?;
@@ -428,14 +428,14 @@ impl Widget {
         Ok(())
     }
 
-    fn update_kind_recursive(widget: &Rc<RefCell<Widget>>) {
+    fn update_kind_recursive(widget: &Rc<RefCell<Widget>>, millis: u32) {
         let kind = Rc::clone(&widget.borrow().kind);
-        kind.borrow_mut().update(&widget);
+        kind.borrow_mut().update(&widget, millis);
 
         let len = widget.borrow().children.len();
         for i in 0..len {
             let child = Rc::clone(&widget.borrow().children[i]);
-            Widget::update_kind_recursive(&child);
+            Widget::update_kind_recursive(&child, millis);
         }
     }
 

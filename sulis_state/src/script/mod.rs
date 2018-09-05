@@ -520,6 +520,13 @@ impl UserData for ScriptInterface {
             Ok(())
         });
 
+        methods.add_method("scroll_view", |_, _, (x, y): (i32, i32)| {
+            let pc = GameState::player();
+            let cb = OnTrigger::ScrollView(x, y);
+            GameState::add_ui_callback(vec![cb], &pc, &pc);
+            Ok(())
+        });
+
         methods.add_method("num_effects_with_tag", |_, _, tag: String| {
             let mgr = GameState::turn_manager();
             let mgr = mgr.borrow();

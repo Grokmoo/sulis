@@ -6,6 +6,7 @@ function on_enter_rockslide(parent, target)
 end
 
 function after_rockslide_cutscene(parent)
+  game:scroll_view(35, 110)
   base_class = game:player():base_class()
   convo_started = false
   

@@ -96,7 +96,7 @@ editor:
     encounter_tile: "gui/editor_encounter"
     visibility_tile: "gui/area_invis"
     explored_tile: "gui/area_unexplored"
-    entity_layer: 5
+    entity_layer: 7
     layers:
       - terrain_base
       - terrain_border
@@ -104,6 +104,8 @@ editor:
       - walls_top
       - prop
       - object
+      - object_interior
+      - decoration
       - walls_aerial
       - aerial
     elev_tiles:

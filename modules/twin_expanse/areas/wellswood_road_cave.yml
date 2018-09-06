@@ -11,8 +11,10 @@ layers:
   - walls_top
   - prop
   - object
+  - object_interior
+  - decoration
   - aerial
-entity_layer: 5
+entity_layer: 7
 actors: []
 props:
   - id: chest_medium_level1_misc

@@ -97,29 +97,40 @@ children:
         children:
           no_wall_button:
             from: .button
-            position: [80, 23]
+            position: [80, 43]
             text: "Clear"
             preferred_size: [20, 20]
           level_label:
             from: .label
             text: "Level"
-            position: [5, 25]
+            position: [55, 5]
             preferred_size: [30, 12]
           level:
             from: .spinner
-            position: [35, 25]
+            position: [75, 5]
           brush_size_label:
             from: .label
             text: "Brush Size"
-            position: [5, 5]
+            position: [0, 5]
             preferred_size: [30, 12]
           brush_size:
             from: .spinner
-            position: [35, 5]
+            position: [25, 5]
+          ext_content:
+            width_relative: Max
+            position: [0, 44]
+            preferred_size: [-20, 20]
+            layout: Grid
+            layout_spacing: [0, 0, 0, 0]
+            children:
+              ext_button:
+                from: .button
+                foreground: "#icon#"
+                preferred_size: [20, 20]
           wall_content:
             height_relative: Max
             width_relative: Max
-            position: [0, 44]
+            position: [0, 64]
             preferred_size: [-20, -24]
             layout: Grid
             layout_spacing: [0, 0, 0, 0]
@@ -148,7 +159,7 @@ children:
             height_relative: Max
             width_relative: Max
             position: [0, 24]
-            preferred_size: [-20, -4]
+            preferred_size: [0, -4]
             layout: Grid
             layout_spacing: [0, 0, 0, 0]
             children:
@@ -250,21 +261,21 @@ children:
         position: [0, 4]
         children:
           layers_content:
-            width_relative: Max
-            preferred_size: [-5, 4]
-            layout: BoxHorizontal
+            height_relative: Max
+            preferred_size: [20, 0]
+            layout: BoxVertical
             children:
               layer_button:
                 from: .button
                 text: "#0#"
                 text_params:
                   scale: 4.0
-                preferred_size: [16, 4]
+                preferred_size: [20, 4]
           tiles:
             height_relative: Max
             width_relative: Max
-            position: [0, 4]
-            preferred_size: [0, -4]
+            position: [20, 0]
+            preferred_size: [-20, 0]
             children:
               scrollbar:
                 from: .scrollbar

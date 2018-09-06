@@ -202,6 +202,10 @@ groups:
     position: [27, 21]
     prefix: water_ice_to_water_med_
     from_template: borders
+  fancy_carpet:
+    position: [50, 0]
+    prefix: fancy_carpet_
+    from_template: borders
 
   roof_thatched:
     position: [7, 59]
@@ -244,6 +248,68 @@ groups:
       outer_edge_all: [2, 3]
       inner_edge_ne_sw: [0, 5]
       inner_edge_nw_se: [1, 5]
+  interior_brick:
+    position: [35, 0]
+    size: [1, 1]
+    prefix: interior_brick_
+    areas:
+      base: [1, 1]
+      outer_edge_nw: [0, 0]
+      outer_edge_n: [1, 0]
+      outer_edge_ne: [2, 0]
+      outer_edge_w: [0, 1]
+      outer_edge_e: [2, 1]
+      outer_edge_sw: [0, 2]
+      outer_edge_s: [1, 2]
+      outer_edge_se: [2, 2]
+      inner_edge_sw: [1, 3]
+      inner_edge_se: [0, 3]
+      inner_edge_ne: [0, 4]
+      inner_edge_nw: [1, 4]
+      outer_edge_all: [2, 3]
+      inner_edge_ne_sw: [0, 5]
+      inner_edge_nw_se: [1, 5]
+  interior_stone_ceil:
+    position: [44, 0]
+    size: [1, 1]
+    prefix: interior_stone_ceil_
+    areas:
+      base: [1, 1]
+      outer_edge_nw: [0, 0]
+      outer_edge_n: [1, 0]
+      outer_edge_ne: [2, 0]
+      outer_edge_w: [0, 1]
+      outer_edge_e: [2, 1]
+      outer_edge_sw: [0, 2]
+      outer_edge_s: [1, 2]
+      outer_edge_se: [2, 2]
+      inner_edge_sw: [1, 3]
+      inner_edge_se: [0, 3]
+      inner_edge_ne: [0, 4]
+      inner_edge_nw: [1, 4]
+      outer_edge_all: [2, 3]
+      inner_edge_ne_sw: [0, 5]
+      inner_edge_nw_se: [1, 5]
+  wall_interior_plaster:
+    position: [47, 0]
+    areas:
+      wall_interior_plaster_outer_edge_sw: [0, 0, 1, 2]
+      wall_interior_plaster_outer_edge_s: [1, 0, 1, 2]
+      wall_interior_plaster_outer_edge_se: [2, 0, 1, 2]
+      wall_impass_override: [3, 1, 1, 1]
+  interior_floors:
+    position: [32, 6]
+    size: [1, 1]
+    areas:
+      interior_wood01_base: [0, 0]
+      interior_wood01_base_variant1: [1, 0]
+      interior_tile_base: [0, 1]
+      interior_tile_base_variant1: [1, 1]
+      interior_stone_base: [0, 2]
+      interior_stone_base_variant1: [1, 2]
+      interior_wood02_base: [0, 3]
+      interior_wood02_base_variant1: [1, 3]
+      interior_dirt_base: [0, 5]
   stone_bordered:
     position: [29, 29]
     size: [1, 1]
@@ -262,6 +328,12 @@ groups:
       outer_edge_sw: [0, 4]
       outer_edge_s: [1, 4]
       outer_edge_se: [2, 4]
+  wall_interior_brick:
+    position: [38, 0]
+    areas:
+      wall_interior_brick_outer_edge_sw: [0, 0, 1, 2]
+      wall_interior_brick_outer_edge_s: [1, 0, 1, 2]
+      wall_interior_brick_outer_edge_se: [2, 0, 1, 2]
   building_stone:
     position: [0, 62]
     size: [1, 2]
@@ -481,10 +553,12 @@ groups:
       cave_entrance_large_c: [2, 5, 1, 3]
       cave_entrance_large_e: [3, 5, 1, 3]
  
-      door_frame_metal_e: [3, 2, 1, 2]
-      door_frame_metal_w: [4, 2, 1, 2]
-      door_frame_wood_e: [5, 2, 1, 2]
-      door_frame_wood_w: [6, 2, 1, 2]
+      door_header_metal: [3, 2, 1, 1]
+      door_header_wood: [5, 2, 1, 1]
+      door_frame_metal_e: [3, 3, 1, 2]
+      door_frame_metal_w: [4, 3, 1, 2]
+      door_frame_wood_e: [5, 3, 1, 2]
+      door_frame_wood_w: [6, 3, 1, 2]
   small_plants:
     position: [0, 45]
     size: [1, 1]
@@ -673,3 +747,65 @@ groups:
       fence_gate_w: [0, 5]
       fence_gate_c: [1, 5]
       fence_gate_e: [2, 5]
+  misc_interior:
+    position: [32, 0]
+    areas:
+      table01: [2, 6, 1, 1]
+      table02: [2, 7, 1, 1]
+      bucket_empty: [3, 6, 1, 1]
+      bucket_full: [3, 7, 1, 1]
+      
+      chair01: [6, 6, 1, 1]
+      chair02: [6, 7, 1, 1]
+      chair03: [6, 8, 1, 1]
+      chair04: [6, 9, 1, 1]
+      
+      bar_vert_east_n: [6, 2, 1, 1]
+      bar_vert_east_c: [6, 3, 1, 1]
+      bar_vert_east_s: [6, 4, 1, 2]
+      bar_vert_west_n: [7, 2, 1, 1]
+      bar_vert_west_c: [7, 3, 1, 1]
+      bar_vert_west_s: [7, 4, 1, 2]
+      
+      rug_small01: [8, 2, 1, 1]
+      rug_small02: [9, 2, 1, 1]
+      plate01: [8, 3, 1, 1]
+      plate02: [9, 3, 1, 1]
+      plate03: [8, 4, 1, 1]
+      plate04: [9, 4, 1, 1]
+      
+      bed_vert_01: [4, 6, 2, 3]
+      
+      bar_horiz_e: [3, 9, 1, 2]
+      bar_horiz_c: [4, 9, 1, 2]
+      bar_horiz_w: [5, 9, 1, 2]
+      
+      bench_horiz01: [3, 12, 3, 2]
+      bench_vert01: [6, 11, 1, 3]
+      
+      cabinet01: [7, 6, 1, 3]
+      cabinet02: [8, 6, 1, 3]
+      cabinet03: [9, 6, 1, 3]
+      cabinet04: [10, 6, 1, 3]
+      cabinet05: [7, 9, 1, 3]
+      cabinet06: [8, 9, 1, 3]
+      cabinet07: [9, 9, 1, 3]
+      cabinet08: [10, 9, 1, 3]
+      cabinet09: [11, 9, 1, 3]
+      
+      chair05: [0, 12, 1, 1]
+      chair06: [0, 13, 1, 1]
+      chair07: [2, 12, 1, 1]
+      chair08: [2, 13, 1, 1]
+      table03: [1, 12, 1, 1]
+      table04: [1, 13, 1, 1]
+      
+      bed_vert_02: [0, 14, 2, 3]
+      bed_vert_03: [2, 14, 2, 3]
+      bed_vert_04: [0, 17, 2, 3]
+      bed_vert_05: [2, 17, 2, 3]
+      
+      bed_horiz_01: [4, 14, 3, 2]
+      bed_horiz_02: [4, 16, 3, 2]
+      bed_horiz_03: [4, 18, 3, 2]
+      bed_horiz_04: [4, 20, 3, 2]

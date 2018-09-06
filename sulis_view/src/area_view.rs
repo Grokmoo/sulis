@@ -384,6 +384,10 @@ impl AreaView {
         let area_state = area_state.borrow();
         if let Some(entity) = area_state.get_entity_at(x, y) {
             Some(AreaMouseover::new_entity(&entity))
+        } else if let Some(_) = self.check_closed_door(x, y, &area_state) {
+            None
+        } else if let Some(transition) = area_state.get_transition_at(x, y) {
+            Some(AreaMouseover::new_transition(&transition.hover_text))
         } else if let Some(index) = area_state.prop_index_at(x, y) {
             let interactive = {
                 let prop = area_state.get_prop(index);
@@ -395,8 +399,20 @@ impl AreaView {
             } else {
                 None
             }
-        } else if let Some(transition) = area_state.get_transition_at(x, y) {
-            Some(AreaMouseover::new_transition(&transition.hover_text))
+        } else {
+            None
+        }
+    }
+
+    fn check_closed_door(&self, x: i32, y: i32,
+                       area_state: &AreaState) -> Option<Rc<RefCell<AreaMouseover>>> {
+        if let Some(index) = area_state.prop_index_at(x, y) {
+            {
+                let prop = area_state.get_prop(index);
+                if !prop.is_door() || !prop.is_enabled() || prop.is_active() { return None; }
+            }
+
+            Some(AreaMouseover::new_prop(index))
         } else {
             None
         }

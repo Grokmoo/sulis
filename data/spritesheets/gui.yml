@@ -474,6 +474,9 @@ groups:
       cursor4by6: [259, 578, 64, 96]
       cursor4by5: [259, 675, 64, 80]
       cursor4by4: [258, 756, 64, 64]
+      cursor3by5: [0, 853, 48, 64]
+      cursor2by4: [49, 853, 32, 64]
+      cursor4by2: [49, 918, 64, 32]
       
       ball: [16, 148, 32, 32]
       ball_active: [16, 181, 32, 32]

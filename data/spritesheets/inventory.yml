@@ -41,14 +41,16 @@ groups:
       legs_leather: [4, 3]
       torso_shirt: [5, 3]
       legs_pants: [6, 3]
+      shield_large: [7, 3]
       
       gloves_plate: [0, 4]
       boots_plate: [1, 4]
       helm_plate: [2, 4]
       torso_plate: [3, 4]
       legs_plate: [4, 4]
+      shield_kite: [5, 4]
       shield_small: [6, 4]
-      shield_large: [7, 4]
+      shield_heater: [7, 4]
       
       belt_01: [0, 5]
       belt_02: [1, 5]

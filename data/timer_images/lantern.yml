@@ -1,0 +1,6 @@
+id: lantern
+frame_time_millis: 150
+frames:
+  - "props/lantern0"
+  - "props/lantern1"
+  - "props/lantern2"

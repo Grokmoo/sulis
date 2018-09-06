@@ -1,7 +1,7 @@
 id: 2by4
 width: 2
 height: 4
-cursor_image: "gui/empty"
+cursor_image: "gui/cursor2by3"
 selection_image: "empty"
 relative_points: [[0, 0], [1, 0],
                   [0, 1], [1, 1],

@@ -747,6 +747,11 @@ groups:
       fence_gate_w: [0, 5]
       fence_gate_c: [1, 5]
       fence_gate_e: [2, 5]
+  entry_light:
+    position: [41, 0]
+    size: [3, 2]
+    areas:
+      entry_light: [0, 0]
   misc_interior:
     position: [32, 0]
     areas:
@@ -809,3 +814,51 @@ groups:
       bed_horiz_02: [4, 16, 3, 2]
       bed_horiz_03: [4, 18, 3, 2]
       bed_horiz_04: [4, 20, 3, 2]
+
+      wine_bottle01: [7, 12, 1, 1]
+      wine_bottle02: [8, 12, 1, 1]
+      plate05: [9, 12, 1, 1]
+      plate06: [7, 13, 1, 1]
+      plate07: [8, 13, 1, 1]
+      plate08: [8, 14, 1, 1]
+      lantern_off: [8, 15, 1, 1]
+      ropes01: [7, 15, 1, 1]
+      wall_crack01: [7, 16, 1, 1]
+      papers: [8, 16, 1, 1]
+      bottles01: [7, 17, 1, 1]
+      bottles02: [8, 17, 1, 1]
+      bottles03: [9, 17, 1, 1]
+      
+      sack_stack: [9, 13, 1, 2]
+      cabinet_top_01: [7, 18, 1, 1]
+      cabinet_top_02: [8, 18, 1, 1]
+      cabinet_top_03: [9, 18, 1, 1]
+      cabinet_top_04: [10, 18, 1, 1]
+      cabinet_bot_01: [7, 19, 1, 1]
+      cabinet_bot_02: [8, 19, 1, 1]
+      cabinet_bot_03: [9, 19, 1, 1]
+      cabinet_bot_04: [10, 19, 1, 1]
+      
+      cabinet_med01: [7, 20, 1, 2]
+      cabinet_med02: [8, 20, 1, 2]
+      cabinet_med03: [9, 20, 1, 2]
+      cabinet_med04: [10, 20, 1, 2]
+      
+      table_large01: [12, 6, 2, 3]
+      book01: [14, 6, 1, 1]
+      papers02: [15, 6, 1, 1]
+      book02: [16, 6, 1, 1]
+      flower_box01: [14, 7, 1, 1]
+      flower_box02: [15, 7, 1, 1]
+      flower_box03: [16, 7, 1, 1]
+      
+      cabinet_wide01: [14, 8, 2, 2]
+      cabinet_wide02: [16, 8, 2, 2]
+      cabinet_wide03: [18, 8, 2, 2]
+      cabinet_wide04: [20, 8, 2, 2]
+      
+      bed_small01: [17, 6, 1, 2]
+      bed_small02: [18, 6, 1, 2]
+      cabinet_short01: [19, 6, 2, 1]
+      cabinet_small_01: [19, 7, 1, 1]
+      cabinet_small_02: [20, 7, 1, 1]

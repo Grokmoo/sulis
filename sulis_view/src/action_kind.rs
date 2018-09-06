@@ -32,8 +32,15 @@ pub fn get_action(x: i32, y: i32) -> Box<ActionKind> {
     if let Some(action) = AttackAction::create_if_valid(x, y) { return action; }
     if let Some(action) = DialogAction::create_if_valid(x, y) { return action; }
     if let Some(action) = LootPropAction::create_if_valid(x, y) { return action; }
+
+    // open door
+    if let Some(action) = DoorPropAction::create_if_valid(x, y, true) { return action; }
+
     if let Some(action) = TransitionAction::create_if_valid(x, y) { return action; }
-    if let Some(action) = DoorPropAction::create_if_valid(x, y) { return action; }
+
+    // close door
+    if let Some(action) = DoorPropAction::create_if_valid(x, y, false) { return action; }
+
     if let Some(action) = MoveAction::create_if_valid(x as f32, y as f32, None) { return action; }
 
     Box::new(InvalidAction {})
@@ -156,7 +163,7 @@ struct DoorPropAction {
 }
 
 impl DoorPropAction {
-    fn create_if_valid(x: i32, y: i32) -> Option<Box<ActionKind>> {
+    fn create_if_valid(x: i32, y: i32, open: bool) -> Option<Box<ActionKind>> {
         let area_state = GameState::area_state();
         let area_state = area_state.borrow();
 
@@ -167,6 +174,9 @@ impl DoorPropAction {
 
         let prop_state = area_state.get_prop(index);
         if !prop_state.is_door() || !prop_state.is_enabled() { return None; }
+
+        if open && prop_state.is_active() { return None; }
+        if !open && !prop_state.is_active() { return None; }
 
         let max_dist = Module::rules().max_prop_distance;
         let pc = match GameState::selected().first() {
@@ -401,11 +411,7 @@ impl MoveThenAction {
         let x = px + (size.width / 2) as f32;
         let y = py + (size.height / 2) as f32;
 
-        let pc = match GameState::selected().first() {
-            None => return None,
-            Some(pc) => Rc::clone(pc),
-        };
-        let dist = dist + pc.borrow().size.diagonal / 2.0 + size.diagonal / 2.0;
+        let dist = dist + size.diagonal / 2.0;
         let move_action = match MoveAction::new_if_valid(x, y, Some(dist)) {
             None => return None,
             Some(move_action) => move_action,

@@ -41,3 +41,7 @@ weighted_entries:
     weight: 10
   shield_large:
     weight: 3
+  shield_heater:
+    weight: 5
+  shield_kite:
+    weight: 5

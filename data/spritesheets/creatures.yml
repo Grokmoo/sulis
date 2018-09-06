@@ -153,6 +153,8 @@ groups:
       crossbow: [48, 15]
       shortbow: [51, 15]
       longbow: [54, 15]
+      shield_heater: [57, 15]
+      shield_large: [60, 15]
       
       dagger_off: [0, 18]
       shortsword_off: [3, 18]
@@ -173,7 +175,7 @@ groups:
       projectile_bow: [48, 18]
       projectile_crossbow: [51, 18]
       shield_small: [54, 18]
-      shield_large: [57, 18]
+      shield_kite: [57, 18]
       
       wolf01: [39, 21]
       wolf_shadow: [39, 24]

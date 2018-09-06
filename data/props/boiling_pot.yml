@@ -1,0 +1,9 @@
+id: boiling_pot
+name: Boiling Pot
+icon: inventory/misc_crate
+image: boiling_pot
+size: 2by2
+visible: true
+interactive:
+  Not
+impass: [[0, 0], [1, 0], [0, 1], [1, 1]]

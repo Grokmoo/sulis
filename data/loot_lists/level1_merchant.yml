@@ -57,6 +57,10 @@ probability_entries:
     weight: 70
   shield_large:
     weight: 50
+  shield_heater:
+    weight: 60
+  shield_kite:
+    weight: 60
   battleaxe:
     weight: 50
   club:

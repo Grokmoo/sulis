@@ -1,0 +1,20 @@
+id: shield_heater
+name: Heater Shield
+kind:
+  Armor:
+    kind: Medium
+icon: inventory/shield_heater
+equippable:
+  slot: HeldOff
+  bonuses:
+    - kind:
+        defense: 8
+    - kind:
+        movement_rate: -0.04
+    - kind:
+        spell_accuracy: -7
+image:
+  HeldOff:
+    creatures/shield_heater
+weight: 250
+value: 70

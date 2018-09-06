@@ -1,0 +1,7 @@
+id: 4by2
+width: 4
+height: 2
+cursor_image: "gui/cursor4by2"
+selection_image: "empty"
+relative_points: [[0, 0], [1, 0], [2, 0], [3, 0],
+                  [0, 1], [1, 1], [2, 1], [3, 1]]

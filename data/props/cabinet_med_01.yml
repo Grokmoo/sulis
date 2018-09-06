@@ -1,0 +1,10 @@
+id: cabinet_med_01
+name: Cabinet
+icon: inventory/misc_crate
+image: tileset/cabinet_med01
+size: 2by4
+visible: true
+passable: false
+interactive:
+  Container:
+    loot: level1_misc

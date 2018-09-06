@@ -1,0 +1,9 @@
+id: lantern
+name: Lantern
+icon: inventory/misc_crate
+image: lantern
+size: 1by1
+visible: true
+interactive:
+  Not
+impass: [[0, 0]]

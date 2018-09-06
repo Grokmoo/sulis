@@ -1,0 +1,10 @@
+id: cabinet_small_01
+name: Cabinet
+icon: inventory/misc_crate
+image: tileset/cabinet_bot_01
+size: 2by2
+visible: true
+passable: false
+interactive:
+  Container:
+    loot: level1_misc

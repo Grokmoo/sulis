@@ -1,0 +1,7 @@
+id: boiling_pot
+frame_time_millis: 150
+frames:
+  - "props/boiling_pot0"
+  - "props/boiling_pot1"
+  - "props/boiling_pot2"
+  - "props/boiling_pot3"

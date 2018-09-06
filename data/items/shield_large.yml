@@ -1,8 +1,8 @@
 id: shield_large
-name: Large Shield
+name: Tower Shield
 kind:
   Armor:
-    kind: Medium
+    kind: Heavy
 icon: inventory/shield_large
 equippable:
   slot: HeldOff
@@ -20,5 +20,5 @@ equippable:
 image:
   HeldOff:
     creatures/shield_large
-weight: 500
+weight: 600
 value: 100

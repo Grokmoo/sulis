@@ -641,7 +641,9 @@ uniform_sets:
     impass: []
     invis: []
     tiles: [
-      plate01, plate02, plate03, plate04
+      plate01, plate02, plate03, plate04, plate05, plate06, plate07, plate08, wine_bottle01,
+      wine_bottle02, lantern_off, ropes01, wall_crack01, papers, bottles01, bottles02, bottles03,
+      book01, papers02, book02
     ]
   interior_pass_2by2:
     layer: object_interior
@@ -661,7 +663,10 @@ uniform_sets:
     tiles: [
       bar_vert_east_n, bar_vert_east_c, bar_vert_west_n, bar_vert_west_c,
       table01, table02, bucket_empty, bucket_full, chair01, chair02, chair03, chair04,
-      table03, table04, chair05, chair06, chair07, chair08
+      table03, table04, chair05, chair06, chair07, chair08,
+      cabinet_bot_01, cabinet_bot_02, cabinet_bot_03, cabinet_bot_04,
+      cabinet_top_01, cabinet_top_02, cabinet_top_03, cabinet_top_04,
+      cabinet_small_01, cabinet_small_02
     ]
   interior_bed_vert:
     layer: object_interior
@@ -684,7 +689,16 @@ uniform_sets:
     tiles: [
       bed_horiz_01, bed_horiz_02, bed_horiz_03, bed_horiz_04
     ]
-  interior_cabinet:
+  interior_cabinet_med:
+    layer: object_interior
+    size: [2, 4]
+    sprite_prefix: "tileset/"
+    impass: [[0, 0], [1, 0], [0, 1], [1, 1], [0, 2], [1, 2], [0, 3], [1, 3]]
+    invis: []
+    tiles: [
+      cabinet_med01, cabinet_med02, cabinet_med03, cabinet_med04, sack_stack
+    ]
+  interior_cabinet_large:
     layer: object_interior
     size: [2, 6]
     sprite_prefix: "tileset/"
@@ -701,6 +715,18 @@ uniform_sets:
     invis: []
     tiles: [
       bar_vert_east_s, bar_vert_west_s, bar_horiz_e, bar_horiz_c, bar_horiz_w
+    ]
+  interior_cabinet_4by4:
+    layer: object_interior
+    size: [4, 4]
+    sprite_prefix: "tileset/"
+    impass: [[0, 0], [1, 0], [2, 0], [3, 0],
+             [0, 1], [1, 1], [2, 1], [3, 1],
+             [0, 2], [1, 2], [2, 2], [3, 2],
+             [0, 3], [1, 3], [2, 3], [3, 3]]
+    invis: []
+    tiles: [
+      cabinet_wide01, cabinet_wide02, cabinet_wide03, cabinet_wide04
     ]
   object_boats:
     layer: object
@@ -761,124 +787,29 @@ uniform_sets:
       [0, 2], [1, 2], [2, 2], [3, 2], [0, 3], [1, 3], [2, 3], [3, 3]]
     invis: []
     tiles: [ well, barrels, nest_empty, nest, bonestack ]
+  interior_walls:
+    layer: walls_aerial
+    size: [2, 2]
+    sprite_prefix: "tileset/interior_"
+    impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+    invis: [[0, 0], [1, 0], [0, 1], [1, 1]]
+    tiles: [
+      stone_ceil_base, stone_ceil_outer_edge_all, stone_ceil_outer_edge_nw, stone_ceil_outer_edge_n,
+      stone_ceil_outer_edge_ne, stone_ceil_outer_edge_w, stone_ceil_outer_edge_e, stone_ceil_outer_edge_sw,
+      stone_ceil_outer_edge_s, stone_ceil_outer_edge_se, stone_ceil_inner_edge_sw, stone_ceil_inner_edge_se,
+      stone_ceil_inner_edge_nw, stone_ceil_inner_edge_ne, stone_ceil_inner_edge_ne_sw, stone_ceil_inner_edge_nw_se,
+      
+      brick_base, brick_outer_edge_all, brick_outer_edge_nw, brick_outer_edge_n,
+      brick_outer_edge_ne, brick_outer_edge_w, brick_outer_edge_e, brick_outer_edge_sw,
+      brick_outer_edge_s, brick_outer_edge_se, brick_inner_edge_sw, brick_inner_edge_se,
+      brick_inner_edge_nw, brick_inner_edge_ne, brick_inner_edge_ne_sw, brick_inner_edge_nw_se,
+      
+      wood_base, wood_outer_edge_all, wood_outer_edge_nw, wood_outer_edge_n,
+      wood_outer_edge_ne, wood_outer_edge_w, wood_outer_edge_e, wood_outer_edge_sw,
+      wood_outer_edge_s, wood_outer_edge_se, wood_inner_edge_sw, wood_inner_edge_se,
+      wood_inner_edge_nw, wood_inner_edge_ne, wood_inner_edge_ne_sw, wood_inner_edge_nw_se,
+    ]
 non_uniform_sets:
-  interior_stone_ceil:
-    layer: walls_aerial
-    size: [2, 2]
-    sprite_prefix: "tileset/interior_stone_ceil_"
-    tiles:
-      base:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-        invis: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      outer_edge_all:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-        invis: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      outer_edge_nw:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      outer_edge_n:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      outer_edge_ne:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      outer_edge_w:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      outer_edge_e:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      outer_edge_sw:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      outer_edge_s:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      outer_edge_se:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      inner_edge_sw:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      inner_edge_se:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      inner_edge_nw:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      inner_edge_ne:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      inner_edge_ne_sw:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      inner_edge_nw_se:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-  interior_brick:
-    layer: walls_aerial
-    size: [2, 2]
-    sprite_prefix: "tileset/interior_brick_"
-    tiles:
-      base:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-        invis: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      outer_edge_all:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-        invis: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      outer_edge_nw:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      outer_edge_n:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      outer_edge_ne:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      outer_edge_w:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      outer_edge_e:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      outer_edge_sw:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      outer_edge_s:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      outer_edge_se:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      inner_edge_sw:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      inner_edge_se:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      inner_edge_nw:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      inner_edge_ne:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      inner_edge_ne_sw:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      inner_edge_nw_se:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-  interior_wood:
-    layer: walls_aerial
-    size: [2, 2]
-    sprite_prefix: "tileset/interior_wood_"
-    tiles:
-      base:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-        invis: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      outer_edge_all:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-        invis: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      outer_edge_nw:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      outer_edge_n:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      outer_edge_ne:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      outer_edge_w:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      outer_edge_e:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      outer_edge_sw:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      outer_edge_s:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      outer_edge_se:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      inner_edge_sw:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      inner_edge_se:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      inner_edge_nw:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      inner_edge_ne:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      inner_edge_ne_sw:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
-      inner_edge_nw_se:
-        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
   roof_brick:
     layer: walls_aerial
     size: [2, 2]
@@ -1690,3 +1621,43 @@ tiles:
     size: [2, 6]
     pass: []
     sprite: tileset/bench_vert01
+  table_large01:
+    layer: object_interior
+    size: [4, 6]
+    pass: [[0, 5], [1, 5], [2, 5], [3, 5]]
+    sprite: tileset/table_large01
+  flower_box01:
+    layer: object
+    size: [2, 2]
+    pass: [[0, 0], [1, 0]]
+    sprite: tileset/flower_box01
+  flower_box02:
+    layer: object
+    size: [2, 2]
+    pass: [[0, 0], [1, 0]]
+    sprite: tileset/flower_box02
+  flower_box03:
+    layer: object
+    size: [2, 2]
+    pass: [[0, 0], [1, 0]]
+    sprite: tileset/flower_box03
+  bed_small01:
+    layer: object_interior
+    size: [2, 4]
+    pass: []
+    sprite: tileset/bed_small01
+  bed_small02:
+    layer: object_interior
+    size: [2, 4]
+    pass: []
+    sprite: tileset/bed_small02
+  cabinet_short01:
+    layer: object_interior
+    size: [4, 2]
+    pass: []
+    sprite: tileset/cabinet_short01
+  01entry_light:
+    layer: aerial
+    size: [6, 4]
+    impass: []
+    sprite: tileset/entry_light

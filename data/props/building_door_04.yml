@@ -1,7 +1,7 @@
-id: building_door_01
+id: building_door_04
 name: Door
 icon: inventory/misc_crate
-image: props/door_single_wall_01
+image: props/door_single_wall_04
 size: 2by3
 impass: []
 invis: []

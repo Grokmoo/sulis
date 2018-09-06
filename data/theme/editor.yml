@@ -95,6 +95,11 @@ children:
         height_relative: Max
         position: [0, 4]
         children:
+          no_wall_button:
+            from: .button
+            position: [80, 23]
+            text: "Clear"
+            preferred_size: [20, 20]
           level_label:
             from: .label
             text: "Level"

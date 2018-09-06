@@ -39,6 +39,7 @@ pub struct WallTiles {
 
     edges: EdgesList,
     extended: Vec<EdgesList>,
+    interior_border: bool,
 }
 
 impl WallTiles {
@@ -69,6 +70,7 @@ impl WallTiles {
             edges,
             extended,
             fill_tile,
+            interior_border: kind.interior_border,
         })
     }
 }
@@ -129,27 +131,33 @@ impl WallPicker {
 
         let tiles = model.wall_kind(self_index).clone();
 
+        if tiles.interior_border {
+            self.check_add_border_interior(model, x, y, self_elev, tiles);
+        } else {
+            self.check_add_border_exterior(model, x, y, self_elev, tiles);
+        }
+    }
+
+    fn check_add_border_exterior(&self, model: &mut AreaModel, x: i32, y: i32,
+                                 self_elev: i8, tiles: WallTiles) {
         model.add_tile(&tiles.fill_tile, x, y);
 
-        let gh = self.grid_height;
-        let gw = self.grid_width;
+        let (gh, gw) = (self.grid_height, self.grid_width);
 
-        let n = self.is_border(model, self_elev, self_index, x, y, 0, -gh);
-        let e = self.is_border(model, self_elev, self_index, x, y, gw, 0);
-        let s = self.is_border(model, self_elev, self_index, x, y, 0, gh);
-        let w = self.is_border(model, self_elev, self_index, x, y, -gw, 0);
-        let nw = self.is_border(model, self_elev, self_index, x, y, -gw, -gh);
-        let ne = self.is_border(model, self_elev, self_index, x, y, gw, -gh);
-        let se = self.is_border(model, self_elev, self_index, x, y, gw, gh);
-        let sw = self.is_border(model, self_elev, self_index, x, y, -gw, gh);
+        let n = self.is_border(model, self_elev, x, y, 0, -gh);
+        let e = self.is_border(model, self_elev, x, y, gw, 0);
+        let s = self.is_border(model, self_elev, x, y, 0, gh);
+        let w = self.is_border(model, self_elev, x, y, -gw, 0);
+        let nw = self.is_border(model, self_elev, x, y, -gw, -gh);
+        let ne = self.is_border(model, self_elev, x, y, gw, -gh);
+        let se = self.is_border(model, self_elev, x, y, gw, gh);
+        let sw = self.is_border(model, self_elev, x, y, -gw, gh);
 
         if n && nw && w { model.add_tile(&tiles.edges.outer_nw, x - gw, y - gh); }
 
         if n && nw && ne { model.add_tile(&tiles.edges.outer_n, x, y - gh); }
 
-        if n && ne && e {
-            model.add_tile(&tiles.edges.outer_ne, x + gw, y - gh);
-        }
+        if n && ne && e { model.add_tile(&tiles.edges.outer_ne, x + gw, y - gh); }
 
         if e && ne && se { model.add_tile(&tiles.edges.outer_e, x + gw, y); }
         else if e && ne { model.add_tile(&tiles.edges.inner_ne, x + gw, y); }
@@ -199,7 +207,96 @@ impl WallPicker {
         }
     }
 
-    fn is_border(&self, model: &AreaModel, self_elev: i8, _self_index: usize, x: i32, y: i32,
+    fn check_add_border_interior(&self, model: &mut AreaModel, x: i32, y: i32,
+                                 self_elev: i8, tiles: WallTiles) {
+        let (gh, gw) = (self.grid_height, self.grid_width);
+
+        let n = self.is_border(model, self_elev, x, y, 0, -gh);
+        let e = self.is_border(model, self_elev, x, y, gw, 0);
+        let s = self.is_border(model, self_elev, x, y, 0, gh);
+        let w = self.is_border(model, self_elev, x, y, -gw, 0);
+        let nw = self.is_border(model, self_elev, x, y, -gw, -gh);
+        let ne = self.is_border(model, self_elev, x, y, gw, -gh);
+        let se = self.is_border(model, self_elev, x, y, gw, gh);
+        let sw = self.is_border(model, self_elev, x, y, -gw, gh);
+
+        if !n && !e && !s && !w && !nw && !ne && !se && !sw {
+            model.add_tile(&tiles.fill_tile, x, y);
+            return;
+        }
+
+        if n && e && s && w && nw && ne && se && sw {
+            model.add_tile(&tiles.edges.outer_all, x, y);
+            for (i, ext) in tiles.extended.iter().enumerate() {
+                model.add_tile(&ext.outer_all, x, y + (i as i32 + 1) * gh);
+            }
+            return;
+        }
+
+        if ne && sw && !n && !s && !e && !w {
+            model.add_tile(&tiles.edges.inner_ne_sw, x, y);
+            return;
+        }
+
+        if nw && se && !n && !s && !e && !w {
+            model.add_tile(&tiles.edges.inner_nw_se, x, y);
+            return;
+        }
+
+        if n && nw && w { model.add_tile(&tiles.edges.outer_nw, x, y); }
+
+        if n && !w && !e { model.add_tile(&tiles.edges.outer_n, x, y); }
+
+        if n && ne && e { model.add_tile(&tiles.edges.outer_ne, x, y); }
+
+        if e && !n && !s { model.add_tile(&tiles.edges.outer_e, x, y); }
+        if w && !n && !s { model.add_tile(&tiles.edges.outer_w, x, y); }
+
+        if nw && !n && !w { model.add_tile(&tiles.edges.inner_nw, x, y); }
+        if ne && !n && !e { model.add_tile(&tiles.edges.inner_ne, x, y); }
+
+        if sw && !s && !w {
+            model.add_tile(&tiles.edges.inner_sw, x, y);
+            for (i, ext) in tiles.extended.iter().enumerate() {
+                model.add_tile(&ext.outer_s, x, y + (i as i32 + 1) * gh);
+            }
+        }
+
+        if se && !s && !e {
+            model.add_tile(&tiles.edges.inner_se, x, y);
+            for (i, ext) in tiles.extended.iter().enumerate() {
+                model.add_tile(&ext.outer_s, x, y + (i as i32 + 1) * gh);
+            }
+        }
+
+        if s && !w && !e {
+            model.add_tile(&tiles.edges.outer_s, x, y);
+            for (i, ext) in tiles.extended.iter().enumerate() {
+                let offset = 1 + i as i32;
+                model.add_tile(&ext.outer_s, x, y + offset * gh);
+            }
+        }
+
+        if s && se && e {
+            model.add_tile(&tiles.edges.outer_se, x, y);
+
+            for (i, ext) in tiles.extended.iter().enumerate() {
+                let offset = 1 + i as i32;
+                model.add_tile(&ext.outer_se, x, y + offset * gh);
+            }
+        }
+
+        if s && sw && w {
+            model.add_tile(&tiles.edges.outer_sw, x, y);
+
+            for (i, ext) in tiles.extended.iter().enumerate() {
+                let offset = 1 + i as i32;
+                model.add_tile(&ext.outer_sw, x, y + offset * gh);
+            }
+        }
+    }
+
+    fn is_border(&self, model: &AreaModel, self_elev: i8, x: i32, y: i32,
                  delta_x: i32, delta_y: i32) -> bool {
 
         let x = x + delta_x;
@@ -350,6 +447,7 @@ impl WidgetKind for WallPicker {
 
         let brush_size_label = Widget::with_theme(Label::empty(), "brush_size_label");
 
+        let no_wall_button = Widget::with_theme(Button::empty(), "no_wall_button");
         let wall_content = Widget::empty("wall_content");
         for (i, wall_kind) in Module::wall_kinds().into_iter().enumerate() {
             let base_tile_id = format!("{}{}{}", self.wall_rules.prefix, wall_kind.id,
@@ -358,10 +456,12 @@ impl WidgetKind for WallPicker {
             let button = Widget::with_theme(Button::empty(), "wall_button");
             button.borrow_mut().state.add_text_arg("icon", &base_tile_id);
 
+            let no_wall_ref = Rc::clone(&no_wall_button);
             let cb: Callback = Callback::new(Rc::new(move |widget, _| {
                 let parent = Widget::get_parent(widget);
                 let cur_state = widget.borrow_mut().state.is_active();
                 if !cur_state {
+                    no_wall_ref.borrow_mut().state.set_active(false);
                     for child in parent.borrow_mut().children.iter() {
                         child.borrow_mut().state.set_active(false);
                     }
@@ -377,7 +477,19 @@ impl WidgetKind for WallPicker {
             Widget::add_child_to(&wall_content, button);
         }
 
+        let wall_content_ref = Rc::clone(&wall_content);
+        no_wall_button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
+            let parent = Widget::get_parent(&widget);
+            let picker = Widget::downcast_kind_mut::<WallPicker>(&parent);
+            picker.cur_wall = None;
+            for child in wall_content_ref.borrow_mut().children.iter() {
+                child.borrow_mut().state.set_active(false);
+            }
+
+            widget.borrow_mut().state.set_active(true);
+        })));
+
         vec![self.level_widget.clone(), level_label, self.brush_size_widget.clone(), brush_size_label,
-          wall_content]
+          wall_content, no_wall_button]
     }
 }

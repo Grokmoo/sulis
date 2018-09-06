@@ -85,6 +85,9 @@ pub struct EdgeRules {
     pub se_postfix: String,
     pub nw_postfix: String,
     pub sw_postfix: String,
+    pub all_postfix: String,
+    pub ne_sw_postfix: String,
+    pub nw_se_postfix: String,
 }
 
 #[derive(Deserialize, Debug, Clone)]

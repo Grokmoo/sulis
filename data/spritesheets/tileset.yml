@@ -1,6 +1,6 @@
 id: tileset
 src: "tileset.png"
-size: [1024, 2048]
+size: [2048, 2048]
 simple_image_gen_scale: 32
 grid_multiplier: 32
 templates:
@@ -21,7 +21,7 @@ templates:
   borders:
     size: [1, 1]
     areas:
-      top1: [0, 0]
+      outer_edge_all: [0, 0]
       top2: [0, 1]
       inner_edge_se: [1, 0]
       inner_edge_sw: [2, 0]
@@ -39,8 +39,8 @@ templates:
       base_variant1: [0, 5]
       base_variant2: [1, 5]
       base_variant3: [2, 5]
-      sw_to_ne: [0, 6]
-      nw_to_se: [1, 6]
+      inner_edge_ne_sw: [0, 6]
+      inner_edge_nw_se: [1, 6]
 groups:
   dirt_light:
     position: [0, 0]
@@ -223,6 +223,27 @@ groups:
     position: [10, 59]
     prefix: roof_brick_
     from_template: roof
+  interior_wood:
+    position: [32, 0]
+    size: [1, 1]
+    prefix: interior_wood_
+    areas:
+      base: [1, 1]
+      outer_edge_nw: [0, 0]
+      outer_edge_n: [1, 0]
+      outer_edge_ne: [2, 0]
+      outer_edge_w: [0, 1]
+      outer_edge_e: [2, 1]
+      outer_edge_sw: [0, 2]
+      outer_edge_s: [1, 2]
+      outer_edge_se: [2, 2]
+      inner_edge_sw: [1, 3]
+      inner_edge_se: [0, 3]
+      inner_edge_ne: [0, 4]
+      inner_edge_nw: [1, 4]
+      outer_edge_all: [2, 3]
+      inner_edge_ne_sw: [0, 5]
+      inner_edge_nw_se: [1, 5]
   stone_bordered:
     position: [29, 29]
     size: [1, 1]

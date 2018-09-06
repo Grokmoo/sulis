@@ -57,6 +57,10 @@ pub struct EdgesList {
     pub outer_ne: Option<Rc<Tile>>,
     pub outer_sw: Option<Rc<Tile>>,
     pub outer_nw: Option<Rc<Tile>>,
+
+    pub outer_all: Option<Rc<Tile>>,
+    pub inner_ne_sw: Option<Rc<Tile>>,
+    pub inner_nw_se: Option<Rc<Tile>>,
 }
 
 impl EdgesList {
@@ -74,10 +78,16 @@ impl EdgesList {
         let outer_nw = EdgesList::get_edge(&prefix, &id, &rules.outer_edge_postfix, &rules.nw_postfix);
         let outer_se = EdgesList::get_edge(&prefix, &id, &rules.outer_edge_postfix, &rules.se_postfix);
         let outer_sw = EdgesList::get_edge(&prefix, &id, &rules.outer_edge_postfix, &rules.sw_postfix);
+        let outer_all = EdgesList::get_edge(&prefix, &id, &rules.outer_edge_postfix, &rules.all_postfix);
+
+        let inner_ne_sw = EdgesList::get_edge(&prefix, &id, &rules.inner_edge_postfix, &rules.ne_sw_postfix);
+
+        let inner_nw_se = EdgesList::get_edge(&prefix, &id, &rules.inner_edge_postfix, &rules.nw_se_postfix);
 
         Ok(EdgesList {
             inner_nw, inner_ne, inner_sw, inner_se,
             outer_n, outer_s, outer_e, outer_w, outer_se, outer_ne, outer_sw, outer_nw,
+            outer_all, inner_ne_sw, inner_nw_se,
         })
     }
 

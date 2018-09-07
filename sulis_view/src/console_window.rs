@@ -18,10 +18,12 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
+use rlua;
+
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::io::InputAction;
 use sulis_widgets::{Label, InputField};
-use sulis_state::GameState;
+use sulis_state::{GameState, ScriptState};
 
 pub const NAME: &str = "console_window";
 
@@ -31,6 +33,7 @@ pub struct ConsoleWindow {
     output: Rc<RefCell<Widget>>,
     history: Vec<String>,
     history_index: usize,
+    script_state: ScriptState,
 }
 
 impl ConsoleWindow {
@@ -42,6 +45,7 @@ impl ConsoleWindow {
             output: Widget::with_theme(Label::empty(), "output"),
             history: Vec::new(),
             history_index: 0,
+            script_state: ScriptState::new(),
         }))
     }
 
@@ -50,7 +54,14 @@ impl ConsoleWindow {
 
         self.history.push(script[0..script.len() - 1].to_string());
         self.history_index = self.history.len();
-        let result = GameState::execute_console_script(script);
+
+        let party = GameState::party();
+
+        let result =  match self.script_state.console(script, &party) {
+            Ok(result) => result,
+            Err(rlua::Error::FromLuaConversionError { .. }) => "Success".to_string(),
+            Err(e) => format!("{}", e),
+        };
 
         info!("Console result: {}", result);
         self.output.borrow_mut().state.text = result;
@@ -60,6 +71,11 @@ impl ConsoleWindow {
         if self.history_index >= self.history.len() { return "".to_string(); }
 
         self.history[self.history_index].clone()
+    }
+
+    pub fn grab_keyboard(&self) {
+        Widget::grab_keyboard_focus(&self.input_widget);
+        self.input.borrow_mut().set_ignore_next();
     }
 }
 
@@ -75,7 +91,7 @@ impl WidgetKind for ConsoleWindow {
             match key {
                 InputAction::ToggleConsole => {
                     Widget::clear_keyboard_focus(widget);
-                    parent.borrow_mut().mark_for_removal();
+                    parent.borrow_mut().state.set_visible(false);
                 },
                 InputAction::ScrollUp => {
                     if console.history_index > 0 {

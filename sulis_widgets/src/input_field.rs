@@ -37,6 +37,7 @@ pub struct InputField {
     enter_callback: Option<Callback>,
     key_press_callback: Option<Rc<Fn(&Rc<RefCell<Widget>>, &mut InputField, InputAction)>>,
     initializing: bool,
+    ignore_next: bool, // hack to prevent console from receiving a character
 }
 
 impl InputField {
@@ -51,7 +52,12 @@ impl InputField {
             enter_callback: None,
             key_press_callback: None,
             initializing: true,
+            ignore_next: false,
         }))
+    }
+
+    pub fn set_ignore_next(&mut self) {
+        self.ignore_next = true;
     }
 
     pub fn set_key_press_callback(&mut self, cb: Rc<Fn(&Rc<RefCell<Widget>>, &mut InputField, InputAction)>) {
@@ -116,6 +122,11 @@ impl WidgetKind for InputField {
     }
 
     fn on_char_typed(&mut self, widget: &Rc<RefCell<Widget>>, c: char) -> bool {
+        if self.ignore_next {
+            self.ignore_next = false;
+            return true;
+        }
+
         match c {
             '\u{8}' => {
                 self.text.pop();

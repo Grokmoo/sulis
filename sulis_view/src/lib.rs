@@ -22,6 +22,7 @@ extern crate sulis_widgets;
 
 extern crate open;
 extern crate chrono;
+extern crate rlua;
 #[macro_use] extern crate log;
 
 mod abilities_bar;
@@ -156,6 +157,8 @@ pub struct RootView {
     status_added: Option<Instant>,
     area_view: Rc<RefCell<AreaView>>,
     area_view_widget: Rc<RefCell<Widget>>,
+    console: Rc<RefCell<ConsoleWindow>>,
+    console_widget: Rc<RefCell<Widget>>,
     area: String,
 }
 
@@ -176,6 +179,10 @@ impl RootView {
     pub fn new() -> Rc<RefCell<RootView>> {
         let area_view = AreaView::new();
         let area_view_widget = Widget::with_defaults(area_view.clone());
+
+        let console = ConsoleWindow::new();
+        let console_widget = Widget::with_defaults(console.clone());
+
         Rc::new(RefCell::new(RootView {
             next_step: None,
             status: Widget::with_theme(Label::empty(), "status_text"),
@@ -183,6 +190,8 @@ impl RootView {
             area_view,
             area_view_widget,
             area: "".to_string(),
+            console,
+            console_widget,
         }))
     }
 
@@ -244,10 +253,11 @@ impl RootView {
         });
     }
 
-    pub fn set_console_window(&mut self, widget: &Rc<RefCell<Widget>>, desired_state: bool) {
-        self.set_window(widget, self::console_window::NAME, desired_state, &|| {
-            Some(ConsoleWindow::new())
-        });
+    pub fn set_console_window(&mut self, _widget: &Rc<RefCell<Widget>>, desired_state: bool) {
+        self.console_widget.borrow_mut().state.set_visible(desired_state);
+        if desired_state {
+            self.console.borrow().grab_keyboard();
+        }
     }
 
     pub fn set_formation_window(&mut self, widget: &Rc<RefCell<Widget>>, desired_state: bool) {
@@ -282,7 +292,7 @@ impl RootView {
     }
 
     pub fn toggle_console_window(&mut self, widget: &Rc<RefCell<Widget>>) {
-        let desired_state = !Widget::has_child_with_name(widget, self::console_window::NAME);
+        let desired_state = !self.console_widget.borrow().state.is_visible();
         self.set_console_window(widget, desired_state);
     }
 
@@ -437,6 +447,8 @@ impl WidgetKind for RootView {
     fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         info!("Adding to root widget.");
 
+        self.console_widget.borrow_mut().state.set_visible(false);
+
         self.area_view = AreaView::new();
         self.area_view_widget = Widget::with_defaults(self.area_view.clone());
 
@@ -537,7 +549,8 @@ impl WidgetKind for RootView {
         let ticker = Widget::with_defaults(InitiativeTicker::new());
 
         // area widget must be the first entry in the children list
-        vec![Rc::clone(&self.area_view_widget), bot_pane, ap_bar, ticker, self.status.clone()]
+        vec![Rc::clone(&self.area_view_widget), bot_pane, ap_bar, ticker, self.status.clone(),
+            Rc::clone(&self.console_widget)]
     }
 }
 

@@ -20,8 +20,6 @@ use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 use std::cell::{Cell, RefCell};
 
-use rlua;
-
 use sulis_core::config::Config;
 use sulis_core::util::{self, Point, invalid_data_error, ExtInt};
 use sulis_core::io::{GraphicsRenderer};
@@ -474,16 +472,6 @@ impl GameState {
 
             state.party.clone()
         })
-    }
-
-    pub fn execute_console_script(script: String) -> String {
-        let party = GameState::party();
-
-        match ScriptState::new().console(script, &party) {
-            Ok(result) => result,
-            Err(rlua::Error::FromLuaConversionError { .. }) => "Success".to_string(),
-            Err(e) => format!("{}", e),
-        }
     }
 
     pub fn execute_ai_script(parent: &Rc<RefCell<EntityState>>, func: &str) -> ai::State {

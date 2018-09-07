@@ -244,6 +244,14 @@ impl WidgetKind for ItemButton {
                         if !item_state.item.meets_prereqs(&player[0].borrow().actor.actor) {
                             item_window.state.add_text_arg("prereqs_not_met", "true");
                         }
+
+                        if let Some(ref equip) = item_state.item.equippable {
+                            if player[0].borrow().actor.actor.race.is_disabled(equip.slot) {
+                                item_window.state.add_text_arg("slot_disabled_for_race", "true");
+                                item_window.state.add_text_arg("player_race",
+                                                               &player[0].borrow().actor.actor.race.name);
+                            }
+                        }
                     }
                 },
                 _ => (),

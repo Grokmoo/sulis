@@ -1038,6 +1038,7 @@ children:
       ][s=5|[?total_duration;c=f00|#remaining_duration# of #total_duration# Rounds Remaining
       ][?prereqs_not_met;c=f00|Prereqs not Met
       ][?prof_not_met;s=5.0;c=f00|Proficiency Not Met
+      ][?slot_disabled_for_race;s=5.0;c=f00|Not Usable by #player_race#
       ][?any_armor|[s=6.0|Armor: ][?armor;s=6.0|#armor#][?armor_slashing;s=5.0| (Slashing: #armor_slashing#)][?armor_piercing;s=5.0| (Piercing: #armor_piercing#)][?armor_crushing;s=5.0| (Crushing: #armor_crushing#)][?armor_acid;s=5.0| (Acid: #armor_acid#)][?armor_cold;s=5.0| (Cold: #armor_cold#)][?armor_electrical;s=5.0| (Electrical: #armor_electrical#)][?armor_fire;s=5.0| (Fire: #armor_fire#)][?armor_sonic;s=5.0| (Sonic: #armor_sonic#)]
       ][?any_accuracy|[s=6|Accuracy:][?melee_accuracy| (Melee #melee_accuracy#)][?ranged_accuracy| (Ranged: #ranged_accuracy#)][?spell_accuracy| (Spell: #spell_accuracy#)]
       ][?ability_group_0|#ability_group_0# ability uses per encounter: #ability_group_0_uses_per_encounter#

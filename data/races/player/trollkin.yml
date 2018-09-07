@@ -1,0 +1,101 @@
+id: trollkin
+name: Trollkin
+description: |
+  Trollkin are typically half troll and half human, but sometimes a different combination.  They are tall and exceptionally strong, but are usually only slightly more intelligent than their pure troll ancestors.  They make effective Fighters.
+size: 2by2
+movement_rate: 1.0
+base_stats:
+  - kind: { attribute: [Strength, 3 ] }
+  - kind: { attribute: [Endurance, 1 ] }
+  - kind: { attribute: [Perception, -2 ] }
+  - kind: { attribute: [Intellect, -2 ] }
+  - kind: { hit_points: 40 }
+  - kind: { melee_accuracy: 30 }
+  - kind: { ranged_accuracy: 30 }
+  - kind: { spell_accuracy: 30 }
+  - kind: { defense: 30 }
+  - kind: { fortitude: 30 }
+  - kind: { reflex: 30 }
+  - kind: { will: 30 }
+  - kind: { reach: 0.5 }
+base_attack:
+  damage:
+    min: 8
+    max: 12
+    kind: Crushing
+  kind: #Melee
+    reach: 0.5
+  bonuses: {}
+default_images:
+  Male:
+    Foreground: creatures/trollkin_fg
+    Background: creatures/trollkin_bg
+    Ears: creatures/trollkin_ears
+    Shadow: creatures/trollkin_shadow
+  Female:
+    Foreground: creatures/trollkin_fg
+    Background: creatures/trollkin_bg
+    Ears: creatures/trollkin_ears
+    Shadow: creatures/trollkin_shadow
+ticker_offset: [0.5, 2.5]
+image_layer_offset_scale: 16
+image_layer_offsets:
+  HeldMain: [-26, -24]
+  HeldOff: [9, -22]
+  Ears: [-8,-18]
+  Hair: [-7,-22]
+  Beard: [-7,-21]
+  Head: [-7,-22]
+  Hands: [-8,-18]
+  Foreground: [-8,-18]
+  Torso: [-8,-18]
+  Legs: [-8,-18]
+  Feet: [-8,-18]
+  Background: [-8,-18]
+  Cloak: [-8,-18]
+  Shadow: [-8,-18]
+image_layer_postfix:
+  Female: "_trollkin"
+  Male: "_trollkin"
+portrait_selections:
+  - portraits/trollkin01
+  - portraits/trollkin02
+  - portraits/trollkin03
+  - portraits/trollkin04
+  - portraits/trollkin05
+  - portraits/trollkin06
+  - portraits/trollkin07
+  - portraits/trollkin08
+  - portraits/trollkin09
+  - portraits/trollkin10
+  - portraits/trollkin11
+hair_selections:
+  - creatures/hair02
+  - creatures/hair01
+  - creatures/hair03
+  - creatures/hair04
+  - creatures/hair05
+  - creatures/hair06
+  - creatures/hair07
+  - creatures/hair08
+  - creatures/hair09
+  - creatures/hair10
+  - creatures/hair11
+beard_selections:
+  - creatures/beard01
+  - creatures/beard02
+  - creatures/beard03
+  - creatures/beard04
+  - creatures/beard05
+  - creatures/beard06
+  - creatures/beard07
+hair_colors : [
+  "8B4513", "FFFFFF", "C0C0C0", "808080", "545454",
+  "545454", "000000", "EEE685", "FFFF00", 
+  "CC9900", "D98719", "FFA500", "EE7600",
+  "FF0000", "C00000", "800000", "CD853F",
+  "8B5A2B", "8B5A00", "5C3317" ]
+skin_colors : [
+  "A8A8A8", "747F73", "586b56", "616153",
+  "2F5161", "F6D39B", "F6D39B", "EDAE67",
+  "CE9452", "734A29", "D48661", "80412B" ]

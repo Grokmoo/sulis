@@ -234,6 +234,9 @@ impl Inventory {
 
         if item_state.item.equippable.is_none() { return false; }
 
+        let slot = item_state.item.equippable.as_ref().unwrap().slot;
+        if actor.race.is_disabled(slot) { return false; }
+
         true
     }
 

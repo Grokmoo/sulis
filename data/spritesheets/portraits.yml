@@ -135,5 +135,25 @@ groups:
       ratkin04: [3, 10]
       ratkin05: [4, 10]
       
+      dracon01: [5, 10]
+      dracon02: [6, 10]
+      dracon03: [7, 10]
+      dracon04: [8, 10]
+      dracon05: [9, 10]
+      dracon06: [10, 10]
+      dracon07: [11, 10]
+      
+      trollkin01: [0, 11]
+      trollkin02: [1, 11]
+      trollkin03: [2, 11]
+      trollkin04: [3, 11]
+      trollkin05: [4, 11]
+      trollkin06: [5, 11]
+      trollkin07: [6, 11]
+      trollkin08: [7, 11]
+      trollkin09: [8, 11]
+      trollkin10: [9, 11]
+      trollkin11: [10, 11]
+      
       frame: [11, 11]
 

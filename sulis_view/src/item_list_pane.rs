@@ -165,8 +165,9 @@ impl ItemListPane {
                 }
             }
 
-            if let Some(_) = item.item.equippable {
+            if let Some(ref equip) = item.item.equippable {
                 if !combat_active && has_proficiency(&item, &actor.stats) &&
+                    !actor.actor.race.is_disabled(equip.slot) &&
                     item.item.meets_prereqs(&actor.actor) {
                     item_but.borrow_mut().add_action("Equip", equip_item_cb(&self.entity, index));
                 }

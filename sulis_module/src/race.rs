@@ -23,7 +23,7 @@ use sulis_core::image::Image;
 use sulis_core::resource::{ResourceBuilder, ResourceSet};
 use sulis_core::util::{invalid_data_error, unable_to_create_error, Point};
 use sulis_core::serde_yaml;
-use sulis_rules::{BonusList, bonus::AttackBuilder};
+use sulis_rules::{BonusList, bonus::AttackBuilder, Slot};
 
 use actor::{Sex};
 
@@ -41,6 +41,7 @@ pub struct Race {
     pub hair_selections: Vec<String>,
     pub beard_selections: Vec<String>,
     pub portrait_selections: Vec<String>,
+    pub disabled_slots: Vec<Slot>,
     pub hair_colors: Vec<Color>,
     pub skin_colors: Vec<Color>,
     pub ticker_offset: (f32, f32),
@@ -93,6 +94,7 @@ impl Race {
             description: builder.description,
             movement_rate: builder.movement_rate,
             size,
+            disabled_slots: builder.disabled_slots,
             base_stats: builder.base_stats,
             base_attack: builder.base_attack,
             default_images,
@@ -127,6 +129,13 @@ impl Race {
     pub fn default_images(&self) -> &ImageLayerSet {
         &self.default_images
     }
+
+    pub fn is_disabled(&self, slot: Slot) -> bool {
+        for disabled in self.disabled_slots.iter() {
+            if *disabled == slot { return true; }
+        }
+        false
+    }
 }
 
 #[derive(Deserialize, Debug)]
@@ -149,6 +158,9 @@ pub struct RaceBuilder {
     image_layer_offsets: HashMap<ImageLayer, Point>,
     image_layer_offset_scale: i32,
     image_layer_postfix: HashMap<Sex, String>,
+
+    #[serde(default)]
+    disabled_slots: Vec<Slot>,
 }
 
 impl ResourceBuilder for RaceBuilder {

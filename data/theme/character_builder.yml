@@ -84,7 +84,7 @@ children:
             position: [0, 25]
           races_pane:
             border: [1, 1, 1, 1]
-            preferred_size: [20, 12]
+            preferred_size: [0, 12]
             width_relative: ChildSum
             x_relative: Center
             position: [0, 10]
@@ -433,15 +433,11 @@ children:
             text: "Male"
             preferred_size: [30, 8]
             position: [33, 30]
-            custom:
-              tooltip: "This choice is purely cosmetic."
           female_button:
             from: .button
             text: "Female"
             preferred_size: [30, 8]
             position: [68, 30]
-            custom:
-              tooltip: "This choice is purely cosmetic."
           skin_color_label:
             from: .label
             text: "Skin"

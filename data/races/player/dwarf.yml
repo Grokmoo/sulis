@@ -1,0 +1,107 @@
+id: dwarf
+name: Dwarf
+description: |
+  Short of stature but tough and stronger than one would expect for their size, Dwarves make for excellent front line fighters.  Most dwarves spend their entire lives never leaving their mountain kingdoms, but some few do venture to other lands.
+size: 2by2
+movement_rate: 0.85
+base_stats:
+  - kind: { attribute: [Dexterity, -2] }
+  - kind: { attribute: [Endurance, 3] }
+  - kind: { attribute: [Wisdom, -1] }
+  - kind: { hit_points: 40 }
+  - kind: { melee_accuracy: 30 }
+  - kind: { ranged_accuracy: 30 }
+  - kind: { spell_accuracy: 25 }
+  - kind: { defense: 30 }
+  - kind: { fortitude: 30 }
+  - kind: { reflex: 30 }
+  - kind: { will: 40 }
+  - kind: { reach: 0.25 }
+base_attack:
+  damage:
+    min: 8
+    max: 12
+    kind: Crushing
+  kind: #Melee
+    reach: 0.5
+  bonuses: {}
+default_images:
+  Male:
+    Foreground: creatures/dwarf_fg
+    Background: creatures/dwarf_bg
+    Shadow: creatures/dwarf_shadow
+  Female:
+    Foreground: creatures/dwarf_fg
+    Background: creatures/dwarf_bg
+    Shadow: creatures/dwarf_shadow
+ticker_offset: [0.5, 2]
+image_layer_offset_scale: 16
+image_layer_offsets:
+  HeldMain: [-26, -18]
+  HeldOff: [8, -19]
+  Ears: [-8,-8]
+  Hair: [-8,-8]
+  Beard: [-8,-8]
+  Head: [-8,-8]
+  Hands: [-8,-12]
+  Foreground: [-8,-12]
+  Torso: [-8,-12]
+  Legs: [-8,-12]
+  Feet: [-8,-12]
+  Background: [-8,-12]
+  Cloak: [-8,-12]
+  Shadow: [-8,-12]
+image_layer_postfix:
+  Female: "_dwarf"
+  Male: "_dwarf"
+portrait_selections:
+  - portraits/dwarf01
+  - portraits/dwarf02
+  - portraits/dwarf03
+  - portraits/dwarf04
+  - portraits/dwarf05
+  - portraits/dwarf06
+  - portraits/dwarf07
+  - portraits/dwarf08
+  - portraits/dwarf09
+  - portraits/dwarf10
+  - portraits/dwarf11
+  - portraits/dwarf12
+  - portraits/dwarf13
+  - portraits/dwarf14
+  - portraits/dwarf15
+  - portraits/dwarf16
+  - portraits/dwarf17
+  - portraits/dwarf18
+  - portraits/dwarf19
+hair_selections:
+  - creatures/hair04
+  - creatures/hair01
+  - creatures/hair02
+  - creatures/hair03
+  - creatures/hair05
+  - creatures/hair06
+  - creatures/hair07
+  - creatures/hair08
+  - creatures/hair09
+  - creatures/hair10
+  - creatures/hair11
+beard_selections:
+  - creatures/beard01
+  - creatures/beard02
+  - creatures/beard03
+  - creatures/beard04
+  - creatures/beard05
+  - creatures/beard06
+  - creatures/beard07
+hair_colors : [
+  "8B4513", "FFFFFF", "C0C0C0", "808080", "545454",
+  "545454", "000000", "EEE685", "FFFF00", 
+  "CC9900", "D98719", "FFA500", "EE7600",
+  "FF0000", "C00000", "800000", "CD853F",
+  "8B5A2B", "8B5A00", "5C3317" ]
+skin_colors : [
+  "F9F4C8", "F6D39B", "F8E088", "F6D39B",
+  "EDAE67", "CE9452", "734A29", "422110",
+  "2F1010", "FFC794", "D48661", "80412B",
+  "501002" ]

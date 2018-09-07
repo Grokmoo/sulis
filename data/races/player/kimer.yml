@@ -1,0 +1,102 @@
+id: kimer
+name: Kimer
+description: |
+  An ancient and proud people, their massive cities are cloistered away far from prying eyes in the ocean depths.  Occasionally, however, some wander-lusted Kimer make their way into the realms of the other races.  They are well suited to be magic users or warriors.
+size: 2by2
+movement_rate: 1.0
+base_stats:
+  - kind: { attribute: [ Endurance, -1 ] }
+  - kind: { attribute: [ Perception, -1 ] }
+  - kind: { attribute: [ Intellect, 1 ] }
+  - kind: { attribute: [ Wisdom, 1 ] }
+  - kind: { hit_points: 40 }
+  - kind: { melee_accuracy: 25 }
+  - kind: { ranged_accuracy: 30 }
+  - kind: { spell_accuracy: 35 }
+  - kind: { defense: 32 }
+  - kind: { fortitude: 35 }
+  - kind: { reflex: 30 }
+  - kind: { will: 30 }
+  - kind: { reach: 0.25 }
+base_attack:
+  damage:
+    min: 8
+    max: 12
+    kind: Crushing
+  kind: #Melee
+    reach: 0.5
+  bonuses: {}
+default_images:
+  Male:
+    Foreground: creatures/merling_male_fg
+    Background: creatures/merling_male_bg
+    Ears: creatures/merling_male_ears
+    Shadow: creatures/human_male_shadow
+  Female:
+    Foreground: creatures/merling_female_fg
+    Background: creatures/merling_female_bg
+    Ears: creatures/merling_female_ears
+    Shadow: creatures/human_female_shadow
+ticker_offset: [0.5, 2]
+image_layer_offset_scale: 16
+image_layer_offsets:
+  HeldMain: [-24, -26]
+  HeldOff: [9, -24]
+  Ears: [-8,-18]
+  Hair: [-8,-18]
+  Beard: [-8,-18]
+  Head: [-8,-18]
+  Hands: [-8,-18]
+  Foreground: [-8,-18]
+  Torso: [-8,-18]
+  Legs: [-8,-18]
+  Feet: [-8,-18]
+  Background: [-8,-18]
+  Cloak: [-8,-18]
+  Shadow: [-8,-18]
+image_layer_postfix:
+  Female: "_female"
+portrait_selections:
+  - portraits/merling01
+  - portraits/merling02
+  - portraits/merling03
+  - portraits/merling04
+  - portraits/merling05
+  - portraits/merling06
+  - portraits/merling07
+  - portraits/merling08
+  - portraits/merling09
+  - portraits/merling10
+  - portraits/merling11
+  - portraits/merling12
+  - portraits/merling13
+  - portraits/merling14
+hair_selections:
+  - creatures/hair06
+  - creatures/hair01
+  - creatures/hair02
+  - creatures/hair03
+  - creatures/hair04
+  - creatures/hair05
+  - creatures/hair07
+  - creatures/hair08
+  - creatures/hair09
+  - creatures/hair10
+  - creatures/hair11
+beard_selections:
+  - creatures/beard01
+  - creatures/beard02
+  - creatures/beard03
+  - creatures/beard04
+  - creatures/beard05
+  - creatures/beard06
+  - creatures/beard07
+hair_colors : [
+  "309164", "FFFFFF", "C0C0C0", "808080",
+  "545454", "000000", "F3FCBB", "C7FCD0",
+  "93CC7A", "346452", "C5C5FF",
+  "6E3F89", "4D146E" ]
+skin_colors : [
+  "6DA2E2", "CDF8F8", "ADD8F8", "2D58AD",
+  "1D3971", "C4FFCB", "93CC7A", "6C9D71",
+  "309164", "278162", "007777" ]

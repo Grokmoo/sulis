@@ -46,8 +46,8 @@ pub enum ImageLayer {
 }
 
 use self::ImageLayer::*;
-const IMAGE_LAYERS_LIST: [ImageLayer; 14] = [Shadow, Cloak, Background, Feet, Legs, Foreground, Hands, Torso,
-    Beard, Hair, Head, Ears, HeldOff, HeldMain];
+const IMAGE_LAYERS_LIST: [ImageLayer; 14] = [Shadow, Cloak, Background, Feet, Legs,
+    Torso, Foreground, Hands, Beard, Hair, Head, Ears, HeldOff, HeldMain];
 
 impl ImageLayer {
     pub fn iter() -> Iter<'static, ImageLayer> {

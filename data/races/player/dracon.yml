@@ -1,9 +1,9 @@
 id: dracon
 name: Dracon
 description: |
-  Dracon are an ancient race of lizard like creatures.  They are built significantly larger than humans, and their scales are very tough, granting them significant protection.  Due to their individually unique head shapes and horns, they are unable to wear ordinary helmets.  Dracon make excellent front line Fighter.
+  Dracon are an ancient race of lizard like creatures.  They are built significantly larger than humans, and their scales are very tough, granting them significant protection.  Due to their individually unique head shapes and horns, they are unable to wear ordinary helmets.  Dracon make excellent front line Fighters.
 size: 2by2
-movement_rate: 1.0
+movement_rate: 0.9
 disabled_slots: [ Head ]
 base_stats:
   - kind: { attribute: [Strength, 2 ] }
@@ -12,11 +12,11 @@ base_stats:
   - kind: { attribute: [Perception, -1] }
   - kind: { hit_points: 40 }
   - kind: { melee_accuracy: 30 }
-  - kind: { ranged_accuracy: 30 }
+  - kind: { ranged_accuracy: 25 }
   - kind: { spell_accuracy: 30 }
   - kind: { defense: 30 }
   - kind: { fortitude: 30 }
-  - kind: { reflex: 30 }
+  - kind: { reflex: 25 }
   - kind: { will: 30 }
   - kind: { reach: 0.5 }
 base_attack:
@@ -40,7 +40,7 @@ ticker_offset: [0.5, 2.5]
 image_layer_offset_scale: 16
 image_layer_offsets:
   HeldMain: [-26, -24]
-  HeldOff: [9, -22]
+  HeldOff: [9, -23]
   Ears: [-8,-18]
   Hair: [-8,-28]
   Beard: [-7,-21]

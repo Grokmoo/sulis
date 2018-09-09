@@ -110,7 +110,7 @@ impl PartialEq for Actor {
 
 impl Actor {
     pub fn from(other: &Actor, class_to_add: Option<Rc<Class>>, xp: u32,
-                abilities_to_add: Vec<Rc<Ability>>) -> Actor {
+                abilities_to_add: Vec<Rc<Ability>>, inventory: InventoryBuilder) -> Actor {
 
         let mut levels = other.levels.clone();
         if let Some(class_to_add) = class_to_add {
@@ -157,7 +157,7 @@ impl Actor {
             race: Rc::clone(&other.race),
             sex: other.sex,
             attributes: other.attributes,
-            inventory: other.inventory.clone(),
+            inventory,
             xp,
             total_level: other.total_level + 1,
             levels,

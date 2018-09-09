@@ -1,7 +1,5 @@
 id: goblin_ambush_escape
 on_end:
-  - game_over_window: |
-      Thanks for playing the introductory campaign for Sulis.  Check back in the coming months for more content!
   - fire_script:
       id: goblin_cliffs
       func: after_escape_cutscene

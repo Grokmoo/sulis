@@ -509,6 +509,13 @@ impl UserData for ScriptInterface {
             Ok(())
         });
 
+        methods.add_method("load_module", |_, _, id: String| {
+            let pc = GameState::player();
+            let cb = OnTrigger::LoadModule(id);
+            GameState::add_ui_callback(vec![cb], &pc, &pc);
+            Ok(())
+        });
+
         methods.add_method("player", |_, _, ()| {
             Ok(ScriptEntity::from(&GameState::player()))
         });

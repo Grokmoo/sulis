@@ -24,7 +24,7 @@ use sulis_widgets::{Label, TextArea};
 use sulis_module::{Actor, OnTrigger, MerchantData, Conversation, conversation::{Response}, Module};
 use sulis_state::{EntityState, ChangeListener, GameState, area_feedback_text::ColorKind, NextGameStep};
 
-use {CutsceneWindow, RootView, GameOverWindow};
+use {character_window, CutsceneWindow, RootView, GameOverWindow};
 
 pub const NAME: &str = "dialog_window";
 
@@ -259,7 +259,8 @@ pub fn activate(widget: &Rc<RefCell<Widget>>, on_select: &Vec<OnTrigger>,
 
                 let mut pc = pc.borrow_mut();
                 let state = &mut pc.actor;
-                let new_actor = Actor::from(&state.actor, None, state.actor.xp, vec![ability]);
+                let new_actor = Actor::from(&state.actor, None, state.actor.xp, vec![ability],
+                                            state.actor.inventory.clone());
                 state.replace_actor(new_actor);
             },
             TargetFlags(ref flags) => {
@@ -283,8 +284,33 @@ pub fn activate(widget: &Rc<RefCell<Widget>>, on_select: &Vec<OnTrigger>,
             FireScript(ref script) => fire_script(&script.id, &script.func, pc, target),
             GameOverWindow(ref text) => game_over_window(widget, text.to_string()),
             ScrollView(x, y) => scroll_view(widget, *x, *y),
+            LoadModule(ref module_id) => load_module(widget, module_id),
         }
     }
+}
+
+fn load_module(widget: &Rc<RefCell<Widget>>, module_id: &str) {
+    let root = Widget::get_root(widget);
+    let view = Widget::downcast_kind_mut::<RootView>(&root);
+
+    let pc = GameState::player();
+    let inventory = character_window::get_inventory(&pc.borrow().actor);
+    let actor = Actor::from(&pc.borrow().actor.actor, None, pc.borrow().actor.xp(),
+        Vec::new(), inventory);
+
+    let modules_list = Module::get_available_modules("modules");
+    for module in modules_list {
+        if module.id != module_id { continue; }
+
+        let step = NextGameStep::LoadModuleAndNewCampaign {
+            pc_actor: Rc::new(actor),
+            module_dir: module.dir.to_string(),
+        };
+        view.set_next_step(step);
+        return;
+    }
+
+    warn!("Unable to load module '{}' as it was not found.", module_id);
 }
 
 fn scroll_view(widget: &Rc<RefCell<Widget>>, x: i32, y: i32) {

@@ -171,6 +171,10 @@ impl RootView {
         self.next_step.take()
     }
 
+    pub fn set_next_step(&mut self, step: NextGameStep) {
+        self.next_step = Some(step);
+    }
+
     pub fn add_status_text(&mut self, text: &str) {
         self.status.borrow_mut().state.text = text.to_string();
         self.status_added = Some(Instant::now());

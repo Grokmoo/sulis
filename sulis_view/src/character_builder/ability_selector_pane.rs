@@ -99,8 +99,11 @@ impl BuilderPane for AbilitySelectorPane {
             self.add_already_selected(ability);
         }
 
-        let prereq_actor = Rc::new(Actor::from(&self.pc.borrow().actor.actor,
-            builder.class.clone(), 0, builder.abilities.clone()));
+        let prereq_actor = {
+            let state = &self.pc.borrow().actor;
+            Rc::new(Actor::from(&state.actor, builder.class.clone(), 0,
+                builder.abilities.clone(), state.actor.inventory.clone()))
+        };
 
         self.prereqs_not_met.clear();
         for entry in self.choices.iter() {

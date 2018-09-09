@@ -19,10 +19,8 @@ use std::rc::Rc;
 use std::cell::{RefCell};
 
 use sulis_core::ui::*;
-use sulis_core::util;
-use sulis_core::config::Config;
 use sulis_widgets::{Button, Label, list_box, MutuallyExclusiveListBox, TextArea};
-use sulis_module::{Module, ModuleInfo};
+use sulis_module::{ModuleInfo};
 
 use main_menu::MainMenu;
 
@@ -79,12 +77,6 @@ impl WidgetKind for ModuleSelector {
             };
 
             let module = entry.item().clone();
-            info!("Reading module from {}", module.dir);
-            let resource_dir = Config::resources_config().directory;
-            if let Err(e) =  Module::init(&resource_dir, &module.dir) {
-                error!("{}", e);
-                util::error_and_exit("There was a fatal error setting up the module.");
-            };
 
             let root = Widget::get_root(&widget);
             let menu = Widget::downcast_kind_mut::<MainMenu>(&root);

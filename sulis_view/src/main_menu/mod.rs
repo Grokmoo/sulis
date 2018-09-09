@@ -102,6 +102,18 @@ fn load_module_internal(module_dir: &str) {
     };
 }
 
+pub fn load_module(module_dir: &str) {
+    load_module_internal(module_dir);
+
+    match write_selected_module_file(module_dir) {
+        Ok(()) => (),
+        Err(e) => {
+            warn!("Unable to write selected module file");
+            warn!("{}", e);
+        }
+    }
+}
+
 pub struct MainMenu {
     pub(crate) next_step: Option<NextGameStep>,
     mode: Mode,
@@ -147,19 +159,10 @@ impl MainMenu {
     }
 
     pub fn load_module(&mut self, module_dir: &str) {
-        load_module_internal(module_dir);
-
-        match write_selected_module_file(module_dir) {
-            Ok(()) => (),
-            Err(e) => {
-                warn!("Unable to write selected module file");
-                warn!("{}", e);
-            }
-        }
+        load_module(module_dir);
 
         self.reset();
     }
-
 }
 
 impl WidgetKind for MainMenu {

@@ -158,6 +158,7 @@ pub struct Module {
 
 #[derive(Clone)]
 pub struct ModuleInfo {
+    pub id: String,
     pub dir: String,
     pub name: String,
     pub description: String,
@@ -171,6 +172,7 @@ impl ModuleInfo {
         let game: GameBuilder = read_single_resource(&format!("{}/module", path_str))?;
 
         Ok(ModuleInfo {
+            id: game.id,
             dir: path_str,
             name: game.name,
             description: game.description,

@@ -6,5 +6,5 @@ function on_enter_ambush(parent, target)
 end
 
 function after_escape_cutscene(parent, target)
-  
+  game:load_module("twin_expanse_ch1")
 end

@@ -137,6 +137,10 @@ fn main() {
             NextGameStep::NewCampaign { pc_actor } => new_campaign(&mut io, pc_actor),
             NextGameStep::LoadCampaign { save_state } => load_campaign(&mut io, save_state),
             NextGameStep::MainMenu => main_menu(&mut io),
+            NextGameStep::LoadModuleAndNewCampaign { pc_actor, module_dir } => {
+                main_menu::load_module(&module_dir);
+                new_campaign(&mut io, pc_actor)
+            }
             NextGameStep::RecreateIO => {
                 io = create_io();
                 main_menu(&mut io)

@@ -151,6 +151,26 @@ impl WidgetKind for CharacterWindow {
     }
 }
 
+pub fn get_inventory(pc: &ActorState) -> InventoryBuilder {
+    let coins = GameState::party_coins();
+
+    let stash = GameState::party_stash();
+    let items = stash.borrow().items().iter().map(|(qty, item)| (*qty, item.item.id.to_string()))
+        .collect();
+
+    let equipped = Slot::iter().map(|slot| (*slot, pc.inventory().equipped(*slot)))
+        .filter(|(_, item)| item.is_some())
+        .map(|(slot, item)| (slot, item.unwrap().item.id.to_string()))
+        .collect();
+
+    let quick = QuickSlot::iter().map(|slot| (*slot, pc.inventory().quick(*slot)))
+        .filter(|(_, item)| item.is_some())
+        .map(|(slot, item)| (slot, item.unwrap().item.id.to_string()))
+        .collect();
+
+    InventoryBuilder::new(equipped, quick, coins, items)
+}
+
 fn export_character(pc: &ActorState) {
     let (filename, id) = match get_character_export_filename(&pc.actor.name) {
         Err(e) => {
@@ -169,23 +189,7 @@ fn export_character(pc: &ActorState) {
     let levels = pc.actor.levels.iter().map(|(class, level)| (class.id.to_string(), *level))
         .collect();
 
-    let coins = GameState::party_coins();
-
-    let stash = GameState::party_stash();
-    let items = stash.borrow().items().iter().map(|(qty, item)| (*qty, item.item.id.to_string()))
-        .collect();
-
-    let equipped = Slot::iter().map(|slot| (*slot, pc.inventory().equipped(*slot)))
-        .filter(|(_, item)| item.is_some())
-        .map(|(slot, item)| (slot, item.unwrap().item.id.to_string()))
-        .collect();
-
-    let quick = QuickSlot::iter().map(|slot| (*slot, pc.inventory().quick(*slot)))
-        .filter(|(_, item)| item.is_some())
-        .map(|(slot, item)| (slot, item.unwrap().item.id.to_string()))
-        .collect();
-
-    let inventory = InventoryBuilder::new(equipped, quick, coins, items);
+    let inventory = get_inventory(&pc);
 
     let actor = ActorBuilder {
         id,

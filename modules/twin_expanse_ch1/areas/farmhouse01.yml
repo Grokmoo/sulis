@@ -72,7 +72,13 @@ transitions:
     hover_text: "To Farms"
     to_area: wellswood_farms
     image_display: transition
-triggers: []
+triggers:
+  - kind: OnAreaLoad
+    on_activate:
+      - fire_script:
+          id: farmhouse01
+          func: on_area_load
+    initially_enabled: true
 visibility_tile: gui/area_invis
 explored_tile: gui/area_unexplored
 max_vis_distance: 12

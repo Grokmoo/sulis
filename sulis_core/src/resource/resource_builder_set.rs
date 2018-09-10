@@ -35,7 +35,7 @@ use std::path::{Path, PathBuf};
 
 #[derive(Debug)]
 pub struct ResourceBuilderSet {
-    pub theme_builder: ThemeBuilder,
+    pub theme_builder: Option<ThemeBuilder>,
     pub simple_builders: HashMap<String, SimpleImageBuilder>,
     pub composed_builders: HashMap<String, ComposedImageBuilder>,
     pub timer_builders: HashMap<String, TimerImageBuilder>,
@@ -48,37 +48,44 @@ pub struct ResourceBuilderSet {
 
 impl ResourceBuilderSet {
     pub fn new(root: &str) -> Result<ResourceBuilderSet, Error> {
-        let theme_filename = root.to_owned() + "/theme/theme";
-        info!("Reading theme from {}", theme_filename);
-        let mut theme_builder = match create_theme(
-            &format!("{}/theme/", root.to_owned()), "theme") {
-            Ok(t) => t,
-            Err(e) => {
-                error!("Unable to load theme from {}", theme_filename);
-                return Err(e);
-            }
-        };
+        let mut theme_builder = read_theme_builder(root);
 
-        match theme_builder.expand_references() {
-            Ok(()) => (),
-            Err(e) => {
-                error!("Unable to load theme from {}", theme_filename);
-                return Err(e);
-            }
-        };
+        if let Some(ref mut theme_builder) = theme_builder {
+            match theme_builder.expand_references() {
+                Ok(()) => (),
+                Err(e) => {
+                    error!("Unable to expand theme references");
+                    return Err(e);
+                }
+            };
+        }
 
         let root_dirs: Vec<&str> = vec![root];
         Ok(ResourceBuilderSet {
             theme_builder,
-            simple_builders: read(&root_dirs, "images"),
-            composed_builders: read(&root_dirs, "composed_images"),
-            timer_builders: read(&root_dirs, "timer_images"),
-            animated_builders: read(&root_dirs, "animated_images"),
+            simple_builders: read(&root_dirs, "images/simple"),
+            composed_builders: read(&root_dirs, "images/composed"),
+            timer_builders: read(&root_dirs, "images/timer"),
+            animated_builders: read(&root_dirs, "images/animated"),
             spritesheet_builders: read(&root_dirs, "spritesheets"),
             spritesheets_dir: format!("{}/spritesheets/", root),
             font_builders: read(&root_dirs, "fonts"),
             fonts_dir: format!("{}/fonts/", root),
         })
+    }
+}
+
+fn read_theme_builder(root: &str) -> Option<ThemeBuilder> {
+    let theme_filename = root.to_owned() + "/theme/theme";
+    info!("Attempting to read theme from {}", theme_filename);
+    match create_theme(
+        &format!("{}/theme/", root.to_owned()), "theme") {
+        Ok(t) => Some(t),
+        Err(e) => {
+            info!("Unable to load theme from {}", theme_filename);
+            info!("{}", e);
+            None
+        }
     }
 }
 

@@ -23,7 +23,7 @@ use sulis_core::serde_yaml;
 
 use {Conversation, Module};
 
-pub struct Game {
+pub struct Campaign {
     pub id: String,
     pub starting_area: String,
     pub starting_location: Point,
@@ -33,8 +33,8 @@ pub struct Game {
     pub max_starting_level: u32,
 }
 
-impl Game {
-    pub fn new(builder: GameBuilder) -> Result<Game, Error> {
+impl Campaign {
+    pub fn new(builder: CampaignBuilder) -> Result<Campaign, Error> {
 
         let backstory_conversation = match Module::conversation(&builder.backstory_conversation) {
             None => {
@@ -43,7 +43,7 @@ impl Game {
             }, Some(convo) => convo,
         };
 
-        Ok(Game {
+        Ok(Campaign {
             starting_area: builder.starting_area,
             starting_location: builder.starting_location,
             name: builder.name,
@@ -57,7 +57,7 @@ impl Game {
 
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
-pub struct GameBuilder {
+pub struct CampaignBuilder {
     pub id: String,
     pub starting_area: String,
     pub starting_location: Point,
@@ -67,13 +67,13 @@ pub struct GameBuilder {
     pub max_starting_level: u32,
 }
 
-impl ResourceBuilder for GameBuilder {
+impl ResourceBuilder for CampaignBuilder {
     fn owned_id(&self) -> String {
-        "GameBuilder".to_string()
+        "CampaignBuilder".to_string()
     }
 
-    fn from_yaml(data: &str) -> Result<GameBuilder, Error> {
-        let resource: Result<GameBuilder, serde_yaml::Error> = serde_yaml::from_str(data);
+    fn from_yaml(data: &str) -> Result<CampaignBuilder, Error> {
+        let resource: Result<CampaignBuilder, serde_yaml::Error> = serde_yaml::from_str(data);
 
         match resource {
             Ok(resource) => Ok(resource),

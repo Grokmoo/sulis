@@ -62,7 +62,7 @@ pub struct SaveFileMetaData {
 fn get_save_dir() -> PathBuf {
     let mut path = config::USER_DIR.clone();
     path.push("save");
-    path.push(&Module::game().id);
+    path.push(&Module::campaign().id);
     path
 }
 

@@ -95,7 +95,9 @@ impl WidgetKind for SaveWindow {
         let area_editor_kind_ref = Rc::clone(&self.area_editor);
         save_button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _kind| {
             let parent = Widget::get_parent(widget);
-            let filename_prefix = format!("../modules/{}/areas/", Config::editor_config().module);
+            let filename_prefix = format!("../{}/{}/areas/",
+                                          Config::resources_config().campaigns_directory,
+                                          Config::editor_config().module);
             area_editor_kind_ref.borrow().model.save(&filename_prefix);
             parent.borrow_mut().mark_for_removal();
         })));

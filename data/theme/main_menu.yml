@@ -36,7 +36,7 @@ children:
         children:
           module:
             from: .main_menu.button
-            text: "Select Module"
+            text: "Select Campaign"
           new:
             from: .main_menu.button
             text: "New Game"
@@ -552,7 +552,7 @@ children:
         from: .label
         text_params:
           scale: 10.0
-        text: "Select a Module"
+        text: "Select a Campaign"
         x_relative: Center
         preferred_size: [40, 10]
         position: [0, 0]
@@ -569,7 +569,7 @@ children:
         position: [-30, -5]
       modules_title:
         from: .label
-        text: "Available Modules"
+        text: "Available Campaigns"
         text_params:
           scale: 9.0
         x_relative: Center

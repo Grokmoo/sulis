@@ -59,8 +59,8 @@ pub use self::on_trigger::MerchantData;
 pub mod encounter;
 pub use self::encounter::Encounter;
 
-pub mod game;
-pub use self::game::Game;
+pub mod campaign;
+pub use self::campaign::Campaign;
 
 mod generator;
 
@@ -100,7 +100,7 @@ use std::rc::Rc;
 use std::io::Error;
 use std::cell::RefCell;
 use std::fmt::{self, Display};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::fs;
 use std::ffi::OsStr;
 
@@ -115,7 +115,7 @@ use self::conversation::ConversationBuilder;
 use self::cutscene::CutsceneBuilder;
 use self::area::AreaBuilder;
 use self::class::ClassBuilder;
-use self::game::GameBuilder;
+use self::campaign::CampaignBuilder;
 use self::encounter::EncounterBuilder;
 use self::item::ItemBuilder;
 use self::loot_list::LootListBuilder;
@@ -130,7 +130,7 @@ thread_local! {
 
 pub struct Module {
     rules: Option<Rc<Rules>>,
-    game: Option<Rc<Game>>,
+    campaign: Option<Rc<Campaign>>,
     abilities: HashMap<String, Rc<Ability>>,
     ability_lists: HashMap<String, Rc<AbilityList>>,
     actors: HashMap<String, Rc<Actor>>,
@@ -153,6 +153,8 @@ pub struct Module {
     terrain_kinds: Vec<TerrainKind>,
     wall_rules: Option<WallRules>,
     wall_kinds: Vec<WallKind>,
+
+    root_dir: Option<String>,
     init: bool,
 }
 
@@ -169,13 +171,13 @@ impl ModuleInfo {
         let path_str = path.to_string_lossy().to_string();
         debug!("Checking module at '{}'", path_str);
 
-        let game: GameBuilder = read_single_resource(&format!("{}/module", path_str))?;
+        let campaign: CampaignBuilder = read_single_resource(&format!("{}/campaign", path_str))?;
 
         Ok(ModuleInfo {
-            id: game.id,
+            id: campaign.id,
             dir: path_str,
-            name: game.name,
-            description: game.description,
+            name: campaign.name,
+            description: campaign.description,
         })
     }
 }
@@ -309,17 +311,45 @@ impl Module {
     }
 
     pub fn init(data_dir: &str, root_dir: &str) -> Result<(), Error> {
+        ResourceSet::add_module_resources(root_dir)?;
+
         let builder_set = ModuleBuilder::new(data_dir, root_dir);
 
         debug!("Creating module from parsed data.");
 
-        let rules = read_single_resource(&format!("{}/rules", root_dir))?;
+        let rules = {
+            let root_path = format!("{}/rules.yml", root_dir);
+            let path = Path::new(&root_path);
+            if path.is_file() {
+                read_single_resource_path(path)
+            } else {
+                read_single_resource(&format!("{}/rules", data_dir))
+            }
+        }?;
 
         MODULE.with(|module| {
             let mut module = module.borrow_mut();
+            module.abilities.clear();
+            module.ability_lists.clear();
+            module.actors.clear();
+            module.ai_templates.clear();
+            module.areas.clear();
+            module.classes.clear();
+            module.conversations.clear();
+            module.cutscenes.clear();
+            module.encounters.clear();
+            module.items.clear();
+            module.item_adjectives.clear();
+            module.loot_lists.clear();
+            module.props.clear();
+            module.races.clear();
+            module.sizes.clear();
+            module.tiles.clear();
+            module.scripts.clear();
 
             module.rules = Some(Rc::new(rules));
             module.scripts = read_to_string(&vec![data_dir, root_dir], "scripts");
+            module.root_dir = Some(root_dir.to_string());
 
             for (id, adj) in builder_set.item_adjectives {
                 trace!("Inserting resource of type item_adjective with key {} \
@@ -396,16 +426,25 @@ impl Module {
             }
         });
 
-        let game_builder = read_single_resource(&format!("{}/module", root_dir))?;
-        let game = Game::new(game_builder)?;
+        let campaign_builder = read_single_resource(&format!("{}/campaign", root_dir))?;
+        let campaign = Campaign::new(campaign_builder)?;
 
         MODULE.with(move |m| {
             let mut m = m.borrow_mut();
-            m.game = Some(Rc::new(game));
+            m.campaign= Some(Rc::new(campaign));
             m.init = true;
         });
 
         Ok(())
+    }
+
+    pub fn module_dir() -> Option<String> {
+        MODULE.with(|m| {
+            match m.borrow().root_dir {
+                None => None,
+                Some(ref dir) => Some(dir.to_string()),
+            }
+        })
     }
 
     pub fn is_initialized() -> bool {
@@ -419,8 +458,8 @@ impl Module {
         })
     }
 
-    pub fn game() -> Rc<Game> {
-        MODULE.with(|m| Rc::clone(m.borrow().game.as_ref().unwrap()))
+    pub fn campaign() -> Rc<Campaign> {
+        MODULE.with(|m| Rc::clone(m.borrow().campaign.as_ref().unwrap()))
     }
 
     pub fn rules() -> Rc<Rules> {
@@ -503,8 +542,9 @@ impl Module {
 impl Default for Module {
     fn default() -> Module {
         Module {
+            root_dir: None,
             rules: None,
-            game: None,
+            campaign: None,
             abilities: HashMap::new(),
             ability_lists: HashMap::new(),
             actors: HashMap::new(),

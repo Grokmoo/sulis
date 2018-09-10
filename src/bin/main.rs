@@ -132,16 +132,17 @@ fn main() {
 
     let mut next_step = NextGameStep::MainMenu;
     loop {
+        use sulis_state::NextGameStep::*;
         next_step = match next_step {
-            NextGameStep::Exit => break,
-            NextGameStep::NewCampaign { pc_actor } => new_campaign(&mut io, pc_actor),
-            NextGameStep::LoadCampaign { save_state } => load_campaign(&mut io, save_state),
-            NextGameStep::MainMenu => main_menu(&mut io),
-            NextGameStep::LoadModuleAndNewCampaign { pc_actor, module_dir } => {
-                main_menu::load_module(&module_dir);
+            Exit => break,
+            NewCampaign { pc_actor } => new_campaign(&mut io, pc_actor),
+            LoadCampaign { save_state } => load_campaign(&mut io, save_state),
+            MainMenu => main_menu(&mut io),
+            LoadModuleAndNewCampaign { pc_actor, module_dir } => {
+                main_menu::write_selected_module_and_load(&module_dir);
                 new_campaign(&mut io, pc_actor)
-            }
-            NextGameStep::RecreateIO => {
+            },
+            RecreateIO => {
                 io = create_io();
                 main_menu(&mut io)
             }

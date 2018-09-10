@@ -73,13 +73,13 @@ enum Mode {
     NoChoice,
 }
 
-fn selected_module_file_path() -> PathBuf {
+pub fn selected_module_file_path() -> PathBuf {
     let mut path = config::USER_DIR.clone();
     path.push("selected_module.txt");
     path
 }
 
-fn write_selected_module_file(module_dir: &str) -> Result<(), Error> {
+pub fn write_selected_module_file(module_dir: &str) -> Result<(), Error> {
     let mut file = File::create(selected_module_file_path())?;
     file.write_all(module_dir.as_bytes())?;
 
@@ -102,7 +102,16 @@ fn check_selected_module_file() -> Result<String, Error> {
     Ok(module_dir)
 }
 
-fn load_module_internal(module_dir: &str) {
+pub fn write_selected_module_and_load(module_dir: &str) {
+    if let Err(e) = write_selected_module_file(module_dir) {
+        warn!("Error writing selected module file.");
+        warn!("{}", e);
+    }
+
+    load_module(module_dir);
+}
+
+pub fn load_module(module_dir: &str) {
     let reload_resources = match Module::module_dir() {
         None => false,
         Some(ref dir) => module_dir != dir,
@@ -127,18 +136,6 @@ fn load_module_internal(module_dir: &str) {
     };
 }
 
-pub fn load_module(module_dir: &str) {
-    load_module_internal(module_dir);
-
-    match write_selected_module_file(module_dir) {
-        Ok(()) => (),
-        Err(e) => {
-            warn!("Unable to write selected module file");
-            warn!("{}", e);
-        }
-    }
-}
-
 pub struct MainMenu {
     pub(crate) next_step: Option<NextGameStep>,
     mode: Mode,
@@ -150,7 +147,7 @@ pub struct MainMenu {
 impl MainMenu {
     pub fn new(display_configurations: Vec<DisplayConfiguration>) -> Rc<RefCell<MainMenu>> {
         match check_selected_module_file() {
-            Ok(dir) => load_module_internal(&dir),
+            Ok(dir) => load_module(&dir),
             Err(e) => {
                 info!("Unable to read selected_module file");
                 info!("{}", e);
@@ -181,12 +178,6 @@ impl MainMenu {
 
     pub fn recreate_io(&mut self) {
         self.next_step = Some(NextGameStep::RecreateIO);
-    }
-
-    pub fn load_module(&mut self, module_dir: &str) {
-        load_module(module_dir);
-
-        self.reset();
     }
 }
 

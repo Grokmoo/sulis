@@ -63,10 +63,10 @@ impl ResourceBuilderSet {
         let root_dirs: Vec<&str> = vec![root];
         Ok(ResourceBuilderSet {
             theme_builder,
-            simple_builders: read(&root_dirs, "images"),
-            composed_builders: read(&root_dirs, "composed_images"),
-            timer_builders: read(&root_dirs, "timer_images"),
-            animated_builders: read(&root_dirs, "animated_images"),
+            simple_builders: read(&root_dirs, "images/simple"),
+            composed_builders: read(&root_dirs, "images/composed"),
+            timer_builders: read(&root_dirs, "images/timer"),
+            animated_builders: read(&root_dirs, "images/animated"),
             spritesheet_builders: read(&root_dirs, "spritesheets"),
             spritesheets_dir: format!("{}/spritesheets/", root),
             font_builders: read(&root_dirs, "fonts"),

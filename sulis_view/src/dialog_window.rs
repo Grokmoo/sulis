@@ -25,7 +25,7 @@ use sulis_widgets::{Label, TextArea};
 use sulis_module::{Actor, OnTrigger, MerchantData, Conversation, conversation::{Response}, Module};
 use sulis_state::{EntityState, ChangeListener, GameState, area_feedback_text::ColorKind, NextGameStep};
 
-use {character_window, CutsceneWindow, RootView, GameOverWindow};
+use {character_window, CutsceneWindow, RootView, GameOverWindow, LoadingScreen};
 
 pub const NAME: &str = "dialog_window";
 
@@ -308,6 +308,10 @@ fn load_module(widget: &Rc<RefCell<Widget>>, module_id: &str) {
             module_dir: module.dir.to_string(),
         };
         view.set_next_step(step);
+
+        let loading_screen = Widget::with_defaults(LoadingScreen::new());
+        loading_screen.borrow_mut().state.set_modal(true);
+        Widget::add_child_to(&root, loading_screen);
         return;
     }
 

@@ -21,8 +21,10 @@ use std::cell::{RefCell};
 use sulis_core::ui::*;
 use sulis_widgets::{Button, Label, list_box, MutuallyExclusiveListBox, TextArea};
 use sulis_module::{ModuleInfo};
+use sulis_state::NextGameStep;
 
-use main_menu::MainMenu;
+use main_menu::{self, MainMenu};
+use LoadingScreen;
 
 pub struct ModuleSelector {
     modules: Vec<ModuleInfo>,
@@ -80,8 +82,15 @@ impl WidgetKind for ModuleSelector {
 
             let root = Widget::get_root(&widget);
             let menu = Widget::downcast_kind_mut::<MainMenu>(&root);
-            menu.load_module(&module.dir);
-            root.borrow_mut().invalidate_children();
+            if let Err(e) = main_menu::write_selected_module_file(&module.dir) {
+                warn!("Unable to write selected module file");
+                warn!("{}", e);
+            };
+            menu.next_step = Some(NextGameStep::MainMenu);
+
+            let loading_screen = Widget::with_defaults(LoadingScreen::new());
+            loading_screen.borrow_mut().state.set_modal(true);
+            Widget::add_child_to(&root, loading_screen);
         })));
         play.borrow_mut().state.disable();
 

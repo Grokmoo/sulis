@@ -100,7 +100,7 @@ use std::rc::Rc;
 use std::io::Error;
 use std::cell::RefCell;
 use std::fmt::{self, Display};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::fs;
 use std::ffi::OsStr;
 
@@ -317,7 +317,15 @@ impl Module {
 
         debug!("Creating module from parsed data.");
 
-        let rules = read_single_resource(&format!("{}/rules", root_dir))?;
+        let rules = {
+            let root_path = format!("{}/rules.yml", root_dir);
+            let path = Path::new(&root_path);
+            if path.is_file() {
+                read_single_resource_path(path)
+            } else {
+                read_single_resource(&format!("{}/rules", data_dir))
+            }
+        }?;
 
         MODULE.with(|module| {
             let mut module = module.borrow_mut();

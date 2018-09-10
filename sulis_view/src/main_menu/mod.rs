@@ -34,6 +34,7 @@ use std::rc::Rc;
 use std::cell::{RefCell};
 
 use sulis_core::config::{self, Config};
+use sulis_core::resource::ResourceSet;
 use sulis_core::io::{InputAction, MainLoopUpdater, DisplayConfiguration};
 use sulis_core::ui::*;
 use sulis_core::util;
@@ -102,6 +103,23 @@ fn check_selected_module_file() -> Result<String, Error> {
 }
 
 fn load_module_internal(module_dir: &str) {
+    let reload_resources = match Module::module_dir() {
+        None => false,
+        Some(ref dir) => module_dir != dir,
+    };
+
+    if reload_resources {
+        // reload resources if we have already loaded a module previously
+        // to prevent resources from the old module persisting
+
+        let resources_dir = Config::resources_config().directory;
+        info!("Reading resources from {}", resources_dir);
+        if let Err(e) = ResourceSet::init(&resources_dir) {
+            error!("{}", e);
+            util::error_and_exit("There was a fatal error reading resources..");
+        };
+    }
+
     info!("Reading module from {}", module_dir);
     if let Err(e) =  Module::init(&Config::resources_config().directory, module_dir) {
         error!("{}", e);

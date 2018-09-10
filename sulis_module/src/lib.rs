@@ -153,6 +153,8 @@ pub struct Module {
     terrain_kinds: Vec<TerrainKind>,
     wall_rules: Option<WallRules>,
     wall_kinds: Vec<WallKind>,
+
+    root_dir: Option<String>,
     init: bool,
 }
 
@@ -309,6 +311,8 @@ impl Module {
     }
 
     pub fn init(data_dir: &str, root_dir: &str) -> Result<(), Error> {
+        ResourceSet::add_module_resources(root_dir)?;
+
         let builder_set = ModuleBuilder::new(data_dir, root_dir);
 
         debug!("Creating module from parsed data.");
@@ -317,9 +321,27 @@ impl Module {
 
         MODULE.with(|module| {
             let mut module = module.borrow_mut();
+            module.abilities.clear();
+            module.ability_lists.clear();
+            module.actors.clear();
+            module.ai_templates.clear();
+            module.areas.clear();
+            module.classes.clear();
+            module.conversations.clear();
+            module.cutscenes.clear();
+            module.encounters.clear();
+            module.items.clear();
+            module.item_adjectives.clear();
+            module.loot_lists.clear();
+            module.props.clear();
+            module.races.clear();
+            module.sizes.clear();
+            module.tiles.clear();
+            module.scripts.clear();
 
             module.rules = Some(Rc::new(rules));
             module.scripts = read_to_string(&vec![data_dir, root_dir], "scripts");
+            module.root_dir = Some(root_dir.to_string());
 
             for (id, adj) in builder_set.item_adjectives {
                 trace!("Inserting resource of type item_adjective with key {} \
@@ -406,6 +428,15 @@ impl Module {
         });
 
         Ok(())
+    }
+
+    pub fn module_dir() -> Option<String> {
+        MODULE.with(|m| {
+            match m.borrow().root_dir {
+                None => None,
+                Some(ref dir) => Some(dir.to_string()),
+            }
+        })
     }
 
     pub fn is_initialized() -> bool {
@@ -503,6 +534,7 @@ impl Module {
 impl Default for Module {
     fn default() -> Module {
         Module {
+            root_dir: None,
             rules: None,
             campaign: None,
             abilities: HashMap::new(),

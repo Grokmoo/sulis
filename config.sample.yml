@@ -39,6 +39,9 @@ display:
 resources:
     # all resources are subdirectories under this
     directory: data
+    
+    # campaigns are stored here
+    campaigns_directory: campaigns
 
 input:
     # whether moving the mouse to the screen edge will scroll the view

@@ -216,6 +216,7 @@ pub enum DisplayMode {
 #[serde(deny_unknown_fields)]
 pub struct ResourcesConfig {
     pub directory: String,
+    pub campaigns_directory: String,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone)]

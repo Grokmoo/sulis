@@ -259,12 +259,12 @@ impl GameState {
             party_stash.add_quantity(qty, item_state);
         }
 
-        let game = Module::game();
+        let campaign= Module::campaign();
 
-        let area_state = GameState::setup_area_state(&game.starting_area)?;
+        let area_state = GameState::setup_area_state(&campaign.starting_area)?;
 
-        debug!("Setting up PC {}, with {:?}", &pc.name, &game.starting_location);
-        let location = Location::from_point(&game.starting_location, &area_state.borrow().area);
+        debug!("Setting up PC {}, with {:?}", &pc.name, &campaign.starting_location);
+        let location = Location::from_point(&campaign.starting_location, &area_state.borrow().area);
 
         if !location.coords_valid(location.x, location.y) {
             error!("Starting location coordinates must be valid for the starting area.");
@@ -288,7 +288,7 @@ impl GameState {
         let path_finder = PathFinder::new(&area_state.borrow().area);
 
         let mut areas: HashMap<String, Rc<RefCell<AreaState>>> = HashMap::new();
-        areas.insert(game.starting_area.to_string(), Rc::clone(&area_state));
+        areas.insert(campaign.starting_area.to_string(), Rc::clone(&area_state));
 
         let mut party = Vec::new();
         party.push(Rc::clone(&pc_state));

@@ -48,7 +48,7 @@ pub fn get_initial_node(convo: &Rc<Conversation>) -> String {
 
 impl BackstorySelectorPane {
     pub fn new() -> Rc<RefCell<BackstorySelectorPane>> {
-        let convo = Rc::clone(&Module::game().backstory_conversation);
+        let convo = Rc::clone(&Module::campaign().backstory_conversation);
         let cur_node = get_initial_node(&convo);
         Rc::new(RefCell::new(BackstorySelectorPane {
             node: TextArea::empty(),

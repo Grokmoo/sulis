@@ -49,7 +49,7 @@ impl CharacterSelector {
 
     #[must_use]
     fn set_play_enabled(&self, play: &mut WidgetState) -> Rc<RefCell<Widget>> {
-        let max_level = Module::game().max_starting_level;
+            let max_level = Module::campaign().max_starting_level;
 
         let invalid_level = Widget::with_theme(TextArea::empty(), "invalid_level_box");
         let (enabled, invalid_vis) = match self.selected {

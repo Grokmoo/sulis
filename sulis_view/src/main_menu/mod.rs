@@ -27,8 +27,8 @@ pub mod options;
 pub use self::options::Options;
 
 use std::fs::File;
-use std::io::{prelude::*, Error};
-use std::path::PathBuf;
+use std::io::{prelude::*, Error, ErrorKind};
+use std::path::{Path, PathBuf};
 use std::any::Any;
 use std::rc::Rc;
 use std::cell::{RefCell};
@@ -90,6 +90,13 @@ fn check_selected_module_file() -> Result<String, Error> {
     let mut module_dir = String::new();
     file.read_to_string(&mut module_dir)?;
     module_dir.trim();
+
+    let campaign_file = format!("{}/campaign.yml", module_dir);
+    let campaign_path = Path::new(&campaign_file);
+    if !campaign_path.is_file() {
+        warn!("Selected module file does not point to a valid campaign");
+        return Err(Error::new(ErrorKind::InvalidData, "Invalid selected_module.txt file"));
+    }
 
     Ok(module_dir)
 }
@@ -195,7 +202,7 @@ impl WidgetKind for MainMenu {
 
         let module_title = Widget::with_theme(Label::empty(), "module_title");
         if Module::is_initialized() {
-            module_title.borrow_mut().state.add_text_arg("module", &Module::game().name);
+            module_title.borrow_mut().state.add_text_arg("module", &Module::campaign().name);
         }
 
         let menu_pane = Widget::empty("menu_pane");
@@ -232,7 +239,8 @@ impl WidgetKind for MainMenu {
             let window = Widget::downcast_kind_mut::<MainMenu>(&parent);
 
             window.mode = Mode::Module;
-            let modules_list = Module::get_available_modules("modules");
+            let modules_list = Module::get_available_modules(
+                &Config::resources_config().campaigns_directory);
             if modules_list.len() == 0 {
                 util::error_and_exit("No valid modules found.");
             }

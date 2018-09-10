@@ -37,7 +37,9 @@ fn main() {
     util::setup_logger();
     info!("Setup Logger and read configuration from 'config.yml'");
 
-    let dir = Config::resources_config().directory;
+    let resources_config = Config::resources_config();
+
+    let dir = resources_config.directory;
     info!("Reading resources from {}", dir);
     let data_dir = format!("../{}", dir);
     if let Err(e) = ResourceSet::init(&data_dir) {
@@ -45,9 +47,10 @@ fn main() {
         util::error_and_exit("There was a fatal error reading resources.");
     };
 
+    let campaigns_dir = resources_config.campaigns_directory;
     let module = Config::editor_config().module;
     info!("Reading module from {}", module);
-    if let Err(e) =  Module::init(&data_dir, &format!("../modules/{}", module)) {
+    if let Err(e) =  Module::init(&data_dir, &format!("../{}/{}", campaigns_dir, module)) {
         error!("{}", e);
         util::error_and_exit("There was a fatal error setting up the module.");
     };

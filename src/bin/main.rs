@@ -43,10 +43,12 @@ fn init() -> Box<IO> {
 
     let resources_dir = Config::resources_config().directory;
     info!("Reading resources from {}", resources_dir);
-    if let Err(e) = ResourceSet::init(&resources_dir) {
+
+    let dirs = vec![Config::resources_config().directory];
+    if let Err(e) = ResourceSet::load_resources(dirs) {
         error!("{}", e);
-        util::error_and_exit("There was a fatal error reading resources..");
-    };
+        util::error_and_exit("Fatal error reading resources.");
+    }
 
     create_io()
 }

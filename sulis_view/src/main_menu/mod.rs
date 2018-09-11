@@ -114,27 +114,25 @@ pub fn write_selected_module_and_load(module_dir: &str) {
 pub fn load_module(module_dir: &str) {
     let resources_dir = Config::resources_config().directory;
 
-    let reload_resources = match Module::module_dir() {
-        None => false,
-        Some(ref dir) => module_dir != dir,
-    };
-
-    if reload_resources {
-        // reload resources if we have already loaded a module previously
-        // to prevent resources from the old module persisting
-
-        info!("Reading resources from {}", resources_dir);
-        if let Err(e) = ResourceSet::init(&resources_dir) {
+    let dirs = vec![resources_dir, module_dir.to_string()];
+    info!("Reading resources from '{:?}'", dirs);
+    let yaml = match ResourceSet::load_resources(dirs.clone()) {
+        Err(e) => {
             error!("{}", e);
-            util::error_and_exit("There was a fatal error reading resources..");
-        };
-    }
-
-    info!("Reading module from {}", module_dir);
-    if let Err(e) =  Module::init(&Config::resources_config().directory, module_dir) {
-        error!("{}", e);
-        util::error_and_exit("There was a fatal error setting up the module.");
+            util::error_and_exit("Fatal error reading resources.");
+            unreachable!();
+        },
+        Ok(yaml) => yaml,
     };
+
+    info!("Loading module '{}'", module_dir);
+    match Module::load_resources(yaml, dirs) {
+        Err(e) => {
+            error!("{}", e);
+            util::error_and_exit("Fatal error setting up module.");
+        },
+        Ok(()) => (),
+    }
 }
 
 pub struct MainMenu {

@@ -10,7 +10,7 @@ equippable:
   slot: Legs
   bonuses:
     - kind: { armor: 2 }
-    - kind: { armor_kind: [ Slashing, 1] }
+    - kind: { armor_kind: { kind: Slashing, amount: 1 } }
     - kind: { movement_rate: -0.03 }
     - kind: { spell_accuracy: -2 }
 image:

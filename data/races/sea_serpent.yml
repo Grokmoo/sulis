@@ -4,10 +4,10 @@ description: "Monster"
 size: 4by4
 movement_rate: 1.0
 base_stats:
-  - kind: { attribute: [Strength, 5 ] }
-  - kind: { attribute: [Dexterity, 2 ] }
-  - kind: { attribute: [Endurance, 3 ] }
-  - kind: { attribute: [Intellect, -5 ] }
+  - kind: { attribute: { attribute: Strength, amount: 5 } }
+  - kind: { attribute: { attribute: Dexterity, amount: 2 } }
+  - kind: { attribute: { attribute: Endurance, amount: 3 } }
+  - kind: { attribute: { attribute: Intellect, amount: -5 } }
   - kind: { hit_points: 40 }
   - kind: { melee_accuracy: 30 }
   - kind: { ranged_accuracy: 30 }

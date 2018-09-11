@@ -10,10 +10,10 @@ equippable:
   slot: Hands
   bonuses:
     - kind: { armor: 3 }
-    - kind: { armor_kind: [ Slashing, 1] }
-    - kind: { armor_kind: [ Electrical, -2] }
+    - kind: { armor_kind: { kind: Slashing, amount: 1 } }
+    - kind: { armor_kind: { kind: Electrical, amount: -2 } }
     - kind: { movement_rate: -0.02 }
-    - kind: { attribute: [Dexterity, -1] }
+    - kind: { attribute: { attribute: Dexterity, amount: -1 } }
     - kind: { spell_accuracy: -10 }
 image:
   Hands:

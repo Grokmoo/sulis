@@ -17,10 +17,11 @@
 use std::collections::HashMap;
 use std::io::{Error, ErrorKind};
 use std::rc::Rc;
+use std::path::PathBuf;
 
 use image::SimpleImage;
 use resource::{ResourceBuilder, ResourceSet};
-use util::{Point, Size};
+use util::{Point, Size, unable_to_create_error};
 
 use serde_yaml;
 
@@ -74,16 +75,29 @@ impl Sprite {
 }
 
 impl Spritesheet {
-    pub fn new(dir: &str, builder: SpritesheetBuilder,
+    pub fn new(builder: SpritesheetBuilder,
                resources: &mut ResourceSet) -> Result<Rc<Spritesheet>, Error> {
-        let filename = format!("{}{}", dir, builder.src);
-        let image = match extern_image::open(&filename) {
-            Ok(image) => image,
-            Err(e) => {
-                warn!("Error reading '{}', {}", &filename, e);
-                return Err(Error::new(ErrorKind::InvalidData,
-                                      format!("Cannot open spritesheet at '{}'", filename)));
+
+        let mut image = None;
+        for dir in builder.source_dirs.iter().rev() {
+            let mut filepath = PathBuf::from(dir);
+            filepath.push(&builder.src);
+
+            match extern_image::open(&filepath) {
+                Ok(read_image) => {
+                    image = Some(read_image);
+                    break;
+                }
+                Err(_) => (),
             }
+        }
+
+        let image = match image {
+            None => {
+                warn!("Unable to read spritesheet source '{}' from any of '{:?}'",
+                      builder.src, builder.source_dirs);
+                return unable_to_create_error("spritesheet", &builder.id);
+            }, Some(img) => img,
         };
 
         let image = image.to_rgba();
@@ -191,6 +205,7 @@ impl Spritesheet {
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct SpritesheetBuilder {
+    pub source_dirs: Vec<String>,
     pub id: String,
     pub src: String,
     pub size: Size,

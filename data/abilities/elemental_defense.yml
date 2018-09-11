@@ -5,12 +5,12 @@ description: |
   Through superior training and strength of will, you are able to shrug off elemental damage.  You gain 3 points of Armor against Acid, Cold, Electrical, and Fire damage.
 bonuses:
   - kind:
-      armor_kind: [ Acid, 3]
+      armor_kind: { kind: Acid, amount: 3 }
   - kind:
-      armor_kind: [ Cold, 3]
+      armor_kind: { kind: Cold, amount: 3 }
   - kind:
-      armor_kind: [Electrical, 3]
+      armor_kind: { kind: Electrical, amount: 3 }
   - kind:
-      armor_kind: [Fire, 3]
+      armor_kind: { kind: Fire, amount: 3 }
 prereqs:
   abilities: [ tenacious_soul ]

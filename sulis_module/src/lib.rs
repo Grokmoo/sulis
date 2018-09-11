@@ -103,11 +103,12 @@ use std::rc::Rc;
 use std::io::Error;
 use std::cell::RefCell;
 use std::fmt::{self, Display};
-use std::path::{Path, PathBuf};
+use std::path::{PathBuf};
 use std::fs;
 use std::ffi::OsStr;
 
 use sulis_core::config;
+use sulis_core::util::invalid_data_error;
 use sulis_core::resource::*;
 
 use self::area::Tile;
@@ -313,23 +314,40 @@ impl Module {
         actors
     }
 
-    pub fn init(data_dir: &str, root_dir: &str) -> Result<(), Error> {
-        ResourceSet::add_module_resources(root_dir)?;
-
-        let builder_set = ModuleBuilder::new(data_dir, root_dir);
-
+    pub fn load_resources(mut yaml: YamlResourceSet, dirs: Vec<String>) -> Result<(), Error> {
+        assert!(dirs.len() > 1);
         debug!("Creating module from parsed data.");
 
-        let rules = {
-            let root_path = format!("{}/rules.yml", root_dir);
-            let path = Path::new(&root_path);
-            if path.is_file() {
-                read_single_resource_path(path)
-            } else {
-                read_single_resource(&format!("{}/rules", data_dir))
-            }
-        }?;
+        let top_level = yaml.resources.remove(&YamlResourceKind::TopLevel);
+        let (rules_yaml, campaign_yaml) = match top_level {
+            None => return invalid_data_error("No rules or campaign files defined"),
+            Some(mut map) => {
+                let rules_yaml = match map.remove("rules") {
+                    None => return invalid_data_error("No rules file defined"),
+                    Some(yaml) => yaml,
+                };
 
+                let mut campaign_yaml = None;
+                for (id, yaml) in map {
+                    if campaign_yaml.is_some() {
+                        return invalid_data_error(&format!("Multiple potential campaign files \
+                            detected at top level: '{}'", id));
+                    }
+                    campaign_yaml = Some(yaml);
+                }
+
+                if campaign_yaml.is_none() {
+                    return invalid_data_error("No campaign file found at top level");
+                }
+
+                (rules_yaml, campaign_yaml.unwrap())
+            }
+        };
+
+        let rules: Rules = read_builder(rules_yaml)?;
+        let campaign_builder: CampaignBuilder = read_builder(campaign_yaml)?;
+
+        let builder_set = ModuleBuilder::from_yaml(&mut yaml)?;
         MODULE.with(|module| {
             let mut module = module.borrow_mut();
             module.abilities.clear();
@@ -351,8 +369,9 @@ impl Module {
             module.scripts.clear();
 
             module.rules = Some(Rc::new(rules));
-            module.scripts = read_to_string(&vec![data_dir, root_dir], "scripts");
-            module.root_dir = Some(root_dir.to_string());
+            module.scripts = read_to_string(&dirs, "scripts");
+
+            module.root_dir = Some(dirs[1].to_string());
 
             for (id, adj) in builder_set.item_adjectives {
                 trace!("Inserting resource of type item_adjective with key {} \
@@ -364,7 +383,9 @@ impl Module {
                 insert_if_ok("size", id, ObjectSize::new(builder), &mut module.sizes);
             }
 
-            for (_, tiles_list) in builder_set.tile_builders {
+            for (_, mut tiles_list) in builder_set.tile_builders {
+                tiles_list.move_tiles();
+
                 module.terrain_rules = Some(tiles_list.terrain_rules);
                 module.terrain_kinds = tiles_list.terrain_kinds;
                 module.wall_rules = Some(tiles_list.wall_rules);
@@ -429,7 +450,6 @@ impl Module {
             }
         });
 
-        let campaign_builder = read_single_resource(&format!("{}/campaign", root_dir))?;
         let campaign = Campaign::new(campaign_builder)?;
 
         MODULE.with(move |m| {
@@ -594,25 +614,25 @@ struct ModuleBuilder {
 }
 
 impl ModuleBuilder {
-    fn new(data_dir: &str, root_dir: &str) -> ModuleBuilder {
-        let root_dirs: Vec<&str> = vec![data_dir, root_dir];
-        ModuleBuilder {
-            ability_builders: read(&root_dirs, "abilities"),
-            ability_list_builders: read(&root_dirs, "ability_lists"),
-            actor_builders: read(&root_dirs, "actors"),
-            ai_builders: read(&root_dirs, "ai"),
-            area_builders: read(&root_dirs, "areas"),
-            class_builders: read(&root_dirs, "classes"),
-            conversation_builders: read(&root_dirs, "conversations"),
-            cutscene_builders: read(&root_dirs, "cutscenes"),
-            encounter_builders: read(&root_dirs, "encounters"),
-            item_builders: read(&root_dirs, "items"),
-            item_adjectives: read(&root_dirs, "item_adjectives"),
-            loot_builders: read(&root_dirs, "loot_lists"),
-            prop_builders: read(&root_dirs, "props"),
-            race_builders: read(&root_dirs, "races"),
-            size_builders: read(&root_dirs, "sizes"),
-            tile_builders: read(&root_dirs, "tiles"),
-        }
+    fn from_yaml(resources: &mut YamlResourceSet) -> Result<ModuleBuilder, Error> {
+        use self::YamlResourceKind::*;
+        Ok(ModuleBuilder {
+            ability_builders: read_builders(resources, Ability)?,
+            ability_list_builders: read_builders(resources, AbilityList)?,
+            actor_builders: read_builders(resources, Actor)?,
+            ai_builders: read_builders(resources, AiTemplate)?,
+            area_builders: read_builders(resources, Area)?,
+            class_builders: read_builders(resources, Class)?,
+            conversation_builders: read_builders(resources, Conversation)?,
+            cutscene_builders: read_builders(resources, Cutscene)?,
+            encounter_builders: read_builders(resources, Encounter)?,
+            item_builders: read_builders(resources, Item)?,
+            item_adjectives: read_builders(resources, ItemAdjective)?,
+            loot_builders: read_builders(resources, LootList)?,
+            prop_builders: read_builders(resources, Prop)?,
+            race_builders: read_builders(resources, Race)?,
+            size_builders: read_builders(resources, Size)?,
+            tile_builders: read_builders(resources, Tile)?,
+        })
     }
 }

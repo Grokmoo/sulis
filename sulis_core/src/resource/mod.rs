@@ -16,7 +16,7 @@
 
 mod resource_builder_set;
 pub use self::resource_builder_set::{read, read_single_resource, read_single_resource_path,
-    read_to_string, write_to_file, write_json_to_file};
+    read_to_string, write_to_file, write_json_to_file, read_builder, read_builders};
 
 mod spritesheet;
 pub use self::spritesheet::Spritesheet;
@@ -63,7 +63,7 @@ pub struct ResourceSet {
 }
 
 impl ResourceSet {
-    pub fn new() -> ResourceSet {
+    fn new() -> ResourceSet {
         ResourceSet {
             theme: None,
             images: HashMap::new(),
@@ -79,6 +79,7 @@ impl ResourceSet {
         }
 
         let root = dirs.remove(0);
+        let theme_dir = format!("{}/theme/", root);
         let path = Path::new(&root);
         let mut yaml = YamlResourceSet::new(&path)?;
 
@@ -91,57 +92,18 @@ impl ResourceSet {
         let file_val = serde_yaml::Value::String(yaml_resource_set::FILE_VAL_STR.to_string());
         for (key, map) in yaml.resources.iter() {
             for (id, map) in map.iter() {
-                info!("{:?}: {}, dirs: {:?}, files: {:?}", key, id, map.get(&dir_val),
+                trace!("{:?}: {}, dirs: {:?}, files: {:?}", key, id, map.get(&dir_val),
                     map.get(&file_val));
             }
         }
 
+        let builder_set = ResourceBuilderSet::from_yaml(&mut yaml, &theme_dir)?;
+        ResourceSet::load_builders(builder_set)?;
+
         Ok(yaml)
     }
 
-    pub fn add_module_resources(module_dir: &str) -> Result<(), Error> {
-        debug!("Adding module resources in '{}' to resource set", module_dir);
-
-        let builder_set = ResourceBuilderSet::new(module_dir)?;
-
-        RESOURCE_SET.with(|resource_set| {
-            let mut set = resource_set.borrow_mut();
-
-            let sheets_dir = &builder_set.spritesheets_dir;
-            for (id, sheet) in builder_set.spritesheet_builders {
-                insert_if_ok_boxed("spritesheet", id, Spritesheet::new(sheets_dir, sheet, &mut set),
-                    &mut set.spritesheets);
-            }
-
-            let fonts_dir = &builder_set.fonts_dir;
-            for (id, font) in builder_set.font_builders {
-                insert_if_ok_boxed("font", id, Font::new(fonts_dir, font),
-                &mut set.fonts);
-            }
-
-            for (id, image) in builder_set.simple_builders {
-                insert_if_ok_boxed("image", id, SimpleImage::new(image, &set), &mut set.images);
-            }
-
-            for (id, image) in builder_set.composed_builders {
-                insert_if_ok_boxed("image", id, ComposedImage::new(image, &mut set), &mut set.images);
-            }
-
-            for (id, image) in builder_set.timer_builders {
-                insert_if_ok_boxed("image", id, TimerImage::new(image, &set.images), &mut set.images);
-            }
-
-            for (id, image) in builder_set.animated_builders {
-                insert_if_ok_boxed("image", id, AnimatedImage::new(image, &set.images), &mut set.images);
-            }
-        });
-
-        Ok(())
-    }
-
-    pub fn init(root_directory: &str) -> Result<(), Error> {
-        let builder_set = ResourceBuilderSet::new(root_directory)?;
-
+    fn load_builders(builder_set: ResourceBuilderSet) -> Result<(), Error> {
         debug!("Creating resource set from parsed data.");
 
         RESOURCE_SET.with(|resource_set| {
@@ -150,22 +112,15 @@ impl ResourceSet {
             set.spritesheets.clear();
             set.fonts.clear();
 
-            if let Some(theme_builder) = builder_set.theme_builder {
-                set.theme = Some(Rc::new(Theme::new("", theme_builder)));
-            } else {
-                error!("No theme definition found.");
-                return Err(Error::new(ErrorKind::NotFound, "Theme definition not found"));
-            }
+            set.theme = Some(Rc::new(Theme::new("", builder_set.theme_builder)));
 
-            let sheets_dir = &builder_set.spritesheets_dir;
             for (id, sheet) in builder_set.spritesheet_builders {
-                insert_if_ok_boxed("spritesheet", id, Spritesheet::new(sheets_dir, sheet, &mut set),
+                insert_if_ok_boxed("spritesheet", id, Spritesheet::new(sheet, &mut set),
                     &mut set.spritesheets);
             }
 
-            let fonts_dir = &builder_set.fonts_dir;
             for (id, font) in builder_set.font_builders {
-                insert_if_ok_boxed("font", id, Font::new(fonts_dir, font),
+                insert_if_ok_boxed("font", id, Font::new(font),
                 &mut set.fonts);
             }
 

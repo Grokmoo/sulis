@@ -140,7 +140,7 @@ pub struct Tileset {
 }
 
 impl Tileset {
-    fn move_tiles(&mut self) {
+    pub fn move_tiles(&mut self) {
         self.move_uniform();
         self.move_non_uniform();
     }

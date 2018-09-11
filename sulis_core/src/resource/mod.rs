@@ -32,9 +32,12 @@ pub use self::yaml_resource_set::YamlResourceKind;
 use std::collections::HashMap;
 use std::rc::Rc;
 use std::cell::RefCell;
+use std::path::Path;
 use std::io::{Error, ErrorKind};
 use std::fmt::Display;
 use std::hash::Hash;
+
+use serde_yaml;
 
 use config::Config;
 use resource::resource_builder_set::ResourceBuilderSet;
@@ -67,6 +70,33 @@ impl ResourceSet {
             spritesheets: HashMap::new(),
             fonts: HashMap::new(),
         }
+    }
+
+    pub fn load_resources(mut dirs: Vec<String>) -> Result<YamlResourceSet, Error> {
+        if dirs.len() == 0 {
+            return Err(Error::new(ErrorKind::InvalidInput, "Must specify at least \
+                                  a root data directory to load resources"));
+        }
+
+        let root = dirs.remove(0);
+        let path = Path::new(&root);
+        let mut yaml = YamlResourceSet::new(&path)?;
+
+        for dir in dirs {
+            let path = Path::new(&dir);
+            yaml.append(path);
+        }
+
+        let dir_val = serde_yaml::Value::String(yaml_resource_set::DIRECTORY_VAL_STR.to_string());
+        let file_val = serde_yaml::Value::String(yaml_resource_set::FILE_VAL_STR.to_string());
+        for (key, map) in yaml.resources.iter() {
+            for (id, map) in map.iter() {
+                info!("{:?}: {}, dirs: {:?}, files: {:?}", key, id, map.get(&dir_val),
+                    map.get(&file_val));
+            }
+        }
+
+        Ok(yaml)
     }
 
     pub fn add_module_resources(module_dir: &str) -> Result<(), Error> {

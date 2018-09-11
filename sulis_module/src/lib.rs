@@ -82,6 +82,9 @@ pub use self::item_adjective::ItemAdjective;
 pub mod loot_list;
 pub use self::loot_list::LootList;
 
+pub mod modification;
+pub use self::modification::ModificationInfo;
+
 pub mod prereq_list;
 pub use self::prereq_list::PrereqList;
 pub use self::prereq_list::PrereqListBuilder;

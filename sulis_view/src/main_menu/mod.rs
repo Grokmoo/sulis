@@ -34,7 +34,7 @@ use std::rc::Rc;
 use std::cell::{RefCell};
 
 use sulis_core::config::{self, Config};
-use sulis_core::resource::ResourceSet;
+use sulis_core::resource::{ResourceSet};
 use sulis_core::io::{InputAction, MainLoopUpdater, DisplayConfiguration};
 use sulis_core::ui::*;
 use sulis_core::util;
@@ -112,6 +112,8 @@ pub fn write_selected_module_and_load(module_dir: &str) {
 }
 
 pub fn load_module(module_dir: &str) {
+    let resources_dir = Config::resources_config().directory;
+
     let reload_resources = match Module::module_dir() {
         None => false,
         Some(ref dir) => module_dir != dir,
@@ -121,7 +123,6 @@ pub fn load_module(module_dir: &str) {
         // reload resources if we have already loaded a module previously
         // to prevent resources from the old module persisting
 
-        let resources_dir = Config::resources_config().directory;
         info!("Reading resources from {}", resources_dir);
         if let Err(e) = ResourceSet::init(&resources_dir) {
             error!("{}", e);

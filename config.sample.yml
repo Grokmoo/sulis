@@ -42,6 +42,9 @@ resources:
     
     # campaigns are stored here
     campaigns_directory: campaigns
+    
+    # mods are stored here
+    mods_directory: mods
 
 input:
     # whether moving the mouse to the screen edge will scroll the view

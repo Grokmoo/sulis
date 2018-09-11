@@ -217,6 +217,7 @@ pub enum DisplayMode {
 pub struct ResourcesConfig {
     pub directory: String,
     pub campaigns_directory: String,
+    pub mods_directory: String,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone)]

@@ -1,4 +1,5 @@
 ---
+id: rules
 display_ap: 1000
 base_ap: 4000
 max_ap: 8000

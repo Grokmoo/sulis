@@ -27,7 +27,7 @@ use std::rc::Rc;
 
 use sulis_core::ui::{self, Cursor};
 use sulis_core::config::Config;
-use sulis_core::resource::ResourceSet;
+use sulis_core::resource::{ResourceSet};
 use sulis_core::io::IO;
 use sulis_core::util;
 use sulis_module::{Actor};

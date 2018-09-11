@@ -24,6 +24,7 @@ use sulis_core::serde_yaml;
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct Rules {
+    pub id: String,
     pub base_ap: u32,
     pub max_overflow_ap: i32,
     pub min_overflow_ap: i32,

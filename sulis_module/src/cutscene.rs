@@ -14,10 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::io::{Error, ErrorKind};
-
-use sulis_core::resource::ResourceBuilder;
-use sulis_core::serde_yaml;
+use std::io::{Error};
 
 use {Module, OnTrigger};
 
@@ -64,21 +61,4 @@ pub struct CutsceneBuilder {
 
     #[serde(default)]
     pub on_end: Vec<OnTrigger>,
-}
-
-impl ResourceBuilder for CutsceneBuilder {
-    fn owned_id(&self) -> String {
-        self.id.to_string()
-    }
-
-    fn from_yaml(data: &str) -> Result<CutsceneBuilder, Error> {
-        let resource: Result<CutsceneBuilder, serde_yaml::Error>
-            = serde_yaml::from_str(data);
-
-        match resource {
-            Ok(resource) => Ok(resource),
-            Err(error) => Err(Error::new(ErrorKind::InvalidData,
-                                         format!("{}", error)))
-        }
-    }
 }

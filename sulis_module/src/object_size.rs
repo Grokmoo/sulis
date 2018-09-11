@@ -14,13 +14,12 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::io::{Error, ErrorKind};
+use std::io::{Error};
 use std::rc::Rc;
 
 use sulis_core::image::Image;
-use sulis_core::resource::{ResourceBuilder, ResourceSet, Sprite};
+use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::util::{invalid_data_error, unable_to_create_error, Point};
-use sulis_core::serde_yaml;
 
 #[derive(Debug)]
 pub struct ObjectSize {
@@ -122,19 +121,3 @@ pub struct ObjectSizeBuilder {
     pub selection_image: String,
     pub relative_points: Vec<Vec<usize>>,
 }
-
-impl ResourceBuilder for ObjectSizeBuilder {
-    fn owned_id(&self) -> String {
-        self.id.to_string()
-    }
-
-    fn from_yaml(data: &str) -> Result<ObjectSizeBuilder, Error> {
-        let resource: Result<ObjectSizeBuilder, serde_yaml::Error> = serde_yaml::from_str(data);
-
-        match resource {
-            Ok(resource) => Ok(resource),
-            Err(error) => Err(Error::new(ErrorKind::InvalidData, format!("{}", error)))
-        }
-    }
-}
-

@@ -15,15 +15,13 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::collections::HashMap;
-use std::io::{Error, ErrorKind};
+use std::io::{Error};
 use std::rc::Rc;
 use std::path::PathBuf;
 
 use image::SimpleImage;
-use resource::{ResourceBuilder, ResourceSet};
+use resource::{ResourceSet};
 use util::{Point, Size, unable_to_create_error};
-
-use serde_yaml;
 
 use extern_image::{self, ImageBuffer, Rgba};
 
@@ -239,20 +237,5 @@ impl SpritesheetGroup {
 
     fn get_position(&self) -> Point {
         self.position.unwrap_or(Point::as_zero())
-    }
-}
-
-impl ResourceBuilder for SpritesheetBuilder {
-    fn owned_id(&self) -> String {
-        self.id.to_owned()
-    }
-
-    fn from_yaml(data: &str) -> Result<SpritesheetBuilder, Error> {
-        let resource: Result<SpritesheetBuilder, serde_yaml::Error> = serde_yaml::from_str(data);
-
-        match resource {
-            Ok(resource) => Ok(resource),
-            Err(error) => Err(Error::new(ErrorKind::InvalidData, format!("{}", error)))
-        }
     }
 }

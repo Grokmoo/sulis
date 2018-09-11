@@ -15,13 +15,10 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::rc::Rc;
-use std::io::{Error, ErrorKind};
+use std::io::{Error};
 use std::collections::HashMap;
 
-use serde_yaml;
-
 use image::Image;
-use resource::ResourceBuilder;
 use io::{DrawList, GraphicsRenderer};
 use ui::AnimationState;
 use util::{invalid_data_error, Size};
@@ -114,19 +111,4 @@ impl Image for AnimatedImage {
 pub struct AnimatedImageBuilder {
     pub id: String,
     pub states: HashMap<String, String>,
-}
-
-impl ResourceBuilder for AnimatedImageBuilder {
-    fn owned_id(&self) -> String {
-        self.id.to_owned()
-    }
-
-    fn from_yaml(data: &str) -> Result<AnimatedImageBuilder, Error> {
-        let resource: Result<AnimatedImageBuilder, serde_yaml::Error> = serde_yaml::from_str(data);
-
-        match resource {
-            Ok(resource) => Ok(resource),
-            Err(error) => Err(Error::new(ErrorKind::InvalidData, format!("{}", error)))
-        }
-    }
 }

@@ -40,20 +40,27 @@ fn main() {
     let resources_config = Config::resources_config();
 
     let dir = resources_config.directory;
-    info!("Reading resources from {}", dir);
     let data_dir = format!("../{}", dir);
-    if let Err(e) = ResourceSet::init(&data_dir) {
-        error!("{}", e);
-        util::error_and_exit("There was a fatal error reading resources.");
-    };
 
     let campaigns_dir = resources_config.campaigns_directory;
     let module = Config::editor_config().module;
-    info!("Reading module from {}", module);
-    if let Err(e) =  Module::init(&data_dir, &format!("../{}/{}", campaigns_dir, module)) {
-        error!("{}", e);
-        util::error_and_exit("There was a fatal error setting up the module.");
+    let module_dir = format!("../{}/{}", campaigns_dir, module);
+
+    let dirs = vec![data_dir, module_dir];
+    info!("Reading resources from {:?}", dirs);
+
+    let yaml = match ResourceSet::load_resources(dirs.clone()) {
+        Err(e) => {
+            error!("{}", e);
+            util::error_and_exit("Fatal error reading resources.");
+            unreachable!();
+        }, Ok(yaml) => yaml,
     };
+
+    if let Err(e) = Module::load_resources(yaml, dirs) {
+        error!("{}", e);
+        util::error_and_exit("Fatal error settign up module.");
+    }
 
     info!("Setting up display adapter.");
     let mut io = match sulis_core::io::create() {

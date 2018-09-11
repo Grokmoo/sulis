@@ -14,18 +14,15 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::io::{Error, ErrorKind};
+use std::io::{Error};
 use std::rc::Rc;
 use std::char;
 use std::path::PathBuf;
 use std::collections::HashMap;
 
 use io::Vertex;
-use resource::ResourceBuilder;
 use util::{invalid_data_error, Point, Size, unable_to_create_error};
 use config::Config;
-
-use serde_yaml;
 
 use extern_image::{self, ImageBuffer, Rgba};
 
@@ -183,19 +180,4 @@ struct FontCharBuilder {
     xywh: [u32; 4],
     offset: Point,
     x_advance: u32
-}
-
-impl ResourceBuilder for FontBuilder {
-    fn owned_id(&self) -> String {
-        self.id.to_owned()
-    }
-
-    fn from_yaml(data: &str) -> Result<FontBuilder, Error> {
-        let resource: Result<FontBuilder, serde_yaml::Error> = serde_yaml::from_str(data);
-
-        match resource {
-            Ok(resource) => Ok(resource),
-            Err(error) => Err(Error::new(ErrorKind::InvalidData, format!("{}", error)))
-        }
-    }
 }

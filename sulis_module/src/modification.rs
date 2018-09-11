@@ -18,9 +18,7 @@ use std::path::{PathBuf};
 use std::fs;
 use std::io::Error;
 
-use sulis_core::resource::{ResourceBuilder, read_single_resource};
-use sulis_core::util::{invalid_data_error};
-use sulis_core::serde_yaml;
+use sulis_core::resource::{read_single_resource};
 
 pub fn get_available_modifications(root_dir: &str) -> Vec<ModificationInfo> {
     let mut mods = Vec::new();
@@ -90,20 +88,4 @@ pub struct ModificationInfoBuilder {
     pub id: String,
     pub name: String,
     pub description: String,
-}
-
-impl ResourceBuilder for ModificationInfoBuilder {
-    fn owned_id(&self) -> String {
-        "ModificationInfoBuilder".to_string()
-    }
-
-    fn from_yaml(data: &str) -> Result<ModificationInfoBuilder, Error> {
-        let resource: Result<ModificationInfoBuilder, serde_yaml::Error> =
-            serde_yaml::from_str(data);
-
-        match resource {
-            Ok(resource) => Ok(resource),
-            Err(e) => invalid_data_error(&format!("{}", e)),
-        }
-    }
 }

@@ -15,12 +15,11 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::collections::{HashMap, HashSet};
-use std::io::{Error, ErrorKind};
+use std::io::{Error};
 use std::rc::Rc;
 
 use sulis_core::util::{invalid_data_error, unable_to_create_error, Point};
-use sulis_core::resource::{Sprite, ResourceBuilder, ResourceSet};
-use sulis_core::serde_yaml;
+use sulis_core::resource::{Sprite, ResourceSet};
 
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
@@ -198,24 +197,6 @@ impl Tileset {
 
                 self.tiles.insert(id, tile);
             }
-        }
-    }
-}
-
-impl ResourceBuilder for Tileset {
-    fn owned_id(&self) -> String {
-        self.id.to_owned()
-    }
-
-    fn from_yaml(data: &str) -> Result<Tileset, Error> {
-        let resource: Result<Tileset, serde_yaml::Error> = serde_yaml::from_str(data);
-
-        match resource {
-            Ok(mut resource) => {
-                resource.move_tiles();
-                Ok(resource)
-            },
-            Err(error) => Err(Error::new(ErrorKind::InvalidData, format!("{}", error)))
         }
     }
 }

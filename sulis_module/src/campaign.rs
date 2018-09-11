@@ -17,9 +17,7 @@
 use std::rc::Rc;
 use std::io::Error;
 
-use sulis_core::resource::ResourceBuilder;
-use sulis_core::util::{invalid_data_error, unable_to_create_error, Point};
-use sulis_core::serde_yaml;
+use sulis_core::util::{unable_to_create_error, Point};
 
 use {Conversation, Module};
 
@@ -65,19 +63,4 @@ pub struct CampaignBuilder {
     pub description: String,
     pub backstory_conversation: String,
     pub max_starting_level: u32,
-}
-
-impl ResourceBuilder for CampaignBuilder {
-    fn owned_id(&self) -> String {
-        "CampaignBuilder".to_string()
-    }
-
-    fn from_yaml(data: &str) -> Result<CampaignBuilder, Error> {
-        let resource: Result<CampaignBuilder, serde_yaml::Error> = serde_yaml::from_str(data);
-
-        match resource {
-            Ok(resource) => Ok(resource),
-            Err(e) => invalid_data_error(&format!("{}", e)),
-        }
-    }
 }

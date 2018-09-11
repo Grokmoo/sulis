@@ -19,12 +19,10 @@ use std::io::{Error, ErrorKind};
 
 use image::{Image, SimpleImage};
 use image::simple_image::SimpleImageBuilder;
-use resource::{ResourceBuilder, ResourceSet};
+use resource::{ResourceSet};
 use io::{DrawList, GraphicsRenderer};
 use ui::AnimationState;
 use util::{invalid_data_error, Size};
-
-use serde_yaml;
 
 const GRID_DIM: i32 = 3;
 const GRID_LEN: i32 = GRID_DIM * GRID_DIM;
@@ -226,19 +224,4 @@ pub struct ComposedImageBuilder {
     id: String,
     grid: Vec<String>,
     generate_sub_images: Option<SubImageData>,
-}
-
-impl ResourceBuilder for ComposedImageBuilder {
-    fn owned_id(&self) -> String {
-        self.id.to_owned()
-    }
-
-    fn from_yaml(data: &str) -> Result<ComposedImageBuilder, Error> {
-        let resource: Result<ComposedImageBuilder, serde_yaml::Error> = serde_yaml::from_str(data);
-
-        match resource {
-            Ok(resource) => Ok(resource),
-            Err(error) => Err(Error::new(ErrorKind::InvalidData, format!("{}", error)))
-        }
-    }
 }

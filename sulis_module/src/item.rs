@@ -14,15 +14,14 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::io::{Error, ErrorKind};
+use std::io::{Error};
 use std::collections::hash_map::Iter;
 use std::collections::HashMap;
 use std::rc::Rc;
 
-use sulis_core::image::Image;
-use sulis_core::resource::{ResourceBuilder, ResourceSet};
-use sulis_core::serde_yaml;
 use sulis_core::util::unable_to_create_error;
+use sulis_core::image::Image;
+use sulis_core::resource::{ResourceSet};
 use sulis_rules::{ItemKind, bonus::AttackBuilder, BonusList, Slot};
 
 use {Actor, ImageLayer, Module, ability::{AIData, Duration}, PrereqList, PrereqListBuilder};
@@ -214,21 +213,6 @@ pub struct ItemBuilder {
     value: u32,
     weight: u32,
     usable: Option<UsableBuilder>,
-}
-
-impl ResourceBuilder for ItemBuilder {
-    fn owned_id(&self) -> String {
-        self.id.to_owned()
-    }
-
-    fn from_yaml(data: &str) -> Result<ItemBuilder, Error> {
-        let resource: Result<ItemBuilder, serde_yaml::Error> = serde_yaml::from_str(data);
-
-        match resource {
-            Ok(resource) => Ok(resource),
-            Err(error) => Err(Error::new(ErrorKind::InvalidData, format!("{}", error)))
-        }
-    }
 }
 
 pub fn format_item_value(value: i32) -> String {

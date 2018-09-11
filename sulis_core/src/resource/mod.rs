@@ -15,7 +15,7 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 mod resource_builder_set;
-pub use self::resource_builder_set::{read, read_single_resource, read_single_resource_path,
+pub use self::resource_builder_set::{read_single_resource, read_single_resource_path,
     read_to_string, write_to_file, write_json_to_file, read_builder, read_builders};
 
 mod spritesheet;
@@ -47,12 +47,6 @@ use ui::Theme;
 
 thread_local! {
     static RESOURCE_SET: RefCell<ResourceSet> = RefCell::new(ResourceSet::new());
-}
-
-pub trait ResourceBuilder where Self: Sized {
-    fn owned_id(& self) -> String;
-
-    fn from_yaml(data: &str) -> Result<Self, Error>;
 }
 
 pub struct ResourceSet {

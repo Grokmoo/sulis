@@ -172,62 +172,51 @@ pub fn write_to_file<T: serde::ser::Serialize, P: AsRef<Path>>(filename: P, data
     }
 }
 
-pub fn read_single_resource_path<T: ResourceBuilder>(path: &Path) -> Result<T, Error> {
-    let mut file = File::open(path)?;
+pub fn read_single_resource_path<T: serde::de::DeserializeOwned>(path: &Path) -> Result<T, Error> {
+    let data = fs::read_to_string(path)?;
 
-    let mut file_data = String::new();
-    file.read_to_string(&mut file_data)?;
-
-    T::from_yaml(&file_data)
+    let result: Result<T, serde_yaml::Error> = serde_yaml::from_str(&data);
+    match result {
+        Ok(result) => Ok(result),
+        Err(e) => Err(Error::new(ErrorKind::InvalidData, format!("{}", e))),
+    }
 }
 
-pub fn read_single_resource<T: ResourceBuilder>(filename: &str) -> Result<T, Error> {
+pub fn read_single_resource<T: serde::de::DeserializeOwned>(filename: &str) -> Result<T, Error> {
     let mut file = File::open(format!("{}.json", filename));
     if file.is_err() {
         file = File::open(format!("{}.yml", filename));
     }
 
-    if file.is_err() {
-        return invalid_data_error(
-            &format!("Unable to locate '{}.json' or '{}.yml'", filename, filename));
+    let mut file = match file {
+        Err(_) => {
+            return invalid_data_error(
+                &format!("Unable to locate '{}.json' or {}.yml'", filename, filename));
+        },
+        Ok(f) => f,
+    };
+
+    let mut data = String::new();
+    file.read_to_string(&mut data)?;
+
+    let result: Result<T, serde_yaml::Error> = serde_yaml::from_str(&data);
+    match result {
+        Ok(result) => Ok(result),
+        Err(e) => Err(Error::new(ErrorKind::InvalidData, format!("{}", e))),
     }
-
-    let mut file_data = String::new();
-    file.unwrap().read_to_string(&mut file_data)?;
-
-    T::from_yaml(&file_data)
-}
-
-pub fn read<T: ResourceBuilder>(root_dirs: &Vec<&str>, dir: &str) -> HashMap<String, T> {
-    let mut resources: HashMap<String, T> = HashMap::new();
-
-    for root in root_dirs.iter() {
-        read_recursive([root, dir].iter().collect(), &mut resources, &load_resource_builder);
-    }
-
-    if resources.is_empty() {
-        info!("Unable to read any resources from subdir '{}' in directories: '{:?}'", dir, root_dirs);
-    }
-
-    resources
 }
 
 pub fn read_to_string(root_dirs: &Vec<String>, dir: &str) -> HashMap<String, String> {
     let mut resources = HashMap::new();
 
     for root in root_dirs.iter() {
-        read_recursive([root, dir].iter().collect(), &mut resources, &load_resource_to_string);
-    }
-
-    if resources.is_empty() {
-        info!("Unable to read any resources from subdir '{}' in directories: '{:?}'", dir, root_dirs);
+        read_recursive_to_string([root, dir].iter().collect(), &mut resources);
     }
 
     resources
 }
 
-fn read_recursive<T>(dir: PathBuf, resources: &mut HashMap<String, T>,
-                                      func: &Fn(&str, String, &mut HashMap<String, T>)) {
+fn read_recursive_to_string(dir: PathBuf, resources: &mut HashMap<String, String>) {
     let dir_str = dir.to_string_lossy().to_string();
     debug!("Reading resources from {}", dir_str);
 
@@ -240,7 +229,6 @@ fn read_recursive<T>(dir: PathBuf, resources: &mut HashMap<String, T>,
     };
 
     for entry in dir_entries {
-        trace!("Found entry {:?}", entry);
         let entry = match entry {
             Ok(e) => e,
             Err(error) => {
@@ -252,73 +240,29 @@ fn read_recursive<T>(dir: PathBuf, resources: &mut HashMap<String, T>,
         let path = entry.path();
 
         if path.is_dir() {
-            read_recursive(path, resources, func);
+            read_recursive_to_string(path, resources);
         } else if path.is_file() {
-            read_file(path, resources, func);
+            read_file_to_string(path, resources);
         }
     }
 }
 
-fn read_file<T>(path: PathBuf, resources: &mut HashMap<String, T>,
-                                 func: &Fn(&str, String, &mut HashMap<String, T>)) {
+fn read_file_to_string(path: PathBuf, resources: &mut HashMap<String, String>) {
     let path_str = path.to_string_lossy().to_string();
 
     // don't attempt to parse image files
-    if !path_str.ends_with("json") && !path_str.ends_with("yml") && !path_str.ends_with("lua") {
-        trace!("Skipping file '{}' because of unrecognized extension", path_str);
-        return
-    }
+    if !path_str.ends_with("lua") { return; }
 
-    debug!("Reading file at {}", path_str);
-    let mut file = match File::open(path) {
-        Ok(file) => file,
-        Err(error) => {
-            warn!("Error reading file: {}", error);
+    debug!("Reading file at {} to string", path_str);
+    let data = match fs::read_to_string(path.clone()) {
+        Ok(data) => data,
+        Err(e) => {
+            warn!("Error reading file at '{}': {}", path_str, e);
             return;
         }
     };
 
-    let mut file_data = String::new();
-    if file.read_to_string(&mut file_data).is_err() {
-        warn!("Error reading file data from file {}", path_str);
-        return;
-    }
-    trace!("Read file data.");
-
-    (func)(&path_str, file_data, resources);
-}
-
-fn load_resource_to_string(path: &str, file_data: String,
-                           resources: &mut HashMap<String, String>) {
-    let path_buf = PathBuf::from(path);
-
-    let id: String = path_buf.file_stem().unwrap_or(OsStr::new("")).to_string_lossy().to_string();
-
-    trace!("Created string resource '{}'", id);
-    if resources.contains_key(&id) {
-        debug!("Overwriting resource with key: {} in {}", id, path);
-    }
-
-    resources.insert(id, file_data);
-}
-
-fn load_resource_builder<T: ResourceBuilder>(path: &str, file_data: String,
-                                             resources: &mut HashMap<String, T>) {
-    let resource = match T::from_yaml(&file_data) {
-        Ok(res) => res,
-        Err(error) => {
-            warn!("Error parsing file data: {:?}", path);
-            warn!("  {}", error);
-            return;
-        }
-    };
-
-    let id = resource.owned_id();
-
-    trace!("Created resource '{}'", id);
-    if resources.contains_key(&id) {
-        debug!("Overwriting resource with key: {} in {}", id, path);
-    }
-
-    resources.insert(id, resource);
+    let id: String = path.file_stem().unwrap_or(OsStr::new(""))
+        .to_string_lossy().to_string();
+    resources.insert(id, data);
 }

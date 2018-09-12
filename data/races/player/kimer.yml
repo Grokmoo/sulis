@@ -5,10 +5,10 @@ description: |
 size: 2by2
 movement_rate: 1.0
 base_stats:
-  - kind: { attribute: [ Endurance, -1 ] }
-  - kind: { attribute: [ Perception, -1 ] }
-  - kind: { attribute: [ Intellect, 1 ] }
-  - kind: { attribute: [ Wisdom, 1 ] }
+  - kind: { attribute: { attribute: Endurance, amount: -1 } }
+  - kind: { attribute: { attribute: Perception, amount: -1 } }
+  - kind: { attribute: { attribute: Intellect, amount: 1 } }
+  - kind: { attribute: { attribute: Wisdom, amount: 1 } }
   - kind: { hit_points: 40 }
   - kind: { melee_accuracy: 25 }
   - kind: { ranged_accuracy: 30 }

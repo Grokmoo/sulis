@@ -18,9 +18,7 @@ use std::rc::Rc;
 use std::collections::HashMap;
 use std::io::Error;
 
-use sulis_core::resource::ResourceBuilder;
-use sulis_core::util::{invalid_data_error, unable_to_create_error, ExtInt};
-use sulis_core::serde_yaml;
+use sulis_core::util::{unable_to_create_error, ExtInt};
 use sulis_rules::{AttributeList, BonusList};
 
 use {Ability, AbilityList, InventoryBuilder, Module};
@@ -150,19 +148,4 @@ pub struct ClassBuilder {
     pub upgrades: HashMap<u32, UpgradesBuilder>,
     pub starting_abilities: Vec<String>,
     pub kits: Vec<Kit>,
-}
-
-impl ResourceBuilder for ClassBuilder {
-    fn owned_id(&self) -> String {
-        self.id.to_owned()
-    }
-
-    fn from_yaml(data: &str) -> Result<ClassBuilder, Error> {
-        let resource: Result<ClassBuilder, serde_yaml::Error> = serde_yaml::from_str(data);
-
-        match resource {
-            Ok(resource) => Ok(resource),
-            Err(error) => invalid_data_error(&format!("{}", error))
-        }
-    }
 }

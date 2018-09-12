@@ -20,9 +20,8 @@ use std::collections::HashMap;
 
 use sulis_core::ui::Color;
 use sulis_core::image::Image;
-use sulis_core::resource::{ResourceBuilder, ResourceSet};
-use sulis_core::util::{invalid_data_error, unable_to_create_error, Point};
-use sulis_core::serde_yaml;
+use sulis_core::resource::{ResourceSet};
+use sulis_core::util::{unable_to_create_error, Point};
 use sulis_rules::{BonusList, bonus::AttackBuilder, Slot};
 
 use actor::{Sex};
@@ -161,19 +160,4 @@ pub struct RaceBuilder {
 
     #[serde(default)]
     disabled_slots: Vec<Slot>,
-}
-
-impl ResourceBuilder for RaceBuilder {
-    fn owned_id(&self) -> String {
-        self.id.to_owned()
-    }
-
-    fn from_yaml(data: &str) -> Result<RaceBuilder, Error> {
-        let resource: Result<RaceBuilder, serde_yaml::Error> = serde_yaml::from_str(data);
-
-        match resource {
-            Ok(resource) => Ok(resource),
-            Err(error) => invalid_data_error(&format!("{}", error))
-        }
-    }
 }

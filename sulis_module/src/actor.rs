@@ -14,17 +14,16 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::io::{Error, ErrorKind};
+use std::io::{Error};
 use std::rc::Rc;
 use std::fmt;
 use std::collections::HashMap;
 
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::image::{Image, LayeredImage};
-use sulis_core::resource::{ResourceBuilder, ResourceSet};
+use sulis_core::resource::{ResourceSet};
 use sulis_core::ui::{Color};
 use sulis_core::util::{unable_to_create_error};
-use sulis_core::{serde_yaml};
 use sulis_rules::AttributeList;
 
 use {Ability, AITemplate, Class, Conversation, ImageLayer, ImageLayerSet, InventoryBuilder,
@@ -390,19 +389,4 @@ pub struct ActorBuilder {
     pub reward: Option<RewardBuilder>,
     pub abilities: Vec<String>,
     pub ai: Option<String>,
-}
-
-impl ResourceBuilder for ActorBuilder {
-    fn owned_id(&self) -> String {
-        self.id.to_owned()
-    }
-
-    fn from_yaml(data: &str) -> Result<ActorBuilder, Error> {
-        let resource: Result<ActorBuilder, serde_yaml::Error> = serde_yaml::from_str(data);
-
-        match resource {
-            Ok(resource) => Ok(resource),
-            Err(error) => Err(Error::new(ErrorKind::InvalidData, format!("{}", error)))
-        }
-    }
 }

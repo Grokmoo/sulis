@@ -5,10 +5,10 @@ description: |
   Your body has gained enhanced toughness, granting you 3 additional armor against physical attacks (Slashing, Piercing, and Crushing).
 bonuses:
   - kind:
-      armor_kind: [ Slashing, 3]
+      armor_kind: { kind: Slashing, amount: 3 }
   - kind:
-      armor_kind: [ Piercing, 3]
+      armor_kind: { kind: Piercing, amount: 3 }
   - kind:
-      armor_kind: [ Crushing, 3]
+      armor_kind: { kind: Crushing, amount: 3 }
 prereqs:
   abilities: [ resilient_body ]

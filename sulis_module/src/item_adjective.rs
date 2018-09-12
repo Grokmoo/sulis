@@ -14,11 +14,6 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::io::{Error, ErrorKind};
-
-use sulis_core::resource::ResourceBuilder;
-use sulis_core::serde_yaml;
-
 /// An adjective is a modifier that affects the stats of
 /// an item in a given way.  Items can have zero, one, or
 /// many adjectives.
@@ -32,22 +27,5 @@ pub struct ItemAdjective {
 impl PartialEq for ItemAdjective {
     fn eq(&self, other: &ItemAdjective) -> bool {
         self.id == other.id
-    }
-}
-
-impl ResourceBuilder for ItemAdjective {
-    fn owned_id(&self) -> String {
-        self.id.to_string()
-    }
-
-    fn from_yaml(data: &str) -> Result<ItemAdjective, Error> {
-        let resource: Result<ItemAdjective, serde_yaml::Error>
-            = serde_yaml::from_str(data);
-
-        match resource {
-            Ok(resource) => Ok(resource),
-            Err(error) => Err(Error::new(ErrorKind::InvalidData,
-                                         format!("{}", error)))
-        }
     }
 }

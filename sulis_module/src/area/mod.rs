@@ -28,13 +28,12 @@ pub use self::tile::Tile;
 pub use self::tile::Tileset;
 
 use std::collections::HashMap;
-use std::io::{Error, ErrorKind};
+use std::io::{Error};
 use std::rc::Rc;
 
 use sulis_core::image::Image;
-use sulis_core::resource::{ResourceBuilder, ResourceSet, Sprite};
+use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::util::{Point, Size, unable_to_create_error};
-use sulis_core::serde_yaml;
 
 use {Encounter, Item, Module, ObjectSize, OnTrigger, Prop};
 
@@ -287,21 +286,6 @@ pub struct AreaBuilder {
 // fn as_base64<S>(input: &[u8], serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
 //     serializer.serialize_str(&base64::encode(input))
 // }
-
-impl ResourceBuilder for AreaBuilder {
-    fn owned_id(&self) -> String {
-        self.id.to_owned()
-    }
-
-    fn from_yaml(data: &str) -> Result<AreaBuilder, Error> {
-        let resource: Result<AreaBuilder, serde_yaml::Error> = serde_yaml::from_str(data);
-
-        match resource {
-            Ok(resource) => Ok(resource),
-            Err(error) => Err(Error::new(ErrorKind::InvalidData, format!("{}", error)))
-        }
-    }
-}
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]

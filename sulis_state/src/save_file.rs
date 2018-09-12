@@ -21,8 +21,8 @@ use std::time;
 
 use chrono::prelude::*;
 
-use sulis_core::{config, serde_yaml, util::self, serde_json};
-use sulis_core::resource::{ResourceBuilder, read_single_resource_path, write_json_to_file};
+use sulis_core::{config, util::self, serde_json};
+use sulis_core::resource::{read_single_resource_path, write_json_to_file};
 use sulis_core::util::{invalid_data_error};
 use sulis_module::Module;
 use {GameState, SaveState};
@@ -264,20 +264,5 @@ fn time_modified(data: &SaveFileMetaData) -> time::SystemTime {
             }
         },
         Err(_) => time::UNIX_EPOCH,
-    }
-}
-
-impl ResourceBuilder for SaveFile {
-    fn owned_id(&self) -> String {
-        self.meta.player_name.to_string()
-    }
-
-    fn from_yaml(data: &str) -> Result<Self, Error> {
-        let resource: Result<SaveFile, serde_yaml::Error> = serde_yaml::from_str(data);
-
-        match resource {
-            Ok(resource) => Ok(resource),
-            Err(error) => invalid_data_error(&format!("{}", error))
-        }
     }
 }

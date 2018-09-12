@@ -15,15 +15,13 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::rc::Rc;
-use std::io::{Error, ErrorKind};
+use std::io::{Error};
 
 use image::Image;
-use resource::{ResourceBuilder, ResourceSet, Sprite};
+use resource::{ResourceSet, Sprite};
 use io::{DrawList, GraphicsRenderer};
 use ui::AnimationState;
 use util::Size;
-
-use serde_yaml;
 
 #[derive(Debug)]
 pub struct SimpleImage {
@@ -77,19 +75,3 @@ pub struct SimpleImageBuilder {
     pub (crate) image_display: String,
     pub (crate) size: Size,
 }
-
-impl ResourceBuilder for SimpleImageBuilder {
-    fn owned_id(&self) -> String {
-        self.id.to_string()
-    }
-
-    fn from_yaml(data: &str) -> Result<SimpleImageBuilder, Error> {
-        let resource: Result<SimpleImageBuilder, serde_yaml::Error> = serde_yaml::from_str(data);
-
-        match resource {
-            Ok(resource) => Ok(resource),
-            Err(error) => Err(Error::new(ErrorKind::InvalidData, format!("{}", error)))
-        }
-    }
-}
-

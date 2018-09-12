@@ -19,11 +19,12 @@ use std::rc::Rc;
 use std::cell::{RefCell};
 
 use sulis_core::ui::*;
+use sulis_core::util::ActiveResources;
 use sulis_widgets::{Button, Label, list_box, MutuallyExclusiveListBox, TextArea};
 use sulis_module::{ModuleInfo};
 use sulis_state::NextGameStep;
 
-use main_menu::{self, MainMenu};
+use main_menu::{MainMenu};
 use LoadingScreen;
 
 pub struct ModuleSelector {
@@ -82,11 +83,10 @@ impl WidgetKind for ModuleSelector {
 
             let root = Widget::get_root(&widget);
             let menu = Widget::downcast_kind_mut::<MainMenu>(&root);
-            if let Err(e) = main_menu::write_selected_module_file(&module.dir) {
-                warn!("Unable to write selected module file");
-                warn!("{}", e);
-            };
-            menu.next_step = Some(NextGameStep::MainMenu);
+            let mut active = ActiveResources::read();
+            active.campaign = Some(module.dir);
+            active.write();
+            menu.next_step = Some(NextGameStep::MainMenuReloadResources);
 
             let loading_screen = Widget::with_defaults(LoadingScreen::new());
             loading_screen.borrow_mut().state.set_modal(true);

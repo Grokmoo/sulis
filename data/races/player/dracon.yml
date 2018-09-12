@@ -6,10 +6,10 @@ size: 2by2
 movement_rate: 0.9
 disabled_slots: [ Head ]
 base_stats:
-  - kind: { attribute: [Strength, 2 ] }
-  - kind: { attribute: [Endurance, 2 ] }
-  - kind: { attribute: [Dexterity, -3] }
-  - kind: { attribute: [Perception, -1] }
+  - kind: { attribute: { attribute: Strength, amount: 2 } }
+  - kind: { attribute: { attribute: Endurance, amount: 2 } }
+  - kind: { attribute: { attribute: Dexterity, amount: -3 } }
+  - kind: { attribute: { attribute: Perception, amount: -1 } }
   - kind: { hit_points: 40 }
   - kind: { melee_accuracy: 30 }
   - kind: { ranged_accuracy: 25 }

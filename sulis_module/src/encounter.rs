@@ -15,13 +15,10 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use rand::{self, Rng};
-use std::io::{Error, ErrorKind};
+use std::io::{Error};
 use std::rc::Rc;
 
-use sulis_core::resource::{ResourceBuilder};
-use sulis_core::serde_yaml;
 use sulis_core::util::unable_to_create_error;
-
 use {Actor, Module};
 
 struct Entry {
@@ -130,19 +127,4 @@ pub struct EntryBuilder {
 
     #[serde(default)]
     always: bool,
-}
-
-impl ResourceBuilder for EncounterBuilder {
-    fn owned_id(&self) -> String {
-        self.id.to_owned()
-    }
-
-    fn from_yaml(data: &str) -> Result<EncounterBuilder, Error> {
-        let resource: Result<EncounterBuilder, serde_yaml::Error> = serde_yaml::from_str(data);
-
-        match resource {
-            Ok(resource) => Ok(resource),
-            Err(error) => Err(Error::new(ErrorKind::InvalidData, format!("{}", error)))
-        }
-    }
 }

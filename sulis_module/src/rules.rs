@@ -14,16 +14,12 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::io::Error;
 use rand::{self, Rng};
-
-use sulis_core::resource::ResourceBuilder;
-use sulis_core::util::invalid_data_error;
-use sulis_core::serde_yaml;
 
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct Rules {
+    pub id: String,
     pub base_ap: u32,
     pub max_overflow_ap: i32,
     pub min_overflow_ap: i32,
@@ -79,20 +75,5 @@ impl Rules {
         let roll = rand::thread_rng().gen_range(1, 101);
         debug!("Concealment roll: {} against {}", roll, concealment);
         roll > concealment
-    }
-}
-
-impl ResourceBuilder for Rules {
-    fn owned_id(&self) -> String {
-        "Rules".to_string()
-    }
-
-    fn from_yaml(data: &str) -> Result<Rules, Error> {
-        let resource: Result<Rules, serde_yaml::Error> = serde_yaml::from_str(data);
-
-        match resource {
-            Ok(resource) => Ok(resource),
-            Err(e) => invalid_data_error(&format!("{}", e)),
-        }
     }
 }

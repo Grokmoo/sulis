@@ -16,12 +16,9 @@
 
 use std::collections::HashMap;
 use std::rc::Rc;
-use std::io::{Error, ErrorKind};
-
-use serde_yaml;
+use std::io::{Error};
 
 use image::Image;
-use resource::ResourceBuilder;
 use io::{DrawList, GraphicsRenderer};
 use ui::AnimationState;
 use util::{invalid_data_error, Size};
@@ -112,19 +109,4 @@ pub struct TimerImageBuilder {
     id: String,
     frames: Vec<String>,
     frame_time_millis: u32,
-}
-
-impl ResourceBuilder for TimerImageBuilder {
-    fn owned_id(&self) -> String {
-        self.id.to_owned()
-    }
-
-    fn from_yaml(data: &str) -> Result<TimerImageBuilder, Error> {
-        let resource: Result<TimerImageBuilder, serde_yaml::Error> = serde_yaml::from_str(data);
-
-        match resource {
-            Ok(resource) => Ok(resource),
-            Err(error) => Err(Error::new(ErrorKind::InvalidData, format!("{}", error)))
-        }
-    }
 }

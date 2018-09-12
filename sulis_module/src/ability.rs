@@ -20,9 +20,8 @@ use std::io::Error;
 
 use sulis_rules::{BonusList, StatList};
 use sulis_core::image::Image;
-use sulis_core::resource::{ResourceBuilder, ResourceSet};
-use sulis_core::util::{invalid_data_error, unable_to_create_error};
-use sulis_core::serde_yaml;
+use sulis_core::resource::{ResourceSet};
+use sulis_core::util::{unable_to_create_error};
 
 use {Actor, Module, PrereqList, PrereqListBuilder};
 
@@ -298,19 +297,4 @@ pub struct AbilityBuilder {
     pub bonuses: Option<BonusList>,
     pub prereqs: Option<PrereqListBuilder>,
     pub upgrades: Option<Vec<Upgrade>>,
-}
-
-impl ResourceBuilder for AbilityBuilder {
-    fn owned_id(&self) -> String {
-        self.id.to_owned()
-    }
-
-    fn from_yaml(data: &str) -> Result<AbilityBuilder, Error> {
-        let resource: Result<AbilityBuilder, serde_yaml::Error> = serde_yaml::from_str(data);
-
-        match resource {
-            Ok(resource) => Ok(resource),
-            Err(error) => invalid_data_error(&format!("{}", error))
-        }
-    }
 }

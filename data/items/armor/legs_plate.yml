@@ -10,11 +10,11 @@ equippable:
   slot: Legs
   bonuses:
     - kind: { armor: 5 }
-    - kind: { armor_kind: [ Slashing, 2] }
-    - kind: { armor_kind: [ Piercing, 1] }
-    - kind: { armor_kind: [ Electrical, -3] }
+    - kind: { armor_kind: { kind: Slashing, amount: 2 } }
+    - kind: { armor_kind: { kind: Piercing, amount: 1 } }
+    - kind: { armor_kind: { kind: Electrical, amount: -3 } }
     - kind: { movement_rate: -0.08 }
-    - kind: { attribute: [Dexterity, -1] }
+    - kind: { attribute: { attribute: Dexterity, amount: -1 } }
     - kind: { spell_accuracy: -5 }
 image:
   Legs:

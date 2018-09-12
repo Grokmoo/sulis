@@ -26,15 +26,11 @@ pub use self::module_selector::ModuleSelector;
 pub mod options;
 pub use self::options::Options;
 
-use std::fs::File;
-use std::io::{prelude::*, Error, ErrorKind};
-use std::path::{Path, PathBuf};
 use std::any::Any;
 use std::rc::Rc;
 use std::cell::{RefCell};
 
-use sulis_core::config::{self, Config};
-use sulis_core::resource::{ResourceSet};
+use sulis_core::config::{Config};
 use sulis_core::io::{InputAction, MainLoopUpdater, DisplayConfiguration};
 use sulis_core::ui::*;
 use sulis_core::util;
@@ -73,68 +69,6 @@ enum Mode {
     NoChoice,
 }
 
-pub fn selected_module_file_path() -> PathBuf {
-    let mut path = config::USER_DIR.clone();
-    path.push("selected_module.txt");
-    path
-}
-
-pub fn write_selected_module_file(module_dir: &str) -> Result<(), Error> {
-    let mut file = File::create(selected_module_file_path())?;
-    file.write_all(module_dir.as_bytes())?;
-
-    Ok(())
-}
-
-fn check_selected_module_file() -> Result<String, Error> {
-    let mut file = File::open(selected_module_file_path())?;
-    let mut module_dir = String::new();
-    file.read_to_string(&mut module_dir)?;
-    module_dir.trim();
-
-    let campaign_file = format!("{}/campaign.yml", module_dir);
-    let campaign_path = Path::new(&campaign_file);
-    if !campaign_path.is_file() {
-        warn!("Selected module file does not point to a valid campaign");
-        return Err(Error::new(ErrorKind::InvalidData, "Invalid selected_module.txt file"));
-    }
-
-    Ok(module_dir)
-}
-
-pub fn write_selected_module_and_load(module_dir: &str) {
-    if let Err(e) = write_selected_module_file(module_dir) {
-        warn!("Error writing selected module file.");
-        warn!("{}", e);
-    }
-
-    load_module(module_dir);
-}
-
-pub fn load_module(module_dir: &str) {
-    let resources_dir = Config::resources_config().directory;
-
-    let dirs = vec![resources_dir, module_dir.to_string()];
-    info!("Reading resources from '{:?}'", dirs);
-    let yaml = match ResourceSet::load_resources(dirs.clone()) {
-        Err(e) => {
-            error!("{}", e);
-            util::error_and_exit("Fatal error reading resources.");
-            unreachable!();
-        },
-        Ok(yaml) => yaml,
-    };
-
-    info!("Loading module '{}'", module_dir);
-    match Module::load_resources(yaml, dirs) {
-        Err(e) => {
-            error!("{}", e);
-            util::error_and_exit("Fatal error setting up module.");
-        },
-        Ok(()) => (),
-    }
-}
-
 pub struct MainMenu {
     pub(crate) next_step: Option<NextGameStep>,
     mode: Mode,
@@ -145,14 +79,6 @@ pub struct MainMenu {
 
 impl MainMenu {
     pub fn new(display_configurations: Vec<DisplayConfiguration>) -> Rc<RefCell<MainMenu>> {
-        match check_selected_module_file() {
-            Ok(dir) => load_module(&dir),
-            Err(e) => {
-                info!("Unable to read selected_module file");
-                info!("{}", e);
-            }
-        }
-
         Rc::new(RefCell::new(MainMenu {
             next_step: None,
             mode: Mode::NoChoice,

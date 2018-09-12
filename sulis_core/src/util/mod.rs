@@ -29,13 +29,89 @@ use std::io::{Error, ErrorKind};
 use std::{thread, time};
 use std::time::Duration;
 use std::panic;
+use std::path::PathBuf;
+use std::fs;
 
 use backtrace::Backtrace;
 use flexi_logger::{Duplicate, Logger, opt_format};
+use serde_yaml;
 
+use resource::write_to_file;
 use config::{self, Config};
 use ui::Widget;
 use io::{IO, MainLoopUpdater};
+
+fn active_resources_file_path() -> PathBuf {
+    let mut path = config::USER_DIR.clone();
+    path.push("active_resources.yml");
+    path
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
+pub struct ActiveResources {
+    pub campaign: Option<String>,
+    pub mods: Vec<String>,
+}
+
+impl ActiveResources {
+    pub fn read() -> ActiveResources {
+        let path = active_resources_file_path();
+
+        let data = match fs::read_to_string(path) {
+            Ok(data) => data,
+            Err(_) => {
+                info!("active_resources file not found");
+                return ActiveResources::default();
+            }
+        };
+
+        let active_resources: ActiveResources = match serde_yaml::from_str(&data) {
+            Ok(val) => val,
+            Err(e) => {
+                warn!("Error reading active resources file");
+                warn!("{}", e);
+                return ActiveResources::default();
+            }
+        };
+
+        active_resources
+    }
+
+    pub fn write(&self) {
+        let file = active_resources_file_path();
+        match write_to_file(file, self) {
+            Ok(()) => (),
+            Err(e) => {
+                warn!("Error writing active resources file");
+                warn!("{}", e);
+            }
+        }
+    }
+
+    pub fn directories(&self) -> Vec<String> {
+        let mut dirs = Vec::new();
+
+        dirs.push(Config::resources_config().directory);
+        if let Some(ref dir) = self.campaign {
+            dirs.push(dir.to_string());
+        }
+
+        for mod_dir in self.mods.iter() {
+            dirs.push(mod_dir.to_string());
+        }
+
+        dirs
+    }
+}
+
+impl Default for ActiveResources {
+    fn default() -> Self {
+        ActiveResources {
+            campaign: None,
+            mods: Vec::new(),
+        }
+    }
+}
 
 #[derive(Deserialize, Serialize, Debug, Clone, Copy, PartialEq)]
 #[serde(deny_unknown_fields, untagged)]

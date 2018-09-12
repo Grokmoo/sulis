@@ -120,6 +120,7 @@ pub enum NextGameStep {
     LoadCampaign { save_state: SaveState },
     LoadModuleAndNewCampaign { pc_actor: Rc<Actor>, module_dir: String },
     MainMenu,
+    MainMenuReloadResources,
     RecreateIO,
 }
 

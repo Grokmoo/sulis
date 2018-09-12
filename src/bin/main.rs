@@ -26,11 +26,10 @@ extern crate sulis_view;
 use std::rc::Rc;
 
 use sulis_core::ui::{self, Cursor};
-use sulis_core::config::Config;
 use sulis_core::resource::{ResourceSet};
 use sulis_core::io::IO;
-use sulis_core::util;
-use sulis_module::{Actor};
+use sulis_core::util::{self, ActiveResources};
+use sulis_module::{Actor, Module};
 use sulis_state::{GameState, NextGameStep, SaveState};
 use sulis_view::{RootView, main_menu};
 
@@ -41,14 +40,7 @@ fn init() -> Box<IO> {
     info!("=========Initializing=========");
     info!("Setup Logger and read configuration from 'config.yml'");
 
-    let resources_dir = Config::resources_config().directory;
-    info!("Reading resources from {}", resources_dir);
-
-    let dirs = vec![Config::resources_config().directory];
-    if let Err(e) = ResourceSet::load_resources(dirs) {
-        error!("{}", e);
-        util::error_and_exit("Fatal error reading resources.");
-    }
+    load_resources();
 
     create_io()
 }
@@ -63,6 +55,31 @@ fn create_io() -> Box<IO> {
             error!("{}", e);
             util::error_and_exit("There was a fatal error initializing the display.");
             unreachable!();
+        }
+    }
+}
+
+fn load_resources() {
+    let active = ActiveResources::read();
+
+    let dirs = active.directories();
+
+    info!("Reading resources from '{:?}'", dirs);
+    let yaml = match ResourceSet::load_resources(dirs.clone()) {
+        Err(e) => {
+            error!("{}", e);
+            util::error_and_exit("Fatal error reading resources.");
+            unreachable!();
+        }, Ok(yaml) => yaml,
+    };
+
+    if dirs.len() > 1 {
+        info!("Loading module '{}'", dirs[1]);
+        match Module::load_resources(yaml, dirs) {
+            Err(e) => {
+                error!("{}", e);
+                util::error_and_exit("Fatal error setting up module.");
+            }, Ok(()) => (),
         }
     }
 }
@@ -140,8 +157,15 @@ fn main() {
             NewCampaign { pc_actor } => new_campaign(&mut io, pc_actor),
             LoadCampaign { save_state } => load_campaign(&mut io, save_state),
             MainMenu => main_menu(&mut io),
+            MainMenuReloadResources => {
+                load_resources();
+                main_menu(&mut io)
+            },
             LoadModuleAndNewCampaign { pc_actor, module_dir } => {
-                main_menu::write_selected_module_and_load(&module_dir);
+                let mut active = ActiveResources::read();
+                active.campaign = Some(module_dir);
+                active.write();
+                load_resources();
                 new_campaign(&mut io, pc_actor)
             },
             RecreateIO => {

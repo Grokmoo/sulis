@@ -108,6 +108,7 @@ use std::fs;
 use std::ffi::OsStr;
 
 use sulis_core::config;
+use sulis_core::serde_yaml;
 use sulis_core::util::invalid_data_error;
 use sulis_core::resource::*;
 
@@ -318,6 +319,8 @@ impl Module {
         assert!(dirs.len() > 1);
         debug!("Creating module from parsed data.");
 
+        let file_key = serde_yaml::Value::String(yaml_resource_set::FILE_VAL_STR.to_string());
+
         let top_level = yaml.resources.remove(&YamlResourceKind::TopLevel);
         let (rules_yaml, campaign_yaml) = match top_level {
             None => return invalid_data_error("No rules or campaign files defined"),
@@ -329,6 +332,18 @@ impl Module {
 
                 let mut campaign_yaml = None;
                 for (id, yaml) in map {
+                    if let serde_yaml::Value::Mapping(ref map) = yaml {
+                        if let Some(serde_yaml::Value::Sequence(files)) = map.get(&file_key) {
+                            if files.iter().all(|file| {
+                                if let serde_yaml::Value::String(file) = file {
+                                    !file.ends_with("campaign.yml")
+                                } else {
+                                    false
+                                }
+                            }) { continue; }
+                        }
+                    }
+
                     if campaign_yaml.is_some() {
                         return invalid_data_error(&format!("Multiple potential campaign files \
                             detected at top level: '{}'", id));

@@ -25,7 +25,7 @@ pub use self::spritesheet::Sprite;
 mod font;
 pub use self::font::Font;
 
-mod yaml_resource_set;
+pub mod yaml_resource_set;
 pub use self::yaml_resource_set::YamlResourceSet;
 pub use self::yaml_resource_set::YamlResourceKind;
 

@@ -1,0 +1,9 @@
+id: mage
+starting_abilities:
+  - firebolt
+upgrades:
+  1:
+    ability_choices: []
+    group_uses_per_encounter:
+      - [ "Cantrips", 3 ]
+      - [ "1st Circle", 1 ]

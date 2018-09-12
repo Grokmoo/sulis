@@ -78,7 +78,6 @@ fn load_resources() {
         match Module::load_resources(yaml, dirs) {
             Err(e) => {
                 error!("{}", e);
-                util::error_and_exit("Fatal error setting up module.");
             }, Ok(()) => (),
         }
     }

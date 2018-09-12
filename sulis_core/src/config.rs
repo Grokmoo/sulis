@@ -270,6 +270,13 @@ fn get_home_dir() -> PathBuf {
 const CONFIG_FILENAME: &str = "config.yml";
 pub const CONFIG_BASE: &str = "config.sample.yml";
 
+pub fn create_dir_and_warn(path: &Path) {
+    if let Err(e) = fs::create_dir_all(path) {
+        warn!("Unable to create dir: '{:?}'", path);
+        warn!("{}", e);
+    }
+}
+
 impl Config {
     fn init() -> Config {
         let mut config_path = USER_DIR.clone();
@@ -305,10 +312,7 @@ impl Config {
 
         println!("{} not found, attempting to create it from {}", CONFIG_FILENAME, CONFIG_BASE);
         if let Some(path) = config_path.parent() {
-            match fs::create_dir_all(path) {
-                Err(_) => (),
-                Ok(_) => (),
-            };
+            create_dir_and_warn(path);
         }
 
         match fs::copy(config_base_path, config_path) {

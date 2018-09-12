@@ -27,18 +27,21 @@ use MarkupRenderer;
 
 pub struct TextArea {
     pub text: Option<String>,
+    pub(crate) limit_to_screen_edge: bool,
 }
 
 impl TextArea {
     pub fn empty() -> Rc<RefCell<TextArea>> {
         Rc::new(RefCell::new(TextArea {
             text: None,
+            limit_to_screen_edge: true,
         }))
     }
 
     pub fn new(text: &str) -> Rc<RefCell<TextArea>> {
         Rc::new(RefCell::new(TextArea {
             text: Some(text.to_string()),
+            limit_to_screen_edge: true,
         }))
     }
 
@@ -121,6 +124,8 @@ impl WidgetKind for TextArea {
         // limit position of text area to inside the screen
         // we need to double render in this case - first render finds
         // the text area size, second render to actually display the text
+        if !self.limit_to_screen_edge { return; }
+
         if widget.state.position.y + widget.state.size.height > ui_y {
             let x = widget.state.position.x;
             let y = ui_y - widget.state.size.height;

@@ -43,6 +43,9 @@ children:
           load:
             from: .main_menu.button
             text: "Load Game"
+          mods:
+            from: .main_menu.button
+            text: "Mods"
           options:
             from: .main_menu.button
             text: "Options"
@@ -59,6 +62,12 @@ children:
         position: [0, 35]
         x_relative: Center
         preferred_size: [150, 138]
+      mods_selector:
+        from: .mods_selector
+        position: [0, 40]
+        width_relative: Max
+        height_relative: Max
+        preferred_size: [0, -40]
       module_selector:
         from: .module_selector
         position: [0, 40]
@@ -546,6 +555,153 @@ children:
                     text_params:
                       horizontal_alignment: Left
                     preferred_size: [35, 6]
+  mods_selector:
+    children:
+      title:
+        from: .label
+        text_params:
+          scale: 10.0
+        text: "Choose Active Mods"
+        x_relative: Center
+        preferred_size: [225, 10]
+      available_title:
+        from: .label
+        text: "Available Mods"
+        text_params:
+          scale: 9.0
+        x_relative: Center
+        preferred_size: [110, 10]
+        position: [55, 9]
+      active_title:
+        from: .label
+        text: "Active Mods"
+        text_params:
+          scale: 9.0
+        x_relative: Center
+        preferred_size: [110, 10]
+        position: [-57, 9]
+      active:
+        border: [2, 2, 2, 2]
+        preferred_size: [110, -34]
+        height_relative: Max
+        background: bg_base
+        x_relative: Center
+        position: [-57, 17]
+        children:
+          scrollbar:
+            from: .scrollbar
+            custom:
+              scroll_delta: 26
+          content:
+            width_relative: Max
+            height_relative: Max
+            preferred_size: [-7, 0]
+            layout: BoxVertical
+            layout_spacing: { top: 0, bottom: 2, left: 0, right: 0 }
+            children:
+              mod_pane:
+                from: .mod_pane
+                children:
+                  description:
+                    position: [0, 0]
+                  toggle:
+                    text: ">>"
+                    custom:
+                      tooltip: "Deactivate this mod"
+                    x_relative: Max
+      available:
+        border: [2, 2, 2, 2]
+        preferred_size: [110, -34]
+        height_relative: Max
+        background: bg_base
+        x_relative: Center
+        position: [55, 17]
+        children:
+          scrollbar:
+            from: .scrollbar
+            custom:
+              scroll_delta: 26
+          content:
+            width_relative: Max
+            height_relative: Max
+            preferred_size: [-7, 0]
+            layout: BoxVertical
+            layout_spacing: { top: 0, bottom: 2, left: 0, right: 0 }
+            children:
+              mod_pane:
+                from: .mod_pane
+                children:
+                  description:
+                    position: [8, 0]
+                  toggle:
+                    text: "<<"
+                    custom:
+                      tooltip: "Activate this mod"
+                    x_relative: Zero
+      clear:
+        from: .button
+        preferred_size: [30, 10]
+        text_params:
+          scale: 8
+        text: "Clear"
+        x_relative: Center
+        y_relative: Max
+        position: [-97, -5]
+        custom:
+          tooltip: "Remove all active mods"
+      cancel:
+        from: .button
+        preferred_size: [30, 10]
+        text_params:
+          scale: 8
+        text: "Cancel"
+        x_relative: Center
+        y_relative: Max
+        position: [-62, -5]
+      apply:
+        from: .button
+        preferred_size: [30, 10]
+        position: [95, -5]
+        text_params:
+          scale: 8
+        text: "Apply"
+        x_relative: Center
+        y_relative: Max
+  mod_pane:
+    background: bg_base
+    width_relative: Max
+    preferred_size: [0, 24]
+    border: [2, 2, 2, 2]
+    children:
+      description:
+        from: .text_area
+        width_relative: Max
+        height_relative: Max
+        preferred_size: [-8, 0]
+        text: |
+          [s=8.0|#name#][s=4.0|
+          ]
+          [s=5.0|#description#]
+      toggle:
+        from: .button
+        preferred_size: [6, 6]
+        position: [0, 7]
+      up:
+        from: .button
+        preferred_size: [6, 6]
+        position: [0, 0]
+        x_relative: Max
+        text: "^"
+        custom:
+          tooltip: "Move this mod up in the load order"
+      down:
+        from: .button
+        preferred_size: [6, 6]
+        position: [0, 14]
+        x_relative: Max
+        text: "v"
+        custom:
+          tooltip: "Move this mod down in the load order"
   module_selector:
     children:
       title:

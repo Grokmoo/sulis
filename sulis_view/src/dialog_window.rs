@@ -18,7 +18,6 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_core::config::Config;
 use sulis_core::ui::{Widget, WidgetKind, theme, Callback};
 use sulis_core::io::{event};
 use sulis_widgets::{Label, TextArea};
@@ -299,7 +298,7 @@ fn load_module(widget: &Rc<RefCell<Widget>>, module_id: &str) {
     let actor = Actor::from(&pc.borrow().actor.actor, None, pc.borrow().actor.xp(),
         Vec::new(), inventory);
 
-    let modules_list = Module::get_available_modules(&Config::resources_config().campaigns_directory);
+    let modules_list = Module::get_available_modules();
     for module in modules_list {
         if module.id != module_id { continue; }
 

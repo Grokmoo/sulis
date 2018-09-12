@@ -107,9 +107,9 @@ use std::path::{PathBuf};
 use std::fs;
 use std::ffi::OsStr;
 
-use sulis_core::config;
+use sulis_core::config::{self, Config};
 use sulis_core::serde_yaml;
-use sulis_core::util::invalid_data_error;
+use sulis_core::util::{invalid_data_error};
 use sulis_core::resource::*;
 
 use self::area::Tile;
@@ -204,38 +204,28 @@ macro_rules! getters {
 }
 
 impl Module {
-    pub fn get_available_modules(root_dir: &str) -> Vec<ModuleInfo> {
-        let mut modules: Vec<ModuleInfo> = Vec::new();
-        let path = PathBuf::from(root_dir);
+    pub fn get_available_modules() -> Vec<ModuleInfo> {
+        let root_dir = Config::resources_config().campaigns_directory;
+        let mut user_dir = config::USER_DIR.clone();
+        user_dir.push(&root_dir);
 
-        let dir_entries = match fs::read_dir(path) {
-            Ok(entries) => entries,
-            Err(_) => {
-                warn!("Unable to read directory: {}", root_dir);
-                return modules;
-            }
+        let mut modules: Vec<ModuleInfo> = Vec::new();
+
+        let mut dirs = Vec::new();
+        match subdirs(&root_dir) {
+            Ok(mut subdirs) => dirs.append(&mut subdirs),
+            Err(e) => warn!("Unable to read modules from '{}': {}", root_dir, e),
         };
 
-        for entry in dir_entries {
-            trace!("Found entry {:?}", entry);
-            let entry = match entry {
-                Ok(e) => e,
-                Err(e) => {
-                    warn!("Error reading entry: {}", e);
-                    continue;
-                }
-            };
+        match subdirs(&user_dir) {
+            Ok(mut user_dirs) => dirs.append(&mut user_dirs),
+            Err(e) => warn!("Unable to read modules from '{:?}': {}", user_dir, e),
+        }
 
-            if entry.path().is_dir() {
-                let module = match ModuleInfo::from_dir(entry.path()) {
-                    Ok(module) => module,
-                    Err(e) => {
-                        warn!("Unable to read module from '{:?}'", entry.path());
-                        warn!("{}", e);
-                        continue;
-                    }
-                };
-                modules.push(module);
+        for dir in dirs {
+            match ModuleInfo::from_dir(dir.clone()) {
+                Ok(module) => modules.push(module),
+                Err(e) => warn!("Error reading module from '{:?}': {}", dir, e),
             }
         }
 

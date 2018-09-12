@@ -23,7 +23,7 @@ use sulis_core::io::{InputAction, GraphicsRenderer};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::util::{Point, Size};
 
-use Button;
+use {Button, TextArea};
 
 /// Simple ScrollPane that clips its child content to its inner area
 /// nested scroll panes are not supported
@@ -49,7 +49,26 @@ impl ScrollPane {
     }
 
     pub fn add_to_content(&self, child: Rc<RefCell<Widget>>) {
+        // for text areas inside scroll panes don't limit drawing
+        // inside the screen area on layout as scroll panes
+        // need to allow widgets to be off screen
+        disable_text_area_limit_recursive(&child);
+
         Widget::add_child_to(&self.content, child);
+    }
+}
+
+fn disable_text_area_limit_recursive(parent: &Rc<RefCell<Widget>>) {
+    let kind = Rc::clone(&parent.borrow().kind);
+    match kind.borrow_mut().as_any_mut().downcast_mut::<TextArea>() {
+        None => (),
+        Some(text_area) => {
+            text_area.limit_to_screen_edge = false;
+        }
+    }
+
+    for child in parent.borrow().children.iter() {
+        disable_text_area_limit_recursive(child);
     }
 }
 

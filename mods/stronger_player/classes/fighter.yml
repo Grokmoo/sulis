@@ -1,0 +1,8 @@
+id: fighter
+starting_abilities:
+  - mighty_blow
+upgrades:
+  1:
+    ability_choices: []
+    group_uses_per_encounter:
+      - [ Fighter, 2 ]

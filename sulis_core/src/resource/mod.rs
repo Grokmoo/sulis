@@ -36,6 +36,8 @@ use std::path::Path;
 use std::io::{Error, ErrorKind};
 use std::fmt::Display;
 use std::hash::Hash;
+use std::fs;
+use std::path::PathBuf;
 
 use serde_yaml;
 
@@ -259,4 +261,20 @@ fn insert_if_ok_boxed<K: Eq + Hash + Display, V: ?Sized>(type_str: &str,
 fn warn_on_insert<K: Display>(type_str: &str, key: K, error: Error) {
     warn!("Error in {} with id '{}'", type_str, key);
     warn!("{}", error);
+}
+
+pub fn subdirs<P: AsRef<Path>>(path: P) -> Result<Vec<PathBuf>, Error> {
+    let mut result = Vec::new();
+
+    let dir_entries = fs::read_dir(path)?;
+
+    for entry in dir_entries {
+        let entry = entry?;
+
+        if !entry.path().is_dir() { continue; }
+
+        result.push(entry.path());
+    }
+
+    Ok(result)
 }

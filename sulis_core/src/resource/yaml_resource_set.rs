@@ -303,14 +303,14 @@ fn merge_map(dir: &str, name: &str, map: &mut serde_yaml::Mapping,
                         Value::Sequence(append) => merge_sequence(dir, name, seq, append),
                         _ => warn!("Expected sequence for '{:?}' in '{}'", key, name),
                     }
-                    return;
+                    continue;
                 },
                 Value::Mapping(ref mut map) => {
                     match value {
                         Value::Mapping(append) => merge_map(dir, name, map, append),
                         _ => warn!("Expected mapping for '{:?}' in '{}'", key, name),
                     }
-                    return;
+                    continue;
                 }
             }
         }

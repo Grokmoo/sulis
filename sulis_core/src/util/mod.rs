@@ -328,4 +328,18 @@ pub fn setup_logger() {
         let bt = Backtrace::new();
         warn!("{:?}", bt);
     }));
+
+    create_user_dirs();
+}
+
+fn create_user_dirs() {
+    let res = Config::resources_config();
+
+    let mut campaign_dir = config::USER_DIR.clone();
+    campaign_dir.push(&res.campaigns_directory);
+    config::create_dir_and_warn(&campaign_dir);
+
+    let mut mods_dir = config::USER_DIR.clone();
+    mods_dir.push(&res.mods_directory);
+    config::create_dir_and_warn(&mods_dir);
 }

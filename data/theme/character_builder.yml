@@ -3,7 +3,8 @@ children:
   builder_pane:
     height_relative: Max
     x_relative: Center
-    preferred_size: [180, -13]
+    preferred_size: [220, -13]
+    border: { left: 20, right: 20 }
     position: [0, 0]
     children:
       title:
@@ -99,6 +100,7 @@ children:
                 preferred_size: [25, 10]
       ability_selector_pane:
         from: .builder_pane
+        border: [0, 0, 0, 0]
         width_relative: Max
         preferred_size: [0, -13]
         children:
@@ -369,7 +371,7 @@ children:
             position: [0, 103]
       backstory_selector_pane:
         from: .builder_pane
-        border: { top: 0, bottom: 5, left: 5, right: 5 }
+        border: { top: 0, bottom: 5, left: 25, right: 25 }
         children:
           start_over:
             from: .button

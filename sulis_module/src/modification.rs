@@ -14,70 +14,65 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::fmt::{self, Display};
 use std::path::{PathBuf};
-use std::fs;
 use std::io::Error;
 
-use sulis_core::resource::{read_single_resource};
+use sulis_core::config::{self, Config};
+use sulis_core::resource::{subdirs, read_single_resource};
 
-pub fn get_available_modifications(root_dir: &str) -> Vec<ModificationInfo> {
+pub fn get_available_modifications() -> Vec<ModificationInfo> {
+    let root_dir = Config::resources_config().mods_directory;
+    let mut user_dir = config::USER_DIR.clone();
+    user_dir.push(&root_dir);
+
     let mut mods = Vec::new();
 
-    let path = PathBuf::from(root_dir);
+    let mut dirs = Vec::new();
+    match subdirs(&root_dir) {
+        Ok(mut subdirs) => dirs.append(&mut subdirs),
+        Err(e) => warn!("Unable to read mods from '{}': {}", root_dir, e),
+    }
 
-    let dir_entries = match fs::read_dir(path) {
-        Ok(entries) => entries,
-        Err(_) => {
-            warn!("Unable to read directory: {}", root_dir);
-            return mods;
-        }
-    };
+    match subdirs(&user_dir) {
+        Ok(mut subdirs) => dirs.append(&mut subdirs),
+        Err(e) => warn!("Unable to read mods from '{:?}': {}", user_dir, e),
+    }
 
-    for entry in dir_entries {
-        let entry = match entry {
-            Ok(e) => e,
-            Err(e) => {
-                warn!("Error reading entry: {}", e);
-                continue;
-            }
-        };
-
-        if entry.path().is_dir() {
-            let modi = match ModificationInfo::from_dir(entry.path()) {
-                Ok(modi) => modi,
-                Err(e) => {
-                    warn!("Unable to read modification from '{:?}'", entry.path());
-                    warn!("{}", e);
-                    continue;
-                }
-            };
-
-            mods.push(modi);
+    for dir in dirs {
+        match ModificationInfo::from_dir(dir.clone()) {
+            Ok(modi) => mods.push(modi),
+            Err(e) => warn!("Error reading module from '{:?}': {}", dir, e),
         }
     }
 
     mods
 }
 
+#[derive(Debug, Clone)]
 pub struct ModificationInfo {
     pub id: String,
     pub name: String,
     pub description: String,
+    pub dir: String,
+}
+
+impl Display for ModificationInfo {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.name)
+    }
 }
 
 impl ModificationInfo {
     pub fn from_dir(path: PathBuf) -> Result<ModificationInfo, Error> {
         let path_str = path.to_string_lossy().to_string();
-        let builder = read_single_resource(&format!("{}/mod", path_str))?;
+        let builder: ModificationInfoBuilder = read_single_resource(&format!("{}/mod", path_str))?;
 
-        Ok(ModificationInfo::new(builder)?)
-    }
-
-    pub fn new(builder: ModificationInfoBuilder) -> Result<ModificationInfo, Error> {
         Ok(ModificationInfo {
             name: builder.name,
             description: builder.description,
             id: builder.id,
+            dir: path_str,
         })
     }
 }

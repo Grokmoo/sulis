@@ -1,0 +1,9 @@
+id: rogue
+starting_abilities:
+  - backstab
+upgrades:
+  1:
+    ability_choices: []
+    group_uses_per_encounter:
+      - [ Rogue, 2 ]
+      - [ Modes, ~ ]

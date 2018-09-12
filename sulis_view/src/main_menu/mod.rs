@@ -23,6 +23,9 @@ use self::links_pane::LinksPane;
 pub mod module_selector;
 pub use self::module_selector::ModuleSelector;
 
+mod mods_selector;
+use self::mods_selector::ModsSelector;
+
 pub mod options;
 pub use self::options::Options;
 
@@ -30,12 +33,11 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::{RefCell};
 
-use sulis_core::config::{Config};
 use sulis_core::io::{InputAction, MainLoopUpdater, DisplayConfiguration};
 use sulis_core::ui::*;
 use sulis_core::util;
 use sulis_widgets::{Button, ConfirmationWindow, Label};
-use sulis_module::{Module};
+use sulis_module::{Module, modification};
 use sulis_state::{NextGameStep, save_file};
 
 use {CharacterBuilder, LoadWindow};
@@ -64,6 +66,7 @@ enum Mode {
     New,
     Load,
     Module,
+    Mods,
     Options,
     Links,
     NoChoice,
@@ -167,14 +170,25 @@ impl WidgetKind for MainMenu {
             parent.borrow_mut().invalidate_children();
         })));
 
+        let mods = Widget::with_theme(Button::empty(), "mods");
+        mods.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+            let parent = Widget::go_up_tree(&widget, 2);
+            let view = Widget::downcast_kind_mut::<MainMenu>(&parent);
+
+            let mods_list = modification::get_available_modifications();
+
+            parent.borrow_mut().invalidate_children();
+            view.mode = Mode::Mods;
+            view.content = Widget::with_defaults(ModsSelector::new(mods_list));
+        })));
+
         let module = Widget::with_theme(Button::empty(), "module");
         module.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
             let parent = Widget::go_up_tree(&widget, 2);
             let window = Widget::downcast_kind_mut::<MainMenu>(&parent);
 
             window.mode = Mode::Module;
-            let modules_list = Module::get_available_modules(
-                &Config::resources_config().campaigns_directory);
+            let modules_list = Module::get_available_modules();
             if modules_list.len() == 0 {
                 util::error_and_exit("No valid modules found.");
             }
@@ -217,6 +231,7 @@ impl WidgetKind for MainMenu {
         match self.mode {
             Mode::New => new.borrow_mut().state.set_active(true),
             Mode::Load => load.borrow_mut().state.set_active(true),
+            Mode::Mods => mods.borrow_mut().state.set_active(true),
             Mode::Module => module.borrow_mut().state.set_active(true),
             Mode::Options => options.borrow_mut().state.set_active(true),
             Mode::Links => links.borrow_mut().state.set_active(true),
@@ -231,7 +246,7 @@ impl WidgetKind for MainMenu {
             load.borrow_mut().state.set_enabled(false);
         }
 
-        Widget::add_children_to(&menu_pane, vec![module, new, load, options, links, exit]);
+        Widget::add_children_to(&menu_pane, vec![module, new, load, mods, options, links, exit]);
 
         let mut children = vec![title, module_title, menu_pane, self.content.clone()];
 

@@ -58,8 +58,7 @@ pub struct Trigger {
 pub struct Transition {
     pub from: Point,
     pub size: Rc<ObjectSize>,
-    pub to: Point,
-    pub to_area: Option<String>,
+    pub to: ToKind,
     pub hover_text: String,
     pub image_display: Rc<Image>,
 }
@@ -103,6 +102,7 @@ pub struct Area {
     pub vis_dist: i32,
     pub vis_dist_squared: i32,
     pub vis_dist_up_one_squared: i32,
+    pub world_map_location: Option<String>,
 }
 
 impl PartialEq for Area {
@@ -166,13 +166,14 @@ impl Area {
                 continue;
             }
 
-            debug!("Created transition to '{:?}' at {},{}", t_builder.to_area, t_builder.from.x, t_builder.from.y);
+            debug!("Created transition to '{:?}' at {},{}", t_builder.to,
+                   t_builder.from.x, t_builder.from.y);
+
             let transition = Transition {
                 from: t_builder.from,
                 to: t_builder.to,
                 hover_text: t_builder.hover_text,
                 size,
-                to_area: t_builder.to_area,
                 image_display: image,
             };
             transitions.push(transition);
@@ -236,6 +237,7 @@ impl Area {
             vis_dist: builder.max_vis_distance,
             vis_dist_squared: builder.max_vis_distance * builder.max_vis_distance,
             vis_dist_up_one_squared: builder.max_vis_up_one_distance * builder.max_vis_up_one_distance,
+            world_map_location: builder.world_map_location,
         })
     }
 
@@ -270,6 +272,7 @@ pub struct AreaBuilder {
     pub explored_tile: String,
     pub max_vis_distance: i32,
     pub max_vis_up_one_distance: i32,
+    pub world_map_location: Option<String>,
     pub layer_set: HashMap<String, Vec<Vec<usize>>>,
     pub terrain: Vec<Option<String>>,
     pub walls: Vec<(i8, Option<String>)>,
@@ -295,14 +298,21 @@ pub struct TriggerBuilder {
     pub initially_enabled: bool,
 }
 
+#[derive(Deserialize, Serialize, Debug, Clone)]
+#[serde(deny_unknown_fields)]
+pub enum ToKind {
+    Area { id: String, x: i32, y: i32 },
+    CurArea { x: i32, y: i32 },
+    WorldMap,
+}
+
 #[derive(Deserialize, Serialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct TransitionBuilder {
     pub from: Point,
     pub size: String,
-    pub to: Point,
+    pub to: ToKind,
     pub hover_text: String,
-    pub to_area: Option<String>,
     pub image_display: String,
 }
 

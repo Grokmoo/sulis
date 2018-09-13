@@ -273,9 +273,10 @@ impl RootView {
         });
     }
 
-    pub fn set_map_window(&mut self, widget: &Rc<RefCell<Widget>>, desired_state: bool) {
+    pub fn set_map_window(&mut self, widget: &Rc<RefCell<Widget>>,
+                          desired_state: bool, transition_enabled: bool) {
         self.set_window(widget, self::world_map_window::NAME, desired_state, &|| {
-            Some(WorldMapWindow::new())
+            Some(WorldMapWindow::new(transition_enabled))
         });
     }
 
@@ -321,7 +322,7 @@ impl RootView {
 
     pub fn toggle_map_window(&mut self, widget: &Rc<RefCell<Widget>>) {
         let desired_state = !Widget::has_child_with_name(widget, self::world_map_window::NAME);
-        self.set_map_window(widget, desired_state);
+        self.set_map_window(widget, desired_state, false);
     }
 
     pub fn show_menu(&mut self, widget: &Rc<RefCell<Widget>>) {

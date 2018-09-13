@@ -100,11 +100,12 @@ transitions:
       "y": 9
     size: 3by4
     to:
-      x: 12
-      "y": 10
-    to_area: wellswood_road_south
+      Area:
+        id: wellswood_road_south
+        x: 12
+        y: 10
     hover_text: "Exit Cave"
-    image_display: transition
+    image_display: empty
 triggers:
   - kind:
       OnPlayerEnter:

@@ -166,21 +166,23 @@ transitions:
       "y": 115
     size: 3by4
     to:
-      x: 68
-      "y": 18
+      Area:
+        id: wellswood_road_south
+        x: 68
+        y: 18
     hover_text: Road South
-    to_area: wellswood_road_south
-    image_display: transition
+    image_display: empty
   - from:
       x: 102
       "y": 0
     size: 5by3
     to:
-      x: 31
-      "y": 76
+      Area:
+        id: goblin_cliffs
+        x: 31
+        y: 76
     hover_text: To Cliffs
-    to_area: goblin_cliffs
-    image_display: transition
+    image_display: empty
 triggers:
   - kind:
       OnPlayerEnter:

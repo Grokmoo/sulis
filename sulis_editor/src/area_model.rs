@@ -49,6 +49,7 @@ pub struct AreaModel {
     filename: String,
     max_vis_distance: i32,
     max_vis_up_one_distance: i32,
+    world_map_location: Option<String>,
 
     terrain_kinds: Vec<TerrainTiles>,
     terrain: Vec<Option<usize>>,
@@ -125,6 +126,7 @@ impl AreaModel {
             id,
             name,
             filename,
+            world_map_location: None,
             max_vis_distance: 20,
             max_vis_up_one_distance: 6,
         }
@@ -149,13 +151,19 @@ impl AreaModel {
     pub fn elevation(&self, x: i32, y: i32) -> u8 {
         if x < 0 || y < 0 { return 0; }
 
-        self.elevation[(x + y * MAX_AREA_SIZE) as usize]
+        let index = (x + y * MAX_AREA_SIZE) as usize;
+        if index >= (MAX_AREA_SIZE * MAX_AREA_SIZE) as usize { return 0; }
+
+        self.elevation[index]
     }
 
     pub fn set_elevation(&mut self, elev: u8, x: i32, y: i32) {
         if x < 0 || y < 0 { return; }
 
-        self.elevation[(x + y * MAX_AREA_SIZE) as usize] = elev;
+        let index = (x + y * MAX_AREA_SIZE) as usize;
+        if index >= (MAX_AREA_SIZE * MAX_AREA_SIZE) as usize { return; }
+
+        self.elevation[index] = elev;
     }
 
     pub fn wall_kind(&self, index: usize) -> &WallTiles {
@@ -361,8 +369,7 @@ impl AreaModel {
 
         self.transitions.push(Transition {
             from: Point::new(1, 1),
-            to: Point::new(1, 1),
-            to_area: None,
+            to: ToKind::WorldMap,
             hover_text: "<<PLACEHOLDER>>".to_string(),
             size,
             image_display: sprite,
@@ -435,7 +442,18 @@ impl AreaModel {
             draw_list.set_scale(scale_x, scale_y);
             renderer.draw(draw_list);
 
-            let text = format!("to {}", transition.to_area.as_ref().unwrap_or(&"None".to_string()));
+            let text = match transition.to {
+                ToKind::CurArea { .. } => {
+                    "to Current Area".to_string()
+                },
+                ToKind::Area { ref id, .. } => {
+                    format!("to {}", id)
+                },
+                ToKind::WorldMap => {
+                    "to World Map".to_string()
+                }
+            };
+
             let mut draw_list = font_renderer.get_draw_list(&text, x, y, 1.0);
             draw_list.set_scale(scale_x, scale_y);
             renderer.draw(draw_list);
@@ -493,6 +511,7 @@ impl AreaModel {
         self.filename = filename.to_string();
         self.max_vis_distance = area_builder.max_vis_distance;
         self.max_vis_up_one_distance = area_builder.max_vis_up_one_distance;
+        self.world_map_location = area_builder.world_map_location.clone();
 
         trace!("Loading terrain");
         let width = area_builder.width as i32;
@@ -655,7 +674,6 @@ impl AreaModel {
                 to: transition_builder.to,
                 size,
                 hover_text: transition_builder.hover_text,
-                to_area: transition_builder.to_area,
                 image_display: image,
             });
         }
@@ -747,9 +765,8 @@ impl AreaModel {
             transitions.push(TransitionBuilder {
                 from: transition.from,
                 size: transition.size.id.to_string(),
-                to: transition.to,
+                to: transition.to.clone(),
                 hover_text: transition.hover_text.to_string(),
-                to_area: transition.to_area.clone(),
                 image_display: self.config.transition_image.clone(),
             });
         }
@@ -816,6 +833,7 @@ impl AreaModel {
             triggers: self.triggers.clone(),
             max_vis_distance: self.max_vis_distance,
             max_vis_up_one_distance: self.max_vis_up_one_distance,
+            world_map_location: self.world_map_location.clone(),
         };
 
         trace!("Writing to file {}", filename);

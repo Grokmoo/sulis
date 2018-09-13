@@ -19,7 +19,7 @@ use std::rc::Rc;
 
 use sulis_core::ui::{animation_state, Widget};
 use sulis_core::util::Point;
-use sulis_module::{Faction, Module, ObjectSize};
+use sulis_module::{Faction, Module, ObjectSize, area::ToKind};
 use sulis_state::{MOVE_TO_THRESHOLD, EntityState, GameState, ScriptCallback};
 use {dialog_window, RootView};
 
@@ -272,9 +272,7 @@ impl ActionKind for LootPropAction {
 struct TransitionAction {
     x: i32,
     y: i32,
-    to_x: i32,
-    to_y: i32,
-    area_id: Option<String>,
+    to: ToKind,
 }
 
 impl TransitionAction {
@@ -288,10 +286,9 @@ impl TransitionAction {
         };
 
         let cb_action = Box::new(TransitionAction {
-            area_id: transition.to_area.clone(),
-            x, y,
-            to_x: transition.to.x,
-            to_y: transition.to.y,
+            x,
+            y,
+            to: transition.to.clone(),
         });
 
         let max_dist = Module::rules().max_transition_distance;
@@ -324,9 +321,21 @@ impl ActionKind for TransitionAction {
 
     fn fire_action(&mut self, widget: &Rc<RefCell<Widget>>) {
         trace!("Firing transition callback.");
-        GameState::transition(&self.area_id, self.to_x, self.to_y);
-        let root = Widget::get_root(widget);
-        root.borrow_mut().invalidate_children();
+        match self.to {
+            ToKind::Area { ref id, x, y } => {
+                GameState::transition(&Some(id.to_string()), x, y);
+                let root = Widget::get_root(widget);
+                root.borrow_mut().invalidate_children();
+            },
+            ToKind::CurArea { x, y } => {
+                GameState::transition(&None, x, y);
+            },
+            ToKind::WorldMap => {
+                let root = Widget::get_root(widget);
+                let view = Widget::downcast_kind_mut::<RootView>(&root);
+                view.set_map_window(&root, true, true);
+            }
+        }
     }
 }
 
@@ -516,6 +525,7 @@ impl ActionKind for MoveAction {
         let root = Widget::get_root(widget);
         let view = Widget::downcast_kind_mut::<RootView>(&root);
         view.set_prop_window(&root, false, 0);
+        view.set_map_window(&root, false, false);
 
         if self.cb.is_some() || GameState::is_combat_active() {
             self.move_one();

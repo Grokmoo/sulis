@@ -335,7 +335,7 @@ children:
         height_relative: Zero
         preferred_size: [160, 80]
         x_relative: Center
-        y_relative: Center
+        y_relative: Max
         children:
           title:
             text: "Transition Editor"
@@ -363,43 +363,58 @@ children:
             position: [0, 5]
             height_relative: Max
             width_relative: Zero
+          cur_area_button:
+            from: .button
+            text: "Cur Area"
+            preferred_size: [20, 8]
+            position: [68, 10]
+          area_button:
+            from: .button
+            text: "Other Area"
+            preferred_size: [20, 8]
+            position: [90, 10]
+          world_map_button:
+            from: .button
+            text: "World Map"
+            preferred_size: [20, 8]
+            position: [112, 10]
           from_label:
             from: .label
             text: "From Point"
             text_params:
               horizontal_alignment: Right
             preferred_size: [8, 12]
-            position: [68, 5]
+            position: [68, 20]
           to_label:
             from: .label
             text: "To Point"
             text_params:
               horizontal_alignment: Right
             preferred_size: [16, 12]
-            position: [68, 20]
+            position: [68, 35]
           to_area_label:
             from: .label
             text: "To Area ID"
             text_params:
               horizontal_alignment: Right
             preferred_size: [16, 6]
-            position: [68, 35]
+            position: [68, 50]
           from_x:
             from: .spinner
-            position: [88, 5]
+            position: [88, 20]
           from_y:
             from: .spinner
-            position: [108, 5]
+            position: [108, 20]
           to_x:
             from: .spinner
-            position: [88, 20]
+            position: [88, 35]
           to_y:
             from: .spinner
-            position: [108, 20]
+            position: [108, 35]
           to_area:
             from: .input_field
             preferred_size: [60, 6]
-            position: [88, 35]
+            position: [88, 50]
       load_window:
         from: .window
         height_relative: Zero

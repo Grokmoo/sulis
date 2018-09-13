@@ -1,0 +1,9 @@
+id: transition_hint
+name: Transition Hint
+icon: inventory/misc_crate
+image: transition
+size: 2by2
+visible: true
+interactive:
+  Not
+impass: []

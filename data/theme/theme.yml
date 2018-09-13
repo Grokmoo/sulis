@@ -510,14 +510,22 @@ children:
           location:
             from: .button
             background: "#icon#"
-            text: "#name#"
-            text_params:
-              vertical_alignment: Top
-              font: outlined
             foreground: world_map_button
             x_relative: Custom
             y_relative: Custom
             preferred_size: [24, 17]
+          label:
+            from: .label
+            text: "#name#"
+            text_params:
+              font: outlined
+              vertical_alignment: Top
+              horizontal_alignment: Center
+              scale: 6.0
+            x_relative: Custom
+            y_relative: Custom
+            position: [-38, 0]
+            preferred_size: [100, 17]
   formation_window:
     from: .window
     border: { top: 8, bottom: 8, left: 6, right: 6 }

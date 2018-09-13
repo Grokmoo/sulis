@@ -106,10 +106,11 @@ mod turn_manager;
 pub(crate) use self::turn_manager::TurnManager;
 pub use self::turn_manager::ROUND_TIME_MILLIS;
 
+use std::collections::HashMap;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_module::{Actor, OnTrigger};
+use sulis_module::{Actor, OnTrigger, Module};
 
 pub const MOVE_TO_THRESHOLD: f32 = 0.4;
 
@@ -128,4 +129,66 @@ pub struct UICallback {
     pub on_trigger: Vec<OnTrigger>,
     pub parent: Rc<RefCell<EntityState>>,
     pub target: Rc<RefCell<EntityState>>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct WorldMapState {
+    locations: HashMap<String, WorldMapLocationState>,
+}
+
+impl WorldMapState {
+    fn new() -> WorldMapState {
+        let campaign = Module::campaign();
+        let map = &campaign.world_map;
+
+        let mut locations = HashMap::new();
+        for location in map.locations.iter() {
+            locations.insert(location.id.clone(), WorldMapLocationState {
+                visible: location.initially_visible,
+                enabled: location.initially_enabled,
+            });
+        }
+
+        WorldMapState { locations }
+    }
+
+    pub fn is_visible(&self, location: &str) -> bool {
+        if let Some(ref state) = self.locations.get(location) {
+            state.visible
+        } else {
+            warn!("Location '{}' not found when querying visible", location);
+            false
+        }
+    }
+
+    pub fn is_enabled(&self, location: &str) -> bool {
+        if let Some(ref state) = self.locations.get(location) {
+            state.enabled
+        } else {
+            warn!("Location '{}' not found when querying enabled", location);
+            false
+        }
+    }
+
+    fn set_visible(&mut self, location: &str, visible: bool) {
+        if let Some(ref mut state) = self.locations.get_mut(location) {
+            state.visible = visible;
+        } else {
+            warn!("Location '{}' not found when setting visible", location);
+        }
+    }
+
+    fn set_enabled(&mut self, location: &str, enabled: bool) {
+        if let Some(ref mut state) = self.locations.get_mut(location) {
+            state.enabled = enabled;
+        } else {
+            warn!("Location '{}' not found when setting enabled", location);
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+struct WorldMapLocationState {
+    pub visible: bool,
+    pub enabled: bool,
 }

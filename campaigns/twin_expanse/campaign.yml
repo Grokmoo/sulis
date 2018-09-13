@@ -44,6 +44,7 @@ world_map:
       position: [13.5, 4]
       icon: town04
       initially_enabled: false
+      initially_visible: false
     twain:
       name: "Twain"
       position: [14.75, 10.25]

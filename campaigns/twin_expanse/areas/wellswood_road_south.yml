@@ -103,21 +103,23 @@ transitions:
       "y": 9
     size: 4by3
     to:
-      x: 4
-      "y": 9
-    to_area: wellswood_road_cave
+      Area:
+        id: wellswood_road_cave
+        x: 4
+        y: 9
     hover_text: "Enter Cave"
-    image_display: transition
+    image_display: empty
   - from:
       x: 71
       "y": 18
     size: 3by3
     to:
-      x: 2
-      "y": 116
-    to_area: wellswood_road_north
+      Area:
+        id: wellswood_road_north
+        x: 2
+        y: 116
     hover_text: "Road North"
-    image_display: transition
+    image_display: empty
 triggers:
   - kind:
       OnPlayerEnter:

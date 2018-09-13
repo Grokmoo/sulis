@@ -1,5 +1,5 @@
 id: transition
-frame_time_millis: 200
+frame_time_millis: 50
 frames:
   - "props/transition0"
   - "props/transition1"
@@ -7,3 +7,7 @@ frames:
   - "props/transition3"
   - "props/transition4"
   - "props/transition5"
+  - "props/transition4"
+  - "props/transition3"
+  - "props/transition2"
+  - "props/transition1"

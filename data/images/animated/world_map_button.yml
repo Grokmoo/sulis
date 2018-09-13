@@ -1,8 +1,18 @@
 id: world_map_button
 states:
     normal: empty3x3
+    active: bg_transparent_base
+    active + hover: bg_transparent_base
+    active + hover + pressed: bg_transparent_base
+    
+    custom1: empty3x3
+    custom1 + active: bg_transparent_base
+    custom1 + active + hover: bg_transparent_base
+    custom1 + active + hover + pressed: bg_transparent_base
+    custom1 + hover: empty3x3
+    custom1 + hover + pressed: empty3x3
+    
     hover: bg_transparent_hover
-    active: bg_transparent_active
-    active + hover: bg_transparent_active
     pressed + hover: bg_transparent_active
+    
     disabled: empty3x3

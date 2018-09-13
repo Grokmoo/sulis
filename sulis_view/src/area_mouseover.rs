@@ -19,7 +19,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_core::ui::{Widget, WidgetKind, WidgetState};
-use sulis_core::io::{GraphicsRenderer};
+use sulis_core::io::{GraphicsRenderer, event::ClickKind};
 use sulis_core::util::Point;
 use sulis_widgets::{TextArea};
 use sulis_state::{ChangeListener, EntityState, GameState};
@@ -119,7 +119,40 @@ impl AreaMouseover {
 impl WidgetKind for AreaMouseover {
     widget_kind!(NAME);
 
+    fn on_mouse_press(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
+        self.super_on_mouse_press(widget, kind);
+        false
+    }
+
+    fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
+        self.super_on_mouse_release(widget, kind);
+        false
+    }
+
+    fn on_mouse_drag(&mut self, _widget: &Rc<RefCell<Widget>>, _kind: ClickKind,
+                     _delta_x: f32, _delta_y: f32) -> bool {
+        false
+    }
+
+    fn on_mouse_move(&mut self, _widget: &Rc<RefCell<Widget>>,
+                     _delta_x: f32, _delta_y: f32) -> bool {
+        true
+    }
+
+    fn on_mouse_enter(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
+        self.super_on_mouse_enter(widget);
+        false
+    }
+
+    fn on_mouse_exit(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
+        self.super_on_mouse_exit(widget);
+        false
+    }
+
     fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+        // prevent focus grab in root view where we compute mouse state each frame
+        widget.borrow_mut().state.set_enabled(false);
+
         match self.kind {
             Kind::Entity(ref entity) => {
                 entity.borrow_mut().actor.listeners.add(

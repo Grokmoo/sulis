@@ -25,7 +25,7 @@ use sulis_rules::{QuickSlot, Slot, BonusList};
 use sulis_module::{actor::{ActorBuilder, RewardBuilder}};
 
 use {ActorState, effect, Effect, EntityState, Formation, GameState, ItemState, Location,
-    PropState, prop_state::Interactive, Merchant};
+    PropState, prop_state::Interactive, Merchant, WorldMapState};
 use area_state::{TriggerState};
 use script::CallbackData;
 use animation::AnimSaveState;
@@ -42,6 +42,7 @@ pub struct SaveState {
     #[serde(default = "default_zoom")]
     pub(crate) zoom: f32,
     pub(crate) current_area: String,
+    pub(crate) world_map: WorldMapState,
     pub(crate) areas: HashMap<String, AreaSaveState>,
     pub(crate) manager: ManagerSaveState,
     pub(crate) anims: Vec<AnimSaveState>,
@@ -87,6 +88,7 @@ impl SaveState {
             stash,
             manager: ManagerSaveState::new(),
             anims: GameState::save_anims(),
+            world_map: GameState::world_map(),
         }
     }
 

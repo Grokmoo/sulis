@@ -17,15 +17,15 @@ groups:
       wagon01: [0, 0]
       wagon02: [4, 0]
   transition:
-    size: [3, 3]
-    position: [40, 14]
+    size: [2, 2]
+    position: [30, 0]
     areas:
       transition0: [0, 0]
-      transition1: [3, 0]
-      transition2: [6, 0]
-      transition3: [9, 0]
-      transition4: [12, 0]
-      transition5: [15, 0]
+      transition1: [2, 0]
+      transition2: [4, 0]
+      transition3: [6, 0]
+      transition4: [8, 0]
+      transition5: [10, 0]
   2by2:
     size: [2, 2]
     areas:

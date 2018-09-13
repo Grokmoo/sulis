@@ -67,11 +67,12 @@ transitions:
       "y": 33
     size: 4by3
     to:
-      x: 7
-      "y": 11
+      Area:
+       id: wellswood_farms
+       x: 7
+       y: 11
     hover_text: "To Farms"
-    to_area: wellswood_farms
-    image_display: transition
+    image_display: empty
 triggers:
   - kind: OnAreaLoad
     on_activate:
@@ -83,6 +84,7 @@ visibility_tile: gui/area_invis
 explored_tile: gui/area_unexplored
 max_vis_distance: 12
 max_vis_up_one_distance: 6
+world_map_location: wellswood
 layer_set:
   tileset/bar_horiz_c:
     - - 22

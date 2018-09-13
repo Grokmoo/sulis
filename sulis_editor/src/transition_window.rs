@@ -20,7 +20,7 @@ use std::cell::RefCell;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::util::Point;
-use sulis_module::area::MAX_AREA_SIZE;
+use sulis_module::area::{ToKind, MAX_AREA_SIZE};
 use sulis_widgets::{Button, InputField, Label, list_box, ListBox, Spinner};
 
 use AreaEditor;
@@ -62,19 +62,21 @@ impl WidgetKind for TransitionWindow {
             let area_editor = self.area_editor.borrow();
             let transition = area_editor.model.transition(index);
 
-            let to_area_str = match transition.to_area {
-                None => "",
-                Some(ref area) => area,
+
+            let (to_area_str, to_x, to_y) = match transition.to {
+                ToKind::CurArea { x, y } => (String::new(), x, y),
+                ToKind::Area { ref id, x, y } => (id.to_string(), x, y),
+                ToKind::WorldMap => (String::new(), 0, 0),
             };
 
             let max = MAX_AREA_SIZE - 1;
             let from_x = Spinner::new(transition.from.x, 0, max);
             let from_y = Spinner::new(transition.from.y, 0, max);
 
-            let to_x = Spinner::new(transition.to.x, 0, max);
-            let to_y = Spinner::new(transition.to.y, 0, max);
+            let to_x = Spinner::new(to_x, 0, max);
+            let to_y = Spinner::new(to_y, 0, max);
 
-            let to_area = Widget::with_theme(InputField::new(to_area_str), "to_area");
+            let to_area = Widget::with_theme(InputField::new(&to_area_str), "to_area");
             let from_label = Widget::with_theme(Label::empty(), "from_label");
             let to_label = Widget::with_theme(Label::empty(), "to_label");
             let to_area_label = Widget::with_theme(Label::empty(), "to_area_label");
@@ -82,38 +84,11 @@ impl WidgetKind for TransitionWindow {
             let apply = Widget::with_theme(Button::empty(), "apply_button");
 
             let to_area_ref = Rc::clone(&to_area);
-            let area_editor_ref = Rc::clone(&self.area_editor);
 
             let from_x_ref = Rc::clone(&from_x);
             let from_y_ref = Rc::clone(&from_y);
             let to_x_ref = Rc::clone(&to_x);
             let to_y_ref = Rc::clone(&to_y);
-            apply.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let to_area_str = to_area_ref.borrow().state.text.to_string();
-                let to_area = if to_area_str.is_empty() {
-                    None
-                } else {
-                    Some(to_area_str)
-                };
-
-                let from = Point::new(from_x_ref.borrow().value(), from_y_ref.borrow().value());
-                let to = Point::new(to_x_ref.borrow().value(), to_y_ref.borrow().value());
-
-                let window = Widget::get_parent(widget);
-                window.borrow_mut().invalidate_children();
-
-                let transition_window = Widget::downcast_kind_mut::<TransitionWindow>(&window);
-                let cur_index = match transition_window.selected_transition {
-                    Some(index) => index,
-                    None => return,
-                };
-
-                let mut area_editor = area_editor_ref.borrow_mut();
-                let transition = area_editor.model.transition_mut(cur_index);
-                transition.from = from;
-                transition.to = to;
-                transition.to_area = to_area;
-            })));
 
             let delete = Widget::with_theme(Button::empty(), "delete_button");
 
@@ -132,10 +107,69 @@ impl WidgetKind for TransitionWindow {
                 transition_window.selected_transition = None;
             })));
 
-            widgets.append(&mut vec![to_area, from_label, to_label,
-                           to_area_label, apply, delete]);
-            widgets.append(&mut vec![Widget::with_theme(to_x, "to_x"), Widget::with_theme(to_y, "to_y"),
-                Widget::with_theme(from_x, "from_x"), Widget::with_theme(from_y, "from_y")]);
+            let cur_area_button = Widget::with_theme(Button::empty(), "cur_area_button");
+            let area_button = Widget::with_theme(Button::empty(), "area_button");
+            let world_map_button = Widget::with_theme(Button::empty(), "world_map_button");
+
+            match transition.to {
+                ToKind::CurArea { .. } => cur_area_button.borrow_mut().state.set_active(true),
+                ToKind::Area { .. } => area_button.borrow_mut().state.set_active(true),
+                ToKind::WorldMap => world_map_button.borrow_mut().state.set_active(true),
+            }
+
+            let refs = vec![Rc::clone(&cur_area_button), Rc::clone(&area_button),
+                Rc::clone(&world_map_button)];
+            let refs_clone = refs.clone();
+            for widget in refs {
+                let widget_refs = refs_clone.clone();
+                widget.borrow_mut().state.add_callback(Callback::new(Rc::new(move | widget, _| {
+                    for widget in widget_refs.iter() {
+                        widget.borrow_mut().state.set_active(false);
+                    }
+                    widget.borrow_mut().state.set_active(true);
+                })));
+            }
+
+            let area_editor_ref = Rc::clone(&self.area_editor);
+            let world_map_ref = Rc::clone(&world_map_button);
+            let area_ref = Rc::clone(&area_button);
+            let cur_area_ref = Rc::clone(&cur_area_button);
+            apply.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
+                let to_area_str = to_area_ref.borrow().state.text.to_string();
+
+                let from = Point::new(from_x_ref.borrow().value(), from_y_ref.borrow().value());
+                let to = Point::new(to_x_ref.borrow().value(), to_y_ref.borrow().value());
+
+                let window = Widget::get_parent(widget);
+                window.borrow_mut().invalidate_children();
+
+                let transition_window = Widget::downcast_kind_mut::<TransitionWindow>(&window);
+                let cur_index = match transition_window.selected_transition {
+                    Some(index) => index,
+                    None => return,
+                };
+
+                let mut area_editor = area_editor_ref.borrow_mut();
+                let transition = area_editor.model.transition_mut(cur_index);
+                transition.from = from;
+
+                if world_map_ref.borrow().state.is_active() {
+                    transition.to = ToKind::WorldMap;
+                } else if area_ref.borrow().state.is_active() {
+                    transition.to = ToKind::Area { id: to_area_str, x: to.x, y: to.y };
+                } else if cur_area_ref.borrow().state.is_active() {
+                    transition.to = ToKind::CurArea { x: to.x, y: to.y };
+                }
+            })));
+
+
+            widgets.append(&mut vec![cur_area_button, area_button, world_map_button]);
+
+            widgets.append(&mut vec![to_area, from_label, to_label, to_area_label, apply, delete]);
+            widgets.append(&mut vec![Widget::with_theme(to_x, "to_x"),
+                Widget::with_theme(to_y, "to_y"),
+                Widget::with_theme(from_x, "from_x"),
+                Widget::with_theme(from_y, "from_y")]);
         }
 
         let mut entries: Vec<list_box::Entry<String>> = Vec::new();
@@ -148,9 +182,10 @@ impl WidgetKind for TransitionWindow {
                 transition_window.selected_transition = Some(index);
             }));
 
-            let to = match &transition.to_area {
-                &Some(ref to) => to.to_string(),
-                &None => "".to_string(),
+            let to = match transition.to {
+                ToKind::CurArea { .. } => "self".to_string(),
+                ToKind::Area { ref id, .. } => id.to_string(),
+                ToKind::WorldMap => "World Map".to_string(),
             };
 
             let text = format!("{}: {}", index, to);

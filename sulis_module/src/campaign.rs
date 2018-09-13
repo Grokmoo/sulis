@@ -36,6 +36,10 @@ pub struct WorldMapLocation {
     pub position: (f32, f32),
     pub icon: Rc<Image>,
     pub initially_enabled: bool,
+    pub initially_visible: bool,
+
+    pub linked_area: Option<String>,
+    pub linked_area_pos: Point,
 }
 
 pub struct Campaign {
@@ -74,6 +78,9 @@ impl Campaign {
                 icon: image,
                 position: location.position,
                 initially_enabled: location.initially_enabled,
+                initially_visible: location.initially_visible,
+                linked_area: location.linked_area,
+                linked_area_pos: location.linked_area_pos,
             });
         }
 
@@ -113,8 +120,18 @@ pub struct WorldMapLocationBuilder {
     pub name: String,
     pub position: (f32, f32),
     pub icon: String,
+
+    #[serde(default="bool_true")]
     pub initially_enabled: bool,
+    #[serde(default="bool_true")]
+    pub initially_visible: bool,
+
+    pub linked_area: Option<String>,
+    #[serde(default = "Point::as_zero")]
+    pub linked_area_pos: Point,
 }
+
+fn bool_true() -> bool { true }
 
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]

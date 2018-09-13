@@ -17,11 +17,15 @@ world_map:
       position: [9, 8.5]
       icon: town01
       initially_enabled: true
+      linked_area: wellswood_farms
+      linked_area_pos: [31, 3]
     wellswood_forest:
       name: "Wellswood Forest"
       position: [6.75, 7.25]
       icon: forest01
       initially_enabled: true
+      linked_area: wellswood_forest
+      linked_area_pos: [123, 123]
     last_edge:
       name: "Last Edge"
       position: [2, 3]
@@ -42,6 +46,7 @@ world_map:
       position: [13.5, 4]
       icon: town04
       initially_enabled: false
+      initially_visible: false
     twain:
       name: "Twain"
       position: [14.75, 10.25]

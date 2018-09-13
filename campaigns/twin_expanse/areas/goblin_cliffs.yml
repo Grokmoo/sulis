@@ -108,11 +108,12 @@ transitions:
       "y": 75
     size: 4by3
     to:
-      x: 103
-      "y": 2
+      Area:
+        id: wellswood_road_north
+        x: 103
+        y: 2
     hover_text: To Wellswood Road
-    to_area: wellswood_road_north
-    image_display: transition
+    image_display: empty
 triggers:
   - kind:
       OnPlayerEnter:

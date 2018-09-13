@@ -401,6 +401,18 @@ impl UserData for ScriptInterface {
             Ok(y.atan2(x))
         });
 
+        methods.add_method("set_world_map_location_visible",
+                           |_, _, (location, vis): (String, bool)| {
+            GameState::set_world_map_location_visible(&location, vis);
+            Ok(())
+        });
+
+        methods.add_method("set_world_map_location_enabled",
+                           |_, _, (location, en): (String, bool)| {
+            GameState::set_world_map_location_enabled(&location, en);
+            Ok(())
+        });
+
         methods.add_method("is_passable", |_, _, (entity, x, y): (ScriptEntity, i32, i32)| {
             let area_state = GameState::area_state();
             let area_state = area_state.borrow();

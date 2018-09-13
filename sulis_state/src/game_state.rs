@@ -28,7 +28,7 @@ use sulis_module::{Ability, Actor, Module, ObjectSize, OnTrigger, area::{Trigger
 
 use {ai, AI, AreaState, ChangeListener, ChangeListenerList, Effect,
     EntityState, Location, Formation, ItemList, ItemState, PartyStash,
-    PathFinder, SaveState, ScriptState, UICallback, MOVE_TO_THRESHOLD, TurnManager};
+    PathFinder, SaveState, ScriptState, UICallback, MOVE_TO_THRESHOLD, TurnManager, WorldMapState};
 use script::{script_callback::{self, ScriptHitKind}, ScriptEntitySet, ScriptCallback, ScriptItemKind};
 use animation::{self, Anim, AnimState, AnimSaveState, particle_generator::Param};
 
@@ -45,6 +45,7 @@ thread_local! {
 pub struct GameState {
     areas: HashMap<String, Rc<RefCell<AreaState>>>,
     area_state: Rc<RefCell<AreaState>>,
+    world_map: WorldMapState,
     selected: Vec<Rc<RefCell<EntityState>>>,
     user_zoom: f32,
     party: Vec<Rc<RefCell<EntityState>>>,
@@ -212,6 +213,7 @@ impl GameState {
                 party_stash: Rc::new(RefCell::new(PartyStash::new(stash))),
                 party_listeners: ChangeListenerList::default(),
                 ui_callbacks: Vec::new(),
+                world_map: save_state.world_map,
             })
         };
 
@@ -308,6 +310,34 @@ impl GameState {
             party_stash: Rc::new(RefCell::new(PartyStash::new(party_stash))),
             party_listeners: ChangeListenerList::default(),
             ui_callbacks: Vec::new(),
+            world_map: WorldMapState::new(),
+        })
+    }
+
+    pub fn set_world_map_location_visible(location: &str, visible: bool) {
+        STATE.with(|state| {
+            let mut state = state.borrow_mut();
+            let state = state.as_mut().unwrap();
+
+            state.world_map.set_visible(location, visible);
+        })
+    }
+
+    pub fn set_world_map_location_enabled(location: &str, enabled: bool) {
+        STATE.with(|state| {
+            let mut state = state.borrow_mut();
+            let state = state.as_mut().unwrap();
+
+            state.world_map.set_enabled(location, enabled);
+        })
+    }
+
+    pub fn world_map() -> WorldMapState {
+        STATE.with(|state| {
+            let state = state.borrow();
+            let state = state.as_ref().unwrap();
+
+            state.world_map.clone()
         })
     }
 

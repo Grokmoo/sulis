@@ -18,14 +18,16 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_core::ui::{Callback, Widget, WidgetKind};
+use sulis_core::ui::{Callback, Widget, WidgetKind, animation_state};
 use sulis_widgets::{Label, Button, TextArea};
 use sulis_module::Module;
+use sulis_state::GameState;
 
 pub const NAME: &str = "world_map_window";
 
 pub struct Entry {
     child: Rc<RefCell<Widget>>,
+    label: Rc<RefCell<Widget>>,
     position: (f32, f32),
 }
 
@@ -34,15 +36,17 @@ pub struct WorldMapWindow {
     size: (f32, f32),
     offset: (f32, f32),
     content: Rc<RefCell<Widget>>,
+    transition_enabled: bool,
 }
 
 impl WorldMapWindow {
-    pub fn new() -> Rc<RefCell<WorldMapWindow>> {
+    pub fn new(transition_enabled: bool) -> Rc<RefCell<WorldMapWindow>> {
         Rc::new(RefCell::new(WorldMapWindow {
             entries: Vec::new(),
             size: (0.0, 0.0),
             offset: (0.0, 0.0),
             content: Widget::empty("content"),
+            transition_enabled,
         }))
     }
 }
@@ -72,6 +76,7 @@ impl WidgetKind for WorldMapWindow {
                 let x = start_x + (grid_w * entry.position.0 + offset_x) as i32;
                 let y = start_y + (grid_h * entry.position.1 + offset_y) as i32;
                 entry.child.borrow_mut().state.set_position(x, y);
+                entry.label.borrow_mut().state.set_position(x, y);
             }
         }
 
@@ -89,30 +94,72 @@ impl WidgetKind for WorldMapWindow {
 
         let campaign = Module::campaign();
         let map = &campaign.world_map;
+        let map_state = GameState::world_map();
 
         self.content = Widget::empty("content");
         self.entries.clear();
         self.size = map.size;
         self.offset = map.offset;
 
+        let area_state = GameState::area_state();
+        let cur_location_id = area_state.borrow().area.world_map_location.clone();
+
         for location in map.locations.iter() {
             let button = Widget::with_theme(Button::empty(), "location");
 
-            {
+            let (add_callback, label) = {
                 let mut state = &mut button.borrow_mut().state;
                 state.add_text_arg("name", &location.name);
                 state.add_text_arg("icon", &location.icon.id());
-            }
 
-            button.borrow_mut().state.set_enabled(location.initially_enabled);
+                let is_active = if let Some(ref location_id) = &cur_location_id {
+                    &location.id == location_id
+                } else {
+                    false
+                };
+
+                state.set_active(is_active);
+
+                let (is_enabled, is_visible) =
+                    (map_state.is_enabled(&location.id), map_state.is_visible(&location.id));
+                state.set_enabled(is_enabled);
+                state.set_visible(is_visible);
+
+                if !self.transition_enabled {
+                    state.animation_state.add(animation_state::Kind::Custom1);
+                }
+
+                let label = Widget::with_defaults(Label::empty());
+                label.borrow_mut().state.add_text_arg("name", &location.name);
+                label.borrow_mut().state.set_visible(is_visible);
+
+                (self.transition_enabled && is_enabled && is_visible && !is_active, label)
+            };
+
+            if add_callback {
+                let (x, y) = (location.linked_area_pos.x, location.linked_area_pos.y);
+                let area_id = location.linked_area.clone();
+                button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
+                    let area_id = match area_id {
+                        None => return,
+                        Some(ref id) => id.clone(),
+                    };
+
+                    GameState::transition(&Some(area_id), x, y);
+                    let root = Widget::get_root(&widget);
+                    root.borrow_mut().invalidate_children();
+                })));
+            }
 
             let entry = Entry {
                 child: Rc::clone(&button),
+                label: Rc::clone(&label),
                 position: location.position,
             };
 
             self.entries.push(entry);
             Widget::add_child_to(&self.content, button);
+            Widget::add_child_to(&self.content, label);
         }
 
         vec![label, bg, close, labels, Rc::clone(&self.content)]

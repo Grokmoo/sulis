@@ -112,6 +112,7 @@ impl Actor {
                 abilities_to_add: Vec<Rc<Ability>>, inventory: InventoryBuilder) -> Actor {
 
         let mut levels = other.levels.clone();
+        let mut total_level = other.total_level;
         if let Some(class_to_add) = class_to_add {
             let mut added = false;
             for &mut (ref existing_class, ref mut level) in levels.iter_mut() {
@@ -124,6 +125,7 @@ impl Actor {
             if !added {
                 levels.push((class_to_add, 1));
             }
+            total_level += 1;
         }
 
         let image_layers = other.image_layers.clone();
@@ -158,7 +160,7 @@ impl Actor {
             attributes: other.attributes,
             inventory,
             xp,
-            total_level: other.total_level + 1,
+            total_level,
             levels,
             hue: other.hue,
             hair_color: other.hair_color,

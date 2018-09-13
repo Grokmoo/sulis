@@ -117,13 +117,7 @@ impl Widget {
             Some(ref t) => t,
         };
 
-        if let Some(ref bg) = theme.background {
-            match ResourceSet::get_image(&bg) {
-                Some(image) => self.state.set_background(Some(image)),
-                None => warn!("Image '{}' not found in theme.", bg),
-            }
-        }
-
+        theme.apply_background(&mut self.state);
         theme.apply_foreground(&mut self.state);
 
         if let Some(font) = ResourceSet::get_font(&theme.text_params.font) {

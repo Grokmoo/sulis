@@ -59,6 +59,8 @@ input:
         KeyI: ToggleInventory
         KeyC: ToggleCharacter
         KeyF: ToggleFormation
+        KeyM: ToggleMap
+        KeyJ: ToggleJournal
         KeySpace: EndTurn
         KeyDown: ScrollDown
         KeyUp: ScrollUp

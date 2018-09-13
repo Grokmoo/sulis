@@ -14,12 +14,29 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::collections::HashMap;
 use std::rc::Rc;
 use std::io::Error;
 
+use sulis_core::image::Image;
+use sulis_core::resource::ResourceSet;
 use sulis_core::util::{unable_to_create_error, Point};
 
 use {Conversation, Module};
+
+pub struct WorldMap {
+    pub size: (f32, f32),
+    pub offset: (f32, f32),
+    pub locations: Vec<WorldMapLocation>,
+}
+
+pub struct WorldMapLocation {
+    pub id: String,
+    pub name: String,
+    pub position: (f32, f32),
+    pub icon: Rc<Image>,
+    pub initially_enabled: bool,
+}
 
 pub struct Campaign {
     pub id: String,
@@ -29,6 +46,7 @@ pub struct Campaign {
     pub description: String,
     pub backstory_conversation: Rc<Conversation>,
     pub max_starting_level: u32,
+    pub world_map: WorldMap,
 }
 
 impl Campaign {
@@ -41,6 +59,24 @@ impl Campaign {
             }, Some(convo) => convo,
         };
 
+        let mut locations = Vec::new();
+        for (id, location) in builder.world_map.locations {
+            let image = match ResourceSet::get_image(&location.icon) {
+                None => {
+                    warn!("Invalid image for '{}': '{}'", id, location.icon);
+                    return unable_to_create_error("module", &builder.name);
+                }, Some(img) => img,
+            };
+
+            locations.push(WorldMapLocation {
+                id,
+                name: location.name,
+                icon: image,
+                position: location.position,
+                initially_enabled: location.initially_enabled,
+            });
+        }
+
         Ok(Campaign {
             starting_area: builder.starting_area,
             starting_location: builder.starting_location,
@@ -49,6 +85,11 @@ impl Campaign {
             backstory_conversation,
             id: builder.id,
             max_starting_level: builder.max_starting_level,
+            world_map: WorldMap {
+                size: builder.world_map.size,
+                offset: builder.world_map.offset,
+                locations,
+            }
         })
     }
 }
@@ -63,4 +104,22 @@ pub struct CampaignBuilder {
     pub description: String,
     pub backstory_conversation: String,
     pub max_starting_level: u32,
+    pub world_map: WorldMapBuilder,
+}
+
+#[derive(Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct WorldMapLocationBuilder {
+    pub name: String,
+    pub position: (f32, f32),
+    pub icon: String,
+    pub initially_enabled: bool,
+}
+
+#[derive(Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct WorldMapBuilder {
+    pub size: (f32, f32),
+    pub offset: (f32, f32),
+    pub locations: HashMap<String, WorldMapLocationBuilder>,
 }

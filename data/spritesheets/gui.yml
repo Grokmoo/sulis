@@ -1,6 +1,6 @@
 id: gui
 src: "gui.png"
-size: [ 1024, 1024 ]
+size: [ 2048, 2048 ]
 groups:
   bg_base:
     size: [5, 5]
@@ -438,6 +438,38 @@ groups:
       mouse_search: [0, 256]
       mouse_unlock: [128, 256]
       mouse_interact: [256, 256]
+  world_map:
+    size: [100, 72]
+    position: [1022, 513]
+    areas:
+      camp01: [0, 0]
+      town01: [100, 0]
+      city01: [200, 0]
+      mountain_town01: [300, 0]
+      desert_town01: [400, 0]
+      city02: [500, 0]
+      town02: [600, 0]
+      city03: [700, 0]
+      forest01: [800, 0]
+      town03: [900, 0]
+      city04: [0, 72]
+      town04: [100, 72]
+      city05: [200, 72]
+      city06: [300, 72]
+      camp01_disabled: [0, 144]
+      town01_disabled: [100, 144]
+      city01_disabled: [200, 144]
+      mountain_town01_disabled: [300, 144]
+      desert_town01_disabled: [400, 144]
+      city02_disabled: [500, 144]
+      town02_disabled: [600, 144]
+      city03_disabled: [700, 144]
+      forest01_disabled: [800, 144]
+      town03_disabled: [900, 144]
+      city04_disabled: [0, 216]
+      town04_disabled: [100, 216]
+      city05_disabled: [200, 216]
+      city06_disabled: [300, 216]
   special:
     areas:
       empty: [0, 512, 5, 5]
@@ -449,6 +481,7 @@ groups:
       area_unexplored: [57, 512, 16, 16]
       editor_encounter: [187, 513, 14, 14]
       
+      world_map: [1025, 0, 896, 512]
       inventory_paper_doll: [ 512, 0, 512, 512]
       icon_up: [0, 153, 15, 15]
       icon_down: [0, 170, 15, 15]

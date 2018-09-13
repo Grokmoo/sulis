@@ -1,0 +1,4 @@
+id: mountain_town01
+states:
+    normal: mountain_town01_normal
+    disabled: mountain_town01_disabled

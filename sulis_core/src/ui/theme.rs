@@ -173,6 +173,20 @@ impl Theme {
         state.set_text_content(out);
     }
 
+    /// Sets the background image for the `WidgetState`.  See `apply_foreground`
+    pub fn apply_background(&self, state: &mut WidgetState) {
+        let out = match self.background {
+            None => return,
+            Some(ref text) => expand_text_args(text, state),
+        };
+        if out.is_empty() { return; }
+
+        match ResourceSet::get_image(&out) {
+            None => warn!("Unable to find image for background '{}'", out),
+            Some(image) => state.set_background(Some(image)),
+        }
+    }
+
     /// Sets the foreground image for the `WidgetState` based on the
     /// defined theme image.  References are expanded.  See `WidgetState#add_text_arg`
     /// and `expand_text_args`

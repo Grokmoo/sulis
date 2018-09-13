@@ -1,0 +1,3 @@
+id: world_map
+size: [1, 1]
+image_display: "gui/world_map"

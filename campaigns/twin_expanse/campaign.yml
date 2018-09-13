@@ -10,3 +10,47 @@ description: |
   This is an adventure for a new character of any background starting at level 1.
 backstory_conversation: backstory
 max_starting_level: 1
+world_map:
+  size: [21.0, 12.0]
+  offset: [-1.0, -0.7]
+  locations:
+    wellswood:
+      name: "Wellswood"
+      position: [9, 8.5]
+      icon: town01
+      initially_enabled: false
+    wellswood_forest:
+      name: "Wellswood Forest"
+      position: [6.75, 7.25]
+      icon: forest01
+      initially_enabled: true
+    last_edge:
+      name: "Last Edge"
+      position: [2, 3]
+      icon: desert_town01
+      initially_enabled: false
+    naathfir:
+      name: "Naathfir"
+      position: [8, 2.75]
+      icon: mountain_town01
+      initially_enabled: false
+    rose_lake:
+      name: "Rose Lake"
+      position: [9.75, 6]
+      icon: city01
+      initially_enabled: false
+    rose_pastures:
+      name: "Rose Pastures"
+      position: [13.5, 4]
+      icon: town04
+      initially_enabled: false
+    twain:
+      name: "Twain"
+      position: [14.75, 10.25]
+      icon: town02
+      initially_enabled: false
+    kels_bay:
+      name: "Kel's Bay"
+      position: [17.5, 7.75]
+      icon: city02
+      initially_enabled: false

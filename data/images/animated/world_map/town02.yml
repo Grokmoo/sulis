@@ -1,0 +1,4 @@
+id: town02
+states:
+    normal: town02_normal
+    disabled: town02_disabled

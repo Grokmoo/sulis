@@ -1,0 +1,4 @@
+id: city02
+states:
+    normal: city02_normal
+    disabled: city02_disabled

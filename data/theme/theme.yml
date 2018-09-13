@@ -478,6 +478,46 @@ children:
             children:
               item_button:
                 from: .item_button
+  world_map_window:
+    from: .window
+    position: [0, 2]
+    x_relative: Center
+    width_relative: Zero
+    height_relative: Zero
+    preferred_size: [226, 136]
+    border: { top: 8, bottom: 8, left: 8, right: 8 }
+    children:
+      title:
+        text: "Map"
+        position: [0, -7]
+      close:
+        position: [5, -5]
+      bg:
+        width_relative: Max
+        height_relative: Max
+        background: world_map
+      labels:
+        from: .text_area
+        width_relative: Max
+        height_relative: Max
+        text: |
+          [s=4.0|
+          ][f=outlined;s=10.0;a=210|The Twin Expanse]
+      content:
+        width_relative: Max
+        height_relative: Max
+        children:
+          location:
+            from: .button
+            background: "#icon#"
+            text: "#name#"
+            text_params:
+              vertical_alignment: Top
+              font: outlined
+            foreground: world_map_button
+            x_relative: Custom
+            y_relative: Custom
+            preferred_size: [24, 17]
   formation_window:
     from: .window
     border: { top: 8, bottom: 8, left: 6, right: 6 }

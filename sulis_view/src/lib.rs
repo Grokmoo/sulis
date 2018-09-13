@@ -111,6 +111,9 @@ pub mod main_menu;
 mod race_pane;
 pub use self::race_pane::RacePane;
 
+mod world_map_window;
+pub use self::world_map_window::WorldMapWindow;
+
 use std::time::Instant;
 use std::any::Any;
 use std::rc::Rc;
@@ -270,6 +273,12 @@ impl RootView {
         });
     }
 
+    pub fn set_map_window(&mut self, widget: &Rc<RefCell<Widget>>, desired_state: bool) {
+        self.set_window(widget, self::world_map_window::NAME, desired_state, &|| {
+            Some(WorldMapWindow::new())
+        });
+    }
+
     fn set_window(&mut self, widget: &Rc<RefCell<Widget>>, name: &str, desired_state: bool,
                      cb: &Fn() -> Option<Rc<RefCell<WidgetKind>>>) {
         match Widget::get_child_with_name(widget, name) {
@@ -308,6 +317,11 @@ impl RootView {
     pub fn toggle_character_window(&mut self, widget: &Rc<RefCell<Widget>>) {
         let desired_state = !Widget::has_child_with_name(widget, self::character_window::NAME);
         self.set_character_window(widget, desired_state);
+    }
+
+    pub fn toggle_map_window(&mut self, widget: &Rc<RefCell<Widget>>) {
+        let desired_state = !Widget::has_child_with_name(widget, self::world_map_window::NAME);
+        self.set_map_window(widget, desired_state);
     }
 
     pub fn show_menu(&mut self, widget: &Rc<RefCell<Widget>>) {
@@ -433,6 +447,7 @@ impl WidgetKind for RootView {
             ToggleConsole => self.toggle_console_window(widget),
             ToggleInventory => self.toggle_inventory_window(widget),
             ToggleCharacter => self.toggle_character_window(widget),
+            ToggleMap => self.toggle_map_window(widget),
             ToggleFormation => self.toggle_formation_window(widget),
             EndTurn => self.end_turn(),
             Exit => self.show_exit(widget),
@@ -508,7 +523,11 @@ impl WidgetKind for RootView {
             })));
 
             let map_button = Widget::with_theme(Button::empty(), "map_button");
-            map_button.borrow_mut().state.set_enabled(false);
+            map_button.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+                let parent = Widget::get_root(&widget);
+                let view = Widget::downcast_kind_mut::<RootView>(&parent);
+                view.toggle_map_window(&parent);
+            })));
 
             let log_button = Widget::with_theme(Button::empty(), "log_button");
             log_button.borrow_mut().state.set_enabled(false);

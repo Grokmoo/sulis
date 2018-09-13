@@ -601,8 +601,7 @@ uniform_sets:
       plant01, plant02, plant03, plant04, plant05, plant06, plant07, plant08, plant09,
       plant11, plant12, plant13, plant14, plant15, plant16, plant17, plant18, plant19, plant20,
       rocks_small, campfire, lilypad03, lilypad04,
-      meat01, meat02, fish01, fish02, fish03,
-      veg01, veg02, veg03, veg04, veg05, veg06
+      window_small01, window_small02, window_small03, window_small04, window_small05, window_small06, window_small07 
     ]
   object_bin_impass:
     layer: object
@@ -643,7 +642,17 @@ uniform_sets:
     tiles: [
       plate01, plate02, plate03, plate04, plate05, plate06, plate07, plate08, wine_bottle01,
       wine_bottle02, lantern_off, ropes01, wall_crack01, papers, bottles01, bottles02, bottles03,
-      book01, papers02, book02
+      book01, papers02, book02, meat01, meat02, fish01, fish02, fish03,
+      veg01, veg02, veg03, veg04, veg05, veg06
+    ]
+  doors:
+    layer: prop
+    size: [2, 3]
+    sprite_prefix: "props/"
+    impass: [[0, 0], [1, 0], [0, 1], [1, 1], [0, 2], [1, 2]]
+    invis: []
+    tiles: [
+      door_single_01_closed, door_single_02_closed, door_single_03_closed, door_single_04_closed
     ]
   interior_pass_2by2:
     layer: object_interior
@@ -764,6 +773,8 @@ uniform_sets:
       farm_plant_01b, farm_plant_02b, farm_plant_03b, farm_plant_04b, farm_plant_05b, farm_plant_06b, farm_plant_07b,
       farm_plant_01c, farm_plant_02c, farm_plant_03c, farm_plant_04c, farm_plant_05c, farm_plant_06c, farm_plant_07c,
       farm_plant_01d, farm_plant_02d, farm_plant_03d, farm_plant_04d, farm_plant_05d, farm_plant_06d, farm_plant_07d,
+      window03, window04, window05, window06, window07, window08, window09, window10, window11,
+      window12, window13, window14, window15, window16, window17, window18, window19, window20
     ]
   2by2prop:
     layer: prop

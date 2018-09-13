@@ -752,6 +752,35 @@ groups:
     size: [3, 2]
     areas:
       entry_light: [0, 0]
+  windows:
+    position: [53, 0]
+    areas:
+      window03: [0, 0, 1, 2]
+      window04: [1, 0, 1, 2]
+      window05: [2, 0, 1, 2]
+      window06: [3, 0, 1, 2]
+      window07: [4, 0, 1, 2]
+      window08: [5, 0, 1, 2]
+      window09: [6, 0, 1, 2]
+      window10: [7, 0, 1, 2]
+      window11: [8, 0, 1, 2]
+      window12: [0, 2, 1, 2]
+      window13: [1, 2, 1, 2]
+      window14: [2, 2, 1, 2]
+      window15: [3, 2, 1, 2]
+      window16: [4, 2, 1, 2]
+      window17: [5, 2, 1, 2]
+      window18: [6, 2, 1, 2]
+      window19: [7, 2, 1, 2]
+      window20: [8, 2, 1, 2]
+      
+      window_small01: [9, 0, 1, 1]
+      window_small02: [10, 0, 1, 1]
+      window_small03: [9, 0, 1, 1]
+      window_small04: [10, 0, 1, 1]
+      window_small05: [9, 0, 1, 1]
+      window_small06: [10, 0, 1, 1]
+      window_small07: [10, 0, 1, 1]
   misc_interior:
     position: [32, 0]
     areas:

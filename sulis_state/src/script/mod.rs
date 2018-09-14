@@ -605,9 +605,9 @@ impl UserData for ScriptInterface {
             Ok(())
         });
 
-        methods.add_method("add_party_item", |_, _, item: String| {
+        methods.add_method("add_party_item", |_, _, (item, adj): (String, Option<String>)| {
             let stash = GameState::party_stash();
-            let item = match ItemState::from(&item) {
+            let item = match Module::item(&item) {
                 None => return Err(rlua::Error::FromLuaConversionError {
                     from: "String",
                     to: "Item",
@@ -616,7 +616,23 @@ impl UserData for ScriptInterface {
                 Some(item) => item,
             };
 
-            stash.borrow_mut().add_item(1, item);
+            let item = if let Some(adj) = adj {
+                let adj = match Module::item_adjective(&adj) {
+                    None => return Err(rlua::Error::FromLuaConversionError {
+                        from: "String",
+                        to: "ItemAdjective",
+                        message: Some(format!("ItemAdjective '{}' does not exist", adj)),
+                    }),
+                    Some(adj) => adj,
+                };
+                // TODO the module needs to handle this so it can be cached
+                Rc::new(Item::clone_with_adjectives(&item, vec![adj]))
+            } else {
+                item
+            };
+
+            let item_state = ItemState::new(item);
+            stash.borrow_mut().add_item(1, item_state);
             Ok(())
         });
 

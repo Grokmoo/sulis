@@ -268,9 +268,11 @@ impl Display for DamageKind {
     }
 }
 
-#[derive(Deserialize, Serialize, Debug, Copy, Clone)]
+#[derive(Deserialize, Serialize, Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
 #[serde(deny_unknown_fields)]
 pub struct Damage {
+    // note that if this is ever changed to allow negative values, bonus.apply_modifiers
+    // needs to be updated to account for that case
     pub min: u32,
     pub max: u32,
 
@@ -286,7 +288,13 @@ impl Damage {
         self.ap += other.ap;
     }
 
-    pub fn mult_f32(&mut self, val: f32) -> Damage {
+    pub fn mult_f32_mut(&mut self, val: f32) {
+        self.min = (self.min as f32 * val) as u32;
+        self.max = (self.max as f32 * val) as u32;
+        self.ap = (self.ap as f32 * val) as u32;
+    }
+
+    pub fn mult_f32(&self, val: f32) -> Damage {
         Damage {
             min: (self.min as f32 * val) as u32,
             max: (self.max as f32 * val) as u32,

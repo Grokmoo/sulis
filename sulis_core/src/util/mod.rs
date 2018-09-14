@@ -20,6 +20,7 @@ pub use self::point::Point;
 pub mod size;
 pub use self::size::Size;
 
+use std::cmp::Ordering;
 use std::f32;
 use std::ops::*;
 use std::fmt;
@@ -113,11 +114,36 @@ impl Default for ActiveResources {
     }
 }
 
-#[derive(Deserialize, Serialize, Debug, Clone, Copy, PartialEq)]
+#[derive(Deserialize, Serialize, Debug, Clone, Copy, PartialEq, Eq)]
 #[serde(deny_unknown_fields, untagged)]
 pub enum ExtInt {
     Int(u32),
     Infinity,
+}
+
+impl Ord for ExtInt {
+    fn cmp(&self, other: &ExtInt) -> Ordering {
+        match self {
+            ExtInt::Int(val) => {
+                match other {
+                    ExtInt::Int(other) => val.cmp(&other),
+                    ExtInt::Infinity => Ordering::Less,
+                }
+            },
+            ExtInt::Infinity => {
+                match other {
+                    ExtInt::Int(_) => Ordering::Greater,
+                    ExtInt::Infinity => Ordering::Equal,
+                }
+            }
+        }
+    }
+}
+
+impl PartialOrd for ExtInt {
+    fn partial_cmp(&self, other: &ExtInt) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
 }
 
 impl ExtInt {

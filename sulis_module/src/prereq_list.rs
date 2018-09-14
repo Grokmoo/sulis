@@ -23,7 +23,7 @@ use sulis_core::util::unable_to_create_error;
 
 use {Actor, Module, Race};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PrereqList {
     pub attributes: Option<Vec<(Attribute, u8)>>,
 

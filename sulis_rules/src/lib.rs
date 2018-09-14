@@ -50,7 +50,7 @@ pub use self::damage::DamageList;
 pub mod stat_list;
 pub use self::stat_list::StatList;
 
-#[derive(Deserialize, Serialize, Debug, Copy, Clone, PartialEq, Eq, Hash)]
+#[derive(Deserialize, Serialize, Debug, Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 #[serde(deny_unknown_fields)]
 pub enum Slot {
     Cloak,
@@ -106,7 +106,7 @@ use self::Slot::*;
 const SLOTS_LIST: [Slot; 12] = [Cloak, Feet, Legs, Torso, Hands, Head, HeldMain, HeldOff, Waist,
                                 Neck, FingerMain, FingerOff];
 
-#[derive(Deserialize, Serialize, Debug, Copy, Clone, PartialEq, Eq, Hash)]
+#[derive(Deserialize, Serialize, Debug, Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 #[serde(deny_unknown_fields)]
 pub enum QuickSlot {
     AltHeldMain,
@@ -134,7 +134,7 @@ const QUICKSLOTS_LIST: [QuickSlot; 6] = [ AltHeldMain, AltHeldOff, Usable1, Usab
 
 const USABLE_QUICKSLOTS_LIST: [QuickSlot; 4] = [ Usable1, Usable2, Usable3, Usable4 ];
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum ItemKind {
     Armor { kind: ArmorKind },
     Weapon { kind: WeaponKind },

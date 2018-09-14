@@ -26,9 +26,9 @@ upgrades:
       You get more hits and fewer grazes when using maces.
     bonuses:
       - kind:
-          hit_threshold: -10
+          hit_threshold: 10
         when:
-          AttackWithWeapon: Mace        
+          AttackWithWeapon: Mace
       - kind:
           damage: { min: 3, max: 5}
         when:

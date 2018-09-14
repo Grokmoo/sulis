@@ -135,13 +135,16 @@ impl Ability {
             Some(prereqs) => Some(PrereqList::new(prereqs, module)?),
         };
 
+        let mut bonuses = builder.bonuses.unwrap_or_default();
+        bonuses.merge_duplicates();
+
         Ok(Ability {
             id: builder.id,
             name: builder.name,
             description: builder.description,
             icon,
             active,
-            bonuses: builder.bonuses.unwrap_or_default(),
+            bonuses,
             prereqs,
             upgrades: builder.upgrades.unwrap_or_default(),
         })
@@ -169,7 +172,7 @@ impl Ability {
     }
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
 pub enum Duration {
     Rounds(u32),

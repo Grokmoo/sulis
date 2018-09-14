@@ -521,6 +521,7 @@ impl Module {
         cutscene, cutscenes, Cutscene;
         encounter, encounters, Encounter;
         item, items, Item;
+        item_adjective, item_adjectives, ItemAdjective;
         loot_list, loot_lists, LootList;
         object_size, sizes, ObjectSize;
         prop, props, Prop;

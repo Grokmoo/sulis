@@ -1,0 +1,11 @@
+id: worn
+name: Worn
+name_prefix: "Worn "
+value_modifier: 0.6
+bonus_modifier: 0.8
+penalty_modifier: 1.20
+attack_damage_modifier: 0.8
+attack_bonus_modifier: 0.75
+attack_penalty_modifier: 1.25
+bonuses: []
+attack_bonuses: {}

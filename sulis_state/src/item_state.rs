@@ -25,7 +25,7 @@ pub struct ItemState {
 
 impl PartialEq for ItemState {
     fn eq(&self, other: &ItemState) -> bool {
-        self.item == other.item
+        Rc::ptr_eq(&self.item, &other.item)
     }
 }
 

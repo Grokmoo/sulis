@@ -10,13 +10,13 @@ bonuses:
       crit_multiplier: 0.5
     when: AttackWhenFlanking
   - kind:
-      crit_threshold: -10
+      crit_threshold: 10
     when:  AttackWhenHidden
   - kind:
       crit_multiplier: 1.0
     when: AttackWhenFlanking
   - kind:
-      crit_threshold: -20
+      crit_threshold: 20
     when:  AttackWhenHidden
 prereqs:
   abilities: [ feint, killing_blow ]

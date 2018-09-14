@@ -5,7 +5,7 @@ description: |
   You are a master of combat with two weapons.  Your attack speed and initiative are significantly increased when using two weapons.
 bonuses:
   - kind:
-      attack_cost: -500
+      attack_cost: 500
     when:
       WeaponStyle: DualWielding
   - kind:

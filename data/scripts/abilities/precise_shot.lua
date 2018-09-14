@@ -11,7 +11,7 @@ function on_activate(parent, ability)
 
   effect = parent:create_effect(ability:name())
   effect:deactivate_with(ability)
-  effect:add_num_bonus("attack_cost", 1000)
+  effect:add_num_bonus("attack_cost", -1000)
   effect:add_damage(0, 0, 5)
 
   stats = parent:stats()

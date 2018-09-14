@@ -14,6 +14,8 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use sulis_rules::{BonusList, AttackBonuses};
+
 /// An adjective is a modifier that affects the stats of
 /// an item in a given way.  Items can have zero, one, or
 /// many adjectives.
@@ -22,6 +24,21 @@
 pub struct ItemAdjective {
     pub id: String,
     pub name: String,
+
+    pub name_prefix: Option<String>,
+    pub name_postfix: Option<String>,
+    pub value_modifier: Option<f32>,
+    pub bonus_modifier: Option<f32>,
+    pub penalty_modifier: Option<f32>,
+    pub attack_damage_modifier: Option<f32>,
+    pub attack_bonus_modifier: Option<f32>,
+    pub attack_penalty_modifier: Option<f32>,
+
+    #[serde(default)]
+    pub bonuses: BonusList,
+
+    #[serde(default)]
+    pub attack_bonuses: AttackBonuses,
 }
 
 impl PartialEq for ItemAdjective {

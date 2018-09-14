@@ -14,10 +14,12 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::mem;
+
 use sulis_core::util::ExtInt;
 use {Attribute, Damage, DamageKind, ArmorKind, Slot, WeaponKind, WeaponStyle};
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd)]
 #[serde(deny_unknown_fields)]
 #[serde(rename_all = "snake_case")]
 pub enum BonusKind {
@@ -57,7 +59,7 @@ pub enum BonusKind {
     GroupUsesPerEncounter { group: String, amount: ExtInt },
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 #[serde(deny_unknown_fields)]
 pub enum Contingent {
     /// Bonuses that should always be applied
@@ -98,7 +100,7 @@ impl Default for Contingent {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialOrd, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub struct Bonus {
     #[serde(default)]
@@ -110,9 +112,13 @@ pub struct Bonus {
 #[serde(deny_unknown_fields)]
 pub struct BonusList(Vec<Bonus>);
 
+impl Default for BonusList {
+    fn default() -> BonusList {
+        BonusList(Vec::new())
+    }
+}
+
 impl BonusList {
-    /// An iterator through all standard bonuses held in this list.  These bonuses
-    /// should always be applied to the parent entity
     pub fn iter(&self) -> impl Iterator<Item=&Bonus> {
         self.0.iter()
     }
@@ -124,13 +130,191 @@ impl BonusList {
     pub fn add_kind(&mut self, kind: BonusKind) {
         self.0.push(Bonus { when: Contingent::Always, kind });
     }
-}
 
-impl Default for BonusList {
-    fn default() -> BonusList {
-        BonusList(Vec::new())
+    pub fn merge_duplicates(&mut self) {
+        let bonuses = &mut self.0;
+        bonuses.sort_by(|a, b| a.partial_cmp(b).unwrap());
+
+        let mut i = 0;
+        loop {
+            if i + 1 >= bonuses.len() { return; }
+
+            if let Some(merged_bonus) = merge_if_dup(&bonuses[i], &bonuses[i + 1]) {
+                mem::replace(&mut bonuses[i], merged_bonus);
+                bonuses.remove(i + 1);
+            }
+
+            i += 1;
+        }
+    }
+
+    pub fn apply_modifiers(&mut self, penalty_mod: f32, bonus_mod: f32) {
+        for mut bonus in self.0.iter_mut() {
+            apply_modifiers(&mut bonus, penalty_mod, bonus_mod);
+        }
     }
 }
+
+
+macro_rules! apply_kind_mod_i32 {
+    ($kind:ident ( $val:ident ) : $penalty:ident, $bonus:ident) => {
+        if $val > 0 {
+            $kind(($val as f32 * $bonus).round() as i32)
+        } else {
+            $kind(($val as f32 * $penalty).round() as i32)
+        }
+    }
+}
+
+macro_rules! apply_kind_mod_f32 {
+    ($kind:ident ( $val:ident ) : $penalty:ident, $bonus:ident) => {
+        if $val > 0.0 {
+            $kind($val * $bonus)
+        } else {
+            $kind($val * $penalty)
+        }
+    }
+}
+
+fn apply_modifiers(bonus: &mut Bonus, neg: f32, pos: f32) {
+    use self::BonusKind::*;
+    let new_kind = match bonus.kind {
+        // all of these could easily merged into one macro, but then it
+        // would need a separate match and we would lose the exhaustiveness check
+        ActionPoints(val) => apply_kind_mod_i32!(ActionPoints(val): neg, pos),
+        Armor(val) => apply_kind_mod_i32!(Armor(val): neg, pos),
+        Reach(val) => apply_kind_mod_f32!(Reach(val): neg, pos),
+        Range(val) => apply_kind_mod_f32!(Range(val): neg, pos),
+        Initiative(val) => apply_kind_mod_i32!(Initiative(val): neg, pos),
+        HitPoints(val) => apply_kind_mod_i32!(HitPoints(val): neg, pos),
+        MeleeAccuracy(val) => apply_kind_mod_i32!(MeleeAccuracy(val): neg, pos),
+        RangedAccuracy(val) => apply_kind_mod_i32!(RangedAccuracy(val): neg, pos),
+        SpellAccuracy(val) => apply_kind_mod_i32!(SpellAccuracy(val): neg, pos),
+        Defense(val) => apply_kind_mod_i32!(Defense(val): neg, pos),
+        Fortitude(val) => apply_kind_mod_i32!(Fortitude(val): neg, pos),
+        Reflex(val) => apply_kind_mod_i32!(Reflex(val): neg, pos),
+        Will(val) => apply_kind_mod_i32!(Will(val): neg, pos),
+        Concealment(val) => apply_kind_mod_i32!(Concealment(val): neg, pos),
+        ConcealmentIgnore(val) => apply_kind_mod_i32!(ConcealmentIgnore(val): neg, pos),
+        CritThreshold(val) => apply_kind_mod_i32!(CritThreshold(val): neg, pos),
+        HitThreshold(val) => apply_kind_mod_i32!(HitThreshold(val): neg, pos),
+        GrazeThreshold(val) => apply_kind_mod_i32!(GrazeThreshold(val): neg, pos),
+        CritMultiplier(val) => apply_kind_mod_f32!(CritMultiplier(val): neg, pos),
+        HitMultiplier(val) => apply_kind_mod_f32!(HitMultiplier(val): neg, pos),
+        GrazeMultiplier(val) => apply_kind_mod_f32!(GrazeMultiplier(val): neg, pos),
+        MovementRate(val) => apply_kind_mod_f32!(MovementRate(val): neg, pos),
+        AttackCost(val) => apply_kind_mod_i32!(AttackCost(val): neg, pos),
+        FlankingAngle(val) => apply_kind_mod_i32!(FlankingAngle(val): neg, pos),
+        CasterLevel(val) => apply_kind_mod_i32!(CasterLevel(val): neg, pos),
+        Damage(damage) => Damage(damage.mult_f32(pos)),
+        ArmorKind { kind, amount } => {
+            if amount > 0 {
+                ArmorKind { kind, amount: (amount as f32 * pos).round() as i32 }
+            } else {
+                ArmorKind { kind, amount: (amount as f32 * neg).round() as i32 }
+            }
+        }
+        Attribute { attribute, amount } => {
+            if amount > 0 {
+                Attribute { attribute, amount: (amount as f32 * pos).round() as i8 }
+            } else {
+                Attribute { attribute, amount: (amount as f32 * neg).round() as i8 }
+            }
+        },
+        ArmorProficiency(_) | WeaponProficiency(_) | MoveDisabled
+            | AttackDisabled | Hidden | GroupUsesPerEncounter { ..} => return,
+    };
+
+    bonus.kind = new_kind;
+}
+
+macro_rules! merge_int_bonus {
+    ($kind:ident, $val:ident, $sec:ident, $when:ident) => {
+        if let $kind(other) = $sec.kind {
+            return Some(Bonus { $when, kind: $kind($val + other) });
+        }
+    }
+}
+
+fn merge_if_dup(first: &Bonus, sec: &Bonus) -> Option<Bonus> {
+    if first.when != sec.when { return None; }
+
+    let when = first.when;
+    use self::BonusKind::*;
+    match first.kind {
+        Attribute { attribute, amount } => if let Attribute { attribute: attr, amount: amt } = sec.kind {
+            if attr != attribute { return None; }
+            return Some(Bonus { when, kind: Attribute { attribute, amount: amount + amt }});
+        },
+        ArmorKind { kind, amount } => if let ArmorKind { kind: other_kind, amount: other } = sec.kind {
+            if other_kind != kind { return None; }
+            return Some(Bonus { when, kind: ArmorKind { kind, amount: amount + other }});
+        },
+        Damage(damage) => if let Damage(other) = sec.kind {
+            if damage.kind != other.kind { return None; }
+            let mut damage = damage.clone();
+            damage.add(other);
+            return Some(Bonus { when, kind: Damage(damage) });
+        },
+        ArmorProficiency(kind) => if let ArmorProficiency(other) = sec.kind {
+            if kind != other { return None; }
+            return Some(Bonus { when, kind: ArmorProficiency(kind) });
+        },
+        WeaponProficiency(kind) => if let WeaponProficiency(other) = sec.kind {
+            if kind != other { return None; }
+            return Some(Bonus { when, kind: WeaponProficiency(kind) });
+        },
+        MoveDisabled => if let MoveDisabled = sec.kind {
+            return Some(Bonus { when, kind: MoveDisabled });
+        },
+        AttackDisabled => if let AttackDisabled = sec.kind {
+            return Some(Bonus { when, kind: AttackDisabled });
+        },
+        Hidden => if let Hidden = sec.kind {
+            return Some(Bonus { when, kind: Hidden });
+        },
+        GroupUsesPerEncounter { ref group, amount } => {
+            if let GroupUsesPerEncounter { group: ref other_grp, amount: amt } = sec.kind {
+                if group != other_grp { return None; }
+                let group = group.clone();
+                let amount = amount + amt;
+                return Some(Bonus { when, kind: GroupUsesPerEncounter { group, amount }});
+            }
+        },
+        // all of these statements could be easily merged into one macro,
+        // but then it would need to be its own match statement and you would
+        // lose the exhaustiveness check
+        ActionPoints(val) => merge_int_bonus!(ActionPoints, val, sec, when),
+        Armor(val) => merge_int_bonus!(Armor, val, sec, when),
+        Range(val) => merge_int_bonus!(Range, val, sec, when),
+        Reach(val) => merge_int_bonus!(Reach, val, sec, when),
+        Initiative(val) => merge_int_bonus!(Initiative, val, sec, when),
+        HitPoints(val) => merge_int_bonus!(HitPoints, val, sec, when),
+        MeleeAccuracy(val) => merge_int_bonus!(MeleeAccuracy, val, sec, when),
+        RangedAccuracy(val) => merge_int_bonus!(RangedAccuracy, val, sec, when),
+        SpellAccuracy(val) => merge_int_bonus!(SpellAccuracy, val, sec, when),
+        Defense(val) => merge_int_bonus!(Defense, val, sec, when),
+        Fortitude(val) => merge_int_bonus!(Fortitude, val, sec, when),
+        Reflex(val) => merge_int_bonus!(Reflex, val, sec, when),
+        Will(val) => merge_int_bonus!(Will, val, sec, when),
+        Concealment(val) => merge_int_bonus!(Concealment, val, sec, when),
+        ConcealmentIgnore(val) => merge_int_bonus!(ConcealmentIgnore, val, sec, when),
+        CritThreshold(val) => merge_int_bonus!(CritThreshold, val, sec, when),
+        HitThreshold(val) => merge_int_bonus!(HitThreshold, val, sec, when),
+        GrazeThreshold(val) => merge_int_bonus!(GrazeThreshold, val, sec, when),
+        CritMultiplier(val) => merge_int_bonus!(CritMultiplier, val, sec, when),
+        HitMultiplier(val) => merge_int_bonus!(HitMultiplier, val, sec, when),
+        GrazeMultiplier(val) => merge_int_bonus!(GrazeMultiplier, val, sec, when),
+        MovementRate(val) => merge_int_bonus!(MovementRate, val, sec, when),
+        AttackCost(val) => merge_int_bonus!(AttackCost, val, sec, when),
+        FlankingAngle(val) => merge_int_bonus!(FlankingAngle, val, sec, when),
+        CasterLevel(val) => merge_int_bonus!(CasterLevel, val, sec, when),
+    }
+
+    None
+}
+
+
 
 #[derive(Deserialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
@@ -146,6 +330,60 @@ pub struct AttackBonuses {
     pub crit_multiplier: f32,
     pub hit_multiplier: f32,
     pub graze_multiplier: f32,
+}
+
+macro_rules! mod_field {
+    ($field:expr, $pos:ident, $neg:ident) => {
+        if $field > 0 { $field = ($field as f32 * $pos).round() as i32; }
+        else { $field = ($field as f32 * $neg).round() as i32; }
+    }
+}
+
+macro_rules! mod_field_f32 {
+    ($field:expr, $pos:ident, $neg:ident) => {
+        if $field > 0.0 { $field = $field * $pos; }
+        else { $field = $field as f32 * $neg; }
+    }
+}
+
+impl AttackBonuses {
+    pub fn add(&mut self, other: &AttackBonuses) {
+        if let Some(mut damage) = self.damage {
+            if let Some(other) = other.damage {
+                damage.add(other.clone());
+            }
+        } else {
+            if let Some(other) = other.damage {
+                self.damage = Some(other.clone());
+            }
+        }
+
+        self.melee_accuracy += other.melee_accuracy;
+        self.ranged_accuracy += other.ranged_accuracy;
+        self.spell_accuracy += other.spell_accuracy;
+        self.crit_threshold += other.crit_threshold;
+        self.hit_threshold += other.hit_threshold;
+        self.graze_threshold += other.graze_threshold;
+        self.crit_multiplier += other.crit_multiplier;
+        self.hit_multiplier += other.hit_multiplier;
+        self.graze_multiplier += other.graze_multiplier;
+    }
+
+    pub fn apply_modifier(&mut self, neg: f32, pos: f32) {
+        if let Some(mut damage) = self.damage {
+            damage.mult_f32_mut(pos);
+        }
+
+        mod_field!(self.melee_accuracy, pos, neg);
+        mod_field!(self.ranged_accuracy, pos, neg);
+        mod_field!(self.spell_accuracy, pos, neg);
+        mod_field!(self.crit_threshold, pos, neg);
+        mod_field!(self.hit_threshold, pos, neg);
+        mod_field!(self.graze_threshold, pos, neg);
+        mod_field_f32!(self.crit_multiplier, pos, neg);
+        mod_field_f32!(self.hit_multiplier, pos, neg);
+        mod_field_f32!(self.graze_multiplier, pos, neg);
+    }
 }
 
 impl Default for AttackBonuses {

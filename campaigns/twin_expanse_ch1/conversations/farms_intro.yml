@@ -24,9 +24,7 @@ nodes:
         to: start03b
   start03a:
     text: |
-      You are new in town so I'll let that one go.  But don't let it happen again.
-      
-      [c=888|The man addresses the farmer:] Don't forget our arrangement.
+      You are new in town so I'll let that one go.  But you had best learn not to talk to me like that.
     responses:
       - text: "[c=888|Continue]"
         to: start04
@@ -40,7 +38,7 @@ nodes:
     text: |
       [c=888|The man addresses the farmer:] Don't forget our arrangment.
       
-      [c=888|And before you can get in another word, he is off.]
+      [c=888|Before you can get in another word, he is off.]
     on_view:
       - fire_script:
           id: wellswood_farms

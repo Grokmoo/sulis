@@ -1,2 +1,11 @@
 id: fine
 name: Fine
+name_prefix: "Fine "
+value_modifier: 1.5
+bonus_modifier: 1.1
+penalty_modifier: 0.9
+attack_damage_modifier: 1.1
+attack_bonus_modifier: 1.1
+attack_penalty_modifier: 0.9
+bonuses: []
+attack_bonuses: {}

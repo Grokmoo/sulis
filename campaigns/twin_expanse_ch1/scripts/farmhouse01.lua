@@ -1,5 +1,7 @@
 function on_area_load(parent)
   add_min_xp_coins()
+  
+  game:start_conversation("intro", parent)
 end
 
 MIN_COINS = 5000

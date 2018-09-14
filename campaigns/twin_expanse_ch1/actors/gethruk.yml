@@ -1,0 +1,58 @@
+---
+id: "gethruk"
+name: Gethruk
+race: human
+sex: Male
+portrait: portraits/human10
+attributes:
+  str: 18
+  dex: 14
+  end: 16
+  per: 12
+  int: 10
+  wis: 10
+conversation: ~
+faction: Friendly
+images:
+  Beard: creatures/beard04
+  Hair: creatures/hair05
+hue: 0.40000003576278689
+hair_color:
+  r: 0.3294117748737335
+  g: 0.3294117748737335
+  b: 0.3294117748737335
+  a: 1.0
+skin_color:
+  r: 0.9764705896377564
+  g: 0.95686274766922
+  b: 0.7843137383460999
+  a: 1.0
+inventory:
+  equipped:
+    Feet: boots_leather
+    Torso: torso_leather
+    Legs: legs_leather
+    HeldMain: shortsword
+    HeldOff: dagger
+  quick:
+    Usable1: potion_healing
+levels:
+  fighter: 4
+xp: ~
+reward:
+  xp: 50
+  loot: level5_misc
+  loot_chance: 100
+abilities:
+  - armor_light
+  - armor_medium
+  - armor_heavy
+  - weapon_axe
+  - weapon_crossbow
+  - weapon_bow
+  - weapon_small_sword
+  - weapon_large_sword
+  - weapon_spear
+  - weapon_mace
+  - weapon_simple
+ai: ai_basic

@@ -486,6 +486,7 @@ impl TurnManager {
         debug!("Added entity with unique id '{}' at {} to turn timer", entity.borrow().unique_id(), index);
 
         entity.borrow_mut().set_index(index);
+        entity.borrow_mut().actor.init_turn();
         self.listeners.notify(&self);
 
         index

@@ -28,7 +28,7 @@ use sulis_core::config::Config;
 use sulis_core::resource::ResourceSet;
 use sulis_rules::{Attribute, AttackKind, DamageKind, Attack, HitKind};
 use {ActorState, EntityState, GameState, Location, area_feedback_text::ColorKind};
-use {ai, animation::{self}, script::*};
+use {ai, animation::{self}, script::*, MOVE_TO_THRESHOLD};
 
 #[derive(Clone, Debug)]
 pub struct ScriptEntity {
@@ -307,6 +307,15 @@ impl UserData for ScriptEntity {
             }
         });
 
+        methods.add_method("move_towards_point", |_, entity, (x, y, dist):
+                           (f32, f32, Option<f32>)| {
+
+            let parent = entity.try_unwrap()?;
+
+            let dist = dist.unwrap_or(MOVE_TO_THRESHOLD);
+            Ok(GameState::move_towards_point(&parent, Vec::new(), x, y, dist, None))
+        });
+
         methods.add_method("has_ap_to_attack", |_, entity, ()| {
             let parent = entity.try_unwrap()?;
             let result = parent.borrow().actor.has_ap_to_attack();
@@ -451,6 +460,12 @@ impl UserData for ScriptEntity {
 
             let hit_kind = ScriptHitKind { kind: hit_kind, damage };
             Ok(hit_kind)
+        });
+
+        methods.add_method("remove", |_, entity, ()| {
+            let parent = entity.try_unwrap()?;
+            parent.borrow_mut().marked_for_removal = true;
+            Ok(())
         });
 
         methods.add_method("take_damage", |_, entity, (attacker, min_damage, max_damage, damage_kind, ap):

@@ -401,6 +401,13 @@ impl UserData for ScriptInterface {
             Ok(y.atan2(x))
         });
 
+        methods.add_method("create_callback", |_, _, (parent, script):
+                           (ScriptEntity, String)| {
+            let index = parent.try_unwrap_index()?;
+            let cb_data = CallbackData::new_trigger(index, script);
+            Ok(cb_data)
+        });
+
         methods.add_method("set_world_map_location_visible",
                            |_, _, (location, vis): (String, bool)| {
             GameState::set_world_map_location_visible(&location, vis);

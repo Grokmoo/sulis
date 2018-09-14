@@ -1,0 +1,26 @@
+id: intro
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=888|You awaken to the sound of raised voices outside.  Unfamiliar voices - where are your comrades?
+      
+      You have no idea how long you have been asleep - days or even weeks?]
+    responses:
+      - text: |
+          [c=888|Continue]
+        to: start02
+  start02:
+    text: |
+      [c=888|Your mind is full of questions.  Where are you?  And how did you get here?]
+    responses:
+      - text: |
+          [c=888|Continue]
+        to: start03
+  start03:
+    text: |
+      [c=888|You feel your old strength returning as you look about the room.  You had best go and see what is happening outside.]
+    responses:
+      - text: |
+          [c=888|Go]

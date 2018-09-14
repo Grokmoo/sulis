@@ -1,0 +1,49 @@
+id: farms_intro
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=888|As you step outside the door you see a rough looking man holding a large dagger, threatening a farmer.]
+      
+      You will pay if you know what's good for you, hear?
+    responses:
+      - text: "[c=888|Say nothing.]"
+        to: start02
+      - text: "What is going on here?"
+        to: start02
+  start02:
+    text: |
+      Who the hell is this?  You didn't tell me you had guests.  Where are your manners?
+      
+      [c=888|The farmer starts to stammer a response.]
+    responses:
+      - text: "You'll leave him alone if you know what is good for you."
+        to: start03a
+      - text: "This is really none of my business; I'll just be going."
+        to: start03b
+  start03a:
+    text: |
+      You are new in town so I'll let that one go.  But don't let it happen again.
+      
+      [c=888|The man addresses the farmer:] Don't forget our arrangement.
+    responses:
+      - text: "[c=888|Continue]"
+        to: start04
+  start03b:
+    text: |
+      I guess no good deed really does go unpunished, eh?
+    responses:
+      - text: "[c=888|Continue]"
+        to: start04
+  start04:
+    text: |
+      [c=888|The man addresses the farmer:] Don't forget our arrangment.
+      
+      [c=888|And before you can get in another word, he is off.]
+    on_view:
+      - fire_script:
+          id: wellswood_farms
+          func: gethruk_leave_intro
+    responses:
+      - text: End

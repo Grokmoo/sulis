@@ -86,6 +86,7 @@ enum Kind {
                   // slot - this allows creating callbacks after the
                   // consumable items has been used
     Entity,
+    Script(String),
 }
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
@@ -148,6 +149,16 @@ impl CallbackData {
         }
     }
 
+    pub fn new_trigger(parent: usize, script: String) -> CallbackData {
+        CallbackData {
+            parent,
+            effect: None,
+            kind: Kind::Script(script),
+            targets: None,
+            funcs: HashMap::new(),
+        }
+    }
+
     // functions used in setting up the data
 
     pub(crate) fn set_effect(&mut self, index: usize) {
@@ -204,6 +215,9 @@ impl CallbackData {
             Kind::Entity => {
                 GameState::execute_entity_script(&parent, targets, &func);
             },
+            Kind::Script(script) => {
+                GameState::execute_trigger_script(&script, &func, &parent, &parent);
+            }
         }
     }
 
@@ -230,6 +244,9 @@ impl CallbackData {
             Kind::Entity => {
                 GameState::execute_entity_with_attack_data(&parent, targets, hit_kind, damage,
                                                            &func);
+            },
+            Kind::Script(script) => {
+                GameState::execute_trigger_script(&script, &func, &parent, &parent);
             }
         }
     }
@@ -346,6 +363,9 @@ fn compute_surface_targets(effect: Option<usize>, parent: usize, target: Option<
 impl UserData for CallbackData {
     fn add_methods(methods: &mut UserDataMethods<Self>) {
         methods.add_method_mut("add_target", |_, cb, target: ScriptEntity| {
+            if let Kind::Script(_) = cb.kind {
+                warn!("Setting targets on global generated callback will have no effect");
+            }
             cb.create_targets_if_missing();
             let index = target.try_unwrap_index()?;
             if let Some(ref mut cb_targets) = cb.targets {
@@ -355,6 +375,10 @@ impl UserData for CallbackData {
         });
 
         methods.add_method_mut("add_targets", |_, cb, targets: ScriptEntitySet| {
+            if let Kind::Script(_) = cb.kind {
+                warn!("Setting targets on global generated callback will have no effect");
+            }
+
             cb.create_targets_if_missing();
             if let Some(ref mut cb_targets) = cb.targets {
                 cb_targets.append(&targets);
@@ -363,6 +387,10 @@ impl UserData for CallbackData {
         });
 
         methods.add_method_mut("add_selected_point", |_, cb, p: HashMap<String, i32>| {
+            if let Kind::Script(_) = cb.kind {
+                warn!("Setting targets on global generated callback will have no effect");
+            }
+
             cb.create_targets_if_missing();
             let (x, y) = script_entity::unwrap_point(p)?;
             if let Some(ref mut cb_targets) = cb.targets {

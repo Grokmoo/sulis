@@ -9,39 +9,96 @@ generate:
 weighted_entries:
   boots_leather:
     weight: 10
+    adjective1:
+      none: 5
+      worn: 5
   boots_mail:
     weight: 3
+    adjective1:
+      none: 3
+      worn: 7
   boots_plate:
     weight: 1
+    adjective1:
+      none: 1
+      worn: 9
   gloves_leather:
     weight: 10
+    adjective1:
+      none: 5
+      worn: 5
   gloves_mail:
     weight: 3
+    adjective1:
+      none: 3
+      worn: 7
   gloves_plate:
     weight: 1
+    adjective1:
+      none: 1
+      worn: 9
   helm_leather:
     weight: 10
+    adjective1:
+      none: 5
+      worn: 5
   helm_mail:
     weight: 3
+    adjective1:
+      none: 3
+      worn: 7
   helm_plate:
     weight: 1
+    adjective1:
+      none: 1
+      worn: 9
   legs_leather:
     weight: 10
+    adjective1:
+      none: 5
+      worn: 5
   legs_mail:
     weight: 3
+    adjective1:
+      none: 3
+      worn: 7
   legs_plate:
     weight: 1
+    adjective1:
+      none: 1
+      worn: 9
   torso_leather:
     weight: 10
+    adjective1:
+      none: 5
+      worn: 5
   torso_mail:
     weight: 3
+    adjective1:
+      none: 3
+      worn: 7
   torso_plate:
     weight: 1
+    adjective1:
+      none: 1
+      worn: 9
   shield_small:
     weight: 10
-  shield_large:
-    weight: 3
+    adjective1:
+      none: 5
+      worn: 5
   shield_heater:
     weight: 5
+    adjective1:
+      none: 3
+      worn: 7
   shield_kite:
     weight: 5
+    adjective1:
+      none: 3
+      worn: 7
+  shield_large:
+    weight: 3
+    adjective1:
+      none: 1
+      worn: 9

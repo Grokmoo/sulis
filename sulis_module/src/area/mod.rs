@@ -35,7 +35,7 @@ use sulis_core::image::Image;
 use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::util::{Point, Size, unable_to_create_error};
 
-use {Encounter, Item, Module, ObjectSize, OnTrigger, Prop};
+use {Encounter, Module, ObjectSize, OnTrigger, Prop, ItemListEntrySaveState};
 
 pub const MAX_AREA_SIZE: i32 = 128;
 
@@ -74,7 +74,7 @@ pub struct ActorData {
 pub struct PropData {
     pub prop: Rc<Prop>,
     pub location: Point,
-    pub items: Vec<Rc<Item>>,
+    pub items: Vec<ItemListEntrySaveState>,
     pub enabled: bool,
 }
 
@@ -329,7 +329,8 @@ pub struct EncounterDataBuilder {
 pub struct PropDataBuilder {
     pub id: String,
     pub location: Point,
-    pub items: Option<Vec<String>>,
+    #[serde(default)]
+    pub items: Vec<ItemListEntrySaveState>,
     pub enabled: Option<bool>,
 }
 
@@ -341,25 +342,12 @@ pub fn create_prop(builder: &PropDataBuilder, module: &Module) -> Result<PropDat
 
     let location = builder.location;
 
-    let mut items = Vec::new();
-    if let Some(ref builder_items) = builder.items.as_ref() {
-        for item_id in builder_items.iter() {
-            let item = match module.items.get(item_id) {
-                None => {
-                    warn!("No item with ID '{}' found", item_id);
-                    return unable_to_create_error("prop", &builder.id);
-                }, Some(item) => Rc::clone(item),
-            };
-            items.push(item);
-        }
-    }
-
     let enabled = builder.enabled.unwrap_or(true);
 
     Ok(PropData {
         prop,
         location,
-        items,
+        items: builder.items.clone(),
         enabled,
     })
 }

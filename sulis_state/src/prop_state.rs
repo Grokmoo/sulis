@@ -62,8 +62,17 @@ impl fmt::Debug for PropState {
 impl PropState {
     pub(crate) fn new(prop_data: &PropData, location: Location, temporary: bool) -> PropState {
         let mut items = ItemList::new();
-        for item in prop_data.items.iter() {
-            items.add(ItemState::new(Rc::clone(item)));
+        for item_save in prop_data.items.iter() {
+            let quantity = item_save.quantity;
+            let item = &item_save.item;
+            let item = match Module::create_get_item(&item.id, &item.adjectives) {
+                None => {
+                    warn!("Unable to create item '{}' with '{:?}' in prop '{}'",
+                          item_save.item.id, item_save.item.adjectives, prop_data.prop.id);
+                    continue;
+                }, Some(item) => item,
+            };
+            items.add_quantity(quantity, ItemState::new(item));
         }
 
         let mut anim_state = AnimationState::default();

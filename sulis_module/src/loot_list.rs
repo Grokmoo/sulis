@@ -25,9 +25,15 @@ use {Item, Module};
 
 #[derive(Debug)]
 struct Entry {
-    item: Rc<Item>,
+    id: String,
     weight: u32,
     quantity: [u32; 2],
+
+    adjective1_total_weight: u32,
+    adjective1: Vec<(String, u32)>,
+
+    adjective2_total_weight: u32,
+    adjective2: Vec<(String, u32)>,
 }
 
 #[derive(Debug)]
@@ -87,22 +93,48 @@ impl LootList {
 
     fn create_entry(builder_id: &str, module: &Module, id: String,
                     entry_in: EntryBuilder) -> Result<Entry, Error> {
-        let item = match module.items.get(&id) {
-            None => {
-                warn!("Unable to find item '{}'", id);
-                return unable_to_create_error("loot_list", &builder_id);
-            }, Some(item) => Rc::clone(item),
-        };
+        if let None = module.items.get(&id) {
+            warn!("Unable to find item '{}'", id);
+            return unable_to_create_error("loot_list", &builder_id);
+        }
 
         let (min_qty, max_qty) = match entry_in.quantity {
             None => (1, 1),
             Some(qty) => (qty[0], qty[1]),
         };
 
+        let mut adjective1 = Vec::new();
+        let mut adjective1_total_weight = 0;
+        for (id, weight) in entry_in.adjective1 {
+            adjective1_total_weight += weight;
+            if id == "none" { continue; }
+            if let None = module.item_adjectives.get(&id) {
+                warn!("Unable to find item adjective '{}'", id);
+                return unable_to_create_error("loot_list", &builder_id);
+            }
+            adjective1.push((id, weight));
+        }
+
+        let mut adjective2 = Vec::new();
+        let mut adjective2_total_weight = 0;
+        for (id, weight) in entry_in.adjective2 {
+            adjective2_total_weight += weight;
+            if id == "none" { continue; }
+            if let None = module.item_adjectives.get(&id) {
+                warn!("Unable to find item adjective '{}'", id);
+                return unable_to_create_error("loot_list", &builder_id);
+            }
+            adjective2.push((id, weight));
+        }
+
         Ok(Entry {
-            item,
+            id,
             weight: entry_in.weight,
             quantity: [min_qty, max_qty],
+            adjective1,
+            adjective1_total_weight,
+            adjective2,
+            adjective2_total_weight,
         })
     }
 
@@ -136,11 +168,49 @@ impl LootList {
                     rand::thread_rng().gen_range(entry.quantity[0], entry.quantity[1] + 1)
                 };
 
-                items.push((quantity, Rc::clone(&entry.item)));
+                let adjectives = self.gen_adjectives(entry);
+                let item = match Module::create_get_item(&entry.id, &adjectives) {
+                    None => {
+                        warn!("Unable to create item '{}' with '{:?}'", entry.id, adjectives);
+                        continue;
+                    }, Some(item) => item,
+                };
+                items.push((quantity, item));
             }
         }
 
         items
+    }
+
+    fn gen_adjectives(&self, entry: &Entry) -> Vec<String> {
+        let mut result = Vec::new();
+        if entry.adjective1_total_weight > 0 {
+            let roll = rand::thread_rng().gen_range(0, entry.adjective1_total_weight);
+
+            let mut cur_weight = 0;
+            for (id, weight) in entry.adjective1.iter() {
+                cur_weight += weight;
+                if roll < cur_weight {
+                    result.push(id.clone());
+                    break;
+                }
+            }
+        }
+
+        if entry.adjective2_total_weight > 0 {
+            let roll = rand::thread_rng().gen_range(0, entry.adjective2_total_weight);
+
+            let mut cur_weight = 0;
+            for (id, weight) in entry.adjective2.iter() {
+                cur_weight += weight;
+                if roll < cur_weight {
+                    result.push(id.clone());
+                    break;
+                }
+            }
+        }
+
+        result
     }
 
     fn gen_item(&self) -> Option<(u32, Rc<Item>)> {
@@ -155,7 +225,15 @@ impl LootList {
                 } else {
                     rand::thread_rng().gen_range(entry.quantity[0], entry.quantity[1] + 1)
                 };
-                return Some((quantity, Rc::clone(&entry.item)));
+
+                let adjectives = self.gen_adjectives(entry);
+                let item = match Module::create_get_item(&entry.id, &adjectives) {
+                    None => {
+                        warn!("Unable to create item '{}' with '{:?}'", entry.id, adjectives);
+                        continue;
+                    }, Some(item) => item,
+                };
+                return Some((quantity, item));
             }
         }
 
@@ -184,6 +262,10 @@ impl LootList {
 struct EntryBuilder {
     weight: u32,
     quantity: Option<[u32;2]>,
+    #[serde(default)]
+    adjective1: HashMap<String, u32>,
+    #[serde(default)]
+    adjective2: HashMap<String, u32>,
 }
 
 #[derive(Deserialize, Debug)]

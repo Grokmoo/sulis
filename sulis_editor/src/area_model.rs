@@ -629,24 +629,11 @@ impl AreaModel {
                 }, Some(prop) => prop,
             };
 
-            let mut items = Vec::new();
-            if let Some(ref builder_items) = prop_builder.items.as_ref() {
-                for item_id in builder_items.iter() {
-                    let item = match Module::item(item_id) {
-                        None => {
-                            warn!("No item with ID '{}' found", item_id);
-                            continue;
-                        }, Some(item) => item,
-                    };
-                    items.push(item);
-                }
-            }
-
             let prop_data = PropData {
                 prop,
                 enabled: prop_builder.enabled.unwrap_or(true),
                 location: prop_builder.location,
-                items,
+                items: prop_builder.items,
             };
 
             self.props.push(prop_data);
@@ -734,16 +721,11 @@ impl AreaModel {
         trace!("Saving props.");
         let mut props: Vec<PropDataBuilder> = Vec::new();
         for prop_data in self.props.iter() {
-            let mut items = Vec::new();
-            for item in prop_data.items.iter() {
-                items.push(item.id.to_string());
-            }
-
             let builder = PropDataBuilder {
                 id: prop_data.prop.id.to_string(),
                 enabled: Some(prop_data.enabled),
                 location: prop_data.location,
-                items: Some(items),
+                items: prop_data.items.clone(),
             };
             props.push(builder);
         }

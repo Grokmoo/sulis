@@ -29,13 +29,13 @@ skin_color:
   a: 1.0
 inventory:
   equipped:
-    Feet: boots_leather
-    Torso: torso_leather
-    Legs: legs_leather
-    HeldMain: shortsword
-    HeldOff: dagger
+    Feet: { id: boots_leather }
+    Torso: { id: torso_leather }
+    Legs: { id: legs_leather }
+    HeldMain: { id: shortsword }
+    HeldOff: { id: dagger }
   quick:
-    Usable1: potion_healing
+    Usable1: { id: potion_healing }
 levels:
   fighter: 4
 xp: ~

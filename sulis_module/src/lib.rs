@@ -70,6 +70,8 @@ pub use self::image_layer::ImageLayerSet;
 
 pub mod inventory_builder;
 pub use self::inventory_builder::InventoryBuilder;
+pub use self::inventory_builder::ItemSaveState;
+pub use self::inventory_builder::ItemListEntrySaveState;
 
 pub mod item;
 pub use self::item::Item;
@@ -508,6 +510,44 @@ impl Module {
 
     pub fn terrain_kinds() -> Vec<TerrainKind> {
         MODULE.with(|m| m.borrow().terrain_kinds.clone())
+    }
+
+    pub fn create_get_item(id: &str, adjectives: &Vec<String>) -> Option<Rc<Item>> {
+        if adjectives.len() == 0 { return Module::item(id); }
+
+        MODULE.with(|m| {
+            let mut module = m.borrow_mut();
+
+            let mut new_id = String::new();
+            new_id.push_str(id);
+            new_id.push_str("__ADJ__");
+            for adj in adjectives.iter() {
+                new_id.push_str(&adj);
+            }
+
+            if let Some(ref item) = module.items.get(&new_id) {
+                return Some(Rc::clone(item));
+            }
+
+            let base_item = match module.items.get(id) {
+                None => return None,
+                Some(ref item) => Rc::clone(item),
+            };
+
+            let mut adjs = Vec::new();
+            for adj_id in adjectives.iter() {
+                let adjective = match module.item_adjectives.get(adj_id) {
+                    None => return None,
+                    Some(ref adj) => Rc::clone(adj),
+                };
+                adjs.push(adjective);
+            }
+
+            let item = Rc::new(Item::clone_with_adjectives(&base_item, adjs, new_id.clone()));
+
+            module.items.insert(new_id, Rc::clone(&item));
+            Some(item)
+        })
     }
 
     getters!(

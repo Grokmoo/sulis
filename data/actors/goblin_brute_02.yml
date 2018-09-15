@@ -14,10 +14,10 @@ levels:
   fighter: 4
 inventory:
   equipped:
-    HeldMain: hatchet
-    Torso: torso_leather
+    HeldMain: { id: hatchet }
+    Torso: { id: torso_leather }
   quick:
-    Usable1: potion_power
+    Usable1: { id: potion_power }
 reward:
   xp: 15
   loot: level1_misc

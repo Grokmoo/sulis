@@ -22,9 +22,9 @@ use std::collections::HashMap;
 
 use sulis_core::util::{Point, ExtInt};
 use sulis_rules::{QuickSlot, Slot, BonusList};
-use sulis_module::{actor::{ActorBuilder, RewardBuilder}};
+use sulis_module::{actor::{ActorBuilder, RewardBuilder}, ItemSaveState, ItemListEntrySaveState};
 
-use {ActorState, effect, Effect, EntityState, Formation, GameState, ItemState, Location,
+use {ActorState, effect, Effect, EntityState, Formation, GameState, Location,
     PropState, prop_state::Interactive, Merchant, WorldMapState};
 use area_state::{TriggerState};
 use script::CallbackData;
@@ -253,7 +253,8 @@ impl PropSaveState {
                     Some(ref loot_list) => Some(loot_list.id.to_string()),
                 };
 
-                let items = items.iter().map(|(qty, ref it)| ItemListEntrySaveState::new(*qty, it)).collect();
+                let items = items.iter().map(|(qty, ref it)|
+                    ItemListEntrySaveState::new(*qty, &it.item)).collect();
 
                 Container {
                     loot_to_generate,
@@ -292,36 +293,6 @@ pub enum PropInteractiveSaveState {
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
-pub struct ItemListEntrySaveState {
-    pub(crate) quantity: u32,
-    pub(crate) item: ItemSaveState,
-}
-
-impl ItemListEntrySaveState {
-    pub(crate) fn new(quantity: u32, item_state: &ItemState) -> ItemListEntrySaveState {
-        ItemListEntrySaveState {
-            quantity,
-            item: ItemSaveState { id: item_state.item.id.to_string() },
-        }
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-#[serde(deny_unknown_fields)]
-pub struct ItemSaveState {
-    pub(crate) id: String,
-}
-
-impl ItemSaveState {
-    fn new(item: &ItemState) -> ItemSaveState {
-        ItemSaveState {
-            id: item.item.id.clone(),
-        }
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-#[serde(deny_unknown_fields)]
 pub struct TriggerSaveState {
     pub(crate) fired: bool,
     pub(crate) enabled: bool,
@@ -347,7 +318,8 @@ pub struct MerchantSaveState {
 
 impl MerchantSaveState {
     pub fn new(merchant: &Merchant) -> MerchantSaveState {
-        let items = merchant.items().iter().map(|(q, ref it)| ItemListEntrySaveState::new(*q, it)).collect();
+        let items = merchant.items().iter().map(|(q, ref it)|
+            ItemListEntrySaveState::new(*q, &it.item)).collect();
 
         MerchantSaveState {
             id: merchant.id.to_string(),
@@ -482,7 +454,7 @@ impl ActorSaveState {
         let mut equipped = Vec::new();
         for slot in Slot::iter() {
             if let Some(item) = actor_state.inventory().equipped(*slot) {
-                equipped.push(Some(ItemSaveState::new(item)));
+                equipped.push(Some(ItemSaveState::new(&item.item)));
             } else {
                 equipped.push(None);
             }
@@ -491,7 +463,7 @@ impl ActorSaveState {
         let mut quick = Vec::new();
         for quick_slot in QuickSlot::iter() {
             if let Some(item) = actor_state.inventory().quick(*quick_slot) {
-                quick.push(Some(ItemSaveState::new(item)));
+                quick.push(Some(ItemSaveState::new(&item.item)));
             } else {
                 quick.push(None);
             }

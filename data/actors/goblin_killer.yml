@@ -14,9 +14,9 @@ levels:
   fighter: 10
 inventory:
   equipped:
-    HeldMain: greataxe
+    HeldMain: { id: greataxe }
   quick:
-    Usable1: potion_healing
+    Usable1: { id: potion_healing }
 reward:
   xp: 50
   loot: level5_misc

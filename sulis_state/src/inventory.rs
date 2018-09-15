@@ -22,9 +22,8 @@ use std::collections::HashMap;
 use sulis_core::image::Image;
 use sulis_core::util::invalid_data_error;
 use sulis_rules::{StatList, Slot, ItemKind, WeaponStyle, bonus::AttackKindBuilder, QuickSlot};
-use sulis_module::{Actor, ImageLayer, Module};
+use sulis_module::{Actor, ImageLayer, Module, ItemSaveState};
 use {ItemState};
-use save_state::{ItemSaveState};
 
 #[derive(Clone)]
 pub struct Inventory {
@@ -51,7 +50,7 @@ impl Inventory {
                 Some(item) => item,
             };
 
-            let item_state = match Module::item(&item.id) {
+            let item_state = match Module::create_get_item(&item.id, &item.adjectives) {
                 None => invalid_data_error(&format!("No item with ID '{}'", item.id)),
                 Some(item) => Ok(ItemState::new(item)),
             }?;
@@ -89,7 +88,7 @@ impl Inventory {
                 Some(item) => item,
             };
 
-            let item_state = match Module::item(&item.id) {
+            let item_state = match Module::create_get_item(&item.id, &item.adjectives) {
                 None => invalid_data_error(&format!("No item with ID '{}'", item.id)),
                 Some(item) => Ok(ItemState::new(item)),
             }?;

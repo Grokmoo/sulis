@@ -14,9 +14,9 @@ levels:
   fighter: 10
 inventory:
   equipped:
-    HeldMain: shortsword
-    HeldOff: shield_large
-    Torso: torso_plate
+    HeldMain: { id: shortsword }
+    HeldOff: { id: shield_large }
+    Torso: { id: torso_plate }
 reward:
   xp: 50
   loot: level5_misc

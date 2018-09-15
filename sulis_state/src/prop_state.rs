@@ -109,7 +109,8 @@ impl PropState {
             PropInteractiveSaveState::Container { loot_to_generate, temporary, items } => {
                 let mut item_list = ItemList::new();
                 for item_save_state in items {
-                    let item = match Module::item(&item_save_state.item.id) {
+                    let item = &item_save_state.item;
+                    let item = match Module::create_get_item(&item.id, &item.adjectives) {
                         None => invalid_data_error(&format!("No item with ID '{}'",
                                                             item_save_state.item.id)),
                         Some(item) => Ok(item),

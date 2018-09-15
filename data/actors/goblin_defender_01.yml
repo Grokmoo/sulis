@@ -14,9 +14,9 @@ levels:
   fighter: 4
 inventory:
   equipped:
-    HeldMain: mace
-    HeldOff: shield_small
-    Torso: torso_mail
+    HeldMain: { id: mace }
+    HeldOff: { id: shield_small }
+    Torso: { id: torso_mail }
 reward:
   xp: 15
   loot: level1_misc

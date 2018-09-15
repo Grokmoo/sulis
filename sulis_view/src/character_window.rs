@@ -28,7 +28,7 @@ use sulis_core::util::ExtInt;
 use sulis_core::ui::{Callback, Widget, WidgetKind, WidgetState};
 use sulis_rules::{Attribute, DamageKind, Slot, QuickSlot};
 use sulis_widgets::{Button, Label, TextArea, ScrollPane};
-use sulis_module::{ActorBuilder, Module, InventoryBuilder};
+use sulis_module::{ActorBuilder, Module, InventoryBuilder, ItemSaveState, ItemListEntrySaveState};
 use sulis_state::{ActorState, Effect, GameState, ChangeListener, EntityState};
 
 use CharacterBuilder;
@@ -155,17 +155,17 @@ pub fn get_inventory(pc: &ActorState) -> InventoryBuilder {
     let coins = GameState::party_coins();
 
     let stash = GameState::party_stash();
-    let items = stash.borrow().items().iter().map(|(qty, item)| (*qty, item.item.id.to_string()))
-        .collect();
+    let items = stash.borrow().items().iter().map(|(qty, item)|
+        ItemListEntrySaveState::new(*qty, &item.item)).collect();
 
     let equipped = Slot::iter().map(|slot| (*slot, pc.inventory().equipped(*slot)))
         .filter(|(_, item)| item.is_some())
-        .map(|(slot, item)| (slot, item.unwrap().item.id.to_string()))
+        .map(|(slot, item)| (slot, ItemSaveState::new(&item.unwrap().item)))
         .collect();
 
     let quick = QuickSlot::iter().map(|slot| (*slot, pc.inventory().quick(*slot)))
         .filter(|(_, item)| item.is_some())
-        .map(|(slot, item)| (slot, item.unwrap().item.id.to_string()))
+        .map(|(slot, item)| (slot, ItemSaveState::new(&item.unwrap().item)))
         .collect();
 
     InventoryBuilder::new(equipped, quick, coins, items)

@@ -30,14 +30,14 @@ skin_color:
   a: 1
 inventory:
   equipped:
-    HeldMain: battleaxe
-    HeldOff: shield_small
-    Feet: boots_leather
-    Torso: torso_mail
-    Legs: legs_mail
-    Hands: gloves_mail
+    HeldMain: { id: battleaxe }
+    HeldOff: { id: shield_small }
+    Feet: { id: boots_leather }
+    Torso: { id: torso_mail }
+    Legs: { id: legs_mail }
+    Hands: { id: gloves_mail }
   quick:
-    Usable1: potion_healing
+    Usable1: { id: potion_healing }
 xp: 600
 levels:
   fighter: 4

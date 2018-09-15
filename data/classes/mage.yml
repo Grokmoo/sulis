@@ -143,13 +143,13 @@ kits:
       wis: 12
     starting_inventory:
       equipped:
-        HeldMain: quarterstaff
-        Feet: boots_leather
-        Torso: torso_shirt
-        Legs: legs_pants
+        HeldMain: { id: quarterstaff }
+        Feet: { id: boots_leather }
+        Torso: { id: torso_shirt }
+        Legs: { id: legs_pants }
       quick:
-        Usable1: potion_healing
-        Usable2: potion_mind
+        Usable1: { id: potion_healing }
+        Usable2: { id: potion_mind }
       pc_starting_coins: 600
     description: |
       A mage with the capability to cast a variety of spells from the circles of magic.

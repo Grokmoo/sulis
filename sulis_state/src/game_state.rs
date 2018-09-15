@@ -193,7 +193,8 @@ impl GameState {
 
             let mut stash = ItemList::new();
             for item_save in save_state.stash {
-                let item = match Module::item(&item_save.item.id) {
+                let item = &item_save.item;
+                let item = match Module::create_get_item(&item.id, &item.adjectives) {
                     None => invalid_data_error(&format!("No item with ID '{}'", item_save.item.id)),
                     Some(item) => Ok(item),
                 }?;

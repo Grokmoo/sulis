@@ -28,10 +28,10 @@ skin_color:
   a: 1.0
 inventory:
   equipped:
-    Feet: boots_leather
-    Torso: torso_leather
-    Legs: legs_pants
-    Cloak: cloak
+    Feet: { id: boots_leather }
+    Torso: { id: torso_leather }
+    Legs: { id: legs_pants }
+    Cloak: { id: cloak }
 levels:
   fighter: 1
 xp: ~

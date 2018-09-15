@@ -14,9 +14,9 @@ levels:
   fighter: 4
 inventory:
   equipped:
-    HeldMain: mace
+    HeldMain: { id: mace }
   quick:
-    Usable1: potion_healing
+    Usable1: { id: potion_healing }
 reward:
   xp: 15
   loot: level1_misc

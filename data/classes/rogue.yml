@@ -126,15 +126,15 @@ kits:
       wis: 10
     starting_inventory:
       equipped:
-        HeldMain: shortsword
-        Feet: boots_leather
-        Torso: torso_leather
-        Legs: legs_leather
-        Hands: gloves_leather
+        HeldMain: { id: shortsword }
+        Feet: { id: boots_leather }
+        Torso: { id: torso_leather }
+        Legs: { id: legs_leather }
+        Hands: { id: gloves_leather }
       quick:
-        Usable1: potion_healing
-        Usable2: potion_power
-        Usable3: potion_mind
+        Usable1: { id: potion_healing }
+        Usable2: { id: potion_power }
+        Usable3: { id: potion_mind }
       pc_starting_coins: 300
     description: |
       Not afraid to get their hands dirty on the front lines, the Swashbuckler will use every trick in the book to keep themselves out of harm's way and their enemies in it.  They can be very effective, but are also vulnerable to being overwhelmed.
@@ -148,16 +148,16 @@ kits:
       wis: 10
     starting_inventory:
       equipped:
-        HeldMain: crossbow
-        Feet: boots_leather
-        Torso: torso_leather
-        Legs: legs_pants
-        Hands: gloves_leather
+        HeldMain: { id: crossbow }
+        Feet: { id: boots_leather }
+        Torso: { id: torso_leather }
+        Legs: { id: legs_pants }
+        Hands: { id: gloves_leather }
       quick:
-        Usable1: potion_healing
-        Usable2: potion_power
-        Usable3: potion_mind
-        AltHeldMain: dagger
+        Usable1: { id: potion_healing }
+        Usable2: { id: potion_power }
+        Usable3: { id: potion_mind }
+        AltHeldMain: { id: dagger }
       pc_starting_coins: 300
     description: |
       An expert in locks, traps, and all things mechanical thanks to keen senses and intellect.  Prefers to keep out of harms way in combat, using precise ranged strikes.
@@ -171,17 +171,17 @@ kits:
       wis: 12
     starting_inventory:
       equipped:
-        HeldMain: dagger
-        Feet: boots_leather
-        Torso: torso_leather
-        Legs: legs_leather
-        Hands: gloves_leather
-        Cloak: cloak
+        HeldMain: { id: dagger }
+        Feet: { id: boots_leather }
+        Torso: { id: torso_leather }
+        Legs: { id: legs_leather }
+        Hands: { id: gloves_leather }
+        Cloak: { id: cloak }
       quick:
-        Usable1: potion_healing
-        Usable2: potion_power
-        Usable3: potion_mind
-        AltHeldMain: dagger
+        Usable1: { id: potion_healing }
+        Usable2: { id: potion_power }
+        Usable3: { id: potion_mind }
+        AltHeldMain: { id: dagger }
       pc_starting_coins: 400
     description: |
       Striking from the shadows when least expected, Assassins can bring down the most dangerous targets in seconds, ideally giving their prey no time to react.  They can be quickly brought down themselves, though, if caught out in the open.

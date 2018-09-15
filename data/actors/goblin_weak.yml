@@ -15,7 +15,7 @@ levels:
   rogue: 1
 inventory:
   equipped:
-    HeldMain: weak_dagger
+    HeldMain: { id: weak_dagger }
 reward:
   xp: 8
   loot: level1_misc

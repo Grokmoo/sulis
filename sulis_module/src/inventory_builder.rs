@@ -20,16 +20,51 @@ use std::collections::HashMap;
 use sulis_rules::{Slot, QuickSlot};
 use {Item, Module};
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct ItemListEntrySaveState {
+    pub quantity: u32,
+    pub item: ItemSaveState,
+}
+
+impl ItemListEntrySaveState {
+    pub fn new(quantity: u32, item: &Rc<Item>) -> ItemListEntrySaveState {
+        ItemListEntrySaveState {
+            quantity,
+            item: ItemSaveState::new(item),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct ItemSaveState {
+    pub id: String,
+    #[serde(default)]
+    pub adjectives: Vec<String>,
+}
+
+impl ItemSaveState {
+    pub fn new(item: &Rc<Item>) -> ItemSaveState {
+        let adjectives = item.added_adjectives.iter().map(|adj| adj.id.clone()).collect();
+
+        ItemSaveState {
+            id: item.original_id.clone(),
+            adjectives,
+        }
+    }
+}
+
 #[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(deny_unknown_fields, default)]
 pub struct InventoryBuilder {
-    equipped: HashMap<Slot, String>,
-    quick: HashMap<QuickSlot, String>,
+    equipped: HashMap<Slot, ItemSaveState>,
+    quick: HashMap<QuickSlot, ItemSaveState>,
 
     #[serde(default)]
     pc_starting_coins: i32,
     #[serde(default)]
-    pc_starting_items: Vec<(u32, String)>,
+    pc_starting_items: Vec<ItemListEntrySaveState>,
 }
 
 fn equippable_to(item: &Rc<Item>, item_id: &str, slot: Slot) -> bool {
@@ -53,8 +88,10 @@ fn equippable_to(item: &Rc<Item>, item_id: &str, slot: Slot) -> bool {
 }
 
 impl InventoryBuilder {
-    pub fn new(equipped: HashMap<Slot, String>, quick: HashMap<QuickSlot, String>,
-               pc_starting_coins: i32, pc_starting_items: Vec<(u32, String)>) -> InventoryBuilder {
+    pub fn new(equipped: HashMap<Slot, ItemSaveState>,
+               quick: HashMap<QuickSlot, ItemSaveState>,
+               pc_starting_coins: i32,
+               pc_starting_items: Vec<ItemListEntrySaveState>) -> InventoryBuilder {
         InventoryBuilder {
             equipped,
             quick,
@@ -71,12 +108,15 @@ impl InventoryBuilder {
 
     /// Iterates over the items in this inventory, validating that they exist
     pub fn pc_starting_item_iter<'a>(&'a self) -> impl Iterator<Item=(u32, Rc<Item>)> + 'a {
-        self.pc_starting_items.iter().filter_map(|(qty, item_id)| {
-            match Module::item(item_id) {
+        self.pc_starting_items.iter().filter_map(|entry| {
+            let qty = entry.quantity;
+            let item = &entry.item;
+            match Module::create_get_item(&item.id, &item.adjectives) {
                 None => {
-                    warn!("Item with id '{}' not found for inventory item", item_id);
+                    warn!("Item '{}' with adjectives '{:?}' not found in inventory",
+                          item.id, item.adjectives);
                     None
-                }, Some(item) => Some((*qty, item)),
+                }, Some(item) => Some((qty, item)),
             }
         })
     }
@@ -85,16 +125,17 @@ impl InventoryBuilder {
     /// Validates as much as possible that items are valid for the specified slots,
     /// but cannot do validations that depend on the actor.
     pub fn equipped_iter<'a>(&'a self) -> impl Iterator<Item=(Slot, Rc<Item>)> + 'a {
-        self.equipped.iter().filter_map(|(slot, item_id)| {
+        self.equipped.iter().filter_map(|(slot, item_save)| {
             let slot = *slot;
-            let item = match Module::item(item_id) {
+            let item = match Module::create_get_item(&item_save.id, &item_save.adjectives) {
                 None => {
-                    warn!("Item with id '{}' not found in equipped for inventory", item_id);
+                    warn!("Item '{}' with adjectives '{:?}' not found in equipped",
+                          item_save.id, item_save.adjectives);
                     return None;
                 }, Some(item) => item,
             };
 
-            if !equippable_to(&item, item_id, slot) { return None; }
+            if !equippable_to(&item, &item_save.id, slot) { return None; }
 
             Some((slot, item))
         })
@@ -104,11 +145,12 @@ impl InventoryBuilder {
     /// Validates as much as possible that the items are valid for the slots, but cannot do
     /// any validation that also depends on the actor.
     pub fn quick_iter<'a>(&'a self) -> impl Iterator<Item=(QuickSlot, Rc<Item>)> + 'a {
-        self.quick.iter().filter_map(|(slot, item_id)| {
+        self.quick.iter().filter_map(|(slot, item_save)| {
             let slot = *slot;
-            let item = match Module::item(item_id) {
+            let item = match Module::create_get_item(&item_save.id, &item_save.adjectives) {
                 None => {
-                    warn!("Item with id '{}' not found in quick for inventory", item_id);
+                    warn!("Item '{}' with adjectives '{:?}' not found in quick",
+                          item_save.id, item_save.adjectives);
                     return None;
                 }, Some(item) => item,
             };
@@ -116,10 +158,10 @@ impl InventoryBuilder {
             use sulis_rules::QuickSlot::*;
             match slot {
                 AltHeldMain => {
-                    if !equippable_to(&item, item_id, Slot::HeldMain) { return None; }
+                    if !equippable_to(&item, &item_save.id, Slot::HeldMain) { return None; }
                 },
                 AltHeldOff => {
-                    if !equippable_to(&item, item_id, Slot::HeldOff) { return None; }
+                    if !equippable_to(&item, &item_save.id, Slot::HeldOff) { return None; }
                 },
                 Usable1 | Usable2 | Usable3 | Usable4 => {
                     if item.usable.is_none() { return None; }

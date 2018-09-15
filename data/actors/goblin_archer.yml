@@ -15,9 +15,9 @@ levels:
   rogue: 3
 inventory:
   equipped:
-    HeldMain: shortbow
+    HeldMain: { id: shortbow }
   quick:
-    AltHeldMain: dagger
+    AltHeldMain: { id: dagger }
 reward:
   xp: 10
   loot: level1_misc

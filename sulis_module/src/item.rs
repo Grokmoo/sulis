@@ -61,6 +61,7 @@ pub struct Item {
     pub usable: Option<Usable>,
 
     // original values from before any adjectives are applied
+    pub original_id: String,
     original_value: i32,
     original_equippable: Option<Equippable>,
 
@@ -70,7 +71,7 @@ pub struct Item {
 
     // adjectives that were not in the item builder but were created
     // dynamically
-    added_adjectives: Vec<Rc<ItemAdjective>>,
+    pub added_adjectives: Vec<Rc<ItemAdjective>>,
 }
 
 fn build_hash_map(id: &str, input: Option<HashMap<ImageLayer, String>>)
@@ -95,7 +96,10 @@ fn build_hash_map(id: &str, input: Option<HashMap<ImageLayer, String>>)
 }
 
 impl Item {
-    pub fn clone_with_adjectives(item: &Rc<Item>, mut adjectives: Vec<Rc<ItemAdjective>>) -> Item {
+    pub fn clone_with_adjectives(item: &Rc<Item>, mut adjectives: Vec<Rc<ItemAdjective>>,
+                                 new_id: String) -> Item {
+        assert!(adjectives.len() > 0);
+
         let mut added_adjectives = item.added_adjectives.clone();
         added_adjectives.append(&mut adjectives);
 
@@ -119,7 +123,7 @@ impl Item {
         }
 
         Item {
-            id: item.id.clone(),
+            id: new_id,
             icon: Rc::clone(&item.icon),
             image: item.image.clone(),
             kind: item.kind,
@@ -130,6 +134,7 @@ impl Item {
             weight: item.weight,
             usable: item.usable.clone(),
             prereqs: item.prereqs.clone(),
+            original_id: item.original_id.clone(),
             original_value: item.original_value,
             original_equippable: item.original_equippable.clone(),
             builder_adjectives: item.builder_adjectives.clone(),
@@ -199,7 +204,7 @@ impl Item {
         let (equippable, value) = apply_adjectives(&builder.equippable, builder.value as i32, &adjectives);
 
         Ok(Item {
-            id: builder.id,
+            id: builder.id.clone(),
             icon: icon,
             image: images,
             kind: builder.kind.unwrap_or(ItemKind::Other),
@@ -210,6 +215,7 @@ impl Item {
             weight: builder.weight as i32,
             usable,
             prereqs,
+            original_id: builder.id,
             original_value: builder.value as i32,
             original_equippable: builder.equippable,
             builder_adjectives: adjectives,

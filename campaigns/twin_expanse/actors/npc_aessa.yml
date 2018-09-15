@@ -29,14 +29,14 @@ skin_color:
   a: 1
 inventory:
   equipped:
-    HeldMain: quarterstaff
-    Feet: boots_leather
-    Torso: torso_shirt
-    Legs: legs_pants
-    Cloak: cloak
+    HeldMain: { id: quarterstaff }
+    Feet: { id: boots_leather }
+    Torso: { id: torso_shirt }
+    Legs: { id: legs_pants }
+    Cloak: { id: cloak }
   quick:
-    Usable1: potion_healing
-    AltHeldMain: crossbow
+    Usable1: { id: potion_healing }
+    AltHeldMain: { id: crossbow }
 xp: 120
 levels:
   mage: 2

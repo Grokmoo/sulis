@@ -114,15 +114,16 @@ kits:
       wis: 10
     starting_inventory:
       equipped:
-        HeldMain: battleaxe
-        Feet: boots_leather
-        Torso: torso_leather
-        Legs: legs_pants
+        HeldMain: { id: battleaxe }
+        Feet: { id: boots_leather }
+        Torso: { id: torso_leather }
+        Legs: { id: legs_pants }
       quick:
-        Usable1: potion_healing
-        Usable2: potion_power
+        Usable1: { id: potion_healing }
+        Usable2: { id: potion_power }
       pc_starting_items:
-        - [ 1, potion_power]
+       - quantity: 1
+         item: { id: potion_power }
       pc_starting_coins: 200
     description: |
       A battle hardened warrior who prefers large weapons and close quarters combat.  They can deal out tremendous damage to any foes who dare to enter the melee.
@@ -136,16 +137,17 @@ kits:
       wis: 10
     starting_inventory:
       equipped:
-        HeldMain: shortbow
-        Feet: boots_leather
-        Torso: torso_leather
-        Legs: legs_pants
+        HeldMain: { id: shortbow }
+        Feet: { id: boots_leather }
+        Torso: { id: torso_leather }
+        Legs: { id: legs_pants }
       quick:
-        Usable1: potion_healing
-        Usable2: potion_power
-        AltHeldMain: dagger
+        Usable1: { id: potion_healing }
+        Usable2: { id: potion_power }
+        AltHeldMain: { id: dagger }
       pc_starting_items:
-        - [ 1, potion_power]
+        - quantity: 1
+          item: { id: potion_power }
       pc_starting_coins: 200
     description: |
       An expert with ranged weapons, who prefers to keep their distance from enemies where possible, using their skills to take down the most dangerous targets from afar.
@@ -159,17 +161,18 @@ kits:
       wis: 10
     starting_inventory:
       equipped:
-        HeldMain: shortsword
-        HeldOff: shield_small
-        Feet: boots_leather
-        Torso: torso_leather
-        Legs: legs_leather
-        Hands: gloves_leather
+        HeldMain: { id: shortsword }
+        HeldOff: { id: shield_small }
+        Feet: { id: boots_leather }
+        Torso: { id: torso_leather }
+        Legs: { id: legs_leather }
+        Hands: { id: gloves_leather }
       quick:
-        Usable1: potion_healing
-        Usable2: potion_power
+        Usable1: { id: potion_healing }
+        Usable2: { id: potion_power }
       pc_starting_items:
-        - [ 1, potion_power]
+        - quantity: 1
+          item: { id: potion_power }
       pc_starting_coins: 100
     description: |
       A fighter who will typically use heavy armor and a large shield.  While certainly capable of dishing out punishment, their primary role on the battlefield is often to protect their compatriots.

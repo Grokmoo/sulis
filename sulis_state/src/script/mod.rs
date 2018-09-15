@@ -606,29 +606,16 @@ impl UserData for ScriptInterface {
         });
 
         methods.add_method("add_party_item", |_, _, (item, adj): (String, Option<String>)| {
+            let adjectives: Vec<_> = adj.into_iter().collect();
+
             let stash = GameState::party_stash();
-            let item = match Module::item(&item) {
+            let item = match Module::create_get_item(&item, &adjectives) {
                 None => return Err(rlua::Error::FromLuaConversionError {
                     from: "String",
                     to: "Item",
                     message: Some(format!("Item '{}' does not exist", item)),
                 }),
                 Some(item) => item,
-            };
-
-            let item = if let Some(adj) = adj {
-                let adj = match Module::item_adjective(&adj) {
-                    None => return Err(rlua::Error::FromLuaConversionError {
-                        from: "String",
-                        to: "ItemAdjective",
-                        message: Some(format!("ItemAdjective '{}' does not exist", adj)),
-                    }),
-                    Some(adj) => adj,
-                };
-                // TODO the module needs to handle this so it can be cached
-                Rc::new(Item::clone_with_adjectives(&item, vec![adj]))
-            } else {
-                item
             };
 
             let item_state = ItemState::new(item);

@@ -15,9 +15,8 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 
-use sulis_module::Module;
-use {ChangeListenerList, GameState, ItemList, ItemState,
-    save_state::ItemListEntrySaveState};
+use sulis_module::{Module, ItemListEntrySaveState};
+use {ChangeListenerList, GameState, ItemList, ItemState};
 
 pub struct PartyStash {
     items: ItemList,
@@ -36,7 +35,7 @@ impl PartyStash {
     }
 
     pub(crate) fn save(&self) -> Vec<ItemListEntrySaveState> {
-        self.items.iter().map(|(q, ref i)| ItemListEntrySaveState::new(*q, i)).collect()
+        self.items.iter().map(|(q, ref i)| ItemListEntrySaveState::new(*q, &i.item)).collect()
     }
 
     pub fn items(&self) -> &ItemList {

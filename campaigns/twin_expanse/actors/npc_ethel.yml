@@ -29,13 +29,13 @@ skin_color:
   a: 1.0
 inventory:
   equipped:
-    HeldMain: shortbow
-    Feet: boots_leather
-    Torso: torso_leather
-    Legs: legs_leather
+    HeldMain: { id: shortbow }
+    Feet: { id: boots_leather }
+    Torso: { id: torso_leather }
+    Legs: { id: legs_leather }
   quick:
-    Usable1: potion_healing
-    AltHeldMain: shortbow
+    Usable1: { id: potion_healing }
+    AltHeldMain: { id: shortbow }
 xp: 300
 levels:
   fighter: 3

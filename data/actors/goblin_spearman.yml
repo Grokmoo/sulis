@@ -15,7 +15,7 @@ levels:
   rogue: 3
 inventory:
   equipped:
-    HeldMain: shortspear
+    HeldMain: { id: shortspear }
 reward:
   xp: 10
   loot: level1_misc

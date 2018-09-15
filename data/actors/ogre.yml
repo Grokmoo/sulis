@@ -15,7 +15,7 @@ levels:
   fighter: 5
 inventory:
   equipped:
-    HeldMain: battleaxe
+    HeldMain: { id: battleaxe }
 reward:
   xp: 50
   loot: level5_misc

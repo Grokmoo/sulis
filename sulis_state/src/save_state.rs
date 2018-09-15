@@ -25,7 +25,7 @@ use sulis_rules::{QuickSlot, Slot, BonusList};
 use sulis_module::{actor::{ActorBuilder, RewardBuilder}, ItemSaveState, ItemListEntrySaveState};
 
 use {ActorState, effect, Effect, EntityState, Formation, GameState, Location,
-    PropState, prop_state::Interactive, Merchant, WorldMapState};
+    PropState, prop_state::Interactive, Merchant, WorldMapState, QuestState};
 use area_state::{TriggerState};
 use script::CallbackData;
 use animation::AnimSaveState;
@@ -43,6 +43,7 @@ pub struct SaveState {
     pub(crate) zoom: f32,
     pub(crate) current_area: String,
     pub(crate) world_map: WorldMapState,
+    pub(crate) quests: Vec<QuestState>,
     pub(crate) areas: HashMap<String, AreaSaveState>,
     pub(crate) manager: ManagerSaveState,
     pub(crate) anims: Vec<AnimSaveState>,
@@ -77,6 +78,11 @@ impl SaveState {
         let stash = GameState::party_stash();
         let stash = stash.borrow().save();
 
+        let mut quests = Vec::new();
+        for (_, quest_state) in GameState::quest_state().into_iter() {
+            quests.push(quest_state);
+        }
+
         SaveState {
             areas,
             current_area,
@@ -89,6 +95,7 @@ impl SaveState {
             manager: ManagerSaveState::new(),
             anims: GameState::save_anims(),
             world_map: GameState::world_map(),
+            quests,
         }
     }
 

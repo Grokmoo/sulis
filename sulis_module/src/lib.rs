@@ -94,6 +94,9 @@ pub use self::prereq_list::PrereqListBuilder;
 pub mod prop;
 pub use self::prop::Prop;
 
+pub mod quest;
+pub use self::quest::Quest;
+
 pub mod race;
 pub use self::race::Race;
 
@@ -151,6 +154,7 @@ pub struct Module {
     item_adjectives: HashMap<String, Rc<ItemAdjective>>,
     loot_lists: HashMap<String, Rc<LootList>>,
     props: HashMap<String, Rc<Prop>>,
+    quests: HashMap<String, Rc<Quest>>,
     races: HashMap<String, Rc<Race>>,
     sizes: HashMap<String, Rc<ObjectSize>>,
     tiles: HashMap<String, Rc<Tile>>,
@@ -369,6 +373,7 @@ impl Module {
             module.items.clear();
             module.item_adjectives.clear();
             module.loot_lists.clear();
+            module.quests.clear();
             module.props.clear();
             module.races.clear();
             module.sizes.clear();
@@ -384,6 +389,12 @@ impl Module {
                 trace!("Inserting resource of type item_adjective with key {} \
                     into resource set.", id);
                 module.item_adjectives.insert(id, Rc::new(adj));
+            }
+
+            for (id, quest) in builder_set.quests {
+                trace!("Inserting resource of type quest with key {} \
+                    into module.", id);
+                module.quests.insert(id, Rc::new(quest));
             }
 
             for (id, builder) in builder_set.size_builders {
@@ -564,6 +575,7 @@ impl Module {
         item_adjective, item_adjectives, ItemAdjective;
         loot_list, loot_lists, LootList;
         object_size, sizes, ObjectSize;
+        quest, quests, Quest;
         prop, props, Prop;
         race, races, Race;
         tile, tiles, Tile
@@ -599,6 +611,10 @@ impl Module {
         MODULE.with(|r| all_resources(&r.borrow().props))
     }
 
+    pub fn all_quests() -> Vec<Rc<Quest>> {
+        MODULE.with(|r| all_resources(&r.borrow().quests))
+    }
+
     pub fn all_races() -> Vec<Rc<Race>> {
         MODULE.with(|r| all_resources(&r.borrow().races))
     }
@@ -625,6 +641,7 @@ impl Default for Module {
             items: HashMap::new(),
             encounters: HashMap::new(),
             props: HashMap::new(),
+            quests: HashMap::new(),
             item_adjectives: HashMap::new(),
             loot_lists: HashMap::new(),
             races: HashMap::new(),
@@ -651,12 +668,14 @@ struct ModuleBuilder {
     conversation_builders: HashMap<String, ConversationBuilder>,
     encounter_builders: HashMap<String, EncounterBuilder>,
     item_builders: HashMap<String, ItemBuilder>,
-    item_adjectives: HashMap<String, ItemAdjective>,
     loot_builders: HashMap<String, LootListBuilder>,
     prop_builders: HashMap<String, PropBuilder>,
     race_builders: HashMap<String, RaceBuilder>,
     size_builders: HashMap<String, ObjectSizeBuilder>,
     tile_builders: HashMap<String, Tileset>,
+
+    item_adjectives: HashMap<String, ItemAdjective>,
+    quests: HashMap<String, Quest>,
 }
 
 impl ModuleBuilder {
@@ -676,6 +695,7 @@ impl ModuleBuilder {
             item_adjectives: read_builders(resources, ItemAdjective)?,
             loot_builders: read_builders(resources, LootList)?,
             prop_builders: read_builders(resources, Prop)?,
+            quests: read_builders(resources, Quest)?,
             race_builders: read_builders(resources, Race)?,
             size_builders: read_builders(resources, Size)?,
             tile_builders: read_builders(resources, Tile)?,

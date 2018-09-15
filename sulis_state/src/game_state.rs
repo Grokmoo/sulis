@@ -27,7 +27,7 @@ use sulis_rules::HitKind;
 use sulis_module::{Ability, Actor, Module, ObjectSize, OnTrigger, area::{Trigger, TriggerKind}};
 
 use {ai, AI, AreaState, ChangeListener, ChangeListenerList, Effect,
-    EntityState, Location, Formation, ItemList, ItemState, PartyStash,
+    EntityState, Location, Formation, ItemList, ItemState, PartyStash, QuestStateSet, quest_state,
     PathFinder, SaveState, ScriptState, UICallback, MOVE_TO_THRESHOLD, TurnManager, WorldMapState};
 use script::{script_callback::{self, ScriptHitKind}, ScriptEntitySet, ScriptCallback, ScriptItemKind};
 use animation::{self, Anim, AnimState, AnimSaveState, particle_generator::Param};
@@ -46,6 +46,7 @@ pub struct GameState {
     areas: HashMap<String, Rc<RefCell<AreaState>>>,
     area_state: Rc<RefCell<AreaState>>,
     world_map: WorldMapState,
+    quests: QuestStateSet,
     selected: Vec<Rc<RefCell<EntityState>>>,
     user_zoom: f32,
     party: Vec<Rc<RefCell<EntityState>>>,
@@ -202,6 +203,8 @@ impl GameState {
                 stash.add_quantity(item_save.quantity, ItemState::new(item));
             }
 
+            let quests = QuestStateSet::load(save_state.quests);
+
             Ok(GameState {
                 areas,
                 area_state,
@@ -215,6 +218,7 @@ impl GameState {
                 party_listeners: ChangeListenerList::default(),
                 ui_callbacks: Vec::new(),
                 world_map: save_state.world_map,
+                quests,
             })
         };
 
@@ -312,6 +316,7 @@ impl GameState {
             party_listeners: ChangeListenerList::default(),
             ui_callbacks: Vec::new(),
             world_map: WorldMapState::new(),
+            quests: QuestStateSet::new(),
         })
     }
 
@@ -339,6 +344,47 @@ impl GameState {
             let state = state.as_ref().unwrap();
 
             state.world_map.clone()
+        })
+    }
+
+    pub fn quest_state() -> QuestStateSet {
+        STATE.with(|state| {
+            let state = state.borrow();
+            let state = state.as_ref().unwrap();
+
+            state.quests.clone()
+        })
+    }
+
+    pub fn get_quest_state(quest: String) -> quest_state::EntryState {
+        STATE.with(|state| {
+            let state = state.borrow();
+            let state = state.as_ref().unwrap();
+            state.quests.state(&quest)
+        })
+    }
+
+    pub fn get_quest_entry_state(quest: String, entry: String) -> quest_state::EntryState {
+        STATE.with(|state| {
+            let state = state.borrow();
+            let state = state.as_ref().unwrap();
+            state.quests.entry_state(&quest, &entry)
+        })
+    }
+
+    pub fn set_quest_state(quest: String, entry_state: quest_state::EntryState) {
+        STATE.with(|state| {
+            let mut state = state.borrow_mut();
+            let state = state.as_mut().unwrap();
+            state.quests.set_state(&quest, entry_state);
+        });
+    }
+
+    pub fn set_quest_entry_state(quest: String, entry: String, entry_state: quest_state::EntryState) {
+        STATE.with(|state| {
+            let mut state = state.borrow_mut();
+            let state = state.as_mut().unwrap();
+            state.quests.set_entry_state(&quest, &entry, entry_state);
         })
     }
 

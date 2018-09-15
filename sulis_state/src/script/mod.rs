@@ -57,11 +57,12 @@ use std::cell::RefCell;
 
 use rlua::{self, Function, Lua, UserData, UserDataMethods};
 
+use sulis_core::resource::ResourceSet;
 use sulis_core::config::Config;
-use sulis_core::util::Point;
+use sulis_core::util::{Point, ExtInt};
 use sulis_rules::QuickSlot;
 use sulis_module::{ability, Ability, Item, Module, OnTrigger};
-use {EntityState, ItemState, GameState, ai, area_feedback_text::ColorKind};
+use {EntityState, ItemState, GameState, ai, area_feedback_text::ColorKind, quest_state};
 
 type Result<T> = std::result::Result<T, rlua::Error>;
 
@@ -401,11 +402,72 @@ impl UserData for ScriptInterface {
             Ok(y.atan2(x))
         });
 
+        methods.add_method("run_script_delayed", |_, _, (script, func, delay): (String, String, f32)| {
+            let player = GameState::player();
+            let parent = player.borrow().index();
+            let mut cb_data = CallbackData::new_trigger(parent, script);
+            cb_data.add_func(FuncKind::OnAnimComplete, func)?;
+
+            let image = ResourceSet::get_empty_image();
+            let duration = ExtInt::Int((delay * 1000.0) as u32);
+            let mut anim = ScriptParticleGenerator::new_anim(parent, image.id(), duration);
+            anim.set_completion_callback(cb_data);
+
+            let model = anim.owned_model();
+            let pgen = script_particle_generator::create_pgen(&anim, model)?;
+
+            GameState::add_animation(pgen);
+            Ok(())
+        });
+
         methods.add_method("create_callback", |_, _, (parent, script):
                            (ScriptEntity, String)| {
             let index = parent.try_unwrap_index()?;
             let cb_data = CallbackData::new_trigger(index, script);
             Ok(cb_data)
+        });
+
+        methods.add_method("set_quest_state", |_, _, (quest, state): (String, String)| {
+            let state = quest_state::EntryState::from_str(&state);
+            if let None = Module::quest(&quest) {
+                warn!("Set quest state for invalid quest '{}'", quest);
+            }
+            GameState::set_quest_state(quest, state);
+            Ok(())
+        });
+
+        methods.add_method("set_quest_entry_state", |_, _, (quest, entry, state): (String, String, String)| {
+            let state = quest_state::EntryState::from_str(&state);
+            match Module::quest(&quest) {
+                None => warn!("Set quest entry state for invalid quest '{}'", quest),
+                Some(ref quest) => {
+                    if !quest.entries.contains_key(&entry) {
+                        warn!("Set quest entry state for invalid entry '{}' in '{:?}'", entry, quest);
+                    }
+                }
+            }
+
+            GameState::set_quest_entry_state(quest, entry, state);
+            Ok(())
+        });
+
+        methods.add_method("get_quest_state", |_, _, quest: String| {
+            if let None = Module::quest(&quest) {
+                warn!("Requested state for invalid quest '{}'", quest);
+            }
+            Ok(format!("{:?}", GameState::get_quest_state(quest)))
+        });
+
+        methods.add_method("get_quest_entry_state", |_, _, (quest, entry): (String, String)| {
+            match Module::quest(&quest) {
+                None => warn!("Requested entry state for invalid quest '{}'", quest),
+                Some(ref quest) => {
+                    if !quest.entries.contains_key(&entry) {
+                        warn!("Requested entry state for invalid entry '{}' in '{:?}'", entry, quest);
+                    }
+                }
+            }
+            Ok(format!("{:?}", GameState::get_quest_entry_state(quest, entry)))
         });
 
         methods.add_method("set_world_map_location_visible",
@@ -427,7 +489,8 @@ impl UserData for ScriptInterface {
             let entity = entity.borrow();
             let entities_to_ignore = vec![entity.index()];
             Ok(area_state.is_passable(&entity, &entities_to_ignore, x, y))
-        });
+        }
+        );
 
         methods.add_method("spawn_encounter_at", |_, _, (x, y): (i32, i32)| {
             let area_state = GameState::area_state();

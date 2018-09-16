@@ -91,7 +91,7 @@ pub use self::party_stash::PartyStash;
 mod prop_state;
 pub use self::prop_state::PropState;
 
-mod quest_state;
+pub mod quest_state;
 pub use self::quest_state::QuestState;
 pub use self::quest_state::QuestStateSet;
 

@@ -356,6 +356,15 @@ impl GameState {
         })
     }
 
+    pub fn add_quest_state_change_listener(listener: ChangeListener<QuestStateSet>) {
+        STATE.with(|state| {
+            let mut state = state.borrow_mut();
+            let state = state.as_mut().unwrap();
+
+            state.quests.listeners.add(listener);
+        })
+    }
+
     pub fn get_quest_state(quest: String) -> quest_state::EntryState {
         STATE.with(|state| {
             let state = state.borrow();

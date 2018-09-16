@@ -17,10 +17,12 @@
 use std::collections::HashMap;
 
 use sulis_module::{Module};
+use ChangeListenerList;
 
-#[derive(Debug, Clone)]
 pub struct QuestStateSet {
     quests: HashMap<String, QuestState>,
+
+    pub listeners: ChangeListenerList<QuestStateSet>,
 }
 
 impl QuestStateSet {
@@ -30,7 +32,7 @@ impl QuestStateSet {
             let id = state.id.to_string();
             quests.insert(id, state);
         }
-        QuestStateSet { quests }
+        QuestStateSet { quests, listeners: ChangeListenerList::default() }
     }
 
     pub fn new() -> QuestStateSet {
@@ -41,7 +43,14 @@ impl QuestStateSet {
             quests.insert(id, QuestState::new(quest.id.to_string()));
         }
 
-        QuestStateSet { quests }
+        QuestStateSet { quests, listeners: ChangeListenerList::default() }
+    }
+
+    pub fn clone(&self) -> QuestStateSet {
+        QuestStateSet {
+            quests: self.quests.clone(),
+            listeners: ChangeListenerList::default(),
+        }
     }
 
     pub fn state(&self, quest: &str) -> EntryState {
@@ -61,8 +70,14 @@ impl QuestStateSet {
     }
 
     pub fn set_state(&mut self, quest: &str, state: EntryState) {
+        let mut done = false;
         if let Some(ref mut quest) = self.quests.get_mut(quest) {
             quest.state = state;
+            done = true;
+        }
+
+        if done {
+            self.listeners.notify(&self);
             return;
         }
 
@@ -70,11 +85,18 @@ impl QuestStateSet {
         let mut quest = QuestState::new(quest.to_string());
         quest.state = state;
         self.quests.insert(id, quest);
+        self.listeners.notify(&self);
     }
 
     pub fn set_entry_state(&mut self, quest: &str, entry: &str, state: EntryState) {
+        let mut done = false;
         if let Some(ref mut quest) = self.quests.get_mut(quest) {
             quest.set_entry_state(entry, state);
+            done = true;
+        }
+
+        if done {
+            self.listeners.notify(&self);
             return;
         }
 
@@ -82,6 +104,7 @@ impl QuestStateSet {
         let mut quest = QuestState::new(id.to_string());
         quest.set_entry_state(entry, state);
         self.quests.insert(id, quest);
+        self.listeners.notify(&self);
     }
 
     pub fn into_iter(self) -> impl Iterator<Item=(String, QuestState)> {
@@ -114,6 +137,15 @@ impl QuestState {
     }
 
     pub fn set_entry_state(&mut self, entry: &str, state: EntryState) {
+        match state {
+            EntryState::Visible | EntryState::Active => {
+                if self.state == EntryState::Hidden {
+                    self.state = EntryState::Visible;
+                }
+            },
+            _ => (),
+        }
+
         self.entries.insert(entry.to_string(), state);
     }
 
@@ -126,11 +158,12 @@ impl QuestState {
     }
 }
 
-#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 pub enum EntryState {
     Hidden,
     Visible,
     Active,
+    Complete,
 }
 
 impl EntryState {
@@ -139,6 +172,7 @@ impl EntryState {
             "Hidden" => EntryState::Hidden,
             "Visible" => EntryState::Visible,
             "Active" => EntryState::Active,
+            "Complete" => EntryState::Complete,
             _ => {
                 warn!("Invalid quest state '{}'", s);
                 EntryState::Hidden

@@ -103,6 +103,9 @@ pub use self::portrait_view::PortraitView;
 mod prop_window;
 pub use self::prop_window::PropWindow;
 
+mod quest_window;
+pub use self::quest_window::QuestWindow;
+
 mod quick_item_bar;
 use self::quick_item_bar::QuickItemBar;
 
@@ -267,6 +270,12 @@ impl RootView {
         }
     }
 
+    pub fn set_quest_window(&mut self, widget: &Rc<RefCell<Widget>>, desired_state: bool) {
+        self.set_window(widget, self::quest_window::NAME, desired_state, &|| {
+            Some(QuestWindow::new())
+        });
+    }
+
     pub fn set_formation_window(&mut self, widget: &Rc<RefCell<Widget>>, desired_state: bool) {
         self.set_window(widget, self::formation_window::NAME, desired_state, &|| {
             Some(FormationWindow::new())
@@ -318,6 +327,11 @@ impl RootView {
     pub fn toggle_character_window(&mut self, widget: &Rc<RefCell<Widget>>) {
         let desired_state = !Widget::has_child_with_name(widget, self::character_window::NAME);
         self.set_character_window(widget, desired_state);
+    }
+
+    pub fn toggle_quest_window(&mut self, widget: &Rc<RefCell<Widget>>) {
+        let desired_state = !Widget::has_child_with_name(widget, self::quest_window::NAME);
+        self.set_quest_window(widget, desired_state);
     }
 
     pub fn toggle_map_window(&mut self, widget: &Rc<RefCell<Widget>>) {
@@ -449,6 +463,7 @@ impl WidgetKind for RootView {
             ToggleInventory => self.toggle_inventory_window(widget),
             ToggleCharacter => self.toggle_character_window(widget),
             ToggleMap => self.toggle_map_window(widget),
+            ToggleJournal => self.toggle_quest_window(widget),
             ToggleFormation => self.toggle_formation_window(widget),
             EndTurn => self.end_turn(),
             Exit => self.show_exit(widget),
@@ -530,8 +545,12 @@ impl WidgetKind for RootView {
                 view.toggle_map_window(&parent);
             })));
 
-            let log_button = Widget::with_theme(Button::empty(), "log_button");
-            log_button.borrow_mut().state.set_enabled(false);
+            let log_button = Widget::with_theme(Button::empty(), "journal_button");
+            log_button.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+                let parent = Widget::get_root(&widget);
+                let view = Widget::downcast_kind_mut::<RootView>(&parent);
+                view.toggle_quest_window(&parent);
+            })));
 
             let men_button = Widget::with_theme(Button::empty(), "menu_button");
             men_button.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {

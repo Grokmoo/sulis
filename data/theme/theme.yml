@@ -286,10 +286,10 @@ children:
           tooltip: "Map"
         position: [-26, 0]
         foreground: map_icon
-      log_button:
+      journal_button:
         from: .bottom_pane.window_button
         custom:
-          tooltip: "Log"
+          tooltip: "Journal"
         position: [-26, -13]
         foreground: log_icon
       character_button:
@@ -478,6 +478,72 @@ children:
             children:
               item_button:
                 from: .item_button
+  quest_window:
+    from: .window
+    position: [0, 2]
+    x_relative: Center
+    width_relative: Zero
+    height_relative: Zero
+    preferred_size: [226, 136]
+    border: { top: 6, bottom: 8, right: 8, left: 8 }
+    children:
+      title:
+        text: "Journal"
+      quest_list:
+        background: bg_base
+        border: [2, 2, 2, 2]
+        preferred_size: [50, -2]
+        position: [0, 2]
+        height_relative: Max
+        children:
+          scrollbar:
+            from: .scrollbar
+            custom:
+              scroll_delta: 12
+          content:
+            preferred_size: [0, 0]
+            layout: BoxVertical
+            layout_spacing: { top: 0, bottom: 2, left: 0, right: 0 }
+            width_relative: Max
+            height_relative: Max
+            children:
+                quest_button:
+                  from: .button
+                  border: [2, 2, 2, 2]
+                  preferred_size: [0, 10]
+                  width_relative: Max
+                  children:
+                    text_area:
+                      from: .text_area
+                      width_relative: Max
+                      height_relative: Max
+                      text: "#name#"
+      quest_entries:
+        border: [2, 2, 2, 2]
+        preferred_size: [-52, -2]
+        position: [52, 2]
+        width_relative: Max
+        height_relative: Max
+        children:
+          scrollbar:
+            from: .scrollbar
+            custom:
+              scroll_delta: 17
+          content:
+            layout: BoxVertical
+            layout_spacing: { top: 0, bottom: 2, left: 0, right: 0 }
+            width_relative: Max
+            height_relative: Max
+            children:
+              quest_entry:
+                from: .text_area
+                background: bg_base
+                border: [2, 2, 2, 2]
+                width_relative: Max
+                height_relative: Zero
+                preferred_size: [-7, 20]
+                y_relative: Custom
+                text: "#description#"
   world_map_window:
     from: .window
     position: [0, 2]

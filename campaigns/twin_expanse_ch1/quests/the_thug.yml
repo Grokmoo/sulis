@@ -1,2 +1,9 @@
 id: the_thug
 name: "The Thug"
+entries:
+  start:
+    description: |
+      A man was threatening one of the farmers in Wellswood.  I may want to investigate.
+  investigated:
+    description: |
+      I learned that the thug, Guthrek, has been extorting money and goods from some of the local farmers.

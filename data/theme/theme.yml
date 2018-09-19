@@ -489,11 +489,21 @@ children:
     children:
       title:
         text: "Journal"
+      show_completed_label:
+        from: .label
+        text: "Show Completed Quests"
+        text_params:
+          horizontal_alignment: Right
+        preferred_size: [33, 7]
+        position: [0, 0]
+      show_completed_toggle:
+        from: .button
+        preferred_size: [7, 7]
+        position: [35, 0]
       quest_list:
-        background: bg_base
         border: [2, 2, 2, 2]
-        preferred_size: [50, -2]
-        position: [0, 2]
+        preferred_size: [50, -10]
+        position: [0, 10]
         height_relative: Max
         children:
           scrollbar:
@@ -501,7 +511,7 @@ children:
             custom:
               scroll_delta: 12
           content:
-            preferred_size: [0, 0]
+            preferred_size: [-7, 0]
             layout: BoxVertical
             layout_spacing: { top: 0, bottom: 2, left: 0, right: 0 }
             width_relative: Max
@@ -533,6 +543,7 @@ children:
             layout: BoxVertical
             layout_spacing: { top: 0, bottom: 2, left: 0, right: 0 }
             width_relative: Max
+            preferred_size: [-7, 0]
             height_relative: Max
             children:
               quest_entry:
@@ -541,7 +552,7 @@ children:
                 border: [2, 2, 2, 2]
                 width_relative: Max
                 height_relative: Zero
-                preferred_size: [-7, 20]
+                preferred_size: [0, 40]
                 y_relative: Custom
                 text: "#description#"
   world_map_window:

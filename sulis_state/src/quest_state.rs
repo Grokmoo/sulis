@@ -46,6 +46,13 @@ impl QuestStateSet {
         QuestStateSet { quests, listeners: ChangeListenerList::default() }
     }
 
+    pub fn quest(&self, quest: &str) -> Option<&QuestState> {
+        match self.quests.get(quest) {
+            None => None,
+            Some(ref quest) => Some(quest),
+        }
+    }
+
     pub fn clone(&self) -> QuestStateSet {
         QuestStateSet {
             quests: self.quests.clone(),
@@ -116,7 +123,7 @@ impl QuestStateSet {
 pub struct QuestState {
     id: String,
     state: EntryState,
-    entries: HashMap<String, EntryState>,
+    entries: Vec<(String, EntryState)>,
 }
 
 impl QuestState {
@@ -124,16 +131,16 @@ impl QuestState {
         QuestState {
             id,
             state: EntryState::Hidden,
-            entries: HashMap::new(),
+            entries: Vec::new(),
         }
     }
 
     pub fn entry_state(&self, entry: &str) -> EntryState {
-        if let Some(entry) = self.entries.get(entry) {
-            *entry
-        } else {
-            EntryState::Hidden
+        for (ref id, state) in self.entries.iter() {
+            if id == entry { return *state; }
         }
+
+        EntryState::Hidden
     }
 
     pub fn set_entry_state(&mut self, entry: &str, state: EntryState) {
@@ -146,14 +153,21 @@ impl QuestState {
             _ => (),
         }
 
-        self.entries.insert(entry.to_string(), state);
+        for (ref id, ref mut entry_state) in self.entries.iter_mut() {
+            if id != entry { continue; }
+
+            *entry_state = state;
+            return;
+        }
+
+        self.entries.push((entry.to_string(), state));
     }
 
     pub fn state(&self) -> EntryState {
         self.state
     }
 
-    pub fn iter(&self) -> impl Iterator<Item=(&String, &EntryState)> {
+    pub fn iter(&self) -> impl DoubleEndedIterator<Item=&(String, EntryState)> {
         self.entries.iter()
     }
 }

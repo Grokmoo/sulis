@@ -17,5 +17,4 @@ function gethruk_moved_finish_intro(parent)
   target:remove()
   
   game:set_quest_entry_state("the_thug", "start", "Visible")
-  game:set_quest_entry_state("the_thug", "investigated", "Visible")
 end

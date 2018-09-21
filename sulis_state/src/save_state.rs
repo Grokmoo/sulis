@@ -43,7 +43,7 @@ pub struct SaveState {
     pub(crate) zoom: f32,
     pub(crate) current_area: String,
     pub(crate) world_map: WorldMapState,
-    pub(crate) quests: Vec<QuestState>,
+    pub(crate) quests: QuestSaveState,
     pub(crate) areas: HashMap<String, AreaSaveState>,
     pub(crate) manager: ManagerSaveState,
     pub(crate) anims: Vec<AnimSaveState>,
@@ -78,10 +78,17 @@ impl SaveState {
         let stash = GameState::party_stash();
         let stash = stash.borrow().save();
 
+        let quest_state = GameState::quest_state();
+        let current_quest = quest_state.current_quest().clone();
         let mut quests = Vec::new();
-        for (_, quest_state) in GameState::quest_state().into_iter() {
+        for (_, quest_state) in quest_state.into_iter() {
             quests.push(quest_state);
         }
+
+        let quest_state = QuestSaveState {
+            current_quest,
+            quests,
+        };
 
         SaveState {
             areas,
@@ -95,13 +102,20 @@ impl SaveState {
             manager: ManagerSaveState::new(),
             anims: GameState::save_anims(),
             world_map: GameState::world_map(),
-            quests,
+            quests: quest_state,
         }
     }
 
     pub fn load(self) -> Result<(), Error> {
         GameState::load(self)
     }
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct QuestSaveState {
+    pub(crate) quests: Vec<QuestState>,
+    pub(crate) current_quest: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

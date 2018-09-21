@@ -1,0 +1,15 @@
+id: the_goblin_trap
+name: "The Goblin Trap"
+entries:
+  start:
+    description: |
+      I have taken a contract with a small group of mercenaries under the leadership of the Dwarf, Tervald.  We are to find the whereabouts of a caravan that is long overdue.  We have started our search in the last known location of the caravan, the woods to the Northeast of Wellswood.
+  ambush:
+    description: |
+      Our group has been ambushed by a small party of goblins - scouts for a much larger force.  Tervald has sent me deeper into the woods, to search for a way to evade the main force.
+  rockslide:
+    description: |
+      Tervald is dead after a large rockslide engineered by our goblin adversaries.  Our only option now is to press deeper into the woods.  I have been elected as our new leader.
+  cliffs:
+    description: |
+      The only path forward is through cliffs where the goblins will have their camp.  Our only hope is that most of the warriors should be away in their war party.

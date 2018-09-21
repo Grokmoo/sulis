@@ -47,6 +47,14 @@ impl WidgetKind for QuestWindow {
 
         let quests = GameState::quest_state();
 
+        if self.active_quest.is_none() {
+            if let Some(ref current_id) = quests.current_quest() {
+                if let Some(quest) = Module::quest(current_id) {
+                    self.active_quest = Some(quest);
+                }
+            }
+        }
+
         let label = Widget::with_theme(Label::empty(), "title");
 
         let close = Widget::with_theme(Button::empty(), "close");

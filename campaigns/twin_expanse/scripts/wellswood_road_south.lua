@@ -1,20 +1,19 @@
-function disable_go_too_far()
+function tervald_ambush_complete(npc_to_add)
+  game:add_party_member(npc_to_add)
   game:disable_trigger_at(3, 27)
+  game:set_quest_entry_state("the_goblin_trap", "ambush", "Active")
 end
 
 function on_add_aessa(parent, target)
-  game:add_party_member("npc_aessa")
-  disable_go_too_far()
+  tervald_ambush_complete("npc_aessa")
 end
 
 function on_add_jorzal(parent, target)
-  game:add_party_member("npc_jorzal")
-  disable_go_too_far()
+  tervald_ambush_complete("npc_jorzal")
 end
 
 function on_add_grazi(parent, target)
-  game:add_party_member("npc_grazi")
-  disable_go_too_far()
+  tervald_ambush_complete("npc_grazi")
 end
 
 function on_player_enter_bridge(parent, target)
@@ -52,6 +51,8 @@ function on_area_load(parent)
   end
   
   game:start_conversation("tervald", target)
+  
+  game:set_quest_entry_state("the_goblin_trap", "start", "Active")
 end
 
 MIN_COINS = 0

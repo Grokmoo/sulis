@@ -8,3 +8,7 @@ end
 function after_escape_cutscene(parent, target)
   game:load_module("twin_expanse_ch1")
 end
+
+function on_area_load(parent)
+  game:set_quest_entry_state("the_goblin_trap", "cliffs", "Active")
+end

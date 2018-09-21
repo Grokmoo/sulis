@@ -34,6 +34,8 @@ function after_rockslide_cutscene(parent)
 	  convo_started = true
 	end
   end
+  
+  game:set_quest_entry_state("the_goblin_trap", "rockslide", "Active")
 end
 
 function after_rockslide_dialog(parent)

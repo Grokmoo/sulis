@@ -368,7 +368,7 @@ children:
     y_relative: Max
     width_relative: Zero
     height_relative: Zero
-    preferred_size: [150, 60]
+    preferred_size: [150, 80]
     children:
       title:
         text: "#name#"

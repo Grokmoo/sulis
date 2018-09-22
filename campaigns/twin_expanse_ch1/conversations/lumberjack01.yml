@@ -1,0 +1,36 @@
+id: lumberjack01
+initial_nodes:
+  - id: questions
+    to_view:
+      - target_flags: [ already_talked ]
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=888|This large, muscular man holds his axe to the side as you approach.]
+      
+      You're the one that was found up in the rocks, right?
+    on_view:
+      - target_flags: [ already_talked ]
+    responses:
+      - text: "Yeah, you heard about that?"
+        to: affirm
+      - text: "No, that wasn't me."
+        to: neg
+  affirm:
+    text: |
+      Yeah, word gets around here pretty quick.
+    responses:
+      - text: "[c=888|Continue]"
+        to: questions
+  neg:
+    text: |
+      [c=888|The man looks a bit taken aback.]
+      That accident messed with your head, maybe?  They pulled you out of a pile of rocks about a week ago.
+    responses:
+      - text: "[c=888|Continue]"
+        to: questions
+  questions:
+    text: "Can I help you with something?"
+    responses:
+      - text: "No, farewell."

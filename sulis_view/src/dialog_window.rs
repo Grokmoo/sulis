@@ -113,7 +113,7 @@ impl WidgetKind for DialogWindow {
             for response in responses {
                 if !is_viewable(response, &self.pc, &self.entity) { continue; }
 
-                let response_button = ResponseButton::new(&response);
+                let response_button = ResponseButton::new(&response, &self.pc);
                 let widget = Widget::with_defaults(response_button);
                 Widget::add_child_to(&responses_widget, widget);
             }
@@ -127,14 +127,16 @@ struct ResponseButton {
     text: String,
     to: Option<String>,
     on_select: Vec<OnTrigger>,
+    pc: Rc<RefCell<EntityState>>,
 }
 
 impl ResponseButton {
-    fn new(response: &Response) -> Rc<RefCell<ResponseButton>> {
+    fn new(response: &Response, pc: &Rc<RefCell<EntityState>>) -> Rc<RefCell<ResponseButton>> {
         Rc::new(RefCell::new(ResponseButton {
             text: response.text.to_string(),
             to: response.to.clone(),
             on_select: response.on_select.clone(),
+            pc: Rc::clone(&pc),
         }))
     }
 }
@@ -143,9 +145,15 @@ impl WidgetKind for ResponseButton {
     widget_kind!("response_button");
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
-        let text_area = Widget::with_defaults(TextArea::new(&self.text));
+        let text_area = TextArea::empty();
+        let text_area_widget = Widget::with_defaults(text_area.clone());
 
-        vec![text_area]
+        text_area_widget.borrow_mut().state
+            .add_text_arg("player_name", &self.pc.borrow().actor.actor.name);
+        let cur_text = theme::expand_text_args(&self.text, &text_area_widget.borrow().state);
+
+        text_area.borrow_mut().text = Some(cur_text);
+        vec![text_area_widget]
     }
 
     fn layout(&mut self, widget: &mut Widget) {

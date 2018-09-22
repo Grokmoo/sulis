@@ -1,0 +1,11 @@
+id: wellswood_farms_about_to_exit
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=888|As you make your way down the road towards town, the Elf standing to the North of the road motions to you.
+      
+      Perhaps you should see what he has to say.]
+    responses:
+      - text: "[c=888|Continue]"

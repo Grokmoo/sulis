@@ -30,3 +30,17 @@ end
 function adventurer_talked(parent)
   game:set_quest_entry_state("a_rosy_picture", "start", "Visible")
 end
+
+function about_to_exit(parent)
+  game:cancel_blocking_anims()
+  game:scroll_view(106, 56)
+  game:start_conversation("wellswood_farms_about_to_exit", parent)
+end
+
+function vaalyun_quest_start(parent)
+  game:set_quest_entry_state("vaalyuns_journey", "start", "Visible")
+end
+
+function vaalyun_join(parent)
+  game:add_party_member("npc_vaalyun")
+end

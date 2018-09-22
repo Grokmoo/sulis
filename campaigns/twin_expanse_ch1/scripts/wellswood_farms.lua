@@ -18,3 +18,15 @@ function gethruk_moved_finish_intro(parent)
   
   game:set_quest_entry_state("the_thug", "start", "Visible")
 end
+
+function gethruk_investigated(parent)
+  game:set_quest_entry_state("the_thug", "investigated", "Visible")
+end
+
+function rockslide_investigated(parent)
+  game:set_quest_entry_state("the_rockslide", "investigated", "Visible")
+end
+
+function adventurer_talked(parent)
+  game:set_quest_entry_state("a_rosy_picture", "start", "Visible")
+end

@@ -1,0 +1,13 @@
+id: the_rockslide
+name: "The Rockslide"
+entries:
+  start:
+    description: |
+      I have woken up inside a farmhouse with no sign of my companions - I need to figure out what happened.
+      
+      My last memory is of escaping a large goblin ambush into a narrow pass, and then a large rockslide.
+      
+      If I survived, perhaps some of the others did as well.
+  investigated:
+    description: |
+      I learned that a farmer pulled me out of the rocks, north of town.

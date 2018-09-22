@@ -1,6 +1,7 @@
 function on_area_load(parent)
   add_min_xp_coins()
   
+  game:set_quest_entry_state("the_rockslide", "start", "Visible")
   game:start_conversation("intro", parent)
 end
 

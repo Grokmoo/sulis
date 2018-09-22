@@ -36,6 +36,18 @@ props:
       "y": 15
     items: []
     enabled: true
+  - id: cabinet_small_01
+    location:
+      x: 4
+      "y": 6
+    items: []
+    enabled: true
+  - id: chest_small_level1_misc
+    location:
+      x: 12
+      "y": 28
+    items: []
+    enabled: true
 encounters: []
 transitions:
   - from:
@@ -46,8 +58,8 @@ transitions:
       Area:
         id: wellswood_farms
         x: 13
-        y: 71
-    hover_text: "To Farms"
+        "y": 71
+    hover_text: To Farms
     image_display: empty
 triggers: []
 visibility_tile: gui/area_invis
@@ -56,22 +68,15 @@ max_vis_distance: 12
 max_vis_up_one_distance: 6
 world_map_location: wellswood
 layer_set:
-  tileset/interior_wood_inner_edge_nw:
-    - - 14
-      - 30
-    - - 32
-      - 32
-    - - 32
-      - 12
   tileset/cabinet_bot_04:
     - - 6
       - 4
-  tileset/building_wood_variant1:
-    - - 12
-      - 2
-  tileset/building_wood_variant2:
-    - - 8
-      - 2
+  tileset/plate03:
+    - - 27
+      - 8
+  tileset/book01:
+    - - 2
+      - 28
   tileset/interior_wood_outer_edge_n:
     - - 2
       - 30
@@ -117,12 +122,427 @@ layer_set:
       - 12
     - - 14
       - 12
+  tileset/building_wood_outer_edge_sw:
+    - - 26
+      - 16
+    - - 10
+      - 16
+  tileset/interior_wood_inner_edge_ne:
+    - - 0
+      - 30
+    - - 0
+      - 12
+    - - 16
+      - 32
+  tileset/bottles01:
+    - - 26
+      - 18
+  tileset/rug_small01:
+    - - 24
+      - 30
+    - - 6
+      - 22
+  tileset/building_wood_outer_edge_s:
+    - - 0
+      - 2
+    - - 2
+      - 2
+    - - 4
+      - 2
+    - - 6
+      - 2
+    - - 10
+      - 2
+    - - 14
+      - 2
+    - - 16
+      - 2
+    - - 18
+      - 2
+    - - 20
+      - 2
+    - - 22
+      - 2
+    - - 24
+      - 2
+    - - 26
+      - 2
+    - - 30
+      - 2
+    - - 32
+      - 2
+    - - 0
+      - 16
+    - - 32
+      - 16
+    - - 16
+      - 16
+    - - 18
+      - 16
+    - - 20
+      - 16
+    - - 28
+      - 16
+    - - 30
+      - 16
+    - - 2
+      - 16
+    - - 4
+      - 16
+    - - 12
+      - 16
+    - - 14
+      - 16
+  tileset/building_wood_outer_edge_se:
+    - - 22
+      - 16
+    - - 6
+      - 16
+  tileset/cabinet_wide01:
+    - - 10
+      - 17
+  tileset/sack_stack:
+    - - 2
+      - 4
+  tileset/interior_wood_outer_edge_sw:
+    - - 26
+      - 14
+    - - 10
+      - 14
+  tileset/cabinet02:
+    - - 20
+      - 2
+  tileset/cabinet04:
+    - - 18
+      - 16
+  tileset/interior_wood_base:
+    - - 0
+      - 32
+    - - 2
+      - 32
+    - - 4
+      - 32
+    - - 6
+      - 32
+    - - 8
+      - 32
+    - - 10
+      - 32
+    - - 12
+      - 32
+    - - 14
+      - 32
+  tileset/cabinet03:
+    - - 18
+      - 2
+  tileset/interior_wood_outer_edge_e:
+    - - 0
+      - 2
+    - - 0
+      - 4
+    - - 0
+      - 6
+    - - 0
+      - 8
+    - - 0
+      - 26
+    - - 0
+      - 28
+    - - 0
+      - 10
+    - - 0
+      - 16
+    - - 0
+      - 18
+    - - 0
+      - 20
+    - - 0
+      - 22
+    - - 0
+      - 24
+    - - 16
+      - 30
+    - - 16
+      - 22
+    - - 16
+      - 24
+    - - 16
+      - 26
+    - - 16
+      - 28
+    - - 16
+      - 16
+    - - 16
+      - 18
+    - - 16
+      - 20
+  tileset/wine_bottle02:
+    - - 6
+      - 19
+  tileset/interior_wood_outer_edge_se:
+    - - 22
+      - 14
+    - - 6
+      - 14
+  tileset/interior_wood_inner_edge_nw:
+    - - 14
+      - 30
+    - - 32
+      - 32
+    - - 32
+      - 12
+  tileset/cabinet_bot_03:
+    - - 20
+      - 19
+  tileset/bar_vert_east_s:
+    - - 30
+      - 26
+  tileset/chair04:
+    - - 30
+      - 6
+    - - 30
+      - 8
+  tileset/plate05:
+    - - 28
+      - 18
+  tileset/bed_vert_01:
+    - - 2
+      - 19
+  tileset/cabinet_small_01:
+    - - 6
+      - 20
+  tileset/bar_horiz_w:
+    - - 6
+      - 28
+    - - 30
+      - 18
   tileset/ropes01:
     - - 22
       - 4
+  tileset/plate04:
+    - - 27
+      - 6
+  tileset/chair03:
+    - - 24
+      - 6
+  tileset/plate08:
+    - - 30
+      - 18
+  tileset/interior_wood_outer_edge_ne:
+    - - 22
+      - 12
+    - - 6
+      - 12
+  tileset/interior_wood_inner_edge_sw:
+    - - 32
+      - 0
+    - - 32
+      - 14
+    - - 14
+      - 14
+  tileset/bar_vert_east_c:
+    - - 30
+      - 22
+    - - 30
+      - 24
+  tileset/cabinet_top_02:
+    - - 20
+      - 17
+  tileset/lantern_off:
+    - - 30
+      - 26
+  tileset/bucket_full:
+    - - 19
+      - 30
+  table_large01:
+    - - 26
+      - 6
+  tileset/flour_sack_2by2:
+    - - 2
+      - 8
+  tileset/building_wood_variant3:
+    - - 28
+      - 2
   tileset/cabinet_top_03:
     - - 4
       - 4
+  tileset/bar_vert_east_n:
+    - - 30
+      - 20
+  tileset/interior_wood01_base:
+    - - 18
+      - 28
+    - - 20
+      - 28
+    - - 22
+      - 28
+    - - 18
+      - 30
+    - - 20
+      - 30
+    - - 22
+      - 30
+    - - 24
+      - 30
+    - - 26
+      - 30
+    - - 28
+      - 30
+    - - 30
+      - 30
+    - - 26
+      - 20
+    - - 28
+      - 20
+    - - 30
+      - 20
+    - - 18
+      - 20
+    - - 20
+      - 20
+    - - 22
+      - 20
+    - - 24
+      - 20
+    - - 18
+      - 22
+    - - 20
+      - 22
+    - - 22
+      - 22
+    - - 18
+      - 24
+    - - 20
+      - 24
+    - - 22
+      - 24
+    - - 18
+      - 26
+    - - 20
+      - 26
+    - - 22
+      - 26
+    - - 24
+      - 22
+    - - 26
+      - 22
+    - - 28
+      - 22
+    - - 30
+      - 22
+    - - 24
+      - 24
+    - - 26
+      - 24
+    - - 30
+      - 24
+    - - 24
+      - 26
+    - - 26
+      - 26
+    - - 28
+      - 26
+    - - 30
+      - 26
+    - - 24
+      - 28
+    - - 26
+      - 28
+    - - 28
+      - 28
+    - - 30
+      - 28
+    - - 28
+      - 24
+  tileset/interior_wood_outer_edge_s:
+    - - 2
+      - 0
+    - - 4
+      - 0
+    - - 6
+      - 0
+    - - 8
+      - 0
+    - - 10
+      - 0
+    - - 12
+      - 0
+    - - 14
+      - 0
+    - - 16
+      - 0
+    - - 18
+      - 0
+    - - 20
+      - 0
+    - - 22
+      - 0
+    - - 24
+      - 0
+    - - 26
+      - 0
+    - - 28
+      - 0
+    - - 30
+      - 0
+    - - 18
+      - 14
+    - - 20
+      - 14
+    - - 28
+      - 14
+    - - 30
+      - 14
+    - - 2
+      - 14
+    - - 4
+      - 14
+    - - 12
+      - 14
+  tileset/building_wood_variant1:
+    - - 12
+      - 2
+  tileset/interior_wood_outer_edge_w:
+    - - 32
+      - 2
+    - - 32
+      - 4
+    - - 32
+      - 6
+    - - 32
+      - 8
+    - - 32
+      - 10
+    - - 14
+      - 22
+    - - 14
+      - 24
+    - - 14
+      - 26
+    - - 14
+      - 28
+    - - 32
+      - 30
+    - - 32
+      - 16
+    - - 32
+      - 18
+    - - 32
+      - 20
+    - - 32
+      - 22
+    - - 32
+      - 24
+    - - 32
+      - 26
+    - - 32
+      - 28
+    - - 14
+      - 20
+    - - 14
+      - 16
+    - - 14
+      - 18
   tileset/interior_wood02_base:
     - - 2
       - 20
@@ -290,158 +710,19 @@ layer_set:
       - 16
     - - 24
       - 18
-  tileset/cabinet03:
-    - - 18
-      - 2
-  tileset/building_wood_outer_edge_sw:
-    - - 26
-      - 16
-    - - 10
-      - 16
-  tileset/cabinet_bot_01:
+  tileset/bar_horiz_c:
     - - 4
-      - 6
-  tileset/interior_wood_outer_edge_s:
-    - - 2
-      - 0
-    - - 4
-      - 0
-    - - 6
-      - 0
-    - - 8
-      - 0
-    - - 10
-      - 0
-    - - 12
-      - 0
-    - - 14
-      - 0
-    - - 16
-      - 0
-    - - 18
-      - 0
-    - - 20
-      - 0
-    - - 22
-      - 0
-    - - 24
-      - 0
-    - - 26
-      - 0
+      - 28
     - - 28
-      - 0
-    - - 30
-      - 0
-    - - 18
-      - 14
-    - - 20
-      - 14
-    - - 28
-      - 14
-    - - 30
-      - 14
-    - - 2
-      - 14
-    - - 4
-      - 14
-    - - 12
-      - 14
-  tileset/interior_wood_outer_edge_nw:
-    - - 26
-      - 12
-    - - 10
-      - 12
-  tileset/plate08:
-    - - 30
       - 18
-  tileset/interior_wood01_base:
-    - - 18
-      - 28
-    - - 20
-      - 28
-    - - 22
-      - 28
-    - - 18
-      - 30
-    - - 20
-      - 30
-    - - 22
-      - 30
-    - - 24
-      - 30
-    - - 26
-      - 30
-    - - 28
-      - 30
-    - - 30
-      - 30
-    - - 26
-      - 20
-    - - 28
-      - 20
-    - - 30
-      - 20
-    - - 18
-      - 20
-    - - 20
-      - 20
-    - - 22
-      - 20
-    - - 24
-      - 20
-    - - 18
-      - 22
-    - - 20
-      - 22
-    - - 22
-      - 22
-    - - 18
-      - 24
-    - - 20
-      - 24
-    - - 22
-      - 24
-    - - 18
-      - 26
-    - - 20
-      - 26
-    - - 22
-      - 26
-    - - 24
-      - 22
-    - - 26
-      - 22
-    - - 28
-      - 22
-    - - 30
-      - 22
-    - - 24
-      - 24
-    - - 26
-      - 24
-    - - 30
-      - 24
-    - - 24
-      - 26
-    - - 26
-      - 26
-    - - 28
-      - 26
-    - - 30
-      - 26
-    - - 24
+  tileset/bar_horiz_e:
+    - - 2
       - 28
     - - 26
-      - 28
-    - - 28
-      - 28
-    - - 30
-      - 28
-    - - 28
-      - 24
-  tileset/bucket_full:
-    - - 19
-      - 30
+      - 18
+  tileset/building_wood_variant2:
+    - - 8
+      - 2
   tileset/interior_wood_inner_edge_se:
     - - 0
       - 0
@@ -449,286 +730,14 @@ layer_set:
       - 14
     - - 16
       - 14
-  tileset/interior_wood_outer_edge_ne:
-    - - 22
+  tileset/interior_wood_outer_edge_nw:
+    - - 26
       - 12
-    - - 6
+    - - 10
       - 12
-  tileset/building_wood_outer_edge_s:
-    - - 0
-      - 2
-    - - 2
-      - 2
-    - - 4
-      - 2
-    - - 6
-      - 2
-    - - 10
-      - 2
-    - - 14
-      - 2
-    - - 16
-      - 2
-    - - 18
-      - 2
-    - - 20
-      - 2
-    - - 22
-      - 2
-    - - 24
-      - 2
-    - - 26
-      - 2
-    - - 30
-      - 2
-    - - 32
-      - 2
-    - - 0
-      - 16
-    - - 32
-      - 16
-    - - 16
-      - 16
-    - - 18
-      - 16
-    - - 20
-      - 16
-    - - 28
-      - 16
-    - - 30
-      - 16
-    - - 2
-      - 16
-    - - 4
-      - 16
-    - - 12
-      - 16
-    - - 14
-      - 16
-  tileset/bar_horiz_w:
-    - - 6
-      - 28
-    - - 30
-      - 18
-  tileset/bar_horiz_e:
-    - - 2
-      - 28
-    - - 26
-      - 18
-  tileset/cabinet_top_02:
-    - - 20
-      - 17
-  tileset/interior_wood_outer_edge_e:
-    - - 0
-      - 2
-    - - 0
-      - 4
-    - - 0
-      - 6
-    - - 0
-      - 8
-    - - 0
-      - 26
-    - - 0
-      - 28
-    - - 0
-      - 10
-    - - 0
-      - 16
-    - - 0
-      - 18
-    - - 0
-      - 20
-    - - 0
-      - 22
-    - - 0
-      - 24
-    - - 16
-      - 30
-    - - 16
-      - 22
-    - - 16
-      - 24
-    - - 16
-      - 26
-    - - 16
-      - 28
-    - - 16
-      - 16
-    - - 16
-      - 18
-    - - 16
-      - 20
-  tileset/bar_horiz_c:
-    - - 4
-      - 28
-    - - 28
-      - 18
-  tileset/cabinet02:
-    - - 20
-      - 2
-  tileset/bottles01:
-    - - 26
-      - 18
-  tileset/chair03:
-    - - 24
-      - 6
-  tileset/bar_vert_east_s:
-    - - 30
-      - 26
-  tileset/flour_sack_2by2:
-    - - 2
-      - 8
-  tileset/bar_vert_east_c:
-    - - 30
-      - 22
-    - - 30
-      - 24
-  tileset/plate03:
-    - - 27
-      - 8
-  tileset/bar_vert_east_n:
-    - - 30
-      - 20
-  tileset/plate05:
-    - - 28
-      - 18
-  tileset/wine_bottle02:
-    - - 6
-      - 19
-  tileset/interior_wood_base:
-    - - 0
-      - 32
-    - - 2
-      - 32
-    - - 4
-      - 32
-    - - 6
-      - 32
-    - - 8
-      - 32
-    - - 10
-      - 32
-    - - 12
-      - 32
-    - - 14
-      - 32
-  tileset/bed_vert_01:
-    - - 2
-      - 19
-  tileset/interior_wood_inner_edge_sw:
-    - - 32
-      - 0
-    - - 32
-      - 14
-    - - 14
-      - 14
-  tileset/interior_wood_outer_edge_w:
-    - - 32
-      - 2
-    - - 32
-      - 4
-    - - 32
-      - 6
-    - - 32
-      - 8
-    - - 32
-      - 10
-    - - 14
-      - 22
-    - - 14
-      - 24
-    - - 14
-      - 26
-    - - 14
-      - 28
-    - - 32
-      - 30
-    - - 32
-      - 16
-    - - 32
-      - 18
-    - - 32
-      - 20
-    - - 32
-      - 22
-    - - 32
-      - 24
-    - - 32
-      - 26
-    - - 32
-      - 28
-    - - 14
-      - 20
-    - - 14
-      - 16
-    - - 14
-      - 18
-  tileset/building_wood_outer_edge_se:
-    - - 22
-      - 16
-    - - 6
-      - 16
   01entry_light:
     - - 22
       - 28
-  table_large01:
-    - - 26
-      - 6
-  tileset/building_wood_variant3:
-    - - 28
-      - 2
-  tileset/cabinet_small_01:
-    - - 6
-      - 20
-  tileset/sack_stack:
-    - - 2
-      - 4
-  tileset/plate04:
-    - - 27
-      - 6
-  tileset/cabinet_bot_03:
-    - - 20
-      - 19
-  tileset/interior_wood_outer_edge_se:
-    - - 22
-      - 14
-    - - 6
-      - 14
-  tileset/interior_wood_inner_edge_ne:
-    - - 0
-      - 30
-    - - 0
-      - 12
-    - - 16
-      - 32
-  tileset/cabinet04:
-    - - 18
-      - 16
-  tileset/chair04:
-    - - 30
-      - 6
-    - - 30
-      - 8
-  tileset/book01:
-    - - 2
-      - 28
-  tileset/rug_small01:
-    - - 24
-      - 30
-    - - 6
-      - 22
-  tileset/cabinet_wide01:
-    - - 10
-      - 17
-  tileset/lantern_off:
-    - - 30
-      - 26
-  tileset/interior_wood_outer_edge_sw:
-    - - 26
-      - 14
-    - - 10
-      - 14
 terrain:
   - ~
   - ~

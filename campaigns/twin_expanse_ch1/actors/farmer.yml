@@ -5,13 +5,13 @@ race: human
 sex: Male
 portrait: portraits/human21
 attributes:
-  str: 18
-  dex: 14
-  end: 16
-  per: 12
-  int: 10
+  str: 12
+  dex: 10
+  end: 13
+  per: 10
+  int: 9
   wis: 10
-conversation: ~
+conversation: farmer
 faction: Friendly
 images:
   Hair: creatures/hair03
@@ -38,14 +38,5 @@ xp: ~
 reward: ~
 abilities:
   - armor_light
-  - armor_medium
-  - armor_heavy
-  - weapon_axe
-  - weapon_crossbow
-  - weapon_bow
-  - weapon_small_sword
-  - weapon_large_sword
-  - weapon_spear
-  - weapon_mace
   - weapon_simple
 ai: ~

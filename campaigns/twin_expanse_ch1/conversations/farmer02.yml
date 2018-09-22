@@ -1,0 +1,52 @@
+id: farmer02
+initial_nodes:
+  - id: already_talked
+    to_view:
+      - target_flags: [ already_talked ]
+  - id: start01
+nodes:
+  __ADVENTURER_REFS:
+    text: ""
+    responses: &adventurer_responses
+      - text: "I don't know, a quiet life on the farm sounds nice."
+        to: neg02
+      - text: "Yeah, it is pretty great!"
+        to: affirm02
+      - text: "It isn't all good - there is an awful lot of walking - and talking to boring strangers."
+        to: neg02
+  already_talked:
+    text: "I wish I were an adventurer!"
+    responses: []
+  start01:
+    text: |
+      [c=888|This woman seems more excitable than the others around here.]
+      
+      Hey - are you an adventurer?
+    on_view:
+      - target_flags: [ already_talked ]
+      - fire_script:
+          id: wellswood_farms
+          func: adventurer_talked
+    responses:
+      - text: "I suppose I am."
+        to: affirm
+      - text: "No, not really."
+        to: neg
+      - text: "You are damn right I am!"
+        to: affirm
+  affirm:
+    text: |
+      I knew it!  I wish I was like you!  Fighting evil, righting wrongs.  It all sounds so exciting!
+    responses: *adventurer_responses
+  neg:
+    text: |
+      Don't be coy with me!  I already know you are!
+      
+      I wish I were like you!  Fighting evil, righting wrongs.  It all sounds so exciting!
+    responses: *adventurer_responses
+  neg02:
+    text: "You are crazy!  Anything would beat staying here!"
+    responses: []
+  affirm02:
+    text: "Wow, it sounds amazing!"
+    responses: []

@@ -1,0 +1,50 @@
+---
+id: "farmer02"
+name: Farmer
+race: human
+sex: Female
+portrait: portraits/human21
+attributes:
+  str: 12
+  dex: 10
+  end: 13
+  per: 10
+  int: 9
+  wis: 10
+conversation: farmer02
+faction: Friendly
+images:
+  Hair: creatures/hair03
+hue: 0.7000001072883606
+hair_color:
+  r: 0.545098066329956
+  g: 0.2705882489681244
+  b: 0.07450980693101883
+  a: 1.0
+skin_color:
+  r: 0.8078431487083435
+  g: 0.5803921818733215
+  b: 0.32156863808631899
+  a: 1.0
+inventory:
+  equipped:
+    Torso:
+      id: torso_shirt
+      adjectives: []
+    HeldMain:
+      id: quarterstaff
+      adjectives: []
+    Feet:
+      id: boots_leather
+      adjectives: []
+    Legs:
+      id: legs_pants
+      adjectives: []
+levels:
+  fighter: 1
+xp: ~
+reward: ~
+abilities:
+  - armor_light
+  - weapon_simple
+ai: ~

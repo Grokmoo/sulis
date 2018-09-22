@@ -76,7 +76,10 @@ impl WidgetKind for QuestWindow {
         let quest_list_pane = ScrollPane::new();
         let quest_list_widget = Widget::with_theme(quest_list_pane.clone(), "quest_list");
 
-        for quest in Module::all_quests() {
+        let mut all_quests = Module::all_quests();
+        all_quests.sort_unstable_by_key(|q| q.name.clone());
+
+        for quest in all_quests {
             let selected = if let Some(ref active_quest) = self.active_quest {
                 Rc::ptr_eq(active_quest, &quest)
             } else {

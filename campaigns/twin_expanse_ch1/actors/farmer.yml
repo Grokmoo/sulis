@@ -14,8 +14,10 @@ attributes:
 conversation: farmer
 faction: Friendly
 images:
-  Hair: creatures/hair03
-hue: 0.0
+  Foreground: empty
+  Background: creatures/human01
+  Shadow: empty
+hue: 0.5
 hair_color:
   r: 0.8509804010391235
   g: 0.529411792755127
@@ -26,12 +28,7 @@ skin_color:
   g: 0.95686274766922
   b: 0.7843137383460999
   a: 1.0
-inventory:
-  equipped:
-    Feet: { id: boots_leather }
-    Torso: { id: torso_leather }
-    Legs: { id: legs_pants }
-    Cloak: { id: cloak }
+inventory: {}
 levels:
   fighter: 1
 xp: ~

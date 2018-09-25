@@ -54,6 +54,10 @@ children:
             from: .editor.top_bar.mode_button
             text: "Shift Tiles"
             position: [80, 0]
+          actor_creator:
+            from: .editor.top_bar.mode_button
+            text: "Actor Creator"
+            position: [106, 0]
           walls:
             from: .editor.top_bar.mode_button
             text: "Walls"
@@ -298,6 +302,158 @@ children:
         children:
           title:
             text: "Exit the Editor?"
+      actor_creator_window:
+        from: .window
+        height_relative: Zero
+        preferred_size: [180, 100]
+        x_relative: Center
+        y_relative: Center
+        children:
+          title:
+            text: "Actor Creator"
+          accept_button:
+            from: .button
+            preferred_size: [16, 6]
+            text: "Save"
+            y_relative: Max
+            x_relative: Max
+          race_pane:
+            height_relative: Max
+            preferred_size: [30, 0]
+            children:
+              race_title:
+                from: .label
+                text: "Race"
+                width_relative: Max
+                preferred_size: [0, 8]
+              races_list:
+                from: .list_box
+                border: [1, 1, 1, 1]
+                preferred_size: [0, -8]
+                position: [0, 8]
+                height_relative: Max
+                width_relative: Max
+                children:
+                  entry:
+                    text_params:
+                      scale: 6.0
+                    preferred_size: [0, 6]
+          images_pane:
+            height_relative: ChildSum
+            position: [35, 20]
+            preferred_size: [40, 0]
+            layout: BoxVertical
+            children:
+              layer_pane:
+                border: [1, 1, 1, 1]
+                preferred_size: [0, 10]
+                width_relative: Max
+                background: bg_base
+                children:
+                  prev_button:
+                    from: .button
+                    text: "<"
+                    position: [0, 0]
+                    preferred_size: [8, 8]
+                  title:
+                    from: .label
+                    text: "#0#"
+                    position: [10, 0]
+                    preferred_size: [18, 8]
+                  next_button:
+                    from: .button
+                    text: ">"
+                    preferred_size: [8, 8]
+                    position: [30, 0]
+          id_pane:
+            position: [35, 10]
+            preferred_size: [40, 10]
+            children:
+              title:
+                from: .label
+                text: "ID"
+                position: [0, 0]
+                preferred_size: [8, 8]
+              id_field:
+                from: .input_field
+                position: [10, 0]
+                preferred_size: [-10, 8]
+                width_relative: Max
+          name_pane:
+            position: [85, 10]
+            preferred_size: [60, 10]
+            children:
+              title:
+                from: .label
+                text: "Name"
+                position: [0, 0]
+                preferred_size: [8, 8]
+              name_field:
+                from: .input_field
+                position: [10, 0]
+                preferred_size: [-10, 8]
+                width_relative: Max
+          levels_pane:
+            position: [85, 20]
+            preferred_size: [60, 30]
+            layout: Grid
+            layout_spacing: { bottom: 1, right: 1 }
+            children:
+              class_widget:
+                from: .button
+                preferred_size: [19, 8]
+                text: "#0#"
+          faction_pane:
+            position: [85, 50]
+            preferred_size: [40, 10]
+            children:
+              Friendly:
+                from: .button
+                position: [0, 0]
+                text: "Friendly"
+                preferred_size: [18, 8]
+              Hostile:
+                from: .button
+                position: [20, 0]
+                text: "Hostile"
+                preferred_size: [18, 8]
+          sex_pane:
+            position: [85, 60]
+            preferred_size: [40, 10]
+            children:
+              Male:
+                from: .button
+                position: [0, 0]
+                text: "Male"
+                preferred_size: [18, 8]
+              Female:
+                from: .button
+                position: [20, 0]
+                text: "Female"
+                preferred_size: [18, 8]
+          hue_pane:
+            position: [85, 70]
+            preferred_size: [40, 10]
+            children:
+              prev_button:
+                from: .button
+                text: "<"
+                position: [0, 0]
+                preferred_size: [8, 8]
+              title:
+                from: .label
+                text: "Hue"
+                position: [10, 0]
+                preferred_size: [18, 8]
+              next_button:
+                from: .button
+                text: ">"
+                preferred_size: [8, 8]
+                position: [30, 0]
+          view_pane:
+            background: bg_transparent_base
+            preferred_size: [15, 15]
+            position: [150, 10]
       shift_tiles_window:
         from: .window
         height_relative: Zero

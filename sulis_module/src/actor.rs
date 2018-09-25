@@ -36,6 +36,12 @@ pub enum Faction {
     Hostile,
 }
 
+impl Faction{
+    pub fn iter() -> impl Iterator<Item=&'static Faction> {
+        [Faction::Friendly, Faction::Hostile].iter()
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct Reward {
     pub xp: u32,
@@ -64,6 +70,12 @@ impl Default for Reward {
 pub enum Sex {
     Male,
     Female,
+}
+
+impl Sex {
+    pub fn iter() -> impl Iterator<Item=&'static Sex> {
+        [Sex::Male, Sex::Female].iter()
+    }
 }
 
 impl fmt::Display for Sex {
@@ -376,18 +388,27 @@ pub struct ActorBuilder {
     pub name: String,
     pub race: String,
     pub sex: Option<Sex>,
+    #[serde(skip_serializing_if="Option::is_none")]
     pub portrait: Option<String>,
     pub attributes: AttributeList,
     pub conversation: Option<String>,
     pub faction: Option<Faction>,
     pub images: HashMap<ImageLayer, String>,
     pub hue: Option<f32>,
+
+    #[serde(skip_serializing_if="Option::is_none")]
     pub hair_color: Option<Color>,
+
+    #[serde(skip_serializing_if="Option::is_none")]
     pub skin_color: Option<Color>,
     #[serde(default)]
     pub inventory: InventoryBuilder,
     pub levels: HashMap<String, u32>,
+
+    #[serde(skip_serializing_if="Option::is_none")]
     pub xp: Option<u32>,
+
+    #[serde(skip_serializing_if="Option::is_none")]
     pub reward: Option<RewardBuilder>,
     pub abilities: Vec<String>,
     pub ai: Option<String>,

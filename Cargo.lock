@@ -855,6 +855,7 @@ dependencies = [
  "serde 1.0.78 (registry+https://github.com/rust-lang/crates.io-index)",
  "sulis_core 0.1.1",
  "sulis_module 0.1.1",
+ "sulis_rules 0.1.1",
  "sulis_state 0.1.1",
  "sulis_widgets 0.1.1",
 ]

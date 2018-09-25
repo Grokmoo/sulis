@@ -16,6 +16,7 @@
 
 use std::io::Error;
 use std::rc::Rc;
+use std::fmt;
 use std::collections::HashMap;
 
 use sulis_core::ui::Color;
@@ -47,6 +48,14 @@ pub struct Race {
     default_images: ImageLayerSet,
     image_layer_offsets: HashMap<ImageLayer, (f32, f32)>,
     image_layer_postfix: HashMap<Sex, String>,
+
+    editor_creator_images: Vec<(ImageLayer, Vec<Rc<Image>>)>,
+}
+
+impl fmt::Display for Race {
+   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.id)
+    }
 }
 
 impl PartialEq for Race {
@@ -87,6 +96,21 @@ impl Race {
             skin_colors.push(Color::from_string(color_str));
         }
 
+        let mut editor_creator_images = Vec::new();
+        for (layer, vec) in builder.editor_creator_images {
+            let mut images = Vec::new();
+            for image_id in vec {
+                match ResourceSet::get_image(&image_id) {
+                    None => {
+                        warn!("No image found with id '{}'", image_id);
+                        return unable_to_create_error("race", &builder.id);
+                    },
+                    Some(image) => images.push(image),
+                }
+            }
+            editor_creator_images.push((layer, images));
+        }
+
         Ok(Race {
             id: builder.id,
             name: builder.name,
@@ -105,7 +129,16 @@ impl Race {
             hair_colors,
             skin_colors,
             ticker_offset: builder.ticker_offset,
+            editor_creator_images,
         })
+    }
+
+    pub fn has_editor_creator_images(&self) -> bool {
+        !self.editor_creator_images.is_empty()
+    }
+
+    pub fn editor_creator_images(&self) -> Vec<(ImageLayer, Vec<Rc<Image>>)> {
+        self.editor_creator_images.clone()
     }
 
     pub fn image_for_sex(&self, sex: Sex, image: &Rc<Image>) -> Rc<Image> {
@@ -157,6 +190,9 @@ pub struct RaceBuilder {
     image_layer_offsets: HashMap<ImageLayer, Point>,
     image_layer_offset_scale: i32,
     image_layer_postfix: HashMap<Sex, String>,
+
+    #[serde(default)]
+    editor_creator_images: HashMap<ImageLayer, Vec<String>>,
 
     #[serde(default)]
     disabled_slots: Vec<Slot>,

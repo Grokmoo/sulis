@@ -17,6 +17,9 @@
 mod actor_picker;
 use actor_picker::ActorPicker;
 
+mod actor_creator_window;
+use actor_creator_window::ActorCreatorWindow;
+
 mod area_editor;
 use area_editor::AreaEditor;
 
@@ -64,6 +67,7 @@ extern crate rand;
 
 extern crate sulis_core;
 extern crate sulis_module;
+extern crate sulis_rules;
 extern crate sulis_widgets;
 
 use std::any::Any;
@@ -218,9 +222,18 @@ impl WidgetKind for EditorView {
                 Widget::add_child_to(&root, shift_tiles_window);
             })));
 
+            let actor_creator = Widget::with_theme(Button::empty(), "actor_creator");
+            actor_creator.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
+                let root = Widget::get_root(widget);
+                let window = Widget::with_defaults(ActorCreatorWindow::new());
+                window.borrow_mut().state.set_modal(true);
+                Widget::add_child_to(&root, window);
+            })));
+
             Widget::add_child_to(&top_bar, menu);
             Widget::add_child_to(&top_bar, transitions);
             Widget::add_child_to(&top_bar, shift_tiles);
+            Widget::add_child_to(&top_bar, actor_creator);
         }
 
         let tile_picker_kind = TilePicker::new();

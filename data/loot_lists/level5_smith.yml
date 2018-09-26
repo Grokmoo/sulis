@@ -1,0 +1,176 @@
+id: level5_smith
+generate: {}
+weighted_entries: {}
+probability_entries:
+  boots_leather:
+    weight: 80
+    adjective1:
+      none: 8
+      fine: 2
+  boots_mail:
+    weight: 70
+    adjective1:
+      none: 9
+      fine: 1
+  boots_plate:
+    weight: 30
+  gloves_leather:
+    weight: 80
+    adjective1:
+      none: 8
+      fine: 2
+  gloves_mail:
+    weight: 70
+    adjective1:
+      none: 9
+      fine: 1
+  gloves_plate:
+    weight: 30
+  helm_leather:
+    weight: 80
+    adjective1:
+      none: 8
+      fine: 2
+  helm_mail:
+    weight: 70
+    adjective1:
+      none: 9
+      fine: 1
+  helm_plate:
+    weight: 30
+  legs_leather:
+    weight: 80
+    adjective1:
+      none: 8
+      fine: 2
+  legs_mail:
+    weight: 70
+    adjective1:
+      none: 9
+      fine: 1
+  legs_plate:
+    weight: 30
+  torso_leather:
+    weight: 70
+    adjective1:
+      none: 8
+      fine: 2
+  torso_mail:
+    weight: 70
+    adjective1:
+      none: 9
+      fine: 1
+  torso_plate:
+    weight: 5
+  shield_small:
+    weight: 70
+    adjective1:
+      none: 8
+      fine: 2
+  shield_large:
+    weight: 50
+    adjective1:
+      none: 8
+      fine: 2
+  shield_heater:
+    weight: 60
+    adjective1:
+      none: 8
+      fine: 2
+  shield_kite:
+    weight: 60
+    adjective1:
+      none: 8
+      fine: 2
+  battleaxe:
+    weight: 50
+    adjective1:
+      none: 7
+      fine: 3
+  club:
+    weight: 80
+  crossbow:
+    weight: 50
+    adjective1:
+      none: 7
+      fine: 3
+  dagger:
+    weight: 80
+    adjective1:
+      none: 7
+      fine: 3
+  flail:
+    weight: 10
+    adjective1:
+      none: 7
+      fine: 3
+  greataxe:
+    weight: 10
+    adjective1:
+      none: 7
+      fine: 3
+  greathammer:
+    weight: 10
+    adjective1:
+      none: 7
+      fine: 3
+  greatsword:
+    weight: 10
+    adjective1:
+      none: 7
+      fine: 3
+  hatchet:
+    weight: 80
+    adjective1:
+      none: 7
+      fine: 3
+  longbow:
+    weight: 10
+    adjective1:
+      none: 7
+      fine: 3
+  longspear:
+    weight: 20
+    adjective1:
+      none: 7
+      fine: 3
+  longsword:
+    weight: 20
+    adjective1:
+      none: 7
+      fine: 3
+  mace:
+    weight: 50
+    adjective1:
+      none: 7
+      fine: 3
+  morningstar:
+    weight: 20
+    adjective1:
+      none: 7
+      fine: 3
+  quarterstaff:
+    weight: 80
+    adjective1:
+      none: 7
+      fine: 3
+  shortbow:
+    weight: 50
+    adjective1:
+      none: 7
+      fine: 3
+  shortspear:
+    weight: 50
+    adjective1:
+      none: 7
+      fine: 3
+  shortsword:
+    weight: 50
+    adjective1:
+      none: 7
+      fine: 3
+  warhammer:
+    weight: 50
+    adjective1:
+      none: 7
+      fine: 3

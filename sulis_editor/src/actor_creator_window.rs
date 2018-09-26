@@ -108,7 +108,9 @@ impl ActorCreatorWindow {
         };
 
         match write_to_file(&filename, &actor) {
-            Ok(()) => (),
+            Ok(()) => {
+                Module::add_actor_to_resources(actor);
+            },
             Err(e) => {
                 warn!("{}", e);
                 warn!("Unable to write created character to file '{}'", filename);

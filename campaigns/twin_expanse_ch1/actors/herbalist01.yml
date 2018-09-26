@@ -1,0 +1,28 @@
+---
+id: herbalist01
+name: Herbalist
+race: human
+sex: Male
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
+conversation: herbalist01
+faction: Friendly
+images:
+  Shadow: empty
+  Background: creatures/human16
+  Foreground: empty
+hue: 0.8999999761581421
+inventory:
+  equipped: {}
+  quick: {}
+  pc_starting_coins: 0
+  pc_starting_items: []
+levels:
+  mage: 1
+abilities: []
+ai: ~

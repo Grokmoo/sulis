@@ -1,0 +1,28 @@
+---
+id: townsperson11
+name: Townsperson
+race: human
+sex: Male
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
+conversation: ~
+faction: Friendly
+images:
+  Foreground: empty
+  Shadow: empty
+  Background: creatures/human02
+hue: 0.7999999523162842
+inventory:
+  equipped: {}
+  quick: {}
+  pc_starting_coins: 0
+  pc_starting_items: []
+levels:
+  fighter: 1
+abilities: []
+ai: ~

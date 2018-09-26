@@ -499,6 +499,21 @@ impl Module {
         })
     }
 
+    pub fn add_actor_to_resources(builder: ActorBuilder) {
+        let result: Result<(), Error> = MODULE.with(|module| {
+            let mut module = module.borrow_mut();
+            let actor = Actor::new(builder, &module)?;
+            let id = actor.id.to_string();
+            module.actors.insert(id, Rc::new(actor));
+            Ok(())
+        });
+
+        if let Err(e) = result {
+            warn!("Error loading and inserting actor");
+            warn!("{}", e);
+        }
+    }
+
     pub fn campaign() -> Rc<Campaign> {
         MODULE.with(|m| Rc::clone(m.borrow().campaign.as_ref().unwrap()))
     }

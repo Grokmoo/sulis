@@ -1,0 +1,28 @@
+---
+id: smith01
+name: Blacksmith
+race: human
+sex: Male
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
+conversation: smith01
+faction: Friendly
+images:
+  Foreground: empty
+  Background: creatures/human12
+  Shadow: empty
+hue: 0.30000001192092898
+inventory:
+  equipped: {}
+  quick: {}
+  pc_starting_coins: 0
+  pc_starting_items: []
+levels:
+  fighter: 1
+abilities: []
+ai: ~

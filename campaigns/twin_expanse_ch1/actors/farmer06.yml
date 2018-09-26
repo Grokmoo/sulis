@@ -1,0 +1,28 @@
+---
+id: farmer06
+name: Farmer
+race: human
+sex: Male
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
+conversation: ~
+faction: Friendly
+images:
+  Shadow: empty
+  Background: creatures/human03
+  Foreground: empty
+hue: 0.6000000238418579
+inventory:
+  equipped: {}
+  quick: {}
+  pc_starting_coins: 0
+  pc_starting_items: []
+levels:
+  fighter: 1
+abilities: []
+ai: ~

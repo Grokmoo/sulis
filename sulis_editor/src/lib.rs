@@ -280,6 +280,7 @@ impl WidgetKind for EditorView {
             entries.push(list_box::Entry::new(name.to_string(), Some(Callback::new(Rc::new(move |widget, _| {
                 pickers_ref.iter().for_each(|p| p.borrow_mut().state.set_visible(false));
                 pickers_ref[index].borrow_mut().state.set_visible(true);
+                pickers_ref[index].borrow_mut().invalidate_children();
                 area_editor_ref.borrow_mut().set_editor(picker_kinds_ref[index].clone());
 
                 let parent = Widget::get_parent(widget);

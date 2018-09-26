@@ -1,5 +1,5 @@
 ---
-id: "farmer04"
+id: "farmer01"
 name: Farmer
 race: human
 sex: Male
@@ -14,12 +14,14 @@ attributes:
 conversation: ~
 faction: Friendly
 images:
-  Beard: creatures/beard03
-hue: 0.07
+  Background: creatures/human01
+  Foreground: empty
+  Shadow: empty
+hue: 0.6000000834465027
 hair_color:
-  r: 0.8039215803146362
-  g: 0.5215686559677124
-  b: 0.24705882370471955
+  r: 0.545098066329956
+  g: 0.2705882489681244
+  b: 0.07450980693101883
   a: 1.0
 skin_color:
   r: 1.0
@@ -39,9 +41,6 @@ inventory:
       adjectives: []
 levels:
   fighter: 1
-xp: ~
-reward: ~
 abilities:
   - armor_light
   - weapon_simple
-ai: ~

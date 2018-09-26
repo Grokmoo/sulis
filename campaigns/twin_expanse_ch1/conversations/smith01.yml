@@ -1,0 +1,18 @@
+id: smith01
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=888|This large man stands outside of a large blacksmith's shop.]
+      
+      What can I get for you?
+    responses:
+      - text: "Lets see what you have."
+        on_select:
+          - show_merchant:
+              id: smith01
+              loot_list: level5_smith
+              buy_frac: 1.0
+              sell_frac: 0.25
+      - text: "Nothing today."

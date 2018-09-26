@@ -1,0 +1,18 @@
+id: herbalist01
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=888|An earthy smell permeates the air as you walk up.]
+      
+      Welcome.  Do you need anything?
+    responses:
+      - text: "Yes, I'll have a look."
+        on_select:
+          - show_merchant:
+              id: herbalist01
+              loot_list: level5_herbalist
+              buy_frac: 1.0
+              sell_frac: 0.25
+      - text: "Nothing for now."

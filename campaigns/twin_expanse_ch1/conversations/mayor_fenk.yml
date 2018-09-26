@@ -1,0 +1,95 @@
+id: mayor_fenk
+initial_nodes:
+  - id: questions
+    to_view:
+      - target_flags: [ already_talked ]
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=888|This man wears robes that are too ornate for a commoner, and speaks with the air of authority.]
+      
+      Hello, I don't believe we've met.  I am Aldius Fenk, mayor of this town.
+    on_view:
+      - target_flags: [ already_talked ]
+    responses:
+      - text: "I am #player_name#."
+        to: start02
+  start02:
+    text: |
+      Well met, #player_name#.  Are you here about the raids, or is there something else?
+    responses:
+      - text: "I had questions."
+        to: questions
+      - text: "What's this about the raids?"
+        to: raids
+  questions:
+    text: "What can I help you with?"
+    responses:
+      - text: "I was with Tervald's group.  We were ambushed by goblins and I am the only survivor."
+        to: tervald
+      - text: "What's this about the raids?"
+        to: raids
+      - text: "Nothing, farewell."
+  tervald:
+    text: "That's terrible news!  Tervald was a skilled warrior and good friend.  He will be missed."
+    responses:
+      - text: "[c=888|Continue]"
+        to: questions
+  raids:
+    text: |
+      The goblins have become bolder of late, and many of our farms have been destroyed and people killed.
+      
+      We've even heard rumors of trolls traveling with the goblins!
+    responses:
+      - text: "[c=888|Continue]"
+        to: raids02
+  raids02:
+    text: |
+      Someone or something is organzing the goblin tribes.  Normally, we could call on Rose Lake at times like these, but they have rejected my messengers.  I need skilled warriors to track down and eliminate the leader or leaders of this uprising.
+      
+      I am putting out a general call for aid - and a substantial reward.
+    responses:
+      - text: "[c=888|Continue]"
+        to: raids03
+        on_select:
+          - fire_script:
+              id: wellswood
+              func: goblin_raids_start
+  raids03:
+    text: |
+      Do you have any questions?
+    responses:
+      - text: "Rose Lake won't render aid?"
+        to: rose_lake_aid
+      - text: "Do you have any leads on where to start?"
+        to: goblin_raids_leads
+      - text: "What sort of reward are you offering?"
+        to: goblin_raids_reward
+      - text: "I have other questions."
+        to: questions
+      - text: "Nothing right now.  Farewell."
+  goblin_raids_leads:
+    text: |
+      We honestly have very little to go on.  We don't even know whether there is a single chieftan organizing this or some outside group.
+      
+      The best place to start looking is in Wellswood forest and the surrounding hills.  It is goblin country though, so be prepared.
+    responses:
+      - text: "[c=888|Continue]"
+        to: raids03
+        on_select:
+          - fire_script:
+              id: wellswood
+              func: goblin_raids_leads
+  goblin_raids_reward:
+    text: |
+      I can't name numbers yet but any assistance will be met with our undying gratitude and a substantial sum as well.
+    responses:
+      - text: "[c=888|Continue]"
+        to: raids03
+  rose_lake_aid:
+    text: |
+      Most of the people here have a rather dim view of Rose Lake's propensity to help us.  But, they have helped in the past.  They are currently going through some political turmoil that is blocking that.
+    responses:
+      - text: "[c=888|Continue]"
+        to: raids03

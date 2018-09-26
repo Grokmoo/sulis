@@ -1,0 +1,18 @@
+id: priest01
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=888|This person's symbols and outfit identify them as a priest of Icanir.]
+      
+      Hello.  How may I help you?
+    responses:
+      - text: "Can I see what services you offer?"
+        on_select:
+          - show_merchant:
+              id: priest01
+              loot_list: level5_priest
+              buy_frac: 1.0
+              sell_frac: 0.25
+      - text: "Nothing for now."

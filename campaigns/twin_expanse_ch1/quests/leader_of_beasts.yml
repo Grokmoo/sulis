@@ -1,0 +1,9 @@
+id: leader_of_beasts
+name: "Leader of Beasts"
+entries:
+  start:
+    description: |
+      The mayor of Wellswood, a man named Fenk, wants me to try to track down and kill whoever is leading the current goblin raids.
+  leads:
+    description: |
+      Very little is known of the goblin leader.  It is suggested I start my search in Wellswood forest.

@@ -31,9 +31,6 @@ skin_color:
 inventory: {}
 levels:
   fighter: 1
-xp: ~
-reward: ~
 abilities:
   - armor_light
   - weapon_simple
-ai: ~

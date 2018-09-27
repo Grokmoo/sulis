@@ -15,7 +15,7 @@ conversation: vaalyun
 faction: Friendly
 images:
   Hair: creatures/hair08
-hue: 0.30000001192092898
+hue: 0.3
 hair_color:
   r: 0.3607843220233917
   g: 0.20000000298023225
@@ -56,7 +56,6 @@ inventory:
 levels:
   fighter: 4
 xp: 800
-reward: ~
 abilities:
   - armor_light
   - armor_medium
@@ -73,4 +72,3 @@ abilities:
   - crippling_shot
   - lightning_reflexes
   - helping_hand
-ai: ~

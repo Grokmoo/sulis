@@ -1,0 +1,40 @@
+id: forest_troll
+name: Forest Troll
+description: "Monster"
+size: 3by3
+movement_rate: 1.2
+base_stats:
+  - kind: { attribute: { attribute: Strength, amount: 4 } }
+  - kind: { attribute: { attribute: Endurance, amount: 4 } }
+  - kind: { attribute: { attribute: Intellect, amount: -4 } }
+  - kind: { hit_points: 40 }
+  - kind: { melee_accuracy: 30 }
+  - kind: { ranged_accuracy: 30 }
+  - kind: { spell_accuracy: 20 }
+  - kind: { defense: 30 }
+  - kind: { fortitude: 30 }
+  - kind: { reflex: 30 }
+  - kind: { will: 30 }
+  - kind: { reach: 1.0 }
+base_attack:
+  damage:
+    min: 15
+    max: 22
+    kind: Crushing
+  kind: #Melee
+    reach: 1.0
+  bonuses: {}
+default_images:
+  Male:
+    Background: creatures/forest_troll01
+    Shadow: creatures/forest_troll_shadow
+  Female:
+    Background: creatures/forest_troll01
+    Shadow: creatures/forest_troll_shadow
+ticker_offset: [0.0, 1.5]
+image_layer_offset_scale: 16
+image_layer_offsets:
+  Shadow: [-8, -34]
+  Background: [-8, -24]
+image_layer_postfix: {}
+

@@ -1,0 +1,19 @@
+id: forest_troll_level6
+auto_spawn: true
+min_gen_actors: 2
+max_gen_actors: 3
+entries:
+  - id: forest_troll
+    always: true
+  - id: goblin_archer
+    weight: 2
+  - id: goblin_champion_01
+    weight: 1
+  - id: goblin_champion_02
+    weight: 1
+  - id: goblin_rogue
+    weight: 1
+  - id: goblin_mage_01
+    weight: 1
+  - id: goblin_mage_02
+    weight: 1

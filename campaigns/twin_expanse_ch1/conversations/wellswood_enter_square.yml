@@ -1,0 +1,15 @@
+id: wellswood_enter_square
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=888|As you move towards the square, you notice a small group of townspeople harrassing a young Rodian.]
+    responses:
+      - text: "[c=888|Continue]"
+        to: start02
+  start02:
+    text: |
+      [c=888|One of the men shoves the Rodian, but he doesn't fight back.  The rodian backs away and the men seem to have lost interest, at least for now.]
+    responses:
+      - text: "[c=888|Continue]"

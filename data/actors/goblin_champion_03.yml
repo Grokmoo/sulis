@@ -1,0 +1,39 @@
+id: goblin_champion_03
+ai: ai_basic
+name: Goblin Champion
+faction: Hostile
+race: goblin
+attributes:
+  str: 15
+  dex: 10
+  end: 11
+  per: 10
+  int: 10
+  wis: 10
+levels:
+  fighter: 6
+inventory:
+  equipped:
+    HeldMain: { id: morningstar }
+    HeldOff: { id: shield_large }
+reward:
+  xp: 30
+  loot: level1_misc
+  loot_chance: 45
+images:
+  Background: creatures/goblin2
+abilities:
+  - armor_light
+  - armor_medium
+  - armor_heavy
+  - weapon_axe
+  - weapon_crossbow
+  - weapon_bow
+  - weapon_small_sword
+  - weapon_large_sword
+  - weapon_spear
+  - weapon_mace
+  - weapon_simple
+  - guardian
+  - powerful_blows
+  - shield_slam

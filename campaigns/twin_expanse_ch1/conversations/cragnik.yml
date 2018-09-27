@@ -1,0 +1,96 @@
+id: cragnik
+initial_nodes:
+  - id: questions
+    to_view:
+      - target_flags: [ joined ]
+  - id: reconsider
+    to_view:
+      - target_flags: [ rejected ]
+  - id: start02
+    to_view:
+      - target_flags: [ already_talked ]
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=888|This rodian seems very out of place in a small town.]
+      
+      This one offers you greetings.  This one is called Cragnik.
+    on_view:
+      - target_flags: [ already_talked ]
+    responses:
+      - text: "I am #player_name#.  Pleased to meet you."
+        to: start02
+      - text: "I'm #player_name#."
+        to: start02
+  start02:
+    text: |
+      Greetings, #player_name#.  This one is most humbled by your presence.  This one has a request if you would hear it.
+    responses:
+      - text: "Go ahead."
+        to: start04
+      - text: "Ok, but make it quick."
+        to: start04
+      - text: "I'm not interested in whatever you are selling."
+        to: start03
+  start03:
+    text: |
+      Not selling anything, no!  Will just take a moment!
+    responses:
+      - text: "Not interested.  Farewell."
+      - text: "Ok.  Go ahead."
+        to: start04
+  start04:
+    text: |
+      You are a traveler-adventurer, yes?  This one wishes to join you.  This one is a skilled rogue and can help you.
+    responses:
+      - text: "Why do you want to join me?"
+        to: start05
+      - text: "Sounds good.  Welcome aboard."
+        to: join
+      - text: "Not interested."
+        to: reject
+  start05:
+    text: |
+      This one does not do well in the small town, in the forest.  This one is at home in the city.  This one wants to go to Rose Lake, but entrance is closed.
+    responses:
+      - text: "Rose Lake is closed off?  Why?"
+        to: start06
+      - text: "Ok.  You can join me."
+        to: join
+      - text: "I'm not interested in you joining me."
+        to: reject
+  start06:
+    text: |
+      This one doesn't know details.  Some internal politics in city, this one thinks.
+    responses:
+      - text: "Ok.  You can join me."
+        to: join
+      - text: "I'm not interested in you joining me."
+        to: reject
+  reject:
+    text: "This one hopes you will reconsider."
+    on_view:
+      - target_flags: [ rejected ]
+    responses:
+      - text: "[c=888|Leave]"
+  reconsider:
+    text: "Have you reconsidered my offer of joining you?"
+    responses:
+      - text: "Yes.  Welcome aboard."
+        to: join
+      - text: "No, not interested."
+        to: reject
+  join:
+    text: "This one is overjoyed!  You will not regret it."
+    on_view:
+      - fire_script:
+          id: wellswood
+          func: cragnik_join
+    responses:
+      - text: "[c=888|Leave]"
+  questions:
+    text: |
+      What can this one do for you?
+    responses:
+      - text: "Nothing right now, Cragnik."

@@ -34,6 +34,8 @@ groups:
       spider_large_shadow: [4, 21]
       scorpion_large: [8, 21]
       scorpion_large_shadow: [12, 21]
+      forest_troll01: [51, 21]
+      forest_troll_shadow: [55, 21]
   3by3:
     size: [3, 3]
     areas:

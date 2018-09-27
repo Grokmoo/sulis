@@ -1,0 +1,34 @@
+id: goblin_rogue
+ai: ai_basic
+name: Goblin Rogue
+faction: Hostile
+images: {}
+race: goblin
+attributes:
+  str: 9
+  dex: 12
+  end: 10
+  per: 12
+  int: 10
+  wis: 10
+levels:
+  rogue: 6
+inventory:
+  equipped:
+    HeldMain: { id: shortsword }
+reward:
+  xp: 10
+  loot: level1_misc
+  loot_chance: 35
+abilities:
+  - armor_light
+  - armor_medium
+  - weapon_bow
+  - weapon_small_sword
+  - weapon_spear
+  - weapon_simple
+  - backstab
+  - flanker
+  - flanker
+  - feint
+  - become_wind

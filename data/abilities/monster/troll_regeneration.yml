@@ -1,0 +1,19 @@
+id: troll_regeneration
+name: "Troll Regeneration"
+icon: abilities/heal
+description: |
+  Trolls regenerate hit points every round.
+active:
+  script: "troll_regeneration"
+  group: Fighter
+  ap: 0
+  duration:
+    Instant
+  cooldown: 1
+  ai:
+    priority: 1
+    kind: Buff
+    group: Single
+    range: Personal
+  short_description: |
+    Trolls regenerate hit points every round.

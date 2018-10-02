@@ -14,7 +14,6 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::env;
 use std::cell::RefCell;
 use std::io::{Read, Error, ErrorKind};
 use std::path::Path;
@@ -25,6 +24,7 @@ use std::collections::HashMap;
 use io::keyboard_event::Key;
 use io::{KeyboardEvent, InputAction};
 
+use dirs;
 use serde_yaml;
 
 thread_local! {
@@ -261,7 +261,7 @@ fn get_user_dir() -> PathBuf {
 }
 
 fn get_home_dir() -> PathBuf {
-    match env::home_dir() {
+    match dirs::home_dir() {
         Some(path) => path,
         None => PathBuf::new(),
     }

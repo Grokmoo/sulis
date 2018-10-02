@@ -361,7 +361,7 @@ impl UserData for ScriptEntity {
                 }
 
                 let new_loc = Location::new(x, y, &area_state.borrow().area);
-                match area_state.borrow_mut().transition_entity_to(entity, entity_index, new_loc) {
+                match area_state.borrow_mut().transition_entity_to(&entity, entity_index, new_loc) {
                     Err(e) => {
                         warn!("Unable to move entity using script function");
                         warn!("{}", e);

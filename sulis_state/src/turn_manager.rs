@@ -393,10 +393,7 @@ impl TurnManager {
 
             if !entity.is_party_member() { continue; }
 
-            entity.actor.init_turn();
-
-            // TODO this is healing the party at the end of each combat
-            entity.actor.init();
+            entity.actor.end_encounter();
         }
 
         if GameState::selected().is_empty() {

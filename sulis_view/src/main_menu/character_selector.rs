@@ -176,8 +176,7 @@ impl WidgetKind for CharacterSelector {
         let details = if let Some(ref actor) = self.selected {
             let mut actor_state = ActorState::new(Rc::clone(actor));
             actor_state.compute_stats();
-            actor_state.init();
-            actor_state.init_turn();
+            actor_state.init_day();
             create_details_text_box(&actor_state)
         } else {
             Widget::with_theme(TextArea::empty(), "details")

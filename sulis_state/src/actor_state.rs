@@ -27,24 +27,19 @@ use sulis_rules::{AccuracyKind, Attack, AttackKind, BonusList, HitKind, StatList
     QuickSlot, Slot, ItemKind};
 use sulis_module::{Actor, Module, ActorBuilder};
 use area_feedback_text::ColorKind;
-use {AbilityState, ChangeListenerList, Effect, EntityState, GameState, Inventory, ItemState};
+use {AbilityState, ChangeListenerList, Effect, EntityState, GameState, Inventory, ItemState, PStats};
 use save_state::ActorSaveState;
 
 pub struct ActorState {
     pub actor: Rc<Actor>,
     pub stats: StatList,
     pub listeners: ChangeListenerList<ActorState>,
-    hp: i32,
-    ap: u32,
-    overflow_ap: i32,
-    xp: u32,
-    has_level_up: bool,
     inventory: Inventory,
     effects: Vec<(usize, BonusList)>,
     image: LayeredImage,
     pub(crate) ability_states: HashMap<String, AbilityState>,
-    pub(crate) current_group_uses_per_encounter: HashMap<String, ExtInt>,
     texture_cache_invalid: bool,
+    p_stats: PStats,
 }
 
 impl ActorState {
@@ -85,23 +80,16 @@ impl ActorState {
         let mut inventory = Inventory::empty();
         inventory.load(save.equipped, save.quick)?;
 
-        let current_group_uses_per_encounter = save.current_group_uses_per_encounter;
-
         Ok(ActorState {
             actor,
             inventory,
             stats: StatList::new(attrs),
             listeners: ChangeListenerList::default(),
-            hp: save.hp,
-            ap: save.ap,
-            overflow_ap: save.overflow_ap,
-            xp: save.xp,
-            has_level_up: false,
             image,
             effects: Vec::new(),
             ability_states,
             texture_cache_invalid: false,
-            current_group_uses_per_encounter,
+            p_stats: save.p_stats,
         })
     }
 
@@ -122,24 +110,16 @@ impl ActorState {
             ability_states.insert(ability.id.to_string(), AbilityState::new(ability));
         }
 
-        let current_group_uses_per_encounter = HashMap::new();
-
-        let xp = actor.xp;
         let mut actor_state = ActorState {
             actor: Rc::clone(&actor),
             inventory,
             stats: StatList::new(attrs),
             listeners: ChangeListenerList::default(),
-            hp: 0,
-            ap: 0,
-            overflow_ap: 0,
-            xp,
-            has_level_up: false,
             image,
             effects: Vec::new(),
             ability_states,
             texture_cache_invalid: false,
-            current_group_uses_per_encounter,
+            p_stats: PStats::new(&actor),
         };
 
         actor_state.compute_stats();
@@ -167,6 +147,10 @@ impl ActorState {
         actor_state
     }
 
+    pub fn clone_p_stats(&self) -> PStats {
+        self.p_stats.clone()
+    }
+
     pub fn check_texture_cache_invalid(&mut self) -> bool {
         if self.texture_cache_invalid {
             self.texture_cache_invalid = false;
@@ -177,7 +161,8 @@ impl ActorState {
     }
 
     pub fn current_uses_per_encounter(&self, ability_group: &str) -> ExtInt {
-        *self.current_group_uses_per_encounter.get(ability_group).unwrap_or(&ExtInt::Int(0))
+        *self.p_stats.current_group_uses_per_encounter
+            .get(ability_group).unwrap_or(&ExtInt::Int(0))
     }
 
     pub fn ability_state(&mut self, id: &str) -> Option<&mut AbilityState> {
@@ -186,7 +171,7 @@ impl ActorState {
 
     /// Returns true if the parent can swap weapons, false otherwise
     pub fn can_swap_weapons(&self) -> bool {
-        self.ap >= Module::rules().swap_weapons_ap
+        self.p_stats.ap() >= Module::rules().swap_weapons_ap
     }
 
     /// Returns true if this actor can use the item in the specified quick slot
@@ -216,7 +201,7 @@ impl ActorState {
         match &item_state.item.usable {
             None => false,
             Some(usable) => {
-                self.ap >= usable.ap
+                self.p_stats.ap() >= usable.ap
             }
         }
     }
@@ -227,7 +212,7 @@ impl ActorState {
         match self.ability_states.get(id) {
             None => false,
             Some(ref state) => {
-                if self.ap < state.activate_ap() { return false; }
+                if self.p_stats.ap() < state.activate_ap() { return false; }
 
                 if state.is_active_mode() { return true; }
 
@@ -242,7 +227,7 @@ impl ActorState {
         match self.ability_states.get(id) {
             None => false,
             Some(ref state) => {
-                if self.ap < state.activate_ap() { return false; }
+                if self.p_stats.ap() < state.activate_ap() { return false; }
 
                 if self.current_uses_per_encounter(&state.group).is_zero() { return false; }
 
@@ -275,8 +260,10 @@ impl ActorState {
             None => (),
             Some(ref mut state) => {
                 state.activate();
-                let cur = *self.current_group_uses_per_encounter.get(&state.group).unwrap_or(&ExtInt::Int(1));
-                self.current_group_uses_per_encounter.insert(state.group.to_string(), cur - 1);
+                let cur = *self.p_stats.current_group_uses_per_encounter
+                    .get(&state.group).unwrap_or(&ExtInt::Int(1));
+                self.p_stats.current_group_uses_per_encounter
+                    .insert(state.group.to_string(), cur - 1);
             }
         }
     }
@@ -297,7 +284,7 @@ impl ActorState {
         }
 
         self.compute_stats();
-        self.init();
+        self.init_day();
     }
 
     pub fn draw(&self, renderer: &mut GraphicsRenderer, scale_x: f32, scale_y: f32,
@@ -324,7 +311,7 @@ impl ActorState {
     }
 
     pub(crate) fn has_ap_to_attack(&self) -> bool {
-        self.ap >= self.stats.attack_cost as u32
+        self.p_stats.ap() >= self.stats.attack_cost as u32
     }
 
     pub fn weapon_attack(parent: &Rc<RefCell<EntityState>>,
@@ -500,7 +487,7 @@ impl ActorState {
 
     pub fn swap_weapon_set(&mut self) {
         let swap_ap = Module::rules().swap_weapons_ap;
-        if self.ap < swap_ap { return; }
+        if self.ap() < swap_ap { return; }
         self.inventory.swap_weapon_set();
         self.compute_stats();
         self.texture_cache_invalid = true;
@@ -539,7 +526,7 @@ impl ActorState {
     }
 
     pub fn is_dead(&self) -> bool {
-        self.hp <= 0
+        self.hp() <= 0
     }
 
     pub fn check_death(parent: &Rc<RefCell<EntityState>>, target: &Rc<RefCell<EntityState>>) {
@@ -591,28 +578,27 @@ impl ActorState {
     }
 
     pub fn has_level_up(&self) -> bool {
-        self.has_level_up
+        self.p_stats.has_level_up()
     }
 
     pub fn add_xp(&mut self, xp: u32) {
-        self.xp += xp;
-        self.compute_stats();
+        self.p_stats.add_xp(xp, &self.actor);
     }
 
     pub fn xp(&self) -> u32 {
-        self.xp
+        self.p_stats.xp()
     }
 
     pub fn hp(&self) -> i32 {
-        self.hp
+        self.p_stats.hp()
     }
 
     pub fn overflow_ap(&self) -> i32 {
-        self.overflow_ap
+        self.p_stats.overflow_ap()
     }
 
     pub fn ap(&self) -> u32 {
-        self.ap
+        self.p_stats.ap()
     }
 
     pub fn get_move_ap_cost(&self, squares: u32) -> u32 {
@@ -621,55 +607,26 @@ impl ActorState {
     }
 
     pub fn set_overflow_ap(&mut self, ap: i32) {
-        let rules = Module::rules();
-        self.overflow_ap = ap;
-
-        if self.overflow_ap > rules.max_overflow_ap {
-            self.overflow_ap = rules.max_overflow_ap;
-        } else if self.overflow_ap < rules.min_overflow_ap {
-            self.overflow_ap = rules.min_overflow_ap;
-        }
+        self.p_stats.set_overflow_ap(ap);
     }
 
     pub fn change_overflow_ap(&mut self, ap: i32) {
-        let rules = Module::rules();
-        self.overflow_ap += ap;
-
-        if self.overflow_ap > rules.max_overflow_ap {
-            self.overflow_ap = rules.max_overflow_ap;
-        } else if self.overflow_ap < rules.min_overflow_ap {
-            self.overflow_ap = rules.min_overflow_ap;
-        }
+        let cur_overflow = self.p_stats.overflow_ap();
+        self.p_stats.set_overflow_ap(cur_overflow + ap);
     }
 
     pub(crate) fn remove_ap(&mut self, ap: u32) {
-        if ap > self.ap {
-            self.ap = 0;
-        } else {
-            self.ap -= ap;
-        }
-
+        self.p_stats.remove_ap(ap);
         self.listeners.notify(&self);
     }
 
     pub(crate) fn remove_hp(&mut self, hp: u32) {
-        if hp as i32 > self.hp {
-            self.hp = 0;
-        } else {
-            self.hp -= hp as i32;
-        }
-
+        self.p_stats.remove_hp(hp);
         self.listeners.notify(&self);
     }
 
     pub(crate) fn add_hp(&mut self, hp: u32) {
-        let hp = hp as i32;
-        if hp + self.hp > self.stats.max_hp {
-            self.hp = self.stats.max_hp;
-        } else {
-            self.hp += hp;
-        }
-
+        self.p_stats.add_hp(hp, self.stats.max_hp);
         self.listeners.notify(&self);
     }
 
@@ -699,49 +656,22 @@ impl ActorState {
         self.compute_stats();
     }
 
-    pub fn init(&mut self) {
-        self.hp = self.stats.max_hp;
-        for (ref group, amount) in self.stats.uses_per_encounter_iter() {
-            self.current_group_uses_per_encounter.insert(group.to_string(), *amount);
-        }
+    pub fn init_day(&mut self) {
+        self.p_stats.init_day(&self.stats);
+    }
+
+    pub fn end_encounter(&mut self) {
+        self.p_stats.end_encounter(&self.stats);
     }
 
     pub fn init_turn(&mut self) {
-        let rules = Module::rules();
-
-        info!("Init turn for '{}' with overflow ap of {}", self.actor.name, self.overflow_ap);
-
-        let mut ap = rules.base_ap as i32 + self.overflow_ap;
-
-        if ap < 0 {
-            self.overflow_ap += rules.base_ap as i32;
-        } else {
-            self.overflow_ap = 0;
-        }
-
-        ap += self.stats.bonus_ap;
-        if ap < 0 {
-            ap = 0;
-        }
-
-        let mut ap = ap as u32;
-        if ap > rules.max_ap {
-            ap = rules.max_ap;
-        }
-
-        self.ap = ap;
-
+        info!("Init turn for '{}' with overflow ap of {}", self.actor.name, self.overflow_ap());
+        self.p_stats.init_turn(&self.stats);
         self.listeners.notify(&self);
     }
 
     pub fn end_turn(&mut self) {
-        let max_overflow_ap = Module::rules().max_overflow_ap;
-        self.overflow_ap += self.ap as i32;
-        if self.overflow_ap > max_overflow_ap {
-            self.overflow_ap = max_overflow_ap;
-        }
-
-        self.ap = 0;
+        self.p_stats.end_turn();
         self.listeners.notify(&self);
     }
 
@@ -829,7 +759,8 @@ impl ActorState {
         self.stats.crit_multiplier += rules.crit_damage_multiplier;
         self.stats.movement_rate += self.actor.race.movement_rate;
         self.stats.attack_cost += rules.attack_ap as i32;
-        self.has_level_up = rules.get_xp_for_next_level(self.actor.total_level) <= self.xp;
+
+        self.p_stats.recompute_level_up(&self.actor);
 
         self.listeners.notify(&self);
     }

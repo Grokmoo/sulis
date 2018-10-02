@@ -383,6 +383,13 @@ impl UserData for ScriptInterface {
             Ok(())
         });
 
+        methods.add_method("init_party_day", |_, _, ()| {
+            for member in GameState::party() {
+                member.borrow_mut().actor.init_day();
+            }
+            Ok(())
+        });
+
         methods.add_method("log", |_, _, val: String| {
             info!("[LUA]: {}", val);
             Ok(())

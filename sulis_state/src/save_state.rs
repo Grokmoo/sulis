@@ -25,7 +25,7 @@ use sulis_rules::{QuickSlot, Slot, BonusList};
 use sulis_module::{actor::{ActorBuilder, RewardBuilder}, ItemSaveState, ItemListEntrySaveState};
 
 use {ActorState, effect, Effect, EntityState, Formation, GameState, Location,
-    PropState, prop_state::Interactive, Merchant, WorldMapState, QuestState};
+    PropState, prop_state::Interactive, Merchant, WorldMapState, PStats, QuestState};
 use area_state::{TriggerState};
 use script::CallbackData;
 use animation::AnimSaveState;
@@ -459,19 +459,14 @@ impl LocationSaveState {
 #[serde(deny_unknown_fields)]
 pub struct ActorSaveState {
     pub(crate) id: String,
-    pub(crate) hp: i32,
-    pub(crate) ap: u32,
-    pub(crate) overflow_ap: i32,
-    pub(crate) xp: u32,
     pub(crate) equipped: Vec<Option<ItemSaveState>>,
     pub(crate) quick: Vec<Option<ItemSaveState>>,
     pub(crate) ability_states: HashMap<String, AbilitySaveState>,
-    pub(crate) current_group_uses_per_encounter: HashMap<String, ExtInt>,
+    pub(crate) p_stats: PStats,
 }
 
 impl ActorSaveState {
     pub fn new(actor_state: &ActorState) -> ActorSaveState {
-        // TODO serialize effects
         let mut equipped = Vec::new();
         for slot in Slot::iter() {
             if let Some(item) = actor_state.inventory().equipped(*slot) {
@@ -499,14 +494,10 @@ impl ActorSaveState {
 
         ActorSaveState {
             id: actor_state.actor.id.to_string(),
-            hp: actor_state.hp(),
-            ap: actor_state.ap(),
-            overflow_ap: actor_state.overflow_ap(),
-            xp: actor_state.xp(),
             equipped,
             quick,
             ability_states,
-            current_group_uses_per_encounter: actor_state.current_group_uses_per_encounter.clone(),
+            p_stats: actor_state.clone_p_stats(),
         }
     }
 }

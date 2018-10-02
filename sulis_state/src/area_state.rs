@@ -761,7 +761,7 @@ impl AreaState {
                                                            location.clone(),
                                                            is_pc,
                                                            ai_group)));
-        match self.add_entity(entity, location) {
+        match self.add_entity(&entity, location) {
             Ok(index) => Ok(index),
             Err(e) => {
                 warn!("Unable to add entity to area");
@@ -820,15 +820,22 @@ impl AreaState {
         entities
     }
 
-    pub(crate) fn add_entity(&mut self, entity: Rc<RefCell<EntityState>>,
-                                location: Location) -> Result<usize, Error> {
-
+    pub(crate) fn load_entity(&mut self, entity: &Rc<RefCell<EntityState>>,
+                              location: Location) -> Result<usize, Error> {
         let mgr = GameState::turn_manager();
         let index = mgr.borrow_mut().add_entity(&entity);
-        self.transition_entity_to(entity, index, location)
+        self.transition_entity_to(&entity, index, location)
     }
 
-    pub(crate) fn transition_entity_to(&mut self, entity: Rc<RefCell<EntityState>>, index: usize,
+    pub(crate) fn add_entity(&mut self, entity: &Rc<RefCell<EntityState>>,
+                                location: Location) -> Result<usize, Error> {
+
+        let result = self.load_entity(entity, location);
+        entity.borrow_mut().actor.init_day();
+        result
+    }
+
+    pub(crate) fn transition_entity_to(&mut self, entity: &Rc<RefCell<EntityState>>, index: usize,
                                 location: Location) -> Result<usize, Error> {
         let x = location.x;
         let y = location.y;
@@ -843,7 +850,6 @@ impl AreaState {
         }
 
         entity.borrow_mut().actor.compute_stats();
-        entity.borrow_mut().actor.init();
 
         entity.borrow_mut().location = location;
         self.entities.push(index);

@@ -133,7 +133,7 @@ impl GameState {
                 };
 
                 let location = entity.borrow().location.clone();
-                area_state.borrow_mut().add_entity(Rc::clone(entity), location)?;
+                area_state.borrow_mut().load_entity(entity, location)?;
             }
 
             let mut effects = HashMap::new();
@@ -729,7 +729,7 @@ impl GameState {
                     cur_location.x, cur_location.y);
                 let index = entity.borrow().index();
 
-                match state.area_state.borrow_mut().transition_entity_to(Rc::clone(entity), index, cur_location) {
+                match state.area_state.borrow_mut().transition_entity_to(entity, index, cur_location) {
                     Ok(_) => (),
                     Err(e) => {
                         warn!("Unable to add party member");

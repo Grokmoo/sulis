@@ -332,6 +332,13 @@ children:
           scale: 7.0
           color: { r: 1.0, g: 0.0, b: 0.0, a: 1.0 }
         text: "Select target for #ability_id#"
+      window_fade:
+        width_relative: Max
+        height_relative: Max
+        custom:
+          fade_millis: 2000
+          pause_millis: 1000
+          fill_image: black_fill
   cutscene_window:
     border: [5, 5, 5, 5]
     width_relative: Max

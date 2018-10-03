@@ -114,6 +114,9 @@ pub mod main_menu;
 mod race_pane;
 pub use self::race_pane::RacePane;
 
+mod window_fade;
+pub use self::window_fade::WindowFade;
+
 mod world_map_window;
 pub use self::world_map_window::WorldMapWindow;
 

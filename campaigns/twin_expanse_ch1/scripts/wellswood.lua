@@ -15,3 +15,8 @@ function enter_square(parent)
   game:scroll_view(98, 47)
   game:start_conversation("wellswood_enter_square", parent)
 end
+
+function priest_rest(parent)
+  game:fade_out_in()
+  game:init_party_day()
+end

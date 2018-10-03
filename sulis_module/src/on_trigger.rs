@@ -44,4 +44,5 @@ pub enum OnTrigger {
     GameOverWindow(String),
     ScrollView(i32, i32),
     LoadModule(String),
+    FadeOutIn,
 }

@@ -658,6 +658,7 @@ impl ActorState {
 
     pub fn init_day(&mut self) {
         self.p_stats.init_day(&self.stats);
+        self.listeners.notify(&self);
     }
 
     pub fn end_encounter(&mut self) {

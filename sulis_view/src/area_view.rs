@@ -35,7 +35,7 @@ use sulis_module::{area::{Layer, Tile}};
 use sulis_state::{AreaDrawable, AreaState, EntityState, EntityTextureCache, GameState};
 use sulis_state::area_feedback_text;
 
-use {AreaMouseover, action_kind};
+use {AreaMouseover, action_kind, WindowFade, window_fade};
 
 struct HoverSprite {
     pub sprite: Rc<Sprite>,
@@ -567,7 +567,9 @@ impl WidgetKind for AreaView {
             warn!("No targeter tile specified for Areaview");
         }
     }
+
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+        info!("Adding area to widget tree");
         self.hover_sprite = None;
 
         let area_state = GameState::area_state();
@@ -578,7 +580,9 @@ impl WidgetKind for AreaView {
         }
         self.cache_invalid = true;
 
-        vec![Rc::clone(&self.targeter_label)]
+        let fade = Widget::with_defaults(WindowFade::new(window_fade::Mode::In));
+
+        vec![Rc::clone(&self.targeter_label), fade]
     }
 
     fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {

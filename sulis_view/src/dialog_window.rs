@@ -24,7 +24,8 @@ use sulis_widgets::{Label, TextArea};
 use sulis_module::{Actor, OnTrigger, MerchantData, Conversation, conversation::{Response}, Module};
 use sulis_state::{EntityState, ChangeListener, GameState, area_feedback_text::ColorKind, NextGameStep};
 
-use {character_window, CutsceneWindow, RootView, GameOverWindow, LoadingScreen};
+use {character_window, CutsceneWindow, RootView, GameOverWindow, LoadingScreen,
+    window_fade, WindowFade};
 
 pub const NAME: &str = "dialog_window";
 
@@ -293,6 +294,7 @@ pub fn activate(widget: &Rc<RefCell<Widget>>, on_select: &Vec<OnTrigger>,
             GameOverWindow(ref text) => game_over_window(widget, text.to_string()),
             ScrollView(x, y) => scroll_view(widget, *x, *y),
             LoadModule(ref module_id) => load_module(widget, module_id),
+            FadeOutIn => fade_out_in(widget),
         }
     }
 }
@@ -323,6 +325,18 @@ fn load_module(widget: &Rc<RefCell<Widget>>, module_id: &str) {
     }
 
     warn!("Unable to load module '{}' as it was not found.", module_id);
+}
+
+fn fade_out_in(widget: &Rc<RefCell<Widget>>) {
+    let root = Widget::get_root(widget);
+    let (_, area_view_widget) = {
+        let view = Widget::downcast_kind_mut::<RootView>(&root);
+        view.area_view()
+    };
+
+    let fade = Widget::with_defaults(WindowFade::new(window_fade::Mode::OutIn));
+
+    Widget::add_child_to(&area_view_widget, fade);
 }
 
 fn scroll_view(widget: &Rc<RefCell<Widget>>, x: i32, y: i32) {

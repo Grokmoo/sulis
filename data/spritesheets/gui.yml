@@ -521,6 +521,7 @@ groups:
       40_transparent_fill: [9, 187, 5, 5]
       60_transparent_fill: [1, 195, 5, 5]
       80_transparent_fill: [9, 195, 5, 5]
+      black_fill: [3, 88, 5, 5]
       
       20_red_transparent_fill: [1, 203, 5, 5]
       40_red_transparent_fill: [9, 203, 5, 5]

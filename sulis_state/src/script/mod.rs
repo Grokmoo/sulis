@@ -383,6 +383,13 @@ impl UserData for ScriptInterface {
             Ok(())
         });
 
+        methods.add_method("fade_out_in", |_, _, ()| {
+            let pc = GameState::player();
+            let cb = OnTrigger::FadeOutIn;
+            GameState::add_ui_callback(vec![cb], &pc, &pc);
+            Ok(())
+        });
+
         methods.add_method("init_party_day", |_, _, ()| {
             for member in GameState::party() {
                 member.borrow_mut().actor.init_day();

@@ -411,8 +411,8 @@ impl Widget {
     }
 
     pub fn update(root: &Rc<RefCell<Widget>>, millis: u32) -> Result<(), Error> {
-        Widget::check_children_removal(&root);
         Widget::update_kind_recursive(&root, millis);
+        Widget::check_children_removal(&root);
 
         Widget::check_readd(&root);
         Widget::check_children(&root)?;
@@ -489,6 +489,13 @@ impl Widget {
                 true
             }
         });
+
+        let parent = parent.borrow();
+        let len = parent.children.len();
+        for i in 0..len {
+            let child = Rc::clone(&parent.children[i]);
+            Widget::check_children_removal(&child);
+        }
     }
 
     pub fn check_children(parent: &Rc<RefCell<Widget>>) -> Result<(), Error> {

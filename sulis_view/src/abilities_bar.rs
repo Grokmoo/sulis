@@ -80,7 +80,10 @@ impl WidgetKind for AbilitiesBar {
 
         let mut groups = Vec::new();
         for (index, group_id) in Module::rules().ability_groups.iter().enumerate() {
-            if !self.entity.borrow().actor.stats.uses_per_encounter(group_id).is_zero() {
+            let stats = &self.entity.borrow().actor.stats;
+            if !stats.uses_per_encounter(group_id).is_zero()
+                || !stats.uses_per_day(group_id).is_zero() {
+
                 groups.push(AbilityGroup { index });
             }
         }
@@ -167,8 +170,11 @@ impl WidgetKind for GroupPane {
     widget_kind!("group_pane");
 
     fn layout(&mut self, widget: &mut Widget) {
-        self.description.borrow_mut().state.add_text_arg("current_uses",
+        self.description.borrow_mut().state.add_text_arg("current_uses_per_encounter",
             &self.entity.borrow().actor.current_uses_per_encounter(&self.group).to_string());
+
+        self.description.borrow_mut().state.add_text_arg("current_uses_per_day",
+            &self.entity.borrow().actor.current_uses_per_day(&self.group).to_string());
 
         widget.do_base_layout();
     }
@@ -191,8 +197,15 @@ impl WidgetKind for GroupPane {
         self.description.borrow_mut().state.clear_text_args();
 
         let total_uses = self.entity.borrow().actor.stats.uses_per_encounter(&self.group);
-        if !total_uses.is_infinite() {
-            self.description.borrow_mut().state.add_text_arg("total_uses", &total_uses.to_string());
+        if !total_uses.is_infinite() && !total_uses.is_zero() {
+            self.description.borrow_mut().state.add_text_arg("total_uses_per_encounter",
+                &total_uses.to_string());
+        }
+
+        let total_uses = self.entity.borrow().actor.stats.uses_per_day(&self.group);
+        if !total_uses.is_infinite() && !total_uses.is_zero() {
+            self.description.borrow_mut().state.add_text_arg("total_uses_per_day",
+                &total_uses.to_string());
         }
 
         self.description.borrow_mut().state.add_text_arg("group", &self.group);

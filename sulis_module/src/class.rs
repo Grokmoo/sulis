@@ -36,6 +36,7 @@ pub struct Kit {
 pub struct Upgrades {
     pub ability_choices: Vec<Rc<AbilityList>>,
     pub group_uses_per_encounter: Vec<(String, ExtInt)>,
+    pub group_uses_per_day: Vec<(String, ExtInt)>,
 }
 
 #[derive(Debug)]
@@ -71,11 +72,13 @@ impl Class {
                 ability_choices.push(ability_list);
             }
 
+            let group_uses_per_day = upgrades_builder.group_uses_per_day;
             let group_uses_per_encounter = upgrades_builder.group_uses_per_encounter;
 
             let upgrades_for_level = Upgrades {
                 ability_choices,
                 group_uses_per_encounter,
+                group_uses_per_day,
             };
 
             upgrades.insert(level, upgrades_for_level);
@@ -120,6 +123,13 @@ impl Class {
         }
     }
 
+    pub fn group_uses_per_day(&self, level: u32) -> Vec<(String, ExtInt)> {
+        match self.upgrades.get(&level) {
+            None => Vec::new(),
+            Some(upgrades) => upgrades.group_uses_per_day.clone(),
+        }
+    }
+
     // TODO would love to just return a ref here but we can't return a ref to an empty vec
     pub fn group_uses_per_encounter(&self, level: u32) -> Vec<(String, ExtInt)> {
         match self.upgrades.get(&level) {
@@ -136,6 +146,9 @@ pub struct UpgradesBuilder {
 
     #[serde(default)]
     group_uses_per_encounter: Vec<(String, ExtInt)>,
+
+    #[serde(default)]
+    group_uses_per_day: Vec<(String, ExtInt)>,
 }
 
 #[derive(Deserialize, Debug)]

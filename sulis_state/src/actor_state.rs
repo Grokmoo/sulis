@@ -160,6 +160,11 @@ impl ActorState {
         }
     }
 
+    pub fn current_uses_per_day(&self, ability_group: &str) -> ExtInt {
+        *self.p_stats.current_group_uses_per_day
+            .get(ability_group).unwrap_or(&ExtInt::Int(0))
+    }
+
     pub fn current_uses_per_encounter(&self, ability_group: &str) -> ExtInt {
         *self.p_stats.current_group_uses_per_encounter
             .get(ability_group).unwrap_or(&ExtInt::Int(0))
@@ -206,6 +211,12 @@ impl ActorState {
         }
     }
 
+    fn group_has_uses(&self, group_id: &str) -> bool {
+        if self.current_uses_per_encounter(group_id).greater_than(0) { return true; }
+
+        self.current_uses_per_day(group_id).greater_than(0)
+    }
+
     /// Returns true if the ability state for the given ability can be
     /// activated (any active ability) or deactivated (only relevant for modes)
     pub fn can_toggle(&self, id: &str) -> bool {
@@ -216,7 +227,7 @@ impl ActorState {
 
                 if state.is_active_mode() { return true; }
 
-                if self.current_uses_per_encounter(&state.group).is_zero() { return false; }
+                if !self.group_has_uses(&state.group) { return false; }
 
                 state.is_available()
             }
@@ -229,7 +240,7 @@ impl ActorState {
             Some(ref state) => {
                 if self.p_stats.ap() < state.activate_ap() { return false; }
 
-                if self.current_uses_per_encounter(&state.group).is_zero() { return false; }
+                if !self.group_has_uses(&state.group) { return false; }
 
                 state.is_available()
             }
@@ -256,15 +267,24 @@ impl ActorState {
     }
 
     pub fn activate_ability_state(&mut self, id: &str) {
-        match self.ability_states.get_mut(id) {
-            None => (),
-            Some(ref mut state) => {
-                state.activate();
-                let cur = *self.p_stats.current_group_uses_per_encounter
-                    .get(&state.group).unwrap_or(&ExtInt::Int(1));
-                self.p_stats.current_group_uses_per_encounter
-                    .insert(state.group.to_string(), cur - 1);
-            }
+        let state = match self.ability_states.get_mut(id) {
+            None => return,
+            Some(mut state) => state
+        };
+        state.activate();
+
+        let per_enc = *self.p_stats.current_group_uses_per_encounter
+            .get(&state.group).unwrap_or(&ExtInt::Int(1));
+
+        // take one use from per encounter if available, otherwise take from per day
+        if per_enc.is_zero() {
+            let per_day = *self.p_stats.current_group_uses_per_day
+                .get(&state.group).unwrap_or(&ExtInt::Int(0));
+            self.p_stats.current_group_uses_per_day
+                .insert(state.group.to_string(), per_day - 1);
+        } else {
+            self.p_stats.current_group_uses_per_encounter
+                .insert(state.group.to_string(), per_enc - 1);
         }
     }
 
@@ -692,6 +712,10 @@ impl ActorState {
             self.stats.add_multiple(&class.bonuses_per_level, level);
             for (ref group_id, amount) in class.group_uses_per_encounter(level).iter() {
                 self.stats.add_single_group_uses_per_encounter(group_id, *amount);
+            }
+
+            for (ref group_id, amount) in class.group_uses_per_day(level).iter() {
+                self.stats.add_single_group_uses_per_day(group_id, *amount);
             }
         }
 

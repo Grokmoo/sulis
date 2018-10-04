@@ -609,8 +609,17 @@ fn add<T: Display>(widget_state: &mut WidgetState, name: &str, value: T) {
     widget_state.add_text_arg(name, &value.to_string());
 }
 
+fn find_index(group: &str, uses_so_far: &mut Vec<String>) -> usize {
+    for (index, so_far_group) in uses_so_far.iter().enumerate() {
+        if so_far_group == group { return index; }
+    }
+
+    uses_so_far.push(group.to_string());
+    uses_so_far.len() - 1
+}
+
 fn add_bonus(bonus: &Bonus, state: &mut WidgetState, has_accuracy: &mut bool,
-             group_uses_index: &mut usize, damage_index: &mut usize, armor: &mut Armor) {
+             group_uses_so_far: &mut Vec<String>, damage_index: &mut usize, armor: &mut Armor) {
     use sulis_rules::BonusKind::*;
     match &bonus.kind {
         Attribute { attribute, amount } => add(state, &attribute.short_name(), amount),
@@ -657,11 +666,15 @@ fn add_bonus(bonus: &Bonus, state: &mut WidgetState, has_accuracy: &mut bool,
             add(state, "attack_cost", cost);
         },
         GroupUsesPerEncounter { group, amount } => {
-            let index = *group_uses_index;
+            let index = find_index(group, group_uses_so_far);
             add(state, &format!("ability_group_{}", index), group);
             add(state, &format!("ability_group_{}_uses_per_encounter", index), amount);
-            *group_uses_index += 1;
-        }
+        },
+        GroupUsesPerDay { group, amount } => {
+            let index = find_index(group, group_uses_so_far);
+            add(state, &format!("ability_group_{}", index), group);
+            add(state, &format!("ability_group_{}_uses_per_day", index), amount);
+        },
         ArmorProficiency(armor_kind) => {
             add(state, &format!("armor_proficiency_{:?}", armor_kind), "true");
         },
@@ -716,7 +729,7 @@ pub fn add_prereq_text_args(prereqs: &PrereqList, state: &mut WidgetState) {
 }
 
 pub fn add_bonus_text_args(bonuses: &BonusList, widget_state: &mut WidgetState) {
-    let mut group_uses_index = 0;
+    let mut group_uses_so_far = Vec::new();
     let mut damage_index = 0;
     let mut armor = Armor::default();
     let mut has_accuracy = false;
@@ -725,7 +738,7 @@ pub fn add_bonus_text_args(bonuses: &BonusList, widget_state: &mut WidgetState) 
             Contingent::Always => (),
             _ => continue,
         }
-        add_bonus(bonus, widget_state, &mut has_accuracy, &mut group_uses_index,
+        add_bonus(bonus, widget_state, &mut has_accuracy, &mut group_uses_so_far,
                   &mut damage_index, &mut armor);
     }
 

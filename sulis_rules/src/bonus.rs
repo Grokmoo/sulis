@@ -57,6 +57,7 @@ pub enum BonusKind {
     AttackDisabled,
     Hidden,
     GroupUsesPerEncounter { group: String, amount: ExtInt },
+    GroupUsesPerDay { group: String, amount: ExtInt },
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -222,7 +223,8 @@ fn apply_modifiers(bonus: &mut Bonus, neg: f32, pos: f32) {
             }
         },
         ArmorProficiency(_) | WeaponProficiency(_) | MoveDisabled
-            | AttackDisabled | Hidden | GroupUsesPerEncounter { ..} => return,
+            | AttackDisabled | Hidden | GroupUsesPerEncounter { .. }
+            | GroupUsesPerDay { .. } => return,
     };
 
     bonus.kind = new_kind;
@@ -279,6 +281,14 @@ fn merge_if_dup(first: &Bonus, sec: &Bonus) -> Option<Bonus> {
                 let group = group.clone();
                 let amount = amount + amt;
                 return Some(Bonus { when, kind: GroupUsesPerEncounter { group, amount }});
+            }
+        },
+        GroupUsesPerDay { ref group, amount } => {
+            if let GroupUsesPerDay { group: ref other_grp, amount: amt } = sec.kind {
+                if group != other_grp { return None; }
+                let group = group.clone();
+                let amount = amount + amt;
+                return Some(Bonus { when, kind: GroupUsesPerDay { group, amount }});
             }
         },
         // all of these statements could be easily merged into one macro,

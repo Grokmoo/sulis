@@ -33,6 +33,7 @@ pub struct PStats {
     has_level_up: bool,
 
     pub(crate) current_group_uses_per_encounter: HashMap<String, ExtInt>,
+    pub(crate) current_group_uses_per_day: HashMap<String, ExtInt>,
 }
 
 impl PStats {
@@ -44,6 +45,7 @@ impl PStats {
             xp: actor.xp,
             has_level_up: false,
             current_group_uses_per_encounter: HashMap::new(),
+            current_group_uses_per_day: HashMap::new(),
         }
     }
 
@@ -106,6 +108,10 @@ impl PStats {
     /// as well as `end_encounter`, which in turn calls `init_turn`
     pub fn init_day(&mut self, stats: &StatList) {
         self.hp = stats.max_hp;
+
+        for (ref group, amount) in stats.uses_per_day_iter() {
+            self.current_group_uses_per_day.insert(group.to_string(), *amount);
+        }
 
         self.end_encounter(stats);
     }

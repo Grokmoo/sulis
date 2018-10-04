@@ -174,6 +174,13 @@ impl ExtInt {
             ExtInt::Infinity => false,
         }
     }
+
+    pub fn greater_than(&self, other: u32) -> bool {
+        match self {
+            ExtInt::Int(amount) => *amount > other,
+            ExtInt::Infinity => true,
+        }
+    }
 }
 
 impl fmt::Display for ExtInt {

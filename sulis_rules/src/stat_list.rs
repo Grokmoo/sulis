@@ -70,6 +70,7 @@ pub struct StatList {
     pub hidden: bool,
     pub caster_level: i32,
     group_uses_per_encounter: HashMap<String, ExtInt>,
+    group_uses_per_day: HashMap<String, ExtInt>,
 }
 
 impl StatList {
@@ -113,15 +114,20 @@ impl StatList {
             hidden: false,
             caster_level: 0,
             group_uses_per_encounter: HashMap::new(),
+            group_uses_per_day: HashMap::new(),
         }
+    }
+
+    pub fn uses_per_day_iter(&self) -> impl Iterator<Item = (&String, &ExtInt)> {
+        self.group_uses_per_day.iter()
     }
 
     pub fn uses_per_encounter_iter(&self) -> impl Iterator<Item = (&String, &ExtInt)> {
         self.group_uses_per_encounter.iter()
     }
 
-    pub fn ability_groups(&self) -> Vec<String> {
-        self.group_uses_per_encounter.keys().map(|k| k.to_string()).collect()
+    pub fn uses_per_day(&self, ability_group: &str) -> ExtInt {
+        *self.group_uses_per_day.get(ability_group).unwrap_or(&ExtInt::Int(0))
     }
 
     pub fn uses_per_encounter(&self, ability_group: &str) -> ExtInt {
@@ -185,16 +191,16 @@ impl StatList {
         self.attack_range
     }
 
+    pub fn add_single_group_uses_per_day(&mut self, group_id: &str, uses: ExtInt) {
+        let cur_uses = *self.group_uses_per_day.get(group_id).unwrap_or(&ExtInt::Int(0));
+        let new_uses = cur_uses + uses;
+        self.group_uses_per_day.insert(group_id.to_string(), new_uses);
+    }
+
     pub fn add_single_group_uses_per_encounter(&mut self, group_id: &str, uses: ExtInt) {
         let cur_uses = *self.group_uses_per_encounter.get(group_id).unwrap_or(&ExtInt::Int(0));
         let new_uses = cur_uses + uses;
         self.group_uses_per_encounter.insert(group_id.to_string(), new_uses);
-    }
-
-    pub fn add_group_uses_per_encounter(&mut self, uses: &Vec<(String, ExtInt)>, times: u32) {
-        for (ref group_id, amount) in uses.iter() {
-            self.add_single_group_uses_per_encounter(group_id, *amount * times);
-        }
     }
 
     /// Adds the bonuses from the specified BonusList to this stat list.
@@ -269,7 +275,10 @@ impl StatList {
             MoveDisabled => self.move_disabled = true,
             AttackDisabled => self.attack_disabled = true,
             Hidden => self.hidden = true,
-            GroupUsesPerEncounter { group, amount } => self.add_single_group_uses_per_encounter(group, *amount),
+            GroupUsesPerEncounter { group, amount } =>
+                self.add_single_group_uses_per_encounter(group, *amount),
+            GroupUsesPerDay { group, amount } =>
+                self.add_single_group_uses_per_day(group, *amount),
         }
     }
 

@@ -228,7 +228,7 @@ children:
               vertical_count: 2
               grid_width: 13
               grid_border: 2
-              min_horizontal_count: 1
+              min_horizontal_count: 2
             children:
               description:
                 from: .text_area
@@ -236,7 +236,7 @@ children:
                 preferred_size: [0, 8]
                 text: |
                   [s=5.0;c=f00|#group#]
-                  [?total_uses;s=5.0|#current_uses# / #total_uses#]
+                  [?total_uses_per_encounter;s=5.0|#current_uses_per_encounter#/#total_uses_per_encounter# Enc][?total_uses_per_day;s=5.0;x=14|#current_uses_per_day#/#total_uses_per_day# Day]
               abilities_pane:
                 width_relative: Max
                 height_relative: Max

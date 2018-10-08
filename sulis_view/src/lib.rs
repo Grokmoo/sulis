@@ -129,7 +129,9 @@ use sulis_core::config::Config;
 use sulis_core::io::{InputAction, MainLoopUpdater};
 use sulis_core::ui::{Callback, Widget, WidgetKind, Cursor};
 use sulis_core::util;
-use sulis_state::{ChangeListener, GameState, NextGameStep, save_file::create_save, script::script_callback};
+use sulis_module::area::OnRest;
+use sulis_state::{ChangeListener, GameState, NextGameStep,
+    save_file::create_save, script::script_callback, area_feedback_text::ColorKind};
 use sulis_widgets::{Button, ConfirmationWindow, Label};
 
 const NAME: &str = "root";
@@ -506,6 +508,23 @@ impl WidgetKind for RootView {
                 GameState::select_party_members(GameState::party());
             })));
 
+            let rest = Widget::with_theme(Button::empty(), "rest_button");
+            rest.borrow_mut().state.add_callback(Callback::new(Rc::new(|_, _| {
+                let area_state = GameState::area_state();
+                let area = Rc::clone(&area_state.borrow().area);
+
+                let target = GameState::player();
+                match area.on_rest {
+                    OnRest::Disabled { ref message } => {
+                        area_state.borrow_mut().add_feedback_text(message.to_string(),
+                            &target, ColorKind::Info);
+                    },
+                    OnRest::FireScript { ref id, ref func } => {
+                        GameState::execute_trigger_script(id, func, &target, &target);
+                    }
+                }
+            })));
+
             let end_turn_button = Widget::with_theme(Button::empty(), "end_turn_button");
             end_turn_button.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
                 let root = Widget::get_root(&widget);
@@ -574,7 +593,7 @@ impl WidgetKind for RootView {
 
             Widget::add_children_to(&bot_pane, vec![inv_button, cha_button, map_button,
                                     log_button, men_button, abilities, quick_items,
-                                    portrait_pane, select_all, formations]);
+                                    portrait_pane, select_all, formations, rest]);
         }
 
         let widget_ref = Rc::clone(widget);

@@ -181,6 +181,10 @@ visibility_tile: gui/area_invis
 explored_tile: gui/area_unexplored
 max_vis_distance: 20
 max_vis_up_one_distance: 6
+on_rest:
+  FireScript:
+    id: campaign
+    func: on_rest
 layer_set:
   tileset/cliffs_grass_outer_edge_nw:
     - - 52

@@ -131,6 +131,14 @@ children:
         preferred_size: [10, 10]
         custom:
           tooltip: "Set party formation"
+      rest_button:
+        from: .button
+        foreground: rest
+        border: [0, 0, 0, 0]
+        position: [0, 22]
+        preferred_size: [10, 10]
+        custom:
+          tooltip: "Rest"
       portrait_pane:
         preferred_size: [120, 0]
         position: [11, 0]
@@ -1102,6 +1110,15 @@ children:
           scale: 7
         position: [0, 11]
         x_relative: Center
+  script_confirmation:
+    from: .confirmation_window
+    children:
+      title:
+        text: "#message#"
+      accept:
+        text: "#text#"
+      cancel:
+        text: "#text#"
   exit_confirmation:
     from: .confirmation_window
     children:

@@ -31,6 +31,15 @@ pub struct ScriptData {
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct DialogData {
+    pub message: String,
+    pub accept_text: String,
+    pub cancel_text: String,
+    pub on_accept: Option<ScriptData>,
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(deny_unknown_fields, rename_all="snake_case")]
 pub enum OnTrigger {
     PlayerAbility(String),
@@ -44,5 +53,6 @@ pub enum OnTrigger {
     GameOverWindow(String),
     ScrollView(i32, i32),
     LoadModule(String),
+    ShowConfirm(DialogData),
     FadeOutIn,
 }

@@ -61,7 +61,7 @@ use sulis_core::resource::ResourceSet;
 use sulis_core::config::Config;
 use sulis_core::util::{Point, ExtInt};
 use sulis_rules::QuickSlot;
-use sulis_module::{ability, Ability, Item, Module, OnTrigger};
+use sulis_module::{ability, Ability, Item, Module, OnTrigger, on_trigger};
 use {EntityState, ItemState, GameState, ai, area_feedback_text::ColorKind, quest_state};
 
 type Result<T> = std::result::Result<T, rlua::Error>;
@@ -394,6 +394,23 @@ impl UserData for ScriptInterface {
             for member in GameState::party() {
                 member.borrow_mut().actor.init_day();
             }
+            Ok(())
+        });
+
+        methods.add_method("show_confirm", |_, _, (msg, accept, cancel, id, func):
+                           (String, String, String, String, String)| {
+            let pc = GameState::player();
+            let data = on_trigger::DialogData {
+                message: msg,
+                accept_text: accept,
+                cancel_text: cancel,
+                on_accept: Some(on_trigger::ScriptData {
+                    id,
+                    func
+                }),
+            };
+            let cb = OnTrigger::ShowConfirm(data);
+            GameState::add_ui_callback(vec![cb], &pc, &pc);
             Ok(())
         });
 

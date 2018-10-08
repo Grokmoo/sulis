@@ -21,11 +21,13 @@ use std::cell::RefCell;
 use sulis_core::ui::{Widget, WidgetKind, theme, Callback};
 use sulis_core::io::{event};
 use sulis_widgets::{Label, TextArea};
-use sulis_module::{Actor, OnTrigger, MerchantData, Conversation, conversation::{Response}, Module};
-use sulis_state::{EntityState, ChangeListener, GameState, area_feedback_text::ColorKind, NextGameStep};
+use sulis_module::{Actor, OnTrigger, MerchantData, Conversation,
+    conversation::{Response}, Module, on_trigger};
+use sulis_state::{EntityState, ChangeListener, GameState,
+    area_feedback_text::ColorKind, NextGameStep};
 
 use {character_window, CutsceneWindow, RootView, GameOverWindow, LoadingScreen,
-    window_fade, WindowFade};
+    window_fade, WindowFade, ConfirmationWindow};
 
 pub const NAME: &str = "dialog_window";
 
@@ -294,9 +296,39 @@ pub fn activate(widget: &Rc<RefCell<Widget>>, on_select: &Vec<OnTrigger>,
             GameOverWindow(ref text) => game_over_window(widget, text.to_string()),
             ScrollView(x, y) => scroll_view(widget, *x, *y),
             LoadModule(ref module_id) => load_module(widget, module_id),
+            ShowConfirm(ref data) => show_confirm(widget, data),
             FadeOutIn => fade_out_in(widget),
         }
     }
+}
+
+fn show_confirm(widget: &Rc<RefCell<Widget>>, data: &on_trigger::DialogData) {
+    let root = Widget::get_root(widget);
+
+    let cb = if let Some(ref on_accept) = data.on_accept {
+        let id = on_accept.id.to_string();
+        let func = on_accept.func.to_string();
+        Callback::new(Rc::new(move |widget, _| {
+            let target = GameState::player();
+            fire_script(&id, &func, &target, &target);
+
+            let parent = Widget::get_parent(&widget);
+            parent.borrow_mut().mark_for_removal();
+        }))
+    } else {
+        Callback::empty()
+    };
+    let window = ConfirmationWindow::new(cb);
+    {
+        let title = Rc::clone(window.borrow().title());
+        title.borrow_mut().state.add_text_arg("message", &data.message);
+        window.borrow().add_accept_text_arg("text", &data.accept_text);
+        window.borrow().add_cancel_text_arg("text", &data.cancel_text);
+    }
+
+    let widget = Widget::with_theme(window, "script_confirmation");
+    widget.borrow_mut().state.set_modal(true);
+    Widget::add_child_to(&root, widget);
 }
 
 fn load_module(widget: &Rc<RefCell<Widget>>, module_id: &str) {

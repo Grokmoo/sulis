@@ -489,6 +489,7 @@ groups:
       select_all: [384, 768, 128, 128]
       formations: [384, 896, 128, 128]
       swap_weapons: [960, 896, 64, 64]
+      rest: [960, 960, 64, 64]
       
       cursor1by1: [0, 529, 16, 16]
       cursor2by2: [17, 529, 32, 32]

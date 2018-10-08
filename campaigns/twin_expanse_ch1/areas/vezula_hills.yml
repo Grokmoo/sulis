@@ -43,6 +43,10 @@ explored_tile: gui/area_unexplored
 max_vis_distance: 20
 max_vis_up_one_distance: 6
 world_map_location: ~
+on_rest:
+  FireScript:
+    id: campaign
+    func: on_rest
 layer_set:
   tileset/grass_light_outer_edge_n:
     - - 0

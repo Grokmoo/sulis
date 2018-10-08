@@ -67,6 +67,9 @@ explored_tile: gui/area_unexplored
 max_vis_distance: 12
 max_vis_up_one_distance: 6
 world_map_location: wellswood
+on_rest:
+  Disabled:
+    message: "You cannot rest here.  Find an inn or temple."
 layer_set:
   tileset/cabinet_bot_04:
     - - 6

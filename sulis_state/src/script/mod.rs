@@ -57,12 +57,12 @@ use std::cell::RefCell;
 
 use rlua::{self, Function, Lua, UserData, UserDataMethods};
 
-use sulis_core::resource::ResourceSet;
 use sulis_core::config::Config;
-use sulis_core::util::{Point, ExtInt};
+use sulis_core::util::{Point};
 use sulis_rules::QuickSlot;
 use sulis_module::{ability, Ability, Item, Module, OnTrigger, on_trigger};
-use {EntityState, ItemState, GameState, ai, area_feedback_text::ColorKind, quest_state};
+use {EntityState, ItemState, GameState, ai, area_feedback_text::ColorKind, quest_state,
+    animation::Anim};
 
 type Result<T> = std::result::Result<T, rlua::Error>;
 
@@ -439,15 +439,10 @@ impl UserData for ScriptInterface {
             let mut cb_data = CallbackData::new_trigger(parent, script);
             cb_data.add_func(FuncKind::OnAnimComplete, func)?;
 
-            let image = ResourceSet::get_empty_image();
-            let duration = ExtInt::Int((delay * 1000.0) as u32);
-            let mut anim = ScriptParticleGenerator::new_anim(parent, image.id(), duration);
-            anim.set_completion_callback(cb_data);
+            let mut anim = Anim::new_non_blocking_wait(&player, (delay * 1000.0) as u32);
+            anim.add_completion_callback(Box::new(cb_data));
 
-            let model = anim.owned_model();
-            let pgen = script_particle_generator::create_pgen(&anim, model)?;
-
-            GameState::add_animation(pgen);
+            GameState::add_animation(anim);
             Ok(())
         });
 

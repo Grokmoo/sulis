@@ -51,10 +51,6 @@ impl ScriptParticleGenerator {
         }
     }
 
-    pub fn set_completion_callback(&mut self, cb: CallbackData) {
-        self.completion_callback = Some(cb);
-    }
-
     pub fn new_anim(parent: usize, image: String, duration_millis: ExtInt) -> ScriptParticleGenerator {
         let mut pgen = ScriptParticleGenerator::new(parent, image, duration_millis);
         pgen.model.initial_overflow = 1.0;

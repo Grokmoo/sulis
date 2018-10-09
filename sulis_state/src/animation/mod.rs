@@ -219,6 +219,9 @@ pub (in animation) enum AnimKind {
     /// An animation that does nothing, but blocks the entity for a specified time
     Wait,
 
+    /// An animation that does nothing, and does not block
+    NonBlockingWait,
+
     /// An animation that changes the color of an entity while active
     EntityColor { color: [Param; 4], color_sec: [Param; 4] },
 
@@ -243,6 +246,10 @@ pub (in animation) enum AnimKind {
 }
 
 impl Anim {
+    pub fn new_non_blocking_wait(owner: &Rc<RefCell<EntityState>>, duration_millis: u32) -> Anim {
+        Anim::new(owner, ExtInt::Int(duration_millis), AnimKind::NonBlockingWait)
+    }
+
     pub fn new_wait(owner: &Rc<RefCell<EntityState>>, duration_millis: u32) -> Anim {
         Anim::new(owner, ExtInt::Int(duration_millis), AnimKind::Wait)
     }
@@ -447,6 +454,7 @@ impl Anim {
             RangedAttack { .. } => true,
             Move { .. } => true,
             Wait => true,
+            NonBlockingWait => false,
             ParticleGenerator { model, ..} => {
                 !model.duration_millis.is_infinite()
             },

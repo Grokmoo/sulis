@@ -40,7 +40,7 @@ macro_rules! try_unwrap {
 }
 
 impl UserData for ScriptInventory {
-    fn add_methods(methods: &mut UserDataMethods<Self>) {
+    fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
         methods.add_method("has_equipped_weapon", |_, data, ()| {
             try_unwrap!(data => inv);
 
@@ -117,7 +117,7 @@ pub struct ScriptUsableItem {
 }
 
 impl UserData for ScriptUsableItem {
-    fn add_methods(methods: &mut UserDataMethods<Self>) {
+    fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
         methods.add_method("ai_data", |lua, item, ()| {
             let ai_data = lua.create_table()?;
             ai_data.set("priority", item.ai.priority())?;

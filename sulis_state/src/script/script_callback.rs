@@ -361,7 +361,7 @@ fn compute_surface_targets(effect: Option<usize>, parent: usize, target: Option<
 }
 
 impl UserData for CallbackData {
-    fn add_methods(methods: &mut UserDataMethods<Self>) {
+    fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
         methods.add_method_mut("add_target", |_, cb, target: ScriptEntity| {
             if let Kind::Script(_) = cb.kind {
                 warn!("Setting targets on global generated callback will have no effect");
@@ -429,7 +429,7 @@ pub struct ScriptHitKind {
 }
 
 impl UserData for ScriptHitKind {
-    fn add_methods(methods: &mut UserDataMethods<Self>) {
+    fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
         methods.add_method("is_miss", |_, hit, ()| Ok(hit.kind == HitKind::Miss));
         methods.add_method("is_graze", |_, hit, ()| Ok(hit.kind == HitKind::Graze));
         methods.add_method("is_hit", |_, hit, ()| Ok(hit.kind == HitKind::Hit));

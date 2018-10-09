@@ -34,7 +34,7 @@ pub struct ScriptActiveSurface {
 }
 
 impl UserData for ScriptActiveSurface {
-    fn add_methods(methods: &mut UserDataMethods<Self>) {
+    fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
         methods.add_method("mark_for_removal", |_, surface, _args: ()| {
             let mgr = GameState::turn_manager();
             let mut mgr = mgr.borrow_mut();
@@ -104,7 +104,7 @@ impl ScriptEffect {
 }
 
 impl UserData for ScriptEffect {
-    fn add_methods(methods: &mut UserDataMethods<Self>) {
+    fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
         methods.add_method("apply", |_, effect, _args: ()| {
             apply(effect)
         });

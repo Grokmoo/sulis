@@ -96,7 +96,7 @@ impl ScriptEntity {
 }
 
 impl UserData for ScriptEntity {
-    fn add_methods(methods: &mut UserDataMethods<Self>) {
+    fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
         methods.add_method("state_end", |_, _, ()| {
             Ok(ai::State::End)
         });
@@ -842,7 +842,7 @@ impl ScriptEntitySet {
 }
 
 impl UserData for ScriptEntitySet {
-    fn add_methods(methods: &mut UserDataMethods<Self>) {
+    fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
         methods.add_method("to_table", |_, set, ()| {
             let table: Vec<ScriptEntity> = set.indices.iter().map(|i| ScriptEntity { index: *i }).collect();
 

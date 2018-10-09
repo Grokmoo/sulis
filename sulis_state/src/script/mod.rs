@@ -119,7 +119,7 @@ impl ScriptState {
 
         self.lua.globals().set("party", party_table)?;
 
-        self.lua.eval::<String>(&script, None)
+        self.lua.eval::<_, String>(&script, None)
 }
 
     pub fn ai_script(&self, parent: &Rc<RefCell<EntityState>>, func: &str) -> Result<ai::State> {
@@ -344,7 +344,7 @@ fn get_targeter() -> Result<Rc<RefCell<AreaTargeter>>> {
 pub struct ScriptInterface { }
 
 impl UserData for ScriptInterface {
-    fn add_methods(methods: &mut UserDataMethods<Self>) {
+    fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
         methods.add_method("has_targeter", |_, _, ()| {
             let area_state = GameState::area_state();
             let mut area_state = area_state.borrow_mut();
@@ -829,7 +829,7 @@ impl ScriptItem {
 }
 
 impl UserData for ScriptItem {
-    fn add_methods(methods: &mut UserDataMethods<Self>) {
+    fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
         methods.add_method("activate", &activate_item);
         methods.add_method("name", |_, item, ()| {
             Ok(item.name.to_string())

@@ -49,7 +49,7 @@ impl ScriptAbilitySet {
 }
 
 impl UserData for ScriptAbilitySet {
-    fn add_methods(methods: &mut UserDataMethods<Self>) {
+    fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
         methods.add_method("len", |_, set, ()| {
             Ok(set.abilities.len())
         });
@@ -193,7 +193,7 @@ impl ScriptAbility {
 }
 
 impl UserData for ScriptAbility {
-    fn add_methods(methods: &mut UserDataMethods<Self>) {
+    fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
         methods.add_method("is_active_mode", |_, ability, target: ScriptEntity| {
             ability.error_if_not_active()?;
             let target = target.try_unwrap()?;

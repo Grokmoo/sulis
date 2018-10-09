@@ -64,7 +64,7 @@ impl ScriptParticleGenerator {
 }
 
 impl UserData for ScriptParticleGenerator {
-    fn add_methods(methods: &mut UserDataMethods<Self>) {
+    fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
         methods.add_method("activate", &activate);
         methods.add_method("param", &param);
         methods.add_method("dist_param", &dist_param);

@@ -50,6 +50,7 @@ pub struct AreaModel {
     max_vis_distance: i32,
     max_vis_up_one_distance: i32,
     world_map_location: Option<String>,
+    on_rest: OnRest,
 
     terrain_kinds: Vec<TerrainTiles>,
     terrain: Vec<Option<usize>>,
@@ -129,6 +130,7 @@ impl AreaModel {
             world_map_location: None,
             max_vis_distance: 20,
             max_vis_up_one_distance: 6,
+            on_rest: OnRest::Disabled { message: "<PLACEHOLDER>".to_string() },
         }
     }
 
@@ -512,6 +514,7 @@ impl AreaModel {
         self.max_vis_distance = area_builder.max_vis_distance;
         self.max_vis_up_one_distance = area_builder.max_vis_up_one_distance;
         self.world_map_location = area_builder.world_map_location.clone();
+        self.on_rest = area_builder.on_rest.clone();
 
         trace!("Loading terrain");
         let width = area_builder.width as i32;
@@ -816,6 +819,7 @@ impl AreaModel {
             max_vis_distance: self.max_vis_distance,
             max_vis_up_one_distance: self.max_vis_up_one_distance,
             world_map_location: self.world_map_location.clone(),
+            on_rest: self.on_rest.clone(),
         };
 
         trace!("Writing to file {}", filename);

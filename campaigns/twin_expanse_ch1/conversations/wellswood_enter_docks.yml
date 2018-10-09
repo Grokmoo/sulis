@@ -1,0 +1,126 @@
+id: wellswood_enter_docks
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=888|Along the docks, you see a group of three thugs threatening some dock workers.]
+    responses:
+      - text: "[c=888|Continue]"
+        to: start02
+  start02:
+    text: |
+      [c=888|The thug who seems to be the leader speaks.]
+      
+      So, where is it?
+    on_view:
+      - fire_script:
+          id: wellswood
+          func: view_docks_thug
+    responses:
+      - text: "[c=888|Continue]"
+        to: start03
+  start03:
+    text: |
+      [c=888|The dock worker looks nervous.]
+      
+      I'm s...sorry, we don't have it.  Things have been slow...
+    responses:
+      - text: "[c=888|Continue]"
+        to: start04
+  start04:
+    text: |
+      [c=888|The thug maintains his calm.]
+      
+      The boss doesn't want excuses.  He wants his money.
+    responses:
+      - text: "[c=888|Continue]"
+        to: start05
+  start05:
+    text: |
+      "We just don't have it.  We need more time!"
+    responses:
+      - text: "[c=888|Continue]"
+        to: start06
+  start06:
+    text: |
+      [c=888|The thug is about to respond, but then notices your presence.]
+      
+      This is a private conversation!  If you know what is good for you, you'll get outta here!
+    responses:
+      - text: "I'm sorry.  We'll move along."
+      - text: "It sounds like you are extorting money from these workers."
+        to: interjectA
+      - text: "You seem to be having a disagreement.  Perhaps I can help."
+        to: interjectB
+  interjectA:
+    text: |
+      [c=888|The thug doesn't bat an eye.]
+      
+      So?  What are you going to do about it?
+    responses:
+      - text: "Nothing.  Just making an observation.  I'll move along."
+      - text: "I'm going to put a stop to it."
+        to: interject_threat
+      - text: "End your villainy!  [c=f00|Attack]"
+        on_select:
+          - fire_script:
+              id: wellswood
+              func: docks_thugs_attack
+  interjectB:
+    text: |
+      The only way to solve our disagreement is to pay what is owed...100 gold.
+    responses:
+      - text: "That's outrageous!  I'll pay you 50 to leave these workers in peace."
+        to_view:
+          - player_flags: [ has_50_coins]
+        on_select:
+          - fire_script:
+              id: wellswood
+              func: docks_thugs_pay50
+        to: interjectB_paid
+      - text: "Very well.  Here is 100 gold."
+        to_view:
+          - player_flags: [ has_100_coins ]
+        on_select:
+          - fire_script:
+              id: wellswood
+              func: docks_thugs_pay100
+        to: interjectB_paid
+      - text: "I'm sorry, I don't have money to spare."
+        to: interjectB_not_paid
+      - text: "I'm not paying you a single copper."
+        to: interjectB_not_paid
+  interjectB_paid:
+    text: |
+      That will do for now.  We'll be back later for more.
+    responses:
+      - text: "[c=888|Continue]"
+        on_select:
+          - fire_script:
+              id: wellswood
+              func: docks_thugs_leave
+  interjectB_not_paid:
+    text: |
+      Then you are no use to me.  Get out of my sight.
+    responses:
+      - text: "Very well.  Farewell."
+      - text: "We are putting a stop to this shake-down."
+        to: interject_threat
+      - text: "Its time to end this.  [c=f00|Attack]"
+        on_select:
+          - fire_script:
+              id: wellswood
+              func: docks_thugs_attack
+  interject_threat:
+    text: |
+      Boss says not to cause too much of a ruckus in the streets, or I would make you eat those words.
+      
+      We'll be back soon.  [c=888|He turns to the workers.]  You had better have our money then.
+    responses:
+      - text: "[c=888|Continue]"
+        on_select:
+          - fire_script:
+              id: wellswood
+              func: docks_thugs_leave
+      

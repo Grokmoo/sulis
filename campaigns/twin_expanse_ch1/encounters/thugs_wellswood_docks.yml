@@ -1,0 +1,14 @@
+id: thugs_wellswood_docks
+auto_spawn: true
+min_gen_actors: 0
+max_gen_actors: 0
+entries:
+  - id: thug01
+    unique_id: thug01
+    always: true
+  - id: thug02
+    unique_id: thug02
+    always: true
+  - id: thug03
+    unique_id: thug03
+    always: true

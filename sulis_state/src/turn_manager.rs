@@ -584,6 +584,23 @@ impl TurnManager {
         self.surfaces.retain(|e| *e != index);
     }
 
+    fn check_encounter_cleared(&self, entity: &Rc<RefCell<EntityState>>) -> Option<usize>{
+        let ai_group = match entity.borrow().ai_group() {
+            None => return None,
+            Some(index) => index,
+        };
+
+        for other in self.entity_iter() {
+            let other = other.borrow();
+            if other.actor.hp() < 0 { continue; }
+            if let Some(index) = other.ai_group() {
+                if index == ai_group { return None; }
+            }
+        }
+
+        Some(ai_group)
+    }
+
     fn remove_entity(&mut self, index: usize) {
         let entity = Rc::clone(self.entities[index].as_ref().unwrap());
         let area_state = GameState::get_area_state(&entity.borrow().location.area_id).unwrap();
@@ -623,6 +640,11 @@ impl TurnManager {
         }) {
             self.set_combat_active(false);
         }
+
+        if let Some(ai_group) = self.check_encounter_cleared(&entity) {
+            area_state.borrow().fire_on_encounter_cleared(ai_group, &entity);
+        }
+
         self.listeners.notify(&self);
     }
 }

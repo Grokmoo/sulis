@@ -23,6 +23,7 @@ use {Actor, Module};
 
 struct Entry {
     actor: Rc<Actor>,
+    unique_id: Option<String>,
     weight: u32,
     always: bool,
 }
@@ -56,6 +57,7 @@ impl Encounter {
             total_weight += entry.weight;
             entries.push(Entry {
                 actor,
+                unique_id: entry.unique_id,
                 weight: entry.weight,
                 always: entry.always,
             });
@@ -71,20 +73,20 @@ impl Encounter {
         })
     }
 
-    fn gen_actor(&self) -> Option<Rc<Actor>> {
+    fn gen_actor(&self) -> Option<(Rc<Actor>, Option<String>)> {
         let roll = rand::thread_rng().gen_range(0, self.total_weight);
         let mut cur_weight = 0;
         for entry in self.entries.iter() {
             cur_weight += entry.weight;
             if roll < cur_weight {
-                return Some(Rc::clone(&entry.actor));
+                return Some((Rc::clone(&entry.actor), entry.unique_id.clone()));
             }
         }
 
         None
     }
 
-    pub fn gen_actors(&self) -> Vec<Rc<Actor>> {
+    pub fn gen_actors(&self) -> Vec<(Rc<Actor>, Option<String>)> {
         let mut actors = Vec::new();
 
         let num = rand::thread_rng().gen_range(self.min_gen_actors, self.max_gen_actors + 1);
@@ -93,14 +95,14 @@ impl Encounter {
                 None => {
                     warn!("Unable to generate actor for encounter '{}'", self.id);
                     continue;
-                }, Some(actor) => {
-                    actors.push(actor);
+                }, Some(actor_data) => {
+                    actors.push(actor_data);
                 }
             }
         }
 
         for entry in self.entries.iter() {
-            if entry.always { actors.push(Rc::clone(&entry.actor)); }
+            if entry.always { actors.push((Rc::clone(&entry.actor), entry.unique_id.clone())); }
         }
 
         actors
@@ -127,4 +129,7 @@ pub struct EntryBuilder {
 
     #[serde(default)]
     always: bool,
+
+    #[serde(default)]
+    unique_id: Option<String>,
 }

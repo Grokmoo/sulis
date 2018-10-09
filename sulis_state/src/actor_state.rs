@@ -554,10 +554,6 @@ impl ActorState {
 
         let area_state = GameState::area_state();
 
-        if let Some(index) = target.borrow().ai_group() {
-            area_state.borrow().check_encounter_cleared(index, parent, target);
-        }
-
         let reward = {
             let target = target.borrow();
             match target.actor.actor.reward {

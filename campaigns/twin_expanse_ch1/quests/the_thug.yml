@@ -7,3 +7,6 @@ entries:
   investigated:
     description: |
       I learned that the thug, Guthrek, has been extorting money and goods from some of the local farmers.  The local guard seems unwilling or unable to step in.
+  docks_view:
+    description: |
+      I saw a group of thugs shaking down some workers on the docks.  This problem appears to be widespread in Wellswood.

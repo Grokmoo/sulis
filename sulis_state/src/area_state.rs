@@ -333,22 +333,15 @@ impl AreaState {
         }
     }
 
-    pub fn check_encounter_cleared(&self, index: usize, parent: &Rc<RefCell<EntityState>>,
-                                   target: &Rc<RefCell<EntityState>>) {
-        let mgr = GameState::turn_manager();
-        for entity in mgr.borrow().entity_iter() {
-            if let Some(entity_index) = entity.borrow().ai_group() {
-                if entity_index == index && entity.borrow().actor.hp() > 0 { return; }
-            }
-        }
-
-        for trigger_index in self.area.encounters[index].triggers.iter() {
+    pub fn fire_on_encounter_cleared(&self, ai_group: usize, target: &Rc<RefCell<EntityState>>) {
+        let player = GameState::player();
+        for trigger_index in self.area.encounters[ai_group].triggers.iter() {
             let trigger = &self.area.triggers[*trigger_index];
 
             match trigger.kind {
                 TriggerKind::OnEncounterCleared { .. } => {
                     info!("    Calling OnEncounterCleared");
-                    GameState::add_ui_callback(trigger.on_activate.clone(), parent, target);
+                    GameState::add_ui_callback(trigger.on_activate.clone(), &player, target);
                 },
                 _ => (),
             }
@@ -374,7 +367,7 @@ impl AreaState {
         if respect_debug && !Config::debug().encounter_spawning { return; }
         let encounter = &enc_data.encounter;
         let actors = encounter.gen_actors();
-        for actor in actors {
+        for (actor, unique_id) in actors {
             let location = match self.gen_location(&actor, &enc_data) {
                 None => {
                     warn!("Unable to generate location for encounter '{}'", encounter.id);
@@ -382,7 +375,7 @@ impl AreaState {
                 }, Some(location) => location,
             };
 
-            match self.add_actor(actor, location, None, false, Some(enc_index)) {
+            match self.add_actor(actor, location, unique_id, false, Some(enc_index)) {
                 Ok(_) => (),
                 Err(e) => {
                     warn!("Error adding actor for spawned encounter: {}", e);

@@ -892,7 +892,11 @@ impl GameState {
             to_add
         });
 
-        ANIMATIONS.with(|a| a.borrow_mut().update(to_add, millis));
+        let (update_cbs, complete_cbs) = ANIMATIONS.with(|a| {
+            a.borrow_mut().update(to_add, millis)
+        });
+        update_cbs.into_iter().for_each(|cb| cb.on_anim_update());
+        complete_cbs.into_iter().for_each(|cb| cb.on_anim_complete());
 
         let mgr = GameState::turn_manager();
         let cbs = mgr.borrow_mut().update(millis);

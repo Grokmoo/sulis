@@ -64,7 +64,15 @@ impl AnimState {
         self.above_anims.clear();
     }
 
-    pub fn update(&mut self, to_add: Vec<Anim>, elapsed: u32) {
+    /// Updates all animations based on the elapsed time.  Adds the specified animations.
+    /// Returns two vecs, the first is the list of animations that should be `on_anim_update`,
+    /// the second is the list that should be `on_anim_complete`
+    #[must_use]
+    pub fn update(&mut self, to_add: Vec<Anim>,
+                  elapsed: u32) -> (Vec<Box<ScriptCallback>>, Vec<Box<ScriptCallback>>) {
+        let mut update_cbs = Vec::new();
+        let mut complete_cbs = Vec::new();
+
         for anim in to_add {
             use self::AnimKind::*;
             let draw_above = match anim.kind {
@@ -93,9 +101,14 @@ impl AnimState {
             }
         }
 
-        AnimState::update_vec(&mut self.no_draw_anims, elapsed);
-        AnimState::update_vec(&mut self.below_anims, elapsed);
-        AnimState::update_vec(&mut self.above_anims, elapsed);
+        AnimState::update_vec(&mut self.no_draw_anims, elapsed,
+                              &mut update_cbs, &mut complete_cbs);
+        AnimState::update_vec(&mut self.below_anims, elapsed,
+                              &mut update_cbs, &mut complete_cbs);
+        AnimState::update_vec(&mut self.above_anims, elapsed,
+                              &mut update_cbs, &mut complete_cbs);
+
+        (update_cbs, complete_cbs)
     }
 
     pub fn save_anims(&self) -> Vec<AnimSaveState> {
@@ -189,7 +202,8 @@ impl AnimState {
         }
     }
 
-    fn update_vec(vec: &mut Vec<Anim>, elapsed: u32) {
+    fn update_vec(vec: &mut Vec<Anim>, elapsed: u32, update_cbs: &mut Vec<Box<ScriptCallback>>,
+                  complete_cbs: &mut Vec<Box<ScriptCallback>>) {
         let mut i = 0;
         while i < vec.len() {
             let retain = vec[i].update(elapsed);
@@ -197,7 +211,7 @@ impl AnimState {
             if retain { i += 1; }
             else {
                 vec[i].cleanup_kind();
-                vec[i].run_completion_callbacks();
+                vec[i].get_completion_callbacks(update_cbs, complete_cbs);
                 vec.remove(i);
             }
         }
@@ -335,16 +349,15 @@ impl Anim {
         }
     }
 
-    fn run_completion_callbacks(&mut self) {
-        for cb in self.update_callbacks.iter() {
-            cb.1.on_anim_update();
+    fn get_completion_callbacks(&mut self, update_cbs: &mut Vec<Box<ScriptCallback>>,
+                                complete_cbs: &mut Vec<Box<ScriptCallback>>) {
+        for cb in self.update_callbacks.drain(..) {
+            update_cbs.push(cb.1);
         }
-        self.update_callbacks.clear();
 
-        for cb in self.completion_callbacks.iter() {
-            cb.on_anim_complete();
+        for cb in self.completion_callbacks.drain(..) {
+            complete_cbs.push(cb);
         }
-        self.completion_callbacks.clear();
     }
 
     fn ok_to_remove(&self) -> bool {

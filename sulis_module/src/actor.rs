@@ -34,11 +34,12 @@ use {Ability, AITemplate, Class, Conversation, ImageLayer, ImageLayerSet, Invent
 pub enum Faction {
     Friendly,
     Hostile,
+    Neutral,
 }
 
 impl Faction{
     pub fn iter() -> impl Iterator<Item=&'static Faction> {
-        [Faction::Friendly, Faction::Hostile].iter()
+        [Faction::Friendly, Faction::Hostile, Faction::Neutral].iter()
     }
 }
 
@@ -88,7 +89,7 @@ impl fmt::Display for Sex {
 pub struct Actor {
     pub id: String,
     pub name: String,
-    pub faction: Faction,
+    faction: Faction,
     pub conversation: Option<Rc<Conversation>>,
     pub portrait: Option<Rc<Image>>,
     pub race: Rc<Race>,
@@ -321,6 +322,10 @@ impl Actor {
             abilities,
             ai,
         })
+    }
+
+    pub fn faction(&self) -> Faction {
+        self.faction
     }
 
     pub fn levels(&self, other_class: &Rc<Class>) -> u32 {

@@ -26,6 +26,12 @@ world_map:
       initially_enabled: true
       linked_area: wellswood_forest
       linked_area_pos: [123, 123]
+    thugs_hideout:
+      name: "Thug's Hideout"
+      position: [9.5, 10]
+      icon: cave01
+      initially_enabled: false
+      initially_visible: false
     last_edge:
       name: "Last Edge"
       position: [2, 3]

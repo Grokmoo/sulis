@@ -10,3 +10,6 @@ entries:
   docks_view:
     description: |
       I saw a group of thugs shaking down some workers on the docks.  This problem appears to be widespread in Wellswood.
+  docks_info:
+    description: |
+      I learned the location of the thugs hideout, a cave south of town.

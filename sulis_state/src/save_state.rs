@@ -403,7 +403,7 @@ impl EntitySaveState {
                 portrait: actor.portrait.as_ref().map(|p| p.id().to_string()),
                 attributes: actor.attributes,
                 conversation: actor.conversation.as_ref().map(|c| c.id.to_string()),
-                faction: Some(actor.faction),
+                faction: Some(actor.faction()),
                 images: actor.builder_images.clone(),
                 hue: actor.hue,
                 hair_color: actor.hair_color,

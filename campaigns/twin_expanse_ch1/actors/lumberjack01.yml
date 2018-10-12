@@ -12,7 +12,7 @@ attributes:
   int: 9
   wis: 10
 conversation: lumberjack01
-faction: Friendly
+faction: Neutral
 images:
   Beard: creatures/beard04
 hue: 0.3

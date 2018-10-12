@@ -25,7 +25,7 @@ use sulis_core::image::{LayeredImage};
 use sulis_core::util::{invalid_data_error, ExtInt};
 use sulis_rules::{AccuracyKind, Attack, AttackKind, BonusList, HitKind, StatList, WeaponKind,
     QuickSlot, Slot, ItemKind};
-use sulis_module::{Actor, Module, ActorBuilder};
+use sulis_module::{Actor, Module, ActorBuilder, Faction};
 use area_feedback_text::ColorKind;
 use {AbilityState, ChangeListenerList, Effect, EntityState, GameState, Inventory, ItemState, PStats};
 use save_state::ActorSaveState;
@@ -145,6 +145,14 @@ impl ActorState {
         }
 
         actor_state
+    }
+
+    pub fn faction(&self) -> Faction {
+        self.p_stats.faction
+    }
+
+    pub fn set_faction(&mut self, faction: Faction) {
+        self.p_stats.faction = faction;
     }
 
     pub fn clone_p_stats(&self) -> PStats {

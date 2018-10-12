@@ -417,6 +417,11 @@ children:
                 position: [20, 0]
                 text: "Hostile"
                 preferred_size: [18, 8]
+              Neutral:
+                from: .button
+                position: [40, 0]
+                text: "Neutral"
+                preferred_size: [18, 8]
           sex_pane:
             position: [85, 60]
             preferred_size: [40, 10]

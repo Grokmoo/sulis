@@ -49,6 +49,10 @@ nodes:
       This is a private conversation!  If you know what is good for you, you'll get outta here!
     responses:
       - text: "I'm sorry.  We'll move along."
+        on_select:
+          - fire_script:
+              id: wellswood
+              func: docks_thugs_leave_early
       - text: "It sounds like you are extorting money from these workers."
         to: interjectA
       - text: "You seem to be having a disagreement.  Perhaps I can help."
@@ -60,6 +64,10 @@ nodes:
       So?  What are you going to do about it?
     responses:
       - text: "Nothing.  Just making an observation.  I'll move along."
+        on_select:
+          - fire_script:
+              id: wellswood
+              func: docks_thugs_leave_early
       - text: "I'm going to put a stop to it."
         to: interject_threat
       - text: "End your villainy!  [c=f00|Attack]"
@@ -99,12 +107,16 @@ nodes:
         on_select:
           - fire_script:
               id: wellswood
-              func: docks_thugs_leave
+              func: docks_thugs_leave_helped
   interjectB_not_paid:
     text: |
       Then you are no use to me.  Get out of my sight.
     responses:
       - text: "Very well.  Farewell."
+        on_select:
+          - fire_script:
+              id: wellswood
+              func: docks_thugs_leave_early
       - text: "We are putting a stop to this shake-down."
         to: interject_threat
       - text: "Its time to end this.  [c=f00|Attack]"
@@ -122,5 +134,5 @@ nodes:
         on_select:
           - fire_script:
               id: wellswood
-              func: docks_thugs_leave
+              func: docks_thugs_leave_helped
       

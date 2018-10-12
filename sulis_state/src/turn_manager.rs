@@ -303,7 +303,7 @@ impl TurnManager {
             let mut entity = entity.borrow_mut();
             if !entity.is_hostile(mover) { continue; }
             if !entity.location.is_in(&area_state) { continue; }
-            if entity.actor.actor.ai.is_none() { continue; }
+            if entity.actor.actor.ai.is_none() && !entity.is_party_member() { continue; }
 
             let mover = mover.borrow();
             if !area_state.has_visibility(&mover, &entity) && !area_state.has_visibility(&entity, &mover) {
@@ -634,7 +634,7 @@ impl TurnManager {
                 Entry::Effect(_) => true,
                 Entry::Entity(index) => {
                     let entity = self.entities[*index].as_ref().unwrap().borrow();
-                    !entity.is_ai_active() || entity.actor.actor.faction == Faction::Friendly
+                    !entity.is_ai_active() || entity.actor.faction() != Faction::Hostile
                 }
             }
         }) {

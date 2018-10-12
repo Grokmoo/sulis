@@ -55,7 +55,7 @@ impl ActorCreatorWindow {
             selected_images: HashMap::new(),
             view_pane: Widget::empty("view_pane"),
             selected_hue: 0.0,
-            selected_faction: Faction::Friendly,
+            selected_faction: Faction::Neutral,
             selected_sex: Sex::Male,
             preview: None,
             id_field: InputField::new("creature01"),

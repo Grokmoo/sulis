@@ -4,14 +4,14 @@ name: Thug
 race: human
 sex: Male
 attributes:
-  str: 10
-  dex: 10
-  end: 10
+  str: 13
+  dex: 14
+  end: 13
   per: 10
-  int: 10
-  wis: 10
+  int: 9
+  wis: 9
 conversation: ~
-faction: Friendly
+faction: Neutral
 images:
   Shadow: empty
   Foreground: empty
@@ -23,6 +23,20 @@ inventory:
   pc_starting_coins: 0
   pc_starting_items: []
 levels:
-  rogue: 1
-abilities: []
-ai: ~
+  rogue: 4
+reward:
+  xp: 30
+  loot: level1_misc
+  loot_chance: 35
+abilities:
+  - armor_light
+  - armor_medium
+  - weapon_bow
+  - weapon_small_sword
+  - weapon_spear
+  - weapon_simple
+  - backstab
+  - flanker
+  - flanker
+  - feint
+ai: ai_basic

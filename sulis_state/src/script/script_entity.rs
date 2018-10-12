@@ -27,6 +27,7 @@ use sulis_core::util::{invalid_data_error, ExtInt};
 use sulis_core::config::Config;
 use sulis_core::resource::ResourceSet;
 use sulis_rules::{Attribute, AttackKind, DamageKind, Attack, HitKind};
+use sulis_module::Faction;
 use {ActorState, EntityState, GameState, Location, area_feedback_text::ColorKind};
 use {ai, animation::{self}, script::*, MOVE_TO_THRESHOLD};
 
@@ -116,6 +117,32 @@ impl UserData for ScriptEntity {
         methods.add_method("add_xp", |_, entity, amount: u32| {
             let entity = entity.try_unwrap()?;
             entity.borrow_mut().actor.add_xp(amount);
+            Ok(())
+        });
+
+        methods.add_method("set_faction", |_, entity, faction: String| {
+            let entity = entity.try_unwrap()?;
+
+            match faction.as_ref() {
+                "Hostile" => {
+                    entity.borrow_mut().actor.set_faction(Faction::Hostile);
+                },
+                "Friendly" => {
+                    entity.borrow_mut().actor.set_faction(Faction::Friendly);
+                },
+                "Neutral" => {
+                    entity.borrow_mut().actor.set_faction(Faction::Neutral);
+                },
+                _ => {
+                    warn!("Invalid faction '{}' in script", faction);
+                }
+            }
+
+            let mgr = GameState::turn_manager();
+            let area_state = GameState::area_state();
+
+            mgr.borrow_mut().check_ai_activation(&entity, &mut area_state.borrow_mut());
+
             Ok(())
         });
 

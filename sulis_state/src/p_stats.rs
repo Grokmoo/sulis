@@ -19,7 +19,7 @@ use std::collections::HashMap;
 
 use sulis_core::util::ExtInt;
 use sulis_rules::StatList;
-use sulis_module::{Actor, Module};
+use sulis_module::{Actor, Module, Faction};
 
 /// Persistent Stats, that are not computed from the base StatList, are
 /// saved, and may persist between actions
@@ -34,6 +34,7 @@ pub struct PStats {
 
     pub(crate) current_group_uses_per_encounter: HashMap<String, ExtInt>,
     pub(crate) current_group_uses_per_day: HashMap<String, ExtInt>,
+    pub(crate) faction: Faction,
 }
 
 impl PStats {
@@ -46,6 +47,7 @@ impl PStats {
             has_level_up: false,
             current_group_uses_per_encounter: HashMap::new(),
             current_group_uses_per_day: HashMap::new(),
+            faction: actor.faction(),
         }
     }
 

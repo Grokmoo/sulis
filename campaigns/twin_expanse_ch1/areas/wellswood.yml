@@ -132,11 +132,10 @@ actors:
       x: 52
       y: 114
     unique_id: townsperson04b
-  - id: townsperson14
+  - id: dock_foreman
     location:
-      x: 53
+      x: 55
       y: 110
-    unique_id: townsperson14b
 props:
   - id: transition_hint
     location:

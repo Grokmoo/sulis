@@ -36,7 +36,33 @@ function view_docks_thug(parent)
 end
 
 function docks_thugs_attack(parent)
-  -- TODO set thugs to hostile disposition
+  worker = game:entity_with_id("dock_foreman")
+  worker:set_flag("player_fought")
+
+  thug01 = game:entity_with_id("thug01")
+  thug02 = game:entity_with_id("thug02")
+  thug03 = game:entity_with_id("thug03")
+  
+  thug01:set_faction("Hostile")
+  thug02:set_faction("Hostile")
+  thug03:set_faction("Hostile")
+end
+
+function docks_thugs_leave_early(parent)
+  thug01 = game:entity_with_id("thug01")
+  game:say_line("That will teach you!  Have the money next time or else!")
+  
+  worker = game:entity_with_id("dock_foreman")
+  worker:set_flag("player_didnt_help")
+  worker:take_damage(thug01, 6, 6, "Raw")
+  game:run_script_delayed("wellswood", "docks_thugs_leave", 2.0)
+end
+
+function docks_thugs_leave_helped(parent)
+  worker = game:entity_with_id("dock_foreman")
+  worker:set_flag("player_helped")
+  
+  docks_thugs_leave(parent)
 end
 
 function docks_thugs_leave(parent)
@@ -71,7 +97,8 @@ function docks_thugs_leave_finish(parent)
 end
 
 function docks_thugs_cleared(parent)
-  -- TODO start dock worker convo
+  worker = game:entity_with_id("dock_foreman")
+  game:say_line("Alright, back to work!", worker)
 end
 
 function docks_thugs_pay50(parent)
@@ -80,6 +107,15 @@ end
 
 function docks_thugs_pay100(parent)
   game:add_party_coins(-1000)
+end
+
+function docks_foreman_info(parent)
+  worker = game:entity_with_id("dock_foreman")
+  worker:set_flag("got_info")
+  game:set_quest_entry_state("the_thug", "docks_info", "Visible")
+  
+  game:set_world_map_location_visible("thugs_hideout", true)
+  game:set_world_map_location_enabled("thugs_hideout", true)
 end
 
 function priest_rest(parent)

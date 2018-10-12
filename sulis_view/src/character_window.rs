@@ -198,7 +198,7 @@ fn export_character(pc: &ActorState) {
         race: pc.actor.race.id.to_string(),
         sex: Some(pc.actor.sex),
         attributes: pc.actor.attributes,
-        faction: Some(pc.actor.faction),
+        faction: Some(pc.actor.faction()),
         conversation: None,
         images: pc.actor.builder_images.clone(),
         hue: pc.actor.hue.clone(),

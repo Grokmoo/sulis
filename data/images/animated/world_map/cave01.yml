@@ -1,0 +1,4 @@
+id: cave01
+states:
+    normal: cave01_normal
+    disabled: cave01_disabled

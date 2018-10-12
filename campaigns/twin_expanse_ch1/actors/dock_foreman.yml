@@ -1,6 +1,6 @@
 ---
-id: townsperson17
-name: Townsperson
+id: dock_foreman
+name: Dock Foreman
 race: human
 sex: Male
 attributes:
@@ -10,13 +10,13 @@ attributes:
   per: 10
   int: 10
   wis: 10
-conversation: ~
+conversation: dock_foreman
 faction: Neutral
 images:
   Shadow: empty
-  Background: creatures/human09
   Foreground: empty
-hue: 0.19999992847442628
+  Background: creatures/human05
+hue: 0.5
 inventory:
   equipped: {}
   quick: {}

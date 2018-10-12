@@ -11,7 +11,7 @@ attributes:
   int: 10
   wis: 10
 conversation: ~
-faction: Friendly
+faction: Neutral
 images:
   Foreground: empty
   Shadow: empty

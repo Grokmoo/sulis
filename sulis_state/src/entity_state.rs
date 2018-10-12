@@ -309,7 +309,13 @@ impl EntityState {
     }
 
     pub fn is_hostile(&self, other: &Rc<RefCell<EntityState>>) -> bool {
-        self.actor.actor.faction != other.borrow().actor.actor.faction
+        let self_faction = self.actor.faction();
+        let other_faction = other.borrow().actor.faction();
+
+        if let Faction::Neutral = self_faction { return false; }
+        if let Faction::Neutral = other_faction { return false; }
+
+        self_faction != other_faction
     }
 
     pub (crate) fn is_marked_for_removal(&self) -> bool {
@@ -539,8 +545,9 @@ impl AreaDrawable for EntityState {
             scale_x: f32, scale_y: f32, x: f32, y: f32, _millis: u32, alpha: f32) {
         // don't draw invisible hostiles
         if self.actor.stats.hidden {
-            match self.actor.actor.faction {
+            match self.actor.faction() {
                 Faction::Hostile => return,
+                Faction::Neutral => (),
                 Faction::Friendly => (),
             }
         }

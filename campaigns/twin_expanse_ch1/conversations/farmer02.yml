@@ -2,7 +2,7 @@ id: farmer02
 initial_nodes:
   - id: already_talked
     to_view:
-      - target_flags: [ already_talked ]
+      - target_flag: already_talked
   - id: start01
 nodes:
   __ADVENTURER_REFS:
@@ -23,7 +23,7 @@ nodes:
       
       Hey - are you an adventurer?
     on_view:
-      - target_flags: [ already_talked ]
+      - target_flag: already_talked
       - fire_script:
           id: wellswood_farms
           func: adventurer_talked

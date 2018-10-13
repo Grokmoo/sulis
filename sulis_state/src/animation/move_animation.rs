@@ -30,6 +30,8 @@ fn check_immediate_cancel(mover: &Rc<RefCell<EntityState>>, model: &mut MoveAnim
 
     if GameState::is_combat_active() != model.combat_mode { return true; }
 
+    if mover.borrow().marked_for_removal { return true; }
+
     let actor = &mover.borrow().actor;
     if actor.is_dead() || actor.stats.move_disabled { return true; }
 

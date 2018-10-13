@@ -40,11 +40,27 @@ pub struct DialogData {
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct NumFlagData {
+    pub flag: String,
+
+    #[serde(default)]
+    pub val: f32,
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(deny_unknown_fields, rename_all="snake_case")]
 pub enum OnTrigger {
+    PlayerCoins(i32),
+    PlayerNumFlag(NumFlagData),
+    TargetNumFlag(NumFlagData),
+    NotPlayerNumFlag(NumFlagData),
+    NotTargetNumFlag(NumFlagData),
     PlayerAbility(String),
-    TargetFlags(Vec<String>),
-    PlayerFlags(Vec<String>),
+    NotPlayerFlag(String),
+    NotTargetFlag(String),
+    TargetFlag(String),
+    PlayerFlag(String),
     ShowMerchant(MerchantData),
     ShowCutscene(String),
     StartConversation(String),

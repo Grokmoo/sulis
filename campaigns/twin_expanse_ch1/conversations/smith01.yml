@@ -15,4 +15,118 @@ nodes:
               loot_list: level5_smith
               buy_frac: 1.0
               sell_frac: 0.25
+      - text: "I'm trying to track down a group of local thugs.  Know where I can find them?"
+        to_view:
+          - player_flag: the_thug_active
+          - not_target_flag: asked_thug
+        to: thug01
+      - text: "About those thugs..."
+        to_view:
+          - target_flag: asked_thug
+        to: thug_already_asked
       - text: "Nothing today."
+  thug_already_asked:
+    text: |
+      Go bother someone else.  I've got nothing more to say.
+    responses:
+      - text: "[c=888|Leave]"
+  thug01:
+    text: |
+      [c=888|The Smith pauses just a bit longer than natural in answering.]
+      
+      You mean Gethruk's crew?  Yeah I know about em.  Why are you so interested?
+    on_view:
+      - target_flag: asked_thug
+    responses:
+      - text: "I'm going to put a stop to them."
+        on_select:
+          - target_num_flag: { flag: disposition, val: -2 }
+        to: thug02a
+      - text: "I'm trying to negotiate a solution that will benefit everyone."
+        on_select:
+          - target_num_flag: { flag: disposition, val: 1 }
+        to: thug02b
+      - text: "I want to join up!"
+        on_select:
+          - target_num_flag: { flag: disposition, val: 0 }
+        to: thug02c
+      - text: "No particular reason."
+        on_select:
+          - target_num_flag: { flag: disposition, val: -1 }
+        to: thug02d
+  thug02a:
+    text: |
+      Yeah, good luck with that.  I'm afraid I can't help you.
+    responses:
+      - text: "[c=888|Continue]"
+        to: thug03
+  thug02b:
+    text: |
+      [c=888|He looks skeptical.]
+      
+      Oh really?  Help everyone you say?
+    responses:
+      - text: "[c=888|Continue]"
+        to: thug03
+  thug02c:
+    text: |
+      [c=888|The smith laughs.]
+      
+      I don't think you should be saying that so loudly around here.  Folk won't take too kindly.
+    responses:
+      - text: "[c=888|Continue]"
+        to: thug03
+  thug02d:
+    text: |
+      So you ain't got a reason to ask then?  Why bother asking?
+    responses:
+      - text: "[c=888|Continue]"
+        to: thug03
+  thug03:
+    text: |
+      [c=888|The smith waits for your response.]
+    responses:
+      - text: "Just tell me what I need to know."
+        on_select:
+          - target_num_flag: { flag: disposition, val: 0 }
+        to: thug_response_check
+      - text: "[c=888|Offer [c=f00|50] gold coins.] I will make it worth your while."
+        on_select:
+          - target_num_flag: { flag: disposition, val: 1 }
+          - target_num_flag: { flag: coins_to_take, val: 500 }
+        to: thug_response_check
+      - text: "[c=888|Offer [c=f00|100] gold coins.] I will make it worth your while."
+        on_select:
+          - target_num_flag: { flag: disposition, val: 2 }
+          - target_num_flag: { flag: coins_to_take, val: 1000 }
+        to: thug_response_check
+      - text: "Sorry I bothered you.  Farewell."
+  thug_response_check:
+    text: |
+      [c=888|The smith considers for a moment.]
+    responses:
+      - text: "[c=888|Continue]"
+        to_view:
+          - target_num_flag: { flag: disposition, val: 1 }
+        to: thug_accept
+      - text: "[c=888|Continue]"
+        to_view:
+          - not_target_num_flag: { flag: disposition, val: 1 }
+        to: thug_reject
+  thug_reject:
+    text: |
+      I'm sorry, I can't help you.
+    responses:
+      - text: "Very well then.  Farewell."
+      - text: "I know you are hiding something - and I'm going to find out what it is."
+  thug_accept:
+    text: |
+      [c=888|He looks around shiftily.]
+      
+      Ok, but you didn't hear this from me.  They've got a hideout just south of town in a cave.  I'll mark it on your map.
+    on_view:
+      - fire_script:
+          id: wellswood
+          func: smith_info
+    responses:
+      - text: "Thank you.  Farewell."

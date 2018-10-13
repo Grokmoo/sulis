@@ -81,19 +81,15 @@ nodes:
     responses:
       - text: "That's outrageous!  I'll pay you 50 to leave these workers in peace."
         to_view:
-          - player_flags: [ has_50_coins]
+          - player_coins: 500
         on_select:
-          - fire_script:
-              id: wellswood
-              func: docks_thugs_pay50
+          - player_coins: -500
         to: interjectB_paid
       - text: "Very well.  Here is 100 gold."
         to_view:
-          - player_flags: [ has_100_coins ]
+          - player_coins: 1000
         on_select:
-          - fire_script:
-              id: wellswood
-              func: docks_thugs_pay100
+          - player_coins: -1000
         to: interjectB_paid
       - text: "I'm sorry, I don't have money to spare."
         to: interjectB_not_paid

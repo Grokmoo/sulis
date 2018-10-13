@@ -2,10 +2,10 @@ id: vaalyun
 initial_nodes:
   - id: questions
     to_view:
-      - target_flags: [ joined ]
+      - target_flag: joined
   - id: not_joined
     to_view:
-      - target_flags: [ already_talked ]
+      - target_flag: already_talked
   - id: start01
 nodes:
   start01:
@@ -14,7 +14,7 @@ nodes:
       
       Thanks for speaking to me.  My name is Vaalyun, formerly of Pard.
     on_view:
-      - target_flags: [ already_talked ]
+      - target_flag: already_talked
     responses:
       - text: "I am #player_name#.  Pleased to meet you."
         to: start02
@@ -27,7 +27,7 @@ nodes:
       - text: "[c=f00|Lie] I don't know."
         to: start03a
         on_select:
-          - target_flags: [ lied_ethel_death ]
+          - target_flag: lied_ethel_death
       - text: "I'm sorry, he is dead."
         to: start03b
       - text: "He died."

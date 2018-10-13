@@ -2,13 +2,13 @@ id: tervald
 initial_nodes:
   - id: plan_formed
     to_view:
-      - target_flags: [ plan_formed ]
+      - target_flag: plan_formed
   - id: ambush_cleared
     to_view:
-      - target_flags: [ ambush_cleared ]
+      - target_flag: ambush_cleared
   - id: already_talked
     to_view:
-      - target_flags: [ already_talked ]
+      - target_flag: already_talked
   - id: start01
 nodes:
   plan_formed:
@@ -21,7 +21,7 @@ nodes:
       
       Damn it those goblins were right on top of us!
     on_view:
-      - target_flags: [ plan_formed ]
+      - target_flag: plan_formed
     responses:
       - text: |
           [c=888|Continue]
@@ -57,7 +57,7 @@ nodes:
       - text: |
           Come on, Jorzal.  [c=888|Jorzal is a strong front line fighter and defender.]
         to_view:
-          - target_flags: [ jorzal_valid_pick ]
+          - target_flag: jorzal_valid_pick
         on_select:
           - fire_script:
               id: wellswood_road_south
@@ -66,7 +66,7 @@ nodes:
       - text: |
           Grazi, you are with me.  [c=888|Grazi is a quick and resourceful rogue.]
         to_view:
-          - target_flags: [ grazi_valid_pick ]
+          - target_flag: grazi_valid_pick
         on_select:
           - fire_script:
               id: wellswood_road_south
@@ -75,7 +75,7 @@ nodes:
       - text: |
           Aessa, let's go.  [c=888|Aessa is a powerful magic user.]
         to_view:
-          - target_flags: [ aessa_valid_pick ]
+          - target_flag: aessa_valid_pick
         on_select:
           - fire_script:
               id: wellswood_road_south
@@ -95,7 +95,7 @@ nodes:
       
       Alright, we know the wagon went into these woods.  The question is: did it come out again?
     on_view:
-      - target_flags: [ already_talked ]
+      - target_flag: already_talked
     responses:
       - text: |
           [c=888|Continue]

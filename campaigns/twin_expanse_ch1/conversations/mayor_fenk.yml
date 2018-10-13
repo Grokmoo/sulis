@@ -2,7 +2,7 @@ id: mayor_fenk
 initial_nodes:
   - id: questions
     to_view:
-      - target_flags: [ already_talked ]
+      - target_flag: already_talked
   - id: start01
 nodes:
   start01:
@@ -11,7 +11,7 @@ nodes:
       
       Hello, I don't believe we've met.  I am Aldius Fenk, mayor of this town.
     on_view:
-      - target_flags: [ already_talked ]
+      - target_flag: already_talked
     responses:
       - text: "I am #player_name#."
         to: start02
@@ -30,9 +30,16 @@ nodes:
         to: tervald
       - text: "What's this about the raids?"
         to: raids
+      - text: "What do you know about crime in Wellswood?"
+        to: crime
       - text: "Nothing, farewell."
   tervald:
     text: "That's terrible news!  Tervald was a skilled warrior and good friend.  He will be missed."
+    responses:
+      - text: "[c=888|Continue]"
+        to: questions
+  crime:
+    text: "I assume you mean Gethruk's gang?  The town guard may be a bit stretched, but they will have no problem putting down those rats, have no doubt."
     responses:
       - text: "[c=888|Continue]"
         to: questions

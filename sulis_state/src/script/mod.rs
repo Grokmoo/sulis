@@ -691,6 +691,18 @@ impl UserData for ScriptInterface {
             let stash = GameState::party_stash();
             let stash = &stash.borrow();
             stash.listeners.notify(stash);
+
+            let factor = Module::rules().item_value_display_factor;
+            let pc = GameState::player();
+            let line = if amount >= 0 {
+                format!("Gained {} coins", (amount as f32 / factor) as i32)
+            } else {
+                format!("Lost {} coins", (-amount as f32 / factor) as i32)
+            };
+
+            let cb = OnTrigger::SayLine(line);
+            GameState::add_ui_callback(vec![cb], &pc, &pc);
+
             Ok(())
         });
 

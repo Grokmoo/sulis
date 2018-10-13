@@ -2,7 +2,7 @@ id: farmer
 initial_nodes:
   - id: main
     to_view:
-      - target_flags: [ already_talked ]
+      - target_flag: already_talked
   - id: start01
 nodes:
   start01:
@@ -11,7 +11,7 @@ nodes:
       
       I see you are up.  Looking much better.
     on_view:
-      - target_flags: [ already_talked ]
+      - target_flag: already_talked
     responses:
       - text: "[c=888|Continue]"
         to: main

@@ -2,17 +2,17 @@ id: dock_foreman
 initial_nodes:
   - id: got_info
     to_view:
-      - target_flags: [ got_info ]
+      - target_flag: got_info
   - id: main
     to_view:
-      - target_flags: [ already_talked ]
+      - target_flag: already_talked
   - id: start01
 nodes:
   start01:
     text: |
       Bastards!  Why bother working when every penny goes to those thugs?
     on_view:
-      - target_flags: [ already_talked ]
+      - target_flag: already_talked
     responses:
       - text: "[c=888|Continue]"
         to: main
@@ -31,15 +31,15 @@ nodes:
     responses:
       - text: "Anything more?  Where can I find Gethruk?"
         to_view:
-          - target_flags: [ player_didnt_help ]
+          - target_flag: player_didnt_help
         to: thugs02a
       - text: "Anything more?  Where can I find Gethruk?"
         to_view:
-          - target_flags: [ player_helped ]
+          - target_flag: player_helped
         to: thugs02b
       - text: "Anything more?  Where can I find Gethruk?"
         to_view:
-          - target_flags: [ player_fought ]
+          - target_flag: player_fought
         to: thugs02c
   thugs02a:
     text: |
@@ -48,7 +48,7 @@ nodes:
       - text: "I guess you shouldn't.  Farewell."
   thugs02b:
     text: |
-      I doubt you can talk much sense into Gethruk, but I'll mark where his hideout is on your map.  Its a cave south of town.  No big, secret, really.
+      I doubt you can talk much sense into Gethruk, but I'll mark where his hideout is on your map.  Its a cave south of town.  I overheard them talking about it.
     on_view:
       - fire_script:
           id: wellswood
@@ -57,7 +57,7 @@ nodes:
       - text: "Thank you.  Farewell."
   thugs02c:
     text: |
-      I don't know if you will be able to fight the whole lot of them, but I'll mark where his hideout is on your map.  Its a cave south of town.  No big, secret, really.
+      I don't know if you will be able to fight the whole lot of them, but I'll mark where his hideout is on your map.  Its a cave south of town.  I overheard them talking about it.
     on_view:
       - fire_script:
           id: wellswood

@@ -228,6 +228,31 @@ impl EntityState {
         }
     }
 
+    pub fn add_num_flag(&mut self, flag: &str, value: f32) {
+        let cur_val = match self.get_custom_flag(flag) {
+            None => 0.0,
+            Some(ref val_str) => {
+                match val_str.parse::<f32>() {
+                    Err(_) => 0.0,
+                    Ok(val) => val,
+                }
+            }
+        };
+        self.set_custom_flag(flag, &(cur_val + value).to_string());
+    }
+
+    pub fn get_num_flag(&self, flag: &str) -> f32 {
+        match self.get_custom_flag(flag) {
+            None => 0.0,
+            Some(ref val_str) => {
+                match val_str.parse::<f32>() {
+                    Err(_) => 0.0,
+                    Ok(val) => val,
+                }
+            }
+        }
+    }
+
     pub fn has_custom_flag(&self, flag: &str) -> bool {
         self.custom_flags.contains_key(flag)
     }

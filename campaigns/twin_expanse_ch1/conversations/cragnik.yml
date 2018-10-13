@@ -2,13 +2,13 @@ id: cragnik
 initial_nodes:
   - id: questions
     to_view:
-      - target_flags: [ joined ]
+      - target_flag: joined
   - id: reconsider
     to_view:
-      - target_flags: [ rejected ]
+      - target_flag: rejected
   - id: start02
     to_view:
-      - target_flags: [ already_talked ]
+      - target_flag: already_talked
   - id: start01
 nodes:
   start01:
@@ -17,7 +17,7 @@ nodes:
       
       This one offers you greetings.  This one is called Cragnik.
     on_view:
-      - target_flags: [ already_talked ]
+      - target_flag: already_talked
     responses:
       - text: "I am #player_name#.  Pleased to meet you."
         to: start02
@@ -71,7 +71,7 @@ nodes:
   reject:
     text: "This one hopes you will reconsider."
     on_view:
-      - target_flags: [ rejected ]
+      - target_flag: rejected
     responses:
       - text: "[c=888|Leave]"
   reconsider:

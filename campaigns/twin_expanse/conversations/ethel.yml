@@ -6,7 +6,7 @@ nodes:
     text: |
       Hey.  Interested in making any trades?
     on_view:
-      - target_flags: [ already_talked ]
+      - target_flag: already_talked
     responses:
       - text: |
           Not today.  Farewell.

@@ -2,7 +2,7 @@ id: lumberjack01
 initial_nodes:
   - id: questions
     to_view:
-      - target_flags: [ already_talked ]
+      - target_flag: already_talked
   - id: start01
 nodes:
   start01:
@@ -11,7 +11,7 @@ nodes:
       
       You're the one that was found up in the rocks, right?
     on_view:
-      - target_flags: [ already_talked ]
+      - target_flag: already_talked
     responses:
       - text: "Yeah, you heard about that?"
         to: affirm

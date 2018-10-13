@@ -219,15 +219,33 @@ pub fn is_match(on_trigger: &Vec<OnTrigger>, pc: &Rc<RefCell<EntityState>>,
     for trigger in on_trigger.iter() {
         use sulis_module::OnTrigger::*;
         match trigger {
-            TargetFlags(ref flags) => {
-                for flag in flags.iter() {
-                    if !target.borrow_mut().has_custom_flag(flag) { return false; }
-                }
+            PlayerCoins(amount) => {
+                let cur = GameState::party_coins();
+                if cur < *amount { return false; }
+            }
+            TargetNumFlag(ref data) => {
+                if target.borrow().get_num_flag(&data.flag) < data.val { return false; }
             },
-            PlayerFlags(ref flags) => {
-                for flag in flags.iter() {
-                    if !pc.borrow_mut().has_custom_flag(flag) { return false; }
-                }
+            PlayerNumFlag(ref data) => {
+                if pc.borrow().get_num_flag(&data.flag) < data.val { return false; }
+            },
+            NotTargetNumFlag(ref data) => {
+                if target.borrow().get_num_flag(&data.flag) >= data.val { return false; }
+            },
+            NotPlayerNumFlag(ref data) => {
+                if pc.borrow().get_num_flag(&data.flag) >= data.val { return false; }
+            },
+            NotTargetFlag(ref flag) => {
+                if target.borrow().has_custom_flag(flag) { return false; }
+            },
+            NotPlayerFlag(ref flag) => {
+                if pc.borrow().has_custom_flag(flag) { return false; }
+            },
+            TargetFlag(ref flag) => {
+                if !target.borrow().has_custom_flag(flag) { return false; }
+            },
+            PlayerFlag(ref flag) => {
+                if !pc.borrow().has_custom_flag(flag) { return false; }
             },
             PlayerAbility(ref ability_to_find) => {
                 let mut has_ability = false;
@@ -274,15 +292,32 @@ pub fn activate(widget: &Rc<RefCell<Widget>>, on_select: &Vec<OnTrigger>,
                                             state.actor.inventory.clone());
                 state.replace_actor(new_actor);
             },
-            TargetFlags(ref flags) => {
-                for flag in flags.iter() {
-                    target.borrow_mut().set_custom_flag(flag, "true");
-                }
+            PlayerCoins(amount) => {
+                GameState::add_party_coins(*amount);
+            }
+            TargetNumFlag(ref data) => {
+                target.borrow_mut().add_num_flag(&data.flag, data.val);
             },
-            PlayerFlags(ref flags) => {
-                for flag in flags.iter() {
-                    pc.borrow_mut().set_custom_flag(flag, "true");
-                }
+            PlayerNumFlag(ref data) => {
+                pc.borrow_mut().add_num_flag(&data.flag, data.val);
+            },
+            NotTargetNumFlag(ref data) => {
+                target.borrow_mut().clear_custom_flag(&data.flag);
+            },
+            NotPlayerNumFlag(ref data) => {
+                pc.borrow_mut().clear_custom_flag(&data.flag);
+            },
+            NotTargetFlag(ref flag) => {
+                target.borrow_mut().clear_custom_flag(flag);
+            },
+            NotPlayerFlag(ref flag) => {
+                pc.borrow_mut().clear_custom_flag(flag);
+            },
+            TargetFlag(ref flag) => {
+                target.borrow_mut().set_custom_flag(flag, "true");
+            },
+            PlayerFlag(ref flag) => {
+                pc.borrow_mut().set_custom_flag(flag, "true");
             },
             ShowMerchant(ref merch) => show_merchant(widget, merch),
             StartConversation(ref convo) => start_convo(widget, convo, pc, target),

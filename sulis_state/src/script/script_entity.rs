@@ -146,6 +146,18 @@ impl UserData for ScriptEntity {
             Ok(())
         });
 
+        methods.add_method("get_num_flag", |_, entity, flag: String| {
+            let entity = entity.try_unwrap()?;
+            let val = entity.borrow().get_num_flag(&flag);
+            Ok(val)
+        });
+
+        methods.add_method("add_num_flag", |_, entity, (flag, val): (String, f32)| {
+            let entity = entity.try_unwrap()?;
+            entity.borrow_mut().add_num_flag(&flag, val);
+            Ok(())
+        });
+
         methods.add_method("set_flag", |_, entity, (flag, val): (String, Option<String>)| {
             let entity = entity.try_unwrap()?;
             let val = match &val {

@@ -24,15 +24,6 @@ end
 
 function view_docks_thug(parent)
   game:set_quest_entry_state("the_thug", "docks_view", "Visible")
-  
-  coins = game:party_coins()
-  if coins > 500 then
-    parent:set_flag("has_50_coins")
-  end
-  
-  if coins > 1000 then
-    parent:set_flag("has_100_coins")
-  end
 end
 
 function docks_thugs_attack(parent)
@@ -101,14 +92,6 @@ function docks_thugs_cleared(parent)
   game:say_line("Alright, back to work!", worker)
 end
 
-function docks_thugs_pay50(parent)
-  game:add_party_coins(-500)
-end
-
-function docks_thugs_pay100(parent)
-  game:add_party_coins(-1000)
-end
-
 function docks_foreman_info(parent)
   worker = game:entity_with_id("dock_foreman")
   worker:set_flag("got_info")
@@ -116,6 +99,19 @@ function docks_foreman_info(parent)
   
   game:set_world_map_location_visible("thugs_hideout", true)
   game:set_world_map_location_enabled("thugs_hideout", true)
+end
+
+function smith_info(parent)
+  game:set_quest_entry_state("the_thug", "docks_info", "Visible")
+  
+  game:set_world_map_location_visible("thugs_hideout", true)
+  game:set_world_map_location_enabled("thugs_hideout", true)
+  
+  smith = game:entity_with_id("smith01")
+  coins = math.floor(smith:get_num_flag("coins_to_take"))
+  if coins > 0 then
+    game:add_party_coins(-coins)
+  end
 end
 
 function priest_rest(parent)

@@ -32,6 +32,8 @@ world_map:
       icon: cave01
       initially_enabled: false
       initially_visible: false
+      linked_area: thugs_hideout
+      linked_area_pos: [3, 11]
     last_edge:
       name: "Last Edge"
       position: [2, 3]

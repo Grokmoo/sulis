@@ -1,0 +1,101 @@
+id: level5_weapons
+probability_entries: {}
+# format is number of items: weight
+# i.e. 2: 1 means generate 2 items with weight 1
+generate:
+  1: 4
+  2: 1
+weighted_entries:
+  battleaxe:
+    weight: 5
+    adjective1:
+      none: 5
+      fine: 5
+  club:
+    weight: 10
+  crossbow:
+    weight: 2
+    adjective1:
+      none: 5
+      fine: 5
+  dagger:
+    weight: 10
+    adjective1:
+      none: 5
+      fine: 5
+  flail:
+    weight: 2
+    adjective1:
+      none: 5
+      fine: 5
+  greataxe:
+    weight: 1
+    adjective1:
+      none: 5
+      fine: 5
+  greathammer:
+    weight: 1
+    adjective1:
+      none: 5
+      fine: 5
+  greatsword:
+    weight: 1
+    adjective1:
+      none: 5
+      fine: 5
+  hatchet:
+    weight: 10
+    adjective1:
+      none: 5
+      fine: 5
+  longbow:
+    weight: 1
+    adjective1:
+      none: 5
+      fine: 5
+  longspear:
+    weight: 2
+    adjective1:
+      none: 5
+      fine: 5
+  longsword:
+    weight: 2
+    adjective1:
+      none: 5
+      fine: 5
+  mace:
+    weight: 5
+    adjective1:
+      none: 5
+      fine: 5
+  morningstar:
+    weight: 2
+    adjective1:
+      none: 5
+      fine: 5
+  quarterstaff:
+    weight: 10
+    adjective1:
+      none: 5
+      fine: 5
+  shortbow:
+    weight: 5
+    adjective1:
+      none: 5
+      fine: 5
+  shortspear:
+    weight: 10
+    adjective1:
+      none: 5
+      fine: 5
+  shortsword:
+    weight: 5
+    adjective1:
+      none: 5
+      fine: 5
+  warhammer:
+    weight: 5
+    adjective1:
+      none: 5
+      fine: 5
+

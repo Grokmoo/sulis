@@ -1,0 +1,10 @@
+id: chest_xl_level5_weapons
+name: Chest
+icon: inventory/misc_crate
+image: props/chest03
+size: 3by3
+visible: true
+passable: false
+interactive:
+  Container:
+    loot: level5_weapons

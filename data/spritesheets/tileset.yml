@@ -559,6 +559,9 @@ groups:
       door_frame_metal_w: [4, 3, 1, 2]
       door_frame_wood_e: [5, 3, 1, 2]
       door_frame_wood_w: [6, 3, 1, 2]
+      
+      cliff_aerial_pass: [20, 6, 1, 5]
+      cliff_grass_aerial_pass: [21, 6, 1, 5]
   small_plants:
     position: [0, 45]
     size: [1, 1]

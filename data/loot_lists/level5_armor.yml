@@ -1,0 +1,104 @@
+id: level5_armor
+probability_entries: {}
+# format is number of items: weight
+# i.e. 2: 1 means generate 2 items with weight 1
+generate:
+  1: 4
+  2: 2
+  3: 1
+weighted_entries:
+  boots_leather:
+    weight: 10
+    adjective1:
+      none: 5
+      fine: 5
+  boots_mail:
+    weight: 3
+    adjective1:
+      none: 7
+      fine: 3
+  boots_plate:
+    weight: 1
+    adjective1:
+      none: 8
+      fine: 2
+  gloves_leather:
+    weight: 10
+    adjective1:
+      none: 5
+      fine: 5
+  gloves_mail:
+    weight: 3
+    adjective1:
+      none: 7
+      fine: 3
+  gloves_plate:
+    weight: 1
+    adjective1:
+      none: 8
+      fine: 2
+  helm_leather:
+    weight: 10
+    adjective1:
+      none: 5
+      fine: 5
+  helm_mail:
+    weight: 3
+    adjective1:
+      none: 7
+      fine: 3
+  helm_plate:
+    weight: 1
+    adjective1:
+      none: 8
+      fine: 2
+  legs_leather:
+    weight: 10
+    adjective1:
+      none: 5
+      fine: 5
+  legs_mail:
+    weight: 3
+    adjective1:
+      none: 7
+      fine: 3
+  legs_plate:
+    weight: 1
+    adjective1:
+      none: 8
+      fine: 2
+  torso_leather:
+    weight: 10
+    adjective1:
+      none: 5
+      fine: 5
+  torso_mail:
+    weight: 3
+    adjective1:
+      none: 7
+      fine: 3
+  torso_plate:
+    weight: 1
+    adjective1:
+      none: 8
+      fine: 2
+  shield_small:
+    weight: 10
+    adjective1:
+      none: 5
+      fine: 5
+  shield_heater:
+    weight: 5
+    adjective1:
+      none: 7
+      fine: 3
+  shield_kite:
+    weight: 5
+    adjective1:
+      none: 7
+      fine: 3
+  shield_large:
+    weight: 3
+    adjective1:
+      none: 8
+      fine: 2

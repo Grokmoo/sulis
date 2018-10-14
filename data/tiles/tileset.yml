@@ -1243,6 +1243,18 @@ tiles:
     size: [2, 6]
     sprite: tileset/cave_entrance_large_e
     pass: [[0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [1, 4], [1, 5]]
+  01_cliff_aerial_pass:
+    layer: aerial
+    size: [2, 10]
+    sprite: tileset/cliff_aerial_pass
+    override_impass: true
+    impass: []
+  01_cliff_grass_aerial_pass:
+    layer: aerial
+    size: [2, 10]
+    sprite: tileset/cliff_grass_aerial_pass
+    override_impass: true
+    impass: []
   01_wall_impass_override:
     layer: terrain_base
     size: [2, 2]

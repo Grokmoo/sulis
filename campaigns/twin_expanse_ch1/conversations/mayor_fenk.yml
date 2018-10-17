@@ -28,16 +28,36 @@ nodes:
     responses:
       - text: "I was with Tervald's group.  We were ambushed by goblins and I am the only survivor."
         to: tervald
+        to_view:
+          - not_target_flag: tervald_notified
       - text: "What's this about the raids?"
         to: raids
       - text: "What do you know about crime in Wellswood?"
         to: crime
+        to_view:
+          - not_target_flag: thugs_cleared
+      - text: "I took care of Gethruk and his gang.  They won't bother the town again."
+        to: gethruk_cleared
+        to_view:
+          - player_flag: gethruk_cleared
       - text: "Nothing, farewell."
+  gethruk_cleared:
+    text: "That's fantastic news!  Please accept this small token of our appreciation."
+    responses:
+      - text: "[c=888|Continue]"
+        on_select:
+          - fire_script:
+              id: wellswood
+              func: thugs_reward
+          - target_flag: thugs_cleared
+        to: questions
   tervald:
     text: "That's terrible news!  Tervald was a skilled warrior and good friend.  He will be missed."
     responses:
       - text: "[c=888|Continue]"
         to: questions
+        on_select:
+          - target_flag: tervald_notified
   crime:
     text: "I assume you mean Gethruk's gang?  The town guard may be a bit stretched, but they will have no problem putting down those rats, have no doubt."
     responses:

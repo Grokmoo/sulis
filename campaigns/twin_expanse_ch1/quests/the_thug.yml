@@ -13,3 +13,6 @@ entries:
   docks_info:
     description: |
       I learned the location of the thugs hideout, a cave south of town.
+  gethruk_dead:
+    description: |
+      I entered the thug's hideout.  Gethruk now lies dead.  I should speak to the Mayor for some kind of reward.

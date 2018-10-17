@@ -123,19 +123,9 @@ impl UserData for ScriptEntity {
         methods.add_method("set_faction", |_, entity, faction: String| {
             let entity = entity.try_unwrap()?;
 
-            match faction.as_ref() {
-                "Hostile" => {
-                    entity.borrow_mut().actor.set_faction(Faction::Hostile);
-                },
-                "Friendly" => {
-                    entity.borrow_mut().actor.set_faction(Faction::Friendly);
-                },
-                "Neutral" => {
-                    entity.borrow_mut().actor.set_faction(Faction::Neutral);
-                },
-                _ => {
-                    warn!("Invalid faction '{}' in script", faction);
-                }
+            match Faction::from_str(&faction) {
+                None => warn!("Invalid faction '{}' in script", faction),
+                Some(faction) => entity.borrow_mut().actor.set_faction(faction),
             }
 
             let mgr = GameState::turn_manager();

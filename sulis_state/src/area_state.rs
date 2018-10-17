@@ -333,9 +333,11 @@ impl AreaState {
         }
     }
 
-    pub fn fire_on_encounter_cleared(&self, ai_group: usize, target: &Rc<RefCell<EntityState>>) {
+    pub fn fire_on_encounter_cleared(&self, index: usize, target: &Rc<RefCell<EntityState>>) {
+        info!("OnEncounterCleared for {}", index);
+
         let player = GameState::player();
-        for trigger_index in self.area.encounters[ai_group].triggers.iter() {
+        for trigger_index in self.area.encounters[index].triggers.iter() {
             let trigger = &self.area.triggers[*trigger_index];
 
             match trigger.kind {
@@ -364,6 +366,8 @@ impl AreaState {
 
     pub fn spawn_encounter(&mut self, enc_index: usize, enc_data: &EncounterData,
                            respect_debug: bool) {
+        let mgr = GameState::turn_manager();
+        let ai_group = mgr.borrow_mut().get_next_ai_group(&self.area.id, enc_index);
         if respect_debug && !Config::debug().encounter_spawning { return; }
         let encounter = &enc_data.encounter;
         let actors = encounter.gen_actors();
@@ -375,7 +379,7 @@ impl AreaState {
                 }, Some(location) => location,
             };
 
-            match self.add_actor(actor, location, unique_id, false, Some(enc_index)) {
+            match self.add_actor(actor, location, unique_id, false, Some(ai_group)) {
                 Ok(_) => (),
                 Err(e) => {
                     warn!("Error adding actor for spawned encounter: {}", e);

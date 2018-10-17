@@ -1,0 +1,48 @@
+id: human_simple
+name: Human
+description: "Human with limited subicons"
+size: 2by2
+movement_rate: 1.0
+base_stats:
+  - kind: { attribute: { attribute: Strength, amount: 1 } }
+  - kind: { attribute: { attribute: Endurance, amount: 1 } }
+  - kind: { attribute: { attribute: Perception, amount: -1 } }
+  - kind: { hit_points: 40 }
+  - kind: { melee_accuracy: 30 }
+  - kind: { ranged_accuracy: 30 }
+  - kind: { spell_accuracy: 30 }
+  - kind: { defense: 30 }
+  - kind: { fortitude: 30 }
+  - kind: { reflex: 30 }
+  - kind: { will: 30 }
+  - kind: { reach: 0.25 }
+base_attack:
+  damage:
+    min: 8
+    max: 12
+    kind: Crushing
+  kind: #Melee
+    reach: 0.5
+  bonuses: {}
+default_images:
+  Male:
+    Foreground: creatures/human_male_fg
+    Background: creatures/human_male_bg
+    Shadow: creatures/human_male_shadow
+  Female:
+    Foreground: creatures/human_female_fg
+    Background: creatures/human_female_bg
+    Shadow: creatures/human_female_shadow
+ticker_offset: [0.5, 2]
+image_layer_offset_scale: 16
+image_layer_offsets:
+  HeldMain: [-24, -26]
+  HeldOff: [9, -25]
+  Hair: [-8,-18]
+  Beard: [-8,-18]
+  Foreground: [-8,-18]
+  Background: [-8,-18]
+  Cloak: [-8,-18]
+  Shadow: [-8,-18]
+image_layer_postfix:
+  Female: "_female"

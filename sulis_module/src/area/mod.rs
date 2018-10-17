@@ -27,7 +27,7 @@ pub mod tile;
 pub use self::tile::Tile;
 pub use self::tile::Tileset;
 
-use std::collections::HashMap;
+use std::collections::{HashSet, HashMap};
 use std::io::{Error};
 use std::rc::Rc;
 
@@ -189,6 +189,7 @@ impl Area {
             });
         }
 
+        let mut used_triggers = HashSet::new();
         let mut encounters = Vec::new();
         for encounter_builder in builder.encounters {
             let encounter = match module.encounters.get(&encounter_builder.id) {
@@ -204,6 +205,7 @@ impl Area {
                     TriggerKind::OnEncounterCleared { encounter_location } => {
                         if encounter_location == encounter_builder.location {
                             encounter_triggers.push(index);
+                            used_triggers.insert(index);
                         }
                     },
                     _ => (),
@@ -216,6 +218,17 @@ impl Area {
                 size: encounter_builder.size,
                 triggers: encounter_triggers,
             });
+        }
+
+        for (index, trigger) in triggers.iter().enumerate() {
+            match trigger.kind {
+                TriggerKind::OnEncounterCleared { encounter_location } => {
+                    if !used_triggers.contains(&index) {
+                        warn!("Invalid encounter cleared trigger at point {:?}", encounter_location);
+                    }
+                },
+                _ => (),
+            }
         }
 
         let visibility_tile = ResourceSet::get_sprite(&builder.visibility_tile)?;

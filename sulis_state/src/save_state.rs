@@ -25,7 +25,8 @@ use sulis_rules::{QuickSlot, Slot, BonusList};
 use sulis_module::{actor::{ActorBuilder, RewardBuilder}, ItemSaveState, ItemListEntrySaveState};
 
 use {ActorState, effect, Effect, EntityState, Formation, GameState, Location,
-    PropState, prop_state::Interactive, Merchant, WorldMapState, PStats, QuestState};
+    PropState, prop_state::Interactive, Merchant, WorldMapState, PStats, QuestState,
+    turn_manager::EncounterRef};
 use area_state::{TriggerState};
 use script::CallbackData;
 use animation::AnimSaveState;
@@ -123,6 +124,8 @@ pub struct QuestSaveState {
 pub struct ManagerSaveState {
     pub(crate) entities: Vec<EntitySaveState>,
     pub(crate) effects: Vec<EffectSaveState>,
+    pub(crate) cur_ai_group_index: usize,
+    pub(crate) ai_groups: HashMap<String, EncounterRef>,
 }
 
 impl ManagerSaveState {
@@ -144,9 +147,17 @@ impl ManagerSaveState {
             }
         }
 
+        let cur_ai_group_index = mgr.cur_ai_group_index;
+        let mut ai_groups = HashMap::new();
+        for (key, value) in mgr.ai_groups.iter() {
+            ai_groups.insert(key.to_string(), value.clone());
+        }
+
         ManagerSaveState {
             entities,
             effects,
+            cur_ai_group_index,
+            ai_groups,
         }
     }
 }

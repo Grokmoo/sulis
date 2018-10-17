@@ -16,7 +16,7 @@
 
 use std::rc::Rc;
 use std::cell::{RefCell, Cell};
-use std::collections::{HashSet, VecDeque, vec_deque::Iter};
+use std::collections::{HashSet, HashMap, VecDeque, vec_deque::Iter};
 
 use rand::{self, Rng};
 
@@ -33,6 +33,13 @@ enum Entry {
     Effect(usize),
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct EncounterRef {
+    area_id: String,
+    encounter_index: usize,
+}
+
 pub struct TurnManager {
     entities: Vec<Option<Rc<RefCell<EntityState>>>>,
     pub(crate) effects: Vec<Option<Effect>>,
@@ -42,6 +49,9 @@ pub struct TurnManager {
 
     pub listeners: ChangeListenerList<TurnManager>,
     order: VecDeque<Entry>,
+
+    pub(crate) ai_groups: HashMap<usize, EncounterRef>,
+    pub(crate) cur_ai_group_index: usize,
 }
 
 impl Default for TurnManager {
@@ -54,6 +64,8 @@ impl Default for TurnManager {
             listeners: ChangeListenerList::default(),
             order: VecDeque::new(),
             combat_active: false,
+            ai_groups: HashMap::new(),
+            cur_ai_group_index: 0,
         }
     }
 }
@@ -67,6 +79,8 @@ impl TurnManager {
         self.combat_active = false;
         self.listeners = ChangeListenerList::default();
         self.order.clear();
+        self.cur_ai_group_index = 0;
+        self.ai_groups.clear();
     }
 
     pub fn effect_mut_checked(&mut self, index: usize) -> Option<&mut Effect> {
@@ -105,6 +119,17 @@ impl TurnManager {
         if index >= self.entities.len() { return false; }
 
         self.entities[index].is_some()
+    }
+
+    pub fn get_next_ai_group(&mut self, area_id: &str, enc_index: usize) -> usize {
+        let value = self.cur_ai_group_index;
+
+        self.cur_ai_group_index += 1;
+        self.ai_groups.insert(value, EncounterRef {
+            area_id: area_id.to_string(),
+            encounter_index: enc_index,
+        });
+        value
     }
 
     pub fn entity_checked(&self, index: usize) -> Option<Rc<RefCell<EntityState>>> {
@@ -590,11 +615,15 @@ impl TurnManager {
             Some(index) => index,
         };
 
+        debug!("Check encounter cleared: {}", ai_group);
         for other in self.entity_iter() {
             let other = other.borrow();
             if other.actor.hp() < 0 { continue; }
             if let Some(index) = other.ai_group() {
-                if index == ai_group { return None; }
+                if index == ai_group {
+                    debug!("  Found blocking entity '{}'", other.actor.actor.id);
+                    return None;
+                }
             }
         }
 
@@ -642,7 +671,9 @@ impl TurnManager {
         }
 
         if let Some(ai_group) = self.check_encounter_cleared(&entity) {
-            area_state.borrow().fire_on_encounter_cleared(ai_group, &entity);
+            let enc_ref = self.ai_groups.get(&ai_group).unwrap().clone();
+            let area_state = GameState::get_area_state(&enc_ref.area_id).unwrap();
+            area_state.borrow().fire_on_encounter_cleared(enc_ref.encounter_index, &entity);
         }
 
         self.listeners.notify(&self);

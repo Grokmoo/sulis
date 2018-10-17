@@ -37,10 +37,11 @@ inventory:
   quick:
     Usable1: { id: potion_healing }
 levels:
-  fighter: 4
+  fighter: 6
+  rogue: 2
 xp: ~
 reward:
-  xp: 50
+  xp: 100
   loot: level5_misc
   loot_chance: 100
 abilities:
@@ -55,4 +56,8 @@ abilities:
   - weapon_spear
   - weapon_mace
   - weapon_simple
+  - feint
+  - mighty_blow
+  - backstab
+  - flanker
 ai: ai_basic

@@ -724,6 +724,14 @@ impl UserData for ScriptInterface {
             Ok(())
         });
 
+        methods.add_method("add_party_xp", |_, _, amount: u32| {
+            for member in GameState::party().iter() {
+                member.borrow_mut().add_xp(amount);
+            }
+
+            Ok(())
+        });
+
         methods.add_method("transition_party_to", |_, _, (area, x, y): (String, i32, i32)| {
             let location = Some(area);
             GameState::transition(&location, x, y);

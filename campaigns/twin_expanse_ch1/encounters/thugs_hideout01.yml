@@ -1,0 +1,11 @@
+id: thugs_hideout01
+auto_spawn: true
+min_gen_actors: 0
+max_gen_actors: 0
+entries:
+  - id: thug04
+    unique_id: thug04
+    always: true
+  - id: thug05
+    unique_id: thug05
+    always: true

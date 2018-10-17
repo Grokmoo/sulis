@@ -1,0 +1,58 @@
+id: gethruk_boss
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=888|The man you now know as Gethruk addresses you.]
+      
+      Who the hell are you?
+    responses:
+      - text: "I'm here to kill you.  [c=f00|Attack]"
+        on_select:
+          - fire_script:
+              id: thugs_hideout
+              func: set_boss_hostile
+      - text: "I'm here on behalf of Wellswood.  You must stop your extortion there at once."
+        to: start02a
+      - text: "I'm here on behalf of Wellswood.  I want to find a peaceful solution to the problems there."
+        to: start02b
+  start02a:
+    text: |
+      And you think you can stop us!  Think again!
+      
+      Let's show this fool who's really in charge of Wellswood!
+    responses:
+      - text: "[c=f00|Fight]"
+        on_select:
+          - fire_script:
+              id: thugs_hideout
+              func: set_boss_hostile
+  start02b:
+    text: |
+      [c=888|Gethruk laughs.]  You mean how we've got every merchant and farmer bankrolling us?
+    responses:
+      - text: "[c=888|Continue]"
+        to_view:
+          - player_flag: fought_gethruk_thugs
+        to: start03a
+      - text: "[c=888|Continue]"
+        to_view:
+          - not_player_flag: fought_gethruk_thugs
+        to: start04
+  start03a:
+    text: |
+      You've got some nerve, I'll give you that.  Claiming you want to talk after carving through my men.
+    responses:
+      - text: "[c=888|Continue]"
+        to: start04
+  start04:
+    text: |
+      I'm afraid there will be no negotiation.  Kill these fools!
+    responses:
+      - text: "[c=f00|Fight]"
+        on_select:
+          - fire_script:
+              id: thugs_hideout
+              func: set_boss_hostile
+      

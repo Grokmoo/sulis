@@ -1,0 +1,75 @@
+id: thugs_hideout_enter
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=888|As you approach the cave, the men at the entrance call to you.]
+      
+      Hey!  I don't know you!  What are you doing here?
+    responses:
+      - text: "I want to speak to Gethruk."
+        to: speak01
+      - text: "I'm here to repay your crimes in Wellswood!"
+        to: start_combat2
+      - text: "Nothing - I'll just be on my way."
+        to: start_combat
+  start_combat:
+    text: |
+      You aren't going anywhere.  Take them!
+    responses:
+      - text: "[c=f00|Fight!]"
+        on_select:
+          - fire_script:
+              id: thugs_hideout
+              func: set_thugs_hostile
+  start_combat2:
+    text: |
+      We'll see about that!  Take them!
+    responses:
+      - text: "[c=f00|Fight!]"
+        on_select:
+          - fire_script:
+              id: thugs_hideout
+              func: set_thugs_hostile
+  start_combat3:
+    text: |
+      I'm afraid not.  Kill them!
+    responses:
+      - text: "[c=f00|Fight!]"
+        on_select:
+          - fire_script:
+              id: thugs_hideout
+              func: set_thugs_hostile
+  speak01:
+    text: |
+      Oh?  And what would you want to talk about?
+    responses:
+      - text: I want to find a peaceful solution to the crimes there.
+        to: speak02
+      - text: Gethruk must stop his activities in Wellswood.
+        to: start_combat2
+      - text: I'm going to end his reign of terror!
+        to: start_combat2
+  speak02:
+    text: |
+      Ha!  Why should we let you in?
+    responses:
+      - text: Because if you don't I will kill you.
+        to: start_combat2
+      - text: Because it is the right thing to do?
+        to: start_combat3
+      - text: "[c=888|Offer 100 gold coins] I can make it worth your while."
+        to_view:
+          - player_coins: 1000
+        to: speak03
+  speak03:
+    text: |
+      Fine.  [c=888|He takes the coins.]  But don't cause any trouble.
+    responses:
+      - text: "[c=888|Leave]"
+    on_view:
+      - player_coins: -1000
+      - fire_script:
+          id: thugs_hideout
+          func: thugs_pay_off

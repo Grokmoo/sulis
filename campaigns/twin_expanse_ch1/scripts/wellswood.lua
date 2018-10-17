@@ -40,6 +40,7 @@ function docks_thugs_attack(parent)
 end
 
 function docks_thugs_leave_early(parent)
+  game:add_party_xp(100)
   thug01 = game:entity_with_id("thug01")
   game:say_line("That will teach you!  Have the money next time or else!")
   
@@ -93,6 +94,7 @@ function docks_thugs_cleared(parent)
 end
 
 function docks_foreman_info(parent)
+  game:add_party_xp(100)
   worker = game:entity_with_id("dock_foreman")
   worker:set_flag("got_info")
   game:set_quest_entry_state("the_thug", "docks_info", "Visible")
@@ -102,6 +104,7 @@ function docks_foreman_info(parent)
 end
 
 function smith_info(parent)
+  game:add_party_xp(100)
   game:set_quest_entry_state("the_thug", "docks_info", "Visible")
   
   game:set_world_map_location_visible("thugs_hideout", true)
@@ -112,6 +115,13 @@ function smith_info(parent)
   if coins > 0 then
     game:add_party_coins(-coins)
   end
+end
+
+function thugs_reward(parent)
+  game:add_party_xp(200)
+  game:add_party_coins(3000)
+  game:set_quest_state("the_thug", "Complete")
+  game:player():clear_flag("gethruk_cleared")
 end
 
 function priest_rest(parent)

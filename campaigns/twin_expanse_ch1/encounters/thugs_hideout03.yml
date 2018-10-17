@@ -1,0 +1,20 @@
+id: thugs_hideout03
+auto_spawn: true
+min_gen_actors: 0
+max_gen_actors: 0
+entries:
+  - id: thug09
+    unique_id: thug09
+    always: true
+  - id: thug10
+    unique_id: thug10
+    always: true
+  - id: thug11
+    unique_id: thug11
+    always: true
+  - id: thug12
+    unique_id: thug12
+    always: true
+  - id: gethruk
+    unique_id: gethruk_boss
+    always: true

@@ -139,6 +139,18 @@ impl GameState {
             let mut effects = HashMap::new();
 
             let mgr = GameState::turn_manager();
+            mgr.borrow_mut().cur_ai_group_index = save_state.manager.cur_ai_group_index;
+            for (key, value) in save_state.manager.ai_groups {
+                let index = match key.parse::<usize>() {
+                    Ok(val) => val,
+                    Err(e) => {
+                        let err = Error::new(ErrorKind::InvalidInput, e);
+                        return Err(err);
+                    }
+                };
+                mgr.borrow_mut().ai_groups.insert(index, value);
+            }
+
             for effect_save in save_state.manager.effects {
                 let old_index = effect_save.index;
                 let new_index = mgr.borrow().get_next_effect_index();

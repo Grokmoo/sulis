@@ -41,6 +41,15 @@ impl Faction{
     pub fn iter() -> impl Iterator<Item=&'static Faction> {
         [Faction::Friendly, Faction::Hostile, Faction::Neutral].iter()
     }
+
+    pub fn from_str(val: &str) -> Option<Faction> {
+        match val {
+            "Hostile" => Some(Faction::Hostile),
+            "Neutral" => Some(Faction::Neutral),
+            "Friendly" => Some(Faction::Friendly),
+            _ => None,
+        }
+    }
 }
 
 #[derive(Debug, Clone)]

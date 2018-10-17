@@ -1,43 +1,43 @@
 ---
-id: thug03
+id: thug06
 name: Thug
-race: human
+race: human_simple
 sex: Male
 attributes:
   str: 13
-  dex: 14
-  end: 13
+  dex: 16
+  end: 12
   per: 10
-  int: 9
-  wis: 9
+  int: 10
+  wis: 10
 conversation: ~
 faction: Neutral
 images:
+  Background: creatures/human05
   Shadow: empty
   Foreground: empty
-  Background: creatures/human06
 hue: 0.6000000238418579
 inventory:
   equipped:
-    HeldMain: { id: dagger }
+    HeldMain: { id: shortsword }
+    Torso: { id: torso_leather }
+    Legs: { id: legs_leather }
+    Feet: { id: boots_leather }
+    Hands: { id: gloves_leather }
   quick: {}
-  pc_starting_coins: 0
-  pc_starting_items: []
 levels:
-  rogue: 4
+  rogue: 5
 reward:
-  xp: 30
+  xp: 50
   loot: level1_misc
-  loot_chance: 35
+  loot_chance: 50
 abilities:
   - armor_light
-  - armor_medium
+  - weapon_crossbow
   - weapon_bow
   - weapon_small_sword
-  - weapon_spear
   - weapon_simple
   - backstab
   - flanker
   - flanker
-  - feint
 ai: ai_basic

@@ -20,40 +20,45 @@ actors:
   - id: townsperson16
     location:
       x: 35
-      "y": 23
+      y: 23
     unique_id: ~
   - id: townsperson17
     location:
       x: 21
-      "y": 23
+      y: 23
     unique_id: ~
   - id: townsperson18
     location:
       x: 28
-      "y": 18
+      y: 18
     unique_id: ~
   - id: townsperson19
     location:
       x: 29
-      "y": 22
+      y: 22
     unique_id: ~
   - id: mayor_fenk
     location:
       x: 29
-      "y": 9
+      y: 9
+    unique_id: ~
+  - id: npc_jhilsara
+    location:
+      x: 19
+      y: 6
     unique_id: ~
 props: []
 encounters: []
 transitions:
   - from:
       x: 16
-      "y": 33
+      y: 33
     size: 4by3
     to:
       Area:
         id: wellswood
         x: 101
-        "y": 33
+        y: 33
     hover_text: To Outside
     image_display: empty
 triggers: []
@@ -64,22 +69,133 @@ max_vis_up_one_distance: 6
 world_map_location: ~
 on_rest:
   Disabled:
-    message: "You cannot rest here.  Find an inn or temple."
+    message: You cannot rest here.  Find an inn or temple.
 layer_set:
-  tileset/interior_stone_ceil_outer_edge_ne:
-    - - 10
-      - 10
-  tileset/cabinet07:
+  tileset/interior_stone_ceil_inner_edge_se:
+    - - 0
+      - 0
+    - - 0
+      - 12
+    - - 16
+      - 0
+  tileset/wall_interior_plaster_outer_edge_s:
+    - - 24
+      - 2
+    - - 26
+      - 2
+    - - 28
+      - 2
+    - - 30
+      - 2
+    - - 32
+      - 2
+    - - 34
+      - 2
+    - - 36
+      - 2
+    - - 38
+      - 2
+    - - 0
+      - 14
+    - - 2
+      - 14
+    - - 4
+      - 14
+    - - 6
+      - 14
+    - - 8
+      - 14
+    - - 2
+      - 2
     - - 4
       - 2
-  tileset/chair03:
-    - - 22
-      - 21
-    - - 22
-      - 18
-  tileset/bottles03:
+    - - 6
+      - 2
+    - - 8
+      - 2
+    - - 10
+      - 2
     - - 12
-      - 5
+      - 2
+    - - 14
+      - 2
+    - - 16
+      - 2
+    - - 18
+      - 2
+    - - 20
+      - 2
+    - - 22
+      - 2
+  tileset/interior_stone_ceil_outer_edge_se:
+    - - 10
+      - 12
+    - - 16
+      - 4
+  tileset/rug_small01:
+    - - 17
+      - 34
+  tileset/chair02:
+    - - 33
+      - 23
+    - - 25
+      - 23
+  tileset/interior_stone_ceil_inner_edge_sw:
+    - - 38
+      - 0
+    - - 14
+      - 0
+  tileset/papers:
+    - - 25
+      - 20
+  tileset/bar_horiz_e:
+    - - 27
+      - 11
+  tileset/interior_stone_ceil_outer_edge_n:
+    - - 36
+      - 36
+    - - 34
+      - 36
+    - - 2
+      - 36
+    - - 4
+      - 36
+    - - 6
+      - 36
+    - - 8
+      - 36
+    - - 10
+      - 36
+    - - 12
+      - 36
+    - - 14
+      - 36
+    - - 16
+      - 36
+    - - 18
+      - 36
+    - - 20
+      - 36
+    - - 22
+      - 36
+    - - 24
+      - 36
+    - - 26
+      - 36
+    - - 28
+      - 36
+    - - 30
+      - 36
+    - - 32
+      - 36
+    - - 2
+      - 10
+    - - 4
+      - 10
+    - - 6
+      - 10
+    - - 8
+      - 10
   tileset/interior_dirt_base:
     - - 32
       - 24
@@ -841,124 +957,30 @@ layer_set:
       - 22
     - - 38
       - 22
-  tileset/interior_stone_ceil_outer_edge_s:
-    - - 24
-      - 0
-    - - 26
-      - 0
-    - - 28
-      - 0
-    - - 30
-      - 0
-    - - 32
-      - 0
-    - - 34
-      - 0
-    - - 36
-      - 0
-    - - 2
-      - 0
-    - - 2
-      - 12
-    - - 4
-      - 12
-    - - 6
-      - 12
-    - - 8
-      - 12
-    - - 4
-      - 0
-    - - 6
-      - 0
-    - - 8
-      - 0
-    - - 10
-      - 0
-    - - 12
-      - 0
-    - - 18
-      - 0
-    - - 20
-      - 0
-    - - 22
-      - 0
-  tileset/interior_stone_ceil_inner_edge_sw:
-    - - 38
-      - 0
-    - - 14
-      - 0
-  tileset/cabinet05:
-    - - 8
-      - 2
   tileset/bar_horiz_w:
     - - 31
       - 11
-  tileset/interior_brick_outer_edge_se:
-    - - 10
-      - 28
-    - - 26
-      - 28
-    - - 18
-      - 16
-  tileset/interior_stone_ceil_outer_edge_n:
-    - - 36
-      - 36
-    - - 34
-      - 36
-    - - 2
-      - 36
-    - - 4
-      - 36
-    - - 6
-      - 36
-    - - 8
-      - 36
-    - - 10
-      - 36
-    - - 12
-      - 36
+  tileset/wall_interior_plaster_outer_edge_sw:
     - - 14
-      - 36
-    - - 16
-      - 36
-    - - 18
-      - 36
-    - - 20
-      - 36
-    - - 22
-      - 36
+      - 6
+  tileset/cabinet06:
+    - - 2
+      - 2
+    - - 10
+      - 2
+  tileset/cabinet05:
+    - - 8
+      - 2
+  table_large01:
     - - 24
-      - 36
-    - - 26
-      - 36
-    - - 28
-      - 36
-    - - 30
-      - 36
-    - - 32
-      - 36
-    - - 2
-      - 10
-    - - 4
-      - 10
-    - - 6
-      - 10
-    - - 8
-      - 10
-  tileset/chair02:
-    - - 33
-      - 23
-    - - 25
-      - 23
-  tileset/wine_bottle02:
-    - - 3
       - 18
-  tileset/bucket_full:
-    - - 3
-      - 8
-  tileset/interior_stone_ceil_outer_edge_sw:
-    - - 14
-      - 4
+    - - 32
+      - 18
+  tileset/wall_interior_plaster_outer_edge_se:
+    - - 10
+      - 14
+    - - 16
+      - 6
   tileset/interior_brick_outer_edge_sw:
     - - 8
       - 28
@@ -966,55 +988,7 @@ layer_set:
       - 28
     - - 16
       - 16
-  tileset/table03:
-    - - 3
-      - 33
-    - - 3
-      - 28
-    - - 3
-      - 19
-  tileset/interior_stone_ceil_inner_edge_se:
-    - - 0
-      - 0
-    - - 0
-      - 12
-    - - 16
-      - 0
-  01entry_light:
-    - - 15
-      - 32
-  tileset/wall_interior_brick_outer_edge_se:
-    - - 10
-      - 30
-    - - 26
-      - 30
-    - - 18
-      - 18
-  tileset/interior_brick_outer_edge_ne:
-    - - 10
-      - 26
-    - - 26
-      - 26
-    - - 18
-      - 14
-  tileset/interior_stone_ceil_outer_edge_se:
-    - - 10
-      - 12
-    - - 16
-      - 4
-  tileset/cabinet08:
-    - - 6
-      - 2
-  tileset/chair05:
-    - - 6
-      - 18
-  tileset/wall_interior_plaster_outer_edge_s:
-    - - 24
-      - 2
-    - - 26
-      - 2
-    - - 28
-      - 2
+  tileset/cabinet02:
     - - 30
       - 2
     - - 32
@@ -1023,45 +997,65 @@ layer_set:
       - 2
     - - 36
       - 2
+  tileset/bottles03:
+    - - 12
+      - 5
+  tileset/interior_stone_ceil_outer_edge_w:
+    - - 38
+      - 8
+    - - 38
+      - 10
+    - - 38
+      - 12
+    - - 38
+      - 14
+    - - 38
+      - 16
+    - - 38
+      - 18
+    - - 38
+      - 20
+    - - 38
+      - 22
+    - - 38
+      - 24
+    - - 38
+      - 26
+    - - 38
+      - 28
     - - 38
       - 2
-    - - 0
-      - 14
-    - - 2
-      - 14
-    - - 4
-      - 14
-    - - 6
-      - 14
-    - - 8
-      - 14
-    - - 2
-      - 2
-    - - 4
-      - 2
-    - - 6
-      - 2
-    - - 8
-      - 2
-    - - 10
-      - 2
-    - - 12
-      - 2
+    - - 38
+      - 4
+    - - 38
+      - 6
+    - - 38
+      - 30
+    - - 38
+      - 32
+    - - 38
+      - 34
     - - 14
       - 2
-    - - 16
-      - 2
-    - - 18
-      - 2
-    - - 20
-      - 2
-    - - 22
-      - 2
-  tileset/chair04:
-    - - 36
-      - 21
-    - - 36
-      - 18
+  tileset/interior_stone_ceil_inner_edge_nw:
+    - - 38
+      - 36
+  tileset/interior_stone_ceil_outer_edge_ne:
+    - - 10
+      - 10
+  tileset/bar_horiz_c:
+    - - 29
+      - 11
+  tileset/table03:
+    - - 3
+      - 33
+    - - 3
+      - 28
+    - - 3
+      - 19
+  tileset/interior_stone_ceil_outer_edge_sw:
+    - - 14
+      - 4
   tileset/chair06:
     - - 2
       - 22
@@ -1069,9 +1063,36 @@ layer_set:
       - 25
     - - 2
       - 30
-  tileset/papers:
-    - - 25
-      - 20
+  tileset/cabinet07:
+    - - 4
+      - 2
+  tileset/wall_interior_brick_outer_edge_se:
+    - - 10
+      - 30
+    - - 26
+      - 30
+    - - 18
+      - 18
+  tileset/chair03:
+    - - 22
+      - 21
+    - - 22
+      - 18
+  tileset/wine_bottle02:
+    - - 3
+      - 18
+  tileset/chair04:
+    - - 36
+      - 21
+    - - 36
+      - 18
+  tileset/interior_brick_outer_edge_se:
+    - - 10
+      - 28
+    - - 26
+      - 28
+    - - 18
+      - 16
   tileset/interior_stone_ceil_outer_edge_e:
     - - 38
       - 8
@@ -1143,97 +1164,15 @@ layer_set:
       - 18
     - - 16
       - 2
-  tileset/rug_small01:
-    - - 17
-      - 34
-  tileset/interior_stone_ceil_inner_edge_nw:
-    - - 38
-      - 36
-  tileset/wall_interior_brick_outer_edge_sw:
-    - - 8
-      - 30
-    - - 24
-      - 30
-    - - 16
-      - 18
-  tileset/bar_horiz_c:
-    - - 29
-      - 11
-  tileset/bar_horiz_e:
-    - - 27
-      - 11
-  tileset/interior_stone_ceil_outer_edge_w:
-    - - 38
-      - 8
-    - - 38
-      - 10
-    - - 38
-      - 12
-    - - 38
-      - 14
-    - - 38
-      - 16
-    - - 38
-      - 18
-    - - 38
-      - 20
-    - - 38
-      - 22
-    - - 38
-      - 24
-    - - 38
-      - 26
-    - - 38
-      - 28
-    - - 38
-      - 2
-    - - 38
-      - 4
-    - - 38
-      - 6
-    - - 38
-      - 30
-    - - 38
+  01entry_light:
+    - - 15
       - 32
-    - - 38
-      - 34
-    - - 14
-      - 2
-  table_large01:
-    - - 24
+  tileset/chair05:
+    - - 6
       - 18
-    - - 32
-      - 18
-  tileset/cabinet06:
-    - - 2
-      - 2
-    - - 10
-      - 2
-  tileset/wall_interior_plaster_outer_edge_se:
-    - - 10
-      - 14
-    - - 16
-      - 6
-  tileset/cabinet02:
-    - - 30
-      - 2
-    - - 32
-      - 2
-    - - 34
-      - 2
-    - - 36
-      - 2
-  tileset/ropes01:
-    - - 9
-      - 16
-  tileset/wall_interior_plaster_outer_edge_sw:
-    - - 14
-      - 6
-  tileset/interior_stone_ceil_inner_edge_ne:
-    - - 0
-      - 36
-    - - 0
-      - 10
+  tileset/bucket_full:
+    - - 3
+      - 8
   tileset/interior_brick_outer_edge_nw:
     - - 8
       - 26
@@ -1241,9 +1180,75 @@ layer_set:
       - 26
     - - 16
       - 14
+  tileset/interior_stone_ceil_inner_edge_ne:
+    - - 0
+      - 36
+    - - 0
+      - 10
+  tileset/wall_interior_brick_outer_edge_sw:
+    - - 8
+      - 30
+    - - 24
+      - 30
+    - - 16
+      - 18
+  tileset/interior_stone_ceil_outer_edge_s:
+    - - 24
+      - 0
+    - - 26
+      - 0
+    - - 28
+      - 0
+    - - 30
+      - 0
+    - - 32
+      - 0
+    - - 34
+      - 0
+    - - 36
+      - 0
+    - - 2
+      - 0
+    - - 2
+      - 12
+    - - 4
+      - 12
+    - - 6
+      - 12
+    - - 8
+      - 12
+    - - 4
+      - 0
+    - - 6
+      - 0
+    - - 8
+      - 0
+    - - 10
+      - 0
+    - - 12
+      - 0
+    - - 18
+      - 0
+    - - 20
+      - 0
+    - - 22
+      - 0
+  tileset/cabinet08:
+    - - 6
+      - 2
+  tileset/ropes01:
+    - - 9
+      - 16
   tileset/book01:
     - - 28
       - 11
+  tileset/interior_brick_outer_edge_ne:
+    - - 10
+      - 26
+    - - 26
+      - 26
+    - - 18
+      - 14
 terrain:
   - interior_dirt
   - ~

@@ -457,6 +457,7 @@ groups:
       city05: [200, 72]
       city06: [300, 72]
       cave01: [400, 72]
+      bridge01: [500, 72]
       camp01_disabled: [0, 144]
       town01_disabled: [100, 144]
       city01_disabled: [200, 144]
@@ -472,6 +473,7 @@ groups:
       city05_disabled: [200, 216]
       city06_disabled: [300, 216]
       cave01_disabled: [400, 216]
+      bridge01_disabled: [500,  216]
   special:
     areas:
       empty: [0, 512, 5, 5]

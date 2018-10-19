@@ -1,0 +1,14 @@
+id: entering_rose_lake
+name: "Entering Rose Lake"
+entries:
+  start:
+    description: |
+      The only bridge to Rose Lake from this side of the river is closed.  I'll either need to find a way to persuade the guards to allow me to cross, or find another way.
+  learn_pass:
+    description: |
+      I learned that I may be able to obtain a pass across the bridge if I am on official government business.
+  mayor_fenk_ask_pass:
+    description: |
+      Mayor Fenk will provide me with a pass if I stop the raids currently plaguing Wellswood.
+      
+      [c=f00|Note] This quest cannot be progressed any further until a later game update.

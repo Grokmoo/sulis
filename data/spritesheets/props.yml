@@ -59,6 +59,8 @@ groups:
       anvil: [6, 13]
       coins_small: [9, 13]
       dummy: [12, 13]
+      barricade_open: [12, 7]
+      barricade_e_w: [15, 7]
   brazier:
     size: [3, 4]
     areas:

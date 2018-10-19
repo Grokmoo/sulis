@@ -1,0 +1,9 @@
+id: barricade_e_w
+name: Barricade
+icon: inventory/misc_crate
+image: props/barricade_e_w
+size: 3by3
+visible: true
+passable: false
+interactive:
+  Not

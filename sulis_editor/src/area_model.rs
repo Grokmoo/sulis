@@ -422,7 +422,10 @@ impl AreaModel {
         }
 
         for &(pos, ref actor) in self.actors.iter() {
-            actor.draw(renderer, scale_x, scale_y, pos.x as f32 + x, pos.y as f32 + y, millis);
+            let w = actor.race.size.width as f32 / 2.0;
+            let h = actor.race.size.height as f32 / 2.0;
+            actor.draw(renderer, scale_x, scale_y, pos.x as f32 + x - w,
+                       pos.y as f32 + y - h, millis);
         }
 
         let encounter_sprite = match self.encounter_sprite {

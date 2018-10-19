@@ -1,0 +1,4 @@
+id: bridge01
+states:
+    normal: bridge01_normal
+    disabled: bridge01_disabled

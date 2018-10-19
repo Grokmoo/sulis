@@ -784,6 +784,24 @@ groups:
       window_small05: [9, 0, 1, 1]
       window_small06: [10, 0, 1, 1]
       window_small07: [10, 0, 1, 1]
+  bridge:
+    position: [54, 4]
+    areas:
+      bridge_top_w1: [0, 0, 1, 1]
+      bridge_top_w2: [1, 0, 1, 1]
+      bridge_top_mid: [2, 0, 1, 1]
+      bridge_top_e1: [3, 0, 1, 1]
+      bridge_top_e2: [4, 0, 1, 1]
+      bridge_mid: [0, 1, 4, 1]
+      bridge_bot: [0, 2, 4, 1]
+      bridge_bot_water: [0, 3, 4, 1]
+      bridge_column_w: [4, 1, 1, 1]
+      bridge_column_mid: [5, 1, 1, 1]
+      bridge_column_e: [6, 1, 1, 1]
+      bridge_column_w_water: [4, 2, 1, 1]
+      bridge_column_mid_water: [5, 2, 1, 1]
+      bridge_column_e_water: [6, 2, 1, 1]
+      
   misc_interior:
     position: [32, 0]
     areas:

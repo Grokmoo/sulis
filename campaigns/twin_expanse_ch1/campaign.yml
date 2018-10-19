@@ -13,19 +13,26 @@ world_map:
   offset: [-1.0, -0.7]
   locations:
     wellswood:
-      name: "Wellswood"
+      name: "Wellswood Village"
       position: [9, 8.5]
       icon: town01
       initially_enabled: true
       linked_area: wellswood
       linked_area_pos: [120, 33]
     wellswood_forest:
-      name: "Wellswood Forest"
-      position: [6.75, 7.25]
+      name: "Wellswood"
+      position: [6.0, 7.25]
       icon: forest01
       initially_enabled: true
       linked_area: wellswood_forest
       linked_area_pos: [123, 123]
+    firtuk_crossing:
+      name: "Firtuk Bridge"
+      position: [8.0, 6.25]
+      icon: bridge01
+      initially_enabled: true
+      linked_area: firtuk_bridge
+      linked_area_pos: [4, 79]
     thugs_hideout:
       name: "Thug's Hideout"
       position: [9.5, 10]
@@ -46,7 +53,7 @@ world_map:
       initially_enabled: false
     rose_lake:
       name: "Rose Lake"
-      position: [9.75, 6]
+      position: [9.75, 5.5]
       icon: city01
       initially_enabled: false
     rose_pastures:

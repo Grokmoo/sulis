@@ -10,6 +10,11 @@ function cragnik_join(parent)
   game:add_party_member("npc_cragnik")
 end
 
+function jhilsara_join(parent)
+  game:add_party_member("npc_jhilsara")
+  game:set_quest_entry_state("leader_of_beasts", "jhilsara", "Visible")
+end
+
 function enter_square(parent)
   game:cancel_blocking_anims()
   game:scroll_view(98, 47)

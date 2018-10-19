@@ -632,6 +632,26 @@ uniform_sets:
       wood_pile, anvil01, flour_sack, anvil02, veg_sack01, veg_sack02,
       fence_e, fence_e_w, fence_w, fence_n, fence_n_s, fence_s, fence_e_s, fence_e_w_s, fence_w_s, fence_e_n_s,
       fence_e_w_n_s, fence_w_n_s, fence_e_n, fence_e_w_n, fence_w_n, fence_gate_w, fence_gate_c, fence_gate_e,
+      bridge_top_w1, bridge_top_w2, bridge_top_mid, bridge_top_e1, bridge_top_e2
+      
+    ]
+  walls_impass:
+    layer: walls
+    size: [2, 2]
+    sprite_prefix: "tileset/"
+    impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+    invis: []
+    tiles: [
+      bridge_column_w, bridge_column_mid,bridge_column_e,bridge_column_w_water,bridge_column_mid_water, bridge_column_e_water
+    ]
+  walls_impass_4by1:
+    layer: walls
+    size: [8, 2]
+    sprite_prefix: "tileset/"
+    impass: [[0, 0], [1, 0], [0, 1], [1, 1], [2, 0], [3, 0], [2, 1], [3, 1], [4, 0], [5, 0], [4, 1], [5, 1], [6, 0], [7, 0], [6, 1], [7, 1]]
+    invis: []
+    tiles: [
+      bridge_mid, bridge_bot, bridge_bot_water
     ]
   decoration:
     layer: decoration

@@ -159,7 +159,11 @@ impl WidgetKind for WorldMapWindow {
 
             self.entries.push(entry);
             Widget::add_child_to(&self.content, button);
-            Widget::add_child_to(&self.content, label);
+        }
+
+        // add labels after buttons so they show up on top
+        for entry in self.entries.iter() {
+            Widget::add_child_to(&self.content, Rc::clone(&entry.label));
         }
 
         vec![label, bg, close, labels, Rc::clone(&self.content)]

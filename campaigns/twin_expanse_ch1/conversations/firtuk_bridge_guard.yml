@@ -1,0 +1,49 @@
+id: firtuk_bridge_guard
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=888|The guard eyes you suspciously.]
+      
+      Halt!  The bridge to Rose Lake is closed.
+    on_view:
+      - fire_script:
+          id: firtuk_bridge
+          func: learn_bridge_closed
+    responses:
+      - text: "[c=888|Continue]"
+        to: main
+  main:
+    text: |
+      [c=888|The guard eyes you suspciously.]
+    responses:
+      - text: "Why is the bridge closed?"
+        to: ask_why
+      - text: "But I need to get to Rose Lake!"
+        to: ask_2
+      - text: "No one can pass through here?"
+        to: ask_pass
+      - text: "I'll just be leaving, then."
+  ask_why:
+    text: |
+      Trouble in the city.  I'm afraid I can't say any more.  Our orders come directly from the Council of Five.
+    responses:
+      - text: "[c=888|Continue]"
+        to: main
+  ask_2:
+    text: |
+      Unfortunately, I cannot help you.  The bridge is closed.
+    responses:
+      - text: "[c=888|Continue]"
+        to: main
+  ask_pass:
+    text: |
+      Only VIPs or those on official government business may pass.  You meet neither of those conditions.
+    on_view:
+      - fire_script:
+          id: firtuk_bridge
+          func: learn_bridge_pass
+    responses:
+      - text: "[c=888|Continue]"
+        to: main

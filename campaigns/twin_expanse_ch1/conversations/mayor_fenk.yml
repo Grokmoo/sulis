@@ -40,7 +40,29 @@ nodes:
         to: gethruk_cleared
         to_view:
           - player_flag: gethruk_cleared
+      - text: "I need to get to Rose Lake.  I was hoping you could provide a pass."
+        to: ask_pass
+        to_view:
+          - player_flag: rose_lake_bridge_pass
       - text: "Nothing, farewell."
+  ask_pass:
+    text: "I'm afraid its not so simple.  I can only provide a pass if you are on official government business."
+    responses:
+      - text: "I see.  I had other questions."
+        to: questions
+      - text: "Surely there is something you can do?"
+        to: ask_pass2
+  ask_pass2:
+    text: "I'll tell you what - if you do something about these raids, then I'll see what I can do."
+    on_view:
+      - fire_script:
+          id: firtuk_bridge
+          func: mayor_fenk_ask_pass
+    responses:
+      - text: "Very well then.  I had other questions."
+        to: questions
+      - text: "I'll think about it.  I had other questions."
+        to: questions
   gethruk_cleared:
     text: "That's fantastic news!  Please accept this small token of our appreciation."
     responses:

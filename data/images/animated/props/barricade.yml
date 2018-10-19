@@ -1,0 +1,4 @@
+id: props/barricade
+states:
+  normal: props/barricade
+  active: props/barricade_open

@@ -49,7 +49,10 @@ impl EditorMode for ActorPicker {
             scale_x: f32, scale_y: f32, millis: u32) {
 
         for &(pos, ref actor) in self.removal_actors.iter() {
-            actor.draw(renderer, scale_x, scale_y, x + pos.x as f32, y + pos.y as f32, millis);
+            let w = actor.race.size.width as f32 / 2.0;
+            let h = actor.race.size.height as f32 / 2.0;
+            actor.draw(renderer, scale_x, scale_y, x + pos.x as f32 - w,
+                       y + pos.y as f32 - h, millis);
         }
 
         let actor = match self.cur_actor {
@@ -62,7 +65,10 @@ impl EditorMode for ActorPicker {
             Some(pos) => pos,
         };
 
-        actor.draw(renderer, scale_x, scale_y, x + pos.x as f32, y + pos.y as f32, millis);
+        let w = actor.race.size.width as f32 / 2.0;
+        let h = actor.race.size.height as f32 / 2.0;
+        actor.draw(renderer, scale_x, scale_y, x + pos.x as f32 - w,
+                   y + pos.y as f32 - h, millis);
     }
 
     fn cursor_size(&self) -> (i32, i32) {

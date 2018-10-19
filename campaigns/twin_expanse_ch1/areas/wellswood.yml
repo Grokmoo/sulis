@@ -126,7 +126,7 @@ actors:
     location:
       x: 55
       y: 102
-    unique_id: ~
+    unique_id: townsperson18b
   - id: townsperson04
     location:
       x: 52

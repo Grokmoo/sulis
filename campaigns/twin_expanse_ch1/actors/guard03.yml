@@ -1,0 +1,42 @@
+---
+id: guard03
+name: Guard
+race: human_simple
+sex: Male
+attributes:
+  str: 12
+  dex: 10
+  end: 13
+  per: 10
+  int: 10
+  wis: 10
+conversation: firtuk_bridge_guard
+faction: Neutral
+images:
+  Shadow: empty
+  Background: creatures/human21
+  Foreground: empty
+hue: 0.7000000476837158
+inventory:
+  equipped:
+    Feet: { id: boots_mail }
+    Torso: { id: torso_mail }
+    Legs: { id: legs_mail }
+    HeldMain: { id: shortsword }
+    HeldOff: { id: shield_heater }
+  quick: {}
+levels:
+  fighter: 1
+abilities:
+  - armor_light
+  - armor_medium
+  - armor_heavy
+  - weapon_axe
+  - weapon_crossbow
+  - weapon_bow
+  - weapon_small_sword
+  - weapon_large_sword
+  - weapon_spear
+  - weapon_mace
+  - weapon_simple
+ai: ~

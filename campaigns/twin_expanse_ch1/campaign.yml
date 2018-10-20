@@ -26,6 +26,22 @@ world_map:
       initially_enabled: true
       linked_area: wellswood_forest
       linked_area_pos: [123, 123]
+    vezula_hills:
+      name: "Vezula Hills"
+      position: [5.5, 5.5]
+      icon: hills01
+      initially_enabled: false
+      initially_visible: false
+      linked_area: vezula_hills
+      linked_area_pos: [27, 3]
+    serpents_mire:
+      name: "Serpent's Mire"
+      position: [3.5, 6.5]
+      icon: swamp01
+      initially_enabled: false
+      initially_visible: false
+      linked_area: serpents_mire
+      linked_area_pos: [122, 3]
     firtuk_crossing:
       name: "Firtuk Bridge"
       position: [8.0, 6.25]

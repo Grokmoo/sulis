@@ -1,0 +1,4 @@
+id: swamp01
+states:
+    normal: swamp01_normal
+    disabled: swamp01_disabled

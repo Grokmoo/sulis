@@ -1,0 +1,53 @@
+id: troll_journal
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=888|This is a fairly lengthy journal.  Unusually, it appears to be written by a troll.]
+    responses:
+      - text: "[c=888|Flip through the pages for anything of interest.]"
+        to: flip_through
+      - text: "[c=888|Read the first passage.]"
+        to: first_passage
+      - text: "[c=888|Read a passage in the middle.]"
+        to: middle_passage
+      - text: "[c=888|Read the last passage.]"
+        to: last_passage
+      - text: "[c=888|Close the journal.]"
+  flip_through:
+    text: |
+      [c=888|Flipping through the pages, you immediately come upon a crude but understandable map.]
+      
+      [c=888|Highly emphasized is an area called Serpent's Mire to the West.  It appears to be the base of operations for the raiders.]
+    on_view:
+      - fire_script:
+          id: vezula_hills
+          func: serpent_mire_map
+    responses:
+      - text: "[c=888|Continue]"
+        to: start01
+  first_passage:
+    text: |
+      [c=888|You turn to the first page of the book.]
+      
+      Me very happy to know about read and write!  Me keeping a journal to practice.
+    responses:
+      - text: "[c=888|Continue]"
+        to: start01
+  middle_passage:
+    text: |
+      [c=888|You turn to a page near the middle of the book.]
+      
+      Me - I am very happy with progress in reading and writing.  Leader says learning is a waste of time for dumb troll.  I'll show him dumb troll!
+    responses:
+      - text: "[c=888|Continue]"
+        to: start01
+  last_passage:
+    text: |
+      [c=888|You turn to the last page of the book.]
+      
+      Leader says we go to Vezula Hills - kill anybody who wanders through.  That was a week ago.  I don't think anyone is coming, but we wait anyway.
+    responses:
+      - text: "[c=888|Continue]"
+        to: start01

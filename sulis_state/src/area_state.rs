@@ -333,12 +333,32 @@ impl AreaState {
         }
     }
 
-    pub fn fire_on_encounter_cleared(&self, index: usize, target: &Rc<RefCell<EntityState>>) {
+    pub fn fire_on_encounter_activated(&mut self, index: usize, target: &Rc<RefCell<EntityState>>) {
+        info!("OnEncounterActivated for {}", index);
+
+        let player = GameState::player();
+        for trigger_index in self.area.encounters[index].triggers.iter() {
+            let trigger = &self.area.triggers[*trigger_index];
+            if self.triggers[*trigger_index].fired { continue; }
+            self.triggers[*trigger_index].fired = true;
+
+            match trigger.kind {
+                TriggerKind::OnEncounterActivated { .. } => {
+                    info!("    Calling OnEncounterActivated");
+                    GameState::add_ui_callback(trigger.on_activate.clone(), &player, target);
+                },
+                _ => (),
+            }
+        }
+    }
+
+    pub fn fire_on_encounter_cleared(&mut self, index: usize, target: &Rc<RefCell<EntityState>>) {
         info!("OnEncounterCleared for {}", index);
 
         let player = GameState::player();
         for trigger_index in self.area.encounters[index].triggers.iter() {
             let trigger = &self.area.triggers[*trigger_index];
+            self.triggers[*trigger_index].fired = true;
 
             match trigger.kind {
                 TriggerKind::OnEncounterCleared { .. } => {

@@ -45,6 +45,7 @@ pub enum TriggerKind {
     OnAreaLoad,
     OnPlayerEnter { location: Point, size: Size },
     OnEncounterCleared { encounter_location: Point },
+    OnEncounterActivated { encounter_location: Point },
 }
 
 #[derive(Debug, Clone)]
@@ -202,7 +203,8 @@ impl Area {
             let mut encounter_triggers = Vec::new();
             for (index, trigger) in triggers.iter().enumerate() {
                 match trigger.kind {
-                    TriggerKind::OnEncounterCleared { encounter_location } => {
+                    TriggerKind::OnEncounterCleared { encounter_location } |
+                        TriggerKind::OnEncounterActivated { encounter_location } => {
                         if encounter_location == encounter_builder.location {
                             encounter_triggers.push(index);
                             used_triggers.insert(index);
@@ -222,9 +224,10 @@ impl Area {
 
         for (index, trigger) in triggers.iter().enumerate() {
             match trigger.kind {
-                TriggerKind::OnEncounterCleared { encounter_location } => {
+                TriggerKind::OnEncounterCleared { encounter_location } |
+                    TriggerKind::OnEncounterActivated { encounter_location } => {
                     if !used_triggers.contains(&index) {
-                        warn!("Invalid encounter cleared trigger at point {:?}", encounter_location);
+                        warn!("Invalid encounter trigger at point {:?}", encounter_location);
                     }
                 },
                 _ => (),

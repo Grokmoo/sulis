@@ -52,6 +52,7 @@ pub struct NumFlagData {
 #[serde(deny_unknown_fields, rename_all="snake_case")]
 pub enum OnTrigger {
     PlayerCoins(i32),
+    PartyMember(String),
     PlayerNumFlag(NumFlagData),
     TargetNumFlag(NumFlagData),
     NotPlayerNumFlag(NumFlagData),

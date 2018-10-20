@@ -21,7 +21,7 @@ use std::cell::{Cell, RefCell};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{Button, ScrollPane};
 use sulis_module::{Item, Module};
-use sulis_state::{EntityState, GameState, inventory::has_proficiency};
+use sulis_state::{EntityState, GameState, inventory::has_proficiency, script::ScriptItemKind};
 
 use {item_button::*, ItemButton};
 
@@ -158,10 +158,15 @@ impl ItemListPane {
 
             let item_but = ItemButton::inventory(item.item.icon.id(), quantity, index);
 
-            if let Some(_) = item.item.usable {
+            if let Some(ref usable) = item.item.usable {
                 if !combat_active && item.item.meets_prereqs(&actor.actor) {
                     let mut but = item_but.borrow_mut();
-                    but.add_action("Add to Use Slot", set_quickslot_cb(&self.entity, index));
+                    if usable.use_in_slot {
+                        but.add_action("Add to Use Slot", set_quickslot_cb(&self.entity, index));
+                    } else {
+                        let kind = ScriptItemKind::Stash(index);
+                        but.add_action("Use", use_item_cb(&self.entity, kind));
+                    }
                 }
             }
 

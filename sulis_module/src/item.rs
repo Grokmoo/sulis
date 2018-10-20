@@ -44,6 +44,7 @@ pub struct Usable {
     pub consumable: bool,
     pub short_description: String,
     pub ai: AIData,
+    pub use_in_slot: bool,
 }
 
 #[derive(Debug)]
@@ -181,6 +182,7 @@ impl Item {
                     ap: usable.ap,
                     short_description: usable.short_description,
                     ai: usable.ai,
+                    use_in_slot: usable.use_in_slot,
                 })
             }
         };
@@ -321,7 +323,11 @@ pub struct UsableBuilder {
     pub consumable: bool,
     pub short_description: String,
     pub ai: AIData,
+    #[serde(default="bool_true")]
+    pub use_in_slot: bool,
 }
+
+fn bool_true() -> bool { true }
 
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]

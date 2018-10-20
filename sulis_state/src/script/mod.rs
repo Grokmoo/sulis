@@ -666,6 +666,10 @@ impl UserData for ScriptInterface {
             }
         });
 
+        methods.add_method("has_party_member", |_, _, id: String| {
+            Ok(GameState::has_party_member(&id))
+        });
+
         methods.add_method("add_party_member", |_, _, id: String| {
             let entity = match entity_with_id(id) {
                 Some(entity) => entity,
@@ -729,6 +733,10 @@ impl UserData for ScriptInterface {
                 member.borrow_mut().add_xp(amount);
             }
 
+            let pc = GameState::player();
+            let line = format!("Gained {} xp", amount);
+            let cb = OnTrigger::SayLine(line);
+            GameState::add_ui_callback(vec![cb], &pc, &pc);
             Ok(())
         });
 
@@ -892,7 +900,7 @@ fn entities_with_ids(ids: Vec<String>) -> Vec<ScriptEntity> {
     result
 }
 
-fn entity_with_id(id: String) -> Option<Rc<RefCell<EntityState>>> {
+pub fn entity_with_id(id: String) -> Option<Rc<RefCell<EntityState>>> {
     let mgr = GameState::turn_manager();
     for entity in mgr.borrow().entity_iter() {
         {

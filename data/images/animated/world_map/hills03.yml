@@ -1,0 +1,4 @@
+id: hills03
+states:
+    normal: hills03_normal
+    disabled: hills03_disabled

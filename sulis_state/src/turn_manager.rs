@@ -363,6 +363,16 @@ impl TurnManager {
             }
         }
 
+        for group in groups_to_activate {
+            let enc_ref = self.ai_groups.get(&group).unwrap().clone();
+            if enc_ref.area_id == area_state.area.id {
+                area_state.fire_on_encounter_activated(enc_ref.encounter_index, &mover);
+            } else {
+                let area_state = GameState::get_area_state(&enc_ref.area_id).unwrap();
+                area_state.borrow_mut().fire_on_encounter_activated(enc_ref.encounter_index, &mover);
+            }
+        }
+
         if !self.combat_active {
             self.set_combat_active(true);
             loop {
@@ -673,7 +683,7 @@ impl TurnManager {
         if let Some(ai_group) = self.check_encounter_cleared(&entity) {
             let enc_ref = self.ai_groups.get(&ai_group).unwrap().clone();
             let area_state = GameState::get_area_state(&enc_ref.area_id).unwrap();
-            area_state.borrow().fire_on_encounter_cleared(enc_ref.encounter_index, &entity);
+            area_state.borrow_mut().fire_on_encounter_cleared(enc_ref.encounter_index, &entity);
         }
 
         self.listeners.notify(&self);

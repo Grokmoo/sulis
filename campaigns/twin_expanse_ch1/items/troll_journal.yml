@@ -1,0 +1,17 @@
+id: troll_journal
+name: Journal
+icon: inventory/misc_book01
+weight: 100
+value: 10
+usable:
+  consumable: false
+  script: troll_journal
+  ap: 2000
+  duration: Instant
+  use_in_slot: false
+  ai:
+    priority: 99999
+    kind: Special
+    group: Single
+    range: Personal
+  short_description: "Read this journal"

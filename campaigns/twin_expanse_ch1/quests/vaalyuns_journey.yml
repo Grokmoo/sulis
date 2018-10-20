@@ -4,3 +4,6 @@ entries:
   start:
     description: |
       An elf named Vaalyun would like to travel with me to recover an item that my former companion, Ethel, was carrying.
+  ring_gone:
+    description: |
+      We have learned that the ring that Vaalyun was seeking has been taken from Ethel's body.  We do not know by whom.

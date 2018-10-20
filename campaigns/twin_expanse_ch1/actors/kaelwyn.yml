@@ -1,0 +1,76 @@
+---
+id: kaelwyn
+name: Kaelwyn
+race: elf
+sex: Male
+portrait: portraits/elf09
+attributes:
+  str: 13
+  dex: 18
+  end: 14
+  per: 15
+  int: 10
+  wis: 10
+conversation: ~
+faction: Neutral
+images:
+  Hair: creatures/hair04
+hue: 0.65
+hair_color:
+  r: 1.0
+  g: 0.647
+  b: 0.0
+  a: 1.0
+skin_color:
+  r: 0.965
+  g: 0.827
+  b: 0.608
+  a: 1.0
+inventory:
+  equipped:
+    Legs:
+      id: legs_pants
+      adjectives: []
+    Feet:
+      id: boots_leather
+      adjectives: []
+    HeldMain:
+      id: shortbow
+      adjectives: [ fine ]
+    Torso:
+      id: torso_leather
+      adjectives: []
+  quick:
+    AltHeldMain:
+      id: dagger
+      adjectives: []
+    Usable1:
+      id: potion_healing
+      adjectives: []
+    Usable2:
+      id: potion_power
+      adjectives: []
+  pc_starting_coins: 200
+  pc_starting_items:
+    - quantity: 1
+      item:
+        id: potion_power
+        adjectives: []
+levels:
+  fighter: 5
+abilities:
+  - armor_light
+  - armor_medium
+  - armor_heavy
+  - weapon_axe
+  - weapon_crossbow
+  - weapon_bow
+  - weapon_small_sword
+  - weapon_large_sword
+  - weapon_spear
+  - weapon_mace
+  - weapon_simple
+  - powerful_shot
+  - penetrating_shot
+  - helping_hand
+ai: ai_basic

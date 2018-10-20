@@ -522,6 +522,14 @@ impl GameState {
         });
     }
 
+    pub fn has_party_member(id: &str) -> bool {
+        for entity in GameState::party() {
+            if &entity.borrow().actor.actor.id == id { return true; }
+        }
+
+        false
+    }
+
     pub fn add_party_member(entity: Rc<RefCell<EntityState>>) {
         info!("Add party member {}", entity.borrow().actor.actor.id);
         STATE.with(|state| {

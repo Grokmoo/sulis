@@ -24,7 +24,7 @@ use sulis_widgets::{Label, TextArea};
 use sulis_module::{Actor, OnTrigger, MerchantData, Conversation,
     conversation::{Response}, Module, on_trigger};
 use sulis_state::{EntityState, ChangeListener, GameState,
-    area_feedback_text::ColorKind, NextGameStep};
+    area_feedback_text::ColorKind, NextGameStep, script::entity_with_id};
 
 use {character_window, CutsceneWindow, RootView, GameOverWindow, LoadingScreen,
     window_fade, WindowFade, ConfirmationWindow};
@@ -222,7 +222,10 @@ pub fn is_match(on_trigger: &Vec<OnTrigger>, pc: &Rc<RefCell<EntityState>>,
             PlayerCoins(amount) => {
                 let cur = GameState::party_coins();
                 if cur < *amount { return false; }
-            }
+            },
+            PartyMember(ref id) => {
+                if !GameState::has_party_member(id) { return false; }
+            },
             TargetNumFlag(ref data) => {
                 if target.borrow().get_num_flag(&data.flag) < data.val { return false; }
             },
@@ -294,7 +297,14 @@ pub fn activate(widget: &Rc<RefCell<Widget>>, on_select: &Vec<OnTrigger>,
             },
             PlayerCoins(amount) => {
                 GameState::add_party_coins(*amount);
-            }
+            },
+            PartyMember(ref id) => {
+                match entity_with_id(id.to_string()) {
+                    None => warn!("Attempted to add party member '{}' but entity does not exist",
+                                  id),
+                    Some(entity) => GameState::add_party_member(entity),
+                }
+            },
             TargetNumFlag(ref data) => {
                 target.borrow_mut().add_num_flag(&data.flag, data.val);
             },

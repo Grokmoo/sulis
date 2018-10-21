@@ -4,6 +4,9 @@ size: [ 1024, 512 ]
 simple_image_gen_scale: 16
 grid_multiplier: 16
 groups:
+  misc:
+    areas:
+      dragon01: [37, 27, 5, 6]
   2by2:
     size: [2, 2]
     areas:
@@ -23,6 +26,10 @@ groups:
       selected1: [2, 29]
       selected2: [4, 29]
       selected3: [6, 29]
+      beetle0: [8, 30]
+      rat0: [10, 30]
+      bat0: [12, 30]
+      lizard0: [14, 30]
   4by4:
     size: [4, 4]
     areas:
@@ -36,9 +43,15 @@ groups:
       scorpion_large_shadow: [12, 21]
       forest_troll01: [51, 21]
       forest_troll_shadow: [55, 21]
+      
+      slime_cube: [42, 29]
   3by3:
     size: [3, 3]
     areas:
+      slime1: [16, 30]
+      slime2: [19, 30]
+      slime3: [20, 30]
+    
       scorpion_medium: [16, 21]
       scorpion_medium_shadow: [19, 21]
     

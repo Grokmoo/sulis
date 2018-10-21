@@ -1,6 +1,6 @@
 id: particles
 src: "particles.png"
-size: [ 512, 256 ]
+size: [ 512, 512 ]
 simple_image_gen_scale: 4
 groups:
   sticky_trap:
@@ -207,3 +207,21 @@ groups:
       arrow_up3: [40, 0]
       arrow_up4: [60, 0]
       arrow_up5: [80, 0]
+  dust_cloud:
+    size: [64, 64]
+    position: [0, 256]
+    areas:
+      dust_cloud01: [0, 0]
+      dust_cloud02: [64, 0]
+      dust_cloud03: [128, 0]
+      dust_cloud04: [192, 0]
+      dust_cloud05: [256, 0]
+      dust_cloud06: [320, 0]
+      dust_cloud07: [384, 0]
+      dust_cloud08: [448, 0]
+      dust_cloud09: [0, 64]
+      dust_cloud10: [64, 64]
+      dust_cloud11: [128, 64]
+      dust_cloud12: [192, 64]
+      dust_cloud13: [256, 64]
+      dust_cloud14: [320, 64]

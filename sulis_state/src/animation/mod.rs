@@ -468,9 +468,7 @@ impl Anim {
             Move { .. } => true,
             Wait => true,
             NonBlockingWait => false,
-            ParticleGenerator { model, ..} => {
-                !model.duration_millis.is_infinite()
-            },
+            ParticleGenerator { model, ..} => model.is_blocking,
             EntityDeath { .. } => true,
         }
     }

@@ -1,6 +1,6 @@
 id: inventory
 src: "inventory.png"
-size: [ 1024, 2048 ]
+size: [ 2048, 2048 ]
 simple_image_gen_scale: 128
 grid_multiplier: 128
 groups:
@@ -139,16 +139,61 @@ groups:
       craft_gem03: [2, 14]
       craft_gem04: [3, 14]
       craft_gem05: [4, 14]
-      
-      misc_book04: [6, 14]
-      misc_key: [7, 14]
-      
+      craft_gem11: [5, 14]
+      craft_gem12: [6, 14]
+      craft_gem13: [7, 14]
+      craft_gem14: [8, 14]
+      craft_gem15: [9, 14]
+      craft_gem16: [10, 14]
+
       craft_gem06: [0, 15]
       craft_gem07: [1, 15]
       craft_gem08: [2, 15]
       craft_gem09: [3, 15]
       craft_gem10: [4, 15]
+      craft_gem17: [5, 15]
+      craft_gem18: [6, 15]
+      craft_gem19: [7, 15]
+      craft_gem20: [8, 15]
+      craft_gem21: [9, 15]
+      craft_gem22: [10, 15]
       
-      misc_book05: [5, 15]
-      misc_book06: [6, 15]
-      misc_book07: [7, 15]
+      weapon_axe02: [8, 0]
+      weapon_hammer02: [9, 0]
+      weapon_staff02: [10, 0]
+      weapon_staff03: [11, 0]
+      weapon_staff04: [12, 0]
+      
+      weapon_sword02: [8, 1]
+      weapon_sword03: [9, 1]
+      weapon_bow02: [10, 1]
+      
+      gloves_robes01: [8, 3]
+      boots_robes01: [9, 3]
+      helm_robes01: [10, 3]
+      torso_robes01: [11, 3]
+      legs_robes01: [12, 3]
+      
+      gloves_robes02: [8, 4]
+      boots_robes02: [9, 4]
+      helm_robes02: [10, 4]
+      torso_robes02: [11, 4]
+      legs_robes02: [12, 4]
+      
+      misc_key: [8, 5]
+      misc_book04: [9, 5]
+      misc_book05: [10, 5]
+      misc_book06: [11, 5]
+      misc_book07: [12, 5]
+      
+      misc_scroll01: [8, 6]
+      misc_note01: [9, 6]
+      misc_map01: [10, 6]
+      misc_letter01: [11, 6]
+      misc_letter02: [12, 6]
+      
+      potion03_red: [8, 7]
+      potion03_green: [9, 7]
+      potion03_blue: [10, 7]
+      misc_book08: [11, 7]
+      misc_scroll02: [12, 7]

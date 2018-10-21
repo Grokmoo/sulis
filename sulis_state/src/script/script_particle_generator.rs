@@ -74,6 +74,10 @@ impl UserData for ScriptParticleGenerator {
         methods.add_method("angular_dist", |_, _, (min_a, max_a, min_s, max_s): (f32, f32, f32, f32)| {
             Ok(Dist::create_angular(min_a, max_a, min_s, max_s))
         });
+        methods.add_method_mut("set_blocking", |_, gen, block: bool| {
+            gen.model.is_blocking = block;
+            Ok(())
+        });
         methods.add_method_mut("set_draw_below_entities", |_, gen, _: ()| {
             gen.model.draw_above_entities = false;
             Ok(())

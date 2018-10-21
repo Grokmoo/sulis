@@ -62,7 +62,7 @@ use sulis_core::util::{Point};
 use sulis_rules::QuickSlot;
 use sulis_module::{ability, Ability, Item, Module, OnTrigger, on_trigger};
 use {EntityState, ItemState, GameState, ai, area_feedback_text::ColorKind, quest_state,
-    animation::Anim};
+    animation::Anim, Location};
 
 type Result<T> = std::result::Result<T, rlua::Error>;
 
@@ -517,6 +517,31 @@ impl UserData for ScriptInterface {
             Ok(area_state.is_passable(&entity, &entities_to_ignore, x, y))
         }
         );
+
+        methods.add_method("spawn_actor_at", |_, _, (id, x, y): (String, i32, i32)| {
+            let actor = match Module::actor(&id) {
+                None => {
+                    warn!("Unable to spawn actor '{}': not found", id);
+                    return Ok(ScriptEntity::invalid());
+                }, Some(actor) => actor,
+            };
+
+            let area_state = GameState::area_state();
+            let location = Location::new(x, y, &area_state.borrow().area);
+            let result = match area_state.borrow_mut()
+                .add_actor(actor, location, None, false, None) {
+                Ok(index) => Ok(ScriptEntity::new(index)),
+                Err(e) => {
+                    warn!("Error spawning actor in area: {}", e);
+                    Ok(ScriptEntity::invalid())
+                }
+            };
+
+            let mgr = GameState::turn_manager();
+            mgr.borrow_mut().check_ai_activation_for_party(&mut area_state.borrow_mut());
+
+            result
+        });
 
         methods.add_method("spawn_encounter_at", |_, _, (x, y): (i32, i32)| {
             let area_state = GameState::area_state();

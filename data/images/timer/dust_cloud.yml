@@ -1,0 +1,17 @@
+id: dust_cloud
+frame_time_millis: 50
+frames:
+  - particles/dust_cloud01
+  - particles/dust_cloud02
+  - particles/dust_cloud03
+  - particles/dust_cloud04
+  - particles/dust_cloud05
+  - particles/dust_cloud06
+  - particles/dust_cloud07
+  - particles/dust_cloud08
+  - particles/dust_cloud09
+  - particles/dust_cloud10
+  - particles/dust_cloud11
+  - particles/dust_cloud12
+  - particles/dust_cloud13
+  - particles/dust_cloud14

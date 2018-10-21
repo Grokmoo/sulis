@@ -371,12 +371,16 @@ pub struct GeneratorModel {
     pub particle_size_dist: Option<(Dist, Dist)>,
 
     pub draw_above_entities: bool,
+
+    pub is_blocking: bool,
 }
 
 impl UserData for GeneratorModel { }
 
 impl GeneratorModel {
     pub fn new(duration_millis: ExtInt, x: f32, y: f32) -> GeneratorModel {
+        let blocking = !duration_millis.is_infinite();
+
         GeneratorModel {
             duration_millis,
             position: (Param::fixed(x), Param::fixed(y)),
@@ -393,6 +397,7 @@ impl GeneratorModel {
             particle_frame_time_offset_dist: None,
             particle_size_dist: None,
             draw_above_entities: true,
+            is_blocking: blocking,
         }
     }
 

@@ -380,7 +380,15 @@ pub fn create_details_text_box(pc: &ActorState) -> Rc<RefCell<Widget>> {
             if !stats.armor.differs_from_base(*kind) { continue; }
 
             state.add_text_arg(&format!("armor_{}", kind).to_lowercase(),
-            &stats.armor.amount(*kind).to_string());
+                &stats.armor.amount(*kind).to_string());
+        }
+
+        for kind in DamageKind::iter() {
+            let amount = stats.resistance.amount(*kind);
+            if amount == 0 { continue; }
+
+            state.add_text_arg(&format!("resistance_{}", kind).to_lowercase(),
+                &amount.to_string());
         }
 
         state.add_text_arg("melee_accuracy", &stats.melee_accuracy.to_string());

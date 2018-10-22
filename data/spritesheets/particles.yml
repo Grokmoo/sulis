@@ -13,6 +13,9 @@ groups:
   fire_trap:
     areas:
       fire_trap: [432, 48, 16, 16]
+  web:
+    areas:
+      web16: [448, 48, 16, 16]
   misc:
     areas:
       circle16: [0, 0, 16, 16]

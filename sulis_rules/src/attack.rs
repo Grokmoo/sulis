@@ -19,7 +19,7 @@ use std::rc::Rc;
 use sulis_core::image::Image;
 use sulis_core::resource::ResourceSet;
 use bonus::{AttackBuilder, AttackKindBuilder, BonusKind, BonusList};
-use {Armor, AttackBonuses, Damage, DamageKind, DamageList, StatList, WeaponKind};
+use {Armor, AttackBonuses, Damage, DamageKind, DamageList, Resistance, StatList, WeaponKind};
 
 use AttackKind::*;
 
@@ -192,9 +192,9 @@ impl Attack {
         }
     }
 
-    pub fn roll_damage(&self, armor: &Armor,
+    pub fn roll_damage(&self, armor: &Armor, resistance: &Resistance,
                        multiplier: f32) -> Vec<(DamageKind, u32)> {
-        self.damage.roll(armor, multiplier)
+        self.damage.roll(armor, resistance, multiplier)
     }
 
     // Returns the distance that this attack can reach

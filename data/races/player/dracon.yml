@@ -19,6 +19,7 @@ base_stats:
   - kind: { reflex: 25 }
   - kind: { will: 30 }
   - kind: { reach: 0.5 }
+  - kind: { resistance: { kind: "Fire", amount: 25 } }
 base_attack:
   damage:
     min: 8

@@ -184,6 +184,14 @@ impl UserData for ScriptEffect {
             add_bonus_to_effect(effect, kind, when);
             Ok(())
         });
+        methods.add_method_mut("add_resistance", |_, effect, (value, kind, when):
+                               (f32, String, Option<String>)| {
+            let value = value as i32;
+            let dmg_kind = DamageKind::from_str(&kind);
+            let kind = BonusKind::Resistance { kind: dmg_kind, amount: value };
+            add_bonus_to_effect(effect, kind, when);
+            Ok(())
+        });
         methods.add_method_mut("add_attribute_bonus", |_, effect, (attr, amount, when):
                                (String, f32, Option<String>)| {
             let amount = amount as i8;

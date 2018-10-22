@@ -47,6 +47,9 @@ pub use self::damage::Damage;
 pub use self::damage::DamageKind;
 pub use self::damage::DamageList;
 
+pub mod resistance;
+pub use self::resistance::Resistance;
+
 pub mod stat_list;
 pub use self::stat_list::StatList;
 

@@ -505,9 +505,12 @@ impl UserData for ScriptEntity {
 
             let min_damage = min_damage as u32;
             let max_damage = max_damage as u32;
-            let attack = Attack::special(&parent.borrow().actor.stats, min_damage, max_damage,
-                ap.unwrap_or(0), damage_kind, AttackKind::Dummy);
-            let damage = attack.roll_damage(&parent.borrow().actor.stats.armor, 1.0);
+            let damage = {
+                let parent = &parent.borrow().actor.stats;
+                let attack = Attack::special(parent, min_damage, max_damage, ap.unwrap_or(0),
+                    damage_kind, AttackKind::Dummy);
+                attack.roll_damage(&parent.armor, &parent.resistance, 1.0)
+            };
 
             let (text, color) = if !damage.is_empty() {
                 let mut total = 0;
@@ -577,6 +580,12 @@ impl UserData for ScriptEntity {
             let entity = entity.try_unwrap()?;
             let entity = entity.borrow();
             Ok(entity.actor.actor.name.to_string())
+        });
+
+        methods.add_method("has_ability", |_, entity, id: String| {
+            let entity = entity.try_unwrap()?;
+            let has = entity.borrow().actor.actor.has_ability_with_id(&id);
+            Ok(has)
         });
 
         methods.add_method("get_ability", |_, entity, id: String| {
@@ -731,6 +740,12 @@ fn create_stats_table<'a>(lua: &'a Lua, parent: &ScriptEntity, _args: ()) -> Res
         armor.set(kind.to_str(), src.armor.amount(*kind))?;
     }
     stats.set("armor", armor)?;
+
+    let resistance = lua.create_table()?;
+    for kind in DamageKind::iter() {
+        resistance.set(kind.to_str(), src.resistance.amount(*kind))?;
+    }
+    stats.set("resistance", resistance)?;
 
     stats.set("level", parent.actor.actor.total_level)?;
     stats.set("caster_level", src.caster_level)?;

@@ -1,9 +1,9 @@
-id: spider
+id: slime_blue
 ai: ai_basic
-name: Spider
+name: Blue Slime
 faction: Hostile
 images: {}
-race: spider
+race: slime_large
 attributes:
   str: 10
   dex: 10
@@ -12,9 +12,11 @@ attributes:
   int: 10
   wis: 10
 levels:
-  fighter: 3
+  fighter: 4
+images:
+  Background: creatures/slime1
 reward:
-  xp: 10
+  xp: 40
   loot: level1_misc
   loot_chance: 35
 abilities:
@@ -24,4 +26,4 @@ abilities:
   - weapon_small_sword
   - weapon_spear
   - weapon_simple
-  - spider_immunity
+  - toxic_fog

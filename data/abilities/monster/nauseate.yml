@@ -1,0 +1,19 @@
+id: nauseate
+name: "Nauseate"
+icon: empty
+description: |
+  Your target must succeed at a Fortitude check or suffer penalties to physical attributes.
+active:
+  script: "nauseate"
+  group: "Fighter"
+  ap: 2000
+  duration:
+    Rounds: 3
+  cooldown: 6
+  ai:
+    priority: 20
+    kind: Debuff
+    group: Single
+    range: Reach
+  short_description: |
+    Reduce fighting stats of an opponent.

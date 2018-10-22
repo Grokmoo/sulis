@@ -50,7 +50,7 @@ groups:
     areas:
       slime1: [16, 30]
       slime2: [19, 30]
-      slime3: [20, 30]
+      slime3: [22, 30]
     
       scorpion_medium: [16, 21]
       scorpion_medium_shadow: [19, 21]

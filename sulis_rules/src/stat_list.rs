@@ -21,7 +21,7 @@ use rand::{self, Rng};
 use sulis_core::image::Image;
 use sulis_core::util::ExtInt;
 use {AccuracyKind, Armor, AttributeList, Attack, Damage,
-    HitKind, WeaponKind, ArmorKind, Slot, WeaponStyle};
+    HitKind, WeaponKind, ArmorKind, Slot, WeaponStyle, Resistance};
 use bonus::{AttackBonuses, AttackBuilder, Bonus, BonusKind, BonusList};
 
 #[derive(Clone)]
@@ -45,6 +45,7 @@ pub struct StatList {
     pub bonus_range: f32,
     pub attacks: Vec<Attack>,
     pub armor: Armor,
+    pub resistance: Resistance,
     pub max_hp: i32,
     pub initiative: i32,
     pub flanking_angle: i32,
@@ -89,6 +90,7 @@ impl StatList {
             attack_range: 0.0,
             attacks: Vec::new(),
             armor: Armor::default(),
+            resistance: Resistance::default(),
             max_hp: 0,
             initiative: 0,
             flanking_angle: 0,
@@ -238,6 +240,7 @@ impl StatList {
             ActionPoints(amount) => self.bonus_ap += amount * times_i32,
             Armor(amount) => self.armor.add_base(amount * times_i32),
             ArmorKind { kind, amount } => self.armor.add_kind(*kind, amount * times_i32),
+            Resistance { kind, amount } => self.resistance.add_kind(*kind, amount * times_i32),
             Damage(damage) => self.bonus_damage.push(damage.mult(times)),
             ArmorProficiency(kind) => {
                 if !self.armor_proficiencies.contains(kind) {

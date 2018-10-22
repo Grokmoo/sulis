@@ -1,0 +1,19 @@
+id: acid_spit
+name: "Acid Spit"
+icon: empty
+description: |
+  Spit acid on an opponent, dealing damage and sundering armor.
+active:
+  script: "acid_spit"
+  group: "Fighter"
+  ap: 2000
+  duration:
+    Instant
+  cooldown: 1
+  ai:
+    priority: 30
+    kind: Damage
+    group: Single
+    range: Visible
+  short_description: |
+    Deal acid damage and sunder armor on one opponent.

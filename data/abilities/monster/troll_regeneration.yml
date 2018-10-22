@@ -1,6 +1,6 @@
 id: troll_regeneration
 name: "Troll Regeneration"
-icon: abilities/heal
+icon: empty
 description: |
   Trolls regenerate hit points every round.
 active:

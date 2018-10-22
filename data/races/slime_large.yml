@@ -1,7 +1,7 @@
-id: slime
+id: slime_large
 name: Slime
 description: "Monster"
-size: 2by2
+size: 3by3
 movement_rate: 0.4
 base_stats:
   - kind: { attribute: { attribute: Strength, amount: 3 } }
@@ -9,7 +9,7 @@ base_stats:
   - kind: { attribute: { attribute: Endurance, amount: 3 } }
   - kind: { attribute: { attribute: Perception, amount: -3 } }
   - kind: { attribute: { attribute: Intellect, amount: -5 } }
-  - kind: { hit_points: 20 }
+  - kind: { hit_points: 40 }
   - kind: { melee_accuracy: 25 }
   - kind: { ranged_accuracy: 30 }
   - kind: { spell_accuracy: 25 }
@@ -22,23 +22,20 @@ base_stats:
   - kind: { resistance: { kind: "Fire", amount: -25 } }
 base_attack:
   damage:
-    min: 8
-    max: 12
+    min: 12
+    max: 16
     kind: Acid
   kind: #Melee
-    reach: 1.0
+    reach: 1.5
   bonuses: {}
 default_images:
   Male:
-    Background: creatures/slime0
-    Shadow: creatures/goblin_shadow
+    Background: creatures/slime1
   Female:
-    Background: creatures/slime0
-    Shadow: creatures/goblin_shadow
-ticker_offset: [0.5, 1]
+    Background: creatures/slime1
+ticker_offset: [0.0, 0.0]
 image_layer_offset_scale: 16
 image_layer_offsets:
-  Shadow: [0, -4]
   Background: [0, 0]
 image_layer_postfix: {}
 

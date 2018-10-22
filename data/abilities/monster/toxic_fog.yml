@@ -1,0 +1,19 @@
+id: toxic_fog
+name: "Toxic Fog"
+icon: empty
+description: |
+  Creates debilitating fog in an area, that causes acid damage and reduces stats of all hostiles inside.
+active:
+  script: "toxic_fog"
+  group: Fighter
+  ap: 2000
+  duration:
+    Rounds: 3
+  cooldown: 6
+  ai:
+    priority: 100
+    kind: Debuff
+    group: Multiple
+    range: Short
+  short_description: |
+    Create toxic fog in an area.

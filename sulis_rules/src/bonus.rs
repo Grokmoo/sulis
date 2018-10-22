@@ -27,6 +27,7 @@ pub enum BonusKind {
     ActionPoints(i32),
     Armor(i32),
     ArmorKind { kind: DamageKind, amount: i32 },
+    Resistance { kind: DamageKind, amount: i32 },
     Damage(Damage),
     ArmorProficiency(ArmorKind),
     WeaponProficiency(WeaponKind),
@@ -214,7 +215,14 @@ fn apply_modifiers(bonus: &mut Bonus, neg: f32, pos: f32) {
             } else {
                 ArmorKind { kind, amount: (amount as f32 * neg).round() as i32 }
             }
-        }
+        },
+        Resistance { kind, amount } => {
+            if amount > 0 {
+                Resistance { kind, amount: (amount as f32 * pos).round() as i32 }
+            } else {
+                Resistance { kind, amount: (amount as f32 * neg).round() as i32 }
+            }
+        },
         Attribute { attribute, amount } => {
             if amount > 0 {
                 Attribute { attribute, amount: (amount as f32 * pos).round() as i8 }
@@ -251,6 +259,10 @@ fn merge_if_dup(first: &Bonus, sec: &Bonus) -> Option<Bonus> {
         ArmorKind { kind, amount } => if let ArmorKind { kind: other_kind, amount: other } = sec.kind {
             if other_kind != kind { return None; }
             return Some(Bonus { when, kind: ArmorKind { kind, amount: amount + other }});
+        },
+        Resistance { kind, amount } => if let Resistance { kind: other_kind, amount: other } = sec.kind {
+            if other_kind != kind { return None; }
+            return Some(Bonus { when, kind: Resistance { kind, amount: amount + other }});
         },
         Damage(damage) => if let Damage(other) = sec.kind {
             if damage.kind != other.kind { return None; }

@@ -116,6 +116,7 @@ editor:
       - decoration
       - walls_aerial
       - aerial
+      - aerial_prop
     elev_tiles:
       - gui/elev_lowest
       - gui/elev_lower

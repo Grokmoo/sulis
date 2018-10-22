@@ -4,6 +4,17 @@ size: [ 1024, 512 ]
 simple_image_gen_scale: 16
 grid_multiplier: 16
 groups:
+  carts_and_wells:
+    position: [27, 9]
+    areas:
+      cart01: [0, 0, 5, 4]
+      cart02: [5, 0, 5, 4]
+      cart03: [10, 0, 5, 4]
+      cart04: [15, 0, 5, 4]
+      well01_top: [0, 4, 5, 3]
+      well02_top: [5, 4, 5, 3]
+      well01_bot: [0, 7, 5, 3]
+      well02_bot: [5, 7, 5, 3]
   tents:
     size: [6, 6]
     position: [33, 3]

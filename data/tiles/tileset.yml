@@ -665,6 +665,16 @@ uniform_sets:
       book01, papers02, book02, meat01, meat02, fish01, fish02, fish03,
       veg01, veg02, veg03, veg04, veg05, veg06
     ]
+  decoration2by1:
+    layer: decoration
+    size: [4, 2]
+    sprite_prefix: "tileset/"
+    impass: []
+    invis: []
+    tiles: [
+      mushroom01, mushroom02, mushroom03, mushroom04, mushroom05,
+      rocks01, rocks02, rocks03, rocks04, rocks05
+    ]
   doors:
     layer: prop
     size: [2, 3]
@@ -1704,3 +1714,43 @@ tiles:
     size: [6, 4]
     impass: []
     sprite: tileset/entry_light
+  cart01:
+    layer: prop
+    size: [5, 4]
+    pass: [[0, 0], [3, 0], [4, 0], [0, 3], [1, 3]]
+    sprite: props/cart01
+  cart02:
+    layer: prop
+    size: [5, 4]
+    pass: [[0, 0], [1, 0], [4, 0], [3, 3], [4, 3]]
+    sprite: props/cart02
+  cart03:
+    layer: prop
+    size: [5, 4]
+    pass: [[0, 0], [3, 0], [4, 0], [0, 3], [1, 3]]
+    sprite: props/cart03
+  cart04:
+    layer: prop
+    size: [5, 4]
+    pass: [[0, 0], [1, 0], [2, 0], [0, 3], [3, 3], [4, 3]]
+    sprite: props/cart04
+  well01_top:
+    layer: aerial_prop
+    size: [5, 3]
+    impass: []
+    sprite: props/well01_top
+  well02_top:
+    layer: aerial_prop
+    size: [5, 3]
+    impass: []
+    sprite: props/well02_top
+  well01_bot:
+    layer: prop
+    size: [5, 3]
+    pass: [[4, 0], [4, 1], [4, 2]]
+    sprite: props/well01_bot
+  well02_bot:
+    layer: prop
+    size: [5, 3]
+    pass: [[4, 0], [4, 1], [4, 2]]
+    sprite: props/well02_bot

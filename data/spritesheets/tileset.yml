@@ -801,7 +801,20 @@ groups:
       bridge_column_w_water: [4, 2, 1, 1]
       bridge_column_mid_water: [5, 2, 1, 1]
       bridge_column_e_water: [6, 2, 1, 1]
-      
+  shrooms_and_rocks:
+    position: [32, 22]
+    size: [2, 1]
+    areas:
+      mushroom01: [0, 0]
+      mushroom02: [2, 0]
+      mushroom03: [4, 0]
+      mushroom04: [6, 0]
+      mushroom05: [8, 0]
+      rocks01: [0, 1]
+      rocks02: [2, 1]
+      rocks03: [4, 1]
+      rocks04: [6, 1]
+      rocks05: [8, 1]
   misc_interior:
     position: [32, 0]
     areas:

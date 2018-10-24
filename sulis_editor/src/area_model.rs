@@ -277,6 +277,22 @@ impl AreaModel {
         }
     }
 
+    pub fn add_trigger(&mut self, x: i32, y: i32, w: i32, h: i32) {
+        if x < 0 || y < 0 { return; }
+
+        let location = Point::new(x, y);
+        let size = Size::new(w, h);
+
+        self.triggers.push(TriggerBuilder {
+            kind: TriggerKind::OnPlayerEnter {
+                location,
+                size,
+            },
+            on_activate: Vec::new(),
+            initially_enabled: true,
+        });
+    }
+
     pub fn add_encounter(&mut self, encounter: Rc<Encounter>, x: i32, y: i32, w: i32, h: i32) {
         if x < 0 || y < 0 { return; }
 
@@ -344,6 +360,17 @@ impl AreaModel {
         }
 
         within
+    }
+
+    pub fn remove_triggers_within(&mut self, x: i32, y: i32, width: i32, height: i32) {
+        self.triggers.retain(|trig| {
+            match trig.kind {
+                TriggerKind::OnPlayerEnter { location, size } => {
+                    !is_removal(location, size.width, size.height, x, y, width, height)
+                },
+                _ => true,
+            }
+        });
     }
 
     pub fn remove_encounters_within(&mut self, x: i32, y: i32, width: i32, height: i32) {

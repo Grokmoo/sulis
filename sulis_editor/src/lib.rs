@@ -56,6 +56,9 @@ use tile_picker::TilePicker;
 mod transition_window;
 use transition_window::TransitionWindow;
 
+mod trigger_picker;
+use trigger_picker::TriggerPicker;
+
 mod vis_picker;
 use vis_picker::VisPicker;
 
@@ -243,6 +246,7 @@ impl WidgetKind for EditorView {
         let prop_picker_kind = PropPicker::new();
         let elev_picker_kind = ElevPicker::new();
         let encounter_picker_kind = EncounterPicker::new();
+        let trigger_picker_kind = TriggerPicker::new();
         let pass_picker_kind = PassPicker::new();
         let vis_picker_kind = VisPicker::new();
 
@@ -254,6 +258,7 @@ impl WidgetKind for EditorView {
         pickers.push(Widget::with_defaults(prop_picker_kind.clone()));
         pickers.push(Widget::with_defaults(elev_picker_kind.clone()));
         pickers.push(Widget::with_defaults(encounter_picker_kind.clone()));
+        pickers.push(Widget::with_defaults(trigger_picker_kind.clone()));
         pickers.push(Widget::with_defaults(pass_picker_kind.clone()));
         pickers.push(Widget::with_defaults(vis_picker_kind.clone()));
         for picker in pickers.iter() {
@@ -262,11 +267,11 @@ impl WidgetKind for EditorView {
 
         let picker_kinds: Vec<Rc<RefCell<EditorMode>>> =
             vec![tile_picker_kind, terrain_picker_kind, wall_picker_kind, actor_picker_kind,
-                prop_picker_kind, elev_picker_kind, encounter_picker_kind, pass_picker_kind,
-                vis_picker_kind];
+                prop_picker_kind, elev_picker_kind, encounter_picker_kind, trigger_picker_kind,
+                pass_picker_kind, vis_picker_kind];
 
         let names = vec!["Tiles", "Terrain", "Walls", "Actors", "Props",
-            "Elevation", "Encounters", "Passability", "Visibility"];
+            "Elevation", "Encounters", "Triggers", "Passability", "Visibility"];
 
         // Any new pickers need to be added in all 3 places
         assert!(names.len() == picker_kinds.len());

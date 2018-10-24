@@ -225,6 +225,25 @@ children:
             text_params:
               scale: 6.0
             preferred_size: [40, 6]
+      trigger_picker:
+        background: bg_base
+        border: [1, 1, 1, 1]
+        preferred_size: [128, -4]
+        x_relative: Max
+        height_relative: Max
+        position: [0, 4]
+        children:
+          size_label:
+            from: .label
+            text: "Size"
+            position: [0, 0]
+            preferred_size: [10, 12]
+          width:
+            from: .spinner
+            position: [15, 0]
+          height:
+            from: .spinner
+            position: [40, 0]
       encounter_picker:
         background: bg_base
         border: [1, 1, 1, 1]

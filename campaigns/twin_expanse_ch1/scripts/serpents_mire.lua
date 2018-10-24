@@ -7,6 +7,26 @@ function encounter_01_spawn(parent)
   spawn_target_at("slime", 107, 14)
 end
 
+function encounter_02_spawn(parent)
+  game:cancel_blocking_anims()
+  game:scroll_view(98, 103)
+  
+  spawn_target_at("slime", 92, 100)
+  spawn_target_at("slime_orange", 92, 104)
+  spawn_target_at("slime", 105, 104)
+  spawn_target_at("slime_red", 110, 109)
+end
+
+function encounter_03_spawn(parent)
+  game:cancel_blocking_anims()
+  game:scroll_view(43, 57)
+  
+  spawn_target_at("slime", 36, 54)
+  spawn_target_at("slime_blue", 45, 57)
+  spawn_target_at("slime", 38, 61)
+  spawn_target_at("slime_red", 52, 58)
+end
+
 function spawn_target_at(target_id, x, y)
   entity = game:spawn_actor_at(target_id, x, y)
   if not entity:is_valid() then return end

@@ -326,6 +326,7 @@ impl TurnManager {
             if Rc::ptr_eq(mover, entity) { continue; }
 
             let mut entity = entity.borrow_mut();
+            if entity.actor.is_dead() { continue; }
             if !entity.is_hostile(mover) { continue; }
             if !entity.location.is_in(&area_state) { continue; }
             if entity.actor.actor.ai.is_none() && !entity.is_party_member() { continue; }
@@ -649,7 +650,15 @@ impl TurnManager {
             self.remove_from_surface(index, *surface);
         }
 
-        self.entities[index] = None;
+        let cur_hp = entity.borrow().actor.hp();
+        if cur_hp > 0 {
+            // don't want all the entity checks, just to set the value
+            // to zero
+            entity.borrow_mut().actor.remove_hp(cur_hp as u32);
+        }
+        // don't actually remove the entity from the backing vec, to allow
+        // scripts to continue to reference it
+        // self.entities[index] = None;
 
         // can't do this with a collect because of lifetime issues
         let mut effects_to_remove = Vec::new();

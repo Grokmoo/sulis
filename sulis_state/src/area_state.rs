@@ -838,11 +838,11 @@ impl AreaState {
     }
 
     pub(crate) fn load_entity(&mut self, entity: &Rc<RefCell<EntityState>>,
-                              location: Location) -> Result<usize, Error> {
+                              location: Location, is_dead: bool) -> Result<usize, Error> {
         let mgr = GameState::turn_manager();
-        let index = mgr.borrow_mut().add_entity(&entity);
+        let index = mgr.borrow_mut().add_entity(&entity, is_dead);
 
-        if entity.borrow().actor.is_dead() {
+        if is_dead {
             Ok(index)
         } else {
             self.transition_entity_to(&entity, index, location)
@@ -852,7 +852,7 @@ impl AreaState {
     pub(crate) fn add_entity(&mut self, entity: &Rc<RefCell<EntityState>>,
                                 location: Location) -> Result<usize, Error> {
 
-        let result = self.load_entity(entity, location);
+        let result = self.load_entity(entity, location, false);
         entity.borrow_mut().actor.init_day();
         result
     }

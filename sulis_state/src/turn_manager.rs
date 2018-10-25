@@ -499,7 +499,7 @@ impl TurnManager {
         entity.borrow_mut().actor.remove_effect(surface_index);
     }
 
-    pub fn add_entity(&mut self, entity: &Rc<RefCell<EntityState>>) -> usize {
+    pub fn add_entity(&mut self, entity: &Rc<RefCell<EntityState>>, is_dead: bool) -> usize {
         {
             let entity = entity.borrow();
             let uid = entity.unique_id();
@@ -516,7 +516,7 @@ impl TurnManager {
         self.entities.push(Some(entity_to_add));
         let index = self.entities.len() - 1;
 
-        if !entity.borrow().actor.is_dead() {
+        if !is_dead {
             self.order.push_back(Entry::Entity(index));
             debug!("Added entity with unique id '{}' at {} to turn timer", entity.borrow().unique_id(), index);
         }

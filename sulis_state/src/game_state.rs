@@ -132,8 +132,9 @@ impl GameState {
                     None => unreachable!(),
                 };
 
+                let is_dead = entity.borrow().actor.is_dead();
                 let location = entity.borrow().location.clone();
-                area_state.borrow_mut().load_entity(entity, location)?;
+                area_state.borrow_mut().load_entity(entity, location, is_dead)?;
             }
 
             let mut effects = HashMap::new();

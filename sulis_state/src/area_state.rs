@@ -841,7 +841,12 @@ impl AreaState {
                               location: Location) -> Result<usize, Error> {
         let mgr = GameState::turn_manager();
         let index = mgr.borrow_mut().add_entity(&entity);
-        self.transition_entity_to(&entity, index, location)
+
+        if entity.borrow().actor.is_dead() {
+            Ok(index)
+        } else {
+            self.transition_entity_to(&entity, index, location)
+        }
     }
 
     pub(crate) fn add_entity(&mut self, entity: &Rc<RefCell<EntityState>>,

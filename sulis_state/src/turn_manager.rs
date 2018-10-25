@@ -515,8 +515,11 @@ impl TurnManager {
         let entity_to_add = Rc::clone(entity);
         self.entities.push(Some(entity_to_add));
         let index = self.entities.len() - 1;
-        self.order.push_back(Entry::Entity(index));
-        debug!("Added entity with unique id '{}' at {} to turn timer", entity.borrow().unique_id(), index);
+
+        if !entity.borrow().actor.is_dead() {
+            self.order.push_back(Entry::Entity(index));
+            debug!("Added entity with unique id '{}' at {} to turn timer", entity.borrow().unique_id(), index);
+        }
 
         entity.borrow_mut().set_index(index);
         entity.borrow_mut().actor.init_turn();

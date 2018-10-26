@@ -19,6 +19,11 @@ wall_rules:
     ne_sw_postfix: "ne_sw"
     nw_se_postfix: "nw_se"
 wall_kinds:
+  - id: castle01
+    base_tile: _outer_edge_s
+    fill_tile: _base
+    extended: [ castle01_top, castle01_mid, castle01_bot ]
+    interior_border: false
   - id: interior_stone_ceil
     base_tile: _outer_edge_s
     fill_tile: _base
@@ -601,7 +606,8 @@ uniform_sets:
       plant01, plant02, plant03, plant04, plant05, plant06, plant07, plant08, plant09,
       plant11, plant12, plant13, plant14, plant15, plant16, plant17, plant18, plant19, plant20,
       rocks_small, campfire, lilypad03, lilypad04,
-      window_small01, window_small02, window_small03, window_small04, window_small05, window_small06, window_small07 
+      window_small01, window_small02, window_small03, window_small04, window_small05, window_small06, window_small07,
+      bones02,
     ]
   object_bin_impass:
     layer: object
@@ -633,7 +639,7 @@ uniform_sets:
       fence_e, fence_e_w, fence_w, fence_n, fence_n_s, fence_s, fence_e_s, fence_e_w_s, fence_w_s, fence_e_n_s,
       fence_e_w_n_s, fence_w_n_s, fence_e_n, fence_e_w_n, fence_w_n, fence_gate_w, fence_gate_c, fence_gate_e,
       bridge_top_w1, bridge_top_w2, bridge_top_mid, bridge_top_e1, bridge_top_e2,
-      
+      box_grey_large,  box_grey_small, box_gold_large, box_gold_small, box_red_large, box_red_small, barrel_water
     ]
   walls_impass:
     layer: walls
@@ -643,8 +649,9 @@ uniform_sets:
     invis: []
     tiles: [
       bridge_column_w, bridge_column_mid,bridge_column_e,bridge_column_w_water,bridge_column_mid_water, bridge_column_e_water,
-      castle01_bot, castle01_center, castle01_bot_w, castle01_bot_e, castle01_top_w, castle01_top_e,
-      castle01_mid_w, castle01_mid_e, castle01_lmid_w, castle01_lmid_e, castle01_broken_wall
+      castle01_bot_outer_edge_s, castle01_bot_outer_edge_sw, castle01_bot_outer_edge_se, castle01_top_outer_edge_sw, castle01_top_outer_edge_se,
+      castle01_top_outer_edge_s, castle01_mid_outer_edge_s, castle01_bot_outer_edge_s,
+      castle01_mid_outer_edge_sw, castle01_mid_outer_edge_se, castle01_broken_wall
     ]
   walls_impass_4by1:
     layer: walls
@@ -666,8 +673,7 @@ uniform_sets:
       wine_bottle02, lantern_off, ropes01, wall_crack01, papers, bottles01, bottles02, bottles03,
       book01, papers02, book02, meat01, meat02, fish01, fish02, fish03,
       veg01, veg02, veg03, veg04, veg05, veg06,
-      
-      castle01_window01
+      castle01_window01, shield01, shield02, swords01, swords02
     ]
   decoration2by1:
     layer: decoration
@@ -678,6 +684,24 @@ uniform_sets:
     tiles: [
       mushroom01, mushroom02, mushroom03, mushroom04, mushroom05,
       rocks01, rocks02, rocks03, rocks04, rocks05
+    ]
+  decoration1by2:
+    layer: decoration
+    size: [2, 4]
+    sprite_prefix: "tileset/"
+    impass: []
+    invis: []
+    tiles: [
+      banner_shield_grey, banner_red, banner_blue
+    ]
+  decoration1by3:
+    layer: decoration
+    size: [2, 6]
+    sprite_prefix: "tileset/"
+    impass: []
+    invis: []
+    tiles: [
+      banner_large_blue, banner_large_red
     ]
   doors:
     layer: prop
@@ -856,44 +880,56 @@ uniform_sets:
       wood_inner_edge_nw, wood_inner_edge_ne, wood_inner_edge_ne_sw, wood_inner_edge_nw_se,
     ]
 non_uniform_sets:
-  castle01_tower:
+  castle01:
     layer: walls_aerial
     size: [2, 2]
-    sprite_prefix: "tileset/castle01_tower_"
+    sprite_prefix: "tileset/castle01_"
     tiles:
-      outer_nw:
+      outer_edge_nw:
         impass: [[1, 1]]
         invis: [[1, 1]]
-      point_outer_n:
+      outer_edge_n:
         impass: [[0, 1], [1, 1]]
         invis: [[0, 1], [1, 1]]
-      square_outer_n:
+      square_outer_edge_n:
         impass: [[0, 1], [1, 1]]
         invis: [[0, 1], [1, 1]]
-      outer_ne:
+      outer_edge_ne:
         impass: [[0, 1]]
         invis: [[0, 1]]
-      outer_w:
+      outer_edge_w:
         impass: [[1, 0], [1, 1]]
         invis: [[1, 0], [1, 1]]
       base:
         impass: []
         invis: []
-      outer_e:
+      outer_edge_e:
         impass: [[0, 0], [0, 1]]
         invis: [[0, 0], [0, 1]]
-      outer_sw:
+      outer_edge_sw:
         impass: [[1, 0], [1, 1]]
         invis: [[1, 0], [1, 1]]
-      point_outer_s:
+      outer_edge_s:
         impass: [[0, 1], [1, 1]]
         invis: [[0, 1], [1, 1]]
-      square_outer_s:
+      square_outer_edge_s:
         impass: [[0, 1], [1, 1]]
         invis: [[0, 1], [1, 1]]
-      outer_se:
+      outer_edge_se:
         impass: [[0, 0], [0, 1]]
         invis: [[0, 0], [0, 1]]
+      inner_edge_nw:
+        impass: [[0, 0], [0, 1], [1, 0]]
+        invis: [[0, 0], [0, 1], [1, 0]]
+      inner_edge_ne:
+        impass: [[0, 0], [1, 0], [1, 1]]
+        invis: [[0, 0], [1, 0], [1, 1]]
+      inner_edge_sw:
+        impass: [[0, 0], [0, 1], [1, 1]]
+        invis: [[0, 0], [0, 1], [1, 1]]
+      inner_edge_se:
+        impass: [[1, 0], [0, 1], [1, 1]]
+        invis: [[1, 0], [0, 1], [1, 1]]
   roof_brick:
     layer: walls_aerial
     size: [2, 2]
@@ -1821,3 +1857,9 @@ tiles:
     impass: [[0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [5, 1], [5, 2], [5, 3], [5, 4], [5, 5]]
     invis: [[0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [5, 1], [5, 2], [5, 3], [5, 4], [5, 5]]
     sprite: tileset/castle01_gate_tunnel_square
+  castle01_gate_tunnel:
+    layer: walls
+    size: [6, 4]
+    impass: []
+    invis: []
+    sprite: tileset/castle01_gate_tunnel

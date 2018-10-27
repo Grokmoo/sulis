@@ -1,0 +1,13 @@
+id: shrooms_level7
+auto_spawn: true
+min_gen_actors: 0
+max_gen_actors: 0
+entries:
+  - id: shroom_med
+    always: true
+  - id: shroom_med
+    always: true
+  - id: shroom_med
+    always: true
+  - id: shroom_large
+    always: true

@@ -1,0 +1,23 @@
+id: swamp_fortress_main_gate
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=888|You approach the gates of what looks to be an old fortress, abandoned by its original owners.]
+    responses:
+      - text: "[c=888|Continue]"
+        to: start02
+  start02:
+    text: |
+      [c=888|Whoever is organizing the raids on Wellswood and directing the hordes must be inside.]
+    responses:
+      - text: "[c=888|Continue]"
+        to: start03
+  start03:
+    text: |
+      [c=888|There doesn't seem to be anyone watching the approach.]
+      
+      [c=888|You could try rushing the main gate, or perhaps there is a back way inside.]
+    responses:
+      - text: "[c=888|End]"

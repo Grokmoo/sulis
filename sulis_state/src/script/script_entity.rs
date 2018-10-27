@@ -966,6 +966,10 @@ impl UserData for ScriptEntitySet {
             })
         });
 
+        methods.add_method("parent", |_, set, ()| {
+            Ok(ScriptEntity::new(set.parent))
+        });
+
         methods.add_method("without_self", &without_self);
         methods.add_method("visible_within", &visible_within);
         methods.add_method("visible", |lua, set, ()| visible_within(lua, set, std::f32::MAX));

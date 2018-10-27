@@ -1,0 +1,19 @@
+id: orcs_level8
+auto_spawn: true
+min_gen_actors: 5
+max_gen_actors: 5
+entries:
+  - id: orc_archer
+    weight: 1
+  - id: orc_warrior
+    weight: 1
+  - id: orc_crusher
+    weight: 2
+  - id: orc_protector
+    weight: 2
+  - id: orc_rogue
+    weight: 2
+  - id: goblin_mage_01
+    weight: 1
+  - id: goblin_mage_02
+    weight: 1

@@ -1,0 +1,19 @@
+id: spore_cloud
+name: "Spore Cloud"
+icon: empty
+description: |
+  Creates a cloud of mushroom spores.
+active:
+  script: "spore_cloud"
+  group: Fighter
+  ap: 2000
+  duration:
+    Rounds: 3
+  cooldown: 6
+  ai:
+    priority: 100
+    kind: Debuff
+    group: Multiple
+    range: Short
+  short_description: |
+    Create a cloud of shroom spores.

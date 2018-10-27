@@ -1,0 +1,19 @@
+id: shroom_spores
+name: "Shroom Spores"
+icon: empty
+description: |
+  The target must succeed at a Fortitude save or be put to sleep.
+active:
+  script: "shroom_spores"
+  group: "Fighter"
+  ap: 2000
+  duration:
+    Rounds: 3
+  cooldown: 4
+  ai:
+    priority: 20
+    kind: Debuff
+    group: Single
+    range: Reach
+  short_description: |
+    Put a target to sleep.

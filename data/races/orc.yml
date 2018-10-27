@@ -1,0 +1,44 @@
+id: orc
+name: Orc
+description: "Monster"
+size: 2by2
+movement_rate: 0.8
+base_stats:
+  - kind: { attribute: { attribute: Strength, amount: 2 } }
+  - kind: { attribute: { attribute: Endurance, amount: 2 } }
+  - kind: { attribute: { attribute: Dexterity, amount: -1 } }
+  - kind: { attribute: { attribute: Perception, amount: -1 } }
+  - kind: { attribute: { attribute: Intellect, amount: -4 } }
+  - kind: { hit_points: 40 }
+  - kind: { melee_accuracy: 30 }
+  - kind: { ranged_accuracy: 25 }
+  - kind: { spell_accuracy: 30 }
+  - kind: { defense: 30 }
+  - kind: { fortitude: 30 }
+  - kind: { reflex: 25 }
+  - kind: { will: 30 }
+  - kind: { reach: 0.5 }
+base_attack:
+  damage:
+    min: 8
+    max: 12
+    kind: Crushing
+  kind: #Melee
+    reach: 0.5
+  bonuses: {}
+default_images:
+  Male:
+    Background: creatures/orc01
+    Shadow: creatures/orc01_shadow
+  Female:
+    Background: creatures/orc01
+    Shadow: creatures/orc01_shadow
+ticker_offset: [0.5, 2.5]
+image_layer_offset_scale: 16
+image_layer_offsets:
+  HeldMain: [-28, -22]
+  HeldOff: [12, -20]
+  Background: [-8,-18]
+  Cloak: [-8,-18]
+  Shadow: [-8,-18]
+image_layer_postfix: {}

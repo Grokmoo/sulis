@@ -1,9 +1,9 @@
-id: shroom_med
+id: orc_archer
 ai: ai_basic
-name: Mushroom
+name: Orc Archer
 faction: Hostile
 images: {}
-race: shroom
+race: orc
 attributes:
   str: 10
   dex: 10
@@ -12,7 +12,12 @@ attributes:
   int: 10
   wis: 10
 levels:
-  fighter: 5
+  fighter: 6
+inventory:
+  equipped:
+    HeldMain: { id: longbow }
+  quick:
+    AltHeldMain: { id: hatchet }
 reward:
   xp: 30
   loot: level1_misc
@@ -20,8 +25,13 @@ reward:
 abilities:
   - armor_light
   - armor_medium
+  - armor_heavy
+  - weapon_axe
+  - weapon_crossbow
   - weapon_bow
   - weapon_small_sword
+  - weapon_large_sword
   - weapon_spear
+  - weapon_mace
   - weapon_simple
-  - shroom_spores
+  - penetrating_shot

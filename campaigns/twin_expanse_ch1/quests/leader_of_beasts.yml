@@ -13,3 +13,6 @@ entries:
   serpents_mire:
     description: |
       I have learned the location of the raider's base: the Serpent's Mire.
+  fortress_found:
+    description: |
+      I have found the location of a large fortress hidden deep in the Serpent's Mire.  The leader of the raiders will likely be found within.

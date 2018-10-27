@@ -1,18 +1,22 @@
-id: shroom_med
+id: orc_rogue
 ai: ai_basic
-name: Mushroom
+name: Orc Rogue
 faction: Hostile
 images: {}
-race: shroom
+race: orc
 attributes:
-  str: 10
-  dex: 10
-  end: 10
+  str: 9
+  dex: 13
+  end: 9
   per: 10
   int: 10
   wis: 10
 levels:
-  fighter: 5
+  rogue: 6
+inventory:
+  equipped:
+    HeldMain: { id: shortsword }
+    HeldOff: { id: shortsword}
 reward:
   xp: 30
   loot: level1_misc
@@ -20,8 +24,11 @@ reward:
 abilities:
   - armor_light
   - armor_medium
+  - weapon_crossbow
   - weapon_bow
   - weapon_small_sword
   - weapon_spear
   - weapon_simple
-  - shroom_spores
+  - backstab
+  - flanker
+  - pierce

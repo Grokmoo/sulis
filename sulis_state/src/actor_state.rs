@@ -610,6 +610,7 @@ impl ActorState {
 
     pub fn add_xp(&mut self, xp: u32) {
         self.p_stats.add_xp(xp, &self.actor);
+        self.listeners.notify(&self);
     }
 
     pub fn xp(&self) -> u32 {
@@ -690,6 +691,7 @@ impl ActorState {
 
     pub fn end_encounter(&mut self) {
         self.p_stats.end_encounter(&self.stats);
+        self.listeners.notify(&self);
     }
 
     pub fn init_turn(&mut self) {

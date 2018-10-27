@@ -5,3 +5,9 @@ max_gen_actors: 0
 entries:
   - id: shroom_med
     always: true
+  - id: shroom_med
+    always: true
+  - id: shroom_med
+    always: true
+  - id: shroom_large
+    always: true

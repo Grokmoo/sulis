@@ -618,7 +618,7 @@ children:
       save_window:
         from: .window
         height_relative: Zero
-        preferred_size: [84, 48]
+        preferred_size: [124, 48]
         x_relative: Center
         y_relative: Center
         children:
@@ -633,7 +633,7 @@ children:
               horizontal_alignment: Right
           id_field:
             from: .input_field
-            preferred_size: [40, 4]
+            preferred_size: [80, 4]
             position: [24, 12]
           name_label:
             from: .label
@@ -644,7 +644,7 @@ children:
               horizontal_alignment: Right
           name_field:
             from: .input_field
-            preferred_size: [40, 4]
+            preferred_size: [80, 4]
             position: [24, 20]
           filename_label:
             from: .label
@@ -655,11 +655,11 @@ children:
               horizontal_alignment: Right
           filename_field:
             from: .input_field
-            preferred_size: [40, 4]
+            preferred_size: [80, 4]
             position: [24, 28]
           save_button:
             from: .button
             preferred_size: [16, 4]
-            position: [24, 36]
+            position: [44, 36]
             text: "Save"
 ...

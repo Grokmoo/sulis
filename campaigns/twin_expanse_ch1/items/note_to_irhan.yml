@@ -1,0 +1,17 @@
+id: note_to_irhan
+name: "Note to Irhan"
+icon: inventory/misc_note01
+weight: 10
+value: 2
+usable:
+  consumable: false
+  script: note_to_irhan
+  ap: 2000
+  duration: Instant
+  use_in_slot: false
+  ai:
+    priority: 99999
+    kind: Special
+    group: Single
+    range: Personal
+  short_description: "Read this note."

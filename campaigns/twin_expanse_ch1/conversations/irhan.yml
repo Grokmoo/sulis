@@ -1,0 +1,81 @@
+id: irhan
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=888|You see before you a mage of the third or perhaps even fourth circle.]
+      
+      Greetings.  I must admit I am a bit surprised to see you here?
+    responses:
+      - text: "You were expecting me?"
+        to: start02b
+      - text: "And you are?"
+        to: start02a
+      - text: "[c=f00|Fight] I'm not interested in talking."
+  start02a:
+    text: |
+      I am called Irhan.  I lead these creatures.
+    responses:
+      - text: "[c=888|Continue]"
+        to: menu
+      - text: "[c=f00|Fight] Time to die, Irhan."
+  start02b:
+    text: |
+      In a manner of speaking.  I have watched your progress with some interest.
+      
+      I am called Irhan.
+    responses:
+      - text: "[c=888|Continue]"
+        to: menu
+      - text: "[c=f00|Fight] Time to die, Irhan."
+  menu:
+    text: |
+      You wish to parlay, I take it?
+    responses:
+      - text: "What is the purpose of these attacks?"
+        to: attacks
+      - text: "How did you come to lead so many tribes?"
+        to: tribes
+      - text: "Who do you serve?"
+        to_view:
+          - target_flag: ask_serve
+        to: ask_serve
+      - text: "[c=f00|Fight] Time to end this."
+  attacks:
+    text: |
+      Obviously, to sow chaos and death.  To gain power, and money.
+      
+      What other end is there?
+    responses:
+      - text: "[c=888|Continue]"
+        to: menu
+  tribes:
+    text: |
+      Would you believe me if I told you it was my natural charisma?
+      
+      [c=888|He chuckles.]
+      
+      I have been given a taste of true power.  It has allowed me to bend these feeble creatures to my will.
+    on_view:
+      - target_flag: ask_serve
+    responses:
+      - text: "[c=888|Continue]"
+        to: menu
+  ask_serve:
+    text: |
+      An astute question.  Why should someone who holds such power serve anyone?
+    responses:
+      - text: "[c=888|Continue]"
+        to: ask_serve02
+  ask_serve02:
+    text: |
+      Well, the one I serve holds such power that even the Gods must take notice - and soon.
+    responses:
+      - text: "[c=888|Continue]"
+        to: ask_serve03
+  ask_serve03:
+    text: |
+      Be that as it may, I'm afraid that now you must die.  Kill them all!
+    responses:
+      - text: "[c=f00|Fight!]"

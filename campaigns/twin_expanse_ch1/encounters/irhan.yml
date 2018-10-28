@@ -1,0 +1,16 @@
+id: irhan
+auto_spawn: true
+min_gen_actors: 0
+max_gen_actors: 0
+entries:
+  - id: irhan
+    always: true
+    unique_id: irhan
+  - id: shroom_med
+    always: true
+  - id: slime_red
+    always: true
+  - id: slime_orange
+    always: true
+  - id: forest_troll
+    always: true

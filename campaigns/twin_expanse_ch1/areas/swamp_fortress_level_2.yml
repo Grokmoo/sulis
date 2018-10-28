@@ -1,0 +1,7710 @@
+---
+id: swamp_fortress_level_2
+name: Swamp Fortress Level 2
+width: 28
+height: 58
+generate: false
+layers:
+  - terrain_base
+  - terrain_border
+  - walls
+  - walls_top
+  - prop
+  - object
+  - object_interior
+  - decoration
+  - walls_aerial
+  - aerial
+  - aerial_prop
+entity_layer: 7
+actors: []
+props:
+  - id: door_single_02
+    location:
+      x: 8
+      y: 41
+    items: []
+    enabled: true
+  - id: chest_xl_level5_armor
+    location:
+      x: 6
+      y: 53
+    items: []
+    enabled: true
+  - id: door_double_02
+    location:
+      x: 20
+      y: 23
+    items: []
+    enabled: true
+  - id: chest_small
+    location:
+      x: 21
+      y: 50
+    items: [ { item: { id: note_to_irhan }, quantity: 1 }, { item: { id: coin }, quantity: 500 } ]
+    enabled: true
+encounters:
+  - id: irhan
+    location:
+      x: 10
+      y: 32
+    size:
+      width: 10
+      height: 8
+transitions:
+  - from:
+      x: 7
+      y: 3
+    size: 2by3
+    to:
+      Area:
+        id: swamp_fortress_level_1
+        x: 106
+        y: 48
+    hover_text: To Level 1
+    image_display: empty
+triggers:
+  - kind:
+      OnEncounterActivated:
+        encounter_location:
+          x: 10
+          y: 32
+    on_activate:
+      - fire_script:
+          id: swamp_fortress
+          func: on_activate_irhan
+    initially_enabled: true
+visibility_tile: gui/area_invis
+explored_tile: gui/area_unexplored
+max_vis_distance: 20
+max_vis_up_one_distance: 6
+world_map_location: ~
+on_rest:
+  Disabled:
+    message: There are too many enemies about.  You may not rest here.
+layer_set:
+  tileset/fancy_carpet_outer_edge_ne:
+    - - 16
+      - 30
+  tileset/fancy_carpet_base:
+    - - 8
+      - 32
+    - - 8
+      - 34
+    - - 10
+      - 34
+    - - 12
+      - 34
+    - - 14
+      - 34
+    - - 14
+      - 32
+    - - 12
+      - 32
+    - - 10
+      - 32
+  tileset/interior_brick_outer_edge_nw:
+    - - 10
+      - 40
+  tileset/rug_small01:
+    - - 21
+      - 51
+  tileset/fancy_carpet_outer_edge_s:
+    - - 8
+      - 36
+    - - 10
+      - 36
+    - - 12
+      - 36
+    - - 14
+      - 36
+  tileset/wall_interior_brick_outer_edge_se:
+    - - 18
+      - 24
+    - - 16
+      - 50
+    - - 6
+      - 44
+  tileset/cabinet_bot_02:
+    - - 18
+      - 48
+  tileset/interior_brick_base:
+    - - 0
+      - 14
+    - - 0
+      - 16
+    - - 2
+      - 14
+    - - 4
+      - 14
+    - - 6
+      - 14
+    - - 2
+      - 16
+    - - 8
+      - 14
+    - - 10
+      - 14
+    - - 12
+      - 14
+    - - 26
+      - 0
+    - - 26
+      - 2
+    - - 26
+      - 4
+    - - 26
+      - 6
+    - - 26
+      - 8
+    - - 26
+      - 10
+    - - 26
+      - 12
+    - - 14
+      - 14
+    - - 16
+      - 14
+    - - 26
+      - 14
+    - - 26
+      - 16
+    - - 0
+      - 18
+    - - 2
+      - 18
+    - - 0
+      - 20
+    - - 2
+      - 20
+    - - 0
+      - 22
+    - - 0
+      - 24
+    - - 0
+      - 26
+    - - 0
+      - 28
+    - - 0
+      - 30
+    - - 0
+      - 32
+    - - 26
+      - 18
+    - - 26
+      - 20
+    - - 0
+      - 48
+    - - 0
+      - 50
+    - - 0
+      - 52
+    - - 0
+      - 54
+    - - 0
+      - 56
+    - - 0
+      - 34
+    - - 0
+      - 36
+    - - 0
+      - 38
+    - - 0
+      - 40
+    - - 0
+      - 42
+    - - 0
+      - 44
+    - - 0
+      - 46
+    - - 4
+      - 16
+    - - 6
+      - 16
+    - - 8
+      - 16
+    - - 10
+      - 16
+    - - 12
+      - 16
+    - - 14
+      - 16
+    - - 16
+      - 16
+    - - 4
+      - 18
+    - - 6
+      - 18
+    - - 8
+      - 18
+    - - 10
+      - 18
+    - - 12
+      - 18
+    - - 14
+      - 18
+    - - 16
+      - 18
+    - - 4
+      - 20
+    - - 6
+      - 20
+    - - 8
+      - 20
+    - - 10
+      - 20
+    - - 12
+      - 20
+    - - 14
+      - 20
+    - - 16
+      - 20
+    - - 16
+      - 0
+    - - 18
+      - 0
+    - - 20
+      - 0
+    - - 22
+      - 0
+    - - 24
+      - 0
+    - - 16
+      - 2
+    - - 18
+      - 2
+    - - 20
+      - 2
+    - - 22
+      - 2
+    - - 24
+      - 2
+  tileset/cabinet02:
+    - - 12
+      - 44
+  tileset/cabinet_wide01:
+    - - 2
+      - 3
+  tileset/papers:
+    - - 23
+      - 37
+  tileset/cabinet_med03:
+    - - 4
+      - 34
+  tileset/ropes01:
+    - - 15
+      - 51
+  tileset/interior_wood02_base:
+    - - 20
+      - 48
+    - - 22
+      - 48
+    - - 24
+      - 48
+    - - 18
+      - 50
+    - - 20
+      - 50
+    - - 22
+      - 50
+    - - 24
+      - 50
+    - - 18
+      - 52
+    - - 22
+      - 52
+    - - 24
+      - 52
+    - - 18
+      - 54
+    - - 20
+      - 54
+    - - 22
+      - 54
+    - - 24
+      - 54
+    - - 20
+      - 52
+    - - 18
+      - 48
+  tileset/bar_horiz_e:
+    - - 4
+      - 29
+  tileset/papers02:
+    - - 22
+      - 36
+  tileset/interior_dirt_base:
+    - - 16
+      - 18
+    - - 16
+      - 20
+    - - 16
+      - 22
+    - - 16
+      - 24
+    - - 18
+      - 24
+    - - 20
+      - 24
+    - - 22
+      - 24
+    - - 24
+      - 24
+    - - 16
+      - 26
+    - - 18
+      - 26
+    - - 20
+      - 26
+    - - 22
+      - 26
+    - - 24
+      - 26
+    - - 26
+      - 14
+    - - 26
+      - 16
+    - - 18
+      - 18
+    - - 20
+      - 18
+    - - 22
+      - 18
+    - - 24
+      - 18
+    - - 26
+      - 18
+    - - 18
+      - 20
+    - - 20
+      - 20
+    - - 22
+      - 20
+    - - 24
+      - 20
+    - - 26
+      - 20
+    - - 18
+      - 22
+    - - 20
+      - 22
+    - - 22
+      - 22
+    - - 24
+      - 22
+    - - 26
+      - 22
+    - - 20
+      - 8
+    - - 22
+      - 8
+    - - 24
+      - 8
+    - - 20
+      - 10
+    - - 22
+      - 10
+    - - 24
+      - 10
+    - - 20
+      - 12
+    - - 22
+      - 12
+    - - 24
+      - 12
+    - - 20
+      - 14
+    - - 22
+      - 14
+    - - 24
+      - 14
+    - - 20
+      - 16
+    - - 22
+      - 16
+    - - 24
+      - 16
+    - - 14
+      - 8
+    - - 16
+      - 8
+    - - 18
+      - 8
+    - - 14
+      - 10
+    - - 16
+      - 10
+    - - 18
+      - 10
+    - - 14
+      - 12
+    - - 16
+      - 12
+    - - 18
+      - 12
+    - - 10
+      - 14
+    - - 12
+      - 14
+    - - 14
+      - 14
+    - - 16
+      - 14
+    - - 18
+      - 14
+    - - 10
+      - 16
+    - - 12
+      - 16
+    - - 14
+      - 16
+    - - 16
+      - 16
+    - - 18
+      - 16
+    - - 10
+      - 4
+    - - 12
+      - 4
+    - - 10
+      - 6
+    - - 12
+      - 6
+    - - 10
+      - 8
+    - - 12
+      - 8
+    - - 10
+      - 10
+    - - 12
+      - 10
+    - - 10
+      - 12
+    - - 12
+      - 12
+    - - 0
+      - 4
+    - - 2
+      - 4
+    - - 4
+      - 4
+    - - 6
+      - 4
+    - - 8
+      - 4
+    - - 0
+      - 6
+    - - 2
+      - 6
+    - - 4
+      - 6
+    - - 6
+      - 6
+    - - 8
+      - 6
+    - - 0
+      - 8
+    - - 2
+      - 8
+    - - 4
+      - 8
+    - - 6
+      - 8
+    - - 8
+      - 8
+    - - 0
+      - 10
+    - - 2
+      - 10
+    - - 4
+      - 10
+    - - 6
+      - 10
+    - - 8
+      - 10
+    - - 0
+      - 12
+    - - 2
+      - 12
+    - - 4
+      - 12
+    - - 6
+      - 12
+    - - 8
+      - 12
+  tileset/cabinet_bot_01:
+    - - 24
+      - 48
+  tileset/fancy_carpet_outer_edge_se:
+    - - 16
+      - 36
+  tileset/cabinet_top_04:
+    - - 24
+      - 46
+  tileset/interior_brick_outer_edge_sw:
+    - - 24
+      - 22
+    - - 14
+      - 48
+    - - 10
+      - 42
+    - - 14
+      - 4
+  tileset/interior_brick_outer_edge_se:
+    - - 18
+      - 22
+    - - 16
+      - 48
+    - - 6
+      - 42
+  tileset/interior_brick_outer_edge_ne:
+    - - 18
+      - 12
+    - - 6
+      - 40
+  tileset/fancy_carpet_outer_edge_e:
+    - - 16
+      - 32
+    - - 16
+      - 34
+  tileset/swords01:
+    - - 11
+      - 3
+  tileset/interior_brick_outer_edge_n:
+    - - 2
+      - 12
+    - - 4
+      - 12
+    - - 6
+      - 12
+    - - 8
+      - 12
+    - - 10
+      - 12
+    - - 12
+      - 12
+    - - 14
+      - 12
+    - - 16
+      - 12
+    - - 4
+      - 56
+    - - 6
+      - 56
+    - - 24
+      - 56
+    - - 8
+      - 56
+    - - 10
+      - 56
+    - - 12
+      - 56
+    - - 14
+      - 56
+    - - 16
+      - 56
+    - - 18
+      - 56
+    - - 20
+      - 56
+    - - 22
+      - 56
+    - - 14
+      - 40
+    - - 16
+      - 40
+    - - 18
+      - 40
+    - - 20
+      - 40
+    - - 22
+      - 40
+    - - 24
+      - 40
+    - - 4
+      - 40
+    - - 12
+      - 40
+  tileset/book02:
+    - - 12
+      - 29
+  tileset/cabinet_top_02:
+    - - 18
+      - 46
+  tileset/interior_brick_inner_edge_se:
+    - - 0
+      - 0
+    - - 2
+      - 22
+    - - 16
+      - 42
+    - - 2
+      - 42
+  tileset/interior_brick_outer_edge_s:
+    - - 2
+      - 0
+    - - 4
+      - 0
+    - - 6
+      - 0
+    - - 8
+      - 0
+    - - 10
+      - 0
+    - - 18
+      - 42
+    - - 20
+      - 42
+    - - 22
+      - 42
+    - - 24
+      - 42
+    - - 4
+      - 42
+    - - 12
+      - 42
+    - - 4
+      - 22
+    - - 6
+      - 22
+    - - 8
+      - 22
+    - - 10
+      - 22
+    - - 12
+      - 22
+    - - 14
+      - 22
+    - - 16
+      - 22
+    - - 12
+      - 0
+    - - 16
+      - 4
+    - - 18
+      - 4
+    - - 20
+      - 4
+    - - 22
+      - 4
+  table_large01:
+    - - 22
+      - 36
+  tileset/bottles03:
+    - - 6
+      - 29
+  tileset/interior_brick_outer_edge_e:
+    - - 0
+      - 2
+    - - 0
+      - 4
+    - - 0
+      - 6
+    - - 0
+      - 8
+    - - 0
+      - 10
+    - - 18
+      - 14
+    - - 18
+      - 16
+    - - 2
+      - 24
+    - - 2
+      - 26
+    - - 2
+      - 28
+    - - 2
+      - 30
+    - - 2
+      - 32
+    - - 18
+      - 18
+    - - 18
+      - 20
+    - - 2
+      - 50
+    - - 2
+      - 52
+    - - 2
+      - 54
+    - - 2
+      - 48
+    - - 16
+      - 44
+    - - 16
+      - 46
+    - - 2
+      - 34
+    - - 2
+      - 36
+    - - 2
+      - 38
+    - - 2
+      - 44
+    - - 2
+      - 46
+  tileset/interior_brick_inner_edge_nw:
+    - - 26
+      - 56
+    - - 26
+      - 40
+  tileset/interior_brick_inner_edge_sw:
+    - - 26
+      - 22
+    - - 14
+      - 42
+    - - 26
+      - 42
+    - - 14
+      - 0
+    - - 24
+      - 4
+  tileset/fancy_carpet_outer_edge_sw:
+    - - 6
+      - 36
+  tileset/bottles01:
+    - - 4
+      - 29
+  tileset/fancy_carpet_outer_edge_nw:
+    - - 6
+      - 30
+  tileset/wall_interior_brick_outer_edge_s:
+    - - 0
+      - 2
+    - - 2
+      - 2
+    - - 4
+      - 2
+    - - 6
+      - 2
+    - - 8
+      - 2
+    - - 10
+      - 2
+    - - 26
+      - 24
+    - - 14
+      - 44
+    - - 16
+      - 44
+    - - 18
+      - 44
+    - - 20
+      - 44
+    - - 22
+      - 44
+    - - 24
+      - 44
+    - - 26
+      - 44
+    - - 2
+      - 44
+    - - 4
+      - 44
+    - - 12
+      - 44
+    - - 2
+      - 24
+    - - 4
+      - 24
+    - - 6
+      - 24
+    - - 8
+      - 24
+    - - 10
+      - 24
+    - - 12
+      - 24
+    - - 14
+      - 24
+    - - 16
+      - 24
+    - - 12
+      - 2
+    - - 14
+      - 2
+    - - 16
+      - 6
+    - - 18
+      - 6
+    - - 20
+      - 6
+    - - 22
+      - 6
+    - - 24
+      - 6
+  tileset/bucket_full:
+    - - 24
+      - 28
+  tileset/interior_tile_base_variant1:
+    - - 8
+      - 42
+    - - 26
+      - 36
+  tileset/swords02:
+    - - 6
+      - 25
+  tileset/chair07:
+    - - 5
+      - 50
+  tileset/castle01_doorway:
+    - - 7
+      - 2
+  tileset/interior_brick_outer_edge_w:
+    - - 24
+      - 12
+    - - 24
+      - 14
+    - - 24
+      - 16
+    - - 24
+      - 18
+    - - 24
+      - 20
+    - - 26
+      - 24
+    - - 26
+      - 26
+    - - 26
+      - 28
+    - - 26
+      - 30
+    - - 26
+      - 32
+    - - 26
+      - 34
+    - - 26
+      - 50
+    - - 26
+      - 52
+    - - 26
+      - 54
+    - - 26
+      - 36
+    - - 26
+      - 38
+    - - 14
+      - 44
+    - - 26
+      - 44
+    - - 14
+      - 46
+    - - 26
+      - 46
+    - - 26
+      - 48
+    - - 14
+      - 2
+    - - 24
+      - 6
+    - - 24
+      - 8
+    - - 24
+      - 10
+  tileset/fancy_carpet_outer_edge_n:
+    - - 14
+      - 30
+    - - 8
+      - 30
+    - - 10
+      - 30
+    - - 12
+      - 30
+  tileset/fancy_carpet_outer_edge_w:
+    - - 6
+      - 32
+    - - 6
+      - 34
+  tileset/shield01:
+    - - 17
+      - 25
+  tileset/interior_brick_inner_edge_ne:
+    - - 0
+      - 12
+    - - 2
+      - 56
+    - - 2
+      - 40
+  tileset/table01:
+    - - 24
+      - 54
+    - - 4
+      - 54
+  tileset/wine_bottle02:
+    - - 24
+      - 53
+  tileset/wine_bottle01:
+    - - 4
+      - 53
+  tileset/bucket_empty:
+    - - 2
+      - 10
+  tileset/wall_interior_brick_outer_edge_sw:
+    - - 24
+      - 24
+    - - 14
+      - 50
+    - - 10
+      - 44
+    - - 14
+      - 6
+  tileset/cabinet_wide04:
+    - - 4
+      - 46
+  tileset/bar_horiz_w:
+    - - 14
+      - 29
+  tileset/interior_tile_base:
+    - - 4
+      - 38
+    - - 4
+      - 40
+    - - 6
+      - 40
+    - - 2
+      - 36
+    - - 4
+      - 36
+    - - 6
+      - 36
+    - - 6
+      - 38
+    - - 8
+      - 36
+    - - 8
+      - 38
+    - - 8
+      - 40
+    - - 10
+      - 40
+    - - 12
+      - 40
+    - - 14
+      - 40
+    - - 10
+      - 42
+    - - 12
+      - 42
+    - - 14
+      - 42
+    - - 16
+      - 42
+    - - 10
+      - 36
+    - - 12
+      - 36
+    - - 14
+      - 36
+    - - 10
+      - 38
+    - - 12
+      - 38
+    - - 14
+      - 38
+    - - 18
+      - 36
+    - - 16
+      - 38
+    - - 18
+      - 38
+    - - 16
+      - 40
+    - - 18
+      - 40
+    - - 20
+      - 36
+    - - 22
+      - 36
+    - - 24
+      - 36
+    - - 20
+      - 38
+    - - 22
+      - 38
+    - - 24
+      - 38
+    - - 26
+      - 38
+    - - 20
+      - 40
+    - - 22
+      - 40
+    - - 24
+      - 40
+    - - 26
+      - 40
+    - - 26
+      - 26
+    - - 24
+      - 28
+    - - 26
+      - 28
+    - - 24
+      - 30
+    - - 26
+      - 30
+    - - 24
+      - 32
+    - - 26
+      - 32
+    - - 24
+      - 34
+    - - 26
+      - 34
+    - - 16
+      - 28
+    - - 18
+      - 28
+    - - 20
+      - 28
+    - - 22
+      - 28
+    - - 16
+      - 30
+    - - 18
+      - 30
+    - - 20
+      - 30
+    - - 22
+      - 30
+    - - 16
+      - 32
+    - - 18
+      - 32
+    - - 20
+      - 32
+    - - 22
+      - 32
+    - - 16
+      - 34
+    - - 18
+      - 34
+    - - 22
+      - 34
+    - - 12
+      - 26
+    - - 14
+      - 26
+    - - 12
+      - 28
+    - - 14
+      - 28
+    - - 12
+      - 30
+    - - 14
+      - 30
+    - - 2
+      - 26
+    - - 4
+      - 26
+    - - 6
+      - 26
+    - - 8
+      - 26
+    - - 10
+      - 26
+    - - 2
+      - 28
+    - - 4
+      - 28
+    - - 6
+      - 28
+    - - 8
+      - 28
+    - - 10
+      - 28
+    - - 2
+      - 30
+    - - 4
+      - 30
+    - - 8
+      - 30
+    - - 10
+      - 30
+    - - 2
+      - 32
+    - - 4
+      - 32
+    - - 2
+      - 34
+    - - 4
+      - 34
+    - - 6
+      - 34
+    - - 16
+      - 36
+    - - 20
+      - 34
+    - - 6
+      - 32
+    - - 6
+      - 30
+  bed_small01:
+    - - 21
+      - 47
+  tileset/bar_horiz_c:
+    - - 6
+      - 29
+    - - 8
+      - 29
+    - - 10
+      - 29
+    - - 12
+      - 29
+  tileset/interior_wood01_base:
+    - - 4
+      - 48
+    - - 4
+      - 50
+    - - 4
+      - 52
+    - - 4
+      - 54
+    - - 6
+      - 48
+    - - 8
+      - 48
+    - - 10
+      - 48
+    - - 12
+      - 48
+    - - 6
+      - 50
+    - - 6
+      - 52
+    - - 6
+      - 54
+    - - 8
+      - 50
+    - - 10
+      - 50
+    - - 8
+      - 52
+    - - 10
+      - 52
+    - - 8
+      - 54
+    - - 10
+      - 54
+    - - 12
+      - 50
+    - - 14
+      - 50
+    - - 16
+      - 50
+    - - 12
+      - 52
+    - - 14
+      - 52
+    - - 16
+      - 52
+    - - 12
+      - 54
+    - - 14
+      - 54
+    - - 16
+      - 54
+    - - 8
+      - 44
+    - - 8
+      - 46
+terrain:
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_dirt
+  - ~
+  - interior_tile
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - fancy_carpet
+  - ~
+  - fancy_carpet
+  - ~
+  - fancy_carpet
+  - ~
+  - fancy_carpet
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - fancy_carpet
+  - ~
+  - fancy_carpet
+  - ~
+  - fancy_carpet
+  - ~
+  - fancy_carpet
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - interior_tile
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - interior_wood01
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - interior_wood01
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - interior_wood01
+  - ~
+  - interior_wood01
+  - ~
+  - interior_wood01
+  - ~
+  - interior_wood01
+  - ~
+  - interior_wood01
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - interior_wood02
+  - ~
+  - interior_wood02
+  - ~
+  - interior_wood02
+  - ~
+  - interior_wood02
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - interior_wood01
+  - ~
+  - interior_wood01
+  - ~
+  - interior_wood01
+  - ~
+  - interior_wood01
+  - ~
+  - interior_wood01
+  - ~
+  - interior_wood01
+  - ~
+  - interior_wood01
+  - ~
+  - interior_wood02
+  - ~
+  - interior_wood02
+  - ~
+  - interior_wood02
+  - ~
+  - interior_wood02
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - interior_wood01
+  - ~
+  - interior_wood01
+  - ~
+  - interior_wood01
+  - ~
+  - interior_wood01
+  - ~
+  - interior_wood01
+  - ~
+  - interior_wood01
+  - ~
+  - interior_wood01
+  - ~
+  - interior_wood02
+  - ~
+  - interior_wood02
+  - ~
+  - interior_wood02
+  - ~
+  - interior_wood02
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - interior_wood01
+  - ~
+  - interior_wood01
+  - ~
+  - interior_wood01
+  - ~
+  - interior_wood01
+  - ~
+  - interior_wood01
+  - ~
+  - interior_wood01
+  - ~
+  - interior_wood01
+  - ~
+  - interior_wood02
+  - ~
+  - interior_wood02
+  - ~
+  - interior_wood02
+  - ~
+  - interior_wood02
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+  - ~
+walls:
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 1
+    - interior_brick
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+  - - 0
+    - ~
+elevation:
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2

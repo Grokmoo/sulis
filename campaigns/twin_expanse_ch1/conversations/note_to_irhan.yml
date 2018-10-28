@@ -1,0 +1,13 @@
+id: note_to_irhan
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=888|This is a note addressed to the mage, Irhan.]
+      
+      You have done well, Irhan.  Rose Lake is even weaker than we thought if they cannot even support Wellswood.
+      
+      I expect to see the town razed to the ground by summer's end.  Then, you will turn your attention directly to Rose Lake.
+    responses:
+      - text: "[c=888|Put down the note.]"

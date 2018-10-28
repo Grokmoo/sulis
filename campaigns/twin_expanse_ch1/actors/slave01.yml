@@ -1,0 +1,55 @@
+---
+id: "slave"
+name: Slave
+race: human
+sex: Male
+portrait: portraits/human10
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
+conversation: ~
+faction: Neutral
+images:
+  Hair: creatures/hair05
+hue: 0.4000
+hair_color:
+  r: 0.33
+  g: 0.33
+  b: 0.33
+  a: 1.0
+skin_color:
+  r: 0.9764705896377564
+  g: 0.95686274766922
+  b: 0.7843137383460999
+  a: 1.0
+inventory:
+  equipped:
+    Legs: { id: legs_pants }
+levels:
+  fighter: 1
+xp: ~
+reward:
+  xp: 8
+  loot: level1_misc
+  loot_chance: 10
+abilities:
+  - armor_light
+  - armor_medium
+  - armor_heavy
+  - weapon_axe
+  - weapon_crossbow
+  - weapon_bow
+  - weapon_small_sword
+  - weapon_large_sword
+  - weapon_spear
+  - weapon_mace
+  - weapon_simple
+  - feint
+  - mighty_blow
+  - backstab
+  - flanker
+ai: ai_basic

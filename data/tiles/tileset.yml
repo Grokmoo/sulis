@@ -673,7 +673,8 @@ uniform_sets:
       wine_bottle02, lantern_off, ropes01, wall_crack01, papers, bottles01, bottles02, bottles03,
       book01, papers02, book02, meat01, meat02, fish01, fish02, fish03,
       veg01, veg02, veg03, veg04, veg05, veg06,
-      castle01_window01, shield01, shield02, swords01, swords02
+      castle01_window01, shield01, shield02, swords01, swords02,
+      cobwebs_nw, cobwebs_ne
     ]
   decoration2by1:
     layer: decoration
@@ -880,6 +881,55 @@ uniform_sets:
       wood_inner_edge_nw, wood_inner_edge_ne, wood_inner_edge_ne_sw, wood_inner_edge_nw_se,
     ]
 non_uniform_sets:
+  dungeon_bars:
+    layer: walls_aerial
+    size: [2, 2]
+    sprite_prefix: "tileset/dungeon_bars_"
+    tiles:
+      e:
+        impass: [[1, 0], [1, 1]]
+        invis: []
+      w:
+        impass: [[0, 0], [0, 1]]
+        invis: []
+      ne:
+        impass: []
+        invis: []
+      nw:
+        impass: []
+        invis: []
+      n:
+        impass: []
+        invis: []
+      se:
+        impass: [[1, 0], [1, 1]]
+        invis: []
+      sw:
+        impass: [[0, 0], [0, 1]]
+        invis: []
+      header:
+        impass: []
+        invis: []
+      corner_ne:
+        impass: [[1, 0], [1, 1]]
+        invis: []
+      corner_nw:
+        impass: [[0, 0], [0, 1]]
+        invis: []
+  dungeon_bars_below:
+    layer: walls
+    size: [2, 2]
+    sprite_prefix: "tileset/dungeon_bars_"
+    tiles:
+      corner_se:
+        impass: [[1, 0], [1, 1]]
+        invis: []
+      corner_sw:
+        impass: [[0, 0], [0, 1]]
+        invis: []
+      s:
+        impass: [[0, 0], [1, 0], [0, 1], [1, 1]]
+        invis: []
   castle01:
     layer: walls_aerial
     size: [2, 2]

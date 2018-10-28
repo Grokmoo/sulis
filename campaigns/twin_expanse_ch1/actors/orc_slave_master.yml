@@ -1,0 +1,36 @@
+id: orc_slave_master
+ai: ai_basic
+name: Orc Slavemaster
+faction: Hostile
+images: {}
+race: orc
+attributes:
+  str: 12
+  dex: 10
+  end: 10
+  per: 10
+  int: 12
+  wis: 10
+levels:
+  fighter: 7
+inventory:
+  equipped:
+    HeldMain: { id: greatsword }
+reward:
+  xp: 30
+  loot: level1_misc
+  loot_chance: 35
+abilities:
+  - armor_light
+  - armor_medium
+  - armor_heavy
+  - weapon_axe
+  - weapon_crossbow
+  - weapon_bow
+  - weapon_small_sword
+  - weapon_large_sword
+  - weapon_spear
+  - weapon_mace
+  - weapon_simple
+  - mighty_blow
+  - powerful_blows

@@ -58,6 +58,6 @@ function apply_effect(parent, ability, targets)
                                   anim:dist_param(anim:fixed_dist(0.0), anim:uniform_dist(1.0, 1.5)))
   anim:set_particle_duration_dist(anim:fixed_dist(1.2))
   anim:set_color(anim:param(0.0), anim:param(1.0), anim:param(0.1), anim:param(0.5))
-  effect:add_anim(gen)
+  effect:add_anim(anim)
   effect:apply()
 end

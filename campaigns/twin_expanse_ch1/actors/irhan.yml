@@ -1,0 +1,41 @@
+---
+id: "irhan"
+name: Irhan
+race: human
+sex: Male
+portrait: portraits/human21
+attributes:
+  str: 10
+  dex: 10
+  end: 13
+  per: 12
+  int: 18
+  wis: 13
+conversation: ~
+faction: Hostile
+images:
+  Foreground: empty
+  Background: creatures/human_mage01
+hue: 0.4
+hair_color:
+  r: 0.85
+  g: 0.53
+  b: 0.098
+  a: 1.0
+skin_color:
+  r: 0.9764705896377564
+  g: 0.95686274766922
+  b: 0.7843137383460999
+  a: 1.0
+inventory: {}
+levels:
+  mage: 10
+abilities:
+  - weapon_simple
+  - weapon_crossbow
+  - fireball
+  - fire_shield
+  - chameleon
+  - heal
+  - petrify
+ai: ai_basic

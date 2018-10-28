@@ -801,8 +801,28 @@ groups:
       bridge_column_w_water: [4, 2, 1, 1]
       bridge_column_mid_water: [5, 2, 1, 1]
       bridge_column_e_water: [6, 2, 1, 1]
+  dungeon:
+    position: [32, 20]
+    size: [1, 1]
+    areas:
+      cobwebs_nw: [0, 0]
+      cobwebs_ne: [0, 1]
+      dungeon_bars_e: [1, 0]
+      dungeon_bars_w: [2, 0]
+      dungeon_bars_ne: [1, 1]
+      dungeon_bars_n: [2, 1]
+      dungeon_bars_nw: [3, 1]
+      dungeon_bars_se: [1, 2]
+      dungeon_bars_s: [2, 2]
+      dungeon_bars_sw: [3, 2]
+      
+      dungeon_bars_corner_ne: [4, 2]
+      dungeon_bars_header: [5, 2]
+      dungeon_bars_corner_nw: [6, 2]
+      dungeon_bars_corner_se: [4, 3]
+      dungeon_bars_corner_sw: [6, 3]
   shrooms_and_rocks:
-    position: [32, 22]
+    position: [32, 24]
     size: [2, 1]
     areas:
       mushroom01: [0, 0]

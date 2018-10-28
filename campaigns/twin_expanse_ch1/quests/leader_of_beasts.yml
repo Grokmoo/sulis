@@ -16,3 +16,6 @@ entries:
   fortress_found:
     description: |
       I have found the location of a large fortress hidden deep in the Serpent's Mire.  The leader of the raiders will likely be found within.
+  leader_defeated:
+    description: |
+      I have defeated the one who brough the tribes together, a powerful mage called Irhan.  Disturbingly, I have learned that he intended to destroy Wellswood and attack Rose Lake directly.  I should bring this information to the mayor of Wellswood.

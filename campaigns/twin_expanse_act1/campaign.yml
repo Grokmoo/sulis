@@ -1,11 +1,11 @@
-id: twin_expanse_ch1
+id: twin_expanse_act1
 starting_area: farmhouse01
 starting_location: [10, 13]
-name: "The Twin Expanse - Chapter 1"
+name: "The Twin Expanse - Act 1"
 description: |
   After narrowly escaping a large goblin warband and an accidental avalanche, you awaken on the outskirks of Wellswood village.
   
-  This is intended for a character who has completed the Prologue.  New characters may also be used - they will be given an appropriate level of experience and money to start the module.
+  This is intended for a character who has completed the Prologue.  New characters may also be used - they will be given an appropriate level of experience and money to start the campaign.
 backstory_conversation: backstory
 max_starting_level: 8
 world_map:

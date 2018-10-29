@@ -133,3 +133,18 @@ function priest_rest(parent)
   game:fade_out_in()
   game:init_party_day()
 end
+
+function get_rose_lake_pass(parent)
+  game:add_party_xp(500)
+  game:add_party_coins(5000)
+  
+  game:set_quest_entry_state("entering_rose_lake", "got_pass", "Visible")
+  game:set_quest_state("entering_rose_lake", "Complete")
+  
+  game:set_quest_entry_state("leader_of_beasts", "complete", "Visible")
+  game:set_quest_state("leader_of_beasts", "Complete")
+  
+  game:add_party_item("rose_lake_pass")
+  
+  game:player():set_flag("leader_of_beasts_reported")
+end

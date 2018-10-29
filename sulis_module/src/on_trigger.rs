@@ -53,6 +53,7 @@ pub struct NumFlagData {
 pub enum OnTrigger {
     PlayerCoins(i32),
     PartyMember(String),
+    PartyItem(String),
     PlayerNumFlag(NumFlagData),
     TargetNumFlag(NumFlagData),
     NotPlayerNumFlag(NumFlagData),

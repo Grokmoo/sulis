@@ -10,5 +10,6 @@ entries:
   mayor_fenk_ask_pass:
     description: |
       Mayor Fenk will provide me with a pass if I stop the raids currently plaguing Wellswood.
-      
-      [c=f00|Note] This quest cannot be progressed any further until a later game update.
+  got_pass:
+    description: |
+      Mayor Fenk provided me with a pass I can use to enter Rose Lake.

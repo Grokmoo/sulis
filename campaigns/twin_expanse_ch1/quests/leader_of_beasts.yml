@@ -19,3 +19,6 @@ entries:
   leader_defeated:
     description: |
       I have defeated the one who brough the tribes together, a powerful mage called Irhan.  Disturbingly, I have learned that he intended to destroy Wellswood and attack Rose Lake directly.  I should bring this information to the mayor of Wellswood.
+  complete:
+    description: |
+      I reported my success to the mayor of Wellswood.

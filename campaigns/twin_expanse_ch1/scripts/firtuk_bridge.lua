@@ -10,3 +10,7 @@ end
 function mayor_fenk_ask_pass(parent)
   game:set_quest_entry_state("entering_rose_lake", "mayor_fenk_ask_pass", "Visible")
 end
+
+function exit_to_rose_lake(parent)
+  game:set_world_map_location_enabled("rose_lake", true)
+end

@@ -32,6 +32,8 @@ nodes:
           - not_target_flag: tervald_notified
       - text: "What's this about the raids?"
         to: raids
+        to_view:
+          - not_player_flag: leader_of_beasts_defeated
       - text: "What do you know about crime in Wellswood?"
         to: crime
         to_view:
@@ -44,7 +46,36 @@ nodes:
         to: ask_pass
         to_view:
           - player_flag: rose_lake_bridge_pass
+      - text: "The one responsible for organizing the raids is dead."
+        to: raids_complete
+        to_view:
+          - player_flag: leader_of_beasts_defeated
+          - not_player_flag: leader_of_beasts_reported
       - text: "Nothing, farewell."
+  raids_complete:
+    text: "That is wonderful news.  Tell me the details!"
+    responses:
+      - text: "[c=888|Tell him of Irhan and the note with the plans to destroy Wellswood.]"
+        to: raids_complete2
+  raids_complete2:
+    text: |
+      We are fortunate you were able to deal with Irhan before he completed his plans.
+      
+      But this news worries me greatly.  It sounds like there is some larger plot at work.
+    responses:
+      - text: "[c=888|Continue]"
+        to: raids_complete3
+  raids_complete3:
+    text: |
+      Take this pass.  It will allow you to enter Rose Lake.  Bring what you know to the Council of Five.  They will know how to handle this.
+      
+      Oh, and don't forget your reward.
+    on_view:
+      - fire_script:
+          id: wellswood
+          func: get_rose_lake_pass
+    responses:
+      - text: "Thank you.  Farewell."
   ask_pass:
     text: "I'm afraid its not so simple.  I can only provide a pass if you are on official government business."
     responses:

@@ -234,7 +234,7 @@ visibility_tile: gui/area_invis
 explored_tile: gui/area_unexplored
 max_vis_distance: 12
 max_vis_up_one_distance: 6
-world_map_location: ~
+world_map_location: serpents_mire
 on_rest:
   Disabled:
     message: There are too many enemies about.  You may not rest here.

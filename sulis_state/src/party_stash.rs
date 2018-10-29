@@ -56,6 +56,16 @@ impl PartyStash {
         self.listeners.notify(&self);
     }
 
+    /// Returns whether or not this stash has at least one item
+    /// with the specified ID
+    pub fn has_item(&self, id: &str) -> bool {
+        for (_, ref item) in self.items.iter() {
+            if item.item.id == id { return true; }
+        }
+
+        false
+    }
+
     #[must_use]
     /// Removes one item from the specified index.  returns it if there
     /// was an item to remove

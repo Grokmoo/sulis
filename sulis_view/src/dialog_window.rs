@@ -23,7 +23,7 @@ use sulis_core::io::{event};
 use sulis_widgets::{Label, TextArea};
 use sulis_module::{Actor, OnTrigger, MerchantData, Conversation,
     conversation::{Response}, Module, on_trigger};
-use sulis_state::{EntityState, ChangeListener, GameState,
+use sulis_state::{EntityState, ChangeListener, GameState, ItemState,
     area_feedback_text::ColorKind, NextGameStep, script::entity_with_id};
 
 use {character_window, CutsceneWindow, RootView, GameOverWindow, LoadingScreen,
@@ -226,6 +226,10 @@ pub fn is_match(on_trigger: &Vec<OnTrigger>, pc: &Rc<RefCell<EntityState>>,
             PartyMember(ref id) => {
                 if !GameState::has_party_member(id) { return false; }
             },
+            PartyItem(ref id) => {
+                let stash = GameState::party_stash();
+                if !stash.borrow().has_item(id) { return false; }
+            },
             TargetNumFlag(ref data) => {
                 if target.borrow().get_num_flag(&data.flag) < data.val { return false; }
             },
@@ -303,6 +307,13 @@ pub fn activate(widget: &Rc<RefCell<Widget>>, on_select: &Vec<OnTrigger>,
                     None => warn!("Attempted to add party member '{}' but entity does not exist",
                                   id),
                     Some(entity) => GameState::add_party_member(entity),
+                }
+            },
+            PartyItem(ref id) => {
+                let stash = GameState::party_stash();
+                match ItemState::from(id) {
+                    None => warn!("Attempted to add item '{}' but it does not exist", id),
+                    Some(item) => stash.borrow_mut().add_item(1, item),
                 }
             },
             TargetNumFlag(ref data) => {

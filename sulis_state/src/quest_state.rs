@@ -21,7 +21,7 @@ use {ChangeListenerList, save_state::QuestSaveState};
 
 pub struct QuestStateSet {
     quests: HashMap<String, QuestState>,
-    current_quest: Option<String>,
+    current_quest: Vec<String>, // the order that quests have been updated, most recent last
 
     pub listeners: ChangeListenerList<QuestStateSet>,
 }
@@ -50,13 +50,17 @@ impl QuestStateSet {
 
         QuestStateSet {
             quests,
-            current_quest: None,
+            current_quest: Vec::new(),
             listeners: ChangeListenerList::default()
         }
     }
 
-    pub fn current_quest(&self) -> &Option<String> {
-        &self.current_quest
+    pub(crate) fn current_quest_stack(&self) -> Vec<String> {
+        self.current_quest.clone()
+    }
+
+    pub fn current_quest(&self) -> Option<&String> {
+        self.current_quest.last()
     }
 
     pub fn quest(&self, quest: &str) -> Option<&QuestState> {
@@ -91,7 +95,18 @@ impl QuestStateSet {
     }
 
     fn set_current_quest_and_notify(&mut self, quest: &str) {
-        self.current_quest = Some(quest.to_string());
+        self.current_quest.retain(|id| id != quest);
+
+        match self.quests.get(quest).unwrap().state {
+            EntryState::Complete | EntryState::Hidden => {
+                // don't add the current quest as active since it isn't
+                // displayed in the window by default
+            },
+            EntryState::Visible | EntryState::Active => {
+                self.current_quest.push(quest.to_string());
+            }
+        };
+
         self.listeners.notify(&self);
     }
 

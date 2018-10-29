@@ -80,7 +80,7 @@ impl SaveState {
         let stash = stash.borrow().save();
 
         let quest_state = GameState::quest_state();
-        let current_quest = quest_state.current_quest().clone();
+        let current_quest = quest_state.current_quest_stack();
         let mut quests = Vec::new();
         for (_, quest_state) in quest_state.into_iter() {
             quests.push(quest_state);
@@ -116,7 +116,7 @@ impl SaveState {
 #[serde(deny_unknown_fields)]
 pub struct QuestSaveState {
     pub(crate) quests: Vec<QuestState>,
-    pub(crate) current_quest: Option<String>,
+    pub(crate) current_quest: Vec<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

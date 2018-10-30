@@ -176,7 +176,14 @@ impl Spritesheet {
                     }
 
                 let sprite = Rc::new(sprite);
-                if let Some(scale) = builder.simple_image_gen_scale {
+
+                // default to group scale, then fallback to overall sheet scale
+                // if neither are defined, don't gen images
+                let mut scale = group.simple_image_gen_scale;
+                if scale.is_none() {
+                    scale = builder.simple_image_gen_scale;
+                }
+                if let Some(scale) = scale {
                     let scale = scale as i32;
                     let full_id = format!("{}/{}", builder.id, id);
                     let simple_image = SimpleImage {
@@ -228,6 +235,7 @@ struct SpritesheetGroup {
     pub prefix: Option<String>,
     pub areas: Option<HashMap<String, Vec<i32>>>,
     pub from_template: Option<String>,
+    pub simple_image_gen_scale: Option<u32>,
 }
 
 impl SpritesheetGroup {

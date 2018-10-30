@@ -1,6 +1,7 @@
 id: rusty
 name: Rusty
 name_prefix: "Rusty "
+item_status_icon: gui/status_negative
 value_modifier: 0.5
 bonus_modifier: 0.9
 penalty_modifier: 1.1

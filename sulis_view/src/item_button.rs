@@ -23,7 +23,7 @@ use sulis_core::io::event;
 use sulis_core::ui::{Callback, Widget, WidgetKind, WidgetState};
 use sulis_rules::bonus::{AttackBuilder, AttackKindBuilder, Contingent};
 use sulis_rules::{Bonus, BonusList, Armor, DamageKind, QuickSlot, Slot};
-use sulis_module::{ability, item::{format_item_value, format_item_weight}, Module, PrereqList};
+use sulis_module::{ability, Item, item::{format_item_value, format_item_weight}, Module, PrereqList};
 use sulis_state::{EntityState, GameState, ItemState, inventory::has_proficiency};
 use sulis_state::script::ScriptItemKind;
 use sulis_widgets::{Label, TextArea};
@@ -39,6 +39,7 @@ enum Kind {
 
 pub struct ItemButton {
     icon: String,
+    adjective_icons: Vec<String>,
     quantity: u32,
     kind: Kind,
     actions: Vec<(String, Callback)>,
@@ -49,37 +50,42 @@ pub struct ItemButton {
 const ITEM_BUTTON_NAME: &str = "item_button";
 
 impl ItemButton {
-    pub fn inventory(icon: String, quantity: u32, item_index: usize) -> Rc<RefCell<ItemButton>> {
-        ItemButton::new(icon, quantity, Kind::Inventory { item_index })
+    pub fn inventory(item: &Rc<Item>, quantity: u32,
+                     item_index: usize) -> Rc<RefCell<ItemButton>> {
+        ItemButton::new(item, quantity, Kind::Inventory { item_index })
     }
 
-    pub fn equipped(player: &Rc<RefCell<EntityState>>, icon: String,
+    pub fn equipped(player: &Rc<RefCell<EntityState>>, item: &Rc<Item>,
                     slot: Slot) -> Rc<RefCell<ItemButton>> {
         let player = Rc::clone(player);
-        ItemButton::new(icon, 1, Kind::Equipped { player, slot })
+        ItemButton::new(item, 1, Kind::Equipped { player, slot })
     }
 
-    pub fn quick(player: &Rc<RefCell<EntityState>>, quantity: u32, icon: String,
+    pub fn quick(player: &Rc<RefCell<EntityState>>, quantity: u32, item: &Rc<Item>,
                  quick: QuickSlot) -> Rc<RefCell<ItemButton>> {
         let player = Rc::clone(player);
-        ItemButton::new(icon, quantity, Kind::Quick { player, quick })
+        ItemButton::new(item, quantity, Kind::Quick { player, quick })
     }
 
-    pub fn prop(icon: String, quantity: u32, item_index: usize,
+    pub fn prop(item: &Rc<Item>, quantity: u32, item_index: usize,
                 prop_index: usize) -> Rc<RefCell<ItemButton>> {
-        ItemButton::new(icon, quantity,
+        ItemButton::new(item, quantity,
                         Kind::Prop { prop_index, item_index })
     }
 
-    pub fn merchant(icon: String, quantity: u32, item_index: usize,
+    pub fn merchant(item: &Rc<Item>, quantity: u32, item_index: usize,
                     merchant_id: &str) -> Rc<RefCell<ItemButton>> {
-        ItemButton::new(icon, quantity,
+        ItemButton::new(item, quantity,
                         Kind::Merchant { id: merchant_id.to_string(), item_index })
     }
 
-    fn new(icon: String, quantity: u32, kind: Kind) -> Rc<RefCell<ItemButton>> {
+    fn new(item: &Rc<Item>, quantity: u32, kind: Kind) -> Rc<RefCell<ItemButton>> {
+        let icon = item.icon.id();
+        let adjective_icons = item.adjective_icons();
+
         Rc::new(RefCell::new(ItemButton {
             icon,
+            adjective_icons,
             quantity,
             kind,
             actions: Vec::new(),
@@ -211,7 +217,14 @@ impl WidgetKind for ItemButton {
         let icon = Widget::empty("icon");
         icon.borrow_mut().state.add_text_arg("icon", &self.icon);
 
-        vec![icon, qty_label]
+        let adj = Widget::empty("adjectives_pane");
+        for icon in self.adjective_icons.iter() {
+            let widget = Widget::empty("icon");
+            widget.borrow_mut().state.add_text_arg("icon", icon);
+            Widget::add_child_to(&adj, widget);
+        }
+
+        vec![icon, adj, qty_label]
     }
 
     fn on_mouse_enter(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {

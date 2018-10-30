@@ -1,6 +1,7 @@
 id: fine
 name: Fine
 name_prefix: "Fine "
+item_status_icon: gui/status_positive
 value_modifier: 1.5
 bonus_modifier: 1.1
 penalty_modifier: 0.9

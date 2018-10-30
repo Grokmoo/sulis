@@ -1,6 +1,7 @@
 id: worn
 name: Worn
 name_prefix: "Worn "
+item_status_icon: gui/status_negative
 value_modifier: 0.6
 bonus_modifier: 0.9
 penalty_modifier: 1.10

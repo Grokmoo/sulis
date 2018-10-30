@@ -136,6 +136,15 @@ children:
         foreground: "#icon#"
         width_relative: Max
         height_relative: Max
+      adjectives_pane:
+        preferred_size: [0, 4]
+        width_relative: ChildSum
+        x_relative: Max
+        layout: BoxHorizontal
+        children:
+          icon:
+            foreground: "#icon#"
+            preferred_size: [4, 4]
   progress_bar:
     background: bg_base
     border: [1, 1, 1, 1]

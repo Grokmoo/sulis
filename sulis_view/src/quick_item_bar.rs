@@ -92,7 +92,7 @@ fn create_button(entity: &Rc<RefCell<EntityState>>, slot: QuickSlot,
         }, Some(item_state) => {
             let quantity = 1 + stash.borrow().items().get_quantity(&item_state);
             let kind = ScriptItemKind::Quick(slot);
-            let button = ItemButton::quick(entity, quantity, item_state.item.icon.id(), slot);
+            let button = ItemButton::quick(entity, quantity, &item_state.item, slot);
             button.borrow_mut().add_action("Use", use_item_cb(entity, kind));
             button.borrow_mut().add_action("Clear Slot", clear_quickslot_cb(entity, slot));
             let widget = Widget::with_theme(button.clone(), theme_id);

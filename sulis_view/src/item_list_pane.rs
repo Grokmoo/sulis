@@ -106,7 +106,7 @@ impl ItemListPane {
         for (index, &(qty, ref item)) in merchant.items().iter().enumerate() {
             if !self.cur_filter.get().is_allowed(&item.item) { continue; }
 
-            let item_button = ItemButton::merchant(item.item.icon.id(), qty, index, merchant_id);
+            let item_button = ItemButton::merchant(&item.item, qty, index, merchant_id);
             item_button.borrow_mut().add_action("Buy", buy_item_cb(merchant_id, index));
 
             scrollpane.borrow().add_to_content(Widget::with_defaults(item_button));
@@ -130,7 +130,7 @@ impl ItemListPane {
                 for (index, &(qty, ref item)) in items.iter().enumerate() {
                     if !self.cur_filter.get().is_allowed(&item.item) { continue; }
 
-                    let item_button = ItemButton::prop(item.item.icon.id(), qty, index, prop_index);
+                    let item_button = ItemButton::prop(&item.item, qty, index, prop_index);
                     if !combat_active {
                         item_button.borrow_mut()
                             .add_action("Take", take_item_cb(prop_index, index));
@@ -156,7 +156,7 @@ impl ItemListPane {
         for (index, &(quantity, ref item)) in stash.items().iter().enumerate() {
             if !self.cur_filter.get().is_allowed(&item.item) { continue; }
 
-            let item_but = ItemButton::inventory(item.item.icon.id(), quantity, index);
+            let item_but = ItemButton::inventory(&item.item, quantity, index);
 
             if let Some(ref usable) = item.item.usable {
                 if !combat_active && item.item.meets_prereqs(&actor.actor) {
@@ -212,7 +212,7 @@ impl WidgetKind for ItemListPane {
                 };
                 let amount = GameState::party_coins() as f32 /
                     Module::rules().item_value_display_factor;
-                let button = ItemButton::inventory(coins_item.icon.id(), amount as u32, 0);
+                let button = ItemButton::inventory(&coins_item, amount as u32, 0);
                 let coins_button = Widget::with_theme(button, "coins_button");
                 coins_button.borrow_mut().state.set_enabled(false);
                 children.push(coins_button);

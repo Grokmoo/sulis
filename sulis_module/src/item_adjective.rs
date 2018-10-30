@@ -14,6 +14,10 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::rc::Rc;
+
+use sulis_core::resource::deserialize_image;
+use sulis_core::image::Image;
 use sulis_rules::{BonusList, AttackBonuses};
 
 /// An adjective is a modifier that affects the stats of
@@ -24,6 +28,9 @@ use sulis_rules::{BonusList, AttackBonuses};
 pub struct ItemAdjective {
     pub id: String,
     pub name: String,
+
+    #[serde(deserialize_with = "deserialize_image")]
+    pub item_status_icon: Rc<Image>,
 
     pub name_prefix: Option<String>,
     pub name_postfix: Option<String>,

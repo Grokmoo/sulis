@@ -39,6 +39,7 @@ use std::hash::Hash;
 use std::fs;
 use std::path::PathBuf;
 
+use serde::{Deserialize, Deserializer, de::self};
 use serde_yaml;
 
 use config::Config;
@@ -277,4 +278,14 @@ pub fn subdirs<P: AsRef<Path>>(path: P) -> Result<Vec<PathBuf>, Error> {
     }
 
     Ok(result)
+}
+
+pub fn deserialize_image<'de, D>(deserializer: D) -> Result<Rc<Image>, D::Error>
+    where D: Deserializer<'de> {
+
+    let id = String::deserialize(deserializer)?;
+    match ResourceSet::get_image(&id) {
+        None => Err(de::Error::custom(format!("No image with ID '{}' found", id))),
+        Some(image) => Ok(image),
+    }
 }

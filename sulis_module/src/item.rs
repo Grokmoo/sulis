@@ -225,6 +225,11 @@ impl Item {
         })
     }
 
+    pub fn adjective_icons(&self) -> Vec<String> {
+        self.builder_adjectives.iter().chain(self.added_adjectives.iter())
+            .map(|adj| adj.item_status_icon.id()).collect()
+    }
+
     pub fn meets_prereqs(&self, actor: &Rc<Actor>) -> bool {
         match self.prereqs {
             None => true,

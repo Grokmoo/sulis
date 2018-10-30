@@ -1,0 +1,15 @@
+id: helm_hood
+name: Hood
+icon: inventory/helm_robes01
+equippable:
+  slot: Head
+  bonuses: []
+image:
+  Head:
+    creatures/helm_hood
+  Hair:
+    empty
+  Ears:
+    empty
+weight: 10
+value: 4

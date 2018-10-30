@@ -257,10 +257,12 @@ impl BuilderSet for CharacterCreator {
             abilities.push(ability.id.to_string());
         }
 
-        let inventory = match builder.inventory {
+        let mut inventory = match builder.inventory {
             None => InventoryBuilder::default(),
             Some(ref inv) => inv.clone(),
         };
+
+        inventory.remove_invalid_items(&builder.race.as_ref().unwrap());
 
         let actor = ActorBuilder {
             id: id.to_string(),

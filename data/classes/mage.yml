@@ -193,8 +193,9 @@ kits:
       equipped:
         HeldMain: { id: quarterstaff }
         Feet: { id: boots_leather }
-        Torso: { id: torso_shirt }
+        Torso: { id: torso_robe }
         Legs: { id: legs_pants }
+        Head: { id: helm_hood }
       quick:
         Usable1: { id: potion_healing }
         Usable2: { id: potion_mind }

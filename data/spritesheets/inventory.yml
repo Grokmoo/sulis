@@ -168,6 +168,8 @@ groups:
       weapon_sword03: [9, 1]
       weapon_bow02: [10, 1]
       
+      helm_hat01: [8, 2]
+      
       gloves_robes01: [8, 3]
       boots_robes01: [9, 3]
       helm_robes01: [10, 3]

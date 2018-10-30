@@ -1,0 +1,11 @@
+id: torso_robe
+name: Robe
+icon: inventory/torso_robes01
+equippable:
+  slot: Torso
+  bonuses: []
+image:
+  Torso:
+    creatures/torso_robe
+weight: 100
+value: 15

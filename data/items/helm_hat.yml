@@ -1,0 +1,13 @@
+id: helm_hat
+name: Hat
+icon: inventory/helm_hat01
+equippable:
+  slot: Head
+  bonuses: []
+image:
+  Head:
+    creatures/helm_hat
+  Ears:
+    empty
+weight: 10
+value: 4

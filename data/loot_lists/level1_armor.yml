@@ -7,6 +7,18 @@ generate:
   2: 2
   3: 1
 weighted_entries:
+  torso_robe:
+    weight: 10
+    adjective1:
+      none: 5
+  helm_hood:
+    weight: 10
+    adjective1:
+      none: 5
+  helm_hat:
+    weight: 10
+    adjective1:
+      none: 5
   boots_leather:
     weight: 10
     adjective1:

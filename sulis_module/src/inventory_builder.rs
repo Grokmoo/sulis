@@ -18,7 +18,7 @@ use std::rc::Rc;
 use std::collections::HashMap;
 
 use sulis_rules::{Slot, QuickSlot};
-use {Item, Module};
+use {Item, Module, Race};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
@@ -97,6 +97,12 @@ impl InventoryBuilder {
             quick,
             pc_starting_coins,
             pc_starting_items,
+        }
+    }
+
+    pub fn remove_invalid_items(&mut self, race: &Rc<Race>) {
+        for slot in race.disabled_slots.iter() {
+            self.equipped.remove(slot);
         }
     }
 

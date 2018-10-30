@@ -131,6 +131,7 @@ kits:
         Torso: { id: torso_leather }
         Legs: { id: legs_leather }
         Hands: { id: gloves_leather }
+        Head: { id: helm_hat }
       quick:
         Usable1: { id: potion_healing }
         Usable2: { id: potion_power }
@@ -153,6 +154,7 @@ kits:
         Torso: { id: torso_leather }
         Legs: { id: legs_pants }
         Hands: { id: gloves_leather }
+        Head: { id: helm_hat }
       quick:
         Usable1: { id: potion_healing }
         Usable2: { id: potion_power }
@@ -176,6 +178,7 @@ kits:
         Torso: { id: torso_leather }
         Legs: { id: legs_leather }
         Hands: { id: gloves_leather }
+        Head: { id: helm_hood }
         Cloak: { id: cloak }
       quick:
         Usable1: { id: potion_healing }

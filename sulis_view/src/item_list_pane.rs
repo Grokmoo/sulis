@@ -107,7 +107,7 @@ impl ItemListPane {
             if !self.cur_filter.get().is_allowed(&item.item) { continue; }
 
             let item_button = ItemButton::merchant(&item.item, qty, index, merchant_id);
-            item_button.borrow_mut().add_action("Buy", buy_item_cb(merchant_id, index));
+            item_button.borrow_mut().add_action("Buy", buy_item_cb(merchant_id, index), true);
 
             scrollpane.borrow().add_to_content(Widget::with_defaults(item_button));
         }
@@ -133,7 +133,7 @@ impl ItemListPane {
                     let item_button = ItemButton::prop(&item.item, qty, index, prop_index);
                     if !combat_active {
                         item_button.borrow_mut()
-                            .add_action("Take", take_item_cb(prop_index, index));
+                            .add_action("Take", take_item_cb(prop_index, index), true);
                     }
                     scrollpane.borrow().add_to_content(Widget::with_defaults(item_button));
                 }
@@ -162,10 +162,11 @@ impl ItemListPane {
                 if !combat_active && item.item.meets_prereqs(&actor.actor) {
                     let mut but = item_but.borrow_mut();
                     if usable.use_in_slot {
-                        but.add_action("Add to Use Slot", set_quickslot_cb(&self.entity, index));
+                        but.add_action("Add to Use Slot",
+                            set_quickslot_cb(&self.entity, index), true);
                     } else {
                         let kind = ScriptItemKind::Stash(index);
-                        but.add_action("Use", use_item_cb(&self.entity, kind));
+                        but.add_action("Use", use_item_cb(&self.entity, kind), true);
                     }
                 }
             }
@@ -174,12 +175,13 @@ impl ItemListPane {
                 if !combat_active && has_proficiency(&item, &actor.stats) &&
                     !actor.actor.race.is_disabled(equip.slot) &&
                     item.item.meets_prereqs(&actor.actor) {
-                    item_but.borrow_mut().add_action("Equip", equip_item_cb(&self.entity, index));
+                    item_but.borrow_mut().add_action("Equip",
+                        equip_item_cb(&self.entity, index), true);
                 }
             }
 
             if !combat_active {
-                item_but.borrow_mut().add_action("Drop", drop_item_cb(&self.entity, index));
+                item_but.borrow_mut().add_action("Drop", drop_item_cb(&self.entity, index), false);
             }
 
             scrollpane.borrow().add_to_content(Widget::with_defaults(item_but));

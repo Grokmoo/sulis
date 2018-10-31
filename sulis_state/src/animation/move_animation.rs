@@ -68,7 +68,7 @@ pub (in animation) fn update(mover: &Rc<RefCell<EntityState>>, marked_for_remova
     model.last_frame_index = frame_index as i32;
 
     let p = model.path[frame_index];
-    let area_state = GameState::area_state();
+    let area_state = GameState::get_area_state(&mover.borrow().location.area_id).unwrap();
     if !area_state.borrow_mut().move_entity(mover, p.x, p.y, move_ap as u32) {
         marked_for_removal.set(true);
         return;

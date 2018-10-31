@@ -81,9 +81,17 @@ impl WidgetKind for InventoryWindow {
         let close = Widget::with_theme(Button::empty(), "close");
         close.borrow_mut().state.add_callback(Callback::remove_parent());
 
+        let swap_weapons = Widget::with_theme(Button::empty(), "swap_weapons");
+        let entity_ref = Rc::clone(&self.entity);
+        swap_weapons.borrow_mut().state.add_callback(Callback::new(Rc::new(move |_, _| {
+            entity_ref.borrow_mut().actor.swap_weapon_set();
+        })));
+        swap_weapons.borrow_mut().state.set_enabled(self.entity.borrow().actor.can_swap_weapons());
+
         let ref actor = self.entity.borrow().actor;
 
-        let item_list_pane = Widget::with_defaults(ItemListPane::new_entity(&self.entity, &self.filter));
+        let item_list_pane = Widget::with_defaults(ItemListPane::new_entity(&self.entity,
+                                                                            &self.filter));
 
         let equipped_area = Widget::empty("equipped_area");
         for slot in Slot::iter() {
@@ -98,14 +106,15 @@ impl WidgetKind for InventoryWindow {
                     let button = ItemButton::equipped(&self.entity, &item_state.item, *slot);
                     if !combat_active {
                         let mut but = button.borrow_mut();
-                        but.add_action("Unequip", unequip_item_cb(&self.entity, *slot));
-                        but.add_action("Drop", unequip_and_drop_item_cb(&self.entity, *slot));
+                        but.add_action("Unequip", unequip_item_cb(&self.entity, *slot), true);
+                        but.add_action("Drop", unequip_and_drop_item_cb(&self.entity, *slot), false);
                     }
 
                     Widget::add_child_to(&equipped_area, Widget::with_theme(button, &theme_id));
                 }
             }
         }
+        Widget::add_child_to(&equipped_area, swap_weapons);
 
         for quick_slot in QuickSlot::iter() {
             let theme_id = format!("{:?}_button", quick_slot).to_lowercase();
@@ -122,11 +131,11 @@ impl WidgetKind for InventoryWindow {
 
                     if actor.can_use_quick(*quick_slot) {
                         let kind = ScriptItemKind::Quick(*quick_slot);
-                        but.borrow_mut().add_action("Use", use_item_cb(&self.entity, kind));
+                        but.borrow_mut().add_action("Use", use_item_cb(&self.entity, kind), true);
                     }
 
                     but.borrow_mut().add_action("Clear Slot",
-                                                clear_quickslot_cb(&self.entity, *quick_slot));
+                        clear_quickslot_cb(&self.entity, *quick_slot), false);
 
                     Widget::add_child_to(&equipped_area, Widget::with_theme(but, &theme_id));
                 }

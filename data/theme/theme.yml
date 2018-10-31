@@ -700,6 +700,13 @@ children:
         preferred_size: [96, 96]
         position: [2, 2]
         children:
+          swap_weapons:
+            from: .button
+            foreground: swap_weapons
+            preferred_size: [7, 7]
+            position: [36, 44]
+            custom:
+              tooltip: "Swap Weapon Set"
           cloak_button:
             from: .item_button
             position: [66, 12]

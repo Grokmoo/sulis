@@ -93,8 +93,8 @@ fn create_button(entity: &Rc<RefCell<EntityState>>, slot: QuickSlot,
             let quantity = 1 + stash.borrow().items().get_quantity(&item_state);
             let kind = ScriptItemKind::Quick(slot);
             let button = ItemButton::quick(entity, quantity, &item_state.item, slot);
-            button.borrow_mut().add_action("Use", use_item_cb(entity, kind));
-            button.borrow_mut().add_action("Clear Slot", clear_quickslot_cb(entity, slot));
+            button.borrow_mut().add_action("Use", use_item_cb(entity, kind), true);
+            button.borrow_mut().add_action("Clear Slot", clear_quickslot_cb(entity, slot), false);
             let widget = Widget::with_theme(button.clone(), theme_id);
             if actor.can_use_quick(slot) {
                 widget.borrow_mut().state.animation_state.remove(animation_state::Kind::Custom1);

@@ -37,12 +37,18 @@ enum Kind {
     Quick { player: Rc<RefCell<EntityState>>, quick: QuickSlot },
 }
 
+struct ButtonAction {
+    label: String,
+    callback: Callback,
+    can_left_click: bool,
+}
+
 pub struct ItemButton {
     icon: String,
     adjective_icons: Vec<String>,
     quantity: u32,
     kind: Kind,
-    actions: Vec<(String, Callback)>,
+    actions: Vec<ButtonAction>,
 
     item_window: Option<Rc<RefCell<Widget>>>,
 }
@@ -93,8 +99,13 @@ impl ItemButton {
         }))
     }
 
-    pub fn add_action(&mut self, name: &str, cb: Callback) {
-        self.actions.push((name.to_string(), cb));
+    pub fn add_action(&mut self, name: &str, cb: Callback, can_left_click: bool) {
+        let action = ButtonAction {
+            label: name.to_string(),
+            callback: cb,
+            can_left_click,
+        };
+        self.actions.push(action);
     }
 
     fn remove_item_window(&mut self) {
@@ -156,7 +167,7 @@ impl ItemButton {
         }
     }
 
-    fn check_sell_action(&self, widget: &Rc<RefCell<Widget>>) -> Option<Callback> {
+    fn check_sell_action(&self, widget: &Rc<RefCell<Widget>>) -> Option<ButtonAction> {
         let item_index = match self.kind {
             Kind::Inventory { item_index, .. } => item_index,
             _ => return None
@@ -168,7 +179,14 @@ impl ItemButton {
         let root_view = Widget::downcast_kind_mut::<RootView>(&root);
         if let Some(window_widget) = root_view.get_merchant_window(&root) {
             let merchant_window = Widget::downcast_kind_mut::<MerchantWindow>(&window_widget);
-            Some(sell_item_cb(merchant_window.player(), item_index))
+
+            let action = ButtonAction {
+                label: "Sell".to_string(),
+                callback: sell_item_cb(merchant_window.player(), item_index),
+                can_left_click: true
+            };
+
+            Some(action)
         } else {
             None
         }
@@ -329,17 +347,13 @@ impl WidgetKind for ItemButton {
 
         match kind {
             event::ClickKind::Left => {
-                let action = match self.check_sell_action(widget) {
-                    Some(action) => Some(action),
-                    None => {
-                        match self.actions.first() {
-                            None => None,
-                            Some(ref action) => Some(action.1.clone()),
-                        }
+                let sell_action = self.check_sell_action(widget);
+                let cb = sell_action.iter().chain(self.actions.iter())
+                    .find_map(|action| {
+                        if action.can_left_click { Some(action.callback.clone()) } else { None }
                     }
-                };
-
-                if let Some(action) = action {
+                );
+                if let Some(action) = cb {
                     action.call(widget, self);
                 }
             },
@@ -348,12 +362,12 @@ impl WidgetKind for ItemButton {
 
                 let mut at_least_one_action = false;
                 if let Some(action) = self.check_sell_action(widget) {
-                    menu.borrow_mut().add_action("Sell", action);
+                    menu.borrow_mut().add_action(&action.label, action.callback);
                     at_least_one_action = true;
                 }
 
-                for &(ref name, ref cb) in self.actions.iter() {
-                    menu.borrow_mut().add_action(name, cb.clone());
+                for action in self.actions.iter() {
+                    menu.borrow_mut().add_action(&action.label, action.callback.clone());
                     at_least_one_action = true;
                 }
 

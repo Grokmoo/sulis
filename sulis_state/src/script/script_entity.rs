@@ -789,6 +789,94 @@ fn create_stats_table<'a>(lua: &'a Lua, parent: &ScriptEntity, _args: ()) -> Res
     Ok(stats)
 }
 
+/// Represents a set of ScriptEntities, which can be created from a variety of
+/// sources.  This is passed to many script functions as a `targets` variable.
+/// It includes a parent ScriptEntity, a list of target ScriptEntities,
+/// optionally a selected point (for a targeter that has been activated), and
+/// optionally a list of affected points (again for a targeter).
+///
+/// # `to_table() -> Table`
+/// Creates a table of this set.  Iterating over the table will allow you
+/// to access each entity in this set.
+/// ## Examples
+/// ```lua
+///   table = targets:to_table()
+///   for i in 1, #table do
+///    game:log("target: " .. table[i]:name())
+///   end
+/// ```
+///
+/// # `random_affected_points(frac: Float) -> Table`
+/// Returns a table of a randomly selected subset of the affected points in this
+/// set.  The probability of any individual point ending up in the returned set
+/// is set by `frac`.
+///
+/// # `surface() -> ScriptActiveSurface`
+/// Returns the surface associated with this target set, if it is defined.  Otherwise
+/// throws an error.
+///
+/// # `affected_points() -> Table`
+/// Returns a table containing all the affected points in this set.
+/// ## Examples
+/// ```lua
+///   points = targets:affected_points()
+///   for i = 1, #points do
+///     point = points[i]
+///     game:log("point " .. point.x .. ", " .. point.y)
+///   end
+/// ```
+///
+/// # `selected_point() -> Table`
+/// Returns a table representing the selected point for this set, if one is defined.
+/// The table will have `x` and `y` elements defined.  If there is no selected point,
+/// throws an error.
+///
+/// # `is_empty() -> Bool`
+/// Returns whether or not there are any targets in this ScriptEntitySet.  Does not
+/// take affected points or selected_point into consideration.
+///
+/// # `first() -> ScriptEntity`
+/// Returns the first ScriptEntity as a target in this set, or throws an error if the
+/// set is empty.
+///
+/// # `parent() -> ScriptEntity`
+/// Returns the parent ScriptEntity of this set.  When this is passed to a function as
+/// `targets`, usually, but not always, the `parent` argument is the same as this.
+///
+/// # `without_self() -> ScriptEntitySet`
+/// Creates a new ScriptEntitySet which contains all the data in this set, except
+/// it does not include the parent entity as a target.
+///
+/// # `visible_within(dist: Float) -> ScriptEntitySet`
+/// Creates a new ScriptEntitySet containing all the data in this set, except all
+/// targets that are not visible or are outside the specified dist from the parent
+/// are removed.
+///
+/// # `visible() -> ScriptEntitySet`
+/// Creates a new ScriptEntitySet with all the data from this set, except only targets
+/// that are visible to the parent are present.
+///
+/// # `hostile() -> ScriptEntitySet`
+/// Creates a new ScriptEntitySet with all the data from this set, except only targets
+/// that are hostile to the parent are present.
+///
+/// # `friendly() -> ScriptEntitySet`
+/// Creates a new ScriptEntitySet with all the data from this set, except only targets
+/// that are friendly to the parent are present.
+///
+/// # `reachable() -> ScriptEntitySet`
+/// Creates a new ScriptEntitySet with all the data from this set, except only targets
+/// which the parent can reach with a melee weapon are present.
+///
+/// # `attackable() -> ScriptEntitySet`
+/// Creates a new ScriptEntitySet with all the data from this set, except only targets
+/// which the parent can attack with their current weapon are present.  If the parent
+/// does not have enough AP or otherwise cannot attack, the set will be empty.
+///
+/// # `threatening() -> ScriptEntitySet`
+/// Creates a new ScriptEntitySet with all the data from this set, except only targets
+/// which can hit the parent with a melee weapon currently or in the future without moving
+/// are present.
 #[derive(Deserialize, Serialize, Clone, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct ScriptEntitySet {

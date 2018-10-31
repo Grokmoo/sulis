@@ -318,7 +318,7 @@ fn get_targeter() -> Result<Rc<RefCell<AreaTargeter>>> {
 /// The ScriptInterface, accessible in all Lua scripts as the global `game`.
 /// The following methods are available on this object (documentation WIP):
 ///
-/// # `entity_with_id(id) -> Table<ScriptEntity>`
+/// # `entity_with_id(id: String) -> Table<ScriptEntity>`
 /// Returns a `ScriptEntity` object for the entity with the given unique
 /// id, if such an entity can be found.  Otherwise, returns the invalid `ScriptEntity`.  The ID is
 /// the unique id associated with the individual entity, which is typically the same as the actor
@@ -330,7 +330,7 @@ fn get_targeter() -> Result<Rc<RefCell<AreaTargeter>>> {
 ///   game:log("Found entity with name " .. entity:name())
 ///```
 ///
-/// # `entities_with_ids(ids) -> ScriptEntity`
+/// # `entities_with_ids(ids: Table) -> ScriptEntity`
 /// Returns a list of `ScriptEntity` objects for each of the specified
 /// ids that are found.  The list may be empty.  Also see `entity_with_id(id)`.
 /// ## Examples
@@ -339,8 +339,226 @@ fn get_targeter() -> Result<Rc<RefCell<AreaTargeter>>> {
 ///  for i = 1, #entities do
 ///    game:log("Found entity with name " .. entities[i]:name())
 ///  end
-///
 /// ```
+///
+///# `activate_targeter()`
+/// Activates the current targeter, if one exists.  You should first
+/// validate the targeter exists with `has_targeter()` and then
+/// set a valid position with `check_targeter_position(x, y)`.
+///
+/// ## Examples
+/// ```lua
+/// if game:has_targeter() then
+///   x = target:x()
+///   y = target:y()
+///   if game:check_targeter_position(x, y) then
+///     game:activate_targeter()
+///   end
+/// end
+/// ```
+///
+/// # `cancel_targeter()`
+/// Deactivates the current targeter.  Throws an error if there is no
+/// active targeter.  You should verify a targeter is active with `has_targeter()`
+/// before calling this method.
+///
+/// # `check_targeter_position(x: Int, y: Int) -> bool`
+/// Sets the selected coordinates for the targeter and then checks if
+/// the position is valid to activate.  See also `activate_targeter()`
+///
+/// # `get_targeter_affected() -> ScriptEntitySet`
+/// Returns the set of entities currently affected by the active targeter,
+/// if there is one.  If there is no active targeter, throws an error.  You
+/// should verify a targeter is active with `has_targeter()` before calling
+/// this method.
+///
+/// # `has_targeter() -> Bool`
+/// Returns true if a targeter is currently active, false otherwise.
+/// Useful for AI activating of abilities.
+///
+/// # `cancel_blocking_anims()`
+/// Cancels all current blocking animations on all entities.  Blocking animations
+/// are those that normally cause the player to wait for their completion before
+/// performing another action.  This includes movement, attacks, and most
+/// fixed duration particle effects.
+///
+/// # `fade_out_in()`
+/// Causes the main view to fade out, then back in again.  This duration of the
+/// fades is defined in the theme for the `WindowFade` widget.
+///
+/// # `init_party_day()`
+/// Starts a new day for the player character and party.  This resets all skill
+/// uses and sets maximum hit points.  This is normally used in a script when the
+/// party rests.
+///
+/// # `show_confirm(message: String, accept: String, cancel: String,
+/// id: String, func: String)`
+/// Shows a simple confirmation dialog with the specified `message`, and specified text
+/// on the `accept` and `cancel` buttons.  If the user cancels, no action is taken.  If the
+/// user accepts, the specified `func` is called from the script with `id`.
+///
+/// # `log(message: String)`
+/// Logs the specified string to the game's output at info level.  This is primarily useful
+/// for debugging purposes.
+///
+/// # `ap_display_factor() -> Int`
+/// Gets the ap display factor, which is the factor that the internal AP representation is
+/// divided by when displayed.  Any AP values that are displayed to the user must be
+/// divided by this factor.
+///
+/// # `anim_base_time() -> Float`
+/// Returns the animation base time, which affects how long animations last.  Generally,
+/// animations should multiply some base time by this factor when determining the duration
+/// of animations.  This value is user configurable in the options menu.
+///
+/// # `atan2(x: Float, y: Float) -> Float`
+/// Computes the four quadrant arctan function.  See `f32::atan2`
+///
+/// # `run_script_delayed(script_id: String, func: String, delay: Float)`
+/// Causes the specified `func` from the script with `script_id` to be run after `delay`
+/// seconds.  The script is actually run on the first frame after `delay` seconds have
+/// elapsed.  The game can normally achieve a comfortable 60 fps on the vast majority of
+/// hardware, but be aware that this is not always the case.
+///
+/// # `create_callback(parent: ScriptEntity, script: String) -> ScriptCallback`
+/// Creates a new script callback.  This callback will utilize the specified script
+/// file for all methods.  See `ScriptCallback` for more.
+///
+/// # `set_quest_state(quest: String, state: String)`
+/// Sets the specified `quest` to the `state`.  `state` must be one of `Hidden`, `Visible`,
+/// `Active`, or `Complete`.  `quest` must be the ID of a valid quest definition.
+///
+/// # `set_quest_entry_state(quest: String, entry: String, state: String)`
+/// Sets the specified `entry` within the specified `quest` to `state`.  `state` must be one
+/// of `Hidden`, `Visible, `Active`, or `Complete`.  `quest` must be the ID of a valid quest
+/// definition, and `entry` must be an entry within that quest.
+///
+/// # `get_quest_state(quest: String) -> String`
+/// Returns the current `state` of the specified `quest`.  `state` will be one of
+/// `Hidden`, `Visible`, `Active`, or `Complete`.
+///
+/// # `get_quest_entry_state(quest: String, entry: String)`
+/// Returns the current `state` of the specified `entry` in the given `quest`.
+///
+/// # `set_world_map_location_visible(location: String, visible: Bool)`
+/// Sets the specified `location` in the world map to the specified `visible`.  The
+/// location must be defined in the world_map section of the campaign definition file.
+///
+/// # `set_world_map_location_enabled(location: String, enabled: Bool)`
+/// Sets the specified `location` in the world map `enabled`.  If disabled, a user
+/// viewing the world map cannot travel to that location.  The location  must be defined
+/// in the world_map section of the campaign definition file.
+///
+/// # `is_passable(entity: ScriptEntity, x: Int, y: Int) -> Bool`
+/// Returns true if the specified coordinates in the current area are passable for
+/// the entity, false otherwise.
+///
+/// # `spawn_actor_at(id: String, x: Int, y: Int) -> ScriptEntity`
+/// Attempts the spawn an instance of the actor with the specified `id` at the
+/// coordinates `x`, `y` in the current area.  If successful, returns the
+/// ScriptEntity that was just spawned.  If not, returns the invalid ScriptEntity
+///
+/// # `spawn_encounter_at(x: Int, y: Int)`
+/// Causes the encounter in the current area at `x`, `y` to spawn entities based
+/// on its encounter definition.  If the entities are hostile and within player
+/// visibility, will initiate combat.
+///
+/// # `enable_trigger_at(x: Int, y: Int)`
+/// Sets the trigger in the current area at `x`, `y` to enabled.  This means the
+/// trigger will fire when its condition (such as player entering its coordinates)
+/// are met.  This method will only have an effect on triggers which are set to
+/// be initially_disabled in their defintion, or which have been disabled via
+/// `disable_trigger_at`.
+///
+/// # `disable_trigger_at(x: Int, y: Int)`
+/// Sets the trigger in the current area at `x`, `y` to disabled.  This means the
+/// trigger will not fire regardless of whether its condition is met.
+///
+/// # `enable_prop_at(x: Int, y: Int)`
+/// Sets the prop in the current area at `x`, `y` to enabled.  When enabled, props
+/// can be interacted with if relevant for the given prop (doors or containers).
+///
+/// # `disable_prop_at(x: Int, y: Int)`
+/// Sets the prop in the current area at `x`, `y` to disabled.  When disabled, props
+/// cannot be interacted with regardless of whether they otherwise are interactive.
+///
+/// # `toggle_prop_at(x: Int, y: Int)`
+/// Toggles the enabled / disabled state of the prop at `x`, `y`.  See `enable_prop_at` and
+/// `disable_prop_at`
+///
+/// # `say_line(line: String, target: ScriptEntity (Optional))`
+/// The specified `target`, or the player if no target is specified, will say the line
+/// of text specified by `line`.  This is represented by the text appearing on the main
+/// area view overhead of the target entity.  The text fades away after several seconds.
+///
+/// # `start_conversation(id: String, target: ScriptEntity (Optional))`
+/// Starts the conversation with the specified `id`, with the `target` or the player if the
+/// target is not specified.  The conversation is defined in the conversation data file
+/// for the relevant id.
+///
+/// # `show_game_over_window(text: String)`
+/// Shows the game over window, indicating that the player cannot continue
+/// in the current module without loading.  This can be used to show victory
+/// or defeat.  The specified `text` is displayed.
+///
+/// # `load_module(id: String)`
+/// Causes the module with the specified `id` to be loaded.  The player, their money,
+/// items, and party stash are transfered to the module intact.  Player script state is
+/// not currently transfered, and any other data in the current module is also not
+/// transfered, including the player's party.  This action is performed asynchronously
+/// on the next UI update, the remained of the current script will be executed.
+///
+/// # `player -> ScriptEntity`
+/// Returns a reference to the player character ScriptEntity.
+///
+/// # `show_cutscene(id: String)`
+/// Causes the cutscene with the specified `id` to show.  This blocks the user interface
+/// until the cutscene is complete or the player skips it.  The cutscene is launched
+/// asynchronously on the next frame, so the remaineder of this script script will execute
+/// immediately.
+///
+/// # `scroll_view(x: Int, y: Int)`
+/// Causes the view of the current area to scroll to the specified `x`, `y` coordinates.
+/// This done using a smooth scroll effect.  The scroll begins on the next frame, so the
+/// remainder of the current script will continue to execute immediately.
+///
+/// # `num_effects_with_tag(tag: String) -> Int`
+/// Returns the number of currently active effects, in any area, with the specified effect
+/// tag.  This can be used in scripts to enforce a global limit on a specific effect type.
+///
+/// # `has_party_member(id: String) -> Bool`
+/// Returns true if one of the current party members has the specified `id`, false otherwise
+///
+/// # `add_party_member(id: String)`
+/// Searches for an entity with the specified `id`.  If it is found, adds that entity as a
+/// member of the player's party, making them controllable by the player.  If an entity with
+/// the `id` is not found, throws an error.
+///
+/// # `party_coins() -> Int`
+/// Returns the current amount of party coins.  Note that this value must be divided by the
+/// item_value_display_factor in the module rules in order to get the displayed amount of
+/// coins.
+///
+/// # `add_party_coins(amount: Int)`
+/// Adds the specified number of coins to the party.  Note that this value is divided by
+/// the item_value_display_factor to get the displayed coinage.
+///
+/// # `add_party_item(id: String, adjective: String (Optional))`
+/// Creates an item with the specified `id`, and `adjective`, if specified.  If there is
+/// no item definition with this ID or the adjective is specified but there is no
+/// adjective with that ID, throws an error.  Otherwise, the item is added to the party
+/// stash.
+///
+/// # `add_party_xp(amount: Int)`
+/// Adds the specified amount of XP to the party.  Each current party member is given
+/// this amount of XP.
+///
+/// # `transition_party_to(area: String, x: Int, y: Int)`
+/// Moves the party to the specified coordinates within the specified area.  If the area
+/// or coordinates are invalid, this will currently leave the game in a bad state where
+/// the player is forced to load to continue.  The player is moved to the exact coordinates,
+/// whereas other party members are moved to nearby coordinates.
+///
 pub struct ScriptInterface { }
 
 impl UserData for ScriptInterface {
@@ -832,6 +1050,32 @@ impl ScriptItemKind {
     }
 }
 
+/// A ScriptItem, representing a specific item in a player or creature inventory,
+/// quick slot, or the party stash, depending on the `ScriptItemKind`.
+/// This is passed as the `item` field when using usable items with an associated
+/// script.
+///
+/// # `activate(target: ScriptEntity)`
+/// Activates this usable item.  This will remove the AP associated with using this
+/// item from the specified `target`.  If the item is consumable, the item will be
+/// consumed on calling this method.
+///
+/// This method is generally used when called from the `on_activate` script of a
+/// usable item, once the script has determined that the item should definitely be
+/// used.
+///
+/// # `name() -> String`
+/// Returns the name of this Item.
+///
+/// # `duration() -> Int`
+/// Returns the duration, in rounds, of this item, as defined in the item's resource
+/// definition.  How this value is used (or not) is up to the script to define.
+///
+/// # `create_callback(parent: ScriptEntity)`
+/// Creates a `ScriptCallback` with the specified parent for this item.  Methods
+/// can then be added to the ScriptCallback to cause it to be called when certain
+/// events happen.  These methods will be called from this item's script, as
+/// defined in its resource file.
 #[derive(Clone)]
 pub struct ScriptItem {
     parent: usize,

@@ -20,6 +20,34 @@ use sulis_rules::{Slot, QuickSlot};
 use sulis_module::ability::AIData;
 use script::*;
 
+/// The inventory of a particular creature, including equipped items
+/// and quickslots.
+///
+/// # `has_equipped_weapon() -> Bool`
+/// Returns true if the parent entity currently has a weapon equipped,
+/// false otherwise.
+///
+/// # `has_equipped_shield() -> Bool`
+/// Returns true if the parent entity currently has a shield equipped,
+/// false otherwise.
+///
+/// # `has_alt_weapons() -> Bool`
+/// Returns true if the parent entity has an item in at least one of its
+/// alt weapon slots, meaning it can switch to an alt weapon set.
+///
+/// # `alt_weapon_style() -> String`
+/// Returns the weapon style of the alt weapons that are in the quick slots
+/// of the parent creature.  Valid values are `Ranged`, `TwoHanded`, `Single`,
+/// `Shielded`, and `DualWielding`
+///
+/// # `weapon_style() -> String`
+/// Returns the weapon style of the currently equipped weapons
+/// of the parent creature.  Valid values are `Ranged`, `TwoHanded`, `Single`,
+/// `Shielded`, and `DualWielding`
+///
+/// # `usable_items() -> Table`
+/// Returns a table of all items currently in Use QuickSlots for the parent
+/// entity.  Each item is represented by a `ScriptUsableItem` in the table.
 #[derive(Clone)]
 pub struct ScriptInventory {
     parent: ScriptEntity,
@@ -109,6 +137,11 @@ impl UserData for ScriptInventory {
     }
 }
 
+/// A representation of an item that is usable and in a particular QuickSlot for a parent
+/// entity.
+/// # `ai_data -> Table`
+/// Returns a table representing the AI Data of this item, as defined in its resource definition.
+/// See `ScriptItem::ai_data`
 #[derive(Clone)]
 pub struct ScriptUsableItem {
     parent: ScriptEntity,

@@ -26,6 +26,67 @@ use script::{ScriptEntity, CallbackData};
 
 type Result<T> = std::result::Result<T, rlua::Error>;
 
+/// Represents the set of abilities that a given Entity has access to.
+/// This will only include active abilities, not passive ones.
+/// See `ScriptEntity`
+/// # `len() -> Int`
+/// Returns the number of abilities in this set
+///
+/// # `is_empty() -> Bool`
+/// Returns true if there are no abilities in this set, false otherwise.
+///
+/// # `to_table() -> Table`
+/// Creates and returns a Lua table which can be used to iterate over the
+/// abilities in this set.
+/// ## Examples
+/// ```lua
+///  abilities = parent:abilities()
+///  table = abilities:to_table()
+///  for i = 1, #table do
+///    game:log(parent:name() .. " has ability " .. table[i]:name())
+///  end
+/// ```
+///
+/// # `can_activate() -> Bool`
+/// Returns whether or the parent entity can currently activate at least
+/// one ability in this set.  See `ScriptAbility#can_activate`
+///
+/// # `remove_kind(kind: String) -> ScriptAbilitySet`
+/// Creates a new ScriptAbilitySet from this one, but with all abilities
+/// with the specified AI Kind `kind` removed.  The kind is specified in the ability
+/// definition.  Does not modify this set. Valid kinds are `Damage`, `Heal`, `Buff`,
+/// `Debuff`, `Special`
+///
+/// ## Examples
+/// ```lua
+///   abilities = parent:abilities()
+///   abilities_without_special = abilities:remove_kind("special")
+/// ```
+///
+/// # `only_kind(kind: String) -> ScriptAbilitySet`
+/// Creates a new ScriptAbilitySet from this one, but only including abilities
+/// with the specified AI Kind `kind`.  Valid kinds are `Damage`, `Heal`, `Buff`,
+/// `Debuff`, `Special`
+///
+/// # `only_group(group: String) -> ScriptAbilitySet`
+/// Creates a new ScriptAbilitySet from this one, but only including abilities
+/// with the specified AI group `group`. Valid group types are `Single` and `Multiple`.
+///
+/// # `only_range(range: String) -> ScriptAbilitySet`
+/// Creates a new ScriptAbilitySet from this one, but only including abilities
+/// with the specified AI range `range`.  Valid range types are `Personal`, `Reach`,
+/// `Short`, `Visible`
+///
+/// # `sort_by_priority()`
+/// Sorts this set in place, according to the AI priority of the abilities in the
+/// set.  Lower priorities are sorted first.
+/// ## Examples
+/// ```lua
+///   abilities = parent:abilities():only_range("Reach"):only_kind("Attack")
+///   if abilities:is_empty() return end
+///   abilities:sort_by_priority()
+///   -- do something with the first ability
+/// ```
 #[derive(Clone)]
 pub struct ScriptAbilitySet {
     pub parent: usize,
@@ -132,6 +193,41 @@ impl UserData for ScriptAbilitySet {
     }
 }
 
+/// Represents a specific active ability.  This is passed into ability
+/// scripts in the `ability` field, and can also be obtained by iterating
+/// over a `ScriptEntitySet`
+///
+/// # `is_active_mode(target: ScriptEntity) -> Bool`
+/// Returns true if this ability is a mode that is currently active on the `target`,
+/// false otherwise.
+///
+/// # `activate(target: ScriptEntity, take_ap: Bool (Optional)`
+/// Activates this ability for the target.  This will remove AP on the target, if
+/// take_ap is not specified or specified and true.
+///
+/// # `deactivate(target: ScriptEntity)`
+/// Deactivates this ability, a currently active mode, on the specified `target`.
+/// Normally, you will verify that this is an active mode with `is_active_mode` before
+/// calling this method.
+///
+/// # `name() -> String`
+/// Returns the name of this ability as defined in its resource file.
+///
+/// # `duration() -> Int`
+/// Returns the duration, in rounds of this ability as defined in its resource file.
+/// How this duration is used is up to the ability's script.
+///
+/// # `create_callback(parent: ScriptEntity) -> ScriptCallback`
+/// Creates a script callback from this ability for the `parent`.  Methods
+/// can then be added to the ScriptCallback, which are called when certain conditions
+/// are met.  These methods will be called from this ability's script, as defined in
+/// its resource file.
+///
+/// # `ai_data() -> Table`
+/// Creates a Lua table including the AI data of this ability.  This includes
+/// the `priority`, an integer, the `kind`, `group, and `range`, all Strings.  See
+/// `ScriptAbilitySet::only_group`, `ScriptAbilitySet::only_range`,
+/// `ScriptAbilitySet::only_kind`.
 #[derive(Clone)]
 pub struct ScriptAbility {
     pub id: String,

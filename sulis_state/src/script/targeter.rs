@@ -28,6 +28,78 @@ pub enum Kind {
     Item(ScriptItemKind),
 }
 
+/// Created by calling `create_targeter` on a `ScriptEntity`.  A targeter
+/// allows the player (or ai script) to select a specific target from a list
+/// of available targets, or choose a location for an area of effect.
+///
+/// The targeter is configured, and then finally activated with `activate()`
+///
+/// # `activate()`
+/// Once configuration of this targeter is complete, activate it.  The player (or ai
+/// script) will then be able to interact with it.
+///
+/// # `set_callback_fn(func: String)`
+/// Sets the callback function that is called when the target is selected.  By
+/// default, this is `on_target_select(parent, ability/item, targets)`.  However,
+/// if more than one targeter is used in a given script then this method can
+/// be used to make those targeters use different functions.
+///
+/// # `set_callback_custom_target(target: ScriptEntity)`
+/// Causes the specified `target` to always be added to the list of targets returned
+/// by the targeter.  This is occasionally useful for targeters that select a location
+/// rather than an entity.
+///
+/// # `add_all_selectable(selectable: ScriptEntitySet)`
+/// Adds all entities in `selectable` as possible selections for this targeter.  They must
+/// still meet all other constraints added in order to be valid selections.
+///
+/// # `add_selectable(selectable: ScriptEntity)`
+/// Adds a single entity `selectable` as a possible selection for this targeter.  It must
+/// still meet all other constraints in order to be a valid selection.
+///
+/// # `set_show_mouseover(show: Bool)`
+/// Sets whether to `show` the entity mouseover for this targeter.  By default, it is shown.
+/// For some abilities, it may be a better user experience to not show it.
+///
+/// # `set_free_select(range: Float)`
+/// Sets free select mode, allowing any point within the specified range of the parent entity
+/// to be selected.  By default, the targeter is in entity select mode.
+///
+/// # `set_free_select_must_be_passable(size_id: String)`
+/// Only applies when the targeter is in free select mode.  Requires any point that is selected
+/// in free select to be passable for the size specified by `size_id`
+///
+/// # `add_all_effectable(targets: ScriptEntitySet)`
+/// Adds all entities in the set as targets that can potentially be affected by this targeter.
+/// Only affectable entities within the area of effect of the chosen shape will end up as
+/// targets.
+///
+/// # `add_effectable(target: ScriptEntity)`
+/// Adds the specified entity as a target to potentially be affected by this targeter.  See
+/// `add_all_effectable`
+///
+/// # `set_max_effectable(max: Int)`
+/// Sets the maximum number of targets that this targeter may affect and return.
+///
+/// # `set_shape_circle(radius: Float)`
+/// Sets the shape of this targeter to a circle with the specified `radius`, in tiles
+///
+/// # `set_shape_line(size: String, x: Int, y: Int, length: Int)`
+/// Sets the shape of this targeter to a line that extends from `x`, `y` as its origin for the
+/// specified `length`.  The width of the line is determined by the `size`.  Effectively,
+/// only the angle that the line is pointing in is determined by the user.
+///
+/// # `set_shape_line_segment(size: String, x: Int, y: Int)`
+/// Sets the shape of this targeter to a line segment from `x`, `y` to the user selected point.
+/// The width of the segment is based on `size`.
+///
+/// # `set_shape_object_size(size: String)`
+/// Sets this targeter to affect a set of points with the shape specified by the specified
+/// `size`.
+///
+/// # `set_shape_cone(x: Float, y: Float, radius: Float, angle: Float)`
+/// Sets this targeter to a cone shape, with center / origin `x`, `y`, a specified `radius`,
+/// and subtending the specified `angle`.  The angle is in radians.
 #[derive(Clone)]
 pub struct TargeterData {
     pub kind: Kind,

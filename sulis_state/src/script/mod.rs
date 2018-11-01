@@ -14,6 +14,24 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+//! This module contains Sulis' scripting API.  Most structs are inserted into lua scripts as
+//! objects.  The documentation for each struct describes the available functions on each
+//! object when interacting with them within a lua script.
+//!
+//! There are currently four kinds of scripts:
+//!
+//! 1. AI Scripts:  These are attached to a given actor in their resource definition under `ai`.
+//!    Whenever the parent entity is active, the `ai_action(parent, state)` method is called.
+//! 2. Area / Trigger Scripts: These are called by triggers, conversations, and cutscenes.
+//!    Named script functions are called, via a `fire_script` type containing an `id` for the
+//!    script and a `func`.
+//! 3. Ability Scripts: These are called when activating an ability or when an active ability
+//!    meets certain conditions.  The entry point for the script is `on_activate(parent, ability)`.
+//!    When using a targeter, `on_target_select(parent, ability, targets)` is the return from that
+//!    targeter.
+//! 4. Item Scripts: Similar to ability scripts, but called when using an item.  The entry point is
+//!    `on_activate(parent, item)`.
+
 mod area_targeter;
 pub use self::area_targeter::AreaTargeter;
 
@@ -28,8 +46,8 @@ pub use self::script_callback::ScriptHitKind;
 pub use self::script_callback::FuncKind;
 
 mod script_effect;
-use self::script_effect::ScriptEffect;
-use self::script_effect::ScriptActiveSurface;
+pub use self::script_effect::ScriptEffect;
+pub use self::script_effect::ScriptActiveSurface;
 
 mod script_entity;
 pub use self::script_entity::ScriptEntity;
@@ -40,16 +58,16 @@ pub use self::script_inventory::ScriptInventory;
 pub use self::script_inventory::ScriptUsableItem;
 
 mod script_color_animation;
-use self::script_color_animation::ScriptColorAnimation;
+pub use self::script_color_animation::ScriptColorAnimation;
 
 mod script_particle_generator;
-use self::script_particle_generator::ScriptParticleGenerator;
+pub use self::script_particle_generator::ScriptParticleGenerator;
 
 mod script_subpos_animation;
-use self::script_subpos_animation::ScriptSubposAnimation;
+pub use self::script_subpos_animation::ScriptSubposAnimation;
 
 pub mod targeter;
-use self::targeter::TargeterData;
+pub use self::targeter::TargeterData;
 
 use std;
 use std::rc::Rc;
@@ -65,6 +83,8 @@ use {EntityState, ItemState, GameState, ai, area_feedback_text::ColorKind, quest
     animation::Anim, Location};
 
 type Result<T> = std::result::Result<T, rlua::Error>;
+
+/// A script state, containing a complete lua state.
 
 pub struct ScriptState {
     lua: Lua,

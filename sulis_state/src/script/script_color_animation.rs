@@ -22,6 +22,29 @@ use animation::{Anim};
 use animation::particle_generator::{Param};
 use script::{CallbackData, Result, script_particle_generator};
 
+/// A color animation changing a parent entity's base or secondary
+/// color.  Created normally by `ScriptEntity:create_color_anim`
+///
+/// # `activate()`
+/// Creates and applies this animation directly.
+///
+/// # `set_color(r: Param, g: Param, b: Param, a: Param)`
+/// Sets the color components of this animation to the specified `Param`s
+///
+/// # `set_color_sec(r: Param, g: Param, b: Param, a: Param)`
+/// Sets the secondary color copmonents of this animation to the
+/// specified `Param`s
+///
+/// # `set_completion_callback(callback: CallbackData)`
+/// Adds the specified `callback` to be called when this animation is complete.
+///
+/// # `add_callback(callback: CallbackData, time: Float)`
+/// Sets the specified `callback` to be called at the specified `time` elapsed,
+/// in seconds.
+///
+/// # `param(value: Float, dt: Float (Optional), d2t: Float (Optional),
+/// d3t: Float (Optional))`
+/// Creates a param for use in this animation's setup.  See `ScriptParticleGenerator`
 #[derive(Clone)]
 pub struct ScriptColorAnimation {
     parent: usize,

@@ -22,6 +22,27 @@ use animation::{Anim};
 use animation::particle_generator::{Param};
 use script::{CallbackData, Result, script_particle_generator};
 
+/// An animation that moves the pixel precise coordinates of
+/// an entity.  Normally created via `ScriptEntity:create_subps_anim`.
+/// When this animation is complete, the parent subpos is set back to
+/// the default, (0, 0)
+///
+/// # `activate()`
+/// Activates and applies this animation to the parent.
+///
+/// # `param(value: Float, dt: Float (Optional), d2t: Float (Optional),
+/// d3t: Float (Optional))`
+/// Creates a param.  See `ScriptParticleGenerator`
+///
+/// # `set_position(x: Param, y: Param)`
+/// Sets the parent entity position `x` and `y` coordinates, as Params.
+///
+/// # `set_completion_callback(callback: CallbackData)`
+/// Sets the specified `callback` to be called when this animation completes.
+///
+/// # `add_callback(callback: CallbackData, time: Float)`
+/// Sets the specified `callback` to be called after the specified `time` has elapsed,
+/// in seconds.
 #[derive(Clone)]
 pub struct ScriptSubposAnimation {
     parent: usize,

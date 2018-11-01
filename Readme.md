@@ -6,6 +6,9 @@ Standalone binary releases are available for Windows and Linux if you are only i
 
 Please visit https://www.sulisgame.com or check the [Releases page](https://github.com/Grokmoo/sulis/releases).  
 
+## Developers and Modders
+Resources for developers and modders are available on a [page on the website](https://www.sulisgame.com/dev-modding).  Currently, this includes docs for the LUA scripting API.
+
 ## Building from Source
 
 ### Prerequisites

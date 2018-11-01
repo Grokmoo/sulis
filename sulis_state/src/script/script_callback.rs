@@ -41,21 +41,51 @@ pub fn fire_on_moved_in_surface(cbs: Vec<(Rc<CallbackData>, usize)>) {
     }
 }
 
+/// A type of callback function for a `CallbackData` object.
+
 #[derive(Serialize, Deserialize, Clone, Copy, PartialOrd, Ord, Hash, PartialEq, Eq, Debug)]
 #[serde(deny_unknown_fields)]
 pub enum FuncKind {
+    /// Called whenver a parent entity loses hit points
     OnDamaged,
+
+    /// Called on the attacking entity immediately before the attack is rolled
+    /// Only applies to standard weapon attacks.
     BeforeAttack,
+
+    /// Called on the attacking entity immediately after the attack is rolled.
+    /// Only applies to standard weapon attacks.
     AfterAttack,
+
+    /// Called on the defending entity immediately after the attack is rolled.
+    /// Only applies to standard weapon attacks.
     AfterDefense,
+
+    /// Called on the defending entity immediately before the attack is rolled.
+    /// Only applies to standard weapon attacks.
     BeforeDefense,
+
+    /// Called whenever an animation copmletes, due to its duration elapsing or
+    /// the owning effect being removed.
     OnAnimComplete,
+
+    /// Called at a specific time elapsed on an animation update.
     OnAnimUpdate,
+
+    /// Called once each time a round elapses for the parent
     OnRoundElapsed,
+
+    /// Only relevant for surfaces.  Called once each time a round elapses for the
+    /// surface effect, including a list of all affected entities as targets.
     OnSurfaceRoundElapsed,
+
+    /// Called each time an entity moves within a given surface.  Controlled by
+    /// `set_squares_to_fire_on_moved`
     OnMovedInSurface,
 }
 
+/// A trait representing a callback that will fire a script when called.  In lua scripts,
+/// `CallbackData` is constructed to use this trait.
 pub trait ScriptCallback {
     fn on_damaged(&self, _targets: &ScriptEntitySet, _hit_kind: HitKind, _damage: u32) { }
 
@@ -89,6 +119,34 @@ enum Kind {
     Script(String),
 }
 
+/// A callback that can be passed to various functions to be executed later.
+/// A single callback can hold multiple invocations by setting several different functions.
+///
+/// # `add_target(target: ScriptEntity)`
+/// Adds the specified `target` to the list of targets this callback will provide to its
+/// callee.
+///
+/// # `add_targets(targets: ScriptEntitySet)`
+/// Adds the specified `targets` to the list of targets this callback will provide to its
+/// callee
+///
+/// # `add_selected_point(point: Table)`
+/// Adds the specified `point` to the list of points this callback will provide in its
+/// targets.  The point is a table of the form `{x:x_coord, y: y_coord}`
+///
+/// # `set_on_damaged_fn(func: String)`
+/// # `set_before_attack_fn(func: String)`
+/// # `set_after_attack_fn(func: String)`
+/// # `set_before_defense_fn(func: String)`
+/// # `set_after_defense_fn(func: String)`
+/// # `set_on_anim_update_fn(func: String)`
+/// # `set_on_anim_complete_fn(func: String)`
+/// # `set_on_round_elapsed_fn(func: String)`
+/// # `set_on_surface_round_elapsed_fn(func: String)`
+/// # `set_on_moved_in_surface_fn(func: String)`
+/// Each of these methods causes a specified lua `func` to be called when the condition is met,
+/// as described in `FuncKind`.  Multiple of these methods may be added to one
+/// Callback.
 #[derive(Deserialize, Serialize, Clone, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct CallbackData {
@@ -422,6 +480,26 @@ impl UserData for CallbackData {
     }
 }
 
+/// ScriptHitKind stores the result of an attack for lua.  Includes the hit kind
+/// and any damage.
+///
+/// # `is_miss() -> Bool`
+/// Whether the attack was a miss
+///
+/// # `is_graze() -> Bool`
+/// Whether the attack was a graze
+///
+/// # `is_hit() -> Bool`
+/// Whether the attack was a hit
+///
+/// # `is_crit() -> Bool`
+/// Whether the attack was a crit
+///
+/// # `total_damage() -> Int`
+/// The total damage (in hit points) that the attack did.
+///
+/// # `kind() -> String`
+/// The type of hit.  One of `Miss`, `Graze`, `Hit`, or `Crit`.
 #[derive(Clone)]
 pub struct ScriptHitKind {
     pub kind: HitKind,

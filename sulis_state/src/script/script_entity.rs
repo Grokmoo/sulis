@@ -31,6 +31,311 @@ use sulis_module::Faction;
 use {ActorState, EntityState, GameState, Location, area_feedback_text::ColorKind};
 use {ai, animation::{self}, script::*, MOVE_TO_THRESHOLD};
 
+/// Represents a single entity for Lua scripts.  Also can represent an invalid,
+/// non-existant entity in some cases.  Many script functions pass a parent
+/// which is a script entity, and often targets, which is a `ScriptEntitySet`
+/// that a ScriptEntity can be extracted from.
+///
+/// # `state_end() -> AIState`
+/// Returns the AI state telling the caller to end the AI turn.
+/// ## Examples
+/// ```lua
+///   function ai_action(parent, state)
+///     -- tell ai to end turn immediately
+///     _G.state = game:state_end()
+///   end
+/// ```
+///
+/// # `state_wait(time: Int) -> AIState`
+/// Returns the AI state telling the caller to wait for the specified
+/// number of milliseconds (`time`), and then call the AI again.
+/// See `state_end`
+///
+/// # `vis_dist() -> Float`
+/// Returns the currently visibility distance for this entity (how
+/// many tiles on the map it can see).  This is dependant on the
+/// area that the entity is in.
+///
+/// # `add_xp(amount: Int)`
+/// Adds the specified `amount` of XP to the entity.  For adding XP to
+/// the party, you generally want to use `game:add_party_xp(amount)`
+/// instead.
+///
+/// # `set_faction(faction: String)`
+/// Sets this entity to the specified `faction`.  Valid factions are currently
+/// `Hostile`, `Neutral`, or `Friendly`.  Hostiles will attack the player and
+/// friendlies on sight, but will not engage neutrals.
+///
+/// # `set_flag(flag: String, value: String (Optional))`
+/// Sets a `flag` to be stored on this entity.  This value will persist as part of the
+/// save game and can be used to store custom state.  If the value is not specified,
+/// sets the flag exists (for querying with `has_flag()`), but does not neccessarily
+/// set a specific value.
+///
+/// # `add_num_flag(flag: String, value: Float)`
+/// Sets the specified `flag` to a floating point numeric `value`.  This is for
+/// convenience to avoid Lua needing to parse numbers from a string flag.
+///
+/// # `get_flag(flag: String) -> String`
+/// Returns the value of the specified `flag` on this entity.  Returns the lua
+/// value of `Nil` if the flag does not exist.
+///
+/// # `has_flag(flag: String) -> Bool`
+/// Returns true if the specified `flag` is set to any value on this entity, false
+/// otherwise
+///
+/// # `get_num_flag(flag: String) -> Int`
+/// Returns the numeric value of this `flag` set on this entity, or 0.0 if it has
+/// not been set.
+///
+/// # `clear_flag(flag: String)`
+/// Clears the `flag` from this entity, as if it had never been set.  Works for both
+/// numeric and standard flags.  If the flag had not previously been set, does nothing.
+/// After this method, `has_flag(flag)` will return `false`.
+///
+/// # `is_valid() -> Bool`
+/// Returns true if this ScriptEntity references a valid entity that can be queried and
+/// acted on, false otherwise.
+///
+/// # `is_dead() -> Bool`
+/// Returns true if this entity is dead (zero hit points), false otherwise.  Dead entities
+/// cannot be currently interacted with in meaningful ways.
+///
+/// # `is_party_member() -> Bool`
+/// Returns true if this entity is a member of the player's party (or if it is the player),
+/// false otherwise.
+///
+/// # `use_ability(ability: ScriptAbility) -> Bool`
+/// The parent entity attempts to use the `ability`.  Returns true if the ability use was
+/// successful, false if it was not.  After activating, the script will often need to handle
+/// a targeter (depending on the ability), using the methods on `ScriptInterface` (the `game`
+/// object).
+///
+/// # `use_item(item: ScriptUsableItem) -> Bool`
+/// Attempts to use the specified `item`.  Returns true if the item use was successful, false
+/// if it was not.  See `use_ability`.
+///
+/// # `swap_weapons() -> Bool`
+/// Attempts to swap weapons from the currently held weapon set to the alternate weapon slots.
+/// Returns true if this is succesful, false if it is not.  The entity must have enough AP
+/// to complete the action.
+///
+/// # `abilities() -> ScriptAbilitySet`
+/// Returns the ScriptAbilitySet with all the abilities that this entity can potentially activate.
+///
+/// # `targets() -> ScriptEntitySet`
+/// Creates a ScriptEntitySet consisting of all possible targets for abilities or items used
+/// by this entity.  This includes all known entities in the same area as the parent entity.
+///
+/// # `remove_effects_with_tag(tag: String)`
+/// Removes all currently active effects applied to this entity that have the specified tag.
+///
+/// # `create_effect(name: String, duration: Int (Optional)) -> ScriptEffect`
+/// Creates a new effect with the specified `name` and `duration`.  If `duration` is not
+/// specified, it is infinite, and will remain until removed or deactivated for a mode.
+/// The effect will not be in effect until you call `apply()` on it.
+///
+/// # `create_surface(name: String, points: Table, duration: Int (Optional)) -> ScriptEffect`
+/// Creates a surface effect with this entity as the parent.  This is a special case of
+/// `create_effect`, above.  The effect must have `apply()`
+/// called in order to actually be put into effect.  See `ScriptEffect`.
+/// The `points` used by this method is a table of tables with `x` and `y` elements.  This
+/// can be constructed by hand, or obtained from a `ScriptEntitySet` as the `affected_points`.
+///
+/// # `create_subpos_anim(duration: Float (Optional)) -> ScriptSubposAnimation`
+/// Creates an entity subpos animation, that can be used to temporarily move
+/// the location of the entity with pixel accuracy on the screen, for the specified
+/// `duration` in seconds.  The animation is set up with further calls before
+/// calling `activate()`.
+///
+/// # `create_color_anim(duration: Float (Optional)) -> ScriptColorAnimation`
+/// Creates an entity color animation, which changes the primary and secondary
+/// colors of the parent entity.  If `duration` is specified, lasts for that many seconds.
+/// Otherwise, will last forever, or more typically until the attached effect is removed.
+///
+/// # `create_particle_generator(image: String, duration: Float (Optional)) ->
+/// ScriptParticleGenerator`
+/// Creates a Particle Generator animation.  Despite the name, can also be used for more
+/// traditional frame based animations by using a single particle (see `create_anim`.
+/// If `duration` is specified, lasts for that number of seconds.  Otherwise, will last
+/// forever, or more typically until the attached effect is removed.  The specified image
+/// must be the ID of a defined image.
+///
+/// # `create_anim(image: String, duration: Float (Optional)) -> ScriptParticleGenerator`
+/// Creates a particle generator animation set up for a single particle frame based
+/// animation.  The `image` should normally be the ID of a timer image with specified frames.
+/// The `duration` is in seconds, or not specified to make the animation repeat until
+/// the parent effect is removed (if there is one).  The anim must have `activate()` called
+/// once setup is complete.
+///
+/// # `create_targeter(ability: ScriptAbility) -> TargeterData`
+/// Creates a new targeter for the specified ability.  The ability's script will be used for
+/// all functions.  This targeter can then be configured
+/// before calling `activate()` to put it into effect.  Upon the user or ai script selecting
+/// a target, `on_target_select` is called.
+///
+/// # `create_targeter_for_item(item: ScriptItem) -> TargeterData`
+/// Creates a new targeter for the specified item.  The item's script will be used for all
+/// functions.  The targeter can then be configured before calling `activate()`.  See
+/// `create_targeter` above.
+///
+/// # `move_towards_entity(target: ScriptEntity, distance: Float (Optional)) -> Bool`
+/// Causes this entity to attempt to begin moving towards the specified `target`.  If this
+/// entity cannot move at all towards the desired target, returns false, otherwise, returns
+/// true and creates a move animation that will proceed to be run asynchronously.
+/// Optionally, a `distance` can be specified which is the distance this entity should be
+/// within the target to complete the move.  If no distance is specified, the entity
+/// attempts to move within attack range.
+///
+/// # `move_towards_point(x: Float, y: Float, distance: Float (Optional)) -> Bool`
+/// Causes this entity to attempt to begin moving towards the specified point at
+/// `x` and `y`.  If `distance` is specified, attempts to move within that distance
+/// of the point.  Otherwise, attempts to move so the parent entity's coordinates
+/// are equal to the nearest integers to `x` and `y`.  If the entity cannot move at
+/// all or a path cannot be found, this returns false.  Otherwise, returns true and
+/// an asynchronous move animation is initiated.
+///
+/// # `dist_to_entity(target: ScriptEntity) -> Float`
+/// Computes the current euclidean distance to the specified `target`, in tiles.
+///
+/// # `dist_to_point(point: Table) -> Float`
+/// Computes the euclidean distance to the specified `point`, in tiles.  Point is
+/// a table of the form `{x: x_coord, y: y_coord}`
+///
+/// # `has_ap_to_attack() -> Bool`
+/// Returns true if this entity has enough AP to issue a single attack, false otherwise.
+///
+/// # `can_reach(target: ScriptEntity) -> Bool`
+/// Returns true if this entity can reach the `target` with a melee attack, false
+/// otherwise.
+///
+/// # `has_visibility(target: ScriptEntity) -> Bool`
+/// Returns true if this entity can see the `target`, false otherwise.
+///
+/// # `can_move() -> Bool`
+/// Returns true if this entity can move at all (even 1 square), false otherwise.
+///
+/// # `teleport_to(dest: Table)`
+/// Instantly moves this entity to the `dest`, which is a table of the form
+/// `{ x: x_coord, y: y_coord }`.  Will not move the entity if the dest
+/// position is invalid (outside area bounds, impassable).
+///
+/// # `weapon_attack(target: ScriptEntity) -> ScriptHitKind`
+/// Immediately rolls a random attack against the specified `target`, using this
+/// entities stats vs the defender. Returns the hit type, one of crit, hit,
+/// graze, or miss.
+///
+/// # 'anim_weapon_attack(target: ScriptEntity, callback: CallbackData (Optional),
+/// use_ap: Bool (Optional))`
+/// Attempts to perform a standard weapon attack against the `target`.  The attack
+/// is animated, so this method immediately returns but the attack happens
+/// asynchronously.  Upon completion of the attack, the `callback` (if specified)
+/// is run.  If `use_ap` is specified to false, no ap is deducted from the parent
+/// for the attack.  By default, the standard amount of ap is deducted.
+///
+/// # `special_attack(target: ScriptEntity, attack_kind: String, accuracy_kind: String,
+/// min_damage: Float, max_damage: Float, ap_damage: Float, damage_kind: String)`
+/// Immediately rolls a random non-standard attack against the `target`, using the specified
+/// parameters.  See `anim_special_attack`.
+///
+/// # `anim_special_attack(target: ScriptEntity, attack_kind: String, accuracy_kind: String,
+/// min_damage: Float, max_damage: Float, ap_damage: Float, damage_kind: String,
+/// callback: CallbackData (Optional))`
+/// Animates a non standard attack against the `target` with the specified parameters.
+/// AttackKind is one of `Melee`, `Ranged`, or `Spell`, and determines which of the attackers
+/// attack types to use.  AccuracyKind is one of `Fortitude`, `Reflex`, `Will`, or `Dummy`
+/// and determines which of the defenders defense stats to use.
+/// The amount of damage is rolled randomly, between the `min_damage` and `max_damage`, with
+/// the specified (`ap_damage`) amount of armor piercing.  This damage is then compared
+/// against the defender's armor as normal.
+/// If specified, the callback is called after the animation completes.  No ap is deducted
+/// for this attack.
+///
+/// # `remove()`
+/// Sets this entity to be removed (as if dead) on the next frame update.  This method
+/// is called asynchronously, so the entity will not yet be removed immediately after
+/// this method.
+///
+/// # `take_damage(attacker: ScriptEntity, min_damage: Float, max_damage: Float,
+/// damage_kind: String, ap: Int (Optional))`
+/// Causes this entity to take the specified amount of damage.  Hit points are removed,
+/// based on this entity's armor.  The damage is rolled randomly between `min_damage` and
+/// `max_damage`, with the specified (`ap`) amount of armor piercing.
+///
+/// # `heal_damage(amount: Float)`
+/// Adds the specified number of hit points to this entity.  The entity's maximum hit
+/// points cannot be exceeded in this way.
+///
+/// # `get_overflow_ap() -> Int`
+/// Returns the current amount of overflow ap for this entity.  This is AP that will become
+/// available as bonus AP (up to the maximum per round AP) on this entity's next turn.
+///
+/// # `change_overflow_ap(ap: Int)`
+/// Modifies the amount of available overflow ap for this entity.  See `get_overflow_ap`.
+///
+/// # `set_subpos(x: Float, y: Float)`
+/// Sets the pixel precise position of this entity to the specified value.  An entity should
+/// generally not be left with non-zero values for either `x` or `y`.
+///
+/// # `remove_ap(amount: Int)`
+/// Removes the specified `amount` of AP from this entity.  Keep in mind the `display_ap`
+/// factor that this amount is divided by for display purposes.
+///
+/// # `base_class() -> String`
+/// Returns the ID of the base class of this entity, or the class that this entity took at
+/// level 1.
+///
+/// # `id() -> String`
+/// Returns the ID of this entity.  This should be unique, but it is currently possible to have
+/// more than one entity with the same ID (the game does provide a warning in this case).
+///
+/// # `name() -> String`
+/// Returns the name of this entity.
+///
+/// # `has_ability(ability_id: String) -> Bool`
+/// Returns true if this entity possesses the ability with the specified `ability_id`, false
+/// otherwise.
+///
+/// # `get_ability(ability_id: String) -> ScriptAbility`
+/// Returns a `ScriptAbility` representing the ability with the specified `ability_id`.  Throws
+/// an error if this entity does not possess the ability.
+///
+/// # `ability_level(ability: ScriptAbility) -> Int`
+/// Returns the level of the specified `ability` for this entity.  This is zero if the entity
+/// does not possess the ability, one if it possesses just the base ability, and larger numbers
+/// depending on the number of upgrades possessed.
+///
+/// # `has_active_mode() -> Bool`
+/// Returns true if this entity has at least one currently active mode ability, false
+/// otherwise.
+///
+/// # `stats() -> Table`
+/// Creates and returns a stats table for this entity.  This includes all stats shown on the
+/// character sheet.
+///
+/// # `inventory() -> ScriptInventory`
+/// Returns a `ScriptInventory` object representing this entity's inventory.
+///
+/// # `size_str() -> String`
+/// Returns the ID of the size of this entity, i.e. 2by2 or 3by3.
+///
+/// # `width() -> Int`
+/// Returns the width of this entity in tiles
+///
+/// # `height() -> Int`
+/// Returns the height of this entity in tiles
+///
+/// # `x() -> Int`
+/// Returns the x coordinate of this entity's position in tiles
+///
+/// # `y() -> Int`
+/// Returns the y coordinate of this entity's position in tiles
+///
+/// # `center_x() -> Float`
+/// Returns the position of this entity's center (x + width / 2) as a float.
+///
+/// # `center_y() -> Float`
+/// Returns the position of this entity's center (y + height / 2) as a float.
 #[derive(Clone, Debug)]
 pub struct ScriptEntity {
     pub index: Option<usize>,

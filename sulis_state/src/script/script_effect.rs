@@ -26,8 +26,11 @@ use script::{CallbackData, Result, script_particle_generator, ScriptParticleGene
     script_color_animation, ScriptColorAnimation, ScriptAbility};
 use {Effect, GameState};
 
-// represents a surface already present to be passed into a script,
-// not an effect that is to be created
+/// Represents a surface that already exists, and is being passed into
+/// a Lua script.  Not used during effect creation
+/// # `mark_for_removal()`
+/// Causes the referenced surface to be removed on the next frame.  This
+/// is an asynchronous function.
 #[derive(Clone, Debug)]
 pub struct ScriptActiveSurface {
     pub index: usize,
@@ -60,6 +63,83 @@ enum Kind {
     }
 }
 
+/// An effect, normally created via `ScriptEntity:create_effect`.
+/// The effect is then configured and then `apply()` is called.
+///
+/// # `apply()`
+/// Sets this effect to active on the parent entity.
+///
+/// # `set_squares_to_fire_on_moved(squares: Int)`
+/// Only has an effect on surfaces.  Sets the number of squares that an entity
+/// must move within a surface in order to trigger an `OnMovedInSurface` script
+/// event.
+///
+/// # `add_color_anim(anim: ScriptColorAnimation)`
+/// Adds the specified `anim` to this effect.  The anim will be have `apply()` called
+/// when this effect has `apply()` called.  It will be removed when this effect is
+/// removed.
+///
+/// # `add_anim(anim: ScriptParticleGenerator)`
+/// Adds the specified `anim` to this effect.  The anim will be have `apply()` called
+/// when this effect has `apply()` called.  It will be removed when this effect is
+/// removed.
+///
+/// # `add_callback(callback: CallbackData)`
+/// Adds the specified `callback` to fire for entity's with this effect.
+///
+/// # `deactivate_with(ability: ScriptAbility)`
+/// Sets this effect to be removed whenever the specified `ability` is deactivated.
+/// The ability must be a mode.
+///
+/// # `set_tag(tag: String)`
+/// Sets a tag to identify this effect as being of a particular type to other scripts.
+/// Most notably, this is used when calling `remove_effects_with_tag` on a `ScriptEntity`
+///
+/// # `add_num_bonus(kind: String, amount: Float, when: String (Optional))`
+/// Adds a numeric bonus that is applied to the parent entity when this effect is active.
+/// Positive values are bonuses, while negative values are penalties.  `when` is optional
+/// and specifies a condition that must be met for the bonus to be active.  By default,
+/// the bonus is always applied.  Valid values are `always`, `attack_when_hidden`,
+/// `attack_when_flanking`, `weapon_equipped <WEAPON_KIND>`,
+/// `armor_equipped <ARMOR_KIND> <INVENTORY_SLOT>`, `weapon_style <WEAPON_STYLE>`,
+/// `attack_with_weapon <WEAPON_KIND>`, `attack_with_damage_kind <DAMAGE_KIND>`
+///
+/// Bonus kinds include `armor`, `ap`, `reach`, `range`, `initiative`, `hit_points`,
+/// `melee_accuracy`, `ranged_accuracy`, `spell_accuracy`, `defense`, `fortitude`,
+/// `reflex`, `will`, `concealment`, `concealment_ignore`, `crit_threshold`,
+/// `hit_threshold`, `graze_threshold`, `graze_multiplier`, `hit_multiplier`,
+/// `crit_multiplier`, `movement_rate`, `attack_cost`
+///
+/// # `add_damage(min: Float, max: Float, ap: Float (Optional), when: String (Optional))`
+/// Adds a damage bonus of the specified amount (from `min` to `max` randomly, with `ap`
+/// armor piercing).  See `add_num_bonus`
+///
+/// # `add_hidden(when: String (Optional))
+/// Adds the hidden status to this effect.  See `add_num_bonus`
+///
+/// # `add_move_disabled(when: String (Optional))
+/// Adds the move disabled status to this effect. See `add_num_bonus`
+///
+/// # `add_attack_disabled(when: String (Optional))
+/// Adds the attack disabled status to this effect.  See `add_num_bonus`
+///
+/// # `add_damage_of_kind(min: Float, max: Float, kind: String, ap: String (Optional),
+/// when: String (Optional))`
+/// Adds the specified amount (from `min` to `max` randomly, with `ap` armor piercing)
+/// of damage of the specified `kind` to this effect.
+/// See `add_num_bonus`
+///
+/// # `add_armor_of_kind(value: Float, kind: String, when: String (Optional))`
+/// Adds an armor bonus of the specified `value` and `kind` to this effect.  See
+/// `add_num_bonus`
+///
+/// # `add_resistance(value: Float, kind: String, when: String (Optional))`
+/// Adds a percentage damage resistance of `value` against `kind` damage
+/// as a bonus to this effect.  See `add_num_bonus`
+///
+/// # `add_attribute_bonus(attr: String, amount: Float, when: String (Optional))`
+/// Adds an attribute bonus for `attr` of `amount` to this effect.  Valid attributes
+/// are `Strength`, `Dexterity`, `Endurance`, `Perception`, `Intellect`, and `Wisdom`
 #[derive(Clone)]
 pub struct ScriptEffect {
     kind: Kind,

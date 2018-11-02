@@ -199,3 +199,6 @@ groups:
       potion03_blue: [10, 7]
       misc_book08: [11, 7]
       misc_scroll02: [12, 7]
+      
+      chest01: [8, 8]
+      bag01: [9, 8]

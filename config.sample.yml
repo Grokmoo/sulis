@@ -92,7 +92,7 @@ logging:
 # Defaults used by the editor when creating areas
 editor:
   # The ID of the module that the editor will load
-  module: twin_expanse
+  module: twin_expanse_act1
 
   transition_image: empty
   transition_size: 4by3

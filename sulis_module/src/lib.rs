@@ -61,6 +61,7 @@ pub use self::encounter::Encounter;
 
 pub mod campaign;
 pub use self::campaign::Campaign;
+pub use self::campaign::CampaignGroup;
 
 mod generator;
 
@@ -175,6 +176,7 @@ pub struct ModuleInfo {
     pub dir: String,
     pub name: String,
     pub description: String,
+    pub group: CampaignGroup,
 }
 
 impl ModuleInfo {
@@ -184,11 +186,21 @@ impl ModuleInfo {
 
         let campaign: CampaignBuilder = read_single_resource(&format!("{}/campaign", path_str))?;
 
+        let group = match campaign.group {
+            None => CampaignGroup {
+                id: campaign.id.to_string(),
+                name: campaign.name.to_string(),
+                position: 0
+            },
+            Some(group) => group,
+        };
+
         Ok(ModuleInfo {
             id: campaign.id,
             dir: path_str,
             name: campaign.name,
             description: campaign.description,
+            group,
         })
     }
 }

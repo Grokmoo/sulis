@@ -17,6 +17,8 @@
 use std::collections::HashMap;
 use std::rc::Rc;
 use std::io::Error;
+use std::hash::{Hash, Hasher};
+use std::cmp::Ordering;
 
 use sulis_core::image::Image;
 use sulis_core::resource::ResourceSet;
@@ -42,6 +44,40 @@ pub struct WorldMapLocation {
     pub linked_area_pos: Point,
 }
 
+#[derive(Deserialize, Debug, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct CampaignGroup {
+    pub id: String,
+    pub name: String,
+    pub position: usize,
+}
+
+impl Hash for CampaignGroup {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.id.hash(state);
+    }
+}
+
+impl PartialEq for CampaignGroup {
+    fn eq(&self, other: &CampaignGroup) -> bool {
+        self.id == other.id
+    }
+}
+
+impl Eq for CampaignGroup {}
+
+impl Ord for CampaignGroup {
+    fn cmp(&self, other: &CampaignGroup) -> Ordering {
+        self.id.cmp(&other.id)
+    }
+}
+
+impl PartialOrd for CampaignGroup {
+    fn partial_cmp(&self, other: &CampaignGroup) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
 pub struct Campaign {
     pub id: String,
     pub starting_area: String,
@@ -51,6 +87,7 @@ pub struct Campaign {
     pub backstory_conversation: Rc<Conversation>,
     pub max_starting_level: u32,
     pub world_map: WorldMap,
+    pub group: Option<CampaignGroup>,
 }
 
 impl Campaign {
@@ -85,6 +122,7 @@ impl Campaign {
         }
 
         Ok(Campaign {
+            group: builder.group,
             starting_area: builder.starting_area,
             starting_location: builder.starting_location,
             name: builder.name,
@@ -105,6 +143,7 @@ impl Campaign {
 #[serde(deny_unknown_fields)]
 pub struct CampaignBuilder {
     pub id: String,
+    pub group: Option<CampaignGroup>,
     pub starting_area: String,
     pub starting_location: Point,
     pub name: String,

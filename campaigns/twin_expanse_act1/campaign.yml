@@ -1,7 +1,11 @@
 id: twin_expanse_act1
+group:
+  id: twin_expanse
+  name: "The Twin Expanse"
+  position: 1
+name: Act 1
 starting_area: farmhouse01
 starting_location: [10, 13]
-name: "The Twin Expanse - Act 1"
 description: |
   After narrowly escaping a large goblin warband and an accidental avalanche, you awaken on the outskirks of Wellswood village.
   

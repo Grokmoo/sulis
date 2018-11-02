@@ -16,7 +16,7 @@ children:
         from: .label
         text_params:
           scale: 10
-        text: "#module#"
+        text: "#group# #module#"
         preferred_size: [100, 10]
         x_relative: Center
         position: [0, 10]
@@ -730,20 +730,39 @@ children:
           scale: 9.0
         x_relative: Center
         preferred_size: [80, 10]
-        position: [-50, 10]
-      modules_list:
-        from: .list_box
+        position: [-60, 10]
+      campaign_groups:
+        background: bg_base
         border: [2, 2, 2, 2]
         preferred_size: [100, -35]
         position: [-60, 18]
         x_relative: Center
         height_relative: Max
         width_relative: Zero
+        layout: BoxVertical
         children:
-          entry:
-            text_params:
-              scale: 9.0
-            preferred_size: [0, 6]
+          campaign_group:
+            border: { bottom: 5 }
+            width_relative: Max
+            height_relative: ChildSum
+            layout: BoxVertical
+            layout_spacing: { bottom: 2 }
+            children:
+              name_label:
+                from: .label
+                text: "#name#"
+                text_params:
+                  scale: 9.0
+                  horizontal_alignment: Center
+                width_relative: Max
+                preferred_size: [0, 6]
+              module_button:
+                from: .button
+                text: "#module#"
+                text_params:
+                  scale: 9.0
+                width_relative: Max
+                preferred_size: [0, 8]
       details:
         from: .text_area
         border: [4, 4, 4, 4]

@@ -1,7 +1,11 @@
 id: twin_expanse_prologue
+group:
+  id: twin_expanse
+  name: "The Twin Expanse"
+  position: 0
+name: Prologue
 starting_area: wellswood_road_south
 starting_location: [48, 72]
-name: "The Twin Expanse - Prologue"
 description: |
   Leaving your home at a young age, you have the spent the last year on the road learning the craft of an adventurer.
   

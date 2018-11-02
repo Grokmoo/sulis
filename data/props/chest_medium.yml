@@ -1,6 +1,6 @@
 id: chest_medium
 name: Chest
-icon: inventory/misc_crate
+icon: inventory/chest01
 image: props/chest02
 size: 3by3
 visible: true

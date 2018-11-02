@@ -139,7 +139,11 @@ impl WidgetKind for MainMenu {
 
         let module_title = Widget::with_theme(Label::empty(), "module_title");
         if Module::is_initialized() {
-            module_title.borrow_mut().state.add_text_arg("module", &Module::campaign().name);
+            let campaign = Module::campaign();
+            module_title.borrow_mut().state.add_text_arg("module", &campaign.name);
+            if let Some(group) = &campaign.group {
+                module_title.borrow_mut().state.add_text_arg("group", &group.name);
+            }
         }
 
         let menu_pane = Widget::empty("menu_pane");

@@ -1,6 +1,6 @@
 id: chest_big_level1_misc
 name: Chest
-icon: inventory/misc_crate
+icon: inventory/chest01
 image: props/chest_large
 size: 3by3
 visible: true

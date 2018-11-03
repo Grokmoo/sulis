@@ -647,7 +647,7 @@ impl TurnManager {
     fn remove_entity(&mut self, index: usize) {
         let entity = Rc::clone(self.entities[index].as_ref().unwrap());
         let area_state = GameState::get_area_state(&entity.borrow().location.area_id).unwrap();
-        let surfaces = area_state.borrow_mut().remove_entity(&entity);
+        let surfaces = area_state.borrow_mut().remove_entity(&entity, &self);
 
         for surface in surfaces.iter() {
             self.remove_from_surface(index, *surface);

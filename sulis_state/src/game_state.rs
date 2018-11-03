@@ -732,7 +732,7 @@ impl GameState {
                     let entity_index = entity.borrow().index();
                     let area_id = entity.borrow().location.area_id.to_string();
                     let area = &state.areas.get(&area_id).unwrap();
-                    let surfaces = area.borrow_mut().remove_entity(&entity);
+                    let surfaces = area.borrow_mut().remove_entity(&entity, &mgr.borrow());
 
                     for surface in surfaces {
                         mgr.borrow_mut().remove_from_surface(entity_index, surface);

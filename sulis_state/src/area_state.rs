@@ -857,6 +857,44 @@ impl AreaState {
         result
     }
 
+    fn compute_threatened(&self, mover: &Rc<RefCell<EntityState>>,
+                          mgr: &TurnManager, removal: bool) {
+        let mut mover = mover.borrow_mut();
+        let mover_index = mover.index();
+        for index in self.entities.iter() {
+            let index = *index;
+            if index == mover_index { continue; }
+
+            let entity = mgr.entity(index);
+
+            if !mover.is_hostile(&entity) { continue; }
+
+            let mut entity = entity.borrow_mut();
+
+            self.check_threatened(&mut mover, &mut entity, removal);
+            self.check_threatened(&mut entity, &mut mover, removal);
+        }
+    }
+
+    fn check_threatened(&self, att: &mut EntityState, def: &mut EntityState, removal: bool) {
+        if removal || !self.is_threat(att, def) {
+            att.actor.remove_threatening(def.index());
+            def.actor.remove_threatener(att.index());
+        } else {
+            att.actor.add_threatening(def.index());
+            def.actor.add_threatener(att.index());
+        }
+    }
+
+    fn is_threat(&self, att: &mut EntityState, def: &mut EntityState) -> bool {
+        if !att.actor.stats.attack_is_melee() { return false; }
+        if att.actor.stats.attack_disabled { return false; }
+        if att.actor.is_dead() { return false; }
+
+        let dist = att.dist(def.location.to_point(), &def.size);
+        att.actor.can_reach(dist)
+    }
+
     pub(crate) fn transition_entity_to(&mut self, entity: &Rc<RefCell<EntityState>>, index: usize,
                                 location: Location) -> Result<usize, Error> {
         let x = location.x;
@@ -877,6 +915,9 @@ impl AreaState {
         self.entities.push(index);
 
         let mgr = GameState::turn_manager();
+
+        self.compute_threatened(entity, &mgr.borrow(), false);
+
         let surfaces = self.add_entity_points(&entity.borrow());
         for surface in surfaces {
             mgr.borrow_mut().add_to_surface(entity.borrow().index(), surface);
@@ -907,6 +948,7 @@ impl AreaState {
         let old_surfaces = self.clear_entity_points(&entity.borrow(), old_x, old_y);
         let new_surfaces = self.add_entity_points(&entity.borrow());
 
+        self.compute_threatened(entity, mgr, false);
         // remove from surfaces in old but not in new
         for surface in old_surfaces.difference(&new_surfaces) {
             mgr.remove_from_surface(entity_index, *surface);
@@ -1085,15 +1127,20 @@ impl AreaState {
     }
 
     #[must_use]
-    pub fn remove_entity(&mut self, entity: &Rc<RefCell<EntityState>>) -> HashSet<usize> {
-        let entity = entity.borrow();
-        let index = entity.index();
-        trace!("Removing entity '{}' with index '{}'", entity.actor.actor.name, index);
-        let x = entity.location.x;
-        let y = entity.location.y;
-        let surfaces = self.clear_entity_points(&entity, x, y);
+    pub fn remove_entity(&mut self, entity: &Rc<RefCell<EntityState>>,
+                         mgr: &TurnManager) -> HashSet<usize> {
+        let (index, surfaces) = {
+            let entity = entity.borrow();
+            let index = entity.index();
+            trace!("Removing entity '{}' with index '{}'", entity.actor.actor.name, index);
+            let x = entity.location.x;
+            let y = entity.location.y;
+            (index, self.clear_entity_points(&entity, x, y))
+        };
 
         self.entities.retain(|i| *i != index);
+
+        self.compute_threatened(entity, mgr, true);
 
         surfaces
     }

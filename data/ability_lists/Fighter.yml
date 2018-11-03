@@ -45,6 +45,8 @@ abilities:
     position: [0, 7]
   - id: penetrating_shot
     position: [2, 6.5]
+  - id: point_blank_shot
+    position: [3, 6]
   - id: arrow_storm
     position: [3, 7]
   - id: ranged_mastery

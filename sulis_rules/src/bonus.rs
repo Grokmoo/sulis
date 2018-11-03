@@ -94,6 +94,9 @@ pub enum Contingent {
 
     /// Bonuses that are only applied to attacks with the specified base damage kind
     AttackWithDamageKind(DamageKind),
+
+    /// Bonuses that only apply when the parent is threatened in melee
+    Threatened,
 }
 
 impl Default for Contingent {

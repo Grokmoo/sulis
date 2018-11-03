@@ -301,6 +301,7 @@ fn add_bonus_to_effect(effect: &mut ScriptEffect, bonus_kind: BonusKind, when: O
                 "always" => Contingent::Always,
                 "attack_when_hidden" => Contingent::AttackWhenHidden,
                 "attack_when_flanking" => Contingent::AttackWhenFlanking,
+                "threatened" => Contingent::Threatened,
                 _ => {
                     warn!("Unable to parse contingent '{}'.  May need an additional arg.", when);
                     return;

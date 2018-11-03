@@ -336,6 +336,10 @@ use {ai, animation::{self}, script::*, MOVE_TO_THRESHOLD};
 ///
 /// # `center_y() -> Float`
 /// Returns the position of this entity's center (y + height / 2) as a float.
+///
+/// # `is_threatened() -> Bool`
+/// Returns whether or not this entity is currently threatened by a hostile
+/// with a melee weapon
 #[derive(Clone, Debug)]
 pub struct ScriptEntity {
     pub index: Option<usize>,
@@ -689,7 +693,7 @@ impl UserData for ScriptEntity {
                 let old_area_state = GameState::get_area_state(
                     &entity.borrow().location.area_id).unwrap();
 
-                let surfaces = old_area_state.borrow_mut().remove_entity(&entity);
+                let surfaces = old_area_state.borrow_mut().remove_entity(&entity, &mgr.borrow());
                 for surface in surfaces {
                     mgr.borrow_mut().remove_from_surface(entity_index, surface);
                 }
@@ -984,6 +988,12 @@ impl UserData for ScriptEntity {
             let entity = entity.try_unwrap()?;
             let entity = entity.borrow();
             Ok(entity.dist_to_point(Point::new(x, y)))
+        });
+
+        methods.add_method("is_threatened", |_, entity, ()| {
+            let entity = entity.try_unwrap()?;
+            let entity = entity.borrow();
+            Ok(entity.actor.is_threatened())
         });
     }
 }
@@ -1428,9 +1438,11 @@ fn attackable(_lua: &Lua, set: &ScriptEntitySet, _args: ()) -> Result<ScriptEnti
 
 fn threatening(_lua: &Lua, set: &ScriptEntitySet, _args: ()) -> Result<ScriptEntitySet> {
     filter_entities(set, (), &|parent, entity, _| {
-        if !entity.borrow().actor.stats.attack_is_melee() { return false; }
+        let entity = entity.borrow();
+        if !entity.actor.stats.attack_is_melee() { return false; }
+        if entity.actor.stats.attack_disabled { return false; }
 
-        entity.borrow().can_reach(parent)
+        entity.can_reach(parent)
     })
 }
 

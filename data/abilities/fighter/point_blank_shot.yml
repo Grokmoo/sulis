@@ -1,0 +1,17 @@
+id: point_blank_shot
+name: "Point Blank Shot"
+icon: abilities/point_blank_shot
+description: |
+  You no longer suffer penalties to attack and defense when using your ranged weapon in melee combat.
+bonuses:
+  - kind:
+      ranged_accuracy: 20
+    when:
+      Threatened
+  - kind:
+      defense: 20
+    when:
+      Threatened
+prereqs:
+  abilities: [ crippling_shot ]
+  total_level: 7

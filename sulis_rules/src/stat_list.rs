@@ -224,7 +224,7 @@ impl StatList {
                 AttackWithWeapon(_) | AttackWhenHidden | AttackWithDamageKind(_) =>
                     self.attack_bonuses.push(bonus.clone()),
                 AttackWhenFlanking => self.flanking_bonuses.add(bonus.clone()),
-                WeaponEquipped(_) | ArmorEquipped {..} | WeaponStyle(_) =>
+                WeaponEquipped(_) | ArmorEquipped {..} | WeaponStyle(_) | Threatened =>
                     self.contingent_bonuses.add(bonus.clone()),
             }
         }
@@ -290,7 +290,8 @@ impl StatList {
                     equipped_armor: HashMap<Slot, ArmorKind>,
                     weapon_style: WeaponStyle,
                     multiplier: f32,
-                    base_attr: i32) {
+                    base_attr: i32,
+                    threatened: bool) {
         let is_melee = if attacks.is_empty() {
             warn!("Finalized stats with no attacks");
             false
@@ -323,6 +324,9 @@ impl StatList {
                         self.add_bonus(&bonus.kind, 1);
                     }
                 },
+                Threatened => {
+                    if threatened { self.add_bonus(&bonus.kind, 1); }
+                }
             }
         }
 

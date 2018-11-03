@@ -563,7 +563,7 @@ fn get_targeter() -> Result<Rc<RefCell<AreaTargeter>>> {
 /// Adds the specified number of coins to the party.  Note that this value is divided by
 /// the item_value_display_factor to get the displayed coinage.
 ///
-/// # `add_party_item(id: String, adjective: String (Optional))`
+/// # `add_party_item(id: String, adjective: String (Optional, up to 3))`
 /// Creates an item with the specified `id`, and `adjective`, if specified.  If there is
 /// no item definition with this ID or the adjective is specified but there is no
 /// adjective with that ID, throws an error.  Otherwise, the item is added to the party
@@ -973,8 +973,10 @@ impl UserData for ScriptInterface {
             Ok(())
         });
 
-        methods.add_method("add_party_item", |_, _, (item, adj): (String, Option<String>)| {
-            let adjectives: Vec<_> = adj.into_iter().collect();
+        methods.add_method("add_party_item", |_, _, (item, adj1, adj2, adj3):
+            (String, Option<String>, Option<String>, Option<String>)| {
+            let adjs = vec![adj1, adj2, adj3];
+            let adjectives: Vec<_> = adjs.into_iter().filter_map(|a| a).collect();
 
             let stash = GameState::party_stash();
             let item = match Module::create_get_item(&item, &adjectives) {

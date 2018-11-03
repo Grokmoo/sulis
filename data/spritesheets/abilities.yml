@@ -127,5 +127,6 @@ groups:
       sundering_trap: [2, 15]
       become_wind: [3, 15]
       practiced_caster: [4, 15]
+      point_blank_shot: [5, 15]
       
       prereqs_not_met: [7, 4]

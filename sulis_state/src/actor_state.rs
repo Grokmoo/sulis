@@ -147,6 +147,36 @@ impl ActorState {
         actor_state
     }
 
+    pub fn is_threatened(&self) -> bool { self.p_stats.is_threatened() }
+
+    pub fn add_threatening(&mut self, index: usize) {
+        self.p_stats.add_threatening(index);
+    }
+
+    pub fn remove_threatening(&mut self, index: usize) {
+        self.p_stats.remove_threatening(index);
+    }
+
+    pub fn add_threatener(&mut self, index: usize) {
+        let cur = self.p_stats.is_threatened();
+        self.p_stats.add_threatener(index);
+
+        if cur != self.p_stats.is_threatened() {
+            trace!("Recompute threat on {}", self.actor.name);
+            self.compute_stats();
+        }
+    }
+
+    pub fn remove_threatener(&mut self, index: usize) {
+        let cur = self.p_stats.is_threatened();
+        self.p_stats.remove_threatener(index);
+
+        if cur != self.p_stats.is_threatened() {
+            trace!("Recompute threat on {}", self.actor.name);
+            self.compute_stats();
+        }
+    }
+
     pub fn faction(&self) -> Faction {
         self.p_stats.faction
     }
@@ -782,8 +812,10 @@ impl ActorState {
         }
 
         let weapon_style = self.inventory.weapon_style();
+        let is_threatened = self.is_threatened();
 
-        self.stats.finalize(attacks_list, equipped_armor, weapon_style, multiplier, rules.base_attribute);
+        self.stats.finalize(attacks_list, equipped_armor, weapon_style,
+                            multiplier, rules.base_attribute, is_threatened);
         self.stats.flanking_angle += rules.base_flanking_angle;
         self.stats.crit_threshold += rules.crit_percentile as i32;
         self.stats.hit_threshold += rules.hit_percentile as i32;

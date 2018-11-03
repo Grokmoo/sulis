@@ -13,7 +13,7 @@ bonuses:
     when:
       WeaponStyle: Ranged
 prereqs:
-  abilities: [ arrow_storm, crippling_shot ]
+  abilities: [ arrow_storm, point_blank_shot ]
   total_level: 9
 upgrades:
   - description: |

@@ -9,7 +9,13 @@ value: 300
 equippable:
   slot: HeldMain
   blocks_slot: HeldOff
-  bonuses: []
+  bonuses:
+    - when: Threatened
+      kind:
+        defense: -20
+    - when: Threatened
+      kind:
+        ranged_accuracy: -20
   attack:
     damage:
       min: 12

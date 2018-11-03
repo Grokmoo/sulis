@@ -29,6 +29,7 @@ use serde_yaml;
 
 thread_local! {
     static CONFIG: RefCell<Config> = RefCell::new(Config::init());
+    static OLD_CONFIG: RefCell<Option<Config>> = RefCell::new(None);
 }
 
 lazy_static! {
@@ -50,7 +51,13 @@ pub struct Config {
 
 impl Config {
     pub fn set(config: Config) {
-        CONFIG.with(|c| *c.borrow_mut() = config);
+        let old_config = CONFIG.with(|c| c.replace(config));
+
+        OLD_CONFIG.with(|c| c.replace(Some(old_config)));
+    }
+
+    pub fn take_old_config() -> Option<Config> {
+        OLD_CONFIG.with(|c| c.replace(None))
     }
 
     pub fn get_clone() -> Config {

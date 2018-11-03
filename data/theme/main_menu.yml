@@ -102,6 +102,8 @@ children:
         from: .portrait_selector
       exit_confirmation_window:
         from: .exit_confirmation
+      save_or_revert_options_window:
+        from: .save_or_revert_options_window
       delete_character_confirmation_window:
         from: .confirmation_window
         children:
@@ -239,6 +241,44 @@ children:
         text: "Press a key to bind to #action#"
         width_relative: Max
         height_relative: Max
+  save_or_revert_options_window:
+    background: bg_base
+    border: [1, 1, 1, 1]
+    preferred_size: [100, 43]
+    x_relative: Center
+    y_relative: Center
+    position: [0, -20]
+    children:
+      title:
+        from: .label
+        width_relative: Max
+        preferred_size: [0, 4]
+        position: [0, 3]
+        text_params:
+          scale: 7
+        text: "Your options will revert to their previous state in"
+      timer:
+        from: .label
+        width_relative: Max
+        preferred_size: [0, 5]
+        position: [0, 8]
+        text_params:
+          scale: 7
+        text: "#time# seconds"
+      revert:
+        from: .button
+        preferred_size: [44, 12]
+        text: "Revert Now"
+        text_params:
+          scale: 7
+        position: [51, 25]
+      accept:
+        from: .button
+        preferred_size: [44, 12]
+        text: "Accept Changes"
+        text_params:
+          scale: 7
+        position: [3, 25]
   options_window:
     children:
       title:

@@ -29,10 +29,14 @@ use self::mods_selector::ModsSelector;
 pub mod options;
 pub use self::options::Options;
 
+pub mod save_or_revert_options_window;
+pub use self::save_or_revert_options_window::SaveOrRevertOptionsWindow;
+
 use std::any::Any;
 use std::rc::Rc;
 use std::cell::{RefCell};
 
+use sulis_core::config::Config;
 use sulis_core::io::{InputAction, MainLoopUpdater, DisplayConfiguration};
 use sulis_core::ui::*;
 use sulis_core::util;
@@ -256,6 +260,12 @@ impl WidgetKind for MainMenu {
 
         if let Some(builder) = self.char_builder_to_add.take() {
             children.push(Widget::with_defaults(builder));
+        }
+
+        if let Some(options) = Config::take_old_config() {
+            let config_confirm = Widget::with_defaults(SaveOrRevertOptionsWindow::new(options));
+            config_confirm.borrow_mut().state.set_modal(true);
+            children.push(config_confirm);
         }
 
         children

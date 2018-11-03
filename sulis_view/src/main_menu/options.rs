@@ -20,7 +20,6 @@ use std::cell::{RefCell};
 use std::path::Path;
 
 use sulis_core::config::{self, Config};
-use sulis_core::resource::write_to_file;
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::io::{keyboard_event::Key, InputAction, DisplayConfiguration, event::ClickKind};
 use sulis_core::config::DisplayMode;
@@ -88,15 +87,8 @@ impl Options {
             }
         };
 
-        let mut path = config::USER_DIR.clone();
-        path.push("config.yml");
-        match write_to_file(path.as_path(), &config) {
-            Ok(()) => (),
-            Err(e) => {
-                warn!("Error writing config to file:");
-                warn!("{}", e);
-            }
-        }
+        // don't save config to disk at this point.  it is only saved
+        // when accepted in the save_or_revert_options_window popup
         Config::set(config);
     }
 
@@ -117,16 +109,8 @@ impl Options {
             config.input.keybindings.insert(*k, *v);
         }
 
-        let mut path = config::USER_DIR.clone();
-        path.push("config.yml");
-        match write_to_file(path.as_path(), &config) {
-            Ok(()) => (),
-            Err(e) => {
-                warn!("Error writing config to file:");
-                warn!("{}", e);
-            }
-        }
-
+        // don't save config to disk at this point.  it is only saved
+        // when accepted in the save_or_revert_options_window popup
         Config::set(config);
     }
 

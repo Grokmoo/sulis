@@ -632,10 +632,11 @@ impl TurnManager {
         debug!("Check encounter cleared: {}", ai_group);
         for other in self.entity_iter() {
             let other = other.borrow();
-            if other.actor.hp() < 0 { continue; }
+            if other.actor.hp() <= 0 { continue; }
             if let Some(index) = other.ai_group() {
                 if index == ai_group {
-                    debug!("  Found blocking entity '{}'", other.actor.actor.id);
+                    debug!("  Found blocking entity '{}' with {}",
+                           other.actor.actor.id, other.actor.hp());
                     return None;
                 }
             }
@@ -662,6 +663,7 @@ impl TurnManager {
         // don't actually remove the entity from the backing vec, to allow
         // scripts to continue to reference it
         // self.entities[index] = None;
+        entity.borrow_mut().marked_for_removal = false;
 
         // can't do this with a collect because of lifetime issues
         let mut effects_to_remove = Vec::new();

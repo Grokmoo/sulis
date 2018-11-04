@@ -5,7 +5,7 @@ max_gen_actors: 0
 entries:
   - id: ogre
     always: true
-  - id: goblin_archer
+  - id: goblin
     always: true
-  - id: goblin_archer
+  - id: goblin
     always: true

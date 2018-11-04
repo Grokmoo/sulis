@@ -2,7 +2,7 @@ id: tenacious_soul
 name: "Tenacious Soul"
 icon: abilities/tenacious_soul
 description: |
-  Your strength of mind is improved.  You gain +10 to Will Defense.
+  Your strength of mind is improved.  You gain +10 to Will.
 bonuses:
   - kind:
       will: 10

@@ -84,6 +84,7 @@ impl CosmeticSelectorPane {
 
         let mut insert: HashMap<ImageLayer, Rc<Image>> = HashMap::new();
         for (slot, item) in self.items.iter() {
+            if *slot == Slot::Head { continue; } // don't show helmet so we can see hair and ears
             if race.disabled_slots.contains(slot) { continue; }
 
             let iter = match &item.equippable {

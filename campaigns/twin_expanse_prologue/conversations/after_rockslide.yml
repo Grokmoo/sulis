@@ -4,7 +4,7 @@ initial_nodes:
 nodes:
   start01:
     text: |
-      [c=888|As the dust clears, you see several members of your party around you, but no sign of Torvald.  It seems also that the goblins have left, at least for now.]
+      [c=888|As the dust clears, you see a couple members of your party around you, but no sign of Torvald.  It seems also that the goblins have left, at least for now.]
     responses:
       - text: |
           What happened?
@@ -38,9 +38,9 @@ nodes:
         to: start04
   start04:
     text: |
-      #player_name#, I think you are the best choice to lead us out of this.  You've certainly shown more initiative then anyone else here.
+      #player_name#, I think you are the best choice to lead us out of this.  You've certainly shown more initiative then anyone else in the group.
       
-      [c=888|The others nod in agreement.  It looks like the matter has been quickly settled.]
+      [c=888|It looks like the matter has been quickly settled.]
     responses:
       - text: |
           Alright then.  Lets go.

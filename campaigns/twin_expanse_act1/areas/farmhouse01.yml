@@ -50,13 +50,9 @@ props:
       - quantity: 1
         item:
           id: longsword
-          adjectives:
-            - fine
       - quantity: 1
         item:
           id: shortbow
-          adjectives:
-            - fine
     enabled: true
   - id: cabinet_med_04
     location:

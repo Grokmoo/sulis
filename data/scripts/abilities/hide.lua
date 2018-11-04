@@ -55,8 +55,8 @@ end
 function check_spotted(parent, ability)
   stats = parent:stats()
   parent_concealment = stats.concealment
-  parent_hide_level = parent:ability_level(ability) * 20 + stats.level * 2
-  break_even_distance = 8
+  parent_hide_level = 5 + parent:ability_level(ability) * 20 + stats.level * 2
+  break_even_distance = 6
   if parent:get_ability("hide_in_plain_sight") ~= nil then
     break_even_distance = 0
   end

@@ -11,6 +11,9 @@ swap_weapons_ap: 2000
 initiative_roll_max: 20
 base_flanking_angle: 150
 
+flanking_accuracy_bonus: 10
+hidden_accuracy_bonus: 20
+
 graze_percentile: 20
 hit_percentile: 55
 crit_percentile: 100

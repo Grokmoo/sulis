@@ -762,10 +762,10 @@ impl UserData for ScriptEntity {
             let time = Config::animation_base_time_millis() * 5;
             let anim = animation::melee_attack_animation::new(&Rc::clone(&parent), &target,
                                                               time, cbs, Box::new(move |att, def| {
-                let attack = Attack::special(&parent.borrow().actor.stats, min_damage, max_damage,
-                    ap, damage_kind, attack_kind.clone());
+                let mut attack = Attack::special(&parent.borrow().actor.stats,
+                    min_damage, max_damage, ap, damage_kind, attack_kind.clone());
 
-                ActorState::attack(att, def, &attack)
+                ActorState::attack(att, def, &mut attack)
             }));
 
             GameState::add_animation(anim);
@@ -788,10 +788,11 @@ impl UserData for ScriptEntity {
             let max_damage = max_damage.unwrap_or(0.0) as u32;
             let ap = ap.unwrap_or(0.0) as u32;
 
-            let attack = Attack::special(&parent.borrow().actor.stats,
+            let mut attack = Attack::special(&parent.borrow().actor.stats,
                 min_damage, max_damage, ap, damage_kind, attack_kind);
 
-            let (hit_kind, damage, text, color) = ActorState::attack(&parent, &target, &attack);
+            let (hit_kind, damage, text, color) =
+                ActorState::attack(&parent, &target, &mut attack);
 
             let area_state = GameState::area_state();
             area_state.borrow_mut().add_feedback_text(text, &target, color);

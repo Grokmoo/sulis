@@ -34,6 +34,9 @@ pub struct Rules {
     pub hit_percentile: u32,
     pub crit_percentile: u32,
 
+    pub flanking_accuracy_bonus: i32,
+    pub hidden_accuracy_bonus: i32,
+
     pub graze_damage_multiplier: f32,
     pub crit_damage_multiplier: f32,
 

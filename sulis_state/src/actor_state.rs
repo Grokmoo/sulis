@@ -372,25 +372,14 @@ impl ActorState {
         self.p_stats.ap() >= self.stats.attack_cost as u32
     }
 
-    pub fn weapon_attack(parent: &Rc<RefCell<EntityState>>,
-                         target: &Rc<RefCell<EntityState>>) -> (HitKind, u32, String, ColorKind) {
-        if target.borrow_mut().actor.hp() <= 0 {
-            return (HitKind::Miss, 0, "Miss".to_string(), ColorKind::Miss);
-        }
-
-        info!("'{}' attacks '{}'", parent.borrow().actor.actor.name, target.borrow().actor.actor.name);
-
-        let mut color = ColorKind::Miss;
-        let mut damage_str = String::new();
-        let mut not_first = false;
-        let mut hit_kind = HitKind::Miss;
-        let mut total_damage = 0;
-
-        let attacks = parent.borrow().actor.stats.attacks.clone();
-
-        let mut is_flanking = false;
+     fn is_flanking(parent: &Rc<RefCell<EntityState>>,
+                              target: &Rc<RefCell<EntityState>>) -> bool {
         let mgr = GameState::turn_manager();
-        for entity in mgr.borrow().entity_iter() {
+        let area = GameState::get_area_state(&parent.borrow().location.area_id).unwrap();
+        let area = area.borrow();
+        for entity_index in area.entity_iter() {
+            let entity = mgr.borrow().entity(*entity_index);
+
             if Rc::ptr_eq(&entity, parent) { continue; }
             if Rc::ptr_eq(&entity, target) { continue; }
 
@@ -407,27 +396,62 @@ impl ActorState {
             let p1 = (p_target.0 - p_parent.0, p_target.1 - p_parent.1);
             let p2 = (p_target.0 - p_other.0, p_target.1 - p_other.1);
 
-            let angle = ((p1.0 * p2.0 + p1.1 * p2.1) / (p1.0.hypot(p1.1) * p2.0.hypot(p2.1))).acos();
-            let angle = angle.to_degrees();
+            // info!("p1: {:?}", p1);
+            // info!("p2: {:?}", p2);
 
-            // info!("Got angle {} between {} and {} attacking {}", angle, parent.borrow().actor.actor.name,
-            //     entity.actor.actor.name, target.borrow().actor.actor.name);
+            let mut cos_angle = (p1.0 * p2.0 + p1.1 * p2.1) / (p1.0.hypot(p1.1) * p2.0.hypot(p2.1));
+            if cos_angle > 1.0 { cos_angle = 1.0; }
+            if cos_angle < -1.0 { cos_angle = -1.0; }
+            // info!("cos(angle) = {}", cos_angle);
+
+            let angle = cos_angle.acos().to_degrees();
+
+            trace!("Got angle {} between {} and {} attacking {}", angle,
+                   parent.borrow().actor.actor.name, entity.actor.actor.name,
+                   target.borrow().actor.actor.name);
+
             if angle > parent.borrow().actor.stats.flanking_angle as f32 {
-                is_flanking = true;
-                break;
+                return true;
             }
+        }
+
+        false
+    }
+
+    pub fn weapon_attack(parent: &Rc<RefCell<EntityState>>,
+                         target: &Rc<RefCell<EntityState>>) -> (HitKind, u32, String, ColorKind) {
+        if target.borrow_mut().actor.hp() <= 0 {
+            return (HitKind::Miss, 0, "Miss".to_string(), ColorKind::Miss);
+        }
+
+        info!("'{}' attacks '{}'", parent.borrow().actor.actor.name, target.borrow().actor.actor.name);
+
+        let mut color = ColorKind::Miss;
+        let mut damage_str = String::new();
+        let mut not_first = false;
+        let mut hit_kind = HitKind::Miss;
+        let mut total_damage = 0;
+
+        let attacks = parent.borrow().actor.stats.attacks.clone();
+
+        let is_flanking = ActorState::is_flanking(parent, target);
+        if parent.borrow().actor.stats.hidden {
+            damage_str.push_str("Sneak Attack! ");
+        } else if is_flanking {
+            damage_str.push_str("Flanked! ");
         }
 
         for attack in attacks {
             if not_first { damage_str.push_str(", "); }
 
-            let attack = if is_flanking {
+            let mut attack = if is_flanking {
                 Attack::from(&attack, &parent.borrow().actor.stats.flanking_bonuses)
             } else {
                 attack
             };
 
-            let (hit, dmg, attack_result, attack_color) = ActorState::attack_internal(parent, target, &attack);
+            let (hit, dmg, attack_result, attack_color) =
+                ActorState::attack_internal(parent, target, &mut attack, is_flanking);
             if attack_color != ColorKind::Miss {
                 color = attack_color;
             }
@@ -448,22 +472,37 @@ impl ActorState {
     }
 
     pub fn attack(parent: &Rc<RefCell<EntityState>>, target: &Rc<RefCell<EntityState>>,
-                  attack: &Attack) -> (HitKind, u32, String, ColorKind) {
+                  attack: &mut Attack) -> (HitKind, u32, String, ColorKind) {
         if target.borrow_mut().actor.hp() <= 0 {
             return (HitKind::Miss, 0, "Miss".to_string(), ColorKind::Miss);
         }
 
         info!("'{}' attacks '{}'", parent.borrow().actor.actor.name, target.borrow().actor.actor.name);
 
-        let result = ActorState::attack_internal(parent, target, attack);
+        let mut damage_str = String::new();
+        let is_flanking = ActorState::is_flanking(parent, target);
+        if parent.borrow().actor.stats.hidden {
+            damage_str.push_str("Sneak Attack! ");
+        } else if is_flanking {
+            damage_str.push_str("Flanked! ");
+        }
+
+        let (hit_kind, damage, result, color) =
+            ActorState::attack_internal(parent, target, attack, is_flanking);
+        damage_str.push_str(&result);
 
         ActorState::check_death(parent, target);
-        result
+
+        (hit_kind, damage, damage_str, color)
     }
 
-    fn attack_internal(parent: &Rc<RefCell<EntityState>>, target: &Rc<RefCell<EntityState>>,
-                       attack: &Attack) -> (HitKind, u32, String, ColorKind) {
+    fn attack_internal(parent: &Rc<RefCell<EntityState>>,
+                       target: &Rc<RefCell<EntityState>>,
+                       attack: &mut Attack,
+                       flanking: bool) -> (HitKind, u32, String, ColorKind) {
         let rules = Module::rules();
+
+        let hidden = parent.borrow().actor.stats.hidden;
 
         let concealment = cmp::max(0, target.borrow().actor.stats.concealment -
                                    parent.borrow().actor.stats.concealment_ignore);
@@ -486,6 +525,16 @@ impl ActorState {
                 }
             }
         };
+
+        if flanking {
+            attack.bonuses.melee_accuracy += rules.flanking_accuracy_bonus;
+            attack.bonuses.ranged_accuracy += rules.flanking_accuracy_bonus;
+            attack.bonuses.spell_accuracy += rules.flanking_accuracy_bonus;
+        } else if hidden {
+            attack.bonuses.melee_accuracy += rules.hidden_accuracy_bonus;
+            attack.bonuses.ranged_accuracy += rules.hidden_accuracy_bonus;
+            attack.bonuses.spell_accuracy += rules.hidden_accuracy_bonus;
+        }
 
         let (hit_kind, damage_multiplier) = {
             let parent_stats = &parent.borrow().actor.stats;

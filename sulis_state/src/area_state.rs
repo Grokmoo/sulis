@@ -17,12 +17,13 @@
 use std::io::Error;
 use std::{ptr};
 use std::rc::Rc;
+use std::time;
 use std::cell::{Ref, RefCell};
 use std::collections::HashSet;
 
 use rand::{self, Rng};
 
-use sulis_core::util::{invalid_data_error, Point};
+use sulis_core::util::{self, invalid_data_error, Point};
 use sulis_core::config::Config;
 use sulis_module::{Actor, Area, LootList, Module, ObjectSize, prop};
 use sulis_module::area::{EncounterData, PropData, Transition, TriggerKind};
@@ -628,8 +629,23 @@ impl AreaState {
     }
 
     pub fn compute_pc_visibility(&mut self, entity: &Rc<RefCell<EntityState>>, delta_x: i32, delta_y: i32) {
-        calculate_los(&mut self.pc_explored, &self.area, &self.prop_vis_grid,
+
+        let start_time = time::Instant::now();
+
+        let props_vis = calculate_los(&mut self.pc_explored, &self.area, &self.prop_vis_grid,
+                      &self.prop_grid,
                       &mut entity.borrow_mut(), delta_x, delta_y);
+
+        // set explored to true for any partially visible props
+        for prop_index in props_vis {
+            let prop = self.props[prop_index].as_ref().unwrap();
+            for point in prop.location_points() {
+                let index = (point.x + point.y * self.area.width) as usize;
+                self.pc_explored[index] = true;
+            }
+        }
+
+        trace!("Visibility compute time: {}", util::format_elapsed_secs(start_time.elapsed()));
     }
 
     pub fn update_view_visibility(&mut self) {

@@ -15,17 +15,16 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::rc::Rc;
-use std::time;
 use std::cmp;
+use std::collections::HashSet;
 
-use sulis_core::util;
 use sulis_module::Area;
 use {EntityState};
 
+#[must_use]
 pub fn calculate_los(exp: &mut Vec<bool>, area: &Rc<Area>, prop_vis_grid: &[bool],
-                     entity: &mut EntityState, delta_x: i32, delta_y: i32) {
-    let start_time = time::Instant::now();
-
+                     prop_grid: &[Option<usize>], entity: &mut EntityState,
+                     delta_x: i32, delta_y: i32) -> HashSet<usize> {
     let max_dist = area.vis_dist;
     let entity_x = entity.location.x + entity.size.width / 2;
     let entity_y = entity.location.y + entity.size.height / 2;
@@ -39,19 +38,26 @@ pub fn calculate_los(exp: &mut Vec<bool>, area: &Rc<Area>, prop_vis_grid: &[bool
 
     let src_elev = area.layer_set.elevation(entity_x, entity_y);
 
+    let mut props_vis: HashSet<usize> = HashSet::new();
+
     for y in min_y..max_y {
         for x in min_x..max_x {
             let index = (x + y * area.width) as usize;
             if check_vis(area, prop_vis_grid, entity_x, entity_y, x, y, src_elev) {
                 los[index] = true;
                 exp[index] = true;
+
+                match prop_grid[index] {
+                    None => (),
+                    Some(prop) => { props_vis.insert(prop); },
+                }
             } else {
                 los[index] = false;
             }
         }
     }
 
-    trace!("Visibility compute time: {}", util::format_elapsed_secs(start_time.elapsed()));
+    props_vis
 }
 
 pub fn has_visibility(area: &Rc<Area>, prop_vis_grid: &[bool],

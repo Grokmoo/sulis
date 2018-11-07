@@ -21,7 +21,7 @@ use std::io::Error;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{animation_state, AnimationState};
 use sulis_core::util::invalid_data_error;
-use sulis_module::{Item, LootList, Module, Prop, prop};
+use sulis_module::{Item, LootList, Module, Prop, prop, ObjectSizeIterator};
 use sulis_module::area::PropData;
 
 use entity_state::AreaDrawable;
@@ -161,6 +161,10 @@ impl PropState {
 
     pub fn is_enabled(&self) -> bool {
         self.enabled
+    }
+
+    pub fn location_points(&self) -> ObjectSizeIterator {
+        self.prop.size.points(self.location.x, self.location.y)
     }
 
     pub (crate) fn set_enabled(&mut self, enabled: bool) {

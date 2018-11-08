@@ -18,7 +18,7 @@ inventory:
     HeldMain: { id: shortsword }
     HeldOff: { id: shortsword}
 reward:
-  xp: 30
+  xp: 25
   loot: level1_misc
   loot_chance: 35
 abilities:

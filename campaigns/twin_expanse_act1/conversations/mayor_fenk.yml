@@ -46,6 +46,7 @@ nodes:
         to: ask_pass
         to_view:
           - player_flag: rose_lake_bridge_pass
+          - not_player_flag: leader_of_beasts_reported
       - text: "The one responsible for organizing the raids is dead."
         to: raids_complete
         to_view:

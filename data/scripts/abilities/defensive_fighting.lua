@@ -10,7 +10,7 @@ function on_activate(parent, ability)
   end
 
   stats = parent:stats()
-  amount = 10 + stats.level / 2
+  amount = 5 + stats.level / 2
   
   effect = parent:create_effect(ability:name())
   effect:deactivate_with(ability)

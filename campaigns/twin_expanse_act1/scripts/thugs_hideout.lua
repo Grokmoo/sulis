@@ -18,7 +18,7 @@ function set_thugs_hostile()
 end
 
 function thugs_pay_off()
-  game:add_party_xp(100)
+  game:add_party_xp(50)
 end
 
 function set_boss_hostile()

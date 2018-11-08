@@ -47,7 +47,7 @@ upgrades:
   3:
     ability_choices: [ mage, general ]
     group_uses_per_encounter:
-      - [ "Cantrips", 1 ]
+      - [ "Cantrips", 2 ]
     group_uses_per_day:
       - [ "Cantrips", 3 ]
       - [ "1st Circle", 2 ]
@@ -62,7 +62,7 @@ upgrades:
   5:
     ability_choices: [ mage ]
     group_uses_per_encounter:
-      - [ "Cantrips", 2 ]
+      - [ "Cantrips", 3 ]
     group_uses_per_day:
       - [ "Cantrips", 3 ]
       - [ "1st Circle", 3 ]
@@ -70,7 +70,7 @@ upgrades:
   6:
     ability_choices: [ mage, general ]
     group_uses_per_encounter:
-      - [ "Cantrips", 2 ]
+      - [ "Cantrips", 3 ]
       - [ "1st Circle", 1 ]
     group_uses_per_day:
       - [ "Cantrips", 3 ]
@@ -79,7 +79,7 @@ upgrades:
   7:
     ability_choices: [ mage ]
     group_uses_per_encounter:
-      - [ "Cantrips", 2 ]
+      - [ "Cantrips", 3 ]
       - [ "1st Circle", 1 ]
     group_uses_per_day:
       - [ "Cantrips", 2 ]

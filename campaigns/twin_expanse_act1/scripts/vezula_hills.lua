@@ -7,7 +7,7 @@ end
 function rockslide_final_fate(parent)
   game:set_quest_entry_state("the_rockslide", "final_fate", "Visible")
   game:set_quest_state("the_rockslide", "Complete")
-  game:add_party_xp(200)
+  game:add_party_xp(100)
 end
 
 function kaelwyn_leave(parent)
@@ -17,7 +17,7 @@ end
 
 function learn_ring_gone(parent)
   game:set_quest_entry_state("vaalyuns_journey", "ring_gone", "Visible")
-  game:add_party_xp(100)
+  game:add_party_xp(50)
 end
 
 function enable_worldmap(parent)
@@ -33,7 +33,7 @@ end
 
 function serpent_mire_map(parent)
   game:set_quest_entry_state("leader_of_beasts", "serpents_mire", "Visible")
-  game:add_party_xp(100)
+  game:add_party_xp(50)
   
   game:set_world_map_location_visible("serpents_mire", true)
   game:set_world_map_location_enabled("serpents_mire", true)

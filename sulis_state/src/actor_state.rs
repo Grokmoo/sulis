@@ -312,7 +312,7 @@ impl ActorState {
         state.activate();
 
         let per_enc = *self.p_stats.current_group_uses_per_encounter
-            .get(&state.group).unwrap_or(&ExtInt::Int(1));
+            .get(&state.group).unwrap_or(&ExtInt::Int(0));
 
         // take one use from per encounter if available, otherwise take from per day
         if per_enc.is_zero() {

@@ -18,7 +18,7 @@ inventory:
     HeldMain: { id: longsword }
     HeldOff: { id: shield_large }
 reward:
-  xp: 30
+  xp: 25
   loot: level1_misc
   loot_chance: 35
 abilities:

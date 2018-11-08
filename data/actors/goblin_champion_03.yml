@@ -17,7 +17,7 @@ inventory:
     HeldMain: { id: morningstar }
     HeldOff: { id: shield_large }
 reward:
-  xp: 30
+  xp: 20
   loot: level1_misc
   loot_chance: 45
 images:

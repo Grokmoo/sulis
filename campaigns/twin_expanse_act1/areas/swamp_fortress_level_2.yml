@@ -67,10 +67,10 @@ encounters:
   - id: irhan
     location:
       x: 10
-      y: 32
+      y: 30
     size:
-      width: 10
-      height: 8
+      width: 12
+      height: 10
 transitions:
   - from:
       x: 7
@@ -110,13 +110,16 @@ on_rest:
   Disabled:
     message: There are too many enemies about.  You may not rest here.
 layer_set:
-  tileset/interior_brick_outer_edge_ne:
-    - - 18
+  tileset/interior_brick_inner_edge_ne:
+    - - 0
       - 12
-    - - 6
+    - - 2
       - 40
-    - - 18
+    - - 2
       - 56
+  tileset/bar_horiz_w:
+    - - 14
+      - 27
   tileset/interior_brick_inner_edge_sw:
     - - 14
       - 42
@@ -130,336 +133,9 @@ layer_set:
       - 4
     - - 16
       - 62
-  tileset/interior_tile_base_variant1:
-    - - 26
-      - 36
-  table_large01:
-    - - 22
-      - 36
-  tileset/ropes01:
-    - - 15
-      - 51
-  tileset/interior_brick_outer_edge_w:
-    - - 14
-      - 44
-    - - 14
-      - 46
-    - - 14
-      - 2
-    - - 26
-      - 36
-    - - 26
-      - 38
-    - - 26
-      - 34
-    - - 26
-      - 30
-    - - 26
-      - 32
-    - - 26
-      - 26
-    - - 26
-      - 28
-    - - 26
-      - 24
-    - - 24
-      - 18
-    - - 24
-      - 20
-    - - 24
-      - 16
-    - - 24
-      - 12
-    - - 24
-      - 14
-    - - 24
-      - 10
-    - - 24
-      - 6
-    - - 24
-      - 8
-    - - 26
-      - 44
-    - - 26
-      - 46
-    - - 26
-      - 48
-    - - 26
-      - 50
-    - - 26
-      - 52
-    - - 26
-      - 54
-    - - 22
-      - 58
-    - - 22
-      - 60
-    - - 22
-      - 62
-  tileset/swords02:
-    - - 6
-      - 25
-  tileset/interior_brick_outer_edge_s:
-    - - 2
-      - 0
-    - - 4
-      - 0
-    - - 6
-      - 0
-    - - 8
-      - 0
-    - - 10
-      - 0
-    - - 18
-      - 42
-    - - 20
-      - 42
-    - - 4
-      - 42
-    - - 12
-      - 42
-    - - 4
-      - 22
-    - - 6
-      - 22
-    - - 8
-      - 22
-    - - 10
-      - 22
-    - - 12
-      - 22
-    - - 14
-      - 22
-    - - 16
-      - 22
-    - - 12
-      - 0
-    - - 16
-      - 4
-    - - 18
-      - 4
-    - - 20
-      - 4
-    - - 22
-      - 42
-    - - 24
-      - 42
-    - - 22
-      - 4
-    - - 0
-      - 62
-    - - 2
-      - 62
-    - - 4
-      - 62
-    - - 6
-      - 62
-    - - 8
-      - 62
-    - - 10
-      - 62
-    - - 12
-      - 62
-    - - 14
-      - 62
-    - - 26
-      - 62
-    - - 28
-      - 62
-  tileset/cabinet02:
-    - - 12
-      - 44
-  tileset/fancy_carpet_outer_edge_s:
-    - - 8
-      - 36
-    - - 10
-      - 36
-    - - 12
-      - 36
-    - - 14
-      - 36
-  tileset/fancy_carpet_outer_edge_se:
-    - - 16
-      - 36
-  tileset/interior_brick_outer_edge_nw:
-    - - 10
-      - 40
-    - - 22
-      - 56
-  tileset/interior_brick_outer_edge_sw:
-    - - 14
-      - 48
-    - - 10
-      - 42
-    - - 14
-      - 4
-    - - 24
-      - 22
-  tileset/bucket_empty:
-    - - 2
-      - 10
-  tileset/interior_brick_inner_edge_nw:
-    - - 26
-      - 40
-    - - 26
-      - 56
-  tileset/papers:
-    - - 23
-      - 37
-  tileset/rug_small01:
-    - - 21
-      - 51
-  tileset/bar_horiz_e:
-    - - 4
-      - 29
-  tileset/interior_brick_outer_edge_se:
-    - - 18
-      - 22
-    - - 16
-      - 48
-    - - 6
-      - 42
-  tileset/interior_brick_inner_edge_se:
-    - - 0
-      - 0
-    - - 2
-      - 22
-    - - 16
-      - 42
-    - - 2
-      - 42
-    - - 24
-      - 62
-  tileset/cabinet_bot_01:
-    - - 24
-      - 48
   tileset/bottles01:
     - - 4
-      - 29
-  tileset/cabinet_top_02:
-    - - 18
-      - 46
-  tileset/table01:
-    - - 24
-      - 54
-    - - 4
-      - 54
-  tileset/fancy_carpet_base:
-    - - 8
-      - 32
-    - - 8
-      - 34
-    - - 10
-      - 34
-    - - 12
-      - 34
-    - - 14
-      - 34
-    - - 14
-      - 32
-    - - 12
-      - 32
-    - - 10
-      - 32
-  tileset/bar_horiz_w:
-    - - 14
-      - 29
-  tileset/cabinet_bot_02:
-    - - 18
-      - 48
-  tileset/interior_brick_outer_edge_e:
-    - - 0
-      - 2
-    - - 0
-      - 4
-    - - 0
-      - 6
-    - - 0
-      - 8
-    - - 0
-      - 10
-    - - 18
-      - 14
-    - - 18
-      - 16
-    - - 2
-      - 24
-    - - 2
-      - 26
-    - - 2
-      - 28
-    - - 2
-      - 30
-    - - 2
-      - 32
-    - - 18
-      - 18
-    - - 18
-      - 20
-    - - 2
-      - 50
-    - - 2
-      - 48
-    - - 16
-      - 44
-    - - 16
-      - 46
-    - - 2
-      - 34
-    - - 2
-      - 36
-    - - 2
-      - 38
-    - - 2
-      - 44
-    - - 2
-      - 46
-    - - 2
-      - 52
-    - - 2
-      - 54
-    - - 18
-      - 58
-    - - 18
-      - 60
-    - - 18
-      - 62
-  tileset/wine_bottle02:
-    - - 24
-      - 53
-  tileset/wall_interior_brick_outer_edge_se:
-    - - 18
-      - 24
-    - - 6
-      - 44
-  bed_small01:
-    - - 21
-      - 47
-  tileset/chair07:
-    - - 5
-      - 50
-  tileset/swords01:
-    - - 11
-      - 3
-  tileset/wall_interior_brick_outer_edge_sw:
-    - - 10
-      - 44
-    - - 14
-      - 6
-    - - 24
-      - 24
-  tileset/bar_horiz_c:
-    - - 6
-      - 29
-    - - 8
-      - 29
-    - - 10
-      - 29
-    - - 12
-      - 29
-  tileset/cabinet_med03:
-    - - 4
-      - 34
+      - 27
   tileset/interior_tile_base:
     - - 4
       - 38
@@ -645,185 +321,69 @@ layer_set:
       - 32
     - - 6
       - 30
-  tileset/cabinet_top_04:
-    - - 24
+  tileset/interior_brick_outer_edge_w:
+    - - 14
+      - 44
+    - - 14
       - 46
-  tileset/interior_wood02_base:
-    - - 20
-      - 48
-    - - 22
-      - 48
+    - - 14
+      - 2
+    - - 26
+      - 36
+    - - 26
+      - 38
+    - - 26
+      - 34
+    - - 26
+      - 30
+    - - 26
+      - 32
+    - - 26
+      - 26
+    - - 26
+      - 28
+    - - 26
+      - 24
     - - 24
+      - 18
+    - - 24
+      - 20
+    - - 24
+      - 16
+    - - 24
+      - 12
+    - - 24
+      - 14
+    - - 24
+      - 10
+    - - 24
+      - 6
+    - - 24
+      - 8
+    - - 26
+      - 44
+    - - 26
+      - 46
+    - - 26
       - 48
-    - - 18
+    - - 26
       - 50
-    - - 20
-      - 50
-    - - 22
-      - 50
-    - - 24
-      - 50
-    - - 18
+    - - 26
       - 52
-    - - 22
-      - 52
-    - - 24
-      - 52
-    - - 18
-      - 54
-    - - 20
+    - - 26
       - 54
     - - 22
-      - 54
-    - - 24
-      - 54
-    - - 20
-      - 52
-    - - 18
-      - 48
-    - - 20
-      - 56
-  tileset/cabinet_wide01:
-    - - 2
-      - 3
+      - 58
+    - - 22
+      - 60
+    - - 22
+      - 62
   tileset/shield01:
     - - 17
       - 25
-  tileset/interior_brick_inner_edge_ne:
-    - - 0
-      - 12
-    - - 2
-      - 40
-    - - 2
-      - 56
-  tileset/papers02:
-    - - 22
-      - 36
-  tileset/interior_brick_outer_edge_n:
-    - - 2
-      - 12
-    - - 4
-      - 12
+  tileset/swords02:
     - - 6
-      - 12
-    - - 8
-      - 12
-    - - 10
-      - 12
-    - - 12
-      - 12
-    - - 14
-      - 12
-    - - 16
-      - 12
-    - - 14
-      - 40
-    - - 16
-      - 40
-    - - 18
-      - 40
-    - - 20
-      - 40
-    - - 4
-      - 40
-    - - 12
-      - 40
-    - - 22
-      - 40
-    - - 24
-      - 40
-    - - 4
-      - 56
-    - - 6
-      - 56
-    - - 8
-      - 56
-    - - 10
-      - 56
-    - - 12
-      - 56
-    - - 14
-      - 56
-    - - 16
-      - 56
-    - - 24
-      - 56
-  tileset/cabinet_wide04:
-    - - 4
-      - 46
-  tileset/wall_interior_brick_outer_edge_s:
-    - - 0
-      - 2
-    - - 2
-      - 2
-    - - 4
-      - 2
-    - - 6
-      - 2
-    - - 8
-      - 2
-    - - 10
-      - 2
-    - - 14
-      - 44
-    - - 16
-      - 44
-    - - 18
-      - 44
-    - - 2
-      - 44
-    - - 4
-      - 44
-    - - 12
-      - 44
-    - - 2
-      - 24
-    - - 4
-      - 24
-    - - 6
-      - 24
-    - - 8
-      - 24
-    - - 10
-      - 24
-    - - 12
-      - 24
-    - - 14
-      - 24
-    - - 16
-      - 24
-    - - 12
-      - 2
-    - - 14
-      - 2
-    - - 16
-      - 6
-    - - 18
-      - 6
-    - - 20
-      - 6
-    - - 20
-      - 44
-    - - 26
-      - 24
-    - - 22
-      - 6
-    - - 24
-      - 6
-    - - 22
-      - 44
-    - - 24
-      - 44
-    - - 26
-      - 44
-  tileset/castle01_doorway:
-    - - 7
-      - 2
-  tileset/fancy_carpet_outer_edge_e:
-    - - 16
-      - 32
-    - - 16
-      - 34
+      - 25
   tileset/interior_dirt_base:
     - - 16
       - 18
@@ -1029,9 +589,519 @@ layer_set:
       - 60
     - - 20
       - 62
+  tileset/fancy_carpet_base:
+    - - 8
+      - 32
+    - - 8
+      - 34
+    - - 10
+      - 34
+    - - 12
+      - 34
+    - - 14
+      - 34
+    - - 14
+      - 32
+    - - 12
+      - 32
+    - - 10
+      - 32
   tileset/wine_bottle01:
     - - 4
       - 53
+  tileset/fancy_carpet_outer_edge_sw:
+    - - 6
+      - 36
+  tileset/interior_wood02_base:
+    - - 20
+      - 48
+    - - 22
+      - 48
+    - - 24
+      - 48
+    - - 18
+      - 50
+    - - 20
+      - 50
+    - - 22
+      - 50
+    - - 24
+      - 50
+    - - 18
+      - 52
+    - - 22
+      - 52
+    - - 24
+      - 52
+    - - 18
+      - 54
+    - - 20
+      - 54
+    - - 22
+      - 54
+    - - 24
+      - 54
+    - - 20
+      - 52
+    - - 18
+      - 48
+    - - 20
+      - 56
+  table_large01:
+    - - 22
+      - 36
+  tileset/interior_brick_outer_edge_ne:
+    - - 18
+      - 12
+    - - 6
+      - 40
+    - - 18
+      - 56
+  tileset/papers:
+    - - 23
+      - 37
+  tileset/wall_interior_brick_outer_edge_s:
+    - - 0
+      - 2
+    - - 2
+      - 2
+    - - 4
+      - 2
+    - - 6
+      - 2
+    - - 8
+      - 2
+    - - 10
+      - 2
+    - - 14
+      - 44
+    - - 16
+      - 44
+    - - 18
+      - 44
+    - - 2
+      - 44
+    - - 4
+      - 44
+    - - 12
+      - 44
+    - - 2
+      - 24
+    - - 4
+      - 24
+    - - 6
+      - 24
+    - - 8
+      - 24
+    - - 10
+      - 24
+    - - 12
+      - 24
+    - - 14
+      - 24
+    - - 16
+      - 24
+    - - 12
+      - 2
+    - - 14
+      - 2
+    - - 16
+      - 6
+    - - 18
+      - 6
+    - - 20
+      - 6
+    - - 20
+      - 44
+    - - 26
+      - 24
+    - - 22
+      - 6
+    - - 24
+      - 6
+    - - 22
+      - 44
+    - - 24
+      - 44
+    - - 26
+      - 44
+  tileset/interior_brick_outer_edge_e:
+    - - 0
+      - 2
+    - - 0
+      - 4
+    - - 0
+      - 6
+    - - 0
+      - 8
+    - - 0
+      - 10
+    - - 18
+      - 14
+    - - 18
+      - 16
+    - - 2
+      - 24
+    - - 2
+      - 26
+    - - 2
+      - 28
+    - - 2
+      - 30
+    - - 2
+      - 32
+    - - 18
+      - 18
+    - - 18
+      - 20
+    - - 2
+      - 50
+    - - 2
+      - 48
+    - - 16
+      - 44
+    - - 16
+      - 46
+    - - 2
+      - 34
+    - - 2
+      - 36
+    - - 2
+      - 38
+    - - 2
+      - 44
+    - - 2
+      - 46
+    - - 2
+      - 52
+    - - 2
+      - 54
+    - - 18
+      - 58
+    - - 18
+      - 60
+    - - 18
+      - 62
+  tileset/cabinet_top_02:
+    - - 18
+      - 46
+  tileset/interior_brick_outer_edge_nw:
+    - - 10
+      - 40
+    - - 22
+      - 56
+  tileset/cabinet_wide04:
+    - - 4
+      - 46
+  tileset/bucket_empty:
+    - - 2
+      - 10
+  tileset/papers02:
+    - - 22
+      - 36
+  tileset/fancy_carpet_outer_edge_se:
+    - - 16
+      - 36
+  tileset/interior_brick_outer_edge_s:
+    - - 2
+      - 0
+    - - 4
+      - 0
+    - - 6
+      - 0
+    - - 8
+      - 0
+    - - 10
+      - 0
+    - - 18
+      - 42
+    - - 20
+      - 42
+    - - 4
+      - 42
+    - - 12
+      - 42
+    - - 4
+      - 22
+    - - 6
+      - 22
+    - - 8
+      - 22
+    - - 10
+      - 22
+    - - 12
+      - 22
+    - - 14
+      - 22
+    - - 16
+      - 22
+    - - 12
+      - 0
+    - - 16
+      - 4
+    - - 18
+      - 4
+    - - 20
+      - 4
+    - - 22
+      - 42
+    - - 24
+      - 42
+    - - 22
+      - 4
+    - - 0
+      - 62
+    - - 2
+      - 62
+    - - 4
+      - 62
+    - - 6
+      - 62
+    - - 8
+      - 62
+    - - 10
+      - 62
+    - - 12
+      - 62
+    - - 14
+      - 62
+    - - 26
+      - 62
+    - - 28
+      - 62
+  tileset/fancy_carpet_outer_edge_w:
+    - - 6
+      - 32
+    - - 6
+      - 34
+  tileset/fancy_carpet_outer_edge_s:
+    - - 8
+      - 36
+    - - 10
+      - 36
+    - - 12
+      - 36
+    - - 14
+      - 36
+  tileset/castle01_doorway:
+    - - 7
+      - 2
+  tileset/interior_tile_base_variant1:
+    - - 26
+      - 36
+  tileset/cabinet_wide01:
+    - - 2
+      - 3
+  tileset/table01:
+    - - 24
+      - 54
+    - - 4
+      - 54
+  tileset/fancy_carpet_outer_edge_nw:
+    - - 6
+      - 30
+  tileset/wall_interior_brick_outer_edge_sw:
+    - - 10
+      - 44
+    - - 14
+      - 6
+    - - 24
+      - 24
+  tileset/interior_brick_inner_edge_se:
+    - - 0
+      - 0
+    - - 2
+      - 22
+    - - 16
+      - 42
+    - - 2
+      - 42
+    - - 24
+      - 62
+  tileset/interior_brick_outer_edge_sw:
+    - - 14
+      - 48
+    - - 10
+      - 42
+    - - 14
+      - 4
+    - - 24
+      - 22
+  tileset/wall_interior_brick_outer_edge_se:
+    - - 18
+      - 24
+    - - 6
+      - 44
+  tileset/cabinet_med03:
+    - - 4
+      - 34
+  tileset/chair07:
+    - - 5
+      - 50
+  tileset/ropes01:
+    - - 15
+      - 51
+  tileset/cabinet_bot_01:
+    - - 24
+      - 48
+  tileset/rug_small01:
+    - - 21
+      - 51
+  tileset/book02:
+    - - 13
+      - 27
+  tileset/cabinet_bot_02:
+    - - 18
+      - 48
+  tileset/swords01:
+    - - 11
+      - 3
+  tileset/fancy_carpet_outer_edge_e:
+    - - 16
+      - 32
+    - - 16
+      - 34
+  bed_small01:
+    - - 21
+      - 47
+  tileset/bar_horiz_c:
+    - - 6
+      - 27
+    - - 8
+      - 27
+    - - 10
+      - 27
+    - - 12
+      - 27
+  tileset/bar_horiz_e:
+    - - 4
+      - 27
+  tileset/interior_wood01_base:
+    - - 4
+      - 48
+    - - 4
+      - 50
+    - - 4
+      - 52
+    - - 4
+      - 54
+    - - 6
+      - 48
+    - - 8
+      - 48
+    - - 10
+      - 48
+    - - 12
+      - 48
+    - - 6
+      - 50
+    - - 6
+      - 52
+    - - 6
+      - 54
+    - - 8
+      - 50
+    - - 10
+      - 50
+    - - 8
+      - 52
+    - - 10
+      - 52
+    - - 8
+      - 54
+    - - 10
+      - 54
+    - - 12
+      - 50
+    - - 14
+      - 50
+    - - 16
+      - 50
+    - - 12
+      - 52
+    - - 14
+      - 52
+    - - 16
+      - 52
+    - - 12
+      - 54
+    - - 14
+      - 54
+    - - 16
+      - 54
+    - - 8
+      - 44
+    - - 8
+      - 46
+    - - 8
+      - 42
+  tileset/bucket_full:
+    - - 24
+      - 28
+  tileset/cabinet02:
+    - - 12
+      - 44
+  tileset/wine_bottle02:
+    - - 24
+      - 53
+  tileset/interior_brick_outer_edge_n:
+    - - 2
+      - 12
+    - - 4
+      - 12
+    - - 6
+      - 12
+    - - 8
+      - 12
+    - - 10
+      - 12
+    - - 12
+      - 12
+    - - 14
+      - 12
+    - - 16
+      - 12
+    - - 14
+      - 40
+    - - 16
+      - 40
+    - - 18
+      - 40
+    - - 20
+      - 40
+    - - 4
+      - 40
+    - - 12
+      - 40
+    - - 22
+      - 40
+    - - 24
+      - 40
+    - - 4
+      - 56
+    - - 6
+      - 56
+    - - 8
+      - 56
+    - - 10
+      - 56
+    - - 12
+      - 56
+    - - 14
+      - 56
+    - - 16
+      - 56
+    - - 24
+      - 56
+  tileset/fancy_carpet_outer_edge_n:
+    - - 14
+      - 30
+    - - 8
+      - 30
+    - - 10
+      - 30
+    - - 12
+      - 30
   tileset/interior_brick_base:
     - - 0
       - 14
@@ -1289,96 +1359,26 @@ layer_set:
       - 60
     - - 28
       - 60
-  tileset/fancy_carpet_outer_edge_sw:
-    - - 6
-      - 36
-  tileset/book02:
-    - - 12
-      - 29
-  tileset/fancy_carpet_outer_edge_w:
-    - - 6
-      - 32
-    - - 6
-      - 34
-  tileset/interior_wood01_base:
-    - - 4
-      - 48
-    - - 4
-      - 50
-    - - 4
-      - 52
-    - - 4
-      - 54
-    - - 6
-      - 48
-    - - 8
-      - 48
-    - - 10
-      - 48
-    - - 12
-      - 48
-    - - 6
-      - 50
-    - - 6
-      - 52
-    - - 6
-      - 54
-    - - 8
-      - 50
-    - - 10
-      - 50
-    - - 8
-      - 52
-    - - 10
-      - 52
-    - - 8
-      - 54
-    - - 10
-      - 54
-    - - 12
-      - 50
-    - - 14
-      - 50
-    - - 16
-      - 50
-    - - 12
-      - 52
-    - - 14
-      - 52
-    - - 16
-      - 52
-    - - 12
-      - 54
-    - - 14
-      - 54
-    - - 16
-      - 54
-    - - 8
-      - 44
-    - - 8
-      - 46
-    - - 8
-      - 42
-  tileset/bucket_full:
-    - - 24
-      - 28
-  tileset/fancy_carpet_outer_edge_n:
-    - - 14
-      - 30
-    - - 8
-      - 30
-    - - 10
-      - 30
-    - - 12
-      - 30
+  tileset/interior_brick_inner_edge_nw:
+    - - 26
+      - 40
+    - - 26
+      - 56
   tileset/bottles03:
+    - - 7
+      - 27
+  tileset/cabinet_top_04:
+    - - 24
+      - 46
+  tileset/interior_brick_outer_edge_se:
+    - - 18
+      - 22
+    - - 16
+      - 48
     - - 6
-      - 29
+      - 42
   tileset/fancy_carpet_outer_edge_ne:
     - - 16
-      - 30
-  tileset/fancy_carpet_outer_edge_nw:
-    - - 6
       - 30
 terrain:
   - ~

@@ -18,6 +18,8 @@ base_stats:
   - kind: { reflex: 30 }
   - kind: { will: 30 }
   - kind: { reach: 0.0 }
+  - kind: { flanked_immunity }
+  - kind: { sneak_attack_immunity }
 base_attack:
   damage:
     min: 12

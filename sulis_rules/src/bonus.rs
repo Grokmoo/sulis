@@ -57,6 +57,9 @@ pub enum BonusKind {
     MoveDisabled,
     AttackDisabled,
     Hidden,
+    FlankedImmunity,
+    SneakAttackImmunity,
+    CritImmunity,
     GroupUsesPerEncounter { group: String, amount: ExtInt },
     GroupUsesPerDay { group: String, amount: ExtInt },
 }
@@ -235,7 +238,8 @@ fn apply_modifiers(bonus: &mut Bonus, neg: f32, pos: f32) {
         },
         ArmorProficiency(_) | WeaponProficiency(_) | MoveDisabled
             | AttackDisabled | Hidden | GroupUsesPerEncounter { .. }
-            | GroupUsesPerDay { .. } => return,
+            | GroupUsesPerDay { .. } | FlankedImmunity | SneakAttackImmunity
+            | CritImmunity => return,
     };
 
     bonus.kind = new_kind;
@@ -289,6 +293,15 @@ fn merge_if_dup(first: &Bonus, sec: &Bonus) -> Option<Bonus> {
         },
         Hidden => if let Hidden = sec.kind {
             return Some(Bonus { when, kind: Hidden });
+        },
+        FlankedImmunity => if let FlankedImmunity = sec.kind {
+            return Some(Bonus { when, kind: FlankedImmunity });
+        },
+        SneakAttackImmunity => if let SneakAttackImmunity = sec.kind {
+            return Some(Bonus { when, kind: SneakAttackImmunity });
+        },
+        CritImmunity => if let CritImmunity = sec.kind {
+            return Some(Bonus { when, kind: CritImmunity });
         },
         GroupUsesPerEncounter { ref group, amount } => {
             if let GroupUsesPerEncounter { group: ref other_grp, amount: amt } = sec.kind {

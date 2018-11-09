@@ -95,7 +95,7 @@ triggers:
       OnEncounterActivated:
         encounter_location:
           x: 10
-          y: 32
+          y: 30
     on_activate:
       - fire_script:
           id: swamp_fortress

@@ -123,6 +123,15 @@ enum Kind {
 /// # `add_attack_disabled(when: String (Optional))
 /// Adds the attack disabled status to this effect.  See `add_num_bonus`
 ///
+/// # `add_flanked_immunity(when: String (Optional))
+/// Adds immunity to flanking to this effect.  See `add_num_bonus`
+///
+/// # `add_sneak_attack_immunity(when: String (Optional))
+/// Adds immunity to sneak attack to this effect.  See `add_num_bonus`
+///
+/// # `add_crit_immunity(when: String (Optional))
+/// Adds immunity to crits to this effect (all crits become hits).  See `add_num_bonus`
+///
 /// # `add_damage_of_kind(min: Float, max: Float, kind: String, ap: String (Optional),
 /// when: String (Optional))`
 /// Adds the specified amount (from `min` to `max` randomly, with `ap` armor piercing)
@@ -241,6 +250,21 @@ impl UserData for ScriptEffect {
         });
         methods.add_method_mut("add_attack_disabled", |_, effect, when: Option<String>| {
             let kind = BonusKind::AttackDisabled;
+            add_bonus_to_effect(effect, kind, when);
+            Ok(())
+        });
+        methods.add_method_mut("add_flanked_immunity", |_, effect, when: Option<String>| {
+            let kind = BonusKind::FlankedImmunity;
+            add_bonus_to_effect(effect, kind, when);
+            Ok(())
+        });
+        methods.add_method_mut("add_sneak_attack_immunity", |_, effect, when: Option<String>| {
+            let kind = BonusKind::SneakAttackImmunity;
+            add_bonus_to_effect(effect, kind, when);
+            Ok(())
+        });
+        methods.add_method_mut("add_crit_immunity", |_, effect, when: Option<String>| {
+            let kind = BonusKind::CritImmunity;
             add_bonus_to_effect(effect, kind, when);
             Ok(())
         });

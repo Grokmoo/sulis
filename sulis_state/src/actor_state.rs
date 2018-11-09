@@ -372,8 +372,15 @@ impl ActorState {
         self.p_stats.ap() >= self.stats.attack_cost as u32
     }
 
-     fn is_flanking(parent: &Rc<RefCell<EntityState>>,
-                              target: &Rc<RefCell<EntityState>>) -> bool {
+    fn is_sneak_attack(parent: &Rc<RefCell<EntityState>>,
+                       target: &Rc<RefCell<EntityState>>) -> bool {
+        parent.borrow().actor.stats.hidden && !target.borrow().actor.stats.sneak_attack_immunity
+    }
+
+    fn is_flanking(parent: &Rc<RefCell<EntityState>>,
+                   target: &Rc<RefCell<EntityState>>) -> bool {
+        if target.borrow().actor.stats.flanked_immunity { return false; }
+
         let mgr = GameState::turn_manager();
         let area = GameState::get_area_state(&parent.borrow().location.area_id).unwrap();
         let area = area.borrow();
@@ -435,7 +442,8 @@ impl ActorState {
         let attacks = parent.borrow().actor.stats.attacks.clone();
 
         let is_flanking = ActorState::is_flanking(parent, target);
-        if parent.borrow().actor.stats.hidden {
+        let is_sneak_attack = ActorState::is_sneak_attack(parent, target);
+        if is_sneak_attack {
             damage_str.push_str("Sneak Attack! ");
         } else if is_flanking {
             damage_str.push_str("Flanked! ");
@@ -451,7 +459,8 @@ impl ActorState {
             };
 
             let (hit, dmg, attack_result, attack_color) =
-                ActorState::attack_internal(parent, target, &mut attack, is_flanking);
+                ActorState::attack_internal(parent, target, &mut attack,
+                                            is_flanking, is_sneak_attack);
             if attack_color != ColorKind::Miss {
                 color = attack_color;
             }
@@ -481,14 +490,15 @@ impl ActorState {
 
         let mut damage_str = String::new();
         let is_flanking = ActorState::is_flanking(parent, target);
-        if parent.borrow().actor.stats.hidden {
+        let is_sneak_attack = ActorState::is_sneak_attack(parent, target);
+        if is_sneak_attack {
             damage_str.push_str("Sneak Attack! ");
         } else if is_flanking {
             damage_str.push_str("Flanked! ");
         }
 
         let (hit_kind, damage, result, color) =
-            ActorState::attack_internal(parent, target, attack, is_flanking);
+            ActorState::attack_internal(parent, target, attack, is_flanking, is_sneak_attack);
         damage_str.push_str(&result);
 
         ActorState::check_death(parent, target);
@@ -499,10 +509,9 @@ impl ActorState {
     fn attack_internal(parent: &Rc<RefCell<EntityState>>,
                        target: &Rc<RefCell<EntityState>>,
                        attack: &mut Attack,
-                       flanking: bool) -> (HitKind, u32, String, ColorKind) {
+                       flanking: bool,
+                       sneak_attack: bool) -> (HitKind, u32, String, ColorKind) {
         let rules = Module::rules();
-
-        let hidden = parent.borrow().actor.stats.hidden;
 
         let concealment = cmp::max(0, target.borrow().actor.stats.concealment -
                                    parent.borrow().actor.stats.concealment_ignore);
@@ -525,12 +534,13 @@ impl ActorState {
                 }
             }
         };
+        let crit_immunity = target.borrow().actor.stats.crit_immunity;
 
         if flanking {
             attack.bonuses.melee_accuracy += rules.flanking_accuracy_bonus;
             attack.bonuses.ranged_accuracy += rules.flanking_accuracy_bonus;
             attack.bonuses.spell_accuracy += rules.flanking_accuracy_bonus;
-        } else if hidden {
+        } else if sneak_attack {
             attack.bonuses.melee_accuracy += rules.hidden_accuracy_bonus;
             attack.bonuses.ranged_accuracy += rules.hidden_accuracy_bonus;
             attack.bonuses.spell_accuracy += rules.hidden_accuracy_bonus;
@@ -538,7 +548,8 @@ impl ActorState {
 
         let (hit_kind, damage_multiplier) = {
             let parent_stats = &parent.borrow().actor.stats;
-            let hit_kind = parent_stats.attack_roll(accuracy_kind, defense, &attack.bonuses);
+            let hit_kind = parent_stats.attack_roll(accuracy_kind, crit_immunity,
+                                                    defense, &attack.bonuses);
             let damage_multiplier = match hit_kind {
                 HitKind::Miss => {
                     debug!("Miss");

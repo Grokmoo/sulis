@@ -69,6 +69,9 @@ pub struct StatList {
     pub move_disabled: bool,
     pub attack_disabled: bool,
     pub hidden: bool,
+    pub flanked_immunity: bool,
+    pub sneak_attack_immunity: bool,
+    pub crit_immunity: bool,
     pub caster_level: i32,
     group_uses_per_encounter: HashMap<String, ExtInt>,
     group_uses_per_day: HashMap<String, ExtInt>,
@@ -114,6 +117,9 @@ impl StatList {
             move_disabled: false,
             attack_disabled: false,
             hidden: false,
+            flanked_immunity: false,
+            sneak_attack_immunity: false,
+            crit_immunity: false,
             caster_level: 0,
             group_uses_per_encounter: HashMap::new(),
             group_uses_per_day: HashMap::new(),
@@ -144,7 +150,7 @@ impl StatList {
         self.weapon_proficiencies.contains(&prof)
     }
 
-    pub fn attack_roll(&self, accuracy_kind: AccuracyKind,
+    pub fn attack_roll(&self, accuracy_kind: AccuracyKind, crit_immunity: bool,
                        defense: i32, bonuses: &AttackBonuses) -> HitKind {
         let accuracy = match accuracy_kind {
             AccuracyKind::Melee => self.melee_accuracy + bonuses.melee_accuracy,
@@ -158,7 +164,7 @@ impl StatList {
 
         let result = roll + accuracy - defense;
 
-        if result > self.crit_threshold + bonuses.crit_threshold {
+        if !crit_immunity && result > self.crit_threshold + bonuses.crit_threshold {
             HitKind::Crit
         } else if result > self.hit_threshold + bonuses.hit_threshold {
             HitKind::Hit
@@ -278,6 +284,9 @@ impl StatList {
             MoveDisabled => self.move_disabled = true,
             AttackDisabled => self.attack_disabled = true,
             Hidden => self.hidden = true,
+            FlankedImmunity => self.flanked_immunity = true,
+            SneakAttackImmunity => self.sneak_attack_immunity = true,
+            CritImmunity => self.crit_immunity = true,
             GroupUsesPerEncounter { group, amount } =>
                 self.add_single_group_uses_per_encounter(group, *amount),
             GroupUsesPerDay { group, amount } =>

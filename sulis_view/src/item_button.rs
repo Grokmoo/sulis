@@ -713,6 +713,9 @@ fn add_bonus(bonus: &Bonus, state: &mut WidgetState, has_accuracy: &mut bool,
         MoveDisabled => add(state, "move_disabled", true),
         AttackDisabled => add(state, "attack_disabled", true),
         Hidden => add(state, "hidden", true),
+        FlankedImmunity => add(state, "flanked_immunity", true),
+        SneakAttackImmunity => add(state, "sneak_attack_immunity", true),
+        CritImmunity => add(state, "crit_immunity", true),
     }
 }
 

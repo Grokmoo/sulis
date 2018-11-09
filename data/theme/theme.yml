@@ -1257,6 +1257,9 @@ children:
       ][?move_disabled|Movement Disabled
       ][?attack_disabled|Attack Disabled
       ][?hidden|Hidden
+      ][?flanked_immunity|Flanked Immunity
+      ][?sneak_attack_immunity|Sneak Attack Immunity
+      ][?crit_immunity|Crit Immunity
       ][?prereqs|[s=4|]
       [s=6;c=f00|Prereqs]
       [?prereq_total_level|Level: #prereq_total_level#

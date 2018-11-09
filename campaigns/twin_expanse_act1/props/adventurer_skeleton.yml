@@ -1,0 +1,9 @@
+id: adventurer_skeleton
+name: Adventurer's Skeleton
+icon: inventory/misc_crate
+image: props/bones
+size: 4by4
+visible: true
+passable: false
+interactive:
+  Container: {}

@@ -10,4 +10,4 @@ nodes:
       
       I expect to see the town razed to the ground by summer's end.  Then, you will turn your attention directly to Rose Lake.
     responses:
-      - text: "[c=888|Put down the note.]"
+      - text: "[c=888|Stop reading]"

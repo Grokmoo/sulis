@@ -1,0 +1,15 @@
+id: adventurers_note
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=888|This is a note you found on a body in Wellswood.]
+      
+      It was so stupid of me to come here.  Everyone told me, but I was too stupid to listen.  Stupid and stubborn.
+      
+      I have been trapped in these woods for three days.  I could try to run for it, but the goblins are everywhere.  Even now I can hear them moving about in the trees.
+      
+      I don't think I'm going to make it.  If anyone finds this, please don't make the same mistakes I did.
+    responses:
+      - text: "[c=888|Stop reading]"

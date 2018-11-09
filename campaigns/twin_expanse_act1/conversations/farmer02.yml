@@ -1,5 +1,12 @@
 id: farmer02
 initial_nodes:
+  - id: complete
+    to_view:
+      - target_flag: complete
+  - id: has_note
+    to_view:
+      - party_item: adventurers_note
+      - target_flag: already_talked
   - id: already_talked
     to_view:
       - target_flag: already_talked
@@ -14,6 +21,27 @@ nodes:
         to: affirm02
       - text: "It isn't all good - there is an awful lot of walking - and talking to boring strangers."
         to: neg02
+  has_note:
+    text: "I wish I were an adventurer!"
+    responses:
+      - text: "[c=f00|Show her the note of the adventurer who died in the Wellswood.] Take a look at this."
+        to: has_note02
+      - text: "Whatever.  Farewell."
+  has_note02:
+    text: |
+      [c=888|As she reads the note, her mood quickly becomes more somber.]
+      
+      I...I'm not sure what to say.  You've given me a lot to think about.
+    on_view:
+      - target_flag: complete
+      - fire_script:
+          id: wellswood_farms
+          func: adventurer_complete
+    responses:
+      - text: "Indeed.  Farewell."
+  complete:
+    text: "I've got a lot to think about."
+    responses: []
   already_talked:
     text: "I wish I were an adventurer!"
     responses: []

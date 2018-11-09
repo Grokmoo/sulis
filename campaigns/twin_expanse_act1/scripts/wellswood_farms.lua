@@ -28,6 +28,12 @@ function rockslide_investigated(parent)
   game:set_quest_entry_state("the_rockslide", "investigated", "Visible")
 end
 
+function adventurer_complete(parent)
+  game:add_party_xp(50)
+  game:set_quest_entry_state("a_rosy_picture", "complete", "Visible")
+  game:set_quest_state("a_rosy_picture", "Complete")
+end
+
 function adventurer_talked(parent)
   game:set_quest_entry_state("a_rosy_picture", "start", "Visible")
 end

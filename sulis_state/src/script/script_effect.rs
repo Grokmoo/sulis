@@ -114,22 +114,22 @@ enum Kind {
 /// Adds a damage bonus of the specified amount (from `min` to `max` randomly, with `ap`
 /// armor piercing).  See `add_num_bonus`
 ///
-/// # `add_hidden(when: String (Optional))
+/// # `add_hidden(when: String (Optional))`
 /// Adds the hidden status to this effect.  See `add_num_bonus`
 ///
-/// # `add_move_disabled(when: String (Optional))
+/// # `add_move_disabled(when: String (Optional))`
 /// Adds the move disabled status to this effect. See `add_num_bonus`
 ///
-/// # `add_attack_disabled(when: String (Optional))
+/// # `add_attack_disabled(when: String (Optional))`
 /// Adds the attack disabled status to this effect.  See `add_num_bonus`
 ///
-/// # `add_flanked_immunity(when: String (Optional))
+/// # `add_flanked_immunity(when: String (Optional))`
 /// Adds immunity to flanking to this effect.  See `add_num_bonus`
 ///
-/// # `add_sneak_attack_immunity(when: String (Optional))
+/// # `add_sneak_attack_immunity(when: String (Optional))`
 /// Adds immunity to sneak attack to this effect.  See `add_num_bonus`
 ///
-/// # `add_crit_immunity(when: String (Optional))
+/// # `add_crit_immunity(when: String (Optional))`
 /// Adds immunity to crits to this effect (all crits become hits).  See `add_num_bonus`
 ///
 /// # `add_damage_of_kind(min: Float, max: Float, kind: String, ap: String (Optional),

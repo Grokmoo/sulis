@@ -244,7 +244,7 @@ pub enum IOAdapter {
 
 #[cfg(not(target_os = "windows"))]
 fn get_user_dir() -> PathBuf {
-    let mut path = match env::var("XDG_CONFIG_HOME") {
+    let mut path = match ::std::env::var("XDG_CONFIG_HOME") {
         Ok(path_str) => {
             PathBuf::from(path_str)
         },

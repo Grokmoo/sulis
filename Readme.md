@@ -20,10 +20,17 @@ You'll need recent versions of Rust and Cargo installed.  The game will compile 
 1. `cargo build --release`
 1. Run the game with `cargo run --release`
 1. On first run, `config.yml` is created in your home directory.  This file may be edited with your preferences.  It is also written to when using the in game options menu, however changes you have made manually should generally be preserved.
+1. The Sulis User Folder location:
   * Linux - `$XDG_CONFIG_HOME/.sulis/` (typically `$HOME/.config/.sulis`) 
   * Windows -`$HOME\My Documents\My Games\Sulis`
 
 Note that Running with release mode is recommended.  The compilation process takes several minutes, but load time and performance in game are massively improved over a standard debug build.
+
+## Troubleshooting
+
+If you have issues running the game after upgrading to a new version, try removing your Sulis user data folder (see above).  Save games, characters, and other data are not generally compatible between different major versions.
+
+For other problems, you can [create an issue](https://github.com/Grokmoo/sulis/issues/new).  Please leave as much information as you can, including logs from your sulis user folder /log directory
 
 ### Running the editor
 

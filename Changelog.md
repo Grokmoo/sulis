@@ -2,10 +2,11 @@
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
+
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html) is used with major version changes for breaking save game and data format compatibility.
 
 ## [0.2.0] - 2018-11-09
-Data from the 0.1.x releases will not work with this release.
+Data from the 0.1.x releases, such as save games and characters, will not work with this release.
 ### Added
 - The first half of The Twin Expanse Act 1 is available.  New quests, encounters, characters, and items.
 - New playable races, Dracon and Trollkin

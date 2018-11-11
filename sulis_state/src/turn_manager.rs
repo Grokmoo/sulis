@@ -45,6 +45,7 @@ pub struct TurnManager {
     pub(crate) effects: Vec<Option<Effect>>,
     surfaces: Vec<usize>,
     effects_remove_next_update: Vec<usize>,
+    entities_move_callback_next_update: HashSet<usize>,
     combat_active: bool,
 
     pub listeners: ChangeListenerList<TurnManager>,
@@ -61,6 +62,7 @@ impl Default for TurnManager {
             effects: Vec::new(),
             surfaces: Vec::new(),
             effects_remove_next_update: Vec::new(),
+            entities_move_callback_next_update: HashSet::new(),
             listeners: ChangeListenerList::default(),
             order: VecDeque::new(),
             combat_active: false,
@@ -153,6 +155,19 @@ impl TurnManager {
         }
 
         result
+    }
+
+    #[must_use]
+    pub fn update_entity_move_callbacks(&mut self) -> Vec<Rc<CallbackData>> {
+        let mut cbs = Vec::new();
+
+        let indices: Vec<_> = self.entities_move_callback_next_update.drain().collect();
+        for index in indices {
+            let entity = self.entity(index);
+            cbs.append(&mut entity.borrow().callbacks(&self));
+        }
+
+        cbs
     }
 
     #[must_use]
@@ -314,6 +329,8 @@ impl TurnManager {
     }
 
     pub fn check_ai_activation(&mut self, mover: &Rc<RefCell<EntityState>>, area_state: &mut AreaState) {
+        if mover.borrow().actor.stats.hidden { return; }
+
         let mut groups_to_activate: HashSet<usize> = HashSet::new();
         let mut state_changed = false;
 
@@ -474,6 +491,10 @@ impl TurnManager {
             entity.borrow_mut().actor.set_overflow_ap(0);
         }
         GameState::set_clear_anims();
+    }
+
+    pub(crate) fn fire_on_moved_next_update(&mut self, entity_index: usize) {
+        self.entities_move_callback_next_update.insert(entity_index);
     }
 
     pub(crate) fn increment_surface_squares_moved(&mut self, entity_index: usize, surface_index: usize) {

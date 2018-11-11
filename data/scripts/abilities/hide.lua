@@ -9,13 +9,6 @@ function on_activate(parent, ability)
   end
 end
 
-function deactivate(parent, ability)
-  if ability:is_active_mode(parent) then
-    game:say_line("Spotted!", parent)
-    ability:deactivate(parent)
-  end
-end
-
 function activate_no_ap(parent, ability)
   activate_no_check(parent, ability)
   ability:activate(parent, false)
@@ -29,6 +22,7 @@ function activate_no_check(parent, ability)
   cb = ability:create_callback(parent)
   cb:set_on_round_elapsed_fn("on_round_elapsed")
   cb:set_after_attack_fn("after_attack")
+  cb:set_on_moved_fn("on_moved")
   effect:add_callback(cb)
   
   anim = parent:create_color_anim()
@@ -40,16 +34,31 @@ function activate_no_check(parent, ability)
   effect:apply()
 end
 
+function on_moved(parent, ability)
+  if check_spotted(parent, ability) then
+    game:say_line("Spotted!", parent)
+	ability:deactivate(parent)
+	game:cancel_blocking_anims()
+	game:run_script_delayed("hide", "on_deactivate", 0.1)
+  end
+end
+
 function on_round_elapsed(parent, ability)
   if check_spotted(parent, ability) then
     game:say_line("Spotted!", parent)
 	ability:deactivate(parent)
+	game:run_script_delayed("hide", "on_deactivate", 0.1)
   end
+end
+
+function on_deactivate(parent)
+  game:check_ai_activation(parent)
 end
 
 function after_attack(parent, ability)
   game:say_line("Spotted!", parent)
   ability:deactivate(parent)
+  game:run_script_delayed("hide", "on_deactivate", 0.1)
 end
 
 function check_spotted(parent, ability)

@@ -41,6 +41,12 @@ pub fn fire_on_moved_in_surface(cbs: Vec<(Rc<CallbackData>, usize)>) {
     }
 }
 
+pub fn fire_on_moved(cbs: Vec<Rc<CallbackData>>) {
+    for cb in cbs {
+        cb.on_moved();
+    }
+}
+
 /// A type of callback function for a `CallbackData` object.
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialOrd, Ord, Hash, PartialEq, Eq, Debug)]
@@ -75,6 +81,9 @@ pub enum FuncKind {
     /// Called once each time a round elapses for the parent
     OnRoundElapsed,
 
+    /// Called each time an entity moves a square
+    OnMoved,
+
     /// Only relevant for surfaces.  Called once each time a round elapses for the
     /// surface effect, including a list of all affected entities as targets.
     OnSurfaceRoundElapsed,
@@ -102,6 +111,8 @@ pub trait ScriptCallback {
     fn on_anim_update(&self) { }
 
     fn on_round_elapsed(&self) { }
+
+    fn on_moved(&self) { }
 
     fn on_surface_round_elapsed(&self) { }
 
@@ -142,6 +153,7 @@ enum Kind {
 /// # `set_on_anim_update_fn(func: String)`
 /// # `set_on_anim_complete_fn(func: String)`
 /// # `set_on_round_elapsed_fn(func: String)`
+/// # `set_on_moved_fn(func: String)`
 /// # `set_on_surface_round_elapsed_fn(func: String)`
 /// # `set_on_moved_in_surface_fn(func: String)`
 /// Each of these methods causes a specified lua `func` to be called when the condition is met,
@@ -331,6 +343,10 @@ impl ScriptCallback for CallbackData {
         self.exec_standard_script(self.get_or_create_targets(), FuncKind::OnRoundElapsed);
     }
 
+    fn on_moved(&self) {
+        self.exec_standard_script(self.get_or_create_targets(), FuncKind::OnMoved);
+    }
+
     /// when called, this computes the current target set and sends it to
     /// the lua function based on the surface state
     fn on_surface_round_elapsed(&self) {
@@ -473,6 +489,8 @@ impl UserData for CallbackData {
                                |_, cb, func: String| cb.add_func(FuncKind::OnAnimComplete, func));
         methods.add_method_mut("set_on_round_elapsed_fn",
                                |_, cb, func: String| cb.add_func(FuncKind::OnRoundElapsed, func));
+        methods.add_method_mut("set_on_moved_fn",
+                               |_, cb, func: String| cb.add_func(FuncKind::OnMoved, func));
         methods.add_method_mut("set_on_surface_round_elapsed_fn",
                                |_, cb, func: String| cb.add_func(FuncKind::OnSurfaceRoundElapsed, func));
         methods.add_method_mut("set_on_moved_in_surface_fn",

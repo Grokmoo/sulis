@@ -398,6 +398,7 @@ impl Anim {
             EntityColor { .. } => entity_color_animation::cleanup(&self.owner),
             EntitySubpos { .. } => entity_subpos_animation::cleanup(&self.owner),
             MeleeAttack { .. } => melee_attack_animation::cleanup(&self.owner),
+            RangedAttack { .. } => ranged_attack_animation::cleanup(&self.owner),
             Move { .. } => move_animation::cleanup(&self.owner),
             EntityDeath { .. } => {
                 self.owner.borrow_mut().marked_for_removal = true;

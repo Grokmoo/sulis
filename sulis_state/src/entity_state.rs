@@ -30,7 +30,7 @@ use sulis_rules::HitKind;
 use sulis_module::{actor::Faction, Actor, ObjectSize, ObjectSizeIterator, Module, ai};
 use sulis_module::area::{MAX_AREA_SIZE, Transition};
 use {ActorState, AreaState, ChangeListenerList, EntityTextureCache, EntityTextureSlot,
-    GameState, Location, PropState, ScriptCallback};
+    GameState, Location, PropState, ScriptCallback, TurnManager};
 use script::{self, CallbackData, ScriptEntitySet};
 use animation::{self, Anim};
 use save_state::EntitySaveState;
@@ -191,9 +191,7 @@ impl EntityState {
         }
     }
 
-    pub fn callbacks(&self) -> Vec<Rc<CallbackData>> {
-        let mgr = GameState::turn_manager();
-        let mgr = mgr.borrow();
+    pub fn callbacks(&self, mgr: &TurnManager) -> Vec<Rc<CallbackData>> {
         let mut result: Vec<_> = self.actor.effects_iter().flat_map(|index| {
             if let Some(effect) = mgr.effect_checked(*index) {
                 effect.callbacks()
@@ -420,7 +418,9 @@ impl EntityState {
         }
 
         let targets = ScriptEntitySet::from_pair(entity, attacker);
-        let cbs = entity.borrow().callbacks();
+
+        let mgr = GameState::turn_manager();
+        let cbs = entity.borrow().callbacks(&mgr.borrow());
         cbs.iter().for_each(|cb| cb.on_damaged(&targets, hit_kind, hp_amount));
     }
 

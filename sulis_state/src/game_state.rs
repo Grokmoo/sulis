@@ -924,6 +924,9 @@ impl GameState {
 
         script_callback::fire_round_elapsed(cbs);
 
+        let cbs = mgr.borrow_mut().update_entity_move_callbacks();
+        script_callback::fire_on_moved(cbs);
+
         let on_moved_cbs = mgr.borrow_mut().update_on_moved_in_surface();
         script_callback::fire_on_moved_in_surface(on_moved_cbs);
 

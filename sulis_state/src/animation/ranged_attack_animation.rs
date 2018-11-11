@@ -36,8 +36,11 @@ pub (in animation) fn update(attacker: &Rc<RefCell<EntityState>>, model: &mut Ra
 
             let area_state = GameState::area_state();
 
-            let defender_cbs = model.defender.borrow().callbacks();
-            let attacker_cbs = attacker.borrow().callbacks();
+            let (defender_cbs, attacker_cbs) = {
+                let mgr = GameState::turn_manager();
+                let mgr = mgr.borrow();
+                (model.defender.borrow().callbacks(&mgr), attacker.borrow().callbacks(&mgr))
+            };
 
             attacker_cbs.iter().for_each(|cb| cb.before_attack(&cb_att_targets));
             defender_cbs.iter().for_each(|cb| cb.before_defense(&cb_def_targets));
@@ -57,6 +60,14 @@ pub (in animation) fn update(attacker: &Rc<RefCell<EntityState>>, model: &mut Ra
     } else {
         model.cur_pos = (frac * model.vec.0 + model.start_pos.0,
                         frac * model.vec.1 + model.start_pos.1);
+    }
+}
+
+pub (in animation) fn cleanup(owner: &Rc<RefCell<EntityState>>) {
+    if !GameState::is_combat_active() {
+        let area_state = GameState::get_area_state(&owner.borrow().location.area_id).unwrap();
+        let mgr = GameState::turn_manager();
+        mgr.borrow_mut().check_ai_activation(&owner, &mut area_state.borrow_mut());
     }
 }
 

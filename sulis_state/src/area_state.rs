@@ -992,6 +992,7 @@ impl AreaState {
             self.check_trigger_grid(&entity);
         }
 
+        mgr.fire_on_moved_next_update(entity_index);
         mgr.check_ai_activation(entity, self);
     }
 

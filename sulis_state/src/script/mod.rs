@@ -402,6 +402,14 @@ fn get_targeter() -> Result<Rc<RefCell<AreaTargeter>>> {
 /// performing another action.  This includes movement, attacks, and most
 /// fixed duration particle effects.
 ///
+/// # `check_ai_activation(entity: ScriptEntity)`
+/// Checks all entities for ai activation - i.e. if they can see a hostile,
+/// they become AI active.  This can trigger the start of combat.  Useful
+/// when a script updates the state of the area in such a way that combat
+/// might start (such as unhiding an entity or spawning an encounter).  This
+/// is not needed when scripts cause movement, as it is called automatically
+/// in those cases.  The entity should be the one whose state has changed.
+///
 /// # `fade_out_in()`
 /// Causes the main view to fade out, then back in again.  This duration of the
 /// fades is defined in the theme for the `WindowFade` widget.
@@ -618,6 +626,14 @@ impl UserData for ScriptInterface {
 
         methods.add_method("cancel_blocking_anims", |_, _, ()| {
             GameState::remove_all_blocking_animations();
+            Ok(())
+        });
+
+        methods.add_method("check_ai_activation", |_, _, entity: ScriptEntity| {
+            let entity = entity.try_unwrap()?;
+            let area = GameState::get_area_state(&entity.borrow().location.area_id).unwrap();
+            let mgr = GameState::turn_manager();
+            mgr.borrow_mut().check_ai_activation(&entity, &mut area.borrow_mut());
             Ok(())
         });
 

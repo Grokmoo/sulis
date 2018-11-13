@@ -49,11 +49,13 @@ impl EntityTextureSlot {
         entity.actor.draw_to_texture(renderer, &self.texture_id, scale_x, scale_y, min_x, min_y);
     }
 
-    pub fn draw(&self, renderer: &mut GraphicsRenderer, x: f32, y: f32,
-                     scale_x: f32, scale_y: f32, color: Color, color_sec: Color) {
+    pub fn draw(&self, renderer: &mut GraphicsRenderer, x: f32, y: f32, offset_x: f32,
+                     offset_y: f32, scale_x: f32, scale_y: f32, color: Color, color_sec: Color) {
         let mut list = DrawList::from_texture_id(&self.texture_id, &self.tex_coords,
-                                                 x - BORDER_SIZE_F, y - BORDER_SIZE_F,
-                                                 self.w as f32, self.h as f32);
+                                                 x - BORDER_SIZE_F - offset_x,
+                                                 y - BORDER_SIZE_F - offset_y,
+                                                 self.w as f32 + offset_x * 2.0,
+                                                 self.h as f32 + offset_y * 2.0);
 
         list.set_scale(scale_x, scale_y);
         list.set_color(color);

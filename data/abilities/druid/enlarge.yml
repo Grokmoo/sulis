@@ -1,0 +1,21 @@
+id: enlarge
+name: "Enlarge"
+icon: abilities/enlarge
+description: |
+  A nearby ally increases in size, gaining bonuses to attack accuracy, damage, and reach but penalties to defense.
+active:
+  script: "enlarge"
+  group: "Druid"
+  ap: 2000
+  duration:
+    Rounds: 3
+  cooldown: 4
+  ai:
+    priority: 20
+    kind: Buff
+    group: Single
+    range: Short
+  short_description: |
+    Increases size of one ally.
+prereqs:
+  total_level: 1

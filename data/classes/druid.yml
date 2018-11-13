@@ -1,0 +1,134 @@
+id: druid
+name: Druid
+description: |
+  Druids practice an instinctive, natural magical tradition rooted in the wild, untamed places of Eao.  Druids think of their magic as forming the branches of a tree, with different branches constantly in flux.
+bonuses_per_level:
+  - kind:
+      hit_points: 5
+  - kind:
+      melee_accuracy: 3
+  - kind:
+      ranged_accuracy: 3
+  - kind:
+      spell_accuracy: 3
+  - kind:
+      defense: 2
+  - kind:
+      fortitude: 2
+  - kind:
+      reflex: 2
+  - kind:
+      will: 3
+  - kind:
+      initiative: 1
+  - kind:
+      caster_level: 1
+starting_abilities:
+  - armor_light
+  - weapon_simple
+  - weapon_axe
+  - weapon_bow
+  - weapon_spear
+upgrades:
+  1:
+    ability_choices: [ ]
+    group_uses_per_encounter:
+      - [ Druid, 2 ]
+  2:
+    ability_choices: [ druid ]
+    group_uses_per_encounter:
+      - [ Druid, 2 ]
+  3:
+    ability_choices: [ druid, general ]
+    group_uses_per_encounter:
+      - [ Druid, 2 ]
+  4:
+    ability_choices: [ druid ]
+    group_uses_per_encounter:
+      - [ Druid, 3 ]
+  5:
+    ability_choices: [ druid, general ]
+    group_uses_per_encounter:
+      - [ Druid, 3 ]
+  6:
+    ability_choices: [ druid ]
+    group_uses_per_encounter:
+      - [ Druid, 3 ]
+  7:
+    ability_choices: [ druid, general ]
+    group_uses_per_encounter:
+      - [ Druid, 4 ]
+  8:
+    ability_choices: [ druid ]
+    group_uses_per_encounter:
+      - [ Druid, 4 ]
+  9:
+    ability_choices: [ druid, general ]
+    group_uses_per_encounter:
+      - [ Druid, 4 ]
+  10:
+    ability_choices: [ druid ]
+    group_uses_per_encounter:
+      - [ Druid, 5 ]
+  11:
+    ability_choices: [ druid, general ]
+    group_uses_per_encounter:
+      - [ Druid, 5 ]
+  12:
+    ability_choices: [ druid ]
+    group_uses_per_encounter:
+      - [ Druid, 5 ]
+  13:
+    ability_choices: [ druid, general ]
+    group_uses_per_encounter:
+      - [ Druid, 6 ]
+  14:
+    ability_choices: [ druid ]
+    group_uses_per_encounter:
+      - [ Druid, 6 ]
+  15:
+    ability_choices: [ druid, general ]
+    group_uses_per_encounter:
+      - [ Druid, 6 ]
+kits:
+  - name: Shifter
+    default_attributes:
+      str: 14
+      dex: 12
+      end: 13
+      per: 13
+      int: 13
+      wis: 15
+    starting_inventory:
+      equipped:
+        HeldMain: { id: quarterstaff }
+        Feet: { id: boots_leather }
+        Torso: { id: torso_robe }
+        Legs: { id: legs_pants }
+      quick:
+        Usable1: { id: potion_healing }
+        Usable2: { id: potion_mind }
+      pc_starting_coins: 600
+    description: |
+      A close-in fighter utilizing powerful transformations in combat.
+  - name: Summoner
+    default_attributes:
+      str: 10
+      dex: 14
+      end: 12
+      per: 15
+      int: 13
+      wis: 16
+    starting_inventory:
+      equipped:
+        HeldMain: { id: shortbow }
+        Feet: { id: boots_leather }
+        Torso: { id: torso_robe }
+        Legs: { id: legs_pants }
+      quick:
+        Usable1: { id: potion_healing }
+        Usable2: { id: potion_mind }
+      pc_starting_coins: 600
+    description: |
+      A druid who fights from afar, using summoned creatures and spells to suppor their party.
+

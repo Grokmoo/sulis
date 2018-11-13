@@ -130,6 +130,9 @@ children:
             children:
               ability_button:
                 preferred_size: [10, 10]
+          abilities_pane_druid:
+            from: .character_builder.ability_selector_pane.abilities_pane
+            preferred_size: [128, 128]
           abilities_pane_general:
             from: .character_builder.ability_selector_pane.abilities_pane
             background: general_abilities

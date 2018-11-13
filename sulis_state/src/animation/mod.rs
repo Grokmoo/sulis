@@ -24,6 +24,8 @@ pub use self::anim_save_state::AnimSaveState;
 
 mod entity_color_animation;
 
+mod entity_scale_animation;
+
 mod entity_subpos_animation;
 
 pub mod melee_attack_animation;
@@ -239,6 +241,9 @@ pub (in animation) enum AnimKind {
     /// An animation that changes the color of an entity while active
     EntityColor { color: [Param; 4], color_sec: [Param; 4] },
 
+    /// An animation that changes the size of an entity while active
+    EntityScale { scale: Param },
+
     /// An animation that changes the position of an entity while active
     EntitySubpos { x: Param, y: Param },
 
@@ -271,6 +276,11 @@ impl Anim {
     pub fn new_entity_color(owner: &Rc<RefCell<EntityState>>, duration_millis: ExtInt,
                             color: [Param; 4], color_sec: [Param; 4]) -> Anim {
         Anim::new(owner, duration_millis, AnimKind::EntityColor { color, color_sec })
+    }
+
+    pub fn new_entity_scale(owner: &Rc<RefCell<EntityState>>, duration_millis: ExtInt,
+                            scale: Param) -> Anim {
+        Anim::new(owner, duration_millis, AnimKind::EntityScale { scale })
     }
 
     pub fn new_entity_subpos(owner: &Rc<RefCell<EntityState>>, duration_millis: ExtInt,
@@ -380,6 +390,8 @@ impl Anim {
                 entity_color_animation::update(color, color_sec, &self.owner, millis),
             EntitySubpos { ref mut x, ref mut y } =>
                 entity_subpos_animation::update(x, y, &self.owner, millis),
+            EntityScale { ref mut scale } =>
+                entity_scale_animation::update(scale, &self.owner, millis),
             MeleeAttack { ref mut model } =>
                 melee_attack_animation::update(&self.owner, model, frac),
             RangedAttack { ref mut model } =>
@@ -397,6 +409,7 @@ impl Anim {
         match self.kind {
             EntityColor { .. } => entity_color_animation::cleanup(&self.owner),
             EntitySubpos { .. } => entity_subpos_animation::cleanup(&self.owner),
+            EntityScale { .. } => entity_scale_animation::cleanup(&self.owner),
             MeleeAttack { .. } => melee_attack_animation::cleanup(&self.owner),
             RangedAttack { .. } => ranged_attack_animation::cleanup(&self.owner),
             Move { .. } => move_animation::cleanup(&self.owner),
@@ -464,6 +477,7 @@ impl Anim {
         match &self.kind {
             EntityColor { .. } => false,
             EntitySubpos { .. } => true,
+            EntityScale { .. } => !self.duration_millis.is_infinite(),
             MeleeAttack { .. } => true,
             RangedAttack { .. } => true,
             Move { .. } => true,

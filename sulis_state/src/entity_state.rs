@@ -52,6 +52,7 @@ pub struct EntityState {
     pub sub_pos: (f32, f32),
     pub color: Color,
     pub color_sec: Color,
+    pub scale: f32,
     pub listeners: ChangeListenerList<EntityState>,
 
     ai_state: AIState,
@@ -113,6 +114,7 @@ impl EntityState {
             sub_pos: (0.0, 0.0),
             color: color::WHITE,
             color_sec: Color::new(0.0, 0.0, 0.0, 0.0),
+            scale: 1.0,
             listeners: ChangeListenerList::default(),
             ai_state,
             marked_for_removal: false,
@@ -150,6 +152,7 @@ impl EntityState {
             sub_pos: (0.0, 0.0),
             color: color::WHITE,
             color_sec: Color::new(0.0, 0.0, 0.0, 0.0),
+            scale: 1.0,
             size,
             index: usize::MAX,
             unique_id: unique_id,
@@ -539,7 +542,7 @@ impl EntityState {
         let a = self.color.a * alpha;
         let color = Color::new(self.color.r, self.color.g, self.color.b, a);
         if let Some(ref slot) = self.texture_cache_slot {
-            slot.draw(renderer, x, y, scale_x, scale_y, color, self.color_sec);
+            slot.draw(renderer, x, y, 0.0, 0.0, scale_x, scale_y, color, self.color_sec);
         }
     }
 }
@@ -577,13 +580,15 @@ impl AreaDrawable for EntityState {
             }
         }
 
+        let offset_x = self.scale * self.size.width as f32 / 2.0;
+        let offset_y = self.scale * self.size.height as f32 / 2.0;
         let x = x + self.location.x as f32 + self.sub_pos.0;
         let y = y + self.location.y as f32 + self.sub_pos.1;
 
         let a = self.color.a * alpha;
         let color = Color::new(self.color.r, self.color.g, self.color.b, a);
         if let Some(ref slot) = self.texture_cache_slot {
-            slot.draw(renderer, x, y, scale_x, scale_y, color, self.color_sec);
+            slot.draw(renderer, x, y, offset_x, offset_y, scale_x, scale_y, color, self.color_sec);
         }
     }
 

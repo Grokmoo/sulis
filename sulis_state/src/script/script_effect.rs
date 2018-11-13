@@ -23,7 +23,8 @@ use sulis_rules::{Attribute, Bonus, BonusKind, BonusList, Damage, DamageKind, bo
     WeaponKind, ArmorKind, Slot, WeaponStyle};
 
 use script::{CallbackData, Result, script_particle_generator, ScriptParticleGenerator,
-    script_color_animation, ScriptColorAnimation, ScriptAbility};
+    script_color_animation, ScriptColorAnimation, ScriptAbility,
+    script_scale_animation, ScriptScaleAnimation};
 use {Effect, GameState};
 
 /// Represents a surface that already exists, and is being passed into
@@ -75,12 +76,17 @@ enum Kind {
 /// event.
 ///
 /// # `add_color_anim(anim: ScriptColorAnimation)`
-/// Adds the specified `anim` to this effect.  The anim will be have `apply()` called
+/// Adds the specified `anim` to this effect.  The anim will have `apply()` called
 /// when this effect has `apply()` called.  It will be removed when this effect is
 /// removed.
 ///
+/// # `add_scale_anim(anim: ScriptScaleAnimation)`
+/// Adds the specified `anim` to this effect.  The anim will have `apply()` called when
+/// this effect has `apply()` called.  It will be removed when this effect is
+/// removed.
+///
 /// # `add_anim(anim: ScriptParticleGenerator)`
-/// Adds the specified `anim` to this effect.  The anim will be have `apply()` called
+/// Adds the specified `anim` to this effect.  The anim will have `apply()` called
 /// when this effect has `apply()` called.  It will be removed when this effect is
 /// removed.
 ///
@@ -160,6 +166,7 @@ pub struct ScriptEffect {
     callbacks: Vec<CallbackData>,
     pgens: Vec<ScriptParticleGenerator>,
     color_anims: Vec<ScriptColorAnimation>,
+    scale_anims: Vec<ScriptScaleAnimation>,
 }
 
 impl ScriptEffect {
@@ -174,6 +181,7 @@ impl ScriptEffect {
             callbacks: Vec::new(),
             pgens: Vec::new(),
             color_anims: Vec::new(),
+            scale_anims: Vec::new(),
         }
     }
 
@@ -188,6 +196,7 @@ impl ScriptEffect {
             callbacks: Vec::new(),
             pgens: Vec::new(),
             color_anims: Vec::new(),
+            scale_anims: Vec::new(),
         }
     }
 }
@@ -206,6 +215,10 @@ impl UserData for ScriptEffect {
                     *squares_to_fire_on_moved = squares;
                 }
             }
+            Ok(())
+        });
+        methods.add_method_mut("add_scale_anim", |_, effect, anim: ScriptScaleAnimation| {
+            effect.scale_anims.push(anim);
             Ok(())
         });
         methods.add_method_mut("add_color_anim", |_, effect, anim: ScriptColorAnimation| {
@@ -465,6 +478,13 @@ fn apply(effect_data: &ScriptEffect) -> Result<()> {
     let mut marked = Vec::new();
     for anim in effect_data.color_anims.iter() {
         let mut anim = script_color_animation::create_anim(&anim)?;
+        anim.set_removal_effect(effect_index);
+        marked.push(anim.get_marked_for_removal());
+        GameState::add_animation(anim);
+    }
+
+    for anim in effect_data.scale_anims.iter() {
+        let mut anim = script_scale_animation::create_anim(&anim)?;
         anim.set_removal_effect(effect_index);
         marked.push(anim.get_marked_for_removal());
         GameState::add_animation(anim);

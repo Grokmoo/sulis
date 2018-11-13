@@ -1,0 +1,4 @@
+id: druid
+abilities:
+  - id: enlarge
+    position: [0, 0]

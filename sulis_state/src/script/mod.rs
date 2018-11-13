@@ -63,6 +63,9 @@ pub use self::script_color_animation::ScriptColorAnimation;
 mod script_particle_generator;
 pub use self::script_particle_generator::ScriptParticleGenerator;
 
+mod script_scale_animation;
+pub use self::script_scale_animation::ScriptScaleAnimation;
+
 mod script_subpos_animation;
 pub use self::script_subpos_animation::ScriptSubposAnimation;
 

@@ -142,6 +142,11 @@ use {ai, animation::{self}, script::*, MOVE_TO_THRESHOLD};
 /// The `points` used by this method is a table of tables with `x` and `y` elements.  This
 /// can be constructed by hand, or obtained from a `ScriptEntitySet` as the `affected_points`.
 ///
+/// # `create_scale_anim(duration: Float (Optional)) -> ScriptScaleAnimation`
+/// Creates a scale animation that will change the size of the entity by a
+/// factor, for the specified duration.  If `duration` is not specified, the
+/// animation lasts forever or until the attached effect is removed.
+///
 /// # `create_subpos_anim(duration: Float (Optional)) -> ScriptSubposAnimation`
 /// Creates an entity subpos animation, that can be used to temporarily move
 /// the location of the entity with pixel accuracy on the screen, for the specified
@@ -575,6 +580,16 @@ impl UserData for ScriptEntity {
             let ability = args.0;
             let index = entity.try_unwrap_index()?;
             Ok(ScriptEffect::new_entity(index, &ability, duration))
+        });
+
+        methods.add_method("create_scale_anim", |_, entity, duration_secs: Option<f32>| {
+            let index = entity.try_unwrap_index()?;
+            let duration = match duration_secs {
+                None => ExtInt::Infinity,
+                Some(amount) => ExtInt::Int((amount * 1000.0) as u32),
+            };
+
+            Ok(ScriptScaleAnimation::new(index, duration))
         });
 
         methods.add_method("create_subpos_anim", |_, entity, duration_secs: f32| {

@@ -23,7 +23,7 @@ function on_target_select(parent, ability, targets)
   effect:add_num_bonus("reach", 1.0)
   
   gen = target:create_scale_anim()
-  gen:set_scale(gen:param(1.4))
+  gen:set_scale(gen:param(1.5))
   effect:add_scale_anim(gen)
   effect:apply()
 end

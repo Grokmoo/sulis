@@ -580,8 +580,8 @@ impl AreaDrawable for EntityState {
             }
         }
 
-        let offset_x = self.scale * self.size.width as f32 / 2.0;
-        let offset_y = self.scale * self.size.height as f32 / 2.0;
+        let offset_x = (self.scale - 1.0) * self.size.width as f32 / 2.0;
+        let offset_y = (self.scale - 1.0) * self.size.height as f32 / 2.0;
         let x = x + self.location.x as f32 + self.sub_pos.0;
         let y = y + self.location.y as f32 + self.sub_pos.1;
 

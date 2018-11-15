@@ -14,6 +14,8 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::str::FromStr;
+
 use rlua::{UserData, UserDataMethods};
 
 use sulis_rules::{Slot, QuickSlot};
@@ -22,6 +24,15 @@ use script::*;
 
 /// The inventory of a particular creature, including equipped items
 /// and quickslots.
+///
+/// # `equip_item(item: ScriptStashItem)`
+/// Equips the given `item` from the stash into the appropriate inventory
+/// slot of the parent.
+///
+/// # `unequip_item(slot: String)`
+/// Unequips the item in the specified inventory `slot` of the parent.
+/// Slot must be one of cloak, head, torso, hands, held_main, held_off,
+/// legs, feet, waist, neck, finger_main, finger_off
 ///
 /// # `has_equipped_weapon() -> Bool`
 /// Returns true if the parent entity currently has a weapon equipped,
@@ -69,6 +80,44 @@ macro_rules! try_unwrap {
 
 impl UserData for ScriptInventory {
     fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
+        methods.add_method("equip_item", |_, data, item: ScriptStashItem| {
+            let entity = data.parent.try_unwrap()?;
+            let index = item.unwrap_index()?;
+            let stash = GameState::party_stash();
+            let item = match stash.borrow_mut().remove_item(index) {
+                None => {
+                    warn!("Unable to remove item at index '{}' from stash for equip", index);
+                    return Ok(());
+                }, Some(item) => item,
+            };
+
+            let to_add = entity.borrow_mut().actor.equip(item, None);
+            for item in to_add {
+                stash.borrow_mut().add_item(1, item);
+            }
+            Ok(())
+        });
+
+        methods.add_method_mut("unequip_item", |_, data, slot: String| {
+            let slot = match Slot::from_str(&slot) {
+                Err(_) =>
+                    return Err(rlua::Error::FromLuaConversionError {
+                        from: "String",
+                        to: "Slot",
+                        message: Some(format!("Invalid slot '{}'", slot)),
+                    }),
+                Ok(slot) => slot
+            };
+
+            let parent = data.parent.try_unwrap()?;
+            let item = parent.borrow_mut().actor.unequip(slot);
+            if let Some(item) = item {
+                let stash = GameState::party_stash();
+                stash.borrow_mut().add_item(1, item);
+            }
+            Ok(())
+        });
+
         methods.add_method("has_equipped_weapon", |_, data, ()| {
             try_unwrap!(data => inv);
 
@@ -133,6 +182,36 @@ impl UserData for ScriptInventory {
             }
 
             Ok(items)
+        });
+    }
+}
+
+/// A representation of an item in the stash
+/// # `is_valid() -> Bool`
+/// Returns true if this is a valid item in the stash, false otherwise
+#[derive(Clone)]
+pub struct ScriptStashItem {
+    pub index: Option<usize>,
+}
+
+impl ScriptStashItem {
+    pub fn unwrap_index(&self) -> Result<usize> {
+        match self.index {
+            None =>
+                return Err(rlua::Error::FromLuaConversionError {
+                    from: "ScriptStashItem",
+                    to: "Item",
+                    message: Some(format!("ScriptStashItem is invalid / does not exist.")),
+                }),
+            Some(index) => Ok(index),
+        }
+    }
+}
+
+impl UserData for ScriptStashItem {
+    fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
+        methods.add_method("is_valid", |_, item, ()| {
+            Ok(item.index.is_some())
         });
     }
 }

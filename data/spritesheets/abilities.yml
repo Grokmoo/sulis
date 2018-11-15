@@ -40,6 +40,9 @@ groups:
       minor_heal: [7, 3]
       
       expediate: [0, 4]
+      beast_shape: [1, 4]
+      
+      prereqs_not_met: [7, 4]
       
       whirlwind_attack: [0, 5]
       blitz: [1, 5]
@@ -129,4 +132,3 @@ groups:
       practiced_caster: [4, 15]
       point_blank_shot: [5, 15]
       enlarge: [6, 15]
-      prereqs_not_met: [7, 4]

@@ -142,6 +142,11 @@ use {ai, animation::{self}, script::*, MOVE_TO_THRESHOLD};
 /// The `points` used by this method is a table of tables with `x` and `y` elements.  This
 /// can be constructed by hand, or obtained from a `ScriptEntitySet` as the `affected_points`.
 ///
+/// # `create_image_layer_anim(duration: Floag (Optional)) -> ScriptImageLayerAnimation`
+/// Creates an image layer animation that will add (or override) image layers of the entity
+/// for the specified duraiton.  If `duration` is not specified, the animation lasts forever
+/// or until the attached effect is removed.
+///
 /// # `create_scale_anim(duration: Float (Optional)) -> ScriptScaleAnimation`
 /// Creates a scale animation that will change the size of the entity by a
 /// factor, for the specified duration.  If `duration` is not specified, the
@@ -580,6 +585,16 @@ impl UserData for ScriptEntity {
             let ability = args.0;
             let index = entity.try_unwrap_index()?;
             Ok(ScriptEffect::new_entity(index, &ability, duration))
+        });
+
+        methods.add_method("create_image_layer_anim", |_, entity, duration_secs: Option<f32>| {
+            let index = entity.try_unwrap_index()?;
+            let duration = match duration_secs {
+                None => ExtInt::Infinity,
+                Some(amount) => ExtInt::Int((amount * 1000.0) as u32),
+            };
+
+            Ok(ScriptImageLayerAnimation::new(index, duration))
         });
 
         methods.add_method("create_scale_anim", |_, entity, duration_secs: Option<f32>| {

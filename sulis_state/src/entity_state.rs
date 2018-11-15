@@ -527,16 +527,6 @@ impl EntityState {
         self.size.points(x, y)
     }
 
-    /// Returns true if `e1` and `e2` refer to the same EntityState, false
-    /// otherwise
-    pub fn equals(e1: &Rc<RefCell<EntityState>>, e2: &Rc<RefCell<EntityState>>) -> bool {
-        if e1.borrow().location != e2.borrow().location {
-            return false;
-        }
-
-        e1.borrow().index == e2.borrow().index
-    }
-
     pub fn draw_no_pos(&self, renderer: &mut GraphicsRenderer,
                    scale_x: f32, scale_y: f32, x: f32, y: f32, alpha: f32) {
         let a = self.color.a * alpha;

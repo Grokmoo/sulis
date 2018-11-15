@@ -21,11 +21,11 @@ use std::cell::{RefCell};
 use std::collections::HashMap;
 
 use sulis_core::io::GraphicsRenderer;
-use sulis_core::image::{LayeredImage};
+use sulis_core::image::{LayeredImage, Image};
 use sulis_core::util::{invalid_data_error, ExtInt};
 use sulis_rules::{AccuracyKind, Attack, AttackKind, BonusList, HitKind, StatList, WeaponKind,
     QuickSlot, Slot, ItemKind};
-use sulis_module::{Actor, Module, ActorBuilder, Faction};
+use sulis_module::{Actor, Module, ActorBuilder, Faction, ImageLayer};
 use area_feedback_text::ColorKind;
 use {AbilityState, ChangeListenerList, Effect, EntityState, GameState, Inventory, ItemState, PStats};
 use save_state::ActorSaveState;
@@ -39,6 +39,7 @@ pub struct ActorState {
     image: LayeredImage,
     pub(crate) ability_states: HashMap<String, AbilityState>,
     texture_cache_invalid: bool,
+    anim_image_layers: HashMap<ImageLayer, Rc<Image>>,
     p_stats: PStats,
 }
 
@@ -90,6 +91,7 @@ impl ActorState {
             ability_states,
             texture_cache_invalid: false,
             p_stats: save.p_stats,
+            anim_image_layers: HashMap::new(),
         })
     }
 
@@ -120,6 +122,7 @@ impl ActorState {
             ability_states,
             texture_cache_invalid: false,
             p_stats: PStats::new(&actor),
+            anim_image_layers: HashMap::new(),
         };
 
         actor_state.compute_stats();
@@ -145,6 +148,30 @@ impl ActorState {
         }
 
         actor_state
+    }
+
+    pub fn add_anim_image_layers(&mut self, images: &HashMap<ImageLayer, Rc<Image>>) {
+        let mut change = false;
+        for (layer, ref image) in images.iter() {
+            if let Some(img) = self.anim_image_layers.get(layer) {
+                if Rc::ptr_eq(img, image) { continue; }
+            }
+            change = true;
+            self.anim_image_layers.insert(*layer, Rc::clone(image));
+        }
+
+        if change {
+            self.compute_stats();
+            self.texture_cache_invalid = true;
+        }
+    }
+
+    pub fn remove_anim_image_layers(&mut self, images: &HashMap<ImageLayer, Rc<Image>>) {
+        for ref layer in images.keys() {
+            self.anim_image_layers.remove(*layer);
+        }
+        self.compute_stats();
+        self.texture_cache_invalid = true;
     }
 
     pub fn is_threatened(&self) -> bool { self.p_stats.is_threatened() }
@@ -799,9 +826,16 @@ impl ActorState {
         debug!("Compute stats for '{}'", self.actor.name);
         self.stats = StatList::new(self.actor.attributes);
 
-        let layers = self.actor.image_layers().get_list_with(self.actor.sex, &self.actor.race,
-                                                             self.actor.hair_color, self.actor.skin_color,
-                                                             self.inventory.get_image_layers());
+        let mut layers_override = self.inventory().get_image_layers();
+        for (layer, image) in self.anim_image_layers.iter() {
+            layers_override.insert(*layer, Rc::clone(image));
+        }
+
+        let layers = self.actor.image_layers().get_list_with(self.actor.sex,
+                                                             &self.actor.race,
+                                                             self.actor.hair_color,
+                                                             self.actor.skin_color,
+                                                             layers_override);
         self.image = LayeredImage::new(layers, self.actor.hue);
 
         let rules = Module::rules();

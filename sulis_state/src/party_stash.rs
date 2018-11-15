@@ -42,18 +42,20 @@ impl PartyStash {
         &self.items
     }
 
-    pub fn add_item(&mut self, quantity: u32, item_state: ItemState) {
-        if quantity == 0 { return; }
+    pub fn add_item(&mut self, quantity: u32, item_state: ItemState) -> Option<usize> {
+        if quantity == 0 { return None; }
 
         if item_state.item.id == self.coins_id {
             let qty = quantity as i32 * Module::rules().item_value_display_factor as i32;
             GameState::add_party_coins(qty);
-            return;
+            return None;
         }
 
-        self.items.add_quantity(quantity, item_state);
+        let index = self.items.add_quantity(quantity, item_state);
 
         self.listeners.notify(&self);
+
+        Some(index)
     }
 
     /// Returns whether or not this stash has at least one item

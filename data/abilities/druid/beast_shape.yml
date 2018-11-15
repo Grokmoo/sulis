@@ -1,0 +1,23 @@
+id: beast_shape
+name: "Beast Shape"
+icon: abilities/beast_shape
+description: |
+  The caster transforms into a werewolf, a formidable melee combatant.  Most equipment is temporarily absorbed into the form, with the exception of items in the hands which are swapped out if possible or unequipped if not.  Most bonuses from equipment are retained.  However, armor, defense, and accuracy are all set to values based on the strength of the spell and independant of any equipment.
+  
+  The caster's reduced mental facilties will make most spells cast while in this form significantly weakened.
+active:
+  script: "beast_shape"
+  group: "Druid"
+  ap: 2000
+  duration:
+    Rounds: 3
+  cooldown: 4
+  ai:
+    priority: 10
+    kind: Buff
+    group: Single
+    range: Personal
+  short_description: |
+    Turns the caster into a ferocious werewolf.
+prereqs:
+  total_level: 1

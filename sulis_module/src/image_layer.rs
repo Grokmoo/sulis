@@ -14,7 +14,8 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::io::Error;
+use std::str::FromStr;
+use std::io::{Error, ErrorKind};
 use std::slice::Iter;
 use std::collections::HashMap;
 use std::rc::Rc;
@@ -43,6 +44,36 @@ pub enum ImageLayer {
     Background,
     Cloak,
     Shadow,
+}
+
+impl FromStr for ImageLayer {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        use self::ImageLayer::*;
+        let val = match s {
+            "HeldMain" => HeldMain,
+            "HeldOff" => HeldOff,
+            "Ears" => Ears,
+            "Hair" => Hair,
+            "Beard" => Beard,
+            "Head" => Head,
+            "Hands" => Hands,
+            "Foreground" => Foreground,
+            "Torso" => Torso,
+            "Legs" => Legs,
+            "Feet" => Feet,
+            "Background" => Background,
+            "Cloak" => Cloak,
+            "Shadown" => Shadow,
+            _ => {
+                return Err(Error::new(ErrorKind::InvalidInput,
+                                      format!("Unable to parse ImageLayer from '{}'", s)));
+            }
+        };
+
+        Ok(val)
+    }
 }
 
 use self::ImageLayer::*;
@@ -125,7 +156,12 @@ impl ImageLayerSet {
         match self.images.get(&sex) {
             Some(sex_map) => {
                 for layer in ImageLayer::iter() {
-                    if insert_for_race_sex(&mut list, &insert, sex, race, *layer) {
+                    let mut base_size = None;
+                    if let Some(ref image) = sex_map.get(&layer) {
+                        base_size = Some((image.get_width_f32(), image.get_height_f32()));
+                    }
+
+                    if insert_for_race_sex(&mut list, &insert, sex, race, *layer, base_size) {
                         continue;
                     }
 
@@ -141,10 +177,11 @@ impl ImageLayerSet {
                 }
             }, None => {
                 for layer in ImageLayer::iter() {
-                    insert_for_race_sex(&mut list, &insert, sex, race, *layer);
+                    insert_for_race_sex(&mut list, &insert, sex, race, *layer, None);
                 }
             }
         }
+
         list
     }
 
@@ -176,13 +213,22 @@ fn get_color(layer: ImageLayer, hair: Option<Color>, skin: Option<Color>) -> Opt
 
 fn insert_for_race_sex(list: &mut Vec<(f32, f32, Option<Color>, Rc<Image>)>,
                        insert: &HashMap<ImageLayer, Rc<Image>>,
-                       sex: Sex, race: &Rc<Race>, layer: ImageLayer) -> bool {
-    let (x, y) = match race.get_image_layer_offset(layer) {
+                       sex: Sex,
+                       race: &Rc<Race>,
+                       layer: ImageLayer,
+                       base_size: Option<(f32, f32)>) -> bool {
+    let (mut x, mut y) = match race.get_image_layer_offset(layer) {
         None => return true,
         Some((x, y)) => (*x, *y),
     };
+
     match insert.get(&layer) {
         Some(ref image) => {
+            if let Some((width_base, height_base)) = base_size {
+                x -= (image.get_width_f32() - width_base) / 2.0;
+                y -= (image.get_height_f32() - height_base) / 2.0;
+            }
+
             list.push((x, y, None, race.image_for_sex(sex, image)));
             true
         }, None => {

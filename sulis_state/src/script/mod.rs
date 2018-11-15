@@ -56,9 +56,13 @@ pub use self::script_entity::ScriptEntitySet;
 mod script_inventory;
 pub use self::script_inventory::ScriptInventory;
 pub use self::script_inventory::ScriptUsableItem;
+pub use self::script_inventory::ScriptStashItem;
 
 mod script_color_animation;
 pub use self::script_color_animation::ScriptColorAnimation;
+
+mod script_image_layer_animation;
+pub use self::script_image_layer_animation::ScriptImageLayerAnimation;
 
 mod script_particle_generator;
 pub use self::script_particle_generator::ScriptParticleGenerator;
@@ -574,11 +578,16 @@ fn get_targeter() -> Result<Rc<RefCell<AreaTargeter>>> {
 /// Adds the specified number of coins to the party.  Note that this value is divided by
 /// the item_value_display_factor to get the displayed coinage.
 ///
-/// # `add_party_item(id: String, adjective: String (Optional, up to 3))`
+/// # `find_party_item(id: String, adjective: String (Optional, up to 3)) -> ScriptStashItem`
+/// Returns a ScriptStashItem representing the first item in the party stash found
+/// matching the specified ID and all specified `adjective`s.  If no such item is found,
+/// returns an invalid ScriptStashItem.
+///
+/// # `add_party_item(id: String, adjective: String (Optional, up to 3)) -> ScriptStashItem`
 /// Creates an item with the specified `id`, and `adjective`, if specified.  If there is
 /// no item definition with this ID or the adjective is specified but there is no
 /// adjective with that ID, throws an error.  Otherwise, the item is added to the party
-/// stash.
+/// stash.  Returns a `ScriptStashItem` representing the added item.
 ///
 /// # `add_party_xp(amount: Int)`
 /// Adds the specified amount of XP to the party.  Each current party member is given
@@ -992,6 +1001,25 @@ impl UserData for ScriptInterface {
             Ok(())
         });
 
+        methods.add_method("find_party_item", |_, _, (id, adj1, adj2, adj3):
+                           (String, Option<String>, Option<String>, Option<String>)| {
+
+            let adjs = vec![adj1, adj2, adj3];
+            let adjectives: Vec<_> = adjs.into_iter().filter_map(|a| a).collect();
+            let stash = GameState::party_stash();
+            let item = match Module::create_get_item(&id, &adjectives) {
+                None => return Err(rlua::Error::FromLuaConversionError {
+                    from: "String",
+                    to: "Item",
+                    message: Some(format!("Item '{}' does not exist", id)),
+                }),
+                Some(item) => item,
+            };
+            let item_state = ItemState::new(item);
+            let index = stash.borrow().items().find_index(&item_state);
+            Ok(ScriptStashItem { index })
+        });
+
         methods.add_method("add_party_item", |_, _, (item, adj1, adj2, adj3):
             (String, Option<String>, Option<String>, Option<String>)| {
             let adjs = vec![adj1, adj2, adj3];
@@ -1008,8 +1036,8 @@ impl UserData for ScriptInterface {
             };
 
             let item_state = ItemState::new(item);
-            stash.borrow_mut().add_item(1, item_state);
-            Ok(())
+            let index = stash.borrow_mut().add_item(1, item_state);
+            Ok(ScriptStashItem { index })
         });
 
         methods.add_method("add_party_xp", |_, _, amount: u32| {

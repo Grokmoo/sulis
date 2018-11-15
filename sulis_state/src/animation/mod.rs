@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::collections::HashMap;
 use std::time::{Duration};
 use std::cmp;
 use std::rc::Rc;
@@ -36,8 +37,8 @@ pub mod particle_generator;
 
 pub mod ranged_attack_animation;
 
-use sulis_core::{io::GraphicsRenderer, util::{self, ExtInt}};
-
+use sulis_core::{io::GraphicsRenderer, util::{self, ExtInt}, image::Image};
+use sulis_module::ImageLayer;
 use {ChangeListener, Effect, EntityState, ScriptCallback};
 use self::particle_generator::Param;
 use self::melee_attack_animation::MeleeAttackAnimModel;
@@ -238,6 +239,10 @@ pub (in animation) enum AnimKind {
     /// An animation that does nothing, and does not block
     NonBlockingWait,
 
+    /// An animation that adds or overrides image layers on an entity
+    /// while active
+    EntityImageLayer { images: HashMap<ImageLayer, Rc<Image>> },
+
     /// An animation that changes the color of an entity while active
     EntityColor { color: [Param; 4], color_sec: [Param; 4] },
 
@@ -271,6 +276,11 @@ impl Anim {
 
     pub fn new_wait(owner: &Rc<RefCell<EntityState>>, duration_millis: u32) -> Anim {
         Anim::new(owner, ExtInt::Int(duration_millis), AnimKind::Wait)
+    }
+
+    pub fn new_entity_image_layer(owner: &Rc<RefCell<EntityState>>, duration_millis: ExtInt,
+                                  images: HashMap<ImageLayer, Rc<Image>>) -> Anim {
+        Anim::new(owner, duration_millis, AnimKind::EntityImageLayer { images })
     }
 
     pub fn new_entity_color(owner: &Rc<RefCell<EntityState>>, duration_millis: ExtInt,
@@ -384,6 +394,9 @@ impl Anim {
         let frac = millis as f32 / self.duration_millis.to_f32();
         use self::AnimKind::*;
         match self.kind {
+            EntityImageLayer { ref images } => {
+                self.owner.borrow_mut().actor.add_anim_image_layers(images);
+            },
             EntityColor { ref mut color, ref mut color_sec } =>
                 entity_color_animation::update(color, color_sec, &self.owner, millis),
             EntityDeath { ref mut color, ref mut color_sec } =>
@@ -407,6 +420,9 @@ impl Anim {
     fn cleanup_kind(&mut self) {
         use self::AnimKind::*;
         match self.kind {
+            EntityImageLayer { ref images } => {
+                self.owner.borrow_mut().actor.remove_anim_image_layers(images);
+            },
             EntityColor { .. } => entity_color_animation::cleanup(&self.owner),
             EntitySubpos { .. } => entity_subpos_animation::cleanup(&self.owner),
             EntityScale { .. } => entity_scale_animation::cleanup(&self.owner),
@@ -477,7 +493,7 @@ impl Anim {
         match &self.kind {
             EntityColor { .. } => false,
             EntitySubpos { .. } => true,
-            EntityScale { .. } => !self.duration_millis.is_infinite(),
+            EntityScale { .. } | EntityImageLayer { .. } => !self.duration_millis.is_infinite(),
             MeleeAttack { .. } => true,
             RangedAttack { .. } => true,
             Move { .. } => true,

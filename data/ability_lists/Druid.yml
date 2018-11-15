@@ -2,3 +2,5 @@ id: druid
 abilities:
   - id: enlarge
     position: [0, 0]
+  - id: beast_shape
+    position: [0, 1]

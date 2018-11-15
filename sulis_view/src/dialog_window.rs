@@ -313,7 +313,7 @@ pub fn activate(widget: &Rc<RefCell<Widget>>, on_select: &Vec<OnTrigger>,
                 let stash = GameState::party_stash();
                 match ItemState::from(id) {
                     None => warn!("Attempted to add item '{}' but it does not exist", id),
-                    Some(item) => stash.borrow_mut().add_item(1, item),
+                    Some(item) => { stash.borrow_mut().add_item(1, item); },
                 }
             },
             TargetNumFlag(ref data) => {

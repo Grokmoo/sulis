@@ -20,6 +20,7 @@ use rlua::{UserData, UserDataMethods};
 
 use sulis_rules::{Slot, QuickSlot};
 use sulis_module::ability::AIData;
+use GameState;
 use script::*;
 
 /// The inventory of a particular creature, including equipped items
@@ -29,10 +30,12 @@ use script::*;
 /// Equips the given `item` from the stash into the appropriate inventory
 /// slot of the parent.
 ///
-/// # `unequip_item(slot: String)`
+/// # `unequip_item(slot: String) -> ScriptStashItem`
 /// Unequips the item in the specified inventory `slot` of the parent.
 /// Slot must be one of cloak, head, torso, hands, held_main, held_off,
-/// legs, feet, waist, neck, finger_main, finger_off
+/// legs, feet, waist, neck, finger_main, finger_off.  Returns the
+/// ScriptStashItem representing the unequipped item in the stash, or
+/// the invalid item if no item was in the slot
 ///
 /// # `has_equipped_weapon() -> Bool`
 /// Returns true if the parent entity currently has a weapon equipped,
@@ -111,11 +114,12 @@ impl UserData for ScriptInventory {
 
             let parent = data.parent.try_unwrap()?;
             let item = parent.borrow_mut().actor.unequip(slot);
+            let mut index = None;
             if let Some(item) = item {
                 let stash = GameState::party_stash();
-                stash.borrow_mut().add_item(1, item);
+                index = stash.borrow_mut().add_item(1, item);
             }
-            Ok(())
+            Ok(ScriptStashItem { index })
         });
 
         methods.add_method("has_equipped_weapon", |_, data, ()| {
@@ -212,6 +216,22 @@ impl UserData for ScriptStashItem {
     fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
         methods.add_method("is_valid", |_, item, ()| {
             Ok(item.index.is_some())
+        });
+
+        methods.add_method("id", |_, item, ()| {
+            match item.index {
+                None => Ok(None),
+                Some(index) => {
+                    let stash = GameState::party_stash();
+                    let stash = stash.borrow();
+                    match stash.items().get(index) {
+                        None => Ok(None),
+                        Some((_, item)) => {
+                            Ok(Some(item.item.id.to_string()))
+                        }
+                    }
+                }
+            }
         });
     }
 }

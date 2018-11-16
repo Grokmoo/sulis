@@ -920,9 +920,10 @@ impl GameState {
         complete_cbs.into_iter().for_each(|cb| cb.on_anim_complete());
 
         let mgr = GameState::turn_manager();
-        let cbs = mgr.borrow_mut().update(millis);
+        let (turn_cbs, removal_cbs) = mgr.borrow_mut().update(millis);
 
-        script_callback::fire_round_elapsed(cbs);
+        script_callback::fire_round_elapsed(turn_cbs);
+        script_callback::fire_on_removed(removal_cbs);
 
         let cbs = mgr.borrow_mut().update_entity_move_callbacks();
         script_callback::fire_on_moved(cbs);

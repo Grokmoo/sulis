@@ -28,6 +28,12 @@ use sulis_module::{Module};
 use script::{Result, script_entity, ScriptEntity, ScriptEntitySet, ScriptActiveSurface, ScriptItemKind};
 use {EntityState, GameState};
 
+pub fn fire_on_removed(cbs: Vec<Rc<CallbackData>>) {
+    for cb in cbs {
+        cb.on_removed();
+    }
+}
+
 pub fn fire_round_elapsed(cbs: Vec<Rc<CallbackData>>) {
     for cb in cbs {
         cb.on_round_elapsed();
@@ -52,6 +58,9 @@ pub fn fire_on_moved(cbs: Vec<Rc<CallbackData>>) {
 #[derive(Serialize, Deserialize, Clone, Copy, PartialOrd, Ord, Hash, PartialEq, Eq, Debug)]
 #[serde(deny_unknown_fields)]
 pub enum FuncKind {
+    /// Called whenever a an effect is removed from a parent
+    OnRemoved,
+
     /// Called whenver a parent entity loses hit points
     OnDamaged,
 
@@ -96,6 +105,8 @@ pub enum FuncKind {
 /// A trait representing a callback that will fire a script when called.  In lua scripts,
 /// `CallbackData` is constructed to use this trait.
 pub trait ScriptCallback {
+    fn on_removed(&self) { }
+
     fn on_damaged(&self, _targets: &ScriptEntitySet, _hit_kind: HitKind, _damage: u32) { }
 
     fn after_defense(&self, _targets: &ScriptEntitySet, _hit_kind: HitKind, _damage: u32) { }
@@ -145,6 +156,7 @@ enum Kind {
 /// Adds the specified `point` to the list of points this callback will provide in its
 /// targets.  The point is a table of the form `{x:x_coord, y: y_coord}`
 ///
+/// # `set_on_removed_fn(func: String)`
 /// # `set_on_damaged_fn(func: String)`
 /// # `set_before_attack_fn(func: String)`
 /// # `set_after_attack_fn(func: String)`
@@ -323,6 +335,10 @@ impl CallbackData {
 }
 
 impl ScriptCallback for CallbackData {
+    fn on_removed(&self) {
+        self.exec_standard_script(self.get_or_create_targets(), FuncKind::OnRemoved);
+    }
+
     fn before_defense(&self, targets: &ScriptEntitySet) {
         self.exec_standard_script(self.get_targets(targets), FuncKind::BeforeDefense);
     }
@@ -473,6 +489,8 @@ impl UserData for CallbackData {
             Ok(())
         });
 
+        methods.add_method_mut("set_on_removed_fn",
+                               |_, cb, func: String| cb.add_func(FuncKind::OnRemoved, func));
         methods.add_method_mut("set_on_damaged_fn",
                                |_, cb, func: String| cb.add_func(FuncKind::OnDamaged, func));
         methods.add_method_mut("set_before_attack_fn",

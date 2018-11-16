@@ -171,21 +171,22 @@ impl TurnManager {
     }
 
     #[must_use]
-    pub fn update(&mut self, elapsed_millis: u32) -> Vec<Rc<CallbackData>> {
+    pub fn update(&mut self, elapsed_millis: u32) -> (Vec<Rc<CallbackData>>, Vec<Rc<CallbackData>>) {
         // need to do an additional copy to satisfy the borrow checker here
         let to_remove: Vec<usize> = self.effects_remove_next_update.drain(..).collect();
+
+        let mut removal_cbs = Vec::new();
         for index in to_remove {
-            self.remove_effect(index);
+            removal_cbs.append(&mut self.remove_effect(index));
         }
 
-        let mut cbs = Vec::new();
-
+        let mut turn_cbs = Vec::new();
         let elapsed_millis = if !self.combat_active { elapsed_millis } else { 0 };
 
         // removal just replaces some with none, so we can safely iterate
         for index in 0..self.effects.len() {
             let (is_removal, mut effect_cbs) = self.update_effect(index, elapsed_millis);
-            cbs.append(&mut effect_cbs);
+            turn_cbs.append(&mut effect_cbs);
             if is_removal {
                 self.queue_remove_effect(index);
             }
@@ -197,7 +198,7 @@ impl TurnManager {
             }
         }
 
-        cbs
+        (turn_cbs, removal_cbs)
     }
 
     #[must_use]
@@ -621,13 +622,18 @@ impl TurnManager {
         self.effects_remove_next_update.push(index);
     }
 
-    fn remove_effect(&mut self, index: usize) {
+    fn remove_effect(&mut self, index: usize) -> Vec<Rc<CallbackData>> {
+        let cbs;
         let mut entities = HashSet::new();
         if let Some(effect) = &self.effects[index] {
             if let Some((ref area_id, ref points)) = effect.surface() {
                 let area = GameState::get_area_state(area_id).unwrap();
                 entities = area.borrow_mut().remove_surface(index, points);
             }
+
+            cbs = effect.callbacks.clone();
+        } else {
+            cbs = Vec::new();
         }
 
         for entity in entities {
@@ -642,6 +648,8 @@ impl TurnManager {
         });
 
         self.surfaces.retain(|e| *e != index);
+
+        cbs
     }
 
     fn check_encounter_cleared(&self, entity: &Rc<RefCell<EntityState>>) -> Option<usize>{

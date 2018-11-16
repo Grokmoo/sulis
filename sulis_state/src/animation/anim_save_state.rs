@@ -20,6 +20,7 @@ use std::collections::HashMap;
 
 use sulis_core::resource::ResourceSet;
 use sulis_core::util::ExtInt;
+use sulis_module::ImageLayer;
 use {EntityState};
 use animation::{Anim, AnimKind,
     particle_generator::{GeneratorModel, GeneratorState, Param, Particle}};
@@ -41,6 +42,20 @@ impl AnimSaveState {
                 Kind::EntityColor {
                     color: color.clone(),
                     color_sec: color_sec.clone(),
+                }
+            },
+            AnimKind::EntityScale { scale } => {
+                Kind::EntityScale {
+                    scale: scale.clone(),
+                }
+            },
+            AnimKind::EntityImageLayer { images } => {
+                let mut imgs = HashMap::new();
+                for (layer, image) in images.iter() {
+                    imgs.insert(*layer, image.id());
+                }
+                Kind::EntityImageLayer {
+                    images: imgs
                 }
             },
             AnimKind::ParticleGenerator { model, state } => {
@@ -94,6 +109,20 @@ impl AnimSaveState {
             Kind::EntityColor { color, color_sec } => {
                 Anim::new_entity_color(&entity, self.duration_millis, color, color_sec)
             },
+            Kind::EntityScale { scale } => {
+                Anim::new_entity_scale(&entity, self.duration_millis, scale)
+            },
+            Kind::EntityImageLayer { images } => {
+                let mut imgs = HashMap::new();
+                for (layer, image) in images {
+                    let img = match ResourceSet::get_image(&image) {
+                        None => continue,
+                        Some(image) => image,
+                    };
+                    imgs.insert(layer, img);
+                }
+                Anim::new_entity_image_layer(&entity, self.duration_millis, imgs)
+            },
             Kind::ParticleGenerator { model, state } => {
                 let image = match ResourceSet::get_image(&state.image) {
                     None => {
@@ -139,6 +168,8 @@ enum Kind {
     Invalid,
     EntityColor { color: [Param; 4], color_sec: [Param; 4] },
     ParticleGenerator { model: GeneratorModel, state: GeneratorSaveState },
+    EntityScale { scale: Param },
+    EntityImageLayer { images: HashMap<ImageLayer, String> },
 }
 
 #[derive(Serialize, Deserialize, Debug)]

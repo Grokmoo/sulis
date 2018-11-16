@@ -583,6 +583,9 @@ fn get_targeter() -> Result<Rc<RefCell<AreaTargeter>>> {
 /// matching the specified ID and all specified `adjective`s.  If no such item is found,
 /// returns an invalid ScriptStashItem.
 ///
+/// # `remove_party_item(item: ScriptStashItem)`
+/// Removes a quantity of one of the specified item from the party stash.
+///
 /// # `add_party_item(id: String, adjective: String (Optional, up to 3)) -> ScriptStashItem`
 /// Creates an item with the specified `id`, and `adjective`, if specified.  If there is
 /// no item definition with this ID or the adjective is specified but there is no
@@ -1018,6 +1021,15 @@ impl UserData for ScriptInterface {
             let item_state = ItemState::new(item);
             let index = stash.borrow().items().find_index(&item_state);
             Ok(ScriptStashItem { index })
+        });
+
+        methods.add_method("remove_party_item", |_, _, item: ScriptStashItem| {
+            let stash = GameState::party_stash();
+            if let Some(index) = item.index {
+                // throw away item
+                let _ = stash.borrow_mut().remove_item(index);
+            }
+            Ok(())
         });
 
         methods.add_method("add_party_item", |_, _, (item, adj1, adj2, adj3):

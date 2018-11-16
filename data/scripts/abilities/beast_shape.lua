@@ -4,6 +4,10 @@ function on_activate(parent, ability)
   effect = parent:create_effect(ability:name(), ability:duration())
   effect:set_tag("shapeshift")
   
+  cb = ability:create_callback(parent)
+  cb:set_on_removed_fn("on_removed")
+  effect:add_callback(cb)
+  
   effect:add_attribute_bonus("Strength", 5)
   effect:add_attribute_bonus("Dexterity", 4)
   effect:add_attribute_bonus("Endurance", 4)
@@ -42,4 +46,13 @@ function on_activate(parent, ability)
   effect:add_image_layer_anim(gen)
   
   effect:apply()
+end
+
+function on_removed(parent, ability)
+   inv = parent:inventory()
+   item = inv:unequip_item("held_main")
+   
+   if item:id() == "werewolf_claw" then
+	game:remove_party_item(item)
+   end
 end

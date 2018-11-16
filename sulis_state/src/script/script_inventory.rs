@@ -26,6 +26,13 @@ use script::*;
 /// The inventory of a particular creature, including equipped items
 /// and quickslots.
 ///
+/// # `set_locked(locked: Bool)`
+/// Sets whether this inventory is locked.  The player will be unable
+/// to equip or unequip any items in a locked inventory.
+///
+/// # `is_locked() -> Bool`
+/// Returns whether or not this inventory is locked.  See `set_locked`
+///
 /// # `equip_item(item: ScriptStashItem)`
 /// Equips the given `item` from the stash into the appropriate inventory
 /// slot of the parent.
@@ -83,6 +90,18 @@ macro_rules! try_unwrap {
 
 impl UserData for ScriptInventory {
     fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
+        methods.add_method("set_locked", |_, data, locked: bool| {
+            let entity = data.parent.try_unwrap()?;
+            entity.borrow_mut().actor.set_inventory_locked(locked);
+            Ok(())
+        });
+
+        methods.add_method("is_locked", |_, data, ()| {
+            let entity = data.parent.try_unwrap()?;
+            let locked = entity.borrow().actor.is_inventory_locked();
+            Ok(locked)
+        });
+
         methods.add_method("equip_item", |_, data, item: ScriptStashItem| {
             let entity = data.parent.try_unwrap()?;
             let index = item.unwrap_index()?;

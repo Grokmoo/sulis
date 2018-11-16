@@ -21,7 +21,7 @@ use std::cell::{Cell, RefCell};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{Button, ScrollPane};
 use sulis_module::{Item, Module};
-use sulis_state::{EntityState, GameState, inventory::has_proficiency, script::ScriptItemKind};
+use sulis_state::{EntityState, GameState, script::ScriptItemKind};
 
 use {item_button::*, ItemButton};
 
@@ -171,13 +171,9 @@ impl ItemListPane {
                 }
             }
 
-            if let Some(ref equip) = item.item.equippable {
-                if !combat_active && has_proficiency(&item, &actor.stats) &&
-                    !actor.actor.race.is_disabled(equip.slot) &&
-                    item.item.meets_prereqs(&actor.actor) {
-                    item_but.borrow_mut().add_action("Equip",
-                        equip_item_cb(&self.entity, index), true);
-                }
+            if !combat_active && actor.can_equip(&item) {
+                item_but.borrow_mut().add_action("Equip",
+                                                 equip_item_cb(&self.entity, index), true);
             }
 
             if !combat_active {

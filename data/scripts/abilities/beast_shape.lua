@@ -31,6 +31,7 @@ function on_activate(parent, ability)
   
   item = game:add_party_item("werewolf_claw")
   inv:equip_item(item)
+  inv:set_locked(true)
   
   gen = parent:create_image_layer_anim()
   gen:add_image("Ears", "empty")
@@ -50,6 +51,7 @@ end
 
 function on_removed(parent, ability)
    inv = parent:inventory()
+   inv:set_locked(false)
    item = inv:unequip_item("held_main")
    
    if item:id() == "werewolf_claw" then

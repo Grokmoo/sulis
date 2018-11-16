@@ -63,8 +63,6 @@ impl WidgetKind for InventoryWindow {
         self.entity.borrow_mut().actor.listeners.add(
             ChangeListener::invalidate(NAME, widget));
 
-        let combat_active = GameState::is_combat_active();
-
         let widget_ref = Rc::clone(widget);
         GameState::add_party_listener(ChangeListener::new(NAME, Box::new(move |entity| {
             let entity = match entity {
@@ -104,7 +102,7 @@ impl WidgetKind for InventoryWindow {
                     Widget::add_child_to(&equipped_area, button);
                 }, Some(item_state) => {
                     let button = ItemButton::equipped(&self.entity, &item_state.item, *slot);
-                    if !combat_active {
+                    if actor.can_unequip(*slot) {
                         let mut but = button.borrow_mut();
                         but.add_action("Unequip", unequip_item_cb(&self.entity, *slot), true);
                         but.add_action("Drop", unequip_and_drop_item_cb(&self.entity, *slot), false);

@@ -32,6 +32,9 @@ pub struct PStats {
     xp: u32,
     has_level_up: bool,
 
+    #[serde(default)]
+    inventory_locked: bool,
+
     #[serde(skip)] // will be computed on load anyway
     threatened_by: Vec<usize>,
 
@@ -51,6 +54,7 @@ impl PStats {
             overflow_ap: 0,
             xp: actor.xp,
             has_level_up: false,
+            inventory_locked: false,
             threatened_by: Vec::new(),
             threatening: Vec::new(),
             current_group_uses_per_encounter: HashMap::new(),
@@ -79,6 +83,12 @@ impl PStats {
 
     pub fn remove_threatener(&mut self, index: usize) {
         self.threatened_by.retain(|x| *x != index);
+    }
+
+    pub fn is_inventory_locked(&self) -> bool { self.inventory_locked }
+
+    pub fn set_inventory_locked(&mut self, locked: bool) {
+        self.inventory_locked = locked;
     }
 
     pub fn hp(&self) -> i32 { self.hp }

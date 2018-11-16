@@ -226,8 +226,10 @@ impl Inventory {
         self.quick.insert(slot, item_state)
     }
 
-    /// Returns true if the given item can be equipped
-    pub fn can_equip(&self, item_state: &ItemState, stats: &StatList, actor: &Rc<Actor>) -> bool {
+    /// Returns true if the given item can be equipped - use ActorState::can_equip as it
+    /// checks all conditions including these
+    pub(crate) fn can_equip(&self, item_state: &ItemState,
+                            stats: &StatList, actor: &Rc<Actor>) -> bool {
         if !item_state.item.meets_prereqs(actor) { return false; }
         if !has_proficiency(item_state, stats) { return false; }
 

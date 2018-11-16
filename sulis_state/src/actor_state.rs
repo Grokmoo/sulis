@@ -129,7 +129,7 @@ impl ActorState {
 
         for (slot, item) in actor.inventory.equipped_iter() {
             let item = ItemState::new(item);
-            if !actor_state.inventory.can_equip(&item, &actor_state.stats, &actor) {
+            if !actor_state.can_equip(&item) {
                 warn!("Unable to equip item '{}' for actor '{}'", item.item.id, actor.id);
             } else {
                 let _ = actor_state.inventory.equip(item, Some(slot));
@@ -172,6 +172,12 @@ impl ActorState {
         }
         self.compute_stats();
         self.texture_cache_invalid = true;
+    }
+
+    pub fn is_inventory_locked(&self) -> bool { self.p_stats.is_inventory_locked() }
+
+    pub fn set_inventory_locked(&mut self, locked: bool) {
+        self.p_stats.set_inventory_locked(locked);
     }
 
     pub fn is_threatened(&self) -> bool { self.p_stats.is_threatened() }
@@ -241,6 +247,8 @@ impl ActorState {
 
     /// Returns true if the parent can swap weapons, false otherwise
     pub fn can_swap_weapons(&self) -> bool {
+        if self.p_stats.is_inventory_locked() { return false; }
+
         self.p_stats.ap() >= Module::rules().swap_weapons_ap
     }
 
@@ -651,7 +659,7 @@ impl ActorState {
     /// in order to equip the new item.  This will frequently be an empty list
     #[must_use]
     pub fn equip(&mut self, item: ItemState, preferred_slot: Option<Slot>) -> Vec<ItemState> {
-        if !self.inventory.can_equip(&item, &self.stats, &self.actor) {
+        if !self.can_equip(&item) {
             return vec![item];
         }
 
@@ -661,8 +669,22 @@ impl ActorState {
         unequipped
     }
 
+    pub fn can_equip(&self, item: &ItemState) -> bool {
+        if self.p_stats.is_inventory_locked() { return false; }
+
+        self.inventory.can_equip(&item, &self.stats, &self.actor)
+    }
+
+    pub fn can_unequip(&self, _slot: Slot) -> bool {
+        if self.p_stats.is_inventory_locked() { return false; }
+
+        return !GameState::is_combat_active()
+    }
+
     #[must_use]
     pub fn unequip(&mut self, slot: Slot) -> Option<ItemState> {
+        if self.p_stats.is_inventory_locked() { return None; }
+
         let item = self.inventory.unequip(slot);
         self.compute_stats();
         self.texture_cache_invalid = true;

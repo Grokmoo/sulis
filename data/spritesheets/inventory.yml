@@ -163,10 +163,15 @@ groups:
       weapon_staff02: [10, 0]
       weapon_staff03: [11, 0]
       weapon_staff04: [12, 0]
+      weapon_sickle: [13, 0]
+      weapon_halberd: [14, 0]
+      weapon_glaive: [15, 0]
       
       weapon_sword02: [8, 1]
       weapon_sword03: [9, 1]
       weapon_bow02: [10, 1]
+      weapon_scimitar: [11, 1]
+      weapon_sabre: [12, 1]
       
       helm_hat01: [8, 2]
       

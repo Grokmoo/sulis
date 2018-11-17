@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::str::FromStr;
 use std::{self, f32, u32};
 use std::rc::Rc;
 use std::cell::RefCell;
@@ -27,7 +28,7 @@ use sulis_core::util::{invalid_data_error, ExtInt};
 use sulis_core::config::Config;
 use sulis_core::resource::ResourceSet;
 use sulis_rules::{Attribute, AttackKind, DamageKind, Attack, HitKind};
-use sulis_module::Faction;
+use sulis_module::{ImageLayer, Faction};
 use {ActorState, EntityState, GameState, Location, area_feedback_text::ColorKind};
 use {ai, animation::{self}, script::*, MOVE_TO_THRESHOLD};
 
@@ -325,6 +326,15 @@ use {ai, animation::{self}, script::*, MOVE_TO_THRESHOLD};
 ///
 /// # `inventory() -> ScriptInventory`
 /// Returns a `ScriptInventory` object representing this entity's inventory.
+///
+/// # `race() -> String`
+/// Returns the ID of the race of this entity
+///
+/// # `image_layer_offset(layer: String) -> Table`
+/// Gets the image layer offset, in tiles for the given image layer
+/// for this entity.  The table has members `x` and `y` with the offset value.
+/// The layer must be a valid ImageLayer, one of HeldMain, HeldOff, Ears, Hair,
+/// Beard, Head, Hands, Foreground, Torso, Legs, Feet, Background, Cloak, Shadow
 ///
 /// # `size_str() -> String`
 /// Returns the ID of the size of this entity, i.e. 2by2 or 3by3.
@@ -965,6 +975,31 @@ impl UserData for ScriptEntity {
         });
 
         methods.add_method("stats", &create_stats_table);
+
+        methods.add_method("race", |_, entity, ()| {
+            let entity = entity.try_unwrap()?;
+            let race_id = entity.borrow().actor.actor.race.id.to_string();
+            Ok(race_id)
+        });
+
+        methods.add_method("image_layer_offset", |_, entity, layer: String| {
+            let layer = match ImageLayer::from_str(&layer) {
+                Err(e) => return Err(rlua::Error::FromLuaConversionError {
+                    from: "String",
+                    to: "ImageLayer",
+                    message: Some(e.to_string())
+                }),
+                Ok(layer) => layer,
+            };
+
+            let entity = entity.try_unwrap()?;
+            let offset = entity.borrow().actor.actor.race
+                .get_image_layer_offset(layer).unwrap_or(&(0.0, 0.0)).clone();
+            let mut table: HashMap<&str, f32> = HashMap::new();
+            table.insert("x", offset.0);
+            table.insert("y", offset.1);
+            Ok(table)
+        });
 
         methods.add_method("inventory", |_, entity, ()| {
             Ok(ScriptInventory::new(entity.clone()))

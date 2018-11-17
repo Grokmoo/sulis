@@ -244,6 +244,17 @@ groups:
       
       helm_hood: [6, 21]
       helm_hat: [9, 21]
+      sickle: [12, 21]
+      halberd: [15, 21]
+      glaive: [18, 21]
+      sabre: [21, 21]
+      scimitar: [24, 21]
+      
+      sickle_off: [12, 24]
+      halberd_off: [15, 24]
+      glaive_off: [18, 24]
+      sabre_off: [21, 24]
+      scimitar_off: [24, 24]
       
       wolf01: [39, 27]
       wolf_shadow: [39, 30]

@@ -3,6 +3,12 @@ src: "particles.png"
 size: [ 512, 512 ]
 simple_image_gen_scale: 4
 groups:
+  spirit_claw:
+    areas:      
+      spirit_claw01: [0, 384, 48, 48]
+      spirit_claw02: [48, 384, 48, 48]
+      spirit_claw03: [96, 384, 48, 48]
+      spirit_claw04: [144, 384, 48, 48]
   sticky_trap:
     areas:
       sticky_trap: [416, 48, 16, 16]

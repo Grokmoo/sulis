@@ -1,24 +1,23 @@
-id: longspear
-name: Long Spear
+id: glaive
+name: Glaive
 kind:
   Weapon:
     kind: Spear
-icon: inventory/weapon_longspear
+icon: inventory/weapon_glaive
 weight: 800
-value: 200
+value: 500
 equippable:
   slot: HeldMain
   blocks_slot: HeldOff
   bonuses: []
   attack:
     damage:
-      min: 18
-      max: 25
-      ap: 5
+      min: 20
+      max: 28
       kind: Piercing
     kind: # Melee
-      reach: 3.5
+      reach: 2.5
     bonuses: {}
 image:
   HeldMain:
-    creatures/longspear
+    creatures/glaive

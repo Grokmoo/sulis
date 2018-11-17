@@ -1,0 +1,23 @@
+id: scimitar
+name: Scimitar
+kind:
+  Weapon:
+    kind: LargeSword
+icon: inventory/weapon_scimitar
+weight: 400
+value: 900
+equippable:
+  slot: HeldMain
+  bonuses: []
+  attack:
+    damage:
+      min: 14
+      max: 20
+      kind: Slashing
+    kind: # Melee
+      reach: 1.5
+    bonuses:
+      melee_accuracy: 5
+image:
+  HeldMain:
+    creatures/scimitar

@@ -1,11 +1,11 @@
-id: longspear
-name: Long Spear
+id: halberd
+name: Halberd
 kind:
   Weapon:
     kind: Spear
-icon: inventory/weapon_longspear
+icon: inventory/weapon_halberd
 weight: 800
-value: 200
+value: 500
 equippable:
   slot: HeldMain
   blocks_slot: HeldOff
@@ -14,11 +14,11 @@ equippable:
     damage:
       min: 18
       max: 25
-      ap: 5
+      ap: 10
       kind: Piercing
     kind: # Melee
-      reach: 3.5
+      reach: 2.5
     bonuses: {}
 image:
   HeldMain:
-    creatures/longspear
+    creatures/halberd

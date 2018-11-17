@@ -1,0 +1,27 @@
+id: sabre
+name: Sabre
+kind:
+  Weapon:
+    kind: SmallSword
+icon: inventory/weapon_sabre
+weight: 200
+value: 500
+equippable:
+  slot: HeldMain
+  alternate_slot: HeldOff
+  bonuses: []
+  attack:
+    damage:
+      min: 11
+      max: 17
+      kind: Slashing
+    kind: # Melee
+      reach: 1.5
+    bonuses:
+      melee_accuracy: 5
+image:
+  HeldMain:
+    creatures/sabre
+alternate_image:
+  HeldOff:
+    creatures/sabre_off

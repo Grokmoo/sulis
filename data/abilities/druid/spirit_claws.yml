@@ -1,0 +1,23 @@
+id: spirit_claws
+name: "Spirit Claws"
+icon: abilities/spirit_claws
+description: |
+  The caster's hands are transformed into magical claws that cut through the thickest armor with ease.
+  
+  While the spell is active, the caster cannot swap weapons and suffers a significant penalty to spell accuracy.
+active:
+  script: "spirit_claws"
+  group: "Druid"
+  ap: 2000
+  duration:
+    Rounds: 3
+  cooldown: 4
+  ai:
+    priority: 20
+    kind: Buff
+    group: Single
+    range: Personal
+  short_description: |
+    Grants a magical damage melee attack.
+prereqs:
+  total_level: 1

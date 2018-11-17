@@ -98,4 +98,28 @@ weighted_entries:
     adjective1:
       none: 5
       fine: 5
-
+  sickle:
+    weight: 10
+    adjective1:
+      none: 5
+      fine: 5
+  sabre:
+    weight: 3
+    adjective1:
+      none: 5
+      fine: 5
+  scimitar:
+    weight: 1
+    adjective1:
+      none: 5
+      fine: 5
+  halberd:
+    weight: 1
+    adjective1:
+      none: 5
+      fine: 5
+  glaive:
+    weight: 1
+    adjective1:
+      none: 5
+      fine: 5

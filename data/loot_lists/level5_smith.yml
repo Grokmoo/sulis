@@ -174,3 +174,28 @@ probability_entries:
     adjective1:
       none: 7
       fine: 3
+  sickle:
+    weight: 40
+    adjective1:
+      none: 5
+      fine: 5
+  sabre:
+    weight: 30
+    adjective1:
+      none: 7
+      fine: 3
+  scimitar:
+    weight: 10
+    adjective1:
+      none: 7
+      fine: 3
+  halberd:
+    weight: 10
+    adjective1:
+      none: 8
+      fine: 2
+  glaive:
+    weight: 10
+    adjective1:
+      none: 8
+      fine: 2

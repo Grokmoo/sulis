@@ -203,3 +203,28 @@ probability_entries:
     adjective1:
       none: 5
       rusty: 5
+  sickle:
+    weight: 40
+    adjective1:
+      none: 5
+      rusty: 5
+  sabre:
+    weight: 30
+    adjective1:
+      none: 5
+      rusty: 5
+  scimitar:
+    weight: 10
+    adjective1:
+      none: 5
+      rusty: 5
+  halberd:
+    weight: 10
+    adjective1:
+      none: 5
+      rusty: 5
+  glaive:
+    weight: 10
+    adjective1:
+      none: 5
+      rusty: 5

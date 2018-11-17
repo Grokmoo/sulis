@@ -1,0 +1,26 @@
+id: sickle
+name: Sickle
+kind:
+  Weapon:
+    kind: SmallSword
+icon: inventory/weapon_sickle
+weight: 200
+value: 300
+equippable:
+  slot: HeldMain
+  alternate_slot: HeldOff
+  bonuses: []
+  attack:
+    damage:
+      min: 13
+      max: 19
+      kind: Slashing
+    kind: # Melee
+      reach: 0.5
+    bonuses: {}
+image:
+  HeldMain:
+    creatures/sickle
+alternate_image:
+  HeldOff:
+    creatures/sickle_off

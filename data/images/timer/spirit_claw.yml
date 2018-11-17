@@ -1,0 +1,9 @@
+id: spirit_claw
+frame_time_millis: 150
+frames:
+  - particles/spirit_claw01
+  - particles/spirit_claw02
+  - particles/spirit_claw03
+  - particles/spirit_claw04
+  - particles/spirit_claw03
+  - particles/spirit_claw02

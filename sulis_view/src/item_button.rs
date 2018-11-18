@@ -653,7 +653,8 @@ fn add_bonus(bonus: &Bonus, state: &mut WidgetState, has_accuracy: &mut bool,
         ActionPoints(amount) => add(state, "bonus_ap", *amount / Module::rules().display_ap as i32),
         Armor(amount) => armor.add_base(*amount),
         ArmorKind { kind, amount } => armor.add_kind(*kind, *amount),
-        Resistance { kind, amount } => add(state, &format!("resistance_{}", kind), *amount),
+        Resistance { kind, amount } =>
+            add(state, &format!("resistance_{}", kind).to_lowercase(), *amount),
         Damage(damage) => {
             let index = *damage_index;
             if damage.max > 0 {

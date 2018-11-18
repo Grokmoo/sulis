@@ -8,18 +8,15 @@ function on_activate(parent, ability)
   cb:set_on_removed_fn("on_removed")
   effect:add_callback(cb)
   
-  effect:add_attribute_bonus("Strength", 3)
-  effect:add_attribute_bonus("Dexterity", 2)
-  effect:add_attribute_bonus("Endurance", 2)
-  effect:add_attribute_bonus("Intellect", -6)
-  effect:add_attribute_bonus("Wisdom", -6)
+  effect:add_attribute_bonus("Strength", 8)
+  effect:add_attribute_bonus("Dexterity", -4)
+  effect:add_attribute_bonus("Endurance", 8)
+  effect:add_move_disabled()
   
   stats = parent:stats()
   level = stats.caster_level / 2 + stats.wisdom_bonus / 4
  
-  effect:add_num_bonus("armor", 10 + level - stats.base_armor)
-  effect:add_num_bonus("defense", 50 + level * 2 - stats.defense)
-  effect:add_num_bonus("melee_accuracy", 50 + level * 2 - stats.melee_accuracy)
+  effect:add_num_bonus("armor", 8 + level)
   
   inv = parent:inventory()
   if inv:has_alt_weapons() then
@@ -29,7 +26,7 @@ function on_activate(parent, ability)
     parent:swap_weapons()
   end
   
-  item = game:add_party_item("werewolf_claw")
+  item = game:add_party_item("tree_attack")
   inv:equip_item(item)
   inv:set_locked(true)
   
@@ -39,7 +36,7 @@ function on_activate(parent, ability)
   gen:add_image("Beard", "empty")
   gen:add_image("Head", "empty")
   gen:add_image("Hands", "empty")
-  gen:add_image("Foreground", "creatures/werewolf")
+  gen:add_image("Foreground", "creatures/treeman")
   gen:add_image("Torso", "empty")
   gen:add_image("Legs", "empty")
   gen:add_image("Feet", "empty")
@@ -61,7 +58,7 @@ function on_removed(parent, ability)
   inv:set_locked(false)
   item = inv:unequip_item("held_main")
    
-  if item:id() == "werewolf_claw" then
+  if item:id() == "tree_attack" then
 	game:remove_party_item(item)
   end
    

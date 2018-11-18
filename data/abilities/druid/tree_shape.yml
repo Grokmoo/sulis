@@ -1,0 +1,23 @@
+id: tree_shape
+name: "Tree Shape"
+icon: abilities/tree_shape
+description: |
+  You transform into a tree like shape, gaining tremendous strength and endurance and a powerful melee attack, but becoming rooted in one spot.  Most equipment is temporarily absorbed into the form, with the exception of items in the hands which are swapped out if possible or unequipped if not.  Most bonuses from equipment are retained.
+  
+  You will not be able to change your equipped items while shapeshifted.
+active:
+  script: "tree_shape"
+  group: "Druid"
+  ap: 2000
+  duration:
+    Rounds: 3
+  cooldown: 6
+  ai:
+    priority: 10
+    kind: Buff
+    group: Single
+    range: Personal
+  short_description: |
+    Turns the caster into a powerful tree.
+prereqs:
+  total_level: 1

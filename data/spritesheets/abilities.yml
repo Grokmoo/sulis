@@ -42,12 +42,17 @@ groups:
       
       expediate: [0, 4]
       beast_shape: [1, 4]
+      regenerate: [2, 4]
+      entangling_vines: [3, 4]
+      resist_elements: [4, 4]
       
       prereqs_not_met: [7, 4]
       
       whirlwind_attack: [0, 5]
       blitz: [1, 5]
       petrify: [2, 5]
+      layer_of_bark: [3, 5]
+      tree_shape: [4, 5]
       
       flaming_fingers: [0, 6]
       fire_shield: [1, 6]
@@ -133,3 +138,4 @@ groups:
       practiced_caster: [4, 15]
       point_blank_shot: [5, 15]
       enlarge: [6, 15]
+      stinging_swarm: [7, 15]

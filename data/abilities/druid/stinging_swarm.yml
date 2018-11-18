@@ -1,0 +1,19 @@
+id: stinging_swarm
+name: "Stinging Swarm"
+icon: abilities/stinging_swarm
+description: |
+  You summon forth a cloud of stinging, biting insects.  Any creatures in the area of effect suffer penalties to accuracy and defense, as well as suffering a small amount of damage for each round they remain in the swarm.
+active:
+  script: "stinging_swarm"
+  group: Druid
+  ap: 2000
+  duration:
+    Rounds: 3
+  cooldown: 5
+  ai:
+    priority: 30
+    kind: Debuff
+    group: Multiple
+    range: Visible
+  short_description: |
+    A swarm of biting insects damages and debilitates your enemies.

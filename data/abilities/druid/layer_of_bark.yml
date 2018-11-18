@@ -1,0 +1,19 @@
+id: layer_of_bark
+name: "Layer of Bark"
+icon: abilities/layer_of_bark
+description: |
+  Your skin transforms into a thick layer of tough tree bark.  You gain substantial damage resistance to slashing, piercing, and crushing damage, but vulnerability to fire.
+active:
+  script: "layer_of_bark"
+  group: "Druid"
+  ap: 2000
+  duration:
+    Rounds: 3
+  cooldown: 4
+  ai:
+    priority: 10
+    kind: Buff
+    group: Single
+    range: Personal
+  short_description: |
+    Gain resistance to physical attacks but vulnerability to fire.

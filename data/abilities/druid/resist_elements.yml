@@ -1,0 +1,19 @@
+id: resist_elements
+name: "Resist Elements"
+icon: abilities/resist_elements
+description: |
+  You are granted substantial damage resistance to all elemental damage types, including Fire, Cold, Acid, and Electrical damage.
+active:
+  script: "resist_elements"
+  group: "Druid"
+  ap: 2000
+  duration:
+    Rounds: 3
+  cooldown: 4
+  ai:
+    priority: 30
+    kind: Buff
+    group: Single
+    range: Personal
+  short_description: |
+    Gain resistance to elemental damage types.

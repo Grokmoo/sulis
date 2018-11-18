@@ -59,6 +59,7 @@ groups:
       forest_troll01: [51, 27]
       forest_troll_shadow: [55, 27]
       werewolf: [59, 27]
+      treeman: [59, 31]
       
       slime_cube: [42, 35]
   3by3:

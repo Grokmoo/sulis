@@ -1,0 +1,19 @@
+id: entangling_vines
+name: "Entangling Vines"
+icon: abilities/entangling_vines
+description: |
+  Thick vines spring up from the ground in a large area.  The vines actively entangle all creatures in the area, greatly slowing their movement.  Creatures who fail a reflex save are completely stuck in place for one turn.
+active:
+  script: "entangling_vines"
+  group: Druid
+  ap: 2000
+  duration:
+    Rounds: 3
+  cooldown: 5
+  ai:
+    priority: 30
+    kind: Debuff
+    group: Multiple
+    range: Visible
+  short_description: |
+    Movement is hampered in a large area nearby.

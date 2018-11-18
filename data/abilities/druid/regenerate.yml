@@ -1,0 +1,19 @@
+id: regenerate
+name: "Regenerate"
+icon: abilities/regenerate
+description: |
+  A nearby ally begins to rapidly regenerate, regaining lost hit points over several rounds.
+active:
+  script: "regenerate"
+  group: "Druid"
+  ap: 2000
+  duration:
+    Rounds: 2
+  cooldown: 3
+  ai:
+    priority: 20
+    kind: Heal
+    group: Single
+    range: Short
+  short_description: |
+    Heal damage on a nearby ally over several rounds.

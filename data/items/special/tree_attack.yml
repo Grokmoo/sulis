@@ -1,0 +1,19 @@
+id: tree_attack
+name: Tree Attack
+kind:
+  Weapon:
+    kind: Simple
+icon: empty
+weight: 0
+value: 0
+equippable:
+  slot: HeldMain
+  bonuses: []
+  attack:
+    damage:
+      min: 25
+      max: 30
+      kind: Crushing
+    kind: # Melee
+      reach: 3.0
+    bonuses: {}

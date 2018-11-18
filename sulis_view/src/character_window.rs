@@ -93,7 +93,7 @@ impl WidgetKind for CharacterWindow {
 
         let char_ref = Rc::clone(&self.character);
         let level_up = Widget::with_theme(Button::empty(), "level_up");
-        level_up.borrow_mut().state.set_visible(self.character.borrow_mut().actor.has_level_up());
+        level_up.borrow_mut().state.set_visible(false);
         level_up.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
             let root = Widget::get_root(&widget);
             let window = Widget::with_defaults(CharacterBuilder::level_up(Rc::clone(&char_ref)));
@@ -137,6 +137,7 @@ impl WidgetKind for CharacterWindow {
         let cur_pane = match self.active_pane {
             ActivePane::Character => {
                 char_pane.borrow_mut().state.set_active(true);
+                level_up.borrow_mut().state.set_visible(self.character.borrow_mut().actor.has_level_up());
                 create_details_text_box(&self.character.borrow().actor)
             }, ActivePane::Ability => {
                 abilities_pane.borrow_mut().state.set_active(true);

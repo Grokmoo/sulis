@@ -6,3 +6,16 @@ abilities:
     position: [0, 1]
   - id: spirit_claws
     position: [0, 2]
+  - id: stinging_swarm
+    position: [0, 3]
+  - id: regenerate
+    position: [0, 4]
+  - id: layer_of_bark
+    position: [0, 5]
+  - id: entangling_vines
+    position: [0, 6]
+  - id: resist_elements
+    position: [0, 7]
+    
+  - id: tree_shape
+    position: [1, 0]

@@ -3,6 +3,14 @@ src: "particles.png"
 size: [ 512, 512 ]
 simple_image_gen_scale: 4
 groups:
+  vines:
+    size: [16, 32]
+    position: [192, 384]
+    areas:
+      vines01: [0, 0]
+      vines02: [16, 0]
+      vines03: [32, 0]
+      vines04: [48, 0]
   spirit_claw:
     areas:      
       spirit_claw01: [0, 384, 48, 48]

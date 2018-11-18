@@ -1,0 +1,9 @@
+id: vines
+frame_time_millis: 150
+frames:
+  - particles/vines01
+  - particles/vines02
+  - particles/vines03
+  - particles/vines04
+  - particles/vines03
+  - particles/vines02

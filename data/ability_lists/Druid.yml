@@ -19,3 +19,5 @@ abilities:
     
   - id: tree_shape
     position: [1, 0]
+  - id: lightning_bolt
+    position: [1, 1]

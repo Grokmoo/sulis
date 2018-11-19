@@ -1,6 +1,6 @@
 id: particles
 src: "particles.png"
-size: [ 512, 512 ]
+size: [ 1024, 512 ]
 simple_image_gen_scale: 4
 groups:
   vines:
@@ -242,3 +242,17 @@ groups:
       dust_cloud12: [192, 64]
       dust_cloud13: [256, 64]
       dust_cloud14: [320, 64]
+  lightning_bolt:
+    size: [76, 190]
+    position: [512, 0]
+    areas:
+      lightning_bolt01: [0, 0]
+      lightning_bolt02: [76, 0]
+      lightning_bolt03: [152, 0]
+      lightning_bolt04: [228, 0]
+      lightning_bolt05: [304, 0]
+      lightning_bolt06: [0, 190]
+      lightning_bolt07: [76, 190]
+      lightning_bolt08: [152, 190]
+      lightning_bolt09: [228, 190]
+      lightning_bolt10: [304, 190]

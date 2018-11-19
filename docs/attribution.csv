@@ -95,3 +95,4 @@ data/spritesheets/props.png,Cart and Well,"432,144 to 752,304",rubberduck,CC0 - 
 data/spritesheets/particles.png,,,Jared Stephen,CC0 - Public Domain,http://creativecommons.org/publicdomain/zero/1.0/,,,
 data/spritesheets/particles.png,Shock / Lightning animation,"0, 192 to 384, 256",13rice,CC0 - Public Domain,http://creativecommons.org/publicdomain/zero/1.0/,Radial Lightning Effect,https://opengameart.org/content/radial-lightning-effect,
 data/spritesheets/particles.png,Dust Cloud animation,"0,256 to 512,384",para,CC0 - Public Domain,http://creativecommons.org/publicdomain/zero/1.0/,Animated Particle Effects #1,https://opengameart.org/content/animated-particle-effects-1,"Sampled frames, downsized, adjusted color"
+data/spritesheets/particles.png,Lightning Bolt animation,"512, 0 to 968,380",Mikodrak,CC0 - Public Domain,http://creativecommons.org/publicdomain/zero/1.0/,2D Spell Effects,https://opengameart.org/content/2d-spell-effects,Sampled frames

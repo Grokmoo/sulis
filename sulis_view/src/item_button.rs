@@ -711,6 +711,7 @@ fn add_bonus(bonus: &Bonus, state: &mut WidgetState, has_accuracy: &mut bool,
             add(state, &format!("weapon_proficiency_{:?}", weapon_kind), "true");
         },
         FlankingAngle(amount) => add(state, "flanking_angle", amount),
+        AbilitiesDisabled => add(state, "abilities_disabled", true),
         MoveDisabled => add(state, "move_disabled", true),
         AttackDisabled => add(state, "attack_disabled", true),
         Hidden => add(state, "hidden", true),

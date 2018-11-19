@@ -12,6 +12,7 @@ function on_activate(parent, ability)
   effect:add_attribute_bonus("Dexterity", -4)
   effect:add_attribute_bonus("Endurance", 8)
   effect:add_move_disabled()
+  effect:add_abilities_disabled()
   
   stats = parent:stats()
   level = stats.caster_level / 2 + stats.wisdom_bonus / 4

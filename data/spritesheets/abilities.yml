@@ -45,6 +45,7 @@ groups:
       regenerate: [2, 4]
       entangling_vines: [3, 4]
       resist_elements: [4, 4]
+      lightning_bolt: [5, 4]
       
       prereqs_not_met: [7, 4]
       

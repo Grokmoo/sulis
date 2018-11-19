@@ -56,6 +56,7 @@ pub enum BonusKind {
     CasterLevel(i32),
     MoveDisabled,
     AttackDisabled,
+    AbilitiesDisabled,
     Hidden,
     FlankedImmunity,
     SneakAttackImmunity,
@@ -239,7 +240,7 @@ fn apply_modifiers(bonus: &mut Bonus, neg: f32, pos: f32) {
         ArmorProficiency(_) | WeaponProficiency(_) | MoveDisabled
             | AttackDisabled | Hidden | GroupUsesPerEncounter { .. }
             | GroupUsesPerDay { .. } | FlankedImmunity | SneakAttackImmunity
-            | CritImmunity => return,
+            | CritImmunity | AbilitiesDisabled => return,
     };
 
     bonus.kind = new_kind;
@@ -287,6 +288,9 @@ fn merge_if_dup(first: &Bonus, sec: &Bonus) -> Option<Bonus> {
         },
         MoveDisabled => if let MoveDisabled = sec.kind {
             return Some(Bonus { when, kind: MoveDisabled });
+        },
+        AbilitiesDisabled => if let AbilitiesDisabled = sec.kind {
+            return Some(Bonus { when, kind: AbilitiesDisabled });
         },
         AttackDisabled => if let AttackDisabled = sec.kind {
             return Some(Bonus { when, kind: AttackDisabled });

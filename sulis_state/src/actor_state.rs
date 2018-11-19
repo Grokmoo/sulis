@@ -293,6 +293,8 @@ impl ActorState {
     /// Returns true if the ability state for the given ability can be
     /// activated (any active ability) or deactivated (only relevant for modes)
     pub fn can_toggle(&self, id: &str) -> bool {
+        if self.stats.abilities_disabled { return false; }
+
         match self.ability_states.get(id) {
             None => false,
             Some(ref state) => {
@@ -308,6 +310,8 @@ impl ActorState {
     }
 
     pub fn can_activate(&self, id: &str) -> bool {
+        if self.stats.abilities_disabled { return false; }
+
         match self.ability_states.get(id) {
             None => false,
             Some(ref state) => {

@@ -1255,6 +1255,7 @@ children:
       ][?flanking_angle|Flanking Angle: #flanking_angle#
       ][?move_disabled|Movement Disabled
       ][?attack_disabled|Attack Disabled
+      ][?abilities_disabled|Abilities Disabled
       ][?hidden|Hidden
       ][?flanked_immunity|Flanked Immunity
       ][?sneak_attack_immunity|Sneak Attack Immunity

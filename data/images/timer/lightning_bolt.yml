@@ -1,0 +1,13 @@
+id: lightning_bolt
+frame_time_millis: 100
+frames:
+  - particles/lightning_bolt01
+  - particles/lightning_bolt02
+  - particles/lightning_bolt03
+  - particles/lightning_bolt04
+  - particles/lightning_bolt05
+  - particles/lightning_bolt06
+  - particles/lightning_bolt07
+  - particles/lightning_bolt08
+  - particles/lightning_bolt09
+  - particles/lightning_bolt10

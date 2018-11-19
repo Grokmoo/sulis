@@ -129,6 +129,9 @@ enum Kind {
 /// # `add_hidden(when: String (Optional))`
 /// Adds the hidden status to this effect.  See `add_num_bonus`
 ///
+/// # `add_abilities_disabled(when: String (Optional))`
+/// Adds ability-use disabled status to this effect.  See `add_num_bonus`
+///
 /// # `add_move_disabled(when: String (Optional))`
 /// Adds the move disabled status to this effect. See `add_num_bonus`
 ///
@@ -266,6 +269,11 @@ impl UserData for ScriptEffect {
         });
         methods.add_method_mut("add_hidden", |_, effect, when: Option<String>| {
             let kind = BonusKind::Hidden;
+            add_bonus_to_effect(effect, kind, when);
+            Ok(())
+        });
+        methods.add_method_mut("add_abilities_disabled", |_, effect, when: Option<String>| {
+            let kind = BonusKind::AbilitiesDisabled;
             add_bonus_to_effect(effect, kind, when);
             Ok(())
         });

@@ -1,0 +1,19 @@
+id: lightning_bolt
+name: "Lightning Bolt"
+icon: abilities/lightning_bolt
+description: |
+  You call down a powerful bolt of lightning from the sky, doing massive electricity damage to all targets in a small area.
+active:
+  script: "lightning_bolt"
+  group: "Druid"
+  ap: 2000
+  duration:
+    Instant
+  cooldown: 3
+  ai:
+    priority: 10
+    kind: Damage
+    group: Single
+    range: Visible
+  short_description: |
+    Do major electricity damage to a small area.

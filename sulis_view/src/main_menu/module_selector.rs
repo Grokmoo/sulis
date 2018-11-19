@@ -21,7 +21,7 @@ use std::collections::HashMap;
 
 use sulis_core::ui::*;
 use sulis_core::util::ActiveResources;
-use sulis_widgets::{Button, Label, TextArea};
+use sulis_widgets::{Button, Label, TextArea, ScrollPane};
 use sulis_module::{ModuleInfo};
 use sulis_state::NextGameStep;
 
@@ -70,7 +70,8 @@ impl WidgetKind for ModuleSelector {
         campaign_groups.sort();
         campaign_groups.dedup();
 
-        let groups_widget = Widget::empty("campaign_groups");
+        let scrollpane = ScrollPane::new();
+        let scroll_widget = Widget::with_theme(scrollpane.clone(), "campaign_groups");
         for campaign_group in campaign_groups {
             let group_widget = Widget::empty("campaign_group");
 
@@ -89,7 +90,7 @@ impl WidgetKind for ModuleSelector {
                 }
 
                 button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                    let parent = Widget::go_up_tree(widget, 3);
+                    let parent = Widget::go_up_tree(widget, 4);
                     let module_selector = Widget::downcast_kind_mut::<ModuleSelector>(&parent);
                     module_selector.selected_module = Some(index);
                     parent.borrow_mut().invalidate_children();
@@ -97,7 +98,7 @@ impl WidgetKind for ModuleSelector {
                 Widget::add_child_to(&group_widget, button);
             }
 
-            Widget::add_child_to(&groups_widget, group_widget);
+            scrollpane.borrow().add_to_content(group_widget);
         }
 
         play.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
@@ -125,6 +126,6 @@ impl WidgetKind for ModuleSelector {
         })));
         play.borrow_mut().state.set_enabled(self.selected_module.is_some());
 
-        vec![title, modules_title, play, groups_widget, details]
+        vec![title, modules_title, play, scroll_widget, details]
     }
 }

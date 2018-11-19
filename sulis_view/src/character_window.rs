@@ -246,7 +246,10 @@ pub fn get_character_export_filename(name: &str) -> Result<(String, String), Err
 pub fn create_abilities_pane(pc: &ActorState) -> Rc<RefCell<Widget>> {
     let abilities = Widget::empty("abilities");
 
+    let details_scroll = ScrollPane::new();
+    let details_widget = Widget::with_theme(details_scroll.clone(), "details_pane");
     let details = Widget::with_theme(TextArea::empty(), "details");
+    details_scroll.borrow().add_to_content(Rc::clone(&details));
 
     let scrollpane = ScrollPane::new();
     let list = Widget::with_theme(scrollpane.clone(), "list");
@@ -257,18 +260,19 @@ pub fn create_abilities_pane(pc: &ActorState) -> Rc<RefCell<Widget>> {
         button.borrow_mut().state.add_text_arg("icon", &ability.icon.id());
 
         let ability_ref = Rc::clone(&ability);
+        let details_widget_ref = Rc::clone(&details_widget);
         let details_ref = Rc::clone(&details);
         button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |_, _| {
             add_ability_text_args(&mut details_ref.borrow_mut().state, &ability_ref);
             details_ref.borrow_mut().state.add_text_arg("owned_level", &(level + 1).to_string());
-            details_ref.borrow_mut().invalidate_layout();
+            details_widget_ref.borrow_mut().invalidate_layout();
         })));
 
         scrollpane.borrow().add_to_content(button);
     }
 
     Widget::add_child_to(&abilities, list);
-    Widget::add_child_to(&abilities, details);
+    Widget::add_child_to(&abilities, details_widget);
     abilities
 }
 

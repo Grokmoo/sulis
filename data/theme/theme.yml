@@ -816,14 +816,26 @@ children:
         position: [0, 7]
         preferred_size: [0, -6]
         children:
-          details:
-            from: .ability_pane.details
-            border: [2, 2, 2, 2]
+          details_pane:
             background: bg_base
             width_relative: Max
-            height_relative: Zero
-            preferred_size: [0, 66]
             y_relative: Max
+            preferred_size: [0, 66]
+            children:
+              scrollbar:
+                from: .scrollbar
+                custom:
+                  scroll_delta: 12
+              content:
+                width_relative: Max
+                preferred_size: [-7, 0]
+                height_relative: Max
+                children:
+                  details:
+                    from: .ability_pane.details
+                    border: [2, 2, 2, 2]
+                    width_relative: Max
+                    height_relative: Custom
           list:
             preferred_size: [0, -68]
             width_relative: Max

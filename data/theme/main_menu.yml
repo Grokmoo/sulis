@@ -155,13 +155,13 @@ children:
     children:
       invalid_level_box:
         from: .text_area
-        text: "[c=f00|This character is level #level#, which is greater than the module maximum, level #max_level#.]"
+        text: "[c=f00|This character is level #level#, which is greater than the campaign maximum, level #max_level#.]"
         background: bg_base
         border: [2, 2, 2, 2]
         x_relative: Center
         y_relative: Max
-        position: [-60, -20]
-        preferred_size: [96, 13]
+        position: [-62, -20]
+        preferred_size: [89, 13]
       title:
         from: .label
         text_params:
@@ -200,14 +200,23 @@ children:
         height_relative: Max
         preferred_size: [100, -35]
         position: [-60, 18]
-        layout: Grid
-        layout_spacing: { top: 0, bottom: 1, right: 1, left: 0 }
         children:
-          character_button:
-            from: .button
-            background: background_inner
-            foreground: "#portrait#"
-            preferred_size: [28, 28]
+          scrollbar:
+            from: .scrollbar
+            custom:
+              scroll_delta: 29
+          content:
+            width_relative: Max
+            preferred_size: [-7, 0]
+            height_relative: Max
+            layout: Grid
+            layout_spacing: { top: 0, bottom: 1, right: 1, left: 0 }
+            children:
+              character_button:
+                from: .button
+                background: background_inner
+                foreground: "#portrait#"
+                preferred_size: [28, 28]
       play_button:
         from: .button
         background: hint_to_click_background
@@ -779,30 +788,39 @@ children:
         x_relative: Center
         height_relative: Max
         width_relative: Zero
-        layout: BoxVertical
         children:
-          campaign_group:
-            border: { bottom: 5 }
+          scrollbar:
+            from: .scrollbar
+            custom:
+              scroll_delta: 20
+          content:
             width_relative: Max
-            height_relative: ChildSum
+            preferred_size: [-7, 0]
+            height_relative: Max
             layout: BoxVertical
-            layout_spacing: { bottom: 2 }
             children:
-              name_label:
-                from: .label
-                text: "#name#"
-                text_params:
-                  scale: 9.0
-                  horizontal_alignment: Center
+              campaign_group:
+                border: { bottom: 5 }
                 width_relative: Max
-                preferred_size: [0, 6]
-              module_button:
-                from: .button
-                text: "#module#"
-                text_params:
-                  scale: 9.0
-                width_relative: Max
-                preferred_size: [0, 8]
+                height_relative: ChildSum
+                layout: BoxVertical
+                layout_spacing: { bottom: 2 }
+                children:
+                  name_label:
+                    from: .label
+                    text: "#name#"
+                    text_params:
+                      scale: 9.0
+                      horizontal_alignment: Center
+                    width_relative: Max
+                    preferred_size: [0, 6]
+                  module_button:
+                    from: .button
+                    text: "#module#"
+                    text_params:
+                      scale: 9.0
+                    width_relative: Max
+                    preferred_size: [0, 8]
       details:
         from: .text_area
         border: [4, 4, 4, 4]

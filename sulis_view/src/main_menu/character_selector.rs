@@ -21,7 +21,7 @@ use std::cell::{RefCell};
 use sulis_core::ui::*;
 use sulis_state::{ActorState, NextGameStep};
 use sulis_module::{Actor, Module};
-use sulis_widgets::{Button, ConfirmationWindow, Label, TextArea};
+use sulis_widgets::{Button, ConfirmationWindow, Label, TextArea, ScrollPane};
 
 use character_window::create_details_text_box;
 use {CharacterBuilder, LoadingScreen, main_menu::MainMenu};
@@ -125,12 +125,12 @@ impl WidgetKind for CharacterSelector {
         };
 
         let mut must_create_character = true;
-        let characters_pane = Widget::empty("characters_pane");
+        let scrollpane = ScrollPane::new();
+        let scroll_widget = Widget::with_theme(scrollpane.clone(), "characters_pane");
         {
             let characters = Module::get_available_characters();
             for actor in characters {
                 let actor = Rc::new(actor);
-                trace!("Adding button for {}", actor.id);
 
                 if actor.id == to_select {
                     self.selected = Some(Rc::clone(&actor));
@@ -151,9 +151,10 @@ impl WidgetKind for CharacterSelector {
                 actor_button.borrow_mut().state.add_callback(actor_callback(actor));
 
                 must_create_character = false;
-                Widget::add_child_to(&characters_pane, actor_button);
+                scrollpane.borrow().add_to_content(actor_button);
             }
         }
+
 
         let play_button = Widget::with_theme(Button::empty(), "play_button");
         play_button.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
@@ -192,14 +193,14 @@ impl WidgetKind for CharacterSelector {
         }
         self.first_add = false;
 
-        vec![title, chars_title, characters_pane, new_character_button,
+        vec![title, chars_title, scroll_widget, new_character_button,
             delete_char_button, play_button, details, invalid_level]
     }
 }
 
 fn actor_callback(actor: Rc<Actor>) -> Callback {
     Callback::new(Rc::new(move |widget, _| {
-        let parent = Widget::go_up_tree(&widget, 2);
+        let parent = Widget::go_up_tree(&widget, 3);
         let selector = Widget::downcast_kind_mut::<CharacterSelector>(&parent);
         selector.selected = Some(Rc::clone(&actor));
         parent.borrow_mut().invalidate_children();

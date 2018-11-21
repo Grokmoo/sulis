@@ -28,7 +28,7 @@ use sulis_core::util::{invalid_data_error, ExtInt};
 use sulis_core::config::Config;
 use sulis_core::resource::ResourceSet;
 use sulis_rules::{Attribute, AttackKind, DamageKind, Attack, HitKind};
-use sulis_module::{ImageLayer, Faction};
+use sulis_module::{ImageLayer, Faction, Actor, InventoryBuilder};
 use {ActorState, EntityState, GameState, Location, area_feedback_text::ColorKind};
 use {ai, animation::{self}, script::*, MOVE_TO_THRESHOLD};
 
@@ -57,10 +57,20 @@ use {ai, animation::{self}, script::*, MOVE_TO_THRESHOLD};
 /// many tiles on the map it can see).  This is dependant on the
 /// area that the entity is in.
 ///
+/// # `add_levels(class: String, levels: Int)`
+/// Adds the specified number of levels of the specified class to this entity
+///
 /// # `add_xp(amount: Int)`
 /// Adds the specified `amount` of XP to the entity.  For adding XP to
 /// the party, you generally want to use `game:add_party_xp(amount)`
 /// instead.
+///
+/// # `add_to_party(show_portrait: Bool (Optional))`
+/// Adds this entity to the player's party.  `show_portrait` is whether the entity
+/// shows up in the portraits area of the UI.  Defaults to true.
+///
+/// # `remove_from_party()`
+/// Removes this entity from the player's party
 ///
 /// # `set_faction(faction: String)`
 /// Sets this entity to the specified `faction`.  Valid factions are currently
@@ -446,6 +456,40 @@ impl UserData for ScriptEntity {
         methods.add_method("add_xp", |_, entity, amount: u32| {
             let entity = entity.try_unwrap()?;
             entity.borrow_mut().actor.add_xp(amount);
+            Ok(())
+        });
+
+        methods.add_method("add_levels", |_, entity, (class, levels): (String, u32)| {
+            let entity = entity.try_unwrap()?;
+
+            let class = match Module::class(&class) {
+                None => {
+                    warn!("Invalid class '{}' in script", class);
+                    return Ok(());
+                }, Some(class) => class,
+            };
+
+            let actor = {
+                let old_actor = &entity.borrow().actor.actor;
+                let xp = entity.borrow().actor.xp();
+                Actor::from(old_actor, Some((class, levels)), xp, Vec::new(),
+                    InventoryBuilder::default())
+            };
+
+            entity.borrow_mut().actor.replace_actor(actor);
+
+            Ok(())
+        });
+
+        methods.add_method("add_to_party", |_, entity, show_portrait: Option<bool>| {
+            let entity = entity.try_unwrap()?;
+            GameState::add_party_member(entity, show_portrait.unwrap_or(true));
+            Ok(())
+        });
+
+        methods.add_method("remove_from_party", |_, entity, ()| {
+            let entity = entity.try_unwrap()?;
+            GameState::remove_party_member(entity);
             Ok(())
         });
 

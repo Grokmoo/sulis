@@ -78,7 +78,7 @@ impl BuilderSet for LevelUpBuilder {
         let mut pc = self.pc.borrow_mut();
         let state = &mut pc.actor;
 
-        let new_actor = Actor::from(&state.actor, Some(class), state.xp(),
+        let new_actor = Actor::from(&state.actor, Some((class, 1)), state.xp(),
             builder.abilities.clone(), state.actor.inventory.clone());
         state.replace_actor(new_actor);
     }

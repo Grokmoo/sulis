@@ -85,7 +85,7 @@ use rlua::{self, Function, Lua, UserData, UserDataMethods};
 use sulis_core::config::Config;
 use sulis_core::util::{Point};
 use sulis_rules::QuickSlot;
-use sulis_module::{ability, Ability, Item, Module, OnTrigger, on_trigger};
+use sulis_module::{ability, Ability, Item, Module, OnTrigger, on_trigger, Faction};
 use {EntityState, ItemState, GameState, ai, area_feedback_text::ColorKind, quest_state,
     animation::Anim, Location};
 
@@ -488,10 +488,12 @@ fn get_targeter() -> Result<Rc<RefCell<AreaTargeter>>> {
 /// Returns true if the specified coordinates in the current area are passable for
 /// the entity, false otherwise.
 ///
-/// # `spawn_actor_at(id: String, x: Int, y: Int) -> ScriptEntity`
+/// # `spawn_actor_at(id: String, x: Int, y: Int, faction: String (Optional)) -> ScriptEntity`
 /// Attempts the spawn an instance of the actor with the specified `id` at the
 /// coordinates `x`, `y` in the current area.  If successful, returns the
-/// ScriptEntity that was just spawned.  If not, returns the invalid ScriptEntity
+/// ScriptEntity that was just spawned.  If not, returns the invalid ScriptEntity.
+/// Optionally, you may set the faction of the spawned actor to the specified value.
+/// Must be "Hostile", "Neutral", or "Friendly".
 ///
 /// # `spawn_encounter_at(x: Int, y: Int)`
 /// Causes the encounter in the current area at `x`, `y` to spawn entities based
@@ -564,10 +566,12 @@ fn get_targeter() -> Result<Rc<RefCell<AreaTargeter>>> {
 /// # `has_party_member(id: String) -> Bool`
 /// Returns true if one of the current party members has the specified `id`, false otherwise
 ///
-/// # `add_party_member(id: String)`
+/// # `add_party_member(id: String, show_portrait: Bool (Optional))`
 /// Searches for an entity with the specified `id`.  If it is found, adds that entity as a
 /// member of the player's party, making them controllable by the player.  If an entity with
 /// the `id` is not found, throws an error.
+/// `show_portrait` controls where the entity is displayed in the portraits area of the UI.  If
+/// not passed, defaults to true.
 ///
 /// # `party_coins() -> Int`
 /// Returns the current amount of party coins.  Note that this value must be divided by the
@@ -787,7 +791,8 @@ impl UserData for ScriptInterface {
         }
         );
 
-        methods.add_method("spawn_actor_at", |_, _, (id, x, y): (String, i32, i32)| {
+        methods.add_method("spawn_actor_at", |_, _, (id, x, y, faction):
+                           (String, i32, i32, Option<String>)| {
             let actor = match Module::actor(&id) {
                 None => {
                     warn!("Unable to spawn actor '{}': not found", id);
@@ -799,17 +804,26 @@ impl UserData for ScriptInterface {
             let location = Location::new(x, y, &area_state.borrow().area);
             let result = match area_state.borrow_mut()
                 .add_actor(actor, location, None, false, None) {
-                Ok(index) => Ok(ScriptEntity::new(index)),
+                Ok(index) => ScriptEntity::new(index),
                 Err(e) => {
                     warn!("Error spawning actor in area: {}", e);
-                    Ok(ScriptEntity::invalid())
+                    return Ok(ScriptEntity::invalid())
                 }
             };
 
+            let entity = result.try_unwrap()?;
+            if let Some(faction) = faction {
+                match Faction::from_str(&faction) {
+                    None => warn!("Invalid faction '{}' in script", faction),
+                    Some(faction) => entity.borrow_mut().actor.set_faction(faction),
+                }
+            }
+
             let mgr = GameState::turn_manager();
+            mgr.borrow_mut().check_ai_activation(&entity, &mut area_state.borrow_mut());
             mgr.borrow_mut().check_ai_activation_for_party(&mut area_state.borrow_mut());
 
-            result
+            Ok(result)
         });
 
         methods.add_method("spawn_encounter_at", |_, _, (x, y): (i32, i32)| {
@@ -964,7 +978,9 @@ impl UserData for ScriptInterface {
             Ok(GameState::has_party_member(&id))
         });
 
-        methods.add_method("add_party_member", |_, _, id: String| {
+        methods.add_method("add_party_member", |_, _, (id, show_portrait):
+                           (String, Option<bool>)| {
+            let show_portrait = show_portrait.unwrap_or(true);
             let entity = match entity_with_id(id) {
                 Some(entity) => entity,
                 None => return Err(rlua::Error::ToLuaConversionError {
@@ -974,7 +990,7 @@ impl UserData for ScriptInterface {
                 })
             };
 
-            GameState::add_party_member(entity);
+            GameState::add_party_member(entity, show_portrait);
 
             Ok(())
         });

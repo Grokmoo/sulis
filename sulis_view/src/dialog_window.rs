@@ -306,7 +306,7 @@ pub fn activate(widget: &Rc<RefCell<Widget>>, on_select: &Vec<OnTrigger>,
                 match entity_with_id(id.to_string()) {
                     None => warn!("Attempted to add party member '{}' but entity does not exist",
                                   id),
-                    Some(entity) => GameState::add_party_member(entity),
+                    Some(entity) => GameState::add_party_member(entity, true),
                 }
             },
             PartyItem(ref id) => {

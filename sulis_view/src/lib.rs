@@ -639,6 +639,8 @@ impl WidgetKind for PortraitPane {
 
         let selected = GameState::selected();
         for entity in GameState::party() {
+            if !entity.borrow().show_portrait() { continue; }
+
             let mut is_selected = false;
             for sel in selected.iter() {
                 if Rc::ptr_eq(sel, &entity) {

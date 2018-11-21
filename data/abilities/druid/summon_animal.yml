@@ -1,0 +1,19 @@
+id: summon_animal
+name: "Summon Animal"
+icon: abilities/summon_animal
+description: |
+  You summon an animal to fight for you.  The type and power of the animal depends on your own caster level and ability level.  The animal is loyal to you and will obey your commands, following you and attacking any targets you choose for the duration of the spell or until killed.
+active:
+  script: "summon_animal"
+  group: Druid
+  ap: 2000
+  duration:
+    Rounds: 4
+  cooldown: 6
+  ai:
+    priority: 30
+    kind: Special
+    group: Multiple
+    range: Visible
+  short_description: |
+    Summon a loyal animal to fight for you.

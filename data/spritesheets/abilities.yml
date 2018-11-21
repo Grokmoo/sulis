@@ -14,6 +14,7 @@ groups:
       backstory: [4, 0]
       crush: [5, 0]
       spirit_claws: [6, 0]
+      summon_animal: [7, 0]
       
       lightning_reflexes: [0, 1]
       stunning_blow: [1, 1]

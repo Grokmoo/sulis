@@ -21,3 +21,5 @@ abilities:
     position: [1, 0]
   - id: lightning_bolt
     position: [1, 1]
+  - id: summon_animal
+    position: [1, 2]

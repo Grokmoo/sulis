@@ -38,6 +38,7 @@ use save_state::EntitySaveState;
 enum AIState {
     Player {
         vis: Vec<bool>,
+        show_portrait: bool,
     },
     AI {
         group: Option<usize>,
@@ -86,6 +87,7 @@ impl EntityState {
                 let dim = (MAX_AREA_SIZE * MAX_AREA_SIZE) as usize;
                 AIState::Player {
                     vis: vec![false; dim],
+                    show_portrait: save.show_portrait,
                 }
             },
         };
@@ -129,6 +131,7 @@ impl EntityState {
             let dim = (MAX_AREA_SIZE * MAX_AREA_SIZE) as usize;
             AIState::Player {
                 vis: vec![false; dim],
+                show_portrait: true,
             }
         } else {
             AIState::AI {
@@ -288,18 +291,26 @@ impl EntityState {
         }
     }
 
-    pub fn set_party_member(&mut self, member: bool) {
-        if member {
-            let dim = (MAX_AREA_SIZE * MAX_AREA_SIZE) as usize;
-            self.ai_state = AIState::Player {
-                vis: vec![false; dim],
-            };
-        } else {
-            self.ai_state = AIState::AI {
-                group: None,
-                active: false,
-            }
+    pub fn show_portrait(&self) -> bool {
+        match self.ai_state {
+            AIState::Player { show_portrait, .. } => show_portrait,
+            AIState::AI { .. } => false,
         }
+    }
+
+    pub fn add_to_party(&mut self, show_portrait: bool) {
+        let dim = (MAX_AREA_SIZE * MAX_AREA_SIZE) as usize;
+        self.ai_state = AIState::Player {
+            vis: vec![false; dim],
+            show_portrait,
+        };
+    }
+
+    pub fn remove_from_party(&mut self) {
+        self.ai_state = AIState::AI {
+            group: None,
+            active: false,
+        };
     }
 
     pub fn is_party_member(&self) -> bool {

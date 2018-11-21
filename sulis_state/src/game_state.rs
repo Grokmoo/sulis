@@ -490,7 +490,7 @@ impl GameState {
             let mut state = state.borrow_mut();
             let state = state.as_mut().unwrap();
 
-            entity.borrow_mut().set_party_member(false);
+            entity.borrow_mut().remove_from_party();
             state.party.retain(|e| !Rc::ptr_eq(e, &entity));
 
             state.selected.retain(|e| !Rc::ptr_eq(e, &entity));
@@ -531,7 +531,7 @@ impl GameState {
         false
     }
 
-    pub fn add_party_member(entity: Rc<RefCell<EntityState>>) {
+    pub fn add_party_member(entity: Rc<RefCell<EntityState>>, show_portrait: bool) {
         info!("Add party member {}", entity.borrow().actor.actor.id);
         STATE.with(|state| {
             let mut state = state.borrow_mut();
@@ -542,7 +542,7 @@ impl GameState {
                 entity.borrow_mut().actor.init_turn();
             }
 
-            entity.borrow_mut().set_party_member(true);
+            entity.borrow_mut().add_to_party(show_portrait);
             state.area_state.borrow_mut().compute_pc_visibility(&entity, 0, 0);
             state.party.push(Rc::clone(&entity));
 

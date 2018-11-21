@@ -362,6 +362,8 @@ impl MerchantSaveState {
     }
 }
 
+fn serde_true() -> bool { true }
+
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct EntitySaveState {
@@ -374,6 +376,9 @@ pub struct EntitySaveState {
     pub(crate) custom_flags: HashMap<String, String>,
     pub(crate) ai_group: Option<usize>,
     pub(crate) ai_active: bool,
+
+    #[serde(default="serde_true")]
+    pub(crate) show_portrait: bool,
 }
 
 impl EntitySaveState {
@@ -443,6 +448,7 @@ impl EntitySaveState {
             custom_flags: flags,
             ai_group: entity.ai_group(),
             ai_active: entity.is_ai_active(),
+            show_portrait: entity.show_portrait(),
             actor_base,
         }
     }

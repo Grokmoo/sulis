@@ -1,0 +1,18 @@
+id: plant_elemental
+ai: ai_basic
+name: Plant Elemental
+faction: Hostile
+images: {}
+race: plant_elemental
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
+levels:
+  fighter: 1
+inventory: {}
+abilities:
+  - weapon_simple

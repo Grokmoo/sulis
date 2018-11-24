@@ -1,0 +1,19 @@
+id: sunbeam
+name: "Sunbeam"
+icon: abilities/sunbeam
+description: |
+  A concentrated beam of the sun's rays bathes all creatures in the target area, blinding them if they fail a Reflex save and doing minor fire damage.
+active:
+  script: "sunbeam"
+  group: "Druid"
+  ap: 2000
+  duration:
+    Rounds: 3
+  cooldown: 5
+  ai:
+    priority: 10
+    kind: Damage
+    group: Single
+    range: Visible
+  short_description: |
+    Blind and deal minor damage in a large area.

@@ -1,0 +1,44 @@
+id: wind_elemental
+name: "Wind Elemental"
+description: "Monster"
+size: 3by3
+movement_rate: 1.2
+base_stats:
+  - kind: { attribute: { attribute: Strength, amount: 2 } }
+  - kind: { attribute: { attribute: Dexterity, amount: 7 } }
+  - kind: { attribute: { attribute: Endurance, amount: -3 } }
+  - kind: { hit_points: 40 }
+  - kind: { melee_accuracy: 30 }
+  - kind: { ranged_accuracy: 30 }
+  - kind: { spell_accuracy: 20 }
+  - kind: { defense: 30 }
+  - kind: { fortitude: 30 }
+  - kind: { reflex: 30 }
+  - kind: { will: 30 }
+  - kind: { reach: 1.0 }
+  - kind: { resistance: { kind: "Slashing", amount: 75 } }
+  - kind: { resistance: { kind: "Piercing", amount: 75 } }
+  - kind: { resistance: { kind: "Crushing", amount: 75 } }
+  - kind: { resistance: { kind: "Electrical", amount: 100 } }
+base_attack:
+  damage:
+    min: 15
+    max: 22
+    kind: Electrical
+  kind: #Melee
+    reach: 1.0
+  bonuses: {}
+default_images:
+  Male:
+    Background: creatures/elemental_wind
+    Shadow: creatures/4x4_medium_shadow
+  Female:
+    Background: creatures/elemental_wind
+    Shadow: creatures/4x4_medium_shadow
+ticker_offset: [0.0, 1.5]
+image_layer_offset_scale: 16
+image_layer_offsets:
+  Shadow: [-8, -20]
+  Background: [-8, -24]
+image_layer_postfix: {}
+

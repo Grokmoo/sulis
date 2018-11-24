@@ -1,0 +1,19 @@
+id: summon_wind_elemental
+name: "Summon Wind Elemental"
+icon: abilities/summon_wind_elemental
+description: |
+  You summon a powerful spirit of the air to fight for you.  It deals electrical damage to your enemies, and is highly resistant to physical damage.
+active:
+  script: "summon_wind_elemental"
+  group: Druid
+  ap: 2000
+  duration:
+    Rounds: 4
+  cooldown: 6
+  ai:
+    priority: 30
+    kind: Special
+    group: Multiple
+    range: Visible
+  short_description: |
+    Summon a powerful air spirit to fight for you.

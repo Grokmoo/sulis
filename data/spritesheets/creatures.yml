@@ -53,6 +53,9 @@ groups:
       4x4_large_shadow: [16, 46]
       elemental_fire: [20, 46]
       elemental_air: [24, 46]
+      4x4_medium_shadow: [28, 46]
+      elemental_plant: [32, 46]
+      elemental_wind: [36, 46]
       
       seaserpent01: [29, 31]
       seaserpent01_shadow: [33, 31]
@@ -69,6 +72,7 @@ groups:
   3by3:
     size: [3, 3]
     areas:
+      selected3by3: [30, 36]
       slime1: [16, 36]
       slime2: [19, 36]
       slime3: [22, 36]

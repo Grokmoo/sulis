@@ -1,0 +1,19 @@
+id: summon_plant_elemental
+name: "Summon Plant Elemental"
+icon: abilities/summon_plant_elemental
+description: |
+  You summon a powerful spirit of the plants and trees to fight for you.  The spirit attacks your enemies with crushing damage.
+active:
+  script: "summon_plant_elemental"
+  group: Druid
+  ap: 2000
+  duration:
+    Rounds: 4
+  cooldown: 6
+  ai:
+    priority: 30
+    kind: Special
+    group: Multiple
+    range: Visible
+  short_description: |
+    Summon a powerful nature spirit to fight for you.

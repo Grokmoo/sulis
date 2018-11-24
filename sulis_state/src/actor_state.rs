@@ -431,6 +431,7 @@ impl ActorState {
 
             let entity = entity.borrow();
             if !entity.is_hostile(&target) { continue; }
+            if entity.actor.stats.attack_disabled { continue; }
 
             // TODO allow ranged weapons to flank?  and at any distance?
             if !entity.can_reach(&target) { continue; }

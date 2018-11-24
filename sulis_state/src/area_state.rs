@@ -36,6 +36,16 @@ pub struct TriggerState {
     pub(crate) enabled: bool,
 }
 
+#[derive(Clone, Copy)]
+pub enum PCVisRedraw {
+    Full,
+    Partial { delta_x: i32, delta_y: i32 },
+    Not,
+}
+
+impl PCVisRedraw {
+}
+
 pub struct AreaState {
     pub area: Rc<Area>,
 
@@ -57,7 +67,7 @@ pub struct AreaState {
     prop_vis_grid: Vec<bool>,
     pub(crate) prop_pass_grid: Vec<bool>,
 
-    pub pc_vis_delta: (bool, i32, i32),
+    pc_vis_redraw: PCVisRedraw,
     pc_vis: Vec<bool>,
 
     feedback_text: Vec<AreaFeedbackText>,
@@ -99,7 +109,7 @@ impl AreaState {
             prop_pass_grid: vec![true;dim],
             pc_vis,
             pc_explored,
-            pc_vis_delta: (false, 0, 0),
+            pc_vis_redraw: PCVisRedraw::Not,
             feedback_text: Vec::new(),
             scroll_to_callback: None,
             targeter: None,
@@ -170,6 +180,24 @@ impl AreaState {
         }
 
         Ok(area_state)
+    }
+
+    fn pc_vis_partial_redraw(&mut self, x: i32, y: i32) {
+        match self.pc_vis_redraw{
+            PCVisRedraw::Not =>
+                self.pc_vis_redraw = PCVisRedraw::Partial { delta_x: x, delta_y: y },
+            _ => (),
+        }
+    }
+
+    pub fn pc_vis_full_redraw(&mut self) {
+        self.pc_vis_redraw = PCVisRedraw::Full;
+    }
+
+    pub fn take_pc_vis(&mut self) -> PCVisRedraw {
+        let result = self.pc_vis_redraw;
+        self.pc_vis_redraw = PCVisRedraw::Not;
+        result
     }
 
     pub fn get_merchant(&self, id: &str) -> Option<&Merchant> {
@@ -556,7 +584,7 @@ impl AreaState {
 
         self.update_prop_vis_pass_grid(index);
 
-        self.pc_vis_delta = (true, 0, 0);
+        self.pc_vis_partial_redraw(0, 0);
         for member in GameState::party().iter() {
             self.compute_pc_visibility(member, 0, 0);
         }
@@ -984,8 +1012,7 @@ impl AreaState {
         if is_pc {
             let d_x = old_x - entity.borrow().location.x;
             let d_y = old_y - entity.borrow().location.y;
-            self.pc_vis_delta = (true, d_x, d_y);
-
+            self.pc_vis_partial_redraw(d_x, d_y);
             self.compute_pc_visibility(&entity, d_x, d_y);
             self.update_view_visibility();
 

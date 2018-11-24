@@ -1,6 +1,6 @@
 id: abilities
 src: "abilities.png"
-size: [ 1024, 2048 ]
+size: [ 2048, 2048 ]
 simple_image_gen_scale: 128
 grid_multiplier: 128
 groups:
@@ -70,6 +70,7 @@ groups:
       precise_shot: [5, 7]
       penetrating_shot: [6, 7]
       crippling_shot: [7, 7]
+      spirit_eye: [8, 7]
       
       armor_light: [0, 8]
       armor_medium: [1, 8]

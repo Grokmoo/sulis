@@ -23,3 +23,5 @@ abilities:
     position: [1, 1]
   - id: summon_animal
     position: [1, 2]
+  - id: spirit_eye
+    position: [1, 3]

@@ -1,0 +1,19 @@
+id: spirit_eye
+name: "Spirit Eye"
+icon: abilities/spirit_eye
+description: |
+  You summon an invisible, magical spirit scout that can be used to locate enemies, plan routes, or for any other scouting task.  The scout is invisible and undetectable, but can be damaged or destroyed by magical area attacks if in the wrong place at the wrong time.  The scout cannot engage in combat.
+active:
+  script: "spirit_eye"
+  group: Druid
+  ap: 2000
+  duration:
+    Rounds: 4
+  cooldown: 6
+  ai:
+    priority: 30
+    kind: Special
+    group: Multiple
+    range: Visible
+  short_description: |
+    Summon an invisible magic scout.

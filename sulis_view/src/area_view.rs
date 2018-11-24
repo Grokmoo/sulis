@@ -33,7 +33,7 @@ use sulis_core::extern_image::ImageBuffer;
 use sulis_widgets::Label;
 use sulis_module::{area::{Layer, Tile}};
 use sulis_state::{AreaDrawable, AreaState, EntityState, EntityTextureCache, GameState};
-use sulis_state::area_feedback_text;
+use sulis_state::{area_feedback_text, area_state::PCVisRedraw};
 
 use {AreaMouseover, action_kind, WindowFade, window_fade};
 
@@ -674,21 +674,27 @@ impl WidgetKind for AreaView {
                 self.draw_layer_to_texture(renderer, &layer, texture_id);
             }
 
-            let (max_x, max_y) = AreaView::get_texture_cache_max(state.area.width, state.area.height);
-            trace!("Full area visibility draw from 0,0 to {},{}", max_x, max_y);
-            self.draw_vis_to_texture(renderer, &state.area.visibility_tile, &state.area.explored_tile,
-                                     &state, 0, 0, max_x, max_y);
+            // cause full area visibility redraw at the next step
+            state.pc_vis_full_redraw();
             self.cache_invalid = false;
-            state.pc_vis_delta = (false, 0, 0);
         }
 
-        let (redraw, pc_vis_delta_x, pc_vis_delta_y) = state.pc_vis_delta;
-        if redraw {
-            state.pc_vis_delta = (false, 0, 0);
-            trace!("Redrawing PC visibility to texture");
-            self.draw_visibility_to_texture(renderer, &state.area.visibility_tile,
-                                            &state.area.explored_tile, &state,
-                                            pc_vis_delta_x, pc_vis_delta_y);
+        match state.take_pc_vis() {
+            PCVisRedraw::Full => {
+                let (max_x, max_y) = AreaView::get_texture_cache_max(state.area.width,
+                                                                     state.area.height);
+                trace!("Full area visibility draw from 0,0 to {},{}", max_x, max_y);
+                self.draw_vis_to_texture(renderer, &state.area.visibility_tile,
+                                         &state.area.explored_tile,
+                                         &state, 0, 0, max_x, max_y);
+            },
+            PCVisRedraw::Partial { delta_x, delta_y } => {
+                trace!("Redrawing PC visibility to texture");
+                self.draw_visibility_to_texture(renderer, &state.area.visibility_tile,
+                                                &state.area.explored_tile, &state,
+                                                delta_x, delta_y);
+            },
+            PCVisRedraw::Not => (),
         }
 
         let p = widget.state.inner_position;

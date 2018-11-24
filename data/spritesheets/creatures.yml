@@ -9,6 +9,10 @@ groups:
       dragon01: [37, 33, 5, 6]
       demon_lord01: [51, 33, 5, 6]
       demon_lord01_shadow: [56, 33, 5, 6]
+  1by1:
+    size: [1, 1]
+    areas:
+      selected1by1: [0, 37]
   2by2:
     size: [2, 2]
     areas:

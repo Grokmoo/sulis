@@ -1,0 +1,16 @@
+id: spirit_eye
+ai: ai_basic
+name: Spirit Eye
+faction: Hostile
+images: {}
+race: spirit_eye
+attributes:
+  str: 7
+  dex: 13
+  end: 6
+  per: 16
+  int: 10
+  wis: 13
+levels:
+  fighter: 1
+abilities: []

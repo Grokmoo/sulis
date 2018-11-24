@@ -39,7 +39,7 @@ pub mod animation;
 pub mod area_feedback_text;
 use self::area_feedback_text::AreaFeedbackText;
 
-mod area_state;
+pub mod area_state;
 pub use self::area_state::AreaState;
 
 mod change_listener;

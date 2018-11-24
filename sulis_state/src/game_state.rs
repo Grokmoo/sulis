@@ -500,11 +500,15 @@ impl GameState {
                 Some(ref entity) => Some(Rc::clone(entity)),
             };
             state.party_listeners.notify(&entity);
-        })
+        });
+
+        let area_state = GameState::area_state();
+        area_state.borrow_mut().update_view_visibility();
+        area_state.borrow_mut().pc_vis_full_redraw();
     }
 
     pub fn remove_dead_party_members() {
-        STATE.with(|state| {
+        let removed = STATE.with(|state| {
             let mut state = state.borrow_mut();
             let state = state.as_mut().unwrap();
 
@@ -519,8 +523,17 @@ impl GameState {
                     Some(ref entity) => Some(Rc::clone(entity)),
                 };
                 state.party_listeners.notify(&entity);
+                true
+            } else {
+                false
             }
         });
+
+        if removed {
+            let area_state = GameState::area_state();
+            area_state.borrow_mut().update_view_visibility();
+            area_state.borrow_mut().pc_vis_full_redraw();
+        }
     }
 
     pub fn has_party_member(id: &str) -> bool {
@@ -551,7 +564,10 @@ impl GameState {
                 Some(ref entity) => Some(Rc::clone(entity)),
             };
             state.party_listeners.notify(&entity);
-        })
+        });
+
+        let area_state = GameState::area_state();
+        area_state.borrow_mut().update_view_visibility();
     }
 
     pub fn add_party_listener(listener: ChangeListener<Option<Rc<RefCell<EntityState>>>>) {

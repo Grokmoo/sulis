@@ -58,6 +58,9 @@ pub use self::script_inventory::ScriptInventory;
 pub use self::script_inventory::ScriptUsableItem;
 pub use self::script_inventory::ScriptStashItem;
 
+mod script_menu;
+pub use self::script_menu::ScriptMenu;
+
 mod script_color_animation;
 pub use self::script_color_animation::ScriptColorAnimation;
 
@@ -284,12 +287,24 @@ impl ScriptState {
         self.execute_script(parent, &args_string, script.to_string(), func)
     }
 
-    pub fn trigger_script(&self, script_id: &str, func: &str, parent: &Rc<RefCell<EntityState>>,
-                          target: &Rc<RefCell<EntityState>>) -> Result<()> {
+    pub fn trigger_script<'a, T>(&'a self, script_id: &str,
+                                 func: &str,
+                                 parent: &Rc<RefCell<EntityState>>,
+                                 target: &Rc<RefCell<EntityState>>,
+                                 arg: Option<(&str, T)>) -> Result<()> where T: rlua::prelude::ToLua<'a> + Send {
         let script = get_script_from_id(script_id)?;
         self.lua.globals().set("target", ScriptEntity::from(target))?;
 
-        self.execute_script(parent, "(parent, target)", script, func)
+        let mut args_string = "(parent, target".to_string();
+        if let Some((arg_str, arg)) = arg {
+            args_string.push_str(", ");
+            args_string.push_str(arg_str);
+
+            self.lua.globals().set(arg_str, arg)?;
+        }
+        args_string.push(')');
+
+        self.execute_script(parent, &args_string, script, func)
     }
 }
 
@@ -425,6 +440,10 @@ fn get_targeter() -> Result<Rc<RefCell<AreaTargeter>>> {
 /// Starts a new day for the player character and party.  This resets all skill
 /// uses and sets maximum hit points.  This is normally used in a script when the
 /// party rests.
+///
+/// # `create_menu(title: String, callback: CallbackData)`
+/// Creates a new `ScriptMenu` which can then be built up and finally shown with `show()`.
+/// Calls the callback function `on_menu_select` when the user select an option.
 ///
 /// # `show_confirm(message: String, accept: String, cancel: String,
 /// id: String, func: String)`
@@ -668,6 +687,10 @@ impl UserData for ScriptInterface {
                 member.borrow_mut().actor.init_day();
             }
             Ok(())
+        });
+
+        methods.add_method("create_menu", |_, _, (title, cb): (String, CallbackData)| {
+            let menu = ScriptMenu::new(title, cb); Ok(menu)
         });
 
         methods.add_method("show_confirm", |_, _, (msg, accept, cancel, id, func):

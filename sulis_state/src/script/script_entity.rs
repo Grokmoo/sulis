@@ -805,7 +805,7 @@ impl UserData for ScriptEntity {
             let area_state = GameState::area_state();
             area_state.borrow_mut().add_feedback_text(text, &target, color);
 
-            let hit_kind = ScriptHitKind { kind: hit_kind, damage };
+            let hit_kind = ScriptHitKind::new(hit_kind, damage);
             Ok(hit_kind)
         });
 
@@ -881,7 +881,7 @@ impl UserData for ScriptEntity {
             let area_state = GameState::area_state();
             area_state.borrow_mut().add_feedback_text(text, &target, color);
 
-            let hit_kind = ScriptHitKind { kind: hit_kind, damage };
+            let hit_kind = ScriptHitKind::new(hit_kind, damage);
             Ok(hit_kind)
         });
 
@@ -908,11 +908,11 @@ impl UserData for ScriptEntity {
 
             let (text, color) = if !damage.is_empty() {
                 let mut total = 0;
-                for (_, amount) in damage {
+                for (_, amount) in damage.iter() {
                     total += amount;
                 }
 
-                EntityState::remove_hp(&parent, &attacker, HitKind::Hit, total);
+                EntityState::remove_hp(&parent, &attacker, HitKind::Hit, damage);
                 (format!("{}", total), ColorKind::Hit)
             } else {
                 ("0".to_string(), ColorKind::Miss)
@@ -1226,7 +1226,7 @@ fn create_stats_table<'a>(lua: &'a Lua, parent: &ScriptEntity, _args: ()) -> Res
 /// ## Examples
 /// ```lua
 ///   table = targets:to_table()
-///   for i in 1, #table do
+///   for i = 1, #table do
 ///    game:log("target: " .. table[i]:name())
 ///   end
 /// ```

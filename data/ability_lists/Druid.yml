@@ -33,3 +33,6 @@ abilities:
     position: [1, 6]
   - id: summon_wind_elemental
     position: [1, 7]
+
+  - id: absorb_energy
+    position: [2, 0]

@@ -26,7 +26,7 @@ use sulis_core::config::Config;
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::ui::{color, Color};
 use sulis_core::util::{Point, invalid_data_error};
-use sulis_rules::HitKind;
+use sulis_rules::{DamageKind, HitKind};
 use sulis_module::{actor::Faction, Actor, ObjectSize, ObjectSizeIterator, Module, ai};
 use sulis_module::area::{MAX_AREA_SIZE, Transition};
 use {ActorState, AreaState, ChangeListenerList, EntityTextureCache, EntityTextureSlot,
@@ -418,8 +418,15 @@ impl EntityState {
     }
 
     pub fn remove_hp(entity: &Rc<RefCell<EntityState>>, attacker: &Rc<RefCell<EntityState>>,
-                     hit_kind: HitKind, hp_amount: u32) {
+                     hit_kind: HitKind, damage: Vec<(DamageKind, u32)>) {
+        let hp_amount = damage.iter().map(|(_, amount)| amount).sum();
         entity.borrow_mut().actor.remove_hp(hp_amount);
+
+        let targets = ScriptEntitySet::from_pair(entity, attacker);
+
+        let mgr = GameState::turn_manager();
+        let cbs = entity.borrow().callbacks(&mgr.borrow());
+        cbs.iter().for_each(|cb| cb.on_damaged(&targets, hit_kind, damage.clone()));
 
         let hp = entity.borrow().actor.hp();
         if hp <= 0 {
@@ -430,12 +437,6 @@ impl EntityState {
         } else {
             GameState::create_damage_animation(&entity);
         }
-
-        let targets = ScriptEntitySet::from_pair(entity, attacker);
-
-        let mgr = GameState::turn_manager();
-        let cbs = entity.borrow().callbacks(&mgr.borrow());
-        cbs.iter().for_each(|cb| cb.on_damaged(&targets, hit_kind, hp_amount));
     }
 
     pub fn move_to(&mut self, x: i32, y: i32, squares: u32) -> bool {

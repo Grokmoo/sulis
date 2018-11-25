@@ -23,8 +23,8 @@ use std::result::{self};
 use rlua::{UserData, UserDataMethods};
 
 use sulis_core::util::invalid_data_error;
-use sulis_rules::HitKind;
-use sulis_module::{Module};
+use sulis_rules::{HitKind, DamageKind};
+use sulis_module::{Module, on_trigger::Kind};
 use script::{Result, script_entity, ScriptEntity, ScriptEntitySet, ScriptActiveSurface, ScriptItemKind};
 use {EntityState, GameState};
 
@@ -58,6 +58,9 @@ pub fn fire_on_moved(cbs: Vec<Rc<CallbackData>>) {
 #[derive(Serialize, Deserialize, Clone, Copy, PartialOrd, Ord, Hash, PartialEq, Eq, Debug)]
 #[serde(deny_unknown_fields)]
 pub enum FuncKind {
+    /// Called when a menu option is selected in a custom menu
+    OnMenuSelect,
+
     /// Called whenever a an effect is removed from a parent
     OnRemoved,
 
@@ -105,17 +108,22 @@ pub enum FuncKind {
 /// A trait representing a callback that will fire a script when called.  In lua scripts,
 /// `CallbackData` is constructed to use this trait.
 pub trait ScriptCallback {
+    fn on_menu_select(&self, _value: String) { }
+
     fn on_removed(&self) { }
 
-    fn on_damaged(&self, _targets: &ScriptEntitySet, _hit_kind: HitKind, _damage: u32) { }
+    fn on_damaged(&self, _targets: &ScriptEntitySet, _hit_kind: HitKind,
+                  _damage: Vec<(DamageKind, u32)>) { }
 
-    fn after_defense(&self, _targets: &ScriptEntitySet, _hit_kind: HitKind, _damage: u32) { }
+    fn after_defense(&self, _targets: &ScriptEntitySet, _hit_kind: HitKind,
+                     _damage: Vec<(DamageKind, u32)>) { }
 
     fn before_defense(&self, _targets: &ScriptEntitySet) { }
 
     fn before_attack(&self, _targets: &ScriptEntitySet) { }
 
-    fn after_attack(&self, _targets: &ScriptEntitySet, _hit_kind: HitKind, _damage: u32) { }
+    fn after_attack(&self, _targets: &ScriptEntitySet, _hit_kind: HitKind,
+                    _damage: Vec<(DamageKind, u32)>) { }
 
     fn on_anim_complete(&self) { }
 
@@ -128,17 +136,6 @@ pub trait ScriptCallback {
     fn on_surface_round_elapsed(&self) { }
 
     fn on_moved_in_surface(&self, _target: usize) { }
-}
-
-#[derive(Clone, Serialize, Deserialize, Debug)]
-#[serde(deny_unknown_fields)]
-enum Kind {
-    Ability(String),
-    Item(String), // callback is based on an item ID, not a particular
-                  // slot - this allows creating callbacks after the
-                  // consumable items has been used
-    Entity,
-    Script(String),
 }
 
 /// A callback that can be passed to various functions to be executed later.
@@ -156,6 +153,7 @@ enum Kind {
 /// Adds the specified `point` to the list of points this callback will provide in its
 /// targets.  The point is a table of the form `{x:x_coord, y: y_coord}`
 ///
+/// # `set_on_menu_select_fn(func: String)`
 /// # `set_on_removed_fn(func: String)`
 /// # `set_on_damaged_fn(func: String)`
 /// # `set_before_attack_fn(func: String)`
@@ -182,6 +180,21 @@ pub struct CallbackData {
 }
 
 impl CallbackData {
+    pub fn kind(&self) -> Kind {
+        self.kind.clone()
+    }
+
+    pub fn parent(&self) -> usize {
+        self.parent
+    }
+
+    pub fn get_func(&self, func: FuncKind) -> Option<String> {
+        match self.funcs.get(&func) {
+            None => None,
+            Some(func) => Some(func.to_string()),
+        }
+    }
+
     pub fn update_entity_refs_on_load(&mut self, entities: &HashMap<usize,
                                       Rc<RefCell<EntityState>>>) -> result::Result<(), Error> {
 
@@ -303,8 +316,35 @@ impl CallbackData {
         }
     }
 
+    fn exec_script_with_arg(&self, targets: ScriptEntitySet, arg: String, func_kind: FuncKind) {
+        let func = match self.funcs.get(&func_kind) {
+            None => return,
+            Some(ref func) => func.to_string(),
+        };
+
+        let mgr = GameState::turn_manager();
+        let parent = mgr.borrow().entity(self.parent);
+
+        match &self.kind {
+            Kind::Ability(ref id) => {
+                let ability = Module::ability(id).unwrap();
+                GameState::execute_ability_with_arg(&parent, &ability, targets, arg, &func);
+            },
+            Kind::Item(id) => {
+                GameState::execute_item_with_arg(&parent,
+                    ScriptItemKind::WithID(id.to_string()), targets, arg, &func);
+            },
+            Kind::Entity => {
+                GameState::execute_entity_with_arg(&parent, targets, arg, &func);
+            },
+            Kind::Script(script) => {
+                GameState::execute_trigger_with_arg(&script, &func, &parent, &parent, arg);
+            }
+        }
+    }
+
     fn exec_script_with_attack_data(&self, targets: ScriptEntitySet, hit_kind: HitKind,
-                                    damage: u32, func_kind: FuncKind) {
+                                    damage: Vec<(DamageKind, u32)>, func_kind: FuncKind) {
         let func = match self.funcs.get(&func_kind) {
             None => return,
             Some(ref func) => func.to_string(),
@@ -328,13 +368,18 @@ impl CallbackData {
                                                            &func);
             },
             Kind::Script(script) => {
-                GameState::execute_trigger_script(&script, &func, &parent, &parent);
+                GameState::execute_trigger_with_attack_data(&script, &func, &parent, &parent,
+                                                            hit_kind, damage);
             }
         }
     }
 }
 
 impl ScriptCallback for CallbackData {
+    fn on_menu_select(&self, value: String) {
+        self.exec_script_with_arg(self.get_or_create_targets(), value, FuncKind::OnMenuSelect);
+    }
+
     fn on_removed(&self) {
         self.exec_standard_script(self.get_or_create_targets(), FuncKind::OnRemoved);
     }
@@ -392,17 +437,20 @@ impl ScriptCallback for CallbackData {
         self.exec_standard_script(targets, FuncKind::OnMovedInSurface);
     }
 
-    fn after_defense(&self, targets: &ScriptEntitySet, hit_kind: HitKind, damage: u32) {
+    fn after_defense(&self, targets: &ScriptEntitySet, hit_kind: HitKind,
+                     damage: Vec<(DamageKind, u32)>) {
         self.exec_script_with_attack_data(self.get_targets(targets), hit_kind, damage,
             FuncKind::AfterDefense);
     }
 
-    fn after_attack(&self, targets: &ScriptEntitySet, hit_kind: HitKind, damage: u32) {
+    fn after_attack(&self, targets: &ScriptEntitySet, hit_kind: HitKind,
+                    damage: Vec<(DamageKind, u32)>) {
         self.exec_script_with_attack_data(self.get_targets(targets), hit_kind, damage,
             FuncKind::AfterAttack);
     }
 
-    fn on_damaged(&self, targets: &ScriptEntitySet, hit_kind: HitKind, damage: u32) {
+    fn on_damaged(&self, targets: &ScriptEntitySet, hit_kind: HitKind,
+                  damage: Vec<(DamageKind, u32)>) {
         self.exec_script_with_attack_data(self.get_targets(targets), hit_kind, damage,
             FuncKind::OnDamaged);
     }
@@ -489,6 +537,8 @@ impl UserData for CallbackData {
             Ok(())
         });
 
+        methods.add_method_mut("set_on_menu_select_fn",
+                               |_, cb, func: String| cb.add_func(FuncKind::OnMenuSelect, func));
         methods.add_method_mut("set_on_removed_fn",
                                |_, cb, func: String| cb.add_func(FuncKind::OnRemoved, func));
         methods.add_method_mut("set_on_damaged_fn",
@@ -534,12 +584,57 @@ impl UserData for CallbackData {
 /// # `total_damage() -> Int`
 /// The total damage (in hit points) that the attack did.
 ///
+/// # `damage_of_type(type: String) -> Int`
+/// Returns the total damage (in hit points) from this attack for the given
+/// damage type
+///
+/// # `entries() -> Table`
+/// Creates a table of damage entries in this hit.  Iterating over the table
+/// will allow you to access each damage type and corresponding amount.
+/// ## Examples
+/// ```lua
+///   entries = hit:entries()
+///   for i = 1, #entries do
+///     game:log("Type: " .. entries[i]:type() .. ", amount: " .. tostring(entries[i]:amount()))
+///   end
+/// ```
+///
 /// # `kind() -> String`
 /// The type of hit.  One of `Miss`, `Graze`, `Hit`, or `Crit`.
 #[derive(Clone)]
 pub struct ScriptHitKind {
     pub kind: HitKind,
-    pub damage: u32,
+    entries: Vec<DamageEntry>,
+    pub total_damage: u32,
+}
+
+#[derive(Clone)]
+struct DamageEntry {
+    kind: &'static str,
+    amount: u32,
+}
+impl UserData for DamageEntry {
+    fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
+        methods.add_method("kind", |_, entry, ()| Ok(entry.kind));
+        methods.add_method("amount", |_, entry, ()| Ok(entry.amount));
+    }
+}
+
+impl ScriptHitKind {
+    pub fn new(kind: HitKind, damage: Vec<(DamageKind, u32)>) -> ScriptHitKind {
+        let mut total_damage = 0;
+        let mut entries = Vec::new();
+        for (kind, amount) in damage {
+            total_damage += amount;
+            entries.push(DamageEntry { kind: kind.to_str(), amount });
+        }
+
+        ScriptHitKind {
+            kind,
+            entries,
+            total_damage,
+        }
+    }
 }
 
 impl UserData for ScriptHitKind {
@@ -548,7 +643,19 @@ impl UserData for ScriptHitKind {
         methods.add_method("is_graze", |_, hit, ()| Ok(hit.kind == HitKind::Graze));
         methods.add_method("is_hit", |_, hit, ()| Ok(hit.kind == HitKind::Hit));
         methods.add_method("is_crit", |_, hit, ()| Ok(hit.kind == HitKind::Crit));
-        methods.add_method("total_damage", |_, hit, ()| Ok(hit.damage));
+        methods.add_method("total_damage", |_, hit, ()| Ok(hit.total_damage));
+        methods.add_method("entries", |_, hit, ()| {
+            let table = hit.entries.clone();
+            Ok(table)
+        });
+        methods.add_method("damage_of_type", |_, hit, kind: String| {
+            let mut total = 0;
+            for entry in hit.entries.iter() {
+                if entry.kind != &kind { continue; }
+                total += entry.amount;
+            }
+            Ok(total)
+        });
         methods.add_method("kind", |_, hit, ()| {
             Ok(format!("{:?}", hit.kind))
         });

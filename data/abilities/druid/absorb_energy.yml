@@ -1,0 +1,19 @@
+id: absorb_energy
+name: "Absorb Energy"
+icon: abilities/absorb_energy
+description: |
+  You select a single damage type.  When you would normally be damaged by that damage type, you are instead healed for a fraction of the damage.
+active:
+  script: "absorb_energy"
+  group: "Druid"
+  ap: 2000
+  duration:
+    Rounds: 3
+  cooldown: 6
+  ai:
+    priority: 30
+    kind: Special
+    group: Single
+    range: Personal
+  short_description: |
+    A single selected damage type heals instead of harms you.

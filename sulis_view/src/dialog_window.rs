@@ -22,12 +22,13 @@ use sulis_core::ui::{Widget, WidgetKind, theme, Callback};
 use sulis_core::io::{event};
 use sulis_widgets::{Label, TextArea};
 use sulis_module::{Actor, OnTrigger, MerchantData, Conversation,
-    conversation::{Response}, Module, on_trigger};
+    conversation::{Response}, Module, on_trigger::{self, Kind}};
 use sulis_state::{EntityState, ChangeListener, GameState, ItemState,
-    area_feedback_text::ColorKind, NextGameStep, script::entity_with_id};
+    area_feedback_text::ColorKind, NextGameStep,
+    script::{entity_with_id, CallbackData, FuncKind}};
 
 use {character_window, CutsceneWindow, RootView, GameOverWindow, LoadingScreen,
-    window_fade, WindowFade, ConfirmationWindow};
+    window_fade, WindowFade, ConfirmationWindow, ScriptMenu};
 
 pub const NAME: &str = "dialog_window";
 
@@ -353,9 +354,34 @@ pub fn activate(widget: &Rc<RefCell<Widget>>, on_select: &Vec<OnTrigger>,
             ScrollView(x, y) => scroll_view(widget, *x, *y),
             LoadModule(ref module_id) => load_module(widget, module_id),
             ShowConfirm(ref data) => show_confirm(widget, data),
+            ShowMenu(ref data) => show_menu(widget, data),
             FadeOutIn => fade_out_in(widget),
         }
     }
+}
+
+fn show_menu(widget: &Rc<RefCell<Widget>>, data: &on_trigger::MenuData) {
+    let root = Widget::get_root(widget);
+
+    let mut script_cb = match &data.cb_kind {
+        Kind::Ability(ref id) => {
+            CallbackData::new_ability(data.cb_parent, id)
+        },
+        Kind::Item(id) => {
+            CallbackData::new_item(data.cb_parent, id.to_string())
+        },
+        Kind::Entity => {
+            CallbackData::new_entity(data.cb_parent)
+        },
+        Kind::Script(id) => {
+            CallbackData::new_trigger(data.cb_parent, id.to_string())
+        }
+    };
+    script_cb.add_func(FuncKind::OnMenuSelect, data.cb_func.to_string()).unwrap();
+
+    let window = ScriptMenu::new(script_cb, data.title.to_string(), data.choices.clone());
+    let widget = Widget::with_defaults(window);
+    Widget::add_child_to(&root, widget);
 }
 
 fn show_confirm(widget: &Rc<RefCell<Widget>>, data: &on_trigger::DialogData) {

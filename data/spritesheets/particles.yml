@@ -1,6 +1,6 @@
 id: particles
 src: "particles.png"
-size: [ 1024, 512 ]
+size: [ 1024, 1024 ]
 simple_image_gen_scale: 4
 groups:
   vines:
@@ -256,3 +256,23 @@ groups:
       lightning_bolt08: [152, 190]
       lightning_bolt09: [228, 190]
       lightning_bolt10: [304, 190]
+  shell:
+    size: [80, 80]
+    position: [256, 380]
+    areas:
+      shell01: [0, 0]
+      shell02: [80, 0]
+      shell03: [160, 0]
+      shell04: [240, 0]
+      shell05: [320, 0]
+      shell06: [400, 0]
+      shell07: [480, 0]
+      shell08: [560, 0]
+      shell09: [0, 80]
+      shell10: [80, 80]
+      shell11: [160, 80]
+      shell12: [240, 80]
+      shell13: [320, 80]
+      shell14: [400, 80]
+      shell15: [480, 80]
+      shell16: [560, 80]

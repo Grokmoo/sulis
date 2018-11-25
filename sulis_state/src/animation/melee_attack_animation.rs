@@ -17,7 +17,7 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_rules::HitKind;
+use sulis_rules::{HitKind, DamageKind};
 use {script::ScriptEntitySet, ScriptCallback};
 use {animation::Anim, EntityState, GameState, area_feedback_text::ColorKind};
 
@@ -47,11 +47,13 @@ pub (in animation) fn update(attacker: &Rc<RefCell<EntityState>>, model: &mut Me
         model.has_attacked = true;
 
         for cb in model.callbacks.iter() {
-            cb.after_attack(&cb_def_targets, hit_kind, damage);
+            cb.after_attack(&cb_def_targets, hit_kind, damage.clone());
         }
 
-        attacker_cbs.iter().for_each(|cb| cb.after_attack(&cb_att_targets, hit_kind, damage));
-        defender_cbs.iter().for_each(|cb| cb.after_defense(&cb_def_targets, hit_kind, damage));
+        attacker_cbs.iter().for_each(|cb|
+            cb.after_attack(&cb_att_targets, hit_kind, damage.clone()));
+        defender_cbs.iter().for_each(|cb|
+            cb.after_defense(&cb_def_targets, hit_kind, damage.clone()));
     }
 
     let mut attacker = attacker.borrow_mut();
@@ -78,7 +80,7 @@ pub (in animation) struct MeleeAttackAnimModel {
     vector: (f32, f32),
     pub (in animation) has_attacked: bool,
     attack_func: Box<Fn(&Rc<RefCell<EntityState>>, &Rc<RefCell<EntityState>>) ->
-        (HitKind, u32, String, ColorKind)>,
+        (HitKind, Vec<(DamageKind, u32)>, String, ColorKind)>,
 }
 
 pub fn new(attacker: &Rc<RefCell<EntityState>>,
@@ -86,7 +88,7 @@ pub fn new(attacker: &Rc<RefCell<EntityState>>,
            duration_millis: u32,
            callbacks: Vec<Box<ScriptCallback>>,
            attack_func: Box<Fn(&Rc<RefCell<EntityState>>, &Rc<RefCell<EntityState>>) ->
-                (HitKind, u32, String, ColorKind)>) -> Anim {
+                (HitKind, Vec<(DamageKind, u32)>, String, ColorKind)>) -> Anim {
 
     let x = defender.borrow().location.x + defender.borrow().size.width / 2
         - attacker.borrow().location.x - attacker.borrow().size.width / 2;

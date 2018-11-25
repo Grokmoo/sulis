@@ -14,6 +14,17 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+#[derive(Clone, Serialize, Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
+pub enum Kind {
+    Ability(String),
+    Item(String), // callback is based on an item ID, not a particular
+                  // slot - this allows creating callbacks after the
+                  // consumable items has been used
+    Entity,
+    Script(String),
+}
+
 #[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct MerchantData {
@@ -37,6 +48,16 @@ pub struct DialogData {
     pub accept_text: String,
     pub cancel_text: String,
     pub on_accept: Option<ScriptData>,
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct MenuData {
+    pub title: String,
+    pub choices: Vec<String>,
+    pub cb_func: String,
+    pub cb_kind: Kind,
+    pub cb_parent: usize,
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
@@ -72,5 +93,6 @@ pub enum OnTrigger {
     ScrollView(i32, i32),
     LoadModule(String),
     ShowConfirm(DialogData),
+    ShowMenu(MenuData),
     FadeOutIn,
 }

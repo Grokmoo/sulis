@@ -33,6 +33,7 @@ groups:
       rock_armor: [7, 2]
       summon_wind_elemental: [8, 2]
       summon_plant_elemental: [9, 2]
+      absorb_energy: [10, 2]
       
       heal: [0, 3]
       shock: [1, 3]

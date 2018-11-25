@@ -24,7 +24,7 @@ use sulis_core::io::GraphicsRenderer;
 use sulis_core::image::{LayeredImage, Image};
 use sulis_core::util::{invalid_data_error, ExtInt};
 use sulis_rules::{AccuracyKind, Attack, AttackKind, BonusList, HitKind, StatList, WeaponKind,
-    QuickSlot, Slot, ItemKind};
+    QuickSlot, Slot, ItemKind, DamageKind};
 use sulis_module::{Actor, Module, ActorBuilder, Faction, ImageLayer};
 use area_feedback_text::ColorKind;
 use {AbilityState, ChangeListenerList, Effect, EntityState, GameState, Inventory, ItemState, PStats};
@@ -465,10 +465,11 @@ impl ActorState {
         false
     }
 
-    pub fn weapon_attack(parent: &Rc<RefCell<EntityState>>,
-                         target: &Rc<RefCell<EntityState>>) -> (HitKind, u32, String, ColorKind) {
+    pub fn weapon_attack(parent: &Rc<RefCell<EntityState>>, target: &Rc<RefCell<EntityState>>)
+        -> (HitKind, Vec<(DamageKind, u32)>, String, ColorKind) {
+
         if target.borrow_mut().actor.hp() <= 0 {
-            return (HitKind::Miss, 0, "Miss".to_string(), ColorKind::Miss);
+            return (HitKind::Miss, Vec::new(), "Miss".to_string(), ColorKind::Miss);
         }
 
         info!("'{}' attacks '{}'", parent.borrow().actor.actor.name, target.borrow().actor.actor.name);
@@ -477,7 +478,7 @@ impl ActorState {
         let mut damage_str = String::new();
         let mut not_first = false;
         let mut hit_kind = HitKind::Miss;
-        let mut total_damage = 0;
+        let mut total_damage = Vec::new();
 
         let attacks = parent.borrow().actor.stats.attacks.clone();
 
@@ -498,7 +499,7 @@ impl ActorState {
                 attack
             };
 
-            let (hit, dmg, attack_result, attack_color) =
+            let (hit, mut dmg, attack_result, attack_color) =
                 ActorState::attack_internal(parent, target, &mut attack,
                                             is_flanking, is_sneak_attack);
             if attack_color != ColorKind::Miss {
@@ -511,7 +512,7 @@ impl ActorState {
                 hit_kind = hit;
             }
 
-            total_damage += dmg;
+            total_damage.append(&mut dmg);
 
             not_first = true;
         }
@@ -521,12 +522,13 @@ impl ActorState {
     }
 
     pub fn attack(parent: &Rc<RefCell<EntityState>>, target: &Rc<RefCell<EntityState>>,
-                  attack: &mut Attack) -> (HitKind, u32, String, ColorKind) {
+                  attack: &mut Attack) -> (HitKind, Vec<(DamageKind, u32)>, String, ColorKind) {
         if target.borrow_mut().actor.hp() <= 0 {
-            return (HitKind::Miss, 0, "Miss".to_string(), ColorKind::Miss);
+            return (HitKind::Miss, Vec::new(), "Miss".to_string(), ColorKind::Miss);
         }
 
-        info!("'{}' attacks '{}'", parent.borrow().actor.actor.name, target.borrow().actor.actor.name);
+        info!("'{}' attacks '{}'", parent.borrow().actor.actor.name,
+            target.borrow().actor.actor.name);
 
         let mut damage_str = String::new();
         let is_flanking = ActorState::is_flanking(parent, target);
@@ -550,7 +552,7 @@ impl ActorState {
                        target: &Rc<RefCell<EntityState>>,
                        attack: &mut Attack,
                        flanking: bool,
-                       sneak_attack: bool) -> (HitKind, u32, String, ColorKind) {
+                       sneak_attack: bool) -> (HitKind, Vec<(DamageKind, u32)>, String, ColorKind) {
         let rules = Module::rules();
 
         let concealment = cmp::max(0, target.borrow().actor.stats.concealment -
@@ -558,7 +560,7 @@ impl ActorState {
 
         if !rules.concealment_roll(concealment) {
             debug!("Concealment miss");
-            return (HitKind::Miss, 0, "Concealment".to_string(), ColorKind::Miss);
+            return (HitKind::Miss, Vec::new(), "Concealment".to_string(), ColorKind::Miss);
         }
 
         let (accuracy_kind, defense) = {
@@ -570,7 +572,7 @@ impl ActorState {
                 AttackKind::Melee { .. } => (AccuracyKind::Melee, target_stats.defense),
                 AttackKind::Ranged { .. } => (AccuracyKind::Ranged, target_stats.defense),
                 AttackKind::Dummy => {
-                    return (HitKind::Hit, 0, "".to_string(), ColorKind::Miss);
+                    return (HitKind::Hit, Vec::new(), "".to_string(), ColorKind::Miss);
                 }
             }
         };
@@ -593,7 +595,7 @@ impl ActorState {
             let damage_multiplier = match hit_kind {
                 HitKind::Miss => {
                     debug!("Miss");
-                    return (HitKind::Miss, 0, "Miss".to_string(), ColorKind::Miss);
+                    return (HitKind::Miss, Vec::new(), "Miss".to_string(), ColorKind::Miss);
                 },
                 HitKind::Graze =>
                     parent_stats.graze_multiplier + attack.bonuses.graze_multiplier,
@@ -614,17 +616,17 @@ impl ActorState {
 
         if !damage.is_empty() {
             let mut total = 0;
-            for (_kind, amount) in damage {
+            for (_kind, amount) in damage.iter() {
                 total += amount;
             }
 
-            EntityState::remove_hp(target, parent, hit_kind, total);
-            return (hit_kind, total, format!("{:?}: {}", hit_kind, total), ColorKind::Hit);
+            EntityState::remove_hp(target, parent, hit_kind, damage.clone());
+            return (hit_kind, damage, format!("{:?}: {}", hit_kind, total), ColorKind::Hit);
         } else if attack.damage.max() == 0 {
             // if attack cannot do any damage
-            return (hit_kind, 0, format!("{:?}", hit_kind), ColorKind::Hit);
+            return (hit_kind, Vec::new(), format!("{:?}", hit_kind), ColorKind::Hit);
         } else {
-            return (hit_kind, 0, format!("{:?}: {}", hit_kind, 0), ColorKind::Miss);
+            return (hit_kind, Vec::new(), format!("{:?}: {}", hit_kind, 0), ColorKind::Miss);
         }
     }
 

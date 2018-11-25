@@ -1,0 +1,19 @@
+id: shell
+frame_time_millis: 80
+frames:
+  - particles/shell01
+  - particles/shell02
+  - particles/shell03
+  - particles/shell04
+  - particles/shell05
+  - particles/shell06
+  - particles/shell07
+  - particles/shell08
+  - particles/shell09
+  - particles/shell10
+  - particles/shell11
+  - particles/shell12
+  - particles/shell13
+  - particles/shell14
+  - particles/shell15
+  - particles/shell16

@@ -23,7 +23,7 @@ use std::cell::{Cell, RefCell};
 use sulis_core::config::Config;
 use sulis_core::util::{self, Point, invalid_data_error, ExtInt};
 use sulis_core::io::{GraphicsRenderer};
-use sulis_rules::HitKind;
+use sulis_rules::{HitKind, DamageKind};
 use sulis_module::{Ability, Actor, Module, ObjectSize, OnTrigger, area::{Trigger, TriggerKind}};
 
 use {ai, AI, AreaState, ChangeListener, ChangeListenerList, Effect,
@@ -628,9 +628,15 @@ impl GameState {
 
     pub fn execute_entity_with_attack_data(parent: &Rc<RefCell<EntityState>>,
                                            targets: ScriptEntitySet, kind: HitKind,
-                                           damage: u32, func: &str) {
-        let hit_kind = ScriptHitKind { kind, damage };
+                                           damage: Vec<(DamageKind, u32)>, func: &str) {
+        let hit_kind = ScriptHitKind::new(kind, damage);
         let t = Some(("hit", hit_kind));
+        exec_script!(entity_script: parent, targets, t, func);
+    }
+
+    pub fn execute_entity_with_arg(parent: &Rc<RefCell<EntityState>>,
+                                   targets: ScriptEntitySet, arg: String, func: &str) {
+        let t = Some(("arg", arg));
         exec_script!(entity_script: parent, targets, t, func);
     }
 
@@ -642,9 +648,15 @@ impl GameState {
 
     pub fn execute_item_with_attack_data(parent: &Rc<RefCell<EntityState>>, i_kind: ScriptItemKind,
                                          targets: ScriptEntitySet, kind: HitKind,
-                                         damage: u32, func: &str) {
-        let hit_kind = ScriptHitKind { kind, damage };
+                                         damage: Vec<(DamageKind, u32)>, func: &str) {
+        let hit_kind = ScriptHitKind::new(kind, damage);
         let t = Some(("hit", hit_kind));
+        exec_script!(item_script: parent, i_kind, targets, t, func);
+    }
+
+    pub fn execute_item_with_arg(parent: &Rc<RefCell<EntityState>>, i_kind: ScriptItemKind,
+                                 targets: ScriptEntitySet, arg: String, func: &str) {
+        let t = Some(("arg", arg));
         exec_script!(item_script: parent, i_kind, targets, t, func);
     }
 
@@ -677,9 +689,15 @@ impl GameState {
 
     pub fn execute_ability_with_attack_data(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>,
                                         targets: ScriptEntitySet, kind: HitKind,
-                                        damage: u32, func: &str) {
-        let hit_kind = ScriptHitKind { kind, damage };
+                                        damage: Vec<(DamageKind, u32)>, func: &str) {
+        let hit_kind = ScriptHitKind::new(kind, damage);
         let t = Some(("hit", hit_kind));
+        exec_script!(ability_script: parent, ability, targets, t, func);
+    }
+
+    pub fn execute_ability_with_arg(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>,
+                                    targets: ScriptEntitySet, arg: String, func: &str) {
+        let t = Some(("arg", arg));
         exec_script!(ability_script: parent, ability, targets, t, func);
     }
 
@@ -691,7 +709,24 @@ impl GameState {
 
     pub fn execute_trigger_script(script_id: &str, func: &str, parent: &Rc<RefCell<EntityState>>,
                                   target: &Rc<RefCell<EntityState>>) {
-        exec_script!(trigger_script: script_id, func, parent, target);
+        let t: Option<(&str, usize)> = None;
+        exec_script!(trigger_script: script_id, func, parent, target, t);
+    }
+
+    pub fn execute_trigger_with_attack_data(script_id: &str, func: &str,
+                                            parent: &Rc<RefCell<EntityState>>,
+                                            target: &Rc<RefCell<EntityState>>,
+                                            kind: HitKind, damage: Vec<(DamageKind, u32)>) {
+        let hit_kind = ScriptHitKind::new(kind, damage);
+        let t = Some(("hit", hit_kind));
+        exec_script!(trigger_script: script_id, func, parent, target, t);
+    }
+
+    pub fn execute_trigger_with_arg(script_id: &str, func: &str,
+                                    parent: &Rc<RefCell<EntityState>>,
+                                    target: &Rc<RefCell<EntityState>>, arg: String) {
+        let t = Some(("arg", arg));
+        exec_script!(trigger_script: script_id, func, parent, target, t);
     }
 
     pub fn transition(area_id: &Option<String>, x: i32, y: i32) {

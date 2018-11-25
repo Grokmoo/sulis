@@ -1130,6 +1130,54 @@ children:
           scale: 7
         position: [0, 11]
         x_relative: Center
+  script_menu:
+    background: 60_transparent_fill
+    border: [1, 1, 1, 1]
+    preferred_size: [60, 60]
+    x_relative: Center
+    y_relative: Center
+    children:
+      title:
+        from: .text_area
+        text: |
+          [a=58|#title#]
+        preferred_size: [0, 4]
+        width_relative: Max
+      cancel:
+        from: .button
+        preferred_size: [0, 10]
+        text: "Cancel"
+        width_relative: Max
+        y_relative: Max
+      entries:
+        border: [2, 2, 2, 2]
+        width_relative: Max
+        height_relative: Max
+        preferred_size: [0, -14]
+        position: [0, 4]
+        children:
+          scrollbar:
+            from: .scrollbar
+            custom:
+              scroll_delta: 12
+          content:
+            width_relative: Max
+            height_relative: Max
+            preferred_size: [0, 0]
+            layout: BoxVertical
+            layout_spacing: { top: 0, bottom: 2, left: 0, right: 0 }
+            children:
+              entry:
+                from: .button
+                width_relative: Max
+                preferred_size: [0, 10]
+                children:
+                  text_area:
+                    from: .text_area
+                    width_relative: Max
+                    height_relative: Max
+                    text: |
+                      [a=54|#choice#]
   script_confirmation:
     from: .confirmation_window
     children:

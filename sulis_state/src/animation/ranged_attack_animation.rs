@@ -51,11 +51,13 @@ pub (in animation) fn update(attacker: &Rc<RefCell<EntityState>>, model: &mut Ra
             model.has_attacked = true;
 
             for cb in model.callbacks.iter() {
-                cb.after_attack(&cb_def_targets, hit_kind, damage);
+                cb.after_attack(&cb_def_targets, hit_kind, damage.clone());
             }
 
-            attacker_cbs.iter().for_each(|cb| cb.after_attack(&cb_att_targets, hit_kind, damage));
-            defender_cbs.iter().for_each(|cb| cb.after_defense(&cb_def_targets, hit_kind, damage));
+            attacker_cbs.iter().for_each(|cb|
+                cb.after_attack(&cb_att_targets, hit_kind, damage.clone()));
+            defender_cbs.iter().for_each(|cb|
+                cb.after_defense(&cb_def_targets, hit_kind, damage.clone()));
         }
     } else {
         model.cur_pos = (frac * model.vec.0 + model.start_pos.0,

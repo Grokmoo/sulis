@@ -741,6 +741,7 @@ impl UserData for ScriptEntity {
         methods.add_method("has_ap_to_attack", |_, entity, ()| {
             let parent = entity.try_unwrap()?;
             let result = parent.borrow().actor.has_ap_to_attack();
+            if parent.borrow().actor.stats.attack_disabled { return Ok(false); }
             Ok(result)
         });
 

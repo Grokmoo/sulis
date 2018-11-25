@@ -1,5 +1,5 @@
 id: shell
-frame_time_millis: 80
+frame_time_millis: 70
 frames:
   - particles/shell01
   - particles/shell02

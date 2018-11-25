@@ -2,37 +2,42 @@ id: druid
 abilities:
   - id: enlarge
     position: [0, 0]
-  - id: beast_shape
-    position: [0, 1]
   - id: spirit_claws
-    position: [0, 2]
-  - id: stinging_swarm
-    position: [0, 3]
-  - id: regenerate
-    position: [0, 4]
-  - id: layer_of_bark
-    position: [0, 5]
-  - id: entangling_vines
-    position: [0, 6]
-  - id: resist_elements
-    position: [0, 7]
-    
-  - id: tree_shape
-    position: [1, 0]
-  - id: lightning_bolt
-    position: [1, 1]
-  - id: summon_animal
-    position: [1, 2]
-  - id: spirit_eye
-    position: [1, 3]
-  - id: sunbeam
-    position: [1, 4]
-  - id: spirit_defense
-    position: [1, 5]
-  - id: summon_plant_elemental
-    position: [1, 6]
-  - id: summon_wind_elemental
-    position: [1, 7]
-
-  - id: absorb_energy
+    position: [0, 1]
+  - id: beast_shape
     position: [2, 0]
+  - id: layer_of_bark
+    position: [1, 1]
+  - id: tree_shape
+    position: [3, 1]
+  - id: polymorph
+    position: [4, 0.5]
+        
+  - id: lightning_bolt
+    position: [1, 2.5]
+  - id: sunbeam
+    position: [2, 2]
+  - id: hail_storm
+    position: [3, 3]
+
+  - id: spirit_defense
+    position: [0, 4.5]
+  - id: regenerate
+    position: [1, 4.0]
+  - id: resist_elements
+    position: [2, 4.5]
+  - id: absorb_energy
+    position: [3, 4.5]
+
+  - id: summon_animal
+    position: [0, 6.1]
+  - id: spirit_eye
+    position: [2, 5.6]
+  - id: stinging_swarm
+    position: [2, 6.6]
+  - id: entangling_vines
+    position: [1, 6.1]
+  - id: summon_plant_elemental
+    position: [4, 6.1]
+  - id: summon_wind_elemental
+    position: [4, 7.0]

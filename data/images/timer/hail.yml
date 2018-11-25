@@ -1,0 +1,19 @@
+id: hail
+frame_time_millis: 50
+frames:
+  - particles/hail01
+  - particles/hail02
+  - particles/hail03
+  - particles/hail04
+  - particles/hail05
+  - particles/hail06
+  - particles/hail07
+  - particles/hail08
+  - particles/hail09
+  - particles/hail10
+  - particles/hail11
+  - particles/hail12
+  - particles/hail13
+  - particles/hail14
+  - particles/hail15
+  - particles/hail16

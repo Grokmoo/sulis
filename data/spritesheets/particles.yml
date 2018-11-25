@@ -3,6 +3,26 @@ src: "particles.png"
 size: [ 1024, 1024 ]
 simple_image_gen_scale: 4
 groups:
+  hail:
+    size: [20, 40]
+    position: [0, 440]
+    areas:
+      hail01: [0, 0]
+      hail02: [20, 0]
+      hail03: [40, 0]
+      hail04: [80, 0]
+      hail05: [100, 0]
+      hail06: [120, 0]
+      hail07: [140, 0]
+      hail08: [160, 0]
+      hail09: [0, 40]
+      hail10: [20, 40]
+      hail11: [40, 40]
+      hail12: [80, 40]
+      hail13: [100, 40]
+      hail14: [120, 40]
+      hail15: [140, 40]
+      hail16: [160, 40]
   vines:
     size: [16, 32]
     position: [192, 384]

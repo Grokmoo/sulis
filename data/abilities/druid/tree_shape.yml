@@ -20,4 +20,5 @@ active:
   short_description: |
     Turns the caster into a powerful tree.
 prereqs:
-  total_level: 1
+  abilities: [ layer_of_bark ]
+  total_level: 9

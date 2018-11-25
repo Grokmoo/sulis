@@ -17,3 +17,6 @@ active:
     range: Personal
   short_description: |
     Gain resistance to physical attacks but vulnerability to fire.
+prereqs:
+  abilities: [ spirit_claws ]
+  total_level: 3

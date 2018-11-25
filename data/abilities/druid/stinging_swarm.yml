@@ -17,3 +17,6 @@ active:
     range: Visible
   short_description: |
     A swarm of biting insects damages and debilitates your enemies.
+prereqs:
+  abilities: [ summon_animal ]
+  total_level: 6

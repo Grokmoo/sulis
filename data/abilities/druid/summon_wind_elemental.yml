@@ -17,3 +17,6 @@ active:
     range: Visible
   short_description: |
     Summon a powerful air spirit to fight for you.
+prereqs:
+  abilities: [ summon_animal ]
+  total_level: 12

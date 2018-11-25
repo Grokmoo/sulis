@@ -17,3 +17,5 @@ active:
     range: Visible
   short_description: |
     Summon an invisible magic scout.
+prereqs:
+  total_level: 6

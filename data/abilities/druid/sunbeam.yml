@@ -17,3 +17,6 @@ active:
     range: Visible
   short_description: |
     Blind and deal minor damage in a large area.
+prereqs:
+  abilities: [ lightning_bolt ]
+  total_level: 6

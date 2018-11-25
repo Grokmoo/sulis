@@ -17,3 +17,6 @@ active:
     range: Short
   short_description: |
     Heal damage on a nearby ally over several rounds.
+prereqs:
+  abilities: [ spirit_defense ]
+  total_level: 3

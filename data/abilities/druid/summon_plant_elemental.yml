@@ -17,3 +17,6 @@ active:
     range: Visible
   short_description: |
     Summon a powerful nature spirit to fight for you.
+prereqs:
+  abilities: [ entangling_vines ]
+  total_level: 12

@@ -20,4 +20,5 @@ active:
   short_description: |
     Turns the caster into a ferocious werewolf.
 prereqs:
-  total_level: 1
+  abilities: [ enlarge ]
+  total_level: 6

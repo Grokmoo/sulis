@@ -19,5 +19,3 @@ active:
     range: Personal
   short_description: |
     Grants a magical damage melee attack.
-prereqs:
-  total_level: 1

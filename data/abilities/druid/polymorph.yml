@@ -1,0 +1,22 @@
+id: polymorph
+name: "Polymorph"
+icon: abilities/polymorph
+description: |
+  Your target must succeed at a Will check or be forcefully polymorphed into a chicken.  They retain bonuses from most equipment while in this form but suffer major penalties to many stats, and cannot attack or use abilities.
+active:
+  script: "polymorph"
+  group: "Druid"
+  ap: 3000
+  duration:
+    Rounds: 3
+  cooldown: 8
+  ai:
+    priority: 10
+    kind: Debuff
+    group: Single
+    range: Short
+  short_description: |
+    Turns an opponent into a chicken.
+prereqs:
+  abilities: [ tree_shape, beast_shape ]
+  total_level: 12

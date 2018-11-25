@@ -1,0 +1,22 @@
+id: hail_storm
+name: "Hail Storm"
+icon: abilities/hail_storm
+description: |
+  A storm of massive, razor sharp hail stones appears in the target area, dealing heavy damage to all creatures in the area for several rounds.
+active:
+  script: "hail_storm"
+  group: Druid
+  ap: 2000
+  duration:
+    Rounds: 3
+  cooldown: 5
+  ai:
+    priority: 10
+    kind: Damage
+    group: Multiple
+    range: Visible
+  short_description: |
+    A storm of hail bombards your enemies.
+prereqs:
+  abilities: [ lightning_bolt ]
+  total_level: 9

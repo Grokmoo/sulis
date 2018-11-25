@@ -36,6 +36,7 @@ groups:
       rat0: [10, 36]
       bat0: [12, 36]
       lizard0: [14, 36]
+      chicken0: [40, 42]
   4by4:
     size: [4, 4]
     areas:
@@ -69,9 +70,15 @@ groups:
       treeman: [59, 31]
       
       slime_cube: [42, 35]
+      
+      cow0: [42, 42]
+      llama0: [46, 42]
   3by3:
     size: [3, 3]
     areas:
+      pig0: [50, 42]
+      sheep0: [53, 42]
+    
       selected3by3: [30, 36]
       slime1: [16, 36]
       slime2: [19, 36]

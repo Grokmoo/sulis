@@ -17,3 +17,5 @@ active:
     range: Visible
   short_description: |
     Do major electricity damage to a small area.
+prereqs:
+  total_level: 3

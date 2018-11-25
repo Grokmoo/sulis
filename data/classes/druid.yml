@@ -30,11 +30,12 @@ starting_abilities:
   - weapon_bow
   - weapon_spear
   - weapon_small_sword
+  - summon_animal
 upgrades:
   1:
     ability_choices: [ ]
     group_uses_per_encounter:
-      - [ Druid, 2 ]
+      - [ Druid, 1 ]
   2:
     ability_choices: [ druid ]
     group_uses_per_encounter:

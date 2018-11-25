@@ -17,3 +17,6 @@ active:
     range: Visible
   short_description: |
     Movement is hampered in a large area nearby.
+prereqs:
+  abilities: [ summon_animal ]
+  total_level: 3

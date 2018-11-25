@@ -34,6 +34,8 @@ groups:
       summon_wind_elemental: [8, 2]
       summon_plant_elemental: [9, 2]
       absorb_energy: [10, 2]
+      hail_storm: [11, 2]
+      polymorph: [12, 2]
       
       heal: [0, 3]
       shock: [1, 3]

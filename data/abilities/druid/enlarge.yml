@@ -17,5 +17,3 @@ active:
     range: Short
   short_description: |
     Increases size of one ally.
-prereqs:
-  total_level: 1

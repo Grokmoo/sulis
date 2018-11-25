@@ -17,3 +17,6 @@ active:
     range: Personal
   short_description: |
     A single selected damage type heals instead of harms you.
+prereqs:
+  abilities: [ resist_elements ]
+  total_level: 9

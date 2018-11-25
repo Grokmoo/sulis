@@ -17,3 +17,6 @@ active:
     range: Personal
   short_description: |
     Gain resistance to elemental damage types.
+prereqs:
+  abilities: [ spirit_defense ]
+  total_level: 6

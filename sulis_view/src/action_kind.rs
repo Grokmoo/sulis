@@ -20,7 +20,7 @@ use std::rc::Rc;
 use sulis_core::ui::{animation_state, Widget};
 use sulis_core::util::Point;
 use sulis_module::{Faction, Module, ObjectSize, area::ToKind};
-use sulis_state::{MOVE_TO_THRESHOLD, EntityState, GameState, ScriptCallback};
+use sulis_state::{MOVE_TO_THRESHOLD, EntityState, GameState, ScriptCallback, AreaState};
 use {dialog_window, RootView};
 
 pub fn get_action(x: i32, y: i32) -> Box<ActionKind> {
@@ -344,23 +344,31 @@ struct AttackAction {
     target: Rc<RefCell<EntityState>>,
 }
 
+fn get_attack_target(area_state: &AreaState, x: i32, y: i32) -> Option<Rc<RefCell<EntityState>>> {
+    match area_state.get_entity_at(x, y) {
+        None => None,
+        Some(ref entity) => {
+            if entity.borrow().actor.hp() <= 0 { return None; }
+            if entity.borrow().is_party_member() { return None; }
+            if entity.borrow().actor.faction() != Faction::Hostile { return None; }
+            Some(Rc::clone(entity))
+        }
+    }
+}
+
 impl AttackAction {
     fn create_if_valid(x: i32, y: i32) -> Option<Box<ActionKind>> {
         let area_state = GameState::area_state();
         let area_state = area_state.borrow();
-        let target = match area_state.get_entity_at(x, y) {
+        let target = match get_attack_target(&area_state, x, y) {
             None => return None,
-            Some(ref entity) => {
-                if entity.borrow().actor.hp() <= 0 { return None; }
-                if entity.borrow().is_party_member() { return None; }
-                if entity.borrow().actor.faction() != Faction::Hostile { return None; }
-                Rc::clone(entity)
-            }
+            Some(target) => target,
         };
         let pc = match GameState::selected().first() {
             None => return None,
             Some(pc) => Rc::clone(pc),
         };
+
         if pc.borrow().can_attack(&target, &area_state) {
             Some(Box::new(AttackAction { pc, target }))
         } else {
@@ -479,14 +487,28 @@ fn entities_to_ignore() -> Vec<usize> {
 
 impl MoveAction {
     fn new_if_valid(x: f32, y: f32, dist: Option<f32>) -> Option<MoveAction> {
-        let selected = GameState::selected();
+        let area_state = GameState::area_state();
+        let area_state = area_state.borrow();
 
-        if selected.is_empty() { return None; }
+        let pc = match GameState::selected().first() {
+            None => return None,
+            Some(pc) => Rc::clone(pc),
+        };
 
         let dist = match dist {
             None => MOVE_TO_THRESHOLD,
             Some(dist) => dist,
         };
+
+        if let Some(target) = get_attack_target(&area_state, x as i32, y as i32) {
+            if pc.borrow().can_attack(&target, &area_state) {
+                // if we can already reach the target with our weapon, don't
+                // move further towards them
+                return None;
+            }
+        }
+
+        let selected = GameState::selected();
 
         if !GameState::can_move_towards_point(&selected[0], entities_to_ignore(), x, y, dist) {
             return None;

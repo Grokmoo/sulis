@@ -21,10 +21,35 @@ use std::cell::RefCell;
 use sulis_state::{ChangeListener, EntityState, GameState};
 use sulis_core::io::event::ClickKind;
 use sulis_core::ui::{Widget, WidgetKind};
-use sulis_module::Module;
-use sulis_widgets::{Label};
+use sulis_module::{Module, OnTrigger};
+use sulis_widgets::{ProgressBar};
+
+use RootView;
 
 pub const NAME: &str = "ap_bar";
+
+pub fn check_end_turn(widget: &Rc<RefCell<Widget>>) {
+    let mut end_turn = false;
+    {
+        let mgr = GameState::turn_manager();
+        let mgr = mgr.borrow();
+        if let Some(entity) = mgr.current() {
+            let entity = entity.borrow();
+            if entity.is_party_member() &&
+                entity.actor.ap() < entity.actor.get_move_ap_cost(1) &&
+                !entity.actor.has_ap_to_attack() {
+
+                end_turn = true;
+            }
+        }
+    }
+
+    if end_turn {
+        let root = Widget::get_root(&widget);
+        let view = Widget::downcast_kind_mut::<RootView>(&root);
+        view.end_turn();
+    }
+}
 
 pub struct ApBar {
     entity: Rc<RefCell<EntityState>>,
@@ -57,10 +82,19 @@ impl WidgetKind for ApBar {
     }
 
     fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>>  {
-        widget.borrow_mut().state.set_visible(GameState::is_current(&self.entity));
+        let visible = GameState::is_current(&self.entity);
 
         let mut entity = self.entity.borrow_mut();
-        entity.actor.listeners.add(ChangeListener::invalidate(NAME, widget));
+
+        widget.borrow_mut().state.set_visible(visible);
+
+        let widget_ref = Rc::clone(widget);
+        entity.actor.listeners.add(ChangeListener::new(NAME, Box::new(move |_| {
+            widget_ref.borrow_mut().invalidate_children();
+            let cb = OnTrigger::CheckEndTurn;
+            let pc = GameState::player();
+            GameState::add_ui_callback(vec![cb], &pc, &pc);
+        })));
 
         let widget_ref = Rc::clone(widget);
         GameState::add_party_listener(ChangeListener::new(NAME, Box::new(move |entity| {
@@ -75,15 +109,25 @@ impl WidgetKind for ApBar {
 
         let rules = Module::rules();
         let ap_per_ball = rules.display_ap;
-        let cur_ap = entity.actor.ap();
-        let active_balls = cur_ap / ap_per_ball;
         let total_balls = rules.max_ap / ap_per_ball;
 
         let mut children = Vec::new();
-        for i in 0..total_balls {
-            let ball = Widget::with_theme(Label::empty(), "ball");
-            ball.borrow_mut().state.set_active(i < active_balls);
-            children.push(ball);
+        let mut ap_left = entity.actor.ap();
+        for _ in 0..total_balls {
+            let frac;
+            if ap_left > ap_per_ball {
+                frac = 1.0;
+                ap_left -= ap_per_ball;
+            } else if ap_left == 0 {
+                frac = 0.0;
+            } else {
+                frac = ap_left as f32 / ap_per_ball as f32;
+                ap_left = 0;
+            }
+
+            let ball = ProgressBar::new(frac);
+            let widget = Widget::with_theme(ball, "ball");
+            children.push(widget);
         }
 
         children

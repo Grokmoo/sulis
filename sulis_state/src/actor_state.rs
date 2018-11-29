@@ -407,7 +407,7 @@ impl ActorState {
         self.can_reach(dist)
     }
 
-    pub(crate) fn has_ap_to_attack(&self) -> bool {
+    pub fn has_ap_to_attack(&self) -> bool {
         self.p_stats.ap() >= self.stats.attack_cost as u32
     }
 

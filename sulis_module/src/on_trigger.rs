@@ -95,4 +95,5 @@ pub enum OnTrigger {
     ShowConfirm(DialogData),
     ShowMenu(MenuData),
     FadeOutIn,
+    CheckEndTurn,
 }

@@ -21,7 +21,7 @@ use std::cell::RefCell;
 use sulis_core::resource::ResourceSet;
 use sulis_core::image::Image;
 use sulis_core::ui::{LineRenderer, Widget, WidgetKind};
-use sulis_core::io::{GraphicsRenderer};
+use sulis_core::io::{GraphicsRenderer, DrawList};
 use sulis_core::util::Point;
 
 use Label;
@@ -84,7 +84,28 @@ impl WidgetKind for ProgressBar {
                 let y = widget.state.inner_top() as f32;
                 let w = widget.state.inner_width() as f32 * self.fraction;
                 let h = widget.state.inner_height() as f32;
-                bar.draw(renderer, &widget.state.animation_state, x, y, w, h, millis);
+
+                let mut draw_list = DrawList::empty_sprite();
+                bar.append_to_draw_list(&mut draw_list, &widget.state.animation_state,
+                                        x, y, w, h, millis);
+
+                // draw only the fractional part for images consisting of only
+                // a single quad
+                if draw_list.quads.len() == 6 {
+                    // info!("Drawlist for prog bar initial: {:#?}", draw_list);
+                    let tcx_min = draw_list.quads[1].tex_coords[0];
+                    let tcx_max = draw_list.quads[2].tex_coords[0];
+
+                    let new_x_max = tcx_min + (tcx_max - tcx_min) * self.fraction;
+
+                    draw_list.quads[2].tex_coords[0] = new_x_max;
+                    draw_list.quads[3].tex_coords[0] = new_x_max;
+                    draw_list.quads[5].tex_coords[0] = new_x_max;
+
+                    // info!("Drawlist for prog bar mod: {:#?}", draw_list);
+                }
+
+                renderer.draw(draw_list);
             }
         }
 

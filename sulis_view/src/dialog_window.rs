@@ -28,7 +28,7 @@ use sulis_state::{EntityState, ChangeListener, GameState, ItemState,
     script::{entity_with_id, CallbackData, FuncKind}};
 
 use {character_window, CutsceneWindow, RootView, GameOverWindow, LoadingScreen,
-    window_fade, WindowFade, ConfirmationWindow, ScriptMenu};
+    window_fade, WindowFade, ConfirmationWindow, ScriptMenu, ap_bar};
 
 pub const NAME: &str = "dialog_window";
 
@@ -286,6 +286,9 @@ pub fn activate(widget: &Rc<RefCell<Widget>>, on_select: &Vec<OnTrigger>,
     use sulis_module::OnTrigger::*;
     for trigger in on_select.iter() {
         match trigger {
+            CheckEndTurn => {
+                ap_bar::check_end_turn(widget);
+            }
             PlayerAbility(ref ability_id) => {
                 let ability = match Module::ability(ability_id) {
                     None => {

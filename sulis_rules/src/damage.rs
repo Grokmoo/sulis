@@ -201,7 +201,6 @@ pub enum DamageKind {
     Cold,
     Electrical,
     Fire,
-    Sonic,
     Raw,
 }
 
@@ -209,8 +208,8 @@ use DamageKind::*;
 
 // This array MUST be in the same order as the ordering on the DamageKind enum
 // This is top to bottom declaration order for derived.
-const DAMAGE_KINDS: [DamageKind; 9] = [Slashing, Piercing, Crushing, Acid, Cold,
-    Electrical, Fire, Sonic, Raw];
+const DAMAGE_KINDS: [DamageKind; 8] = [Slashing, Piercing, Crushing, Acid, Cold,
+    Electrical, Fire, Raw];
 
 impl DamageKind {
     pub fn iter() -> Iter<'static, DamageKind> {
@@ -227,8 +226,7 @@ impl DamageKind {
             &Cold => 4,
             &Electrical => 5,
             &Fire => 6,
-            &Sonic => 7,
-            &Raw => 8,
+            &Raw => 7,
         }
     }
 
@@ -241,7 +239,6 @@ impl DamageKind {
             "Cold" => DamageKind::Cold,
             "Electrical" => DamageKind::Electrical,
             "Fire" => DamageKind::Fire,
-            "Sonic" => DamageKind::Sonic,
             "Raw" => DamageKind::Raw,
             _ => {
                 warn!("Unable to parse '{}' as damage kind", s);
@@ -259,7 +256,6 @@ impl DamageKind {
             &Cold => "Cold",
             &Electrical => "Electrical",
             &Fire => "Fire",
-            &Sonic => "Sonic",
             &Raw => "Raw",
         }
     }

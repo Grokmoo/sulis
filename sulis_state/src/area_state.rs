@@ -25,6 +25,7 @@ use rand::{self, Rng};
 
 use sulis_core::util::{self, invalid_data_error, Point};
 use sulis_core::config::Config;
+use sulis_rules::{HitFlags, HitKind, DamageKind};
 use sulis_module::{Actor, Area, LootList, Module, ObjectSize, prop};
 use sulis_module::area::{EncounterData, PropData, Transition, TriggerKind};
 use script::AreaTargeter;
@@ -1196,6 +1197,60 @@ impl AreaState {
 
         self.props.push(None);
         self.props.len() - 1
+    }
+
+    pub fn add_damage_feedback_text(&mut self, target: &Rc<RefCell<EntityState>>,
+                                    hit_kind: HitKind, hit_flags: HitFlags,
+                                    damage: Vec<(DamageKind, u32)>) {
+
+        let mut add_space = false;
+        let mut output = String::new();
+        if hit_flags.sneak_attack {
+            output.push_str("Sneak Attack!");
+            add_space = true;
+        } else if hit_flags.flanking {
+            output.push_str("Flanking!");
+            add_space = true;
+        }
+
+        if hit_flags.concealment {
+            if add_space { output.push_str(" "); }
+            output.push_str("Concealment!");
+            add_space = true;
+        }
+
+        if add_space { output.push_str(" "); }
+        output.push_str(match hit_kind {
+            HitKind::Miss => "Miss",
+            HitKind::Graze => "Graze",
+            HitKind::Hit => "Hit",
+            HitKind::Crit => "Crit",
+        });
+        add_space = true;
+
+        if damage.is_empty() {
+            let color = match hit_kind {
+                HitKind::Miss => area_feedback_text::ColorKind::Miss,
+                HitKind::Graze | HitKind::Hit | HitKind::Crit => {
+                    area_feedback_text::ColorKind::Hit
+                }
+            };
+
+            self.add_feedback_text(output, target, color);
+        } else {
+            for (kind, amount) in damage {
+                if add_space { output.push_str(" "); }
+
+                let color = area_feedback_text::ColorKind::Damage { kind };
+                output.push_str(&format!("{}", amount));
+
+                self.add_feedback_text(output.clone(), target, color);
+
+                // only display the flags and hit info on the first entry
+                add_space = false;
+                output.clear();
+            }
+        }
     }
 
     pub fn add_feedback_text(&mut self, text: String, target: &Rc<RefCell<EntityState>>,

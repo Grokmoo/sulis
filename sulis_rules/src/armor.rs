@@ -20,14 +20,14 @@ use DamageKind;
 #[serde(deny_unknown_fields)]
 pub struct Armor {
     base: u32,
-    kinds: [u32; 8],
+    kinds: [u32; 7],
 }
 
 impl Default for Armor {
     fn default() -> Armor {
         Armor {
             base: 0,
-            kinds: [0; 8],
+            kinds: [0; 7],
         }
     }
 }

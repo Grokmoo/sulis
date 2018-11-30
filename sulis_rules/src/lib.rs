@@ -145,6 +145,23 @@ pub enum ItemKind {
 }
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
+pub struct HitFlags {
+    pub flanking: bool,
+    pub sneak_attack: bool,
+    pub concealment: bool,
+}
+
+impl Default for HitFlags {
+    fn default() -> Self {
+        HitFlags {
+            flanking: false,
+            sneak_attack: false,
+            concealment: false,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
 pub enum HitKind {
     Miss,
     Graze,

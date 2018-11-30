@@ -20,8 +20,9 @@ use std::time::Instant;
 use sulis_core::config::Config;
 use sulis_core::resource::{ResourceSet, Font};
 use sulis_core::io::GraphicsRenderer;
-use sulis_core::ui::{color, Color, LineRenderer};
+use sulis_core::ui::{Color, LineRenderer};
 use sulis_core::util::{self, Point};
+use sulis_rules::DamageKind;
 
 pub struct Params {
     pub font: Rc<Font>,
@@ -30,17 +31,21 @@ pub struct Params {
     pub miss_color: Color,
     pub hit_color: Color,
     pub heal_color: Color,
+    pub damage_colors: [Color; 8],
 }
 
 impl Default for Params {
     fn default() -> Params {
+        use sulis_core::ui::color::*;
         Params {
             font: ResourceSet::get_default_font(),
             scale: 1.0,
-            info_color: color::LIGHT_GRAY,
-            miss_color: color::LIGHT_GRAY,
-            hit_color: color::RED,
-            heal_color: color::BLUE,
+            info_color: LIGHT_GRAY,
+            miss_color: LIGHT_GRAY,
+            hit_color: RED,
+            heal_color: BLUE,
+            damage_colors: [LIGHT_GRAY, LIGHT_GRAY, LIGHT_GRAY, GREEN,
+                CYAN, BLUE, YELLOW, PURPLE],
         }
     }
 }
@@ -51,6 +56,7 @@ pub enum ColorKind {
     Miss,
     Hit,
     Heal,
+    Damage { kind: DamageKind },
 }
 
 pub struct AreaFeedbackText {
@@ -125,6 +131,10 @@ impl AreaFeedbackText {
             ColorKind::Miss => params.miss_color,
             ColorKind::Hit => params.hit_color,
             ColorKind::Heal => params.heal_color,
+            ColorKind::Damage { kind } => {
+                let index = kind.index();
+                params.damage_colors[index]
+            }
         };
         color.a = self.alpha;
 

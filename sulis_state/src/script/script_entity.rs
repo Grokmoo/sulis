@@ -27,7 +27,7 @@ use rlua::{self, Lua, UserData, UserDataMethods};
 use sulis_core::util::{invalid_data_error, ExtInt};
 use sulis_core::config::Config;
 use sulis_core::resource::ResourceSet;
-use sulis_rules::{Attribute, AttackKind, DamageKind, Attack, HitKind};
+use sulis_rules::{Attribute, AttackKind, DamageKind, Attack, HitKind, HitFlags};
 use sulis_module::{ImageLayer, Faction, Actor, InventoryBuilder};
 use {ActorState, EntityState, GameState, Location, area_feedback_text::ColorKind};
 use {ai, animation::{self}, script::*, MOVE_TO_THRESHOLD};
@@ -801,12 +801,25 @@ impl UserData for ScriptEntity {
         methods.add_method("weapon_attack", |_, entity, target: ScriptEntity| {
             let target = target.try_unwrap()?;
             let parent = entity.try_unwrap()?;
-            let (hit_kind, damage, text, color) = ActorState::weapon_attack(&parent, &target);
-
             let area_state = GameState::area_state();
-            area_state.borrow_mut().add_feedback_text(text, &target, color);
+            let result = ActorState::weapon_attack(&parent, &target);
 
-            let hit_kind = ScriptHitKind::new(hit_kind, damage);
+            let mut total_hit_kind = HitKind::Miss;
+            let mut total_damage = Vec::new();
+            for entry in result {
+                let (hit_kind, hit_flags, damage) = entry;
+
+                if hit_kind > total_hit_kind {
+                    total_hit_kind = hit_kind;
+                }
+
+                total_damage.append(&mut damage.clone());
+
+                area_state.borrow_mut().add_damage_feedback_text(&target, hit_kind,
+                                                                 hit_flags, damage);
+            }
+
+            let hit_kind = ScriptHitKind::new(total_hit_kind, total_damage);
             Ok(hit_kind)
         });
 
@@ -850,7 +863,7 @@ impl UserData for ScriptEntity {
                 let mut attack = Attack::special(&parent.borrow().actor.stats,
                     min_damage, max_damage, ap, damage_kind, attack_kind.clone());
 
-                ActorState::attack(att, def, &mut attack)
+                vec![ActorState::attack(att, def, &mut attack)]
             }));
 
             GameState::add_animation(anim);
@@ -876,12 +889,12 @@ impl UserData for ScriptEntity {
             let mut attack = Attack::special(&parent.borrow().actor.stats,
                 min_damage, max_damage, ap, damage_kind, attack_kind);
 
-            let (hit_kind, damage, text, color) =
+            let (hit_kind, hit_flags, damage) =
                 ActorState::attack(&parent, &target, &mut attack);
 
             let area_state = GameState::area_state();
-            area_state.borrow_mut().add_feedback_text(text, &target, color);
-
+            area_state.borrow_mut().add_damage_feedback_text(&target, hit_kind,
+                                                             hit_flags, damage.clone());
             let hit_kind = ScriptHitKind::new(hit_kind, damage);
             Ok(hit_kind)
         });
@@ -907,20 +920,13 @@ impl UserData for ScriptEntity {
                 attack.roll_damage(&parent.armor, &parent.resistance, 1.0)
             };
 
-            let (text, color) = if !damage.is_empty() {
-                let mut total = 0;
-                for (_, amount) in damage.iter() {
-                    total += amount;
-                }
-
-                EntityState::remove_hp(&parent, &attacker, HitKind::Hit, damage);
-                (format!("{}", total), ColorKind::Hit)
-            } else {
-                ("0".to_string(), ColorKind::Miss)
-            };
+            if !damage.is_empty() {
+                EntityState::remove_hp(&parent, &attacker, HitKind::Hit, damage.clone());
+            }
 
             let area_state = GameState::area_state();
-            area_state.borrow_mut().add_feedback_text(text, &parent, color);
+            area_state.borrow_mut().add_damage_feedback_text(&parent, HitKind::Hit,
+                                                             HitFlags::default(), damage);
             Ok(())
         });
 

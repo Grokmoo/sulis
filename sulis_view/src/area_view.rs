@@ -30,6 +30,7 @@ use sulis_core::util::{self, Point};
 use sulis_core::config::Config;
 use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::extern_image::ImageBuffer;
+use sulis_rules::DamageKind;
 use sulis_widgets::Label;
 use sulis_module::{area::{Layer, Tile}};
 use sulis_state::{AreaDrawable, AreaState, EntityState, EntityTextureCache, GameState};
@@ -561,6 +562,13 @@ impl WidgetKind for AreaView {
                 theme.get_custom_or_default("feedback_text_hit_color", color::RED);
             self.feedback_text_params.heal_color =
                 theme.get_custom_or_default("feedback_text_heal_color", color::BLUE);
+
+            for kind in DamageKind::iter() {
+                let id = format!("feedback_text_damage_{}_color", kind.to_str().to_lowercase());
+                let index = kind.index();
+                self.feedback_text_params.damage_colors[index] =
+                    theme.get_custom_or_default(&id, color::LIGHT_GRAY);
+            }
         }
 
         if self.targeter_tile.is_none() {

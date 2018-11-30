@@ -17,9 +17,9 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_rules::{HitKind, DamageKind};
+use sulis_rules::{HitKind, HitFlags, DamageKind};
 use {script::ScriptEntitySet, ScriptCallback};
-use {animation::Anim, EntityState, GameState, area_feedback_text::ColorKind};
+use {animation::Anim, EntityState, GameState};
 
 pub (in animation) fn update(attacker: &Rc<RefCell<EntityState>>, model: &mut MeleeAttackAnimModel, frac: f32) {
     if !model.has_attacked && frac > 0.5 {
@@ -41,19 +41,22 @@ pub (in animation) fn update(attacker: &Rc<RefCell<EntityState>>, model: &mut Me
         attacker_cbs.iter().for_each(|cb| cb.before_attack(&cb_def_targets));
         defender_cbs.iter().for_each(|cb| cb.before_defense(&cb_att_targets));
 
-        let (hit_kind, damage, text, color) = (model.attack_func)(attacker, &model.defender);
-
-        area_state.borrow_mut().add_feedback_text(text, &model.defender, color);
         model.has_attacked = true;
+        let result = (model.attack_func)(attacker, &model.defender);
+        for entry in result {
+            let (hit_kind, hit_flags, damage) = entry;
+            area_state.borrow_mut().add_damage_feedback_text(&model.defender, hit_kind,
+                                                             hit_flags, damage.clone());
 
-        for cb in model.callbacks.iter() {
-            cb.after_attack(&cb_def_targets, hit_kind, damage.clone());
+            for cb in model.callbacks.iter() {
+                cb.after_attack(&cb_def_targets, hit_kind, damage.clone());
+            }
+
+            attacker_cbs.iter()
+                .for_each(|cb| cb.after_attack(&cb_att_targets, hit_kind, damage.clone()));
+            defender_cbs.iter()
+                .for_each(|cb| cb.after_defense(&cb_def_targets, hit_kind, damage.clone()));
         }
-
-        attacker_cbs.iter().for_each(|cb|
-            cb.after_attack(&cb_att_targets, hit_kind, damage.clone()));
-        defender_cbs.iter().for_each(|cb|
-            cb.after_defense(&cb_def_targets, hit_kind, damage.clone()));
     }
 
     let mut attacker = attacker.borrow_mut();
@@ -80,7 +83,7 @@ pub (in animation) struct MeleeAttackAnimModel {
     vector: (f32, f32),
     pub (in animation) has_attacked: bool,
     attack_func: Box<Fn(&Rc<RefCell<EntityState>>, &Rc<RefCell<EntityState>>) ->
-        (HitKind, Vec<(DamageKind, u32)>, String, ColorKind)>,
+        Vec<(HitKind, HitFlags, Vec<(DamageKind, u32)>)>>,
 }
 
 pub fn new(attacker: &Rc<RefCell<EntityState>>,
@@ -88,7 +91,7 @@ pub fn new(attacker: &Rc<RefCell<EntityState>>,
            duration_millis: u32,
            callbacks: Vec<Box<ScriptCallback>>,
            attack_func: Box<Fn(&Rc<RefCell<EntityState>>, &Rc<RefCell<EntityState>>) ->
-                (HitKind, Vec<(DamageKind, u32)>, String, ColorKind)>) -> Anim {
+                Vec<(HitKind, HitFlags, Vec<(DamageKind, u32)>)>>) -> Anim {
 
     let x = defender.borrow().location.x + defender.borrow().size.width / 2
         - attacker.borrow().location.x - attacker.borrow().size.width / 2;

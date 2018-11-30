@@ -45,19 +45,22 @@ pub (in animation) fn update(attacker: &Rc<RefCell<EntityState>>, model: &mut Ra
             attacker_cbs.iter().for_each(|cb| cb.before_attack(&cb_att_targets));
             defender_cbs.iter().for_each(|cb| cb.before_defense(&cb_def_targets));
 
-            let (hit_kind, damage, text, color) =
-                ActorState::weapon_attack(attacker, &model.defender);
-            area_state.borrow_mut().add_feedback_text(text, &model.defender, color);
             model.has_attacked = true;
+            let result = ActorState::weapon_attack(attacker, &model.defender);
+            for entry in result {
+                let (hit_kind, hit_flags, damage) = entry;
+                area_state.borrow_mut().add_damage_feedback_text(&model.defender, hit_kind,
+                                                                 hit_flags, damage.clone());
 
-            for cb in model.callbacks.iter() {
-                cb.after_attack(&cb_def_targets, hit_kind, damage.clone());
+                for cb in model.callbacks.iter() {
+                    cb.after_attack(&cb_def_targets, hit_kind, damage.clone());
+                }
+
+                attacker_cbs.iter()
+                    .for_each(|cb| cb.after_attack(&cb_att_targets, hit_kind, damage.clone()));
+                defender_cbs.iter()
+                    .for_each(|cb| cb.after_defense(&cb_def_targets, hit_kind, damage.clone()));
             }
-
-            attacker_cbs.iter().for_each(|cb|
-                cb.after_attack(&cb_att_targets, hit_kind, damage.clone()));
-            defender_cbs.iter().for_each(|cb|
-                cb.after_defense(&cb_def_targets, hit_kind, damage.clone()));
         }
     } else {
         model.cur_pos = (frac * model.vec.0 + model.start_pos.0,

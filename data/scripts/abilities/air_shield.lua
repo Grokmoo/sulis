@@ -3,7 +3,6 @@ function on_activate(parent, ability)
   
   stats = parent:stats()
   effect:add_armor_of_kind(7 + stats.caster_level / 2, "Electrical")
-  effect:add_armor_of_kind(7 + stats.caster_level / 2, "Sonic")
 
   cb = ability:create_callback(parent)
   cb:set_before_defense_fn("before_defense")

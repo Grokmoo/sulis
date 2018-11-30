@@ -70,9 +70,35 @@ impl WidgetKind for PortraitView {
         vec![portrait, hp_bar, level_up]
     }
 
+    fn on_mouse_enter(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {
+        self.super_on_mouse_enter(widget);
+
+        let area_state = GameState::area_state();
+        let targeter = area_state.borrow_mut().targeter();
+
+        if let Some(targeter) = targeter {
+            let x = self.entity.borrow().location.x;
+            let y = self.entity.borrow().location.y;
+
+            let mut targeter = targeter.borrow_mut();
+            targeter.on_mouse_move(x, y);
+        }
+        true
+    }
+
     fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: event::ClickKind) -> bool {
         self.super_on_mouse_release(widget, kind);
-        GameState::set_selected_party_member(Rc::clone(&self.entity));
+
+        let area_state = GameState::area_state();
+        let targeter = area_state.borrow_mut().targeter();
+
+        if let Some(targeter) = targeter {
+            let mut targeter = targeter.borrow_mut();
+            targeter.on_activate();
+        } else {
+            GameState::set_selected_party_member(Rc::clone(&self.entity));
+        }
+
         true
     }
 }

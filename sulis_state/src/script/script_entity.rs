@@ -925,7 +925,7 @@ impl UserData for ScriptEntity {
             }
 
             let area_state = GameState::area_state();
-            area_state.borrow_mut().add_damage_feedback_text(&parent, HitKind::Hit,
+            area_state.borrow_mut().add_damage_feedback_text(&parent, HitKind::Auto,
                                                              HitFlags::default(), damage);
             Ok(())
         });

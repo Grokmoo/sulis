@@ -167,6 +167,7 @@ pub enum HitKind {
     Graze,
     Hit,
     Crit,
+    Auto,
 }
 
 impl FromStr for HitKind {
@@ -178,6 +179,7 @@ impl FromStr for HitKind {
             "graze" => HitKind::Graze,
             "hit" => HitKind::Hit,
             "crit" => HitKind::Crit,
+            "auto" => HitKind::Auto,
             _ => {
                 return Err(Error::new(ErrorKind::InvalidInput,
                                       format!("Unable to parse HitKind from '{}'", s)));

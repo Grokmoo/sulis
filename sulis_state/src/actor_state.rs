@@ -574,6 +574,7 @@ impl ActorState {
                     parent_stats.hit_multiplier + attack.bonuses.hit_multiplier,
                 HitKind::Crit =>
                     parent_stats.crit_multiplier + attack.bonuses.crit_multiplier,
+                HitKind::Auto => panic!(),
             };
             (hit_kind, damage_multiplier)
         };

@@ -1225,13 +1225,14 @@ impl AreaState {
             HitKind::Graze => "Graze",
             HitKind::Hit => "Hit",
             HitKind::Crit => "Crit",
+            HitKind::Auto => "",
         });
         add_space = true;
 
         if damage.is_empty() {
             let color = match hit_kind {
                 HitKind::Miss => area_feedback_text::ColorKind::Miss,
-                HitKind::Graze | HitKind::Hit | HitKind::Crit => {
+                HitKind::Graze | HitKind::Hit | HitKind::Crit | HitKind::Auto => {
                     area_feedback_text::ColorKind::Hit
                 }
             };

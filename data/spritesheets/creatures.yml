@@ -265,6 +265,10 @@ groups:
       glaive: [18, 21]
       sabre: [21, 21]
       scimitar: [24, 21]
+      hair12: [27, 21]
+      hair13: [30, 21]
+      hair14: [33, 21]
+      hair15: [36, 21]
       
       sickle_off: [12, 24]
       halberd_off: [15, 24]

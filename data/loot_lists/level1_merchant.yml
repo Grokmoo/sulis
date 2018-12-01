@@ -183,6 +183,11 @@ probability_entries:
     adjective1:
       none: 5
       worn: 5
+  druid_staff:
+    weight: 40
+    adjective1:
+      none: 5
+      worn: 5
   shortbow:
     weight: 50
     adjective1:

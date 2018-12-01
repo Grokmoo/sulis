@@ -111,7 +111,8 @@ kits:
       quick:
         Usable1: { id: potion_healing }
         Usable2: { id: potion_mind }
-      pc_starting_coins: 600
+        AltHeldMain: { id: druid_staff }
+      pc_starting_coins: 500
     description: |
       A druid at home in melee combat.  They typically employ a variety of spells to bolster themselves and allies around them.
   - name: Summoner
@@ -124,15 +125,15 @@ kits:
       wis: 16
     starting_inventory:
       equipped:
-        HeldMain: { id: shortbow }
+        HeldMain: { id: druid_staff }
         Feet: { id: boots_leather }
         Torso: { id: torso_leather }
         Legs: { id: legs_pants }
       quick:
         Usable1: { id: potion_healing }
         Usable2: { id: potion_mind }
-        AltHeldMain: { id: sickle }
-      pc_starting_coins: 500
+        AltHeldMain: { id: shortbow }
+      pc_starting_coins: 400
     description: |
       A druid who fights from afar, using summoned creatures and spells to support their party.
 

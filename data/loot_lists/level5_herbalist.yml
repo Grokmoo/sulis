@@ -2,6 +2,8 @@ id: level5_herbalist
 generate: {}
 weighted_entries: {}
 probability_entries:
+  druid_staff:
+    weight: 50
   poison_vial:
     weight: 50
     quantity: [3, 5]

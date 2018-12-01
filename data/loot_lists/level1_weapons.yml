@@ -78,6 +78,11 @@ weighted_entries:
     adjective1:
       none: 5
       worn: 5
+  druid_staff:
+    weight: 10
+    adjective1:
+      none: 5
+      worn: 5
   shortbow:
     weight: 5
     adjective1:

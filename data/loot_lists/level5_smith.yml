@@ -154,6 +154,11 @@ probability_entries:
     adjective1:
       none: 7
       fine: 3
+  druid_staff:
+    weight: 80
+    adjective1:
+      none: 7
+      fine: 3
   shortbow:
     weight: 50
     adjective1:

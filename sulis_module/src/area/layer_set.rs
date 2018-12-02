@@ -198,6 +198,11 @@ impl LayerSet {
     }
 
     #[inline]
+    pub fn is_passable_index(&self, index: usize) -> bool {
+        self.passable[index]
+    }
+
+    #[inline]
     pub fn is_visible(&self, x: i32, y: i32) -> bool {
         self.visible[(x + y * self.width) as usize]
     }

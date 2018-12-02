@@ -112,21 +112,85 @@ impl Shape {
         }
     }
 
-    pub fn get_points(&self, pos: Point, shift: f32)-> Vec<Point> {
-        match self {
-            &Shape::Single => Vec::new(),
-            &Shape::Circle { radius } => self.get_points_circle(radius, pos, shift),
+    pub fn get_points(&self, pos: Point, shift: f32, allow_impass: bool, allow_invis: bool,
+                      impass_blocks: bool, invis_blocks: bool)-> Vec<Point> {
+        let area_state = GameState::area_state();
+        let area_state = area_state.borrow();
+
+        let (origin_x, origin_y) = match &self {
+            Shape::Single | Shape::Circle { .. }  => (pos.x, pos.y),
+            Shape::Cone { origin_x, origin_y, .. } => (*origin_x, *origin_y),
+            Shape::Line { origin_x, origin_y, .. } => (*origin_x, *origin_y),
+            Shape::LineSegment { origin_x, origin_y, .. } => (*origin_x, *origin_y),
+            Shape::ObjectSize { ref size } => {
+                let offset = get_cursor_offset_from_size(size);
+                (pos.x + offset.x, pos.y + offset.y)
+            }
+        };
+        let src_elev = area_state.area.layer_set.elevation(origin_x, origin_y);
+
+        let mut points = match self {
+            &Shape::Single =>
+                Vec::new(),
+            &Shape::Circle { radius } =>
+                self.get_points_circle(radius, pos, shift, &area_state),
             &Shape::Line { ref size, origin_x, origin_y, length } =>
-                self.get_points_line(Point::new(origin_x, origin_y), pos, length, size),
+                self.get_points_line(Point::new(origin_x, origin_y),
+                    pos, length, size, &area_state, src_elev, impass_blocks, invis_blocks),
             &Shape::LineSegment { ref size, origin_x, origin_y } =>
-                self.get_points_line_segment(Point::new(origin_x, origin_y), pos, size),
-            &Shape::ObjectSize { ref size } => self.get_points_object_size(pos, size),
+                self.get_points_line_segment(Point::new(origin_x, origin_y),
+                    pos, size, &area_state, src_elev, impass_blocks, invis_blocks),
+            &Shape::ObjectSize { ref size } =>
+                self.get_points_object_size(pos, size, &area_state),
             &Shape::Cone { origin_x, origin_y, radius, angle } =>
-                self.get_points_cone(Point::new(origin_x, origin_y), pos, radius, angle),
+                self.get_points_cone(Point::new(origin_x, origin_y), pos,
+                    radius, angle, &area_state),
+        };
+
+        if !allow_impass {
+            points.retain(|p| {
+                if !area_state.area.coords_valid(p.x, p.y) { return false; }
+
+                let index = (p.x + p.y * area_state.area.width) as usize;
+                if !area_state.prop_pass_grid[index] { return false; }
+
+                area_state.area.layer_set.is_passable_index(index)
+            });
         }
+
+        if !allow_invis {
+            points.retain(|p| {
+                if !area_state.area.coords_valid(p.x, p.y) { return false; }
+
+                let index = (p.x + p.y * area_state.area.width) as usize;
+                if !area_state.prop_vis_grid[index] { return false; }
+
+                if area_state.area.layer_set.elevation_index(index) > src_elev { return false; }
+
+                area_state.area.layer_set.is_visible_index(index)
+            });
+        }
+
+        if impass_blocks || invis_blocks {
+            let start = Point::new(origin_x, origin_y);
+            let size = "1by1"; // TODO don't hardcode this
+            match &self {
+                Shape::ObjectSize { .. } | Shape::Cone { .. } | Shape::Circle { .. } => {
+                    points.retain(|p| {
+                        let (_, concat) = self.get_points_line_internal(start, *p, size,
+                            &area_state, src_elev, impass_blocks, invis_blocks);
+                        !concat
+                    });
+                },
+                Shape::Single | Shape::Line { .. } | Shape::LineSegment { .. }  => (),
+            }
+        }
+
+        points
     }
 
-    pub fn get_effected_entities(&self, points: &Vec<Point>, target: Option<&Rc<RefCell<EntityState>>>,
+    pub fn get_effected_entities(&self, points: &Vec<Point>,
+                                 target: Option<&Rc<RefCell<EntityState>>>,
                                  effectable: &Vec<Rc<RefCell<EntityState>>>)
         -> Vec<Rc<RefCell<EntityState>>> {
         match self {
@@ -168,15 +232,20 @@ impl Shape {
        effected
     }
 
-    fn get_points_line_segment(&self, start: Point, end: Point, size: &str) -> Vec<Point> {
-        let (points, concat) = self.get_points_line_internal(start, end, size);
+    fn get_points_line_segment(&self, start: Point, end: Point, size: &str,
+                               area_state: &AreaState, src_elev: u8,
+                               impass_blocks: bool, invis_blocks: bool) -> Vec<Point> {
+        let (points, concat) = self.get_points_line_internal(start, end, size, area_state,
+            src_elev, impass_blocks, invis_blocks);
 
         if concat { return Vec::new(); }
 
         points
     }
 
-    fn get_points_line(&self, start: Point, pos: Point, len: i32, size: &str) -> Vec<Point> {
+    fn get_points_line(&self, start: Point, pos: Point, len: i32, size: &str,
+                       area_state: &AreaState, src_elev: u8, impass_blocks: bool,
+                       invis_blocks: bool) -> Vec<Point> {
         let dir_x = pos.x - start.x;
         let dir_y = pos.y - start.y;
 
@@ -190,15 +259,15 @@ impl Shape {
         let end_y = (start.y as f32 + dir_y * len as f32).round();
 
         let (points, _) =
-            self.get_points_line_internal(start, Point::new(end_x as i32, end_y as i32), size);
+            self.get_points_line_internal(start, Point::new(end_x as i32, end_y as i32),
+                size, area_state, src_elev, impass_blocks, invis_blocks);
 
         points
     }
 
     fn get_points_line_internal(&self, start: Point, end: Point,
-                                size: &str) -> (Vec<Point>, bool) {
-        let area_state = GameState::area_state();
-        let area_state = area_state.borrow();
+                                size: &str, area_state: &AreaState, src_elev: u8,
+                                impass_blocks: bool, invis_blocks: bool) -> (Vec<Point>, bool) {
         let size = match Module::object_size(size) {
             None => {
                 warn!("Invalid object size in Targeter: '{}'", size);
@@ -209,21 +278,25 @@ impl Shape {
         let (mut points, concat) = if (end.y - start.y).abs() < (end.x - start.x).abs() {
             if start.x > end.x {
                 let mut p = cast_low(&size, end, start);
-                let concated = self.concat_from_end(&area_state, &size, &mut p);
+                let concated = self.concat_from_end(&area_state, &size, &mut p,
+                                                    impass_blocks, invis_blocks, src_elev);
                 (p, concated)
             } else {
                 let mut p = cast_low(&size, start, end);
-                let concated = self.concat_from_start(&area_state, &size, &mut p);
+                let concated = self.concat_from_start(&area_state, &size, &mut p,
+                                                      impass_blocks, invis_blocks, src_elev);
                 (p, concated)
             }
         } else {
             if start.y > end.y {
                 let mut p = cast_high(&size, end, start);
-                let concated = self.concat_from_end(&area_state, &size, &mut p);
+                let concated = self.concat_from_end(&area_state, &size, &mut p,
+                                                    impass_blocks, invis_blocks, src_elev);
                 (p, concated)
             } else {
                 let mut p = cast_high(&size, start, end);
-                let concated = self.concat_from_start(&area_state, &size, &mut p);
+                let concated = self.concat_from_start(&area_state, &size, &mut p,
+                                                      impass_blocks, invis_blocks, src_elev);
                 (p, concated)
             }
         };
@@ -233,15 +306,36 @@ impl Shape {
         (points, concat)
     }
 
-    fn concat_from_start(&self, area: &AreaState, size: &ObjectSize,
-                         points: &mut Vec<Point>) -> bool {
+    fn check_concat_break(&self, area: &AreaState, size: &ObjectSize, x: i32, y: i32,
+                          impass_blocks: bool, invis_blocks: bool, src_elev: u8) -> bool {
+        let p_index = (x + y * area.area.width) as usize;
+
+        if impass_blocks {
+            if !area.is_terrain_passable(&size.id, x, y) { return true; }
+
+            if !area.prop_pass_grid[p_index] { return true; }
+        }
+
+        if invis_blocks {
+            if !area.prop_vis_grid[p_index] { return true; }
+
+            if area.area.layer_set.elevation_index(p_index) > src_elev { return true; }
+
+            if !area.area.layer_set.is_visible_index(p_index) { return true; }
+        }
+
+        false
+    }
+
+    fn concat_from_start(&self, area: &AreaState, size: &ObjectSize, points: &mut Vec<Point>,
+                         impass_blocks: bool, invis_blocks: bool, src_elev: u8) -> bool {
         let mut index = 0;
         loop {
             if index == points.len() { return false; }
 
-            if !area.is_terrain_passable(&size.id, points[index].x, points[index].y) {
-                break;
-            }
+            if self.check_concat_break(area, size, points[index].x, points[index].y,
+                                       impass_blocks, invis_blocks, src_elev) { break; }
+
             index += 1;
         }
 
@@ -251,13 +345,12 @@ impl Shape {
         true
     }
 
-    fn concat_from_end(&self, area: &AreaState, size: &ObjectSize,
-                       points: &mut Vec<Point>) -> bool {
+    fn concat_from_end(&self, area: &AreaState, size: &ObjectSize, points: &mut Vec<Point>,
+                       impass_blocks: bool, invis_blocks: bool, src_elev: u8) -> bool {
         let mut index = points.len() - 1;
         loop {
-            if !area.is_terrain_passable(&size.id, points[index].x, points[index].y) {
-                break;
-            }
+            if self.check_concat_break(area, size, points[index].x, points[index].y,
+                                       impass_blocks, invis_blocks, src_elev) { break; }
 
             if index == 0 { return false; }
             index -= 1;
@@ -270,7 +363,7 @@ impl Shape {
     }
 
     fn get_points_cone(&self, origin: Point, to: Point, radius: f32,
-                       angular_size: f32) -> Vec<Point> {
+                       angular_size: f32, _area_state: &AreaState) -> Vec<Point> {
         let mut points = Vec::new();
 
         let angle = ((to.y - origin.y) as f32).atan2((to.x - origin.x) as f32);
@@ -292,7 +385,8 @@ impl Shape {
         points
     }
 
-    fn get_points_circle(&self, radius: f32, pos: Point, shift: f32) -> Vec<Point> {
+    fn get_points_circle(&self, radius: f32, pos: Point, shift: f32,
+                         _area_state: &AreaState) -> Vec<Point> {
         let mut points = Vec::new();
 
         let r = (radius + 1.0).ceil() as i32;
@@ -306,7 +400,8 @@ impl Shape {
         points
     }
 
-    fn get_points_object_size(&self, pos: Point, size: &str) -> Vec<Point> {
+    fn get_points_object_size(&self, pos: Point, size: &str,
+                              _area_state: &AreaState) -> Vec<Point> {
         let size = match Module::object_size(size) {
             None => {
                 warn!("Invalid object size in Targeter: '{}'", size);
@@ -336,6 +431,10 @@ pub struct AreaTargeter {
     show_mouseover: bool,
     free_select: Option<f32>,
     free_select_must_be_passable: Option<Rc<ObjectSize>>,
+    allow_affected_points_impass: bool,
+    allow_affected_points_invis: bool,
+    impass_blocks_affected_points: bool,
+    invis_blocks_affected_points: bool,
 
     free_select_valid: bool,
     cur_target: Option<Rc<RefCell<EntityState>>>,
@@ -408,6 +507,10 @@ impl AreaTargeter {
             cancel: false,
             free_select: data.free_select,
             free_select_must_be_passable,
+            allow_affected_points_impass: data.allow_affected_points_impass,
+            allow_affected_points_invis: data.allow_affected_points_invis,
+            impass_blocks_affected_points: data.impass_blocks_affected_points,
+            invis_blocks_affected_points: data.invis_blocks_affected_points,
             free_select_valid: false,
             show_mouseover: data.show_mouseover,
             cur_target: None,
@@ -442,14 +545,19 @@ impl AreaTargeter {
             let center_y = target.borrow().center_y() - self.cursor_offset.y;
             let shift = if target.borrow().size.width % 2 == 0 { 0.5 } else { 0.0 };
 
-            self.cur_points = self.shape.get_points(Point::new(center_x, center_y), shift);
+            self.cur_points = self.shape.get_points(Point::new(center_x, center_y),
+                shift, self.allow_affected_points_impass, self.allow_affected_points_invis,
+                self.impass_blocks_affected_points, self.invis_blocks_affected_points);
             self.cur_effected = self.shape.get_effected_entities(&self.cur_points,
                                                                  Some(&target), &self.effectable);
         } else {
             if !self.free_select_valid { return; }
 
             let pos = self.cursor_pos - self.cursor_offset;
-            self.cur_points = self.shape.get_points(pos, 0.0);
+            self.cur_points = self.shape.get_points(pos, 0.0, self.allow_affected_points_impass,
+                                                    self.allow_affected_points_invis,
+                                                    self.impass_blocks_affected_points,
+                                                    self.invis_blocks_affected_points);
             self.cur_effected = self.shape.get_effected_entities(&self.cur_points, None,
                                                                  &self.effectable);
 

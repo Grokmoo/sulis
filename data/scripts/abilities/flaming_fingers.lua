@@ -7,6 +7,7 @@ function on_activate(parent, ability)
   targeter:set_free_select(max_dist * 2)
   targeter:set_shape_cone(parent:center_x(), parent:center_y(), max_dist, math.pi / 3) 
   targeter:add_all_effectable(targets)
+  targeter:invis_blocks_affected_points(true)
   targeter:activate()
 end
 

@@ -69,6 +69,20 @@ pub enum Kind {
 /// Only applies when the targeter is in free select mode.  Requires any point that is selected
 /// in free select to be passable for the size specified by `size_id`
 ///
+/// # `impass_blocks_affected_points(blocks: bool)`
+/// Sets whether or not an impassable tile blocks further affected points in a line extending
+/// from the targeter center outwards.  Defaults to false
+///
+/// # `invis_blocks_affected_points(blocks: bool)`
+/// Sets whether a visibility blocking tile blocks further affected points in a line extending
+/// from the targeter center outwards.  Defaults to false
+///
+/// # `allow_affected_points_impass(allow: bool)`
+/// Sets whether or not to allow affected points to be terrain impassable.  defaults to true
+///
+/// # `allow_affected_points_invis(allow: bool)`
+/// Sets whether or not to allow affected points to prevent visibility.  defaults to false
+///
 /// # `add_all_effectable(targets: ScriptEntitySet)`
 /// Adds all entities in the set as targets that can potentially be affected by this targeter.
 /// Only affectable entities within the area of effect of the chosen shape will end up as
@@ -111,6 +125,10 @@ pub struct TargeterData {
     pub show_mouseover: bool,
     pub free_select: Option<f32>,
     pub free_select_must_be_passable: Option<String>,
+    pub allow_affected_points_impass: bool,
+    pub impass_blocks_affected_points: bool,
+    pub invis_blocks_affected_points: bool,
+    pub allow_affected_points_invis: bool,
     pub on_target_select_func: String,
     pub on_target_select_custom_target: Option<usize>,
 }
@@ -129,6 +147,10 @@ impl TargeterData {
             free_select_must_be_passable: None,
             on_target_select_func: "on_target_select".to_string(),
             on_target_select_custom_target: None,
+            allow_affected_points_impass: true,
+            impass_blocks_affected_points: false,
+            invis_blocks_affected_points: false,
+            allow_affected_points_invis: false,
         }
     }
 
@@ -170,6 +192,27 @@ impl UserData for TargeterData {
             targeter.free_select = Some(val);
             Ok(())
         });
+
+        methods.add_method_mut("impass_blocks_affected_points", |_, targeter, blocks: bool| {
+            targeter.impass_blocks_affected_points = blocks;
+            Ok(())
+        });
+
+        methods.add_method_mut("invis_blocks_affected_points", |_, targeter, blocks: bool| {
+            targeter.invis_blocks_affected_points = blocks;
+            Ok(())
+        });
+
+        methods.add_method_mut("allow_affected_points_impass", |_, targeter, allow: bool| {
+            targeter.allow_affected_points_impass = allow;
+            Ok(())
+        });
+
+        methods.add_method_mut("allow_affected_points_invis", |_, targeter, allow: bool| {
+            targeter.allow_affected_points_invis = allow;
+            Ok(())
+        });
+
         methods.add_method_mut("set_free_select_must_be_passable", |_, targeter, val: String| {
             match Module::object_size(&val) {
                 None => {

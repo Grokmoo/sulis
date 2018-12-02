@@ -447,7 +447,7 @@ uniform_sets:
     layer: terrain_border
     size: [2, 2]
     sprite_prefix: "tileset/"
-    impass: [[0, 0], [1, 0], [0, 1]]
+    impass: [[0, 0], [1, 0], [1, 1]]
     invis: []
     tiles: [
       water_light_inner_edge_sw, water_med_inner_edge_sw, water_dark_inner_edge_sw, water_poison_inner_edge_sw, water_ice_inner_edge_sw,

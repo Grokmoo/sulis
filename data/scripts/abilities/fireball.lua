@@ -9,6 +9,7 @@ function on_activate(parent, ability)
   -- targeter:set_free_select_must_be_passable("1by1")
   -- targeter:set_shape_circle(fireball_radius)
   targeter:set_shape_object_size("9by9round")
+  targeter:invis_blocks_affected_points(true)
   targeter:add_all_effectable(targets)
   targeter:activate()
 end

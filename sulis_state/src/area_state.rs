@@ -65,7 +65,7 @@ pub struct AreaState {
     transition_grid: Vec<Option<usize>>,
     trigger_grid: Vec<Option<usize>>,
 
-    prop_vis_grid: Vec<bool>,
+    pub(crate) prop_vis_grid: Vec<bool>,
     pub(crate) prop_pass_grid: Vec<bool>,
 
     pc_vis_redraw: PCVisRedraw,

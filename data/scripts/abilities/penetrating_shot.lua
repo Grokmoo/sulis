@@ -1,4 +1,4 @@
-line_len = 30.0
+line_len = 20.0
 
 function on_activate(parent, ability)
   stats = parent:stats()
@@ -13,6 +13,7 @@ function on_activate(parent, ability)
   targeter:set_free_select(line_len)
   targeter:set_shape_line("1by1", parent:x(), parent:y(), line_len)
   targeter:add_all_effectable(targets)
+  targeter:invis_blocks_affected_points(true)
   targeter:activate()
 end
 

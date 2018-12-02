@@ -235,6 +235,8 @@ impl Shape {
     fn get_points_line_segment(&self, start: Point, end: Point, size: &str,
                                area_state: &AreaState, src_elev: u8,
                                impass_blocks: bool, invis_blocks: bool) -> Vec<Point> {
+        trace!("Computing line seg points from {},{} to {},{}", start.x, start.y, end.x, end.y);
+
         let (points, concat) = self.get_points_line_internal(start, end, size, area_state,
             src_elev, impass_blocks, invis_blocks);
 
@@ -246,6 +248,10 @@ impl Shape {
     fn get_points_line(&self, start: Point, pos: Point, len: i32, size: &str,
                        area_state: &AreaState, src_elev: u8, impass_blocks: bool,
                        invis_blocks: bool) -> Vec<Point> {
+        if start.x == pos.x && start.y == pos.y { return Vec::new(); }
+
+        trace!("Compute line end from start {},{}, len {}, pos {},{}",
+               start.x, start.y, len, pos.x, pos.y);
         let dir_x = pos.x - start.x;
         let dir_y = pos.y - start.y;
 
@@ -257,6 +263,11 @@ impl Shape {
 
         let end_x = (start.x as f32 + dir_x * len as f32).round();
         let end_y = (start.y as f32 + dir_y * len as f32).round();
+
+        assert!(end_x.is_finite());
+        assert!(end_y.is_finite());
+
+        trace!("Computing line points from {},{} to {},{}", start.x, start.y, end_x, end_y);
 
         let (points, _) =
             self.get_points_line_internal(start, Point::new(end_x as i32, end_y as i32),

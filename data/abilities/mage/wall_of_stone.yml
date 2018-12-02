@@ -1,0 +1,21 @@
+id: wall_of_stone
+name: "Wall of Stone"
+icon: abilities/wall_of_stone
+description: |
+  You summon forth a wall made of solid stone, up to 8 tiles long.  The wall blocks movement but does not restrict the passage of most spells and abilities.  The wall disappears after 3 rounds, or individual sections can be destroyed with attacks.
+active:
+  script: "wall_of_stone"
+  group: "3rd Circle"
+  ap: 2000
+  duration:
+    Rounds: 3
+  cooldown: 5
+  ai:
+    priority: 10
+    kind: Special
+    group: Single
+    range: Personal
+  short_description: |
+    Create a wall to temporarily block enemies.
+prereqs:
+  total_level: 7

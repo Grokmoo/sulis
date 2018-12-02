@@ -52,3 +52,5 @@ abilities:
     position: [5, 9.05]
   - id: acid_spores
     position: [7, 8.45]
+  - id: wall_of_stone
+    position: [4, 8.9]

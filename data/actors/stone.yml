@@ -1,0 +1,15 @@
+id: stone
+name: Stone
+faction: Neutral
+images: {}
+race: stone
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
+levels:
+  fighter: 1
+abilities: []

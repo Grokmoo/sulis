@@ -512,7 +512,8 @@ fn get_targeter() -> Result<Rc<RefCell<AreaTargeter>>> {
 /// coordinates `x`, `y` in the current area.  If successful, returns the
 /// ScriptEntity that was just spawned.  If not, returns the invalid ScriptEntity.
 /// Optionally, you may set the faction of the spawned actor to the specified value.
-/// Must be "Hostile", "Neutral", or "Friendly".
+/// Must be "Hostile", "Neutral", or "Friendly".  This method can fail if the
+/// ID or coordinates are invalid, or if the location is not passable for the entity
 ///
 /// # `spawn_encounter_at(x: Int, y: Int)`
 /// Causes the encounter in the current area at `x`, `y` to spawn entities based
@@ -823,7 +824,16 @@ impl UserData for ScriptInterface {
                 }, Some(actor) => actor,
             };
 
+            let size = Rc::clone(&actor.race.size);
+
             let area_state = GameState::area_state();
+
+            if !area_state.borrow().is_passable_size(&size, x, y) {
+                info!("Unable to spawn actor '{}' at {},{}: not passable",
+                      id, x, y);
+                return Ok(ScriptEntity::invalid())
+            }
+
             let location = Location::new(x, y, &area_state.borrow().area);
             let result = match area_state.borrow_mut()
                 .add_actor(actor, location, None, false, None) {

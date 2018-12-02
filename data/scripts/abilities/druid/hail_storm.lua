@@ -5,6 +5,7 @@ function on_activate(parent, ability)
   targeter:set_free_select(16.0)
   targeter:set_shape_circle(5.0)
   targeter:add_all_effectable(targets)
+  targeter:allow_affected_points_impass(false)
   targeter:activate()
 end
 

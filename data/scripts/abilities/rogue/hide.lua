@@ -55,6 +55,13 @@ function on_deactivate(parent)
   game:check_ai_activation(parent)
 end
 
+-- this function is used by external scripts that deactivate the hidden state
+function deactivate(parent, ability)
+  if not ability:is_active_mode(parent) then return end
+  game:say_line("Spotted!", parent)
+  ability:deactivate(parent)
+end
+
 function after_attack(parent, ability)
   game:say_line("Spotted!", parent)
   ability:deactivate(parent)
@@ -66,7 +73,7 @@ function check_spotted(parent, ability)
   parent_concealment = stats.concealment
   parent_hide_level = 15 + parent:ability_level(ability) * 20 + stats.level * 2
   break_even_distance = 5
-  if parent:get_ability("hide_in_plain_sight") ~= nil then
+  if parent:has_ability("hide_in_plain_sight") then
     break_even_distance = 0
   end
   

@@ -998,6 +998,13 @@ impl UserData for ScriptEntity {
                 }),
                 Some(ability) => ability,
             };
+            if ability.active.is_none() {
+                return Err(rlua::Error::FromLuaConversionError {
+                    from: "String",
+                    to: "ScriptAbility",
+                    message: Some(format!("Ability '{}' is not active", id)),
+                });
+            }
             let entity = entity.try_unwrap()?;
             if !entity.borrow().actor.actor.has_ability(&ability) {
                 return Ok(None);

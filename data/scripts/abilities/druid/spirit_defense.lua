@@ -7,6 +7,7 @@ function on_activate(parent, ability)
   targeter:add_selectable(parent)
   targeter:set_shape_circle(radius)
   targeter:add_all_effectable(targets)
+  targeter:invis_blocks_affected_points(true)
   targeter:activate()
 end
 

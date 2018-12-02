@@ -11,6 +11,7 @@ function on_activate(parent, ability)
   end
   
   targeter:add_all_effectable(targets)
+  targeter:invis_blocks_affected_points(true)
   targeter:activate()
 end
 
@@ -43,7 +44,7 @@ function create_explosion(parent, ability, targets)
   
   position = targets:selected_point()
   
-  gen = target:create_anim("burst", 0.15)
+  gen = parent:create_anim("burst", 0.15)
   gen:set_position(gen:param(position.x - 4.0), gen:param(position.y - 4.0))
   gen:set_particle_size_dist(gen:fixed_dist(8.0), gen:fixed_dist(8.0))
   
@@ -62,6 +63,7 @@ function attack_target(parent, ability, targets)
   target = targets:first()
   if not target:is_valid() then return end
   
+  stats = parent:stats()
   target = targets:first()
   
   hit = parent:special_attack(target, "Reflex", "Ranged")

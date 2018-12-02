@@ -7,6 +7,7 @@ function on_activate(parent, ability)
   targeter:set_free_select(max_dist * 2)
   targeter:set_shape_cone(parent:center_x(), parent:center_y(), max_dist, math.pi / 4) 
   targeter:add_all_effectable(targets)
+  targeter:invis_blocks_affected_points(true)
   targeter:activate()
 end
 
@@ -78,6 +79,7 @@ function push_target(parent, ability, targets)
   dest_x = target_x
   dest_y = target_y
   
+  total_dist = 0
   -- go along the direction, checking until we hit an impassable spot
   for dist = 1, pushback_dist do
     local test_x = math.floor(target_x + x_norm * dist + 0.5)

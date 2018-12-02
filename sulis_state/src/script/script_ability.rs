@@ -240,7 +240,10 @@ pub struct ScriptAbility {
 impl ScriptAbility {
     pub fn from(ability: &Rc<Ability>) -> ScriptAbility {
         let (duration, ai_data) = match ability.active {
-            None => unreachable!(),
+            None => {
+                error!("Attempted to get ScriptAbility for non-active '{}'", ability.id);
+                unreachable!();
+            },
             Some(ref active) => {
                 let duration = match active.duration {
                     ability::Duration::Rounds(rounds) => rounds,

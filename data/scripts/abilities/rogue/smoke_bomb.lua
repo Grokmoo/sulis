@@ -8,6 +8,7 @@ function on_activate(parent, ability)
   -- targeter:set_free_select_must_be_passable("1by1")
   targeter:set_shape_circle(smoke_radius)
   targeter:add_all_effectable(targets)
+  targeter:invis_blocks_affected_points(true)
   targeter:activate()
 end
 

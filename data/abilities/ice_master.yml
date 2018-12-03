@@ -13,7 +13,7 @@ bonuses:
     when:
       AttackWithDamageKind: Cold
   - kind:
-      crit_multiplier: 0.225
+      crit_multiplier: 0.3
     when:
       AttackWithDamageKind: Cold
 prereqs:

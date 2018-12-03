@@ -915,7 +915,7 @@ children:
           ][?0_melee_accuracy;s=5;x=0|Accuracy: #0_melee_accuracy#
           ][?0_ranged_accuracy;s=5;x=0|Accuracy: #0_ranged_accuracy#
           ][?0_spell_accuracy;s=5;x=0|Accuracy: #0_spell_accuracy#
-          ][?0_crit_threshold;s=5;x=0|Crit Threshold: #0_crit_threshold#
+          ][?0_crit_chance;s=5;x=0|Crit Chance: #0_crit_chance#%
           ][?0_hit_threshold;s=5;x=0|Hit Threshold: #0_hit_threshold#
           ][?0_graze_threshold;s=5;x=0|Graze Threshold: #0_graze_threshold#
           ][?0_crit_multiplier;s=5;x=0|Crit Multiplier: #0_crit_multiplier#
@@ -928,7 +928,7 @@ children:
           ][?1_melee_accuracy;s=5;x=0|Accuracy: #1_melee_accuracy#
           ][?1_ranged_accuracy;s=5;x=0|Accuracy: #1_ranged_accuracy#
           ][?1_spell_accuracy;s=5;x=0|Accuracy: #1_spell_accuracy#
-          ][?1_crit_threshold;s=5;x=35|Crit Threshold: #1_crit_threshold#
+          ][?1_crit_chance;s=5;x=35|Crit Chance: #1_crit_chance#%
           ][?1_hit_threshold;s=5;x=35|Hit Threshold: #1_hit_threshold#
           ][?1_graze_threshold;s=5;x=35|Graze Threshold: #1_graze_threshold#
           ][?1_crit_multiplier;s=5;x=35|Crit Multiplier: #1_crit_multiplier#
@@ -956,7 +956,7 @@ children:
           [x=60;s=5|Concealment Ignore[x=90|#concealment_ignore#]]
           
           [y=100;x=0|Graze][x=20|Hit][x=40|Crit]
-          [x=0|#graze_threshold# / x#graze_multiplier#][x=20|#hit_threshold# / x#hit_multiplier#][x=40|#crit_threshold# /  x#crit_multiplier#]
+          [x=0|#graze_threshold# / x#graze_multiplier#][x=20|#hit_threshold# / x#hit_multiplier#][x=40|#crit_chance#% /  x#crit_multiplier#]
 
           [y=110;s=6|Resistances ][s=5|[?resistance_slashing|(Slashing: #resistance_slashing#%) ][?resistance_piercing|(Piercing: #resistance_piercing#%) ][?resistance_crushing|(Crushing: #resistance_crushing#%) ][?resistance_acid|(Acid: #resistance_acid#%) ][?resistance_cold|(Cold: #resistance_cold#%) ][?resistance_electrical|(Electrical: #resistance_electrical#%) ][?resistance_fire|(Fire: #resistance_fire#%) ]]
           
@@ -1292,7 +1292,7 @@ children:
       ][?attack_melee_accuracy|Melee Accuracy: #attack_melee_accuracy#
       ][?attack_ranged_accuracy|Ranged Accuracy: #attack_ranged_accuracy#
       ][?attack_spell_accuracy|Spell Accuracy: #attack_spell_accuracy#
-      ][?attack_crit_threshold|Crit Threshold: #attack_crit_threshold#
+      ][?attack_crit_chance|Crit Chance: #attack_crit_chance#%
       ][?attack_hit_threshold|Hit Threshold: #attack_hit_threshold#
       ][?attack_graze_threshold|Graze Threshold: #attack_graze_threshold#
       ][?attack_crit_multiplier|Crit Multiplier: #attack_crit_multiplier#
@@ -1313,7 +1313,7 @@ children:
       ][?will|Will: #will#
       ][?concealment|Concealment: #concealment#
       ][?concealment_ignore|Ignore Concealment: #concealment_ignore#
-      ][?crit_threshold|Crit Threshold: #crit_threshold#
+      ][?crit_chance|Crit Chance: #crit_chance#%
       ][?hit_threshold|Hit Threshold: #hit_threshold#
       ][?graze_threshold|Graze Threshold: #graze_threshold#
       ][?crit_multiplier|Crit Multiplier: #crit_multiplier#

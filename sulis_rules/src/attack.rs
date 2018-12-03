@@ -29,7 +29,7 @@ fn add_bonus(bonuses: &mut AttackBonuses, bonus_damage: &mut Vec<Damage>, bonus_
         BonusKind::MeleeAccuracy(amount) => bonuses.melee_accuracy += amount,
         BonusKind::RangedAccuracy(amount) => bonuses.ranged_accuracy += amount,
         BonusKind::SpellAccuracy(amount) => bonuses.spell_accuracy += amount,
-        BonusKind::CritThreshold(amount) => bonuses.crit_threshold -= amount,
+        BonusKind::CritChance(amount) => bonuses.crit_chance -= amount,
         BonusKind::HitThreshold(amount) => bonuses.hit_threshold -= amount,
         BonusKind::GrazeThreshold(amount) => bonuses.graze_threshold -= amount,
         BonusKind::CritMultiplier(amount) => bonuses.crit_multiplier += amount,

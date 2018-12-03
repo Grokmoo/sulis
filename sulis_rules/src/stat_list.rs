@@ -58,7 +58,7 @@ pub struct StatList {
     pub will: i32,
     pub concealment: i32,
     pub concealment_ignore: i32,
-    pub crit_threshold: i32,
+    pub crit_chance: i32,
     pub hit_threshold: i32,
     pub graze_threshold: i32,
     pub graze_multiplier: f32,
@@ -107,7 +107,7 @@ impl StatList {
             will: 0,
             concealment: 0,
             concealment_ignore: 0,
-            crit_threshold: 0,
+            crit_chance: 0,
             hit_threshold: 0,
             graze_threshold: 0,
             graze_multiplier: 0.0,
@@ -166,8 +166,14 @@ impl StatList {
 
         let result = roll + accuracy - defense;
 
-        if !crit_immunity && result > self.crit_threshold + bonuses.crit_threshold {
-            HitKind::Crit
+        if !crit_immunity && (100 - roll) < self.crit_chance + bonuses.crit_chance {
+            let roll2 = rand::thread_rng().gen_range(1, 101);
+            let result2 = roll2 + accuracy - defense;
+            if result2 > self.graze_threshold + bonuses.graze_threshold {
+                HitKind::Crit
+            } else {
+                HitKind::Hit
+            }
         } else if result > self.hit_threshold + bonuses.hit_threshold {
             HitKind::Hit
         } else if result > self.graze_threshold + bonuses.graze_threshold {
@@ -273,7 +279,7 @@ impl StatList {
             Will(amount) => self.will += amount * times_i32,
             Concealment(amount) => self.concealment += amount * times_i32,
             ConcealmentIgnore(amount) => self.concealment_ignore += amount * times_i32,
-            CritThreshold(amount) => self.crit_threshold -= amount * times_i32,
+            CritChance(amount) => self.crit_chance += amount * times_i32,
             HitThreshold(amount) => self.hit_threshold -= amount * times_i32,
             GrazeThreshold(amount) => self.graze_threshold -= amount * times_i32,
             CritMultiplier(amount) => self.crit_multiplier += amount * times_f32,
@@ -380,11 +386,19 @@ impl StatList {
         if is_melee {
             self.graze_multiplier += 0.02 * str_bonus as f32;
             self.hit_multiplier += 0.04 * str_bonus as f32;
-            self.crit_multiplier += 0.06 * str_bonus as f32;
+            self.crit_multiplier += 0.08 * str_bonus as f32;
         }
 
-        if self.crit_threshold < self.hit_threshold {
-            self.hit_threshold = self.crit_threshold;
+        if self.hit_multiplier < self.graze_multiplier {
+            self.hit_multiplier = self.graze_multiplier;
+        }
+
+        if self.crit_multiplier < self.hit_multiplier {
+            self.crit_multiplier = self.hit_multiplier;
+        }
+
+        if self.crit_chance < 0 {
+            self.crit_chance = 0;
         }
 
         if self.hit_threshold < self.graze_threshold {

@@ -1206,7 +1206,7 @@ fn create_stats_table<'a>(lua: &'a Lua, parent: &ScriptEntity, _args: ()) -> Res
 
     stats.set("concealment", src.concealment)?;
     stats.set("concealment_ignore", src.concealment_ignore)?;
-    stats.set("crit_threshold", src.crit_threshold)?;
+    stats.set("crit_chance", src.crit_chance)?;
     stats.set("graze_threshold", src.graze_threshold)?;
     stats.set("hit_threshold", src.hit_threshold)?;
     stats.set("graze_multiplier", src.graze_multiplier)?;

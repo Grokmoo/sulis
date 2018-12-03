@@ -25,7 +25,7 @@ equippable:
       range: 30.0
       projectile: creatures/projectile_bow
     bonuses:
-      crit_multiplier: 0.5
+      crit_multiplier: 1.0
 image:
   HeldOff:
     creatures/shortbow

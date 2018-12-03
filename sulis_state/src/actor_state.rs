@@ -908,7 +908,7 @@ impl ActorState {
         self.stats.finalize(attacks_list, equipped_armor, weapon_style,
                             multiplier, rules.base_attribute, is_threatened);
         self.stats.flanking_angle += rules.base_flanking_angle;
-        self.stats.crit_threshold += rules.crit_percentile as i32;
+        self.stats.crit_chance += rules.crit_chance as i32;
         self.stats.hit_threshold += rules.hit_percentile as i32;
         self.stats.graze_threshold += rules.graze_percentile as i32;
         self.stats.graze_multiplier += rules.graze_damage_multiplier;

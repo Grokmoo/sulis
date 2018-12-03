@@ -16,10 +16,10 @@ hidden_accuracy_bonus: 20
 
 graze_percentile: 20
 hit_percentile: 55
-crit_percentile: 100
+crit_chance: 3
 
 graze_damage_multiplier: 0.5
-crit_damage_multiplier: 1.5
+crit_damage_multiplier: 1.7
 
 dual_wield_damage_multiplier: 0.75
 

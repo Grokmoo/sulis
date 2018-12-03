@@ -13,7 +13,7 @@ bonuses:
     when:
       AttackWithDamageKind: Electrical
   - kind:
-      crit_multiplier: 0.225
+      crit_multiplier: 0.3
     when:
       AttackWithDamageKind: Electrical
 prereqs:

@@ -17,4 +17,4 @@ equippable:
     kind: # Melee
       reach: 1.0
     bonuses:
-      crit_multiplier: 0.5
+      crit_multiplier: 1.0

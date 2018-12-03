@@ -18,10 +18,10 @@ upgrades:
       Critical hits you make with spears become more frequent and more damaging.
     bonuses:
       - kind:
-          crit_threshold: 10
+          crit_chance: 3
         when:
           AttackWithWeapon: Spear
       - kind:
-          crit_multiplier: 0.25
+          crit_multiplier: 0.5
         when:
           AttackWithWeapon: Spear

@@ -17,8 +17,8 @@ function on_activate(parent, ability)
   effect:add_num_bonus("defense", amount)
   effect:add_num_bonus("reflex", amount / 2)
   effect:add_num_bonus("fortitude", amount / 2)
-  effect:add_num_bonus("crit_threshold", -20)
-  effect:add_num_bonus("crit_multiplier", -0.25)
+  effect:add_num_bonus("crit_chance", -6)
+  effect:add_num_bonus("crit_multiplier", -0.5)
   effect:add_num_bonus("melee_accuracy", -10)
 
   if parent:ability_level(ability) > 1 then

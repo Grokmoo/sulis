@@ -613,7 +613,7 @@ pub fn add_attack_text_args(attack: &AttackBuilder, widget_state: &mut WidgetSta
     }
 
     let bonuses = &attack.bonuses;
-    add_if_nonzero(widget_state, "attack_crit_threshold", bonuses.crit_threshold as f32);
+    add_if_nonzero(widget_state, "attack_crit_chance", bonuses.crit_chance as f32);
     add_if_nonzero(widget_state, "attack_hit_threshold", bonuses.hit_threshold as f32);
     add_if_nonzero(widget_state, "attack_graze_threshold", bonuses.graze_threshold as f32);
     add_if_nonzero(widget_state, "attack_graze_multiplier", bonuses.graze_multiplier);
@@ -682,7 +682,7 @@ fn add_bonus(bonus: &Bonus, state: &mut WidgetState, has_accuracy: &mut bool,
         Will(amount) => add(state, "will", amount),
         Concealment(amount) => add(state, "concealment", amount),
         ConcealmentIgnore(amount) => add(state, "concealment_ignore", amount),
-        CritThreshold(amount) => add(state, "crit_threshold", amount),
+        CritChance(amount) => add(state, "crit_chance", amount),
         HitThreshold(amount) => add(state, "hit_threshold", amount),
         GrazeThreshold(amount) => add(state, "graze_threshold", amount),
         CritMultiplier(amount) => state.add_text_arg("crit_multiplier", &format!("{:.2}", amount)),

@@ -360,7 +360,7 @@ pub fn create_details_text_box(pc: &ActorState) -> Rc<RefCell<Widget>> {
             add_if_nonzero(state, index, "spell_accuracy", attack.bonuses.spell_accuracy as f32);
             add_if_nonzero(state, index, "ranged_accuracy", attack.bonuses.ranged_accuracy as f32);
             add_if_nonzero(state, index, "melee_accuracy", attack.bonuses.melee_accuracy as f32);
-            add_if_nonzero(state, index, "crit_threshold", attack.bonuses.crit_threshold as f32);
+            add_if_nonzero(state, index, "crit_chance", attack.bonuses.crit_chance as f32);
             add_if_nonzero(state, index, "hit_threshold", attack.bonuses.hit_threshold as f32);
             add_if_nonzero(state, index, "graze_threshold", attack.bonuses.graze_threshold as f32);
             add_if_nonzero(state, index, "crit_multiplier", attack.bonuses.crit_multiplier);
@@ -405,7 +405,7 @@ pub fn create_details_text_box(pc: &ActorState) -> Rc<RefCell<Widget>> {
         state.add_text_arg("will", &stats.will.to_string());
         state.add_text_arg("concealment", &stats.concealment.to_string());
         state.add_text_arg("concealment_ignore", &stats.concealment_ignore.to_string());
-        state.add_text_arg("crit_threshold", &stats.crit_threshold.to_string());
+        state.add_text_arg("crit_chance", &stats.crit_chance.to_string());
         state.add_text_arg("hit_threshold", &stats.hit_threshold.to_string());
         state.add_text_arg("graze_threshold", &stats.graze_threshold.to_string());
         state.add_text_arg("crit_multiplier", &format!("{:.2}", stats.crit_multiplier));

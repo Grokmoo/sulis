@@ -118,7 +118,7 @@ enum Kind {
 ///
 /// Bonus kinds include `armor`, `ap`, `reach`, `range`, `initiative`, `hit_points`,
 /// `melee_accuracy`, `ranged_accuracy`, `spell_accuracy`, `defense`, `fortitude`,
-/// `reflex`, `will`, `concealment`, `concealment_ignore`, `crit_threshold`,
+/// `reflex`, `will`, `concealment`, `concealment_ignore`, `crit_chance`,
 /// `hit_threshold`, `graze_threshold`, `graze_multiplier`, `hit_multiplier`,
 /// `crit_multiplier`, `movement_rate`, `attack_cost`
 ///
@@ -466,7 +466,7 @@ fn add_num_bonus(_lua: &Lua, effect: &mut ScriptEffect, (name, amount, when):
         "will" => Will(amount_int),
         "concealment" => Concealment(amount_int),
         "concealment_ignore" => ConcealmentIgnore(amount_int),
-        "crit_threshold" => CritThreshold(amount_int),
+        "crit_chance" => CritChance(amount_int),
         "hit_threshold" => HitThreshold(amount_int),
         "graze_threshold" => GrazeThreshold(amount_int),
         "graze_multiplier" => GrazeMultiplier(amount),

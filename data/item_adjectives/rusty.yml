@@ -11,4 +11,4 @@ attack_penalty_modifier: 1.1
 bonuses: []
 attack_bonuses:
   melee_accuracy: -5
-  crit_multiplier: -0.25
+  crit_multiplier: -0.5

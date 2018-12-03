@@ -44,7 +44,7 @@ pub enum BonusKind {
     Will(i32),
     Concealment(i32),
     ConcealmentIgnore(i32),
-    CritThreshold(i32),
+    CritChance(i32),
     HitThreshold(i32),
     GrazeThreshold(i32),
     CritMultiplier(f32),
@@ -84,7 +84,7 @@ pub enum Contingent {
     WeaponStyle(WeaponStyle),
 
     /// For bonuses applied to attacks, only Damage, MeleeAccuracy, RangedAccuracy,
-    /// SpellAccuracy, CritThreshold, HitThreshold,
+    /// SpellAccuracy, CritChance, HitThreshold,
     /// GrazeThreshold, CritMultiplier, HitMultiplier, and GrazeMultiplier are valid
 
     /// Bonuses that should only be applied to an attack using the given WeaponKind
@@ -205,7 +205,7 @@ fn apply_modifiers(bonus: &mut Bonus, neg: f32, pos: f32) {
         Will(val) => apply_kind_mod_i32!(Will(val): neg, pos),
         Concealment(val) => apply_kind_mod_i32!(Concealment(val): neg, pos),
         ConcealmentIgnore(val) => apply_kind_mod_i32!(ConcealmentIgnore(val): neg, pos),
-        CritThreshold(val) => apply_kind_mod_i32!(CritThreshold(val): neg, pos),
+        CritChance(val) => apply_kind_mod_i32!(CritChance(val): neg, pos),
         HitThreshold(val) => apply_kind_mod_i32!(HitThreshold(val): neg, pos),
         GrazeThreshold(val) => apply_kind_mod_i32!(GrazeThreshold(val): neg, pos),
         CritMultiplier(val) => apply_kind_mod_f32!(CritMultiplier(val): neg, pos),
@@ -341,7 +341,7 @@ fn merge_if_dup(first: &Bonus, sec: &Bonus) -> Option<Bonus> {
         Will(val) => merge_int_bonus!(Will, val, sec, when),
         Concealment(val) => merge_int_bonus!(Concealment, val, sec, when),
         ConcealmentIgnore(val) => merge_int_bonus!(ConcealmentIgnore, val, sec, when),
-        CritThreshold(val) => merge_int_bonus!(CritThreshold, val, sec, when),
+        CritChance(val) => merge_int_bonus!(CritChance, val, sec, when),
         HitThreshold(val) => merge_int_bonus!(HitThreshold, val, sec, when),
         GrazeThreshold(val) => merge_int_bonus!(GrazeThreshold, val, sec, when),
         CritMultiplier(val) => merge_int_bonus!(CritMultiplier, val, sec, when),
@@ -366,7 +366,7 @@ pub struct AttackBonuses {
     pub melee_accuracy: i32,
     pub ranged_accuracy: i32,
     pub spell_accuracy: i32,
-    pub crit_threshold: i32,
+    pub crit_chance: i32,
     pub hit_threshold: i32,
     pub graze_threshold: i32,
     pub crit_multiplier: f32,
@@ -403,7 +403,7 @@ impl AttackBonuses {
         self.melee_accuracy += other.melee_accuracy;
         self.ranged_accuracy += other.ranged_accuracy;
         self.spell_accuracy += other.spell_accuracy;
-        self.crit_threshold += other.crit_threshold;
+        self.crit_chance += other.crit_chance;
         self.hit_threshold += other.hit_threshold;
         self.graze_threshold += other.graze_threshold;
         self.crit_multiplier += other.crit_multiplier;
@@ -419,7 +419,7 @@ impl AttackBonuses {
         mod_field!(self.melee_accuracy, pos, neg);
         mod_field!(self.ranged_accuracy, pos, neg);
         mod_field!(self.spell_accuracy, pos, neg);
-        mod_field!(self.crit_threshold, pos, neg);
+        mod_field!(self.crit_chance, pos, neg);
         mod_field!(self.hit_threshold, pos, neg);
         mod_field!(self.graze_threshold, pos, neg);
         mod_field_f32!(self.crit_multiplier, pos, neg);
@@ -435,7 +435,7 @@ impl Default for AttackBonuses {
             melee_accuracy: 0,
             ranged_accuracy: 0,
             spell_accuracy: 0,
-            crit_threshold: 0,
+            crit_chance: 0,
             hit_threshold: 0,
             graze_threshold: 0,
             crit_multiplier: 0.0,

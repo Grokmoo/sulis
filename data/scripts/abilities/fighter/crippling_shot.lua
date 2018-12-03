@@ -29,7 +29,7 @@ function create_parent_penalty(parent, ability, targets)
   effect = parent:create_effect(ability:name(), 0)
   effect:add_num_bonus("graze_multiplier", -0.25)
   effect:add_num_bonus("hit_multiplier", -0.5)
-  effect:add_num_bonus("crit_multiplier", -0.75)
+  effect:add_num_bonus("crit_multiplier", -1.0)
   effect:apply()
 end
 

@@ -48,7 +48,7 @@ function apply_effect(parent, ability, targets)
   effect:add_num_bonus("melee_accuracy", amount)
   effect:add_num_bonus("ranged_accuracy", amount)
   effect:add_num_bonus("spell_accuracy", amount)
-  effect:add_num_bonus("crit_threshold", amount)
+  effect:add_num_bonus("crit_chance", amount / 3)
 
   anim = target:create_particle_generator("sparkle")
   anim:set_moves_with_parent()

@@ -32,7 +32,7 @@ pub struct Rules {
     pub base_flanking_angle: i32,
     pub graze_percentile: u32,
     pub hit_percentile: u32,
-    pub crit_percentile: u32,
+    pub crit_chance: u32,
 
     pub flanking_accuracy_bonus: i32,
     pub hidden_accuracy_bonus: i32,

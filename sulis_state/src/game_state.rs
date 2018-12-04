@@ -790,35 +790,36 @@ impl GameState {
                     }
                 }
             }
-
-            let base_location = Location::new(x, y, &state.area_state.borrow().area);
-            for entity in state.party.iter() {
-                entity.borrow_mut().clear_pc_vis();
-                let mut cur_location = base_location.clone();
-                GameState::find_transition_location(&mut cur_location, &entity.borrow().size,
-                                                    &state.area_state.borrow());
-                info!("Transitioning {} to {},{}", entity.borrow().actor.actor.name,
-                    cur_location.x, cur_location.y);
-                let index = entity.borrow().index();
-
-                match state.area_state.borrow_mut().transition_entity_to(entity, index, cur_location) {
-                    Ok(_) => (),
-                    Err(e) => {
-                        warn!("Unable to add party member");
-                        warn!("{}", e);
-                    }
-                }
-            }
-
-            state.area_state.borrow_mut().push_scroll_to_callback(Rc::clone(&state.party[0]));
-
-            for entity in mgr.borrow().entity_iter() {
-                entity.borrow_mut().clear_texture_cache();
-            }
         });
 
-        let area_state = GameState::area_state();
         let pc = GameState::player();
+        let mgr = GameState::turn_manager();
+        let area_state = GameState::area_state();
+        let base_location = Location::new(x, y, &area_state.borrow().area);
+        for entity in GameState::party() {
+            entity.borrow_mut().clear_pc_vis();
+            let mut cur_location = base_location.clone();
+            GameState::find_transition_location(&mut cur_location, &entity.borrow().size,
+            &area_state.borrow());
+            info!("Transitioning {} to {},{}", entity.borrow().actor.actor.name,
+            cur_location.x, cur_location.y);
+            let index = entity.borrow().index();
+
+            match area_state.borrow_mut().transition_entity_to(&entity, index, cur_location) {
+                Ok(_) => (),
+                Err(e) => {
+                    warn!("Unable to add party member");
+                    warn!("{}", e);
+                }
+            }
+        }
+
+        area_state.borrow_mut().push_scroll_to_callback(Rc::clone(&pc));
+
+        for entity in mgr.borrow().entity_iter() {
+            entity.borrow_mut().clear_texture_cache();
+        }
+
         let mut area_state = area_state.borrow_mut();
         area_state.update_view_visibility();
         if !area_state.on_load_fired {

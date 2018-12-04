@@ -14,7 +14,11 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::cmp::max;
+
 use rand::{self, Rng};
+
+use sulis_rules::{DamageList, Armor, DamageKind, Resistance};
 
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
@@ -63,9 +67,57 @@ pub struct Rules {
     pub item_value_display_factor: f32,
 
     pub coins_item: String,
+
+    armor_damage_reduction_cap: Vec<u32>,
 }
 
 impl Rules {
+    /// Computes the amount of damage that this damage list will apply to the given
+    /// `armor`.  Each damage component of this list is rolled randomly, with the resulting
+    /// damage then multiplied by the `multiplier`, rounded down.  The damage is then
+    /// modified by the percentage resistance, if any.  The armor against
+    /// the base damage kind of this damage is then subtracted from the damage, capped
+    /// by the armor damage reduction cap for that armor value.  The
+    /// resulting vector may be an empty vector to indicate no damage, or a vector of
+    /// one or more kinds each associated with a positive damage amount.  The damage
+    /// amount for each entry will never be zero.
+    pub fn roll_damage(&self, damage: &DamageList, armor: &Armor, resistance: &Resistance,
+                       multiplier: f32) -> Vec<(DamageKind, u32)> {
+        debug!("Rolling damage from {} to {} vs {} base armor",
+               damage.min(), damage.max(), armor.base());
+
+        if damage.is_empty() { return Vec::new(); }
+
+        let mut output = Vec::new();
+        for damage in damage.iter() {
+            let kind = damage.kind.unwrap();
+
+            let resistance = (100 - resistance.amount(kind)) as f32 / 100.0;
+            let amount = damage.roll() as f32 * multiplier * resistance;
+
+            let armor = max(0, armor.amount(kind) as i32 - damage.ap as i32) as u32;
+            let armor_max = self.armor_damage_reduction_cap(armor) as f32 * amount / 100.0;
+            let armor = armor as f32;
+
+            let armor = if armor_max > armor { armor } else { armor_max };
+            let armor = if armor > amount { amount } else { armor };
+
+            let amount = amount - armor;
+            if amount > 0.0 {
+                output.push((kind, amount.ceil() as u32));
+            }
+        }
+
+        output
+    }
+
+    /// Returns the percentile armor reduction cap for the given armor value.  this
+    /// is the maximum percentage that the armor of that level can reduce a damage
+    /// amount by.  the remaining damage is rounded up.
+    pub fn armor_damage_reduction_cap(&self, armor: u32) -> u32 {
+        *self.armor_damage_reduction_cap.get(armor as usize).unwrap_or(&100)
+    }
+
     pub fn get_xp_for_next_level(&self, cur_level: u32) -> u32 {
         if cur_level < 1 { return 0; }
         if cur_level - 1 >= self.experience_for_level.len() as u32 { return 0; }

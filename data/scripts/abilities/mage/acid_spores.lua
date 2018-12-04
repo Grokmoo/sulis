@@ -117,12 +117,12 @@ end
 
 function on_moved(parent, ability, targets)
   target = targets:first()
-  target:take_damage(parent, 2, 4, "Acid", 12)
+  target:take_damage(parent, 2, 4, "Acid", 3)
 end
 
 function on_round_elapsed(parent, ability, targets)
   targets = targets:to_table()
   for i = 1, #targets do
-	targets[i]:take_damage(parent, 2, 4, "Acid", 12)
+	targets[i]:take_damage(parent, 2, 4, "Acid", 3)
   end
 end

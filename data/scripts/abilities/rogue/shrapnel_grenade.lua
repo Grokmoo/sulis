@@ -69,6 +69,6 @@ function attack_target(parent, ability, targets)
     stats = parent:stats()
 	min_dmg = 12 + stats.level / 4 + stats.intellect_bonus / 6
     max_dmg = 24 + stats.intellect_bonus / 3 + stats.level / 2
-    parent:special_attack(target, "Reflex", "Ranged", min_dmg, max_dmg, 10, "Piercing")
+    parent:special_attack(target, "Reflex", "Ranged", min_dmg, max_dmg, 8, "Piercing")
   end
 end

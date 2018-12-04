@@ -907,6 +907,7 @@ impl UserData for ScriptEntity {
 
         methods.add_method("take_damage", |_, entity, (attacker, min_damage, max_damage, damage_kind, ap):
                            (ScriptEntity, f32, f32, String, Option<u32>)| {
+            let rules = Module::rules();
             let parent = entity.try_unwrap()?;
             let attacker = attacker.try_unwrap()?;
             let damage_kind = DamageKind::from_str(&damage_kind);
@@ -917,7 +918,8 @@ impl UserData for ScriptEntity {
                 let parent = &parent.borrow().actor.stats;
                 let attack = Attack::special(parent, min_damage, max_damage, ap.unwrap_or(0),
                     damage_kind, AttackKind::Dummy);
-                attack.roll_damage(&parent.armor, &parent.resistance, 1.0)
+                let damage = &attack.damage;
+                rules.roll_damage(damage, &parent.armor, &parent.resistance, 1.0)
             };
 
             if !damage.is_empty() {

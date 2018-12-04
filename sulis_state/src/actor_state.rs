@@ -581,7 +581,8 @@ impl ActorState {
 
         let damage = {
             let target = &target.borrow().actor.stats;
-            attack.roll_damage(&target.armor, &target.resistance, damage_multiplier)
+            let damage = &attack.damage;
+            rules.roll_damage(damage, &target.armor, &target.resistance, damage_multiplier)
         };
 
         debug!("{:?}. {:?} damage", hit_kind, damage);

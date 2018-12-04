@@ -60,7 +60,7 @@ impl Armor {
         }
     }
 
-    /// Returns the amount of damage resistance that this armor value
+    /// Returns the amount of armor that this Armor value
     /// applies to the specified damage kind.
     pub fn amount(&self, check_kind: DamageKind) -> u32 {
         if check_kind == DamageKind::Raw { return 0; }

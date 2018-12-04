@@ -18,8 +18,6 @@ use std::slice::Iter;
 use std::fmt::{self, Display};
 use rand::{self, Rng};
 
-use {Armor, Resistance};
-
 #[derive(Clone)]
 pub struct DamageList {
     damage: Vec<Damage>,
@@ -120,48 +118,9 @@ impl DamageList {
         }
     }
 
-    /// Computes the amount of damage that this damage list will apply to the given
-    /// `armor`.  Each damage component of this list is rolled randomly, with the resulting
-    /// damage then multiplied by the `multiplier`, rounded down.  The damage is then
-    /// modified by the percentage resistance, if any.  The armor against
-    /// the base damage kind of this damage is then subtracted from the damage.  The
-    /// resulting vector may be an empty vector to indicate no damage, or a vector of
-    /// one or more kinds each associated with a positive damage amount.  The damage
-    /// amount for each entry will never be zero.
-    pub fn roll(&self, armor: &Armor, resistance: &Resistance,
-                multiplier: f32) -> Vec<(DamageKind, u32)> {
-        if self.damage.is_empty() { return Vec::new(); }
+    pub fn iter(&self) -> impl Iterator<Item=&Damage> { self.damage.iter() }
 
-        let armor_amount = armor.amount(self.damage[0].kind.unwrap());
-
-        debug!("Computing damage amount from {} to {} vs {} armor", self.min,
-               self.max, armor_amount);
-
-        let armor_amount = if self.ap > armor_amount {
-            0
-        } else {
-            armor_amount - self.ap
-        };
-        trace!("Armor adjusted by AP: {}", armor_amount);
-
-        let mut output = Vec::new();
-        let mut armor_left = armor_amount;
-        for damage in self.damage.iter() {
-            let kind = damage.kind.unwrap();
-            let res_mult = (100 - resistance.amount(kind)) as f32 / 100.0;
-            let mut damage_amount = (damage.roll() as f32 * multiplier * res_mult) as u32;
-
-            if armor_left >= damage_amount {
-                armor_left -= damage_amount;
-            } else {
-                damage_amount -= armor_left;
-                armor_left = 0;
-                output.push((kind, damage_amount));
-            }
-        }
-
-        output
-    }
+    pub fn is_empty(&self) -> bool { self.damage.is_empty() }
 
     pub fn ap(&self) -> u32 { self.ap }
 

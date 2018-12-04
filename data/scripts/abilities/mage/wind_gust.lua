@@ -96,7 +96,7 @@ function push_target(parent, ability, targets)
   
   push_damage_base = pushback_dist - total_dist
   if push_damage_base > 0 then
-    target:take_damage(parent, push_damage_base * 3 - 2, push_damage_base * 3 + 2, "Crushing")
+    target:take_damage(parent, push_damage_base * 2 - 2, push_damage_base * 2 + 2, "Crushing")
   end
   
   -- return if the result is to not move the target

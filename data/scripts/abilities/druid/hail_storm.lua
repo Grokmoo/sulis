@@ -54,7 +54,7 @@ function do_attack(parent, ability, targets)
   targets = targets:to_table()
   for i = 1, #targets do
     target = targets[i]
-    target:take_damage(parent, 3, 6, "Cold", 8)
-    target:take_damage(parent, 3, 6, "Piercing", 8)
+    target:take_damage(parent, 3, 6, "Cold", 4)
+    target:take_damage(parent, 3, 6, "Piercing", 4)
   end
 end

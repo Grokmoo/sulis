@@ -53,7 +53,7 @@ function on_entered(parent, ability, targets)
   anim:set_draw_above_entities()
   anim:activate()
   
-  hit = parent:special_attack(target, "Reflex", "Ranged", 10, 15, 15, "Piercing")
+  hit = parent:special_attack(target, "Reflex", "Ranged", 10, 15, 5, "Piercing")
   
   effect = target:create_effect(ability:name(), 2)
   

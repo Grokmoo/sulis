@@ -1,3 +1,6 @@
+held_main_id = "__tree_shape_equip_held_main"
+held_off_id = "__tree_shape_equip_held_off"
+
 function on_activate(parent, ability)
   ability:activate(parent)
   
@@ -20,11 +23,15 @@ function on_activate(parent, ability)
   effect:add_num_bonus("armor", 8 + level)
   
   inv = parent:inventory()
-  if inv:has_alt_weapons() then
-    inv:unequip_item("held_main")
-	inv:unequip_item("held_off")
-  else
-    parent:swap_weapons()
+  held_main = inv:unequip_item("held_main")
+  held_off = inv:unequip_item("held_off")
+  
+  if held_main:is_valid() then
+    parent:set_flag(held_main_id, held_main:id())
+  end
+  
+  if held_off:is_valid() then
+    parent:set_flag(held_off_id, held_off:id())
   end
   
   item = game:add_party_item("tree_attack")
@@ -69,4 +76,24 @@ function on_removed(parent, ability)
                      anim:param(1.0, -1,0),
                      anim:param(0.0))
   anim:activate()
+  
+  if parent:has_flag(held_main_id) then
+     item_id = parent:get_flag(held_main_id)
+	 item = game:find_party_item(item_id)
+	 if item:is_valid() then
+	   inv:equip_item(item)
+	 end
+   
+     parent:clear_flag(held_main_id)
+   end
+   
+   if parent:has_flag(held_off_id) then
+     item_id = parent:get_flag(held_off_id)
+	 item = game:find_party_item(item_id)
+	 if item:is_valid() then
+	   inv:equip_item(item)
+	 end
+	 
+     parent:clear_flag(held_off_id)
+   end
 end

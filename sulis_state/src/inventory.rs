@@ -301,6 +301,7 @@ impl Inventory {
         debug!("Equipping item '{}' into '{:?}'", item_state.item.id, slot_to_use);
         self.equipped.insert(slot_to_use, item_state);
 
+        debug!("Unequip: {:?}", unequipped);
         unequipped
     }
 
@@ -339,7 +340,9 @@ impl Inventory {
 
     #[must_use]
     pub fn unequip(&mut self, slot: Slot) -> Option<ItemState> {
-        self.equipped.remove(&slot)
+        let result = self.equipped.remove(&slot);
+        info!("Unequipped '{:?}' from {:?}", result, slot);
+        result
     }
 
     pub fn get_image_layers(&self) -> HashMap<ImageLayer, Rc<Image>> {

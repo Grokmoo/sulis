@@ -1,3 +1,6 @@
+held_main_id = "__spirit_claws_equip_held_main"
+held_off_id = "__spirit_claws_equip_held_off"
+
 function on_activate(parent, ability)
   ability:activate(parent)
   
@@ -11,11 +14,16 @@ function on_activate(parent, ability)
   effect:add_num_bonus("spell_accuracy", -30)
   
   inv = parent:inventory()
-  if inv:has_alt_weapons() then
-    inv:unequip_item("held_main")
-	inv:unequip_item("held_off")
-  else
-    parent:swap_weapons()
+  
+  held_main = inv:unequip_item("held_main")
+  held_off = inv:unequip_item("held_off")
+  
+  if held_main:is_valid() then
+    parent:set_flag(held_main_id, held_main:id())
+  end
+  
+  if held_off:is_valid() then
+    parent:set_flag(held_off_id, held_off:id())
   end
   
   item = game:add_party_item("spirit_claw")
@@ -33,8 +41,6 @@ function on_activate(parent, ability)
   gen:set_particle_size_dist(gen:fixed_dist(3.0), gen:fixed_dist(3.0))
   effect:add_anim(gen)
   effect:apply()
-  
-  effect:apply()
 end
 
 function on_removed(parent, ability)
@@ -44,5 +50,25 @@ function on_removed(parent, ability)
    
    if item:id() == "spirit_claw" then
 	game:remove_party_item(item)
+   end
+   
+   if parent:has_flag(held_main_id) then
+     item_id = parent:get_flag(held_main_id)
+	 item = game:find_party_item(item_id)
+	 if item:is_valid() then
+	   inv:equip_item(item)
+	 end
+   
+     parent:clear_flag(held_main_id)
+   end
+   
+   if parent:has_flag(held_off_id) then
+     item_id = parent:get_flag(held_off_id)
+	 item = game:find_party_item(item_id)
+	 if item:is_valid() then
+	   inv:equip_item(item)
+	 end
+	 
+     parent:clear_flag(held_off_id)
    end
 end

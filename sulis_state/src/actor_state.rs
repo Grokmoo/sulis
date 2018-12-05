@@ -24,7 +24,7 @@ use sulis_core::io::GraphicsRenderer;
 use sulis_core::image::{LayeredImage, Image};
 use sulis_core::util::{invalid_data_error, ExtInt};
 use sulis_rules::{AccuracyKind, Attack, AttackKind, BonusList, HitKind, StatList, WeaponKind,
-    QuickSlot, Slot, ItemKind, DamageKind, HitFlags};
+    QuickSlot, Slot, ItemKind, DamageKind, HitFlags, WeaponStyle};
 use sulis_module::{Actor, Module, ActorBuilder, Faction, ImageLayer};
 use {AbilityState, ChangeListenerList, Effect, EntityState, GameState, Inventory, ItemState, PStats};
 use save_state::ActorSaveState;
@@ -429,10 +429,17 @@ impl ActorState {
             if Rc::ptr_eq(&entity, target) { continue; }
 
             let entity = entity.borrow();
+
             if !entity.is_hostile(&target) { continue; }
+
             if entity.actor.stats.attack_disabled { continue; }
 
-            // TODO allow ranged weapons to flank?  and at any distance?
+            match entity.actor.inventory.weapon_style() {
+                WeaponStyle::Ranged => continue,
+                WeaponStyle::TwoHanded | WeaponStyle::Single
+                    | WeaponStyle::Shielded | WeaponStyle::DualWielding => (),
+            }
+
             if !entity.can_reach(&target) { continue; }
 
             let p_target = (target.borrow().center_x_f32(), target.borrow().center_y_f32());
@@ -442,17 +449,13 @@ impl ActorState {
             let p1 = (p_target.0 - p_parent.0, p_target.1 - p_parent.1);
             let p2 = (p_target.0 - p_other.0, p_target.1 - p_other.1);
 
-            // info!("p1: {:?}", p1);
-            // info!("p2: {:?}", p2);
-
             let mut cos_angle = (p1.0 * p2.0 + p1.1 * p2.1) / (p1.0.hypot(p1.1) * p2.0.hypot(p2.1));
             if cos_angle > 1.0 { cos_angle = 1.0; }
             if cos_angle < -1.0 { cos_angle = -1.0; }
-            // info!("cos(angle) = {}", cos_angle);
 
             let angle = cos_angle.acos().to_degrees();
 
-            trace!("Got angle {} between {} and {} attacking {}", angle,
+            debug!("Got angle {} between {} and {} attacking {}", angle,
                    parent.borrow().actor.actor.name, entity.actor.actor.name,
                    target.borrow().actor.actor.name);
 

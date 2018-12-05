@@ -369,6 +369,8 @@ impl AttackAction {
             Some(pc) => Rc::clone(pc),
         };
 
+        if !pc.borrow().actor.has_ap_to_attack() { return None; }
+
         if pc.borrow().can_attack(&target, &area_state) {
             Some(Box::new(AttackAction { pc, target }))
         } else {

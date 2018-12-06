@@ -22,7 +22,7 @@ use rand::{self, Rng};
 
 use sulis_core::util::Point;
 use sulis_module::{Faction, Module};
-use script::CallbackData;
+use script::{CallbackData};
 use {AreaState, ChangeListener, ChangeListenerList, Effect, EntityState, GameState};
 
 pub const ROUND_TIME_MILLIS: u32 = 5000;

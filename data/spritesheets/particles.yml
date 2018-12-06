@@ -296,3 +296,16 @@ groups:
       shell14: [400, 80]
       shell15: [480, 80]
       shell16: [560, 80]
+      
+  ring:
+    size: [64, 64]
+    position: [0, 540]
+    areas:
+      ring01: [0, 0]
+      ring02: [64, 0]
+      ring03: [128, 0]
+      ring04: [192, 0]
+      ring05: [256, 0]
+      ring06: [320, 0]
+      ring07: [384, 0]
+      ring08: [448, 0]

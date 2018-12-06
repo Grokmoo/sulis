@@ -39,6 +39,8 @@ abilities:
     position: [8, 5]
   - id: healing_circle
     position: [8.80, 4]
+  - id: ward
+    position: [8.80, 6]
   
   - id: crush
     position: [5, 7]

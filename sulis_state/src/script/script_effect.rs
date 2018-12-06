@@ -25,7 +25,7 @@ use sulis_rules::{Attribute, Bonus, BonusKind, BonusList, Damage, DamageKind, bo
 use script::{CallbackData, Result, script_particle_generator, ScriptParticleGenerator,
     script_color_animation, ScriptColorAnimation, ScriptAbility,
     script_scale_animation, ScriptScaleAnimation,
-    script_image_layer_animation, ScriptImageLayerAnimation};
+    script_image_layer_animation, ScriptImageLayerAnimation, ScriptCallback};
 use {Effect, GameState};
 
 /// Represents a surface that already exists, and is being passed into
@@ -62,6 +62,102 @@ enum Kind {
     Surface {
         points: Vec<(i32, i32)>,
         squares_to_fire_on_moved: u32
+    }
+}
+
+/// A user menu selection
+///
+/// # `value() -> String`
+/// Returns the text value that the user selected
+#[derive(Clone)]
+pub struct ScriptMenuSelection {
+    pub value: String,
+}
+
+impl UserData for ScriptMenuSelection {
+    fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
+        methods.add_method("value", |_, selection, ()| {
+            Ok(selection.value.to_string())
+        });
+    }
+}
+
+/// An already applied effect, in contrast to an effect being created
+/// via `ScriptEntity:create_effect`
+///
+/// # `name() -> String`
+/// Returns the user defined name of this effect
+///
+/// # `tag() -> String`
+/// Returns the user defined tag of this effect
+///
+/// # `cur_duration() -> Int`
+/// Returns the number of rounds this effect has currently been active
+///
+/// # `total_duration() -> Int`
+/// Returns the total number of rounds this effect will be active for, or
+/// 0 for infinite duration (modal) effects
+///
+/// # `total_duration_is_infinite() -> Bool`
+/// Returns true if this effect has infinite duration (manually removed or modal),
+/// false otherwise
+///
+/// # `mark_for_removal()`
+/// Marks this effect to be removed on the next update.  This is done asynchronously,
+/// so the effect will still be applied when this method returns.
+#[derive(Clone)]
+pub struct ScriptAppliedEffect {
+    index: usize,
+    name: String,
+    tag: String,
+    cur_duration: u32,
+    total_duration: ExtInt,
+}
+
+impl ScriptAppliedEffect {
+    pub fn new(effect: &Effect, index: usize) -> ScriptAppliedEffect {
+        ScriptAppliedEffect {
+            index,
+            name: effect.name.to_string(),
+            tag: effect.tag.to_string(),
+            cur_duration: effect.cur_duration,
+            total_duration: effect.total_duration,
+        }
+    }
+}
+
+impl UserData for ScriptAppliedEffect {
+    fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
+        methods.add_method("name", |_, effect, ()| {
+            Ok(effect.name.to_string())
+        });
+
+        methods.add_method("tag", |_, effect, ()| {
+            Ok(effect.tag.to_string())
+        });
+
+        methods.add_method("cur_duration", |_, effect, ()| {
+            Ok(effect.cur_duration)
+        });
+
+        methods.add_method("total_duration", |_, effect, ()| {
+            Ok(match effect.total_duration {
+                ExtInt::Infinity => 0,
+                ExtInt::Int(val) => val,
+            })
+        });
+
+        methods.add_method("total_duration_is_infinite", |_, effect, ()| {
+            Ok(effect.total_duration.is_infinite())
+        });
+
+        methods.add_method("mark_for_removal", |_, effect, ()| {
+            let mgr = GameState::turn_manager();
+            let mut mgr = mgr.borrow_mut();
+            let effect = mgr.effect_mut(effect.index);
+            effect.mark_for_removal();
+            Ok(())
+        });
     }
 }
 
@@ -528,7 +624,15 @@ fn apply(effect_data: &ScriptEffect) -> Result<()> {
             let entity = mgr.borrow().entity(*parent);
             effect.set_owning_entity(entity.borrow().index());
             info!("Apply effect to '{}' with duration {}", entity.borrow().actor.actor.name, duration);
-            mgr.borrow_mut().add_effect(effect, &entity, cbs, marked);
+            // get the list of cbs before applying so it doesn't include itself
+            let on_applied_cbs = entity.borrow().callbacks(&mgr.borrow());
+
+            // apply the effect
+            let index = mgr.borrow_mut().add_effect(effect, &entity, cbs, marked);
+
+            // fire the on_applied cbs
+            let sae = ScriptAppliedEffect::new(&mgr.borrow().effect(index), index);
+            on_applied_cbs.iter().for_each(|cb| cb.on_effect_applied(sae.clone()));
         },
         Kind::Surface { points, squares_to_fire_on_moved } => {
             let points: Vec<_> = points.iter().map(|(x, y)| Point::new(*x, *y)).collect();

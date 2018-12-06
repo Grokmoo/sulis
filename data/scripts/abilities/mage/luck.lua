@@ -44,6 +44,7 @@ function apply_effect(parent, ability, targets)
   target = targets:first()
   
   effect = target:create_effect(ability:name(), ability:duration())
+  effect:set_tag("luck")
   effect:add_num_bonus("defense", amount)
   effect:add_num_bonus("melee_accuracy", amount)
   effect:add_num_bonus("ranged_accuracy", amount)

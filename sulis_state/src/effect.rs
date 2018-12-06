@@ -21,7 +21,7 @@ use std::io::Error;
 
 use sulis_core::util::{ExtInt, Point};
 use sulis_rules::BonusList;
-use script::{CallbackData};
+use script::{CallbackData, script_callback::FuncKind};
 use {ChangeListenerList, save_state::EffectSaveState, EntityState};
 
 use ROUND_TIME_MILLIS;
@@ -107,7 +107,16 @@ impl Effect {
 
     pub fn mark_for_removal(&mut self) {
         self.total_duration = ExtInt::Int(0);
-        self.callbacks.clear(); // prevent any more scripts from firing
+
+        // prevent any more scripts from firing except on_removed
+        for cb in self.callbacks.iter_mut() {
+            // DANGER
+            // there will be at least one other Rc of this callback outstanding
+            // frequently - from the script that is resulting in a call to this
+            // func.  in that case, using make_mut to clone on write should be fine.
+            let cb = Rc::make_mut(cb);
+            cb.clear_funcs_except(FuncKind::OnRemoved);
+        }
     }
 
     pub fn set_surface_for_area(&mut self, area: &str, points: &Vec<Point>, squares_to_fire_on_moved: u32) {

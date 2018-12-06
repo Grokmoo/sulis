@@ -61,6 +61,7 @@ function attack_target(parent, ability, targets)
   end
   
   effect = target:create_effect(ability:name(), duration)
+  effect:set_tag("damage")
   
   cb = ability:create_callback(parent)
   cb:add_target(target)

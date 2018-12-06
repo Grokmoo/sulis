@@ -25,7 +25,7 @@ use rlua::{UserData, UserDataMethods};
 use sulis_core::util::invalid_data_error;
 use sulis_rules::{HitKind, DamageKind};
 use sulis_module::{Module, on_trigger::Kind};
-use script::{Result, script_entity, ScriptEntity, ScriptEntitySet, ScriptActiveSurface, ScriptItemKind};
+use script::{Result, script_entity, ScriptEntity, ScriptEntitySet, ScriptActiveSurface, ScriptItemKind, ScriptMenuSelection, ScriptAppliedEffect};
 use {EntityState, GameState};
 
 pub fn fire_on_removed(cbs: Vec<Rc<CallbackData>>) {
@@ -58,10 +58,13 @@ pub fn fire_on_moved(cbs: Vec<Rc<CallbackData>>) {
 #[derive(Serialize, Deserialize, Clone, Copy, PartialOrd, Ord, Hash, PartialEq, Eq, Debug)]
 #[serde(deny_unknown_fields)]
 pub enum FuncKind {
+    /// Called when a new effect is applied to a parent
+    OnEffectApplied,
+
     /// Called when a menu option is selected in a custom menu
     OnMenuSelect,
 
-    /// Called whenever a an effect is removed from a parent
+    /// Called whenever an effect is removed from a parent
     OnRemoved,
 
     /// Called whenver a parent entity loses hit points
@@ -108,7 +111,9 @@ pub enum FuncKind {
 /// A trait representing a callback that will fire a script when called.  In lua scripts,
 /// `CallbackData` is constructed to use this trait.
 pub trait ScriptCallback {
-    fn on_menu_select(&self, _value: String) { }
+    fn on_effect_applied(&self, _effect: ScriptAppliedEffect) { }
+
+    fn on_menu_select(&self, _value: ScriptMenuSelection) { }
 
     fn on_removed(&self) { }
 
@@ -153,6 +158,7 @@ pub trait ScriptCallback {
 /// Adds the specified `point` to the list of points this callback will provide in its
 /// targets.  The point is a table of the form `{x:x_coord, y: y_coord}`
 ///
+/// # `set_on_effect_applied_fn(func: String)`
 /// # `set_on_menu_select_fn(func: String)`
 /// # `set_on_removed_fn(func: String)`
 /// # `set_on_damaged_fn(func: String)`
@@ -180,6 +186,14 @@ pub struct CallbackData {
 }
 
 impl CallbackData {
+    pub fn clear_funcs_except(&mut self, func: FuncKind) {
+        let value = self.funcs.remove(&func);
+        self.funcs.clear();
+        if let Some(value) = value {
+            self.funcs.insert(func, value);
+        }
+    }
+
     pub fn kind(&self) -> Kind {
         self.kind.clone()
     }
@@ -316,7 +330,8 @@ impl CallbackData {
         }
     }
 
-    fn exec_script_with_arg(&self, targets: ScriptEntitySet, arg: String, func_kind: FuncKind) {
+    fn exec_script_with_arg<T>(&self, targets: ScriptEntitySet, arg: T, func_kind: FuncKind)
+        where T: rlua::UserData + Send + 'static {
         let func = match self.funcs.get(&func_kind) {
             None => return,
             Some(ref func) => func.to_string(),
@@ -376,7 +391,11 @@ impl CallbackData {
 }
 
 impl ScriptCallback for CallbackData {
-    fn on_menu_select(&self, value: String) {
+    fn on_effect_applied(&self, effect: ScriptAppliedEffect) {
+        self.exec_script_with_arg(self.get_or_create_targets(), effect, FuncKind::OnEffectApplied);
+    }
+
+    fn on_menu_select(&self, value: ScriptMenuSelection) {
         self.exec_script_with_arg(self.get_or_create_targets(), value, FuncKind::OnMenuSelect);
     }
 
@@ -537,6 +556,8 @@ impl UserData for CallbackData {
             Ok(())
         });
 
+        methods.add_method_mut("set_on_effect_applied_fn",
+                               |_, cb, func: String| cb.add_func(FuncKind::OnEffectApplied, func));
         methods.add_method_mut("set_on_menu_select_fn",
                                |_, cb, func: String| cb.add_func(FuncKind::OnMenuSelect, func));
         methods.add_method_mut("set_on_removed_fn",

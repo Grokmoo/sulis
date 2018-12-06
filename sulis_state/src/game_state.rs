@@ -634,8 +634,9 @@ impl GameState {
         exec_script!(entity_script: parent, targets, t, func);
     }
 
-    pub fn execute_entity_with_arg(parent: &Rc<RefCell<EntityState>>,
-                                   targets: ScriptEntitySet, arg: String, func: &str) {
+    pub fn execute_entity_with_arg<T>(parent: &Rc<RefCell<EntityState>>,
+                                   targets: ScriptEntitySet, arg: T, func: &str)
+        where T: rlua::UserData + Send + 'static {
         let t = Some(("arg", arg));
         exec_script!(entity_script: parent, targets, t, func);
     }
@@ -654,8 +655,9 @@ impl GameState {
         exec_script!(item_script: parent, i_kind, targets, t, func);
     }
 
-    pub fn execute_item_with_arg(parent: &Rc<RefCell<EntityState>>, i_kind: ScriptItemKind,
-                                 targets: ScriptEntitySet, arg: String, func: &str) {
+    pub fn execute_item_with_arg<T>(parent: &Rc<RefCell<EntityState>>, i_kind: ScriptItemKind,
+                                 targets: ScriptEntitySet, arg: T, func: &str)
+        where T: rlua::UserData + Send + 'static {
         let t = Some(("arg", arg));
         exec_script!(item_script: parent, i_kind, targets, t, func);
     }
@@ -695,8 +697,9 @@ impl GameState {
         exec_script!(ability_script: parent, ability, targets, t, func);
     }
 
-    pub fn execute_ability_with_arg(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>,
-                                    targets: ScriptEntitySet, arg: String, func: &str) {
+    pub fn execute_ability_with_arg<T>(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>,
+                                    targets: ScriptEntitySet, arg: T, func: &str)
+        where T: rlua::UserData + Send + 'static {
         let t = Some(("arg", arg));
         exec_script!(ability_script: parent, ability, targets, t, func);
     }
@@ -722,9 +725,10 @@ impl GameState {
         exec_script!(trigger_script: script_id, func, parent, target, t);
     }
 
-    pub fn execute_trigger_with_arg(script_id: &str, func: &str,
+    pub fn execute_trigger_with_arg<T>(script_id: &str, func: &str,
                                     parent: &Rc<RefCell<EntityState>>,
-                                    target: &Rc<RefCell<EntityState>>, arg: String) {
+                                    target: &Rc<RefCell<EntityState>>, arg: T)
+        where T: rlua::UserData + Send + 'static {
         let t = Some(("arg", arg));
         exec_script!(trigger_script: script_id, func, parent, target, t);
     }

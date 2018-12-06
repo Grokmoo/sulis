@@ -9,13 +9,13 @@ function on_activate(parent, ability)
   menu:show()
 end
 
-function menu_select(parent, ability, targets, arg)
+function menu_select(parent, ability, targets, selection)
   effect = parent:create_effect(ability:name(), ability:duration())
   
   w = parent:width() + 2
   h = parent:height() + 2
 
-  parent:set_flag("__absorb_energy_type", arg)
+  parent:set_flag("__absorb_energy_type", selection:value())
 
   cb = ability:create_callback(parent)
   cb:set_on_damaged_fn("on_damaged")

@@ -57,6 +57,7 @@ function on_entered(parent, ability, targets)
   
   effect = target:create_effect(ability:name(), duration)
   effect:add_move_disabled()
+  effect:set_tag("stuck")
   
   anim = target:create_particle_generator("particles/circle4")
   anim:set_moves_with_parent()

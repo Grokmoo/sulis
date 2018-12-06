@@ -56,6 +56,7 @@ function on_entered(parent, ability, targets)
   hit = parent:special_attack(target, "Reflex", "Ranged", 10, 15, 5, "Piercing")
   
   effect = target:create_effect(ability:name(), 2)
+  effect:set_tag("sundered_armor")
   
   if hit:is_miss() then return end
 

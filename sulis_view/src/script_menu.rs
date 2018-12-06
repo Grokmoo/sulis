@@ -20,7 +20,7 @@ use std::cell::RefCell;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{Button, TextArea, ScrollPane};
-use sulis_state::script::{CallbackData, ScriptCallback};
+use sulis_state::script::{CallbackData, ScriptCallback, ScriptMenuSelection};
 
 const NAME: &str = "script_menu";
 
@@ -60,7 +60,8 @@ impl WidgetKind for ScriptMenu {
             let text = choice.to_string();
             let cb = self.callback.clone();
             widget.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                cb.on_menu_select(text.to_string());
+                let selection = ScriptMenuSelection { value: text.to_string() };
+                cb.on_menu_select(selection);
 
                 let parent = Widget::go_up_tree(&widget, 3);
                 parent.borrow_mut().mark_for_removal();

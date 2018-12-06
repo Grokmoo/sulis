@@ -1,0 +1,17 @@
+id: ring
+frame_time_millis: 70
+frames:
+  - particles/ring01
+  - particles/ring02
+  - particles/ring03
+  - particles/ring04
+  - particles/ring05
+  - particles/ring06
+  - particles/ring07
+  - particles/ring08
+  - particles/ring07
+  - particles/ring06
+  - particles/ring05
+  - particles/ring04
+  - particles/ring03
+  - particles/ring02

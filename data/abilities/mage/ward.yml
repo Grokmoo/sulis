@@ -1,0 +1,21 @@
+id: ward
+name: "Ward"
+icon: abilities/ward
+description: |
+  Protects yourself or a nearby ally from most harmful magical effects.  The spell can absorb two such effects before dissipating.
+active:
+  script: "ward"
+  group: "3rd Circle"
+  ap: 2000
+  duration:
+    Rounds: 4
+  cooldown: 7
+  ai:
+    priority: 20
+    kind: Buff
+    group: Single
+    range: Short
+  short_description: |
+    Protect yourself or an ally from harmful effects.
+prereqs:
+  total_level: 7

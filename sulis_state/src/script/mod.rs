@@ -48,6 +48,8 @@ pub use self::script_callback::FuncKind;
 mod script_effect;
 pub use self::script_effect::ScriptEffect;
 pub use self::script_effect::ScriptActiveSurface;
+pub use self::script_effect::ScriptAppliedEffect;
+pub use self::script_effect::ScriptMenuSelection;
 
 mod script_entity;
 pub use self::script_entity::ScriptEntity;

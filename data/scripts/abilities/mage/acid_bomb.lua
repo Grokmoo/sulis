@@ -29,6 +29,7 @@ function on_target_select(parent, ability, targets)
   target:take_damage(parent, 4, max_dmg, "Acid", 5)
   
   effect = target:create_effect(ability:name(), duration)
+  effect:set_tag("weaken")
   effect:add_num_bonus("melee_accuracy", -10 - stats.caster_level / 2)
   effect:add_num_bonus("ranged_accuracy", -10 - stats.caster_level / 2)
   effect:add_num_bonus("spell_accuracy", -10 - stats.caster_level / 2)

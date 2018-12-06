@@ -39,6 +39,7 @@ function create_cripple_effect(parent, ability, targets, hit)
   if hit:is_miss() then return end
   
   effect = target:create_effect(ability:name(), ability:duration())
+  effect:set_tag("cripple")
   stats = parent:stats()
   
   if hit:is_graze() then

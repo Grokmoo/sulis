@@ -138,6 +138,14 @@ use {ai, animation::{self}, script::*, MOVE_TO_THRESHOLD};
 /// Creates a ScriptEntitySet consisting of all possible targets for abilities or items used
 /// by this entity.  This includes all known entities in the same area as the parent entity.
 ///
+/// # `has_effects_with_tag(tag: String) -> Bool`
+/// Returns true if this entity has one or more active effects with the specified tag,
+/// false otherwise.
+///
+/// # `get_effect_with_tag(tag: String) -> Tablei of ScriptAppliedEffect`
+/// Returns an array-like table containing all of the effects currently applied to this
+/// entity with the specified tag.
+///
 /// # `remove_effects_with_tag(tag: String)`
 /// Removes all currently active effects applied to this entity that have the specified tag.
 ///
@@ -599,6 +607,38 @@ impl UserData for ScriptEntity {
         });
 
         methods.add_method("targets", &targets);
+
+        methods.add_method("get_effects_with_tag", |_, entity, tag: String| {
+            let entity = entity.try_unwrap()?;
+            let entity = entity.borrow();
+            let mgr = GameState::turn_manager();
+            let mgr = mgr.borrow();
+
+            let mut result = Vec::new();
+            for effect_index in entity.actor.effects_iter() {
+                let effect = mgr.effect(*effect_index);
+                if effect.tag != tag { continue; }
+
+                let sae = ScriptAppliedEffect::new(effect, *effect_index);
+                result.push(sae);
+            }
+
+            Ok(result)
+        });
+
+        methods.add_method("has_effect_with_tag", |_, entity, tag: String| {
+            let entity = entity.try_unwrap()?;
+            let entity = entity.borrow();
+            let mgr = GameState::turn_manager();
+            let mgr = mgr.borrow();
+
+            for effect_index in entity.actor.effects_iter() {
+                let effect = mgr.effect(*effect_index);
+                if effect.tag == tag { return Ok(true); }
+            }
+
+            Ok(false)
+        });
 
         methods.add_method("remove_effects_with_tag", |_, entity, tag: String| {
             let entity = entity.try_unwrap()?;

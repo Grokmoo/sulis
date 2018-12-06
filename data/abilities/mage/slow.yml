@@ -17,3 +17,5 @@ active:
     range: Short
   short_description: |
     Reduce action points for one opponent with a Will check.
+prereqs:
+  total_level: 2

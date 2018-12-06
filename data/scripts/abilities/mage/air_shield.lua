@@ -1,5 +1,6 @@
 function on_activate(parent, ability)
   effect = parent:create_effect(ability:name(), ability:duration())
+  effect:set_tag("magic_defense")
   
   stats = parent:stats()
   effect:add_armor_of_kind(7 + stats.caster_level / 2, "Electrical")

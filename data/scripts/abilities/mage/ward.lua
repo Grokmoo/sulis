@@ -44,7 +44,8 @@ function on_effect_applied(parent, ability, targets, effect)
     slow = true,
     weaken = true,
     damage = true,
-    petrify = true
+    petrify = true,
+	dazzle = true,
   }
   
   if matching_tags[effect:tag()] ~= nil then

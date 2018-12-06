@@ -44,6 +44,7 @@ function apply_effect(parent, ability, targets)
   target = targets:first()
   
   effect = target:create_effect(ability:name(), ability:duration())
+  effect:set_tag("magic_defense")
   effect:add_num_bonus("defense", amount / 2)
   effect:add_num_bonus("fortitude", amount)
   effect:add_num_bonus("reflex", amount)

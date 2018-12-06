@@ -19,4 +19,4 @@ active:
   short_description: |
     Deal large fire damage to a group of opponents.
 prereqs:
-  total_level: 7
+  total_level: 9

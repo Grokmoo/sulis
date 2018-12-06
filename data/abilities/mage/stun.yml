@@ -18,4 +18,4 @@ active:
   short_description: |
     Stun a single opponent with a Will check.
 prereqs:
-  total_level: 4
+  total_level: 5

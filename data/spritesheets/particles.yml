@@ -296,7 +296,6 @@ groups:
       shell14: [400, 80]
       shell15: [480, 80]
       shell16: [560, 80]
-      
   ring:
     size: [64, 64]
     position: [0, 540]
@@ -309,3 +308,18 @@ groups:
       ring06: [320, 0]
       ring07: [384, 0]
       ring08: [448, 0]
+  frostbite:
+    size: [80, 80]
+    position: [0, 604]
+    areas:
+      frostbite01: [0, 0]
+      frostbite02: [80, 0]
+      frostbite03: [160, 0]
+      frostbite04: [240, 0]
+      frostbite05: [320, 0]
+      frostbite06: [400, 0]
+      frostbite07: [480, 0]
+      frostbite08: [560, 0]
+      frostbite09: [640, 0]
+      frostbite10: [720, 0]
+      frostbite11: [800, 0]

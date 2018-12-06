@@ -1,0 +1,23 @@
+id: breach
+name: "Breach"
+icon: abilities/breach
+description: |
+  You strip magical defenses from the target creature.  This includes spells that provide resistance to a damage type or general defenses, including Air Shield, Fire Shield, Rock Armor, Layer of Bark, Spirit Defense, Resist Elements, and Absorb Energy.
+  
+  If the target has a ward activated, the two spells will cancel each other out, removing the ward but leaving any other magical defenses intact.
+active:
+  script: "breach"
+  group: "3rd Circle"
+  ap: 2000
+  duration:
+    Rounds: 3
+  cooldown: 5
+  ai:
+    priority: 10
+    kind: Debuff
+    group: Single
+    range: Short
+  short_description: |
+    Removes magical protections from an opponent.
+prereqs:
+  total_level: 9

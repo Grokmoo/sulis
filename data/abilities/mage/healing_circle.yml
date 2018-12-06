@@ -18,4 +18,4 @@ active:
   short_description: |
     Continually heal all allies in an area.
 prereqs:
-  total_level: 7
+  total_level: 9

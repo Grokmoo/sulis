@@ -18,4 +18,4 @@ active:
   short_description: |
     Gain concealment against all attacks.
 prereqs:
-  total_level: 7
+  total_level: 9

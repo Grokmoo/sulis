@@ -18,4 +18,4 @@ active:
   short_description: |
     Create a wall to temporarily block enemies.
 prereqs:
-  total_level: 7
+  total_level: 9

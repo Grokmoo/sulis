@@ -11,6 +11,7 @@ end
 
 function menu_select(parent, ability, targets, selection)
   effect = parent:create_effect(ability:name(), ability:duration())
+  effect:set_tag("magic_defense")
   
   w = parent:width() + 2
   h = parent:height() + 2

@@ -18,4 +18,4 @@ active:
   short_description: |
     Move yourself or an ally instantly to a nearby location.
 prereqs:
-  total_level: 4
+  total_level: 5

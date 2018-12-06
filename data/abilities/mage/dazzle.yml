@@ -1,0 +1,21 @@
+id: dazzle
+name: "Dazzle"
+icon: abilities/dazzle
+description: |
+  A nearby target must succeed at a will check or suffer a substantial accuracy penalty for the spell's duration.
+active:
+  script: "dazzle"
+  group: "1st Circle"
+  ap: 2000
+  duration:
+    Rounds: 2
+  cooldown: 4
+  ai:
+    priority: 40
+    kind: Debuff
+    group: Single
+    range: Short
+  short_description: |
+    A single opponent suffers an accuracy penalty.
+prereqs:
+  total_level: 2

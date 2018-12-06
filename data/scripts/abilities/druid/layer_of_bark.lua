@@ -1,5 +1,6 @@
 function on_activate(parent, ability)
   effect = parent:create_effect(ability:name(), ability:duration())
+  effect:set_tag("magic_defense")
   
   stats = parent:stats()
   bonus = stats.caster_level + stats.wisdom_bonus

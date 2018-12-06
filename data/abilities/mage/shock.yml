@@ -17,3 +17,5 @@ active:
     range: Visible
   short_description: |
     Damage one opponent with electricity.
+prereqs:
+  total_level: 2

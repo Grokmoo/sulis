@@ -18,4 +18,4 @@ active:
   short_description: |
     Launch multiple acid blasts at nearby targets.
 prereqs:
-  total_level: 7
+  total_level: 9

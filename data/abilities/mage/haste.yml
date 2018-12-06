@@ -18,4 +18,4 @@ active:
   short_description: |
     Give bonus action points to one ally.
 prereqs:
-  total_level: 4
+  total_level: 5

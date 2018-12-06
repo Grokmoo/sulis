@@ -1,0 +1,21 @@
+id: frostbite
+name: "Frostbite"
+icon: abilities/frostbite
+description: |
+  A small location nearby is hit with a blast of extreme cold, doing minor damage to any targets in the area.
+active:
+  script: "frostbite"
+  group: "1st Circle"
+  ap: 2000
+  duration:
+    Instant
+  cooldown: 3
+  ai:
+    priority: 40
+    kind: Damage
+    group: Single
+    range: Visible
+  short_description: |
+    Deal cold damage in a small area.
+prereqs:
+  total_level: 2

@@ -19,4 +19,4 @@ active:
   short_description: |
     Deal fire damage to all opponents in an arc.
 prereqs:
-  total_level: 4
+  total_level: 5

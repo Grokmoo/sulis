@@ -17,3 +17,5 @@ active:
   cooldown: 3
   short_description: |
     Knock back all enemies in an arc.
+prereqs:
+  total_level: 2

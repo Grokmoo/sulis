@@ -18,4 +18,4 @@ active:
   short_description: |
     Gain resistance to fire and damage any who attack you in melee.
 prereqs:
-  total_level: 4
+  total_level: 5

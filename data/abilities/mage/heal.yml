@@ -17,3 +17,5 @@ active:
     range: Short
   short_description: |
     Heal a significant amount of damage to one ally instantly.
+prereqs:
+  total_level: 2

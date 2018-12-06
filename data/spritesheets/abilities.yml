@@ -37,6 +37,7 @@ groups:
       hail_storm: [11, 2]
       polymorph: [12, 2]
       ward: [13, 2]
+      dazzle: [14, 2]
       
       heal: [0, 3]
       shock: [1, 3]
@@ -63,12 +64,14 @@ groups:
       petrify: [2, 5]
       layer_of_bark: [3, 5]
       tree_shape: [4, 5]
+      frostbite: [5, 5]
       
       flaming_fingers: [0, 6]
       fire_shield: [1, 6]
       slow: [2, 6]
       flare: [3, 6]
       acid_bomb: [4, 6]
+      breach: [5, 6]
       
       grapple: [0, 7]
       arrow_storm: [1, 7]

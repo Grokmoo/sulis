@@ -49,137 +49,164 @@ upgrades:
     group_uses_per_encounter:
       - [ "Cantrips", 2 ]
     group_uses_per_day:
-      - [ "Cantrips", 3 ]
+      - [ "Cantrips", 2 ]
       - [ "1st Circle", 2 ]
   4:
     ability_choices: [ mage ]
     group_uses_per_encounter:
       - [ "Cantrips", 2 ]
+      - [ "1st Circle", 1 ]
     group_uses_per_day:
-      - [ "Cantrips", 3 ]
+      - [ "Cantrips", 2 ]
       - [ "1st Circle", 2 ]
-      - [ "2nd Circle", 1 ]
   5:
     ability_choices: [ mage ]
     group_uses_per_encounter:
       - [ "Cantrips", 3 ]
+      - [ "1st Circle", 1 ]
     group_uses_per_day:
-      - [ "Cantrips", 3 ]
-      - [ "1st Circle", 3 ]
-      - [ "2nd Circle", 2 ]
+      - [ "Cantrips", 1 ]
+      - [ "1st Circle", 2 ]
+      - [ "2nd Circle", 1 ]
   6:
     ability_choices: [ mage, general ]
     group_uses_per_encounter:
       - [ "Cantrips", 3 ]
-      - [ "1st Circle", 1 ]
+      - [ "1st Circle", 2 ]
     group_uses_per_day:
-      - [ "Cantrips", 3 ]
-      - [ "1st Circle", 3 ]
+      - [ "Cantrips", 1 ]
+      - [ "1st Circle", 2 ]
       - [ "2nd Circle", 2 ]
   7:
     ability_choices: [ mage ]
     group_uses_per_encounter:
-      - [ "Cantrips", 3 ]
-      - [ "1st Circle", 1 ]
+      - [ "Cantrips", 2 ]
+      - [ "1st Circle", 2 ]
     group_uses_per_day:
       - [ "Cantrips", 2 ]
-      - [ "1st Circle", 3 ]
-      - [ "2nd Circle", 2 ]
-      - [ "3rd Circle", 1 ]
+      - [ "1st Circle", 2 ]
+      - [ "2nd Circle", 3 ]
   8:
     ability_choices: [ mage ]
     group_uses_per_encounter:
-      - [ "Cantrips", 2 ]
+      - [ "Cantrips", 4 ]
       - [ "1st Circle", 2 ]
+      - [ "2nd Circle", 1 ]
     group_uses_per_day:
-      - [ "Cantrips", 2 ]
       - [ "1st Circle", 2 ]
-      - [ "2nd Circle", 3 ]
-      - [ "3rd Circle", 2 ]
+      - [ "2nd Circle", 2 ]
   9:
     ability_choices: [ mage, general ]
     group_uses_per_encounter:
-      - [ "Cantrips", 2 ]
+      - [ "Cantrips", 4 ]
       - [ "1st Circle", 2 ]
       - [ "2nd Circle", 1 ]
     group_uses_per_day:
-      - [ "Cantrips", 2 ]
       - [ "1st Circle", 2 ]
       - [ "2nd Circle", 3 ]
-      - [ "3rd Circle", 2 ]
+      - [ "3rd Circle", 1 ]
   10:
     ability_choices: [ mage ]
     group_uses_per_encounter:
-      - [ "Cantrips", 2 ]
+      - [ "Cantrips", 4 ]
       - [ "1st Circle", 2 ]
-      - [ "2nd Circle", 1 ]
+      - [ "2nd Circle", 2 ]
     group_uses_per_day:
-      - [ "Cantrips", 2 ]
       - [ "1st Circle", 2 ]
-      - [ "2nd Circle", 3 ]
+      - [ "2nd Circle", 2 ]
       - [ "3rd Circle", 2 ]
-      - [ "4th Circle", 1 ]
   11:
     ability_choices: [ mage ]
     group_uses_per_encounter:
-      - [ "Cantrips", 2 ]
+      - [ "Cantrips", 4 ]
       - [ "1st Circle", 2 ]
       - [ "2nd Circle", 2 ]
     group_uses_per_day:
-      - [ "Cantrips", 2 ]
       - [ "1st Circle", 2 ]
       - [ "2nd Circle", 2 ]
       - [ "3rd Circle", 3 ]
-      - [ "4th Circle", 2 ]
   12:
     ability_choices: [ mage, general ]
     group_uses_per_encounter:
-      - [ "Cantrips", 2 ]
+      - [ "Cantrips", 4 ]
       - [ "1st Circle", 2 ]
       - [ "2nd Circle", 2 ]
       - [ "3rd Circle", 1 ]
     group_uses_per_day:
-      - [ "Cantrips", 2 ]
       - [ "1st Circle", 2 ]
       - [ "2nd Circle", 2 ]
-      - [ "3rd Circle", 3 ]
-      - [ "4th Circle", 2 ]
+      - [ "3rd Circle", 2 ]
   13:
     ability_choices: [ mage ]
     group_uses_per_encounter:
-      - [ "Cantrips", 2 ]
+      - [ "Cantrips", 4 ]
       - [ "1st Circle", 2 ]
       - [ "2nd Circle", 2 ]
       - [ "3rd Circle", 1 ]
     group_uses_per_day:
-      - [ "Cantrips", 2 ]
       - [ "1st Circle", 2 ]
       - [ "2nd Circle", 2 ]
       - [ "3rd Circle", 3 ]
-      - [ "4th Circle", 3 ]
+      - [ "4th Circle", 1 ]
   14:
     ability_choices: [ mage ]
     group_uses_per_encounter:
-      - [ "Cantrips", 2 ]
+      - [ "Cantrips", 4 ]
       - [ "1st Circle", 2 ]
       - [ "2nd Circle", 2 ]
       - [ "3rd Circle", 2 ]
     group_uses_per_day:
-      - [ "Cantrips", 2 ]
+      - [ "1st Circle", 2 ]
+      - [ "2nd Circle", 2 ]
+      - [ "3rd Circle", 2 ]
+      - [ "4th Circle", 2 ]
+  15:
+    ability_choices: [ mage, general ]
+    group_uses_per_encounter:
+      - [ "Cantrips", 4 ]
+      - [ "1st Circle", 2 ]
+      - [ "2nd Circle", 2 ]
+      - [ "3rd Circle", 2 ]
+    group_uses_per_day:
       - [ "1st Circle", 2 ]
       - [ "2nd Circle", 2 ]
       - [ "3rd Circle", 2 ]
       - [ "4th Circle", 3 ]
-  15:
+  16:
     ability_choices: [ mage, general ]
     group_uses_per_encounter:
-      - [ "Cantrips", 2 ]
+      - [ "Cantrips", 4 ]
       - [ "1st Circle", 2 ]
       - [ "2nd Circle", 2 ]
       - [ "3rd Circle", 2 ]
       - [ "4th Circle", 1 ]
     group_uses_per_day:
-      - [ "Cantrips", 2 ]
+      - [ "1st Circle", 2 ]
+      - [ "2nd Circle", 2 ]
+      - [ "3rd Circle", 2 ]
+      - [ "4th Circle", 2 ]
+  17:
+    ability_choices: [ mage, general ]
+    group_uses_per_encounter:
+      - [ "Cantrips", 4 ]
+      - [ "1st Circle", 2 ]
+      - [ "2nd Circle", 2 ]
+      - [ "3rd Circle", 2 ]
+      - [ "4th Circle", 1 ]
+    group_uses_per_day:
+      - [ "1st Circle", 2 ]
+      - [ "2nd Circle", 2 ]
+      - [ "3rd Circle", 2 ]
+      - [ "4th Circle", 3 ]
+  17:
+    ability_choices: [ mage, general ]
+    group_uses_per_encounter:
+      - [ "Cantrips", 4 ]
+      - [ "1st Circle", 2 ]
+      - [ "2nd Circle", 2 ]
+      - [ "3rd Circle", 2 ]
+      - [ "4th Circle", 2 ]
+    group_uses_per_day:
       - [ "1st Circle", 2 ]
       - [ "2nd Circle", 2 ]
       - [ "3rd Circle", 2 ]

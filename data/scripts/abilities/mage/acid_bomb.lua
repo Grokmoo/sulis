@@ -30,10 +30,6 @@ function on_target_select(parent, ability, targets)
   
   effect = target:create_effect(ability:name(), duration)
   effect:set_tag("weaken")
-  effect:add_num_bonus("melee_accuracy", -10 - stats.caster_level / 2)
-  effect:add_num_bonus("ranged_accuracy", -10 - stats.caster_level / 2)
-  effect:add_num_bonus("spell_accuracy", -10 - stats.caster_level / 2)
-  
   cb = ability:create_callback(parent)
   cb:add_target(target)
   cb:set_on_round_elapsed_fn("apply_damage")

@@ -17,3 +17,5 @@ active:
     range: Short
   short_description: |
     Imbues the target's weapon with acid damage.
+prereqs:
+  total_level: 2

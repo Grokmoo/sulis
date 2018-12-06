@@ -1,0 +1,14 @@
+id: frostbite
+frame_time_millis: 50
+frames:
+  - particles/frostbite01
+  - particles/frostbite02
+  - particles/frostbite03
+  - particles/frostbite04
+  - particles/frostbite05
+  - particles/frostbite06
+  - particles/frostbite07
+  - particles/frostbite08
+  - particles/frostbite09
+  - particles/frostbite10
+  - particles/frostbite11

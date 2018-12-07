@@ -5,6 +5,32 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html) is used with major version changes for breaking save game and data format compatibility.
 
+## [0.2.1] - 2018-12-06
+This version should be save compatible with 0.2.0.
+### Added
+- A new playable character class, the Druid, is available, with a brand new ability tree.
+- Summoning and shapeshifting abilities for the Druid
+- Several new weapons including druid themed weapons
+- Several new mage abilities have been added
+- Many new script hooks are available for new content and mods
+
+### Changed
+- Reworked critical hits to only occur on a high natural roll, for more exciting combat
+- Reworked armor to cap damage reduction and make high armor somewhat less powerful
+- Hidden characters will no longer automatically trigger combat
+- Several lists and panels that did not have scrolling now have it
+- The player's AP bar now shows fractional AP to allow you to see how much movement you have available
+- Damage type is now indicated via the feedback color on hits
+- Improved how affected targets are determined for area of effect spells
+- You can now use the character portraits as targets for abilities
+
+### Fixed
+- Flanking calculations were considering ranged attacks incorrectly
+- Several edge case bugs associated with calculating player visibility
+- Fixed some annoying behavior around attack to move when AP is low
+- Attack and ability usage feedback text is more consistent
+- Many fixes to abilities that were broken or had unintentional effects
+
 ## [0.2.0] - 2018-11-09
 Data from the 0.1.x releases, such as save games and characters, will not work with this release.
 ### Added

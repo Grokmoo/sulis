@@ -11,7 +11,7 @@ sulis_rules = { path = "../sulis_rules" }
 
 log = "0.4"
 chrono = "0.4"
-rand = "0.5"
+rand = "0.6"
 rlua = "0.15"
 int_hash = "0.1"
 serde = "1.0"

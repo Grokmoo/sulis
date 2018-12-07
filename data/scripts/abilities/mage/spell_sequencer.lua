@@ -1,4 +1,8 @@
 function on_activate(parent, ability)
+  parent:clear_flag("__sequencer_spell_1")
+  parent:clear_flag("__sequencer_spell_2")
+  parent:clear_flag("__sequencer_type")
+
   cb = ability:create_callback(parent)
   cb:set_on_menu_select_fn("spell_select1")
 
@@ -28,6 +32,11 @@ function spell_select2(parent, ability, targets, selection)
 end
 
 function setup_menu(parent, ability, target_type, cb, title)
+  already_selected = "none"
+  if parent:has_flag("__sequencer_spell_1") then
+    already_selected = parent:get_flag("__sequencer_spell_1")
+  end
+
   if target_type == "self" then
     abilities = { "heal", "acid_weapon", "rock_armor", "fire_shield", "haste", "air_shield", "luck", "expediate", "minor_heal" }
   elseif target_type == "friendly" then
@@ -40,9 +49,11 @@ function setup_menu(parent, ability, target_type, cb, title)
   menu = game:create_menu(title, cb)
   for i = 1, #abilities do
     ability_id = abilities[i]
-	if parent:has_ability(ability_id) then
-	  ability = parent:get_ability(ability_id)
-	  menu:add_choice(ability:name(), ability_id)
+	if already_selected ~= ability_id then
+	  if parent:has_ability(ability_id) then
+	    ability = parent:get_ability(ability_id)
+	    menu:add_choice(ability:name(), ability_id)
+	  end
 	end
   end
   menu:show()

@@ -34,8 +34,6 @@ abilities:
     position: [5, 2]
   - id: chameleon
     position: [5.5, 1.1]
-  - id: contingency
-    position: [4.5, 1.1]
 
   - id: slow
     position: [7, 5]
@@ -49,6 +47,8 @@ abilities:
     position: [8.80, 6]
   - id: frostbite
     position: [6.8, 5.95]
+  - id: contingency
+    position: [8.4, 3]
   
   - id: crush
     position: [5, 7]

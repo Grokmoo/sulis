@@ -1,6 +1,6 @@
 id: activate_sequencer
 name: "Activate Sequencer"
-icon: abilities/spell_sequencer
+icon: abilities/activate_spell_sequencer
 description: |
   Activate a stored Spell Sequencer created with the Spell Sequencer ability.
 active:

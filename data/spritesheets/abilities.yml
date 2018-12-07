@@ -17,6 +17,7 @@ groups:
       summon_animal: [7, 0]
       contingency: [8, 0]
       spell_sequencer: [9, 0]
+      activate_spell_sequencer: [10, 0]
       
       lightning_reflexes: [0, 1]
       stunning_blow: [1, 1]

@@ -1,0 +1,16 @@
+id: pulsing_particle
+frame_time_millis: 76
+frames:
+  - particles/wind1
+  - particles/wind2
+  - particles/wind3
+  - particles/wind4
+  - particles/wind5
+  - particles/wind6
+  - particles/wind7
+  - particles/wind8
+  - particles/wind6
+  - particles/wind5
+  - particles/wind4
+  - particles/wind3
+  - particles/wind2

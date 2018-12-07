@@ -31,90 +31,105 @@ upgrades:
     ability_choices: []
     group_uses_per_encounter:
       - [ Modes, ~ ]
+      - [ Special, ~ ]
   2:
     ability_choices: [ rogue ]
     group_uses_per_encounter:
       - [ Rogue, 2 ]
       - [ Modes, ~ ]
       - [ Mechanics, ~ ]
+      - [ Special, ~ ]
   3:
     ability_choices: [ rogue, general ]
     group_uses_per_encounter:
       - [ Rogue, 2 ]
       - [ Modes, ~ ]
       - [ Mechanics, ~ ]
+      - [ Special, ~ ]
   4:
     ability_choices: [ rogue ]
     group_uses_per_encounter:
       - [ Rogue, 3 ]
       - [ Modes, ~ ]
       - [ Mechanics, ~ ]
+      - [ Special, ~ ]
   5:
     ability_choices: [ rogue, general ]
     group_uses_per_encounter:
       - [ Rogue, 3 ]
       - [ Modes, ~ ]
       - [ Mechanics, ~ ]
+      - [ Special, ~ ]
   6:
     ability_choices: [ rogue ]
     group_uses_per_encounter:
       - [ Rogue, 3 ]
       - [ Modes, ~ ]
       - [ Mechanics, ~ ]
+      - [ Special, ~ ]
   7:
     ability_choices: [ rogue, general ]
     group_uses_per_encounter:
       - [ Rogue, 4 ]
       - [ Modes, ~ ]
       - [ Mechanics, ~ ]
+      - [ Special, ~ ]
   8:
     ability_choices: [ rogue ]
     group_uses_per_encounter:
       - [ Rogue, 4 ]
       - [ Modes, ~ ]
       - [ Mechanics, ~ ]
+      - [ Special, ~ ]
   9:
     ability_choices: [ rogue, general ]
     group_uses_per_encounter:
       - [ Rogue, 4 ]
       - [ Modes, ~ ]
       - [ Mechanics, ~ ]
+      - [ Special, ~ ]
   10:
     ability_choices: [ rogue ]
     group_uses_per_encounter:
       - [ Rogue, 5 ]
       - [ Modes, ~ ]
       - [ Mechanics, ~ ]
+      - [ Special, ~ ]
   11:
     ability_choices: [ rogue, general ]
     group_uses_per_encounter:
       - [ Rogue, 5 ]
       - [ Modes, ~ ]
       - [ Mechanics, ~ ]
+      - [ Special, ~ ]
   12:
     ability_choices: [ rogue ]
     group_uses_per_encounter:
       - [ Rogue, 5 ]
       - [ Modes, ~ ]
       - [ Mechanics, ~ ]
+      - [ Special, ~ ]
   13:
     ability_choices: [ rogue, general ]
     group_uses_per_encounter:
       - [ Rogue, 6 ]
       - [ Modes, ~ ]
       - [ Mechanics, ~ ]
+      - [ Special, ~ ]
   14:
     ability_choices: [ rogue ]
     group_uses_per_encounter:
       - [ Rogue, 6 ]
       - [ Modes, ~ ]
       - [ Mechanics, ~ ]
+      - [ Special, ~ ]
   15:
     ability_choices: [ rogue, general ]
     group_uses_per_encounter:
       - [ Rogue, 6 ]
       - [ Modes, ~ ]
       - [ Mechanics, ~ ]
+      - [ Special, ~ ]
 kits:
   - name: Swashbuckler
     default_attributes:

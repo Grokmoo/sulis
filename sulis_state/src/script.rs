@@ -453,6 +453,9 @@ fn get_targeter() -> Result<Rc<RefCell<AreaTargeter>>> {
 /// on the `accept` and `cancel` buttons.  If the user cancels, no action is taken.  If the
 /// user accepts, the specified `func` is called from the script with `id`.
 ///
+/// # `warn(message: String)`
+/// Logs the specified string to the game's output at warn level.
+///
 /// # `log(message: String)`
 /// Logs the specified string to the game's output at info level.  This is primarily useful
 /// for debugging purposes.
@@ -710,6 +713,11 @@ impl UserData for ScriptInterface {
             };
             let cb = OnTrigger::ShowConfirm(data);
             GameState::add_ui_callback(vec![cb], &pc, &pc);
+            Ok(())
+        });
+
+        methods.add_method("warn", |_, _, val: String| {
+            warn!("[LUA WARN]: {}", val);
             Ok(())
         });
 

@@ -694,6 +694,10 @@ fn add_bonus(bonus: &Bonus, state: &mut WidgetState, has_accuracy: &mut bool,
             let cost = amount / Module::rules().display_ap as i32;
             add(state, "attack_cost", cost);
         },
+        AbilityActionPointCost(amount) => {
+            let cost = amount / Module::rules().display_ap as i32;
+            add(state, "ability_ap_cost", cost);
+        },
         GroupUsesPerEncounter { group, amount } => {
             let index = find_index(group, group_uses_so_far);
             add(state, &format!("ability_group_{}", index), group);
@@ -711,6 +715,7 @@ fn add_bonus(bonus: &Bonus, state: &mut WidgetState, has_accuracy: &mut bool,
             add(state, &format!("weapon_proficiency_{:?}", weapon_kind), "true");
         },
         FlankingAngle(amount) => add(state, "flanking_angle", amount),
+        FreeAbilityGroupUse => add(state, "free_ability_group_use", true),
         AbilitiesDisabled => add(state, "abilities_disabled", true),
         MoveDisabled => add(state, "move_disabled", true),
         AttackDisabled => add(state, "attack_disabled", true),

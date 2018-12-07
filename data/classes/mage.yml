@@ -35,12 +35,14 @@ upgrades:
     ability_choices: []
     group_uses_per_encounter:
       - [ "Cantrips", 1 ]
+      - [ Special, ~ ]
     group_uses_per_day:
       - [ "Cantrips", 3 ]
   2:
     ability_choices: [ mage ]
     group_uses_per_encounter:
       - [ "Cantrips", 1 ]
+      - [ Special, ~ ]
     group_uses_per_day:
       - [ "Cantrips", 3 ]
       - [ "1st Circle", 1 ]
@@ -48,6 +50,7 @@ upgrades:
     ability_choices: [ mage, general ]
     group_uses_per_encounter:
       - [ "Cantrips", 2 ]
+      - [ Special, ~ ]
     group_uses_per_day:
       - [ "Cantrips", 2 ]
       - [ "1st Circle", 2 ]
@@ -56,6 +59,7 @@ upgrades:
     group_uses_per_encounter:
       - [ "Cantrips", 2 ]
       - [ "1st Circle", 1 ]
+      - [ Special, ~ ]
     group_uses_per_day:
       - [ "Cantrips", 2 ]
       - [ "1st Circle", 2 ]
@@ -64,6 +68,7 @@ upgrades:
     group_uses_per_encounter:
       - [ "Cantrips", 3 ]
       - [ "1st Circle", 1 ]
+      - [ Special, ~ ]
     group_uses_per_day:
       - [ "Cantrips", 1 ]
       - [ "1st Circle", 2 ]
@@ -73,6 +78,7 @@ upgrades:
     group_uses_per_encounter:
       - [ "Cantrips", 3 ]
       - [ "1st Circle", 2 ]
+      - [ Special, ~ ]
     group_uses_per_day:
       - [ "Cantrips", 1 ]
       - [ "1st Circle", 2 ]
@@ -82,6 +88,7 @@ upgrades:
     group_uses_per_encounter:
       - [ "Cantrips", 2 ]
       - [ "1st Circle", 2 ]
+      - [ Special, ~ ]
     group_uses_per_day:
       - [ "Cantrips", 2 ]
       - [ "1st Circle", 2 ]
@@ -92,6 +99,7 @@ upgrades:
       - [ "Cantrips", 4 ]
       - [ "1st Circle", 2 ]
       - [ "2nd Circle", 1 ]
+      - [ Special, ~ ]
     group_uses_per_day:
       - [ "1st Circle", 2 ]
       - [ "2nd Circle", 2 ]
@@ -101,6 +109,7 @@ upgrades:
       - [ "Cantrips", 4 ]
       - [ "1st Circle", 2 ]
       - [ "2nd Circle", 1 ]
+      - [ Special, ~ ]
     group_uses_per_day:
       - [ "1st Circle", 2 ]
       - [ "2nd Circle", 3 ]
@@ -111,6 +120,7 @@ upgrades:
       - [ "Cantrips", 4 ]
       - [ "1st Circle", 2 ]
       - [ "2nd Circle", 2 ]
+      - [ Special, ~ ]
     group_uses_per_day:
       - [ "1st Circle", 2 ]
       - [ "2nd Circle", 2 ]
@@ -121,6 +131,7 @@ upgrades:
       - [ "Cantrips", 4 ]
       - [ "1st Circle", 2 ]
       - [ "2nd Circle", 2 ]
+      - [ Special, ~ ]
     group_uses_per_day:
       - [ "1st Circle", 2 ]
       - [ "2nd Circle", 2 ]
@@ -132,6 +143,7 @@ upgrades:
       - [ "1st Circle", 2 ]
       - [ "2nd Circle", 2 ]
       - [ "3rd Circle", 1 ]
+      - [ Special, ~ ]
     group_uses_per_day:
       - [ "1st Circle", 2 ]
       - [ "2nd Circle", 2 ]
@@ -143,6 +155,7 @@ upgrades:
       - [ "1st Circle", 2 ]
       - [ "2nd Circle", 2 ]
       - [ "3rd Circle", 1 ]
+      - [ Special, ~ ]
     group_uses_per_day:
       - [ "1st Circle", 2 ]
       - [ "2nd Circle", 2 ]
@@ -155,6 +168,7 @@ upgrades:
       - [ "1st Circle", 2 ]
       - [ "2nd Circle", 2 ]
       - [ "3rd Circle", 2 ]
+      - [ Special, ~ ]
     group_uses_per_day:
       - [ "1st Circle", 2 ]
       - [ "2nd Circle", 2 ]
@@ -167,6 +181,7 @@ upgrades:
       - [ "1st Circle", 2 ]
       - [ "2nd Circle", 2 ]
       - [ "3rd Circle", 2 ]
+      - [ Special, ~ ]
     group_uses_per_day:
       - [ "1st Circle", 2 ]
       - [ "2nd Circle", 2 ]
@@ -180,6 +195,7 @@ upgrades:
       - [ "2nd Circle", 2 ]
       - [ "3rd Circle", 2 ]
       - [ "4th Circle", 1 ]
+      - [ Special, ~ ]
     group_uses_per_day:
       - [ "1st Circle", 2 ]
       - [ "2nd Circle", 2 ]
@@ -193,12 +209,13 @@ upgrades:
       - [ "2nd Circle", 2 ]
       - [ "3rd Circle", 2 ]
       - [ "4th Circle", 1 ]
+      - [ Special, ~ ]
     group_uses_per_day:
       - [ "1st Circle", 2 ]
       - [ "2nd Circle", 2 ]
       - [ "3rd Circle", 2 ]
       - [ "4th Circle", 3 ]
-  17:
+  18:
     ability_choices: [ mage, general ]
     group_uses_per_encounter:
       - [ "Cantrips", 4 ]
@@ -206,6 +223,7 @@ upgrades:
       - [ "2nd Circle", 2 ]
       - [ "3rd Circle", 2 ]
       - [ "4th Circle", 2 ]
+      - [ Special, ~ ]
     group_uses_per_day:
       - [ "1st Circle", 2 ]
       - [ "2nd Circle", 2 ]

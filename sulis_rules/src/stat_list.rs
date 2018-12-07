@@ -39,7 +39,9 @@ pub struct StatList {
 
     // these bonuses are applied only to the attack itself of the given weaponkind
     pub attack_bonuses: Vec<Bonus>,
+
     pub bonus_ap: i32,
+    pub bonus_ability_action_point_cost: i32,
     pub bonus_damage: Vec<Damage>,
     pub bonus_reach: f32,
     pub bonus_range: f32,
@@ -73,6 +75,7 @@ pub struct StatList {
     pub flanked_immunity: bool,
     pub sneak_attack_immunity: bool,
     pub crit_immunity: bool,
+    pub free_ability_group_use: bool,
     pub caster_level: i32,
     group_uses_per_encounter: HashMap<String, ExtInt>,
     group_uses_per_day: HashMap<String, ExtInt>,
@@ -88,6 +91,7 @@ impl StatList {
             flanking_bonuses: BonusList::default(),
             attack_bonuses: Vec::new(),
             bonus_ap: 0,
+            bonus_ability_action_point_cost: 0,
             bonus_damage: Vec::new(),
             bonus_reach: 0.0,
             bonus_range: 0.0,
@@ -122,6 +126,7 @@ impl StatList {
             flanked_immunity: false,
             sneak_attack_immunity: false,
             crit_immunity: false,
+            free_ability_group_use: false,
             caster_level: 0,
             group_uses_per_encounter: HashMap::new(),
             group_uses_per_day: HashMap::new(),
@@ -250,6 +255,7 @@ impl StatList {
 
         use crate::bonus::BonusKind::*;
         match bonus {
+            AbilityActionPointCost(amount) => self.bonus_ability_action_point_cost += amount * times_i32,
             Attribute { attribute, amount } => self.attributes.add(*attribute, *amount),
             ActionPoints(amount) => self.bonus_ap += amount * times_i32,
             Armor(amount) => self.armor.add_base(amount * times_i32),
@@ -289,6 +295,7 @@ impl StatList {
             AttackCost(amount) => self.attack_cost -= amount * times_i32,
             FlankingAngle(amount) => self.flanking_angle += amount * times_i32,
             CasterLevel(amount) => self.caster_level += amount * times_i32,
+            FreeAbilityGroupUse => self.free_ability_group_use = true,
             AbilitiesDisabled => self.abilities_disabled = true,
             MoveDisabled => self.move_disabled = true,
             AttackDisabled => self.attack_disabled = true,

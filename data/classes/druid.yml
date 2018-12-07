@@ -36,62 +36,77 @@ upgrades:
     ability_choices: [ ]
     group_uses_per_encounter:
       - [ Druid, 1 ]
+      - [ Special, ~ ]
   2:
     ability_choices: [ druid ]
     group_uses_per_encounter:
       - [ Druid, 2 ]
+      - [ Special, ~ ]
   3:
     ability_choices: [ druid, general ]
     group_uses_per_encounter:
       - [ Druid, 2 ]
+      - [ Special, ~ ]
   4:
     ability_choices: [ druid ]
     group_uses_per_encounter:
       - [ Druid, 3 ]
+      - [ Special, ~ ]
   5:
     ability_choices: [ druid, general ]
     group_uses_per_encounter:
       - [ Druid, 3 ]
+      - [ Special, ~ ]
   6:
     ability_choices: [ druid ]
     group_uses_per_encounter:
       - [ Druid, 3 ]
+      - [ Special, ~ ]
   7:
     ability_choices: [ druid, general ]
     group_uses_per_encounter:
       - [ Druid, 4 ]
+      - [ Special, ~ ]
   8:
     ability_choices: [ druid ]
     group_uses_per_encounter:
       - [ Druid, 4 ]
+      - [ Special, ~ ]
   9:
     ability_choices: [ druid, general ]
     group_uses_per_encounter:
       - [ Druid, 4 ]
+      - [ Special, ~ ]
   10:
     ability_choices: [ druid ]
     group_uses_per_encounter:
       - [ Druid, 5 ]
+      - [ Special, ~ ]
   11:
     ability_choices: [ druid, general ]
     group_uses_per_encounter:
       - [ Druid, 5 ]
+      - [ Special, ~ ]
   12:
     ability_choices: [ druid ]
     group_uses_per_encounter:
       - [ Druid, 5 ]
+      - [ Special, ~ ]
   13:
     ability_choices: [ druid, general ]
     group_uses_per_encounter:
       - [ Druid, 6 ]
+      - [ Special, ~ ]
   14:
     ability_choices: [ druid ]
     group_uses_per_encounter:
       - [ Druid, 6 ]
+      - [ Special, ~ ]
   15:
     ability_choices: [ druid, general ]
     group_uses_per_encounter:
       - [ Druid, 6 ]
+      - [ Special, ~ ]
 kits:
   - name: Avenger
     default_attributes:

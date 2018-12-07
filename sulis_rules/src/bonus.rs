@@ -54,6 +54,8 @@ pub enum BonusKind {
     AttackCost(i32),
     FlankingAngle(i32),
     CasterLevel(i32),
+    AbilityActionPointCost(i32),
+    FreeAbilityGroupUse,
     MoveDisabled,
     AttackDisabled,
     AbilitiesDisabled,
@@ -215,6 +217,7 @@ fn apply_modifiers(bonus: &mut Bonus, neg: f32, pos: f32) {
         AttackCost(val) => apply_kind_mod_i32!(AttackCost(val): neg, pos),
         FlankingAngle(val) => apply_kind_mod_i32!(FlankingAngle(val): neg, pos),
         CasterLevel(val) => apply_kind_mod_i32!(CasterLevel(val): neg, pos),
+        AbilityActionPointCost(val) => apply_kind_mod_i32!(AbilityActionPointCost(val): neg, pos),
         Damage(damage) => Damage(damage.mult_f32(pos)),
         ArmorKind { kind, amount } => {
             if amount > 0 {
@@ -240,7 +243,7 @@ fn apply_modifiers(bonus: &mut Bonus, neg: f32, pos: f32) {
         ArmorProficiency(_) | WeaponProficiency(_) | MoveDisabled
             | AttackDisabled | Hidden | GroupUsesPerEncounter { .. }
             | GroupUsesPerDay { .. } | FlankedImmunity | SneakAttackImmunity
-            | CritImmunity | AbilitiesDisabled => return,
+            | CritImmunity | AbilitiesDisabled | FreeAbilityGroupUse => return,
     };
 
     bonus.kind = new_kind;
@@ -254,7 +257,7 @@ macro_rules! merge_int_bonus {
     }
 }
 
-fn merge_if_dup(first: &Bonus, sec: &Bonus) -> Option<Bonus> {
+pub fn merge_if_dup(first: &Bonus, sec: &Bonus) -> Option<Bonus> {
     if first.when != sec.when { return None; }
 
     let when = first.when;
@@ -307,6 +310,9 @@ fn merge_if_dup(first: &Bonus, sec: &Bonus) -> Option<Bonus> {
         CritImmunity => if let CritImmunity = sec.kind {
             return Some(Bonus { when, kind: CritImmunity });
         },
+        FreeAbilityGroupUse => if let FreeAbilityGroupUse = sec.kind {
+            return Some(Bonus { when, kind: FreeAbilityGroupUse });
+        },
         GroupUsesPerEncounter { ref group, amount } => {
             if let GroupUsesPerEncounter { group: ref other_grp, amount: amt } = sec.kind {
                 if group != other_grp { return None; }
@@ -326,6 +332,7 @@ fn merge_if_dup(first: &Bonus, sec: &Bonus) -> Option<Bonus> {
         // all of these statements could be easily merged into one macro,
         // but then it would need to be its own match statement and you would
         // lose the exhaustiveness check
+        AbilityActionPointCost(val) => merge_int_bonus!(AbilityActionPointCost, val, sec, when),
         ActionPoints(val) => merge_int_bonus!(ActionPoints, val, sec, when),
         Armor(val) => merge_int_bonus!(Armor, val, sec, when),
         Range(val) => merge_int_bonus!(Range, val, sec, when),

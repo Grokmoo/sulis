@@ -20,6 +20,7 @@ use std::cell::RefCell;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{Button, TextArea};
+use sulis_module::on_trigger::ScriptMenuChoice;
 use sulis_state::script::{CallbackData, ScriptCallback, ScriptMenuSelection};
 
 const NAME: &str = "script_menu";
@@ -27,12 +28,12 @@ const NAME: &str = "script_menu";
 pub struct ScriptMenu {
     callback: CallbackData,
     title: String,
-    choices: Vec<String>,
+    choices: Vec<ScriptMenuChoice>,
 }
 
 impl ScriptMenu {
     pub fn new(callback: CallbackData, title: String,
-               choices: Vec<String>) -> Rc<RefCell<ScriptMenu>> {
+               choices: Vec<ScriptMenuChoice>) -> Rc<RefCell<ScriptMenu>> {
         Rc::new(RefCell::new(ScriptMenu { callback, title, choices }))
     }
 }
@@ -54,14 +55,14 @@ impl WidgetKind for ScriptMenu {
         // let entries = Widget::with_theme(scrollpane.clone(), "entries");
         for choice in self.choices.iter() {
             let text_area = Widget::with_defaults(TextArea::empty());
-            text_area.borrow_mut().state.add_text_arg("choice", choice);
+            text_area.borrow_mut().state.add_text_arg("choice", &choice.display);
 
             let widget = Widget::with_theme(Button::empty(), "entry");
 
-            let text = choice.to_string();
+            let text = choice.clone();
             let cb = self.callback.clone();
             widget.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let selection = ScriptMenuSelection { value: text.to_string() };
+                let selection = ScriptMenuSelection { value: text.value.to_string() };
                 cb.on_menu_select(selection);
 
                 let parent = Widget::go_up_tree(&widget, 2);

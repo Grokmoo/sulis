@@ -38,71 +38,85 @@ upgrades:
     group_uses_per_encounter:
       - [ Fighter, 2 ]
       - [ Modes, ~ ]
+      - [ Special, ~ ]
   3:
     ability_choices: [ fighter, general ]
     group_uses_per_encounter:
       - [ Fighter, 2 ]
       - [ Modes, ~ ]
+      - [ Special, ~ ]
   4:
     ability_choices: [ fighter ]
     group_uses_per_encounter:
       - [ Fighter, 3 ]
       - [ Modes, ~ ]
+      - [ Special, ~ ]
   5:
     ability_choices: [ fighter, general ]
     group_uses_per_encounter:
       - [ Fighter, 3 ]
       - [ Modes, ~ ]
+      - [ Special, ~ ]
   6:
     ability_choices: [ fighter ]
     group_uses_per_encounter:
       - [ Fighter, 3 ]
       - [ Modes, ~ ]
+      - [ Special, ~ ]
   7:
     ability_choices: [ fighter, general ]
     group_uses_per_encounter:
       - [ Fighter, 4 ]
       - [ Modes, ~ ]
+      - [ Special, ~ ]
   8:
     ability_choices: [ fighter ]
     group_uses_per_encounter:
       - [ Fighter, 4 ]
       - [ Modes, ~ ]
+      - [ Special, ~ ]
   9:
     ability_choices: [ fighter, general ]
     group_uses_per_encounter:
       - [ Fighter, 4 ]
       - [ Modes, ~ ]
+      - [ Special, ~ ]
   10:
     ability_choices: [ fighter ]
     group_uses_per_encounter:
       - [ Fighter, 5 ]
       - [ Modes, ~ ]
+      - [ Special, ~ ]
   11:
     ability_choices: [ fighter, general ]
     group_uses_per_encounter:
       - [ Fighter, 5 ]
       - [ Modes, ~ ]
+      - [ Special, ~ ]
   12:
     ability_choices: [ fighter ]
     group_uses_per_encounter:
       - [ Fighter, 5 ]
       - [ Modes, ~ ]
+      - [ Special, ~ ]
   13:
     ability_choices: [ fighter, general ]
     group_uses_per_encounter:
       - [ Fighter, 6 ]
       - [ Modes, ~ ]
+      - [ Special, ~ ]
   14:
     ability_choices: [ fighter ]
     group_uses_per_encounter:
       - [ Fighter, 6 ]
       - [ Modes, ~ ]
+      - [ Special, ~ ]
   15:
     ability_choices: [ fighter, general ]
     group_uses_per_encounter:
       - [ Fighter, 6 ]
       - [ Modes, ~ ]
+      - [ Special, ~ ]
 kits:
   - name: Brawler
     default_attributes:

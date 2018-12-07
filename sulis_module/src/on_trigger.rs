@@ -52,9 +52,16 @@ pub struct DialogData {
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
+pub struct ScriptMenuChoice {
+    pub display: String,
+    pub value: String,
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
+#[serde(deny_unknown_fields)]
 pub struct MenuData {
     pub title: String,
-    pub choices: Vec<String>,
+    pub choices: Vec<ScriptMenuChoice>,
     pub cb_func: String,
     pub cb_kind: Kind,
     pub cb_parent: usize,

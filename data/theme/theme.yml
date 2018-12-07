@@ -1301,6 +1301,7 @@ children:
       ][?fortitude|Fortitude: #fortitude#
       ][?reflex|Reflex: #reflex#
       ][?will|Will: #will#
+      ][?ability_ap_cost|Ability AP Cost: #ability_ap_cost#
       ][?concealment|Concealment: #concealment#
       ][?concealment_ignore|Ignore Concealment: #concealment_ignore#
       ][?crit_chance|Crit Chance: #crit_chance#%
@@ -1319,6 +1320,7 @@ children:
       ][?flanked_immunity|Flanked Immunity
       ][?sneak_attack_immunity|Sneak Attack Immunity
       ][?crit_immunity|Crit Immunity
+      ][?free_ability_group_use|Free Ability Group Use
       ][?prereqs|[s=4|]
       [s=6;c=f00|Prereqs]
       [?prereq_total_level|Level: #prereq_total_level#

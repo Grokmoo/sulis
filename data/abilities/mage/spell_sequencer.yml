@@ -1,0 +1,21 @@
+id: spell_sequencer
+name: "Spell Sequencer"
+icon: abilities/spell_sequencer
+description: |
+  You create a spell sequencer, which is a special ability that you can trigger at a later time.  Inside the sequencer, you store two spells of 2nd Circle or lower of your choice.  When the sequencer is activated, the spells are both fired in rapid sequence at the same target, for a cost of 2 AP.
+active:
+  script: "spell_sequencer"
+  group: "3rd Circle"
+  ap: 4000
+  duration:
+    Mode
+  cooldown: 4
+  ai:
+    priority: 10
+    kind: Special
+    group: Single
+    range: Personal
+  short_description: |
+    Store two spells to cast later at the same time.
+prereqs:
+  total_level: 9

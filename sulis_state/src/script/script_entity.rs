@@ -60,6 +60,9 @@ use crate::{ai, animation::{self}, script::*, MOVE_TO_THRESHOLD};
 /// # `add_ability(ability_id: String)`
 /// Adds the ability with the specified ID to this entity
 ///
+/// # `remove_ability(ability_id: String)`
+/// Removes the ability with the specified ID from this entity
+///
 /// # `add_levels(class: String, levels: Int)`
 /// Adds the specified number of levels of the specified class to this entity
 ///
@@ -119,11 +122,12 @@ use crate::{ai, animation::{self}, script::*, MOVE_TO_THRESHOLD};
 /// Returns true if this entity is a member of the player's party (or if it is the player),
 /// false otherwise.
 ///
-/// # `use_ability(ability: ScriptAbility) -> Bool`
+/// # `use_ability(ability: ScriptAbility, allow_invalid: Bool (Optional)) -> Bool`
 /// The parent entity attempts to use the `ability`.  Returns true if the ability use was
 /// successful, false if it was not.  After activating, the script will often need to handle
 /// a targeter (depending on the ability), using the methods on `ScriptInterface` (the `game`
-/// object).
+/// object).  If `allow_invalid` is set to true, the ability will fire even if the parent
+/// could not normally use it at this time.
 ///
 /// # `use_item(item: ScriptUsableItem) -> Bool`
 /// Attempts to use the specified `item`.  Returns true if the item use was successful, false
@@ -470,6 +474,21 @@ impl UserData for ScriptEntity {
             Ok(())
         });
 
+        methods.add_method("remove_ability", |_, entity, ability: String| {
+            let entity = entity.try_unwrap()?;
+
+            let actor = {
+                let old_actor = &entity.borrow().actor.actor;
+                let xp = entity.borrow().actor.xp();
+                Actor::from(old_actor, None, xp, Vec::new(), vec![ability],
+                    InventoryBuilder::default())
+            };
+
+            entity.borrow_mut().actor.replace_actor(actor);
+
+            Ok(())
+        });
+
         methods.add_method("add_ability", |_, entity, ability: String| {
             let entity = entity.try_unwrap()?;
 
@@ -483,7 +502,7 @@ impl UserData for ScriptEntity {
             let actor = {
                 let old_actor = &entity.borrow().actor.actor;
                 let xp = entity.borrow().actor.xp();
-                Actor::from(old_actor, None, xp, vec![ability],
+                Actor::from(old_actor, None, xp, vec![ability], Vec::new(),
                             InventoryBuilder::default())
             };
 
@@ -504,11 +523,12 @@ impl UserData for ScriptEntity {
             let actor = {
                 let old_actor = &entity.borrow().actor.actor;
                 let xp = entity.borrow().actor.xp();
-                Actor::from(old_actor, Some((class, levels)), xp, Vec::new(),
+                Actor::from(old_actor, Some((class, levels)), xp, Vec::new(), Vec::new(),
                     InventoryBuilder::default())
             };
 
             entity.borrow_mut().actor.replace_actor(actor);
+            entity.borrow_mut().actor.init_day();
 
             Ok(())
         });
@@ -602,9 +622,13 @@ impl UserData for ScriptEntity {
             Ok(is_member)
         });
 
-        methods.add_method("use_ability", |_, entity, ability: ScriptAbility| {
+        methods.add_method("use_ability", |_, entity, (ability, allow_invalid): (ScriptAbility, Option<bool>)| {
+            let allow_invalid = allow_invalid.unwrap_or(false);
+
             let parent = entity.try_unwrap()?;
-            if !parent.borrow().actor.can_toggle(&ability.id) { return Ok(false); }
+            if !allow_invalid {
+                if !parent.borrow().actor.can_toggle(&ability.id) { return Ok(false); }
+            }
             GameState::execute_ability_on_activate(&parent, &ability.to_ability());
             Ok(true)
         });
@@ -1280,6 +1304,11 @@ fn create_stats_table<'a>(lua: &'a Lua, parent: &ScriptEntity, _args: ()) -> Res
     stats.set("crit_multiplier", src.crit_multiplier)?;
     stats.set("movement_rate", src.movement_rate)?;
     stats.set("attack_cost", src.attack_cost)?;
+
+    stats.set("is_hidden", src.hidden)?;
+    stats.set("is_abilities_disabled", src.abilities_disabled)?;
+    stats.set("is_attack_disabled", src.attack_disabled)?;
+    stats.set("is_move_disabled", src.move_disabled)?;
 
     if let Some(image) = src.get_ranged_projectile() {
         stats.set("ranged_projectile", image.id())?;

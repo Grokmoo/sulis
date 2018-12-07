@@ -300,8 +300,9 @@ pub fn activate(widget: &Rc<RefCell<Widget>>, on_select: &Vec<OnTrigger>,
                 let mut pc = pc.borrow_mut();
                 let state = &mut pc.actor;
                 let new_actor = Actor::from(&state.actor, None, state.actor.xp, vec![ability],
-                                            state.actor.inventory.clone());
+                                            Vec::new(), state.actor.inventory.clone());
                 state.replace_actor(new_actor);
+                state.init_day();
             },
             PlayerCoins(amount) => {
                 GameState::add_party_coins(*amount);
@@ -423,7 +424,7 @@ fn load_module(widget: &Rc<RefCell<Widget>>, module_id: &str) {
     let pc = GameState::player();
     let inventory = character_window::get_inventory(&pc.borrow().actor);
     let actor = Actor::from(&pc.borrow().actor.actor, None, pc.borrow().actor.xp(),
-        Vec::new(), inventory);
+        Vec::new(), Vec::new(), inventory);
 
     let modules_list = Module::get_available_modules();
     for module in modules_list {

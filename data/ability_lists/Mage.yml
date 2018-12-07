@@ -34,6 +34,8 @@ abilities:
     position: [5, 2]
   - id: chameleon
     position: [5.5, 1.1]
+  - id: contingency
+    position: [4.5, 1.1]
 
   - id: slow
     position: [7, 5]
@@ -62,3 +64,5 @@ abilities:
     position: [7, 8.45]
   - id: wall_of_stone
     position: [4, 8.9]
+  - id: spell_sequencer
+    position: [3, 8.45]

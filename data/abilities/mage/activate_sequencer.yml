@@ -1,0 +1,21 @@
+id: activate_sequencer
+name: "Activate Sequencer"
+icon: abilities/spell_sequencer
+description: |
+  Activate a stored Spell Sequencer created with the Spell Sequencer ability.
+active:
+  script: "activate_sequencer"
+  group: "Special"
+  ap: 2000
+  duration:
+    Instant
+  cooldown: 2
+  ai:
+    priority: 10
+    kind: Special
+    group: Single
+    range: Personal
+  short_description: |
+    Activate a stored spell sequencer.
+prereqs:
+  total_level: 9

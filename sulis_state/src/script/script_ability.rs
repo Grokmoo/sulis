@@ -15,6 +15,7 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std;
+use std::cmp;
 use std::rc::Rc;
 use std::cell::RefCell;
 
@@ -340,7 +341,9 @@ fn activate(_lua: &Lua, ability: &ScriptAbility, (target, take_ap): (ScriptEntit
 
     let mgr = GameState::turn_manager();
     if take_ap && mgr.borrow().is_combat_active() {
-        entity.borrow_mut().actor.remove_ap(ability.ap);
+        let bonus = entity.borrow().actor.stats.bonus_ability_action_point_cost;
+        let ap = cmp::max(0, ability.ap as i32 - bonus);
+        entity.borrow_mut().actor.remove_ap(ap as u32);
     }
 
     let area = GameState::area_state();

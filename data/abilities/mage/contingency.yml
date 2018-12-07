@@ -1,0 +1,21 @@
+id: contingency
+name: "Contingency"
+icon: abilities/contingency
+description: |
+  You select a trigger condition such as being hit, badly damaged, or attacked in melee.  Then, you select another spell of 2nd Circle or lower that can be cast on yourself.  The next time the trigger condition is met, this spell will automatically be cast on yourself without using any AP, even if it is not currently your turn.
+active:
+  script: "contingency"
+  group: "3rd Circle"
+  ap: 4000
+  duration:
+    Mode
+  cooldown: 4
+  ai:
+    priority: 10
+    kind: Special
+    group: Single
+    range: Personal
+  short_description: |
+    Cause another spell to automatically trigger when a condition is met.
+prereqs:
+  total_level: 9

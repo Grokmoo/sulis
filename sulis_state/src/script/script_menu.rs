@@ -16,16 +16,17 @@
 
 use rlua::{UserData, UserDataMethods};
 
-use sulis_module::on_trigger::{self, OnTrigger};
+use sulis_module::on_trigger::{self, OnTrigger, ScriptMenuChoice};
 use crate::script::{script_callback::FuncKind, CallbackData};
 use crate::GameState;
 
 /// A user interface menu being created by a script.  Normally created
 /// by `game:create_menu()`
 ///
-/// # `add_choice(text: String)`
-/// Adds a choice to this menu that the user can select.  The text is
-/// displayed and also returned to the callback if selected.
+/// # `add_choice(text: String, value: String (Optional))`
+/// Adds a choice to this menu that the user can select.  The `text` is
+/// displayed.  The selection return is either `value` if specified,
+/// or `text` if not.
 ///
 /// # `show()`
 /// Shows this menu, allowing the user to select their choice.
@@ -48,8 +49,13 @@ impl ScriptMenu {
 
 impl UserData for ScriptMenu {
     fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
-        methods.add_method_mut("add_choice", |_, menu, text: String| {
-            menu.choices.push(ScriptMenuChoice { text });
+        methods.add_method_mut("add_choice", |_, menu, (text, value): (String, Option<String>)| {
+            let value = match value {
+                None => text.clone(),
+                Some(value) => value,
+            };
+
+            menu.choices.push(ScriptMenuChoice { display: text, value });
             Ok(())
         });
 
@@ -63,7 +69,7 @@ impl UserData for ScriptMenu {
                 Some(func) => func,
             };
 
-            let choices = menu.choices.iter().map(|choice| choice.text.to_string()).collect();
+            let choices = menu.choices.clone();
 
             let data = on_trigger::MenuData {
                 title: menu.title.to_string(),
@@ -80,13 +86,4 @@ impl UserData for ScriptMenu {
             Ok(())
         });
     }
-}
-
-#[derive(Clone)]
-pub struct ScriptMenuChoice {
-    text: String,
-}
-
-impl UserData for ScriptMenuChoice {
-    fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(_methods: &mut M) { }
 }

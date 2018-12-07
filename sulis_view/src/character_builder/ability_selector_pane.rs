@@ -108,7 +108,7 @@ impl BuilderPane for AbilitySelectorPane {
             };
 
             Rc::new(Actor::from(&state.actor, class, 0,
-                builder.abilities.clone(), state.actor.inventory.clone()))
+                builder.abilities.clone(), Vec::new(), state.actor.inventory.clone()))
         };
 
         self.prereqs_not_met.clear();

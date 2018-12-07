@@ -131,7 +131,8 @@ impl PartialEq for Actor {
 
 impl Actor {
     pub fn from(other: &Actor, class_to_add: Option<(Rc<Class>, u32)>, xp: u32,
-                abilities_to_add: Vec<Rc<Ability>>, inventory: InventoryBuilder) -> Actor {
+                abilities_to_add: Vec<Rc<Ability>>, abilities_to_remove: Vec<String>,
+                inventory: InventoryBuilder) -> Actor {
 
         let mut levels = other.levels.clone();
         let mut total_level = other.total_level;
@@ -170,6 +171,9 @@ impl Actor {
             }
         }
 
+        for ability in abilities_to_remove {
+            abilities.retain(|owned| owned.ability.id != ability);
+        }
 
         Actor {
             id: other.id.to_string(),

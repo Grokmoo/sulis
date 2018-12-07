@@ -79,7 +79,8 @@ impl BuilderSet for LevelUpBuilder {
         let state = &mut pc.actor;
 
         let new_actor = Actor::from(&state.actor, Some((class, 1)), state.xp(),
-            builder.abilities.clone(), state.actor.inventory.clone());
+            builder.abilities.clone(), Vec::new(), state.actor.inventory.clone());
         state.replace_actor(new_actor);
+        state.init_day();
     }
 }

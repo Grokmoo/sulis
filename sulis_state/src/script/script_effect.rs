@@ -19,7 +19,7 @@ use std::str::FromStr;
 use rlua::{Lua, UserData, UserDataMethods};
 
 use sulis_core::util::{ExtInt, Point};
-use sulis_rules::{Attribute, Bonus, BonusKind, BonusList, Damage, DamageKind, bonus::Contingent,
+use sulis_rules::{Attribute, Bonus, BonusKind, BonusList, Damage, DamageKind, bonus::{self, Contingent},
     WeaponKind, ArmorKind, Slot, WeaponStyle};
 
 use crate::script::{CallbackData, Result, script_particle_generator, ScriptParticleGenerator,
@@ -102,6 +102,16 @@ impl UserData for ScriptMenuSelection {
 /// Returns true if this effect has infinite duration (manually removed or modal),
 /// false otherwise
 ///
+/// # `has_bonus_of_kind(kind: String) -> Bool`
+/// Checks whether this effect has one of more bonuses of the given kind.  The kind
+/// Bonus kinds include `armor`, `ap`, `reach`, `range`, `initiative`, `hit_points`,
+/// `melee_accuracy`, `ranged_accuracy`, `spell_accuracy`, `defense`, `fortitude`,
+/// `reflex`, `will`, `concealment`, `concealment_ignore`, `crit_chance`,
+/// `hit_threshold`, `graze_threshold`, `graze_multiplier`, `hit_multiplier`,
+/// `crit_multiplier`, `movement_rate`, `attack_cost`, `ability_ap_cost`,
+/// `hidden`, `free_ability_group_use`, abilities_disabled`, `move_disabled`,
+/// `attack_disabled`, `flanked_immunity`, `sneak_attack_immunity`, `crit_immunity`
+///
 /// # `mark_for_removal()`
 /// Marks this effect to be removed on the next update.  This is done asynchronously,
 /// so the effect will still be applied when this method returns.
@@ -124,6 +134,67 @@ impl ScriptAppliedEffect {
             total_duration: effect.total_duration,
         }
     }
+}
+
+fn check_for_bonus(effect: &ScriptAppliedEffect, kind: String) -> bool {
+    let mgr = GameState::turn_manager();
+    let mgr = mgr.borrow();
+    let effect = match mgr.effect_checked(effect.index) {
+        None => {
+            error!("Invalid ScriptAppliedEffect {}", effect.name);
+            return false;
+        }, Some(effect) => effect,
+    };
+
+    use sulis_rules::bonus::BonusKind::*;
+    let kind = match kind.as_ref() {
+        "ability_ap_cost" => AbilityActionPointCost(0),
+        "armor" => Armor(0),
+        "ap" => ActionPoints(0),
+        "reach" => Reach(0.0),
+        "range" => Range(0.0),
+        "initiative" => Initiative(0),
+        "hit_points" => HitPoints(0),
+        "melee_accuracy" => MeleeAccuracy(0),
+        "ranged_accuracy" => RangedAccuracy(0),
+        "spell_accuracy" => SpellAccuracy(0),
+        "defense" => Defense(0),
+        "fortitude" => Fortitude(0),
+        "reflex" => Reflex(0),
+        "will" => Will(0),
+        "concealment" => Concealment(0),
+        "concealment_ignore" => ConcealmentIgnore(0),
+        "crit_chance" => CritChance(0),
+        "hit_threshold" => HitThreshold(0),
+        "graze_threshold" => GrazeThreshold(0),
+        "graze_multiplier" => GrazeMultiplier(0.0),
+        "hit_multiplier" => HitMultiplier(0.0),
+        "crit_multiplier" => CritMultiplier(0.0),
+        "movement_rate" => MovementRate(0.0),
+        "attack_cost" => AttackCost(0),
+        "hidden" => Hidden,
+        "free_ability_group_use" => FreeAbilityGroupUse,
+        "abilities_disabled" => AbilitiesDisabled,
+        "move_disabled" => MoveDisabled,
+        "attack_disabled" => AttackDisabled,
+        "flanked_immunity" => FlankedImmunity,
+        "sneak_attack_immunity" => SneakAttackImmunity,
+        "crit_immunity" => CritImmunity,
+        _ => {
+            warn!("Attempted to add num bonus with invalid type '{}'", kind);
+            return false;
+        }
+    };
+
+    for bonus in effect.bonuses.iter() {
+        let check_bonus = Bonus { when: bonus.when, kind: kind.clone() };
+
+        if bonus::merge_if_dup(bonus, &check_bonus).is_some() {
+            return true;
+        }
+    }
+
+    true
 }
 
 impl UserData for ScriptAppliedEffect {
@@ -149,6 +220,10 @@ impl UserData for ScriptAppliedEffect {
 
         methods.add_method("total_duration_is_infinite", |_, effect, ()| {
             Ok(effect.total_duration.is_infinite())
+        });
+
+        methods.add_method("has_bonus_of_kind", |_, effect, kind: String| {
+            Ok(check_for_bonus(effect, kind))
         });
 
         methods.add_method("mark_for_removal", |_, effect, ()| {
@@ -216,7 +291,7 @@ impl UserData for ScriptAppliedEffect {
 /// `melee_accuracy`, `ranged_accuracy`, `spell_accuracy`, `defense`, `fortitude`,
 /// `reflex`, `will`, `concealment`, `concealment_ignore`, `crit_chance`,
 /// `hit_threshold`, `graze_threshold`, `graze_multiplier`, `hit_multiplier`,
-/// `crit_multiplier`, `movement_rate`, `attack_cost`
+/// `crit_multiplier`, `movement_rate`, `attack_cost`, `ability_ap_cost`
 ///
 /// # `add_damage(min: Float, max: Float, ap: Float (Optional), when: String (Optional))`
 /// Adds a damage bonus of the specified amount (from `min` to `max` randomly, with `ap`
@@ -224,6 +299,9 @@ impl UserData for ScriptAppliedEffect {
 ///
 /// # `add_hidden(when: String (Optional))`
 /// Adds the hidden status to this effect.  See `add_num_bonus`
+///
+/// # `add_free_ability_group_use(when: String(Optional))`
+/// Abbs ability use not using up group uses per encounter/day to this effect.  See `add_num_bonus`
 ///
 /// # `add_abilities_disabled(when: String (Optional))`
 /// Adds ability-use disabled status to this effect.  See `add_num_bonus`
@@ -365,6 +443,11 @@ impl UserData for ScriptEffect {
         });
         methods.add_method_mut("add_hidden", |_, effect, when: Option<String>| {
             let kind = BonusKind::Hidden;
+            add_bonus_to_effect(effect, kind, when);
+            Ok(())
+        });
+        methods.add_method_mut("add_free_ability_group_use", |_, effect, when: Option<String>| {
+            let kind = BonusKind::FreeAbilityGroupUse;
             add_bonus_to_effect(effect, kind, when);
             Ok(())
         });
@@ -547,6 +630,7 @@ fn add_num_bonus(_lua: &Lua, effect: &mut ScriptEffect, (name, amount, when):
     trace!("Adding numeric bonus {} to '{}'", amount, name);
     use sulis_rules::bonus::BonusKind::*;
     let kind = match name.as_ref() {
+        "ability_ap_cost" => AbilityActionPointCost(amount_int),
         "armor" => Armor(amount_int),
         "ap" => ActionPoints(amount_int),
         "reach" => Reach(amount),

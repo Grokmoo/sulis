@@ -43,7 +43,7 @@ pub struct ActorState {
 }
 
 impl ActorState {
-    pub fn load(save: ActorSaveState, base: Option<ActorBuilder>) -> Result<ActorState, Error> {
+    pub fn load(mut save: ActorSaveState, base: Option<ActorBuilder>) -> Result<ActorState, Error> {
         let actor = match base {
             None => {
                 match Module::actor(&save.id) {
@@ -67,14 +67,27 @@ impl ActorState {
 
             let mut ability_state = AbilityState::new(&ability.ability);
 
-            match save.ability_states.get(&ability.ability.id) {
+            match save.ability_states.remove(&ability.ability.id) {
                 None => (),
-                Some(ref ability_save) => {
+                Some(ability_save) => {
                     ability_state.remaining_duration = ability_save.remaining_duration;
                 }
             }
 
             ability_states.insert(ability.ability.id.to_string(), ability_state);
+        }
+
+        // Add any abilities that aren't on the base actor
+        for (ability_id, state) in save.ability_states {
+            let ability = match Module::ability(&ability_id) {
+                None => return invalid_data_error(&format!("No ability with ID '{}' for actor '{}'",
+                                                    ability_id, actor.id)),
+                Some(ability) => ability,
+            };
+
+            let mut ability_state = AbilityState::new(&ability);
+            ability_state.remaining_duration = state.remaining_duration;
+            ability_states.insert(ability_id, ability_state);
         }
 
         let mut inventory = Inventory::empty();
@@ -349,18 +362,22 @@ impl ActorState {
         };
         state.activate();
 
-        let per_enc = *self.p_stats.current_group_uses_per_encounter
-            .get(&state.group).unwrap_or(&ExtInt::Int(0));
+        let decrement_uses = !self.stats.free_ability_group_use;
 
-        // take one use from per encounter if available, otherwise take from per day
-        if per_enc.is_zero() {
-            let per_day = *self.p_stats.current_group_uses_per_day
+        if decrement_uses {
+            let per_enc = *self.p_stats.current_group_uses_per_encounter
                 .get(&state.group).unwrap_or(&ExtInt::Int(0));
-            self.p_stats.current_group_uses_per_day
-                .insert(state.group.to_string(), per_day - 1);
-        } else {
-            self.p_stats.current_group_uses_per_encounter
-                .insert(state.group.to_string(), per_enc - 1);
+
+            // take one use from per encounter if available, otherwise take from per day
+            if per_enc.is_zero() {
+                let per_day = *self.p_stats.current_group_uses_per_day
+                    .get(&state.group).unwrap_or(&ExtInt::Int(0));
+                self.p_stats.current_group_uses_per_day
+                    .insert(state.group.to_string(), per_day - 1);
+            } else {
+                self.p_stats.current_group_uses_per_encounter
+                    .insert(state.group.to_string(), per_enc - 1);
+            }
         }
     }
 
@@ -379,8 +396,24 @@ impl ActorState {
             self.ability_states.insert(ability.id.to_string(), AbilityState::new(ability));
         }
 
+        let mut to_remove = Vec::new();
+        for id in self.ability_states.keys() {
+            let mut found = false;
+            for owned in self.actor.abilities.iter() {
+                if &owned.ability.id == id {
+                    found = true;
+                    break;
+                }
+            }
+
+            if !found { to_remove.push(id.clone()); }
+        }
+
+        for id in to_remove {
+            self.ability_states.remove(&id);
+        }
+
         self.compute_stats();
-        self.init_day();
     }
 
     pub fn draw(&self, renderer: &mut GraphicsRenderer, scale_x: f32, scale_y: f32,

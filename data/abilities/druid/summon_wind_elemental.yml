@@ -20,3 +20,6 @@ active:
 prereqs:
   abilities: [ summon_animal ]
   total_level: 12
+upgrades:
+  - description: |
+      Your wind elemental can now cast the wind gust and shock spells in combat.

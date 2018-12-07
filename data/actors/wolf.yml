@@ -17,10 +17,4 @@ reward:
   xp: 10
   loot: level1_misc
   loot_chance: 35
-abilities:
-  - armor_light
-  - armor_medium
-  - weapon_bow
-  - weapon_small_sword
-  - weapon_spear
-  - weapon_simple
+abilities: []

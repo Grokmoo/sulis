@@ -43,12 +43,25 @@ end
 
 function on_moved(parent, ability, targets)
   target = targets:first()
-  target:take_damage(parent, 2, 4, "Piercing", 18)
+  target:take_damage(parent, 2, 4, "Piercing", 5)
 end
 
 function on_round_elapsed(parent, ability, targets)
   targets = targets:to_table()
-  for i = 1, #targets do
-	targets[i]:take_damage(parent, 2, 4, "Piercing", 18)
+
+  special_index = 0
+  if parent:ability_level(ability) > 1 then
+    special_index = math.random(#targets)
   end
+
+  for i = 1, #targets do
+    if i == special_index then
+	  game:say_line("Swarmed!", targets[i])
+	  targets[i]:take_damage(parent, 15, 22, "Piercing", 8)
+	else
+	  targets[i]:take_damage(parent, 2, 4, "Piercing", 5)
+	end
+  end
+  
+  
 end

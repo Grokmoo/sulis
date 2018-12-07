@@ -13,6 +13,10 @@ function on_activate(parent, ability)
   
   effect:add_num_bonus("spell_accuracy", -30)
   
+  if parent:ability_level(ability) > 1 then
+    effect:add_damage_of_kind(3, 7, "Raw")
+  end
+  
   inv = parent:inventory()
   
   held_main = inv:unequip_item("held_main")

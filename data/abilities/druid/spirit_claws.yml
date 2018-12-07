@@ -19,3 +19,6 @@ active:
     range: Personal
   short_description: |
     Grants a magical damage melee attack.
+upgrades:
+  - description: |
+      Your spirit claws now do additional Raw damage that cannot be resisted.

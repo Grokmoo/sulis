@@ -65,6 +65,9 @@ groups:
       layer_of_bark: [3, 5]
       tree_shape: [4, 5]
       frostbite: [5, 5]
+      web: [6, 5]
+      shroom_spores: [7, 5]
+      spore_cloud: [8, 5]
       
       flaming_fingers: [0, 6]
       fire_shield: [1, 6]

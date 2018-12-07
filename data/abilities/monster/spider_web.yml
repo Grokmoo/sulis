@@ -1,6 +1,6 @@
 id: spider_web
 name: "Spider Web"
-icon: empty
+icon: abilities/web
 description: |
   Creates sticky webs in an area, preventing targets from moving or slowing them.
 active:

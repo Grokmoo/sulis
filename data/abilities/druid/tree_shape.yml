@@ -22,3 +22,6 @@ active:
 prereqs:
   abilities: [ layer_of_bark ]
   total_level: 9
+upgrades:
+  - description: |
+      Your tree shape additionally gains resistance to physical damage types including Piercing, Slashing, and Crushing.

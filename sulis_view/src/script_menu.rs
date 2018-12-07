@@ -19,7 +19,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_widgets::{Button, TextArea, ScrollPane};
+use sulis_widgets::{Button, TextArea};
 use sulis_state::script::{CallbackData, ScriptCallback, ScriptMenuSelection};
 
 const NAME: &str = "script_menu";
@@ -49,8 +49,9 @@ impl WidgetKind for ScriptMenu {
             parent.borrow_mut().mark_for_removal();
         })));
 
-        let scrollpane = ScrollPane::new();
-        let entries = Widget::with_theme(scrollpane.clone(), "entries");
+        let entries = Widget::empty("entries");
+        // let scrollpane = ScrollPane::new();
+        // let entries = Widget::with_theme(scrollpane.clone(), "entries");
         for choice in self.choices.iter() {
             let text_area = Widget::with_defaults(TextArea::empty());
             text_area.borrow_mut().state.add_text_arg("choice", choice);
@@ -63,16 +64,17 @@ impl WidgetKind for ScriptMenu {
                 let selection = ScriptMenuSelection { value: text.to_string() };
                 cb.on_menu_select(selection);
 
-                let parent = Widget::go_up_tree(&widget, 3);
+                let parent = Widget::go_up_tree(&widget, 2);
                 parent.borrow_mut().mark_for_removal();
             })));
             Widget::add_child_to(&widget, text_area);
-            scrollpane.borrow().add_to_content(widget);
+            Widget::add_child_to(&entries, widget);
+            // scrollpane.borrow().add_to_content(widget);
         }
 
         let title = Widget::with_theme(TextArea::empty(), "title");
         title.borrow_mut().state.add_text_arg("title", &self.title);
 
-        vec![cancel, title, entries]
+        vec![title, entries, cancel]
     }
 }

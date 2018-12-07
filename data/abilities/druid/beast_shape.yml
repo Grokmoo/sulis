@@ -22,3 +22,6 @@ active:
 prereqs:
   abilities: [ enlarge ]
   total_level: 6
+upgrades:
+  - description: |
+      Your beast shape gains vastly improved physical attributes.

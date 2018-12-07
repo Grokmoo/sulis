@@ -17,7 +17,12 @@ function on_target_select(parent, ability, targets)
   
   levels = parent:stats().caster_level
   if levels > 3 then
-    summon:add_levels("fighter", levels - 3)
+    summon:add_levels("mage", levels - 3)
+  end
+  
+  if parent:ability_level(ability) > 1 then
+    summon:add_ability("wind_gust")
+	summon:add_ability("shock")
   end
   
   effect = summon:create_effect(ability:name(), ability:duration())

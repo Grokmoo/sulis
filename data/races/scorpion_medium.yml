@@ -2,13 +2,13 @@ id: scorpion_medium
 name: Scorpion
 description: "Monster"
 size: 2by2
-movement_rate: 0.8
+movement_rate: 0.7
 base_stats:
   - kind: { attribute: { attribute: Strength, amount: 1 } }
-  - kind: { attribute: { attribute: Dexterity, amount: 5 } }
-  - kind: { attribute: { attribute: Endurance, amount: 2 } }
+  - kind: { attribute: { attribute: Dexterity, amount: 3 } }
+  - kind: { attribute: { attribute: Endurance, amount: -2 } }
   - kind: { attribute: { attribute: Intellect, amount: -5 } }
-  - kind: { hit_points: 40 }
+  - kind: { hit_points: 20 }
   - kind: { melee_accuracy: 30 }
   - kind: { ranged_accuracy: 30 }
   - kind: { spell_accuracy: 20 }

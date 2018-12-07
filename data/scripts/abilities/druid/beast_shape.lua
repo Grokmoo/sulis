@@ -11,9 +11,14 @@ function on_activate(parent, ability)
   cb:set_on_removed_fn("on_removed")
   effect:add_callback(cb)
   
-  effect:add_attribute_bonus("Strength", 3)
-  effect:add_attribute_bonus("Dexterity", 2)
-  effect:add_attribute_bonus("Endurance", 2)
+  attr_bonus = 2
+  if parent:ability_level(ability) > 1 then
+    attr_bonus = 6
+  end
+  
+  effect:add_attribute_bonus("Strength", attr_bonus)
+  effect:add_attribute_bonus("Dexterity", attr_bonus)
+  effect:add_attribute_bonus("Endurance", attr_bonus)
   effect:add_abilities_disabled()
   
   stats = parent:stats()

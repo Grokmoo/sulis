@@ -1,14 +1,14 @@
-id: wolf
-name: Wolf
+id: rat
+name: Rat
 description: "Monster"
 size: 2by2
 movement_rate: 1.3
 base_stats:
-  - kind: { attribute: { attribute: Strength, amount: 1 } }
-  - kind: { attribute: { attribute: Dexterity, amount: 3 } }
-  - kind: { attribute: { attribute: Endurance, amount: 1 } }
+  - kind: { attribute: { attribute: Strength, amount: -4 } }
+  - kind: { attribute: { attribute: Dexterity, amount: 6 } }
+  - kind: { attribute: { attribute: Perception, amount: 2 } }
   - kind: { attribute: { attribute: Intellect, amount: -5 } }
-  - kind: { hit_points: 25 }
+  - kind: { hit_points: 10 }
   - kind: { melee_accuracy: 25 }
   - kind: { ranged_accuracy: 30 }
   - kind: { spell_accuracy: 25 }
@@ -16,26 +16,26 @@ base_stats:
   - kind: { fortitude: 30 }
   - kind: { reflex: 30 }
   - kind: { will: 30 }
-  - kind: { reach: 1.0 }
+  - kind: { reach: 0.0 }
 base_attack:
   damage:
-    min: 8
-    max: 12
+    min: 6
+    max: 10
     kind: Piercing
   kind: #Melee
     reach: 0.5
   bonuses: {}
 default_images:
   Male:
-    Background: creatures/wolf01
-    Shadow: creatures/wolf_shadow
+    Background: creatures/rat0
+    Shadow: creatures/goblin_shadow
   Female:
-    Background: creatures/wolf01
-    Shadow: creatures/wolf_shadow
+    Background: creatures/rat0
+    Shadow: creatures/goblin_shadow
 ticker_offset: [0.5, 2]
 image_layer_offset_scale: 16
 image_layer_offsets:
-  Shadow: [-8, -19]
-  Background: [-8, -19]
+  Shadow: [0, 0]
+  Background: [0, -2]
 image_layer_postfix: {}
 

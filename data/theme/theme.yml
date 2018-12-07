@@ -1143,9 +1143,11 @@ children:
   script_menu:
     background: 60_transparent_fill
     border: [1, 1, 1, 1]
-    preferred_size: [60, 60]
+    preferred_size: [60, 0]
     x_relative: Center
     y_relative: Center
+    height_relative: ChildSum
+    layout: BoxVertical
     children:
       title:
         from: .text_area
@@ -1158,36 +1160,24 @@ children:
         preferred_size: [0, 10]
         text: "Cancel"
         width_relative: Max
-        y_relative: Max
       entries:
-        border: [2, 2, 2, 2]
+        border: { top: 2, bottom: 5, left: 2, right: 2 }
         width_relative: Max
-        height_relative: Max
-        preferred_size: [0, -14]
-        position: [0, 4]
+        height_relative: ChildSum
+        layout: BoxVertical
+        layout_spacing: { top: 0, bottom: 2, left: 0, right: 0 }
         children:
-          scrollbar:
-            from: .scrollbar
-            custom:
-              scroll_delta: 12
-          content:
+          entry:
+            from: .button
             width_relative: Max
-            height_relative: Max
-            preferred_size: [0, 0]
-            layout: BoxVertical
-            layout_spacing: { top: 0, bottom: 2, left: 0, right: 0 }
+            preferred_size: [0, 10]
             children:
-              entry:
-                from: .button
+              text_area:
+                from: .text_area
                 width_relative: Max
-                preferred_size: [0, 10]
-                children:
-                  text_area:
-                    from: .text_area
-                    width_relative: Max
-                    height_relative: Max
-                    text: |
-                      [a=54|#choice#]
+                height_relative: Max
+                text: |
+                  [a=54|#choice#]
   script_confirmation:
     from: .confirmation_window
     children:

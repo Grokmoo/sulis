@@ -20,3 +20,4 @@ prereqs:
   abilities: [ deadly_caster ]
   levels:
     mage: 9
+    druid: 9

@@ -1,8 +1,8 @@
 id: spore_cloud
 name: "Spore Cloud"
-icon: empty
+icon: abilities/spore_cloud
 description: |
-  Creates a cloud of mushroom spores.
+  Creates a cloud of mushroom spores that lower the mental capabilities of targets in the specified area.
 active:
   script: "spore_cloud"
   group: Fighter
@@ -16,4 +16,4 @@ active:
     group: Multiple
     range: Short
   short_description: |
-    Create a cloud of shroom spores.
+    Lower a group of opponent's mental capacities.

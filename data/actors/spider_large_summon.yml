@@ -1,9 +1,9 @@
-id: scorpion_medium
+id: spider_large_summon
 ai: ai_basic
-name: Scorpion
+name: Large Spider
 faction: Hostile
 images: {}
-race: scorpion_medium
+race: spider_large
 attributes:
   str: 10
   dex: 10
@@ -16,5 +16,7 @@ levels:
 reward:
   xp: 10
   loot: level1_misc
-  loot_chance: 35
-abilities: []
+  loot_chance: 30
+abilities:
+  - spider_web
+  - spider_immunity

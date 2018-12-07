@@ -20,3 +20,6 @@ active:
 prereqs:
   abilities: [ summon_animal ]
   total_level: 6
+upgrades:
+  - description: |
+      Each round, one target within the swarm is selected at random to receive a massive surge of insects, dealing heavy damage.

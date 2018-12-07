@@ -49,6 +49,10 @@ function apply_effect(parent, ability, targets)
   effect:add_num_bonus("fortitude", amount)
   effect:add_num_bonus("reflex", amount)
   effect:add_num_bonus("will", amount)
+  
+  if parent:ability_level(ability) > 1 then
+    effect:add_num_bonus("concealment", amount)
+  end
 
   anim = target:create_particle_generator("sparkle")
   anim:set_moves_with_parent()

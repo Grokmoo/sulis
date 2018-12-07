@@ -1,6 +1,6 @@
 id: shroom_spores
 name: "Shroom Spores"
-icon: empty
+icon: abilities/shroom_spores
 description: |
   The target must succeed at a Fortitude save or be put to sleep.
 active:

@@ -17,3 +17,6 @@ active:
     range: Short
   short_description: |
     Improve all types of defenses for nearby allies.
+upgrades:
+  - description: |
+      The spirits take a more active role in absorbing some hits, granting all affected a measure of concealment.

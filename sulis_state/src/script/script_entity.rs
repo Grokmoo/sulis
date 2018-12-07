@@ -57,6 +57,9 @@ use crate::{ai, animation::{self}, script::*, MOVE_TO_THRESHOLD};
 /// many tiles on the map it can see).  This is dependant on the
 /// area that the entity is in.
 ///
+/// # `add_ability(ability_id: String)`
+/// Adds the ability with the specified ID to this entity
+///
 /// # `add_levels(class: String, levels: Int)`
 /// Adds the specified number of levels of the specified class to this entity
 ///
@@ -464,6 +467,27 @@ impl UserData for ScriptEntity {
         methods.add_method("add_xp", |_, entity, amount: u32| {
             let entity = entity.try_unwrap()?;
             entity.borrow_mut().actor.add_xp(amount);
+            Ok(())
+        });
+
+        methods.add_method("add_ability", |_, entity, ability: String| {
+            let entity = entity.try_unwrap()?;
+
+            let ability = match Module::ability(&ability) {
+                None => {
+                    warn!("Invalid ability '{}' in script", ability);
+                    return Ok(());
+                }, Some(ability) => ability,
+            };
+
+            let actor = {
+                let old_actor = &entity.borrow().actor.actor;
+                let xp = entity.borrow().actor.xp();
+                Actor::from(old_actor, None, xp, vec![ability],
+                            InventoryBuilder::default())
+            };
+
+            entity.borrow_mut().actor.replace_actor(actor);
             Ok(())
         });
 

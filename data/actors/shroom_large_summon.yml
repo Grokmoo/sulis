@@ -1,0 +1,24 @@
+id: shroom_large_summon
+ai: ai_basic
+name: Mushroom
+faction: Hostile
+images:
+  Background: creatures/shroom_large
+  Shadow: creatures/shroom_large_shadow
+race: shroom
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
+levels:
+  fighter: 1
+reward:
+  xp: 10
+  loot: level1_misc
+  loot_chance: 50
+abilities:
+  - spore_cloud
+  - shroom_spores

@@ -11,6 +11,14 @@ function on_activate(parent, ability)
   cb:set_on_removed_fn("on_removed")
   effect:add_callback(cb)
   
+  if parent:ability_level(ability) > 1 then
+    stats = parent:stats()
+    bonus = stats.caster_level + stats.wisdom_bonus
+    effect:add_resistance(15 + bonus, "Slashing")
+    effect:add_resistance(20 + bonus, "Piercing")
+    effect:add_resistance(10 + bonus, "Crushing")
+  end
+  
   effect:add_attribute_bonus("Strength", 8)
   effect:add_attribute_bonus("Dexterity", -4)
   effect:add_attribute_bonus("Endurance", 8)

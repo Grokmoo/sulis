@@ -19,13 +19,13 @@ use std::collections::HashMap;
 use std::cell::{Ref, RefCell};
 use std::rc::Rc;
 
-use config::{Config, DisplayMode};
-use io::*;
-use io::keyboard_event::Key;
-use io::event::ClickKind;
-use resource::ResourceSet;
-use ui::{Cursor, Widget};
-use util::{self, Point};
+use crate::config::{Config, DisplayMode};
+use crate::io::*;
+use crate::io::keyboard_event::Key;
+use crate::io::event::ClickKind;
+use crate::resource::ResourceSet;
+use crate::ui::{Cursor, Widget};
+use crate::util::{self, Point};
 
 use glium::{self, CapabilitiesSource, Surface, glutin, Rect};
 use glium::backend::Facade;
@@ -571,7 +571,7 @@ fn process_keyboard_input(input: glutin::KeyboardInput) -> Option<KeyboardEvent>
         Some(key) => key,
     };
 
-    use io::keyboard_event::Key::*;
+    use crate::io::keyboard_event::Key::*;
     use glium::glutin::VirtualKeyCode::*;
     let key = match key_code {
         A => KeyA,

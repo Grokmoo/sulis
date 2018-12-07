@@ -17,11 +17,11 @@
 use std::rc::Rc;
 use std::io::{Error};
 
-use image::Image;
-use resource::{ResourceSet, Sprite};
-use io::{DrawList, GraphicsRenderer};
-use ui::AnimationState;
-use util::Size;
+use crate::image::Image;
+use crate::resource::{ResourceSet, Sprite};
+use crate::io::{DrawList, GraphicsRenderer};
+use crate::ui::AnimationState;
+use crate::util::Size;
 
 #[derive(Debug)]
 pub struct SimpleImage {

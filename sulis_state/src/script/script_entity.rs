@@ -29,8 +29,8 @@ use sulis_core::config::Config;
 use sulis_core::resource::ResourceSet;
 use sulis_rules::{Attribute, AttackKind, DamageKind, Attack, HitKind, HitFlags};
 use sulis_module::{ImageLayer, Faction, Actor, InventoryBuilder};
-use {ActorState, EntityState, GameState, Location, area_feedback_text::ColorKind};
-use {ai, animation::{self}, script::*, MOVE_TO_THRESHOLD};
+use crate::{ActorState, EntityState, GameState, Location, area_feedback_text::ColorKind};
+use crate::{ai, animation::{self}, script::*, MOVE_TO_THRESHOLD};
 
 /// Represents a single entity for Lua scripts.  Also can represent an invalid,
 /// non-existant entity in some cases.  Many script functions pass a parent

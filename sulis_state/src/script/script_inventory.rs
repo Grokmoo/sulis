@@ -20,8 +20,8 @@ use rlua::{UserData, UserDataMethods};
 
 use sulis_rules::{Slot, QuickSlot};
 use sulis_module::ability::AIData;
-use GameState;
-use script::*;
+use crate::GameState;
+use crate::script::*;
 
 /// The inventory of a particular creature, including equipped items
 /// and quickslots.

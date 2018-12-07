@@ -20,7 +20,7 @@ use std::io::Error;
 
 use sulis_core::util::{unable_to_create_error};
 
-use {Module, OnTrigger};
+use crate::{Module, OnTrigger};
 
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]

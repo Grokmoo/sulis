@@ -27,7 +27,7 @@ use sulis_state::{EntityState, ChangeListener, GameState, ItemState,
     area_feedback_text::ColorKind, NextGameStep,
     script::{entity_with_id, CallbackData, FuncKind}};
 
-use {character_window, CutsceneWindow, RootView, GameOverWindow, LoadingScreen,
+use crate::{character_window, CutsceneWindow, RootView, GameOverWindow, LoadingScreen,
     window_fade, WindowFade, ConfirmationWindow, ScriptMenu, ap_bar};
 
 pub const NAME: &str = "dialog_window";

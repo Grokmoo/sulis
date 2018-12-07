@@ -18,7 +18,7 @@ use std::cmp::Ordering;
 use std::fmt::{Debug, Formatter, Result};
 
 use sulis_core::util::Point;
-use AreaState;
+use crate::AreaState;
 use sulis_module::Area;
 
 #[derive(Clone, Eq)]

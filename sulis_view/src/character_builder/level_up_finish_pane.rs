@@ -22,8 +22,8 @@ use sulis_core::ui::{Widget, WidgetKind};
 use sulis_widgets::{Label, TextArea};
 use sulis_module::{Ability, Class};
 
-use {CharacterBuilder};
-use character_builder::BuilderPane;
+use crate::{CharacterBuilder};
+use crate::character_builder::BuilderPane;
 
 pub const NAME: &str = "level_up_finish_pane";
 

@@ -20,7 +20,7 @@ use std::io::Error;
 
 use sulis_core::util::{unable_to_create_error};
 
-use {Ability, Module};
+use crate::{Ability, Module};
 
 #[derive(Debug)]
 pub struct Entry {

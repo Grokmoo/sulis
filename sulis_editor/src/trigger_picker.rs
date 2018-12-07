@@ -25,7 +25,7 @@ use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::util::Point;
 use sulis_widgets::{Label, Spinner};
 
-use {AreaModel, EditorMode};
+use crate::{AreaModel, EditorMode};
 
 const NAME: &str = "trigger_picker";
 

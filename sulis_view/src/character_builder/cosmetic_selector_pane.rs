@@ -29,8 +29,8 @@ use sulis_module::actor::Sex;
 use sulis_module::{ImageLayer, ImageLayerSet, Item, Race};
 use sulis_widgets::{Button, InputField, Label};
 
-use CharacterBuilder;
-use character_builder::{BuilderPane, ColorButton};
+use crate::CharacterBuilder;
+use crate::character_builder::{BuilderPane, ColorButton};
 
 pub const NAME: &str = "cosmetic_selector_pane";
 

@@ -21,7 +21,7 @@ use std::rc::Rc;
 
 use sulis_core::util::unable_to_create_error;
 
-use {Item, Module};
+use crate::{Item, Module};
 
 #[derive(Debug)]
 struct Entry {

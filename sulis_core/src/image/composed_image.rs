@@ -17,12 +17,12 @@
 use std::rc::Rc;
 use std::io::{Error, ErrorKind};
 
-use image::{Image, SimpleImage};
-use image::simple_image::SimpleImageBuilder;
-use resource::{ResourceSet};
-use io::{DrawList, GraphicsRenderer};
-use ui::AnimationState;
-use util::{invalid_data_error, Size};
+use crate::image::{Image, SimpleImage};
+use crate::image::simple_image::SimpleImageBuilder;
+use crate::resource::{ResourceSet};
+use crate::io::{DrawList, GraphicsRenderer};
+use crate::ui::AnimationState;
+use crate::util::{invalid_data_error, Size};
 
 const GRID_DIM: i32 = 3;
 const GRID_LEN: i32 = GRID_DIM * GRID_DIM;

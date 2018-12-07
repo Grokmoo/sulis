@@ -18,10 +18,10 @@ use std::collections::HashMap;
 use std::rc::Rc;
 use std::io::{Error};
 
-use image::Image;
-use io::{DrawList, GraphicsRenderer};
-use ui::AnimationState;
-use util::{invalid_data_error, Size};
+use crate::image::Image;
+use crate::io::{DrawList, GraphicsRenderer};
+use crate::ui::AnimationState;
+use crate::util::{invalid_data_error, Size};
 
 #[derive(Debug)]
 pub struct TimerImage {

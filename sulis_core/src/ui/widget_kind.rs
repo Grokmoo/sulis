@@ -18,10 +18,10 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use io::{GraphicsRenderer, InputAction, keyboard_event::Key};
-use io::event::ClickKind;
-use ui::{animation_state, Cursor, Widget};
-use util::Point;
+use crate::io::{GraphicsRenderer, InputAction, keyboard_event::Key};
+use crate::io::event::ClickKind;
+use crate::ui::{animation_state, Cursor, Widget};
+use crate::util::Point;
 
 pub (crate) struct EmptyWidget { }
 

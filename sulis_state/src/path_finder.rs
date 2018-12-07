@@ -23,7 +23,7 @@ use int_hash::{IntHashMap, IntHashSet};
 
 use sulis_core::util::{self, Point};
 use sulis_module::Area;
-use {EntityState, AreaState};
+use crate::{EntityState, AreaState};
 
 const MAX_ITERATIONS: i32 = 400;
 

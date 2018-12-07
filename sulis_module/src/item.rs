@@ -24,7 +24,7 @@ use sulis_core::image::Image;
 use sulis_core::resource::{ResourceSet};
 use sulis_rules::{ItemKind, bonus::AttackBuilder, BonusList, Slot};
 
-use {Actor, ImageLayer, Module, ability::{AIData, Duration}, PrereqList, PrereqListBuilder, ItemAdjective};
+use crate::{Actor, ImageLayer, Module, ability::{AIData, Duration}, PrereqList, PrereqListBuilder, ItemAdjective};
 
 #[derive(Deserialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]

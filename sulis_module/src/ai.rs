@@ -19,7 +19,7 @@ use std::io::Error;
 
 use sulis_core::util::{unable_to_create_error};
 
-use {Module};
+use crate::{Module};
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialOrd, Ord, Hash, PartialEq, Eq, Debug)]
 #[serde(deny_unknown_fields)]

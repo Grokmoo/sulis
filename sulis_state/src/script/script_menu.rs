@@ -17,8 +17,8 @@
 use rlua::{UserData, UserDataMethods};
 
 use sulis_module::on_trigger::{self, OnTrigger};
-use script::{script_callback::FuncKind, CallbackData};
-use GameState;
+use crate::script::{script_callback::FuncKind, CallbackData};
+use crate::GameState;
 
 /// A user interface menu being created by a script.  Normally created
 /// by `game:create_menu()`

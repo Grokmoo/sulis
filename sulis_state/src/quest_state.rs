@@ -17,7 +17,7 @@
 use std::collections::HashMap;
 
 use sulis_module::{Module};
-use {ChangeListenerList, save_state::QuestSaveState};
+use crate::{ChangeListenerList, save_state::QuestSaveState};
 
 pub struct QuestStateSet {
     quests: HashMap<String, QuestState>,

@@ -132,7 +132,7 @@ impl WidgetKind for QuestWindow {
                     let entry = Widget::with_theme(TextArea::empty(), "quest_entry");
 
                     {
-                        let mut state = &mut entry.borrow_mut().state;
+                        let state = &mut entry.borrow_mut().state;
                         state.set_active(active);
 
                         if let Some(ref quest_data) = quest.entries.get(id) {

@@ -25,8 +25,8 @@ use rlua::{UserData, UserDataMethods};
 use sulis_core::util::invalid_data_error;
 use sulis_rules::{HitKind, DamageKind};
 use sulis_module::{Module, on_trigger::Kind};
-use script::{Result, script_entity, ScriptEntity, ScriptEntitySet, ScriptActiveSurface, ScriptItemKind, ScriptMenuSelection, ScriptAppliedEffect};
-use {EntityState, GameState};
+use crate::script::{Result, script_entity, ScriptEntity, ScriptEntitySet, ScriptActiveSurface, ScriptItemKind, ScriptMenuSelection, ScriptAppliedEffect};
+use crate::{EntityState, GameState};
 
 pub fn fire_on_removed(cbs: Vec<Rc<CallbackData>>) {
     for cb in cbs {

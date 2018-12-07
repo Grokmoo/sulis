@@ -17,7 +17,7 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use ui::{Widget, WidgetKind};
+use crate::ui::{Widget, WidgetKind};
 
 pub struct Callback {
     cb: Rc<Fn(&Rc<RefCell<Widget>>, &mut WidgetKind)>

@@ -24,8 +24,8 @@ use sulis_core::ui::{animation_state, color, Cursor};
 use sulis_core::util::{Point};
 use sulis_module::{Ability, Module, ObjectSize};
 
-use script::{targeter, TargeterData, ScriptItemKind};
-use {AreaState, EntityState, GameState, TurnManager};
+use crate::script::{targeter, TargeterData, ScriptItemKind};
+use crate::{AreaState, EntityState, GameState, TurnManager};
 
 #[derive(Clone)]
 pub enum Shape {

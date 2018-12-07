@@ -24,14 +24,14 @@ use serde;
 use serde_yaml;
 use serde_json;
 
-use resource::*;
-use resource::spritesheet::SpritesheetBuilder;
-use resource::font::FontBuilder;
-use image::simple_image::SimpleImageBuilder;
-use image::composed_image::ComposedImageBuilder;
-use image::timer_image::TimerImageBuilder;
-use image::animated_image::AnimatedImageBuilder;
-use ui::theme::{ThemeBuilder, create_theme};
+use crate::resource::*;
+use crate::resource::spritesheet::SpritesheetBuilder;
+use crate::resource::font::FontBuilder;
+use crate::image::simple_image::SimpleImageBuilder;
+use crate::image::composed_image::ComposedImageBuilder;
+use crate::image::timer_image::TimerImageBuilder;
+use crate::image::animated_image::AnimatedImageBuilder;
+use crate::ui::theme::{ThemeBuilder, create_theme};
 
 #[derive(Debug)]
 pub struct ResourceBuilderSet {

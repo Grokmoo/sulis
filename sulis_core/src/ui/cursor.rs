@@ -17,12 +17,12 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use image::Image;
-use io::event::ClickKind;
-use io::{event, Event, GraphicsRenderer};
-use config::Config;
-use resource::ResourceSet;
-use ui::{animation_state, AnimationState, Widget};
+use crate::image::Image;
+use crate::io::event::ClickKind;
+use crate::io::{event, Event, GraphicsRenderer};
+use crate::config::Config;
+use crate::resource::ResourceSet;
+use crate::ui::{animation_state, AnimationState, Widget};
 
 pub struct Cursor {
     pub x: i32,

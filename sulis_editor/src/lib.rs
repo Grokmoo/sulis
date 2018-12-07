@@ -15,63 +15,57 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 mod actor_picker;
-use actor_picker::ActorPicker;
+use crate::actor_picker::ActorPicker;
 
 mod actor_creator_window;
-use actor_creator_window::ActorCreatorWindow;
+use crate::actor_creator_window::ActorCreatorWindow;
 
 mod area_editor;
-use area_editor::AreaEditor;
+use crate::area_editor::AreaEditor;
 
 mod area_model;
-use area_model::AreaModel;
+use crate::area_model::AreaModel;
 
 mod elev_picker;
-use elev_picker::ElevPicker;
+use crate::elev_picker::ElevPicker;
 
 mod encounter_picker;
-use encounter_picker::EncounterPicker;
+use crate::encounter_picker::EncounterPicker;
 
 mod load_window;
-use load_window::LoadWindow;
+use crate::load_window::LoadWindow;
 
 mod pass_picker;
-use pass_picker::PassPicker;
+use crate::pass_picker::PassPicker;
 
 mod prop_picker;
-use prop_picker::PropPicker;
+use crate::prop_picker::PropPicker;
 
 mod save_window;
-use save_window::SaveWindow;
+use crate::save_window::SaveWindow;
 
 mod shift_tiles_window;
-use shift_tiles_window::ShiftTilesWindow;
+use crate::shift_tiles_window::ShiftTilesWindow;
 
 mod terrain_picker;
-use terrain_picker::TerrainPicker;
+use crate::terrain_picker::TerrainPicker;
 
 mod tile_picker;
-use tile_picker::TilePicker;
+use crate::tile_picker::TilePicker;
 
 mod transition_window;
-use transition_window::TransitionWindow;
+use crate::transition_window::TransitionWindow;
 
 mod trigger_picker;
-use trigger_picker::TriggerPicker;
+use crate::trigger_picker::TriggerPicker;
 
 mod vis_picker;
-use vis_picker::VisPicker;
+use crate::vis_picker::VisPicker;
 
 mod wall_picker;
-use wall_picker::WallPicker;
+use crate::wall_picker::WallPicker;
 
-extern crate rand;
 #[macro_use] extern crate log;
-
-extern crate sulis_core;
-extern crate sulis_module;
-extern crate sulis_rules;
-extern crate sulis_widgets;
 
 use std::any::Any;
 use std::rc::Rc;
@@ -128,7 +122,7 @@ impl WidgetKind for EditorView {
     fn as_any_mut(&mut self) -> &mut Any { self }
 
     fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
-        use InputAction::*;
+        use crate::InputAction::*;
         match key {
             ShowMenu => {
                 let exit_window = Widget::with_theme(ConfirmationWindow::new(Callback::with(

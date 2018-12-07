@@ -24,8 +24,8 @@ use sulis_core::ui::Color;
 use sulis_core::image::Image;
 use sulis_core::resource::ResourceSet;
 use sulis_core::util::invalid_data_error;
-use actor::Sex;
-use Race;
+use crate::actor::Sex;
+use crate::Race;
 
 #[derive(Deserialize, Serialize, Debug, Copy, Clone, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]

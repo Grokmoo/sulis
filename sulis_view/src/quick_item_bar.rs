@@ -22,7 +22,7 @@ use sulis_core::ui::{animation_state, Callback, Widget, WidgetKind};
 use sulis_rules::QuickSlot;
 use sulis_state::{ChangeListener, EntityState, GameState, script::ScriptItemKind};
 use sulis_widgets::{Label, Button};
-use {item_button::{clear_quickslot_cb, use_item_cb}, ItemButton};
+use crate::{item_button::{clear_quickslot_cb, use_item_cb}, ItemButton};
 
 pub const NAME: &str = "quick_item_bar";
 

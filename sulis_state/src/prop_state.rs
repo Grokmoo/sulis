@@ -24,9 +24,9 @@ use sulis_core::util::invalid_data_error;
 use sulis_module::{Item, LootList, Module, Prop, prop, ObjectSizeIterator};
 use sulis_module::area::PropData;
 
-use entity_state::AreaDrawable;
-use {ChangeListenerList, EntityTextureCache, ItemList, ItemState, Location};
-use save_state::PropInteractiveSaveState;
+use crate::entity_state::AreaDrawable;
+use crate::{ChangeListenerList, EntityTextureCache, ItemList, ItemState, Location};
+use crate::save_state::PropInteractiveSaveState;
 
 #[derive(Debug)]
 pub enum Interactive {

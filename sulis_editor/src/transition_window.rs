@@ -23,7 +23,7 @@ use sulis_core::util::Point;
 use sulis_module::area::{ToKind, MAX_AREA_SIZE};
 use sulis_widgets::{Button, InputField, Label, list_box, ListBox, Spinner};
 
-use AreaEditor;
+use crate::AreaEditor;
 
 pub const NAME: &str = "transition_window";
 

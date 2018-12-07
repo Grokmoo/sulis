@@ -23,7 +23,7 @@ use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{Color, Widget, WidgetKind};
 
-use {AreaModel, EditorMode};
+use crate::{AreaModel, EditorMode};
 
 const NAME: &str = "elevation_picker";
 

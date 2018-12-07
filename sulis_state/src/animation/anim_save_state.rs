@@ -21,8 +21,8 @@ use std::collections::HashMap;
 use sulis_core::resource::ResourceSet;
 use sulis_core::util::ExtInt;
 use sulis_module::ImageLayer;
-use {EntityState};
-use animation::{Anim, AnimKind,
+use crate::{EntityState};
+use crate::animation::{Anim, AnimKind,
     particle_generator::{GeneratorModel, GeneratorState, Param, Particle}};
 
 #[derive(Serialize, Deserialize, Debug)]

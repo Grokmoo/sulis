@@ -17,7 +17,7 @@
 use std::ops;
 use std::cmp;
 
-use ui::Border;
+use crate::ui::Border;
 
 pub static ZERO_SIZE: Size = Size { width: 0, height: 0 };
 

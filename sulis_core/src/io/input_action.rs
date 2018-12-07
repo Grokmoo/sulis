@@ -17,9 +17,9 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use ui::{Cursor, Widget};
-use io::event::{ClickKind, Kind};
-use io::{keyboard_event::Key, Event};
+use crate::ui::{Cursor, Widget};
+use crate::io::event::{ClickKind, Kind};
+use crate::io::{keyboard_event::Key, Event};
 
 #[derive(Debug, Deserialize, Serialize, Copy, Clone, PartialOrd, PartialEq)]
 #[serde(deny_unknown_fields)]
@@ -58,7 +58,7 @@ impl InputAction {
         }
 
         Widget::remove_mouse_over(&root);
-        use io::InputAction::*;
+        use crate::io::InputAction::*;
         match action {
             MouseMove(x, y) => Cursor::move_to(root, x, y),
             MouseDown(kind) => Cursor::press(root, kind),

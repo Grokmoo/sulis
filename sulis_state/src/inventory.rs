@@ -23,7 +23,7 @@ use sulis_core::image::Image;
 use sulis_core::util::invalid_data_error;
 use sulis_rules::{StatList, Slot, ItemKind, WeaponStyle, bonus::AttackKindBuilder, QuickSlot};
 use sulis_module::{Actor, ImageLayer, Module, ItemSaveState};
-use {ItemState};
+use crate::{ItemState};
 
 #[derive(Clone)]
 pub struct Inventory {

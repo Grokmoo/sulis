@@ -17,7 +17,7 @@
 use std::mem;
 
 use sulis_core::util::ExtInt;
-use {Attribute, Damage, DamageKind, ArmorKind, Slot, WeaponKind, WeaponStyle};
+use crate::{Attribute, Damage, DamageKind, ArmorKind, Slot, WeaponKind, WeaponStyle};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd)]
 #[serde(deny_unknown_fields)]

@@ -25,8 +25,8 @@ use sulis_widgets::{Button, Label, TextArea, ScrollPane};
 use sulis_module::{ModuleInfo};
 use sulis_state::NextGameStep;
 
-use main_menu::{MainMenu};
-use LoadingScreen;
+use crate::main_menu::{MainMenu};
+use crate::LoadingScreen;
 
 pub struct ModuleSelector {
     modules: Vec<ModuleInfo>,

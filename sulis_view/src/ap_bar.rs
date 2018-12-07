@@ -24,7 +24,7 @@ use sulis_core::ui::{Widget, WidgetKind};
 use sulis_module::{Module, OnTrigger};
 use sulis_widgets::{ProgressBar};
 
-use RootView;
+use crate::RootView;
 
 pub const NAME: &str = "ap_bar";
 

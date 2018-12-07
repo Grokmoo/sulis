@@ -21,10 +21,10 @@ use std::io::Error;
 
 use sulis_core::util::{ExtInt, Point};
 use sulis_rules::BonusList;
-use script::{CallbackData, script_callback::FuncKind};
-use {ChangeListenerList, save_state::EffectSaveState, EntityState};
+use crate::script::{CallbackData, script_callback::FuncKind};
+use crate::{ChangeListenerList, save_state::EffectSaveState, EntityState};
 
-use ROUND_TIME_MILLIS;
+use crate::ROUND_TIME_MILLIS;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]

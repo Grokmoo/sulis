@@ -18,10 +18,10 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_rules::{HitKind, HitFlags, DamageKind};
-use {script::ScriptEntitySet, ScriptCallback};
-use {animation::Anim, EntityState, GameState};
+use crate::{script::ScriptEntitySet, ScriptCallback};
+use crate::{animation::Anim, EntityState, GameState};
 
-pub (in animation) fn update(attacker: &Rc<RefCell<EntityState>>, model: &mut MeleeAttackAnimModel, frac: f32) {
+pub (in crate::animation) fn update(attacker: &Rc<RefCell<EntityState>>, model: &mut MeleeAttackAnimModel, frac: f32) {
     if !model.has_attacked && frac > 0.5 {
         let cb_def_targets = ScriptEntitySet::new(&model.defender, &vec![Some(Rc::clone(attacker))]);
         let cb_att_targets = ScriptEntitySet::new(attacker, &vec![Some(Rc::clone(&model.defender))]);
@@ -67,7 +67,7 @@ pub (in animation) fn update(attacker: &Rc<RefCell<EntityState>>, model: &mut Me
     }
 }
 
-pub (in animation) fn cleanup(owner: &Rc<RefCell<EntityState>>) {
+pub (in crate::animation) fn cleanup(owner: &Rc<RefCell<EntityState>>) {
     owner.borrow_mut().sub_pos = (0.0, 0.0);
 
     if !GameState::is_combat_active() {
@@ -77,11 +77,11 @@ pub (in animation) fn cleanup(owner: &Rc<RefCell<EntityState>>) {
     }
 }
 
-pub (in animation) struct MeleeAttackAnimModel {
+pub (in crate::animation) struct MeleeAttackAnimModel {
     defender: Rc<RefCell<EntityState>>,
     callbacks: Vec<Box<ScriptCallback>>,
     vector: (f32, f32),
-    pub (in animation) has_attacked: bool,
+    pub (in crate::animation) has_attacked: bool,
     attack_func: Box<Fn(&Rc<RefCell<EntityState>>, &Rc<RefCell<EntityState>>) ->
         Vec<(HitKind, HitFlags, Vec<(DamageKind, u32)>)>>,
 }

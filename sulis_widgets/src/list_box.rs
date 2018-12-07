@@ -21,7 +21,7 @@ use std::slice::Iter;
 use std::cell::RefCell;
 
 use sulis_core::ui::{animation_state, AnimationState, Callback, Widget, WidgetKind};
-use Button;
+use crate::Button;
 
 #[derive(Clone)]
 pub struct Entry<T: Display + Clone + 'static> {

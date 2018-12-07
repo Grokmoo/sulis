@@ -29,11 +29,11 @@ use sulis_core::util::{Point, invalid_data_error};
 use sulis_rules::{DamageKind, HitKind};
 use sulis_module::{actor::Faction, Actor, ObjectSize, ObjectSizeIterator, Module, ai};
 use sulis_module::area::{MAX_AREA_SIZE, Transition};
-use {ActorState, AreaState, ChangeListenerList, EntityTextureCache, EntityTextureSlot,
+use crate::{ActorState, AreaState, ChangeListenerList, EntityTextureCache, EntityTextureSlot,
     GameState, Location, PropState, ScriptCallback, TurnManager};
-use script::{self, CallbackData, ScriptEntitySet};
-use animation::{self, Anim};
-use save_state::EntitySaveState;
+use crate::script::{self, CallbackData, ScriptEntitySet};
+use crate::animation::{self, Anim};
+use crate::save_state::EntitySaveState;
 
 enum AIState {
     Player {

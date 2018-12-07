@@ -24,7 +24,7 @@ use sulis_core::io::event::ClickKind;
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::util::Point;
 
-use TextArea;
+use crate::TextArea;
 
 pub struct Label {
     pub text: Option<String>,

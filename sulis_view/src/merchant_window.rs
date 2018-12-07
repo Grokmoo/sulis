@@ -22,7 +22,7 @@ use sulis_state::{ChangeListener, EntityState, GameState};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{Button, Label};
 
-use {ItemListPane, item_list_pane::Filter};
+use crate::{ItemListPane, item_list_pane::Filter};
 
 pub const NAME: &str = "merchant_window";
 

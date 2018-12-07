@@ -36,7 +36,7 @@ use sulis_module::{area::{Layer, Tile}};
 use sulis_state::{AreaDrawable, AreaState, EntityState, EntityTextureCache, GameState};
 use sulis_state::{area_feedback_text, area_state::PCVisRedraw};
 
-use {AreaMouseover, action_kind, WindowFade, window_fade};
+use crate::{AreaMouseover, action_kind, WindowFade, window_fade};
 
 struct HoverSprite {
     pub sprite: Rc<Sprite>,

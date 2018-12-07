@@ -35,7 +35,7 @@ use sulis_core::image::Image;
 use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::util::{Point, Size, unable_to_create_error};
 
-use {Encounter, Module, ObjectSize, OnTrigger, Prop, ItemListEntrySaveState};
+use crate::{Encounter, Module, ObjectSize, OnTrigger, Prop, ItemListEntrySaveState};
 
 pub const MAX_AREA_SIZE: i32 = 128;
 
@@ -157,7 +157,7 @@ impl Area {
                 }, Some(ref size) => Rc::clone(size),
             };
 
-            let mut p = t_builder.from;
+            let p = t_builder.from;
             if !p.in_bounds(builder.width as i32, builder.height as i32) {
                 warn!("Transition {} falls outside area bounds", index);
                 continue;

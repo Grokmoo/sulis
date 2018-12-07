@@ -27,8 +27,8 @@ use sulis_core::util::{Point, Size};
 use sulis_module::{Actor, Encounter, Module, Prop};
 use sulis_module::area::*;
 
-use wall_picker::WallTiles;
-use terrain_picker::TerrainTiles;
+use crate::wall_picker::WallTiles;
+use crate::terrain_picker::TerrainTiles;
 
 pub struct AreaModel {
     pub config: EditorConfig,

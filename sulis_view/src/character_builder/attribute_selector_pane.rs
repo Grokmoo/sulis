@@ -25,8 +25,8 @@ use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_module::{Class, Module, Race};
 use sulis_widgets::{Button, Label, Spinner, TextArea};
 
-use CharacterBuilder;
-use character_builder::BuilderPane;
+use crate::CharacterBuilder;
+use crate::character_builder::BuilderPane;
 
 pub const NAME: &str = "attribute_selector_pane";
 

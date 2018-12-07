@@ -21,7 +21,7 @@ use std::io::Error;
 use sulis_core::util::{unable_to_create_error, ExtInt};
 use sulis_rules::{AttributeList, BonusList};
 
-use {Ability, AbilityList, InventoryBuilder, Module};
+use crate::{Ability, AbilityList, InventoryBuilder, Module};
 
 #[derive(Deserialize, Serialize, Debug)]
 #[serde(deny_unknown_fields)]

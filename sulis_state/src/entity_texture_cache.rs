@@ -17,7 +17,7 @@
 use sulis_core::config::Config;
 use sulis_core::ui::Color;
 use sulis_core::io::{DrawList, GraphicsRenderer};
-use EntityState;
+use crate::EntityState;
 
 const BORDER_SIZE: i32 = 2;
 const BORDER_SIZE_F: f32 = BORDER_SIZE as f32;

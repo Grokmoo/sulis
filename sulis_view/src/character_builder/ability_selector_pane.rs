@@ -24,8 +24,8 @@ use sulis_widgets::{Button, Label};
 use sulis_module::{Ability, AbilityList, Actor, actor::OwnedAbility};
 use sulis_state::EntityState;
 
-use {AbilityPane, CharacterBuilder};
-use character_builder::BuilderPane;
+use crate::{AbilityPane, CharacterBuilder};
+use crate::character_builder::BuilderPane;
 
 pub const NAME: &str = "ability_selector_pane";
 

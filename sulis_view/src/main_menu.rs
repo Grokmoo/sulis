@@ -44,7 +44,7 @@ use sulis_widgets::{Button, ConfirmationWindow, Label};
 use sulis_module::{Module, modification};
 use sulis_state::{NextGameStep, save_file};
 
-use {CharacterBuilder, LoadWindow};
+use crate::{CharacterBuilder, LoadWindow};
 
 pub struct LoopUpdater {
     view: Rc<RefCell<MainMenu>>,

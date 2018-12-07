@@ -24,7 +24,7 @@ use sulis_core::ui::{LineRenderer, Widget, WidgetKind};
 use sulis_core::io::{GraphicsRenderer, DrawList};
 use sulis_core::util::Point;
 
-use Label;
+use crate::Label;
 
 const NAME: &str = "progress_bar";
 

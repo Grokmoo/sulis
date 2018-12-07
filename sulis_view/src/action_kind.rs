@@ -21,7 +21,7 @@ use sulis_core::ui::{animation_state, Widget};
 use sulis_core::util::Point;
 use sulis_module::{Faction, Module, ObjectSize, area::ToKind};
 use sulis_state::{MOVE_TO_THRESHOLD, EntityState, GameState, ScriptCallback, AreaState};
-use {dialog_window, RootView};
+use crate::{dialog_window, RootView};
 
 pub fn get_action(x: i32, y: i32) -> Box<ActionKind> {
     let area_state = GameState::area_state();

@@ -14,7 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use io::{keyboard_event::Key, InputAction};
+use crate::io::{keyboard_event::Key, InputAction};
 
 #[derive(Copy, Clone, Debug)]
 pub struct Event {

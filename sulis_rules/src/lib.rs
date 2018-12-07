@@ -17,10 +17,6 @@
 use std::str::FromStr;
 use std::io::{Error, ErrorKind};
 
-extern crate sulis_core;
-
-extern crate rand;
-
 #[macro_use] extern crate serde_derive;
 #[macro_use] extern crate log;
 

@@ -23,7 +23,7 @@ use sulis_widgets::{Button, Label, ScrollPane, TextArea, ConfirmationWindow};
 use sulis_state::{SaveState, SaveFileMetaData, NextGameStep};
 use sulis_state::save_file::{delete_save, load_state, get_available_save_files};
 
-use {LoadingScreen, main_menu::MainMenu, RootView};
+use crate::{LoadingScreen, main_menu::MainMenu, RootView};
 
 const NAME: &str = "load_window";
 

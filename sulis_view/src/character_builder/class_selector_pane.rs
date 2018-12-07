@@ -22,8 +22,8 @@ use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{Button, Label};
 use sulis_module::{Module, Class};
 
-use {CharacterBuilder, ClassPane};
-use character_builder::BuilderPane;
+use crate::{CharacterBuilder, ClassPane};
+use crate::character_builder::BuilderPane;
 
 pub const NAME: &str = "class_selector_pane";
 

@@ -23,7 +23,7 @@ use sulis_core::io::event;
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{Button, Label, ProgressBar};
 
-use {CharacterBuilder};
+use crate::{CharacterBuilder};
 
 pub const NAME: &str = "portrait_view";
 

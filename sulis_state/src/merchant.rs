@@ -20,7 +20,7 @@ use std::rc::Rc;
 use sulis_core::util::invalid_data_error;
 use sulis_module::{LootList, Module};
 
-use {ChangeListenerList, ItemList, ItemState, save_state::MerchantSaveState};
+use crate::{ChangeListenerList, ItemList, ItemState, save_state::MerchantSaveState};
 
 pub struct Merchant {
     pub id: String,

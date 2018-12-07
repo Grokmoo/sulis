@@ -21,7 +21,7 @@ use std::cell::{Cell, RefCell};
 use sulis_state::{ChangeListener, EntityState, GameState};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{Button, Label};
-use {ItemListPane, RootView, item_list_pane::Filter};
+use crate::{ItemListPane, RootView, item_list_pane::Filter};
 
 pub const NAME: &str = "prop_window";
 

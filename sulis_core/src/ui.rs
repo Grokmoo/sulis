@@ -64,9 +64,9 @@ pub use self::widget_state::WidgetState;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use config::Config;
-use resource::ResourceSet;
-use util::{Point, Size};
+use crate::config::Config;
+use crate::resource::ResourceSet;
+use crate::util::{Point, Size};
 
 pub fn create_ui_tree(kind: Rc<RefCell<WidgetKind>>) -> Rc<RefCell<Widget>> {
 

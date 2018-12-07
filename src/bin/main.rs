@@ -16,14 +16,9 @@
 
 #![windows_subsystem = "windows"]
 
-extern crate sulis_core;
-extern crate sulis_module;
-extern crate sulis_state;
-extern crate sulis_view;
-
-#[macro_use] extern crate log;
-
 use std::rc::Rc;
+
+use log::{error, warn, info};
 
 use sulis_core::ui::{self, Cursor};
 use sulis_core::resource::{ResourceSet};

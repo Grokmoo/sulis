@@ -18,12 +18,12 @@ use std::rc::Rc;
 use std::option::Option;
 use std::collections::HashMap;
 
-use ui::{animation_state, AnimationState, Border, Callback, FontRenderer, Size};
-use ui::theme::TextParams;
+use crate::ui::{animation_state, AnimationState, Border, Callback, FontRenderer, Size};
+use crate::ui::theme::TextParams;
 
-use util::Point;
-use image::Image;
-use resource::Font;
+use crate::util::Point;
+use crate::image::Image;
+use crate::resource::Font;
 
 pub struct WidgetState {
     pub visible: bool,
@@ -44,8 +44,8 @@ pub struct WidgetState {
     pub modal_remove_on_click_outside: bool,
     pub is_mouse_over: bool,
     text_args: HashMap<String, String>,
-    pub (in ui) callback: Option<Callback>,
-    pub (in ui) has_keyboard_focus: bool,
+    pub (in crate::ui) callback: Option<Callback>,
+    pub (in crate::ui) has_keyboard_focus: bool,
 }
 
 impl WidgetState {

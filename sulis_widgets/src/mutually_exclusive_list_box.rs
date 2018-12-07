@@ -22,8 +22,8 @@ use std::cell::RefCell;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 
-use {ListBox};
-use list_box::{self, Entry};
+use crate::{ListBox};
+use crate::list_box::{self, Entry};
 
 pub struct MutuallyExclusiveListBox<T: Display + Clone + 'static> {
     list_box: ListBox<T>,

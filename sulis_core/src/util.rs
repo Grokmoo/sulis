@@ -37,10 +37,10 @@ use backtrace::Backtrace;
 use flexi_logger::{Duplicate, Logger, opt_format};
 use serde_yaml;
 
-use resource::write_to_file;
-use config::{self, Config};
-use ui::Widget;
-use io::{IO, MainLoopUpdater};
+use crate::resource::write_to_file;
+use crate::config::{self, Config};
+use crate::ui::Widget;
+use crate::io::{IO, MainLoopUpdater};
 
 fn active_resources_file_path() -> PathBuf {
     let mut path = config::USER_DIR.clone();

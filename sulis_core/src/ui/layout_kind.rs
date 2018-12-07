@@ -18,9 +18,9 @@ use std::rc::Rc;
 use std::cell::RefMut;
 use std::cmp;
 
-use config::Config;
-use ui::{Size, Widget};
-use ui::theme::Theme;
+use crate::config::Config;
+use crate::ui::{Size, Widget};
+use crate::ui::theme::Theme;
 
 #[derive(Deserialize, Debug, Clone, Copy, PartialEq)]
 pub enum LayoutKind {
@@ -124,13 +124,13 @@ impl LayoutKind {
 
         child.state.set_size(size);
 
-        use ui::theme::PositionRelative::*;
+        use crate::ui::theme::PositionRelative::*;
         let x = match theme.x_relative {
             Zero => widget.state.inner_left(),
             Center => (widget.state.inner_left() + widget.state.inner_right() -
                        size.width) / 2,
             Max => widget.state.inner_right() - size.width,
-            Cursor => cmp::min(::ui::Cursor::get_x(), Config::ui_width() - size.width),
+            Cursor => cmp::min(crate::ui::Cursor::get_x(), Config::ui_width() - size.width),
             Custom => child.state.position.x,
         };
         let y = match theme.y_relative {
@@ -138,7 +138,7 @@ impl LayoutKind {
             Center => (widget.state.inner_top() + widget.state.inner_bottom() -
                        size.height) / 2,
             Max => widget.state.inner_bottom() - size.height,
-            Cursor => cmp::min(::ui::Cursor::get_y(), Config::ui_height() - size.height),
+            Cursor => cmp::min(crate::ui::Cursor::get_y(), Config::ui_height() - size.height),
             Custom => child.state.position.y,
         };
 
@@ -153,7 +153,7 @@ impl LayoutKind {
 
         let mut height = theme.preferred_size.height;
 
-        use ui::theme::SizeRelative::*;
+        use crate::ui::theme::SizeRelative::*;
         match theme.height_relative {
             Max => height += parent_inner_size.height,
             ChildMax => {
@@ -195,7 +195,7 @@ impl LayoutKind {
 
         let mut width = theme.preferred_size.width;
 
-        use ui::theme::SizeRelative::*;
+        use crate::ui::theme::SizeRelative::*;
         match theme.width_relative {
             Max => width += parent_inner_size.width,
             ChildMax => {

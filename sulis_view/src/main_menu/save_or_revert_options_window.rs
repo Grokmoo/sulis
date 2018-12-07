@@ -18,7 +18,7 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use {Button, Label, main_menu::MainMenu};
+use crate::{Button, Label, main_menu::MainMenu};
 use sulis_core::config::{self, Config};
 use sulis_core::resource::write_to_file;
 use sulis_core::ui::{Callback, Widget, WidgetKind};

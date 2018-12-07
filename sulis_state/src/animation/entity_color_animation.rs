@@ -19,10 +19,10 @@ use std::rc::Rc;
 
 use sulis_core::ui::{color, Color};
 
-use {EntityState};
-use animation::particle_generator::Param;
+use crate::{EntityState};
+use crate::animation::particle_generator::Param;
 
-pub (in animation) fn update(color: &mut [Param; 4], color_sec: &mut [Param; 4],
+pub (in crate::animation) fn update(color: &mut [Param; 4], color_sec: &mut [Param; 4],
                              owner: &Rc<RefCell<EntityState>>, millis: u32) {
     let secs = millis as f32 / 1000.0;
 
@@ -43,7 +43,7 @@ pub (in animation) fn update(color: &mut [Param; 4], color_sec: &mut [Param; 4],
     owner.borrow_mut().color_sec = color_sec;
 }
 
-pub (in animation) fn cleanup(owner: &Rc<RefCell<EntityState>>) {
+pub (in crate::animation) fn cleanup(owner: &Rc<RefCell<EntityState>>) {
     owner.borrow_mut().color = color::WHITE;
     owner.borrow_mut().color_sec = Color::new(0.0, 0.0, 0.0, 0.0);
 }

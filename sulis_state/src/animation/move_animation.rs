@@ -22,7 +22,7 @@ use sulis_core::util::{Point};
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::animation_state;
 use sulis_module::ObjectSize;
-use {animation::Anim, EntityState, GameState};
+use crate::{animation::Anim, EntityState, GameState};
 
 fn check_immediate_cancel(mover: &Rc<RefCell<EntityState>>, model: &mut MoveAnimModel) -> bool {
     let cur_area_id = mover.borrow().location.area_id.to_string();
@@ -38,7 +38,7 @@ fn check_immediate_cancel(mover: &Rc<RefCell<EntityState>>, model: &mut MoveAnim
     false
 }
 
-pub (in animation) fn update(mover: &Rc<RefCell<EntityState>>, marked_for_removal: &Rc<Cell<bool>>,
+pub (in crate::animation) fn update(mover: &Rc<RefCell<EntityState>>, marked_for_removal: &Rc<Cell<bool>>,
                              model: &mut MoveAnimModel, millis: u32) {
     if check_immediate_cancel(mover, model) {
         marked_for_removal.set(true);
@@ -79,7 +79,7 @@ pub (in animation) fn update(mover: &Rc<RefCell<EntityState>>, marked_for_remova
     }
 }
 
-pub (in animation) fn draw(model: &MoveAnimModel, renderer: &mut GraphicsRenderer,
+pub (in crate::animation) fn draw(model: &MoveAnimModel, renderer: &mut GraphicsRenderer,
                            offset_x: f32, offset_y: f32,
                            scale_x: f32, scale_y: f32, millis: u32) {
     if model.path.len() == 0 { return; }
@@ -98,7 +98,7 @@ pub (in animation) fn draw(model: &MoveAnimModel, renderer: &mut GraphicsRendere
     renderer.draw(draw_list);
 }
 
-pub (in animation) fn cleanup(owner: &Rc<RefCell<EntityState>>) {
+pub (in crate::animation) fn cleanup(owner: &Rc<RefCell<EntityState>>) {
     owner.borrow_mut().sub_pos = (0.0, 0.0);
 }
 
@@ -121,8 +121,8 @@ pub fn new(mover: &Rc<RefCell<EntityState>>, path: Vec<Point>, frame_time_millis
             // next and next2 are already set to the final point
         }
 
-        let mut avg_x = (prev2.x + prev.x + cur.x + next.x + next2.x) as f32 / 5.0;
-        let mut avg_y = (prev2.y + prev.y + cur.y + next.y + next2.y) as f32 / 5.0;
+        let avg_x = (prev2.x + prev.x + cur.x + next.x + next2.x) as f32 / 5.0;
+        let avg_y = (prev2.y + prev.y + cur.y + next.y + next2.y) as f32 / 5.0;
 
         smoothed_path.push((avg_x, avg_y));
 
@@ -149,8 +149,8 @@ pub struct MoveAnimModel {
     area_id: String,
     combat_mode: bool, // whether this move was created in or out of combat.  a change in
                        // this status will cancel the move
-    pub (in animation) path: Vec<Point>,
-    pub (in animation) last_frame_index: i32,
+    pub (in crate::animation) path: Vec<Point>,
+    pub (in crate::animation) last_frame_index: i32,
     frame_time_millis: u32,
     smoothed_path: Vec<(f32, f32)>,
     owner_size: Rc<ObjectSize>,

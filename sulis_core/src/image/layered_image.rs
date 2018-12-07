@@ -16,10 +16,10 @@
 
 use std::rc::Rc;
 
-use image::Image;
-use io::{DrawList, GraphicsRenderer};
-use ui::{animation_state, AnimationState, Color};
-use util::Size;
+use crate::image::Image;
+use crate::io::{DrawList, GraphicsRenderer};
+use crate::ui::{animation_state, AnimationState, Color};
+use crate::util::Size;
 
 #[derive(Debug)]
 pub struct LayeredImage {

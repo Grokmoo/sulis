@@ -91,7 +91,7 @@ use sulis_core::config::Config;
 use sulis_core::util::{Point};
 use sulis_rules::QuickSlot;
 use sulis_module::{ability, Ability, Item, Module, OnTrigger, on_trigger, Faction};
-use {EntityState, ItemState, GameState, ai, area_feedback_text::ColorKind, quest_state,
+use crate::{EntityState, ItemState, GameState, ai, area_feedback_text::ColorKind, quest_state,
     animation::Anim, Location};
 
 type Result<T> = std::result::Result<T, rlua::Error>;

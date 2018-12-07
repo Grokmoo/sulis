@@ -20,8 +20,8 @@ use std::collections::HashMap;
 
 use sulis_core::util::{invalid_data_error};
 
-use area::{AreaBuilder, Layer, PropData, Tile};
-use {Module, generator};
+use crate::area::{AreaBuilder, Layer, PropData, Tile};
+use crate::{Module, generator};
 
 pub struct LayerSet {
     pub width: i32,
@@ -60,7 +60,7 @@ impl LayerSet {
                     return invalid_data_error(&format!("Tile {} has undefined layer {}", tile_id, tile.layer));
                 }
 
-                let mut cur_layer = layer_tiles.get_mut(&tile.layer).unwrap();
+                let cur_layer = layer_tiles.get_mut(&tile.layer).unwrap();
                 for point in locations.iter() {
                     let index = point[0] + point[1] * width as usize;
                     if index >= dim {

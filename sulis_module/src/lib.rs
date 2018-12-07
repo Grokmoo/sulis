@@ -14,10 +14,6 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-extern crate sulis_core;
-extern crate sulis_rules;
-
-extern crate rand;
 #[macro_use] extern crate log;
 #[macro_use] extern crate serde_derive;
 

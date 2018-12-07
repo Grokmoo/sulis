@@ -18,7 +18,7 @@ use std::fmt;
 use std::ops;
 use std::cmp;
 
-use ui::Border;
+use crate::ui::Border;
 
 #[derive(Copy, Clone, Deserialize, Serialize, Eq, Hash, PartialEq, Ord)]
 #[serde(deny_unknown_fields)]

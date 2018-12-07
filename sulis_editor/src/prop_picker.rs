@@ -24,7 +24,7 @@ use sulis_core::util::Point;
 use sulis_module::{Prop, Module};
 use sulis_widgets::Button;
 
-use {AreaModel, EditorMode};
+use crate::{AreaModel, EditorMode};
 
 const NAME: &str = "prop_picker";
 

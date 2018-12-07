@@ -108,7 +108,7 @@ impl WidgetKind for WorldMapWindow {
             let button = Widget::with_theme(Button::empty(), "location");
 
             let (add_callback, label) = {
-                let mut state = &mut button.borrow_mut().state;
+                let state = &mut button.borrow_mut().state;
                 state.add_text_arg("name", &location.name);
                 state.add_text_arg("icon", &location.icon.id());
 

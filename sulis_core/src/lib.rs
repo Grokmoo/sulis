@@ -14,20 +14,12 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-extern crate dirs;
-
-extern crate backtrace;
-
-#[macro_use] extern crate lazy_static;
-
-#[macro_use] extern crate log;
-extern crate flexi_logger;
-
 pub extern crate serde;
 pub extern crate serde_yaml;
 pub extern crate serde_json;
-#[macro_use] extern crate serde_derive;
 
+#[macro_use] extern crate log;
+#[macro_use] extern crate serde_derive;
 #[macro_use] extern crate glium;
 pub extern crate image as extern_image;
 

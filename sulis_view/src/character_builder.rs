@@ -53,8 +53,8 @@ use sulis_module::{Ability, ActorBuilder, Class, Faction, ImageLayer, InventoryB
 use sulis_rules::{AttributeList};
 use sulis_state::{EntityState};
 
-use main_menu::CharacterSelector;
-use character_window::{get_character_export_filename, write_character_to_file};
+use crate::main_menu::CharacterSelector;
+use crate::character_window::{get_character_export_filename, write_character_to_file};
 
 pub const NAME: &str = "character_builder";
 
@@ -67,9 +67,9 @@ trait BuilderPane {
 }
 
 pub struct CharacterBuilder {
-    pub (in character_builder) next: Rc<RefCell<Widget>>,
-    pub (in character_builder) prev: Rc<RefCell<Widget>>,
-    pub (in character_builder) finish: Rc<RefCell<Widget>>,
+    pub (in crate::character_builder) next: Rc<RefCell<Widget>>,
+    pub (in crate::character_builder) prev: Rc<RefCell<Widget>>,
+    pub (in crate::character_builder) finish: Rc<RefCell<Widget>>,
     builder_panes: Vec<Rc<RefCell<BuilderPane>>>,
     builder_pane_index: usize,
     // we rely on the builder panes in the above vec having the same

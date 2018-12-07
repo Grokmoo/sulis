@@ -19,7 +19,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use {Button, Label};
+use crate::{Button, Label};
 
 const NAME: &str = "spinner";
 

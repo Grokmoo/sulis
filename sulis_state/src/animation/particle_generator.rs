@@ -24,7 +24,7 @@ use sulis_core::image::Image;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{animation_state, Color};
 use sulis_core::util::ExtInt;
-use {animation::Anim, EntityState};
+use crate::{animation::Anim, EntityState};
 
 fn is_zero(val: &f32) -> bool {
     *val == 0.0
@@ -239,7 +239,7 @@ impl Param {
     }
 }
 
-pub (in animation) fn update(owner: &Rc<RefCell<EntityState>>, model: &mut GeneratorModel,
+pub (in crate::animation) fn update(owner: &Rc<RefCell<EntityState>>, model: &mut GeneratorModel,
                              state: &mut GeneratorState, marked_for_removal: &Rc<Cell<bool>>, millis: u32) {
     if model.moves_with_parent && owner.borrow().actor.is_dead() {
         marked_for_removal.set(true);
@@ -290,7 +290,7 @@ pub (in animation) fn update(owner: &Rc<RefCell<EntityState>>, model: &mut Gener
     state.previous_secs = secs;
 }
 
-pub (in animation) fn draw(state: &GeneratorState, model: &GeneratorModel, owner: &Rc<RefCell<EntityState>>,
+pub (in crate::animation) fn draw(state: &GeneratorState, model: &GeneratorModel, owner: &Rc<RefCell<EntityState>>,
         renderer: &mut GraphicsRenderer, offset_x: f32, offset_y: f32,
         scale_x: f32, scale_y: f32, _millis: u32) {
     let (offset_x, offset_y) = if model.moves_with_parent {
@@ -334,11 +334,11 @@ pub fn new(owner: &Rc<RefCell<EntityState>>, image: Rc<Image>, model: GeneratorM
 
     Anim::new_pgen(owner, model.duration_millis, model, state)
 }
-pub (in animation) struct GeneratorState {
-    pub(in animation) image: Rc<Image>,
-    pub(in animation) particles: Vec<Particle>,
-    pub(in animation) gen_overflow: f32,
-    pub(in animation) previous_secs: f32,
+pub (in crate::animation) struct GeneratorState {
+    pub(in crate::animation) image: Rc<Image>,
+    pub(in crate::animation) particles: Vec<Particle>,
+    pub(in crate::animation) gen_overflow: f32,
+    pub(in crate::animation) previous_secs: f32,
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
@@ -466,7 +466,7 @@ impl GeneratorModel {
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
-pub(in animation) struct Particle {
+pub(in crate::animation) struct Particle {
     position: (Param, Param),
     total_duration: f32,
     current_duration: f32,

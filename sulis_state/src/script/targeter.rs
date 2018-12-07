@@ -18,9 +18,9 @@ use rlua::{self, Lua, UserData, UserDataMethods};
 
 use sulis_module::{Module, OnTrigger};
 
-use script::area_targeter::Shape;
-use script::{AreaTargeter, Result, ScriptEntity, ScriptEntitySet, ScriptItemKind};
-use {GameState};
+use crate::script::area_targeter::Shape;
+use crate::script::{AreaTargeter, Result, ScriptEntity, ScriptEntitySet, ScriptItemKind};
+use crate::{GameState};
 
 #[derive(Clone)]
 pub enum Kind {

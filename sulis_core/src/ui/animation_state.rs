@@ -16,6 +16,8 @@
 
 use std::io::{Error, ErrorKind};
 
+use lazy_static::lazy_static;
+
 use self::Kind::*;
 
 #[derive(PartialOrd, Ord, Copy, Clone, Debug, PartialEq, Eq, Hash)]

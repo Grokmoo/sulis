@@ -22,7 +22,7 @@ use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{Button, ConfirmationWindow};
 use sulis_state::{GameState};
 
-use {LoadWindow, RootView};
+use crate::{LoadWindow, RootView};
 
 const NAME: &str = "in_game_menu";
 

@@ -25,9 +25,9 @@ use sulis_core::resource::{ResourceSet};
 use sulis_core::util::{unable_to_create_error, Point};
 use sulis_rules::{BonusList, bonus::AttackBuilder, Slot};
 
-use actor::{Sex};
+use crate::actor::{Sex};
 
-use {ObjectSize, ImageLayer, ImageLayerSet, Module};
+use crate::{ObjectSize, ImageLayer, ImageLayerSet, Module};
 
 #[derive(Debug)]
 pub struct Race {

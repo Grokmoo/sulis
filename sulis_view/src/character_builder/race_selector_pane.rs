@@ -22,8 +22,8 @@ use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{Button, Label};
 use sulis_module::{Module, Race};
 
-use {CharacterBuilder, RacePane};
-use character_builder::BuilderPane;
+use crate::{CharacterBuilder, RacePane};
+use crate::character_builder::BuilderPane;
 
 pub const NAME: &str = "race_selector_pane";
 

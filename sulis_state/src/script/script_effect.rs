@@ -22,11 +22,11 @@ use sulis_core::util::{ExtInt, Point};
 use sulis_rules::{Attribute, Bonus, BonusKind, BonusList, Damage, DamageKind, bonus::Contingent,
     WeaponKind, ArmorKind, Slot, WeaponStyle};
 
-use script::{CallbackData, Result, script_particle_generator, ScriptParticleGenerator,
+use crate::script::{CallbackData, Result, script_particle_generator, ScriptParticleGenerator,
     script_color_animation, ScriptColorAnimation, ScriptAbility,
     script_scale_animation, ScriptScaleAnimation,
     script_image_layer_animation, ScriptImageLayerAnimation, ScriptCallback};
-use {Effect, GameState};
+use crate::{Effect, GameState};
 
 /// Represents a surface that already exists, and is being passed into
 /// a Lua script.  Not used during effect creation

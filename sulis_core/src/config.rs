@@ -21,8 +21,10 @@ use std::fs::{self, File};
 use std::path::PathBuf;
 use std::collections::HashMap;
 
-use io::keyboard_event::Key;
-use io::{KeyboardEvent, InputAction};
+use lazy_static::lazy_static;
+
+use crate::io::keyboard_event::Key;
+use crate::io::{KeyboardEvent, InputAction};
 
 use dirs;
 use serde_yaml;

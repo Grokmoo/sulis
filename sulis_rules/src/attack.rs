@@ -18,10 +18,10 @@ use std::rc::Rc;
 
 use sulis_core::image::Image;
 use sulis_core::resource::ResourceSet;
-use bonus::{AttackBuilder, AttackKindBuilder, BonusKind, BonusList};
-use {AttackBonuses, Damage, DamageKind, DamageList, StatList, WeaponKind};
+use crate::bonus::{AttackBuilder, AttackKindBuilder, BonusKind, BonusList};
+use crate::{AttackBonuses, Damage, DamageKind, DamageList, StatList, WeaponKind};
 
-use AttackKind::*;
+use crate::AttackKind::*;
 
 fn add_bonus(bonuses: &mut AttackBonuses, bonus_damage: &mut Vec<Damage>, bonus_kind: &BonusKind) {
     match bonus_kind{
@@ -62,7 +62,7 @@ impl Attack {
         let mut bonus_damage = Vec::new();
 
         for bonus in stats.attack_bonuses.iter() {
-            use bonus::Contingent::*;
+            use crate::bonus::Contingent::*;
             match bonus.when {
                 AttackWithWeapon(_) => (), // doesn't apply to this non weapon attack
                 AttackWhenHidden => {
@@ -116,7 +116,7 @@ impl Attack {
             bonus_damage.push(damage);
         }
         for bonus in stats.attack_bonuses.iter() {
-            use bonus::Contingent::*;
+            use crate::bonus::Contingent::*;
             match bonus.when {
                 AttackWithWeapon(bonus_weapon_kind) => {
                     if bonus_weapon_kind == weapon_kind {

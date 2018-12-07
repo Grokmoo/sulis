@@ -15,9 +15,9 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::rc::Rc;
-use io::{DrawList, GraphicsRenderer, Vertex};
-use resource::Font;
-use ui::WidgetState;
+use crate::io::{DrawList, GraphicsRenderer, Vertex};
+use crate::resource::Font;
+use crate::ui::WidgetState;
 
 pub trait FontRenderer {
     fn render(&self, renderer: &mut GraphicsRenderer,

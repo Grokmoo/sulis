@@ -42,11 +42,11 @@ use std::path::PathBuf;
 use serde::{Deserialize, Deserializer, de::self};
 use serde_yaml;
 
-use config::Config;
-use resource::resource_builder_set::ResourceBuilderSet;
-use image::{Image, EmptyImage, SimpleImage, AnimatedImage, ComposedImage, TimerImage};
-use util::invalid_data_error;
-use ui::Theme;
+use crate::config::Config;
+use crate::resource::resource_builder_set::ResourceBuilderSet;
+use crate::image::{Image, EmptyImage, SimpleImage, AnimatedImage, ComposedImage, TimerImage};
+use crate::util::invalid_data_error;
+use crate::ui::Theme;
 
 thread_local! {
     static RESOURCE_SET: RefCell<ResourceSet> = RefCell::new(ResourceSet::new());

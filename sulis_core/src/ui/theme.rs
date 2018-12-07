@@ -22,10 +22,10 @@ use std::io::{Read, Error, ErrorKind};
 use std::rc::Rc;
 use std::collections::HashMap;
 
-use config::Config;
-use resource::{ResourceSet};
-use util::Point;
-use ui::{Border, color, Color, LayoutKind, Size, WidgetState};
+use crate::config::Config;
+use crate::resource::{ResourceSet};
+use crate::util::Point;
+use crate::ui::{Border, color, Color, LayoutKind, Size, WidgetState};
 
 use serde_yaml;
 
@@ -438,7 +438,7 @@ impl ThemeBuilder {
             }
 
             // expand any refs in children before copying them over
-            for (_, mut child) in other_children.iter_mut() {
+            for (_, child) in other_children.iter_mut() {
                 if child.from.is_some() {
                     child.expand_self(builders);
                 }
@@ -449,7 +449,7 @@ impl ThemeBuilder {
                     self.children.as_mut().unwrap().insert(id, child);
                 } else {
                     let mut self_child = self.children.as_mut().unwrap().get_mut(&id);
-                    let mut self_child_unwrapped = self_child.as_mut().unwrap();
+                    let self_child_unwrapped = self_child.as_mut().unwrap();
                     self_child_unwrapped.copy_from(child, builders);
                 }
             }

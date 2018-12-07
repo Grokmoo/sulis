@@ -32,9 +32,9 @@ pub use self::timer_image::TimerImage;
 
 use std::fmt::Debug;
 
-use io::{DrawList, GraphicsRenderer};
-use ui::AnimationState;
-use util::{size, Size};
+use crate::io::{DrawList, GraphicsRenderer};
+use crate::ui::AnimationState;
+use crate::util::{size, Size};
 
 pub trait Image: Debug {
     fn draw(&self, renderer: &mut GraphicsRenderer, state: &AnimationState,

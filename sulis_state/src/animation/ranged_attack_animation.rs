@@ -20,10 +20,10 @@ use std::cell::RefCell;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::image::Image;
 use sulis_core::ui::{animation_state};
-use {ActorState, EntityState, GameState, ScriptCallback, script::ScriptEntitySet};
-use animation::{Anim};
+use crate::{ActorState, EntityState, GameState, ScriptCallback, script::ScriptEntitySet};
+use crate::animation::{Anim};
 
-pub (in animation) fn update(attacker: &Rc<RefCell<EntityState>>, model: &mut RangedAttackAnimModel, frac: f32) {
+pub (in crate::animation) fn update(attacker: &Rc<RefCell<EntityState>>, model: &mut RangedAttackAnimModel, frac: f32) {
     if frac > 1.0 {
         if !model.has_attacked {
             let cb_def_targets = ScriptEntitySet::new(&model.defender,
@@ -68,7 +68,7 @@ pub (in animation) fn update(attacker: &Rc<RefCell<EntityState>>, model: &mut Ra
     }
 }
 
-pub (in animation) fn cleanup(owner: &Rc<RefCell<EntityState>>) {
+pub (in crate::animation) fn cleanup(owner: &Rc<RefCell<EntityState>>) {
     if !GameState::is_combat_active() {
         let area_state = GameState::get_area_state(&owner.borrow().location.area_id).unwrap();
         let mgr = GameState::turn_manager();
@@ -76,7 +76,7 @@ pub (in animation) fn cleanup(owner: &Rc<RefCell<EntityState>>) {
     }
 }
 
-pub (in animation) fn draw(model: &RangedAttackAnimModel, renderer: &mut GraphicsRenderer,
+pub (in crate::animation) fn draw(model: &RangedAttackAnimModel, renderer: &mut GraphicsRenderer,
                            offset_x: f32, offset_y: f32,
                            scale_x: f32, scale_y: f32, millis: u32) {
     if let Some(ref projectile) = model.projectile {
@@ -126,13 +126,13 @@ pub fn new(attacker: &Rc<RefCell<EntityState>>, defender: &Rc<RefCell<EntityStat
     Anim::new_ranged_attack(attacker, millis, model)
 }
 
-pub (in animation) struct RangedAttackAnimModel {
+pub (in crate::animation) struct RangedAttackAnimModel {
     defender: Rc<RefCell<EntityState>>,
     angle: f32,
     vec: (f32, f32),
     start_pos: (f32, f32),
     cur_pos: (f32, f32),
-    pub (in animation) has_attacked: bool,
+    pub (in crate::animation) has_attacked: bool,
     projectile: Option<Rc<Image>>,
     callbacks: Vec<Box<ScriptCallback>>,
 }

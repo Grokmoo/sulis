@@ -23,7 +23,7 @@ use sulis_core::image::Image;
 use sulis_core::resource::{ResourceSet};
 use sulis_core::util::{unable_to_create_error};
 
-use {Actor, Module, PrereqList, PrereqListBuilder};
+use crate::{Actor, Module, PrereqList, PrereqListBuilder};
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct AbilityGroup {

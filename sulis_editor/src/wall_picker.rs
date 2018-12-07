@@ -27,8 +27,8 @@ use sulis_core::util::{Point};
 use sulis_module::{Module, area::MAX_AREA_SIZE, area::tile::{Tile, WallKind, WallRules}};
 use sulis_widgets::{Button, Label, Spinner};
 
-use {AreaModel, EditorMode};
-use terrain_picker::EdgesList;
+use crate::{AreaModel, EditorMode};
+use crate::terrain_picker::EdgesList;
 
 const NAME: &str = "wall_picker";
 

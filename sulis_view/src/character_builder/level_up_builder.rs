@@ -21,7 +21,7 @@ use sulis_core::ui::{Widget};
 use sulis_module::Actor;
 use sulis_state::EntityState;
 
-use character_builder::*;
+use crate::character_builder::*;
 
 pub struct LevelUpBuilder {
     pub pc: Rc<RefCell<EntityState>>,
@@ -52,7 +52,7 @@ impl BuilderSet for LevelUpBuilder {
 
         let actor = &self.pc.borrow().actor.actor;
         let level = actor.total_level + 1;
-        for (index, mut ability_list) in actor.base_class().ability_choices(level).into_iter().enumerate() {
+        for (index, ability_list) in actor.base_class().ability_choices(level).into_iter().enumerate() {
             let pane = AbilitySelectorPane::new(ability_list, index, Rc::clone(&self.pc),
                 actor.abilities.clone());
             let widget = Widget::with_defaults(pane.clone());

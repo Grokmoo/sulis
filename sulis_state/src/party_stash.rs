@@ -16,7 +16,7 @@
 
 
 use sulis_module::{Module, ItemListEntrySaveState};
-use {ChangeListenerList, GameState, ItemList, ItemState};
+use crate::{ChangeListenerList, GameState, ItemList, ItemState};
 
 pub struct PartyStash {
     items: ItemList,

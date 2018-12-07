@@ -19,7 +19,7 @@ use std::cmp;
 use std::collections::HashSet;
 
 use sulis_module::Area;
-use {EntityState};
+use crate::{EntityState};
 
 #[must_use]
 pub fn calculate_los(exp: &mut Vec<bool>, area: &Rc<Area>, prop_vis_grid: &[bool],

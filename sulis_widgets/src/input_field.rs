@@ -23,7 +23,7 @@ use sulis_core::image::Image;
 use sulis_core::ui::{Callback, LineRenderer, Widget, WidgetKind};
 use sulis_core::io::{GraphicsRenderer, InputAction};
 use sulis_core::util::Point;
-use Label;
+use crate::Label;
 
 const NAME: &str = "input_field";
 

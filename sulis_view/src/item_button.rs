@@ -27,7 +27,7 @@ use sulis_module::{ability, Item, item::{format_item_value, format_item_weight},
 use sulis_state::{EntityState, GameState, ItemState, inventory::has_proficiency};
 use sulis_state::script::ScriptItemKind;
 use sulis_widgets::{Label, TextArea};
-use {ItemActionMenu, MerchantWindow, PropWindow, RootView};
+use crate::{ItemActionMenu, MerchantWindow, PropWindow, RootView};
 
 enum Kind {
     Prop { prop_index: usize, item_index: usize },

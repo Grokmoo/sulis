@@ -23,7 +23,7 @@ use sulis_core::io::{InputAction, GraphicsRenderer};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::util::{Point, Size};
 
-use {Button, TextArea};
+use crate::{Button, TextArea};
 
 /// Simple ScrollPane that clips its child content to its inner area
 /// nested scroll panes are not supported

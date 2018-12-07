@@ -25,8 +25,8 @@ use sulis_widgets::{Button, Label, ScrollPane, TextArea};
 use sulis_module::{ModificationInfo};
 use sulis_state::NextGameStep;
 
-use main_menu::{MainMenu};
-use LoadingScreen;
+use crate::main_menu::{MainMenu};
+use crate::LoadingScreen;
 
 pub struct ModsSelector {
     available_mods: Vec<ModificationInfo>,

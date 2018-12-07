@@ -26,11 +26,11 @@ use sulis_core::io::{GraphicsRenderer};
 use sulis_rules::{HitKind, DamageKind};
 use sulis_module::{Ability, Actor, Module, ObjectSize, OnTrigger, area::{Trigger, TriggerKind}};
 
-use {ai, AI, AreaState, ChangeListener, ChangeListenerList, Effect,
+use crate::{ai, AI, AreaState, ChangeListener, ChangeListenerList, Effect,
     EntityState, Location, Formation, ItemList, ItemState, PartyStash, QuestStateSet, quest_state,
     PathFinder, SaveState, ScriptState, UICallback, MOVE_TO_THRESHOLD, TurnManager, WorldMapState};
-use script::{script_callback::{self, ScriptHitKind}, ScriptEntitySet, ScriptCallback, ScriptItemKind};
-use animation::{self, Anim, AnimState, AnimSaveState, particle_generator::Param};
+use crate::script::{script_callback::{self, ScriptHitKind}, ScriptEntitySet, ScriptCallback, ScriptItemKind};
+use crate::animation::{self, Anim, AnimState, AnimSaveState, particle_generator::Param};
 
 thread_local! {
     static TURN_MANAGER: Rc<RefCell<TurnManager>> = Rc::new(RefCell::new(TurnManager::default()));

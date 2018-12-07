@@ -19,10 +19,10 @@ use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 use std::cell::{Ref, RefCell};
 
-use io::{event, Event, GraphicsRenderer};
-use ui::{Cursor, EmptyWidget, Theme, WidgetState, WidgetKind};
-use resource::ResourceSet;
-use util::{invalid_data_error, Point};
+use crate::io::{event, Event, GraphicsRenderer};
+use crate::ui::{Cursor, EmptyWidget, Theme, WidgetState, WidgetKind};
+use crate::resource::ResourceSet;
+use crate::util::{invalid_data_error, Point};
 
 pub struct Widget {
     pub state: WidgetState,
@@ -256,7 +256,7 @@ impl Widget {
         let mut kind = kind.borrow_mut();
         let result = match kind.as_any_mut().downcast_mut::<T>() {
             None => panic!("Failed to downcast_mut Kind"),
-            Some(mut result) => result,
+            Some(result) => result,
         };
         unsafe {
             mem::transmute::<&mut T, &'a mut T>(result)
@@ -613,7 +613,7 @@ impl Widget {
             }
         }
 
-        use io::event::Kind::*;
+        use crate::io::event::Kind::*;
         // always pass mouse entered and exited to the widget kind
         let enter_exit_retval = match event.kind {
             MouseEnter =>

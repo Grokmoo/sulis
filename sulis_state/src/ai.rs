@@ -20,8 +20,8 @@ use std::cell::RefCell;
 use rlua;
 
 use sulis_core::config::Config;
-use script::script_callback;
-use {animation::Anim, EntityState, GameState};
+use crate::script::script_callback;
+use crate::{animation::Anim, EntityState, GameState};
 
 pub struct AI {
     ai: Option<EntityAI>,

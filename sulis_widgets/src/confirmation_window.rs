@@ -18,7 +18,7 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use {Button, Label};
+use crate::{Button, Label};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 
 pub struct ConfirmationWindow {

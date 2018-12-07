@@ -20,9 +20,9 @@ use rand::{self, Rng};
 
 use sulis_core::image::Image;
 use sulis_core::util::ExtInt;
-use {AccuracyKind, Armor, AttributeList, Attack, Damage,
+use crate::{AccuracyKind, Armor, AttributeList, Attack, Damage,
     HitKind, WeaponKind, ArmorKind, Slot, WeaponStyle, Resistance};
-use bonus::{AttackBonuses, AttackBuilder, Bonus, BonusKind, BonusList};
+use crate::bonus::{AttackBonuses, AttackBuilder, Bonus, BonusKind, BonusList};
 
 #[derive(Clone)]
 pub struct StatList {
@@ -232,7 +232,7 @@ impl StatList {
 
         // TODO handle add multiple for weapon and attack bonuses
         for bonus in bonuses.iter() {
-            use bonus::Contingent::*;
+            use crate::bonus::Contingent::*;
             match bonus.when {
                 Always => self.add_bonus(&bonus.kind, times),
                 AttackWithWeapon(_) | AttackWhenHidden | AttackWithDamageKind(_) =>
@@ -248,7 +248,7 @@ impl StatList {
         let times_i32 = times as i32;
         let times_f32 = times as f32;
 
-        use bonus::BonusKind::*;
+        use crate::bonus::BonusKind::*;
         match bonus {
             Attribute { attribute, amount } => self.attributes.add(*attribute, *amount),
             ActionPoints(amount) => self.bonus_ap += amount * times_i32,
@@ -321,7 +321,7 @@ impl StatList {
         // even though it would be safe
         let contingent = self.contingent_bonuses.clone();
         for bonus in contingent.iter() {
-            use bonus::Contingent::*;
+            use crate::bonus::Contingent::*;
             match bonus.when {
                 Always | AttackWithWeapon(_) | AttackWhenHidden |
                     AttackWhenFlanking | AttackWithDamageKind(_) => unreachable!(),
@@ -350,7 +350,7 @@ impl StatList {
 
         let mut attack_range = None;
         for (builder, weapon_kind) in attacks {
-            let mut attack = Attack::new(builder, &self, weapon_kind).mult(multiplier);
+            let attack = Attack::new(builder, &self, weapon_kind).mult(multiplier);
 
             if attack_range.is_none() {
                 attack_range = Some(attack.distance());
@@ -366,7 +366,7 @@ impl StatList {
 
         self.attack_range = attack_range.unwrap_or(0.0);
 
-        use Attribute::*;
+        use crate::Attribute::*;
         let attrs = &self.attributes;
         let str_bonus = attrs.bonus(Strength, base_attr);
         let dex_bonus = attrs.bonus(Dexterity, base_attr);

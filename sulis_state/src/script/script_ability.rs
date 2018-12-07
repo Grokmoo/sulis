@@ -21,8 +21,8 @@ use std::cell::RefCell;
 use rlua::{self, Lua, UserData, UserDataMethods};
 
 use sulis_module::{ability::{self, AIData}, Ability, Module};
-use {EntityState, GameState, area_feedback_text::ColorKind};
-use script::{ScriptEntity, CallbackData};
+use crate::{EntityState, GameState, area_feedback_text::ColorKind};
+use crate::script::{ScriptEntity, CallbackData};
 
 type Result<T> = std::result::Result<T, rlua::Error>;
 

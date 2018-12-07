@@ -19,10 +19,10 @@ use rlua::{self, Lua, UserData, UserDataMethods};
 use sulis_core::resource::ResourceSet;
 use sulis_core::util::ExtInt;
 
-use {GameState};
-use animation::{Anim, self};
-use animation::particle_generator::{Dist, Param, DistParam, DistParam2D, GeneratorModel};
-use script::{CallbackData, Result};
+use crate::{GameState};
+use crate::animation::{Anim, self};
+use crate::animation::particle_generator::{Dist, Param, DistParam, DistParam2D, GeneratorModel};
+use crate::script::{CallbackData, Result};
 
 /// A flexible animation type, which can be used to create particle effects, simple
 /// frame based animations, or anything in between.

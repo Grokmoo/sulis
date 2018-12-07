@@ -24,12 +24,12 @@ use sulis_core::util::{Point, ExtInt};
 use sulis_rules::{QuickSlot, Slot, BonusList};
 use sulis_module::{actor::{ActorBuilder, RewardBuilder}, ItemSaveState, ItemListEntrySaveState};
 
-use {ActorState, effect, Effect, EntityState, Formation, GameState, Location,
+use crate::{ActorState, effect, Effect, EntityState, Formation, GameState, Location,
     PropState, prop_state::Interactive, Merchant, WorldMapState, PStats, QuestState,
     turn_manager::EncounterRef};
-use area_state::{TriggerState};
-use script::CallbackData;
-use animation::AnimSaveState;
+use crate::area_state::{TriggerState};
+use crate::script::CallbackData;
+use crate::animation::AnimSaveState;
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(deny_unknown_fields)]

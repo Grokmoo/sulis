@@ -25,7 +25,7 @@ use sulis_widgets::{Button, Label};
 use sulis_rules::{Slot, QuickSlot};
 use sulis_state::{EntityState, ChangeListener, GameState, script::ScriptItemKind};
 
-use {item_button::*, ItemListPane, ItemButton, item_list_pane::Filter};
+use crate::{item_button::*, ItemListPane, ItemButton, item_list_pane::Filter};
 
 pub const NAME: &str = "inventory_window";
 

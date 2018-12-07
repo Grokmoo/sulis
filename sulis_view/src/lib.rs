@@ -15,14 +15,6 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 #[macro_use] extern crate sulis_core;
-extern crate sulis_rules;
-extern crate sulis_module;
-extern crate sulis_state;
-extern crate sulis_widgets;
-
-extern crate open;
-extern crate chrono;
-extern crate rlua;
 #[macro_use] extern crate log;
 
 mod abilities_bar;

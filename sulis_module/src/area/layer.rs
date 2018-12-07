@@ -19,7 +19,7 @@ use std::io::Error;
 
 use sulis_core::resource::{ResourceSet, Spritesheet};
 use sulis_core::util::{invalid_data_error, Point};
-use area::{AreaBuilder, Tile};
+use crate::area::{AreaBuilder, Tile};
 
 pub struct Layer {
     pub id: String,
@@ -29,7 +29,7 @@ pub struct Layer {
     passable: Vec<bool>,
     visible: Vec<bool>,
     spritesheet_id: Option<String>,
-    pub (in area) impass_override_tiles: Vec<(Point, Rc<Tile>)>,
+    pub (in crate::area) impass_override_tiles: Vec<(Point, Rc<Tile>)>,
 }
 
 impl Layer {

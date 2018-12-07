@@ -28,9 +28,9 @@ use sulis_core::config::Config;
 use sulis_rules::{HitFlags, HitKind, DamageKind};
 use sulis_module::{Actor, Area, LootList, Module, ObjectSize, prop};
 use sulis_module::area::{EncounterData, PropData, Transition, TriggerKind};
-use script::AreaTargeter;
-use save_state::{AreaSaveState};
-use *;
+use crate::script::AreaTargeter;
+use crate::save_state::{AreaSaveState};
+use crate::*;
 
 pub struct TriggerState {
     pub(crate) fired: bool,

@@ -250,13 +250,13 @@ fn merge_doc(dir: &str, name: &str, base: &mut Value, append: Value) {
     match base {
         Value::Mapping(ref mut mapping) => {
             {
-                let mut seq = mapping.get_mut(&directory_val).unwrap();
+                let seq = mapping.get_mut(&directory_val).unwrap();
                 if let Value::Sequence(ref mut seq) = seq {
                     seq.push(Value::String(name.to_string()));
                 }
             }
             {
-                let mut seq = mapping.get_mut(&file_val).unwrap();
+                let seq = mapping.get_mut(&file_val).unwrap();
                 if let Value::Sequence(ref mut seq) = seq {
                     seq.push(Value::String(name.to_string()));
                 }

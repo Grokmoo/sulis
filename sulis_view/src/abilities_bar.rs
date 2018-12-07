@@ -250,7 +250,7 @@ impl WidgetKind for AbilityButton {
 
         if let Some(ref mut state) = self.entity.borrow_mut().actor.ability_state(&self.ability.id) {
             widget.children[1].borrow_mut().state.clear_text_args();
-            let mut child = &mut widget.children[1].borrow_mut().state;
+            let child = &mut widget.children[1].borrow_mut().state;
             match state.remaining_duration_rounds() {
                 ExtInt::Infinity => child.add_text_arg("duration", "Active"),
                 ExtInt::Int(rounds) => {

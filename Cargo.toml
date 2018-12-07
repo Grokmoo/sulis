@@ -5,6 +5,7 @@ authors = ["Jared Stephen <grok_moo@yahoo.com>"]
 license = "GPLv3"
 description = "An RPG with Turn Based Combat"
 repository = "https://github.com/Grokmoo/sulis"
+edition = "2018"
 
 [workspace]
 members = [

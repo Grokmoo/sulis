@@ -25,7 +25,7 @@ use sulis_module::Module;
 use sulis_module::area::Tile;
 use sulis_widgets::{Button, ScrollPane};
 
-use {AreaModel, EditorMode};
+use crate::{AreaModel, EditorMode};
 
 const NAME: &str = "tile_picker";
 

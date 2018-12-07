@@ -17,10 +17,10 @@
 use rlua::{Lua, UserData, UserDataMethods};
 
 use sulis_core::util::ExtInt;
-use {GameState};
-use animation::{Anim};
-use animation::particle_generator::{Param};
-use script::{CallbackData, Result, script_particle_generator};
+use crate::{GameState};
+use crate::animation::{Anim};
+use crate::animation::particle_generator::{Param};
+use crate::script::{CallbackData, Result, script_particle_generator};
 
 /// A color animation changing a parent entity's base or secondary
 /// color.  Created normally by `ScriptEntity:create_color_anim`

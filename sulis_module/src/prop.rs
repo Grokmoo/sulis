@@ -23,8 +23,8 @@ use sulis_core::image::Image;
 use sulis_core::resource::{ResourceSet};
 use sulis_core::util::{Point, unable_to_create_error};
 
-use {LootList, Module, ObjectSize};
-use area::tile::verify_point;
+use crate::{LootList, Module, ObjectSize};
+use crate::area::tile::verify_point;
 
 #[derive(Debug)]
 pub enum Interactive {

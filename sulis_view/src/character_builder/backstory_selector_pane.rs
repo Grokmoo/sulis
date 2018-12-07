@@ -23,8 +23,8 @@ use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{Button, Label, TextArea};
 use sulis_module::{Ability, Conversation, Module, conversation::Response, OnTrigger};
 
-use {CharacterBuilder};
-use character_builder::BuilderPane;
+use crate::{CharacterBuilder};
+use crate::character_builder::BuilderPane;
 
 pub const NAME: &str = "backstory_selector_pane";
 

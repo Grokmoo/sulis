@@ -26,7 +26,7 @@ use sulis_core::util::Point;
 use sulis_module::{Encounter, Module};
 use sulis_widgets::{Button, Label, Spinner};
 
-use {AreaModel, EditorMode};
+use crate::{AreaModel, EditorMode};
 
 const NAME: &str = "encounter_picker";
 

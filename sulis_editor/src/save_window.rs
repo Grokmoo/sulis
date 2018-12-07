@@ -22,7 +22,7 @@ use sulis_core::config::Config;
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{Button, InputField, Label};
 
-use AreaEditor;
+use crate::AreaEditor;
 
 pub const NAME: &str = "save_window";
 
@@ -58,7 +58,7 @@ impl WidgetKind for SaveWindow {
         let area_editor_ref = Rc::clone(&self.area_editor);
         id_field.borrow_mut().state.add_callback(Callback::new(Rc::new(move |_widget, kind| {
             let input_field = match kind.as_any_mut().downcast_mut::<InputField>() {
-                Some(mut input_field) => input_field,
+                Some(input_field) => input_field,
                 None => panic!("Failed to downcast to InputField"),
             };
             area_editor_ref.borrow_mut().model.set_id(&input_field.text);
@@ -71,7 +71,7 @@ impl WidgetKind for SaveWindow {
         let area_editor_ref = Rc::clone(&self.area_editor);
         name_field.borrow_mut().state.add_callback(Callback::new(Rc::new(move |_widget, kind| {
             let input_field = match kind.as_any_mut().downcast_mut::<InputField>() {
-                Some(mut input_field) => input_field,
+                Some(input_field) => input_field,
                 None => panic!("Failed to downcast to InputField"),
             };
             area_editor_ref.borrow_mut().model.set_name(&input_field.text);
@@ -84,7 +84,7 @@ impl WidgetKind for SaveWindow {
         let area_editor_ref = Rc::clone(&self.area_editor);
         filename_field.borrow_mut().state.add_callback(Callback::new(Rc::new(move |_widget, kind| {
             let input_field = match kind.as_any_mut().downcast_mut::<InputField>() {
-                Some(mut input_field) => input_field,
+                Some(input_field) => input_field,
                 None => panic!("Failed to downcast to InputField"),
             };
             area_editor_ref.borrow_mut().model.set_filename(&input_field.text);

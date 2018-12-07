@@ -17,7 +17,7 @@
 use std::ops::Index;
 use std::slice::Iter;
 
-use ItemState;
+use crate::ItemState;
 
 #[derive(Clone, Debug)]
 pub struct ItemList {

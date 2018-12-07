@@ -31,9 +31,9 @@ use sulis_widgets::{Button, Label, TextArea, ScrollPane};
 use sulis_module::{ActorBuilder, Module, InventoryBuilder, ItemSaveState, ItemListEntrySaveState};
 use sulis_state::{ActorState, Effect, GameState, ChangeListener, EntityState};
 
-use CharacterBuilder;
-use ability_pane::add_ability_text_args;
-use item_button::{add_bonus_text_args};
+use crate::CharacterBuilder;
+use crate::ability_pane::add_ability_text_args;
+use crate::item_button::{add_bonus_text_args};
 
 pub const NAME: &str = "character_window";
 

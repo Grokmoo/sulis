@@ -21,7 +21,7 @@ use std::io::Error;
 use sulis_rules::{Attribute};
 use sulis_core::util::unable_to_create_error;
 
-use {Actor, Module, Race};
+use crate::{Actor, Module, Race};
 
 #[derive(Debug, Clone)]
 pub struct PrereqList {

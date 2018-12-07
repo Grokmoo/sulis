@@ -20,11 +20,11 @@ use std::char;
 use std::path::PathBuf;
 use std::collections::HashMap;
 
-use io::Vertex;
-use util::{invalid_data_error, Point, Size, unable_to_create_error};
-use config::Config;
+use crate::io::Vertex;
+use crate::util::{invalid_data_error, Point, Size, unable_to_create_error};
+use crate::config::Config;
 
-use extern_image::{self, ImageBuffer, Rgba};
+use crate::extern_image::{self, ImageBuffer, Rgba};
 
 pub struct Font {
     pub id: String,

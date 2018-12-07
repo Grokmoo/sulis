@@ -2,6 +2,7 @@
 name = "sulis_module"
 version = "0.2.0"
 authors = ["Jared Stephen <grok_moo@yahoo.com>"]
+edition = "2018"
 
 [dependencies]
 sulis_core = { path = "../sulis_core" }

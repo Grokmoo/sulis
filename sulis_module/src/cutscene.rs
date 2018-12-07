@@ -16,7 +16,7 @@
 
 use std::io::{Error};
 
-use {Module, OnTrigger};
+use crate::{Module, OnTrigger};
 
 pub struct Frame {
     pub text: String,

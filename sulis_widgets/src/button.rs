@@ -22,7 +22,7 @@ use std::cell::RefCell;
 use sulis_core::ui::{LineRenderer, Widget, WidgetKind};
 use sulis_core::io::{event, GraphicsRenderer};
 use sulis_core::util::{self, Point};
-use {Label, TextArea};
+use crate::{Label, TextArea};
 
 pub struct Button {
     label: Rc<RefCell<Label>>,

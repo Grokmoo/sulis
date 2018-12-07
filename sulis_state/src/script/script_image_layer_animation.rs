@@ -21,9 +21,9 @@ use rlua::{Lua, UserData, UserDataMethods};
 
 use sulis_core::{util::ExtInt, resource::ResourceSet};
 use sulis_module::{ImageLayer};
-use {GameState};
-use animation::{Anim};
-use script::{CallbackData, Result};
+use crate::{GameState};
+use crate::animation::{Anim};
+use crate::script::{CallbackData, Result};
 
 /// An animation that adds one or more ImageLayers to the parent creature
 /// for rendering.  These override any racial or inventory image layers, with

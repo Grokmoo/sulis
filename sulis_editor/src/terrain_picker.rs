@@ -30,7 +30,7 @@ use sulis_core::util::{unable_to_create_error, Point};
 use sulis_module::{Module, area::MAX_AREA_SIZE, area::tile::{Tile, TerrainKind, TerrainRules, EdgeRules}};
 use sulis_widgets::{Button, Label, Spinner};
 
-use {AreaModel, EditorMode};
+use crate::{AreaModel, EditorMode};
 
 #[derive(Clone)]
 pub struct TerrainTiles {

@@ -26,7 +26,7 @@ use sulis_core::ui::{Color};
 use sulis_core::util::{unable_to_create_error};
 use sulis_rules::AttributeList;
 
-use {Ability, AITemplate, Class, Conversation, ImageLayer, ImageLayerSet, InventoryBuilder,
+use crate::{Ability, AITemplate, Class, Conversation, ImageLayer, ImageLayerSet, InventoryBuilder,
     LootList, Module, Race};
 
 #[derive(Deserialize, Serialize, Debug, Clone, Copy, PartialEq, Eq, Hash)]

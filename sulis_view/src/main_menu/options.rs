@@ -25,7 +25,7 @@ use sulis_core::io::{keyboard_event::Key, InputAction, DisplayConfiguration, eve
 use sulis_core::config::DisplayMode;
 use sulis_widgets::{Button, Label, ScrollPane};
 
-use main_menu::MainMenu;
+use crate::main_menu::MainMenu;
 
 enum Tab {
     Display,

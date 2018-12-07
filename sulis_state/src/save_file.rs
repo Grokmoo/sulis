@@ -25,7 +25,7 @@ use sulis_core::{config, util::self, serde_json};
 use sulis_core::resource::{read_single_resource_path, write_json_to_file};
 use sulis_core::util::{invalid_data_error};
 use sulis_module::Module;
-use {GameState, SaveState};
+use crate::{GameState, SaveState};
 
 #[derive(Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]

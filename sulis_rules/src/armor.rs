@@ -14,7 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use DamageKind;
+use crate::DamageKind;
 
 #[derive(Deserialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]

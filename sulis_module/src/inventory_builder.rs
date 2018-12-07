@@ -18,7 +18,7 @@ use std::rc::Rc;
 use std::collections::HashMap;
 
 use sulis_rules::{Slot, QuickSlot};
-use {Item, Module, Race};
+use crate::{Item, Module, Race};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]

@@ -23,7 +23,7 @@ use sulis_core::ui::theme::SizeRelative;
 use sulis_core::ui::{Widget, WidgetKind};
 use sulis_core::io::{GraphicsRenderer, event::ClickKind};
 use sulis_core::util::{Point, Size};
-use MarkupRenderer;
+use crate::MarkupRenderer;
 
 pub struct TextArea {
     pub text: Option<String>,

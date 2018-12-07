@@ -39,7 +39,7 @@ pub mod ranged_attack_animation;
 
 use sulis_core::{io::GraphicsRenderer, util::{self, ExtInt}, image::Image};
 use sulis_module::ImageLayer;
-use {ChangeListener, Effect, EntityState, ScriptCallback};
+use crate::{ChangeListener, Effect, EntityState, ScriptCallback};
 use self::particle_generator::Param;
 use self::melee_attack_animation::MeleeAttackAnimModel;
 use self::ranged_attack_animation::RangedAttackAnimModel;
@@ -222,17 +222,17 @@ impl AnimState {
 }
 
 pub struct Anim {
-    pub(in animation) kind: AnimKind,
-    pub(in animation) elapsed: u32,
-    pub(in animation) duration_millis: ExtInt,
+    pub(in crate::animation) kind: AnimKind,
+    pub(in crate::animation) elapsed: u32,
+    pub(in crate::animation) duration_millis: ExtInt,
     marked_for_removal: Rc<Cell<bool>>,
     completion_callbacks: Vec<Box<ScriptCallback>>,
     update_callbacks: Vec<(u32, Box<ScriptCallback>)>, // sorted by the first field, time in secs
-    pub(in animation) owner: Rc<RefCell<EntityState>>,
-    pub(in animation) removal_effect: Option<usize>, // used only for save/load purposes
+    pub(in crate::animation) owner: Rc<RefCell<EntityState>>,
+    pub(in crate::animation) removal_effect: Option<usize>, // used only for save/load purposes
 }
 
-pub (in animation) enum AnimKind {
+pub (in crate::animation) enum AnimKind {
     /// An animation that does nothing, but blocks the entity for a specified time
     Wait,
 
@@ -298,22 +298,22 @@ impl Anim {
         Anim::new(owner, duration_millis, AnimKind::EntitySubpos { x, y })
     }
 
-    pub (in animation) fn new_melee_attack(attacker: &Rc<RefCell<EntityState>>, duration_millis: u32,
+    pub (in crate::animation) fn new_melee_attack(attacker: &Rc<RefCell<EntityState>>, duration_millis: u32,
                             model: MeleeAttackAnimModel) -> Anim {
         Anim::new(attacker, ExtInt::Int(duration_millis), AnimKind::MeleeAttack { model })
     }
 
-    pub (in animation) fn new_ranged_attack(attacker: &Rc<RefCell<EntityState>>, duration_millis: u32,
+    pub (in crate::animation) fn new_ranged_attack(attacker: &Rc<RefCell<EntityState>>, duration_millis: u32,
                                             model: RangedAttackAnimModel) -> Anim {
         Anim::new(attacker, ExtInt::Int(duration_millis), AnimKind::RangedAttack { model })
     }
 
-    pub (in animation) fn new_move(mover: &Rc<RefCell<EntityState>>, duration_millis: u32,
+    pub (in crate::animation) fn new_move(mover: &Rc<RefCell<EntityState>>, duration_millis: u32,
                                    model: MoveAnimModel) -> Anim {
         Anim::new(mover, ExtInt::Int(duration_millis), AnimKind::Move { model })
     }
 
-    pub (in animation) fn new_pgen(owner: &Rc<RefCell<EntityState>>, duration_millis: ExtInt,
+    pub (in crate::animation) fn new_pgen(owner: &Rc<RefCell<EntityState>>, duration_millis: ExtInt,
                                    model: GeneratorModel, state: GeneratorState) -> Anim {
         Anim::new(owner, duration_millis, AnimKind::ParticleGenerator { model, state })
     }

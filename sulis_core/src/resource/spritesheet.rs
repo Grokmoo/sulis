@@ -19,11 +19,11 @@ use std::io::{Error};
 use std::rc::Rc;
 use std::path::PathBuf;
 
-use image::SimpleImage;
-use resource::{ResourceSet};
-use util::{Point, Size, unable_to_create_error};
+use crate::image::SimpleImage;
+use crate::resource::{ResourceSet};
+use crate::util::{Point, Size, unable_to_create_error};
 
-use extern_image::{self, ImageBuffer, Rgba};
+use crate::extern_image::{self, ImageBuffer, Rgba};
 
 #[derive(Debug)]
 pub struct Spritesheet {
@@ -136,7 +136,7 @@ impl Spritesheet {
                 group_areas.drain().for_each(|(k, v)| {areas.insert(k, v); });
             }
 
-            if let Some(mut template) = template.as_mut() {
+            if let Some(template) = template.as_mut() {
                 template.areas.drain().for_each(|(k, v)| { areas.insert(k, v); });
             }
 

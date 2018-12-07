@@ -21,7 +21,7 @@ use std::cell::RefCell;
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{Button, Label, Spinner};
 
-use {AreaEditor};
+use crate::{AreaEditor};
 
 pub const NAME: &str = "shift_tiles_window";
 

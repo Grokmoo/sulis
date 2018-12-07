@@ -24,7 +24,7 @@ use sulis_core::ui::{compute_area_scaling, Cursor, Scrollable, Widget, WidgetKin
 use sulis_core::util::{Point};
 use sulis_module::area::MAX_AREA_SIZE;
 
-use {AreaModel, EditorMode};
+use crate::{AreaModel, EditorMode};
 
 const NAME: &str = "area_editor";
 

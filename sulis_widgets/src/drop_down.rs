@@ -20,9 +20,9 @@ use std::cell::RefCell;
 use std::fmt::Display;
 use std::slice::Iter;
 
-use list_box::Entry;
+use crate::list_box::Entry;
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use {Button, ListBox};
+use crate::{Button, ListBox};
 
 const NAME: &str = "drop_down";
 

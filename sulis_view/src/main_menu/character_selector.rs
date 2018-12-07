@@ -23,8 +23,8 @@ use sulis_state::{ActorState, NextGameStep};
 use sulis_module::{Actor, Module};
 use sulis_widgets::{Button, ConfirmationWindow, Label, TextArea, ScrollPane};
 
-use character_window::create_details_text_box;
-use {CharacterBuilder, LoadingScreen, main_menu::MainMenu};
+use crate::character_window::create_details_text_box;
+use crate::{CharacterBuilder, LoadingScreen, main_menu::MainMenu};
 
 pub struct CharacterSelector {
     selected: Option<Rc<Actor>>,

@@ -29,12 +29,12 @@ use std::io::Error;
 use std::rc::Rc;
 use std::cell::{RefCell, Ref};
 
-use extern_image::{ImageBuffer, Rgba};
+use crate::extern_image::{ImageBuffer, Rgba};
 
-use config::{Config, IOAdapter};
-use ui::{Widget, Color};
-use resource::Sprite;
-use util::{Point, Size};
+use crate::config::{Config, IOAdapter};
+use crate::ui::{Widget, Color};
+use crate::resource::Sprite;
+use crate::util::{Point, Size};
 
 #[derive(Debug, Clone)]
 pub struct DisplayConfiguration {

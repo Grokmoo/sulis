@@ -26,8 +26,8 @@ use sulis_core::util::{invalid_data_error, ExtInt};
 use sulis_rules::{AccuracyKind, Attack, AttackKind, BonusList, HitKind, StatList, WeaponKind,
     QuickSlot, Slot, ItemKind, DamageKind, HitFlags, WeaponStyle};
 use sulis_module::{Actor, Module, ActorBuilder, Faction, ImageLayer};
-use {AbilityState, ChangeListenerList, Effect, EntityState, GameState, Inventory, ItemState, PStats};
-use save_state::ActorSaveState;
+use crate::{AbilityState, ChangeListenerList, Effect, EntityState, GameState, Inventory, ItemState, PStats};
+use crate::save_state::ActorSaveState;
 
 pub struct ActorState {
     pub actor: Rc<Actor>,
@@ -345,7 +345,7 @@ impl ActorState {
     pub fn activate_ability_state(&mut self, id: &str) {
         let state = match self.ability_states.get_mut(id) {
             None => return,
-            Some(mut state) => state
+            Some(state) => state
         };
         state.activate();
 

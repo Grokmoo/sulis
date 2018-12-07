@@ -17,8 +17,8 @@
 use std::rc::Rc;
 use std::fmt;
 
-use ObjectSize;
-use area::LayerSet;
+use crate::ObjectSize;
+use crate::area::LayerSet;
 
 pub struct PathFinderGrid {
     pub size: Rc<ObjectSize>,

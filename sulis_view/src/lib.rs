@@ -520,6 +520,8 @@ impl WidgetKind for RootView {
                 }
             })));
 
+            let navi_pane = Widget::empty("navi_pane");
+
             let end_turn_button = Widget::with_theme(Button::empty(), "end_turn_button");
             end_turn_button.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
                 let root = Widget::get_root(&widget);
@@ -538,8 +540,6 @@ impl WidgetKind for RootView {
                     };
                     end_turn_button_ref.borrow_mut().state.set_enabled(enabled);
                 })));
-
-            Widget::add_child_to(&bot_pane, end_turn_button);
 
             let inv_button = Widget::with_theme(Button::empty(), "inventory_button");
             inv_button.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
@@ -576,6 +576,9 @@ impl WidgetKind for RootView {
                 view.show_menu(&parent);
             })));
 
+            Widget::add_children_to(&navi_pane, vec![end_turn_button, inv_button,
+                                    cha_button, map_button, log_button, men_button]);
+
             let mut selected = GameState::selected();
             let entity = if selected.is_empty() {
                 GameState::player()
@@ -586,8 +589,7 @@ impl WidgetKind for RootView {
             let quick_items = Widget::with_defaults(QuickItemBar::new(&entity));
             let abilities = Widget::with_defaults(AbilitiesBar::new(entity));
 
-            Widget::add_children_to(&bot_pane, vec![inv_button, cha_button, map_button,
-                                    log_button, men_button, abilities, quick_items,
+            Widget::add_children_to(&bot_pane, vec![abilities, quick_items, navi_pane,
                                     portrait_pane, select_all, formations, rest]);
         }
 

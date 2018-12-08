@@ -112,7 +112,7 @@ children:
             preferred_size: [12, 0]
             height_relative: Max
   bottom_pane:
-    background: bg_base
+    background: bg_middle_base
     border: [1, 1, 1, 1]
     preferred_size: [0, 40]
     y_relative: Max
@@ -224,13 +224,14 @@ children:
             position: [14, 23]
       abilities_bar:
         height_relative: Max
+        width_relative: Max
         position: [161, 0]
-        preferred_size: [120, 0]
+        preferred_size: [-199, 0]
         layout: BoxHorizontal
         layout_spacing: { top: 0, bottom: 0, left: 0, right: 1 }
         children:
           collapsed_panes:
-            preferred_size: [20, 0]
+            preferred_size: [15, 0]
             height_relative: Max
             layout: BoxVertical
             layout_spacing: { bottom: 1 }
@@ -239,17 +240,16 @@ children:
             children:
               collapsed_group_pane:
                 background: bg_base
-                preferred_size: [0, 11]
+                preferred_size: [0, 12]
                 width_relative: Max
                 border: { top: 1, bottom: 1, left: 1, right: 0 }
                 children:
                   change_size:
                     from: .button
-                    text: "+"
-                    preferred_size: [5, 5]
-                    x_relative: Max
-                    y_relative: Max
-                    position: [-1, 0]
+                    background: background_transparent
+                    preferred_size: [1, 5]
+                    width_relative: Max
+                    position: [-1, -1]
                     custom:
                       tooltip: "Expand"
                   description:
@@ -258,8 +258,8 @@ children:
                     preferred_size: [0, 10]
                     text: |
                       [y=-1.5;s=5.0;c=f00|#group#]
-                      [y=2.5|][?total_uses_per_encounter;s=5.0|#current_uses_per_encounter#/#total_uses_per_encounter# Enc]
-                      [y=5.5|][?total_uses_per_day;s=5.0|#current_uses_per_day#/#total_uses_per_day# Day]
+                      [y=3.0|][?total_uses_per_encounter;s=5.0|#current_uses_per_encounter#/#total_uses_per_encounter# Enc][!total_uses_per_encounter;s=5.0|Unlimited]
+                      [y=6.0|][?total_uses_per_day;s=5.0|#current_uses_per_day#/#total_uses_per_day# Day]
           group_pane:
             background: bg_base
             preferred_size: [0, 0]
@@ -270,14 +270,14 @@ children:
               vertical_count: 2
               grid_width: 13
               grid_border: 2
-              min_horizontal_count: 2
+              min_horizontal_count: 1
             children:
               change_size:
                 from: .button
-                text: "-"
-                preferred_size: [5, 5]
-                x_relative: Max
-                position: [-1, 0]
+                background: background_transparent_no_disabled
+                preferred_size: [1, 5]
+                width_relative: Max
+                position: [-1, -1]
                 custom:
                   tooltip: "Collapse"
               description:
@@ -286,8 +286,8 @@ children:
                 preferred_size: [0, 10]
                 text: |
                   [y=-1.5;s=5.0;c=f00|#group#]
-                  [y=2.5|][?total_uses_per_encounter;s=5.0|#current_uses_per_encounter#/#total_uses_per_encounter# Enc]
-                  [y=5.5|][?total_uses_per_day;s=5.0|#current_uses_per_day#/#total_uses_per_day# Day]
+                  [y=3.0|][?total_uses_per_encounter;s=5.0|#current_uses_per_encounter#/#total_uses_per_encounter# Enc][!total_uses_per_encounter;!total_uses_per_day;s=5.0|Unlimited]
+                  [y=6.0|][?total_uses_per_day;s=5.0|#current_uses_per_day#/#total_uses_per_day# Day]
               abilities_pane:
                 width_relative: Max
                 height_relative: Max
@@ -315,52 +315,60 @@ children:
                         foreground: "#icon#"
                         width_relative: Max
                         height_relative: Max
-      end_turn_button:
-        from: .button
-        custom:
-          tooltip: "End Turn"
-        background: background_rounded
-        preferred_size: [23, 23]
-        y_relative: Max
-        x_relative: Max
-        foreground: end_turn_icon
       window_button:
         from: .button
-        background: background_rounded
+        background: background
         border: [1, 1, 1, 1]
-        preferred_size: [11, 11]
+        preferred_size: [10, 10]
         y_relative: Max
         x_relative: Max
-      map_button:
-        from: .bottom_pane.window_button
-        custom:
-          tooltip: "Map"
-        position: [-24, 0]
-        foreground: map_icon
-      journal_button:
-        from: .bottom_pane.window_button
-        custom:
-          tooltip: "Journal"
-        position: [-24, -12]
-        foreground: log_icon
-      character_button:
-        from: .bottom_pane.window_button
-        custom:
-          tooltip: "Character Sheet"
-        position: [-24, -24]
-        foreground: char_icon
-      inventory_button:
-        from: .bottom_pane.window_button
-        custom:
-          tooltip: "Inventory"
-        position: [-12, -24]
-        foreground: inv_icon
-      menu_button:
-        from: .bottom_pane.window_button
-        custom:
-          tooltip: "Menu"
-        position: [0, -24]
-        foreground: menu_icon
+      navi_pane:
+        background: bg_base
+        border: [1, 1, 1, 1]
+        height_relative: Max
+        x_relative: Max
+        preferred_size: [38, 0]
+        children:
+          end_turn_button:
+            from: .button
+            custom:
+              tooltip: "End Turn"
+            background: background
+            preferred_size: [22, 22]
+            position: [-1, -1]
+            y_relative: Max
+            x_relative: Max
+            foreground: end_turn_icon
+          map_button:
+            from: .bottom_pane.window_button
+            custom:
+              tooltip: "Map"
+            position: [-25, -1]
+            foreground: map_icon
+          journal_button:
+            from: .bottom_pane.window_button
+            custom:
+              tooltip: "Journal"
+            position: [-25, -13]
+            foreground: log_icon
+          character_button:
+            from: .bottom_pane.window_button
+            custom:
+              tooltip: "Character Sheet"
+            position: [-25, -25]
+            foreground: char_icon
+          inventory_button:
+            from: .bottom_pane.window_button
+            custom:
+              tooltip: "Inventory"
+            position: [-13, -25]
+            foreground: inv_icon
+          menu_button:
+            from: .bottom_pane.window_button
+            custom:
+              tooltip: "Menu"
+            position: [-1, -25]
+            foreground: menu_icon
   area:
     preferred_size: [0, -40]
     width_relative: Max

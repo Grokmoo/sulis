@@ -323,7 +323,7 @@ impl WidgetKind for GroupPane {
             parent.borrow_mut().invalidate_children();
         })));
 
-        vec![self.description.clone(), abilities_pane, change_size]
+        vec![self.description.clone(), change_size, abilities_pane]
     }
 }
 

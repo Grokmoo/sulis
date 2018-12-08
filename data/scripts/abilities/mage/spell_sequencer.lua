@@ -40,7 +40,7 @@ function setup_menu(parent, ability, target_type, cb, title)
   if target_type == "self" then
     abilities = { "heal", "acid_weapon", "rock_armor", "fire_shield", "haste", "air_shield", "luck", "expediate", "minor_heal" }
   elseif target_type == "friendly" then
-    abilities = { "heal", "acid_weapon", "haste", "luck", "expediate", "minor_heal" }
+    abilities = { "heal", "acid_weapon", "haste", "expediate", "minor_heal" }
   else
     abilities = { "flare", "acid_bomb", "crush", "frostbite", "slow", "wind_gust", "shock", "firebolt", "dazzle",
 	  "flaming_fingers", "stun" }

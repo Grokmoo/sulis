@@ -113,7 +113,7 @@ children:
             height_relative: Max
   bottom_pane:
     background: bg_base
-    border: [2, 2, 2, 2]
+    border: [1, 1, 1, 1]
     preferred_size: [0, 40]
     y_relative: Max
     width_relative: Max
@@ -122,6 +122,7 @@ children:
         from: .button
         foreground: select_all
         border: [0, 0, 0, 0]
+        position: [0, 2]
         preferred_size: [10, 10]
         custom:
           tooltip: "Select All Party Members"
@@ -129,7 +130,7 @@ children:
         from: .button
         foreground: formations
         border: [0, 0, 0, 0]
-        position: [0, 11]
+        position: [0, 13]
         preferred_size: [10, 10]
         custom:
           tooltip: "Set party formation"
@@ -137,7 +138,7 @@ children:
         from: .button
         foreground: rest
         border: [0, 0, 0, 0]
-        position: [0, 22]
+        position: [0, 24]
         preferred_size: [10, 10]
         custom:
           tooltip: "Rest"
@@ -178,7 +179,7 @@ children:
                 preferred_size: [7, 7]
       quick_item_bar:
         height_relative: Max
-        position: [133, 0]
+        position: [132, 0]
         preferred_size: [28, 0]
         background: bg_base
         border: [1, 1, 1, 1]
@@ -186,7 +187,7 @@ children:
           title:
             from: .label
             text: "Usable Items"
-            position: [0, 0]
+            position: [0, 1]
             preferred_size: [0, 8]
             width_relative: Max
             text_params:
@@ -205,29 +206,60 @@ children:
             from: .item_button
             background: quick_item_button
             foreground: ability_button_fg
-            position: [0, 8]
+            position: [0, 9]
           usable2:
             from: .item_button
             background: quick_item_button
             foreground: ability_button_fg
-            position: [14, 8]
+            position: [14, 9]
           usable3:
             from: .item_button
             background: quick_item_button
             foreground: ability_button_fg
-            position: [0, 21]
+            position: [0, 23]
           usable4:
             from: .item_button
             background: quick_item_button
             foreground: ability_button_fg
-            position: [14, 21]
+            position: [14, 23]
       abilities_bar:
         height_relative: Max
-        position: [162, 0]
+        position: [161, 0]
         preferred_size: [120, 0]
         layout: BoxHorizontal
         layout_spacing: { top: 0, bottom: 0, left: 0, right: 1 }
         children:
+          collapsed_panes:
+            preferred_size: [20, 0]
+            height_relative: Max
+            layout: BoxVertical
+            layout_spacing: { bottom: 1 }
+            custom:
+              max_collapsed: 3
+            children:
+              collapsed_group_pane:
+                background: bg_base
+                preferred_size: [0, 11]
+                width_relative: Max
+                border: { top: 1, bottom: 1, left: 1, right: 0 }
+                children:
+                  change_size:
+                    from: .button
+                    text: "+"
+                    preferred_size: [5, 5]
+                    x_relative: Max
+                    y_relative: Max
+                    position: [-1, 0]
+                    custom:
+                      tooltip: "Expand"
+                  description:
+                    from: .text_area
+                    width_relative: Max
+                    preferred_size: [0, 10]
+                    text: |
+                      [y=-1.5;s=5.0;c=f00|#group#]
+                      [y=2.5|][?total_uses_per_encounter;s=5.0|#current_uses_per_encounter#/#total_uses_per_encounter# Enc]
+                      [y=5.5|][?total_uses_per_day;s=5.0|#current_uses_per_day#/#total_uses_per_day# Day]
           group_pane:
             background: bg_base
             preferred_size: [0, 0]
@@ -240,17 +272,26 @@ children:
               grid_border: 2
               min_horizontal_count: 2
             children:
+              change_size:
+                from: .button
+                text: "-"
+                preferred_size: [5, 5]
+                x_relative: Max
+                position: [-1, 0]
+                custom:
+                  tooltip: "Collapse"
               description:
                 from: .text_area
                 width_relative: Max
-                preferred_size: [0, 8]
+                preferred_size: [0, 10]
                 text: |
-                  [s=5.0;c=f00|#group#]
-                  [?total_uses_per_encounter;s=5.0|#current_uses_per_encounter#/#total_uses_per_encounter# Enc][?total_uses_per_day;s=5.0;x=14|#current_uses_per_day#/#total_uses_per_day# Day]
+                  [y=-1.5;s=5.0;c=f00|#group#]
+                  [y=2.5|][?total_uses_per_encounter;s=5.0|#current_uses_per_encounter#/#total_uses_per_encounter# Enc]
+                  [y=5.5|][?total_uses_per_day;s=5.0|#current_uses_per_day#/#total_uses_per_day# Day]
               abilities_pane:
                 width_relative: Max
                 height_relative: Max
-                preferred_size: [0, -8]
+                preferred_size: [0, -10]
                 y_relative: Max
                 layout: Grid
                 layout_spacing: { top: 0, bottom: 0, left: 0, right: 0 }
@@ -279,7 +320,7 @@ children:
         custom:
           tooltip: "End Turn"
         background: background_rounded
-        preferred_size: [24, 24]
+        preferred_size: [23, 23]
         y_relative: Max
         x_relative: Max
         foreground: end_turn_icon
@@ -294,31 +335,31 @@ children:
         from: .bottom_pane.window_button
         custom:
           tooltip: "Map"
-        position: [-26, 0]
+        position: [-24, 0]
         foreground: map_icon
       journal_button:
         from: .bottom_pane.window_button
         custom:
           tooltip: "Journal"
-        position: [-26, -13]
+        position: [-24, -12]
         foreground: log_icon
       character_button:
         from: .bottom_pane.window_button
         custom:
           tooltip: "Character Sheet"
-        position: [-26, -26]
+        position: [-24, -24]
         foreground: char_icon
       inventory_button:
         from: .bottom_pane.window_button
         custom:
           tooltip: "Inventory"
-        position: [-13, -26]
+        position: [-12, -24]
         foreground: inv_icon
       menu_button:
         from: .bottom_pane.window_button
         custom:
           tooltip: "Menu"
-        position: [0, -26]
+        position: [0, -24]
         foreground: menu_icon
   area:
     preferred_size: [0, -40]

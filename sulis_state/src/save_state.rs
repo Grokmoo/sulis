@@ -379,6 +379,9 @@ pub struct EntitySaveState {
 
     #[serde(default="serde_true")]
     pub(crate) show_portrait: bool,
+
+    #[serde(default)]
+    pub(crate) collapsed_groups: Vec<String>,
 }
 
 impl EntitySaveState {
@@ -450,6 +453,7 @@ impl EntitySaveState {
             ai_active: entity.is_ai_active(),
             show_portrait: entity.show_portrait(),
             actor_base,
+            collapsed_groups: entity.collapsed_groups(),
         }
     }
 }

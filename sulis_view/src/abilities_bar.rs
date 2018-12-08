@@ -18,19 +18,22 @@ use std::cmp;
 use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
+use std::collections::HashSet;
 
 use sulis_core::io::event;
-use sulis_core::ui::{animation_state, Widget, WidgetKind};
+use sulis_core::ui::{animation_state, Widget, WidgetKind, Callback};
 use sulis_core::util::{Size, ExtInt};
 use sulis_module::{actor::OwnedAbility, Ability, Module, ability::{AbilityGroup, Duration}};
 use sulis_state::{ChangeListener, EntityState, GameState};
-use sulis_widgets::{Label, TextArea};
+use sulis_widgets::{Label, TextArea, Button};
 
 pub const NAME: &str = "abilities_bar";
 
 pub struct AbilitiesBar {
     entity: Rc<RefCell<EntityState>>,
     group_panes: Vec<Rc<RefCell<Widget>>>,
+    collapsed_panes: Vec<Rc<RefCell<Widget>>>,
+    max_collapsed: u32,
 }
 
 impl AbilitiesBar {
@@ -38,6 +41,8 @@ impl AbilitiesBar {
         Rc::new(RefCell::new(AbilitiesBar {
             entity,
             group_panes: Vec::new(),
+            collapsed_panes: Vec::new(),
+            max_collapsed: 3,
         }))
     }
 }
@@ -46,6 +51,12 @@ impl WidgetKind for AbilitiesBar {
     widget_kind!(NAME);
 
     fn layout(&mut self, widget: &mut Widget) {
+        if let Some(ref theme) = widget.theme {
+            if let Some(ref count) = theme.custom.get("max_collapsed") {
+                self.max_collapsed = count.parse::<u32>().unwrap_or(3);
+            }
+        }
+
         widget.do_self_layout();
 
         // need to set the custom sizing for each panel prior to doing their layouts
@@ -78,18 +89,39 @@ impl WidgetKind for AbilitiesBar {
         let mut children = Vec::new();
         let abilities = self.entity.borrow().actor.actor.abilities.clone();
 
+        let collapsed_group_ids: HashSet<String> = self.entity.borrow()
+            .collapsed_groups().into_iter().collect();
+
+        let mut collapsed_groups = Vec::new();
         let mut groups = Vec::new();
         for (index, group_id) in Module::rules().ability_groups.iter().enumerate() {
             let stats = &self.entity.borrow().actor.stats;
             if !stats.uses_per_encounter(group_id).is_zero()
                 || !stats.uses_per_day(group_id).is_zero() {
 
-                groups.push(AbilityGroup { index });
+                if !collapsed_group_ids.contains(group_id) {
+                    groups.push(AbilityGroup { index });
+                } else {
+                    collapsed_groups.push(AbilityGroup { index });
+                }
             }
         }
 
+        let collapse_enabled = (collapsed_groups.len() as u32) < self.max_collapsed;
+        if collapsed_groups.len() > 0 {
+            let all_collapsed = Widget::empty("collapsed_panes");
+            for group in collapsed_groups {
+                let pane = CollapsedGroupPane::new(group, &self.entity);
+                let widget = Widget::with_defaults(pane);
+
+                self.collapsed_panes.push(Rc::clone(&widget));
+                Widget::add_child_to(&all_collapsed, widget);
+            }
+            children.push(all_collapsed);
+        }
+
         for group in groups {
-            let group_pane = GroupPane::new(group, &self.entity, &abilities);
+            let group_pane = GroupPane::new(group, &self.entity, &abilities, collapse_enabled);
 
             if group_pane.borrow().abilities.is_empty() { continue; }
 
@@ -102,6 +134,66 @@ impl WidgetKind for AbilitiesBar {
     }
 }
 
+struct CollapsedGroupPane {
+    entity: Rc<RefCell<EntityState>>,
+    group: String,
+    description: Rc<RefCell<Widget>>,
+}
+
+impl CollapsedGroupPane {
+    fn new(group: AbilityGroup,
+           entity: &Rc<RefCell<EntityState>>) -> Rc<RefCell<CollapsedGroupPane>> {
+        Rc::new(RefCell::new(CollapsedGroupPane {
+            group: group.name(),
+            entity: Rc::clone(entity),
+            description: Widget::with_theme(TextArea::empty(), "description"),
+        }))
+    }
+}
+
+impl WidgetKind for CollapsedGroupPane {
+    widget_kind!("collapsed_group_pane");
+
+    fn layout(&mut self, widget: &mut Widget) {
+        self.description.borrow_mut().state.add_text_arg("current_uses_per_encounter",
+            &self.entity.borrow().actor.current_uses_per_encounter(&self.group).to_string());
+
+        self.description.borrow_mut().state.add_text_arg("current_uses_per_day",
+            &self.entity.borrow().actor.current_uses_per_day(&self.group).to_string());
+
+        widget.do_base_layout();
+    }
+
+    fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>>  {
+        self.description.borrow_mut().state.clear_text_args();
+
+        let total_uses = self.entity.borrow().actor.stats.uses_per_encounter(&self.group);
+        if !total_uses.is_infinite() && !total_uses.is_zero() {
+            self.description.borrow_mut().state.add_text_arg("total_uses_per_encounter",
+                &total_uses.to_string());
+        }
+
+        let total_uses = self.entity.borrow().actor.stats.uses_per_day(&self.group);
+        if !total_uses.is_infinite() && !total_uses.is_zero() {
+            self.description.borrow_mut().state.add_text_arg("total_uses_per_day",
+                &total_uses.to_string());
+        }
+
+        self.description.borrow_mut().state.add_text_arg("group", &self.group);
+
+        let change_size = Widget::with_theme(Button::empty(), "change_size");
+        let group = self.group.clone();
+        let entity = Rc::clone(&self.entity);
+        change_size.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
+            entity.borrow_mut().remove_collapsed_group(&group);
+
+            let parent = Widget::go_up_tree(&widget, 3);
+            parent.borrow_mut().invalidate_children();
+        })));
+
+        vec![self.description.clone(), change_size]
+    }
+}
 struct GroupPane {
     entity: Rc<RefCell<EntityState>>,
     abilities: Vec<OwnedAbility>,
@@ -111,11 +203,12 @@ struct GroupPane {
     min_horizontal_count: u32,
     grid_width: u32,
     grid_border: u32,
+    collapse_enabled: bool,
 }
 
 impl GroupPane {
     fn new(group: AbilityGroup, entity: &Rc<RefCell<EntityState>>,
-           abilities: &Vec<OwnedAbility>) -> Rc<RefCell<GroupPane>> {
+           abilities: &Vec<OwnedAbility>, collapse_enabled: bool) -> Rc<RefCell<GroupPane>> {
         let mut abilities_to_add = Vec::new();
         for ability in abilities.iter() {
             let active = match ability.ability.active {
@@ -136,6 +229,7 @@ impl GroupPane {
             grid_border: 1,
             vertical_count: 1,
             min_horizontal_count: 1,
+            collapse_enabled,
         }))
     }
 
@@ -218,7 +312,18 @@ impl WidgetKind for GroupPane {
             Widget::add_child_to(&abilities_pane, button);
         }
 
-        vec![self.description.clone(), abilities_pane]
+        let change_size = Widget::with_theme(Button::empty(), "change_size");
+        change_size.borrow_mut().state.set_enabled(self.collapse_enabled);
+        let group = self.group.clone();
+        let entity = Rc::clone(&self.entity);
+        change_size.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
+            entity.borrow_mut().add_collapsed_group(group.clone());
+
+            let parent = Widget::go_up_tree(&widget, 2);
+            parent.borrow_mut().invalidate_children();
+        })));
+
+        vec![self.description.clone(), abilities_pane, change_size]
     }
 }
 

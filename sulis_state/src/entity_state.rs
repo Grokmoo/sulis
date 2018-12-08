@@ -65,6 +65,8 @@ pub struct EntityState {
 
     index: usize, // index in vec of the owning manager
     unique_id: String, // assigned when setting the index and persisted on save
+
+    collapsed_groups: Vec<String>,
 }
 
 impl PartialEq for EntityState {
@@ -122,6 +124,7 @@ impl EntityState {
             marked_for_removal: false,
             texture_cache_slot: None,
             custom_flags: save.custom_flags,
+            collapsed_groups: save.collapsed_groups,
         })
     }
 
@@ -164,7 +167,20 @@ impl EntityState {
             ai_state,
             texture_cache_slot: None,
             custom_flags: HashMap::new(),
+            collapsed_groups: Vec::new(),
         }
+    }
+
+    pub fn add_collapsed_group(&mut self, group: String) {
+        self.collapsed_groups.push(group);
+    }
+
+    pub fn remove_collapsed_group(&mut self, group: &str) {
+        self.collapsed_groups.retain(|g| g != group);
+    }
+
+    pub fn collapsed_groups(&self) -> Vec<String> {
+        self.collapsed_groups.clone()
     }
 
     pub fn unique_id(&self) -> &str {

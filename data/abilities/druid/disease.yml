@@ -1,0 +1,21 @@
+id: disease
+name: "Disease"
+icon: abilities/disease
+description: |
+  A nearby target must succeed at a fortitude check or suffer the effects of a virulent disease.  The disease causes significant penalties to attribute scores, and is permanent.  It can only be removed with specialized curative magic.
+active:
+  script: "disease"
+  group: "Druid"
+  ap: 2000
+  duration:
+    Permanent
+  cooldown: 5
+  ai:
+    priority: 10
+    kind: Debuff
+    group: Single
+    range: Short
+  short_description: |
+    A single target is afflicted with a permanent debilitating disease.
+prereqs:
+  total_level: 6

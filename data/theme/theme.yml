@@ -258,7 +258,7 @@ children:
                     preferred_size: [0, 10]
                     text: |
                       [y=-1.5;s=5.0;c=f00|#group#]
-                      [y=3.0|][?total_uses_per_encounter;s=5.0|#current_uses_per_encounter#/#total_uses_per_encounter# Enc][!total_uses_per_encounter;s=5.0|Unlimited]
+                      [y=3.0|][?total_uses_per_encounter;s=5.0|#current_uses_per_encounter#/#total_uses_per_encounter# Enc][!total_uses_per_encounter;!total_uses_per_day;s=5.0|Unlimited]
                       [y=6.0|][?total_uses_per_day;s=5.0|#current_uses_per_day#/#total_uses_per_day# Day]
           group_pane:
             background: bg_base

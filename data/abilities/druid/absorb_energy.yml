@@ -19,4 +19,4 @@ active:
     A single selected damage type heals instead of harms you.
 prereqs:
   abilities: [ resist_elements ]
-  total_level: 9
+  total_level: 12

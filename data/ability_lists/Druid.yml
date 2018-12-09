@@ -14,20 +14,24 @@ abilities:
     position: [4, 0.5]
         
   - id: lightning_bolt
-    position: [1, 2.5]
+    position: [1, 2.25]
   - id: sunbeam
     position: [2, 2]
   - id: hail_storm
-    position: [3, 3]
+    position: [3, 2.5]
 
   - id: spirit_defense
-    position: [0, 4.5]
+    position: [0, 4.0]
   - id: regenerate
-    position: [1, 4.0]
-  - id: resist_elements
+    position: [1, 4.5]
+  - id: purify
     position: [2, 4.5]
+  - id: resist_elements
+    position: [3, 4.0]
   - id: absorb_energy
-    position: [3, 4.5]
+    position: [4, 4.0]
+  - id: disease
+    position: [2, 3.5]
 
   - id: summon_animal
     position: [0, 6.1]

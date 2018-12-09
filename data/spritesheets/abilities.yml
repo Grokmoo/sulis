@@ -18,6 +18,7 @@ groups:
       contingency: [8, 0]
       spell_sequencer: [9, 0]
       activate_spell_sequencer: [10, 0]
+      disease: [11, 0]
       
       lightning_reflexes: [0, 1]
       stunning_blow: [1, 1]
@@ -41,6 +42,7 @@ groups:
       polymorph: [12, 2]
       ward: [13, 2]
       dazzle: [14, 2]
+      purify: [15, 2]
       
       heal: [0, 3]
       shock: [1, 3]
@@ -50,6 +52,7 @@ groups:
       stun: [5, 3]
       guardian: [6, 3]
       minor_heal: [7, 3]
+      restoration: [8, 3]
       
       expediate: [0, 4]
       beast_shape: [1, 4]

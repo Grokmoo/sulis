@@ -19,6 +19,8 @@ function on_target_select(parent, ability, targets)
   end
   
   target:remove_effects_with_tag("slow")
+  target:remove_effects_with_tag("nauseate")
+  target:remove_effects_with_tag("dazzle")
   
   anim = target:create_particle_generator("sparkle", 1.0)
   anim:set_moves_with_parent()

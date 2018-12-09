@@ -46,6 +46,7 @@ function on_effect_applied(parent, ability, targets, effect)
     damage = true,
     petrify = true,
 	dazzle = true,
+	disease = true,
   }
   
   if matching_tags[effect:tag()] ~= nil then

@@ -1,0 +1,22 @@
+id: purify
+name: "Purify"
+icon: abilities/purify
+description: |
+  Nature's warm embrace flows into the target, instantly healing an array of afflictions, including Nauseate, Cripple, Blind, Slow, and Disease.
+active:
+  script: "purify"
+  group: "Druid"
+  ap: 2000
+  duration:
+    Instant
+  cooldown: 4
+  ai:
+    priority: 20
+    kind: Heal
+    group: Single
+    range: Short
+  short_description: |
+    Cures status afflictions on an ally.
+prereqs:
+  total_level: 6
+  abilities: [ regenerate ]

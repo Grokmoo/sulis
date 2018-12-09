@@ -2,7 +2,7 @@ id: beast_shape
 name: "Beast Shape"
 icon: abilities/beast_shape
 description: |
-  The caster transforms into a werewolf, a formidable melee combatant.  Most equipment is temporarily absorbed into the form, with the exception of items in the hands which are swapped out if possible or unequipped if not.  Most bonuses from equipment are retained.  However, armor, defense, and accuracy are all set to values based on the strength of the spell and independant of any equipment.
+  The caster transforms into a werewolf, a formidable melee combatant.  Most equipment is temporarily absorbed into the form, with the exception of items in the hands which are temporarily unequipped.  Most bonuses from equipment are retained.  However, armor, defense, and accuracy are all set to values based on the strength of the spell and independant of any equipment.
   
   You cannot use abilities while shapeshifted.  You will not be able to change your equipped items while shapeshifted.
 active:

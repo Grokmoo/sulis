@@ -1,0 +1,21 @@
+id: restoration
+name: "Restoration"
+icon: abilities/restoration
+description: |
+  Restorative energy engulfs you and nearby allies, removing several afflictions including Disease, Nauseate, Cripple, and Blind.
+active:
+  script: "restoration"
+  group: "2nd Circle"
+  ap: 2000
+  duration:
+    Instant
+  cooldown: 5
+  ai:
+    priority: 20
+    kind: Buff
+    group: Multiple
+    range: Short
+  short_description: |
+    Cure conditions on nearby allies.
+prereqs:
+  total_level: 5

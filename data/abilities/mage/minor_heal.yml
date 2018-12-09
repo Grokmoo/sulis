@@ -2,7 +2,7 @@ id: minor_heal
 name: "Minor Heal"
 icon: abilities/minor_heal
 description: |
-  You touch one nearby ally, channeling a small burst of healing energy into them.
+  You touch one nearby ally, channeling a small burst of healing energy into them.  They recover a small number of hit points.
 active:
   script: "minor_heal"
   group: "Cantrips"

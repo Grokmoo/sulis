@@ -2,7 +2,7 @@ id: regenerate
 name: "Regenerate"
 icon: abilities/regenerate
 description: |
-  A nearby ally begins to rapidly regenerate, regaining lost hit points over several rounds.
+  A nearby ally begins to rapidly regenerate, regaining lost hit points over several rounds.  This does not cure any other conditions such as disease.
 active:
   script: "regenerate"
   group: "Druid"

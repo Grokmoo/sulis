@@ -41,6 +41,8 @@ abilities:
     position: [6.6, 3.95]
   - id: luck
     position: [8, 5]
+  - id: restoration
+    position: [7.3, 3.1]
   - id: healing_circle
     position: [8.80, 4]
   - id: ward

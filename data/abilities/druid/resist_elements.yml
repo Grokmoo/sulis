@@ -19,4 +19,4 @@ active:
     Gain resistance to elemental damage types.
 prereqs:
   abilities: [ spirit_defense ]
-  total_level: 6
+  total_level: 9

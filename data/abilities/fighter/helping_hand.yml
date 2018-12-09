@@ -2,7 +2,7 @@ id: helping_hand
 name: "Helping Hand"
 icon: abilities/helping_hand
 description: |
-  Clear stun and slow effects on one nearby ally.
+  Clear minor status effects on one nearby ally, including stun, slow, nauseate, and dazzle.
 active:
   script: "helping_hand"
   group: Fighter

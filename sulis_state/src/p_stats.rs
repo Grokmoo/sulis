@@ -112,6 +112,10 @@ impl PStats {
         }
     }
 
+    pub fn add_ap(&mut self, ap: u32) {
+        self.ap += ap;
+    }
+
     pub fn remove_ap(&mut self, ap: u32) {
         if ap > self.ap {
             self.ap = 0;

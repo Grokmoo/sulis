@@ -18,5 +18,5 @@ active:
   short_description: |
     Attack all opponents in an arc.
 prereqs:
-  abilities: [ powerful_shot ]
-  total_level: 7
+  abilities: [ called_shot ]
+  total_level: 9

@@ -1,0 +1,11 @@
+id: eye
+frame_time_millis: 200
+frames:
+  - particles/eye01
+  - particles/eye02
+  - particles/eye03
+  - particles/eye04
+  - particles/eye05
+  - particles/eye04
+  - particles/eye03
+  - particles/eye02

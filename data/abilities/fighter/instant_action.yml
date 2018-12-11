@@ -1,0 +1,22 @@
+id: instant_action
+name: "Instant Action"
+icon: abilities/instant_action
+description: |
+  With a burst of adrenaline and incredible speed, you are able to immediately act.  You gain two action points immediately, but lose two action points in your subsequent turn.
+active:
+  script: "instant_action"
+  group: Fighter
+  ap: 0
+  duration:
+    Instant
+  cooldown: 4
+  ai:
+    priority: 5
+    kind: Buff
+    group: Single
+    range: Personal
+  short_description: |
+    Gain instant bonus action points at the cost of them next turn.
+prereqs:
+  abilities: [ sixth_sense, charge_attack ]
+  total_level: 12

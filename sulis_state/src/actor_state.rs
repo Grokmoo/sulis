@@ -795,6 +795,11 @@ impl ActorState {
         self.p_stats.set_overflow_ap(cur_overflow + ap);
     }
 
+    pub(crate) fn add_ap(&mut self, ap: u32) {
+        self.p_stats.add_ap(ap);
+        self.listeners.notify(&self);
+    }
+
     pub(crate) fn remove_ap(&mut self, ap: u32) {
         self.p_stats.remove_ap(ap);
         self.listeners.notify(&self);

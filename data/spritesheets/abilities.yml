@@ -94,6 +94,10 @@ groups:
       wall_of_stone: [9, 7]
       deflection: [10, 7]
       shield_throw: [11, 7]
+      called_shot: [12, 7]
+      sixth_sense: [13, 7]
+      mark_target: [14, 7]
+      instant_action: [15, 7]
       
       armor_light: [0, 8]
       armor_medium: [1, 8]
@@ -103,6 +107,7 @@ groups:
       weapon_crossbow: [5, 8]
       weapon_large_sword: [6, 8]
       weapon_mace: [7, 8]
+      overpower: [8, 8]
       
       weapon_simple: [0, 9]
       weapon_small_sword: [1, 9]

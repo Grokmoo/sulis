@@ -13,7 +13,7 @@ bonuses:
     when:
       WeaponStyle: TwoHanded
 prereqs:
-  abilities: [ powerful_blows, whirlwind_attack ]
+  abilities: [ overpower ]
   total_level: 12
 upgrades:
   - description: |

@@ -1,0 +1,22 @@
+id: called_shot
+name: "Called Shot"
+icon: abilities/called_shot
+description: |
+  You fire a carefully aimed shot at the weakest part of your target.  If it hits, this attack is guaranteed to Crit unless the target is immune.
+active:
+  script: "called_shot"
+  group: Fighter
+  ap: 2000
+  duration:
+    Instant
+  cooldown: 3
+  ai:
+    priority: 10
+    kind: Damage
+    group: Single
+    range: Visible
+  short_description: |
+    Attack a target with a guaranteed critical hit.
+prereqs:
+  abilities: [ powerful_shot ]
+  total_level: 7

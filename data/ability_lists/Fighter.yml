@@ -25,6 +25,12 @@ abilities:
     position: [0, 3]
   - id: inspire
     position: [2, 3]
+  - id: sixth_sense
+    position: [4, 3]
+  - id: mark_target
+    position: [3, 2.5]
+  - id: instant_action
+    position: [5, 2.5]
 
   - id: mighty_blow
     position: [0, 4.5]
@@ -36,6 +42,8 @@ abilities:
     position: [2, 4.375]
   - id: blitz
     position: [3, 5]
+  - id: overpower
+    position: [4, 4]
   - id: melee_mastery
     position: [5, 4.05]
   - id: dual_wielding_mastery
@@ -51,7 +59,9 @@ abilities:
     position: [2, 6.5]
   - id: point_blank_shot
     position: [3, 6]
-  - id: arrow_storm
+  - id: called_shot
     position: [3, 7]
+  - id: arrow_storm
+    position: [4, 7]
   - id: ranged_mastery
     position: [5, 6.5]

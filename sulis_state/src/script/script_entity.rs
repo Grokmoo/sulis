@@ -313,6 +313,10 @@ use crate::{ai, animation::{self}, script::*, MOVE_TO_THRESHOLD};
 /// Sets the pixel precise position of this entity to the specified value.  An entity should
 /// generally not be left with non-zero values for either `x` or `y`.
 ///
+/// # `add_ap(amount: Int)`
+/// Adds the specified `amount` of AP to this entity.  Keep in mind the `display_ap`
+/// factor that this amount is divided by for display purposes.
+///
 /// # `remove_ap(amount: Int)`
 /// Removes the specified `amount` of AP from this entity.  Keep in mind the `display_ap`
 /// factor that this amount is divided by for display purposes.
@@ -1046,6 +1050,12 @@ impl UserData for ScriptEntity {
         methods.add_method("set_subpos", |_, entity, (x, y): (f32, f32)| {
             let entity = entity.try_unwrap()?;
             entity.borrow_mut().sub_pos = (x, y);
+            Ok(())
+        });
+
+        methods.add_method("add_ap", |_, entity, ap| {
+            let entity = entity.try_unwrap()?;
+            entity.borrow_mut().actor.add_ap(ap);
             Ok(())
         });
 

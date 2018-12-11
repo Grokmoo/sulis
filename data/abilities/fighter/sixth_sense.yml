@@ -1,0 +1,22 @@
+id: sixth_sense
+name: "Sixth Sense"
+icon: abilities/sixth_sense
+description: |
+  You gain preternatural senses for all that occurs around you, becoming immune to flanking and crits, ignoring concealment and gaining a large bonus to perception.
+active:
+  script: "sixth_sense"
+  group: Fighter
+  ap: 1000
+  duration:
+    Rounds: 3
+  cooldown: 5
+  ai:
+    priority: 10
+    kind: Buff
+    group: Single
+    range: Personal
+  short_description: |
+    Grant attribute bonuses to all nearby allies.
+prereqs:
+  abilities: [ inspire ]
+  total_level: 9

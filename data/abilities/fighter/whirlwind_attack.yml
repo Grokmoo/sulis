@@ -18,5 +18,5 @@ active:
   short_description: |
     Attacks all enemies in an arc.
 prereqs:
-  abilities: [ powerful_blows, stunning_blow ]
+  abilities: [ mighty_blow ]
   total_level: 5

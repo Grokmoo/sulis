@@ -1,0 +1,22 @@
+id: overpower
+name: "Overpower"
+icon: abilities/overpower
+description: |
+  You make a massive attack against an opponent in melee range, doing heavy damage, sundering armor, and lowering defenses for the duration of the ability.
+active:
+  script: "overpower"
+  group: Fighter
+  ap: 3000
+  duration:
+    Rounds: 3
+  cooldown: 4
+  ai:
+    priority: 10
+    kind: Damage
+    group: Single
+    range: Reach
+  short_description: |
+    Stun a single opponent for one round.
+prereqs:
+  abilities: [ powerful_blows, whirlwind_attack ]
+  total_level: 9

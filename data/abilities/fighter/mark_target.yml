@@ -1,0 +1,22 @@
+id: mark_target
+name: "Mark Target"
+icon: abilities/mark_target
+description: |
+  Select a single target to mark for death.  The target gains vulnerability to all physical damage types.
+active:
+  script: "mark_target"
+  group: Fighter
+  ap: 1000
+  duration:
+    Rounds: 3
+  cooldown: 5
+  ai:
+    priority: 20
+    kind: Debuff
+    group: Single
+    range: Short
+  short_description: |
+    Apply physical damage vulnerability to a target.
+prereqs:
+  abilities: [ grapple ]
+  total_level: 7

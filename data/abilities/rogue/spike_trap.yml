@@ -19,4 +19,4 @@ active:
     Set a damaging trap for enemies
 upgrades:
   - description: |
-      Your spike trap deals cripples the target, limiting its movement.
+      Your spike trap now cripples the target, limiting its movement.

@@ -2,14 +2,18 @@ id: fighter
 abilities:
   - id: defensive_fighting
     position: [0, 0.0]
+  - id: deflection
+    position: [2, 0]
   - id: shield_slam
     position: [0, 1]
+  - id: shield_throw
+    position: [3, 1]
   - id: impenetrable_defense
-    position: [2, 1]
+    position: [4, 0]
   - id: guardian
-    position: [1, 0]
+    position: [1.25, 0.4]
   - id: shielded_mastery
-    position: [4, 0.5]
+    position: [5, 0.5]
 
   - id: leap
     position: [0, 2]
@@ -33,9 +37,9 @@ abilities:
   - id: blitz
     position: [3, 5]
   - id: melee_mastery
-    position: [4, 4.05]
+    position: [5, 4.05]
   - id: dual_wielding_mastery
-    position: [4, 5]
+    position: [5, 5]
     
   - id: precise_shot
     position: [0, 6]
@@ -50,4 +54,4 @@ abilities:
   - id: arrow_storm
     position: [3, 7]
   - id: ranged_mastery
-    position: [4, 6.5]
+    position: [5, 6.5]

@@ -18,7 +18,7 @@ use std::str::FromStr;
 
 use rlua::{UserData, UserDataMethods};
 
-use sulis_rules::{Slot, QuickSlot};
+use sulis_rules::{Slot, QuickSlot, ItemKind};
 use sulis_module::ability::AIData;
 use crate::GameState;
 use crate::script::*;
@@ -32,6 +32,19 @@ use crate::script::*;
 ///
 /// # `is_locked() -> Bool`
 /// Returns whether or not this inventory is locked.  See `set_locked`
+///
+/// # `has_equipped(slot: String) -> Bool`
+/// Returns true if the owning entity has an item equipped in the given
+/// slot, false otherwise.  Valid slots are `cloak`, `head`, `torso`,
+/// `hands`, `held_main`, `held_off`, `legs`, `feet`, `waist`, `neck`,
+/// `fingerMain`, `fingerOff`
+///
+/// # `equipped_stats(slot: String) -> Table`
+/// Returns a table describing the stats of the item in the given slot, or
+/// errors if there is no item or the slot is invalid.  See `has_equipped`
+/// for valid slots.  The table `stats` includes `stats.name`, `stats.value`,
+/// `stats.weight`, `stats.kind`, and `stats.armor_kind` for armor or
+/// `stats.weapon_kind` for weapons.
 ///
 /// # `equip_item(item: ScriptStashItem)`
 /// Equips the given `item` from the stash into the appropriate inventory
@@ -100,6 +113,66 @@ impl UserData for ScriptInventory {
             let entity = data.parent.try_unwrap()?;
             let locked = entity.borrow().actor.is_inventory_locked();
             Ok(locked)
+        });
+
+        methods.add_method("has_equipped", |_, data, slot: String| {
+            let entity = data.parent.try_unwrap()?;
+            let slot = match Slot::from_str(&slot) {
+                Err(e) => {
+                    warn!("{}", e);
+                    return Ok(false);
+                }, Ok(slot) => slot,
+            };
+
+            let has_equipped = entity.borrow().actor.inventory().equipped(slot).is_some();
+            Ok(has_equipped)
+        });
+
+        methods.add_method("equipped_stats", |lua, data, slot: String| {
+            let entity = data.parent.try_unwrap()?;
+            let slot = match Slot::from_str(&slot) {
+                Err(e) => {
+                    warn!("{}", e);
+                    return Err(rlua::Error::FromLuaConversionError {
+                        from: "String",
+                        to: "Slot",
+                        message: Some(format!("{}", e)),
+                    });
+                }, Ok(slot) => slot,
+            };
+
+            let entity = entity.borrow();
+            let item = match entity.actor.inventory().equipped(slot) {
+                None => {
+                    warn!("No item equipped in slot '{:?}'", slot);
+                    return Err(rlua::Error::FromLuaConversionError {
+                        from: "String",
+                        to: "Item",
+                        message: Some(format!("No item equipped in slot '{:?}'", slot)),
+                    });
+                }, Some(item) => item,
+            };
+
+            let item = &item.item;
+
+            let stats = lua.create_table()?;
+            stats.set("name", item.name.to_string())?;
+            stats.set("value", item.value)?;
+            stats.set("weight", item.weight)?;
+
+            match item.kind {
+                ItemKind::Armor { kind } => {
+                    stats.set("kind", "armor")?;
+                    stats.set("armor_kind", format!("{:?}", kind).to_lowercase())?;
+                },
+                ItemKind::Weapon { kind } => {
+                    stats.set("kind", "weapon")?;
+                    stats.set("weapon_kind", format!("{:?}", kind).to_lowercase())?;
+                },
+                ItemKind::Other => stats.set("kind", "other")?,
+            }
+
+            Ok(stats)
         });
 
         methods.add_method("equip_item", |_, data, item: ScriptStashItem| {

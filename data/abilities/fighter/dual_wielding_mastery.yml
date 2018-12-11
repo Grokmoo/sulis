@@ -14,7 +14,7 @@ bonuses:
       WeaponStyle: DualWielding
 prereqs:
   abilities: [ blitz, whirlwind_attack ]
-  total_level: 9
+  total_level: 12
 upgrades:
   - description: |
       Your dual weapons create a lethal wall to your enemies, granting you a significant bonus to accuracy and defense.

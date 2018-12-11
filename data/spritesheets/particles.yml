@@ -323,3 +323,15 @@ groups:
       frostbite09: [640, 0]
       frostbite10: [720, 0]
       frostbite11: [800, 0]
+  spinning_shield:
+    size: [20, 20]
+    position: [362, 107]
+    areas:
+      spinning_shield01: [0, 0]
+      spinning_shield02: [20, 0]
+      spinning_shield03: [40, 0]
+      spinning_shield04: [60, 0]
+      spinning_shield05: [80, 0]
+      spinning_shield06: [100, 0]
+      spinning_shield07: [120, 0]
+      spinning_shield08: [140, 0]

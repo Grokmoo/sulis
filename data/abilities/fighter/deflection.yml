@@ -1,0 +1,22 @@
+id: deflection
+name: "Deflection"
+icon: abilities/deflection
+description: |
+  You enter a special stance.  All ranged attacks against you are cause a deflected attack back at your attacker.  Note that the attacks still do full damage to you.  You may only have one combat mode active at a time.
+active:
+  script: "deflection"
+  group: Modes
+  ap: 1000
+  duration:
+    Mode
+  cooldown: 2
+  ai:
+    priority: 10
+    kind: Buff
+    group: Single
+    range: Personal
+  short_description: |
+    Enter a mode that deflects ranged attacks
+prereqs:
+  abilities: [ defensive_fighting ]
+  total_level: 5

@@ -173,8 +173,8 @@ impl ActorState {
         }
 
         if change {
-            self.compute_stats();
             self.texture_cache_invalid = true;
+            self.compute_stats();
         }
     }
 
@@ -182,8 +182,9 @@ impl ActorState {
         for ref layer in images.keys() {
             self.anim_image_layers.remove(*layer);
         }
-        self.compute_stats();
+
         self.texture_cache_invalid = true;
+        self.compute_stats();
     }
 
     pub fn is_inventory_locked(&self) -> bool { self.p_stats.is_inventory_locked() }

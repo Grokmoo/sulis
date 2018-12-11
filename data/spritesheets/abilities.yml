@@ -92,6 +92,8 @@ groups:
       crippling_shot: [7, 7]
       spirit_eye: [8, 7]
       wall_of_stone: [9, 7]
+      deflection: [10, 7]
+      shield_throw: [11, 7]
       
       armor_light: [0, 8]
       armor_medium: [1, 8]

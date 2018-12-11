@@ -1,0 +1,11 @@
+id: spinning_shield
+frame_time_millis: 50
+frames:
+  - particles/spinning_shield01
+  - particles/spinning_shield02
+  - particles/spinning_shield03
+  - particles/spinning_shield04
+  - particles/spinning_shield05
+  - particles/spinning_shield06
+  - particles/spinning_shield07
+  - particles/spinning_shield08

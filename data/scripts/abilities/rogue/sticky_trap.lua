@@ -45,6 +45,10 @@ function on_entered(parent, ability, targets)
   target = targets:first()
   hit = parent:special_attack(target, "Reflex", "Ranged")
   duration = 2
+  if parent:has_ability("mechanical_mastery") then
+    duration = duration + 1
+  end
+  
   if hit:is_miss() then
     return
   elseif hit:is_graze() then

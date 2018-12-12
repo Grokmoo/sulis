@@ -1,0 +1,22 @@
+id: corrupted_strike
+name: "Corrupted Strike"
+icon: abilities/corrupted_strike
+description: |
+  Make an attack against a single opponent that causes a permanent disease effect that can only be removed with specialized magic.  The disease penalizes the target's physical attributes.
+active:
+  script: "corrupted_strike"
+  group: Rogue
+  ap: 2000
+  duration:
+    Instant
+  cooldown: 3
+  ai:
+    priority: 20
+    kind: Damage
+    group: Single
+    range: Reach
+  short_description: |
+    Make an attack that causes permanent disease.
+prereqs:
+  total_level: 9
+  abilities: [ rupture ]

@@ -2,7 +2,7 @@ id: killing_blow
 name: "Killing Blow"
 icon: abilities/killing_blow
 description: |
-  An attack that does raw damage against a single opponent that cannot be resisted.  If the target is below 30% hit points, they die instantly.
+  An attack that does raw damage against a single opponent that cannot be resisted.  If the target is below 30% hit points, they die instantly.  You must have a melee weapon equipped to use this ability.
 active:
   script: "killing_blow"
   group: Rogue
@@ -18,6 +18,5 @@ active:
   short_description: |
     Instantly kill heavily damaged targets.
 prereqs:
-  abilities:
-    - pierce
-  total_level: 7
+  abilities: [ rapid_strikes ]
+  total_level: 9

@@ -20,7 +20,7 @@ active:
   short_description: |
     Turns the caster into a powerful tree.
 prereqs:
-  abilities: [ layer_of_bark ]
+  abilities: [ layer_of_bark, entangling_vines ]
   total_level: 9
 upgrades:
   - description: |

@@ -61,12 +61,17 @@ function on_entered(parent, ability, targets)
   if hit:is_miss() then return end
 
   stats = parent:stats()
+  amount = 8 + stats.level / 2
+  if parent:has_ability("mechanical_mastery") then
+    amount = amount + 3
+  end
+
   if hit:is_graze() then
-    effect:add_num_bonus("armor", -5 - stats.level / 3)
+    effect:add_num_bonus("armor", -amount / 1.5)
   elseif hit:is_hit() then
-    effect:add_num_bonus("armor", -10 - stats.level / 2)
+    effect:add_num_bonus("armor", -amount)
   elseif hit:is_crit() then
-    effect:add_num_bonus("armor", -15 - stats.level / 2)
+    effect:add_num_bonus("armor", -(amount * 1.5))
   end
   
   gen = target:create_particle_generator("shield")

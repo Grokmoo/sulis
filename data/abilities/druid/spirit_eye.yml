@@ -19,3 +19,4 @@ active:
     Summon an invisible magic scout.
 prereqs:
   total_level: 6
+  abilities: [ summon_animal ]

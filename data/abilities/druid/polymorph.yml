@@ -18,5 +18,5 @@ active:
   short_description: |
     Turns an opponent into a chicken.
 prereqs:
-  abilities: [ tree_shape, beast_shape ]
+  abilities: [ tree_shape, purify ]
   total_level: 12

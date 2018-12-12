@@ -19,5 +19,5 @@ bonuses:
       crit_chance: 6
     when:  AttackWhenHidden
 prereqs:
-  abilities: [ feint, killing_blow ]
-  total_level: 9
+  abilities: [ feint, pierce ]
+  total_level: 12

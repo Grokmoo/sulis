@@ -1,0 +1,9 @@
+id: mechanical_mastery
+name: "Mechanical Mastery"
+icon: abilities/mechanical_mastery
+description: |
+  You are a master of mechanical contraptions.  All of your traps, bombs, and grenades are more effective, doing more damage and having longer lasting effects.
+bonuses: []
+prereqs:
+  abilities: [ shrapnel_grenade, sundering_trap ]
+  total_level: 12

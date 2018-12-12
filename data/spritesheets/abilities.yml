@@ -108,6 +108,10 @@ groups:
       weapon_large_sword: [6, 8]
       weapon_mace: [7, 8]
       overpower: [8, 8]
+      speed_of_thought: [9, 8]
+      corrupted_strike: [10, 8]
+      rupture: [11, 8]
+      mechanical_mastery: [12, 8]
       
       weapon_simple: [0, 9]
       weapon_small_sword: [1, 9]

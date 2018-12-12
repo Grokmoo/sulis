@@ -2,7 +2,7 @@ id: rapid_strikes
 name: "Rapid Strikes"
 icon: abilities/rapid_strikes
 description: |
-  Rapidly leap and attack up to 3 enemies in a cone in front of you in turn.
+  Rapidly leap and attack up to 3 enemies in a cone in front of you in turn.  You must have a melee weapon equipped to use this attack.
 active:
   script: "rapid_strikes"
   group: Rogue

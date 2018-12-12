@@ -1,7 +1,10 @@
-smoke_radius = 5.0
-
 function on_activate(parent, ability)
   targets = parent:targets()
+  
+  smoke_radius = 5.0
+  if parent:has_ability("mechanical_mastery") then
+    smoke_radius = smoke_radius + 2.0
+  end
   
   targeter = parent:create_targeter(ability)
   targeter:set_free_select(10.0)

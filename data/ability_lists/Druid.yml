@@ -1,47 +1,47 @@
 id: druid
 abilities:
   - id: enlarge
-    position: [0, 0]
+    position: [2.0, 7]
   - id: spirit_claws
-    position: [0, 1]
+    position: [4.0, 7]
   - id: beast_shape
-    position: [2, 0]
+    position: [2.0, 4.5]
   - id: layer_of_bark
-    position: [1, 1]
+    position: [4.0, 6]
   - id: tree_shape
-    position: [3, 1]
+    position: [5.0, 2.5]
   - id: polymorph
-    position: [4, 0.5]
+    position: [3.5, 1]
         
   - id: lightning_bolt
-    position: [1, 2.25]
+    position: [2.75, 5]
   - id: sunbeam
-    position: [2, 2]
+    position: [2.5, 3.5]
   - id: hail_storm
     position: [3, 2.5]
 
   - id: spirit_defense
-    position: [0, 4.0]
+    position: [3, 7]
   - id: regenerate
-    position: [1, 4.5]
+    position: [3.5, 5]
   - id: purify
-    position: [2, 4.5]
+    position: [3.75, 3.5]
   - id: resist_elements
-    position: [3, 4.0]
+    position: [1.0, 2.5]
   - id: absorb_energy
-    position: [4, 4.0]
+    position: [0.0, 1]
   - id: disease
-    position: [2, 3.5]
+    position: [0, 3]
 
   - id: summon_animal
-    position: [0, 6.1]
+    position: [5.0, 7]
   - id: spirit_eye
-    position: [2, 5.6]
+    position: [6.5, 3.5]
   - id: stinging_swarm
-    position: [2, 6.6]
+    position: [5.5, 4.5]
   - id: entangling_vines
-    position: [1, 6.1]
+    position: [4.75, 6]
   - id: summon_plant_elemental
-    position: [4, 6.1]
+    position: [6.0, 1]
   - id: summon_wind_elemental
-    position: [4, 7.0]
+    position: [7.0, 1]

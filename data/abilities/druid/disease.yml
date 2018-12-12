@@ -18,4 +18,5 @@ active:
   short_description: |
     A single target is afflicted with a permanent debilitating disease.
 prereqs:
-  total_level: 6
+  total_level: 8
+  abilities: [ beast_shape ]

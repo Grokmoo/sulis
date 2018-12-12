@@ -1,0 +1,21 @@
+id: rupture
+name: "Rupture"
+icon: abilities/rupture
+description: |
+  Make an attack against an enemy that ruptures their legs.  Every square they move for the duration of the effect, they suffer Raw damage.
+active:
+  script: "rupture"
+  group: Rogue
+  ap: 2000
+  duration:
+    Rounds: 2
+  cooldown: 4
+  ai:
+    priority: 10
+    kind: Damage
+    group: Single
+    range: Reach
+  short_description: |
+    Make an attack that causes the enemy to suffer damage when they move.
+prereqs:
+  total_level: 5

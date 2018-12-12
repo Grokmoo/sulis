@@ -18,7 +18,8 @@ active:
   short_description: |
     Do major electricity damage to a small area.
 prereqs:
-  total_level: 3
+  total_level: 4
+  abilities: [ spirit_defense ]
 upgrades:
   - description: |
       Your lightning bolt gains a large amount of AP damage, allowing it to easily crack open heavily armored targets.

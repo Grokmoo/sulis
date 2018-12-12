@@ -17,5 +17,3 @@ active:
     range: Reach
   short_description: |
     Move behind an enemy and make an attack.
-prereqs:
-  total_level: 3

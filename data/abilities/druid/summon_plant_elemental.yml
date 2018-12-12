@@ -18,5 +18,5 @@ active:
   short_description: |
     Summon a powerful nature spirit to fight for you.
 prereqs:
-  abilities: [ entangling_vines ]
+  abilities: [ tree_shape ]
   total_level: 12

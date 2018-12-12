@@ -19,4 +19,4 @@ active:
     Make an armor penetrating attack.
 prereqs:
   abilities: [ backstab ]
-  total_level: 3
+  total_level: 5

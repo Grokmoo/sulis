@@ -18,5 +18,5 @@ active:
   short_description: |
     Gain resistance to elemental damage types.
 prereqs:
-  abilities: [ spirit_defense ]
+  abilities: [ sunbeam ]
   total_level: 9

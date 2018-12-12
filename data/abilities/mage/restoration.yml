@@ -2,7 +2,7 @@ id: restoration
 name: "Restoration"
 icon: abilities/restoration
 description: |
-  Restorative energy engulfs you and nearby allies, removing several afflictions including Disease, Nauseate, Cripple, and Blind.
+  Restorative energy engulfs you and nearby allies, removing several afflictions including Disease, Nauseate, Cripple, Rupture, and Blind.
 active:
   script: "restoration"
   group: "2nd Circle"

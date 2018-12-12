@@ -58,6 +58,12 @@ function on_entered(parent, ability, targets)
   stats = parent:stats()
   min_dmg = 25 + stats.level / 2 + stats.intellect_bonus / 4
   max_dmg = 35 + stats.level + stats.intellect_bonus / 2
+  
+  if parent:has_ability("mechanical_mastery") then
+    min_dmg = min_dmg + 5
+	max_dmg = max_dmg + 7
+  end
+  
   parent:special_attack(target, "Reflex", "Ranged", min_dmg, max_dmg, 0, "Fire")
   
   if parent:ability_level(ability) > 1 then

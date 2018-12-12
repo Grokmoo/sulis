@@ -18,7 +18,7 @@ active:
   short_description: |
     Summon a powerful air spirit to fight for you.
 prereqs:
-  abilities: [ summon_animal ]
+  abilities: [ spirit_eye ]
   total_level: 12
 upgrades:
   - description: |

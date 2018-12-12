@@ -1,0 +1,22 @@
+id: speed_of_thought
+name: "Speed of Thought"
+icon: abilities/speed_of_thought
+description: |
+  You gain a boost of incredible speed, gaining bonus action points for the duration.
+active:
+  script: "speed_of_thought"
+  group: "Rogue"
+  ap: 1000
+  duration:
+    Rounds: 2
+  cooldown: 4
+  ai:
+    priority: 30
+    kind: Buff
+    group: Single
+    range: Personal
+  short_description: |
+    Gain bonus action points.
+prereqs:
+  total_level: 7
+  abilities: [ become_wind, hide ]

@@ -68,6 +68,11 @@ function attack_target(parent, ability, targets)
   
   hit = parent:special_attack(target, "Reflex", "Ranged")
   amount = -(2 + stats.intellect_bonus / 20) * game:ap_display_factor()
+  
+  if parent:has_ability("mechanical_mastery") then
+    amount = amount * 1.5
+  end
+  
   if hit:is_miss() then
     return
   elseif hit:is_graze() then

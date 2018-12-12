@@ -21,7 +21,7 @@ active:
     Turns the caster into a ferocious werewolf.
 prereqs:
   abilities: [ enlarge ]
-  total_level: 6
+  total_level: 5
 upgrades:
   - description: |
       Your beast shape gains vastly improved physical attributes.

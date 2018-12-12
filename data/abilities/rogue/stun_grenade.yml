@@ -18,7 +18,7 @@ active:
   short_description: |
     Stun enemies in an area
 prereqs:
-  total_level: 3
+  total_level: 5
   abilities: [ smoke_bomb ]
 upgrades:
   - description: |

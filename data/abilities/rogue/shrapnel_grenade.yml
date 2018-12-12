@@ -18,5 +18,5 @@ active:
   short_description: |
     Deal piercing damage to a group of enemies.
 prereqs:
-  total_level: 7
-  abilities: [ smoke_bomb, fire_trap ]
+  total_level: 9
+  abilities: [ stun_grenade, fire_trap ]

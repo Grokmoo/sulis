@@ -44,4 +44,5 @@ function apply_effect(parent, ability, targets)
   target:remove_effects_with_tag("cripple")
   target:remove_effects_with_tag("blind")
   target:remove_effects_with_tag("disease")
+  target:remove_effects_with_tag("rupture")
 end

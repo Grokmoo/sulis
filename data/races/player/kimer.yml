@@ -1,7 +1,9 @@
 id: kimer
 name: Kimer
 description: |
-  An ancient and proud people, their massive cities are cloistered away far from prying eyes in the ocean depths.  Occasionally, however, some wander-lusted Kimer make their way into the realms of the other races.  They are well suited to be magic users or warriors.
+  An ancient and proud people, their massive cities are cloistered away far from prying eyes in the ocean depths.  Occasionally, however, some wander-lusted Kimer make their way into the realms of the other races.  They must maintain a base level of moisture on their bodies to survive, and suffer vulnerability to Electrical damage because of this.
+  
+  Kimer are well suited to be Mages, Fighters, or any other role.
 size: 2by2
 movement_rate: 1.0
 base_stats:
@@ -18,6 +20,7 @@ base_stats:
   - kind: { reflex: 30 }
   - kind: { will: 30 }
   - kind: { reach: 0.25 }
+  - kind: { resistance: { kind: "Electrical", amount: -25 } }
 base_attack:
   damage:
     min: 8

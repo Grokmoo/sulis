@@ -1,7 +1,7 @@
 id: druid
 name: Druid
 description: |
-  Druids practice an instinctive, natural magical tradition rooted in the wild, untamed places of Eao.  Druids think of their magic as forming the branches of a tree, with different branches constantly in flux.
+  Druids practice an instinctive, natural magical tradition rooted in the wild, untamed places of Eao.  Druids think of their magic as forming the branches of a tree, with different branches constantly in flux.  They can call upon wild creatures to aid them, and employ powerful transformations to enhance themselves and their allies.
 bonuses_per_level:
   - kind:
       hit_points: 5

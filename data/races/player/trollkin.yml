@@ -1,7 +1,9 @@
 id: trollkin
 name: Trollkin
 description: |
-  Trollkin are typically half troll and half human, but sometimes a different combination.  They are tall and exceptionally strong, but are usually only slightly more intelligent than their pure troll ancestors.  They make effective Fighters.
+  Considered beastial, barbaric, and downright undesirable by the so-called "civilized" races, Trollkin are the descendants of trolls that have paired with another race, usually humans.  They are tall, tough, and exceptionally strong, but suffer from a vulnerability to Fire and Acid, just like their Troll forebears.
+  
+  Trollkin adventurers normally operate as front-line Fighters, but most other professions are common enough.  Trollkin Mages are virtually unheard of, as almost no Human or Elven school of magic would accept them.
 size: 2by2
 movement_rate: 1.1
 base_stats:
@@ -18,6 +20,8 @@ base_stats:
   - kind: { reflex: 30 }
   - kind: { will: 30 }
   - kind: { reach: 0.5 }
+  - kind: { resistance: { kind: "Fire", amount: -25 } }
+  - kind: { resistance: { kind: "Acid", amount: -25 } }
 base_attack:
   damage:
     min: 8

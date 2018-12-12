@@ -1,7 +1,9 @@
 id: rodian
 name: Rodian
 description: |
-  Distrusted by most due to their appearance and reputation for thievery, Rodians nonetheless maintain a vast, loosely connected underground empire stretching across the known world and beyond.  Rodians are a common sight in the large cities of other races.  They make excellent Rogues.
+  Distrusted by most due to their appearance and reputation for thievery, Rodians nonetheless maintain a vast, loosely connected underground empire stretching across the known world and beyond.  Rodians are a common sight in the large cities of other races.  They are very fast and agile, but lack the Strength of the larger races.
+  
+  Rodians can be found occupying any profession, but Rogues are probably the most common.
 size: 2by2
 movement_rate: 1.0
 base_stats:
@@ -9,7 +11,7 @@ base_stats:
   - kind: { attribute: { attribute: Dexterity, amount: 4 } }
   - kind: { attribute: { attribute: Endurance, amount: -1 } }
   - kind: { attribute: { attribute: Wisdom, amount: -1 } }
-  - kind: { hit_points: 40 }
+  - kind: { hit_points: 35 }
   - kind: { melee_accuracy: 25 }
   - kind: { ranged_accuracy: 35 }
   - kind: { spell_accuracy: 30 }

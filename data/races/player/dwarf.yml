@@ -1,7 +1,9 @@
 id: dwarf
 name: Dwarf
 description: |
-  Short of stature but tough and stronger than one would expect for their size, Dwarves make for excellent front line fighters.  Most dwarves spend their entire lives never leaving their mountain kingdoms, but some few do venture to other lands.
+  Short of stature but tougher and stronger than one would expect for their size, Dwarves are very formidable warriors.  They are however a bit slower on their feet than other races.  Most dwarves spend their entire lives never leaving their mountain kingdoms, but some few do venture to other lands.
+  
+  Dwarves make excellent Fighters.  Culturally, magic is frowned upon but they can be powerful Mages when they choose to.
 size: 2by2
 movement_rate: 0.85
 base_stats:

@@ -1,15 +1,17 @@
 id: elf
 name: Elf
 description: |
-  Boasting perhaps the oldest of the known civilizations, the empire of the Elves stretched across most of the known world at its peak.  While those days are long gone, individual elves can still be formidable foes.  They are best used off the front line, as magic users, rogues, or archers.
+  Boasting the oldest civilization in the known world (at least according to them), the Elves had empires that stretched across the known world and beyond at their peak.  While those days are long gone, individual Elves are still fairly common in most areas of the world, including the Twin Expanse.  Elves are known for being frail but remarkably quick and perceptive.
+  
+  Elves are natural Mages and Archers, but generally make poor front-line Fighters.
 size: 2by2
-movement_rate: 1.0
+movement_rate: 1.1
 base_stats:
   - kind: { attribute: { attribute: Strength, amount: -1 } }
   - kind: { attribute: { attribute: Dexterity, amount: 1 } }
   - kind: { attribute: { attribute: Endurance, amount: -2 } }
   - kind: { attribute: { attribute: Perception, amount: 2 } }
-  - kind: { hit_points: 40 }
+  - kind: { hit_points: 35 }
   - kind: { melee_accuracy: 30 }
   - kind: { ranged_accuracy: 30 }
   - kind: { spell_accuracy: 35 }

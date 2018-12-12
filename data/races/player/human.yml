@@ -1,7 +1,9 @@
 id: human
 name: Human
 description: |
-  Tough and adaptable, humans have colonized much of the world, often at the expense of other races.  Human adventurers of all types can frequently be found throughout the Five Corners and beyond. 
+  Tough and adaptable, Humans are the most populous race in the known world.  In the thousand years since the Sundering, Humans have spread and colonized vast stretches of all over Eao.
+  
+  Human adventurers of all roles can be found frequently throughout the Twin Expanse and beyond.
 size: 2by2
 movement_rate: 1.0
 base_stats:

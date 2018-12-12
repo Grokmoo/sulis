@@ -1,10 +1,10 @@
 id: mage
 name: Mage
 description: |
-  Mages are students of the highly complex system known as the circles of magic.  Although highly sophisticated and powerful, it is extremely rigid with formalized rules, gestures, and phrases developed over thousands of years.
+  Mages are students of the highly complex system known as the circles of magic.  Although highly sophisticated and powerful, it is extremely rigid with formalized rules, gestures, and phrases developed over thousands of years.  As they gain levels, Mages become incredibly flexible, gaining access to the widest range of spells of any class.
 bonuses_per_level:
   - kind:
-      hit_points: 5
+      hit_points: 4
   - kind:
       melee_accuracy: 2
   - kind:

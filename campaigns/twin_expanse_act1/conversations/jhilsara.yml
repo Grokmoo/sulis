@@ -47,7 +47,7 @@ nodes:
       - text: "Farewell, then."
   maybe:
     text: |
-      Look, I'm not going to beg.  I just thing we might make a good team.
+      Look, I'm not going to beg.  I just think we might make a good team.
     responses:
       - text: "Alright, Agreed."
         to: join

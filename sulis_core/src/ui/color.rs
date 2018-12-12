@@ -23,8 +23,12 @@ pub struct Color {
     pub r: f32,
     pub g: f32,
     pub b: f32,
+
+    #[serde(default = "float_one")]
     pub a: f32,
 }
+
+fn float_one() -> f32 { 1.0 }
 
 fn get_component(text: &str, max: f32) -> f32 {
     let component = i32::from_str_radix(&text, 16);

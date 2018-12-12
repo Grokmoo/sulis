@@ -2,24 +2,33 @@
 children:
   main_menu:
     children:
+      background:
+        background: "bg2/image"
+        preferred_size: [-2, -2]
+        x_relative: Center
+        y_relative: Center
+        width_relative: Max
+        height_relative: Max
       tooltip:
         from: .tooltip
       title:
         from: .label
         text_params:
           scale: 12
+          font: outlined
         text: "Sulis"
         preferred_size: [40, 10]
         x_relative: Center
-        position: [0, 0]
+        position: [0, 5]
       module_title:
         from: .label
         text_params:
           scale: 10
+          font: outlined
         text: "#group# #module#"
         preferred_size: [100, 10]
         x_relative: Center
-        position: [0, 10]
+        position: [0, 15]
       button:
         from: .button
         preferred_size: [35, 12]
@@ -835,6 +844,13 @@ children:
     width_relative: Max
     height_relative: Max
     children:
+      background:
+        background: "bg1/image"
+        preferred_size: [-80, -10]
+        x_relative: Center
+        y_relative: Center
+        width_relative: Max
+        height_relative: Max
       loading_label:
         from: .label
         text_params:

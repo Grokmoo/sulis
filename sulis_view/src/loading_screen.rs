@@ -42,6 +42,7 @@ impl WidgetKind for LoadingScreen {
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let loading_label = Widget::with_theme(Label::empty(), "loading_label");
-        vec![loading_label]
+        let background = Widget::empty("background");
+        vec![background, loading_label]
     }
 }

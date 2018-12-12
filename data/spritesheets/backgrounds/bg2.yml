@@ -1,0 +1,8 @@
+id: bg2
+src: "bg2.jpg"
+size: [ 1024, 768 ]
+simple_image_gen_scale: 64
+groups:
+  bg:
+    areas:
+      image: [0, 0, 1024, 768]

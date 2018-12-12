@@ -141,6 +141,8 @@ impl WidgetKind for MainMenu {
 
         let title = Widget::with_theme(Label::empty(), "title");
 
+        let background = Widget::empty("background");
+
         let module_title = Widget::with_theme(Label::empty(), "module_title");
         if Module::is_initialized() {
             let campaign = Module::campaign();
@@ -256,7 +258,7 @@ impl WidgetKind for MainMenu {
 
         Widget::add_children_to(&menu_pane, vec![module, new, load, mods, options, links, exit]);
 
-        let mut children = vec![title, module_title, menu_pane, self.content.clone()];
+        let mut children = vec![background, title, module_title, menu_pane, self.content.clone()];
 
         if let Some(builder) = self.char_builder_to_add.take() {
             children.push(Widget::with_defaults(builder));

@@ -6,10 +6,10 @@ description: |
 active:
   script: "layer_of_bark"
   group: "Druid"
-  ap: 2000
+  ap: 1000
   duration:
     Rounds: 3
-  cooldown: 4
+  cooldown: 5
   ai:
     priority: 10
     kind: Buff

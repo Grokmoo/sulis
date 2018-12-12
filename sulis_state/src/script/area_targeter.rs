@@ -30,11 +30,11 @@ use crate::{AreaState, EntityState, GameState, TurnManager};
 #[derive(Clone)]
 pub enum Shape {
     Single,
-    Circle { radius: f32 },
+    Circle { min_radius: f32, radius: f32 },
     Line { size: String, origin_x: i32, origin_y: i32, length: i32 },
     LineSegment { size: String, origin_x: i32, origin_y: i32 },
     ObjectSize { size: String },
-    Cone { origin_x: i32, origin_y: i32, radius: f32, angle: f32 },
+    Cone { origin_x: f32, origin_y: f32, min_radius: f32, radius: f32, angle: f32 },
 }
 
 fn contains(target: &Rc<RefCell<EntityState>>, list: &Vec<Rc<RefCell<EntityState>>>) -> bool {
@@ -118,22 +118,22 @@ impl Shape {
         let area_state = area_state.borrow();
 
         let (origin_x, origin_y) = match &self {
-            Shape::Single | Shape::Circle { .. }  => (pos.x, pos.y),
+            Shape::Single | Shape::Circle { .. }  => (pos.x as f32, pos.y as f32),
             Shape::Cone { origin_x, origin_y, .. } => (*origin_x, *origin_y),
-            Shape::Line { origin_x, origin_y, .. } => (*origin_x, *origin_y),
-            Shape::LineSegment { origin_x, origin_y, .. } => (*origin_x, *origin_y),
+            Shape::Line { origin_x, origin_y, .. } => (*origin_x as f32, *origin_y as f32),
+            Shape::LineSegment { origin_x, origin_y, .. } => (*origin_x as f32, *origin_y as f32),
             Shape::ObjectSize { ref size } => {
                 let offset = get_cursor_offset_from_size(size);
-                (pos.x + offset.x, pos.y + offset.y)
+                (pos.x as f32 + offset.x as f32, pos.y as f32 + offset.y as f32)
             }
         };
-        let src_elev = area_state.area.layer_set.elevation(origin_x, origin_y);
+        let src_elev = area_state.area.layer_set.elevation(origin_x as i32, origin_y as i32);
 
         let mut points = match self {
             &Shape::Single =>
                 Vec::new(),
-            &Shape::Circle { radius } =>
-                self.get_points_circle(radius, pos, shift, &area_state),
+            &Shape::Circle { min_radius, radius } =>
+                self.get_points_circle(min_radius, radius, pos, shift, &area_state),
             &Shape::Line { ref size, origin_x, origin_y, length } =>
                 self.get_points_line(Point::new(origin_x, origin_y),
                     pos, length, size, &area_state, src_elev, impass_blocks, invis_blocks),
@@ -142,9 +142,9 @@ impl Shape {
                     pos, size, &area_state, src_elev, impass_blocks, invis_blocks),
             &Shape::ObjectSize { ref size } =>
                 self.get_points_object_size(pos, size, &area_state),
-            &Shape::Cone { origin_x, origin_y, radius, angle } =>
-                self.get_points_cone(Point::new(origin_x, origin_y), pos,
-                    radius, angle, &area_state),
+            &Shape::Cone { origin_x, origin_y, min_radius, radius, angle } =>
+                self.get_points_cone(origin_x, origin_y, pos,
+                    min_radius, radius, angle, &area_state),
         };
 
         if !allow_impass {
@@ -172,7 +172,7 @@ impl Shape {
         }
 
         if impass_blocks || invis_blocks {
-            let start = Point::new(origin_x, origin_y);
+            let start = Point::new(origin_x as i32, origin_y as i32);
             let size = "1by1"; // TODO don't hardcode this
             match &self {
                 Shape::ObjectSize { .. } | Shape::Cone { .. } | Shape::Circle { .. } => {
@@ -373,30 +373,37 @@ impl Shape {
         true
     }
 
-    fn get_points_cone(&self, origin: Point, to: Point, radius: f32,
+    fn get_points_cone(&self, origin_x: f32, origin_y: f32, to: Point,
+                       min_radius: f32, radius: f32,
                        angular_size: f32, _area_state: &AreaState) -> Vec<Point> {
         let mut points = Vec::new();
 
-        let angle = ((to.y - origin.y) as f32).atan2((to.x - origin.x) as f32);
+        let angle = (to.y as f32 - origin_y).atan2(to.x as f32 - origin_x);
+        let shift_x = origin_x.fract();
+        let shift_y = origin_y.fract();
+        let origin_x = origin_x.trunc() as i32;
+        let origin_y = origin_y.trunc() as i32;
 
         let r = (radius + 1.0).ceil() as i32;
         for y in -r..r {
             for x in -r..r {
-                if (x as f32).hypot(y as f32) > radius { continue; }
+                let dist = (x as f32 - shift_x).hypot(y as f32 - shift_y);
+                if dist > radius { continue; }
+                if dist < min_radius { continue; }
 
                 let cur_angle = (y as f32).atan2(x as f32);
 
                 let angle_diff = (angle - cur_angle + 3.0 * PI) % (2.0 * PI) - PI;
                 if angle_diff.abs() > angular_size / 2.0 { continue; }
 
-                points.push(Point::new(x + origin.x, y + origin.y));
+                points.push(Point::new(x + origin_x, y + origin_y));
             }
         }
 
         points
     }
 
-    fn get_points_circle(&self, radius: f32, pos: Point, shift: f32,
+    fn get_points_circle(&self, min_radius: f32, radius: f32, pos: Point, shift: f32,
                          _area_state: &AreaState) -> Vec<Point> {
         let mut points = Vec::new();
 
@@ -404,7 +411,11 @@ impl Shape {
 
         for y in -r..r {
             for x in -r..r {
-                if (x as f32 + shift).hypot(y as f32 + shift) > radius { continue; }
+                let dist = (x as f32 + shift).hypot(y as f32 + shift);
+
+                if dist > radius { continue; }
+                if dist < min_radius { continue; }
+
                 points.push(Point::new(x + pos.x, y + pos.y));
             }
         }

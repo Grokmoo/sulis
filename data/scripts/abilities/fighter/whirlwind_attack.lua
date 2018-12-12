@@ -18,7 +18,7 @@ end
 function on_target_select(parent, ability, targets)
   duration = 1.0
   gen = parent:create_anim("whirlwind", duration)
-  gen:set_position(gen:param(parent:center_x() - 2.0), gen:param(parent:center_y() - 2.0))
+  gen:set_position(gen:param(parent:center_x() - 1.5), gen:param(parent:center_y() - 2.0))
   gen:set_particle_size_dist(gen:fixed_dist(4.0), gen:fixed_dist(4.0))
   gen:set_alpha(gen:param(1.0, 0.0, 0.0, -6.0))
 

@@ -6,7 +6,7 @@ description: |
 active:
   script: "rapid_strikes"
   group: Rogue
-  ap: 4000
+  ap: 3000
   duration:
     Instant
   cooldown: 4

@@ -31,8 +31,8 @@ function on_position(parent, ability, targets, custom_target)
   
   duration = 0.89
   anim = parent:create_anim("teleport", duration)
-  anim:set_position(anim:param(custom_target:center_x() - 1.0),
-                    anim:param(custom_target:center_y() - 2.0))
+  anim:set_position(anim:param(custom_target:center_x() - 0.5),
+                    anim:param(custom_target:center_y() - 1.75))
   anim:set_particle_size_dist(anim:fixed_dist(2.0), anim:fixed_dist(3.0))
   
   cb = ability:create_callback(parent)

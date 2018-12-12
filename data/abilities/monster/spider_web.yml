@@ -5,8 +5,8 @@ description: |
   Creates sticky webs in an area, preventing targets from moving or slowing them.
 active:
   script: "spider_web"
-  group: Fighter
-  ap: 2000
+  group: Special
+  ap: 3000
   duration:
     Rounds: 3
   cooldown: 6

@@ -6,10 +6,10 @@ description: |
 active:
   script: "arrow_storm"
   group: Fighter
-  ap: 4000
+  ap: 3000
   duration:
     Instant
-  cooldown: 3
+  cooldown: 5
   ai:
     priority: 10
     kind: Damage

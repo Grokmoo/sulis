@@ -5,11 +5,11 @@ description: |
   Your target must succeed at a Fortitude check or suffer penalties to physical attributes.
 active:
   script: "nauseate"
-  group: "Fighter"
+  group: "Special"
   ap: 2000
   duration:
     Rounds: 3
-  cooldown: 6
+  cooldown: 5
   ai:
     priority: 20
     kind: Debuff

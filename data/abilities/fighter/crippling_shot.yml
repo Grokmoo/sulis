@@ -9,7 +9,7 @@ active:
   ap: 2000
   duration:
     Rounds: 3
-  cooldown: 3
+  cooldown: 6
   ai:
     priority: 10
     kind: Debuff

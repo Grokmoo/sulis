@@ -6,7 +6,7 @@ description: |
 active:
   script: "stun"
   group: "2nd Circle"
-  ap: 3000
+  ap: 2000
   duration:
     Instant
   cooldown: 3

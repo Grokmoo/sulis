@@ -6,7 +6,7 @@ description: |
 active:
   script: "chameleon"
   group: "3rd Circle"
-  ap: 2000
+  ap: 1000
   duration:
     Rounds: 3
   cooldown: 4

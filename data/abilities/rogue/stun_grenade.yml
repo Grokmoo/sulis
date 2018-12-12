@@ -9,7 +9,7 @@ active:
   ap: 3000
   duration:
     Instant
-  cooldown: 4
+  cooldown: 5
   ai:
     priority: 20
     kind: Debuff

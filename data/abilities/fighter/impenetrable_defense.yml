@@ -7,10 +7,10 @@ description: |
 active:
   script: "impenetrable_defense"
   group: Fighter
-  ap: 4000
+  ap: 3000
   duration:
     Rounds: 2
-  cooldown: 3
+  cooldown: 5
   ai:
     priority: 20
     kind: Buff

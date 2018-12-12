@@ -6,10 +6,10 @@ description: |
 active:
   script: "rock_armor"
   group: "2nd Circle"
-  ap: 2000
+  ap: 1000
   duration:
     Rounds: 2
-  cooldown: 3
+  cooldown: 4
   ai:
     priority: 10
     kind: Buff

@@ -9,7 +9,7 @@ active:
   ap: 1000
   duration:
     Instant
-  cooldown: 2
+  cooldown: 3
   ai:
     priority: 100
     kind: Special

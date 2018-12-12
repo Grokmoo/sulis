@@ -82,7 +82,7 @@ end
 
 function create_fire_surface(parent, ability, targets)
   points = targets:random_affected_points(0.7)
-  surf = parent:create_surface(ability:name(), points, 2)
+  surf = parent:create_surface("Fire", points, 2)
   surf:set_squares_to_fire_on_moved(3)
   
   cb = ability:create_callback(parent)

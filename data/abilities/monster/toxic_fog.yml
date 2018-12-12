@@ -5,8 +5,8 @@ description: |
   Creates debilitating fog in an area, that causes acid damage and reduces stats of all hostiles inside.
 active:
   script: "toxic_fog"
-  group: Fighter
-  ap: 2000
+  group: Special
+  ap: 3000
   duration:
     Rounds: 3
   cooldown: 6

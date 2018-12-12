@@ -5,7 +5,7 @@ function on_activate(parent, ability)
   
   targeter = parent:create_targeter(ability)
   targeter:set_free_select(max_dist * 2)
-  targeter:set_shape_cone(parent:center_x(), parent:center_y(), max_dist, math.pi / 8) 
+  targeter:set_shape_cone(parent:center_x(), parent:center_y(), 1.0, max_dist, math.pi / 8) 
   targeter:add_all_effectable(targets)
   targeter:activate()
 end

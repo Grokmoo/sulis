@@ -95,8 +95,10 @@ pub enum Kind {
 /// # `set_max_effectable(max: Int)`
 /// Sets the maximum number of targets that this targeter may affect and return.
 ///
-/// # `set_shape_circle(radius: Float)`
-/// Sets the shape of this targeter to a circle with the specified `radius`, in tiles
+/// # `set_shape_circle(radius: Float, min_radius: Float (Optional))`
+/// Sets the shape of this targeter to a circle with the specified `radius`, in tiles.
+/// If `min_radius` is specified, instead creates a ring shape with the specified minimum
+/// and maximum radii.
 ///
 /// # `set_shape_line(size: String, x: Int, y: Int, length: Int)`
 /// Sets the shape of this targeter to a line that extends from `x`, `y` as its origin for the
@@ -111,9 +113,11 @@ pub enum Kind {
 /// Sets this targeter to affect a set of points with the shape specified by the specified
 /// `size`.
 ///
-/// # `set_shape_cone(x: Float, y: Float, radius: Float, angle: Float)`
+/// # `set_shape_cone(x: Float, y: Float, min_radius: Float, radius: Float, angle: Float)`
 /// Sets this targeter to a cone shape, with center / origin `x`, `y`, a specified `radius`,
-/// and subtending the specified `angle`.  The angle is in radians.
+/// and subtending the specified `angle`.  The angle is in radians.  `min_radius` specifies
+/// a minimum distance points must be from the origin to be included.  This should be zero
+/// for a true cone.
 #[derive(Clone)]
 pub struct TargeterData {
     pub kind: Kind,
@@ -241,8 +245,10 @@ impl UserData for TargeterData {
             targeter.max_effectable = Some(max);
             Ok(())
         });
-        methods.add_method_mut("set_shape_circle", |_, targeter, radius: f32| {
-            targeter.shape = Shape::Circle { radius };
+        methods.add_method_mut("set_shape_circle", |_, targeter, (radius, min_radius):
+                               (f32, Option<f32>)| {
+            let min_radius = min_radius.unwrap_or(0.0);
+            targeter.shape = Shape::Circle { min_radius, radius };
             Ok(())
         });
         methods.add_method_mut("set_shape_line", |_, targeter, (size, origin_x, origin_y, length):
@@ -292,10 +298,9 @@ impl UserData for TargeterData {
             Ok(())
         });
         methods.add_method_mut("set_shape_cone", |_, targeter,
-                               (origin_x, origin_y, radius, angle): (f32, f32, f32, f32)| {
-            let origin_x = origin_x.floor() as i32;
-            let origin_y = origin_y.floor() as i32;
-            targeter.shape = Shape::Cone { origin_x, origin_y, radius, angle };
+                               (origin_x, origin_y, min_radius, radius, angle):
+                               (f32, f32, f32, f32, f32)| {
+            targeter.shape = Shape::Cone { origin_x, origin_y, min_radius, radius, angle };
             Ok(())
         });
     }

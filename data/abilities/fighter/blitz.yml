@@ -6,10 +6,10 @@ description: |
 active:
   script: "blitz"
   group: Fighter
-  ap: 4000
+  ap: 3000
   duration:
     Instant
-  cooldown: 4
+  cooldown: 5
   ai:
     priority: 10
     kind: Damage

@@ -3,9 +3,11 @@ max_dist = 8
 function on_activate(parent, ability)
   targets = parent:targets():without_self()
   
+  min_dist = math.max(parent:width(), parent:height()) / 2.0
+  
   targeter = parent:create_targeter(ability)
   targeter:set_free_select(max_dist * 2)
-  targeter:set_shape_cone(parent:center_x(), parent:center_y(), max_dist, math.pi / 3) 
+  targeter:set_shape_cone(parent:center_x(), parent:center_y(), min_dist, max_dist, math.pi / 3) 
   targeter:add_all_effectable(targets)
   targeter:invis_blocks_affected_points(true)
   targeter:activate()
@@ -21,14 +23,14 @@ function on_target_select(parent, ability, targets)
 
   pos = targets:selected_point()
   
-  delta_x = pos.x - parent:center_x()
-  delta_y = pos.y - parent:center_y()
+  delta_x = pos.x - parent:x()
+  delta_y = pos.y - parent:y()
   angle = game:atan2(delta_x, delta_y)
   
   duration = 1.5
   
   gen = parent:create_particle_generator("fire_particle", duration)
-  gen:set_position(gen:param(parent:center_x()), gen:param(parent:center_y()))
+  gen:set_position(gen:param(parent:center_x() + 0.5), gen:param(parent:center_y() - 0.5))
   gen:set_gen_rate(gen:param(500.0, -500))
   gen:set_initial_gen(500.0)
   gen:set_particle_size_dist(gen:fixed_dist(0.7), gen:fixed_dist(0.7))
@@ -67,7 +69,7 @@ end
 
 function create_fire_surface(parent, ability, targets)
   points = targets:random_affected_points(0.3)
-  surf = parent:create_surface(ability:name(), points, 1)
+  surf = parent:create_surface("Fire", points, 1)
   surf:set_squares_to_fire_on_moved(3)
   
   cb = ability:create_callback(parent)

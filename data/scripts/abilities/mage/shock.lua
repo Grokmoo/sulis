@@ -12,7 +12,7 @@ function on_target_select(parent, ability, targets)
 
   duration = 0.6
   anim = parent:create_anim("shock", duration)
-  anim:set_position(anim:param(target:center_x() - 1.5), anim:param(target:center_y() - 1.5))
+  anim:set_position(anim:param(target:center_x() - 1.0), anim:param(target:center_y() - 1.5))
   anim:set_particle_size_dist(anim:fixed_dist(3.0), anim:fixed_dist(3.0))
   anim:set_alpha(anim:param(1.0))
   

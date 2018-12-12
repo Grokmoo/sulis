@@ -5,7 +5,7 @@ description: |
   Trolls regenerate hit points every round.
 active:
   script: "troll_regeneration"
-  group: Fighter
+  group: Special
   ap: 0
   duration:
     Instant

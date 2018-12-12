@@ -6,10 +6,10 @@ description: |
 active:
   script: "summon_wind_elemental"
   group: Druid
-  ap: 2000
+  ap: 3000
   duration:
     Rounds: 4
-  cooldown: 6
+  cooldown: 8
   ai:
     priority: 30
     kind: Special

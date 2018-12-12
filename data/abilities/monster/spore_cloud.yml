@@ -5,8 +5,8 @@ description: |
   Creates a cloud of mushroom spores that lower the mental capabilities of targets in the specified area.
 active:
   script: "spore_cloud"
-  group: Fighter
-  ap: 2000
+  group: Special
+  ap: 3000
   duration:
     Rounds: 3
   cooldown: 6

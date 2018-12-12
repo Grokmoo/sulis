@@ -9,7 +9,7 @@ active:
   ap: 3000
   duration:
     Instant
-  cooldown: 3
+  cooldown: 4
   ai:
     priority: 30
     kind: Damage

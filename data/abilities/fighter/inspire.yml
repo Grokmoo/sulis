@@ -6,7 +6,7 @@ description: |
 active:
   script: "inspire"
   group: Fighter
-  ap: 3000
+  ap: 2000
   duration:
     Rounds: 3
   cooldown: 5

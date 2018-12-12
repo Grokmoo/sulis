@@ -6,7 +6,7 @@ description: |
 active:
   script: "dazzle"
   group: "1st Circle"
-  ap: 2000
+  ap: 1000
   duration:
     Rounds: 2
   cooldown: 4

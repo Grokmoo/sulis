@@ -6,7 +6,7 @@ description: |
 active:
   script: "expediate"
   group: "Cantrips"
-  ap: 2000
+  ap: 1000
   duration:
     Rounds: 2
   cooldown: 4

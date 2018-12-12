@@ -5,11 +5,11 @@ description: |
   The target must succeed at a Fortitude save or be put to sleep.
 active:
   script: "shroom_spores"
-  group: "Fighter"
+  group: "Special"
   ap: 2000
   duration:
     Rounds: 3
-  cooldown: 4
+  cooldown: 5
   ai:
     priority: 20
     kind: Debuff

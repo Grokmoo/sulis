@@ -5,7 +5,7 @@ function on_activate(parent, ability)
   
   targeter = parent:create_targeter(ability)
   targeter:set_free_select(max_dist * 2)
-  targeter:set_shape_cone(parent:center_x(), parent:center_y(), max_dist, math.pi / 3) 
+  targeter:set_shape_cone(parent:center_x(), parent:center_y(), 1.0, max_dist, math.pi / 3) 
   targeter:add_all_effectable(targets)
   targeter:impass_blocks_affected_points(true)
   targeter:activate()
@@ -15,7 +15,7 @@ function on_target_select(parent, ability, targets)
   if targets:is_empty() then return end
   target = targets:first()
   
-  speed = 500 * game:anim_base_time()
+  speed = 700 * game:anim_base_time()
   dist = parent:dist_to_entity(target)
   duration = 0.2 + dist / speed
   
@@ -60,7 +60,7 @@ function attack_target1(parent, ability, targets)
   
   target2 = targets_table[2]
   
-  speed = 500 * game:anim_base_time()
+  speed = 700 * game:anim_base_time()
   dist = target1:dist_to_entity(target2)
   duration = 0.2 + dist / speed
   parent:set_subpos(initial_delta_x, initial_delta_y)
@@ -99,7 +99,7 @@ function attack_target2(parent, ability, targets)
   parent:set_subpos(initial_delta_x, initial_delta_y)
   target3 = targets_table[3]
   
-  speed = 500 * game:anim_base_time()
+  speed = 700 * game:anim_base_time()
   dist = target2:dist_to_entity(target3)
   duration = 0.2 + dist / speed
   
@@ -130,8 +130,8 @@ function attack_target3(parent, ability, targets)
 end
 
 function anim_return(parent, ability, target)
-  speed = 500 * game:anim_base_time()
-  dist = target3:dist_to_entity(target)
+  speed = 700 * game:anim_base_time()
+  dist = target:dist_to_entity(parent)
   duration = 0.2 + dist / speed
   
   anim = parent:create_subpos_anim(duration)

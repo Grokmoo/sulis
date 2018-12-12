@@ -14,7 +14,7 @@ function on_target_select(parent, ability, targets)
   amount = 30 + stats.caster_level + stats.intellect_bonus / 2
   target:heal_damage(amount)
 
-  anim = target:create_particle_generator("heal")
+  anim = target:create_particle_generator("heal", 2.0)
   anim:set_moves_with_parent()
   anim:set_position(anim:param(-0.5), anim:param(-1.5))
   anim:set_particle_size_dist(anim:fixed_dist(1.0), anim:fixed_dist(1.0))

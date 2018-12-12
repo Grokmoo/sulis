@@ -9,7 +9,7 @@ active:
   ap: 1000
   duration:
     Rounds: 2
-  cooldown: 4
+  cooldown: 5
   ai:
     priority: 30
     kind: Buff

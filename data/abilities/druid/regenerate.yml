@@ -9,7 +9,7 @@ active:
   ap: 2000
   duration:
     Rounds: 2
-  cooldown: 3
+  cooldown: 4
   ai:
     priority: 20
     kind: Heal

@@ -1190,13 +1190,15 @@ impl UserData for ScriptEntity {
         });
         methods.add_method("center_x", |_, entity, ()| {
             let entity = entity.try_unwrap()?;
-            let x = entity.borrow().location.x as f32 + entity.borrow().size.width as f32 / 2.0;
+            let x = entity.borrow().location.x as f32
+                + entity.borrow().size.width as f32 / 2.0 - 0.5;
             Ok(x)
         });
 
         methods.add_method("center_y", |_, entity, ()| {
             let entity = entity.try_unwrap()?;
-            let y = entity.borrow().location.y as f32 + entity.borrow().size.height as f32 / 2.0;
+            let y = entity.borrow().location.y as f32
+                + entity.borrow().size.height as f32 / 2.0 - 0.5;
             Ok(y)
         });
 

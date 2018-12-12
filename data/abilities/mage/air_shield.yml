@@ -6,7 +6,7 @@ description: |
 active:
   script: "air_shield"
   group: "2nd Circle"
-  ap: 2000
+  ap: 1000
   duration:
     Rounds: 3
   cooldown: 4

@@ -8,7 +8,7 @@ active:
   group: "1st Circle"
   ap: 2000
   duration:
-    Rounds: 2
+    Instant
   cooldown: 3
   ai:
     priority: 20

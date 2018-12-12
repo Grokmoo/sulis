@@ -6,10 +6,10 @@ description: |
 active:
   script: "resist_elements"
   group: "Druid"
-  ap: 2000
+  ap: 1000
   duration:
     Rounds: 3
-  cooldown: 4
+  cooldown: 5
   ai:
     priority: 30
     kind: Buff

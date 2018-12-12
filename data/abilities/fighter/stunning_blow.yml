@@ -8,7 +8,7 @@ description: |
 active:
   script: "stunning_blow"
   group: Fighter
-  ap: 3000
+  ap: 2000
   duration:
     Instant
   cooldown: 3

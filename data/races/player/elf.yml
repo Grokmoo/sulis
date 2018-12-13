@@ -6,6 +6,7 @@ description: |
   Elves are natural Mages and Archers, but generally make poor front-line Fighters.
 size: 2by2
 movement_rate: 1.1
+pc_death_prop: pc_dead_med
 base_stats:
   - kind: { attribute: { attribute: Strength, amount: -1 } }
   - kind: { attribute: { attribute: Dexterity, amount: 1 } }

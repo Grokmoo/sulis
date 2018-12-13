@@ -6,6 +6,7 @@ description: |
   Rodians can be found occupying any profession, but Rogues are probably the most common.
 size: 2by2
 movement_rate: 1.0
+pc_death_prop: pc_dead_small
 base_stats:
   - kind: { attribute: { attribute: Strength, amount: -2 } }
   - kind: { attribute: { attribute: Dexterity, amount: 4 } }

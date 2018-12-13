@@ -6,6 +6,7 @@ description: |
   Dwarves make excellent Fighters.  Culturally, magic is frowned upon but they can be powerful Mages when they choose to.
 size: 2by2
 movement_rate: 0.85
+pc_death_prop: pc_dead_small
 base_stats:
   - kind: { attribute: { attribute: Dexterity, amount: -2 } }
   - kind: { attribute: { attribute: Endurance, amount: 3 } }

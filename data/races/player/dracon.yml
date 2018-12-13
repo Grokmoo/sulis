@@ -6,6 +6,7 @@ description: |
   Dracons rarely become Rogues but otherwise frequently choose all professions.
 size: 2by2
 movement_rate: 0.9
+pc_death_prop: pc_dead_large
 disabled_slots: [ Head ]
 base_stats:
   - kind: { attribute: { attribute: Strength, amount: 2 } }

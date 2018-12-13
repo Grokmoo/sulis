@@ -77,6 +77,7 @@ pub struct PropData {
     pub location: Point,
     pub items: Vec<ItemListEntrySaveState>,
     pub enabled: bool,
+    pub hover_text: Option<String>,
 }
 
 pub struct EncounterData {
@@ -358,6 +359,8 @@ pub struct PropDataBuilder {
     #[serde(default)]
     pub items: Vec<ItemListEntrySaveState>,
     pub enabled: Option<bool>,
+    #[serde(default)]
+    pub hover_text: Option<String>,
 }
 
 pub fn create_prop(builder: &PropDataBuilder, module: &Module) -> Result<PropData, Error> {
@@ -375,5 +378,6 @@ pub fn create_prop(builder: &PropDataBuilder, module: &Module) -> Result<PropDat
         location,
         items: builder.items.clone(),
         enabled,
+        hover_text: builder.hover_text.clone(),
     })
 }

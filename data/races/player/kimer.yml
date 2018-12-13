@@ -6,6 +6,7 @@ description: |
   Kimer are well suited to be Mages, Fighters, or any other role.
 size: 2by2
 movement_rate: 1.0
+pc_death_prop: pc_dead_med
 base_stats:
   - kind: { attribute: { attribute: Endurance, amount: -1 } }
   - kind: { attribute: { attribute: Perception, amount: -1 } }

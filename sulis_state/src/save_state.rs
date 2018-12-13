@@ -297,6 +297,9 @@ impl PropSaveState {
             Interactive::Door { open } => Door {
                 open,
             },
+            Interactive::Hover { ref text } => Hover {
+                text: text.clone(),
+            },
         };
 
         PropSaveState {
@@ -321,6 +324,9 @@ pub enum PropInteractiveSaveState {
     Door {
         open: bool,
     },
+    Hover {
+        text: String,
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug)]

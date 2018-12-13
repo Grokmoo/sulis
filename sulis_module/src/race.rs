@@ -27,7 +27,7 @@ use sulis_rules::{BonusList, bonus::AttackBuilder, Slot};
 
 use crate::actor::{Sex};
 
-use crate::{ObjectSize, ImageLayer, ImageLayerSet, Module};
+use crate::{ObjectSize, ImageLayer, ImageLayerSet, Module, Prop};
 
 #[derive(Debug)]
 pub struct Race {
@@ -35,6 +35,7 @@ pub struct Race {
     pub name: String,
     pub description: String,
     pub movement_rate: f32,
+    pub pc_death_prop: Option<Rc<Prop>>,
     pub size: Rc<ObjectSize>,
     pub base_stats: BonusList,
     pub base_attack: AttackBuilder,
@@ -111,6 +112,18 @@ impl Race {
             editor_creator_images.push((layer, images));
         }
 
+        let pc_death_prop = match builder.pc_death_prop {
+            None => None,
+            Some(id) => {
+                match module.props.get(&id) {
+                    None => {
+                        warn!("No prop found with id '{}' for pc_death_prop", id);
+                        return unable_to_create_error("race", &builder.id);
+                    }, Some(prop) => Some(Rc::clone(prop)),
+                }
+            }
+        };
+
         Ok(Race {
             id: builder.id,
             name: builder.name,
@@ -130,6 +143,7 @@ impl Race {
             skin_colors,
             ticker_offset: builder.ticker_offset,
             editor_creator_images,
+            pc_death_prop,
         })
     }
 
@@ -180,6 +194,7 @@ pub struct RaceBuilder {
     pub movement_rate: f32,
     pub base_attack: AttackBuilder,
     pub base_stats: BonusList,
+    pub pc_death_prop: Option<String>,
     pub default_images: HashMap<Sex, HashMap<ImageLayer, String>>,
     pub hair_selections: Option<Vec<String>>,
     pub beard_selections: Option<Vec<String>>,

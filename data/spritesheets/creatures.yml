@@ -270,6 +270,9 @@ groups:
       hair13: [33, 21]
       hair14: [36, 21]
       hair15: [39, 21]
+      pc_dead_med: [42, 21]
+      pc_dead_small: [45, 21]
+      pc_dead_large: [48, 21]
       
       sickle_off: [12, 24]
       halberd_off: [15, 24]

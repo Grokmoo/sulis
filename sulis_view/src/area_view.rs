@@ -392,7 +392,7 @@ impl AreaView {
         } else if let Some(index) = area_state.prop_index_at(x, y) {
             let interactive = {
                 let prop = area_state.get_prop(index);
-                prop.is_container() && prop.is_enabled()
+                (prop.is_container() || prop.is_hover()) && prop.is_enabled()
             };
 
             if interactive {

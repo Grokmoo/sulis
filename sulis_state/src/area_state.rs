@@ -26,7 +26,7 @@ use rand::{self, Rng};
 use sulis_core::util::{self, invalid_data_error, Point};
 use sulis_core::config::Config;
 use sulis_rules::{HitFlags, HitKind, DamageKind};
-use sulis_module::{Actor, Area, LootList, Module, ObjectSize, prop};
+use sulis_module::{Actor, Area, LootList, Module, ObjectSize, prop, Prop};
 use sulis_module::area::{EncounterData, PropData, Transition, TriggerKind};
 use crate::script::AreaTargeter;
 use crate::save_state::{AreaSaveState};
@@ -153,6 +153,7 @@ impl AreaState {
                 location: prop_save_state.location,
                 items: Vec::new(),
                 enabled: prop_save_state.enabled,
+                hover_text: None,
             };
 
             let index = area_state.add_prop(&prop_data, location, false)?;
@@ -519,6 +520,24 @@ impl AreaState {
         self.prop_grid[x + y * self.area.width as usize]
     }
 
+    pub fn add_prop_at(&mut self, prop: &Rc<Prop>, x: i32, y: i32, hover_text: Option<String>) {
+        let location = Location::new(x, y, &self.area);
+        let prop_data = PropData {
+            prop: Rc::clone(prop),
+            enabled: true,
+            location: Point::new(x, y),
+            items: Vec::new(),
+            hover_text,
+        };
+
+        match self.add_prop(&prop_data, location, true) {
+            Err(e) => {
+                warn!("Unable to add prop at {},{}", x, y);
+                warn!("{}", e);
+            }, Ok(_) => (),
+        }
+    }
+
     pub fn check_create_prop_container_at(&mut self, x: i32, y: i32) {
         match self.prop_index_at(x, y) {
             Some(_) => return,
@@ -538,6 +557,7 @@ impl AreaState {
             enabled: true,
             location: location.to_point(),
             items: Vec::new(),
+            hover_text: None,
         };
 
         match self.add_prop(&prop_data, location, true) {
@@ -791,6 +811,31 @@ impl AreaState {
         self.update_prop_vis_pass_grid(index);
 
         Ok(index)
+    }
+
+    pub(crate) fn remove_matching_prop(&mut self, x: i32, y: i32, name: &str) {
+        let mut matching_index = None;
+        for (index, prop) in self.props.iter().enumerate() {
+            let prop = match prop {
+                None => continue,
+                Some(ref prop) => prop,
+            };
+
+            match prop.interactive {
+                prop_state::Interactive::Hover { ref text } => {
+                    if text == name {
+                        if prop.location.x == x && prop.location.y == y {
+                            matching_index = Some(index);
+                            break;
+                        }
+                    }
+                }, _ => (),
+            }
+        }
+
+        if let Some(index) = matching_index {
+            self.remove_prop(index);
+        }
     }
 
     pub(crate) fn remove_prop(&mut self, index: usize) {

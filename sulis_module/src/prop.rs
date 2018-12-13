@@ -36,7 +36,8 @@ pub enum Interactive {
         initially_open: bool,
         closed_impass: Vec<Point>,
         closed_invis: Vec<Point>,
-    }
+    },
+    Hover,
 }
 
 #[derive(Debug)]
@@ -49,6 +50,7 @@ pub struct Prop {
     pub impass: Vec<Point>,
     pub invis: Vec<Point>,
     pub interactive: Interactive,
+    pub status_text: Option<String>,
 }
 
 impl Prop {
@@ -118,6 +120,7 @@ impl Prop {
 
         let interactive = match builder.interactive {
             InteractiveBuilder::Not => Interactive::Not,
+            InteractiveBuilder::Hover => Interactive::Hover,
             InteractiveBuilder::Container { loot } => {
                 let loot = match loot {
                     None => None,
@@ -146,6 +149,7 @@ impl Prop {
             impass,
             invis,
             interactive,
+            status_text: builder.status_text,
         })
     }
 
@@ -169,8 +173,8 @@ pub enum InteractiveBuilder {
         initially_open: bool,
         closed_impass: Vec<Point>,
         closed_invis: Vec<Point>,
-    }
-
+    },
+    Hover
 }
 
 #[derive(Deserialize, Debug)]
@@ -186,4 +190,5 @@ pub struct PropBuilder {
     pub invis: Option<Vec<Vec<usize>>>,
     pub visible: Option<bool>,
     pub interactive: InteractiveBuilder,
+    pub status_text: Option<String>,
 }

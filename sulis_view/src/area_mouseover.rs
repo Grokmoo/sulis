@@ -102,10 +102,14 @@ impl AreaMouseover {
 
                 let prop = area_state.get_prop(index);
 
-                if !prop.might_contain_items() {
+                if !prop.is_hover() && !prop.might_contain_items() {
                     state.add_text_arg("empty", "true");
                 }
-                state.add_text_arg("name", &prop.prop.name);
+                state.add_text_arg("name", prop.name());
+
+                if let Some(ref text) = prop.prop.status_text {
+                    state.add_text_arg("status", text);
+                }
             },
             Kind::Transition(ref name) => {
                 state.add_text_arg("name", &name);

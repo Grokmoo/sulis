@@ -756,6 +756,12 @@ impl ActorState {
         }
     }
 
+    pub fn is_disabled(&self) -> bool { self.p_stats.is_disabled() }
+
+    pub fn set_disabled(&mut self, disabled: bool) {
+        self.p_stats.set_disabled(disabled);
+    }
+
     pub fn has_level_up(&self) -> bool {
         self.p_stats.has_level_up()
     }

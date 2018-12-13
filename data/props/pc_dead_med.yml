@@ -1,0 +1,9 @@
+id: pc_dead_med
+name: Dead
+icon: inventory/misc_backpack
+image: creatures/pc_dead_med
+size: 3by3
+visible: true
+passable: true
+interactive: Hover
+status_text: Disabled

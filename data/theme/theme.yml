@@ -62,6 +62,7 @@ children:
       [s=8.0|[a=56|#name#]]
       [?cur_hp;s=5.0|[a=56|#cur_hp# / #max_hp#]
       ][?empty;c=888;s=5.0|[a=56|Empty]
+      ][?status;c=800;s=5.0;a=56|#status#
       ]
     preferred_size: [60, 12]
     x_relative: Center

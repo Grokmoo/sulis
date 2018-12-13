@@ -44,6 +44,9 @@ pub struct PStats {
     pub(crate) current_group_uses_per_encounter: HashMap<String, ExtInt>,
     pub(crate) current_group_uses_per_day: HashMap<String, ExtInt>,
     pub(crate) faction: Faction,
+
+    #[serde(default)]
+    disabled: bool,
 }
 
 impl PStats {
@@ -60,8 +63,15 @@ impl PStats {
             current_group_uses_per_encounter: HashMap::new(),
             current_group_uses_per_day: HashMap::new(),
             faction: actor.faction(),
+            disabled: false,
         }
     }
+
+    pub fn set_disabled(&mut self, disabled: bool) {
+        self.disabled = disabled;
+    }
+
+    pub fn is_disabled(&self) -> bool { self.disabled }
 
     pub fn is_threatened(&self) -> bool { self.threatened_by.len() > 0 }
 

@@ -521,6 +521,11 @@ impl TurnManager {
         entity.borrow_mut().actor.remove_effect(surface_index);
     }
 
+    pub fn readd_entity(&mut self, entity: &Rc<RefCell<EntityState>>) {
+        let index = entity.borrow().index();
+        self.order.push_back(Entry::Entity(index));
+    }
+
     pub fn add_entity(&mut self, entity: &Rc<RefCell<EntityState>>, is_dead: bool) -> usize {
         {
             let entity = entity.borrow();
@@ -700,7 +705,7 @@ impl TurnManager {
             let entity = entity.borrow();
             for index in entity.actor.effects_iter() {
                 effects_to_remove.push(*index);
-                self.effects[*index] = None;
+                self.queue_remove_effect(*index);
             }
         }
 

@@ -438,12 +438,14 @@ impl GameState {
         GameState::select_party_members(Vec::new());
     }
 
-    pub fn select_party_members(members: Vec<Rc<RefCell<EntityState>>>) {
+    pub fn select_party_members(mut members: Vec<Rc<RefCell<EntityState>>>) {
         for member in members.iter() {
             if !member.borrow().is_party_member() {
                 warn!("Attempted to select non-party member {}", member.borrow().actor.actor.id);
             }
         }
+
+        members.retain(|e| !e.borrow().actor.is_dead());
 
         STATE.with(|state| {
             let mut state = state.borrow_mut();
@@ -507,16 +509,65 @@ impl GameState {
         area_state.borrow_mut().pc_vis_full_redraw();
     }
 
-    pub fn remove_dead_party_members() {
-        let removed = STATE.with(|state| {
+    fn add_disabled_party_members() {
+        for member in GameState::party() {
+            {
+                let mut member = member.borrow_mut();
+                if member.actor.is_dead() && member.actor.is_disabled() {
+                    member.actor.set_disabled(false);
+                    member.actor.add_hp(1);
+                } else {
+                    continue;
+                }
+            }
+
+            let location = member.borrow().location.clone();
+            let area_state = GameState::get_area_state(&location.area_id).unwrap();
+            let index = member.borrow().index();
+            let mut area_state = area_state.borrow_mut();
+            area_state.remove_matching_prop(location.x, location.y,
+                                            &member.borrow().actor.actor.name);
+            match area_state.transition_entity_to(&member, index, location) {
+                Err(e) => {
+                    warn!("Error re-adding disabled party member:");
+                    warn!("{}", e);
+                },
+                Ok(_) => (),
+            }
+            let mgr = GameState::turn_manager();
+            mgr.borrow_mut().readd_entity(&member);
+
+            let anim = Anim::new_entity_recover(&member);
+            GameState::add_animation(anim);
+        }
+    }
+
+    fn remove_disabled_party_members() -> bool {
+        STATE.with(|state| {
             let mut state = state.borrow_mut();
             let state = state.as_mut().unwrap();
 
-            let cur_lens = (state.party.len(), state.selected.len());
-            state.party.retain(|e| !e.borrow().actor.is_dead());
+            for member in state.party.iter() {
+                let mut member = member.borrow_mut();
+                if member.actor.is_dead() && !member.actor.is_disabled() {
+                    let prop = match &member.actor.actor.race.pc_death_prop {
+                        None => continue,
+                        Some(ref prop) => Rc::clone(prop),
+                    };
+                    let area_state = &state.areas.get(&member.location.area_id).unwrap();
+                    let x = member.location.x;
+                    let y = member.location.y;
+                    area_state.borrow_mut()
+                        .add_prop_at(&prop, x, y, Some(member.actor.actor.name.to_string()));
+                    member.actor.set_disabled(true);
+                }
+            }
+
+            let cur_len = state.party.len();
+            // state.party.retain(|e| !e.borrow().actor.is_dead());
             state.selected.retain(|e| !e.borrow().actor.is_dead());
 
-            if state.party.len() != cur_lens.0 || state.selected.len() != cur_lens.1 {
+            if state.party.len() != cur_len {
                 info!("Removed a dead party member; notifying listeners");
                 let entity = match state.selected.first() {
                     None => None,
@@ -527,9 +578,17 @@ impl GameState {
             } else {
                 false
             }
-        });
+        })
+    }
 
-        if removed {
+    pub fn handle_disabled_party_members() {
+        let update = GameState::remove_disabled_party_members();
+
+        if !GameState::is_combat_active() {
+            GameState::add_disabled_party_members();
+        }
+
+        if update {
             let area_state = GameState::area_state();
             area_state.borrow_mut().update_view_visibility();
             area_state.borrow_mut().pc_vis_full_redraw();
@@ -995,7 +1054,7 @@ impl GameState {
             area_state.update();
         });
 
-        GameState::remove_dead_party_members();
+        GameState::handle_disabled_party_members();
 
         if GameState::check_clear_anims() {
             ANIMATIONS.with(|a| a.borrow_mut().clear_all_blocking_anims());

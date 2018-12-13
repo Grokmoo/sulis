@@ -318,6 +318,15 @@ impl Anim {
         Anim::new(owner, duration_millis, AnimKind::ParticleGenerator { model, state })
     }
 
+    pub fn new_entity_recover(owner: &Rc<RefCell<EntityState>>) -> Anim {
+        let duration_millis = ExtInt::Int(800);
+        let fixed = Param::fixed(1.0);
+        let vel = Param::with_speed(1.0, -1.0);
+        let color = [fixed, fixed, fixed, fixed];
+        let color_sec = [vel, vel, vel, Param::fixed(0.0)];
+        Anim::new(owner, duration_millis, AnimKind::EntityColor { color, color_sec })
+    }
+
     pub fn new_entity_death(owner: &Rc<RefCell<EntityState>>) -> Anim {
         let time = 800;
         let time_f32 = time as f32 / 1000.0;
@@ -430,6 +439,7 @@ impl Anim {
             RangedAttack { .. } => ranged_attack_animation::cleanup(&self.owner),
             Move { .. } => move_animation::cleanup(&self.owner),
             EntityDeath { .. } => {
+                entity_color_animation::cleanup(&self.owner);
                 self.owner.borrow_mut().marked_for_removal = true;
             },
             _ => (),

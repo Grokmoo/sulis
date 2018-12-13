@@ -6,6 +6,7 @@ description: |
   Trollkin adventurers normally operate as front-line Fighters, but most other professions are common enough.  Trollkin Mages are virtually unheard of, as almost no Human or Elven school of magic would accept them.
 size: 2by2
 movement_rate: 1.1
+pc_death_prop: pc_dead_large
 base_stats:
   - kind: { attribute: { attribute: Strength, amount: 3 } }
   - kind: { attribute: { attribute: Endurance, amount: 1 } }

@@ -39,6 +39,9 @@ pub enum Interactive {
     Door {
         open: bool,
     },
+    Hover {
+        text: String
+    },
 }
 
 pub struct PropState {
@@ -78,6 +81,12 @@ impl PropState {
         let mut anim_state = AnimationState::default();
 
         let interactive = match prop_data.prop.interactive {
+            prop::Interactive::Hover => {
+                let text = prop_data.hover_text.clone().unwrap_or(String::new());
+                Interactive::Hover {
+                    text
+                }
+            }
             prop::Interactive::Not => {
                 if !items.is_empty() { warn!("Attempted to add items to a non-container prop"); }
                 Interactive::Not
@@ -153,10 +162,20 @@ impl PropState {
                 } else {
                     self.animation_state.remove(animation_state::Kind::Active);
                 }
-            }
+            },
+            PropInteractiveSaveState::Hover { text } => {
+                self.interactive = Interactive::Hover { text: text.clone() };
+            },
         }
 
         Ok(())
+    }
+
+    pub fn name(&self) -> &str {
+        match self.interactive {
+            Interactive::Hover { ref text } => text,
+            _ => &self.prop.name,
+        }
     }
 
     pub fn is_enabled(&self) -> bool {
@@ -194,6 +213,13 @@ impl PropState {
         }
     }
 
+    pub fn is_hover(&self) -> bool {
+        match self.interactive {
+            Interactive::Hover { .. } => true,
+            _ => false,
+        }
+    }
+
     pub fn is_container(&self) -> bool {
         match self.interactive {
             Interactive::Container { .. } => true,
@@ -206,7 +232,7 @@ impl PropState {
         let is_active = self.is_active();
 
         match self.interactive {
-            Interactive::Not => (),
+            Interactive::Not | Interactive::Hover { .. } => (),
             Interactive::Container { ref mut items, ref mut loot_to_generate, .. } => {
                 if !is_active { return; }
 

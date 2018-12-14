@@ -19,7 +19,7 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_core::ui::{LineRenderer, Widget, WidgetKind};
+use sulis_core::ui::{LineRenderer, Widget, WidgetKind, theme};
 use sulis_core::io::{event, GraphicsRenderer};
 use sulis_core::util::{self, Point};
 use crate::{Label, TextArea};
@@ -97,7 +97,7 @@ impl WidgetKind for Button {
             self.repeat_time = theme.get_custom_or_default("repeat_time", 0);
             self.repeat_init_time = theme.get_custom_or_default("repeat_init_time", 0);
             if let Some(tooltip) = theme.custom.get("tooltip") {
-                self.tooltip = tooltip.to_string();
+                self.tooltip = theme::expand_text_args(tooltip, &widget.state);
             }
         }
     }

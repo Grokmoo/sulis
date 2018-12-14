@@ -29,6 +29,7 @@ function add_injury(parent)
   local injuries = {
     { fn = function(parent)
       local effect = parent:create_effect("Injury: Broken Leg")
+	  effect:set_icon("gui/status_injury", "Injury: Broken Leg")
       effect:add_attribute_bonus("Dexterity", -6)
 	  effect:add_num_bonus("movement_rate", -0.5)
       return effect
@@ -36,6 +37,7 @@ function add_injury(parent)
 	
 	{ fn = function(parent)
 	  local effect = parent:create_effect("Injury: Internal Bleeding")
+	  effect:set_icon("gui/status_injury", "Injury: Internal Bleeding")
 	  effect:add_attribute_bonus("Endurance", -4)
 	  effect:add_num_bonus("defense", -20)
 	  return effect
@@ -43,6 +45,7 @@ function add_injury(parent)
 	
 	{ fn = function(parent)
 	  local effect = parent:create_effect("Injury: Broken Arm")
+	  effect:set_icon("gui/status_injury", "Injury: Broken Arm")
 	  effect:add_attribute_bonus("Strength", -4)
 	  effect:add_num_bonus("melee_accuracy", -15)
 	  effect:add_num_bonus("ranged_accuracy", -15)
@@ -52,6 +55,7 @@ function add_injury(parent)
     
     { fn = function(parent)
       local effect = parent:create_effect("Injury: Concussion")
+	  effect:set_icon("gui/status_injury", "Injury: Concussion")
       effect:add_attribute_bonus("Wisdom", -4)
 	  effect:add_num_bonus("fortitude", -20)
 	  effect:add_num_bonus("reflex", -20)
@@ -61,6 +65,7 @@ function add_injury(parent)
     
     { fn = function(parent)
       local effect = parent:create_effect("Injury: Cracked Skull")
+	  effect:set_icon("gui/status_injury", "Injury: Cracked Skull")
       effect:add_attribute_bonus("Intellect", -4)
 	  effect:add_num_bonus("ap", -1000)
       return effect
@@ -68,6 +73,7 @@ function add_injury(parent)
     
     { fn = function(parent)
       local effect = parent:create_effect("Injury: Damaged Eye")
+	  effect:set_icon("gui/status_injury", "Injury: Damaged Eye")
       effect:add_attribute_bonus("Perception", -4)
 	  effect:add_num_bonus("crit_chance", -10)
       return effect
@@ -77,6 +83,5 @@ function add_injury(parent)
   local index = math.random(#injuries)
   local effect = injuries[index].fn(parent)
   effect:set_tag("injury")
-  
   effect:apply()
 end

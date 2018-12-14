@@ -130,8 +130,7 @@ function thugs_reward(parent)
 end
 
 function priest_rest(parent)
-  game:fade_out_in()
-  game:init_party_day()
+  game:run_script_delayed("campaign", "fire_rest", 0.0)
 end
 
 function get_rose_lake_pass(parent)

@@ -178,6 +178,19 @@ children:
                   tooltip: "Level Up"
                 x_relative: Max
                 preferred_size: [7, 7]
+              icons:
+                width_relative: Max
+                height_relative: Max
+                preferred_size: [-7, 0]
+                layout: Grid
+                layout_spacing: { top: 0, bottom: 1, left: 0, right: 1 }
+                children:
+                  icon:
+                    preferred_size: [6, 6]
+                    background: bg_base
+                    foreground: "#icon#"
+                    custom:
+                      tooltip: "#text#"
       quick_item_bar:
         height_relative: Max
         position: [132, 0]

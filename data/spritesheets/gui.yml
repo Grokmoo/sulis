@@ -494,6 +494,7 @@ groups:
       status_heal: [128, 0]
       status_ice: [160, 0]
       status_electric: [192, 0]
+      status_disease: [224, 0]
       status_shield: [0, 32]
       status_acid: [32, 32]
       status_water: [64, 32]
@@ -501,6 +502,7 @@ groups:
       status_darkness: [128, 32]
       status_positive: [160, 32]
       status_negative: [192, 32]
+      status_injury: [224, 32]
   special:
     areas:
       empty: [0, 512, 5, 5]

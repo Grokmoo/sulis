@@ -28,6 +28,7 @@ function on_target_select(parent, ability, targets)
   
   effect = target:create_effect(ability:name())
   effect:set_tag("disease")
+  effect:set_icon("gui/status_disease", "Disease")
   
   effect:add_attribute_bonus("Strength", -amount)
   effect:add_attribute_bonus("Dexterity", -amount)

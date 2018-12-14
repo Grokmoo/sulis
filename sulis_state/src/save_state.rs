@@ -175,6 +175,9 @@ pub struct EffectSaveState {
     pub(crate) entity: Option<usize>,
     pub(crate) bonuses: BonusList,
     pub(crate) callbacks: Vec<CallbackData>,
+
+    #[serde(default)]
+    pub(crate) icon: Option<effect::Icon>,
 }
 
 impl EffectSaveState {
@@ -196,6 +199,7 @@ impl EffectSaveState {
             entity: effect.entity.clone(),
             bonuses: effect.bonuses.clone(),
             callbacks,
+            icon: effect.icon.clone(),
         }
     }
 }

@@ -18,7 +18,7 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_core::ui::theme::{HorizontalTextAlignment, VerticalTextAlignment};
+use sulis_core::ui::theme::{self, HorizontalTextAlignment, VerticalTextAlignment};
 use sulis_core::ui::{LineRenderer, Widget, WidgetKind};
 use sulis_core::io::event::ClickKind;
 use sulis_core::io::GraphicsRenderer;
@@ -138,7 +138,7 @@ impl WidgetKind for Label {
 
         if let Some(ref theme) = widget.theme {
             if let Some(tooltip) = theme.custom.get("tooltip") {
-                self.tooltip = tooltip.to_string();
+                self.tooltip = theme::expand_text_args(tooltip, &widget.state);
             }
         }
     }

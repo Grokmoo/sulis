@@ -34,6 +34,13 @@ pub struct Surface {
     pub(crate) squares_to_fire_on_moved: u32,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct Icon {
+    pub icon: String,
+    pub text: String,
+}
+
 pub struct Effect {
     pub name: String,
     pub tag: String,
@@ -45,6 +52,7 @@ pub struct Effect {
     pub(crate) surface: Option<Surface>,
     pub(crate) entity: Option<usize>,
     pub(crate) callbacks: Vec<Rc<CallbackData>>,
+    pub(crate) icon: Option<Icon>,
 
     squares_moved: HashMap<usize, u32>,
 
@@ -75,6 +83,7 @@ impl Effect {
             deactivate_with_ability: data.deactivate_with_ability,
             surface: data.surface,
             entity: data.entity,
+            icon: data.icon,
 
             squares_moved: HashMap::new(),
             callbacks,
@@ -97,6 +106,7 @@ impl Effect {
             deactivate_with_ability,
             surface: None,
             entity: None,
+            icon: None,
             squares_moved: HashMap::new(),
         }
     }
@@ -126,6 +136,14 @@ impl Effect {
             points: points.clone(),
             squares_to_fire_on_moved,
         })
+    }
+
+    pub fn icon(&self) -> Option<&Icon> {
+        self.icon.as_ref()
+    }
+
+    pub fn set_icon(&mut self, icon: String, text: String) {
+        self.icon = Some(Icon { icon, text });
     }
 
     pub fn set_owning_entity(&mut self, entity: usize) {

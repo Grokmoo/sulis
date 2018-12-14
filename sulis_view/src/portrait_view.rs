@@ -68,7 +68,28 @@ impl WidgetKind for PortraitView {
         level_up.borrow_mut().state.set_enabled(!GameState::is_combat_active());
 
         widget.borrow_mut().state.set_enabled(!entity.actor.is_dead());
-        vec![portrait, hp_bar, level_up]
+
+        let icons = Widget::empty("icons");
+        let mgr = GameState::turn_manager();
+        let mgr = mgr.borrow();
+        for index in entity.actor.effects_iter() {
+            let effect = match mgr.effect_checked(*index) {
+                None => continue,
+                Some(effect) => effect,
+            };
+
+            let icon = match effect.icon() {
+                None => continue,
+                Some(icon) => icon,
+            };
+
+            let icon_widget = Widget::with_theme(Label::empty(), "icon");
+            icon_widget.borrow_mut().state.add_text_arg("icon", &icon.icon);
+            icon_widget.borrow_mut().state.add_text_arg("text", &icon.text);
+            Widget::add_child_to(&icons, icon_widget);
+        }
+
+        vec![portrait, hp_bar, level_up, icons]
     }
 
     fn on_mouse_enter(&mut self, widget: &Rc<RefCell<Widget>>) -> bool {

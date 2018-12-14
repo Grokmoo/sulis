@@ -26,7 +26,7 @@ use crate::script::{CallbackData, Result, script_particle_generator, ScriptParti
     script_color_animation, ScriptColorAnimation, ScriptAbility,
     script_scale_animation, ScriptScaleAnimation,
     script_image_layer_animation, ScriptImageLayerAnimation, ScriptCallback};
-use crate::{Effect, GameState};
+use crate::{effect, Effect, GameState};
 
 /// Represents a surface that already exists, and is being passed into
 /// a Lua script.  Not used during effect creation
@@ -242,6 +242,10 @@ impl UserData for ScriptAppliedEffect {
 /// # `apply()`
 /// Sets this effect to active on the parent entity.
 ///
+/// # `set_icon(icon: String, text: String)`
+/// Sets the specified icon and text as the icon data for this effect.  This icon
+/// is displayed in various places in the UI.
+///
 /// # `set_squares_to_fire_on_moved(squares: Int)`
 /// Only has an effect on surfaces.  Sets the number of squares that an entity
 /// must move within a surface in order to trigger an `OnMovedInSurface` script
@@ -346,6 +350,7 @@ pub struct ScriptEffect {
     duration: ExtInt,
     deactivate_with_ability: Option<String>,
     pub bonuses: BonusList,
+    icon: Option<effect::Icon>,
     callbacks: Vec<CallbackData>,
     pgens: Vec<ScriptParticleGenerator>,
     image_layer_anims: Vec<ScriptImageLayerAnimation>,
@@ -361,6 +366,7 @@ impl ScriptEffect {
             tag: "default".to_string(),
             deactivate_with_ability: None,
             duration,
+            icon: None,
             bonuses: BonusList::default(),
             callbacks: Vec::new(),
             pgens: Vec::new(),
@@ -377,6 +383,7 @@ impl ScriptEffect {
             tag: "default".to_string(),
             deactivate_with_ability: None,
             duration,
+            icon: None,
             bonuses: BonusList::default(),
             callbacks: Vec::new(),
             pgens: Vec::new(),
@@ -391,6 +398,10 @@ impl UserData for ScriptEffect {
     fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
         methods.add_method("apply", |_, effect, _args: ()| {
             apply(effect)
+        });
+        methods.add_method_mut("set_icon", |_, effect, (icon, text): (String, String)| {
+            effect.icon = Some(effect::Icon { icon, text });
+            Ok(())
         });
         methods.add_method_mut("set_squares_to_fire_on_moved", |_, effect, squares: u32| {
             match effect.kind {
@@ -673,6 +684,9 @@ fn apply(effect_data: &ScriptEffect) -> Result<()> {
     debug!("Apply effect with {}, {}, {}", effect_data.name, effect_data.tag, duration);
     let mut effect = Effect::new(&effect_data.name, &effect_data.tag, duration, effect_data.bonuses.clone(),
         effect_data.deactivate_with_ability.clone());
+    if let Some(icon) = &effect_data.icon {
+        effect.set_icon(icon.icon.clone(), icon.text.clone());
+    }
     let cbs = effect_data.callbacks.clone();
 
     let effect_index = mgr.borrow().get_next_effect_index();

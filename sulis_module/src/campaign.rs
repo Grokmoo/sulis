@@ -24,7 +24,7 @@ use sulis_core::image::Image;
 use sulis_core::resource::ResourceSet;
 use sulis_core::util::{unable_to_create_error, Point};
 
-use crate::{Conversation, Module};
+use crate::{Conversation, Module, on_trigger};
 
 pub struct WorldMap {
     pub size: (f32, f32),
@@ -86,6 +86,7 @@ pub struct Campaign {
     pub description: String,
     pub backstory_conversation: Rc<Conversation>,
     pub max_starting_level: u32,
+    pub on_party_death_script: on_trigger::ScriptData,
     pub world_map: WorldMap,
     pub group: Option<CampaignGroup>,
 }
@@ -130,6 +131,7 @@ impl Campaign {
             backstory_conversation,
             id: builder.id,
             max_starting_level: builder.max_starting_level,
+            on_party_death_script: builder.on_party_death_script,
             world_map: WorldMap {
                 size: builder.world_map.size,
                 offset: builder.world_map.offset,
@@ -150,6 +152,7 @@ pub struct CampaignBuilder {
     pub description: String,
     pub backstory_conversation: String,
     pub max_starting_level: u32,
+    pub on_party_death_script: on_trigger::ScriptData,
     pub world_map: WorldMapBuilder,
 }
 

@@ -705,7 +705,6 @@ impl TurnManager {
             let entity = entity.borrow();
             for index in entity.actor.effects_iter() {
                 effects_to_remove.push(*index);
-                self.queue_remove_effect(*index);
             }
         }
 

@@ -362,6 +362,9 @@ fn get_targeter() -> Result<Rc<RefCell<AreaTargeter>>> {
 /// The ScriptInterface, accessible in all Lua scripts as the global `game`.
 /// The following methods are available on this object (documentation WIP):
 ///
+/// # `party() -> Table<ScriptEntity>`
+/// Returns a table containing all current party members.
+///
 /// # `entity_with_id(id: String) -> Table<ScriptEntity>`
 /// Returns a `ScriptEntity` object for the entity with the given unique
 /// id, if such an entity can be found.  Otherwise, returns the invalid `ScriptEntity`.  The ID is
@@ -472,6 +475,10 @@ fn get_targeter() -> Result<Rc<RefCell<AreaTargeter>>> {
 ///
 /// # `atan2(x: Float, y: Float) -> Float`
 /// Computes the four quadrant arctan function.  See `f32::atan2`
+///
+/// # `block_ui(time: Float)`
+/// Locks the UI so the player cannot take any additional in game actions (such as movement
+/// or combat) for the specified `time` number of seconds.
 ///
 /// # `run_script_delayed(script_id: String, func: String, delay: Float)`
 /// Causes the specified `func` from the script with `script_id` to be run after `delay`
@@ -635,6 +642,14 @@ pub struct ScriptInterface { }
 
 impl UserData for ScriptInterface {
     fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
+        methods.add_method("party", |lua, _, ()| {
+            let table = lua.create_table()?;
+            for (index, member) in GameState::party().iter().enumerate() {
+                table.set(index + 1, ScriptEntity::from(member))?;
+            }
+            Ok(table)
+        });
+
         methods.add_method("has_targeter", |_, _, ()| {
             let area_state = GameState::area_state();
             let mut area_state = area_state.borrow_mut();
@@ -738,6 +753,13 @@ impl UserData for ScriptInterface {
 
         methods.add_method("atan2", |_, _, (x, y): (f32, f32)| {
             Ok(y.atan2(x))
+        });
+
+        methods.add_method("block_ui", |_, _, time: f32| {
+            let player = GameState::player();
+            let anim = Anim::new_wait(&player, (time * 1000.0) as u32);
+            GameState::add_animation(anim);
+            Ok(())
         });
 
         methods.add_method("run_script_delayed", |_, _, (script, func, delay): (String, String, f32)| {

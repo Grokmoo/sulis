@@ -1178,7 +1178,7 @@ children:
         position: [0, 3]
         text_params:
           scale: 7
-        text: "You have died!"
+        text: "You have been defeated."
       content:
         from: .text_area
       exit:

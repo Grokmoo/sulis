@@ -56,6 +56,7 @@ pub struct GameState {
 
     // listener returns the first selected party member
     party_listeners: ChangeListenerList<Option<Rc<RefCell<EntityState>>>>,
+    party_death_listeners: ChangeListenerList<Vec<Rc<RefCell<EntityState>>>>,
     path_finder: PathFinder,
     ui_callbacks: Vec<UICallback>,
 }
@@ -229,6 +230,7 @@ impl GameState {
                 party_coins,
                 party_stash: Rc::new(RefCell::new(PartyStash::new(stash))),
                 party_listeners: ChangeListenerList::default(),
+                party_death_listeners: ChangeListenerList::default(),
                 ui_callbacks: Vec::new(),
                 world_map: save_state.world_map,
                 quests,
@@ -327,6 +329,7 @@ impl GameState {
             party_coins,
             party_stash: Rc::new(RefCell::new(PartyStash::new(party_stash))),
             party_listeners: ChangeListenerList::default(),
+            party_death_listeners: ChangeListenerList::default(),
             ui_callbacks: Vec::new(),
             world_map: WorldMapState::new(),
             quests: QuestStateSet::new(),
@@ -543,32 +546,50 @@ impl GameState {
     }
 
     fn remove_disabled_party_members() -> bool {
+        let mut notify = false;
+        for member in GameState::party().iter() {
+            {
+                let member = member.borrow();
+                if !member.actor.is_dead() { continue; }
+                if member.actor.is_disabled() { continue; }
+            }
+
+            let script = &Module::campaign().on_party_death_script;
+            GameState::execute_trigger_script(&script.id, &script.func, &member, &member);
+
+            {
+                let member = member.borrow();
+                let prop = match &member.actor.actor.race.pc_death_prop {
+                    None => continue,
+                    Some(ref prop) => Rc::clone(prop),
+                };
+
+                let area_state = GameState::get_area_state(&member.location.area_id).unwrap();
+                let x = member.location.x;
+                let y = member.location.y;
+                let name = member.actor.actor.name.to_string();
+                let enabled = member.actor.is_disabled();
+                area_state.borrow_mut().add_prop_at(&prop, x, y, enabled, Some(name));
+            }
+            notify = true;
+        }
+
         STATE.with(|state| {
             let mut state = state.borrow_mut();
             let state = state.as_mut().unwrap();
 
-            for member in state.party.iter() {
-                let mut member = member.borrow_mut();
-                if member.actor.is_dead() && !member.actor.is_disabled() {
-                    let prop = match &member.actor.actor.race.pc_death_prop {
-                        None => continue,
-                        Some(ref prop) => Rc::clone(prop),
-                    };
-                    let area_state = &state.areas.get(&member.location.area_id).unwrap();
-                    let x = member.location.x;
-                    let y = member.location.y;
-                    area_state.borrow_mut()
-                        .add_prop_at(&prop, x, y, Some(member.actor.actor.name.to_string()));
-                    member.actor.set_disabled(true);
-                }
-            }
-
-            let cur_len = state.party.len();
-            // state.party.retain(|e| !e.borrow().actor.is_dead());
+            let pc = Rc::clone(&state.party[0]); // don't ever remove the PC
+            state.party.retain(|e| {
+                if Rc::ptr_eq(&e, &pc) { return true; }
+                let actor = &e.borrow().actor;
+                !actor.is_dead() || actor.is_disabled()
+            });
             state.selected.retain(|e| !e.borrow().actor.is_dead());
 
-            if state.party.len() != cur_len {
-                info!("Removed a dead party member; notifying listeners");
+            if notify {
+                info!("Removed or Disabled a dead party member; notifying listeners");
+                state.party_death_listeners.notify(&state.party);
+
                 let entity = match state.selected.first() {
                     None => None,
                     Some(ref entity) => Some(Rc::clone(entity)),
@@ -627,6 +648,14 @@ impl GameState {
 
         let area_state = GameState::area_state();
         area_state.borrow_mut().update_view_visibility();
+    }
+
+    pub fn add_party_death_listener(listener: ChangeListener<Vec<Rc<RefCell<EntityState>>>>) {
+        STATE.with(|state| {
+            let mut state = state.borrow_mut();
+            let state = state.as_mut().unwrap();
+            state.party_death_listeners.add(listener);
+        })
     }
 
     pub fn add_party_listener(listener: ChangeListener<Option<Rc<RefCell<EntityState>>>>) {
@@ -1054,8 +1083,6 @@ impl GameState {
             area_state.update();
         });
 
-        GameState::handle_disabled_party_members();
-
         if GameState::check_clear_anims() {
             ANIMATIONS.with(|a| a.borrow_mut().clear_all_blocking_anims());
         }
@@ -1067,6 +1094,8 @@ impl GameState {
                 ai.update(entity);
             });
         }
+
+        GameState::handle_disabled_party_members();
 
         ui_cb
     }

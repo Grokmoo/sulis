@@ -36,7 +36,7 @@ function on_target_select(parent, ability, targets)
   
   anim = target:create_particle_generator("heal")
   anim:set_moves_with_parent()
-  anim:set_color(anim:param(1.0), anim:param(0.0), anim:param(0.0))
+  anim:set_color(anim:param(1.0), anim:param(1.0), anim:param(0.0))
   anim:set_position(anim:param(-0.5), anim:param(-1.5))
   anim:set_particle_size_dist(anim:fixed_dist(1.0), anim:fixed_dist(1.0))
   anim:set_gen_rate(anim:param(3.0))

@@ -9,20 +9,20 @@ end
 function on_target_select(parent, ability, targets)
   pos = targets:selected_point()
   
+  speed = 600 * game:anim_base_time()
+  dist = parent:dist_to_point(pos)
+  duration = dist / speed
+  
   hide = parent:get_ability("hide")
   cb = hide:create_callback(parent)
   cb:set_on_anim_complete_fn("activate_no_ap")
-  hide_anim = parent:wait_anim(0.1)
+  hide_anim = parent:wait_anim(duration + 0.5)
   hide_anim:set_completion_callback(cb)
   hide_anim:activate()
   
   cb = ability:create_callback(parent)
   cb:add_targets(targets)
   cb:set_on_anim_complete_fn("move_parent")
-  
-  speed = 600 * game:anim_base_time()
-  dist = parent:dist_to_point(pos)
-  duration = dist / speed
   
   anim = parent:create_subpos_anim(duration)
 
@@ -33,14 +33,6 @@ function on_target_select(parent, ability, targets)
   anim:set_completion_callback(cb)
   anim:activate()
   ability:activate(parent)
-end
-
-function attack_target(parent, ability, target)
-  target = targets:first()
-
-  if target:is_valid() then
-    parent:weapon_attack(target)
-  end
 end
 
 function move_parent(parent, ability, targets)

@@ -125,7 +125,7 @@ use sulis_core::io::{InputAction, MainLoopUpdater};
 use sulis_core::ui::{Callback, Widget, WidgetKind, Cursor};
 use sulis_core::util;
 use sulis_module::area::OnRest;
-use sulis_state::{ChangeListener, GameState, NextGameStep,
+use sulis_state::{ChangeListener, EntityState, GameState, NextGameStep,
     save_file::create_save, script::script_callback, area_feedback_text::ColorKind};
 use sulis_widgets::{Button, ConfirmationWindow, Label};
 
@@ -594,9 +594,13 @@ impl WidgetKind for RootView {
         }
 
         let widget_ref = Rc::clone(widget);
-        let pc = GameState::player();
-        pc.borrow_mut().actor.listeners.add(ChangeListener::new(NAME, Box::new(move |pc| {
-            if !pc.is_dead() { return; }
+        GameState::add_party_death_listener(ChangeListener::new(NAME, Box::new(move |party| {
+            if !is_defeated(party) { return; }
+
+            // set player to disabled, even though they are actually dead
+            // this prevents this callback from being called over and over
+            party[0].borrow_mut().actor.set_disabled(true);
+
             let menu_cb = Callback::new(Rc::new(|widget, _| {
                 let root = Widget::get_root(widget);
                 let root_view = Widget::downcast_kind_mut::<RootView>(&root);
@@ -614,6 +618,21 @@ impl WidgetKind for RootView {
         vec![Rc::clone(&self.area_view_widget), bot_pane, ap_bar, ticker, self.status.clone(),
             Rc::clone(&self.console_widget)]
     }
+}
+
+fn is_defeated(party: &[Rc<RefCell<EntityState>>]) -> bool {
+    if party.len() == 0 { return true; }
+
+    {
+        let player = &party[0].borrow().actor;
+        if player.is_dead() && !player.is_disabled() { return true; }
+    }
+
+    for member in party.iter() {
+        if !member.borrow().actor.is_dead() { return false; }
+    }
+
+    true
 }
 
 pub struct PortraitPane {}

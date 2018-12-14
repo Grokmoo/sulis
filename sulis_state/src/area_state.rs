@@ -520,11 +520,12 @@ impl AreaState {
         self.prop_grid[x + y * self.area.width as usize]
     }
 
-    pub fn add_prop_at(&mut self, prop: &Rc<Prop>, x: i32, y: i32, hover_text: Option<String>) {
+    pub fn add_prop_at(&mut self, prop: &Rc<Prop>, x: i32, y: i32,
+                       enabled: bool, hover_text: Option<String>) {
         let location = Location::new(x, y, &self.area);
         let prop_data = PropData {
             prop: Rc::clone(prop),
-            enabled: true,
+            enabled,
             location: Point::new(x, y),
             items: Vec::new(),
             hover_text,

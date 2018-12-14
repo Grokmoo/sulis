@@ -75,6 +75,13 @@ use crate::{ai, animation::{self}, script::*, MOVE_TO_THRESHOLD};
 /// Adds this entity to the player's party.  `show_portrait` is whether the entity
 /// shows up in the portraits area of the UI.  Defaults to true.
 ///
+/// # `set_disabled(disabled: Bool)`
+/// Sets this entity to disabled status or not.  Disabled status is only checked when
+/// an entity is dead, so this is only useful from the campaign `on_party_death` script.
+/// Disabled party members will not be removed from the party, and will be set back to 1
+/// hit point when combat ends.  You can use this behavior for custom death behavior in
+/// a campaign.
+///
 /// # `remove_from_party()`
 /// Removes this entity from the player's party
 ///
@@ -534,6 +541,12 @@ impl UserData for ScriptEntity {
             entity.borrow_mut().actor.replace_actor(actor);
             entity.borrow_mut().actor.init_day();
 
+            Ok(())
+        });
+
+        methods.add_method("set_disabled", |_, entity, disabled: bool| {
+            let entity = entity.try_unwrap()?;
+            entity.borrow_mut().actor.set_disabled(disabled);
             Ok(())
         });
 

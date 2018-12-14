@@ -16,7 +16,7 @@ active:
     group: Multiple
     range: Visible
   short_description: |
-    Attacks all enemies in an arc.
+    Do raw damage to all enemies in a line.
 prereqs:
   abilities: [ powerful_shot ]
   total_level: 5

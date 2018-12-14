@@ -337,6 +337,7 @@ impl AreaModel {
             enabled: true,
             location: Point::new(x, y),
             items: Vec::new(),
+            hover_text: None,
         };
         self.props.push(prop_data);
     }
@@ -667,6 +668,7 @@ impl AreaModel {
                 enabled: prop_builder.enabled.unwrap_or(true),
                 location: prop_builder.location,
                 items: prop_builder.items,
+                hover_text: prop_builder.hover_text,
             };
 
             self.props.push(prop_data);
@@ -759,6 +761,7 @@ impl AreaModel {
                 enabled: Some(prop_data.enabled),
                 location: prop_data.location,
                 items: prop_data.items.clone(),
+                hover_text: prop_data.hover_text.clone(),
             };
             props.push(builder);
         }

@@ -670,6 +670,7 @@ fn apply(effect_data: &ScriptEffect) -> Result<()> {
     let mgr = GameState::turn_manager();
     let duration = effect_data.duration * TURNS_TO_MILLIS;
 
+    debug!("Apply effect with {}, {}, {}", effect_data.name, effect_data.tag, duration);
     let mut effect = Effect::new(&effect_data.name, &effect_data.tag, duration, effect_data.bonuses.clone(),
         effect_data.deactivate_with_ability.clone());
     let cbs = effect_data.callbacks.clone();

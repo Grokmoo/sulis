@@ -14,6 +14,9 @@ description: |
   This is an adventure for a new character of any background starting at level 1.
 backstory_conversation: backstory
 max_starting_level: 1
+on_party_death_script:
+  id: campaign
+  func: on_party_death
 world_map:
   size: [21.0, 12.0]
   offset: [-1.0, -0.7]

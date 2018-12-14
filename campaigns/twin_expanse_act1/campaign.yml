@@ -11,7 +11,10 @@ description: |
   
   This is intended for a character who has completed the Prologue.  New characters may also be used - they will be given an appropriate level of experience and money to start the campaign.
 backstory_conversation: backstory
-max_starting_level: 8
+max_starting_level: 5
+on_party_death_script:
+  id: campaign
+  func: on_party_death
 world_map:
   size: [21.0, 12.0]
   offset: [-1.0, -0.7]

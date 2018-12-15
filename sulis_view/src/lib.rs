@@ -124,7 +124,7 @@ use sulis_core::config::Config;
 use sulis_core::io::{InputAction, MainLoopUpdater};
 use sulis_core::ui::{Callback, Widget, WidgetKind, Cursor};
 use sulis_core::util;
-use sulis_module::area::OnRest;
+use sulis_module::{Module, area::OnRest};
 use sulis_state::{ChangeListener, EntityState, GameState, NextGameStep,
     save_file::create_save, script::script_callback, area_feedback_text::ColorKind};
 use sulis_widgets::{Button, ConfirmationWindow, Label};
@@ -589,8 +589,27 @@ impl WidgetKind for RootView {
             let quick_items = Widget::with_defaults(QuickItemBar::new(&entity));
             let abilities = Widget::with_defaults(AbilitiesBar::new(entity));
 
+            let time_label = Widget::with_theme(Label::empty(), "time");
+            let mgr = GameState::turn_manager();
+            let time = mgr.borrow().current_time();
+            let rules = Module::rules();
+            let hour = rules.get_hour_name(time.hour);
+            time_label.borrow_mut().state.add_text_arg("day", &time.day.to_string());
+            time_label.borrow_mut().state.add_text_arg("hour", hour);
+            time_label.borrow_mut().state.add_text_arg("round", &time.round.to_string());
+
+            let time_label_ref = Rc::clone(&time_label);
+            mgr.borrow_mut().time_listeners.add(ChangeListener::new(NAME, Box::new(move |time| {
+                let rules = Module::rules();
+                let hour = rules.get_hour_name(time.hour);
+                time_label_ref.borrow_mut().state.add_text_arg("day", &time.day.to_string());
+                time_label_ref.borrow_mut().state.add_text_arg("hour", hour);
+                time_label_ref.borrow_mut().state.add_text_arg("round", &time.round.to_string());
+                time_label_ref.borrow_mut().invalidate_layout();
+            })));
+
             Widget::add_children_to(&bot_pane, vec![abilities, quick_items, navi_pane,
-                                    portrait_pane, select_all, formations, rest]);
+                                    portrait_pane, select_all, formations, rest, time_label]);
         }
 
         let widget_ref = Rc::clone(widget);

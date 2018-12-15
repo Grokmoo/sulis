@@ -56,10 +56,10 @@ loot_drop_prop: backpack
 
 rounds_per_hour: 10
 hours_per_day: 24
-hour_names: [ Midnight, Midnight,  Early Morning, Early Morning, Early Morning, Dawn,        Dawn,
-                        Morning,   Morning,       Morning,       Mid Morning,   Mid Morning, Noon,
-                        Afternoon, Afternoon,     Afternoon,     Afternoon,     Evening,     Evening,
-                        Evening,   Dusk,          Night,         Night,         Night ]
+hour_names: [ Midnight, Late Night, Late Night,    Early Morning,  Early Morning,      Dawn,        Dawn,
+                        Morning,    Morning,       Mid Morning,    Mid Morning,        Midday,      Midday,
+                        Afternoon,  Afternoon,     Late Afternoon, Late Afternoon,     Evening,     Evening,
+                        Dusk,       Dusk,          Night,          Night,              Midnight ]
 
 area_colors:
   Outdoors: [

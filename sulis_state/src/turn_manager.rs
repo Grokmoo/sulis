@@ -48,6 +48,7 @@ pub struct TurnManager {
     entities_move_callback_next_update: HashSet<usize>,
     combat_active: bool,
 
+    pub time_listeners: ChangeListenerList<Time>,
     pub listeners: ChangeListenerList<TurnManager>,
     order: VecDeque<Entry>,
 
@@ -66,6 +67,7 @@ impl Default for TurnManager {
             effects_remove_next_update: Vec::new(),
             entities_move_callback_next_update: HashSet::new(),
             listeners: ChangeListenerList::default(),
+            time_listeners: ChangeListenerList::default(),
             order: VecDeque::new(),
             combat_active: false,
             ai_groups: HashMap::new(),
@@ -99,7 +101,22 @@ impl TurnManager {
     pub fn add_time(&mut self, time: Time) {
         let rules = Module::rules();
 
-        self.total_elapsed_millis += rules.compute_millis(time);
+        self.add_millis_and_notify(rules.compute_millis(time));
+    }
+
+    fn add_millis(&mut self, millis: u32) {
+        self.add_millis_and_notify(millis as usize);
+    }
+
+    fn add_millis_and_notify(&mut self, millis: usize) {
+        let prev_round = self.current_round();
+        self.total_elapsed_millis += millis;
+
+        let new_round = self.current_round();
+        if prev_round != new_round {
+            let time = self.current_time();
+            self.time_listeners.notify(&time);
+        }
     }
 
     pub(crate) fn load(&mut self, total_elapsed_millis: usize) {
@@ -109,6 +126,7 @@ impl TurnManager {
         self.effects_remove_next_update.clear();
         self.combat_active = false;
         self.listeners = ChangeListenerList::default();
+        self.time_listeners = ChangeListenerList::default();
         self.order.clear();
         self.cur_ai_group_index = 0;
         self.ai_groups.clear();
@@ -213,7 +231,7 @@ impl TurnManager {
         let mut turn_cbs = Vec::new();
         let elapsed_millis = if !self.combat_active { elapsed_millis } else { 0 };
 
-        self.total_elapsed_millis += elapsed_millis as usize;
+        self.add_millis(elapsed_millis);
 
         // removal just replaces some with none, so we can safely iterate
         for index in 0..self.effects.len() {
@@ -339,7 +357,7 @@ impl TurnManager {
                     current_ended = true;
                 }
                 Entry::TurnChange => {
-                    self.total_elapsed_millis += ROUND_TIME_MILLIS as usize;
+                    self.add_millis(ROUND_TIME_MILLIS);
                     self.order.push_back(Entry::TurnChange);
                 }
             }
@@ -486,7 +504,7 @@ impl TurnManager {
             entity.actor.end_encounter();
         }
 
-        self.total_elapsed_millis += ROUND_TIME_MILLIS as usize;
+        self.add_millis(ROUND_TIME_MILLIS);
 
         if GameState::selected().is_empty() {
             GameState::set_selected_party_member(GameState::player());

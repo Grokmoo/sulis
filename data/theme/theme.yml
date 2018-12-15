@@ -337,8 +337,6 @@ children:
         y_relative: Max
         x_relative: Max
       navi_pane:
-        background: bg_base
-        border: [1, 1, 1, 1]
         height_relative: Max
         x_relative: Max
         preferred_size: [38, 0]
@@ -349,7 +347,7 @@ children:
               tooltip: "End Turn"
             background: background
             preferred_size: [22, 22]
-            position: [-1, -1]
+            position: [-1, -4]
             y_relative: Max
             x_relative: Max
             foreground: end_turn_icon
@@ -357,32 +355,40 @@ children:
             from: .bottom_pane.window_button
             custom:
               tooltip: "Map"
-            position: [-25, -1]
+            position: [-25, -4]
             foreground: map_icon
           journal_button:
             from: .bottom_pane.window_button
             custom:
               tooltip: "Journal"
-            position: [-25, -13]
+            position: [-25, -16]
             foreground: log_icon
           character_button:
             from: .bottom_pane.window_button
             custom:
               tooltip: "Character Sheet"
-            position: [-25, -25]
+            position: [-25, -28]
             foreground: char_icon
           inventory_button:
             from: .bottom_pane.window_button
             custom:
               tooltip: "Inventory"
-            position: [-13, -25]
+            position: [-13, -28]
             foreground: inv_icon
           menu_button:
             from: .bottom_pane.window_button
             custom:
               tooltip: "Menu"
-            position: [-1, -25]
+            position: [-1, -28]
             foreground: menu_icon
+      time:
+        from: .label
+        text: "#hour#, Day #day#"
+        text_params:
+          horizontal_alignment: Right
+        preferred_size: [40, 4]
+        x_relative: Max
+        y_relative: Max
   area:
     preferred_size: [0, -40]
     width_relative: Max

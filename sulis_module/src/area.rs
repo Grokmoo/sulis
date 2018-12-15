@@ -106,6 +106,7 @@ pub struct Area {
     pub vis_dist_up_one_squared: i32,
     pub world_map_location: Option<String>,
     pub on_rest: OnRest,
+    pub location_kind: LocationKind,
 }
 
 impl PartialEq for Area {
@@ -257,6 +258,7 @@ impl Area {
             vis_dist_up_one_squared: builder.max_vis_up_one_distance * builder.max_vis_up_one_distance,
             world_map_location: builder.world_map_location,
             on_rest: builder.on_rest,
+            location_kind: builder.location_kind,
         })
     }
 
@@ -293,11 +295,20 @@ pub struct AreaBuilder {
     pub max_vis_up_one_distance: i32,
     pub world_map_location: Option<String>,
     pub on_rest: OnRest,
+    pub location_kind: LocationKind,
     pub layer_set: HashMap<String, Vec<Vec<usize>>>,
     pub terrain: Vec<Option<String>>,
     pub walls: Vec<(i8, Option<String>)>,
     // #[serde(serialize_with="ser_elevation", deserialize_with="from_base64")]
     pub elevation: Vec<u8>,
+}
+
+#[derive(Deserialize, Serialize, Debug, Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[serde(deny_unknown_fields)]
+pub enum LocationKind {
+    Outdoors,
+    Indoors,
+    Underground,
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]

@@ -1,6 +1,7 @@
 ---
 id: firtuk_bridge
 name: Firtuk Bridge
+location_kind: Outdoors
 width: 76
 height: 84
 generate: false

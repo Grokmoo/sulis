@@ -19,7 +19,7 @@ use std::rc::Rc;
 use std::io::Error;
 
 use sulis_core::io::{DrawList, GraphicsRenderer};
-use sulis_core::ui::{animation_state, AnimationState};
+use sulis_core::ui::{animation_state, AnimationState, Color};
 use sulis_core::util::invalid_data_error;
 use sulis_module::{Item, LootList, Module, Prop, prop, ObjectSizeIterator};
 use sulis_module::area::PropData;
@@ -336,13 +336,13 @@ impl AreaDrawable for PropState {
     fn cache(&mut self, _renderer: &mut GraphicsRenderer, _texture_cache: &mut EntityTextureCache) { }
 
     fn draw(&self, renderer: &mut GraphicsRenderer,
-            scale_x: f32, scale_y: f32, x: f32, y: f32, millis: u32, alpha: f32) {
+            scale_x: f32, scale_y: f32, x: f32, y: f32, millis: u32, color: Color) {
         let x = x + self.location.x as f32;
         let y = y + self.location.y as f32;
 
         let mut draw_list = DrawList::empty_sprite();
         draw_list.set_scale(scale_x, scale_y);
-        draw_list.set_alpha(alpha);
+        draw_list.set_color(color);
         self.append_to_draw_list(&mut draw_list, x, y, millis);
         renderer.draw(draw_list);
     }

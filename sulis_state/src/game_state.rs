@@ -79,7 +79,9 @@ macro_rules! exec_script {
 
 impl GameState {
     pub fn load(save_state: SaveState) -> Result<(), Error> {
-        TURN_MANAGER.with(|mgr| mgr.borrow_mut().clear());
+        TURN_MANAGER.with(|mgr| {
+            mgr.borrow_mut().load(save_state.total_elapsed_millis);
+        });
         ANIMATIONS.with(|anims| anims.borrow_mut().clear());
         STATE.with(|state| *state.borrow_mut() = None);
         CLEAR_ANIMS.with(|c| c.set(false));
@@ -253,7 +255,9 @@ impl GameState {
 
     pub fn init(pc_actor: Rc<Actor>) -> Result<(), Error> {
         TURN_MANAGER.with(|mgr| {
-            mgr.borrow_mut().clear();
+            let rules = Module::rules();
+            let starting_time = Module::campaign().starting_time;
+            mgr.borrow_mut().load(rules.compute_millis(starting_time));
         });
 
         let game_state = GameState::new(pc_actor)?;

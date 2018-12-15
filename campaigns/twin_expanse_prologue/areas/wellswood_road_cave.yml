@@ -1,6 +1,7 @@
 ---
 id: wellswood_road_cave
 name: Cave
+location_kind: Underground
 width: 68
 height: 66
 generate: false

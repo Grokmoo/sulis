@@ -48,6 +48,9 @@ pub struct SaveState {
     pub(crate) areas: HashMap<String, AreaSaveState>,
     pub(crate) manager: ManagerSaveState,
     pub(crate) anims: Vec<AnimSaveState>,
+
+    #[serde(default)]
+    pub(crate) total_elapsed_millis: usize,
 }
 
 fn default_zoom() -> f32 { 1.0 }
@@ -91,6 +94,9 @@ impl SaveState {
             quests,
         };
 
+        let mgr = GameState::turn_manager();
+        let total_elapsed_millis = mgr.borrow().total_elapsed_millis();
+
         SaveState {
             areas,
             current_area,
@@ -104,6 +110,7 @@ impl SaveState {
             anims: GameState::save_anims(),
             world_map: GameState::world_map(),
             quests: quest_state,
+            total_elapsed_millis,
         }
     }
 

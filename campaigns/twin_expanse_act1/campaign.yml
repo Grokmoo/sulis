@@ -4,6 +4,9 @@ group:
   name: "The Twin Expanse"
   position: 1
 name: Act 1
+starting_time:
+  day: 1
+  hour: 11
 starting_area: farmhouse01
 starting_location: [10, 13]
 description: |

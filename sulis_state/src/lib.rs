@@ -103,7 +103,6 @@ pub use self::script::ScriptCallback;
 
 mod turn_manager;
 pub(crate) use self::turn_manager::TurnManager;
-pub use self::turn_manager::ROUND_TIME_MILLIS;
 
 use std::collections::HashMap;
 use std::rc::Rc;

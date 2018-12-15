@@ -23,7 +23,7 @@ use std::mem;
 
 use sulis_core::image::Image;
 use sulis_core::ui::{compute_area_scaling, animation_state};
-use sulis_core::ui::{color, Cursor, Scrollable, WidgetKind, Widget};
+use sulis_core::ui::{color, Color, Cursor, Scrollable, WidgetKind, Widget};
 use sulis_core::io::*;
 use sulis_core::io::event::ClickKind;
 use sulis_core::util::{self, Point};
@@ -32,7 +32,7 @@ use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::extern_image::ImageBuffer;
 use sulis_rules::DamageKind;
 use sulis_widgets::Label;
-use sulis_module::{area::{Layer, Tile}};
+use sulis_module::{area::{Layer, Tile}, Module};
 use sulis_state::{AreaDrawable, AreaState, EntityState, EntityTextureCache, GameState};
 use sulis_state::{area_feedback_text, area_state::PCVisRedraw};
 
@@ -240,7 +240,7 @@ impl AreaView {
     }
 
     fn draw_layer(&self, renderer: &mut GraphicsRenderer, scale_x: f32, scale_y: f32,
-                  widget: &Widget, id: &str) {
+                  widget: &Widget, id: &str, color: Color) {
         let p = widget.state.inner_position;
         let mut draw_list =
             DrawList::from_texture_id(&id, &TEX_COORDS,
@@ -249,11 +249,12 @@ impl AreaView {
                                       (TILE_CACHE_TEXTURE_SIZE / TILE_SIZE) as f32,
                                       (TILE_CACHE_TEXTURE_SIZE / TILE_SIZE) as f32);
         draw_list.set_scale(scale_x, scale_y);
+        draw_list.set_color(color);
         renderer.draw(draw_list);
     }
 
     fn draw_entities_props(&mut self, renderer: &mut GraphicsRenderer, scale_x: f32, scale_y: f32,
-                     alpha: f32, widget: &Widget, state: &AreaState, millis: u32) {
+                     color: Color, widget: &Widget, state: &AreaState, millis: u32) {
         // let start_time = time::Instant::now();
         let mut to_draw: Vec<&AreaDrawable> = Vec::new();
 
@@ -284,7 +285,7 @@ impl AreaView {
         for drawable in to_draw {
             let x = widget.state.inner_position.x as f32 - self.scroll.x();
             let y = widget.state.inner_position.y as f32 - self.scroll.y();
-            drawable.draw(renderer, scale_x, scale_y, x, y, millis, alpha);
+            drawable.draw(renderer, scale_x, scale_y, x, y, millis, color);
         }
 
         // info!("Entity & Prop draw time: {}", util::format_elapsed_secs(start_time.elapsed()));
@@ -707,7 +708,12 @@ impl WidgetKind for AreaView {
 
         let p = widget.state.inner_position;
 
-        self.draw_layer(renderer, scale_x, scale_y, widget, BASE_LAYER_ID);
+        let rules = Module::rules();
+        let mgr = GameState::turn_manager();
+        let time = mgr.borrow().current_time();
+        let area_color = rules.get_area_color(state.area.location_kind, time);
+
+        self.draw_layer(renderer, scale_x, scale_y, widget, BASE_LAYER_ID, area_color);
         GameState::draw_below_entities(renderer, p.x as f32 - self.scroll.x(), p.y as f32- self.scroll.y(),
             scale_x, scale_y, millis);
 
@@ -733,10 +739,10 @@ impl WidgetKind for AreaView {
             self.draw_selection(&entity, renderer, scale_x, scale_y, widget, millis);
         }
 
-        self.draw_entities_props(renderer, scale_x, scale_y, 1.0, widget, &state, millis);
+        self.draw_entities_props(renderer, scale_x, scale_y, area_color, widget, &state, millis);
         GameState::draw_above_entities(renderer, p.x as f32 - self.scroll.x(), p.y as f32- self.scroll.y(),
             scale_x, scale_y, millis);
-        self.draw_layer(renderer, scale_x, scale_y, widget, AERIAL_LAYER_ID);
+        self.draw_layer(renderer, scale_x, scale_y, widget, AERIAL_LAYER_ID, area_color);
 
         if let Some(ref hover) = self.hover_sprite {
             let mut draw_list = DrawList::from_sprite_f32(&hover.sprite,
@@ -758,8 +764,9 @@ impl WidgetKind for AreaView {
                 scale_x, scale_y, millis);
         }
 
-        self.draw_entities_props(renderer, scale_x, scale_y, 0.6, widget, &state, millis);
-        self.draw_layer(renderer, scale_x, scale_y, widget, VISIBILITY_TEX_ID);
+        let color = Color::new(area_color.r, area_color.g, area_color.b, 0.6 * area_color.a);
+        self.draw_entities_props(renderer, scale_x, scale_y, color, widget, &state, millis);
+        self.draw_layer(renderer, scale_x, scale_y, widget, VISIBILITY_TEX_ID, color::WHITE);
 
         if let Some(ref image) = self.selection_box_image {
             if let Some((x, y, x_end, y_end)) = self.get_selection_box_coords() {

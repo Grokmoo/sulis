@@ -1,6 +1,7 @@
 ---
 id: wellswood_farms
 name: Wellswood Farms
+location_kind: Outdoors
 width: 118
 height: 106
 generate: false

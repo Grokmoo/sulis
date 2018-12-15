@@ -1,6 +1,7 @@
 ---
 id: wellswood_town_hall
 name: Wellswood Town Hall
+location_kind: Indoors
 width: 40
 height: 38
 generate: false

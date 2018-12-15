@@ -20,11 +20,9 @@ use std::rc::Rc;
 use std::io::Error;
 
 use sulis_core::util::{ExtInt, Point};
-use sulis_rules::BonusList;
+use sulis_rules::{BonusList, ROUND_TIME_MILLIS};
 use crate::script::{CallbackData, script_callback::FuncKind};
 use crate::{ChangeListenerList, save_state::EffectSaveState, EntityState};
-
-use crate::ROUND_TIME_MILLIS;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]

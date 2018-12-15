@@ -89,7 +89,7 @@ use rlua::{self, Function, Lua, UserData, UserDataMethods};
 
 use sulis_core::config::Config;
 use sulis_core::util::{Point};
-use sulis_rules::QuickSlot;
+use sulis_rules::{Time, QuickSlot};
 use sulis_module::{ability, Ability, Item, Module, OnTrigger, on_trigger, Faction};
 use crate::{EntityState, ItemState, GameState, ai, area_feedback_text::ColorKind, quest_state,
     animation::Anim, Location};
@@ -361,6 +361,18 @@ fn get_targeter() -> Result<Rc<RefCell<AreaTargeter>>> {
 
 /// The ScriptInterface, accessible in all Lua scripts as the global `game`.
 /// The following methods are available on this object (documentation WIP):
+///
+/// # `current_round() -> Int`
+/// Returns the current round, or the total number of rounds of playtime that have elapsed.
+/// This number increases by 1 for every complete round of combat, or by 1 for every 5 seconds
+/// of out of combat play.
+///
+/// # `add_time(days: Int, hours: Int (Optional), rounds: Int (Optional))`
+/// Adds the specified days, hours, and rounds to the current time.
+///
+/// # `current_time() -> Table`
+/// Returns a table containing the current time.
+/// Table entries are `day`, `hour`, and `round`.
 ///
 /// # `party() -> Table<ScriptEntity>`
 /// Returns a table containing all current party members.
@@ -642,6 +654,33 @@ pub struct ScriptInterface { }
 
 impl UserData for ScriptInterface {
     fn add_methods<'lua, M: UserDataMethods<'lua, Self>>(methods: &mut M) {
+        methods.add_method("current_round", |_, _, ()| {
+            let mgr = GameState::turn_manager();
+            let round = mgr.borrow().current_round();
+            Ok(round)
+        });
+
+        methods.add_method("add_time", |_, _, (day, hour, round)
+                           : (u32, Option<u32>, Option<u32>)| {
+            let hour = hour.unwrap_or(0);
+            let round = round.unwrap_or(0);
+            let time = Time { day, hour, round, millis: 0 };
+
+            let mgr = GameState::turn_manager();
+            mgr.borrow_mut().add_time(time);
+            Ok(())
+        });
+
+        methods.add_method("current_time", |lua, _, ()| {
+            let mgr = GameState::turn_manager();
+            let time = mgr.borrow().current_time();
+            let table = lua.create_table()?;
+            table.set("day", time.day)?;
+            table.set("hour", time.hour)?;
+            table.set("round", time.round)?;
+            Ok(table)
+        });
+
         methods.add_method("party", |lua, _, ()| {
             let table = lua.create_table()?;
             for (index, member) in GameState::party().iter().enumerate() {

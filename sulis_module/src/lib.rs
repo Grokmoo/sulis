@@ -364,6 +364,8 @@ impl Module {
         };
 
         let rules: Rules = read_builder(rules_yaml)?;
+        rules.validate()?;
+
         let campaign_builder: CampaignBuilder = read_builder(campaign_yaml)?;
 
         let builder_set = ModuleBuilder::from_yaml(&mut yaml)?;

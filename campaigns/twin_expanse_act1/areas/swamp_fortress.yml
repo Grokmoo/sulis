@@ -1,6 +1,7 @@
 ---
 id: swamp_fortress
 name: Swamp Fortress
+location_kind: Outdoors
 width: 128
 height: 128
 generate: false

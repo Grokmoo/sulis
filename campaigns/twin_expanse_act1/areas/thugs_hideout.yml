@@ -1,6 +1,7 @@
 ---
 id: thugs_hideout
 name: "Thug's Hideout"
+location_kind: Outdoors
 width: 84
 height: 80
 generate: false

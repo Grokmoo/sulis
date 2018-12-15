@@ -20,7 +20,7 @@ use rlua::{Lua, UserData, UserDataMethods};
 
 use sulis_core::util::{ExtInt, Point};
 use sulis_rules::{Attribute, Bonus, BonusKind, BonusList, Damage, DamageKind, bonus::{self, Contingent},
-    WeaponKind, ArmorKind, Slot, WeaponStyle};
+    WeaponKind, ArmorKind, Slot, WeaponStyle, ROUND_TIME_MILLIS};
 
 use crate::script::{CallbackData, Result, script_particle_generator, ScriptParticleGenerator,
     script_color_animation, ScriptColorAnimation, ScriptAbility,
@@ -675,11 +675,9 @@ fn add_num_bonus(_lua: &Lua, effect: &mut ScriptEffect, (name, amount, when):
     Ok(())
 }
 
-const TURNS_TO_MILLIS: u32 = 5000;
-
 fn apply(effect_data: &ScriptEffect) -> Result<()> {
     let mgr = GameState::turn_manager();
-    let duration = effect_data.duration * TURNS_TO_MILLIS;
+    let duration = effect_data.duration * ROUND_TIME_MILLIS;
 
     debug!("Apply effect with {}, {}, {}", effect_data.name, effect_data.tag, duration);
     let mut effect = Effect::new(&effect_data.name, &effect_data.tag, duration, effect_data.bonuses.clone(),

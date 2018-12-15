@@ -1,6 +1,7 @@
 ---
 id: farmhouse01
 name: Farmhouse
+location_kind: Indoors
 width: 36
 height: 38
 generate: false

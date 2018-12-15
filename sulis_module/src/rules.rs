@@ -14,11 +14,16 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::collections::HashMap;
+use std::io::Error;
 use std::cmp::max;
 
 use rand::{self, Rng};
 
-use sulis_rules::{DamageList, Armor, DamageKind, Resistance};
+use sulis_core::ui::{color, Color};
+use sulis_core::util::invalid_data_error;
+use sulis_rules::{DamageList, Armor, DamageKind, Resistance, Time, ROUND_TIME_MILLIS};
+use crate::area::LocationKind;
 
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
@@ -69,9 +74,76 @@ pub struct Rules {
     pub coins_item: String,
 
     armor_damage_reduction_cap: Vec<u32>,
+
+    pub rounds_per_hour: u32,
+    pub hours_per_day: u32,
+    pub hour_names: Vec<String>,
+
+    pub area_colors: HashMap<LocationKind, Vec<Color>>,
 }
 
 impl Rules {
+    pub fn validate(&self) -> Result<(), Error> {
+        if self.hour_names.len() != self.hours_per_day as usize {
+            return invalid_data_error(&format!("Must specify '{}' hours names to match number of hours",
+                                              self.hours_per_day));
+        }
+
+        for (_, colors) in self.area_colors.iter() {
+            if colors.len() != self.hours_per_day as usize {
+                return invalid_data_error(&format!("Must specify '{}' hours for each area_colors.",
+                                                   self.hours_per_day));
+            }
+        }
+
+        Ok(())
+    }
+
+    pub fn compute_millis(&self, time: Time) -> usize {
+        let mut millis = time.millis as usize;
+
+        let mut factor = ROUND_TIME_MILLIS as usize;
+        millis += time.round as usize * factor;
+
+        factor *= self.rounds_per_hour as usize;
+        millis += time.hour as usize * factor;
+
+        factor *= self.hours_per_day as usize;
+        millis += time.day as usize * factor;
+
+        millis
+    }
+
+    pub fn get_hour_name(&self, hour: u32) -> &str {
+        assert!((hour as usize) < self.hour_names.len());
+
+        &self.hour_names[hour as usize]
+    }
+
+    pub fn get_area_color(&self, location_kind: LocationKind, time: Time) -> Color {
+        let (prev, next) = match self.area_colors.get(&location_kind) {
+            None => return color::WHITE,
+            Some(colors) => {
+                let prev = time.hour as usize;
+                if prev == colors.len() - 1 {
+                    (colors[prev], colors[0])
+                } else {
+                    (colors[prev], colors[prev + 1])
+                }
+            }
+        };
+
+        let round_frac = 1.0 / self.rounds_per_hour as f32;
+        let next_frac = round_frac * (time.round as f32 + time.millis as f32 / ROUND_TIME_MILLIS as f32);
+        let prev_frac = 1.0 - next_frac;
+
+        let r = prev_frac * prev.r + next_frac * next.r;
+        let g = prev_frac * prev.g + next_frac * next.g;
+        let b = prev_frac * prev.b + next_frac * next.b;
+        let a = prev_frac * prev.a + next_frac * next.a;
+        Color { r, g, b, a }
+    }
+
     /// Computes the amount of damage that this damage list will apply to the given
     /// `armor`.  Each damage component of this list is rolled randomly, with the resulting
     /// damage then multiplied by the `multiplier`, rounded down.  The damage is then

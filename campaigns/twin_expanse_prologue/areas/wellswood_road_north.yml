@@ -1,6 +1,7 @@
 ---
 id: wellswood_road_north
 name: Wellswood Road North
+location_kind: Outdoors
 width: 123
 height: 122
 generate: false

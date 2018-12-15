@@ -1,6 +1,7 @@
 ---
 id: goblin_cliffs
 name: Goblin Cliffs
+location_kind: Outdoors
 width: 106
 height: 78
 generate: false

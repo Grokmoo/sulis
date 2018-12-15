@@ -1,6 +1,7 @@
 ---
 id: vezula_hills
 name: Vezula Hills
+location_kind: Outdoors
 width: 72
 height: 92
 generate: false

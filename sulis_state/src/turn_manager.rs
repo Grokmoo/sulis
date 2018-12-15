@@ -22,15 +22,15 @@ use rand::{self, Rng};
 
 use sulis_core::util::Point;
 use sulis_module::{Faction, Module};
+use sulis_rules::{Time, ROUND_TIME_MILLIS};
 use crate::script::{CallbackData};
 use crate::{AreaState, ChangeListener, ChangeListenerList, Effect, EntityState, GameState};
-
-pub const ROUND_TIME_MILLIS: u32 = 5000;
 
 #[derive(Clone, Copy)]
 enum Entry {
     Entity(usize),
     Effect(usize),
+    TurnChange,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -53,6 +53,8 @@ pub struct TurnManager {
 
     pub(crate) ai_groups: HashMap<usize, EncounterRef>,
     pub(crate) cur_ai_group_index: usize,
+
+    total_elapsed_millis: usize
 }
 
 impl Default for TurnManager {
@@ -68,12 +70,39 @@ impl Default for TurnManager {
             combat_active: false,
             ai_groups: HashMap::new(),
             cur_ai_group_index: 0,
+            total_elapsed_millis: 0,
         }
     }
 }
 
 impl TurnManager {
-    pub(crate) fn clear(&mut self) {
+    pub fn total_elapsed_millis(&self) -> usize { self.total_elapsed_millis }
+
+    pub fn current_round(&self) -> u32 {
+        (self.total_elapsed_millis / ROUND_TIME_MILLIS as usize) as u32
+    }
+
+    pub fn current_time(&self) -> Time {
+        let rules = Module::rules();
+
+        let total_rounds = self.current_round();
+        let total_hours = total_rounds / rules.rounds_per_hour;
+
+        let day = total_hours / rules.hours_per_day;
+        let hour = total_hours % rules.hours_per_day;
+        let round = total_rounds % rules.rounds_per_hour;
+        let millis = (self.total_elapsed_millis % ROUND_TIME_MILLIS as usize) as u32;
+
+        Time { day, hour, round, millis }
+    }
+
+    pub fn add_time(&mut self, time: Time) {
+        let rules = Module::rules();
+
+        self.total_elapsed_millis += rules.compute_millis(time);
+    }
+
+    pub(crate) fn load(&mut self, total_elapsed_millis: usize) {
         self.entities.clear();
         self.effects.clear();
         self.surfaces.clear();
@@ -83,6 +112,7 @@ impl TurnManager {
         self.order.clear();
         self.cur_ai_group_index = 0;
         self.ai_groups.clear();
+        self.total_elapsed_millis = total_elapsed_millis;
     }
 
     pub fn effect_mut_checked(&mut self, index: usize) -> Option<&mut Effect> {
@@ -182,6 +212,8 @@ impl TurnManager {
 
         let mut turn_cbs = Vec::new();
         let elapsed_millis = if !self.combat_active { elapsed_millis } else { 0 };
+
+        self.total_elapsed_millis += elapsed_millis as usize;
 
         // removal just replaces some with none, so we can safely iterate
         for index in 0..self.effects.len() {
@@ -305,6 +337,10 @@ impl TurnManager {
 
                     self.order.push_back(Entry::Entity(index));
                     current_ended = true;
+                }
+                Entry::TurnChange => {
+                    self.total_elapsed_millis += ROUND_TIME_MILLIS as usize;
+                    self.order.push_back(Entry::TurnChange);
                 }
             }
         }
@@ -450,6 +486,8 @@ impl TurnManager {
             entity.actor.end_encounter();
         }
 
+        self.total_elapsed_millis += ROUND_TIME_MILLIS as usize;
+
         if GameState::selected().is_empty() {
             GameState::set_selected_party_member(GameState::player());
         }
@@ -473,14 +511,23 @@ impl TurnManager {
                 Entry::Effect(_) => {
                     // this effect should come just before the associated entity
                     initiative[index] = 2 * last_initiative - 1;
-                }
+                },
+                Entry::TurnChange => (),
             }
         }
 
 
         let mut entries: Vec<_> = self.order.drain(..).zip(initiative).collect();
         entries.sort_by_key(|&(_, initiative)| { initiative });
-        entries.into_iter().for_each(|(entry, _)| self.order.push_front(entry));
+
+        for (entry, _) in entries {
+            match entry {
+                Entry::TurnChange => continue,
+                _ => (),
+            }
+            self.order.push_front(entry);
+        }
+        self.order.push_back(Entry::TurnChange);
 
         for entity in self.entities.iter() {
             let entity = match entity {
@@ -649,6 +696,7 @@ impl TurnManager {
             match e {
                 Entry::Effect(i) => *i != index,
                 Entry::Entity(_) => true,
+                Entry::TurnChange => true,
             }
         });
 
@@ -712,6 +760,7 @@ impl TurnManager {
             match e {
                 Entry::Entity(i) => *i != index,
                 Entry::Effect(i) => !effects_to_remove.contains(i),
+                Entry::TurnChange => true,
             }
         });
 
@@ -721,7 +770,8 @@ impl TurnManager {
                 Entry::Entity(index) => {
                     let entity = self.entities[*index].as_ref().unwrap().borrow();
                     !entity.is_ai_active() || entity.actor.faction() != Faction::Hostile
-                }
+                },
+                Entry::TurnChange => true,
             }
         }) {
             self.set_combat_active(false);
@@ -757,7 +807,8 @@ impl<'a> Iterator for ActiveEntityIterator<'a> {
                         if entity.borrow().is_party_member() || entity.borrow().is_ai_active() {
                             return Some(entity);
                         }
-                    }
+                    },
+                    Entry::TurnChange => (),
                 }
             }
         }

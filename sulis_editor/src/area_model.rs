@@ -833,6 +833,7 @@ impl AreaModel {
         let area_builder = AreaBuilder {
             id: self.id.clone(),
             name: self.name.clone(),
+            location_kind: LocationKind::Outdoors,
             elevation: elevation,
             terrain,
             walls,

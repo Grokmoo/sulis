@@ -4,6 +4,9 @@ group:
   name: "The Twin Expanse"
   position: 0
 name: Prologue
+starting_time:
+  day: 1
+  hour: 9
 starting_area: wellswood_road_south
 starting_location: [48, 72]
 description: |

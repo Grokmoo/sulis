@@ -49,6 +49,21 @@ pub use self::resistance::Resistance;
 pub mod stat_list;
 pub use self::stat_list::StatList;
 
+pub const ROUND_TIME_MILLIS: u32 = 5000;
+
+#[derive(Deserialize, Serialize, Debug, Copy, Clone, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct Time {
+    pub day: u32,
+    pub hour: u32,
+
+    #[serde(default)]
+    pub round: u32,
+
+    #[serde(default)]
+    pub millis: u32,
+}
+
 #[derive(Deserialize, Serialize, Debug, Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 #[serde(deny_unknown_fields)]
 pub enum Slot {

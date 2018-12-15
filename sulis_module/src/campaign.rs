@@ -23,6 +23,7 @@ use std::cmp::Ordering;
 use sulis_core::image::Image;
 use sulis_core::resource::ResourceSet;
 use sulis_core::util::{unable_to_create_error, Point};
+use sulis_rules::Time;
 
 use crate::{Conversation, Module, on_trigger};
 
@@ -80,6 +81,7 @@ impl PartialOrd for CampaignGroup {
 
 pub struct Campaign {
     pub id: String,
+    pub starting_time: Time,
     pub starting_area: String,
     pub starting_location: Point,
     pub name: String,
@@ -124,6 +126,7 @@ impl Campaign {
 
         Ok(Campaign {
             group: builder.group,
+            starting_time: builder.starting_time,
             starting_area: builder.starting_area,
             starting_location: builder.starting_location,
             name: builder.name,
@@ -146,6 +149,7 @@ impl Campaign {
 pub struct CampaignBuilder {
     pub id: String,
     pub group: Option<CampaignGroup>,
+    pub starting_time: Time,
     pub starting_area: String,
     pub starting_location: Point,
     pub name: String,

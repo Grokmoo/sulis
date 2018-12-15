@@ -18,10 +18,9 @@ use std::u32;
 use std::rc::Rc;
 
 use sulis_core::util::ExtInt;
+use sulis_rules::ROUND_TIME_MILLIS;
 use sulis_module::{ability::Duration, Ability};
 use crate::ChangeListenerList;
-
-use crate::ROUND_TIME_MILLIS;
 
 pub struct AbilityState {
     pub ability: Rc<Ability>,

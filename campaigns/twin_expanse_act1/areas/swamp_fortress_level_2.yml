@@ -1,6 +1,7 @@
 ---
 id: swamp_fortress_level_2
 name: Swamp Fortress Level 2
+location_kind: Underground
 width: 30
 height: 64
 generate: false

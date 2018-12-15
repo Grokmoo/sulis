@@ -569,7 +569,7 @@ pub trait AreaDrawable {
     fn cache(&mut self, renderer: &mut GraphicsRenderer, texture_cache: &mut EntityTextureCache);
 
     fn draw(&self, renderer: &mut GraphicsRenderer,
-            scale_x: f32, scale_y: f32, x: f32, y: f32, millis: u32, alpha: f32);
+            scale_x: f32, scale_y: f32, x: f32, y: f32, millis: u32, color: Color);
 
     fn location(&self) -> &Location;
 }
@@ -588,7 +588,7 @@ impl AreaDrawable for EntityState {
     }
 
     fn draw(&self, renderer: &mut GraphicsRenderer,
-            scale_x: f32, scale_y: f32, x: f32, y: f32, _millis: u32, alpha: f32) {
+            scale_x: f32, scale_y: f32, x: f32, y: f32, _millis: u32, color: Color) {
         // don't draw invisible hostiles
         if self.actor.stats.hidden {
             match self.actor.faction() {
@@ -603,8 +603,8 @@ impl AreaDrawable for EntityState {
         let x = x + self.location.x as f32 + self.sub_pos.0;
         let y = y + self.location.y as f32 + self.sub_pos.1;
 
-        let a = self.color.a * alpha;
-        let color = Color::new(self.color.r, self.color.g, self.color.b, a);
+        let color = Color::new(self.color.r * color.r, self.color.g * color.g,
+                               self.color.b * color.b, self.color.a * color.a);
         if let Some(ref slot) = self.texture_cache_slot {
             slot.draw(renderer, x, y, offset_x, offset_y, scale_x, scale_y, color, self.color_sec);
         }

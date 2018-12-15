@@ -1,5 +1,5 @@
 function on_rest(parent)
-  game:show_confirm("Rest now?", "Yes", "No", "campaign", "fire_rest")
+  game:show_confirm("Rest now for 8 hours?", "Yes", "No", "campaign", "fire_rest")
 end
 
 function fire_rest(parent)
@@ -11,6 +11,7 @@ end
 
 function heal_party(parent)
   game:init_party_day()
+  game:add_time(0, 8)
   
   local party = game:party()
   for i = 1, #party do

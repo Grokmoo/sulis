@@ -29,6 +29,13 @@ world_map:
       initially_enabled: true
       linked_area: wellswood
       linked_area_pos: [120, 33]
+      travel_times:
+        wellswood_forest: 12
+        vezula_hills: 18
+        serpents_mire: 18
+        firtuk_crossing: 12
+        thugs_hideout: 4
+        rose_lake: 24
     wellswood_forest:
       name: "Wellswood"
       position: [6.0, 7.25]
@@ -36,6 +43,13 @@ world_map:
       initially_enabled: true
       linked_area: wellswood_forest
       linked_area_pos: [123, 123]
+      travel_times:
+        wellswood: 12
+        vezula_hills: 6
+        serpents_mire: 6
+        firtuk_crossing: 24
+        thugs_hideout: 28
+        rose_lake: 36
     vezula_hills:
       name: "Vezula Hills"
       position: [5.5, 5.5]
@@ -44,6 +58,13 @@ world_map:
       initially_visible: false
       linked_area: vezula_hills
       linked_area_pos: [27, 3]
+      travel_times:
+        wellswood: 18
+        wellswood_forest: 6
+        serpents_mire: 6
+        firtuk_crossing: 30
+        thugs_hideout: 22
+        rose_lake: 42
     serpents_mire:
       name: "Serpent's Mire"
       position: [3.5, 6.5]
@@ -52,6 +73,13 @@ world_map:
       initially_visible: false
       linked_area: serpents_mire
       linked_area_pos: [122, 3]
+      travel_times:
+        wellswood: 18
+        wellswood_forest: 6
+        vezula_hills: 6
+        firtuk_crossing: 30
+        thugs_hideout: 22
+        rose_lake: 42
     firtuk_crossing:
       name: "Firtuk Bridge"
       position: [8.0, 6.25]
@@ -59,6 +87,13 @@ world_map:
       initially_enabled: true
       linked_area: firtuk_bridge
       linked_area_pos: [4, 79]
+      travel_times:
+        wellswood: 12
+        wellswood_forest: 24
+        vezula_hills: 30
+        serpents_mire: 30
+        thugs_hideout: 16
+        rose_lake: 12
     thugs_hideout:
       name: "Thug's Hideout"
       position: [9.5, 10]
@@ -67,6 +102,13 @@ world_map:
       initially_visible: false
       linked_area: thugs_hideout
       linked_area_pos: [3, 11]
+      travel_times:
+        wellswood: 4
+        wellswood_forest: 16
+        vezula_hills: 22
+        serpents_mire: 22
+        firtuk_crossing: 16
+        rose_lake: 28
     last_edge:
       name: "Last Edge"
       position: [2, 3]
@@ -82,6 +124,13 @@ world_map:
       position: [9.75, 5.5]
       icon: city01
       initially_enabled: false
+      travel_times:
+        wellswood: 24
+        wellswood_forest: 36
+        vezula_hills: 42
+        serpents_mire: 42
+        firtuk_crossing: 12
+        thugs_hideout: 28
     rose_pastures:
       name: "Rose Pastures"
       position: [13.5, 4]

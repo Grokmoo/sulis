@@ -1186,7 +1186,8 @@ impl UserData for ScriptInterface {
 
         methods.add_method("transition_party_to", |_, _, (area, x, y): (String, i32, i32)| {
             let location = Some(area);
-            GameState::transition(&location, x, y);
+            GameState::transition(&location, x, y, Time {
+                day: 0, hour: 0, round: 0, millis: 0});
             Ok(())
         });
     }

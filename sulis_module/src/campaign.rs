@@ -43,6 +43,8 @@ pub struct WorldMapLocation {
 
     pub linked_area: Option<String>,
     pub linked_area_pos: Point,
+
+    pub travel_times: HashMap<String, u32>,
 }
 
 #[derive(Deserialize, Debug, Clone)]
@@ -121,6 +123,7 @@ impl Campaign {
                 initially_visible: location.initially_visible,
                 linked_area: location.linked_area,
                 linked_area_pos: location.linked_area_pos,
+                travel_times: location.travel_times,
             });
         }
 
@@ -175,6 +178,9 @@ pub struct WorldMapLocationBuilder {
     pub linked_area: Option<String>,
     #[serde(default = "Point::as_zero")]
     pub linked_area_pos: Point,
+
+    #[serde(default)]
+    pub travel_times: HashMap<String, u32>,
 }
 
 fn bool_true() -> bool { true }

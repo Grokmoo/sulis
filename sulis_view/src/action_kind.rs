@@ -19,6 +19,7 @@ use std::rc::Rc;
 
 use sulis_core::ui::{animation_state, Widget};
 use sulis_core::util::Point;
+use sulis_rules::Time;
 use sulis_module::{Faction, Module, ObjectSize, area::ToKind};
 use sulis_state::{MOVE_TO_THRESHOLD, EntityState, GameState, ScriptCallback, AreaState};
 use crate::{dialog_window, RootView};
@@ -321,14 +322,15 @@ impl ActionKind for TransitionAction {
 
     fn fire_action(&mut self, widget: &Rc<RefCell<Widget>>) {
         trace!("Firing transition callback.");
+        let time = Time { day: 0, hour: 0, round: 0, millis: 0 };
         match self.to {
             ToKind::Area { ref id, x, y } => {
-                GameState::transition(&Some(id.to_string()), x, y);
+                GameState::transition(&Some(id.to_string()), x, y, time);
                 let root = Widget::get_root(widget);
                 root.borrow_mut().invalidate_children();
             },
             ToKind::CurArea { x, y } => {
-                GameState::transition(&None, x, y);
+                GameState::transition(&None, x, y, time);
             },
             ToKind::WorldMap => {
                 let root = Widget::get_root(widget);

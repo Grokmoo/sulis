@@ -23,7 +23,7 @@ use std::cell::{Cell, RefCell};
 use sulis_core::config::Config;
 use sulis_core::util::{self, Point, invalid_data_error, ExtInt};
 use sulis_core::io::{GraphicsRenderer};
-use sulis_rules::{HitKind, DamageKind};
+use sulis_rules::{HitKind, DamageKind, Time};
 use sulis_module::{Ability, Actor, Module, ObjectSize, OnTrigger, area::{Trigger, TriggerKind}};
 
 use crate::{ai, AI, AreaState, ChangeListener, ChangeListenerList, Effect,
@@ -825,7 +825,7 @@ impl GameState {
         exec_script!(trigger_script: script_id, func, parent, target, t);
     }
 
-    pub fn transition(area_id: &Option<String>, x: i32, y: i32) {
+    pub fn transition(area_id: &Option<String>, x: i32, y: i32, travel_time: Time) {
         let p = Point::new(x, y);
         info!("Area transition to {:?} at {},{}", area_id, x, y);
 
@@ -890,6 +890,8 @@ impl GameState {
 
         let pc = GameState::player();
         let mgr = GameState::turn_manager();
+        mgr.borrow_mut().add_time(travel_time);
+
         let area_state = GameState::area_state();
         let base_location = Location::new(x, y, &area_state.borrow().area);
         for entity in GameState::party() {

@@ -347,7 +347,7 @@ children:
               tooltip: "End Turn"
             background: background
             preferred_size: [22, 22]
-            position: [-1, -4]
+            position: [0, -4]
             y_relative: Max
             x_relative: Max
             foreground: end_turn_icon
@@ -355,31 +355,31 @@ children:
             from: .bottom_pane.window_button
             custom:
               tooltip: "Map"
-            position: [-25, -4]
+            position: [-24, -4]
             foreground: map_icon
           journal_button:
             from: .bottom_pane.window_button
             custom:
               tooltip: "Journal"
-            position: [-25, -16]
+            position: [-24, -16]
             foreground: log_icon
           character_button:
             from: .bottom_pane.window_button
             custom:
               tooltip: "Character Sheet"
-            position: [-25, -28]
+            position: [-24, -28]
             foreground: char_icon
           inventory_button:
             from: .bottom_pane.window_button
             custom:
               tooltip: "Inventory"
-            position: [-13, -28]
+            position: [-12, -28]
             foreground: inv_icon
           menu_button:
             from: .bottom_pane.window_button
             custom:
               tooltip: "Menu"
-            position: [-1, -28]
+            position: [0, -28]
             foreground: menu_icon
       time:
         from: .label
@@ -681,17 +681,17 @@ children:
           location:
             from: .button
             background: "#icon#"
+            text: "#travel_time#"
             foreground: world_map_button
             x_relative: Custom
             y_relative: Custom
             preferred_size: [24, 17]
           label:
-            from: .label
-            text: "#name#"
+            text: |
+              [a=100|#name#]
+              [?travel_time;a=100;s=5.0;f=normal|#travel_time# hours]
             text_params:
               font: outlined
-              vertical_alignment: Top
-              horizontal_alignment: Center
               scale: 6.0
             x_relative: Custom
             y_relative: Custom

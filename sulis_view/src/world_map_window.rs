@@ -20,6 +20,7 @@ use std::cell::RefCell;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind, animation_state};
 use sulis_widgets::{Label, Button, TextArea};
+use sulis_rules::Time;
 use sulis_module::Module;
 use sulis_state::GameState;
 
@@ -129,7 +130,7 @@ impl WidgetKind for WorldMapWindow {
                     state.animation_state.add(animation_state::Kind::Custom1);
                 }
 
-                let label = Widget::with_defaults(Label::empty());
+                let label = Widget::with_theme(TextArea::empty(), "label");
                 label.borrow_mut().state.add_text_arg("name", &location.name);
                 label.borrow_mut().state.set_visible(is_visible);
 
@@ -137,6 +138,14 @@ impl WidgetKind for WorldMapWindow {
             };
 
             if add_callback {
+                let mut travel_time = Time { day: 0, hour: 0, round: 0, millis: 0 };
+                if let Some(cur_location) = &cur_location_id {
+                    if let Some(hours) = location.travel_times.get(cur_location) {
+                        travel_time.hour = *hours;
+                        label.borrow_mut().state.add_text_arg("travel_time", &hours.to_string());
+                    }
+                }
+
                 let (x, y) = (location.linked_area_pos.x, location.linked_area_pos.y);
                 let area_id = location.linked_area.clone();
                 button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
@@ -145,7 +154,7 @@ impl WidgetKind for WorldMapWindow {
                         Some(ref id) => id.clone(),
                     };
 
-                    GameState::transition(&Some(area_id), x, y);
+                    GameState::transition(&Some(area_id), x, y, travel_time);
                     let root = Widget::get_root(&widget);
                     root.borrow_mut().invalidate_children();
                 })));

@@ -334,7 +334,7 @@ groups:
       spinning_shield05: [80, 0]
       spinning_shield06: [100, 0]
       spinning_shield07: [120, 0]
-      spinning_shield08: [140, 0]
+      spinning_shield08: [120, 20]
   eye:
     size: [20, 20]
     position: [362, 127]

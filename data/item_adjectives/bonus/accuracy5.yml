@@ -1,0 +1,19 @@
+id: accuracy5
+name: Accuracy
+name_postfix: " of Accuracy"
+item_status_icon: gui/status_accuracy
+value_modifier: 1.2
+value_add: 80
+bonus_modifier: 1.0
+penalty_modifier: 1.0
+attack_damage_modifier: 1.0
+attack_bonus_modifier: 1.0
+attack_penalty_modifier: 1.0
+bonuses:
+  - kind:
+      melee_accuracy: 5
+  - kind:
+      ranged_accuracy: 5
+  - kind:
+      spell_accuracy: 5
+attack_bonuses: {}

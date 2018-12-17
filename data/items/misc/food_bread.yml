@@ -3,3 +3,15 @@ name: Bread
 icon: inventory/food_bread
 weight: 50
 value: 10
+usable:
+  consumable: true
+  script: food_healing
+  ap: 2000
+  duration:
+    Instant
+  ai:
+    priority: 100
+    kind: Heal
+    group: Single
+    range: Personal
+  short_description: "Heals a small amount of damage."

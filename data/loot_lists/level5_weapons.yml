@@ -12,54 +12,54 @@ weighted_entries:
       none: 5
       fine: 5
   club:
-    weight: 10
+    weight: 8
   crossbow:
-    weight: 2
+    weight: 3
     adjective1:
       none: 5
       fine: 5
   dagger:
-    weight: 10
+    weight: 8
     adjective1:
       none: 5
       fine: 5
   flail:
-    weight: 2
+    weight: 3
     adjective1:
       none: 5
       fine: 5
   greataxe:
-    weight: 1
+    weight: 2
     adjective1:
       none: 5
       fine: 5
   greathammer:
-    weight: 1
+    weight: 2
     adjective1:
       none: 5
       fine: 5
   greatsword:
-    weight: 1
+    weight: 2
     adjective1:
       none: 5
       fine: 5
   hatchet:
-    weight: 10
+    weight: 8
     adjective1:
       none: 5
       fine: 5
   longbow:
-    weight: 1
+    weight: 2
     adjective1:
       none: 5
       fine: 5
   longspear:
-    weight: 2
+    weight: 3
     adjective1:
       none: 5
       fine: 5
   longsword:
-    weight: 2
+    weight: 3
     adjective1:
       none: 5
       fine: 5
@@ -69,17 +69,17 @@ weighted_entries:
       none: 5
       fine: 5
   morningstar:
-    weight: 2
+    weight: 3
     adjective1:
       none: 5
       fine: 5
   quarterstaff:
-    weight: 10
+    weight: 8
     adjective1:
       none: 5
       fine: 5
   druid_staff:
-    weight: 10
+    weight: 8
     adjective1:
       none: 5
       fine: 5
@@ -89,7 +89,7 @@ weighted_entries:
       none: 5
       fine: 5
   shortspear:
-    weight: 10
+    weight: 8
     adjective1:
       none: 5
       fine: 5
@@ -104,7 +104,7 @@ weighted_entries:
       none: 5
       fine: 5
   sickle:
-    weight: 10
+    weight: 8
     adjective1:
       none: 5
       fine: 5
@@ -114,17 +114,17 @@ weighted_entries:
       none: 5
       fine: 5
   scimitar:
-    weight: 1
+    weight: 2
     adjective1:
       none: 5
       fine: 5
   halberd:
-    weight: 1
+    weight: 2
     adjective1:
       none: 5
       fine: 5
   glaive:
-    weight: 1
+    weight: 2
     adjective1:
       none: 5
       fine: 5

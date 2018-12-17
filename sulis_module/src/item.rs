@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::cmp;
 use std::io::{Error};
 use std::collections::hash_map::Iter;
 use std::collections::HashMap;
@@ -269,6 +270,7 @@ impl Item {
 fn apply_adjectives(equippable: &Option<Equippable>, value: i32,
                     adjectives: &Vec<Rc<ItemAdjective>>) -> (Option<Equippable>, i32) {
     // first, add bonuses from adjectives and accumulate modifiers
+    let mut value_add = 0;
     let mut value_modifier = 1.0;
     let mut bonus_modifier = 1.0;
     let mut penalty_modifier = 1.0;
@@ -278,6 +280,7 @@ fn apply_adjectives(equippable: &Option<Equippable>, value: i32,
 
     let mut equippable = equippable.clone();
     for adjective in adjectives.iter() {
+        value_add += adjective.value_add.unwrap_or(0);
         value_modifier += adjective.value_modifier.unwrap_or(1.0) - 1.0;
         bonus_modifier += adjective.bonus_modifier.unwrap_or(1.0) - 1.0;
         penalty_modifier += adjective.penalty_modifier.unwrap_or(1.0) - 1.0;
@@ -314,7 +317,7 @@ fn apply_adjectives(equippable: &Option<Equippable>, value: i32,
         equippable.bonuses.apply_modifiers(penalty_modifier, bonus_modifier);
     }
 
-    let value = (value as f32 * value_modifier).round() as i32;
+    let value = cmp::max(0, (value as f32 * value_modifier).round() as i32 + value_add);
 
     (equippable, value)
 }

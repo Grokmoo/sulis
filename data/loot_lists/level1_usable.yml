@@ -1,0 +1,33 @@
+id: level1_usable
+generate:
+  1: 2
+  2: 1
+weighted_entries:
+  potion_elements:
+    weight: 10
+  healing_kit:
+    weight: 20
+  potion_healing:
+    weight: 40
+  potion_mind:
+    weight: 10
+  potion_power:
+    weight: 10
+  potion_spellpower:
+    weight: 10
+  food_apple:
+    weight: 10
+  food_beer:
+    weight: 10
+  food_bread:
+    weight: 10
+  food_cheese:
+    weight: 10
+  food_egg:
+    weight: 10
+  food_grain:
+    weight: 10
+  food_meat:
+    weight: 10
+  food_wine:
+    weight: 10

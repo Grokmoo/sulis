@@ -1,0 +1,15 @@
+id: reflex5
+name: Reflex
+name_postfix: " of Reflex"
+item_status_icon: gui/status_reflex
+value_modifier: 1.2
+value_add: 50
+bonus_modifier: 1.0
+penalty_modifier: 1.0
+attack_damage_modifier: 1.0
+attack_bonus_modifier: 1.0
+attack_penalty_modifier: 1.0
+bonuses:
+  - kind:
+      reflex: 5
+attack_bonuses: {}

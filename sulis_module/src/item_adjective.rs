@@ -35,6 +35,7 @@ pub struct ItemAdjective {
     pub name_prefix: Option<String>,
     pub name_postfix: Option<String>,
     pub value_modifier: Option<f32>,
+    pub value_add: Option<i32>,
     pub bonus_modifier: Option<f32>,
     pub penalty_modifier: Option<f32>,
     pub attack_damage_modifier: Option<f32>,

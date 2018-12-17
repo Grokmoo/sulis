@@ -1,0 +1,65 @@
+id: level1_crafting
+generate:
+  1: 2
+  2: 4
+weighted_entries:
+  poison_vial:
+    weight: 10
+  craft_gem01:
+    weight: 3
+  craft_gem02:
+    weight: 3
+  craft_gem03:
+    weight: 3
+  craft_gem04:
+    weight: 3
+  craft_gem05:
+    weight: 3
+  craft_gem06:
+    weight: 1
+  craft_gem07:
+    weight: 1
+  craft_gem08:
+    weight: 1
+  craft_gem09:
+    weight: 1
+  craft_gem10:
+    weight: 1
+  craft_bottle:
+    weight: 20
+  craft_cloth:
+    weight: 10
+  craft_coal:
+    weight: 10
+  craft_copper:
+    weight: 5
+  craft_crystal01:
+    weight: 3
+  craft_crystal02:
+    weight: 3
+  craft_feathers:
+    weight: 10
+  craft_gold:
+    weight: 1
+  craft_iron:
+    weight: 10
+  craft_leaf:
+    weight: 10
+  craft_leather:
+    weight: 10
+  craft_nails:
+    weight: 10
+  craft_paper:
+    weight: 10
+  craft_rope:
+    weight: 10
+  craft_silk:
+    weight: 5
+  craft_silver:
+    weight: 2
+  craft_steel:
+    weight: 5
+  craft_wood:
+    weight: 10
+  misc_trap:
+    weight: 10

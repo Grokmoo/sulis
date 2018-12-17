@@ -1,5 +1,5 @@
 function on_activate(parent, item)
-  parent:heal_damage(35)
+  parent:heal_damage(5)
 
   anim = parent:create_particle_generator("heal", 1.0)
   anim:set_moves_with_parent()

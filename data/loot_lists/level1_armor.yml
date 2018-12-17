@@ -8,19 +8,19 @@ generate:
   3: 1
 weighted_entries:
   torso_robe:
-    weight: 10
+    weight: 5
     adjective1:
       none: 5
   helm_hood:
-    weight: 10
+    weight: 5
     adjective1:
       none: 5
   helm_hat:
-    weight: 10
+    weight: 5
     adjective1:
       none: 5
   boots_leather:
-    weight: 10
+    weight: 7
     adjective1:
       none: 5
       worn: 5
@@ -30,12 +30,12 @@ weighted_entries:
       none: 3
       worn: 7
   boots_plate:
-    weight: 1
+    weight: 2
     adjective1:
       none: 1
       worn: 9
   gloves_leather:
-    weight: 10
+    weight: 7
     adjective1:
       none: 5
       worn: 5
@@ -45,12 +45,12 @@ weighted_entries:
       none: 3
       worn: 7
   gloves_plate:
-    weight: 1
+    weight: 2
     adjective1:
       none: 1
       worn: 9
   helm_leather:
-    weight: 10
+    weight: 7
     adjective1:
       none: 5
       worn: 5
@@ -60,12 +60,12 @@ weighted_entries:
       none: 3
       worn: 7
   helm_plate:
-    weight: 1
+    weight: 2
     adjective1:
       none: 1
       worn: 9
   legs_leather:
-    weight: 10
+    weight: 7
     adjective1:
       none: 5
       worn: 5
@@ -75,12 +75,12 @@ weighted_entries:
       none: 3
       worn: 7
   legs_plate:
-    weight: 1
+    weight: 2
     adjective1:
       none: 1
       worn: 9
   torso_leather:
-    weight: 10
+    weight: 7
     adjective1:
       none: 5
       worn: 5
@@ -90,12 +90,12 @@ weighted_entries:
       none: 3
       worn: 7
   torso_plate:
-    weight: 1
+    weight: 2
     adjective1:
       none: 1
       worn: 9
   shield_small:
-    weight: 10
+    weight: 5
     adjective1:
       none: 5
       worn: 5

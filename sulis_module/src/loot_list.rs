@@ -23,6 +23,8 @@ use sulis_core::util::unable_to_create_error;
 
 use crate::{Item, Module};
 
+const MAX_DEPTH: u32 = 10;
+
 #[derive(Debug)]
 struct Entry {
     id: String,
@@ -52,6 +54,8 @@ pub struct LootList {
     total_entries_weight: u32,
 
     probability_entries: Vec<Entry>,
+
+    sub_lists: Vec<Entry>,
 }
 
 impl LootList {
@@ -81,6 +85,12 @@ impl LootList {
             probability_entries.push(entry);
         }
 
+        let mut sub_lists = Vec::new();
+        for (id, entry) in builder.sub_lists {
+            let entry = LootList::create_sublist_entry(&builder.id, id, entry)?;
+            sub_lists.push(entry);
+        }
+
         Ok(LootList {
             id: builder.id,
             generate,
@@ -88,6 +98,31 @@ impl LootList {
             weighted_entries,
             total_entries_weight,
             probability_entries,
+            sub_lists,
+        })
+    }
+
+    fn create_sublist_entry(builder_id: &str, id: String,
+                            entry_in: EntryBuilder) -> Result<Entry, Error> {
+        if entry_in.adjective1.len() != 0 || entry_in.adjective2.len() != 0 {
+            warn!("Item adjectives may not be specified in loot list sub_list entries: '{}'",
+                  id);
+            return unable_to_create_error("loot_list", &builder_id);
+        }
+
+        let (min_qty, max_qty) = match entry_in.quantity {
+            None => (1, 1),
+            Some(qty) => (qty[0], qty[1]),
+        };
+
+        Ok(Entry {
+            id,
+            weight: entry_in.weight,
+            quantity: [min_qty, max_qty],
+            adjective1: Vec::new(),
+            adjective1_total_weight: 0,
+            adjective2: Vec::new(),
+            adjective2_total_weight: 0,
         })
     }
 
@@ -141,13 +176,23 @@ impl LootList {
     pub fn generate_with_chance(&self, chance: u32) -> Vec<(u32, Rc<Item>)> {
         let roll = rand::thread_rng().gen_range(1, 101);
         if chance >= roll {
-            self.generate()
+            self.generate_internal(0)
         } else {
             Vec::new()
         }
     }
 
     pub fn generate(&self) -> Vec<(u32, Rc<Item>)> {
+        self.generate_internal(0)
+    }
+
+    fn generate_internal(&self, depth: u32) -> Vec<(u32, Rc<Item>)> {
+        if depth >= MAX_DEPTH {
+            warn!("Exceeded maximum sub list depth of {}.  \
+                  This is most likely caused by a circular reference.", MAX_DEPTH);
+            return Vec::new();
+        }
+
         let num_items = self.gen_num_items();
 
         let mut items = Vec::new();
@@ -176,6 +221,30 @@ impl LootList {
                     }, Some(item) => item,
                 };
                 items.push((quantity, item));
+            }
+        }
+
+        for entry in self.sub_lists.iter() {
+            let sub_list = match Module::loot_list(&entry.id) {
+                None => {
+                    warn!("No loot list with ID '{}' found for sublist of '{}'",
+                          entry.id, self.id);
+                    continue;
+                }, Some(list) => list,
+            };
+
+            let roll = rand::thread_rng().gen_range(0, 100);
+            if roll < entry.weight {
+                let mult_quantity = if entry.quantity[0] == entry.quantity[1] {
+                    entry.quantity[0]
+                } else {
+                    rand::thread_rng().gen_range(entry.quantity[0], entry.quantity[1] + 1)
+                };
+
+                let subitems = sub_list.generate_internal(depth + 1);
+                for (quantity, item) in subitems {
+                    items.push((quantity * mult_quantity, item));
+                }
             }
         }
 
@@ -272,7 +341,13 @@ struct EntryBuilder {
 #[serde(deny_unknown_fields)]
 pub struct LootListBuilder {
     pub id: String,
+    #[serde(default)]
     generate: HashMap<u32, u32>,
+    #[serde(default)]
     weighted_entries: HashMap<String, EntryBuilder>,
+    #[serde(default)]
     probability_entries: HashMap<String, EntryBuilder>,
+
+    #[serde(default)]
+    sub_lists: HashMap<String, EntryBuilder>,
 }

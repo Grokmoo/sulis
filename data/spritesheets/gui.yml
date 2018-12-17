@@ -503,6 +503,17 @@ groups:
       status_positive: [160, 32]
       status_negative: [192, 32]
       status_injury: [224, 32]
+      status_strength: [256, 0]
+      status_dexterity: [288, 0]
+      status_endurance: [320, 0]
+      status_perception: [256, 32]
+      status_intellect: [288, 32]
+      status_wisdom: [320, 32]
+      status_defense: [352, 0]
+      status_accuracy: [352, 32]
+      status_fortitude: [384, 0]
+      status_reflex: [384, 32]
+      status_will: [416, 0]
   special:
     areas:
       empty: [0, 512, 5, 5]

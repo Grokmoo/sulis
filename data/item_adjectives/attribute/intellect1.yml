@@ -1,0 +1,15 @@
+id: intellect1
+name: Intellect
+name_postfix: " of Intellect"
+item_status_icon: gui/status_intellect
+value_modifier: 1.2
+value_add: 100
+bonus_modifier: 1.0
+penalty_modifier: 1.0
+attack_damage_modifier: 1.0
+attack_bonus_modifier: 1.0
+attack_penalty_modifier: 1.0
+bonuses:
+  - kind:
+      attribute: { attribute: Intellect, amount: 1 }
+attack_bonuses: {}

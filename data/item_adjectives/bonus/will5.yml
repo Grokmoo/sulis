@@ -1,0 +1,15 @@
+id: will5
+name: Will
+name_postfix: " of Will"
+item_status_icon: gui/status_will
+value_modifier: 1.2
+value_add: 50
+bonus_modifier: 1.0
+penalty_modifier: 1.0
+attack_damage_modifier: 1.0
+attack_bonus_modifier: 1.0
+attack_penalty_modifier: 1.0
+bonuses:
+  - kind:
+      will: 5
+attack_bonuses: {}

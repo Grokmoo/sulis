@@ -1,0 +1,15 @@
+id: strength1
+name: Strength
+name_postfix: " of Strength"
+item_status_icon: gui/status_strength
+value_modifier: 1.2
+value_add: 100
+bonus_modifier: 1.0
+penalty_modifier: 1.0
+attack_damage_modifier: 1.0
+attack_bonus_modifier: 1.0
+attack_penalty_modifier: 1.0
+bonuses:
+  - kind:
+      attribute: { attribute: Strength, amount: 1 }
+attack_bonuses: {}

@@ -15,6 +15,8 @@ nodes:
               loot_list: level5_smith
               buy_frac: 1.0
               sell_frac: 0.25
+              refresh_time:
+                hour: 24
       - text: "I'm trying to track down a group of local thugs.  Know where I can find them?"
         to_view:
           - player_flag: the_thug_active

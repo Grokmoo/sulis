@@ -54,7 +54,10 @@ pub const ROUND_TIME_MILLIS: u32 = 5000;
 #[derive(Deserialize, Serialize, Debug, Copy, Clone, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
 pub struct Time {
+    #[serde(default)]
     pub day: u32,
+
+    #[serde(default)]
     pub hour: u32,
 
     #[serde(default)]
@@ -62,6 +65,17 @@ pub struct Time {
 
     #[serde(default)]
     pub millis: u32,
+}
+
+impl Default for Time {
+    fn default() -> Self {
+        Time {
+            day: 0,
+            hour: 0,
+            round: 0,
+            millis: 0,
+        }
+    }
 }
 
 #[derive(Deserialize, Serialize, Debug, Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]

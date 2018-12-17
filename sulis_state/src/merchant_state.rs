@@ -18,20 +18,25 @@ use std::io::Error;
 use std::rc::Rc;
 
 use sulis_core::util::invalid_data_error;
+use sulis_rules::Time;
 use sulis_module::{LootList, Module};
 
-use crate::{ChangeListenerList, ItemList, ItemState, save_state::MerchantSaveState};
+use crate::{ChangeListenerList, ItemList, ItemState, save_state::MerchantSaveState, GameState};
 
-pub struct Merchant {
+pub struct MerchantState {
     pub id: String,
     pub buy_frac: f32,
     pub sell_frac: f32,
-    pub listeners: ChangeListenerList<Merchant>,
+    pub listeners: ChangeListenerList<MerchantState>,
     items: ItemList,
+
+    pub loot_list_id: Option<String>,
+    pub refresh_rate_millis: usize,
+    pub last_refresh_millis: usize,
 }
 
-impl Merchant {
-    pub fn load(save: MerchantSaveState) -> Result<Merchant, Error> {
+impl MerchantState {
+    pub fn load(save: MerchantSaveState) -> Result<MerchantState, Error> {
         let mut items = ItemList::new();
         for item_save in save.items {
             let item = match Module::item(&item_save.item.id) {
@@ -42,16 +47,24 @@ impl Merchant {
             items.add_quantity(item_save.quantity, ItemState::new(item));
         }
 
-        Ok(Merchant {
+        Ok(MerchantState {
             id: save.id,
+            loot_list_id: save.loot_list_id,
             buy_frac: save.buy_frac,
             sell_frac: save.sell_frac,
             listeners: ChangeListenerList::default(),
             items,
+            refresh_rate_millis: save.refresh_rate_millis,
+            last_refresh_millis: save.last_refresh_millis,
         })
     }
 
-    pub fn new(id: &str, loot_list: &Rc<LootList>, buy_frac: f32, sell_frac: f32) -> Merchant {
+    pub fn new(id: &str, loot_list: &Rc<LootList>, buy_frac: f32,
+               sell_frac: f32, refresh_time: Time) -> MerchantState {
+        let mgr = GameState::turn_manager();
+        let last_refresh_millis = mgr.borrow().total_elapsed_millis();
+        let refresh_rate_millis = Module::rules().compute_millis(refresh_time);
+
         let mut items = ItemList::new();
 
         for (qty, item) in loot_list.generate() {
@@ -59,12 +72,44 @@ impl Merchant {
             items.add_quantity(qty, item_state);
         }
 
-        Merchant {
+        MerchantState {
             id: id.to_string(),
+            loot_list_id: Some(loot_list.id.to_string()),
             buy_frac,
             sell_frac,
             items,
             listeners: ChangeListenerList::default(),
+            last_refresh_millis,
+            refresh_rate_millis,
+        }
+    }
+
+    pub fn check_refresh(&mut self) {
+        if self.refresh_rate_millis == 0 { return; }
+
+        let mgr = GameState::turn_manager();
+        let cur_millis = mgr.borrow().total_elapsed_millis();
+        if cur_millis < self.last_refresh_millis + self.refresh_rate_millis {
+            return;
+        }
+
+        self.last_refresh_millis = cur_millis;
+
+        let loot_list_id = match self.loot_list_id {
+            None => return,
+            Some(ref id) => id,
+        };
+
+        let loot_list = match Module::loot_list(loot_list_id) {
+            None => {
+                warn!("Invalid loot list '{}' saved in merchant state", loot_list_id);
+                return;
+            }, Some(list) => list,
+        };
+
+        self.items.clear();
+        for (qty, item) in loot_list.generate() {
+            self.items.add_quantity(qty, ItemState::new(item));
         }
     }
 

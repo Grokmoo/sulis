@@ -15,4 +15,6 @@ nodes:
               loot_list: level5_herbalist
               buy_frac: 1.0
               sell_frac: 0.25
+              refresh_time:
+                hour: 24
       - text: "Nothing for now."

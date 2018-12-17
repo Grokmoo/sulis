@@ -71,8 +71,8 @@ mod los_calculator;
 pub use self::los_calculator::calculate_los;
 pub use self::los_calculator::has_visibility;
 
-mod merchant;
-pub use self::merchant::Merchant;
+mod merchant_state;
+pub use self::merchant_state::MerchantState;
 
 mod path_finder;
 use self::path_finder::PathFinder;

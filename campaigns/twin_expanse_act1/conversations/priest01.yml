@@ -15,6 +15,8 @@ nodes:
               loot_list: level5_priest
               buy_frac: 1.0
               sell_frac: 0.25
+              refresh_time:
+                hour: 24
       - text: "May we rest in the temple for a bit?"
         to: rest
       - text: "Nothing for now."

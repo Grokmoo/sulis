@@ -14,6 +14,8 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use sulis_rules::Time;
+
 #[derive(Clone, Serialize, Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub enum Kind {
@@ -32,6 +34,9 @@ pub struct MerchantData {
     pub loot_list: String,
     pub buy_frac: f32,
     pub sell_frac: f32,
+
+    #[serde(default)]
+    pub refresh_time: Time,
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]

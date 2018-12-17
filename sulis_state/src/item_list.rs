@@ -38,6 +38,10 @@ impl ItemList {
         }
     }
 
+    pub fn clear(&mut self) {
+        self.items.clear();
+    }
+
     pub fn iter<'a>(&'a self) -> Iter<'a, (u32, ItemState)> {
         self.items.iter()
     }

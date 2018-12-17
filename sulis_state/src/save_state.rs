@@ -25,7 +25,7 @@ use sulis_rules::{QuickSlot, Slot, BonusList};
 use sulis_module::{actor::{ActorBuilder, RewardBuilder}, ItemSaveState, ItemListEntrySaveState};
 
 use crate::{ActorState, effect, Effect, EntityState, Formation, GameState, Location,
-    PropState, prop_state::Interactive, Merchant, WorldMapState, PStats, QuestState,
+    PropState, prop_state::Interactive, MerchantState, WorldMapState, PStats, QuestState,
     turn_manager::EncounterRef};
 use crate::area_state::{TriggerState};
 use crate::script::CallbackData;
@@ -363,18 +363,28 @@ pub struct MerchantSaveState {
     pub(crate) buy_frac: f32,
     pub(crate) sell_frac: f32,
     pub(crate) items: Vec<ItemListEntrySaveState>,
+    #[serde(default)]
+    pub(crate) refresh_rate_millis: usize,
+    #[serde(default)]
+    pub(crate) last_refresh_millis: usize,
+
+    #[serde(default)]
+    pub(crate) loot_list_id: Option<String>,
 }
 
 impl MerchantSaveState {
-    pub fn new(merchant: &Merchant) -> MerchantSaveState {
+    pub fn new(merchant: &MerchantState) -> MerchantSaveState {
         let items = merchant.items().iter().map(|(q, ref it)|
             ItemListEntrySaveState::new(*q, &it.item)).collect();
 
         MerchantSaveState {
             id: merchant.id.to_string(),
+            loot_list_id: merchant.loot_list_id.clone(),
             buy_frac: merchant.buy_frac,
             sell_frac: merchant.sell_frac,
             items,
+            refresh_rate_millis: merchant.refresh_rate_millis,
+            last_refresh_millis: merchant.last_refresh_millis,
         }
     }
 }

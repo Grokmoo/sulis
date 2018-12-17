@@ -25,7 +25,7 @@ use rand::{self, Rng};
 
 use sulis_core::util::{self, invalid_data_error, Point};
 use sulis_core::config::Config;
-use sulis_rules::{HitFlags, HitKind, DamageKind};
+use sulis_rules::{HitFlags, HitKind, DamageKind, Time};
 use sulis_module::{Actor, Area, LootList, Module, ObjectSize, prop, Prop};
 use sulis_module::area::{EncounterData, PropData, Transition, TriggerKind};
 use crate::script::AreaTargeter;
@@ -57,7 +57,7 @@ pub struct AreaState {
     entities: Vec<usize>,
     surfaces: Vec<usize>,
     pub(crate) triggers: Vec<TriggerState>,
-    pub(crate) merchants: Vec<Merchant>,
+    pub(crate) merchants: Vec<MerchantState>,
 
     prop_grid: Vec<Option<usize>>,
     pub(crate) entity_grid: Vec<Vec<usize>>,
@@ -178,7 +178,7 @@ impl AreaState {
         area_state.add_transitions_from_area();
 
         for merchant_save in save.merchants {
-            area_state.merchants.push(Merchant::load(merchant_save)?);
+            area_state.merchants.push(MerchantState::load(merchant_save)?);
         }
 
         Ok(area_state)
@@ -202,7 +202,7 @@ impl AreaState {
         result
     }
 
-    pub fn get_merchant(&self, id: &str) -> Option<&Merchant> {
+    pub fn get_merchant(&self, id: &str) -> Option<&MerchantState> {
         let mut index = None;
         for (i, merchant) in self.merchants.iter().enumerate() {
             if merchant.id == id {
@@ -217,7 +217,7 @@ impl AreaState {
         }
     }
 
-    pub fn get_merchant_mut(&mut self, id: &str) -> Option<&mut Merchant> {
+    pub fn get_merchant_mut(&mut self, id: &str) -> Option<&mut MerchantState> {
         let mut index = None;
         for (i, merchant) in self.merchants.iter().enumerate() {
             if merchant.id == id {
@@ -290,8 +290,8 @@ impl AreaState {
         }
     }
 
-    pub fn get_or_create_merchant(&mut self, id: &str, loot_list: &Rc<LootList>,
-                                  buy_frac: f32, sell_frac: f32) -> &mut Merchant {
+    pub fn get_or_create_merchant(&mut self, id: &str, loot_list: &Rc<LootList>, buy_frac: f32,
+                                  sell_frac: f32, refresh_time: Time) -> &mut MerchantState {
         let mut index = None;
         for (i, merchant) in self.merchants.iter().enumerate() {
             if merchant.id == id {
@@ -301,11 +301,15 @@ impl AreaState {
         }
 
         match index {
-            Some(i) => &mut self.merchants[i],
+            Some(i) => {
+                self.merchants[i].check_refresh();
+                &mut self.merchants[i]
+            },
             None => {
                 info!("Creating merchant '{}'", id);
                 let len = self.merchants.len();
-                let merchant = Merchant::new(id, loot_list, buy_frac, sell_frac);
+                let merchant = MerchantState::new(id, loot_list, buy_frac,
+                                                  sell_frac, refresh_time);
                 self.merchants.push(merchant);
                 &mut self.merchants[len]
             }

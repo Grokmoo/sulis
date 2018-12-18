@@ -1,7 +1,29 @@
 id: level5_priest
 generate: {}
 weighted_entries: {}
+sub_lists:
+  level1_accessories:
+    weight: 100
+    quantity: [4, 8]
 probability_entries:
+  torso_robe:
+    weight: 80
+    adjective1:
+      none: 8
+      fine: 2
+    adjective2:
+      none: 5
+      will5: 2
+      intellect1: 2
+  helm_hood:
+    weight: 80
+    adjective1:
+      none: 8
+      fine: 2
+    adjective2:
+      none: 5
+      concealment5: 2
+      wisdom1: 2
   healing_kit:
     weight: 90
     quantity: [3, 8]

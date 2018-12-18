@@ -11,7 +11,7 @@ equippable:
   bonuses:
     - kind: { armor: 3 }
     - kind: { armor_kind: { kind: Slashing, amount: 1 } }
-    - kind: { armor_kind: { kind: Electrical, amount: -2 } }
+    - kind: { armor_kind: { kind: Shock, amount: -2 } }
     - kind: { movement_rate: -0.03 }
     - kind: { spell_accuracy: -5 }
 image:

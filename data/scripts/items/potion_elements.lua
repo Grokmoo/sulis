@@ -2,7 +2,7 @@ function on_activate(parent, item)
   effect = parent:create_effect(item:name(), item:duration())
   effect:add_armor_of_kind(8, "Fire")
   effect:add_armor_of_kind(8, "Cold")
-  effect:add_armor_of_kind(8, "Electrical")
+  effect:add_armor_of_kind(8, "Shock")
   effect:add_armor_of_kind(8, "Acid")
 
   anim = parent:create_particle_generator("arrow_up")

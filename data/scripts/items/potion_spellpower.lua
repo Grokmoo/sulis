@@ -2,7 +2,7 @@ function on_activate(parent, item)
   effect = parent:create_effect(item:name(), item:duration())
   effect:add_damage(5, 8, 0, "attack_with_damage_kind Acid")
   effect:add_damage(5, 8, 0, "attack_with_damage_kind Cold")
-  effect:add_damage(5, 8, 0, "attack_with_damage_kind Electrical")
+  effect:add_damage(5, 8, 0, "attack_with_damage_kind Shock")
   effect:add_damage(5, 8, 0, "attack_with_damage_kind Fire")
 
   anim = parent:create_particle_generator("arrow_up")

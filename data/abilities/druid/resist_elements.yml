@@ -2,7 +2,7 @@ id: resist_elements
 name: "Resist Elements"
 icon: abilities/resist_elements
 description: |
-  You are granted substantial damage resistance to all elemental damage types, including Fire, Cold, Acid, and Electrical damage.
+  You are granted substantial damage resistance to all elemental damage types, including Fire, Cold, Acid, and Shock damage.
 active:
   script: "resist_elements"
   group: "Druid"

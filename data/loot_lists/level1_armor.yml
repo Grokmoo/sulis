@@ -11,106 +11,197 @@ weighted_entries:
     weight: 5
     adjective1:
       none: 5
+    adjective2:
+      none: 5
+      will5: 2
+      intellect1: 2
   helm_hood:
     weight: 5
     adjective1:
       none: 5
+    adjective2:
+      none: 5
+      concealment5: 2
+      wisdom1: 2
   helm_hat:
     weight: 5
     adjective1:
       none: 5
+    adjective2:
+      none: 5
+      reflex5: 2
+      dexterity1: 2
   boots_leather:
     weight: 7
     adjective1:
       none: 5
       worn: 5
+    adjective2:
+      none: 7
+      movement5: 2
+      flanking5: 2
+      initiative1: 2
   boots_mail:
     weight: 3
     adjective1:
       none: 3
       worn: 7
+    adjective2:
+      none: 7
+      movement5: 2
+      flanking5: 2
+      initiative1: 2
   boots_plate:
     weight: 2
     adjective1:
       none: 1
       worn: 9
+    adjective2:
+      none: 7
+      movement5: 2
+      flanking5: 2
+      initiative1: 2
   gloves_leather:
     weight: 7
     adjective1:
       none: 5
       worn: 5
+    adjective2:
+      none: 5
+      reflex5: 2
+      dexterity1: 2
   gloves_mail:
     weight: 3
     adjective1:
       none: 3
       worn: 7
+    adjective2:
+      none: 5
+      reflex5: 2
+      dexterity1: 2
   gloves_plate:
     weight: 2
     adjective1:
       none: 1
       worn: 9
+    adjective2:
+      none: 5
+      reflex5: 2
+      dexterity1: 2
   helm_leather:
     weight: 7
     adjective1:
       none: 5
       worn: 5
+    adjective2:
+      none: 5
+      perception1: 2
+      accuracy5: 2
   helm_mail:
     weight: 3
     adjective1:
       none: 3
       worn: 7
+    adjective2:
+      none: 5
+      perception1: 2
+      accuracy5: 2
   helm_plate:
     weight: 2
     adjective1:
       none: 1
       worn: 9
+    adjective2:
+      none: 5
+      perception1: 2
+      accuracy5: 2
   legs_leather:
     weight: 7
     adjective1:
       none: 5
       worn: 5
+    adjective2:
+      none: 5
+      movement5: 2
+      endurance1: 2
   legs_mail:
     weight: 3
     adjective1:
       none: 3
       worn: 7
+    adjective2:
+      none: 5
+      movement5: 2
+      endurance1: 2
   legs_plate:
     weight: 2
     adjective1:
       none: 1
       worn: 9
+    adjective2:
+      none: 5
+      movement5: 2
+      endurance1: 2
   torso_leather:
     weight: 7
     adjective1:
       none: 5
       worn: 5
+    adjective2:
+      none: 5
+      fortitude5: 2
+      strength1: 2
   torso_mail:
     weight: 3
     adjective1:
       none: 3
       worn: 7
+    adjective2:
+      none: 5
+      fortitude5: 2
+      strength1: 2
   torso_plate:
     weight: 2
     adjective1:
       none: 1
       worn: 9
+    adjective2:
+      none: 5
+      fortitude5: 2
+      strength1: 2
   shield_small:
     weight: 5
     adjective1:
       none: 5
       worn: 5
+    adjective2:
+      none: 5
+      defense5: 2
+      reflex5: 2
   shield_heater:
     weight: 5
     adjective1:
       none: 3
       worn: 7
+    adjective2:
+      none: 5
+      defense5: 2
+      reflex5: 2
   shield_kite:
     weight: 5
     adjective1:
       none: 3
       worn: 7
+    adjective2:
+      none: 5
+      defense5: 2
+      reflex5: 2
   shield_large:
     weight: 3
     adjective1:
       none: 1
       worn: 9
+    adjective2:
+      none: 5
+      defense5: 2
+      reflex5: 2

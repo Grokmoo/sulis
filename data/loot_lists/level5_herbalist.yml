@@ -1,6 +1,10 @@
 id: level5_herbalist
 generate: {}
 weighted_entries: {}
+sub_lists:
+  level1_accessories:
+    weight: 100
+    quantity: [4, 8]
 probability_entries:
   druid_staff:
     weight: 50

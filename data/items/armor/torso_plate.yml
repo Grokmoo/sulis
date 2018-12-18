@@ -12,7 +12,7 @@ equippable:
     - kind: { armor: 7 }
     - kind: { armor_kind: { kind: Slashing, amount: 2 } }
     - kind: { armor_kind: { kind: Piercing, amount: 1 } }
-    - kind: { armor_kind: { kind: Electrical, amount: -5 } }
+    - kind: { armor_kind: { kind: Shock, amount: -5 } }
     - kind: { movement_rate: -0.14 }
     - kind: { attribute: { attribute: Dexterity, amount: -2 } }
     - kind: { spell_accuracy: -10 }

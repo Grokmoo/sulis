@@ -35,6 +35,6 @@ function attack_target(parent, ability, target)
     ap = 10
   end
   
-  parent:special_attack(target, "Reflex", "Spell", min_dmg, max_dmg, ap, "Electrical")
+  parent:special_attack(target, "Reflex", "Spell", min_dmg, max_dmg, ap, "Shock")
 end
 

@@ -293,7 +293,7 @@ impl StatList {
             GrazeMultiplier(amount) => self.graze_multiplier += amount * times_f32,
             MovementRate(amount) => self.movement_rate += amount * times_f32,
             AttackCost(amount) => self.attack_cost -= amount * times_i32,
-            FlankingAngle(amount) => self.flanking_angle += amount * times_i32,
+            FlankingAngle(amount) => self.flanking_angle -= amount * times_i32,
             CasterLevel(amount) => self.caster_level += amount * times_i32,
             FreeAbilityGroupUse => self.free_ability_group_use = true,
             AbilitiesDisabled => self.abilities_disabled = true,

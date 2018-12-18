@@ -11,120 +11,345 @@ weighted_entries:
     adjective1:
       none: 5
       fine: 5
+    adjective2:
+      none: 7
+      weapon_accuracy5: 1
+      acid5: 1
+      cold5: 1
+      fire5: 1
+      shock5: 1
+      crits5: 1
+      damage5: 1
   club:
     weight: 8
+    adjective2:
+      none: 7
+      weapon_accuracy5: 1
+      acid5: 1
+      cold5: 1
+      fire5: 1
+      shock5: 1
+      crits5: 1
+      damage5: 1
   crossbow:
     weight: 3
     adjective1:
       none: 5
       fine: 5
+    adjective2:
+      none: 7
+      ranged_accuracy5: 1
+      acid5: 1
+      cold5: 1
+      fire5: 1
+      shock5: 1
+      crits5: 1
+      damage5: 1
   dagger:
     weight: 8
     adjective1:
       none: 5
       fine: 5
+    adjective2:
+      none: 7
+      weapon_accuracy5: 1
+      acid5: 1
+      cold5: 1
+      fire5: 1
+      shock5: 1
+      crits5: 1
+      damage5: 1
   flail:
     weight: 3
     adjective1:
       none: 5
       fine: 5
+    adjective2:
+      none: 7
+      weapon_accuracy5: 1
+      acid5: 1
+      cold5: 1
+      fire5: 1
+      shock5: 1
+      crits5: 1
+      damage5: 1
   greataxe:
     weight: 2
     adjective1:
       none: 5
       fine: 5
+    adjective2:
+      none: 7
+      weapon_accuracy5: 1
+      acid5: 1
+      cold5: 1
+      fire5: 1
+      shock5: 1
+      crits5: 1
+      damage5: 1
   greathammer:
     weight: 2
     adjective1:
       none: 5
       fine: 5
+    adjective2:
+      none: 7
+      weapon_accuracy5: 1
+      acid5: 1
+      cold5: 1
+      fire5: 1
+      shock5: 1
+      crits5: 1
+      damage5: 1
   greatsword:
     weight: 2
     adjective1:
       none: 5
       fine: 5
+    adjective2:
+      none: 7
+      weapon_accuracy5: 1
+      acid5: 1
+      cold5: 1
+      fire5: 1
+      shock5: 1
+      crits5: 1
+      damage5: 1
   hatchet:
     weight: 8
     adjective1:
       none: 5
       fine: 5
+    adjective2:
+      none: 7
+      weapon_accuracy5: 1
+      acid5: 1
+      cold5: 1
+      fire5: 1
+      shock5: 1
+      crits5: 1
+      damage5: 1
   longbow:
     weight: 2
     adjective1:
       none: 5
       fine: 5
+    adjective2:
+      none: 7
+      ranged_accuracy5: 1
+      acid5: 1
+      cold5: 1
+      fire5: 1
+      shock5: 1
+      crits5: 1
+      damage5: 1
   longspear:
     weight: 3
     adjective1:
       none: 5
       fine: 5
+    adjective2:
+      none: 7
+      weapon_accuracy5: 1
+      acid5: 1
+      cold5: 1
+      fire5: 1
+      shock5: 1
+      crits5: 1
+      damage5: 1
   longsword:
     weight: 3
     adjective1:
       none: 5
       fine: 5
+    adjective2:
+      none: 7
+      weapon_accuracy5: 1
+      acid5: 1
+      cold5: 1
+      fire5: 1
+      shock5: 1
+      crits5: 1
+      damage5: 1
   mace:
     weight: 5
     adjective1:
       none: 5
       fine: 5
+    adjective2:
+      none: 7
+      weapon_accuracy5: 1
+      acid5: 1
+      cold5: 1
+      fire5: 1
+      shock5: 1
+      crits5: 1
+      damage5: 1
   morningstar:
     weight: 3
     adjective1:
       none: 5
       fine: 5
+    adjective2:
+      none: 7
+      weapon_accuracy5: 1
+      acid5: 1
+      cold5: 1
+      fire5: 1
+      shock5: 1
+      crits5: 1
+      damage5: 1
   quarterstaff:
     weight: 8
     adjective1:
       none: 5
       fine: 5
+    adjective2:
+      none: 7
+      weapon_accuracy5: 1
+      acid5: 1
+      cold5: 1
+      fire5: 1
+      shock5: 1
+      crits5: 1
+      damage5: 1
   druid_staff:
     weight: 8
     adjective1:
       none: 5
       fine: 5
+    adjective2:
+      none: 7
+      weapon_accuracy5: 1
+      acid5: 1
+      cold5: 1
+      fire5: 1
+      shock5: 1
+      crits5: 1
+      damage5: 1
   shortbow:
     weight: 5
     adjective1:
       none: 5
       fine: 5
+    adjective2:
+      none: 7
+      ranged_accuracy5: 1
+      acid5: 1
+      cold5: 1
+      fire5: 1
+      shock5: 1
+      crits5: 1
+      damage5: 1
   shortspear:
     weight: 8
     adjective1:
       none: 5
       fine: 5
+    adjective2:
+      none: 7
+      weapon_accuracy5: 1
+      acid5: 1
+      cold5: 1
+      fire5: 1
+      shock5: 1
+      crits5: 1
+      damage5: 1
   shortsword:
     weight: 5
     adjective1:
       none: 5
       fine: 5
+    adjective2:
+      none: 7
+      weapon_accuracy5: 1
+      acid5: 1
+      cold5: 1
+      fire5: 1
+      shock5: 1
+      crits5: 1
+      damage5: 1
   warhammer:
     weight: 5
     adjective1:
       none: 5
       fine: 5
+    adjective2:
+      none: 7
+      weapon_accuracy5: 1
+      acid5: 1
+      cold5: 1
+      fire5: 1
+      shock5: 1
+      crits5: 1
+      damage5: 1
   sickle:
     weight: 8
     adjective1:
       none: 5
       fine: 5
+    adjective2:
+      none: 7
+      weapon_accuracy5: 1
+      acid5: 1
+      cold5: 1
+      fire5: 1
+      shock5: 1
+      crits5: 1
+      damage5: 1
   sabre:
     weight: 3
     adjective1:
       none: 5
       fine: 5
+    adjective2:
+      none: 7
+      weapon_accuracy5: 1
+      acid5: 1
+      cold5: 1
+      fire5: 1
+      shock5: 1
+      crits5: 1
+      damage5: 1
   scimitar:
     weight: 2
     adjective1:
       none: 5
       fine: 5
+    adjective2:
+      none: 7
+      weapon_accuracy5: 1
+      acid5: 1
+      cold5: 1
+      fire5: 1
+      shock5: 1
+      crits5: 1
+      damage5: 1
   halberd:
     weight: 2
     adjective1:
       none: 5
       fine: 5
+    adjective2:
+      none: 7
+      weapon_accuracy5: 1
+      acid5: 1
+      cold5: 1
+      fire5: 1
+      shock5: 1
+      crits5: 1
+      damage5: 1
   glaive:
     weight: 2
     adjective1:
       none: 5
       fine: 5
+    adjective2:
+      none: 7
+      weapon_accuracy5: 1
+      acid5: 1
+      cold5: 1
+      fire5: 1
+      shock5: 1
+      crits5: 1
+      damage5: 1

@@ -1,10 +1,10 @@
-id: worn
-name: Worn
-name_prefix: "Worn "
-item_status_icon: gui/status_negative
-value_modifier: 0.6
+id: rusty
+name: Rusty
+name_prefix: "Rusty "
+item_status_icon: gui/status_negative_quality
+value_modifier: 0.5
 bonus_modifier: 0.9
-penalty_modifier: 1.10
+penalty_modifier: 1.1
 attack_damage_modifier: 0.9
 attack_bonus_modifier: 0.9
 attack_penalty_modifier: 1.1

@@ -1,9 +1,9 @@
-id: will5
-name: Will
-name_postfix: " of Will"
-item_status_icon: gui/status_will
+id: fortitude5
+name: Fortitude
+name_postfix: " of Fortitude"
+item_status_icon: gui/status_fortitude
 value_modifier: 1.2
-value_add: 50
+value_add: 500
 bonus_modifier: 1.0
 penalty_modifier: 1.0
 attack_damage_modifier: 1.0
@@ -11,5 +11,5 @@ attack_bonus_modifier: 1.0
 attack_penalty_modifier: 1.0
 bonuses:
   - kind:
-      will: 5
+      fortitude: 5
 attack_bonuses: {}

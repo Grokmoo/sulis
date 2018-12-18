@@ -8,10 +8,10 @@ prereqs:
   total_level: 3
 bonuses:
   - kind:
-      flanking_angle: -30
+      flanking_angle: 30
 upgrades:
   - description: |
       You are able to flank from an even greater range of positions.
     bonuses:
       - kind:
-          flanking_angle: -30
+          flanking_angle: 30

@@ -1006,7 +1006,7 @@ children:
           [s=6;x=0;y=46|Accuracy]
           [s=5|[x=0|Melee: #melee_accuracy#][x=28|Ranged: #ranged_accuracy#][x=56|Spell: #spell_accuracy#]]
           [s=4|
-          ][s=6.0;x=0|Armor: #armor#][?armor_slashing;s=5.0| (Slashing: #armor_slashing#)][?armor_piercing;s=5.0| (Piercing: #armor_piercing#)][?armor_crushing;s=5.0| (Crushing: #armor_crushing#)][?armor_acid;s=5.0| (Acid: #armor_acid#)][?armor_cold;s=5.0| (Cold: #armor_cold#)][?armor_electrical;s=5.0| (Electrical: #armor_electrical#)][?armor_fire;s=5.0| (Fire: #armor_fire#)]
+          ][s=6.0;x=0|Armor: #armor#][?armor_slashing;s=5.0| (Slashing: #armor_slashing#)][?armor_piercing;s=5.0| (Piercing: #armor_piercing#)][?armor_crushing;s=5.0| (Crushing: #armor_crushing#)][?armor_acid;s=5.0| (Acid: #armor_acid#)][?armor_cold;s=5.0| (Cold: #armor_cold#)][?armor_electrical;s=5.0| (Shock: #armor_electrical#)][?armor_fire;s=5.0| (Fire: #armor_fire#)]
           [s=5|[x=0|Defense: #defense#][x=28|Fortitude: #fortitude#][x=56|Reflex: #reflex#][x=84|Will: #will#]]
           [s=4|
           ][s=6;y=70|[x=0|Strength][r=30|#str#]
@@ -1020,14 +1020,14 @@ children:
           [x=60;s=5|Caster level[x=90|#caster_level#]]
           [x=60;s=5|Initiative[x=90|#initiative#]]
           [x=60;s=5|Movement Rate[x=90|#movement_rate#]]
-          [x=60;s=5|Flanking Angle[x=90|#flanking_angle#]]
+          [x=60;s=5|Flanking Angle[x=90|#flanking_angle#]°]
           [x=60;s=5|Concealment[x=90|#concealment#]]
           [x=60;s=5|Concealment Ignore[x=90|#concealment_ignore#]]
           
           [y=100;x=0|Graze][x=20|Hit][x=40|Crit]
           [x=0|#graze_threshold# / x#graze_multiplier#][x=20|#hit_threshold# / x#hit_multiplier#][x=40|#crit_chance#% /  x#crit_multiplier#]
 
-          [y=110;s=6|Resistances ][s=5|[?resistance_slashing|(Slashing: #resistance_slashing#%) ][?resistance_piercing|(Piercing: #resistance_piercing#%) ][?resistance_crushing|(Crushing: #resistance_crushing#%) ][?resistance_acid|(Acid: #resistance_acid#%) ][?resistance_cold|(Cold: #resistance_cold#%) ][?resistance_electrical|(Electrical: #resistance_electrical#%) ][?resistance_fire|(Fire: #resistance_fire#%) ]]
+          [y=110;s=6|Resistances ][s=5|[?resistance_slashing|(Slashing: #resistance_slashing#%) ][?resistance_piercing|(Piercing: #resistance_piercing#%) ][?resistance_crushing|(Crushing: #resistance_crushing#%) ][?resistance_acid|(Acid: #resistance_acid#%) ][?resistance_cold|(Cold: #resistance_cold#%) ][?resistance_electrical|(Shock: #resistance_electrical#%) ][?resistance_fire|(Fire: #resistance_fire#%) ]]
           
           [?portrait;x=64;y=-3;i=#portrait#;s=40.0|]
           [?portrait;x=64;y=-3;i=portraits/frame;s=40.0|]]
@@ -1324,13 +1324,13 @@ children:
       ][?prereqs_not_met;c=f00|Prereqs not Met
       ][?prof_not_met;s=5.0;c=f00|Proficiency Not Met
       ][?slot_disabled_for_race;s=5.0;c=f00|Not Usable by #player_race#
-      ][?any_armor|[s=6.0|Armor: ][?armor;s=6.0|#armor#][?armor_slashing;s=5.0| (Slashing: #armor_slashing#)][?armor_piercing;s=5.0| (Piercing: #armor_piercing#)][?armor_crushing;s=5.0| (Crushing: #armor_crushing#)][?armor_acid;s=5.0| (Acid: #armor_acid#)][?armor_cold;s=5.0| (Cold: #armor_cold#)][?armor_electrical;s=5.0| (Electrical: #armor_electrical#)][?armor_fire;s=5.0| (Fire: #armor_fire#)]
+      ][?any_armor|[s=6.0|Armor: ][?armor;s=6.0|#armor#][?armor_slashing;s=5.0| (Slashing: #armor_slashing#)][?armor_piercing;s=5.0| (Piercing: #armor_piercing#)][?armor_crushing;s=5.0| (Crushing: #armor_crushing#)][?armor_acid;s=5.0| (Acid: #armor_acid#)][?armor_cold;s=5.0| (Cold: #armor_cold#)][?armor_electrical;s=5.0| (Shock: #armor_electrical#)][?armor_fire;s=5.0| (Fire: #armor_fire#)]
       ][?resistance_slashing|Slashing Resistance #resistance_slashing#%
       ][?resistance_piercing|Piercing Resistance #resistance_piercing#%
       ][?resistance_crushing|Crushing Resistance #resistance_crushing#%
       ][?resistance_acid|Acid Resistance #resistance_acid#%
       ][?resistance_cold|Cold Resistance #resistance_cold#%
-      ][?resistance_electrical|Electrical Resistance #resistance_electrical#%
+      ][?resistance_electrical|Shock Resistance #resistance_electrical#%
       ][?resistance_fire|Fire Resistance #resistance_fire#%
       ][?any_accuracy|[s=6|Accuracy:][?melee_accuracy| (Melee #melee_accuracy#)][?ranged_accuracy| (Ranged: #ranged_accuracy#)][?spell_accuracy| (Spell: #spell_accuracy#)]
       ][?ability_group_0|#ability_group_0# ability uses per encounter: #ability_group_0_uses_per_encounter#
@@ -1380,7 +1380,7 @@ children:
       ][?graze_multiplier|Graze Multiplier: #graze_multiplier#
       ][?movement_rate|Movement Rate: #movement_rate#
       ][?attack_cost|Attack Cost: #attack_cost#
-      ][?flanking_angle|Flanking Angle: #flanking_angle#
+      ][?flanking_angle|Flanking Angle: #flanking_angle#°
       ][?move_disabled|Movement Disabled
       ][?attack_disabled|Attack Disabled
       ][?abilities_disabled|Abilities Disabled

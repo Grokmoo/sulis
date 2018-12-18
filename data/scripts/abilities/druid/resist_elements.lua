@@ -7,7 +7,7 @@ function on_activate(parent, ability)
   effect:add_resistance(amount, "Fire")
   effect:add_resistance(amount, "Cold")
   effect:add_resistance(amount, "Acid")
-  effect:add_resistance(amount, "Electrical")
+  effect:add_resistance(amount, "Shock")
 
   gen = parent:create_particle_generator("wind_particle", duration)
   setup_anim(gen)

@@ -158,7 +158,7 @@ pub enum DamageKind {
     Crushing,
     Acid,
     Cold,
-    Electrical,
+    Shock,
     Fire,
     Raw,
 }
@@ -168,7 +168,7 @@ use crate::DamageKind::*;
 // This array MUST be in the same order as the ordering on the DamageKind enum
 // This is top to bottom declaration order for derived.
 const DAMAGE_KINDS: [DamageKind; 8] = [Slashing, Piercing, Crushing, Acid, Cold,
-    Electrical, Fire, Raw];
+    Shock, Fire, Raw];
 
 impl DamageKind {
     pub fn iter() -> Iter<'static, DamageKind> {
@@ -183,7 +183,7 @@ impl DamageKind {
             &Crushing => 2,
             &Acid => 3,
             &Cold => 4,
-            &Electrical => 5,
+            &Shock => 5,
             &Fire => 6,
             &Raw => 7,
         }
@@ -196,7 +196,7 @@ impl DamageKind {
             "Crushing" => DamageKind::Crushing,
             "Acid" => DamageKind::Acid,
             "Cold" => DamageKind::Cold,
-            "Electrical" => DamageKind::Electrical,
+            "Shock" => DamageKind::Shock,
             "Fire" => DamageKind::Fire,
             "Raw" => DamageKind::Raw,
             _ => {
@@ -213,7 +213,7 @@ impl DamageKind {
             &Crushing => "Crushing",
             &Acid => "Acid",
             &Cold => "Cold",
-            &Electrical => "Electrical",
+            &Shock => "Shock",
             &Fire => "Fire",
             &Raw => "Raw",
         }

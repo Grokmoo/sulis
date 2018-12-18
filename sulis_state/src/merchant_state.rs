@@ -39,8 +39,9 @@ impl MerchantState {
     pub fn load(save: MerchantSaveState) -> Result<MerchantState, Error> {
         let mut items = ItemList::new();
         for item_save in save.items {
-            let item = match Module::item(&item_save.item.id) {
-                None => invalid_data_error(&format!("No item with ID '{}'", item_save.item.id)),
+            let item = item_save.item;
+            let item = match Module::create_get_item(&item.id, &item.adjectives) {
+                None => invalid_data_error(&format!("No item with ID '{}'", item.id)),
                 Some(item) => Ok(item),
             }?;
 
@@ -89,6 +90,9 @@ impl MerchantState {
 
         let mgr = GameState::turn_manager();
         let cur_millis = mgr.borrow().total_elapsed_millis();
+        info!("Check merchant '{}' refresh with current millis: {}, \
+              refresh rate: {}, last_refresh: {}", self.id, cur_millis,
+              self.refresh_rate_millis, self.last_refresh_millis);
         if cur_millis < self.last_refresh_millis + self.refresh_rate_millis {
             return;
         }

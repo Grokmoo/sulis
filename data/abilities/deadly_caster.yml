@@ -2,7 +2,7 @@ id: deadly_caster
 name: "Deadly Caster"
 icon: abilities/deadly_caster
 description: |
-  Your spells of all energy types - Acid, Cold, Electrical, and Fire - do a small amount of additional damage.
+  Your spells of all energy types - Acid, Cold, Shock, and Fire - do a small amount of additional damage.
 bonuses:
   - kind:
       damage: { min: 2, max: 3 }
@@ -15,7 +15,7 @@ bonuses:
   - kind:
       damage: { min: 2, max: 3 }
     when:
-      AttackWithDamageKind: Electrical
+      AttackWithDamageKind: Shock
   - kind:
       damage: { min: 2, max: 3 }
     when:

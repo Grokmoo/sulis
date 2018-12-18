@@ -235,15 +235,17 @@ impl LootList {
 
             let roll = rand::thread_rng().gen_range(0, 100);
             if roll < entry.weight {
-                let mult_quantity = if entry.quantity[0] == entry.quantity[1] {
+                let times  = if entry.quantity[0] == entry.quantity[1] {
                     entry.quantity[0]
                 } else {
                     rand::thread_rng().gen_range(entry.quantity[0], entry.quantity[1] + 1)
                 };
 
-                let subitems = sub_list.generate_internal(depth + 1);
-                for (quantity, item) in subitems {
-                    items.push((quantity * mult_quantity, item));
+                for _ in 0..times {
+                    let subitems = sub_list.generate_internal(depth + 1);
+                    for (quantity, item) in subitems {
+                        items.push((quantity, item));
+                    }
                 }
             }
         }

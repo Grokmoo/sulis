@@ -1,9 +1,9 @@
-id: defense5
-name: Defense
-name_postfix: " of Defense"
-item_status_icon: gui/status_defense
+id: concealment5
+name: Concealment
+name_postfix: " of Concealment"
+item_status_icon: gui/status_darkness
 value_modifier: 1.2
-value_add: 80
+value_add: 500
 bonus_modifier: 1.0
 penalty_modifier: 1.0
 attack_damage_modifier: 1.0
@@ -11,5 +11,5 @@ attack_bonus_modifier: 1.0
 attack_penalty_modifier: 1.0
 bonuses:
   - kind:
-      defense: 5
+      concealment: 5
 attack_bonuses: {}

@@ -1,9 +1,9 @@
-id: concealment5
-name: Concealment
-name_postfix: " of Concealment"
-item_status_icon: gui/status_darkness
+id: flanking5
+name: Flanking
+name_postfix: " of Flanking"
+item_status_icon: gui/status_flanking
 value_modifier: 1.2
-value_add: 100
+value_add: 500
 bonus_modifier: 1.0
 penalty_modifier: 1.0
 attack_damage_modifier: 1.0
@@ -11,5 +11,5 @@ attack_bonus_modifier: 1.0
 attack_penalty_modifier: 1.0
 bonuses:
   - kind:
-      concealment: 5
+      flanking_angle: 15
 attack_bonuses: {}

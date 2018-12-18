@@ -1,0 +1,12 @@
+id: exceptional
+name: Exceptional
+name_prefix: "Exceptional "
+item_status_icon: gui/status_exceptional
+value_modifier: 6.0
+bonus_modifier: 1.25
+penalty_modifier: 0.75
+attack_damage_modifier: 1.25
+attack_bonus_modifier: 1.25
+attack_penalty_modifier: 0.75
+bonuses: []
+attack_bonuses: {}

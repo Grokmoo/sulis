@@ -1,0 +1,12 @@
+id: masterwork
+name: Masterwork
+name_prefix: "Masterwork "
+item_status_icon: gui/status_masterwork
+value_modifier: 12.0
+bonus_modifier: 1.5
+penalty_modifier: 0.5
+attack_damage_modifier: 1.5
+attack_bonus_modifier: 1.5
+attack_penalty_modifier: 0.5
+bonuses: []
+attack_bonuses: {}

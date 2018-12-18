@@ -1,9 +1,9 @@
-id: perception1
-name: Perception
-name_postfix: " of Perception"
-item_status_icon: gui/status_perception
+id: initiative1
+name: Initiative
+name_postfix: " of Initiative"
+item_status_icon: gui/status_initiative
 value_modifier: 1.2
-value_add: 1000
+value_add: 500
 bonus_modifier: 1.0
 penalty_modifier: 1.0
 attack_damage_modifier: 1.0
@@ -11,5 +11,5 @@ attack_bonus_modifier: 1.0
 attack_penalty_modifier: 1.0
 bonuses:
   - kind:
-      attribute: { attribute: Perception, amount: 1 }
+      initiative: 1
 attack_bonuses: {}

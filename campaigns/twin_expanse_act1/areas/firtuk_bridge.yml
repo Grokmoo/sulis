@@ -71,13 +71,13 @@ props:
       x: 34
       y: 39
     items: []
-    enabled: true
+    enabled: false
   - id: barricade
     location:
       x: 34
       y: 41
     items: []
-    enabled: true
+    enabled: false
   - id: transition_hint
     location:
       x: 68

@@ -1,7 +1,14 @@
 id: firtuk_bridge_guard
 initial_nodes:
+  - id: open_bridge
+    to_view:
+      - target_flag: open_bridge_complete
   - id: start01
 nodes:
+  open_bridge:
+    text: |
+      You are free to access the city.
+    responses: []
   start01:
     text: |
       [c=888|The guard eyes you suspciously.]
@@ -31,10 +38,23 @@ nodes:
       - text: "I'll just be leaving, then."
   has_pass:
     text: |
-      [c=f00|Rose Lake and the associated content is still under development.  Please keep an eye out for a new version in the coming months.]
+      [c=888|The guard looks surprised.]
+      
+      Seems to be authentic.  You can pass.
     responses:
       - text: "[c=888|Continue]"
-        to: main
+        to: has_pass2
+  has_pass2:
+    text: |
+      Just don't cause any trouble.
+    on_view:
+      - fire_script:
+          id: firtuk_bridge
+          func: open_bridge
+    responses:
+      - text: "Thanks, farewell."
+        on_select:
+          - target_flag: open_bridge_complete
   ask_why:
     text: |
       Trouble in the city.  I'm afraid I can't say any more.  Our orders come directly from the Council of Five.

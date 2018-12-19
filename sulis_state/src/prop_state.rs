@@ -123,8 +123,23 @@ impl PropState {
     pub(crate) fn load_interactive(&mut self, interactive: PropInteractiveSaveState)
         -> Result<(), Error>{
         match interactive {
-            PropInteractiveSaveState::Not => { self.interactive = Interactive::Not; },
+            PropInteractiveSaveState::Not => {
+                // the base prop interactive must match, if not don't load this.
+                // this is for save compat.
+                match self.prop.interactive {
+                    prop::Interactive::Not => (),
+                    _ => return Ok(()),
+                }
+                self.interactive = Interactive::Not;
+            },
             PropInteractiveSaveState::Container { loot_to_generate, temporary, items } => {
+                // the base prop interactive must match, if not don't load this.
+                // this is for save compat.
+                match self.prop.interactive {
+                    prop::Interactive::Container { .. } => (),
+                    _ => return Ok(()),
+                }
+
                 let mut item_list = ItemList::new();
                 for item_save_state in items {
                     let item = &item_save_state.item;
@@ -153,9 +168,14 @@ impl PropState {
                 };
             },
             PropInteractiveSaveState::Door { open } => {
-                self.interactive = Interactive::Door {
-                    open
-                };
+                // the base prop interactive must match, if not don't load this.
+                // this is for save compat.
+                match self.prop.interactive {
+                    prop::Interactive::Door { .. } => (),
+                    _ => return Ok(()),
+                }
+
+                self.interactive = Interactive::Door { open };
 
                 if open {
                     self.animation_state.add(animation_state::Kind::Active);
@@ -164,6 +184,13 @@ impl PropState {
                 }
             },
             PropInteractiveSaveState::Hover { text } => {
+                // the base prop interactive must match, if not don't load this.
+                // this is for save compat.
+                match self.prop.interactive {
+                    prop::Interactive::Hover { .. } => (),
+                    _ => return Ok(()),
+                }
+
                 self.interactive = Interactive::Hover { text: text.clone() };
             },
         }

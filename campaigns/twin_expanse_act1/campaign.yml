@@ -124,6 +124,8 @@ world_map:
       position: [9.75, 5.5]
       icon: city01
       initially_enabled: false
+      linked_area: rose_lake
+      linked_area_pos: [2, 122]
       travel_times:
         wellswood: 24
         wellswood_forest: 36

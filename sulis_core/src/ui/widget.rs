@@ -412,7 +412,20 @@ impl Widget {
 
     pub fn update(root: &Rc<RefCell<Widget>>, millis: u32) -> Result<(), Error> {
         Widget::update_kind_recursive(&root, millis);
+
+        let mut find_new_modal = false;
+        if let Some(ref child) = root.borrow().modal_child {
+            if child.borrow().marked_for_removal {
+                find_new_modal = true;
+            }
+        }
+
         Widget::check_children_removal(&root);
+
+        if find_new_modal {
+            let modal = Widget::find_new_modal_child(root);
+            root.borrow_mut().modal_child = modal;
+        }
 
         Widget::check_readd(&root);
         Widget::check_children(&root)?;
@@ -467,19 +480,23 @@ impl Widget {
         widget_ref.kind.borrow_mut().on_remove();
     }
 
-    pub fn check_children_removal(parent: &Rc<RefCell<Widget>>) {
-        let mut remove_modal = false;
-        if let Some(ref w) = parent.borrow().modal_child {
-            if w.borrow().marked_for_removal {
-                remove_modal = true;
+    fn find_new_modal_child(parent: &Rc<RefCell<Widget>>) -> Option<Rc<RefCell<Widget>>> {
+        let len = parent.borrow().children.len();
+        for i in (0..len).rev() {
+            let child = Rc::clone(&parent.borrow().children[i]);
+            if child.borrow().state.is_modal {
+                return Some(child);
+            }
+
+            if let Some(child) = Widget::find_new_modal_child(&child) {
+                return Some(child);
             }
         }
 
-        if remove_modal {
-            trace!("Removing modal widget.");
-            parent.borrow_mut().modal_child = None;
-        }
+        None
+    }
 
+    pub fn check_children_removal(parent: &Rc<RefCell<Widget>>) {
         parent.borrow_mut().children.retain(|widget| {
             let widget_ref = widget.borrow();
             if widget_ref.marked_for_removal {

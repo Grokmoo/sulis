@@ -19,7 +19,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_core::ui::{Widget, WidgetKind, theme, Callback};
-use sulis_core::io::{event};
+use sulis_core::io::{event, InputAction};
 use sulis_widgets::{Label, TextArea};
 use sulis_module::{Actor, OnTrigger, MerchantData, Conversation,
     conversation::{Response}, Module, on_trigger::{self, Kind}};
@@ -59,21 +59,19 @@ impl DialogWindow {
 impl WidgetKind for DialogWindow {
     widget_kind!(NAME);
 
-    // TODO support finding an old modal when a new one is removed to allow for this
-    // to work and still keep the dialog window modal
-    // fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
-    //     let root = Widget::get_root(widget);
-    //     let view = Widget::downcast_kind_mut::<RootView>(&root);
-    //
-    //     use sulis_core::io::InputAction::*;
-    //     match key {
-    //         ShowMenu => view.show_menu(&root),
-    //         Exit => view.show_exit(&root),
-    //         _ => return false,
-    //     }
-    //
-    //     true
-    // }
+    fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
+        let root = Widget::get_root(widget);
+        let view = Widget::downcast_kind_mut::<RootView>(&root);
+
+        use sulis_core::io::InputAction::*;
+        match key {
+            ShowMenu => view.show_menu(&root),
+            Exit => view.show_exit(&root),
+            _ => return false,
+        }
+
+        true
+    }
 
     fn on_remove(&mut self) {
         self.entity.borrow_mut().actor.listeners.remove(NAME);

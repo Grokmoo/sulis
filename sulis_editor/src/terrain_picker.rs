@@ -426,7 +426,7 @@ impl WidgetKind for TerrainPicker {
             button.borrow_mut().state.add_text_arg("icon", &base_tile_id);
 
             let cb: Callback = Callback::new(Rc::new(move |widget, _| {
-                let parent = Widget::go_up_tree(widget, 2);
+                let parent = Widget::get_parent(widget);
                 let cur_state = widget.borrow_mut().state.is_active();
                 if !cur_state {
                     for child in parent.borrow_mut().children.iter() {
@@ -434,7 +434,7 @@ impl WidgetKind for TerrainPicker {
                     }
                     widget.borrow_mut().state.set_active(true);
 
-                    let parent = Widget::get_parent(&parent);
+                    let parent = Widget::go_up_tree(&parent, 2);
                     let terrain_picker = Widget::downcast_kind_mut::<TerrainPicker>(&parent);
                     terrain_picker.cur_terrain = Some(i);
                 }

@@ -2,7 +2,8 @@ id: tileset
 wall_rules:
   grid_width: 2
   grid_height: 2
-  layers: [ "walls", "walls_top", "walls_aerial" ]
+  up_layers: [ "walls_top", "walls_aerial" ]
+  down_layers: [ "walls" ]
   prefix: "tileset/"
   edges:
     inner_edge_postfix: "_inner_edge_"

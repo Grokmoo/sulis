@@ -66,7 +66,8 @@ pub struct TileBuilder {
 pub struct WallRules {
     pub grid_width: u32,
     pub grid_height: u32,
-    pub layers: Vec<String>,
+    pub up_layers: Vec<String>,
+    pub down_layers: Vec<String>,
     pub prefix: String,
     pub edges: EdgeRules,
 }

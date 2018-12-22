@@ -354,12 +354,20 @@ impl EditorMode for WallPicker {
         let x_min = if x % 2 == 0 { x } else { x + 1 };
         let y_min = if y % 2 == 0 { y } else { y + 1 };
 
-        for layer in self.wall_rules.layers.iter() {
+        for layer in self.wall_rules.down_layers.iter() {
+            model.remove_tiles_within(layer,
+                                      x_min - 3 * self.grid_width,
+                                      y_min,
+                                      (self.brush_size + 6) * self.grid_width,
+                                      self.brush_size * self.grid_height);
+        }
+
+        for layer in self.wall_rules.up_layers.iter() {
             model.remove_tiles_within(layer,
                                       x_min - 3 * self.grid_width,
                                       y_min - 3 * self.grid_height,
                                       (self.brush_size + 6) * self.grid_width,
-                                      (self.brush_size + 6) * self.grid_height);
+                                      self.brush_size * self.grid_height);
         }
 
         for yi in 0..self.brush_size {
@@ -391,7 +399,8 @@ impl EditorMode for WallPicker {
         let x_min = if x % 2 == 0 { x } else { x + 1 };
         let y_min = if y % 2 == 0 { y } else { y + 1 };
 
-        for layer in self.wall_rules.layers.iter() {
+        let iter = self.wall_rules.up_layers.iter().chain(self.wall_rules.down_layers.iter());
+        for layer in iter {
             model.remove_tiles_within(layer, x_min, y_min,
                                       self.brush_size * self.grid_width,
                                       self.brush_size * self.grid_height);

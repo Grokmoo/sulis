@@ -23,7 +23,7 @@ use std::cell::RefCell;
 
 use sulis_core::config::Config;
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_widgets::{Button, Label, list_box, ListBox};
+use sulis_widgets::{Button, Label, list_box, ListBox, ScrollPane};
 
 use crate::AreaEditor;
 
@@ -80,7 +80,8 @@ impl WidgetKind for LoadWindow {
             let entry = list_box::Entry::new(area, Some(cb.clone()));
             entries.push(entry);
         }
-        let areas_list = Widget::with_theme(ListBox::new(entries), "areas_list");
+        let scrollpane = ScrollPane::new();
+        let areas_list = Widget::with_theme(ListBox::new(entries), "listbox");
 
         let area_editor_ref = Rc::clone(&self.area_editor);
         let areas_list_ref = Rc::clone(&areas_list);
@@ -98,8 +99,9 @@ impl WidgetKind for LoadWindow {
             let parent = Widget::get_parent(widget);
             parent.borrow_mut().mark_for_removal();
         })));
+        scrollpane.borrow().add_to_content(areas_list);
 
-        vec![title, close, areas_list, load]
+        vec![title, close, load, Widget::with_theme(scrollpane, "areas_list")]
     }
 }
 

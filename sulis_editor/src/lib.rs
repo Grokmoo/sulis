@@ -200,12 +200,12 @@ impl WidgetKind for EditorView {
 
             let transitions = Widget::with_theme(Button::empty(), "transitions");
 
+            let top_bar_ref = Rc::clone(&top_bar);
             let area_editor_kind_ref = Rc::clone(&area_editor_kind);
             transitions.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
                 let root = Widget::get_root(widget);
                 let transition_window = Widget::with_defaults(
-                    TransitionWindow::new(Rc::clone(&area_editor_kind_ref)));
-                transition_window.borrow_mut().state.set_modal(true);
+                    TransitionWindow::new(Rc::clone(&area_editor_kind_ref), Rc::clone(&top_bar_ref)));
                 Widget::add_child_to(&root, transition_window);
             })));
 

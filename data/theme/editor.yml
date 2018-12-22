@@ -556,13 +556,17 @@ children:
       transition_window:
         from: .window
         background: bg_medium
+        border: [1, 1, 1, 1]
         height_relative: Zero
-        preferred_size: [160, 80]
-        x_relative: Center
-        y_relative: Max
+        preferred_size: [130, 80]
+        position: [0, 0]
+        x_relative: Max
         children:
           title:
             text: "Transition Editor"
+            position: [0, 0]
+          close:
+            position: [0, 0]
           apply_button:
             from: .button
             preferred_size: [16, 6]
@@ -574,16 +578,16 @@ children:
             preferred_size: [16, 6]
             text: "New"
             y_relative: Max
-            position: [65, 0]
+            position: [50, 0]
           delete_button:
             from: .button
             preferred_size: [16, 6]
             text: "Delete"
             y_relative: Max
-            position: [85, 0]
+            position: [70, 0]
           transitions_list:
             from: .list_box
-            preferred_size: [60, -5]
+            preferred_size: [50, -5]
             position: [0, 5]
             height_relative: Max
             width_relative: Zero
@@ -591,119 +595,192 @@ children:
             from: .button
             text: "Cur Area"
             preferred_size: [20, 8]
-            position: [68, 10]
+            position: [53, 10]
           area_button:
             from: .button
             text: "Other Area"
             preferred_size: [20, 8]
-            position: [90, 10]
+            position: [75, 10]
           world_map_button:
             from: .button
             text: "World Map"
             preferred_size: [20, 8]
-            position: [112, 10]
+            position: [97, 10]
           from_label:
             from: .label
             text: "From Point"
             text_params:
               horizontal_alignment: Right
             preferred_size: [8, 12]
-            position: [68, 20]
+            position: [53, 20]
           to_label:
             from: .label
             text: "To Point"
             text_params:
               horizontal_alignment: Right
             preferred_size: [16, 12]
-            position: [68, 35]
+            position: [53, 35]
           to_area_label:
             from: .label
             text: "To Area ID"
             text_params:
               horizontal_alignment: Right
             preferred_size: [16, 6]
-            position: [68, 50]
+            position: [53, 50]
           from_x:
             from: .spinner
-            position: [88, 20]
+            position: [73, 20]
           from_y:
             from: .spinner
-            position: [108, 20]
+            position: [93, 20]
           to_x:
             from: .spinner
-            position: [88, 35]
+            position: [73, 35]
           to_y:
             from: .spinner
-            position: [108, 35]
+            position: [93, 35]
           to_area:
             from: .input_field
-            preferred_size: [60, 6]
-            position: [88, 50]
+            preferred_size: [50, 6]
+            position: [73, 50]
       load_window:
         from: .window
         height_relative: Zero
-        preferred_size: [84, 84]
+        preferred_size: [84, 74]
         x_relative: Center
         y_relative: Center
         children:
           title:
             text: "Load Area"
           areas_list:
-            from: .list_box
-            preferred_size: [68, 56]
+            preferred_size: [68, 46]
             position: [4, 8]
-            height_relative: Zero
-            width_relative: Zero
+            children:
+              scrollbar:
+                from: .scrollbar
+              content:
+                width_relative: Max
+                height_relative: Max
+                children:
+                  listbox:
+                    from: .list_box
+                    width_relative: Max
           load_button:
             from: .button
             preferred_size: [16, 4]
-            position: [56, 68]
+            position: [56, 58]
             text: "Load"
       save_window:
         from: .window
         height_relative: Zero
-        preferred_size: [124, 48]
+        preferred_size: [124, 90]
         x_relative: Center
         y_relative: Center
         children:
+          field_box:
+            width_relative: Max
+            preferred_size: [0, 6]
+            children:
+              label:
+                from: .label
+                text_params:
+                  horizontal_alignment: Right
+                height_relative: Max
+                preferred_size: [28, 0]
+              input_field:
+                from: .input_field
+                height_relative: Max
+                width_relative: Max
+                x_relative: Max
+                preferred_size: [-30, 0]
           title:
             text: "Save Area"
-          id_label:
-            from: .label
-            text: "ID"
-            position: [0, 12]
-            preferred_size: [20, 4]
-            text_params:
-              horizontal_alignment: Right
-          id_field:
-            from: .input_field
-            preferred_size: [80, 4]
-            position: [24, 12]
-          name_label:
-            from: .label
-            text: "Name"
-            position: [0, 20]
-            preferred_size: [20, 4]
-            text_params:
-              horizontal_alignment: Right
-          name_field:
-            from: .input_field
-            preferred_size: [80, 4]
-            position: [24, 20]
-          filename_label:
-            from: .label
-            text: "Filename:"
-            position: [0, 28]
-            preferred_size: [20, 4]
-            text_params:
-              horizontal_alignment: Right
-          filename_field:
-            from: .input_field
-            preferred_size: [80, 4]
-            position: [24, 28]
           save_button:
             from: .button
-            preferred_size: [16, 4]
-            position: [44, 36]
+            preferred_size: [25, 6]
+            position: [0, 4]
+            x_relative: Center
+            y_relative: Max
             text: "Save"
+          content:
+            width_relative: Max
+            height_relative: Max
+            children:
+              id:
+                from: .editor.save_window.field_box
+                position: [0, 8]
+                children:
+                  label:
+                    text: "ID"
+              name:
+                from: .editor.save_window.field_box
+                position: [0, 16]
+                children:
+                  label:
+                    text: "Name"
+              filename:
+                from: .editor.save_window.field_box
+                position: [0, 24]
+                children:
+                  label:
+                    text: "Filename"
+              location_kind:
+                position: [30, 32]
+                layout: BoxHorizontal
+                layout_spacing: { right: 1 }
+                width_relative: Max
+                preferred_size: [-30, 6]
+                children:
+                  button:
+                    from: .button
+                    text: "#name#"
+                    preferred_size: [25, 6]
+              vis_dist:
+                position: [0, 40]
+                preferred_size: [0, 14]
+                width_relative: Max
+                children:
+                  vis_dist_label:
+                    from: .label
+                    text: "Vis Dist"
+                    text_params:
+                      horizontal_alignment: Right
+                    height_relative: Max
+                    preferred_size: [28, 0]
+                    position: [0, 0]
+                  vis_dist_spinner:
+                    from: .spinner
+                    position: [30, 0]
+                  vis_dist_up_label:
+                    from: .label
+                    text: "Vis Up One Dist"
+                    text_params:
+                      horizontal_alignment: Right
+                    height_relative: Max
+                    preferred_size: [38, 0]
+                    position: [50, 0]
+                  vis_dist_up_spinner:
+                    from: .spinner
+                    position: [90, 0]
+              world_map_location:
+                from: .editor.save_window.field_box
+                position: [0, 54]
+                children:
+                  label:
+                    text: "World Map Location"
+              on_rest:
+                position: [0, 62]
+                preferred_size: [0, 8]
+                width_relative: Max
+                children:
+                  disabled:
+                    from: .button
+                    text: "Disabled"
+                    preferred_size: [25, 6]
+                    position: [30, 0]
+                  fire_script:
+                    from: .button
+                    text: "Fire Script"
+                    preferred_size: [25, 6]
+                    position: [56, 0]
 ...

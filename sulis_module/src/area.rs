@@ -311,6 +311,13 @@ pub enum LocationKind {
     Underground,
 }
 
+impl LocationKind {
+    pub fn iter() -> impl Iterator<Item=&'static LocationKind> {
+        use crate::area::LocationKind::*;
+        [ Outdoors, Indoors, Underground].into_iter()
+    }
+}
+
 #[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
 pub enum OnRest {

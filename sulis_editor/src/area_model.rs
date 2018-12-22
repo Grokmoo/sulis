@@ -47,10 +47,11 @@ pub struct AreaModel {
     id: String,
     name: String,
     filename: String,
-    max_vis_distance: i32,
-    max_vis_up_one_distance: i32,
-    world_map_location: Option<String>,
-    on_rest: OnRest,
+    pub max_vis_distance: i32,
+    pub max_vis_up_one_distance: i32,
+    pub world_map_location: Option<String>,
+    pub location_kind: LocationKind,
+    pub on_rest: OnRest,
 
     terrain_kinds: Vec<TerrainTiles>,
     terrain: Vec<Option<usize>>,
@@ -130,6 +131,7 @@ impl AreaModel {
             world_map_location: None,
             max_vis_distance: 20,
             max_vis_up_one_distance: 6,
+            location_kind: LocationKind::Outdoors,
             on_rest: OnRest::Disabled { message: "<PLACEHOLDER>".to_string() },
         }
     }
@@ -137,6 +139,7 @@ impl AreaModel {
     pub fn id(&self) -> &str { &self.id }
     pub fn name(&self) -> &str { &self.name }
     pub fn filename(&self) -> &str { &self.filename }
+    pub fn location_kind(&self) -> LocationKind { self.location_kind }
 
     pub fn set_id(&mut self, id: &str) {
         self.id = id.to_string();
@@ -148,6 +151,10 @@ impl AreaModel {
 
     pub fn set_filename(&mut self, filename: &str) {
         self.filename = filename.to_string();
+    }
+
+    pub fn set_location_kind(&mut self, location_kind: LocationKind) {
+        self.location_kind = location_kind;
     }
 
     pub fn elevation(&self, x: i32, y: i32) -> u8 {
@@ -546,6 +553,7 @@ impl AreaModel {
         self.max_vis_up_one_distance = area_builder.max_vis_up_one_distance;
         self.world_map_location = area_builder.world_map_location.clone();
         self.on_rest = area_builder.on_rest.clone();
+        self.location_kind = area_builder.location_kind;
 
         trace!("Loading terrain");
         let width = area_builder.width as i32;
@@ -833,7 +841,7 @@ impl AreaModel {
         let area_builder = AreaBuilder {
             id: self.id.clone(),
             name: self.name.clone(),
-            location_kind: LocationKind::Outdoors,
+            location_kind: self.location_kind,
             elevation: elevation,
             terrain,
             walls,

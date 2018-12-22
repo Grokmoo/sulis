@@ -29,13 +29,16 @@ pub const NAME: &str = "transition_window";
 
 pub struct TransitionWindow {
     area_editor: Rc<RefCell<AreaEditor>>,
+    top_bar: Rc<RefCell<Widget>>,
     selected_transition: Option<usize>,
 }
 
 impl TransitionWindow {
-    pub fn new(area_editor: Rc<RefCell<AreaEditor>>) -> Rc<RefCell<TransitionWindow>> {
+    pub fn new(area_editor: Rc<RefCell<AreaEditor>>,
+               top_bar: Rc<RefCell<Widget>>) -> Rc<RefCell<TransitionWindow>> {
         Rc::new(RefCell::new(TransitionWindow {
             area_editor,
+            top_bar,
             selected_transition: None,
         }))
     }
@@ -48,7 +51,12 @@ impl WidgetKind for TransitionWindow {
 
     fn as_any_mut(&mut self) -> &mut Any { self }
 
+    fn on_remove(&mut self) {
+        self.top_bar.borrow_mut().state.set_enabled(true);
+    }
+
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
+        self.top_bar.borrow_mut().state.set_enabled(false);
         let mut widgets: Vec<Rc<RefCell<Widget>>> = Vec::new();
 
         let title = Widget::with_theme(Label::empty(), "title");

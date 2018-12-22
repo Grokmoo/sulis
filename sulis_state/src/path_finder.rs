@@ -19,7 +19,7 @@ use std::cell::Ref;
 use std::collections::{BTreeMap};
 use std::{f32, ptr};
 
-use int_hash::{IntHashMap, IntHashSet};
+use hashbrown::{HashMap, HashSet};
 
 use sulis_core::util::{self, Point};
 use sulis_module::Area;
@@ -34,8 +34,8 @@ pub struct PathFinder {
     f_score: Vec<i32>,
     g_score: Vec<i32>,
     open: BTreeMap<i32, i32>,
-    closed: IntHashSet<i32>,
-    came_from: IntHashMap<i32, i32>,
+    closed: HashSet<i32>,
+    came_from: HashMap<i32, i32>,
 
     goal_x: f32,
     goal_y: f32,
@@ -53,8 +53,8 @@ impl PathFinder {
             f_score: vec![0;(width*height) as usize],
             g_score: vec![0;(width*height) as usize],
             open: BTreeMap::new(),
-            closed: IntHashSet::default(),
-            came_from: IntHashMap::default(),
+            closed: HashSet::default(),
+            came_from: HashMap::default(),
             goal_x: 0.0,
             goal_y: 0.0,
         }

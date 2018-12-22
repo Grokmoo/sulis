@@ -22,7 +22,7 @@ use sulis_core::io::{GraphicsRenderer};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::util::Point;
 use sulis_module::{Actor, Module};
-use sulis_widgets::Button;
+use sulis_widgets::{Button, ScrollPane};
 
 use crate::{AreaModel, EditorMode};
 
@@ -120,7 +120,7 @@ impl WidgetKind for ActorPicker {
         let mut all_actors = Module::all_actors();
         all_actors.sort_by(|a, b| a.id.cmp(&b.id));
 
-        let mut widgets: Vec<Rc<RefCell<Widget>>> = Vec::new();
+        let scrollpane = ScrollPane::new();
         for actor in all_actors {
             let button = Widget::with_theme(Button::empty(), "actor_button");
             button.borrow_mut().state.add_text_arg("name", &actor.id);
@@ -135,13 +135,14 @@ impl WidgetKind for ActorPicker {
                     widget.borrow_mut().state.set_active(true);
                 }
 
+                let parent = Widget::go_up_tree(&parent, 2);
                 let actor_picker = Widget::downcast_kind_mut::<ActorPicker>(&parent);
                 actor_picker.cur_actor = Some(Rc::clone(&actor));
             })));
 
-            widgets.push(button);
+            scrollpane.borrow().add_to_content(button);
         }
 
-        widgets
+        vec![Widget::with_theme(scrollpane, "actors")]
     }
 }

@@ -25,7 +25,7 @@ use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
 use sulis_core::util::{Point};
 use sulis_module::{Module, area::MAX_AREA_SIZE, area::tile::{Tile, WallKind, WallRules}};
-use sulis_widgets::{Button, Label, Spinner};
+use sulis_widgets::{Button, Label, Spinner, ScrollPane};
 
 use crate::{AreaModel, EditorMode};
 use crate::terrain_picker::EdgesList;
@@ -448,7 +448,8 @@ impl WidgetKind for WallPicker {
         let brush_size_label = Widget::with_theme(Label::empty(), "brush_size_label");
 
         let no_wall_button = Widget::with_theme(Button::empty(), "no_wall_button");
-        let wall_content = Widget::empty("wall_content");
+        let mut all_buttons = Vec::new();
+        let scrollpane = ScrollPane::new();
         for (i, wall_kind) in Module::wall_kinds().into_iter().enumerate() {
             let base_tile_id = format!("{}{}{}", self.wall_rules.prefix, wall_kind.id,
                                        wall_kind.base_tile);
@@ -467,29 +468,28 @@ impl WidgetKind for WallPicker {
                     }
                     widget.borrow_mut().state.set_active(true);
 
-                    let parent = Widget::get_parent(&parent);
+                    let parent = Widget::go_up_tree(&parent, 2);
                     let wall_picker = Widget::downcast_kind_mut::<WallPicker>(&parent);
                     wall_picker.cur_wall = Some(i);
                 }
             }));
             button.borrow_mut().state.add_callback(cb);
-
-            Widget::add_child_to(&wall_content, button);
+            all_buttons.push(Rc::clone(&button));
+            scrollpane.borrow().add_to_content(button);
         }
 
-        let wall_content_ref = Rc::clone(&wall_content);
         no_wall_button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
             let parent = Widget::get_parent(&widget);
             let picker = Widget::downcast_kind_mut::<WallPicker>(&parent);
             picker.cur_wall = None;
-            for child in wall_content_ref.borrow_mut().children.iter() {
-                child.borrow_mut().state.set_active(false);
+            for button in all_buttons.iter() {
+                button.borrow_mut().state.set_active(false);
             }
 
             widget.borrow_mut().state.set_active(true);
         })));
 
         vec![self.level_widget.clone(), level_label, self.brush_size_widget.clone(), brush_size_label,
-          wall_content, no_wall_button]
+          no_wall_button, Widget::with_theme(scrollpane, "walls")]
     }
 }

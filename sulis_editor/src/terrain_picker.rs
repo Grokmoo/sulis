@@ -28,7 +28,7 @@ use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
 use sulis_core::util::{unable_to_create_error, Point};
 use sulis_module::{Module, area::MAX_AREA_SIZE, area::tile::{Tile, TerrainKind, TerrainRules, EdgeRules}};
-use sulis_widgets::{Button, Label, Spinner};
+use sulis_widgets::{Button, Label, Spinner, ScrollPane};
 
 use crate::{AreaModel, EditorMode};
 
@@ -417,7 +417,7 @@ impl WidgetKind for TerrainPicker {
 
         let brush_size_label = Widget::with_theme(Label::empty(), "brush_size_label");
 
-        let terrain_content = Widget::empty("terrain_content");
+        let scrollpane = ScrollPane::new();
         for (i, terrain_kind) in Module::terrain_kinds().into_iter().enumerate() {
             let base_tile_id = format!("{}{}{}", self.terrain_rules.prefix, terrain_kind.id,
                                        self.terrain_rules.base_postfix);
@@ -426,7 +426,7 @@ impl WidgetKind for TerrainPicker {
             button.borrow_mut().state.add_text_arg("icon", &base_tile_id);
 
             let cb: Callback = Callback::new(Rc::new(move |widget, _| {
-                let parent = Widget::get_parent(widget);
+                let parent = Widget::go_up_tree(widget, 2);
                 let cur_state = widget.borrow_mut().state.is_active();
                 if !cur_state {
                     for child in parent.borrow_mut().children.iter() {
@@ -441,9 +441,9 @@ impl WidgetKind for TerrainPicker {
             }));
             button.borrow_mut().state.add_callback(cb);
 
-            Widget::add_child_to(&terrain_content, button);
+            scrollpane.borrow().add_to_content(button);
         }
 
-        vec![self.brush_size_widget.clone(), brush_size_label, terrain_content]
+        vec![self.brush_size_widget.clone(), brush_size_label, Widget::with_theme(scrollpane, "terrain")]
     }
 }

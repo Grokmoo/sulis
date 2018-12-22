@@ -24,7 +24,7 @@ use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::util::Point;
 use sulis_module::{Encounter, Module};
-use sulis_widgets::{Button, Label, Spinner};
+use sulis_widgets::{Button, Label, Spinner, ScrollPane};
 
 use crate::{AreaModel, EditorMode};
 
@@ -145,7 +145,7 @@ impl WidgetKind for EncounterPicker {
 
         let size_label = Widget::with_theme(Label::empty(), "size_label");
 
-        let encounters = Widget::empty("encounters");
+        let scrollpane = ScrollPane::new();
         {
             let mut all_encounters = Module::all_encounters();
             all_encounters.sort_by(|a, b| a.id.cmp(&b.id));
@@ -154,7 +154,7 @@ impl WidgetKind for EncounterPicker {
                 let button = Widget::with_theme(Button::empty(), "encounter_button");
                 button.borrow_mut().state.add_text_arg("name", &encounter.id);
                 button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                    let parent = Widget::go_up_tree(widget, 2);
+                    let parent = Widget::get_parent(widget);
                     let cur_state = widget.borrow_mut().state.is_active();
                     if !cur_state {
                         trace!("Set active encounter: {}", widget.borrow().state.text);
@@ -164,14 +164,15 @@ impl WidgetKind for EncounterPicker {
                         widget.borrow_mut().state.set_active(true);
                     }
 
+                    let parent = Widget::go_up_tree(&parent, 2);
                     let encounter_picker = Widget::downcast_kind_mut::<EncounterPicker>(&parent);
                     encounter_picker.cur_encounter = Some(Rc::clone(&encounter));
                 })));
 
-                Widget::add_child_to(&encounters, button);
+                scrollpane.borrow().add_to_content(button);
             }
         }
 
-        vec![width, height, size_label, encounters]
+        vec![width, height, size_label, Widget::with_theme(scrollpane, "encounters")]
     }
 }

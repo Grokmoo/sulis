@@ -22,7 +22,7 @@ use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{animation_state, Callback, Color, Widget, WidgetKind};
 use sulis_core::util::Point;
 use sulis_module::{Prop, Module};
-use sulis_widgets::Button;
+use sulis_widgets::{Button, ScrollPane};
 
 use crate::{AreaModel, EditorMode};
 
@@ -126,7 +126,7 @@ impl WidgetKind for PropPicker {
         let mut all_props = Module::all_props();
         all_props.sort_by(|a, b| a.id.cmp(&b.id));
 
-        let mut widgets: Vec<Rc<RefCell<Widget>>> = Vec::new();
+        let scrollpane = ScrollPane::new();
         for prop in all_props {
             let button = Widget::with_theme(Button::empty(), "prop_button");
             button.borrow_mut().state.add_text_arg("name", &prop.id);
@@ -141,13 +141,14 @@ impl WidgetKind for PropPicker {
                     widget.borrow_mut().state.set_active(true);
                 }
 
+                let parent = Widget::go_up_tree(&parent, 2);
                 let prop_picker = Widget::downcast_kind_mut::<PropPicker>(&parent);
                 prop_picker.cur_prop = Some(Rc::clone(&prop));
             })));
 
-            widgets.push(button);
+            scrollpane.borrow().add_to_content(button);
         }
 
-        widgets
+        vec![Widget::with_theme(scrollpane, "props")]
     }
 }

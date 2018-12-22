@@ -131,18 +131,26 @@ children:
                 from: .button
                 foreground: "#icon#"
                 preferred_size: [20, 20]
-          wall_content:
+          walls:
             height_relative: Max
             width_relative: Max
             position: [0, 64]
-            preferred_size: [-20, -24]
-            layout: Grid
-            layout_spacing: [0, 0, 0, 0]
+            preferred_size: [0, -64]
             children:
-              wall_button:
-                from: .button
-                foreground: "#icon#"
-                preferred_size: [20, 20]
+              scrollbar:
+                from: .scrollbar
+                custom:
+                  scroll_delta: 20
+              content:
+                width_relative: Max
+                height_relative: Max
+                layout: Grid
+                layout_spacing: [0, 0, 0, 0]
+                children:
+                  wall_button:
+                    from: .button
+                    foreground: "#icon#"
+                    preferred_size: [20, 20]
       terrain_picker:
         background: bg_base
         border: [1, 1, 1, 1]
@@ -159,18 +167,26 @@ children:
           brush_size:
             from: .spinner
             position: [35, 5]
-          terrain_content:
+          terrain:
             height_relative: Max
             width_relative: Max
             position: [0, 24]
-            preferred_size: [0, -4]
-            layout: Grid
-            layout_spacing: [0, 0, 0, 0]
+            preferred_size: [0, -24]
             children:
-              terrain_button:
-                from: .button
-                foreground: "#icon#"
-                preferred_size: [20, 20]
+              scrollbar:
+                from: .scrollbar
+                custom:
+                  scroll_delta: 20
+              content:
+                width_relative: Max
+                height_relative: Max
+                layout: Grid
+                layout_spacing: [0, 0, 0, 0]
+                children:
+                  terrain_button:
+                    from: .button
+                    foreground: "#icon#"
+                    preferred_size: [20, 20]
       elevation_picker:
         background: bg_base
         border: [1, 1, 1, 1]
@@ -205,10 +221,24 @@ children:
         layout: Grid
         layout_spacing: [0, 1, 0, 1]
         children:
-          actor_button:
-            from: .button
-            text: "#name#"
-            preferred_size: [40, 6]
+          actors:
+            height_relative: Max
+            width_relative: Max
+            children:
+              scrollbar:
+                from: .scrollbar
+                custom:
+                  scroll_delta: 10
+              content:
+                width_relative: Max
+                height_relative: Max
+                layout: Grid
+                layout_spacing: [0, 0, 0, 0]
+                children:
+                  actor_button:
+                    from: .button
+                    text: "#name#"
+                    preferred_size: [40, 6]
       prop_picker:
         background: bg_base
         border: [1, 1, 1, 1]
@@ -219,12 +249,24 @@ children:
         layout: Grid
         layout_spacing: [0, 1, 0, 1]
         children:
-          prop_button:
-            from: .button
-            text: "#name#"
-            text_params:
-              scale: 6.0
-            preferred_size: [40, 6]
+          props:
+            height_relative: Max
+            width_relative: Max
+            children:
+              scrollbar:
+                from: .scrollbar
+                custom:
+                  scroll_delta: 10
+              content:
+                width_relative: Max
+                height_relative: Max
+                layout: Grid
+                layout_spacing: [0, 0, 0, 0]
+                children:
+                  prop_button:
+                    from: .button
+                    text: "#name#"
+                    preferred_size: [40, 6]
       trigger_picker:
         background: bg_base
         border: [1, 1, 1, 1]
@@ -266,15 +308,21 @@ children:
           encounters:
             height_relative: Max
             width_relative: Max
-            preferred_size: [0, -15]
             position: [0, 15]
-            layout: Grid
-            layout_spacing: [0, 1, 0, 1]
+            preferred_size: [0, -15]
             children:
-              encounter_button:
-                from: .button
-                text: "#name#"
-                preferred_size: [40, 6]
+              scrollbar:
+                from: .scrollbar
+              content:
+                width_relative: Max
+                height_relative: Max
+                layout: Grid
+                layout_spacing: [0, 0, 0, 0]
+                children:
+                  encounter_button:
+                    from: .button
+                    text: "#name#"
+                    preferred_size: [40, 6]
       tile_picker:
         background: bg_base
         border: [1, 1, 1, 1]
@@ -312,10 +360,6 @@ children:
                     from: .button
                     foreground: "#icon#"
                     preferred_size: [20, 20]
-          scrollbar:
-            from: .scrollbar
-            custom:
-              scroll_delta: "20"
       exit_confirmation_window:
         from: .exit_confirmation
         children:

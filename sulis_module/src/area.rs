@@ -31,6 +31,8 @@ use std::collections::{HashSet, HashMap};
 use std::io::{Error};
 use std::rc::Rc;
 
+use serde::{Deserialize, Deserializer, Serializer};
+
 use sulis_core::image::Image;
 use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::util::{Point, Size, unable_to_create_error};
@@ -281,6 +283,13 @@ pub struct AreaBuilder {
     pub name: String,
     pub width: usize,
     pub height: usize,
+    pub visibility_tile: String,
+    pub explored_tile: String,
+    pub max_vis_distance: i32,
+    pub max_vis_up_one_distance: i32,
+    pub world_map_location: Option<String>,
+    pub on_rest: OnRest,
+    pub location_kind: LocationKind,
     pub generate: bool,
     pub layers: Vec<String>,
     pub entity_layer: usize,
@@ -289,18 +298,22 @@ pub struct AreaBuilder {
     pub encounters: Vec<EncounterDataBuilder>,
     pub transitions: Vec<TransitionBuilder>,
     pub triggers: Vec<TriggerBuilder>,
-    pub visibility_tile: String,
-    pub explored_tile: String,
-    pub max_vis_distance: i32,
-    pub max_vis_up_one_distance: i32,
-    pub world_map_location: Option<String>,
-    pub on_rest: OnRest,
-    pub location_kind: LocationKind,
     pub layer_set: HashMap<String, Vec<Vec<usize>>>,
     pub terrain: Vec<Option<String>>,
     pub walls: Vec<(i8, Option<String>)>,
-    // #[serde(serialize_with="ser_elevation", deserialize_with="from_base64")]
+
+    #[serde(serialize_with="as_base64", deserialize_with="from_base64")]
     pub elevation: Vec<u8>,
+}
+
+fn from_base64<'de, D>(deserializer: D) -> Result<Vec<u8>, D::Error> where D: Deserializer<'de> {
+    use sulis_core::serde::de::Error;
+    let s = String::deserialize(deserializer)?;
+    base64::decode(&s).map_err(|err| Error::custom(err.to_string()))
+}
+
+fn as_base64<S>(input: &[u8], serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
+    serializer.serialize_str(&base64::encode(input))
 }
 
 #[derive(Deserialize, Serialize, Debug, Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
@@ -324,16 +337,6 @@ pub enum OnRest {
     Disabled { message: String },
     FireScript { id: String, func: String },
 }
-
-// fn from_base64<'de, D>(deserializer: D) -> Result<Vec<u8>, D::Error> where D: Deserializer<'de> {
-//     use sulis_core::serde::de::Error;
-//     let s = String::deserialize(deserializer)?;
-//     base64::decode(&s).map_err(|err| Error::custom(err.to_string()))
-// }
-//
-// fn as_base64<S>(input: &[u8], serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
-//     serializer.serialize_str(&base64::encode(input))
-// }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]

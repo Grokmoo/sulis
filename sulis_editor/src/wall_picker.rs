@@ -139,7 +139,7 @@ impl WallPicker {
     }
 
     fn check_add_border_exterior(&self, model: &mut AreaModel, x: i32, y: i32,
-                                 self_elev: i8, tiles: WallTiles) {
+                                 self_elev: u8, tiles: WallTiles) {
         model.add_tile(&tiles.fill_tile, x, y);
 
         let (gh, gw) = (self.grid_height, self.grid_width);
@@ -208,7 +208,7 @@ impl WallPicker {
     }
 
     fn check_add_border_interior(&self, model: &mut AreaModel, x: i32, y: i32,
-                                 self_elev: i8, tiles: WallTiles) {
+                                 self_elev: u8, tiles: WallTiles) {
         let (gh, gw) = (self.grid_height, self.grid_width);
 
         let n = self.is_border(model, self_elev, x, y, 0, -gh);
@@ -296,7 +296,7 @@ impl WallPicker {
         }
     }
 
-    fn is_border(&self, model: &AreaModel, self_elev: i8, x: i32, y: i32,
+    fn is_border(&self, model: &AreaModel, self_elev: u8, x: i32, y: i32,
                  delta_x: i32, delta_y: i32) -> bool {
 
         let x = x + delta_x;
@@ -376,7 +376,7 @@ impl EditorMode for WallPicker {
                 let y = y_min + yi * self.grid_height;
                 if x < 0 || x >= MAX_AREA_SIZE || y < 0 || y >= MAX_AREA_SIZE { continue; }
 
-                model.set_wall(x, y, self.level as i8, self.cur_wall);
+                model.set_wall(x, y, self.level as u8, self.cur_wall);
                 for ye in y-1..y + self.grid_height + 1 {
                     for xe in x-1..x + self.grid_height + 1 {
                         model.set_elevation(2 * self.level as u8, xe, ye);

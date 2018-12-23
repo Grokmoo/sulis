@@ -32,6 +32,7 @@ use std::io::{Error};
 use std::rc::Rc;
 
 use serde::{Deserialize, Deserializer, Serializer};
+use serde::ser::SerializeMap;
 
 use sulis_core::image::Image;
 use sulis_core::resource::{ResourceSet, Sprite};
@@ -298,12 +299,61 @@ pub struct AreaBuilder {
     pub encounters: Vec<EncounterDataBuilder>,
     pub transitions: Vec<TransitionBuilder>,
     pub triggers: Vec<TriggerBuilder>,
-    pub layer_set: HashMap<String, Vec<Vec<usize>>>,
     pub terrain: Vec<Option<String>>,
-    pub walls: Vec<(i8, Option<String>)>,
+    pub walls: Vec<(u8, Option<String>)>,
+
+    #[serde(serialize_with="ser_layer_set", deserialize_with="de_layer_set")]
+    pub layer_set: HashMap<String, Vec<Vec<u16>>>,
 
     #[serde(serialize_with="as_base64", deserialize_with="from_base64")]
     pub elevation: Vec<u8>,
+}
+
+fn ser_layer_set<S>(input: &HashMap<String, Vec<Vec<u16>>>,
+                    serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
+    let mut map = serializer.serialize_map(Some(input.len()))?;
+    for (key, vec) in input.iter() {
+        let mut out: Vec<u8> = Vec::new();
+        for pos in vec.iter() {
+            out.push(((pos[0] >> 8) & 0xff) as u8);
+            out.push((pos[0] & 0xff) as u8);
+            out.push(((pos[1] >> 8) & 0xff) as u8);
+            out.push((pos[1] & 0xff) as u8);
+        }
+        map.serialize_entry(key, &base64::encode(&out))?;
+    }
+
+    map.end()
+}
+
+fn de_layer_set<'de, D>(deserializer: D) -> Result<HashMap<String, Vec<Vec<u16>>>, D::Error>
+    where D: Deserializer<'de> {
+
+    let input: HashMap<String, String> = HashMap::deserialize(deserializer)?;
+
+    let mut result: HashMap<String, Vec<Vec<u16>>> = HashMap::new();
+    for (key, encoded) in input {
+        use sulis_core::serde::de::Error;
+        let vec_u8 = base64::decode(&encoded).map_err(|err| Error::custom(err.to_string()))?;
+
+        let mut result_vec: Vec<Vec<u16>> = Vec::new();
+        let mut i = 0;
+        loop {
+            if i + 4 > vec_u8.len() {
+                return Err(Error::custom("Invalid encoded base64 string"));
+            }
+            let x = vec_u8[i] as u16 * 256 + vec_u8[i + 1] as u16;
+            let y = vec_u8[i + 2] as u16 * 256 + vec_u8[i + 3] as u16;
+            result_vec.push(vec![x, y]);
+
+            if i + 4 == vec_u8.len() { break; }
+
+            i += 4;
+        }
+        result.insert(key, result_vec);
+    }
+
+    Ok(result)
 }
 
 fn from_base64<'de, D>(deserializer: D) -> Result<Vec<u8>, D::Error> where D: Deserializer<'de> {

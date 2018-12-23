@@ -62,9 +62,11 @@ impl LayerSet {
 
                 let cur_layer = layer_tiles.get_mut(&tile.layer).unwrap();
                 for point in locations.iter() {
-                    let index = point[0] + point[1] * width as usize;
+                    let x = point[0] as usize;
+                    let y = point[1] as usize;
+                    let index = x + y * width as usize;
                     if index >= dim {
-                        warn!("Invalid tile location {},{}", point[0], point[1]);
+                        warn!("Invalid tile location {},{}", x, y);
                         continue;
                     }
                     cur_layer[index].push(Rc::clone(&tile));
@@ -146,8 +148,12 @@ impl LayerSet {
                 &format!("Entity layer of {} is invalid.", entity_layer_index));
         }
 
+        let elevation;
         if builder.elevation.len() != dim {
-            return invalid_data_error("Elevation array must be dimension length*width");
+            warn!("In '{}': Elevation array must be dimensions length*width", builder.id);
+            elevation = vec![0; dim];
+        } else {
+            elevation = builder.elevation.clone();
         }
 
         Ok(LayerSet {
@@ -157,7 +163,7 @@ impl LayerSet {
             entity_layer_index,
             passable,
             visible,
-            elevation: builder.elevation.clone(),
+            elevation,
         })
     }
 

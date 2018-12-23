@@ -57,7 +57,7 @@ pub struct AreaModel {
     terrain: Vec<Option<usize>>,
 
     wall_kinds: Vec<WallTiles>,
-    walls: Vec<(i8, Option<usize>)>,
+    walls: Vec<(u8, Option<usize>)>,
 }
 
 impl AreaModel {
@@ -183,11 +183,11 @@ impl AreaModel {
         &self.wall_kinds
     }
 
-    pub fn wall_at(&self, x: i32, y: i32) -> (i8, Option<usize>) {
+    pub fn wall_at(&self, x: i32, y: i32) -> (u8, Option<usize>) {
         self.walls[(x + y * MAX_AREA_SIZE) as usize]
     }
 
-    pub fn set_wall(&mut self, x: i32, y: i32, elev: i8, index: Option<usize>) {
+    pub fn set_wall(&mut self, x: i32, y: i32, elev: u8, index: Option<usize>) {
         self.walls[(x + y * MAX_AREA_SIZE) as usize] = (elev, index);
     }
 
@@ -736,7 +736,7 @@ impl AreaModel {
         let mut width = 0;
         let mut height = 0;
         let mut layers: Vec<String> = Vec::new();
-        let mut layer_set: HashMap<String, Vec<Vec<usize>>> = HashMap::new();
+        let mut layer_set: HashMap<String, Vec<Vec<u16>>> = HashMap::new();
 
         trace!("Saving layer_set.");
         for &(ref layer_id, ref tiles) in self.tiles.iter() {
@@ -747,7 +747,7 @@ impl AreaModel {
 
                 if position.x >= MAX_AREA_SIZE || position.y >= MAX_AREA_SIZE { continue; }
                 let tiles_vec = layer_set.entry(tile.id.to_string()).or_insert(Vec::new());
-                tiles_vec.push(vec![position.x as usize, position.y as usize]);
+                tiles_vec.push(vec![position.x as u16, position.y as u16]);
             }
         }
         width = cmp::min(width, MAX_AREA_SIZE);

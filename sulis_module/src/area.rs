@@ -28,11 +28,11 @@ pub use self::tile::Tile;
 pub use self::tile::Tileset;
 
 use std::collections::{HashSet, HashMap};
-use std::io::{Error};
+use std::io::{Error, ErrorKind};
 use std::rc::Rc;
 
 use serde::{Deserialize, Deserializer, Serializer};
-use serde::ser::SerializeMap;
+use serde::ser::{SerializeMap, SerializeStruct};
 
 use sulis_core::image::Image;
 use sulis_core::resource::{ResourceSet, Sprite};
@@ -299,7 +299,11 @@ pub struct AreaBuilder {
     pub encounters: Vec<EncounterDataBuilder>,
     pub transitions: Vec<TransitionBuilder>,
     pub triggers: Vec<TriggerBuilder>,
+
+    #[serde(serialize_with="ser_terrain", deserialize_with="de_terrain")]
     pub terrain: Vec<Option<String>>,
+
+    #[serde(serialize_with="ser_walls", deserialize_with="de_walls")]
     pub walls: Vec<(u8, Option<String>)>,
 
     #[serde(serialize_with="ser_layer_set", deserialize_with="de_layer_set")]
@@ -307,6 +311,135 @@ pub struct AreaBuilder {
 
     #[serde(serialize_with="as_base64", deserialize_with="from_base64")]
     pub elevation: Vec<u8>,
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+#[serde(deny_unknown_fields)]
+struct U8WithKinds {
+    kinds: Vec<String>,
+    entries: String,
+}
+
+fn entry_index<'a>(map: &mut HashMap<&'a str, u8>, index: &mut u8,
+               entry: &'a Option<String>) -> Result<u8, Error> {
+    Ok(match entry {
+        None => 255,
+        Some(ref id) => {
+            let index = map.entry(id).or_insert_with(|| {
+                let ret_val = *index;
+                *index += 1;
+                ret_val
+            });
+
+            if *index > 254 {
+                return Err(Error::new(ErrorKind::InvalidInput,
+                                      "Can only serialize up to 255 wall kinds"));
+            }
+
+            *index
+        }
+    })
+}
+
+fn serialize_u8_with_kinds<'a, S>(kinds: HashMap<&str, u8>, name: &'static str,
+    vec: Vec<u8>, serializer: S) -> Result<S::Ok, S::Error> where S:Serializer {
+
+    let mut kinds: Vec<_> = kinds.into_iter().collect();
+    kinds.sort_by_key(|k| k.1);
+    let kinds = kinds.into_iter().map(|k| k.0).collect::<Vec<&str>>();
+
+    let mut data = serializer.serialize_struct(name, 2)?;
+    data.serialize_field("kinds", &kinds)?;
+    data.serialize_field("entries", &base64::encode(&vec))?;
+    data.end()
+}
+
+fn de_terrain<'de, D>(deserializer: D) -> Result<Vec<Option<String>>, D::Error>
+    where D:Deserializer<'de> {
+
+    let input = U8WithKinds::deserialize(deserializer)?;
+    use sulis_core::serde::de::Error;
+    let vec_u8 = base64::decode(&input.entries).map_err(|err| Error::custom(err.to_string()))?;
+
+    let mut out = Vec::new();
+    for entry in vec_u8 {
+        let index = entry as usize;
+        if index== 255 {
+            out.push(None);
+        } else if index >= input.kinds.len() {
+            return Err(Error::custom("Invalid base64 encoding in terrain index."));
+        } else {
+            out.push(Some(input.kinds[index].clone()));
+        }
+    }
+
+    Ok(out)
+}
+
+fn ser_terrain<S>(input: &Vec<Option<String>>,
+                  serializer: S) -> Result<S::Ok, S::Error> where S:Serializer {
+
+    let mut kinds: HashMap<&str, u8> = HashMap::new();
+    let mut terrain: Vec<u8> = Vec::new();
+
+    let mut index = 0;
+    for terrain_id in input.iter() {
+        use sulis_core::serde::ser::Error;
+        let entry_index = entry_index(&mut kinds, &mut index, terrain_id)
+            .map_err(|e| Error::custom(e.to_string()))?;
+
+        terrain.push(entry_index as u8);
+    }
+
+    serialize_u8_with_kinds(kinds, "terrain", terrain, serializer)
+}
+
+fn de_walls<'de, D>(deserializer: D) -> Result<Vec<(u8, Option<String>)>, D::Error>
+    where D:Deserializer<'de> {
+
+    let input = U8WithKinds::deserialize(deserializer)?;
+    use sulis_core::serde::de::Error;
+    let vec_u8 = base64::decode(&input.entries).map_err(|err| Error::custom(err.to_string()))?;
+
+    let mut out = Vec::new();
+    let mut i = 0;
+    loop {
+        if i + 2 > vec_u8.len() { return Err(Error::custom("Invalid base64 encoding in walls")); }
+
+        let elev = vec_u8[i + 1];
+        let index = vec_u8[i] as usize;
+
+        if index == 255 {
+            out.push((elev, None));
+        } else if index >= input.kinds.len() {
+            return Err(Error::custom("Invalid base64 encoding in walls index"));
+        } else {
+            out.push((elev, Some(input.kinds[index].clone())));
+        }
+
+        i += 2;
+        if i == vec_u8.len() { break; }
+    }
+
+    Ok(out)
+}
+
+fn ser_walls<S>(input: &Vec<(u8, Option<String>)>,
+                serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
+    let mut kinds: HashMap<&str, u8> = HashMap::new();
+    let mut walls: Vec<u8> = Vec::new();
+
+    let mut index = 0;
+    for (level, wall_id) in input.iter() {
+        use sulis_core::serde::ser::Error;
+        let entry_index = entry_index(&mut kinds, &mut index, wall_id)
+            .map_err(|e| Error::custom(e.to_string()))?;
+
+        walls.push(entry_index as u8);
+        walls.push(*level);
+    }
+
+    serialize_u8_with_kinds(kinds, "walls", walls, serializer)
 }
 
 fn ser_layer_set<S>(input: &HashMap<String, Vec<Vec<u16>>>,

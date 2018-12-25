@@ -397,9 +397,9 @@ impl AreaModel {
             }, Some(image) => image,
         };
 
-        let size = match Module::object_size(&self.config.transition_size) {
+        let size = match Module::object_size(&self.config.transition_sizes[0]) {
             None => {
-                warn!("No size with ID '{}' found.", self.config.transition_size);
+                warn!("No size with ID '{}' found.", self.config.transition_sizes[0]);
                 return None;
             }, Some(ref size) => Rc::clone(size),
         };

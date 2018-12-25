@@ -95,7 +95,7 @@ editor:
   module: twin_expanse_act1
 
   transition_image: empty
-  transition_size: 4by3
+  transition_sizes: [ 4by3, 4by4, 2by3, 2by4, 3by4, 4by5, 2by2 ]
   cursor: "gui/white"
   area:
     filename: "editor_test"

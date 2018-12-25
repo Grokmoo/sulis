@@ -18,9 +18,10 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
+use sulis_core::config::{Config, EditorConfig};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::util::Point;
-use sulis_module::area::{ToKind, MAX_AREA_SIZE};
+use sulis_module::{Module, area::{ToKind, MAX_AREA_SIZE}};
 use sulis_widgets::{Button, InputField, Label, list_box, ListBox, Spinner};
 
 use crate::AreaEditor;
@@ -31,6 +32,7 @@ pub struct TransitionWindow {
     area_editor: Rc<RefCell<AreaEditor>>,
     top_bar: Rc<RefCell<Widget>>,
     selected_transition: Option<usize>,
+    config: EditorConfig,
 }
 
 impl TransitionWindow {
@@ -40,6 +42,7 @@ impl TransitionWindow {
             area_editor,
             top_bar,
             selected_transition: None,
+            config: Config::editor_config(),
         }))
     }
 }
@@ -70,7 +73,7 @@ impl WidgetKind for TransitionWindow {
             let area_editor = self.area_editor.borrow();
             let transition = area_editor.model.transition(index);
 
-
+            let hover_text_str = transition.hover_text.to_string();
             let (to_area_str, to_x, to_y) = match transition.to {
                 ToKind::CurArea { x, y } => (String::new(), x, y),
                 ToKind::Area { ref id, x, y } => (id.to_string(), x, y),
@@ -88,11 +91,34 @@ impl WidgetKind for TransitionWindow {
             let from_label = Widget::with_theme(Label::empty(), "from_label");
             let to_label = Widget::with_theme(Label::empty(), "to_label");
             let to_area_label = Widget::with_theme(Label::empty(), "to_area_label");
+            let hover_text_label = Widget::with_theme(Label::empty(), "hover_text_label");
+            let hover_text = Widget::with_theme(InputField::new(&hover_text_str), "hover_text");
+
+            let sizes = Widget::empty("sizes");
+            for size_id in self.config.transition_sizes.iter() {
+                let button = Widget::with_theme(Button::empty(), "size");
+                button.borrow_mut().state.add_text_arg("size", size_id);
+                if &transition.size.id == size_id {
+                    button.borrow_mut().state.set_active(true);
+                }
+
+                button.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+                    let parent = Widget::get_parent(widget);
+
+                    for child in parent.borrow().children.iter() {
+                        child.borrow_mut().state.set_active(false);
+                    }
+                    widget.borrow_mut().state.set_active(true);
+                })));
+
+                Widget::add_child_to(&sizes, button);
+            }
 
             let apply = Widget::with_theme(Button::empty(), "apply_button");
 
+            let hover_text_ref = Rc::clone(&hover_text);
             let to_area_ref = Rc::clone(&to_area);
-
+            let sizes_ref = Rc::clone(&sizes);
             let from_x_ref = Rc::clone(&from_x);
             let from_y_ref = Rc::clone(&from_y);
             let to_x_ref = Rc::clone(&to_x);
@@ -144,6 +170,7 @@ impl WidgetKind for TransitionWindow {
             let cur_area_ref = Rc::clone(&cur_area_button);
             apply.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
                 let to_area_str = to_area_ref.borrow().state.text.to_string();
+                let hover_text_str = hover_text_ref.borrow().state.text.to_string();
 
                 let from = Point::new(from_x_ref.borrow().value(), from_y_ref.borrow().value());
                 let to = Point::new(to_x_ref.borrow().value(), to_y_ref.borrow().value());
@@ -160,6 +187,7 @@ impl WidgetKind for TransitionWindow {
                 let mut area_editor = area_editor_ref.borrow_mut();
                 let transition = area_editor.model.transition_mut(cur_index);
                 transition.from = from;
+                transition.hover_text = hover_text_str;
 
                 if world_map_ref.borrow().state.is_active() {
                     transition.to = ToKind::WorldMap;
@@ -168,12 +196,28 @@ impl WidgetKind for TransitionWindow {
                 } else if cur_area_ref.borrow().state.is_active() {
                     transition.to = ToKind::CurArea { x: to.x, y: to.y };
                 }
+
+                for child in sizes_ref.borrow().children.iter() {
+                    let child = child.borrow();
+                    if child.state.is_active() {
+                        let size_id = match child.state.get_text_arg("size") {
+                            None => panic!("size text arg not set"),
+                            Some(id) => id,
+                        };
+                        let size = match Module::object_size(size_id) {
+                            None => {
+                                warn!("Transition size '{}' does not exist", size_id);
+                                break;
+                            }, Some(size) => size,
+                        };
+                        transition.size = size;
+                    }
+                }
             })));
 
-
             widgets.append(&mut vec![cur_area_button, area_button, world_map_button]);
-
             widgets.append(&mut vec![to_area, from_label, to_label, to_area_label, apply, delete]);
+            widgets.append(&mut vec![hover_text, hover_text_label, sizes]);
             widgets.append(&mut vec![Widget::with_theme(to_x, "to_x"),
                 Widget::with_theme(to_y, "to_y"),
                 Widget::with_theme(from_x, "from_x"),

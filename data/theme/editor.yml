@@ -558,7 +558,7 @@ children:
         background: bg_medium
         border: [1, 1, 1, 1]
         height_relative: Zero
-        preferred_size: [130, 80]
+        preferred_size: [130, 90]
         position: [0, 0]
         x_relative: Max
         children:
@@ -643,6 +643,28 @@ children:
             from: .input_field
             preferred_size: [50, 6]
             position: [73, 50]
+          hover_text_label:
+            from: .label
+            text: "Hover Text"
+            text_params:
+              horizontal_alignment: Right
+            preferred_size: [16, 6]
+            position: [53, 58]
+          hover_text:
+            from: .input_field
+            preferred_size: [50, 6]
+            position: [73, 58]
+          sizes:
+            preferred_size: [78, 8]
+            position: [51, 66]
+            layout: BoxHorizontal
+            layout_spacing: { right: 1 }
+            border: { top: 1, bottom: 1 }
+            children:
+              size:
+                from: .button
+                text: "#size#"
+                preferred_size: [10, 6]
       load_window:
         from: .window
         height_relative: Zero

@@ -21,6 +21,7 @@ use std::fs::{self, File};
 use std::path::PathBuf;
 use std::collections::HashMap;
 
+use serde::{Deserialize, Deserializer};
 use lazy_static::lazy_static;
 
 use crate::io::keyboard_event::Key;
@@ -171,8 +172,22 @@ pub struct EditorConfig {
     pub module: String,
     pub cursor: String,
     pub transition_image: String,
-    pub transition_size: String,
+
+    #[serde(deserialize_with="de_non_empty_vec")]
+    pub transition_sizes: Vec<String>,
     pub area: EditorAreaConfig,
+}
+
+fn de_non_empty_vec<'de, D>(deserializer: D) -> Result<Vec<String>, D::Error>
+where D: Deserializer<'de> {
+    let result = Vec::deserialize(deserializer)?;
+
+    if result.is_empty() {
+        use serde::de::Error;
+        return Err(Error::custom("Vec must be non-empty"));
+    }
+
+    Ok(result)
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
@@ -184,7 +199,11 @@ pub struct EditorAreaConfig {
     pub visibility_tile: String,
     pub explored_tile: String,
     pub encounter_tile: String,
+
+    #[serde(deserialize_with="de_non_empty_vec")]
     pub layers: Vec<String>,
+
+    #[serde(deserialize_with="de_non_empty_vec")]
     pub elev_tiles: Vec<String>,
     pub entity_layer: usize,
 }

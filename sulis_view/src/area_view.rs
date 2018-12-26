@@ -658,7 +658,7 @@ impl WidgetKind for AreaView {
         }
 
         if self.cache_invalid {
-            debug!("Caching area '{}' layers to texture", state.area.id);
+            info!("Caching area '{}' layers to texture", state.area.id);
 
             let texture_ids = vec![VISIBILITY_TEX_ID, BASE_LAYER_ID, AERIAL_LAYER_ID, ENTITY_TEX_ID];
             for texture_id in texture_ids {
@@ -683,6 +683,7 @@ impl WidgetKind for AreaView {
                 self.draw_layer_to_texture(renderer, &layer, texture_id);
             }
 
+            self.entity_texture_cache.invalidate();
             // cause full area visibility redraw at the next step
             state.pc_vis_full_redraw();
             self.cache_invalid = false;

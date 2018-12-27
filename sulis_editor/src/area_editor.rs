@@ -29,11 +29,13 @@ use crate::{AreaModel, EditorMode};
 const NAME: &str = "area_editor";
 
 pub struct AreaEditor {
-    cur_editor: Option<Rc<RefCell<EditorMode>>>,
+    cur_editor: Option<Rc<RefCell<dyn EditorMode>>>,
     pub (crate) model: AreaModel,
 
     scroll: Scrollable,
     scale: (f32, f32),
+
+    last_click_position: Option<Point>,
 }
 
 impl AreaEditor {
@@ -43,6 +45,7 @@ impl AreaEditor {
             cur_editor: None,
             scroll: Scrollable::new(),
             scale: (1.0, 1.0),
+            last_click_position: None,
         }))
     }
 
@@ -52,7 +55,7 @@ impl AreaEditor {
         self.cur_editor = None;
     }
 
-    pub fn set_editor(&mut self, editor: Rc<RefCell<EditorMode>>) {
+    pub fn set_editor(&mut self, editor: Rc<RefCell<dyn EditorMode>>) {
         self.cur_editor = Some(editor);
     }
 
@@ -66,6 +69,19 @@ impl AreaEditor {
         y -= height as f32 / 2.0;
 
         ((x + self.scroll.x()).round() as i32, (y + self.scroll.y()).round() as i32)
+    }
+
+    fn get_event_data(&self, widget: &Rc<RefCell<Widget>>)
+        -> Option<(Rc<RefCell<dyn EditorMode>>, i32, i32)> {
+
+        let editor = match self.cur_editor {
+            None => return None,
+            Some(ref editor) => editor,
+        };
+
+        let (width, height) = editor.borrow().cursor_size();
+        let (x, y) = self.get_cursor_pos(widget, width, height);
+        Some((Rc::clone(editor), x, y))
     }
 }
 
@@ -112,14 +128,13 @@ impl WidgetKind for AreaEditor {
         true
     }
 
-    fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
-        let editor = match self.cur_editor {
+    fn on_mouse_press(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
+        let (editor, x, y) = match self.get_event_data(widget) {
             None => return true,
-            Some(ref editor) => editor,
+            Some(value) => value,
         };
 
-        let (width, height) = editor.borrow().cursor_size();
-        let (x, y) = self.get_cursor_pos(widget, width, height);
+        self.last_click_position = Some(Point::new(x, y));
         match kind {
             ClickKind::Left => editor.borrow_mut().left_click(&mut self.model, x, y),
             ClickKind::Right => editor.borrow_mut().right_click(&mut self.model, x, y),
@@ -129,13 +144,37 @@ impl WidgetKind for AreaEditor {
         true
     }
 
+    fn on_mouse_release(&mut self, _: &Rc<RefCell<Widget>>, _: ClickKind) -> bool {
+        self.last_click_position = None;
+        true
+    }
+
     fn on_mouse_drag(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind,
                      delta_x: f32, delta_y: f32) -> bool {
-        self.scroll.compute_max(&*widget.borrow(),
-            MAX_AREA_SIZE, MAX_AREA_SIZE, self.scale.0, self.scale.1);
+        if let ClickKind::Middle = kind {
+            self.scroll.compute_max(&*widget.borrow(),
+                MAX_AREA_SIZE, MAX_AREA_SIZE, self.scale.0, self.scale.1);
+            self.scroll.change(delta_x, delta_y);
+            return true;
+        }
 
+        let (editor, x, y) = match self.get_event_data(widget) {
+            None => return true,
+            Some(value) => value,
+        };
+
+        // only fire left / right click event if the position has changed
+        match self.last_click_position {
+            None => (),
+            Some(p) => {
+                if p.x == x && p.y == y { return true; }
+            },
+        }
+
+        self.last_click_position = Some(Point::new(x, y));
         match kind {
-            ClickKind::Middle => self.scroll.change(delta_x, delta_y),
+            ClickKind::Left => editor.borrow_mut().left_click(&mut self.model, x, y),
+            ClickKind::Right => editor.borrow_mut().right_click(&mut self.model, x, y),
             _ => (),
         }
 
@@ -144,13 +183,10 @@ impl WidgetKind for AreaEditor {
 
     fn on_mouse_move(&mut self, widget: &Rc<RefCell<Widget>>,
                      _delta_x: f32, _delta_y: f32) -> bool {
-        let editor = match self.cur_editor {
+        let (editor, x, y) = match self.get_event_data(widget) {
             None => return true,
-            Some(ref editor) => editor,
+            Some(value) => value,
         };
-
-        let (width, height) = editor.borrow().cursor_size();
-        let (x, y) = self.get_cursor_pos(widget, width, height);
         editor.borrow_mut().mouse_move(&mut self.model, x, y);
 
         true

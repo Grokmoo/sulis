@@ -1,0 +1,20 @@
+id: rose_lake_smith
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=888|This man stands near an anvil in the market square.]
+      
+      What can I get for you?  I've got the finest arms and armor in the `spance.
+    responses:
+      - text: "Lets see what you have."
+        on_select:
+          - show_merchant:
+              id: rose_lake_smith
+              loot_list: level5_smith
+              buy_frac: 1.0
+              sell_frac: 0.25
+              refresh_time:
+                hour: 24
+      - text: "Nothing today."

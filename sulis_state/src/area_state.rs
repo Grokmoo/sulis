@@ -1001,7 +1001,7 @@ impl AreaState {
 
         let entities_to_ignore = vec![entity.borrow().index()];
         if !self.is_passable(&entity.borrow(), &entities_to_ignore, x, y) {
-            warn!("Entity location in '{}' is not passable: {},{} for '{}'", &self.area.id,
+            info!("Entity location in '{}' is not passable: {},{} for '{}'", &self.area.id,
                   x, y, &entity.borrow().actor.actor.id);
         }
 

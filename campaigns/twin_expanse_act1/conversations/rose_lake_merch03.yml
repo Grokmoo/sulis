@@ -1,0 +1,20 @@
+id: rose_lake_merch03
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=888|This man has a bit of a slimy demeanor.]
+      
+      I've got all manner of bargains here.  What are you in the market for?
+    responses:
+      - text: "Yes, I'll have a look."
+        on_select:
+          - show_merchant:
+              id: rose_lake_merch03
+              loot_list: level5_misc_merchant
+              buy_frac: 0.9
+              sell_frac: 0.25
+              refresh_time:
+                hour: 24
+      - text: "Nothing for now."

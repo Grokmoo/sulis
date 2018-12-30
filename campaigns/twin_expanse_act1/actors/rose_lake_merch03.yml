@@ -1,0 +1,28 @@
+---
+id: rose_lake_merch03
+name: Merchant
+race: human
+sex: Male
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
+conversation: rose_lake_merch03
+faction: Neutral
+images:
+  Background: creatures/human06
+  Shadow: creatures/goblin_shadow
+  Foreground: empty
+hue: 0.7000000476837158
+inventory:
+  equipped: {}
+  quick: {}
+  pc_starting_coins: 0
+  pc_starting_items: []
+levels:
+  druid: 1
+abilities: []
+ai: ~

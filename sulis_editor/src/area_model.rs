@@ -34,7 +34,7 @@ pub struct AreaModel {
     pub config: EditorConfig,
 
     tiles: Vec<(String, Vec<(Point, Rc<Tile>)>)>,
-    actors: Vec<(Point, Rc<Actor>)>,
+    actors: Vec<(Point, Rc<Actor>, Option<String>)>,
     props: Vec<PropData>,
     encounters: Vec<EncounterData>,
     transitions: Vec<Transition>,
@@ -314,18 +314,18 @@ impl AreaModel {
     pub fn add_actor(&mut self, actor: Rc<Actor>, x: i32, y: i32) {
         if x < 0 || y < 0 { return; }
 
-        self.actors.push((Point::new(x, y), actor));
+        self.actors.push((Point::new(x, y), actor, None));
     }
 
     pub fn remove_actors_within(&mut self, x: i32, y: i32, width: i32, height: i32) {
-        self.actors.retain(|&(pos, ref actor)| {
+        self.actors.retain(|&(pos, ref actor, _)| {
             !is_removal(pos, actor.race.size.width, actor.race.size.height, x, y, width, height)
         });
     }
 
     pub fn actors_within(&self, x: i32, y: i32, width: i32, height: i32) -> Vec<(Point, Rc<Actor>)> {
         let mut actors = Vec::new();
-        for &(pos, ref actor) in self.actors.iter() {
+        for &(pos, ref actor, _) in self.actors.iter() {
             if !is_removal(pos, actor.race.size.width, actor.race.size.height, x, y, width, height) {
                 continue;
             }
@@ -456,7 +456,7 @@ impl AreaModel {
             renderer.draw(draw_list);
         }
 
-        for &(pos, ref actor) in self.actors.iter() {
+        for &(pos, ref actor, _) in self.actors.iter() {
             let w = actor.race.size.width as f32 / 2.0;
             let h = actor.race.size.height as f32 / 2.0;
             actor.draw(renderer, scale_x, scale_y, pos.x as f32 + x - w,
@@ -639,7 +639,7 @@ impl AreaModel {
                 }, Some(actor) => actor,
             };
 
-            self.actors.push((actor_data.location, actor));
+            self.actors.push((actor_data.location, actor, actor_data.unique_id));
         }
 
         trace!("Loading area encounters.");
@@ -756,9 +756,11 @@ impl AreaModel {
 
         trace!("Saving actors.");
         let mut actors: Vec<ActorData> = Vec::new();
-        for &(pos, ref actor) in self.actors.iter() {
-            let unique_id = None;
-            actors.push(ActorData { id: actor.id.to_string(), unique_id, location: pos });
+        for &(pos, ref actor, ref unique_id) in self.actors.iter() {
+            actors.push(ActorData {
+                id: actor.id.to_string(),
+                unique_id: unique_id.clone(),
+                location: pos });
         }
 
         trace!("Saving props.");

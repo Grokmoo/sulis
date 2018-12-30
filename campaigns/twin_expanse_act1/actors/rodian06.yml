@@ -1,0 +1,28 @@
+---
+id: rodian06
+name: Rodian
+race: rodian
+sex: Male
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
+conversation: ~
+faction: Neutral
+images:
+  Shadow: creatures/goblin_shadow
+  Background: creatures/rodian03
+  Foreground: empty
+hue: 0.20000000298023225
+inventory:
+  equipped: {}
+  quick: {}
+  pc_starting_coins: 0
+  pc_starting_items: []
+levels:
+  rogue: 1
+abilities: []
+ai: ~

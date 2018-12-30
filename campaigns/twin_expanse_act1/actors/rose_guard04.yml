@@ -1,0 +1,42 @@
+---
+id: rose_guard04
+name: "Rose Guard"
+race: human_simple
+sex: Male
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
+conversation: ~
+faction: Neutral
+images:
+  Background: creatures/human21
+  Foreground: empty
+  Shadow: empty
+hue: 0.3999999165534973
+inventory:
+  equipped:
+    Feet: { id: boots_mail }
+    Torso: { id: torso_mail }
+    Legs: { id: legs_mail }
+    HeldMain: { id: shortsword }
+    HeldOff: { id: shield_kite }
+  quick: {}
+levels:
+  fighter: 7
+abilities:
+  - armor_light
+  - armor_medium
+  - armor_heavy
+  - weapon_axe
+  - weapon_crossbow
+  - weapon_bow
+  - weapon_small_sword
+  - weapon_large_sword
+  - weapon_spear
+  - weapon_mace
+  - weapon_simple
+ai: ~

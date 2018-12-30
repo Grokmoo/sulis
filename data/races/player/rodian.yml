@@ -77,3 +77,7 @@ skin_colors : [
   "EDAE67", "CE9452", "734A29", "422110",
   "2F1010", "FFC794", "D48661", "80412B",
   "501002" ]
+editor_creator_images:
+  Background: [ creatures/rodian01, creatures/rodian02, creatures/rodian03, creatures/rodian04, creatures/rodian05 ]
+  Foreground: [ empty ]
+  Shadow: [ creatures/goblin_shadow ]

@@ -1,0 +1,33 @@
+id: rose_lake_priest
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=888|This woman is marked as a priest of Anu.]
+      
+      Hello.  What can the goddess do for you on this day?
+    responses:
+      - text: "Can I see what services you offer?"
+        on_select:
+          - show_merchant:
+              id: rose_lake_priest
+              loot_list: level5_priest
+              buy_frac: 1.0
+              sell_frac: 0.25
+              refresh_time:
+                hour: 24
+      - text: "May we rest in the temple for a bit?"
+        to: rest
+      - text: "Nothing for now."
+  rest:
+    text: |
+      Yes, of course.
+      
+      Rest, and recover from your injuries.
+    responses:
+      - text: "[c=888|Rest]"
+        on_select:
+          - fire_script:
+              id: wellswood
+              func: priest_rest

@@ -1,0 +1,28 @@
+---
+id: rose_lake_merch01
+name: Merchant
+race: human
+sex: Male
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
+conversation: rose_lake_merch01
+faction: Neutral
+images:
+  Shadow: empty
+  Foreground: empty
+  Background: creatures/human13
+hue: 0.30000001192092898
+inventory:
+  equipped: {}
+  quick: {}
+  pc_starting_coins: 0
+  pc_starting_items: []
+levels:
+  fighter: 1
+abilities: []
+ai: ~

@@ -14,10 +14,12 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
+use std::ptr;
+
 use sulis_core::config::Config;
 use sulis_core::ui::Color;
 use sulis_core::io::{DrawList, GraphicsRenderer};
-use crate::EntityState;
+use crate::{EntityState, GameState};
 
 const BORDER_SIZE: i32 = 2;
 const BORDER_SIZE_F: f32 = BORDER_SIZE as f32;
@@ -90,6 +92,19 @@ impl EntityTextureCache {
         }
     }
 
+    pub fn invalidate(&mut self) {
+        self.entity_slots.clear();
+
+        unsafe {
+            ptr::write_bytes(self.slots.as_mut_ptr(), 0, self.slots.len());
+        }
+
+        let mgr = GameState::turn_manager();
+        for entity in mgr.borrow().entity_iter() {
+            entity.borrow_mut().clear_texture_cache();
+        }
+    }
+
     /// Adds the specified entity to the cache, finding a slot for the entity and drawing
     /// the entity in that slot.  the returned index is a handle to the slot used by the entity
     pub fn add_entity(&mut self, entity: &EntityState, renderer: &mut GraphicsRenderer) -> EntityTextureSlot {
@@ -101,7 +116,8 @@ impl EntityTextureCache {
         let x = slot.x as f32 + BORDER_SIZE_F;
         let y = slot.y as f32 + BORDER_SIZE_F;
 
-        debug!("Drawing entity to texture {} at {},{}", self.texture_id, x, y);
+        info!("Drawing entity '{}' to slot {} at {},{}", entity.actor.actor.id,
+               slot_index, x, y);
         let (ui_x, ui_y) = Config::ui_size();
         let scale_x = ui_x as f32 / self.slots_dim as f32;
         let scale_y = ui_y as f32 / self.slots_dim as f32;
@@ -150,6 +166,10 @@ impl EntityTextureCache {
         let y_min = index / self.slots_dim;
         let x_max = x_min + width as usize;
         let y_max = y_min + height as usize;
+
+        if x_max >= self.slots_dim || y_max >= self.slots_dim {
+            return false;
+        }
 
         for y in y_min..y_max {
             for x in x_min..x_max {

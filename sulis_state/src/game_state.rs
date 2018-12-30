@@ -914,10 +914,6 @@ impl GameState {
 
         area_state.borrow_mut().push_scroll_to_callback(Rc::clone(&pc));
 
-        for entity in mgr.borrow().entity_iter() {
-            entity.borrow_mut().clear_texture_cache();
-        }
-
         let mut area_state = area_state.borrow_mut();
         area_state.update_view_visibility();
         if !area_state.on_load_fired {

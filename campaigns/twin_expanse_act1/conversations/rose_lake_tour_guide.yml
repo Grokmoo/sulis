@@ -1,0 +1,86 @@
+id: rose_lake_tour_guide
+initial_nodes:
+  - id: main
+    to_view:
+      - target_flag: already_talked
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=888|This man seems overly enthusiastic for the somber mood over the city.]
+      
+      Welcome to Rose Lake!  I can give directions or information about anything in the city that you want to know!
+    on_view:
+      - target_flag: already_talked
+    responses:
+      - text: "[c=888|Continue]"
+        to: main
+  main:
+    text: |
+      So what can I do for you?
+    responses:
+      - text: "What is the general layout of the city?"
+        to: ask_layout
+      - text: "I have an important message for the Council of Five.  How do I reach them?"
+        to: ask_council
+      - text: "Where should I go for shopping?"
+        to: ask_shopping
+      - text: "Is there anywhere I can rest and recover?"
+        to: ask_rest
+      - text: "Do you know of anyone needing any jobs done?"
+        to: ask_jobs
+      - text: "Nothing for now.  Farewell."
+  ask_layout:
+    text: |
+      Well, the city layout is quite simple, really.  Everything is centered around the main market square and the tradesman's square just North of it.  This area also includes the guard post, town hall, and temple.
+      
+      Here by the gates, you have the Commoner's district, mostly housing really.
+    responses:
+      - text: "[c=888|Continue]"
+        to: ask_layout2
+  ask_layout2:
+    text: |
+      To the North is the Rodian burrows - I doubt there is anything of interest to you there.
+      
+      On the far side of the market square are the Lake docks and warehouses.
+    responses:
+      - text: "[c=888|Continue]"
+        to: ask_layout3
+  ask_layout3:
+    text: |
+      To the East is the Noble district and Terfelly Square.  The best of our fine city have their estates there.
+      
+      Finally, along the main road is Rose Fort and the council chambers, the seat of power for the city and the area beyond.
+    responses:
+      - text: "[c=888|Continue]"
+        to: main
+  ask_shopping:
+    text: |
+      You can buy anything that suits your fancy and quite a few things that don't, all in the central market square.
+      
+      Its just a bit to the East and then North, in the center of the city - just follow the main road.  And don't forget to check out the tradesman's square to the north of the main square.
+    responses:
+      - text: "[c=888|Continue]"
+        to: main
+  ask_rest:
+    text: |
+      The temple to Anu is located just East of the main market square, located East and then North in the center of the city.  The priestess there can tend to your needs.
+    responses:
+      - text: "[c=888|Continue]"
+        to: main
+  ask_jobs:
+    text: |
+      From the look of you I am guessing you don't mean fetching water, eh?
+      
+      I'd check out the Rose Lake Guard post or town hall, both to the West of the market square to the Northeast.
+    responses:
+      - text: "[c=888|Continue]"
+        to: main
+  ask_council:
+    text: |
+      Well, the Council does grant audiences on occasion but I'm not sure when the next one is.  If it is important, maybe you can get an audience special.
+      
+      You will find them in the Council chambers, inside the Rose Fort.  Follow the main road to the Northeast and then East, and you can't miss it.
+    responses:
+      - text: "[c=888|Continue]"
+        to: main

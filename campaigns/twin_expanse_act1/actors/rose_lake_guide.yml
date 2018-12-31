@@ -1,0 +1,28 @@
+---
+id: rose_lake_guide
+name: Guide
+race: human
+sex: Female
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
+conversation: rose_lake_tour_guide
+faction: Neutral
+images:
+  Foreground: empty
+  Shadow: empty
+  Background: creatures/human11
+hue: 0.7000000476837158
+inventory:
+  equipped: {}
+  quick: {}
+  pc_starting_coins: 0
+  pc_starting_items: []
+levels:
+  mage: 1
+abilities: []
+ai: ~

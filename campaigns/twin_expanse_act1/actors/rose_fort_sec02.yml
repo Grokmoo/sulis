@@ -1,0 +1,28 @@
+---
+id: rose_fort_sec02
+name: Receptionist
+race: human
+sex: Male
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
+conversation: ~
+faction: Neutral
+images:
+  Background: creatures/human14
+  Foreground: empty
+  Shadow: empty
+hue: 0.7000000476837158
+inventory:
+  equipped: {}
+  quick: {}
+  pc_starting_coins: 0
+  pc_starting_items: []
+levels:
+  mage: 1
+abilities: []
+ai: ~

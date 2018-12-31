@@ -46,27 +46,27 @@ actors:
     location:
       x: 26
       y: 59
-    unique_id: ~
+    unique_id: fb_tp01
   - id: townsperson03
     location:
       x: 24
       y: 53
-    unique_id: ~
+    unique_id: fb_tp03
   - id: townsperson05
     location:
       x: 16
       y: 46
-    unique_id: ~
+    unique_id: fb_tp05
   - id: townsperson07
     location:
       x: 18
       y: 44
-    unique_id: ~
+    unique_id: fb_tp07
   - id: townsperson12
     location:
       x: 13
       y: 43
-    unique_id: ~
+    unique_id: fb_tp12
 props:
   - id: transition_hint
     location:

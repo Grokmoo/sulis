@@ -32,3 +32,4 @@ prereqs:
   abilities: [ armor_light ]
   levels:
     mage: 3
+    druid: 3

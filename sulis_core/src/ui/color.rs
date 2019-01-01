@@ -64,9 +64,9 @@ impl FromStr for Color {
 
     fn from_str(text: &str) -> Result<Self, Self::Err> {
         if text.len() == 3 || text.len() == 4 {
-            let r = get_component(&text[0..1], 16.0);
-            let g = get_component(&text[1..2], 16.0);
-            let b = get_component(&text[2..3], 16.0);
+            let r = get_component(&text[0..1], 15.0);
+            let g = get_component(&text[1..2], 15.0);
+            let b = get_component(&text[2..3], 15.0);
             let a = if text.len() == 4 {
                 get_component(&text[3..4], 16.0)
             } else {

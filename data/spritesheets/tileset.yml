@@ -1006,3 +1006,28 @@ groups:
       cabinet_short01: [19, 6, 2, 1]
       cabinet_small_01: [19, 7, 1, 1]
       cabinet_small_02: [20, 7, 1, 1]
+  benches:
+    position: [44, 10]
+    areas:
+      bench_n: [0, 0, 2, 1]
+      bench_s_top: [2, 0, 2, 1]
+      bench_s_bot: [2, 1, 2, 1]
+      bench_e: [0, 1, 1, 2]
+      bench_w: [1, 1, 1, 2]
+      bench_small_ew: [2, 2, 1, 1]
+      bench_small_ns: [3, 2, 1, 1]
+      table05: [4, 0, 2, 2]
+      table06: [4, 2, 2, 1]
+  signs:
+    position: [50, 10]
+    size: [1, 1]
+    areas:
+      sign_weapon: [0, 0]
+      sign_bag: [1, 0]
+      sign_helm: [2, 0]
+      sign_bottle: [3, 0]
+      sign_mug: [0, 1]
+      sign_inn: [1, 1]
+      sign_medal: [2, 1]
+      sign_tools: [3, 1]
+      sign_blank: [0, 2]

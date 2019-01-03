@@ -675,7 +675,8 @@ uniform_sets:
       book01, papers02, book02, meat01, meat02, fish01, fish02, fish03,
       veg01, veg02, veg03, veg04, veg05, veg06,
       castle01_window01, shield01, shield02, swords01, swords02,
-      cobwebs_nw, cobwebs_ne
+      cobwebs_nw, cobwebs_ne,
+      sign_weapon, sign_bag, sign_helm, sign_bottle, sign_mug, sign_inn, sign_medal, sign_tools, sign_blank
     ]
   decoration2by1:
     layer: decoration
@@ -735,7 +736,8 @@ uniform_sets:
       table03, table04, chair05, chair06, chair07, chair08,
       cabinet_bot_01, cabinet_bot_02, cabinet_bot_03, cabinet_bot_04,
       cabinet_top_01, cabinet_top_02, cabinet_top_03, cabinet_top_04,
-      cabinet_small_01, cabinet_small_02
+      cabinet_small_01, cabinet_small_02,
+      bench_small_ew, bench_small_ns
     ]
   interior_bed_vert:
     layer: object_interior
@@ -765,7 +767,8 @@ uniform_sets:
     impass: [[0, 0], [1, 0], [0, 1], [1, 1], [0, 2], [1, 2], [0, 3], [1, 3]]
     invis: []
     tiles: [
-      cabinet_med01, cabinet_med02, cabinet_med03, cabinet_med04, sack_stack
+      cabinet_med01, cabinet_med02, cabinet_med03, cabinet_med04, sack_stack,
+      bench_e, bench_w
     ]
   interior_cabinet_large:
     layer: object_interior
@@ -1914,3 +1917,33 @@ tiles:
     impass: []
     invis: []
     sprite: tileset/castle01_gate_tunnel
+  bench_n:
+    layer: object_interior
+    size: [4, 2]
+    pass: []
+    invis: []
+    sprite: tileset/bench_n
+  table06:
+    layer: object_interior
+    size: [4, 2]
+    pass: []
+    invis: []
+    sprite: tileset/table06
+  bench_s_top:
+    layer: aerial
+    size: [4, 2]
+    impass: []
+    invis: []
+    sprite: tileset/bench_s_top
+  bench_s_bot:
+    layer: object_interior
+    size: [4, 2]
+    pass: []
+    invis: []
+    sprite: tileset/bench_s_bot
+  table05:
+    layer: object_interior
+    size: [4, 4]
+    pass: [[0, 3], [1, 3], [2, 3], [3, 3]]
+    invis: []
+    sprite: tileset/table05

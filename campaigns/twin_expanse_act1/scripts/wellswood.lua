@@ -146,4 +146,6 @@ function get_rose_lake_pass(parent)
   game:add_party_item("rose_lake_pass")
   
   game:player():set_flag("leader_of_beasts_reported")
+
+  game:set_quest_entry_state("seeing_the_council", "start", "Visible")
 end

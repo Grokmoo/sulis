@@ -10,7 +10,7 @@ attributes:
   per: 10
   int: 10
   wis: 10
-conversation: ~
+conversation: rose_fort_sec02
 faction: Neutral
 images:
   Background: creatures/human14

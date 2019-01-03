@@ -1,0 +1,9 @@
+id: seeing_the_council
+name: "Seeing the Council"
+entries:
+  start:
+    description: |
+      The Mayor of Wellswood has asked me to travel to Rose Lake and report to the council with the information I have gathered from the Swamp Fortress.
+  blocked:
+    description: |
+      My attempt to see the Council has been blocked by layers of bureaucracy.  It has been suggested that I should seek out the Captain of the Guard or the High Priestess of Anu for a way forward.

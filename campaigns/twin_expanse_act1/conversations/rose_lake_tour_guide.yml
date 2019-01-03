@@ -19,6 +19,8 @@ nodes:
     text: |
       So what can I do for you?
     responses:
+      - text: "Why has the city been closed?"
+        to: ask_closed
       - text: "What is the general layout of the city?"
         to: ask_layout
       - text: "I have an important message for the Council of Five.  How do I reach them?"
@@ -30,6 +32,12 @@ nodes:
       - text: "Do you know of anyone needing any jobs done?"
         to: ask_jobs
       - text: "Nothing for now.  Farewell."
+  ask_closed:
+    text: |
+      A bit of a mystery, that is.  The best I've heard on the street is that there was a murder of some high ranking official and they think the murderer is still in the city.  Regardless, it has been hell to get anyone in or out of the city.
+    responses:
+      - text: "[c=888|Continue]"
+        to: main
   ask_layout:
     text: |
       Well, the city layout is quite simple, really.  Everything is centered around the main market square and the tradesman's square just North of it.  This area also includes the guard post, town hall, and temple.

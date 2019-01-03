@@ -1,0 +1,72 @@
+id: rose_fort_sec02
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=888|This woman seems to be the receptionist in charge of the Council chambers.]
+      
+      How may I be of service?
+    responses:
+      - text: "We have urgent news for the Council."
+        to: request_see
+      - text: "Nothing right now."
+  request_see:
+    text: |
+      [c=888|The woman seems unimpressed.]
+      
+      Oh?  Do you have an appointment?
+    responses:
+      - text: "[c=800|Lie] Yes, we have an appointment."
+        to: request_see02lie
+      - text: "No, but it really is important."
+        to: request_see02
+      - text: "No.  Sorry for wasting your time."
+  request_see02lie:
+    text: |
+      [c=888|The woman looks down at her book for a moment.]
+      
+      I'm afraid I don't have you listed.
+    responses:
+      - text: "It is really important!"
+        to: request_see02
+      - text: "I see.  Sorry for wasting your time."
+  request_see02:
+    text: |
+      I'm sure it is, but I'm afraid the Council is not open for general audience at this time.
+    responses:
+      - text: "When will the Council be open for general audience?"
+        to: request_see03a
+      - text: "Can I schedule an appointment, then?"
+        to: request_see03b
+      - text: "Is there no way to see the council?"
+        to: request_see03c
+      - text: "Very well.  Farewell."
+  request_see03a:
+    text: |
+      I'm afraid there is no general audience scheduled at this time, so I really can't say.  It could be quite a while.
+    responses:
+      - text: "[c=888|Continue]"
+        to: request_see02
+  request_see03b:
+    text: |
+      Unfortunately I don't have any availability to schedule an appointment at this time.
+    responses:
+      - text: "[c=888|Continue]"
+        to: request_see02
+  request_see03c:
+    text: |
+      Well, certain important officials in the city have the authority to see the council - the Captain of the Guard or the High Priestess of Anu, for example.  So, I suppose you could try to get one of them to help you.
+    on_view:
+      - fire_script:
+          id: rose_lake
+          func: council_secretary_suggestion
+    responses:
+      - text: "How would I go about doing that?"
+        to: request_see04
+  request_see04:
+    text: |
+      [c=888|The secretary seems visibly annoyed.] I really have no idea.  Look, I'm just trying to do my job here.
+    responses:
+      - text: "[c=888|Continue]"
+        to: request_see02

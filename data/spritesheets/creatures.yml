@@ -324,3 +324,15 @@ groups:
       human19: [54, 0]
       human20: [57, 0]
       human21: [60, 0]
+  premades02:
+    size: [3, 3]
+    position: [40, 46]
+    areas:
+      human22: [0, 0]
+      human23: [3, 0]
+      human24: [6, 0]
+      human25: [9, 0]
+      human26: [12, 0]
+      human27: [15, 0]
+      human28: [18, 0]
+      human29: [0, 3]

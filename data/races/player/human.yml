@@ -147,6 +147,7 @@ editor_creator_images:
   Background: [ creatures/human01, creatures/human02, creatures/human03, creatures/human04, creatures/human05, creatures/human06,
     creatures/human07, creatures/human08, creatures/human09, creatures/human10, creatures/human11, creatures/human12,
     creatures/human13, creatures/human14, creatures/human15, creatures/human16, creatures/human17, creatures/human18,
-    creatures/human19, creatures/human20, creatures/human21 ]
+    creatures/human19, creatures/human20, creatures/human21, creatures/human22, creatures/human23, creatures/human24,
+    creatures/human25, creatures/human26, creatures/human27, creatures/human28, creatures/human29    ]
   Foreground: [ empty ]
   Shadow: [ empty ]

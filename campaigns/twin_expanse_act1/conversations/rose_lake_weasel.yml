@@ -1,0 +1,169 @@
+id: rose_lake_weasel
+initial_nodes:
+  - id: grateful
+    to_view:
+      - target_flag: agreed_to_help
+  - id: hateful
+    to_view:
+      - target_flag: extorted
+  - id: start01
+nodes:
+  grateful:
+    text: "Thank you so much for your help."
+    responses: []
+  hateful:
+    text: "You got what you wanted.  Leave us alone."
+    responses: []
+  start01:
+    text: |
+      What do you want?
+    responses:
+      - text: "I'm here to collect for Jevero."
+        to_view:
+          - quest_state:
+              quest: a_weasels_debt
+              entry: start
+              state: Visible
+        to: collect01
+      - text: "Nothing for now."
+  collect01:
+    text: |
+      [c=888|The Rodian's eyes dart nervously from one side to the other.]
+      
+      I already told Jevero, I have no money.  We have nothing here, see?
+      
+      [c=888|He points around the dirty "room", if you could even call it that.]
+    responses:
+      - text: "I see.  What was the debt for?"
+        to: collect_inquire01
+      - text: "I don't care about that.  Jevero says you owe five hundred.  Time to pay."
+        to: ask_hard
+      - text: "You know what, forget it.  Farewell."
+  collect_inquire01:
+    text: |
+      Three hundred.  For tools, clothes - for jobs.  But none of the humans above will hire us.  So now we have nothing, no money, no jobs.
+    responses:
+      - text: "That's very sad.  But Jevero says you owe five hundred.  So pay up."
+        to: ask_hard
+      - text: "I'm sorry to hear that.  Maybe I could help work something out with Jevero."
+        to: ask_med
+      - text: "That's terrible.  I will speak to Jevero.  He should not be taking advantage of you like this."
+        to: ask_soft
+      - text: "I'm sorry I asked.  Farewell."
+  ask_hard:
+    text: |
+      Already told you, I have no money!  Nothing!
+    responses:
+      - text: "I don't believe that for a second.  You are holding out on me."
+        to: ask_hard2
+      - text: "Maybe I could help you work something out?"
+        to: ask_med
+      - text: "You know, it is terrible what he is doing to you.  I will speak to Jevero."
+        to: ask_soft
+  ask_hard2:
+    text: |
+      Ok ok.  We can do the three hundred.  But that is everything.  We have no more.
+    responses:
+      - text: "That will do.  I will make sure Jevero accepts."
+        on_select:
+          - target_num_flag: { flag: coins_to_take, val: 3000 }
+        to: ask_hard_end
+      - text: "You are holding out.  I know you have more."
+        to: ask_hard3a
+      - text: "[c=800|Threaten Him] Things are about to become very unpleasant for you.  Pay up."
+        to: ask_hard3b
+  ask_hard3a:
+    text: |
+      No, we have nothing.  Please, three hundred.  It is all we have.
+    responses:
+      - text: "Ok, then.  300 will do."
+        on_select:
+          - target_num_flag: { flag: coins_to_take, val: 3000 }
+        to: ask_hard_end
+      - text: "[c=800|Threaten Him] Hand over what you owe or things are about to get violent."
+        to: ask_hard3b
+  ask_hard3b:
+    text: |
+      [c=888|The Rodian is quivering slightly as he responds.]
+      
+      Please!  We need money for food!  Our children won't eat!
+    responses:
+      - text: "[c=800|Draw your weapon] 500 now.  Last chance."
+        to: ask_hard4
+      - text: "Fine.  300 will do."
+        on_select:
+          - target_num_flag: { flag: coins_to_take, val: 3000 }
+        to: ask_hard_end
+  ask_hard4:
+    text: |
+      [c=888|The Rodian sighs, defeated.]
+      
+      We give you 500.  Then you go away.
+    responses:
+      - text: "Yes, that is the deal."
+        on_select:
+          - target_num_flag: { flag: coins_to_take, val: 5000 }
+        to: ask_hard_end
+  ask_med:
+    text: |
+      Work out what?
+    responses:
+      - text: "Give me whatever you can spare.  I will take it to Jevero and get him to call it even."
+        to: ask_med2a
+      - text: "Give me the original 300.  I will take it to Jevero and get him to call it even."
+        to: ask_med2b
+  ask_med2a:
+    text: |
+      Ok.  You take two hundred.  Every penny from all of us.  We call it even.
+    responses:
+      - text: "Ok.  I will make Jevero accept."
+        on_select:
+          - target_num_flag: { flag: coins_to_take, val: 2000 }
+        to: ask_med_end
+  ask_med2b:
+    text: |
+      Sigh.  It will be hard on us.  But here, three hundred.  Just make sure Jerevo calls it even.
+    responses:
+      - text: "Yes, he will."
+        on_select:
+          - target_num_flag: { flag: coins_to_take, val: 3000 }
+        to: ask_hard_end
+  ask_hard_end:
+    text: |
+      You go then, and not come back.
+    on_view:
+      - target_flag: extorted
+      - quest_state:
+          quest: a_weasels_debt
+          entry: take_weasel
+          state: Visible
+      - fire_script:
+          id: rose_lake
+          func: weasel_end
+    responses:
+      - text: "Goodbye."
+  ask_med_end:
+    text: |
+      Thank you.  We will be glad to put this behind.
+    on_view:
+      - target_flag: agreed_to_help
+      - quest_state:
+          quest: a_weasels_debt
+          entry: take_weasel
+          state: Visible
+      - fire_script:
+          id: rose_lake
+          func: weasel_end
+    responses:
+      - text: "Farewell."
+  ask_soft:
+    text: |
+      I thank you, thank you!  Please just get him to leave us alone!
+    on_view:
+      - target_flag: agreed_to_help
+      - quest_state:
+          quest: a_weasels_debt
+          entry: help_weasel
+          state: Visible
+    responses:
+      - text: "I will try.  Farewell."

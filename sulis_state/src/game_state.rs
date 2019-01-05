@@ -25,9 +25,10 @@ use sulis_core::util::{self, Point, invalid_data_error, ExtInt};
 use sulis_core::io::{GraphicsRenderer};
 use sulis_rules::{HitKind, DamageKind, Time};
 use sulis_module::{Ability, Actor, Module, ObjectSize, OnTrigger, area::{Trigger, TriggerKind}};
+use sulis_module::on_trigger::QuestEntryState;
 
 use crate::{ai, AI, AreaState, ChangeListener, ChangeListenerList, Effect,
-    EntityState, Location, Formation, ItemList, ItemState, PartyStash, QuestStateSet, quest_state,
+    EntityState, Location, Formation, ItemList, ItemState, PartyStash, QuestStateSet,
     PathFinder, SaveState, ScriptState, UICallback, MOVE_TO_THRESHOLD, TurnManager, WorldMapState};
 use crate::script::{script_callback::{self, ScriptHitKind}, ScriptEntitySet, ScriptCallback, ScriptItemKind};
 use crate::animation::{self, Anim, AnimState, AnimSaveState, particle_generator::Param};
@@ -385,7 +386,7 @@ impl GameState {
         })
     }
 
-    pub fn get_quest_state(quest: String) -> quest_state::EntryState {
+    pub fn get_quest_state(quest: String) -> QuestEntryState {
         STATE.with(|state| {
             let state = state.borrow();
             let state = state.as_ref().unwrap();
@@ -393,7 +394,7 @@ impl GameState {
         })
     }
 
-    pub fn get_quest_entry_state(quest: String, entry: String) -> quest_state::EntryState {
+    pub fn get_quest_entry_state(quest: String, entry: String) -> QuestEntryState {
         STATE.with(|state| {
             let state = state.borrow();
             let state = state.as_ref().unwrap();
@@ -401,7 +402,7 @@ impl GameState {
         })
     }
 
-    pub fn set_quest_state(quest: String, entry_state: quest_state::EntryState) {
+    pub fn set_quest_state(quest: String, entry_state: QuestEntryState) {
         STATE.with(|state| {
             let mut state = state.borrow_mut();
             let state = state.as_mut().unwrap();
@@ -409,7 +410,7 @@ impl GameState {
         });
     }
 
-    pub fn set_quest_entry_state(quest: String, entry: String, entry_state: quest_state::EntryState) {
+    pub fn set_quest_entry_state(quest: String, entry: String, entry_state: QuestEntryState) {
         STATE.with(|state| {
             let mut state = state.borrow_mut();
             let state = state.as_mut().unwrap();

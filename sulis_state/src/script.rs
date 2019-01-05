@@ -90,8 +90,9 @@ use rlua::{self, Function, Lua, UserData, UserDataMethods};
 use sulis_core::config::Config;
 use sulis_core::util::{Point};
 use sulis_rules::{Time, QuickSlot};
-use sulis_module::{ability, Ability, Item, Module, OnTrigger, on_trigger, Faction};
-use crate::{EntityState, ItemState, GameState, ai, area_feedback_text::ColorKind, quest_state,
+use sulis_module::{ability, Ability, Item, Module, OnTrigger, Faction};
+use sulis_module::on_trigger::{self, QuestEntryState};
+use crate::{EntityState, ItemState, GameState, ai, area_feedback_text::ColorKind,
     animation::Anim, Location};
 
 type Result<T> = std::result::Result<T, rlua::Error>;
@@ -822,7 +823,7 @@ impl UserData for ScriptInterface {
         });
 
         methods.add_method("set_quest_state", |_, _, (quest, state): (String, String)| {
-            let state = quest_state::EntryState::from_str(&state);
+            let state = QuestEntryState::from_str(&state);
             if let None = Module::quest(&quest) {
                 warn!("Set quest state for invalid quest '{}'", quest);
             }
@@ -831,7 +832,7 @@ impl UserData for ScriptInterface {
         });
 
         methods.add_method("set_quest_entry_state", |_, _, (quest, entry, state): (String, String, String)| {
-            let state = quest_state::EntryState::from_str(&state);
+            let state = QuestEntryState::from_str(&state);
             match Module::quest(&quest) {
                 None => warn!("Set quest entry state for invalid quest '{}'", quest),
                 Some(ref quest) => {

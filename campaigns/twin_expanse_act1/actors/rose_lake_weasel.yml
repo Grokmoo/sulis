@@ -1,6 +1,6 @@
 ---
-id: rodian08
-name: Rodian
+id: rose_lake_weasel
+name: Weasel
 race: rodian
 sex: Male
 attributes:
@@ -10,13 +10,13 @@ attributes:
   per: 10
   int: 10
   wis: 10
-conversation: ~
+conversation: rose_lake_weasel
 faction: Neutral
 images:
   Background: creatures/rodian03
   Shadow: creatures/goblin_shadow
   Foreground: empty
-hue: 0.6000000238418579
+hue: 0.6
 inventory:
   equipped: {}
   quick: {}

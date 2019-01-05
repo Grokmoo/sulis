@@ -1,0 +1,208 @@
+id: rose_lake_q01
+initial_nodes:
+  - id: quest_complete
+    to_view:
+      - target_flag: complete
+  - id: quest_update
+    to_view:
+      - target_flag: already_talked 
+  - id: start01
+nodes:
+  quest_complete:
+    text: |
+      I have no further business with you.
+    responses: []
+  start01:
+    text: |
+      [c=888|The nobleman looks you over.]
+      
+      Ah, you might be just the person I am looking for!  I am Jevero.
+    responses:
+      - text: "Greetings, Jevero.  I am #player_name#."
+        to: quest01
+      - text: "Ok.  What do you have for me?"
+        to: quest01
+      - text: "I'm afraid I am not interested.  Goodbye."
+  quest01:
+    text: |
+      Yes, yes.  You see, there is a rather delicate matter of some funds I am owed.  A sum of 500 coins - nothing particularly large, you see, but I cannot allow debts to be unpaid for this long.
+    on_view:
+      - target_flag: already_talked
+    responses:
+      - text: "[c=888|Continue]"
+        to: quest02
+  quest02:
+    text: |
+      Anyway, the debtor is a Rodian they call Weasel.  He's usually found in the Warrens on the north end of town.
+      
+      He's really being quite unreasonable.  I need someone who can show a bit of strength, and get him to pay up.
+    responses:
+      - text: "[c=888|Continue]"
+        to: quest03
+  quest03:
+    text: |
+      So.  Are you interested?
+    on_view:
+      - quest_state:
+          quest: a_weasels_debt
+          entry: start
+          state: Visible
+    responses:
+      - text: "We'll do it."
+        to: quest_accept
+      - text: "What do we get out of it?"
+        to: quest_negotiate
+      - text: "Sorry, no."
+        to: quest_reject
+  quest_accept:
+    text: |
+      That's wonderful.  As I said, you'll likely find him in the Warrens.  Please let me know when you have the coins.
+    responses:
+      - text: "Farewell."
+  quest_reject:
+    text: |
+      I hope you reconsider.  I am usually here if you are able to collect.
+    responses:
+      - text: "Farewell."
+  quest_negotiate:
+    text: |
+      Well, there is a finder's fee of course.  Let's say 20% - 100 coins.
+    on_view:
+      - target_num_flag: { flag: negotiate, val: 1 }
+    responses:
+      - text: "Sounds good.  We'll do it."
+        to: quest_accept
+      - text: "Make that 30% and you've got a deal."
+        to: quest_negotiate02
+        on_select:
+          - target_num_flag: { flag: negotiate, val: 1 }
+      - text: "Not interested."
+        to: quest_negotiate03
+        on_select:
+          - target_num_flag: { flag: negotiate, val: 2 }
+  quest_negotiate02:
+    text: |
+      Yes, yes, very well.  As I said you'll likely find him in the Warrens.  Let me know when you have been able to collect.
+    responses:
+      - text: "Farewell."
+  quest_negotiate03:
+    text: |
+      Wait!
+      
+      I'll offer you 40% - 200 coins.  I simply can't go any higher.
+    responses:
+      - text: "You've got yourself a deal."
+        to: quest_accept
+      - text: "Sorry, I'm just not interested."
+        to: quest_reject
+  quest_update:
+    text: |
+      So, were you able to collect the money from Weasel?
+    responses:
+      - text: "No, and I'm not going to.  You are done preying on those people."
+        to_view:
+          - quest_state:
+              quest: a_weasels_debt
+              entry: help_weasel
+              state: Visible
+        to: quest_help01
+      - text: "Yes."
+        to_view:
+          - quest_state:
+              quest: a_weasels_debt
+              entry: take_weasel
+              state: Visible
+        to: quest_take01
+      - text: "No, not yet."
+  quest_help01:
+    text: |
+      What do you mean?  I made a business transaction.  If you don't want to collect, I'll find someone who will.
+    responses:
+      - text: "Those people have no jobs, no food, no money.  You are going to have to chalk up a loss on this one."
+        to: quest_help02
+      - text: "Fine.  Goodbye."
+  quest_help02:
+    text: |
+      [c=888|He seems flustered.]
+      
+      I'm not out to hurt anyone, I just want back what is rightfully mine.
+    responses:
+      - text: "Yeah, that's fair.  But it just isn't happening in this case."
+        to: quest_help03
+      - text: "Your own greed has cost you on this one.  There is no money to be had."
+        to: quest_help03
+  quest_help03:
+    text: |
+      [c=888|He frowns.]
+      
+      Perhaps not.  I suppose I have no choice but to take the loss and move on.
+    responses:
+      - text: "So you won't be hiring anyone else to come after Weasel?"
+        to: quest_help04
+  quest_help04:
+    text: |
+      No, I suppose not.  You've made your point.
+      
+      If you don't mind, I have other matters to attend.  Farewell.
+    responses:
+      - text: "Farewell."
+        on_select:
+          - target_flag: complete
+          - fire_script:
+              id: rose_lake
+              func: weasel_debt_help_complete
+  quest_take01:
+    text: |
+      So, you have the 500 then?
+    responses:
+      - text: "Yes, here is the 500."
+        to_view:
+          - player_coins: 5000
+        on_select:
+          - target_num_flag: { flag: coins_to_take, val: 5000 }
+        to: quest_take_500
+      - text: "I was only able to get 300."
+        to_view:
+          - player_coins: 3000
+        on_select:
+          - target_num_flag: { flag: negotiate, val: -1 }
+          - target_num_flag: { flag: coins_to_take, val: 3000 }
+        to: quest_take_300
+      - text: "I was only able to get 200."
+        to_view:
+          - player_coins: 2000
+        on_select:
+          - target_num_flag: { flag: negotiate, val: -2 }
+          - target_num_flag: { flag: coins_to_take, val: 2000 }
+        to: quest_take_200
+      - text: "Sorry, I have to go get it."
+  quest_take_200:
+    text: |
+      Truly?  I suppose you told him the deal is settled as well?  
+      
+      I guess it will do, but this is coming out of your end!
+    responses:
+      - text: "[c=888| Continue]"
+        to: quest_take_complete
+  quest_take_300:
+    text: |
+      I see.  Well, I suppose it will do.  Your fee will have to be a bit less, of course.
+    responses:
+      - text: "[c=888| Continue]"
+        to: quest_take_complete
+  quest_take_500:
+    text: |
+      Fantastic!  The finder's fee is yours.
+    responses:
+      - text: "[c=888| Continue]"
+        to: quest_take_complete
+  quest_take_complete:
+    text: |
+      Now, if you will excuse me.
+    on_view:
+      - target_flag: complete
+      - fire_script:
+          id: rose_lake
+          func: weasel_debt_take_complete
+    responses:
+      - text: "Thank you.  Farewell."

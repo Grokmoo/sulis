@@ -264,6 +264,15 @@ pub fn is_match(on_trigger: &Vec<OnTrigger>, pc: &Rc<RefCell<EntityState>>,
 
                 if !has_ability { return false; }
             },
+            QuestState(ref data) => {
+                let state = if let Some(ref entry) = data.entry {
+                    GameState::get_quest_entry_state(data.quest.to_string(), entry.to_string())
+                } else {
+                    GameState::get_quest_state(data.quest.to_string())
+                };
+
+                if state != data.state { return false; }
+            },
             _ => {
                 warn!("Unsupported OnTrigger kind '{:?}' in validator", trigger);
             }
@@ -358,6 +367,26 @@ pub fn activate(widget: &Rc<RefCell<Widget>>, on_select: &Vec<OnTrigger>,
             ShowConfirm(ref data) => show_confirm(widget, data),
             ShowMenu(ref data) => show_menu(widget, data),
             FadeOutIn => fade_out_in(widget),
+            QuestState(ref data) => {
+                match Module::quest(&data.quest) {
+                    None => warn!("Quest state for invalid quest '{}'", data.quest),
+                    Some(quest) => {
+                        if let Some(ref entry) = data.entry {
+                            if !quest.entries.contains_key(entry) {
+                                warn!("Quest entry state for invalid quest entry '{}' in '{}'",
+                                      entry, data.quest);
+                            }
+                        }
+                    }
+                }
+
+                if let Some(ref entry) = data.entry {
+                    GameState::set_quest_entry_state(data.quest.to_string(),
+                        entry.to_string(), data.state);
+                } else {
+                    GameState::set_quest_state(data.quest.to_string(), data.state);
+                }
+            },
         }
     }
 }

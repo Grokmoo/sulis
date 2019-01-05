@@ -1,0 +1,18 @@
+id: a_weasels_debt
+name: "A Weasel's Debt"
+entries:
+  start:
+    description: |
+      A nobleman by the name of Jevero in the Rose Lake noble quarter has asked me to collect a debt from Weasel, a Rodian who can be found in the Rose Lake Warrens.
+  help_weasel:
+    description: |
+      I have decided that the rich Jevero should not have taken advantage of the poor Rodians.  I have promised to speak to him on their behalf.
+  take_weasel:
+    description: |
+      I have gotten all that I could from Weasel.  Now to return to Jevero.
+  help_complete:
+    description: |
+      I convinced Jevero to lay off of Weasel and his people and let the debt slide.
+  take_complete:
+    description: |
+      I returned the money to Jevero and received my reward.

@@ -20,8 +20,8 @@ use std::cell::RefCell;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_widgets::{Label, Button, TextArea, ScrollPane};
-use sulis_module::{Quest, Module};
-use sulis_state::{quest_state::EntryState, GameState, ChangeListener};
+use sulis_module::{Quest, Module, on_trigger::QuestEntryState};
+use sulis_state::{GameState, ChangeListener};
 
 pub const NAME: &str = "quest_window";
 
@@ -87,10 +87,10 @@ impl WidgetKind for QuestWindow {
             };
 
             let active = match quests.state(&quest.id) {
-                EntryState::Hidden => continue,
-                EntryState::Visible => selected,
-                EntryState::Active => true,
-                EntryState::Complete => {
+                QuestEntryState::Hidden => continue,
+                QuestEntryState::Visible => selected,
+                QuestEntryState::Active => true,
+                QuestEntryState::Complete => {
                     if !self.show_completed { continue; }
                     selected
                 },
@@ -123,10 +123,10 @@ impl WidgetKind for QuestWindow {
                 for (id, _quest_entry) in quest_state.iter().rev() {
 
                     let active = match quests.entry_state(&quest.id, id) {
-                        EntryState::Hidden => continue,
-                        EntryState::Visible => false,
-                        EntryState::Active => true,
-                        EntryState::Complete => false,
+                        QuestEntryState::Hidden => continue,
+                        QuestEntryState::Visible => false,
+                        QuestEntryState::Active => true,
+                        QuestEntryState::Complete => false,
                     };
 
                     let entry = Widget::with_theme(TextArea::empty(), "quest_entry");

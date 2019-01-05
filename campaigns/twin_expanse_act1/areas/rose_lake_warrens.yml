@@ -62,11 +62,11 @@ actors:
       x: 11
       y: 9
     unique_id: rlw_07
-  - id: rodian08
+  - id: rose_lake_weasel
     location:
       x: 35
       y: 14
-    unique_id: rlw_08
+    unique_id: ~
   - id: rodian09
     location:
       x: 39

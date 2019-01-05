@@ -81,6 +81,37 @@ pub struct NumFlagData {
     pub val: f32,
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+pub enum QuestEntryState {
+    Hidden,
+    Visible,
+    Active,
+    Complete,
+}
+
+impl QuestEntryState {
+    pub fn from_str(s: &str) -> QuestEntryState {
+        match s {
+            "Hidden" => QuestEntryState::Hidden,
+            "Visible" => QuestEntryState::Visible,
+            "Active" => QuestEntryState::Active,
+            "Complete" => QuestEntryState::Complete,
+            _ => {
+                warn!("Invalid quest state '{}'", s);
+                QuestEntryState::Hidden
+            }
+        }
+    }
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct QuestStateData {
+    pub quest: String,
+    pub entry: Option<String>,
+    pub state: QuestEntryState,
+}
+
 #[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(deny_unknown_fields, rename_all="snake_case")]
 pub enum OnTrigger {
@@ -106,6 +137,7 @@ pub enum OnTrigger {
     LoadModule(String),
     ShowConfirm(DialogData),
     ShowMenu(MenuData),
+    QuestState(QuestStateData),
     FadeOutIn,
     CheckEndTurn,
 }

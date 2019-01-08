@@ -221,6 +221,8 @@ impl GameState {
             }
 
             let quests = QuestStateSet::load(save_state.quests);
+            let mut world_map = save_state.world_map;
+            world_map.load();
 
             Ok(GameState {
                 areas,
@@ -235,7 +237,7 @@ impl GameState {
                 party_listeners: ChangeListenerList::default(),
                 party_death_listeners: ChangeListenerList::default(),
                 ui_callbacks: Vec::new(),
-                world_map: save_state.world_map,
+                world_map,
                 quests,
             })
         };

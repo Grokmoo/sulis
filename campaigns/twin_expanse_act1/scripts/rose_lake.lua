@@ -39,3 +39,8 @@ function weasel_debt_help_complete(parent)
   game:set_quest_entry_state("a_weasels_debt", "help_complete", "Visible")
   game:set_quest_state("a_weasels_debt", "Complete")
 end
+
+function enable_naathfir(parent)
+  game:set_world_map_location_visible("naathfir_road", true)
+  game:set_world_map_location_enabled("naathfir_road", true)
+end

@@ -1,0 +1,30 @@
+id: naathfir_road_thug
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=888|One of the thugs before you, presumably the leader, addresses you.]
+      
+      Well, well, well, what have we here?  Fresh meat?
+    on_view:
+      - fire_script:
+          id: naathfir
+          func: set_road_thugs_hostile
+    responses:
+      - text: "Time to die, villian! [c=800|Attack]"
+      - text: "We have no wish to fight.  We simply wish to pass through."
+        to: ask_pass
+      - text: "Perhaps we can work something out in exchange for passage?"
+        to: ask_deal
+  ask_pass:
+    text: |
+      You just want to pass through?  How cute.  At, em boys!
+    responses:
+      - text: "[c=800|Fight]"
+  ask_deal:
+    text: |
+      You mean like a deal?  I've got one!  Your money, and your life!
+    responses:
+      - text: "[c=800|Fight]"
+      

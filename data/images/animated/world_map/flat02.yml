@@ -1,0 +1,4 @@
+id: flat02
+states:
+    normal: flat02_normal
+    disabled: flat02_disabled

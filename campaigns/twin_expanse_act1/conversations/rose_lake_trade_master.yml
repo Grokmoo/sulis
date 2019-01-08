@@ -1,0 +1,83 @@
+id: rose_lake_trade_master
+initial_nodes:
+  - id: quest_started
+    to_view:
+      - target_flag: already_talked
+  - id: start01
+nodes:
+  quest_started:
+    text: |
+      Hello.  Have you made any progress on the goods from Naathfir?
+    responses:
+      - text: "I had a few questions about that."
+        to: dwarven_goods_menu
+      - text: "Not yet.  Farewell."
+  start01:
+    text: |
+      [c=888|This man has an air of authority about him.]
+      
+      Hello, what can I do for you?  [c=888|He looks you over.] Or perhaps, you can do something for me?
+    responses:
+      - text: "What is it you had in mind?"
+        to: dwarven_goods01
+      - text: "Not at the moment."
+  dwarven_goods01:
+    text: |
+      Well, you look you can handle yourself - and I know all that equipment is expensive.
+    responses:
+      - text: "[c=888|Continue]"
+        to: dwarven_goods02
+    on_view:
+      - target_flag: already_talked
+  dwarven_goods02:
+    text: |
+      We've been expecting a large caravan of good from Naathfir - Dwarven arms and armor, mostly.  They are desperately needed by the Rose Guard.
+    responses:
+      - text: "[c=888|Continue]"
+        to: dwarven_goods03
+  dwarven_goods03:
+    text: |
+      Last word we received is that the good have been delayed - it sounds like the problem may be banditry.
+      
+      I need good warriors to head to Naathfir and assist in whatever way is neccessary to ensure the goods are delivered in a timely fashion.
+    responses:
+      - text: "[c=888|Continue]"
+        to: dwarven_goods_menu
+    on_view:
+      - quest_state:
+          quest: dwarven_goods
+          entry: start
+          state: Visible
+      - fire_script:
+          id: rose_lake
+          func: enable_naathfir
+  dwarven_goods_menu:
+    text: |
+      [c=888|The man pauses and looks to you for questions.]
+    responses:
+      - text: "Why can't the Rose Guard assist?"
+        to: ask_rose_guard
+      - text: "What sort of reward are you offering?"
+        to: ask_reward
+      - text: "Why does the Rose Guard need the shipment?  They seem well equipped already."
+        to: ask_need
+      - text: "I will look into it.  Farewell."
+      - text: "I'm not interested.  Farewell."
+  ask_rose_guard:
+    text: |
+      I'm afraid every available guardsman is needed at home at the moment.  I'm sure you've heard the rumors going around.  I won't confirm or deny any of them, but suffice it to say the city is on high alert.
+    responses:
+      - text: "[c=888|Continue]"
+        to: dwarven_goods_menu
+  ask_reward:
+    text: |
+      There is a reward, of course.  For someone such as yourself, some of the choicest pieces from the shipment would be fitting, no?
+    responses:
+      - text: "[c=888|Continue]"
+        to: dwarven_goods_menu
+  ask_need:
+    text: |
+      The current equipment is adequate, I do not deny.  But, the Council wants the Guard using only the finest.  I'm afraid I can say no more.
+    responses:
+      - text: "[c=888|Continue]"
+        to: dwarven_goods_menu

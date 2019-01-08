@@ -1,0 +1,20 @@
+id: naathfir_road_thugs
+auto_spawn: true
+min_gen_actors: 0
+max_gen_actors: 0
+entries:
+  - id: naathfir_thug01
+    unique_id: naathfir_thug01
+    always: true
+  - id: naathfir_thug02
+    unique_id: naathfir_thug02
+    always: true
+  - id: naathfir_thug03
+    unique_id: naathfir_thug03
+    always: true
+  - id: naathfir_thug04
+    unique_id: naathfir_thug04
+    always: true
+  - id: naathfir_thug05
+    unique_id: naathfir_thug05
+    always: true

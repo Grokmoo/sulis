@@ -1,0 +1,26 @@
+---
+id: rose_lake_high_priestess
+name: Rose Lake High Priestess
+race: human
+sex: Male
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
+conversation: ~
+faction: Neutral
+images:
+  Background: creatures/human20
+  Shadow: empty
+  Foreground: empty
+hue: 0.7000000476837158
+inventory:
+  equipped: {}
+  quick: {}
+levels:
+  mage: 5
+abilities: []
+ai: ~

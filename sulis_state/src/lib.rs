@@ -150,6 +150,20 @@ impl WorldMapState {
         WorldMapState { locations }
     }
 
+    fn load(&mut self) {
+        let campaign = Module::campaign();
+        let map = &campaign.world_map;
+
+        for location in map.locations.iter() {
+            if self.locations.contains_key(&location.id) { continue; }
+
+            self.locations.insert(location.id.clone(), WorldMapLocationState {
+                visible: location.initially_visible,
+                enabled: location.initially_enabled,
+            });
+        }
+    }
+
     pub fn is_visible(&self, location: &str) -> bool {
         if let Some(ref state) = self.locations.get(location) {
             state.visible

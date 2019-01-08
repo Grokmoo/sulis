@@ -1,0 +1,43 @@
+---
+id: naathfir_thug03
+name: Thug
+race: human_simple
+sex: Male
+attributes:
+  str: 18
+  dex: 12
+  end: 14
+  per: 10
+  int: 10
+  wis: 10
+conversation: ~
+faction: Neutral
+images:
+  Background: creatures/human10
+  Foreground: empty
+  Shadow: empty
+hue: 0.2
+inventory:
+  equipped:
+    HeldMain: { id: longsword }
+    Torso: { id: torso_leather }
+    Legs: { id: legs_leather }
+    Feet: { id: boots_leather }
+    Hands: { id: gloves_leather }
+  quick: {}
+levels:
+  fighter: 8
+reward:
+  xp: 50
+  loot: level5_misc
+  loot_chance: 50
+abilities:
+  - armor_light
+  - weapon_crossbow
+  - weapon_bow
+  - weapon_small_sword
+  - weapon_large_sword
+  - weapon_simple
+  - whirlwind_attack
+  - stunning_blow
+ai: ai_basic

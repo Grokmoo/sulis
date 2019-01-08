@@ -1,0 +1,43 @@
+---
+id: rose_lake_guard_captain
+name: Rose Lake Guard Captain
+race: human
+sex: Male
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
+conversation: ~
+faction: Neutral
+images:
+  Foreground: empty
+  Background: creatures/human21
+  Shadow: empty
+hue: 0.6000000238418579
+inventory:
+  equipped:
+    Feet: { id: boots_mail }
+    Torso: { id: torso_mail }
+    Legs: { id: legs_mail }
+    HeldMain: { id: longsword }
+    HeldOff: { id: shield_kite }
+    Cloak: { id: cloak }
+  quick: {}
+levels:
+  fighter: 7
+abilities:
+  - armor_light
+  - armor_medium
+  - armor_heavy
+  - weapon_axe
+  - weapon_crossbow
+  - weapon_bow
+  - weapon_small_sword
+  - weapon_large_sword
+  - weapon_spear
+  - weapon_mace
+  - weapon_simple
+ai: ~

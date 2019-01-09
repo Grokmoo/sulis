@@ -336,3 +336,10 @@ groups:
       human27: [15, 0]
       human28: [18, 0]
       human29: [0, 3]
+  dragons:
+    position: [0, 52]
+    areas:
+      dragon_snake01: [0, 0, 3, 3]
+      dragon_juvenile01: [3, 0, 4, 4]
+      dragon_red01: [7, 0, 5, 5]
+      dragon_large01: [0, 5, 10, 7]

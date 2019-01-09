@@ -1,0 +1,20 @@
+id: sea_snake
+ai: ai_basic
+name: Sea Snake
+faction: Hostile
+images: {}
+race: sea_snake
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
+levels:
+  fighter: 7
+reward:
+  xp: 50
+  loot: level5_misc
+  loot_chance: 100
+abilities: []

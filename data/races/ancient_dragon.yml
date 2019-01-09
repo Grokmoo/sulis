@@ -1,0 +1,39 @@
+id: ancient_dragon
+name: Ancient Dragon
+description: "Monster"
+size: 6by5
+movement_rate: 1.5
+base_stats:
+  - kind: { attribute: { attribute: Strength, amount: 10 } }
+  - kind: { attribute: { attribute: Dexterity, amount: -2 } }
+  - kind: { attribute: { attribute: Endurance, amount: 10 } }
+  - kind: { attribute: { attribute: Intellect, amount: 4 } }
+  - kind: { hit_points: 100 }
+  - kind: { melee_accuracy: 50 }
+  - kind: { ranged_accuracy: 50 }
+  - kind: { spell_accuracy: 50 }
+  - kind: { defense: 50 }
+  - kind: { fortitude: 50 }
+  - kind: { reflex: 50 }
+  - kind: { will: 50 }
+  - kind: { reach: 1.5 }
+base_attack:
+  damage:
+    min: 25
+    max: 35
+    kind: Piercing
+  kind: #Melee
+    reach: 2.0
+  bonuses: {}
+default_images:
+  Male:
+    Background: creatures/dragon_large01
+  Female:
+    Background: creatures/dragon_large01
+ticker_offset: [-2.0, -2.0]
+image_layer_offset_scale: 16
+image_layer_offsets:
+  Shadow: [-32, -19]
+  Background: [-32, -19]
+image_layer_postfix: {}
+

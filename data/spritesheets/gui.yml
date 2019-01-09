@@ -567,6 +567,8 @@ groups:
       cursor3by5: [0, 853, 48, 64]
       cursor2by4: [49, 853, 32, 64]
       cursor4by2: [49, 918, 64, 32]
+      cursor6by6: [246, 481, 96, 96]
+      cursor6by5: [274, 821, 96, 80]
       
       ball: [16, 148, 32, 32]
       ball_active: [16, 181, 32, 32]

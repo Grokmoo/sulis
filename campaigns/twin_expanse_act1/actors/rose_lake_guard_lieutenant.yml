@@ -1,8 +1,8 @@
 ---
-id: rose_lake_guard_captain
-name: Guard Captain
+id: rose_lake_guard_lieutenant
+name: Guard Lieutenant
 race: human
-sex: Male
+sex: Female
 attributes:
   str: 10
   dex: 10
@@ -10,20 +10,20 @@ attributes:
   per: 10
   int: 10
   wis: 10
-conversation: rose_lake_guard_captain
+conversation: rose_lake_guard_lieutenant
 faction: Neutral
 images:
   Foreground: empty
   Background: creatures/human21
   Shadow: empty
-hue: 0.6000000238418579
+hue: 0.9
 inventory:
   equipped:
     Feet: { id: boots_mail }
     Torso: { id: torso_mail }
     Legs: { id: legs_mail }
     HeldMain: { id: longsword }
-    HeldOff: { id: shield_kite }
+    HeldOff: { id: shield_heater }
     Cloak: { id: cloak }
   quick: {}
 levels:

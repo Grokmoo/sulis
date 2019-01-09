@@ -44,3 +44,8 @@ function enable_naathfir(parent)
   game:set_world_map_location_visible("naathfir_road", true)
   game:set_world_map_location_enabled("naathfir_road", true)
 end
+
+function guard_lieutenant(parent)
+  game:set_world_map_location_visible("lake_grounds", true)
+  game:set_world_map_location_enabled("lake_grounds", true)
+end

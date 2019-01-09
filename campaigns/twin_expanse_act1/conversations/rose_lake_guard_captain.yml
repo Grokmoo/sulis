@@ -1,0 +1,111 @@
+id: rose_lake_guard_captain
+initial_nodes:
+  - id: in_progress
+    to_view:
+      - quest_state:
+          quest: seeing_the_council
+          entry: guard_captain
+          state: Visible
+  - id: start01
+nodes:
+  in_progress:
+    text: "Go see the Lieutenant at the docks, then report back to me."
+    responses: []
+  start01:
+    text: |
+      [c=888|The captain of the guard glances up from his desk at you, but only for a moment.  Then his eyes return to his work.]
+      
+      Make it quick, citizen.
+    responses:
+      - text: "I have valuable information I need to bring to the council.  I heard you can help."
+        to: ask_council01
+        to_view:
+          - quest_state:
+              quest: seeing_the_council
+              entry: blocked
+              state: Visible
+      - text: "Nothing, nevermind."
+  ask_council01:
+    text: |
+      [c=888|You seem to have caught his interest as he looks up, directly at you.]
+      
+      Oh?  What sort of information is that?
+    responses:
+      - text: "Sorry, but this is  for the Council's ears only."
+        to: ask_council_med
+      - text: "This is above your pay grade, captain."
+        to: ask_council_neg
+      - text: "How do I know I can trust you?"
+        to: ask_council_med
+      - text: "[c=888|Quickly go over Irhan and the evidence you found of a conspiracy against Rose Lake]"
+        to: ask_council_easy
+  ask_council_neg:
+    text: |
+      [c=888|Without losing a beat, the captain looks back down at his work.]
+      
+      I doubt that very much.  Get out of here, before I have you removed.
+    responses:
+      - text: "But..."
+        to: ask_council_neg02
+      - text: "[c=888|Leave]"
+  ask_council_neg02:
+    text: |
+      [c=888|He looks at you again.]
+      
+      I won't repeat myself again.  Get out of here!
+    responses:
+      - text: "[c=888|Leave]"
+  ask_council_med:
+    text: |
+      [c=888|He sighs.]
+      
+      I suppose if it really is that important, best to keep it close.
+    responses:
+      - text: "[c=888|Continue]"
+        to: ask_council02
+  ask_council_easy:
+    text: |
+      [c=888|He listens intently.]
+    
+      That is quite a story.  If it is true, I'm sure the council will want to hear it from you.
+    responses:
+      - text: "[c=888|Continue]"
+        to: ask_council02
+  ask_council02:
+    text: |
+      The truth is I can help you.  But, I can't just send anyone who walks in here on to the Council.  You'll need to prove yourself first.
+    responses:
+      - text: "Prove myself?  This is urgent!"
+        to: ask_council03
+      - text: "How do I do that?"
+        to: ask_council04
+  ask_council03:
+    text: |
+      I know it may seem that way, but the Council of Five deals with these sorts of threats all the time.  They are dealing with one right now, as a matter of fact.
+    responses:
+      - text: "[c=888|Continue]"
+        to: ask_council04
+  ask_council04:
+    text: |
+      What I need from you is simple enough.  Find my Lieutenant out on the docks.  Help her with this current case we're dealing with.  Then, I'll let you see the Council.
+    responses:
+      - text: "Ok, you've got a deal.  I'll return when I've helped the Lieutenant."
+        to: ask_council06
+      - text: "Just what exactly is this case?"
+        to: ask_council05
+  ask_council05:
+    text: |
+      I'll let her explain that.  Just meet her at the docks.
+    responses:
+      - text: "[c=888|Continue]"
+        to: ask_council06
+  ask_council06:
+    text: |
+      Alright, now get to it.  And good luck.
+    responses:
+      - text: "[c=888|Leave]"
+        on_select:
+          - quest_state:
+              quest: seeing_the_council
+              entry: guard_captain
+              state: Visible

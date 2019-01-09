@@ -10,7 +10,7 @@ attributes:
   per: 10
   int: 10
   wis: 10
-conversation: ~
+conversation: rose_lake_high_priestess
 faction: Neutral
 images:
   Background: creatures/human20

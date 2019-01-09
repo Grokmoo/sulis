@@ -7,3 +7,12 @@ entries:
   blocked:
     description: |
       My attempt to see the Council has been blocked by layers of bureaucracy.  It has been suggested that I should seek out the Captain of the Guard or the High Priestess of Anu for a way forward.
+  priestess:
+    description: |
+      The High Priestess was unable to help me.
+  guard_captain:
+    description: |
+      The Guard Captain agreed to help me if I assist in an investigation.  I am to meet the Guard Lieutenant near the docks.
+  serpents:
+    description: |
+      I am to head to the other end of Rose Lake and investigate the Serpent Spawning Grounds there to follow up on some local disappearances.

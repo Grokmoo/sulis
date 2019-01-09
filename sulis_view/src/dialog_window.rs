@@ -22,7 +22,7 @@ use sulis_core::ui::{Widget, WidgetKind, theme, Callback};
 use sulis_core::io::{event, InputAction};
 use sulis_widgets::{Label, TextArea};
 use sulis_module::{Actor, OnTrigger, MerchantData, Conversation,
-    conversation::{Response}, Module, on_trigger::{self, Kind}};
+    conversation::{Response}, Module, on_trigger::{self, Kind, QuestStateData}};
 use sulis_state::{EntityState, ChangeListener, GameState, ItemState,
     area_feedback_text::ColorKind, NextGameStep,
     script::{entity_with_id, CallbackData, FuncKind}};
@@ -273,6 +273,15 @@ pub fn is_match(on_trigger: &Vec<OnTrigger>, pc: &Rc<RefCell<EntityState>>,
 
                 if state != data.state { return false; }
             },
+            NotQuestState(ref data) => {
+                let state = if let Some(ref entry) = data.entry {
+                    GameState::get_quest_entry_state(data.quest.to_string(), entry.to_string())
+                } else {
+                    GameState::get_quest_state(data.quest.to_string())
+                };
+
+                if state == data.state { return false; }
+            }
             _ => {
                 warn!("Unsupported OnTrigger kind '{:?}' in validator", trigger);
             }
@@ -368,17 +377,7 @@ pub fn activate(widget: &Rc<RefCell<Widget>>, on_select: &Vec<OnTrigger>,
             ShowMenu(ref data) => show_menu(widget, data),
             FadeOutIn => fade_out_in(widget),
             QuestState(ref data) => {
-                match Module::quest(&data.quest) {
-                    None => warn!("Quest state for invalid quest '{}'", data.quest),
-                    Some(quest) => {
-                        if let Some(ref entry) = data.entry {
-                            if !quest.entries.contains_key(entry) {
-                                warn!("Quest entry state for invalid quest entry '{}' in '{}'",
-                                      entry, data.quest);
-                            }
-                        }
-                    }
-                }
+                verify_quest(data);
 
                 if let Some(ref entry) = data.entry {
                     GameState::set_quest_entry_state(data.quest.to_string(),
@@ -387,6 +386,23 @@ pub fn activate(widget: &Rc<RefCell<Widget>>, on_select: &Vec<OnTrigger>,
                     GameState::set_quest_state(data.quest.to_string(), data.state);
                 }
             },
+            NotQuestState(_) => {
+                warn!("NotQuestState invalid for trigger/dialog on_activate");
+            }
+        }
+    }
+}
+
+fn verify_quest(data: &QuestStateData) {
+    match Module::quest(&data.quest) {
+        None => warn!("Quest state for invalid quest '{}'", data.quest),
+        Some(quest) => {
+            if let Some(ref entry) = data.entry {
+                if !quest.entries.contains_key(entry) {
+                    warn!("Quest entry state for invalid quest entry '{}' in '{}'",
+                          entry, data.quest);
+                }
+            }
         }
     }
 }

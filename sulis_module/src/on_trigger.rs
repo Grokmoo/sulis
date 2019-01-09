@@ -138,6 +138,7 @@ pub enum OnTrigger {
     ShowConfirm(DialogData),
     ShowMenu(MenuData),
     QuestState(QuestStateData),
+    NotQuestState(QuestStateData),
     FadeOutIn,
     CheckEndTurn,
 }

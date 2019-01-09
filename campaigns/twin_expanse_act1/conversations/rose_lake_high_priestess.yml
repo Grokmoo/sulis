@@ -1,0 +1,34 @@
+id: rose_lake_high_priestess
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=888|This is a priestess of Anu, of a significant rank.]
+      
+      And what can Anu do for you, friend?
+    responses:
+      - text: "Nothing today."
+      - text: "I heard you may be able to help me see the Council of Five."
+        to: ask_council
+        to_view:
+          - quest_state:
+              quest: seeing_the_council
+              entry: blocked
+              state: Visible
+          - not_quest_state:
+              quest: seeing_the_council
+              entry: priestess
+              state: Visible
+  ask_council:
+    text: |
+      [c=888|The priestess' face turns to a frown.]
+      
+      I'll have to stop you right there.  I don't know what darkness has taken hold in the council of late, but I am not welcome there as I once was.  You will have to seek another way.
+    responses:
+      - text: "I see.  Thanks anyway."
+        on_select:
+          - quest_state:
+              quest: seeing_the_council
+              entry: priestess
+              state: Visible

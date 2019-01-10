@@ -49,3 +49,18 @@ function guard_lieutenant(parent)
   game:set_world_map_location_visible("lake_grounds", true)
   game:set_world_map_location_enabled("lake_grounds", true)
 end
+
+function arzel_fight_init(parent)
+  game:cancel_blocking_anims()
+  game:scroll_view(107, 15)
+  
+  arzel = game:entity_with_id("arzel")
+  arzel:set_faction("Hostile")
+  
+  game:start_conversation("arzel", parent)
+end
+
+function arzel_spawn(parent)
+  game:spawn_encounter_at(92, 15)
+  game:set_quest_entry_state("seeing_the_council", "arzel", "Visible")
+end

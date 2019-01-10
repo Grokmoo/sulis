@@ -1,0 +1,110 @@
+id: arzel
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=888|Standing before you is a Mage of Sulis.  He doesn't seem to notice you.]
+      
+      At last.  I can finally leave this accursed place.
+    responses:
+      - text: "[c=888|Continue]"
+        to: start02
+  start02:
+    text: |
+      [c=888|Reaching into the water, he pulls out a glowing object.  It looks to be a wand or stave of some kind.]
+    responses:
+      - text: "[c=888|Continue]"
+        to: start03
+  start03:
+    text: |
+      [c=888|With a start, he notices you.]
+
+      What...how did you get past all the serpents?
+    responses:
+      - text: "I killed them."
+        to: start04a
+      - text: "I could ask you the same."
+        to: start04b
+      - text: "[c=f00|Fight] To hell with this."      
+        to: convo_exit
+        on_select:
+          - fire_script:
+              id: rose_lake
+              func: arzel_spawn
+  start04b:
+    text: |
+      The master has given me a taste of power.  Not that these creatures would pose a threat to me regardless.
+    responses:
+      - text: "[c=888|Continue]"
+        to: start05
+  start04a:
+    text: |
+      [c=888|For just a moment, his lips form a smile.]
+      
+      How...delightful.
+    responses:
+      - text: "[c=888|Continue]"
+        to: start05
+  start05:
+    text: |
+      I suppose you seek the Aegis.  Well, you are too late.  I will be the one to give it to the master.
+    responses:
+      - text: "[c=f00|Fight] We'll see about that."
+        to: convo_exit
+        on_select:
+          - fire_script:
+              id: rose_lake
+              func: arzel_spawn
+      - text: "[c=888|Lie] Perhaps we can return it to the master together."
+        to: start06a
+      - text: "Who is this master, and what are you planning?"
+        to: start06b
+  start06a:
+    text: |
+      [c=888|He seems surprised.]
+      
+      Together...
+      
+      You do not serve him. Did you just stumble in here unawares?
+    responses:
+      - text: "[c=888|Continue]"
+        to: start07
+  start06b:
+    text: |
+      [c=888|He seems surprised, but only for a moment.  His expression hardens.]
+      
+      You truly do not know?  Did you just stumble in here unawares?
+    responses:
+      - text: "[c=888|Continue]"
+        to: start07
+  start07:
+    text: |
+      I'll save you some trouble.  Rose Lake is already ours.  Now we have another piece of the Aegis.
+      
+      You have no hope.
+    responses:
+      - text: "[c=f00|Fight] It is you who are hopeless."
+        to: convo_exit
+        on_select:
+          - fire_script:
+              id: rose_lake
+              func: arzel_spawn
+      - text: "I don't wish to fight you."
+        to: start08
+  start08:
+    text: |
+      [c=888|He laughs again.]
+      
+      I'm afraid that will not be possible.
+    responses:
+      - text: "[c=f00|Fight]"
+        to: convo_exit
+        on_select:
+          - fire_script:
+              id: rose_lake
+              func: arzel_spawn
+  convo_exit:
+    text: |
+      Yes, yes.  To me, my creatures!
+    responses: []

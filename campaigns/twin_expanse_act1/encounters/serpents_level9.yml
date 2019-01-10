@@ -1,0 +1,15 @@
+id: serpents_level9
+auto_spawn: true
+min_gen_actors: 4
+max_gen_actors: 5
+entries:
+  - id: sea_serpent
+    always: true
+  - id: slime_blue
+    weight: 1
+  - id: slime_red
+    weight: 1
+  - id: slime_orange
+    weight: 1
+  - id: sea_snake
+    weight: 4

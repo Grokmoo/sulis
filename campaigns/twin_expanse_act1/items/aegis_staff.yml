@@ -1,0 +1,17 @@
+id: aegis_staff
+name: "Aegis Staff"
+icon: inventory/weapon_staff03
+weight: 10
+value: 2
+usable:
+  consumable: false
+  script: aegis_staff
+  ap: 2000
+  duration: Instant
+  use_in_slot: false
+  ai:
+    priority: 99999
+    kind: Special
+    group: Single
+    range: Personal
+  short_description: "The Aegis Staff"

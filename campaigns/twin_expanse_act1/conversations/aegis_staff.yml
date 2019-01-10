@@ -1,0 +1,16 @@
+id: aegis_staff
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=888|This is a staff - but upon closer examination, it is only one part of something greater.  It radiates intense magical energy.]
+    responses:
+      - text: "[c=888|Examine the staff closely]"
+        to: examine
+      - text: "[c=888|Put the staff away for now]"
+  examine:
+    text: |
+      [c=888|You spend some time looking the staff over in detail.  You are not able to activate any hidden functions or otherwise interact with it.]
+    responses:
+      - text: "[c=888|Put the staff away for now]"

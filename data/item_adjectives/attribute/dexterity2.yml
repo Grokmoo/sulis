@@ -1,0 +1,15 @@
+id: dexterity2
+name: Dexterity
+name_postfix: " of Dexterity"
+item_status_icon: gui/status_dexterity
+value_modifier: 1.5
+value_add: 2000
+bonus_modifier: 1.0
+penalty_modifier: 1.0
+attack_damage_modifier: 1.0
+attack_bonus_modifier: 1.0
+attack_penalty_modifier: 1.0
+bonuses:
+  - kind:
+      attribute: { attribute: Dexterity, amount: 2 }
+attack_bonuses: {}

@@ -1,0 +1,46 @@
+---
+id: arzel
+name: Arzel
+race: human
+sex: Male
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 13
+  int: 19
+  wis: 12
+conversation: arzel
+faction: Neutral
+images:
+  Shadow: empty
+  Foreground: empty
+  Background: creatures/human27
+hue: 0.2
+inventory:
+  equipped: {}
+  quick: {}
+levels:
+  mage: 11
+abilities:
+  - minor_heal
+  - flare
+  - acid_bomb
+  - weapon_simple
+  - weapon_crossbow
+  - shock
+  - heal
+  - deadly_caster
+  - haste
+  - rock_armor
+  - tenacious_soul
+  - stun
+  - luck
+  - fireball
+  - lightning_master
+  - breach
+ai: ai_basic
+reward:
+  xp: 100
+  loot: arzel_loot
+  loot_chance: 100

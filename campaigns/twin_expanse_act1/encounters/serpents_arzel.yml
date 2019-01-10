@@ -1,0 +1,11 @@
+id: serpents_arzel
+auto_spawn: false
+min_gen_actors: 2
+max_gen_actors: 3
+entries:
+  - id: sea_serpent
+    always: true
+  - id: sea_serpent
+    always: true
+  - id: sea_snake
+    weight: 4

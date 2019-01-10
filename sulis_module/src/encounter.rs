@@ -74,6 +74,8 @@ impl Encounter {
     }
 
     fn gen_actor(&self) -> Option<(Rc<Actor>, Option<String>)> {
+        if self.total_weight == 0 { return None; }
+
         let roll = rand::thread_rng().gen_range(0, self.total_weight);
         let mut cur_weight = 0;
         for entry in self.entries.iter() {

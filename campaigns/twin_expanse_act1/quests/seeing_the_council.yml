@@ -19,3 +19,9 @@ entries:
   arzel:
     description: |
       I confronted a mage in a cave near the lake.  He had recovered a magical artifact of some sort.  I should report this to the guard.
+  granted:
+    description: |
+      I reported my findings to the Captain.  He has sent word ahead to allow me access to the Council of Five.
+  complete:
+    description: |
+      I spoke to the Council and learned of the history of the Aegis, the Council, and Rose Lake.

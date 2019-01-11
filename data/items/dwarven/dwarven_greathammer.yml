@@ -1,0 +1,25 @@
+id: dwarven_greathammer
+name: Dwarven Great Hammer
+kind:
+  Weapon:
+    kind: Hammer
+icon: inventory/weapon_hammer02
+weight: 1600
+value: 600
+equippable:
+  slot: HeldMain
+  blocks_slot: HeldOff
+  bonuses: []
+  attack:
+    damage:
+      min: 24
+      max: 32
+      ap: 8
+      kind: Crushing
+    kind: # Melee
+      reach: 1.0
+    bonuses:
+      crit_multiplier: -0.5
+image:
+  HeldMain:
+    creatures/greathammer

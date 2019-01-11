@@ -1,0 +1,19 @@
+id: dwarven_boots_plate
+name: Dwarven Plate Boots
+kind:
+  Armor:
+    kind: Heavy
+icon: inventory/boots_plate02
+weight: 300
+value: 1200
+equippable:
+  slot: Feet
+  bonuses:
+    - kind: { armor: 3 }
+    - kind: { armor_kind: { kind: Slashing, amount: 2 } }
+    - kind: { armor_kind: { kind: Shock, amount: -2 } }
+    - kind: { movement_rate: -0.02 }
+    - kind: { spell_accuracy: -7 }
+image:
+  Feet:
+    creatures/boots_plate

@@ -280,6 +280,9 @@ groups:
       pc_dead_small: [45, 21]
       pc_dead_large: [48, 21]
       
+      helm_plate02: [30, 24]
+      helm_plate03: [33, 24]
+      
       sickle_off: [12, 24]
       halberd_off: [15, 24]
       glaive_off: [18, 24]
@@ -336,6 +339,14 @@ groups:
       human27: [15, 0]
       human28: [18, 0]
       human29: [0, 3]
+      dwarf01: [3, 3]
+      dwarf02: [6, 3]
+      dwarf03: [9, 3]
+      dwarf04: [12, 3]
+      dwarf05: [15, 3]
+      dwarf06: [18, 3]
+      dwarf07: [21, 3]
+      
   dragons:
     position: [0, 52]
     areas:

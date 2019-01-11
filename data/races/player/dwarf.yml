@@ -109,3 +109,8 @@ skin_colors : [
   "EDAE67", "CE9452", "734A29", "422110",
   "2F1010", "FFC794", "D48661", "80412B",
   "501002" ]
+editor_creator_images:
+  Background: [ creatures/dwarf01, creatures/dwarf02, creatures/dwarf03, creatures/dwarf04, creatures/dwarf05, creatures/dwarf06,
+    creatures/dwarf07 ]
+  Foreground: [ empty ]
+  Shadow: [ empty ]

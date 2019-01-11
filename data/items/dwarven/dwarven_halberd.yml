@@ -1,0 +1,24 @@
+id: dwarven_halberd
+name: Dwarven Halberd
+kind:
+  Weapon:
+    kind: Spear
+icon: inventory/weapon_polearm02
+weight: 700
+value: 650
+equippable:
+  slot: HeldMain
+  blocks_slot: HeldOff
+  bonuses: []
+  attack:
+    damage:
+      min: 18
+      max: 25
+      ap: 12
+      kind: Piercing
+    kind: # Melee
+      reach: 2.5
+    bonuses: {}
+image:
+  HeldMain:
+    creatures/halberd

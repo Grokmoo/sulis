@@ -1,0 +1,21 @@
+id: dwarven_torso_plate
+name: Dwarven Plate Armor
+kind:
+  Armor:
+    kind: Heavy
+icon: inventory/torso_plate02
+weight: 1000
+value: 6000
+equippable:
+  slot: Torso
+  bonuses:
+    - kind: { armor: 7 }
+    - kind: { armor_kind: { kind: Slashing, amount: 3 } }
+    - kind: { armor_kind: { kind: Piercing, amount: 1 } }
+    - kind: { armor_kind: { kind: Shock, amount: -5 } }
+    - kind: { movement_rate: -0.10 }
+    - kind: { attribute: { attribute: Dexterity, amount: -2 } }
+    - kind: { spell_accuracy: -15 }
+image:
+  Torso:
+    creatures/torso_plate

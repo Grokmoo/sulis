@@ -1,0 +1,18 @@
+id: dwarf_merch01
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      Get your supplies here!
+    responses:
+      - text: "Yes, I'll have a look."
+        on_select:
+          - show_merchant:
+              id: dwarf_merch01
+              loot_list: level5_misc_merchant
+              buy_frac: 1.0
+              sell_frac: 0.25
+              refresh_time:
+                hour: 24
+      - text: "Nothing for now."

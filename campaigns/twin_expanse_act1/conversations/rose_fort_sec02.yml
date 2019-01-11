@@ -1,7 +1,21 @@
 id: rose_fort_sec02
 initial_nodes:
+  - id: granted
+    to_view:
+      - quest_state:
+          quest: seeing_the_council
+          entry: granted
+          state: Visible
   - id: start01
 nodes:
+  granted:
+    text: "Word has been sent that you are to see the Council immediately.  Please go on in."
+    on_view:
+      - fire_script:
+          id: rose_lake
+          func: open_council
+    responses:
+      - text: "Thank you."
   start01:
     text: |
       [c=888|This woman seems to be the receptionist in charge of the Council chambers.]

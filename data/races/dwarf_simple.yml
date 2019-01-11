@@ -1,0 +1,49 @@
+id: dwarf_simple
+name: Dwarf
+description: "Dwarf with limited subicons"
+size: 2by2
+movement_rate: 0.85
+base_stats:
+  - kind: { attribute: { attribute: Dexterity, amount: -2 } }
+  - kind: { attribute: { attribute: Endurance, amount: 3 } }
+  - kind: { attribute: { attribute: Wisdom, amount: -1 } }
+  - kind: { hit_points: 40 }
+  - kind: { melee_accuracy: 30 }
+  - kind: { ranged_accuracy: 30 }
+  - kind: { spell_accuracy: 25 }
+  - kind: { defense: 30 }
+  - kind: { fortitude: 30 }
+  - kind: { reflex: 30 }
+  - kind: { will: 40 }
+  - kind: { reach: 0.25 }
+base_attack:
+  damage:
+    min: 8
+    max: 12
+    kind: Crushing
+  kind: #Melee
+    reach: 0.5
+  bonuses: {}
+default_images:
+  Male:
+    Foreground: creatures/dwarf_fg
+    Background: creatures/dwarf_bg
+    Shadow: creatures/dwarf_shadow
+  Female:
+    Foreground: creatures/dwarf_fg
+    Background: creatures/dwarf_bg
+    Shadow: creatures/dwarf_shadow
+ticker_offset: [0.5, 2]
+image_layer_offset_scale: 16
+image_layer_offsets:
+  HeldMain: [-26, -18]
+  HeldOff: [8, -19]
+  Hair: [-8,-16]
+  Beard: [-8,-16]
+  Foreground: [-8,-12]
+  Background: [-8,-12]
+  Cloak: [-8,-12]
+  Shadow: [-8,-12]
+image_layer_postfix:
+  Female: "_dwarf"
+  Male: "_dwarf"

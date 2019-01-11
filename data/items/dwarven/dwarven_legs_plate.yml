@@ -1,21 +1,21 @@
-id: legs_plate
-name: Plate Greaves
+id: dwarven_legs_plate
+name: Dwarven Plate Greaves
 kind:
   Armor:
     kind: Heavy
-icon: inventory/legs_plate
+icon: inventory/legs_plate02
 weight: 500
-value: 2000
+value: 2500
 equippable:
   slot: Legs
   bonuses:
     - kind: { armor: 5 }
-    - kind: { armor_kind: { kind: Slashing, amount: 2 } }
+    - kind: { armor_kind: { kind: Slashing, amount: 3 } }
     - kind: { armor_kind: { kind: Piercing, amount: 1 } }
     - kind: { armor_kind: { kind: Shock, amount: -3 } }
-    - kind: { movement_rate: -0.08 }
+    - kind: { movement_rate: -0.05 }
     - kind: { attribute: { attribute: Dexterity, amount: -1 } }
-    - kind: { spell_accuracy: -5 }
+    - kind: { spell_accuracy: -7 }
 image:
   Legs:
     creatures/legs_plate

@@ -72,6 +72,8 @@ pub struct Transition {
 pub struct ActorData {
     pub id: String,
     pub location: Point,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub unique_id: Option<String>,
 }
 
@@ -560,10 +562,10 @@ pub struct EncounterDataBuilder {
 pub struct PropDataBuilder {
     pub id: String,
     pub location: Point,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub items: Vec<ItemListEntrySaveState>,
     pub enabled: Option<bool>,
-    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub hover_text: Option<String>,
 }
 

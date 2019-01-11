@@ -1,0 +1,23 @@
+id: dwarven_battleaxe
+name: Dwarven Battleaxe
+kind:
+  Weapon:
+    kind: Axe
+icon: inventory/weapon_axe03
+weight: 400
+value: 300
+equippable:
+  slot: HeldMain
+  bonuses: []
+  attack:
+    damage:
+      min: 15
+      max: 22
+      kind: Slashing
+    kind: # Melee
+      reach: 1.0
+    bonuses:
+      crit_multiplier: 1.25
+image:
+  HeldMain:
+    creatures/battleaxe

@@ -1,0 +1,23 @@
+id: dwarven_helm_plate
+name: Dwarven Plate Helm
+kind:
+  Armor:
+    kind: Heavy
+icon: inventory/helm_plate04
+weight: 300
+value: 1200
+equippable:
+  slot: Head
+  bonuses:
+    - kind: { armor: 3 }
+    - kind: { armor_kind: { kind: Slashing, amount: 2 } }
+    - kind: { armor_kind: { kind: Shock, amount: -2 } }
+    - kind: { movement_rate: -0.02 }
+    - kind: { spell_accuracy: -7 }
+image:
+  Head:
+    creatures/helm_plate03
+  Hair:
+    empty
+  Ears:
+    empty

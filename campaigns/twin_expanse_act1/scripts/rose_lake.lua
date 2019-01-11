@@ -64,3 +64,27 @@ function arzel_spawn(parent)
   game:spawn_encounter_at(92, 15)
   game:set_quest_entry_state("seeing_the_council", "arzel", "Visible")
 end
+
+function guard_quest_complete(parent)
+  game:set_quest_entry_state("seeing_the_council", "granted", "Visible")
+  game:add_party_xp(200)
+end
+
+function open_council(parent, target)
+  if not target:has_flag("rose_lake_council_door_opened") then
+    game:enable_prop_at(36, 28)
+	game:toggle_prop_at(36, 28)
+	target:set_flag("rose_lake_council_door_opened")
+  end
+end
+
+function remove_staff(parent)
+  item = game:find_party_item("aegis_staff")
+  game:remove_party_item(item)
+  
+  game:set_quest_entry_state("seeing_the_council", "complete", "Visible")
+  game:set_quest_state("seeing_the_council", "Complete")
+  
+  game:set_world_map_location_visible("naathfir_road", true)
+  game:set_world_map_location_enabled("naathfir_road", true)
+end

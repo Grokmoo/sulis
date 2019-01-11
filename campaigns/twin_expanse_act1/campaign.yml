@@ -137,6 +137,8 @@ world_map:
       position: [8, 2.5]
       icon: mountain_town01
       initially_enabled: false
+      linked_area: naathfir
+      linked_area_pos: [36, 79]
       travel_times:
         wellswood: 48
         wellswood_forest: 60
@@ -184,7 +186,7 @@ world_map:
         lake_grounds: 6
     lake_grounds:
       name: "Lake Grounds"
-      position: [11.0, 4.0]
+      position: [12.0, 4.5]
       icon: flat03
       initially_enabled: false
       initially_visible: false

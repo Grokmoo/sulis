@@ -1,0 +1,20 @@
+id: dwarf_smith
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=888|This man stands near an anvil in the market square.]
+      
+      Superior dwarven arms.  For sale here.
+    responses:
+      - text: "Lets see what you have."
+        on_select:
+          - show_merchant:
+              id: dwarf_smith
+              loot_list: level5_dwarven_smith
+              buy_frac: 1.1
+              sell_frac: 0.25
+              refresh_time:
+                hour: 24
+      - text: "No thanks."

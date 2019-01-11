@@ -1,0 +1,23 @@
+id: helm_plate03
+name: Plate Helm
+kind:
+  Armor:
+    kind: Heavy
+icon: inventory/helm_plate03
+weight: 300
+value: 1000
+equippable:
+  slot: Head
+  bonuses:
+    - kind: { armor: 3 }
+    - kind: { armor_kind: { kind: Slashing, amount: 1 } }
+    - kind: { armor_kind: { kind: Shock, amount: -2 } }
+    - kind: { movement_rate: -0.03 }
+    - kind: { spell_accuracy: -5 }
+image:
+  Head:
+    creatures/helm_plate03
+  Hair:
+    empty
+  Ears:
+    empty

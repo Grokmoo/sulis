@@ -1,11 +1,11 @@
-id: crossbow
-name: Crossbow
+id: dwarven_crossbow
+name: Dwarven Crossbow
 kind:
   Weapon:
     kind: Crossbow
-icon: inventory/weapon_crossbow02
-weight: 400
-value: 400
+icon: inventory/weapon_crossbow
+weight: 500
+value: 500
 equippable:
   slot: HeldMain
   blocks_slot: HeldOff
@@ -20,7 +20,7 @@ equippable:
     damage:
       min: 18
       max: 25
-      ap: 10
+      ap: 12
       kind: Piercing
     kind: # Ranged
       range: 30.0

@@ -1,0 +1,137 @@
+id: rose_lake_berkeley
+initial_nodes:
+  - id: aegis_gem_in_progress
+    to_view:
+      - target_flag: aegis_gem_given
+  - id: staff01
+    to_view:
+      - target_flag: already_talked
+  - id: start01
+nodes:
+  aegis_gem_in_progress:
+    text: "Go to Naathfir and recover the gem."
+    responses:
+      - text: "[c=888|Continue]"
+        to: aegis_gem_main
+  start01:
+    text: |
+      [c=888|Before you stands the First Councillor of Rose Lake, Aurelianus Berkeley.]
+      
+      Greetings, #player_name#.  I am Aurelianus Berkeley.
+      
+      Word has reached us of your exploits.  Most impressive.
+    responses:
+      - text: "[c=888|Continue]"
+        to: start02
+  start02:
+    text: |
+      But, one thing I have learned serving this city is not to rely on hearsay.  So, if you please.  From the beginning.
+    responses:
+      - text: "[c=888|Retell your story thus far, your victories over Irhan and Arzel, and the conspiracy against the city.]"
+        to: start03
+  start03:
+    text: |
+      This is dire news indeed:  A conspiracy against Rose Lake and indeed the entire Twin Expanse, involving multiple mages of the highest Circle.
+      
+      I am most curious about this artifact uncovered under the Lake - the Aegis.  You have it with you?
+    responses:
+      - text: "[c=888|Continue]"
+        on_select:
+          - target_flag: already_talked
+        to: staff02
+  staff_exit:
+    text: |
+      Get it, and bring it back to this chamber.  At once.
+    responses:
+      - text: "[c=888|Leave]"
+  staff01:
+    text: |
+      Do you have the Aegis staff?
+    responses:
+      - text: "[c=888|Continue]"
+        to: staff02
+  staff02:
+    text: |
+      [c=888|All the council members wait expectantly.]
+    responses:
+      - text: "[c=888|Hand it to him.]  Yes, here it is."
+        to_view:
+          - party_item: aegis_staff
+        on_select:
+          - fire_script:
+              id: rose_lake
+              func: remove_staff
+          - target_flag: aegis_gem_given
+        to: staff03
+      - text: "No, I don't have it."
+        to: staff_exit
+  staff03:
+    text: |
+      [c=888|Several Councillors make an audible gasp as you produce the item.]
+      
+      It is as we feared.  A true piece of the Aegis.
+    responses:
+      - text: "[c=888|Continue]"
+        to: staff04
+  staff04:
+    text: |
+      I suppose an explanation is in order.  [c=888|He gathers his breath.]
+      
+      The Aegis is a magical artifact from before the Sundering, before magical power was limited in this world.
+      
+      Hundreds of years ago, my ancestor came to this area.  He happened upon another piece of the artifact, the Aegis Gem.  With its power of clairvoyance, they were able to found Rose Lake and gain great power.
+    responses:
+      - text: "[c=888|Continue]"
+        to: staff05
+  staff05:
+    text: |
+      Over time, the Council has come to fear the Gem's power, and the visions it gives.  We have not used it in centuries.  It has been a secret, known only to us.
+    responses:
+      - text: "[c=888|Continue]"
+        to: staff06
+  staff06:
+    text: |
+      Until, some weeks ago, Councillor Lurel was murdered, and the gem was stolen.  We had closed off the city to try to catch the murderer, but they have slipped through our grasp.
+      
+      [c=888|Berkeley looks at you.]
+      
+      You have shown great courage and skill in coming this far.  Perhaps you can help us.
+    responses:
+      - text: "[c=888|Continue]"
+        to: staff07
+  staff07:
+    on_view:
+      - quest_state:
+          quest: the_aegis_gem
+          entry: start
+          state: Visible
+    text: |
+      With the recovery of the main body of the staff, it is clear that our enemies are trying to reassemble the full Aegis staff.  I do not know what powers it will bestow, but it will certainly not be good for Rose Lake.
+      
+      [c=888|He pauses.]
+      
+      We have received reliable information that the killer is still in the region, in Naathfir.  Go there, exact justice upon the murderer, and return what was stolen.  The gem must not remain in hands hostile to Rose Lake.
+    responses:
+      - text: "[c=888|Continue]"
+        to: aegis_gem_main
+  aegis_gem_main:
+    text: Questions?
+    responses:
+      - text: "What is in this for me?"
+        to: ask_reward
+      - text: "Why aren't you sending the Rose Guard?"
+        to: ask_guard
+      - text: "I will not fail you."
+      - text: "I will think on it.  Farewell."
+  ask_reward:
+    text: |
+      We are only a moderately sized city, but we nonetheless have substantial amount of wealth to call upon in matters such as this.  Land and title are also not out of the question.
+    responses:
+      - text: "[c=888|Continue]"
+        to: aegis_gem_main
+  ask_guard:
+    text: |
+      I'm afraid that will not do.  The information you have brought us confirms the existance of a conspiracy against the city.  We do not know how many among us may be spies.  If we mobilize, it will almost certainly alert our enemies, and reveal that we know what they are up to.
+    responses:
+      - text: "[c=888|Continue]"
+        to: aegis_gem_main

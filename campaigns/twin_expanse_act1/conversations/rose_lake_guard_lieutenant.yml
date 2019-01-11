@@ -1,5 +1,11 @@
 id: rose_lake_guard_lieutenant
 initial_nodes:
+  - id: done
+    to_view:
+      - quest_state:
+          quest: seeing_the_council
+          entry: serpents
+          state: Visible
   - id: in_progress
     to_view:
       - quest_state:
@@ -8,6 +14,9 @@ initial_nodes:
           state: Visible
   - id: default
 nodes:
+  done:
+    text: "You should make any reports at the central guard house."
+    responses: []
   default:
     text: "Move along, citizen."
     responses: []

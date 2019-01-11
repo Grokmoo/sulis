@@ -1,0 +1,19 @@
+id: dwarven_gloves_plate
+name: Dwarven Plate Gloves
+kind:
+  Armor:
+    kind: Heavy
+icon: inventory/gloves_plate02
+weight: 200
+value: 1000
+equippable:
+  slot: Hands
+  bonuses:
+    - kind: { armor: 3 }
+    - kind: { armor_kind: { kind: Slashing, amount: 2 } }
+    - kind: { armor_kind: { kind: Shock, amount: -2 } }
+    - kind: { attribute: { attribute: Dexterity, amount: -1 } }
+    - kind: { spell_accuracy: -12 }
+image:
+  Hands:
+    creatures/gloves_plate

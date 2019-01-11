@@ -1,5 +1,17 @@
 id: rose_lake_guard_captain
 initial_nodes:
+  - id: end
+    to_view:
+      - quest_state:
+          quest: seeing_the_council
+          entry: granted
+          state: Visible
+  - id: complete
+    to_view:
+      - quest_state:
+          quest: seeing_the_council
+          entry: arzel
+          state: Visible
   - id: in_progress
     to_view:
       - quest_state:
@@ -8,6 +20,34 @@ initial_nodes:
           state: Visible
   - id: start01
 nodes:
+  end:
+    text: "You would make one hell of a guardsman."
+    responses: []
+  complete:
+    text: |
+      [c=888|The captain of the guard greets you more warmly than before.]
+      
+      I heard you have been out working with the Lieutenant.  What's your report?
+    responses:
+      - text: "[c=888|Describe the events in the Lake Cave, Arzel, and the Aegis Staff you recovered.]"
+        to: complete02
+  complete02:
+    text: |
+      [c=888|The captain listens intently.]
+      
+      Well damn.  Based on your story, you need to get right over to the Council right away.  And bring this 'Aegis'.  I'm sure they will want to see it.
+    on_view:
+      - fire_script:
+          id: rose_lake
+          func: guard_quest_complete
+    responses:
+      - text: "[c=888|Continue]"
+        to: complete03
+  complete03:
+    text: |
+      You did fine work, #player_name#.  None of my people could have done better.
+    responses:
+      - text: "Thanks.  Farewell."
   in_progress:
     text: "Go see the Lieutenant at the docks, then report back to me."
     responses: []

@@ -1,0 +1,20 @@
+id: dwarven_shield
+name: Dwarven War Shield
+kind:
+  Armor:
+    kind: Medium
+icon: inventory/shield_kite02
+equippable:
+  slot: HeldOff
+  bonuses:
+    - kind:
+        defense: 13
+    - kind:
+        movement_rate: -0.05
+    - kind:
+        spell_accuracy: -10
+image:
+  HeldOff:
+    creatures/shield_kite
+weight: 300
+value: 150

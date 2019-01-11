@@ -1,0 +1,25 @@
+id: dwarven_greataxe
+name: Dwarven Great Axe
+kind:
+  Weapon:
+    kind: Axe
+icon: inventory/weapon_axe02
+weight: 800
+value: 700
+equippable:
+  slot: HeldMain
+  blocks_slot: HeldOff
+  bonuses: []
+  attack:
+    damage:
+      min: 22
+      max: 30
+      ap: 6
+      kind: Slashing
+    kind: # Melee
+      reach: 1.5
+    bonuses:
+      crit_multiplier: 1.25
+image:
+  HeldMain:
+    creatures/greataxe

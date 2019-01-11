@@ -1,0 +1,24 @@
+id: dwarven_longspear
+name: Dwarven Long Spear
+kind:
+  Weapon:
+    kind: Spear
+icon: inventory/weapon_polearm04
+weight: 700
+value: 300
+equippable:
+  slot: HeldMain
+  blocks_slot: HeldOff
+  bonuses: []
+  attack:
+    damage:
+      min: 18
+      max: 25
+      ap: 8
+      kind: Piercing
+    kind: # Melee
+      reach: 3.0
+    bonuses: {}
+image:
+  HeldMain:
+    creatures/longspear

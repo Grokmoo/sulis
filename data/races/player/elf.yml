@@ -107,10 +107,22 @@ hair_colors : [
   "FFA500", "FFFFFF", "C0C0C0", "808080", "545454",
   "545454", "000000", "EEE685", "FFFF00", 
   "CC9900", "D98719", "EE7600",
-  "FF0000", "C00000", "800000", "CD853F",
+  "EE3C00", "9A3C00", "800000", "CD853F",
   "8B5A2B", "8B5A00", "8B4513", "5C3317" ]
 skin_colors : [
   "F9F4C8", "F6D39B", "F8E088", "F6D39B",
   "EDAE67", "CE9452", "734A29", "422110",
   "2F1010", "FFC794", "D48661", "80412B",
   "501002" ]
+male_random_names: [
+  "Aramon", "Argoth", "Arzhen", "Callmand", "Ceryn", "Cregil", "Dericris", "Edrus", "Firlon", "Iniot", "Isais", "Iuvea",
+  "Labhaidh", "Mellus", "Nimrosin", "Qualus", "Scotapth", "Sirith", "Tiritissie", "Vianssl", "Xerindsye", "Edriellion",
+  "Vicoral", "Aesholen", "Imirllan", "Aesras", "Faranel", "Caavandrel", "Eponras", "Carane", "Harlad", "Ullialdil",
+  "Morinal", "Caarel", "Amarel", "Hascoral", "Imarr", "Dollad", "Sirfar", "Larcoran", "Torarr", "Ralhile", "Malhuil",
+  "Urdiandilas", "Carhil", "Dolarel", "Imraanel", "Offran", "Laurerond", "Eldinor", "Shaswing" ]
+female_random_names: [
+  "Anwen", "Alacia", "Bonea", "Brada", "Chaeth", "Colena", "Eawyn", "Eochta", "Fiath", "Galli", "Glyneth", "Gwylis", "Jophilda",
+  "Kacelda", "Mithieene", "Neamhna", "Perskeylia", "Stelynne", "Swiua", "Tameline", "Xydrian", "Yunad", "Vallana", "Ellhali",
+  "Calhali", "Amarel", "Filuviel", "Linandara", "Amandilas", "Edriavandrel", "Edriina", "Torfana", "Edrifar", "Caia", "Ellcora",
+  "Lorhali", "Iocora", "Shasanel", "Carllana", "Imgrana", "Malina", "Airfar", "Algrana", "Marwen", "Yavahal", "Laurethi",
+  "Galmaris", "Linwing", "Eldiandil", "Fanuviel" ]

@@ -19,6 +19,8 @@ use std::rc::Rc;
 use std::fmt;
 use std::collections::HashMap;
 
+use rand::{self, Rng};
+
 use sulis_core::ui::Color;
 use sulis_core::image::Image;
 use sulis_core::resource::{ResourceSet};
@@ -42,6 +44,8 @@ pub struct Race {
     pub hair_selections: Vec<String>,
     pub beard_selections: Vec<String>,
     pub portrait_selections: Vec<String>,
+    pub male_random_names: Vec<String>,
+    pub female_random_names: Vec<String>,
     pub disabled_slots: Vec<Slot>,
     pub hair_colors: Vec<Color>,
     pub skin_colors: Vec<Color>,
@@ -139,12 +143,28 @@ impl Race {
             hair_selections: builder.hair_selections.unwrap_or(Vec::new()),
             beard_selections: builder.beard_selections.unwrap_or(Vec::new()),
             portrait_selections: builder.portrait_selections.unwrap_or(Vec::new()),
+            male_random_names: builder.male_random_names,
+            female_random_names: builder.female_random_names,
             hair_colors,
             skin_colors,
             ticker_offset: builder.ticker_offset,
             editor_creator_images,
             pc_death_prop,
         })
+    }
+
+    pub fn random_name(&self, sex: &Sex) -> &str {
+        let names = match sex {
+            Sex::Male => &self.male_random_names,
+            Sex::Female => &self.female_random_names,
+        };
+
+        if names.is_empty() { return ""; }
+
+        if names.len() == 1 { return &names[0] }
+
+        let index = rand::thread_rng().gen_range(0, names.len());
+        &names[index]
     }
 
     pub fn has_editor_creator_images(&self) -> bool {
@@ -199,6 +219,13 @@ pub struct RaceBuilder {
     pub hair_selections: Option<Vec<String>>,
     pub beard_selections: Option<Vec<String>>,
     pub portrait_selections: Option<Vec<String>>,
+
+    #[serde(default)]
+    pub male_random_names: Vec<String>,
+
+    #[serde(default)]
+    pub female_random_names: Vec<String>,
+
     pub hair_colors: Option<Vec<String>>,
     pub skin_colors: Option<Vec<String>>,
     pub ticker_offset: (f32, f32),

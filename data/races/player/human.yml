@@ -136,13 +136,25 @@ hair_colors : [
   "8B4513", "FFFFFF", "C0C0C0", "808080", "545454",
   "545454", "000000", "EEE685", "FFFF00", 
   "CC9900", "D98719", "FFA500", "EE7600",
-  "FF0000", "C00000", "800000", "CD853F",
+  "EE3C00", "9A3C00", "800000", "CD853F",
   "8B5A2B", "8B5A00", "5C3317" ]
 skin_colors : [
   "F9F4C8", "F6D39B", "F8E088", "F6D39B",
   "EDAE67", "CE9452", "734A29", "422110",
   "2F1010", "FFC794", "D48661", "80412B",
   "501002" ]
+male_random_names: [
+  "Adane", "Aeric", "Brien", "Cromir", "Cyric", "Darian", "Duffus", "Golin", "Jackin", "Jartet",
+  "Kennig", "Melin", "Merick", "Ranith", "Sorran", "Shorman", "Sydney", "Teffis", "Terlin", "Wellen",
+  "Melor", "Ruan", "Alan", "Nadelek", "Colan", "Jermyn", "Conan", "Gawen", "Howel", "Pedrek", "Carlyon",
+  "Branek", "Wolmar", "Rudi", "Georg", "Rutger", "Jakob", "Runnolf", "Vikar", "Bosi", "Fjori", "Frodi",
+  "Asmund", "Hakon", "Bjarkmar", "Hosvir", "Hakon" ]
+female_random_names: [
+  "Alissa", "Amicia", "Brena", "Brook", "Coley", "Crista", "Glinta", "Gwena", "Jenae", "Kerry", "Lobanna",
+  "Lucie", "Nella", "Rosie", "Morianna", "Shamma", "Shirriel", "Tetra", "Vadanna", "Zaria", "Elestren",
+  "Tega", "Tressa", "Lowenna", "Eseld", "Rosenwyn", "Tressa", "Mellyn", "Kerensa", "Caja", "Bronnen",
+  "Wenna", "Gitta", "Elfrida", "Kathrine", "Emilie", "Sima", "Frida", "Ursua", "Theda", "Elisa", "Bera",
+  "Galumvor", "Isgerd", "Vaetild", "Ilsa" ]
 editor_creator_images:
   Background: [ creatures/human01, creatures/human02, creatures/human03, creatures/human04, creatures/human05, creatures/human06,
     creatures/human07, creatures/human08, creatures/human09, creatures/human10, creatures/human11, creatures/human12,

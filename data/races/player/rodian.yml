@@ -77,6 +77,14 @@ skin_colors : [
   "EDAE67", "CE9452", "734A29", "422110",
   "2F1010", "FFC794", "D48661", "80412B",
   "501002" ]
+male_random_names: [
+  "Alba","Alli","Ana","Ante","Arma","Barra","Bea","Buffa","Cani","Cari","Cate","Coyo","Cri","Cro","Croco","Drago",
+  "Ele","Feli","Fla","Flami","Gaze","Gira","Hexa","Hone","Jagu","Komo","Leo","Locu","Mana","Moo","Pa","Pea","Peli","Phea","Porcu","Rhi",
+  "Rhino","Sala","Scolri","Skuda","Snayl","Snai","Spanna","Spizer","Squip","Stirp","Toa","Ursa","Vina","Weas","Wharen","Woo" ]
+female_random_names: [
+  "Alba","Alli","Ana","Ante","Arma","Barra","Bea","Buffa","Cani","Cari","Cate","Coyo","Cri","Cro","Croco","Drago",
+  "Ele","Feli","Fla","Flami","Gaze","Gira","Hexa","Hone","Jagu","Komo","Leo","Locu","Mana","Moo","Pa","Pea","Peli","Phea","Porcu","Rhi",
+  "Rhino","Sala","Scolri","Skuda","Snayl","Snai","Spanna","Spizer","Squip","Stirp","Toa","Ursa","Vina","Weas","Wharen","Woo" ]
 editor_creator_images:
   Background: [ creatures/rodian01, creatures/rodian02, creatures/rodian03, creatures/rodian04, creatures/rodian05 ]
   Foreground: [ empty ]

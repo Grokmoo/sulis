@@ -102,13 +102,25 @@ hair_colors : [
   "8B4513", "FFFFFF", "C0C0C0", "808080", "545454",
   "545454", "000000", "EEE685", "FFFF00", 
   "CC9900", "D98719", "FFA500", "EE7600",
-  "FF0000", "C00000", "800000", "CD853F",
+  "EE3C00", "9A3C00", "800000", "CD853F",
   "8B5A2B", "8B5A00", "5C3317" ]
 skin_colors : [
   "F9F4C8", "F6D39B", "F8E088", "F6D39B",
   "EDAE67", "CE9452", "734A29", "422110",
   "2F1010", "FFC794", "D48661", "80412B",
   "501002" ]
+male_random_names: [
+  "Angolf", "Beardie", "Connink", "Daalor", "Hraftink", "Haleon", "Hrothil", "Killus", "Morgour", "Muili", "Oilti", "Orgrin", "Osrin",
+  "Thior", "Thaid", "Thorvyn", "Thraunos", "Uerih", "Wendir", "Ysonir", "Dor", "Ovund", "Durkon", "Bulak", "Barrak", "Ovlin", "Hadri",
+  "Dil", "Durrak", "Dordri", "Ragur", "Balrak", "Thorkon", "Munzad", "Bulbur", "Morain", "Fimrund", "Boltil", "Nalzad", "Farain",
+  "Bofdri", "Brak", "Dalur", "Bilum", "Morkk", "Bofim", "Fimgin", "Barond", "Dalain", "Morlin", "Dalond", "Chalkon", "Thingar",
+  "Munni", "Dorunn", "Nalur", "Norar" ]
+female_random_names: [
+  "Alynnee", "Armissa", "Blatia", "Britta", "Codaha", "Garwai", "Gregina", "Imaryle", "Lorcy", "Nokkvi", "Norean", "Onnda", "Pesina",
+  "Quodda", "Rathie", "Turella", "Shorta", "Tytta", "Winie", "Zabethe", "Runzadi", "Griumma", "Fimili", "Gargoli", "Grogoli", "Gomrimi",
+  "Harili", "Dorbura", "Nora", "Ragip", "Dwinila", "Gimraka", "Drukka", "Groa", "Gomundi", "Barnia", "Ragria", "Durkka", "Thrunni",
+  "Gomunni", "Norundi", "Ketina", "Herrimi", "Simdina", "Chalundi", "Ovondi", "Farili", "Gombari", "Stordina", "Belzadi", "Mungari",
+  "Farola", "Dormina", "Thola", "Storana" ]
 editor_creator_images:
   Background: [ creatures/dwarf01, creatures/dwarf02, creatures/dwarf03, creatures/dwarf04, creatures/dwarf05, creatures/dwarf06,
     creatures/dwarf07 ]

@@ -102,9 +102,29 @@ hair_colors : [
   "8B4513", "FFFFFF", "C0C0C0", "808080", "545454",
   "545454", "000000", "EEE685", "FFFF00", 
   "CC9900", "D98719", "FFA500", "EE7600",
-  "FF0000", "C00000", "800000", "CD853F",
+  "EE3C00", "9A3C00", "800000", "CD853F",
   "8B5A2B", "8B5A00", "5C3317" ]
 skin_colors : [
   "A8A8A8", "747F73", "586b56", "616153",
   "2F5161", "F6D39B", "F6D39B", "EDAE67",
   "CE9452", "734A29", "D48661", "80412B" ]
+male_random_names: [
+  'Ditid','Quivilt','Mohanlal','Sollix','Equinus','Gamjee','Matuna','Kurzol','Erodjan','Alwan','Anje',
+  'Azibo','Ajin','Ekon','Erasto','Haijen','Hamedi','Hokima','Jaafan','Jabir','Jalai','Javyn','Jijel','Juma','Jumoke',
+  'Kaijin','Kazko','Maalik','Makas','Malak','Nyabingi','Rahjin','Rakash','Rashi','Razi','Reji','Rujabu','Rujin',
+  'Seji','Senwe','Seshi','Teshi','Tzane','Tzuljin','Voyambi','Vuzashi','Vuzembi','Yamike','Yavo','Yawan','Zaejin',
+  'Zallah','Zebajin','Zelaji','Zevrij','Zinjo','Zufem','Alzim','Ayagi','Ayargajin','Dorkuraz','Hakalai','Halasuwa','Hokajin',
+  'Hoodah','Hyptu','Jaryaya','Jayunya','Jinjin','Jojin','Kelraz','Kuroji','Lakjin','Laojin','Melkree','Mezilkree','Napokue',
+  'Nuenvan','Paikei','Rapshider','Rhazin','Shaktilar','Shengis','Sligo','Tanjin','Tazingo','Tedar','Trezzahn','Trolgar',
+  'Ttarmek','Ugoki','Vekuzz','Venjo','Vulzal','Wanjin','Wonjin','Xukundi','Yetu','Zengu','Zoljin','Zulabar','Zulbaljin',
+  'Zulgeteb','Zulkaz','Zulkis','Zulrajas','Zulyafi','Zunabar' ]
+female_random_names: [ 'Gilta','Vitchen','Tirezi','Fefeya','Aradya','Nepita','Damari','Meenah','Kenaya','Vriska','Ajia',
+  'Aketa','Altoa','Aszea','Atae','Azra','Ecia','Ejie','Eleja','Esha','Illa','Kea','Keja','Kina','Kiya','Kizi','Moza','Oyana',
+  'Raca','Rasha','Seshia','Suja','Suli','Talisa','Tasiya','Tayo','Teja','Teza','Tezzi','Tizali','Xia','Yaci','Yajdna','Yashi','Yera',
+  'Yeree','Yesha','Yishi','Zara','Zashi','Zea','Zelea','Zesa','Zeti','Zola','Zoti','Zujia','Zyra','Alunja','Anji','Arany','Bajin','Baliaja',
+  'Benni','Bie','Boonoo','Bunjin','Csini','Feylin','Girisha','Hailith','Ithra','Javilla','Javinda','Jezemalu','Jinthaiya','Jiranty',
+  'Jozala','Jubukraa','Juljin','Kanjin','Katanja','Katzine','Khelynn','Khijazi','Khuwei','Kululu','Lujin','Makali','Mandula','Meimei',
+  'Melelea','Nelina','Prerrahar','Pujati','Rangi','Renjai','Renji','Ronjaty','Saedmara','Saonji','Segawa','Senzala','Shadrala',
+  'Shakawatha','Shaktila','Shamra','Sharimara','Shubre','Soniya','Sonja','Suliya','Sulynn','Titamor','Tsaijo','Usitutie','Valja',
+  'Vanjin','Venmara','Vinji','Vinjin','Vonjai','Vujii','Vulzala','Watu','Yuhai','Zalma','Zalmea','Zenma','Zhonya','Zhoumai','Ziataaman',
+  'Ziataima','Ziataja','Ziatajie','Ziatakraa','Zonraja','Zulja','Zulja','Zuljah','Zuljin','Zulkraa','Zulmara','Zulraja','Zulrea','Zulwatha' ]

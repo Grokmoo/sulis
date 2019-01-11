@@ -428,12 +428,17 @@ children:
               scale: 8
           name_field:
             from: .input_field
-            preferred_size: [60, 8]
+            preferred_size: [50, 8]
             position: [33, 15]
             text_params:
               scale: 8
             custom:
               carat_height: 5.0
+          random_name_button:
+            from: .button
+            text: "Random"
+            preferred_size: [18, 8]
+            position: [85, 15]
           male_button:
             from: .button
             text: "Male"
@@ -544,15 +549,21 @@ children:
   portrait_selector:
     background: bg_base
     border: [2, 2, 2, 2]
-    preferred_size: [215, 100]
-    width_relative: Zero
-    height_relative: Zero
+    preferred_size: [150, 116]
     x_relative: Center
     y_relative: Center
-    layout: Grid
     children:
-      portrait_button:
-        from: .button
-        preferred_size: [18, 18]
-    layout_spacing: { top: 0, bottom: 1, left: 0, right: 1 }
+      scrollbar:
+        from: .scrollbar
+        custom:
+          scroll_delta: 28
+      content:
+        width_relative: Max
+        height_relative: Max
+        layout: Grid
+        layout_spacing: { top: 0, bottom: 1, left: 0, right: 1 }
+        children:
+          portrait_button:
+            from: .button
+            preferred_size: [27, 27]
 ...

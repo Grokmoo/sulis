@@ -9,7 +9,7 @@ initial_nodes:
   - id: start01
 nodes:
   aegis_gem_in_progress:
-    text: "Go to Naathfir and recover the gem."
+    text: "Go to the Naathfir mines and recover the gem."
     responses:
       - text: "[c=888|Continue]"
         to: aegis_gem_main
@@ -110,7 +110,7 @@ nodes:
       
       [c=888|He pauses.]
       
-      We have received reliable information that the killer is still in the region, in Naathfir.  Go there, exact justice upon the murderer, and return what was stolen.  The gem must not remain in hands hostile to Rose Lake.
+      We have received reliable information that the killer is still in the region, in the Naathfir mines.  Go there, exact justice upon the murderer, and return what was stolen.  The gem must not remain in hands hostile to Rose Lake.
     responses:
       - text: "[c=888|Continue]"
         to: aegis_gem_main

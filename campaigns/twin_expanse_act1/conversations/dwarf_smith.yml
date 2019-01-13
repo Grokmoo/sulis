@@ -17,4 +17,17 @@ nodes:
               sell_frac: 0.25
               refresh_time:
                 hour: 24
+      - text: "Can you direct me to the mines?"
+        to: ask_mines
+        to_view:
+          - quest_state:
+              quest: the_aegis_gem
+              entry: start
+              state: Visible
       - text: "No thanks."
+  ask_mines:
+    text: |
+      They are just up the road, at the North end of town.
+    responses:
+      - text: "[c=888|Continue]"
+        to: start01

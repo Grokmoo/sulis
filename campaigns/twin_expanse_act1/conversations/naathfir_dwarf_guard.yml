@@ -1,0 +1,59 @@
+id: naathfir_dwarf_guard
+initial_nodes:
+  - id: already_talked
+    to_view:
+      - target_flag: already_talked
+  - id: allow_enter
+    to_view:
+      - quest_state:
+          quest: the_aegis_gem
+          entry: start
+          state: Visible
+  - id: start01
+nodes:
+  already_talked:
+    text: "Best of luck to you."
+    responses: []
+  allow_enter:
+    text: |
+      [c=888|The guard nods at you.]
+      
+      The Council sent word to expect you.  What you seek is inside the mines.
+      
+      Be warned though, the situation inside is not pretty.
+    responses:
+      - text: "Thank you.  Farewell."
+        on_select:
+          - target_flag: already_talked
+          - fire_script:
+              id: naathfir
+              func: guard_open_gate
+  start01:
+    text: |
+      [c=888|The guard looks at you.]
+      
+      I'm afraid there has been a disturbance in the mines.  No access is allowed at this time.
+    responses:
+      - text: "[c=888|Continue]"
+        to: start02
+  start02:
+    text: |
+      [c=888|The guard looks off to indicate he is done with you.]
+    responses:
+      - text: "Why are the mines closed?"
+        to: ask_why
+      - text: "But I must enter!"
+        to: ask_enter
+      - text: "Very well.  Farewell."
+  ask_why:
+    text: |
+      As I said, there has been a disturbance.  More than that, I cannot say.
+    responses:
+      - text: "[c=888|Continue]"
+        to: start02
+  ask_enter:
+    text: |
+      My orders are clear.  No admittance.
+    responses:
+      - text: "[c=888|Continue]"
+        to: start02

@@ -10,7 +10,7 @@ attributes:
   per: 10
   int: 10
   wis: 10
-conversation: ~
+conversation: naathfir_dwarf_guard
 faction: Neutral
 images:
   Shadow: empty

@@ -3,4 +3,7 @@ name: "The Aegis Gem"
 entries:
   start:
     description: |
-      The Council of Five in Rose Lake has tasked me with retrieving the Aegis Gem.  They believe it is currently in Naathfir.
+      The Council of Five in Rose Lake has tasked me with retrieving the Aegis Gem.  They believe it is currently in the Naathfir mines.
+  mines:
+    description: |
+      I have gained access to the Naathfir mines.  The murderer of Councillor Lurel and the Aegis Gem are inside.

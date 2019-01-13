@@ -34,3 +34,9 @@ function trader_leave_finish(parent)
   trader = game:entity_with_id("dwarf_trader01")
   trader:remove()
 end
+
+function guard_open_gate(parent)
+  game:enable_prop_at(34, 7)
+  game:toggle_prop_at(34, 7)
+  game:set_quest_entry_state("the_aegis_gem", "mines", "Visible")
+end

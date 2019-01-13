@@ -88,3 +88,18 @@ function remove_staff(parent)
   game:set_world_map_location_visible("naathfir_road", true)
   game:set_world_map_location_enabled("naathfir_road", true)
 end
+
+function dwarven_goods_complete(parent)
+  game:set_quest_entry_state("dwarven_goods", "complete", "Visible")
+  game:set_quest_state("dwarven_goods", "Complete")
+  
+  local weapons = { "dwarven_battleaxe", "dwarven_crossbow", "dwarven_greataxe",
+    "dwarven_greathammer", "dwarven_halberd", "dwarven_longspear" }
+
+  local armor = { "dwarven_torso_plate", "dwarven_shield", "dwarven_legs_plate" }
+  
+  game:add_party_item(weapons[math.random(#weapons)], "fine")
+  game:add_party_item(armor[math.random(#armor)], "fine")
+  game:add_party_xp(200)
+  game:add_party_coins(2000)
+end

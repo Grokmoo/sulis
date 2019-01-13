@@ -14,8 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use std::str::FromStr;
-use std::io::{Error, ErrorKind};
+use std::{str::FromStr, io::{Error, ErrorKind}, fmt};
 
 #[macro_use] extern crate serde_derive;
 #[macro_use] extern crate log;
@@ -65,6 +64,43 @@ pub struct Time {
 
     #[serde(default)]
     pub millis: u32,
+}
+
+impl fmt::Display for Time {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let mut prev = false;
+        if self.day > 0 {
+            write_singular_or_plural(f, prev, self.day, "day")?;
+            prev = true;
+        }
+
+        if self.hour > 0 {
+            write_singular_or_plural(f, prev, self.hour, "hour")?;
+            prev = true;
+        }
+
+        if self.round > 0 {
+            write_singular_or_plural(f, prev, self.round, "round")?;
+            prev = true;
+        }
+
+        if self.millis > 0 {
+            write_singular_or_plural(f, prev, self.millis, "milli")?;
+        }
+
+        Ok(())
+    }
+}
+
+fn write_singular_or_plural(f: &mut fmt::Formatter, prev: bool,
+                            qty: u32, unit: &str) -> fmt::Result {
+    if prev { write!(f, ", ")?; }
+
+    write!(f, "{} {}", qty, unit)?;
+
+    if qty > 1 { write!(f, "s")?; }
+
+    Ok(())
 }
 
 impl Default for Time {

@@ -18,3 +18,19 @@ function set_hostile(entities)
     entities[i]:set_faction("Hostile")
   end
 end
+
+function trader_farewell(parent)
+  game:set_quest_entry_state("dwarven_goods", "found", "Visible")
+  trader = game:entity_with_id("dwarf_trader01")
+  
+  if not trader:move_towards_point(21, 40) then
+    game:warn("dwarf_trader01 unable to move")
+  end
+  
+  game:run_script_delayed("naathfir", "trader_leave_finish", 2.0)
+end
+
+function trader_leave_finish(parent)
+  trader = game:entity_with_id("dwarf_trader01")
+  trader:remove()
+end

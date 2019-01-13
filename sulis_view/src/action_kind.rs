@@ -21,7 +21,7 @@ use sulis_core::ui::{animation_state, Widget};
 use sulis_core::util::Point;
 use sulis_rules::Time;
 use sulis_module::{Faction, Module, ObjectSize, area::ToKind};
-use sulis_state::{MOVE_TO_THRESHOLD, EntityState, GameState, ScriptCallback, AreaState};
+use sulis_state::{MOVE_TO_THRESHOLD, EntityState, GameState, ScriptCallback, AreaState, PropState};
 use crate::{dialog_window, RootView};
 
 pub fn get_action(x: i32, y: i32) -> Box<ActionKind> {
@@ -32,19 +32,56 @@ pub fn get_action(x: i32, y: i32) -> Box<ActionKind> {
     if let Some(action) = SelectAction::create_if_valid(x, y) { return action; }
     if let Some(action) = AttackAction::create_if_valid(x, y) { return action; }
     if let Some(action) = DialogAction::create_if_valid(x, y) { return action; }
-    if let Some(action) = LootPropAction::create_if_valid(x, y) { return action; }
 
-    // open door
-    if let Some(action) = DoorPropAction::create_if_valid(x, y, true) { return action; }
+    if let Some(action) = get_prop_or_transition_action(x, y) { return action; }
 
-    if let Some(action) = TransitionAction::create_if_valid(x, y) { return action; }
-
-    // close door
-    if let Some(action) = DoorPropAction::create_if_valid(x, y, false) { return action; }
+    // if let Some(action) = LootPropAction::create_if_valid(x, y) { return action; }
+    //
+    // // open door
+    // if let Some(action) = DoorPropAction::create_if_valid(x, y, true) { return action; }
+    //
+    // if let Some(action) = TransitionAction::create_if_valid(x, y) { return action; }
+    //
+    // // close door
+    // if let Some(action) = DoorPropAction::create_if_valid(x, y, false) { return action; }
 
     if let Some(action) = MoveAction::create_if_valid(x as f32, y as f32, None) { return action; }
 
     Box::new(InvalidAction {})
+}
+
+fn get_prop_or_transition_action(x: i32, y: i32) -> Option<Box<ActionKind>> {
+    let area_state = GameState::area_state();
+    let area_state = area_state.borrow();
+
+    let index = match area_state.prop_index_at(x, y) {
+        None => return TransitionAction::create_if_valid(x, y, &area_state),
+        Some(index) => index,
+    };
+    let prop = area_state.get_prop(index);
+
+    // an enabled container or a closed door (regardless of enabled) blocks a transition.
+    // an open door (regardless of enabled) does not block a transition
+
+    if prop.is_container() && prop.is_enabled() {
+        return LootPropAction::create_if_valid(index, &prop);
+    }
+
+    if prop.is_door() {
+        if !prop.is_active() {
+            // open door action (if enabled)
+            return DoorPropAction::create_if_valid(index, &prop);
+        }
+
+        if let Some(action) = TransitionAction::create_if_valid(x, y, &area_state) {
+            return Some(action);
+        }
+
+        // close door action (if enabled)
+        return DoorPropAction::create_if_valid(index, &prop);
+    }
+
+    TransitionAction::create_if_valid(x, y, &area_state)
 }
 
 pub trait ActionKind {
@@ -164,20 +201,8 @@ struct DoorPropAction {
 }
 
 impl DoorPropAction {
-    fn create_if_valid(x: i32, y: i32, open: bool) -> Option<Box<ActionKind>> {
-        let area_state = GameState::area_state();
-        let area_state = area_state.borrow();
-
-        let index = match area_state.prop_index_at(x, y) {
-            None => return None,
-            Some(index) => index,
-        };
-
-        let prop_state = area_state.get_prop(index);
+    fn create_if_valid(index: usize, prop_state: &PropState) -> Option<Box<ActionKind>> {
         if !prop_state.is_door() || !prop_state.is_enabled() { return None; }
-
-        if open && prop_state.is_active() { return None; }
-        if !open && !prop_state.is_active() { return None; }
 
         let max_dist = Module::rules().max_prop_distance;
         let pc = match GameState::selected().first() {
@@ -217,16 +242,7 @@ struct LootPropAction {
 }
 
 impl LootPropAction {
-    fn create_if_valid(x: i32, y: i32) -> Option<Box<ActionKind>> {
-        let area_state = GameState::area_state();
-        let area_state = area_state.borrow();
-
-        let index = match area_state.prop_index_at(x, y) {
-            None => return None,
-            Some(index) => index,
-        };
-
-        let prop_state = area_state.get_prop(index);
+    fn create_if_valid(index: usize, prop_state: &PropState) -> Option<Box<ActionKind>> {
         if !prop_state.is_container() || !prop_state.is_enabled() { return None; }
 
         let max_dist = Module::rules().max_prop_distance;
@@ -277,9 +293,7 @@ struct TransitionAction {
 }
 
 impl TransitionAction {
-    fn create_if_valid(x: i32, y: i32) -> Option<Box<ActionKind>> {
-        let area_state = GameState::area_state();
-        let area_state = area_state.borrow();
+    fn create_if_valid(x: i32, y: i32, area_state: &AreaState) -> Option<Box<ActionKind>> {
         let transition = area_state.get_transition_at(x, y);
         let transition = match transition {
             None => return None,

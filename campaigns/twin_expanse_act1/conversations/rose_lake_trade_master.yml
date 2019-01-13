@@ -1,10 +1,39 @@
 id: rose_lake_trade_master
 initial_nodes:
+  - id: complete
+    to_view:
+      - target_flag: complete
+  - id: quest_complete
+    to_view:
+      - quest_state:
+          quest: dwarven_goods
+          entry: found
+          state: Visible
   - id: quest_started
     to_view:
       - target_flag: already_talked
   - id: start01
 nodes:
+  complete:
+    text: |
+      Thanks again for your help.
+    responses: []
+  quest_complete:
+    text: |
+      Hello there.  Our trader finally made it back.  He told me about what happened.
+    responses:
+      - text: "[c=888|Continue]"
+        to: quest_complete02
+  quest_complete02:
+    text: |
+      As promised, your reward.  Fine dwarven goods.  And some coins for your pockets, as well.
+    on_view:
+      - target_flag: complete
+      - fire_script:
+          id: rose_lake
+          func: dwarven_goods_complete
+    responses:
+      - text: "Thank you.  Farewell."
   quest_started:
     text: |
       Hello.  Have you made any progress on the goods from Naathfir?

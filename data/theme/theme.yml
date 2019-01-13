@@ -689,7 +689,7 @@ children:
           label:
             text: |
               [a=100|#name#]
-              [?travel_time;a=100;s=5.0;f=normal|#travel_time# hours]
+              [a=100;s=5.0;?travel_time|#travel_time#]
             text_params:
               font: outlined
               scale: 6.0

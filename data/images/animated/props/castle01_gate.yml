@@ -1,4 +1,4 @@
 id: props/castle01_gate
 states:
-  normal: tileset/castle01_gate_closed
-  active: tileset/castle01_gate_open
+  normal: props/castle01_gate_closed
+  active: props/castle01_gate_open

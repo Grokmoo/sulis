@@ -30,15 +30,15 @@ world_map:
       linked_area: wellswood
       linked_area_pos: [120, 33]
       travel_times:
-        wellswood_forest: 12
-        vezula_hills: 18
-        serpents_mire: 18
-        firtuk_crossing: 12
-        thugs_hideout: 4
-        rose_lake: 24
-        naathfir: 48
-        naathfir_road: 36
-        lake_grounds: 30
+        wellswood_forest: 24
+        vezula_hills: 36
+        serpents_mire: 36
+        firtuk_crossing: 24
+        thugs_hideout: 8
+        rose_lake: 48
+        naathfir: 96
+        naathfir_road: 72
+        lake_grounds: 60
     wellswood_forest:
       name: "Wellswood"
       position: [6.0, 7.25]
@@ -47,15 +47,15 @@ world_map:
       linked_area: wellswood_forest
       linked_area_pos: [123, 123]
       travel_times:
-        wellswood: 12
-        vezula_hills: 6
-        serpents_mire: 6
-        firtuk_crossing: 24
-        thugs_hideout: 28
-        rose_lake: 36
-        naathfir: 60
-        naathfir_road: 48
-        lake_grounds: 42
+        wellswood: 24
+        vezula_hills: 12
+        serpents_mire: 12
+        firtuk_crossing: 48
+        thugs_hideout: 56
+        rose_lake: 72
+        naathfir: 120
+        naathfir_road: 96
+        lake_grounds: 84
     vezula_hills:
       name: "Vezula Hills"
       position: [5.5, 5.5]
@@ -65,15 +65,15 @@ world_map:
       linked_area: vezula_hills
       linked_area_pos: [27, 3]
       travel_times:
-        wellswood: 18
-        wellswood_forest: 6
-        serpents_mire: 6
-        firtuk_crossing: 30
-        thugs_hideout: 22
-        rose_lake: 42
-        naathfir: 66
-        naathfir_road: 54
-        lake_grounds: 48
+        wellswood: 36
+        wellswood_forest: 12
+        serpents_mire: 12
+        firtuk_crossing: 60
+        thugs_hideout: 44
+        rose_lake: 84
+        naathfir: 132
+        naathfir_road: 108
+        lake_grounds: 96
     serpents_mire:
       name: "Serpent's Mire"
       position: [3.5, 6.5]
@@ -83,15 +83,15 @@ world_map:
       linked_area: serpents_mire
       linked_area_pos: [122, 3]
       travel_times:
-        wellswood: 18
-        wellswood_forest: 6
-        vezula_hills: 6
-        firtuk_crossing: 30
-        thugs_hideout: 22
-        rose_lake: 42
-        naathfir: 66
-        naathfir_road: 54
-        lake_grounds: 48
+        wellswood: 36
+        wellswood_forest: 12
+        vezula_hills: 12
+        firtuk_crossing: 60
+        thugs_hideout: 44
+        rose_lake: 84
+        naathfir: 132
+        naathfir_road: 108
+        lake_grounds: 96
     firtuk_crossing:
       name: "Firtuk Bridge"
       position: [8.0, 6.25]
@@ -100,15 +100,15 @@ world_map:
       linked_area: firtuk_bridge
       linked_area_pos: [4, 79]
       travel_times:
-        wellswood: 12
-        wellswood_forest: 24
-        vezula_hills: 30
-        serpents_mire: 30
-        thugs_hideout: 16
-        rose_lake: 12
-        naathfir: 36
-        naathfir_road: 24
-        lake_grounds: 18
+        wellswood: 24
+        wellswood_forest: 48
+        vezula_hills: 60
+        serpents_mire: 60
+        thugs_hideout: 32
+        rose_lake: 24
+        naathfir: 72
+        naathfir_road: 48
+        lake_grounds: 36
     thugs_hideout:
       name: "Thug's Hideout"
       position: [9.5, 10]
@@ -118,15 +118,15 @@ world_map:
       linked_area: thugs_hideout
       linked_area_pos: [3, 11]
       travel_times:
-        wellswood: 4
-        wellswood_forest: 16
-        vezula_hills: 22
-        serpents_mire: 22
-        firtuk_crossing: 16
-        rose_lake: 28
-        naathfir: 52
-        naathfir_road: 40
-        lake_grounds: 34
+        wellswood: 8
+        wellswood_forest: 32
+        vezula_hills: 44
+        serpents_mire: 44
+        firtuk_crossing: 32
+        rose_lake: 56
+        naathfir: 104
+        naathfir_road: 80
+        lake_grounds: 68
     last_edge:
       name: "Last Edge"
       position: [2, 3]
@@ -140,15 +140,15 @@ world_map:
       linked_area: naathfir
       linked_area_pos: [36, 79]
       travel_times:
-        wellswood: 48
-        wellswood_forest: 60
-        vezula_hills: 66
-        serpents_mire: 66
-        firtuk_crossing: 36
-        thugs_hideout: 52
-        rose_lake: 24
-        naathfir_road: 12
-        lake_grounds: 18
+        wellswood: 96
+        wellswood_forest: 120
+        vezula_hills: 132
+        serpents_mire: 132
+        firtuk_crossing: 72
+        thugs_hideout: 104
+        rose_lake: 48
+        naathfir_road: 24
+        lake_grounds: 36
     naathfir_road:
       name: "Road to Naathfir"
       position: [8.75, 4.0]
@@ -158,15 +158,15 @@ world_map:
       linked_area: naathfir_road
       linked_area_pos: [25, 68]
       travel_times:
-        wellswood: 36
-        wellswood_forest: 48
-        vezula_hills: 54
-        serpents_mire: 54
-        firtuk_crossing: 24
-        thugs_hideout: 40
-        rose_lake: 12
-        naathfir: 12
-        lake_grounds: 18
+        wellswood: 72
+        wellswood_forest: 96
+        vezula_hills: 108
+        serpents_mire: 108
+        firtuk_crossing: 48
+        thugs_hideout: 80
+        rose_lake: 24
+        naathfir: 24
+        lake_grounds: 36
     rose_lake:
       name: "Rose Lake"
       position: [9.75, 5.5]
@@ -175,15 +175,15 @@ world_map:
       linked_area: rose_lake
       linked_area_pos: [2, 122]
       travel_times:
-        wellswood: 24
-        wellswood_forest: 36
-        vezula_hills: 42
-        serpents_mire: 42
-        firtuk_crossing: 12
-        thugs_hideout: 28
-        naathfir: 24
-        naathfir_road: 12
-        lake_grounds: 6
+        wellswood: 48
+        wellswood_forest: 72
+        vezula_hills: 84
+        serpents_mire: 84
+        firtuk_crossing: 24
+        thugs_hideout: 56
+        naathfir: 48
+        naathfir_road: 24
+        lake_grounds: 12
     lake_grounds:
       name: "Lake Grounds"
       position: [12.0, 4.5]
@@ -193,15 +193,15 @@ world_map:
       linked_area: lake_grounds
       linked_area_pos: [6, 13]
       travel_times:
-        wellswood: 30
-        wellswood_forest: 42
-        vezula_hills: 48
-        serpents_mire: 48
-        firtuk_crossing: 18
-        thugs_hideout: 34
-        naathfir: 30
-        naathfir_road: 18
-        rose_lake: 6
+        wellswood: 60
+        wellswood_forest: 84
+        vezula_hills: 96
+        serpents_mire: 96
+        firtuk_crossing: 36
+        thugs_hideout: 68
+        naathfir: 60
+        naathfir_road: 36
+        rose_lake: 12
     rose_pastures:
       name: "Rose Pastures"
       position: [13.5, 4]

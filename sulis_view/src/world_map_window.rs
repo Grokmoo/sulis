@@ -142,7 +142,10 @@ impl WidgetKind for WorldMapWindow {
                 if let Some(cur_location) = &cur_location_id {
                     if let Some(hours) = location.travel_times.get(cur_location) {
                         travel_time.hour = *hours;
-                        label.borrow_mut().state.add_text_arg("travel_time", &hours.to_string());
+                        Module::rules().canonicalize_time(&mut travel_time);
+
+                        label.borrow_mut().state.add_text_arg("travel_time",
+                                                              &travel_time.to_string());
                     }
                 }
 

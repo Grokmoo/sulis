@@ -96,6 +96,8 @@ groups:
       coins_medium: [24, 20]
       coins_large: [28, 20]
       bonespike: [32, 20]
+      castle01_gate_closed: [37, 13]
+      castle01_gate_open: [41, 13]
   misc:
     areas:
       armor_statue: [4, 4, 2, 3]

@@ -83,6 +83,33 @@ pub struct Rules {
 }
 
 impl Rules {
+    pub fn canonicalize_time(&self, time: &mut Time) {
+        let mut millis = time.millis;
+        let mut round = time.round;
+        let mut hour = time.hour;
+        let mut day = time.day;
+
+        if millis >= ROUND_TIME_MILLIS {
+            round += millis / ROUND_TIME_MILLIS;
+            millis = millis % ROUND_TIME_MILLIS;
+        }
+
+        if round >= self.rounds_per_hour {
+            hour += round / self.rounds_per_hour;
+            round = round % self.rounds_per_hour;
+        }
+
+        if hour >= self.hours_per_day {
+            day += hour / self.hours_per_day;
+            hour = hour % self.hours_per_day;
+        }
+
+        time.millis = millis;
+        time.round = round;
+        time.hour = hour;
+        time.day = day;
+    }
+
     pub fn validate(&self) -> Result<(), Error> {
         if self.hour_names.len() != self.hours_per_day as usize {
             return invalid_data_error(&format!("Must specify '{}' hours names to match number of hours",

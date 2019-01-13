@@ -1,0 +1,43 @@
+id: dwarf_trader01
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=888|This Dwarven trader has bound arms and legs.  He has a few scrapes and bruises, but nothing life threatening.]
+      
+      Well?  Cut me free?
+    responses:
+      - text: "[c=888|Cut him free]"
+        to: start02
+      - text: "[c=888|Leave him] I'm afraid not."
+  start02:
+    text: |
+      [c=888|He rubs his wrists where the ropes were.]
+      
+      Thank you kindly, stranger.  Those bastards killed my guards.  I expect they would have killed me too except they thought the hold would pay a couple coins for me.
+      
+      Jokes on them now.
+    responses:
+      - text: "[c=888|Continue]"
+        to: start03
+  start03:
+    text: |
+      I should gather up what I can and head to Rose Lake.  I'm very late on this shipment.  You should see the Trade Master for a reward.  He is usually near the warehouses on the North end of the tradesman's square.
+    responses:
+      - text: "Ok.  Farewell."
+        on_select:
+          - fire_script:
+              id: naathfir
+              func: trader_farewell
+      - text: "Will you be ok going back on your own?"
+        to: start04
+  start04:
+    text: |
+      Yeah, now that I'm out of the mountains I won't be seeing any more trouble.  Thank you again.
+    responses:
+      - text: "Farewell."
+        on_select:
+          - fire_script:
+              id: naathfir
+              func: trader_farewell

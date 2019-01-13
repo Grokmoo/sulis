@@ -411,7 +411,7 @@ impl AreaView {
         if let Some(index) = area_state.prop_index_at(x, y) {
             {
                 let prop = area_state.get_prop(index);
-                if !prop.is_door() || !prop.is_enabled() || prop.is_active() { return None; }
+                if !prop.is_door() || prop.is_active() { return None; }
             }
 
             Some(AreaMouseover::new_prop(index))

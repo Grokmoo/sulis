@@ -4,3 +4,9 @@ entries:
   start:
     description: |
       The Trade Master in Rose Lake has asked me to look into why a shipment of Dwarven trade goods from Naathfir has not arrived in Rose Lake.  I should ask into it in Naathfir.
+  found:
+    description: |
+      I found a Dwarf trader who had been ambushed and held captive by some bandits on the road to Naathfir.  He head to Rose Lake after I dispatched the bandits.  I should speak to the Trade Master on the north end of the Tradesman's square, near the warehouses.
+  complete:
+    description: |
+      I received my reward from the Trade Master.

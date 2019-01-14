@@ -7,3 +7,6 @@ entries:
   mines:
     description: |
       I have gained access to the Naathfir mines.  The murderer of Councillor Lurel and the Aegis Gem are inside.
+  lost:
+    description: |
+      I was too late to recover the Aegis Gem from the mines.  And the Tailpiece, recovered from the Naathfir Mines, has been lost as well.  I must return to the Council in Rose Lake immediately to protect the Staff.

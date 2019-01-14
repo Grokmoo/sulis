@@ -40,3 +40,14 @@ function guard_open_gate(parent)
   game:toggle_prop_at(34, 7)
   game:set_quest_entry_state("the_aegis_gem", "mines", "Visible")
 end
+
+function mines_boss_enter(parent)
+  game:cancel_blocking_anims()
+  game:scroll_view(77, 54)
+
+  omonar = game:entity_with_id("mines_omonar")
+  omonar:set_faction("Hostile")
+  game:start_conversation("naathfir_mines_omonar", omonar)
+  game:spawn_encounter_at(89, 42)
+  game:set_quest_entry_state("the_aegis_gem", "lost", "Visible")
+end

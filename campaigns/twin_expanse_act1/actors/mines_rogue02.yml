@@ -1,0 +1,40 @@
+---
+id: mines_rogue02
+name: Rogue
+race: human_simple
+sex: Male
+attributes:
+  str: 10
+  dex: 10
+  end: 10
+  per: 10
+  int: 10
+  wis: 10
+conversation: ~
+faction: Hostile
+images:
+  Foreground: empty
+  Shadow: empty
+  Background: creatures/human30
+hue: 0.300
+inventory:
+  equipped:
+    HeldMain: { id: longbow }
+    Torso: { id: torso_leather }
+    Legs: { id: legs_leather }
+    Feet: { id: boots_leather }
+    Hands: { id: gloves_leather }
+  quick: {}
+levels:
+  rogue: 9
+abilities:
+  - armor_light
+  - armor_medium
+  - weapon_bow
+  - weapon_small_sword
+  - weapon_spear
+  - weapon_simple
+  - stun_grenade
+  - shrapnel_grenade
+  - rupture
+ai: ai_basic

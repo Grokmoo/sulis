@@ -338,6 +338,7 @@ groups:
       human26: [12, 0]
       human27: [15, 0]
       human28: [18, 0]
+      human30: [21, 0]
       human29: [0, 3]
       dwarf01: [3, 3]
       dwarf02: [6, 3]
@@ -346,6 +347,7 @@ groups:
       dwarf05: [15, 3]
       dwarf06: [18, 3]
       dwarf07: [21, 3]
+      human31: [0, 6]
       
   dragons:
     position: [0, 52]

@@ -1,0 +1,19 @@
+id: elemental_crush
+name: "Crush"
+icon: abilities/crush
+description: |
+  A large chunk of stone erupts from the ground, damaging a single target with Crushing damage.
+active:
+  script: "crush"
+  group: "Special"
+  ap: 2000
+  duration:
+    Instant
+  cooldown: 3
+  ai:
+    priority: 30
+    kind: Damage
+    group: Single
+    range: Visible
+  short_description: |
+    Deal crushing damage to a single target.

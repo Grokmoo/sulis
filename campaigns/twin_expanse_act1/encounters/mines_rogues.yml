@@ -1,0 +1,13 @@
+id: mines_rogues
+auto_spawn: false
+min_gen_actors: 0
+max_gen_actors: 0
+entries:
+  - id: mines_rogue01
+    always: true
+  - id: mines_rogue02
+    always: true
+  - id: mines_rogue03
+    always: true
+  - id: mines_rogue04
+    always: true

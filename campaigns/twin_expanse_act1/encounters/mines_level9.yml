@@ -1,0 +1,17 @@
+id: mines_level9
+auto_spawn: true
+min_gen_actors: 3
+max_gen_actors: 4
+entries:
+  - id: earth_elemental
+    always: true
+  - id: slime_blue
+    weight: 1
+  - id: slime_red
+    weight: 1
+  - id: slime_orange
+    weight: 1
+  - id: shroom_med
+    weight: 2
+  - id: shroom_large
+    weight: 1

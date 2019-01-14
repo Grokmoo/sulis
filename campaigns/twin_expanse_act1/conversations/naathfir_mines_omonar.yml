@@ -1,0 +1,34 @@
+id: naathfir_mines_omonar
+initial_nodes:
+  - id: start01
+nodes:
+  start01:
+    text: |
+      [c=888|Before you stands a shadowy figure.]
+      
+      Right on time.
+      
+      Greetings.  I am called Omonar.  And this mine is your tomb.
+    responses:
+      - text: "[c=888|Continue]"
+        to: start02
+  start02:
+    text: |
+      I'm afraid you are much too late.  We have already taken the Aegis tailpiece from these mines, and the gem from Rose Lake.  And the staff - that's being secured as we speak.
+      
+      All three pieces are ours.  You have lost.  And now, you will die.
+    responses:
+      - text: "Who do you work for?"
+        to: start03
+      - text: "How did you know I was coming?"
+        to: start03
+      - text: "[c=800|Fight] It is you who will die."
+  start03:
+    text: |
+      [c=888|He laughs.]
+      
+      You truly know so little of who you are fighting?  Simply pathetic.
+      
+      [c=888|He draws his weapon]
+    responses:
+      - text: "[c=800|Fight]"

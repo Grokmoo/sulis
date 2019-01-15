@@ -294,6 +294,8 @@ struct TransitionAction {
 
 impl TransitionAction {
     fn create_if_valid(x: i32, y: i32, area_state: &AreaState) -> Option<Box<ActionKind>> {
+        if GameState::is_combat_active() { return None; }
+
         let transition = area_state.get_transition_at(x, y);
         let transition = match transition {
             None => return None,

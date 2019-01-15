@@ -93,7 +93,7 @@ use sulis_rules::{Time, QuickSlot};
 use sulis_module::{ability, Ability, Item, Module, OnTrigger, Faction};
 use sulis_module::on_trigger::{self, QuestEntryState};
 use crate::{EntityState, ItemState, GameState, ai, area_feedback_text::ColorKind,
-    animation::Anim, Location};
+    animation::Anim, Location, AreaState};
 
 type Result<T> = std::result::Result<T, rlua::Error>;
 
@@ -540,31 +540,31 @@ fn get_targeter() -> Result<Rc<RefCell<AreaTargeter>>> {
 /// Must be "Hostile", "Neutral", or "Friendly".  This method can fail if the
 /// ID or coordinates are invalid, or if the location is not passable for the entity
 ///
-/// # `spawn_encounter_at(x: Int, y: Int)`
+/// # `spawn_encounter_at(x: Int, y: Int, area_id: String (Optional))`
 /// Causes the encounter in the current area at `x`, `y` to spawn entities based
 /// on its encounter definition.  If the entities are hostile and within player
 /// visibility, will initiate combat.
 ///
-/// # `enable_trigger_at(x: Int, y: Int)`
+/// # `enable_trigger_at(x: Int, y: Int, area_id: String (Optional))`
 /// Sets the trigger in the current area at `x`, `y` to enabled.  This means the
 /// trigger will fire when its condition (such as player entering its coordinates)
 /// are met.  This method will only have an effect on triggers which are set to
 /// be initially_disabled in their defintion, or which have been disabled via
 /// `disable_trigger_at`.
 ///
-/// # `disable_trigger_at(x: Int, y: Int)`
+/// # `disable_trigger_at(x: Int, y: Int, area_id: String(Optional))`
 /// Sets the trigger in the current area at `x`, `y` to disabled.  This means the
 /// trigger will not fire regardless of whether its condition is met.
 ///
-/// # `enable_prop_at(x: Int, y: Int)`
+/// # `enable_prop_at(x: Int, y: Int, area_id: String (Optional))`
 /// Sets the prop in the current area at `x`, `y` to enabled.  When enabled, props
 /// can be interacted with if relevant for the given prop (doors or containers).
 ///
-/// # `disable_prop_at(x: Int, y: Int)`
+/// # `disable_prop_at(x: Int, y: Int, area_id: String (Optional))`
 /// Sets the prop in the current area at `x`, `y` to disabled.  When disabled, props
 /// cannot be interacted with regardless of whether they otherwise are interactive.
 ///
-/// # `toggle_prop_at(x: Int, y: Int)`
+/// # `toggle_prop_at(x: Int, y: Int, area_id: String (Optional))`
 /// Toggles the enabled / disabled state of the prop at `x`, `y`.  See `enable_prop_at` and
 /// `disable_prop_at`
 ///
@@ -645,8 +645,9 @@ fn get_targeter() -> Result<Rc<RefCell<AreaTargeter>>> {
 /// Adds the specified amount of XP to the party.  Each current party member is given
 /// this amount of XP.
 ///
-/// # `transition_party_to(area: String, x: Int, y: Int)`
-/// Moves the party to the specified coordinates within the specified area.  If the area
+/// # `transition_party_to(x: Int, y: Int, area: String (Optional))`
+/// Moves the party to the specified coordinates within the specified area.  If an area is not
+/// specified, the transition occurs within the current area.  If the area
 /// or coordinates are invalid, this will currently leave the game in a bad state where
 /// the player is forced to load to continue.  The player is moved to the exact coordinates,
 /// whereas other party members are moved to nearby coordinates.
@@ -931,8 +932,8 @@ impl UserData for ScriptInterface {
             Ok(result)
         });
 
-        methods.add_method("spawn_encounter_at", |_, _, (x, y): (i32, i32)| {
-            let area_state = GameState::area_state();
+        methods.add_method("spawn_encounter_at", |_, _, (x, y, id): (i32, i32, Option<String>)| {
+            let area_state = get_area(id)?;
             let mut area_state = area_state.borrow_mut();
 
             if !area_state.spawn_encounter_at(x, y) {
@@ -945,8 +946,8 @@ impl UserData for ScriptInterface {
             Ok(())
         });
 
-        methods.add_method("enable_trigger_at", |_, _, (x, y): (i32, i32)| {
-            let area_state = GameState::area_state();
+        methods.add_method("enable_trigger_at", |_, _, (x, y, id): (i32, i32, Option<String>)| {
+            let area_state = get_area(id)?;
             let mut area_state = area_state.borrow_mut();
             if !area_state.set_trigger_enabled_at(x, y, true) {
                 warn!("Unable to find trigger at {},{}", x, y);
@@ -954,8 +955,8 @@ impl UserData for ScriptInterface {
             Ok(())
         });
 
-        methods.add_method("disable_trigger_at", |_, _, (x, y): (i32, i32)| {
-            let area_state = GameState::area_state();
+        methods.add_method("disable_trigger_at", |_, _, (x, y, id): (i32, i32, Option<String>)| {
+            let area_state = get_area(id)?;
             let mut area_state = area_state.borrow_mut();
             if !area_state.set_trigger_enabled_at(x, y, false) {
                 warn!("Unable to find trigger at {},{}", x, y);
@@ -963,8 +964,8 @@ impl UserData for ScriptInterface {
             Ok(())
         });
 
-        methods.add_method("enable_prop_at", |_, _, (x, y): (i32, i32)| {
-            let area_state = GameState::area_state();
+        methods.add_method("enable_prop_at", |_, _, (x, y, id): (i32, i32, Option<String>)| {
+            let area_state = get_area(id)?;
             let mut area_state = area_state.borrow_mut();
             if !area_state.set_prop_enabled_at(x, y, true) {
                 warn!("Unable to find prop at {},{}", x, y);
@@ -972,8 +973,8 @@ impl UserData for ScriptInterface {
             Ok(())
         });
 
-        methods.add_method("disable_prop_at", |_, _, (x, y): (i32, i32)| {
-            let area_state = GameState::area_state();
+        methods.add_method("disable_prop_at", |_, _, (x, y, id): (i32, i32, Option<String>)| {
+            let area_state = get_area(id)?;
             let mut area_state = area_state.borrow_mut();
             if !area_state.set_prop_enabled_at(x, y, false) {
                 warn!("Unable to find prop at {},{}", x, y);
@@ -981,8 +982,8 @@ impl UserData for ScriptInterface {
             Ok(())
         });
 
-        methods.add_method("toggle_prop_at", |_, _, (x, y): (i32, i32)| {
-            let area_state = GameState::area_state();
+        methods.add_method("toggle_prop_at", |_, _, (x, y, id): (i32, i32, Option<String>)| {
+            let area_state = get_area(id)?;
             let mut area_state = area_state.borrow_mut();
             let index = match area_state.prop_index_at(x, y) {
                 None => {
@@ -1185,12 +1186,26 @@ impl UserData for ScriptInterface {
             Ok(())
         });
 
-        methods.add_method("transition_party_to", |_, _, (area, x, y): (String, i32, i32)| {
-            let location = Some(area);
-            GameState::transition(&location, x, y, Time {
+        methods.add_method("transition_party_to", |_, _, (x, y, area): (i32, i32, Option<String>)| {
+            GameState::transition(&area, x, y, Time {
                 day: 0, hour: 0, round: 0, millis: 0});
             Ok(())
         });
+    }
+}
+
+fn get_area(id: Option<String>) -> Result<Rc<RefCell<AreaState>>> {
+    match id {
+        None => {
+            Ok(GameState::area_state())
+        }, Some(id) => {
+            GameState::get_area_state(&id).ok_or(rlua::Error::FromLuaConversionError {
+                from: "String",
+                to: "AreaState",
+                message: Some(format!("The area '{}' does not exist or is not loaded.",
+                                      id)),
+            })
+        }
     }
 }
 

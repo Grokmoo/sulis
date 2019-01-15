@@ -2,7 +2,7 @@
 id: rose_lake_cc3
 name: Councilwoman Valmaris
 race: human
-sex: Male
+sex: Female
 attributes:
   str: 10
   dex: 10

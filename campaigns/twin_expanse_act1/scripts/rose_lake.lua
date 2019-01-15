@@ -103,3 +103,50 @@ function dwarven_goods_complete(parent)
   game:add_party_xp(200)
   game:add_party_coins(2000)
 end
+
+function rose_fort_final_boss(parent)
+  game:block_ui(4.0)
+  game:fade_out_in()
+  game:cancel_blocking_anims()
+  game:run_script_delayed("rose_lake", "rose_fort_final_boss2", 2.0)
+end
+
+function rose_fort_final_boss2(parent)
+  game:toggle_prop_at(36, 28)
+  game:disable_prop_at(36, 28)
+  game:scroll_view(29, 13)
+  game:transition_party_to(29, 13)
+  game:run_script_delayed("rose_lake", "rose_fort_final_boss3", 2.0)
+end
+
+function rose_fort_final_boss3(parent)
+  target = game:entity_with_id("rose_lake_cc0")
+  game:start_conversation("rose_lake_berkeley_boss", target)
+end
+
+function rose_fort_kill_council(parent)
+  attacker = game:entity_with_id("rose_lake_cc0")
+
+  target = game:entity_with_id("rose_lake_cc1")
+  target:take_damage(attacker, 500, 500, "Raw")
+  
+  target = game:entity_with_id("rose_lake_cc2")
+  target:take_damage(attacker, 500, 500, "Raw")
+  
+  target = game:entity_with_id("rose_lake_cc3")
+  target:take_damage(attacker, 500, 500, "Raw")
+end
+
+function rose_fort_portal(parent)
+  target = game:entity_with_id("rose_lake_cc0")
+  
+  anim = target:create_anim("teleport")
+  anim:set_position(anim:param(30),
+                    anim:param(14))
+  anim:set_particle_size_dist(anim:fixed_dist(4.0), anim:fixed_dist(6.0))
+  anim:activate()
+end
+
+function rose_fort_end(parent)
+  game:show_game_over_window("Thanks for playing!  You have completed Act 1 of the Twin Expanse.  Please keep an eye out for future content and Act 2 of the campaign.")
+end

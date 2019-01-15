@@ -50,4 +50,5 @@ function mines_boss_enter(parent)
   game:start_conversation("naathfir_mines_omonar", omonar)
   game:spawn_encounter_at(89, 42)
   game:set_quest_entry_state("the_aegis_gem", "lost", "Visible")
+  game:enable_trigger_at(34, 20, "rose_fort_interior")
 end

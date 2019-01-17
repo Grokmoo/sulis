@@ -115,6 +115,7 @@ pub struct QuestStateData {
 #[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(deny_unknown_fields, rename_all="snake_case")]
 pub enum OnTrigger {
+    BlockUI(u32), // block user interface for specified number of millis
     PlayerCoins(i32),
     PartyMember(String),
     PartyItem(String),

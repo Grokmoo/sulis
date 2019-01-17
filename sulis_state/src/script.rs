@@ -797,9 +797,9 @@ impl UserData for ScriptInterface {
         });
 
         methods.add_method("block_ui", |_, _, time: f32| {
-            let player = GameState::player();
-            let anim = Anim::new_wait(&player, (time * 1000.0) as u32);
-            GameState::add_animation(anim);
+            let pc = GameState::player();
+            let cb = OnTrigger::BlockUI((time * 1000.0) as u32);
+            GameState::add_ui_callback(vec![cb], &pc, &pc);
             Ok(())
         });
 

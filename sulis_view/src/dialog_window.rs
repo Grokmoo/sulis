@@ -28,7 +28,7 @@ use sulis_state::{EntityState, ChangeListener, GameState, ItemState,
     script::{entity_with_id, CallbackData, FuncKind}};
 
 use crate::{character_window, CutsceneWindow, RootView, GameOverWindow, LoadingScreen,
-    window_fade, WindowFade, ConfirmationWindow, ScriptMenu, ap_bar};
+    window_fade, WindowFade, ConfirmationWindow, ScriptMenu, ap_bar, UIBlocker};
 
 pub const NAME: &str = "dialog_window";
 
@@ -302,6 +302,11 @@ pub fn activate(widget: &Rc<RefCell<Widget>>, on_select: &Vec<OnTrigger>,
     use sulis_module::OnTrigger::*;
     for trigger in on_select.iter() {
         match trigger {
+            BlockUI(millis) => {
+                let root = Widget::get_root(widget);
+                let ui_blocker = Widget::with_defaults(UIBlocker::new(*millis));
+                Widget::add_child_to(&root, ui_blocker);
+            },
             CheckEndTurn => {
                 ap_bar::check_end_turn(widget);
             }

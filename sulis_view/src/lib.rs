@@ -691,3 +691,25 @@ impl WidgetKind for PortraitPane {
         children
     }
 }
+
+pub struct UIBlocker {
+    remaining_millis: u32,
+}
+
+impl UIBlocker {
+    pub fn new(remaining_millis: u32) -> Rc<RefCell<UIBlocker>> {
+        Rc::new(RefCell::new(UIBlocker { remaining_millis }))
+    }
+}
+
+impl WidgetKind for UIBlocker {
+    widget_kind!("ui_blocker");
+
+    fn update(&mut self, widget: &Rc<RefCell<Widget>>, millis: u32) {
+        if millis > self.remaining_millis {
+            widget.borrow_mut().mark_for_removal();
+        } else {
+            self.remaining_millis -= millis;
+        }
+    }
+}

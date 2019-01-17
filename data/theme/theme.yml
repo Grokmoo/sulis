@@ -389,6 +389,10 @@ children:
         preferred_size: [40, 4]
         x_relative: Max
         y_relative: Max
+  ui_blocker:
+    preferred_size: [0, -40]
+    width_relative: Max
+    height_relative: Max
   area:
     preferred_size: [0, -40]
     width_relative: Max

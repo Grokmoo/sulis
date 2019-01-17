@@ -57,6 +57,7 @@ function on_target_select(parent, ability, targets)
   if not summon:is_valid() then return end
   
   summon:add_to_party(false)
+  summon:set_flag("__is_summoned_party_member")
   
   levels = parent:stats().caster_level
   if levels > 1 then

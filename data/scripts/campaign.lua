@@ -20,6 +20,9 @@ function heal_party(parent)
 end
 
 function on_party_death(parent)
+  -- don't do injuries on summons, just permakill
+  if parent:has_flag("__is_summoned_party_member") then return end
+
   parent:set_disabled(true)
   add_injury(parent)
 end

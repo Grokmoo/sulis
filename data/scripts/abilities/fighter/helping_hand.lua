@@ -18,6 +18,7 @@ function on_target_select(parent, ability, targets)
     target:change_overflow_ap(new_ap - ap)
   end
   
+  target:remove_effects_with_tag("tangle")
   target:remove_effects_with_tag("slow")
   target:remove_effects_with_tag("nauseate")
   target:remove_effects_with_tag("dazzle")

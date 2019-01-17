@@ -152,7 +152,7 @@ use crate::{ai, animation::{self}, script::*, MOVE_TO_THRESHOLD};
 /// Creates a ScriptEntitySet consisting of all possible targets for abilities or items used
 /// by this entity.  This includes all known entities in the same area as the parent entity.
 ///
-/// # `has_effects_with_tag(tag: String) -> Bool`
+/// # `has_effect_with_tag(tag: String) -> Bool`
 /// Returns true if this entity has one or more active effects with the specified tag,
 /// false otherwise.
 ///

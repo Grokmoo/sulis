@@ -43,17 +43,20 @@ end
 function on_round_elapsed(parent, ability, targets)
   targets = targets:to_table()
   for i = 1, #targets do
+    targets[i]:remove_effects_with_tag("tangle")
 	try_hold(parent, ability, targets[i])
   end
 end
 
 function try_hold(parent, ability, target)
+  if target:has_effect_with_tag("tangle") then return end
+
   hit = parent:special_attack(target, "Reflex", "Spell")
   
   if hit:is_miss() then return end
   
   effect = target:create_effect(ability:name(), 1)
-  effect:set_tag("slow")
+  effect:set_tag("tangle")
   
   if hit:is_graze() then
     effect:add_num_bonus("defense", -5)

@@ -31,22 +31,22 @@ actors:
     location:
       x: 35
       y: 23
-    unique_id: ~
+    unique_id: wth_tp01
   - id: townsperson17
     location:
       x: 21
       y: 23
-    unique_id: ~
+    unique_id: wth_tp02
   - id: townsperson18
     location:
       x: 28
       y: 18
-    unique_id: ~
+    unique_id: wth_tp03
   - id: townsperson19
     location:
       x: 29
       y: 22
-    unique_id: ~
+    unique_id: wth_tp04
   - id: mayor_fenk
     location:
       x: 29

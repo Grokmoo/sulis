@@ -316,7 +316,8 @@ impl StatList {
                     weapon_style: WeaponStyle,
                     multiplier: f32,
                     base_attr: i32,
-                    threatened: bool) {
+                    threatened: bool,
+                    total_level: u32) {
         let is_melee = if attacks.is_empty() {
             warn!("Finalized stats with no attacks");
             false
@@ -389,6 +390,7 @@ impl StatList {
         self.fortitude += end_bonus * 2;
         self.reflex += dex_bonus * 2;
         self.will += wis_bonus * 2;
+        self.max_hp += (total_level as i32 * end_bonus) / 3;
 
         if is_melee {
             self.graze_multiplier += 0.02 * str_bonus as f32;

@@ -618,6 +618,10 @@ fn get_targeter() -> Result<Rc<RefCell<AreaTargeter>>> {
 /// `show_portrait` controls where the entity is displayed in the portraits area of the UI.  If
 /// not passed, defaults to true.
 ///
+/// # `remove_party_member(id: String)`
+/// Removes the entity with the specified ID from the party, if it is currently in the party.
+/// Does nothing otherwise.
+///
 /// # `party_coins() -> Int`
 /// Returns the current amount of party coins.  Note that this value must be divided by the
 /// item_value_display_factor in the module rules in order to get the displayed amount of
@@ -1101,6 +1105,16 @@ impl UserData for ScriptInterface {
             Ok(())
         });
 
+        methods.add_method("remove_party_member", |_, _, id: String| {
+            for member in GameState::party() {
+                if member.borrow().unique_id() == id {
+                    GameState::remove_party_member(member);
+                    break;
+                }
+            }
+            Ok(())
+        });
+
         methods.add_method("party_coins", |_, _, ()| {
             let coins = GameState::party_coins();
             Ok(coins)
@@ -1370,18 +1384,14 @@ impl UserData for ScriptItem {
 fn entities_with_ids(ids: Vec<String>) -> Vec<ScriptEntity> {
     let mut result = Vec::new();
 
-    let area_state = GameState::area_state();
-    let area_id = area_state.borrow().area.id.to_string();
-
     let mgr = GameState::turn_manager();
-    for entity in mgr.borrow().entity_iter() {
-        {
-            let entity = entity.borrow();
-            if !entity.location.is_in_area_id(&area_id) { continue; }
-            if !ids.iter().any(|uid| uid == entity.unique_id()) { continue; }
+    for id in ids {
+        for entity in mgr.borrow().entity_iter() {
+            if entity.borrow().unique_id() == id {
+                result.push(ScriptEntity::from(&entity));
+                break;
+            }
         }
-
-        result.push(ScriptEntity::from(&entity));
     }
 
     result

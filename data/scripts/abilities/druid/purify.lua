@@ -11,7 +11,7 @@ function on_target_select(parent, ability, targets)
   ability:activate(parent)
 
   target = targets:first()
-  
+
   target:remove_effects_with_tag("slow")
   target:remove_effects_with_tag("nauseate")
   target:remove_effects_with_tag("cripple")

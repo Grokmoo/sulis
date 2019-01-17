@@ -44,7 +44,3 @@ nodes:
     responses:
       - text: |
           Alright then.  Lets go.
-        on_select:
-          - fire_script:
-              id: wellswood_road_north
-              func: after_rockslide_dialog

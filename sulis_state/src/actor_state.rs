@@ -955,7 +955,8 @@ impl ActorState {
         let is_threatened = self.is_threatened();
 
         self.stats.finalize(attacks_list, equipped_armor, weapon_style,
-                            multiplier, rules.base_attribute, is_threatened);
+                            multiplier, rules.base_attribute, is_threatened,
+                            self.actor.total_level);
         self.stats.flanking_angle += rules.base_flanking_angle;
         self.stats.crit_chance += rules.crit_chance as i32;
         self.stats.hit_threshold += rules.hit_percentile as i32;

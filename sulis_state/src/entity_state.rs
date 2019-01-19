@@ -495,7 +495,7 @@ impl EntityState {
         let y1 = self.location.y as f32 + (self.size.height / 2) as f32;
 
         let mut dist = ((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)).sqrt();
-        dist -= self.size.diagonal / 2.0 - offset;
+        dist -= self.size.diagonal / 2.0 + offset;
 
         if dist > 0.0 { dist }
         else { 0.0 }

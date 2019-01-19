@@ -26,7 +26,7 @@ inventory:
     Hands: { id: gloves_leather }
   quick: {}
 levels:
-  fighter: 5
+  fighter: 4
 reward:
   xp: 30
   loot: level1_misc

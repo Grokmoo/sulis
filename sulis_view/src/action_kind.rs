@@ -164,7 +164,7 @@ impl DialogAction {
                 target: Rc::clone(&target),
                 pc: Rc::clone(&pc),
             });
-            return MoveThenAction::create_if_valid(target.borrow().location.to_point(),
+            return MoveThenAction::create_if_valid(&pc, target.borrow().location.to_point(),
                 &target.borrow().size, max_dist, cb_action,
                 animation_state::Kind::MouseDialog);
         }
@@ -211,7 +211,7 @@ impl DoorPropAction {
         };
         if pc.borrow().dist_to_prop(prop_state) > max_dist {
             let cb_action = Box::new(DoorPropAction { index });
-            return MoveThenAction::create_if_valid(prop_state.location.to_point(),
+            return MoveThenAction::create_if_valid(&pc, prop_state.location.to_point(),
                 &prop_state.prop.size, max_dist, cb_action, animation_state::Kind::MouseInteract);
         }
 
@@ -243,6 +243,8 @@ struct LootPropAction {
 
 impl LootPropAction {
     fn create_if_valid(index: usize, prop_state: &PropState) -> Option<Box<ActionKind>> {
+        if GameState::is_combat_active() { return None; }
+
         if !prop_state.is_container() || !prop_state.is_enabled() { return None; }
 
         let max_dist = Module::rules().max_prop_distance;
@@ -252,7 +254,7 @@ impl LootPropAction {
         };
         if pc.borrow().dist_to_prop(prop_state) > max_dist {
             let cb_action = Box::new(LootPropAction { index });
-            return MoveThenAction::create_if_valid(prop_state.location.to_point(),
+            return MoveThenAction::create_if_valid(&pc, prop_state.location.to_point(),
                 &prop_state.prop.size, max_dist, cb_action, animation_state::Kind::MouseLoot);
         }
 
@@ -314,7 +316,7 @@ impl TransitionAction {
             Some(pc) => Rc::clone(pc),
         };
         if pc.borrow().dist_to_transition(transition) > max_dist {
-            return MoveThenAction::create_if_valid(transition.from,
+            return MoveThenAction::create_if_valid(&pc, transition.from,
                 &transition.size, max_dist, cb_action, animation_state::Kind::MouseTravel);
         }
 
@@ -396,7 +398,7 @@ impl AttackAction {
                 pc: Rc::clone(&pc),
                 target: Rc::clone(&target)
             });
-            return MoveThenAction::create_if_valid(target.borrow().location.to_point(),
+            return MoveThenAction::create_if_valid(&pc, target.borrow().location.to_point(),
                 &target.borrow().size, pc.borrow().actor.stats.attack_distance(), cb_action,
                 animation_state::Kind::MouseAttack);
         }
@@ -441,14 +443,18 @@ struct MoveThenAction {
 }
 
 impl MoveThenAction {
-    fn create_if_valid(pos: Point, size: &Rc<ObjectSize>, dist: f32, cb_action: Box<ActionKind>,
+    fn create_if_valid(pc: &Rc<RefCell<EntityState>>,
+                       pos: Point,
+                       size: &Rc<ObjectSize>,
+                       dist: f32,
+                       cb_action: Box<ActionKind>,
                        cursor_state: animation_state::Kind) -> Option<Box<ActionKind>> {
         let (px, py) = (pos.x as f32, pos.y as f32);
 
         let x = px + (size.width / 2) as f32;
         let y = py + (size.height / 2) as f32;
 
-        let dist = dist + size.diagonal / 2.0;
+        let dist = dist + (size.diagonal + pc.borrow().size.diagonal) / 2.0;
         let move_action = match MoveAction::new_if_valid(x, y, Some(dist)) {
             None => return None,
             Some(move_action) => move_action,

@@ -432,8 +432,8 @@ impl ActorState {
     }
 
     pub(crate) fn can_weapon_attack(&self, _target: &Rc<RefCell<EntityState>>, dist: f32) -> bool {
-        trace!("Checking can attack for '{}'.  Distance to target is {}",
-               self.actor.name, dist);
+        trace!("Checking can attack for '{}'.  Distance to target is {} with attack dist of {}",
+               self.actor.name, dist, self.stats.attack_distance());
 
         if !self.has_ap_to_attack() { return false; }
 

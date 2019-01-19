@@ -37,7 +37,7 @@ inventory:
   quick:
     Usable1: { id: potion_healing }
 levels:
-  fighter: 6
+  fighter: 5
   rogue: 2
 xp: ~
 reward:

@@ -1448,6 +1448,8 @@ fn activate_item(_lua: &Lua, script_item: &ScriptItem, target: ScriptEntity) -> 
 
 fn add_another_to_quickbar(parent: &Rc<RefCell<EntityState>>,
                            item: Option<ItemState>, slot: QuickSlot) {
+    if !parent.borrow().is_party_member() { return; }
+
     let item = match item {
         None => return,
         Some(item) => item,

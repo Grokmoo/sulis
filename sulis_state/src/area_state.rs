@@ -1016,7 +1016,8 @@ impl AreaState {
 
         let surfaces = self.add_entity_points(&entity.borrow());
         for surface in surfaces {
-            mgr.borrow_mut().add_to_surface(entity.borrow().index(), surface);
+            let index = entity.borrow().index();
+            mgr.borrow_mut().add_to_surface(index, surface);
         }
 
         if entity.borrow().is_party_member() {

@@ -481,24 +481,24 @@ impl EntityState {
     }
 
     pub fn dist_to_point(&self, pos: Point) -> f32 {
-        let x1 = self.location.x as f32 + (self.size.width / 2) as f32;
-        let y1 = self.location.y as f32 + (self.size.height / 2) as f32;
-        let x2 = pos.x as f32;
-        let y2 = pos.y as f32;
-
-        let dist = ((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)).sqrt();
-        dist - self.size.diagonal / 2.0 - (2.0 as f32).sqrt() / 2.0
+        self.dist_internal(pos.x as f32, pos.y as f32, (2.0 as f32).sqrt() / 2.0)
     }
 
     pub fn dist(&self, pos: Point, size: &Rc<ObjectSize>) -> f32 {
+        self.dist_internal(pos.x as f32 + size.width as f32 / 2.0,
+                           pos.y as f32 + size.height as f32 / 2.0,
+                           size.diagonal / 2.0)
+    }
+
+    fn dist_internal(&self, x2: f32, y2: f32, offset: f32) -> f32 {
         let x1 = self.location.x as f32 + (self.size.width / 2) as f32;
         let y1 = self.location.y as f32 + (self.size.height / 2) as f32;
 
-        let x2 = pos.x as f32 + size.width as f32 / 2.0;
-        let y2 = pos.y as f32 + size.height as f32 / 2.0;
+        let mut dist = ((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)).sqrt();
+        dist -= self.size.diagonal / 2.0 - offset;
 
-        let dist = ((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)).sqrt();
-        dist - self.size.diagonal / 2.0 - size.diagonal / 2.0
+        if dist > 0.0 { dist }
+        else { 0.0 }
     }
 
     pub fn dist_to_entity(&self, other: &Rc<RefCell<EntityState>>) -> f32 {

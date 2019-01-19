@@ -7,7 +7,7 @@ function on_activate(parent, ability)
     return
   end
 
-  targets = parent:targets():visible():without_self()
+  targets = parent:targets():without_self()
   
   targeter = parent:create_targeter(ability)
   targeter:set_free_select(line_len)

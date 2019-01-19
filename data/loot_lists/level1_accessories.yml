@@ -21,14 +21,16 @@ weighted_entries:
     weight: 3
     adjective1:
       none: 5
-      strength1: 3
-      endurance1: 3
+      strength1: 2
+      endurance1: 2
+      fortitude5: 2
   cloak:
     weight: 2
     adjective1:
       none: 5
-      dexterity1: 3
-      concealment5: 3
+      dexterity1: 2
+      concealment5: 2
+      defense5: 2
   ring_copper:
     weight: 3
     adjective1:

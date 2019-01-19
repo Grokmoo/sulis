@@ -12,6 +12,7 @@ function on_enter_slave_pens(parent)
 end
 
 function on_activate_irhan(parent)
+  game:spawn_encounter_at(10, 30)
   game:cancel_blocking_anims()
   game:scroll_view(20, 34)
   

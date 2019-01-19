@@ -1,5 +1,5 @@
 id: irhan
-auto_spawn: true
+auto_spawn: false
 min_gen_actors: 0
 max_gen_actors: 0
 entries:

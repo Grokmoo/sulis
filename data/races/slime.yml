@@ -20,6 +20,9 @@ base_stats:
   - kind: { reach: 0.0 }
   - kind: { resistance: { kind: "Acid", amount: 100 } }
   - kind: { resistance: { kind: "Fire", amount: -25 } }
+  - kind: { resistance: { kind: "Slashing", amount: 50 } }
+  - kind: { resistance: { kind: "Piercing", amount: 50 } }
+  - kind: { resistance: { kind: "Crushing", amount: 25 } }
   - kind: { flanked_immunity }
   - kind: { sneak_attack_immunity }
 base_attack:

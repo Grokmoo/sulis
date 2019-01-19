@@ -617,7 +617,7 @@ children:
             children:
                 quest_button:
                   from: .button
-                  border: [2, 2, 2, 2]
+                  border: [1, 1, 1, 1]
                   preferred_size: [0, 10]
                   width_relative: Max
                   children:
@@ -625,7 +625,9 @@ children:
                       from: .text_area
                       width_relative: Max
                       height_relative: Max
-                      text: "#name#"
+                      text: |
+                        #name#
+                        [?complete;s=4.0;x=25.0;y=2.8;c=f00|Complete]
       quest_entries:
         border: [2, 2, 2, 2]
         preferred_size: [-52, -2]

@@ -21,10 +21,9 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::io::Error;
 
-use rand::{self, Rng};
 use rlua::{self, Lua, UserData, UserDataMethods};
 
-use sulis_core::util::{invalid_data_error, ExtInt};
+use sulis_core::util::{gen_rand, invalid_data_error, ExtInt};
 use sulis_core::config::Config;
 use sulis_core::resource::ResourceSet;
 use sulis_rules::{Attribute, AttackKind, DamageKind, Attack, HitKind, HitFlags};
@@ -1542,7 +1541,7 @@ impl UserData for ScriptEntitySet {
 
         methods.add_method("random_affected_points", |_, set, frac: f32| {
             let table: Vec<HashMap<&str, i32>> = set.affected_points.iter().filter_map(|p| {
-                let roll = rand::thread_rng().gen_range(0.0, 1.0);
+                let roll = gen_rand(0.0, 1.0);
                 if roll > frac {
                     None
                 } else {

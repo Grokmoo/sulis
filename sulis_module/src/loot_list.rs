@@ -14,12 +14,11 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use rand::{self, Rng};
 use std::collections::HashMap;
 use std::io::{Error};
 use std::rc::Rc;
 
-use sulis_core::util::unable_to_create_error;
+use sulis_core::util::{gen_rand, unable_to_create_error};
 
 use crate::{Item, Module};
 
@@ -174,7 +173,7 @@ impl LootList {
     }
 
     pub fn generate_with_chance(&self, chance: u32) -> Vec<(u32, Rc<Item>)> {
-        let roll = rand::thread_rng().gen_range(1, 101);
+        let roll = gen_rand(1, 101);
         if chance >= roll {
             self.generate_internal(0)
         } else {
@@ -205,12 +204,12 @@ impl LootList {
         }
 
         for entry in self.probability_entries.iter() {
-            let roll = rand::thread_rng().gen_range(0, 100);
+            let roll = gen_rand(0, 100);
             if roll < entry.weight {
                 let quantity = if entry.quantity[0] == entry.quantity[1] {
                     entry.quantity[0]
                 } else {
-                    rand::thread_rng().gen_range(entry.quantity[0], entry.quantity[1] + 1)
+                    gen_rand(entry.quantity[0], entry.quantity[1] + 1)
                 };
 
                 let adjectives = self.gen_adjectives(entry);
@@ -233,12 +232,12 @@ impl LootList {
                 }, Some(list) => list,
             };
 
-            let roll = rand::thread_rng().gen_range(0, 100);
+            let roll = gen_rand(0, 100);
             if roll < entry.weight {
                 let times  = if entry.quantity[0] == entry.quantity[1] {
                     entry.quantity[0]
                 } else {
-                    rand::thread_rng().gen_range(entry.quantity[0], entry.quantity[1] + 1)
+                    gen_rand(entry.quantity[0], entry.quantity[1] + 1)
                 };
 
                 for _ in 0..times {
@@ -256,7 +255,7 @@ impl LootList {
     fn gen_adjectives(&self, entry: &Entry) -> Vec<String> {
         let mut result = Vec::new();
         if entry.adjective1_total_weight > 0 {
-            let roll = rand::thread_rng().gen_range(0, entry.adjective1_total_weight);
+            let roll = gen_rand(0, entry.adjective1_total_weight);
 
             let mut cur_weight = 0;
             for (id, weight) in entry.adjective1.iter() {
@@ -269,7 +268,7 @@ impl LootList {
         }
 
         if entry.adjective2_total_weight > 0 {
-            let roll = rand::thread_rng().gen_range(0, entry.adjective2_total_weight);
+            let roll = gen_rand(0, entry.adjective2_total_weight);
 
             let mut cur_weight = 0;
             for (id, weight) in entry.adjective2.iter() {
@@ -285,7 +284,7 @@ impl LootList {
     }
 
     fn gen_item(&self) -> Option<(u32, Rc<Item>)> {
-        let roll = rand::thread_rng().gen_range(0, self.total_entries_weight);
+        let roll = gen_rand(0, self.total_entries_weight);
 
         let mut cur_weight = 0;
         for entry in self.weighted_entries.iter() {
@@ -294,7 +293,7 @@ impl LootList {
                 let quantity = if entry.quantity[0] == entry.quantity[1] {
                     entry.quantity[0]
                 } else {
-                    rand::thread_rng().gen_range(entry.quantity[0], entry.quantity[1] + 1)
+                    gen_rand(entry.quantity[0], entry.quantity[1] + 1)
                 };
 
                 let adjectives = self.gen_adjectives(entry);
@@ -314,7 +313,7 @@ impl LootList {
     fn gen_num_items(&self) -> u32 {
         if self.total_generate_weight == 0 { return 0; }
 
-        let roll = rand::thread_rng().gen_range(0, self.total_generate_weight);
+        let roll = gen_rand(0, self.total_generate_weight);
 
         let mut cur_gen_weight = 0;
         for generate in self.generate.iter() {

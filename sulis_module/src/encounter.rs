@@ -14,11 +14,10 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use rand::{self, Rng};
 use std::io::{Error};
 use std::rc::Rc;
 
-use sulis_core::util::unable_to_create_error;
+use sulis_core::util::{gen_rand, unable_to_create_error};
 use crate::{Actor, Module};
 
 struct Entry {
@@ -76,7 +75,7 @@ impl Encounter {
     fn gen_actor(&self) -> Option<(Rc<Actor>, Option<String>)> {
         if self.total_weight == 0 { return None; }
 
-        let roll = rand::thread_rng().gen_range(0, self.total_weight);
+        let roll = gen_rand(0, self.total_weight);
         let mut cur_weight = 0;
         for entry in self.entries.iter() {
             cur_weight += entry.weight;
@@ -91,7 +90,7 @@ impl Encounter {
     pub fn gen_actors(&self) -> Vec<(Rc<Actor>, Option<String>)> {
         let mut actors = Vec::new();
 
-        let num = rand::thread_rng().gen_range(self.min_gen_actors, self.max_gen_actors + 1);
+        let num = gen_rand(self.min_gen_actors, self.max_gen_actors + 1);
         for _ in 0..num {
             match self.gen_actor() {
                 None => {

@@ -15,7 +15,6 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use rlua::{UserData};
-use rand::{self, Rng};
 
 use std::cell::{Cell, RefCell};
 use std::rc::Rc;
@@ -23,7 +22,7 @@ use std::rc::Rc;
 use sulis_core::image::Image;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{animation_state, Color};
-use sulis_core::util::ExtInt;
+use sulis_core::util::{gen_rand, ExtInt};
 use crate::{animation::Anim, EntityState};
 
 fn is_zero(val: &f32) -> bool {
@@ -103,19 +102,19 @@ impl Dist {
     fn generate_pair(&self) -> (f32, f32) {
         match self {
             &Dist::Fixed { value } => (value, value),
-            &Dist::Uniform { min, max } => (rand::thread_rng().gen_range(min, max),
-                rand::thread_rng().gen_range(min, max)),
+            &Dist::Uniform { min, max } => (gen_rand(min, max),
+                gen_rand(min, max)),
             &Dist::FixedAngleUniformSpeed { angle, min_speed, max_speed } => {
-                let speed = rand::thread_rng().gen_range(min_speed, max_speed);
+                let speed = gen_rand(min_speed, max_speed);
                 radial_to_cart(angle, speed)
             },
             &Dist::UniformAngleFixedSpeed { min_angle, max_angle, speed } => {
-                let angle = rand::thread_rng().gen_range(min_angle, max_angle);
+                let angle = gen_rand(min_angle, max_angle);
                 radial_to_cart(angle, speed)
             },
             &Dist::UniformAngleUniformSpeed { min_angle, max_angle, min_speed, max_speed } => {
-                let speed = rand::thread_rng().gen_range(min_speed, max_speed);
-                let angle = rand::thread_rng().gen_range(min_angle, max_angle);
+                let speed = gen_rand(min_speed, max_speed);
+                let angle = gen_rand(min_angle, max_angle);
                 radial_to_cart(angle, speed)
             },
         }
@@ -124,7 +123,7 @@ impl Dist {
     fn generate(&self) -> f32 {
         match self {
             &Dist::Fixed { value } => value,
-            &Dist::Uniform { min, max } => rand::thread_rng().gen_range(min, max),
+            &Dist::Uniform { min, max } => gen_rand(min, max),
             _ => {
                 warn!("2D dists should only be used as the sole dist in a position component");
                 0.0

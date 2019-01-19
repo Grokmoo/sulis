@@ -21,9 +21,7 @@ use std::time;
 use std::cell::{Ref, RefCell};
 use std::collections::HashSet;
 
-use rand::{self, Rng};
-
-use sulis_core::util::{self, invalid_data_error, Point};
+use sulis_core::util::{self, gen_rand, invalid_data_error, Point};
 use sulis_core::config::Config;
 use sulis_rules::{HitFlags, HitKind, DamageKind, Time};
 use sulis_module::{Actor, Area, LootList, Module, ObjectSize, prop, Prop};
@@ -447,7 +445,7 @@ impl AreaState {
         let available = self.get_available_locations(actor, data);
         if available.is_empty() { return None; }
 
-        let roll = rand::thread_rng().gen_range(0, available.len());
+        let roll = gen_rand(0, available.len());
 
         let point = available[roll];
         let location = Location::from_point(&point, &self.area);

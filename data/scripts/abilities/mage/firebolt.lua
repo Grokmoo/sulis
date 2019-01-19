@@ -10,7 +10,7 @@ end
 function on_target_select(parent, ability, targets)
   target = targets:first()
   
-  speed = 15.0
+  speed = 10.0
   dist = parent:dist_to_entity(target)
   duration = dist / speed
   parent_center_y = parent:center_y() - 1.0

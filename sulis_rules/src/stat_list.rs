@@ -16,10 +16,9 @@
 
 use std::collections::HashMap;
 use std::rc::Rc;
-use rand::{self, Rng};
 
 use sulis_core::image::Image;
-use sulis_core::util::ExtInt;
+use sulis_core::util::{ExtInt, gen_rand};
 use crate::{AccuracyKind, Armor, AttributeList, Attack, Damage,
     HitKind, WeaponKind, ArmorKind, Slot, WeaponStyle, Resistance};
 use crate::bonus::{AttackBonuses, AttackBuilder, Bonus, BonusKind, BonusList};
@@ -164,7 +163,7 @@ impl StatList {
             AccuracyKind::Ranged => self.ranged_accuracy + bonuses.ranged_accuracy,
             AccuracyKind::Spell => self.spell_accuracy + bonuses.spell_accuracy,
         };
-        let roll = rand::thread_rng().gen_range(1, 101);
+        let roll = gen_rand(1, 101);
         debug!("Attack roll: {} with accuracy {} against {}", roll, accuracy, defense);
 
         if roll + accuracy < defense { return HitKind::Miss; }
@@ -172,7 +171,7 @@ impl StatList {
         let result = roll + accuracy - defense;
 
         if !crit_immunity && (100 - roll) < self.crit_chance + bonuses.crit_chance {
-            let roll2 = rand::thread_rng().gen_range(1, 101);
+            let roll2 = gen_rand(1, 101);
             let result2 = roll2 + accuracy - defense;
             if result2 > self.graze_threshold + bonuses.graze_threshold {
                 HitKind::Crit

@@ -9,7 +9,6 @@ sulis_core = { path = "../sulis_core" }
 sulis_rules = { path = "../sulis_rules" }
 
 log = "0.4"
-rand = "0.6"
 serde = "1.0"
 serde_derive = "1.0"
 base64 = "0.10"

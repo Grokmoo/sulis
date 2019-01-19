@@ -20,13 +20,11 @@ use std::any::Any;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use rand::{self, Rng};
-
 use sulis_core::config::Config;
 use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
-use sulis_core::util::{unable_to_create_error, Point};
+use sulis_core::util::{gen_rand, unable_to_create_error, Point};
 use sulis_module::{Module, area::MAX_AREA_SIZE, area::tile::{Tile, TerrainKind, TerrainRules, EdgeRules}};
 use sulis_widgets::{Button, Label, Spinner, ScrollPane};
 
@@ -227,7 +225,7 @@ impl TerrainPicker {
         let base_weight = tiles.base_weight;
         let total_weight = base_weight + tiles.variants.len() as u32;
 
-        let roll = rand::thread_rng().gen_range(0, total_weight);
+        let roll = gen_rand(0, total_weight);
 
         if roll < base_weight {
             return Rc::clone(&tiles.base);

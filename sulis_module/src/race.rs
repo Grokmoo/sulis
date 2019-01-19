@@ -19,12 +19,10 @@ use std::rc::Rc;
 use std::fmt;
 use std::collections::HashMap;
 
-use rand::{self, Rng};
-
 use sulis_core::ui::Color;
 use sulis_core::image::Image;
 use sulis_core::resource::{ResourceSet};
-use sulis_core::util::{unable_to_create_error, Point};
+use sulis_core::util::{gen_rand, unable_to_create_error, Point};
 use sulis_rules::{BonusList, bonus::AttackBuilder, Slot};
 
 use crate::actor::{Sex};
@@ -163,7 +161,7 @@ impl Race {
 
         if names.len() == 1 { return &names[0] }
 
-        let index = rand::thread_rng().gen_range(0, names.len());
+        let index = gen_rand(0, names.len());
         &names[index]
     }
 

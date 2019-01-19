@@ -16,7 +16,8 @@
 
 use std::slice::Iter;
 use std::fmt::{self, Display};
-use rand::{self, Rng};
+
+use sulis_core::util::gen_rand;
 
 #[derive(Clone)]
 pub struct DamageList {
@@ -275,7 +276,7 @@ impl Damage {
     }
 
     pub fn roll(&self) -> u32 {
-        rand::thread_rng().gen_range(self.min, self.max + 1)
+        gen_rand(self.min, self.max + 1)
     }
 }
 

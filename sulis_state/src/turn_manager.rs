@@ -18,9 +18,7 @@ use std::rc::Rc;
 use std::cell::{RefCell, Cell};
 use std::collections::{HashSet, HashMap, VecDeque, vec_deque::Iter};
 
-use rand::{self, Rng};
-
-use sulis_core::util::Point;
+use sulis_core::util::{gen_rand, Point};
 use sulis_module::{Faction, Module};
 use sulis_rules::{Time, ROUND_TIME_MILLIS};
 use crate::script::{CallbackData};
@@ -523,7 +521,7 @@ impl TurnManager {
                 Entry::Entity(entity_index) => {
                     let base = self.entities[*entity_index].as_ref()
                         .unwrap().borrow().actor.stats.initiative;
-                    last_initiative = base + rand::thread_rng().gen_range(0, initiative_roll_max);
+                    last_initiative = base + gen_rand(0, initiative_roll_max);
                     initiative[index] = 2* last_initiative;
                 },
                 Entry::Effect(_) => {

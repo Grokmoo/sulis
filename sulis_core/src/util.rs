@@ -35,12 +35,17 @@ use std::fs;
 
 use backtrace::Backtrace;
 use flexi_logger::{Duplicate, Logger, opt_format};
+use rand::{self, Rng, distributions::uniform::SampleUniform};
 use serde_yaml;
 
 use crate::resource::write_to_file;
 use crate::config::{self, Config};
 use crate::ui::Widget;
 use crate::io::{IO, MainLoopUpdater};
+
+pub fn gen_rand<T: SampleUniform + Sized>(min: T, max: T) -> T {
+    rand::thread_rng().gen_range(min, max)
+}
 
 fn active_resources_file_path() -> PathBuf {
     let mut path = config::USER_DIR.clone();

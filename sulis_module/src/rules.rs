@@ -18,10 +18,8 @@ use std::collections::HashMap;
 use std::io::Error;
 use std::cmp::max;
 
-use rand::{self, Rng};
-
 use sulis_core::ui::{color, Color};
-use sulis_core::util::invalid_data_error;
+use sulis_core::util::{gen_rand, invalid_data_error};
 use sulis_rules::{DamageList, Armor, DamageKind, Resistance, Time, ROUND_TIME_MILLIS};
 use crate::area::LocationKind;
 
@@ -226,7 +224,7 @@ impl Rules {
 
     pub fn concealment_roll(&self, concealment: i32) -> bool {
         if concealment == 0 { return true; }
-        let roll = rand::thread_rng().gen_range(1, 101);
+        let roll = gen_rand(1, 101);
         debug!("Concealment roll: {} against {}", roll, concealment);
         roll > concealment
     }

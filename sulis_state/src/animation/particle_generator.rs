@@ -22,7 +22,7 @@ use std::rc::Rc;
 use sulis_core::image::Image;
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{animation_state, Color};
-use sulis_core::util::{gen_rand, ExtInt};
+use sulis_core::util::{approx_eq, gen_rand, ExtInt};
 use crate::{animation::Anim, EntityState};
 
 fn is_zero(val: &f32) -> bool {
@@ -75,7 +75,7 @@ impl Dist {
     }
 
     pub fn create_uniform(min: f32, max: f32) -> Dist {
-        if min == max {
+        if approx_eq(min, max) {
             Dist::Fixed { value: min }
         } else {
             let (min, max) = swap_if_backwards(min, max);
@@ -87,12 +87,12 @@ impl Dist {
         let (min_speed, max_speed) = swap_if_backwards(min_speed, max_speed);
         let (min_angle, max_angle) = swap_if_backwards(min_angle, max_angle);
 
-        if min_angle == max_angle && min_speed == max_speed {
+        if approx_eq(min_angle, max_angle) && approx_eq(min_speed, max_speed) {
             warn!("Creating invalid angular distribution with both speed and angle fixed");
             Dist::Fixed { value: min_speed }
-        } else if min_angle == max_angle {
+        } else if approx_eq(min_angle, max_angle) {
             Dist::FixedAngleUniformSpeed { angle: min_angle, min_speed, max_speed, }
-        } else if min_speed == max_speed {
+        } else if approx_eq(min_speed, max_speed) {
             Dist::UniformAngleFixedSpeed { min_angle, max_angle, speed: min_speed, }
         } else {
             Dist::UniformAngleUniformSpeed { min_angle, max_angle, min_speed, max_speed, }

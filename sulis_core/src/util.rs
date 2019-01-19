@@ -43,6 +43,20 @@ use crate::config::{self, Config};
 use crate::ui::Widget;
 use crate::io::{IO, MainLoopUpdater};
 
+const MAX_ULPS: i32 = 100;
+const MAX_DIFF: f32 = std::f32::EPSILON;
+
+pub fn approx_eq(a: f32, b: f32) -> bool {
+    if (a - b).abs() <= MAX_DIFF { return true; }
+
+    if a.signum() != b.signum() { return false; }
+
+    let a_int: i32 = unsafe { std::mem::transmute(a) };
+    let b_int: i32 = unsafe { std::mem::transmute(b) };
+
+    i32::abs(a_int - b_int) <= MAX_ULPS
+}
+
 pub fn gen_rand<T: SampleUniform + Sized>(min: T, max: T) -> T {
     rand::thread_rng().gen_range(min, max)
 }

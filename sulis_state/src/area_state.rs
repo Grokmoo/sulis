@@ -427,7 +427,8 @@ impl AreaState {
         for (actor, unique_id) in actors {
             let location = match self.gen_location(&actor, &enc_data) {
                 None => {
-                    warn!("Unable to generate location for encounter '{}'", encounter.id);
+                    warn!("Unable to generate location for encounter '{}' at {},{}",
+                          encounter.id, enc_data.location.x, enc_data.location.y);
                     continue;
                 }, Some(location) => location,
             };
@@ -435,7 +436,8 @@ impl AreaState {
             match self.add_actor(actor, location, unique_id, false, Some(ai_group)) {
                 Ok(_) => (),
                 Err(e) => {
-                    warn!("Error adding actor for spawned encounter: {}", e);
+                    warn!("Error adding actor for spawned encounter: '{}' at {},{}",
+                          e, enc_data.location.x, enc_data.location.y);
                 }
             }
         }

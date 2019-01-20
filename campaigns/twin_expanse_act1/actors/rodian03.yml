@@ -14,7 +14,7 @@ conversation: ~
 faction: Neutral
 images:
   Background: creatures/rodian02
-  Shadow: creatures/goblin_shadow
+  Shadow: creatures/dwarf_shadow
   Foreground: empty
 hue: 1.0
 inventory:

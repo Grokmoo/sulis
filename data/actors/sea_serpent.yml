@@ -5,14 +5,14 @@ faction: Hostile
 images: {}
 race: sea_serpent
 attributes:
-  str: 10
+  str: 15
   dex: 10
-  end: 10
+  end: 16
   per: 10
   int: 10
   wis: 10
 levels:
-  fighter: 9
+  fighter: 11
 reward:
   xp: 50
   loot: level5_misc

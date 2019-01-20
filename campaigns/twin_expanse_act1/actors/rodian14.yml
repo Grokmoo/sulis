@@ -15,7 +15,7 @@ faction: Neutral
 images:
   Foreground: empty
   Background: creatures/rodian05
-  Shadow: creatures/goblin_shadow
+  Shadow: creatures/dwarf_shadow
 hue: 0.6000000238418579
 inventory:
   equipped: {}

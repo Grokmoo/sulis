@@ -13,7 +13,7 @@ attributes:
 conversation: ~
 faction: Neutral
 images:
-  Shadow: creatures/goblin_shadow
+  Shadow: creatures/dwarf_shadow
   Background: creatures/rodian03
   Foreground: empty
 hue: 0.20000000298023225

@@ -45,7 +45,7 @@ fn contains(target: &Rc<RefCell<EntityState>>, list: &Vec<Rc<RefCell<EntityState
     false
 }
 
-fn cast_high(size: &Rc<ObjectSize>, start: Point, end: Point) -> Vec<Point> {
+fn cast_high(start: Point, end: Point) -> Vec<Point> {
     let mut points = Vec::new();
 
     let mut delta_x = end.x - start.x;
@@ -55,7 +55,7 @@ fn cast_high(size: &Rc<ObjectSize>, start: Point, end: Point) -> Vec<Point> {
     let mut d = 2 * delta_x - delta_y;
     let mut x = start.x;
     for y in start.y..end.y {
-        points.append(&mut size.points(x, y).collect());
+        points.push(Point::new(x, y));
 
         if d > 0 {
             x += xi;
@@ -64,11 +64,11 @@ fn cast_high(size: &Rc<ObjectSize>, start: Point, end: Point) -> Vec<Point> {
         d += 2 * delta_x;
     }
 
-    points.append(&mut size.points(end.x, end.y).collect());
+    points.push(Point::new(end.x, end.y));
     points
 }
 
-fn cast_low(size: &Rc<ObjectSize>, start: Point, end: Point) -> Vec<Point> {
+fn cast_low(start: Point, end: Point) -> Vec<Point> {
     let mut points = Vec::new();
 
     let mut delta_y = end.y - start.y;
@@ -78,7 +78,7 @@ fn cast_low(size: &Rc<ObjectSize>, start: Point, end: Point) -> Vec<Point> {
     let mut d = 2 * delta_y - delta_x;
     let mut y = start.y;
     for x in start.x..end.x {
-        points.append(&mut size.points(x, y).collect());
+        points.push(Point::new(x, y));
 
         if d > 0 {
             y += yi;
@@ -87,7 +87,7 @@ fn cast_low(size: &Rc<ObjectSize>, start: Point, end: Point) -> Vec<Point> {
         d += 2 * delta_y;
     }
 
-    points.append(&mut size.points(end.x, end.y).collect());
+    points.push(Point::new(end.x, end.y));
     points
 }
 
@@ -286,35 +286,40 @@ impl Shape {
             }, Some(size) => size,
         };
 
-        let (mut points, concat) = if (end.y - start.y).abs() < (end.x - start.x).abs() {
+        let (points, concat) = if (end.y - start.y).abs() < (end.x - start.x).abs() {
             if start.x > end.x {
-                let mut p = cast_low(&size, end, start);
+                let mut p = cast_low(end, start);
                 let concated = self.concat_from_end(&area_state, &size, &mut p,
                                                     impass_blocks, invis_blocks, src_elev);
                 (p, concated)
             } else {
-                let mut p = cast_low(&size, start, end);
+                let mut p = cast_low(start, end);
                 let concated = self.concat_from_start(&area_state, &size, &mut p,
                                                       impass_blocks, invis_blocks, src_elev);
                 (p, concated)
             }
         } else {
             if start.y > end.y {
-                let mut p = cast_high(&size, end, start);
+                let mut p = cast_high(end, start);
                 let concated = self.concat_from_end(&area_state, &size, &mut p,
                                                     impass_blocks, invis_blocks, src_elev);
                 (p, concated)
             } else {
-                let mut p = cast_high(&size, start, end);
+                let mut p = cast_high(start, end);
                 let concated = self.concat_from_start(&area_state, &size, &mut p,
                                                       impass_blocks, invis_blocks, src_elev);
                 (p, concated)
             }
         };
 
-        points.sort();
-        points.dedup();
-        (points, concat)
+        let mut result = Vec::new();
+        for p in points {
+            size.points(p.x, p.y).for_each(|p| result.push(p));
+        }
+
+        result.sort();
+        result.dedup();
+        (result, concat)
     }
 
     fn check_concat_break(&self, area: &AreaState, size: &ObjectSize, x: i32, y: i32,

@@ -6,6 +6,30 @@ sub_lists:
     weight: 100
     quantity: [4, 8]
 probability_entries:
+  torso_robe:
+    weight: 50
+    adjective1:
+      none: 5
+    adjective2:
+      none: 5
+      will5: 2
+      intellect1: 2
+  helm_hood:
+    weight: 50
+    adjective1:
+      none: 5
+    adjective2:
+      none: 5
+      concealment5: 2
+      wisdom1: 2
+  helm_hat:
+    weight: 50
+    adjective1:
+      none: 5
+    adjective2:
+      none: 5
+      reflex5: 2
+      dexterity1: 2
   druid_staff:
     weight: 50
   poison_vial:

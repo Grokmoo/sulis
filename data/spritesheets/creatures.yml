@@ -37,12 +37,6 @@ groups:
       bat0: [12, 36]
       lizard0: [14, 36]
       chicken0: [40, 42]
-      
-      rodian01: [0, 50]
-      rodian02: [2, 50]
-      rodian03: [4, 50]
-      rodian04: [6, 50]
-      rodian05: [8, 50]
   4by4:
     size: [4, 4]
     areas:
@@ -301,7 +295,12 @@ groups:
       
       imp01: [48, 27]
       imp01_shadow: [48, 30]
-      
+          
+      rodian01: [12, 50]
+      rodian02: [15, 50]
+      rodian03: [18, 50]
+      rodian04: [21, 50]
+      rodian05: [24, 50]
   premades:
     size: [3, 3]
     position: [0, 39]

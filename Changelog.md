@@ -5,10 +5,41 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html) is used with major version changes for breaking save game and data format compatibility.
 
+## [0.2.2] - 2019-01-19
+This version remains save compatible with 0.2.x.
+### Added
+- The Twin Expanse Act 1 is now fully playable all the way through
+- Reworked ability trees and added new abilities for all classes
+- A variety of new loot modifiers (magic items) and improved loot lists
+- A wounds system for when party members fall in combat
+- Day / Night cycle and time tracking for travel times
+- Merchant inventories now refresh over time
+- Random name generator in character customization
+- A new Accessory filter in item windows
+- Custom icons show up on the character portrait for permanent effects
+- Editor ease of use features, area properties, transition improvements
+- Many new area and creature assets
+
+### Changed
+- Reworked and rebalanced how Attributes influence various stats
+- Performed an initial balance pass on Races, Classes, and Abilities
+- User interface layout, appearance, and modal improvements
+- Cleaned up and rebalanced previously released campaign content
+- Use base64 in several places in area data files to massively decrease file size
+
+### Fixed
+- Many bug fixes in ability, item, and campaign scripts
+- Color deserialization now correctly allows for maximum value
+- UI Block script method now actually blocks the UI
+- Creatures will no longer appear invisible after many other creatures have been loaded
+- Move then attack and similar actions now calculate distance correctly
+- Enemies now have quick items removed on use
+- Several crash fixes in area transition and particle generator code
+
 ## [0.2.1] - 2018-12-06
 This version should be save compatible with 0.2.0.
 ### Added
-- A new playable character class, the Druid, is available, with a brand new ability tree.
+- A new playable character class, the Druid, is available, with a brand new ability tree
 - Summoning and shapeshifting abilities for the Druid
 - Several new weapons including druid themed weapons
 - Several new mage abilities have been added

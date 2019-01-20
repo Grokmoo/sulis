@@ -38,6 +38,7 @@ pub enum Filter {
     All,
     Weapon,
     Armor,
+    Accessory,
     Usable,
 }
 
@@ -48,13 +49,17 @@ impl Filter {
             All => true,
             Weapon => item.is_weapon(),
             Armor => item.is_armor(),
+            Accessory => {
+                if item.is_weapon() || item.is_armor() { return false; }
+                item.equippable.is_some()
+            },
             Usable => item.usable.is_some(),
         }
     }
 }
 
 use self::Filter::*;
-const FILTERS_LIST: [Filter; 4] = [ All, Weapon, Armor, Usable ];
+const FILTERS_LIST: [Filter; 5] = [ All, Weapon, Armor, Accessory, Usable ];
 
 pub struct ItemListPane {
     entity: Rc<RefCell<EntityState>>,

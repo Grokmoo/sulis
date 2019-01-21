@@ -1,11 +1,11 @@
 max_dist = 8
 
 function on_activate(parent, ability)
-  targets = parent:targets():without_self()
+  local targets = parent:targets():without_self()
   
-  min_dist = math.max(parent:width(), parent:height()) / 2.0
+  local min_dist = math.max(parent:width(), parent:height()) / 2.0
   
-  targeter = parent:create_targeter(ability)
+  local targeter = parent:create_targeter(ability)
   targeter:set_free_select(max_dist * 2)
   targeter:set_shape_cone(parent:center_x(), parent:center_y(), min_dist, max_dist, math.pi / 3) 
   targeter:add_all_effectable(targets)
@@ -14,22 +14,22 @@ function on_activate(parent, ability)
 end
 
 function on_target_select(parent, ability, targets)
-  anim = parent:wait_anim(0.3)
-  cb = ability:create_callback(parent)
+  local anim = parent:wait_anim(0.3)
+  local cb = ability:create_callback(parent)
   cb:add_targets(targets)
   cb:set_on_anim_complete_fn("create_fire_surface")
   anim:set_completion_callback(cb)
   anim:activate()
 
-  pos = targets:selected_point()
+  local pos = targets:selected_point()
   
-  delta_x = pos.x - parent:x()
-  delta_y = pos.y - parent:y()
-  angle = game:atan2(delta_x, delta_y)
+  local delta_x = pos.x - parent:x()
+  local delta_y = pos.y - parent:y()
+  local angle = game:atan2(delta_x, delta_y)
   
-  duration = 1.5
+  local duration = 1.5
   
-  gen = parent:create_particle_generator("fire_particle", duration)
+  local gen = parent:create_particle_generator("fire_particle", duration)
   gen:set_position(gen:param(parent:center_x() + 0.5), gen:param(parent:center_y() - 0.5))
   gen:set_gen_rate(gen:param(500.0, -500))
   gen:set_initial_gen(500.0)
@@ -40,12 +40,12 @@ function on_target_select(parent, ability, targets)
     
   gen:set_particle_duration_dist(gen:fixed_dist(0.6))
   
-  targets_table = targets:to_table()
+  local targets_table = targets:to_table()
   for i = 1, #targets_table do
-    dist = parent:dist_to_entity(targets_table[i])
-    cb_dur = duration * dist / max_dist
+    local dist = parent:dist_to_entity(targets_table[i])
+    local cb_dur = duration * dist / max_dist
     
-    cb = ability:create_callback(parent)
+    local cb = ability:create_callback(parent)
 	cb:add_target(targets_table[i])
 	cb:set_on_anim_update_fn("attack_target")
     gen:add_callback(cb, cb_dur)
@@ -56,28 +56,28 @@ function on_target_select(parent, ability, targets)
 end
 
 function attack_target(parent, ability, targets)
-  target = targets:first()
+  local target = targets:first()
 
   if target:is_valid() then
-    stats = parent:stats()
-	min_dmg = 8 + stats.caster_level / 2 + stats.intellect_bonus / 4
-	max_dmg = 16 + stats.caster_level + stats.intellect_bonus / 2
+    local stats = parent:stats()
+	local min_dmg = 8 + stats.caster_level / 2 + stats.intellect_bonus / 4
+	local max_dmg = 16 + stats.caster_level + stats.intellect_bonus / 2
   
     parent:special_attack(target, "Reflex", "Spell", min_dmg, max_dmg, 0, "Fire")
   end
 end
 
 function create_fire_surface(parent, ability, targets)
-  points = targets:random_affected_points(0.3)
-  surf = parent:create_surface("Fire", points, 1)
+  local points = targets:random_affected_points(0.3)
+  local surf = parent:create_surface("Fire", points, 1)
   surf:set_squares_to_fire_on_moved(3)
   
-  cb = ability:create_callback(parent)
+  local cb = ability:create_callback(parent)
   cb:set_on_surface_round_elapsed_fn("on_round_elapsed")
   cb:set_on_moved_in_surface_fn("on_moved")
   surf:add_callback(cb)
   
-  gen = parent:create_particle_generator("fire_particle")
+  local gen = parent:create_particle_generator("fire_particle")
   gen:set_alpha(gen:param(0.75))
   gen:set_gen_rate(gen:param(30.0))
   gen:set_position(gen:param(0.0), gen:param(0.0))
@@ -88,7 +88,7 @@ function create_fire_surface(parent, ability, targets)
   gen:set_draw_above_entities()
   surf:add_anim(gen)
   
-  below = parent:create_anim("particles/circle16")
+  local below = parent:create_anim("particles/circle16")
   below:set_draw_below_entities()
   below:set_position(below:param(-0.25), below:param(-0.25))
   below:set_particle_size_dist(below:fixed_dist(1.5), below:fixed_dist(1.5))
@@ -99,12 +99,12 @@ function create_fire_surface(parent, ability, targets)
 end
 
 function on_moved(parent, ability, targets)
-  target = targets:first()
+  local target = targets:first()
   target:take_damage(parent, 2, 4, "Fire", 5)
 end
 
 function on_round_elapsed(parent, ability, targets)
-  targets = targets:to_table()
+  local targets = targets:to_table()
   for i = 1, #targets do
 	targets[i]:take_damage(parent, 2, 4, "Fire", 5)
   end

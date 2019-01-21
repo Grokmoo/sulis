@@ -1,29 +1,29 @@
 function on_activate(parent, ability)
-  stats = parent:stats()
+  local stats = parent:stats()
   if not stats.attack_is_melee then
     game:say_line("You must have a melee weapon equipped.", parent)
     return
   end
 
-  targets = parent:targets():hostile():attackable()
+  local targets = parent:targets():hostile():attackable()
   
-  targeter = parent:create_targeter(ability)
+  local targeter = parent:create_targeter(ability)
   targeter:add_all_selectable(targets)
   targeter:add_all_effectable(targets)
   targeter:activate()
 end
 
 function on_target_select(parent, ability, targets)
-  target = targets:first()
+  local target = targets:first()
   
-  cb = ability:create_callback(parent)
+  local cb = ability:create_callback(parent)
   cb:add_target(target)
   cb:set_after_attack_fn("do_attack")
   
   ability:activate(parent)
   parent:anim_special_attack(target, "Dummy", "Melee", 0, 0, 0, "Raw", cb)
   
-  anim = target:create_color_anim(1.0)
+  local anim = target:create_color_anim(1.0)
   anim:set_color(anim:param(1.0, 0.0),
                  anim:param(0.2, 0.8),
                  anim:param(0.2, 0.8),
@@ -36,15 +36,15 @@ function on_target_select(parent, ability, targets)
 end
 
 function do_attack(parent, ability, targets)
-  target = targets:first()
-  stats = parent:stats()
+  local target = targets:first()
+  local stats = parent:stats()
 
-  min_dmg = stats.damage_min_0
-  max_dmg = stats.damage_max_0
+  local min_dmg = stats.damage_min_0
+  local max_dmg = stats.damage_max_0
   
-  target_stats = target:stats()
-  cur_hp = target_stats.current_hp
-  max_hp = target_stats.max_hp
+  local target_stats = target:stats()
+  local cur_hp = target_stats.current_hp
+  local max_hp = target_stats.max_hp
   
   if cur_hp / max_hp < 0.3 then
     target:take_damage(parent, cur_hp, cur_hp, "Raw")
@@ -52,7 +52,7 @@ function do_attack(parent, ability, targets)
     target:take_damage(parent, min_dmg, max_dmg, "Raw")
   end
 
-  gen = target:create_anim("burst", 0.15)
+  local gen = target:create_anim("burst", 0.15)
   gen:set_moves_with_parent()
   gen:set_position(gen:param(-1.25), gen:param(-1.25))
   gen:set_particle_size_dist(gen:fixed_dist(2.5), gen:fixed_dist(2.5))

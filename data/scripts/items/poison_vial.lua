@@ -1,11 +1,11 @@
 function on_activate(parent, item)
-  effect = parent:create_effect(item:name(), item:duration())
+  local effect = parent:create_effect(item:name(), item:duration())
 
-  cb = item:create_callback(parent)
+  local cb = item:create_callback(parent)
   cb:set_after_attack_fn("apply_poison")
   effect:add_callback(cb)
   
-  anim = parent:create_particle_generator("particles/circle4")
+  local anim = parent:create_particle_generator("particles/circle4")
   anim:set_moves_with_parent()
   anim:set_initial_gen(8.0)
   anim:set_color(anim:param(1.0), anim:param(1.0), anim:param(0.0))
@@ -22,11 +22,11 @@ function on_activate(parent, item)
 end
 
 function apply_poison(parent, item, targets, hit)
-  target = targets:first()
+  local target = targets:first()
 
   if hit:is_miss() then return end
   
-  duration = 2
+  local duration = 2
   
   if hit:is_graze() then
     duration = duration - 1
@@ -36,14 +36,14 @@ function apply_poison(parent, item, targets, hit)
     duration = duration + 1
   end
   
-  effect = target:create_effect(item:name(), duration)
+  local effect = target:create_effect(item:name(), duration)
   
-  cb = item:create_callback(parent)
+  local cb = item:create_callback(parent)
   cb:add_target(target)
   cb:set_on_round_elapsed_fn("poison_round_elapsed")
   effect:add_callback(cb)
   
-  anim = target:create_particle_generator("particles/circle8")
+  local anim = target:create_particle_generator("particles/circle8")
   anim:set_moves_with_parent()
   anim:set_initial_gen(8.0)
   anim:set_color(anim:param(1.0), anim:param(1.0), anim:param(0.0))
@@ -59,7 +59,7 @@ function apply_poison(parent, item, targets, hit)
 end
 
 function poison_round_elapsed(parent, item, targets)
-  target = targets:first()
+  local target = targets:first()
 
   target:take_damage(parent, 2, 4, "Raw")
 end

@@ -1,5 +1,5 @@
 function on_activate(parent, ability)
-  targeter = parent:create_targeter(ability)
+  local targeter = parent:create_targeter(ability)
   targeter:set_free_select(15.0)
   targeter:set_shape_object_size("1by1")
   targeter:set_callback_fn("on_target")
@@ -7,8 +7,8 @@ function on_activate(parent, ability)
 end
 
 function on_target(parent, ability, targets)
-  selected_point = targets:selected_point()
-  targeter = parent:create_targeter(ability)
+  local selected_point = targets:selected_point()
+  local targeter = parent:create_targeter(ability)
   targeter:set_free_select(15.0)
   targeter:set_free_select_must_be_passable("1by1")
   targeter:set_shape_line("1by1", selected_point.x, selected_point.y, 8)
@@ -19,20 +19,20 @@ function on_target(parent, ability, targets)
 end
 
 function on_position(parent, ability, targets)
-  points = targets:affected_points()
+  local points = targets:affected_points()
   for i = 1, #points do
-    point = points[i]
-	summon = game:spawn_actor_at("stone", point.x, point.y, "Neutral")
+    local point = points[i]
+	local summon = game:spawn_actor_at("stone", point.x, point.y, "Neutral")
 
 	if summon:is_valid() then
-	  effect = summon:create_effect(ability:name(), ability:duration())
+	  local effect = summon:create_effect(ability:name(), ability:duration())
 	
-      cb = ability:create_callback(summon)
+      local cb = ability:create_callback(summon)
       cb:set_on_removed_fn("on_removed")
       effect:add_callback(cb)
       effect:apply()
       
-      anim = summon:create_color_anim(1.0)
+      local anim = summon:create_color_anim(1.0)
       anim:set_color_sec(anim:param(1.0, -1,0),
                         anim:param(1.0, -1,0),
                          anim:param(1.0, -1,0),
@@ -45,10 +45,10 @@ function on_position(parent, ability, targets)
 end
 
 function on_removed(parent, ability)
-  cb = ability:create_callback(parent)
+  local cb = ability:create_callback(parent)
   cb:set_on_anim_complete_fn("on_remove_complete")
 
-  anim = parent:create_color_anim(1.0)
+  local anim = parent:create_color_anim(1.0)
   anim:set_color(anim:param(1.0), anim:param(1.0), anim:param(1.0), anim:param(1.0, -1.0))
   anim:set_color_sec(anim:param(1.0, -1,0),
                      anim:param(1.0, -1,0),

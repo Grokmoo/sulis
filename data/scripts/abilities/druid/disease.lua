@@ -1,7 +1,7 @@
 function on_activate(parent, ability)
-  targets = parent:targets():hostile():visible_within(10)
+  local targets = parent:targets():hostile():visible_within(10)
   
-  targeter = parent:create_targeter(ability)
+  local targeter = parent:create_targeter(ability)
   targeter:add_all_selectable(targets)
   targeter:add_all_effectable(targets)
   targeter:activate()
@@ -10,10 +10,11 @@ end
 function on_target_select(parent, ability, targets)
   ability:activate(parent)
 
-  stats = parent:stats()
-  target = targets:first()
+  local stats = parent:stats()
+  local target = targets:first()
   
-  hit = parent:special_attack(target, "Fortitude", "Spell")
+  local hit = parent:special_attack(target, "Fortitude", "Spell")
+  local factor = 0
   if hit:is_miss() then
     return
   elseif hit:is_graze() then
@@ -24,9 +25,9 @@ function on_target_select(parent, ability, targets)
     factor = 3
   end
   
-  amount = (1 + stats.caster_level / 8 + stats.wisdom_bonus / 8) * factor
+  local amount = (1 + stats.caster_level / 8 + stats.wisdom_bonus / 8) * factor
   
-  effect = target:create_effect(ability:name())
+  local effect = target:create_effect(ability:name())
   effect:set_tag("disease")
   effect:set_icon("gui/status_disease", "Disease")
   
@@ -35,7 +36,7 @@ function on_target_select(parent, ability, targets)
   effect:add_attribute_bonus("Endurance", -amount)
   effect:add_attribute_bonus("Perception", -amount)
   
-  anim = target:create_particle_generator("heal")
+  local anim = target:create_particle_generator("heal")
   anim:set_moves_with_parent()
   anim:set_color(anim:param(1.0), anim:param(1.0), anim:param(0.0))
   anim:set_position(anim:param(-0.5), anim:param(-1.5))

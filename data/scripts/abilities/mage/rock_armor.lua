@@ -1,12 +1,12 @@
 function on_activate(parent, ability)
-  effect = parent:create_effect(ability:name(), ability:duration())
+  local effect = parent:create_effect(ability:name(), ability:duration())
   effect:set_tag("magic_defense")
   
-  stats = parent:stats()
+  local stats = parent:stats()
   effect:add_num_bonus("armor", 12 + stats.caster_level)
   effect:add_attribute_bonus("Dexterity", -4)
 
-  anim = parent:create_color_anim()
+  local anim = parent:create_color_anim()
   anim:set_color(anim:param(0.2),
                  anim:param(0.15),
                  anim:param(0.0),

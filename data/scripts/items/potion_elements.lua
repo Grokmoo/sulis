@@ -1,11 +1,11 @@
 function on_activate(parent, item)
-  effect = parent:create_effect(item:name(), item:duration())
+  local effect = parent:create_effect(item:name(), item:duration())
   effect:add_armor_of_kind(8, "Fire")
   effect:add_armor_of_kind(8, "Cold")
   effect:add_armor_of_kind(8, "Shock")
   effect:add_armor_of_kind(8, "Acid")
 
-  anim = parent:create_particle_generator("arrow_up")
+  local anim = parent:create_particle_generator("arrow_up")
   anim:set_moves_with_parent()
   anim:set_position(anim:param(-0.5), anim:param(-1.5))
   anim:set_particle_size_dist(anim:fixed_dist(0.75), anim:fixed_dist(0.75))

@@ -341,7 +341,10 @@ impl Inventory {
     #[must_use]
     pub fn unequip(&mut self, slot: Slot) -> Option<ItemState> {
         let result = self.equipped.remove(&slot);
-        info!("Unequipped '{:?}' from {:?}", result, slot);
+        match &result {
+            None => (),
+            Some(item_state) => info!("Unequipped '{}' from {:?}", item_state.item.id, slot),
+        }
         result
     }
 

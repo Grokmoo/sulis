@@ -13,7 +13,7 @@ end
 function set_thugs_hostile()
   game:player():set_flag("fought_gethruk_thugs")
 
-  entities = game:entities_with_ids({"thug04", "thug05", "thug06", "thug07", "thug08"})
+  local entities = game:entities_with_ids({"thug04", "thug05", "thug06", "thug07", "thug08"})
   set_hostile(entities)
 end
 
@@ -22,7 +22,7 @@ function thugs_pay_off()
 end
 
 function set_boss_hostile()
-  entities = game:entities_with_ids({"thug09", "thug10", "thug11", "thug12", "gethruk_boss"})
+  local entities = game:entities_with_ids({"thug09", "thug10", "thug11", "thug12", "gethruk_boss"})
   set_hostile(entities)
   
   entities = game:entities_with_ids({"thug04", "thug05", "thug06", "thug07", "thug08"})

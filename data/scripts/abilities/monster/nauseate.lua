@@ -1,20 +1,20 @@
 function on_activate(parent, ability)
-  targets = parent:targets():hostile():reachable()
+  local targets = parent:targets():hostile():reachable()
   
-  targeter = parent:create_targeter(ability)
+  local targeter = parent:create_targeter(ability)
   targeter:add_all_selectable(targets)
   targeter:add_all_effectable(targets)
   targeter:activate()
 end
 
 function on_target_select(parent, ability, targets)
-  stats = parent:stats()
+  local stats = parent:stats()
   ability:activate(parent)
 
-  target = targets:first()
+  local target = targets:first()
   
-  hit = parent:special_attack(target, "Fortitude", "Melee")
-  amount = -4
+  local hit = parent:special_attack(target, "Fortitude", "Melee")
+  local amount = -4
   if hit:is_miss() then
     return
   elseif hit:is_graze() then
@@ -25,13 +25,13 @@ function on_target_select(parent, ability, targets)
     amount = amount * 1.5
   end
   
-  effect = target:create_effect(ability:name(), ability:duration())
+  local effect = target:create_effect(ability:name(), ability:duration())
   effect:set_tag("nauseate")
   effect:add_attribute_bonus("Strength", amount)
   effect:add_attribute_bonus("Dexterity", amount)
   effect:add_attribute_bonus("Endurance", amount)
   
-  anim = target:create_particle_generator("sparkle")
+  local anim = target:create_particle_generator("sparkle")
   anim:set_moves_with_parent()
   anim:set_position(anim:param(-0.5), anim:param(-1.5))
   anim:set_particle_size_dist(anim:fixed_dist(0.5), anim:fixed_dist(0.5))

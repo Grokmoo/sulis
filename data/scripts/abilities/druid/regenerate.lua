@@ -1,26 +1,26 @@
 function on_activate(parent, ability)
-  targets = parent:targets():friendly():visible_within(10)
+  local targets = parent:targets():friendly():visible_within(10)
   
-  targeter = parent:create_targeter(ability)
+  local targeter = parent:create_targeter(ability)
   targeter:add_all_selectable(targets)
   targeter:add_all_effectable(targets)
   targeter:activate()
 end
 
 function on_target_select(parent, ability, targets)
-  stats = parent:stats()
-  target = targets:first()
+  local stats = parent:stats()
+  local target = targets:first()
   
   target:heal_damage(10 + stats.caster_level / 3 + stats.wisdom_bonus / 3)
   
-  effect = target:create_effect(ability:name(), ability:duration())
+  local effect = target:create_effect(ability:name(), ability:duration())
   
-  cb = ability:create_callback(parent)
+  local cb = ability:create_callback(parent)
   cb:add_target(target)
   cb:set_on_round_elapsed_fn("apply_heal")
   effect:add_callback(cb)
   
-  anim = target:create_particle_generator("heal")
+  local anim = target:create_particle_generator("heal")
   anim:set_moves_with_parent()
   anim:set_position(anim:param(-0.5), anim:param(-1.5))
   anim:set_particle_size_dist(anim:fixed_dist(1.0), anim:fixed_dist(1.0))
@@ -36,8 +36,8 @@ function on_target_select(parent, ability, targets)
 end
 
 function apply_heal(parent, ability, targets)
-  stats = parent:stats()
-  target = targets:first()
+  local stats = parent:stats()
+  local target = targets:first()
   
   target:heal_damage(10 + stats.caster_level / 3 + stats.wisdom_bonus / 3)
 end

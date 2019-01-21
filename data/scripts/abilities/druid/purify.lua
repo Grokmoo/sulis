@@ -1,7 +1,7 @@
 function on_activate(parent, ability)
-  targets = parent:targets():friendly():visible_within(12)
+  local targets = parent:targets():friendly():visible_within(12)
   
-  targeter = parent:create_targeter(ability)
+  local targeter = parent:create_targeter(ability)
   targeter:add_all_selectable(targets)
   targeter:add_all_effectable(targets)
   targeter:activate()
@@ -10,7 +10,7 @@ end
 function on_target_select(parent, ability, targets)
   ability:activate(parent)
 
-  target = targets:first()
+  local target = targets:first()
 
   target:remove_effects_with_tag("slow")
   target:remove_effects_with_tag("nauseate")
@@ -19,7 +19,7 @@ function on_target_select(parent, ability, targets)
   target:remove_effects_with_tag("disease")
   target:remove_effects_with_tag("rupture")
   
-  anim = target:create_particle_generator("particles/circle20", 2.0)
+  local anim = target:create_particle_generator("particles/circle20", 2.0)
   anim:set_position(anim:param(target:x() + 0.5), anim:param(target:y()))
   anim:set_particle_size_dist(anim:fixed_dist(1.0), anim:fixed_dist(1.0))
   anim:set_gen_rate(anim:param(0.0))

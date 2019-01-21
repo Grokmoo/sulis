@@ -11,7 +11,7 @@ function rockslide_final_fate(parent)
 end
 
 function kaelwyn_leave(parent)
-  target = game:entity_with_id("kaelwyn")
+  local target = game:entity_with_id("kaelwyn")
   target:remove()
 end
 
@@ -26,7 +26,7 @@ function enable_worldmap(parent)
 end
 
 function activate_troll_encounter(parent)
-  troll = game:entity_with_id("forest_troll_leader")
+  local troll = game:entity_with_id("forest_troll_leader")
   
   game:say_line("Up and at em, boys!  Kills these fools then its back to the mire!", troll)
 end

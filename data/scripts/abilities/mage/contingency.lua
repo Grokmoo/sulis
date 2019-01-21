@@ -1,8 +1,8 @@
 function on_activate(parent, ability)
-  cb = ability:create_callback(parent)
+  local cb = ability:create_callback(parent)
   cb:set_on_menu_select_fn("spell_select")
 
-  menu = game:create_menu("Select a Condition on the Caster", cb)
+  local menu = game:create_menu("Select a Condition on the Caster", cb)
   menu:add_choice("Movement Disabled", "move_disabled")
   menu:add_choice("Damaged", "damaged")
   menu:add_choice("Hit points below 50%", "hit_points_50")
@@ -15,16 +15,16 @@ end
 function spell_select(parent, ability, targets, selection)
   parent:set_flag("__contingency_trigger_condition", selection:value())
 
-  cb = ability:create_callback(parent)
+  local cb = ability:create_callback(parent)
   cb:set_on_menu_select_fn("create_contingency")
   
-  abilities = { "heal", "acid_weapon", "rock_armor", "fire_shield", "haste", "air_shield", "luck", "expediate", "minor_heal" }
+  local abilities = { "heal", "acid_weapon", "rock_armor", "fire_shield", "haste", "air_shield", "luck", "expediate", "minor_heal" }
   
-  menu = game:create_menu("Select a Spell", cb)
+  local menu = game:create_menu("Select a Spell", cb)
   for i = 1, #abilities do
-    ability_id = abilities[i]
+    local ability_id = abilities[i]
 	if parent:has_ability(ability_id) then
-	  ability = parent:get_ability(ability_id)
+	  local ability = parent:get_ability(ability_id)
 	  menu:add_choice(ability:name(), ability_id)
 	end
   end
@@ -34,15 +34,15 @@ end
 function create_contingency(parent, ability, targets, selection)
   parent:set_flag("__contingency_spell", selection:value())
   
-  effect = parent:create_effect(ability:name())
+  local effect = parent:create_effect(ability:name())
   effect:deactivate_with(ability)
-  cb = ability:create_callback(parent)
+  local cb = ability:create_callback(parent)
   cb:set_on_damaged_fn("on_damaged")
   cb:set_on_effect_applied_fn("on_effect_applied")
   cb:set_after_defense_fn("after_defense")
   effect:add_callback(cb)
   
-  gen = parent:create_anim("pulsing_particle")
+  local gen = parent:create_anim("pulsing_particle")
   gen:set_moves_with_parent()
   gen:set_position(gen:param(-1.0), gen:param(-3.0))
   gen:set_color(gen:param(1.0), gen:param(0.0), gen:param(1.0), gen:param(1.0))
@@ -54,17 +54,17 @@ function create_contingency(parent, ability, targets, selection)
 end
 
 function fire_contingency(parent, ability)
-  selection = parent:get_flag("__contingency_spell")
+  local selection = parent:get_flag("__contingency_spell")
 
   ability:deactivate(parent)
   game:say_line("Contingency", parent)
   
-  effect = parent:create_effect(ability:name(), 0)
+  local effect = parent:create_effect(ability:name(), 0)
   effect:add_num_bonus("ability_ap_cost", 10 * game:ap_display_factor())
   effect:add_free_ability_group_use()
   effect:apply()
   
-  ability_to_fire = parent:get_ability(selection)
+  local ability_to_fire = parent:get_ability(selection)
   parent:use_ability(ability_to_fire, true)
   
   if game:has_targeter() then
@@ -86,8 +86,8 @@ function on_effect_applied(parent, ability, targets, effect)
 end
 
 function after_defense(parent, ability, targets, hit)
-  attacker = targets:first()
-  defender = parent
+  local attacker = targets:first()
+  local defender = parent
   
   if get_trigger_condition(parent) == "attacked_melee" then
     if attacker:inventory():weapon_style() ~= "Ranged" then
@@ -99,9 +99,9 @@ function after_defense(parent, ability, targets, hit)
 end
 
 function on_damaged(parent, ability, targets, hit)
-  stats = parent:stats()
-  hp = stats.current_hp
-  max_hp = stats.max_hp
+  local stats = parent:stats()
+  local hp = stats.current_hp
+  local max_hp = stats.max_hp
   
   if get_trigger_condition(parent) == "damaged" then
     if hp < max_hp then

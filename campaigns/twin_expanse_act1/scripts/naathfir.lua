@@ -4,12 +4,12 @@ function enable_naathfir(parent)
 end
 
 function naathfir_road_thugs(parent)
-  thug = game:entity_with_id("naathfir_thug02")
+  local thug = game:entity_with_id("naathfir_thug02")
   game:start_conversation("naathfir_road_thug", thug)
 end
 
 function set_road_thugs_hostile()
-  entities = game:entities_with_ids({"naathfir_thug01", "naathfir_thug02", "naathfir_thug03", "naathfir_thug04", "naathfir_thug05"})
+  local entities = game:entities_with_ids({"naathfir_thug01", "naathfir_thug02", "naathfir_thug03", "naathfir_thug04", "naathfir_thug05"})
   set_hostile(entities)
 end
 
@@ -21,7 +21,7 @@ end
 
 function trader_farewell(parent)
   game:set_quest_entry_state("dwarven_goods", "found", "Visible")
-  trader = game:entity_with_id("dwarf_trader01")
+  local trader = game:entity_with_id("dwarf_trader01")
   
   if not trader:move_towards_point(21, 40) then
     game:warn("dwarf_trader01 unable to move")
@@ -31,7 +31,7 @@ function trader_farewell(parent)
 end
 
 function trader_leave_finish(parent)
-  trader = game:entity_with_id("dwarf_trader01")
+  local trader = game:entity_with_id("dwarf_trader01")
   trader:remove()
 end
 
@@ -45,7 +45,7 @@ function mines_boss_enter(parent)
   game:cancel_blocking_anims()
   game:scroll_view(77, 54)
 
-  omonar = game:entity_with_id("mines_omonar")
+  local omonar = game:entity_with_id("mines_omonar")
   omonar:set_faction("Hostile")
   game:start_conversation("naathfir_mines_omonar", omonar)
   game:spawn_encounter_at(89, 42)

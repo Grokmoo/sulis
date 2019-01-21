@@ -1,10 +1,10 @@
 function on_activate(parent, ability)
-  stats = parent:stats()
-  range = 7 + stats.caster_level / 2
+  local stats = parent:stats()
+  local range = 7 + stats.caster_level / 2
 
-  targets = parent:targets():visible_within(range)
+  local targets = parent:targets():visible_within(range)
   
-  targeter = parent:create_targeter(ability)
+  local targeter = parent:create_targeter(ability)
   targeter:add_all_selectable(targets)
   targeter:add_all_effectable(targets)
   targeter:set_callback_fn("on_target")
@@ -12,12 +12,12 @@ function on_activate(parent, ability)
 end
 
 function on_target(parent, ability, targets)
-  target = targets:first()
+  local target = targets:first()
   
-  stats = parent:stats()
-  range = 7 + stats.caster_level / 2
+  local stats = parent:stats()
+  local range = 7 + stats.caster_level / 2
 
-  targeter = parent:create_targeter(ability)
+  local targeter = parent:create_targeter(ability)
   targeter:set_free_select(range + 2)
   targeter:set_free_select_must_be_passable(parent:size_str())
   targeter:set_shape_object_size(parent:size_str())
@@ -27,15 +27,15 @@ function on_target(parent, ability, targets)
 end
 
 function on_position(parent, ability, targets, custom_target)
-  pos = targets:selected_point()
+  local pos = targets:selected_point()
   
-  duration = 0.89
-  anim = parent:create_anim("teleport", duration)
+  local duration = 0.89
+  local anim = parent:create_anim("teleport", duration)
   anim:set_position(anim:param(custom_target:center_x() - 0.5),
                     anim:param(custom_target:center_y() - 1.75))
   anim:set_particle_size_dist(anim:fixed_dist(2.0), anim:fixed_dist(3.0))
   
-  cb = ability:create_callback(parent)
+  local cb = ability:create_callback(parent)
   cb:add_target(custom_target)
   cb:add_selected_point(pos)
   cb:set_on_anim_update_fn("move_target")
@@ -46,8 +46,8 @@ function on_position(parent, ability, targets, custom_target)
 end
 
 function move_target(parent, ability, targets)
-  target = targets:first()
-  pos = targets:selected_point()
+  local target = targets:first()
+  local pos = targets:selected_point()
 
   target:teleport_to(pos)
 end

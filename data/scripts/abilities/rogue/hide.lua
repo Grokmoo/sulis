@@ -63,8 +63,7 @@ function deactivate(parent, ability)
 end
 
 function after_attack(parent, ability)
-  game:say_line("Spotted!", parent)
-  ability:deactivate(parent)
+  deactivate(parent, ability)
   game:run_script_delayed("hide", "on_deactivate", 0.1)
 end
 

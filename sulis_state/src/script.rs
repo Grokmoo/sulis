@@ -262,6 +262,7 @@ const MILLIS_LIMIT: f64 = 100.0;
 pub struct InstructionState {
     count: u32,
     start_time: time::Instant,
+    eval_time: time::Duration,
 }
 
 /// A script state, containing a complete lua state.
@@ -291,6 +292,7 @@ impl ScriptState {
         let instructions = Arc::new(Mutex::new(InstructionState {
             count: 0,
             start_time: time::Instant::now(),
+            eval_time: time::Duration::default(),
         }));
         let state = ScriptState { lua, instructions, creation_time: time::Instant::now() };
 
@@ -318,11 +320,16 @@ impl ScriptState {
     }
 
     fn print_report(&self, func: &str) {
-        let count = (*self.instructions.lock().unwrap()).count;
+        let (count, eval_time) = {
+            let inst = &(*self.instructions.lock().unwrap());
+            (inst.count, inst.eval_time)
+        };
         let total = get_elapsed_millis(self.creation_time.elapsed());
+        let eval = get_elapsed_millis(eval_time);
         let mem = (self.lua.used_memory() as f32) / 1024.0;
-        info!("Script Execution for {}: Total Time: {:.3} millis", func, total);
-        info!("  Memory Allocated: {:.3} KB / Instruction Count: {}", mem, count);
+        info!("Script Execution '{}' - Total: {:.3} millis, Eval: {:.3} millis",
+              func, total, eval);
+        info!("  Memory Allocated: {:.3} KB / Instruction Count: ~{}", mem, count);
     }
 
     fn reset_instruction_state(&self) {
@@ -339,8 +346,13 @@ impl ScriptState {
         let result = self.lua.context(|lua| {
             let chunk = lua.load(script).set_name(function)?;
             chunk.exec()?;
+
+            let eval_start = time::Instant::now();
             let func: Function = lua.globals().get(function)?;
-            func.call(args)
+            let result = func.call(args);
+
+            (*self.instructions.lock().unwrap()).eval_time = eval_start.elapsed();
+            result
         });
         self.print_report(function);
         result

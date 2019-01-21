@@ -1,7 +1,7 @@
 function on_activate(parent, ability)
   ability:activate(parent)
 
-  local amount = 2 * game:ap_display_factor()
+  local amount = 3 * game:ap_display_factor()
   parent:change_overflow_ap(-amount)
   parent:add_ap(amount)
   

@@ -17,7 +17,7 @@
 use std::str::FromStr;
 use std::collections::HashMap;
 
-use rlua::{Lua, UserData, UserDataMethods};
+use rlua::{Context, UserData, UserDataMethods};
 
 use sulis_core::{util::ExtInt, resource::ResourceSet};
 use sulis_module::{ImageLayer};
@@ -102,7 +102,7 @@ impl UserData for ScriptImageLayerAnimation {
     }
 }
 
-fn activate(_lua: &Lua, data: &ScriptImageLayerAnimation, _args: ()) -> Result<()> {
+fn activate(_lua: Context, data: &ScriptImageLayerAnimation, _args: ()) -> Result<()> {
     let anim = create_anim(data)?;
 
     GameState::add_animation(anim);
@@ -117,7 +117,7 @@ pub fn create_anim(data: &ScriptImageLayerAnimation) -> Result<Anim> {
     let mut images = HashMap::new();
     for (layer, ref image_id) in data.images.iter() {
         match ResourceSet::get_image(image_id) {
-            None => 
+            None =>
                 return Err(rlua::Error::FromLuaConversionError {
                     from: "String",
                     to: "Image",

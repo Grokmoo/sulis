@@ -67,14 +67,11 @@ const MAX_ZOOM: f32 = 2.0;
 
 macro_rules! exec_script {
     ($func:ident: $($x:ident),*) => {
-        let start_time = time::Instant::now();
-
-        if let Err(e) = ScriptState::new().$func($($x, )*) {
+        let state = ScriptState::new();
+        if let Err(e) = state.$func($($x, )*) {
             warn!("Error executing lua script function");
             warn!("{}", e);
         }
-
-        info!("Script execution time: {}", util::format_elapsed_secs(start_time.elapsed()));
     }
 }
 
@@ -693,9 +690,8 @@ impl GameState {
     }
 
     pub fn execute_ai_script(parent: &Rc<RefCell<EntityState>>, func: &str) -> ai::State {
-        let start_time = time::Instant::now();
-
-        let result = match ScriptState::new().ai_script(parent, func) {
+        let state = ScriptState::new();
+        match state.ai_script(parent, func) {
             Err(e) => {
                 warn!("Error in lua AI script");
                 warn!("{}", e);
@@ -704,11 +700,7 @@ impl GameState {
             Ok(val) => {
                 val
             }
-        };
-
-        info!("AI Script execution time: {}", util::format_elapsed_secs(start_time.elapsed()));
-
-        result
+        }
     }
 
     pub fn execute_item_on_activate(parent: &Rc<RefCell<EntityState>>, kind: ScriptItemKind) {

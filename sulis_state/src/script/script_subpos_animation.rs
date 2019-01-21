@@ -14,7 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use rlua::{Lua, UserData, UserDataMethods};
+use rlua::{Context, UserData, UserDataMethods};
 
 use sulis_core::util::ExtInt;
 use crate::{GameState};
@@ -83,7 +83,7 @@ impl UserData for ScriptSubposAnimation {
     }
 }
 
-fn activate(_lua: &Lua, data: &ScriptSubposAnimation, _args: ()) -> Result<()> {
+fn activate(_lua: Context, data: &ScriptSubposAnimation, _args: ()) -> Result<()> {
     let anim = create_anim(data)?;
 
     GameState::add_animation(anim);

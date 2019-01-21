@@ -82,10 +82,12 @@ pub mod targeter;
 pub use self::targeter::TargeterData;
 
 use std;
+use std::time;
 use std::rc::Rc;
-use std::cell::RefCell;
+use std::cell::{RefCell};
+use std::sync::{Arc, Mutex};
 
-use rlua::{self, Function, Lua, UserData, UserDataMethods};
+use rlua::{self, ToLua, FromLuaMulti, Context, Lua, UserData, UserDataMethods};
 
 use sulis_core::config::Config;
 use sulis_core::util::{Point};
@@ -97,17 +99,42 @@ use crate::{EntityState, ItemState, GameState, ai, area_feedback_text::ColorKind
 
 type Result<T> = std::result::Result<T, rlua::Error>;
 
-/// A script state, containing a complete lua state.
 
+fn get_rlua_std_lib() -> rlua::StdLib {
+    use rlua::StdLib;
+
+    StdLib::BASE | StdLib::TABLE | StdLib::STRING | StdLib::MATH
+}
+
+fn get_elapsed_millis(elapsed: time::Duration) -> f64 {
+    (elapsed.as_secs() as f64) * 1000.0 +
+        (elapsed.subsec_nanos() as f64) / 1_000_000.0
+}
+
+const MEM_LIMIT: usize = 10_485_760;
+const INSTRUCTION_LIMIT: u32 = 10_000;
+const INSTRUCTIONS_PER_CHECK: u32 = 10;
+const MILLIS_LIMIT: f64 = 100.0;
+
+pub struct InstructionState {
+    count: u32,
+    start_time: time::Instant,
+}
+
+/// A script state, containing a complete lua state.
 pub struct ScriptState {
     lua: Lua,
+    creation_time: time::Instant,
+    instructions: Arc<Mutex<InstructionState>>,
 }
 
 impl ScriptState {
     pub fn new() -> ScriptState {
-        let lua = Lua::new();
+        let lua = Lua::new_with(get_rlua_std_lib());
+        lua.gc_stop();
+        lua.set_memory_limit(Some(MEM_LIMIT));
 
-        {
+        lua.context(|lua| {
             let globals = lua.globals();
             match globals.set("game", ScriptInterface {}) {
                 Ok(()) => (),
@@ -116,44 +143,92 @@ impl ScriptState {
                     warn!("{}", e);
                 },
             }
-        }
+        });
 
-        ScriptState { lua }
+        let instructions = Arc::new(Mutex::new(InstructionState {
+            count: 0,
+            start_time: time::Instant::now(),
+        }));
+        let state = ScriptState { lua, instructions, creation_time: time::Instant::now() };
+
+        let instructions = Arc::clone(&state.instructions);
+        state.lua.set_hook(rlua::HookTriggers {
+            every_nth_instruction: Some(INSTRUCTIONS_PER_CHECK), ..Default::default()
+        }, move |_, _| {
+            let state = &mut *instructions.lock().unwrap();
+            state.count += INSTRUCTIONS_PER_CHECK;
+
+            if state.count > INSTRUCTION_LIMIT {
+                return Err(rlua::Error::RuntimeError(format!("Instruction limit of \
+                    {} reached", INSTRUCTION_LIMIT)));
+            }
+
+            if get_elapsed_millis(state.start_time.elapsed()) > MILLIS_LIMIT {
+                return Err(rlua::Error::RuntimeError(format!("Script time limit of \
+                    {} millis reached", MILLIS_LIMIT)));
+            }
+
+            Ok(())
+        });
+
+        state
     }
 
-    fn execute_script<'lua, T: rlua::FromLuaMulti<'lua>>(&'lua self,
-                                                         parent: &Rc<RefCell<EntityState>>,
-                                                         function_args: &str,
-                                                         mut script: String,
-                                                         function: &str) -> Result<T> {
-        let globals = self.lua.globals();
-        globals.set("parent", ScriptEntity::from(&parent))?;
+    fn print_report(&self, func: &str) {
+        let count = (*self.instructions.lock().unwrap()).count;
+        let total = get_elapsed_millis(self.creation_time.elapsed());
+        let mem = (self.lua.used_memory() as f32) / 1024.0;
+        info!("Script Execution for {}: Total Time: {:.3} millis", func, total);
+        info!("  Memory Allocated: {:.3} KB / Instruction Count: {}", mem, count);
+    }
 
-        debug!("Loading script for '{}'", function);
+    fn reset_instruction_state(&self) {
+        let instructions = &mut *self.instructions.lock().unwrap();
+        instructions.count = 0;
+        instructions.start_time = time::Instant::now();
+    }
 
-        script.push('\n');
-        script.push_str(function);
-        script.push_str(function_args);
-        let func: Function = self.lua.load(&script, Some(function))?;
+    fn execute_script<T>(&self,
+                      parent: &Rc<RefCell<EntityState>>,
+                      function_args: &str,
+                      mut script: String,
+                      function: &str) -> Result<T> where T: for<'a> FromLuaMulti<'a> {
+        self.reset_instruction_state();
+        let result = self.lua.context(|lua| {
+            let globals = lua.globals();
+            globals.set("parent", ScriptEntity::from(&parent))?;
 
-        debug!("Calling script function '{}'", function);
+            debug!("Loading script for '{}'", function);
 
-        func.call::<_, T>("")
+            script.push('\n');
+            script.push_str(function);
+            script.push_str(function_args);
+
+            debug!("Calling script function '{}'", function);
+            lua.load(&script).set_name(function)?.eval::<T>()
+        });
+        self.print_report(function);
+        result
     }
 
     pub fn console(&self, script: String, party: &Vec<Rc<RefCell<EntityState>>>) -> Result<String> {
         assert!(party.len() > 0);
-        self.lua.globals().set("player", ScriptEntity::from(&party[0]))?;
+        self.reset_instruction_state();
+        let result = self.lua.context(|lua| {
+            lua.globals().set("player", ScriptEntity::from(&party[0]))?;
 
-        let party_table = self.lua.create_table()?;
-        for (index, member) in party.iter().enumerate() {
-            party_table.set(index + 1, ScriptEntity::from(member))?;
-        }
+            let party_table = lua.create_table()?;
+            for (index, member) in party.iter().enumerate() {
+                party_table.set(index + 1, ScriptEntity::from(member))?;
+            }
 
-        self.lua.globals().set("party", party_table)?;
+            lua.globals().set("party", party_table)?;
 
-        self.lua.eval::<_, String>(&script, None)
-}
+            lua.load(&script).eval::<String>()
+        });
+        self.print_report("console");
+        result
+    }
 
     pub fn ai_script(&self, parent: &Rc<RefCell<EntityState>>, func: &str) -> Result<ai::State> {
         let script = match &parent.borrow().actor.actor.ai {
@@ -161,10 +236,15 @@ impl ScriptState {
             Some(ai_template) => ai_template.script(),
         };
 
-        self.lua.globals().set("state", ai::State::End)?;
+        self.lua.context(|lua| {
+            lua.globals().set("state", ai::State::End)
+        })?;
+
         self.execute_script(parent, "(parent, state)", script, func)?;
 
-        self.lua.globals().get("state")
+        self.lua.context(|lua| {
+            lua.globals().get("state")
+        })
     }
 
     pub fn item_on_activate(&self, parent: &Rc<RefCell<EntityState>>,
@@ -192,12 +272,10 @@ impl ScriptState {
         self.item_script(parent, kind, targets, arg, func)
     }
 
-    pub fn entity_script<'a, T>(&'a self, parent: &Rc<RefCell<EntityState>>,
+    pub fn entity_script<T>(&self, parent: &Rc<RefCell<EntityState>>,
                                 targets: ScriptEntitySet,
                                 arg: Option<(&str, T)>,
-                                func: &str) -> Result<()> where T: rlua::prelude::ToLua<'a> + Send {
-        self.lua.globals().set("targets", targets)?;
-
+                                func: &str) -> Result<()> where T: for<'a> ToLua<'a> + Send {
         let script = match &parent.borrow().actor.actor.ai {
             None => {
                 warn!("Script called for entity {} with no AI", parent.borrow().actor.actor.name);
@@ -211,11 +289,15 @@ impl ScriptState {
         };
 
         let mut args_string = "(parent, targets".to_string();
-        if let Some((arg_str, arg)) = arg {
-            args_string.push_str(", ");
-            args_string.push_str(arg_str);
-            self.lua.globals().set(arg_str, arg)?;
-        }
+        self.lua.context(|lua| {
+            lua.globals().set("targets", targets)?;
+            if let Some((arg_str, arg)) = arg {
+                args_string.push_str(", ");
+                args_string.push_str(arg_str);
+                lua.globals().set(arg_str, arg)?;
+            }
+            Ok(())
+        })?;
         args_string.push(')');
         self.execute_script(parent, &args_string, script.to_string(), func)
     }
@@ -224,26 +306,31 @@ impl ScriptState {
     /// is assumed that the item exists on the parent at the specified `item_index`.  If it Some,
     /// this is not assumed, but the specified index is still set on the item that is passed into
     /// the script state.
-    pub fn item_script<'a, T>(&'a self, parent: &Rc<RefCell<EntityState>>,
+    pub fn item_script<T>(&self, parent: &Rc<RefCell<EntityState>>,
                               kind: ScriptItemKind,
                               targets: ScriptEntitySet,
                               arg: Option<(&str, T)>,
-                              func: &str) -> Result<()> where T: rlua::prelude::ToLua<'a> + Send {
+                              func: &str) -> Result<()> where T: for<'a> ToLua<'a> + Send {
         let script_item = ScriptItem::new(parent, kind)?;
 
         let item = script_item.try_item()?;
         let script = get_item_script(&item)?;
-        self.lua.globals().set("item", script_item)?;
-        self.lua.globals().set("targets", targets)?;
 
         let mut args_string = "(parent, item, targets".to_string();
-        if let Some((arg_str, arg)) = arg {
-            args_string.push_str(", ");
-            args_string.push_str(arg_str);
+        self.lua.context(|lua| {
+            lua.globals().set("item", script_item)?;
+            lua.globals().set("targets", targets)?;
 
-            self.lua.globals().set(arg_str, arg)?;
-        }
-        args_string.push(')');
+            if let Some((arg_str, arg)) = arg {
+                args_string.push_str(", ");
+                args_string.push_str(arg_str);
+
+               lua.globals().set(arg_str, arg)?;
+            }
+            args_string.push(')');
+            Ok(())
+        })?;
+
         self.execute_script(parent, &args_string, script.to_string(), func)
     }
 
@@ -272,40 +359,48 @@ impl ScriptState {
         self.ability_script(parent, ability, targets, arg, func)
     }
 
-    pub fn ability_script<'a, T>(&'a self, parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>,
+    pub fn ability_script<T>(&self, parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>,
                                  targets: ScriptEntitySet, arg: Option<(&str, T)>,
-                                 func: &str) -> Result<()> where T: rlua::prelude::ToLua<'a> + Send {
+                                 func: &str) -> Result<()> where T: for<'a> ToLua<'a> + Send {
         let script = get_ability_script(ability)?;
-        self.lua.globals().set("ability", ScriptAbility::from(ability))?;
-        self.lua.globals().set("targets", targets)?;
-
         let mut args_string = "(parent, ability, targets".to_string();
-        if let Some((arg_str, arg)) = arg {
-            args_string.push_str(", ");
-            args_string.push_str(arg_str);
 
-            self.lua.globals().set(arg_str, arg)?;
-        }
-        args_string.push(')');
+        self.lua.context(|lua| {
+            lua.globals().set("ability", ScriptAbility::from(ability))?;
+            lua.globals().set("targets", targets)?;
+
+            if let Some((arg_str, arg)) = arg {
+                args_string.push_str(", ");
+                args_string.push_str(arg_str);
+
+                lua.globals().set(arg_str, arg)?;
+            }
+            args_string.push(')');
+            Ok(())
+        })?;
         self.execute_script(parent, &args_string, script.to_string(), func)
     }
 
-    pub fn trigger_script<'a, T>(&'a self, script_id: &str,
+    pub fn trigger_script<T>(&self, script_id: &str,
                                  func: &str,
                                  parent: &Rc<RefCell<EntityState>>,
                                  target: &Rc<RefCell<EntityState>>,
-                                 arg: Option<(&str, T)>) -> Result<()> where T: rlua::prelude::ToLua<'a> + Send {
+                                 arg: Option<(&str, T)>) -> Result<()> where T: for<'a> ToLua<'a> + Send {
         let script = get_script_from_id(script_id)?;
-        self.lua.globals().set("target", ScriptEntity::from(target))?;
-
         let mut args_string = "(parent, target".to_string();
-        if let Some((arg_str, arg)) = arg {
-            args_string.push_str(", ");
-            args_string.push_str(arg_str);
 
-            self.lua.globals().set(arg_str, arg)?;
-        }
-        args_string.push(')');
+        self.lua.context(|lua| {
+            lua.globals().set("target", ScriptEntity::from(target))?;
+
+            if let Some((arg_str, arg)) = arg {
+                args_string.push_str(", ");
+                args_string.push_str(arg_str);
+
+                lua.globals().set(arg_str, arg)?;
+            }
+            args_string.push(')');
+            Ok(())
+        })?;
 
         self.execute_script(parent, &args_string, script, func)
     }
@@ -1411,7 +1506,7 @@ pub fn entity_with_id(id: String) -> Option<Rc<RefCell<EntityState>>> {
     None
 }
 
-fn activate_item(_lua: &Lua, script_item: &ScriptItem, target: ScriptEntity) -> Result<()> {
+fn activate_item(_lua: Context, script_item: &ScriptItem, target: ScriptEntity) -> Result<()> {
     let item = script_item.try_item()?;
     let target = target.try_unwrap()?;
 

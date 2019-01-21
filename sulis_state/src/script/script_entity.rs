@@ -21,7 +21,7 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::io::Error;
 
-use rlua::{self, Lua, UserData, UserDataMethods};
+use rlua::{self, Context, UserData, UserDataMethods};
 
 use sulis_core::util::{gen_rand, invalid_data_error, ExtInt};
 use sulis_core::config::Config;
@@ -1258,7 +1258,7 @@ pub fn unwrap_point(point: HashMap<String, i32>) -> Result<(i32, i32)> {
     Ok((x, y))
 }
 
-fn create_stats_table<'a>(lua: &'a Lua, parent: &ScriptEntity, _args: ()) -> Result<rlua::Table<'a>> {
+fn create_stats_table<'a>(lua: Context<'a>, parent: &ScriptEntity, _args: ()) -> Result<rlua::Table<'a>> {
     let rules = Module::rules();
 
     let parent = parent.try_unwrap()?;
@@ -1627,7 +1627,7 @@ impl UserData for ScriptEntitySet {
     }
 }
 
-fn targets(_lua: &Lua, parent: &ScriptEntity, _args: ()) -> Result<ScriptEntitySet> {
+fn targets(_lua: Context, parent: &ScriptEntity, _args: ()) -> Result<ScriptEntitySet> {
     let parent = parent.try_unwrap()?;
     let area_id = parent.borrow().location.area_id.to_string();
 
@@ -1655,13 +1655,13 @@ fn targets(_lua: &Lua, parent: &ScriptEntity, _args: ()) -> Result<ScriptEntityS
     })
 }
 
-fn without_self(_lua: &Lua, set: &ScriptEntitySet, _: ()) -> Result<ScriptEntitySet> {
+fn without_self(_lua: Context, set: &ScriptEntitySet, _: ()) -> Result<ScriptEntitySet> {
     filter_entities(set, (), &|parent, entity, _| {
         !Rc::ptr_eq(parent, entity)
     })
 }
 
-fn visible_within(_lua: &Lua, set: &ScriptEntitySet, dist: f32) -> Result<ScriptEntitySet> {
+fn visible_within(_lua: Context, set: &ScriptEntitySet, dist: f32) -> Result<ScriptEntitySet> {
     filter_entities(set, dist, &|parent, entity, dist| {
         if parent.borrow().dist_to_entity(entity) > dist { return false; }
 
@@ -1671,7 +1671,7 @@ fn visible_within(_lua: &Lua, set: &ScriptEntitySet, dist: f32) -> Result<Script
     })
 }
 
-fn attackable(_lua: &Lua, set: &ScriptEntitySet, _args: ()) -> Result<ScriptEntitySet> {
+fn attackable(_lua: Context, set: &ScriptEntitySet, _args: ()) -> Result<ScriptEntitySet> {
     filter_entities(set, (), &|parent, entity, _| {
         let area_state = GameState::area_state();
         let area_state = area_state.borrow();
@@ -1679,7 +1679,7 @@ fn attackable(_lua: &Lua, set: &ScriptEntitySet, _args: ()) -> Result<ScriptEnti
     })
 }
 
-fn threatening(_lua: &Lua, set: &ScriptEntitySet, _args: ()) -> Result<ScriptEntitySet> {
+fn threatening(_lua: Context, set: &ScriptEntitySet, _args: ()) -> Result<ScriptEntitySet> {
     filter_entities(set, (), &|parent, entity, _| {
         let entity = entity.borrow();
         if !entity.actor.stats.attack_is_melee() { return false; }
@@ -1689,19 +1689,19 @@ fn threatening(_lua: &Lua, set: &ScriptEntitySet, _args: ()) -> Result<ScriptEnt
     })
 }
 
-fn reachable(_lua: &Lua, set: &ScriptEntitySet, _args: ()) -> Result<ScriptEntitySet> {
+fn reachable(_lua: Context, set: &ScriptEntitySet, _args: ()) -> Result<ScriptEntitySet> {
     filter_entities(set, (), &|parent, entity, _| {
         parent.borrow().can_reach(entity)
     })
 }
 
-fn is_hostile(_lua: &Lua, set: &ScriptEntitySet) -> Result<ScriptEntitySet> {
+fn is_hostile(_lua: Context, set: &ScriptEntitySet) -> Result<ScriptEntitySet> {
     filter_entities(set, (), &|parent, entity, _| {
         parent.borrow().is_hostile(entity)
     })
 }
 
-fn is_friendly(_lua: &Lua, set: &ScriptEntitySet) -> Result<ScriptEntitySet> {
+fn is_friendly(_lua: Context, set: &ScriptEntitySet) -> Result<ScriptEntitySet> {
     filter_entities(set, (), &|parent, entity, _| {
         !parent.borrow().is_hostile(entity)
     })

@@ -19,7 +19,7 @@ use std::cmp;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use rlua::{self, Lua, UserData, UserDataMethods};
+use rlua::{self, Context, UserData, UserDataMethods};
 
 use sulis_module::{ability::{self, AIData}, Ability, Module};
 use crate::{EntityState, GameState, area_feedback_text::ColorKind};
@@ -334,7 +334,7 @@ impl UserData for ScriptAbility {
     }
 }
 
-fn activate(_lua: &Lua, ability: &ScriptAbility, (target, take_ap): (ScriptEntity, Option<bool>)) -> Result<()> {
+fn activate(_lua: Context, ability: &ScriptAbility, (target, take_ap): (ScriptEntity, Option<bool>)) -> Result<()> {
     ability.error_if_not_active()?;
     let entity = target.try_unwrap()?;
     let take_ap = take_ap.unwrap_or(true);

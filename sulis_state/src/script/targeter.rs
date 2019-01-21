@@ -14,7 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use rlua::{self, Lua, UserData, UserDataMethods};
+use rlua::{self, Context, UserData, UserDataMethods};
 
 use sulis_module::{Module, OnTrigger};
 
@@ -306,7 +306,7 @@ impl UserData for TargeterData {
     }
 }
 
-fn activate(_lua: &Lua, data: &TargeterData, _args: ()) -> Result<()> {
+fn activate(_lua: Context, data: &TargeterData, _args: ()) -> Result<()> {
     info!("Activating targeter");
 
     let parent = ScriptEntity::new(data.parent).try_unwrap()?;

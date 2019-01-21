@@ -16,7 +16,7 @@
 
 use std::str::FromStr;
 
-use rlua::{Lua, UserData, UserDataMethods};
+use rlua::{Context, UserData, UserDataMethods};
 
 use sulis_core::util::{ExtInt, Point};
 use sulis_rules::{Attribute, Bonus, BonusKind, BonusList, Damage, DamageKind, bonus::{self, Contingent},
@@ -633,7 +633,7 @@ fn add_bonus_to_effect(effect: &mut ScriptEffect, bonus_kind: BonusKind, when: O
     }
 }
 
-fn add_num_bonus(_lua: &Lua, effect: &mut ScriptEffect, (name, amount, when):
+fn add_num_bonus(_lua: Context, effect: &mut ScriptEffect, (name, amount, when):
                  (String, f32, Option<String>)) -> Result<()> {
     let name = name.to_lowercase();
     let amount_int = amount as i32;

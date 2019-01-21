@@ -14,7 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use rlua::{self, Lua, UserData, UserDataMethods};
+use rlua::{self, Context, UserData, UserDataMethods};
 
 use sulis_core::resource::ResourceSet;
 use sulis_core::util::ExtInt;
@@ -247,7 +247,7 @@ impl UserData for ScriptParticleGenerator {
     }
 }
 
-fn dist_param(_lua: &Lua, _: &ScriptParticleGenerator,
+fn dist_param(_lua: Context, _: &ScriptParticleGenerator,
               (value, dt, d2t, d3t) : (Dist, Option<Dist>, Option<Dist>, Option<Dist>)) -> Result<DistParam> {
     if dt.is_none() {
         Ok(DistParam::new(value, Dist::create_fixed(0.0), Dist::create_fixed(0.0), Dist::create_fixed(0.0)))
@@ -260,7 +260,7 @@ fn dist_param(_lua: &Lua, _: &ScriptParticleGenerator,
     }
 }
 
-pub fn param<T>(_lua: &Lua, _: &T,
+pub fn param<T>(_lua: Context, _: &T,
          (value, dt, d2t, d3t): (f32, Option<f32>, Option<f32>, Option<f32>)) -> Result<Param> {
     if dt.is_none() {
         Ok(Param::fixed(value))
@@ -273,7 +273,7 @@ pub fn param<T>(_lua: &Lua, _: &T,
     }
 }
 
-fn activate(_lua: &Lua, gen: &ScriptParticleGenerator, _args: ()) -> Result<()> {
+fn activate(_lua: Context, gen: &ScriptParticleGenerator, _args: ()) -> Result<()> {
     let pgen = create_pgen(gen, gen.model.clone())?;
 
     GameState::add_animation(pgen);

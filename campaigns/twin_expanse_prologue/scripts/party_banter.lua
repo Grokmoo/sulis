@@ -43,6 +43,11 @@ function get_party_member()
   if #targets == 0 then
     return nil
   else
+    for i=#targets,1,-1 do
+	  if not targets[i]:is_party_member() then
+	    table.remove(targets, i)
+	  end
+	end
     -- random party member
     return targets[math.random(#targets)]
   end

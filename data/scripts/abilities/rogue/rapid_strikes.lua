@@ -45,8 +45,8 @@ function attack_target1(parent, ability, targets)
   if parent:has_ability("hide") then
     local hide = parent:get_ability("hide")
     local cb = hide:create_callback(parent)
-    local cb:set_on_anim_complete_fn("deactivate")
-    hide_anim = parent:wait_anim(0.1)
+    cb:set_on_anim_complete_fn("deactivate")
+    local hide_anim = parent:wait_anim(0.1)
     hide_anim:set_completion_callback(cb)
     hide_anim:activate()
   end

@@ -6,7 +6,7 @@ description: |
 active:
   script: "instant_action"
   group: Fighter
-  ap: 0
+  ap: 1
   duration:
     Instant
   cooldown: 4

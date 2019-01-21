@@ -16,7 +16,7 @@ active:
     group: Single
     range: Reach
   short_description: |
-    Stun a single opponent for one round.
+    A massive attack against a single opponent.
 prereqs:
   abilities: [ powerful_blows, whirlwind_attack ]
   total_level: 9

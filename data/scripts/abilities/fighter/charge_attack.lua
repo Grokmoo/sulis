@@ -50,7 +50,7 @@ function on_target_select(parent, ability, targets)
   ability:activate(parent)
 end
 
-function attack_target(parent, ability, target)
+function attack_target(parent, ability, targets)
   local target = targets:first()
 
   if target:is_valid() then

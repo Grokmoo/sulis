@@ -1,4 +1,4 @@
-function ai_action(parent, state)
+function ai_action(parent)
     abilities = parent:abilities():can_activate():remove_kind("Special")
     abilities:sort_by_priority()
 	
@@ -6,8 +6,7 @@ function ai_action(parent, state)
     friendlies = parent:targets():friendly():to_table()
 
 	if check_swap_weapons(parent, hostiles).done then
-		_G.state = parent:state_wait(10)
-		return
+		return parent:state_wait(10)
 	end
 	
 	items = parent:inventory():usable_items()
@@ -20,8 +19,7 @@ function ai_action(parent, state)
     for i = 1,10 do
 		result = find_and_use_item(parent, items, hostiles, friendlies, failed_use_count)
 		if result.done then
-			_G.state = parent:state_wait(10)
-			return
+			return parent:state_wait(10)
 		end
 	
         if abilities:is_empty() then
@@ -30,8 +28,7 @@ function ai_action(parent, state)
 
         result = find_and_use_ability(parent, abilities, hostiles, friendlies, failed_use_count)
         if result.done then
-            _G.state = parent:state_wait(10)
-            return
+            return parent:state_wait(10)
         end
 
 		cur_len = abilities:len()
@@ -46,8 +43,7 @@ function ai_action(parent, state)
     end
 
     if not parent:has_ap_to_attack() then
-        _G.state = parent:state_end()
-        return
+        return parent:state_end()
     end
 
     target = find_target(parent, hostiles)
@@ -57,9 +53,9 @@ function ai_action(parent, state)
 	end
 	
 	if result.done then
-		_G.state = parent:state_end()
+		return parent:state_end()
 	else
-		_G.state = parent:state_wait(10)
+		return parent:state_wait(10)
 	end
 end
 

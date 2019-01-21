@@ -645,7 +645,7 @@ impl UserData for ScriptEntity {
             if !allow_invalid {
                 if !parent.borrow().actor.can_toggle(&ability.id) { return Ok(false); }
             }
-            GameState::execute_ability_on_activate(&parent, &ability.to_ability());
+            Script::ability_on_activate(&parent, &ability.to_ability());
             Ok(true)
         });
 
@@ -653,7 +653,7 @@ impl UserData for ScriptEntity {
             let slot = item.slot;
             let parent = entity.try_unwrap()?;
             if !parent.borrow().actor.can_use_quick(slot) { return Ok(false); }
-            GameState::execute_item_on_activate(&parent, ScriptItemKind::Quick(slot));
+            Script::item_on_activate(&parent, ScriptItemKind::Quick(slot));
             Ok(true)
         });
 
@@ -813,7 +813,7 @@ impl UserData for ScriptEntity {
 
         methods.add_method("create_targeter_for_item", |_, entity, item: ScriptItem| {
             let index = entity.try_unwrap_index()?;
-            Ok(TargeterData::new_item(index, item.kind))
+            Ok(TargeterData::new_item(index, item.kind()))
         });
 
         methods.add_method("move_towards_entity", |_, entity, (dest, dist):

@@ -24,7 +24,7 @@ use sulis_core::ui::{Callback, Widget, WidgetKind, WidgetState};
 use sulis_rules::bonus::{AttackBuilder, AttackKindBuilder, Contingent};
 use sulis_rules::{Bonus, BonusList, Armor, DamageKind, QuickSlot, Slot};
 use sulis_module::{ability, Item, item::{format_item_value, format_item_weight}, Module, PrereqList};
-use sulis_state::{EntityState, GameState, ItemState, inventory::has_proficiency};
+use sulis_state::{EntityState, Script, GameState, ItemState, inventory::has_proficiency};
 use sulis_state::script::ScriptItemKind;
 use sulis_widgets::{Label, TextArea};
 use crate::{ItemActionMenu, MerchantWindow, PropWindow, RootView};
@@ -439,7 +439,7 @@ pub fn use_item_cb(entity: &Rc<RefCell<EntityState>>, kind: ScriptItemKind) -> C
         let root = Widget::get_root(widget);
         let view = Widget::downcast_kind_mut::<RootView>(&root);
         view.set_inventory_window(&root, false);
-        GameState::execute_item_on_activate(&entity, kind.clone());
+        Script::item_on_activate(&entity, kind.clone());
     }))
 }
 

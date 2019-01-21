@@ -98,8 +98,7 @@ mod save_state;
 pub use self::save_state::SaveState;
 
 pub mod script;
-pub use self::script::ScriptState;
-pub use self::script::ScriptCallback;
+pub use self::script::{Script, ScriptState, ScriptCallback};
 
 mod turn_manager;
 pub(crate) use self::turn_manager::TurnManager;

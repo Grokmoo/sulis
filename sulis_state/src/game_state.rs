@@ -23,14 +23,14 @@ use std::cell::{Cell, RefCell};
 use sulis_core::config::Config;
 use sulis_core::util::{self, Point, invalid_data_error, ExtInt};
 use sulis_core::io::{GraphicsRenderer};
-use sulis_rules::{HitKind, DamageKind, Time};
-use sulis_module::{Ability, Actor, Module, ObjectSize, OnTrigger, area::{Trigger, TriggerKind}};
+use sulis_rules::{Time};
+use sulis_module::{Actor, Module, ObjectSize, OnTrigger, area::{Trigger, TriggerKind}};
 use sulis_module::on_trigger::QuestEntryState;
 
-use crate::{ai, AI, AreaState, ChangeListener, ChangeListenerList, Effect,
+use crate::{AI, AreaState, ChangeListener, ChangeListenerList, Effect,
     EntityState, Location, Formation, ItemList, ItemState, PartyStash, QuestStateSet,
-    PathFinder, SaveState, ScriptState, UICallback, MOVE_TO_THRESHOLD, TurnManager, WorldMapState};
-use crate::script::{script_callback::{self, ScriptHitKind}, ScriptEntitySet, ScriptCallback, ScriptItemKind};
+    PathFinder, SaveState, UICallback, MOVE_TO_THRESHOLD, TurnManager, WorldMapState};
+use crate::script::{script_callback, ScriptCallback, Script};
 use crate::animation::{self, Anim, AnimState, AnimSaveState, particle_generator::Param};
 
 thread_local! {
@@ -64,16 +64,6 @@ pub struct GameState {
 
 const MIN_ZOOM: f32 = 0.7;
 const MAX_ZOOM: f32 = 2.0;
-
-macro_rules! exec_script {
-    ($func:ident: $($x:ident),*) => {
-        let state = ScriptState::new();
-        if let Err(e) = state.$func($($x, )*) {
-            warn!("Error executing lua script function");
-            warn!("{}", e);
-        }
-    }
-}
 
 impl GameState {
     pub fn load(save_state: SaveState) -> Result<(), Error> {
@@ -559,7 +549,7 @@ impl GameState {
             }
 
             let script = &Module::campaign().on_party_death_script;
-            GameState::execute_trigger_script(&script.id, &script.func, &member, &member);
+            Script::trigger(&script.id, &script.func, &member, &member);
 
             {
                 let member = member.borrow();
@@ -687,137 +677,6 @@ impl GameState {
 
             state.party.clone()
         })
-    }
-
-    pub fn execute_ai_script(parent: &Rc<RefCell<EntityState>>, func: &str) -> ai::State {
-        let state = ScriptState::new();
-        match state.ai_script(parent, func) {
-            Err(e) => {
-                warn!("Error in lua AI script");
-                warn!("{}", e);
-                return ai::State::End;
-            },
-            Ok(val) => {
-                val
-            }
-        }
-    }
-
-    pub fn execute_item_on_activate(parent: &Rc<RefCell<EntityState>>, kind: ScriptItemKind) {
-        exec_script!(item_on_activate: parent, kind);
-    }
-
-    pub fn execute_entity_script(parent: &Rc<RefCell<EntityState>>,
-                                 targets: ScriptEntitySet, func: &str) {
-        let t: Option<(&str, usize)> = None;
-        exec_script!(entity_script: parent, targets, t, func);
-    }
-
-    pub fn execute_entity_with_attack_data(parent: &Rc<RefCell<EntityState>>,
-                                           targets: ScriptEntitySet, kind: HitKind,
-                                           damage: Vec<(DamageKind, u32)>, func: &str) {
-        let hit_kind = ScriptHitKind::new(kind, damage);
-        let t = Some(("hit", hit_kind));
-        exec_script!(entity_script: parent, targets, t, func);
-    }
-
-    pub fn execute_entity_with_arg<T>(parent: &Rc<RefCell<EntityState>>,
-                                   targets: ScriptEntitySet, arg: T, func: &str)
-        where T: rlua::UserData + Send + 'static {
-        let t = Some(("arg", arg));
-        exec_script!(entity_script: parent, targets, t, func);
-    }
-
-    pub fn execute_item_script(parent: &Rc<RefCell<EntityState>>, kind: ScriptItemKind,
-                               targets: ScriptEntitySet, func: &str) {
-        let t: Option<(&str, usize)> = None;
-        exec_script!(item_script: parent, kind, targets, t, func);
-    }
-
-    pub fn execute_item_with_attack_data(parent: &Rc<RefCell<EntityState>>, i_kind: ScriptItemKind,
-                                         targets: ScriptEntitySet, kind: HitKind,
-                                         damage: Vec<(DamageKind, u32)>, func: &str) {
-        let hit_kind = ScriptHitKind::new(kind, damage);
-        let t = Some(("hit", hit_kind));
-        exec_script!(item_script: parent, i_kind, targets, t, func);
-    }
-
-    pub fn execute_item_with_arg<T>(parent: &Rc<RefCell<EntityState>>, i_kind: ScriptItemKind,
-                                 targets: ScriptEntitySet, arg: T, func: &str)
-        where T: rlua::UserData + Send + 'static {
-        let t = Some(("arg", arg));
-        exec_script!(item_script: parent, i_kind, targets, t, func);
-    }
-
-    pub fn execute_item_on_target_select(parent: &Rc<RefCell<EntityState>>,
-                                         kind: ScriptItemKind,
-                                         targets: Vec<Option<Rc<RefCell<EntityState>>>>,
-                                         selected_point: Point,
-                                         affected_points: Vec<Point>,
-                                         func: &str,
-                                         custom_target: Option<Rc<RefCell<EntityState>>>) {
-        exec_script!(item_on_target_select: parent, kind, targets, selected_point,
-                     affected_points, func, custom_target);
-    }
-
-    pub fn execute_ability_on_activate(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>) {
-        exec_script!(ability_on_activate: parent, ability);
-    }
-
-    pub fn execute_ability_on_target_select(parent: &Rc<RefCell<EntityState>>,
-                                            ability: &Rc<Ability>,
-                                            targets: Vec<Option<Rc<RefCell<EntityState>>>>,
-                                            selected_point: Point,
-                                            affected_points: Vec<Point>,
-                                            func: &str,
-                                            custom_target: Option<Rc<RefCell<EntityState>>>) {
-
-        exec_script!(ability_on_target_select: parent, ability, targets, selected_point,
-                     affected_points, func, custom_target);
-    }
-
-    pub fn execute_ability_with_attack_data(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>,
-                                        targets: ScriptEntitySet, kind: HitKind,
-                                        damage: Vec<(DamageKind, u32)>, func: &str) {
-        let hit_kind = ScriptHitKind::new(kind, damage);
-        let t = Some(("hit", hit_kind));
-        exec_script!(ability_script: parent, ability, targets, t, func);
-    }
-
-    pub fn execute_ability_with_arg<T>(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>,
-                                    targets: ScriptEntitySet, arg: T, func: &str)
-        where T: rlua::UserData + Send + 'static {
-        let t = Some(("arg", arg));
-        exec_script!(ability_script: parent, ability, targets, t, func);
-    }
-
-    pub fn execute_ability_script(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability>,
-                                  targets: ScriptEntitySet, func: &str) {
-        let t: Option<(&str, usize)> = None;
-        exec_script!(ability_script: parent, ability, targets, t, func);
-    }
-
-    pub fn execute_trigger_script(script_id: &str, func: &str, parent: &Rc<RefCell<EntityState>>,
-                                  target: &Rc<RefCell<EntityState>>) {
-        let t: Option<(&str, usize)> = None;
-        exec_script!(trigger_script: script_id, func, parent, target, t);
-    }
-
-    pub fn execute_trigger_with_attack_data(script_id: &str, func: &str,
-                                            parent: &Rc<RefCell<EntityState>>,
-                                            target: &Rc<RefCell<EntityState>>,
-                                            kind: HitKind, damage: Vec<(DamageKind, u32)>) {
-        let hit_kind = ScriptHitKind::new(kind, damage);
-        let t = Some(("hit", hit_kind));
-        exec_script!(trigger_script: script_id, func, parent, target, t);
-    }
-
-    pub fn execute_trigger_with_arg<T>(script_id: &str, func: &str,
-                                    parent: &Rc<RefCell<EntityState>>,
-                                    target: &Rc<RefCell<EntityState>>, arg: T)
-        where T: rlua::UserData + Send + 'static {
-        let t = Some(("arg", arg));
-        exec_script!(trigger_script: script_id, func, parent, target, t);
     }
 
     pub fn transition(area_id: &Option<String>, x: i32, y: i32, travel_time: Time) {

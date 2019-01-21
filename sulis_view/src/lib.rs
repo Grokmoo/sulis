@@ -125,7 +125,7 @@ use sulis_core::io::{InputAction, MainLoopUpdater};
 use sulis_core::ui::{Callback, Widget, WidgetKind, Cursor};
 use sulis_core::util;
 use sulis_module::{Module, area::OnRest};
-use sulis_state::{ChangeListener, EntityState, GameState, NextGameStep,
+use sulis_state::{ChangeListener, EntityState, GameState, NextGameStep, Script,
     save_file::create_save, script::script_callback, area_feedback_text::ColorKind};
 use sulis_widgets::{Button, ConfirmationWindow, Label};
 
@@ -515,7 +515,7 @@ impl WidgetKind for RootView {
                             &target, ColorKind::Info);
                     },
                     OnRest::FireScript { ref id, ref func } => {
-                        GameState::execute_trigger_script(id, func, &target, &target);
+                        Script::trigger(id, func, &target, &target);
                     }
                 }
             })));

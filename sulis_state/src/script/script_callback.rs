@@ -26,7 +26,7 @@ use sulis_core::util::invalid_data_error;
 use sulis_rules::{HitKind, DamageKind};
 use sulis_module::{Module, on_trigger::Kind};
 use crate::script::{Result, script_entity, ScriptEntity, ScriptEntitySet, ScriptActiveSurface, ScriptItemKind, ScriptMenuSelection, ScriptAppliedEffect};
-use crate::{EntityState, GameState};
+use crate::{EntityState, GameState, Script};
 
 pub fn fire_on_removed(cbs: Vec<Rc<CallbackData>>) {
     for cb in cbs {
@@ -315,17 +315,16 @@ impl CallbackData {
         match &self.kind {
             Kind::Ability(ref id) => {
                 let ability = Module::ability(id).unwrap();
-                GameState::execute_ability_script(&parent, &ability, targets, &func);
+                Script::ability(&parent, &ability, targets, &func);
             },
             Kind::Item(id) => {
-                GameState::execute_item_script(&parent, ScriptItemKind::WithID(id.to_string()),
-                    targets, &func);
+                Script::item(&parent, ScriptItemKind::WithID(id.to_string()), targets, &func);
             },
             Kind::Entity => {
-                GameState::execute_entity_script(&parent, targets, &func);
+                Script::entity(&parent, targets, &func);
             },
             Kind::Script(script) => {
-                GameState::execute_trigger_script(&script, &func, &parent, &parent);
+                Script::trigger(&script, &func, &parent, &parent);
             }
         }
     }
@@ -343,17 +342,17 @@ impl CallbackData {
         match &self.kind {
             Kind::Ability(ref id) => {
                 let ability = Module::ability(id).unwrap();
-                GameState::execute_ability_with_arg(&parent, &ability, targets, arg, &func);
+                Script::ability_with_arg(&parent, &ability, targets, arg, &func);
             },
             Kind::Item(id) => {
-                GameState::execute_item_with_arg(&parent,
+                Script::item_with_arg(&parent,
                     ScriptItemKind::WithID(id.to_string()), targets, arg, &func);
             },
             Kind::Entity => {
-                GameState::execute_entity_with_arg(&parent, targets, arg, &func);
+                Script::entity_with_arg(&parent, targets, arg, &func);
             },
             Kind::Script(script) => {
-                GameState::execute_trigger_with_arg(&script, &func, &parent, &parent, arg);
+                Script::trigger_with_arg(&script, &func, &parent, &parent, arg);
             }
         }
     }
@@ -371,20 +370,19 @@ impl CallbackData {
         match &self.kind {
             Kind::Ability(ref id) => {
                 let ability = Module::ability(id).unwrap();
-                GameState::execute_ability_with_attack_data(&parent, &ability, targets,
-                                                            hit_kind, damage, &func);
+                Script::ability_with_attack_data(&parent, &ability, targets,
+                                                 hit_kind, damage, &func);
             },
             Kind::Item(id) => {
-                GameState::execute_item_with_attack_data(&parent,
+                Script::item_with_attack_data(&parent,
                     ScriptItemKind::WithID(id.to_string()), targets, hit_kind, damage, &func);
             },
             Kind::Entity => {
-                GameState::execute_entity_with_attack_data(&parent, targets, hit_kind, damage,
-                                                           &func);
+                Script::entity_with_attack_data(&parent, targets, hit_kind, damage, &func);
             },
             Kind::Script(script) => {
-                GameState::execute_trigger_with_attack_data(&script, &func, &parent, &parent,
-                                                            hit_kind, damage);
+                Script::trigger_with_attack_data(&script, &func, &parent, &parent,
+                                                 hit_kind, damage);
             }
         }
     }

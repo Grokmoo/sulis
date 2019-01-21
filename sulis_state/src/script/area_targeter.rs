@@ -25,7 +25,7 @@ use sulis_core::util::{Point};
 use sulis_module::{Ability, Module, ObjectSize};
 
 use crate::script::{targeter, TargeterData, ScriptItemKind};
-use crate::{AreaState, EntityState, GameState, TurnManager};
+use crate::{AreaState, EntityState, GameState, TurnManager, Script};
 
 #[derive(Clone)]
 pub enum Shape {
@@ -753,11 +753,11 @@ impl AreaTargeter {
         info!("on target select script");
         match &self.script_source {
             ScriptSource::Ability(ref ability) =>
-                GameState::execute_ability_on_target_select(&self.parent, ability, affected,
-                                                            pos, points, func, custom_target),
+                Script::ability_on_target_select(&self.parent, ability, affected,
+                                                 pos, points, func, custom_target),
             ScriptSource::Item { kind, .. } =>
-                GameState::execute_item_on_target_select(&self.parent, kind.clone(), affected, pos,
-                                                         points, func, custom_target),
+                Script::item_on_target_select(&self.parent, kind.clone(), affected, pos,
+                                              points, func, custom_target),
         }
     }
 }

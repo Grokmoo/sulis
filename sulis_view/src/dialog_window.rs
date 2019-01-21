@@ -24,7 +24,7 @@ use sulis_widgets::{Label, TextArea};
 use sulis_module::{Actor, OnTrigger, MerchantData, Conversation,
     conversation::{Response}, Module, on_trigger::{self, Kind, QuestStateData}};
 use sulis_state::{EntityState, ChangeListener, GameState, ItemState,
-    area_feedback_text::ColorKind, NextGameStep,
+    area_feedback_text::ColorKind, NextGameStep, Script,
     script::{entity_with_id, CallbackData, FuncKind}};
 
 use crate::{character_window, CutsceneWindow, RootView, GameOverWindow, LoadingScreen,
@@ -538,7 +538,7 @@ fn game_over_window(widget: &Rc<RefCell<Widget>>, text: String) {
 
 fn fire_script(script_id: &str, func: &str, parent: &Rc<RefCell<EntityState>>,
                target: &Rc<RefCell<EntityState>>) {
-    GameState::execute_trigger_script(script_id, func, parent, target);
+    Script::trigger(script_id, func, parent, target);
 }
 
 fn show_merchant(widget: &Rc<RefCell<Widget>>, merch: &MerchantData) {

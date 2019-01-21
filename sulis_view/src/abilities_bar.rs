@@ -24,7 +24,7 @@ use sulis_core::io::event;
 use sulis_core::ui::{animation_state, Widget, WidgetKind, Callback};
 use sulis_core::util::{Size, ExtInt};
 use sulis_module::{actor::OwnedAbility, Ability, Module, ability::{AbilityGroup, Duration}};
-use sulis_state::{ChangeListener, EntityState, GameState};
+use sulis_state::{ChangeListener, EntityState, GameState, Script};
 use sulis_widgets::{Label, TextArea, Button};
 
 pub const NAME: &str = "abilities_bar";
@@ -412,7 +412,7 @@ impl WidgetKind for AbilityButton {
         self.super_on_mouse_release(widget, kind);
 
         if self.entity.borrow().actor.can_activate(&self.ability.id) {
-            GameState::execute_ability_on_activate(&self.entity, &self.ability);
+            Script::ability_on_activate(&self.entity, &self.ability);
         } else if self.entity.borrow().actor.can_toggle(&self.ability.id) {
             self.entity.borrow_mut().actor.deactivate_ability_state(&self.ability.id);
         }

@@ -21,7 +21,7 @@ use rlua;
 
 use sulis_core::config::Config;
 use crate::script::script_callback;
-use crate::{animation::Anim, EntityState, GameState};
+use crate::{animation::Anim, EntityState, GameState, Script};
 
 pub struct AI {
     ai: Option<EntityAI>,
@@ -117,6 +117,6 @@ impl EntityAI {
 
         self.actions_taken_this_turn += 1;
 
-        GameState::execute_ai_script(&self.entity, "ai_action")
+        Script::ai(&self.entity, "ai_action")
     }
 }

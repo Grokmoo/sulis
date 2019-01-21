@@ -1,22 +1,22 @@
 function on_activate(parent, ability)
-  targets = parent:targets():friendly():reachable()
+  local targets = parent:targets():friendly():reachable()
   
-  targeter = parent:create_targeter(ability)
+  local targeter = parent:create_targeter(ability)
   targeter:add_all_selectable(targets)
   targeter:add_all_effectable(targets)
   targeter:activate()
 end
 
 function on_target_select(parent, ability, targets)
-  stats = parent:stats()
-  target = targets:first()
-  effect = target:create_effect(ability:name(), ability:duration())
+  local stats = parent:stats()
+  local target = targets:first()
+  local effect = target:create_effect(ability:name(), ability:duration())
   effect:set_tag("haste")
   effect:add_num_bonus("movement_rate", 0.5 + stats.intellect_bonus * 0.01 + stats.caster_level * 0.02)
   effect:add_num_bonus("defense", 5 + stats.intellect_bonus / 4 + stats.caster_level / 2)
   effect:add_num_bonus("reflex", 5 + stats.intellect_bonus / 4 + stats.caster_level / 2)
 
-  gen = target:create_particle_generator("wind_particle")
+  local gen = target:create_particle_generator("wind_particle")
   gen:set_moves_with_parent()
   gen:set_gen_rate(gen:param(30.0))
   gen:set_position(gen:param(-0.25), gen:param(0.0))

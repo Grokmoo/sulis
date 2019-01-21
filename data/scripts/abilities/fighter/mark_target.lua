@@ -1,20 +1,20 @@
 function on_activate(parent, ability)
-  targets = parent:targets():hostile():visible()
+  local targets = parent:targets():hostile():visible()
   
-  targeter = parent:create_targeter(ability)
+  local targeter = parent:create_targeter(ability)
   targeter:add_all_selectable(targets)
   targeter:add_all_effectable(targets)
   targeter:activate()
 end
 
 function on_target_select(parent, ability, targets)
-  stats = parent:stats()
+  local stats = parent:stats()
   ability:activate(parent)
 
-  target = targets:first()
+  local target = targets:first()
   
-  hit = parent:special_attack(target, "Fortitude", "Melee")
-  amount = 25 + stats.strength_bonus + stats.level
+  local hit = parent:special_attack(target, "Fortitude", "Melee")
+  local amount = 25 + stats.strength_bonus + stats.level
   if hit:is_miss() then
     return
   elseif hit:is_graze() then
@@ -25,13 +25,13 @@ function on_target_select(parent, ability, targets)
     amount = amount * 1.5
   end
   
-  effect = target:create_effect(ability:name(), ability:duration())
+  local effect = target:create_effect(ability:name(), ability:duration())
   effect:set_tag("vulnerable")
   effect:add_resistance(-amount, "Piercing")
   effect:add_resistance(-amount, "Slashing")
   effect:add_resistance(-amount, "Crushing")
   
-  gen = target:create_particle_generator("arrow_down")
+  local gen = target:create_particle_generator("arrow_down")
   gen:set_moves_with_parent()
   gen:set_position(gen:param(0.0), gen:param(-0.5))
   gen:set_particle_size_dist(gen:fixed_dist(0.5), gen:fixed_dist(0.5))

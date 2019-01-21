@@ -4,14 +4,14 @@ held_off_id = "__beast_shape_equip_held_off"
 function on_activate(parent, ability)
   ability:activate(parent)
   
-  effect = parent:create_effect(ability:name(), ability:duration())
+  local effect = parent:create_effect(ability:name(), ability:duration())
   effect:set_tag("shapeshift")
   
-  cb = ability:create_callback(parent)
+  local cb = ability:create_callback(parent)
   cb:set_on_removed_fn("on_removed")
   effect:add_callback(cb)
   
-  attr_bonus = 2
+  local attr_bonus = 2
   if parent:ability_level(ability) > 1 then
     attr_bonus = 6
   end
@@ -21,16 +21,16 @@ function on_activate(parent, ability)
   effect:add_attribute_bonus("Endurance", attr_bonus)
   effect:add_abilities_disabled()
   
-  stats = parent:stats()
-  level = stats.caster_level / 2 + stats.wisdom_bonus / 4
+  local stats = parent:stats()
+  local level = stats.caster_level / 2 + stats.wisdom_bonus / 4
  
   effect:add_num_bonus("armor", 10 + level - stats.base_armor)
   effect:add_num_bonus("defense", 50 + level * 2 - stats.defense)
   effect:add_num_bonus("melee_accuracy", 50 + level * 2 - stats.melee_accuracy)
   
-  inv = parent:inventory()
-  held_main = inv:unequip_item("held_main")
-  held_off = inv:unequip_item("held_off")
+  local inv = parent:inventory()
+  local held_main = inv:unequip_item("held_main")
+  local held_off = inv:unequip_item("held_off")
   
   if held_main:is_valid() then
     parent:set_flag(held_main_id, held_main:id())
@@ -40,11 +40,11 @@ function on_activate(parent, ability)
     parent:set_flag(held_off_id, held_off:id())
   end
   
-  item = game:add_party_item("werewolf_claw")
+  local item = game:add_party_item("werewolf_claw")
   inv:equip_item(item)
   inv:set_locked(true)
   
-  gen = parent:create_image_layer_anim()
+  local gen = parent:create_image_layer_anim()
   gen:add_image("Ears", "empty")
   gen:add_image("Hair", "empty")
   gen:add_image("Beard", "empty")
@@ -59,7 +59,7 @@ function on_activate(parent, ability)
   
   effect:apply()
   
-  anim = parent:create_color_anim(1.0)
+  local anim = parent:create_color_anim(1.0)
   anim:set_color_sec(anim:param(1.0, -1,0),
                      anim:param(1.0, -1,0),
                      anim:param(1.0, -1,0),
@@ -68,15 +68,15 @@ function on_activate(parent, ability)
 end
 
 function on_removed(parent, ability)
-  inv = parent:inventory()
+  local inv = parent:inventory()
   inv:set_locked(false)
-  item = inv:unequip_item("held_main")
+  local item = inv:unequip_item("held_main")
    
   if item:id() == "werewolf_claw" then
 	game:remove_party_item(item)
   end
    
-  anim = parent:create_color_anim(1.0)
+  local anim = parent:create_color_anim(1.0)
   anim:set_color_sec(anim:param(1.0, -1,0),
                      anim:param(1.0, -1,0),
                      anim:param(1.0, -1,0),
@@ -84,8 +84,8 @@ function on_removed(parent, ability)
   anim:activate()
   
   if parent:has_flag(held_main_id) then
-     item_id = parent:get_flag(held_main_id)
-	 item = game:find_party_item(item_id)
+     local item_id = parent:get_flag(held_main_id)
+	 local item = game:find_party_item(item_id)
 	 if item:is_valid() then
 	   inv:equip_item(item)
 	 end
@@ -94,8 +94,8 @@ function on_removed(parent, ability)
    end
    
    if parent:has_flag(held_off_id) then
-     item_id = parent:get_flag(held_off_id)
-	 item = game:find_party_item(item_id)
+     local item_id = parent:get_flag(held_off_id)
+	 local item = game:find_party_item(item_id)
 	 if item:is_valid() then
 	   inv:equip_item(item)
 	 end

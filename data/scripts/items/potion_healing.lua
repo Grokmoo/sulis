@@ -1,7 +1,7 @@
 function on_activate(parent, item)
   parent:heal_damage(35)
 
-  anim = parent:create_particle_generator("heal", 1.0)
+  local anim = parent:create_particle_generator("heal", 1.0)
   anim:set_moves_with_parent()
   anim:set_position(anim:param(-0.5), anim:param(-1.5))
   anim:set_particle_size_dist(anim:fixed_dist(1.0), anim:fixed_dist(1.0))

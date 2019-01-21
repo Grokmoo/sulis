@@ -15,17 +15,17 @@ function activate_no_ap(parent, ability)
 end
 
 function activate_no_check(parent, ability)
-  effect = parent:create_effect(ability:name())
+  local effect = parent:create_effect(ability:name())
   effect:deactivate_with(ability)
   effect:add_hidden()
 
-  cb = ability:create_callback(parent)
+  local cb = ability:create_callback(parent)
   cb:set_on_round_elapsed_fn("on_round_elapsed")
   cb:set_after_attack_fn("after_attack")
   cb:set_on_moved_fn("on_moved")
   effect:add_callback(cb)
   
-  anim = parent:create_color_anim()
+  local anim = parent:create_color_anim()
   anim:set_color(anim:param(1.0),
                  anim:param(1.0),
                  anim:param(1.0),
@@ -68,21 +68,21 @@ function after_attack(parent, ability)
 end
 
 function check_spotted(parent, ability)
-  stats = parent:stats()
-  parent_concealment = stats.concealment
-  parent_hide_level = 15 + parent:ability_level(ability) * 20 + stats.level * 2
-  break_even_distance = 5
+  local stats = parent:stats()
+  local parent_concealment = stats.concealment
+  local parent_hide_level = 15 + parent:ability_level(ability) * 20 + stats.level * 2
+  local break_even_distance = 5
   if parent:has_ability("hide_in_plain_sight") then
     break_even_distance = 0
   end
   
-  targets = parent:targets():hostile():visible()
+  local targets = parent:targets():hostile():visible()
   targets = targets:to_table()
   for i = 1, #targets do
-    target = targets[i]
+    local target = targets[i]
 	
-	target_perception = target:stats().perception * 5
-	dist = (target:dist_to_entity(parent) - break_even_distance) * 10
+	local target_perception = target:stats().perception * 5
+	local dist = (target:dist_to_entity(parent) - break_even_distance) * 10
 	
 	-- game:log("hide check with " .. parent_hide_level .. " + " .. parent_concealment .. " + " .. dist .. " vs " .. target_perception)
 	if parent_hide_level + parent_concealment + dist - target_perception < 0 then

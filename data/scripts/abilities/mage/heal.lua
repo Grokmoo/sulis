@@ -1,20 +1,20 @@
 function on_activate(parent, ability)
-  targets = parent:targets():friendly():reachable()
+  local targets = parent:targets():friendly():reachable()
   
-  targeter = parent:create_targeter(ability)
+  local targeter = parent:create_targeter(ability)
   targeter:add_all_selectable(targets)
   targeter:add_all_effectable(targets)
   targeter:activate()
 end
 
 function on_target_select(parent, ability, targets)
-  target = targets:first()
-  stats = parent:stats()
+  local target = targets:first()
+  local stats = parent:stats()
   
-  amount = 30 + stats.caster_level + stats.intellect_bonus / 2
+  local amount = 30 + stats.caster_level + stats.intellect_bonus / 2
   target:heal_damage(amount)
 
-  anim = target:create_particle_generator("heal", 2.0)
+  local anim = target:create_particle_generator("heal", 2.0)
   anim:set_moves_with_parent()
   anim:set_position(anim:param(-0.5), anim:param(-1.5))
   anim:set_particle_size_dist(anim:fixed_dist(1.0), anim:fixed_dist(1.0))

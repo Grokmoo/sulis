@@ -336,17 +336,20 @@ impl ScriptState {
         let instructions = &mut *self.instructions.lock().unwrap();
         instructions.count = 0;
         instructions.start_time = time::Instant::now();
+        instructions.eval_time = time::Duration::default();
     }
 
-    fn exec_script<Args, Ret>(&self, args: Args, script: &str,
-                              function: &str) -> Result<Ret>
+    fn load_script(&self, script: ScriptData) -> Result<()> {
+        self.lua.context(|lua| {
+            lua.load(&script.contents).set_name(&script.name)?.exec()
+        })
+    }
+
+    fn exec_func<Args, Ret>(&self, function: &str, args: Args) -> Result<Ret>
         where Args: for<'a> ToLuaMulti<'a>, Ret: for<'a> FromLuaMulti<'a> {
 
         self.reset_instruction_state();
         let result = self.lua.context(|lua| {
-            let chunk = lua.load(script).set_name(function)?;
-            chunk.exec()?;
-
             let eval_start = time::Instant::now();
             let func: Function = lua.globals().get(function)?;
             let result = func.call(args);
@@ -380,7 +383,8 @@ impl ScriptState {
     pub fn ai_script(&self, parent: &Rc<RefCell<EntityState>>, func: &str) -> Result<ai::State> {
         let script = get_script_from_entity(parent)?;
         let parent = ScriptEntity::from(parent);
-        self.exec_script(parent, &script, func)
+        self.load_script(script)?;
+        self.exec_func(func, parent)
     }
 
     pub fn entity_script<T>(&self, parent: &Rc<RefCell<EntityState>>, targets: ScriptEntitySet,
@@ -389,7 +393,8 @@ impl ScriptState {
 
         let script = get_script_from_entity(parent)?;
         let parent = ScriptEntity::from(parent);
-        self.exec_script((parent, targets, arg), &script, func)
+        self.load_script(script)?;
+        self.exec_func(func, (parent, targets, arg))
     }
 
     pub fn item_on_activate(&self, parent: &Rc<RefCell<EntityState>>,
@@ -426,7 +431,8 @@ impl ScriptState {
         let script = get_item_script(&item_src)?;
         let parent = ScriptEntity::from(parent);
 
-        self.exec_script((parent, item, targets, arg), script, func)
+        self.load_script(script)?;
+        self.exec_func(func, (parent, item, targets, arg))
     }
 
     pub fn ability_on_activate(&self, parent: &Rc<RefCell<EntityState>>,
@@ -457,7 +463,8 @@ impl ScriptState {
         let script = get_ability_script(ability)?;
         let parent = ScriptEntity::from(parent);
         let ability = ScriptAbility::from(ability);
-        self.exec_script((parent, ability, targets, arg), script, func)
+        self.load_script(script)?;
+        self.exec_func(func, (parent, ability, targets, arg))
     }
 
     pub fn trigger_script<T>(&self, script_id: &str, func: &str,
@@ -468,53 +475,70 @@ impl ScriptState {
         let script = get_script_from_id(script_id)?;
         let parent = ScriptEntity::from(parent);
         let target = ScriptEntity::from(target);
-        self.exec_script((parent, target, arg), &script, func)
+        self.load_script(script)?;
+        self.exec_func(func, (parent, target, arg))
     }
 }
 
-fn get_script_from_entity(entity: &Rc<RefCell<EntityState>>) -> Result<String> {
-    match &entity.borrow().actor.actor.ai {
+struct ScriptData {
+    name: String,
+    contents: String,
+}
+
+impl ScriptData {
+    fn new(name: &str, contents: String) -> ScriptData {
+        ScriptData {
+            name: name.to_string(),
+            contents,
+        }
+   }
+}
+
+fn get_script_from_entity(entity: &Rc<RefCell<EntityState>>) -> Result<ScriptData> {
+    let entity = entity.borrow();
+    let id = entity.unique_id();
+    match &entity.actor.actor.ai {
         None => {
-            warn!("Script called for entity '{}' with no AI", entity.borrow().unique_id());
+            warn!("Script called for entity '{}' with no AI", id);
             Err(rlua::Error::ToLuaConversionError {
                 from: "Entity",
                 to: "Script",
                 message: Some(format!("No script found for entity")),
             })
-        }, Some(ai) => Ok(ai.script()),
+        }, Some(ai) => Ok(ScriptData::new(id, ai.script())),
     }
 }
 
-fn get_script_from_id(id: &str) -> Result<String> {
+fn get_script_from_id(id: &str) -> Result<ScriptData> {
     match Module::script(id) {
         None => Err(rlua::Error::ToLuaConversionError {
             from: "&str",
             to: "Script",
             message: Some(format!("No script found with id '{}'", id)),
         }),
-        Some(script) => Ok(script)
+        Some(script) => Ok(ScriptData::new(id, script))
     }
 }
 
-fn get_item_script(item: &Rc<Item>) -> Result<&str> {
+fn get_item_script(item: &Rc<Item>) -> Result<ScriptData> {
     match &item.usable {
         None => Err(rlua::Error::ToLuaConversionError {
             from: "ScriptItem",
             to: "Item",
             message: Some(format!("The item is not usable {}", item.id).to_string()),
         }),
-        Some(usable) => Ok(&usable.script)
+        Some(usable) => Ok(ScriptData::new(&item.id, usable.script.clone()))
     }
 }
 
-fn get_ability_script(ability: &Rc<Ability>) -> Result<&str> {
+fn get_ability_script(ability: &Rc<Ability>) -> Result<ScriptData> {
     match ability.active {
         None => Err(rlua::Error::ToLuaConversionError {
             from: "Rc<Ability>",
             to: "ScriptAbility",
             message: Some("The Ability is not active".to_string()),
         }),
-        Some(ref active) => Ok(&active.script),
+        Some(ref active) => Ok(ScriptData::new(&ability.id, active.script.clone())),
     }
 }
 

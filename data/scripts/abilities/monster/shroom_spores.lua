@@ -1,17 +1,17 @@
 function on_activate(parent, ability)
-  targets = parent:targets():hostile():reachable()
+  local targets = parent:targets():hostile():reachable()
   
-  targeter = parent:create_targeter(ability)
+  local targeter = parent:create_targeter(ability)
   targeter:add_all_selectable(targets)
   targeter:add_all_effectable(targets)
   targeter:activate()
 end
 
 function on_target_select(parent, ability, targets)
-  target = targets:first()
+  local target = targets:first()
   
-  hit = parent:special_attack(target, "Fortitude", "Melee")
-  amount = -4 * game:ap_display_factor()
+  local hit = parent:special_attack(target, "Fortitude", "Melee")
+  local amount = -4 * game:ap_display_factor()
   if hit:is_miss() then
     return
   elseif hit:is_graze() then
@@ -24,17 +24,17 @@ function on_target_select(parent, ability, targets)
   
   target:change_overflow_ap(amount)
   
-  effect = target:create_effect(ability:name(), ability:duration())
+  local effect = target:create_effect(ability:name(), ability:duration())
   effect:set_tag("sleep")
   effect:add_num_bonus("ap", amount)
   effect:add_move_disabled()
   effect:add_attack_disabled()
   
-  cb = ability:create_callback(parent)
+  local cb = ability:create_callback(parent)
   cb:set_on_damaged_fn("on_damaged")
   effect:add_callback(cb)
   
-  anim = target:create_particle_generator("sparkle")
+  local anim = target:create_particle_generator("sparkle")
   anim:set_moves_with_parent()
   anim:set_position(anim:param(-0.5), anim:param(-1.5))
   anim:set_particle_size_dist(anim:fixed_dist(0.5), anim:fixed_dist(0.5))
@@ -51,7 +51,7 @@ function on_target_select(parent, ability, targets)
 end
 
 function on_damaged(parent, ability, targets)
-  target = targets:first()
-  parent = targets:parent() -- parent passed to the func is actually the caster here
+  local target = targets:first()
+  local parent = targets:parent() -- parent passed to the func is actually the caster here
   parent:remove_effects_with_tag("sleep")
 end

@@ -1,7 +1,7 @@
 function on_activate(parent, ability)
-  targets = parent:targets():hostile():visible()
+  local targets = parent:targets():hostile():visible()
   
-  targeter = parent:create_targeter(ability)
+  local targeter = parent:create_targeter(ability)
   targeter:add_all_selectable(targets)
   targeter:add_all_effectable(targets)
   targeter:activate()
@@ -10,11 +10,11 @@ end
 function on_target_select(parent, ability, targets)
   ability:activate(parent)
 
-  target = targets:first()
+  local target = targets:first()
   
-  stats = parent:stats()
-  hit = parent:special_attack(target, "Will", "Spell")
-  amount = -(5 + stats.intellect_bonus / 10) * game:ap_display_factor()
+  local stats = parent:stats()
+  local hit = parent:special_attack(target, "Will", "Spell")
+  local amount = -(5 + stats.intellect_bonus / 10) * game:ap_display_factor()
   if hit:is_miss() then
     return
   elseif hit:is_graze() then
@@ -27,7 +27,7 @@ function on_target_select(parent, ability, targets)
   
   target:change_overflow_ap(amount)
   
-  gen = target:create_anim("burst", 0.15)
+  local gen = target:create_anim("burst", 0.15)
   gen:set_moves_with_parent()
   gen:set_position(gen:param(-0.75), gen:param(-0.75))
   gen:set_particle_size_dist(gen:fixed_dist(1.5), gen:fixed_dist(1.5))

@@ -1,7 +1,7 @@
 function on_activate(parent, ability)
-  targets = parent:targets():hostile():visible_within(7)
+  local targets = parent:targets():hostile():visible_within(7)
   
-  targeter = parent:create_targeter(ability)
+  local targeter = parent:create_targeter(ability)
   targeter:add_all_selectable(targets)
   targeter:add_all_effectable(targets)
   targeter:activate()
@@ -10,10 +10,10 @@ end
 function on_target_select(parent, ability, targets)
   ability:activate(parent)
 
-  target = targets:first()
+  local target = targets:first()
   
-  hit = parent:special_attack(target, "Will", "Spell")
-  duration = ability:duration()
+  local hit = parent:special_attack(target, "Will", "Spell")
+  local duration = ability:duration()
   if hit:is_miss() then
     return
   elseif hit:is_graze() then
@@ -34,7 +34,7 @@ function on_target_select(parent, ability, targets)
   effect:add_attribute_bonus("Strength", -6)
   effect:add_num_bonus("defense", -20)
   
-  gen = target:create_image_layer_anim()
+  local gen = target:create_image_layer_anim()
   gen:add_image("Ears", "empty")
   gen:add_image("Hair", "empty")
   gen:add_image("Beard", "empty")
@@ -51,7 +51,7 @@ function on_target_select(parent, ability, targets)
 
   effect:apply()
   
-  anim = target:create_color_anim(1.0)
+  local anim = target:create_color_anim(1.0)
   anim:set_color_sec(anim:param(1.0, -1,0),
                      anim:param(1.0, -1,0),
                      anim:param(1.0, -1,0),
@@ -60,10 +60,10 @@ function on_target_select(parent, ability, targets)
 end
 
 function on_removed(parent, ability)
-  inv = parent:inventory()
+  local inv = parent:inventory()
   inv:set_locked(false)
    
-  anim = parent:create_color_anim(1.0)
+  local anim = parent:create_color_anim(1.0)
   anim:set_color_sec(anim:param(1.0, -1,0),
                      anim:param(1.0, -1,0),
                      anim:param(1.0, -1,0),

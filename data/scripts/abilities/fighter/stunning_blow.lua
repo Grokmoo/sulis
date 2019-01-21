@@ -1,22 +1,22 @@
 function on_activate(parent, ability)
-  stats = parent:stats()
+  local stats = parent:stats()
   if not stats.attack_is_melee then
     game:say_line("You must have a melee weapon equipped.", parent)
     return
   end
 
-  targets = parent:targets():hostile():attackable()
+  local targets = parent:targets():hostile():attackable()
   
-  targeter = parent:create_targeter(ability)
+  local targeter = parent:create_targeter(ability)
   targeter:add_all_selectable(targets)
   targeter:add_all_effectable(targets)
   targeter:activate()
 end
 
 function on_target_select(parent, ability, targets)
-  target = targets:first()
+  local target = targets:first()
   
-  cb = ability:create_callback(parent)
+  local cb = ability:create_callback(parent)
   cb:add_target(target)
   cb:set_after_attack_fn("create_stun_effect")
   
@@ -25,7 +25,7 @@ function on_target_select(parent, ability, targets)
 end
 
 function create_stun_effect(parent, ability, targets, hit)
-  target = targets:first()
+  local target = targets:first()
   
   if hit:is_graze() then
     target:change_overflow_ap(-2000)
@@ -35,7 +35,7 @@ function create_stun_effect(parent, ability, targets, hit)
     target:change_overflow_ap(-6000)
   end
   
-  gen = target:create_anim("burst", 0.15)
+  local gen = target:create_anim("burst", 0.15)
   gen:set_moves_with_parent()
   gen:set_position(gen:param(-0.75), gen:param(-0.75))
   gen:set_particle_size_dist(gen:fixed_dist(1.5), gen:fixed_dist(1.5))

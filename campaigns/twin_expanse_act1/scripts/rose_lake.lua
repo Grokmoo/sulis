@@ -9,22 +9,22 @@ function council_secretary_suggestion(parent)
 end
 
 function weasel_end(parent)
-  weasel = game:entity_with_id("rose_lake_weasel")
-  coins = math.floor(weasel:get_num_flag("coins_to_take"))
+  local weasel = game:entity_with_id("rose_lake_weasel")
+  local coins = math.floor(weasel:get_num_flag("coins_to_take"))
   if coins > 0 then
     game:add_party_coins(coins)
   end
 end
 
 function weasel_debt_take_complete(parent)
-  jevero = game:entity_with_id("rose_lake_q01")
+  local jevero = game:entity_with_id("rose_lake_q01")
   
   game:set_quest_entry_state("a_weasels_debt", "take_complete", "Visible")
   game:set_quest_state("a_weasels_debt", "Complete")
   
-  percent_fee = (1 + math.floor(jevero:get_num_flag("negotiate"))) * 10
+  local percent_fee = (1 + math.floor(jevero:get_num_flag("negotiate"))) * 10
   
-  coins = math.floor(jevero:get_num_flag("coins_to_take"))
+  local coins = math.floor(jevero:get_num_flag("coins_to_take"))
   if coins > 0 then
     game:add_party_coins(-coins)
 	if percent_fee > 0 then
@@ -54,7 +54,7 @@ function arzel_fight_init(parent)
   game:cancel_blocking_anims()
   game:scroll_view(107, 15)
   
-  arzel = game:entity_with_id("arzel")
+  local arzel = game:entity_with_id("arzel")
   arzel:set_faction("Hostile")
   
   game:start_conversation("arzel", parent)
@@ -79,7 +79,7 @@ function open_council(parent, target)
 end
 
 function remove_staff(parent)
-  item = game:find_party_item("aegis_staff")
+  local item = game:find_party_item("aegis_staff")
   game:remove_party_item(item)
   
   game:set_quest_entry_state("seeing_the_council", "complete", "Visible")
@@ -120,14 +120,14 @@ function rose_fort_final_boss2(parent)
 end
 
 function rose_fort_final_boss3(parent)
-  target = game:entity_with_id("rose_lake_cc0")
+  local target = game:entity_with_id("rose_lake_cc0")
   game:start_conversation("rose_lake_berkeley_boss", target)
 end
 
 function rose_fort_kill_council(parent)
-  attacker = game:entity_with_id("rose_lake_cc0")
+  local attacker = game:entity_with_id("rose_lake_cc0")
 
-  target = game:entity_with_id("rose_lake_cc1")
+  local target = game:entity_with_id("rose_lake_cc1")
   target:take_damage(attacker, 500, 500, "Raw")
   
   target = game:entity_with_id("rose_lake_cc2")
@@ -138,9 +138,9 @@ function rose_fort_kill_council(parent)
 end
 
 function rose_fort_portal(parent)
-  target = game:entity_with_id("rose_lake_cc0")
+  local target = game:entity_with_id("rose_lake_cc0")
   
-  anim = target:create_anim("teleport")
+  local anim = target:create_anim("teleport")
   anim:set_position(anim:param(30),
                     anim:param(14))
   anim:set_particle_size_dist(anim:fixed_dist(4.0), anim:fixed_dist(6.0))

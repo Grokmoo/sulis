@@ -1,23 +1,23 @@
 function on_activate(parent, item)
-  targets = parent:targets():friendly():reachable()
+  local targets = parent:targets():friendly():reachable()
   
-  targeter = parent:create_targeter_for_item(item)
+  local targeter = parent:create_targeter_for_item(item)
   targeter:add_all_selectable(targets)
   targeter:add_all_effectable(targets)
   targeter:activate()
 end
 
 function on_target_select(parent, item, targets)
-  target = targets:first()
+  local target = targets:first()
   
-  effect = target:create_effect(item:name(), item:duration())
+  local effect = target:create_effect(item:name(), item:duration())
   
-  cb = item:create_callback(parent)
+  local cb = item:create_callback(parent)
   cb:add_target(target)
   cb:set_on_round_elapsed_fn("apply_heal")
   effect:add_callback(cb)
   
-  anim = target:create_particle_generator("heal")
+  local anim = target:create_particle_generator("heal")
   anim:set_moves_with_parent()
   anim:set_position(anim:param(-0.5), anim:param(-1.5))
   anim:set_particle_size_dist(anim:fixed_dist(0.75), anim:fixed_dist(0.75))
@@ -33,7 +33,7 @@ function on_target_select(parent, item, targets)
 end
 
 function apply_heal(parent, item, targets)
-  target = targets:first()
+  local target = targets:first()
   
   target:heal_damage(4)
 end

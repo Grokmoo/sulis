@@ -4,23 +4,23 @@ function on_activate(parent, ability)
     return
   end
 
-  targets = parent:targets():hostile():attackable()
+  local targets = parent:targets():hostile():attackable()
   
-  targeter = parent:create_targeter(ability)
+  local targeter = parent:create_targeter(ability)
   targeter:add_all_selectable(targets)
   targeter:add_all_effectable(targets)
   targeter:activate()
 end
 
 function on_target_select(parent, ability, targets)
-  target = targets:first()
+  local target = targets:first()
   
-  cb = ability:create_callback(parent)
+  local cb = ability:create_callback(parent)
   cb:add_target(target)
   cb:set_after_attack_fn("create_stun_effect")
  
   if parent:ability_level(ability) > 1 then
-    effect = parent:create_effect(ability:name(), 0)
+    local effect = parent:create_effect(ability:name(), 0)
     effect:add_num_bonus("melee_accuracy", 25 + parent:stats().level)
     effect:apply()
   end
@@ -30,10 +30,10 @@ function on_target_select(parent, ability, targets)
 end
 
 function create_stun_effect(parent, ability, targets, hit)
-  target = targets:first()
+  local target = targets:first()
   
   -- compute the max target pushback distance
-  pushback_dist = 2 + parent:width() - target:width()
+  local pushback_dist = 2 + parent:width() - target:width()
  
   if parent:ability_level(ability) > 1 then
     pushback_dist = pushback_dist + 3
@@ -51,7 +51,7 @@ function create_stun_effect(parent, ability, targets, hit)
 	pushback_dist = pushback_dist + 2
   end
   
-  gen = target:create_anim("burst", 0.15)
+  local gen = target:create_anim("burst", 0.15)
   gen:set_moves_with_parent()
   gen:set_position(gen:param(-0.75), gen:param(-0.75))
   gen:set_particle_size_dist(gen:fixed_dist(1.5), gen:fixed_dist(1.5))
@@ -62,16 +62,17 @@ function create_stun_effect(parent, ability, targets, hit)
   end
   
   -- compute the normalized direction to push
-  target_x = target:x()
-  target_y = target:y()
-  dir_x = target_x - parent:x()
-  dir_y = target_y - parent:y()
-  mag = math.sqrt(dir_x * dir_x + dir_y * dir_y)
-  x_norm = dir_x / mag
-  y_norm = dir_y / mag
+  local target_x = target:x()
+  local target_y = target:y()
+  local dir_x = target_x - parent:x()
+  local dir_y = target_y - parent:y()
+  local mag = math.sqrt(dir_x * dir_x + dir_y * dir_y)
+  local x_norm = dir_x / mag
+  local y_norm = dir_y / mag
   
-  dest_x = target_x
-  dest_y = target_y
+  local dest_x = target_x
+  local dest_y = target_y
+  local total_dist = 0
   
   -- go along the direction, checking until we hit an impassable spot
   for dist = 1, pushback_dist do
@@ -91,19 +92,19 @@ function create_stun_effect(parent, ability, targets, hit)
   if dest_x == target_x and dest_y == target_y then
     return
   end
-  dest = { x = dest_x, y = dest_y }
+  local dest = { x = dest_x, y = dest_y }
   
   -- move the target now (since we know the dest is valid now) and hide it with a subpos animation
   target:teleport_to(dest)
   
-  subpos_x = dest_x - target_x
-  subpos_y = dest_y - target_y
+  local subpos_x = dest_x - target_x
+  local subpos_y = dest_y - target_y
   target:set_subpos(-subpos_x, -subpos_y)
   
   -- create the movement animation for the computed destination
-  speed = 300 * game:anim_base_time()
-  duration = total_dist / speed
-  anim = target:create_subpos_anim(duration)
+  local speed = 300 * game:anim_base_time()
+  local duration = total_dist / speed
+  local anim = target:create_subpos_anim(duration)
   anim:set_position(anim:param(-subpos_x, subpos_x / duration), anim:param(-subpos_y, subpos_y / duration))
   anim:activate()
 end

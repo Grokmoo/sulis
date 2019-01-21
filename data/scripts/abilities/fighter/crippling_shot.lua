@@ -1,22 +1,22 @@
 function on_activate(parent, ability)
-  stats = parent:stats()
+  local stats = parent:stats()
   if not stats.attack_is_ranged then
     game:say_line("You must have a ranged weapon equipped.", parent)
     return
   end
 
-  targets = parent:targets():hostile():visible()
+  local targets = parent:targets():hostile():visible()
   
-  targeter = parent:create_targeter(ability)
+  local targeter = parent:create_targeter(ability)
   targeter:add_all_selectable(targets)
   targeter:add_all_effectable(targets)
   targeter:activate()
 end
 
 function on_target_select(parent, ability, targets)
-  target = targets:first()
+  local target = targets:first()
   
-  cb = ability:create_callback(parent)
+  local cb = ability:create_callback(parent)
   cb:add_target(target)
   cb:set_after_attack_fn("create_cripple_effect")
   cb:set_before_attack_fn("create_parent_penalty")
@@ -26,7 +26,7 @@ function on_target_select(parent, ability, targets)
 end
 
 function create_parent_penalty(parent, ability, targets)
-  effect = parent:create_effect(ability:name(), 0)
+  local effect = parent:create_effect(ability:name(), 0)
   effect:add_num_bonus("graze_multiplier", -0.25)
   effect:add_num_bonus("hit_multiplier", -0.5)
   effect:add_num_bonus("crit_multiplier", -1.0)
@@ -34,13 +34,13 @@ function create_parent_penalty(parent, ability, targets)
 end
 
 function create_cripple_effect(parent, ability, targets, hit)
-  target = targets:first()
+  local target = targets:first()
 
   if hit:is_miss() then return end
   
-  effect = target:create_effect(ability:name(), ability:duration())
+  local effect = target:create_effect(ability:name(), ability:duration())
   effect:set_tag("cripple")
-  stats = parent:stats()
+  local stats = parent:stats()
   
   if hit:is_graze() then
     effect:add_num_bonus("movement_rate", -0.5 - stats.level / 60)
@@ -50,7 +50,7 @@ function create_cripple_effect(parent, ability, targets, hit)
     effect:add_num_bonus("movement_rate", -1.0 - stats.level / 40)
   end
   
-  anim = target:create_particle_generator("particles/circle4")
+  local anim = target:create_particle_generator("particles/circle4")
   anim:set_initial_gen(10.0)
   anim:set_color(anim:param(1.0), anim:param(0.0), anim:param(0.0))
   anim:set_gen_rate(anim:param(10.0))

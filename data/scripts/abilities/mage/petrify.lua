@@ -1,7 +1,7 @@
 function on_activate(parent, ability)
-  targets = parent:targets():hostile():visible_within(7)
+  local targets = parent:targets():hostile():visible_within(7)
   
-  targeter = parent:create_targeter(ability)
+  local targeter = parent:create_targeter(ability)
   targeter:add_all_selectable(targets)
   targeter:add_all_effectable(targets)
   targeter:activate()
@@ -10,10 +10,10 @@ end
 function on_target_select(parent, ability, targets)
   ability:activate(parent)
 
-  target = targets:first()
+  local target = targets:first()
   
-  hit = parent:special_attack(target, "Fortitude", "Spell")
-  duration = ability:duration()
+  local hit = parent:special_attack(target, "Fortitude", "Spell")
+  local duration = ability:duration()
   if hit:is_miss() then
     return
   elseif hit:is_graze() then
@@ -24,9 +24,9 @@ function on_target_select(parent, ability, targets)
     duration = duration + 1
   end
   
-  stats = parent:stats()
+  local stats = parent:stats()
   
-  effect = target:create_effect(ability:name(), duration)
+  local effect = target:create_effect(ability:name(), duration)
   effect:set_tag("petrify")
   effect:add_move_disabled()
   effect:add_attack_disabled()
@@ -36,7 +36,7 @@ function on_target_select(parent, ability, targets)
   effect:add_num_bonus("will", -20 - stats.caster_level)
   effect:add_armor_of_kind(-8, "Crushing")
   
-  anim = target:create_color_anim()
+  local anim = target:create_color_anim()
   anim:set_color(anim:param(0.4),
                  anim:param(0.3),
                  anim:param(0.3),

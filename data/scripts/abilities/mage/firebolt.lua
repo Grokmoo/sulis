@@ -1,27 +1,27 @@
 function on_activate(parent, ability)
-  targets = parent:targets():hostile():visible()
+  local targets = parent:targets():hostile():visible()
   
-  targeter = parent:create_targeter(ability)
+  local targeter = parent:create_targeter(ability)
   targeter:add_all_selectable(targets)
   targeter:add_all_effectable(targets)
   targeter:activate()
 end
 
 function on_target_select(parent, ability, targets)
-  target = targets:first()
+  local target = targets:first()
   
-  speed = 10.0
-  dist = parent:dist_to_entity(target)
-  duration = dist / speed
-  parent_center_y = parent:center_y() - 1.0
-  vx = (target:center_x() - parent:center_x()) / duration
-  vy = (target:center_y() - parent_center_y) / duration
+  local speed = 10.0
+  local dist = parent:dist_to_entity(target)
+  local duration = dist / speed
+  local parent_center_y = parent:center_y() - 1.0
+  local vx = (target:center_x() - parent:center_x()) / duration
+  local vy = (target:center_y() - parent_center_y) / duration
   
-  cb = ability:create_callback(parent)
+  local cb = ability:create_callback(parent)
   cb:add_target(target)
   cb:set_on_anim_update_fn("attack_target")
   
-  gen = parent:create_particle_generator("fire_particle", duration)
+  local gen = parent:create_particle_generator("fire_particle", duration)
   gen:set_position(gen:param(parent:center_x(), vx), gen:param(parent_center_y, vy))
   gen:set_gen_rate(gen:param(70.0))
   gen:set_initial_gen(35.0)
@@ -36,14 +36,14 @@ function on_target_select(parent, ability, targets)
 end
 
 function attack_target(parent, ability, targets)
-  target = targets:first()
+  local target = targets:first()
   
-  stats = parent:stats()
-  min_dmg = 18 + stats.caster_level / 2 + stats.intellect_bonus / 4
-  max_dmg = 28 + stats.intellect_bonus / 2 + stats.caster_level
+  local stats = parent:stats()
+  local min_dmg = 18 + stats.caster_level / 2 + stats.intellect_bonus / 4
+  local max_dmg = 28 + stats.intellect_bonus / 2 + stats.caster_level
   parent:special_attack(target, "Reflex", "Spell", min_dmg, max_dmg, 0, "Fire")
   
-  gen = target:create_particle_generator("fire_particle", 0.6)
+  local gen = target:create_particle_generator("fire_particle", 0.6)
   gen:set_initial_gen(50.0)
   gen:set_position(gen:param(target:center_x()), gen:param(target:center_y()))
   gen:set_particle_size_dist(gen:fixed_dist(0.3), gen:fixed_dist(0.3))

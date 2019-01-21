@@ -1,12 +1,12 @@
 function on_activate(parent, ability)
-  effect = parent:create_effect(ability:name(), ability:duration())
+  local effect = parent:create_effect(ability:name(), ability:duration())
   
-  stats = parent:stats()
+  local stats = parent:stats()
   effect:add_num_bonus("movement_rate", 0.8 + stats.level / 30)
   effect:add_num_bonus("reflex", 10 + stats.level / 2)
   effect:add_attribute_bonus("Dexterity", 4 + stats.level / 5)
 
-  gen = parent:create_particle_generator("wind_particle", duration)
+  local gen = parent:create_particle_generator("wind_particle", duration)
   gen:set_moves_with_parent()
   gen:set_gen_rate(gen:param(70.0))
   gen:set_position(gen:param(-0.5), gen:param(-0.5))

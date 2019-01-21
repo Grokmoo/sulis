@@ -1,29 +1,29 @@
 function on_activate(parent, ability)
-  effect = parent:create_effect(ability:name(), ability:duration())
+  local effect = parent:create_effect(ability:name(), ability:duration())
   effect:set_tag("magic_defense")
   
-  stats = parent:stats()
-  amount = 40 + stats.caster_level + stats.wisdom_bonus
+  local stats = parent:stats()
+  local amount = 40 + stats.caster_level + stats.wisdom_bonus
   effect:add_resistance(amount, "Fire")
   effect:add_resistance(amount, "Cold")
   effect:add_resistance(amount, "Acid")
   effect:add_resistance(amount, "Shock")
 
-  gen = parent:create_particle_generator("wind_particle", duration)
+  local gen = parent:create_particle_generator("wind_particle", duration)
   setup_anim(gen)
   effect:add_anim(gen)
   
-  gen = parent:create_particle_generator("wind_particle", duration)
+  local gen = parent:create_particle_generator("wind_particle", duration)
   gen:set_color(gen:param(0.0), gen:param(0.2), gen:param(1.0))
   setup_anim(gen)
   effect:add_anim(gen)
   
-  gen = parent:create_particle_generator("wind_particle", duration)
+  local gen = parent:create_particle_generator("wind_particle", duration)
   gen:set_color(gen:param(0.0), gen:param(1.0), gen:param(0.0))
   setup_anim(gen)
   effect:add_anim(gen)
   
-  gen = parent:create_particle_generator("fire_particle")
+  local gen = parent:create_particle_generator("fire_particle")
   setup_anim(gen)
   effect:add_anim(gen)
   

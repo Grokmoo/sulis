@@ -1,16 +1,16 @@
 function on_activate(parent, ability)
-  effect = parent:create_effect(ability:name(), ability:duration())
+  local effect = parent:create_effect(ability:name(), ability:duration())
   effect:set_tag("magic_defense")
   
-  stats = parent:stats()
-  amount = 7 + stats.caster_level / 2
+  local stats = parent:stats()
+  local amount = 7 + stats.caster_level / 2
   effect:add_armor_of_kind(amount, "Fire")
 
-  cb = ability:create_callback(parent)
+  local cb = ability:create_callback(parent)
   cb:set_after_defense_fn("after_defense")
   effect:add_callback(cb)
 
-  gen = parent:create_particle_generator("fire_particle")
+  local gen = parent:create_particle_generator("fire_particle")
   gen:set_moves_with_parent()
   gen:set_gen_rate(gen:param(70.0))
   gen:set_position(gen:param(-0.25), gen:param(0.0))
@@ -25,14 +25,14 @@ function on_activate(parent, ability)
 end
 
 function after_defense(parent, ability, targets)
-  target = targets:first()
+  local target = targets:first()
 
   if parent:dist_to_entity(target) > 4.0 then
     return
   end
 
-  stats = parent:stats()
-  min_dmg = 4 + stats.caster_level / 4 + stats.intellect_bonus / 6
-  max_dmg = 8 + stats.caster_level / 2 + stats.intellect_bonus / 3
+  local stats = parent:stats()
+  local min_dmg = 4 + stats.caster_level / 4 + stats.intellect_bonus / 6
+  local max_dmg = 8 + stats.caster_level / 2 + stats.intellect_bonus / 3
   parent:special_attack(target, "Reflex", "Spell", 4, 8, 0, "Fire")
 end

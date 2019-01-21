@@ -9,10 +9,10 @@ function on_activate(parent, ability)
     return
   end
 
-  stats = parent:stats()
-  amount = 5 + stats.level / 2
+  local stats = parent:stats()
+  local amount = 5 + stats.level / 2
   
-  effect = parent:create_effect(ability:name())
+  local effect = parent:create_effect(ability:name())
   effect:deactivate_with(ability)
   effect:add_num_bonus("defense", amount)
   effect:add_num_bonus("reflex", amount / 2)
@@ -22,12 +22,12 @@ function on_activate(parent, ability)
   effect:add_num_bonus("melee_accuracy", -10)
 
   if parent:ability_level(ability) > 1 then
-    cb = ability:create_callback(parent)
+    local cb = ability:create_callback(parent)
     cb:set_after_defense_fn("after_defense")
     effect:add_callback(cb)
   end
 
-  gen = parent:create_anim("shield")
+  local gen = parent:create_anim("shield")
   gen:set_moves_with_parent()
   gen:set_position(gen:param(-0.5), gen:param(-2.5))
   gen:set_particle_size_dist(gen:fixed_dist(1.0), gen:fixed_dist(1.0))
@@ -40,11 +40,11 @@ end
 function after_defense(parent, ability, targets, hit)
   if hit:total_damage() < 2 then return end
   
-  target = targets:first()
+  local target = targets:first()
 
   if not target:can_reach(parent) then return end
 
-  max_damage = math.floor(hit:total_damage() * 0.3)
+  local max_damage = math.floor(hit:total_damage() * 0.3)
   
   target:take_damage(parent, max_damage, max_damage, "Raw")
 end

@@ -1,10 +1,10 @@
 function on_area_load(parent)
-  target = game:entity_with_id("farmer")
+  local target = game:entity_with_id("farmer")
   game:start_conversation("farms_intro", target)
 end
 
 function gethruk_leave_intro(parent)
-  target = game:entity_with_id("gethruk")
+  local target = game:entity_with_id("gethruk")
   if not target:move_towards_point(24, 50) then
     game:log("Gethruk unable to move")
   end
@@ -13,7 +13,7 @@ function gethruk_leave_intro(parent)
 end
 
 function gethruk_moved_finish_intro(parent)
-  target = game:entity_with_id("gethruk")
+ local  target = game:entity_with_id("gethruk")
   target:remove()
   
   game:set_quest_entry_state("the_thug", "start", "Visible")

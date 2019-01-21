@@ -32,12 +32,12 @@ function view_docks_thug(parent)
 end
 
 function docks_thugs_attack(parent)
-  worker = game:entity_with_id("dock_foreman")
+  local worker = game:entity_with_id("dock_foreman")
   worker:set_flag("player_fought")
 
-  thug01 = game:entity_with_id("thug01")
-  thug02 = game:entity_with_id("thug02")
-  thug03 = game:entity_with_id("thug03")
+  local thug01 = game:entity_with_id("thug01")
+  local thug02 = game:entity_with_id("thug02")
+  local thug03 = game:entity_with_id("thug03")
   
   thug01:set_faction("Hostile")
   thug02:set_faction("Hostile")
@@ -46,26 +46,26 @@ end
 
 function docks_thugs_leave_early(parent)
   game:add_party_xp(50)
-  thug01 = game:entity_with_id("thug01")
+  local thug01 = game:entity_with_id("thug01")
   game:say_line("That will teach you!  Have the money next time or else!")
   
-  worker = game:entity_with_id("dock_foreman")
+  local worker = game:entity_with_id("dock_foreman")
   worker:set_flag("player_didnt_help")
   worker:take_damage(thug01, 6, 6, "Raw")
   game:run_script_delayed("wellswood", "docks_thugs_leave", 2.0)
 end
 
 function docks_thugs_leave_helped(parent)
-  worker = game:entity_with_id("dock_foreman")
+  local worker = game:entity_with_id("dock_foreman")
   worker:set_flag("player_helped")
   
   docks_thugs_leave(parent)
 end
 
 function docks_thugs_leave(parent)
-  thug01 = game:entity_with_id("thug01")
-  thug02 = game:entity_with_id("thug02")
-  thug03 = game:entity_with_id("thug03")
+  local thug01 = game:entity_with_id("thug01")
+  local thug02 = game:entity_with_id("thug02")
+  local thug03 = game:entity_with_id("thug03")
   
   if not thug01:move_towards_point(75, 77) then
     game:log("thug01 unable to move")
@@ -83,10 +83,10 @@ function docks_thugs_leave(parent)
 end
 
 function docks_thugs_leave_finish(parent)
-  target = game:entity_with_id("thug01")
+  local target = game:entity_with_id("thug01")
   target:remove()
   
-  target = game:entity_with_id("thug02")
+  local target = game:entity_with_id("thug02")
   target:remove()
   
   target = game:entity_with_id("thug03")
@@ -94,13 +94,13 @@ function docks_thugs_leave_finish(parent)
 end
 
 function docks_thugs_cleared(parent)
-  worker = game:entity_with_id("dock_foreman")
+  local worker = game:entity_with_id("dock_foreman")
   game:say_line("Alright, back to work!", worker)
 end
 
 function docks_foreman_info(parent)
   game:add_party_xp(50)
-  worker = game:entity_with_id("dock_foreman")
+  local worker = game:entity_with_id("dock_foreman")
   worker:set_flag("got_info")
   game:set_quest_entry_state("the_thug", "docks_info", "Visible")
   
@@ -115,8 +115,8 @@ function smith_info(parent)
   game:set_world_map_location_visible("thugs_hideout", true)
   game:set_world_map_location_enabled("thugs_hideout", true)
   
-  smith = game:entity_with_id("smith01")
-  coins = math.floor(smith:get_num_flag("coins_to_take"))
+  local smith = game:entity_with_id("smith01")
+  local coins = math.floor(smith:get_num_flag("coins_to_take"))
   if coins > 0 then
     game:add_party_coins(-coins)
   end

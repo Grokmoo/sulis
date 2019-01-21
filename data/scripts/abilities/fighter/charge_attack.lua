@@ -1,13 +1,13 @@
 function on_activate(parent, ability)
-  stats = parent:stats()
+  local stats = parent:stats()
   if not stats.attack_is_melee then
     game:say_line("You must have a melee weapon equipped.", parent)
     return
   end
 
-  targets = parent:targets():hostile():visible()
+  local targets = parent:targets():hostile():visible()
   
-  targeter = parent:create_targeter(ability)
+  local targeter = parent:create_targeter(ability)
   targeter:set_free_select(12.0)
   targeter:set_free_select_must_be_passable(parent:size_str())
   targeter:impass_blocks_affected_points(true)
@@ -17,30 +17,30 @@ function on_activate(parent, ability)
 end
 
 function on_target_select(parent, ability, targets)
-  pos = targets:selected_point()
+  local pos = targets:selected_point()
   
-  cb = ability:create_callback(parent)
+  local cb = ability:create_callback(parent)
   cb:add_targets(targets)
   cb:set_on_anim_complete_fn("move_parent")
   
-  speed = 300 * game:anim_base_time()
-  dist = parent:dist_to_point(pos)
-  duration = dist / speed
+  local speed = 300 * game:anim_base_time()
+  local dist = parent:dist_to_point(pos)
+  local duration = dist / speed
   
-  anim = parent:create_subpos_anim(duration)
+  local anim = parent:create_subpos_anim(duration)
 
-  delta_x = pos.x - parent:x()
-  delta_y = pos.y - parent:y()
+  local delta_x = pos.x - parent:x()
+  local delta_y = pos.y - parent:y()
   
   anim:set_position(anim:param(0.0, delta_x / duration), anim:param(0.0, delta_y / duration))
   anim:set_completion_callback(cb)
   
-  targets = targets:to_table()
+  local targets = targets:to_table()
   for i = 1, #targets do 
-    dist = parent:dist_to_entity(targets[i])
-    duration = dist / speed
+    local dist = parent:dist_to_entity(targets[i])
+    local duration = dist / speed
     
-    cb = ability:create_callback(parent)
+    local cb = ability:create_callback(parent)
 	cb:add_target(targets[i])
 	cb:set_on_anim_update_fn("attack_target")
     anim:add_callback(cb, duration)
@@ -51,7 +51,7 @@ function on_target_select(parent, ability, targets)
 end
 
 function attack_target(parent, ability, target)
-  target = targets:first()
+  local target = targets:first()
 
   if target:is_valid() then
     parent:weapon_attack(target)
@@ -59,6 +59,6 @@ function attack_target(parent, ability, target)
 end
 
 function move_parent(parent, ability, targets)
-  dest = targets:selected_point()
+  local dest = targets:selected_point()
   parent:teleport_to(dest)
 end

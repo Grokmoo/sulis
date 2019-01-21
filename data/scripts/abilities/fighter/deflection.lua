@@ -9,16 +9,16 @@ function on_activate(parent, ability)
     return
   end
 
-  stats = parent:stats()
-  amount = 5 + stats.level / 2
+  local stats = parent:stats()
+  local amount = 5 + stats.level / 2
 
-  effect = parent:create_effect(ability:name())
+  local effect = parent:create_effect(ability:name())
   effect:deactivate_with(ability)
-  cb = ability:create_callback(parent)
+  local cb = ability:create_callback(parent)
   cb:set_after_defense_fn("after_defense")
   effect:add_callback(cb)
 
-  gen = parent:create_anim("shield")
+  local gen = parent:create_anim("shield")
   gen:set_moves_with_parent()
   gen:set_position(gen:param(-0.5), gen:param(-2.5))
   gen:set_particle_size_dist(gen:fixed_dist(1.0), gen:fixed_dist(1.0))
@@ -32,30 +32,30 @@ end
 function after_defense(parent, ability, targets, hit)
   if hit:total_damage() < 1 then return end
 
-  target = targets:first()
+  local target = targets:first()
 
   if target:inventory():weapon_style() ~= "Ranged" then return end
   
-  max_dmg = hit:total_damage()
-  min_dmg = max_dmg / 2
+  local max_dmg = hit:total_damage()
+  local min_dmg = max_dmg / 2
 
-  stats = target:stats()
-  projectile = stats.ranged_projectile
+  local stats = target:stats()
+  local projectile = stats.ranged_projectile
   
-  dist = parent:dist_to_entity(target)
-  speed = 500 * game:anim_base_time()
-  duration = dist / speed
-  anim = parent:create_anim(projectile, duration)
+  local dist = parent:dist_to_entity(target)
+  local speed = 500 * game:anim_base_time()
+  local duration = dist / speed
+  local anim = parent:create_anim(projectile, duration)
   
-  delta_x = target:x() - parent:x()
-  delta_y = target:y() - parent:y()
-  angle = game:atan2(delta_x, delta_y)
+  local delta_x = target:x() - parent:x()
+  local delta_y = target:y() - parent:y()
+  local angle = game:atan2(delta_x, delta_y)
   
   anim:set_position(anim:param(parent:x(), delta_x / duration), anim:param(parent:y(), delta_y / duration))
   anim:set_particle_size_dist(anim:fixed_dist(3.0), anim:fixed_dist(3.0))
   anim:set_rotation(anim:param(angle))
   
-  cb = ability:create_callback(parent)
+  local cb = ability:create_callback(parent)
   cb:add_target(target)
   cb:set_on_anim_update_fn("attack_target")
   anim:add_callback(cb, duration)
@@ -63,8 +63,7 @@ function after_defense(parent, ability, targets, hit)
 end
 
 function attack_target(parent, ability, targets)
-  target = targets:first()
-  
-  stats = target:stats()
+  local target = targets:first()
+  local stats = target:stats()
   parent:special_attack(target, "Reflex", "Ranged", stats.damage_min_0, stats.damage_max_0, stats.armor_penetration_0, "Piercing")
 end

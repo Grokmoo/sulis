@@ -1,7 +1,7 @@
 function on_activate(parent, ability)
-  targets = parent:targets()
+  local targets = parent:targets()
   
-  targeter = parent:create_targeter(ability)
+  local targeter = parent:create_targeter(ability)
   targeter:set_free_select(8.0)
   -- targeter:set_free_select_must_be_passable("1by1")
   if parent:ability_level(ability) > 1 then
@@ -16,18 +16,18 @@ function on_activate(parent, ability)
 end
 
 function on_target_select(parent, ability, targets)
-  selected_point = targets:selected_point()
-  speed = 20.0
-  dist = parent:dist_to_point(selected_point)
-  duration = dist / speed
-  vx = (selected_point.x - parent:center_x()) / duration
-  vy = (selected_point.y - parent:center_y()) / duration
+  local selected_point = targets:selected_point()
+  local speed = 20.0
+  local dist = parent:dist_to_point(selected_point)
+  local duration = dist / speed
+  local vx = (selected_point.x - parent:center_x()) / duration
+  local vy = (selected_point.y - parent:center_y()) / duration
   
-  cb = ability:create_callback(parent)
+  local cb = ability:create_callback(parent)
   cb:add_targets(targets)
   cb:set_on_anim_complete_fn("create_explosion")
   
-  gen = parent:create_anim("particles/circle12", duration)
+  local gen = parent:create_anim("particles/circle12", duration)
   gen:set_color(gen:param(0.5), gen:param(0.5), gen:param(0.5))
   gen:set_position(gen:param(parent:center_x(), vx), gen:param(parent:center_y(), vy))
   gen:set_particle_size_dist(gen:fixed_dist(0.7), gen:fixed_dist(0.7))
@@ -40,17 +40,17 @@ function on_target_select(parent, ability, targets)
 end
 
 function create_explosion(parent, ability, targets)
-  duration = 1.2
+  local duration = 1.2
   
-  position = targets:selected_point()
+  local position = targets:selected_point()
   
-  gen = parent:create_anim("burst", 0.15)
+  local gen = parent:create_anim("burst", 0.15)
   gen:set_position(gen:param(position.x - 4.0), gen:param(position.y - 4.0))
   gen:set_particle_size_dist(gen:fixed_dist(8.0), gen:fixed_dist(8.0))
   
-  targets = targets:to_table()
+  local targets = targets:to_table()
   for i = 1, #targets do
-    cb = ability:create_callback(parent)
+    local cb = ability:create_callback(parent)
 	cb:add_target(targets[i])
 	cb:set_on_anim_update_fn("attack_target")
     gen:add_callback(cb, 0.1)
@@ -60,14 +60,13 @@ function create_explosion(parent, ability, targets)
 end
 
 function attack_target(parent, ability, targets)
-  target = targets:first()
+  local target = targets:first()
   if not target:is_valid() then return end
   
-  stats = parent:stats()
-  target = targets:first()
+  local stats = parent:stats()
   
-  hit = parent:special_attack(target, "Reflex", "Ranged")
-  amount = -(2 + stats.intellect_bonus / 20) * game:ap_display_factor()
+  local hit = parent:special_attack(target, "Reflex", "Ranged")
+  local amount = -(2 + stats.intellect_bonus / 20) * game:ap_display_factor()
   
   if parent:has_ability("mechanical_mastery") then
     amount = amount * 1.5

@@ -1,23 +1,23 @@
 function ai_action(parent)
-    abilities = parent:abilities():can_activate():remove_kind("Special")
+    local abilities = parent:abilities():can_activate():remove_kind("Special")
     abilities:sort_by_priority()
 	
-    hostiles = parent:targets():hostile()
-    friendlies = parent:targets():friendly():to_table()
+    local hostiles = parent:targets():hostile()
+    local friendlies = parent:targets():friendly():to_table()
 
 	if check_swap_weapons(parent, hostiles).done then
 		return parent:state_wait(10)
 	end
 	
-	items = parent:inventory():usable_items()
+	local items = parent:inventory():usable_items()
 	
 	hostiles = hostiles:to_table()
 	
-	failed_use_count = 0
+	local failed_use_count = 0
 	
     -- only loop at most 10 times
     for i = 1,10 do
-		result = find_and_use_item(parent, items, hostiles, friendlies, failed_use_count)
+		local result = find_and_use_item(parent, items, hostiles, friendlies, failed_use_count)
 		if result.done then
 			return parent:state_wait(10)
 		end
@@ -26,12 +26,12 @@ function ai_action(parent)
             break
         end
 
-        result = find_and_use_ability(parent, abilities, hostiles, friendlies, failed_use_count)
+        local result = find_and_use_ability(parent, abilities, hostiles, friendlies, failed_use_count)
         if result.done then
             return parent:state_wait(10)
         end
 
-		cur_len = abilities:len()
+		local cur_len = abilities:len()
         abilities = abilities:can_activate()
 		
 		if cur_len == abilities:len() then
@@ -46,8 +46,8 @@ function ai_action(parent)
         return parent:state_end()
     end
 
-    target = find_target(parent, hostiles)
-	result = check_move_for_attack(parent, target)
+    local target = find_target(parent, hostiles)
+	local result = check_move_for_attack(parent, target)
 	if result.attack then
 		parent:anim_weapon_attack(target, nil, true)
 	end
@@ -69,8 +69,8 @@ function check_move_for_attack(parent, target)
 			return { attack=false, done=true }
 		end
 	else
-		dist = parent:dist_to_entity(target)
-		target_dist = parent:vis_dist() - 2
+		local dist = parent:dist_to_entity(target)
+		local target_dist = parent:vis_dist() - 2
 		
 		if dist > target_dist then
 			if not parent:move_towards_entity(target, target_dist) then
@@ -118,15 +118,15 @@ end
 
 function find_and_use_item(parent, items, hostiles, friendlies, failed_use_count)
 	for i = 1, #items do
-		item = items[i]
-		result = check_action(parent, item:ai_data(), hostiles, friendlies, failed_use_count)
+		local item = items[i]
+		local result = check_action(parent, item:ai_data(), hostiles, friendlies, failed_use_count)
 		if result.done then
 			return { done=true }
 		end
 			
-		if not result.next_action then
+		if result.target then
 			parent:use_item(item)
-			return handle_targeter(parent, target)
+			return handle_targeter(parent, result.target)
 		end
 	end
 	
@@ -134,18 +134,18 @@ function find_and_use_item(parent, items, hostiles, friendlies, failed_use_count
 end
 
 function find_and_use_ability(parent, abilities, hostiles, friendlies, failed_use_count)
-    abilities_table = abilities:to_table()
+    local abilities_table = abilities:to_table()
     for i = 1, #abilities_table do
-        ability = abilities_table[i]
+        local ability = abilities_table[i]
 
-        result = check_action(parent, ability:ai_data(), hostiles, friendlies, failed_use_count)
+        local result = check_action(parent, ability:ai_data(), hostiles, friendlies, failed_use_count)
         if result.done then
             return { done=true }
         end
 
-        if not result.next_action then
+        if result.target then
 			parent:use_ability(ability)
-            return handle_targeter(parent, target)
+            return handle_targeter(parent, result.target)
         end
     end
 	
@@ -158,8 +158,8 @@ function handle_targeter(parent, target)
         return { done=true }
     end
 
-    x = target:x()
-    y = target:y()
+    local x = target:x()
+    local y = target:y()
 
     if game:check_targeter_position(x, y) then
         game:activate_targeter()
@@ -172,36 +172,36 @@ function handle_targeter(parent, target)
 end
 
 function check_action(parent, ai_data, hostiles, friendlies, failed_use_count)
-    target = get_best_target(parent, ai_data, hostiles, friendlies)
+    local target = get_best_target(parent, ai_data, hostiles, friendlies)
 
     if target == nil then
-        return { done=false, next_action=true }
+        return { done=false, target=nil }
     end
 
-    target_dist = 0
+    local target_dist = 0
 	
     if ai_data.range == "Personal" then
-        return { done=false, next_action=false }
+        return { done=false, target=parent }
     elseif ai_data.range == "Reach" then
         if parent:can_reach(target) then
-            return { done=false, next_action = false }
+            return { done=false, target=target }
         end
 
         parent:move_towards_entity(target)
-        return { done=true, next_action = false }
+        return { done=true }
     elseif ai_data.range == "Short" then
         target_dist = 8 - failed_use_count * 2
     elseif ai_data.range == "Visible" then
         target_dist = parent:vis_dist() - 1 - failed_use_count * 3
     end
 	
-	dist = parent:dist_to_entity(target)
+	local dist = parent:dist_to_entity(target)
 	
 	if dist < target_dist then
-	  return { done=false, next_action=false }
+	  return { done=false, target=target}
 	else
 	  parent:move_towards_entity(target, target_dist)
-	  return { done=true, next_action=false }
+	  return { done=true }
 	end
 end
 
@@ -229,13 +229,13 @@ function get_best_target(parent, ai_data, hostiles, friendlies)
 end
 
 function find_heal_target(parent, targets)
-    best_frac = 1.0
-	best_target = nil
+    local best_frac = 1.0
+	local best_target = nil
 	
 	for i = 1, #targets do
-	    stats = targets[i]:stats()
+	    local stats = targets[i]:stats()
 		
-		frac = stats.current_hp / stats.max_hp
+		local frac = stats.current_hp / stats.max_hp
 		if frac < best_frac then
 		    best_frac = frac
 			best_target = targets[i]
@@ -251,12 +251,12 @@ end
 
 -- Just finds the closest target for now
 function find_target(parent, targets)
-    closest_dist = 1000
-    closest_target = nil
+    local closest_dist = 1000
+    local closest_target = nil
 
     for i = 1, #targets do
-        target = targets[i]
-        dist = parent:dist_to_entity(target)
+        local target = targets[i]
+        local dist = parent:dist_to_entity(target)
         if dist < closest_dist then
             closest_dist = dist
             closest_target = target
@@ -268,7 +268,7 @@ end
 
 -- OnDamaged script hook
 function on_damaged(parent, targets, hit)
-    target = targets:first()
+    local target = targets:first()
 	
 	-- game:log(parent:name() .. " damaged by " .. target:name() .. ": "
 	--     .. hit:kind() .. " for " .. hit:total_damage() .. " damage.")

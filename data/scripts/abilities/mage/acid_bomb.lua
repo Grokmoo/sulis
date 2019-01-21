@@ -1,7 +1,7 @@
 function on_activate(parent, ability)
-  targets = parent:targets():hostile():visible_within(8)
+  local targets = parent:targets():hostile():visible_within(8)
   
-  targeter = parent:create_targeter(ability)
+  local targeter = parent:create_targeter(ability)
   targeter:add_all_selectable(targets)
   targeter:add_all_effectable(targets)
   targeter:activate()
@@ -10,11 +10,11 @@ end
 function on_target_select(parent, ability, targets)
   ability:activate(parent)
 
-  stats = parent:stats()
-  target = targets:first()
+  local stats = parent:stats()
+  local target = targets:first()
   
-  hit = parent:special_attack(target, "Reflex", "Spell")
-  duration = ability:duration()
+  local hit = parent:special_attack(target, "Reflex", "Spell")
+  local duration = ability:duration()
   if hit:is_miss() then
     return
   elseif hit:is_graze() then
@@ -25,17 +25,17 @@ function on_target_select(parent, ability, targets)
     duration = duration * 3 / 2
   end
   
-  max_dmg = 8 + stats.caster_level / 2
+  local max_dmg = 8 + stats.caster_level / 2
   target:take_damage(parent, 4, max_dmg, "Acid", 5)
   
-  effect = target:create_effect(ability:name(), duration)
+  local effect = target:create_effect(ability:name(), duration)
   effect:set_tag("weaken")
-  cb = ability:create_callback(parent)
+  local cb = ability:create_callback(parent)
   cb:add_target(target)
   cb:set_on_round_elapsed_fn("apply_damage")
   effect:add_callback(cb)
   
-  anim = target:create_particle_generator("particles/circle4")
+  local anim = target:create_particle_generator("particles/circle4")
   anim:set_moves_with_parent()
   anim:set_initial_gen(10.0)
   anim:set_color(anim:param(0.0), anim:param(1.0), anim:param(0.2))
@@ -50,9 +50,9 @@ function on_target_select(parent, ability, targets)
 end
 
 function apply_damage(parent, ability, targets)
-  stats = parent:stats()
-  target = targets:first()
+  local stats = parent:stats()
+  local target = targets:first()
   
-  max_dmg = 8 + stats.caster_level / 2
+  local max_dmg = 8 + stats.caster_level / 2
   target:take_damage(parent, 4, max_dmg, "Acid", 5)
 end

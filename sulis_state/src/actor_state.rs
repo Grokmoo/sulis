@@ -858,7 +858,7 @@ impl ActorState {
     }
 
     pub fn init_turn(&mut self) {
-        info!("Init turn for '{}' with overflow ap of {}", self.actor.name, self.overflow_ap());
+        debug!("Init turn for '{}' with overflow ap of {}", self.actor.name, self.overflow_ap());
         self.p_stats.init_turn(&self.stats);
         self.listeners.notify(&self);
     }

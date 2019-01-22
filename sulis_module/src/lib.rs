@@ -616,6 +616,13 @@ impl Module {
         })
     }
 
+    pub fn all_scripts() -> Vec<String> {
+        MODULE.with(|r| {
+            let module = r.borrow();
+            module.scripts.keys().map(|k| k.to_string()).collect()
+        })
+    }
+
     pub fn all_actors() -> Vec<Rc<Actor>> {
         MODULE.with(|r| all_resources(&r.borrow().actors))
     }

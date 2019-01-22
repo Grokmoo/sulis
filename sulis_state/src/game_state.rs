@@ -30,7 +30,7 @@ use sulis_module::on_trigger::QuestEntryState;
 use crate::{AI, AreaState, ChangeListener, ChangeListenerList, Effect,
     EntityState, Location, Formation, ItemList, ItemState, PartyStash, QuestStateSet,
     PathFinder, SaveState, UICallback, MOVE_TO_THRESHOLD, TurnManager, WorldMapState};
-use crate::script::{script_callback, ScriptCallback, Script};
+use crate::script::{script_cache, script_callback, ScriptCallback, Script};
 use crate::animation::{self, Anim, AnimState, AnimSaveState, particle_generator::Param};
 
 thread_local! {
@@ -76,6 +76,7 @@ impl GameState {
         MODAL_LOCKED.with(|c| c.set(false));
         ANIMS_TO_ADD.with(|anims| anims.borrow_mut().clear());
         AI.with(|ai| *ai.borrow_mut() = AI::new());
+        script_cache::setup().map_err(|e| Error::new(ErrorKind::InvalidInput, e))?;
 
         let game_state: Result<GameState, Error> = {
             let mut areas = HashMap::new();
@@ -250,6 +251,7 @@ impl GameState {
             mgr.borrow_mut().load(rules.compute_millis(starting_time));
         });
 
+        script_cache::setup().map_err(|e| Error::new(ErrorKind::InvalidInput, e))?;
         let game_state = GameState::new(pc_actor)?;
         STATE.with(|state| {
             *state.borrow_mut() = Some(game_state);

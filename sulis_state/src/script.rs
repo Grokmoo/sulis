@@ -494,21 +494,6 @@ impl ScriptData {
    }
 }
 
-fn get_script_from_entity(entity: &Rc<RefCell<EntityState>>) -> Result<ScriptData> {
-    let entity = entity.borrow();
-    let id = entity.unique_id();
-    match &entity.actor.actor.ai {
-        None => {
-            warn!("Script called for entity '{}' with no AI", id);
-            Err(rlua::Error::ToLuaConversionError {
-                from: "Entity",
-                to: "Script",
-                message: Some(format!("No script found for entity")),
-            })
-        }, Some(ai) => Ok(ScriptData::new(id, ai.script())),
-    }
-}
-
 fn get_script_from_id(id: &str) -> Result<ScriptData> {
     match Module::script(id) {
         None => Err(rlua::Error::ToLuaConversionError {
@@ -520,6 +505,20 @@ fn get_script_from_id(id: &str) -> Result<ScriptData> {
     }
 }
 
+fn get_script_from_entity(entity: &Rc<RefCell<EntityState>>) -> Result<ScriptData> {
+    let entity = entity.borrow();
+    let id = entity.unique_id();
+    match &entity.actor.actor.ai {
+        None => {
+            Err(rlua::Error::ToLuaConversionError {
+                from: "Entity",
+                to: "Script",
+                message: Some(format!("Script called for entity '{}' with no AI", id)),
+            })
+        }, Some(ai) => get_script_from_id(&ai.script),
+    }
+}
+
 fn get_item_script(item: &Rc<Item>) -> Result<ScriptData> {
     match &item.usable {
         None => Err(rlua::Error::ToLuaConversionError {
@@ -527,18 +526,18 @@ fn get_item_script(item: &Rc<Item>) -> Result<ScriptData> {
             to: "Item",
             message: Some(format!("The item is not usable {}", item.id).to_string()),
         }),
-        Some(usable) => Ok(ScriptData::new(&item.id, usable.script.clone()))
+        Some(usable) => get_script_from_id(&usable.script),
     }
 }
 
 fn get_ability_script(ability: &Rc<Ability>) -> Result<ScriptData> {
-    match ability.active {
+    match &ability.active {
         None => Err(rlua::Error::ToLuaConversionError {
             from: "Rc<Ability>",
             to: "ScriptAbility",
             message: Some("The Ability is not active".to_string()),
         }),
-        Some(ref active) => Ok(ScriptData::new(&ability.id, active.script.clone())),
+        Some(active) => get_script_from_id(&active.script),
     }
 }
 

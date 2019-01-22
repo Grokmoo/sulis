@@ -169,15 +169,15 @@ impl Item {
         let usable = match builder.usable {
             None => None,
             Some(usable) => {
-                let script = match module.scripts.get(&usable.script) {
+                match module.scripts.get(&usable.script) {
                     None => {
                         warn!("No script found with id '{}'", usable.script);
                         return unable_to_create_error("item", &builder.id);
-                    }, Some(ref script) => script.to_string(),
+                    }, Some(_) => (),
                 };
 
                 Some(Usable {
-                    script,
+                    script: usable.script,
                     consumable: usable.consumable,
                     duration: usable.duration,
                     ap: usable.ap,

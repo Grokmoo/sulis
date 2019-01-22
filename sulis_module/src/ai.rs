@@ -33,28 +33,24 @@ pub enum FuncKind {
 #[derive(Debug)]
 pub struct AITemplate {
     pub id: String,
-    script: String,
+    pub script: String,
     pub hooks: HashMap<FuncKind, String>,
 }
 
 impl AITemplate {
     pub fn new(builder: AITemplateBuilder, module: &Module) -> Result<AITemplate, Error> {
-        let script = match module.scripts.get(&builder.script) {
+        match module.scripts.get(&builder.script) {
             None => {
                 warn!("No script found with id '{}'", builder.script);
                 return unable_to_create_error("ai_template", &builder.id);
-            }, Some(ref script) => script.to_string(),
+            }, Some(_) => (),
         };
 
         Ok(AITemplate {
             id: builder.id,
-            script,
+            script: builder.script,
             hooks: builder.hooks,
         })
-    }
-
-    pub fn script(&self) -> String {
-        self.script.clone()
     }
 }
 

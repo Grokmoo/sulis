@@ -21,8 +21,22 @@ use std::collections::{HashSet, HashMap, VecDeque, vec_deque::Iter};
 use sulis_core::util::{gen_rand, Point};
 use sulis_module::{Faction, Module};
 use sulis_rules::{Time, ROUND_TIME_MILLIS};
-use crate::script::{CallbackData};
+use crate::script::{CallbackData, FuncKind};
 use crate::{AreaState, ChangeListener, ChangeListenerList, Effect, EntityState, GameState};
+
+fn add_campaign_elapsed_callback(cbs: &mut Vec<Rc<CallbackData>>) {
+    let script_data = match Module::campaign().on_round_elapsed_script {
+        None => return,
+        Some(ref data) => data.clone(),
+    };
+
+    let player = GameState::player();
+
+    let mut cb = CallbackData::new_trigger(player.borrow().index(), script_data.id);
+    cb.add_func(FuncKind::OnRoundElapsed, script_data.func).unwrap();
+
+    cbs.push(Rc::new(cb));
+}
 
 #[derive(Clone, Copy)]
 enum Entry {
@@ -102,11 +116,11 @@ impl TurnManager {
         self.add_millis_and_notify(rules.compute_millis(time));
     }
 
-    fn add_millis(&mut self, millis: u32) {
-        self.add_millis_and_notify(millis as usize);
+    fn add_millis(&mut self, millis: u32) -> bool {
+        self.add_millis_and_notify(millis as usize)
     }
 
-    fn add_millis_and_notify(&mut self, millis: usize) {
+    fn add_millis_and_notify(&mut self, millis: usize) -> bool {
         let prev_round = self.current_round();
         self.total_elapsed_millis += millis;
 
@@ -114,6 +128,9 @@ impl TurnManager {
         if prev_round != new_round {
             let time = self.current_time();
             self.time_listeners.notify(&time);
+            true
+        } else {
+            false
         }
     }
 
@@ -229,7 +246,8 @@ impl TurnManager {
         let mut turn_cbs = Vec::new();
         let elapsed_millis = if !self.combat_active { elapsed_millis } else { 0 };
 
-        self.add_millis(elapsed_millis);
+        let new_round = self.add_millis(elapsed_millis);
+        if new_round { add_campaign_elapsed_callback(&mut turn_cbs); }
 
         // removal just replaces some with none, so we can safely iterate
         for index in 0..self.effects.len() {
@@ -241,7 +259,13 @@ impl TurnManager {
         }
 
         for index in 0..self.entities.len() {
-            if self.update_entity(index, elapsed_millis) {
+            let (remove, cb) = self.update_entity(index, elapsed_millis, new_round);
+
+            if let Some(cb) = cb {
+                turn_cbs.push(cb);
+            }
+
+            if remove {
                 self.remove_entity(index);
             }
         }
@@ -260,15 +284,23 @@ impl TurnManager {
         (effect.is_removal(), cbs)
     }
 
-    fn update_entity(&mut self, index: usize, elapsed_millis: u32) -> bool {
+    #[must_use]
+    fn update_entity(&mut self, index: usize, elapsed_millis: u32,
+                     new_round: bool) -> (bool, Option<Rc<CallbackData>>) {
         let entity = match self.entities[index].as_ref() {
-            None => return false,
+            None => return (false, None),
             Some(entity) => entity,
         };
 
         let mut entity = entity.borrow_mut();
+        let cb = if new_round {
+            entity.ai_callbacks()
+        } else {
+            None
+        };
+
         entity.actor.elapse_time(elapsed_millis, &self.effects);
-        entity.is_marked_for_removal()
+        (entity.is_marked_for_removal(), cb)
     }
 
     #[must_use]
@@ -349,6 +381,9 @@ impl TurnManager {
                 Entry::Entity(index) => {
                     if let Some(entity) = &self.entities[index] {
                         entity.borrow_mut().actor.end_turn();
+                        if let Some(cb) = entity.borrow().ai_callbacks() {
+                            cbs.push(cb);
+                        }
                     }
 
                     self.order.push_back(Entry::Entity(index));
@@ -357,6 +392,7 @@ impl TurnManager {
                 Entry::TurnChange => {
                     self.add_millis(ROUND_TIME_MILLIS);
                     self.order.push_back(Entry::TurnChange);
+                    add_campaign_elapsed_callback(&mut cbs);
                 }
             }
         }

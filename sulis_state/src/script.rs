@@ -48,7 +48,10 @@ pub use self::script_effect::{ScriptActiveSurface, ScriptAppliedEffect,
     ScriptEffect, ScriptMenuSelection};
 
 mod script_entity;
-pub use self::script_entity::{ScriptEntity, ScriptEntitySet};
+pub use self::script_entity::{ScriptEntity};
+
+mod script_entity_set;
+pub use self::script_entity_set::ScriptEntitySet;
 
 mod script_interface;
 pub use self::script_interface::{ScriptInterface, entity_with_id};
@@ -109,12 +112,6 @@ impl Script {
         }
     }
 
-    pub fn item_on_activate(parent: &Rc<RefCell<EntityState>>, kind: ScriptItemKind) {
-        if let Err(e) = script_cache::item_on_activate(parent, kind) {
-            warn!("Error in item on_activate script: {}", e);
-        }
-    }
-
     pub fn entity(parent: &Rc<RefCell<EntityState>>, targets: ScriptEntitySet, func: &str) {
         let t: Option<usize> = None;
         if let Err(e) = script_cache::entity_script(parent, targets, t, func) {
@@ -133,11 +130,17 @@ impl Script {
 
     pub fn entity_with_arg<T>(parent: &Rc<RefCell<EntityState>>,
                               targets: ScriptEntitySet, arg: T, func: &str)
-        where T: rlua::UserData + Send + 'static {
-            if let Err(e) = script_cache::entity_script(parent, targets, Some(arg), func) {
-                warn!("Error in entity with arg script '{}': {}", func, e);
-            }
+    where T: rlua::UserData + Send + 'static {
+        if let Err(e) = script_cache::entity_script(parent, targets, Some(arg), func) {
+            warn!("Error in entity with arg script '{}': {}", func, e);
         }
+    }
+
+    pub fn item_on_activate(parent: &Rc<RefCell<EntityState>>, kind: ScriptItemKind) {
+        if let Err(e) = script_cache::item_on_activate(parent, kind) {
+            warn!("Error in item on_activate script: {}", e);
+        }
+    }
 
     pub fn item(parent: &Rc<RefCell<EntityState>>, kind: ScriptItemKind,
                 targets: ScriptEntitySet, func: &str) {
@@ -226,32 +229,11 @@ impl Script {
         }
     }
 
-    pub fn trigger(script_id: &str, func: &str, parent: &Rc<RefCell<EntityState>>,
-                   target: &Rc<RefCell<EntityState>>) {
-        let t: Option<usize> = None;
-        if let Err(e) = script_cache::trigger_script(script_id, func, parent, target, t) {
+    pub fn trigger<Arg>(script_id: &str, func: &str, arg: Arg)
+        where Arg: for<'a> ToLuaMulti<'a> {
+
+        if let Err(e) = script_cache::trigger_script(script_id, func, arg) {
             warn!("Error in trigger script '{}/{}': {}", script_id, func, e);
-        }
-    }
-
-    pub fn trigger_with_attack_data(script_id: &str, func: &str,
-                                    parent: &Rc<RefCell<EntityState>>,
-                                    target: &Rc<RefCell<EntityState>>,
-                                    kind: HitKind, damage: Vec<(DamageKind, u32)>) {
-        let t = Some(ScriptHitKind::new(kind, damage));
-        if let Err(e) = script_cache::trigger_script(script_id, func, parent, target, t) {
-            warn!("Error in trigger with attack data script '{}/{}': {}", script_id, func, e);
-        }
-    }
-
-    pub fn trigger_with_arg<T>(script_id: &str, func: &str,
-                               parent: &Rc<RefCell<EntityState>>,
-                               target: &Rc<RefCell<EntityState>>, arg: T)
-        where T: rlua::UserData + Send + 'static {
-
-        if let Err(e) = script_cache::trigger_script(script_id, func, parent,
-                                                          target, Some(arg)) {
-              warn!("Error in trigger with arg script '{}/{}': {}", script_id, func, e);
         }
     }
 }
@@ -331,8 +313,8 @@ impl ScriptState {
         };
         let total = get_elapsed_millis(time);
         let mem = (self.lua.used_memory() as f32) / 1024.0;
-        info!("Script Execution '{}:{}' - Total: {:.3} millis", self.id, func, total);
-        info!("  Memory Allocated: {:.3} KB / Instruction Count: ~{}", mem, count);
+        info!("Executed Lua '{}:{}': {:.3} millis, {:.3} KB, ~{} Instructions",
+              self.id, func, total, mem, count);
     }
 
     fn reset_instruction_state(&self) {
@@ -349,7 +331,7 @@ impl ScriptState {
     }
 
     pub (in crate::script) fn exec_func<Args, Ret>(&self, function: &str,
-                                                   args: Args) -> Result<Ret>
+                                                   args: Args, report: bool) -> Result<Ret>
         where Args: for<'a> ToLuaMulti<'a>, Ret: for<'a> FromLuaMulti<'a> {
 
         let cur_depth = self.current_depth.get();
@@ -357,18 +339,18 @@ impl ScriptState {
             self.reset_instruction_state();
         }
         self.current_depth.set(cur_depth + 1);
-        info!("Exec '{}:{}' with depth of {}", self.id, function, cur_depth + 1);
+        if report { debug!("Exec '{}:{}' with depth of {}", self.id, function, cur_depth + 1); }
         let result = self.lua.context(|lua| {
             let func: Function = lua.globals().get(function)?;
             func.call(args)
         });
         self.lua.gc_collect()?;
-        self.print_report(function);
+        if report { self.print_report(function); }
         self.current_depth.set(cur_depth);
         result
     }
 
-    pub fn console(&self, script: String, party: &Vec<Rc<RefCell<EntityState>>>) -> Result<String> {
+    pub fn console(&self, script: String, party: &[Rc<RefCell<EntityState>>]) -> Result<String> {
         assert!(party.len() > 0);
         self.reset_instruction_state();
         let result = self.lua.context(|lua| {

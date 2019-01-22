@@ -201,7 +201,10 @@ impl EntityState {
                     ai::FuncKind::OnDamaged => cbs.add_func(script::FuncKind::OnDamaged, func),
                     ai::FuncKind::BeforeAttack => cbs.add_func(script::FuncKind::BeforeAttack, func),
                     ai::FuncKind::AfterAttack => cbs.add_func(script::FuncKind::AfterAttack, func),
-                    ai::FuncKind::BeforeDefense => cbs.add_func(script::FuncKind::BeforeDefense, func),
+                    ai::FuncKind::BeforeDefense =>
+                        cbs.add_func(script::FuncKind::BeforeDefense, func),
+                    ai::FuncKind::OnRoundElapsed =>
+                        cbs.add_func(script::FuncKind::OnRoundElapsed, func),
                 };
                 result.unwrap();
             }
@@ -211,6 +214,10 @@ impl EntityState {
         if self.unique_id.len() == 0 {
             self.unique_id = format!("__uid__{}{}", self.actor.actor.id, index);
         }
+    }
+
+    pub fn ai_callbacks(&self) -> Option<Rc<CallbackData>> {
+        self.ai_callbacks.clone()
     }
 
     pub fn callbacks(&self, mgr: &TurnManager) -> Vec<Rc<CallbackData>> {
@@ -442,6 +449,7 @@ impl EntityState {
 
         let mgr = GameState::turn_manager();
         let cbs = entity.borrow().callbacks(&mgr.borrow());
+        info!("Got {} cbs for {}", cbs.len(), entity.borrow().unique_id());
         cbs.iter().for_each(|cb| cb.on_damaged(&targets, hit_kind, damage.clone()));
 
         let hp = entity.borrow().actor.hp();

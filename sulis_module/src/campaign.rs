@@ -91,6 +91,8 @@ pub struct Campaign {
     pub backstory_conversation: Rc<Conversation>,
     pub max_starting_level: u32,
     pub on_party_death_script: on_trigger::ScriptData,
+    pub on_tick_script: Option<on_trigger::ScriptData>,
+    pub on_round_elapsed_script: Option<on_trigger::ScriptData>,
     pub world_map: WorldMap,
     pub group: Option<CampaignGroup>,
 }
@@ -138,6 +140,8 @@ impl Campaign {
             id: builder.id,
             max_starting_level: builder.max_starting_level,
             on_party_death_script: builder.on_party_death_script,
+            on_tick_script: builder.on_tick_script,
+            on_round_elapsed_script: builder.on_round_elapsed_script,
             world_map: WorldMap {
                 size: builder.world_map.size,
                 offset: builder.world_map.offset,
@@ -160,6 +164,8 @@ pub struct CampaignBuilder {
     pub backstory_conversation: String,
     pub max_starting_level: u32,
     pub on_party_death_script: on_trigger::ScriptData,
+    pub on_tick_script: Option<on_trigger::ScriptData>,
+    pub on_round_elapsed_script: Option<on_trigger::ScriptData>,
     pub world_map: WorldMapBuilder,
 }
 

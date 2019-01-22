@@ -15,11 +15,6 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::collections::HashMap;
-use std::io::Error;
-
-use sulis_core::util::{unable_to_create_error};
-
-use crate::{Module};
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialOrd, Ord, Hash, PartialEq, Eq, Debug)]
 #[serde(deny_unknown_fields)]
@@ -28,35 +23,12 @@ pub enum FuncKind {
     BeforeAttack,
     AfterAttack,
     BeforeDefense,
-}
-
-#[derive(Debug)]
-pub struct AITemplate {
-    pub id: String,
-    pub script: String,
-    pub hooks: HashMap<FuncKind, String>,
-}
-
-impl AITemplate {
-    pub fn new(builder: AITemplateBuilder, module: &Module) -> Result<AITemplate, Error> {
-        match module.scripts.get(&builder.script) {
-            None => {
-                warn!("No script found with id '{}'", builder.script);
-                return unable_to_create_error("ai_template", &builder.id);
-            }, Some(_) => (),
-        };
-
-        Ok(AITemplate {
-            id: builder.id,
-            script: builder.script,
-            hooks: builder.hooks,
-        })
-    }
+    OnRoundElapsed,
 }
 
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
-pub struct AITemplateBuilder {
+pub struct AITemplate {
     pub id: String,
     pub script: String,
     pub hooks: HashMap<FuncKind, String>,

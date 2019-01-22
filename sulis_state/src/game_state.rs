@@ -30,7 +30,7 @@ use sulis_module::on_trigger::QuestEntryState;
 use crate::{AI, AreaState, ChangeListener, ChangeListenerList, Effect,
     EntityState, Location, Formation, ItemList, ItemState, PartyStash, QuestStateSet,
     PathFinder, SaveState, UICallback, MOVE_TO_THRESHOLD, TurnManager, WorldMapState};
-use crate::script::{script_cache, script_callback, ScriptCallback, Script};
+use crate::script::{script_cache, script_callback, ScriptCallback, Script, ScriptEntity};
 use crate::animation::{self, Anim, AnimState, AnimSaveState, particle_generator::Param};
 
 thread_local! {
@@ -551,7 +551,7 @@ impl GameState {
             }
 
             let script = &Module::campaign().on_party_death_script;
-            Script::trigger(&script.id, &script.func, &member, &member);
+            Script::trigger(&script.id, &script.func, ScriptEntity::from(member));
 
             {
                 let member = member.borrow();
@@ -954,6 +954,14 @@ impl GameState {
         }
 
         GameState::handle_disabled_party_members();
+
+        let campaign = Module::campaign();
+        if let Some(script_data) = &campaign.on_tick_script {
+            script_cache::set_report_enabled(false);
+            let arg: Option<bool> = None;
+            Script::trigger(&script_data.id, &script_data.func, arg);
+            script_cache::set_report_enabled(true);
+        }
 
         ui_cb
     }

@@ -15,6 +15,12 @@ description: |
   This is intended for a character who has completed the Prologue.  New characters may also be used - they will be given an appropriate level of experience and money to start the campaign.
 backstory_conversation: backstory
 max_starting_level: 5
+on_round_elapsed_script:
+  id: campaign
+  func: on_round_elapsed
+on_tick_script:
+  id: campaign
+  func: on_tick
 on_party_death_script:
   id: campaign
   func: on_party_death

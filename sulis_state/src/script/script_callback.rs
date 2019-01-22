@@ -324,7 +324,7 @@ impl CallbackData {
                 Script::entity(&parent, targets, &func);
             },
             Kind::Script(script) => {
-                Script::trigger(&script, &func, &parent, &parent);
+                Script::trigger(&script, &func, ScriptEntity::from(&parent));
             }
         }
     }
@@ -352,7 +352,7 @@ impl CallbackData {
                 Script::entity_with_arg(&parent, targets, arg, &func);
             },
             Kind::Script(script) => {
-                Script::trigger_with_arg(&script, &func, &parent, &parent, arg);
+                Script::trigger(&script, &func, (ScriptEntity::from(&parent), arg));
             }
         }
     }
@@ -381,8 +381,8 @@ impl CallbackData {
                 Script::entity_with_attack_data(&parent, targets, hit_kind, damage, &func);
             },
             Kind::Script(script) => {
-                Script::trigger_with_attack_data(&script, &func, &parent, &parent,
-                                                 hit_kind, damage);
+                Script::trigger(&script, &func,
+                    (ScriptEntity::from(&parent), ScriptHitKind::new(hit_kind, damage)));
             }
         }
     }

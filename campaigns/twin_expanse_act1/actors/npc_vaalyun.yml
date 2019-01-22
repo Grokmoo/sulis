@@ -13,6 +13,7 @@ attributes:
   wis: 10
 conversation: vaalyun
 faction: Friendly
+ai: ai_vaalyun
 images:
   Hair: creatures/hair08
 hue: 0.3

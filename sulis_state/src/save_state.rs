@@ -441,6 +441,11 @@ impl EntitySaveState {
                 }
             }
 
+            let ai = match &actor.ai {
+                None => None,
+                Some(ai) => Some(ai.id.to_string()),
+            };
+
             Some(ActorBuilder {
                 id: actor.id.to_string(),
                 name: actor.name.to_string(),
@@ -459,7 +464,7 @@ impl EntitySaveState {
                 xp: Some(actor.xp),
                 reward,
                 abilities,
-                ai: None,
+                ai,
             })
         } else {
             None

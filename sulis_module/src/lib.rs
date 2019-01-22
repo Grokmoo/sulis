@@ -117,7 +117,6 @@ use sulis_core::resource::*;
 use self::area::Tile;
 use self::ability::AbilityBuilder;
 use self::ability_list::AbilityListBuilder;
-use self::ai::AITemplateBuilder;
 use self::conversation::ConversationBuilder;
 use self::cutscene::CutsceneBuilder;
 use self::area::AreaBuilder;
@@ -425,8 +424,7 @@ impl Module {
             }
 
             for (id, builder) in builder_set.ai_builders {
-                insert_if_ok("ai_template", id, AITemplate::new(builder, &module),
-                    &mut module.ai_templates);
+                module.ai_templates.insert(id, Rc::new(builder));
             }
 
             for (id, builder) in builder_set.ability_builders {
@@ -693,7 +691,7 @@ struct ModuleBuilder {
     ability_builders: HashMap<String, AbilityBuilder>,
     ability_list_builders: HashMap<String, AbilityListBuilder>,
     actor_builders: HashMap<String, ActorBuilder>,
-    ai_builders: HashMap<String, AITemplateBuilder>,
+    ai_builders: HashMap<String, AITemplate>,
     area_builders: HashMap<String, AreaBuilder>,
     class_builders: HashMap<String, ClassBuilder>,
     cutscene_builders: HashMap<String, CutsceneBuilder>,

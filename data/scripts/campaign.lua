@@ -1,3 +1,11 @@
+function on_tick()
+
+end
+
+function on_round_elapsed()
+
+end
+
 function on_rest(parent)
   game:show_confirm("Rest now for 8 hours?", "Yes", "No", "campaign", "fire_rest")
 end

@@ -17,7 +17,7 @@
 use std::time::{Instant, Duration};
 use std::collections::HashMap;
 use std::rc::Rc;
-use std::cell::RefCell;
+use std::cell::{Cell, RefCell};
 
 use rlua::{self, ToLuaMulti, FromLuaMulti, ToLua};
 
@@ -29,6 +29,7 @@ use crate::script::{Result, ScriptState, ScriptEntity, ScriptEntitySet,
 
 thread_local! {
     static SCRIPT_CACHE: RefCell<HashMap<String, Rc<ScriptState>>> = RefCell::new(HashMap::new());
+    static REPORTING: Cell<bool> = Cell::new(true);
 }
 
 pub fn setup() -> Result<()> {
@@ -50,6 +51,10 @@ pub fn setup() -> Result<()> {
     Ok(())
 }
 
+pub fn set_report_enabled(enabled: bool) {
+    REPORTING.with(|r| r.set(enabled));
+}
+
 pub fn exec_func<Args, Ret>(id: &str, func: &str, args: Args) -> Result<Ret>
     where Args: for<'a> ToLuaMulti<'a>, Ret: for<'a> FromLuaMulti<'a> {
 
@@ -68,7 +73,9 @@ pub fn exec_func<Args, Ret>(id: &str, func: &str, args: Args) -> Result<Ret>
         Ok(Rc::clone(&cache.get(id).unwrap()))
     })?;
 
-    state.exec_func(func, args)
+    let reporting = REPORTING.with(|r| r.get());
+
+    state.exec_func(func, args, reporting)
 }
 
 pub fn ai_script(parent: &Rc<RefCell<EntityState>>, func: &str) -> Result<ai::State> {
@@ -154,14 +161,10 @@ pub fn ability_script<T>(parent: &Rc<RefCell<EntityState>>, ability: &Rc<Ability
     exec_func(&script, func, (parent, ability, targets, arg))
 }
 
-pub fn trigger_script<T>(script_id: &str, func: &str,
-                         parent: &Rc<RefCell<EntityState>>, target: &Rc<RefCell<EntityState>>,
-                         arg: Option<T>) -> Result<()>
-where T: for<'a> ToLua<'a> + Send {
+pub fn trigger_script<Args>(script_id: &str, func: &str, args: Args) -> Result<()>
+    where Args: for<'a> ToLuaMulti<'a> {
 
-    let parent = ScriptEntity::from(parent);
-    let target = ScriptEntity::from(target);
-    exec_func(script_id, func, (parent, target, arg))
+    exec_func(script_id, func, args)
 }
 
 fn get_script_id_from_entity(entity: &Rc<RefCell<EntityState>>) -> Result<String> {

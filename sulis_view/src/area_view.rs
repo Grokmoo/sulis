@@ -126,10 +126,10 @@ impl AreaView {
         self.scroll_target = Some((x, y));
     }
 
-    fn get_cursor_pos(&self, widget: &Rc<RefCell<Widget>>) -> (i32, i32) {
+    fn get_cursor_pos(&self, widget: &Rc<RefCell<Widget>>) -> (f32, f32) {
         let pos = widget.borrow().state.inner_position;
         let (x, y) = self.get_cursor_pos_scaled(pos.x, pos.y);
-        ((x + self.scroll.x()) as i32, (y + self.scroll.y()) as i32)
+        ((x + self.scroll.x()), (y + self.scroll.y()))
     }
 
     fn get_cursor_pos_scaled(&self, pos_x: i32, pos_y: i32) -> (f32, f32) {
@@ -420,7 +420,7 @@ impl AreaView {
         }
     }
 
-    fn set_cursor(&mut self, x: i32, y: i32) {
+    fn set_cursor(&mut self, x: f32, y: f32) {
         let action = action_kind::get_action(x, y);
         Cursor::set_cursor_state(action.cursor_state());
         match action.get_hover_info() {
@@ -451,7 +451,7 @@ impl AreaView {
         }
 
         let (area_x, area_y) = self.get_cursor_pos(widget);
-        match self.check_mouseover(area_x, area_y) {
+        match self.check_mouseover(area_x as i32, area_y as i32) {
             None => {
                 self.clear_area_mouseover();
             },
@@ -792,7 +792,7 @@ impl WidgetKind for AreaView {
     fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: ClickKind) -> bool {
         self.super_on_mouse_release(widget, kind);
         let (x, y) = self.get_cursor_pos(widget);
-        if x < 0 || y < 0 { return true; }
+        if x < 0.0 || y < 0.0 { return true; }
 
         if kind == ClickKind::Middle { return true; }
 

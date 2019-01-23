@@ -24,26 +24,17 @@ use sulis_module::{Faction, Module, ObjectSize, area::ToKind};
 use sulis_state::{MOVE_TO_THRESHOLD, EntityState, GameState, ScriptCallback, AreaState, PropState};
 use crate::{dialog_window, RootView};
 
-pub fn get_action(x: i32, y: i32) -> Box<ActionKind> {
+pub fn get_action(x_f32: f32, y_f32: f32) -> Box<ActionKind> {
+    let (x, y) = (x_f32 as i32, y_f32 as i32);
     let area_state = GameState::area_state();
     if !area_state.borrow().area.coords_valid(x, y) { return Box::new(InvalidAction {}); }
     if !area_state.borrow().is_pc_explored(x, y) { return Box::new(InvalidAction {}); }
 
-    if let Some(action) = SelectAction::create_if_valid(x, y) { return action; }
+    if let Some(action) = SelectAction::create_if_valid(x_f32, y_f32) { return action; }
     if let Some(action) = AttackAction::create_if_valid(x, y) { return action; }
     if let Some(action) = DialogAction::create_if_valid(x, y) { return action; }
 
     if let Some(action) = get_prop_or_transition_action(x, y) { return action; }
-
-    // if let Some(action) = LootPropAction::create_if_valid(x, y) { return action; }
-    //
-    // // open door
-    // if let Some(action) = DoorPropAction::create_if_valid(x, y, true) { return action; }
-    //
-    // if let Some(action) = TransitionAction::create_if_valid(x, y) { return action; }
-    //
-    // // close door
-    // if let Some(action) = DoorPropAction::create_if_valid(x, y, false) { return action; }
 
     if let Some(action) = MoveAction::create_if_valid(x as f32, y as f32, None) { return action; }
 
@@ -97,16 +88,22 @@ struct SelectAction {
 }
 
 impl SelectAction {
-    fn create_if_valid(x: i32, y: i32) -> Option<Box<ActionKind>> {
+    fn create_if_valid(x: f32, y: f32) -> Option<Box<ActionKind>> {
         let area_state = GameState::area_state();
         let area_state = area_state.borrow();
-        let target = match area_state.get_entity_at(x, y) {
+        let target = match area_state.get_entity_at(x as i32, y as i32) {
             None => return None,
             Some(ref entity) => {
                 if !entity.borrow().is_party_member() { return None; }
                 Rc::clone(entity)
             }
         };
+
+        let (x, y) = ((x - 0.5) as i32, (y - 0.5) as i32);
+        match area_state.get_entity_at(x, y) {
+            None => return None,
+            Some(_) => (),
+        }
 
         Some(Box::new(SelectAction {
             target,

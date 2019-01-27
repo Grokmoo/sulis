@@ -31,11 +31,11 @@ use crate::image::simple_image::SimpleImageBuilder;
 use crate::image::composed_image::ComposedImageBuilder;
 use crate::image::timer_image::TimerImageBuilder;
 use crate::image::animated_image::AnimatedImageBuilder;
-use crate::ui::theme::{ThemeBuilder, create_theme};
+use crate::ui::{ThemeBuilderSet};
 
 #[derive(Debug)]
 pub struct ResourceBuilderSet {
-    pub theme_builder: ThemeBuilder,
+    pub theme_builder: ThemeBuilderSet,
     pub simple_builders: HashMap<String, SimpleImageBuilder>,
     pub composed_builders: HashMap<String, ComposedImageBuilder>,
     pub timer_builders: HashMap<String, TimerImageBuilder>,
@@ -45,13 +45,22 @@ pub struct ResourceBuilderSet {
 }
 
 impl ResourceBuilderSet {
-    pub fn from_yaml(resources: &mut YamlResourceSet,
-                     theme_dir: &str) -> Result<ResourceBuilderSet, Error> {
-        let theme_builder = build_theme(theme_dir)?;
+    pub fn from_yaml(resources: &mut YamlResourceSet) -> Result<ResourceBuilderSet, Error> {
+        let theme_builders: HashMap<String, ThemeBuilderSet> = read_builders(resources, Theme)?;
+        let mut themes_out = HashMap::new();
+        for (_, theme_map) in theme_builders {
+            for (id, theme) in theme_map.themes {
+                if themes_out.contains_key(&id) {
+                    warn!("Overwritting theme '{}'", id);
+                }
+
+                themes_out.insert(id, theme);
+            }
+        }
 
         use self::YamlResourceKind::*;
         Ok(ResourceBuilderSet {
-            theme_builder,
+            theme_builder: ThemeBuilderSet { themes: themes_out },
             font_builders: read_builders_insert_dirs(resources, Font)?,
             simple_builders: read_builders(resources, SimpleImage)?,
             composed_builders: read_builders(resources, ComposedImage)?,
@@ -140,16 +149,6 @@ fn read_builder_internal<T: serde::de::DeserializeOwned>(value: serde_yaml::Valu
         Ok(res) => Ok(res),
         Err(e) => Err(Error::new(ErrorKind::InvalidData, format!("{}", e))),
     }
-}
-
-fn build_theme(theme_dir: &str) -> Result<ThemeBuilder, Error> {
-    info!("Reading theme from '{}'", theme_dir);
-
-    let mut theme_builder = create_theme(theme_dir, "theme")?;
-
-    theme_builder.expand_references()?;
-
-    Ok(theme_builder)
 }
 
 pub fn write_json_to_file<T: serde::ser::Serialize,

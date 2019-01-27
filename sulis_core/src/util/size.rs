@@ -21,7 +21,7 @@ use crate::ui::Border;
 
 pub static ZERO_SIZE: Size = Size { width: 0, height: 0 };
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+#[derive(Copy, Clone, Debug, Default, PartialEq, Eq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Size {
     pub width: i32,
@@ -29,21 +29,10 @@ pub struct Size {
 }
 
 impl Size {
-    pub fn as_zero() -> Size {
-        Size { width: 0, height: 0 }
-    }
-
     pub fn new(width: i32, height: i32) -> Size {
         Size {
             width,
             height,
-        }
-    }
-
-    pub fn from(other: &Size) -> Size {
-        Size {
-            width: other.width,
-            height: other.height,
         }
     }
 
@@ -52,6 +41,10 @@ impl Size {
             width: vals.0,
             height: vals.1,
         }
+    }
+
+    pub fn as_tuple(&self) -> (i32, i32) {
+        (self.width, self.height)
     }
 
     pub fn inner(&self, border: &Border) -> Size {

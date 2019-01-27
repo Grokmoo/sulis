@@ -34,6 +34,7 @@ pub enum YamlResourceKind {
     TopLevel,
     Skip,
 
+    Theme,
     Font,
     AnimatedImage,
     ComposedImage,
@@ -76,6 +77,7 @@ impl YamlResourceKind {
     fn from_str(s: &str) -> Option<YamlResourceKind> {
         use self::YamlResourceKind::*;
         Some(match s {
+            "themes" => Theme,
             "fonts" => Font,
             "images/animated" | "images\\animated" => AnimatedImage,
             "images/composed" | "images\\composed" => ComposedImage,

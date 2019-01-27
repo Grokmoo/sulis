@@ -14,33 +14,17 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-#[derive(Deserialize, Debug, Copy, Clone)]
-#[serde(deny_unknown_fields)]
+#[derive(Default, Deserialize, Debug, Copy, Clone)]
+#[serde(deny_unknown_fields, default)]
 pub struct Border {
-    #[serde(default)]
     pub top: i32,
-
-    #[serde(default)]
     pub bottom: i32,
-
-    #[serde(default)]
     pub left: i32,
-
-    #[serde(default)]
     pub right: i32,
 }
 
 impl Border {
-    pub fn as_zero() -> Border {
-        Border {
-            top: 0,
-            bottom: 0,
-            left: 0,
-            right: 0,
-        }
-    }
-
-    pub fn as_uniform(border: i32) -> Border {
+    pub fn uniform(border: i32) -> Border {
         Border {
             top: border,
             bottom: border,

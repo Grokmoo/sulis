@@ -15,21 +15,22 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::mem;
-use std::io::{Error, ErrorKind};
+use std::io::{Error};
 use std::rc::Rc;
 use std::cell::{Ref, RefCell};
 
+use crate::config::Config;
 use crate::io::{event, Event, GraphicsRenderer};
 use crate::ui::{Cursor, EmptyWidget, Theme, WidgetState, WidgetKind};
 use crate::resource::ResourceSet;
-use crate::util::{invalid_data_error, Point};
+use crate::util::{Point, Size};
 
 pub struct Widget {
     pub state: WidgetState,
     pub kind: Rc<RefCell<WidgetKind>>,
     pub children: Vec<Rc<RefCell<Widget>>>,
-    pub theme: Option<Rc<Theme>>,
-    pub theme_id: String,
+    pub theme: Rc<Theme>,
+    theme_id: String,
     pub theme_subname: String,
 
     modal_child: Option<Rc<RefCell<Widget>>>,
@@ -42,6 +43,8 @@ pub struct Widget {
 }
 
 impl Widget {
+    pub fn theme_id(&self) -> &str { &self.theme_id }
+
     pub fn has_modal(&self) -> bool {
         self.modal_child.is_some()
     }
@@ -50,11 +53,10 @@ impl Widget {
         if !self.state.visible { return; }
 
         if let Some(ref image) = self.state.background {
-            let x = self.state.position.x as f32;
-            let y = self.state.position.y as f32;
-            let w = self.state.size.width as f32;
-            let h = self.state.size.height as f32;
-            image.draw(renderer, &self.state.animation_state, x, y, w, h, millis);
+            let (x, y) = self.state.position().as_tuple();
+            let (w, h) = self.state.size().as_tuple();
+            image.draw(renderer, &self.state.animation_state, x as f32, y as f32,
+                       w as f32, h as f32, millis);
         }
 
         self.kind.borrow_mut().draw(renderer, pixel_size, &self, millis);
@@ -65,10 +67,10 @@ impl Widget {
             child.draw(renderer, pixel_size, millis);
 
             if let Some(ref image) = child.state.foreground {
-                let x = child.state.inner_position.x as f32;
-                let y = child.state.inner_position.y as f32;
-                let w = child.state.inner_size.width as f32;
-                let h = child.state.inner_size.height as f32;
+                let x = child.state.inner_left() as f32;
+                let y = child.state.inner_top() as f32;
+                let w = child.state.inner_width() as f32;
+                let h = child.state.inner_height() as f32;
                 image.draw(renderer, &child.state.animation_state, x, y, w, h, millis);
             }
         }
@@ -112,15 +114,11 @@ impl Widget {
     }
 
     pub fn do_self_layout(&mut self) {
-        let theme = match self.theme {
-            None => return,
-            Some(ref t) => t,
-        };
-
+        let theme = &self.theme;
         theme.apply_background(&mut self.state);
         theme.apply_foreground(&mut self.state);
 
-        if let Some(font) = ResourceSet::get_font(&theme.text_params.font) {
+        if let Some(font) = ResourceSet::font(&theme.text_params.font) {
             self.state.font = Some(font);
         } else if theme.text.is_some() {
             warn!("Font '{}' not found for widget '{}' which has text.",
@@ -134,18 +132,13 @@ impl Widget {
     }
 
     pub fn do_children_layout(&self) {
-        let theme = match self.theme {
-            None => return,
-            Some(ref t) => Rc::clone(t),
-        };
-
-        theme.layout.layout(self);
+        self.theme.layout.layout(self);
     }
 
     fn layout_widget(&mut self) {
         if self.marked_for_layout {
             trace!("Performing layout on widget '{}' with size {:?} at {:?}",
-                   self.theme_id, self.state.size, self.state.position);
+                   self.theme_id, self.state.size(), self.state.position());
             let kind = Rc::clone(&self.kind);
             kind.borrow_mut().layout(self);
             self.marked_for_layout = false;
@@ -171,7 +164,7 @@ impl Widget {
             keyboard_focus_child: None,
             parent: None,
             marked_for_layout: true,
-            theme: None,
+            theme: ResourceSet::default_theme(),
             theme_id: String::new(),
             theme_subname: theme.to_string(),
             marked_for_removal: false,
@@ -400,7 +393,7 @@ impl Widget {
 
         trace!("Add mouse over from '{}'", widget.borrow().theme_id);
         mouse_over.borrow_mut().state.is_mouse_over = true;
-        mouse_over.borrow_mut().state.position = Point::new(x, y);
+        mouse_over.borrow_mut().state.set_position(x, y);
         Widget::add_child_to(&root, mouse_over);
     }
 
@@ -515,32 +508,24 @@ impl Widget {
         }
     }
 
+    pub(in crate::ui) fn setup_root(root: &Rc<RefCell<Widget>>) {
+        let (ui_x, ui_y) = Config::ui_size();
+        let mut root = root.borrow_mut();
+        root.state.set_size(Size::new(ui_x, ui_y));
+        root.theme_id = root.theme_subname.clone();
+        root.theme = ResourceSet::theme(&root.theme_id);
+    }
+
     pub fn check_children(parent: &Rc<RefCell<Widget>>) -> Result<(), Error> {
         // set up theme
-        if parent.borrow().theme.is_none() {
+        if parent.borrow().theme_id.is_empty() {
             let parent_parent = Widget::get_parent(parent);
 
-            let parent_parent_theme = match parent_parent.borrow().theme {
-                None => {
-                    let parent_parent_ref = parent_parent.borrow();
-                    return invalid_data_error(&format!("No theme exists for {}",
-                            parent_parent_ref.kind.borrow().get_name()));
-                }, Some(ref t) => Rc::clone(&t),
-            };
-
             let mut parent = parent.borrow_mut();
-            let parent_name = parent.theme_subname.clone();
-            parent.theme_id = format!("{}.{}", &parent_parent.borrow().theme_id,
-                parent_name);
-            let parent_theme = parent_parent_theme.children.get(&parent_name);
+            let parent_name = &parent.theme_subname;
+            parent.theme_id = format!("{}.{}", &parent_parent.borrow().theme_id, parent_name);
 
-            parent.theme = Some(match parent_theme {
-                None => return Err(Error::new(ErrorKind::InvalidData,
-                            format!("No theme exists for {}", parent.theme_id))),
-                Some(ref t) => Rc::clone(&t),
-            });
-
-            trace!("Got theme for {:?}", parent.theme_id);
+            parent.theme = ResourceSet::theme(&parent.theme_id);
         }
 
         // set up parent references

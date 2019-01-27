@@ -145,9 +145,9 @@ impl<'a> GliumRenderer<'a> {
 
         trace!("Creating texture for ID '{}' of type '{:?}'", texture_id, draw_list.kind);
         let image = match draw_list.kind {
-            DrawListKind::Sprite => ResourceSet::get_spritesheet(&texture_id)
+            DrawListKind::Sprite => ResourceSet::spritesheet(&texture_id)
                 .unwrap().image.clone(),
-            DrawListKind::Font => ResourceSet::get_font(&texture_id)
+            DrawListKind::Font => ResourceSet::font(&texture_id)
                 .unwrap().image.clone(),
         };
 

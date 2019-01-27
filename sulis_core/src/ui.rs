@@ -49,7 +49,10 @@ mod layout_kind;
 pub use self::layout_kind::LayoutKind;
 
 pub mod theme;
-pub use self::theme::Theme;
+pub use self::theme::{Theme, ThemeSet};
+
+pub mod theme_builder;
+pub use self::theme_builder::{ThemeBuilder, ThemeBuilderSet};
 
 pub mod widget;
 pub use self::widget::Widget;
@@ -64,18 +67,12 @@ pub use self::widget_state::WidgetState;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use crate::config::Config;
-use crate::resource::ResourceSet;
 use crate::util::{Point, Size};
 
 pub fn create_ui_tree(kind: Rc<RefCell<WidgetKind>>) -> Rc<RefCell<Widget>> {
-
     debug!("Creating UI tree.");
     let root = Widget::with_defaults(kind);
-    let (ui_x, ui_y) = Config::ui_size();
-    root.borrow_mut().state.set_size(Size::new(ui_x, ui_y));
-    root.borrow_mut().theme = Some(ResourceSet::get_theme());
-
+    Widget::setup_root(&root);
     root
 }
 

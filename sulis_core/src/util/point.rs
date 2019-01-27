@@ -20,7 +20,7 @@ use std::cmp;
 
 use crate::ui::Border;
 
-#[derive(Copy, Clone, Deserialize, Serialize, Eq, Hash, PartialEq, Ord)]
+#[derive(Copy, Clone, Default, Deserialize, Serialize, Eq, Hash, PartialEq, Ord)]
 #[serde(deny_unknown_fields)]
 pub struct Point {
     pub x: i32,
@@ -38,10 +38,6 @@ impl Point {
         self.x + self.y * 65536
     }
 
-    pub fn as_zero() -> Point {
-        Point { x: 0, y: 0 }
-    }
-
     pub fn new(x: i32, y: i32) -> Point {
         Point { x, y }
     }
@@ -56,6 +52,10 @@ impl Point {
 
     pub fn from_tuple(other: (u32, u32)) -> Point {
         Point { x: other.0 as i32, y: other.1 as i32 }
+    }
+
+    pub fn as_tuple(&self) -> (i32, i32) {
+        (self.x, self.y)
     }
 
     pub fn mult_mut(&mut self, val: i32) {

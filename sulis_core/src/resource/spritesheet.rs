@@ -67,8 +67,8 @@ impl Sprite {
         format!("{}/{}", self.sheet_id, self.sprite_id)
     }
 
-    pub fn get_spritesheet(&self) -> Rc<Spritesheet> {
-        ResourceSet::get_spritesheet(&self.sheet_id).unwrap()
+    pub fn spritesheet(&self) -> Rc<Spritesheet> {
+        ResourceSet::spritesheet(&self.sheet_id).unwrap()
     }
 }
 
@@ -104,7 +104,7 @@ impl Spritesheet {
         let multiplier = builder.grid_multiplier.unwrap_or(1) as i32;
 
         let mut sprites: HashMap<String, Rc<Sprite>> = HashMap::new();
-        for (_id, group) in builder.groups {
+        for (_id, mut group) in builder.groups {
             let mut template: Option<SpritesheetGroupTemplate> = match group.from_template {
                 None => None,
                 Some(ref id) => {
@@ -125,16 +125,14 @@ impl Spritesheet {
             };
 
             let base_size = match template {
-                None => group.get_size(),
+                None => group.size,
                 Some(ref template) => template.size,
             };
 
-            let base_pos = group.get_position();
+            let base_pos = group.position;
 
             let mut areas: HashMap<String, Vec<i32>> = HashMap::new();
-            if let Some(mut group_areas) = group.areas {
-                group_areas.drain().for_each(|(k, v)| {areas.insert(k, v); });
-            }
+            group.areas.drain().for_each(|(k, v)| { areas.insert(k, v); });
 
             if let Some(template) = template.as_mut() {
                 template.areas.drain().for_each(|(k, v)| { areas.insert(k, v); });
@@ -230,20 +228,15 @@ struct SpritesheetGroupTemplate {
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 struct SpritesheetGroup {
-    pub size: Option<Size>,
-    pub position: Option<Point>,
+    #[serde(default)]
+    pub size: Size,
+
+    #[serde(default)]
+    pub position: Point,
     pub prefix: Option<String>,
-    pub areas: Option<HashMap<String, Vec<i32>>>,
+
+    #[serde(default)]
+    pub areas: HashMap<String, Vec<i32>>,
     pub from_template: Option<String>,
     pub simple_image_gen_scale: Option<u32>,
-}
-
-impl SpritesheetGroup {
-    fn get_size(&self) -> Size {
-        self.size.unwrap_or(Size::as_zero())
-    }
-
-    fn get_position(&self) -> Point {
-        self.position.unwrap_or(Point::as_zero())
-    }
 }

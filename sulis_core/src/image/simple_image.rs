@@ -32,7 +32,7 @@ pub struct SimpleImage {
 
 impl SimpleImage {
     pub fn new(builder: SimpleImageBuilder, resources: &ResourceSet) -> Result<Rc<Image>, Error> {
-        let sprite = resources.get_sprite_internal(&builder.image_display)?;
+        let sprite = resources.sprite_internal(&builder.image_display)?;
 
         Ok(Rc::new(SimpleImage {
             id: builder.id,

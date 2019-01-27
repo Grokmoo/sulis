@@ -46,29 +46,21 @@ use crate::config::Config;
 use crate::resource::resource_builder_set::ResourceBuilderSet;
 use crate::image::{Image, EmptyImage, SimpleImage, AnimatedImage, ComposedImage, TimerImage};
 use crate::util::invalid_data_error;
-use crate::ui::Theme;
+use crate::ui::{ThemeSet, Theme};
 
 thread_local! {
-    static RESOURCE_SET: RefCell<ResourceSet> = RefCell::new(ResourceSet::new());
+    static RESOURCE_SET: RefCell<ResourceSet> = RefCell::new(ResourceSet::default());
 }
 
+#[derive(Default)]
 pub struct ResourceSet {
-    pub (crate) theme: Option<Rc<Theme>>,
+    pub (crate) themes: ThemeSet,
     pub (crate) images: HashMap<String, Rc<Image>>,
     pub (crate) spritesheets: HashMap<String, Rc<Spritesheet>>,
     pub (crate) fonts: HashMap<String, Rc<Font>>,
 }
 
 impl ResourceSet {
-    fn new() -> ResourceSet {
-        ResourceSet {
-            theme: None,
-            images: HashMap::new(),
-            spritesheets: HashMap::new(),
-            fonts: HashMap::new(),
-        }
-    }
-
     pub fn load_resources(mut dirs: Vec<String>) -> Result<YamlResourceSet, Error> {
         if dirs.len() == 0 {
             return Err(Error::new(ErrorKind::InvalidInput, "Must specify at least \
@@ -76,7 +68,6 @@ impl ResourceSet {
         }
 
         let root = dirs.remove(0);
-        let theme_dir = format!("{}/theme/", root);
         let path = Path::new(&root);
         let mut yaml = YamlResourceSet::new(&path)?;
 
@@ -94,7 +85,7 @@ impl ResourceSet {
             }
         }
 
-        let builder_set = ResourceBuilderSet::from_yaml(&mut yaml, &theme_dir)?;
+        let builder_set = ResourceBuilderSet::from_yaml(&mut yaml)?;
         ResourceSet::load_builders(builder_set)?;
 
         Ok(yaml)
@@ -109,7 +100,7 @@ impl ResourceSet {
             set.spritesheets.clear();
             set.fonts.clear();
 
-            set.theme = Some(Rc::new(Theme::new("", builder_set.theme_builder)));
+            set.themes = builder_set.theme_builder.create_theme_set()?;
 
             for (id, sheet) in builder_set.spritesheet_builders {
                 insert_if_ok_boxed("spritesheet", id, Spritesheet::new(sheet, &mut set),
@@ -149,7 +140,7 @@ impl ResourceSet {
         })
     }
 
-    pub fn get_image_else_empty(id: &str) -> Rc<Image> {
+    pub fn image_else_empty(id: &str) -> Rc<Image> {
         RESOURCE_SET.with(|r| {
             match get_resource(id, &r.borrow().images) {
                 None => {
@@ -162,37 +153,41 @@ impl ResourceSet {
         })
     }
 
-    pub fn get_empty_image() -> Rc<Image> {
+    pub fn empty_image() -> Rc<Image> {
         RESOURCE_SET.with(|r| get_resource("empty", &r.borrow().images)).unwrap()
     }
 
-    pub fn get_default_font() -> Rc<Font> {
+    pub fn default_font() -> Rc<Font> {
         RESOURCE_SET.with(|r| get_resource(&Config::default_font(), &r.borrow().fonts)).unwrap()
     }
 
-    pub fn get_theme() -> Rc<Theme> {
-        RESOURCE_SET.with(|r| Rc::clone(r.borrow().theme.as_ref().unwrap()))
-    }
-
-    pub fn get_spritesheet(id: &str) -> Option<Rc<Spritesheet>> {
+    pub fn spritesheet(id: &str) -> Option<Rc<Spritesheet>> {
         RESOURCE_SET.with(|r| get_resource(id, &r.borrow().spritesheets))
     }
 
-    pub fn get_sprite(id: &str) -> Result<Rc<Sprite>, Error> {
-        RESOURCE_SET.with(|r| r.borrow().get_sprite_internal(id))
+    pub fn sprite(id: &str) -> Result<Rc<Sprite>, Error> {
+        RESOURCE_SET.with(|r| r.borrow().sprite_internal(id))
     }
 
-    pub fn get_font(id: &str) -> Option<Rc<Font>> {
+    pub fn default_theme() -> Rc<Theme> {
+        RESOURCE_SET.with(|r| Rc::clone(r.borrow().themes.default_theme()))
+    }
+
+    pub fn theme(id: &str) -> Rc<Theme> {
+        RESOURCE_SET.with(|r| Rc::clone(r.borrow().themes.get(id)))
+    }
+
+    pub fn font(id: &str) -> Option<Rc<Font>> {
         RESOURCE_SET.with(|r| get_resource(id, &r.borrow().fonts))
     }
 
-    pub fn get_image(id: &str) -> Option<Rc<Image>> {
+    pub fn image(id: &str) -> Option<Rc<Image>> {
         RESOURCE_SET.with(|r| get_resource(id, &r.borrow().images))
     }
 
     /// Parses the `id` string to get a sprite from a spritesheet.  The string
     /// must be of the form {SPRITE_SHEET_ID}/{SPRITE_ID}
-    pub fn get_sprite_internal(&self, id: &str) -> Result<Rc<Sprite>, Error> {
+    pub fn sprite_internal(&self, id: &str) -> Result<Rc<Sprite>, Error> {
         let format_error = invalid_data_error("Image display must be \
                                               of format {SHEET_ID}/{SPRITE_ID}");
 
@@ -284,7 +279,7 @@ pub fn deserialize_image<'de, D>(deserializer: D) -> Result<Rc<Image>, D::Error>
     where D: Deserializer<'de> {
 
     let id = String::deserialize(deserializer)?;
-    match ResourceSet::get_image(&id) {
+    match ResourceSet::image(&id) {
         None => Err(de::Error::custom(format!("No image with ID '{}' found", id))),
         Some(image) => Ok(image),
     }

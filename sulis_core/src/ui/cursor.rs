@@ -58,7 +58,7 @@ impl Cursor {
             let mut cursor = cursor.borrow_mut();
 
             if cursor.image.is_none() {
-                cursor.image = ResourceSet::get_image(&Config::default_cursor());
+                cursor.image = ResourceSet::image(&Config::default_cursor());
             }
 
             let image = match cursor.image {

@@ -15,10 +15,8 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::rc::Rc;
-use std::cell::RefMut;
 use std::cmp;
 
-use crate::config::Config;
 use crate::ui::{Size, Widget};
 use crate::ui::theme::Theme;
 
@@ -30,16 +28,18 @@ pub enum LayoutKind {
     Grid,
 }
 
+impl Default for LayoutKind {
+    fn default() -> Self {
+        LayoutKind::Normal
+    }
+}
+
 impl LayoutKind {
     pub fn layout(&self, widget: &Widget) {
-        let theme = match widget.theme {
-            None => return,
-            Some(ref t) => Rc::clone(&t),
-        };
-
+        let theme = Rc::clone(&widget.theme);
         use self::LayoutKind::*;
         match *self {
-            Normal => LayoutKind::layout_normal(widget),
+            Normal => LayoutKind::layout_normal(widget, theme),
             BoxVertical => LayoutKind::layout_box_vertical(widget, theme),
             BoxHorizontal => LayoutKind::layout_box_horizontal(widget, theme),
             Grid => LayoutKind::layout_grid(widget, theme),
@@ -56,10 +56,10 @@ impl LayoutKind {
         for child in widget.children.iter() {
             current_x += theme.layout_spacing.left;
 
-            let width = LayoutKind::get_preferred_width_recursive(&child.borrow_mut(),
-                &widget.state.inner_size);
-            let height = LayoutKind::get_preferred_height_recursive(&child.borrow_mut(),
-                &widget.state.inner_size);
+            let width = LayoutKind::width_recursive(&child.borrow_mut(),
+                widget.state.inner_width());
+            let height = LayoutKind::height_recursive(&child.borrow_mut(),
+                widget.state.inner_height());
             max_height = cmp::max(max_height, height);
             child.borrow_mut().state.set_size(Size::new(width, height));
 
@@ -76,14 +76,14 @@ impl LayoutKind {
     }
 
     fn layout_box_horizontal(widget: &Widget, theme: Rc<Theme>) {
-        let height = widget.state.inner_size.height;
+        let height = widget.state.inner_height();
         let y = widget.state.inner_top();
         let mut current_x = widget.state.inner_left();
 
         for child in widget.children.iter() {
             current_x += theme.layout_spacing.left;
-            let width = LayoutKind::get_preferred_width_recursive(&child.borrow_mut(),
-                &widget.state.inner_size);
+            let width = LayoutKind::width_recursive(&child.borrow_mut(),
+                widget.state.inner_width());
             child.borrow_mut().state.set_size(Size::new(width, height));
             child.borrow_mut().state.set_position(current_x, y);
             current_x += width;
@@ -92,14 +92,14 @@ impl LayoutKind {
     }
 
     fn layout_box_vertical(widget: &Widget, theme: Rc<Theme>) {
-        let width = widget.state.inner_size.width;
+        let width = widget.state.inner_width();
         let x = widget.state.inner_left();
         let mut current_y = widget.state.inner_top();
 
         for child in widget.children.iter() {
             current_y += theme.layout_spacing.top;
-            let height = LayoutKind::get_preferred_height_recursive(&child.borrow_mut(),
-                &widget.state.inner_size);
+            let height = LayoutKind::height_recursive(&child.borrow_mut(),
+                widget.state.inner_height());
             child.borrow_mut().state.set_size(Size::new(width, height));
             child.borrow_mut().state.set_position(x, current_y);
             current_y += height;
@@ -107,68 +107,56 @@ impl LayoutKind {
         }
     }
 
-    fn layout_normal(widget: &Widget) {
+    fn layout_normal(widget: &Widget, _theme: Rc<Theme>) {
         for child in widget.children.iter() {
             LayoutKind::child_layout_normal(widget, &mut child.borrow_mut());
         }
     }
 
-    fn child_layout_normal(widget: &Widget, child: &mut RefMut<Widget>) {
-        let theme = match child.theme {
-            None => return,
-            Some(ref t) => Rc::clone(&t),
-        };
-
-        let size = Size::new(LayoutKind::get_preferred_width_recursive(child, &widget.state.inner_size),
-            LayoutKind::get_preferred_height_recursive(child, &widget.state.inner_size));
+    fn child_layout_normal(widget: &Widget, child: &mut Widget) {
+        let theme = Rc::clone(&child.theme);
+        let size = Size::new(LayoutKind::width_recursive(child, widget.state.inner_width()),
+            LayoutKind::height_recursive(child, widget.state.inner_height()));
 
         child.state.set_size(size);
 
         use crate::ui::theme::PositionRelative::*;
-        let x = match theme.x_relative {
+        let x = match theme.relative.x {
             Zero => widget.state.inner_left(),
             Center => (widget.state.inner_left() + widget.state.inner_right() -
                        size.width) / 2,
             Max => widget.state.inner_right() - size.width,
-            Cursor => cmp::min(crate::ui::Cursor::get_x(), Config::ui_width() - size.width),
-            Custom => child.state.position.x,
+            Custom => child.state.position().x,
         };
-        let y = match theme.y_relative {
+        let y = match theme.relative.y {
             Zero => widget.state.inner_top(),
             Center => (widget.state.inner_top() + widget.state.inner_bottom() -
                        size.height) / 2,
             Max => widget.state.inner_bottom() - size.height,
-            Cursor => cmp::min(crate::ui::Cursor::get_y(), Config::ui_height() - size.height),
-            Custom => child.state.position.y,
+            Custom => child.state.position().y,
         };
 
         child.state.set_position(x + theme.position.x, y + theme.position.y);
     }
 
-    fn get_preferred_height_recursive(widget: &RefMut<Widget>, parent_inner_size: &Size) -> i32 {
-        let theme = match widget.theme {
-            None => return 0,
-            Some(ref t) => t,
-        };
-
-        let mut height = theme.preferred_size.height;
+    fn height_recursive(widget: &Widget, parent_inner_height: i32) -> i32 {
+        let theme = &widget.theme;
+        let mut height = theme.size.height;
 
         use crate::ui::theme::SizeRelative::*;
-        match theme.height_relative {
-            Max => height += parent_inner_size.height,
+        match theme.relative.height {
+            Parent => height += parent_inner_height,
             ChildMax => {
                 for child in widget.children.iter() {
                     height = cmp::max(height,
-                        LayoutKind::get_preferred_height_recursive(&child.borrow_mut(),
-                            parent_inner_size));
+                        LayoutKind::height_recursive(&child.borrow(),
+                            parent_inner_height));
                 }
                 height += theme.border.vertical()
             },
             ChildSum => {
                 for child in widget.children.iter() {
-                    height +=
-                        LayoutKind::get_preferred_height_recursive(&child.borrow_mut(),
-                            parent_inner_size);
+                    height += LayoutKind::height_recursive(&child.borrow(), parent_inner_height);
                 }
                 height += theme.border.vertical();
 
@@ -180,37 +168,30 @@ impl LayoutKind {
                     _ => (),
                 }
             },
-            Custom => height += widget.state.size.height,
-            _ => {},
+            Custom => height += widget.state.size().height,
+            Zero => (),
         };
 
         height
     }
 
-    fn get_preferred_width_recursive(widget: &RefMut<Widget>, parent_inner_size: &Size) -> i32 {
-        let theme = match widget.theme {
-            None => return 0,
-            Some(ref t) => t,
-        };
-
-        let mut width = theme.preferred_size.width;
+    fn width_recursive(widget: &Widget, parent_inner_width: i32) -> i32 {
+        let theme = &widget.theme;
+        let mut width = theme.size.width;
 
         use crate::ui::theme::SizeRelative::*;
-        match theme.width_relative {
-            Max => width += parent_inner_size.width,
+        match theme.relative.width {
+            Parent => width += parent_inner_width,
             ChildMax => {
                 for child in widget.children.iter() {
                     width = cmp::max(width,
-                        LayoutKind::get_preferred_width_recursive(&child.borrow_mut(),
-                            parent_inner_size));
+                        LayoutKind::width_recursive(&child.borrow(), parent_inner_width));
                 }
                 width += theme.border.horizontal()
             },
             ChildSum => {
                 for child in widget.children.iter() {
-                    width +=
-                        LayoutKind::get_preferred_width_recursive(&child.borrow_mut(),
-                            parent_inner_size);
+                    width += LayoutKind::width_recursive(&child.borrow(), parent_inner_width);
                 }
                 width += theme.border.horizontal();
 
@@ -222,8 +203,8 @@ impl LayoutKind {
                     _ => (),
                 }
             },
-            Custom => width += widget.state.size.width,
-            _ => {},
+            Custom => width += widget.state.size().width,
+            Zero => (),
         };
 
 

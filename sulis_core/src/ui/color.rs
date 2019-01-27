@@ -28,6 +28,17 @@ pub struct Color {
     pub a: f32,
 }
 
+impl Default for Color {
+    fn default() -> Self {
+        Self {
+            r: 1.0,
+            g: 1.0,
+            b: 1.0,
+            a: 1.0,
+        }
+    }
+}
+
 fn float_one() -> f32 { 1.0 }
 
 fn get_component(text: &str, max: f32) -> f32 {

@@ -173,17 +173,19 @@ pub trait WidgetKind {
     }
 
     fn super_on_mouse_enter(&self, widget: &Rc<RefCell<Widget>>) {
-        widget.borrow_mut().state.set_mouse_inside(true);
-        widget.borrow_mut().state.animation_state.add(animation_state::Kind::Hover);
+        let mut widget = widget.borrow_mut();
+        widget.state.set_mouse_inside(true);
+        widget.state.animation_state.add(animation_state::Kind::Hover);
         trace!("Mouse entered '{}', anim state: '{:?}'",
-               widget.borrow().theme_id, widget.borrow().state.animation_state);
+               widget.theme_id(), widget.state.animation_state);
     }
 
     fn super_on_mouse_exit(&self, widget: &Rc<RefCell<Widget>>) {
-        widget.borrow_mut().state.set_mouse_inside(false);
-        widget.borrow_mut().state.animation_state.remove(animation_state::Kind::Hover);
-        widget.borrow_mut().state.animation_state.remove(animation_state::Kind::Pressed);
+        let mut widget = widget.borrow_mut();
+        widget.state.set_mouse_inside(false);
+        widget.state.animation_state.remove(animation_state::Kind::Hover);
+        widget.state.animation_state.remove(animation_state::Kind::Pressed);
         trace!("Mouse exited '{}', anim state: '{:?}'",
-               widget.borrow().theme_id, widget.borrow().state.animation_state);
+               widget.theme_id(), widget.state.animation_state);
     }
 }

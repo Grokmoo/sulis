@@ -27,11 +27,9 @@ use crate::resource::Font;
 
 pub struct WidgetState {
     pub visible: bool,
-    pub position: Point,
-    pub size: Size,
-    pub inner_size: Size,
-    pub inner_position: Point,
-    pub border: Border,
+    position: Point,
+    size: Size,
+    border: Border,
     pub mouse_is_inside: bool,
     pub background: Option<Rc<Image>>,
     pub foreground: Option<Rc<Image>>,
@@ -53,9 +51,9 @@ impl WidgetState {
         WidgetState {
             visible: true,
             callback: None,
-            size: Size::as_zero(),
-            position: Point::as_zero(),
-            border: Border::as_zero(),
+            size: Size::default(),
+            position: Point::default(),
+            border: Border::default(),
             mouse_is_inside: false,
             background: None,
             foreground: None,
@@ -65,8 +63,6 @@ impl WidgetState {
             text_params: TextParams::default(),
             text_renderer: None,
             text_args: HashMap::new(),
-            inner_size: Size::as_zero(),
-            inner_position: Point::as_zero(),
             is_modal: false,
             modal_remove_on_click_outside: false,
             is_mouse_over: false,
@@ -127,29 +123,21 @@ impl WidgetState {
         self.is_modal = modal;
     }
 
-    pub fn inner_width(&self) -> i32 {
-        self.inner_size.width
-    }
+    pub fn position(&self) -> Point { self.position }
+    pub fn size(&self) -> Size { self.size }
 
-    pub fn inner_height(&self) -> i32 {
-        self.inner_size.height
-    }
+    pub fn left(&self) -> i32 { self.position.x }
+    pub fn top(&self) -> i32 { self.position.y }
+    pub fn right(&self) -> i32 { self.position.x + self.size.width }
+    pub fn bottom(&self) -> i32 { self.position.y + self.size.height }
 
-    pub fn inner_right(&self) -> i32 {
-        self.position.x + self.size.width - self.border.right
-    }
+    pub fn inner_width(&self) -> i32 { self.size.width - self.border.horizontal() }
+    pub fn inner_height(&self) -> i32 { self.size.height - self.border.vertical() }
 
-    pub fn inner_bottom(&self) -> i32 {
-        self.position.y + self.size.height - self.border.bottom
-    }
-
-    pub fn inner_top(&self) -> i32 {
-        self.position.y + self.border.top
-    }
-
-    pub fn inner_left(&self) -> i32 {
-        self.position.x + self.border.left
-    }
+    pub fn inner_left(&self) -> i32 { self.position.x + self.border.left }
+    pub fn inner_top(&self) -> i32 { self.position.y + self.border.top }
+    pub fn inner_right(&self) -> i32 { self.right() - self.border.right }
+    pub fn inner_bottom(&self) -> i32 { self.bottom() - self.border.bottom }
 
     /// Adds a text argument to the list of text args stored in this
     /// state.  When building the output text for the owning widget,
@@ -202,13 +190,10 @@ impl WidgetState {
 
     pub fn set_border(&mut self, border: Border) {
         self.border = border;
-        self.inner_size = self.size.inner(&border);
-        self.inner_position = self.position.inner(&border);
     }
 
     pub fn set_size(&mut self, size: Size) {
         self.size = size;
-        self.inner_size = self.size.inner(&self.border);
     }
 
     pub fn set_position_centered(&mut self, x: i32, y: i32) {
@@ -219,7 +204,6 @@ impl WidgetState {
 
     pub fn set_position(&mut self, x: i32, y: i32) {
         self.position = Point::new(x, y);
-        self.inner_position = self.position.inner(&self.border);
     }
 
     //// Returns a point which will cause a widget with the specified

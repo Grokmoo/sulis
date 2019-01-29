@@ -145,7 +145,7 @@ impl LayoutKind {
 
         use crate::ui::theme::SizeRelative::*;
         match theme.relative.height {
-            Parent => height += parent_inner_height,
+            Max => height += parent_inner_height,
             ChildMax => {
                 for child in widget.children.iter() {
                     height = cmp::max(height,
@@ -181,7 +181,7 @@ impl LayoutKind {
 
         use crate::ui::theme::SizeRelative::*;
         match theme.relative.width {
-            Parent => width += parent_inner_width,
+            Max => width += parent_inner_width,
             ChildMax => {
                 for child in widget.children.iter() {
                     width = cmp::max(width,

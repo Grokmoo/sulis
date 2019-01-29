@@ -102,7 +102,7 @@ impl Layer {
     pub fn get_spritesheet(&self) -> Option<Rc<Spritesheet>> {
         match self.spritesheet_id {
             None => None,
-            Some(ref id) => ResourceSet::get_spritesheet(id),
+            Some(ref id) => ResourceSet::spritesheet(id),
         }
     }
 

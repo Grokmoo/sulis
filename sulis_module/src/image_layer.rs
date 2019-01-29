@@ -190,7 +190,7 @@ impl ImageLayerSet {
         let sex_map = images.entry(sex).or_insert(HashMap::new());
 
         for (image_layer, image_str) in refs {
-            let image = match ResourceSet::get_image(&image_str) {
+            let image = match ResourceSet::image(&image_str) {
                 None => {
                     warn!("Image '{}' not found for layer '{:?}'", image_str, image_layer);
                     return invalid_data_error(&format!("Unable to create image_layer_set"));

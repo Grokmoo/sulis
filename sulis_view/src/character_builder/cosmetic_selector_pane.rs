@@ -211,10 +211,10 @@ impl WidgetKind for CosmeticSelectorPane {
         };
 
         let child = self.preview.borrow();
-        let scale_x = 0.8 * child.state.inner_size.width as f32 / preview.get_width_f32();
-        let scale_y = 0.8 * child.state.inner_size.height as f32 / preview.get_height_f32();
-        let x = (child.state.inner_position.x as f32) / scale_x + race.ticker_offset.0;
-        let y = (child.state.inner_position.y as f32) / scale_y + race.ticker_offset.1;
+        let scale_x = 0.8 * child.state.inner_width() as f32 / preview.get_width_f32();
+        let scale_y = 0.8 * child.state.inner_height() as f32 / preview.get_height_f32();
+        let x = (child.state.inner_left() as f32) / scale_x + race.ticker_offset.0;
+        let y = (child.state.inner_top() as f32) / scale_y + race.ticker_offset.1;
         preview.draw(renderer, scale_x, scale_y, x, y, millis);
     }
 
@@ -443,7 +443,7 @@ impl WidgetKind for CosmeticSelectorPane {
             pop_up.borrow_mut().state.modal_remove_on_click_outside = true;
 
             for portrait_id in race_ref.portrait_selections.iter() {
-                let portrait = match ResourceSet::get_image(portrait_id) {
+                let portrait = match ResourceSet::image(portrait_id) {
                     None => {
                         warn!("Invalid race portrait selection '{}'", portrait_id);
                         continue;

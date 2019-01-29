@@ -115,7 +115,7 @@ impl AnimSaveState {
             Kind::EntityImageLayer { images } => {
                 let mut imgs = HashMap::new();
                 for (layer, image) in images {
-                    let img = match ResourceSet::get_image(&image) {
+                    let img = match ResourceSet::image(&image) {
                         None => continue,
                         Some(image) => image,
                     };
@@ -124,7 +124,7 @@ impl AnimSaveState {
                 Anim::new_entity_image_layer(&entity, self.duration_millis, imgs)
             },
             Kind::ParticleGenerator { model, state } => {
-                let image = match ResourceSet::get_image(&state.image) {
+                let image = match ResourceSet::image(&state.image) {
                     None => {
                         warn!("Invalid image for animation {}", state.image);
                         return None;

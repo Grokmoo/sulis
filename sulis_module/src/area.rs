@@ -149,7 +149,7 @@ impl Area {
 
         let mut transitions: Vec<Transition> = Vec::new();
         for (index, t_builder) in builder.transitions.into_iter().enumerate() {
-            let image = match ResourceSet::get_image(&t_builder.image_display) {
+            let image = match ResourceSet::image(&t_builder.image_display) {
                 None => {
                     warn!("Image '{}' not found for transition.", t_builder.image_display);
                     continue;
@@ -241,8 +241,8 @@ impl Area {
             }
         }
 
-        let visibility_tile = ResourceSet::get_sprite(&builder.visibility_tile)?;
-        let explored_tile = ResourceSet::get_sprite(&builder.explored_tile)?;
+        let visibility_tile = ResourceSet::sprite(&builder.visibility_tile)?;
+        let explored_tile = ResourceSet::sprite(&builder.explored_tile)?;
 
         Ok(Area {
             id: builder.id,

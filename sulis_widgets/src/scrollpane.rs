@@ -77,10 +77,10 @@ impl WidgetKind for ScrollPane {
 
     fn draw(&mut self, renderer: &mut GraphicsRenderer, _pixel_size: Point,
             widget: &Widget, _millis: u32) {
-        let x = widget.state.inner_position.x;
-        let y = widget.state.inner_position.y;
-        let width = widget.state.inner_size.width;
-        let height = widget.state.inner_size.height;
+        let x = widget.state.inner_left();
+        let y = widget.state.inner_top();
+        let width = widget.state.inner_width();
+        let height = widget.state.inner_height();
         renderer.set_scissor(Point::new(x, y), Size::new(width, height));
     }
 
@@ -100,24 +100,22 @@ impl WidgetKind for ScrollPane {
         let scroll = self.scrollbar.borrow().cur_y();
 
         widget.do_self_layout();
-        let x = widget.state.position.x;
-        let y = widget.state.position.y;
+        let (x, y) = widget.state.position().as_tuple();
         widget.state.set_position(x, y - scroll);
 
         widget.do_children_layout();
 
         widget.state.set_position(x, y);
 
-        let sx = self.scrollbar_widget.borrow().state.position.x;
-        let sy = self.scrollbar_widget.borrow().state.position.y;
+        let (sx, sy) = self.scrollbar_widget.borrow().state.position().as_tuple();
         self.scrollbar_widget.borrow_mut().state.set_position(sx, sy + scroll);
 
         if self.content_height == 0 {
-            self.content_height = self.content.borrow().state.size.height;
+            self.content_height = self.content.borrow().state.height();
             self.scrollbar.borrow_mut().content_height = self.content_height;
         }
 
-        let w = self.content.borrow().state.size.width;
+        let w = self.content.borrow().state.width();
         self.content.borrow_mut().state.set_size(Size::new(w, self.content_height + scroll));
     }
 
@@ -186,11 +184,11 @@ impl Scrollbar {
         for i in 0..len {
             let child = Rc::clone(&widget.borrow().children[i]);
 
-            max_y = cmp::max(max_y, child.borrow().state.position.y + child.borrow().state.size.height);
+            max_y = cmp::max(max_y, child.borrow().state.top() + child.borrow().state.height());
         }
 
-        self.max_y = max_y - self.content_height + widget.borrow().state.border.vertical()
-            - widget.borrow().state.position.y;
+        self.max_y = max_y - self.content_height + widget.borrow().state.border().vertical()
+            - widget.borrow().state.top();
 
         if self.max_y < self.min_y { self.max_y = self.min_y }
     }
@@ -203,15 +201,13 @@ impl WidgetKind for Scrollbar {
         widget.do_base_layout();
 
         if self.content_height == 0 {
-            self.content_height = self.widget.borrow().state.size.height;
+            self.content_height = self.widget.borrow().state.height();
         }
 
         let widget_ref = Rc::clone(&self.widget);
         self.compute_min_max_y(&widget_ref);
 
-        if let Some(ref theme) = widget.theme {
-            self.delta = theme.get_custom_or_default("scroll_delta", 1);
-        }
+        self.delta = widget.theme.get_custom_or_default("scroll_delta", 1);
 
         self.up.borrow_mut().state.set_enabled(self.cur_y != self.min_y);
         self.down.borrow_mut().state.set_enabled(self.cur_y != self.max_y);
@@ -223,17 +219,17 @@ impl WidgetKind for Scrollbar {
         self.thumb.borrow_mut().state.set_enabled(false);
         widget.state.set_visible(thumb_frac < 1.0);
 
-        let inner_height = widget.state.inner_height() - self.up.borrow().state.size.height -
-            self.down.borrow().state.size.height;
+        let inner_height = widget.state.inner_height() - self.up.borrow().state.height() -
+            self.down.borrow().state.height();
         let thumb_height = (thumb_frac * inner_height as f32).round() as i32;
-        let thumb_width = self.thumb.borrow().state.size.width;
+        let thumb_width = self.thumb.borrow().state.width();
         self.thumb.borrow_mut().state.set_size(Size::new(thumb_width, thumb_height));
 
-        let thumb_x = self.thumb.borrow().state.position.x;
-        let thumb_base_y = self.up.borrow().state.position.y + self.up.borrow().state.size.height;
+        let thumb_x = self.thumb.borrow().state.left();
+        let thumb_base_y = self.up.borrow().state.top() + self.up.borrow().state.height();
 
         let thumb_pos_frac = (self.cur_y as f32 - self.min_y as f32) / (self.max_y as f32 - self.min_y as f32);
-        let thumb_max_y = self.down.borrow().state.position.y - thumb_height - thumb_base_y;
+        let thumb_max_y = self.down.borrow().state.top() - thumb_height - thumb_base_y;
 
         let thumb_y = thumb_base_y + (thumb_pos_frac * thumb_max_y as f32).round() as i32;
 

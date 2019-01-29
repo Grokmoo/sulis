@@ -799,7 +799,7 @@ impl UserData for ScriptEntity {
 
         methods.add_method("wait_anim", |_, entity, duration: f32| {
             let index = entity.try_unwrap_index()?;
-            let image = ResourceSet::get_empty_image();
+            let image = ResourceSet::empty_image();
             let duration = ExtInt::Int((duration * 1000.0) as u32);
             Ok(ScriptParticleGenerator::new_anim(index, image.id(), duration))
         });

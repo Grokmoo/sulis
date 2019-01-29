@@ -60,7 +60,7 @@ impl ResourceBuilderSet {
 
         use self::YamlResourceKind::*;
         Ok(ResourceBuilderSet {
-            theme_builder: ThemeBuilderSet { themes: themes_out },
+            theme_builder: ThemeBuilderSet { id: "themes".to_string(), themes: themes_out },
             font_builders: read_builders_insert_dirs(resources, Font)?,
             simple_builders: read_builders(resources, SimpleImage)?,
             composed_builders: read_builders(resources, ComposedImage)?,
@@ -143,11 +143,37 @@ pub fn read_builder<T: serde::de::DeserializeOwned>(mut value: serde_yaml::Value
 }
 
 fn read_builder_internal<T: serde::de::DeserializeOwned>(value: serde_yaml::Value) -> Result<T, Error> {
+    // we'd really rather not do this clone, but need to preserve the value in case there is an
+    // error
+    let value_clone = value.clone();
     let res: Result<T, serde_yaml::Error> = serde_yaml::from_value(value);
 
     match res {
         Ok(res) => Ok(res),
-        Err(e) => Err(Error::new(ErrorKind::InvalidData, format!("{}", e))),
+        Err(e) => {
+            let details = match handle_merged_error::<T>(value_clone) {
+                Ok(details) => details,
+                Err(handler_error) => {
+                    warn!("Original Error: {}", e);
+                    warn!("Handler Result: {}", handler_error);
+                    String::new()
+                }
+            };
+
+            Err(Error::new(ErrorKind::InvalidData, format!("{}", details)))
+        }
+    }
+}
+
+fn handle_merged_error<T: serde::de::DeserializeOwned>(value: serde_yaml::Value) -> Result<String, Error> {
+    let value_string = serde_yaml::to_string(&value)
+        .map_err(|e| Error::new(ErrorKind::InvalidData, format!("{}", e)))?;
+    let result: Result<T, serde_yaml::Error> = serde_yaml::from_str(&value_string);
+
+    match result {
+        Ok(_) => Err(Error::new(ErrorKind::InvalidData,
+                                format!("There was no error when parsing the value as a string"))),
+        Err(e) => Ok(e.to_string())
     }
 }
 

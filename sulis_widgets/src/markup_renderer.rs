@@ -334,7 +334,7 @@ impl MarkupRenderer {
     fn draw_sprite(&mut self, image: &str, markup: &Markup, x: f32, y: f32) {
         if markup.ignore { return; }
 
-        let sprite = match ResourceSet::get_sprite(image) {
+        let sprite = match ResourceSet::sprite(image) {
             Err(_) => {
                 warn!("Unable to find sprite '{}'", image);
                 return;

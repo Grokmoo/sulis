@@ -144,7 +144,7 @@ impl Attack {
             AttackKindBuilder::Melee { reach } =>
                 Melee { reach: reach + stats.bonus_reach },
             AttackKindBuilder::Ranged { range, ref projectile } => {
-                let projectile = match ResourceSet::get_image(projectile) {
+                let projectile = match ResourceSet::image(projectile) {
                     None => {
                         warn!("No image found for projectile '{}'", projectile);
                         "empty".to_string()
@@ -178,7 +178,7 @@ impl Attack {
     pub fn get_ranged_projectile(&self) -> Option<Rc<Image>> {
         match self.kind {
             Ranged { ref projectile, .. } => {
-                ResourceSet::get_image(projectile)
+                ResourceSet::image(projectile)
             },
             _ => None,
         }

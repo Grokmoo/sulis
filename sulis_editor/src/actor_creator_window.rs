@@ -229,10 +229,10 @@ impl WidgetKind for ActorCreatorWindow {
         };
 
         let child = &self.view_pane.borrow().state;
-        let scale_x = 0.8 * child.inner_size.width as f32 / preview.get_width_f32();
-        let scale_y = 0.8 * child.inner_size.height as f32 / preview.get_height_f32();
-        let x = (child.inner_position.x as f32) / scale_x;
-        let y = (child.inner_position.y as f32) / scale_y;
+        let scale_x = 0.8 * child.inner_width() as f32 / preview.get_width_f32();
+        let scale_y = 0.8 * child.inner_height() as f32 / preview.get_height_f32();
+        let x = (child.inner_left() as f32) / scale_x;
+        let y = (child.inner_top() as f32) / scale_y;
 
         preview.draw(renderer, scale_x, scale_y, x, y, millis);
     }

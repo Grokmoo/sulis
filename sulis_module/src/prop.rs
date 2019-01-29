@@ -55,14 +55,14 @@ pub struct Prop {
 
 impl Prop {
     pub fn new(builder: PropBuilder, module: &Module) -> Result<Prop, Error> {
-        let icon = match ResourceSet::get_image(&builder.icon) {
+        let icon = match ResourceSet::image(&builder.icon) {
             None => {
                     warn!("No image found for icon '{}'", builder.icon);
                     return unable_to_create_error("prop", &builder.id);
             }, Some(icon) => icon,
         };
 
-        let image = match ResourceSet::get_image(&builder.image) {
+        let image = match ResourceSet::image(&builder.image) {
             None => {
                 warn!("No image found for image '{}'", builder.image);
                 return unable_to_create_error("prop", &builder.id);

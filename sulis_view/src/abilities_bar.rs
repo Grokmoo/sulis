@@ -51,10 +51,8 @@ impl WidgetKind for AbilitiesBar {
     widget_kind!(NAME);
 
     fn layout(&mut self, widget: &mut Widget) {
-        if let Some(ref theme) = widget.theme {
-            if let Some(ref count) = theme.custom.get("max_collapsed") {
-                self.max_collapsed = count.parse::<u32>().unwrap_or(3);
-            }
+        if let Some(ref count) = widget.theme.custom.get("max_collapsed") {
+            self.max_collapsed = count.parse::<u32>().unwrap_or(3);
         }
 
         widget.do_self_layout();
@@ -234,25 +232,24 @@ impl GroupPane {
     }
 
     fn set_layout_size(&mut self, widget: &mut Widget) {
-        if let Some(ref theme) = widget.theme {
-            if let Some(ref count) = theme.custom.get("vertical_count") {
-                self.vertical_count = count.parse::<u32>().unwrap_or(1);
-            }
-
-            if let Some(ref width) = theme.custom.get("grid_width") {
-                self.grid_width = width.parse::<u32>().unwrap_or(1);
-            }
-
-            if let Some(ref count) = theme.custom.get("min_horizontal_count") {
-                self.min_horizontal_count = count.parse::<u32>().unwrap_or(1);
-            }
-
-            if let Some(ref width) = theme.custom.get("grid_border") {
-                self.grid_border = width.parse::<u32>().unwrap_or(1);
-            }
+        let theme = &widget.theme;
+        if let Some(ref count) = theme.custom.get("vertical_count") {
+            self.vertical_count = count.parse::<u32>().unwrap_or(1);
         }
 
-        let height = widget.state.size.height;
+        if let Some(ref width) = theme.custom.get("grid_width") {
+            self.grid_width = width.parse::<u32>().unwrap_or(1);
+        }
+
+        if let Some(ref count) = theme.custom.get("min_horizontal_count") {
+            self.min_horizontal_count = count.parse::<u32>().unwrap_or(1);
+        }
+
+        if let Some(ref width) = theme.custom.get("grid_border") {
+            self.grid_border = width.parse::<u32>().unwrap_or(1);
+        }
+
+        let height = widget.state.height();
         let cols = (self.abilities.len() as f32 / self.vertical_count as f32).ceil() as u32;
         let cols = cmp::max(cols, self.min_horizontal_count) as i32;
         let width = cols * self.grid_width as i32 + self.grid_border as i32;

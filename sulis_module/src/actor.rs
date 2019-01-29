@@ -241,7 +241,7 @@ impl Actor {
 
         let portrait = match builder.portrait {
             None => None,
-            Some(ref image) => match ResourceSet::get_image(image) {
+            Some(ref image) => match ResourceSet::image(image) {
                 None => {
                     warn!("Unable to find image for portrait '{}'", image);
                     return unable_to_create_error("actor", &builder.id);

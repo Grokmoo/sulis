@@ -82,7 +82,7 @@ fn build_hash_map(id: &str, input: Option<HashMap<ImageLayer, String>>)
         Some(input_images) => {
             let mut output = HashMap::new();
             for (layer, image_str) in input_images {
-                let image = match ResourceSet::get_image(&image_str) {
+                let image = match ResourceSet::image(&image_str) {
                     None => {
                         warn!("No image found for image '{}'", image_str);
                         return unable_to_create_error("item", id);
@@ -145,7 +145,7 @@ impl Item {
     }
 
     pub fn new(builder: ItemBuilder, module: &Module) -> Result<Item, Error> {
-        let icon = match ResourceSet::get_image(&builder.icon) {
+        let icon = match ResourceSet::image(&builder.icon) {
             None => {
                 warn!("No image found for icon '{}'", builder.icon);
                 return unable_to_create_error("item", &builder.id);

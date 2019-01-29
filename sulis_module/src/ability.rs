@@ -84,7 +84,7 @@ impl PartialEq for Ability {
 
 impl Ability {
     pub fn new(builder: AbilityBuilder, module: &Module) -> Result<Ability, Error> {
-        let icon = match ResourceSet::get_image(&builder.icon) {
+        let icon = match ResourceSet::image(&builder.icon) {
             None => {
                 warn!("No image found for icon '{}'", builder.icon);
                 return unable_to_create_error("ability", &builder.id);

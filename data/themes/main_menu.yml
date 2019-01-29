@@ -1,127 +1,139 @@
 ---
-children:
+id: main_menu
+themes:
   main_menu:
     children:
       background:
         background: "bg2/image"
-        preferred_size: [-2, -2]
-        x_relative: Center
-        y_relative: Center
-        width_relative: Max
-        height_relative: Max
+        size: [-2, -2]
+        relative:
+          x: Center
+          y: Center
+          width: Max
+          height: Max
       tooltip:
-        from: .tooltip
+        from: tooltip
       title:
-        from: .label
+        from: label
         text_params:
           scale: 12
           font: outlined
         text: "Sulis"
-        preferred_size: [40, 10]
-        x_relative: Center
+        size: [40, 10]
+        relative:
+          x: Center
         position: [0, 5]
       module_title:
-        from: .label
+        from: label
         text_params:
           scale: 10
           font: outlined
         text: "#group# #module#"
-        preferred_size: [100, 10]
-        x_relative: Center
+        size: [100, 10]
+        relative:
+          x: Center
         position: [0, 15]
       button:
-        from: .button
-        preferred_size: [35, 12]
+        from: button
+        size: [35, 12]
         text_params:
           scale: 7
-        x_relative: Center
+        relative:
+          x: Center
       menu_pane:
         position: [0, 25]
-        preferred_size: [0, 12]
-        width_relative: ChildSum
+        size: [0, 12]
         layout: BoxHorizontal
         layout_spacing: { right: 5 }
-        x_relative: Center
+        relative:
+          x: Center
+          width: ChildSum
         children:
           module:
-            from: .main_menu.button
+            from: main_menu.button
             text: "Select Campaign"
           new:
-            from: .main_menu.button
+            from: main_menu.button
             text: "New Game"
           load:
-            from: .main_menu.button
+            from: main_menu.button
             text: "Load Game"
           mods:
-            from: .main_menu.button
+            from: main_menu.button
             text: "Mods"
           options:
-            from: .main_menu.button
+            from: main_menu.button
             text: "Options"
           links:
-            from: .main_menu.button
+            from: main_menu.button
             text: "Credits & Docs"
           exit:
-            from: .main_menu.button
+            from: main_menu.button
             text: "Exit Sulis"
       content: {}
       load_window:
-        from: .load_window_base
+        from: load_window_base
         border: [5, 5, 5, 5]
         position: [0, 35]
-        x_relative: Center
-        preferred_size: [150, 138]
+        relative:
+          x: Center
+        size: [150, 138]
       mods_selector:
-        from: .mods_selector
+        from: mods_selector
         position: [0, 40]
-        width_relative: Max
-        height_relative: Max
-        preferred_size: [0, -40]
+        relative:
+          width: Max
+          height: Max
+        size: [0, -40]
       module_selector:
-        from: .module_selector
+        from: module_selector
         position: [0, 40]
-        width_relative: Max
-        height_relative: Max
-        preferred_size: [0, -40]
+        relative:
+          width: Max
+          height: Max
+        size: [0, -40]
       keybinding_popup:
-        from: .keybinding_popup
+        from: keybinding_popup
       links_pane:
-        from: .links_pane
+        from: links_pane
         position: [0, 40]
-        width_relative: Max
-        height_relative: Max
-        preferred_size: [0, -40]
+        relative:
+          width: Max
+          height: Max
+        size: [0, -40]
       options_window:
-        from: .options_window
+        from: options_window
         position: [0, 40]
-        width_relative: Max
-        height_relative: Max
-        preferred_size: [0, -40]
+        relative:
+          width: Max
+          height: Max
+        size: [0, -40]
       character_selector:
-        from: .character_selector
+        from: character_selector
         position: [0, 40]
-        width_relative: Max
-        height_relative: Max
-        preferred_size: [0, -40]
+        relative:
+          width: Max
+          height: Max
+        size: [0, -40]
       character_builder:
-        from: .character_builder
+        from: character_builder
       loading_screen:
-        from: .loading_screen
+        from: loading_screen
       portrait_selector:
-        from: .portrait_selector
+        from: portrait_selector
       exit_confirmation_window:
-        from: .exit_confirmation
+        from: exit_confirmation
       save_or_revert_options_window:
-        from: .save_or_revert_options_window
+        from: save_or_revert_options_window
       delete_character_confirmation_window:
-        from: .confirmation_window
+        from: confirmation_window
         children:
           title:
             text: "Delete #name#?"
           accept:
             text: "Delete"
       delete_save_confirmation:
-        from: .confirmation_window
+        from: confirmation_window
         children:
           title:
             text: "Delete Saved Game?"
@@ -130,169 +142,188 @@ children:
   links_pane:
     children:
       title:
-        from: .label
+        from: label
         text_params:
           scale: 8
         text: "Links will open in your Web Browser:"
-        x_relative: Center
-        preferred_size: [80, 10]
+        relative:
+          x: Center
+        size: [80, 10]
       website:
-        from: .button
+        from: button
         text: "Sulis Website (www.sulisgame.com)"
-        preferred_size: [80, 10]
-        x_relative: Center
+        size: [80, 10]
+        relative:
+          x: Center
         position: [0, 15]
       github:
-        from: .button
+        from: button
         text: "GitHub (github.com/Grokmoo/sulis)"
-        preferred_size: [80, 10]
-        x_relative: Center
+        size: [80, 10]
+        relative:
+          x: Center
         position: [0, 30]
       credits:
-        from: .button
+        from: button
         text: "Credits & Attribution (on GitHub)"
-        preferred_size: [80, 10]
-        x_relative: Center
+        size: [80, 10]
+        relative:
+          x: Center
         position: [0, 45]
       changes:
-        from: .button
+        from: button
         text: "Changelog (on GitHub)"
-        preferred_size: [80, 10]
-        x_relative: Center
+        size: [80, 10]
+        relative:
+          x: Center
         position: [0, 60]
   character_selector:
     children:
       invalid_level_box:
-        from: .text_area
+        from: text_area
         text: "[c=f00|This character is level #level#, which is greater than the campaign maximum, level #max_level#.]"
         background: bg_base
         border: [2, 2, 2, 2]
-        x_relative: Center
-        y_relative: Max
+        relative:
+          x: Center
+          y: Max
         position: [-62, -20]
-        preferred_size: [89, 13]
+        size: [89, 13]
       title:
-        from: .label
+        from: label
         text_params:
           scale: 10
         text: "Select a Character"
-        x_relative: Center
-        preferred_size: [40, 10]
+        relative:
+          x: Center
+        size: [40, 10]
         position: [0, 0]
       characters_title:
-        from: .label
+        from: label
         text_params:
           scale: 9
           horizontal_alignment: Left
         text: "Available Characters"
-        x_relative: Center
+        relative:
+          x: Center
         position: [-40, 10]
-        preferred_size: [80, 10]
+        size: [80, 10]
       new_character_button:
-        from: .button
+        from: button
         text: "New Character"
-        x_relative: Center
-        y_relative: Max
+        relative:
+          x: Center
+          y: Max
         position: [-95, -5]
-        preferred_size: [30, 10]
+        size: [30, 10]
       delete_character_button:
-        from: .button
+        from: button
         text: "Delete"
-        x_relative: Center
-        y_relative: Max
+        relative:
+          x: Center
+          y: Max
         position: [-67, -5]
-        preferred_size: [20, 10]
+        size: [20, 10]
       characters_pane:
         border: [1, 1, 1, 1]
         background: bg_base
-        x_relative: Center
-        height_relative: Max
-        preferred_size: [100, -35]
+        relative:
+          x: Center
+          height: Max
+        size: [100, -35]
         position: [-60, 18]
         children:
           scrollbar:
-            from: .scrollbar
+            from: scrollbar
             custom:
-              scroll_delta: 29
+              scroll_delta: "29"
           content:
-            width_relative: Max
-            preferred_size: [-7, 0]
-            height_relative: Max
+            relative:
+              width: Max
+              height: Max
+            size: [-7, 0]
             layout: Grid
             layout_spacing: { top: 0, bottom: 1, right: 1, left: 0 }
             children:
               character_button:
-                from: .button
+                from: button
                 background: background_inner
                 foreground: "#portrait#"
-                preferred_size: [28, 28]
+                size: [28, 28]
       play_button:
-        from: .button
+        from: button
         background: hint_to_click_background
         text: "Play"
         text_params:
           scale: 9
-        x_relative: Center
-        y_relative: Max
+        relative:
+          x: Center
+          y: Max
         position: [-30, -5]
-        preferred_size: [40, 10]
+        size: [40, 10]
       details:
-        from: .character_window.details
+        from: character_window.details
         border: [4, 4, 4, 4]
         background: bg_base
-        x_relative: Center
-        width_relative: Zero
-        height_relative: Max
-        preferred_size: [115, -15]
+        relative:
+          x: Center
+          width: Zero
+          height: Max
+        size: [115, -15]
         position: [50, 10]
   keybinding_popup:
-    x_relative: Center
-    y_relative: Center
-    preferred_size: [100, 50]
+    relative:
+      x: Center
+      y: Center
+    size: [100, 50]
     background: bg_base
     children:
       title:
-        from: .label
+        from: label
         text_params:
           scale: 8
-        x_relative: Center
+        relative:
+          x: Center
+          width: Max
+          height: Max
         text: "Press a key to bind to #action#"
-        width_relative: Max
-        height_relative: Max
   save_or_revert_options_window:
     background: bg_base
     border: [1, 1, 1, 1]
-    preferred_size: [100, 43]
-    x_relative: Center
-    y_relative: Center
+    size: [100, 43]
+    relative:
+      x: Center
+      y: Center
     position: [0, -20]
     children:
       title:
-        from: .label
-        width_relative: Max
-        preferred_size: [0, 4]
+        from: label
+        relative:
+          width: Max
+        size: [0, 4]
         position: [0, 3]
         text_params:
           scale: 7
         text: "Your options will revert to their previous state in"
       timer:
-        from: .label
-        width_relative: Max
-        preferred_size: [0, 5]
+        from: label
+        relative:
+          width: Max
+        size: [0, 5]
         position: [0, 8]
         text_params:
           scale: 7
         text: "#time# seconds"
       revert:
-        from: .button
-        preferred_size: [44, 12]
+        from: button
+        size: [44, 12]
         text: "Revert Now"
         text_params:
           scale: 7
         position: [51, 25]
       accept:
-        from: .button
-        preferred_size: [44, 12]
+        from: button
+        size: [44, 12]
         text: "Accept Changes"
         text_params:
           scale: 7
@@ -300,365 +331,413 @@ children:
   options_window:
     children:
       title:
-        from: .label
+        from: label
         text_params:
           scale: 10.0
         text: "Options"
-        x_relative: Center
-        preferred_size: [40, 10]
+        relative:
+          x: Center
+        size: [40, 10]
         position: [0, 0]
       display:
-        from: .tab_button
+        from: tab_button
         text: "Display"
         position: [-60, 3]
-        preferred_size: [19, 7]
-        x_relative: Center
+        size: [19, 7]
+        relative:
+          x: Center
       input:
-        from: .tab_button
+        from: tab_button
         text: "Input"
         position: [-40, 3]
-        preferred_size: [19, 7]
-        x_relative: Center
+        size: [19, 7]
+        relative:
+          x: Center
       reset:
-        from: .button
-        preferred_size: [30, 10]
+        from: button
+        size: [30, 10]
         text_params:
           scale: 8
         text: "Reset"
-        x_relative: Center
-        y_relative: Max
+        relative:
+          x: Center
+          y: Max
         position: [-55, -5]
         custom:
           tooltip: "Reset all options to defaults"
       cancel:
-        from: .button
-        preferred_size: [30, 10]
+        from: button
+        size: [30, 10]
         text_params:
           scale: 8
         text: "Cancel"
-        x_relative: Center
-        y_relative: Max
+        relative:
+          x: Center
+          y: Max
         position: [-20, -5]
       apply:
-        from: .button
-        preferred_size: [30, 10]
+        from: button
+        size: [30, 10]
         position: [55, -5]
         text_params:
           scale: 8
         text: "Apply"
-        x_relative: Center
-        y_relative: Max
+        relative:
+          x: Center
+          y: Max
       content_title:
-        from: .label
+        from: label
         text_params:
           scale: 6
           horizontal_alignment: Center
-        x_relative: Center
-        preferred_size: [50, 5]
+        relative:
+          x: Center
+        size: [50, 5]
       content_sub_content:
         background: bg_base
         border: [1, 1, 1, 1]
-        x_relative: Center
+        relative:
+          x: Center
       content:
         background: bg_base
         border: { top: 2, bottom: 2, left: 5, right: 5 }
-        preferred_size: [140, -27]
-        height_relative: Max
-        x_relative: Center
+        size: [140, -27]
+        relative:
+          x: Center
+          height: Max
         position: [0, 10]
         children:
           mode_title:
-            from: .options_window.content_title
+            from: options_window.content_title
             text: "Display Mode"
             position: [0, 0]
-            x_relative: Center
+            relative:
+              x: Center
           mode_content:
-            from: .options_window.content_sub_content
-            x_relative: Center
-            preferred_size: [0, 8]
+            from: options_window.content_sub_content
+            relative:
+              x: Center
+              width: ChildSum
+            size: [0, 8]
             position: [0, 5]
-            width_relative: ChildSum
             layout: BoxHorizontal
             layout_spacing: { right: 2 }
             children:
               mode_window:
-                from: .button
+                from: button
                 text: "Windowed"
-                preferred_size: [23, 0]
-                height_relative: Max
+                size: [23, 0]
+                relative:
+                  height: Max
                 custom:
                   tooltip: "A standard window that can be resized, minimized and maximized."
               mode_borderless:
-                from: .button
+                from: button
                 text: "Borderless"
-                preferred_size: [23, 0]
-                height_relative: Max
+                size: [23, 0]
+                relative:
+                  height: Max
                 custom:
                   tooltip: "Borderless Window - Select this along with maximum resolution for fullscreen."
               mode_fullscreen:
-                from: .button
+                from: button
                 text: "Fullscreen"
-                preferred_size: [23, 0]
-                height_relative: Max
+                size: [23, 0]
+                relative:
+                  height: Max
                 custom:
                   tooltip: "Traditional fullscreen mode.  Borderless is almost always the better choice."
           monitor_title:
-            from: .options_window.content_title
+            from: options_window.content_title
             text: "Monitor"
             position: [0, 15]
-            x_relative: Center
+            relative:
+              x: Center
           monitor_content:
-            from: .options_window.content_sub_content
-            x_relative: Center
-            preferred_size: [50, 8]
+            from: options_window.content_sub_content
+            relative:
+              x: Center
+            size: [50, 8]
             position: [0, 20]
             children:
               monitor_label:
-                from: .label
+                from: label
                 text_params:
                   horizontal_alignment: Left
                 text: "#monitor#"
-                preferred_size: [-12, 0]
-                width_relative: Max
-                height_relative: Max
+                size: [-12, 0]
+                relative:
+                  width: Max
+                  height: Max
               next_monitor:
-                from: .button
+                from: button
                 text: "Next"
-                x_relative: Max
-                height_relative: Max
-                preferred_size: [10, 0]
+                relative:
+                  x: Center
+                  height: Max
+                size: [10, 0]
                 custom:
                   tooltip: "Specify which monitor to display on."
           resolution_title:
-            from: .options_window.content_title
+            from: options_window.content_title
             text: "Resolution"
             position: [0, 30]
-            x_relative: Center
+            relative:
+              x: Center
           resolution_pane:
-            from: .options_window.content_sub_content
+            from: options_window.content_sub_content
             background: empty
-            x_relative: Center
-            preferred_size: [50, 43]
+            relative:
+              x: Center
+            size: [50, 43]
             position: [3, 35]
             children:
               scrollbar:
-                from: .scrollbar
+                from: scrollbar
                 custom:
-                  scroll_delta: 7
+                  scroll_delta: "7"
               content:
-                width_relative: Max
-                height_relative: Max
+                relative:
+                  width: Max
+                  height: Max
                 layout: BoxVertical
                 layout_spacing: { bottom: 1 }
-                preferred_size: [-7, 0]
+                size: [-7, 0]
                 children:
                   resolution_button:
-                    from: .button
+                    from: button
                     text: "#width# by #height#"
-                    width_relative: Max
-                    preferred_size: [0, 6]
+                    relative:
+                      width: Max
+                    size: [0, 6]
           ui_scale_title:
-            from: .options_window.content_title
+            from: options_window.content_title
             text: "UI Scale"
             position: [0, 80]
-            x_relative: Center
+            relative:
+              x: Center
           ui_scale_content:
-            from: .options_window.content_sub_content
-            x_relative: Center
-            preferred_size: [50, 8]
+            from: options_window.content_sub_content
+            relative:
+              x: Center
+            size: [50, 8]
             position: [0, 85]
             children:
               small:
-                from: .button
+                from: button
                 text: "Small"
-                height_relative: Max
-                preferred_size: [23, 0]
+                relative:
+                  height: Max
+                size: [23, 0]
                 custom:
                   tooltip: "All buttons, text, and other UI elements are smaller."
               normal:
-                from: .button
+                from: button
                 text: "Normal"
-                height_relative: Max
-                x_relative: Max
-                preferred_size: [23, 0]
+                relative:
+                  x: Max
+                  height: Max
+                size: [23, 0]
                 custom:
                   tooltip: "Standard size buttons, text, and other UI elements."
           anim_speed_title:
-            from: .options_window.content_title
+            from: options_window.content_title
             text: "Animation Speed"
             position: [0, 95]
-            x_relative: Center
+            relative:
+              x: Center
           anim_speed_slow:
-            from: .label
+            from: label
             text: Slow
             position: [-20, 96]
-            preferred_size: [10, 5]
-            x_relative: Center
+            size: [10, 5]
+            relative:
+              x: Center
           anim_speed_fast:
-            from: .label
+            from: label
             text: Fast
             position: [20, 96]
-            preferred_size: [10, 5]
-            x_relative: Center
+            size: [10, 5]
+            relative:
+              x: Center
           anim_speed_content:
-            from: .options_window.content_sub_content
-            x_relative: Center
-            preferred_size: [0, 8]
-            width_relative: ChildSum
+            from: options_window.content_sub_content
+            relative:
+              x: Center
+              width: ChildSum
+            size: [0, 8]
             layout: BoxHorizontal
             layout_spacing: { top: 0, bottom: 0, left: 0, right: 2 }
             position: [0, 100]
             children:
               speed_button:
-                from: .button
-                height_relative: Max
-                preferred_size: [8, 0]
+                from: button
+                relative:
+                  height: Max
+                size: [8, 0]
                 custom:
                   tooltip: "Set the speed of all in game animations.  Affects the speed of combat and character movement."
           scroll_speed_title:
-            from: .options_window.content_title
+            from: options_window.content_title
             text: "Scroll Speed"
             position: [0, 0]
-            x_relative: Center
+            relative:
+              x: Center
           scroll_speed_slow:
-            from: .label
+            from: label
             text: Slow
             position: [-30, 1]
-            preferred_size: [10, 5]
-            x_relative: Center
+            size: [10, 5]
+            relative:
+              x: Center
           scroll_speed_fast:
-            from: .label
+            from: label
             text: Fast
             position: [30, 1]
-            preferred_size: [10, 5]
-            x_relative: Center
+            size: [10, 5]
+            relative:
+              x: Center
           scroll_speed_content:
-            from: .options_window.content_sub_content
-            x_relative: Center
-            preferred_size: [70, 8]
+            from: options_window.content_sub_content
+            relative:
+              x: Center
+            size: [70, 8]
             position: [0, 5]
             layout: BoxHorizontal
             layout_spacing: { right: 2 }
             children:
               speed_button:
-                from: .button
-                height_relative: Max
-                preferred_size: [8, 0]
+                from: button
+                relative:
+                  height: Max
+                size: [8, 0]
                 custom:
                   tooltip: "Set the speed of view scrolling."
           edge_scroll_content:
-            from: .options_window.content_sub_content
-            x_relative: Center
-            preferred_size: [50, 8]
+            from: options_window.content_sub_content
+            relative:
+              x: Center
+            size: [50, 8]
             position: [0, 17]
             children:
               label:
-                from: .label
+                from: label
                 text: "Edge Scrolling"
                 text_params:
                   scale: 6
-                x_relative: Zero
-                preferred_size: [32, 6]
+                relative:
+                  x: Zero
+                size: [32, 6]
               on:
-                from: .button
+                from: button
                 text: "On"
-                x_relative: Max
-                preferred_size: [8, 6]
+                relative:
+                  x: Max
+                size: [8, 6]
                 custom:
                   tooltip: "Scroll the view when the mouse is at the edge of the screen."
               off:
-                from: .button
+                from: button
                 text: "Off"
-                x_relative: Max
-                preferred_size: [8, 6]
+                relative:
+                  x: Max
+                size: [8, 6]
                 position: [-9, 0]
                 custom:
                   tooltip: "Do not scroll the view when the mouse is at the edge of the screen."
           keybindings_title:
-            from: .options_window.content_title
+            from: options_window.content_title
             text: "Keybindings"
             position: [0, 30]
-            x_relative: Center
+            relative:
+              x: Center
           keybindings_pane:
-            from: .options_window.content_sub_content
+            from: options_window.content_sub_content
             background: bg_base
-            x_relative: Center
-            preferred_size: [70, 73]
+            relative:
+              x: Center
+            size: [70, 73]
             position: [0, 35]
             children:
               scrollbar:
-                from: .scrollbar
+                from: scrollbar
                 custom:
-                  scroll_delta: 7
+                  scroll_delta: "7"
               content:
-                from: .options_window.content_sub_content
+                from: options_window.content_sub_content
                 background: empty
-                width_relative: Max
-                height_relative: Max
+                relative:
+                  width: Max
+                  height: Max
                 layout: Grid
                 layout_spacing: { right: 1, bottom: 1 }
                 children:
                   key_button:
-                    from: .button
+                    from: button
                     text: "#key#"
                     text_params:
                       horizontal_alignment: Right
-                    preferred_size: [25, 6]
+                    size: [25, 6]
                     custom:
                       tooltip: "Press to rebind this action."
                   action_label:
-                    from: .button
+                    from: button
                     background: bg_base
                     text: "#action#"
                     text_params:
                       horizontal_alignment: Left
-                    preferred_size: [35, 6]
+                    size: [35, 6]
   mods_selector:
     children:
       title:
-        from: .label
+        from: label
         text_params:
           scale: 10.0
         text: "Choose Active Mods"
-        x_relative: Center
-        preferred_size: [225, 10]
+        relative:
+          x: Center
+        size: [225, 10]
       available_title:
-        from: .label
+        from: label
         text: "Available Mods"
         text_params:
           scale: 9.0
-        x_relative: Center
-        preferred_size: [110, 10]
+        relative:
+          x: Center
+        size: [110, 10]
         position: [55, 9]
       active_title:
-        from: .label
+        from: label
         text: "Active Mods"
         text_params:
           scale: 9.0
-        x_relative: Center
-        preferred_size: [110, 10]
+        relative:
+          x: Center
+        size: [110, 10]
         position: [-57, 9]
       active:
         border: [2, 2, 2, 2]
-        preferred_size: [110, -34]
-        height_relative: Max
+        size: [110, -34]
         background: bg_base
-        x_relative: Center
+        relative:
+          x: Center
+          height: Max
         position: [-57, 17]
         children:
           scrollbar:
-            from: .scrollbar
+            from: scrollbar
             custom:
-              scroll_delta: 26
+              scroll_delta: "26"
           content:
-            width_relative: Max
-            height_relative: Max
-            preferred_size: [-7, 0]
+            relative:
+              width: Max
+              height: Max
+            size: [-7, 0]
             layout: BoxVertical
             layout_spacing: { top: 0, bottom: 2, left: 0, right: 0 }
             children:
               mod_pane:
-                from: .mod_pane
+                from: mod_pane
                 children:
                   description:
                     position: [0, 0]
@@ -666,28 +745,32 @@ children:
                     text: ">>"
                     custom:
                       tooltip: "Deactivate this mod"
-                    x_relative: Max
+                    relative:
+                      x: Max
+                      y: Max
       available:
         border: [2, 2, 2, 2]
-        preferred_size: [110, -34]
-        height_relative: Max
+        size: [110, -34]
         background: bg_base
-        x_relative: Center
+        relative:
+          x: Center
+          height: Max
         position: [55, 17]
         children:
           scrollbar:
-            from: .scrollbar
+            from: scrollbar
             custom:
-              scroll_delta: 26
+              scroll_delta: "26"
           content:
-            width_relative: Max
-            height_relative: Max
-            preferred_size: [-7, 0]
+            relative:
+              width: Max
+              height: Max
+            size: [-7, 0]
             layout: BoxVertical
             layout_spacing: { top: 0, bottom: 2, left: 0, right: 0 }
             children:
               mod_pane:
-                from: .mod_pane
+                from: mod_pane
                 children:
                   description:
                     position: [8, 0]
@@ -695,171 +778,191 @@ children:
                     text: "<<"
                     custom:
                       tooltip: "Activate this mod"
-                    x_relative: Zero
+                    relative:
+                      x: Zero
       clear:
-        from: .button
-        preferred_size: [30, 10]
+        from: button
+        size: [30, 10]
         text_params:
           scale: 8
         text: "Clear"
-        x_relative: Center
-        y_relative: Max
+        relative:
+          x: Center
+          y: Max
         position: [-97, -5]
         custom:
           tooltip: "Remove all active mods"
       cancel:
-        from: .button
-        preferred_size: [30, 10]
+        from: button
+        size: [30, 10]
         text_params:
           scale: 8
         text: "Cancel"
-        x_relative: Center
-        y_relative: Max
+        relative:
+          x: Center
+          y: Max
         position: [-62, -5]
       apply:
-        from: .button
-        preferred_size: [30, 10]
+        from: button
+        size: [30, 10]
         position: [95, -5]
         text_params:
           scale: 8
         text: "Apply"
-        x_relative: Center
-        y_relative: Max
+        relative:
+          x: Center
+          y: Max
   mod_pane:
     background: bg_base
-    width_relative: Max
-    preferred_size: [0, 24]
+    relative:
+      width: Max
+    size: [0, 24]
     border: [2, 2, 2, 2]
     children:
       description:
-        from: .text_area
-        width_relative: Max
-        height_relative: Max
-        preferred_size: [-8, 0]
+        from: text_area
+        relative:
+          width: Max
+          height: Max
+        size: [-8, 0]
         text: |
           [s=8.0|#name#][s=4.0|
           ]
           [s=5.0|#description#]
       toggle:
-        from: .button
-        preferred_size: [6, 6]
+        from: button
+        size: [6, 6]
         position: [0, 7]
       up:
-        from: .button
-        preferred_size: [6, 6]
+        from: button
+        size: [6, 6]
         position: [0, 0]
-        x_relative: Max
+        relative:
+          x: Max
         text: "^"
         custom:
           tooltip: "Move this mod up in the load order"
       down:
-        from: .button
-        preferred_size: [6, 6]
+        from: button
+        size: [6, 6]
         position: [0, 14]
-        x_relative: Max
+        relative:
+          x: Max
         text: "v"
         custom:
           tooltip: "Move this mod down in the load order"
   module_selector:
     children:
       title:
-        from: .label
+        from: label
         text_params:
           scale: 10.0
         text: "Select a Campaign"
-        x_relative: Center
-        preferred_size: [40, 10]
+        relative:
+          x: Center
+        size: [40, 10]
         position: [0, 0]
       play_button:
-        from: .button
+        from: button
         background: hint_to_click_background
         text: "Select"
         text_params:
           scale: 9.0
           vertical_alignment: Center
-        preferred_size: [40, 10]
-        x_relative: Center
-        y_relative: Max
+        size: [40, 10]
+        relative:
+          x: Center
+          y: Max
         position: [-30, -5]
       modules_title:
-        from: .label
+        from: label
         text: "Available Campaigns"
         text_params:
           scale: 9.0
-        x_relative: Center
-        preferred_size: [80, 10]
+        relative:
+          x: Center
+        size: [80, 10]
         position: [-60, 10]
       campaign_groups:
         background: bg_base
         border: [2, 2, 2, 2]
-        preferred_size: [100, -35]
+        size: [100, -35]
         position: [-60, 18]
-        x_relative: Center
-        height_relative: Max
-        width_relative: Zero
+        relative:
+          x: Center
+          height: Max
+          width: Zero
         children:
           scrollbar:
-            from: .scrollbar
+            from: scrollbar
             custom:
-              scroll_delta: 20
+              scroll_delta: "20"
           content:
-            width_relative: Max
-            preferred_size: [-7, 0]
-            height_relative: Max
+            relative:
+              width: Max
+              height: Max
+            size: [-7, 0]
             layout: BoxVertical
             children:
               campaign_group:
                 border: { bottom: 5 }
-                width_relative: Max
-                height_relative: ChildSum
+                relative:
+                  width: Max
+                  height: ChildSum
                 layout: BoxVertical
                 layout_spacing: { bottom: 2 }
                 children:
                   name_label:
-                    from: .label
+                    from: label
                     text: "#name#"
                     text_params:
                       scale: 9.0
                       horizontal_alignment: Center
-                    width_relative: Max
-                    preferred_size: [0, 6]
+                    relative:
+                      width: Max
+                    size: [0, 6]
                   module_button:
-                    from: .button
+                    from: button
                     text: "#module#"
                     text_params:
                       scale: 9.0
-                    width_relative: Max
-                    preferred_size: [0, 8]
+                    relative:
+                      width: Max
+                    size: [0, 8]
       details:
-        from: .text_area
+        from: text_area
         border: [4, 4, 4, 4]
         background: bg_base
-        x_relative: Center
-        height_relative: Max
-        preferred_size: [115, -15]
+        relative:
+          x: Center
+          height: Max
+        size: [115, -15]
         position: [50, 10]
         text: "[s=7.0|#description#]"
   loading_screen:
     background: bg_base
-    width_relative: Max
-    height_relative: Max
+    relative:
+      width: Max
+      height: Max
     children:
       background:
         background: "bg1/image"
-        preferred_size: [-80, -10]
-        x_relative: Center
-        y_relative: Center
-        width_relative: Max
-        height_relative: Max
+        size: [-80, -10]
+        relative:
+          x: Center
+          y: Center
+          width: Max
+          height: Max
       loading_label:
-        from: .label
+        from: label
         text_params:
           scale: 12.0
           horizontal_alignment: Center
         text: "Loading..."
-        x_relative: Center
-        y_relative: Max
-        width_relative: Max
-        preferred_size: [0, 10]
+        relative:
+          x: Center
+          y: Max
+          width: Max
+        size: [0, 10]
         position: [0, -20]
 ...

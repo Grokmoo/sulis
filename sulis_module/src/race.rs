@@ -103,7 +103,7 @@ impl Race {
         for (layer, vec) in builder.editor_creator_images {
             let mut images = Vec::new();
             for image_id in vec {
-                match ResourceSet::get_image(&image_id) {
+                match ResourceSet::image(&image_id) {
                     None => {
                         warn!("No image found with id '{}'", image_id);
                         return unable_to_create_error("race", &builder.id);
@@ -178,7 +178,7 @@ impl Race {
             None => Rc::clone(image),
             Some(ref postfix) => {
                 let id = image.id() + postfix;
-                match ResourceSet::get_image(&id) {
+                match ResourceSet::image(&id) {
                     None => Rc::clone(image),
                     Some(ref new_image) => Rc::clone(new_image),
                 }

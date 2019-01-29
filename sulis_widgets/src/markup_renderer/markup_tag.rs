@@ -136,7 +136,7 @@ impl Markup {
             Center => self.center = Some(get_float(buf)),
             Right => self.right = Some(get_float(buf)),
             Image => self.image = Some(buf.to_string()),
-            Font => match ResourceSet::get_font(buf) {
+            Font => match ResourceSet::font(buf) {
                 None => warn!("Font not found '{}'", buf),
                 Some(font) => self.font = font,
             },

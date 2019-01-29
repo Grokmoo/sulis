@@ -77,16 +77,15 @@ impl WidgetKind for FormationWindow {
     widget_kind!(NAME);
 
     fn layout(&mut self, widget: &mut Widget) {
-        if let Some(ref theme) = widget.theme {
-            self.grid_half_width = theme.get_custom_or_default("grid_half_width", 10.0);
-            self.grid_height = theme.get_custom_or_default("grid_height", 10.0);
-            self.button_size = theme.get_custom_or_default("button_size", 2.0);
-        }
+        let theme = &widget.theme;
+        self.grid_half_width = theme.get_custom_or_default("grid_half_width", 10.0);
+        self.grid_height = theme.get_custom_or_default("grid_height", 10.0);
+        self.button_size = theme.get_custom_or_default("button_size", 2.0);
 
         widget.do_self_layout();
 
-        let w = widget.state.inner_size.width as f32;
-        let h = widget.state.inner_size.height as f32;
+        let w = widget.state.inner_width() as f32;
+        let h = widget.state.inner_height() as f32;
 
         self.grid_size = (w / (1.0 + self.grid_half_width * 2.0), h / self.grid_height);
         self.grid_offset = (self.grid_size.0 * self.grid_half_width, 0.0);
@@ -97,8 +96,8 @@ impl WidgetKind for FormationWindow {
         for entry in self.entries.iter() {
             let x = entry.position.0 * self.grid_size.0 + self.grid_offset.0;
             let y = entry.position.1 * self.grid_size.1 + self.grid_offset.1;
-            entry.child.borrow_mut().state.set_position(widget.state.inner_position.x + x as i32,
-                                                        widget.state.inner_position.y + y as i32);
+            entry.child.borrow_mut().state.set_position(widget.state.inner_left() + x as i32,
+                                                        widget.state.inner_top() + y as i32);
             entry.child.borrow_mut().state.set_size(Size::new((self.grid_size.0 * self.button_size) as i32,
                 (self.grid_size.1 * self.button_size) as i32));
         }
@@ -113,8 +112,8 @@ impl WidgetKind for FormationWindow {
         let cur_grid_pos = self.entries[index].position;
 
         // compute the new grid position
-        let x = Cursor::get_x_f32() - widget.borrow().state.inner_position.x as f32;
-        let y = Cursor::get_y_f32() - widget.borrow().state.inner_position.y as f32;
+        let x = Cursor::get_x_f32() - widget.borrow().state.inner_left() as f32;
+        let y = Cursor::get_y_f32() - widget.borrow().state.inner_top() as f32;
 
         let mut grid_pos = (
             ((x - self.grid_offset.0) / self.grid_size.0 - self.button_size / 4.0).floor(),

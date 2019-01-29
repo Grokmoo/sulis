@@ -18,7 +18,7 @@
 
 use std::rc::Rc;
 
-use log::{error, warn, info};
+use log::{error, info};
 
 use sulis_core::ui::{self, Cursor};
 use sulis_core::resource::{ResourceSet};
@@ -82,14 +82,6 @@ fn main_menu(io: &mut Box<IO>) -> NextGameStep {
     let view = main_menu::MainMenu::new(io.get_display_configurations());
     let loop_updater = main_menu::LoopUpdater::new(&view);
     let root = ui::create_ui_tree(view.clone());
-    match ResourceSet::get_theme().children.get("main_menu") {
-        None => warn!("No theme found for 'main_menu'"),
-        Some(ref theme) => {
-            root.borrow_mut().theme = Some(Rc::clone(theme));
-            root.borrow_mut().theme_id = ".main_menu".to_string();
-            root.borrow_mut().theme_subname = "main_menu".to_string();
-        }
-    }
 
     if let Err(e) = util::main_loop(io, root, Box::new(loop_updater)) {
         error!("{}", e);

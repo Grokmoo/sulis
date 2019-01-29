@@ -25,7 +25,7 @@ use crate::ui::color::Color;
 use crate::ui::{WidgetState, Border, LayoutKind};
 use crate::util::{Size, Point};
 
-#[derive(Deserialize, Debug, Clone, Copy)]
+#[derive(Deserialize, Debug, Clone, Copy, Eq, Hash, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub enum HorizontalAlignment {
     Left,
@@ -34,10 +34,10 @@ pub enum HorizontalAlignment {
 }
 
 impl Default for HorizontalAlignment {
-    fn default() -> Self { HorizontalAlignment::Left }
+    fn default() -> Self { HorizontalAlignment::Center }
 }
 
-#[derive(Deserialize, Debug, Clone, Copy)]
+#[derive(Deserialize, Debug, Clone, Copy, Eq, Hash, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub enum VerticalAlignment {
     Top,
@@ -49,11 +49,11 @@ impl Default for VerticalAlignment {
     fn default() -> Self { VerticalAlignment::Center }
 }
 
-#[derive(Deserialize, Debug, Clone, Copy)]
+#[derive(Deserialize, Debug, Clone, Copy, Eq, Hash, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub enum SizeRelative {
     Zero,
-    Parent,
+    Max,
     ChildMax,
     ChildSum,
     Custom,
@@ -65,7 +65,7 @@ impl Default for SizeRelative {
     }
 }
 
-#[derive(Deserialize, Debug, Clone, Copy)]
+#[derive(Deserialize, Debug, Clone, Copy, Eq, Hash, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub enum PositionRelative {
     Zero,
@@ -103,7 +103,7 @@ impl Default for TextParams {
             vertical_alignment: VerticalAlignment::Center,
             color: Color::default(),
             scale: 1.0,
-            font: "Default".to_string(),
+            font: "normal".to_string(),
         }
     }
 }
@@ -262,7 +262,10 @@ impl ThemeSet {
 
     pub fn get(&self, id: &str) -> &Rc<Theme> {
         match self.themes.get(id) {
-            None => &self.themes[DEFAULT_THEME_ID],
+            None => {
+                warn!("Theme not found: {}", id);
+                &self.themes[DEFAULT_THEME_ID]
+            },
             Some(theme) => theme,
         }
     }

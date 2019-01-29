@@ -60,8 +60,8 @@ impl AreaEditor {
     }
 
     fn get_cursor_pos(&self, widget: &Rc<RefCell<Widget>>, width: i32, height: i32) -> (i32, i32) {
-        let mut x = Cursor::get_x_f32() - widget.borrow().state.inner_position.x as f32;
-        let mut y = Cursor::get_y_f32() - widget.borrow().state.inner_position.y as f32;
+        let mut x = Cursor::get_x_f32() - widget.borrow().state.inner_left() as f32;
+        let mut y = Cursor::get_y_f32() - widget.borrow().state.inner_top() as f32;
 
         x /= self.scale.0;
         y /= self.scale.1;
@@ -97,7 +97,7 @@ impl WidgetKind for AreaEditor {
         self.scale = compute_area_scaling(pixel_size);
         let (scale_x, scale_y) = self.scale;
 
-        let p = widget.state.position;
+        let p = widget.state.position();
         // TODO fix this hack
         let p = Point::new(p.x / 4, p.y / 4);
 

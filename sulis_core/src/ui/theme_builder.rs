@@ -84,7 +84,7 @@ impl TextParamsBuilder {
             vertical_alignment: self.vertical_alignment.unwrap_or_default(),
             color: self.color.unwrap_or_default(),
             scale: self.scale.unwrap_or(1.0),
-            font: self.font.unwrap_or("default".to_string()),
+            font: self.font.unwrap_or("normal".to_string()),
         }
     }
 
@@ -182,6 +182,7 @@ impl ThemeBuilder {
 #[derive(Deserialize, Default, Debug)]
 #[serde(default, deny_unknown_fields)]
 pub struct ThemeBuilderSet {
+    pub(crate) id: String,
     pub(crate) themes: HashMap<String, ThemeBuilder>,
 }
 
@@ -216,7 +217,8 @@ impl ThemeBuilderSet {
 
     fn flatten_children_recursive(&mut self, id: String) -> Result<(), Error> {
         let children: Vec<(String, ThemeBuilder)> =
-            self.themes.get_mut(&id).unwrap().children.drain().collect();
+            self.themes.get_mut(&id).unwrap().children.iter()
+                .map(|(k, v)| (k.to_string(), v.clone())).collect();
 
         for (child_id, mut child) in children {
             let new_id = format!("{}.{}", id, child_id);
@@ -269,12 +271,29 @@ impl ThemeBuilderSet {
             // reference at the same time, but as long as they aren't equal
             // it should be ok
             let from_theme = self.themes[&from].clone();
-            ThemeBuilderSet::expand_from_theme(&mut self.themes.get_mut(id).unwrap(), &from_theme);
+            self.copy_from_theme_recursive(id, &from_theme, depth)?;
         }
         Ok(())
     }
 
-    fn expand_from_theme(to: &mut ThemeBuilder, from: &ThemeBuilder) {
+    fn copy_from_theme_recursive(&mut self, id: &str, from: &ThemeBuilder,
+                                 depth: u32) -> Result<(), Error> {
+        if !self.themes.contains_key(id) {
+            self.themes.insert(id.to_string(), from.clone());
+        } else {
+            ThemeBuilderSet::copy_from_theme(&mut self.themes.get_mut(id).unwrap(), &from);
+        }
+
+        for (child_id, child) in from.children.iter() {
+            // TODO expand the child from if it exists
+            let sub_id = format!("{}.{}", id, child_id);
+            self.copy_from_theme_recursive(&sub_id, child, depth)?;
+        }
+
+        Ok(())
+    }
+
+    fn copy_from_theme(to: &mut ThemeBuilder, from: &ThemeBuilder) {
         to.layout = to.layout.or(from.layout);
         to.layout_spacing = to.layout_spacing.or(from.layout_spacing);
         to.border = to.border.or(from.border);

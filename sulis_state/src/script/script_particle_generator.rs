@@ -294,7 +294,7 @@ pub fn create_pgen(gen: &ScriptParticleGenerator, model: GeneratorModel) -> Resu
     let mgr = GameState::turn_manager();
     let parent = mgr.borrow().entity(gen.parent);
 
-    let image = match ResourceSet::get_image(&gen.image) {
+    let image = match ResourceSet::image(&gen.image) {
         Some(image) => image,
         None => {
             warn!("Unable to locate image '{}' for particle generator", gen.image);

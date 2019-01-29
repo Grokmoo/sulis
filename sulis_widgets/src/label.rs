@@ -18,7 +18,7 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_core::ui::theme::{self, HorizontalTextAlignment, VerticalTextAlignment};
+use sulis_core::ui::theme::{self, HorizontalAlignment, VerticalAlignment};
 use sulis_core::ui::{LineRenderer, Widget, WidgetKind};
 use sulis_core::io::event::ClickKind;
 use sulis_core::io::GraphicsRenderer;
@@ -55,8 +55,8 @@ impl Label {
     fn get_draw_params(width: f32, height: f32, widget: &Widget) -> (f32, f32) {
         let x = widget.state.inner_left() as f32;
         let y = widget.state.inner_top() as f32;
-        let w = widget.state.inner_size.width as f32;
-        let h = widget.state.inner_size.height as f32;
+        let w = widget.state.inner_width() as f32;
+        let h = widget.state.inner_height() as f32;
 
         let len = if width > w {
             w
@@ -65,15 +65,15 @@ impl Label {
         };
 
         let x = match widget.state.text_params.horizontal_alignment {
-            HorizontalTextAlignment::Left => x,
-            HorizontalTextAlignment::Center => (x + (w - len) / 2.0),
-            HorizontalTextAlignment::Right => x +w - len,
+            HorizontalAlignment::Left => x,
+            HorizontalAlignment::Center => (x + (w - len) / 2.0),
+            HorizontalAlignment::Right => x +w - len,
         };
 
         let y = match widget.state.text_params.vertical_alignment {
-            VerticalTextAlignment::Top => y,
-            VerticalTextAlignment::Center => y + (h - height) / 2.0,
-            VerticalTextAlignment::Bottom => y + h - height,
+            VerticalAlignment::Top => y,
+            VerticalAlignment::Center => y + (h - height) / 2.0,
+            VerticalAlignment::Bottom => y + h - height,
         };
 
         (x, y)
@@ -117,7 +117,7 @@ impl WidgetKind for Label {
 
         let (x, y) = {
             let state = &widget.borrow().state;
-            (state.position.x + state.size.width, state.position.y)
+            (state.position().x + state.size().width, state.position().y)
         };
 
         Widget::set_mouse_over_widget(widget, tooltip, x, y);
@@ -136,10 +136,8 @@ impl WidgetKind for Label {
             widget.state.text_renderer = Some(Box::new(LineRenderer::new(font)));
         }
 
-        if let Some(ref theme) = widget.theme {
-            if let Some(tooltip) = theme.custom.get("tooltip") {
-                self.tooltip = theme::expand_text_args(tooltip, &widget.state);
-            }
+        if let Some(tooltip) = widget.theme.custom.get("tooltip") {
+            self.tooltip = theme::expand_text_args(tooltip, &widget.state);
         }
     }
 

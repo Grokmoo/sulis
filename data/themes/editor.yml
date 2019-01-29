@@ -1,566 +1,605 @@
 ---
-children:
+id: editor
+themes:
   editor:
     children:
       menu_list:
-        from: .list_box
+        from: list_box
         border: { top: 1, bottom: 1, left: 1, right: 1 }
         background: bg_base
         position: [0, 4]
-        preferred_size: [24, 0]
+        size: [24, 0]
       modes_list:
-        from: .list_box
+        from: list_box
         border: { top: 1, bottom: 1, left: 1, right: 1 }
         background: bg_base
         position: [28, 4]
-        preferred_size: [24, 0]
+        size: [24, 0]
       top_bar:
         background: bg_base
-        width_relative: Max
-        preferred_size: [0, 4]
+        relative:
+          width: Max
+        size: [0, 4]
         position: [0, 0]
         children:
           menu:
             background: bg_base
-            width_relative: ChildMax
-            height_relative: ChildSum
+            relative:
+              width: ChildMax
+              height: ChildSum
             layout: BoxVertical
             position: [0, 0]
             children:
               button:
-                from: .button
+                from: button
                 text: "Menu"
-                preferred_size: [24, 4]
+                size: [24, 4]
           modes:
             background: bg_base
-            width_relative: ChildMax
-            height_relative: ChildSum
+            relative:
+              width: ChildMax
+              height: ChildSum
             layout: BoxVertical
             position: [28, 0]
             children:
               button:
-                from: .button
+                from: button
                 text: "Mode"
-                preferred_size: [24, 4]
+                size: [24, 4]
           transitions:
-            from: .button
-            preferred_size: [24, 4]
+            from: button
+            size: [24, 4]
             text: "Transitions"
             position: [54, 0]
           mode_button:
-            from: .button
-            preferred_size: [24, 4]
+            from: button
+            size: [24, 4]
           shift_tiles:
-            from: .editor.top_bar.mode_button
+            from: editor.top_bar.mode_button
             text: "Shift Tiles"
             position: [80, 0]
           actor_creator:
-            from: .editor.top_bar.mode_button
+            from: editor.top_bar.mode_button
             text: "Actor Creator"
             position: [106, 0]
           walls:
-            from: .editor.top_bar.mode_button
+            from: editor.top_bar.mode_button
             text: "Walls"
             position: [144, 0]
           terrain:
-            from: .editor.top_bar.mode_button
+            from: editor.top_bar.mode_button
             text: "Terrain"
             position: [168, 0]
           tiles:
-            from: .editor.top_bar.mode_button
+            from: editor.top_bar.mode_button
             text: "Tiles"
             position: [192, 0]
           actors:
-            from: .editor.top_bar.mode_button
+            from: editor.top_bar.mode_button
             text: "Actors"
             position: [216, 0]
           props:
-            from: .editor.top_bar.mode_button
+            from: editor.top_bar.mode_button
             text: "Props"
             position: [240, 0]
           elevation:
-            from: .editor.top_bar.mode_button
+            from: editor.top_bar.mode_button
             text: "Elevation"
             position: [264, 0]
           encounters:
-            from: .editor.top_bar.mode_button
+            from: editor.top_bar.mode_button
             text: "Encounters"
             position: [288, 0]
       area_editor:
-        width_relative: Max
-        height_relative: Max
-        preferred_size: [-128, -4]
+        relative:
+          width: Max
+          height: Max
+        size: [-128, -4]
         position: [0, 4]
       wall_picker:
         background: bg_base
         border: [1, 1, 1, 1]
-        preferred_size: [128, -4]
-        x_relative: Max
-        height_relative: Max
+        size: [128, -4]
+        relative:
+          x: Max
+          height: Max
         position: [0, 4]
         children:
           no_wall_button:
-            from: .button
+            from: button
             position: [80, 43]
             text: "Clear"
-            preferred_size: [20, 20]
+            size: [20, 20]
           level_label:
-            from: .label
+            from: label
             text: "Level"
             position: [55, 5]
-            preferred_size: [30, 12]
+            size: [30, 12]
           level:
-            from: .spinner
+            from: spinner
             position: [75, 5]
           brush_size_label:
-            from: .label
+            from: label
             text: "Brush Size"
             position: [0, 5]
-            preferred_size: [30, 12]
+            size: [30, 12]
           brush_size:
-            from: .spinner
+            from: spinner
             position: [25, 5]
           ext_content:
-            width_relative: Max
+            relative:
+              width: Max
             position: [0, 44]
-            preferred_size: [-20, 20]
+            size: [-20, 20]
             layout: Grid
             layout_spacing: [0, 0, 0, 0]
             children:
               ext_button:
-                from: .button
+                from: button
                 foreground: "#icon#"
-                preferred_size: [20, 20]
+                size: [20, 20]
           walls:
-            height_relative: Max
-            width_relative: Max
+            relative:
+              width: Max
+              height: Max
             position: [0, 64]
-            preferred_size: [0, -64]
+            size: [0, -64]
             children:
               scrollbar:
-                from: .scrollbar
+                from: scrollbar
                 custom:
-                  scroll_delta: 20
+                  scroll_delta: "20"
               content:
-                width_relative: Max
-                height_relative: Max
+                relative:
+                  width: Max
+                  height: Max
                 layout: Grid
                 layout_spacing: [0, 0, 0, 0]
                 children:
                   wall_button:
-                    from: .button
+                    from: button
                     foreground: "#icon#"
-                    preferred_size: [20, 20]
+                    size: [20, 20]
       terrain_picker:
         background: bg_base
         border: [1, 1, 1, 1]
-        preferred_size: [128, -4]
-        x_relative: Max
-        height_relative: Max
+        size: [128, -4]
+        relative:
+          x: Max
+          height: Max
         position: [0, 4]
         children:
           brush_size_label:
-            from: .label
+            from: label
             text: "Brush Size"
             position: [5, 5]
-            preferred_size: [30, 12]
+            size: [30, 12]
           brush_size:
-            from: .spinner
+            from: spinner
             position: [35, 5]
           terrain:
-            height_relative: Max
-            width_relative: Max
+            relative:
+              width: Max
+              height: Max
             position: [0, 24]
-            preferred_size: [0, -24]
+            size: [0, -24]
             children:
               scrollbar:
-                from: .scrollbar
+                from: scrollbar
                 custom:
-                  scroll_delta: 20
+                  scroll_delta: "20"
               content:
-                width_relative: Max
-                height_relative: Max
+                relative:
+                  width: Max
+                  height: Max
                 layout: Grid
                 layout_spacing: [0, 0, 0, 0]
                 children:
                   terrain_button:
-                    from: .button
+                    from: button
                     foreground: "#icon#"
-                    preferred_size: [20, 20]
+                    size: [20, 20]
       elevation_picker:
         background: bg_base
         border: [1, 1, 1, 1]
-        preferred_size: [128, -4]
-        x_relative: Max
-        height_relative: Max
+        size: [128, -4]
+        relative:
+          x: Max
+          height: Max
         position: [0, 4]
         children:
           brush_size_label:
-            from: .label
+            from: label
             text: "Brush Size"
             position: [5, 5]
-            preferred_size: [30, 12]
+            size: [30, 12]
           brush_size:
-            from: .spinner
+            from: spinner
             position: [35, 5]
           elev_label:
-            from: .label
+            from: label
             text: "Set Elevation to"
             position: [5, 30]
-            preferred_size: [30, 12]
+            size: [30, 12]
           elev:
-            from: .spinner
+            from: spinner
             position: [35, 30]
       actor_picker:
         background: bg_base
         border: [1, 1, 1, 1]
-        preferred_size: [128, -4]
-        x_relative: Max
-        height_relative: Max
+        size: [128, -4]
+        relative:
+          x: Max
+          height: Max
         position: [0, 4]
         layout: Grid
         layout_spacing: [0, 1, 0, 1]
         children:
           actors:
-            height_relative: Max
-            width_relative: Max
+            relative:
+              width: Max
+              height: Max
             children:
               scrollbar:
-                from: .scrollbar
+                from: scrollbar
                 custom:
-                  scroll_delta: 10
+                  scroll_delta: "10"
               content:
-                width_relative: Max
-                height_relative: Max
+                relative:
+                  width: Max
+                  height: Max
                 layout: Grid
                 layout_spacing: [0, 0, 0, 0]
                 children:
                   actor_button:
-                    from: .button
+                    from: button
                     text: "#name#"
-                    preferred_size: [40, 6]
+                    size: [40, 6]
       prop_picker:
         background: bg_base
         border: [1, 1, 1, 1]
-        preferred_size: [128, -4]
-        x_relative: Max
-        height_relative: Max
+        size: [128, -4]
+        relative:
+          x: Max
+          height: Max
         position: [0, 4]
         layout: Grid
         layout_spacing: [0, 1, 0, 1]
         children:
           props:
-            height_relative: Max
-            width_relative: Max
+            relative:
+              width: Max
+              height: Max
             children:
               scrollbar:
-                from: .scrollbar
+                from: scrollbar
                 custom:
-                  scroll_delta: 10
+                  scroll_delta: "10"
               content:
-                width_relative: Max
-                height_relative: Max
+                relative:
+                  width: Max
+                  height: Max
                 layout: Grid
                 layout_spacing: [0, 0, 0, 0]
                 children:
                   prop_button:
-                    from: .button
+                    from: button
                     text: "#name#"
-                    preferred_size: [40, 6]
+                    size: [40, 6]
       trigger_picker:
         background: bg_base
         border: [1, 1, 1, 1]
-        preferred_size: [128, -4]
-        x_relative: Max
-        height_relative: Max
+        size: [128, -4]
+        relative:
+          x: Max
+          height: Max
         position: [0, 4]
         children:
           size_label:
-            from: .label
+            from: label
             text: "Size"
             position: [0, 0]
-            preferred_size: [10, 12]
+            size: [10, 12]
           width:
-            from: .spinner
+            from: spinner
             position: [15, 0]
           height:
-            from: .spinner
+            from: spinner
             position: [40, 0]
       encounter_picker:
         background: bg_base
         border: [1, 1, 1, 1]
-        preferred_size: [128, -4]
-        x_relative: Max
-        height_relative: Max
+        size: [128, -4]
+        relative:
+          x: Max
+          height: Max
         position: [0, 4]
         children:
           size_label:
-            from: .label
+            from: label
             text: "Size"
             position: [0, 0]
-            preferred_size: [10, 12]
+            size: [10, 12]
           width:
-            from: .spinner
+            from: spinner
             position: [15, 0]
           height:
-            from: .spinner
+            from: spinner
             position: [40, 0]
           encounters:
-            height_relative: Max
-            width_relative: Max
+            relative:
+              width: Max
+              height: Max
             position: [0, 15]
-            preferred_size: [0, -15]
+            size: [0, -15]
             children:
               scrollbar:
-                from: .scrollbar
+                from: scrollbar
               content:
-                width_relative: Max
-                height_relative: Max
+                relative:
+                  width: Max
+                  height: Max
                 layout: Grid
                 layout_spacing: [0, 0, 0, 0]
                 children:
                   encounter_button:
-                    from: .button
+                    from: button
                     text: "#name#"
-                    preferred_size: [40, 6]
+                    size: [40, 6]
       tile_picker:
         background: bg_base
         border: [1, 1, 1, 1]
-        preferred_size: [128, -4]
-        x_relative: Max
-        height_relative: Max
+        size: [128, -4]
+        relative:
+          x: Max
+          height: Max
         position: [0, 4]
         children:
           layers_content:
-            height_relative: Max
-            preferred_size: [20, 0]
+            relative:
+              height: Max
+            size: [20, 0]
             layout: BoxVertical
             children:
               layer_button:
-                from: .button
+                from: button
                 text: "#0#"
                 text_params:
                   scale: 4.0
-                preferred_size: [20, 4]
+                size: [20, 4]
           tiles:
-            height_relative: Max
-            width_relative: Max
+            relative:
+              width: Max
+              height: Max
             position: [20, 0]
-            preferred_size: [-20, 0]
+            size: [-20, 0]
             children:
               scrollbar:
-                from: .scrollbar
+                from: scrollbar
               content:
-                width_relative: Max
-                height_relative: Max
+                relative:
+                  width: Max
+                  height: Max
                 layout: Grid
                 layout_spacing: [0, 0, 0, 0]
                 children:
                   tile_button:
-                    from: .button
+                    from: button
                     foreground: "#icon#"
-                    preferred_size: [20, 20]
+                    size: [20, 20]
       exit_confirmation_window:
-        from: .exit_confirmation
+        from: exit_confirmation
         children:
           title:
             text: "Exit the Editor?"
       actor_creator_window:
-        from: .window
-        height_relative: Zero
-        preferred_size: [180, 100]
-        x_relative: Center
-        y_relative: Center
+        from: window
+        size: [180, 100]
+        relative:
+          x: Center
+          y: Center
+          height: Zero
         children:
           title:
             text: "Actor Creator"
           accept_button:
-            from: .button
-            preferred_size: [16, 6]
+            from: button
+            size: [16, 6]
             text: "Save"
-            y_relative: Max
-            x_relative: Max
+            relative:
+              x: Max
+              y: Max
           race_pane:
-            height_relative: Max
-            preferred_size: [30, 0]
+            relative:
+              height: Max
+            size: [30, 0]
             children:
               race_title:
-                from: .label
+                from: label
                 text: "Race"
-                width_relative: Max
-                preferred_size: [0, 8]
+                relative:
+                  width: Max
+                size: [0, 8]
               races_list:
-                from: .list_box
+                from: list_box
                 border: [1, 1, 1, 1]
-                preferred_size: [0, -8]
+                size: [0, -8]
                 position: [0, 8]
-                height_relative: Max
-                width_relative: Max
+                relative:
+                  width: Max
+                  height: Max
                 children:
                   entry:
                     text_params:
                       scale: 6.0
-                    preferred_size: [0, 6]
+                    size: [0, 6]
           images_pane:
-            height_relative: ChildSum
+            relative:
+              height: ChildSum
             position: [35, 20]
-            preferred_size: [40, 0]
+            size: [40, 0]
             layout: BoxVertical
             children:
               layer_pane:
                 border: [1, 1, 1, 1]
-                preferred_size: [0, 10]
-                width_relative: Max
+                size: [0, 10]
+                relative:
+                  width: Max
                 background: bg_base
                 children:
                   prev_button:
-                    from: .button
+                    from: button
                     text: "<"
                     position: [0, 0]
-                    preferred_size: [8, 8]
+                    size: [8, 8]
                   title:
-                    from: .label
+                    from: label
                     text: "#0#"
                     position: [10, 0]
-                    preferred_size: [18, 8]
+                    size: [18, 8]
                   next_button:
-                    from: .button
+                    from: button
                     text: ">"
-                    preferred_size: [8, 8]
+                    size: [8, 8]
                     position: [30, 0]
           id_pane:
             position: [35, 10]
-            preferred_size: [40, 10]
+            size: [40, 10]
             children:
               title:
-                from: .label
+                from: label
                 text: "ID"
                 position: [0, 0]
-                preferred_size: [8, 8]
+                size: [8, 8]
               id_field:
-                from: .input_field
+                from: input_field
                 position: [10, 0]
-                preferred_size: [-10, 8]
-                width_relative: Max
+                size: [-10, 8]
+                relative:
+                  width: Max
           name_pane:
             position: [85, 10]
-            preferred_size: [60, 10]
+            size: [60, 10]
             children:
               title:
-                from: .label
+                from: label
                 text: "Name"
                 position: [0, 0]
-                preferred_size: [8, 8]
+                size: [8, 8]
               name_field:
-                from: .input_field
+                from: input_field
                 position: [10, 0]
-                preferred_size: [-10, 8]
-                width_relative: Max
+                size: [-10, 8]
+                relative:
+                  width: Max
           levels_pane:
             position: [85, 20]
-            preferred_size: [60, 30]
+            size: [60, 30]
             layout: Grid
             layout_spacing: { bottom: 1, right: 1 }
             children:
               class_widget:
-                from: .button
-                preferred_size: [19, 8]
+                from: button
+                size: [19, 8]
                 text: "#0#"
           faction_pane:
             position: [85, 50]
-            preferred_size: [40, 10]
+            size: [40, 10]
             children:
               Friendly:
-                from: .button
+                from: button
                 position: [0, 0]
                 text: "Friendly"
-                preferred_size: [18, 8]
+                size: [18, 8]
               Hostile:
-                from: .button
+                from: button
                 position: [20, 0]
                 text: "Hostile"
-                preferred_size: [18, 8]
+                size: [18, 8]
               Neutral:
-                from: .button
+                from: button
                 position: [40, 0]
                 text: "Neutral"
-                preferred_size: [18, 8]
+                size: [18, 8]
           sex_pane:
             position: [85, 60]
-            preferred_size: [40, 10]
+            size: [40, 10]
             children:
               Male:
-                from: .button
+                from: button
                 position: [0, 0]
                 text: "Male"
-                preferred_size: [18, 8]
+                size: [18, 8]
               Female:
-                from: .button
+                from: button
                 position: [20, 0]
                 text: "Female"
-                preferred_size: [18, 8]
+                size: [18, 8]
           hue_pane:
             position: [85, 70]
-            preferred_size: [40, 10]
+            size: [40, 10]
             children:
               prev_button:
-                from: .button
+                from: button
                 text: "<"
                 position: [0, 0]
-                preferred_size: [8, 8]
+                size: [8, 8]
               title:
-                from: .label
+                from: label
                 text: "Hue"
                 position: [10, 0]
-                preferred_size: [18, 8]
+                size: [18, 8]
               next_button:
-                from: .button
+                from: button
                 text: ">"
-                preferred_size: [8, 8]
+                size: [8, 8]
                 position: [30, 0]
           view_pane:
             background: bg_transparent_base
-            preferred_size: [15, 15]
+            size: [15, 15]
             position: [150, 10]
       shift_tiles_window:
-        from: .window
-        height_relative: Zero
-        preferred_size: [75, 50]
-        x_relative: Center
-        y_relative: Center
+        from: window
+        size: [75, 50]
+        relative:
+          x: Center
+          y: Center
+          height: Zero
         children:
           title:
             text: "Shift Tiles"
           x_label:
-            from: .label
+            from: label
             text: "X"
             position: [0, 10]
-            preferred_size: [10, 12]
+            size: [10, 12]
           x_spinner:
-            from: .spinner
+            from: spinner
             position: [10, 10]
           y_label:
-            from: .label
+            from: label
             text: "Y"
             position: [30, 10]
-            preferred_size: [10, 12]
+            size: [10, 12]
           y_spinner:
-            from: .spinner
+            from: spinner
             position: [40, 10]
           apply_button:
-            from: .button
-            preferred_size: [16, 4]
+            from: button
+            size: [16, 4]
             text: "Apply"
             position: [0, 30]
-            x_relative: Center
+            relative:
+              x: Center
       transition_window:
-        from: .window
+        from: window
         background: bg_medium
         border: [1, 1, 1, 1]
-        height_relative: Zero
-        preferred_size: [130, 90]
+        relative:
+          x: Max
+          height: Zero
+        size: [130, 90]
         position: [0, 0]
-        x_relative: Max
         children:
           title:
             text: "Transition Editor"
@@ -568,180 +607,193 @@ children:
           close:
             position: [0, 0]
           apply_button:
-            from: .button
-            preferred_size: [16, 6]
+            from: button
+            size: [16, 6]
             text: "Apply"
-            y_relative: Max
-            x_relative: Max
+            relative:
+              x: Max
+              y: Max
           new_button:
-            from: .button
-            preferred_size: [16, 6]
+            from: button
+            size: [16, 6]
             text: "New"
-            y_relative: Max
+            relative:
+              y: Max
             position: [50, 0]
           delete_button:
-            from: .button
-            preferred_size: [16, 6]
+            from: button
+            size: [16, 6]
             text: "Delete"
-            y_relative: Max
+            relative:
+              y: Max
             position: [70, 0]
           transitions_list:
-            from: .list_box
-            preferred_size: [50, -5]
+            from: list_box
+            size: [50, -5]
             position: [0, 5]
-            height_relative: Max
-            width_relative: Zero
+            relative:
+              height: Max
+              width: Zero
           cur_area_button:
-            from: .button
+            from: button
             text: "Cur Area"
-            preferred_size: [20, 8]
+            size: [20, 8]
             position: [53, 10]
           area_button:
-            from: .button
+            from: button
             text: "Other Area"
-            preferred_size: [20, 8]
+            size: [20, 8]
             position: [75, 10]
           world_map_button:
-            from: .button
+            from: button
             text: "World Map"
-            preferred_size: [20, 8]
+            size: [20, 8]
             position: [97, 10]
           from_label:
-            from: .label
+            from: label
             text: "From Point"
             text_params:
               horizontal_alignment: Right
-            preferred_size: [8, 12]
+            size: [8, 12]
             position: [53, 20]
           to_label:
-            from: .label
+            from: label
             text: "To Point"
             text_params:
               horizontal_alignment: Right
-            preferred_size: [16, 12]
+            size: [16, 12]
             position: [53, 35]
           to_area_label:
-            from: .label
+            from: label
             text: "To Area ID"
             text_params:
               horizontal_alignment: Right
-            preferred_size: [16, 6]
+            size: [16, 6]
             position: [53, 50]
           from_x:
-            from: .spinner
+            from: spinner
             position: [73, 20]
           from_y:
-            from: .spinner
+            from: spinner
             position: [93, 20]
           to_x:
-            from: .spinner
+            from: spinner
             position: [73, 35]
           to_y:
-            from: .spinner
+            from: spinner
             position: [93, 35]
           to_area:
-            from: .input_field
-            preferred_size: [50, 6]
+            from: input_field
+            size: [50, 6]
             position: [73, 50]
           hover_text_label:
-            from: .label
+            from: label
             text: "Hover Text"
             text_params:
               horizontal_alignment: Right
-            preferred_size: [16, 6]
+            size: [16, 6]
             position: [53, 58]
           hover_text:
-            from: .input_field
-            preferred_size: [50, 6]
+            from: input_field
+            size: [50, 6]
             position: [73, 58]
           sizes:
-            preferred_size: [78, 8]
+            size: [78, 8]
             position: [51, 66]
             layout: BoxHorizontal
             layout_spacing: { right: 1 }
             border: { top: 1, bottom: 1 }
             children:
               size:
-                from: .button
+                from: button
                 text: "#size#"
-                preferred_size: [10, 6]
+                size: [10, 6]
       load_window:
-        from: .window
-        height_relative: Zero
-        preferred_size: [84, 74]
-        x_relative: Center
-        y_relative: Center
+        from: window
+        size: [84, 74]
+        relative:
+          x: Center
+          y: Center
+          height: Zero
         children:
           title:
             text: "Load Area"
           areas_list:
-            preferred_size: [68, 46]
+            size: [68, 46]
             position: [4, 8]
             children:
               scrollbar:
-                from: .scrollbar
+                from: scrollbar
               content:
-                width_relative: Max
-                height_relative: Max
+                relative:
+                  width: Max
+                  height: Max
                 children:
                   listbox:
-                    from: .list_box
-                    width_relative: Max
+                    from: list_box
+                    relative:
+                      width: Max
           load_button:
-            from: .button
-            preferred_size: [16, 4]
+            from: button
+            size: [16, 4]
             position: [56, 58]
             text: "Load"
       save_window:
-        from: .window
-        height_relative: Zero
-        preferred_size: [124, 90]
-        x_relative: Center
-        y_relative: Center
+        from: window
+        relative:
+          x: Center
+          y: Center
+          height: Zero
+        size: [124, 90]
         children:
           field_box:
-            width_relative: Max
-            preferred_size: [0, 6]
+            relative:
+              width: Max
+            size: [0, 6]
             children:
               label:
-                from: .label
+                from: label
                 text_params:
                   horizontal_alignment: Right
-                height_relative: Max
-                preferred_size: [28, 0]
+                relative:
+                  height: Max
+                size: [28, 0]
               input_field:
-                from: .input_field
-                height_relative: Max
-                width_relative: Max
-                x_relative: Max
-                preferred_size: [-30, 0]
+                from: input_field
+                relative:
+                  x: Max
+                  width: Max
+                  height: Max
+                size: [-30, 0]
           title:
             text: "Save Area"
           save_button:
-            from: .button
-            preferred_size: [25, 6]
+            from: button
+            size: [25, 6]
             position: [0, 4]
-            x_relative: Center
-            y_relative: Max
+            relative:
+              x: Center
+              y: Max
             text: "Save"
           content:
-            width_relative: Max
-            height_relative: Max
+            relative:
+              width: Max
+              height: Max
             children:
               id:
-                from: .editor.save_window.field_box
+                from: editor.save_window.field_box
                 position: [0, 8]
                 children:
                   label:
                     text: "ID"
               name:
-                from: .editor.save_window.field_box
+                from: editor.save_window.field_box
                 position: [0, 16]
                 children:
                   label:
                     text: "Name"
               filename:
-                from: .editor.save_window.field_box
+                from: editor.save_window.field_box
                 position: [0, 24]
                 children:
                   label:
@@ -750,59 +802,64 @@ children:
                 position: [30, 32]
                 layout: BoxHorizontal
                 layout_spacing: { right: 1 }
-                width_relative: Max
-                preferred_size: [-30, 6]
+                relative:
+                  width: Max
+                size: [-30, 6]
                 children:
                   button:
-                    from: .button
+                    from: button
                     text: "#name#"
-                    preferred_size: [25, 6]
+                    size: [25, 6]
               vis_dist:
                 position: [0, 40]
-                preferred_size: [0, 14]
-                width_relative: Max
+                size: [0, 14]
+                relative:
+                  width: Max
                 children:
                   vis_dist_label:
-                    from: .label
+                    from: label
                     text: "Vis Dist"
                     text_params:
                       horizontal_alignment: Right
-                    height_relative: Max
-                    preferred_size: [28, 0]
+                    relative:
+                      height: Max
+                    size: [28, 0]
                     position: [0, 0]
                   vis_dist_spinner:
-                    from: .spinner
+                    from: spinner
                     position: [30, 0]
                   vis_dist_up_label:
-                    from: .label
+                    from: label
                     text: "Vis Up One Dist"
                     text_params:
                       horizontal_alignment: Right
-                    height_relative: Max
-                    preferred_size: [38, 0]
+                    relative:
+                      height: Max
+                    size: [38, 0]
                     position: [50, 0]
                   vis_dist_up_spinner:
-                    from: .spinner
+                    from: spinner
                     position: [90, 0]
               world_map_location:
-                from: .editor.save_window.field_box
+                from: editor.save_window.field_box
                 position: [0, 54]
                 children:
                   label:
                     text: "World Map Location"
               on_rest:
                 position: [0, 62]
-                preferred_size: [0, 8]
-                width_relative: Max
+                size: [0, 8]
+                relative:
+                  width: Max
                 children:
                   disabled:
-                    from: .button
+                    from: button
                     text: "Disabled"
-                    preferred_size: [25, 6]
+                    size: [25, 6]
                     position: [30, 0]
                   fire_script:
-                    from: .button
+                    from: button
                     text: "Fire Script"
-                    preferred_size: [25, 6]
+                    size: [25, 6]
                     position: [56, 0]
 ...

@@ -80,7 +80,7 @@ impl UserData for ScriptImageLayerAnimation {
                 }
             };
 
-            if let None = ResourceSet::get_image(&image) {
+            if let None = ResourceSet::image(&image) {
                 return Err(rlua::Error::FromLuaConversionError {
                     from: "String",
                     to: "Image",
@@ -116,7 +116,7 @@ pub fn create_anim(data: &ScriptImageLayerAnimation) -> Result<Anim> {
 
     let mut images = HashMap::new();
     for (layer, ref image_id) in data.images.iter() {
-        match ResourceSet::get_image(image_id) {
+        match ResourceSet::image(image_id) {
             None =>
                 return Err(rlua::Error::FromLuaConversionError {
                     from: "String",

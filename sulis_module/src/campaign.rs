@@ -109,7 +109,7 @@ impl Campaign {
 
         let mut locations = Vec::new();
         for (id, location) in builder.world_map.locations {
-            let image = match ResourceSet::get_image(&location.icon) {
+            let image = match ResourceSet::image(&location.icon) {
                 None => {
                     warn!("Invalid image for '{}': '{}'", id, location.icon);
                     return unable_to_create_error("module", &builder.name);
@@ -182,7 +182,7 @@ pub struct WorldMapLocationBuilder {
     pub initially_visible: bool,
 
     pub linked_area: Option<String>,
-    #[serde(default = "Point::as_zero")]
+    #[serde(default)]
     pub linked_area_pos: Point,
 
     #[serde(default)]

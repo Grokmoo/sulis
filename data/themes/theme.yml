@@ -1,61 +1,60 @@
 ---
-include:
-  - widgets
-  - character_builder
-  - main_menu
-  - editor
-children:
+id: theme
+themes:
   status_text:
-    from: .label
+    from: label
     position: [0, 2]
   item_window:
-    from: .bonus_text
+    from: bonus_text
     border: { top: 1, bottom: 1, left: 1, right: 1 }
     background: 80_transparent_fill
-    width_relative: Custom
-    height_relative: Custom
-    preferred_size: [52, 14]
+    size: [52, 14]
     position: [0, 0]
-    x_relative: Custom
-    y_relative: Custom
+    relative:
+      x: Custom
+      y: Custom
+      width: Custom
+      height: Custom
   item_action_menu:
-    from: .list_box
-    x_relative: Cursor
-    y_relative: Cursor
+    from: list_box
+    relative:
+      x: Custom
+      y: Custom
+      height: ChildSum
+      width: Zero
     position: [-1, -1]
-    preferred_size: [30, 0]
-    height_relative: ChildSum
-    width_relative: Zero
+    size: [30, 0]
     children:
       title:
-        from: .label
+        from: label
         text: "Actions"
         text_params:
           scale: 7.0
           horizontal_alignment: Center
-        preferred_size: [0, 4]
-        width_relative: Max
+        size: [0, 4]
+        relative:
+          width: Max
       actions:
-        from: .list_box
+        from: list_box
         border: [0, 0, 0, 0]
-        width_relative: Max
+        relative:
+          width: Max
         position: [0, 4]
   ability_hover:
-    from: .text_area
+    from: text_area
     border: { top: 1, bottom: 1, left: 2, right: 2 }
     background: 80_transparent_fill
     text: |
       [s=6.0|#name#]   [s=5.0;c=f00|AP: #activate_ap#]
       [s=5.0|#short_description#]
-    preferred_size: [60, 12]
-    width_relative: Custom
-    height_relative: Custom
-    x_relative: Custom
-    y_relative: Custom
-  tooltip:
-    from: .tooltip
+    size: [60, 12]
+    relative:
+      width: Custom
+      height: Custom
+      x: Custom
+      y: Custom
   area_mouseover:
-    from: .text_area
+    from: text_area
     border: { top: 2, bottom: 0, left: 2, right: 2 }
     background: bg_inner_transparent_80
     text: |
@@ -64,342 +63,375 @@ children:
       ][?empty;c=888;s=5.0|[a=56|Empty]
       ][?status;c=800;s=5.0;a=56|#status#
       ]
-    preferred_size: [60, 12]
-    x_relative: Center
+    size: [60, 12]
+    relative:
+      x: Center
     position: [0, 13]
   ap_bar:
-    y_relative: Max
-    x_relative: Center
+    relative:
+      y: Max
+      x: Center
+      width: ChildSum
     position: [0, -40]
-    preferred_size: [0, 8]
-    width_relative: ChildSum
+    size: [0, 8]
     border: [1, 1, 1, 1]
     layout: BoxHorizontal
     layout_spacing: { top: 0, bottom: 0, left: 1, right: 0 }
     children:
       ball:
         background: ball
-        preferred_size: [6, 6]
+        size: [6, 6]
         custom:
           bar_image: ball_active
   initiative_ticker:
-    preferred_size: [0, 12]
+    size: [0, 12]
     position: [0, 0]
-    width_relative: Max
+    relative:
+      width: Max
     children:
       pane:
-        x_relative: Center
-        width_relative: ChildSum
-        height_relative: Max
+        relative:
+          x: Center
+          width: ChildSum
+          height: Max
         layout: BoxHorizontal
         layout_spacing: { right: 1, left: 0, top: 0, bottom: 0 }
         children:
           entry:
-            from: .label
+            from: label
             background: bg_rounded
             text: "#0#"
             text_params:
               horizontal_alignment: Center
-            preferred_size: [12, 0]
-            height_relative: Max
+            size: [12, 0]
+            relative:
+              height: Max
           current_entry:
-            from: .label
+            from: label
             background: bg_rounded_hover
             text: "#0#"
             text_params:
               horizontal_alignment: Center
-              color: [1.0, 0.0, 0.0, 1.0]
+              color: f00
               scale: 9.0
-            preferred_size: [12, 0]
-            height_relative: Max
+            size: [12, 0]
+            relative:
+              height: Max
   bottom_pane:
     background: bg_middle_base
     border: [1, 1, 1, 1]
-    preferred_size: [0, 40]
-    y_relative: Max
-    width_relative: Max
+    size: [0, 40]
+    relative:
+      y: Max
+      width: Max
     children:
       select_all_button:
-        from: .button
+        from: button
         foreground: select_all
         border: [0, 0, 0, 0]
         position: [0, 2]
-        preferred_size: [10, 10]
+        size: [10, 10]
         custom:
           tooltip: "Select All Party Members"
       formations_button:
-        from: .button
+        from: button
         foreground: formations
         border: [0, 0, 0, 0]
         position: [0, 13]
-        preferred_size: [10, 10]
+        size: [10, 10]
         custom:
           tooltip: "Set party formation"
       rest_button:
-        from: .button
+        from: button
         foreground: rest
         border: [0, 0, 0, 0]
         position: [0, 24]
-        preferred_size: [10, 10]
+        size: [10, 10]
         custom:
           tooltip: "Rest"
       portrait_pane:
-        preferred_size: [120, 0]
+        size: [120, 0]
         position: [11, 0]
-        height_relative: Max
+        relative:
+          height: Max
         layout: BoxHorizontal
         children:
           portrait_view:
             background: background_rounded
-            x_relative: Max
-            preferred_size: [30, 36]
+            relative:
+              x: Max
+            size: [30, 36]
             border: [1, 1, 1, 1]
             children:
               portrait:
-                width_relative: Max
-                height_relative: Max
-                preferred_size: [0, -6]
+                relative:
+                  width: Max
+                  height: Max
+                size: [0, -6]
                 foreground: "#image#"
               hp_bar:
-                from: .progress_bar
-                width_relative: Max
-                y_relative: Max
-                preferred_size: [0, 6]
+                from: progress_bar
+                relative:
+                  y: Max
+                  width: Max
+                size: [0, 6]
                 text: "#cur_hp# / #max_hp#"
                 text_params:
                   scale: 7.0
                   horizontal_alignment: Center
               level_up:
-                from: .button
+                from: button
                 text: "+"
                 text_params:
                   scale: 7.0
                 custom:
                   tooltip: "Level Up"
-                x_relative: Max
-                preferred_size: [7, 7]
+                relative:
+                  x: Max
+                size: [7, 7]
               icons:
-                width_relative: Max
-                height_relative: Max
-                preferred_size: [-7, 0]
+                relative:
+                  width: Max
+                  height: Max
+                size: [-7, 0]
                 layout: Grid
                 layout_spacing: { top: 0, bottom: 1, left: 0, right: 1 }
                 children:
                   icon:
-                    preferred_size: [6, 6]
+                    size: [6, 6]
                     background: bg_base
                     foreground: "#icon#"
                     custom:
                       tooltip: "#text#"
       quick_item_bar:
-        height_relative: Max
+        relative:
+          height: Max
         position: [132, 0]
-        preferred_size: [28, 0]
+        size: [28, 0]
         background: bg_base
         border: [1, 1, 1, 1]
         children:
           title:
-            from: .label
+            from: label
             text: "Usable Items"
             position: [0, 1]
-            preferred_size: [0, 8]
-            width_relative: Max
+            size: [0, 8]
+            relative:
+              width: Max
             text_params:
               vertical_alignment: Top
               horizontal_alignment: Left
-              color: { r: 1.0, g: 0.0, b: 0.0, a: 1.0 }
+              color: f00
           swap_weapons:
-            from: .button
+            from: button
             foreground: swap_weapons
-            preferred_size: [7, 7]
+            size: [7, 7]
             position: [0, 0]
-            x_relative: Max
+            relative:
+              x: Max
             custom:
               tooltip: "Swap Weapon Set"
           usable1:
-            from: .item_button
+            from: item_button
             background: quick_item_button
             foreground: ability_button_fg
             position: [0, 9]
           usable2:
-            from: .item_button
+            from: item_button
             background: quick_item_button
             foreground: ability_button_fg
             position: [14, 9]
           usable3:
-            from: .item_button
+            from: item_button
             background: quick_item_button
             foreground: ability_button_fg
             position: [0, 23]
           usable4:
-            from: .item_button
+            from: item_button
             background: quick_item_button
             foreground: ability_button_fg
             position: [14, 23]
       abilities_bar:
-        height_relative: Max
-        width_relative: Max
+        relative:
+          width: Max
+          height: Max
         position: [161, 0]
-        preferred_size: [-199, 0]
+        size: [-199, 0]
         layout: BoxHorizontal
         layout_spacing: { top: 0, bottom: 0, left: 0, right: 1 }
         children:
           collapsed_panes:
-            preferred_size: [15, 0]
-            height_relative: Max
+            size: [15, 0]
+            relative:
+              height: Max
             layout: BoxVertical
             layout_spacing: { bottom: 1 }
             custom:
-              max_collapsed: 3
+              max_collapsed: "3"
             children:
               collapsed_group_pane:
                 background: bg_base
-                preferred_size: [0, 12]
-                width_relative: Max
+                size: [0, 12]
+                relative:
+                  width: Max
                 border: { top: 1, bottom: 1, left: 1, right: 0 }
                 children:
                   change_size:
-                    from: .button
+                    from: button
                     background: background_transparent
-                    preferred_size: [1, 5]
-                    width_relative: Max
+                    size: [1, 5]
+                    relative:
+                      width: Max
                     position: [-1, -1]
                     custom:
                       tooltip: "Expand"
                   description:
-                    from: .text_area
-                    width_relative: Max
-                    preferred_size: [0, 10]
+                    from: text_area
+                    relative:
+                      width: Max
+                    size: [0, 10]
                     text: |
                       [y=-1.5;s=5.0;c=f00|#group#]
                       [y=3.0|][?total_uses_per_encounter;s=5.0|#current_uses_per_encounter#/#total_uses_per_encounter# Enc][!total_uses_per_encounter;!total_uses_per_day;s=5.0|Unlimited]
                       [y=6.0|][?total_uses_per_day;s=5.0|#current_uses_per_day#/#total_uses_per_day# Day]
           group_pane:
             background: bg_base
-            preferred_size: [0, 0]
-            height_relative: Max
-            width_relative: Custom
+            size: [0, 0]
+            relative:
+              height: Max
+              width: Custom
             border: { top: 1, bottom: 1, left: 1, right: 0 }
             custom:
-              vertical_count: 2
-              grid_width: 13
-              grid_border: 2
-              min_horizontal_count: 1
+              vertical_count: "2"
+              grid_width: "13"
+              grid_border: "2"
+              min_horizontal_count: "1"
             children:
               change_size:
-                from: .button
+                from: button
                 background: background_transparent_no_disabled
-                preferred_size: [1, 5]
-                width_relative: Max
+                size: [1, 5]
+                relative:
+                  width: Max
                 position: [-1, -1]
                 custom:
                   tooltip: "Collapse"
               description:
-                from: .text_area
-                width_relative: Max
-                preferred_size: [0, 10]
+                from: text_area
+                relative:
+                  width: Max
+                size: [0, 10]
                 text: |
                   [y=-1.5;s=5.0;c=f00|#group#]
                   [y=3.0|][?total_uses_per_encounter;s=5.0|#current_uses_per_encounter#/#total_uses_per_encounter# Enc][!total_uses_per_encounter;!total_uses_per_day;s=5.0|Unlimited]
                   [y=6.0|][?total_uses_per_day;s=5.0|#current_uses_per_day#/#total_uses_per_day# Day]
               abilities_pane:
-                width_relative: Max
-                height_relative: Max
-                preferred_size: [0, -10]
-                y_relative: Max
+                relative:
+                  width: Max
+                  height: Max
+                  y: Max
+                size: [0, -10]
                 layout: Grid
                 layout_spacing: { top: 0, bottom: 0, left: 0, right: 0 }
                 children:
                   ability_button:
-                    from: .button
+                    from: button
                     background: ability_button
                     foreground: ability_button_fg
-                    preferred_size: [13, 13]
+                    size: [13, 13]
                     children:
                       duration_label:
-                        from: .label
+                        from: label
                         text: "#duration#"
                         text_params:
                           horizontal_alignment: Right
                           vertical_alignment: Top
-                          color: { r: 1.0, g: 0.0, b: 0.0, a: 1.0 }
-                        width_relative: Max
-                        height_relative: Max
+                          color: f00
+                        relative:
+                          width: Max
+                          height: Max
                       icon:
                         foreground: "#icon#"
-                        width_relative: Max
-                        height_relative: Max
+                        relative:
+                          width: Max
+                          height: Max
       window_button:
-        from: .button
+        from: button
         background: background
         border: [1, 1, 1, 1]
-        preferred_size: [10, 10]
-        y_relative: Max
-        x_relative: Max
+        size: [10, 10]
+        relative:
+          x: Max
+          y: Max
       navi_pane:
-        height_relative: Max
-        x_relative: Max
-        preferred_size: [38, 0]
+        relative:
+          x: Max
+          height: Max
+        size: [38, 0]
         children:
           end_turn_button:
-            from: .button
+            from: button
             custom:
               tooltip: "End Turn"
             background: background
-            preferred_size: [22, 22]
+            size: [22, 22]
             position: [0, -4]
-            y_relative: Max
-            x_relative: Max
+            relative:
+              x: Max
+              y: Max
             foreground: end_turn_icon
           map_button:
-            from: .bottom_pane.window_button
+            from: bottom_pane.window_button
             custom:
               tooltip: "Map"
             position: [-24, -4]
             foreground: map_icon
           journal_button:
-            from: .bottom_pane.window_button
+            from: bottom_pane.window_button
             custom:
               tooltip: "Journal"
             position: [-24, -16]
             foreground: log_icon
           character_button:
-            from: .bottom_pane.window_button
+            from: bottom_pane.window_button
             custom:
               tooltip: "Character Sheet"
             position: [-24, -28]
             foreground: char_icon
           inventory_button:
-            from: .bottom_pane.window_button
+            from: bottom_pane.window_button
             custom:
               tooltip: "Inventory"
             position: [-12, -28]
             foreground: inv_icon
           menu_button:
-            from: .bottom_pane.window_button
+            from: bottom_pane.window_button
             custom:
               tooltip: "Menu"
             position: [0, -28]
             foreground: menu_icon
       time:
-        from: .label
+        from: label
         text: "#hour#, Day #day#"
         text_params:
           horizontal_alignment: Right
-        preferred_size: [40, 4]
-        x_relative: Max
-        y_relative: Max
+        size: [40, 4]
+        relative:
+          x: Max
+          y: Max
   ui_blocker:
-    preferred_size: [0, -40]
-    width_relative: Max
-    height_relative: Max
+    size: [0, -40]
+    relative:
+      width: Max
+      height: Max
   area:
-    preferred_size: [0, -40]
-    width_relative: Max
-    height_relative: Max
+    size: [0, -40]
+    relative:
+      width: Max
+      height: Max
     custom:
       targeter_tile: "60_red_transparent_fill"
-      feedback_text_scale: 1.5
+      feedback_text_scale: "1.5"
       feedback_text_font: outlined
       feedback_text_info_color: FFF
       feedback_text_miss_color: AAA
@@ -416,37 +448,42 @@ children:
       selection_box_image: "bg_selection_box"
     children:
       targeter_label:
-        from: .label
-        x_relative: Center
+        from: label
+        relative:
+          x: Center
         position: [-20, 15]
         text_params:
           scale: 7.0
-          color: { r: 1.0, g: 0.0, b: 0.0, a: 1.0 }
+          color: f00
         text: "Select target for #ability_id#"
       window_fade:
-        width_relative: Max
-        height_relative: Max
+        relative:
+          width: Max
+          height: Max
         custom:
-          fade_millis: 2000
-          pause_millis: 1000
+          fade_millis: "2000"
+          pause_millis: "1000"
           fill_image: black_fill
   cutscene_window:
     border: [5, 5, 5, 5]
-    width_relative: Max
-    height_relative: Max
+    relative:
+      width: Max
+      height: Max
     background: bg_base
     children:
       close:
-        from: .button
-        preferred_size: [8, 4]
+        from: button
+        size: [8, 4]
         text: "X"
-        x_relative: Max
+        relative:
+          x: Max
       next_button:
-        from: .button
+        from: button
         text: "Continue"
-        x_relative: Center
-        preferred_size: [30, 10]
-        y_relative: Max
+        size: [30, 10]
+        relative:
+          x: Center
+          y: Max
       text_area:
         border: [2, 2, 2, 2]
         text_params:
@@ -454,228 +491,249 @@ children:
           scale: 9.0
         background: bg_base
         text: "#0#"
-        width_relative: Max
-        y_relative: Max
-        x_relative: Center
+        relative:
+          x: Center
+          y: Max
+          width: Max
         position: [0, -20]
-        preferred_size: [-10, 40]
+        size: [-10, 40]
   dialog_window:
-    from: .window
+    from: window
     background: bg_medium
-    x_relative: Center
-    y_relative: Max
-    width_relative: Zero
-    height_relative: Zero
-    preferred_size: [150, 80]
+    relative:
+      x: Center
+      y: Max
+      width: Zero
+      height: Zero
+    size: [150, 80]
     children:
       title:
         text: "#name#"
       node:
-        width_relative: Max
-        preferred_size: [0, -8]
+        relative:
+          width: Max
+        size: [0, -8]
         position: [0, 8]
         text_params:
           font: "normal"
           scale: 5.0
         text: "#0#"
       responses:
-        y_relative: Max
+        relative:
+          width: Max
+          height: ChildSum
+          y: Max
         layout: BoxVertical
         layout_spacing: { top: 0, bottom: 1, left: 0, right: 0 }
-        width_relative: Max
-        height_relative: ChildSum
         children:
           response_button:
-            from: .button
-            width_relative: Max
-            preferred_size: [0, 6]
+            from: button
+            relative:
+              width: Max
+            size: [0, 6]
             children:
               text_area:
-                from: .text_area
+                from: text_area
                 text: "[s=5.0|#0#]"
-                width_relative: Max
+                relative:
+                  width: Max
   console_window:
     position: [0, 0]
     border: [1, 1, 1, 1]
-    width_relative: Max
-    preferred_size: [0, 12]
+    relative:
+      width: Max
+    size: [0, 12]
     background: 80_transparent_fill
     children:
       prompt:
-        from: .label
+        from: label
         text: ">"
         text_params:
-          color: [1.0, 0.0, 0.0, 1.0]
+          color: f00
           font: mono
           scale: 4.0
           horizontal_alignment: Right
         position: [0, 0]
-        preferred_size: [4, 4]
+        size: [4, 4]
       input:
-        from: .input_field
+        from: input_field
         background: empty
         text_params:
           font: mono
           scale: 4.0
         position: [4, 0]
-        preferred_size: [-4, 4]
-        width_relative: Max
+        size: [-4, 4]
+        relative:
+          width: Max
       output:
-        from: .label
+        from: label
         text_params:
-          color: [0.8, 0.8, 0.8, 1.0]
+          color: CCC
           horizontal_alignment: Left
           font: mono
           scale: 4.0
         position: [0, 4]
-        preferred_size: [0, 4]
-        width_relative: Max
+        size: [0, 4]
+        relative:
+          width: Max
   item_list_pane:
     children:
       coins_button:
-        from: .item_button
-        preferred_size: [18, 8]
+        from: item_button
+        size: [18, 8]
         position: [56, -9]
         children:
           icon:
-            width_relative: Zero
-            preferred_size: [8, 0]
+            relative:
+              width: Zero
+            size: [8, 0]
           quantity_label:
             text_params:
               vertical_alignment: Center
-            preferred_size: [-1, -1]
+            size: [-1, -1]
       filter_all:
-        from: .tab_button
+        from: tab_button
         text: "All"
-        preferred_size: [9, 6]
+        size: [9, 6]
         position: [1, 0]
       filter_weapon:
-        from: .tab_button
+        from: tab_button
         text: "Weapon"
-        preferred_size: [16, 6]
+        size: [16, 6]
         position: [10, 0]
       filter_armor:
-        from: .tab_button
+        from: tab_button
         text: "Armor"
-        preferred_size: [13, 6]
+        size: [13, 6]
         position: [26, 0]
       filter_accessory:
-        from: .tab_button
+        from: tab_button
         text: "Accessory"
-        preferred_size: [19, 6]
+        size: [19, 6]
         position: [39, 0]
       filter_usable:
-        from: .tab_button
+        from: tab_button
         text: "Usable"
-        preferred_size: [14, 6]
+        size: [14, 6]
         position: [58, 0]
       items_list:
         background: bg_rounded
         border: [2, 2, 2, 2]
-        preferred_size: [0, -6]
+        size: [0, -6]
         position: [0, 6]
-        width_relative: Max
-        height_relative: Max
+        relative:
+          width: Max
+          height: Max
         children:
           scrollbar:
-            from: .scrollbar
+            from: scrollbar
             custom:
-              scroll_delta: 13
+              scroll_delta: "13"
           content:
-            preferred_size: [-7, 0]
+            size: [-7, 0]
             layout: Grid
             layout_spacing: [0, 1, 0, 1]
-            width_relative: Max
-            height_relative: Max
+            relative:
+              width: Max
+              height: Max
             children:
               item_button:
-                from: .item_button
+                from: item_button
   quest_window:
-    from: .window
+    from: window
     position: [0, 2]
-    x_relative: Center
-    width_relative: Zero
-    height_relative: Zero
-    preferred_size: [226, 136]
+    relative:
+      x: Center
+      width: Zero
+      height: Zero
+    size: [226, 136]
     border: { top: 6, bottom: 8, right: 8, left: 8 }
     children:
       title:
         text: "Journal"
       show_completed_label:
-        from: .label
+        from: label
         text: "Show Completed Quests"
         text_params:
           horizontal_alignment: Right
-        preferred_size: [33, 7]
+        size: [33, 7]
         position: [0, 0]
       show_completed_toggle:
-        from: .button
-        preferred_size: [7, 7]
+        from: button
+        size: [7, 7]
         position: [35, 0]
       quest_list:
         border: [2, 2, 2, 2]
-        preferred_size: [50, -10]
+        size: [50, -10]
         position: [0, 10]
-        height_relative: Max
+        relative:
+          height: Max
         children:
           scrollbar:
-            from: .scrollbar
+            from: scrollbar
             custom:
-              scroll_delta: 12
+              scroll_delta: "12"
           content:
-            preferred_size: [-7, 0]
+            size: [-7, 0]
             layout: BoxVertical
             layout_spacing: { top: 0, bottom: 2, left: 0, right: 0 }
-            width_relative: Max
-            height_relative: Max
+            relative:
+              width: Max
+              height: Max
             children:
                 quest_button:
-                  from: .button
+                  from: button
                   border: [1, 1, 1, 1]
-                  preferred_size: [0, 10]
-                  width_relative: Max
+                  size: [0, 10]
+                  relative:
+                    width: Max
                   children:
                     text_area:
-                      from: .text_area
-                      width_relative: Max
-                      height_relative: Max
+                      from: text_area
+                      relative:
+                        width: Max
+                        height: Max
                       text: |
                         #name#
                         [?complete;s=4.0;x=25.0;y=2.8;c=f00|Complete]
       quest_entries:
         border: [2, 2, 2, 2]
-        preferred_size: [-52, -2]
+        size: [-52, -2]
         position: [52, 2]
-        width_relative: Max
-        height_relative: Max
+        relative:
+          width: Max
+          height: Max
         children:
           scrollbar:
-            from: .scrollbar
+            from: scrollbar
             custom:
-              scroll_delta: 17
+              scroll_delta: "17"
           content:
             layout: BoxVertical
             layout_spacing: { top: 0, bottom: 2, left: 0, right: 0 }
-            width_relative: Max
-            preferred_size: [-7, 0]
-            height_relative: Max
+            relative:
+              width: Max
+              height: Max
+            size: [-7, 0]
             children:
               quest_entry:
-                from: .text_area
+                from: text_area
                 background: bg_base
                 border: [2, 2, 2, 2]
-                width_relative: Max
-                height_relative: Zero
-                preferred_size: [0, 40]
-                y_relative: Custom
+                relative:
+                  width: Max
+                  height: Zero
+                  y: Custom
+                size: [0, 40]
                 text: "#description#"
   world_map_window:
-    from: .window
+    from: window
     position: [0, 2]
-    x_relative: Center
-    width_relative: Zero
-    height_relative: Zero
-    preferred_size: [226, 136]
+    relative:
+      x: Center
+      width: Zero
+      height: Zero
+    size: [226, 136]
     border: { top: 8, bottom: 8, left: 8, right: 8 }
     children:
       title:
@@ -684,28 +742,32 @@ children:
       close:
         position: [5, -5]
       bg:
-        width_relative: Max
-        height_relative: Max
+        relative:
+          width: Max
+          height: Max
         background: world_map
       labels:
-        from: .text_area
-        width_relative: Max
-        height_relative: Max
+        from: text_area
+        relative:
+          width: Max
+          height: Max
         text: |
           [s=4.0|
           ][f=outlined;s=10.0;a=210|The Twin Expanse]
       content:
-        width_relative: Max
-        height_relative: Max
+        relative:
+          width: Max
+          height: Max
         children:
           location:
-            from: .button
+            from: button
             background: "#icon#"
             text: "#travel_time#"
             foreground: world_map_button
-            x_relative: Custom
-            y_relative: Custom
-            preferred_size: [24, 17]
+            relative:
+              x: Custom
+              y: Custom
+            size: [24, 17]
           label:
             text: |
               [a=100|#name#]
@@ -713,21 +775,23 @@ children:
             text_params:
               font: outlined
               scale: 6.0
-            x_relative: Custom
-            y_relative: Custom
+            relative:
+              x: Custom
+              y: Custom
             position: [-38, 0]
-            preferred_size: [100, 17]
+            size: [100, 17]
   formation_window:
-    from: .window
+    from: window
     border: { top: 8, bottom: 8, left: 6, right: 6 }
     position: [0, 4]
-    x_relative: Center
-    preferred_size: [148, 108]
-    height_relative: Zero
+    relative:
+      x: Center
+      height: Zero
+    size: [148, 108]
     custom:
-      grid_half_width: 8
-      grid_height: 12
-      button_size: 2
+      grid_half_width: "8"
+      grid_height: "12"
+      button_size: "2"
     children:
       title:
         text: "Party Formation"
@@ -735,258 +799,277 @@ children:
       close:
         position: [3, -5]
       position:
-        from: .button
-        preferred_size: [0, 0]
-        x_relative: Custom
-        y_relative: Custom
-        width_relative: Custom
-        height_relative: Custom
+        from: button
+        size: [0, 0]
+        relative:
+          x: Custom
+          y: Custom
+          width: Custom
+          height: Custom
         children:
           portrait:
             foreground: "#portrait#"
-            preferred_size: [12, 12]
-            x_relative: Center
-            y_relative: Center
+            size: [12, 12]
+            relative:
+              x: Center
+              y: Center
   merchant_window:
-    from: .window
+    from: window
     position: [4, 4]
-    preferred_size: [113, 112]
-    height_relative: Zero
+    size: [113, 112]
+    relative:
+      height: Zero
     children:
       title:
         text: "Merchant"
       item_list_pane:
-        from: .item_list_pane
-        width_relative: Max
-        height_relative: Max
+        from: item_list_pane
+        relative:
+          width: Max
+          height: Max
         position: [0, 4]
-        preferred_size: [0, -4]
+        size: [0, -4]
   prop_window:
-    from: .window
+    from: window
     position: [4, 4]
-    preferred_size: [113, 112]
-    height_relative: Zero
+    size: [113, 112]
+    relative:
+      height: Zero
     children:
       title:
         text: "#name#"
       icon:
-        preferred_size: [20, 20]
+        size: [20, 20]
         background: bg_base
         position: [0, 5]
       take_all:
-        from: .button
+        from: button
         text: "Take All"
         text_params:
           scale: 7.0
-        preferred_size: [25, 10]
+        size: [25, 10]
         position: [25, 10]
       item_list_pane:
-        from: .item_list_pane
+        from: item_list_pane
         position: [0, 27]
-        preferred_size: [0, -27]
-        width_relative: Max
-        height_relative: Max
+        size: [0, -27]
+        relative:
+          width: Max
+          height: Max
   inventory_window:
-    from: .window
-    preferred_size: [187, 112]
-    height_relative: Zero
+    from: window
+    size: [187, 112]
+    relative:
+      height: Zero
     position: [128, 4]
     children:
       title:
         text: "Inventory"
       equipped_area:
         background: inventory_paper_doll
-        preferred_size: [96, 96]
+        size: [96, 96]
         position: [2, 2]
         children:
           swap_weapons:
-            from: .button
+            from: button
             foreground: swap_weapons
-            preferred_size: [7, 7]
+            size: [7, 7]
             position: [36, 44]
             custom:
               tooltip: "Swap Weapon Set"
           cloak_button:
-            from: .item_button
+            from: item_button
             position: [66, 12]
-            preferred_size: [14, 14]
+            size: [14, 14]
           head_button:
-            from: .item_button
+            from: item_button
             position: [50, 4]
           torso_button:
-            from: .item_button
+            from: item_button
             position: [48, 20]
-            preferred_size: [16, 16]
+            size: [16, 16]
           hands_button:
-            from: .item_button
+            from: item_button
             position: [66, 36]
           legs_button:
-            from: .item_button
-            preferred_size: [16, 16]
+            from: item_button
+            size: [16, 16]
             position: [48, 52]
           feet_button:
-            from: .item_button
-            preferred_size: [14, 14]
+            from: item_button
+            size: [14, 14]
             position: [49, 76]
           waist_button:
-            from: .item_button
+            from: item_button
             position: [52, 38]
           neck_button:
-            from: .item_button
+            from: item_button
             position: [40, 10]
-            preferred_size: [8, 8]
+            size: [8, 8]
           fingermain_button:
-            from: .item_button
+            from: item_button
             position: [44, 38]
-            preferred_size: [6, 6]
+            size: [6, 6]
           fingeroff_button:
-            from: .item_button
+            from: item_button
             position: [66, 50]
-            preferred_size: [6, 6]
+            size: [6, 6]
           heldmain_button:
-            from: .item_button
+            from: item_button
             position: [5, 20]
-            preferred_size: [14, 14]
+            size: [14, 14]
           heldoff_button:
-            from: .item_button
+            from: item_button
             position: [20, 20]
-            preferred_size: [14, 14]
+            size: [14, 14]
             
           altheldmain_button:
-            from: .item_button
+            from: item_button
             position: [5, 37]
-            preferred_size: [14, 14]
+            size: [14, 14]
           altheldoff_button:
-            from: .item_button
+            from: item_button
             position: [20, 37]
-            preferred_size: [14, 14]
+            size: [14, 14]
           usable1_button:
-            from: .item_button
+            from: item_button
             position: [8, 58]
           usable2_button:
-            from: .item_button
+            from: item_button
             position: [22, 58]
           usable3_button:
-            from: .item_button
+            from: item_button
             position: [8, 72]
           usable4_button:
-            from: .item_button
+            from: item_button
             position: [22, 72]
       stash_title:
-        from: .label
+        from: label
         text: "Stash"
         text_params:
           scale: 8.0
           horizontal_alignment: Center
         position: [100, 4]
-        width_relative: Max
-        preferred_size: [-100, 6]
+        relative:
+          width: Max
+        size: [-100, 6]
       item_list_pane:
-        from: .item_list_pane
+        from: item_list_pane
         position: [100, 11]
-        preferred_size: [-100, -11]
-        width_relative: Max
-        height_relative: Max
+        size: [-100, -11]
+        relative:
+          width: Max
+          height: Max
   character_window:
-    from: .window
-    height_relative: Zero
-    preferred_size: [120, 140]
+    from: window
+    relative:
+      height: Zero
+    size: [120, 140]
     position: [4, 0]
     children:
       title:
         text: "Character Sheet"
       char_pane_button:
-        from: .tab_button
+        from: tab_button
         text: "Character"
         position: [3, 1]
       abilities_pane_button:
-        from: .tab_button
+        from: tab_button
         text: "Abilities"
         position: [23, 1]
       effects_pane_button:
-        from: .tab_button
+        from: tab_button
         text: "Effects"
         position: [43, 1]
       abilities:
         background: bg_rounded
         border: [2, 2, 2, 2]
-        width_relative: Max
-        height_relative: Max
+        relative:
+          width: Max
+          height: Max
         position: [0, 7]
-        preferred_size: [0, -6]
+        size: [0, -6]
         children:
           details_pane:
             background: bg_base
-            width_relative: Max
-            y_relative: Max
-            preferred_size: [0, 66]
+            relative:
+              width: Max
+              y: Max
+            size: [0, 66]
             children:
               scrollbar:
-                from: .scrollbar
+                from: scrollbar
                 custom:
-                  scroll_delta: 12
+                  scroll_delta: "12"
               content:
-                width_relative: Max
-                preferred_size: [-7, 0]
-                height_relative: Max
+                relative:
+                  width: Max
+                  height: Max
+                size: [-7, 0]
                 children:
                   details:
-                    from: .ability_pane.details
+                    from: ability_pane.details
                     border: [2, 2, 2, 2]
-                    width_relative: Max
-                    height_relative: Custom
+                    relative:
+                      width: Max
+                      height: Custom
           list:
-            preferred_size: [0, -68]
-            width_relative: Max
-            height_relative: Max
+            size: [0, -68]
+            relative:
+              width: Max
+              height: Max
             children:
               scrollbar:
-                from: .scrollbar
+                from: scrollbar
                 custom:
-                  scroll_delta: 15
+                  scroll_delta: "15"
               content:
-                preferred_size: [-7, 0]
+                size: [-7, 0]
                 layout: Grid
                 layout_spacing: { top :0, bottom: 2, left: 0, right: 2 }
-                width_relative: Max
-                height_relative: Max
+                relative:
+                  width: Max
+                  height: Max
                 children:
                   ability_button:
-                    from: .button
-                    preferred_size: [12, 12]
+                    from: button
+                    size: [12, 12]
                     foreground: "#icon#"
       effects:
         background: bg_rounded
         border: [2, 2, 2, 2]
-        width_relative: Max
-        height_relative: Max
-        preferred_size: [0, -6]
+        relative:
+          width: Max
+          height: Max
+        size: [0, -6]
         position: [0, 7]
         layout: Grid
         layout_spacing: { top: 0, bottom: 1, left: 1, right: 0 }
         children:
           scrollbar:
-            from: .scrollbar
+            from: scrollbar
             custom:
-              scroll_delta: 10
+              scroll_delta: "10"
           content:
-            preferred_size: [-7, 0]
+            size: [-7, 0]
             layout: Grid
             layout_spacing: { top :0, bottom: 1, left: 0, right: 1 }
-            width_relative: Max
-            height_relative: Max
+            relative:
+              width: Max
+              height: Max
             children:
               effect:
-                from: .bonus_text
+                from: bonus_text
                 background: bg_rounded
                 border: [1, 1, 1, 1]
-                preferred_size: [48, 35]
+                size: [48, 35]
       details:
         background: bg_rounded
         border: [2, 2, 2, 2]
-        width_relative: Max
-        height_relative: Max
-        preferred_size: [0, -6]
+        relative:
+          width: Max
+          height: Max
+        size: [0, -6]
         position: [0, 7]
         text_params:
           font: "normal"
@@ -1052,29 +1135,34 @@ children:
           [?portrait;x=64;y=-3;i=#portrait#;s=40.0|]
           [?portrait;x=64;y=-3;i=portraits/frame;s=40.0|]]
       level_up:
-        from: .button
+        from: button
         text: "Level Up"
         text_params:
           scale: 7.0
-        x_relative: Max
-        preferred_size: [20, 6]
+        relative:
+          x: Max
+        size: [20, 6]
         position: [-4, 10]
       export:
-        from: .button
+        from: button
         text: "Export"
         text_params:
           scale: 7.0
-        x_relative: Max
-        preferred_size: [20, 5]
+        relative:
+          x: Max
+        size: [20, 5]
         position: [-4, 2]
   race_pane:
-    preferred_size: [40, 40]
+    size: [40, 40]
     background: bg_base
     border: [1, 1, 1, 1]
     children:
       details:
-        from: .text_area
+        from: text_area
         border: [2, 2, 2, 2]
+        relative:
+          width: Max
+          height: Max
         text: |
           #description#
           [s=9|]
@@ -1096,17 +1184,16 @@ children:
           ][x=60;?int|Intelligence [r=92|#int#]
           ][x=60;?wis|Wisdom: [r=92|#wis#]
           ]
-        width_relative: Max
-        height_relative: Max
   ability_pane:
-    preferred_size: [40, 40]
+    size: [40, 40]
     background: bg_base
     border: [2, 2, 2, 2]
     children:
       details:
-        from: .text_area
-        width_relative: Max
-        height_relative: Max
+        from: text_area
+        relative:
+          width: Max
+          height: Max
         text: |
           [s=8|#name#][?prereqs_not_met;c=f00|  Prereqs not Met][?owned_level;c=0f0|  Owned - Level #owned_level#]
           [s=9|]
@@ -1141,13 +1228,16 @@ children:
           ][?prereq_ability_4|Ability: #prereq_ability_4#
           ]]
   class_pane:
-    preferred_size: [40, 40]
+    size: [40, 40]
     background: bg_base
     border: [2, 2, 2, 2]
     children:
       details:
-        from: .text_area
+        from: text_area
         border: [2, 2, 2, 2]
+        relative:
+          width: Max
+          height: Max
         text: |
           #description#
           [s=9|]
@@ -1169,105 +1259,116 @@ children:
           ][?reflex|[s=6.0|Reflex: [r=40|+#reflex#]]
           ][?will|[s=6.0|Will: [r=40|+#will#]]
           ]
-        width_relative: Max
-        height_relative: Max
   script_game_over_window:
     background: bg_base
     border: [3, 3, 3, 3]
-    preferred_size: [100, 50]
-    x_relative: Center
-    y_relative: Center
+    size: [100, 50]
+    relative:
+      x: Center
+      y: Center
     position: [0, 0]
     children:
       title:
-        from: .label
-        width_relative: Max
-        preferred_size: [0, 4]
+        from: label
+        relative:
+          width: Max
+        size: [0, 4]
         position: [0, 3]
         text_params:
           scale: 7
         text: "The End for now"
       content:
-        from: .text_area
+        from: text_area
         text: "#0#"
         position: [0, 13]
-        width_relative: Max
-        preferred_size: [0, 20]
+        relative:
+          width: Max
+        size: [0, 20]
       exit:
-        from: .button
-        preferred_size: [36, 12]
+        from: button
+        size: [36, 12]
         text: "Main Menu"
         text_params:
           scale: 7
         position: [0, 0]
-        x_relative: Center
-        y_relative: Max
+        relative:
+          x: Center
+          y: Max
   game_over_window:
     background: 60_transparent_fill
     border: [1, 1, 1, 1]
-    preferred_size: [60, 28]
-    x_relative: Center
-    y_relative: Max
+    size: [60, 28]
+    relative:
+      x: Center
+      y: Max
     position: [0, -40]
     children:
       title:
-        from: .label
-        width_relative: Max
-        preferred_size: [0, 4]
+        from: label
+        relative:
+          width: Max
+        size: [0, 4]
         position: [0, 3]
         text_params:
           scale: 7
         text: "You have been defeated."
       content:
-        from: .text_area
+        from: text_area
       exit:
-        from: .button
-        preferred_size: [36, 12]
+        from: button
+        size: [36, 12]
         text: "Main Menu"
         text_params:
           scale: 7
         position: [0, 11]
-        x_relative: Center
+        relative:
+          x: Center
   script_menu:
     background: 60_transparent_fill
     border: [1, 1, 1, 1]
-    preferred_size: [60, 0]
-    x_relative: Center
-    y_relative: Center
-    height_relative: ChildSum
+    size: [60, 0]
+    relative:
+      x: Center
+      y: Center
+      height: ChildSum
     layout: BoxVertical
     children:
       title:
-        from: .text_area
+        from: text_area
         text: |
           [a=58|#title#]
-        preferred_size: [0, 4]
-        width_relative: Max
+        size: [0, 4]
+        relative:
+          width: Max
       cancel:
-        from: .button
-        preferred_size: [0, 10]
+        from: button
+        size: [0, 10]
         text: "Cancel"
-        width_relative: Max
+        relative:
+          width: Max
       entries:
         border: { top: 2, bottom: 5, left: 2, right: 2 }
-        width_relative: Max
-        height_relative: ChildSum
+        relative:
+          width: Max
+          height: ChildSum
         layout: BoxVertical
         layout_spacing: { top: 0, bottom: 2, left: 0, right: 0 }
         children:
           entry:
-            from: .button
-            width_relative: Max
-            preferred_size: [0, 10]
+            from: button
+            relative:
+              width: Max
+            size: [0, 10]
             children:
               text_area:
-                from: .text_area
-                width_relative: Max
-                height_relative: Max
+                from: text_area
+                relative:
+                  width: Max
+                  height: Max
                 text: |
                   [a=54|#choice#]
   script_confirmation:
-    from: .confirmation_window
+    from: confirmation_window
     children:
       title:
         text: "#message#"
@@ -1276,19 +1377,19 @@ children:
       cancel:
         text: "#text#"
   exit_confirmation:
-    from: .confirmation_window
+    from: confirmation_window
     children:
       title:
         text: "Exit Sulis?"
   menu_confirmation:
-    from: .confirmation_window
+    from: confirmation_window
     children:
       title:
         text: "Return to Main Menu?"
       accept:
         text: "Accept"
   delete_save_confirmation:
-    from: .confirmation_window
+    from: confirmation_window
     children:
       title:
         text: "Delete Saved Game?"
@@ -1297,43 +1398,45 @@ children:
   in_game_menu:
     background: bg_base
     border: [5, 5, 5, 5]
-    preferred_size: [45, 0]
-    x_relative: Center
-    y_relative: Center
+    size: [45, 0]
+    relative:
+      x: Center
+      y: Center
+      height: ChildSum
     position: [0, 0]
     layout: BoxVertical
     layout_spacing: { top: 0, bottom: 5, left: 0, right: 0 }
-    height_relative: ChildSum
     children:
       button:
-        from: .button
-        preferred_size: [25, 10]
+        from: button
+        size: [25, 10]
         text_params:
           scale: 7.0
       back:
-        from: .in_game_menu.button
+        from: in_game_menu.button
         text: "Back to Game"
       save:
-        from: .in_game_menu.button
+        from: in_game_menu.button
         text: "Save"
       load:
-        from: .in_game_menu.button
+        from: in_game_menu.button
         text: "Load"
       menu:
-        from: .in_game_menu.button
+        from: in_game_menu.button
         text: "Main Menu"
       exit:
-        from: .in_game_menu.button
+        from: in_game_menu.button
         text: "Exit"
   load_window:
-    from: .load_window_base
+    from: load_window_base
     background: bg_large
     border: { top: 6, bottom: 8, left: 6, right: 6 }
-    preferred_size: [120, 118]
-    x_relative: Center
-    y_relative: Center
+    size: [120, 118]
+    relative:
+      x: Center
+      y: Center
   bonus_text:
-    from: .text_area
+    from: text_area
     text: |
       [s=6.0;c=0ff|#name#]
       [?usable_description|AP: #usable_ap# [?consumable;c=f00|    Consumable]

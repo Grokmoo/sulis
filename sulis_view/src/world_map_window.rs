@@ -61,11 +61,8 @@ impl WidgetKind for WorldMapWindow {
 
         {
             let state= &self.content.borrow().state;
-            let start_x = state.inner_position.x;
-            let start_y = state.inner_position.y;
-
-            let w = state.inner_size.width;
-            let h = state.inner_size.height;
+            let (start_x, start_y) = state.inner_position().as_tuple();
+            let (w, h) = state.inner_size().as_tuple();
 
             let grid_w = w as f32 / self.size.0 as f32;
             let grid_h = h as f32 / self.size.1 as f32;

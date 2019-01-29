@@ -47,7 +47,7 @@ impl TextArea {
 
     fn render_to_cache(&self, widget: &mut Widget) {
         if let Some(ref font) = widget.state.font {
-            let mut renderer = MarkupRenderer::new(font, widget.state.inner_size.width);
+            let mut renderer = MarkupRenderer::new(font, widget.state.inner_width());
             renderer.render_to_cache(&widget.state);
             widget.state.text_renderer = Some(Box::new(renderer));
         }
@@ -97,27 +97,26 @@ impl WidgetKind for TextArea {
         let mut right = widget.state.inner_right();
         let mut bottom = widget.state.inner_top();
         if let Some(ref font) = widget.state.font {
-            let mut renderer = MarkupRenderer::new(font, widget.state.inner_size.width);
+            let mut renderer = MarkupRenderer::new(font, widget.state.inner_width());
             renderer.render_to_cache(&widget.state);
             bottom = renderer.text_bottom();
             right = renderer.text_right();
             widget.state.text_renderer = Some(Box::new(renderer));
         }
 
-        if let Some(ref theme) = widget.theme {
-            let mut height = widget.state.size.height;
-            let mut width = widget.state.size.width;
+        let mut height = widget.state.height();
+        let mut width = widget.state.width();
 
-            if theme.height_relative == SizeRelative::Custom {
-                height = bottom - widget.state.position.y + widget.state.border.bottom;
-            }
-
-            if theme.width_relative == SizeRelative::Custom {
-                width = right - widget.state.position.x + widget.state.border.right;
-            }
-
-            widget.state.set_size(Size::new(width, height));
+        let theme = &widget.theme;
+        if theme.relative.height == SizeRelative::Custom {
+            height = bottom - widget.state.top() + widget.state.border().bottom;
         }
+
+        if theme.relative.width == SizeRelative::Custom {
+            width = right - widget.state.left() + widget.state.border().right;
+        }
+
+        widget.state.set_size(Size::new(width, height));
 
         let (ui_x, ui_y) = Config::ui_size();
 
@@ -126,16 +125,16 @@ impl WidgetKind for TextArea {
         // the text area size, second render to actually display the text
         if !self.limit_to_screen_edge { return; }
 
-        if widget.state.position.y + widget.state.size.height > ui_y {
-            let x = widget.state.position.x;
-            let y = ui_y - widget.state.size.height;
+        if widget.state.top() + widget.state.height() > ui_y {
+            let x = widget.state.left();
+            let y = ui_y - widget.state.height();
             widget.state.set_position(x, y);
             self.render_to_cache(widget);
         }
 
-        if widget.state.position.x + widget.state.size.width > ui_x {
-            let x = ui_x - widget.state.size.width;
-            let y = widget.state.position.y;
+        if widget.state.left() + widget.state.width() > ui_x {
+            let x = ui_x - widget.state.width();
+            let y = widget.state.top();
             widget.state.set_position(x, y);
             self.render_to_cache(widget);
         }

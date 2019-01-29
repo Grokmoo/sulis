@@ -95,7 +95,7 @@ fn get_cursor_offset_from_size(size: &str) -> Point {
     let size = match Module::object_size(size) {
         None => {
             warn!("Invalid object size in Targeter: '{}'", size);
-            return Point::as_zero();
+            return Point::default();
         }, Some(size) => size,
     };
 
@@ -105,7 +105,7 @@ fn get_cursor_offset_from_size(size: &str) -> Point {
 impl Shape {
     pub fn get_cursor_offset(&self) -> Point {
         match self {
-            &Shape::Single | &Shape::Circle { .. } | &Shape::Cone { .. } => Point::as_zero(),
+            &Shape::Single | &Shape::Circle { .. } | &Shape::Cone { .. } => Point::default(),
             &Shape::LineSegment { ref size, .. } => get_cursor_offset_from_size(size),
             &Shape::Line { ref size, .. } => get_cursor_offset_from_size(size),
             &Shape::ObjectSize { ref size } => get_cursor_offset_from_size(size),
@@ -541,8 +541,8 @@ impl AreaTargeter {
             free_select_valid: false,
             show_mouseover: data.show_mouseover,
             cur_target: None,
-            cursor_pos: Point::as_zero(),
-            cursor_offset: Point::as_zero(),
+            cursor_pos: Point::default(),
+            cursor_offset: Point::default(),
             cur_points: Vec::new(),
             cur_effected: Vec::new(),
             shape: data.shape.clone(),

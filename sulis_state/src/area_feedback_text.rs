@@ -38,7 +38,7 @@ impl Default for Params {
     fn default() -> Params {
         use sulis_core::ui::color::*;
         Params {
-            font: ResourceSet::get_default_font(),
+            font: ResourceSet::default_font(),
             scale: 1.0,
             info_color: LIGHT_GRAY,
             miss_color: LIGHT_GRAY,

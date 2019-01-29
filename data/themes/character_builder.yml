@@ -1,26 +1,29 @@
 ---
-children:
+id: character_builder
+themes:
   builder_pane:
-    height_relative: Max
-    x_relative: Center
-    preferred_size: [220, -13]
+    relative:
+      x: Center
+      height: Max
+    size: [220, -13]
     border: { left: 20, right: 20 }
     position: [0, 0]
     children:
       title:
-        from: .label
-        preferred_size: [0, 5]
+        from: label
+        size: [0, 5]
         position: [0, 3]
-        width_relative: Max
+        relative:
+          width: Max
         text_params:
           scale: 8.0
   character_builder:
-    preferred_size: [240, 170]
+    size: [240, 170]
     border: { top: 6, bottom: 8, right: 6, left: 6 }
-    x_relative: Center
-    y_relative: Center
-    height_relative: Zero
-    from: .window
+    relative:
+      x: Center
+      y: Center
+    from: window
     children:
       title:
         text: "Character Builder"
@@ -28,40 +31,44 @@ children:
       close:
         position: [3, -3]
       next:
-        from: .button
+        from: button
         text: "Next >>"
         text_params:
           scale: 6.0
-        y_relative: Max
+        relative:
+          y: Max
         position: [62, 0]
-        preferred_size: [35, 10]
+        size: [35, 10]
       previous:
-        from: .button
+        from: button
         text: "<< Previous"
         text_params:
           scale: 6.0
-        y_relative: Max
+        relative:
+          y: Max
         position: [24, 0]
-        preferred_size: [35, 10]
+        size: [35, 10]
       finish:
-        from: .button
+        from: button
         text: "Done"
-        y_relative: Max
+        relative:
+          y: Max
         text_params:
           scale: 6.0
         position: [62, 0]
-        preferred_size: [35, 10]
+        size: [35, 10]
       level_up_finish_pane:
-        from: .builder_pane
+        from: builder_pane
         children:
           title:
             text: "Confirm your choices"
           details:
-            from: .text_area
+            from: text_area
             background: bg_base
             border: [2, 2, 2, 2]
-            preferred_size: [0, 100]
-            width_relative: Max
+            size: [0, 100]
+            relative:
+              width: Max
             position: [0, 15]
             text: |
               [s=7|Class: #class#]
@@ -72,498 +79,530 @@ children:
               [?ability_name_3|Ability: #ability_name_3#]
               [?ability_name_4|Ability: #ability_name_4#]
       race_selector_pane:
-        from: .builder_pane
+        from: builder_pane
         children:
           title:
             text: "Select your Race"
           race_pane:
-            from: .race_pane
+            from: race_pane
             background: bg_base
             border: [1, 1, 1, 1]
-            width_relative: Max
-            preferred_size: [0, 100]
+            relative:
+              width: Max
+            size: [0, 100]
             position: [0, 25]
           races_pane:
             border: [1, 1, 1, 1]
-            preferred_size: [0, 12]
-            width_relative: ChildSum
-            x_relative: Center
+            size: [0, 12]
+            relative:
+              width: ChildSum
+              x: Center
             position: [0, 10]
             layout: BoxHorizontal
             layout_spacing: { top: 0, bottom: 0, left: 0, right: 5 }
             children:
               race_button:
-                from: .button
+                from: button
                 text_params:
                   scale: 7.0
                 text: "#name#"
-                preferred_size: [25, 10]
+                size: [25, 10]
       ability_selector_pane:
-        from: .builder_pane
+        from: builder_pane
         border: [0, 0, 0, 0]
-        width_relative: Max
-        preferred_size: [0, -13]
+        relative:
+          width: Max
+        size: [0, -13]
         children:
           title:
             text: "Select an Ability"
           ability_pane:
-            from: .ability_pane
+            from: ability_pane
             position: [140, 10]
-            preferred_size: [-140, -10]
-            width_relative: Max
-            height_relative: Max
+            size: [-140, -10]
+            relative:
+              width: Max
+              height: Max
           abilities_pane_rogue:
-            from: .character_builder.ability_selector_pane.abilities_pane
+            from: character_builder.ability_selector_pane.abilities_pane
             background: rogue_abilities
-            preferred_size: [128, 128]
+            size: [128, 128]
           abilities_pane_fighter:
-            from: .character_builder.ability_selector_pane.abilities_pane
+            from: character_builder.ability_selector_pane.abilities_pane
             background: fighter_abilities
-            preferred_size: [128, 128]
+            size: [128, 128]
           abilities_pane_mage:
-            from: .character_builder.ability_selector_pane.abilities_pane
+            from: character_builder.ability_selector_pane.abilities_pane
             background: magic_circles
-            preferred_size: [132, 132]
+            size: [132, 132]
             custom:
-              grid_size: 12
-              grid_border: 1
+              grid_size: "12"
+              grid_border: "1"
             children:
               ability_button:
-                preferred_size: [10, 10]
+                size: [10, 10]
           abilities_pane_druid:
-            from: .character_builder.ability_selector_pane.abilities_pane
+            from: character_builder.ability_selector_pane.abilities_pane
             background: druid_abilities
-            preferred_size: [128, 128]
+            size: [128, 128]
           abilities_pane_general:
-            from: .character_builder.ability_selector_pane.abilities_pane
+            from: character_builder.ability_selector_pane.abilities_pane
             background: general_abilities
-            preferred_size: [128, 128]
+            size: [128, 128]
           abilities_pane:
-            preferred_size: [128, 128]
+            size: [128, 128]
             position: [0, 10]
             custom:
-              grid_size: 16
-              grid_border: 2
+              grid_size: "16"
+              grid_border: "2"
             children:
               ability_button:
-                from: .button
+                from: button
                 background: background_inner
                 foreground: ability_overlay
-                preferred_size: [12, 12]
-                x_relative: Custom
-                y_relative: Custom
+                size: [12, 12]
+                relative:
+                  x: Custom
+                  y: Custom
                 children:
                   icon:
                     foreground: "#icon#"
-                    width_relative: Max
-                    height_relative: Max
+                    relative:
+                      width: Max
+                      height: Max
                   upgrade0:
                     foreground: ball_small_animated
-                    preferred_size: [3, 3]
-                    y_relative: Max
+                    size: [3, 3]
+                    relative:
+                      y: Max
                     position: [-1, 1]
                   upgrade1:
                     foreground: ball_small_animated
-                    preferred_size: [3, 3]
-                    y_relative: Max
+                    size: [3, 3]
+                    relative:
+                      y: Max
                     position: [2, 1]
                   upgrade2:
                     foreground: ball_small_animated
-                    preferred_size: [3, 3]
-                    y_relative: Max
+                    size: [3, 3]
+                    relative:
+                      y: Max
                     position: [5, 1]
                   upgrade3:
                     foreground: ball_small_animated
-                    preferred_size: [3, 3]
-                    y_relative: Max
+                    size: [3, 3]
+                    relative:
+                      y: Max
                     position: [8, 1]
       class_selector_pane:
-        from: .builder_pane
+        from: builder_pane
         children:
           title:
             text: "Select your Class"
           class_pane:
-            from: .class_pane
+            from: class_pane
             background: bg_base
             border: [1, 1, 1, 1]
-            width_relative: Max
-            preferred_size: [0, 100]
+            relative:
+              width: Max
+            size: [0, 100]
             position: [0, 25]
           classes_pane:
             border: [1, 1, 1, 1]
-            preferred_size: [0, 12]
-            width_relative: ChildSum
-            x_relative: Center
+            size: [0, 12]
+            relative:
+              x: Center
+              width: ChildSum
             position: [0, 10]
             layout: BoxHorizontal
             layout_spacing: { top: 0, bottom: 0, left: 0, right: 5 }
             children:
               class_button:
-                from: .button
+                from: button
                 text_params:
                   scale: 7.0
                 text: "#name#"
-                preferred_size: [30, 10]
+                size: [30, 10]
       attribute_selector_pane:
-        from: .builder_pane
+        from: builder_pane
         children:
           title:
             text: "Customize your Class"
           kit_area:
-            from: .text_area
+            from: text_area
             background: bg_base
             border: [2, 2, 2, 2]
-            preferred_size: [-70, 100]
-            width_relative: Max
+            size: [-70, 100]
+            relative:
+              width: Max
             position: [0, 25]
             text: |
               #description#
           kits_pane:
             border: [1, 1, 1, 1]
-            preferred_size: [0, 12]
-            width_relative: ChildSum
-            x_relative: Center
+            size: [0, 12]
+            relative:
+              width: ChildSum
+              x: Center
             position: [0, 10]
             layout: BoxHorizontal
             layout_spacing: { top: 0, bottom: 0, left: 0, right: 5 }
             children:
               kit_button:
-                from: .button
+                from: button
                 text_params:
                   scale: 7.0
                 text: "#name#"
-                preferred_size: [30, 10]
+                size: [30, 10]
           attr_label:
-            from: .label
-            preferred_size: [24, 12]
+            from: label
+            size: [24, 12]
             text_params:
               scale: 7.0
               horizontal_alignment: Right
-            x_relative: Max
+            relative:
+              x: Max
           points_label:
-            from: .label
-            preferred_size: [24, 12]
+            from: label
+            size: [24, 12]
             text_params:
               scale: 7.0
               horizontal_alignment: Right
             text: "Points Left"
-            x_relative: Max
+            relative:
+              x: Max
             position: [-40, 115]
           amount_label:
-            from: .label
+            from: label
             background: bg_base
             text: "#points#     "
             position: [-20, 115]
-            preferred_size: [19, 12]
-            x_relative: Max
+            size: [19, 12]
+            relative:
+              x: Max
             text_params:
               scale: 7.0
               horizontal_alignment: Right
           bonus_label:
-            from: .label
+            from: label
             text: "+ #value# = "
-            preferred_size: [10, 6]
-            x_relative: Max
+            size: [10, 6]
+            relative:
+              x: Max
             text_params:
               scale: 7.0
               horizontal_alignment: Right
             custom:
               tooltip: "Your racial bonus"
           total_label:
-            from: .label
+            from: label
             text: "#value#"
-            preferred_size: [10, 6]
+            size: [10, 6]
             text_params:
               scale: 9.0
               horizontal_alignment: Right
-            x_relative: Max
+            relative:
+              x: Max
           str_label:
-            from: .character_builder.attribute_selector_pane.attr_label
+            from: character_builder.attribute_selector_pane.attr_label
             position: [-40, 25]
             text: "Strength"
             custom:
               tooltip: "Affects your damage output and accuracy in close quarters combat."
           str_spinner:
-            from: .spinner
+            from: spinner
             position: [-20, 25]
-            x_relative: Max
+            relative:
+              x: Max
           str_bonus:
-            from: .character_builder.attribute_selector_pane.bonus_label
+            from: character_builder.attribute_selector_pane.bonus_label
             position: [-8, 28]
           str_total:
-            from: .character_builder.attribute_selector_pane.total_label
+            from: character_builder.attribute_selector_pane.total_label
             position: [0, 28]
           dex_label:
-            from: .character_builder.attribute_selector_pane.attr_label
+            from: character_builder.attribute_selector_pane.attr_label
             position: [-40, 40]
             text: "Dexterity"
             custom:
               tooltip: "Affects your ranged accuracy, overall defenses, and reflexes."
           dex_spinner:
-            from: .spinner
+            from: spinner
             position: [-20, 40]
-            x_relative: Max
+            relative:
+              x: Max
           dex_bonus:
-            from: .character_builder.attribute_selector_pane.bonus_label
+            from: character_builder.attribute_selector_pane.bonus_label
             position: [-8, 43]
           dex_total:
-            from: .character_builder.attribute_selector_pane.total_label
+            from: character_builder.attribute_selector_pane.total_label
             position: [0, 43]
           end_label:
-            from: .character_builder.attribute_selector_pane.attr_label
+            from: character_builder.attribute_selector_pane.attr_label
             position: [-40, 55]
             text: "Endurance"
             custom:
               tooltip: "Affects how much damage you can take and your fortitude."
           end_spinner:
-            from: .spinner
+            from: spinner
             position: [-20, 55]
-            x_relative: Max
+            relative:
+              x: Max
           end_bonus:
-            from: .character_builder.attribute_selector_pane.bonus_label
+            from: character_builder.attribute_selector_pane.bonus_label
             position: [-8, 58]
           end_total:
-            from: .character_builder.attribute_selector_pane.total_label
+            from: character_builder.attribute_selector_pane.total_label
             position: [0, 58]
           per_label:
-            from: .character_builder.attribute_selector_pane.attr_label
+            from: character_builder.attribute_selector_pane.attr_label
             position: [-40, 70]
             text: "Perception"
             custom:
               tooltip: "Affects melee and ranged accuracy stats and the order you go in combat."
           per_spinner:
-            from: .spinner
+            from: spinner
             position: [-20, 70]
-            x_relative: Max
+            relative:
+              x: Max
           per_bonus:
-            from: .character_builder.attribute_selector_pane.bonus_label
+            from: character_builder.attribute_selector_pane.bonus_label
             position: [-8, 73]
           per_total:
-            from: .character_builder.attribute_selector_pane.total_label
+            from: character_builder.attribute_selector_pane.total_label
             position: [0, 73]
           int_label:
-            from: .character_builder.attribute_selector_pane.attr_label
+            from: character_builder.attribute_selector_pane.attr_label
             position: [-40, 85]
             text: "Intelligence"
             custom:
               tooltip: "Affects spell accuracy and power of spells and many special abilities."
           int_spinner:
-            from: .spinner
+            from: spinner
             position: [-20, 85]
-            x_relative: Max
+            relative:
+              x: Max
           int_bonus:
-            from: .character_builder.attribute_selector_pane.bonus_label
+            from: character_builder.attribute_selector_pane.bonus_label
             position: [-8, 88]
           int_total:
-            from: .character_builder.attribute_selector_pane.total_label
+            from: character_builder.attribute_selector_pane.total_label
             position: [0, 88]
           wis_label:
-            from: .character_builder.attribute_selector_pane.attr_label
+            from: character_builder.attribute_selector_pane.attr_label
             position: [-40, 100]
             text: "Wisdom"
             custom:
               tooltip: "Affects spell accuracy and your ability to resist many magical effects."
           wis_spinner:
-            from: .spinner
+            from: spinner
             position: [-20, 100]
-            x_relative: Max
+            relative:
+              x: Max
           wis_bonus:
-            from: .character_builder.attribute_selector_pane.bonus_label
+            from: character_builder.attribute_selector_pane.bonus_label
             position: [-8, 103]
           wis_total:
-            from: .character_builder.attribute_selector_pane.total_label
+            from: character_builder.attribute_selector_pane.total_label
             position: [0, 103]
       backstory_selector_pane:
-        from: .builder_pane
+        from: builder_pane
         border: { top: 0, bottom: 5, left: 25, right: 25 }
         children:
           start_over:
-            from: .button
+            from: button
             text: "Start Over"
-            preferred_size: [25, 6]
+            size: [25, 6]
             position: [2, 135]
           title:
             text: "Customize your Backstory"
           node:
             border: [2, 2, 2, 2]
             background: bg_rounded
-            width_relative: Max
-            height_relative: Max
-            preferred_size: [0, -23]
+            relative:
+              width: Max
+              height: Max
+            size: [0, -23]
             position: [0, 28]
             text_params:
               font: "normal"
               scale: 6.0
             text: "[s=6.0|#0#]"
           responses:
-            y_relative: Max
+            relative:
+              y: Max
             layout: BoxVertical
             layout_spacing: { top: 0, bottom: 1, left: 0, right: 0 }
-            width_relative: Max
-            height_relative: ChildSum
-            preferred_size: [-4, 10]
+            relative:
+              width: Max
+              height: ChildSum
+            size: [-4, 10]
             position: [2, 0]
             children:
               response_button:
-                from: .button
-                width_relative: Max
-                preferred_size: [0, 6]
+                from: button
+                relative:
+                  width: Max
+                size: [0, 6]
                 children:
                   text_area:
-                    from: .text_area
+                    from: text_area
                     text: "[s=6.0|#0#]"
-                    width_relative: Max
+                    relative:
+                      width: Max
       cosmetic_selector_pane:
-        from: .builder_pane
+        from: builder_pane
         children:
           title:
             text: "Customize your Appearance"
           name_label:
-            from: .label
+            from: label
             text: "Name"
-            preferred_size: [30, 8]
+            size: [30, 8]
             position: [0, 15]
             text_params:
               horizontal_alignment: Right
               scale: 8
           name_field:
-            from: .input_field
-            preferred_size: [50, 8]
+            from: input_field
+            size: [50, 8]
             position: [33, 15]
             text_params:
               scale: 8
             custom:
-              carat_height: 5.0
+              carat_height: "5.0"
           random_name_button:
-            from: .button
+            from: button
             text: "Random"
-            preferred_size: [18, 8]
+            size: [18, 8]
             position: [85, 15]
           male_button:
-            from: .button
+            from: button
             text: "Male"
-            preferred_size: [30, 8]
+            size: [30, 8]
             position: [33, 30]
           female_button:
-            from: .button
+            from: button
             text: "Female"
-            preferred_size: [30, 8]
+            size: [30, 8]
             position: [68, 30]
           skin_color_label:
-            from: .label
+            from: label
             text: "Skin"
-            preferred_size: [30, 12]
+            size: [30, 12]
             position: [0, 45]
             text_params:
               scale: 8
               horizontal_alignment: Right
           skin_color_panel:
             position: [33, 45]
-            preferred_size: [60, 14]
+            size: [60, 14]
             layout: Grid
             layout_spacing: { top: 0, bottom: 1, left: 0, right: 1 }
             children:
               color_button:
-                from: .color_button
-                preferred_size: [6, 6]
+                from: color_button
+                size: [6, 6]
           hair_label:
-            from: .label
+            from: label
             text: "Hair"
-            preferred_size: [15, 8]
+            size: [15, 8]
             position: [8, 65]
             text_params:
               scale: 8
           next_hair:
-            from: .button
+            from: button
             text: ">"
-            preferred_size: [8, 8]
+            size: [8, 8]
             position: [23, 65]
           prev_hair:
-            from: .button
+            from: button
             text: "<"
-            preferred_size: [8, 8]
+            size: [8, 8]
             position: [0, 65]
           beard_label:
-            from: .label
+            from: label
             text: "Beard"
-            preferred_size: [15, 8]
+            size: [15, 8]
             position: [8, 75]
             text_params:
               scale: 8
           next_beard:
-            from: .button
+            from: button
             text: ">"
-            preferred_size: [8, 8]
+            size: [8, 8]
             position: [23, 75]
           prev_beard:
-            from: .button
+            from: button
             text: "<"
-            preferred_size: [8, 8]
+            size: [8, 8]
             position: [0, 75]
           hair_color_label:
-            from: .label
+            from: label
           hair_color_panel:
             position: [33, 68]
-            preferred_size: [70, 14]
+            size: [70, 14]
             layout: Grid
             layout_spacing: { top: 0, bottom: 1, left: 0, right: 1 }
             children:
               color_button:
-                from: .color_button
-                preferred_size: [6, 6]
+                from: color_button
+                size: [6, 6]
           color_label:
-            from: .label
+            from: label
             text: "Clothing"
-            preferred_size: [30, 12]
+            size: [30, 12]
             position: [0, 87]
             text_params:
               scale: 8
               horizontal_alignment: Right
           color_panel:
             position: [33, 87]
-            preferred_size: [70, 14]
+            size: [70, 14]
             layout: Grid
             layout_spacing: { top: 0, bottom: 1, left: 0, right: 1 }
             children:
               color_button:
-                from: .color_button
-                preferred_size: [6, 6]
+                from: color_button
+                size: [6, 6]
           portrait_label:
-            from: .label
+            from: label
             text: "Portrait"
-            preferred_size: [30, 35]
+            size: [30, 35]
             position: [0, 106]
             text_params:
               scale: 8
               horizontal_alignment: Right
           portrait_button:
-            from: .button
+            from: button
             background: background_inner
-            preferred_size: [35, 35]
+            size: [35, 35]
             position: [33, 106]
           preview:
             background: bg_transparent_base
             border: { top: 0, bottom: 4, left: 6, right: 0 }
-            preferred_size: [35, 35]
+            size: [35, 35]
             position: [110, 15]
   portrait_selector:
     background: bg_base
     border: [2, 2, 2, 2]
-    preferred_size: [150, 116]
-    x_relative: Center
-    y_relative: Center
+    size: [150, 116]
+    relative:
+      x: Center
+      y: Center
     children:
       scrollbar:
-        from: .scrollbar
+        from: scrollbar
         custom:
-          scroll_delta: 28
+          scroll_delta: "28"
       content:
-        width_relative: Max
-        height_relative: Max
+        relative:
+          width: Max
+          height: Max
         layout: Grid
         layout_spacing: { top: 0, bottom: 1, left: 0, right: 1 }
         children:
           portrait_button:
-            from: .button
-            preferred_size: [27, 27]
+            from: button
+            size: [27, 27]
 ...

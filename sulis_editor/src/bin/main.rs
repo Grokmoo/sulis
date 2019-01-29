@@ -16,8 +16,6 @@
 
 #[macro_use] extern crate log;
 
-use std::rc::Rc;
-
 use sulis_core::ui;
 use sulis_core::config::Config;
 use sulis_core::resource::ResourceSet;
@@ -68,14 +66,6 @@ fn main() {
     };
 
     let root = ui::create_ui_tree(EditorView::new());
-    match ResourceSet::get_theme().children.get("editor") {
-        None => warn!("No theme found for 'editor'"),
-        Some(ref theme) => {
-            root.borrow_mut().theme = Some(Rc::clone(theme));
-            root.borrow_mut().theme_id = ".editor".to_string();
-            root.borrow_mut().theme_subname = "editor".to_string();
-        }
-    }
 
     if let Err(e) = util::main_loop(&mut io, root, Box::new(EditorMainLoopUpdater { })) {
         error!("{}", e);

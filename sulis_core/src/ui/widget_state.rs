@@ -123,8 +123,20 @@ impl WidgetState {
         self.is_modal = modal;
     }
 
+    pub fn border(&self) -> Border { self.border }
     pub fn position(&self) -> Point { self.position }
     pub fn size(&self) -> Size { self.size }
+
+    pub fn width(&self) -> i32 { self.size.width }
+    pub fn height(&self) -> i32 { self.size.height }
+
+    pub fn inner_position(&self) -> Point {
+        Point::new(self.inner_left(), self.inner_top())
+    }
+
+    pub fn inner_size(&self) -> Size {
+        Size::new(self.inner_width(), self.inner_height())
+    }
 
     pub fn left(&self) -> i32 { self.position.x }
     pub fn top(&self) -> i32 { self.position.y }

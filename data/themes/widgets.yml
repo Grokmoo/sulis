@@ -1,43 +1,65 @@
 ---
-children:
+id: widgets
+themes:
+  test_recur:
+    border: [2, 2, 2, 2]
+  test_val:
+    background: bg_base
+    border: [1, 1, 1, 1]
+    children:
+      test_val_child1:
+        size: [10, 0]
+      test_val_child2:
+        size: [12, 0]
+        children:
+          test_val_child3:
+            from: test_recur
+            size: [14, 0]
+  test_to:
+    from: test_val
   tooltip:
-    from: .text_area
+    from: text_area
     border: { top: 1, bottom: 1, left: 2, right: 2 }
     background: 80_transparent_fill
     text: "[s=5.0|#0#]"
-    preferred_size: [50, 4]
-    width_relative: Custom
-    height_relative: Custom
-    x_relative: Custom
-    y_relative: Custom
+    size: [50, 4]
+    relative:
+      width: Custom
+      height: Custom
+      x: Custom
+      y: Custom
   label:
     text_params:
       font: "normal"
       scale: 5.0
   scrollbar:
     background: bg_base
-    preferred_size: [5, 0]
-    x_relative: Max
-    height_relative: Max
+    size: [5, 0]
+    relative:
+      x: Max
+      height: Max
     custom:
       scroll_delta: "10"
     children:
       thumb:
-        from: .button
-        width_relative: Max
-        height_relative: Custom
-        y_relative: Custom
+        from: button
+        relative:
+          width: Max
+          height: Custom
+          y: Custom
       up:
-        from: .button
-        width_relative: Max
-        preferred_size: [0, 5]
+        from: button
+        relative:
+          width: Max
+        size: [0, 5]
         position: [0, 0]
         foreground: icon_up
       down:
-        from: .button
-        width_relative: Max
-        preferred_size: [0, 5]
-        y_relative: Max
+        from: button
+        relative:
+          width: Max
+          y: Max
+        size: [0, 5]
         position: [0, 0]
         foreground: icon_down
   button:
@@ -46,10 +68,11 @@ children:
     text_params:
       font: "normal"
       scale: 6.0
+      horizontal_alignment: Center
   tab_button:
-    from: .button
+    from: button
     background: background_tab
-    preferred_size: [20, 6]
+    size: [20, 6]
   color_button:
     background: background
     border: [1, 1, 1, 1]
@@ -58,8 +81,9 @@ children:
   list_box:
     background: bg_base
     border: [1, 1, 1, 1]
-    width_relative: ChildMax
-    height_relative: ChildSum
+    relative:
+      width: ChildMax
+      height: ChildSum
     layout: BoxVertical
     children:
       entry:
@@ -70,7 +94,7 @@ children:
           scale: 6.0
         background: fill
         border: { top: 0, bottom: 0, left: 0, right: 0 }
-        preferred_size: [0, 4]
+        size: [0, 4]
   text_area:
     text_params:
       font: "normal"
@@ -91,60 +115,66 @@ children:
   window:
     background: bg_large
     border: { top: 6, bottom: 8, left: 6, right: 6 }
-    preferred_size: [120, -8]
+    size: [120, -8]
     position: [0, 4]
-    height_relative: Max
-    x_relative: Zero
+    relative:
+      height: Max
+      x: Zero
     children:
       title:
-        from: .label
+        from: label
         background: bg_base
-        x_relative: Center
-        preferred_size: [40, 5]
+        relative:
+          x: Center
+        size: [40, 5]
         position: [0, -5]
         text_params:
           scale: 7
       close:
-        from: .button
+        from: button
         text_params:
           horizontal_alignment: Center
         border: [0, 0, 0, 0]
-        preferred_size: [8, 4]
+        size: [8, 4]
         text: "X"
         position: [3, -3]
-        x_relative: Max
+        relative:
+          x: Max
   item_button:
-    from: .button
+    from: button
     background: empty
     foreground: background_transparent_no_disabled
     border: [0, 0, 0, 0]
-    preferred_size: [12, 12]
+    size: [12, 12]
     children:
       quantity_label:
-        from: .label
+        from: label
         text: "#quantity#"
         text_params:
           font: outlined
           horizontal_alignment: Right
           vertical_alignment: Top
-          color: { r: 1.0, g: 0.0, b: 0.0, a: 1.0 }
+          color: f00
           scale: 5.0
-        width_relative: Max
-        height_relative: Max
-        preferred_size: [-1, 0]
+        relative:
+          width: Max
+          height: Max
+        size: [-1, 0]
       icon:
         foreground: "#icon#"
-        width_relative: Max
-        height_relative: Max
+        relative:
+          width: Max
+          height: Max
       adjectives_pane:
-        preferred_size: [0, 4]
-        width_relative: ChildSum
-        x_relative: Max
+        size: [0, 4]
+        relative:
+          width: ChildSum
+          x: Max
         layout: BoxHorizontal
         children:
           icon:
             foreground: "#icon#"
-            preferred_size: [4, 4]
+            size: [4, 4]
   progress_bar:
     background: bg_base
     border: [1, 1, 1, 1]
@@ -153,56 +183,58 @@ children:
   spinner:
     background: bg_base
     border: [1, 1, 1, 1]
-    preferred_size: [19, 12]
+    size: [19, 12]
     children:
       label:
-        from: .label
-        preferred_size: [10, 10]
+        from: label
+        size: [10, 10]
         position: [7, 0]
         text: "#value#"
         text_params:
           scale: 6.0
       down:
-        from: .button
-        preferred_size: [7, 5]
+        from: button
+        size: [7, 5]
         text: "-"
         position: [0, 5]
         custom:
-          repeat_init_time: 500
-          repeat_time: 30
+          repeat_init_time: "500"
+          repeat_time: "30"
       up:
-        from: .button
-        preferred_size: [7, 5]
+        from: button
+        size: [7, 5]
         text: "+"
         position: [0, 0]
         custom:
-          repeat_init_time: 500
-          repeat_time: 30
+          repeat_init_time: "500"
+          repeat_time: "30"
   confirmation_window:
     background: bg_base
     border: [1, 1, 1, 1]
-    preferred_size: [60, 28]
-    x_relative: Center
-    y_relative: Center
+    size: [60, 28]
+    relative:
+      x: Center
+      y: Center
     position: [0, -20]
     children:
       title:
-        from: .label
-        width_relative: Max
-        preferred_size: [0, 4]
+        from: label
+        relative:
+          width: Max
+        size: [0, 4]
         position: [0, 3]
         text_params:
           scale: 7
       cancel:
-        from: .button
-        preferred_size: [24, 12]
+        from: button
+        size: [24, 12]
         text: "Cancel"
         text_params:
           scale: 7
         position: [3, 11]
       accept:
-        from: .button
-        preferred_size: [24, 12]
+        from: button
+        size: [24, 12]
         text: "Exit"
         text_params:
           scale: 7
@@ -210,65 +242,73 @@ children:
   load_window_base:
     children:
       title:
-        from: .label
-        width_relative: Max
-        preferred_size: [0, 10]
+        from: label
+        relative:
+          width: Max
+        size: [0, 10]
         text_params:
           scale: 10
         text: "Select a File to Load"
       entries:
         background: bg_base
         border: [2, 2, 2, 2]
-        width_relative: Max
-        height_relative: Max
-        preferred_size: [0, -30]
+        relative:
+          width: Max
+          height: Max
+        size: [0, -30]
         position: [0, 15]
         children:
           scrollbar:
-            from: .scrollbar
+            from: scrollbar
             custom:
-              scroll_delta: 12
+              scroll_delta: "12"
           content:
-            width_relative: Max
-            height_relative: Max
-            preferred_size: [-7, 0]
+            relative:
+              width: Max
+              height: Max
+            size: [-7, 0]
             layout: BoxVertical
             layout_spacing: { top: 0, bottom: 2, left: 0, right: 0 }
             children:
               entry:
-                from: .button
-                width_relative: Max
-                preferred_size: [0, 10]
+                from: button
+                relative:
+                  width: Max
+                size: [0, 10]
                 children:
                   text_area:
-                    from: .text_area
-                    width_relative: Max
-                    height_relative: Max
+                    from: text_area
+                    relative:
+                      width: Max
+                      height: Max
                     text: |
                       [?error;c=f00|Invalid or Corrupt][!error;s=7|#player_name#][x=40|#datetime#]
                       [!error|#current_area_name#]
       delete:
-        from: .button
-        preferred_size: [25, 10]
+        from: button
+        size: [25, 10]
         text_params:
           scale: 7
         text: "Delete"
-        y_relative: Max
+        relative:
+          y: Max
       cancel:
-        from: .button
-        preferred_size: [25, 10]
+        from: button
+        size: [25, 10]
         text_params:
           scale: 7
         text: "Cancel"
-        x_relative: Max
-        y_relative: Max
+        relative:
+          x: Max
+          y: Max
         position: [-30, 0]
       accept:
-        from: .button
-        preferred_size: [25, 10]
+        from: button
+        size: [25, 10]
         text_params:
           scale: 7
         text: "Load"
-        x_relative: Max
-        y_relative: Max
+        relative:
+          x: Max
+          y: Max
 ...

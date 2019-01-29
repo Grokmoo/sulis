@@ -110,15 +110,14 @@ impl WidgetKind for InputField {
             widget.state.text_renderer = Some(Box::new(LineRenderer::new(font)));
         }
 
-        if let Some(ref theme) = widget.theme {
-            if let Some(ref image_id) = theme.custom.get("carat_image") {
-                self.carat = ResourceSet::get_image(image_id);
-            }
-
-            self.carat_width = theme.get_custom_or_default("carat_width", 1.0);
-            self.carat_height = theme.get_custom_or_default("carat_height", 1.0);
-            self.carat_offset = theme.get_custom_or_default("carat_offset", 0.0);
+        let theme = &widget.theme;
+        if let Some(ref image_id) = theme.custom.get("carat_image") {
+            self.carat = ResourceSet::image(image_id);
         }
+
+        self.carat_width = theme.get_custom_or_default("carat_width", 1.0);
+        self.carat_height = theme.get_custom_or_default("carat_height", 1.0);
+        self.carat_offset = theme.get_custom_or_default("carat_offset", 0.0);
     }
 
     fn on_char_typed(&mut self, widget: &Rc<RefCell<Widget>>, c: char) -> bool {
@@ -173,7 +172,7 @@ impl WidgetKind for InputField {
         if let Some(ref carat) = self.carat {
             let x = self.label.borrow().text_draw_end_x + self.carat_offset;
             let y = widget.state.inner_top() as f32 +
-                (widget.state.inner_size.height as f32 - self.carat_height) / 2.0;
+                (widget.state.inner_height() as f32 - self.carat_height) / 2.0;
             let w = self.carat_width;
             let h = self.carat_height;
             carat.draw(renderer, &widget.state.animation_state, x, y, w, h, millis);

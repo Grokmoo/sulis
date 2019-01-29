@@ -48,10 +48,8 @@ impl WidgetKind for ColorButton {
     fn layout(&mut self, widget: &mut Widget) {
         widget.do_base_layout();
 
-        if let Some(ref theme) = widget.theme {
-            if let Some(ref icon_id) = theme.custom.get("icon") {
-                self.icon = ResourceSet::get_image(icon_id);
-            }
+        if let Some(ref icon_id) = widget.theme.custom.get("icon") {
+            self.icon = ResourceSet::image(icon_id);
         }
     }
 
@@ -62,13 +60,11 @@ impl WidgetKind for ColorButton {
             Some(ref icon) => icon,
         };
 
-        let x = widget.state.inner_position.x as f32;
-        let y = widget.state.inner_position.y as f32;
-        let w = widget.state.inner_size.width as f32;
-        let h = widget.state.inner_size.height as f32;
+        let (x, y) = widget.state.inner_position().as_tuple();
+        let (w, h) = widget.state.inner_size().as_tuple();
         let mut draw_list = DrawList::empty_sprite();
         icon.append_to_draw_list(&mut draw_list, &widget.state.animation_state,
-                                 x, y, w, h, millis);
+                                 x as f32, y as f32, w as f32, h as f32, millis);
         draw_list.set_color(self.color);
         renderer.draw(draw_list);
     }

@@ -94,7 +94,7 @@ pub struct WallPicker {
 
 impl WallPicker {
     pub fn new() -> Rc<RefCell<WallPicker>> {
-        let cursor_sprite = match ResourceSet::get_sprite(&Config::editor_config().cursor) {
+        let cursor_sprite = match ResourceSet::sprite(&Config::editor_config().cursor) {
             Err(_) => panic!("Unable to find cursor sprite '{}'", Config::editor_config().cursor),
             Ok(sprite) => sprite,
         };

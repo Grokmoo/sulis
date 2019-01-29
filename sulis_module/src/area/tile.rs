@@ -274,7 +274,7 @@ impl Tile {
             }
         }
 
-        let sprite = ResourceSet::get_sprite(&builder.sprite)?;
+        let sprite = ResourceSet::sprite(&builder.sprite)?;
 
         Ok(Tile {
             id,

@@ -64,7 +64,7 @@ impl AreaModel {
     pub fn new() -> AreaModel {
         let config = Config::editor_config();
 
-        let encounter_sprite = match ResourceSet::get_sprite(&config.area.encounter_tile) {
+        let encounter_sprite = match ResourceSet::sprite(&config.area.encounter_tile) {
             Ok(sprite) => Some(sprite),
             Err(_) => {
                 warn!("Encounter tile '{}' not found", config.area.encounter_tile);
@@ -72,7 +72,7 @@ impl AreaModel {
             },
         };
 
-        let font_renderer = match ResourceSet::get_font(&Config::default_font()) {
+        let font_renderer = match ResourceSet::font(&Config::default_font()) {
             None => {
                 warn!("Font '{}' not found", Config::default_font());
                 None
@@ -390,7 +390,7 @@ impl AreaModel {
     }
 
     pub fn new_transition(&mut self) -> Option<usize> {
-        let sprite = match ResourceSet::get_image(&self.config.transition_image) {
+        let sprite = match ResourceSet::image(&self.config.transition_image) {
             None => {
                 warn!("No image with ID {} found.", self.config.transition_image);
                 return None;
@@ -685,7 +685,7 @@ impl AreaModel {
         trace!("Loading area transitions.");
         self.transitions.clear();
         for transition_builder in area_builder.transitions {
-            let image = match ResourceSet::get_image(&transition_builder.image_display) {
+            let image = match ResourceSet::image(&transition_builder.image_display) {
                 None => {
                     warn!("No image with ID {} found.", transition_builder.image_display);
                     continue;

@@ -166,10 +166,9 @@ impl WidgetKind for AbilitiesPane {
     fn as_any_mut(&mut self) -> &mut Any { self }
 
     fn layout(&mut self, widget: &mut Widget) {
-        if let Some(ref theme) = widget.theme {
-            self.grid_size = theme.get_custom_or_default("grid_size", 10);
-            self.grid_border = theme.get_custom_or_default("grid_border", 1);
-        }
+        let theme = &widget.theme;
+        self.grid_size = theme.get_custom_or_default("grid_size", 10);
+        self.grid_border = theme.get_custom_or_default("grid_border", 1);
 
         let grid = self.grid_size as f32;
         widget.do_self_layout();
@@ -177,8 +176,8 @@ impl WidgetKind for AbilitiesPane {
             let position = self.positions[index];
             let pos_x = (position.0 * grid) as i32 + self.grid_border;
             let pos_y = (position.1 * grid) as i32 + self.grid_border;
-            child.borrow_mut().state.set_position(widget.state.inner_position.x + pos_x,
-                                                  widget.state.inner_position.y + pos_y);
+            child.borrow_mut().state.set_position(widget.state.inner_left() + pos_x,
+                                                  widget.state.inner_top() + pos_y);
         }
 
         widget.do_children_layout();

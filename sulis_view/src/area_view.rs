@@ -127,7 +127,7 @@ impl AreaView {
     }
 
     fn get_cursor_pos(&self, widget: &Rc<RefCell<Widget>>) -> (f32, f32) {
-        let pos = widget.borrow().state.inner_position;
+        let pos = widget.borrow().state.inner_position();
         let (x, y) = self.get_cursor_pos_scaled(pos.x, pos.y);
         ((x + self.scroll.x()), (y + self.scroll.y()))
     }
@@ -241,7 +241,7 @@ impl AreaView {
 
     fn draw_layer(&self, renderer: &mut GraphicsRenderer, scale_x: f32, scale_y: f32,
                   widget: &Widget, id: &str, color: Color) {
-        let p = widget.state.inner_position;
+        let p = widget.state.inner_position();
         let mut draw_list =
             DrawList::from_texture_id(&id, &TEX_COORDS,
                                       p.x as f32 - self.scroll.x(),
@@ -283,8 +283,8 @@ impl AreaView {
         to_draw.sort_by_key(|k| k.location());
 
         for drawable in to_draw {
-            let x = widget.state.inner_position.x as f32 - self.scroll.x();
-            let y = widget.state.inner_position.y as f32 - self.scroll.y();
+            let (x, y) = widget.state.inner_position().as_tuple();
+            let (x, y) = (x as f32 - self.scroll.x(), y as f32 - self.scroll.y());
             drawable.draw(renderer, scale_x, scale_y, x, y, millis, color);
         }
 
@@ -293,8 +293,8 @@ impl AreaView {
 
     fn draw_selection(&mut self, selected: &Rc<RefCell<EntityState>>, renderer: &mut GraphicsRenderer,
                       scale_x: f32, scale_y: f32, widget: &Widget, millis: u32) {
-        let x_base = widget.state.inner_position.x as f32 - self.scroll.x();
-        let y_base = widget.state.inner_position.y as f32 - self.scroll.y();
+        let x_base = widget.state.inner_left() as f32 - self.scroll.x();
+        let y_base = widget.state.inner_top() as f32 - self.scroll.y();
 
         let selected = selected.borrow();
         let w = selected.size.width as f32;
@@ -346,7 +346,7 @@ impl AreaView {
             Some((x, y, x2, y2)) => (x, y, x2, y2),
         };
 
-        let pos = widget.state.inner_position;
+        let pos = widget.state.inner_position();
         let x1 = ((x - pos.x as f32) / self.scale.0 + self.scroll.x()) as i32;
         let y1 = ((y - pos.y as f32) / self.scale.1 + self.scroll.y()) as i32;
         let x2 = ((x_end - pos.x as f32) / self.scale.0 + self.scroll.x()) as i32;
@@ -534,42 +534,41 @@ impl WidgetKind for AreaView {
     fn layout(&mut self, widget: &mut Widget) {
         widget.do_base_layout();
 
-        if let Some(ref theme) = widget.theme {
-            if let Some(ref image_id) = theme.custom.get("targeter_tile") {
-                self.targeter_tile = ResourceSet::get_image(image_id);
-            }
+        let theme = &widget.theme;
+        if let Some(ref image_id) = theme.custom.get("targeter_tile") {
+            self.targeter_tile = ResourceSet::image(image_id);
+        }
 
-            if let Some(ref image_id) = theme.custom.get("selection_box_image") {
-                self.selection_box_image = ResourceSet::get_image(image_id);
-            }
+        if let Some(ref image_id) = theme.custom.get("selection_box_image") {
+            self.selection_box_image = ResourceSet::image(image_id);
+        }
 
-            self.feedback_text_params.scale =
-                theme.get_custom_or_default("feedback_text_scale", 1.0);
+        self.feedback_text_params.scale =
+            theme.get_custom_or_default("feedback_text_scale", 1.0);
 
-            if let Some(ref font_id) = theme.custom.get("feedback_text_font") {
-                self.feedback_text_params.font = match ResourceSet::get_font(font_id) {
-                    None => {
-                        warn!("Invalid font specified for area feedback text '{}'", font_id);
-                        ResourceSet::get_default_font()
-                    }, Some(font) => font,
-                };
-            }
+        if let Some(ref font_id) = theme.custom.get("feedback_text_font") {
+            self.feedback_text_params.font = match ResourceSet::font(font_id) {
+                None => {
+                    warn!("Invalid font specified for area feedback text '{}'", font_id);
+                    ResourceSet::default_font()
+                }, Some(font) => font,
+            };
+        }
 
-            self.feedback_text_params.info_color =
-                theme.get_custom_or_default("feedback_text_info_color", color::LIGHT_GRAY);
-            self.feedback_text_params.miss_color =
-                theme.get_custom_or_default("feedback_text_miss_color", color::LIGHT_GRAY);
-            self.feedback_text_params.hit_color =
-                theme.get_custom_or_default("feedback_text_hit_color", color::RED);
-            self.feedback_text_params.heal_color =
-                theme.get_custom_or_default("feedback_text_heal_color", color::BLUE);
+        self.feedback_text_params.info_color =
+            theme.get_custom_or_default("feedback_text_info_color", color::LIGHT_GRAY);
+        self.feedback_text_params.miss_color =
+            theme.get_custom_or_default("feedback_text_miss_color", color::LIGHT_GRAY);
+        self.feedback_text_params.hit_color =
+            theme.get_custom_or_default("feedback_text_hit_color", color::RED);
+        self.feedback_text_params.heal_color =
+            theme.get_custom_or_default("feedback_text_heal_color", color::BLUE);
 
-            for kind in DamageKind::iter() {
-                let id = format!("feedback_text_damage_{}_color", kind.to_str().to_lowercase());
-                let index = kind.index();
-                self.feedback_text_params.damage_colors[index] =
-                    theme.get_custom_or_default(&id, color::LIGHT_GRAY);
-            }
+        for kind in DamageKind::iter() {
+            let id = format!("feedback_text_damage_{}_color", kind.to_str().to_lowercase());
+            let index = kind.index();
+            self.feedback_text_params.damage_colors[index] =
+                theme.get_custom_or_default(&id, color::LIGHT_GRAY);
         }
 
         if self.targeter_tile.is_none() {
@@ -707,7 +706,7 @@ impl WidgetKind for AreaView {
             PCVisRedraw::Not => (),
         }
 
-        let p = widget.state.inner_position;
+        let p = widget.state.inner_position();
 
         let rules = Module::rules();
         let mgr = GameState::turn_manager();

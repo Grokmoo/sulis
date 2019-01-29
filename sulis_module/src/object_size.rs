@@ -53,9 +53,9 @@ impl ObjectSize {
             points.push(Point::new(x, y));
         }
 
-        let sprite = ResourceSet::get_sprite(&builder.cursor_image)?;
+        let sprite = ResourceSet::sprite(&builder.cursor_image)?;
 
-        let selection_image = match ResourceSet::get_image(&builder.selection_image) {
+        let selection_image = match ResourceSet::image(&builder.selection_image) {
             None => {
                 warn!("Unable to locate image '{}'", builder.selection_image);
                 return unable_to_create_error("object_size", &builder.id);

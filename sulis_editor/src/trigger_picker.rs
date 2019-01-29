@@ -41,7 +41,7 @@ impl TriggerPicker {
     pub fn new() -> Rc<RefCell<TriggerPicker>> {
         let enc_tile = Config::editor_config().area.encounter_tile;
 
-        let sprite = match ResourceSet::get_sprite(&enc_tile) {
+        let sprite = match ResourceSet::sprite(&enc_tile) {
             Ok(sprite) => Some(sprite),
             Err(_) => {
                 warn!("Encounter tile '{}' not found", enc_tile);

@@ -93,12 +93,11 @@ impl WidgetKind for Button {
             widget.state.text_renderer = Some(Box::new(LineRenderer::new(font)));
         }
 
-        if let Some(ref theme) = widget.theme {
-            self.repeat_time = theme.get_custom_or_default("repeat_time", 0);
-            self.repeat_init_time = theme.get_custom_or_default("repeat_init_time", 0);
-            if let Some(tooltip) = theme.custom.get("tooltip") {
-                self.tooltip = theme::expand_text_args(tooltip, &widget.state);
-            }
+        let theme = &widget.theme;
+        self.repeat_time = theme.get_custom_or_default("repeat_time", 0);
+        self.repeat_init_time = theme.get_custom_or_default("repeat_init_time", 0);
+        if let Some(tooltip) = theme.custom.get("tooltip") {
+            self.tooltip = theme::expand_text_args(tooltip, &widget.state);
         }
     }
 
@@ -117,7 +116,7 @@ impl WidgetKind for Button {
 
         let (x, y) = {
             let state = &widget.borrow().state;
-            (state.position.x + state.size.width, state.position.y)
+            (state.position().x + state.size().width, state.position().y)
         };
 
         Widget::set_mouse_over_widget(widget, tooltip, x, y);

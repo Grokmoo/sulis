@@ -84,7 +84,7 @@ themes:
           title:
             text: "Select your Race"
           race_pane:
-            from: race_pane
+            from: game.race_pane
             background: bg_base
             border: [1, 1, 1, 1]
             relative:
@@ -117,7 +117,7 @@ themes:
           title:
             text: "Select an Ability"
           ability_pane:
-            from: ability_pane
+            from: game.ability_pane
             position: [140, 10]
             size: [-140, -10]
             relative:
@@ -200,7 +200,7 @@ themes:
           title:
             text: "Select your Class"
           class_pane:
-            from: class_pane
+            from: game.class_pane
             background: bg_base
             border: [1, 1, 1, 1]
             relative:

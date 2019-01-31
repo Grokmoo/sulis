@@ -122,7 +122,7 @@ themes:
       portrait_selector:
         from: portrait_selector
       exit_confirmation_window:
-        from: exit_confirmation
+        from: game.exit_confirmation
       save_or_revert_options_window:
         from: save_or_revert_options_window
       delete_character_confirmation_window:
@@ -262,7 +262,7 @@ themes:
         position: [-30, -5]
         size: [40, 10]
       details:
-        from: character_window.details
+        from: game.character_window.details
         border: [4, 4, 4, 4]
         background: bg_base
         relative:
@@ -747,7 +747,6 @@ themes:
                       tooltip: "Deactivate this mod"
                     relative:
                       x: Max
-                      y: Max
       available:
         border: [2, 2, 2, 2]
         size: [110, -34]

@@ -130,7 +130,7 @@ use sulis_state::{ChangeListener, EntityState, GameState, NextGameStep, Script,
     script::ScriptEntity};
 use sulis_widgets::{Button, ConfirmationWindow, Label};
 
-const NAME: &str = "root";
+const NAME: &str = "game";
 
 pub struct GameMainLoopUpdater {
     view: Rc<RefCell<RootView>>,

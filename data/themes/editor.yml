@@ -388,7 +388,7 @@ themes:
                     foreground: "#icon#"
                     size: [20, 20]
       exit_confirmation_window:
-        from: exit_confirmation
+        from: game.exit_confirmation
         children:
           title:
             text: "Exit the Editor?"

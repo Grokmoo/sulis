@@ -1,22 +1,6 @@
 ---
 id: widgets
 themes:
-  test_recur:
-    border: [2, 2, 2, 2]
-  test_val:
-    background: bg_base
-    border: [1, 1, 1, 1]
-    children:
-      test_val_child1:
-        size: [10, 0]
-      test_val_child2:
-        size: [12, 0]
-        children:
-          test_val_child3:
-            from: test_recur
-            size: [14, 0]
-  test_to:
-    from: test_val
   tooltip:
     from: text_area
     border: { top: 1, bottom: 1, left: 2, right: 2 }

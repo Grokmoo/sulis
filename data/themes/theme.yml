@@ -1,290 +1,325 @@
 ---
 id: theme
 themes:
-  status_text:
-    from: label
-    position: [0, 2]
-  item_window:
-    from: bonus_text
-    border: { top: 1, bottom: 1, left: 1, right: 1 }
-    background: 80_transparent_fill
-    size: [52, 14]
-    position: [0, 0]
-    relative:
-      x: Custom
-      y: Custom
-      width: Custom
-      height: Custom
-  item_action_menu:
-    from: list_box
-    relative:
-      x: Custom
-      y: Custom
-      height: ChildSum
-      width: Zero
-    position: [-1, -1]
-    size: [30, 0]
+  game:
     children:
-      title:
+      tooltip:
+        from: tooltip
+      status_text:
         from: label
-        text: "Actions"
-        text_params:
-          scale: 7.0
-          horizontal_alignment: Center
-        size: [0, 4]
-        relative:
-          width: Max
-      actions:
-        from: list_box
-        border: [0, 0, 0, 0]
-        relative:
-          width: Max
-        position: [0, 4]
-  ability_hover:
-    from: text_area
-    border: { top: 1, bottom: 1, left: 2, right: 2 }
-    background: 80_transparent_fill
-    text: |
-      [s=6.0|#name#]   [s=5.0;c=f00|AP: #activate_ap#]
-      [s=5.0|#short_description#]
-    size: [60, 12]
-    relative:
-      width: Custom
-      height: Custom
-      x: Custom
-      y: Custom
-  area_mouseover:
-    from: text_area
-    border: { top: 2, bottom: 0, left: 2, right: 2 }
-    background: bg_inner_transparent_80
-    text: |
-      [s=8.0|[a=56|#name#]]
-      [?cur_hp;s=5.0|[a=56|#cur_hp# / #max_hp#]
-      ][?empty;c=888;s=5.0|[a=56|Empty]
-      ][?status;c=800;s=5.0;a=56|#status#
-      ]
-    size: [60, 12]
-    relative:
-      x: Center
-    position: [0, 13]
-  ap_bar:
-    relative:
-      y: Max
-      x: Center
-      width: ChildSum
-    position: [0, -40]
-    size: [0, 8]
-    border: [1, 1, 1, 1]
-    layout: BoxHorizontal
-    layout_spacing: { top: 0, bottom: 0, left: 1, right: 0 }
-    children:
-      ball:
-        background: ball
-        size: [6, 6]
-        custom:
-          bar_image: ball_active
-  initiative_ticker:
-    size: [0, 12]
-    position: [0, 0]
-    relative:
-      width: Max
-    children:
-      pane:
-        relative:
-          x: Center
-          width: ChildSum
-          height: Max
-        layout: BoxHorizontal
-        layout_spacing: { right: 1, left: 0, top: 0, bottom: 0 }
-        children:
-          entry:
-            from: label
-            background: bg_rounded
-            text: "#0#"
-            text_params:
-              horizontal_alignment: Center
-            size: [12, 0]
-            relative:
-              height: Max
-          current_entry:
-            from: label
-            background: bg_rounded_hover
-            text: "#0#"
-            text_params:
-              horizontal_alignment: Center
-              color: f00
-              scale: 9.0
-            size: [12, 0]
-            relative:
-              height: Max
-  bottom_pane:
-    background: bg_middle_base
-    border: [1, 1, 1, 1]
-    size: [0, 40]
-    relative:
-      y: Max
-      width: Max
-    children:
-      select_all_button:
-        from: button
-        foreground: select_all
-        border: [0, 0, 0, 0]
         position: [0, 2]
-        size: [10, 10]
-        custom:
-          tooltip: "Select All Party Members"
-      formations_button:
-        from: button
-        foreground: formations
-        border: [0, 0, 0, 0]
-        position: [0, 13]
-        size: [10, 10]
-        custom:
-          tooltip: "Set party formation"
-      rest_button:
-        from: button
-        foreground: rest
-        border: [0, 0, 0, 0]
-        position: [0, 24]
-        size: [10, 10]
-        custom:
-          tooltip: "Rest"
-      portrait_pane:
-        size: [120, 0]
-        position: [11, 0]
+      item_window:
+        from: game.bonus_text
+        border: { top: 1, bottom: 1, left: 1, right: 1 }
+        background: 80_transparent_fill
+        size: [52, 14]
+        position: [0, 0]
         relative:
-          height: Max
-        layout: BoxHorizontal
-        children:
-          portrait_view:
-            background: background_rounded
-            relative:
-              x: Max
-            size: [30, 36]
-            border: [1, 1, 1, 1]
-            children:
-              portrait:
-                relative:
-                  width: Max
-                  height: Max
-                size: [0, -6]
-                foreground: "#image#"
-              hp_bar:
-                from: progress_bar
-                relative:
-                  y: Max
-                  width: Max
-                size: [0, 6]
-                text: "#cur_hp# / #max_hp#"
-                text_params:
-                  scale: 7.0
-                  horizontal_alignment: Center
-              level_up:
-                from: button
-                text: "+"
-                text_params:
-                  scale: 7.0
-                custom:
-                  tooltip: "Level Up"
-                relative:
-                  x: Max
-                size: [7, 7]
-              icons:
-                relative:
-                  width: Max
-                  height: Max
-                size: [-7, 0]
-                layout: Grid
-                layout_spacing: { top: 0, bottom: 1, left: 0, right: 1 }
-                children:
-                  icon:
-                    size: [6, 6]
-                    background: bg_base
-                    foreground: "#icon#"
-                    custom:
-                      tooltip: "#text#"
-      quick_item_bar:
+          x: Custom
+          y: Custom
+          width: Custom
+          height: Custom
+      item_action_menu:
+        from: list_box
         relative:
-          height: Max
-        position: [132, 0]
-        size: [28, 0]
-        background: bg_base
-        border: [1, 1, 1, 1]
+          x: Custom
+          y: Custom
+          height: ChildSum
+          width: Zero
+        position: [-1, -1]
+        size: [30, 0]
         children:
           title:
             from: label
-            text: "Usable Items"
-            position: [0, 1]
-            size: [0, 8]
+            text: "Actions"
+            text_params:
+              scale: 7.0
+              horizontal_alignment: Center
+            size: [0, 4]
             relative:
               width: Max
-            text_params:
-              vertical_alignment: Top
-              horizontal_alignment: Left
-              color: f00
-          swap_weapons:
-            from: button
-            foreground: swap_weapons
-            size: [7, 7]
-            position: [0, 0]
+          actions:
+            from: list_box
+            border: [0, 0, 0, 0]
             relative:
-              x: Max
+              width: Max
+            position: [0, 4]
+      ability_hover:
+        from: text_area
+        border: { top: 1, bottom: 1, left: 2, right: 2 }
+        background: 80_transparent_fill
+        text: |
+          [s=6.0|#name#]   [s=5.0;c=f00|AP: #activate_ap#]
+          [s=5.0|#short_description#]
+        size: [60, 12]
+        relative:
+          width: Custom
+          height: Custom
+          x: Custom
+          y: Custom
+      area_mouseover:
+        from: text_area
+        border: { top: 2, bottom: 0, left: 2, right: 2 }
+        background: bg_inner_transparent_80
+        text: |
+          [s=8.0|[a=56|#name#]]
+          [?cur_hp;s=5.0|[a=56|#cur_hp# / #max_hp#]
+          ][?empty;c=888;s=5.0|[a=56|Empty]
+          ][?status;c=800;s=5.0;a=56|#status#
+          ]
+        size: [60, 12]
+        relative:
+          x: Center
+        position: [0, 13]
+      ap_bar:
+        relative:
+          y: Max
+          x: Center
+          width: ChildSum
+        position: [0, -40]
+        size: [0, 8]
+        border: [1, 1, 1, 1]
+        layout: BoxHorizontal
+        layout_spacing: { top: 0, bottom: 0, left: 1, right: 0 }
+        children:
+          ball:
+            background: ball
+            size: [6, 6]
             custom:
-              tooltip: "Swap Weapon Set"
-          usable1:
-            from: item_button
-            background: quick_item_button
-            foreground: ability_button_fg
-            position: [0, 9]
-          usable2:
-            from: item_button
-            background: quick_item_button
-            foreground: ability_button_fg
-            position: [14, 9]
-          usable3:
-            from: item_button
-            background: quick_item_button
-            foreground: ability_button_fg
-            position: [0, 23]
-          usable4:
-            from: item_button
-            background: quick_item_button
-            foreground: ability_button_fg
-            position: [14, 23]
-      abilities_bar:
+              bar_image: ball_active
+      initiative_ticker:
+        size: [0, 12]
+        position: [0, 0]
         relative:
           width: Max
-          height: Max
-        position: [161, 0]
-        size: [-199, 0]
-        layout: BoxHorizontal
-        layout_spacing: { top: 0, bottom: 0, left: 0, right: 1 }
         children:
-          collapsed_panes:
-            size: [15, 0]
+          pane:
+            relative:
+              x: Center
+              width: ChildSum
+              height: Max
+            layout: BoxHorizontal
+            layout_spacing: { right: 1, left: 0, top: 0, bottom: 0 }
+            children:
+              entry:
+                from: label
+                background: bg_rounded
+                text: "#0#"
+                text_params:
+                  horizontal_alignment: Center
+                size: [12, 0]
+                relative:
+                  height: Max
+              current_entry:
+                from: label
+                background: bg_rounded_hover
+                text: "#0#"
+                text_params:
+                  horizontal_alignment: Center
+                  color: f00
+                  scale: 9.0
+                size: [12, 0]
+                relative:
+                  height: Max
+      bottom_pane:
+        background: bg_middle_base
+        border: [1, 1, 1, 1]
+        size: [0, 40]
+        relative:
+          y: Max
+          width: Max
+        children:
+          select_all_button:
+            from: button
+            foreground: select_all
+            border: [0, 0, 0, 0]
+            position: [0, 2]
+            size: [10, 10]
+            custom:
+              tooltip: "Select All Party Members"
+          formations_button:
+            from: button
+            foreground: formations
+            border: [0, 0, 0, 0]
+            position: [0, 13]
+            size: [10, 10]
+            custom:
+              tooltip: "Set party formation"
+          rest_button:
+            from: button
+            foreground: rest
+            border: [0, 0, 0, 0]
+            position: [0, 24]
+            size: [10, 10]
+            custom:
+              tooltip: "Rest"
+          portrait_pane:
+            size: [120, 0]
+            position: [11, 0]
             relative:
               height: Max
-            layout: BoxVertical
-            layout_spacing: { bottom: 1 }
-            custom:
-              max_collapsed: "3"
+            layout: BoxHorizontal
             children:
-              collapsed_group_pane:
-                background: bg_base
-                size: [0, 12]
+              portrait_view:
+                background: background_rounded
+                relative:
+                  x: Max
+                size: [30, 36]
+                border: [1, 1, 1, 1]
+                children:
+                  portrait:
+                    relative:
+                      width: Max
+                      height: Max
+                    size: [0, -6]
+                    foreground: "#image#"
+                  hp_bar:
+                    from: progress_bar
+                    relative:
+                      y: Max
+                      width: Max
+                    size: [0, 6]
+                    text: "#cur_hp# / #max_hp#"
+                    text_params:
+                      scale: 7.0
+                      horizontal_alignment: Center
+                  level_up:
+                    from: button
+                    text: "+"
+                    text_params:
+                      scale: 7.0
+                    custom:
+                      tooltip: "Level Up"
+                    relative:
+                      x: Max
+                    size: [7, 7]
+                  icons:
+                    relative:
+                      width: Max
+                      height: Max
+                    size: [-7, 0]
+                    layout: Grid
+                    layout_spacing: { top: 0, bottom: 1, left: 0, right: 1 }
+                    children:
+                      icon:
+                        size: [6, 6]
+                        background: bg_base
+                        foreground: "#icon#"
+                        custom:
+                          tooltip: "#text#"
+          quick_item_bar:
+            relative:
+              height: Max
+            position: [132, 0]
+            size: [28, 0]
+            background: bg_base
+            border: [1, 1, 1, 1]
+            children:
+              title:
+                from: label
+                text: "Usable Items"
+                position: [0, 1]
+                size: [0, 8]
                 relative:
                   width: Max
+                text_params:
+                  vertical_alignment: Top
+                  horizontal_alignment: Left
+                  color: f00
+              swap_weapons:
+                from: button
+                foreground: swap_weapons
+                size: [7, 7]
+                position: [0, 0]
+                relative:
+                  x: Max
+                custom:
+                  tooltip: "Swap Weapon Set"
+              usable1:
+                from: item_button
+                background: quick_item_button
+                foreground: ability_button_fg
+                position: [0, 9]
+              usable2:
+                from: item_button
+                background: quick_item_button
+                foreground: ability_button_fg
+                position: [14, 9]
+              usable3:
+                from: item_button
+                background: quick_item_button
+                foreground: ability_button_fg
+                position: [0, 23]
+              usable4:
+                from: item_button
+                background: quick_item_button
+                foreground: ability_button_fg
+                position: [14, 23]
+          abilities_bar:
+            relative:
+              width: Max
+              height: Max
+            position: [161, 0]
+            size: [-199, 0]
+            layout: BoxHorizontal
+            layout_spacing: { top: 0, bottom: 0, left: 0, right: 1 }
+            children:
+              collapsed_panes:
+                size: [15, 0]
+                relative:
+                  height: Max
+                layout: BoxVertical
+                layout_spacing: { bottom: 1 }
+                custom:
+                  max_collapsed: "3"
+                children:
+                  collapsed_group_pane:
+                    background: bg_base
+                    size: [0, 12]
+                    relative:
+                      width: Max
+                    border: { top: 1, bottom: 1, left: 1, right: 0 }
+                    children:
+                      change_size:
+                        from: button
+                        background: background_transparent
+                        size: [1, 5]
+                        relative:
+                          width: Max
+                        position: [-1, -1]
+                        custom:
+                          tooltip: "Expand"
+                      description:
+                        from: text_area
+                        relative:
+                          width: Max
+                        size: [0, 10]
+                        text: |
+                          [y=-1.5;s=5.0;c=f00|#group#]
+                          [y=3.0|][?total_uses_per_encounter;s=5.0|#current_uses_per_encounter#/#total_uses_per_encounter# Enc][!total_uses_per_encounter;!total_uses_per_day;s=5.0|Unlimited]
+                          [y=6.0|][?total_uses_per_day;s=5.0|#current_uses_per_day#/#total_uses_per_day# Day]
+              group_pane:
+                background: bg_base
+                size: [0, 0]
+                relative:
+                  height: Max
+                  width: Custom
                 border: { top: 1, bottom: 1, left: 1, right: 0 }
+                custom:
+                  vertical_count: "2"
+                  grid_width: "13"
+                  grid_border: "2"
+                  min_horizontal_count: "1"
                 children:
                   change_size:
                     from: button
-                    background: background_transparent
+                    background: background_transparent_no_disabled
                     size: [1, 5]
                     relative:
                       width: Max
                     position: [-1, -1]
                     custom:
-                      tooltip: "Expand"
+                      tooltip: "Collapse"
                   description:
                     from: text_area
                     relative:
@@ -294,727 +329,381 @@ themes:
                       [y=-1.5;s=5.0;c=f00|#group#]
                       [y=3.0|][?total_uses_per_encounter;s=5.0|#current_uses_per_encounter#/#total_uses_per_encounter# Enc][!total_uses_per_encounter;!total_uses_per_day;s=5.0|Unlimited]
                       [y=6.0|][?total_uses_per_day;s=5.0|#current_uses_per_day#/#total_uses_per_day# Day]
-          group_pane:
-            background: bg_base
-            size: [0, 0]
-            relative:
-              height: Max
-              width: Custom
-            border: { top: 1, bottom: 1, left: 1, right: 0 }
-            custom:
-              vertical_count: "2"
-              grid_width: "13"
-              grid_border: "2"
-              min_horizontal_count: "1"
-            children:
-              change_size:
-                from: button
-                background: background_transparent_no_disabled
-                size: [1, 5]
-                relative:
-                  width: Max
-                position: [-1, -1]
-                custom:
-                  tooltip: "Collapse"
-              description:
-                from: text_area
-                relative:
-                  width: Max
-                size: [0, 10]
-                text: |
-                  [y=-1.5;s=5.0;c=f00|#group#]
-                  [y=3.0|][?total_uses_per_encounter;s=5.0|#current_uses_per_encounter#/#total_uses_per_encounter# Enc][!total_uses_per_encounter;!total_uses_per_day;s=5.0|Unlimited]
-                  [y=6.0|][?total_uses_per_day;s=5.0|#current_uses_per_day#/#total_uses_per_day# Day]
-              abilities_pane:
-                relative:
-                  width: Max
-                  height: Max
-                  y: Max
-                size: [0, -10]
-                layout: Grid
-                layout_spacing: { top: 0, bottom: 0, left: 0, right: 0 }
-                children:
-                  ability_button:
-                    from: button
-                    background: ability_button
-                    foreground: ability_button_fg
-                    size: [13, 13]
+                  abilities_pane:
+                    relative:
+                      width: Max
+                      height: Max
+                      y: Max
+                    size: [0, -10]
+                    layout: Grid
+                    layout_spacing: { top: 0, bottom: 0, left: 0, right: 0 }
                     children:
-                      duration_label:
-                        from: label
-                        text: "#duration#"
-                        text_params:
-                          horizontal_alignment: Right
-                          vertical_alignment: Top
-                          color: f00
-                        relative:
-                          width: Max
-                          height: Max
-                      icon:
-                        foreground: "#icon#"
-                        relative:
-                          width: Max
-                          height: Max
-      window_button:
-        from: button
-        background: background
-        border: [1, 1, 1, 1]
-        size: [10, 10]
-        relative:
-          x: Max
-          y: Max
-      navi_pane:
-        relative:
-          x: Max
-          height: Max
-        size: [38, 0]
-        children:
-          end_turn_button:
+                      ability_button:
+                        from: button
+                        background: ability_button
+                        foreground: ability_button_fg
+                        size: [13, 13]
+                        children:
+                          duration_label:
+                            from: label
+                            text: "#duration#"
+                            text_params:
+                              horizontal_alignment: Right
+                              vertical_alignment: Top
+                              color: f00
+                            relative:
+                              width: Max
+                              height: Max
+                          icon:
+                            foreground: "#icon#"
+                            relative:
+                              width: Max
+                              height: Max
+          window_button:
             from: button
-            custom:
-              tooltip: "End Turn"
             background: background
-            size: [22, 22]
-            position: [0, -4]
+            border: [1, 1, 1, 1]
+            size: [10, 10]
             relative:
               x: Max
               y: Max
-            foreground: end_turn_icon
-          map_button:
-            from: bottom_pane.window_button
-            custom:
-              tooltip: "Map"
-            position: [-24, -4]
-            foreground: map_icon
-          journal_button:
-            from: bottom_pane.window_button
-            custom:
-              tooltip: "Journal"
-            position: [-24, -16]
-            foreground: log_icon
-          character_button:
-            from: bottom_pane.window_button
-            custom:
-              tooltip: "Character Sheet"
-            position: [-24, -28]
-            foreground: char_icon
-          inventory_button:
-            from: bottom_pane.window_button
-            custom:
-              tooltip: "Inventory"
-            position: [-12, -28]
-            foreground: inv_icon
-          menu_button:
-            from: bottom_pane.window_button
-            custom:
-              tooltip: "Menu"
-            position: [0, -28]
-            foreground: menu_icon
-      time:
-        from: label
-        text: "#hour#, Day #day#"
-        text_params:
-          horizontal_alignment: Right
-        size: [40, 4]
+          navi_pane:
+            relative:
+              x: Max
+              height: Max
+            size: [38, 0]
+            children:
+              end_turn_button:
+                from: button
+                custom:
+                  tooltip: "End Turn"
+                background: background
+                size: [22, 22]
+                position: [0, -4]
+                relative:
+                  x: Max
+                  y: Max
+                foreground: end_turn_icon
+              map_button:
+                from: game.bottom_pane.window_button
+                custom:
+                  tooltip: "Map"
+                position: [-24, -4]
+                foreground: map_icon
+              journal_button:
+                from: game.bottom_pane.window_button
+                custom:
+                  tooltip: "Journal"
+                position: [-24, -16]
+                foreground: log_icon
+              character_button:
+                from: game.bottom_pane.window_button
+                custom:
+                  tooltip: "Character Sheet"
+                position: [-24, -28]
+                foreground: char_icon
+              inventory_button:
+                from: game.bottom_pane.window_button
+                custom:
+                  tooltip: "Inventory"
+                position: [-12, -28]
+                foreground: inv_icon
+              menu_button:
+                from: game.bottom_pane.window_button
+                custom:
+                  tooltip: "Menu"
+                position: [0, -28]
+                foreground: menu_icon
+          time:
+            from: label
+            text: "#hour#, Day #day#"
+            text_params:
+              horizontal_alignment: Right
+            size: [40, 4]
+            relative:
+              x: Max
+              y: Max
+      ui_blocker:
+        size: [0, -40]
         relative:
-          x: Max
-          y: Max
-  ui_blocker:
-    size: [0, -40]
-    relative:
-      width: Max
-      height: Max
-  area:
-    size: [0, -40]
-    relative:
-      width: Max
-      height: Max
-    custom:
-      targeter_tile: "60_red_transparent_fill"
-      feedback_text_scale: "1.5"
-      feedback_text_font: outlined
-      feedback_text_info_color: FFF
-      feedback_text_miss_color: AAA
-      feedback_text_hit_color: FF1200
-      feedback_text_heal_color: 0F0
-      feedback_text_damage_slashing_color: FF1200
-      feedback_text_damage_piercing_color: FF1200
-      feedback_text_damage_crushing_color: FF1200
-      feedback_text_damage_acid_color: 97ca82
-      feedback_text_damage_cold_color: b7f0f7
-      feedback_text_damage_electrical_color: 007eff
-      feedback_text_damage_fire_color: ff6c00
-      feedback_text_damage_raw_color: ff00a2
-      selection_box_image: "bg_selection_box"
-    children:
-      targeter_label:
-        from: label
-        relative:
-          x: Center
-        position: [-20, 15]
-        text_params:
-          scale: 7.0
-          color: f00
-        text: "Select target for #ability_id#"
-      window_fade:
+          width: Max
+          height: Max
+      area:
+        size: [0, -40]
         relative:
           width: Max
           height: Max
         custom:
-          fade_millis: "2000"
-          pause_millis: "1000"
-          fill_image: black_fill
-  cutscene_window:
-    border: [5, 5, 5, 5]
-    relative:
-      width: Max
-      height: Max
-    background: bg_base
-    children:
-      close:
-        from: button
-        size: [8, 4]
-        text: "X"
-        relative:
-          x: Max
-      next_button:
-        from: button
-        text: "Continue"
-        size: [30, 10]
-        relative:
-          x: Center
-          y: Max
-      text_area:
-        border: [2, 2, 2, 2]
-        text_params:
-          font: normal
-          scale: 9.0
-        background: bg_base
-        text: "#0#"
-        relative:
-          x: Center
-          y: Max
-          width: Max
-        position: [0, -20]
-        size: [-10, 40]
-  dialog_window:
-    from: window
-    background: bg_medium
-    relative:
-      x: Center
-      y: Max
-      width: Zero
-      height: Zero
-    size: [150, 80]
-    children:
-      title:
-        text: "#name#"
-      node:
-        relative:
-          width: Max
-        size: [0, -8]
-        position: [0, 8]
-        text_params:
-          font: "normal"
-          scale: 5.0
-        text: "#0#"
-      responses:
-        relative:
-          width: Max
-          height: ChildSum
-          y: Max
-        layout: BoxVertical
-        layout_spacing: { top: 0, bottom: 1, left: 0, right: 0 }
+          targeter_tile: "60_red_transparent_fill"
+          feedback_text_scale: "1.5"
+          feedback_text_font: outlined
+          feedback_text_info_color: FFF
+          feedback_text_miss_color: AAA
+          feedback_text_hit_color: FF1200
+          feedback_text_heal_color: 0F0
+          feedback_text_damage_slashing_color: FF1200
+          feedback_text_damage_piercing_color: FF1200
+          feedback_text_damage_crushing_color: FF1200
+          feedback_text_damage_acid_color: 97ca82
+          feedback_text_damage_cold_color: b7f0f7
+          feedback_text_damage_electrical_color: 007eff
+          feedback_text_damage_fire_color: ff6c00
+          feedback_text_damage_raw_color: ff00a2
+          selection_box_image: "bg_selection_box"
         children:
-          response_button:
-            from: button
-            relative:
-              width: Max
-            size: [0, 6]
-            children:
-              text_area:
-                from: text_area
-                text: "[s=5.0|#0#]"
-                relative:
-                  width: Max
-  console_window:
-    position: [0, 0]
-    border: [1, 1, 1, 1]
-    relative:
-      width: Max
-    size: [0, 12]
-    background: 80_transparent_fill
-    children:
-      prompt:
-        from: label
-        text: ">"
-        text_params:
-          color: f00
-          font: mono
-          scale: 4.0
-          horizontal_alignment: Right
-        position: [0, 0]
-        size: [4, 4]
-      input:
-        from: input_field
-        background: empty
-        text_params:
-          font: mono
-          scale: 4.0
-        position: [4, 0]
-        size: [-4, 4]
-        relative:
-          width: Max
-      output:
-        from: label
-        text_params:
-          color: CCC
-          horizontal_alignment: Left
-          font: mono
-          scale: 4.0
-        position: [0, 4]
-        size: [0, 4]
-        relative:
-          width: Max
-  item_list_pane:
-    children:
-      coins_button:
-        from: item_button
-        size: [18, 8]
-        position: [56, -9]
-        children:
-          icon:
-            relative:
-              width: Zero
-            size: [8, 0]
-          quantity_label:
-            text_params:
-              vertical_alignment: Center
-            size: [-1, -1]
-      filter_all:
-        from: tab_button
-        text: "All"
-        size: [9, 6]
-        position: [1, 0]
-      filter_weapon:
-        from: tab_button
-        text: "Weapon"
-        size: [16, 6]
-        position: [10, 0]
-      filter_armor:
-        from: tab_button
-        text: "Armor"
-        size: [13, 6]
-        position: [26, 0]
-      filter_accessory:
-        from: tab_button
-        text: "Accessory"
-        size: [19, 6]
-        position: [39, 0]
-      filter_usable:
-        from: tab_button
-        text: "Usable"
-        size: [14, 6]
-        position: [58, 0]
-      items_list:
-        background: bg_rounded
-        border: [2, 2, 2, 2]
-        size: [0, -6]
-        position: [0, 6]
-        relative:
-          width: Max
-          height: Max
-        children:
-          scrollbar:
-            from: scrollbar
-            custom:
-              scroll_delta: "13"
-          content:
-            size: [-7, 0]
-            layout: Grid
-            layout_spacing: [0, 1, 0, 1]
-            relative:
-              width: Max
-              height: Max
-            children:
-              item_button:
-                from: item_button
-  quest_window:
-    from: window
-    position: [0, 2]
-    relative:
-      x: Center
-      width: Zero
-      height: Zero
-    size: [226, 136]
-    border: { top: 6, bottom: 8, right: 8, left: 8 }
-    children:
-      title:
-        text: "Journal"
-      show_completed_label:
-        from: label
-        text: "Show Completed Quests"
-        text_params:
-          horizontal_alignment: Right
-        size: [33, 7]
-        position: [0, 0]
-      show_completed_toggle:
-        from: button
-        size: [7, 7]
-        position: [35, 0]
-      quest_list:
-        border: [2, 2, 2, 2]
-        size: [50, -10]
-        position: [0, 10]
-        relative:
-          height: Max
-        children:
-          scrollbar:
-            from: scrollbar
-            custom:
-              scroll_delta: "12"
-          content:
-            size: [-7, 0]
-            layout: BoxVertical
-            layout_spacing: { top: 0, bottom: 2, left: 0, right: 0 }
-            relative:
-              width: Max
-              height: Max
-            children:
-                quest_button:
-                  from: button
-                  border: [1, 1, 1, 1]
-                  size: [0, 10]
-                  relative:
-                    width: Max
-                  children:
-                    text_area:
-                      from: text_area
-                      relative:
-                        width: Max
-                        height: Max
-                      text: |
-                        #name#
-                        [?complete;s=4.0;x=25.0;y=2.8;c=f00|Complete]
-      quest_entries:
-        border: [2, 2, 2, 2]
-        size: [-52, -2]
-        position: [52, 2]
-        relative:
-          width: Max
-          height: Max
-        children:
-          scrollbar:
-            from: scrollbar
-            custom:
-              scroll_delta: "17"
-          content:
-            layout: BoxVertical
-            layout_spacing: { top: 0, bottom: 2, left: 0, right: 0 }
-            relative:
-              width: Max
-              height: Max
-            size: [-7, 0]
-            children:
-              quest_entry:
-                from: text_area
-                background: bg_base
-                border: [2, 2, 2, 2]
-                relative:
-                  width: Max
-                  height: Zero
-                  y: Custom
-                size: [0, 40]
-                text: "#description#"
-  world_map_window:
-    from: window
-    position: [0, 2]
-    relative:
-      x: Center
-      width: Zero
-      height: Zero
-    size: [226, 136]
-    border: { top: 8, bottom: 8, left: 8, right: 8 }
-    children:
-      title:
-        text: "Map"
-        position: [0, -7]
-      close:
-        position: [5, -5]
-      bg:
-        relative:
-          width: Max
-          height: Max
-        background: world_map
-      labels:
-        from: text_area
-        relative:
-          width: Max
-          height: Max
-        text: |
-          [s=4.0|
-          ][f=outlined;s=10.0;a=210|The Twin Expanse]
-      content:
-        relative:
-          width: Max
-          height: Max
-        children:
-          location:
-            from: button
-            background: "#icon#"
-            text: "#travel_time#"
-            foreground: world_map_button
-            relative:
-              x: Custom
-              y: Custom
-            size: [24, 17]
-          label:
-            text: |
-              [a=100|#name#]
-              [a=100;s=5.0;?travel_time|#travel_time#]
-            text_params:
-              font: outlined
-              scale: 6.0
-            relative:
-              x: Custom
-              y: Custom
-            position: [-38, 0]
-            size: [100, 17]
-  formation_window:
-    from: window
-    border: { top: 8, bottom: 8, left: 6, right: 6 }
-    position: [0, 4]
-    relative:
-      x: Center
-      height: Zero
-    size: [148, 108]
-    custom:
-      grid_half_width: "8"
-      grid_height: "12"
-      button_size: "2"
-    children:
-      title:
-        text: "Party Formation"
-        position: [0, -7]
-      close:
-        position: [3, -5]
-      position:
-        from: button
-        size: [0, 0]
-        relative:
-          x: Custom
-          y: Custom
-          width: Custom
-          height: Custom
-        children:
-          portrait:
-            foreground: "#portrait#"
-            size: [12, 12]
+          targeter_label:
+            from: label
             relative:
               x: Center
-              y: Center
-  merchant_window:
-    from: window
-    position: [4, 4]
-    size: [113, 112]
-    relative:
-      height: Zero
-    children:
-      title:
-        text: "Merchant"
-      item_list_pane:
-        from: item_list_pane
-        relative:
-          width: Max
-          height: Max
-        position: [0, 4]
-        size: [0, -4]
-  prop_window:
-    from: window
-    position: [4, 4]
-    size: [113, 112]
-    relative:
-      height: Zero
-    children:
-      title:
-        text: "#name#"
-      icon:
-        size: [20, 20]
-        background: bg_base
-        position: [0, 5]
-      take_all:
-        from: button
-        text: "Take All"
-        text_params:
-          scale: 7.0
-        size: [25, 10]
-        position: [25, 10]
-      item_list_pane:
-        from: item_list_pane
-        position: [0, 27]
-        size: [0, -27]
-        relative:
-          width: Max
-          height: Max
-  inventory_window:
-    from: window
-    size: [187, 112]
-    relative:
-      height: Zero
-    position: [128, 4]
-    children:
-      title:
-        text: "Inventory"
-      equipped_area:
-        background: inventory_paper_doll
-        size: [96, 96]
-        position: [2, 2]
-        children:
-          swap_weapons:
-            from: button
-            foreground: swap_weapons
-            size: [7, 7]
-            position: [36, 44]
-            custom:
-              tooltip: "Swap Weapon Set"
-          cloak_button:
-            from: item_button
-            position: [66, 12]
-            size: [14, 14]
-          head_button:
-            from: item_button
-            position: [50, 4]
-          torso_button:
-            from: item_button
-            position: [48, 20]
-            size: [16, 16]
-          hands_button:
-            from: item_button
-            position: [66, 36]
-          legs_button:
-            from: item_button
-            size: [16, 16]
-            position: [48, 52]
-          feet_button:
-            from: item_button
-            size: [14, 14]
-            position: [49, 76]
-          waist_button:
-            from: item_button
-            position: [52, 38]
-          neck_button:
-            from: item_button
-            position: [40, 10]
-            size: [8, 8]
-          fingermain_button:
-            from: item_button
-            position: [44, 38]
-            size: [6, 6]
-          fingeroff_button:
-            from: item_button
-            position: [66, 50]
-            size: [6, 6]
-          heldmain_button:
-            from: item_button
-            position: [5, 20]
-            size: [14, 14]
-          heldoff_button:
-            from: item_button
-            position: [20, 20]
-            size: [14, 14]
-            
-          altheldmain_button:
-            from: item_button
-            position: [5, 37]
-            size: [14, 14]
-          altheldoff_button:
-            from: item_button
-            position: [20, 37]
-            size: [14, 14]
-          usable1_button:
-            from: item_button
-            position: [8, 58]
-          usable2_button:
-            from: item_button
-            position: [22, 58]
-          usable3_button:
-            from: item_button
-            position: [8, 72]
-          usable4_button:
-            from: item_button
-            position: [22, 72]
-      stash_title:
-        from: label
-        text: "Stash"
-        text_params:
-          scale: 8.0
-          horizontal_alignment: Center
-        position: [100, 4]
-        relative:
-          width: Max
-        size: [-100, 6]
-      item_list_pane:
-        from: item_list_pane
-        position: [100, 11]
-        size: [-100, -11]
-        relative:
-          width: Max
-          height: Max
-  character_window:
-    from: window
-    relative:
-      height: Zero
-    size: [120, 140]
-    position: [4, 0]
-    children:
-      title:
-        text: "Character Sheet"
-      char_pane_button:
-        from: tab_button
-        text: "Character"
-        position: [3, 1]
-      abilities_pane_button:
-        from: tab_button
-        text: "Abilities"
-        position: [23, 1]
-      effects_pane_button:
-        from: tab_button
-        text: "Effects"
-        position: [43, 1]
-      abilities:
-        background: bg_rounded
-        border: [2, 2, 2, 2]
-        relative:
-          width: Max
-          height: Max
-        position: [0, 7]
-        size: [0, -6]
-        children:
-          details_pane:
-            background: bg_base
+            position: [-20, 15]
+            text_params:
+              scale: 7.0
+              color: f00
+            text: "Select target for #ability_id#"
+          window_fade:
             relative:
               width: Max
+              height: Max
+            custom:
+              fade_millis: "2000"
+              pause_millis: "1000"
+              fill_image: black_fill
+      cutscene_window:
+        border: [5, 5, 5, 5]
+        relative:
+          width: Max
+          height: Max
+        background: bg_base
+        children:
+          close:
+            from: button
+            size: [8, 4]
+            text: "X"
+            relative:
+              x: Max
+          next_button:
+            from: button
+            text: "Continue"
+            size: [30, 10]
+            relative:
+              x: Center
               y: Max
-            size: [0, 66]
+          text_area:
+            border: [2, 2, 2, 2]
+            text_params:
+              font: normal
+              scale: 9.0
+            background: bg_base
+            text: "#0#"
+            relative:
+              x: Center
+              y: Max
+              width: Max
+            position: [0, -20]
+            size: [-10, 40]
+      dialog_window:
+        from: window
+        background: bg_medium
+        relative:
+          x: Center
+          y: Max
+          width: Zero
+          height: Zero
+        size: [150, 80]
+        children:
+          title:
+            text: "#name#"
+          node:
+            relative:
+              width: Max
+            size: [0, -8]
+            position: [0, 8]
+            text_params:
+              font: "normal"
+              scale: 5.0
+            text: "#0#"
+          responses:
+            relative:
+              width: Max
+              height: ChildSum
+              y: Max
+            layout: BoxVertical
+            layout_spacing: { top: 0, bottom: 1, left: 0, right: 0 }
+            children:
+              response_button:
+                from: button
+                relative:
+                  width: Max
+                size: [0, 6]
+                children:
+                  text_area:
+                    from: text_area
+                    text: "[s=5.0|#0#]"
+                    relative:
+                      width: Max
+      console_window:
+        position: [0, 0]
+        border: [1, 1, 1, 1]
+        relative:
+          width: Max
+        size: [0, 12]
+        background: 80_transparent_fill
+        children:
+          prompt:
+            from: label
+            text: ">"
+            text_params:
+              color: f00
+              font: mono
+              scale: 4.0
+              horizontal_alignment: Right
+            position: [0, 0]
+            size: [4, 4]
+          input:
+            from: input_field
+            background: empty
+            text_params:
+              font: mono
+              scale: 4.0
+            position: [4, 0]
+            size: [-4, 4]
+            relative:
+              width: Max
+          output:
+            from: label
+            text_params:
+              color: CCC
+              horizontal_alignment: Left
+              font: mono
+              scale: 4.0
+            position: [0, 4]
+            size: [0, 4]
+            relative:
+              width: Max
+      item_list_pane:
+        children:
+          coins_button:
+            from: item_button
+            size: [18, 8]
+            position: [56, -9]
+            children:
+              icon:
+                relative:
+                  width: Zero
+                size: [8, 0]
+              quantity_label:
+                text_params:
+                  vertical_alignment: Center
+                size: [-1, -1]
+          filter_all:
+            from: tab_button
+            text: "All"
+            size: [9, 6]
+            position: [1, 0]
+          filter_weapon:
+            from: tab_button
+            text: "Weapon"
+            size: [16, 6]
+            position: [10, 0]
+          filter_armor:
+            from: tab_button
+            text: "Armor"
+            size: [13, 6]
+            position: [26, 0]
+          filter_accessory:
+            from: tab_button
+            text: "Accessory"
+            size: [19, 6]
+            position: [39, 0]
+          filter_usable:
+            from: tab_button
+            text: "Usable"
+            size: [14, 6]
+            position: [58, 0]
+          items_list:
+            background: bg_rounded
+            border: [2, 2, 2, 2]
+            size: [0, -6]
+            position: [0, 6]
+            relative:
+              width: Max
+              height: Max
+            children:
+              scrollbar:
+                from: scrollbar
+                custom:
+                  scroll_delta: "13"
+              content:
+                size: [-7, 0]
+                layout: Grid
+                layout_spacing: [0, 1, 0, 1]
+                relative:
+                  width: Max
+                  height: Max
+                children:
+                  item_button:
+                    from: item_button
+      quest_window:
+        from: window
+        position: [0, 2]
+        relative:
+          x: Center
+          width: Zero
+          height: Zero
+        size: [226, 136]
+        border: { top: 6, bottom: 8, right: 8, left: 8 }
+        children:
+          title:
+            text: "Journal"
+          show_completed_label:
+            from: label
+            text: "Show Completed Quests"
+            text_params:
+              horizontal_alignment: Right
+            size: [33, 7]
+            position: [0, 0]
+          show_completed_toggle:
+            from: button
+            size: [7, 7]
+            position: [35, 0]
+          quest_list:
+            border: [2, 2, 2, 2]
+            size: [50, -10]
+            position: [0, 10]
+            relative:
+              height: Max
             children:
               scrollbar:
                 from: scrollbar
                 custom:
                   scroll_delta: "12"
               content:
+                size: [-7, 0]
+                layout: BoxVertical
+                layout_spacing: { top: 0, bottom: 2, left: 0, right: 0 }
                 relative:
                   width: Max
                   height: Max
-                size: [-7, 0]
                 children:
-                  details:
-                    from: ability_pane.details
-                    border: [2, 2, 2, 2]
-                    relative:
-                      width: Max
-                      height: Custom
-          list:
-            size: [0, -68]
+                    quest_button:
+                      from: button
+                      border: [1, 1, 1, 1]
+                      size: [0, 10]
+                      relative:
+                        width: Max
+                      children:
+                        text_area:
+                          from: text_area
+                          relative:
+                            width: Max
+                            height: Max
+                          text: |
+                            #name#
+                            [?complete;s=4.0;x=25.0;y=2.8;c=f00|Complete]
+          quest_entries:
+            border: [2, 2, 2, 2]
+            size: [-52, -2]
+            position: [52, 2]
             relative:
               width: Max
               height: Max
@@ -1022,194 +711,813 @@ themes:
               scrollbar:
                 from: scrollbar
                 custom:
-                  scroll_delta: "15"
+                  scroll_delta: "17"
               content:
-                size: [-7, 0]
-                layout: Grid
-                layout_spacing: { top :0, bottom: 2, left: 0, right: 2 }
+                layout: BoxVertical
+                layout_spacing: { top: 0, bottom: 2, left: 0, right: 0 }
                 relative:
                   width: Max
                   height: Max
+                size: [-7, 0]
                 children:
-                  ability_button:
-                    from: button
-                    size: [12, 12]
-                    foreground: "#icon#"
-      effects:
-        background: bg_rounded
-        border: [2, 2, 2, 2]
+                  quest_entry:
+                    from: text_area
+                    background: bg_base
+                    border: [2, 2, 2, 2]
+                    relative:
+                      width: Max
+                      height: Zero
+                      y: Custom
+                    size: [0, 40]
+                    text: "#description#"
+      world_map_window:
+        from: window
+        position: [0, 2]
         relative:
-          width: Max
-          height: Max
-        size: [0, -6]
-        position: [0, 7]
-        layout: Grid
-        layout_spacing: { top: 0, bottom: 1, left: 1, right: 0 }
+          x: Center
+          width: Zero
+          height: Zero
+        size: [226, 136]
+        border: { top: 8, bottom: 8, left: 8, right: 8 }
         children:
-          scrollbar:
-            from: scrollbar
-            custom:
-              scroll_delta: "10"
+          title:
+            text: "Map"
+            position: [0, -7]
+          close:
+            position: [5, -5]
+          bg:
+            relative:
+              width: Max
+              height: Max
+            background: world_map
+          labels:
+            from: text_area
+            relative:
+              width: Max
+              height: Max
+            text: |
+              [s=4.0|
+              ][f=outlined;s=10.0;a=210|The Twin Expanse]
           content:
-            size: [-7, 0]
-            layout: Grid
-            layout_spacing: { top :0, bottom: 1, left: 0, right: 1 }
             relative:
               width: Max
               height: Max
             children:
-              effect:
-                from: bonus_text
-                background: bg_rounded
-                border: [1, 1, 1, 1]
-                size: [48, 35]
-      details:
-        background: bg_rounded
+              location:
+                from: button
+                background: "#icon#"
+                text: "#travel_time#"
+                foreground: world_map_button
+                relative:
+                  x: Custom
+                  y: Custom
+                size: [24, 17]
+              label:
+                text: |
+                  [a=100|#name#]
+                  [a=100;s=5.0;?travel_time|#travel_time#]
+                text_params:
+                  font: outlined
+                  scale: 6.0
+                relative:
+                  x: Custom
+                  y: Custom
+                position: [-38, 0]
+                size: [100, 17]
+      formation_window:
+        from: window
+        border: { top: 8, bottom: 8, left: 6, right: 6 }
+        position: [0, 4]
+        relative:
+          x: Center
+          height: Zero
+        size: [148, 108]
+        custom:
+          grid_half_width: "8"
+          grid_height: "12"
+          button_size: "2"
+        children:
+          title:
+            text: "Party Formation"
+            position: [0, -7]
+          close:
+            position: [3, -5]
+          position:
+            from: button
+            size: [0, 0]
+            relative:
+              x: Custom
+              y: Custom
+              width: Custom
+              height: Custom
+            children:
+              portrait:
+                foreground: "#portrait#"
+                size: [12, 12]
+                relative:
+                  x: Center
+                  y: Center
+      merchant_window:
+        from: window
+        position: [4, 4]
+        size: [113, 112]
+        relative:
+          height: Zero
+        children:
+          title:
+            text: "Merchant"
+          item_list_pane:
+            from: game.item_list_pane
+            relative:
+              width: Max
+              height: Max
+            position: [0, 4]
+            size: [0, -4]
+      prop_window:
+        from: window
+        position: [4, 4]
+        size: [113, 112]
+        relative:
+          height: Zero
+        children:
+          title:
+            text: "#name#"
+          icon:
+            size: [20, 20]
+            background: bg_base
+            position: [0, 5]
+          take_all:
+            from: button
+            text: "Take All"
+            text_params:
+              scale: 7.0
+            size: [25, 10]
+            position: [25, 10]
+          item_list_pane:
+            from: game.item_list_pane
+            position: [0, 27]
+            size: [0, -27]
+            relative:
+              width: Max
+              height: Max
+      inventory_window:
+        from: window
+        size: [187, 112]
+        relative:
+          height: Zero
+        position: [128, 4]
+        children:
+          title:
+            text: "Inventory"
+          equipped_area:
+            background: inventory_paper_doll
+            size: [96, 96]
+            position: [2, 2]
+            children:
+              swap_weapons:
+                from: button
+                foreground: swap_weapons
+                size: [7, 7]
+                position: [36, 44]
+                custom:
+                  tooltip: "Swap Weapon Set"
+              cloak_button:
+                from: item_button
+                position: [66, 12]
+                size: [14, 14]
+              head_button:
+                from: item_button
+                position: [50, 4]
+              torso_button:
+                from: item_button
+                position: [48, 20]
+                size: [16, 16]
+              hands_button:
+                from: item_button
+                position: [66, 36]
+              legs_button:
+                from: item_button
+                size: [16, 16]
+                position: [48, 52]
+              feet_button:
+                from: item_button
+                size: [14, 14]
+                position: [49, 76]
+              waist_button:
+                from: item_button
+                position: [52, 38]
+              neck_button:
+                from: item_button
+                position: [40, 10]
+                size: [8, 8]
+              fingermain_button:
+                from: item_button
+                position: [44, 38]
+                size: [6, 6]
+              fingeroff_button:
+                from: item_button
+                position: [66, 50]
+                size: [6, 6]
+              heldmain_button:
+                from: item_button
+                position: [5, 20]
+                size: [14, 14]
+              heldoff_button:
+                from: item_button
+                position: [20, 20]
+                size: [14, 14]
+                
+              altheldmain_button:
+                from: item_button
+                position: [5, 37]
+                size: [14, 14]
+              altheldoff_button:
+                from: item_button
+                position: [20, 37]
+                size: [14, 14]
+              usable1_button:
+                from: item_button
+                position: [8, 58]
+              usable2_button:
+                from: item_button
+                position: [22, 58]
+              usable3_button:
+                from: item_button
+                position: [8, 72]
+              usable4_button:
+                from: item_button
+                position: [22, 72]
+          stash_title:
+            from: label
+            text: "Stash"
+            text_params:
+              scale: 8.0
+              horizontal_alignment: Center
+            position: [100, 4]
+            relative:
+              width: Max
+            size: [-100, 6]
+          item_list_pane:
+            from: game.item_list_pane
+            position: [100, 11]
+            size: [-100, -11]
+            relative:
+              width: Max
+              height: Max
+      character_window:
+        from: window
+        relative:
+          height: Zero
+        size: [120, 140]
+        position: [4, 0]
+        children:
+          title:
+            text: "Character Sheet"
+          char_pane_button:
+            from: tab_button
+            text: "Character"
+            position: [3, 1]
+          abilities_pane_button:
+            from: tab_button
+            text: "Abilities"
+            position: [23, 1]
+          effects_pane_button:
+            from: tab_button
+            text: "Effects"
+            position: [43, 1]
+          abilities:
+            background: bg_rounded
+            border: [2, 2, 2, 2]
+            relative:
+              width: Max
+              height: Max
+            position: [0, 7]
+            size: [0, -6]
+            children:
+              details_pane:
+                background: bg_base
+                relative:
+                  width: Max
+                  y: Max
+                size: [0, 66]
+                children:
+                  scrollbar:
+                    from: scrollbar
+                    custom:
+                      scroll_delta: "12"
+                  content:
+                    relative:
+                      width: Max
+                      height: Max
+                    size: [-7, 0]
+                    children:
+                      details:
+                        from: game.ability_pane.details
+                        border: [2, 2, 2, 2]
+                        relative:
+                          width: Max
+                          height: Custom
+              list:
+                size: [0, -68]
+                relative:
+                  width: Max
+                  height: Max
+                children:
+                  scrollbar:
+                    from: scrollbar
+                    custom:
+                      scroll_delta: "15"
+                  content:
+                    size: [-7, 0]
+                    layout: Grid
+                    layout_spacing: { top :0, bottom: 2, left: 0, right: 2 }
+                    relative:
+                      width: Max
+                      height: Max
+                    children:
+                      ability_button:
+                        from: button
+                        size: [12, 12]
+                        foreground: "#icon#"
+          effects:
+            background: bg_rounded
+            border: [2, 2, 2, 2]
+            relative:
+              width: Max
+              height: Max
+            size: [0, -6]
+            position: [0, 7]
+            layout: Grid
+            layout_spacing: { top: 0, bottom: 1, left: 1, right: 0 }
+            children:
+              scrollbar:
+                from: scrollbar
+                custom:
+                  scroll_delta: "10"
+              content:
+                size: [-7, 0]
+                layout: Grid
+                layout_spacing: { top :0, bottom: 1, left: 0, right: 1 }
+                relative:
+                  width: Max
+                  height: Max
+                children:
+                  effect:
+                    from: game.bonus_text
+                    background: bg_rounded
+                    border: [1, 1, 1, 1]
+                    size: [48, 35]
+          details:
+            background: bg_rounded
+            border: [2, 2, 2, 2]
+            relative:
+              width: Max
+              height: Max
+            size: [0, -6]
+            position: [0, 7]
+            text_params:
+              font: "normal"
+              scale: 6.0
+            text: |
+              [?name|[s=8|#name# - #race# #sex#]
+              [s=6|Level #level_0# #class_0#]
+              [s=4|]
+              [s=6|[x=0|Hit Points][x=30|Experience]]
+              [x=0|#cur_hp# / #max_hp#][x=30|#cur_xp# / #next_xp#]
+              
+              [?0_damage_min;s=6;x=0;y=25|Main Hand]
+              [?0_damage_min;s=5;x=0|Damage: #0_damage_min# to #0_damage_max#
+              ][?0_armor_penetration;s=5;x=0|AP: #0_armor_penetration#
+              ][?0_melee_accuracy;s=5;x=0|Accuracy: #0_melee_accuracy#
+              ][?0_ranged_accuracy;s=5;x=0|Accuracy: #0_ranged_accuracy#
+              ][?0_spell_accuracy;s=5;x=0|Accuracy: #0_spell_accuracy#
+              ][?0_crit_chance;s=5;x=0|Crit Chance: #0_crit_chance#%
+              ][?0_hit_threshold;s=5;x=0|Hit Threshold: #0_hit_threshold#
+              ][?0_graze_threshold;s=5;x=0|Graze Threshold: #0_graze_threshold#
+              ][?0_crit_multiplier;s=5;x=0|Crit Multiplier: #0_crit_multiplier#
+              ][?0_hit_multiplier;s=5;x=0|Hit Multiplier: #0_hit_multiplier#
+              ][?0_graze_multiplier;s=5;x=0|Graze Multiplier: #0_graze_multiplier#]
+      
+              [?1_damage_min;s=6;x=35;y=25|Off Hand]
+              [?1_damage_min;s=5;x=35|Damage: #1_damage_min# to #1_damage_max#
+              ][?1_armor_penetration;s=5;x=35|AP: #1_armor_penetration#
+              ][?1_melee_accuracy;s=5;x=0|Accuracy: #1_melee_accuracy#
+              ][?1_ranged_accuracy;s=5;x=0|Accuracy: #1_ranged_accuracy#
+              ][?1_spell_accuracy;s=5;x=0|Accuracy: #1_spell_accuracy#
+              ][?1_crit_chance;s=5;x=35|Crit Chance: #1_crit_chance#%
+              ][?1_hit_threshold;s=5;x=35|Hit Threshold: #1_hit_threshold#
+              ][?1_graze_threshold;s=5;x=35|Graze Threshold: #1_graze_threshold#
+              ][?1_crit_multiplier;s=5;x=35|Crit Multiplier: #1_crit_multiplier#
+              ][?1_hit_multiplier;s=5;x=35|Hit Multiplier: #1_hit_multiplier#
+              ][?1_graze_multiplier;s=5;x=35|Graze Multiplier: #1_graze_multiplier#]
+              [s=6;x=0;y=46|Accuracy]
+              [s=5|[x=0|Melee: #melee_accuracy#][x=28|Ranged: #ranged_accuracy#][x=56|Spell: #spell_accuracy#]]
+              [s=4|
+              ][s=6.0;x=0|Armor: #armor#][?armor_slashing;s=5.0| (Slashing: #armor_slashing#)][?armor_piercing;s=5.0| (Piercing: #armor_piercing#)][?armor_crushing;s=5.0| (Crushing: #armor_crushing#)][?armor_acid;s=5.0| (Acid: #armor_acid#)][?armor_cold;s=5.0| (Cold: #armor_cold#)][?armor_electrical;s=5.0| (Shock: #armor_electrical#)][?armor_fire;s=5.0| (Fire: #armor_fire#)]
+              [s=5|[x=0|Defense: #defense#][x=28|Fortitude: #fortitude#][x=56|Reflex: #reflex#][x=84|Will: #will#]]
+              [s=4|
+              ][s=6;y=70|[x=0|Strength][r=30|#str#]
+                   [x=0|Dexterity][r=30|#dex#]
+                   [x=0|Endurance][r=30|#end#]
+                   [x=0|Perception][r=30|#per#]
+                   [x=0|Intellect][r=30|#int#]
+                   [x=0|Wisdom][r=30|#wis#]]
+              
+              [y=70;x=60;s=5|Range[x=90|#reach#]]
+              [x=60;s=5|Caster level[x=90|#caster_level#]]
+              [x=60;s=5|Initiative[x=90|#initiative#]]
+              [x=60;s=5|Movement Rate[x=90|#movement_rate#]]
+              [x=60;s=5|Flanking Angle[x=90|#flanking_angle#]°]
+              [x=60;s=5|Concealment[x=90|#concealment#]]
+              [x=60;s=5|Concealment Ignore[x=90|#concealment_ignore#]]
+              
+              [y=100;x=0|Graze][x=20|Hit][x=40|Crit]
+              [x=0|#graze_threshold# / x#graze_multiplier#][x=20|#hit_threshold# / x#hit_multiplier#][x=40|#crit_chance#% /  x#crit_multiplier#]
+      
+              [y=110;s=6|Resistances ][s=5|[?resistance_slashing|(Slashing: #resistance_slashing#%) ][?resistance_piercing|(Piercing: #resistance_piercing#%) ][?resistance_crushing|(Crushing: #resistance_crushing#%) ][?resistance_acid|(Acid: #resistance_acid#%) ][?resistance_cold|(Cold: #resistance_cold#%) ][?resistance_electrical|(Shock: #resistance_electrical#%) ][?resistance_fire|(Fire: #resistance_fire#%) ]]
+              
+              [?portrait;x=64;y=-3;i=#portrait#;s=40.0|]
+              [?portrait;x=64;y=-3;i=portraits/frame;s=40.0|]]
+          level_up:
+            from: button
+            text: "Level Up"
+            text_params:
+              scale: 7.0
+            relative:
+              x: Max
+            size: [20, 6]
+            position: [-4, 10]
+          export:
+            from: button
+            text: "Export"
+            text_params:
+              scale: 7.0
+            relative:
+              x: Max
+            size: [20, 5]
+            position: [-4, 2]
+      race_pane:
+        size: [40, 40]
+        background: bg_base
+        border: [1, 1, 1, 1]
+        children:
+          details:
+            from: text_area
+            border: [2, 2, 2, 2]
+            relative:
+              width: Max
+              height: Max
+            text: |
+              #description#
+              [s=9|]
+              [y=45;s=7|Base Stats]
+              [?initiative|[s=6.0|Initiative [r=40|#initiative#]]
+              ][?melee_accuracy|[s=6.0|Melee Accuracy [r=40|#melee_accuracy#]]
+              ][?ranged_accuracy|[s=6.0|Ranged Accuracy [r=40|#ranged_accuracy#]]
+              ][?spell_accuracy|[s=6.0|Spell Accuracy [r=40|#spell_accuracy#]]
+              ][?defense|[s=6.0|Defense [r=40|#defense#]]
+              ][?fortitude|[s=6.0|Fortitude [r=40|#fortitude#]]
+              ][?reflex|[s=6.0|Reflex [r=40|#reflex#]]
+              ][?will|[s=6.0|Will [r=40|#will#]]
+              ]
+              [y=45|][x=60;s=7|Attribute Bonuses]
+              [x=60;?str|Strength [r=92|#str#]
+              ][x=60;?dex|Dexterity [r=92|#dex#]
+              ][x=60;?end|Endurance [r=92|#end#]
+              ][x=60;?per|Perception [r=92|#per#]
+              ][x=60;?int|Intelligence [r=92|#int#]
+              ][x=60;?wis|Wisdom: [r=92|#wis#]
+              ]
+      ability_pane:
+        size: [40, 40]
+        background: bg_base
         border: [2, 2, 2, 2]
-        relative:
-          width: Max
-          height: Max
-        size: [0, -6]
-        position: [0, 7]
-        text_params:
-          font: "normal"
-          scale: 6.0
-        text: |
-          [?name|[s=8|#name# - #race# #sex#]
-          [s=6|Level #level_0# #class_0#]
-          [s=4|]
-          [s=6|[x=0|Hit Points][x=30|Experience]]
-          [x=0|#cur_hp# / #max_hp#][x=30|#cur_xp# / #next_xp#]
-          
-          [?0_damage_min;s=6;x=0;y=25|Main Hand]
-          [?0_damage_min;s=5;x=0|Damage: #0_damage_min# to #0_damage_max#
-          ][?0_armor_penetration;s=5;x=0|AP: #0_armor_penetration#
-          ][?0_melee_accuracy;s=5;x=0|Accuracy: #0_melee_accuracy#
-          ][?0_ranged_accuracy;s=5;x=0|Accuracy: #0_ranged_accuracy#
-          ][?0_spell_accuracy;s=5;x=0|Accuracy: #0_spell_accuracy#
-          ][?0_crit_chance;s=5;x=0|Crit Chance: #0_crit_chance#%
-          ][?0_hit_threshold;s=5;x=0|Hit Threshold: #0_hit_threshold#
-          ][?0_graze_threshold;s=5;x=0|Graze Threshold: #0_graze_threshold#
-          ][?0_crit_multiplier;s=5;x=0|Crit Multiplier: #0_crit_multiplier#
-          ][?0_hit_multiplier;s=5;x=0|Hit Multiplier: #0_hit_multiplier#
-          ][?0_graze_multiplier;s=5;x=0|Graze Multiplier: #0_graze_multiplier#]
-
-          [?1_damage_min;s=6;x=35;y=25|Off Hand]
-          [?1_damage_min;s=5;x=35|Damage: #1_damage_min# to #1_damage_max#
-          ][?1_armor_penetration;s=5;x=35|AP: #1_armor_penetration#
-          ][?1_melee_accuracy;s=5;x=0|Accuracy: #1_melee_accuracy#
-          ][?1_ranged_accuracy;s=5;x=0|Accuracy: #1_ranged_accuracy#
-          ][?1_spell_accuracy;s=5;x=0|Accuracy: #1_spell_accuracy#
-          ][?1_crit_chance;s=5;x=35|Crit Chance: #1_crit_chance#%
-          ][?1_hit_threshold;s=5;x=35|Hit Threshold: #1_hit_threshold#
-          ][?1_graze_threshold;s=5;x=35|Graze Threshold: #1_graze_threshold#
-          ][?1_crit_multiplier;s=5;x=35|Crit Multiplier: #1_crit_multiplier#
-          ][?1_hit_multiplier;s=5;x=35|Hit Multiplier: #1_hit_multiplier#
-          ][?1_graze_multiplier;s=5;x=35|Graze Multiplier: #1_graze_multiplier#]
-          [s=6;x=0;y=46|Accuracy]
-          [s=5|[x=0|Melee: #melee_accuracy#][x=28|Ranged: #ranged_accuracy#][x=56|Spell: #spell_accuracy#]]
-          [s=4|
-          ][s=6.0;x=0|Armor: #armor#][?armor_slashing;s=5.0| (Slashing: #armor_slashing#)][?armor_piercing;s=5.0| (Piercing: #armor_piercing#)][?armor_crushing;s=5.0| (Crushing: #armor_crushing#)][?armor_acid;s=5.0| (Acid: #armor_acid#)][?armor_cold;s=5.0| (Cold: #armor_cold#)][?armor_electrical;s=5.0| (Shock: #armor_electrical#)][?armor_fire;s=5.0| (Fire: #armor_fire#)]
-          [s=5|[x=0|Defense: #defense#][x=28|Fortitude: #fortitude#][x=56|Reflex: #reflex#][x=84|Will: #will#]]
-          [s=4|
-          ][s=6;y=70|[x=0|Strength][r=30|#str#]
-               [x=0|Dexterity][r=30|#dex#]
-               [x=0|Endurance][r=30|#end#]
-               [x=0|Perception][r=30|#per#]
-               [x=0|Intellect][r=30|#int#]
-               [x=0|Wisdom][r=30|#wis#]]
-          
-          [y=70;x=60;s=5|Range[x=90|#reach#]]
-          [x=60;s=5|Caster level[x=90|#caster_level#]]
-          [x=60;s=5|Initiative[x=90|#initiative#]]
-          [x=60;s=5|Movement Rate[x=90|#movement_rate#]]
-          [x=60;s=5|Flanking Angle[x=90|#flanking_angle#]°]
-          [x=60;s=5|Concealment[x=90|#concealment#]]
-          [x=60;s=5|Concealment Ignore[x=90|#concealment_ignore#]]
-          
-          [y=100;x=0|Graze][x=20|Hit][x=40|Crit]
-          [x=0|#graze_threshold# / x#graze_multiplier#][x=20|#hit_threshold# / x#hit_multiplier#][x=40|#crit_chance#% /  x#crit_multiplier#]
-
-          [y=110;s=6|Resistances ][s=5|[?resistance_slashing|(Slashing: #resistance_slashing#%) ][?resistance_piercing|(Piercing: #resistance_piercing#%) ][?resistance_crushing|(Crushing: #resistance_crushing#%) ][?resistance_acid|(Acid: #resistance_acid#%) ][?resistance_cold|(Cold: #resistance_cold#%) ][?resistance_electrical|(Shock: #resistance_electrical#%) ][?resistance_fire|(Fire: #resistance_fire#%) ]]
-          
-          [?portrait;x=64;y=-3;i=#portrait#;s=40.0|]
-          [?portrait;x=64;y=-3;i=portraits/frame;s=40.0|]]
-      level_up:
-        from: button
-        text: "Level Up"
-        text_params:
-          scale: 7.0
-        relative:
-          x: Max
-        size: [20, 6]
-        position: [-4, 10]
-      export:
-        from: button
-        text: "Export"
-        text_params:
-          scale: 7.0
-        relative:
-          x: Max
-        size: [20, 5]
-        position: [-4, 2]
-  race_pane:
-    size: [40, 40]
-    background: bg_base
-    border: [1, 1, 1, 1]
-    children:
-      details:
-        from: text_area
+        children:
+          details:
+            from: text_area
+            relative:
+              width: Max
+              height: Max
+            text: |
+              [s=8|#name#][?prereqs_not_met;c=f00|  Prereqs not Met][?owned_level;c=0f0|  Owned - Level #owned_level#]
+              [s=9|]
+              [?active;s=7;c=f00|Active - AP: #activate_ap#
+              [s=6;c=fff|[?duration|Duration: #duration# Rounds][?mode|Mode][?instant|Duration: Instantaneous][?permanent|Permanent]
+              ][?cooldown;s=6;c=fff|Cooldown: #cooldown# Rounds]
+              ][?passive;s=7;c=0ff|Passive]
+              #description#
+              [?upgrade1|[s=6|Level 2]
+              [s=5|#upgrade1#]
+              ][?upgrade2|[s=6|Level 3]
+              [s=5|#upgrade2#]
+              ][?upgrade3|[s=6|Level 4]
+              [s=5|#upgrade3#]
+              ][?prereqs|[s=7|]
+              [s=7;c=f00|Prereqs]
+              [?prereq_total_level|Level: #prereq_total_level#
+              ][?prereq_race|Race: #prereq_race#
+              ][?prereq_class_0|Level #prereq_level_0# #prereq_class_0#
+              ][?prereq_class_1|Level #prereq_level_1# #prereq_class_1#
+              ][?prereq_class_2|Level #prereq_level_2# #prereq_class_2#
+              ][?prereq_str|Strength: #prereq_str#
+              ][?prereq_dex|Dexterity: #prereq_dex#
+              ][?prereq_end|Endurance: #prereq_end#
+              ][?prereq_per|Perception: #prereq_per#
+              ][?prereq_int|Intelligence: #prereq_int#
+              ][?prereq_wis|Wisdom: #prereq_wis#
+              ][?prereq_ability_0|Ability: #prereq_ability_0#
+              ][?prereq_ability_1|Ability: #prereq_ability_1#
+              ][?prereq_ability_2|Ability: #prereq_ability_2#
+              ][?prereq_ability_3|Ability: #prereq_ability_3#
+              ][?prereq_ability_4|Ability: #prereq_ability_4#
+              ]]
+      class_pane:
+        size: [40, 40]
+        background: bg_base
         border: [2, 2, 2, 2]
+        children:
+          details:
+            from: text_area
+            border: [2, 2, 2, 2]
+            relative:
+              width: Max
+              height: Max
+            text: |
+              #description#
+              [s=9|]
+              [y=40;s=7|Bonuses per Level]
+              [?str|Strength: [r=40|+#str#]
+              ][?dex|Dexterity: [r=40|+#dex#]
+              ][?end|Endurance: [r=40|+#end#]
+              ][?per|Perception: [r=40|+#per#]
+              ][?int|Intelligence: [r=40|+#int#]
+              ][?wis|Wisdom: [r=40|+#wis#]
+              ][?caster_level|Caster level: [r=40|+#caster_level#]]
+              [?bonus_ap|AP: [r=40|+#bonus_ap#]
+              ][?hit_points|[s=6.0|Hit Points: [r=40|+#hit_points#]]
+              ][?melee_accuracy|[s=6.0|Melee Accuracy: [r=40|+#melee_accuracy#]]
+              ][?ranged_accuracy|[s=6.0|Ranged Accuracy: [r=40|+#ranged_accuracy#]]
+              ][?spell_accuracy|[s=6.0|Spell Accuracy: [r=40|+#spell_accuracy#]]]
+              [?defense|[s=6.0|Defense: [r=40|+#defense#]]
+              ][?fortitude|[s=6.0|Fortitude: [r=40|+#fortitude#]]
+              ][?reflex|[s=6.0|Reflex: [r=40|+#reflex#]]
+              ][?will|[s=6.0|Will: [r=40|+#will#]]
+              ]
+      script_game_over_window:
+        background: bg_base
+        border: [3, 3, 3, 3]
+        size: [100, 50]
         relative:
-          width: Max
-          height: Max
-        text: |
-          #description#
-          [s=9|]
-          [y=45;s=7|Base Stats]
-          [?initiative|[s=6.0|Initiative [r=40|#initiative#]]
-          ][?melee_accuracy|[s=6.0|Melee Accuracy [r=40|#melee_accuracy#]]
-          ][?ranged_accuracy|[s=6.0|Ranged Accuracy [r=40|#ranged_accuracy#]]
-          ][?spell_accuracy|[s=6.0|Spell Accuracy [r=40|#spell_accuracy#]]
-          ][?defense|[s=6.0|Defense [r=40|#defense#]]
-          ][?fortitude|[s=6.0|Fortitude [r=40|#fortitude#]]
-          ][?reflex|[s=6.0|Reflex [r=40|#reflex#]]
-          ][?will|[s=6.0|Will [r=40|#will#]]
-          ]
-          [y=45|][x=60;s=7|Attribute Bonuses]
-          [x=60;?str|Strength [r=92|#str#]
-          ][x=60;?dex|Dexterity [r=92|#dex#]
-          ][x=60;?end|Endurance [r=92|#end#]
-          ][x=60;?per|Perception [r=92|#per#]
-          ][x=60;?int|Intelligence [r=92|#int#]
-          ][x=60;?wis|Wisdom: [r=92|#wis#]
-          ]
-  ability_pane:
-    size: [40, 40]
-    background: bg_base
-    border: [2, 2, 2, 2]
-    children:
-      details:
+          x: Center
+          y: Center
+        position: [0, 0]
+        children:
+          title:
+            from: label
+            relative:
+              width: Max
+            size: [0, 4]
+            position: [0, 3]
+            text_params:
+              scale: 7
+            text: "The End for now"
+          content:
+            from: text_area
+            text: "#0#"
+            position: [0, 13]
+            relative:
+              width: Max
+            size: [0, 20]
+          exit:
+            from: button
+            size: [36, 12]
+            text: "Main Menu"
+            text_params:
+              scale: 7
+            position: [0, 0]
+            relative:
+              x: Center
+              y: Max
+      game_over_window:
+        background: 60_transparent_fill
+        border: [1, 1, 1, 1]
+        size: [60, 28]
+        relative:
+          x: Center
+          y: Max
+        position: [0, -40]
+        children:
+          title:
+            from: label
+            relative:
+              width: Max
+            size: [0, 4]
+            position: [0, 3]
+            text_params:
+              scale: 7
+            text: "You have been defeated."
+          content:
+            from: text_area
+          exit:
+            from: button
+            size: [36, 12]
+            text: "Main Menu"
+            text_params:
+              scale: 7
+            position: [0, 11]
+            relative:
+              x: Center
+      script_menu:
+        background: 60_transparent_fill
+        border: [1, 1, 1, 1]
+        size: [60, 0]
+        relative:
+          x: Center
+          y: Center
+          height: ChildSum
+        layout: BoxVertical
+        children:
+          title:
+            from: text_area
+            text: |
+              [a=58|#title#]
+            size: [0, 4]
+            relative:
+              width: Max
+          cancel:
+            from: button
+            size: [0, 10]
+            text: "Cancel"
+            relative:
+              width: Max
+          entries:
+            border: { top: 2, bottom: 5, left: 2, right: 2 }
+            relative:
+              width: Max
+              height: ChildSum
+            layout: BoxVertical
+            layout_spacing: { top: 0, bottom: 2, left: 0, right: 0 }
+            children:
+              entry:
+                from: button
+                relative:
+                  width: Max
+                size: [0, 10]
+                children:
+                  text_area:
+                    from: text_area
+                    relative:
+                      width: Max
+                      height: Max
+                    text: |
+                      [a=54|#choice#]
+      script_confirmation:
+        from: confirmation_window
+        children:
+          title:
+            text: "#message#"
+          accept:
+            text: "#text#"
+          cancel:
+            text: "#text#"
+      exit_confirmation:
+        from: confirmation_window
+        children:
+          title:
+            text: "Exit Sulis?"
+      menu_confirmation:
+        from: confirmation_window
+        children:
+          title:
+            text: "Return to Main Menu?"
+          accept:
+            text: "Accept"
+      delete_save_confirmation:
+        from: confirmation_window
+        children:
+          title:
+            text: "Delete Saved Game?"
+          accept:
+            text: "Delete"
+      in_game_menu:
+        background: bg_base
+        border: [5, 5, 5, 5]
+        size: [45, 0]
+        relative:
+          x: Center
+          y: Center
+          height: ChildSum
+        position: [0, 0]
+        layout: BoxVertical
+        layout_spacing: { top: 0, bottom: 5, left: 0, right: 0 }
+        children:
+          button:
+            from: button
+            size: [25, 10]
+            text_params:
+              scale: 7.0
+          back:
+            from: game.in_game_menu.button
+            text: "Back to Game"
+          save:
+            from: game.in_game_menu.button
+            text: "Save"
+          load:
+            from: game.in_game_menu.button
+            text: "Load"
+          menu:
+            from: game.in_game_menu.button
+            text: "Main Menu"
+          exit:
+            from: game.in_game_menu.button
+            text: "Exit"
+      load_window:
+        from: load_window_base
+        background: bg_large
+        border: { top: 6, bottom: 8, left: 6, right: 6 }
+        size: [120, 118]
+        relative:
+          x: Center
+          y: Center
+      bonus_text:
         from: text_area
-        relative:
-          width: Max
-          height: Max
         text: |
-          [s=8|#name#][?prereqs_not_met;c=f00|  Prereqs not Met][?owned_level;c=0f0|  Owned - Level #owned_level#]
-          [s=9|]
-          [?active;s=7;c=f00|Active - AP: #activate_ap#
-          [s=6;c=fff|[?duration|Duration: #duration# Rounds][?mode|Mode][?instant|Duration: Instantaneous][?permanent|Permanent]
-          ][?cooldown;s=6;c=fff|Cooldown: #cooldown# Rounds]
-          ][?passive;s=7;c=0ff|Passive]
-          #description#
-          [?upgrade1|[s=6|Level 2]
-          [s=5|#upgrade1#]
-          ][?upgrade2|[s=6|Level 3]
-          [s=5|#upgrade2#]
-          ][?upgrade3|[s=6|Level 4]
-          [s=5|#upgrade3#]
-          ][?prereqs|[s=7|]
-          [s=7;c=f00|Prereqs]
+          [s=6.0;c=0ff|#name#]
+          [?usable_description|AP: #usable_ap# [?consumable;c=f00|    Consumable]
+          [?usable_duration|Duration: #usable_duration# Rounds][?usable_instant|Duration: Instantaneous]
+          [s=4.0|#usable_description#]
+          ][?active_mode;c=f00|Active Mode
+          ][s=5|[?total_duration;c=f00|#remaining_duration# of #total_duration# Rounds Remaining
+          ][?prereqs_not_met;c=f00|Prereqs not Met
+          ][?prof_not_met;s=5.0;c=f00|Proficiency Not Met
+          ][?slot_disabled_for_race;s=5.0;c=f00|Not Usable by #player_race#
+          ][?any_armor|[s=6.0|Armor: ][?armor;s=6.0|#armor#][?armor_slashing;s=5.0| (Slashing: #armor_slashing#)][?armor_piercing;s=5.0| (Piercing: #armor_piercing#)][?armor_crushing;s=5.0| (Crushing: #armor_crushing#)][?armor_acid;s=5.0| (Acid: #armor_acid#)][?armor_cold;s=5.0| (Cold: #armor_cold#)][?armor_electrical;s=5.0| (Shock: #armor_electrical#)][?armor_fire;s=5.0| (Fire: #armor_fire#)]
+          ][?resistance_slashing|Slashing Resistance #resistance_slashing#%
+          ][?resistance_piercing|Piercing Resistance #resistance_piercing#%
+          ][?resistance_crushing|Crushing Resistance #resistance_crushing#%
+          ][?resistance_acid|Acid Resistance #resistance_acid#%
+          ][?resistance_cold|Cold Resistance #resistance_cold#%
+          ][?resistance_electrical|Shock Resistance #resistance_electrical#%
+          ][?resistance_fire|Fire Resistance #resistance_fire#%
+          ][?any_accuracy|[s=6|Accuracy:][?melee_accuracy| (Melee #melee_accuracy#)][?ranged_accuracy| (Ranged: #ranged_accuracy#)][?spell_accuracy| (Spell: #spell_accuracy#)]
+          ][?ability_group_0|#ability_group_0# ability uses per encounter: #ability_group_0_uses_per_encounter#
+          ][?ability_group_1|#ability_group_1# ability uses per encounter: #ability_group_1_uses_per_encounter#
+          ][?ability_group_2|#ability_group_2# ability uses per encounter: #ability_group_2_uses_per_encounter#
+          ][?str|Strength: #str#
+          ][?dex|Dexterity: #dex#
+          ][?end|Endurance: #end#
+          ][?per|Perception: #per#
+          ][?int|Intelligence: #int#
+          ][?wis|Wisdom: #wis#
+          ][?caster_level|Caster level: #caster_level#
+          ][?bonus_ap|AP: #bonus_ap#
+          ][?min_damage|Damage: #min_damage# to #max_damage# [c=f00|#damage_kind#]
+          ][?armor_penetration|Armor Penetration: #armor_penetration#
+          ][?attack_min_bonus_damage|Damage: #attack_min_bonus_damage# to #attack_max_bonus_damage# [?attack_bonus_damage_kind;c=f00|#attack_bonus_damage_kind#]
+          ][?attack_melee_accuracy|Melee Accuracy: #attack_melee_accuracy#
+          ][?attack_ranged_accuracy|Ranged Accuracy: #attack_ranged_accuracy#
+          ][?attack_spell_accuracy|Spell Accuracy: #attack_spell_accuracy#
+          ][?attack_crit_chance|Crit Chance: #attack_crit_chance#%
+          ][?attack_hit_threshold|Hit Threshold: #attack_hit_threshold#
+          ][?attack_graze_threshold|Graze Threshold: #attack_graze_threshold#
+          ][?attack_crit_multiplier|Crit Multiplier: #attack_crit_multiplier#
+          ][?attack_hit_multiplier|Hit Multiplier: #attack_hit_multiplier#
+          ][?attack_graze_multiplier|Graze Multiplier: #attack_graze_multiplier#
+          ][?min_bonus_damage_0|Damage: #min_bonus_damage_0# to #max_bonus_damage_0# [?bonus_damage_kind_0;c=f00|#bonus_damage_kind_0#]
+          ][?min_bonus_damage_1|Damage: #min_bonus_damage_1# to #max_bonus_damage_1# [?bonus_damage_kind_0;c=f00|#bonus_damage_kind_1#]
+          ][?min_bonus_damage_2|Damage: #min_bonus_damage_2# to #max_bonus_damage_2# [?bonus_damage_kind_0;c=f00|#bonus_damage_kind_2#]
+          ][?reach|Reach: #reach#
+          ][?range|Range: #range#
+          ][?bonus_reach|Reach: #bonus_reach#
+          ][?bonus_range|Range: #bonus_range#
+          ][?initiative|Initiative: #initiative#
+          ][?hit_points|Hit Points: #hit_points#
+          ][?defense|Defense: #defense#
+          ][?fortitude|Fortitude: #fortitude#
+          ][?reflex|Reflex: #reflex#
+          ][?will|Will: #will#
+          ][?ability_ap_cost|Ability AP Cost: #ability_ap_cost#
+          ][?concealment|Concealment: #concealment#
+          ][?concealment_ignore|Ignore Concealment: #concealment_ignore#
+          ][?crit_chance|Crit Chance: #crit_chance#%
+          ][?hit_threshold|Hit Threshold: #hit_threshold#
+          ][?graze_threshold|Graze Threshold: #graze_threshold#
+          ][?crit_multiplier|Crit Multiplier: #crit_multiplier#
+          ][?hit_multiplier|Hit Multiplier: #hit_multiplier#
+          ][?graze_multiplier|Graze Multiplier: #graze_multiplier#
+          ][?movement_rate|Movement Rate: #movement_rate#
+          ][?attack_cost|Attack Cost: #attack_cost#
+          ][?flanking_angle|Flanking Angle: #flanking_angle#°
+          ][?move_disabled|Movement Disabled
+          ][?attack_disabled|Attack Disabled
+          ][?abilities_disabled|Abilities Disabled
+          ][?hidden|Hidden
+          ][?flanked_immunity|Flanked Immunity
+          ][?sneak_attack_immunity|Sneak Attack Immunity
+          ][?crit_immunity|Crit Immunity
+          ][?free_ability_group_use|Free Ability Group Use
+          ][?prereqs|[s=4|]
+          [s=6;c=f00|Prereqs]
           [?prereq_total_level|Level: #prereq_total_level#
           ][?prereq_race|Race: #prereq_race#
           ][?prereq_class_0|Level #prereq_level_0# #prereq_class_0#
@@ -1226,313 +1534,9 @@ themes:
           ][?prereq_ability_2|Ability: #prereq_ability_2#
           ][?prereq_ability_3|Ability: #prereq_ability_3#
           ][?prereq_ability_4|Ability: #prereq_ability_4#
-          ]]
-  class_pane:
-    size: [40, 40]
-    background: bg_base
-    border: [2, 2, 2, 2]
-    children:
-      details:
-        from: text_area
-        border: [2, 2, 2, 2]
-        relative:
-          width: Max
-          height: Max
-        text: |
-          #description#
-          [s=9|]
-          [y=40;s=7|Bonuses per Level]
-          [?str|Strength: [r=40|+#str#]
-          ][?dex|Dexterity: [r=40|+#dex#]
-          ][?end|Endurance: [r=40|+#end#]
-          ][?per|Perception: [r=40|+#per#]
-          ][?int|Intelligence: [r=40|+#int#]
-          ][?wis|Wisdom: [r=40|+#wis#]
-          ][?caster_level|Caster level: [r=40|+#caster_level#]]
-          [?bonus_ap|AP: [r=40|+#bonus_ap#]
-          ][?hit_points|[s=6.0|Hit Points: [r=40|+#hit_points#]]
-          ][?melee_accuracy|[s=6.0|Melee Accuracy: [r=40|+#melee_accuracy#]]
-          ][?ranged_accuracy|[s=6.0|Ranged Accuracy: [r=40|+#ranged_accuracy#]]
-          ][?spell_accuracy|[s=6.0|Spell Accuracy: [r=40|+#spell_accuracy#]]]
-          [?defense|[s=6.0|Defense: [r=40|+#defense#]]
-          ][?fortitude|[s=6.0|Fortitude: [r=40|+#fortitude#]]
-          ][?reflex|[s=6.0|Reflex: [r=40|+#reflex#]]
-          ][?will|[s=6.0|Will: [r=40|+#will#]]
+          ]]][?price;s=4|
+          Price: [c=f00|#price#] Gold     Weight: [c=f00|#weight#] lbs
+          ][!price;?value;s=4|
+          Value: [c=f00|#value#] Gold     Weight: [c=f00|#weight#] lbs
           ]
-  script_game_over_window:
-    background: bg_base
-    border: [3, 3, 3, 3]
-    size: [100, 50]
-    relative:
-      x: Center
-      y: Center
-    position: [0, 0]
-    children:
-      title:
-        from: label
-        relative:
-          width: Max
-        size: [0, 4]
-        position: [0, 3]
-        text_params:
-          scale: 7
-        text: "The End for now"
-      content:
-        from: text_area
-        text: "#0#"
-        position: [0, 13]
-        relative:
-          width: Max
-        size: [0, 20]
-      exit:
-        from: button
-        size: [36, 12]
-        text: "Main Menu"
-        text_params:
-          scale: 7
-        position: [0, 0]
-        relative:
-          x: Center
-          y: Max
-  game_over_window:
-    background: 60_transparent_fill
-    border: [1, 1, 1, 1]
-    size: [60, 28]
-    relative:
-      x: Center
-      y: Max
-    position: [0, -40]
-    children:
-      title:
-        from: label
-        relative:
-          width: Max
-        size: [0, 4]
-        position: [0, 3]
-        text_params:
-          scale: 7
-        text: "You have been defeated."
-      content:
-        from: text_area
-      exit:
-        from: button
-        size: [36, 12]
-        text: "Main Menu"
-        text_params:
-          scale: 7
-        position: [0, 11]
-        relative:
-          x: Center
-  script_menu:
-    background: 60_transparent_fill
-    border: [1, 1, 1, 1]
-    size: [60, 0]
-    relative:
-      x: Center
-      y: Center
-      height: ChildSum
-    layout: BoxVertical
-    children:
-      title:
-        from: text_area
-        text: |
-          [a=58|#title#]
-        size: [0, 4]
-        relative:
-          width: Max
-      cancel:
-        from: button
-        size: [0, 10]
-        text: "Cancel"
-        relative:
-          width: Max
-      entries:
-        border: { top: 2, bottom: 5, left: 2, right: 2 }
-        relative:
-          width: Max
-          height: ChildSum
-        layout: BoxVertical
-        layout_spacing: { top: 0, bottom: 2, left: 0, right: 0 }
-        children:
-          entry:
-            from: button
-            relative:
-              width: Max
-            size: [0, 10]
-            children:
-              text_area:
-                from: text_area
-                relative:
-                  width: Max
-                  height: Max
-                text: |
-                  [a=54|#choice#]
-  script_confirmation:
-    from: confirmation_window
-    children:
-      title:
-        text: "#message#"
-      accept:
-        text: "#text#"
-      cancel:
-        text: "#text#"
-  exit_confirmation:
-    from: confirmation_window
-    children:
-      title:
-        text: "Exit Sulis?"
-  menu_confirmation:
-    from: confirmation_window
-    children:
-      title:
-        text: "Return to Main Menu?"
-      accept:
-        text: "Accept"
-  delete_save_confirmation:
-    from: confirmation_window
-    children:
-      title:
-        text: "Delete Saved Game?"
-      accept:
-        text: "Delete"
-  in_game_menu:
-    background: bg_base
-    border: [5, 5, 5, 5]
-    size: [45, 0]
-    relative:
-      x: Center
-      y: Center
-      height: ChildSum
-    position: [0, 0]
-    layout: BoxVertical
-    layout_spacing: { top: 0, bottom: 5, left: 0, right: 0 }
-    children:
-      button:
-        from: button
-        size: [25, 10]
-        text_params:
-          scale: 7.0
-      back:
-        from: in_game_menu.button
-        text: "Back to Game"
-      save:
-        from: in_game_menu.button
-        text: "Save"
-      load:
-        from: in_game_menu.button
-        text: "Load"
-      menu:
-        from: in_game_menu.button
-        text: "Main Menu"
-      exit:
-        from: in_game_menu.button
-        text: "Exit"
-  load_window:
-    from: load_window_base
-    background: bg_large
-    border: { top: 6, bottom: 8, left: 6, right: 6 }
-    size: [120, 118]
-    relative:
-      x: Center
-      y: Center
-  bonus_text:
-    from: text_area
-    text: |
-      [s=6.0;c=0ff|#name#]
-      [?usable_description|AP: #usable_ap# [?consumable;c=f00|    Consumable]
-      [?usable_duration|Duration: #usable_duration# Rounds][?usable_instant|Duration: Instantaneous]
-      [s=4.0|#usable_description#]
-      ][?active_mode;c=f00|Active Mode
-      ][s=5|[?total_duration;c=f00|#remaining_duration# of #total_duration# Rounds Remaining
-      ][?prereqs_not_met;c=f00|Prereqs not Met
-      ][?prof_not_met;s=5.0;c=f00|Proficiency Not Met
-      ][?slot_disabled_for_race;s=5.0;c=f00|Not Usable by #player_race#
-      ][?any_armor|[s=6.0|Armor: ][?armor;s=6.0|#armor#][?armor_slashing;s=5.0| (Slashing: #armor_slashing#)][?armor_piercing;s=5.0| (Piercing: #armor_piercing#)][?armor_crushing;s=5.0| (Crushing: #armor_crushing#)][?armor_acid;s=5.0| (Acid: #armor_acid#)][?armor_cold;s=5.0| (Cold: #armor_cold#)][?armor_electrical;s=5.0| (Shock: #armor_electrical#)][?armor_fire;s=5.0| (Fire: #armor_fire#)]
-      ][?resistance_slashing|Slashing Resistance #resistance_slashing#%
-      ][?resistance_piercing|Piercing Resistance #resistance_piercing#%
-      ][?resistance_crushing|Crushing Resistance #resistance_crushing#%
-      ][?resistance_acid|Acid Resistance #resistance_acid#%
-      ][?resistance_cold|Cold Resistance #resistance_cold#%
-      ][?resistance_electrical|Shock Resistance #resistance_electrical#%
-      ][?resistance_fire|Fire Resistance #resistance_fire#%
-      ][?any_accuracy|[s=6|Accuracy:][?melee_accuracy| (Melee #melee_accuracy#)][?ranged_accuracy| (Ranged: #ranged_accuracy#)][?spell_accuracy| (Spell: #spell_accuracy#)]
-      ][?ability_group_0|#ability_group_0# ability uses per encounter: #ability_group_0_uses_per_encounter#
-      ][?ability_group_1|#ability_group_1# ability uses per encounter: #ability_group_1_uses_per_encounter#
-      ][?ability_group_2|#ability_group_2# ability uses per encounter: #ability_group_2_uses_per_encounter#
-      ][?str|Strength: #str#
-      ][?dex|Dexterity: #dex#
-      ][?end|Endurance: #end#
-      ][?per|Perception: #per#
-      ][?int|Intelligence: #int#
-      ][?wis|Wisdom: #wis#
-      ][?caster_level|Caster level: #caster_level#
-      ][?bonus_ap|AP: #bonus_ap#
-      ][?min_damage|Damage: #min_damage# to #max_damage# [c=f00|#damage_kind#]
-      ][?armor_penetration|Armor Penetration: #armor_penetration#
-      ][?attack_min_bonus_damage|Damage: #attack_min_bonus_damage# to #attack_max_bonus_damage# [?attack_bonus_damage_kind;c=f00|#attack_bonus_damage_kind#]
-      ][?attack_melee_accuracy|Melee Accuracy: #attack_melee_accuracy#
-      ][?attack_ranged_accuracy|Ranged Accuracy: #attack_ranged_accuracy#
-      ][?attack_spell_accuracy|Spell Accuracy: #attack_spell_accuracy#
-      ][?attack_crit_chance|Crit Chance: #attack_crit_chance#%
-      ][?attack_hit_threshold|Hit Threshold: #attack_hit_threshold#
-      ][?attack_graze_threshold|Graze Threshold: #attack_graze_threshold#
-      ][?attack_crit_multiplier|Crit Multiplier: #attack_crit_multiplier#
-      ][?attack_hit_multiplier|Hit Multiplier: #attack_hit_multiplier#
-      ][?attack_graze_multiplier|Graze Multiplier: #attack_graze_multiplier#
-      ][?min_bonus_damage_0|Damage: #min_bonus_damage_0# to #max_bonus_damage_0# [?bonus_damage_kind_0;c=f00|#bonus_damage_kind_0#]
-      ][?min_bonus_damage_1|Damage: #min_bonus_damage_1# to #max_bonus_damage_1# [?bonus_damage_kind_0;c=f00|#bonus_damage_kind_1#]
-      ][?min_bonus_damage_2|Damage: #min_bonus_damage_2# to #max_bonus_damage_2# [?bonus_damage_kind_0;c=f00|#bonus_damage_kind_2#]
-      ][?reach|Reach: #reach#
-      ][?range|Range: #range#
-      ][?bonus_reach|Reach: #bonus_reach#
-      ][?bonus_range|Range: #bonus_range#
-      ][?initiative|Initiative: #initiative#
-      ][?hit_points|Hit Points: #hit_points#
-      ][?defense|Defense: #defense#
-      ][?fortitude|Fortitude: #fortitude#
-      ][?reflex|Reflex: #reflex#
-      ][?will|Will: #will#
-      ][?ability_ap_cost|Ability AP Cost: #ability_ap_cost#
-      ][?concealment|Concealment: #concealment#
-      ][?concealment_ignore|Ignore Concealment: #concealment_ignore#
-      ][?crit_chance|Crit Chance: #crit_chance#%
-      ][?hit_threshold|Hit Threshold: #hit_threshold#
-      ][?graze_threshold|Graze Threshold: #graze_threshold#
-      ][?crit_multiplier|Crit Multiplier: #crit_multiplier#
-      ][?hit_multiplier|Hit Multiplier: #hit_multiplier#
-      ][?graze_multiplier|Graze Multiplier: #graze_multiplier#
-      ][?movement_rate|Movement Rate: #movement_rate#
-      ][?attack_cost|Attack Cost: #attack_cost#
-      ][?flanking_angle|Flanking Angle: #flanking_angle#°
-      ][?move_disabled|Movement Disabled
-      ][?attack_disabled|Attack Disabled
-      ][?abilities_disabled|Abilities Disabled
-      ][?hidden|Hidden
-      ][?flanked_immunity|Flanked Immunity
-      ][?sneak_attack_immunity|Sneak Attack Immunity
-      ][?crit_immunity|Crit Immunity
-      ][?free_ability_group_use|Free Ability Group Use
-      ][?prereqs|[s=4|]
-      [s=6;c=f00|Prereqs]
-      [?prereq_total_level|Level: #prereq_total_level#
-      ][?prereq_race|Race: #prereq_race#
-      ][?prereq_class_0|Level #prereq_level_0# #prereq_class_0#
-      ][?prereq_class_1|Level #prereq_level_1# #prereq_class_1#
-      ][?prereq_class_2|Level #prereq_level_2# #prereq_class_2#
-      ][?prereq_str|Strength: #prereq_str#
-      ][?prereq_dex|Dexterity: #prereq_dex#
-      ][?prereq_end|Endurance: #prereq_end#
-      ][?prereq_per|Perception: #prereq_per#
-      ][?prereq_int|Intelligence: #prereq_int#
-      ][?prereq_wis|Wisdom: #prereq_wis#
-      ][?prereq_ability_0|Ability: #prereq_ability_0#
-      ][?prereq_ability_1|Ability: #prereq_ability_1#
-      ][?prereq_ability_2|Ability: #prereq_ability_2#
-      ][?prereq_ability_3|Ability: #prereq_ability_3#
-      ][?prereq_ability_4|Ability: #prereq_ability_4#
-      ]]][?price;s=4|
-      Price: [c=f00|#price#] Gold     Weight: [c=f00|#weight#] lbs
-      ][!price;?value;s=4|
-      Value: [c=f00|#value#] Gold     Weight: [c=f00|#weight#] lbs
-      ]
 ...

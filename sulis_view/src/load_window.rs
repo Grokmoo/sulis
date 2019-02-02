@@ -19,7 +19,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_widgets::{Button, Label, ScrollPane, TextArea, ConfirmationWindow};
+use sulis_core::widgets::{Button, Label, ScrollPane, TextArea, ConfirmationWindow};
 use sulis_state::{SaveState, SaveFileMetaData, NextGameStep};
 use sulis_state::save_file::{delete_save, load_state, get_available_save_files};
 

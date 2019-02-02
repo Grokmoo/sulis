@@ -45,9 +45,6 @@ mod font_renderer;
 pub use self::font_renderer::FontRenderer;
 pub use self::font_renderer::LineRenderer;
 
-mod label;
-pub use self::label::Label;
-
 mod layout_kind;
 pub use self::layout_kind::LayoutKind;
 

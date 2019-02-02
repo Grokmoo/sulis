@@ -14,9 +14,6 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-#[macro_use] extern crate log;
-#[macro_use] extern crate sulis_core;
-
 pub mod button;
 pub use self::button::Button;
 
@@ -42,7 +39,7 @@ pub mod mutually_exclusive_list_box;
 pub use self::mutually_exclusive_list_box::MutuallyExclusiveListBox;
 
 pub mod progress_bar;
-pub use crate::progress_bar::ProgressBar;
+pub use self::progress_bar::ProgressBar;
 
 pub mod scrollpane;
 pub use self::scrollpane::ScrollPane;

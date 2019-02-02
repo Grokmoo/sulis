@@ -23,7 +23,7 @@ use std::cell::RefCell;
 
 use sulis_core::config::Config;
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_widgets::{Button, Label, list_box, ListBox, ScrollPane};
+use sulis_core::widgets::{Button, Label, list_box, ListBox, ScrollPane};
 
 use crate::AreaEditor;
 

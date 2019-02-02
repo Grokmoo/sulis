@@ -23,7 +23,7 @@ use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
 use sulis_core::util::Point;
 use sulis_module::Module;
 use sulis_module::area::Tile;
-use sulis_widgets::{Button, ScrollPane};
+use sulis_core::widgets::{Button, ScrollPane};
 
 use crate::{AreaModel, EditorMode};
 

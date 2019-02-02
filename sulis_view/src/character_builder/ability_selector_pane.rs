@@ -20,7 +20,7 @@ use std::cell::RefCell;
 use std::collections::HashSet;
 
 use sulis_core::ui::{animation_state, Callback, Widget, WidgetKind};
-use sulis_widgets::{Button, Label};
+use sulis_core::widgets::{Button, Label};
 use sulis_module::{Ability, AbilityList, Actor, actor::OwnedAbility};
 use sulis_state::EntityState;
 

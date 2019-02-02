@@ -21,7 +21,7 @@ use std::collections::HashMap;
 
 use sulis_core::ui::*;
 use sulis_core::util::ActiveResources;
-use sulis_widgets::{Button, Label, TextArea, ScrollPane};
+use sulis_core::widgets::{Button, Label, TextArea, ScrollPane};
 use sulis_module::{ModuleInfo};
 use sulis_state::NextGameStep;
 

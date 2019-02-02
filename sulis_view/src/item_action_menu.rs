@@ -19,7 +19,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_widgets::{Label, list_box, ListBox};
+use sulis_core::widgets::{Label, list_box, ListBox};
 
 pub const NAME: &str = "item_action_menu";
 

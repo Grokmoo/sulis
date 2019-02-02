@@ -19,7 +19,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_widgets::{Button, TextArea};
+use sulis_core::widgets::{Button, TextArea};
 use sulis_module::on_trigger::ScriptMenuChoice;
 use sulis_state::script::{CallbackData, ScriptCallback, ScriptMenuSelection};
 

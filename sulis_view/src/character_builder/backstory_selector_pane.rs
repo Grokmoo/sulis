@@ -20,7 +20,7 @@ use std::cell::RefCell;
 
 use sulis_core::io::event;
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_widgets::{Button, Label, TextArea};
+use sulis_core::widgets::{Button, Label, TextArea};
 use sulis_module::{Ability, Conversation, Module, conversation::Response, OnTrigger};
 
 use crate::{CharacterBuilder};

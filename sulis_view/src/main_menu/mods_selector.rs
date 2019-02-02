@@ -21,7 +21,7 @@ use std::path::PathBuf;
 
 use sulis_core::ui::*;
 use sulis_core::util::ActiveResources;
-use sulis_widgets::{Button, Label, ScrollPane, TextArea};
+use sulis_core::widgets::{Button, Label, ScrollPane, TextArea};
 use sulis_module::{ModificationInfo};
 use sulis_state::NextGameStep;
 

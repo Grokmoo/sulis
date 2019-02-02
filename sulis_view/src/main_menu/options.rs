@@ -23,7 +23,7 @@ use sulis_core::config::{self, Config};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::io::{keyboard_event::Key, InputAction, DisplayConfiguration, event::ClickKind};
 use sulis_core::config::DisplayMode;
-use sulis_widgets::{Button, Label, ScrollPane};
+use sulis_core::widgets::{Button, Label, ScrollPane};
 
 use crate::main_menu::MainMenu;
 

@@ -19,7 +19,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_core::ui::{Widget, WidgetKind};
-use sulis_widgets::{Label};
+use sulis_core::widgets::{Label};
 
 pub const NAME: &str = "loading_screen";
 

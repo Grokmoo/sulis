@@ -21,7 +21,7 @@ use std::cell::{RefCell};
 use open;
 
 use sulis_core::ui::{Widget, WidgetKind, Callback};
-use sulis_widgets::{Button, Label};
+use sulis_core::widgets::{Button, Label};
 
 pub struct LinksPane {
 }

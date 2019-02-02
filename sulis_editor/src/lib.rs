@@ -73,7 +73,7 @@ use std::cell::RefCell;
 
 use sulis_core::io::{GraphicsRenderer, InputAction, MainLoopUpdater};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_widgets::{Button, ConfirmationWindow, DropDown, list_box};
+use sulis_core::widgets::{Button, ConfirmationWindow, DropDown, list_box};
 
 thread_local! {
     static EXIT: RefCell<bool> = RefCell::new(false);

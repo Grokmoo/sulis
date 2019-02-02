@@ -21,7 +21,8 @@ use std::cell::{Ref, RefCell};
 
 use crate::config::Config;
 use crate::io::{event, Event, GraphicsRenderer};
-use crate::ui::{Cursor, EmptyWidget, Theme, WidgetState, WidgetKind, theme, Label};
+use crate::ui::{Cursor, EmptyWidget, Theme, WidgetState, WidgetKind, theme};
+use crate::widgets::Label;
 use crate::resource::ResourceSet;
 use crate::util::{Point, Size};
 

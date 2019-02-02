@@ -20,7 +20,7 @@ use std::cell::{RefCell};
 
 use sulis_core::util::Size;
 use sulis_core::ui::{Callback, Cursor, Widget, WidgetKind};
-use sulis_widgets::{Button, Label};
+use sulis_core::widgets::{Button, Label};
 use sulis_state::{ChangeListener, GameState};
 
 pub const NAME: &str = "formation_window";

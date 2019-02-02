@@ -19,7 +19,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_widgets::{Button, Label, TextArea};
+use sulis_core::widgets::{Button, Label, TextArea};
 
 const NAME: &str = "game_over_window";
 

@@ -23,7 +23,7 @@ use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
 use sulis_core::util::Point;
-use sulis_widgets::{Label, Spinner};
+use sulis_core::widgets::{Label, Spinner};
 use sulis_module::area::MAX_AREA_SIZE;
 
 use crate::{AreaModel, EditorMode};

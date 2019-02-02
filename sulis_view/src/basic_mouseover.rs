@@ -21,7 +21,7 @@ use std::cell::RefCell;
 use sulis_core::ui::{Widget, WidgetKind};
 use sulis_core::io::{GraphicsRenderer};
 use sulis_core::util::Point;
-use sulis_widgets::{TextArea};
+use sulis_core::widgets::{TextArea};
 
 const NAME: &'static str = "prop_mouseover";
 

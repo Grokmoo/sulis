@@ -22,7 +22,7 @@ use sulis_state::{ChangeListener, EntityState, GameState};
 use sulis_core::io::event::ClickKind;
 use sulis_core::ui::{Widget, WidgetKind};
 use sulis_module::{Module, OnTrigger};
-use sulis_widgets::{ProgressBar};
+use sulis_core::widgets::{ProgressBar};
 
 use crate::RootView;
 

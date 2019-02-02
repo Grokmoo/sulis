@@ -19,7 +19,7 @@ use std::rc::Rc;
 use std::cell::{Cell, RefCell};
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_widgets::{Button, ScrollPane};
+use sulis_core::widgets::{Button, ScrollPane};
 use sulis_module::{Item, Module};
 use sulis_state::{EntityState, GameState, script::ScriptItemKind};
 

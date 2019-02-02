@@ -24,7 +24,7 @@ use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::util::Point;
 use sulis_module::{Encounter, Module};
-use sulis_widgets::{Button, Label, Spinner, ScrollPane};
+use sulis_core::widgets::{Button, Label, Spinner, ScrollPane};
 
 use crate::{AreaModel, EditorMode};
 

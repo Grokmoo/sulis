@@ -17,7 +17,8 @@
 use std::rc::Rc;
 use std::cmp;
 
-use crate::ui::{Size, Widget};
+use crate::config::Config;
+use crate::ui::{Size, Widget, Cursor};
 use crate::ui::theme::Theme;
 
 #[derive(Deserialize, Debug, Clone, Copy, PartialEq)]
@@ -127,6 +128,7 @@ impl LayoutKind {
                        size.width) / 2,
             Max => widget.state.inner_right() - size.width,
             Custom => child.state.position().x,
+            Mouse => cmp::min(Cursor::get_x(), Config::ui_width() - size.width),
         };
         let y = match theme.relative.y {
             Zero => widget.state.inner_top(),
@@ -134,6 +136,7 @@ impl LayoutKind {
                        size.height) / 2,
             Max => widget.state.inner_bottom() - size.height,
             Custom => child.state.position().y,
+            Mouse => cmp::min(Cursor::get_y(), Config::ui_height() - size.height),
         };
 
         child.state.set_position(x + theme.position.x, y + theme.position.y);

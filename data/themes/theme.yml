@@ -22,8 +22,8 @@ themes:
       item_action_menu:
         from: list_box
         relative:
-          x: Custom
-          y: Custom
+          x: Mouse
+          y: Mouse
           height: ChildSum
           width: Zero
         position: [-1, -1]

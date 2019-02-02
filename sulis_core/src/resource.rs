@@ -173,6 +173,14 @@ impl ResourceSet {
         RESOURCE_SET.with(|r| Rc::clone(r.borrow().themes.default_theme()))
     }
 
+    pub fn compute_theme_id(parent_id: &str, id: &str) -> String {
+        RESOURCE_SET.with(|r| r.borrow().themes.compute_theme_id(parent_id, id))
+    }
+
+    pub fn has_theme(id: &str) -> bool {
+        RESOURCE_SET.with(|r| r.borrow().themes.contains(id))
+    }
+
     pub fn theme(id: &str) -> Rc<Theme> {
         RESOURCE_SET.with(|r| Rc::clone(r.borrow().themes.get(id)))
     }

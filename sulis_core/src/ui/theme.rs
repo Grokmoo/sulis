@@ -72,6 +72,7 @@ pub enum PositionRelative {
     Center,
     Max,
     Custom,
+    Mouse,
 }
 
 impl Default for PositionRelative {
@@ -268,6 +269,39 @@ impl ThemeSet {
             },
             Some(theme) => theme,
         }
+    }
+
+    pub fn compute_theme_id(&self, parent_id: &str, id: &str) -> String {
+        match self.themes.get(parent_id) {
+            None => (),
+            Some(theme) => match self.compute_theme_id_recursive(theme, id) {
+                None => (),
+                Some(id) => return id,
+            }
+        }
+
+        format!("{}.{}", parent_id, id)
+    }
+
+    fn compute_theme_id_recursive(&self, theme: &Rc<Theme>, id: &str) -> Option<String> {
+        for child_id in theme.children.iter() {
+            if child_id == id {
+                return Some(format!("{}.{}", theme.id, id));
+            }
+
+            let child_theme = &self.themes.get(child_id).unwrap();
+            match child_theme.kind {
+                Kind::Container => (),
+                _ => continue,
+            }
+
+            match self.compute_theme_id_recursive(child_theme, id) {
+                None => (),
+                Some(id) => return Some(id),
+            }
+        }
+
+        None
     }
 }
 

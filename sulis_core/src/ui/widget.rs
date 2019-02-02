@@ -21,7 +21,7 @@ use std::cell::{Ref, RefCell};
 
 use crate::config::Config;
 use crate::io::{event, Event, GraphicsRenderer};
-use crate::ui::{Cursor, EmptyWidget, Theme, WidgetState, WidgetKind};
+use crate::ui::{Cursor, EmptyWidget, Theme, WidgetState, WidgetKind, theme, Label};
 use crate::resource::ResourceSet;
 use crate::util::{Point, Size};
 
@@ -454,6 +454,10 @@ impl Widget {
             Widget::add_children_to(parent, children);
             parent.borrow_mut().marked_for_readd = false;
             parent.borrow_mut().marked_for_layout = true;
+            if parent.borrow().parent.is_some() {
+                // don't try to force layout on the root widget
+                parent.borrow_mut().theme_id = String::new();
+            }
         } else {
             let len = parent.borrow().children.len();
             for i in 0..len {
@@ -522,24 +526,49 @@ impl Widget {
             let parent_parent = Widget::get_parent(parent);
 
             let mut parent = parent.borrow_mut();
-            let parent_name = &parent.theme_subname;
-            parent.theme_id = format!("{}.{}", &parent_parent.borrow().theme_id, parent_name);
+            parent.theme_id = ResourceSet::compute_theme_id(&parent_parent.borrow().theme_id,
+                &parent.theme_subname);
 
-            parent.theme = ResourceSet::theme(&parent.theme_id);
+            let theme = ResourceSet::theme(&parent.theme_id);
+            match theme.kind {
+                theme::Kind::Ref => (),
+                _ => warn!("Manually added widget for theme {} with kind {:?}",
+                           theme.id, theme.kind),
+            }
+
+            // add theme specified children
+            for id in theme.children.iter() {
+                let subname = match id.split(".").last() {
+                    None => {
+                        warn!("Invalid theme child name {}", id);
+                        continue;
+                    }, Some(name) => name,
+                };
+                let child_theme = ResourceSet::theme(id);
+                let child;
+                match child_theme.kind {
+                    theme::Kind::Label => child = Widget::with_theme(Label::empty(), subname),
+                    theme::Kind::Container => child = Widget::empty(subname),
+                    theme::Kind::Ref => continue,
+                }
+
+                {
+                    let mut child= child.borrow_mut();
+                    child.theme_id = id.clone();
+                    child.theme = child_theme;
+                    child.marked_for_layout = true;
+                }
+                parent.children.push(child);
+            }
+
+            parent.theme = theme;
         }
 
         // set up parent references
         let len = parent.borrow().children.len();
-        for i in 0..len {
-            let setup_parent = {
-                let children = &parent.borrow().children;
-                let child_parent = &children.get(i).unwrap().borrow().parent;
-                child_parent.is_none()
-            };
-
-
+        for i in (0..len).rev() {
             let child = Rc::clone(parent.borrow().children.get(i).unwrap());
-            if setup_parent {
+            if child.borrow().parent.is_none() {
                 child.borrow_mut().parent = Some(Rc::clone(parent));
             }
 

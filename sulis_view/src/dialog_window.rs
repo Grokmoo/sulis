@@ -20,7 +20,7 @@ use std::cell::RefCell;
 
 use sulis_core::ui::{Widget, WidgetKind, theme, Callback};
 use sulis_core::io::{event, InputAction};
-use sulis_widgets::{Label, TextArea};
+use sulis_core::widgets::{Label, TextArea};
 use sulis_module::{Actor, OnTrigger, MerchantData, Conversation,
     conversation::{Response}, Module, on_trigger::{self, Kind, QuestStateData}};
 use sulis_state::{EntityState, ChangeListener, GameState, ItemState,

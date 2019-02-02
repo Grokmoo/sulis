@@ -15,7 +15,6 @@ members = [
 	"sulis_module",
 	"sulis_state",
 	"sulis_view",
-    "sulis_widgets",
 ]
 
 [dependencies]
@@ -24,6 +23,5 @@ sulis_rules = { path = "sulis_rules" }
 sulis_module = { path = "sulis_module" }
 sulis_state = { path = "sulis_state" }
 sulis_view = { path = "sulis_view" }
-sulis_widgets = { path = "sulis_widgets" }
 
 log = "0.4"

@@ -22,7 +22,7 @@ use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{animation_state, Callback, Color, Widget, WidgetKind};
 use sulis_core::util::Point;
 use sulis_module::{Prop, Module};
-use sulis_widgets::{Button, ScrollPane};
+use sulis_core::widgets::{Button, ScrollPane};
 
 use crate::{AreaModel, EditorMode};
 

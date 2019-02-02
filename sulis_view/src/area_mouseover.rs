@@ -21,7 +21,7 @@ use std::cell::RefCell;
 use sulis_core::ui::{Widget, WidgetKind, WidgetState};
 use sulis_core::io::{GraphicsRenderer, event::ClickKind};
 use sulis_core::util::Point;
-use sulis_widgets::{TextArea};
+use sulis_core::widgets::{TextArea};
 use sulis_state::{ChangeListener, EntityState, GameState};
 
 const NAME: &'static str = "area_mouseover";

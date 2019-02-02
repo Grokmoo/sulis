@@ -21,7 +21,7 @@ use std::cell::{Cell, RefCell};
 
 use sulis_core::util;
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_widgets::{Button, Label};
+use sulis_core::widgets::{Button, Label};
 use sulis_rules::{Slot, QuickSlot};
 use sulis_state::{EntityState, ChangeListener, GameState, script::ScriptItemKind};
 

@@ -26,7 +26,7 @@ use sulis_core::io::{DrawList, GraphicsRenderer};
 use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
 use sulis_core::util::{gen_rand, unable_to_create_error, Point};
 use sulis_module::{Module, area::MAX_AREA_SIZE, area::tile::{Tile, TerrainKind, TerrainRules, EdgeRules}};
-use sulis_widgets::{Button, Label, Spinner, ScrollPane};
+use sulis_core::widgets::{Button, Label, Spinner, ScrollPane};
 
 use crate::{AreaModel, EditorMode};
 

@@ -47,7 +47,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
-use sulis_widgets::{Button, Label};
+use sulis_core::widgets::{Button, Label};
 use sulis_module::actor::Sex;
 use sulis_module::{Ability, ActorBuilder, Class, Faction, ImageLayer, InventoryBuilder, Module, Race};
 use sulis_rules::{AttributeList};

@@ -19,7 +19,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_core::ui::{Widget, WidgetKind, WidgetState};
-use sulis_widgets::{TextArea};
+use sulis_core::widgets::{TextArea};
 use sulis_module::{ability, Ability, Module};
 
 use crate::item_button::{add_bonus_text_args, add_prereq_text_args};

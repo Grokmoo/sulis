@@ -19,7 +19,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_core::ui::{Widget, WidgetKind};
-use sulis_widgets::{Label, TextArea};
+use sulis_core::widgets::{Label, TextArea};
 use sulis_module::{Ability, Class};
 
 use crate::{CharacterBuilder};

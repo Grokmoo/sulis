@@ -19,7 +19,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind, animation_state};
-use sulis_widgets::{Label, Button, TextArea};
+use sulis_core::widgets::{Label, Button, TextArea};
 use sulis_rules::Time;
 use sulis_module::Module;
 use sulis_state::GameState;

@@ -25,7 +25,7 @@ use sulis_core::ui::{animation_state, Widget, WidgetKind, Callback};
 use sulis_core::util::{Size, ExtInt};
 use sulis_module::{actor::OwnedAbility, Ability, Module, ability::{AbilityGroup, Duration}};
 use sulis_state::{ChangeListener, EntityState, GameState, Script};
-use sulis_widgets::{Label, TextArea, Button};
+use sulis_core::widgets::{Label, TextArea, Button};
 
 pub const NAME: &str = "abilities_bar";
 

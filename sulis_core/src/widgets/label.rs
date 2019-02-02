@@ -18,11 +18,13 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
+use crate::widget_kind;
 use crate::ui::theme::{self, HorizontalAlignment, VerticalAlignment};
 use crate::ui::{LineRenderer, Widget, WidgetKind};
 use crate::io::event::ClickKind;
 use crate::io::GraphicsRenderer;
 use crate::util::Point;
+use crate::widgets::TextArea;
 
 pub struct Label {
     pub text: Option<String>,
@@ -110,7 +112,7 @@ impl WidgetKind for Label {
     fn on_mouse_move(&mut self, widget: &Rc<RefCell<Widget>>, _dx: f32, _dy: f32) -> bool {
         if self.tooltip.is_empty() { return false; }
 
-        let tooltip = Widget::with_theme(Label::empty(), "tooltip");
+        let tooltip = Widget::with_theme(TextArea::empty(), "tooltip");
         tooltip.borrow_mut().state.add_text_arg("0", &self.tooltip);
 
         let (x, y) = {

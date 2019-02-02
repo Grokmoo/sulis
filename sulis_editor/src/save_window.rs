@@ -20,7 +20,7 @@ use std::cell::RefCell;
 
 use sulis_core::config::Config;
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_widgets::{Button, InputField, Label, Spinner};
+use sulis_core::widgets::{Button, InputField, Label, Spinner};
 use sulis_module::area::{LocationKind, OnRest};
 
 use crate::AreaEditor;

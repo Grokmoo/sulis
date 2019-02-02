@@ -21,7 +21,7 @@ use std::cell::RefCell;
 use sulis_state::{ChangeListener, EntityState, GameState};
 use sulis_core::io::event;
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_widgets::{Button, Label, ProgressBar};
+use sulis_core::widgets::{Button, Label, ProgressBar};
 
 use crate::{CharacterBuilder};
 

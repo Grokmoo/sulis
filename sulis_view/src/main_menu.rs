@@ -40,7 +40,7 @@ use sulis_core::config::Config;
 use sulis_core::io::{InputAction, MainLoopUpdater, DisplayConfiguration};
 use sulis_core::ui::*;
 use sulis_core::util;
-use sulis_widgets::{Button, ConfirmationWindow, Label};
+use sulis_core::widgets::{Button, ConfirmationWindow, Label};
 use sulis_module::{Module, modification};
 use sulis_state::{NextGameStep, save_file};
 

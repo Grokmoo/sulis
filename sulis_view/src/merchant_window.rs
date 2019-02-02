@@ -20,7 +20,7 @@ use std::cell::{Cell, RefCell};
 
 use sulis_state::{ChangeListener, EntityState, GameState};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_widgets::{Button, Label};
+use sulis_core::widgets::{Button, Label};
 
 use crate::{ItemListPane, item_list_pane::Filter};
 

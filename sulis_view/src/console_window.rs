@@ -22,7 +22,7 @@ use rlua;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::io::InputAction;
-use sulis_widgets::{Label, InputField};
+use sulis_core::widgets::{Label, InputField};
 use sulis_state::{GameState, ScriptState};
 
 pub const NAME: &str = "console_window";

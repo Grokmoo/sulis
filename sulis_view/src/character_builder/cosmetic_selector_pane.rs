@@ -27,7 +27,7 @@ use sulis_core::util::Point;
 use sulis_rules::Slot;
 use sulis_module::actor::Sex;
 use sulis_module::{ImageLayer, ImageLayerSet, Item, Race};
-use sulis_widgets::{Button, InputField, Label, ScrollPane};
+use sulis_core::widgets::{Button, InputField, Label, ScrollPane};
 
 use crate::CharacterBuilder;
 use crate::character_builder::{BuilderPane, ColorButton};

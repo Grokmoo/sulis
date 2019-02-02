@@ -26,7 +26,7 @@ use sulis_rules::{Bonus, BonusList, Armor, DamageKind, QuickSlot, Slot};
 use sulis_module::{ability, Item, item::{format_item_value, format_item_weight}, Module, PrereqList};
 use sulis_state::{EntityState, Script, GameState, ItemState, inventory::has_proficiency};
 use sulis_state::script::ScriptItemKind;
-use sulis_widgets::{Label, TextArea};
+use sulis_core::widgets::{Label, TextArea};
 use crate::{ItemActionMenu, MerchantWindow, PropWindow, RootView};
 
 enum Kind {

@@ -21,7 +21,7 @@ use std::cell::{RefCell};
 use sulis_core::ui::*;
 use sulis_state::{ActorState, NextGameStep};
 use sulis_module::{Actor, Module};
-use sulis_widgets::{Button, ConfirmationWindow, Label, TextArea, ScrollPane};
+use sulis_core::widgets::{Button, ConfirmationWindow, Label, TextArea, ScrollPane};
 
 use crate::character_window::create_details_text_box;
 use crate::{CharacterBuilder, LoadingScreen, main_menu::MainMenu};

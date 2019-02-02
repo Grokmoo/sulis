@@ -20,7 +20,7 @@ use std::cell::RefCell;
 
 use sulis_module::{Cutscene};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_widgets::{Button, TextArea};
+use sulis_core::widgets::{Button, TextArea};
 use sulis_state::GameState;
 
 pub const NAME: &str = "cutscene_window";

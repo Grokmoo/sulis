@@ -22,7 +22,7 @@ use sulis_core::config::{Config, EditorConfig};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::util::Point;
 use sulis_module::{Module, area::{ToKind, MAX_AREA_SIZE}};
-use sulis_widgets::{Button, InputField, Label, list_box, ListBox, Spinner};
+use sulis_core::widgets::{Button, InputField, Label, list_box, ListBox, Spinner};
 
 use crate::AreaEditor;
 

@@ -29,4 +29,4 @@ pub mod io;
 pub mod resource;
 pub mod ui;
 pub mod util;
-
+pub mod widgets;

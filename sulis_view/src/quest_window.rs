@@ -19,7 +19,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_widgets::{Label, Button, TextArea, ScrollPane};
+use sulis_core::widgets::{Label, Button, TextArea, ScrollPane};
 use sulis_module::{Quest, Module, on_trigger::QuestEntryState};
 use sulis_state::{GameState, ChangeListener};
 

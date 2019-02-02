@@ -19,7 +19,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_widgets::{Button, ConfirmationWindow};
+use sulis_core::widgets::{Button, ConfirmationWindow};
 use sulis_state::{GameState};
 
 use crate::{LoadWindow, RootView};

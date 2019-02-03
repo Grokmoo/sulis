@@ -107,6 +107,7 @@ themes:
     children:
       title:
         from: label
+        kind: Label
         background: bg_base
         relative:
           x: Center

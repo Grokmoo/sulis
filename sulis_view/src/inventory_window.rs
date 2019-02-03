@@ -74,8 +74,6 @@ impl WidgetKind for InventoryWindow {
             widget_ref.borrow_mut().invalidate_children();
         })));
 
-        let title = Widget::with_theme(Label::empty(), "title");
-
         let close = Widget::with_theme(Button::empty(), "close");
         close.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
             let (parent, _) = Widget::parent::<InventoryWindow>(widget);
@@ -149,6 +147,6 @@ impl WidgetKind for InventoryWindow {
         trace!("Inventory window creation time: {}",
                util::format_elapsed_secs(start_time.elapsed()));
 
-        vec![title, close, equipped_area, item_list_pane, stash_title]
+        vec![close, equipped_area, item_list_pane, stash_title]
     }
 }

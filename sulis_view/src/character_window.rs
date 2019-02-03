@@ -27,7 +27,7 @@ use sulis_core::resource::write_to_file;
 use sulis_core::util::ExtInt;
 use sulis_core::ui::{Callback, Widget, WidgetKind, WidgetState};
 use sulis_rules::{Attribute, DamageKind, Slot, QuickSlot};
-use sulis_core::widgets::{Button, Label, TextArea, ScrollPane};
+use sulis_core::widgets::{Button, TextArea, ScrollPane};
 use sulis_module::{ActorBuilder, Module, InventoryBuilder, ItemSaveState, ItemListEntrySaveState};
 use sulis_state::{ActorState, Effect, GameState, ChangeListener, EntityState};
 
@@ -84,9 +84,6 @@ impl WidgetKind for CharacterWindow {
             window.character = Rc::clone(entity);
             widget_ref.borrow_mut().invalidate_children();
         })));
-
-        let title = Widget::with_theme(Label::empty(), "title");
-        title.borrow_mut().state.add_text_arg("name", &self.character.borrow().actor.actor.name);
 
         let close = Widget::with_theme(Button::empty(), "close");
         close.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
@@ -148,7 +145,7 @@ impl WidgetKind for CharacterWindow {
             }
         };
 
-        vec![title, close, cur_pane, level_up, export, char_pane, abilities_pane, effects_pane]
+        vec![close, cur_pane, level_up, export, char_pane, abilities_pane, effects_pane]
     }
 }
 

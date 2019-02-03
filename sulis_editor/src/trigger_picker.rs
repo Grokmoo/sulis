@@ -105,8 +105,7 @@ impl WidgetKind for TriggerPicker {
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let width = Widget::with_theme(Spinner::new(self.cur_width, 1, 50), "width");
         width.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, kind| {
-            let parent = Widget::get_parent(&widget);
-            let picker = Widget::downcast_kind_mut::<TriggerPicker>(&parent);
+            let (_, picker) = Widget::parent_mut::<TriggerPicker>(widget);
 
             let spinner = match kind.as_any().downcast_ref::<Spinner>() {
                 None => panic!("Unable to downcast to spinner"),
@@ -117,8 +116,7 @@ impl WidgetKind for TriggerPicker {
         })));
         let height = Widget::with_theme(Spinner::new(self.cur_height, 1, 50), "height");
         height.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, kind| {
-            let parent = Widget::get_parent(&widget);
-            let picker = Widget::downcast_kind_mut::<TriggerPicker>(&parent);
+            let (_, picker) = Widget::parent_mut::<TriggerPicker>(widget);
 
             let spinner = match kind.as_any().downcast_ref::<Spinner>() {
                 None => panic!("Unable to downcast to spinner"),

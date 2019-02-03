@@ -136,8 +136,7 @@ impl ActorCreatorWindow {
 
             let prev = Widget::with_theme(Button::empty(), "prev_button");
             prev.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let parent = Widget::go_up_tree(widget, 2);
-                let window = Widget::downcast_kind_mut::<ActorCreatorWindow>(&parent);
+                let (_, window) = Widget::parent_mut::<ActorCreatorWindow>(widget);
 
                 let mut hue = window.selected_hue;
                 hue -= 0.1;
@@ -149,8 +148,7 @@ impl ActorCreatorWindow {
 
             let next = Widget::with_theme(Button::empty(), "next_button");
             next.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let parent = Widget::go_up_tree(widget, 2);
-                let window = Widget::downcast_kind_mut::<ActorCreatorWindow>(&parent);
+                let (_, window) = Widget::parent_mut::<ActorCreatorWindow>(widget);
 
                 let mut hue = window.selected_hue;
                 hue += 0.1;
@@ -176,8 +174,7 @@ impl ActorCreatorWindow {
             let len = images.len();
             let images_ref = images.clone();
             prev.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let parent = Widget::go_up_tree(widget, 3);
-                let window = Widget::downcast_kind_mut::<ActorCreatorWindow>(&parent);
+                let (_, window) = Widget::parent_mut::<ActorCreatorWindow>(widget);
 
                 let index = window.selected_images.get(&layer).unwrap().0;
                 if index > 0 {
@@ -191,8 +188,7 @@ impl ActorCreatorWindow {
 
             let images_ref = images.clone();
             next.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let parent = Widget::go_up_tree(widget, 3);
-                let window = Widget::downcast_kind_mut::<ActorCreatorWindow>(&parent);
+                let (_, window) = Widget::parent_mut::<ActorCreatorWindow>(widget);
 
                 let index = window.selected_images.get(&layer).unwrap().0;
                 if index < len - 1 {
@@ -241,12 +237,14 @@ impl WidgetKind for ActorCreatorWindow {
         let title = Widget::with_theme(Label::empty(), "title");
 
         let close = Widget::with_theme(Button::empty(), "close");
-        close.borrow_mut().state.add_callback(Callback::remove_parent());
+        close.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+            let (parent, _) = Widget::parent_mut::<ActorCreatorWindow>(widget);
+            parent.borrow_mut().mark_for_removal();
+        })));
 
         let accept = Widget::with_theme(Button::empty(), "accept_button");
         accept.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-            let parent = Widget::get_parent(widget);
-            let window = Widget::downcast_kind_mut::<ActorCreatorWindow>(&parent);
+            let (_, window) = Widget::parent_mut::<ActorCreatorWindow>(widget);
             window.save();
         })));
         accept.borrow_mut().state.set_enabled(self.selected_race.is_some());
@@ -269,7 +267,7 @@ impl WidgetKind for ActorCreatorWindow {
 
         let window_ref = Rc::clone(&widget);
         let cb: Rc<Fn(Option<&list_box::Entry<Rc<Race>>>)> = Rc::new(move |active_entry| {
-            let window = Widget::downcast_kind_mut::<ActorCreatorWindow>(&window_ref);
+            let window = Widget::kind_mut::<ActorCreatorWindow>(&window_ref);
             match active_entry {
                 None => window.selected_race = None,
                 Some(ref entry) => window.selected_race = Some(Rc::clone(entry.item())),
@@ -313,8 +311,7 @@ impl WidgetKind for ActorCreatorWindow {
                     widget.borrow_mut().state.set_active(true);
                 }
                 widget.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                    let parent = Widget::go_up_tree(widget, 2);
-                    let window = Widget::downcast_kind_mut::<ActorCreatorWindow>(&parent);
+                    let (parent, window) = Widget::parent_mut::<ActorCreatorWindow>(widget);
                     window.selected_faction = faction;
                     parent.borrow_mut().invalidate_children();
                 })));
@@ -331,8 +328,7 @@ impl WidgetKind for ActorCreatorWindow {
                     widget.borrow_mut().state.set_active(true);
                 }
                 widget.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                    let parent = Widget::go_up_tree(widget, 2);
-                    let window = Widget::downcast_kind_mut::<ActorCreatorWindow>(&parent);
+                    let (parent, window) = Widget::parent_mut::<ActorCreatorWindow>(widget);
                     window.selected_sex = sex;
                     parent.borrow_mut().invalidate_children();
                 })));
@@ -348,8 +344,7 @@ impl WidgetKind for ActorCreatorWindow {
                     widget.borrow_mut().state.set_active(true);
                 }
                 widget.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                    let parent = Widget::go_up_tree(widget, 2);
-                    let window = Widget::downcast_kind_mut::<ActorCreatorWindow>(&parent);
+                    let (parent, window) = Widget::parent_mut::<ActorCreatorWindow>(widget);
                     window.selected_class = Rc::clone(&class);
                     parent.borrow_mut().invalidate_children();
                 })));

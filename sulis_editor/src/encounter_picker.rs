@@ -120,8 +120,7 @@ impl WidgetKind for EncounterPicker {
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let width = Widget::with_theme(Spinner::new(self.cur_width, 1, 50), "width");
         width.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, kind| {
-            let parent = Widget::get_parent(&widget);
-            let picker = Widget::downcast_kind_mut::<EncounterPicker>(&parent);
+            let (_, picker) = Widget::parent_mut::<EncounterPicker>(widget);
 
             let spinner = match kind.as_any().downcast_ref::<Spinner>() {
                 None => panic!("Unable to downcast to spinner"),
@@ -132,8 +131,7 @@ impl WidgetKind for EncounterPicker {
         })));
         let height = Widget::with_theme(Spinner::new(self.cur_height, 1, 50), "height");
         height.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, kind| {
-            let parent = Widget::get_parent(&widget);
-            let picker = Widget::downcast_kind_mut::<EncounterPicker>(&parent);
+            let (_, picker) = Widget::parent_mut::<EncounterPicker>(widget);
 
             let spinner = match kind.as_any().downcast_ref::<Spinner>() {
                 None => panic!("Unable to downcast to spinner"),
@@ -154,7 +152,7 @@ impl WidgetKind for EncounterPicker {
                 let button = Widget::with_theme(Button::empty(), "encounter_button");
                 button.borrow_mut().state.add_text_arg("name", &encounter.id);
                 button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                    let parent = Widget::get_parent(widget);
+                    let parent = Widget::direct_parent(widget);
                     let cur_state = widget.borrow_mut().state.is_active();
                     if !cur_state {
                         trace!("Set active encounter: {}", widget.borrow().state.text);
@@ -164,9 +162,8 @@ impl WidgetKind for EncounterPicker {
                         widget.borrow_mut().state.set_active(true);
                     }
 
-                    let parent = Widget::go_up_tree(&parent, 2);
-                    let encounter_picker = Widget::downcast_kind_mut::<EncounterPicker>(&parent);
-                    encounter_picker.cur_encounter = Some(Rc::clone(&encounter));
+                    let (_, picker) = Widget::parent_mut::<EncounterPicker>(&parent);
+                    picker.cur_encounter = Some(Rc::clone(&encounter));
                 })));
 
                 scrollpane.borrow().add_to_content(button);

@@ -66,7 +66,10 @@ impl WidgetKind for TransitionWindow {
         widgets.push(title);
 
         let close = Widget::with_theme(Button::empty(), "close");
-        close.borrow_mut().state.add_callback(Callback::remove_parent());
+        close.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+            let (parent, _) = Widget::parent::<TransitionWindow>(widget);
+            parent.borrow_mut().mark_for_removal();
+        })));
         widgets.push(close);
 
         if let Some(index) = self.selected_transition {
@@ -103,7 +106,7 @@ impl WidgetKind for TransitionWindow {
                 }
 
                 button.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-                    let parent = Widget::get_parent(widget);
+                    let parent = Widget::direct_parent(widget);
 
                     for child in parent.borrow().children.iter() {
                         child.borrow_mut().state.set_active(false);
@@ -128,17 +131,16 @@ impl WidgetKind for TransitionWindow {
 
             let area_editor_ref = Rc::clone(&self.area_editor);
             delete.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let window = Widget::get_parent(widget);
-                window.borrow_mut().invalidate_children();
+                let (parent, window) = Widget::parent_mut::<TransitionWindow>(widget);
+                parent.borrow_mut().invalidate_children();
 
-                let transition_window = Widget::downcast_kind_mut::<TransitionWindow>(&window);
-                let cur_index = match transition_window.selected_transition {
+                let cur_index = match window.selected_transition {
                     Some(index) => index,
                     None => return,
                 };
 
                 area_editor_ref.borrow_mut().model.delete_transition(cur_index);
-                transition_window.selected_transition = None;
+                window.selected_transition = None;
             })));
 
             let cur_area_button = Widget::with_theme(Button::empty(), "cur_area_button");
@@ -175,11 +177,9 @@ impl WidgetKind for TransitionWindow {
                 let from = Point::new(from_x_ref.borrow().value(), from_y_ref.borrow().value());
                 let to = Point::new(to_x_ref.borrow().value(), to_y_ref.borrow().value());
 
-                let window = Widget::get_parent(widget);
-                window.borrow_mut().invalidate_children();
-
-                let transition_window = Widget::downcast_kind_mut::<TransitionWindow>(&window);
-                let cur_index = match transition_window.selected_transition {
+                let (parent, window) = Widget::parent_mut::<TransitionWindow>(widget);
+                parent.borrow_mut().invalidate_children();
+                let cur_index = match window.selected_transition {
                     Some(index) => index,
                     None => return,
                 };
@@ -227,11 +227,10 @@ impl WidgetKind for TransitionWindow {
         let mut entries: Vec<list_box::Entry<String>> = Vec::new();
         for (index, ref transition) in self.area_editor.borrow().model.transitions_iter().enumerate() {
             let cb = Callback::new(Rc::new(move |widget, _| {
-                let window = Widget::go_up_tree(widget, 2);
-                window.borrow_mut().invalidate_children();
+                let (parent, window) = Widget::parent_mut::<TransitionWindow>(widget);
+                parent.borrow_mut().invalidate_children();
 
-                let transition_window = Widget::downcast_kind_mut::<TransitionWindow>(&window);
-                transition_window.selected_transition = Some(index);
+                window.selected_transition = Some(index);
             }));
 
             let to = match transition.to {
@@ -257,21 +256,15 @@ impl WidgetKind for TransitionWindow {
 
         let area_editor_ref = Rc::clone(&self.area_editor);
         new.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-            let window = Widget::get_parent(widget);
-            window.borrow_mut().invalidate_children();
+            let (parent, window) = Widget::parent_mut::<TransitionWindow>(widget);
+            parent.borrow_mut().invalidate_children();
 
             let index = match area_editor_ref.borrow_mut().model.new_transition() {
                 None => return,
                 Some(index) => index,
             };
 
-            let kind = &window.borrow().kind;
-            let mut kind = kind.borrow_mut();
-            let transition_window = match kind.as_any_mut().downcast_mut::<TransitionWindow>() {
-                Some(window) => window,
-                None => unreachable!("Unable to downcast to transition window."),
-            };
-            transition_window.selected_transition = Some(index);
+            window.selected_transition = Some(index);
         })));
         widgets.push(new);
 

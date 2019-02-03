@@ -52,7 +52,10 @@ impl WidgetKind for LoadWindow {
         let title = Widget::with_theme(Label::empty(), "title");
 
         let close = Widget::with_theme(Button::empty(), "close");
-        close.borrow_mut().state.add_callback(Callback::remove_parent());
+        close.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+            let (parent, _) = Widget::parent_mut::<LoadWindow>(widget);
+            parent.borrow_mut().mark_for_removal();
+        })));
 
         let load = Widget::with_theme(Button::empty(), "load_button");
         load.borrow_mut().state.set_enabled(false);
@@ -63,7 +66,7 @@ impl WidgetKind for LoadWindow {
 
         let load_ref = Rc::clone(&load);
         let cb = Callback::new(Rc::new(move |widget, _kind| {
-            let parent = Widget::get_parent(widget);
+            let parent = Widget::direct_parent(widget);
 
             let cur_state = widget.borrow().state.is_active();
             if !cur_state {
@@ -96,7 +99,7 @@ impl WidgetKind for LoadWindow {
 
             area_editor_ref.borrow_mut().model.load(&dir_str, area);
 
-            let parent = Widget::get_parent(widget);
+            let (parent, _) = Widget::parent::<LoadWindow>(widget);
             parent.borrow_mut().mark_for_removal();
         })));
         scrollpane.borrow().add_to_content(areas_list);

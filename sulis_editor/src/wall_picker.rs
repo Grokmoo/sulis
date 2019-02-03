@@ -430,27 +430,15 @@ impl WidgetKind for WallPicker {
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         self.level_widget.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, kind| {
-            let parent = Widget::get_parent(&widget);
-            let picker = Widget::downcast_kind_mut::<WallPicker>(&parent);
-
-            let spinner = match kind.as_any().downcast_ref::<Spinner>() {
-                None => panic!("Unable to downcast spinner"),
-                Some(widget) => widget,
-            };
-
+            let (_, picker) = Widget::parent_mut::<WallPicker>(widget);
+            let spinner = Widget::downcast::<Spinner>(kind);
             picker.level = spinner.value();
         })));
         let level_label = Widget::with_theme(Label::empty(), "level_label");
 
         self.brush_size_widget.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, kind| {
-            let parent = Widget::get_parent(&widget);
-            let picker = Widget::downcast_kind_mut::<WallPicker>(&parent);
-
-            let spinner = match kind.as_any().downcast_ref::<Spinner>() {
-                None => panic!("Unable to downcast to spinner"),
-                Some(widget) => widget,
-            };
-
+            let (_, picker) = Widget::parent_mut::<WallPicker>(widget);
+            let spinner = Widget::downcast::<Spinner>(kind);
             picker.brush_size = spinner.value();
         })));
 
@@ -468,7 +456,7 @@ impl WidgetKind for WallPicker {
 
             let no_wall_ref = Rc::clone(&no_wall_button);
             let cb: Callback = Callback::new(Rc::new(move |widget, _| {
-                let parent = Widget::get_parent(widget);
+                let parent = Widget::direct_parent(widget);
                 let cur_state = widget.borrow_mut().state.is_active();
                 if !cur_state {
                     no_wall_ref.borrow_mut().state.set_active(false);
@@ -477,9 +465,8 @@ impl WidgetKind for WallPicker {
                     }
                     widget.borrow_mut().state.set_active(true);
 
-                    let parent = Widget::go_up_tree(&parent, 2);
-                    let wall_picker = Widget::downcast_kind_mut::<WallPicker>(&parent);
-                    wall_picker.cur_wall = Some(i);
+                    let (_, picker) = Widget::parent_mut::<WallPicker>(&parent);
+                    picker.cur_wall = Some(i);
                 }
             }));
             button.borrow_mut().state.add_callback(cb);
@@ -488,8 +475,7 @@ impl WidgetKind for WallPicker {
         }
 
         no_wall_button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-            let parent = Widget::get_parent(&widget);
-            let picker = Widget::downcast_kind_mut::<WallPicker>(&parent);
+            let (_, picker) = Widget::parent_mut::<WallPicker>(widget);
             picker.cur_wall = None;
             for button in all_buttons.iter() {
                 button.borrow_mut().state.set_active(false);

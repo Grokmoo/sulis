@@ -133,8 +133,7 @@ impl WidgetKind for ElevPicker {
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let brush_size = Widget::with_theme(Spinner::new(self.brush_size, 1, 10), "brush_size");
         brush_size.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, kind| {
-            let parent = Widget::get_parent(&widget);
-            let picker = Widget::downcast_kind_mut::<ElevPicker>(&parent);
+            let (_, picker) = Widget::parent_mut::<ElevPicker>(widget);
 
             let spinner = match kind.as_any().downcast_ref::<Spinner>() {
                 None => panic!("Unable to downcast to spinner"),
@@ -150,8 +149,7 @@ impl WidgetKind for ElevPicker {
             Spinner::new(self.set_elev_to as i32, 0,
                          Config::editor_config().area.elev_tiles.len() as i32 - 1), "elev");
         elev.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, kind| {
-            let parent = Widget::get_parent(&widget);
-            let picker = Widget::downcast_kind_mut::<ElevPicker>(&parent);
+            let (_, picker) = Widget::parent_mut::<ElevPicker>(widget);
 
             let spinner = match kind.as_any().downcast_ref::<Spinner>() {
                 None => panic!("Unable to downcast to spinner"),

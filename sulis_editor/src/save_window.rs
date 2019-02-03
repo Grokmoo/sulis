@@ -50,12 +50,15 @@ impl WidgetKind for SaveWindow {
         let title = Widget::with_theme(Label::empty(), "title");
 
         let close = Widget::with_theme(Button::empty(), "close");
-        close.borrow_mut().state.add_callback(Callback::remove_parent());
+        close.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+            let (parent, _) = Widget::parent::<SaveWindow>(widget);
+            parent.borrow_mut().mark_for_removal();
+        })));
 
         let save = Widget::with_theme(Button::empty(), "save_button");
         let area_editor_kind_ref = Rc::clone(&self.area_editor);
         save.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _kind| {
-            let parent = Widget::get_parent(widget);
+            let (parent, _) = Widget::parent::<SaveWindow>(widget);
             let filename_prefix = format!("../{}/{}/areas/",
                                           Config::resources_config().campaigns_directory,
                                           Config::editor_config().module);
@@ -122,7 +125,7 @@ impl WidgetKind for SaveWindow {
 
                 let area_editor_ref = Rc::clone(&self.area_editor);
                 button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                    let parent = Widget::get_parent(widget);
+                    let parent = Widget::direct_parent(widget);
                     for child in parent.borrow().children.iter() {
                         child.borrow_mut().state.set_active(false);
                     }

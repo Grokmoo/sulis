@@ -514,7 +514,7 @@ themes:
         size: [150, 80]
         children:
           title:
-            text: "#name#"
+            background: empty
           node:
             relative:
               width: Max
@@ -843,7 +843,7 @@ themes:
           height: Zero
         children:
           title:
-            text: "#name#"
+            text: "Container"
           icon:
             size: [20, 20]
             background: bg_base

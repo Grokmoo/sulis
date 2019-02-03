@@ -163,15 +163,13 @@ impl WidgetKind for FormationWindow {
             widget_ref.borrow_mut().invalidate_children();
         })));
 
-        let title = Widget::with_theme(Label::empty(), "title");
-
         let close = Widget::with_theme(Button::empty(), "close");
         close.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
             let (parent, _) = Widget::parent::<FormationWindow>(widget);
             parent.borrow_mut().mark_for_removal();
         })));
 
-        let mut children = vec![title, close];
+        let mut children = vec![close];
 
         self.entries.clear();
         let party = GameState::party();

@@ -55,8 +55,6 @@ impl WidgetKind for QuestWindow {
             }
         }
 
-        let label = Widget::with_theme(Label::empty(), "title");
-
         let close = Widget::with_theme(Button::empty(), "close");
             close.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
                 let (parent, _) = Widget::parent::<QuestWindow>(widget);
@@ -150,7 +148,7 @@ impl WidgetKind for QuestWindow {
             }
         }
 
-        vec![label, close, quest_list_widget, quest_entries_widget, show_completed_toggle,
+        vec![close, quest_list_widget, quest_entries_widget, show_completed_toggle,
             show_completed_label]
     }
 }

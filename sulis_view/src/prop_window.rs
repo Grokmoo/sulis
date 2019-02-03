@@ -67,7 +67,6 @@ impl WidgetKind for PropWindow {
     }
 
     fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
-        let title = Widget::with_theme(Label::empty(), "title");
         let icon = Widget::with_theme(Label::empty(), "icon");
         let close = Widget::with_theme(Button::empty(), "close");
         let take_all = Widget::with_theme(Button::empty(), "take_all");
@@ -86,7 +85,6 @@ impl WidgetKind for PropWindow {
 
             prop.listeners.add(ChangeListener::invalidate(NAME, widget));
 
-            title.borrow_mut().state.add_text_arg("name", &prop.prop.name);
             icon.borrow_mut().state.foreground = Some(Rc::clone(&prop.prop.icon));
 
             close.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
@@ -111,6 +109,6 @@ impl WidgetKind for PropWindow {
         let item_list_pane = Widget::with_defaults(
             ItemListPane::new_prop(&self.player, self.prop_index, &self.filter));
 
-        vec![title, icon, close, item_list_pane, take_all]
+        vec![icon, close, item_list_pane, take_all]
     }
 }

@@ -19,7 +19,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind, animation_state};
-use sulis_core::widgets::{Label, Button, TextArea};
+use sulis_core::widgets::{Button, TextArea};
 use sulis_rules::Time;
 use sulis_module::Module;
 use sulis_state::GameState;
@@ -82,8 +82,7 @@ impl WidgetKind for WorldMapWindow {
     }
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
-        let label = Widget::with_theme(Label::empty(), "title");
-        let bg= Widget::empty("bg");
+        let bg = Widget::empty("bg");
 
         let close = Widget::with_theme(Button::empty(), "close");
         close.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
@@ -178,6 +177,6 @@ impl WidgetKind for WorldMapWindow {
             Widget::add_child_to(&self.content, Rc::clone(&entry.label));
         }
 
-        vec![label, bg, close, labels, Rc::clone(&self.content)]
+        vec![bg, close, labels, Rc::clone(&self.content)]
     }
 }

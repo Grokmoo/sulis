@@ -20,7 +20,7 @@ use std::cell::{Cell, RefCell};
 
 use sulis_state::{ChangeListener, EntityState, GameState};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_core::widgets::{Button, Label};
+use sulis_core::widgets::{Button};
 
 use crate::{ItemListPane, item_list_pane::Filter};
 
@@ -76,8 +76,6 @@ impl WidgetKind for MerchantWindow {
             merchant.listeners.add(ChangeListener::invalidate(NAME, widget));
         }
 
-        let title = Widget::with_theme(Label::empty(), "title");
-
         let close = Widget::with_theme(Button::empty(), "close");
         close.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
             let (parent, _) = Widget::parent::<MerchantWindow>(widget);
@@ -87,6 +85,6 @@ impl WidgetKind for MerchantWindow {
         let item_list_pane = Widget::with_defaults(
             ItemListPane::new_merchant(&self.player, self.merchant_id.to_string(), &self.filter));
 
-        vec![title, close, item_list_pane]
+        vec![close, item_list_pane]
     }
 }

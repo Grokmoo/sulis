@@ -197,18 +197,17 @@ impl Widget {
         -> (Rc<RefCell<Widget>>, &'a mut T) {
         let mut current = Rc::clone(widget);
         loop {
-            let parent = Rc::clone(current.borrow().parent.as_ref().unwrap());
-            let kind = Rc::clone(&parent.borrow().kind);
-
-            match kind.borrow_mut().as_any_mut().downcast_mut::<T>() {
-                None => (),
-                Some(kind) => {
+            let kind = Rc::clone(&current.borrow().kind);
+            if let Ok(mut kind) = kind.try_borrow_mut() {
+                if let Some(kind) = kind.as_any_mut().downcast_mut::<T>() {
                     let kind = unsafe {
                         mem::transmute::<_, &'a mut T>(kind)
                     };
-                    return (parent, kind);
+                    return (current, kind);
                 }
             }
+
+            let parent = Rc::clone(current.borrow().parent.as_ref().unwrap());
             current = parent;
         }
     }
@@ -217,18 +216,17 @@ impl Widget {
         -> (Rc<RefCell<Widget>>, &'a T) {
         let mut current = Rc::clone(widget);
         loop {
-            let parent = Rc::clone(current.borrow().parent.as_ref().unwrap());
-            let kind = Rc::clone(&parent.borrow().kind);
-
-            match kind.borrow().as_any().downcast_ref::<T>() {
-                None => (),
-                Some(kind) => {
+            let kind = Rc::clone(&current.borrow().kind);
+            if let Ok(kind) = kind.try_borrow() {
+                if let Some(kind) = kind.as_any().downcast_ref::<T>() {
                     let kind = unsafe {
                         mem::transmute::<_, &'a T>(kind)
                     };
-                    return (parent, kind);
+                    return (current, kind);
                 }
             }
+
+            let parent = Rc::clone(current.borrow().parent.as_ref().unwrap());
             current = parent;
         }
     }

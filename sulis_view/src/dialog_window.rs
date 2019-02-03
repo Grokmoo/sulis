@@ -20,7 +20,7 @@ use std::cell::RefCell;
 
 use sulis_core::ui::{Widget, WidgetKind, theme, Callback};
 use sulis_core::io::{event, InputAction};
-use sulis_core::widgets::{Label, TextArea};
+use sulis_core::widgets::{TextArea};
 use sulis_module::{Actor, OnTrigger, MerchantData, Conversation,
     conversation::{Response}, Module, on_trigger::{self, Kind, QuestStateData}};
 use sulis_state::{EntityState, ChangeListener, GameState, ItemState,
@@ -80,9 +80,6 @@ impl WidgetKind for DialogWindow {
         self.entity.borrow_mut().actor.listeners.add(
             ChangeListener::invalidate(NAME, widget));
 
-        let title = Widget::with_theme(Label::empty(), "title");
-        title.borrow_mut().state.add_text_arg("name", &self.entity.borrow().actor.actor.name);
-
         let cur_text = self.convo.text(&self.cur_node);
         let responses = self.convo.responses(&self.cur_node);
 
@@ -120,7 +117,7 @@ impl WidgetKind for DialogWindow {
             }
         }
 
-        vec![title, node_widget, responses_widget]
+        vec![node_widget, responses_widget]
     }
 }
 

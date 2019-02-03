@@ -47,7 +47,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
-use sulis_core::widgets::{Button, Label};
+use sulis_core::widgets::{Button};
 use sulis_module::actor::Sex;
 use sulis_module::{Ability, ActorBuilder, Class, Faction, ImageLayer, InventoryBuilder, Module, Race};
 use sulis_rules::{AttributeList};
@@ -178,7 +178,6 @@ impl WidgetKind for CharacterBuilder {
     fn as_any_mut(&mut self) -> &mut Any { self }
 
     fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
-        let title = Widget::with_theme(Label::empty(), "title");
         let close = Widget::with_theme(Button::empty(), "close");
         close.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
             let (parent, _) = Widget::parent::<CharacterBuilder>(widget);
@@ -188,7 +187,7 @@ impl WidgetKind for CharacterBuilder {
         let builder_set = Rc::clone(&self.builder_set);
         let mut children = builder_set.on_add(self, widget);
 
-        children.append(&mut vec![title, close, Rc::clone(&self.next),
+        children.append(&mut vec![close, Rc::clone(&self.next),
             Rc::clone(&self.prev), Rc::clone(&self.finish)]);
         children
     }

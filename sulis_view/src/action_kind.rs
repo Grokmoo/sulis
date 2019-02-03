@@ -279,8 +279,7 @@ impl ActionKind for LootPropAction {
             state.is_active()
         };
 
-        let root = Widget::get_root(&widget);
-        let view = Widget::downcast_kind_mut::<RootView>(&root);
+        let (root, view) = Widget::parent_mut::<RootView>(widget);
         view.set_prop_window(&root, is_active, self.index);
     }
 }
@@ -348,8 +347,7 @@ impl ActionKind for TransitionAction {
                 GameState::transition(&None, x, y, time);
             },
             ToKind::WorldMap => {
-                let root = Widget::get_root(widget);
-                let view = Widget::downcast_kind_mut::<RootView>(&root);
+                let (root, view) = Widget::parent_mut::<RootView>(widget);
                 view.set_map_window(&root, true, true);
             }
         }
@@ -567,8 +565,7 @@ impl ActionKind for MoveAction {
 
     fn fire_action(&mut self, widget: &Rc<RefCell<Widget>>) {
         trace!("Firing move action");
-        let root = Widget::get_root(widget);
-        let view = Widget::downcast_kind_mut::<RootView>(&root);
+        let (root, view) = Widget::parent_mut::<RootView>(widget);
         view.set_prop_window(&root, false, 0);
         view.set_map_window(&root, false, false);
 

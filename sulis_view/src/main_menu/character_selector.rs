@@ -100,13 +100,13 @@ impl WidgetKind for CharacterSelector {
             let root = Widget::get_root(&widget);
 
             let actor_id = actor_id.clone();
-            let parent = Widget::get_parent(&widget);
+            let (parent, _) = Widget::parent_mut::<CharacterSelector>(widget);
             let window = ConfirmationWindow::new(Callback::new(Rc::new(move |widget, _| {
                 Module::delete_character(&actor_id);
-                let widget_parent = Widget::get_parent(&widget);
-                widget_parent.borrow_mut().mark_for_removal();
+                let (window, _) = Widget::parent::<ConfirmationWindow>(widget);
+                window.borrow_mut().mark_for_removal();
 
-                let selector = Widget::downcast_kind_mut::<CharacterSelector>(&parent);
+                let selector = Widget::kind_mut::<CharacterSelector>(&parent);
                 selector.selected = None;
                 parent.borrow_mut().invalidate_children();
             })));
@@ -158,15 +158,13 @@ impl WidgetKind for CharacterSelector {
 
         let play_button = Widget::with_theme(Button::empty(), "play_button");
         play_button.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::get_parent(&widget);
-            let selector = Widget::downcast_kind_mut::<CharacterSelector>(&parent);
+            let (parent, selector) = Widget::parent_mut::<CharacterSelector>(widget);
             let selected = match selector.selected {
                 None => return,
                 Some(ref selected) => Rc::clone(selected),
             };
 
-            let root = Widget::get_root(&widget);
-            let window = Widget::downcast_kind_mut::<MainMenu>(&root);
+            let (root, window) = Widget::parent_mut::<MainMenu>(&parent);
             window.next_step = Some(NextGameStep::NewCampaign { pc_actor: selected });
 
             let loading_screen = Widget::with_defaults(LoadingScreen::new());
@@ -187,7 +185,7 @@ impl WidgetKind for CharacterSelector {
         let invalid_level = self.set_play_enabled(&mut play_button.borrow_mut().state);
 
         if self.first_add && must_create_character {
-            let menu = Widget::downcast_kind_mut::<MainMenu>(&self.main_menu);
+            let menu = Widget::kind_mut::<MainMenu>(&self.main_menu);
             debug!("Showing character builder");
             menu.char_builder_to_add = Some(CharacterBuilder::new(widget));
         }
@@ -200,8 +198,7 @@ impl WidgetKind for CharacterSelector {
 
 fn actor_callback(actor: Rc<Actor>) -> Callback {
     Callback::new(Rc::new(move |widget, _| {
-        let parent = Widget::go_up_tree(&widget, 3);
-        let selector = Widget::downcast_kind_mut::<CharacterSelector>(&parent);
+        let (parent, selector) = Widget::parent_mut::<CharacterSelector>(widget);
         selector.selected = Some(Rc::clone(&actor));
         parent.borrow_mut().invalidate_children();
     }))

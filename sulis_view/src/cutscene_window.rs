@@ -63,7 +63,7 @@ impl WidgetKind for CutsceneWindow {
 
         let cutscene = Rc::clone(&self.cutscene);
         close.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-            let parent = Widget::get_parent(widget);
+            let (parent, _) = Widget::parent_mut::<CutsceneWindow>(widget);
             parent.borrow_mut().mark_for_removal();
 
             add_on_end_cbs(&cutscene);
@@ -71,8 +71,7 @@ impl WidgetKind for CutsceneWindow {
 
         let next_button = Widget::with_theme(Button::empty(), "next_button");
         next_button.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::get_parent(&widget);
-            let window = Widget::downcast_kind_mut::<CutsceneWindow>(&parent);
+            let (parent, window) = Widget::parent_mut::<CutsceneWindow>(widget);
             window.frame_index += 1;
             parent.borrow_mut().invalidate_children();
         })));

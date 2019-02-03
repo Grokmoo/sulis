@@ -68,8 +68,7 @@ impl AttributeSelectorPane {
     fn set_next_enabled(&mut self, widget: &Rc<RefCell<Widget>>) {
         self.calculate_available();
 
-        let builder_widget = Widget::get_parent(&widget);
-        let builder = Widget::downcast_kind_mut::<CharacterBuilder>(&builder_widget);
+        let (_, builder) = Widget::parent_mut::<CharacterBuilder>(widget);
         builder.next.borrow_mut().state.set_enabled(self.available == 0 && self.selected_kit.is_some());
     }
 }
@@ -146,8 +145,7 @@ impl WidgetKind for AttributeSelectorPane {
             }
             let class_ref = Rc::clone(class);
             kit_button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let parent = Widget::go_up_tree(&widget, 2);
-                let pane = Widget::downcast_kind_mut::<AttributeSelectorPane>(&parent);
+                let (parent, pane) = Widget::parent_mut::<AttributeSelectorPane>(widget);
                 pane.selected_kit = Some(index);
                 pane.attrs = class_ref.kits[index].default_attributes.clone();
                 pane.set_next_enabled(&parent);
@@ -190,10 +188,8 @@ impl WidgetKind for AttributeSelectorPane {
             widget.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, kind| {
                 let value = Widget::downcast_mut::<Spinner>(kind).value();
 
-                let parent = Widget::get_parent(&widget);
+                let (parent, pane) = Widget::parent_mut::<AttributeSelectorPane>(widget);
                 parent.borrow_mut().invalidate_children();
-
-                let pane = Widget::downcast_kind_mut::<AttributeSelectorPane>(&parent);
                 pane.attrs.set(*attr, value as u8);
                 pane.set_next_enabled(&parent);
             })));

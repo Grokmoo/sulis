@@ -106,26 +106,23 @@ impl CharacterBuilder {
     fn with(builder_set: Rc<BuilderSet>) -> Rc<RefCell<CharacterBuilder>> {
         let next = Widget::with_theme(Button::empty(), "next");
         next.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::get_parent(widget);
-            let builder = Widget::downcast_kind_mut::<CharacterBuilder>(&parent);
+            let (parent, builder) = Widget::parent_mut::<CharacterBuilder>(widget);
             let cur_pane = Rc::clone(&builder.builder_panes[builder.builder_pane_index]);
             cur_pane.borrow_mut().next(builder, Rc::clone(&parent));
         })));
 
         let prev = Widget::with_theme(Button::empty(), "previous");
         prev.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::get_parent(widget);
-            let builder = Widget::downcast_kind_mut::<CharacterBuilder>(&parent);
+            let (parent, builder) = Widget::parent_mut::<CharacterBuilder>(widget);
             let cur_pane = Rc::clone(&builder.builder_panes[builder.builder_pane_index]);
             cur_pane.borrow_mut().prev(builder, Rc::clone(&parent));
         })));
 
         let finish = Widget::with_theme(Button::empty(), "finish");
         finish.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::get_parent(&widget);
+            let (parent, builder) = Widget::parent_mut::<CharacterBuilder>(widget);
             parent.borrow_mut().mark_for_removal();
 
-            let builder = Widget::downcast_kind_mut::<CharacterBuilder>(&parent);
             let cur_pane = Rc::clone(&builder.builder_panes[builder.builder_pane_index]);
             cur_pane.borrow_mut().next(builder, Rc::clone(&parent));
 
@@ -183,7 +180,10 @@ impl WidgetKind for CharacterBuilder {
     fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let title = Widget::with_theme(Label::empty(), "title");
         let close = Widget::with_theme(Button::empty(), "close");
-        close.borrow_mut().state.add_callback(Callback::remove_parent());
+        close.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+            let (parent, _) = Widget::parent::<CharacterBuilder>(widget);
+            parent.borrow_mut().mark_for_removal();
+        })));
 
         let builder_set = Rc::clone(&self.builder_set);
         let mut children = builder_set.on_add(self, widget);
@@ -294,7 +294,7 @@ impl BuilderSet for CharacterCreator {
         }
 
         self.character_selector_widget.borrow_mut().invalidate_children();
-        let char_sel = Widget::downcast_kind_mut::<CharacterSelector>(&self.character_selector_widget);
+        let char_sel = Widget::kind_mut::<CharacterSelector>(&self.character_selector_widget);
         char_sel.set_to_select(id);
     }
 }

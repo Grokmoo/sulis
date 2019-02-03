@@ -193,30 +193,78 @@ impl Widget {
         Widget::new(EmptyWidget::new(), theme)
     }
 
-    pub fn go_up_tree(widget: &Rc<RefCell<Widget>>,
-                      levels: usize) -> Rc<RefCell<Widget>> {
-        if levels == 0 {
-            return Rc::clone(widget);
+    pub fn parent_mut<'a, T: WidgetKind + 'static>(widget: &'a Rc<RefCell<Widget>>)
+        -> (Rc<RefCell<Widget>>, &'a mut T) {
+        let mut current = Rc::clone(widget);
+        loop {
+            let parent = Rc::clone(current.borrow().parent.as_ref().unwrap());
+            let kind = Rc::clone(&parent.borrow().kind);
+
+            match kind.borrow_mut().as_any_mut().downcast_mut::<T>() {
+                None => (),
+                Some(kind) => {
+                    let kind = unsafe {
+                        mem::transmute::<_, &'a mut T>(kind)
+                    };
+                    return (parent, kind);
+                }
+            }
+            current = parent;
         }
-        Widget::go_up_tree(&Widget::get_parent(widget), levels - 1)
+    }
+
+    pub fn parent<'a, T: WidgetKind + 'static>(widget: &'a Rc<RefCell<Widget>>)
+        -> (Rc<RefCell<Widget>>, &'a T) {
+        let mut current = Rc::clone(widget);
+        loop {
+            let parent = Rc::clone(current.borrow().parent.as_ref().unwrap());
+            let kind = Rc::clone(&parent.borrow().kind);
+
+            match kind.borrow().as_any().downcast_ref::<T>() {
+                None => (),
+                Some(kind) => {
+                    let kind = unsafe {
+                        mem::transmute::<_, &'a T>(kind)
+                    };
+                    return (parent, kind);
+                }
+            }
+            current = parent;
+        }
     }
 
     pub fn get_root(widget: &Rc<RefCell<Widget>>) -> Rc<RefCell<Widget>> {
-        let is_root = widget.borrow().parent.is_none();
-
-        if is_root { return Rc::clone(widget); }
-
-        Widget::get_root(&Widget::get_parent(widget))
-    }
-
-    pub fn mark_removal_up_tree(widget: &Rc<RefCell<Widget>>, levels: usize) {
-        if levels == 0 {
-            widget.borrow_mut().mark_for_removal();
-        } else {
-            Widget::mark_removal_up_tree(&Widget::get_parent(widget), levels - 1);
+        match &widget.borrow().parent {
+            None => return Rc::clone(widget),
+            Some(parent) => Widget::get_root(parent),
         }
     }
 
+    pub fn kind<'a, T: WidgetKind + 'static>(widget: &'a Rc<RefCell<Widget>>)
+        -> &'a T {
+        let kind = Rc::clone(&widget.borrow().kind);
+        let kind = kind.borrow();
+        let result = match kind.as_any().downcast_ref::<T>() {
+            None => panic!("Failed to downcast Kind"),
+            Some(result) => result,
+        };
+        unsafe {
+            mem::transmute::<&T, &'a T>(result)
+        }
+    }
+
+    pub fn kind_mut<'a, T: WidgetKind + 'static>(widget: &'a Rc<RefCell<Widget>>)
+        -> &'a mut T {
+        let kind = Rc::clone(&widget.borrow().kind);
+        let mut kind = kind.borrow_mut();
+        let result = match kind.as_any_mut().downcast_mut::<T>() {
+            None => panic!("Failed to downcast_mut Kind"),
+            Some(result) => result,
+        };
+        unsafe {
+            mem::transmute::<&mut T, &'a mut T>(result)
+        }
+}
     pub fn downcast<'a, T: WidgetKind + 'static>(kind: &'a WidgetKind) -> &'a T {
         match kind.as_any().downcast_ref::<T>() {
             None => panic!("Failed to downcast kind"),
@@ -231,33 +279,7 @@ impl Widget {
         }
     }
 
-    pub fn downcast_kind<'a, T: WidgetKind + 'static>(widget: &'a Rc<RefCell<Widget>>)
-        -> &'a T {
-        let kind = Rc::clone(&widget.borrow().kind);
-        let kind = kind.borrow();
-        let result = match kind.as_any().downcast_ref::<T>() {
-            None => panic!("Failed to downcast Kind"),
-            Some(result) => result,
-        };
-        unsafe {
-            mem::transmute::<&T, &'a T>(result)
-        }
-    }
-
-    pub fn downcast_kind_mut<'a, T: WidgetKind + 'static>(widget: &'a Rc<RefCell<Widget>>)
-        -> &'a mut T {
-        let kind = Rc::clone(&widget.borrow().kind);
-        let mut kind = kind.borrow_mut();
-        let result = match kind.as_any_mut().downcast_mut::<T>() {
-            None => panic!("Failed to downcast_mut Kind"),
-            Some(result) => result,
-        };
-        unsafe {
-            mem::transmute::<&mut T, &'a mut T>(result)
-        }
-    }
-
-    pub fn get_parent(widget: &Rc<RefCell<Widget>>) -> Rc<RefCell<Widget>> {
+    pub fn direct_parent(widget: &Rc<RefCell<Widget>>) -> Rc<RefCell<Widget>> {
         Rc::clone(widget.borrow().parent.as_ref().unwrap())
     }
 
@@ -524,7 +546,7 @@ impl Widget {
     pub fn check_children(parent: &Rc<RefCell<Widget>>) -> Result<(), Error> {
         // set up theme
         if parent.borrow().theme_id.is_empty() {
-            let parent_parent = Widget::get_parent(parent);
+            let parent_parent = Widget::direct_parent(parent);
 
             let mut parent = parent.borrow_mut();
             parent.theme_id = ResourceSet::compute_theme_id(&parent_parent.borrow().theme_id,

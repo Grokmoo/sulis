@@ -59,7 +59,7 @@ impl WidgetKind for AbilitiesBar {
 
         // need to set the custom sizing for each panel prior to doing their layouts
         for widget in self.group_panes.iter() {
-            let pane = Widget::downcast_kind_mut::<GroupPane>(widget);
+            let pane = Widget::kind_mut::<GroupPane>(widget);
             pane.set_layout_size(&mut widget.borrow_mut());
         }
 
@@ -78,7 +78,7 @@ impl WidgetKind for AbilitiesBar {
                 None => return,
                 Some(entity) => entity,
             };
-            let bar = Widget::downcast_kind_mut::<AbilitiesBar>(&widget_ref);
+            let bar = Widget::kind_mut::<AbilitiesBar>(&widget_ref);
             bar.entity = Rc::clone(entity);
             widget_ref.borrow_mut().invalidate_children();
         })));
@@ -185,7 +185,7 @@ impl WidgetKind for CollapsedGroupPane {
         change_size.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
             entity.borrow_mut().remove_collapsed_group(&group);
 
-            let parent = Widget::go_up_tree(&widget, 3);
+            let (parent, _) = Widget::parent::<AbilitiesBar>(widget);
             parent.borrow_mut().invalidate_children();
         })));
 
@@ -316,7 +316,7 @@ impl WidgetKind for GroupPane {
         change_size.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
             entity.borrow_mut().add_collapsed_group(group.clone());
 
-            let parent = Widget::go_up_tree(&widget, 2);
+            let (parent, _) = Widget::parent::<AbilitiesBar>(widget);
             parent.borrow_mut().invalidate_children();
         })));
 

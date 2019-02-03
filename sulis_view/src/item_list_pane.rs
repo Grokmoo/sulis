@@ -229,8 +229,7 @@ impl WidgetKind for ItemListPane {
             let button = Widget::with_theme(Button::empty(),
                 &format!("filter_{:?}", filter).to_lowercase());
             button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let parent = Widget::get_parent(widget);
-                let pane = Widget::downcast_kind_mut::<ItemListPane>(&parent);
+                let (parent, pane) = Widget::parent_mut::<ItemListPane>(widget);
                 pane.set_filter(filter, &parent);
             })));
             if filter == self.cur_filter.get() {

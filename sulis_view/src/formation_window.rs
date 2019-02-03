@@ -166,7 +166,10 @@ impl WidgetKind for FormationWindow {
         let title = Widget::with_theme(Label::empty(), "title");
 
         let close = Widget::with_theme(Button::empty(), "close");
-        close.borrow_mut().state.add_callback(Callback::remove_parent());
+        close.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+            let (parent, _) = Widget::parent::<FormationWindow>(widget);
+            parent.borrow_mut().mark_for_removal();
+        })));
 
         let mut children = vec![title, close];
 
@@ -177,8 +180,7 @@ impl WidgetKind for FormationWindow {
         for (index, (x, y)) in formation.positions_iter().enumerate() {
             let button = Widget::with_theme(Button::empty(), "position");
             button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let parent = Widget::get_parent(widget);
-                let window = Widget::downcast_kind_mut::<FormationWindow>(&parent);
+                let (_, window) = Widget::parent_mut::<FormationWindow>(widget);
                 if !window.active_entry.is_some() {
                     window.set_active_entry(Some(index));
                 } else {

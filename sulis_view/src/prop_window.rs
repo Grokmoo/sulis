@@ -88,18 +88,21 @@ impl WidgetKind for PropWindow {
 
             title.borrow_mut().state.add_text_arg("name", &prop.prop.name);
             icon.borrow_mut().state.foreground = Some(Rc::clone(&prop.prop.icon));
-            close.borrow_mut().state.add_callback(Callback::remove_parent());
+
+            close.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, _) = Widget::parent::<PropWindow>(widget);
+                parent.borrow_mut().mark_for_removal();
+            })));
 
             let prop_index = self.prop_index;
             take_all.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let parent = Widget::get_parent(&widget);
+                let (parent, _) = Widget::parent::<PropWindow>(widget);
                 parent.borrow_mut().mark_for_removal();
 
                 let stash = GameState::party_stash();
                 stash.borrow_mut().take_all(prop_index);
 
-                let root = Widget::get_root(&parent);
-                let view = Widget::downcast_kind_mut::<RootView>(&root);
+                let (root, view) = Widget::parent_mut::<RootView>(&parent);
                 view.set_inventory_window(&root, false);
             })));
             take_all.borrow_mut().state.set_enabled(!GameState::is_combat_active());

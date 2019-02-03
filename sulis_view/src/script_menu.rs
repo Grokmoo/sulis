@@ -46,7 +46,7 @@ impl WidgetKind for ScriptMenu {
 
         let cancel= Widget::with_theme(Button::empty(), "cancel");
         cancel.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::get_parent(widget);
+            let (parent, _) = Widget::parent::<ScriptMenu>(widget);
             parent.borrow_mut().mark_for_removal();
         })));
 
@@ -65,7 +65,7 @@ impl WidgetKind for ScriptMenu {
                 let selection = ScriptMenuSelection { value: text.value.to_string() };
                 cb.on_menu_select(selection);
 
-                let parent = Widget::go_up_tree(&widget, 2);
+                let (parent, _) = Widget::parent::<ScriptMenu>(widget);
                 parent.borrow_mut().mark_for_removal();
             })));
             Widget::add_child_to(&widget, text_area);

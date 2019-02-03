@@ -75,9 +75,9 @@ impl<T: Display + Clone> WidgetKind for MutuallyExclusiveListBox<T> {
     fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let mut children = Vec::new();
         for widget in self.list_box.on_add(widget) {
-            widget.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _kind| {
-                let parent = Widget::get_parent(widget);
-                let parent_list_box = Widget::downcast_kind_mut::<MutuallyExclusiveListBox<T>>(&parent);
+            widget.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
+                let (parent, parent_list_box) =
+                    Widget::parent_mut::<MutuallyExclusiveListBox<T>>(widget);
 
                 let cur_state = widget.borrow_mut().state.is_active();
                 if !cur_state {

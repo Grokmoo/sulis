@@ -79,7 +79,10 @@ impl WidgetKind for MerchantWindow {
         let title = Widget::with_theme(Label::empty(), "title");
 
         let close = Widget::with_theme(Button::empty(), "close");
-        close.borrow_mut().state.add_callback(Callback::remove_parent());
+        close.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+            let (parent, _) = Widget::parent::<MerchantWindow>(widget);
+            parent.borrow_mut().mark_for_removal();
+        })));
 
         let item_list_pane = Widget::with_defaults(
             ItemListPane::new_merchant(&self.player, self.merchant_id.to_string(), &self.filter));

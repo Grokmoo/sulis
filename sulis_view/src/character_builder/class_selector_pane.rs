@@ -93,13 +93,11 @@ impl WidgetKind for ClassSelectorPane {
 
             let class_ref = Rc::clone(&class);
             class_button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let parent = Widget::go_up_tree(&widget, 2);
-                let pane = Widget::downcast_kind_mut::<ClassSelectorPane>(&parent);
+                let (parent, pane) = Widget::parent_mut::<ClassSelectorPane>(widget);
                 pane.selected_class = Some(Rc::clone(&class_ref));
                 parent.borrow_mut().invalidate_children();
 
-                let builder_widget = Widget::get_parent(&parent);
-                let builder = Widget::downcast_kind_mut::<CharacterBuilder>(&builder_widget);
+                let (_, builder) = Widget::parent_mut::<CharacterBuilder>(&parent);
                 builder.next.borrow_mut().state.set_enabled(true);
             })));
 

@@ -79,31 +79,22 @@ impl WidgetKind for Spinner {
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         self.down.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::get_parent(widget);
-            {
-                let spinner = Widget::downcast_kind_mut::<Spinner>(&parent);
-                if spinner.value > spinner.min {
-                    spinner.value -= 1;
-                }
+            let (parent, spinner) = Widget::parent_mut::<Spinner>(widget);
+            if spinner.value > spinner.min {
+                spinner.value -= 1;
             }
+
             parent.borrow_mut().invalidate_layout();
-            let kind = Rc::clone(&parent.borrow().kind);
-            let mut kind = kind.borrow_mut();
-            Widget::fire_callback(&parent, &mut *kind);
+            Widget::fire_callback(&parent, &mut *spinner);
         })));
 
         self.up.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::get_parent(widget);
-            {
-                let spinner = Widget::downcast_kind_mut::<Spinner>(&parent);
-                if spinner.value < spinner.max {
-                    spinner.value += 1;
-                }
+            let (parent, spinner) = Widget::parent_mut::<Spinner>(widget);
+            if spinner.value < spinner.max {
+                spinner.value += 1;
             }
             parent.borrow_mut().invalidate_layout();
-            let kind = Rc::clone(&parent.borrow().kind);
-            let mut kind = kind.borrow_mut();
-            Widget::fire_callback(&parent, &mut *kind);
+            Widget::fire_callback(&parent, &mut *spinner);
         })));
 
         vec![Rc::clone(&self.down), Rc::clone(&self.up), Rc::clone(&self.label)]

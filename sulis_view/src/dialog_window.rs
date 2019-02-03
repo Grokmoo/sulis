@@ -60,8 +60,7 @@ impl WidgetKind for DialogWindow {
     widget_kind!(NAME);
 
     fn on_key_press(&mut self, widget: &Rc<RefCell<Widget>>, key: InputAction) -> bool {
-        let root = Widget::get_root(widget);
-        let view = Widget::downcast_kind_mut::<RootView>(&root);
+        let (root, view) = Widget::parent_mut::<RootView>(widget);
 
         use sulis_core::io::InputAction::*;
         match key {
@@ -167,8 +166,7 @@ impl WidgetKind for ResponseButton {
     fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: event::ClickKind) -> bool {
         self.super_on_mouse_release(widget, kind);
 
-        let parent = Widget::go_up_tree(widget, 2);
-        let window = Widget::downcast_kind_mut::<DialogWindow>(&parent);
+        let (parent, window) = Widget::parent_mut::<DialogWindow>(widget);
 
         activate(widget, &self.on_select, &window.pc, &window.entity);
 
@@ -446,7 +444,7 @@ fn show_confirm(widget: &Rc<RefCell<Widget>>, data: &on_trigger::DialogData) {
             let target = GameState::player();
             fire_script(&id, &func, &target, &target);
 
-            let parent = Widget::get_parent(&widget);
+            let (parent, _) = Widget::parent::<ConfirmationWindow>(widget);
             parent.borrow_mut().mark_for_removal();
         }))
     } else {
@@ -466,8 +464,7 @@ fn show_confirm(widget: &Rc<RefCell<Widget>>, data: &on_trigger::DialogData) {
 }
 
 fn load_module(widget: &Rc<RefCell<Widget>>, module_id: &str) {
-    let root = Widget::get_root(widget);
-    let view = Widget::downcast_kind_mut::<RootView>(&root);
+    let (root, view) = Widget::parent_mut::<RootView>(widget);
 
     let pc = GameState::player();
     let inventory = character_window::get_inventory(&pc.borrow().actor);
@@ -496,7 +493,7 @@ fn load_module(widget: &Rc<RefCell<Widget>>, module_id: &str) {
 fn fade_out_in(widget: &Rc<RefCell<Widget>>) {
     let root = Widget::get_root(widget);
     let (_, area_view_widget) = {
-        let view = Widget::downcast_kind_mut::<RootView>(&root);
+        let view = Widget::kind_mut::<RootView>(&root);
         view.area_view()
     };
 
@@ -509,7 +506,7 @@ fn scroll_view(widget: &Rc<RefCell<Widget>>, x: i32, y: i32) {
     let root = Widget::get_root(widget);
 
     let (area_view, area_view_widget) = {
-        let view = Widget::downcast_kind_mut::<RootView>(&root);
+        let view = Widget::kind_mut::<RootView>(&root);
         view.area_view()
     };
 
@@ -525,9 +522,8 @@ fn scroll_view(widget: &Rc<RefCell<Widget>>, x: i32, y: i32) {
 
 fn game_over_window(widget: &Rc<RefCell<Widget>>, text: String) {
     let menu_cb = Callback::new(Rc::new(|widget, _| {
-        let root = Widget::get_root(widget);
-        let root_view = Widget::downcast_kind_mut::<RootView>(&root);
-        root_view.next_step = Some(NextGameStep::MainMenu);
+        let (_, view) = Widget::parent_mut::<RootView>(widget);
+        view.next_step = Some(NextGameStep::MainMenu);
     }));
     let window = Widget::with_theme(GameOverWindow::new(menu_cb, text),
         "script_game_over_window");
@@ -558,9 +554,8 @@ fn show_merchant(widget: &Rc<RefCell<Widget>>, merch: &MerchantData) {
                                           merch.sell_frac, merch.refresh_time);
     }
 
-    let root = Widget::get_root(widget);
-    let root_view = Widget::downcast_kind_mut::<RootView>(&root);
-    root_view.set_merchant_window(&root, true, &id);
+    let (root, view) = Widget::parent_mut::<RootView>(widget);
+    view.set_merchant_window(&root, true, &id);
 }
 
 fn show_cutscene(widget: &Rc<RefCell<Widget>>, cutscene_id: &str) {

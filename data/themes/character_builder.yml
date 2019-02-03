@@ -23,6 +23,7 @@ themes:
     relative:
       x: Center
       y: Center
+      height: Zero
     from: window
     children:
       title:
@@ -429,13 +430,12 @@ themes:
               scale: 6.0
             text: "[s=6.0|#0#]"
           responses:
-            relative:
-              y: Max
             layout: BoxVertical
             layout_spacing: { top: 0, bottom: 1, left: 0, right: 0 }
             relative:
               width: Max
               height: ChildSum
+              y: Max
             size: [-4, 10]
             position: [2, 0]
             children:

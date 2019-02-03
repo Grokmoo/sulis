@@ -45,8 +45,7 @@ pub fn check_end_turn(widget: &Rc<RefCell<Widget>>) {
     }
 
     if end_turn {
-        let root = Widget::get_root(&widget);
-        let view = Widget::downcast_kind_mut::<RootView>(&root);
+        let (_, view) = Widget::parent_mut::<RootView>(widget);
         view.end_turn();
     }
 }
@@ -98,7 +97,7 @@ impl WidgetKind for ApBar {
 
         let widget_ref = Rc::clone(widget);
         GameState::add_party_listener(ChangeListener::new(NAME, Box::new(move |entity| {
-            let bar = Widget::downcast_kind_mut::<ApBar>(&widget_ref);
+            let bar = Widget::kind_mut::<ApBar>(&widget_ref);
 
             if let Some(entity) = entity {
                 bar.entity = Rc::clone(entity);

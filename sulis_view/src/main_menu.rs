@@ -122,8 +122,7 @@ impl WidgetKind for MainMenu {
             Exit | ShowMenu => {
                 let exit_window = Widget::with_theme(
                     ConfirmationWindow::new(Callback::new(Rc::new(|widget, _| {
-                        let parent = Widget::get_root(&widget);
-                        let selector = Widget::downcast_kind_mut::<MainMenu>(&parent);
+                        let (_, selector) = Widget::parent_mut::<MainMenu>(widget);
                         selector.next_step = Some(NextGameStep::Exit);
                     }))),
                     "exit_confirmation_window");
@@ -156,8 +155,7 @@ impl WidgetKind for MainMenu {
 
         let new = Widget::with_theme(Button::empty(), "new");
         new.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::go_up_tree(&widget, 2);
-            let starter = Widget::downcast_kind_mut::<MainMenu>(&parent);
+            let (parent, starter) = Widget::parent_mut::<MainMenu>(widget);
 
             parent.borrow_mut().invalidate_children();
             starter.mode = Mode::New;
@@ -166,8 +164,7 @@ impl WidgetKind for MainMenu {
 
         let load = Widget::with_theme(Button::empty(), "load");
         load.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::go_up_tree(&widget, 2);
-            let starter = Widget::downcast_kind_mut::<MainMenu>(&parent);
+            let (parent, starter) = Widget::parent_mut::<MainMenu>(widget);
 
             starter.mode = Mode::Load;
             let load_window = LoadWindow::new(true);
@@ -182,8 +179,7 @@ impl WidgetKind for MainMenu {
 
         let mods = Widget::with_theme(Button::empty(), "mods");
         mods.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::go_up_tree(&widget, 2);
-            let view = Widget::downcast_kind_mut::<MainMenu>(&parent);
+            let (parent, view) = Widget::parent_mut::<MainMenu>(widget);
 
             let mods_list = modification::get_available_modifications();
 
@@ -194,8 +190,7 @@ impl WidgetKind for MainMenu {
 
         let module = Widget::with_theme(Button::empty(), "module");
         module.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::go_up_tree(&widget, 2);
-            let window = Widget::downcast_kind_mut::<MainMenu>(&parent);
+            let (parent, window) = Widget::parent_mut::<MainMenu>(widget);
 
             window.mode = Mode::Module;
             let modules_list = Module::get_available_modules();
@@ -210,8 +205,7 @@ impl WidgetKind for MainMenu {
 
         let options = Widget::with_theme(Button::empty(), "options");
         options.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::go_up_tree(&widget, 2);
-            let window = Widget::downcast_kind_mut::<MainMenu>(&parent);
+            let (parent, window) = Widget::parent_mut::<MainMenu>(widget);
             window.mode = Mode::Options;
             let configs = window.display_configurations.clone();
 
@@ -222,8 +216,7 @@ impl WidgetKind for MainMenu {
 
         let links = Widget::with_theme(Button::empty(), "links");
         links.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::go_up_tree(&widget, 2);
-            let window = Widget::downcast_kind_mut::<MainMenu>(&parent);
+            let (parent, window) = Widget::parent_mut::<MainMenu>(widget);
             window.mode = Mode::Links;
 
             window.content = Widget::with_defaults(LinksPane::new());
@@ -233,8 +226,7 @@ impl WidgetKind for MainMenu {
 
         let exit = Widget::with_theme(Button::empty(), "exit");
         exit.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::go_up_tree(&widget, 2);
-            let window = Widget::downcast_kind_mut::<MainMenu>(&parent);
+            let (_, window) = Widget::parent_mut::<MainMenu>(widget);
             window.next_step = Some(NextGameStep::Exit);
         })));
 

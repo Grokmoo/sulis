@@ -56,7 +56,7 @@ impl WidgetKind for QuickItemBar {
                 None => return,
                 Some(entity) => entity,
             };
-            let bar = Widget::downcast_kind_mut::<QuickItemBar>(&widget_ref);
+            let bar = Widget::kind_mut::<QuickItemBar>(&widget_ref);
             bar.entity = Rc::clone(entity);
             widget_ref.borrow_mut().invalidate_children();
         })));
@@ -65,8 +65,7 @@ impl WidgetKind for QuickItemBar {
 
         let swap_weapons = Widget::with_theme(Button::empty(), "swap_weapons");
         swap_weapons.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::get_parent(widget);
-            let bar = Widget::downcast_kind_mut::<QuickItemBar>(&parent);
+            let (_, bar) = Widget::parent_mut::<QuickItemBar>(widget);
             bar.entity.borrow_mut().actor.swap_weapon_set();
         })));
         swap_weapons.borrow_mut().state.set_enabled(self.entity.borrow().actor.can_swap_weapons());

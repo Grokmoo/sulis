@@ -5,6 +5,8 @@ themes:
     children:
       tooltip:
         from: tooltip
+      character_builder:
+        from: character_builder
       status_text:
         from: label
         position: [0, 2]

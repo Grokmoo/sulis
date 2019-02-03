@@ -50,7 +50,7 @@ impl WidgetKind for ItemActionMenu {
             let cb = cb.clone();
             let callback = Callback::new(Rc::new(move |widget, kind| {
                 cb.call(widget, kind);
-                let parent = Widget::go_up_tree(&widget, 2);
+                let (parent, _) = Widget::parent::<ItemActionMenu>(widget);
                 parent.borrow_mut().mark_for_removal();
             }));
             let entry = list_box::Entry::new(name.to_string(), Some(callback));

@@ -58,13 +58,15 @@ impl WidgetKind for QuestWindow {
         let label = Widget::with_theme(Label::empty(), "title");
 
         let close = Widget::with_theme(Button::empty(), "close");
-        close.borrow_mut().state.add_callback(Callback::remove_parent());
+            close.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+                let (parent, _) = Widget::parent::<QuestWindow>(widget);
+                parent.borrow_mut().mark_for_removal();
+            })));
 
         let show_completed_toggle = Widget::with_theme(Button::empty(), "show_completed_toggle");
         show_completed_toggle.borrow_mut().state.set_active(self.show_completed);
         show_completed_toggle.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::get_parent(&widget);
-            let window = Widget::downcast_kind_mut::<QuestWindow>(&parent);
+            let (parent, window) = Widget::parent_mut::<QuestWindow>(widget);
             let cur = window.show_completed;
             window.show_completed = !cur;
             window.active_quest = None;
@@ -101,8 +103,7 @@ impl WidgetKind for QuestWindow {
 
             let quest_ref = Rc::clone(&quest);
             button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let window = Widget::go_up_tree(&widget, 3);
-                let quest_window = Widget::downcast_kind_mut::<QuestWindow>(&window);
+                let (window, quest_window) = Widget::parent_mut::<QuestWindow>(widget);
                 quest_window.active_quest = Some(Rc::clone(&quest_ref));
                 window.borrow_mut().invalidate_children();
             })));

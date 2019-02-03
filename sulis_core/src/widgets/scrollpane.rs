@@ -174,7 +174,7 @@ impl Scrollbar {
         if self.cur_y < self.min_y { self.cur_y = self.min_y }
         else if self.cur_y > self.max_y { self.cur_y = self.max_y }
 
-        let pane = Widget::get_parent(&self.widget);
+        let pane = Widget::direct_parent(&self.widget);
         pane.borrow_mut().invalidate_layout();
     }
 
@@ -240,15 +240,13 @@ impl WidgetKind for Scrollbar {
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
         let widget_ref = Rc::clone(&self.widget);
         self.up.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-            let parent = Widget::get_parent(&widget);
-            let kind = Widget::downcast_kind_mut::<Scrollbar>(&parent);
+            let (_, kind) = Widget::parent_mut::<Scrollbar>(&widget);
             kind.update_children_position(&widget_ref, -1);
         })));
 
         let widget_ref = Rc::clone(&self.widget);
         self.down.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-            let parent = Widget::get_parent(&widget);
-            let kind = Widget::downcast_kind_mut::<Scrollbar>(&parent);
+            let (_, kind) = Widget::parent_mut::<Scrollbar>(&widget);
             kind.update_children_position(&widget_ref, 1);
         })));
 

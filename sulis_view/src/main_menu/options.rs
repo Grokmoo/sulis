@@ -121,22 +121,19 @@ impl Options {
 
         let mode_window = Widget::with_theme(Button::empty(), "mode_window");
         mode_window.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::go_up_tree(widget, 3);
-            let options = Widget::downcast_kind_mut::<Options>(&parent);
+            let (parent, options) = Widget::parent_mut::<Options>(widget);
             options.cur_display_mode = DisplayMode::Window;
             parent.borrow_mut().invalidate_children();
         })));
         let mode_borderless = Widget::with_theme(Button::empty(), "mode_borderless");
         mode_borderless.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::go_up_tree(widget, 3);
-            let options = Widget::downcast_kind_mut::<Options>(&parent);
+            let (parent, options) = Widget::parent_mut::<Options>(widget);
             options.cur_display_mode = DisplayMode::BorderlessWindow;
             parent.borrow_mut().invalidate_children();
         })));
         let mode_fullscreen = Widget::with_theme(Button::empty(), "mode_fullscreen");
         mode_fullscreen.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::go_up_tree(widget, 3);
-            let options = Widget::downcast_kind_mut::<Options>(&parent);
+            let (parent, options) = Widget::parent_mut::<Options>(widget);
             options.cur_display_mode = DisplayMode::Fullscreen;
             parent.borrow_mut().invalidate_children();
         })));
@@ -160,8 +157,7 @@ impl Options {
         monitor_label.borrow_mut().state.add_text_arg("monitor", &name);
         let next_monitor = Widget::with_theme(Button::empty(), "next_monitor");
         next_monitor.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::go_up_tree(widget, 3);
-            let options = Widget::downcast_kind_mut::<Options>(&parent);
+            let (parent, options) = Widget::parent_mut::<Options>(widget);
 
             if options.cur_display_conf == options.display_confs.len() - 1 {
                 options.cur_display_conf = 0;
@@ -190,8 +186,7 @@ impl Options {
             button.borrow_mut().state.add_text_arg("height", &h.to_string());
 
             button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let parent = Widget::go_up_tree(widget, 4);
-                let options = Widget::downcast_kind_mut::<Options>(&parent);
+            let (parent, options) = Widget::parent_mut::<Options>(widget);
                 options.cur_resolution = (w, h);
                 parent.borrow_mut().invalidate_children();
             })));
@@ -217,16 +212,14 @@ impl Options {
         let (ui_width, ui_height) = (self.cur_ui_scale.0, self.cur_ui_scale.1);
         let normal = Widget::with_theme(Button::empty(), "normal");
         normal.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::go_up_tree(widget, 3);
-            let options = Widget::downcast_kind_mut::<Options>(&parent);
+            let (parent, options) = Widget::parent_mut::<Options>(widget);
             options.cur_ui_scale = UI_SCALE_NORMAL;
             parent.borrow_mut().invalidate_children();
         })));
 
         let small = Widget::with_theme(Button::empty(), "small");
         small.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::go_up_tree(widget, 3);
-            let options = Widget::downcast_kind_mut::<Options>(&parent);
+            let (parent, options) = Widget::parent_mut::<Options>(widget);
             options.cur_ui_scale = UI_SCALE_SMALL;
             parent.borrow_mut().invalidate_children();
         })));
@@ -250,8 +243,7 @@ impl Options {
             let speed = *speed;
             let button = Widget::with_theme(Button::empty(), "speed_button");
             button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let parent = Widget::go_up_tree(widget, 3);
-                let options = Widget::downcast_kind_mut::<Options>(&parent);
+            let (parent, options) = Widget::parent_mut::<Options>(widget);
                 options.cur_anim_speed = speed;
                 parent.borrow_mut().invalidate_children();
             })));
@@ -285,8 +277,7 @@ impl Options {
             let speed = *speed;
             let button = Widget::with_theme(Button::empty(), "speed_button");
             button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let parent = Widget::go_up_tree(widget, 3);
-                let options = Widget::downcast_kind_mut::<Options>(&parent);
+            let (parent, options) = Widget::parent_mut::<Options>(widget);
                 options.cur_scroll_speed = speed;
                 parent.borrow_mut().invalidate_children();
             })));
@@ -312,15 +303,13 @@ impl Options {
 
         let edge_scroll_on = Widget::with_theme(Button::empty(), "on");
         edge_scroll_on.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::go_up_tree(widget, 3);
-            let options = Widget::downcast_kind_mut::<Options>(&parent);
+            let (parent, options) = Widget::parent_mut::<Options>(widget);
             options.cur_edge_scrolling = true;
             parent.borrow_mut().invalidate_children();
         })));
         let edge_scroll_off = Widget::with_theme(Button::empty(), "off");
         edge_scroll_off.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::go_up_tree(widget, 3);
-            let options = Widget::downcast_kind_mut::<Options>(&parent);
+            let (parent, options) = Widget::parent_mut::<Options>(widget);
             options.cur_edge_scrolling = false;
             parent.borrow_mut().invalidate_children();
         })));
@@ -343,7 +332,7 @@ impl Options {
 
             let action_ref = action.clone();
             key_button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let parent = Widget::go_up_tree(widget, 4);
+                let (parent, _) = Widget::parent::<Options>(widget);
 
                 let root = Widget::get_root(widget);
                 let popup = KeybindingPopup::new(action_ref.clone(), parent);
@@ -375,46 +364,39 @@ impl WidgetKind for Options {
 
         let apply = Widget::with_theme(Button::empty(), "apply");
         apply.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::go_up_tree(widget, 1);
-            let options = Widget::downcast_kind_mut::<Options>(&parent);
+            let (parent, options) = Widget::parent_mut::<Options>(widget);
             options.save_current_config();
 
-            let root = Widget::get_root(&widget);
-            let menu = Widget::downcast_kind_mut::<MainMenu>(&root);
+            let (_, menu) = Widget::parent_mut::<MainMenu>(&parent);
             menu.recreate_io();
         })));
 
         let reset = Widget::with_theme(Button::empty(), "reset");
         reset.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::get_parent(widget);
-            let options = Widget::downcast_kind_mut::<Options>(&parent);
+            let (parent, options) = Widget::parent_mut::<Options>(widget);
             options.reset_config();
 
-            let root = Widget::get_root(&widget);
-            let menu = Widget::downcast_kind_mut::<MainMenu>(&root);
+            let (_, menu) = Widget::parent_mut::<MainMenu>(&parent);
             menu.recreate_io();
         })));
 
         let cancel = Widget::with_theme(Button::empty(), "cancel");
         cancel.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let root = Widget::get_root(&widget);
-            let menu = Widget::downcast_kind_mut::<MainMenu>(&root);
+            let (root, menu) = Widget::parent_mut::<MainMenu>(widget);
             menu.reset();
             root.borrow_mut().invalidate_children();
         })));
 
         let display = Widget::with_theme(Button::empty(), "display");
         display.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::get_parent(widget);
-            let options = Widget::downcast_kind_mut::<Options>(&parent);
+            let (parent, options) = Widget::parent_mut::<Options>(widget);
             options.cur_tab = Tab::Display;
             parent.borrow_mut().invalidate_children();
         })));
 
         let input = Widget::with_theme(Button::empty(), "input");
         input.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::get_parent(widget);
-            let options = Widget::downcast_kind_mut::<Options>(&parent);
+            let (parent, options) = Widget::parent_mut::<Options>(widget);
             options.cur_tab = Tab::Input;
             parent.borrow_mut().invalidate_children();
         })));
@@ -460,7 +442,7 @@ impl WidgetKind for KeybindingPopup {
     }
 
     fn on_raw_key(&mut self, widget: &Rc<RefCell<Widget>>, key: Key) -> bool {
-        let options = Widget::downcast_kind_mut::<Options>(&self.options_widget);
+        let options = Widget::kind_mut::<Options>(&self.options_widget);
         let mut matched_index = 0;
         for (index, (_, v)) in options.cur_keybindings.iter().enumerate() {
             if *v == self.action {

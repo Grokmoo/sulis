@@ -132,8 +132,7 @@ impl CosmeticSelectorPane {
     }
 
     fn set_finish_enabled(&self, widget: &Rc<RefCell<Widget>>) {
-        let parent = Widget::get_parent(widget);
-        let builder = Widget::downcast_kind_mut::<CharacterBuilder>(&parent);
+        let (_, builder) = Widget::parent_mut::<CharacterBuilder>(&widget);
         builder.next.borrow_mut().state.set_enabled(self.name.len() > 1 && self.portrait.is_some());
     }
 }
@@ -230,13 +229,8 @@ impl WidgetKind for CosmeticSelectorPane {
         let name_label = Widget::with_theme(Label::empty(), "name_label");
         let name_field = Widget::with_theme(InputField::new(&self.name), "name_field");
         name_field.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, kind| {
-            let parent = Widget::get_parent(&widget);
-            let cosmetic_pane = Widget::downcast_kind_mut::<CosmeticSelectorPane>(&parent);
-
-            let field = match kind.as_any_mut().downcast_mut::<InputField>() {
-                None => panic!("Failed to downcast to InputField"),
-                Some(field) => field,
-            };
+            let (parent, cosmetic_pane) = Widget::parent_mut::<CosmeticSelectorPane>(widget);
+            let field = Widget::downcast::<InputField>(kind);
 
             cosmetic_pane.name = field.text.to_string();
             cosmetic_pane.set_finish_enabled(&parent);
@@ -253,8 +247,7 @@ impl WidgetKind for CosmeticSelectorPane {
         }
 
         random_name_button.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::get_parent(&widget);
-            let pane = Widget::downcast_kind_mut::<CosmeticSelectorPane>(&parent);
+            let (parent, pane) = Widget::parent_mut::<CosmeticSelectorPane>(widget);
 
             let race = match pane.race {
                 None => return,
@@ -271,17 +264,16 @@ impl WidgetKind for CosmeticSelectorPane {
         let male_button = Widget::with_theme(Button::empty(), "male_button");
         male_button.borrow_mut().state.set_active(self.sex == Sex::Male);
         male_button.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::get_parent(&widget);
-            let cosmetic_pane = Widget::downcast_kind_mut::<CosmeticSelectorPane>(&parent);
-            cosmetic_pane.sex = Sex::Male;
+            let (parent, cosmetic_pane) = Widget::parent_mut::<CosmeticSelectorPane>(widget);
+            cosmetic_pane.sex = Sex::Female;
+            cosmetic_pane.beard_index = None;
             parent.borrow_mut().invalidate_children();
         })));
 
         let female_button = Widget::with_theme(Button::empty(), "female_button");
         female_button.borrow_mut().state.set_active(self.sex == Sex::Female);
         female_button.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::get_parent(&widget);
-            let cosmetic_pane = Widget::downcast_kind_mut::<CosmeticSelectorPane>(&parent);
+            let (parent, cosmetic_pane) = Widget::parent_mut::<CosmeticSelectorPane>(widget);
             cosmetic_pane.sex = Sex::Female;
             cosmetic_pane.beard_index = None;
             parent.borrow_mut().invalidate_children();
@@ -290,8 +282,7 @@ impl WidgetKind for CosmeticSelectorPane {
         let hair_label = Widget::with_theme(Label::empty(), "hair_label");
         let next_hair = Widget::with_theme(Button::empty(), "next_hair");
         next_hair.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::get_parent(&widget);
-            let cosmetic_pane = Widget::downcast_kind_mut::<CosmeticSelectorPane>(&parent);
+            let (parent, cosmetic_pane) = Widget::parent_mut::<CosmeticSelectorPane>(widget);
 
             let race = match cosmetic_pane.race {
                 None => return,
@@ -311,8 +302,7 @@ impl WidgetKind for CosmeticSelectorPane {
         })));
         let prev_hair = Widget::with_theme(Button::empty(), "prev_hair");
         prev_hair.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::get_parent(&widget);
-            let cosmetic_pane = Widget::downcast_kind_mut::<CosmeticSelectorPane>(&parent);
+            let (parent, cosmetic_pane) = Widget::parent_mut::<CosmeticSelectorPane>(widget);
 
             let race = match cosmetic_pane.race {
                 None => return,
@@ -335,8 +325,7 @@ impl WidgetKind for CosmeticSelectorPane {
         let next_beard = Widget::with_theme(Button::empty(), "next_beard");
         next_beard.borrow_mut().state.set_enabled(self.sex == Sex::Male);
         next_beard.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::get_parent(&widget);
-            let cosmetic_pane = Widget::downcast_kind_mut::<CosmeticSelectorPane>(&parent);
+            let (parent, cosmetic_pane) = Widget::parent_mut::<CosmeticSelectorPane>(widget);
 
             let race = match cosmetic_pane.race {
                 None => return,
@@ -357,8 +346,7 @@ impl WidgetKind for CosmeticSelectorPane {
         let prev_beard = Widget::with_theme(Button::empty(), "prev_beard");
         prev_beard.borrow_mut().state.set_enabled(self.sex == Sex::Male);
         prev_beard.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::get_parent(&widget);
-            let cosmetic_pane = Widget::downcast_kind_mut::<CosmeticSelectorPane>(&parent);
+            let (parent, cosmetic_pane) = Widget::parent_mut::<CosmeticSelectorPane>(widget);
 
             let race = match cosmetic_pane.race {
                 None => return,
@@ -379,23 +367,20 @@ impl WidgetKind for CosmeticSelectorPane {
 
         let color_label = Widget::with_theme(Label::empty(), "color_label");
         let color_panel = Widget::empty("color_panel");
-        {
-            let mut hue = 0.0;
-            while hue < 1.0 {
-                let color = hue_to_color(hue);
-                let color_button = Widget::with_defaults(ColorButton::new(color));
+        let mut hue = 0.0;
+        while hue < 1.0 {
+            let color = hue_to_color(hue);
+            let color_button = Widget::with_defaults(ColorButton::new(color));
 
-                color_button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                    let parent = Widget::go_up_tree(&widget, 2);
-                    let cosmetic_pane = Widget::downcast_kind_mut::<CosmeticSelectorPane>(&parent);
+            color_button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
+                let (parent, cosmetic_pane) = Widget::parent_mut::<CosmeticSelectorPane>(widget);
 
-                    cosmetic_pane.hue = Some(hue);
-                    parent.borrow_mut().invalidate_children();
-                })));
-                Widget::add_child_to(&color_panel, color_button);
+                cosmetic_pane.hue = Some(hue);
+                parent.borrow_mut().invalidate_children();
+            })));
+            Widget::add_child_to(&color_panel, color_button);
 
-                hue += 0.05;
-            }
+            hue += 0.05;
         }
 
         let skin_color_label = Widget::with_theme(Label::empty(), "skin_color_label");
@@ -404,8 +389,7 @@ impl WidgetKind for CosmeticSelectorPane {
             let color = *color;
             let color_button = Widget::with_defaults(ColorButton::new(color));
             color_button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let parent = Widget::go_up_tree(&widget, 2);
-                let cosmetic_pane = Widget::downcast_kind_mut::<CosmeticSelectorPane>(&parent);
+                let (parent, cosmetic_pane) = Widget::parent_mut::<CosmeticSelectorPane>(widget);
                 cosmetic_pane.skin_color = Some(color);
                 parent.borrow_mut().invalidate_children();
             })));
@@ -418,8 +402,7 @@ impl WidgetKind for CosmeticSelectorPane {
             let color = *color;
             let color_button = Widget::with_defaults(ColorButton::new(color));
             color_button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let parent = Widget::go_up_tree(&widget, 2);
-                let cosmetic_pane = Widget::downcast_kind_mut::<CosmeticSelectorPane>(&parent);
+                let (parent, cosmetic_pane) = Widget::parent_mut::<CosmeticSelectorPane>(widget);
                 cosmetic_pane.hair_color = Some(color);
                 parent.borrow_mut().invalidate_children();
             })));
@@ -435,7 +418,7 @@ impl WidgetKind for CosmeticSelectorPane {
 
         let race_ref = Rc::clone(&race);
         portrait_button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-            let parent = Widget::get_parent(&widget);
+            let (parent, _) = Widget::parent::<CosmeticSelectorPane>(widget);
 
             let scrollpane = ScrollPane::new();
             let pop_up = Widget::with_theme(scrollpane.clone(), "portrait_selector");
@@ -500,12 +483,12 @@ fn portrait_selector_button_callback(portrait: &Rc<Image>, pane_widget: &Rc<RefC
     let pane_widget_ref = Rc::clone(pane_widget);
     let image = Rc::clone(portrait);
     Callback::new(Rc::new(move |widget, _| {
-        let cosmetic_pane = Widget::downcast_kind_mut::<CosmeticSelectorPane>(&pane_widget_ref);
+        let cosmetic_pane = Widget::kind_mut::<CosmeticSelectorPane>(&pane_widget_ref);
         cosmetic_pane.portrait = Some(Rc::clone(&image));
         pane_widget_ref.borrow_mut().invalidate_children();
         cosmetic_pane.set_finish_enabled(&pane_widget_ref);
 
-        let parent = Widget::go_up_tree(widget, 2);
+        let(parent, _) = Widget::parent::<ScrollPane>(widget);
         parent.borrow_mut().mark_for_removal();
     }))
 }

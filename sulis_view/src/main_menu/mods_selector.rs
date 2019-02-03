@@ -88,8 +88,7 @@ impl WidgetKind for ModsSelector {
 
         let clear = Widget::with_theme(Button::empty(), "clear");
         clear.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::get_parent(&widget);
-            let sel = Widget::downcast_kind_mut::<ModsSelector>(&parent);
+            let (parent, sel) = Widget::parent_mut::<ModsSelector>(widget);
 
              for modif in sel.active_mods.drain(..) {
                  sel.available_mods.push(modif);
@@ -100,16 +99,14 @@ impl WidgetKind for ModsSelector {
 
         let cancel = Widget::with_theme(Button::empty(), "cancel");
         cancel.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let root = Widget::get_root(&widget);
-            let menu = Widget::downcast_kind_mut::<MainMenu>(&root);
+            let (root, menu) = Widget::parent_mut::<MainMenu>(widget);
             menu.reset();
             root.borrow_mut().invalidate_children();
         })));
 
         let apply = Widget::with_theme(Button::empty(), "apply");
         apply.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::get_parent(&widget);
-            let sel = Widget::downcast_kind_mut::<ModsSelector>(&parent);
+            let (_, sel) = Widget::parent_mut::<ModsSelector>(widget);
 
             let mut resources = ActiveResources::read();
             resources.mods.clear();
@@ -119,8 +116,7 @@ impl WidgetKind for ModsSelector {
 
             resources.write();
 
-            let root = Widget::get_root(&widget);
-            let menu = Widget::downcast_kind_mut::<MainMenu>(&root);
+            let (root, menu) = Widget::parent_mut::<MainMenu>(widget);
             menu.next_step = Some(NextGameStep::MainMenuReloadResources);
 
             let loading_screen = Widget::with_defaults(LoadingScreen::new());
@@ -169,8 +165,7 @@ impl WidgetKind for ModPane {
         let active = self.active;
         let index = self.index;
         toggle.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-            let parent = Widget::go_up_tree(&widget, 4);
-            let sel = Widget::downcast_kind_mut::<ModsSelector>(&parent);
+            let (parent, sel) = Widget::parent_mut::<ModsSelector>(widget);
 
             if active {
                 let modif = sel.active_mods.remove(index);
@@ -189,8 +184,7 @@ impl WidgetKind for ModPane {
         up.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
             if index == 0 { return; }
 
-            let parent = Widget::go_up_tree(&widget, 4);
-            let sel = Widget::downcast_kind_mut::<ModsSelector>(&parent);
+            let (parent, sel) = Widget::parent_mut::<ModsSelector>(widget);
 
             let vec = if active {
                 &mut sel.active_mods
@@ -211,8 +205,7 @@ impl WidgetKind for ModPane {
         down.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
             if index == len - 1 { return; }
 
-            let parent = Widget::go_up_tree(&widget, 4);
-            let sel = Widget::downcast_kind_mut::<ModsSelector>(&parent);
+            let (parent, sel) = Widget::parent_mut::<ModsSelector>(widget);
 
             let vec = if active {
                 &mut sel.active_mods

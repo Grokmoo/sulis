@@ -175,10 +175,9 @@ impl ItemButton {
 
         // TODO this is a hack putting this here.  but, the state of the merchant
         // window may change after the owing inventory window is opened
-        let root = Widget::get_root(widget);
-        let root_view = Widget::downcast_kind_mut::<RootView>(&root);
+        let (root, root_view) = Widget::parent_mut::<RootView>(widget);
         if let Some(window_widget) = root_view.get_merchant_window(&root) {
-            let merchant_window = Widget::downcast_kind_mut::<MerchantWindow>(&window_widget);
+            let merchant_window = Widget::kind_mut::<MerchantWindow>(&window_widget);
 
             let action = ButtonAction {
                 label: "Sell".to_string(),
@@ -204,12 +203,12 @@ impl ItemButton {
                     item_window.state.add_text_arg("price", &format_item_value(value));
                 }
             }, Kind::Inventory { .. } | Kind::Equipped { .. } => {
-                let root_view = Widget::downcast_kind_mut::<RootView>(&root);
+                let root_view = Widget::kind_mut::<RootView>(&root);
                 let merch_window = match root_view.get_merchant_window(&root) {
                     None => return,
                     Some(window) => window,
                 };
-                let window = Widget::downcast_kind_mut::<MerchantWindow>(&merch_window);
+                let window = Widget::kind_mut::<MerchantWindow>(&merch_window);
                 let merchant = area_state.get_merchant(window.merchant_id());
                 if let Some(ref merchant) = merchant {
                     let value = merchant.get_sell_price(item_state);
@@ -436,8 +435,7 @@ pub fn use_item_cb(entity: &Rc<RefCell<EntityState>>, kind: ScriptItemKind) -> C
                 if !entity.borrow().actor.can_use_quick(slot) { return; }
             }, _ => (),
         }
-        let root = Widget::get_root(widget);
-        let view = Widget::downcast_kind_mut::<RootView>(&root);
+        let (root, view) = Widget::parent_mut::<RootView>(widget);
         view.set_inventory_window(&root, false);
         Script::item_on_activate(&entity, kind.clone());
     }))
@@ -500,12 +498,11 @@ pub fn buy_item_cb(merchant_id: &str, index: usize) -> Callback {
 pub fn sell_item_cb(entity: &Rc<RefCell<EntityState>>, index: usize) -> Callback {
     let entity = Rc::clone(entity);
     Callback::new(Rc::new(move |widget, _| {
-        let root = Widget::get_root(widget);
-        let root_view = Widget::downcast_kind_mut::<RootView>(&root);
+        let (root, root_view) = Widget::parent_mut::<RootView>(widget);
         let merchant = match root_view.get_merchant_window(&root) {
             None => return,
             Some(ref window) => {
-                let merchant_window = Widget::downcast_kind_mut::<MerchantWindow>(&window);
+                let merchant_window = Widget::kind_mut::<MerchantWindow>(&window);
                 merchant_window.merchant_id().to_string()
             }
         };
@@ -543,12 +540,11 @@ pub fn drop_item_cb(entity: &Rc<RefCell<EntityState>>, index: usize) -> Callback
 }
 
 fn drop_item(widget: &Rc<RefCell<Widget>>, entity: &Rc<RefCell<EntityState>>, item: ItemState) {
-    let root = Widget::get_root(widget);
-    let root_view = Widget::downcast_kind_mut::<RootView>(&root);
+    let (root, root_view) = Widget::parent_mut::<RootView>(widget);
     match root_view.get_prop_window(&root) {
         None => drop_to_ground(entity, item),
         Some(ref window) => {
-            let prop_window = Widget::downcast_kind_mut::<PropWindow>(&window);
+            let prop_window = Widget::kind_mut::<PropWindow>(&window);
             let prop_index = prop_window.prop_index();
             drop_to_prop(item, prop_index);
         }

@@ -79,10 +79,10 @@ impl LoadWindow {
     pub fn set_load_step(&self, save_state: SaveState, root: &Rc<RefCell<Widget>>) {
         // TODO remove the bool flag passed in the constructor
         if self.main_menu_mode {
-            let main_menu = Widget::downcast_kind_mut::<MainMenu>(root);
+            let main_menu = Widget::kind_mut::<MainMenu>(root);
             main_menu.next_step = Some(NextGameStep::LoadCampaign { save_state });
         } else {
-            let root_view = Widget::downcast_kind_mut::<RootView>(root);
+            let root_view = Widget::kind_mut::<RootView>(root);
             root_view.next_step = Some(NextGameStep::LoadCampaign { save_state });
         }
 
@@ -128,7 +128,7 @@ impl WidgetKind for LoadWindow {
         let title = Widget::with_theme(Label::empty(), "title");
 
         self.cancel.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::get_parent(widget);
+            let (parent, _) = Widget::parent::<LoadWindow>(widget);
             parent.borrow_mut().mark_for_removal();
         })));
 
@@ -136,12 +136,12 @@ impl WidgetKind for LoadWindow {
         let delete_cb = Callback::new(Rc::new(move |widget, _| {
             load_window_widget_ref.borrow_mut().invalidate_children();
 
-            let load_window = Widget::downcast_kind_mut::<LoadWindow>(&load_window_widget_ref);
+            let load_window = Widget::kind_mut::<LoadWindow>(&load_window_widget_ref);
             load_window.delete_save();
             load_window.selected_entry = None;
             load_window.set_button_state();
 
-            let parent = Widget::get_parent(widget);
+            let (parent, _) = Widget::parent::<ConfirmationWindow>(widget);
             parent.borrow_mut().mark_for_removal();
         }));
 
@@ -153,9 +153,8 @@ impl WidgetKind for LoadWindow {
         })));
 
         self.accept.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let root = Widget::get_root(widget);
-            let parent = Widget::get_parent(widget);
-            let load_window = Widget::downcast_kind_mut::<LoadWindow>(&parent);
+            let (parent, load_window) = Widget::parent_mut::<LoadWindow>(widget);
+            let root = Widget::get_root(&parent);
             load_window.load(&root);
 
             parent.borrow_mut().mark_for_removal();
@@ -175,14 +174,12 @@ impl WidgetKind for LoadWindow {
 
             let widget = Widget::with_theme(Button::empty(), "entry");
             widget.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let parent = Widget::go_up_tree(widget, 3);
+                let (parent, load_window) = Widget::parent_mut::<LoadWindow>(widget);
                 parent.borrow_mut().invalidate_layout();
-
-                let load_window = Widget::downcast_kind_mut::<LoadWindow>(&parent);
                 load_window.selected_entry = Some(index);
                 load_window.set_button_state();
 
-                let content = Widget::get_parent(widget);
+                let content = Widget::direct_parent(widget);
                 for child in content.borrow().children.iter() {
                     child.borrow_mut().state.set_active(false);
                 }

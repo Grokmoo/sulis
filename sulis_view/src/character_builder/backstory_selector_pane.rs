@@ -60,8 +60,7 @@ impl BackstorySelectorPane {
     }
 
     pub fn set_next_enabled(&mut self, widget: &Rc<RefCell<Widget>>) {
-        let builder_widget = Widget::get_parent(&widget);
-        let builder = Widget::downcast_kind_mut::<CharacterBuilder>(&builder_widget);
+        let (_, builder) = Widget::parent_mut::<CharacterBuilder>(widget);
 
         let next = self.complete || self.convo.responses(&self.cur_node).len() == 0;
 
@@ -115,8 +114,7 @@ impl WidgetKind for BackstorySelectorPane {
 
         let start_over = Widget::with_theme(Button::empty(), "start_over");
         start_over.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::get_parent(&widget);
-            let pane = Widget::downcast_kind_mut::<BackstorySelectorPane>(&parent);
+            let (parent, pane) = Widget::parent_mut::<BackstorySelectorPane>(widget);
             pane.cur_node = get_initial_node(&pane.convo);
             pane.abilities.clear();
             pane.set_next_enabled(&parent);
@@ -154,8 +152,7 @@ impl WidgetKind for ResponseButton {
     fn on_mouse_release(&mut self, widget: &Rc<RefCell<Widget>>, kind: event::ClickKind) -> bool {
         self.super_on_mouse_release(widget, kind);
 
-        let parent = Widget::go_up_tree(widget, 2);
-        let pane = Widget::downcast_kind_mut::<BackstorySelectorPane>(&parent);
+        let (parent, pane) = Widget::parent_mut::<BackstorySelectorPane>(widget);
 
         for trigger in self.on_select.iter() {
             match trigger {

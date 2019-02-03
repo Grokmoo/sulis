@@ -237,13 +237,11 @@ impl WidgetKind for AbilitySelectorPane {
 
             let ability_ref = Rc::clone(&ability);
             ability_button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let parent = Widget::go_up_tree(&widget, 2);
-                let pane = Widget::downcast_kind_mut::<AbilitySelectorPane>(&parent);
+                let (parent, pane) = Widget::parent_mut::<AbilitySelectorPane>(widget);
                 pane.selected_ability = Some(Rc::clone(&ability_ref));
                 parent.borrow_mut().invalidate_children();
 
-                let builder_widget = Widget::get_parent(&parent);
-                let builder = Widget::downcast_kind_mut::<CharacterBuilder>(&builder_widget);
+                let (_, builder) = Widget::parent_mut::<CharacterBuilder>(&parent);
                 builder.next.borrow_mut().state.set_enabled(enable_next);
             })));
 

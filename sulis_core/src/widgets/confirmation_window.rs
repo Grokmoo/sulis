@@ -69,7 +69,10 @@ impl WidgetKind for ConfirmationWindow {
     }
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
-        self.cancel.borrow_mut().state.add_callback(Callback::remove_parent());
+        self.cancel.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+            let (parent, _) = Widget::parent::<ConfirmationWindow>(widget);
+            parent.borrow_mut().mark_for_removal();
+        })));
         self.accept.borrow_mut().state.add_callback(self.accept_callback.clone());
 
         vec![Rc::clone(&self.cancel), Rc::clone(&self.accept), Rc::clone(&self.title)]

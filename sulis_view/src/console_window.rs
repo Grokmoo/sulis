@@ -86,8 +86,7 @@ impl WidgetKind for ConsoleWindow {
         let prompt = Widget::with_theme(Label::empty(), "prompt");
 
         self.input.borrow_mut().set_key_press_callback(Rc::new(|widget, field, key| {
-            let parent = Widget::get_parent(widget);
-            let console = Widget::downcast_kind_mut::<ConsoleWindow>(&parent);
+            let (parent, console) = Widget::parent_mut::<ConsoleWindow>(widget);
             match key {
                 InputAction::ToggleConsole => {
                     Widget::clear_keyboard_focus(widget);
@@ -118,8 +117,7 @@ impl WidgetKind for ConsoleWindow {
             let text = field.text();
             field.clear(widget);
 
-            let parent = Widget::get_parent(widget);
-            let console = Widget::downcast_kind_mut::<ConsoleWindow>(&parent);
+            let (_, console) = Widget::parent_mut::<ConsoleWindow>(widget);
             console.execute_script(text);
         })));
 

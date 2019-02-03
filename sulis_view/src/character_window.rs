@@ -80,7 +80,7 @@ impl WidgetKind for CharacterWindow {
                 Some(entity) => entity,
                 None => return,
             };
-            let window = Widget::downcast_kind_mut::<CharacterWindow>(&widget_ref);
+            let window = Widget::kind_mut::<CharacterWindow>(&widget_ref);
             window.character = Rc::clone(entity);
             widget_ref.borrow_mut().invalidate_children();
         })));
@@ -89,7 +89,10 @@ impl WidgetKind for CharacterWindow {
         title.borrow_mut().state.add_text_arg("name", &self.character.borrow().actor.actor.name);
 
         let close = Widget::with_theme(Button::empty(), "close");
-        close.borrow_mut().state.add_callback(Callback::remove_parent());
+        close.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+            let (parent, _) = Widget::parent::<CharacterWindow>(widget);
+            parent.borrow_mut().mark_for_removal();
+        })));
 
         let char_ref = Rc::clone(&self.character);
         let level_up = Widget::with_theme(Button::empty(), "level_up");
@@ -112,24 +115,21 @@ impl WidgetKind for CharacterWindow {
 
         let char_pane = Widget::with_theme(Button::empty(), "char_pane_button");
         char_pane.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::get_parent(&widget);
-            let window = Widget::downcast_kind_mut::<CharacterWindow>(&parent);
+            let (parent, window) = Widget::parent_mut::<CharacterWindow>(widget);
             window.active_pane = ActivePane::Character;
             parent.borrow_mut().invalidate_children();
         })));
 
         let abilities_pane = Widget::with_theme(Button::empty(), "abilities_pane_button");
         abilities_pane.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::get_parent(&widget);
-            let window = Widget::downcast_kind_mut::<CharacterWindow>(&parent);
+            let (parent, window) = Widget::parent_mut::<CharacterWindow>(widget);
             window.active_pane = ActivePane::Ability;
             parent.borrow_mut().invalidate_children();
         })));
 
         let effects_pane = Widget::with_theme(Button::empty(), "effects_pane_button");
         effects_pane.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::get_parent(&widget);
-            let window = Widget::downcast_kind_mut::<CharacterWindow>(&parent);
+            let (parent, window) = Widget::parent_mut::<CharacterWindow>(widget);
             window.active_pane = ActivePane::Effect;
             parent.borrow_mut().invalidate_children();
         })));

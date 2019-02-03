@@ -86,7 +86,10 @@ impl WidgetKind for WorldMapWindow {
         let bg= Widget::empty("bg");
 
         let close = Widget::with_theme(Button::empty(), "close");
-        close.borrow_mut().state.add_callback(Callback::remove_parent());
+        close.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+            let (parent, _) = Widget::parent::<WorldMapWindow>(widget);
+            parent.borrow_mut().mark_for_removal();
+        })));
 
         let labels = Widget::with_theme(TextArea::empty(), "labels");
 

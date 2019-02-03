@@ -69,7 +69,7 @@ impl WidgetKind for InventoryWindow {
                 None => return,
                 Some(entity) => entity,
             };
-            let window = Widget::downcast_kind_mut::<InventoryWindow>(&widget_ref);
+            let window = Widget::kind_mut::<InventoryWindow>(&widget_ref);
             window.entity = Rc::clone(entity);
             widget_ref.borrow_mut().invalidate_children();
         })));
@@ -77,7 +77,10 @@ impl WidgetKind for InventoryWindow {
         let title = Widget::with_theme(Label::empty(), "title");
 
         let close = Widget::with_theme(Button::empty(), "close");
-        close.borrow_mut().state.add_callback(Callback::remove_parent());
+        close.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
+            let (parent, _) = Widget::parent::<InventoryWindow>(widget);
+            parent.borrow_mut().mark_for_removal();
+        })));
 
         let swap_weapons = Widget::with_theme(Button::empty(), "swap_weapons");
         let entity_ref = Rc::clone(&self.entity);

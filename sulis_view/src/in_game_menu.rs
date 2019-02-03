@@ -45,25 +45,23 @@ impl WidgetKind for InGameMenu {
 
         let back = Widget::with_theme(Button::empty(), "back");
         back.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::get_parent(widget);
+            let (parent, _) = Widget::parent::<InGameMenu>(widget);
             parent.borrow_mut().mark_for_removal();
         })));
 
         let save = Widget::with_theme(Button::empty(), "save");
         save.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::get_parent(widget);
+            let (parent, _) = Widget::parent::<InGameMenu>(widget);
             parent.borrow_mut().mark_for_removal();
 
-            let root = Widget::get_root(widget);
-            let view = Widget::downcast_kind_mut::<RootView>(&root);
-
+            let (_, view) = Widget::parent_mut::<RootView>(&parent);
             view.save();
         })));
         save.borrow_mut().state.set_enabled(!GameState::is_combat_active());
 
         let load = Widget::with_theme(Button::empty(), "load");
         load.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::get_parent(widget);
+            let (parent, _) = Widget::parent::<InGameMenu>(widget);
             parent.borrow_mut().mark_for_removal();
 
             let root = Widget::get_root(widget);

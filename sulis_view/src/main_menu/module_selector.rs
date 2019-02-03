@@ -90,8 +90,7 @@ impl WidgetKind for ModuleSelector {
                 }
 
                 button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                    let parent = Widget::go_up_tree(widget, 4);
-                    let module_selector = Widget::downcast_kind_mut::<ModuleSelector>(&parent);
+                    let (parent, module_selector) = Widget::parent_mut::<ModuleSelector>(widget);
                     module_selector.selected_module = Some(index);
                     parent.borrow_mut().invalidate_children();
                 })));
@@ -103,8 +102,7 @@ impl WidgetKind for ModuleSelector {
 
         play.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
             let module = {
-                let parent = Widget::get_parent(widget);
-                let module_selector = Widget::downcast_kind::<ModuleSelector>(&parent);
+                    let (_, module_selector) = Widget::parent_mut::<ModuleSelector>(widget);
 
                 let index = match module_selector.selected_module {
                     None => return,
@@ -113,8 +111,7 @@ impl WidgetKind for ModuleSelector {
                 module_selector.modules[index].clone()
             };
 
-            let root = Widget::get_root(&widget);
-            let menu = Widget::downcast_kind_mut::<MainMenu>(&root);
+            let (root, menu) = Widget::parent_mut::<MainMenu>(widget);
             let mut active = ActiveResources::read();
             active.campaign = Some(module.dir);
             active.write();

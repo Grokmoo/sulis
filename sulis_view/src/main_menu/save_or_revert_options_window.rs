@@ -48,8 +48,7 @@ impl SaveOrRevertOptionsWindow {
         Config::set(config);
         Config::take_old_config(); // throw away reverted config
 
-        let root = Widget::get_root(widget);
-        let main_menu = Widget::downcast_kind_mut::<MainMenu>(&root);
+        let (_, main_menu) = Widget::parent_mut::<MainMenu>(widget);
         main_menu.recreate_io();
     }
 
@@ -88,15 +87,13 @@ impl WidgetKind for SaveOrRevertOptionsWindow {
         let title = Widget::with_theme(Label::empty(), "title");
         let accept = Widget::with_theme(Button::empty(), "accept");
         accept.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::get_parent(widget);
-            let confirm = Widget::downcast_kind::<SaveOrRevertOptionsWindow>(&parent);
+            let (parent, confirm) = Widget::parent_mut::<SaveOrRevertOptionsWindow>(widget);
             confirm.accept(&parent);
         })));
 
         let revert = Widget::with_theme(Button::empty(), "revert");
         revert.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-            let parent = Widget::get_parent(widget);
-            let confirm = Widget::downcast_kind::<SaveOrRevertOptionsWindow>(&parent);
+            let (parent, confirm) = Widget::parent_mut::<SaveOrRevertOptionsWindow>(widget);
             confirm.revert(&parent);
         })));
 

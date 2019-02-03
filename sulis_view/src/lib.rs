@@ -342,14 +342,12 @@ impl RootView {
 
     pub fn show_menu(&mut self, widget: &Rc<RefCell<Widget>>) {
         let exit_cb = Callback::new(Rc::new(|widget, _| {
-            let root = Widget::get_root(widget);
-            let root_view = Widget::downcast_kind_mut::<RootView>(&root);
+            let (_, root_view) = Widget::parent_mut::<RootView>(widget);
             root_view.next_step = Some(NextGameStep::Exit);
         }));
 
         let menu_cb = Callback::new(Rc::new(|widget, _| {
-            let root = Widget::get_root(widget);
-            let root_view = Widget::downcast_kind_mut::<RootView>(&root);
+            let (_, root_view) = Widget::parent_mut::<RootView>(widget);
             root_view.next_step = Some(NextGameStep::MainMenu);
         }));
 
@@ -360,8 +358,7 @@ impl RootView {
 
     pub fn show_exit(&mut self, widget: &Rc<RefCell<Widget>>) {
         let exit_cb = Callback::new(Rc::new(|widget, _| {
-            let root = Widget::get_root(widget);
-            let view = Widget::downcast_kind_mut::<RootView>(&root);
+            let (_, view) = Widget::parent_mut::<RootView>(widget);
             view.next_step = Some(NextGameStep::Exit);
         }));
 
@@ -494,9 +491,8 @@ impl WidgetKind for RootView {
 
             let formations = Widget::with_theme(Button::empty(), "formations_button");
             formations.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-                let parent = Widget::get_root(&widget);
-                let view = Widget::downcast_kind_mut::<RootView>(&parent);
-                view.toggle_formation_window(&parent);
+                let (root, view) = Widget::parent_mut::<RootView>(widget);
+                view.toggle_formation_window(&root);
             })));
 
             let select_all = Widget::with_theme(Button::empty(), "select_all_button");
@@ -525,8 +521,7 @@ impl WidgetKind for RootView {
 
             let end_turn_button = Widget::with_theme(Button::empty(), "end_turn_button");
             end_turn_button.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-                let root = Widget::get_root(&widget);
-                let view = Widget::downcast_kind_mut::<RootView>(&root);
+                let (_, view) = Widget::parent_mut::<RootView>(widget);
                 view.end_turn();
             })));
             end_turn_button.borrow_mut().state.set_enabled(GameState::is_pc_current());
@@ -544,37 +539,32 @@ impl WidgetKind for RootView {
 
             let inv_button = Widget::with_theme(Button::empty(), "inventory_button");
             inv_button.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-                let parent = Widget::get_root(&widget);
-                let view = Widget::downcast_kind_mut::<RootView>(&parent);
-                view.toggle_inventory_window(&parent);
+                let (root, view) = Widget::parent_mut::<RootView>(widget);
+                view.toggle_inventory_window(&root);
             })));
 
             let cha_button = Widget::with_theme(Button::empty(), "character_button");
             cha_button.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-                let parent = Widget::get_root(&widget);
-                let view = Widget::downcast_kind_mut::<RootView>(&parent);
-                view.toggle_character_window(&parent);
+                let (root, view) = Widget::parent_mut::<RootView>(widget);
+                view.toggle_character_window(&root);
             })));
 
             let map_button = Widget::with_theme(Button::empty(), "map_button");
             map_button.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-                let parent = Widget::get_root(&widget);
-                let view = Widget::downcast_kind_mut::<RootView>(&parent);
-                view.toggle_map_window(&parent);
+                let (root, view) = Widget::parent_mut::<RootView>(widget);
+                view.toggle_map_window(&root);
             })));
 
             let log_button = Widget::with_theme(Button::empty(), "journal_button");
             log_button.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-                let parent = Widget::get_root(&widget);
-                let view = Widget::downcast_kind_mut::<RootView>(&parent);
-                view.toggle_quest_window(&parent);
+                let (root, view) = Widget::parent_mut::<RootView>(widget);
+                view.toggle_quest_window(&root);
             })));
 
             let men_button = Widget::with_theme(Button::empty(), "menu_button");
             men_button.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
-                let parent = Widget::get_root(&widget);
-                let view = Widget::downcast_kind_mut::<RootView>(&parent);
-                view.show_menu(&parent);
+                let (root, view) = Widget::parent_mut::<RootView>(widget);
+                view.show_menu(&root);
             })));
 
             Widget::add_children_to(&navi_pane, vec![end_turn_button, inv_button,
@@ -622,9 +612,8 @@ impl WidgetKind for RootView {
             party[0].borrow_mut().actor.set_disabled(true);
 
             let menu_cb = Callback::new(Rc::new(|widget, _| {
-                let root = Widget::get_root(widget);
-                let root_view = Widget::downcast_kind_mut::<RootView>(&root);
-                root_view.next_step = Some(NextGameStep::MainMenu);
+                let (_, view) = Widget::parent_mut::<RootView>(widget);
+                view.next_step = Some(NextGameStep::MainMenu);
             }));
             let menu = Widget::with_defaults(GameOverWindow::new(menu_cb, String::new()));
             Widget::add_child_to(&widget_ref, menu);

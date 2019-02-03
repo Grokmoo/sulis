@@ -131,7 +131,7 @@ impl WidgetKind for PropPicker {
             let button = Widget::with_theme(Button::empty(), "prop_button");
             button.borrow_mut().state.add_text_arg("name", &prop.id);
             button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let parent = Widget::get_parent(widget);
+                let parent = Widget::direct_parent(widget);
                 let cur_state = widget.borrow_mut().state.is_active();
                 if !cur_state {
                     trace!("Set active prop: {}", widget.borrow().state.text);
@@ -141,8 +141,7 @@ impl WidgetKind for PropPicker {
                     widget.borrow_mut().state.set_active(true);
                 }
 
-                let parent = Widget::go_up_tree(&parent, 2);
-                let prop_picker = Widget::downcast_kind_mut::<PropPicker>(&parent);
+                let (_, prop_picker) = Widget::parent_mut::<PropPicker>(&parent);
                 prop_picker.cur_prop = Some(Rc::clone(&prop));
             })));
 

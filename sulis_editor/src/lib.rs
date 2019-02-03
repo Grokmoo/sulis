@@ -151,7 +151,7 @@ impl WidgetKind for EditorView {
             let new = list_box::Entry::new("New".to_string(),
             Some(Callback::with_widget(Rc::new(move |widget| {
                 area_editor_kind_ref.borrow_mut().clear_area();
-                let parent = Widget::get_parent(widget);
+                let parent = Widget::direct_parent(widget);
                 parent.borrow_mut().mark_for_removal();
             }))));
             entries.push(new);
@@ -164,7 +164,7 @@ impl WidgetKind for EditorView {
                     SaveWindow::new(Rc::clone(&area_editor_kind_ref)));
                 Widget::add_child_to(&root, save_window);
 
-                let parent = Widget::get_parent(widget);
+                let parent = Widget::direct_parent(widget);
                 parent.borrow_mut().mark_for_removal();
             }))));
             entries.push(save);
@@ -176,7 +176,7 @@ impl WidgetKind for EditorView {
                 let load_window = Widget::with_defaults(LoadWindow::new(Rc::clone(&area_editor_kind_ref)));
                 Widget::add_child_to(&root, load_window);
 
-                let parent = Widget::get_parent(widget);
+                let parent = Widget::direct_parent(widget);
                 parent.borrow_mut().mark_for_removal();
             }))));
             entries.push(load);
@@ -190,7 +190,7 @@ impl WidgetKind for EditorView {
                 exit_window.borrow_mut().state.set_modal(true);
                 Widget::add_child_to(&root, exit_window);
 
-                let parent = Widget::get_parent(widget);
+                let parent = Widget::direct_parent(widget);
                 parent.borrow_mut().mark_for_removal();
             }))));
             entries.push(quit);
@@ -282,7 +282,7 @@ impl WidgetKind for EditorView {
                 pickers_ref[index].borrow_mut().invalidate_children();
                 area_editor_ref.borrow_mut().set_editor(picker_kinds_ref[index].clone());
 
-                let parent = Widget::get_parent(widget);
+                let parent = Widget::direct_parent(widget);
                 parent.borrow_mut().mark_for_removal();
             })))));
         }

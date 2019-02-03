@@ -149,12 +149,8 @@ impl WidgetKind for TilePicker {
             let button = Widget::with_theme(Button::with_text(&layer), "layer_button");
             let layer_ref = layer.clone();
             button.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let parent = Widget::go_up_tree(widget, 2);
-
-                {
-                    let tile_picker = Widget::downcast_kind_mut::<TilePicker>(&parent);
-                    tile_picker.cur_layer = Some(layer_ref.clone());
-                }
+                let (parent, tile_picker) = Widget::parent_mut::<TilePicker>(widget);
+                tile_picker.cur_layer = Some(layer_ref.clone());
                 parent.borrow_mut().invalidate_children();
             })));
 
@@ -174,7 +170,7 @@ impl WidgetKind for TilePicker {
             button.borrow_mut().state.add_text_arg("icon", &tile.image_display.full_id());
 
             let cb: Callback = Callback::new(Rc::new(move |widget, _kind| {
-                let parent = Widget::get_parent(widget);
+                let parent = Widget::direct_parent(widget);
                 let cur_state = widget.borrow_mut().state.is_active();
                 if !cur_state {
                     trace!("Set active: {}", widget.borrow().state.text);
@@ -183,8 +179,7 @@ impl WidgetKind for TilePicker {
                     }
                     widget.borrow_mut().state.set_active(true);
 
-                    let parent = Widget::go_up_tree(&parent, 2);
-                    let tile_picker = Widget::downcast_kind_mut::<TilePicker>(&parent);
+                    let (_, tile_picker) = Widget::parent_mut::<TilePicker>(&parent);
                     tile_picker.cur_tile = Some(Rc::clone(&tile));
                 }
             }));

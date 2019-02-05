@@ -19,7 +19,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use sulis_core::ui::{animation_state, Callback, Widget, WidgetKind};
-use sulis_rules::QuickSlot;
+use sulis_module::QuickSlot;
 use sulis_state::{ChangeListener, EntityState, GameState, script::ScriptItemKind};
 use sulis_core::widgets::{Label, Button};
 use crate::{item_button::{clear_quickslot_cb, use_item_cb}, ItemButton};

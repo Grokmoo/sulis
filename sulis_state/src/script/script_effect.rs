@@ -19,7 +19,7 @@ use std::str::FromStr;
 use rlua::{Context, UserData, UserDataMethods};
 
 use sulis_core::util::{ExtInt, Point};
-use sulis_rules::{Attribute, Bonus, BonusKind, BonusList, Damage, DamageKind, bonus::{self, Contingent},
+use sulis_module::{Attribute, Bonus, BonusKind, BonusList, Damage, DamageKind, bonus::{self, Contingent},
     WeaponKind, ArmorKind, Slot, WeaponStyle, ROUND_TIME_MILLIS};
 
 use crate::script::{CallbackData, Result, script_particle_generator, ScriptParticleGenerator,
@@ -146,7 +146,7 @@ fn check_for_bonus(effect: &ScriptAppliedEffect, kind: String) -> bool {
         }, Some(effect) => effect,
     };
 
-    use sulis_rules::bonus::BonusKind::*;
+    use sulis_module::bonus::BonusKind::*;
     let kind = match kind.as_ref() {
         "ability_ap_cost" => AbilityActionPointCost(0),
         "armor" => Armor(0),
@@ -639,7 +639,7 @@ fn add_num_bonus(_lua: Context, effect: &mut ScriptEffect, (name, amount, when):
     let amount_int = amount as i32;
 
     trace!("Adding numeric bonus {} to '{}'", amount, name);
-    use sulis_rules::bonus::BonusKind::*;
+    use sulis_module::bonus::BonusKind::*;
     let kind = match name.as_ref() {
         "ability_ap_cost" => AbilityActionPointCost(amount_int),
         "armor" => Armor(amount_int),

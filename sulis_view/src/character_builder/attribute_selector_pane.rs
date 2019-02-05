@@ -20,9 +20,8 @@ use std::any::Any;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_rules::{Attribute, AttributeList, BonusKind};
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_module::{Class, Module, Race};
+use sulis_module::{Class, Module, Race, Attribute, AttributeList, BonusKind};
 use sulis_core::widgets::{Button, Label, Spinner, TextArea};
 
 use crate::CharacterBuilder;

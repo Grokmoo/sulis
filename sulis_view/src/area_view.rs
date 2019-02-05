@@ -30,9 +30,8 @@ use sulis_core::util::{self, Point};
 use sulis_core::config::Config;
 use sulis_core::resource::{ResourceSet, Sprite};
 use sulis_core::extern_image::ImageBuffer;
-use sulis_rules::DamageKind;
 use sulis_core::widgets::Label;
-use sulis_module::{area::{Layer, Tile}, Module};
+use sulis_module::{area::{Layer, Tile}, Module, DamageKind};
 use sulis_state::{AreaDrawable, AreaState, EntityState, EntityTextureCache, GameState};
 use sulis_state::{area_feedback_text, area_state::PCVisRedraw};
 

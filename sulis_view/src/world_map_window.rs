@@ -20,8 +20,7 @@ use std::cell::RefCell;
 
 use sulis_core::ui::{Callback, Widget, WidgetKind, animation_state};
 use sulis_core::widgets::{Button, TextArea};
-use sulis_rules::Time;
-use sulis_module::Module;
+use sulis_module::{Module, Time};
 use sulis_state::GameState;
 
 pub const NAME: &str = "world_map_window";

@@ -6,7 +6,6 @@ edition = "2018"
 
 [dependencies]
 sulis_core = { path = "../sulis_core" }
-sulis_rules = { path = "../sulis_rules" }
 sulis_module = { path = "../sulis_module" }
 sulis_state = { path = "../sulis_state" }
 

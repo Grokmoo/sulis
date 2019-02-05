@@ -26,9 +26,8 @@ use sulis_core::ui::{Callback, Widget, WidgetKind};
 use sulis_core::resource::write_to_file;
 use sulis_core::util::Point;
 use sulis_core::widgets::{Button, Label, list_box, MutuallyExclusiveListBox, InputField};
-use sulis_rules::AttributeList;
 use sulis_module::{Class, Module, Race, ImageLayer, Faction, Sex, ActorBuilder,
-    InventoryBuilder};
+    InventoryBuilder, AttributeList};
 
 pub const NAME: &str = "actor_creator_window";
 

@@ -17,7 +17,7 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use sulis_rules::{HitKind, HitFlags, DamageKind};
+use sulis_module::{HitKind, HitFlags, DamageKind};
 use crate::{script::ScriptEntitySet, ScriptCallback};
 use crate::{animation::Anim, EntityState, GameState};
 

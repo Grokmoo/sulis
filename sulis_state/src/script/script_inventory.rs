@@ -18,8 +18,7 @@ use std::str::FromStr;
 
 use rlua::{UserData, UserDataMethods};
 
-use sulis_rules::{Slot, QuickSlot, ItemKind};
-use sulis_module::ability::AIData;
+use sulis_module::{Slot, QuickSlot, ItemKind, ability::AIData};
 use crate::GameState;
 use crate::script::*;
 

@@ -23,8 +23,7 @@ use std::cell::{Cell, RefCell};
 use sulis_core::config::Config;
 use sulis_core::util::{self, Point, invalid_data_error, ExtInt};
 use sulis_core::io::{GraphicsRenderer};
-use sulis_rules::{Time};
-use sulis_module::{Actor, Module, ObjectSize, OnTrigger, area::{Trigger, TriggerKind}};
+use sulis_module::{Actor, Module, ObjectSize, OnTrigger, area::{Trigger, TriggerKind}, Time};
 use sulis_module::on_trigger::QuestEntryState;
 
 use crate::{AI, AreaState, ChangeListener, ChangeListenerList, Effect,

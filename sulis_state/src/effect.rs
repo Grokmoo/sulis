@@ -20,7 +20,7 @@ use std::rc::Rc;
 use std::io::Error;
 
 use sulis_core::util::{ExtInt, Point};
-use sulis_rules::{BonusList, ROUND_TIME_MILLIS};
+use sulis_module::{BonusList, ROUND_TIME_MILLIS};
 use crate::script::{CallbackData, script_callback::FuncKind};
 use crate::{ChangeListenerList, save_state::EffectSaveState, EntityState};
 

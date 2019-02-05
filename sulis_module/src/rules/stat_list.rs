@@ -19,9 +19,10 @@ use std::rc::Rc;
 
 use sulis_core::image::Image;
 use sulis_core::util::{ExtInt, gen_rand};
-use crate::{AccuracyKind, Armor, AttributeList, Attack, Damage,
+use crate::{Actor, Module};
+use crate::rules::{AccuracyKind, Armor, AttributeList, Attack, Damage,
     HitKind, WeaponKind, ArmorKind, Slot, WeaponStyle, Resistance};
-use crate::bonus::{AttackBonuses, AttackBuilder, Bonus, BonusKind, BonusList};
+use crate::rules::bonus::{AttackBonuses, AttackBuilder, Bonus, BonusKind, BonusList};
 
 #[derive(Clone)]
 pub struct StatList {
@@ -236,7 +237,7 @@ impl StatList {
 
         // TODO handle add multiple for weapon and attack bonuses
         for bonus in bonuses.iter() {
-            use crate::bonus::Contingent::*;
+            use crate::rules::bonus::Contingent::*;
             match bonus.when {
                 Always => self.add_bonus(&bonus.kind, times),
                 AttackWithWeapon(_) | AttackWhenHidden | AttackWithDamageKind(_) =>
@@ -252,7 +253,7 @@ impl StatList {
         let times_i32 = times as i32;
         let times_f32 = times as f32;
 
-        use crate::bonus::BonusKind::*;
+        use crate::rules::bonus::BonusKind::*;
         match bonus {
             AbilityActionPointCost(amount) => self.bonus_ability_action_point_cost += amount * times_i32,
             Attribute { attribute, amount } => self.attributes.add(*attribute, *amount),
@@ -309,26 +310,18 @@ impl StatList {
         }
     }
 
-    pub fn finalize(&mut self,
-                    attacks: Vec<(&AttackBuilder, WeaponKind)>,
+    pub fn finalize<'a>(&mut self, actor: &'a Actor,
+                    mut attacks: Vec<(&'a AttackBuilder, WeaponKind)>,
                     equipped_armor: HashMap<Slot, ArmorKind>,
                     weapon_style: WeaponStyle,
-                    multiplier: f32,
-                    base_attr: i32,
-                    threatened: bool,
-                    total_level: u32) {
-        let is_melee = if attacks.is_empty() {
-            warn!("Finalized stats with no attacks");
-            false
-        } else {
-            attacks[0].0.is_melee()
-        };
+                    threatened: bool) {
+        let rules = Module::rules();
 
         // clone here to avoid problem with add_bonus needing mutable borrow,
         // even though it would be safe
         let contingent = self.contingent_bonuses.clone();
         for bonus in contingent.iter() {
-            use crate::bonus::Contingent::*;
+            use crate::rules::bonus::Contingent::*;
             match bonus.when {
                 Always | AttackWithWeapon(_) | AttackWhenHidden |
                     AttackWhenFlanking | AttackWithDamageKind(_) => unreachable!(),
@@ -355,6 +348,16 @@ impl StatList {
             }
         }
 
+        let multiplier = if attacks.is_empty() {
+            attacks.push((&actor.race.base_attack, WeaponKind::Simple));
+            1.0
+        } else if attacks.len() > 1 {
+            rules.dual_wield_damage_multiplier
+        } else {
+            1.0
+        };
+        let is_melee = attacks[0].0.is_melee();
+
         let mut attack_range = None;
         for (builder, weapon_kind) in attacks {
             let attack = Attack::new(builder, &self, weapon_kind).mult(multiplier);
@@ -373,7 +376,8 @@ impl StatList {
 
         self.attack_range = attack_range.unwrap_or(0.0);
 
-        use crate::Attribute::*;
+        let base_attr = rules.base_attribute;
+        use crate::rules::Attribute::*;
         let attrs = &self.attributes;
         let str_bonus = attrs.bonus(Strength, base_attr);
         let dex_bonus = attrs.bonus(Dexterity, base_attr);
@@ -389,7 +393,7 @@ impl StatList {
         self.fortitude += end_bonus * 2;
         self.reflex += dex_bonus * 2;
         self.will += wis_bonus * 2;
-        self.max_hp += (total_level as i32 * end_bonus) / 3;
+        self.max_hp += (actor.total_level as i32 * end_bonus) / 3;
 
         let damage_stat_bonus = if is_melee {
             str_bonus
@@ -416,6 +420,16 @@ impl StatList {
         if self.hit_threshold < self.graze_threshold {
             self.graze_threshold = self.hit_threshold;
         }
+
+        self.flanking_angle += rules.base_flanking_angle;
+        self.crit_chance += rules.crit_chance as i32;
+        self.hit_threshold += rules.hit_percentile as i32;
+        self.graze_threshold += rules.graze_percentile as i32;
+        self.graze_multiplier += rules.graze_damage_multiplier;
+        self.hit_multiplier += 1.0;
+        self.crit_multiplier += rules.crit_damage_multiplier;
+        self.movement_rate += actor.race.movement_rate;
+        self.attack_cost += rules.attack_ap as i32;
     }
 }
 

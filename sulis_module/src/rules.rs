@@ -15,12 +15,40 @@
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
 use std::collections::HashMap;
-use std::io::Error;
 use std::cmp::max;
+use std::{str::FromStr, io::{Error, ErrorKind}, fmt};
+
+pub mod armor;
+pub use self::armor::Armor;
+
+pub mod attack;
+pub use self::attack::Attack;
+pub use self::attack::AttackKind;
+pub use self::attack::AccuracyKind;
+
+pub mod attribute;
+pub use self::attribute::Attribute;
+pub use self::attribute::AttributeList;
+
+pub mod bonus;
+pub use self::bonus::Bonus;
+pub use self::bonus::BonusKind;
+pub use self::bonus::BonusList;
+pub use self::bonus::AttackBonuses;
+
+pub mod damage;
+pub use self::damage::Damage;
+pub use self::damage::DamageKind;
+pub use self::damage::DamageList;
+
+pub mod resistance;
+pub use self::resistance::Resistance;
+
+pub mod stat_list;
+pub use self::stat_list::StatList;
 
 use sulis_core::ui::{color, Color};
 use sulis_core::util::{gen_rand, invalid_data_error};
-use sulis_rules::{DamageList, Armor, DamageKind, Resistance, Time, ROUND_TIME_MILLIS};
 use crate::area::LocationKind;
 
 #[derive(Deserialize, Debug)]
@@ -227,5 +255,299 @@ impl Rules {
         let roll = gen_rand(1, 101);
         debug!("Concealment roll: {} against {}", roll, concealment);
         roll > concealment
+    }
+}
+
+pub const ROUND_TIME_MILLIS: u32 = 5000;
+
+#[derive(Deserialize, Serialize, Debug, Copy, Clone, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct Time {
+    #[serde(default)]
+    pub day: u32,
+
+    #[serde(default)]
+    pub hour: u32,
+
+    #[serde(default)]
+    pub round: u32,
+
+    #[serde(default)]
+    pub millis: u32,
+}
+
+impl fmt::Display for Time {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let mut prev = false;
+        if self.day > 0 {
+            write_singular_or_plural(f, prev, self.day, "day")?;
+            prev = true;
+        }
+
+        if self.hour > 0 {
+            write_singular_or_plural(f, prev, self.hour, "hour")?;
+            prev = true;
+        }
+
+        if self.round > 0 {
+            write_singular_or_plural(f, prev, self.round, "round")?;
+            prev = true;
+        }
+
+        if self.millis > 0 {
+            write_singular_or_plural(f, prev, self.millis, "milli")?;
+        }
+
+        Ok(())
+    }
+}
+
+fn write_singular_or_plural(f: &mut fmt::Formatter, prev: bool,
+                            qty: u32, unit: &str) -> fmt::Result {
+    if prev { write!(f, ", ")?; }
+
+    write!(f, "{} {}", qty, unit)?;
+
+    if qty > 1 { write!(f, "s")?; }
+
+    Ok(())
+}
+
+impl Default for Time {
+    fn default() -> Self {
+        Time {
+            day: 0,
+            hour: 0,
+            round: 0,
+            millis: 0,
+        }
+    }
+}
+
+#[derive(Deserialize, Serialize, Debug, Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[serde(deny_unknown_fields)]
+pub enum Slot {
+    Cloak,
+    Head,
+    Torso,
+    Hands,
+    HeldMain,
+    HeldOff,
+    Legs,
+    Feet,
+    Waist,
+    Neck,
+    FingerMain,
+    FingerOff,
+}
+
+impl Slot {
+    pub fn iter() -> ::std::slice::Iter<'static, Slot> {
+        SLOTS_LIST.iter()
+    }
+}
+
+impl FromStr for Slot {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let val = match s {
+            "cloak" => Slot::Cloak,
+            "head" => Slot::Head,
+            "torso" => Slot::Torso,
+            "hands" => Slot::Hands,
+            "held_main" => Slot::HeldMain,
+            "held_off" => Slot::HeldOff,
+            "legs" => Slot::Legs,
+            "feet" => Slot::Feet,
+            "waist" => Slot::Waist,
+            "neck" => Slot::Neck,
+            "finger_main" => Slot::FingerMain,
+            "finger_off" => Slot::FingerOff,
+            _ => {
+                return Err(Error::new(ErrorKind::InvalidInput,
+                                      format!("Unable to parse Slot from '{}'", s)));
+            },
+        };
+
+        Ok(val)
+    }
+}
+
+use self::Slot::*;
+
+// The sort order of this list is important
+const SLOTS_LIST: [Slot; 12] = [Cloak, Feet, Legs, Torso, Hands, Head, HeldMain, HeldOff, Waist,
+                                Neck, FingerMain, FingerOff];
+
+#[derive(Deserialize, Serialize, Debug, Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[serde(deny_unknown_fields)]
+pub enum QuickSlot {
+    AltHeldMain,
+    AltHeldOff,
+    Usable1,
+    Usable2,
+    Usable3,
+    Usable4,
+}
+
+impl QuickSlot {
+    pub fn iter() -> ::std::slice::Iter<'static, QuickSlot> {
+        QUICKSLOTS_LIST.iter()
+    }
+
+    pub fn usable_iter() -> ::std::slice::Iter<'static, QuickSlot> {
+        USABLE_QUICKSLOTS_LIST.iter()
+    }
+}
+
+use self::QuickSlot::*;
+
+const QUICKSLOTS_LIST: [QuickSlot; 6] = [ AltHeldMain, AltHeldOff, Usable1, Usable2, Usable3,
+                                          Usable4];
+
+const USABLE_QUICKSLOTS_LIST: [QuickSlot; 4] = [ Usable1, Usable2, Usable3, Usable4 ];
+
+#[derive(Debug, Deserialize, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum ItemKind {
+    Armor { kind: ArmorKind },
+    Weapon { kind: WeaponKind },
+    Other,
+}
+
+#[derive(Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
+pub struct HitFlags {
+    pub flanking: bool,
+    pub sneak_attack: bool,
+    pub concealment: bool,
+}
+
+impl Default for HitFlags {
+    fn default() -> Self {
+        HitFlags {
+            flanking: false,
+            sneak_attack: false,
+            concealment: false,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
+pub enum HitKind {
+    Miss,
+    Graze,
+    Hit,
+    Crit,
+    Auto,
+}
+
+impl FromStr for HitKind {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let val = match s {
+            "miss" => HitKind::Miss,
+            "graze" => HitKind::Graze,
+            "hit" => HitKind::Hit,
+            "crit" => HitKind::Crit,
+            "auto" => HitKind::Auto,
+            _ => {
+                return Err(Error::new(ErrorKind::InvalidInput,
+                                      format!("Unable to parse HitKind from '{}'", s)));
+            },
+        };
+
+        Ok(val)
+    }
+}
+
+#[derive(Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
+pub enum WeaponStyle {
+    Ranged,
+    TwoHanded,
+    Single,
+    Shielded,
+    DualWielding,
+}
+
+impl FromStr for WeaponStyle {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let val = match s {
+            "ranged" => WeaponStyle::Ranged,
+            "two_handed" => WeaponStyle::TwoHanded,
+            "single" => WeaponStyle::Single,
+            "shielded" => WeaponStyle::Shielded,
+            "dual_wielding" => WeaponStyle::DualWielding,
+            _ => {
+                return Err(Error::new(ErrorKind::InvalidInput,
+                                      format!("Unable to parse WeaponStyle from '{}'", s)));
+            },
+        };
+
+        Ok(val)
+    }
+}
+
+#[derive(Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
+pub enum WeaponKind {
+    Axe,
+    Crossbow,
+    Bow,
+    SmallSword,
+    LargeSword,
+    Hammer,
+    Spear,
+    Mace,
+    Simple,
+}
+
+impl FromStr for WeaponKind {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let val = match s {
+            "axe" => WeaponKind::Axe,
+            "crossbow" => WeaponKind::Crossbow,
+            "bow" => WeaponKind::Bow,
+            "small_sword" => WeaponKind::SmallSword,
+            "large_sword" => WeaponKind::LargeSword,
+            "hammer" => WeaponKind::Hammer,
+            "spear" => WeaponKind::Spear,
+            "mace" => WeaponKind::Mace,
+            "simple" => WeaponKind::Simple,
+            _ => {
+                return Err(Error::new(ErrorKind::InvalidInput,
+                                      format!("Unable to parse WeaponKind from '{}'", s)));
+            },
+        };
+
+        Ok(val)
+    }
+}
+
+#[derive(Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
+pub enum ArmorKind {
+    Light,
+    Medium,
+    Heavy,
+}
+
+impl FromStr for ArmorKind {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let val = match s {
+            "light" => ArmorKind::Light,
+            "medium" => ArmorKind::Medium,
+            "heavy" => ArmorKind::Heavy,
+            _ => {
+                return Err(Error::new(ErrorKind::InvalidInput,
+                                      format!("Unable to parse ArmorKind from '{}'", s)));
+            },
+        };
+
+        Ok(val)
     }
 }

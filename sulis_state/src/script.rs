@@ -92,8 +92,7 @@ use std::sync::{Arc, Mutex};
 use rlua::{self, Function, ToLuaMulti, FromLuaMulti, Lua};
 
 use sulis_core::util::{Point};
-use sulis_rules::{DamageKind, HitKind, QuickSlot};
-use sulis_module::{Ability, Module};
+use sulis_module::{Ability, Module, DamageKind, HitKind, QuickSlot};
 use crate::{ai, EntityState, GameState};
 
 pub type Result<T> = std::result::Result<T, rlua::Error>;

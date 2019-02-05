@@ -164,7 +164,7 @@ pub enum DamageKind {
     Raw,
 }
 
-use crate::DamageKind::*;
+use crate::rules::DamageKind::*;
 
 // This array MUST be in the same order as the ordering on the DamageKind enum
 // This is top to bottom declaration order for derived.
@@ -177,7 +177,7 @@ impl DamageKind {
     }
 
     pub fn index(&self) -> usize {
-        use crate::DamageKind::*;
+        use crate::rules::DamageKind::*;
         match self {
             &Slashing => 0,
             &Piercing => 1,

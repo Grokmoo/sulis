@@ -25,10 +25,10 @@ use chrono::prelude::*;
 use sulis_core::config;
 use sulis_core::resource::write_to_file;
 use sulis_core::util::ExtInt;
-use sulis_core::ui::{Callback, Widget, WidgetKind, WidgetState};
-use sulis_rules::{Attribute, DamageKind, Slot, QuickSlot};
 use sulis_core::widgets::{Button, TextArea, ScrollPane};
-use sulis_module::{ActorBuilder, Module, InventoryBuilder, ItemSaveState, ItemListEntrySaveState};
+use sulis_core::ui::{Callback, Widget, WidgetKind, WidgetState};
+use sulis_module::{Attribute, DamageKind, Slot, QuickSlot, ActorBuilder, Module, InventoryBuilder,
+    ItemSaveState, ItemListEntrySaveState};
 use sulis_state::{ActorState, Effect, GameState, ChangeListener, EntityState};
 
 use crate::CharacterBuilder;

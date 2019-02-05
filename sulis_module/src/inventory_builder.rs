@@ -17,7 +17,7 @@
 use std::rc::Rc;
 use std::collections::HashMap;
 
-use sulis_rules::{Slot, QuickSlot};
+use crate::rules::{Slot, QuickSlot};
 use crate::{Item, Module, Race};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -161,7 +161,7 @@ impl InventoryBuilder {
                 }, Some(item) => item,
             };
 
-            use sulis_rules::QuickSlot::*;
+            use crate::rules::QuickSlot::*;
             match slot {
                 AltHeldMain => {
                     if !equippable_to(&item, &item_save.id, Slot::HeldMain) { return None; }

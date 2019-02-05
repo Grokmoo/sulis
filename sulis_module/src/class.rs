@@ -19,7 +19,7 @@ use std::collections::HashMap;
 use std::io::Error;
 
 use sulis_core::util::{unable_to_create_error, ExtInt};
-use sulis_rules::{AttributeList, BonusList};
+use crate::rules::{AttributeList, BonusList};
 
 use crate::{Ability, AbilityList, InventoryBuilder, Module};
 

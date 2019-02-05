@@ -24,9 +24,8 @@ use sulis_core::image::{Image, LayeredImage};
 use sulis_core::resource::ResourceSet;
 use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
 use sulis_core::util::Point;
-use sulis_rules::Slot;
 use sulis_module::actor::Sex;
-use sulis_module::{ImageLayer, ImageLayerSet, Item, Race};
+use sulis_module::{ImageLayer, ImageLayerSet, Item, Race, Slot};
 use sulis_core::widgets::{Button, InputField, Label, ScrollPane};
 
 use crate::CharacterBuilder;

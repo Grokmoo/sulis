@@ -23,8 +23,8 @@ use std::collections::HashSet;
 
 use sulis_core::util::{self, gen_rand, invalid_data_error, Point};
 use sulis_core::config::Config;
-use sulis_rules::{HitFlags, HitKind, DamageKind, Time};
-use sulis_module::{Actor, Area, LootList, Module, ObjectSize, prop, Prop};
+use sulis_module::{Actor, Area, LootList, Module, ObjectSize, prop, Prop, HitFlags, HitKind,
+    DamageKind, Time};
 use sulis_module::area::{EncounterData, PropData, Transition, TriggerKind};
 use crate::script::AreaTargeter;
 use crate::save_state::{AreaSaveState};

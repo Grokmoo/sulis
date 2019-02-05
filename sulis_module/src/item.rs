@@ -23,7 +23,7 @@ use std::rc::Rc;
 use sulis_core::util::unable_to_create_error;
 use sulis_core::image::Image;
 use sulis_core::resource::{ResourceSet};
-use sulis_rules::{ItemKind, bonus::AttackBuilder, BonusList, Slot};
+use crate::rules::{ItemKind, bonus::AttackBuilder, BonusList, Slot};
 
 use crate::{Actor, ImageLayer, Module, ability::{AIData, Duration}, PrereqList, PrereqListBuilder, ItemAdjective};
 

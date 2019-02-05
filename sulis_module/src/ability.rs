@@ -18,7 +18,7 @@ use std::hash::{Hash, Hasher};
 use std::rc::Rc;
 use std::io::Error;
 
-use sulis_rules::{BonusList, StatList};
+use crate::rules::{BonusList, StatList};
 use sulis_core::image::Image;
 use sulis_core::resource::{ResourceSet};
 use sulis_core::util::{unable_to_create_error};

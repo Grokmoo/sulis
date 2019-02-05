@@ -18,8 +18,7 @@ use std::io::Error;
 use std::rc::Rc;
 
 use sulis_core::util::invalid_data_error;
-use sulis_rules::Time;
-use sulis_module::{LootList, Module};
+use sulis_module::{LootList, Module, Time};
 
 use crate::{ChangeListenerList, ItemList, ItemState, save_state::MerchantSaveState, GameState};
 

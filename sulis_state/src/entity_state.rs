@@ -26,8 +26,8 @@ use sulis_core::config::Config;
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::ui::{color, Color};
 use sulis_core::util::{Point, invalid_data_error};
-use sulis_rules::{DamageKind, HitKind};
-use sulis_module::{actor::Faction, Actor, ObjectSize, ObjectSizeIterator, Module, ai};
+use sulis_module::{actor::Faction, Actor, ObjectSize, ObjectSizeIterator, Module, ai,
+    DamageKind, HitKind};
 use sulis_module::area::{MAX_AREA_SIZE, Transition};
 use crate::{ActorState, AreaState, ChangeListenerList, EntityTextureCache, EntityTextureSlot,
     GameState, Location, PropState, ScriptCallback, TurnManager};

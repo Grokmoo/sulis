@@ -23,7 +23,7 @@ use std::collections::HashMap;
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::image::{LayeredImage, Image};
 use sulis_core::util::{invalid_data_error, ExtInt};
-use sulis_rules::{AccuracyKind, Attack, AttackKind, BonusList, HitKind, StatList, WeaponKind,
+use sulis_module::{AccuracyKind, Attack, AttackKind, BonusList, HitKind, StatList,
     QuickSlot, Slot, ItemKind, DamageKind, HitFlags, WeaponStyle};
 use sulis_module::{Actor, Module, ActorBuilder, Faction, ImageLayer};
 use crate::{AbilityState, ChangeListenerList, Effect, EntityState, GameState, Inventory, ItemState, PStats};
@@ -884,7 +884,6 @@ impl ActorState {
                                                              layers_override);
         self.image = LayeredImage::new(layers, self.actor.hue);
 
-        let rules = Module::rules();
         self.stats.add(&self.actor.race.base_stats);
 
         for &(ref class, level) in self.actor.levels.iter() {
@@ -928,15 +927,6 @@ impl ActorState {
             self.stats.add(&equippable.bonuses);
         }
 
-        let multiplier = if attacks_list.is_empty() {
-            attacks_list.push((&self.actor.race.base_attack, WeaponKind::Simple));
-            1.0
-        } else if attacks_list.len() > 1 {
-            rules.dual_wield_damage_multiplier
-        } else {
-            1.0
-        };
-
         for (_, ref bonuses) in self.effects.iter() {
             self.stats.add(bonuses);
         }
@@ -954,18 +944,7 @@ impl ActorState {
         let weapon_style = self.inventory.weapon_style();
         let is_threatened = self.is_threatened();
 
-        self.stats.finalize(attacks_list, equipped_armor, weapon_style,
-                            multiplier, rules.base_attribute, is_threatened,
-                            self.actor.total_level);
-        self.stats.flanking_angle += rules.base_flanking_angle;
-        self.stats.crit_chance += rules.crit_chance as i32;
-        self.stats.hit_threshold += rules.hit_percentile as i32;
-        self.stats.graze_threshold += rules.graze_percentile as i32;
-        self.stats.graze_multiplier += rules.graze_damage_multiplier;
-        self.stats.hit_multiplier += 1.0;
-        self.stats.crit_multiplier += rules.crit_damage_multiplier;
-        self.stats.movement_rate += self.actor.race.movement_rate;
-        self.stats.attack_cost += rules.attack_ap as i32;
+        self.stats.finalize(&self.actor, attacks_list, equipped_armor, weapon_style, is_threatened);
 
         self.p_stats.recompute_level_up(&self.actor);
 

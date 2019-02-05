@@ -19,8 +19,7 @@ use std::cell::{RefCell, Cell};
 use std::collections::{HashSet, HashMap, VecDeque, vec_deque::Iter};
 
 use sulis_core::util::{gen_rand, Point};
-use sulis_module::{Faction, Module};
-use sulis_rules::{Time, ROUND_TIME_MILLIS};
+use sulis_module::{Faction, Module, Time, ROUND_TIME_MILLIS};
 use crate::script::{CallbackData, FuncKind};
 use crate::{AreaState, ChangeListener, ChangeListenerList, Effect, EntityState, GameState};
 

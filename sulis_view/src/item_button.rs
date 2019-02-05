@@ -21,8 +21,8 @@ use std::cell::RefCell;
 
 use sulis_core::io::event;
 use sulis_core::ui::{Callback, Widget, WidgetKind, WidgetState};
-use sulis_rules::bonus::{AttackBuilder, AttackKindBuilder, Contingent};
-use sulis_rules::{Bonus, BonusList, Armor, DamageKind, QuickSlot, Slot};
+use sulis_module::bonus::{AttackBuilder, AttackKindBuilder, Contingent};
+use sulis_module::{Bonus, BonusList, Armor, DamageKind, QuickSlot, Slot};
 use sulis_module::{ability, Item, item::{format_item_value, format_item_weight}, Module, PrereqList};
 use sulis_state::{EntityState, Script, GameState, ItemState, inventory::has_proficiency};
 use sulis_state::script::ScriptItemKind;
@@ -643,7 +643,7 @@ fn find_index(group: &str, uses_so_far: &mut Vec<String>) -> usize {
 
 fn add_bonus(bonus: &Bonus, state: &mut WidgetState, has_accuracy: &mut bool,
              group_uses_so_far: &mut Vec<String>, damage_index: &mut usize, armor: &mut Armor) {
-    use sulis_rules::BonusKind::*;
+    use sulis_module::BonusKind::*;
     match &bonus.kind {
         Attribute { attribute, amount } => add(state, &attribute.short_name(), amount),
         ActionPoints(amount) => add(state, "bonus_ap", *amount / Module::rules().display_ap as i32),

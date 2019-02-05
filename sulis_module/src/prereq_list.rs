@@ -18,7 +18,7 @@ use std::collections::HashMap;
 use std::rc::Rc;
 use std::io::Error;
 
-use sulis_rules::{Attribute};
+use crate::rules::{Attribute};
 use sulis_core::util::unable_to_create_error;
 
 use crate::{Actor, Module, Race};

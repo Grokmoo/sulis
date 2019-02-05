@@ -14,43 +14,77 @@
 //  You should have received a copy of the GNU General Public License
 //  along with Sulis.  If not, see <http://www.gnu.org/licenses/>
 
-use crate::DamageKind;
+use crate::rules::DamageKind;
 
 #[derive(Deserialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
-pub struct Resistance {
-    kinds: [i32; 8],
+pub struct Armor {
+    base: u32,
+    kinds: [u32; 7],
 }
 
-impl Default for Resistance {
-    fn default() -> Resistance {
-        Resistance {
-            kinds: [0; 8],
+impl Default for Armor {
+    fn default() -> Armor {
+        Armor {
+            base: 0,
+            kinds: [0; 7],
         }
     }
 }
 
-impl Resistance {
+impl Armor {
+    pub fn add_base(&mut self, amount: i32) {
+        if self.base as i32 + amount < 0 {
+            self.base = 0;
+        } else {
+            self.base = (self.base as i32 + amount) as u32;
+        }
+
+        for index in 0..self.kinds.len() {
+            if self.kinds[index] as i32 + amount < 0 {
+                self.kinds[index] = 0;
+            } else {
+                self.kinds[index] = (self.kinds[index] as i32 + amount) as u32;
+            }
+        }
+    }
+
     pub fn add_kind(&mut self, kind: DamageKind, amount: i32) {
         if kind == DamageKind::Raw { return; }
 
         let index = kind.index();
-        self.kinds[index] = self.kinds[index] + amount;
+        if self.kinds[index] as i32 + amount < 0 {
+            self.kinds[index] = 0;
+        } else {
+            self.kinds[index] = (self.kinds[index] as i32 + amount) as u32;
+        }
     }
 
-    /// Returns the amount of damage resistance that this armor value
+    /// Returns the amount of armor that this Armor value
     /// applies to the specified damage kind.
-    pub fn amount(&self, check_kind: DamageKind) -> i32 {
+    pub fn amount(&self, check_kind: DamageKind) -> u32 {
         if check_kind == DamageKind::Raw { return 0; }
 
         return self.kinds[check_kind.index()]
     }
 
+    pub fn base(&self) -> u32 {
+        self.base
+    }
+
     pub fn is_empty(&self) -> bool {
+        if self.base > 0 { return false; }
+
         for val in self.kinds.iter() {
             if *val > 0 { return false; }
         }
 
         true
+    }
+
+    pub fn differs_from_base(&self, kind: DamageKind) -> bool {
+        if kind == DamageKind::Raw { return true; }
+
+        return self.kinds[kind.index()] != self.base
     }
 }

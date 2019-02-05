@@ -19,8 +19,7 @@ use std::rc::Rc;
 
 use sulis_core::ui::{animation_state, Widget};
 use sulis_core::util::Point;
-use sulis_rules::Time;
-use sulis_module::{Faction, Module, ObjectSize, area::ToKind};
+use sulis_module::{Faction, Module, ObjectSize, area::ToKind, Time};
 use sulis_state::{MOVE_TO_THRESHOLD, EntityState, GameState, ScriptCallback, AreaState, PropState};
 use crate::{dialog_window, RootView};
 

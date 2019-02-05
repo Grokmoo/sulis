@@ -25,8 +25,8 @@ use rlua::{self, Context, UserData, UserDataMethods};
 use sulis_core::util::{ExtInt};
 use sulis_core::config::Config;
 use sulis_core::resource::ResourceSet;
-use sulis_rules::{Attribute, AttackKind, DamageKind, Attack, HitKind, HitFlags};
-use sulis_module::{ImageLayer, Faction, Actor, InventoryBuilder};
+use sulis_module::{ImageLayer, Faction, Actor, InventoryBuilder, Attribute, AttackKind,
+    DamageKind, Attack, HitKind, HitFlags};
 use crate::{ActorState, EntityState, GameState, Location, area_feedback_text::ColorKind};
 use crate::{ai, animation::{self}, script::*, MOVE_TO_THRESHOLD};
 

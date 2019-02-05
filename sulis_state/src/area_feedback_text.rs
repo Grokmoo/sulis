@@ -22,7 +22,7 @@ use sulis_core::resource::{ResourceSet, Font};
 use sulis_core::io::GraphicsRenderer;
 use sulis_core::ui::{Color, LineRenderer};
 use sulis_core::util::{self, Point};
-use sulis_rules::DamageKind;
+use sulis_module::DamageKind;
 
 pub struct Params {
     pub font: Rc<Font>,

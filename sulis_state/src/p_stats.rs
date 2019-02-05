@@ -18,8 +18,7 @@ use std::rc::Rc;
 use std::collections::HashMap;
 
 use sulis_core::util::ExtInt;
-use sulis_rules::StatList;
-use sulis_module::{Actor, Module, Faction};
+use sulis_module::{Actor, Module, Faction, StatList};
 
 /// Persistent Stats, that are not computed from the base StatList, are
 /// saved, and may persist between actions

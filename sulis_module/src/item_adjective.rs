@@ -18,7 +18,7 @@ use std::rc::Rc;
 
 use sulis_core::resource::deserialize_image;
 use sulis_core::image::Image;
-use sulis_rules::{BonusList, AttackBonuses};
+use crate::rules::{BonusList, AttackBonuses};
 
 /// An adjective is a modifier that affects the stats of
 /// an item in a given way.  Items can have zero, one, or

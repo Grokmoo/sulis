@@ -49,8 +49,8 @@ use std::cell::RefCell;
 use sulis_core::ui::{Callback, Color, Widget, WidgetKind};
 use sulis_core::widgets::{Button};
 use sulis_module::actor::Sex;
-use sulis_module::{Ability, ActorBuilder, Class, Faction, ImageLayer, InventoryBuilder, Module, Race};
-use sulis_rules::{AttributeList};
+use sulis_module::{Ability, ActorBuilder, Class, Faction, ImageLayer, InventoryBuilder, Module,
+    Race, AttributeList};
 use sulis_state::{EntityState};
 
 use crate::main_menu::CharacterSelector;

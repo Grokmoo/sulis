@@ -21,8 +21,8 @@ use std::u64;
 use std::collections::HashMap;
 
 use sulis_core::util::{Point, ExtInt};
-use sulis_rules::{QuickSlot, Slot, BonusList};
-use sulis_module::{actor::{ActorBuilder, RewardBuilder}, ItemSaveState, ItemListEntrySaveState};
+use sulis_module::{actor::{ActorBuilder, RewardBuilder}, ItemSaveState, ItemListEntrySaveState,
+    QuickSlot, Slot, BonusList};
 
 use crate::{ActorState, effect, Effect, EntityState, Formation, GameState, Location,
     PropState, prop_state::Interactive, MerchantState, WorldMapState, PStats, QuestState,

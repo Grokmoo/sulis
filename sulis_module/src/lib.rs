@@ -98,7 +98,11 @@ pub mod race;
 pub use self::race::Race;
 
 pub mod rules;
-pub use self::rules::Rules;
+pub use self::rules::{Rules, Armor, Attack, AttackKind, AccuracyKind, Attribute, AttributeList,
+    Bonus, BonusKind, BonusList, AttackBonuses, Damage, DamageKind, DamageList, Resistance,
+    StatList, ROUND_TIME_MILLIS, Time, Slot, QuickSlot, ItemKind, HitFlags, HitKind,
+    WeaponStyle, WeaponKind, ArmorKind};
+pub use self::rules::bonus;
 
 use std::collections::HashMap;
 use std::rc::Rc;

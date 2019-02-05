@@ -24,7 +24,7 @@ use sulis_core::image::{Image, LayeredImage};
 use sulis_core::resource::{ResourceSet};
 use sulis_core::ui::{Color};
 use sulis_core::util::{unable_to_create_error};
-use sulis_rules::AttributeList;
+use crate::rules::AttributeList;
 
 use crate::{Ability, AITemplate, Class, Conversation, ImageLayer, ImageLayerSet, InventoryBuilder,
     LootList, Module, Race};

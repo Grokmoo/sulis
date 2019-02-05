@@ -23,7 +23,7 @@ use sulis_core::ui::Color;
 use sulis_core::image::Image;
 use sulis_core::resource::{ResourceSet};
 use sulis_core::util::{gen_rand, unable_to_create_error, Point};
-use sulis_rules::{BonusList, bonus::AttackBuilder, Slot};
+use crate::rules::{BonusList, bonus::AttackBuilder, Slot};
 
 use crate::actor::{Sex};
 

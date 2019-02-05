@@ -21,8 +21,7 @@ use std::cell::{RefCell};
 use rlua::{self, UserData, UserDataMethods};
 
 use sulis_core::config::Config;
-use sulis_rules::{Time};
-use sulis_module::{Module, OnTrigger, Faction};
+use sulis_module::{Module, OnTrigger, Faction, Time};
 use sulis_module::on_trigger::{self, QuestEntryState};
 use crate::{EntityState, ItemState, GameState, animation::Anim, Location, AreaState};
 use crate::script::*;

@@ -21,8 +21,8 @@ use std::collections::HashMap;
 
 use sulis_core::image::Image;
 use sulis_core::util::invalid_data_error;
-use sulis_rules::{StatList, Slot, ItemKind, WeaponStyle, bonus::AttackKindBuilder, QuickSlot};
-use sulis_module::{Actor, ImageLayer, Module, ItemSaveState};
+use sulis_module::{Actor, ImageLayer, Module, ItemSaveState, StatList, Slot, ItemKind,
+    WeaponStyle, bonus::AttackKindBuilder, QuickSlot};
 use crate::{ItemState};
 
 #[derive(Clone)]
@@ -204,7 +204,7 @@ impl Inventory {
     /// false otherwise
     pub fn can_set_quick(&mut self, item_state: &ItemState,
                          slot: QuickSlot, actor: &Rc<Actor>) -> bool {
-        use sulis_rules::QuickSlot::*;
+        use sulis_module::QuickSlot::*;
         match slot {
             Usable1 | Usable2 | Usable3 | Usable4 => {
                 if !item_state.item.meets_prereqs(actor) { return false; }

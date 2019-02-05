@@ -622,14 +622,14 @@ impl GameState {
 
     pub fn add_party_member(entity: Rc<RefCell<EntityState>>, show_portrait: bool) {
         info!("Add party member {}", entity.borrow().actor.actor.id);
+        let mgr = GameState::turn_manager();
+        if !mgr.borrow().is_combat_active() {
+            entity.borrow_mut().actor.init_turn();
+        }
+
         STATE.with(|state| {
             let mut state = state.borrow_mut();
             let state = state.as_mut().unwrap();
-
-            let mgr = GameState::turn_manager();
-            if !mgr.borrow().is_combat_active() {
-                entity.borrow_mut().actor.init_turn();
-            }
 
             entity.borrow_mut().add_to_party(show_portrait);
             state.area_state.borrow_mut().compute_pc_visibility(&entity, 0, 0);

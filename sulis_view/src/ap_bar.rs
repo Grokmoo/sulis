@@ -88,11 +88,11 @@ impl WidgetKind for ApBar {
         widget.borrow_mut().state.set_visible(visible);
 
         let widget_ref = Rc::clone(widget);
+        let player_ref = GameState::player();
         entity.actor.listeners.add(ChangeListener::new(NAME, Box::new(move |_| {
             widget_ref.borrow_mut().invalidate_children();
             let cb = OnTrigger::CheckEndTurn;
-            let pc = GameState::player();
-            GameState::add_ui_callback(vec![cb], &pc, &pc);
+            GameState::add_ui_callback(vec![cb], &player_ref, &player_ref);
         })));
 
         let widget_ref = Rc::clone(widget);

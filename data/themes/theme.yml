@@ -10,6 +10,8 @@ themes:
       status_text:
         from: label
         position: [0, 2]
+      loading_screen:
+        from: loading_screen
       item_window:
         from: game.bonus_text
         border: { top: 1, bottom: 1, left: 1, right: 1 }

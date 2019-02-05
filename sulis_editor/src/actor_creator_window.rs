@@ -132,32 +132,30 @@ impl ActorCreatorWindow {
     }
 
     fn populate_hue_pane(&mut self, pane: &Rc<RefCell<Widget>>) {
-        let title = Widget::with_theme(Label::empty(), "title");
+        let prev = Widget::with_theme(Button::empty(), "prev_button");
+        prev.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
+            let (_, window) = Widget::parent_mut::<ActorCreatorWindow>(widget);
 
-            let prev = Widget::with_theme(Button::empty(), "prev_button");
-            prev.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let (_, window) = Widget::parent_mut::<ActorCreatorWindow>(widget);
+            let mut hue = window.selected_hue;
+            hue -= 0.1;
+            if hue < 0.0 { hue = 0.0; }
+            window.selected_hue = hue;
 
-                let mut hue = window.selected_hue;
-                hue -= 0.1;
-                if hue < 0.0 { hue = 0.0; }
-                window.selected_hue = hue;
+            window.build_preview();
+        })));
 
-                window.build_preview();
-            })));
+        let next = Widget::with_theme(Button::empty(), "next_button");
+        next.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
+            let (_, window) = Widget::parent_mut::<ActorCreatorWindow>(widget);
 
-            let next = Widget::with_theme(Button::empty(), "next_button");
-            next.borrow_mut().state.add_callback(Callback::new(Rc::new(move |widget, _| {
-                let (_, window) = Widget::parent_mut::<ActorCreatorWindow>(widget);
+            let mut hue = window.selected_hue;
+            hue += 0.1;
+            if hue > 1.0 { hue = 1.0; }
+            window.selected_hue = hue;
 
-                let mut hue = window.selected_hue;
-                hue += 0.1;
-                if hue > 1.0 { hue = 1.0; }
-                window.selected_hue = hue;
-
-                window.build_preview();
-            })));
-        Widget::add_children_to(pane, vec![title, prev, next]);
+            window.build_preview();
+        })));
+        Widget::add_children_to(pane, vec![prev, next]);
     }
 
     fn populate_images_pane(&mut self, race: Rc<Race>, pane: &Rc<RefCell<Widget>>) {
@@ -234,8 +232,6 @@ impl WidgetKind for ActorCreatorWindow {
     }
 
     fn on_add(&mut self, widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
-        let title = Widget::with_theme(Label::empty(), "title");
-
         let close = Widget::with_theme(Button::empty(), "close");
         close.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
             let (parent, _) = Widget::parent_mut::<ActorCreatorWindow>(widget);
@@ -250,7 +246,6 @@ impl WidgetKind for ActorCreatorWindow {
         accept.borrow_mut().state.set_enabled(self.selected_race.is_some());
 
         let race_pane = Widget::empty("race_pane");
-        Widget::add_child_to(&race_pane, Widget::with_theme(Label::empty(), "race_title"));
 
         let mut entries: Vec<list_box::Entry<Rc<Race>>> = Vec::new();
         for race in Module::all_races() {
@@ -290,16 +285,14 @@ impl WidgetKind for ActorCreatorWindow {
 
         let id_pane = Widget::empty("id_pane");
         if self.selected_race.is_some() {
-            let id_title = Widget::with_theme(Label::empty(), "title");
             let id_widget = Widget::with_theme(self.id_field.clone(), "id_field");
-            Widget::add_children_to(&id_pane, vec![id_title, id_widget]);
+            Widget::add_child_to(&id_pane, id_widget);
         }
 
         let name_pane = Widget::empty("name_pane");
         if self.selected_race.is_some() {
-            let name_title = Widget::with_theme(Label::empty(), "title");
             let name_widget = Widget::with_theme(self.name_field.clone(), "name_field");
-            Widget::add_children_to(&name_pane, vec![name_title, name_widget]);
+            Widget::add_child_to(&name_pane, name_widget);
         }
 
         let faction_pane = Widget::empty("faction_pane");
@@ -353,7 +346,7 @@ impl WidgetKind for ActorCreatorWindow {
         }
 
         self.build_preview();
-        vec![title, close, accept, race_pane, images_pane, hue_pane, name_pane,
+        vec![close, accept, race_pane, images_pane, hue_pane, name_pane,
             id_pane, faction_pane, sex_pane, levels_pane, self.view_pane.clone()]
     }
 }

@@ -47,8 +47,6 @@ impl WidgetKind for SaveWindow {
     fn as_any_mut(&mut self) -> &mut Any { self }
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
-        let title = Widget::with_theme(Label::empty(), "title");
-
         let close = Widget::with_theme(Button::empty(), "close");
         close.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
             let (parent, _) = Widget::parent::<SaveWindow>(widget);
@@ -224,6 +222,6 @@ impl WidgetKind for SaveWindow {
             Widget::add_child_to(&world_map_box, field);
         } Widget::add_child_to(&content, world_map_box);
 
-        vec![title, close, save, content]
+        vec![close, save, content]
     }
 }

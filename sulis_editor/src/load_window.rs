@@ -23,7 +23,7 @@ use std::cell::RefCell;
 
 use sulis_core::config::Config;
 use sulis_core::ui::{Callback, Widget, WidgetKind};
-use sulis_core::widgets::{Button, Label, list_box, ListBox, ScrollPane};
+use sulis_core::widgets::{Button, list_box, ListBox, ScrollPane};
 
 use crate::AreaEditor;
 
@@ -49,8 +49,6 @@ impl WidgetKind for LoadWindow {
     fn as_any_mut(&mut self) -> &mut Any { self }
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
-        let title = Widget::with_theme(Label::empty(), "title");
-
         let close = Widget::with_theme(Button::empty(), "close");
         close.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
             let (parent, _) = Widget::parent_mut::<LoadWindow>(widget);
@@ -104,7 +102,7 @@ impl WidgetKind for LoadWindow {
         })));
         scrollpane.borrow().add_to_content(areas_list);
 
-        vec![title, close, load, Widget::with_theme(scrollpane, "areas_list")]
+        vec![close, load, Widget::with_theme(scrollpane, "areas_list")]
     }
 }
 

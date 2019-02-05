@@ -402,6 +402,7 @@ themes:
         children:
           title:
             text: "Actor Creator"
+            kind: Label
           accept_button:
             from: button
             size: [16, 6]
@@ -416,6 +417,7 @@ themes:
             children:
               race_title:
                 from: label
+                kind: Label
                 text: "Race"
                 relative:
                   width: Max
@@ -468,6 +470,7 @@ themes:
             children:
               title:
                 from: label
+                kind: Label
                 text: "ID"
                 position: [0, 0]
                 size: [8, 8]
@@ -483,6 +486,7 @@ themes:
             children:
               title:
                 from: label
+                kind: Label
                 text: "Name"
                 position: [0, 0]
                 size: [8, 8]
@@ -546,6 +550,7 @@ themes:
                 size: [8, 8]
               title:
                 from: label
+                kind: Label
                 text: "Hue"
                 position: [10, 0]
                 size: [18, 8]

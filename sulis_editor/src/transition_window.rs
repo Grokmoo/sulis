@@ -62,9 +62,6 @@ impl WidgetKind for TransitionWindow {
         self.top_bar.borrow_mut().state.set_enabled(false);
         let mut widgets: Vec<Rc<RefCell<Widget>>> = Vec::new();
 
-        let title = Widget::with_theme(Label::empty(), "title");
-        widgets.push(title);
-
         let close = Widget::with_theme(Button::empty(), "close");
         close.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
             let (parent, _) = Widget::parent::<TransitionWindow>(widget);

@@ -45,8 +45,6 @@ impl WidgetKind for ShiftTilesWindow {
     fn as_any_mut(&mut self) -> &mut Any { self }
 
     fn on_add(&mut self, _widget: &Rc<RefCell<Widget>>) -> Vec<Rc<RefCell<Widget>>> {
-        let title = Widget::with_theme(Label::empty(), "title");
-
         let close = Widget::with_theme(Button::empty(), "close");
         close.borrow_mut().state.add_callback(Callback::new(Rc::new(|widget, _| {
             let (parent, _) = Widget::parent::<ShiftTilesWindow>(widget);
@@ -74,6 +72,6 @@ impl WidgetKind for ShiftTilesWindow {
             parent.borrow_mut().mark_for_removal();
         })));
 
-        vec![title, close, x_label, y_label, x_spinner_widget, y_spinner_widget, accept]
+        vec![close, x_label, y_label, x_spinner_widget, y_spinner_widget, accept]
     }
 }
